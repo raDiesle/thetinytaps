@@ -79,41 +79,6 @@
   gap: 10px 14px;
 }
 
-.rw-views {
-  display: inline-flex;
-  overflow: hidden;
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 4px 0 var(--ink);
-}
-
-.rw-views button {
-  min-height: 52px;
-  padding: 6px 24px;
-  border: 0;
-  border-left: 2px solid color-mix(in srgb, var(--ink) 25%, transparent);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-size: 1.2rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.rw-views button:first-child {
-  border-left: 0;
-}
-
-.rw-views button.selected {
-  background: var(--sunshine);
-}
-
-.rw-view-emoji {
-  font-family: var(--font-emoji);
-}
-
-.rw-collect-view,
 .rw-period button {
   min-height: 44px;
   padding: 4px 16px;
@@ -124,10 +89,6 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
-}
-
-.rw-collect-view.selected {
-  background: var(--sunshine);
 }
 
 .rw-period {
@@ -189,12 +150,6 @@
     gap: 6px;
   }
 
-  .rw-views {
-    box-shadow: none;
-  }
-
-  .rw-views button,
-  .rw-collect-view,
   .rw-period button,
   .rw-boards button {
     min-height: 36px;
@@ -303,16 +258,6 @@
   width: 100%;
   aspect-ratio: 1.45;
   pointer-events: none;
-}
-
-.rw-thumb-blank {
-  place-items: center;
-  justify-content: center;
-  align-items: center;
-  border: 3px dashed color-mix(in srgb, var(--ink) 40%, transparent);
-  border-radius: 14px;
-  font-family: var(--font-emoji);
-  font-size: 2.6rem;
 }
 
 .rw-tpl-name {
@@ -497,26 +442,7 @@
   background: #fff;
 }
 
-.rw-wizard-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.rw-steps {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rw-steps button,
-.rw-wizard-close,
-.rw-wizard-foot button,
-.rw-wizard-card-buttons button {
+.rw-wizard-foot button {
   border: 3px solid var(--ink);
   border-radius: 999px;
   background: #fff;
@@ -526,97 +452,9 @@
   cursor: pointer;
 }
 
-.rw-steps button {
-  min-height: 40px;
-  padding: 2px 12px 2px 4px;
-}
-
-.rw-steps button.selected {
-  background: var(--sunshine);
-}
-
-.rw-steps button:disabled,
 .rw-wizard-foot button:disabled {
   opacity: 0.35;
   cursor: default;
-}
-
-.rw-step-number {
-  display: inline-grid;
-  place-items: center;
-  width: 1.7em;
-  height: 1.7em;
-  border-radius: 50%;
-  background: var(--ink);
-  color: #fff;
-  font-size: 0.85rem;
-}
-
-.rw-wizard-close {
-  width: 44px;
-  height: 44px;
-  font-size: 1.1rem;
-}
-
-.rw-wizard-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  align-items: start;
-  gap: 18px;
-  flex: 1;
-}
-
-.rw-wizard-body.rw-wizard-wide {
-  grid-template-columns: 1fr;
-}
-
-.rw-wizard-step {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-.rw-wizard-step h2 {
-  margin: 0;
-  font-size: 1.35rem;
-}
-
-.rw-wizard-preview {
-  position: sticky;
-  top: 12px;
-}
-
-.rw-wizard-tasks {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rw-wizard-tasks li {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 10px;
-  border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent);
-  border-radius: 16px;
-}
-
-.rw-wizard-task {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 800;
-}
-
-/* ---------- The wizard's choices: what each one makes, as a picture ---------- */
-
-.rw-wizard-sub {
-  margin: 4px 0 0;
-  font-size: 1.05rem;
 }
 
 .rw-picks {
@@ -625,72 +463,14 @@
   gap: 10px;
 }
 
-/*
- * The first step: both kinds on one page, each an area under its big name; in it every view under its name, with its
- * Vorlagen as big pictures beneath.
- */
-.rw-kind-area {
-  container-type: inline-size;
-  scroll-margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px 16px 16px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--ink) 4%, transparent);
-}
-
-.rw-wizard-step .rw-kind-name {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1.1;
-  text-align: left;
-}
-
-/*
- * The views flow in rows with room for five pictures each (`--rw-tile`), and a view is as wide as its pictures, so the
- * Zeitplan's five fill one row and the Belohnungstafel's eight two rows of four, grown to fill them: no gaps at a
- * row's end, and the pictures as big as the width lets them be.
- */
-.rw-view-groups {
-  --rw-tile: calc((100cqi - 112px) / 5);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 28px;
-}
-
-/* A view and its Vorlagen: the view's name big on top, its pictures below. */
-.rw-view-group {
-  flex: var(--rw-tiles) var(--rw-tiles) calc(var(--rw-tiles) * var(--rw-tile) + (var(--rw-tiles) - 1) * 14px);
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* The view's name on the left, „Leer anfangen“ small on the right, underlined together. */
-.rw-view-head {
-  display: flex;
-  flex-wrap: wrap;
+/* „Belohnung“ among the chart's options: one small switch for the whole chart, on by default. */
+.rw-reward-switch {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px 14px;
-  padding-bottom: 4px;
-  border-bottom: 3px solid var(--ink);
-}
-
-.rw-wizard-step .rw-view-name {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 900;
-  text-align: left;
-}
-
-.rw-view-blank {
-  min-height: 34px;
-  padding: 2px 12px;
-  border: 2px dashed color-mix(in srgb, var(--ink) 55%, transparent);
+  gap: 6px;
+  min-height: 32px;
+  padding: 2px 4px 2px 10px;
+  border: 0;
   border-radius: 999px;
   background: none;
   color: inherit;
@@ -700,266 +480,50 @@
   cursor: pointer;
 }
 
-.rw-view-blank:hover {
+.rw-reward-switch:hover {
   background: color-mix(in srgb, var(--sunshine) 30%, transparent);
 }
 
-/* The pictures at the foot of their view, so a view whose head takes two lines keeps them in line with the row's. */
-.rw-gallery-big {
-  grid-template-columns: repeat(var(--rw-tiles), minmax(0, 1fr));
-  gap: 14px;
-  margin-top: auto;
-}
-
-/*
- * A Vorlage: its name big above the picture, and no frame round it – the sheet has its own (user feedback, October
- * 2026). Picked, it glows yellow round the sheet and behind its name, with a tick in its corner – several can be
- * picked and made at once.
- */
-.rw-gallery-big .rw-tpl {
+.rw-switch-track {
   position: relative;
-  justify-content: flex-end; /* a name on two lines never pushes its picture out of line with the others */
-  gap: 6px;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-
-.rw-gallery-big .rw-tpl:hover,
-.rw-gallery-big .rw-tpl.selected {
-  background: none;
-  box-shadow: none;
-}
-
-.rw-gallery-big .rw-tpl-name {
-  order: -1;
-  align-self: flex-start;
-  padding: 2px 12px;
+  width: 36px;
+  height: 20px;
   border-radius: 999px;
-  font-size: 1.25rem;
+  background: color-mix(in srgb, var(--ink) 25%, transparent);
+  transition: background 0.2s;
 }
 
-.rw-gallery-big .rw-thumb {
-  border-radius: 16px;
-  outline: 6px solid transparent;
-  outline-offset: 2px;
-}
-
-.rw-gallery-big .rw-tpl:hover .rw-thumb {
-  outline-color: color-mix(in srgb, var(--sunshine) 55%, transparent);
-}
-
-.rw-gallery-big .rw-tpl.selected .rw-thumb {
-  outline-color: var(--sunshine);
-}
-
-.rw-gallery-big .rw-tpl.selected .rw-tpl-name {
-  background: var(--sunshine);
-}
-
-.rw-tpl-check {
+.rw-switch-track::after {
+  content: "";
   position: absolute;
-  top: 30px;
-  right: -10px;
-  display: none;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 3px solid var(--ink);
-  border-radius: 50%;
-  background: var(--sunshine);
-  font-size: 1.2rem;
-  font-weight: 900;
-}
-
-.rw-tpl.selected .rw-tpl-check {
-  display: grid;
-}
-
-/* 🔍 on the picture's lower corner, always there (a touch screen has no hover): it opens the Vorlage big. */
-.rw-gallery-big li {
-  position: relative;
-}
-
-.rw-tpl-zoom {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  padding: 0;
-  border: 3px solid var(--ink);
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 3px 0 var(--ink);
-  font-family: var(--font-emoji);
-  font-size: 1.5rem;
-  cursor: zoom-in;
+  box-shadow: 0 1px 2px #0004;
+  transition: translate 0.2s;
 }
 
-.rw-tpl-zoom:hover {
-  background: var(--sunshine);
+.rw-reward-switch[aria-checked="true"] .rw-switch-track {
+  background: #2f9e44;
 }
 
-/* A Vorlage big: the whole screen, its name and „Auswählen“ on top, ‹ › beside the picture, which takes all the rest. */
-.rw-zoom {
-  width: 100vw;
-  max-width: none;
-  height: 100dvh;
-  max-height: none;
-  margin: 0;
-  padding: 12px 16px 16px;
-  border: 0;
-  background: transparent;
-  color: var(--ink);
-  font-family: var(--font-rounded);
+.rw-reward-switch[aria-checked="true"] .rw-switch-track::after {
+  translate: 16px 0;
 }
 
-.rw-zoom[open] {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* A plain colour: a backdrop doesn't see the page's custom properties in every browser. */
-.rw-zoom::backdrop {
-  background: rgb(42 30 92 / 85%);
-}
-
-.rw-zoom-head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  align-self: center;
-  max-width: 100%;
-  padding: 6px 8px 6px 20px;
-  border-radius: 999px;
-  background: var(--cream);
-}
-
-.rw-zoom-name {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 900;
-}
-
-.rw-zoom-head button {
-  min-height: 48px;
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  font-size: 1.1rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.rw-zoom-pick {
-  padding: 0 20px;
-}
-
-.rw-zoom-pick.selected {
-  background: var(--sunshine);
-}
-
-.rw-zoom-close {
-  width: 48px;
-  padding: 0;
-}
-
-.rw-zoom-body {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* The picture as big as both width and height allow at its own shape (the thumbnail's 1.45). */
-.rw-zoom-picture {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  container-type: size;
-  display: grid;
-  place-items: center;
-}
-
-.rw-zoom-picture .rw-thumb {
-  width: min(100cqw, 100cqh * 1.45);
-  height: auto;
-}
-
-.rw-zoom-step {
-  flex: none;
-  width: 64px;
-  height: 64px;
-  padding: 0;
-  border: 3px solid var(--ink);
-  border-radius: 50%;
-  background: var(--cream);
-  color: var(--ink);
-  font: inherit;
-  font-size: 2.2rem;
-  font-weight: 900;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.rw-zoom-step:hover {
-  background: var(--sunshine);
-}
-
-/* How many of a kind are picked, beside its name under „Ansicht“. */
-.rw-kind-count {
-  display: inline-grid;
-  place-items: center;
-  min-width: 1.5em;
-  height: 1.5em;
-  margin-left: 6px;
-  border-radius: 999px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 0.8rem;
-}
-
-/* The kinds under „Ansicht“ show only in the column of steps on a big screen (below). */
-.rw-step-kinds {
-  display: none;
-}
-
-/* What the wizard is for, on every step: between the buttons at the foot, or beside the steps (big screen, phone). */
+/* What the wizard is for, between the buttons at its foot. */
 .rw-wizard-help {
   margin: 0;
   font-size: 0.92rem;
   line-height: 1.35;
 }
 
-.rw-wizard-help-side {
-  display: none;
-}
-
-.rw-wizard-help-foot {
-  flex: 1;
-  align-self: center;
-  max-width: 62em;
-  margin-inline: auto;
-  text-align: center;
-}
-
 /* Picture cards (tasks, rewards, cards of a day): small tiles with a big emoji. */
 .rw-picks-tiles {
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 8px;
-}
-
-/* The colours: the board or plan in each, small. */
-.rw-picks-small {
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 8px;
 }
 
@@ -977,12 +541,6 @@
   font: inherit;
   text-align: center;
   cursor: pointer;
-}
-
-.rw-pick-picture {
-  align-items: stretch;
-  padding: 6px 6px 8px;
-  text-align: left;
 }
 
 .rw-pick:hover:not(:disabled) {
@@ -1011,88 +569,7 @@
   line-height: 1.15;
 }
 
-/* A plan's cards in their order, as in the plan: a row of big cards with ‹ ✕ › under each. */
-.rw-wizard-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rw-wizard-row li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 96px;
-}
-
-.rw-wizard-card {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  width: 100%;
-  aspect-ratio: 1;
-  padding: 6px 4px;
-  border: 3px solid var(--sunshine);
-  border-radius: 16px;
-  background: #fff;
-  text-align: center;
-}
-
-.rw-wizard-card-number {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  display: grid;
-  place-items: center;
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  background: var(--sunshine);
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-.rw-wizard-card-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.rw-wizard-card-buttons {
-  display: flex;
-  gap: 2px;
-}
-
-.rw-wizard-card-buttons button {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border-width: 2px;
-  font-size: 0.85rem;
-}
-
-.rw-wizard-card-buttons button:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.rw-wizard-empty {
-  margin: 0;
-  padding: 14px;
-  border: 3px dashed color-mix(in srgb, var(--ink) 30%, transparent);
-  border-radius: 16px;
-  text-align: center;
-}
-
-/* Stays in sight while a long step scrolls, so „Weiter“ and „So nehmen“ are always one tap away. */
+/* Stays in sight while „Weitere Einstellungen“ scroll, so „✓ Anlegen“ is always one tap away. */
 .rw-wizard-foot {
   position: sticky;
   bottom: 0;
@@ -1107,144 +584,12 @@
 .rw-wizard-foot button {
   min-height: 48px;
   padding: 4px 22px;
-}
-
-.rw-wizard-foot button {
   flex: none;
 }
 
-.rw-wizard-back {
-  margin-right: auto;
-}
-
-/*
- * A big screen: the steps are a column on the left that stays in sight, the kinds (Belohnungstafel, Zeitplan) under
- * „Ansicht“ – where they are chosen – and the help below them; the step takes all the rest of the width.
- */
-@media (min-width: 1400px) and (min-height: 700px) {
-  /*
-   * Three pictures a row, in a grid whose columns the views share (a view spans as many as it has pictures, its
-   * pictures on the same columns, so all are the same size) and fill up holes with a later view: five a row were still
-   * too small on a 1920 screen (user feedback, October 2026).
-   */
-  .rw-view-groups {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-flow: row dense;
-    gap: 20px 24px;
-  }
-
-  .rw-view-group {
-    grid-column: span var(--rw-span);
-  }
-
-  .rw-gallery-big {
-    grid-template-columns: repeat(var(--rw-span), minmax(0, 1fr));
-    gap: 24px;
-  }
-
-  .rw-wizard {
-    position: relative;
-    display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-    gap: 12px 28px;
-    padding: 18px 24px;
-  }
-
-  .rw-wizard-head {
-    position: sticky;
-    top: 12px;
-    grid-row: 1 / 3;
-    flex-direction: column;
-    align-items: stretch;
-    align-self: start;
-    gap: 22px;
-  }
-
-  .rw-steps {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 8px;
-  }
-
-  .rw-steps button {
-    width: 100%;
-    min-height: 50px;
-    padding: 4px 16px 4px 6px;
-    font-size: 1.15rem;
-    text-align: left;
-  }
-
-  .rw-step-kinds {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin: 8px 0 4px 26px;
-    padding: 0;
-    list-style: none;
-  }
-
-  .rw-step-kinds button {
-    width: 100%;
-    min-height: 46px;
-    padding: 4px 14px;
-    border-width: 2px;
-    font-size: 1.1rem;
-    text-align: left;
-  }
-
-  .rw-wizard-help-side {
-    display: block;
-    padding: 12px 14px;
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--sunshine) 16%, transparent);
-    font-size: 1rem;
-    text-align: left;
-  }
-
-  .rw-wizard-help-foot {
-    display: none;
-  }
-
-  .rw-wizard-close {
-    position: absolute;
-    top: 14px;
-    right: 18px;
-    z-index: 3;
-  }
-
-  .rw-wizard-body,
-  .rw-wizard-foot {
-    grid-column: 2;
-  }
-
-  /* Room for the ✕ in the top right corner. */
-  .rw-wizard-step > h2:first-child,
-  .rw-kind-area:first-child .rw-kind-name {
-    padding-right: 52px;
-  }
-
-  /* The first step has no column of steps (they show from the second on): its pictures take the whole width, the help at the foot. */
-  .rw-wizard-start {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .rw-wizard-start .rw-wizard-head {
-    display: contents;
-  }
-
-  .rw-wizard-start .rw-wizard-help-side {
-    display: none;
-  }
-
-  .rw-wizard-start .rw-wizard-help-foot {
-    display: block;
-  }
-
-  .rw-wizard-start :is(.rw-wizard-body, .rw-wizard-foot) {
-    grid-column: 1;
-  }
+.rw-wizard-help {
+  flex: 1;
+  align-self: center;
 }
 
 .rw-wizard-done {
@@ -1252,24 +597,319 @@
   box-shadow: 0 4px 0 var(--ink);
 }
 
-/* A phone on its side: steps as numbers, the preview small beside the step. */
+/* ---------- The chart changed right on it (`ChartEditor`): the wizard and „Gestalten“ alike ---------- */
+
+.rw-chart-editor {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 0;
+}
+
+/*
+ * The options in one quiet row, wrapping where narrow, each only as wide as its words, so the chosen one is plain to
+ * see (user feedback, November 2026: stretched across the page nobody could tell which was on).
+ */
+.rw-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+}
+
+.rw-opt-segments {
+  display: inline-flex;
+  flex: none;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--ink) 55%, transparent);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.rw-opt-segments button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+  padding: 2px 12px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rw-opt-segments button + button {
+  border-left: 2px solid color-mix(in srgb, var(--ink) 25%, transparent);
+}
+
+.rw-opt-segments button:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--sunshine) 25%, transparent);
+}
+
+.rw-opt-segments button[aria-pressed="true"] {
+  background: var(--sunshine);
+  font-weight: 800;
+}
+
+.rw-opt-pic {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.4em;
+  font-family: var(--font-emoji);
+}
+
+.rw-opt-pic .pl-paper-arrow {
+  width: 100%;
+  height: 100%;
+}
+
+.rw-opt-print {
+  font-family: var(--font-emoji);
+  font-size: 0.85em;
+}
+
+.rw-opt-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rw-opt-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.rw-opt-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.rw-opt-counter button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid color-mix(in srgb, var(--ink) 55%, transparent);
+  border-radius: 50%;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rw-opt-counter button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sunshine) 40%, #fff);
+}
+
+.rw-opt-counter button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rw-opt-number {
+  min-width: 1.4em;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rw-swatches {
+  gap: 6px;
+}
+
+.rw-swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.rw-swatch[aria-pressed="true"] {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.rw-opt-name-input {
+  box-sizing: border-box;
+  width: 12em;
+  min-height: 32px;
+  padding: 2px 12px;
+  border: 2px solid color-mix(in srgb, var(--ink) 55%, transparent);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+/* The sheet while it is changed: every place to change a tap, outlined under the mouse (a plan's in planner.css). */
+.rw-editing [data-edit] {
+  cursor: pointer;
+}
+
+.rw-editing [data-edit]:hover {
+  outline: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  outline-offset: 2px;
+}
+
+/* A board's tasks in a row under its heading, each a tap, and ＋ for one more. */
+.rw-edit-tasks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.2cqmin;
+}
+
+.rw-edit-task {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8cqmin;
+  padding: 0.5cqmin 1.8cqmin 0.5cqmin 0.8cqmin;
+  border: max(2px, 0.4cqmin) solid var(--rw-ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: max(13px, 2.6cqmin);
+  font-weight: 700;
+}
+
+.rw-edit-task-pic {
+  font-family: var(--font-emoji);
+  font-size: 1.4em;
+  line-height: 1;
+}
+
+.rw-edit-add {
+  justify-content: center;
+  min-width: 2.6em;
+  padding-inline: 0.8cqmin;
+  border-style: dashed;
+}
+
+.rw-reward-add {
+  padding: 0.6cqmin 1.8cqmin;
+  border: max(2px, 0.4cqmin) dashed var(--rw-ink);
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* „Weitere Einstellungen“: the editor of before, for own words and pictures, the weekdays and what to start over. */
+.rw-more {
+  width: 100%;
+}
+
+.rw-more > summary {
+  padding: 6px 0;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+.rw-more > .settings {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+}
+
+/* A window over the chart for the one thing tapped on it. */
+.rw-edit-dialog {
+  box-sizing: border-box;
+  width: min(880px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 12px 16px 16px;
+  overflow: auto;
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.rw-edit-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rw-edit-dialog::backdrop {
+  background: #0006;
+}
+
+.rw-edit-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rw-edit-dialog-head h3 {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.rw-edit-dialog-pic {
+  font-family: var(--font-emoji);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.rw-edit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.rw-edit-button,
+.rw-edit-close {
+  min-height: 40px;
+  padding: 2px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-edit-close {
+  width: 44px;
+  padding: 0;
+}
+
+.rw-edit-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rw-edit-sub {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* A phone on its side: everything smaller, so the chart keeps the room. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .rw-wizard {
     gap: 8px;
     padding: 8px 10px;
     border-radius: 16px;
-  }
-
-  .rw-step-label {
-    display: none;
-  }
-
-  .rw-steps button.selected .rw-step-label {
-    display: inline;
-  }
-
-  .rw-wizard-step h2 {
-    font-size: 1.1rem;
   }
 
   .rw-wizard-foot button {
@@ -1294,88 +934,19 @@
     font-size: 0.82rem;
   }
 
-  .rw-wizard-row li {
-    width: 76px;
+  /* The options in as few lines as can be: the switch without its word (only read out). */
+  .rw-reward-switch {
+    padding-left: 4px;
+    font-size: 0;
   }
 
-  .rw-kind-area {
-    gap: 6px;
-    padding: 6px 8px 10px;
-    border-radius: 14px;
-  }
-
-  .rw-wizard-step .rw-kind-name {
-    font-size: 1.3rem;
-  }
-
-  .rw-wizard-step .rw-view-name {
-    font-size: 1.15rem;
-  }
-
-  .rw-view-groups {
-    --rw-tile: calc((100cqi - 80px) / 5);
-    gap: 10px 18px;
-  }
-
-  .rw-gallery-big {
-    gap: 10px;
-  }
-
-  .rw-gallery-big .rw-tpl-name {
-    padding: 0 8px;
-    font-size: 0.95rem;
-  }
-
-  .rw-gallery-big .rw-thumb {
-    outline-width: 4px;
-  }
-
-  .rw-tpl-check {
-    top: 22px;
-    width: 30px;
-    height: 30px;
-  }
-
-  /* The help beside the steps' numbers, where the row has room, instead of a row of its own at the foot. */
-  .rw-wizard-head {
-    flex-wrap: wrap;
-  }
-
-  .rw-steps {
-    flex: none;
+  .rw-reward-switch > span:first-child {
+    font-size: 1rem;
   }
 
   .rw-wizard-help {
     font-size: 0.72rem;
     line-height: 1.2;
-  }
-
-  .rw-wizard-help-side {
-    display: block;
-    flex: 1 1 260px;
-  }
-
-  .rw-wizard-help-foot {
-    display: none;
-  }
-}
-
-/* An area too narrow for five pictures a row (a phone held upright): two a row. */
-@container (max-width: 560px) {
-  .rw-view-groups {
-    --rw-tile: calc((100cqi - 30px) / 2);
-  }
-}
-
-/* Too narrow for the step and the picture side by side: the picture goes on top. */
-@media (max-width: 700px) {
-  .rw-wizard-body {
-    grid-template-columns: 1fr;
-  }
-
-  .rw-wizard-preview {
-    order: -1;
-    position: static;
   }
 }
 
@@ -1441,42 +1012,6 @@
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
-  .rw-tpl-zoom {
-    right: 6px;
-    bottom: 6px;
-    width: 38px;
-    height: 38px;
-    border-width: 2px;
-    font-size: 1.1rem;
-  }
-
-  .rw-zoom {
-    padding: 6px 8px 8px;
-  }
-
-  .rw-zoom[open] {
-    gap: 6px;
-  }
-
-  .rw-zoom-name {
-    font-size: 1.1rem;
-  }
-
-  .rw-zoom-head button {
-    min-height: 38px;
-    font-size: 0.95rem;
-  }
-
-  .rw-zoom-close {
-    width: 38px;
-  }
-
-  .rw-zoom-step {
-    width: 44px;
-    height: 44px;
-    font-size: 1.6rem;
-  }
-
   .rw-example-note {
     font-size: 0.72rem;
   }
@@ -1873,31 +1408,6 @@
   stroke-linejoin: round;
 }
 
-/* While a grown-up holds a field, its ring fills (HOLD_MS in BoardScreen). */
-.rw-hold {
-  position: absolute;
-  inset: -8%;
-  width: 116%;
-  height: 116%;
-  rotate: -90deg;
-}
-
-.rw-hold circle {
-  fill: none;
-  stroke: var(--rw-ink);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: rw-hold 0.7s linear forwards;
-}
-
-@keyframes rw-hold {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 .rw-field.fresh .rw-mark {
   animation: rw-land 0.5s ease-out;
 }
@@ -2003,47 +1513,8 @@
   background: var(--rw-main);
 }
 
-/* ---------- A star on its way, „Stern zurück“ and the party ---------- */
+/* ---------- „Stern zurück“ and the party ---------- */
 
-.rw-pending {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  background: #2a1e5c40;
-}
-
-.rw-big-star {
-  padding: 0;
-  border: none;
-  background: none;
-  font-family: var(--font-emoji);
-  font-size: min(42vmin, 280px);
-  line-height: 1;
-  cursor: pointer;
-  animation: rw-call 1.1s ease-in-out infinite;
-}
-
-@keyframes rw-call {
-  50% {
-    scale: 1.12;
-    rotate: 8deg;
-  }
-}
-
-.rw-big-star.fly {
-  animation: rw-fly 0.65s ease-in forwards;
-}
-
-@keyframes rw-fly {
-  to {
-    translate: var(--dx) var(--dy);
-    scale: var(--to);
-  }
-}
-
-.rw-pending-cancel,
 .rw-undo {
   min-height: 44px;
   padding: 4px 16px;
@@ -2055,12 +1526,6 @@
   font-weight: 600;
   box-shadow: 0 4px 0 var(--ink);
   cursor: pointer;
-}
-
-.rw-pending-cancel {
-  position: absolute;
-  top: calc(max(16px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
-  left: max(16px, env(safe-area-inset-left));
 }
 
 .rw-undo {
@@ -2444,37 +1909,15 @@
   background: var(--paper);
 }
 
-:root[data-look="book"] :is(.rw-tpl, .rw-steps button, .rw-wizard-close, .rw-wizard-foot button) {
-  background-color: var(--paper);
-  background-image: var(--paper-grain);
-}
-
-:root[data-look="book"] :is(.rw-tpl, .rw-steps button, .rw-wizard-foot button) {
+:root[data-look="book"] .rw-edit-dialog {
   border-width: 2px;
+  border-radius: 14px;
+  background: var(--paper-grain), var(--paper-mottle), var(--paper);
 }
 
 :root[data-look="book"] .rw-tpl {
   border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
   box-shadow: 0 2px 0 #3d304559;
-}
-
-:root[data-look="book"] :is(.rw-tpl.selected, .rw-step-kinds button.selected, .rw-steps button.selected, .rw-wizard-done) {
-  background-color: color-mix(in srgb, var(--sunshine) 75%, var(--paper));
-}
-
-:root[data-look="book"] .rw-view-head {
-  border-bottom-width: 2px;
-}
-
-/* A big Vorlage keeps no frame in the book either: only the sheet's own, and the yellow glow when picked. */
-:root[data-look="book"] .rw-gallery-big .rw-tpl {
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-
-:root[data-look="book"] .rw-wizard-step .rw-view-name {
-  font-weight: 800;
 }
 
 /* The chart fills the page down to its foot, where the families would stand half hidden behind it: they stay out. */

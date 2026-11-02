@@ -61,7 +61,8 @@ export function Editor({
 }: {
   board: Board;
   onChange: (patch: Partial<Board>) => void;
-  onStartOver: () => void;
+  /** Missing while the board is still being made (the wizard). */
+  onStartOver?: () => void;
   /** Missing when it is the only board. */
   onRemove?: () => void;
 }) {
@@ -526,89 +527,99 @@ export function Editor({
         />
       </SettingsGroup>
 
-      <SettingsGroup
-        title={t({ de: "Neu anfangen", en: "Start over", zh: "重新开始", hi: "फिर से शुरू करें", es: "Empezar de nuevo", ar: "البدء من جديد", ru: "Начать заново" })}
-      >
-        <p className="setting-note">
-          {board.kind === "collect"
-            ? t({
-                de: "Leert den Weg für die nächste Runde. Sterne verschwinden sonst nie – auch nicht nach einem schlechten Tag.",
-                en: "Clears the path for the next round. Otherwise stars never disappear – not even after a bad day.",
-                zh: "清空这条路，开始下一轮。除此之外，星星永远不会消失——哪怕某天过得不顺。",
-                hi: "अगले दौर के लिए रास्ता खाली करता है। वरना सितारे कभी नहीं हटते – बुरे दिन के बाद भी नहीं।",
-                es: "Vacía el camino para la siguiente ronda. Por lo demás, las estrellas nunca desaparecen, ni siquiera tras un mal día.",
-                ar: "يُفرغ الطريق للجولة التالية. وفيما عدا ذلك لا تختفي النجوم أبدًا – ولا حتى بعد يوم سيئ.",
-                ru: "Очищает дорожку для следующего круга. В остальном звёзды никогда не исчезают – даже после плохого дня.",
-              })
-            : t({
-                de: "Nimmt die Sterne dieser Woche weg, z. B. nach dem Ausprobieren. Sterne verschwinden sonst nie – auch nicht nach einem schlechten Tag.",
-                en: "Removes this week’s stars, e.g. after trying it out. Otherwise stars never disappear – not even after a bad day.",
-                zh: "清除本周的星星，例如试用之后。除此之外，星星永远不会消失——哪怕某天过得不顺。",
-                hi: "इस हफ़्ते के सितारे हटाता है, जैसे आज़माने के बाद। वरना सितारे कभी नहीं हटते – बुरे दिन के बाद भी नहीं।",
-                es: "Quita las estrellas de esta semana, p. ej., después de probar. Por lo demás, las estrellas nunca desaparecen, ni siquiera tras un mal día.",
-                ar: "يزيل نجوم هذا الأسبوع، مثلًا بعد التجربة. وفيما عدا ذلك لا تختفي النجوم أبدًا – ولا حتى بعد يوم سيئ.",
-                ru: "Убирает звёзды этой недели, например после пробы. В остальном звёзды никогда не исчезают – даже после плохого дня.",
-              })}
-        </p>
-        <div className="rw-chips">
-          <button
-            type="button"
-            onClick={() =>
-              window.confirm(
-                t({
-                  de: "Alle Sterne dieser Tafel wegnehmen?",
-                  en: "Remove all stars from this chart?",
-                  zh: "清除这张奖励表上的所有星星吗？",
-                  hi: "इस चार्ट के सभी सितारे हटाएँ?",
-                  es: "¿Quitar todas las estrellas de esta tabla?",
-                  ar: "إزالة كل نجوم هذه اللوحة؟",
-                  ru: "Убрать все звёзды из этой таблицы?",
-                }),
-              ) && onStartOver()
-            }
-          >
-            🔄{" "}
-            {t({
-              de: "Sterne wegnehmen und neu anfangen",
-              en: "Remove stars and start over",
-              zh: "清除星星，重新开始",
-              hi: "सितारे हटाकर फिर से शुरू करें",
-              es: "Quitar las estrellas y empezar de nuevo",
-              ar: "إزالة النجوم والبدء من جديد",
-              ru: "Убрать звёзды и начать заново",
-            })}
-          </button>
-          {onRemove && (
+      {onStartOver && (
+        <SettingsGroup
+          title={t({
+            de: "Neu anfangen",
+            en: "Start over",
+            zh: "重新开始",
+            hi: "फिर से शुरू करें",
+            es: "Empezar de nuevo",
+            ar: "البدء من جديد",
+            ru: "Начать заново",
+          })}
+        >
+          <p className="setting-note">
+            {board.kind === "collect"
+              ? t({
+                  de: "Leert den Weg für die nächste Runde. Sterne verschwinden sonst nie – auch nicht nach einem schlechten Tag.",
+                  en: "Clears the path for the next round. Otherwise stars never disappear – not even after a bad day.",
+                  zh: "清空这条路，开始下一轮。除此之外，星星永远不会消失——哪怕某天过得不顺。",
+                  hi: "अगले दौर के लिए रास्ता खाली करता है। वरना सितारे कभी नहीं हटते – बुरे दिन के बाद भी नहीं।",
+                  es: "Vacía el camino para la siguiente ronda. Por lo demás, las estrellas nunca desaparecen, ni siquiera tras un mal día.",
+                  ar: "يُفرغ الطريق للجولة التالية. وفيما عدا ذلك لا تختفي النجوم أبدًا – ولا حتى بعد يوم سيئ.",
+                  ru: "Очищает дорожку для следующего круга. В остальном звёзды никогда не исчезают – даже после плохого дня.",
+                })
+              : t({
+                  de: "Nimmt die Sterne dieser Woche weg, z. B. nach dem Ausprobieren. Sterne verschwinden sonst nie – auch nicht nach einem schlechten Tag.",
+                  en: "Removes this week’s stars, e.g. after trying it out. Otherwise stars never disappear – not even after a bad day.",
+                  zh: "清除本周的星星，例如试用之后。除此之外，星星永远不会消失——哪怕某天过得不顺。",
+                  hi: "इस हफ़्ते के सितारे हटाता है, जैसे आज़माने के बाद। वरना सितारे कभी नहीं हटते – बुरे दिन के बाद भी नहीं।",
+                  es: "Quita las estrellas de esta semana, p. ej., después de probar. Por lo demás, las estrellas nunca desaparecen, ni siquiera tras un mal día.",
+                  ar: "يزيل نجوم هذا الأسبوع، مثلًا بعد التجربة. وفيما عدا ذلك لا تختفي النجوم أبدًا – ولا حتى بعد يوم سيئ.",
+                  ru: "Убирает звёзды этой недели, например после пробы. В остальном звёзды никогда не исчезают – даже после плохого дня.",
+                })}
+          </p>
+          <div className="rw-chips">
             <button
               type="button"
               onClick={() =>
                 window.confirm(
                   t({
-                    de: "Diese Tafel ganz löschen?",
-                    en: "Delete this chart completely?",
-                    zh: "彻底删除这张奖励表吗？",
-                    hi: "यह चार्ट पूरी तरह मिटाएँ?",
-                    es: "¿Borrar esta tabla por completo?",
-                    ar: "حذف هذه اللوحة نهائيًا؟",
-                    ru: "Удалить эту таблицу полностью?",
+                    de: "Alle Sterne dieser Tafel wegnehmen?",
+                    en: "Remove all stars from this chart?",
+                    zh: "清除这张奖励表上的所有星星吗？",
+                    hi: "इस चार्ट के सभी सितारे हटाएँ?",
+                    es: "¿Quitar todas las estrellas de esta tabla?",
+                    ar: "إزالة كل نجوم هذه اللوحة؟",
+                    ru: "Убрать все звёзды из этой таблицы?",
                   }),
-                ) && onRemove()
+                ) && onStartOver()
               }
             >
-              🗑️{" "}
+              🔄{" "}
               {t({
-                de: "Diese Tafel löschen",
-                en: "Delete this chart",
-                zh: "删除这张奖励表",
-                hi: "यह चार्ट मिटाएँ",
-                es: "Borrar esta tabla",
-                ar: "حذف هذه اللوحة",
-                ru: "Удалить эту таблицу",
+                de: "Sterne wegnehmen und neu anfangen",
+                en: "Remove stars and start over",
+                zh: "清除星星，重新开始",
+                hi: "सितारे हटाकर फिर से शुरू करें",
+                es: "Quitar las estrellas y empezar de nuevo",
+                ar: "إزالة النجوم والبدء من جديد",
+                ru: "Убрать звёзды и начать заново",
               })}
             </button>
-          )}
-        </div>
-      </SettingsGroup>
+            {onRemove && (
+              <button
+                type="button"
+                onClick={() =>
+                  window.confirm(
+                    t({
+                      de: "Diese Tafel ganz löschen?",
+                      en: "Delete this chart completely?",
+                      zh: "彻底删除这张奖励表吗？",
+                      hi: "यह चार्ट पूरी तरह मिटाएँ?",
+                      es: "¿Borrar esta tabla por completo?",
+                      ar: "حذف هذه اللوحة نهائيًا؟",
+                      ru: "Удалить эту таблицу полностью?",
+                    }),
+                  ) && onRemove()
+                }
+              >
+                🗑️{" "}
+                {t({
+                  de: "Diese Tafel löschen",
+                  en: "Delete this chart",
+                  zh: "删除这张奖励表",
+                  hi: "यह चार्ट मिटाएँ",
+                  es: "Borrar esta tabla",
+                  ar: "حذف هذه اللوحة",
+                  ru: "Удалить эту таблицу",
+                })}
+              </button>
+            )}
+          </div>
+        </SettingsGroup>
+      )}
     </section>
   );
 }

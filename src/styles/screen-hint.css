@@ -96,6 +96,19 @@
   background: #fff;
 }
 
+/*
+ * „Trotzdem hochkant“ is for a grown-up only: small and plain beside the big buttons, so a child's hand goes elsewhere,
+ * yet still a fair tap for a finger.
+ */
+.screen-hint-button.screen-hint-upright {
+  align-self: center;
+  min-height: 40px;
+  padding: 4px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 3px 0 var(--ink);
+}
+
 .screen-hint-button:active {
   transform: translateY(4px);
   box-shadow: 0 1px 0 var(--ink);

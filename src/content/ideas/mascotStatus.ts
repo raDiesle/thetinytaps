@@ -41,11 +41,6 @@ export interface MascotStatusRow {
 /** Every game of the home menu once, in menu order, then the home page. */
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
-    href: "/belohnungstafel/",
-    note: "Gemini-Bilder mit Tapsi, Mama, Papa und Oma Fuchs; die Ärztin ist ein Bär, Freunde sind Hase und Bär – Fuchs und Bär sind schon beide da.",
-    tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
-  },
-  {
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
@@ -57,6 +52,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/toepfchen/",
     note: "Hier kommt Tapsi her: Gemini-Bilder mit Tapsi, Mama und Papa Fuchs – die Vorlage für alle anderen Füchse (für Bären: buch-baeren.webp).",
     tasks: [{ label: "Tapsi und Familie in allen Bildern", work: "picture", pictures: 126, effort: "L", state: "done" }],
+  },
+  {
+    href: "/belohnungstafel/",
+    note: "Gemini-Bilder mit Tapsi, Mama, Papa und Oma Fuchs; die Ärztin ist ein Bär, Freunde sind Hase und Bär – Fuchs und Bär sind schon beide da.",
+    tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
   },
   {
     href: "/bilder/",

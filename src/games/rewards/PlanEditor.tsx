@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { newId, weekday } from "./board";
-import { ACTIVITIES, DAY_NAMES, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
+import { ACTIVITIES, DAY_NAMES, NOW_WAYS, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
 import { ItemPic } from "./pictures";
-import { joinLastPart, MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, stepsOn, withSame, withSteps } from "./plan";
+import { joinLastPart, type Plan, type PlanStep, stepFromCatalog, stepLimit, stepsOn, withSame, withSteps } from "./plan";
 import { usePlanTitle, useStepLabel } from "./PlanSheet";
 
 /** Steps a plan offers to add: the day's activities first, then the tasks of the Belohnungstafel. */
@@ -12,7 +12,8 @@ const OFFERED = [...ACTIVITIES, ...TASKS];
 
 /**
  * Everything a grown-up can change on a plan: name and heading, every day the same or each weekday its own, the steps
- * of a day (from pictures or their own, in order), when a brushing counts, colours – and starting today over or
+ * of a day (from pictures or their own, in order), when a brushing counts, what a Jetzt – Dann's child moves (a marker
+ * or the card into the „Jetzt“ field), colours – and starting today over or
  * removing the plan.
  */
 export function PlanEditor({
@@ -26,7 +27,8 @@ export function PlanEditor({
   /** The day shown: its weekday is edited first. */
   day: Date;
   onChange: (plan: Plan) => void;
-  onRestartToday: () => void;
+  /** Missing while the plan is still being made (the wizard). */
+  onRestartToday?: () => void;
   /** Missing when it is the only plan. */
   onRemove?: () => void;
 }) {
@@ -47,7 +49,7 @@ export function PlanEditor({
     next.splice(index + by, 0, step);
     setSteps(next);
   };
-  const add = (step: PlanStep) => steps.length < MAX_STEPS && setSteps([...steps, joinLastPart(steps, step)]);
+  const add = (step: PlanStep) => steps.length < stepLimit(steps) && setSteps([...steps, joinLastPart(steps, step)]);
   /** This day's steps on other weekdays too (fresh ids, the ticks of those days are their own anyway). */
   const copyTo = (days: number[]) =>
     onChange({ ...plan, days: plan.days.map((list, i) => (days.includes(i) && i !== editDay ? steps.map((step) => ({ ...step })) : list)) });
@@ -98,6 +100,18 @@ export function PlanEditor({
           <input type="text" value={plan.title} maxLength={40} placeholder={autoTitle} onChange={(e) => onChange({ ...plan, title: e.target.value })} />
         </label>
       </SettingsGroup>
+
+      {plan.view === "day" && (
+        <SettingsGroup title={t({ de: "Was wandert?" })}>
+          <Choice
+            label={t({ de: "Was wandert?" })}
+            value={plan.nowField ? "field" : "marker"}
+            onChange={(value) => onChange({ ...plan, nowField: value === "field" })}
+            options={NOW_WAYS.map((way) => ({ value: way.field ? "field" : "marker", label: `${way.emoji} ${t(way.label)}` }))}
+          />
+          <p className="setting-note">{t((NOW_WAYS.find((way) => way.field === !!plan.nowField) ?? NOW_WAYS[0]).note)}</p>
+        </SettingsGroup>
+      )}
 
       <SettingsGroup title={t({ de: "Schritte", en: "Steps", zh: "步骤", hi: "कदम", es: "Pasos", ar: "الخطوات", ru: "Шаги" })}>
         <Choice
@@ -379,11 +393,11 @@ export function PlanEditor({
           aria-label={t({ de: "Schritt hinzufügen", en: "Add a step", zh: "添加步骤", hi: "कदम जोड़ें", es: "Añadir paso", ar: "إضافة خطوة", ru: "Добавить шаг" })}
         >
           {OFFERED.map((item) => (
-            <button key={item.id} type="button" disabled={steps.length >= MAX_STEPS} onClick={() => add(stepFromCatalog(item.id))}>
+            <button key={item.id} type="button" disabled={steps.length >= stepLimit(steps)} onClick={() => add(stepFromCatalog(item.id))}>
               ＋ <ItemPic item={{ emoji: item.emoji, catalog: item.id }} /> {t(item.label)}
             </button>
           ))}
-          <button type="button" disabled={steps.length >= MAX_STEPS} onClick={() => add({ id: newId(), emoji: "⭐", label: "" })}>
+          <button type="button" disabled={steps.length >= stepLimit(steps)} onClick={() => add({ id: newId(), emoji: "⭐", label: "" })}>
             ＋ {t({ de: "Eigene Karte", en: "Own card", zh: "自定义卡片", hi: "अपना कार्ड", es: "Tarjeta propia", ar: "بطاقة خاصة", ru: "Своя карточка" })}
           </button>
         </div>
@@ -405,27 +419,29 @@ export function PlanEditor({
         </div>
       </SettingsGroup>
 
-      <SettingsGroup title={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}>
-        <div className="rw-chips">
-          <button type="button" disabled={stepsOn(plan, new Date()).length === 0} onClick={onRestartToday}>
-            ↺{" "}
-            {t({
-              de: "Heute noch einmal von vorn",
-              en: "Start today again",
-              zh: "今天从头再来",
-              hi: "आज फिर से शुरू करें",
-              es: "Empezar hoy otra vez",
-              ar: "البدء اليوم من جديد",
-              ru: "Начать сегодня заново",
-            })}
-          </button>
-          {onRemove && (
-            <button type="button" onClick={onRemove}>
-              🗑️ {t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })}
+      {onRestartToday && (
+        <SettingsGroup title={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}>
+          <div className="rw-chips">
+            <button type="button" disabled={stepsOn(plan, new Date()).length === 0} onClick={onRestartToday}>
+              ↺{" "}
+              {t({
+                de: "Heute noch einmal von vorn",
+                en: "Start today again",
+                zh: "今天从头再来",
+                hi: "आज फिर से शुरू करें",
+                es: "Empezar hoy otra vez",
+                ar: "البدء اليوم من جديد",
+                ru: "Начать сегодня заново",
+              })}
             </button>
-          )}
-        </div>
-      </SettingsGroup>
+            {onRemove && (
+              <button type="button" onClick={onRemove}>
+                🗑️ {t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })}
+              </button>
+            )}
+          </div>
+        </SettingsGroup>
+      )}
     </section>
   );
 }

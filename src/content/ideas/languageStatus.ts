@@ -56,11 +56,6 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 /** Every game of the home menu once, in menu order, then the home page. */
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
-    href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): die Ansichten „Ablaufplan“ und „Jetzt – Dann“ mit ihren Hinweisen, der Hinweis zu „Erst – Dann“, „Mein Kita-Tag“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, „N anlegen“ im Assistenten, sein Hilfetext auf jedem Schritt, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx).",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-  },
-  {
     href: "/zaehne/",
     parts: [
       {
@@ -92,6 +87,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. In allen sieben Sprachen aufgenommen (Oktober 2026). Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
     ],
+  },
+  {
+    href: "/belohnungstafel/",
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): der Hinweis zu „Erst – Dann“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx). Neu und nur Deutsch (1. November 2026): die Ansicht „Jetzt – Dann“ mit ihrem Hinweis, „Was wandert?“ mit „Pfeil wandert“ und „Karte wandert“, ihren Druckhinweisen „Nur eine Seite drucken“ / „Karten auch drucken und ausschneiden“ und ihren Hinweisen (catalog.ts, auch beim Drucken und unter „Gestalten“), „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Eine Karte weniger / mehr“ (ChartEditor.tsx) und der Hilfetext des Assistenten (Wizard.tsx). Neu und nur Deutsch (2. November 2026): das Bearbeiten direkt auf der Tafel, gleich im Assistenten und unter „Gestalten“ (ChartEditor.tsx) – „Zeitraum“, „Zähler“, der Schalter „Belohnung“, „Name des Kindes“, „Weitere Einstellungen“, die Fenster einer Karte („Sterne“, „Jeden Tag“ / „Nur Mo“, „Früher“, „Später“, „Entfernen“, „Tauschen gegen“), „Karte dazu“, der Belohnung („Sterne bis zur Belohnung“, „Ohne Belohnung“) und einer Aufgabe, „＋ Belohnung“ (BoardSheet.tsx, PlanSheet.tsx) und der neue Hilfetext (Wizard.tsx).",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
     href: "/bilder/",
@@ -148,8 +148,18 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/gefuehle/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
+    parts: [
+      {
+        label: "Wie geht's dir? und Kindergarten",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "Zu Hause",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
+      },
+    ],
   },
   {
     href: "/abenteuer/",
@@ -169,8 +179,34 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/tiere/",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Neu und nur Deutsch (2. November 2026): die Zeile unter dem Namen im Inhaltsverzeichnis, „Futter, Zuhause und versteckte Tiere“ (games.ts).",
+    parts: [
+      { label: "🐾 Das Spiel", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "⚙️ Einstellungen beim Spielen",
+        languages: { de: "done" },
+        note: "„Was drankommt“ und „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer) gibt es nur auf Deutsch (November 2026); die Namen der ersten drei Spielarten sprechen alle Sprachen.",
+      },
+      {
+        label: "💬 Frage in der Sprechblase",
+        languages: { de: "done" },
+        note: "Neu (November 2026): die Fragen der fünf Spielarten in der Sprechblase für Erwachsene („Wer versteckt sich da?“, „Was esse ich?“ …) gibt es nur auf Deutsch (`TopicBubble.tsx`).",
+      },
+      {
+        label: "🥛 Was gibt uns das Tier?",
+        languages: { de: "done" },
+        note: "Neu (Z-01, November 2026): Frage, Sätze, die Namen von Milch, Ei, Honig, Wolle und vom Schaf und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GIFT_TEXTS` in content.ts); Kuh, Huhn und Biene sprechen schon alle Sprachen.",
+      },
+      {
+        label: "🦋 Was wird aus mir?",
+        languages: { de: "done" },
+        note: "Neu (Z-12, November 2026): Frage, Sätze, die Namen von Raupe, Ei, Samen, Kaulquappe, Schmetterling, Küken, Sonnenblume, Frosch und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GROW_TEXTS` in growth.tsx).",
+      },
+      {
+        label: "📖 Zeile im Inhaltsverzeichnis",
+        languages: { de: "done" },
+        note: "Neu (2. November 2026): die Zeile unter dem Namen im Inhaltsverzeichnis, „Verstecke, Futter, Milch, Zuhause, Wachsen“, gibt es nur auf Deutsch (`blurb` in games.ts).",
+      },
+    ],
   },
   {
     href: "/schatten/",
@@ -188,6 +224,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal und die Schnitzerei „Alltagshelfer & erste Spiele …“ mit „← Ein Blick in Belohnungstafel & Zeitplan lohnt sich.“ (Bookshelf.tsx) und das „i“-Buch „Über Books for Both“ im Regal, das sie und den Text für Suchmaschinen enthält (RoomOptions.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal und die Schnitzerei „Für Groß & Klein, Seite an Seite“ mit „Der erste gemeinsame Schritt ins Digitale …“ und ihrem „mehr …“ (Bookshelf.tsx), das „Über Books for Both“ öffnet, mit ihr und dem Text für Suchmaschinen (RoomOptions.tsx), die Wahl „Spiel verlassen“ (✕ antippen oder gedrückt halten) unter ⏳ (HomeOptions.tsx) und „Zum Beenden auf ✕ tippen.“ unter „Gute Nacht“ (GameShell.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
   },
 ];

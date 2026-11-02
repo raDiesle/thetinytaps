@@ -24,6 +24,7 @@ import { rewardChartIdeas } from "./t-reward-chart";
 import { firstVisitIdeas } from "./v-first-visit";
 import { bookIdeas } from "./d-book";
 import { matchingIdeas } from "./z-matching";
+import { feelingsIdeas } from "./c-feelings";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
@@ -45,6 +46,7 @@ export const IDEA_GROUPS: IdeaGroup[] = [
       adventureIdeas,
       littleAdventuresIdeas,
       matchingIdeas,
+      feelingsIdeas,
       otherGamesIdeas,
     ],
   },

@@ -11,6 +11,8 @@ import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { useCommonSettings } from "@/lib/common";
+import { goBack } from "@/lib/goBack";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
@@ -21,16 +23,16 @@ import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
 import goodNightFiles from "./stimme/**/*.mp3?glob";
 
-/** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
+/** How long ✕ has to be held to leave the game, where grown-ups chose holding (`leave`); the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
 
 /** Esc has to be held, since children press it while typing. */
 const ESC_HOLD_MS = 1000;
 
-/** Leaves the game for its start screen, like holding ✕; the end of a level offers it as „Menü“. */
+/** Leaves the game for the menu before it, like ✕; the end of a level offers it as „Menü“. */
 const LeaveGame = createContext<() => void>(() => {});
 
-/** The way back to the game's start screen, for the „Menü“ button at the end of a level. */
+/** The way back to the menu before the game, for the „Menü“ button at the end of a level. */
 export const useLeaveGame = () => useContext(LeaveGame);
 
 /** One way to play a game, picked on its start screen with a big card. */
@@ -60,16 +62,12 @@ interface GameShellProps {
   mode?: string;
   onMode?: (id: string) => void;
   /**
-   * Plays this mode as soon as the page opens, without the start screen, for a game a grown-up opens in the
-   * moment (the child has to go now). The start screen shows only after leaving the game (✕, Esc, „Menü“).
+   * Plays this mode as soon as the page opens, without a start screen, for a game a grown-up opens in the moment (the
+   * child has to go now) or one with nothing to pick first. Leaving it (✕, Esc, „Menü“) goes back to the page it was
+   * opened from, its category's page (or the shelf): never to a start screen the child didn't see before playing.
    */
   startMode?: string;
-  /**
-   * With `startMode`: a game without a start screen of its own, whose menu is the page before it (a picture of
-   * Lebendige Bilder). Leaving the game (✕, Esc, „Menü“) goes there instead. A game with `startMode` and nothing to
-   * pick (no modes, level or settings) goes back to its category's page (or the shelf) without it: a start screen with
-   * only „Los geht’s!“ is no menu.
-   */
+  /** With `startMode`: the menu before the game when it isn't its category's page (a picture of Lebendige Bilder: `/bilder/`). */
   leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
@@ -83,18 +81,18 @@ interface GameShellProps {
 }
 
 /**
- * Where leaving a game (✕, Esc, „Menü“) goes when it has no start screen worth showing: its `leaveTo`, or `back` (its
- * category's table of contents, or the shelf) for a game that plays at once with nothing to pick before it. None when
- * the start screen comes after playing.
+ * Where leaving a game (✕, Esc, „Menü“) goes when it played at once: the menu seen before it, its `leaveTo` or `back`
+ * (its category's table of contents, or the shelf). None for a game started from its own start screen, which shows
+ * again.
  */
-export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo" | "modes" | "level" | "settings">, back: string) {
-  return game.leaveTo ?? (game.startMode && !game.modes && !game.level && !game.settings ? back : undefined);
+export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo">, back: string) {
+  return game.leaveTo ?? (game.startMode ? back : undefined);
 }
 
 /**
  * Wraps a game with a parent start screen (pick the way to play, options),
- * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
- * button, or holding Esc.
+ * fullscreen (kept after the game) + keyboard lock while playing, and the exit: the corner's ✕ (a tap, or held where
+ * grown-ups chose so), or holding Esc – children press Esc while typing, so it is always held.
  */
 export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, level, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
@@ -109,7 +107,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
     (category
       ? t(category.title)
       : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
-  const menu = menuAfterPlay({ startMode, leaveTo, modes, level, settings }, back);
+  const menu = menuAfterPlay({ startMode, leaveTo }, back);
   const [playing, setPlaying] = useState(false);
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -147,8 +145,9 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
     exitKidMode();
     const leave = () => {
       setPlaying(false);
-      if (returnTo) navigate(returnTo, { replace: true });
-      else if (menu) navigate(menu, { replace: true });
+      // Back in the history too, so the phone's back button doesn't open the game again (goBack.ts).
+      if (returnTo) goBack(navigate, returnTo);
+      else if (menu) goBack(navigate, menu);
     };
     // In the book look the page turns back from the game to its menu: as many pages as lie between them, or the book
     // closes and goes back on the shelf.
@@ -197,7 +196,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
     started.current = true;
     if (startMode) onMode?.(startMode);
     // Play time is over: no start screen to wait on, so back to the menu, which the lock covers.
-    if (menu && !returnTo && isPlaytimeOver()) navigate(menu, { replace: true });
+    if (menu && !returnTo && isPlaytimeOver()) goBack(navigate, menu);
     else void start();
   }, []);
 
@@ -400,6 +399,7 @@ export const GOOD_NIGHT: Localized = {
 function GoodNight() {
   const t = useT();
   const language = useAppLanguage();
+  const [{ leave }] = useCommonSettings();
   useEffect(() => {
     playLullaby();
     const timer = setTimeout(() => goodNightVoice.say(GOOD_NIGHT[language.id] ?? GOOD_NIGHT.de, language.id), 1200);
@@ -425,16 +425,19 @@ function GoodNight() {
       <p className="good-night-text">
         {t({ de: "Gute Nacht!", ru: "Спокойной ночи!", en: "Good night!", zh: "晚安！", hi: "शुभ रात्रि!", es: "¡Buenas noches!", ar: "ليلة سعيدة!" })}
       </p>
+      {/* No side named: the ✕ is top right, in the book look the page's corner top left. */}
       <p className="good-night-hint">
-        {t({
-          de: "Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts gedrückt halten.",
-          ru: "Время игры закончилось. Чтобы выйти, удерживайте ✕ справа вверху.",
-          en: "Play time is over. To leave, hold ✕ at the top right.",
-          zh: "游戏时间结束了。按住右上角的 ✕ 即可退出。",
-          hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ऊपर दाईं ओर ✕ दबाए रखें।",
-          es: "Se acabó el tiempo de juego. Para salir, mantenga pulsada la ✕ arriba a la derecha.",
-          ar: "انتهى وقت اللعب. للخروج اضغطوا مطولًا على ✕ في الأعلى يمينًا.",
-        })}
+        {leave === "hold"
+          ? t({
+              de: "Die Spielzeit ist vorbei. Zum Beenden ✕ gedrückt halten.",
+              ru: "Время игры закончилось. Чтобы выйти, удерживайте ✕.",
+              en: "Play time is over. To leave, hold ✕.",
+              zh: "游戏时间结束了。按住 ✕ 即可退出。",
+              hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ✕ दबाए रखें।",
+              es: "Se acabó el tiempo de juego. Para salir, mantenga pulsada la ✕.",
+              ar: "انتهى وقت اللعب. للخروج اضغطوا مطولًا على ✕.",
+            })
+          : t({ de: "Die Spielzeit ist vorbei. Zum Beenden auf ✕ tippen." })}
       </p>
     </div>
   );
@@ -455,31 +458,71 @@ const STARS: [number, number, number][] = [
 ];
 
 /**
- * The ✕ in the corner (in the book look the page's turned-up corner): it has to be held for half a second while the
- * ring fills (the corner lifts); letting go earlier keeps playing. A short note next to it says what
- * it does while it is held (or a mouse is over it) – never by itself when a game starts.
+ * The ✕ in the corner (in the book look the page's turned-up corner): one tap leaves the game, or – where grown-ups chose
+ * holding (`leave`, under ⏳ on the home page) – it has to be held for half a second while the ring fills (the corner
+ * lifts), and letting go earlier keeps playing. No note beside it says what it does: grown-ups know ✕ and the corner
+ * (user feedback, November 2026); its name is only read out.
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
+  const [{ leave }] = useCommonSettings();
+  return leave === "hold" ? <HoldExit onExit={onExit} label={label} /> : <TapExit onExit={onExit} label={label} />;
+}
+
+/** The ✕ left with one tap. */
+function TapExit({ onExit, label }: { onExit: () => void; label: string }) {
+  return (
+    <ExitCorner>
+      <button
+        type="button"
+        className="hold-exit"
+        aria-label={label}
+        // Keeps the game from reacting to the tap on the button.
+        onPointerDown={(e) => e.stopPropagation()}
+        onContextMenu={(e) => e.preventDefault()}
+        // A click, not pointer down: leaving on the way down would let the lifted finger tap the menu.
+        onClick={onExit}
+      >
+        <ExitSign />
+      </button>
+    </ExitCorner>
+  );
+}
+
+/** The ✕ that has to be held. */
+function HoldExit({ onExit, label }: { onExit: () => void; label: string }) {
   const t = useT();
   const { holding, props } = useHold(onExit, EXIT_DELAY_MS);
-
   return (
-    <div className={`exit-corner${holding ? " hinted" : ""}`} data-tap-keep>
-      <span className="exit-hint" aria-hidden>
-        {label} · {t({ de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })}
-      </span>
-      {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
-      <FullscreenButton className="play-fullscreen" playing />
+    <ExitCorner>
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}
         aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })})`}
         {...props}
       >
-        {/* In the book look the page's turned-up corner instead (`book.css`), lifting further while held. */}
-        <span className="hold-exit-sign">✕</span>
-        <PageCornerArt sign="close" />
+        <ExitSign />
       </button>
+    </ExitCorner>
+  );
+}
+
+/** The corner the ✕ sits in, with the fullscreen button. */
+function ExitCorner({ children }: { children: ReactNode }) {
+  return (
+    <div className="exit-corner" data-tap-keep>
+      {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
+      <FullscreenButton className="play-fullscreen" playing />
+      {children}
     </div>
+  );
+}
+
+/** The ✕, or in the book look the page's turned-up corner instead (`book.css`), lifting further while held. */
+function ExitSign() {
+  return (
+    <>
+      <span className="hold-exit-sign">✕</span>
+      <PageCornerArt sign="close" />
+    </>
   );
 }

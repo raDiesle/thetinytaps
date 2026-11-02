@@ -6,7 +6,9 @@
 // that they are still in that file.
 
 import { de } from "@/content/de";
-import { ANIMALS, ANIMAL_TEXTS } from "@/games/animals/content";
+import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, GIVERS } from "@/games/animals/content";
+import { GIFTS } from "@/games/animals/gifts";
+import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
 import { HOMES } from "@/games/animals/homes";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
 import { FILMS } from "@/games/elevator/film/films";
@@ -175,11 +177,25 @@ function animals(): VoiceGroup[] {
     { label: "Füttern: Hunger", lines: once(fed.map(texts.hungry)), built: "Satz mit dem Tier" },
     { label: "Füttern: richtig", lines: once(fed.map((a) => texts.yummy(a, a.food!))), built: "Satz mit Tier und Futter" },
     { label: "Füttern: falsch", lines: once(fed.map(texts.yuck)), built: "Satz mit dem Tier" },
+    { label: "Was gibt uns das Tier?: Frage", lines: once(GIVERS.map(GIFT_TEXTS.de.whatGives)), built: "Satz mit dem Tier" },
+    { label: "Was gibt uns das Tier?: richtig", lines: once(GIVERS.map((a) => GIFT_TEXTS.de.gives(a, GIFTS[a.gives!]))), built: "Satz mit Tier und Gabe" },
+    {
+      label: "Was gibt uns das Tier?: falsch, von wem es kommt",
+      lines: once(GIVERS.map((a) => GIFT_TEXTS.de.comesFrom(GIFTS[a.gives!], a))),
+      built: "Satz mit der Gabe und dem Tier, von dem sie kommt",
+    },
+    { label: "Was wird aus mir?: Frage", lines: once(GROWTHS.map(GROW_TEXTS.de!.whatBecomes)), built: "Satz mit dem Kleinen" },
+    { label: "Was wird aus mir?: richtig", lines: once(GROWTHS.map(GROW_TEXTS.de!.becomes)), built: "Satz mit dem Kleinen und was daraus wird" },
+    {
+      label: "Was wird aus mir?: falsch, woraus es kommt",
+      lines: once(GROWTHS.map(GROW_TEXTS.de!.comesFrom)),
+      built: "Satz mit dem Großen und woraus es kommt",
+    },
     { label: "Zuhause: Frage", lines: once(housed.map(texts.whereLives)), built: "Satz mit dem Tier" },
     { label: "Zuhause: richtig", lines: once(housed.map((a) => texts.movedIn(a, HOMES[a.home!]))), built: "Satz mit Tier und Zuhause" },
     { label: "Zuhause: falsch, wer da wohnt", lines: once(residents.map(texts.livesHere)), built: "Satz mit dem Tier, das dort wohnt" },
     {
-      label: "Wer schaut da raus? (dritte Karte)",
+      label: "Wer schaut da raus?",
       lines: once([SHADOW_TEXTS.de.peek, ...PEEK_ITEMS.map(SHADOW_TEXTS.de.there), ...PEEK_ITEMS.map(SHADOW_TEXTS.de.thatIs)]),
     },
   ];

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, type ShelfRect, TAKE_OUT } from "./shelfLayout";
 
 /** The home page's places: the everyday helpers' books with the words carved beside them, then three picture books. */
@@ -81,5 +82,19 @@ describe("the bookshelf", () => {
       [1250, 640],
     ])
       expect(planShelf(width, height, BOOKS).cells.flatMap((c) => (c.books ? [c.books.length] : []))).toEqual([2, 2]);
+  });
+
+  // Spread over a wide board, the books stood with big empty room between them and looked lost on a big monitor (user
+  // feedback, November 2026): they stand together in the middle, BOOK_GAP apart, and books spine out fill the ends.
+  test("the books of a board stand together in the middle, not spread over it", () => {
+    const css = readFileSync(new URL("../styles/bookshelf.css", import.meta.url), "utf8");
+    const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+    expect(rule(".shelf-row")).toContain("justify-content: center");
+    expect(rule(".shelf-row")).toContain("gap: calc(var(--bh) * var(--gap))");
+    expect(rule(".shelf-end")).toContain("flex: 1 1 0");
+    for (const place of [".shelf-row > .shelf-book", ".shelf-daily-row"]) {
+      expect(rule(place)).toContain("transform");
+      expect(rule(place)).not.toContain("auto");
+    }
   });
 });

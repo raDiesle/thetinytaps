@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PicturePromptReview } from "@/components/PicturePromptReview";
+import { PictureQueue } from "@/components/PictureQueue";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
@@ -73,6 +74,7 @@ const CONTENTS: { id: string; label: string }[] = [
   { id: "maskottchen", label: "🦊🐻 Fuchs & Bär" },
   { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
+  { id: "offene-bilder", label: "🖼️ Offene Bilder" },
   { id: "bilder", label: "🎨 Bildvorschläge" },
   { id: "ideas-list", label: "💡 Alle Ideen" },
 ];
@@ -209,6 +211,8 @@ export function ManagementPage() {
           <ResearchPanel key={research.id} research={research} open={i === 0} onShow={showIdea} />
         ))}
       </section>
+
+      <PictureQueue />
 
       <PicturePromptReview />
 

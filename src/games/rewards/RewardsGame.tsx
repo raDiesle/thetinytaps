@@ -8,27 +8,16 @@ import { useGameSettings } from "@/lib/common";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { takeFinishedStep } from "@/lib/routine";
 import { useStoredSettings } from "@/lib/storage";
-import { addStar, type Board, isTemplateTitle, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
+import { type Board, isTemplateTitle, parseCellKey, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
 import { Certificate, CERTIFICATE } from "./Certificate";
-import {
-  type BoardKind,
-  type ChartType,
-  KINDS,
-  MARK_BY_ID,
-  PLAN_TEMPLATES,
-  PLAN_VIEWS,
-  type PlanTemplate,
-  type PlanView,
-  type Template,
-  TEMPLATES,
-} from "./catalog";
+import { type BoardKind, type ChartType, MARK_BY_ID, PLAN_TEMPLATES, type PlanTemplate, type Template, TEMPLATES } from "./catalog";
 import { Editor } from "./Editor";
 import { TemplateGallery } from "./Gallery";
 import { loadLinkedDays } from "./linked";
-import { PanelButton, PRINT, useComputer, VIEW } from "./pageParts";
-import { type Plan, parseRoutineStep, restartDay } from "./plan";
+import { PanelButton, PRINT, useComputer } from "./pageParts";
+import { counting, fromOlder, type Plan, parseRoutineStep, restartDay, starsOf, stepsOn } from "./plan";
 import { PlanEditor } from "./PlanEditor";
 import { PlanGallery } from "./PlanGallery";
 import { PlanPrint } from "./PlanPrint";
@@ -37,7 +26,8 @@ import { TODAY, usePlanTitle } from "./PlanSheet";
 import { PLANNER_SETTINGS_KEY, plannerDefaults } from "./planSettings";
 import { PrintPanel } from "./PrintPanel";
 import { EARLIER, LATER, REVIEW, Review, usePeriodLabel, YESTERDAY } from "./Review";
-import { CHARTS_KEY, type ChartsSettings, NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
+import { NO_STARS, pageStart, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
+import { ChartEditor } from "./ChartEditor";
 import { type Draft, Wizard, type WizardStart } from "./Wizard";
 import "./rewards.css";
 import "./planner.css";
@@ -58,11 +48,7 @@ const DESIGN: Localized = { de: "Gestalten", en: "Design", zh: "设计", hi: "�
 /** „🧩 Vorlagen“: beside the chart, and the button where there is no room for it. */
 const TEMPLATES_LABEL: Localized = { de: "Vorlagen", en: "Templates", zh: "模板", hi: "टेम्पलेट", es: "Plantillas", ar: "القوالب", ru: "Шаблоны" };
 
-type Panel = "edit" | "print" | "review" | "certificate";
-
-/** The main views of a board: the same stars for a day, a week or a month. Collecting stands apart in the switch. */
-const MAIN_KINDS = KINDS.filter((k) => k.id !== "collect");
-const COLLECT_KIND = KINDS.find((k) => k.id === "collect");
+type Panel = "print" | "review" | "certificate";
 
 /** How far a plan's day view goes back and ahead: a week either way. */
 const DAYS_BACK = 7;
@@ -89,24 +75,31 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const [stored, setStored] = useStoredSettings(REWARDS_STARS_KEY, { log: NO_STARS });
   const [boards, updateBoards] = useGameSettings(REWARDS_SETTINGS_KEY, rewardsDefaults(stored.log));
   const [plans, updatePlans] = useGameSettings(PLANNER_SETTINGS_KEY, plannerDefaults(stored.log));
-  const [page, updatePage] = useStoredSettings<ChartsSettings>(CHARTS_KEY, {});
   const [linked] = useState(loadLinkedDays);
   const [panel, setPanel] = useState<Panel | null>(null);
   const [wizardState, setWizard] = useState<WizardState>(null);
+  /** „Gestalten“: the chart changed right on it, with the wizard's own editor. */
+  const [designing, setDesigning] = useState(false);
   /** Weeks (days, months) back from the current one on a board, days from today on a plan; 0 is now. */
   const [back, setBack] = useState(0);
   const boardTitle = useBoardTitle();
   const planTitle = usePlanTitle();
 
-  // `/tagesplan/` always opens on a plan; the home card's address on what was shown last.
-  const [wanted, setType] = useState<ChartType>(() => (routeType === "plan" ? "plan" : (page.shown ?? routeType)));
+  // Each address opens its own kind, as each has its own book on the shelf: `/tagesplan/` a plan, `/belohnungstafel/` a board.
+  const [wanted, setType] = useState<ChartType>(routeType);
   const board: Board | undefined = boards.boards.find((b) => b.id === boards.current) ?? boards.boards[0];
-  const plan: Plan | undefined = plans.plans.find((p) => p.id === plans.current) ?? plans.plans[0];
+  // Plans as an older version saved them read as today's (its two-card „Jetzt – Dann“ view).
+  const allPlans = plans.plans.map(fromOlder);
+  const currentPlan: Plan | undefined = allPlans.find((p) => p.id === plans.current) ?? allPlans[0];
+  // A plan whose cards count stars is a Belohnungstafel too: the Belohnungstafel's book opens on it where no board is made.
+  const rewardPlan = currentPlan && counting(currentPlan) ? currentPlan : allPlans.find(counting);
   // Nothing made yet (a first visit): the page is the wizard, which can't be closed, as there is nothing behind it.
-  const empty = !board && !plan;
-  const wizard = wizardState ?? (empty ? {} : null);
-  // The kind asked for while there is one; else the one there is (only plans made: /belohnungstafel/ shows a plan).
-  const type: ChartType = empty || (wanted === "board" ? board : plan) ? wanted : wanted === "board" ? "plan" : "board";
+  const empty = !board && !currentPlan;
+  // Only the other kind made (a plan, the Belohnungstafel's book opened): the wizard on the asked kind, the other behind it.
+  const start = pageStart(wanted, { board: !!board || !!rewardPlan, plan: !!currentPlan });
+  const wizard = wizardState ?? (start.wizard ? {} : null);
+  const type: ChartType = start.type === "board" && !board ? "plan" : start.type;
+  const plan = start.type === "board" && !board ? rewardPlan : currentPlan;
   const log = stored.log;
   const setLog = (next: StarLog) => setStored({ log: next });
   const today = new Date();
@@ -118,7 +111,12 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     const finished = takeFinishedStep(location.pathname);
     if (!finished) return;
     const { planId, key } = parseRoutineStep(finished);
-    if (!log[planId]?.[key]) setLog(addStar(log, planId, key, new Date()));
+    // A card with a Zähler gets all its stars at once: the game was the whole task.
+    const { day, taskId } = parseCellKey(key);
+    const routinePlan = allPlans.find((p) => p.id === planId);
+    const step = routinePlan && stepsOn(routinePlan, day).find((s) => s.id === taskId);
+    const most = step ? Math.max(1, starsOf(step)) : 1;
+    if ((log[planId]?.[key] ?? 0) < most) setLog({ ...log, [planId]: { ...log[planId], [key]: most } });
   }, []);
 
   // Another board, plan or view starts at today again.
@@ -136,17 +134,20 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   };
 
   const changeBoard = (patch: Partial<Board>) => updateBoards({ boards: boards.boards.map((b) => (b.id === board?.id ? { ...b, ...patch } : b)) });
-  const changePlan = (next: Plan) => updatePlans({ plans: plans.plans.map((p) => (p.id === next.id ? next : p)) });
-  const setKind = (kind: BoardKind) => {
+  const changePlan = (next: Plan) => updatePlans({ plans: allPlans.map((p) => (p.id === next.id ? next : p)) });
+  /** A change made right on the chart (`ChartEditor`): a board's view keeps its heading only while it is a template's. */
+  const changeDraft = (draft: Draft) => {
+    if (draft.type === "plan") return changePlan(draft.plan);
     if (!board) return;
     const template = TEMPLATES.find((tpl) => tpl.id === board.template);
-    changeBoard(withKind(board, kind, isTemplateTitle(board.title, template?.title) ? board.title : ""));
+    const next =
+      draft.board.kind === board.kind ? draft.board : withKind(board, draft.board.kind, isTemplateTitle(board.title, template?.title) ? board.title : "");
+    changeBoard(next);
   };
-  const setView = (view: PlanView) => plan && changePlan({ ...plan, view });
   const show = (shown: ChartType) => {
     setWizard(null);
+    setDesigning(false);
     setType(shown);
-    updatePage({ shown });
   };
   const showBoard = (id: string) => {
     updateBoards({ current: id });
@@ -156,22 +157,24 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     updatePlans({ current: id });
     show("plan");
   };
-  // On a computer the panels are always open below the chart: the buttons on top only scroll there.
+  // On a computer printing is always open below the chart: its button on top only scrolls there.
   const toggle = (which: Panel) => {
     setWizard(null);
-    if (computer && (which === "edit" || which === "print")) document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setDesigning(false);
+    if (computer && which === "print") document.getElementById("rw-print")?.scrollIntoView({ behavior: "smooth", block: "start" });
     else setPanel(panel === which ? null : which);
   };
-  /** „Gestalten“ from elsewhere (the Urkunde): its panel, or on a computer the editor below once it is back. */
+  /** „Gestalten“ (also from the Urkunde): the chart in place, changed right on it. */
   const openEditor = () => {
-    setPanel(computer ? null : "edit");
-    if (computer) setTimeout(() => document.getElementById("rw-edit")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    setPanel(null);
+    setDesigning(true);
   };
   const openWizard = (start?: WizardStart) => {
     setPanel(null);
+    setDesigning(false);
     setWizard({ start });
   };
-  // Closing the wizard saves the page's choice, so a first visit that looked and left starts on the chart next time.
+  // Closing the wizard shows the chart behind it: where none of the kind asked for is made, the other kind's.
   const closeWizard = () => show(type);
   /** A template from the gallery: the board or plan made from it before, with its stars, or the wizard on it. */
   const pickTemplate = (template: Template) => {
@@ -180,17 +183,15 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     else openWizard({ type: "board", template });
   };
   const pickPlanTemplate = (template: PlanTemplate) => {
-    const made = plans.plans.find((p) => p.template === template.id);
+    const made = allPlans.find((p) => p.template === template.id);
     if (made) showPlan(made.id);
     else openWizard({ type: "plan", template });
   };
-  /** What the wizard made, one chart or several at once: each is added, the last of each kind is shown. */
-  const add = (drafts: Draft[]) => {
-    const newBoards = drafts.flatMap((d) => (d.type === "board" ? [d.board] : []));
-    const newPlans = drafts.flatMap((d) => (d.type === "plan" ? [d.plan] : []));
-    if (newBoards.length > 0) updateBoards({ boards: [...boards.boards, ...newBoards], current: newBoards[newBoards.length - 1].id });
-    if (newPlans.length > 0) updatePlans({ plans: [...plans.plans, ...newPlans], current: newPlans[newPlans.length - 1].id });
-    show(drafts[drafts.length - 1].type);
+  /** What the wizard made: it is added and shown. */
+  const add = (draft: Draft) => {
+    if (draft.type === "board") updateBoards({ boards: [...boards.boards, draft.board], current: draft.board.id });
+    else updatePlans({ plans: [...allPlans, draft.plan], current: draft.plan.id });
+    show(draft.type);
     // The wizard may have been scrolled far down: the new chart starts at the top of the page.
     window.scrollTo({ top: 0 });
   };
@@ -199,12 +200,14 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     setLog(Object.fromEntries(Object.entries(log).filter(([id]) => id !== gone.id)));
     updateBoards({ boards: rest, current: rest[0].id });
     setPanel(null);
+    setDesigning(false);
   };
   const removePlan = (gone: Plan) => {
-    const rest = plans.plans.filter((p) => p.id !== gone.id);
+    const rest = allPlans.filter((p) => p.id !== gone.id);
     setLog(Object.fromEntries(Object.entries(log).filter(([id]) => id !== gone.id)));
     updatePlans({ plans: rest, current: rest[0].id });
     setPanel(null);
+    setDesigning(false);
   };
 
   const editor =
@@ -224,7 +227,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
             day={planDay}
             onChange={changePlan}
             onRestartToday={() => setLog(restartDay(log, plan.id, today))}
-            onRemove={plans.plans.length > 1 ? () => removePlan(plan) : undefined}
+            onRemove={allPlans.length > 1 ? () => removePlan(plan) : undefined}
           />
         );
   const print =
@@ -263,10 +266,20 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const main = wizard ? (
     <Wizard
       key={wizard.start ? `${wizard.start.type}-${wizard.start.template.id}` : "new"}
-      type={type}
       start={wizard.start}
       onDone={add}
       onCancel={empty ? undefined : closeWizard}
+    />
+  ) : designing && (type === "board" ? board : plan) ? (
+    <ChartEditor
+      key={type === "board" ? board?.id : plan?.id}
+      draft={type === "board" && board ? { type: "board", board } : { type: "plan", plan: plan as Plan }}
+      onChange={changeDraft}
+      making={false}
+      day={type === "board" ? boardDay : planDay}
+      log={log}
+      linked={linked}
+      more={editor}
     />
   ) : !computer && panel === "print" ? (
     print
@@ -306,7 +319,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
           {/* While the wizard is open, nothing on top belongs to the chart behind it. */}
           {!wizard && (
             <div className="panel-buttons">
-              <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t(DESIGN)} />
+              <PanelButton open={designing} onClick={() => (designing ? setDesigning(false) : openEditor())} emoji="✏️" label={t(DESIGN)} />
               <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t(PRINT)} />
               {review && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t(REVIEW)} />}
               {certificate && <PanelButton open={panel === "certificate"} onClick={() => toggle("certificate")} emoji="🏅" label={t(CERTIFICATE)} />}
@@ -317,28 +330,15 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
         {/* Nothing made yet: no row of tabs, the wizard has the page. */}
         {!empty && (
           <div className="rw-pickers">
-            {/* While the wizard is open its own steps choose the view. */}
-            {!wizard && type === "board" && board && (
+            {/* The view is chosen under „Gestalten“ (its Zeitraum); here only the way to earlier days. */}
+            {!wizard && type === "board" && board && board.kind !== "collect" && panel !== "review" && (
               <div className="rw-switch">
-                <ViewSwitch views={MAIN_KINDS} selected={board.kind} onPick={setKind} />
-                {COLLECT_KIND && (
-                  <button
-                    type="button"
-                    className={`rw-collect-view${board.kind === "collect" ? " selected" : ""}`}
-                    aria-pressed={board.kind === "collect"}
-                    title={t(COLLECT_KIND.hint)}
-                    onClick={() => setKind("collect")}
-                  >
-                    <span aria-hidden>{COLLECT_KIND.emoji}</span> {t(COLLECT_KIND.label)}
-                  </button>
-                )}
-                {board.kind !== "collect" && panel !== "review" && <PeriodNav kind={board.kind} day={boardDay} back={back} setBack={setBack} />}
+                <PeriodNav kind={board.kind} day={boardDay} back={back} setBack={setBack} />
               </div>
             )}
-            {!wizard && type === "plan" && plan && (
+            {!wizard && type === "plan" && plan && plan.view !== "week" && (
               <div className="rw-switch">
-                <ViewSwitch views={PLAN_VIEWS} selected={plan.view} onPick={setView} />
-                {plan.view !== "week" && <DayNav day={planDay} shift={-back} setShift={(shift) => setBack(-shift)} />}
+                <DayNav day={planDay} shift={-back} setShift={(shift) => setBack(-shift)} />
               </div>
             )}
             <nav
@@ -364,7 +364,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
                   <span aria-hidden>{TEMPLATES.find((tpl) => tpl.id === b.template)?.emoji ?? MARK_BY_ID.get(b.mark)?.emoji}</span> {boardTab(b)}
                 </button>
               ))}
-              {plans.plans.map((p) => (
+              {allPlans.map((p) => (
                 <button
                   key={p.id}
                   type="button"
@@ -385,16 +385,11 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
           </div>
         )}
 
-        {!computer && panel === "edit" && !wizard && editor}
         {main}
       </div>
       {/* The Urkunde prints on its own: the board's print pages below would go to the printer with it. */}
-      {computer && !wizard && !(panel === "certificate" && certificate) && (
+      {computer && !wizard && !designing && !(panel === "certificate" && certificate) && (
         <div className="rw-below">
-          <section id="rw-edit" className="rw-below-part">
-            <h2 className="rw-panel-title">{t(DESIGN)}</h2>
-            {editor}
-          </section>
           <section id="rw-print" className="rw-below-part">
             {print}
           </section>
@@ -402,38 +397,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
       )}
       <SeoText />
     </main>
-  );
-}
-
-/** The big switch of views above the chart: a board's Tag, Woche, Monat or a plan's Tag, Woche. */
-function ViewSwitch<V extends string>({
-  views,
-  selected,
-  onPick,
-}: {
-  views: { id: V; emoji: string; label: Localized; hint: Localized }[];
-  selected: V;
-  onPick: (view: V) => void;
-}) {
-  const t = useT();
-  return (
-    <div className="rw-views" role="group" aria-label={t(VIEW)}>
-      {views.map((view) => (
-        <button
-          key={view.id}
-          type="button"
-          className={view.id === selected ? "selected" : undefined}
-          aria-pressed={view.id === selected}
-          title={t(view.hint)}
-          onClick={() => onPick(view.id)}
-        >
-          <span className="rw-view-emoji" aria-hidden>
-            {view.emoji}
-          </span>{" "}
-          {t(view.label)}
-        </button>
-      ))}
-    </div>
   );
 }
 

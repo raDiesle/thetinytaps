@@ -56,10 +56,32 @@ to be comforted. For every new situation and its pictures:
   when the bear acts, no hands from the edge. When the one with the feeling goes to someone, he is
   seen moving towards them, not already in their arms.
 
+**Whose view a story takes is the child's own (user feedback, November 2026):** where the child itself is the one
+with the feeling at that moment – tired at bedtime – the child is the bear, and the whole story is the bear acting
+himself („Was kann er machen?“, „Hinlegen und zudecken“, no hands from the edge); its not-so-good ideas are what a
+child in that moment does itself (hops on the bed, gets up to play, cries), never what a second child does to the
+bear (pulling his blanket away, drumming next to his bed), which brings in someone who isn't there.
+
 A card only takes, throws or breaks what the story's first picture already shows (a teddy the
 bear doesn't hold can't be taken from him): pick another idea rather than redraw the first picture.
 A card may bring something new (the teddy from the toy box, the light). `bilder/README.md` lists what
 each first picture shows.
+
+**Every card tells one thing without its caption (user feedback, November 2026):** the angry bear's thrown toy car
+wasn't seen as thrown, his deep breath blew towards the fallen tower so he seemed to blow it over, his stomp with both
+feet couldn't be told, and he still blew with a red angry face. For every new story or level, before its pictures are
+made and again when they are there, look at each card alone, as a grown-up without its caption would, and ask what it
+shows (`bilder/README.md`, „Jede Karte versteht man ohne Worte“, has the wording for the prompts):
+- The action is the biggest thing in the picture, caught at its plainest moment: a throw with the arm stretched out
+  and the thing just leaving the paw, close to it; a stomp with him seen down to both feet, both soles hitting the
+  floor together, both lifted in the second frame.
+- Nothing lies where the action goes: a breath, throw, kick or stomp goes into empty space (a breath rises upwards),
+  or it reads as blowing over, hitting or breaking that thing. So pick a story's cause that no card seems to act on
+  (the home's angry bear: a shoe that won't go on, no longer a fallen tower).
+- A good idea shows in the face that it helps: after blowing, breathing or a hug he looks relieved and happy (soft
+  closed eyes, a smile, no red face); only the first picture and the not-so-good ideas keep the angry face.
+- When he acts himself, the prompt says „No hands, no arms come in from the edges“ (the home's room prompt allows a
+  child's hands, and Gemini drew one pointing at the bear throwing alone).
 
 Every choice has a not-so-good idea next to it, so the child always really
 chooses: at home one per round (`Feeling.instead`), in the

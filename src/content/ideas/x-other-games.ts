@@ -126,6 +126,8 @@ export const otherGamesIdeas: IdeaArea = {
       text: "Bei Was gehört zum Tier? darf neben der richtigen Antwort nichts liegen, was auch passt. Heute frisst der Hase die Möhre, daneben liegt aber Salat oder ein Apfel – das frisst ein Hase auch. Weitere Fälle: Pferd (Möhre, Apfel, Heu), Hund (Knochen, Fleisch), Bär (Honig, Fisch, Nüsse, Apfel), Affe (Banane, Apfel, Nüsse, Blätter), Schwein (frisst fast alles), Huhn und Vogel (Mais, Wurm), Maus (Käse, Nüsse, Mais), Panda (Bambus, Blätter), Kuh (Heu, Salat, Blätter). Bei den Häusern genauso: Fisch (Aquarium, Teich), Hund (Hütte, Körbchen), Vogel (Nest, Baum), Fuchs (Bau, Höhle). Jedes Tier bekommt eine Liste, was auch passen würde; das kommt nie als falsche Auswahl. Ein Test prüft, dass jede Runde genau eine passende Antwort hat. Schatten finden und Wer schaut da raus? genauso durchsehen (ähnliche Umrisse).",
       why: "Ein Kind, das richtig denkt, hört sonst „Bäh! Das mag der Hase nicht.“ – das verwirrt und lehrt Falsches. Wichtiger als jede neue Erweiterung.",
       effort: "S",
+      partial:
+        "Tiere füttern und Wer wohnt wo?: jedes Tier hat eine Liste, was es auch frisst (der Bär auch Fisch, Nüsse, Apfel …) und wo es auch wohnt (der Fisch auch im Teich, der Hund auch im Körbchen), die nie als falsche Auswahl kommt, und ein Test prüft das. Das Schwein frisst fast alles und wird nicht mehr gefüttert. Offen: Schatten finden und Wer schaut da raus? (ähnliche Umrisse).",
     },
   ],
 };

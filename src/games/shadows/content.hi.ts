@@ -101,7 +101,6 @@ export function hindiTexts(german: ShadowTexts): ShadowTexts {
     peek: "कौन झाँक रहा है?",
     there: about((hi) => `अरे, यह तो ${hi.name} है!`, german.there),
     shadow: (n) => `परछाईं ${n}`,
-    stars: (n) => `${n} पूरे`,
   };
 }
 

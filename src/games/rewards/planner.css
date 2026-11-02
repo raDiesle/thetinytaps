@@ -1,10 +1,11 @@
 /* ---------- Tagesplan (pl-): the plan's own parts; the page and the sheet come from rewards.css ---------- */
 
 /* Day view: the day's steps as big cards in reading order, „Jetzt“ and „Dann“ above them. */
+/* Little room between the cards, so as many as possible fit a row and each is big (user feedback, November 2026). */
 .pl-steps {
   display: grid;
   flex: 1;
-  gap: 2cqmin 2.4cqmin;
+  gap: 1cqmin;
   min-height: 0;
   margin: 0;
   padding: 0;
@@ -40,7 +41,7 @@
   visibility: hidden;
 }
 
-/* A card sizes its picture and word by itself (it is their container). */
+/* A card sizes its picture by itself (it is its container); no word on it, the child doesn't read. */
 .pl-card {
   container-type: size;
   position: relative;
@@ -65,18 +66,8 @@
 
 .pl-emoji {
   font-family: var(--font-emoji);
-  font-size: 52cqmin;
+  font-size: 58cqmin;
   line-height: 1;
-}
-
-.pl-label {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: max(0.6rem, 11cqmin);
-  font-weight: 800;
-  line-height: 1.1;
-  text-align: center;
-  overflow-wrap: anywhere;
 }
 
 /* The card to do now: in front and outlined, without moving by itself (nothing moves until the child acts). */
@@ -255,7 +246,7 @@
 }
 
 /*
- * Ablaufplan and Jetzt – Dann: the card to do now stands apart on the left, big, on a lit panel under a „Jetzt“
+ * Jetzt – Dann with the „Jetzt“ field: the card to do now stands apart on the left, big, on a lit panel under a „Jetzt“
  * banner; a dashed line parts it from the „Dann“ cards, smaller, in rows (one per part of the day: morning, evening).
  */
 .pl-flow {
@@ -303,19 +294,14 @@
   max-width: 100%;
 }
 
-.pl-flow .pl-tag {
-  align-self: flex-start;
-  font-size: clamp(0.8rem, 4.5cqmin, 1.8rem);
-  color: color-mix(in srgb, var(--rw-ink) 70%, transparent);
-}
-
-/* „Jetzt“ is a banner of its own, in the ink's colour: what hangs under it matters most. */
+/* Over „Jetzt“ a hand pointing down on a white banner edged in the ink's colour: what hangs under it matters most. */
 .pl-flow .pl-tag-now {
   align-self: center;
-  padding: 0.15em 0.9em;
+  padding: 0.05em 0.7em;
+  border: max(2px, 0.6cqmin) solid var(--rw-ink);
   border-radius: 999px;
-  background: var(--rw-ink);
-  color: #fff;
+  background: #fff;
+  font-family: var(--font-emoji);
   font-size: clamp(1rem, 6.5cqmin, 2.8rem);
 }
 
@@ -327,9 +313,19 @@
   min-height: 0;
 }
 
+/* A part of the day: its sun or moon before its cards, in the same line, so the cards keep the row's whole height. */
+.pl-row.pl-row-named {
+  flex-direction: row;
+}
+
+.pl-row-named > .pl-part {
+  align-self: center;
+}
+
 /* A part's cards in one line, each as tall as the row and square, narrower only when many share it. */
 .pl-steps.pl-line {
   display: flex;
+  min-width: 0;
 }
 
 .pl-steps.pl-line > .pl-slot {
@@ -340,28 +336,49 @@
 
 .pl-part {
   flex: none;
-  text-align: start;
-  font-size: clamp(0.7rem, 3.8cqmin, 1.5rem);
-  font-weight: 800;
-  line-height: 1.1;
+  font-family: var(--font-emoji);
+  font-size: clamp(0.8rem, 6cqmin, 3rem);
+  line-height: 1;
 }
 
 .pl-row + .pl-row {
-  padding-top: 1.5cqmin;
+  padding-top: 1cqmin;
   border-top: max(1px, 0.3cqmin) solid color-mix(in srgb, var(--rw-ink) 20%, transparent);
 }
 
-/* Jetzt – Dann: two cards only, „Jetzt“ the bigger one; „Dann“ waits smaller beside it. */
-.pl-nownext > .pl-now {
-  flex: 1.25;
+/*
+ * Jetzt – Dann with a marker: every card keeps its place, leaving room below it for the marker – an arrow cut out of
+ * card, as one at home would be (`PaperArrow`) – which points up at the card to do, its tip over the card's lower edge
+ * (no word stands there). It slides on after a tap (PlanScreen).
+ */
+.pl-marked .pl-slot {
+  position: relative;
 }
 
-.pl-nownext > .pl-then > .pl-slot {
-  flex: 0 1 72%;
-  align-self: center;
-  aspect-ratio: 1;
-  max-width: 100%;
-  margin: auto 0;
+.pl-marked .pl-slot > .pl-card {
+  margin: 1.5cqmin 1.5cqmin 17cqmin;
+}
+
+.pl-paper-arrow {
+  display: block;
+  overflow: visible;
+}
+
+.pl-marker {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 50%;
+  width: 30cqmin;
+  height: 36cqmin;
+  translate: -50% 0;
+  rotate: -7deg;
+  filter: drop-shadow(0 0.8cqmin 0.8cqmin #0004);
+  pointer-events: none;
+}
+
+.pl-marked .pl-card.now {
+  box-shadow: 0 max(2px, 2cqmin) 0 var(--rw-ink);
 }
 
 /* An empty place for a Velcro card (on paper). */
@@ -433,15 +450,10 @@
   max-width: 100%;
 }
 
-.pl-pair .pl-tag {
-  font-size: clamp(0.7rem, 9cqmin, 2.2rem);
-}
-
 .pl-arrow {
   grid-column: 2;
   grid-row: 1;
   align-self: center;
-  padding-top: 9cqmin;
   font-size: 18cqmin;
   font-weight: 900;
   line-height: 1;
@@ -524,22 +536,6 @@
   font-size: 32cqmin;
 }
 
-.pl-card.small .pl-label {
-  display: none;
-  font-size: max(0.55rem, 12cqw);
-}
-
-/* The word only where the card has room for it below the picture. */
-@container (min-height: 76px) and (min-width: 64px) {
-  .pl-card.small .pl-label {
-    display: block;
-  }
-
-  .pl-card.small .pl-emoji {
-    font-size: 46cqmin;
-  }
-}
-
 /* „Von vorn“ after the last step: for the next Erst–Dann, or a new start. */
 .pl-again {
   align-self: center;
@@ -575,4 +571,208 @@
 .pl-card:not(.small) .pl-emoji .rw-pic {
   width: 1.3em;
   height: 1.3em;
+}
+
+/* ---------- The Zähler: star fields on the cards, and the reward at the sheet's end ---------- */
+
+/* A card that counts stars keeps room at its foot for them; the picture shrinks a little. */
+.pl-card.has-stars {
+  justify-content: flex-start;
+  gap: 1cqmin;
+  padding-top: 3cqmin;
+}
+
+.pl-card.has-stars .pl-emoji {
+  font-size: 46cqmin;
+}
+
+.pl-card.small.has-stars .pl-emoji {
+  font-size: 50cqmin;
+}
+
+.pl-stars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2cqmin;
+  margin-top: auto;
+}
+
+.pl-star {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 19cqmin;
+  height: 19cqmin;
+  border: max(1.5px, 1.6cqmin) dashed var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  font-family: var(--font-emoji);
+  font-size: 14cqmin;
+  line-height: 1;
+}
+
+.pl-star.filled {
+  border-style: solid;
+  border-color: var(--rw-main);
+  background: color-mix(in srgb, var(--rw-main) 30%, #fff);
+}
+
+.pl-card.small .pl-star {
+  width: 24cqmin;
+  height: 24cqmin;
+  font-size: 18cqmin;
+}
+
+.pl-card.fresh .pl-star.last {
+  animation: pl-tick-in 0.5s ease-out;
+}
+
+.pl-card.twinkle .pl-star.filled {
+  animation: pl-twinkle 0.6s ease-in-out;
+}
+
+/* Cards that count stars: every open card of today may be tapped, so the glow is quieter than the one card under the arrow. */
+.pl-marked .pl-card.has-stars.now {
+  box-shadow: 0 0 0 max(2px, 2cqmin) var(--rw-main);
+}
+
+.pl-card.has-stars.done {
+  opacity: 1;
+  background: color-mix(in srgb, var(--rw-main) 18%, #fff);
+}
+
+.pl-goal {
+  container-type: inline-size;
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 17%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqmin;
+  min-width: 0;
+  margin-left: 1.5cqmin;
+  padding: 1.5cqmin;
+  border: max(2px, 0.6cqmin) solid var(--rw-main);
+  border-radius: 3cqmin;
+  background: #fff;
+  text-align: center;
+}
+
+.pl-goal.reached {
+  border-color: var(--rw-ink);
+  background: color-mix(in srgb, var(--rw-main) 35%, #fff);
+}
+
+.pl-goal-pic {
+  font-family: var(--font-emoji);
+  font-size: 62cqi;
+  line-height: 1;
+}
+
+.pl-goal-pic .rw-pic {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.pl-goal-label {
+  font-size: clamp(0.7rem, 13cqi, 1.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.pl-goal-count {
+  font-size: clamp(0.7rem, 14cqi, 1.8rem);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pl-goal-add {
+  border-style: dashed;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pl-goal-add > span:first-child {
+  font-family: var(--font-emoji);
+  font-size: 40cqi;
+  opacity: 0.6;
+}
+
+/* ---------- While a plan is made: the places to add, take away and choose ---------- */
+
+/* Tapped to change it: a card or the reward shows a pencil's hand. */
+.pl-editing :is(.pl-card, .pl-goal) {
+  cursor: pointer;
+}
+
+.pl-editing .pl-card:hover,
+.pl-editing .pl-goal:hover {
+  outline: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  outline-offset: 2px;
+}
+
+.pl-add {
+  box-sizing: border-box;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+  border: max(2px, 1cqmin) dashed var(--rw-ink);
+  border-radius: 3cqmin;
+  color: var(--rw-ink);
+  font-size: clamp(1rem, 6cqmin, 3rem);
+  font-weight: 800;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.pl-add:hover {
+  opacity: 0.9;
+  background: #fff;
+}
+
+.pl-add.small {
+  flex: none;
+  aspect-ratio: auto;
+  min-height: 8cqmin;
+  font-size: clamp(0.9rem, 4cqmin, 1.6rem);
+}
+
+.pl-part {
+  position: relative;
+}
+
+/* The ✕ that takes a line of the day away, on its sun or moon. */
+.pl-row-remove {
+  position: absolute;
+  top: -0.35em;
+  right: -0.45em;
+  display: grid;
+  place-items: center;
+  width: 0.8em;
+  height: 0.8em;
+  border: 2px solid var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink);
+  font-family: inherit;
+  font-size: 0.5em;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.pl-part-back {
+  align-self: flex-start;
+  padding: 0.6cqmin 2cqmin;
+  border: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  border-radius: 999px;
+  font-size: clamp(0.8rem, 3cqmin, 1.4rem);
+  font-weight: 700;
+  opacity: 0.7;
+  cursor: pointer;
 }

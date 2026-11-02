@@ -107,7 +107,6 @@ export function spanishTexts(german: ShadowTexts): ShadowTexts {
     peek: "¿Quién se asoma?",
     there: about((es) => `¡Ahí ${es.many ? "están" : "está"} ${es.the}!`, german.there),
     shadow: (n) => `Sombra ${n}`,
-    stars: (n) => `${n} hechos`,
   };
 }
 

@@ -1,5 +1,5 @@
-// Options most games share, the same for all of them: read aloud, sounds, music and the child's figure.
-// Music (🎵) and the figure (👦 / 👧) are set on the home page; read aloud and sounds are decided once
+// Options most games share, the same for all of them: read aloud, sounds, music, the child's figure and how a game is
+// left. Music (🎵), the figure (👦 / 👧) and leaving (⏳) are set on the home page; read aloud and sounds are decided once
 // (FIXED). Each game keeps its own fields for read aloud and sounds and gets them filled
 // in from here (see withCommon).
 
@@ -23,7 +23,15 @@ export interface CommonSettings {
    * Animals and the people in the pictures stay as they are.
    */
   figure: Figure;
+  /**
+   * How a game is left with its ✕ (in the book look the page's corner): one tap, or held for half a second, so a
+   * child's tap can't end it. A tap by default (user decision, November 2026); grown-ups choose holding under ⏳.
+   */
+  leave: Leave;
 }
+
+/** Leaving a game with its ✕: a tap, or held for a moment. */
+export type Leave = "tap" | "hold";
 
 /** The child's own figure: a boy (as everything was drawn first) or a girl. */
 export type Figure = "boy" | "girl";
@@ -35,7 +43,7 @@ export type Figure = "boy" | "girl";
  */
 const FIXED = { speech: false, sounds: true } as const;
 
-export const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true, figure: "boy" };
+export const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true, figure: "boy", leave: "tap" };
 
 /**
  * The options filled into a game's fields of the same name. Not music: a game with
@@ -72,7 +80,7 @@ export const applySavedFigure = () => void current();
 /** The shared options and their setter; every component using them sees a change at once. */
 export function useCommonSettings() {
   const value = useSyncExternalStore(subscribe, current);
-  const update = useCallback((patch: Partial<Pick<CommonSettings, "music" | "figure">>) => {
+  const update = useCallback((patch: Partial<Pick<CommonSettings, "music" | "figure" | "leave">>) => {
     common = showFigure({ ...current(), ...patch });
     try {
       localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(common));

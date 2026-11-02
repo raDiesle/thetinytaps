@@ -9,6 +9,18 @@ export interface Game {
   title: Localized;
   /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
   blurb: Localized;
+  /**
+   * On the shelf (book look) the game stands as these books side by side in one slipcase, one for each part it opens on
+   * (`also`), each with its own name on its spine; in the toy look it stays one card.
+   */
+  volumes?: Volume[];
+}
+
+/** One of a game's books in its slipcase on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
+export interface Volume {
+  href: string;
+  emoji: string;
+  title: Localized;
 }
 
 export interface Category {
@@ -33,33 +45,10 @@ export const CATEGORIES: Category[] = [
     title: { de: "Alltagshelfer" },
     blurb: { de: "Zähne putzen, Töpfchen, Tagesplan" },
     // Each a book of its own on the shelf, its name on its spine (user decision, October 2026). First on the shelf, top
-    // left, and the Belohnungstafel first among them: the everyday helpers are what parents need most (user feedback,
-    // November 2026).
+    // left: the everyday helpers are what parents need most; the Belohnungstafel's slipcase, the shelf's eye-catcher,
+    // stands right of Aufs Töpfchen (user feedback, November 2026).
     apart: true,
     games: [
-      {
-        href: "/belohnungstafel/",
-        also: ["/tagesplan/"],
-        emoji: "📅",
-        title: {
-          de: "Belohnungstafel & Zeitplan",
-          en: "Reward Chart & Schedule",
-          zh: "奖励表和时间表",
-          hi: "इनाम चार्ट और समय-सारणी",
-          es: "Tabla de premios y horario",
-          ar: "لوحة المكافآت والجدول الزمني",
-          ru: "Таблица наград и расписание",
-        },
-        blurb: {
-          de: "Belohnungstafel und Zeitplan in Bildern",
-          en: "Reward chart and schedule in pictures",
-          zh: "用图画做的奖励表和时间表",
-          hi: "तस्वीरों में इनाम चार्ट और समय-सारणी",
-          es: "Premios y horario en imágenes",
-          ar: "لوحة المكافآت والجدول الزمني بالصور",
-          ru: "Таблица наград и расписание в картинках",
-        },
-      },
       {
         href: "/zaehne/",
         emoji: "🦷",
@@ -86,6 +75,50 @@ export const CATEGORIES: Category[] = [
           es: "Ir al baño, paso a paso",
           ar: "الذهاب إلى الحمّام خطوة بخطوة",
           ru: "Ходим в туалет шаг за шагом",
+        },
+      },
+      {
+        href: "/belohnungstafel/",
+        also: ["/tagesplan/"],
+        // On the shelf two books in one slipcase, each opening its own part (user feedback, November 2026).
+        volumes: [
+          {
+            href: "/belohnungstafel/",
+            emoji: "🌟",
+            title: {
+              de: "Belohnungstafel",
+              en: "Reward chart",
+              zh: "奖励表",
+              hi: "इनाम चार्ट",
+              es: "Tabla de premios",
+              ar: "لوحة المكافآت",
+              ru: "Таблица наград",
+            },
+          },
+          {
+            href: "/tagesplan/",
+            emoji: "🗓️",
+            title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
+          },
+        ],
+        emoji: "📅",
+        title: {
+          de: "Belohnungstafel & Zeitplan",
+          en: "Reward Chart & Schedule",
+          zh: "奖励表和时间表",
+          hi: "इनाम चार्ट और समय-सारणी",
+          es: "Tabla de premios y horario",
+          ar: "لوحة المكافآت والجدول الزمني",
+          ru: "Таблица наград и расписание",
+        },
+        blurb: {
+          de: "Belohnungstafel und Zeitplan in Bildern",
+          en: "Reward chart and schedule in pictures",
+          zh: "用图画做的奖励表和时间表",
+          hi: "तस्वीरों में इनाम चार्ट और समय-सारणी",
+          es: "Premios y horario en imágenes",
+          ar: "لوحة المكافآت والجدول الزمني بالصور",
+          ru: "Таблица наград и расписание в картинках",
         },
       },
     ],
@@ -226,7 +259,7 @@ export const CATEGORIES: Category[] = [
           es: "¿Qué necesita el animal?",
           ar: "ماذا يحتاج الحيوان؟",
         },
-        blurb: { de: "Futter, Zuhause und versteckte Tiere" },
+        blurb: { de: "Verstecke, Futter, Milch, Zuhause, Wachsen" },
       },
       {
         href: "/schatten/",
@@ -334,13 +367,13 @@ export interface ShelfEntry {
   game?: Game;
 }
 
-/** The game's own book's id: its address without slashes. */
-const gameBookId = (game: Game) => game.href.replaceAll("/", "");
+/** The id of a game's own book, or of one of its volumes: its address without slashes. */
+export const bookIdOf = (href: string) => href.replaceAll("/", "");
 
 /** The books on the shelf, in order: one per category, or, for a category whose games stand apart, one per game. */
 export const SHELF: ShelfEntry[] = CATEGORIES.flatMap((category) =>
   category.apart
-    ? category.games.map((game) => ({ id: gameBookId(game), href: game.href, category, game }))
+    ? category.games.map((game) => ({ id: bookIdOf(game.href), href: game.href, category, game }))
     : [{ id: category.id, href: categoryHref(category), category }],
 );
 

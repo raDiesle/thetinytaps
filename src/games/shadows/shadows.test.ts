@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ITEMS, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
+import { ITEMS, PEEK_ITEMS, PEEK_LOOKS, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
+import { GRID, pickPeepholes } from "./glyph";
 import { RUSSIAN_NAMES } from "./content.ru";
 import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
 
@@ -42,7 +43,7 @@ test("the sentences have no German left in them, and none in another script has 
       const sentences = [texts.search(item), texts.found(item), texts.thatIs(item), texts.there(item)];
       sentences.forEach((sentence, i) => expect(sentence, `${language} ${item.id}`).not.toBe([de.search, de.found, de.thatIs, de.there][i](item)));
       if (OWN_SCRIPT.includes(language)) {
-        for (const sentence of [...sentences, texts.name(item), texts.peek, texts.shadow(2), texts.stars(3)]) {
+        for (const sentence of [...sentences, texts.name(item), texts.peek, texts.shadow(2)]) {
           expect(sentence, `${language} ${item.id}`).not.toMatch(/[A-Za-zäöüß]/);
         }
       }
@@ -98,4 +99,22 @@ test("sure goes up, unsure goes down, never past the ends", () => {
   expect(nextLevel(2, [1])).toBe(2);
   expect(nextLevel(2, [1, 1])).toBe(1);
   expect(nextLevel(0, [3])).toBe(0);
+});
+
+test("every peeking animal looks like exactly one group of „Wer schaut da raus?“", () => {
+  for (const item of PEEK_ITEMS) expect(PEEK_LOOKS.filter((ids) => ids.includes(item.id)).length, item.id).toBe(1);
+  const ids = new Set(PEEK_ITEMS.map((i) => i.id));
+  for (const id of PEEK_LOOKS.flat()) expect(ids.has(id), id).toBe(true);
+});
+
+test("peepholes lie on drawn cells and never overlap", () => {
+  // A shape drawn only in its left half.
+  const cover = Array.from({ length: GRID * GRID }, (_, i) => (i % GRID < 2 ? 1 : 0));
+  for (let n = 0; n < 20; n++) {
+    const holes = pickPeepholes(cover, 180, 180, 3, 60);
+    expect(holes.length).toBeGreaterThan(0);
+    for (const h of holes) expect(h.x).toBeLessThan(0.4);
+    for (const a of holes) for (const b of holes) if (a !== b) expect(Math.hypot((a.x - b.x) * 180, (a.y - b.y) * 180)).toBeGreaterThanOrEqual(60);
+  }
+  expect(pickPeepholes(new Array(GRID * GRID).fill(0), 180, 180, 3, 60)).toEqual([]);
 });

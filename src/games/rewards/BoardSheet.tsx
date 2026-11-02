@@ -11,6 +11,7 @@ import {
   isFilled,
   isTemplateTitle,
   type LinkedDays,
+  MAX_TASKS,
   monthOf,
   progress,
   taskSlots,
@@ -101,7 +102,7 @@ export function BoardSheet({
   look,
   aspect,
   fresh,
-  holding,
+  edit = false,
 }: {
   board: Board;
   stars: Record<string, number> | undefined;
@@ -117,12 +118,13 @@ export function BoardSheet({
   aspect: number;
   /** The field that just got its star, to pop it in. */
   fresh?: string | null;
-  /** The field a grown-up is holding, to fill its ring. */
-  holding?: string | null;
+  /** Being made or changed: its tasks in a row to tap, and its reward to tap (`data-edit`), never on paper. */
+  edit?: boolean;
 }) {
   const t = useT();
   const { speechLang } = useAppLanguage();
   const title = useBoardTitle()(board);
+  const editing = edit && !look.print;
   const rewardLabel = useRewardLabel();
   const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
   const mark = MARK_BY_ID.get(board.mark) ?? MARKS[0];
@@ -135,13 +137,13 @@ export function BoardSheet({
   // Grey prints take their colours from .rw-grey; inline ones would win over it.
   const grey = greyPrint(look);
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
-  const fieldProps = { mark, look, fresh, holding, example };
+  const fieldProps = { mark, look, fresh, example };
   const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
   const week = board.kind === "week" ? boardDays({ ...board, days: [0, 1, 2, 3, 4, 5, 6] }, day) : [];
 
   return (
     <div
-      className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${example ? " rw-with-examples" : ""}`}
+      className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${example ? " rw-with-examples" : ""}${editing ? " rw-editing" : ""}`}
       style={style}
     >
       {look.print && look.color && <SheetStrip theme={theme} />}
@@ -162,16 +164,26 @@ export function BoardSheet({
         {!look.print && board.kind === "day" && <span className="rw-blank">{dateFormat({ weekday: "long", day: "numeric", month: "long" }).format(day)}</span>}
         {board.kind === "month" && <span className="rw-blank">{dateFormat({ month: "long", year: "numeric" }).format(day)}</span>}
       </header>
+      {editing && <EditTasks board={board} />}
       <div className="rw-body">
         {board.kind === "week" && <WeekGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "month" && <MonthGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "day" && <DayCards board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "collect" && (
-          <CollectPath board={board} count={count} real={Math.min(real?.count ?? 0, board.goal)} aspect={aspect} rewardLabel={rewardLabel} {...fieldProps} />
+          <CollectPath
+            board={board}
+            count={count}
+            real={Math.min(real?.count ?? 0, board.goal)}
+            aspect={aspect}
+            rewardLabel={rewardLabel}
+            edit={editing}
+            {...fieldProps}
+          />
         )}
       </div>
-      {board.kind !== "collect" && (board.reward || goal <= MAX_DOTS) && (
-        <footer className="rw-goal">
+      {board.kind !== "collect" && (board.reward || goal <= MAX_DOTS || editing) && (
+        <footer className="rw-goal" data-edit={editing ? "reward" : undefined}>
+          {editing && !board.reward && <span className="rw-reward rw-reward-add">＋ {t({ de: "Belohnung" })}</span>}
           {board.reward && (
             <span className="rw-reward">
               <span className="rw-reward-emoji" aria-hidden>
@@ -199,6 +211,32 @@ export function BoardSheet({
   );
 }
 
+/**
+ * While a board is made or changed, its tasks in a row under the heading – every view shows them differently or not at
+ * all (a month only as small pictures in its days) –, each a tap to swap or remove it, and ＋ for one more.
+ */
+function EditTasks({ board }: { board: Board }) {
+  const t = useT();
+  const taskLabel = useTaskLabel();
+  return (
+    <div className="rw-edit-tasks">
+      {board.tasks.map((task) => (
+        <span key={task.id} className="rw-edit-task" data-edit="task" data-task={task.id} role="button" tabIndex={0} title={taskLabel(task)}>
+          <span className="rw-edit-task-pic" aria-hidden>
+            <ItemPic item={task} />
+          </span>
+          {taskLabel(task)}
+        </span>
+      ))}
+      {board.tasks.length < MAX_TASKS && (
+        <span className="rw-edit-task rw-edit-add" data-edit="add" role="button" tabIndex={0} aria-label={t({ de: "Aufgabe dazu" })}>
+          ＋
+        </span>
+      )}
+    </div>
+  );
+}
+
 /** A print in grey: line-art pictures to colour in instead of coloured ones. */
 const greyPrint = (look: SheetLook) => look.print && !look.color;
 
@@ -206,7 +244,6 @@ interface FieldLook {
   mark: CatalogMark;
   look: SheetLook;
   fresh?: string | null;
-  holding?: string | null;
   /** Example stars shown, if any. */
   example?: Record<string, number>;
 }
@@ -214,7 +251,7 @@ interface FieldLook {
 /**
  * One field: a dashed ring, with the mark in it once it has its star. `hint` shows pale in an empty ring which task
  * it is for, where a day has several small fields (month); `slot` puts a small sun or moon on its edge, filled or not.
- * An example star (`isExample`) looks filled but stays open: holding it gives the real star.
+ * An example star (`isExample`) looks filled but stays open: a tap gives the real star.
  */
 function Field({
   id,
@@ -222,7 +259,6 @@ function Field({
   mark,
   look,
   fresh,
-  holding,
   next = false,
   hint,
   slot,
@@ -232,7 +268,7 @@ function Field({
   const tap: TapState = look.print || real === "future" ? "" : tapState({ goal: next || real === "open", done: real === "filled" });
   return (
     <div
-      className={`rw-field ${state}${isExample ? " example" : ""}${next ? " next" : ""}${fresh === id ? " fresh" : ""}${holding === id ? " holding" : ""}`}
+      className={`rw-field ${state}${isExample ? " example" : ""}${next ? " next" : ""}${fresh === id ? " fresh" : ""}`}
       data-field={look.print ? undefined : id}
       data-state={real}
       data-tap={look.print ? undefined : tap}
@@ -260,11 +296,6 @@ function Field({
         ) : hint ? (
           <span className="rw-mark pale">{hint}</span>
         ) : null}
-        {holding === id && (
-          <svg className="rw-hold" viewBox="0 0 100 100" aria-hidden>
-            <circle cx="50" cy="50" r="46" pathLength={100} />
-          </svg>
-        )}
       </span>
     </div>
   );
@@ -304,7 +335,7 @@ function fieldOf({ stars, real, linked, today, look }: GridProps, day: Date, tas
 }
 
 /** The props of `Field` that come from the sheet, without the grid's own. */
-const fieldLook = ({ mark, look, fresh, holding, example }: GridProps): FieldLook => ({ mark, look, fresh, holding, example });
+const fieldLook = ({ mark, look, fresh, example }: GridProps): FieldLook => ({ mark, look, fresh, example });
 
 /** Tasks in rows (a row per time of day where a task has several), the chosen weekdays in columns, today's column marked on screen. */
 function WeekGrid(props: GridProps) {
@@ -426,6 +457,7 @@ function CollectPath({
   real,
   aspect,
   rewardLabel,
+  edit,
   ...look
 }: FieldLook & {
   board: Board;
@@ -435,6 +467,8 @@ function CollectPath({
   real: number;
   aspect: number;
   rewardLabel: (r: { label?: string; catalog?: string }) => string;
+  /** Being made or changed: the reward at the end is a tap. */
+  edit: boolean;
 }) {
   const { cols, rows, cells } = snakeLayout(board.goal + 1, aspect);
   const points = cells.map(({ row, col }) => `${col + 0.5},${row + 0.5}`).join(" ");
@@ -462,7 +496,7 @@ function CollectPath({
           />
         </div>
       ))}
-      <div className="rw-cell rw-path-end" style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}>
+      <div className="rw-cell rw-path-end" data-edit={edit ? "reward" : undefined} style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}>
         <span className="rw-reward-emoji" aria-hidden>
           {board.reward ? <ItemPic item={board.reward} kind="reward" lines={greyPrint(look.look)} /> : <Pic src={picture("fest")} emoji="🎉" />}
         </span>
