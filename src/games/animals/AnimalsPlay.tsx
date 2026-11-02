@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/sfx";
+import { playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
@@ -166,7 +166,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
         const mouth = { x: animalBox.left + animalBox.width / 2, y: animalBox.top + animalBox.height * 0.6 };
         setLanded({ who: index, to: { x: mouth.x - start.x + from.x, y: mouth.y - start.y + from.y, scale: 0.3 } });
       }
-      if (settings.sounds) later(450, playMunch);
+      if (settings.sounds) later(450, () => playRecorded("munch", playMunch));
       say(texts.yummy(round.animal, round.foods[index]));
     } else if (round.kind === "gift") {
       // The gift flies to the animal's side and is gone; there the animal makes it anew (`.ap-made`).
@@ -348,21 +348,17 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
       <span ref={emojiRef} className="ap-emoji" role="img" aria-label={texts.animal(round.animal)}>
         {round.animal.emoji}
       </span>
-      {yuck && <span className="ap-bubble">{texts.yuckBubble}</span>}
       {won && round.kind === "gift" && (
         <span className={`ap-made gift-${round.gifts[round.correct].id}`} aria-hidden>
           <GiftDrawing gift={round.gifts[round.correct]} />
         </span>
       )}
       {won && toAnimal && (
-        <>
-          <span className="ap-bubble thanks">{texts.thanksBubble}</span>
-          <span className="ap-hearts" aria-hidden>
-            <span>💖</span>
-            <span>💛</span>
-            <span>💖</span>
-          </span>
-        </>
+        <span className="ap-hearts" aria-hidden>
+          <span>💖</span>
+          <span>💛</span>
+          <span>💖</span>
+        </span>
       )}
     </div>
   );

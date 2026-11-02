@@ -25,7 +25,6 @@
 .zo-dust circle,
 .zo-nashorn-bird,
 .zo-affe-mouth,
-.zo-papagei-bubble,
 .zo-koala-zzz text,
 .zo-flamingo-ripples ellipse,
 .zo-bahn-smoke circle,
@@ -998,10 +997,6 @@
 
 .item-papagei.playing .zo-papagei-tail {
   animation: zo-wiggle 0.3s ease-in-out 6;
-}
-
-.item-papagei.playing .zo-papagei-bubble {
-  animation: zo-pop 1.6s ease-out 0.2s;
 }
 
 /* ---------- Pfau: opens its fan of feathers ---------- */

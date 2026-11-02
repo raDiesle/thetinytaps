@@ -1,5 +1,5 @@
 import { CHEEK, Eye, Face, INK, Inside, heartPath, nth } from "../shared";
-import { Lid, Notes, Puffs } from "../spielplatz/parts";
+import { Lid, Puffs } from "../spielplatz/parts";
 import { Blades, eggPath } from "./parts";
 
 // Animals of the Easter garden: the blackbird's nest, the hen on her eggs, the hatching
@@ -37,7 +37,6 @@ export function Amselnest() {
         <path d="M121 -300 L106 -297 L121 -294 Z" fill="#ff922b" />
         <path className="os-amsel-worm" d="M110 -297 q-6 6 -2 12 q4 6 -2 12" stroke="#ff8fa3" strokeWidth="4" strokeLinecap="round" fill="none" />
       </g>
-      <Notes x={190} y={-310} texts={["Piep!", "Piep!"]} colour="#fff" size={22} />
     </>
   );
 }
@@ -75,7 +74,6 @@ export function Henne() {
       {/* The front of the straw nest */}
       <path d="M-80 -26 Q0 8 80 -26 L76 -2 Q0 16 -76 -2 Z" fill="#e9c46a" />
       <path d="M-70 -14 l18 6 M-40 -6 l16 2 M10 -4 l16 -2 M44 -10 l18 -6 M-20 2 l14 0" stroke="#d4a373" strokeWidth="3" strokeLinecap="round" />
-      <Notes x={70} y={-150} texts={["Gack!", "Gack!"]} colour="#fff" size={26} />
     </>
   );
 }
@@ -114,7 +112,6 @@ export function Eikueken() {
         <path d={CRACK} stroke="#c9b48a" strokeWidth="3" strokeLinejoin="round" fill="none" />
       </g>
       <Blades xs={[-30, -6, 12, 30, 46]} shade="#52b788" height={20} />
-      <Notes x={30} y={-120} texts={["Piep!"]} colour="#ffe066" size={26} />
     </>
   );
 }
@@ -157,7 +154,6 @@ export function Mutterschaf() {
         <ellipse cx="-82" cy="-92" rx="8" ry="5" fill="#343a40" />
         <ellipse className="os-schaf-mouth" cx="-82" cy="-84" rx="6" ry="4" fill="#ff8fa3" style={{ transformOrigin: "-82px -86px" }} />
       </g>
-      <Notes x={-150} y={-160} texts={["Mäh!"]} colour="#fff" size={30} />
     </>
   );
 }
@@ -211,7 +207,6 @@ export function Laemmchen() {
         <rect x="48" y="-62" width="20" height="4" rx="2" fill="#f59f00" />
         <circle cx="58" cy="-56" r="3" fill="#f59f00" />
       </g>
-      <Notes x={70} y={-140} texts={["Mäh!"]} colour="#fff" size={26} />
     </g>
   );
 }
@@ -338,7 +333,6 @@ export function Haeschen() {
         r={4}
         fill="#ff922b"
       />
-      <Notes x={-90} y={-120} texts={["Mampf!"]} colour="#fff" size={24} />
     </g>
   );
 }
@@ -365,7 +359,6 @@ export function Regenwurm() {
         <circle cx="36" cy="-4" r="3.5" />
       </g>
       <path className="os-wurm-heart" d={heartPath(40, -70, 9)} fill="#ff6b9a" />
-      <Notes x={-60} y={-90} texts={["Hallo!"]} colour="#fff" size={22} />
     </>
   );
 }

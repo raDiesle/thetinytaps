@@ -112,8 +112,6 @@ export function arabicTexts(german: AnimalTexts): AnimalTexts {
     whereLives: (a) => (animal(a) ? `أين ${by(a, "يعيش", "تعيش")} ${the(a)}؟` : german.whereLives(a)),
     movedIn: (a, h) => (animal(a) && home(h) ? `رائع! ${the(a)} ${by(a, "يعيش", "تعيش")} ${home(h)!.inPhrase}.` : german.movedIn(a, h)),
     livesHere: (resident) => (animal(resident) ? `لا، هنا ${by(resident, "يعيش", "تعيش")} ${the(resident)}!` : german.livesHere(resident)),
-    yuckBubble: "يع!",
-    thanksBubble: "شكرا!",
     stars: (n) => `تم ${n}`,
   };
 }

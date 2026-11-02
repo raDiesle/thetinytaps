@@ -1,5 +1,5 @@
 import { GLASS, INK, Inside, nth } from "../shared";
-import { Head, Notes } from "./parts";
+import { Head } from "./parts";
 
 // Things in the sky above the playground: the kite, the balloon and the little plane.
 // Each drawing is centred on (0, 0) and placed with `float`.
@@ -69,7 +69,6 @@ export function Flugzeug() {
           <ellipse cx="86" cy="18" rx="4" ry="16" fill="#495057" />
         </g>
       </g>
-      <Notes x={60} y={-50} texts={["Brumm!"]} colour="#fff" size={22} />
     </g>
   );
 }

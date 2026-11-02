@@ -179,7 +179,12 @@ In a fresh worktree run `bun install` first.
 ## Rules for every game (toddlers play alone)
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
-- No wrong answers, no error sounds, nothing to read: pictures, sounds and voice.
+- No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
+  for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
+  feedback, November 2026): the sound says it, and what floats up is a music note (♪ ♫), a heart or a puff. Signs that
+  belong to the drawn world (FEUERWEHR, TAXI) may stay. `src/soundWords.test.ts` checks the drawings. Where a
+  game plays only synthesized noises, a real CC0 recording from Freesound is better: `src/lib/sounds/README.md` says how
+  to cut one, and a game loads its recordings when it starts (`loadRecordings`), so even the first sound is the real one.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.

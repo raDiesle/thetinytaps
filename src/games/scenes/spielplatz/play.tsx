@@ -1,6 +1,6 @@
 import { Hideout } from "../hideout";
 import { INK, Inside, SKIN } from "../shared";
-import { Arm, Head, Hearts, Leg, Lid, Notes, Puffs } from "./parts";
+import { Arm, Head, Hearts, Leg, Lid, Puffs } from "./parts";
 
 // The playground equipment: climbing tower and slide, swing, seesaw, roundabout and spring
 // horse. Each drawing has its foot point at (0, 0); children play on all of them.
@@ -83,7 +83,6 @@ export function Kletterturm() {
           return <path key={i} d={`M${-178 + 58 * t} ${y} H${-138 + 54 * t}`} stroke={WOOD} strokeWidth="7" strokeLinecap="round" />;
         })}
       </g>
-      <Notes x={-150} y={-280} texts={["Ahoi!"]} colour="#ffd60a" />
     </>
   );
 }
@@ -122,7 +121,6 @@ export function Rutsche() {
         r={11}
         fill="#f3d8a2"
       />
-      <Notes x={250} y={-180} texts={["Hui!"]} colour="#ffd43b" />
     </>
   );
 }
@@ -174,7 +172,6 @@ export function Schaukel() {
         <circle cx="-138" cy="-152" r="6" fill={SKIN} />
         <circle cx="-82" cy="-152" r="6" fill={SKIN} />
         <Head cx={-110} cy={-144} r={20} hair="#8d5524" />
-        <Notes x={-60} y={-180} texts={["Hui!", "Hoch!"]} colour="#ffd43b" />
       </g>
     </>
   );
@@ -220,7 +217,6 @@ export function Wippe() {
         ]}
         r={11}
       />
-      <Notes x={-40} y={-170} texts={["Hoch!", "Runter!"]} colour="#e599f7" />
     </>
   );
 }
@@ -259,7 +255,6 @@ export function Karussell() {
       </g>
       <path d="M0 -172 V-200" stroke={INK} strokeWidth="5" strokeLinecap="round" />
       <RideKid className="sp-karussell-front" x={0} shirt="#4dabf7" hair="#e9c46a" style="pigtails" />
-      <Notes x={110} y={-150} texts={["Hihi!", "Hui!"]} colour="#ffd43b" />
     </>
   );
 }
@@ -296,7 +291,6 @@ export function Schaukelpferd() {
         <Arm x1={4} y1={-170} x2={60} y2={-150} sleeve="#ff6b6b" w={9} />
         <Head cx={-6} cy={-204} r={20} hair="#6b4423" cap="#4dabf7" />
       </g>
-      <Notes x={60} y={-220} texts={["Hü!", "Hopp!"]} colour="#e599f7" />
     </>
   );
 }

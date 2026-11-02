@@ -1,6 +1,6 @@
 import { Hideout } from "../hideout";
 import { Face, Inside, SKIN, nth } from "../shared";
-import { Arm, Head, Hearts, Leg, Lid, Notes, Puffs, SAND } from "./parts";
+import { Arm, Head, Hearts, Leg, Lid, Puffs, SAND } from "./parts";
 
 // The big things on the beach: the beach chair with grandpa, the beach tent with the baby,
 // the sunshade, the lifeguard tower, the chip shop and the beach hut. Foot point at (0, 0).
@@ -59,7 +59,6 @@ export function Strandkorb() {
       <Leg x1={-18} y1={-96} x2={-30} y2={-30} trousers="#f8f9fa" shoe={SKIN} w={14} />
       <Leg x1={18} y1={-96} x2={30} y2={-30} trousers="#f8f9fa" shoe={SKIN} w={14} />
       <path d="M-100 -108 H100" stroke="#a0673a" strokeWidth="6" />
-      <Notes x={40} y={-236} texts={["Uaaah!"]} colour="#fff" size={26} />
     </>
   );
 }
@@ -139,7 +138,6 @@ export function Sonnenschirm() {
         </g>
         <circle cx="0" cy="-330" r="8" fill="#ffd43b" />
       </g>
-      <Notes x={110} y={-330} texts={["Hui!"]} colour="#fff" size={24} />
     </>
   );
 }
@@ -185,7 +183,6 @@ export function Rettungsturm() {
         <circle cx="-50" cy="-138" r="24" fill="none" stroke="#fff" strokeWidth="13" strokeDasharray="18.8 18.8" />
         <path d="M-50 -172 V-162" stroke="#495057" strokeWidth="3" />
       </g>
-      <Notes x={60} y={-300} texts={["Trillll!"]} colour="#ffd43b" size={26} />
     </>
   );
 }
@@ -250,7 +247,6 @@ export function Pommesbude() {
         </text>
       </g>
       <rect x="-104" y="-30" width="208" height="30" rx="4" fill="#ffc078" />
-      <Notes x={70} y={-180} texts={["Brutzel!"]} colour="#ffd43b" size={22} />
     </>
   );
 }
@@ -303,7 +299,6 @@ export function Strandhaus() {
       </g>
       <circle cx="-78" cy="-152" r="4" fill="#495057" />
       <path d="M60 -10 Q56 -30 70 -36 Q86 -30 82 -10 Z" fill={SAND} />
-      <Notes x={60} y={-140} texts={["Hallo!"]} colour="#fff" size={24} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { Hideout } from "../hideout";
 import { Inside, nth, sparklePath } from "../shared";
-import { Cheek, DinoEye, Notes, Puff, Smile } from "./parts";
+import { Cheek, DinoEye, Puff, Smile } from "./parts";
 
 // The volcano, the cliff with its cave, the hollow log, the muddy puddle and the amber.
 // Each drawing has its foot point at (0, 0). Openings (cave entrance, log hole) are parts
@@ -50,7 +50,6 @@ export function Vulkan() {
           <Smile x={-26} y={-138} w={52} d={10} width={6} />
         </g>
       </g>
-      <Notes x={110} y={-280} texts={["Puff!", "Puff!"]} size={34} delays={[0.5, 1.2]} />
     </>
   );
 }
@@ -101,7 +100,6 @@ export function Hoehle() {
         </g>
       </Inside>
       <path d="M-88 0 Q-96 -112 -14 -126 Q66 -126 72 0" stroke="#7a6a5f" strokeWidth="8" fill="none" />
-      <Notes x={70} y={-120} texts={["Hihi!", "Hallo!"]} size={30} delays={[0.8, 1.2]} />
     </>
   );
 }
@@ -169,7 +167,6 @@ export function Pfuetze() {
           <circle key={i} cx={30 + i * 10} cy={-16} r={6} style={nth(i)} />
         ))}
       </g>
-      <Notes x={90} y={-50} texts={["Platsch!"]} size={26} delays={[1]} />
     </>
   );
 }

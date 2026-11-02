@@ -12,7 +12,6 @@
 .wd-eiche-leaves path,
 .wd-eiche-fall,
 .wd-birke-fall ellipse,
-.wd-notes text,
 .wd-lid,
 .wd-lines path,
 .wd-specht-chips rect,
@@ -125,10 +124,6 @@
 }
 
 /* "Schuhu!", "Kuckuck!": words float up one after the other (Notes in parts.tsx). */
-.scene-item.playing .wd-notes text {
-  animation: wd-notes 1.2s ease-out calc(0.3s + var(--i) * 0.5s);
-}
-
 @keyframes wd-blink {
   0%,
   28%,
@@ -649,10 +644,6 @@
 
 .item-kuckuck.playing .wd-kuckuck-wing {
   animation: wd-flick 0.2s ease-in-out 1.5s 4 alternate;
-}
-
-.item-kuckuck.playing .wd-notes text {
-  animation-delay: calc(var(--i) * 0.75s);
 }
 
 /* ---------- Ameisenhaufen: shivers, a line of ants marches out and round and back in ---------- */

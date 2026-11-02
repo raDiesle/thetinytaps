@@ -1,5 +1,23 @@
 import { byLanguage } from "@/content/texts";
-import { playBaa, playBark, playBuzz, playCluck, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
+import {
+  playBaa,
+  playBark,
+  playBlub,
+  playBuzz,
+  playChatter,
+  playCluck,
+  playCroak,
+  playMeow,
+  playMoo,
+  playNeigh,
+  playOink,
+  playQuack,
+  playRoar,
+  playSquawk,
+  playSqueak,
+  playTweet,
+  recorded,
+} from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
 import { GIFTS, type Gift, type GiftId } from "./gifts";
@@ -43,6 +61,14 @@ const food = (id: string, emoji: string, name: string, plural = name): Food => (
 
 const FISH = food("fisch", "🐟", "Fisch");
 
+/** Every recording the animals' sounds play, loaded when the game starts so even the first sound is the real one. */
+export const ANIMAL_RECORDINGS: string[] = [];
+/** The recording `name` from src/lib/sounds/, `synth` until it is loaded. */
+const real = (name: string, synth: () => void) => {
+  ANIMAL_RECORDINGS.push(name);
+  return recorded(name, synth);
+};
+
 /**
  * The first animal of a home is the one that peeks out when someone else
  * knocks ("Hier wohnt die Kuh!"), so the best-known resident comes first.
@@ -67,7 +93,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fleisch", "fisch", "kaese", "apfel", "moehre", "banane", "mais", "salat", "nuss", "honig", "fliege"],
     home: "huette",
     alsoLives: ["koerbchen"],
-    sound: playBark,
+    sound: real("bark", playBark),
   },
   {
     id: "katze",
@@ -78,7 +104,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fleisch", "knochen", "kaese", "fliege"],
     home: "koerbchen",
     alsoLives: ["huette", "stall"],
-    sound: playMeow,
+    sound: real("meow", playMeow),
   },
   {
     id: "maus",
@@ -89,7 +115,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["nuss", "mais", "apfel", "moehre", "salat", "banane", "heu", "blaetter"],
     home: "mauseloch",
     alsoLives: ["bau", "stall", "hoehle", "nest"],
-    sound: playSqueak,
+    sound: real("mouse", playSqueak),
   },
   {
     id: "vogel",
@@ -100,7 +126,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch"],
     home: "nest",
     alsoLives: ["baum", "stall", "huette", "koerbchen"],
-    sound: playTweet,
+    sound: real("tweet", playTweet),
   },
   {
     id: "baer",
@@ -111,6 +137,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fisch", "nuss", "apfel", "banane", "fleisch", "knochen", "mais", "wurm", "moehre", "blaetter", "bambus"],
     home: "hoehle",
     alsoLives: ["bau", "eis"],
+    sound: real("growl", playRoar),
   },
   {
     id: "biene",
@@ -123,7 +150,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["baum", "nest"],
     gives: "honig",
     alsoGives: [],
-    sound: playBuzz,
+    sound: real("buzz", playBuzz),
   },
   {
     id: "frosch",
@@ -134,6 +161,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["wurm"],
     home: "teich",
     alsoLives: ["aquarium"],
+    sound: real("croak", playCroak),
   },
   {
     id: "kuh",
@@ -146,7 +174,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: [],
     gives: "milch",
     alsoGives: [],
-    sound: playMoo,
+    sound: real("moo", playMoo),
   },
   {
     id: "pferd",
@@ -157,6 +185,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["moehre", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus"],
     home: "stall",
     alsoLives: [],
+    sound: real("neigh", playNeigh),
   },
   {
     id: "eichhoernchen",
@@ -168,12 +197,22 @@ export const ANIMALS: Animal[] = [
     home: "baum",
     alsoLives: ["nest", "hoehle"],
   },
-  { id: "pinguin", emoji: "🐧", name: "Pinguin", the: "der Pinguin", food: FISH, alsoEats: [], home: "eis", alsoLives: ["teich", "aquarium"] },
-  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich"] },
+  {
+    id: "pinguin",
+    emoji: "🐧",
+    name: "Pinguin",
+    the: "der Pinguin",
+    food: FISH,
+    alsoEats: [],
+    home: "eis",
+    alsoLives: ["teich", "aquarium"],
+    sound: real("penguin", playSquawk),
+  },
+  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich"], sound: real("bubbles", playBlub) },
   { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz", alsoLives: [] },
-  { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", alsoLives: ["stall", "nest"], sound: playQuack },
+  { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", alsoLives: ["stall", "nest"], sound: real("quack", playQuack) },
   { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle"] },
-  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [] },
+  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [], sound: real("oink", playOink) },
   {
     id: "affe",
     emoji: "🐵",
@@ -181,6 +220,7 @@ export const ANIMALS: Animal[] = [
     the: "der Affe",
     food: food("banane", "🍌", "Banane", "Bananen"),
     alsoEats: ["apfel", "nuss", "blaetter", "mais", "moehre", "salat", "bambus", "wurm", "fliege"],
+    sound: real("chatter", playChatter),
   },
   {
     id: "huhn",
@@ -191,7 +231,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["wurm", "fliege", "salat", "apfel", "moehre", "nuss", "banane", "blaetter"],
     gives: "ei",
     alsoGives: [],
-    sound: playCluck,
+    sound: real("cluck", playCluck),
   },
   {
     id: "panda",
@@ -210,8 +250,16 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais"],
   },
   // Only in "Was gibt uns das Tier?" so far, and so said in German in every language until that round is translated.
-  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch"], sound: playBaa },
-  { id: "loewe", emoji: "🦁", name: "Löwe", the: "der Löwe", food: food("fleisch", "🍖", "Fleisch"), alsoEats: ["knochen", "fisch"] },
+  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch"], sound: real("baa", playBaa) },
+  {
+    id: "loewe",
+    emoji: "🦁",
+    name: "Löwe",
+    the: "der Löwe",
+    food: food("fleisch", "🍖", "Fleisch"),
+    alsoEats: ["knochen", "fisch"],
+    sound: real("roar", playRoar),
+  },
   {
     id: "giraffe",
     emoji: "🦒",
@@ -255,10 +303,6 @@ export interface AnimalTexts {
   movedIn: (a: Animal, h: Home) => string;
   /** A wrong home: the one who lives there peeks out. */
   livesHere: (resident: Animal) => string;
-  /** In the speech bubble of an animal given the wrong food. */
-  yuckBubble: string;
-  /** In the speech bubble of a fed animal. */
-  thanksBubble: string;
   /** For screen readers: the stars for `n` done ones. */
   stars: (n: number) => string;
 }
@@ -273,8 +317,6 @@ const GERMAN_TEXTS: AnimalTexts = {
   whereLives: (a) => `Wo wohnt ${a.the}?`,
   movedIn: (a, h) => `Juhu! ${capitalize(a.the)} wohnt ${h.inPhrase}.`,
   livesHere: (resident) => `Nein, hier wohnt ${resident.the}!`,
-  yuckBubble: "Bäh!",
-  thanksBubble: "Danke!",
   stars: (n) => `${n} geschafft`,
 };
 

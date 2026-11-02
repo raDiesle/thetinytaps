@@ -171,7 +171,8 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   - wheels turn, lights blink once, horns/exhausts puff, signs and flags swing;
   - people wave, nod, blink, lift a tool; animals blink, wag, twitch ears, hop;
   - plants rustle, petals open, smoke and dust puff, little extras pop out
-    (notes, hearts, drops, sparks) and vanish again.
+    (notes, hearts, drops, sparks) and vanish again – never a word: no floating „Quak!“ or speech bubble,
+    the sound says it (`src/soundWords.test.ts`).
   Draw these parts as separate elements with their own class from the start, so
   they can move – a door painted into the wall can't open.
 - **The picture is still and silent unless someone acts.** No sound ever plays
@@ -184,7 +185,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 ## Texts
 
 - German, 2–3 short sentences per item, present tense, simple words, sounds
-  ("Brumm, brumm!", "Quak!"). Speech is off by default, but the texts are also
+  ("Brumm, brumm!", "Quak!") – spoken only, never drawn into the picture. Speech is off by default, but the texts are also
   used in find mode ("Wo ist der Traktor?").
 - `name` with the correct article; the find question is built from it.
 - German only, unless the user asks for languages: a scene without (or with an incomplete) `ru.ts` plays

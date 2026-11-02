@@ -74,7 +74,6 @@ export function Katze() {
         <path d="M98 -364 h4 l-2 3 Z" fill="#ff8fa3" />
         <path d="M84 -364 h-12 M84 -360 h-11 M116 -364 h12 M116 -360 h11" stroke="#dee2e6" strokeWidth="1.5" />
       </g>
-      <Notes x={124} y={-388} texts={["Miau!"]} colour="#fff" size={22} />
     </g>
   );
 }
@@ -108,7 +107,6 @@ export function Hund() {
         <path d="M114 -110 q8 10 0 20" style={nth(0)} />
         <path d="M126 -118 q12 18 0 36" style={nth(1)} />
       </g>
-      <Notes x={110} y={-130} texts={["Wau!"]} colour="#fff" size={24} />
     </g>
   );
 }
@@ -152,7 +150,6 @@ export function Tauben() {
       <g transform="translate(160 0) scale(-1 1)">
         <Taube x={0} className="sp-taube-b" />
       </g>
-      <Notes x={20} y={-80} texts={["Gurr!"]} colour="#fff" size={22} />
     </>
   );
 }

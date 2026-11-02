@@ -102,7 +102,7 @@ export function Head({
   );
 }
 
-/** Little floating words or notes, e.g. "Hui!", shown one after the other while the item plays. */
+/** Little floating music notes (♪ ♫), shown one after the other while the item plays; never words, the sound says it. */
 export function Notes({ x, y, texts, colour = "#fff", size = 26 }: { x: number; y: number; texts: string[]; colour?: string; size?: number }) {
   return (
     <g

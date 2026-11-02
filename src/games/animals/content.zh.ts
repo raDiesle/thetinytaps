@@ -93,8 +93,6 @@ export function chineseTexts(german: AnimalTexts): AnimalTexts {
     whereLives: (a) => (animal(a) ? `${animal(a)}住在哪里？` : german.whereLives(a)),
     movedIn: (a, h) => (animal(a) && home(h) ? `耶！${animal(a)}住在${home(h)!.place}。` : german.movedIn(a, h)),
     livesHere: (resident) => (animal(resident) ? `不对，这里住的是${animal(resident)}！` : german.livesHere(resident)),
-    yuckBubble: "咦！",
-    thanksBubble: "谢谢！",
     stars: (n) => `完成了 ${n} 个`,
   };
 }

@@ -1,12 +1,13 @@
-import { useCallback, useRef, useState } from "react";
-import { PEEK_ITEMS } from "@/games/shadows/content";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PEEK_ITEMS, SHADOW_RECORDINGS } from "@/games/shadows/content";
 import { useDeck } from "@/games/shadows/deck";
 import { nextLevel } from "@/games/shadows/levels";
 import { PeekPlay } from "@/games/shadows/PeekPlay";
 import { DEV } from "@/lib/buildInfo";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
+import { loadRecordings } from "@/lib/sfx";
 import { AnimalsPlay } from "./AnimalsPlay";
-import { ANIMALS, GIVERS, type Animal } from "./content";
+import { ANIMAL_RECORDINGS, ANIMALS, GIVERS, type Animal } from "./content";
 import { GrowPlay } from "./GrowPlay";
 import { GROWTHS } from "./growth";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
@@ -38,6 +39,8 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const drawPeek = useDeck(PEEK_ITEMS);
   const drawGrowth = useDeck(GROWTHS);
   const lastAnimal = useRef<Animal | null>(null);
+  // The real animal sounds (and the munch), loaded at once so even the first round sounds real.
+  useEffect(() => loadRecordings([...ANIMAL_RECORDINGS, ...SHADOW_RECORDINGS, "munch"]), []);
 
   /** The next animal to feed, house or ask, never the one of the round before (the kinds share some). */
   const drawAnimal = (draw: () => Animal) => {

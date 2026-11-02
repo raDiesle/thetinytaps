@@ -10,7 +10,6 @@
 .he-ahorn-leaf,
 .he-kastanie-sparkle circle,
 .he-hoernchen-crumbs circle,
-.he-kraehe-call,
 .he-amsel-note,
 .he-amsel-berry,
 .he-schnecke-drops path,
@@ -62,7 +61,6 @@
 .he-kastanie-sparkle circle,
 .he-hoernchen-crumbs circle,
 .he-drachen-bow,
-.he-kraehe-call,
 .he-laterne-light,
 .he-laterne-mouth,
 .he-wurm-hat,
@@ -409,10 +407,6 @@
   animation: he-kraehe-caw 0.5s ease-in-out 0.9s 2;
 }
 
-.item-kraehe.playing .he-kraehe-call {
-  animation: he-call 1s ease-out 0.9s;
-}
-
 @keyframes he-kraehe-hop {
   20% {
     transform: translateY(-30px);
@@ -443,22 +437,6 @@
 @keyframes he-kraehe-caw {
   50% {
     transform: rotate(-18deg);
-  }
-}
-
-@keyframes he-call {
-  0% {
-    opacity: 0;
-    transform: translateY(6px) scale(0.6);
-  }
-  20%,
-  80% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-8px);
   }
 }
 

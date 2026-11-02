@@ -1,5 +1,4 @@
 import { Face, INK, Inside, Rider, SKIN, nth } from "../shared";
-import { Notes } from "./parts";
 
 // Up in the air above the beach: the little plane with its banner and the kite. Drawn around (0, 0).
 
@@ -14,9 +13,10 @@ export function Flugzeug() {
       <g className="sd-flug-banner" style={{ transformOrigin: "104px -4px" }}>
         <path d="M104 -26 Q170 -34 236 -26 Q300 -18 340 -26 V20 Q300 28 236 20 Q170 12 104 20 Z" fill="#fff" />
         <path d="M104 -26 V20" stroke="#e63946" strokeWidth="6" />
-        <text x="222" y="6" textAnchor="middle" fontSize="30" fontWeight="800" fontFamily="system-ui, sans-serif" fill="#e63946">
-          HALLO!
-        </text>
+        {/* Hearts instead of words: nothing to read in the picture. */}
+        {[170, 222, 274].map((x) => (
+          <path key={x} d={`M${x} 14 C${x - 24} -2 ${x - 12} -24 ${x} -10 C${x + 12} -24 ${x + 24} -2 ${x} 14 Z`} fill="#e63946" />
+        ))}
       </g>
       <g className="sd-flug-tilt" style={{ transformOrigin: "0px 0px" }}>
         <path d="M30 -12 L58 -42 H70 L66 -6 Z" fill="#e63946" />
@@ -39,7 +39,6 @@ export function Flugzeug() {
           <rect x="-78" y="-34" width="8" height="56" rx="4" fill="#495057" />
         </g>
       </g>
-      <Notes x={-90} y={-50} texts={["Brumm!"]} colour="#fff" size={24} />
     </g>
   );
 }

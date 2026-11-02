@@ -1,5 +1,5 @@
 import { Eye, INK, Inside, Pane, Rider, SKIN, nth } from "../shared";
-import { Drops, FOAM, Head, Lid, Notes, Puffs, Ripples, SEA } from "./parts";
+import { Drops, FOAM, Head, Lid, Puffs, Ripples, SEA } from "./parts";
 
 // Far out on the sea: the lighthouse on its rock, the sailing boat, the big ferry, the
 // dolphin, the rowing boat and the buoy. Everything floats with its foot point (0, 0) on
@@ -187,7 +187,6 @@ export function Schiff() {
         ]}
         r={7}
       />
-      <Notes x={-200} y={-150} texts={["Tuut!", "Tuut!"]} colour="#fff" size={30} />
     </g>
   );
 }
@@ -223,7 +222,6 @@ export function Delfin() {
         ]}
         r={7}
       />
-      <Notes x={70} y={-120} texts={["Ki-ki!"]} colour="#a5d8ff" size={26} />
     </>
   );
 }
@@ -293,7 +291,6 @@ export function Boje() {
           <rect x="-50" y="-6" width="100" height="14" fill={SEA} opacity="0.5" />
         </Inside>
       </g>
-      <Notes x={24} y={-160} texts={["Bing!", "Bong!"]} colour="#ffd43b" size={24} />
     </>
   );
 }

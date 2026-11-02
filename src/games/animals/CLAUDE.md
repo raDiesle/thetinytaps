@@ -39,6 +39,8 @@ crawling or flying ones, the pond's own), and on the last steps the animal hides
 through round gaps in its leaves (`holes`, placed on drawn parts of the animal by `pickPeepholes` in `glyph.ts`; out of
 the pond it still peeks out).
 
+An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(name, synth)` in `content.ts`, loaded when the game starts; the synthesized one until then); a fed animal munches and hearts float up – no „Danke!“ or „Bäh!“ bubble, the sound says it.
+
 ## Rules
 
 - No start screen and no cards for the five kinds: by default all five take turns and the game finds the difficulty

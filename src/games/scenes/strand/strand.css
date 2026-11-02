@@ -1,6 +1,6 @@
 /* Animations of the Strand scene. Durations match durationMs in Strand.tsx. The dog and the
    beach ball are the playground's drawings and are animated in spielplatz.css, as are the
-   blinking eyelids (sp-lid) and the floating words (sp-notes). */
+   blinking eyelids (sp-lid) and the floating music notes (sp-notes). */
 
 @keyframes sd-sea {
   to {

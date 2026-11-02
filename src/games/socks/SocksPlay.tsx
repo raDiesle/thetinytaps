@@ -1,7 +1,19 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { DEV } from "@/lib/buildInfo";
-import { playBoing, playCountNote, playKnock, playMelody, playPlop, playRandomNote, playTwinkle, playWash, playWhoosh } from "@/lib/sfx";
+import {
+  loadRecordings,
+  playBoing,
+  playCountNote,
+  playKnock,
+  playMelody,
+  playPlop,
+  playRandomNote,
+  playRecorded,
+  playTwinkle,
+  playWash,
+  playWhoosh,
+} from "@/lib/sfx";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { speak } from "@/lib/speech";
@@ -189,9 +201,11 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   // The game starts on its own (its card was the tap): the full machine, a moment later it washes, then the socks.
   // Everything goes through `later`, so React's second mount while developing doesn't wash twice.
   useEffect(() => {
+    // A real washing machine (src/lib/sounds/washer.mp3), loaded while the full machine is still standing there.
+    loadRecordings(["washer"]);
     later(INTRO_MS, () => {
       setPhase("washing");
-      if (settings.sounds) playWash();
+      if (settings.sounds) playRecorded("washer", playWash);
     });
     later(INTRO_MS + WASH_MS, () => {
       say(texts.start);
