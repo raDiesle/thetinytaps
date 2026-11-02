@@ -1072,7 +1072,7 @@
 }
 
 /*
- * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top left, held like the ✕ – it lifts
+ * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top left, tapped or held like the ✕ – held, it lifts
  * further while the finger stays (instead of the ring filling), and the page turns back. The fullscreen button and
  * „Zurück zum Menü · halten“ stay beside it, right of it on the picture's edge.
  */

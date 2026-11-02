@@ -63,9 +63,9 @@ test("in the book look the page turning back is the one whose corner is touched,
 });
 
 // Leaving a game is the same corner in the book look (user feedback, October 2026: every way back turns the page back),
-// with a ✕ on it and held like the ✕ – so a child's tap still can't end the game – in the top left like a menu's, and
-// a game's ⚙️ moves to the top right for it.
-test("in the book look a game is left by holding the page's corner, top left", () => {
+// with a ✕ on it, tapped or held like the ✕ (held where grown-ups chose so, so a child's tap can't end the game), in
+// the top left like a menu's, and a game's ⚙️ moves to the top right for it.
+test("in the book look a game is left by the page's corner, top left", () => {
   const shell = readFileSync("src/components/GameShell.tsx", "utf8");
   const exit = shell.slice(shell.indexOf("function ExitButton"));
   expect(exit).toContain("useHold(");

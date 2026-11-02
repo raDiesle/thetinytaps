@@ -1,6 +1,6 @@
 import { lookOf, type ShadowItem } from "@/games/shadows/content";
 import { shuffle } from "@/games/shadows/deck";
-import { FOODS, type Animal, type Food } from "./content";
+import { wrongFoods, wrongHomes, type Animal, type Food } from "./content";
 import { HOMES, type Home } from "./homes";
 
 /** The three kinds of rounds: who peeks out of the bush (X-04), feeding (N-08), who lives where (N-09). */
@@ -62,17 +62,17 @@ export interface HomeRound {
   correct: number;
 }
 
-/** The foods of a feeding round, `animal`'s own among `count`, in random order. */
+/** The foods of a feeding round, `animal`'s own among `count` it doesn't eat (`wrongFoods`), in random order. */
 export function dealFeed(animal: Animal, count: number): FeedRound {
   const right = animal.food!;
-  const foods = shuffle([right, ...shuffle(FOODS.filter((f) => f.id !== right.id)).slice(0, count - 1)]);
+  const foods = shuffle([right, ...shuffle(wrongFoods(animal)).slice(0, count - 1)]);
   return { kind: "feed", animal, foods, correct: foods.indexOf(right) };
 }
 
-/** The homes of a home round, `animal`'s own among `count`, in random order. */
+/** The homes of a home round, `animal`'s own among `count` it doesn't live in (`wrongHomes`), in random order. */
 export function dealHome(animal: Animal, count: number): HomeRound {
   const right = HOMES[animal.home!];
-  const homes = shuffle([right, ...shuffle(Object.values(HOMES).filter((h) => h.id !== right.id)).slice(0, count - 1)]);
+  const homes = shuffle([right, ...shuffle(wrongHomes(animal)).slice(0, count - 1)]);
   return { kind: "home", animal, homes, correct: homes.indexOf(right) };
 }
 

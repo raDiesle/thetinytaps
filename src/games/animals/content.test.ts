@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS } from "./content";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods, wrongHomes } from "./content";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
@@ -107,12 +107,14 @@ test("every round offers exactly one right choice among as many as its step says
         expect(r.foods.length).toBe(level.choices);
         expect(new Set(r.foods.map((f) => f.id)).size).toBe(level.choices);
         expect(r.foods[r.correct]).toBe(animal.food);
+        for (const f of r.foods) if (f !== animal.food) expect(animal.alsoEats, animal.id).not.toContain(f.id);
       }
       if (animal.home) {
         const r = dealHome(animal, level.choices);
         expect(r.homes.length).toBe(level.choices);
         expect(new Set(r.homes).size).toBe(level.choices);
         expect(r.homes[r.correct].id).toBe(animal.home);
+        for (const h of r.homes) if (h.id !== animal.home) expect(animal.alsoLives, animal.id).not.toContain(h.id);
       }
     }
     for (const item of PEEK_ITEMS) {
@@ -125,5 +127,37 @@ test("every round offers exactly one right choice among as many as its step says
       const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
       expect(alike).toBe(level.peek.alike ? Math.min(kin, level.peek.choices - 1) : 0);
     }
+  }
+});
+
+// Exactly one choice may fit (rules in CLAUDE.md): every fed animal says what else it eats, and enough is left that it doesn't.
+test("every fed animal has enough wrong foods that it really doesn't eat", () => {
+  const most = Math.max(...ANIMAL_LEVELS.map((l) => l.choices)); // the most choices a step offers
+  const foods = new Set(FOODS.map((f) => f.id));
+  for (const animal of ANIMALS.filter((a) => a.food)) {
+    expect(animal.alsoEats, `${animal.id} needs its alsoEats list`).toBeDefined();
+    for (const id of animal.alsoEats!) {
+      expect(foods.has(id), `${animal.id} ${id}`).toBe(true);
+      expect(id, animal.id).not.toBe(animal.food!.id);
+    }
+    const wrong = wrongFoods(animal).map((f) => f.id);
+    expect(wrong, animal.id).not.toContain(animal.food!.id);
+    for (const id of animal.alsoEats!) expect(wrong, animal.id).not.toContain(id);
+    expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
+  }
+});
+
+test("every animal with a home has enough wrong homes it really doesn't live in", () => {
+  const most = Math.max(...ANIMAL_LEVELS.map((l) => l.choices)); // the most choices a step offers
+  for (const animal of ANIMALS.filter((a) => a.home)) {
+    expect(animal.alsoLives, `${animal.id} needs its alsoLives list`).toBeDefined();
+    for (const id of animal.alsoLives!) {
+      expect(id in HOMES, `${animal.id} ${id}`).toBe(true);
+      expect(id, animal.id).not.toBe(animal.home!);
+    }
+    const wrong = wrongHomes(animal).map((h) => h.id);
+    expect(wrong, animal.id).not.toContain(animal.home!);
+    for (const id of animal.alsoLives!) expect(wrong, animal.id).not.toContain(id);
+    expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
   }
 });

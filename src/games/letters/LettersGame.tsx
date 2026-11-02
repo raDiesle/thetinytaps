@@ -94,14 +94,9 @@ export function LettersGame() {
         es: "Letras y números",
         ar: "حروف وأرقام",
       })}
-      modes={[
-        { id: "free", emoji: "⌨️", title: freeTitle },
-        { id: "words", emoji: "✍️", title: wordsTitle },
-      ]}
-      mode={settings.mode}
-      onMode={(mode) => update({ mode: mode as LettersMode })}
-      // Nothing to choose first: the card on the home page plays the way played last at once, and every option is
-      // changed while playing (⚙️ held in the top left corner). The start screen shows only after ✕ or „Menü“.
+      // Nothing to choose first: the book on the shelf plays the way played last at once, and every option, the way to
+      // play too, is changed while playing (⚙️ held in the top left corner). No start screen: ✕ and „Menü“ go back to
+      // the shelf, the page before the game (user feedback, November 2026).
       startMode={settings.mode}
     >
       {findLetter ? (

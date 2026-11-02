@@ -4,13 +4,13 @@ import { FullscreenButton } from "@/components/FullscreenButton";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { targetLanguageFor } from "@/content/targetLanguages";
-import { type Figure, useCommonSettings } from "@/lib/common";
+import { type Figure, type Leave, useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
 import { downloadMusic } from "@/lib/musicFile";
 
 /**
  * On the home page, for the grown-ups: small buttons in the top right corner –
- * the play time for all games, the language and the child's figure (boy or girl), each
+ * the play time for all games and how a game is left, the language and the child's figure (boy or girl), each
  * opening its menu only when tapped, so the games fill the screen, then music and fullscreen (last, where
  * every menu has it), switched by one tap. All on the right, so the sun in the
  * top left corner stays in sight.
@@ -28,6 +28,7 @@ export function HomeOptions() {
         label={t({ de: "Spielzeit", ru: "Время игры", en: "Play time", zh: "游戏时间", hi: "खेलने का समय", es: "Tiempo de juego", ar: "وقت اللعب" })}
       >
         <PlaytimeOptions />
+        <LeaveOptions />
       </MenuButton>
       {/* The language by its own name, so a grown-up who can't read the other one still finds theirs. */}
       <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]}>
@@ -150,6 +151,32 @@ export function MenuButton({
       {art ? sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body) : sheet}
       {keep && !open && <div hidden>{children}</div>}
     </div>
+  );
+}
+
+/**
+ * How a game is left with its ✕ (the page's corner in the book look), for all games: one tap, or held for a moment so a
+ * child's tap can't end it. Beside the play time (⏳), the other rule grown-ups set for playing alone; not on the lock
+ * over the menus, which only gives more time.
+ */
+export function LeaveOptions() {
+  const t = useT();
+  const [common, update] = useCommonSettings();
+  return (
+    <section className="settings">
+      <SettingsGroup title={t({ de: "Spiel verlassen" })}>
+        <Choice<Leave>
+          label={t({ de: "✕ zum Verlassen eines Spiels" })}
+          value={common.leave}
+          onChange={(leave) => update({ leave })}
+          options={[
+            { value: "tap", label: t({ de: "Antippen" }) },
+            { value: "hold", label: t({ de: "Gedrückt halten" }) },
+          ]}
+        />
+        <p className="setting-note">{t({ de: "Gedrückt halten: Ihr Kind beendet ein Spiel nicht aus Versehen. Esc muss immer gehalten werden." })}</p>
+      </SettingsGroup>
+    </section>
   );
 }
 

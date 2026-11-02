@@ -221,8 +221,10 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
  */
 export function putBookBack(from: string, go: () => void) {
   const id = shelfBookOf(from);
+  // Going back is never dropped, not even while a book is still on its way out (a grown-up leaving a game that opened
+  // at once): it then goes without the book.
   if (travelling || still() || !id) {
-    if (!travelling) go();
+    go();
     return;
   }
   travelling = true;
