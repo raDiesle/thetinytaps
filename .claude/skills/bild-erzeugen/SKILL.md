@@ -49,7 +49,9 @@ pictures when they are ready.
   would still be lost (waiting batches, uncommitted files, commits not in main).
 - Running batches are noted in the shared `.git/image-batches/`. `bun run image status`
   shows them, `bun run image fetch [--wait]` saves finished ones from any checkout – into
-  the checkout that sent them, or into this one if that worktree is gone.
+  the checkout that sent them, or into this one if that worktree is gone. `fetch` is for a batch nobody waits for:
+  beside the run still waiting for it, both save and one stops with ENOENT. Never pipe a run into `head` either – it
+  cuts off the list of saved pictures (send its output to a file).
 - `--now` asks right away at the full price: only for a quick single try while
   getting a prompt right. `--no-wait` only sends.
 
@@ -186,7 +188,11 @@ names – use those.
    asked, does a child who can't read understand it, faces/feelings clear, no text or
    stray letters, no extra limbs, edges of a cut-out clean (no magenta fringe, nothing
    of the subject cut away). A "warning: only N% of the border …" means the backdrop
-   was not flat – generate again.
+   was not flat – generate again. A picture that shows an action is looked at alone, without its caption: is the
+   action the biggest thing, caught at its plainest moment (a throw with the thing just leaving the paw), does nothing
+   lie where it goes (a breath blown towards a fallen tower read as blowing it over), and does the face show what the
+   moment is meant to be (relieved after a deep breath, not still red with anger)? No hands from the edge unless
+   someone off-picture really acts – say so in the prompt, or Gemini adds a pointing hand.
 4. If it's wrong, change the prompt (be specific about what was wrong) and run again;
    stop after about three tries and show the user the best one with what's off.
 5. Keep files small: cards ~1200×900 at quality 80 (< 200 KB), sprites 512–768 px.

@@ -35,11 +35,11 @@ export const FEELINGS_ZH: Partial<Record<FeelingId, FeelingText>> = {
     endCaption: "又开心了",
   },
   angry: {
-    title: "生气，塔倒了",
-    questions: ["塔倒了，小熊很生气。他可以怎么做？", "小熊还在生气。他可以怎么做？", "小熊还有一点点生气。你会怎么做？"],
-    intro: "小熊很生气！他的塔倒了。",
+    title: "生气，鞋子穿不上",
+    questions: ["鞋子穿不上，小熊很生气。他可以怎么做？", "小熊还在生气。他可以怎么做？", "小熊还有一点点生气。你会怎么做？"],
+    intro: "小熊很生气！他的鞋子穿不上。",
     instead: [
-      { caption: "扔玩具", answer: "嗯，扔东西会把东西摔坏。还是把生气放出来吧：用力跺跺脚！" },
+      { caption: "扔鞋子", answer: "嗯，扔东西会把东西摔坏。还是把生气放出来吧：用力跺跺脚！" },
       { caption: "大声喊叫", answer: "嗯，大喊大叫会让生气变得更大。还是深深地吹口气吧：呼——。" },
       { caption: "打人", answer: "嗯，打人会疼。还是抱抱他吧。" },
     ],
