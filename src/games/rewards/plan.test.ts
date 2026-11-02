@@ -5,6 +5,8 @@ import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./bo
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { ACTIVITIES, DAY_CARDS, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
+  counterOf,
+  counting,
   currentStep,
   DAY_SHAPES,
   dayCards,
@@ -14,7 +16,7 @@ import {
   gameOf,
   MAX_PART_STEPS,
   MAX_STEPS,
-  MIN_PART_STEPS,
+  partFloor,
   nightsUntil,
   nowSteps,
   pairsOf,
@@ -26,13 +28,16 @@ import {
   routineStep,
   shapeOf,
   splitDone,
+  starsGot,
   stepDone,
   stepLimit,
   stepFromCatalog,
   stepsOn,
   templateLists,
+  withCounter,
   withSame,
   withShape,
+  withStepStars,
   withSteps,
 } from "./plan";
 import { printsCards } from "./PlanPrint";
@@ -106,11 +111,12 @@ describe("plan catalogue", () => {
       for (const card of pool) expect(STEP_BY_ID.has(card.id), `${name}: ${card.id}`).toBe(true);
       expect(new Set(pool.map((c) => c.rank)).size, name).toBe(pool.length);
     }
-    // In parts, the four first of each part are „Mein Tag“ as it was; the whole day's seven are the day with Kita.
+    // In parts, the three first of each part are „Mein Tag“ – six cards, the default (user feedback, November 2026); the
+    // whole day's seven are the day with Kita.
     const mine = stepsOn(template("mein-tag"), WED);
     for (const part of ["morning", "evening"] as const)
-      expect(dayCards(part, 4).map((s) => s.id)).toEqual(mine.filter((s) => s.part === part).map((s) => s.id));
-    expect(DAY_SHAPES.split.counts).toEqual([4, 4]);
+      expect(dayCards(part, 3).map((s) => s.id)).toEqual(mine.filter((s) => s.part === part).map((s) => s.id));
+    expect(DAY_SHAPES.split.counts).toEqual([3, 3]);
     expect(dayCards(undefined, DAY_SHAPES.whole.counts[0]).map((s) => s.catalog)).toEqual([
       "fruehstueck",
       "kita",
@@ -127,9 +133,10 @@ describe("plan catalogue", () => {
     for (const shape of [DAY_SHAPES.split, DAY_SHAPES.whole]) {
       const parts = shape.counts.length;
       for (let i = 0; i < parts; i++)
-        for (let n = MIN_PART_STEPS; n <= partRoom(shape, i); n++) {
+        for (let n = partFloor(shape, i); n <= partRoom(shape, i); n++) {
           const counts = shape.counts.map((c, j) => (j === i ? n : c));
           const steps = withShape(base, { split: shape.split, counts }).days[0];
+          // A part of a day in two may go entirely (its line removed); the day stays in parts.
           expect(shapeOf(steps)).toEqual({ split: shape.split, counts });
           expect(steps.length).toBeLessThanOrEqual(stepLimit(steps));
           for (const part of partsOf(steps)) expect(part.steps.length).toBeLessThanOrEqual(shape.split ? MAX_PART_STEPS : MAX_STEPS);
@@ -144,11 +151,25 @@ describe("plan catalogue", () => {
     const own = withSteps(
       base,
       0,
-      base.days[0].map((s) => (s.part === "evening" && s.catalog === "baden" ? { ...s, label: "Duschen" } : s)),
+      base.days[0].map((s) => (s.part === "evening" && s.catalog === "vorlesen" ? { ...s, label: "Singen" } : s)),
     );
-    const more = withShape(own, { split: true, counts: [5, 4] });
+    const more = withShape(own, { split: true, counts: [5, 3] });
     expect(more.days[0].filter((s) => s.part === "evening")).toEqual(own.days[0].filter((s) => s.part === "evening"));
     expect(more.days[0].filter((s) => s.part === "morning")).toHaveLength(5);
+    // A part that grows keeps its own cards and adds the next of its pool; one that shrinks drops its last.
+    const swapped = withSteps(
+      own,
+      0,
+      own.days[0].map((s) => (s.part === "morning" && s.catalog === "anziehen" ? { ...s, catalog: "haare", emoji: "💇" } : s)),
+    );
+    const grown = withShape(swapped, { split: true, counts: [4, 3] }).days[0].filter((s) => s.part === "morning");
+    expect(grown.map((s) => s.catalog)).toContain("haare");
+    expect(grown).toHaveLength(4);
+    expect(
+      withShape(own, { split: true, counts: [3, 2] })
+        .days[0].filter((s) => s.part === "evening")
+        .map((s) => s.catalog),
+    ).toEqual(["zaehne", "vorlesen"]);
     // One flow instead of parts: the whole day's cards, no part.
     expect(withShape(own, DAY_SHAPES.whole).days[0].every((s) => !s.part)).toBe(true);
   });
@@ -330,5 +351,37 @@ describe("a card the game finished", () => {
     expect(takeFinishedStep("/tagesplan/")).toBeUndefined();
     finishRoutineStep();
     expect(takeFinishedStep("/tagesplan/")).toBeUndefined();
+  });
+});
+
+describe("Zähler", () => {
+  const plain = withCounter(template("mein-tag"), 0);
+
+  test("a plan counts stars only with a Zähler above 0, and the Zähler is its card's most", () => {
+    expect(counting(plain)).toBe(false);
+    expect(counterOf(plain)).toBe(0);
+    const counted = withCounter(plain, 2);
+    expect(counting(counted)).toBe(true);
+    expect(counterOf(counted)).toBe(2);
+    expect(counted.days.flat().every((step) => step.stars === 2)).toBe(true);
+  });
+
+  test("one card's stars change on one weekday only, and the other days keep theirs", () => {
+    const plan = withCounter(plain, 1);
+    const id = stepsOn(plan, new Date(2026, 10, 2))[0].id;
+    const monday = withStepStars(plan, 0, id, 2);
+    expect(monday.same).toBeFalsy();
+    expect(monday.days[0].find((step) => step.id === id)?.stars).toBe(2);
+    expect(monday.days[1].find((step) => step.id === id)?.stars).toBe(1);
+    const everyDay = withStepStars(plan, null, id, 3);
+    expect(everyDay.days.every((day) => day.find((step) => step.id === id)?.stars === 3)).toBe(true);
+  });
+
+  test("a card never gets more stars than its Zähler from taps", () => {
+    const plan = withCounter(plain, 2);
+    const day = new Date(2026, 10, 2);
+    const step = stepsOn(plan, day)[0];
+    expect(starsGot({ [cellKey(day, step.id)]: 5 }, NO_LINKED, day, step)).toBe(2);
+    expect(starsGot(undefined, NO_LINKED, day, step)).toBe(0);
   });
 });

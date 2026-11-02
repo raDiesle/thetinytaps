@@ -1,24 +1,19 @@
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playCountNote, playPop, playTusch, playTwinkle, playWhoosh, unlockAudio } from "@/lib/sfx";
+import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, suggestsCertificate, takeBackStar } from "./board";
 import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
-import { MARK_BY_ID, MARKS } from "./catalog";
-import { ItemPic, MarkPic, Pic, picture } from "./pictures";
+import { ItemPic, Pic, picture } from "./pictures";
 
-/** How long a grown-up holds a field before its star comes. */
-export const HOLD_MS = 700;
-/** How long the star flies from the middle into its field. */
-const FLY_MS = 650;
-/** How long „Stern zurück“ stays after a star, for a grown-up who held the wrong field. */
+/** How long „Stern zurück“ stays after a star, for a grown-up who tapped the wrong field. */
 const UNDO_MS = 8000;
 
-/** A star the grown-up has unlocked: big in the middle until the child taps it. */
-interface Pending {
-  /** The field it flies to. */
+/** Where a tapped star lands. */
+interface Landing {
+  /** The field it lands on. */
   field: string;
   /** Its log key: a `cellKey`, or null on a collecting board. */
   key: string | null;
@@ -27,12 +22,10 @@ interface Pending {
 }
 
 /**
- * The board on screen, as big as the room allows, and how stars come on it:
- * a grown-up holds an open field until its ring is full, a big star appears in the
- * middle, the child taps it and it flies into the field with a sound. A short tap on a
- * field wiggles it (or twinkles a star that is there), so every tap does something but
- * no tap alone gives a star. A full day, and the reward reached, are celebrated.
- * Stars are never taken away – „Stern zurück“ only undoes a wrong hold right after it.
+ * The board on screen, as big as the room allows, and how stars come on it: the child taps an open field and its star
+ * pops in with a sound – one tap is enough (user decision, November 2026: no grown-up's hold, no big star to send off
+ * first). A star already there twinkles, a later day's field wiggles. A full day, and the reward reached, are
+ * celebrated. Stars are never taken away – „Stern zurück“ only undoes a wrong tap right after it.
  * A new board shows example stars (`Board.examples`) until its first real star.
  */
 export function BoardScreen({
@@ -63,13 +56,8 @@ export function BoardScreen({
   const language = useAppLanguage();
   const taskLabel = useTaskLabel();
   const rewardLabel = useRewardLabel();
-  const mark = MARK_BY_ID.get(board.mark) ?? MARKS[0];
   const box = useRef<HTMLDivElement>(null);
   const [aspect, setAspect] = useState(1.6);
-  const [holding, setHolding] = useState<string | null>(null);
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [pending, setPending] = useState<Pending | null>(null);
-  const [flight, setFlight] = useState<CSSProperties | null>(null);
   const [fresh, setFresh] = useState<string | null>(null);
   const [undo, setUndo] = useState<{ key: string | null } | null>(null);
   const [party, setParty] = useState(false);
@@ -99,18 +87,11 @@ export function BoardScreen({
     return () => clearTimeout(timer);
   }, [undo]);
 
-  useEffect(() => () => clearHold(), []);
-
-  // Keys: with a big star waiting any key sends it off; otherwise the stars there twinkle.
-  const bigStar = useRef<HTMLButtonElement>(null);
+  // Keys: the stars there twinkle (a key never gives a star, only a tap on a field does).
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || (e.target as Element).closest("input, textarea, button, a")) return;
       unlockAudio();
-      if (bigStar.current) {
-        bigStar.current.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
-        return;
-      }
       const filled = box.current?.querySelectorAll("[data-state='filled']") ?? [];
       for (const el of filled) poke(el, "twinkle");
       if (filled.length === 0) {
@@ -123,17 +104,11 @@ export function BoardScreen({
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  // Another board: nothing of this one's stars stays waiting.
+  // Another board: nothing of this one's stars can be taken back there.
   useEffect(() => {
-    setPending(null);
     setUndo(null);
     setFresh(null);
   }, [board.id]);
-
-  function clearHold() {
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-    holdTimer.current = null;
-  }
 
   /** Restarts a short CSS animation on a field. */
   const poke = (el: Element, name: "wiggle" | "twinkle") => {
@@ -147,88 +122,40 @@ export function BoardScreen({
 
   const onPointerDown = (e: React.PointerEvent) => {
     const el = (e.target as Element).closest<HTMLElement>("[data-field]");
-    if (!el || pending) return;
+    if (!el) return;
     unlockAudio();
     unlockSpeech();
     const field = el.dataset.field as string;
     const state = el.dataset.state as FieldState;
     const task = fieldTask(field);
-    if (task) say(taskLabel(task));
     if (state === "filled") {
+      if (task) say(taskLabel(task));
       poke(el, "twinkle");
       sound(playTwinkle);
       return;
     }
     if (state === "future") {
+      if (task) say(taskLabel(task));
       poke(el, "wiggle");
       sound(playPop);
       return;
     }
-    // An open field: the ring fills while it is held; let go early and it only wiggles.
-    sound(() => playCountNote(0));
-    setHolding(field);
-    clearHold();
-    holdTimer.current = setTimeout(() => {
-      holdTimer.current = null;
-      setHolding(null);
-      unlock(field);
-    }, HOLD_MS);
+    // An open field: its star comes at once; on a collecting board the next free field gets it, whichever was tapped.
+    if (board.kind === "collect") land({ field: `c${progress(board, stars, linked, today).count}`, key: null, day: today });
+    else if (task) land({ field, key: field, day: parseCellKey(field).day });
   };
 
-  const letGo = () => {
-    if (!holding || !holdTimer.current) return;
-    clearHold();
-    setHolding(null);
-    const el = document.querySelector(`[data-field="${CSS.escape(holding)}"]`);
-    if (el) poke(el, "wiggle");
-  };
-
-  // A finger that slides off the field it holds lets go of it.
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!holding) return;
-    const under = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>("[data-field]");
-    if (under?.dataset.field !== holding) letGo();
-  };
-
-  /** The big star for a held field; on a collecting board it goes to the next free field, whichever was held. */
-  const unlock = (field: string) => {
-    sound(playChime);
-    if (board.kind === "collect") {
-      const { count } = progress(board, stars, linked, today);
-      setPending({ field: `c${count}`, key: null, day: today });
-      return;
-    }
-    if (fieldTask(field)) setPending({ field, key: field, day: parseCellKey(field).day });
-  };
-
-  /** The child taps the big star: it flies to its field, then lands there. */
-  const fly = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (!pending || flight) return;
-    const star = e.currentTarget.getBoundingClientRect();
-    const target = document.querySelector(`[data-field="${CSS.escape(pending.field)}"] .rw-ring`)?.getBoundingClientRect();
-    sound(playWhoosh);
-    if (!target) return land();
-    setFlight({
-      "--dx": `${target.left + target.width / 2 - (star.left + star.width / 2)}px`,
-      "--dy": `${target.top + target.height / 2 - (star.top + star.height / 2)}px`,
-      "--to": `${target.width / star.width}`,
-    } as CSSProperties);
-    setTimeout(land, FLY_MS);
-  };
-
-  const land = () => {
-    if (!pending) return;
+  /** A star lands on its field: the log, a pop and a sound, and the parties of a full day or the goal. */
+  const land = (pending: Landing) => {
     const before = progress(board, stars, linked, day);
     const wasFull = dayFull(board, stars, linked, pending.day);
     const next = addStar(log, board.id, pending.key, today);
     const after = progress(board, next[board.id], linked, day);
     setLog(next);
     if (board.examples) onExamplesOff();
-    setPending(null);
-    setFlight(null);
     setFresh(pending.field);
     setUndo({ key: pending.key });
-    sound(playTwinkle);
+    sound(playChime);
     const target = document.querySelector(`[data-field="${CSS.escape(pending.field)}"]`)?.getBoundingClientRect();
     const x = target ? target.left + target.width / 2 : undefined;
     const y = target ? target.top + target.height / 2 : undefined;
@@ -284,7 +211,7 @@ export function BoardScreen({
   return (
     <div className="rw-screen">
       {/* The fields inside are the targets; one listener for all of them. */}
-      <div ref={box} className="rw-screen-box" onPointerDown={onPointerDown} onPointerUp={letGo} onPointerCancel={letGo} onPointerMove={onPointerMove}>
+      <div ref={box} className="rw-screen-box" onPointerDown={onPointerDown}>
         <BoardSheet
           board={board}
           stars={stars}
@@ -295,7 +222,6 @@ export function BoardScreen({
           look={SCREEN_LOOK}
           aspect={aspect}
           fresh={fresh}
-          holding={holding}
         />
       </div>
       {board.examples && (
@@ -339,37 +265,6 @@ export function BoardScreen({
             ru: "Убрать звезду",
           })}
         </button>
-      )}
-      {pending && (
-        <div className="rw-pending" data-tap-root>
-          <button
-            type="button"
-            ref={bigStar}
-            className={`rw-big-star${flight ? " fly" : ""}`}
-            style={flight ?? undefined}
-            data-tap="goal"
-            aria-label={t({ de: "Stern", en: "Star", zh: "星星", hi: "सितारा", es: "Estrella", ar: "نجمة", ru: "Звезда" })}
-            onPointerDown={fly}
-          >
-            <MarkPic mark={mark} />
-          </button>
-          <button
-            type="button"
-            className="rw-pending-cancel"
-            aria-label={t({
-              de: "Doch keinen Stern",
-              en: "No star after all",
-              zh: "还是不给星星",
-              hi: "सितारा न दें",
-              es: "Mejor sin estrella",
-              ar: "بدون نجمة",
-              ru: "Без звезды",
-            })}
-            onClick={() => setPending(null)}
-          >
-            ✕
-          </button>
-        </div>
       )}
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(false)}>

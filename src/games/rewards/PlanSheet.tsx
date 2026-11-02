@@ -3,9 +3,26 @@ import { dayKey, weekOf } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { AUTO_TITLES, cellKey, isTemplateTitle, type LinkedDays, weekday } from "./board";
+import { useRewardLabel } from "./BoardSheet";
 import { DAY_NAMES, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, SheetStrip } from "./pictures";
-import { nightsUntil, nowSteps, pairsOf, partsOf, type Plan, type PlanStep, splitDone, stepDone, stepsOn } from "./plan";
+import {
+  counting,
+  MAX_PART_STEPS,
+  MAX_STEPS,
+  nightsUntil,
+  nowSteps,
+  pairsOf,
+  partsOf,
+  type Plan,
+  type PlanStep,
+  planProgress,
+  splitDone,
+  starsGot,
+  starsOf,
+  stepDone,
+  stepsOn,
+} from "./plan";
 
 /** Over the first of an Erst–Dann pair. */
 const FIRST: Localized = { de: "Erst", en: "First", zh: "先", hi: "पहले", es: "Primero", ar: "أولًا", ru: "Сначала" };
@@ -82,11 +99,15 @@ export function planLayout(count: number, aspect: number): { cols: number; rows:
 const ROW_GAIN = 1.15;
 
 /**
- * A plan as one picture, the same on screen and on paper: the heading (no date – the switch above says the day), and
- * the cards in the plan's view: Jetzt – Dann (every step in its order, the day's parts in rows of their own, a marker
- * on the one to do – or that one apart and big in a „Jetzt“ field), Erst – Dann (pairs, up to four on a page) or the
- * week in seven columns with moons for the nights until each day. Pure markup – PlanScreen adds the taps
- * through `data-step` – sized in container units like BoardSheet.
+ * A plan as one picture, the same on screen, on paper and while it is made or changed: the heading (no date – the
+ * switch above says the day), and the cards in the plan's view: Jetzt – Dann (every step in its order, the day's parts
+ * in rows of their own, a marker on the one to do – or that one apart and big in a „Jetzt“ field), Erst – Dann (pairs,
+ * up to four on a page) or the week in seven columns with moons for the nights until each day. Where the cards count
+ * stars (a Zähler above 0, `counting`), each card has its row of star fields and the arrow is left out – the stars show
+ * what is done –, and the reward stands at the sheet's end with how many stars are there. With `edit` (the wizard and
+ * „Gestalten“) the same sheet shows where to add a card (＋), take a line of the day away (✕) or set a reward, and its
+ * cards and reward are taps of `ChartEditor`. Pure markup – PlanScreen and ChartEditor add the taps through
+ * `data-step` and `data-edit` – sized in container units like BoardSheet.
  */
 export function PlanSheet({
   plan,
@@ -97,6 +118,7 @@ export function PlanSheet({
   look,
   aspect,
   fresh,
+  edit = false,
 }: {
   plan: Plan;
   /** Ticks shown: real ones and examples. */
@@ -111,6 +133,8 @@ export function PlanSheet({
   aspect: number;
   /** The card just ticked, to pop its tick in. */
   fresh?: string | null;
+  /** Being made or changed: the places to add, take away and choose are drawn (`data-edit`), never on paper. */
+  edit?: boolean;
 }) {
   const { speechLang } = useAppLanguage();
   const title = usePlanTitle()(plan);
@@ -120,10 +144,14 @@ export function PlanSheet({
   const shown = look.print ? undefined : ticks;
   // Only a printed day of a plan whose weekdays differ says which day it is; the screen has the switch above.
   const sub = look.print && plan.view !== "week" && !plan.same ? new Intl.DateTimeFormat(speechLang, { weekday: "long" }).format(day) : "";
-  const props: StepsProps = { plan, ticks: shown, linked, today, day, look, fresh };
+  const editing = edit && !look.print;
+  const props: StepsProps = { plan, ticks: shown, linked, today, day, look, fresh, counts: counting(plan), edit: editing };
 
   return (
-    <div className={`rw-sheet pl-sheet pl-view-${plan.view}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}`} style={style}>
+    <div
+      className={`rw-sheet pl-sheet pl-view-${plan.view}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${editing ? " pl-editing" : ""}`}
+      style={style}
+    >
       {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
         <span className="rw-title">{title}</span>
@@ -137,6 +165,7 @@ export function PlanSheet({
         ) : (
           <DaySteps {...props} aspect={aspect} />
         )}
+        {props.counts && (plan.reward || editing) && <PlanGoal {...props} />}
       </div>
     </div>
   );
@@ -150,12 +179,20 @@ interface StepsProps {
   day: Date;
   look: PlanLook;
   fresh?: string | null;
+  /** The cards count stars: star fields on them, no arrow, every open card of today tapped for its star. */
+  counts: boolean;
+  /** Being made or changed (`PlanSheet`'s `edit`). */
+  edit: boolean;
 }
 
-/** The state of each step of a day: today done, now or later; another day's are done where ticked, else later. */
-function statesOf({ plan, ticks, linked, today, look }: StepsProps, day: Date, steps: PlanStep[]): StepState[] {
+/**
+ * The state of each step of a day: today done, now or later; another day's are done where ticked, else later. Where
+ * the cards count stars every open card of today is „now“ – the stars, not an order, show what is done.
+ */
+function statesOf({ plan, ticks, linked, today, look, counts }: StepsProps, day: Date, steps: PlanStep[]): StepState[] {
   if (look.print) return steps.map(() => "later");
-  const now = dayKey(day) === dayKey(today) ? nowSteps(plan.view, steps, ticks, linked, day) : [];
+  const isToday = dayKey(day) === dayKey(today);
+  const now = !isToday ? [] : counts ? steps.map((_, i) => i) : nowSteps(plan.view, steps, ticks, linked, day);
   return steps.map((step, i) => (stepDone(ticks, linked, day, step) ? "done" : now.includes(i) ? "now" : "later"));
 }
 
@@ -170,6 +207,7 @@ function StepCard({
   number,
   look,
   fresh,
+  got = 0,
   small = false,
 }: {
   day: Date;
@@ -178,13 +216,16 @@ function StepCard({
   number?: number;
   look: PlanLook;
   fresh?: string | null;
+  /** Its stars there today, where it counts stars (`PlanStep.stars`). */
+  got?: number;
   small?: boolean;
 }) {
   const label = useStepLabel()(step);
   const key = cellKey(day, step.id);
+  const stars = starsOf(step);
   return (
     <div
-      className={`pl-card ${state}${small ? " small" : ""}${fresh === key ? " fresh" : ""}`}
+      className={`pl-card ${state}${small ? " small" : ""}${stars ? " has-stars" : ""}${fresh === key ? " fresh" : ""}`}
       data-step={look.print ? undefined : key}
       data-state={look.print ? undefined : state}
       data-tap={look.print ? undefined : tapState({ goal: state === "now", done: state === "done" })}
@@ -196,11 +237,59 @@ function StepCard({
       <span className="pl-emoji" aria-hidden>
         <ItemPic item={step} lines={look.print && !look.color} />
       </span>
-      {state === "done" && (
+      {stars > 0 && <StarFields stars={stars} got={look.print ? 0 : got} />}
+      {state === "done" && !stars && (
         <span className="pl-tick" aria-hidden>
           ✓
         </span>
       )}
+    </div>
+  );
+}
+
+/**
+ * A card's star fields along its foot, one per star of its Zähler: filled as the child taps, the newest popping in. On
+ * paper empty rings, for a sticker or a crayon.
+ */
+function StarFields({ stars, got }: { stars: number; got: number }) {
+  return (
+    <span className="pl-stars" aria-hidden>
+      {Array.from({ length: stars }, (_, i) => (
+        <span key={i} className={`pl-star${i < got ? " filled" : ""}${i === got - 1 ? " last" : ""}`}>
+          {i < got ? "⭐" : ""}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * The reward at the end of a plan that counts stars: its picture, its name and how many stars are there of how many
+ * lead to it (on paper the number to reach). While the plan is made it is a tap to change it, and where it has none a
+ * dashed „＋ Belohnung“ to add one – without it the stars stay, only the picture goes.
+ */
+function PlanGoal({ plan, ticks, linked, day, look, edit }: StepsProps) {
+  const t = useT();
+  const rewardLabel = useRewardLabel();
+  const { count, goal } = planProgress(plan, ticks, linked, day);
+  const reward = plan.reward;
+  if (!reward)
+    return (
+      <div className="pl-goal pl-goal-add" data-edit="reward" role="button" tabIndex={0}>
+        <span aria-hidden>🎁</span>
+        <span className="pl-goal-label">＋ {t({ de: "Belohnung" })}</span>
+      </div>
+    );
+  const label = rewardLabel(reward);
+  return (
+    <div className={`pl-goal${!look.print && count >= goal ? " reached" : ""}`} data-edit={edit ? "reward" : undefined} title={label}>
+      <span className="pl-goal-pic" aria-hidden>
+        <ItemPic item={reward} kind="reward" lines={look.print && !look.color} />
+      </span>
+      <span className="pl-goal-label">{label}</span>
+      <span className="pl-goal-count" role="img" aria-label={`${look.print ? goal : count} / ${goal}`}>
+        <span aria-hidden>⭐</span> {look.print ? goal : `${Math.min(count, goal)} / ${goal}`}
+      </span>
     </div>
   );
 }
@@ -230,14 +319,40 @@ function NoSteps() {
 }
 
 /** A part's sign before its row: ☀️ for the morning, 🌙 for the evening – a picture, not a word („Morgens“ only read out). */
-function PartName({ part }: { part: Slot }) {
+function PartName({ part, edit = false }: { part: Slot; edit?: boolean }) {
   const t = useT();
   const slot = SLOT_BY_ID.get(part);
-  return slot ? (
+  if (!slot) return null;
+  return (
     <span className="pl-part" role="img" aria-label={t(slot.label)} title={t(slot.label)}>
       {slot.emoji}
+      {/* While the plan is made: the line of this part of the day goes (its cards with it). */}
+      {edit && (
+        <span className="pl-row-remove" data-edit="row" data-part={part} role="button" tabIndex={0} aria-label={t({ de: "Zeile entfernen" })}>
+          ✕
+        </span>
+      )}
     </span>
-  ) : null;
+  );
+}
+
+/** While a plan is made: where a card is added – at the end of a part's line, or of a day's column in the week. */
+function AddCard({ part, day, small = false }: { part?: Slot; day?: string; small?: boolean }) {
+  const t = useT();
+  return (
+    <span
+      className={`pl-add${small ? " small" : ""}`}
+      data-edit="add"
+      data-part={part}
+      data-day={day}
+      role="button"
+      tabIndex={0}
+      aria-label={t({ de: "Karte dazu" })}
+      title={t({ de: "Karte dazu" })}
+    >
+      ＋
+    </span>
+  );
 }
 
 /**
@@ -266,9 +381,10 @@ export function PaperArrow({ className = "" }: { className?: string }) {
  * at home – so on paper that board is empty frames, and the cards come on a page of their own to cut out.
  */
 function DaySteps(props: StepsProps & { aspect: number }) {
-  const { plan, ticks, linked, day, look, aspect, fresh } = props;
+  const { plan, ticks, linked, day, look, aspect, fresh, counts, edit } = props;
   const steps = stepsOn(plan, day);
-  const field = !!plan.nowField;
+  // Cards that count stars stay in their place: the stars show what is done, no field and no arrow are needed.
+  const field = !!plan.nowField && !counts && !edit;
   if (field && look.print) return <FieldFrames count={steps.length} aspect={aspect} />;
   const states = statesOf(props, day, steps);
   const { open, done } = field ? splitDone(steps, ticks, linked, day) : { open: steps, done: [] };
@@ -278,14 +394,33 @@ function DaySteps(props: StepsProps & { aspect: number }) {
   // A part's name only where the day has more than one, also once the morning's cards are all done.
   const named = partsOf(steps).length > 1;
   const box = field ? dayBox(props, steps, done, open) : null;
-  // The room for the rows: the sheet less its heading and the box, less the „Jetzt“ column; each part a row of it.
-  const width = lead ? 0.62 : 1;
+  // The room for the rows: the sheet less its heading and the box, less the „Jetzt“ column and the reward; each part a row of it.
+  const width = (lead ? 0.62 : 1) * (counts && (plan.reward || edit) ? 0.82 : 1);
   const card = (step: PlanStep) => (
-    <StepCard day={day} step={step} state={states[steps.indexOf(step)]} number={steps.indexOf(step) + 1} look={look} fresh={fresh} />
+    <StepCard
+      day={day}
+      step={step}
+      state={states[steps.indexOf(step)]}
+      number={steps.indexOf(step) + 1}
+      look={look}
+      fresh={fresh}
+      got={starsGot(ticks, linked, day, step)}
+    />
   );
+  // While it is made, a line can take another card where there is room for it.
+  const roomIn = (row: PlanStep[], part?: Slot) => edit && row.length < (part ? MAX_PART_STEPS : MAX_STEPS);
   return (
     <div className={`pl-dayview${field ? "" : " pl-marked"}`}>
-      {steps.length === 0 && <NoSteps />}
+      {steps.length === 0 &&
+        (edit ? (
+          <ol className="pl-steps pl-line">
+            <li className="pl-slot">
+              <AddCard />
+            </li>
+          </ol>
+        ) : (
+          <NoSteps />
+        ))}
       {open.length > 0 && (
         <div className={`pl-flow${lead ? " has-now" : ""}`}>
           {lead && (
@@ -298,10 +433,11 @@ function DaySteps(props: StepsProps & { aspect: number }) {
             <div className="pl-then">
               {parts.map(({ part, steps: row }, i) => {
                 // Several parts (morning, evening): each a line of cards as tall as its row, from the left.
-                const { cols, rows } = planLayout(row.length, aspect * (box ? 1.5 : 1.12) * width);
+                const adding = roomIn(row, part);
+                const { cols, rows } = planLayout(row.length + (adding ? 1 : 0), aspect * (box ? 1.5 : 1.12) * width);
                 return (
-                  <div key={`${part}-${i}`} className={`pl-row${part && named ? " pl-row-named" : ""}`}>
-                    {part && named && <PartName part={part} />}
+                  <div key={`${part}-${i}`} className={`pl-row${part && (named || edit) ? " pl-row-named" : ""}`}>
+                    {part && (named || edit) && <PartName part={part} edit={edit && named} />}
                     <ol
                       className={`pl-steps${parts.length > 1 ? " pl-line" : ""}`}
                       style={
@@ -312,11 +448,17 @@ function DaySteps(props: StepsProps & { aspect: number }) {
                     >
                       {row.map((step) => (
                         <li key={step.id} className="pl-slot">
-                          {/* The marker the child moves on, under the card to do (never printed: on paper it is a real one). */}
-                          {!field && !look.print && states[steps.indexOf(step)] === "now" && <PaperArrow className="pl-marker" />}
+                          {/* The marker the child moves on, under the card to do (never printed: on paper it is a real
+                              one) – only where the cards count no stars, which show what is done by themselves. */}
+                          {!field && !counts && !edit && !look.print && states[steps.indexOf(step)] === "now" && <PaperArrow className="pl-marker" />}
                           {card(step)}
                         </li>
                       ))}
+                      {adding && (
+                        <li className="pl-slot">
+                          <AddCard part={part} />
+                        </li>
+                      )}
                     </ol>
                   </div>
                 );
@@ -325,8 +467,23 @@ function DaySteps(props: StepsProps & { aspect: number }) {
           )}
         </div>
       )}
+      {/* A day in two with one line taken away: while it is made, the missing part can come back. */}
+      {edit && named === false && steps.some((step) => step.part) && <MissingPart steps={steps} />}
       {box}
     </div>
+  );
+}
+
+/** While a plan is made: the part of the day whose line was taken away, as a ＋ before its sun or moon to bring it back. */
+function MissingPart({ steps }: { steps: PlanStep[] }) {
+  const t = useT();
+  const gone = (["morning", "evening"] as Slot[]).find((part) => !steps.some((step) => step.part === part));
+  const slot = gone && SLOT_BY_ID.get(gone);
+  if (!slot) return null;
+  return (
+    <span className="pl-part-back" data-edit="add" data-part={slot.id} role="button" tabIndex={0}>
+      ＋ {slot.emoji} {t(slot.label)}
+    </span>
   );
 }
 
@@ -393,18 +550,29 @@ function FirstThen(props: StepsProps & { aspect: number }) {
   const t = useT();
   const steps = stepsOn(plan, day);
   const states = statesOf(props, day, steps);
-  const pairs = pairsOf(steps);
+  // While it is made, a pair more to fill where the page has room for one.
+  const more = props.edit && steps.length % 2 === 0 && steps.length < MAX_STEPS;
+  const pairs = more ? [...pairsOf(steps), []] : pairsOf(steps);
   const { cols, rows } = pairLayout(pairs.length, aspect * 1.12);
-  if (steps.length === 0) return <NoSteps />;
+  if (steps.length === 0 && !props.edit) return <NoSteps />;
   return (
     <div className="pl-pairs" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}>
       {pairs.map((pair) => (
-        <div key={pair[0].id} className={`pl-pair${pair.every((step) => states[steps.indexOf(step)] === "done") ? " done" : ""}`}>
+        <div key={pair[0]?.id ?? "more"} className={`pl-pair${pair.length > 0 && pair.every((step) => states[steps.indexOf(step)] === "done") ? " done" : ""}`}>
           {[0, 1].map((i) => (
             <div key={i} className="pl-pair-slot" role="group" aria-label={t(i === 0 ? FIRST : THEN)}>
               <div className="pl-slot">
                 {pair[i] ? (
-                  <StepCard day={day} step={pair[i]} state={states[steps.indexOf(pair[i])]} look={look} fresh={fresh} />
+                  <StepCard
+                    day={day}
+                    step={pair[i]}
+                    state={states[steps.indexOf(pair[i])]}
+                    look={look}
+                    fresh={fresh}
+                    got={starsGot(props.ticks, props.linked, day, pair[i])}
+                  />
+                ) : props.edit && (i === 0 || pair.length === 1) ? (
+                  <AddCard />
                 ) : (
                   <span className="pl-frame" />
                 )}
@@ -454,11 +622,11 @@ function DoneBox({ day, done, example, fresh, full }: { day: Date; done: PlanSte
 
 /** The week: a column per day with its steps; today's marked, and moons over the days to come – one per night until then. */
 function WeekColumns(props: StepsProps) {
-  const { plan, today, day, look, fresh } = props;
+  const { plan, today, day, look, fresh, edit } = props;
   const t = useT();
   const names = t(DAY_NAMES);
   const week = weekOf(day);
-  const most = Math.max(1, ...week.map((d) => stepsOn(plan, d).length));
+  const most = Math.max(1, ...week.map((d) => stepsOn(plan, d).length + (edit ? 1 : 0)));
   return (
     <div className="pl-week" style={{ "--pl-rows": most } as CSSProperties}>
       {week.map((d) => {
@@ -477,8 +645,18 @@ function WeekColumns(props: StepsProps) {
               )}
             </span>
             {steps.map((step, i) => (
-              <StepCard key={step.id} day={d} step={step} state={states[i]} look={look} fresh={fresh} small />
+              <StepCard
+                key={step.id}
+                day={d}
+                step={step}
+                state={states[i]}
+                look={look}
+                fresh={fresh}
+                got={starsGot(props.ticks, props.linked, d, step)}
+                small
+              />
             ))}
+            {edit && steps.length < MAX_STEPS && <AddCard day={dayKey(d)} small />}
           </div>
         );
       })}

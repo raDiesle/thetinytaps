@@ -8,8 +8,23 @@ import { type RoutineVisit, waitForStep } from "@/lib/routine";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
-import { Pic, picture } from "./pictures";
-import { currentStep, exampleTicks, gameOf, nightsUntil, pairsOf, type Plan, restartDay, routineStep, stepDone, stepsOn } from "./plan";
+import { useRewardLabel } from "./BoardSheet";
+import { ItemPic, Pic, picture } from "./pictures";
+import {
+  counting,
+  currentStep,
+  exampleTicks,
+  gameOf,
+  nightsUntil,
+  pairsOf,
+  type Plan,
+  planProgress,
+  restartDay,
+  routineStep,
+  starsOf,
+  stepDone,
+  stepsOn,
+} from "./plan";
 import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, type StepState, TODAY, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
@@ -46,7 +61,8 @@ function flyFrom(el: Element, from: DOMRect, scale: number, delay = 0) {
  * slides on to the next card, as the child moves the paper one; with its „Jetzt“ field a done card flies into the
  * Fertig-Kiste instead of getting a tick, and „Von vorn“ takes them all out again. The teeth card under
  * „Jetzt“ opens Zähne putzen instead, which comes back here with the card done. A new plan shows example ticks until
- * the first tap.
+ * the first tap. Where the cards count stars (a Zähler above 0), any open card of today takes a tap: one star per tap
+ * pops into its fields until it has its Zähler's stars, and the reward's party comes when the goal is reached.
  */
 export function PlanScreen({
   plan,
@@ -78,6 +94,10 @@ export function PlanScreen({
   const [fresh, setFresh] = useState<string | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
   const [party, setParty] = useState<string | null>(null);
+  /** The party is the reward's, its stars all there (else the day's, every card done). */
+  const [won, setWon] = useState(false);
+  const rewardLabel = useRewardLabel();
+  const counts = counting(plan);
   const { bursts, spawn } = useBursts();
   const move = useRef<Move | null>(null);
   /** Where the marker lay before a tick or „Zurück“: it slides from there to the card to do now. */
@@ -215,8 +235,10 @@ export function PlanScreen({
       navigate(game, { state: { returnTo: pathname } satisfies RoutineVisit });
       return;
     }
-    // The card to do now: done, with a tick, and the next one glows.
-    const next = addStar(log, plan.id, key, today);
+    // The card to do now: done, with a tick, and the next one glows – or, counting stars, one star more on it.
+    const before = planProgress(plan, ticks, linked, stepDay);
+    const next = addStar(log, plan.id, key, today, starsOf(step));
+    const after = planProgress(plan, next[plan.id], linked, stepDay);
     if (boxed) move.current = { key, from: el.getBoundingClientRect(), into: true };
     keepMarker();
     setLog(next);
@@ -225,11 +247,31 @@ export function PlanScreen({
     sound(playChime);
     const rect = el.getBoundingClientRect();
     spawn(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    // The reward reached: its party, whatever else is left.
+    if (counts && plan.reward && before.count < before.goal && after.count >= after.goal) {
+      const reward = plan.reward;
+      setTimeout(() => {
+        setWon(true);
+        setParty(reward.emoji);
+        sound(playTusch);
+        for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 90);
+        say(
+          `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(reward)}`,
+        );
+      }, 450);
+      return;
+    }
+    // Counting stars, the card isn't done until it has them all: it says itself again.
+    if (counts && !stepDone(next[plan.id], linked, stepDay, step)) {
+      say(label);
+      return;
+    }
     // An Erst–Dann pair stands on its own: done with its Dann card, and its Erst card says what comes then.
     const pair = plan.view === "first-then" ? pairsOf(steps)[Math.floor(index / 2)] : steps;
-    const after = currentStep(pair, next[plan.id], linked, stepDay);
-    if (after === -1) {
+    const left = currentStep(pair, next[plan.id], linked, stepDay);
+    if (left === -1) {
       setTimeout(() => {
+        setWon(false);
         setParty(step.emoji);
         sound(playTusch);
         for (let i = 0; i < 10; i++) setTimeout(() => spawn(), i * 90);
@@ -245,9 +287,11 @@ export function PlanScreen({
           }),
         );
       }, 450);
+    } else if (counts) {
+      say(t({ de: "Super!", en: "Super!", zh: "太棒了！", hi: "शाबाश!", es: "¡Genial!", ar: "رائع!", ru: "Супер!" }));
     } else {
       say(
-        `${t({ de: "Super! Jetzt:", en: "Super! Now:", zh: "太棒了！现在：", hi: "शाबाश! अब:", es: "¡Genial! Ahora:", ar: "رائع! والآن:", ru: "Супер! Теперь:" })} ${stepLabel(pair[after])}`,
+        `${t({ de: "Super! Jetzt:", en: "Super! Now:", zh: "太棒了！现在：", hi: "शाबाश! अब:", es: "¡Genial! Ahora:", ar: "رائع! والآن:", ru: "Супер! Теперь:" })} ${stepLabel(pair[left])}`,
       );
     }
   };
@@ -361,18 +405,20 @@ export function PlanScreen({
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(null)}>
           <span className="rw-party-emoji" aria-hidden>
-            <Pic src={picture("fest")} emoji={party} />
+            {won && plan.reward ? <ItemPic item={plan.reward} kind="reward" /> : <Pic src={picture("fest")} emoji={party} />}
           </span>
           <span className="rw-party-text">
-            {t({
-              de: "Alles geschafft!",
-              en: "All done!",
-              zh: "全部完成啦！",
-              hi: "सब हो गया!",
-              es: "¡Todo listo!",
-              ar: "انتهينا من كل شيء!",
-              ru: "Всё готово!",
-            })}
+            {won && plan.reward
+              ? rewardLabel(plan.reward)
+              : t({
+                  de: "Alles geschafft!",
+                  en: "All done!",
+                  zh: "全部完成啦！",
+                  hi: "सब हो गया!",
+                  es: "¡Todo listo!",
+                  ar: "انتهينا من كل شيء!",
+                  ru: "Всё готово!",
+                })}
           </span>
         </button>
       )}

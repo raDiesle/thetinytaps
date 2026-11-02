@@ -834,8 +834,8 @@ export interface PlanTemplate {
 
 /** The parts of the day that belong together on one page: the morning and the evening routine. */
 const MORNING_AND_EVENING: PlanTemplatePart[] = [
-  { slot: "morning", steps: ["anziehen", "fruehstueck", "zaehne", "schuhe"] },
-  { slot: "evening", steps: ["baden", "zaehne", "vorlesen", "schlafen"] },
+  { slot: "morning", steps: ["anziehen", "fruehstueck", "zaehne"] },
+  { slot: "evening", steps: ["zaehne", "vorlesen", "schlafen"] },
 ];
 
 /** A card a Jetzt – Dann plan takes from its pool: its catalogue id, how soon it comes (1 first) and its time of day. */
@@ -849,7 +849,7 @@ export interface DayCard {
 
 /**
  * What the first step of the wizard fills a Jetzt – Dann plan with, by how many cards are asked for: the morning's and
- * the evening's for a day in two parts (four each make „Mein Tag“), the whole day for one without parts (seven make
+ * the evening's for a day in two parts (three each make „Mein Tag“, six cards on one page), the whole day for one without parts (seven make
  * the day with Kita). Each list is in the day's order.
  */
 export const DAY_CARDS: Record<"morning" | "evening" | "whole", DayCard[]> = {
@@ -865,10 +865,11 @@ export const DAY_CARDS: Record<"morning" | "evening" | "whole", DayCard[]> = {
   evening: [
     { id: "abendessen", rank: 5 },
     { id: "aufraeumen", rank: 6 },
-    { id: "baden", rank: 1 },
-    { id: "zaehne", rank: 2 },
+    { id: "baden", rank: 4 },
+    { id: "zaehne", rank: 1 },
     { id: "vorlesen", rank: 3 },
-    { id: "schlafen", rank: 4 },
+    // The bed comes early: the evening ends with it, and the row of a Jetzt – Dann gets shorter until only the bed is left.
+    { id: "schlafen", rank: 2 },
   ],
   whole: [
     { id: "aufstehen", rank: 13 },

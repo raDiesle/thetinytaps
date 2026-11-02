@@ -27,7 +27,8 @@ export function PlanEditor({
   /** The day shown: its weekday is edited first. */
   day: Date;
   onChange: (plan: Plan) => void;
-  onRestartToday: () => void;
+  /** Missing while the plan is still being made (the wizard). */
+  onRestartToday?: () => void;
   /** Missing when it is the only plan. */
   onRemove?: () => void;
 }) {
@@ -418,27 +419,29 @@ export function PlanEditor({
         </div>
       </SettingsGroup>
 
-      <SettingsGroup title={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}>
-        <div className="rw-chips">
-          <button type="button" disabled={stepsOn(plan, new Date()).length === 0} onClick={onRestartToday}>
-            ↺{" "}
-            {t({
-              de: "Heute noch einmal von vorn",
-              en: "Start today again",
-              zh: "今天从头再来",
-              hi: "आज फिर से शुरू करें",
-              es: "Empezar hoy otra vez",
-              ar: "البدء اليوم من جديد",
-              ru: "Начать сегодня заново",
-            })}
-          </button>
-          {onRemove && (
-            <button type="button" onClick={onRemove}>
-              🗑️ {t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })}
+      {onRestartToday && (
+        <SettingsGroup title={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}>
+          <div className="rw-chips">
+            <button type="button" disabled={stepsOn(plan, new Date()).length === 0} onClick={onRestartToday}>
+              ↺{" "}
+              {t({
+                de: "Heute noch einmal von vorn",
+                en: "Start today again",
+                zh: "今天从头再来",
+                hi: "आज फिर से शुरू करें",
+                es: "Empezar hoy otra vez",
+                ar: "البدء اليوم من جديد",
+                ru: "Начать сегодня заново",
+              })}
             </button>
-          )}
-        </div>
-      </SettingsGroup>
+            {onRemove && (
+              <button type="button" onClick={onRemove}>
+                🗑️ {t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })}
+              </button>
+            )}
+          </div>
+        </SettingsGroup>
+      )}
     </section>
   );
 }

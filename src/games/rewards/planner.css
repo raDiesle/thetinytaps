@@ -572,3 +572,207 @@
   width: 1.3em;
   height: 1.3em;
 }
+
+/* ---------- The Zähler: star fields on the cards, and the reward at the sheet's end ---------- */
+
+/* A card that counts stars keeps room at its foot for them; the picture shrinks a little. */
+.pl-card.has-stars {
+  justify-content: flex-start;
+  gap: 1cqmin;
+  padding-top: 3cqmin;
+}
+
+.pl-card.has-stars .pl-emoji {
+  font-size: 46cqmin;
+}
+
+.pl-card.small.has-stars .pl-emoji {
+  font-size: 50cqmin;
+}
+
+.pl-stars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2cqmin;
+  margin-top: auto;
+}
+
+.pl-star {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 19cqmin;
+  height: 19cqmin;
+  border: max(1.5px, 1.6cqmin) dashed var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  font-family: var(--font-emoji);
+  font-size: 14cqmin;
+  line-height: 1;
+}
+
+.pl-star.filled {
+  border-style: solid;
+  border-color: var(--rw-main);
+  background: color-mix(in srgb, var(--rw-main) 30%, #fff);
+}
+
+.pl-card.small .pl-star {
+  width: 24cqmin;
+  height: 24cqmin;
+  font-size: 18cqmin;
+}
+
+.pl-card.fresh .pl-star.last {
+  animation: pl-tick-in 0.5s ease-out;
+}
+
+.pl-card.twinkle .pl-star.filled {
+  animation: pl-twinkle 0.6s ease-in-out;
+}
+
+/* Cards that count stars: every open card of today may be tapped, so the glow is quieter than the one card under the arrow. */
+.pl-marked .pl-card.has-stars.now {
+  box-shadow: 0 0 0 max(2px, 2cqmin) var(--rw-main);
+}
+
+.pl-card.has-stars.done {
+  opacity: 1;
+  background: color-mix(in srgb, var(--rw-main) 18%, #fff);
+}
+
+.pl-goal {
+  container-type: inline-size;
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 17%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqmin;
+  min-width: 0;
+  margin-left: 1.5cqmin;
+  padding: 1.5cqmin;
+  border: max(2px, 0.6cqmin) solid var(--rw-main);
+  border-radius: 3cqmin;
+  background: #fff;
+  text-align: center;
+}
+
+.pl-goal.reached {
+  border-color: var(--rw-ink);
+  background: color-mix(in srgb, var(--rw-main) 35%, #fff);
+}
+
+.pl-goal-pic {
+  font-family: var(--font-emoji);
+  font-size: 62cqi;
+  line-height: 1;
+}
+
+.pl-goal-pic .rw-pic {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.pl-goal-label {
+  font-size: clamp(0.7rem, 13cqi, 1.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.pl-goal-count {
+  font-size: clamp(0.7rem, 14cqi, 1.8rem);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pl-goal-add {
+  border-style: dashed;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pl-goal-add > span:first-child {
+  font-family: var(--font-emoji);
+  font-size: 40cqi;
+  opacity: 0.6;
+}
+
+/* ---------- While a plan is made: the places to add, take away and choose ---------- */
+
+/* Tapped to change it: a card or the reward shows a pencil's hand. */
+.pl-editing :is(.pl-card, .pl-goal) {
+  cursor: pointer;
+}
+
+.pl-editing .pl-card:hover,
+.pl-editing .pl-goal:hover {
+  outline: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  outline-offset: 2px;
+}
+
+.pl-add {
+  box-sizing: border-box;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+  border: max(2px, 1cqmin) dashed var(--rw-ink);
+  border-radius: 3cqmin;
+  color: var(--rw-ink);
+  font-size: clamp(1rem, 6cqmin, 3rem);
+  font-weight: 800;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.pl-add:hover {
+  opacity: 0.9;
+  background: #fff;
+}
+
+.pl-add.small {
+  flex: none;
+  aspect-ratio: auto;
+  min-height: 8cqmin;
+  font-size: clamp(0.9rem, 4cqmin, 1.6rem);
+}
+
+.pl-part {
+  position: relative;
+}
+
+/* The ✕ that takes a line of the day away, on its sun or moon. */
+.pl-row-remove {
+  position: absolute;
+  top: -0.35em;
+  right: -0.45em;
+  display: grid;
+  place-items: center;
+  width: 0.8em;
+  height: 0.8em;
+  border: 2px solid var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink);
+  font-family: inherit;
+  font-size: 0.5em;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.pl-part-back {
+  align-self: flex-start;
+  padding: 0.6cqmin 2cqmin;
+  border: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  border-radius: 999px;
+  font-size: clamp(0.8rem, 3cqmin, 1.4rem);
+  font-weight: 700;
+  opacity: 0.7;
+  cursor: pointer;
+}

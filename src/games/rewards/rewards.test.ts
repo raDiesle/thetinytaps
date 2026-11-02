@@ -28,7 +28,8 @@ import {
   withKind,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
-import { SPANS } from "./Wizard";
+import { DAY_PARTS } from "./plan";
+import { defaultDraft, draftInSpan, SPANS } from "./ChartEditor";
 import {
   ACTIVITIES,
   CHART_TYPES,
@@ -379,13 +380,33 @@ describe("one page for boards and plans", () => {
     expect(PLAN_TEMPLATES.length).toBeGreaterThan(0);
   });
 
-  // The first step is sorted by time (user feedback, November 2026): every view of either kind in exactly one span,
-  // a day, a week and a month first, and Sammeln, which counts stars whatever the day, last.
-  test("the wizard's first step holds every view, in time spans from the day to Sammeln", () => {
-    expect(SPANS.slice(0, 3).map((span) => span.id)).toEqual(["day", "week", "month"]);
-    expect(SPANS.at(-1)?.id).toBe("collect");
-    for (const kind of KINDS) expect(SPANS.filter((span) => span.board === kind.id)).toHaveLength(1);
-    for (const view of PLAN_VIEWS) expect(SPANS.filter((span) => span.plan === view.id)).toHaveLength(1);
+  // „Zeitraum“ is sorted by time (user feedback, November 2026): a day, a week and a month first, and Sammeln, which
+  // counts stars whatever the day, last. Tag, Woche and Erst – Dann are plans, Monat and Sammeln boards, each with a Vorlage.
+  test("the Zeitraum goes from the day to Sammeln, each span a view with a Vorlage", () => {
+    expect(SPANS.map((span) => span.id)).toEqual(["day", "week", "month", "first-then", "collect"]);
+    for (const span of SPANS) {
+      if (span.type === "plan") expect(PLAN_TEMPLATES.some((tpl) => tpl.view === span.id)).toBe(true);
+      else expect(TEMPLATES.some((tpl) => tpl.kind === span.id)).toBe(true);
+    }
+  });
+
+  // The wizard starts on „Mein Tag“ with a star a card and a reward (user decision, November 2026), and a new Zeitraum
+  // keeps the child's name, the colours and the reward.
+  test("the wizard starts on Mein Tag, 3 + 3 cards with a Zähler and a reward, and a span keeps name and reward", () => {
+    const draft = defaultDraft("de");
+    if (draft.type !== "plan") throw new Error("Mein Tag is a plan");
+    expect(draft.plan.view).toBe("day");
+    expect(DAY_PARTS.map((part) => draft.plan.days[0].filter((step) => step.part === part).length)).toEqual([3, 3]);
+    expect(draft.plan.days[0].every((step) => step.stars === 1)).toBe(true);
+    expect(draft.plan.reward?.catalog).toBe("spielplatz");
+    const named: typeof draft = { type: "plan", plan: { ...draft.plan, childName: "Lena", theme: "meer" } };
+    for (const span of SPANS) {
+      const moved = draftInSpan(span, named, "de");
+      const chart = moved.type === "board" ? moved.board : moved.plan;
+      expect(moved.type).toBe(span.type);
+      expect([chart.childName, chart.theme, chart.reward?.catalog]).toEqual(["Lena", "meer", "spielplatz"]);
+      if (moved.type === "plan") expect(moved.plan.days.flat().every((step) => step.stars === 1)).toBe(true);
+    }
   });
 
   // The wizard asks for the view before the Vorlage and shows only that view's: each needs one besides „Leer anfangen“
