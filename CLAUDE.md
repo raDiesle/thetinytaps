@@ -268,9 +268,15 @@ In a fresh worktree run `bun install` first.
   Töpfchen – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
-  shelf. The Alltagshelfer are what parents need most, so they stand first, top left (first in `CATEGORIES`), the
-  Belohnungstafel first among them and the eye-catcher of the shelf: thicker, bound in gold, pulled out furthest, glowing
-  brightest, a red ribbon hanging out – still, nothing idles. The group is marked as one by a library's label with its name clipped on the
+  shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
+  language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
+  that many books in one slipcase, each opening its part and found by the way back: Belohnungstafel and Zeitplan, right
+  of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents need most, so they stand first,
+  top left (first in `CATEGORIES`), and that slipcase is the eye-catcher of the shelf: red cloth edged in gold, pulled
+  out furthest, glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. What can be taken is
+  plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
+  or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
+  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a library's label with its name clipped on the
   board's edge under it (`DailyGroup`, chosen from four drafts – bookend, sign, paper band – user decision, November
   2026), and beside it words carved into the back panel tell grown-ups in short what
   the shelf holds – the gist of the info book, everyday helpers and first games to share, child with parents or

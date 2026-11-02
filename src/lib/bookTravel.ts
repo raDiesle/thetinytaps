@@ -1,4 +1,4 @@
-import { shelfEntryOf } from "@/content/games";
+import { bookIdOf, shelfEntryOf } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
 import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
@@ -31,8 +31,16 @@ let travelling = false;
 
 const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** The book on the shelf a page is in, by its `data-book`: its category's (its page and its games), or a game's own. */
-export const shelfBookOf = (pathname: string): string | undefined => shelfEntryOf(pathname)?.id;
+/**
+ * The book on the shelf a page is in, by its `data-book`: its category's (its page and its games), a game's own, or the
+ * volume of a game in a slipcase that the page opens (`Game.volumes`).
+ */
+export function shelfBookOf(pathname: string): string | undefined {
+  const entry = shelfEntryOf(pathname);
+  const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
+  const volume = entry?.game?.volumes?.find((v) => path.startsWith(v.href));
+  return volume ? bookIdOf(volume.href) : entry?.id;
+}
 
 function element(className: string, tag = "div") {
   const el = document.createElement(tag);

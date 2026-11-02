@@ -37,7 +37,7 @@ import { TODAY, usePlanTitle } from "./PlanSheet";
 import { PLANNER_SETTINGS_KEY, plannerDefaults } from "./planSettings";
 import { PrintPanel } from "./PrintPanel";
 import { EARLIER, LATER, REVIEW, Review, usePeriodLabel, YESTERDAY } from "./Review";
-import { CHARTS_KEY, type ChartsSettings, NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
+import { NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
 import { type Draft, Wizard, type WizardStart } from "./Wizard";
 import "./rewards.css";
 import "./planner.css";
@@ -89,7 +89,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const [stored, setStored] = useStoredSettings(REWARDS_STARS_KEY, { log: NO_STARS });
   const [boards, updateBoards] = useGameSettings(REWARDS_SETTINGS_KEY, rewardsDefaults(stored.log));
   const [plans, updatePlans] = useGameSettings(PLANNER_SETTINGS_KEY, plannerDefaults(stored.log));
-  const [page, updatePage] = useStoredSettings<ChartsSettings>(CHARTS_KEY, {});
   const [linked] = useState(loadLinkedDays);
   const [panel, setPanel] = useState<Panel | null>(null);
   const [wizardState, setWizard] = useState<WizardState>(null);
@@ -98,8 +97,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const boardTitle = useBoardTitle();
   const planTitle = usePlanTitle();
 
-  // `/tagesplan/` always opens on a plan; the home card's address on what was shown last.
-  const [wanted, setType] = useState<ChartType>(() => (routeType === "plan" ? "plan" : (page.shown ?? routeType)));
+  // Each address opens its own kind, as each has its own book on the shelf: `/tagesplan/` a plan, `/belohnungstafel/` a board.
+  const [wanted, setType] = useState<ChartType>(routeType);
   const board: Board | undefined = boards.boards.find((b) => b.id === boards.current) ?? boards.boards[0];
   // Plans as an older version saved them read as today's (its two-card „Jetzt – Dann“ view).
   const allPlans = plans.plans.map(fromOlder);
@@ -148,7 +147,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const show = (shown: ChartType) => {
     setWizard(null);
     setType(shown);
-    updatePage({ shown });
   };
   const showBoard = (id: string) => {
     updateBoards({ current: id });

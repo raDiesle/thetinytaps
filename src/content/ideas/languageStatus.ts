@@ -56,11 +56,6 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 /** Every game of the home menu once, in menu order, then the home page. */
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
-    href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): der Hinweis zu „Erst – Dann“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx). Neu und nur Deutsch (1. November 2026): die Ansicht „Jetzt – Dann“ mit ihrem Hinweis, „Was wandert?“ mit „Pfeil wandert“ und „Karte wandert“, ihren Druckhinweisen „Nur eine Seite drucken“ / „Karten auch drucken und ausschneiden“ und ihren Hinweisen (catalog.ts, auch beim Drucken und unter „Gestalten“), „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Eine Karte weniger / mehr“ (WizardPlan.tsx) und der Hilfetext des Assistenten (Wizard.tsx). Neu und nur Deutsch (2. November 2026): der Schalter „Belohnung“ und „Zeitraum“ im Assistenten (Wizard.tsx).",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-  },
-  {
     href: "/zaehne/",
     parts: [
       {
@@ -92,6 +87,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. In allen sieben Sprachen aufgenommen (Oktober 2026). Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
     ],
+  },
+  {
+    href: "/belohnungstafel/",
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): der Hinweis zu „Erst – Dann“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx). Neu und nur Deutsch (1. November 2026): die Ansicht „Jetzt – Dann“ mit ihrem Hinweis, „Was wandert?“ mit „Pfeil wandert“ und „Karte wandert“, ihren Druckhinweisen „Nur eine Seite drucken“ / „Karten auch drucken und ausschneiden“ und ihren Hinweisen (catalog.ts, auch beim Drucken und unter „Gestalten“), „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Eine Karte weniger / mehr“ (WizardPlan.tsx) und der Hilfetext des Assistenten (Wizard.tsx). Neu und nur Deutsch (2. November 2026): der Schalter „Belohnung“ und „Zeitraum“ im Assistenten (Wizard.tsx).",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
     href: "/bilder/",

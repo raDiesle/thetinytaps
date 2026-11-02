@@ -1,5 +1,5 @@
 import { type Board, boardFromTemplate, type StarLog } from "./board";
-import { type ChartType, TEMPLATES } from "./catalog";
+import { TEMPLATES } from "./catalog";
 import type { PhotoFormat } from "./photo";
 
 /** How the board is printed. */
@@ -54,11 +54,3 @@ export const REWARDS_SETTINGS_KEY = "tinytaps.rewards.v1";
 export const REWARDS_STARS_KEY = "tinytaps.rewards.stars.v1";
 
 export const NO_STARS: StarLog = {};
-
-/** What the page itself remembers: whether a board or a plan was shown last, so it opens there again. */
-export interface ChartsSettings {
-  /** Missing until the grown-up has chosen: then the address decides (`/tagesplan/` a plan). */
-  shown?: ChartType;
-}
-
-export const CHARTS_KEY = "tinytaps.tafeln.v1";

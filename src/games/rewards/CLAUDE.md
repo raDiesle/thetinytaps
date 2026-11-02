@@ -14,9 +14,10 @@ row of tabs and one wizard.
 „＋ Neu“ and, where the gallery has no room, „🧩 Vorlagen“; above that row the switch of views of the one shown (a
 board's Tag/Woche/Monat/Sammeln, a plan's Jetzt – Dann/Erst – Dann/Woche) with ‹ ›; beside it the Vorlagen
 of its kind, grouped under the names of their views; „Gestalten“,
-„Drucken“ (and a board's „Rückblick“) work on the one shown. The page remembers whether a board or a plan was shown
-(`CHARTS_KEY`, `tinytaps.tafeln.v1`); `/tagesplan/` always opens on a plan, so the teeth card's return and a search
-visitor land there.
+„Drucken“ (and a board's „Rückblick“) work on the one shown. Each address opens its own kind: `/belohnungstafel/` a board,
+`/tagesplan/` a plan (so the teeth card's return and a search visitor land there) – on the shelf each is a book of its
+own in one slipcase (`Game.volumes`, user feedback, November 2026), so the book named Belohnungstafel opens a board
+wherever there is one. Nothing remembers which was shown last.
 
 „＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart. Its first step, „Ansicht“, is the whole choice of form
 (user feedback, October 2026), sorted by the time a chart covers, not by its kind (`SPANS`, user feedback, November
@@ -60,7 +61,7 @@ whatever the address.
 # Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
-the same on screen and on paper (A4 from the browser, also offline). It stands as a book of its own (spine out, the first and gold of the „Alltagshelfer“) on the home page's shelf, but has no
+the same on screen and on paper (A4 from the browser, also offline). It stands on the home page's shelf as two books, „Belohnungstafel“ and „Zeitplan“, in one gold slipcase right of Aufs Töpfchen among the „Alltagshelfer“, but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
 folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, speech, tap

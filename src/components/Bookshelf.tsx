@@ -1,13 +1,14 @@
-import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
 import { RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { CATEGORIES, hasPage, SHELF } from "@/content/games";
+import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
+import { playKnock } from "@/lib/sfx";
 import { BOOK_ASPECT, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
@@ -32,13 +33,18 @@ interface ShelfBook {
   games?: string[];
   /** The cloth of a book standing spine out. */
   colour?: string;
+  /** A game standing as several books in one slipcase (`Game.volumes`): those books, spine out. */
+  volumes?: ShelfBook[];
 }
 
-/** The cloths of the books standing spine out with a game's name, one after the other; the first is gold (`.shelf-daily-first`). */
-const DAILY_COLOURS = ["#c8952c", "#3f6f8f", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62"];
+/** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
+const DAILY_COLOURS = ["#2f78a8", "#3f8a4a", "#b0457a", "#c77d4f", "#2f5d62"];
 
-/** How wide the books spine out stand, in picture books' widths. */
-const DAILY_SPAN = 1.15;
+/** The cloths of the books in a slipcase: the first (the Belohnungstafel) gold, the shelf's eye-catcher. */
+const VOLUME_COLOURS = ["#c8952c", "#7a4fa0", "#2f78a8"];
+
+/** How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to read. */
+const DAILY_SPAN = 1.3;
 
 /** The words carved beside the everyday helpers: all of them, or only the first line where the room is small. */
 interface Carving {
@@ -83,19 +89,42 @@ for (const entry of SHELF) {
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
   };
+  const volumes = entry.game?.volumes?.map(
+    (v, i): ShelfBook => ({ ...book, id: bookIdOf(v.href), href: v.href, title: v.title, emoji: v.emoji, colour: VOLUME_COLOURS[i % VOLUME_COLOURS.length] }),
+  );
+  const daily = (n: number): ShelfBook => ({ ...book, colour: DAILY_COLOURS[n % DAILY_COLOURS.length], volumes });
   if (!entry.game) PLACES.push([book]);
-  else if (last?.[0].colour && last[0].world === book.world) last.push({ ...book, colour: DAILY_COLOURS[last.length % DAILY_COLOURS.length] });
-  else PLACES.push([{ ...book, colour: DAILY_COLOURS[0] }]);
+  else if (last?.[0].colour && last[0].world === book.world) last.push(daily(last.filter((b) => !b.volumes).length));
+  else PLACES.push([daily(0)]);
 }
 
-/** The colours of the books standing with their spines out beside the picture books, only to fill the shelf. */
-const SPINE_COLOURS = ["#b5523b", "#3f6f8f", "#d9a441", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62", "#a8443f", "#6b7fb0", "#e0b85c"];
+/**
+ * The colours of the books standing with their spines out beside the picture books, only to fill the shelf: dusty and
+ * dim, so that they are plainly not what is there to be taken – the books that open something are bright, labelled
+ * and glowing (user feedback, November 2026).
+ */
+const SPINE_COLOURS = ["#7d6a5c", "#5f6b73", "#8a7d64", "#6c735f", "#76656c", "#5d5f6b", "#857261", "#66706a", "#7b7466", "#6a6359"];
 
 /** The eye's distance from the shelf and its height on it, as share of the shelf's (`perspective` in bookshelf.css). */
 const EYE = 1300;
 const EYE_HEIGHT = 0.36;
 /** How deep the shelf is, in book heights (`--d` in bookshelf.css). */
 const DEPTH = 0.56;
+
+/**
+ * A book only filling the shelf, tapped: it rocks on its board with a soft knock and stays where it is, so a child sees
+ * the tap was felt even though this book opens nothing (user feedback, November 2026).
+ */
+function nudge(e: PointerEvent<HTMLElement>) {
+  const book = (e.target as Element).closest<HTMLElement>(".shelf-spines > .shelf-spine, .shelf-lying");
+  if (!book) return;
+  book.classList.remove("nudged");
+  // Read once so that the rocking starts again on a second tap while it still rocks.
+  void book.offsetWidth;
+  book.classList.add("nudged");
+  book.addEventListener("animationend", () => book.classList.remove("nudged"), { once: true });
+  playKnock(book.classList.contains("shelf-lying") ? 420 : 560);
+}
 
 /** What stands in each of the grown-ups' compartments (the stickers' has its little books; the stickers are on its side). */
 const THINGS: Record<ShelfThing, () => ReactNode> = {
@@ -180,7 +209,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
               <div className="shelf-sign">
                 <Logo secretProps={secretProps} />
               </div>
-              <div className="shelf-box">
+              <div className="shelf-box" onPointerDown={nudge}>
                 <span className="shelf-back" />
                 {layout.cells.map((cell, i) => (
                   <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5}>
@@ -212,10 +241,11 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
 
 /**
  * The books of a category whose games stand apart, spines out side by side, marked as one group by a library's label
- * with its name clipped on the board's edge under them (chosen from four drafts, user decision, November 2026), the first –
- * the Belohnungstafel – gold and pulled out a little further than the rest, so it is what the eye finds first (user
- * feedback, November 2026). Beside them, where there is room, words carved into the shelf's back panel tell grown-ups
- * in short what the shelf holds – the info book's gist – and that the Belohnungstafel is worth a look.
+ * with its name clipped on the board's edge under them (chosen from four drafts, user decision, November 2026). A game
+ * with several parts stands as a slipcase of books (`Slipcase`): the Belohnungstafel's, right of Aufs Töpfchen, gold
+ * and pulled out a little further than the rest, so it is what the eye finds first (user feedback, November 2026).
+ * Beside them, where there is room, words carved into the shelf's back panel tell grown-ups in short what the shelf
+ * holds – the info book's gist – and that the Belohnungstafel is worth a look.
  */
 function DailyGroup({
   books,
@@ -230,11 +260,11 @@ function DailyGroup({
   const name = t(CATEGORIES.find((c) => c.id === books[0].world)?.title ?? books[0].title);
   const span = dailySpan(carving);
   return (
-    <span className="shelf-daily-row" style={{ "--span": span } as CSSProperties}>
+    <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN } as CSSProperties}>
       <span className="shelf-daily-books">
-        {books.map((book) => (
-          <SpineBook key={book.id} book={book} count={books.length} onClick={take(book)} />
-        ))}
+        {books.map((book) =>
+          book.volumes ? <Slipcase key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
+        )}
         <span className="shelf-group-label">{name}</span>
       </span>
       {carving && (
@@ -248,6 +278,24 @@ function DailyGroup({
           )}
         </span>
       )}
+    </span>
+  );
+}
+
+/**
+ * Books standing in one slipcase, each a part of one game with its own name on its spine (Belohnungstafel and
+ * Zeitplan): the case's edges frame their spines, so they are seen as belonging together, and each opens its own part.
+ */
+function Slipcase({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void }) {
+  return (
+    <span className="shelf-slipcase" style={{ "--volumes": volumes.length } as CSSProperties}>
+      <span className="box-left" />
+      <span className="box-right" />
+      <span className="box-top" />
+      {volumes.map((book) => (
+        <SpineBook key={book.id} book={book} onClick={take(book)} />
+      ))}
+      <span className="shelf-slipcase-edge" />
     </span>
   );
 }
@@ -396,9 +444,9 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
  * like a book on a real shelf. It keeps the picture book it is hidden inside (`.shelf-daily-book`): taken out, that one
  * turns its cover out and opens (bookTravel.ts).
  */
-function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
+function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   const t = useT();
-  const style = { "--c": book.colour, "--w1": book.colour, "--n": count } as CSSProperties;
+  const style = { "--c": book.colour, "--w1": book.colour } as CSSProperties;
   return (
     <Link
       to={book.href}
@@ -425,10 +473,13 @@ function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; o
   );
 }
 
-/** The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running down below. */
+/**
+ * The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running
+ * down below in one line, never broken (user feedback, November 2026) – the longer the name, the smaller (`--len`).
+ */
 function SpineLabel({ title, emoji }: { title: string; emoji: string }) {
   return (
-    <span className="shelf-daily-label">
+    <span className="shelf-daily-label" style={{ "--len": [...title].length } as CSSProperties}>
       <span className="shelf-daily-emoji" aria-hidden>
         {emoji}
       </span>
