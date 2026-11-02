@@ -64,7 +64,6 @@ export const HINDI_FOODS: Record<string, HindiFood> = {
   heu: { name: "भूसा" },
   apfel: { name: "सेब", many: true },
   nuss: { name: "अखरोट", many: true },
-  kartoffel: { name: "आलू", many: true },
   banane: { name: "केला", likes: "केले", many: true },
   mais: { name: "मक्का" },
   bambus: { name: "बाँस" },

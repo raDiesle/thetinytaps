@@ -179,7 +179,7 @@ function animals(): VoiceGroup[] {
     { label: "Zuhause: richtig", lines: once(housed.map((a) => texts.movedIn(a, HOMES[a.home!]))), built: "Satz mit Tier und Zuhause" },
     { label: "Zuhause: falsch, wer da wohnt", lines: once(residents.map(texts.livesHere)), built: "Satz mit dem Tier, das dort wohnt" },
     {
-      label: "Wer schaut da raus? (dritte Karte)",
+      label: "Wer schaut da raus?",
       lines: once([SHADOW_TEXTS.de.peek, ...PEEK_ITEMS.map(SHADOW_TEXTS.de.there), ...PEEK_ITEMS.map(SHADOW_TEXTS.de.thatIs)]),
     },
   ];

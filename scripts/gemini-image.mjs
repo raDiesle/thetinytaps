@@ -8,6 +8,8 @@
 //   bun run image <out.webp> --from <picture.png> [--transparent] [--size ...]
 //   bun run image status                      batches still running, in all checkouts
 //   bun run image fetch [--wait]              saves what is ready (and waits for the rest)
+//   bun run image queue [--make] [--force <id,…|all>]
+//                                             what of src/content/pictureQueue.ts is cheap now, and makes it
 //
 // By default the pictures go through the Batch API: half the price, but they can
 // take minutes to hours. The script waits and saves them when they are ready;
@@ -17,6 +19,9 @@
 //
 // --grid asks for several pictures in one (half or a quarter of the price each)
 // with magenta gaps and cuts it apart; each panel gets its own --panel description.
+// `queue` uses that for the pictures waiting in src/content/pictureQueue.ts: full
+// sheets and pictures too big for one are made, sheets short of pictures wait
+// (src/content/pictureQueuePlan.ts) unless --force names them.
 //
 // The untouched Gemini picture is kept in .image-raw/ (not committed), so it can
 // be processed again with --from or passed as --ref for the next picture.
@@ -24,6 +29,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import sharp from "sharp";
+import { PICTURE_QUEUE } from "../src/content/pictureQueue.ts";
+import { jobOf, planQueue, REQUEST_PRICE } from "../src/content/pictureQueuePlan.ts";
 
 const RAW_DIR = ".image-raw";
 const DEFAULT_MODEL = "gemini-3.1-flash-lite-image";
@@ -69,6 +76,8 @@ function parseArgs(argv) {
     else if (a === "--now") opts.now = true;
     else if (a === "--no-wait") opts.wait = false;
     else if (a === "--wait") opts.wait = true;
+    else if (a === "--make") opts.make = true;
+    else if (a === "--force") opts.force = next();
     else if (a.startsWith("--")) fail(`unknown option ${a}`);
     else rest.push(a);
   }
@@ -291,6 +300,46 @@ async function status() {
   }
 }
 
+// ---------- The queue ----------
+
+const dollars = (requests) => `$${(requests * REQUEST_PRICE.batch).toFixed(3)}`;
+
+/** Prints what of the queue is cheap now, what waits for partners and what waits for its reference. */
+function printPlan(plan) {
+  if (!PICTURE_QUEUE.length) return console.log("the queue is empty (src/content/pictureQueue.ts)");
+  const ids = (pictures) => pictures.map((p) => p.id).join(", ");
+  console.log(`cheap now – ${plan.now.length} request${plan.now.length === 1 ? "" : "s"}, ${dollars(plan.now.length)}:`);
+  if (!plan.now.length) console.log("  nothing");
+  for (const sheet of plan.now) {
+    const how = sheet.grid ? `sheet ${sheet.grid}${sheet.variants ? ` (+${sheet.variants} variant${sheet.variants > 1 ? "s" : ""})` : ""}` : "alone";
+    console.log(`  ${how}${sheet.forced ? ", forced" : ""}: ${ids(sheet.pictures)}`);
+  }
+  if (plan.waiting.length) {
+    console.log("waiting for partners – making them now anyway costs one request more each:");
+    for (const w of plan.waiting) console.log(`  sheet ${w.grid}, ${w.missing} missing (+${dollars(1)} now): ${ids(w.pictures)}`);
+  }
+  if (plan.blocked.length) {
+    console.log("waiting for their reference to be made first:");
+    for (const { picture, ref } of plan.blocked) console.log(`  ${picture.id} – after ${ref}`);
+  }
+}
+
+/** Sends the jobs as one batch (or at once with --now) and saves the pictures. */
+async function make(jobs) {
+  if (opts.now) {
+    for (const job of jobs) {
+      const answer = await call(`models/${modelOf(opts)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
+      const { picture, error } = pictureIn(answer);
+      if (error) fail(error);
+      await finish(job, picture, ROOT);
+    }
+  } else {
+    const record = await submit(jobs, modelOf(opts));
+    if (opts.wait !== false) await waitFor([record]);
+    else console.log("not waiting – `bun run image fetch` saves the pictures once they are ready");
+  }
+}
+
 // ---------- Saving ----------
 
 async function finish(job, picture, root) {
@@ -469,6 +518,9 @@ async function save(input, { out, size, quality, transparent }) {
   mkdirSync(dirname(out), { recursive: true });
   const info = await img.toFile(out);
   console.log(`saved ${relative(process.cwd(), out)} (${info.width}×${info.height}, ${Math.round(info.size / 1024)} KB)`);
+  // Saved into this checkout or the one that sent the batch: the path ends in the queued file's.
+  const queued = PICTURE_QUEUE.find((p) => out.endsWith(`/${p.file}`));
+  if (queued) console.log(`  made: take "${queued.id}" out of src/content/pictureQueue.ts`);
 }
 
 // ---------- Main ----------
@@ -490,19 +542,16 @@ if (opts.out === "status") {
   for (const [i, piece] of pieces.entries()) {
     await save(job.transparent ? await cutOut(piece, job.key) : piece, { ...job, out: resolve(ROOT, job.outs[i]) });
   }
+} else if (opts.out === "queue") {
+  const plan = planQueue(PICTURE_QUEUE, opts.force === "all" ? "all" : (opts.force?.split(",") ?? []));
+  const unknown = opts.force && opts.force !== "all" ? opts.force.split(",").filter((id) => !PICTURE_QUEUE.some((p) => p.id === id)) : [];
+  if (unknown.length) fail(`not in the queue: ${unknown.join(", ")}`);
+  printPlan(plan);
+  if (opts.make) {
+    if (!plan.now.length) fail("nothing is cheap to make now – --force <id> makes a waiting picture anyway");
+    await make(plan.now.map((sheet) => toJob(checkedJob(jobOf(sheet)))));
+  }
 } else {
   const shared = { refs: opts.refs, aspect: opts.aspect, size: opts.size, quality: opts.quality, transparent: opts.transparent, key: opts.key };
-  const jobs = opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...checkedJob(o) })) : [toJob(opts)];
-  if (opts.now) {
-    for (const job of jobs) {
-      const answer = await call(`models/${modelOf(opts)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
-      const { picture, error } = pictureIn(answer);
-      if (error) fail(error);
-      await finish(job, picture, ROOT);
-    }
-  } else {
-    const record = await submit(jobs, modelOf(opts));
-    if (opts.wait !== false) await waitFor([record]);
-    else console.log("not waiting – `bun run image fetch` saves the pictures once they are ready");
-  }
+  await make(opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...checkedJob(o) })) : [toJob(opts)]);
 }

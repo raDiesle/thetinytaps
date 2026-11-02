@@ -21,16 +21,17 @@ export const SHADOW_LEVELS: ShadowLevel[] = [
 /**
  * The step after a picture, from the wrong shadows tapped in each picture on the current step (newest last): two
  * pictures without one go one up; two in one picture, or one in each of two pictures in a row, go one down. Time
- * plays no part: a slow but sure child climbs too, and nothing asks it to be quick.
+ * plays no part: a slow but sure child climbs too, and nothing asks it to be quick. `top` is the last step; "Was gehört
+ * zum Tier?" climbs its own steps by the same rule.
  */
-export function nextLevel(level: number, misses: number[]): number {
+export function nextLevel(level: number, misses: number[], top = SHADOW_LEVELS.length - 1): number {
   const last = misses.at(-1);
   if (last === undefined) return level;
   const recent = misses.slice(-2);
   let step = 0;
   if (last >= 2 || (recent.length === 2 && recent.every((m) => m > 0))) step = -1;
   else if (recent.length === 2 && recent.every((m) => m === 0)) step = 1;
-  return Math.max(0, Math.min(SHADOW_LEVELS.length - 1, level + step));
+  return Math.max(0, Math.min(top, level + step));
 }
 
 /** The shadows of one round, `item`'s among them, in random order; the others from `pool` as `level` says. */

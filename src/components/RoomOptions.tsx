@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { AppLanguageOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
+import { AppLanguageOptions, LeaveOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
@@ -65,7 +65,10 @@ export function RoomSpeaker() {
   );
 }
 
-/** The hourglass standing in the shelf, turned wood and glass with sand running: the play time for all games (PlaytimeOptions). */
+/**
+ * The hourglass standing in the shelf, turned wood and glass with sand running: the play time for all games
+ * (PlaytimeOptions) and how a game is left (LeaveOptions).
+ */
 export function RoomHourglass() {
   const t = useT();
   const id = useId();
@@ -118,6 +121,7 @@ export function RoomHourglass() {
       }
     >
       <PlaytimeOptions />
+      <LeaveOptions />
     </MenuButton>
   );
 }

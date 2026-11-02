@@ -61,7 +61,6 @@ export const ARABIC_FOODS: Record<string, ArabicFood> = {
   heu: { name: "تبن", likes: "التبن" },
   apfel: { name: "تفاحة", likes: "التفاح" },
   nuss: { name: "جوزة", likes: "الجوز" },
-  kartoffel: { name: "بطاطا", likes: "البطاطا" },
   banane: { name: "موزة", likes: "الموز" },
   mais: { name: "ذرة", likes: "الذرة" },
   bambus: { name: "خيزران", likes: "الخيزران" },
