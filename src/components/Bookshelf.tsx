@@ -60,8 +60,8 @@ interface Carving {
  * none does, since its „mehr …“ is the way to the texts for grown-ups.
  */
 const CARVINGS: Carving[] = [
-  { span: 1.5, short: false, minBook: 170 },
-  { span: 1.2, short: false, minBook: 170 },
+  { span: 1.7, short: false, minBook: 170 },
+  { span: 1.4, short: false, minBook: 170 },
   { span: 1.25, short: true, minBook: 100 },
 ];
 
@@ -282,7 +282,7 @@ function DailyGroup({
               <span>
                 {t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen, die die Kommunikation fördern, und kleinen Helfern für den Tag." })}
               </span>
-              <span>{t({ de: "Alles kostenlos." })}</span>
+              <span>{t({ de: "Alles kostenlos – von\u00a0Eltern\u00a0für\u00a0Eltern." })}</span>
             </>
           )}
           <RoomNotes />

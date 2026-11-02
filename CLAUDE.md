@@ -281,12 +281,14 @@ In a fresh worktree run `bun install` first.
   2026), and beside it words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein, Seite an Seite“ (Seite both page and side, user's choice), then that it is the
   first step into the digital world taken together, with learning games that foster talking together and little helpers
-  for the day, then that all of it is free („Alles kostenlos.“, a line of its own, user feedback, November 2026) – and nothing else: no pointer to one game („Ein Blick in die
+  for the day, then that all of it is free and made by parents for parents („Alles kostenlos – von Eltern für Eltern.“, a line of its own, user feedback, November 2026) – and nothing else: no pointer to one game („Ein Blick in die
   Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). It ends with a carved, underlined „mehr …“
   that opens the texts for grown-ups (`RoomNotes`, see below). The carving takes room of its own on the board
   (`planShelf` takes each place's width), all of it where the picture books stay nearly as big (`CARVING_SHRINK`) and the
   words big enough to read, else only its first line and „mehr …“ – never none, since „mehr …“ is the way to those
-  texts (`CARVINGS`). Its place is only as wide as its words need: a wider one left a gap beside them. Every picture book's cover shows a picture painted for its
+  texts (`CARVINGS`). Its place is only as wide as its words need: a wider one left a gap beside them;
+  words added to it widen its place (`CARVINGS`), never spill past the board – measure its first and last line against
+  its box at 1280×720 and 1920×1080 (the 3D push makes it look smaller than it is laid out). Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
   emojis: a new category gets one with it (`content.test.ts` checks).
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
