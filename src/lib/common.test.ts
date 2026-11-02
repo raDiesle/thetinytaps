@@ -15,7 +15,15 @@ describe("shared options", () => {
   // Read aloud and sounds were switches once; what a grown-up saved then must not silence a game or start the browser's voice.
   test("sounds are always on and the browser's voice always off, whatever was saved", () => {
     storing({ speech: true, sounds: false, music: false });
-    expect(loadCommon()).toEqual({ speech: false, sounds: true, music: false, figure: "boy" });
+    expect(loadCommon()).toEqual({ speech: false, sounds: true, music: false, figure: "boy", leave: "tap" });
+  });
+
+  // Holding ✕ to leave was the only way once; a tap is the default now (user decision, November 2026), holding a choice.
+  test("a game is left with a tap unless holding was chosen", () => {
+    storing({ music: true });
+    expect(loadCommon().leave).toBe("tap");
+    storing({ leave: "hold" });
+    expect(loadCommon().leave).toBe("hold");
   });
 
   // Saved before there was a figure: everything stays as it was drawn first, the boy.

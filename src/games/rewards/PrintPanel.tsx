@@ -10,6 +10,7 @@ import { PRINT } from "./pageParts";
 import { ItemPic, MarkPic, markPicture } from "./pictures";
 import { PhotoPrint } from "./PhotoPrint";
 import type { PrintOptions } from "./settings";
+import { StickerLink, VelcroLink } from "./shopLinks";
 
 /** Print options both panels share. */
 export const PRINT_WORDS = {
@@ -121,8 +122,13 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
             ar: "تُطبع اللوحة فارغة – وتُضاف النجوم بالملصقات أو الأختام أو الأقلام الملونة. إذا غُلّفت (أو وُضعت في غلاف شفاف) واستُخدم قلم قابل للمسح، تدوم أسابيع كثيرة.",
             ru: "Таблица печатается пустой – звёзды появляются с наклейками, штампами или карандашами. В ламинате (или в прозрачном файле) и со стираемым маркером она прослужит много недель.",
           })}
-          {options.cards &&
-            ` ${t({ de: "Die Bildkarten zeigen, wofür es Sterne gibt: laminiert und mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden) hängen sie neben der Tafel oder an einer Klett-Tafel." })}`}
+          <StickerLink />
+          {options.cards && (
+            <>
+              {` ${t({ de: "Die Bildkarten zeigen, wofür es Sterne gibt: laminiert und mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden) hängen sie neben der Tafel oder an einer Klett-Tafel." })}`}
+              <VelcroLink />
+            </>
+          )}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>
           🖨️ {t(PRINT_WORDS.now)}

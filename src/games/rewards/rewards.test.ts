@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import {
   addStar,
   type Board,
@@ -28,6 +28,7 @@ import {
   withKind,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
+import { SPANS } from "./Wizard";
 import {
   ACTIVITIES,
   CHART_TYPES,
@@ -47,7 +48,8 @@ import {
 import { CATEGORIES } from "@/content/games";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { itemPicture, markPicture, picture } from "./pictures";
-import { DEFAULT_REWARDS_SETTINGS, rewardsDefaults } from "./settings";
+import { DEFAULT_REWARDS_SETTINGS, pageStart, rewardsDefaults } from "./settings";
+import { STICKER_EXAMPLE, VELCRO_EXAMPLE } from "./shopLinks";
 
 const prompts = REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts);
 const promptIds = new Set(prompts.map((p) => p.id));
@@ -377,6 +379,15 @@ describe("one page for boards and plans", () => {
     expect(PLAN_TEMPLATES.length).toBeGreaterThan(0);
   });
 
+  // The first step is sorted by time (user feedback, November 2026): every view of either kind in exactly one span,
+  // a day, a week and a month first, and Sammeln, which counts stars whatever the day, last.
+  test("the wizard's first step holds every view, in time spans from the day to Sammeln", () => {
+    expect(SPANS.slice(0, 3).map((span) => span.id)).toEqual(["day", "week", "month"]);
+    expect(SPANS.at(-1)?.id).toBe("collect");
+    for (const kind of KINDS) expect(SPANS.filter((span) => span.board === kind.id)).toHaveLength(1);
+    for (const view of PLAN_VIEWS) expect(SPANS.filter((span) => span.plan === view.id)).toHaveLength(1);
+  });
+
   // The wizard asks for the view before the Vorlage and shows only that view's: each needs one besides „Leer anfangen“
   // (a board's views are checked with the ready-made boards).
   test("every view of a plan has a Vorlage", () => {
@@ -417,4 +428,23 @@ describe("pictures in place of the emoji", () => {
     // Spielplatz is a reward and a plan card: each finds its own picture.
     expect(itemPicture({ emoji: "🛝", catalog: "spielplatz" }, "task")).not.toBe(itemPicture({ emoji: "🛝", catalog: "spielplatz" }, "reward"));
   });
+});
+
+// Belohnungstafel and Zeitplan are two books on the shelf (user feedback, November 2026): each address opens its own
+// kind, and where none of it is made yet, the wizard on that kind – never just the other kind's chart.
+test("each address opens its own kind, or the wizard on it", () => {
+  expect(pageStart("board", { board: true, plan: true })).toEqual({ type: "board", wizard: false });
+  expect(pageStart("plan", { board: true, plan: true })).toEqual({ type: "plan", wizard: false });
+  expect(pageStart("board", { board: false, plan: true })).toEqual({ type: "plan", wizard: true });
+  expect(pageStart("plan", { board: true, plan: false })).toEqual({ type: "board", wizard: true });
+  expect(pageStart("board", { board: false, plan: false })).toEqual({ type: "board", wizard: true });
+});
+
+test("the print instructions link the user's stickers and Velcro dots", () => {
+  expect(STICKER_EXAMPLE).toContain("amazon.de/dp/B0FN3HCT7Y");
+  expect(VELCRO_EXAMPLE).toContain("amazon.de/s?k=klettpunkte+selbstklebend");
+  const source = (file: string) => readFileSync(`${import.meta.dir}/${file}`, "utf8");
+  // The board's A4 note names stickers and, with the picture cards, Velcro dots; the photo guide and the plan's note Velcro.
+  expect(source("PrintPanel.tsx")).toContain("<StickerLink />");
+  for (const file of ["PrintPanel.tsx", "PhotoPrint.tsx", "PlanPrint.tsx"]) expect(source(file)).toContain("<VelcroLink />");
 });

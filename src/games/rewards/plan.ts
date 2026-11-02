@@ -2,7 +2,7 @@ import { dayKey } from "@/games/teeth/daytime";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { cellKey, type LinkedDays, newId, type StarLog, weekday } from "./board";
-import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
+import { DAY_CARDS, type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
 
 // A Tagesplan (a picture schedule, „Strukturtafel“): the steps of each day in their order, and which of today's
 // are done. Plain data and pure functions like board.ts; the ticks share its star log, keyed by plan id.
@@ -44,10 +44,26 @@ export interface Plan {
   template?: string;
   /** Shows example ticks until the first real one, so a new plan looks like one in use. */
   examples?: boolean;
+  /**
+   * Jetzt – Dann only: the card to do moves into a „Jetzt“ field and done cards into the Fertig-Kiste, so on paper the
+   * cards are cut out and moved. Without it every card stays in its place on one sheet and a marker shows the one to do.
+   */
+  nowField?: boolean;
+}
+
+/** A plan as an older version saved it: its two-card „Jetzt – Dann“ view is now a Jetzt – Dann plan with the „Jetzt“ field. */
+export function fromOlder(plan: Plan): Plan {
+  return (plan.view as string) === "now-next" ? { ...plan, view: "day", nowField: true } : plan;
 }
 
 /** At most this many steps a day: more would not fit as pictures a child can follow. */
 export const MAX_STEPS = 8;
+
+/** At most this many steps in each part of a day in parts (Morgen, Abend): each is a routine of its own, in a row of its own. */
+export const MAX_PART_STEPS = 6;
+
+/** The most steps a day may have: `MAX_STEPS`, or `MAX_PART_STEPS` in each part of a day in parts. */
+export const stepLimit = (steps: PlanStep[]): number => (steps.some((step) => step.part) ? DAY_PARTS.length * MAX_PART_STEPS : MAX_STEPS);
 
 /** The game a linked card opens when the child taps it under „Jetzt“; it comes back to the plan afterwards. */
 const GAME_ROUTES: Partial<Record<LinkedGame, string>> = { teeth: "/zaehne/" };
@@ -111,6 +127,67 @@ export function planFromTemplate(template: PlanTemplate, language: TargetLanguag
     theme: template.theme,
     examples: true,
   };
+}
+
+/** How a Jetzt – Dann day is cut: in two parts (morning and evening) or one, and how many cards each part has. */
+export interface DayShape {
+  split: boolean;
+  /** Cards per part, in the parts' order: two for a day in parts, one for a day without. */
+  counts: number[];
+}
+
+/** The parts of a day in two, in their order. */
+export const DAY_PARTS: Slot[] = ["morning", "evening"];
+
+/** Fewest cards a part can have on the wizard's first step: one card is no order. */
+export const MIN_PART_STEPS = 2;
+
+/** Each cut as the wizard first fills it: four in the morning and four in the evening („Mein Tag“), seven for the whole day. */
+export const DAY_SHAPES: Record<"split" | "whole", DayShape> = { split: { split: true, counts: [4, 4] }, whole: { split: false, counts: [7] } };
+
+/** How a day's cards are cut now. */
+export function shapeOf(steps: PlanStep[]): DayShape {
+  if (!steps.some((step) => step.part)) return { split: false, counts: [steps.length] };
+  return { split: true, counts: DAY_PARTS.map((part) => steps.filter((step) => step.part === part).length) };
+}
+
+/** The most cards the wizard gives a part: what its pool holds, at most `MAX_PART_STEPS` (a day in parts) or `MAX_STEPS`. */
+export function partRoom(shape: DayShape, index: number): number {
+  const pool = DAY_CARDS[shape.split ? (DAY_PARTS[index] as "morning" | "evening") : "whole"];
+  return Math.min(pool.length, shape.split ? MAX_PART_STEPS : MAX_STEPS);
+}
+
+/**
+ * A part's cards (or a whole day's, without `part`) as the wizard fills them from `DAY_CARDS`: the `count` of lowest
+ * rank, in the day's order. Their ids carry the time of day where there is one, as in a template of parts, so the
+ * morning's and the evening's teeth card stay apart.
+ */
+export function dayCards(part: Slot | undefined, count: number): PlanStep[] {
+  const pool = DAY_CARDS[part === "morning" || part === "evening" ? part : "whole"];
+  const taken = new Set([...pool].sort((a, b) => a.rank - b.rank).slice(0, count));
+  return pool
+    .filter((card) => taken.has(card))
+    .map(({ id, slot }) => {
+      const time = part ?? slot;
+      const step = { ...stepFromCatalog(id, time), id: time ? `${id}@${time}` : id };
+      return part ? { ...step, part } : step;
+    });
+}
+
+/**
+ * The plan with its day cut as `shape`, every day alike: a part whose count changed (or every part, where the cut
+ * changed) is filled anew from its pool; a part as it was keeps its cards, also those the grown-up chose.
+ */
+export function withShape(plan: Plan, shape: DayShape): Plan {
+  const parts = shape.split ? DAY_PARTS : [undefined];
+  const days = plan.days.map((steps) => {
+    const was = shapeOf(steps);
+    return parts.flatMap((part, i) => {
+      const kept = steps.filter((step) => step.part === part);
+      return was.split === shape.split && kept.length === shape.counts[i] ? kept : dayCards(part, shape.counts[i]);
+    });
+  });
+  return { ...plan, days };
 }
 
 /** A day's steps in its parts (Morgen, Abend), each with its time of day; a plan without parts is one part without one. */

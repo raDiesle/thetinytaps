@@ -300,51 +300,6 @@
   font-weight: 700;
 }
 
-/* The little book below the stickers (RoomNotes), standing a little askew, left of the stickers' wall. */
-.room-note {
-  margin-right: calc(var(--cw) * 0.16);
-  rotate: -4deg;
-  transform-origin: bottom right;
-}
-
-.room-note svg {
-  height: min(calc(var(--ch) * 0.56), calc(var(--cw) * 0.5 / 0.71));
-  width: auto;
-}
-
-.room-note-spine {
-  fill: #5d8a5a;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-  filter: brightness(0.7);
-}
-
-.room-note-cover {
-  fill: #5d8a5a;
-  stroke: var(--ink);
-  stroke-width: 1.8;
-}
-
-.room-note-shine {
-  stroke: #ffffff40;
-  stroke-width: 2;
-}
-
-.room-note-label {
-  fill: #fbf4e3;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-}
-
-.room-note-sign {
-  fill: var(--ink);
-}
-
-.room-note-title {
-  stroke: #fbf4e3cc;
-  stroke-width: 2.6;
-}
-
 /* The two stickers on the shelf's right inner side, glossy, a little askew: the chosen one bright, the other pale. */
 .room-stickers {
   display: flex;
@@ -389,6 +344,32 @@
 .room-sticker svg {
   width: 100%;
   height: 100%;
+}
+
+/* The little ♀ or ♂ on each sticker's right edge, in the girl's lilac or the boy's blue. */
+.room-sticker-sign {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--s) * -0.26);
+  display: grid;
+  place-items: center;
+  width: calc(var(--s) * 0.4);
+  height: calc(var(--s) * 0.4);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 2px #3a261459,
+    inset 0 0 0 1px #00000014;
+  color: #2f6db0;
+  font-family: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif;
+  font-size: calc(var(--s) * 0.32);
+  font-weight: 700;
+  line-height: 1;
+  translate: 0 -50%;
+}
+
+.room-sticker-sign[data-figure="girl"] {
+  color: #b0457a;
 }
 
 .room-sticker[aria-pressed="true"] {
@@ -573,7 +554,7 @@
   color: inherit;
 }
 
-/* The install hint in the little „i“ book (RoomNotes), below its texts. */
+/* The install hint behind the carving's „mehr …“ (RoomNotes), below its texts. */
 .home-menu-panel .install-hint {
   margin: 12px 0 0;
 }
@@ -615,7 +596,7 @@
   pointer-events: none;
 }
 
-.shelf-box :is(.shelf-book, .shelf-daily, .room-thing) {
+.shelf-box :is(.shelf-book, .shelf-daily, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
   pointer-events: auto;
 }
 
@@ -626,6 +607,7 @@
 .shelf-spines,
 .shelf-daily-row,
 .shelf-daily-books,
+.shelf-slipcase,
 .shelf-spine,
 .shelf-stack,
 .shelf-lying,
@@ -818,14 +800,16 @@
 }
 
 /*
- * The books of a compartment, standing a little behind its front edge: books spine out at the ends, the picture books
- * between them with even room round each (their auto margins share what is left).
+ * The books of a compartment, standing a little behind its front edge: the picture books together in the middle,
+ * `BOOK_GAP` round each (`--gap`), and books spine out filling the ends up to them – never spread over a wide board
+ * with big empty room between them, which looked lost on a big monitor (user feedback, November 2026).
  */
 .shelf-row {
   position: absolute;
   inset: 0;
   display: flex;
-  justify-content: space-between;
+  gap: calc(var(--bh) * var(--gap));
+  justify-content: center;
   align-items: flex-end;
   padding: 0 2px;
   transform: translateZ(calc(var(--d) * -0.2));
@@ -837,7 +821,7 @@
  * 2026). A mouse over it tips it further out.
  */
 .shelf-row > .shelf-book {
-  margin: 0 auto;
+  flex: none;
   transform-origin: 50% 100%;
   transform: translateZ(calc(var(--d) * 0.17)) rotateX(-7deg);
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
@@ -859,11 +843,19 @@
   outline-offset: 3px;
 }
 
+/* Each end takes half of what the books leave; its spines stand next to the books, any room left is at the wall. */
 .shelf-end {
   display: flex;
+  flex: 1 1 0;
+  justify-content: flex-end;
   align-items: flex-end;
   gap: 2px;
+  min-width: 0;
   height: 100%;
+}
+
+.shelf-end:last-child {
+  justify-content: flex-start;
 }
 
 .shelf-spines {
@@ -907,12 +899,12 @@
 
 /* ----- A book as a box: `.box-front` (or the cover), `.box-left`, `.box-right` and `.box-top`, `--depth` deep ----- */
 
-:is(.shelf-book, .shelf-spine, .shelf-lying) > :is(.box-left, .box-right, .box-top) {
+:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > :is(.box-left, .box-right, .box-top) {
   position: absolute;
   backface-visibility: hidden;
 }
 
-:is(.shelf-book, .shelf-spine, .shelf-lying) > .box-left {
+:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > .box-left {
   top: 0;
   right: 100%;
   bottom: 0;
@@ -921,7 +913,7 @@
   transform: rotateY(-90deg);
 }
 
-:is(.shelf-book, .shelf-spine, .shelf-lying) > .box-right {
+:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > .box-right {
   top: 0;
   bottom: 0;
   left: 100%;
@@ -930,7 +922,7 @@
   transform: rotateY(90deg);
 }
 
-:is(.shelf-book, .shelf-spine, .shelf-lying) > .box-top {
+:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > .box-top {
   right: 0;
   bottom: 100%;
   left: 0;
@@ -957,13 +949,59 @@
   backface-visibility: hidden;
 }
 
-/* Some carry a paper label on their spine. */
-.shelf-spine.label > .box-front {
+/*
+ * The books only filling the shelf: dull cloth, dim bands, at most a darker plate where a label once was – never a
+ * paper label, a glow or bright colour, which mark the books that open something (user feedback, November 2026).
+ */
+.shelf-spines > .shelf-spine > .box-front {
   background:
-    linear-gradient(#f3e6c8, #f3e6c8) 50% 40% / 62% 16% no-repeat,
-    linear-gradient(#0000 9%, #e8c76acc 9% 11%, #0000 11% 87%, #e8c76acc 87% 89%, #0000 89%),
-    linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047),
+    linear-gradient(#0000 9%, #b39b6a59 9% 11%, #0000 11% 87%, #b39b6a59 87% 89%, #0000 89%),
+    linear-gradient(90deg, #00000059, #ffffff14 45%, #0000002e 70%, #00000066), var(--c);
+}
+
+.shelf-spines > .shelf-spine.label > .box-front {
+  background:
+    linear-gradient(#00000038, #00000038) 50% 40% / 56% 14% no-repeat,
+    linear-gradient(#0000 9%, #b39b6a59 9% 11%, #0000 11% 87%, #b39b6a59 87% 89%, #0000 89%),
+    linear-gradient(90deg, #00000059, #ffffff14 45%, #0000002e 70%, #00000066),
     var(--c);
+}
+
+/*
+ * Tapped, such a book rocks on its board (`nudge` in Bookshelf.tsx, with a soft knock): the tap was felt, though the
+ * book opens nothing. Only on a tap – nothing on the shelf moves by itself.
+ */
+.shelf-spines > .shelf-spine.nudged {
+  transform-origin: 50% 100%;
+  animation: shelf-nudge 0.55s ease-out;
+}
+
+.shelf-lying.nudged {
+  animation: shelf-nudge-lying 0.45s ease-out;
+}
+
+@keyframes shelf-nudge {
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  55% {
+    transform: rotate(3deg);
+  }
+
+  80% {
+    transform: rotate(-1.2deg);
+  }
+}
+
+@keyframes shelf-nudge-lying {
+  30% {
+    transform: translateX(var(--lx)) translateY(-14%);
+  }
+
+  60% {
+    transform: translateX(calc(var(--lx) + 3%));
+  }
 }
 
 .shelf-spine > :is(.box-left, .box-right) {
@@ -1153,18 +1191,17 @@
   align-items: flex-end;
   width: calc(var(--bh) * 0.82 * var(--span, 1));
   height: var(--bh);
-  margin: 0 auto;
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
-/* The books themselves, the first (the Belohnungstafel) a little thicker than the others. */
+/* The books themselves, and the slipcase of the Belohnungstafel and the Zeitplan among them. */
 .shelf-daily-books {
   position: relative;
   display: flex;
   flex: none;
   gap: calc(var(--bh) * 0.03);
   align-items: flex-end;
-  width: calc(var(--bh) * 0.94);
+  width: calc(var(--bh) * 0.82 * var(--books-span));
   height: 100%;
 }
 
@@ -1194,57 +1231,82 @@
   height: calc(var(--bh) * 0.94);
 }
 
+/* Bright cloth with gold bands at its ends, clear of the label, and a warm glow: unlike the dull books only filling the shelf. */
 .shelf-daily > .box-front {
+  background:
+    linear-gradient(#0000 3.5%, #f3d27a 3.5% 5.5%, #0000 5.5% 94.5%, #f3d27a 94.5% 96.5%, #0000 96.5%),
+    linear-gradient(90deg, #00000040, #ffffff38 45%, #0000001f 70%, #00000047), var(--c);
   box-shadow:
     0 0 0 2px #fff6dccc,
     0 0 calc(var(--bh) * 0.06) calc(var(--bh) * 0.015) #fff1c2b3;
 }
 
 /*
- * The first of them, the Belohnungstafel, is what the eye should find first (user feedback, November 2026): thicker,
- * bound in gold, the tallest, pulled out furthest and glowing brightest, a red ribbon hanging out below it. Still, like
- * everything on the shelf.
+ * The slipcase of the Belohnungstafel and the Zeitplan, two books of one game (`Slipcase`, user feedback, November 2026):
+ * a box of red cloth open at the front, its edges framing the two spines, so they are read as one thing. It is what the
+ * eye should find first: pulled out furthest, edged in gold and glowing brightest, the Belohnungstafel in it bound in
+ * gold. Still, like everything on the shelf; a mouse over a book pulls that book a little out of its case.
  */
-.shelf-daily-books > .shelf-daily:first-child {
-  flex-grow: 1.45;
-  height: calc(var(--bh) * 0.98);
-  transform: translateZ(calc(var(--d) * 0.1)) rotateX(-9deg);
+.shelf-slipcase {
+  --depth: calc(var(--bh) * 0.46);
+  --wall: calc(var(--bh) * 0.026);
+  position: relative;
+  display: flex;
+  flex: calc(var(--volumes) + 0.3) 1 0;
+  gap: calc(var(--bh) * 0.01);
+  min-width: 0;
+  height: var(--bh);
+  padding: var(--wall);
+  transform-origin: 50% 100%;
+  transform: translateZ(calc(var(--d) * 0.1)) rotateX(-8deg);
 }
 
-.shelf-daily-books > .shelf-daily:first-child > .box-front {
-  background:
-    linear-gradient(#0000 6%, #fff3b0 6% 8%, #0000 8% 90%, #fff3b0 90% 92%, #0000 92%),
-    linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), #c8952c;
-  box-shadow:
-    0 0 0 3px #fff3c2,
-    0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
+.shelf-slipcase > :is(.box-left, .box-right) {
+  background: linear-gradient(90deg, #0000004d, #00000026), #9a2f2f;
 }
 
-.shelf-daily-books > .shelf-daily:first-child > .box-front::after {
-  content: "";
+.shelf-slipcase > .box-top {
+  background: linear-gradient(#00000026, #ffffff1a), #a83636;
+}
+
+/* The case's front edges round the spines, over them, and its glow. Taps go through to the books. */
+.shelf-slipcase-edge {
   position: absolute;
-  top: 100%;
-  left: 16%;
-  width: 18%;
-  height: calc(var(--bh) * 0.09);
-  background: linear-gradient(90deg, #8f1d1d, #d23b3b 45%, #9e2323);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+  inset: 0;
+  border: var(--wall) solid #a83636;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 1px #f3d27a,
+    inset 0 0 calc(var(--bh) * 0.03) #000000a6,
+    0 0 0 1px #f3d27a,
+    0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
+  pointer-events: none;
+  transform: translateZ(1px);
 }
 
-/* Its label is wider than the others': the same size of sign and words as theirs, its long name in two lines. */
-.shelf-daily-books > .shelf-daily:first-child .shelf-daily-emoji {
-  font-size: 50cqw;
+.shelf-slipcase > .shelf-daily {
+  height: auto;
+  transform: none;
 }
 
-.shelf-daily-books > .shelf-daily:first-child .shelf-daily-title {
-  font-size: min(29cqw, 12cqh);
-  hyphens: auto;
+.shelf-slipcase > .shelf-daily > .box-front {
+  box-shadow: none;
+}
+
+.shelf-slipcase > .shelf-daily:first-of-type > .box-front {
+  background:
+    linear-gradient(#0000 3.5%, #fff3b0 3.5% 5.5%, #0000 5.5% 94.5%, #fff3b0 94.5% 96.5%, #0000 96.5%),
+    linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), var(--c);
 }
 
 @media (hover: hover) {
-  .shelf-daily-books > .shelf-daily:first-child:hover {
-    transform: translateZ(calc(var(--d) * 0.2)) translateY(-2%) rotateX(-13deg);
+  .shelf-slipcase > .shelf-daily:hover {
+    transform: translateZ(calc(var(--d) * 0.08)) translateY(-3%);
   }
+}
+
+.shelf-slipcase > .shelf-daily:focus-visible {
+  transform: translateZ(calc(var(--d) * 0.08)) translateY(-3%);
 }
 
 /*
@@ -1256,9 +1318,9 @@
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  gap: 0.3em;
+  gap: 0.2em;
   align-self: center;
-  height: 94%;
+  height: 98%;
   padding: 0 calc(var(--bh) * 0.06) 0 calc(var(--bh) * 0.1);
   color: #5b3a1c;
   font-family: Georgia, "Times New Roman", serif;
@@ -1274,15 +1336,25 @@
   pointer-events: none;
 }
 
+/* „mehr …“ (RoomNotes): carved like the words, underlined as a link, the one part of them that takes a tap. */
+.shelf-carving .home-menu {
+  align-self: center;
+}
+
+.shelf-carving-more {
+  padding: 0.1em 0.4em;
+  font-style: italic;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  pointer-events: auto;
+}
+
 .shelf-carving-big {
   font-size: 1.45em;
   font-weight: 700;
   font-style: normal;
-}
-
-/* The pointer to the Belohnungstafel, a little smaller under what the shelf holds. */
-.shelf-carving-hint {
-  font-size: 0.92em;
 }
 
 /* Only the first line, where the room is small (a phone): as big as the books' names, so it can still be read. */
@@ -1291,9 +1363,7 @@
   font-size: calc(var(--bh) * 0.075);
 }
 
-/* ----- Drafts of the mark of the group (`?gruppe=`, Bookshelf.tsx), until one is chosen ----- */
-
-/* A library's label: a brass holder with a card in it, clipped on the board's edge under the books. */
+/* The group's mark: a library's label, a brass holder with a card in it, clipped on the board's edge under the books. */
 .shelf-group-label {
   position: absolute;
   top: 100%;
@@ -1312,94 +1382,6 @@
   white-space: nowrap;
   transform: translateX(-50%) translateZ(calc(var(--d) * 0.03 + 3px));
   pointer-events: none;
-}
-
-/* A sign of painted wood, hanging from the board above on two little cords, a little askew. */
-.shelf-group-sign {
-  position: absolute;
-  top: calc(var(--bh) - var(--ch) + var(--bh) * 0.02);
-  left: 6%;
-  padding: 0.15em 0.7em;
-  border: calc(var(--bh) * 0.012) solid #8a5a32;
-  border-radius: 6px;
-  background: linear-gradient(#ffffff59, #0000 40%), #2f6f5e;
-  box-shadow: 2px 3px 5px #0000004d;
-  color: #fff6dc;
-  font-size: calc(var(--bh) * 0.095);
-  font-weight: 700;
-  line-height: 1.15;
-  white-space: nowrap;
-  transform: translateZ(calc(var(--d) * 0.45)) rotate(-3deg);
-  pointer-events: none;
-}
-
-/* The sign's two nails in the board above. */
-.shelf-group-sign::before,
-.shelf-group-sign::after {
-  content: "";
-  position: absolute;
-  top: 0.12em;
-  left: 0.3em;
-  width: 0.16em;
-  height: 0.16em;
-  border-radius: 50%;
-  background: #d8c08a;
-  box-shadow: 0 1px 1px #0006;
-}
-
-.shelf-group-sign::after {
-  right: 0.3em;
-  left: auto;
-}
-
-/* A paper band round the books, as a bookshop bundles a set. */
-.shelf-group-band {
-  position: absolute;
-  bottom: 9%;
-  left: -3%;
-  right: -3%;
-  padding: 0.12em 0;
-  border-block: 2px solid #b5523b;
-  background: var(--paper-grain, none), #fbf3df;
-  box-shadow: 0 2px 4px #0000004d;
-  color: #8a3726;
-  font-size: calc(var(--bh) * 0.085);
-  font-weight: 700;
-  line-height: 1.1;
-  text-align: center;
-  transform: translateZ(calc(var(--d) * 0.1 + var(--bh) * 0.07));
-  pointer-events: none;
-}
-
-/* A heavy wooden bookend holding the books up, a brass plate on it with the group's name running down. */
-.shelf-group-bookend {
-  position: relative;
-  display: flex;
-  flex: none;
-  justify-content: center;
-  align-items: center;
-  width: calc(var(--bh) * 0.22);
-  height: 88%;
-  margin-left: calc(var(--bh) * 0.03);
-  border-radius: calc(var(--bh) * 0.05) calc(var(--bh) * 0.05) 3px 3px;
-  background:
-    linear-gradient(90deg, #00000033, #ffffff26 40%, #0000 60%, #00000040),
-    var(--wood-grain-h) 0 0 / 600px 180px,
-    #8a5a32;
-  box-shadow: 3px 0 5px #0000004d;
-  pointer-events: none;
-}
-
-.shelf-group-bookend-plate {
-  padding: 0.5em 0.12em;
-  border-radius: 3px;
-  background: linear-gradient(90deg, #a07a2c, #f1d27a 45%, #c79a3c);
-  box-shadow: inset 0 0 0 1px #5c43136b;
-  color: #3d2a08;
-  font-size: calc(var(--bh) * 0.09);
-  font-weight: 700;
-  line-height: 1;
-  writing-mode: vertical-rl;
 }
 
 @media (hover: hover) {
@@ -1426,10 +1408,10 @@
     linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047), var(--c);
 }
 
-/* The paper label between the gold bands: the game's emoji on top, the name running down below it (two lines where it is long). */
+/* The paper label between the gold bands: the game's emoji on top, the name running down below it in one line. */
 .shelf-daily-label {
   position: absolute;
-  inset: 14% 6%;
+  inset: 8% 9%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1446,21 +1428,22 @@
 /* Its size in the label's own units (`cqw`), which only the label's children can use. */
 .shelf-daily-emoji {
   flex: none;
-  margin-block: 8cqw 6cqw;
-  font-size: 70cqw;
+  margin-block: 8cqw 4cqw;
+  font-size: 62cqw;
   line-height: 1;
 }
 
+/* One line, never broken (user feedback, November 2026): as big as the label's width allows, smaller where the name is long (`--len`). */
 .shelf-daily-title {
   flex: 1 1 0;
   min-height: 0;
-  margin-bottom: 8cqw;
+  margin-bottom: 6cqw;
   overflow: hidden;
-  font-size: 45cqw;
+  font-size: min(48cqw, calc((100cqh - 90cqw) / var(--len) * 1.65));
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.3;
   text-align: center;
-  text-wrap: balance;
+  white-space: nowrap;
   writing-mode: vertical-rl;
 }
 

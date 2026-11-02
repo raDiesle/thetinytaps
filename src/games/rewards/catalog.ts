@@ -729,11 +729,11 @@ export const ACTIVITIES: CatalogTask[] = [
 ];
 
 /**
- * The views of a plan, each its own way of showing the same cards: the Ablaufplan (the steps in their order, „Jetzt“
- * apart and big), Jetzt – Dann (only the card to do and the next), Erst – Dann (pairs of two, up to four on a page)
- * and the week.
+ * The views of a plan, each its own way of showing the same cards: Jetzt – Dann (the day's steps in their order on one
+ * sheet, a marker on the one to do now – or, as a variant, that card in a „Jetzt“ field of its own), Erst – Dann
+ * (pairs of two, up to four on a page) and the week.
  */
-export type PlanView = "day" | "now-next" | "first-then" | "week";
+export type PlanView = "day" | "first-then" | "week";
 
 /** A view of a plan with what it shows, in one line for grown-ups. */
 export interface PlanViewInfo {
@@ -746,15 +746,9 @@ export interface PlanViewInfo {
 export const PLAN_VIEWS: PlanViewInfo[] = [
   {
     id: "day",
-    emoji: "📋",
-    label: { de: "Ablaufplan" },
-    hint: { de: "Alle Schritte der Reihe nach – was jetzt dran ist, steht groß vorne" },
-  },
-  {
-    id: "now-next",
     emoji: "👉",
     label: { de: "Jetzt – Dann" },
-    hint: { de: "Nur zwei Karten: was jetzt dran ist und was danach kommt" },
+    hint: { de: "Alle Schritte des Tages der Reihe nach auf einem Blatt – ein Pfeil zeigt, was jetzt dran ist" },
   },
   {
     id: "first-then",
@@ -774,6 +768,40 @@ export const PLAN_VIEWS: PlanViewInfo[] = [
       es: "Qué hay cada día y cuántas noches faltan",
       ar: "ماذا في كل يوم – وكم نومة باقية",
       ru: "Что в какой день – и сколько раз ещё спать",
+    },
+  },
+];
+
+/** How the child follows a Jetzt – Dann plan (`Plan.nowField`), chosen beside its picture on the wizard's first step. */
+export interface NowWay {
+  /** The card to do moves into a „Jetzt“ field, rather than a marker moving over cards that stay. */
+  field: boolean;
+  emoji: string;
+  label: Localized;
+  /** What it costs to print, in a few words inside its button in the wizard (`🖨️` or `✂️` before it). */
+  print: Localized;
+  /** What it means for the paper at home, in a line or two for grown-ups (under Gestalten). */
+  note: Localized;
+}
+
+/** The marker first: one printed sheet and something to move is far less work than cards to cut out and move. */
+export const NOW_WAYS: NowWay[] = [
+  {
+    field: false,
+    emoji: "⬆️",
+    label: { de: "Pfeil wandert" },
+    print: { de: "Nur eine Seite drucken" },
+    note: {
+      de: "Alle Karten stehen fest auf einem Blatt. Ein Pfeil aus Pappe, eine Wäscheklammer oder ein bunter Klebezettel zeigt, was gerade dran ist – Ihr Kind schiebt ihn weiter. Nichts zum Ausschneiden.",
+    },
+  },
+  {
+    field: true,
+    emoji: "🃏",
+    label: { de: "Karte wandert" },
+    print: { de: "Karten auch drucken und ausschneiden" },
+    note: {
+      de: "Mehr Bastelarbeit: Die Karten werden extra gedruckt, ausgeschnitten und mit Klett aufgeklebt. Die Karte, die dran ist, kommt ins Jetzt-Feld, fertige in eine Tasche – dafür hat Ihr Kind sie selbst in der Hand.",
     },
   },
 ];
@@ -810,8 +838,54 @@ const MORNING_AND_EVENING: PlanTemplatePart[] = [
   { slot: "evening", steps: ["baden", "zaehne", "vorlesen", "schlafen"] },
 ];
 
-const KITA_DAY = ["fruehstueck", "kita", "mittagessen", "mittagsschlaf", "spielplatz", "abendessen", "schlafen"];
-const HOME_DAY = ["fruehstueck", "ausflug", "mittagessen", "mittagsschlaf", "spielen", "abendessen", "schlafen"];
+/** A card a Jetzt – Dann plan takes from its pool: its catalogue id, how soon it comes (1 first) and its time of day. */
+export interface DayCard {
+  id: string;
+  /** Which cards a plan of few takes: those of the lowest rank, kept in the day's order. */
+  rank: number;
+  /** The time of day of a linked card in a day without parts: the morning's and the evening's brushing. */
+  slot?: Slot;
+}
+
+/**
+ * What the first step of the wizard fills a Jetzt – Dann plan with, by how many cards are asked for: the morning's and
+ * the evening's for a day in two parts (four each make „Mein Tag“), the whole day for one without parts (seven make
+ * the day with Kita). Each list is in the day's order.
+ */
+export const DAY_CARDS: Record<"morning" | "evening" | "whole", DayCard[]> = {
+  morning: [
+    { id: "aufstehen", rank: 5 },
+    { id: "anziehen", rank: 1 },
+    { id: "fruehstueck", rank: 2 },
+    { id: "zaehne", rank: 3 },
+    { id: "haare", rank: 7 },
+    { id: "jacke", rank: 6 },
+    { id: "schuhe", rank: 4 },
+  ],
+  evening: [
+    { id: "abendessen", rank: 5 },
+    { id: "aufraeumen", rank: 6 },
+    { id: "baden", rank: 1 },
+    { id: "zaehne", rank: 2 },
+    { id: "vorlesen", rank: 3 },
+    { id: "schlafen", rank: 4 },
+  ],
+  whole: [
+    { id: "aufstehen", rank: 13 },
+    { id: "anziehen", rank: 9 },
+    { id: "fruehstueck", rank: 1 },
+    { id: "zaehne", rank: 11, slot: "morning" },
+    { id: "kita", rank: 2 },
+    { id: "mittagessen", rank: 3 },
+    { id: "mittagsschlaf", rank: 4 },
+    { id: "spielplatz", rank: 5 },
+    { id: "abendessen", rank: 6 },
+    { id: "baden", rank: 12 },
+    { id: "zaehne", rank: 8, slot: "evening" },
+    { id: "vorlesen", rank: 10 },
+    { id: "schlafen", rank: 7 },
+  ],
+};
 
 /** The gallery of the Zeitplan in the order of its views; the first is the plan whose pictures the wizard shows first. */
 export const PLAN_TEMPLATES: PlanTemplate[] = [
@@ -824,42 +898,6 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
     theme: "sonne",
     title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
     hint: { de: "Mein Morgen und mein Abend auf einer Seite" },
-  },
-  {
-    id: "kita-tag",
-    emoji: "🏫",
-    label: {
-      de: "Tagesablauf mit Kita",
-      en: "Day with daycare",
-      zh: "上幼儿园的一天",
-      hi: "प्लेस्कूल वाला दिन",
-      es: "Día con guardería",
-      ar: "يوم مع الحضانة",
-      ru: "День с садиком",
-    },
-    view: "day",
-    days: [KITA_DAY, KITA_DAY, KITA_DAY, KITA_DAY, KITA_DAY, HOME_DAY, HOME_DAY],
-    theme: "meer",
-    title: { de: "Mein Kita-Tag" },
-    hint: {
-      de: "Der ganze Tag in Bildern, am Wochenende ohne Kita",
-      en: "The whole day in pictures, without daycare at the weekend",
-      zh: "一整天的图片，周末不上幼儿园",
-      hi: "पूरा दिन तस्वीरों में, सप्ताहांत पर प्लेस्कूल के बिना",
-      es: "Todo el día en imágenes, el fin de semana sin guardería",
-      ar: "اليوم كله بالصور، وفي عطلة نهاية الأسبوع بلا حضانة",
-      ru: "Весь день в картинках, в выходные без садика",
-    },
-  },
-  {
-    id: "jetzt-dann",
-    emoji: "👉",
-    label: { de: "Jetzt – Dann" },
-    view: "now-next",
-    parts: MORNING_AND_EVENING,
-    theme: "wiese",
-    title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
-    hint: { de: "Morgen und Abend Karte für Karte: nur was jetzt dran ist und was danach kommt" },
   },
   {
     id: "erst-dann",
