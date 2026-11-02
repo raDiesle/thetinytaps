@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS } from "./content";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods } from "./content";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 
@@ -76,5 +76,22 @@ test("an animal without its words gets the whole German sentence, in every langu
     expect(texts.hungry(animal), language).toBe(de.hungry(animal));
     expect(texts.yummy(animal, withFood.food!), language).toBe(de.yummy(animal, withFood.food!));
     expect(texts.movedIn(animal, HOMES[withFood.home!]), language).toBe(de.movedIn(animal, HOMES[withFood.home!]));
+  }
+});
+
+// Exactly one choice may fit (rules in CLAUDE.md): every fed animal says what else it eats, and enough is left that it doesn't.
+test("every fed animal has enough wrong foods that it really doesn't eat", () => {
+  const most = 4; // the most choices the settings offer (ChoiceCount)
+  const foods = new Set(FOODS.map((f) => f.id));
+  for (const animal of ANIMALS.filter((a) => a.food)) {
+    expect(animal.alsoEats, `${animal.id} needs its alsoEats list`).toBeDefined();
+    for (const id of animal.alsoEats!) {
+      expect(foods.has(id), `${animal.id} ${id}`).toBe(true);
+      expect(id, animal.id).not.toBe(animal.food!.id);
+    }
+    const wrong = wrongFoods(animal).map((f) => f.id);
+    expect(wrong, animal.id).not.toContain(animal.food!.id);
+    for (const id of animal.alsoEats!) expect(wrong, animal.id).not.toContain(id);
+    expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
   }
 });
