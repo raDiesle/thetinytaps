@@ -278,14 +278,17 @@ In a fresh worktree run `bun install` first.
   and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a library's label with its name clipped on the
   board's edge under it (`DailyGroup`, chosen from four drafts – bookend, sign, paper band – user decision, November
   2026), and beside it words carved into the back panel tell grown-ups in short what
-  the shelf is for – „Für Groß & Klein, Seite an Seite“ (Seite both page and side, user's choice), then that it is the
-  first step into the digital world taken together, with learning games that foster talking together and little helpers
-  for the day, then that all of it is free and made by parents for parents („Alles kostenlos – von Eltern für Eltern.“, a line of its own, user feedback, November 2026) – and nothing else: no pointer to one game („Ein Blick in die
+  the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
+  learning games and little helpers for the day, then that all of it is free („Alles kostenlos.“, a line of its own) –
+  and nothing else: no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
+  taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
   Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). It ends with a carved, underlined „mehr …“
   that opens the texts for grown-ups (`RoomNotes`, see below). The carving takes room of its own on the board
   (`planShelf` takes each place's width), all of it where the picture books stay nearly as big (`CARVING_SHRINK`) and the
   words big enough to read, else only its first line and „mehr …“ – never none, since „mehr …“ is the way to those
-  texts (`CARVINGS`). Its place is only as wide as its words need: a wider one left a gap beside them;
+  texts (`CARVINGS`). Its place is only as wide as its words need: a wider one left a gap beside them, and the picture
+  book beside it stands close to its words, not a finger's gap away (only „mehr …“ in their middle takes a tap, user
+  feedback, November 2026);
   words added to it widen its place (`CARVINGS`), never spill past the board – measure its first and last line against
   its box at 1280×720 and 1920×1080 (the 3D push makes it look smaller than it is laid out). Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
@@ -496,7 +499,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
   book's cover on the shelf (the toy look's home card) shows a piece of it. A new category draws its world (`content.test.ts` checks).
-  Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
+  Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it; on a
+  picture book's cover it lies low, as far from the picture as the title (it once touched the picture, user feedback,
+  November 2026).
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
 - The app is called „Books for Both“ and lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com
