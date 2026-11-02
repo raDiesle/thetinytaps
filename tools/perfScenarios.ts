@@ -94,7 +94,9 @@ export const SCENARIOS: Scenario[] = [
     path: "/",
     parts: [
       { label: "Startseite", ms: 3000 },
-      { label: "Seite blättern in ein Spiel", before: [{ tap: ".game-card" }], ms: 2500 },
+      // The home page is a bookshelf: a book is taken out and opened at its table of contents, whose line turns a page.
+      { label: "Buch aus dem Regal nehmen", before: [{ tap: '.shelf-book[data-book="lebendige-welten"]' }], ms: 2500 },
+      { label: "Seite blättern in ein Spiel", before: [{ waitFor: ".toc-line" }, { tap: ".toc-line" }], ms: 2500 },
     ],
   },
   {
