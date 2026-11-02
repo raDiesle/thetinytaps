@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
@@ -6,6 +7,7 @@ import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
 import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
+import { KIND_SIGNS } from "./TopicBubble";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
@@ -245,4 +247,17 @@ test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „a
   expect(de.becomes(byId.ei)).toBe("Aus dem Ei wird ein Küken. Toll!");
   expect(de.becomes(byId.samen)).toBe("Aus dem Samen wird eine Sonnenblume. Toll!");
   expect(de.comesFrom(byId.kaulquappe)).toBe("Der Frosch kommt aus der Kaulquappe!");
+});
+
+// The bubble's sign tells grown-ups what a round is about; were it one of the pictures to pick from, it would give the
+// answer away or look like one more choice.
+test("no round's sign is a picture the child picks from", () => {
+  const pictures = new Set([...ANIMALS, ...FOODS, ...PEEK_ITEMS, ...GROWTHS].map((thing) => thing.emoji));
+  expect(Object.values(KIND_SIGNS).filter((sign) => pictures.has(sign))).toEqual([]);
+  expect(Object.keys(KIND_SIGNS).sort()).toEqual([...KIND_ORDER].sort());
+});
+
+// The game flows on with nothing to collect: no stars counting the rounds (user feedback, November 2026).
+test("no stars count the rounds", () => {
+  expect(readFileSync("src/games/animals/AnimalsRounds.tsx", "utf8")).not.toContain("⭐");
 });

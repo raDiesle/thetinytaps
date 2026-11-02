@@ -1073,14 +1073,14 @@
 
 /*
  * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top left, tapped or held like the ✕ – held, it lifts
- * further while the finger stays (instead of the ring filling), and the page turns back. The fullscreen button and
- * „Zurück zum Menü · halten“ stay beside it, right of it on the picture's edge.
+ * further while the finger stays (instead of the ring filling), and the page turns back. The fullscreen button stays beside
+ * it, right of it on the picture's edge.
  */
 .hold-exit .page-corner-art {
   display: none;
 }
 
-/* Room right of the corner for it to lift into, so it never covers the fullscreen button or the hint. */
+/* Room right of the corner for it to lift into, so it never covers the fullscreen button. */
 :root[data-look="book"] .play-area .exit-corner {
   flex-direction: row-reverse;
   align-items: flex-start;
@@ -1094,23 +1094,6 @@
 /* The fullscreen slip hangs from the picture's top edge, its clip over it (see the notes clipped on, below). */
 :root[data-look="book"] .play-area .exit-corner > .play-fullscreen {
   margin-top: -5px;
-}
-
-:root[data-look="book"] .play-area .exit-corner .exit-hint {
-  top: 14px;
-  right: auto;
-  left: calc(100% + 8px);
-  translate: -6px 0;
-}
-
-:root[data-look="book"] .play-area .exit-corner.hinted .exit-hint {
-  translate: 0 0;
-}
-
-@media (hover: hover) {
-  :root[data-look="book"] .play-area .exit-corner:hover .exit-hint {
-    translate: 0 0;
-  }
 }
 
 :root[data-look="book"] .play-area .exit-corner .hold-exit {

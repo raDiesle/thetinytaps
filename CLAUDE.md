@@ -257,8 +257,7 @@ In a fresh worktree run `bun install` first.
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ that leaves is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), tapped or held just like the ✕ – held, it lifts further
-  instead of a ring filling – with the fullscreen button and „Zurück zum Menü“ right of it, clear of the room it
-  lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it, and a game's own buttons and signs in the top
+  instead of a ring filling – with the fullscreen button right of it, clear of the room it lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it, and a game's own buttons and signs in the top
   left keep below it with `top: calc(… + var(--corner-clear, 0px))` (Schatten finden's picture choice lay under the ✕,
   user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
@@ -333,9 +332,9 @@ In a fresh worktree run `bun install` first.
   and got in the grown-ups' way (user decision, November 2026), so it is a choice now, „Spiel verlassen“ under ⏳ on
   the home page (`leave` in `src/lib/common.ts`, `LeaveOptions`), for parents whose child taps ✕ by chance. Esc is
   always held, since children press it while typing. The only other way out is „Menü“ at the end of a level. Never add
-  another. Starting a game shows no note on how to leave: the „Zurück zum Menü“ (with „· halten“ where it is held) next
-  to ✕ appears only while it is pressed or a mouse is over it – the moment the finger lands, without fading in (user
-  feedback, October 2026; `css.test.ts`).
+  another. Nothing beside ✕ says what it does, not when a game starts nor while it is pressed or under a mouse: a
+  „Zurück zum Menü“ there was more than grown-ups needed (user feedback, November 2026; `css.test.ts`); its name is
+  only read out.
 - **Back is always the screen seen before** (user feedback, November 2026): ✕, Esc, „Menü“ and a menu's way back lead
   to the menu the child came from, never to a menu it didn't pass on its way in. And they step back in the browser's
   history rather than adding a page to it, or the phone's own back button afterwards opened the game just left again,

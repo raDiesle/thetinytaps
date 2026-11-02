@@ -1,10 +1,9 @@
 import { useCallback, useRef, useState } from "react";
-import { PEEK_ITEMS, SHADOW_TEXTS } from "@/games/shadows/content";
+import { PEEK_ITEMS } from "@/games/shadows/content";
 import { useDeck } from "@/games/shadows/deck";
 import { nextLevel } from "@/games/shadows/levels";
 import { PeekPlay } from "@/games/shadows/PeekPlay";
 import { DEV } from "@/lib/buildInfo";
-import { pick, useAppLanguage } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { AnimalsPlay } from "./AnimalsPlay";
 import { ANIMALS, GIVERS, type Animal } from "./content";
@@ -12,6 +11,7 @@ import { GrowPlay } from "./GrowPlay";
 import { GROWTHS } from "./growth";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import type { AnimalsSettings } from "./settings";
+import { TopicBubble } from "./TopicBubble";
 
 const FED = ANIMALS.filter((a) => a.food);
 const HOUSED = ANIMALS.filter((a) => a.home);
@@ -20,13 +20,11 @@ const HOUSED = ANIMALS.filter((a) => a.home);
  * "Was gehört zum Tier?" as one flowing game: who peeks out, feeding, what the animal gives us, who lives where and
  * what the small one becomes take turns in that order,
  * and the difficulty follows how the child plays (`ANIMAL_LEVELS`). Grown-ups may switch kinds off or fix the
- * difficulty while playing; that counts from the next round. Each round is mounted anew; the stars, the step and the
- * animals still to come live here.
+ * difficulty while playing; that counts from the next round. Each round is mounted anew under a bubble saying
+ * what it is about; the step and the animals still to come live here.
  */
 export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
-  const language = useAppLanguage();
   const [turn, setTurn] = useState(0);
-  const [stars, setStars] = useState(0);
   /**
    * The difficulty step (an index into `ANIMAL_LEVELS`); every visit begins on the first. While developing, `?level=N`
    * starts on step N, to look at the harder rounds.
@@ -73,7 +71,6 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const auto = settings.difficulty === "auto";
   const onSolved = useCallback(
     (misses: number) => {
-      setStars((n) => n + 1);
       if (!auto) return;
       // How this round went decides the next one's step.
       const results = [...resultsRef.current, misses];
@@ -103,14 +100,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
       ) : (
         <AnimalsPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} />
       )}
-      {stars > 0 && (
-        <div className="sh-bar">
-          <div className="sh-stars" aria-label={pick(SHADOW_TEXTS, language.id).stars(stars)}>
-            {"⭐".repeat(Math.min(stars, 10))}
-            {stars > 10 && <span className="sh-count">{stars}</span>}
-          </div>
-        </div>
-      )}
+      <TopicBubble key={`topic-${turn}`} kind={round.kind} />
     </>
   );
 }
