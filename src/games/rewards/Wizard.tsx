@@ -2,18 +2,7 @@ import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type Board, boardFromTemplate, newId, withKind } from "./board";
-import {
-  type BoardKind,
-  CHART_TYPES,
-  type ChartType,
-  KINDS,
-  PLAN_TEMPLATES,
-  PLAN_VIEWS,
-  type PlanTemplate,
-  type PlanView,
-  type Template,
-  TEMPLATES,
-} from "./catalog";
+import { type BoardKind, KINDS, PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate, type PlanView, type Template, TEMPLATES } from "./catalog";
 import { Thumb } from "./Gallery";
 import { VIEW } from "./pageParts";
 import { type Plan, planFromTemplate } from "./plan";
@@ -33,7 +22,7 @@ export interface WizardStep {
   label: Localized;
 }
 
-/** The first step of every chart: every view of both kinds, with the Vorlagen of each view to pick one from. */
+/** The first step of every chart: every time span, with the Vorlagen of each to pick one from. */
 const FIRST_STEP: WizardStep = { id: "view", label: VIEW };
 
 /** „Leer anfangen“: a board or plan of one view with nothing on it yet. */
@@ -82,6 +71,41 @@ const planKey = (id: string) => `plan:${id}`;
 const DAY_TEMPLATE = PLAN_TEMPLATES.find((tpl) => tpl.view === "day");
 const DAY_KEY = planKey(DAY_TEMPLATE?.id ?? "");
 
+/**
+ * The first step's areas, by the time a chart covers rather than by its kind (user feedback, November 2026): a day, a
+ * week, a month, then Erst – Dann, seldom used, and Sammeln last, which counts stars whatever the day. Where both kinds
+ * have a view of the span (Tag, Woche), „Belohnung“ switches between them: off (the default) the plan's Vorlagen, on the
+ * board's, with stars and a reward. A span's id is the view's id of either kind, so a draft's span is its view.
+ */
+type SpanId = "day" | "week" | "month" | "first-then" | "collect";
+
+interface Span {
+  id: SpanId;
+  label: Localized;
+  /** The board's view in this span, if any. */
+  board?: BoardKind;
+  /** The plan's view in this span, if any. */
+  plan?: PlanView;
+}
+
+const kindLabel = (id: BoardKind) => KINDS.find((kind) => kind.id === id)?.label ?? { de: id };
+const planLabel = (id: PlanView) => PLAN_VIEWS.find((view) => view.id === id)?.label ?? { de: id };
+
+/** The time spans of the first step, in their order on the page. */
+export const SPANS: Span[] = [
+  { id: "day", label: kindLabel("day"), board: "day", plan: "day" },
+  { id: "week", label: kindLabel("week"), board: "week", plan: "week" },
+  { id: "month", label: kindLabel("month"), board: "month" },
+  { id: "first-then", label: planLabel("first-then"), plan: "first-then" },
+  { id: "collect", label: kindLabel("collect"), board: "collect" },
+];
+
+/** The span a draft belongs to: its view, of either kind. */
+const spanOf = (draft: Draft): SpanId => (draft.type === "board" ? draft.board.kind : draft.plan.view);
+
+/** „Belohnung“: the switch in a span's head between a plan and a board with stars and a reward. */
+const REWARD: Localized = { de: "Belohnung" };
+
 /** The Vorlage picked and the board or plan it makes, changed by the later steps. */
 interface Picked {
   key: string;
@@ -99,32 +123,21 @@ const ready = (draft: Draft) =>
   draft.type === "board" ? draft.board.tasks.length > 0 || draft.board.kind === "collect" : draft.plan.days.some((day) => day.length > 0);
 
 /**
- * „＋ Neu“, for a Belohnungstafel and a Zeitplan alike. The first step is the whole choice of form, both kinds on one
- * page, each in an area of its own under its name: every view of the kind under its name in big letters – Tag, Woche,
- * … or Jetzt – Dann, Erst – Dann, Woche – with its Vorlagen as big pictures beneath; Jetzt – Dann has one, „Mein Tag“,
- * with its form chosen beside it (`DayConfig`). A tap picks a Vorlage, another puts it back; one chart is made at a
+ * „＋ Neu“, for a Belohnungstafel and a Zeitplan alike. The first step is the whole choice of form, by time span (`SPANS`):
+ * Tag, Woche, Monat, Erst – Dann, Sammeln, each its name over its Vorlagen as big pictures; in Tag and Woche the switch
+ * „Belohnung“ (off by default) shows the board's Vorlagen instead of the plan's. The plan's day has one, „Mein Tag“, with
+ * its form chosen beside it (`DayConfig`). A tap picks a Vorlage, another puts it back; one chart is made at a
  * time. „Weiter“ goes on to its own steps – a board's tasks, reward and look, a plan's cards and look – with the whole
  * board or plan beside each step, and only the last one makes it: every chart goes through every step (user feedback,
- * November 2026). „Leer anfangen“ in a view goes there at once. The steps show only from the second one on; on a big
- * screen they are a column on the left, the two kinds under „Ansicht“ leading back to their areas. Opened on a template from the gallery it starts on that
+ * November 2026). „Leer anfangen“ in a span goes there at once. The steps show only from the second one on; on a big
+ * screen they are a column on the left, the spans under „Ansicht“ leading back to theirs. Opened on a template from the gallery it starts on that
  * template's own steps. Without `onCancel` (nothing made yet) it can't be closed: the page has nothing else to show.
  */
-export function Wizard({
-  type: startType,
-  start,
-  onDone,
-  onCancel,
-}: {
-  /** The kind whose area comes first (the address or the chart shown). */
-  type: ChartType;
-  start?: WizardStart;
-  onDone: (draft: Draft) => void;
-  onCancel?: () => void;
-}) {
+export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDone: (draft: Draft) => void; onCancel?: () => void }) {
   const t = useT();
   const { id: language } = useAppLanguage();
-  const first = start?.type ?? startType;
-  const kinds = [...CHART_TYPES].sort((a, b) => Number(b.id === first) - Number(a.id === first));
+  /** „Belohnung“ per span that has both kinds: off by default, on where the wizard starts on a board's Vorlage. */
+  const [reward, setReward] = useState<Partial<Record<SpanId, boolean>>>(() => (start?.type === "board" ? { [start.template.kind]: true } : {}));
   /** What is picked, by key, as the board or plan it makes (changed by the later steps). */
   const [picked, setPicked] = useState<Picked | null>(() =>
     start ? { key: start.type === "board" ? boardKey(start.template.id) : planKey(start.template.id), draft: fromStart(start, language) } : null,
@@ -159,21 +172,29 @@ export function Wizard({
     setPicked({ key: DAY_KEY, draft: { type: "plan", plan } });
   };
 
-  // Back on the first step, the kind's area comes into sight: its views and Vorlagen.
-  const showKind = (kind: ChartType) => {
+  // Back on the first step, the span's Vorlagen come into sight.
+  const showSpan = (span: SpanId) => {
     setStep(0);
-    requestAnimationFrame(() => document.getElementById(`rw-area-${kind}`)?.scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" }));
+    requestAnimationFrame(() => document.getElementById(`rw-span-${span}`)?.scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" }));
   };
 
-  const groupsOf = (type: ChartType) =>
-    type === "board"
-      ? KINDS.map((kind) => ({
-          id: kind.id,
-          emoji: kind.emoji,
-          label: kind.label,
-          blank: { key: boardKey(`${kind.id}-leer`), make: (): Draft => ({ type: "board", board: blankBoard(kind.id) }) },
+  // The switch shows the span's other kind: a Vorlage picked there is no longer seen, so it is put back.
+  const switchReward = (span: Span) => {
+    setReward((before) => ({ ...before, [span.id]: !before[span.id] }));
+    if (only && spanOf(only) === span.id) setPicked(null);
+  };
+
+  /** A span's Vorlagen: the board's where it has no plan or „Belohnung“ is on, else the plan's (with the day's form). */
+  const groupOf = (span: Span) => {
+    const kind = span.board && (!span.plan || reward[span.id]) ? span.board : undefined;
+    const switchable = !!span.board && !!span.plan;
+    return kind
+      ? {
+          span,
+          switchable,
+          blank: { key: boardKey(`${kind}-leer`), make: (): Draft => ({ type: "board", board: blankBoard(kind) }) },
           config: undefined,
-          tiles: TEMPLATES.filter((tpl) => tpl.kind === kind.id).map((tpl) => {
+          tiles: TEMPLATES.filter((tpl) => tpl.kind === kind).map((tpl) => {
             const board = BOARD_PICTURES.get(tpl.id);
             return {
               key: boardKey(tpl.id),
@@ -183,28 +204,30 @@ export function Wizard({
               make: (): Draft => ({ type: "board", board: { ...boardFromTemplate(tpl, language), id: newId() } }),
             };
           }),
-        }))
-      : PLAN_VIEWS.map((view) => ({
-          id: view.id,
-          emoji: view.emoji,
-          label: view.label,
-          blank: { key: planKey(`${view.id}-leer`), make: (): Draft => ({ type: "plan", plan: blankPlan(view.id) }) },
-          config: view.id === "day" ? <DayConfig plan={dayPlan} onChange={configure} /> : undefined,
-          tiles: PLAN_TEMPLATES.filter((tpl) => tpl.view === view.id).map((tpl) => {
-            const day = planKey(tpl.id) === DAY_KEY;
-            const plan = day ? dayPlan : PLAN_PICTURES.get(tpl.id);
-            return {
-              key: planKey(tpl.id),
-              emoji: tpl.emoji,
-              label: tpl.label,
-              picture: plan && <PlanThumb plan={plan} />,
-              make: (): Draft => ({ type: "plan", plan: day ? dayPlan : planFromTemplate(tpl, language) }),
-            };
-          }),
-        }));
+        }
+      : groupOfPlan(span, span.plan ?? "day", switchable);
+  };
 
-  const groups = kinds.map((kind) => ({ kind, views: groupsOf(kind.id) }));
-  const tiles = groups.flatMap(({ views }) => views.flatMap((view) => view.tiles));
+  const groupOfPlan = (span: Span, view: PlanView, switchable: boolean) => ({
+    span,
+    switchable,
+    blank: { key: planKey(`${view}-leer`), make: (): Draft => ({ type: "plan", plan: blankPlan(view) }) },
+    config: view === "day" ? <DayConfig plan={dayPlan} onChange={configure} /> : undefined,
+    tiles: PLAN_TEMPLATES.filter((tpl) => tpl.view === view).map((tpl) => {
+      const day = planKey(tpl.id) === DAY_KEY;
+      const plan = day ? dayPlan : PLAN_PICTURES.get(tpl.id);
+      return {
+        key: planKey(tpl.id),
+        emoji: tpl.emoji,
+        label: tpl.label,
+        picture: plan && <PlanThumb plan={plan} />,
+        make: (): Draft => ({ type: "plan", plan: day ? dayPlan : planFromTemplate(tpl, language) }),
+      };
+    }),
+  });
+
+  const groups = SPANS.map(groupOf);
+  const tiles = groups.flatMap((group) => group.tiles);
   const zoomAt = tiles.findIndex((tile) => tile.key === zoomed);
 
   return (
@@ -222,13 +245,13 @@ export function Wizard({
                 <button type="button" className={i === step ? "selected" : undefined} aria-current={i === step ? "step" : undefined} onClick={() => setStep(i)}>
                   <span className="rw-step-number">{i + 1}</span> <span className="rw-step-label">{t(s.label)}</span>
                 </button>
-                {/* Under „Ansicht“, on a big screen: the two kinds, each leading to its area, the one picked marked. */}
+                {/* Under „Ansicht“, on a big screen: the spans, each leading back to its Vorlagen, the one picked marked. */}
                 {s.id === FIRST_STEP.id && (
-                  <ul className="rw-step-kinds" aria-label={t({ de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" })}>
-                    {kinds.map((kind) => (
-                      <li key={kind.id}>
-                        <button type="button" className={only?.type === kind.id ? "selected" : undefined} onClick={() => showKind(kind.id)}>
-                          <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
+                  <ul className="rw-step-kinds" aria-label={t({ de: "Zeitraum" })}>
+                    {SPANS.map((span) => (
+                      <li key={span.id}>
+                        <button type="button" className={only && spanOf(only) === span.id ? "selected" : undefined} onClick={() => showSpan(span.id)}>
+                          {t(span.label)}
                         </button>
                       </li>
                     ))}
@@ -253,14 +276,16 @@ export function Wizard({
 
       <div className={`rw-wizard-body${own ? "" : " rw-wizard-wide"}`}>
         <div className="rw-wizard-step">
-          {id === FIRST_STEP.id &&
-            groups.map(({ kind, views }) => (
-              <section key={kind.id} id={`rw-area-${kind.id}`} className="rw-kind-area" aria-label={t(kind.label)}>
-                <h2 className="rw-kind-name">{t(kind.label)}</h2>
-                <div className="rw-view-groups">
-                  {views.map((group) => (
+          {id === FIRST_STEP.id && (
+            <div className="rw-kind-area rw-spans">
+              <div className="rw-view-groups">
+                {groups.map((group) => {
+                  const { span } = group;
+                  const on = !!reward[span.id];
+                  return (
                     <section
-                      key={group.id}
+                      key={span.id}
+                      id={`rw-span-${span.id}`}
                       className={`rw-view-group${group.config ? " rw-view-config" : ""}`}
                       // The form beside „Mein Tag“ takes the room of two pictures.
                       style={
@@ -270,10 +295,16 @@ export function Wizard({
                         } as CSSProperties
                       }
                     >
-                      {/* The view's name stands big over its pictures, as the name of what they show. */}
+                      {/* The span's name over its pictures, the switch and „Leer anfangen“ small on the right. */}
                       <div className="rw-view-head">
-                        <h3 className="rw-view-name">{t(group.label)}</h3>
-                        {/* No picture of anything: a small button beside the view's name, not a tile among the Vorlagen. */}
+                        <h3 className="rw-view-name">{t(span.label)}</h3>
+                        {group.switchable && (
+                          <button type="button" role="switch" aria-checked={on} className="rw-reward-switch" onClick={() => switchReward(span)}>
+                            <span aria-hidden>🎁</span> {t(REWARD)}
+                            <span className="rw-switch-track" aria-hidden />
+                          </button>
+                        )}
+                        {/* No picture of anything: a small button beside the span's name, not a tile among the Vorlagen. */}
                         <button type="button" className="rw-view-blank" onClick={() => blank(group.blank.key, group.blank.make())}>
                           <span aria-hidden>✏️</span> {t(START_BLANK)}
                         </button>
@@ -314,10 +345,11 @@ export function Wizard({
                         {group.config && <li className="rw-day-config-cell">{group.config}</li>}
                       </ul>
                     </section>
-                  ))}
-                </div>
-              </section>
-            ))}
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {only?.type === "board" && own && <BoardStep step={id} board={only.board} onChange={(board) => change({ type: "board", board })} />}
           {only?.type === "plan" && own && <PlanStepView step={id} plan={only.plan} onChange={(plan) => change({ type: "plan", plan })} />}

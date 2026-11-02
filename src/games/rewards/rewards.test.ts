@@ -28,6 +28,7 @@ import {
   withKind,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
+import { SPANS } from "./Wizard";
 import {
   ACTIVITIES,
   CHART_TYPES,
@@ -375,6 +376,15 @@ describe("one page for boards and plans", () => {
     expect(CHART_TYPES.map((kind) => kind.id).sort()).toEqual(["board", "plan"]);
     expect(TEMPLATES.length).toBeGreaterThan(0);
     expect(PLAN_TEMPLATES.length).toBeGreaterThan(0);
+  });
+
+  // The first step is sorted by time (user feedback, November 2026): every view of either kind in exactly one span,
+  // a day, a week and a month first, and Sammeln, which counts stars whatever the day, last.
+  test("the wizard's first step holds every view, in time spans from the day to Sammeln", () => {
+    expect(SPANS.slice(0, 3).map((span) => span.id)).toEqual(["day", "week", "month"]);
+    expect(SPANS.at(-1)?.id).toBe("collect");
+    for (const kind of KINDS) expect(SPANS.filter((span) => span.board === kind.id)).toHaveLength(1);
+    for (const view of PLAN_VIEWS) expect(SPANS.filter((span) => span.plan === view.id)).toHaveLength(1);
   });
 
   // The wizard asks for the view before the Vorlage and shows only that view's: each needs one besides „Leer anfangen“

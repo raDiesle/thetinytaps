@@ -626,7 +626,7 @@
 }
 
 /*
- * The first step: both kinds on one page, each an area under its big name; in it every view under its name, with its
+ * The first step: one area of the time spans (Tag, Woche, Monat, Erst – Dann, Sammeln), each under its name with its
  * Vorlagen as big pictures beneath.
  */
 .rw-kind-area {
@@ -638,14 +638,6 @@
   padding: 12px 16px 16px;
   border-radius: 20px;
   background: color-mix(in srgb, var(--ink) 4%, transparent);
-}
-
-.rw-wizard-step .rw-kind-name {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1.1;
-  text-align: left;
 }
 
 /*
@@ -662,6 +654,7 @@
 
 /* A view and its Vorlagen: the view's name big on top, its pictures below. */
 .rw-view-group {
+  scroll-margin-top: 12px;
   flex: var(--rw-tiles) var(--rw-tiles) calc(var(--rw-tiles) * var(--rw-tile) + (var(--rw-tiles) - 1) * 14px);
   min-width: 0;
   display: flex;
@@ -669,33 +662,36 @@
   gap: 8px;
 }
 
-/* The view's name on the left, „Leer anfangen“ small on the right, underlined together. */
+/*
+ * The span's name on the left, „Belohnung“ and „Leer anfangen“ small and quiet on the right, underlined together: the
+ * pictures are what counts, the controls stay out of their way (user feedback, November 2026).
+ */
 .rw-view-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 4px 14px;
-  padding-bottom: 4px;
-  border-bottom: 3px solid var(--ink);
+  gap: 4px 10px;
+  padding-bottom: 3px;
+  border-bottom: 2px solid color-mix(in srgb, var(--ink) 60%, transparent);
 }
 
 .rw-wizard-step .rw-view-name {
-  margin: 0;
-  font-size: 1.6rem;
+  margin: 0 auto 0 0;
+  font-size: 1.4rem;
   font-weight: 900;
   text-align: left;
 }
 
 .rw-view-blank {
-  min-height: 34px;
-  padding: 2px 12px;
-  border: 2px dashed color-mix(in srgb, var(--ink) 55%, transparent);
+  min-height: 32px;
+  padding: 2px 10px;
+  border: 0;
   border-radius: 999px;
   background: none;
-  color: inherit;
+  color: color-mix(in srgb, var(--ink) 75%, transparent);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -735,9 +731,9 @@
 .rw-gallery-big .rw-tpl-name {
   order: -1;
   align-self: flex-start;
-  padding: 2px 12px;
+  padding: 1px 10px;
   border-radius: 999px;
-  font-size: 1.25rem;
+  font-size: 1.05rem;
 }
 
 .rw-gallery-big .rw-thumb {
@@ -784,19 +780,18 @@
 
 .rw-tpl-zoom {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 8px;
+  bottom: 8px;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   padding: 0;
-  border: 3px solid var(--ink);
+  border: 2px solid color-mix(in srgb, var(--ink) 45%, transparent);
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 3px 0 var(--ink);
+  background: #fffe;
   font-family: var(--font-emoji);
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   cursor: zoom-in;
 }
 
@@ -921,7 +916,8 @@
 
 /*
  * Beside „Mein Tag“, in the place of a second picture: the form of a Jetzt – Dann – parts, how many cards, what moves –
- * as small picks, a counter per part and the note on what it means at home.
+ * as quiet small controls without headings (user feedback, November 2026): two segments, a counter per part under
+ * „Anzahl Karten“, and two buttons with a picture each and what they cost to print inside them.
  */
 .rw-day-config-cell {
   grid-column: span 2;
@@ -935,36 +931,54 @@
 .rw-day-config {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px 12px;
-  border-radius: 16px;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
   background: #fff;
 }
 
-.rw-wizard-step .rw-day-config-head {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 900;
-  text-align: left;
-}
-
-.rw-day-picks {
+.rw-segments {
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  border: 2px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-.rw-day-picks .rw-pick {
-  padding: 6px;
+.rw-segments button {
+  min-height: 38px;
+  padding: 2px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.rw-day-picks .rw-pick-emoji {
-  font-size: 1.6rem;
+.rw-segments button + button {
+  border-left: 2px solid color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.rw-segments button[aria-pressed="true"] {
+  background: var(--sunshine);
 }
 
 .rw-counts {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
+  align-items: center;
+  gap: 4px 18px;
+}
+
+/* „Anzahl Karten“ on a line of its own over the counters. */
+.rw-counts-name {
+  flex-basis: 100%;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
 }
 
 .rw-count {
@@ -975,22 +989,23 @@
 }
 
 .rw-count-name {
-  font-weight: 800;
+  font-family: var(--font-emoji);
+  font-size: 1.3rem;
 }
 
 .rw-count button {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border: 3px solid var(--ink);
+  border: 2px solid color-mix(in srgb, var(--ink) 55%, transparent);
   border-radius: 50%;
   background: #fff;
   color: inherit;
   font: inherit;
-  font-size: 1.4rem;
-  font-weight: 900;
+  font-size: 1.15rem;
+  font-weight: 800;
   line-height: 1;
   cursor: pointer;
 }
@@ -1006,13 +1021,126 @@
 
 .rw-count-number {
   min-width: 1.4em;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 900;
   text-align: center;
 }
 
-.rw-day-note {
-  margin: 0;
+/* What moves: the paper arrow or the card as a picture, its name, and below it what it costs to print, plainly. */
+.rw-ways {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rw-way {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 8px;
+  padding: 6px 10px;
+  border: 2px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rw-way[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--sunshine) 45%, #fff);
+}
+
+.rw-way-pic {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 36px;
+  font-family: var(--font-emoji);
+  font-size: 1.6rem;
+}
+
+.rw-way-pic .pl-paper-arrow {
+  width: 26px;
+  height: 32px;
+  rotate: 90deg;
+}
+
+.rw-way-label {
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+/* The cost to print on a slip of its own: green for one page, orange for cards to cut out as well. */
+.rw-way-print {
+  justify-self: start;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #d3f9d8;
+  color: #1e5f2a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.rw-way-print.more {
+  background: #ffe8cc;
+  color: #8a4200;
+}
+
+/* „Belohnung“ in the head of Tag and Woche: a small switch, off by default, the board's Vorlagen when on. */
+.rw-reward-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin-left: auto;
+  padding: 2px 4px 2px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-reward-switch:hover {
+  background: color-mix(in srgb, var(--sunshine) 30%, transparent);
+}
+
+.rw-switch-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 25%, transparent);
+  transition: background 0.2s;
+}
+
+.rw-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px #0004;
+  transition: translate 0.2s;
+}
+
+.rw-reward-switch[aria-checked="true"] .rw-switch-track {
+  background: #2f9e44;
+}
+
+.rw-reward-switch[aria-checked="true"] .rw-switch-track::after {
+  translate: 16px 0;
 }
 
 /* What the wizard is for, on every step: between the buttons at the foot, or beside the steps (big screen, phone). */
@@ -1201,19 +1329,19 @@
 }
 
 /*
- * A big screen: the steps are a column on the left that stays in sight, the kinds (Belohnungstafel, Zeitplan) under
+ * A big screen: the steps are a column on the left that stays in sight, the time spans (Tag, Woche, …) under
  * „Ansicht“ – where they are chosen – and the help below them; the step takes all the rest of the width.
  */
 @media (min-width: 1400px) and (min-height: 700px) {
   /*
    * Three pictures a row, in a grid whose columns the views share (a view spans as many as it has pictures, its
-   * pictures on the same columns, so all are the same size) and fill up holes with a later view: five a row were still
-   * too small on a 1920 screen (user feedback, October 2026).
+   * pictures on the same columns, so all are the same size): five a row were still too small on a 1920 screen (user
+   * feedback, October 2026). The spans keep their order – Tag, Woche, Monat, … – even where that leaves a hole: a later
+   * span pulled up beside the Tag broke the order by time (user feedback, November 2026).
    */
   .rw-view-groups {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-flow: row dense;
     gap: 20px 24px;
   }
 
@@ -1304,7 +1432,7 @@
 
   /* Room for the ✕ in the top right corner. */
   .rw-wizard-step > h2:first-child,
-  .rw-kind-area:first-child .rw-kind-name {
+  .rw-spans .rw-view-group:first-child .rw-view-head {
     padding-right: 52px;
   }
 
@@ -1387,10 +1515,6 @@
     border-radius: 14px;
   }
 
-  .rw-wizard-step .rw-kind-name {
-    font-size: 1.3rem;
-  }
-
   .rw-wizard-step .rw-view-name {
     font-size: 1.15rem;
   }
@@ -1406,7 +1530,69 @@
 
   .rw-gallery-big .rw-tpl-name {
     padding: 0 8px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+  }
+
+  /* The span's head in one line on a phone: the switch without its word (only read out), „Leer anfangen“ smaller. */
+  .rw-reward-switch {
+    padding-left: 4px;
+    font-size: 0;
+  }
+
+  .rw-reward-switch > span:first-child {
+    font-size: 1rem;
+  }
+
+  .rw-view-blank {
+    min-height: 28px;
+    padding: 0 6px;
+    font-size: 0.72rem;
+  }
+
+  .rw-day-config {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .rw-segments button {
+    min-height: 30px;
+    font-size: 0.75rem;
+  }
+
+  .rw-counts-name {
+    font-size: 0.72rem;
+  }
+
+  .rw-count button {
+    width: 26px;
+    height: 26px;
+  }
+
+  .rw-count-number {
+    font-size: 1rem;
+  }
+
+  .rw-way {
+    padding: 4px 6px;
+    gap: 2px 4px;
+  }
+
+  .rw-way-pic {
+    width: 20px;
+  }
+
+  .rw-way-pic .pl-paper-arrow {
+    width: 18px;
+    height: 22px;
+  }
+
+  .rw-way-label {
+    font-size: 0.78rem;
+  }
+
+  .rw-way-print {
+    padding: 0 5px;
+    font-size: 0.66rem;
   }
 
   .rw-gallery-big .rw-thumb {

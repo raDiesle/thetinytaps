@@ -263,7 +263,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const main = wizard ? (
     <Wizard
       key={wizard.start ? `${wizard.start.type}-${wizard.start.template.id}` : "new"}
-      type={type}
       start={wizard.start}
       onDone={add}
       onCancel={empty ? undefined : closeWizard}

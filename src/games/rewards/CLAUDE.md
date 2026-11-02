@@ -19,25 +19,30 @@ of its kind, grouped under the names of their views; „Gestalten“,
 visitor land there.
 
 „＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart. Its first step, „Ansicht“, is the whole choice of form
-(user feedback, October 2026): both kinds on the one page, each in an area under its name („Belohnungstafel“,
-„Zeitplan“, without emoji like every heading, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
-Woche, Monat, Sammeln; Jetzt – Dann, Erst – Dann, Woche), the view's Vorlagen as big pictures under it,
-each with its name above it, a 🔍 on its corner and a small „✏️ Leer anfangen“ beside the view's name. The views
-share the rows so they fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). The first
+(user feedback, October 2026), sorted by the time a chart covers, not by its kind (`SPANS`, user feedback, November
+2026): **Tag, Woche, Monat**, then **Erst – Dann** (seldom used, so low on the page) and **Sammeln** last (it counts
+stars whatever the day). Each span's name stands on top as a heading, its Vorlagen as big pictures under it, each with
+its name above it and a 🔍 on its corner; in the span's head, small and quiet on the right, „✏️ Leer anfangen“ and – in
+Tag and Woche, where both kinds have a view – the switch „🎁 Belohnung“: off (the default) the plan's Vorlagen, on the
+board's, with stars and a reward (on by itself where the wizard starts on a board's Vorlage). Monat and Sammeln are
+always boards, Erst – Dann always a plan. The spans
+share the rows so they fill them (`--rw-tile`: room for five pictures a row, a span as wide as its pictures). The first
 step shows no list of steps – a lone „1 Ansicht“ over the pictures confused (user feedback, October 2026) –, its help
 sits at the foot; from the second step on the steps show, on a big screen (≥ 1400 × 700) as a column on the left, the
-kinds under „Ansicht“ as links to their areas, the picked one marked. On a big screen the pictures stand three a
-row, on columns the views share (`--rw-span`, holes filled by a later view).
+spans under „Ansicht“ as links back to their Vorlagen, the picked one marked. On a big screen the pictures stand three a
+row, on columns the spans share (`--rw-span`), in their order even where that leaves a hole.
 The 🔍 shows the Vorlage over the whole screen (`Zoom`, a modal `<dialog>`), with „Auswählen“ and ‹ › through all.
 A tap picks a Vorlage (yellow glow, ✓) – only one at a time, of either kind: another tap picks that one instead, a
 tap on the picked one puts it back. „Weiter“ goes on to its own steps – `WizardBoard.tsx`: Aufgaben, Belohnung,
 Aussehen; `WizardPlan.tsx`: Bilder (with which days), Aussehen – with the whole board or plan beside each step, and
 only the last step makes it („✓ Tafel anlegen“ / „✓ Plan anlegen“, `onDone` takes one draft). „Leer anfangen“ goes
 there at once. Jetzt – Dann has one Vorlage, „Mein Tag“, and its form is chosen right beside it on the first step
-(`DayConfig` in `WizardPlan.tsx`, a cell two pictures wide): the day in two parts, morgens and abends, or „Der ganze
-Tag am Stück“; how many cards each part has (− and +, `dayCards` picks the most important of `DAY_CARDS` and keeps
-them in the day's order, `withShape` keeps a part whose count didn't change); and „Was wandert?“ – a marker (default)
-or the card into a „Jetzt“ field. Every choice of the later steps is a `Pick` (`pageParts.tsx`): a picture of the board
+(`DayConfig` in `WizardPlan.tsx`, a cell two pictures wide), in quiet small controls without headings: the day in two
+parts, „Morgens und abends“ (the default), or „Am Stück“; under „Anzahl Karten“ how many cards each part has (☀️ / 🌙
+with − and +, `dayCards` picks the most important of `DAY_CARDS` and keeps them in the day's order, `withShape` keeps a
+part whose count didn't change); and what moves – „Pfeil wandert“ (default, the paper arrow as its picture) or „Karte
+wandert“ into a „Jetzt“ field, each with what it costs to print inside its button („🖨️ Nur eine Seite drucken“, „✂️
+Karten auch drucken und ausschneiden“, `NowWay.print`). Every choice of the later steps is a `Pick` (`pageParts.tsx`): a picture of the board
 or plan as that choice would make it (colours) or a big picture card (tasks, cards, rewards, marks) – never a plain
 list of words. A Vorlage from the gallery beside the chart opens the wizard on its own steps (or shows the board or
 plan made from it before). While the wizard is open nothing on top or below belongs to the chart behind it.
@@ -198,7 +203,8 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - Defaults are the same on every load: no random id in anything `rewardsDefaults` gives, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
 - The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the
-  wizard, whose first step shows both kinds, every view by its name and its Vorlagen as pictures; Tag, Woche and Monat are the big switch
+  wizard, whose first step shows every time span by its name and its Vorlagen as pictures (the boards' of Tag and Woche
+  one tap away, behind „Belohnung“); Tag, Woche and Monat are the big switch
   above the board (parents do ask for months: „belohnungskalender“, „monthly reward chart“), every view has at least
   one template, and so has every view of a plan (`rewards.test.ts` checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is
   in the first row where there is not, and switching a view never loses stars.
@@ -206,8 +212,10 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   (views, colours) or a big picture card (tasks, cards, rewards, marks), never only words or small chips. A new choice
   in the wizard is a `Pick`; detail that needs typing (own words, own emoji) stays under „Gestalten“.
 - The wizard goes from the form to the content (user feedback, October 2026): kind, view and Vorlage are one step,
-  the content follows. Both kinds show at once, grouped in their two areas – never a switch that hides one, which
-  grown-ups overlooked; from the second step on, on a big screen, they are named in the steps' column under „Ansicht“.
+  the content follows. That step is sorted by time span – Tag, Woche, Monat, then Erst – Dann, Sammeln last – never by
+  kind (user feedback, November 2026): grown-ups think in „for a day“ or „for a week“, and whether there is a reward
+  is a switch in the span's head („Belohnung“, off by default), not a page of its own. The spans keep that order on
+  every screen, never pulled up into a hole beside an earlier one.
   Never show a list of steps while there is only the first one to see (a lone „1 Ansicht“ confused). Each view's name stands
   big on top of its Vorlagen as a heading, and a Vorlage's name above its picture, never small below it; a picture has
   no second frame round it (it is framed itself), only a glow when picked. One chart is designed and made at a time:
@@ -220,6 +228,10 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   explanation – no description lines under the choices; the one help line, on every step, says what the wizard is
   for: use the charts on screen, print and make them, or order the photo prints, one Vorlage step by step.
 - A button that can do nothing is left out, never shown greyed (the first step has no „Zurück“).
+- The wizard's controls are quiet so the pictures lead (user feedback, November 2026, on a computer): small segments,
+  counters and buttons in soft lines, no heading over a choice that explains itself („Tag aufteilen?“, „Was wandert?“
+  are only read out; at most a small label such as „Anzahl Karten“), and what a choice means goes into its own button
+  in a few words with a visual sign (🖨️ one page, ✂️ cards to cut out) – never a paragraph of notes under it.
 - Group what belongs together, and what nobody wants without the other goes on one page: Mein Morgen and Mein Abend
   are one „Mein Tag“ (a plan's `parts`, a board's tasks with their times of day), printed on one page (user feedback,
   October 2026). A view's name says what it shows, never „Tagesansicht“, which reads as „one day only“. What differs
@@ -229,7 +241,7 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - Never show a board or plan the grown-up didn't make: no default chart (a Zähne-Woche nobody chose was removed),
   a first visit always starts with the wizard (`rewards.test.ts`, `plan.test.ts` check the empty defaults).
 - Boards and plans are one page: never a second page, menu card or wizard for one of them; a new kind of chart joins
-  `CHART_TYPES` and the wizard's first step.
+  `CHART_TYPES` and the wizard's first step, its views placed in the time spans (`SPANS`).
 - A board is never shown empty the first time: templates and new boards show example stars as if in use, but never a
   full board (`rewards.test.ts` checks), pale and named as examples, never saved and never printed.
 - What is done more than once a day gets a field each time, marked with its time of day (Zähne putzen: morning and
@@ -254,7 +266,7 @@ Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-4
 A picture schedule („Strukturtafel“), called „Zeitplan“ beside the Belohnungstafel (`CHART_TYPES`), in three views –
 three ways of showing the same cards (`PLAN_VIEWS`): **Jetzt – Dann** (view id `"day"`: the day's cards in reading
 order, left to right and row by row, a row per part of the day where it has two; all of them stay fixed on one sheet
-and a yellow sticky note – at home a paper arrow, a clothes peg or a sticky note – marks the card to do and moves on;
+and a paper arrow cut out of card (`PaperArrow`) points up at the card to do from below it and moves on;
 or, as a variant, `nowField`, the card to do stands big on a panel of its own under „Jetzt“, the others smaller under
 „Dann“, and done cards go into the Fertig-Kiste), **Erst – Dann** (pairs of two, each a small board of its own, up to four on a
 page to cut apart) and the **Woche** (a column per day). Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
@@ -276,8 +288,9 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   from, per part in the day's order, `rank` saying which come first) and `PLAN_TEMPLATES`: Mein Tag (Jetzt – Dann:
   Morgen and Abend as `parts` on one page), Erst – Dann (four pairs), Wochenplan (own weekdays, with the Kita).
 - `PlanSheet.tsx` – the sheet for screen and print, one component per view: `DaySteps` (the rows – `planLayout` picks
-  rows and columns for one part, several parts get a line each – with the marker under the card to do; with the field
-  the „Jetzt“ panel, the „Dann“ rows and on screen the Fertig-Kiste below, `DoneBox`, and on paper `FieldFrames`),
+  rows and columns for one part, as many in a row as fit unless another row makes the cards clearly bigger, several
+  parts get a line each with their ☀️ / 🌙 before it – with the paper arrow under the card to do; with the field
+  the „Jetzt“ panel under a 👇, the other rows and on screen the Fertig-Kiste below, `DoneBox`, and on paper `FieldFrames`),
   `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a day). No date on the sheet: only a printed
   plan whose weekdays differ names its weekday.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
@@ -291,8 +304,8 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
 
 ## The tick flow
 
-The child taps the card to do. In Jetzt – Dann with the marker the card stays in its place with a tick and the sticky
-note slides on to the next card, as at home the paper arrow moves along the sheet; with the „Jetzt“ field the card
+The child taps the card to do. In Jetzt – Dann with the marker the card stays in its place with a tick and the paper
+arrow slides on to the next card, as at home the paper arrow moves along the sheet; with the „Jetzt“ field the card
 flies with a sound into the Fertig-Kiste at the bottom edge (H-42), as on a Velcro board at home, and the row gets
 shorter until only the last card (the bed) is left. The voice (if on) names what comes next, and the last one starts a
 small party. The flight (`PlanScreen`, Web Animations from the card's or the marker's old place, `flyFrom`) only
@@ -325,12 +338,17 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
   in two parts (`stepLimit`); a template and every shape the wizard offers stay within it (`plan.test.ts`).
 - No clock times and no dates on a plan's sheet: order, „Jetzt – Dann“ and moons for the days to come; toddlers read
   no clock (the date in the corner was removed, user feedback, October 2026).
+- No words for the child on a plan's sheet (user feedback, November 2026): a card is its picture only (its word is the
+  tooltip and what is read out), a part of the day is its ☀️ or 🌙, „Jetzt“ is a 👇, an Erst – Dann pair is card ➜ card.
+  Only what grown-ups need stays written: the heading and the week's day names. The cards are square, with little room
+  between them, so as many as possible fit a row.
 - In Jetzt – Dann every card stays fixed on one sheet in reading order and only a marker moves to show the card to do
-  – that is the default, since nothing is cut out and one sheet is the whole plan (user feedback, November 2026). The
+  – on screen a paper arrow cut by hand, red card with a strip of tape, as one a family would make (user feedback,
+  November 2026), and on paper the room under every card where the real one goes – that is the default, since nothing is cut out and one sheet is the whole plan (user feedback, November 2026). The
   card that moves into a „Jetzt“ field is a variant (`nowField`), and its cost is said plainly wherever it is chosen
   (wizard, Gestalten) and printed: its cards are printed separately, cut out and fixed with Velcro (`NOW_WAYS`'
-  notes, `printsCards`). With the field, „Jetzt“ stands apart: its card big on a lit panel under a banner in the ink's
-  colour, parted from the smaller „Dann“ cards by a line, so it is plain which card matters now (user feedback,
+  `print` and notes, `printsCards`). With the field, „Jetzt“ stands apart: its card big on a lit panel under a 👇 on a
+  banner edged in the ink's colour, parted from the smaller cards to come by a line, so it is plain which card matters now (user feedback,
   October 2026). Erst – Dann is a view of a plan, like the week; it holds up to four pairs, a page of them
   (`plan.test.ts`).
 - Printed cards are big (at least `MIN_CARD_MM`, 4.5 cm, room for a 20 mm Velcro dot) and the texts suggest Velcro

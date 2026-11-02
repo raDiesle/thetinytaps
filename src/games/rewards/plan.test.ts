@@ -277,6 +277,7 @@ describe("plans", () => {
 describe("cards of a day", () => {
   test("two cards stand side by side, many in a tall box go into rows", () => {
     expect(planLayout(2, 1.6)).toEqual({ cols: 2, rows: 1 });
+    // As many in a row as fit: five a row, not three and two, where that makes the square cards only a little bigger.
     expect(planLayout(5, 2.4).rows).toBe(1);
     expect(planLayout(6, 0.8).rows).toBeGreaterThan(1);
     for (let n = 1; n <= MAX_STEPS; n++) {

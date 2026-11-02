@@ -26,7 +26,7 @@ interface Move {
 }
 
 /** Plays a card's way from `from` to where it now is, shrunk or grown from `scale`. */
-function flyFrom(el: HTMLElement, from: DOMRect, scale: number, delay = 0) {
+function flyFrom(el: Element, from: DOMRect, scale: number, delay = 0) {
   const to = el.getBoundingClientRect();
   const dx = from.left + from.width / 2 - (to.left + to.width / 2);
   const dy = from.top + from.height / 2 - (to.top + to.height / 2);
@@ -127,7 +127,7 @@ export function PlanScreen({
     move.current = null;
     markerFrom.current = null;
     if (!root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const marker = root.querySelector<HTMLElement>(".pl-marker");
+    const marker = root.querySelector(".pl-marker");
     if (from && marker) flyFrom(marker, from, 1);
     if (!m) return;
     if (m.into) {

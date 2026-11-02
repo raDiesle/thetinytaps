@@ -778,7 +778,9 @@ export interface NowWay {
   field: boolean;
   emoji: string;
   label: Localized;
-  /** What it means for the paper at home, in a line or two for grown-ups. */
+  /** What it costs to print, in a few words inside its button in the wizard (`🖨️` or `✂️` before it). */
+  print: Localized;
+  /** What it means for the paper at home, in a line or two for grown-ups (under Gestalten). */
   note: Localized;
 }
 
@@ -786,8 +788,9 @@ export interface NowWay {
 export const NOW_WAYS: NowWay[] = [
   {
     field: false,
-    emoji: "📌",
-    label: { de: "Ein Pfeil wandert" },
+    emoji: "⬆️",
+    label: { de: "Pfeil wandert" },
+    print: { de: "Nur eine Seite drucken" },
     note: {
       de: "Alle Karten stehen fest auf einem Blatt. Ein Pfeil aus Pappe, eine Wäscheklammer oder ein bunter Klebezettel zeigt, was gerade dran ist – Ihr Kind schiebt ihn weiter. Nichts zum Ausschneiden.",
     },
@@ -795,7 +798,8 @@ export const NOW_WAYS: NowWay[] = [
   {
     field: true,
     emoji: "🃏",
-    label: { de: "Die Karte wandert ins Jetzt-Feld" },
+    label: { de: "Karte wandert" },
+    print: { de: "Karten auch drucken und ausschneiden" },
     note: {
       de: "Mehr Bastelarbeit: Die Karten werden extra gedruckt, ausgeschnitten und mit Klett aufgeklebt. Die Karte, die dran ist, kommt ins Jetzt-Feld, fertige in eine Tasche – dafür hat Ihr Kind sie selbst in der Hand.",
     },
