@@ -11,8 +11,6 @@ export const COMFORTS_EN: Partial<Record<ComfortId, ComfortText>> = {
   teddy: { caption: "Give a teddy", narration: "You give Little Bear a teddy to cuddle." },
   stomp: { caption: "Stomp", narration: "Stomp, stomp! Let the anger out." },
   blow: { caption: "Take a deep breath", narration: "Breathe in deeply … and blow out: Phoooo." },
-  blanket: { caption: "Tuck in", narration: "You tuck Little Bear in. Nice and warm." },
-  lullaby: { caption: "Sing a lullaby", narration: "You sing a soft lullaby." },
   hand: { caption: "Hold his paw", narration: "You hold his paw. You are right here." },
   light: { caption: "Turn on the light", narration: "You turn on the light. Now it is bright." },
   dance: { caption: "Dance along", narration: "You dance together. Hop, hop!" },
@@ -52,22 +50,6 @@ export const FEELINGS_EN: Partial<Record<FeelingId, FeelingText>> = {
     ],
     end: { narration: "The anger is gone. Little Bear is calm again.", line: "Thank you!" },
     endCaption: "Calm again",
-  },
-  tired: {
-    title: "Tired in the evening",
-    questions: [
-      "Little Bear is tired and yawning. What do you do?",
-      "Little Bear is still awake. What do you do?",
-      "Little Bear is almost asleep. What do you do?",
-    ],
-    intro: "Little Bear is tired. He is yawning.",
-    instead: [
-      { caption: "Pull the blanket away", answer: "Hmm, without a blanket Little Bear gets cold. Tuck him in instead." },
-      { caption: "Drum loudly", answer: "Hmm, Little Bear can't sleep when it's so loud. Be very quiet instead." },
-      { caption: "Show a tablet", answer: "Hmm, the bright screen wakes Little Bear up again. Give him his teddy instead." },
-    ],
-    end: { narration: "Little Bear falls happily asleep. Good night!", line: "Good night …" },
-    endCaption: "Falling asleep",
   },
   scared: {
     title: "Scared of the storm",

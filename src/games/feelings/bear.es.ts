@@ -12,8 +12,6 @@ export const COMFORTS_ES: Partial<Record<ComfortId, ComfortText>> = {
   teddy: { caption: "Dar un peluche", narration: "Le das a Osito un peluche para abrazar." },
   stomp: { caption: "Zapatear", narration: "¡Pum, pum! Que salga el enojo." },
   blow: { caption: "Soplar hondo", narration: "Respira hondo … y sopla: Fuuu." },
-  blanket: { caption: "Arropar", narration: "Arropas a Osito. Bien calientito." },
-  lullaby: { caption: "Cantar una canción de cuna", narration: "Cantas bajito una canción de cuna." },
   hand: { caption: "Tomarle la patita", narration: "Le tomas la patita. Estás a su lado." },
   light: { caption: "Encender la luz", narration: "Enciendes la luz. Ahora hay luz." },
   dance: { caption: "Bailar juntos", narration: "Bailas con Osito. ¡Salta, salta!" },
@@ -49,18 +47,6 @@ export const FEELINGS_ES: Partial<Record<FeelingId, FeelingText>> = {
     ],
     end: { narration: "El enojo se fue. Osito está tranquilo otra vez.", line: "¡Gracias!" },
     endCaption: "Tranquilo otra vez",
-  },
-  tired: {
-    title: "Sueño por la noche",
-    questions: ["Osito tiene sueño y bosteza. ¿Qué haces tú?", "Osito sigue despierto. ¿Qué haces tú?", "Osito ya casi se duerme. ¿Qué haces tú?"],
-    intro: "Osito tiene sueño. Bosteza.",
-    instead: [
-      { caption: "Quitar la manta", answer: "Mmm, sin manta Osito tiene frío. Mejor arrópalo." },
-      { caption: "Tocar fuerte el tambor", answer: "Mmm, con tanto ruido Osito no puede dormir. Mejor guarda silencio." },
-      { caption: "Enseñar la tableta", answer: "Mmm, la luz de la pantalla despierta otra vez a Osito. Mejor dale su peluche." },
-    ],
-    end: { narration: "Osito se duerme feliz. ¡Buenas noches!", line: "Buenas noches …" },
-    endCaption: "Se duerme",
   },
   scared: {
     title: "Miedo a la tormenta",

@@ -148,8 +148,18 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/gefuehle/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
+    parts: [
+      {
+        label: "Wie geht's dir? und Kindergarten",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "Zu Hause",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
+      },
+    ],
   },
   {
     href: "/abenteuer/",

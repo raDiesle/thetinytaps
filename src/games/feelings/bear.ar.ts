@@ -12,8 +12,6 @@ export const COMFORTS_AR: Partial<Record<ComfortId, ComfortText>> = {
   teddy: { caption: "إعطاء دمية", narration: "نعطي الدبدوب دمية ليحضنها." },
   stomp: { caption: "دبدبة بالقدمين", narration: "دب، دب! ليخرج الغضب." },
   blow: { caption: "نفخ عميق", narration: "شهيق عميق … ثم ننفخ: فووو." },
-  blanket: { caption: "تغطية", narration: "نغطّي الدبدوب. دافئ ومريح." },
-  lullaby: { caption: "غناء تهويدة", narration: "نغنّي تهويدة هادئة." },
   hand: { caption: "إمساك اليد", narration: "نمسك يده. نحن هنا معه." },
   light: { caption: "إشعال الضوء", narration: "نشعل الضوء. الآن صار المكان مضيئًا." },
   dance: { caption: "الرقص معًا", narration: "نرقص معًا. قفزة، قفزة!" },
@@ -45,18 +43,6 @@ export const FEELINGS_AR: Partial<Record<FeelingId, FeelingText>> = {
     ],
     end: { narration: "ذهب الغضب. الدبدوب هادئ من جديد.", line: "شكرًا!" },
     endCaption: "هادئ من جديد",
-  },
-  tired: {
-    title: "نعسان في المساء",
-    questions: ["الدبدوب نعسان ويتثاءب. ماذا نفعل؟", "الدبدوب ما زال مستيقظًا. ماذا نفعل؟", "الدبدوب يكاد ينام. ماذا نفعل؟"],
-    intro: "الدبدوب نعسان. إنه يتثاءب.",
-    instead: [
-      { caption: "سحب الغطاء", answer: "همم، بلا غطاء يبرد الدبدوب. الأفضل أن نغطّيه." },
-      { caption: "قرع الطبل بصوت عالٍ", answer: "همم، مع هذا الصوت العالي لا يستطيع الدبدوب أن ينام. الأفضل أن نتكلم بهدوء شديد." },
-      { caption: "عرض الجهاز اللوحي", answer: "همم، الصورة المضيئة توقظ الدبدوب من جديد. الأفضل أن نعطيه دمية." },
-    ],
-    end: { narration: "الدبدوب ينام سعيدًا. ليلة سعيدة!", line: "ليلة سعيدة …" },
-    endCaption: "ينام",
   },
   scared: {
     title: "خوف من العاصفة",

@@ -56,6 +56,12 @@ to be comforted. For every new situation and its pictures:
   when the bear acts, no hands from the edge. When the one with the feeling goes to someone, he is
   seen moving towards them, not already in their arms.
 
+**Whose view a story takes is the child's own (user feedback, November 2026):** where the child itself is the one
+with the feeling at that moment – tired at bedtime – the child is the bear, and the whole story is the bear acting
+himself („Was kann er machen?“, „Hinlegen und zudecken“, no hands from the edge); its not-so-good ideas are what a
+child in that moment does itself (hops on the bed, gets up to play, cries), never what a second child does to the
+bear (pulling his blanket away, drumming next to his bed), which brings in someone who isn't there.
+
 A card only takes, throws or breaks what the story's first picture already shows (a teddy the
 bear doesn't hold can't be taken from him): pick another idea rather than redraw the first picture.
 A card may bring something new (the teddy from the toy box, the light). `bilder/README.md` lists what

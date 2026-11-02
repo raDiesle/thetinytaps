@@ -5,7 +5,7 @@
 
 import type { OopsSound, SoundName } from "./story";
 
-export type ComfortId = "stroke" | "hug" | "teddy" | "stomp" | "blow" | "blanket" | "lullaby" | "hand" | "light" | "dance" | "streamers";
+export type ComfortId = "stroke" | "hug" | "teddy" | "stomp" | "blow" | "liedown" | "lullaby" | "cuddle" | "hand" | "light" | "dance" | "streamers";
 
 /** One kind thing for the bear. */
 export interface Comfort {
@@ -48,17 +48,23 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
     float: "💨",
     sound: "breath",
   },
-  blanket: {
-    caption: "Zudecken",
-    narration: "Du deckst den Bären zu. Schön warm.",
+  liedown: {
+    caption: "Hinlegen und zudecken",
+    narration: "Der Bär legt sich hin und deckt sich zu. Schön warm.",
     float: "✨",
     sound: "hum",
   },
   lullaby: {
-    caption: "Schlaflied singen",
-    narration: "Du singst ein leises Schlaflied.",
+    caption: "Schlaflied hören",
+    narration: "Der Bär macht die Augen zu und hört ein leises Schlaflied.",
     float: "🎵",
     sound: "musicbox",
+  },
+  cuddle: {
+    caption: "Teddy kuscheln",
+    narration: "Der Bär kuschelt sich an seinen Teddy.",
+    float: "💛",
+    sound: "hum",
   },
   hand: {
     caption: "Hand halten",
@@ -158,12 +164,17 @@ export const FEELINGS: Feeling[] = [
     id: "tired",
     emoji: "😴",
     title: "Müde am Abend",
-    questions: ["Der Bär ist müde und gähnt. Was machst du?", "Der Bär ist noch wach. Was machst du?", "Der Bär ist fast eingeschlafen. Was machst du?"],
-    comforts: ["blanket", "lullaby", "teddy"],
+    // Here the bear does it all himself – the child is the bear going to bed (user feedback): no one else's hands.
+    questions: [
+      "Der Bär ist müde und gähnt. Was kann er machen?",
+      "Der Bär kann noch nicht einschlafen. Was kann er machen?",
+      "Der Bär ist fast eingeschlafen. Was kann er machen?",
+    ],
+    comforts: ["liedown", "lullaby", "cuddle"],
     instead: [
-      { caption: "Decke wegziehen", answer: "Hmm, ohne Decke friert der Bär. Deck ihn lieber zu." },
-      { caption: "Laut trommeln", answer: "Hmm, so laut kann der Bär nicht schlafen. Sei lieber ganz leise." },
-      { caption: "Tablet zeigen", answer: "Hmm, das helle Bild macht den Bären wieder wach. Gib ihm lieber seinen Teddy." },
+      { caption: "Auf dem Bett hüpfen", answer: "Hmm, vom Hüpfen wird der Bär wieder ganz munter. Leg dich lieber hin und deck dich zu." },
+      { caption: "Aufstehen und spielen", answer: "Hmm, jetzt ist der Bär wieder hellwach. Mach lieber die Augen zu und hör das Schlaflied." },
+      { caption: "Weinen", answer: "Hmm, vom Weinen wird der Bär wieder wach. Kuschel dich lieber an deinen Teddy." },
     ],
     end: { narration: "Der Bär schläft glücklich ein. Gute Nacht!", line: "Gute Nacht …" },
     endCaption: "Schläft ein",

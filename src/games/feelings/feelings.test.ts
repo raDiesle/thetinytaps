@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
+import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, storyImages } from "./images";
@@ -9,8 +10,15 @@ import { MOOD_ID, WEATHERS } from "./mood";
 import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
-/** The languages the whole game has been translated into. */
-const TRANSLATED: TargetLanguageId[] = ["en", "zh", "hi", "es", "ar", "ru"];
+// The languages a part has been translated into whole, as the language table on /management/ says: a part marked
+// "done" there has every text, and changing a German line means marking it "partial" until it is translated again.
+const STATUS_PARTS = LANGUAGE_STATUS.find((row) => row.href === "/gefuehle/")?.parts ?? [];
+const translatedIn = (label: string) =>
+  (Object.entries(STATUS_PARTS.find((part) => part.label === label)?.languages ?? {}) as [TargetLanguageId, string][])
+    .filter(([language, state]) => language !== "de" && state === "done")
+    .map(([language]) => language);
+const TRANSLATED_HOME = translatedIn("Zu Hause");
+const TRANSLATED_KITA = translatedIn("Wie geht's dir? und Kindergarten");
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
 // allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
@@ -36,7 +44,7 @@ test("the bear has a picture for every feeling, every round and every comfort", 
     expect(instead.length, id).toBe(comforts.length);
     instead.forEach((_, i) => expectPicture(bearImages.instead(id, i)));
   }
-  for (const id of Object.keys(COMFORTS)) expect(imageFor(bearImages.comfort(id)), bearImages.comfort(id)).toBeDefined();
+  for (const id of Object.keys(COMFORTS)) expectPicture(bearImages.comfort(id));
 });
 
 test("a planned picture that is made leaves „Geplant“", () => {
@@ -135,15 +143,18 @@ test("a translated story has no German title left and keeps its sounds", () => {
 const stringsIn = (value: unknown): string[] =>
   typeof value === "string" ? [value] : value && typeof value === "object" ? Object.values(value).flatMap(stringsIn) : [];
 
-// The languages asked for so far are translated whole: every kind thing, feeling (each not-so-good idea too) and
-// kindergarten story, so none of them is told half in German.
+// A part the language table marks translated is translated whole: every kind thing, feeling (each not-so-good idea
+// too) and kindergarten story, so none of them is told half in German.
 test("every translated language has every story", () => {
-  for (const language of TRANSLATED) {
+  expect(TRANSLATED_KITA.length, "the language table's parts of /gefuehle/").toBeGreaterThan(0);
+  for (const language of TRANSLATED_HOME) {
     for (const id of Object.keys(COMFORTS) as ComfortId[]) expect(COMFORT_TEXTS[language]?.[id], `${language} comfort ${id}`).toBeDefined();
     for (const { id } of FEELINGS) {
       expect(FEELING_TEXTS[language]?.[id], `${language} feeling ${id}`).toBeDefined();
       expect(FEELING_TEXTS[language]?.[id]?.instead, `${language} feeling ${id}`).not.toContain(null);
     }
+  }
+  for (const language of TRANSLATED_KITA) {
     for (const { id } of SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
   }
 });
