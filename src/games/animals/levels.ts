@@ -2,6 +2,7 @@ import { lookOf, type ShadowItem } from "@/games/shadows/content";
 import { shuffle } from "@/games/shadows/deck";
 import { wrongFoods, wrongHomes, type Animal, type Food } from "./content";
 import { HOMES, type Home } from "./homes";
+import type { Difficulty } from "./settings";
 
 /** The three kinds of rounds: who peeks out of the bush (X-04), feeding (N-08), who lives where (N-09). */
 export type RoundKind = "peek" | "feed" | "home";
@@ -45,6 +46,18 @@ export const ANIMAL_LEVELS: AnimalLevel[] = [
   { choices: 4, peek: { choices: 5, show: 0.22, alike: true, holes: { count: 3, r: 34 } } },
   { choices: 4, peek: { choices: 5, show: 0.18, alike: true, holes: { count: 2, r: 30 } } },
 ];
+
+/** The step a fixed difficulty plays on (chosen behind ⚙️); „Von selbst“ climbs and falls instead. */
+export const FIXED_LEVELS: Record<Exclude<Difficulty, "auto">, number> = { easy: 0, medium: 3, hard: ANIMAL_LEVELS.length - 1 };
+
+/** The kind after `last` among those switched on, in `KIND_ORDER`; the first one switched on to begin with (all if none is). */
+export function nextKind(last: RoundKind | null, on: Record<RoundKind, boolean>): RoundKind {
+  const kinds = KIND_ORDER.filter((k) => on[k]);
+  const order = kinds.length > 0 ? kinds : KIND_ORDER;
+  if (last === null) return order[0];
+  const from = KIND_ORDER.indexOf(last);
+  return [...KIND_ORDER.slice(from + 1), ...KIND_ORDER.slice(0, from + 1)].find((k) => order.includes(k))!;
+}
 
 /** A feeding round: `animal` is hungry, one of `foods` (at `correct`) is its own. */
 export interface FeedRound {

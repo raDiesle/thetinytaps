@@ -8,7 +8,7 @@ import { pick, useAppLanguage } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { AnimalsPlay } from "./AnimalsPlay";
 import { ANIMALS, type Animal } from "./content";
-import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, KIND_ORDER } from "./levels";
+import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import type { AnimalsSettings } from "./settings";
 
 const FED = ANIMALS.filter((a) => a.food);
@@ -16,8 +16,9 @@ const HOUSED = ANIMALS.filter((a) => a.home);
 
 /**
  * "Was gehört zum Tier?" as one flowing game: who peeks out, feeding and who lives where take turns in that order,
- * and the difficulty follows how the child plays (`ANIMAL_LEVELS`). Each round is mounted anew; the stars, the step
- * and the animals still to come live here.
+ * and the difficulty follows how the child plays (`ANIMAL_LEVELS`). Grown-ups may switch kinds off or fix the
+ * difficulty while playing; that counts from the next round. Each round is mounted anew; the stars, the step and the
+ * animals still to come live here.
  */
 export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const language = useAppLanguage();
@@ -45,29 +46,39 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
 
   // Dealt once per turn: the round must stay the same while it is played, however often this renders.
   const dealt = useRef<{ turn: number; round: ReturnType<typeof deal> } | null>(null);
-  function deal() {
+  function deal(last: RoundKind | null) {
+    // A fixed difficulty plays its step; switched back to „Von selbst“, the game climbs on from there.
+    if (settings.difficulty !== "auto" && levelRef.current !== FIXED_LEVELS[settings.difficulty]) {
+      levelRef.current = FIXED_LEVELS[settings.difficulty];
+      resultsRef.current = [];
+    }
     const level = ANIMAL_LEVELS[levelRef.current];
-    const kind = KIND_ORDER[turn % KIND_ORDER.length];
+    const kind = nextKind(last, settings);
     if (kind === "peek") {
       const item = drawPeek();
       return { kind, item, choices: dealPeek(item, PEEK_ITEMS, level.peek), level: level.peek } as const;
     }
     return kind === "feed" ? dealFeed(drawAnimal(drawFed), level.choices) : dealHome(drawAnimal(drawHoused), level.choices);
   }
-  if (dealt.current?.turn !== turn) dealt.current = { turn, round: deal() };
+  if (dealt.current?.turn !== turn) dealt.current = { turn, round: deal(dealt.current?.round.kind ?? null) };
   const round = dealt.current.round;
 
-  const onSolved = useCallback((misses: number) => {
-    // How this round went decides the next one's step.
-    const results = [...resultsRef.current, misses];
-    const level = nextLevel(levelRef.current, results, ANIMAL_LEVELS.length - 1);
-    resultsRef.current = level === levelRef.current ? results : [];
-    levelRef.current = level;
-    setStars((n) => n + 1);
-  }, []);
+  const auto = settings.difficulty === "auto";
+  const onSolved = useCallback(
+    (misses: number) => {
+      setStars((n) => n + 1);
+      if (!auto) return;
+      // How this round went decides the next one's step.
+      const results = [...resultsRef.current, misses];
+      const level = nextLevel(levelRef.current, results, ANIMAL_LEVELS.length - 1);
+      resultsRef.current = level === levelRef.current ? results : [];
+      levelRef.current = level;
+    },
+    [auto],
+  );
 
   const onNext = useCallback(() => {
-    // Every turn of all three kinds is a game for a game limit: with the last one played, the game says good night.
+    // Every three rounds are a game for a game limit: with the last one played, the game says good night.
     if ((turn + 1) % KIND_ORDER.length === 0) {
       gameEnded();
       if (isPlaytimeOver()) return;

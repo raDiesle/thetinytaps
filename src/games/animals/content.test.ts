@@ -4,7 +4,7 @@ import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods, wrongHom
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
-import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, KIND_ORDER } from "./levels";
+import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -79,6 +79,24 @@ test("an animal without its words gets the whole German sentence, in every langu
     expect(texts.yummy(animal, withFood.food!), language).toBe(de.yummy(animal, withFood.food!));
     expect(texts.movedIn(animal, HOMES[withFood.home!]), language).toBe(de.movedIn(animal, HOMES[withFood.home!]));
   }
+});
+
+test("only the kinds switched on take turns, in their order, and none switched on plays all", () => {
+  const turns = (on: Record<"peek" | "feed" | "home", boolean>) => {
+    const kinds = [nextKind(null, on)];
+    for (let i = 0; i < 5; i++) kinds.push(nextKind(kinds[kinds.length - 1], on));
+    return kinds;
+  };
+  expect(turns({ peek: true, feed: true, home: true })).toEqual(["peek", "feed", "home", "peek", "feed", "home"]);
+  expect(turns({ peek: false, feed: true, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home"]);
+  expect(turns({ peek: true, feed: false, home: false })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek"]);
+  expect(turns({ peek: false, feed: false, home: false })).toEqual(["peek", "feed", "home", "peek", "feed", "home"]);
+  // A kind switched off while it plays: the turns go on with the next one switched on.
+  expect(nextKind("feed", { peek: true, feed: false, home: false })).toBe("peek");
+  // The fixed difficulties are steps there are, easy to hard.
+  expect(FIXED_LEVELS.easy).toBe(0);
+  expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
+  expect(FIXED_LEVELS.hard).toBe(ANIMAL_LEVELS.length - 1);
 });
 
 test("the rounds take turns starting with who peeks out, and the steps only get harder", () => {

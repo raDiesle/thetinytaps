@@ -2,8 +2,8 @@
 
 Route `/tiere/`.
 
-One flowing game, like Socken-Paare: its card plays at once (`startMode`), with no start screen, no cards, no `level`
-row and no settings; ✕ and „Menü“ go back to the table of contents. `AnimalsRounds.tsx` lets three kinds of rounds take
+One flowing game, like Socken-Paare: its card plays at once (`startMode`), with no start screen, no cards and no `level`
+row; ✕ and „Menü“ go back to the table of contents. Its only options lie behind ⚙️ while playing (`PlayOptions`). `AnimalsRounds.tsx` lets three kinds of rounds take
 turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest:
 1. „Wer schaut da raus?“ (X-04, `PeekPlay` from `src/games/shadows/`, which shares the stage, pictures and glyphs with
    the shadows): a part of an animal peeks out of a bush or the pond, the child taps the whole animal below.
@@ -12,7 +12,7 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest:
 
 Each round is mounted anew (`key={turn}`) and reports `onSolved(misses)` when the right thing is picked and `onNext()`
 when the reaction has been watched; the stars (top left, `sh-bar` from `shadows.css`), the step and the animals still
-to come live in `AnimalsRounds`. Every turn of all three kinds counts as a game for the play-time limit (`gameEnded`,
+to come live in `AnimalsRounds`. Every three rounds count as a game for the play-time limit (`gameEnded`,
 `countGame`). Homes are drawn in `homes.tsx`; animals, foods and sentences are in `content.ts`.
 
 **Difficulty** (`ANIMAL_LEVELS`, `dealFeed`, `dealHome`, `dealPeek` in `levels.ts`; the step rule is `nextLevel` from
@@ -27,8 +27,14 @@ the pond it still peeks out).
 
 ## Rules
 
-- No options: no start screen, no settings, no choice of kind or of how many things – the game takes turns and finds
-  the difficulty itself (user decision, November 2026). Never bring back cards for the three kinds.
+- No start screen and no cards for the three kinds: by default all three take turns and the game finds the difficulty
+  itself (user decision, November 2026). Grown-ups change that only behind ⚙️ held while playing (user feedback,
+  November 2026), and a change counts from the next round:
+  - „Was drankommt“: each kind on or off (`settings.peek/feed/home`); the turns go on with the next kind switched on
+    (`nextKind`), and the last one can't be switched off.
+  - „Schwierigkeit“: „Von selbst“ (the default, `nextLevel`) or a fixed step, Leicht · Mittel · Schwer (`FIXED_LEVELS`);
+    back on „Von selbst“ the game climbs on from the fixed step.
+    No other options (names, dragging instead of tapping were left out on purpose).
 - Harder means more to choose from and less to see, never quicker: no clock, and time doesn't count for the difficulty.
 - A wrong pick is never shown as wrong (the animal says „Bäh!“, the real resident peeks out, the animal shown says who
   it is); it only feeds `nextLevel`.

@@ -1,8 +1,15 @@
+import type { RoundKind } from "./levels";
+
+/** How hard the rounds are: found by how the child plays („Von selbst“), or fixed by a grown-up. */
+export type Difficulty = "auto" | "easy" | "medium" | "hard";
+
 /**
- * Nothing to choose: the game takes turns between its three kinds of rounds and finds the difficulty itself
- * (`levels.ts`). Only the shared options are filled in.
+ * The game starts at once and takes turns between its three kinds of rounds, finding the difficulty itself
+ * (`levels.ts`). Grown-ups may change both while playing, behind ⚙️ held in the corner (`PlayOptions`).
  */
-export interface AnimalsSettings {
+export interface AnimalsSettings extends Record<RoundKind, boolean> {
+  /** Fixed or found by how the child plays. */
+  difficulty: Difficulty;
   /** Speak the question, the thanks and the "Bäh!". */
   speech: boolean;
   /** Munching, animal noises and chimes. */
@@ -10,8 +17,12 @@ export interface AnimalsSettings {
 }
 
 export const DEFAULT_ANIMALS_SETTINGS: AnimalsSettings = {
+  peek: true,
+  feed: true,
+  home: true,
+  difficulty: "auto",
   speech: false,
   sounds: true,
 };
 
-export const ANIMALS_SETTINGS_KEY = "tinytaps.animals.v2";
+export const ANIMALS_SETTINGS_KEY = "tinytaps.animals.v3";

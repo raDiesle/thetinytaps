@@ -289,7 +289,8 @@ In a fresh worktree run `bun install` first.
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
-  its card plays at once with no choice of kind or of how many things (user feedback, November 2026).
+  its card plays at once with no start screen. Grown-ups may still switch kinds off or fix the difficulty, behind ⚙️
+  while playing (`PlayOptions`), never on cards or a start screen (user feedback, November 2026).
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
 - Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
