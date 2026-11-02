@@ -98,7 +98,7 @@ export function ScreenHint() {
               {t({ de: "Vollbild", ru: "Полный экран", en: "Full screen", zh: "全屏", hi: "फ़ुल स्क्रीन", es: "Pantalla completa", ar: "ملء الشاشة" })}
             </button>
           )}
-          <button type="button" className="screen-hint-button secondary" onClick={playUpright}>
+          <button type="button" className="screen-hint-button secondary screen-hint-upright" onClick={playUpright}>
             {t({
               de: "Trotzdem hochkant",
               ru: "Всё равно вертикально",

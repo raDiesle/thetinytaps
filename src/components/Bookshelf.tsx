@@ -262,6 +262,7 @@ function DailyGroup({
           {!carving.short && (
             <>
               <span>{t({ de: "zum Einstieg – gemeinsam erlebt, das Kind mit Eltern oder Großeltern." })}</span>
+              <span>{t({ de: "Alles kostenlos." })}</span>
               <span className="shelf-carving-hint">{t({ de: "← Ein Blick in Belohnungstafel & Zeitplan lohnt sich." })}</span>
             </>
           )}

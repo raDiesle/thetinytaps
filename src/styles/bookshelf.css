@@ -1256,15 +1256,15 @@
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  gap: 0.35em;
+  gap: 0.3em;
   align-self: center;
-  height: 82%;
+  height: 94%;
   padding: 0 calc(var(--bh) * 0.06) 0 calc(var(--bh) * 0.1);
   color: #5b3a1c;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: calc(var(--bh) * 0.082);
+  font-size: calc(var(--bh) * 0.078);
   font-style: italic;
-  line-height: 1.2;
+  line-height: 1.15;
   text-align: center;
   text-wrap: balance;
   text-shadow:

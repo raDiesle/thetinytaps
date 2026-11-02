@@ -273,8 +273,8 @@ In a fresh worktree run `bun install` first.
   brightest, a red ribbon hanging out – still, nothing idles. The group is marked as one with its name (`DailyGroup`,
   drafts by `?gruppe=` until one is chosen), and beside it words carved into the back panel tell grown-ups in short what
   the shelf holds – the gist of the info book, everyday helpers and first games to share, child with parents or
-  grandparents (not „alles kostenlos“, user feedback) – and that the Belohnungstafel is worth a look (user feedback,
-  November 2026). The carving takes
+  grandparents, and that all of it is free („Alles kostenlos.“, a line of its own) – and that the Belohnungstafel is
+  worth a look (user feedback, November 2026). The carving takes
   room of its own on the board (`planShelf` takes each place's width) and comes only where the picture books stay
   nearly as big (`CARVING_SHRINK`) and the words big enough to read – on a phone only its first line. Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
@@ -380,8 +380,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
-  "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for
-  the rest of the visit), and asks once per visit for fullscreen, which on Android
+  "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“, a small plain button beside the big ones so a
+  child's hand goes elsewhere, lets a grown-up play upright for the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
   only between games, while it is in the background on a menu: menu pages call `useUpdateBetweenGames()`
