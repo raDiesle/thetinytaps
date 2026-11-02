@@ -1409,6 +1409,24 @@
   pointer-events: none;
 }
 
+/*
+ * ⚙️ while playing is the bigger slip, its gear twice the size and its clip grown with it: on the small one the grey
+ * gear was hardly seen (user feedback, November 2026).
+ */
+:root[data-look="book"] .play-area .play-options-corner .play-options-button {
+  width: 54px;
+  height: 60px;
+  padding-top: 10px;
+  font-size: 1.9rem;
+}
+
+:root[data-look="book"] .play-area .play-options-corner .play-options-button::before {
+  top: -16px;
+  right: 6px;
+  width: 16px;
+  height: 48px;
+}
+
 /* The highlighter's stroke across the slip, drawn from left to right when it comes on. */
 :root[data-look="book"] :is(.menu-head .panel-icon[aria-expanded="true"], .play-options-button.holding)::after {
   content: "";
