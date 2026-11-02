@@ -38,15 +38,15 @@ export const FEELINGS_EN: Partial<Record<FeelingId, FeelingText>> = {
     endCaption: "Happy again",
   },
   angry: {
-    title: "Angry, tower fell down",
+    title: "Angry, the shoe won't go on",
     questions: [
-      "The tower fell down, Little Bear is angry. What can he do?",
+      "The shoe won't go on, Little Bear is angry. What can he do?",
       "Little Bear is still angry. What can he do?",
       "Little Bear is still a little angry. What do you do?",
     ],
-    intro: "Little Bear is angry! His tower fell down.",
+    intro: "Little Bear is angry! His shoe won't go on.",
     instead: [
-      { caption: "Throw toys", answer: "Hmm, throwing breaks things. Let the anger out instead: stomp really hard!" },
+      { caption: "Throw the shoe", answer: "Hmm, throwing breaks things. Let the anger out instead: stomp really hard!" },
       { caption: "Shout loudly", answer: "Hmm, shouting makes the anger even bigger. Take a deep breath and blow instead: Phoooo." },
       { caption: "Hit", answer: "Hmm, hitting hurts. Give him a hug instead." },
     ],
