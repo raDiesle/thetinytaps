@@ -3,6 +3,8 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS } from "./content";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
+import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
+import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, KIND_ORDER } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -76,5 +78,52 @@ test("an animal without its words gets the whole German sentence, in every langu
     expect(texts.hungry(animal), language).toBe(de.hungry(animal));
     expect(texts.yummy(animal, withFood.food!), language).toBe(de.yummy(animal, withFood.food!));
     expect(texts.movedIn(animal, HOMES[withFood.home!]), language).toBe(de.movedIn(animal, HOMES[withFood.home!]));
+  }
+});
+
+test("the rounds take turns starting with who peeks out, and the steps only get harder", () => {
+  expect(KIND_ORDER[0]).toBe("peek");
+  expect(new Set(KIND_ORDER).size).toBe(3);
+  ANIMAL_LEVELS.forEach((level, i) => {
+    const before = ANIMAL_LEVELS[i - 1];
+    expect(level.choices).toBeGreaterThanOrEqual(2);
+    expect(level.choices).toBeLessThanOrEqual(4);
+    expect(level.peek.choices).toBeLessThanOrEqual(5);
+    if (!before) return;
+    expect(level.choices).toBeGreaterThanOrEqual(before.choices);
+    expect(level.peek.choices).toBeGreaterThanOrEqual(before.peek.choices);
+    expect(level.peek.show).toBeLessThanOrEqual(before.peek.show);
+    expect(before.peek.alike && !level.peek.alike).toBe(false);
+  });
+  // The easiest round comes first.
+  expect(ANIMAL_LEVELS[0]).toMatchObject({ choices: 2, peek: { choices: 2, alike: false } });
+});
+
+test("every round offers exactly one right choice among as many as its step says", () => {
+  for (const level of ANIMAL_LEVELS) {
+    for (const animal of ANIMALS) {
+      if (animal.food) {
+        const r = dealFeed(animal, level.choices);
+        expect(r.foods.length).toBe(level.choices);
+        expect(new Set(r.foods.map((f) => f.id)).size).toBe(level.choices);
+        expect(r.foods[r.correct]).toBe(animal.food);
+      }
+      if (animal.home) {
+        const r = dealHome(animal, level.choices);
+        expect(r.homes.length).toBe(level.choices);
+        expect(new Set(r.homes).size).toBe(level.choices);
+        expect(r.homes[r.correct].id).toBe(animal.home);
+      }
+    }
+    for (const item of PEEK_ITEMS) {
+      const choices = dealPeek(item, PEEK_ITEMS, level.peek);
+      expect(choices.length).toBe(level.peek.choices);
+      expect(new Set(choices).size).toBe(choices.length);
+      expect(choices.filter((c) => c === item).length).toBe(1);
+      // Easy steps offer animals that look quite different; harder ones as many alike as there are.
+      const alike = choices.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
+      const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
+      expect(alike).toBe(level.peek.alike ? Math.min(kin, level.peek.choices - 1) : 0);
+    }
   }
 });
