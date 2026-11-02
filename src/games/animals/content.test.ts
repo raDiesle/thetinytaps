@@ -3,6 +3,8 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods, wrongHomes } from "./content";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
+import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
+import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -79,9 +81,76 @@ test("an animal without its words gets the whole German sentence, in every langu
   }
 });
 
+test("only the kinds switched on take turns, in their order, and none switched on plays all", () => {
+  const turns = (on: Record<"peek" | "feed" | "home", boolean>) => {
+    const kinds = [nextKind(null, on)];
+    for (let i = 0; i < 5; i++) kinds.push(nextKind(kinds[kinds.length - 1], on));
+    return kinds;
+  };
+  expect(turns({ peek: true, feed: true, home: true })).toEqual(["peek", "feed", "home", "peek", "feed", "home"]);
+  expect(turns({ peek: false, feed: true, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home"]);
+  expect(turns({ peek: true, feed: false, home: false })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek"]);
+  expect(turns({ peek: false, feed: false, home: false })).toEqual(["peek", "feed", "home", "peek", "feed", "home"]);
+  // A kind switched off while it plays: the turns go on with the next one switched on.
+  expect(nextKind("feed", { peek: true, feed: false, home: false })).toBe("peek");
+  // The fixed difficulties are steps there are, easy to hard.
+  expect(FIXED_LEVELS.easy).toBe(0);
+  expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
+  expect(FIXED_LEVELS.hard).toBe(ANIMAL_LEVELS.length - 1);
+});
+
+test("the rounds take turns starting with who peeks out, and the steps only get harder", () => {
+  expect(KIND_ORDER[0]).toBe("peek");
+  expect(new Set(KIND_ORDER).size).toBe(3);
+  ANIMAL_LEVELS.forEach((level, i) => {
+    const before = ANIMAL_LEVELS[i - 1];
+    expect(level.choices).toBeGreaterThanOrEqual(2);
+    expect(level.choices).toBeLessThanOrEqual(4);
+    expect(level.peek.choices).toBeLessThanOrEqual(5);
+    if (!before) return;
+    expect(level.choices).toBeGreaterThanOrEqual(before.choices);
+    expect(level.peek.choices).toBeGreaterThanOrEqual(before.peek.choices);
+    expect(level.peek.show).toBeLessThanOrEqual(before.peek.show);
+    expect(before.peek.alike && !level.peek.alike).toBe(false);
+  });
+  // The easiest round comes first.
+  expect(ANIMAL_LEVELS[0]).toMatchObject({ choices: 2, peek: { choices: 2, alike: false } });
+});
+
+test("every round offers exactly one right choice among as many as its step says", () => {
+  for (const level of ANIMAL_LEVELS) {
+    for (const animal of ANIMALS) {
+      if (animal.food) {
+        const r = dealFeed(animal, level.choices);
+        expect(r.foods.length).toBe(level.choices);
+        expect(new Set(r.foods.map((f) => f.id)).size).toBe(level.choices);
+        expect(r.foods[r.correct]).toBe(animal.food);
+        for (const f of r.foods) if (f !== animal.food) expect(animal.alsoEats, animal.id).not.toContain(f.id);
+      }
+      if (animal.home) {
+        const r = dealHome(animal, level.choices);
+        expect(r.homes.length).toBe(level.choices);
+        expect(new Set(r.homes).size).toBe(level.choices);
+        expect(r.homes[r.correct].id).toBe(animal.home);
+        for (const h of r.homes) if (h.id !== animal.home) expect(animal.alsoLives, animal.id).not.toContain(h.id);
+      }
+    }
+    for (const item of PEEK_ITEMS) {
+      const choices = dealPeek(item, PEEK_ITEMS, level.peek);
+      expect(choices.length).toBe(level.peek.choices);
+      expect(new Set(choices).size).toBe(choices.length);
+      expect(choices.filter((c) => c === item).length).toBe(1);
+      // Easy steps offer animals that look quite different; harder ones as many alike as there are.
+      const alike = choices.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
+      const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
+      expect(alike).toBe(level.peek.alike ? Math.min(kin, level.peek.choices - 1) : 0);
+    }
+  }
+});
+
 // Exactly one choice may fit (rules in CLAUDE.md): every fed animal says what else it eats, and enough is left that it doesn't.
 test("every fed animal has enough wrong foods that it really doesn't eat", () => {
-  const most = 4; // the most choices the settings offer (ChoiceCount)
+  const most = Math.max(...ANIMAL_LEVELS.map((l) => l.choices)); // the most choices a step offers
   const foods = new Set(FOODS.map((f) => f.id));
   for (const animal of ANIMALS.filter((a) => a.food)) {
     expect(animal.alsoEats, `${animal.id} needs its alsoEats list`).toBeDefined();
@@ -97,7 +166,7 @@ test("every fed animal has enough wrong foods that it really doesn't eat", () =>
 });
 
 test("every animal with a home has enough wrong homes it really doesn't live in", () => {
-  const most = 4; // the most choices the settings offer (ChoiceCount)
+  const most = Math.max(...ANIMAL_LEVELS.map((l) => l.choices)); // the most choices a step offers
   for (const animal of ANIMALS.filter((a) => a.home)) {
     expect(animal.alsoLives, `${animal.id} needs its alsoLives list`).toBeDefined();
     for (const id of animal.alsoLives!) {

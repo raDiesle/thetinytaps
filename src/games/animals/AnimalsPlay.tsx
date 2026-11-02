@@ -4,8 +4,9 @@ import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/s
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { ANIMAL_TEXTS, ANIMALS, wrongFoods, wrongHomes, type Animal, type Food } from "./content";
-import { HOMES, HomeDrawing, type Home } from "./homes";
+import { ANIMAL_TEXTS, ANIMALS } from "./content";
+import { HomeDrawing } from "./homes";
+import type { FeedRound, HomeRound } from "./levels";
 import type { AnimalsSettings } from "./settings";
 
 /** A finger that moves less than this is a tap, not a drag. */
@@ -17,10 +18,6 @@ const WRONG_MS = 1400;
 /** Dropped this close to a target (as a share of its size) still counts: small fingers don't aim well. */
 const SNAP = 0.35;
 
-type Round =
-  | { id: number; kind: "feed"; animal: Animal; foods: Food[]; correct: number }
-  | { id: number; kind: "home"; animal: Animal; homes: Home[]; correct: number };
-
 /** What is being dragged: a food (its index) or, when looking for a home, the animal itself. */
 type Mover = number | "animal";
 
@@ -28,15 +25,6 @@ interface Offset {
   x: number;
   y: number;
   scale?: number;
-}
-
-function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -50,11 +38,23 @@ function near(r: DOMRect, x: number, y: number) {
 const moveStyle = (o: Offset | null): CSSProperties | undefined =>
   o ? { translate: `${o.x}px ${o.y}px`, scale: o.scale === undefined ? undefined : `${o.scale}` } : undefined;
 
-/** "Was gehört zum Tier?": food to the hungry animal (N-08), or the animal to its home (N-09). */
-export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
+/** What a feeding or home round gets from `AnimalsRounds`, which plays the kinds in turn. */
+export interface AnimalsPlayProps {
+  settings: Pick<AnimalsSettings, "speech" | "sounds">;
+  round: FeedRound | HomeRound;
+  /** The right food or home was picked after `misses` wrong ones. */
+  onSolved: (misses: number) => void;
+  /** The munching or moving in has been watched: the next round may come. */
+  onNext: () => void;
+}
+
+/**
+ * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), or the animal to its home (N-09). Tapping
+ * is enough; dragging works too.
+ */
+export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayProps) {
   const language = useAppLanguage();
   const texts = pick(ANIMAL_TEXTS, language.id);
-  const [round, setRound] = useState<Round | null>(null);
   const [drag, setDrag] = useState<{ who: Mover; x: number; y: number } | null>(null);
   /** The target the dragged thing is over, so it can lean towards it. */
   const [hover, setHover] = useState<Mover | null>(null);
@@ -66,15 +66,11 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
   const focusRef = useRef<number | null>(null);
   /** Set from a pick until the child may pick again; a ref, since a key can come before the next render. */
   const busy = useRef(false);
-  /** Bumped to make the animal or a food hop again, e.g. "drag me" when tapping isn't enough. */
+  /** Bumped to make the animal hop again when it is tapped to ask once more. */
   const [nudge, setNudge] = useState<{ who: Mover; n: number } | null>(null);
-  const [stars, setStars] = useState(0);
   const { bursts, spawn } = useBursts();
-
-  const nextId = useRef(0);
-  const decks = useRef({ feed: [] as Animal[], home: [] as Animal[] });
-  const lastAnimal = useRef<Animal | null>(null);
-  const lastKind = useRef<Round["kind"]>(settings.mode === "home" ? "feed" : "home");
+  /** Wrong foods or homes picked in this round, for the difficulty. */
+  const misses = useRef(0);
   const animalRef = useRef<HTMLDivElement>(null);
   const emojiRef = useRef<HTMLSpanElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -103,52 +99,13 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
     [settings.speech, language.id, language.speechLang],
   );
 
-  const prompt = (r: Round) => (r.kind === "feed" ? texts.hungry(r.animal) : texts.whereLives(r.animal));
+  const prompt = (r: FeedRound | HomeRound) => (r.kind === "feed" ? texts.hungry(r.animal) : texts.whereLives(r.animal));
 
-  /** Go through all animals in random order before one comes again, and never the same one twice in a row. */
-  const drawAnimal = useCallback((kind: Round["kind"]) => {
-    const deck = decks.current[kind];
-    if (deck.length === 0) deck.push(...shuffle(ANIMALS.filter((a) => (kind === "feed" ? a.food : a.home))));
-    let animal = deck.pop()!;
-    if (animal === lastAnimal.current && deck.length > 0) {
-      const other = deck.pop()!;
-      deck.unshift(animal);
-      animal = other;
-    }
-    lastAnimal.current = animal;
-    return animal;
+  // The question and the animal's noise come with the round; the round is mounted anew for every animal.
+  useEffect(() => {
+    say(prompt(round));
+    if (settings.sounds) later(400, () => round.animal.sound?.());
   }, []);
-
-  const nextRound = useCallback(() => {
-    const kind = settings.mix ? (lastKind.current === "feed" ? "home" : "feed") : settings.mode === "home" ? "home" : "feed";
-    lastKind.current = kind;
-    const animal = drawAnimal(kind);
-    const count = Number(settings.choices);
-    const id = nextId.current++;
-    let next: Round;
-    if (kind === "feed") {
-      const right = animal.food!;
-      const foods = shuffle([right, ...shuffle(wrongFoods(animal)).slice(0, count - 1)]);
-      next = { id, kind, animal, foods, correct: foods.indexOf(right) };
-    } else {
-      const right = HOMES[animal.home!];
-      const homes = shuffle([right, ...shuffle(wrongHomes(animal)).slice(0, count - 1)]);
-      next = { id, kind, animal, homes, correct: homes.indexOf(right) };
-    }
-    setRound(next);
-    setDrag(null);
-    setHover(null);
-    setLanded(null);
-    setOutcome(null);
-    setFocus(null);
-    focusRef.current = null;
-    busy.current = false;
-    say(prompt(next));
-    if (settings.sounds) later(400, () => animal.sound?.());
-  }, [settings.mode, settings.mix, settings.choices, settings.sounds, drawAnimal, say, later]);
-
-  // Start with an animal right away; settings can't change while playing.
-  useEffect(() => nextRound(), []);
 
   const funBurst = useCallback(
     (x?: number, y?: number) => {
@@ -160,7 +117,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
 
   /** The child picked option `index`; `from` is how far the dragged thing already is from its place. */
   const choose = (index: number, from: Offset = { x: 0, y: 0 }) => {
-    if (!round || busy.current) return;
+    if (busy.current) return;
     busy.current = true;
     const ok = index === round.correct;
     setOutcome({ pick: index, ok });
@@ -168,6 +125,8 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
     setHover(null);
 
     if (!ok) {
+      // Never a "wrong" for the child; only the difficulty takes note.
+      misses.current++;
       if (round.kind === "feed") {
         if (settings.sounds) playYuck();
         say(texts.yuck(round.animal));
@@ -218,16 +177,15 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
       say(texts.movedIn(round.animal, home));
     }
     if (settings.sounds) later(200, playChime);
-    setStars((n) => n + 1);
+    onSolved(misses.current);
     later(700, () => {
       for (let i = 0; i < 8; i++) spawn();
     });
-    later(CELEBRATE_MS, nextRound);
+    later(CELEBRATE_MS, onNext);
   };
 
   /** Tapping the animal asks again; it makes its noise and hops. */
   const askAgain = () => {
-    if (!round) return;
     say(prompt(round));
     if (settings.sounds) round.animal.sound?.();
     setNudge((prev) => ({ who: "animal", n: (prev?.n ?? 0) + 1 }));
@@ -261,7 +219,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
 
   const onMoverDown = (who: Mover) => (e: PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (!round || outcome || pointer.current) return;
+    if (outcome || pointer.current) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     pointer.current = { who, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
   };
@@ -283,8 +241,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
     pointer.current = null;
     if (!p.moved) {
       if (p.who === "animal") askAgain();
-      else if (settings.tap) choose(p.who);
-      else setNudge((prev) => ({ who: p.who, n: (prev?.n ?? 0) + 1 }));
+      else choose(p.who);
       return;
     }
     const target = targetAt(p.who, e.clientX, e.clientY);
@@ -304,14 +261,13 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
 
   const onHomeDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
-    if (settings.tap) choose(index);
-    else setNudge((prev) => ({ who: "animal", n: (prev?.n ?? 0) + 1 }));
+    choose(index);
   };
 
   // Arrow keys (or any key) move the frame, Space or Enter picks, 1–4 pick straight away.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || !round || e.key === "Escape") return;
+      if (e.repeat || e.key === "Escape") return;
       if (outcome) {
         funBurst();
         return;
@@ -340,8 +296,6 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  if (!round) return null;
-
   const offsetOf = (who: Mover): Offset | null => (landed?.who === who ? landed.to : drag?.who === who ? { x: drag.x, y: drag.y } : null);
   const moverClass = (who: Mover) =>
     `${drag?.who === who ? " dragging" : ""}${landed?.who === who ? " landed" : ""}${nudge?.who === who && !drag ? ` nudge-${nudge.n % 2}` : ""}`;
@@ -352,7 +306,6 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
   const animal = (
     <div
       ref={animalRef}
-      key={`animal-${round.id}`}
       className={`ap-animal${round.kind === "home" ? moverClass("animal") : ""}${hover === "animal" ? " near" : ""}${
         won && round.kind === "feed" ? " munch" : ""
       }${yuck ? " yuck" : ""}`}
@@ -366,7 +319,6 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
       <span ref={emojiRef} className="ap-emoji" role="img" aria-label={texts.animal(round.animal)}>
         {round.animal.emoji}
       </span>
-      {settings.names && <span className="ap-name">{texts.animal(round.animal)}</span>}
       {yuck && <span className="ap-bubble">{texts.yuckBubble}</span>}
       {won && round.kind === "feed" && (
         <>
@@ -386,7 +338,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
       <div className="ap-options" style={{ "--n": round.foods.length } as CSSProperties}>
         {round.foods.map((food, i) => (
           <div
-            key={`${round.id}-${food.id}`}
+            key={food.id}
             ref={(el) => {
               optionRefs.current[i] = el;
             }}
@@ -405,7 +357,6 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
             >
               {food.emoji}
             </span>
-            {settings.names && <span className="ap-name">{texts.food(food)}</span>}
           </div>
         ))}
       </div>
@@ -416,7 +367,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
           const resident = peek ? ANIMALS.find((a) => a.home === home.id) : undefined;
           return (
             <div
-              key={`${round.id}-${home.id}`}
+              key={home.id}
               ref={(el) => {
                 optionRefs.current[i] = el;
               }}
@@ -444,7 +395,6 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
                   </span>
                 )}
               </div>
-              {settings.names && <span className="ap-name">{texts.home(home)}</span>}
             </div>
           );
         })}
@@ -453,18 +403,9 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
 
   return (
     <div className={`animals-play kind-${round.kind}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
-      <p key={round.id} className="ap-prompt">
-        {prompt(round)}
-      </p>
       {/* Up in the picture things stand on the horizon; the ground in front is where the child's things are. */}
       <div className="ap-top">{round.kind === "home" ? options : animal}</div>
       <div className="ap-ground">{round.kind === "home" ? animal : options}</div>
-      {stars > 0 && (
-        <div className="find-stars" aria-label={texts.stars(stars)}>
-          {"⭐".repeat(Math.min(stars, 10))}
-          {stars > 10 && <span className="find-count">{stars}</span>}
-        </div>
-      )}
       <BurstLayer bursts={bursts} />
     </div>
   );

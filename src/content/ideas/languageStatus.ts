@@ -167,7 +167,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
-  { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/tiere/",
+    parts: [
+      { label: "🐾 Das Spiel", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "⚙️ Einstellungen beim Spielen",
+        languages: { de: "done" },
+        note: "„Was drankommt“ und „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer) gibt es nur auf Deutsch (November 2026); die Namen der drei Spielarten sprechen alle Sprachen.",
+      },
+    ],
+  },
   {
     href: "/schatten/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
