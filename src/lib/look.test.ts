@@ -41,3 +41,17 @@ test("what is on in the options is marked with a highlighter, not yellow paper",
   expect(rule(".settings .choice button.selected::after")).toContain("animation: book-highlight");
   expect(rule(".settings .choice button.selected")).toContain("background-color: var(--paper)");
 });
+
+// The small grey gear on ⚙️'s note wasn't seen while playing (user feedback, November 2026): its note is bigger than
+// the fullscreen one beside it, and it lights up softly a few times as play starts, then stands still.
+test("⚙️ while playing is a bigger note that lights up only as play starts", () => {
+  const slip = rule(".play-area .play-options-corner .play-options-button");
+  const width = (decls: string) => Number(decls.match(/width:\s*(\d+)px/)?.[1]);
+  expect(width(slip)).toBeGreaterThan(width(rule(".play-area .play-fullscreen, .play-options-button)")));
+  expect(Number(slip.match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(1.6);
+  const playing = readFileSync("src/styles/playing.css", "utf8");
+  const glow = playing.match(/\.play-options-corner \{[^}]*animation:\s*([^;]+);/)?.[1] ?? "";
+  expect(glow).toContain("play-options-glow");
+  // A number of times, never `infinite`: after it, nothing idles.
+  expect(glow).toMatch(/\s[1-3]$/);
+});

@@ -487,7 +487,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
-  findable on dark pictures). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
+  findable on dark pictures). While playing, ⚙️'s note is the bigger one, its gear large, and as play starts it lights
+  up softly twice, then stands still – never a glow that keeps going or comes back while playing (user feedback, November
+  2026: the small grey gear wasn't seen; `look.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
   grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
   `look.test.ts`); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
