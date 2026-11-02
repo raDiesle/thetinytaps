@@ -409,6 +409,17 @@ describe("one page for boards and plans", () => {
     }
   });
 
+  // A week that counts stars looked like a Belohnungstafel before the charts were made one (user feedback, November
+  // 2026): the same tasks every day, a row each – never the Kita's Wochenplan with other cards each day.
+  test("the week with a Zähler is a reward chart's week: the same tasks every day", () => {
+    const week = SPANS.find((span) => span.id === "week");
+    if (!week) throw new Error("no week");
+    const moved = draftInSpan(week, defaultDraft("de"), "de");
+    if (moved.type !== "plan") throw new Error("a week is a plan");
+    expect(moved.plan.same).toBe(true);
+    expect(moved.plan.days[0].map((step) => step.catalog)).toEqual(TEMPLATES.find((tpl) => tpl.id === "woche")?.tasks ?? []);
+  });
+
   // The wizard asks for the view before the Vorlage and shows only that view's: each needs one besides „Leer anfangen“
   // (a board's views are checked with the ready-made boards).
   test("every view of a plan has a Vorlage", () => {

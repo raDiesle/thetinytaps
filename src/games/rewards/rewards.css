@@ -442,21 +442,6 @@
   background: #fff;
 }
 
-.rw-wizard-foot button {
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.rw-wizard-foot button:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
 .rw-picks {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
@@ -514,13 +499,6 @@
   translate: 16px 0;
 }
 
-/* What the wizard is for, between the buttons at its foot. */
-.rw-wizard-help {
-  margin: 0;
-  font-size: 0.92rem;
-  line-height: 1.35;
-}
-
 /* Picture cards (tasks, rewards, cards of a day): small tiles with a big emoji. */
 .rw-picks-tiles {
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
@@ -569,32 +547,76 @@
   line-height: 1.15;
 }
 
-/* Stays in sight while „Weitere Einstellungen“ scroll, so „✓ Anlegen“ is always one tap away. */
-.rw-wizard-foot {
+/*
+ * The wizard's head, on top and in sight while the page scrolls (user feedback, November 2026): that the chart prints,
+ * and „✓ Tafel anlegen“ big and yellow on the right, where the eye ends the row – no longer small at the foot.
+ */
+.rw-wizard-head {
   position: sticky;
-  bottom: 0;
-  z-index: 2;
+  top: 0;
+  z-index: 3;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 8px 0 max(4px, env(safe-area-inset-bottom));
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 8px 0;
   background: #fff;
 }
 
-.rw-wizard-foot button {
+.rw-wizard-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.rw-wizard-actions button {
   min-height: 48px;
   padding: 4px 22px;
-  flex: none;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.rw-wizard-help {
-  flex: 1;
-  align-self: center;
+.rw-wizard-actions .rw-wizard-done {
+  min-height: 58px;
+  padding: 6px 30px;
+  background: var(--sunshine);
+  font-size: 1.3rem;
+  font-weight: 800;
+  box-shadow: 0 5px 0 var(--ink);
 }
 
-.rw-wizard-done {
-  background: var(--sunshine) !important;
-  box-shadow: 0 4px 0 var(--ink);
+.rw-wizard-done:hover {
+  translate: 0 -1px;
+  box-shadow: 0 6px 0 var(--ink);
+}
+
+/* „Zum Ausdrucken“: a stamp, not a button – nothing prints before the chart is made. */
+.rw-print-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 6px 16px 6px 10px;
+  border: 2px dashed color-mix(in srgb, var(--ink) 60%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--sunshine) 22%, #fff);
+  font-size: 0.98rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.rw-print-badge-pic {
+  font-family: var(--font-emoji);
+  font-size: 1.8rem;
+  line-height: 1;
 }
 
 /* ---------- The chart changed right on it (`ChartEditor`): the wizard and „Gestalten“ alike ---------- */
@@ -609,9 +631,119 @@
 }
 
 /*
- * The options in one quiet row, wrapping where narrow, each only as wide as its words, so the chosen one is plain to
- * see (user feedback, November 2026: stretched across the page nobody could tell which was on).
+ * The sheet as big as the screen, whatever the options above it take: the page scrolls, so the chart never shrinks to a
+ * strip under them.
  */
+.rw-chart-editor > .rw-main {
+  flex: none;
+  height: clamp(300px, calc(100dvh - 120px), 1000px);
+}
+
+/*
+ * The options stand out as a band of their own (user feedback, November 2026: grown-ups didn't see that they lead to
+ * the other charts they came for): the Zeitraum as big picture buttons under a visible name, the rest in a row below.
+ */
+.rw-options-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--sunshine) 18%, #fff);
+}
+
+.rw-spans {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rw-band-label {
+  margin-right: 4px;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.rw-span {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 92px;
+  padding: 6px 12px 8px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-span:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--sunshine) 35%, #fff);
+}
+
+.rw-span[aria-pressed="true"] {
+  background: var(--sunshine);
+  font-weight: 800;
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.rw-span-pic {
+  width: 52px;
+  height: 34px;
+  fill: color-mix(in srgb, var(--ink) 12%, #fff);
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-span[aria-pressed="true"] .rw-span-pic {
+  fill: #fff;
+}
+
+/* An open note with an arrow up at the Zeitraum (only in the wizard): one may switch freely and set everything. */
+.rw-tip {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 46em;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.rw-tip::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  border: 10px solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--ink);
+  translate: -50% 0;
+}
+
+.rw-tip-arrow {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+/* The other options in one row, wrapping where narrow, each only as wide as its words, so the chosen one is plain. */
 .rw-options {
   display: flex;
   flex-wrap: wrap;
@@ -755,6 +887,76 @@
   color: inherit;
   font: inherit;
   font-size: 0.9rem;
+}
+
+/*
+ * Over the sheet: that it is changed right on it (user feedback, November 2026: on opening it must be clear that the
+ * chart is edited as it is seen), and ↶ ↷.
+ */
+.rw-edit-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.rw-wysiwyg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.rw-wysiwyg-pic {
+  flex: none;
+  font-family: var(--font-emoji);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.rw-history {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.rw-history-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 2px 14px 2px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-history-button:hover {
+  background: color-mix(in srgb, var(--sunshine) 35%, #fff);
+}
+
+.rw-history-button.off {
+  visibility: hidden;
+}
+
+.rw-history-sign {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+/* The sheet while it is changed: it carries a dashed edge, a sign that it can be tapped anywhere. */
+.rw-edit-box {
+  outline: 3px dashed color-mix(in srgb, var(--ink) 45%, transparent);
+  outline-offset: 4px;
+  border-radius: 6px;
 }
 
 /* The sheet while it is changed: every place to change a tap, outlined under the mouse (a plan's in planner.css). */
@@ -912,8 +1114,62 @@
     border-radius: 16px;
   }
 
-  .rw-wizard-foot button {
+  .rw-wizard-actions button {
     min-height: 40px;
+  }
+
+  .rw-wizard-actions .rw-wizard-done {
+    min-height: 44px;
+    padding: 4px 18px;
+    font-size: 1.05rem;
+  }
+
+  .rw-print-badge,
+  .rw-wysiwyg,
+  .rw-tip {
+    font-size: 0.78rem;
+  }
+
+  .rw-print-badge-pic,
+  .rw-wysiwyg-pic {
+    font-size: 1.2rem;
+  }
+
+  /* The head in one line, so the sheet keeps the screen: the print stamp says only that it prints. */
+  .rw-print-badge-more {
+    display: none;
+  }
+
+  .rw-wizard-head {
+    padding-block: 4px;
+  }
+
+  .rw-print-badge {
+    padding: 2px 10px 2px 6px;
+  }
+
+  .rw-options-band {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .rw-span {
+    min-width: 0;
+    padding: 2px 8px 4px;
+    font-size: 0.85rem;
+  }
+
+  .rw-span-pic {
+    width: 36px;
+    height: 22px;
+  }
+
+  .rw-band-label {
+    display: none;
+  }
+
+  .rw-history-name {
+    display: none;
   }
 
   .rw-picks-tiles {
@@ -942,11 +1198,6 @@
 
   .rw-reward-switch > span:first-child {
     font-size: 1rem;
-  }
-
-  .rw-wizard-help {
-    font-size: 0.72rem;
-    line-height: 1.2;
   }
 }
 
@@ -1896,17 +2147,56 @@
  * ---------- The book look: the page is a page of the book (`Sky`), the wizard a sheet of paper laid on it ----------
  * Kept here rather than in book.css, so the chart's folder stays whole (it may become a site of its own, T-19).
  */
-:root[data-look="book"] .rw-wizard {
-  border: 2px solid var(--ink);
-  border-radius: 14px;
-  background: var(--paper-grain), var(--paper-mottle), var(--paper);
-  box-shadow:
-    0 2px 0 #3d304540,
-    0 12px 24px -10px #5a3c1f80;
+/*
+ * One tall page that carries everything and scrolls with it (user feedback, November 2026: the content scrolled over
+ * a page that stood still): here the page lies in the screen-high box of the content, not fixed to the window, and
+ * the content keeps inside its paper margin.
+ */
+:root[data-look="book"] .rw-page-screen > .sky {
+  position: absolute;
 }
 
-:root[data-look="book"] .rw-wizard-foot {
-  background: var(--paper);
+:root[data-look="book"] .rw-page-screen {
+  padding-right: calc(var(--page-right) + 16px);
+  padding-bottom: calc(var(--page-bottom, 26px) + 24px);
+  padding-left: calc(var(--page-left) + 16px);
+}
+
+/* What grown-ups read below the chart is on the page too, and the room's floor and toys at its foot stay out (the chart fills it). */
+:root[data-look="book"] .rw-page-screen > .page-foot {
+  position: static;
+}
+
+:root[data-look="book"] .rw-page-screen > .sky :is(.world-thing, .world-floor) {
+  display: none;
+}
+
+/* The wizard is printed on the page itself, no card laid on it. */
+:root[data-look="book"] .rw-wizard {
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Its head stays in sight on a strip of the page's paper, clear of the fullscreen note clipped on the top right. */
+:root[data-look="book"] .rw-wizard-head {
+  margin-inline: -8px;
+  padding-inline: 8px 64px;
+  border-radius: 0 0 10px 10px;
+  background: var(--paper-grain), var(--paper);
+  box-shadow: 0 6px 10px -8px #3d304566;
+}
+
+:root[data-look="book"] .rw-options-band {
+  border-width: 2px;
+  border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
+  background: color-mix(in srgb, var(--sunshine) 22%, var(--paper));
+}
+
+:root[data-look="book"] :is(.rw-span, .rw-history-button, .rw-wizard-actions button) {
+  border-width: 2px;
 }
 
 :root[data-look="book"] .rw-edit-dialog {
