@@ -191,6 +191,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done" },
         note: "Neu (Z-01, November 2026): Frage, Sätze, die Namen von Milch, Ei, Honig, Wolle und vom Schaf und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GIFT_TEXTS` in content.ts); Kuh, Huhn und Biene sprechen schon alle Sprachen.",
       },
+      {
+        label: "🦋 Was wird aus mir?",
+        languages: { de: "done" },
+        note: "Neu (Z-12, November 2026): Frage, Sätze, die Namen von Raupe, Ei, Samen, Kaulquappe, Schmetterling, Küken, Sonnenblume, Frosch und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GROW_TEXTS` in growth.tsx).",
+      },
     ],
   },
   {

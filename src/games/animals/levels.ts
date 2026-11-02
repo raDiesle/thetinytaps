@@ -2,17 +2,18 @@ import { lookOf, type ShadowItem } from "@/games/shadows/content";
 import { shuffle } from "@/games/shadows/deck";
 import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./content";
 import { GIFTS, type Gift } from "./gifts";
+import { GROWTHS, type Growth } from "./growth";
 import { HOMES, type Home } from "./homes";
 import type { Difficulty } from "./settings";
 
 /**
- * The four kinds of rounds: who peeks out of the bush (X-04), feeding (N-08), what the animal gives us (Z-01), who
- * lives where (N-09).
+ * The five kinds of rounds: who peeks out of the bush (X-04), feeding (N-08), what the animal gives us (Z-01), who
+ * lives where (N-09), what the small one becomes (Z-12).
  */
-export type RoundKind = "peek" | "feed" | "gift" | "home";
+export type RoundKind = "peek" | "feed" | "gift" | "home" | "grow";
 
 /** The kinds take turns in this order, starting with the easiest: who peeks out. */
-export const KIND_ORDER: RoundKind[] = ["peek", "feed", "gift", "home"];
+export const KIND_ORDER: RoundKind[] = ["peek", "feed", "gift", "home", "grow"];
 
 /** How "Wer schaut da raus?" is played on a step. */
 export interface PeekLevel {
@@ -31,7 +32,7 @@ export interface PeekLevel {
 
 /** One step of difficulty. */
 export interface AnimalLevel {
-  /** Foods, gifts or homes to choose from when feeding, giving or looking for a home. */
+  /** Foods, gifts, homes or grown ones to choose from when feeding, giving, looking for a home or growing. */
   choices: number;
   peek: PeekLevel;
 }
@@ -87,6 +88,15 @@ export interface HomeRound {
   correct: number;
 }
 
+/** A growing round: what does `growth` become? One of `grown` (at `correct`) is what it becomes. */
+export interface GrowRound {
+  kind: "grow";
+  growth: Growth;
+  /** What the others become, to choose from; each stands for its own small one. */
+  grown: Growth[];
+  correct: number;
+}
+
 /** The foods of a feeding round, `animal`'s own among `count` it doesn't eat (`wrongFoods`), in random order. */
 export function dealFeed(animal: Animal, count: number): FeedRound {
   const right = animal.food!;
@@ -109,6 +119,16 @@ export function dealHome(animal: Animal, count: number): HomeRound {
   const right = HOMES[animal.home!];
   const homes = shuffle([right, ...shuffle(wrongHomes(animal)).slice(0, count - 1)]);
   return { kind: "home", animal, homes, correct: homes.indexOf(right) };
+}
+
+/**
+ * What `growth` becomes among what `count - 1` others become, in random order. A caterpillar, an egg, a seed and a
+ * tadpole each become something none of the others does, so all the others are wrong; there are only four, so at
+ * most four to choose from.
+ */
+export function dealGrow(growth: Growth, count: number): GrowRound {
+  const grown = shuffle([growth, ...shuffle(GROWTHS.filter((g) => g !== growth)).slice(0, count - 1)]);
+  return { kind: "grow", growth, grown, correct: grown.indexOf(growth) };
 }
 
 /** The whole animals to choose from when `item` peeks out, in random order; the others as `level` says. */

@@ -5,7 +5,8 @@ import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
-import { ANIMAL_LEVELS, dealFeed, dealGift, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind } from "./levels";
+import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
+import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -84,17 +85,20 @@ test("an animal without its words gets the whole German sentence, in every langu
 });
 
 test("only the kinds switched on take turns, in their order, and none switched on plays all", () => {
-  const turns = (on: Record<"peek" | "feed" | "gift" | "home", boolean>) => {
-    const kinds = [nextKind(null, on)];
-    for (let i = 0; i < 5; i++) kinds.push(nextKind(kinds[kinds.length - 1], on));
+  const off = { peek: false, feed: false, gift: false, home: false, grow: false };
+  const turns = (on: Partial<Record<RoundKind, boolean>>) => {
+    const all = { ...off, ...on };
+    const kinds = [nextKind(null, all)];
+    for (let i = 0; i < 6; i++) kinds.push(nextKind(kinds[kinds.length - 1], all));
     return kinds;
   };
-  expect(turns({ peek: true, feed: true, gift: true, home: true })).toEqual(["peek", "feed", "gift", "home", "peek", "feed"]);
-  expect(turns({ peek: false, feed: true, gift: false, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home"]);
-  expect(turns({ peek: true, feed: false, gift: false, home: false })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek"]);
-  expect(turns({ peek: false, feed: false, gift: false, home: false })).toEqual(["peek", "feed", "gift", "home", "peek", "feed"]);
+  expect(turns({ peek: true, feed: true, gift: true, home: true, grow: true })).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
+  expect(turns({ feed: true, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home", "feed"]);
+  expect(turns({ peek: true })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek", "peek"]);
+  expect(turns({})).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
   // A kind switched off while it plays: the turns go on with the next one switched on.
-  expect(nextKind("feed", { peek: true, feed: false, gift: false, home: false })).toBe("peek");
+  expect(nextKind("feed", { ...off, peek: true })).toBe("peek");
+  expect(nextKind("grow", { ...off, home: true })).toBe("home");
   // The fixed difficulties are steps there are, easy to hard.
   expect(FIXED_LEVELS.easy).toBe(0);
   expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
@@ -103,7 +107,7 @@ test("only the kinds switched on take turns, in their order, and none switched o
 
 test("the rounds take turns starting with who peeks out, and the steps only get harder", () => {
   expect(KIND_ORDER[0]).toBe("peek");
-  expect(new Set(KIND_ORDER).size).toBe(4);
+  expect(new Set(KIND_ORDER).size).toBe(5);
   ANIMAL_LEVELS.forEach((level, i) => {
     const before = ANIMAL_LEVELS[i - 1];
     expect(level.choices).toBeGreaterThanOrEqual(2);
@@ -212,4 +216,33 @@ test("the German gift sentences say „vom“ and „von der“ right", () => {
   expect(de.gives(by("huhn"), GIFTS.ei)).toBe("Das Huhn gibt uns Eier. Danke!");
   expect(de.comesFrom(GIFTS.ei, by("huhn"))).toBe("Das Ei kommt vom Huhn!");
   expect(de.comesFrom(GIFTS.milch, by("kuh"))).toBe("Die Milch kommt von der Kuh!");
+});
+
+test("what the small one becomes is the one right choice, and the others become something else", () => {
+  expect(new Set(GROWTHS.map((g) => g.id)).size).toBe(GROWTHS.length);
+  expect(new Set(GROWTHS.map((g) => g.emoji)).size).toBe(GROWTHS.length);
+  for (const level of ANIMAL_LEVELS) {
+    for (const growth of GROWTHS) {
+      const round = dealGrow(growth, level.choices);
+      expect(round.grown.length).toBe(Math.min(level.choices, GROWTHS.length));
+      expect(new Set(round.grown).size).toBe(round.grown.length);
+      expect(round.grown.filter((g) => g === growth).length).toBe(1);
+      expect(round.grown[round.correct]).toBe(growth);
+    }
+  }
+  // What it becomes stands inside its box, and its sounds come while it grows.
+  for (const g of GROWTHS) {
+    for (const xy of g.spot) expect(xy, g.id).toBeGreaterThan(0);
+    for (const xy of g.spot) expect(xy, g.id).toBeLessThan(200);
+    for (const [ms] of g.sounds) expect(ms, g.id).toBeLessThan(GROW_MS);
+  }
+});
+
+test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „aus der“ right", () => {
+  const de = GROW_TEXTS.de!;
+  const byId = Object.fromEntries(GROWTHS.map((g) => [g.id, g]));
+  expect(de.whatBecomes(byId.raupe)).toBe("Was wird aus der Raupe?");
+  expect(de.becomes(byId.ei)).toBe("Aus dem Ei wird ein Küken. Toll!");
+  expect(de.becomes(byId.samen)).toBe("Aus dem Samen wird eine Sonnenblume. Toll!");
+  expect(de.comesFrom(byId.kaulquappe)).toBe("Der Frosch kommt aus der Kaulquappe!");
 });

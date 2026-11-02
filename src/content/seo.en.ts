@@ -63,7 +63,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Feed the Animals – Animal Game for Toddlers",
       description:
         "What does the animal need? Who peeks out of the bush, what does it eat, what does it give us, where does it live? With animal sounds, for toddlers, without ads.",
-      text: "Who is peeking out of the bush? The rabbit wants a carrot, the cow gives us milk, the dog looks for its kennel: spot the animal, tap the food, the milk, the egg or the home, and it is happy and makes its sound. The game gets easier or harder by itself.",
+      text: "Who is peeking out of the bush? The rabbit wants a carrot, the cow gives us milk, the dog looks for its kennel, the caterpillar becomes a butterfly: spot the animal, tap the food, the milk, the egg or the home, and it is happy and makes its sound. The game gets easier or harder by itself.",
     },
     "/schatten/": {
       title: "Find the Shadow – Matching Game for Toddlers",

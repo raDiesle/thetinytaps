@@ -104,6 +104,7 @@ export const matchingIdeas: IdeaArea = {
       text: "Oben ist etwas Kleines: eine Raupe, ein Ei, ein Samen, eine Kaulquappe. Unten stehen Schmetterling, Küken, Sonnenblume und Frosch. Das Kind tippt, was daraus wird, und sieht es werden: Die Raupe spinnt sich ein und fliegt davon, der Samen wächst zur Blume.",
       why: "Staunen über das Werden; passt zu den Filmen vom Werden (G-20), aber als kurzes Zuordnen.",
       effort: "M",
+      done: true,
     },
     {
       id: "Z-13",

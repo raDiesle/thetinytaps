@@ -346,6 +346,133 @@
   animation: ap-peek 1.3s ease-in-out forwards;
 }
 
+/* "Was wird aus mir?": the small one above, in a square box, so its parts and what it becomes can be placed in it. */
+.ap-young {
+  position: relative;
+  z-index: 3;
+  cursor: pointer;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ap-grow-box {
+  position: relative;
+  display: block;
+  width: min(44vh, 56vw);
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+.ap-grow-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ap-grow-adult {
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* The small one a wrong pick comes from pops up over its plate; its drawing stands low in its box, so it goes higher. */
+.ap-grow-from {
+  bottom: 88%;
+  width: var(--size);
+}
+
+.ap-grow-from .ap-grow-box {
+  width: 100%;
+}
+
+/* The parts that move while it grows, placed in the box's own units. */
+.ap-grow-box [class*="ap-grow-"] {
+  transform-box: view-box;
+}
+
+/* Hidden until it grows: the chrysalis, the egg's crack and broken edges, the stem, the tadpole's legs. */
+.ap-grow-cocoon,
+.ap-grow-crack,
+.ap-grow-edge,
+.ap-grow-stem,
+.ap-grow-legs {
+  opacity: 0;
+}
+
+/* The caterpillar wriggles, climbs up to the twig and spins itself in; the chrysalis shakes and a butterfly comes out. */
+.growing .ap-grow-caterpillar {
+  transform-origin: 100px 150px;
+  animation: ap-crawl 1.4s ease-in-out forwards;
+}
+
+.growing .ap-grow-cocoon {
+  transform-origin: 100px 26px;
+  animation: ap-cocoon 1.6s ease-in-out 1s forwards;
+}
+
+.grow-raupe .ap-grow-adult {
+  animation: ap-butterfly 1.9s ease-in-out 2.1s both;
+}
+
+/* The egg wobbles, cracks, its top flies off and the chick comes up out of it. */
+.growing .ap-grow-egg {
+  transform-origin: 100px 162px;
+  animation: ap-wobble 0.9s ease-in-out;
+}
+
+.growing .ap-grow-crack {
+  animation: ap-blink 0.5s step-end 0.9s;
+}
+
+.growing .ap-grow-whole {
+  animation: ap-gone 0.01s linear 1.4s forwards;
+}
+
+.growing .ap-grow-edge {
+  animation: ap-appear 0.01s linear 1.4s forwards;
+}
+
+.growing .ap-grow-lid {
+  transform-origin: 100px 90px;
+  animation: ap-lid 0.9s ease-out 1.4s forwards;
+}
+
+.grow-ei .ap-grow-adult {
+  animation: ap-hatch 1.6s ease-out 1.5s both;
+}
+
+/* The seed sinks into the soil, sprouts, grows tall, and the sunflower opens on top. */
+.growing .ap-grow-seed {
+  animation: ap-sink 0.6s ease-in forwards;
+}
+
+.growing .ap-grow-stem {
+  transform-origin: 100px 176px;
+  animation: ap-sprout 1.8s ease-out 0.5s both;
+}
+
+.grow-samen .ap-grow-adult {
+  animation: ap-bloom 1.4s ease-out 2.1s both;
+}
+
+/* The tadpole swims to the lily pad, grows legs and loses its tail; the frog jumps up onto the pad. */
+.growing .ap-grow-tadpole {
+  animation: ap-swim 2.2s ease-in-out forwards;
+}
+
+.growing .ap-grow-tail {
+  transform-origin: 58px 166px;
+  animation: ap-tail 2.2s ease-in-out forwards;
+}
+
+.growing .ap-grow-legs {
+  animation: ap-appear 0.3s linear 0.9s forwards;
+}
+
+.grow-kaulquappe .ap-grow-adult {
+  animation: ap-leap 1.4s ease-out 2.1s both;
+}
+
 @keyframes ap-breathe {
   50% {
     transform: scale(1.03, 0.98);
@@ -450,6 +577,230 @@
   100% {
     opacity: 0;
     transform: translateY(30%) scale(0.4);
+  }
+}
+
+@keyframes ap-appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ap-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ap-crawl {
+  0%,
+  40% {
+    opacity: 1;
+    transform: none;
+  }
+  20% {
+    transform: scale(1.06, 0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -80px) scale(0.35);
+  }
+}
+
+@keyframes ap-cocoon {
+  0% {
+    opacity: 1;
+    transform: scale(0.3, 0.1);
+  }
+  25% {
+    opacity: 1;
+    transform: none;
+  }
+  45% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    opacity: 1;
+    transform: rotate(5deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes ap-butterfly {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  15% {
+    opacity: 1;
+    transform: none;
+  }
+  35% {
+    transform: translate(25%, -35%) scaleX(0.6) rotate(10deg);
+  }
+  50% {
+    transform: translate(50%, -20%);
+  }
+  65% {
+    transform: translate(75%, -50%) scaleX(0.6) rotate(-8deg);
+  }
+  80% {
+    transform: translate(65%, -75%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(85%, -60%) rotate(10deg);
+  }
+}
+
+@keyframes ap-wobble {
+  25% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes ap-lid {
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-60px, -70px) rotate(-50deg);
+  }
+}
+
+@keyframes ap-hatch {
+  0% {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+  10% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-8%);
+  }
+  55%,
+  85%,
+  100% {
+    transform: none;
+  }
+  70% {
+    transform: translateY(-12%);
+  }
+}
+
+@keyframes ap-sink {
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(44px);
+  }
+}
+
+@keyframes ap-sprout {
+  0% {
+    opacity: 1;
+    transform: scale(0.3, 0);
+  }
+  35%,
+  55% {
+    transform: scale(0.5, 0.35);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ap-bloom {
+  0% {
+    transform: scale(0) rotate(-90deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(10deg);
+  }
+  70% {
+    transform: none;
+  }
+  85% {
+    transform: rotate(-6deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes ap-swim {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  45% {
+    transform: translate(30px, -6px);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(62px, -20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(68px, -28px);
+  }
+}
+
+@keyframes ap-tail {
+  10% {
+    transform: rotate(14deg);
+  }
+  20% {
+    transform: rotate(-14deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: none;
+  }
+  100% {
+    transform: scale(0.1);
+  }
+}
+
+@keyframes ap-leap {
+  0% {
+    opacity: 0;
+    transform: translateY(20%) scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-40%);
+  }
+  40%,
+  75%,
+  100% {
+    transform: none;
+  }
+  60% {
+    transform: translateY(-20%);
   }
 }
 
