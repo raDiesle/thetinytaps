@@ -274,8 +274,8 @@ In a fresh worktree run `bun install` first.
   board's edge under it (`DailyGroup`, chosen from four drafts – bookend, sign, paper band – user decision, November
   2026), and beside it words carved into the back panel tell grown-ups in short what
   the shelf holds – the gist of the info book, everyday helpers and first games to share, child with parents or
-  grandparents (not „alles kostenlos“, user feedback) – and that the Belohnungstafel is worth a look (user feedback,
-  November 2026). The carving takes
+  grandparents (not „alles kostenlos“, user feedback) – and nothing else: no pointer to one game („Ein Blick in die
+  Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). The carving takes
   room of its own on the board (`planShelf` takes each place's width) and comes only where the picture books stay
   nearly as big (`CARVING_SHRINK`) and the words big enough to read – where room is short only its first line, and on a
   phone on its side none (`CARVINGS`). Every picture book's cover shows a picture painted for its
