@@ -113,6 +113,56 @@
   animation-fill-mode: backwards;
 }
 
+/* What the round is about, for grown-ups (TopicBubble): a speech bubble at the left of the picture, its tail pointing in
+   to the middle, where the animal is; the sign big, the question small under it. Taps go through it to the game. */
+.ap-topic {
+  position: absolute;
+  z-index: 6;
+  top: calc(max(64px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
+  left: max(16px, 3vw, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: min(30vw, 240px);
+  padding: 0.35em 0.8em 0.45em;
+  border: var(--outline);
+  border-radius: 1.2em;
+  background: #fff;
+  pointer-events: none;
+  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The tail: a square turned on its corner, half out of the bubble's right edge, only its two outer edges drawn. */
+.ap-topic::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -11px;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  border-right: var(--outline);
+  border-bottom: var(--outline);
+  background: #fff;
+  rotate: -45deg;
+}
+
+.ap-topic-sign {
+  font-family: var(--font-emoji);
+  font-size: clamp(2rem, 12vh, 4.5rem);
+  line-height: 1.1;
+}
+
+.ap-topic-text {
+  color: var(--ink);
+  font-size: clamp(0.75rem, 2.6vh, 1.05rem);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+}
+
 .ap-hearts {
   position: absolute;
   inset: 0;

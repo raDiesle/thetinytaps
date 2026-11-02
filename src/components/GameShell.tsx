@@ -460,8 +460,8 @@ const STARS: [number, number, number][] = [
 /**
  * The ✕ in the corner (in the book look the page's turned-up corner): one tap leaves the game, or – where grown-ups chose
  * holding (`leave`, under ⏳ on the home page) – it has to be held for half a second while the ring fills (the corner
- * lifts), and letting go earlier keeps playing. A short note next to it says what it does while it is pressed (or a
- * mouse is over it) – never by itself when a game starts.
+ * lifts), and letting go earlier keeps playing. No note beside it says what it does: grown-ups know ✕ and the corner
+ * (user feedback, November 2026); its name is only read out.
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const [{ leave }] = useCommonSettings();
@@ -470,20 +470,14 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
 
 /** The ✕ left with one tap. */
 function TapExit({ onExit, label }: { onExit: () => void; label: string }) {
-  const [pressed, setPressed] = useState(false);
   return (
-    <ExitCorner label={label} hinted={pressed}>
+    <ExitCorner>
       <button
         type="button"
         className="hold-exit"
         aria-label={label}
         // Keeps the game from reacting to the tap on the button.
-        onPointerDown={(e) => {
-          e.stopPropagation();
-          setPressed(true);
-        }}
-        onPointerLeave={() => setPressed(false)}
-        onPointerCancel={() => setPressed(false)}
+        onPointerDown={(e) => e.stopPropagation()}
         onContextMenu={(e) => e.preventDefault()}
         // A click, not pointer down: leaving on the way down would let the lifted finger tap the menu.
         onClick={onExit}
@@ -499,10 +493,7 @@ function HoldExit({ onExit, label }: { onExit: () => void; label: string }) {
   const t = useT();
   const { holding, props } = useHold(onExit, EXIT_DELAY_MS);
   return (
-    <ExitCorner
-      label={`${label} · ${t({ de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })}`}
-      hinted={holding}
-    >
+    <ExitCorner>
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}
@@ -515,13 +506,10 @@ function HoldExit({ onExit, label }: { onExit: () => void; label: string }) {
   );
 }
 
-/** The corner the ✕ sits in, with the fullscreen button and the note on what ✕ does. */
-function ExitCorner({ label, hinted, children }: { label: string; hinted: boolean; children: ReactNode }) {
+/** The corner the ✕ sits in, with the fullscreen button. */
+function ExitCorner({ children }: { children: ReactNode }) {
   return (
-    <div className={`exit-corner${hinted ? " hinted" : ""}`} data-tap-keep>
-      <span className="exit-hint" aria-hidden>
-        {label}
-      </span>
+    <div className="exit-corner" data-tap-keep>
       {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
       <FullscreenButton className="play-fullscreen" playing />
       {children}

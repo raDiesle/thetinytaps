@@ -6,6 +6,7 @@ import { type Localized, useT } from "@/lib/language";
 import "@/games/shadows/shadows.css";
 import { AnimalsRounds } from "./AnimalsRounds";
 import { KIND_ORDER, type RoundKind } from "./levels";
+import { KIND_SIGNS } from "./TopicBubble";
 import { ANIMALS_SETTINGS_KEY, DEFAULT_ANIMALS_SETTINGS, type Difficulty } from "./settings";
 import "./animals.css";
 
@@ -20,37 +21,37 @@ export const ANIMALS_TITLE: Localized = {
   ar: "ماذا يحتاج الحيوان؟",
 };
 
-/** The names of the five kinds of rounds, for switching them on and off. */
+/** The names of the five kinds of rounds, for switching them on and off (after their sign, `KIND_SIGNS`). */
 const KIND_NAMES: Record<RoundKind, Localized> = {
   peek: {
-    de: "🙈 Wer schaut da raus?",
-    ru: "🙈 Кто там выглядывает?",
-    en: "🙈 Who's peeking out?",
-    zh: "🙈 谁在偷偷看？",
-    hi: "🙈 कौन झाँक रहा है?",
-    es: "🙈 ¿Quién se asoma?",
-    ar: "🙈 من يطل من هناك؟",
+    de: "Wer schaut da raus?",
+    ru: "Кто там выглядывает?",
+    en: "Who's peeking out?",
+    zh: "谁在偷偷看？",
+    hi: "कौन झाँक रहा है?",
+    es: "¿Quién se asoma?",
+    ar: "من يطل من هناك؟",
   },
   feed: {
-    de: "🥕 Tiere füttern",
-    ru: "🥕 Покорми зверюшку",
-    en: "🥕 Feed the animals",
-    zh: "🥕 喂小动物",
-    hi: "🥕 जानवरों को खिलाओ",
-    es: "🥕 Dar de comer",
-    ar: "🥕 إطعام الحيوانات",
+    de: "Tiere füttern",
+    ru: "Покорми зверюшку",
+    en: "Feed the animals",
+    zh: "喂小动物",
+    hi: "जानवरों को खिलाओ",
+    es: "Dar de comer",
+    ar: "إطعام الحيوانات",
   },
-  gift: { de: "🥛 Was gibt uns das Tier?" },
+  gift: { de: "Was gibt uns das Tier?" },
   home: {
-    de: "🏠 Wer wohnt wo?",
-    ru: "🏠 Кто где живёт?",
-    en: "🏠 Who lives where?",
-    zh: "🏠 谁住在哪里？",
-    hi: "🏠 कौन कहाँ रहता है?",
-    es: "🏠 ¿Quién vive dónde?",
-    ar: "🏠 من يعيش أين؟",
+    de: "Wer wohnt wo?",
+    ru: "Кто где живёт?",
+    en: "Who lives where?",
+    zh: "谁住在哪里？",
+    hi: "कौन कहाँ रहता है?",
+    es: "¿Quién vive dónde?",
+    ar: "من يعيش أين؟",
   },
-  grow: { de: "🦋 Was wird aus mir?" },
+  grow: { de: "Was wird aus mir?" },
 };
 
 export function AnimalsGame() {
@@ -72,7 +73,7 @@ export function AnimalsGame() {
           {KIND_ORDER.map((kind) => (
             <Toggle
               key={kind}
-              label={t(KIND_NAMES[kind])}
+              label={`${KIND_SIGNS[kind]} ${t(KIND_NAMES[kind])}`}
               checked={settings[kind]}
               // One kind always stays on: the last one can't be switched off.
               onChange={(on) => (on || kindsOn > 1) && update({ [kind]: on })}
