@@ -60,8 +60,8 @@ interface Carving {
  * none does, since its „mehr …“ is the way to the texts for grown-ups.
  */
 const CARVINGS: Carving[] = [
-  { span: 1.7, short: false, minBook: 170 },
   { span: 1.4, short: false, minBook: 170 },
+  { span: 1.3, short: false, minBook: 170 },
   { span: 1.25, short: true, minBook: 100 },
 ];
 
@@ -275,14 +275,12 @@ function DailyGroup({
       </span>
       {carving && (
         <span className="shelf-carving" data-short={carving.short || undefined}>
-          {/* Kept whole on either side of the comma, so a narrow carving breaks only there. */}
-          <span className="shelf-carving-big">{t({ de: "Für\u00a0Groß\u00a0&\u00a0Klein, Seite\u00a0an\u00a0Seite" })}</span>
+          {/* Kept whole, so a narrow carving never breaks it. */}
+          <span className="shelf-carving-big">{t({ de: "Für\u00a0Groß\u00a0&\u00a0Klein" })}</span>
           {!carving.short && (
             <>
-              <span>
-                {t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen, die die Kommunikation fördern, und kleinen Helfern für den Tag." })}
-              </span>
-              <span>{t({ de: "Alles kostenlos – von\u00a0Eltern\u00a0für\u00a0Eltern." })}</span>
+              <span>{t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag." })}</span>
+              <span>{t({ de: "Alles kostenlos." })}</span>
             </>
           )}
           <RoomNotes />

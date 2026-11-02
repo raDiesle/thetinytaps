@@ -1164,9 +1164,11 @@
   text-align: center;
 }
 
+/* Clear of the picture as the title is, and low on the cover, down into its bottom margin. */
 @container (min-height: 250px) {
   .shelf-book-blurb {
     display: block;
+    margin: 3.5cqh 0 -4cqh;
   }
 }
 
@@ -1191,6 +1193,8 @@
   align-items: flex-end;
   width: calc(var(--bh) * 0.82 * var(--span, 1));
   height: var(--bh);
+  /* The carved words take no tap but „mehr …“ in their middle: the picture book beside them comes close, not a finger's gap away. */
+  margin-right: calc(var(--bh) * -0.12);
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
@@ -1321,7 +1325,7 @@
   gap: 0.2em;
   align-self: center;
   height: 98%;
-  padding: 0 calc(var(--bh) * 0.06) 0 calc(var(--bh) * 0.1);
+  padding: 0 0 0 calc(var(--bh) * 0.1);
   color: #5b3a1c;
   font-family: Georgia, "Times New Roman", serif;
   font-size: calc(var(--bh) * 0.078);
