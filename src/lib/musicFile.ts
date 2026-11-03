@@ -1,6 +1,6 @@
 import songFiles from "./musik/*.mp3?glob";
 import { loadCommon } from "@/lib/common";
-import { afterLoad } from "@/lib/pwa";
+import { afterLoad, savesData } from "@/lib/pwa";
 
 // Downloading the background song (musik/musik-hintergrund.mp3, see the README
 // there), apart from playing it (backgroundMusic.ts) so the start of the site
@@ -26,9 +26,9 @@ export function downloadMusic() {
 
 /**
  * Called once at start-up: if music is on, the song is there by the time a game starts.
- * Only after the page has loaded, so the song (a few MB) doesn't hold up the menu.
- * A game started before that asks for it itself (downloadMusic).
+ * Only after the page has loaded, so the song (a few MB) doesn't hold up the menu,
+ * and not when the visitor saves data. A game started before that asks for it itself (downloadMusic).
  */
 export function downloadMusicIfOn() {
-  if (loadCommon().music) afterLoad(() => void downloadMusic());
+  if (loadCommon().music && !savesData()) afterLoad(() => void downloadMusic());
 }

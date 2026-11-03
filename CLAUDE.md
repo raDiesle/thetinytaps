@@ -447,6 +447,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   only between games, while it is in the background on a menu: menu pages call `useUpdateBetweenGames()`
   (`src/lib/pwa.ts`) – a new menu page does too, a game never. Never restart or reload on a tap: restarting when a
   menu card was tapped made the next menu take seconds to show.
+- Offline: the service worker keeps what a visit uses – at install only the start (`shellFiles` in `tools/build.ts`:
+  index.html, its scripts and styles and the pictures they name), then every file of the site once a page fetched it,
+  so a game played once plays offline – and the whole site only for an installed app (`keepAll`, `isStandalone`). A new
+  build takes over the files named by their content from the old cache instead of downloading them again. Never
+  download every file for every visitor again: it was 42 MB on each first visit and after each build, while few play
+  offline (November 2026; `sw.test.ts`). What is fetched ahead (other pages' code, the song) waits when the visitor
+  saves data (`savesData()` in `src/lib/pwa.ts`).
 - A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
