@@ -3,42 +3,34 @@ import { CATEGORIES } from "@/content/games";
 import { finishRoutineStep, routineReturn, takeFinishedStep, waitForStep } from "@/lib/routine";
 import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./board";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
-import { ACTIVITIES, DAY_CARDS, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
+import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
   counterOf,
   counting,
   currentStep,
-  DAY_SHAPES,
-  dayCards,
   distinctSteps,
   fromOlder,
   exampleTicks,
   gameOf,
-  MAX_PART_STEPS,
   MAX_STEPS,
-  partFloor,
   nightsUntil,
   nowSteps,
   pairsOf,
   parseRoutineStep,
-  partRoom,
   partsOf,
   planFromTemplate,
   restartDay,
   routineStep,
   sameCards,
-  shapeOf,
   splitDone,
   starsGot,
   stepDone,
-  stepLimit,
   stepFromCatalog,
   stepsOn,
   templateLists,
   withCounter,
   withEveryDay,
   withSame,
-  withShape,
   withStepStars,
   withSteps,
 } from "./plan";
@@ -106,76 +98,6 @@ describe("plan catalogue", () => {
     expect(steps.filter((s) => s.linked === "teeth").map((s) => s.slot)).toEqual(["morning", "evening"]);
   });
 
-  // The wizard's first step cuts a Jetzt – Dann day (user feedback, November 2026): what were „Mein Tag“ and the day
-  // with Kita are one plan, in two parts or one, with as many cards as asked for.
-  test("the cards a Jetzt – Dann is filled with are catalogued, each pool ranked once", () => {
-    for (const [name, pool] of Object.entries(DAY_CARDS)) {
-      for (const card of pool) expect(STEP_BY_ID.has(card.id), `${name}: ${card.id}`).toBe(true);
-      expect(new Set(pool.map((c) => c.rank)).size, name).toBe(pool.length);
-    }
-    // In parts, the three first of each part are „Mein Tag“ – six cards, the default (user feedback, November 2026); the
-    // whole day's seven are the day with Kita.
-    const mine = stepsOn(template("mein-tag"), WED);
-    for (const part of ["morning", "evening"] as const)
-      expect(dayCards(part, 3).map((s) => s.id)).toEqual(mine.filter((s) => s.part === part).map((s) => s.id));
-    expect(DAY_SHAPES.split.counts).toEqual([3, 3]);
-    expect(dayCards(undefined, DAY_SHAPES.whole.counts[0]).map((s) => s.catalog)).toEqual([
-      "fruehstueck",
-      "kita",
-      "mittagessen",
-      "mittagsschlaf",
-      "spielplatz",
-      "abendessen",
-      "schlafen",
-    ]);
-  });
-
-  test("every count the wizard allows makes a day of few, unique cards, its teeth cards each with their time", () => {
-    const base = template("mein-tag");
-    for (const shape of [DAY_SHAPES.split, DAY_SHAPES.whole]) {
-      const parts = shape.counts.length;
-      for (let i = 0; i < parts; i++)
-        for (let n = partFloor(shape, i); n <= partRoom(shape, i); n++) {
-          const counts = shape.counts.map((c, j) => (j === i ? n : c));
-          const steps = withShape(base, { split: shape.split, counts }).days[0];
-          // A part of a day in two may go entirely (its line removed); the day stays in parts.
-          expect(shapeOf(steps)).toEqual({ split: shape.split, counts });
-          expect(steps.length).toBeLessThanOrEqual(stepLimit(steps));
-          for (const part of partsOf(steps)) expect(part.steps.length).toBeLessThanOrEqual(shape.split ? MAX_PART_STEPS : MAX_STEPS);
-          expect(new Set(steps.map((s) => s.id)).size).toBe(steps.length);
-          for (const s of steps.filter((x) => x.linked === "teeth")) expect(s.slot, s.id).toBeDefined();
-        }
-    }
-  });
-
-  test("changing one part's count keeps the other part's cards as the grown-up chose them", () => {
-    const base = template("mein-tag");
-    const own = withSteps(
-      base,
-      0,
-      base.days[0].map((s) => (s.part === "evening" && s.catalog === "vorlesen" ? { ...s, label: "Singen" } : s)),
-    );
-    const more = withShape(own, { split: true, counts: [5, 3] });
-    expect(more.days[0].filter((s) => s.part === "evening")).toEqual(own.days[0].filter((s) => s.part === "evening"));
-    expect(more.days[0].filter((s) => s.part === "morning")).toHaveLength(5);
-    // A part that grows keeps its own cards and adds the next of its pool; one that shrinks drops its last.
-    const swapped = withSteps(
-      own,
-      0,
-      own.days[0].map((s) => (s.part === "morning" && s.catalog === "anziehen" ? { ...s, catalog: "haare", emoji: "💇" } : s)),
-    );
-    const grown = withShape(swapped, { split: true, counts: [4, 3] }).days[0].filter((s) => s.part === "morning");
-    expect(grown.map((s) => s.catalog)).toContain("haare");
-    expect(grown).toHaveLength(4);
-    expect(
-      withShape(own, { split: true, counts: [3, 2] })
-        .days[0].filter((s) => s.part === "evening")
-        .map((s) => s.catalog),
-    ).toEqual(["zaehne", "vorlesen"]);
-    // One flow instead of parts: the whole day's cards, no part.
-    expect(withShape(own, DAY_SHAPES.whole).days[0].every((s) => !s.part)).toBe(true);
-  });
-
   // The old two-card „Jetzt – Dann“ view is now a Jetzt – Dann with the „Jetzt“ field; a marker's plan prints no cards.
   test("an older plan's view reads as today's, and only the „Jetzt“ field needs cards to cut out", () => {
     const old = { ...template("mein-tag"), view: "now-next" } as unknown as ReturnType<typeof template>;
@@ -201,6 +123,8 @@ describe("plans", () => {
       const b = planFromTemplate(tpl);
       expect({ ...a, id: "" }).toEqual({ ...b, id: "" });
       for (const day of a.days) expect(new Set(day.map((s) => s.id)).size).toBe(day.length);
+      // Cards are numbered only when a grown-up asks for it under „Weitere Einstellungen“.
+      expect(a.numbers).toBeFalsy();
     }
     // No plan before the wizard made one; an old first plan with ticks stays.
     expect(DEFAULT_PLANNER_SETTINGS.plans).toEqual([]);

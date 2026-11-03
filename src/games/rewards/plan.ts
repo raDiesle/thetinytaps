@@ -2,7 +2,7 @@ import { dayKey, weekOf } from "@/games/teeth/daytime";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { type BoardReward, cellKey, type LinkedDays, newId, rewardFromCatalog, type StarLog, weekday } from "./board";
-import { DAY_CARDS, type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
+import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
 
 // A Tagesplan (a picture schedule, „Strukturtafel“): the steps of each day in their order, and which of today's
 // are done. Plain data and pure functions like board.ts; the ticks share its star log, keyed by plan id.
@@ -61,6 +61,11 @@ export interface Plan {
   reward?: BoardReward | null;
   /** Stars until the reward; missing: all the stars of the day (a week's plan: of the week). */
   goal?: number;
+  /**
+   * Each card of a day shows its number in the day's order. Off by default (user feedback, November 2026: the pictures
+   * say the order), switched on under „Weitere Einstellungen“.
+   */
+  numbers?: boolean;
 }
 
 /** A plan as an older version saved it: its two-card „Jetzt – Dann“ view is now a Jetzt – Dann plan with the „Jetzt“ field. */
@@ -141,83 +146,8 @@ export function planFromTemplate(template: PlanTemplate, language: TargetLanguag
   };
 }
 
-/** How a Jetzt – Dann day is cut: in two parts (morning and evening) or one, and how many cards each part has. */
-export interface DayShape {
-  split: boolean;
-  /** Cards per part, in the parts' order: two for a day in parts, one for a day without. */
-  counts: number[];
-}
-
 /** The parts of a day in two, in their order. */
 export const DAY_PARTS: Slot[] = ["morning", "evening"];
-
-/** Fewest cards a part can have on the wizard's first step: one card is no order. */
-export const MIN_PART_STEPS = 2;
-
-/** Each cut as the wizard first fills it: three in the morning and three in the evening („Mein Tag“), seven for the whole day. */
-export const DAY_SHAPES: Record<"split" | "whole", DayShape> = { split: { split: true, counts: [3, 3] }, whole: { split: false, counts: [7] } };
-
-/** How a day's cards are cut now. */
-export function shapeOf(steps: PlanStep[]): DayShape {
-  if (!steps.some((step) => step.part)) return { split: false, counts: [steps.length] };
-  return { split: true, counts: DAY_PARTS.map((part) => steps.filter((step) => step.part === part).length) };
-}
-
-/** The most cards the wizard gives a part: what its pool holds, at most `MAX_PART_STEPS` (a day in parts) or `MAX_STEPS`. */
-export function partRoom(shape: DayShape, index: number): number {
-  const pool = DAY_CARDS[shape.split ? (DAY_PARTS[index] as "morning" | "evening") : "whole"];
-  return Math.min(pool.length, shape.split ? MAX_PART_STEPS : MAX_STEPS);
-}
-
-/**
- * A part's cards (or a whole day's, without `part`) as the wizard fills them from `DAY_CARDS`: the `count` of lowest
- * rank, in the day's order. Their ids carry the time of day where there is one, as in a template of parts, so the
- * morning's and the evening's teeth card stay apart.
- */
-export function dayCards(part: Slot | undefined, count: number): PlanStep[] {
-  const pool = DAY_CARDS[part === "morning" || part === "evening" ? part : "whole"];
-  const taken = new Set([...pool].sort((a, b) => a.rank - b.rank).slice(0, count));
-  return pool
-    .filter((card) => taken.has(card))
-    .map(({ id, slot }) => {
-      const time = part ?? slot;
-      const step = { ...stepFromCatalog(id, time), id: time ? `${id}@${time}` : id };
-      return part ? { ...step, part } : step;
-    });
-}
-
-/** The fewest cards a part can have: a part of a day in two may go (its line removed), as long as the day keeps a card. */
-export const partFloor = (shape: DayShape, index: number): number =>
-  shape.split ? (shape.counts.some((n, i) => i !== index && n > 0) ? 0 : 1) : MIN_PART_STEPS;
-
-/**
- * The plan with its day cut as `shape`, every day alike. A change of cut fills every part anew from its pool; a part
- * that gets more cards keeps its own and adds the next of its pool in the day's order, one that gets fewer drops its
- * last ones – so the cards the grown-up chose stay. New cards count as many stars as the plan's others (`counterOf`).
- */
-export function withShape(plan: Plan, shape: DayShape): Plan {
-  const parts = shape.split ? DAY_PARTS : [undefined];
-  const stars = counterOf(plan);
-  const days = plan.days.map((steps) => {
-    const was = shapeOf(steps);
-    return parts.flatMap((part, i) => {
-      const count = shape.counts[i] ?? 0;
-      const kept = steps.filter((step) => step.part === part);
-      if (was.split !== shape.split) return dayCards(part, count).map((step) => withStars(step, stars));
-      if (kept.length >= count) return kept.slice(0, count);
-      const pool = dayCards(part, partRoom(shape, i));
-      const more = pool.filter((card) => !kept.some((own) => own.id === card.id || own.catalog === card.catalog)).slice(0, count - kept.length);
-      return [...kept, ...more.map((step) => withStars(step, stars))].sort((a, b) => order(pool, a) - order(pool, b));
-    });
-  });
-  return { ...plan, days };
-}
-
-/** Where a card stands in its pool's day; a card of the grown-up's own keeps its place before the pool's later ones. */
-function order(pool: PlanStep[], step: PlanStep): number {
-  const at = pool.findIndex((card) => card.id === step.id);
-  return at < 0 ? -0.5 : at;
-}
 
 /** A card with its Zähler; 0 leaves it a plain card. */
 const withStars = (step: PlanStep, stars: number): PlanStep => {

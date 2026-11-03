@@ -19,6 +19,7 @@ import {
 } from "./board";
 import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
+import { RewardActions } from "./SheetAction";
 
 /** „Woche vom ____“: the line on a printed week to write its first day on. */
 export const WEEK_OF: Localized = { de: "Woche vom", en: "Week of", zh: "起始日期", hi: "हफ़्ता शुरू", es: "Semana del", ar: "أسبوع يبدأ في", ru: "Неделя с" };
@@ -186,6 +187,7 @@ export function BoardSheet({
           {editing && !board.reward && <span className="rw-reward rw-reward-add">＋ {t({ de: "Belohnung" })}</span>}
           {board.reward && (
             <span className="rw-reward">
+              {editing && <RewardActions />}
               <span className="rw-reward-emoji" aria-hidden>
                 <ItemPic item={board.reward} kind="reward" lines={grey} />
               </span>
@@ -497,6 +499,7 @@ function CollectPath({
         </div>
       ))}
       <div className="rw-cell rw-path-end" data-edit={edit ? "reward" : undefined} style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}>
+        {edit && board.reward && <RewardActions />}
         <span className="rw-reward-emoji" aria-hidden>
           {board.reward ? <ItemPic item={board.reward} kind="reward" lines={greyPrint(look.look)} /> : <Pic src={picture("fest")} emoji="🎉" />}
         </span>

@@ -23,19 +23,24 @@ Belohnungstafel opens a board, or the wizard where none is made yet (below). Not
 Assistent und Seite … alles gleich aussieht und funktioniert“): „＋ Neu“ (`Wizard.tsx`) and „✏️ Gestalten“ are the same
 component, the very sheet that will be used, changed right on it (WYSIWYG). Above the sheet a band of options
 (`.rw-options-band`): **Zeitraum** (Tag, Woche, Monat, Erst – Dann, Sammeln, `SPANS`; on the page only the views of the
-chart's own kind, since a plan's Tag and a board's Monat are different charts), the **⭐ Zähler** (stars a card, 0 to
-`MAX_STARS`), one **🎁 Belohnung** switch for the whole chart, and for the Tag „Morgens und abends“ / „Am Stück“, „Anzahl
-Karten“ per part, „Pfeil wandert“ / „Karte wandert“ (only without a Zähler), the colours and the child's name. On the
-sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) a tap on a card opens its window: its own stars (every day
-or only this weekday), earlier / later in its part, remove, swap for another card; ＋ adds a card to a part, a part's
-🗑️ takes the row of the day away (and ＋ brings it back), a tap on the reward opens the goal, „Ohne Belohnung“ and the
-rewards; a board shows its tasks as chips over the sheet to tap. What needs typing (own words, own emoji, times of day,
+chart's own kind, since a plan's Tag and a board's Monat are different charts), „Pfeil wandert“ / „Karte wandert“ (only
+without a Zähler), the colours and the child's name – nothing the sheet already does with a tap (user feedback, November
+2026: the Zähler, a 🎁 Belohnung switch, „Tag aufteilen?“ and „Anzahl Karten“ stood there twice and went). On the
+sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) every card and the reward carry ⚙️ in their top left
+corner and 🗑️ in their top right (`SheetAction.tsx`): ⚙️ (or a tap on the card) opens its window – its own stars (every
+day or only this weekday), earlier / later in its part, remove, swap for another card – and 🗑️ takes it at once (↶
+brings it back); the reward's ⚙️ opens the goal and the rewards, its 🗑️ leaves the chart without one („＋ Belohnung“
+brings it back). ＋ adds a card to a part; a board shows its tasks as chips over the sheet to tap. What needs typing (own words, own emoji, times of day,
 „Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`). Between the band and the sheet „✏️ Direkt
 auf der Tafel ändern“ says that the sheet is changed as it is seen and printed so, beside ↶ Rückgängig and ↷ Wiederholen
 (`history.ts`, also Ctrl/⌘+Z, Ctrl+Shift+Z, Ctrl+Y outside a box for words; letters typed in a row undo as one word);
-the sheet has a dashed edge while it is changed. On a counting plan every card has − n⭐ ＋ for its own stars
-(`StarStepper`), and a part's sign (☀️ / 🌙) stands big for its whole line with 🗑️ above it, which marks the whole line
-red under the mouse before it takes it. The wizard starts on **„Mein Tag“**
+the sheet has a dashed edge while it is changed. The stars are set where they are seen: − and ＋ stand at the ends of
+the card's row of star fields, no number between them (the fields are the count); under the mouse ＋ shows the next
+field pale and − pales the last. A plain plan's card has a small „＋⭐“, which makes it count (and brings a reward). A
+part's sign (☀️ / 🌙) stands big for its whole line with 🗑️ above it, „„Morgens“ löschen?“, which marks the line red
+under the mouse before it takes it. Where only one part is left its sign stays with its own 🗑️ („Zeichen löschen?“):
+then the cards stand without a part, and pale „＋ ☀️ / ＋ 🌙“ before the row put a sign back (`SignBack`). Cards are not
+numbered unless „Karten nummerieren“ under „Weitere Einstellungen“ says so (`Plan.numbers`, user feedback, November 2026). The wizard starts on **„Mein Tag“**
 (`defaultDraft`): morning and evening on one sheet, three cards each, a Zähler of 1 and a reward; a Zeitraum keeps
 name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board Vorlage „woche“'s tasks, the same every
 day), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. The wizard's head (`.rw-wizard-head`, sticky on top) holds that
@@ -92,7 +97,7 @@ targets) – keep it that way.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars, grouped by view;
-  `ChartEditor.tsx` – the one editor of „＋ Neu“ and „Gestalten“ (above), `Wizard.tsx` – „＋ Neu“ around it; `Review.tsx` – „📜 Rückblick“ (and
+  `ChartEditor.tsx` – the one editor of „＋ Neu“ and „Gestalten“ (above), `SheetAction.tsx` – its ⚙️ / 🗑️ in a corner, `Wizard.tsx` – „＋ Neu“ around it; `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Certificate.tsx` – „🏅 Urkunde“ (below);
   `RewardsGame.tsx` – the page for boards and plans
   (above). There is no „ℹ️ Über die Tafel“ or „Über den Plan“ (removed with every menu's „Über das Spiel“, user
@@ -208,6 +213,15 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   it on the sheet (a tap on what it changes, opening a window of picture cards) or as an option in the band (`.rw-options-band`),
   never as a step, a page or a second editor of its own (user decision, November 2026). Only what needs typing stays
   under „Weitere Einstellungen“.
+- Never put into the band what a tap on the sheet does (user feedback, November 2026): one place for each change, the
+  one where its result is seen. A count that the sheet shows (star fields) is never written beside its − ＋ as well.
+- Delete and change are drawn icons in a thing's corners (`SheetAction`: a bin and a gear in a white disc, the bin red),
+  never an emoji in a ring, which cut through the bin; under the mouse each says its question („„Anziehen“ löschen?“)
+  and a 🗑️ marks in red what it would take. A new thing that can be removed or changed on the sheet gets the same pair
+  with a `data-edit` of its own in `ChartEditor`, not a button somewhere else.
+- `.rw-field` (`rewards.css`) loads after `planner.css` on the dev server: a plan rule that hides or shows a star field
+  needs more weight than it (`.pl-star.pl-star-ghost`), and a size in `padding: %` resolves against the card, not the
+  action – size with `var(--rw-act)`.
 - The options draw the eye, as they lead to the other charts grown-ups come for (user feedback, November 2026, replacing
   „quiet options“): a band of their own, the Zeitraum as big picture buttons (`SpanPic`, the shape of each chart) under
   its visible name, the chosen one yellow; what a choice means goes into its button in a few words with a visual sign,
@@ -227,12 +241,11 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - **The Zähler** (`PlanStep.stars`, user decision, November 2026): above 0 the plan's cards count stars – a star field
   per star under each card, the child taps the card for the next star, and there may be a reward; only at 0 the paper
   arrow (or the „Jetzt“ field) shows the card to do. A card may have more stars than the others, every day or on one
-  weekday only (`withStepStars`, two stars on Monday for brushing), set right on the card with its − ＋; in a week's
-  grid the row's − ＋, 🗑️ and its picture change the card of every day alike (`withEveryDay`, `data-every`). A plan with a Zähler is a Belohnungstafel: „✓ Tafel
+  weekday only (`withStepStars`, two stars on Monday for brushing), set right on the card with the − ＋ at its stars; in a
+  week's grid the row's − ＋, ⚙️, 🗑️ and its picture change the card of every day alike (`withEveryDay`, `data-every`). A plan with a Zähler is a Belohnungstafel: „✓ Tafel
   anlegen“, and the Belohnungstafel's book opens it.
-- **One „🎁 Belohnung“ switch** for the whole chart, on by default (`defaultReward`). Turning it off or „Ohne Belohnung“
-  takes away only the reward (`Plan.reward` null) – the stars and the Zähler stay; „＋ Belohnung“ on the sheet brings
-  it back.
+- **One reward** for the whole chart, there by default (`defaultReward`). Its 🗑️ or „Ohne Belohnung“ takes away only
+  the reward (`Plan.reward` null) – the stars stay; „＋ Belohnung“ on the sheet brings it back.
 - A sheet in the editor stands in a row (`rw-main` round `rw-screen`), like the chart on the page: in a column under a
   box with only a min-height it got no height and shrank to a strip.
 - A button that can do nothing is left out, never shown greyed.
@@ -280,16 +293,15 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
 
 - `plan.ts` – a plan (`Plan`: its `view`, `days` as seven lists Monday first, or `same: true` and only `days[0]`,
   `nowField` for the „Jetzt“ field; a step's `part` is its part of the day, morning or evening; `fromOlder` reads a
-  plan saved as the old view „now-next“ as a Jetzt – Dann with the field), pure functions: the day's shape
-  (`shapeOf`, `DAY_SHAPES`, `dayCards`, `withShape`, `partRoom`, `stepLimit`), `planFromTemplate`, `templateLists`,
+  plan saved as the old view „now-next“ as a Jetzt – Dann with the field, `numbers` for numbered cards), pure functions:
+  `planFromTemplate`, `templateLists`,
   `stepsOn`, `stepDone` (a tick in the log, or the linked game – brushing only for the step's `slot`), `currentStep`,
   `nowSteps` (the cards to do now: one, or on an Erst–Dann the first open one of every pair), `partsOf`, `pairsOf`,
   `splitDone` (the row and the Fertig-Kiste), `exampleTicks`, `restartDay` (a day, or only some of its steps),
   `nightsUntil`, `withSteps`, `withSame`, `joinLastPart` (a new card joins the last part), `distinctSteps` (the cards
   to print, a card twice where one day has it twice).
 - `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS`, `NOW_WAYS` (marker or
-  „Jetzt“ field, each with the note that says what it means to make), `DAY_CARDS` (the cards a day's shape is filled
-  from, per part in the day's order, `rank` saying which come first) and `PLAN_TEMPLATES`: Mein Tag (Jetzt – Dann:
+  „Jetzt“ field, each with the note that says what it means to make) and `PLAN_TEMPLATES`: Mein Tag (Jetzt – Dann:
   Morgen and Abend as `parts` on one page), Erst – Dann (four pairs), Wochenplan (own weekdays, with the Kita).
 - `PlanSheet.tsx` – the sheet for screen and print, one component per view: `DaySteps` (the rows – `planLayout` picks
   rows and columns for one part, as many in a row as fit unless another row makes the cards clearly bigger, several
@@ -370,8 +382,6 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the old first plan kept the fixed id `erster-plan`), as for the board.
-- A day's cards come from `DAY_CARDS` by rank: a new card for the day's shape joins its part with a rank of its own
-  (`plan.test.ts` checks the ranks are unique and that 4 + 4 is Mein Tag).
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
 

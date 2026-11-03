@@ -398,6 +398,7 @@ describe("one page for boards and plans", () => {
     expect(draft.plan.view).toBe("day");
     expect(DAY_PARTS.map((part) => draft.plan.days[0].filter((step) => step.part === part).length)).toEqual([3, 3]);
     expect(draft.plan.days[0].every((step) => step.stars === 1)).toBe(true);
+    expect(draft.plan.numbers).toBeFalsy();
     expect(draft.plan.reward?.catalog).toBe("spielplatz");
     const named: typeof draft = { type: "plan", plan: { ...draft.plan, childName: "Lena", theme: "meer" } };
     for (const span of SPANS) {

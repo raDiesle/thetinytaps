@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Choice, SettingsGroup } from "@/components/SettingControls";
+import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { newId, weekday } from "./board";
 import { ACTIVITIES, DAY_NAMES, NOW_WAYS, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
@@ -114,6 +114,8 @@ export function PlanEditor({
       )}
 
       <SettingsGroup title={t({ de: "Schritte", en: "Steps", zh: "步骤", hi: "कदम", es: "Pasos", ar: "الخطوات", ru: "Шаги" })}>
+        {/* Hidden here on purpose: the pictures say the order (user feedback, November 2026). */}
+        <Toggle label={t({ de: "Karten nummerieren" })} checked={!!plan.numbers} onChange={(numbers) => onChange({ ...plan, numbers })} />
         <Choice
           label={t({ de: "Welche Tage?", en: "Which days?", zh: "哪几天？", hi: "कौन-से दिन?", es: "¿Qué días?", ar: "أيّ الأيام؟", ru: "Какие дни?" })}
           value={plan.same ? "same" : "own"}

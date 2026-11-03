@@ -448,57 +448,6 @@
   gap: 10px;
 }
 
-/* „Belohnung“ among the chart's options: one small switch for the whole chart, on by default. */
-.rw-reward-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 32px;
-  padding: 2px 4px 2px 10px;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  color: inherit;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.rw-reward-switch:hover {
-  background: color-mix(in srgb, var(--sunshine) 30%, transparent);
-}
-
-.rw-switch-track {
-  position: relative;
-  width: 36px;
-  height: 20px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 25%, transparent);
-  transition: background 0.2s;
-}
-
-.rw-switch-track::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 2px #0004;
-  transition: translate 0.2s;
-}
-
-.rw-reward-switch[aria-checked="true"] .rw-switch-track {
-  background: #2f9e44;
-}
-
-.rw-reward-switch[aria-checked="true"] .rw-switch-track::after {
-  translate: 16px 0;
-}
-
 /* Picture cards (tasks, rewards, cards of a day): small tiles with a big emoji. */
 .rw-picks-tiles {
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
@@ -964,7 +913,7 @@
   cursor: pointer;
 }
 
-.rw-editing [data-edit]:hover {
+.rw-editing [data-edit]:not(.rw-act):hover {
   outline: max(2px, 0.5cqmin) dashed var(--rw-ink);
   outline-offset: 2px;
 }
@@ -1000,6 +949,36 @@
   min-width: 2.6em;
   padding-inline: 0.8cqmin;
   border-style: dashed;
+}
+
+/* ⚙️ and 🗑️ on a board's reward: over the ends of its label. */
+.rw-editing :is(.rw-reward, .rw-path-end) {
+  position: relative;
+}
+
+.rw-reward > .rw-act {
+  top: -14px;
+}
+
+.rw-reward > .rw-act-left {
+  left: -12px;
+}
+
+.rw-reward > .rw-act-right {
+  right: -12px;
+}
+
+.rw-path-end > .rw-act {
+  --rw-act: clamp(22px, 16cqmin, 36px);
+  top: 2cqmin;
+}
+
+.rw-path-end > .rw-act-left {
+  left: 2cqmin;
+}
+
+.rw-path-end > .rw-act-right {
+  right: 2cqmin;
 }
 
 .rw-reward-add {
@@ -1188,16 +1167,6 @@
 
   .rw-pick-label {
     font-size: 0.82rem;
-  }
-
-  /* The options in as few lines as can be: the switch without its word (only read out). */
-  .rw-reward-switch {
-    padding-left: 4px;
-    font-size: 0;
-  }
-
-  .rw-reward-switch > span:first-child {
-    font-size: 1rem;
   }
 }
 
@@ -2422,4 +2391,111 @@
 
 .rw-cert-page.rw-grey .rw-cert-marks {
   filter: grayscale(1);
+}
+
+/* ---------- While a chart is made: ⚙️ and 🗑️ in the corners of what they act on (`SheetAction`) ---------- */
+
+/* Drawn signs in a white ring, sized by `--rw-act` where they sit; its question shows under the mouse. */
+.rw-act {
+  position: absolute;
+  z-index: 3;
+  top: 4px;
+  display: block;
+  box-sizing: border-box;
+  width: var(--rw-act, 30px);
+  height: var(--rw-act, 30px);
+  /* Not a percentage: that would be of the card around it. */
+  padding: calc(var(--rw-act, 30px) * 0.14);
+  border: 2px solid var(--rw-ink, var(--ink));
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink, var(--ink));
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--rw-ink, var(--ink)) 30%, transparent);
+  cursor: pointer;
+}
+
+.rw-act-left {
+  left: 4px;
+}
+
+.rw-act-right {
+  right: 4px;
+}
+
+.rw-act > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-act .rw-act-teeth {
+  stroke-width: 3.2;
+  stroke-linecap: butt;
+}
+
+.rw-act-delete {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+.rw-act-configure:hover,
+.rw-act-configure:focus-visible {
+  background: var(--rw-main, var(--sunshine));
+}
+
+.rw-act-delete:hover,
+.rw-act-delete:focus-visible {
+  background: #c62828;
+  color: #fff;
+}
+
+/* Its question („„Abends“ löschen?“), under it and towards the thing it acts on. */
+.rw-act::after {
+  content: attr(data-ask);
+  position: absolute;
+  top: calc(100% + 6px);
+  display: none;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--rw-ink, var(--ink));
+  box-shadow: 0 2px 6px #0003;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.rw-act-left::after {
+  left: 0;
+}
+
+.rw-act-right::after {
+  right: 0;
+}
+
+.rw-act-delete::after {
+  background: #c62828;
+}
+
+.rw-act:hover::after,
+.rw-act:focus-visible::after {
+  display: block;
+}
+
+/* What a 🗑️ would take turns red under the mouse, before the click. */
+:is(.pl-card, .pl-goal, .rw-reward, .rw-path-end):has(> .rw-act-delete:hover) {
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  outline-offset: 2px;
+  background: color-mix(in srgb, #e53935 14%, #fff);
+}
+
+:is(.pl-card, .pl-goal, .rw-reward, .rw-path-end):has(> .rw-act-delete:hover) > :is(.pl-emoji, .pl-stars, .pl-goal-pic, .rw-reward-emoji) {
+  opacity: 0.4;
 }

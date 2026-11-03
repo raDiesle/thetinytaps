@@ -6,6 +6,7 @@ import { AUTO_TITLES, cellKey, isTemplateTitle, type LinkedDays, weekday } from 
 import { useRewardLabel } from "./BoardSheet";
 import { DAY_NAMES, MARK_BY_ID, MARKS, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, SheetStrip } from "./pictures";
+import { RewardActions, SheetAction } from "./SheetAction";
 import {
   counting,
   MAX_PART_STEPS,
@@ -110,8 +111,8 @@ const STAR_CARD = 0.8;
  * up to four on a page) or the week in seven columns with moons for the nights until each day. Where the cards count
  * stars (a Zähler above 0, `counting`), each card has its row of star fields and the arrow is left out – the stars show
  * what is done –, and the reward stands at the sheet's end with how many stars are there. With `edit` (the wizard and
- * „Gestalten“) the same sheet shows where to add a card (＋), take a line of the day away (✕) or set a reward, and its
- * cards and reward are taps of `ChartEditor`. Pure markup – PlanScreen and ChartEditor add the taps through
+ * „Gestalten“) the same sheet shows where to add a card (＋), ⚙️ and 🗑️ on each card, the reward and a part's sign, − ＋
+ * at a card's stars, or where to set a reward, and its cards and reward are taps of `ChartEditor`. Pure markup – PlanScreen and ChartEditor add the taps through
  * `data-step` and `data-edit` – sized in container units like BoardSheet.
  */
 export function PlanSheet({
@@ -202,8 +203,10 @@ function statesOf({ plan, ticks, linked, today, look, counts }: StepsProps, day:
 }
 
 /**
- * One step as a card: its picture, its number in the day, and a tick once done. No word on it – the child doesn't read
- * (user feedback, November 2026); the word is only its name for a mouse's tooltip and read out.
+ * One step as a card: its picture, and a tick once done – its number in the day only where grown-ups chose it
+ * (`Plan.numbers`, user feedback, November 2026). No word on it – the child doesn't read (user feedback, November
+ * 2026); the word is only its name for a mouse's tooltip and read out. While it is made it has ⚙️ and 🗑️ in its top
+ * corners and − ＋ beside its stars.
  */
 function StepCard({
   day,
@@ -228,9 +231,10 @@ function StepCard({
   small?: boolean;
   /** The plan counts stars: the card keeps the room for them, also with none of its own. */
   counts?: boolean;
-  /** Being made or changed: its own number of stars set right on it (`StarStepper`). */
+  /** Being made or changed: ⚙️ and 🗑️ on it, and its own number of stars set right at them (`StarStep`). */
   edit?: boolean;
 }) {
+  const t = useT();
   const label = useStepLabel()(step);
   const key = cellKey(day, step.id);
   const stars = starsOf(step);
@@ -245,11 +249,17 @@ function StepCard({
       title={look.print ? undefined : label}
     >
       {number !== undefined && <span className="pl-number">{number}</span>}
+      {edit && <CardActions cell={key} label={label} />}
       <span className="pl-emoji" aria-hidden>
         <ItemPic item={step} lines={look.print && !look.color} />
       </span>
-      {(stars > 0 || counts) && <StarFields stars={stars} got={look.print ? 0 : got} />}
-      {edit && counts && <StarStepper cell={key} stars={stars} />}
+      {(stars > 0 || counts) && <StarFields stars={stars} got={look.print ? 0 : got} edit={edit ? { cell: key } : undefined} />}
+      {/* A plain plan's card: its first star turns the plan into one that counts. */}
+      {edit && !counts && (
+        <span className="pl-star-add" data-edit="stars" data-cell={key} data-by={1} role="button" tabIndex={0} title={t(MORE_STARS)} aria-label={t(MORE_STARS)}>
+          ＋⭐
+        </span>
+      )}
       {state === "done" && !stars && (
         <span className="pl-tick" aria-hidden>
           ✓
@@ -262,16 +272,23 @@ function StepCard({
 /** The star a plan's fields get: the Belohnungstafel's own sticker, so both kinds of chart fill alike. */
 const STAR = MARK_BY_ID.get("stern") ?? MARKS[0];
 
+/** − and ＋ at a card's stars. */
+const FEWER_STARS: Localized = { de: "Ein Stern weniger" };
+const MORE_STARS: Localized = { de: "Ein Stern mehr" };
+
 /**
  * A card's star fields along its foot, one per star of its Zähler: big dashed rings like the Belohnungstafel's fields
  * (user feedback, November 2026: the small dots of the generalised plan looked poorer than the board of before), filled
  * with its star sticker as the child taps, the newest popping in. On paper empty rings, for a sticker or a crayon.
+ * While it is made (`edit`) − and ＋ stand at the row's ends – no number: the rings show how many (user feedback,
+ * November 2026) –, and under the mouse ＋ shows the ring it would add (`ghost`) and − marks the one it would take.
  */
-function StarFields({ stars, got }: { stars: number; got: number }) {
+function StarFields({ stars, got, edit, ghost = !!edit }: { stars: number; got: number; edit?: { cell: string; every?: boolean }; ghost?: boolean }) {
   return (
-    <span className="pl-stars" style={{ "--pl-n": Math.max(1, stars) } as CSSProperties} aria-hidden>
+    <span className={`pl-stars${edit ? " pl-stars-edit" : ""}`} aria-hidden={!edit}>
+      {edit && <StarStep {...edit} by={-1} off={stars <= 0} />}
       {Array.from({ length: stars }, (_, i) => (
-        <span key={i} className={`pl-star rw-field${i < got ? " filled" : ""}${i === got - 1 ? " last" : ""}`}>
+        <span key={i} className={`pl-star rw-field${i < got ? " filled" : ""}${i === got - 1 ? " last" : ""}${i === stars - 1 ? " pl-star-end" : ""}`}>
           <span className="rw-ring">
             {i < got && (
               <span className="rw-mark">
@@ -281,49 +298,62 @@ function StarFields({ stars, got }: { stars: number; got: number }) {
           </span>
         </span>
       ))}
+      {ghost && stars < MAX_STARS && (
+        <span className="pl-star rw-field pl-star-ghost">
+          <span className="rw-ring" />
+        </span>
+      )}
+      {edit && <StarStep {...edit} by={1} off={stars >= MAX_STARS} />}
     </span>
   );
 }
 
 /**
- * While a chart is made: − ⭐ ＋ on a card, its own number of stars (user feedback, November 2026: every single task its
- * own count, right on the chart). `ChartEditor` does the change by `data-edit="stars"`.
+ * While a chart is made: − or ＋ at a card's stars, its own number of them (user feedback, November 2026: every single
+ * task its own count, right where its stars are). `ChartEditor` does the change by `data-edit="stars"`; one that can do
+ * nothing keeps its place unseen, so the other doesn't jump.
  */
-function StarStepper({ cell, stars, every = false }: { cell: string; stars: number; every?: boolean }) {
+function StarStep({ cell, by, off, every = false }: { cell: string; by: 1 | -1; off: boolean; every?: boolean }) {
   const t = useT();
-  const button = (by: number, sign: string, label: Localized, off: boolean) => (
+  const label = t(by > 0 ? MORE_STARS : FEWER_STARS);
+  return (
     <span
-      className={`pl-stepper-button${off ? " off" : ""}`}
+      className={`pl-star-step ${by > 0 ? "more" : "less"}${off ? " off" : ""}`}
       data-edit={off ? undefined : "stars"}
       data-cell={cell}
       data-by={by}
       data-every={every ? "" : undefined}
       role="button"
       tabIndex={off ? -1 : 0}
-      aria-label={t(label)}
-      aria-disabled={off}
-      title={t(label)}
+      aria-label={label}
+      aria-hidden={off}
+      title={label}
     >
-      {sign}
-    </span>
-  );
-  return (
-    <span className="pl-stepper">
-      {button(-1, "−", { de: "Ein Stern weniger" }, stars <= 0)}
-      <span className="pl-stepper-count" aria-hidden>
-        {stars}
-        <span className="pl-stepper-star">⭐</span>
-      </span>
-      {button(1, "＋", { de: "Ein Stern mehr" }, stars >= MAX_STARS)}
+      {by > 0 ? "＋" : "−"}
     </span>
   );
 }
 
+/** ⚙️ and 🗑️ in the top corners of a card while it is made – with `every` the week grid's row, every day's card alike. */
+function CardActions({ cell, label, every = false }: { cell: string; label: string; every?: boolean }) {
+  const t = useT();
+  const where = { "data-cell": cell, "data-every": every ? "" : undefined };
+  return (
+    <>
+      <SheetAction act="configure" ask={t({ de: "„{name}“ ändern" }).replace("{name}", label)} data={{ "data-edit": "card", ...where }} />
+      <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", ...where }} />
+    </>
+  );
+}
+
+/** The question beside a 🗑️ under the mouse, with the name of what it takes. */
+const DELETE_ASK: Localized = { de: "„{name}“ löschen?" };
+
 /**
  * The reward at the end of a plan that counts stars: its picture and its name – no count of stars under it (user
  * feedback, November 2026: on paper it is in the way, and the fields show the stars anyway). While the plan is made it
- * is a tap to change it, and where it has none a dashed „＋ Belohnung“ to add one – without it the stars stay, only the
- * picture goes.
+ * is a tap to change it, with ⚙️ and 🗑️ in its corners, and where it has none a dashed „＋ Belohnung“ to add one –
+ * without it the stars stay, only the picture goes.
  */
 function PlanGoal({ plan, ticks, linked, day, look, edit }: StepsProps) {
   const t = useT();
@@ -340,6 +370,7 @@ function PlanGoal({ plan, ticks, linked, day, look, edit }: StepsProps) {
   const label = rewardLabel(reward);
   return (
     <div className={`pl-goal${!look.print && count >= goal ? " reached" : ""}`} data-edit={edit ? "reward" : undefined} title={label}>
+      {edit && <RewardActions />}
       <span className="pl-goal-pic" aria-hidden>
         <ItemPic item={reward} kind="reward" lines={look.print && !look.color} />
       </span>
@@ -374,15 +405,24 @@ function NoSteps() {
 
 /**
  * A part's sign before its row: ☀️ for the morning, 🌙 for the evening – a picture, not a word („Morgens“ only read out),
- * big, as it stands for the whole row. While the plan is made the row's delete sits above it (`RowRemove`).
+ * big, as it stands for the whole row. While the plan is made a 🗑️ sits above it: with another part beside it, it takes
+ * the whole line away (`remove="row"`); on the last part only the sign, so the day becomes one line (`"sign"`, user
+ * feedback, November 2026). Under the mouse it asks („„Abends“ löschen?“) and marks red what would go.
  */
-function PartName({ part, edit = false }: { part: Slot; edit?: boolean }) {
+function PartName({ part, remove }: { part: Slot; remove?: "row" | "sign" }) {
   const t = useT();
   const slot = SLOT_BY_ID.get(part);
   if (!slot) return null;
   return (
     <span className="pl-part">
-      {edit && <RowRemove part={part} />}
+      {remove && (
+        <SheetAction
+          act="delete"
+          side="left"
+          ask={remove === "row" ? t(DELETE_ASK).replace("{name}", t(slot.label)) : t({ de: "Zeichen löschen?" })}
+          data={{ "data-edit": remove, "data-part": part }}
+        />
+      )}
       <span className="pl-part-sign" role="img" aria-label={t(slot.label)} title={t(slot.label)}>
         {slot.emoji}
       </span>
@@ -390,17 +430,21 @@ function PartName({ part, edit = false }: { part: Slot; edit?: boolean }) {
   );
 }
 
-/**
- * While a chart is made: 🗑️ that takes a whole row away – a part of the day with its cards, or a card in every day of a
- * week's grid. Under the mouse it marks the whole row it would take (user feedback, November 2026: a small ✕ stuck on
- * the sun looked odd and said nothing of what goes).
- */
-function RowRemove({ part, step }: { part?: Slot; step?: string }) {
+/** While a day in one line is made: ☀️ and 🌙, pale, to give the line a sign again – its cards become the morning's or the evening's. */
+function SignBack() {
   const t = useT();
-  const label = t({ de: "Ganze Zeile entfernen" });
   return (
-    <span className="pl-row-remove" data-edit="row" data-part={part} data-row-step={step} role="button" tabIndex={0} aria-label={label} title={label}>
-      🗑️
+    <span className="pl-part pl-sign-back">
+      {(["morning", "evening"] as Slot[]).map((id) => {
+        const slot = SLOT_BY_ID.get(id);
+        if (!slot) return null;
+        const label = t({ de: "„{name}“ davor" }).replace("{name}", t(slot.label));
+        return (
+          <span key={id} className="pl-sign-add" data-edit="sign-back" data-part={id} role="button" tabIndex={0} aria-label={label} title={label}>
+            {slot.emoji}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -474,7 +518,7 @@ function DaySteps(props: StepsProps & { aspect: number }) {
       day={day}
       step={step}
       state={states[steps.indexOf(step)]}
-      number={steps.indexOf(step) + 1}
+      number={plan.numbers ? steps.indexOf(step) + 1 : undefined}
       look={look}
       fresh={fresh}
       got={starsGot(ticks, linked, day, step)}
@@ -513,8 +557,9 @@ function DaySteps(props: StepsProps & { aspect: number }) {
                 const adding = roomIn(row, part);
                 const { cols, rows } = planLayout(row.length + (adding ? 1 : 0), (aspect * (box ? 1.5 : 1.12) * width) / cardAspect);
                 return (
-                  <div key={`${part}-${i}`} className={`pl-row${part && (named || edit) ? " pl-row-named" : ""}`}>
-                    {part && (named || edit) && <PartName part={part} edit={edit && named} />}
+                  <div key={`${part}-${i}`} className={`pl-row${(part && (named || edit)) || edit ? " pl-row-named" : ""}`}>
+                    {part && (named || edit) && <PartName part={part} remove={edit ? (named ? "row" : "sign") : undefined} />}
+                    {!part && edit && <SignBack />}
                     <ol
                       className={`pl-steps${parts.length > 1 ? " pl-line" : ""}`}
                       style={
@@ -723,8 +768,9 @@ function DayHead({ d, today, look }: { d: Date; today: Date; look: PlanLook }) {
  * A week of stars: the same cards every day (`sameCards`) with a Zähler, drawn as a reward chart always was – a row per
  * card with its picture at the start, a column per day, big star fields in each cell, today's column marked (user
  * feedback, November 2026: the week's columns of small cards looked poorer than the board of before). A cell is tapped
- * like a card (`data-step`). While it is made a row's picture opens the card for every day, ± sets its stars and 🗑️
- * takes the row out of the whole week; ＋ below adds a card to every day.
+ * like a card (`data-step`). While it is made a row's picture (or its ⚙️) opens the card for every day, − ＋ under it set
+ * its stars, marked in the row's fields under the mouse, and 🗑️ takes the row out of the whole week; ＋ below adds a
+ * card to every day.
  */
 function WeekStars(props: StepsProps) {
   const { plan, today, day, look, fresh, edit, ticks, linked } = props;
@@ -744,7 +790,7 @@ function WeekStars(props: StepsProps) {
         </span>
       ))}
       {steps.map((step) => (
-        // A row as one element for its 🗑️ to mark it whole, its cells still the grid's (display: contents).
+        // A row as one element for its 🗑️ and − ＋ to mark it whole, its cells still the grid's (display: contents).
         <div key={step.id} className="pl-wrow">
           <div
             className="pl-whead"
@@ -755,11 +801,16 @@ function WeekStars(props: StepsProps) {
             aria-label={label(step)}
             title={look.print ? undefined : label(step)}
           >
-            {edit && <RowRemove step={step.id} />}
+            {edit && <CardActions cell={cellKey(day, step.id)} label={label(step)} every />}
             <span className="pl-emoji" aria-hidden>
               <ItemPic item={step} lines={look.print && !look.color} />
             </span>
-            {edit && <StarStepper cell={cellKey(day, step.id)} stars={starsOf(step)} every />}
+            {edit && (
+              <span className="pl-whead-steps">
+                <StarStep cell={cellKey(day, step.id)} by={-1} off={starsOf(step) <= 0} every />
+                <StarStep cell={cellKey(day, step.id)} by={1} off={starsOf(step) >= MAX_STARS} every />
+              </span>
+            )}
           </div>
           {week.map((d) => {
             const own = stepsOn(plan, d).find((s) => s.id === step.id) ?? step;
@@ -774,7 +825,7 @@ function WeekStars(props: StepsProps) {
                 data-row={step.id}
                 data-tap={look.print ? undefined : tapState({ goal: state === "now", done: state === "done" })}
               >
-                <StarFields stars={starsOf(own)} got={look.print ? 0 : starsGot(ticks, linked, d, own)} />
+                <StarFields stars={starsOf(own)} got={look.print ? 0 : starsGot(ticks, linked, d, own)} ghost={edit} />
               </div>
             );
           })}

@@ -642,7 +642,9 @@
 }
 
 .pl-goal {
+  --rw-act: clamp(22px, 16cqi, 36px);
   container-type: inline-size;
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex: 0 0 17%;
@@ -736,7 +738,7 @@
   font-size: clamp(0.9rem, 4cqmin, 1.6rem);
 }
 
-/* A part's sign stands for its whole line: big, with room above it for 🗑️ while the chart is made. */
+/* A part's sign stands for its whole line: big, with its 🗑️ above it while the chart is made. */
 .pl-part {
   display: flex;
   flex-direction: column;
@@ -749,95 +751,180 @@
   line-height: 1;
 }
 
-/* 🗑️ takes the whole line away; a mouse over it marks the line it would take, before the click. */
-.pl-row-remove {
-  display: grid;
-  place-items: center;
-  width: max(30px, 1.25em);
-  height: max(30px, 1.25em);
-  border: max(2px, 0.4cqmin) solid var(--rw-ink);
-  border-radius: 50%;
-  background: #fff;
-  font-size: clamp(0.8rem, 4.5cqmin, 1.8rem);
-  cursor: pointer;
+/* The part's 🗑️ above its sign, in the flow: a whole line under the mouse turns red, or the last one's sign alone. */
+.pl-part > .rw-act {
+  --rw-act: clamp(20px, 6cqmin, 34px);
+  position: relative;
+  inset: auto;
 }
 
-.pl-row-remove:hover,
-.pl-row-remove:focus-visible {
-  border-color: #c62828;
-  background: #ffebee;
-}
-
-.pl-row:has(> .pl-part .pl-row-remove:hover),
-.pl-wrow:has(.pl-row-remove:hover) > * {
+.pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover),
+.pl-wrow:has(.pl-whead > .rw-act-delete:hover) > * {
   background: color-mix(in srgb, #e53935 14%, transparent);
   outline: max(2px, 0.5cqmin) dashed #c62828;
   outline-offset: -1px;
 }
 
-.pl-row:has(> .pl-part .pl-row-remove:hover) .pl-card,
-.pl-wrow:has(.pl-row-remove:hover) .pl-wcell .pl-stars,
-.pl-wrow:has(.pl-row-remove:hover) .pl-whead .pl-emoji {
-  opacity: 0.45;
-}
-
-.pl-row:has(> .pl-part .pl-row-remove:hover) {
+.pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover) {
   border-radius: 2cqmin;
 }
 
-/* − ⭐ ＋ on a card while it is made: its own number of stars, in its top corner. */
-.pl-stepper {
+.pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover) :is(.pl-card, .pl-part-sign),
+.pl-wrow:has(.pl-whead > .rw-act-delete:hover) :is(.pl-wcell .pl-stars, .pl-whead .pl-emoji),
+.pl-part:has(> .rw-act[data-edit="sign"]:hover) > .pl-part-sign {
+  opacity: 0.4;
+}
+
+.pl-part:has(> .rw-act[data-edit="sign"]:hover) > .pl-part-sign {
+  border-radius: 50%;
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  outline-offset: 2px;
+}
+
+/* A day in one line: ☀️ and 🌙, pale, to give it a sign again. */
+.pl-sign-back {
+  justify-content: center;
+}
+
+.pl-sign-add {
+  display: grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border: max(2px, 0.4cqmin) dashed var(--rw-ink);
+  border-radius: 50%;
+  font-size: clamp(0.9rem, 5cqmin, 2.4rem);
+  opacity: 0.4;
+  filter: grayscale(0.7);
+  cursor: pointer;
+}
+
+.pl-sign-add:hover,
+.pl-sign-add:focus-visible {
+  background: #fff;
+  opacity: 1;
+  filter: none;
+}
+
+/* While it is made a card's top right corner is its 🗑️: an example's tick says nothing about the design anyway. */
+.pl-editing .pl-tick {
+  display: none;
+}
+
+/* A card's ⚙️ and 🗑️ in its top corners, sized by the card; it comes forward while its question shows. */
+.pl-editing :is(.pl-card, .pl-whead) {
+  --rw-act: clamp(22px, 17cqmin, 38px);
+}
+
+.pl-editing .pl-card.small {
+  --rw-act: clamp(16px, 24cqmin, 26px);
+}
+
+.pl-card > .rw-act,
+.pl-whead > .rw-act {
+  top: 3cqmin;
+}
+
+.pl-card > .rw-act-left,
+.pl-whead > .rw-act-left {
+  left: 3cqmin;
+}
+
+.pl-card > .rw-act-right,
+.pl-whead > .rw-act-right {
+  right: 3cqmin;
+}
+
+.pl-editing :is(.pl-card, .pl-whead, .pl-goal, .pl-part):has(.rw-act:hover, .rw-act:focus-visible) {
+  z-index: 4;
+}
+
+/*
+ * − and ＋ at the ends of a card's stars while it is made: no number, the rings show how many. Under the mouse ＋ shows
+ * the ring it would add (pale) and − fades the one it would take.
+ */
+.pl-star-step {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: center;
+  box-sizing: border-box;
+  width: max(20px, 17cqmin);
+  height: max(20px, 17cqmin);
+  border: max(2px, 1cqmin) solid var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink);
+  font-size: max(13px, 11cqmin);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pl-star-step:hover,
+.pl-star-step:focus-visible {
+  background: var(--rw-main);
+}
+
+.pl-star-step.off {
+  visibility: hidden;
+}
+
+/* Two classes: `.rw-field` (rewards.css, loaded after this file on the dev server) shows it otherwise. */
+.pl-star.pl-star-ghost {
+  display: none;
+  opacity: 0.55;
+}
+
+.pl-stars:has(> .pl-star-step.more:hover) > .pl-star.pl-star-ghost,
+.pl-wrow:has(.pl-star-step.more:hover) .pl-star.pl-star-ghost {
+  display: grid;
+}
+
+.pl-stars:has(> .pl-star-step.less:hover) > .pl-star-end,
+.pl-wrow:has(.pl-star-step.less:hover) .pl-wcell .pl-star-end {
+  opacity: 0.25;
+}
+
+/* The week grid's row: − bottom left and ＋ bottom right of its picture, its stars along the row. */
+.pl-whead-steps {
   position: absolute;
-  z-index: 2;
-  top: 2cqmin;
-  right: 2cqmin;
+  right: 3cqmin;
+  bottom: 3cqmin;
+  left: 3cqmin;
   display: flex;
-  align-items: center;
-  gap: 0.15em;
-  padding: 0.1em;
-  border: max(1.5px, 1cqmin) solid var(--rw-ink);
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.pl-whead-steps > .pl-star-step {
+  width: max(18px, 22cqmin);
+  height: max(18px, 22cqmin);
+  font-size: max(12px, 15cqmin);
+  pointer-events: auto;
+}
+
+/* A plain plan's card: ＋⭐ at its foot, its first star turning the plan into one that counts. */
+.pl-star-add {
+  position: absolute;
+  bottom: 3cqmin;
+  left: 50%;
+  padding: 0.1em 0.6em;
+  border: max(2px, 0.8cqmin) dashed var(--rw-ink);
   border-radius: 999px;
   background: #fff;
   font-size: max(12px, 9cqmin);
   font-weight: 800;
-  line-height: 1;
-  box-shadow: 0 0.15em 0 color-mix(in srgb, var(--rw-ink) 35%, transparent);
-}
-
-.pl-stepper-button {
-  display: grid;
-  place-items: center;
-  width: 1.4em;
-  height: 1.4em;
-  border-radius: 50%;
-  background: var(--rw-main);
+  white-space: nowrap;
+  opacity: 0.6;
+  translate: -50% 0;
   cursor: pointer;
 }
 
-.pl-stepper-button:hover {
-  background: color-mix(in srgb, var(--rw-main) 60%, var(--rw-ink));
-  color: #fff;
-}
-
-.pl-stepper-button.off {
-  visibility: hidden;
-}
-
-.pl-stepper-count {
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.pl-stepper-star {
-  font-family: var(--font-emoji);
-  font-size: 0.8em;
-}
-
-.pl-card.small .pl-stepper {
-  top: -1cqmin;
-  right: -1cqmin;
-  font-size: max(11px, 14cqmin);
+.pl-star-add:hover,
+.pl-star-add:focus-visible {
+  background: var(--rw-main);
+  opacity: 1;
 }
 
 .pl-part-back {
@@ -910,20 +997,6 @@
 .pl-whead > .pl-emoji .rw-pic {
   width: 1.3em;
   height: 1.3em;
-}
-
-.pl-whead > .pl-row-remove {
-  position: absolute;
-  top: 50%;
-  left: 3cqmin;
-  translate: 0 -50%;
-}
-
-.pl-whead > .pl-stepper {
-  top: auto;
-  right: 3cqmin;
-  bottom: 3cqmin;
-  font-size: max(11px, 12cqmin);
 }
 
 .pl-editing .pl-whead {

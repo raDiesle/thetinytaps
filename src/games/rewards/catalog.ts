@@ -838,56 +838,6 @@ const MORNING_AND_EVENING: PlanTemplatePart[] = [
   { slot: "evening", steps: ["zaehne", "vorlesen", "schlafen"] },
 ];
 
-/** A card a Jetzt – Dann plan takes from its pool: its catalogue id, how soon it comes (1 first) and its time of day. */
-export interface DayCard {
-  id: string;
-  /** Which cards a plan of few takes: those of the lowest rank, kept in the day's order. */
-  rank: number;
-  /** The time of day of a linked card in a day without parts: the morning's and the evening's brushing. */
-  slot?: Slot;
-}
-
-/**
- * What the first step of the wizard fills a Jetzt – Dann plan with, by how many cards are asked for: the morning's and
- * the evening's for a day in two parts (three each make „Mein Tag“, six cards on one page), the whole day for one without parts (seven make
- * the day with Kita). Each list is in the day's order.
- */
-export const DAY_CARDS: Record<"morning" | "evening" | "whole", DayCard[]> = {
-  morning: [
-    { id: "aufstehen", rank: 5 },
-    { id: "anziehen", rank: 1 },
-    { id: "fruehstueck", rank: 2 },
-    { id: "zaehne", rank: 3 },
-    { id: "haare", rank: 7 },
-    { id: "jacke", rank: 6 },
-    { id: "schuhe", rank: 4 },
-  ],
-  evening: [
-    { id: "abendessen", rank: 5 },
-    { id: "aufraeumen", rank: 6 },
-    { id: "baden", rank: 4 },
-    { id: "zaehne", rank: 1 },
-    { id: "vorlesen", rank: 3 },
-    // The bed comes early: the evening ends with it, and the row of a Jetzt – Dann gets shorter until only the bed is left.
-    { id: "schlafen", rank: 2 },
-  ],
-  whole: [
-    { id: "aufstehen", rank: 13 },
-    { id: "anziehen", rank: 9 },
-    { id: "fruehstueck", rank: 1 },
-    { id: "zaehne", rank: 11, slot: "morning" },
-    { id: "kita", rank: 2 },
-    { id: "mittagessen", rank: 3 },
-    { id: "mittagsschlaf", rank: 4 },
-    { id: "spielplatz", rank: 5 },
-    { id: "abendessen", rank: 6 },
-    { id: "baden", rank: 12 },
-    { id: "zaehne", rank: 8, slot: "evening" },
-    { id: "vorlesen", rank: 10 },
-    { id: "schlafen", rank: 7 },
-  ],
-};
-
 /** The gallery of the Zeitplan in the order of its views; the first is the plan whose pictures the wizard shows first. */
 export const PLAN_TEMPLATES: PlanTemplate[] = [
   {

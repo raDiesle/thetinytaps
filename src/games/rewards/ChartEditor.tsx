@@ -30,7 +30,6 @@ import {
   PLAN_VIEWS,
   type PlanView,
   REWARDS,
-  SLOT_BY_ID,
   type Slot,
   TASKS,
   TEMPLATES,
@@ -44,25 +43,19 @@ import {
   allStars,
   counterOf,
   counting,
-  DAY_PARTS,
-  DAY_SHAPES,
   defaultReward,
   exampleTicks,
   MAX_STARS,
   type Plan,
   type PlanStep,
-  partFloor,
-  partRoom,
   planFromTemplate,
   planGoal,
-  shapeOf,
   starsOf,
   stepFromCatalog,
   stepLimit,
   stepsOn,
   withCounter,
   withSame,
-  withShape,
   withEveryDay,
   withStepStars,
   withSteps,
@@ -151,12 +144,6 @@ type Editing =
   | { what: "task"; id: string }
   | { what: "add-task" };
 
-/** „Belohnung“: the one switch for the whole chart. */
-const REWARD: Localized = { de: "Belohnung" };
-/** „Zähler“: how many stars each card gets a day; 0 is a plain plan with the paper arrow. */
-const COUNTER: Localized = { de: "Zähler" };
-/** „Anzahl Karten“: the cards of each part of the day. */
-const HOW_MANY: Localized = { de: "Anzahl Karten" };
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum" };
 
@@ -224,13 +211,14 @@ function useDraftHistory(draft: Draft, onChange: (draft: Draft) => void) {
 
 /**
  * A chart as it will look, changed right on it – the same in the wizard and under „Gestalten“ (user decision,
- * November 2026: „exakt gleiche Seite für Assistent und Seite“). On top a row of quiet, compact options: the Zeitraum
- * (in the wizard any span, a new chart from its Vorlage; on the page only views of the same kind, its cards kept), the
- * Zähler (stars a card, 0 the plain plan with the paper arrow), one „Belohnung“ switch for the whole chart, the day's
- * shape and number of cards, what moves where nothing counts, the colours and the child's name. Below the sheet
- * itself in edit mode: a tap on a card swaps it, sets its stars for a day, moves or removes it; ＋ adds one; ✕ takes a
- * line of the day away; the reward is swapped, removed (the stars stay) or its goal set. `more` holds the rest
- * („Weitere Einstellungen“: own words, own emoji, weekdays).
+ * November 2026: „exakt gleiche Seite für Assistent und Seite“). On top only what the sheet has no place to tap for:
+ * the Zeitraum (in the wizard any span, a new chart from its Vorlage; on the page only views of the same kind, its
+ * cards kept), what moves where nothing counts, the colours and the child's name – what a tap on the sheet changes
+ * (stars, reward, cards, the day's parts) is never there twice (user feedback, November 2026). Below, the sheet itself
+ * in edit mode: each card and the reward have ⚙️ and 🗑️ in their corners (`SheetAction`), a card − ＋ at its stars; a
+ * tap on a card swaps it, sets its stars for a day, moves or removes it; ＋ adds one; a part's sign takes its line
+ * away (the last one only its sign, which ☀️ / 🌙 bring back); the reward is swapped, removed (the stars stay) or its
+ * goal set. `more` holds the rest („Weitere Einstellungen“: own words, own emoji, weekdays).
  */
 export function ChartEditor({
   draft,
@@ -260,6 +248,9 @@ export function ChartEditor({
   const [editing, setEditing] = useState<Editing | null>(null);
   const today = new Date();
   const { canUndo, canRedo, back, forward } = useDraftHistory(draft, onChange);
+  const setReward = (next: BoardReward | null) =>
+    onChange(draft.type === "board" ? { type: "board", board: { ...draft.board, reward: next } } : { type: "plan", plan: { ...draft.plan, reward: next } });
+  const setPlan = (next: Plan) => onChange({ type: "plan", plan: next });
 
   useEffect(() => {
     const el = box.current;
@@ -272,28 +263,30 @@ export function ChartEditor({
   const onClick = (event: React.MouseEvent) => {
     const el = (event.target as Element).closest<HTMLElement>("[data-edit], [data-step]");
     if (!el) return;
-    const { edit, part, day: dayId, task, step, cell, by, every, rowStep } = el.dataset;
+    const { edit, part, day: dayId, task, step, cell, by, every } = el.dataset;
     const all = every !== undefined;
+    // The day's cards changed, as a part's sign or line does: the day shown, or every day where they are alike.
+    const dayChanged = (plan: Plan, edit: (steps: PlanStep[]) => PlanStep[]) => withSteps(plan, weekday(day), edit(stepsOn(plan, day)));
     if (draft.type === "plan" && edit === "stars" && cell) {
-      // ± on a card: its own stars, on every day where the days are alike or in a week's grid, else that weekday's.
+      // − ＋ at a card's stars: its own, on every day where the days are alike or in a week's grid, else that weekday's.
       const plan = draft.plan;
       const { day: cellDay, taskId } = parseCellKey(cell);
       const own = stepsOn(plan, cellDay).find((s) => s.id === taskId);
       if (!own) return;
       const n = Math.max(0, Math.min(MAX_STARS, starsOf(own) + Number(by)));
-      onChange({ type: "plan", plan: withStepStars(plan, all || (plan.same && plan.view !== "week") ? null : weekday(cellDay), taskId, n) });
-    } else if (draft.type === "plan" && edit === "row" && rowStep) {
-      onChange({ type: "plan", plan: withEveryDay(draft.plan, (steps) => steps.filter((s) => s.id !== rowStep)) });
-    } else if (draft.type === "plan" && edit === "row" && part) {
-      const plan = draft.plan;
-      onChange({
-        type: "plan",
-        plan: withSteps(
-          plan,
-          weekday(day),
-          stepsOn(plan, day).filter((s) => s.part !== part),
-        ),
-      });
+      const next = withStepStars(plan, all || (plan.same && plan.view !== "week") ? null : weekday(cellDay), taskId, n);
+      // A plain plan's first star makes it count; one that never had a reward gets the default (Belohnung is on by default).
+      setPlan(!counting(plan) && plan.reward === undefined ? { ...next, reward: defaultReward() } : next);
+    } else if (draft.type === "plan" && edit === "card" && cell) setEditing({ what: "card", key: cell, every: all });
+    else if (draft.type === "plan" && edit === "delete-card" && cell) setPlan(withoutCard(draft.plan, cell, all));
+    else if (edit === "no-reward") setReward(null);
+    else if (draft.type === "plan" && edit === "row" && part) {
+      setPlan(dayChanged(draft.plan, (steps) => steps.filter((s) => s.part !== part)));
+    } else if (draft.type === "plan" && edit === "sign") {
+      // The last part's sun or moon taken off: its cards stay, as a day in one.
+      setPlan(dayChanged(draft.plan, (steps) => steps.map(({ part: _, ...s }) => s)));
+    } else if (draft.type === "plan" && edit === "sign-back" && part) {
+      setPlan(dayChanged(draft.plan, (steps) => steps.map((s) => ({ ...s, part: part as Slot }))));
     } else if (edit === "add")
       setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId, every: all });
     else if (edit === "reward") setEditing({ what: "reward" });
@@ -313,16 +306,8 @@ export function ChartEditor({
     else onChange({ type: "board", board: withKind(draft.board, span.id as BoardKind) });
   };
 
-  const reward = rewardOf(draft);
   const plan = draft.type === "plan" ? draft.plan : undefined;
   const counts = plan ? counting(plan) : true;
-  const setReward = (next: BoardReward | null) =>
-    onChange(draft.type === "board" ? { type: "board", board: { ...draft.board, reward: next } } : { type: "plan", plan: { ...draft.plan, reward: next } });
-  const setPlan = (next: Plan) => onChange({ type: "plan", plan: next });
-  /** A new Zähler for every card; from 0 up, a plan that never had a reward gets the default one (Belohnung is on by default). */
-  const setCounter = (stars: number) =>
-    plan && setPlan({ ...withCounter(plan, stars), reward: plan.reward === undefined && stars > 0 ? defaultReward() : plan.reward });
-  const shape = plan ? shapeOf(stepsOn(plan, day)) : undefined;
   const ticks = draft.type === "plan" ? log?.[draft.plan.id] : log?.[draft.board.id];
 
   return (
@@ -355,49 +340,6 @@ export function ChartEditor({
           </p>
         )}
         <div className="rw-options">
-          {plan && <Counter emoji="⭐" label={t(COUNTER)} value={counterOf(plan)} min={0} max={MAX_STARS} onChange={setCounter} />}
-          {counts && (
-            <button
-              type="button"
-              role="switch"
-              aria-checked={!!reward}
-              className="rw-reward-switch"
-              onClick={() => setReward(reward ? null : draft.type === "board" ? rewardFromCatalog(REWARDS[0].id) : defaultReward())}
-            >
-              <span aria-hidden>🎁</span> {t(REWARD)}
-              <span className="rw-switch-track" aria-hidden />
-            </button>
-          )}
-          {plan?.view === "day" && shape && (
-            <>
-              <Segments
-                label={t({ de: "Tag aufteilen?" })}
-                items={[
-                  { id: "split", label: `☀️🌙 ${t({ de: "Morgens und abends" })}` },
-                  { id: "whole", label: `🌈 ${t({ de: "Am Stück" })}` },
-                ]}
-                selected={shape.split ? "split" : "whole"}
-                onPick={(id) => setPlan(withShape(plan, id === "split" ? DAY_SHAPES.split : DAY_SHAPES.whole))}
-              />
-              <span className="rw-opt-group" role="group" aria-label={t(HOW_MANY)}>
-                <span className="rw-opt-name">{t(HOW_MANY)}</span>
-                {shape.counts.map((count, i) => {
-                  const slot = shape.split ? SLOT_BY_ID.get(DAY_PARTS[i]) : undefined;
-                  return (
-                    <Counter
-                      key={slot?.id ?? "whole"}
-                      emoji={slot?.emoji}
-                      label={slot ? t(slot.label) : t(HOW_MANY)}
-                      value={count}
-                      min={partFloor(shape, i)}
-                      max={partRoom(shape, i)}
-                      onChange={(n) => setPlan(withShape(plan, { ...shape, counts: shape.counts.map((c, j) => (j === i ? n : c)) }))}
-                    />
-                  );
-                })}
-              </span>
-            </>
-          )}
           {/* Only where nothing counts: with star fields the stars show what is done, and nothing moves. */}
           {plan?.view === "day" && !counts && (
             <span className="rw-opt-segments" role="group" aria-label={t({ de: "Was wandert?" })}>
@@ -668,6 +610,13 @@ function EditDialog({ title, onClose, children }: { title: ReactNode; onClose: (
       {children}
     </dialog>
   );
+}
+
+/** A card taken off by its 🗑️: from the day it is on, or with `every` (a week's grid) from every day. */
+function withoutCard(plan: Plan, cell: string, every: boolean): Plan {
+  const { day, taskId } = parseCellKey(cell);
+  const drop = (list: PlanStep[]) => list.filter((s) => s.id !== taskId);
+  return every ? withEveryDay(plan, drop) : withDay(plan, day, drop(stepsOn(plan, day)));
 }
 
 /** A day's cards changed: in a week whose days are alike, only the day tapped (its column) changes. */
