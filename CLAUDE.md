@@ -42,7 +42,7 @@ In a fresh worktree run `bun install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `bun run verify`, commit on the branch, merge into **local** `main` without asking,
-  never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
+  never push (and don't offer to – pushing is the user's move). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
