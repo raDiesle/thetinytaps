@@ -57,7 +57,7 @@ export function AdventureGame() {
         story={story}
         language={language}
         settings={common}
-        next={{ emoji: next.emoji, name: storyTitle(next.story, app.id), onNext: () => update({ story: next.id }) }}
+        next={{ name: storyTitle(next.story, app.id), onNext: () => update({ story: next.id }) }}
       />
     </GameShell>
   );

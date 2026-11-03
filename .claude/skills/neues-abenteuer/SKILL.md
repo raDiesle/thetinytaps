@@ -223,7 +223,7 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    and does it stand out, does the obstacle react, does the scenery change when
    solved, is nothing cut off at the screen edges, does nothing hide behind bag and button? Climb takes
    one press; the child walks to each obstacle by itself. At the
-   end the goal comes back, confetti, and the cards (1–4) include the new level.
+   end the goal comes back, hearts, stars and notes rising, and the cards (1–4) include the new level.
    `document.getAnimations()` is empty right after load; the console has no errors.
 3. Play „Der Drachen“ once too if `TrailPlay.tsx`, `items.tsx` or `trail.css`
    shared parts changed.

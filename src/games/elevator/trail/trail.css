@@ -27,8 +27,7 @@
 .tl-carry,
 .tl-string,
 .tl-goal,
-.tl-play .el-tap,
-.tl-play .el-confetti {
+.tl-play .el-tap {
   pointer-events: none;
 }
 

@@ -163,7 +163,7 @@ field carries its sun or moon on its edge, filled or not, on screen and on paper
 
 The child taps an open field and its star pops in with a sound – one tap is enough (user decision, November 2026: the
 grown-up's hold and the big star to send off are gone). A filled field twinkles, a field of a later day wiggles. On a collecting board any open field fills the next
-one. A full day gets small bursts, the goal a party (and speech, if Vorlesen is on). „Stern zurück“ shows for
+one. A full day gets a few hearts, stars and notes rising from it, the goal a party (and speech, if Vorlesen is on). „Stern zurück“ shows for
 `UNDO_MS` after a star, for a wrong tap.
 
 ## Printing

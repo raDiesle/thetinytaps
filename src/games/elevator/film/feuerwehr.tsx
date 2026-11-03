@@ -20,7 +20,7 @@ import { playWash } from "@/lib/realSounds";
 import { FIRE_STRIPE, FireHelmet, Kid, type Look, type Pose, useHero } from "../kid";
 import { Mug } from "../things";
 import type { Picture } from "../trail/items";
-import type { Point } from "../trail/types";
+import type { Cue, Point } from "../trail/types";
 import { Go, route } from "./move";
 import { CREW, DRIVER, Grownup, NEIGHBOUR, RESIDENT } from "./people";
 import {
@@ -154,6 +154,22 @@ const PARTY_ICON = pic(260, 220, () => <Cake lit />);
 
 /** The pictures of the three jobs. */
 const JOB_ICON: Record<Job, Picture> = { katze: CAT_ICON, feuer: FIRE_ICON, auto: CAR_ICON };
+
+/** A part of the town, `[left, top, width, height]`, as a picture for a choice's card. */
+const townPart = ([x, y, w, h]: [number, number, number, number]): Picture =>
+  pic(w, h, () => (
+    <g transform={`translate(${-(x + w / 2)} ${-(y + h)})`}>
+      <TownDraw />
+    </g>
+  ));
+/** The three troubles as the child saw them in the town, close up, for the cards of both choices. */
+const JOB_CARD: Record<Job, Picture> = {
+  katze: townPart([20, 270, 330, 240]),
+  feuer: townPart([560, 300, 480, 350]),
+  auto: townPart([1170, 690, 400, 292]),
+};
+/** What is heard as a job's card comes out. */
+const JOB_SOUND: Record<Job, Cue[]> = { katze: [[0, playMeow]], feuer: [[0, playCrackle]], auto: [[0, playHonk]] };
 /** What is said when the child picks a job. */
 const JOB_SAY: Record<Job, string> = {
   katze: "Die Katze sitzt im Baum fest!",
@@ -233,9 +249,9 @@ const town: Scene = {
   choice: {
     ask: "Wer braucht heute die Feuerwehr?",
     options: [
-      { id: "katze", picture: CAT_ICON, at: [300, 470], r: 230, say: JOB_SAY.katze },
-      { id: "feuer", picture: FIRE_ICON, at: [800, 560], r: 220, say: JOB_SAY.feuer },
-      { id: "auto", picture: CAR_ICON, at: [1420, 800], r: 135, say: JOB_SAY.auto },
+      { id: "katze", picture: CAT_ICON, card: JOB_CARD.katze, sounds: JOB_SOUND.katze, at: [300, 470], r: 230, say: JOB_SAY.katze },
+      { id: "feuer", picture: FIRE_ICON, card: JOB_CARD.feuer, sounds: JOB_SOUND.feuer, at: [800, 560], r: 220, say: JOB_SAY.feuer },
+      { id: "auto", picture: CAR_ICON, card: JOB_CARD.auto, sounds: JOB_SOUND.auto, at: [1420, 800], r: 135, say: JOB_SAY.auto },
     ],
   },
 };
@@ -1091,7 +1107,16 @@ function radioScene(first: Job): Scene {
     choice: {
       ask: "Wohin fahren wir jetzt?",
       options: others.map(
-        (job, i): Option => ({ id: job, picture: JOB_ICON[job], at: [bx + 290 + i * 230, by + bh / 2], r: 100, sign: true, say: JOB_SAY[job] }),
+        (job, i): Option => ({
+          id: job,
+          picture: JOB_ICON[job],
+          card: JOB_CARD[job],
+          sounds: JOB_SOUND[job],
+          at: [bx + 290 + i * 230, by + bh / 2],
+          r: 100,
+          sign: true,
+          say: JOB_SAY[job],
+        }),
       ),
     },
   };
@@ -1269,7 +1294,6 @@ const home: Scene = {
 export const FEUERWEHR: Film = {
   id: "feuerwehr",
   title: "Die Feuerwehr",
-  picture: TRUCK_ICON,
   end: "Was für ein Tag! Alle sind froh.",
   scenes: (picks) => {
     const [first, second] = picks as Job[];
