@@ -26,7 +26,7 @@ export function downloadMusic() {
 
 /**
  * Called once at start-up: if music is on, the song is there by the time a game starts.
- * Only after the page has loaded, so the song (a few MB) doesn't hold up the menu,
+ * Only after the page has loaded, so the song (over a MB) doesn't hold up the menu,
  * and not when the visitor saves data. A game started before that asks for it itself (downloadMusic).
  */
 export function downloadMusicIfOn() {
