@@ -20,7 +20,8 @@ only hops back, and the one it belongs to peeks up over its plate for a moment (
 
 Files: `pairs.tsx` holds the pairs, their drawings and sentences (`PAIRS`, `TOGETHER_TEXTS`); `PairPicture.tsx` draws one
 above in its 200 × 200 box; `TogetherPlay.tsx` is one round, `TogetherRounds.tsx` the turns, the step and the decks
-(`useDeck`, so a thing comes again only after all of its kind); `together.css` all of the moving.
+(`useDeck`, so a thing comes again only after all of its kind); `together.css` all of the moving; `names.ts` the game's name and blurb, also for its card in `games.ts` (there while the
+game is German only, see Languages).
 
 **Difficulty** (`TOGETHER_LEVELS`, `dealRound` in `levels.ts`): 2, 3, 3, 4, 4 things to choose from, with the step rule
 of Schatten finden (`nextLevel`). Every visit begins on the first step; `?level=N` starts on step N while developing.

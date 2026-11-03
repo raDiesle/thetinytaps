@@ -1,3 +1,4 @@
+import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
 export interface Game {
@@ -346,8 +347,8 @@ export const CATEGORIES: Category[] = [
       {
         href: "/zusammen/",
         emoji: "🔑",
-        title: { de: "Was gehört zusammen?" },
-        blurb: { de: "Alltagsdinge, Helfer und ihr Werkzeug" },
+        title: TOGETHER_TITLE,
+        blurb: TOGETHER_BLURB,
       },
       {
         href: "/schatten/",

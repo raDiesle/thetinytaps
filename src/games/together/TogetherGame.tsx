@@ -3,14 +3,12 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
+import { TOGETHER_TITLE } from "./names";
 import { KIND_ORDER, type RoundKind } from "./levels";
 import { DEFAULT_TOGETHER_SETTINGS, type Difficulty, TOGETHER_SETTINGS_KEY } from "./settings";
 import { TogetherRounds } from "./TogetherRounds";
 import { KIND_SIGNS } from "./TopicBubble";
 import "./together.css";
-
-/** The game's name, in its book and in the browser tab. */
-export const TOGETHER_TITLE: Localized = { de: "Was gehört zusammen?" };
 
 /** The names of the two kinds of rounds, for switching them on and off (after their sign, `KIND_SIGNS`). */
 const KIND_NAMES: Record<RoundKind, Localized> = {
