@@ -5,7 +5,7 @@ import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
 import { SeoText } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
-import { categoryHref, categoryOf, pagesBetween } from "@/content/games";
+import { categoryHref, categoryOf, isUnfinished, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
@@ -113,13 +113,17 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   const returnTo = routineReturn(location.state);
   // Neither a routine's step nor a tool counts as play, nor stops when play time is over.
   const free = !!returnTo || !!tool;
-  const category = categoryOf(location.pathname);
-  const back = backHref ?? (category ? categoryHref(category) : "/");
+  // A game still being built is opened from the management page only, so its way back leads there.
+  const unfinished = isUnfinished(location.pathname);
+  const category = unfinished ? undefined : categoryOf(location.pathname);
+  const back = backHref ?? (unfinished ? "/management/" : category ? categoryHref(category) : "/");
   const backText =
     backLabel ??
-    (category
-      ? t(category.title)
-      : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
+    (unfinished
+      ? "Management"
+      : category
+        ? t(category.title)
+        : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const menu = menuAfterPlay({ startMode, leaveTo }, back);
   const [playing, setPlaying] = useState(false);
   // The settings panel below the top row: folded away by default, so the start screen stays short.

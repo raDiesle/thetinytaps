@@ -14,6 +14,11 @@ export interface Game {
    * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
+  /**
+   * Still being built: it stands neither on the shelf nor in its book and is in no search result or sitemap; only the
+   * management page links to it, and its way back leads there (user decision, November 2026). Drop the mark to publish it.
+   */
+  unfinished?: true;
 }
 
 /** One of a game's books in its slipcase on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
@@ -123,18 +128,21 @@ export const CATEGORIES: Category[] = [
       },
       {
         href: "/timer/",
+        unfinished: true,
         emoji: "⏳",
         title: { de: "Timer" },
         blurb: { de: "Warten in Bildern: Zug, Sanduhr, Kerze" },
       },
       {
         href: "/schnullerfee/",
+        unfinished: true,
         emoji: "🧚",
         title: { de: "Die Schnullerfee" },
         blurb: { de: "Abschied vom Schnuller als Geschichte" },
       },
       {
         href: "/abstillen/",
+        unfinished: true,
         emoji: "🤱",
         title: { de: "Abstillen" },
         blurb: { de: "Tschüss, Mama-Milch – eine Geschichte" },
@@ -370,10 +378,16 @@ export const CATEGORIES: Category[] = [
  * A book of one game has no page of its own: it opens straight on its game, a menu with a single card would only be one
  * tap more. Nor has a category whose games stand apart, each a book of its own.
  */
-export const hasPage = (category: Category) => !category.apart && category.games.length > 1;
+export const hasPage = (category: Category) => !category.apart && listedGames(category).length > 1;
+
+/** A category's games a child finds on the shelf or in its book: all but those still being built (`Game.unfinished`). */
+export const listedGames = (category: Category) => category.games.filter((game) => !game.unfinished);
+
+/** The games still being built (`Game.unfinished`), linked only from the management page. */
+export const UNFINISHED: Game[] = CATEGORIES.flatMap((category) => category.games.filter((game) => game.unfinished));
 
 /** Where the category's book on the shelf leads: its page, or its only game; the shelf for one whose games stand apart. */
-export const categoryHref = (category: Category) => (category.apart ? "/" : hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+export const categoryHref = (category: Category) => (category.apart ? "/" : hasPage(category) ? `/spiele/${category.id}/` : listedGames(category)[0].href);
 
 /** A book on the shelf: a category's, or a game's that stands apart (`Category.apart`), standing with its spine out. */
 export interface ShelfEntry {
@@ -391,7 +405,7 @@ export const bookIdOf = (href: string) => href.replaceAll("/", "");
 /** The books on the shelf, in order: one per category, or, for a category whose games stand apart, one per game. */
 export const SHELF: ShelfEntry[] = CATEGORIES.flatMap((category) =>
   category.apart
-    ? category.games.map((game) => ({ id: bookIdOf(game.href), href: game.href, category, game }))
+    ? listedGames(category).map((game) => ({ id: bookIdOf(game.href), href: game.href, category, game }))
     : [{ id: category.id, href: categoryHref(category), category }],
 );
 
@@ -399,6 +413,9 @@ export const SHELF: ShelfEntry[] = CATEGORIES.flatMap((category) =>
 const isGamePage = (game: Game, path: string) => [game.href, ...(game.also ?? [])].some((href) => path.startsWith(href));
 
 const withSlash = (pathname: string) => (pathname.endsWith("/") ? pathname : `${pathname}/`);
+
+/** Whether a page belongs to a game still being built (`Game.unfinished`). */
+export const isUnfinished = (pathname: string) => UNFINISHED.some((game) => isGamePage(game, withSlash(pathname)));
 
 /** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {
@@ -417,7 +434,7 @@ export function bookPage(pathname: string): { book: string; page: number } | und
   const path = withSlash(pathname);
   for (const c of CATEGORIES.filter(hasPage)) {
     if (path === categoryHref(c)) return { book: c.id, page: 0 };
-    const index = c.games.findIndex((g) => g.href === path);
+    const index = listedGames(c).findIndex((g) => g.href === path);
     if (index >= 0) return { book: c.id, page: gamePage(index) };
   }
 }

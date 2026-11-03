@@ -6,6 +6,7 @@
 // German pages have the plain address (/zaehne/); every other language of SEO_LANGUAGES
 // has the same pages under its prefix (/en/zaehne/), its texts in seo.<id>.ts by German address.
 // No `@/` imports here: tools/build.ts reads this file too.
+import { isUnfinished } from "./games";
 // The texts are what parents search for (see the research on /management/).
 // No <meta name="keywords">: Google has ignored it since 2009 and Bing reads it as a hint of spam; the
 // words parents search for belong in title, description and text instead.
@@ -76,8 +77,8 @@ const scene = (id: string, title: string, things: string): PageSeo => ({
   text: `Ein lebendiges Wimmelbild: ${things} – jedes Antippen bringt etwas zum Leben, mit Geräusch und Bewegung. Dazu Suchen, Ausmalen und freies Entdecken.`,
 });
 
-/** Every page that should be found: home, categories, games, scenes. */
-export const SEO_PAGES: PageSeo[] = [
+/** The texts of every page: home, categories, games, scenes – also of games still being built, ready for when they are out. */
+export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/",
     title: "Spiele für Kleinkinder – kostenlos, ohne Werbung",
@@ -229,8 +230,20 @@ export const SEO_PAGES: PageSeo[] = [
   scene("ostern", "Ostern", "Osterhase, Lämmchen und Kirschbaum"),
 ];
 
-/** Addresses that must never be in a search result (for grown-ups only; the Impressum names a private address). */
-export const NO_INDEX_PATHS = ["/management/", "/ideen/", "/impressum/", "/datenschutz/"];
+/** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */
+export const SEO_PAGES: PageSeo[] = SEO_TEXTS.filter((page) => !isUnfinished(page.path));
+
+/**
+ * Addresses that must never be in a search result: the pages for grown-ups only (the Impressum names a private
+ * address) and the games still being built.
+ */
+export const NO_INDEX_PATHS = [
+  "/management/",
+  "/ideen/",
+  "/impressum/",
+  "/datenschutz/",
+  ...SEO_TEXTS.filter((page) => isUnfinished(page.path)).map((page) => page.path),
+];
 
 /** The entry for an address (with or without the trailing slash), if it has one. */
 export function seoFor(pathname: string): PageSeo | undefined {

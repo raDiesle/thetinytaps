@@ -1,9 +1,9 @@
 # Die Schnullerfee
 
-Route `/schnullerfee/` · idea H-11 (Alltagshelfer, a book of its own on the shelf).
+Route `/schnullerfee/` · idea H-11 (Alltagshelfer, a book of its own on the shelf once it is finished). While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
 
 A story without words for the evening before the pacifiers go, played by the child with a grown-up beside it. It
-plays at once (`startMode`), with no start screen; ✕ and „Menü“ go back to the shelf. One room, Tapsi's bedroom, from
+plays at once (`startMode`), with no start screen; ✕ and „Menü“ go back to the page before it. One room, Tapsi's bedroom, from
 evening to morning (`PacifierPlay.tsx`), one thing to tap per step, glowing, with a still pointing hand before its first
 tap (`goalSpot`); every key does what the step waits for (`act`), a tap on anything else sparkles with a soft note:
 1. `collect` – three pacifiers lie on the bed, the floor and the windowsill; each tapped one flies into the box beside

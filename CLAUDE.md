@@ -544,6 +544,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it; on a
   picture book's cover it lies low, as far from the picture as the title (it once touched the picture, user feedback,
   November 2026).
+- A game still being built is marked `unfinished: true` in `CATEGORIES` (user decision, November 2026): it stands
+  neither on the shelf nor in its book, its page carries `noindex` and stays out of the sitemap (its texts wait in
+  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ and „Menü“ lead back. Its
+  rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
+  entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
 - The app is called „Books for Both“ and lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com

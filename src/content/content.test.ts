@@ -1,10 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, SHELF, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
+import { CATEGORIES, SHELF, UNFINISHED, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
 import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
-import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SITE_NAME, SITE_PROMISE, fullTitle, splitLanguage } from "./seo";
+import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SEO_TEXTS, SITE_NAME, SITE_PROMISE, fullTitle, splitLanguage } from "./seo";
 import { SEO_EN } from "./seo.en";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
@@ -102,7 +102,7 @@ describe("ideas", () => {
 });
 
 describe("search engine texts (seo.ts)", () => {
-  const paths = SEO_PAGES.map((page) => page.path);
+  const paths = SEO_TEXTS.map((page) => page.path);
 
   test("every page of the menu and every scene has one, and nothing else", () => {
     const wanted = [
@@ -114,7 +114,7 @@ describe("search engine texts (seo.ts)", () => {
     expect([...paths].sort()).toEqual([...new Set(wanted)].sort());
   });
 
-  test.each(SEO_PAGES.map((page) => [page.path, page] as const))("%s: title and description fit in a search result", (_, page) => {
+  test.each(SEO_TEXTS.map((page) => [page.path, page] as const))("%s: title and description fit in a search result", (_, page) => {
     expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(70);
     expect(page.description.length, page.description).toBeGreaterThanOrEqual(80);
     expect(page.description.length, page.description).toBeLessThanOrEqual(160);
@@ -123,7 +123,7 @@ describe("search engine texts (seo.ts)", () => {
 
   test("titles and descriptions are not shared between pages", () => {
     for (const key of ["title", "description"] as const) {
-      const values = SEO_PAGES.map((page) => page[key]);
+      const values = SEO_TEXTS.map((page) => page[key]);
       expect(values.filter((v, i) => values.indexOf(v) !== i)).toEqual([]);
     }
   });
@@ -161,8 +161,10 @@ describe("search engine texts (seo.ts)", () => {
     expect([(bytes[sof + 7] << 8) | bytes[sof + 8], (bytes[sof + 5] << 8) | bytes[sof + 6]]).toEqual([PREVIEW_IMAGE.width, PREVIEW_IMAGE.height]);
   });
 
-  test("grown-up pages are never in the search pages", () => {
-    for (const path of NO_INDEX_PATHS) expect(paths).not.toContain(path);
+  test("grown-up pages and games still being built are never in the search pages", () => {
+    const found = SEO_PAGES.map((page) => page.path);
+    for (const path of NO_INDEX_PATHS) expect(found).not.toContain(path);
+    for (const game of UNFINISHED) expect(NO_INDEX_PATHS, game.href).toContain(game.href);
   });
 });
 
@@ -174,7 +176,7 @@ describe("no age to start at", () => {
   test.each([
     ["SITE_PROMISE", SITE_PROMISE],
     ["SEO_EN.promise", SEO_EN.promise],
-    ...SEO_PAGES.map((page) => [page.path, `${page.title} ${page.description} ${page.text}`]),
+    ...SEO_TEXTS.map((page) => [page.path, `${page.title} ${page.description} ${page.text}`]),
     ...Object.entries(SEO_EN.pages).map(([path, page]) => [`/en${path}`, `${page.title} ${page.description} ${page.text}`]),
     ...["index.html", "public/manifest.webmanifest", "README.md", "src/pages/LegalPage.tsx", "src/pages/Home.tsx"].map((file) => [
       file,
@@ -470,16 +472,22 @@ describe("Russian", () => {
 
 // User feedback, November 2026: the everyday helpers are what parents need most, so they stand first on the shelf
 // (top left); the Belohnungstafel and the Zeitplan, the shelf's eye-catcher, stand in their slipcase right of Aufs Töpfchen,
-// and the newer helpers after them.
+// and the newer helpers after them once they are finished.
 test("the Alltagshelfer stand first on the shelf, the slipcase of Belohnungstafel & Zeitplan right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
-  expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
-    "/zaehne/",
-    "/toepfchen/",
-    "/belohnungstafel/",
-    "/timer/",
-    "/schnullerfee/",
-    "/abstillen/",
-  ]);
+  expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual(["/zaehne/", "/toepfchen/", "/belohnungstafel/"]);
   expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);
+});
+
+// User decision, November 2026: a game still being built is reached only from the management page, so no child or
+// search engine finds it until it is done.
+test("games still being built stand nowhere on the shelf or in a book", () => {
+  expect(UNFINISHED.map((g) => g.href)).toEqual(["/timer/", "/schnullerfee/", "/abstillen/"]);
+  for (const game of UNFINISHED) {
+    expect(
+      SHELF.map((e) => e.href),
+      game.href,
+    ).not.toContain(game.href);
+    expect(bookPage(game.href), game.href).toBeUndefined();
+  }
 });
