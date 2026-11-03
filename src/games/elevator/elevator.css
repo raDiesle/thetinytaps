@@ -46,10 +46,6 @@
 .el-cabin-front,
 .el-hint,
 .el-night,
-.el-confetti {
-  pointer-events: none;
-}
-
 .el-hopper {
   cursor: pointer;
 }
@@ -641,14 +637,6 @@
   opacity: 0.5;
 }
 
-.el-confetti rect {
-  animation-name: el-fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
 /* ---------- Keyframes ---------- */
 
 @keyframes el-pack-bump {
@@ -1212,15 +1200,6 @@
   }
 }
 
-@keyframes el-fall {
-  from {
-    transform: translateY(-40px) rotate(0deg);
-  }
-  to {
-    transform: translateY(1200px) rotate(540deg);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .pose-walk .el-leg-l,
   .pose-walk .el-leg-r,
@@ -1229,8 +1208,7 @@
   .pose-walk .el-arm-r,
   .pose-paddle .el-paddle,
   .pose-paddle .el-kid-body,
-  .el-rain-lines,
-  .el-confetti rect {
+  .el-rain-lines {
     animation: none;
   }
 }

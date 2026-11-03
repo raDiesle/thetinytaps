@@ -92,7 +92,7 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
   is said) is fixed – the party, the vehicles and the hints are always on, the picture never moves by itself.
   The only choice is the mode, in the row on `/bilder/`; don't bring back a ⚙️ or ℹ️ for a picture, and put
   something a grown-up must switch while playing (like ⌨️) small into a corner of the picture.
-- Every tap on a picture brings something to life, never only shapes: on an item its animation, on the
+- Every tap on a picture brings something to life, never only a ripple: on an item its animation, on the
   background a `<Poke>` thing or what lives in that part of the picture (`spots`, covering the whole picture,
   `scenes.test.ts`). A new picture or a new background drawing gets both; pick what a toddler expects there
   (a crab from sand, not from a kitchen floor), and keep bedtime pictures calm (fireflies, stars).

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { spokenIn, useAppLanguage, useT } from "@/lib/language";
@@ -33,7 +33,7 @@ const cheer = recorded("cheer", playMelody);
 const musicbox = recorded("musicbox", playMusicbox);
 const partyHorn = recorded("partyhorn", playPop);
 
-/** Taps this soon after a step began only sparkle, so a double tap doesn't skip a page. */
+/** Taps this soon after a step began only ripple, so a double tap doesn't skip a page. */
 const TAP_GUARD_MS = 500;
 const LAST = STEPS.length - 1;
 
@@ -91,7 +91,7 @@ export function WeaningPlay() {
   const [fresh, setFresh] = useState(true);
   /** Counts every page begun, so the page's layer and its animations start again, also on the same page. */
   const [beat, setBeat] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
 
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const indexRef = useRef(0);
@@ -127,9 +127,9 @@ export function WeaningPlay() {
       for (const [ms, play] of SOUNDS[here.id]) later(ms, play);
       const { text } = spokenIn(here.line, language);
       voice.say(text, language.id);
-      if (here.id === "morning") for (let i = 0; i < 14; i++) later(200 + i * 120, () => spawn());
+      if (here.id === "morning") later(200, () => celebrate());
     },
-    [language, later, spawn, stopTimers],
+    [language, later, celebrate, stopTimers],
   );
 
   // The book on the shelf opens the story at once: its tap is the act that starts the first page's sound.
@@ -143,12 +143,12 @@ export function WeaningPlay() {
     };
   }, [begin, language.id, stopTimers]);
 
-  /** The next page, or a sparkle where it would come too soon after the last tap and on the last page. */
+  /** The next page, or ripples where it would come too soon after the last tap and on the last page. */
   const act = (x?: number, y?: number) => {
     setFresh(false);
     const now = indexRef.current;
     if (now >= LAST || performance.now() - startedAt.current < TAP_GUARD_MS) {
-      spawn(x, y);
+      ripple(x, y);
       playRandomNote();
       return;
     }
@@ -243,7 +243,7 @@ export function WeaningPlay() {
 
       {/* One story only, so „Weiter“ would be „Nochmal“ again; small in the corners, so the happy morning stays free. */}
       {last && <GameEnd delayMs={step.ms} onAgain={restart} corners />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

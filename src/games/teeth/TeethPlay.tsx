@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { MenuIcon } from "@/components/GameEnd";
 import { CheeringFamily } from "@/components/Mascot";
 import { useLeaveGame } from "@/components/GameShell";
@@ -304,7 +304,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const [tickled, setTickled] = useState<number | null>(null);
   const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
-  const { bursts, spawn } = useBursts();
+  const { effects, celebrate } = useTapFeedback();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
@@ -413,7 +413,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       if (settings.sounds) (phase === 0 ? playTusch : playChime)();
       if (!sung) say(stepText(STEPS[phase], "cue", language));
     } else {
-      // Done: a fanfare of notes and children cheering, and confetti for two bars.
+      // Done: a fanfare of notes and children cheering, and hearts, stars and notes rising slowly.
       if (settings.sounds) {
         [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
         setTimeout(() => playRecorded("cheer", playTusch), 700);
@@ -426,7 +426,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       setWeek(next);
       // Opened by the Tagesplan's teeth card: that card is done, morning or evening.
       finishRoutineStep();
-      for (let i = 0; i < 24; i++) setTimeout(() => spawn(), i * 160);
+      celebrate();
     }
     // Only when the part changes, not when a setting does.
   }, [part, round]);
@@ -820,7 +820,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         </button>
       )}
 
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

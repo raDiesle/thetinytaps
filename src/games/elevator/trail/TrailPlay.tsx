@@ -1,5 +1,5 @@
 import { type ComponentType, type PointerEvent, type ReactNode, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
@@ -9,7 +9,7 @@ import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguage
 import { pick } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
-import { ActionButton, Confetti } from "../house";
+import { ActionButton } from "../house";
 import { KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose, useHero } from "../kid";
 import { spokenIn, translationOf } from "../phrases";
 import { sayIn } from "../voice";
@@ -406,7 +406,7 @@ export function TrailPlay({
   const onString = theGoal.carry === "string";
   const [view, setView] = useState<View>(() => startView(level));
   const viewRef = useRef<View>(view);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, glow, celebrate } = useTapFeedback();
   const { touchOnly } = useDevice();
   /** The key held down right now, so its cap on the screen goes down too. */
   const [held, setHeld] = useState<string | null>(null);
@@ -1001,12 +1001,12 @@ export function TrailPlay({
     for (const [i, s] of way.stations.entries()) await station(s, i === 0);
   };
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   const play = async () => {
@@ -1029,7 +1029,7 @@ export function TrailPlay({
     put({ party: true });
     sound(playMelody);
     say(level.finale.say);
-    for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
+    celebrate();
     const finaleMs = level.finale.ms + (level.finale.via ?? []).reduce((sum, [, ms]) => sum + ms, 0);
     await flyGoal(level.finale, onString ? handOf(viewRef.current.kid) : null);
     const { into } = level.finale;
@@ -1051,9 +1051,9 @@ export function TrailPlay({
       chooser.current = null;
       pick(slot);
     } else if (tapper.current) {
-      spawn(e.clientX, e.clientY);
+      glow(e.clientX, e.clientY);
       tap();
-    } else funBurst(e.clientX, e.clientY);
+    } else softTap(e.clientX, e.clientY);
   };
 
   /** A creature's bubble was tapped while the bag is open: it shows the thing it wants, so that thing is given, just
@@ -1065,7 +1065,7 @@ export function TrailPlay({
     if (!pick || slot < 0) return;
     e.stopPropagation();
     chooser.current = null;
-    spawn(e.clientX, e.clientY);
+    glow(e.clientX, e.clientY);
     pick(slot);
   };
 
@@ -1086,7 +1086,7 @@ export function TrailPlay({
   const pressWay = (way: number) => (e: PointerEvent) => {
     if (!picker.current) return;
     e.stopPropagation();
-    spawn(e.clientX, e.clientY);
+    glow(e.clientX, e.clientY);
     pickWay(way);
   };
 
@@ -1099,11 +1099,11 @@ export function TrailPlay({
     const pick = chooser.current;
     if (pick && slot >= 0) {
       chooser.current = null;
-      spawn(e.clientX, e.clientY);
+      glow(e.clientX, e.clientY);
       return pick(slot);
     }
     if (tapper.current) {
-      spawn(e.clientX, e.clientY);
+      glow(e.clientX, e.clientY);
       return tap();
     }
     if (pick || picker.current) showHint();
@@ -1148,7 +1148,7 @@ export function TrailPlay({
         pick(slot);
       } else {
         if (pick || picker.current) showHint();
-        funBurst();
+        softTap();
       }
     };
     const onKeyUp = () => setHeld(null);
@@ -1207,12 +1207,12 @@ export function TrailPlay({
       className="tl-play"
       onPointerDown={(e) => {
         if (tapper.current) {
-          spawn(e.clientX, e.clientY);
+          glow(e.clientX, e.clientY);
           return tap();
         }
         if (busy()) queue();
         if (chooser.current || picker.current) showHint();
-        funBurst(e.clientX, e.clientY);
+        softTap(e.clientX, e.clientY);
       }}
     >
       <div ref={safeEl} className="tl-safe" />
@@ -1479,15 +1479,10 @@ export function TrailPlay({
             ))}
           </g>
         </g>
-        {view.party && (
-          <g transform={`scale(${VIEW_W / 1400} 1)`}>
-            <Confetti />
-          </g>
-        )}
       </Layer>
 
       {view.picking && <StoryEnd id={level.id} onPick={onPick} />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

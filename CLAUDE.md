@@ -194,6 +194,12 @@ In a fresh worktree run `bun install` first.
 ## Rules for every game (toddlers play alone)
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
+  The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
+  a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world
+  (Lebendige Bilder's `spots`); a tap that sets something off gets a warm light where the finger was (`glow`) and the
+  thing itself answers – never a random shape. Something done is celebrated calmly (`celebrate`): a few hearts, stars
+  and notes rise slowly while everyone in the picture cheers – never a storm of confetti, shapes or fast movement
+  (circles, triangles and squares popping up fitted neither, and were removed). `tapFeedback.test.ts` keeps it calm.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
   feedback, November 2026): the sound says it, and what floats up is a music note (♪ ♫), a heart or a puff. Signs that

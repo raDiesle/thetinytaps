@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -74,7 +74,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
   const busy = useRef(false);
   /** Bumped to make the animal hop again when it is tapped to ask once more. */
   const [nudge, setNudge] = useState<{ who: Mover; n: number } | null>(null);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
   /** Wrong foods or homes picked in this round, for the difficulty. */
   const misses = useRef(0);
   const animalRef = useRef<HTMLDivElement>(null);
@@ -108,12 +108,12 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     if (settings.sounds) later(400, () => round.animal.sound?.());
   }, []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   /** The child picked option `index`; `from` is how far the dragged thing already is from its place. */
@@ -200,7 +200,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     if (settings.sounds) later(200, playChime);
     onSolved(misses.current);
     later(700, () => {
-      for (let i = 0; i < 8; i++) spawn();
+      celebrate();
     });
     later(round.kind === "gift" ? GIFT_CELEBRATE_MS : CELEBRATE_MS, onNext);
   };
@@ -290,7 +290,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.kind === "feed" ? round.foods.length : round.kind === "gift" ? round.gifts.length : round.homes.length;
@@ -455,11 +455,11 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     );
 
   return (
-    <div className={`animals-play kind-${round.kind}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className={`animals-play kind-${round.kind}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       {/* Up in the picture things stand on the horizon; the ground in front is where the child's things are. */}
       <div className="ap-top">{round.kind === "home" ? options : animal}</div>
       <div className="ap-ground">{round.kind === "home" ? animal : options}</div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }
