@@ -68,12 +68,12 @@ describe("the bookshelf", () => {
   );
 
   // The sign with the app's name hangs on its chains in front of a wide shelf, down into its top compartment over the
-  // carved words (user feedback, November 2026): never over a book to take or the wall with the stickers, its foxes
+  // carved words, which stand centred under it (user feedback, November 2026): never over a book to take or the wall with the stickers, its foxes
   // still on the screen; and the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only
   // the shelf's legs.
   test.each(ROOMS.filter(([w, h]) => w > h))("a wide shelf's sign hangs into its top compartment, clear of the books, in a %i × %i room", (width, height) => {
     const options = OPTIONS(height);
-    const { cells, bookHeight: bh, legs, sign } = planShelf(width, height, BOOKS, options);
+    const { cells, bookHeight: bh, legs, sign, wordsShift } = planShelf(width, height, BOOKS, options);
     expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
     const top = cells.find((c) => c.books) as (typeof cells)[number];
     expect(sign).toBeDefined();
@@ -89,6 +89,9 @@ describe("the bookshelf", () => {
     expect(books[0]).toBe(0);
     expect(sign.x).toBeGreaterThanOrEqual(helpersEnd + SIGN_CLEAR.books * bh - 0.01);
     expect(sign.x + sign.w).toBeLessThanOrEqual(top.x + top.w - SIGN_CLEAR.wall * bh + 0.01);
+    // The carved words stand centred under it (user feedback, November 2026), moved right where it hangs right of them.
+    const wordsMiddle = helpersEnd + (CARVED * BOOK_ASPECT * bh) / 2 + 0.05 * bh + (wordsShift ?? 0);
+    expect(wordsMiddle).toBeCloseTo(sign.x + sign.w / 2, 0);
     // The foxes on its o rise 0.4 of its letters above it, below the room's top (at least 48 px, `--top`).
     expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-48);
   });

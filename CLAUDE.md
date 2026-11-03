@@ -292,8 +292,7 @@ In a fresh worktree run `bun install` first.
   standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
   little below its board, never over a book on the board below. Beside the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
-  learning games and little helpers for the day, then that all of it is free („Alles kostenlos.“, a line of its own) –
-  and nothing else: no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
+  learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
   Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). It ends with a carved, underlined „mehr …“
   that opens the texts for grown-ups (`RoomNotes`, see below). The carving takes room of its own on the board
@@ -478,9 +477,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Browsers show how to leave fullscreen over the
   middle of the screen's bottom (or top) edge for a while, again whenever fullscreen starts: so nothing to tap lies
   there (user feedback, November 2026). On a wide screen the shelf starts right under the fullscreen button's room and
-  stands on legs (`--legs`), leaving the bottom's middle to legs and floor, and the app's name is a painted sign hanging
+  stands on four legs at its corners, two in front and two behind them, never one in the middle (`--legs`, user
+  feedback, November 2026), leaving the bottom's middle to the floor, and the app's name is a painted sign hanging
   on its two little chains in front of the shelf, down into its top compartment (`SIGN_DIP`; standing on the floor at
-  the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it,
+  the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
+  and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
   the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
   wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
