@@ -43,6 +43,13 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
 
 The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`, `es`, `zh`, `hi`, `ar`). The game plays in the pack of
 the app language (🌐, `useLanguagePack()`), never in another one and never with a second one next to it; it has no language choice of its own.
+- What the game says is played from its ElevenLabs recording (`voice.ts`, `useLettersSay`, files in `stimme/`), recorded
+  in German only so far (November 2026); another language stays silent until the user asks for its recordings. A new
+  or changed line comes onto the list by `src/content/voiceLines.ts` (`letters()`), is recorded with `bun run voice make
+  --only buchstaben` only when the user asks, and must be said exactly as listed – `eins!` with its „!“, never `eins`,
+  or its recording is never found. Two lines in a row (a word, then the praise) are said one after the other (`queue`),
+  never joined into one sentence, which has no recording. The counting sentences („drei Äpfel!“, `waiting` in
+  `recordedLines.ts`) are not recorded yet: until they are, a number says its number word alone (`sentenceFor`).
 - Grown-up texts (start screen, options, hints on the play screen) go through `useT()` (`t({ de, ru, en, zh, hi, es, ar })`);
   new or changed lines come German-only until translations are asked for, marked in `languageStatus.ts`.
 - Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` types by key

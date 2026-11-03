@@ -52,6 +52,7 @@ import goodNightFiles from "../components/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
 import feelingsFiles from "../games/feelings/stimme/*.mp3?glob";
+import lettersFiles from "../games/letters/stimme/*.mp3?glob";
 import marblesFiles from "../games/marbles/stimme/*.mp3?glob";
 import pottyFiles from "../games/potty/stimme/*.mp3?glob";
 import shadowsFiles from "../games/shadows/stimme/*.mp3?glob";
@@ -373,6 +374,7 @@ const RECORDED = new Set(
     marblesFiles,
     pottyFiles,
     socksFiles,
+    lettersFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
 );
 
