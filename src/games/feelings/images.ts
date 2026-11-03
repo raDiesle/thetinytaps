@@ -37,6 +37,13 @@ export const storyImages = {
   end: (id: string) => `${id}-ende`,
 };
 
+/** Every picture a kindergarten story shows: what happened, the end, and each step with its not-so-good idea. */
+export const situationImages = ({ id, steps }: { id: string; steps: unknown[] }) => [
+  storyImages.problem(id),
+  storyImages.end(id),
+  ...steps.flatMap((_, i) => [storyImages.step(id, i), storyImages.instead(id, i)]),
+];
+
 /** Names of the pictures for comforting the bear. */
 export const bearImages = {
   /** How the bear feels at the start. */

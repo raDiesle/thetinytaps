@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
-import { bearImages, imageFor, moodImages, storyImages } from "./images";
+import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOOD_ID, WEATHERS } from "./mood";
@@ -37,9 +37,7 @@ const ALL_SITUATIONS = [...SITUATIONS, ...SELF_SITUATIONS];
 test("every kindergarten story has its pictures", () => {
   const ids = ALL_SITUATIONS.map((s) => s.id);
   expect(new Set(ids).size, "a story id twice would share its pictures").toBe(ids.length);
-  for (const { id, steps } of ALL_SITUATIONS) {
-    [storyImages.problem(id), storyImages.end(id), ...steps.flatMap((_, i) => [storyImages.step(id, i), storyImages.instead(id, i)])].forEach(expectPicture);
-  }
+  for (const situation of ALL_SITUATIONS) situationImages(situation).forEach(expectPicture);
 });
 
 test("the bear has a picture for every feeling, every round and every comfort", () => {
