@@ -159,6 +159,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
         note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
       },
+      {
+        label: "Mehr Gefühle",
+        languages: { de: "done" },
+        note: "Neu und nur Deutsch (3. November 2026): fünf Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt. Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
+      },
     ],
   },
   {
@@ -224,6 +229,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal, das Holzschild „Lernspiele“ unter den Bilderbüchern (Bookshelf.tsx) und die Schnitzerei „Für Groß & Klein, Seite an Seite“ mit „Der erste gemeinsame Schritt ins Digitale …“ und ihrem „mehr …“ (Bookshelf.tsx), das „Über Books for Both“ öffnet, mit ihr und dem Text für Suchmaschinen (RoomOptions.tsx), die Wahl „Spiel verlassen“ (✕ antippen oder gedrückt halten) unter ⏳ (HomeOptions.tsx) und „Zum Beenden auf ✕ tippen.“ unter „Gute Nacht“ (GameShell.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal, das Holzschild „Lernspiele“ unter den Bilderbüchern (Bookshelf.tsx) und die Schnitzerei „Für Groß & Klein“ mit „Der erste gemeinsame Schritt ins Digitale …“ und ihrem „mehr …“ (Bookshelf.tsx), das „Über Books for Both“ öffnet, mit ihr und dem Text für Suchmaschinen (RoomOptions.tsx), die Wahl „Spiel verlassen“ (✕ antippen oder gedrückt halten) unter ⏳ (HomeOptions.tsx) und „Zum Beenden auf ✕ tippen.“ unter „Gute Nacht“ (GameShell.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
   },
 ];

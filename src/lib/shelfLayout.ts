@@ -94,6 +94,11 @@ export interface ShelfLayout {
   upright: boolean;
   /** Where the sign with the app's name hangs in front of a wide shelf: its board, without the foxes on it. */
   sign?: ShelfRect;
+  /**
+   * How far right of their place the carved words move, in px, so that they stand centred under the sign (user feedback,
+   * November 2026): the sign keeps clear of the books at their left, so it may hang right of their place's middle.
+   */
+  wordsShift?: number;
   /** How high the legs it stands on are, below its `height` (a wide shelf's; 0 for an upright one). */
   legs: number;
 }
@@ -200,9 +205,10 @@ function trailFor(sign: { width: number }, bh: number, words: number) {
 
 /**
  * Where the sign hangs in front of the top compartment `top` of a wide shelf: over the carved words' middle where it can,
- * else as near to it as the books to take at its left and the wall with the stickers at its right let it.
+ * else as near to it as the books to take at its left and the wall with the stickers at its right let it – and how far
+ * the words then move right to stand centred under it.
  */
-function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: number; height: number }, carved: number): ShelfRect {
+function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: number; height: number }, carved: number) {
   // Where the last book to take ends: the books stand together in the middle of what the trail leaves (`.shelf-row` in
   // bookshelf.css: 2 px padding, `BOOK_GAP` between each and the ends), the carved words the end of the helpers' place.
   const books = top.books ?? [];
@@ -213,7 +219,10 @@ function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: nu
   const lo = end - words + SIGN_CLEAR.books * bh;
   const hi = top.x + top.w - SIGN_CLEAR.wall * bh - sign.width;
   const x = Math.max(lo, Math.min(hi, end - words / 2 - sign.width / 2));
-  return { x, y: top.y + top.h * SIGN_DIP - sign.height, w: sign.width, h: sign.height };
+  const rect: ShelfRect = { x, y: top.y + top.h * SIGN_DIP - sign.height, w: sign.width, h: sign.height };
+  // The words' middle lies a little right of their place's, past the padding at their left (`.shelf-carving`).
+  const middle = end - words / 2 + 0.05 * bh;
+  return { sign: rect, wordsShift: words > 0 ? Math.max(0, x + sign.width / 2 - middle) : 0 };
 }
 
 function planWide(width: number, height: number, spans: number[], legs: number, sign: { width: number; height: number }, carved: number): ShelfLayout {
@@ -268,7 +277,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     bookHeight: plan.bh,
     upright: false,
     legs,
-    ...(sign.width > 0 && { sign: signOver(top, spans, plan.bh, sign, carved) }),
+    ...(sign.width > 0 && signOver(top, spans, plan.bh, sign, carved)),
   };
 }
 
