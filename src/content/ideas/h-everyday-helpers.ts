@@ -369,6 +369,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Ein Großer wählt einen Tag (Geburtstag, Urlaub, Oma kommt) und ein Bild dazu. Das Kind sieht einen Mond für jedes Mal Schlafen bis dahin; jeden Morgen ist einer weniger, und am Tag selbst steht das Bild groß da. Antippen sagt „Noch dreimal schlafen, dann Geburtstag“.",
       why: "Die Frage „Wie oft noch schlafen?“ stellt jedes Kleinkind; der Wochenplan des Tagesplans zeigt die Monde schon für sieben Tage, ein Countdown reicht weiter.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-42",

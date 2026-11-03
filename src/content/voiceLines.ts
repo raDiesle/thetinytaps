@@ -101,6 +101,7 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
     { text: "Schon fertig:", file: "src/games/rewards/PlanScreen.tsx" },
     { text: "Hier kommt rein, was fertig ist.", file: "src/games/rewards/PlanScreen.tsx" },
     { text: "Noch einmal schlafen", file: "src/games/rewards/PlanSheet.tsx" },
+    { text: "Heute ist es so weit:", file: "src/games/rewards/PlanScreen.tsx" },
   ],
 };
 
@@ -321,6 +322,11 @@ function rewards(): VoiceGroup[] {
       label: "Sätze auf der Tafel und im Tagesplan",
       lines: once([...inline("/belohnungstafel/"), "Noch 2-mal schlafen:", "Noch 3-mal schlafen:"]),
       built: "Ein Satzanfang, danach der Name einer Aufgabe oder Belohnung",
+    },
+    {
+      label: "Countdown: wie oft noch schlafen",
+      lines: ["Noch einmal schlafen, dann", "Noch 2-mal schlafen, dann", "Noch 3-mal schlafen, dann", "Noch 4-mal schlafen, dann", "Noch 5-mal schlafen, dann"],
+      built: "Wie oft noch schlafen, danach der Name des großen Tages (Geburtstag, Urlaub, Oma und Opa)",
     },
   ];
 }

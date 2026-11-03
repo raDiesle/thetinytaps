@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { dayKey } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import {
   type Board,
@@ -41,11 +42,16 @@ import { CHILD_NAME, Pick } from "./pageParts";
 import { ItemPic } from "./pictures";
 import {
   allStars,
+  bigDayOf,
+  bigDayStep,
   counterOf,
   counting,
+  daysLater,
   defaultReward,
   exampleTicks,
+  MAX_NIGHTS,
   MAX_STARS,
+  moonsLeft,
   type Plan,
   type PlanStep,
   planFromTemplate,
@@ -60,13 +66,13 @@ import {
   withStepStars,
   withSteps,
 } from "./plan";
-import { PaperArrow, PLAN_SCREEN, PlanSheet, useStepLabel } from "./PlanSheet";
+import { BIG_DAY, PaperArrow, PLAN_SCREEN, PlanSheet, useStepLabel } from "./PlanSheet";
 
 /** A chart while it is made or changed: a board or a plan. */
 export type Draft = { type: "board"; board: Board } | { type: "plan"; plan: Plan };
 
 /** The time a chart covers, by the id of its view of either kind. */
-export type SpanId = "day" | "week" | "month" | "first-then" | "collect";
+export type SpanId = "day" | "week" | "month" | "countdown" | "first-then" | "collect";
 
 /** A time span of the „Zeitraum“ switch, and the kind of chart and view it makes in the wizard. */
 interface Span {
@@ -83,14 +89,16 @@ const planLabel = (id: PlanView) => PLAN_VIEWS.find((view) => view.id === id)?.l
 const planHint = (id: PlanView) => PLAN_VIEWS.find((view) => view.id === id)?.hint;
 
 /**
- * „Zeitraum“ in the wizard, by the time a chart covers (user feedback, November 2026): a day, a week, a month, then
- * Erst – Dann, seldom used, and Sammeln last, which counts stars whatever the day. Tag, Woche and Erst – Dann are plans
- * (with a Zähler, a Belohnungstafel), Monat and Sammeln boards.
+ * „Zeitraum“ in the wizard, by the time a chart covers (user feedback, November 2026): a day, a week, a month, the
+ * Countdown to a big day (H-41), then Erst – Dann, seldom used, and Sammeln last, which counts stars whatever the day.
+ * Tag, Woche, Countdown and Erst – Dann are plans (Tag, Woche and Erst – Dann with a Zähler a Belohnungstafel), Monat
+ * and Sammeln boards.
  */
 export const SPANS: Span[] = [
   { id: "day", label: kindLabel("day"), type: "plan", hint: kindHint("day") },
   { id: "week", label: kindLabel("week"), type: "plan", hint: kindHint("week") },
   { id: "month", label: kindLabel("month"), type: "board", hint: kindHint("month") },
+  { id: "countdown", label: planLabel("countdown"), type: "plan", hint: planHint("countdown") },
   { id: "first-then", label: planLabel("first-then"), type: "plan", hint: planHint("first-then") },
   { id: "collect", label: kindLabel("collect"), type: "board", hint: kindHint("collect") },
 ];
@@ -116,7 +124,8 @@ export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId)
   const reward = rewardOf(from);
   if (span.type === "plan") {
     const template = PLAN_TEMPLATES.find((tpl) => tpl.view === span.id) ?? PLAN_TEMPLATES[0];
-    const stars = from.type === "plan" ? counterOf(from.plan) : 1;
+    // A Countdown counts nights, not stars: its card has no Zähler (the reward stays kept for a span that counts).
+    const stars = span.id === "countdown" ? 0 : from.type === "plan" ? counterOf(from.plan) : 1;
     const made = { ...planFromTemplate(template, language), childName, theme };
     // A week that counts stars is a reward chart's week: the same tasks every day, a row each (`WeekStars`), not the
     // Kita's Wochenplan, whose days differ.
@@ -142,7 +151,8 @@ type Editing =
   | { what: "add"; part?: Slot; day?: string; every?: boolean }
   | { what: "reward" }
   | { what: "task"; id: string }
-  | { what: "add-task" };
+  | { what: "add-task" }
+  | { what: "big-day" };
 
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum" };
@@ -290,14 +300,18 @@ export function ChartEditor({
     } else if (edit === "add")
       setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId, every: all });
     else if (edit === "reward") setEditing({ what: "reward" });
+    else if (edit === "big-day") setEditing({ what: "big-day" });
     else if (edit === "task" && task) setEditing({ what: "task", id: task });
     else if (step) setEditing({ what: "card", key: step, every: all });
   };
 
+  // A Countdown is a chart of its own, like a board beside a plan: on the page it never turns into a day's plan or back.
   const spans = making
     ? SPANS
     : draft.type === "plan"
-      ? SPANS.filter((span) => span.type === "plan")
+      ? draft.plan.view === "countdown"
+        ? []
+        : SPANS.filter((span) => span.type === "plan" && span.id !== "countdown")
       : KINDS.map((kind): Span => ({ id: kind.id, label: kind.label, type: "board" }));
   const pickSpan = (span: Span) => {
     if (span.id === spanOf(draft)) return;
@@ -313,29 +327,31 @@ export function ChartEditor({
   return (
     <div className="rw-chart-editor">
       <section className="rw-options-band" aria-label={t({ de: "Art der Tafel und Einstellungen" })}>
-        <div className="rw-spans" role="group" aria-label={t(SPAN)}>
-          <span className="rw-band-label">{t(SPAN)}</span>
-          {spans.map((span) => (
-            <button
-              key={span.id}
-              type="button"
-              className="rw-span"
-              aria-pressed={span.id === spanOf(draft)}
-              title={span.hint ? t(span.hint) : undefined}
-              onClick={() => pickSpan(span)}
-            >
-              <SpanPic id={span.id} />
-              <span className="rw-span-name">{t(span.label)}</span>
-            </button>
-          ))}
-        </div>
+        {spans.length > 0 && (
+          <div className="rw-spans" role="group" aria-label={t(SPAN)}>
+            <span className="rw-band-label">{t(SPAN)}</span>
+            {spans.map((span) => (
+              <button
+                key={span.id}
+                type="button"
+                className="rw-span"
+                aria-pressed={span.id === spanOf(draft)}
+                title={span.hint ? t(span.hint) : undefined}
+                onClick={() => pickSpan(span)}
+              >
+                <SpanPic id={span.id} />
+                <span className="rw-span-name">{t(span.label)}</span>
+              </button>
+            ))}
+          </div>
+        )}
         {making && (
           <p className="rw-tip">
             <span className="rw-tip-arrow" aria-hidden>
               ⤴
             </span>
             {t({
-              de: "Wechseln Sie hier frei zwischen Tag, Woche, Monat, Erst – Dann und Sammeln, und stellen Sie darunter alles ein. Auch später lässt sich alles ändern.",
+              de: "Wechseln Sie hier frei zwischen Tag, Woche, Monat, Countdown, Erst – Dann und Sammeln, und stellen Sie darunter alles ein. Auch später lässt sich alles ändern.",
             })}
           </p>
         )}
@@ -470,6 +486,7 @@ export function ChartEditor({
         />
       )}
       {editing && editing.what === "reward" && <RewardDialog draft={draft} day={day} onChange={onChange} onClose={() => setEditing(null)} />}
+      {editing && plan && editing.what === "big-day" && <BigDayDialog plan={plan} onChange={setPlan} onClose={() => setEditing(null)} />}
       {editing && draft.type === "board" && (editing.what === "task" || editing.what === "add-task") && (
         <TaskDialog
           board={draft.board}
@@ -513,6 +530,15 @@ function SpanPic({ id }: { id: SpanId }) {
           {box(4, 8, 15, 16)}
           <path d="M22 16h6m-3-3 3 3-3 3" fill="none" />
           {box(30, 8, 15, 16)}
+        </>
+      )}
+      {id === "countdown" && (
+        <>
+          {[5, 14, 23].map((x) => (
+            <path key={x} d={`M${x + 4} 10.5a5 5 0 1 0 0 9 5.5 5.5 0 0 1 0-9z`} />
+          ))}
+          <path d="M30 15h3m-1.5-1.5 1.5 1.5-1.5 1.5" fill="none" />
+          {box(36, 8, 9, 14)}
         </>
       )}
       {id === "collect" && (
@@ -787,6 +813,52 @@ function CardPicks({ selected, onPick }: { selected?: string; onPick: (id: strin
         />
       ))}
     </div>
+  );
+}
+
+/**
+ * A Countdown's big day tapped (its moons or its picture): when it is – by date, or by its nights with − + – and which
+ * picture stands for it. The sheet never shows the date, only the moons.
+ */
+function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan: Plan) => void; onClose: () => void }) {
+  const t = useT();
+  const today = new Date();
+  const step = bigDayStep(plan);
+  const on = (key: string) => onChange({ ...plan, bigDay: key });
+  return (
+    <EditDialog title={t(BIG_DAY)} onClose={onClose}>
+      <div className="rw-edit-row">
+        <label className="rw-opt-counter">
+          <span aria-hidden>📅</span>
+          <span className="rw-opt-name">{t({ de: "Datum" })}</span>
+          <input
+            className="rw-big-day-date"
+            type="date"
+            value={dayKey(bigDayOf(plan, today))}
+            min={dayKey(today)}
+            max={dayKey(daysLater(today, MAX_NIGHTS))}
+            onChange={(e) => e.target.value && on(e.target.value)}
+          />
+        </label>
+        <Counter
+          emoji="🌙"
+          wide
+          label={t({ de: "Noch so oft schlafen" })}
+          value={moonsLeft(plan, today)}
+          min={0}
+          max={MAX_NIGHTS}
+          onChange={(n) => on(dayKey(daysLater(today, n)))}
+        />
+      </div>
+      <h4 className="rw-edit-sub">{t({ de: "Bild für den Tag" })}</h4>
+      <CardPicks
+        selected={step?.catalog}
+        onPick={(id) => {
+          onChange({ ...plan, days: [[{ ...stepFromCatalog(id), id }]], same: true });
+          onClose();
+        }}
+      />
+    </EditDialog>
   );
 }
 

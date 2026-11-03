@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { dayKey } from "@/games/teeth/daytime";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
-import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
+import { playChime, playCountNote, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
 import { type RoutineVisit, waitForStep } from "@/lib/routine";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
@@ -11,10 +11,12 @@ import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } fr
 import { useRewardLabel } from "./BoardSheet";
 import { ItemPic, Pic, picture } from "./pictures";
 import {
+  bigDayStep,
   counting,
   currentStep,
   exampleTicks,
   gameOf,
+  moonsLeft,
   nightsUntil,
   pairsOf,
   type Plan,
@@ -25,10 +27,14 @@ import {
   stepDone,
   stepsOn,
 } from "./plan";
-import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, type StepState, TODAY, useStepLabel } from "./PlanSheet";
+import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, SLEEPS_UNTIL, type StepState, TODAY, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
 const UNDO_MS = 8000;
+
+/** A Countdown counts its moons one after the other, this far apart – faster with many, so a month takes no longer than a few seconds. */
+const MOON_MS = 320;
+const ALL_MOONS_MS = 4000;
 
 /**
  * A card on its way between the row and the Fertig-Kiste, started on the next render: `into` the box from where it
@@ -62,7 +68,9 @@ function flyFrom(el: Element, from: DOMRect, scale: number, delay = 0) {
  * Fertig-Kiste instead of getting a tick, and „Von vorn“ takes them all out again. The teeth card under
  * „Jetzt“ opens Zähne putzen instead, which comes back here with the card done. A new plan shows example ticks until
  * the first tap. Where the cards count stars (a Zähler above 0), any open card of today takes a tap: one star per tap
- * pops into its fields until it has its Zähler's stars, and the reward's party comes when the goal is reached.
+ * pops into its fields until it has its Zähler's stars, and the reward's party comes when the goal is reached. A
+ * Countdown has nothing to tick: a tap (or a key) counts its moons one by one, each with a rising note, and the big day's
+ * picture jumps at the end – on the day itself the tap is its party.
  */
 export function PlanScreen({
   plan,
@@ -94,12 +102,15 @@ export function PlanScreen({
   const [fresh, setFresh] = useState<string | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
   const [party, setParty] = useState<string | null>(null);
+  const bigDay = plan.view === "countdown" ? bigDayStep(plan) : undefined;
   /** The party is the reward's, its stars all there (else the day's, every card done). */
   const [won, setWon] = useState(false);
   const rewardLabel = useRewardLabel();
   const counts = counting(plan);
   const { bursts, spawn } = useBursts();
   const move = useRef<Move | null>(null);
+  /** A Countdown's moons still to count: a new tap starts the count again. */
+  const moonTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   /** Where the marker lay before a tick or „Zurück“: it slides from there to the card to do now. */
   const markerFrom = useRef<DOMRect | null>(null);
   const today = new Date();
@@ -138,6 +149,8 @@ export function PlanScreen({
     setFresh(null);
     setParty(null);
   }, [plan.id]);
+
+  useEffect(() => () => moonTimers.current.forEach(clearTimeout), []);
 
   // A card that just went into the box or came out of it flies there from where it was (only after a tap).
   useLayoutEffect(() => {
@@ -179,6 +192,7 @@ export function PlanScreen({
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || (e.target as Element).closest("input, textarea, button, a, select")) return;
       unlockAudio();
+      if (plan.view === "countdown") return countDown();
       const now = box.current?.querySelector("[data-state='now']") ?? box.current?.querySelector("[data-state='done']");
       if (now) poke(now, now.getAttribute("data-state") === "now" ? "wiggle" : "twinkle");
       sound(playTwinkle);
@@ -187,9 +201,48 @@ export function PlanScreen({
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
+  /**
+   * A Countdown tapped: its moons light up one after the other with rising notes, then the big day's picture jumps, and
+   * it says „Noch 3-mal schlafen, dann Geburtstag“. On the day itself the picture's party instead.
+   */
+  const countDown = () => {
+    const root = box.current;
+    const step = bigDayStep(plan);
+    if (!root || !step) return;
+    moonTimers.current.forEach(clearTimeout);
+    const card = root.querySelector(".pl-big-day");
+    const moons = moonsLeft(plan, day);
+    if (moons === 0) {
+      if (card) poke(card, "wiggle");
+      setWon(false);
+      setParty(step.emoji);
+      sound(playTusch);
+      for (let i = 0; i < 10; i++) setTimeout(() => spawn(), i * 90);
+      say(`${t({ de: "Heute ist es so weit:" })} ${stepLabel(step)}`);
+      return;
+    }
+    const each = Math.min(MOON_MS, ALL_MOONS_MS / moons);
+    const later = (ms: number, then: () => void) => moonTimers.current.push(setTimeout(then, ms));
+    root.querySelectorAll(".pl-moon").forEach((moon, i) =>
+      later(i * each, () => {
+        poke(moon, "twinkle");
+        sound(() => playCountNote(i));
+      }),
+    );
+    later(moons * each, () => {
+      if (card) poke(card, "wiggle");
+      sound(playChime);
+    });
+    say(t(SLEEPS_UNTIL)(moons, stepLabel(step)));
+  };
+
   const onPointerDown = (e: React.PointerEvent) => {
     unlockAudio();
     unlockSpeech();
+    if (plan.view === "countdown") {
+      if ((e.target as Element).closest("[data-moon], [data-big-day]")) countDown();
+      return;
+    }
     const header = (e.target as Element).closest<HTMLElement>("[data-day]");
     if (header) return sayDay(header);
     const el = (e.target as Element).closest<HTMLElement>("[data-step]");
@@ -404,21 +457,30 @@ export function PlanScreen({
       )}
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(null)}>
+          {/* A Countdown's party is its big day, never „Alles geschafft!“: nothing was done, the day has come. */}
           <span className="rw-party-emoji" aria-hidden>
-            {won && plan.reward ? <ItemPic item={plan.reward} kind="reward" /> : <Pic src={picture("fest")} emoji={party} />}
+            {won && plan.reward ? (
+              <ItemPic item={plan.reward} kind="reward" />
+            ) : bigDay ? (
+              <ItemPic item={bigDay} kind="task" />
+            ) : (
+              <Pic src={picture("fest")} emoji={party} />
+            )}
           </span>
           <span className="rw-party-text">
             {won && plan.reward
               ? rewardLabel(plan.reward)
-              : t({
-                  de: "Alles geschafft!",
-                  en: "All done!",
-                  zh: "全部完成啦！",
-                  hi: "सब हो गया!",
-                  es: "¡Todo listo!",
-                  ar: "انتهينا من كل شيء!",
-                  ru: "Всё готово!",
-                })}
+              : bigDay
+                ? stepLabel(bigDay)
+                : t({
+                    de: "Alles geschafft!",
+                    en: "All done!",
+                    zh: "全部完成啦！",
+                    hi: "सब हो गया!",
+                    es: "¡Todo listo!",
+                    ar: "انتهينا من كل شيء!",
+                    ru: "Всё готово!",
+                  })}
           </span>
         </button>
       )}
