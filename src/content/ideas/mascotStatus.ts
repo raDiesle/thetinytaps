@@ -81,7 +81,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Fahrer, Mitfahrer und Pilotinnen werden Füchse oder Bären",
         work: "drawing",
         effort: "S",
-        note: "Ein Kopf für alle: Rider in scenes/shared.tsx zeichnet etwa 33 Köpfe in Fahrzeugen.",
+        state: "done",
+        note: "Rider in scenes/shared.tsx hat einen Fuchs- und einen Bärenkopf (`animal`, mit Mütze klein zwischen den Ohren). 24 der 33 Fahrer und Mitfahrer sind jetzt Füchse oder Bären, einige Menschen bleiben; im Stadtbus sitzt ein Bär mit seinem Kind, im Flughafenbus und im Reisebus Fuchs und Fuchskind (`child`).",
       },
       {
         label: "Fuchs- oder Bärenkind schaut aus den Verstecken, Mama, Papa, Oma oder Opa gleich dahinter",

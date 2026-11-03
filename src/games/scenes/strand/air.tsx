@@ -24,7 +24,7 @@ export function Flugzeug() {
         <path d="M-58 -4 H52" stroke="#fab005" strokeWidth="4" />
         <path d={CANOPY} fill="#bde0fe" />
         <Inside d={CANOPY}>
-          <Rider cx={-20} cy={-28} shirt="#1d3557" cap="#e63946" />
+          <Rider animal="fox" cx={-20} cy={-28} shirt="#1d3557" cap="#e63946" />
         </Inside>
         <g className="sd-flug-hand" style={{ transformOrigin: "-8px -28px" }}>
           <path d="M-8 -28 L2 -52" stroke="#1d3557" strokeWidth="7" strokeLinecap="round" />
