@@ -1,40 +1,18 @@
 import { memo } from "react";
 import { STAR_PATH } from "@/components/Bursts";
+import { MASCOT_COLORS, MASCOT_INK, MascotHead } from "@/components/Mascot";
 
 // The drawings of „Die Schnullerfee“, each in its own small svg: the room is drawn once and stands still, everything
 // that moves or changes (pacifiers, box, balloon, lamp, Tapsi, Mama, the fairy, the present) is a layer of its own
 // over it (PacifierPlay), so a phone only moves those.
 
-const FOX = "#e8743b";
-const FOX_DARK = "#c65a26";
-const MUZZLE = "#fff6ec";
-const INK = "#3b2a22";
-
-/** A fox's head in a 100 × 100 box: ears, a white muzzle, eyes open or shut in sleep. */
-function FoxHead({ asleep = false }: { asleep?: boolean }) {
-  return (
-    <g>
-      <path fill={FOX} d="M17 50 L21 9 L45 29 Z M83 50 L79 9 L55 29 Z" />
-      <path fill="#f7c9a8" d="M24 39 L26 18 L38 30 Z M76 39 L74 18 L62 30 Z" />
-      <path fill={FOX} d="M13 52 C13 31 31 24 50 24 C69 24 87 31 87 52 C87 72 69 90 50 92 C31 90 13 72 13 52 Z" />
-      <path fill={MUZZLE} d="M21 61 C33 58 44 63 50 73 C56 63 67 58 79 61 C75 78 63 90 50 92 C37 90 25 78 21 61 Z" />
-      <circle fill="#ff9e9e" opacity="0.6" cx="27" cy="66" r="5" />
-      <circle fill="#ff9e9e" opacity="0.6" cx="73" cy="66" r="5" />
-      {asleep ? (
-        <path d="M31 52 Q37 57 43 52 M57 52 Q63 57 69 52" fill="none" stroke={INK} strokeWidth="2.6" strokeLinecap="round" />
-      ) : (
-        <>
-          <circle fill={INK} cx="37" cy="52" r="4.6" />
-          <circle fill={INK} cx="63" cy="52" r="4.6" />
-          <circle fill="#fff" cx="38.5" cy="50.5" r="1.4" />
-          <circle fill="#fff" cx="64.5" cy="50.5" r="1.4" />
-        </>
-      )}
-      <ellipse fill={INK} cx="50" cy="72" rx="5.4" ry="3.8" />
-      <path d="M50 76 V79 M45 81 Q50 84 55 81" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-    </g>
-  );
-}
+const FOX = MASCOT_COLORS.fox.fur;
+const FOX_DARK = MASCOT_COLORS.fox.paw;
+const MUZZLE = MASCOT_COLORS.fox.pale;
+const BEAR = MASCOT_COLORS.bear.fur;
+const INK = MASCOT_INK;
+/** The line round Tapsi, Mama and the fairy, as round the app's mascots everywhere. */
+const LINE = { stroke: INK, strokeWidth: 3, strokeLinejoin: "round" as const };
 
 /** The room in the evening light, drawn once: wall with a hole where the window's sky shows, floor, rug, bed, bedside table, curtains, toy shelf. */
 export const Room = memo(function Room() {
@@ -255,24 +233,27 @@ export function Balloon({ tied }: { tied: string[] }) {
 export function TapsiStanding() {
   return (
     <svg viewBox="0 0 160 320" aria-hidden>
-      <path d="M112 228 C168 218 178 150 146 118 C152 170 132 200 104 212 Z" fill={FOX} />
-      <path d="M146 118 C162 134 168 150 162 162 C157 147 150 136 138 128 Z" fill={MUZZLE} />
-      <rect x="52" y="228" width="24" height="64" rx="10" fill="#8ec5f0" />
-      <rect x="86" y="228" width="24" height="64" rx="10" fill="#8ec5f0" />
-      <ellipse cx="62" cy="298" rx="19" ry="10" fill={FOX_DARK} />
-      <ellipse cx="100" cy="298" rx="19" ry="10" fill={FOX_DARK} />
-      <path d="M44 132 Q80 118 116 132 L124 234 Q80 246 36 234 Z" fill="#8ec5f0" />
+      <path d="M112 228 C168 218 178 150 146 118 C152 170 132 200 104 212 Z" fill={FOX} {...LINE} />
+      <path d="M146 118 C162 134 168 150 162 162 Q157 157 154 160 Q152 152 148 152 Q146 145 142 146 C141 138 140 132 138 128 Z" fill={MUZZLE} />
+      <path d="M112 228 C168 218 178 150 146 118 C152 170 132 200 104 212" fill="none" {...LINE} />
+      <rect x="52" y="228" width="24" height="64" rx="10" fill="#8ec5f0" {...LINE} />
+      <rect x="86" y="228" width="24" height="64" rx="10" fill="#8ec5f0" {...LINE} />
+      <ellipse cx="62" cy="298" rx="19" ry="10" fill={FOX_DARK} {...LINE} />
+      <ellipse cx="100" cy="298" rx="19" ry="10" fill={FOX_DARK} {...LINE} />
+      <path d="M44 132 Q80 118 116 132 L124 234 Q80 246 36 234 Z" fill="#8ec5f0" {...LINE} />
+      <path d="M112 140 L118 232 Q104 238 96 239 Q110 200 112 140 Z" fill="#6fa9d8" opacity="0.7" />
       <g fill="#fff">
         <circle cx="62" cy="170" r="4" />
         <circle cx="96" cy="160" r="4" />
         <circle cx="80" cy="205" r="4" />
         <circle cx="106" cy="214" r="4" />
       </g>
+      <path d="M50 142 L28 204 M110 142 L132 204" stroke={INK} strokeWidth="27" strokeLinecap="round" />
       <path d="M50 142 L28 204 M110 142 L132 204" stroke="#8ec5f0" strokeWidth="20" strokeLinecap="round" />
-      <circle cx="27" cy="208" r="11" fill={FOX} />
-      <circle cx="133" cy="208" r="11" fill={FOX} />
-      <g transform="translate(20 14) scale(1.2)">
-        <FoxHead />
+      <circle cx="27" cy="208" r="11" fill={FOX_DARK} {...LINE} />
+      <circle cx="133" cy="208" r="11" fill={FOX_DARK} {...LINE} />
+      <g transform="translate(14 8) scale(1.32)">
+        <MascotHead kind="fox" child />
       </g>
     </svg>
   );
@@ -282,10 +263,11 @@ export function TapsiStanding() {
 export function TapsiAsleep() {
   return (
     <svg viewBox="0 0 420 230" aria-hidden>
-      <path d="M372 112 C400 92 418 104 412 124 C404 114 390 112 378 120 Z" fill={FOX} />
-      <path d="M404 100 C414 104 418 112 414 122 C410 114 406 110 398 106 Z" fill={MUZZLE} />
+      <path d="M372 112 C400 92 418 104 412 124 C404 114 390 112 378 120 Z" fill={FOX} {...LINE} />
+      <path d="M404 100 C414 104 418 112 414 122 Q411 118 409 120 Q408 114 405 114 Q404 109 400 108 Z" fill={MUZZLE} />
+      <path d="M372 112 C400 92 418 104 412 124" fill="none" {...LINE} />
       <g transform="translate(44 28) rotate(-14 50 60)">
-        <FoxHead asleep />
+        <MascotHead kind="fox" child eyes="shut" />
       </g>
       <path d="M128 118 Q200 78 290 92 Q360 100 404 118 L404 198 L128 198 Z" fill="#ffe08a" />
       <path d="M128 118 Q200 78 290 92 Q360 100 404 118" fill="none" stroke="#f2c14e" strokeWidth="6" />
@@ -294,7 +276,7 @@ export function TapsiAsleep() {
         <circle cx="270" cy="170" r="7" />
         <circle cx="330" cy="130" r="7" />
       </g>
-      <circle cx="150" cy="120" r="12" fill={FOX} />
+      <circle cx="150" cy="120" r="12" fill={FOX_DARK} />
     </svg>
   );
 }
@@ -303,22 +285,26 @@ export function TapsiAsleep() {
 export function MamaFox() {
   return (
     <svg viewBox="0 0 200 440" aria-hidden>
-      <path d="M140 330 C202 320 216 238 180 198 C186 258 166 298 128 310 Z" fill={FOX} />
-      <path d="M180 198 C198 216 204 236 198 248 C192 232 184 220 170 210 Z" fill={MUZZLE} />
-      <rect x="72" y="362" width="22" height="58" rx="10" fill={FOX} />
-      <rect x="106" y="362" width="22" height="58" rx="10" fill={FOX} />
-      <ellipse cx="82" cy="424" rx="20" ry="10" fill={FOX_DARK} />
-      <ellipse cx="118" cy="424" rx="20" ry="10" fill={FOX_DARK} />
-      <path d="M62 166 Q100 148 138 166 L178 368 Q100 388 22 368 Z" fill="#6cbf84" />
-      <path d="M74 160 Q100 182 126 160 Q100 170 74 160 Z" fill="#fff" />
+      <path d="M140 330 C202 320 216 238 180 198 C186 258 166 298 128 310 Z" fill={FOX} {...LINE} />
+      <path d="M180 198 C198 216 204 236 198 248 Q193 243 190 246 Q188 238 184 238 Q181 230 177 231 C176 222 174 214 170 210 Z" fill={MUZZLE} />
+      <path d="M140 330 C202 320 216 238 180 198 C186 258 166 298 128 310" fill="none" {...LINE} />
+      <rect x="72" y="362" width="22" height="58" rx="10" fill={FOX_DARK} {...LINE} />
+      <rect x="106" y="362" width="22" height="58" rx="10" fill={FOX_DARK} {...LINE} />
+      <ellipse cx="82" cy="424" rx="20" ry="10" fill={FOX_DARK} {...LINE} />
+      <ellipse cx="118" cy="424" rx="20" ry="10" fill={FOX_DARK} {...LINE} />
+      <path d="M62 166 Q100 148 138 166 L178 368 Q100 388 22 368 Z" fill="#6cbf84" {...LINE} />
+      <path d="M128 172 L170 366 Q150 372 132 374 Q144 290 128 172 Z" fill="#4f9f68" opacity="0.7" />
+      <path d="M74 160 Q100 182 126 160 Q100 170 74 160 Z" fill="#fff" {...LINE} strokeWidth="2" />
       <path d="M44 340 Q100 356 156 340" fill="none" stroke="#fff" strokeWidth="6" opacity="0.7" />
+      <path d="M68 180 L36 288 M132 180 L164 288" stroke={INK} strokeWidth="29" strokeLinecap="round" />
       <path d="M68 180 L36 288 M132 180 L164 288" stroke="#6cbf84" strokeWidth="22" strokeLinecap="round" />
-      <circle cx="34" cy="294" r="13" fill={FOX} />
-      <circle cx="166" cy="294" r="13" fill={FOX} />
-      <g transform="translate(25 6) scale(1.5)">
-        <FoxHead />
-        <circle cx="76" cy="26" r="6" fill="#ff7bd0" />
-        <circle cx="76" cy="26" r="2.5" fill="#ffd166" />
+      <circle cx="34" cy="294" r="13" fill={FOX_DARK} {...LINE} />
+      <circle cx="166" cy="294" r="13" fill={FOX_DARK} {...LINE} />
+      <g transform="translate(25 12) scale(1.5)">
+        <MascotHead kind="fox" lashes>
+          <circle cx="77" cy="24" r="6" fill="#ff7bd0" stroke={INK} strokeWidth="1.6" />
+          <circle cx="77" cy="24" r="2.5" fill="#ffd166" />
+        </MascotHead>
       </g>
     </svg>
   );
@@ -349,26 +335,18 @@ export function Fairy({ balloon }: { balloon: boolean }) {
           <path d="M185 82 H195 L190 89 Z" fill="#e0465c" />
         </>
       )}
-      <path d="M110 116 L152 204 Q110 218 68 204 Z" fill="#ff9ec4" />
+      <path d="M110 116 L152 204 Q110 218 68 204 Z" fill="#ff9ec4" {...LINE} />
       <path d="M78 196 Q110 206 142 196" fill="none" stroke="#fff" strokeWidth="4" />
-      <circle cx="98" cy="212" r="7" fill="#a8714a" />
-      <circle cx="122" cy="212" r="7" fill="#a8714a" />
-      <path d="M96 136 L62 118 M124 136 L160 156" stroke="#a8714a" strokeWidth="10" strokeLinecap="round" />
+      <circle cx="98" cy="212" r="7" fill={BEAR} {...LINE} strokeWidth="2.5" />
+      <circle cx="122" cy="212" r="7" fill={BEAR} {...LINE} strokeWidth="2.5" />
+      <path d="M96 136 L62 118 M124 136 L160 156" stroke={INK} strokeWidth="15" strokeLinecap="round" />
+      <path d="M96 136 L62 118 M124 136 L160 156" stroke={BEAR} strokeWidth="10" strokeLinecap="round" />
       <path d="M62 118 L30 70" stroke="#c9a227" strokeWidth="4" strokeLinecap="round" />
       <path d={STAR_PATH} transform="translate(13 50) scale(0.34)" fill="#ffe066" stroke="#e0a800" strokeWidth="5" />
-      <circle cx="88" cy="62" r="12" fill="#a8714a" />
-      <circle cx="132" cy="62" r="12" fill="#a8714a" />
-      <circle cx="88" cy="62" r="6" fill="#e3b48c" />
-      <circle cx="132" cy="62" r="6" fill="#e3b48c" />
-      <circle cx="110" cy="88" r="32" fill="#a8714a" />
-      <ellipse cx="110" cy="101" rx="14" ry="10" fill="#e3c19c" />
-      <ellipse cx="110" cy="96" rx="5" ry="3.6" fill={INK} />
-      <path d="M104 104 Q110 109 116 104" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-      <circle cx="99" cy="84" r="3.8" fill={INK} />
-      <circle cx="121" cy="84" r="3.8" fill={INK} />
-      <circle cx="90" cy="96" r="4.5" fill="#ff9e9e" opacity="0.6" />
-      <circle cx="130" cy="96" r="4.5" fill="#ff9e9e" opacity="0.6" />
-      <path d="M96 60 L101 46 L110 56 L119 46 L124 60 Z" fill="#ffd166" stroke="#e0a800" strokeWidth="2" />
+      <g transform="translate(67 39.8) scale(0.86)">
+        <MascotHead kind="bear" child lashes />
+      </g>
+      <path d="M96 54 L101 40 L110 50 L119 40 L124 54 Z" fill="#ffd166" stroke="#e0a800" strokeWidth="2" />
     </svg>
   );
 }

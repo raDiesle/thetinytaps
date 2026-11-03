@@ -224,6 +224,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         state: "done",
         note: "CheeringFamily (components/Mascot.tsx) neben „Menü“, „Nochmal“, „Weiter“; das Kind springt zweimal, dann steht alles still. Nicht bei `corners` und beim Timer (`noFamily`), deren Bild die Familie schon zeigt.",
       },
+      {
+        label: "Alle gezeichneten Füchse und Bären bekommen einen schöneren, detaillierten Kopf und Körper im Stil der Gemini-Familienbilder",
+        work: "drawing",
+        effort: "M",
+        state: "done",
+        note: "Ein Kopf für alle (`MascotHead` in components/Mascot.tsx): Fellbüschel an den Wangen, Flausch in den Ohren, Schattenseite, Brauen, Augen mit Lichtern, glänzende Nase. Ihn nutzen Spielende, Timer, Fahrer in Lebendige Bilder, Schnullerfee, Sticker im Regal, die Helfer in „Was gehört zusammen?“, Baustelle und Zirkus in Kettenreaktion. Ein neuer Fuchs oder Bär nimmt ihn auch.",
+      },
       { label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)", work: "picture", pictures: 4, effort: "S", idea: "D-21" },
     ],
   },
