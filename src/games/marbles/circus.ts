@@ -581,5 +581,6 @@ export function buildCircus() {
     clownAt,
     sagAt,
     cameraTarget,
+    width: WORLD_W,
   };
 }

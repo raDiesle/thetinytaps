@@ -420,5 +420,6 @@ export function buildNight() {
     asleep,
     rock,
     cameraTarget,
+    width: WORLD_W,
   };
 }

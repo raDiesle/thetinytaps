@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { pagesBetween } from "@/content/games";
 import { putBookBack } from "@/lib/bookTravel";
 import { goBack } from "@/lib/goBack";
+import { holdPreloads } from "@/lib/preloadPages";
 import { playPageTurn } from "@/lib/sfx";
 
 /**
@@ -72,10 +73,14 @@ export function turnPageWith(direction: TurnDirection, update: () => void, pages
     return;
   }
   playPageTurn(TURN_SECONDS);
+  holdPreloads(TURN_SECONDS * 1000 + 200);
   const html = document.documentElement;
   const turn = ++turning;
   html.dataset.turn = direction;
-  const sheets = pageBundle(Math.min(pages, MOST_PAGES) - 1);
+  // The shadow band on the page beneath (`.turn-shade`) turns with the page and the sheets, in the same state.
+  const shade = document.createElement("div");
+  shade.className = "turn-shade";
+  const sheets = [shade, ...pageBundle(Math.min(pages, MOST_PAGES) - 1)];
   const show = (on: boolean) => {
     if (on) html.dataset.turning = "";
     else delete html.dataset.turning;

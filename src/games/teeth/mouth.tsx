@@ -1,4 +1,4 @@
-import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
+import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
@@ -299,6 +299,12 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
   const { box, unit } = fitBox(useRoom(svg, free), mouthFocus(lipPoints, project.zoom, view.open));
   const frame = screenFrame(box, unit);
   const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
+  /** A point of the picture in screen px from the screen's middle (where the box's middle lies), and `scale` in px. */
+  const onScreen = (at: { x: number; y: number }, scale: number): SpriteSpot => ({
+    x: (at.x - box.x - box.width / 2) / unit,
+    y: (at.y - box.y - box.height / 2) / unit,
+    scale: scale / unit,
+  });
 
   // The face and the teeth change only while the head turns or the mouth opens: built once for each view,
   // not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
@@ -376,9 +382,46 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
     );
   }, [view, all, model, gumsByKey, lipsPath, zoneSurface, zoneTeeth, happy, daytime]);
 
-  // Two pictures on top of each other: the still one below, and above it in a layer of its own everything that
-  // moves (the glow, the monsters, the brush; the lips go with them, over the glow), so the brush moving on every frame never has the browser paint the
-  // face and the teeth again. Both have the same viewBox and size, so they line up exactly.
+  const placed = (m: MonsterSpot) => {
+    const face = toothFace(m.tooth, m.surface);
+    const jaw = all[m.tooth.jaw];
+    const facing = jaw.facing(face.normal);
+    // The ones being brushed stay even on a steep face. The waiting ones only where nothing hides them:
+    // with the teeth together, only the outside of the teeth shows.
+    if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
+    const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
+    // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
+    if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
+    // The ones being brushed move, so each lies in a layer of its own (Sprite), placed on the screen.
+    const spot = m.waiting ? { x: at.x, y: at.y, scale: MONSTER_SIZE * project.zoom } : onScreen(at, MONSTER_SIZE * project.zoom);
+    return (
+      <PlacedMonster
+        key={m.id}
+        id={m.id}
+        x={round(spot.x)}
+        y={round(spot.y)}
+        scale={round(spot.scale, 100)}
+        sprite={!m.waiting}
+        color={m.color}
+        variant={m.variant}
+        active={!m.waiting}
+        still={m.waiting}
+        gone={m.gone}
+        scared={m.scared}
+        tickled={m.tickled}
+        blinkMs={m.blinkMs}
+        onTickle={onTickle}
+      />
+    );
+  };
+
+  // Pictures on top of each other, all with the same viewBox and size, so they line up exactly: the still one below
+  // (face, teeth), then each in a layer of its own the glow on the teeth to brush (the whole svg pulses, which a phone
+  // does without painting), the lips and the waiting monsters, what moves (the monsters being brushed, the arrows on
+  // the lips) each in a small layer of its own (Sprite), the mirror's glass and frame, and the brush. Something
+  // animated inside an svg has the browser paint that whole svg again in every frame: the glow once pulsed with the
+  // lips in one picture, and the swaying monsters lay in one the size of the screen, and each time the phone painted
+  // the screen anew 50 times a second.
   return (
     <>
       <svg ref={svg} className="mouth" viewBox={viewBox} role="img" aria-label={pictureLabel}>
@@ -394,13 +437,53 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
         <g clipPath="url(#mirror)">{still}</g>
       </svg>
 
+      {zone && (
+        <svg className="mouth mouth-moving zone-glow" viewBox={viewBox} aria-hidden>
+          <defs>
+            <clipPath id="mirror-glow">
+              <rect {...frame} />
+            </clipPath>
+            <clipPath id="mouth-inside-glow">
+              <path d={lipsPath} />
+            </clipPath>
+          </defs>
+          <g clipPath="url(#mirror-glow)">
+            <g clipPath="url(#mouth-inside-glow)">
+              {zone.teeth.map((id) => {
+                const face = toothFace(id, zone.surface);
+                const at = all[id.jaw];
+                if (at.facing(face.normal) <= MIN_FACING) return null;
+                return <path key={toothKey(id)} d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />;
+              })}
+            </g>
+          </g>
+        </svg>
+      )}
+
       <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
         <defs>
           <clipPath id="mirror-moving">
             <rect {...frame} />
           </clipPath>
-          <clipPath id="mouth-inside-moving">
-            <path d={lipsPath} />
+        </defs>
+        <g clipPath="url(#mirror-moving)">
+          {/* The lips over the glow's edge, here rather than with the still picture, so the glow stays inside them. */}
+          <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
+          <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
+          {monsters.filter((m) => m.waiting).map(placed)}
+        </g>
+      </svg>
+
+      <div className="mouth-sprites">
+        {/* The ones being brushed now on top. */}
+        {monsters.filter((m) => !m.waiting).map(placed)}
+        {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
+      </div>
+
+      <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
+        <defs>
+          <clipPath id="mirror-active">
+            <rect {...frame} />
           </clipPath>
           <radialGradient id="monster-glow">
             <stop offset="0.5" stopColor="#fffbd1" />
@@ -408,50 +491,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
             <stop offset="1" stopColor="#ffb703" stopOpacity={0} />
           </radialGradient>
         </defs>
-        <g clipPath="url(#mirror-moving)">
-          <g clipPath="url(#mouth-inside-moving)">
-            {zone?.teeth.map((id) => {
-              const face = toothFace(id, zone.surface);
-              const at = all[id.jaw];
-              if (at.facing(face.normal) <= MIN_FACING) return null;
-              return (
-                <path key={toothKey(id)} className="zone-glow" d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />
-              );
-            })}
-          </g>
-          {/* The lips over the glow's edge, here rather than with the still picture, so the glow stays inside them. */}
-          <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
-          <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
-
-          {/* The ones being brushed now on top. */}
-          {[...monsters.filter((m) => m.waiting), ...monsters.filter((m) => !m.waiting)].map((m) => {
-            const face = toothFace(m.tooth, m.surface);
-            const jaw = all[m.tooth.jaw];
-            const facing = jaw.facing(face.normal);
-            // The ones being brushed stay even on a steep face. The waiting ones only where nothing hides them:
-            // with the teeth together, only the outside of the teeth shows.
-            if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
-            const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
-            // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
-            if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
-            return (
-              <PlacedMonster
-                key={m.id}
-                id={m.id}
-                transform={`translate(${at.x.toFixed(1)} ${at.y.toFixed(1)}) scale(${(MONSTER_SIZE * project.zoom).toFixed(2)})`}
-                color={m.color}
-                variant={m.variant}
-                active={!m.waiting}
-                still={m.waiting}
-                gone={m.gone}
-                scared={m.scared}
-                tickled={m.tickled}
-                blinkMs={m.blinkMs}
-                onTickle={onTickle}
-              />
-            );
-          })}
-
+        <g clipPath="url(#mirror-active)">
           {happy &&
             model.teeth.map((t, i) => {
               const face = surfaceFace(t.faces, "outer");
@@ -472,8 +512,6 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
               );
             })}
 
-          {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
-
           {/* The mirror glass catches the light. */}
           <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)}) scale(${(1.6 * unit).toFixed(3)})`}>
             <path d="M80 10 L135 10 L10 135 L10 80 Z" />
@@ -485,15 +523,24 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
       {brush &&
         brush.stops.length > 0 &&
         (() => {
-          // Glide between the two stops either side of `at`.
+          // Glide between the two stops either side of `at`, held as on the nearer one: so the brush's shape changes only
+          // when it turns to the next stop, and in between only its layer moves, which a phone does without painting.
           const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
           const next = Math.min(brush.stops.length - 1, i + 1);
           const k = Math.min(1, Math.max(0, brush.at - i));
-          const a = anchorAt(brush.stops[i], brush.surface);
-          const b = anchorAt(brush.stops[next], brush.surface);
-          const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
-          const tooth = brush.stops[k < 0.5 ? i : next].tooth;
-          return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} frame={{ viewBox, box, unit }} />;
+          const near = brush.stops[k < 0.5 ? i : next];
+          const at = lerp3(anchorAt(brush.stops[i], brush.surface).at, anchorAt(brush.stops[next], brush.surface).at, k);
+          return (
+            <Brush
+              anchor={anchorAt(near, brush.surface)}
+              at={at}
+              surface={brush.surface}
+              tooth={near.tooth}
+              motion={brush.motion}
+              project={all[near.tooth.jaw]}
+              frame={{ box, unit }}
+            />
+          );
         })()}
     </>
   );
@@ -505,18 +552,29 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
  */
 const PlacedMonster = memo(function PlacedMonster({
   id,
-  transform,
+  x,
+  y,
+  scale,
+  sprite,
   onTickle,
   ...monster
-}: { id: number; transform: string; onTickle: (id: number) => void } & Omit<Parameters<typeof Monster>[0], "onTickle">) {
-  // While the head turns only `transform` changes: the monster itself is kept, so React doesn't draw it again.
+}: {
+  id: number;
+  /** Where its middle lies and how big it is: in picture units, or for a `sprite` as a SpriteSpot on the screen. */
+  x: number;
+  y: number;
+  scale: number;
+  sprite: boolean;
+  onTickle: (id: number) => void;
+} & Omit<Parameters<typeof Monster>[0], "onTickle">) {
+  // While the head turns only the place changes: the monster itself is kept, so React doesn't draw it again.
   const { color, variant, active, still, gone, scared, tickled, blinkMs } = monster;
   const drawn = useMemo(
     () => (
       <Monster
         color={color}
         variant={variant}
-        active={active}
+        active={active && !sprite}
         still={still}
         gone={gone}
         scared={scared}
@@ -525,10 +583,54 @@ const PlacedMonster = memo(function PlacedMonster({
         onTickle={() => onTickle(id)}
       />
     ),
-    [id, color, variant, active, still, gone, scared, tickled, blinkMs, onTickle],
+    [id, color, variant, active, sprite, still, gone, scared, tickled, blinkMs, onTickle],
   );
-  return <g transform={transform}>{drawn}</g>;
+  if (sprite)
+    return (
+      <Sprite spot={{ x, y, scale }} reach={MONSTER_REACH} className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}`}>
+        {active && <div className="sprite-glow" />}
+        <div className="sprite-body">
+          <svg viewBox={spriteBox(MONSTER_REACH)}>{drawn}</svg>
+        </div>
+      </Sprite>
+    );
+  return <g transform={`translate(${x} ${y}) scale(${scale})`}>{drawn}</g>;
 });
+
+/** Rounded, so a place that hasn't really moved leaves the page as it is. */
+const round = (n: number, by = 10) => Math.round(n * by) / by;
+
+/** How far a monster reaches from its middle, glow and sway included, in its own units. */
+const MONSTER_REACH = 34;
+
+/** Where a sprite's middle lies on the screen, in px from the screen's middle, and how many px one of its units is. */
+interface SpriteSpot {
+  x: number;
+  y: number;
+  scale: number;
+}
+
+/**
+ * A small moving picture over the mirror in an HTML layer of its own, `reach` of its units each way round its middle
+ * (an svg in it takes `spriteBox(reach)`). Something animated inside an svg has the browser paint that whole svg again
+ * in every frame, and even a small svg on every frame keeps a phone's main thread busy: so the monsters being brushed
+ * and the arrows on the lips are each such a layer, and what moves in them (sway, glow, nudge) moves the HTML around
+ * their svg, which the browser does without painting (`.monster-sprite`, `.lip-arrow` in teeth.css).
+ */
+function Sprite({ spot, reach, className, children }: { spot: SpriteSpot; reach: number; className: string; children: ReactNode }) {
+  const size = round(2 * reach * spot.scale);
+  return (
+    <div
+      className={`mouth-sprite ${className}`}
+      style={{ width: size, height: size, transform: `translate(${round(spot.x - size / 2)}px, ${round(spot.y - size / 2)}px)` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** The viewBox of an svg filling a Sprite: `reach` units each way round (0, 0). */
+const spriteBox = (reach: number) => `${-reach} ${-reach} ${2 * reach} ${2 * reach}`;
 
 /** A point just in front of a face, where a monster or the brush sits. */
 const lift = (at: Vec3, face: Face, by: number): Vec3 => [at[0] + face.normal[0] * by, at[1] + face.normal[1] * by, at[2] + face.normal[2] * by];
@@ -542,7 +644,17 @@ const unitOf = (a: Vec3): Vec3 => {
 const ARROW_PATH = "M0 -28 L22 -4 L9 -4 L9 24 L-9 24 L-9 -4 L-22 -4 Z";
 
 /** Big arrows on the lips that nudge the way the mouth should move. */
-function LipArrows({ action, lips, zoom }: { action: MouthAction; lips: Point2[]; zoom: number }) {
+function LipArrows({
+  action,
+  lips,
+  zoom,
+  onScreen,
+}: {
+  action: MouthAction;
+  lips: Point2[];
+  zoom: number;
+  onScreen: (at: { x: number; y: number }, scale: number) => SpriteSpot;
+}) {
   const xs = lips.map((p) => p.x);
   const ys = lips.map((p) => p.y);
   const x = (Math.min(...xs) + Math.max(...xs)) / 2;
@@ -553,15 +665,15 @@ function LipArrows({ action, lips, zoom }: { action: MouthAction; lips: Point2[]
     { y: top - off, turn: action === "open" ? 0 : 180 },
     { y: bottom + off, turn: action === "open" ? 180 : 0 },
   ];
-  return (
-    <g pointerEvents="none">
-      {arrows.map((a, i) => (
-        <g key={i} transform={`translate(${x.toFixed(1)} ${a.y.toFixed(1)}) rotate(${a.turn}) scale(${Math.min(1.1, zoom).toFixed(2)})`}>
-          <path className="lip-arrow" d={ARROW_PATH} fill="#ffd23f" stroke={INK} strokeWidth={4} strokeLinejoin="round" />
-        </g>
-      ))}
-    </g>
-  );
+  return arrows.map((a, i) => (
+    <Sprite key={i} spot={onScreen({ x, y: a.y }, Math.min(1.1, zoom))} reach={44} className="lip-arrow-sprite">
+      <div style={{ transform: `rotate(${a.turn}deg)` }}>
+        <svg className="lip-arrow" viewBox={spriteBox(44)}>
+          <path d={ARROW_PATH} fill="#ffd23f" stroke={INK} strokeWidth={4} strokeLinejoin="round" />
+        </svg>
+      </div>
+    </Sprite>
+  ));
 }
 
 /** Breakfast crumbs on the chin and by the corners of the mouth: across, below the lips, size. */
@@ -651,7 +763,8 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
             strokeLinecap="round"
           />
         ) : (
-          <g key={i} className="face-eye">
+          // The eyes don't blink: the face is the still picture under the mirror, and anything moving in it has a phone paint it again.
+          <g key={i}>
             {girl && (
               <path
                 d={LASHES.map(([a, b]) => `M${at.x + (i ? 1 : -1) * a * squash(facing)} ${at.y - b} l${(i ? 1 : -1) * 9 * squash(facing)} -9`).join(" ")}

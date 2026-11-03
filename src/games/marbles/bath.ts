@@ -580,5 +580,6 @@ export function buildBath() {
     lampSwing,
     capOn,
     cameraTarget,
+    width: WORLD_W,
   };
 }

@@ -665,9 +665,6 @@
 }
 
 :root[data-look="book"][data-turn="forward"]::view-transition-old(root) {
-  mask-image: linear-gradient(270deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
-  mask-size: 250% 100%;
-  mask-repeat: no-repeat;
   animation: book-turn-under var(--turn-time) linear reverse both;
 }
 
@@ -678,10 +675,36 @@
 }
 
 :root[data-look="book"][data-turn="back"]::view-transition-new(root) {
-  mask-image: linear-gradient(270deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
-  mask-size: 250% 100%;
-  mask-repeat: no-repeat;
   animation: book-turn-under var(--turn-time) linear both;
+}
+
+/*
+ * The turning page's shadow on the page beneath: a soft band, dark towards the turning edge, sliding from the page's
+ * outer (left) edge over to the spine. It is an element of its own (`.turn-shade`, look.ts) moved by a transform: a
+ * band drawn by moving a mask over the page beneath had the phone paint the whole screen again in every frame of the turn.
+ */
+.turn-shade {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40vw;
+  pointer-events: none;
+  background: linear-gradient(90deg, #0000, #00000045 50%, #00000066 69%, #0000);
+  view-transition-name: turn-shade;
+}
+
+:root[data-look="book"]::view-transition-group(turn-shade) {
+  z-index: 1;
+  animation-duration: var(--turn-time);
+}
+
+:root[data-look="book"][data-turn="back"]::view-transition-old(turn-shade) {
+  animation: book-turn-shade var(--turn-time) linear both;
+}
+
+:root[data-look="book"][data-turn="forward"]::view-transition-new(turn-shade) {
+  animation: book-turn-shade var(--turn-time) linear reverse both;
 }
 
 /*
@@ -774,30 +797,41 @@
   }
 }
 
-/*
- * The page beneath: dim under the lifting page at first, and the soft shadow band of the turning page's edge sliding
- * from its outer (left) edge to the spine (`mask-position` moves the band, which lets the dark of the group show through).
- */
+/* The page beneath: dim under the lifting page at first, brightening as it turns away. */
 @keyframes book-turn-under {
   0% {
     filter: brightness(0.84);
-    mask-position: 100% 0;
   }
   30% {
     filter: brightness(0.86);
-    mask-position: 90% 0;
   }
   55% {
     filter: brightness(0.92);
-    mask-position: 78% 0;
   }
   78% {
     filter: brightness(0.98);
-    mask-position: 50% 0;
   }
   100% {
     filter: brightness(1);
-    mask-position: 0% 0;
+  }
+}
+
+/* The shadow band (`.turn-shade`) at the same moments: off the page's outer edge, over it, past the spine. */
+@keyframes book-turn-shade {
+  0% {
+    transform: translateX(-45vw);
+  }
+  30% {
+    transform: translateX(-30vw);
+  }
+  55% {
+    transform: translateX(-12vw);
+  }
+  78% {
+    transform: translateX(30vw);
+  }
+  100% {
+    transform: translateX(105vw);
   }
 }
 
@@ -809,6 +843,10 @@
   :root[data-look="book"]::view-transition-old(*.turn-sheet),
   :root[data-look="book"]::view-transition-new(*.turn-sheet) {
     animation: none;
+  }
+
+  .turn-shade {
+    display: none;
   }
 }
 

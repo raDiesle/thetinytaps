@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playHa, playHatschi, playLeaves, playSniff, playSqueak, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { loadRealSounds, playBaa, playBark, playGiggle, playMeow, playMoo, playOink, playQuack, playTrumpet, playTweet } from "@/lib/realSounds";
-import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
+import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
 import type { Pt } from "./path";
 import { INK } from "./scenery";
@@ -141,6 +141,7 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   /** One-off sounds of the ending that have played, and whether the level is done. */
   const fired = useRef(new Set<string>());
   const camera = useRef({ x: 0, z: 1 });
+  const box = useRef<HTMLDivElement>(null);
   const ids = useId();
   const last = row.seats.length - 1;
 
@@ -271,10 +272,15 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   const meadow = useMemo(() => <Meadow worldW={row.worldW} gradient={`${ids}-sky`} />, [row, ids]);
 
   return (
-    <div className="marble-level" onPointerDown={onPointerDown}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
-        {/* Zooming out keeps the meadow's ground line in the same place on the screen. */}
-        <g transform={`translate(0 ${VIEW_H * (1 - camZ)}) scale(${camZ}) translate(${-camX} 0)`}>
+    <div className="marble-level" ref={box} onPointerDown={onPointerDown}>
+      {/* Zooming out keeps the meadow's ground line in the same place on the screen. */}
+      <svg
+        className="marble-camera"
+        viewBox={`0 0 ${row.worldW} ${VIEW_H}`}
+        style={cameraLayer(box.current, { x: 0, y: 0, w: row.worldW, h: VIEW_H }, { x: camX, y: VIEW_H - VIEW_H / camZ, w: VIEW_W, h: VIEW_H }, camZ)}
+        aria-label={label}
+      >
+        <g>
           {meadow}
           <TreeDrawing tree={row.tree} age={t - leavesT.current} />
           {row.seats.map((seat, i) => (

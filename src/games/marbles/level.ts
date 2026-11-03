@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { type Localized, useT } from "@/lib/language";
 import { LEVEL_TEXTS } from "./content";
 import type { MarbleLevel } from "./settings";
@@ -18,6 +18,30 @@ export interface LevelProps {
 /** The picture's size; every level draws in these coordinates. */
 export const VIEW_W = 1600;
 export const VIEW_H = 900;
+
+/** A rectangle of a level's world, in its coordinates. */
+export interface WorldRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/**
+ * The whole world drawn once in one big svg, and the camera a CSS transform of it: the svg's size and its transform so
+ * that `view` (the part of `world` the camera shows, its top left corner and its size before zooming) fills `box` as
+ * `preserveAspectRatio="xMidYMid meet"` would, `zoom` times as big. A phone only moves the finished picture then, where a
+ * changed viewBox or a moved group inside the svg made it paint the whole picture again in every frame (the marble run
+ * and the machines stuttered on phones). The svg is `.marble-camera` (a layer of its own, `overflow: visible`).
+ */
+export function cameraLayer(box: HTMLElement | null, world: WorldRect, view: WorldRect, zoom = 1): CSSProperties {
+  const w = box?.clientWidth || window.innerWidth;
+  const h = box?.clientHeight || window.innerHeight;
+  const s = Math.min(w / view.w, h / view.h);
+  const dx = (w - view.w * s) / 2 - (view.x - world.x) * s * zoom;
+  const dy = (h - view.h * s) / 2 - (view.y - world.y) * s * zoom;
+  return { width: world.w * s, height: world.h * s, transform: `translate3d(${dx}px, ${dy}px, 0)${zoom === 1 ? "" : ` scale(${zoom})`}` };
+}
 
 /** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
 export const wobble = (age: number, amp: number, freq: number, damp: number) => (age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq));

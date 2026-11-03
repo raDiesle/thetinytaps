@@ -148,13 +148,26 @@ In a fresh worktree run `bun install` first.
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
   Phones must keep up: what moves across a big picture as a whole (a scrolling world, a camera) is an HTML layer of its
-  own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
+  own (its own svg in a `div` with `will-change: transform`, or the whole world's svg moved by a CSS transform like
+  Kettenreaktion's `cameraLayer`), never a moved group inside one big svg nor a changing `viewBox`, which the browser
   paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
   tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this). What moves on every frame
-  moves by CSS (`transform`, `opacity` of an HTML layer), never by React drawing it again per frame, and only what the
-  child is busy with moves (waiting figures stand still). `bun run perf` measures it: it plays each game in headless
+  moves by CSS (`transform`, `opacity`, `filter` of an HTML layer), never by React drawing it again per frame, and only
+  what the child is busy with moves (waiting figures stand still). Any CSS animation of an element *inside* an svg, and
+  of `mask-position`, `background-position`, `clip-path` or a size, has the phone paint that whole svg or box again in
+  every frame: a glow pulsing over the teeth with the lips in one svg, and a shadow band slid across the page beneath
+  as a moving mask, each repainted most of the screen 60 times a second. Give such a thing a layer of its own (its own
+  svg or element) and animate that layer's `transform` or `opacity`: a small figure that sways or glows is a small
+  HTML layer round its own little svg, and the HTML moves, not a group inside (even small svgs animating inside kept an
+  old phone's main thread busy; Zähne putzen's monsters, `Sprite`). A layer is only as big as what it shows: a phone
+  rasters a changed layer in bands as wide as the screen. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts,
+  never in its middle, and loading other pages' code waits (`holdPreloads` in `src/lib/preloadPages.ts`).
+  `bun run perf` measures it: it plays each game in headless
   Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
-  (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy). A new game,
+  (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy, and ≤ 30
+  screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles). Until
+  November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
+  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
   `--profile` names the functions that cost, `--shots` shows what was measured). The build ships React's production code
   (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.

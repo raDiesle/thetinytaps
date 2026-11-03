@@ -141,7 +141,12 @@ async function launchChrome() {
       // A microphone that hears a tone, allowed without asking (Laut & Leise).
       "--use-fake-ui-for-media-stream",
       "--use-fake-device-for-media-stream",
-      `--window-size=${device.width},${device.height}`,
+      `--window-size=${device.width * device.scale},${device.height * device.scale}`,
+      // The phone's pixels for real: DevTools' device emulation alone tells the page it has 3× pixels but rasters the
+      // picture at the window's own 1×, so what painting many pixels costs went unmeasured (November 2026).
+      `--force-device-scale-factor=${device.scale}`,
+      // A screen as big as the phone's, or fullscreen (which a phone's first tap asks for) shrinks the window to Chrome's own.
+      `--screen-info={${device.width * device.scale}x${device.height * device.scale}}`,
       "about:blank",
     ],
     { stdout: "ignore", stderr: "ignore" },
@@ -227,6 +232,11 @@ interface Measurement {
   /** Painting (recording what to draw, main thread) and rastering (turning it into pixels, helper threads), ms per second. */
   paintMsPerS: number;
   rasterMsPerS: number;
+  /**
+   * Pixels rastered anew per second, in whole screens at the device's pixels: a phone's GPU paints these, so a picture
+   * drawn anew every frame costs 60 (120 on a phone showing 120 frames a second) however fast this computer is.
+   */
+  rasterScreensPerS: number;
   /** Style recalculations and layouts per second: a lot of them usually means something moves through layout. */
   stylesPerS: number;
   layoutsPerS: number;
@@ -257,9 +267,15 @@ async function centerOf(cdp: Cdp, selector: string) {
   );
 }
 
-/** A finger's tap, as on a phone: pointer down, up and the click it makes. */
+/**
+ * A finger's tap, as on a phone: the finger down and up again, from which Chrome makes the pointer events and the click.
+ * (`Input.synthesizeTapGesture` checks the spot against the window at 1× pixels and refuses most of a 3× screen.)
+ */
 async function tapAt(cdp: Cdp, x: number, y: number) {
-  await cdp.send("Input.synthesizeTapGesture", { x, y, duration: 60, gestureSourceType: "touch" });
+  const touchPoints = [{ x, y, radiusX: 8, radiusY: 8, force: 1, id: 1 }];
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints });
+  await sleep(60);
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
 }
 
 const KEY_CODES: Record<string, number> = { ArrowRight: 39, ArrowLeft: 37, ArrowUp: 38, ArrowDown: 40, " ": 32, Enter: 13, Escape: 27 };
@@ -347,14 +363,21 @@ interface TraceEvent {
   ph: string;
   dur?: number;
   tid: number;
+  args?: {
+    tileData?: { tileId?: { id_ref?: string } };
+    snapshot?: { active_tiles?: { id?: string; content_rect?: number[] }[] };
+  };
 }
 
-/** Records Chrome's trace while `during` runs: where painting (main thread) and rastering (its helper threads) take time. */
+/**
+ * Records Chrome's trace while `during` runs: where painting (main thread) and rastering (its helper threads) take time,
+ * and how many pixels were rastered anew (each raster task's tile, its size from the compositor's tile snapshots).
+ */
 async function traced(cdp: Cdp, during: () => Promise<void>) {
   const events: TraceEvent[] = [];
   const off = cdp.on("Tracing.dataCollected", (params) => events.push(...(params.value as TraceEvent[])));
   await cdp.send("Tracing.start", {
-    traceConfig: { includedCategories: ["devtools.timeline", "disabled-by-default-devtools.timeline", "disabled-by-default-devtools.timeline.frame"] },
+    traceConfig: { includedCategories: ["devtools.timeline", "disabled-by-default-devtools.timeline", "disabled-by-default-devtools.timeline.frame", "disabled-by-default-cc.debug"] },
     transferMode: "ReportEvents",
   });
   await during();
@@ -363,13 +386,21 @@ async function traced(cdp: Cdp, during: () => Promise<void>) {
   await complete;
   off();
   const total = (names: string[]) => events.filter((e) => e.ph === "X" && names.includes(e.name)).reduce((sum, e) => sum + (e.dur ?? 0), 0) / 1000;
-  if (flag("trace-names")) {
-    const counts = new Map<string, number>();
-    for (const e of events) counts.set(e.name, (counts.get(e.name) ?? 0) + 1);
-    console.log([...counts].sort((a, b) => b[1] - a[1]).slice(0, 40));
+  const tileArea = new Map<string, number>();
+  for (const e of events) {
+    for (const tile of e.args?.snapshot?.active_tiles ?? []) {
+      const [, , w = 0, h = 0] = tile.content_rect ?? [];
+      if (tile.id) tileArea.set(tile.id.replace(/^.*\//, ""), w * h);
+    }
   }
-  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]) };
+  const rastered = events
+    .filter((e) => e.name === "RasterTask" && (e.ph === "X" || e.ph === "B"))
+    .reduce((sum, e) => sum + (tileArea.get(e.args?.tileData?.tileId?.id_ref ?? "") ?? 0), 0);
+  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rastered };
 }
+
+/** What the page's frame counter saw: every frame's time since the one before, and the long frames with their scripts. */
+type Frames = { deltas: number[]; long: { ms: number; scripts: { source: string; ms: number }[] }[] };
 
 /** Measures `ms` of whatever runs now. */
 async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget): Promise<Measurement> {
@@ -378,7 +409,10 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget)
   const before = await metrics(cdp);
   const start = performance.now();
   let hot: string[] = [];
-  const { paintMs, rasterMs } = await traced(cdp, async () => {
+  let wall = 0;
+  let after = before;
+  let frames: Frames | null = null;
+  const { paintMs, rasterMs, rasteredPixels } = await traced(cdp, async () => {
     const play = async () => {
       const stopTapping = tap ? startTapping(cdp, tap.selector, tap.every) : null;
       const stopTyping = type ? startTyping(cdp, type.keys, type.every) : null;
@@ -388,10 +422,16 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget)
     };
     if (flag("profile")) hot = await profiled(cdp, play);
     else await play();
+    // Frames and time are read as the stretch ends: collecting the trace takes seconds, and its idle frames would
+    // water down every number (four stutters in a book taken out once passed as fine).
+    wall = (performance.now() - start) / 1000;
+    after = await metrics(cdp);
+    frames = await evaluate(cdp, "window.__perfStop ? window.__perfStop() : null");
   });
-  const wall = (performance.now() - start) / 1000;
-  const after = await metrics(cdp);
-  const { deltas, long } = await evaluate<{ deltas: number[]; long: { ms: number; scripts: { source: string; ms: number }[] }[] }>(cdp, "window.__perfStop()");
+  // (Set inside the callback, which TypeScript can't see.)
+  const counted = frames as Frames | null;
+  if (!counted) throw new Error(`${label}: the page was left while measuring (a tap opened another page?)`);
+  const { deltas, long } = counted;
   const spent = (name: string) => (after[name] - before[name]) / wall;
   const busy = spent("TaskDuration");
   const [script, style, layout] = [spent("ScriptDuration"), spent("RecalcStyleDuration"), spent("LayoutDuration")];
@@ -416,6 +456,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget)
     other: Math.max(0, busy - script - style - layout),
     paintMsPerS: Math.round(paintMs / wall),
     rasterMsPerS: Math.round(rasterMs / wall),
+    rasterScreensPerS: Math.round((rasteredPixels / (device.width * device.height * device.scale ** 2) / wall) * 10) / 10,
     stylesPerS: Math.round(spent("RecalcStyleCount")),
     layoutsPerS: Math.round(spent("LayoutCount")),
     culprits,
@@ -427,6 +468,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget)
   if (m.p95 > limits.p95) m.over.push(`p95 ${m.p95} > ${limits.p95} ms`);
   if (m.stutters / wall > limits.stuttersPerS) m.over.push(`${m.stutters} stutters`);
   if (m.busy > limits.busy) m.over.push(`busy ${Math.round(m.busy * 100)} % > ${Math.round(limits.busy * 100)} %`);
+  if (m.rasterScreensPerS > limits.rasterScreensPerS) m.over.push(`raster ${m.rasterScreensPerS} > ${limits.rasterScreensPerS} screens/s`);
   return m;
 }
 
@@ -461,7 +503,7 @@ const pct = (k: number) => `${Math.round(k * 100)}`.padStart(3);
 function printRow(m: Measurement) {
   const mark = m.over.length ? "✗" : "✓";
   console.log(
-    `  ${mark} ${m.label.padEnd(34)} ${String(m.fps).padStart(5)} fps  ${String(m.stutters).padStart(3)} stutters  longest ${String(m.longest).padStart(4)} ms  p95 ${String(m.p95).padStart(3)} ms  busy ${pct(m.busy)} % (script ${pct(m.script)}, style ${pct(m.style)}, layout ${pct(m.layout)}, other ${pct(m.other)})  paint ${String(m.paintMsPerS).padStart(3)}  raster ${String(m.rasterMsPerS).padStart(4)} ms/s${m.over.length ? `  ← ${m.over.join(", ")}` : ""}`,
+    `  ${mark} ${m.label.padEnd(34)} ${String(m.fps).padStart(5)} fps  ${String(m.stutters).padStart(3)} stutters  longest ${String(m.longest).padStart(4)} ms  p95 ${String(m.p95).padStart(3)} ms  busy ${pct(m.busy)} % (script ${pct(m.script)}, style ${pct(m.style)}, layout ${pct(m.layout)}, other ${pct(m.other)})  paint ${String(m.paintMsPerS).padStart(3)}  raster ${String(m.rasterMsPerS).padStart(4)} ms/s ${String(m.rasterScreensPerS).padStart(5)} screens/s${m.over.length ? `  ← ${m.over.join(", ")}` : ""}`,
   );
   if (m.over.length && m.culprits.length) console.log(`      slowest scripts in long frames: ${m.culprits.join(" · ")}`);
   if (m.over.length && m.stutterAt.length) console.log(`      stutters at: ${m.stutterAt.map((t) => `${t}s`).join(" ")}`);

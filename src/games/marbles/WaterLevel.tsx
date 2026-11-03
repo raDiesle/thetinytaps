@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
 import { playPlop } from "@/lib/sfx";
 import { loadRealSounds, playCroak, playFlush, playQuack, playSplash } from "@/lib/realSounds";
-import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { deg, svgLine } from "./machineKit";
 import type { Pt } from "./path";
 import { INK, Sparkles } from "./scenery";
@@ -40,6 +40,9 @@ import {
 } from "./water";
 import "./water.css";
 import { PROD } from "@/lib/buildInfo";
+
+/** All of the hillside the camera can show, drawn once as a layer of its own that the camera moves. */
+const WATER_WORLD = { x: 0, y: SKY_TOP, w: WORLD_W, h: WORLD_H - SKY_TOP };
 
 const WATER = "#5cc8f5";
 const WATER_DEEP = "#3aa6e0";
@@ -97,6 +100,7 @@ export function WaterLevel({ sound, say, onDone }: LevelProps) {
     const { pt } = pose();
     return clock.current < 0 ? { x: pt.x + 120, y: pt.y - 60 } : { x: pt.x + 80, y: pt.y - 40 };
   };
+  const box = useRef<HTMLDivElement>(null);
   const camera = useRef<Pt | null>(null);
   camera.current ??= cameraFor(focus());
 
@@ -194,9 +198,14 @@ export function WaterLevel({ sound, say, onDone }: LevelProps) {
   const t4 = timeOf(3);
 
   return (
-    <div className="marble-level" onPointerDown={onPointerDown}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
-        <g ref={world} transform={`translate(${-cam.x} ${-cam.y})`}>
+    <div className="marble-level" ref={box} onPointerDown={onPointerDown}>
+      <svg
+        className="marble-camera"
+        viewBox={`0 ${SKY_TOP} ${WORLD_W} ${WORLD_H - SKY_TOP}`}
+        style={cameraLayer(box.current, WATER_WORLD, { x: cam.x, y: cam.y, w: VIEW_W, h: VIEW_H })}
+        aria-label={label}
+      >
+        <g ref={world}>
           <Sky gradient={`${ids}-sky`} />
           <Hill />
           {BASINS.map((b, i) => (

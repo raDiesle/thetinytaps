@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
-import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { cameraOn } from "./machineKit";
 import { Sparkles } from "./scenery";
 import { pickThings, type Thing } from "./things";
@@ -119,6 +119,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const drumAt = useRef(-Infinity);
   const now = useRef(performance.now());
   const camera = useRef(0);
+  const box = useRef<HTMLDivElement>(null);
 
   const drumBox: Pt[] = [
     { x: drumLeft, y: 0 },
@@ -222,9 +223,14 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const first = things[0];
 
   return (
-    <div className="marble-level" onPointerDown={push}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
-        <g transform={`translate(${-camera.current} 0)`}>
+    <div className="marble-level" ref={box} onPointerDown={push}>
+      <svg
+        className="marble-camera"
+        viewBox={`0 0 ${worldW} ${VIEW_H}`}
+        style={cameraLayer(box.current, { x: 0, y: 0, w: worldW, h: VIEW_H }, { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H })}
+        aria-label={label}
+      >
+        <g>
           <Room width={worldW} />
           <g transform={`translate(${MARGIN} ${FLOOR}) scale(${SCALE})`}>
             {things.map((thing, i) => (

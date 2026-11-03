@@ -31,9 +31,15 @@ export interface Budget {
   stuttersPerS: number;
   /** Share of the time the main thread may be busy; above it, taps answer late too. */
   busy: number;
+  /**
+   * Whole screens of pixels rastered anew per second. A phone's GPU paints them, however fast the computer measuring is:
+   * a picture painted again in every frame costs 60 (120 on a gaming phone's screen), which the frames and the main
+   * thread here never showed while Zähne putzen, the marble run and the page turn stuttered on phones (November 2026).
+   */
+  rasterScreensPerS: number;
 }
 
-export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6 };
+export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScreensPerS: 30 };
 
 /** Something done before a stretch is measured. */
 export type Step =
@@ -69,8 +75,8 @@ export interface Scenario {
 
 /** The first card or start button of a game's start screen. */
 const START: Step = { tap: ".start-button, .mode-card", optional: true };
-/** What a child taps while playing: anything that answers a tap. */
-const TAPS = { selector: "[data-tap]", every: 700 };
+/** What a child taps while playing: anything that answers a tap, but the way back (a menu's page corner), which leaves. */
+const TAPS = { selector: "[data-tap]:not(.page-corner)", every: 700 };
 const key = (k: string, times = 1): Step[] => Array.from({ length: times }, () => [{ key: k }, { wait: 150 }]).flat() as Step[];
 
 export const SCENARIOS: Scenario[] = [
@@ -119,6 +125,32 @@ export const SCENARIOS: Scenario[] = [
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },
   { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
+  {
+    // The marble run's camera following three things down the wall (the barrier open, „Von selbst“): the picture that
+    // moves most, and stuttered on phones while the camera was a changing viewBox.
+    name: "kugelbahn",
+    path: "/kettenreaktion/",
+    storage: `localStorage.setItem("tinytaps.marbles.v1", JSON.stringify({ play: "watch" }))`,
+    parts: [
+      {
+        label: "Kamera folgt den Kugeln",
+        before: [START, { wait: 1500 }, ...[1, 2, 3].flatMap(() => [{ tap: ".run-shelf-thing" }, { wait: 700 }] as Step[])],
+        ms: 12000,
+      },
+    ],
+  },
+  {
+    // A machine: one tap, and the camera follows what moves through a wide room for 40 seconds.
+    name: "maschine",
+    path: "/kettenreaktion/",
+    parts: [
+      {
+        label: "Große Maschine läuft",
+        before: [{ eval: `[...document.querySelectorAll(".mode-card")].find((c) => c.textContent.includes("Große Maschine")).click()` }, { wait: 1500 }, ...key(" ")],
+        ms: 12000,
+      },
+    ],
+  },
   {
     name: "kleine-abenteuer",
     path: "/kleine-abenteuer/",

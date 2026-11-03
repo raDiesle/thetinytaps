@@ -64,6 +64,11 @@ stand still, so nothing moves before the child acts.
   The clock runs on after a seek, so a screenshot shows a later moment: to hold one, freeze the frames first
   (`const raf = requestAnimationFrame.bind(window); requestAnimationFrame = (cb) => raf((ts) => cb(window.__frozen ?? ts)); window.__frozen = performance.now()`),
   then seek; set `window.__frozen = undefined` to let it run again.
+- The camera is never a changing `viewBox` nor a moved `<g>`: the whole world is drawn once in one svg as big as the
+  world (`.marble-camera`, a layer of its own) and the camera moves and zooms that svg by a CSS transform
+  (`cameraLayer` in `level.ts`), so a phone only moves a finished picture. A changing viewBox had it paint the whole
+  picture again in every frame, and the marble run and the machines stuttered on phones (November 2026).
+  `camera.test.ts` checks every level; `bun run perf kugelbahn maschine` measures the camera following.
 - Each machine has its own world: never reuse an element of another machine.
 - A machine runs about 35–45 s. It grows by new links, each set off visibly by the one before and setting off the next
   with a sound, never by stretching old moves or adding pauses; its test checks the new moments, hits and the length.

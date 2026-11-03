@@ -528,5 +528,6 @@ export function buildFarm() {
     doorsOpen,
     singing,
     cameraTarget,
+    width: WORLD_W,
   };
 }
