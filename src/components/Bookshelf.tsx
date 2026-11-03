@@ -427,10 +427,17 @@ function Compartment({
       )}
       {label && <span className="shelf-group-label shelf-board-label">{t(label)}</span>}
       {things.includes("figure") && (
-        // The stickers of the child's figure, stuck on the compartment's right wall.
-        <div className="shelf-side-stuck">
-          <RoomStickers />
-        </div>
+        // The stickers of the child's figure, stuck on the compartment's right wall, and above them „Wer spielt?“ carved
+        // into the back panel beside that wall, in the room the books spine out leave there: on the wall itself, seen
+        // edge-on, the words could not be read.
+        <>
+          <span className="shelf-figure-ask" style={{ "--room": `${STICKERS_ROOM * layout.bookHeight}px` } as CSSProperties} aria-hidden>
+            {t({ de: "Wer spielt?" })}
+          </span>
+          <div className="shelf-side-stuck">
+            <RoomStickers />
+          </div>
+        </>
       )}
       {things.map(
         (thing) =>

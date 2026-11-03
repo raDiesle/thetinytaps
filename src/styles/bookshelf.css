@@ -1440,6 +1440,32 @@
   pointer-events: none;
 }
 
+/*
+ * „Wer spielt?“ above the stickers of the child's figure: carved like the words, on the back panel right beside the wall
+ * with the stickers, in its top corner – at the back corner itself, so it is not moved like the words (`--sx`).
+ */
+.shelf-figure-ask {
+  position: absolute;
+  top: 6%;
+  right: 0;
+  width: var(--room);
+  padding-inline: calc(var(--bh) * 0.03);
+  box-sizing: border-box;
+  color: #5b3a1c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: calc(var(--bh) * 0.11);
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow:
+    0 1px 0 #f6dcaecc,
+    0 -1px 0 #2a170866;
+  transform: translateZ(calc(var(--d) * -0.97 + 2px));
+  pointer-events: none;
+}
+
 /* „mehr …“ (RoomNotes): carved like the words, underlined as a link, the one part of them that takes a tap. */
 .shelf-carving .home-menu {
   align-self: center;
