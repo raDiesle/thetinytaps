@@ -34,52 +34,51 @@ test("the way back from a menu is never fixed in a corner", () => {
   expect(fixed).toEqual([]);
 });
 
-// In the book look the way back is the page's corner in the top left, and the page turning back moves from there
-// (user feedback, October 2026: a corner in the top right turned the other page, and grown-ups didn't look there). Every menu head draws it, it lies fixed at the page's corner, and the round arrow gives way to it
-// (the toy look keeps the arrow, next to the title).
-test("in the book look a menu turns back at the page's corner, top left", () => {
+// The way back from a menu is the page's corner in the top left, and the page turning back moves from there (user
+// feedback, October 2026: a corner in the top right turned the other page, and grown-ups didn't look there). Every menu
+// head draws it, it lies fixed at the page's corner, and no round arrow beside the title stands in for it.
+test("a menu turns back at the page's corner, top left", () => {
   const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
   const head = menuTop.slice(menuTop.indexOf("export function MenuHead"), menuTop.indexOf("function PageCorner"));
   expect(head).toContain("<PageCorner ");
+  expect(head).not.toContain("back-link");
+  expect(head).not.toContain("<MenuTop");
   const rules = cssRules();
-  const corner = rules.filter((r) => r.selector === ':root[data-look="book"] .page-corner');
+  const corner = rules.filter((r) => r.selector === ":root .page-corner");
   expect(corner.length).toBe(1);
   expect(corner[0]?.body).toMatch(/position:\s*fixed/);
   expect(corner[0]?.body).toMatch(/\bleft:/);
   expect(corner[0]?.body).not.toMatch(/\bright:/);
   expect(corner[0]?.body).toMatch(/\btop:/);
-  expect(rules.some((r) => r.selector === ".page-corner" && /display:\s*none/.test(r.body))).toBe(true);
-  expect(rules.some((r) => r.selector === ':root[data-look="book"] .menu-head .back-link' && /display:\s*none/.test(r.body))).toBe(true);
 });
 
 // What is touched is what moves: the corner is the left page's outer corner, so the page turning back is this one,
 // lifted at its left edge and swung over the spine on its right (the page seen is the book's left page, look.test.ts).
-test("in the book look the page turning back is the one whose corner is touched, lifted at its left edge", () => {
-  const back = cssRules().filter((r) => r.selector === ':root[data-look="book"][data-turn="back"]::view-transition-old(turn-page)');
+test("the page turning back is the one whose corner is touched, lifted at its left edge", () => {
+  const back = cssRules().filter((r) => r.selector === ':root[data-turn="back"]::view-transition-old(turn-page)');
   expect(back.length).toBe(1);
   expect(back[0]?.body).toMatch(/transform-origin:\s*right center/);
   expect(back[0]?.body).toMatch(/book-turn-away/);
   expect(back[0]?.body).not.toMatch(/\breverse\b/);
 });
 
-// Leaving a game is the same corner in the book look (user feedback, October 2026: every way back turns the page back),
+// Leaving a game is the same corner (user feedback, October 2026: every way back turns the page back),
 // with a ✕ on it, tapped or held like the ✕ (held where grown-ups chose so, so a child's tap can't end the game), in
 // the top left like a menu's, and a game's ⚙️ moves to the top right for it.
-test("in the book look a game is left by the page's corner, top left", () => {
+test("a game is left by the page's corner, top left", () => {
   const shell = readFileSync("src/components/GameShell.tsx", "utf8");
   const exit = shell.slice(shell.indexOf("function ExitButton"));
   expect(exit).toContain("useHold(");
   expect(exit).toContain('<PageCornerArt sign="close" />');
   const rules = cssRules();
-  expect(rules.some((r) => r.selector === ".hold-exit .page-corner-art" && /display:\s*none/.test(r.body))).toBe(true);
-  expect(rules.some((r) => r.selector === ':root[data-look="book"] .play-area .exit-corner .page-corner-art' && /display:\s*block/.test(r.body))).toBe(true);
-  expect(rules.some((r) => r.selector === ':root[data-look="book"] .play-area .exit-corner .hold-exit-sign' && /display:\s*none/.test(r.body))).toBe(true);
+  expect(rules.some((r) => r.selector === ":root .play-area .exit-corner .page-corner-art" && /display:\s*block/.test(r.body))).toBe(true);
+  expect(exit).not.toContain("hold-exit-sign");
   const placed = (selector: string) => rules.filter((r) => r.selector === selector && /\btop:/.test(r.body));
-  const exitCorner = placed(':root[data-look="book"] .play-area .exit-corner');
+  const exitCorner = placed(":root .play-area .exit-corner");
   expect(exitCorner.length).toBe(1);
   expect(exitCorner[0]?.body).toMatch(/\bleft:\s*max\(/);
   expect(exitCorner[0]?.body).toMatch(/\bright:\s*auto/);
-  const options = placed(':root[data-look="book"] .play-area .play-options-corner');
+  const options = placed(":root .play-area .play-options-corner");
   expect(options.length).toBe(1);
   expect(options[0]?.body).toMatch(/\bright:\s*max\(/);
   expect(options[0]?.body).toMatch(/\bleft:\s*auto/);
@@ -98,7 +97,7 @@ test("the menus' sun is in the top left corner", () => {
 // Back onto the shelf no page turns, the book closes and goes back (bookTravel.ts): a page's corner there said „turn the
 // page“, and the cover's corner lying over the page floated where no cover can be (user feedback, October 2026), so the
 // way back to the home page is the book's ribbon hanging over the page's top edge, with a shelf on it.
-test("in the book look the way back onto the shelf is the book's ribbon, not a corner", () => {
+test("the way back onto the shelf is the book's ribbon, not a corner", () => {
   const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
   const corner = menuTop.slice(menuTop.indexOf("function PageCorner"));
   expect(corner).toMatch(/sign=\{to === "\/" \? "shelf" : "back"\}/);
@@ -116,34 +115,28 @@ test("the ribbon reaches no further than the room the menus keep free for it", (
   const [, w, h] = (art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? []).map(Number);
   const rules = cssRules();
   const body = (selector: string) => rules.filter((r) => r.selector === selector).map((r) => r.body);
-  const [ribbon] = body(':root[data-look="book"] .page-corner.page-ribbon');
+  const [ribbon] = body(":root .page-corner.page-ribbon");
   const lift = Number(ribbon?.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
   expect(ribbon).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
   expect(ribbon).toContain("position: absolute");
   expect(readFileSync("src/components/MenuTop.tsx", "utf8")).toContain('createPortal(corner, document.getElementById("root")');
-  const sizes = body(':root[data-look="book"]:has(.page-ribbon)');
+  const sizes = body(":root:has(.page-ribbon)");
   expect(sizes.join("")).toContain(`--ribbon-reach: calc(var(--page-top) + var(--ribbon) * ${(h ?? 0) - lift} / ${w})`);
   // Left of the head, which keeps the corner's room free (`.menu-head`'s margin): its widest part, the arrow's disc.
   const share = Number(sizes.join("").match(/--ribbon:\s*calc\(var\(--corner\) \* ([\d.]+)\)/)?.[1]);
   const disc = art.match(/className="page-ribbon-badge" cx="([\d.]+)" cy="[\d.]+" r="([\d.]+)"/);
   expect(0.12 + (share * (Number(disc?.[1]) + Number(disc?.[2]))) / (w ?? 1)).toBeLessThanOrEqual(1);
-  expect(body(':root[data-look="book"]:has(.page-ribbon) .menu-head').join("")).toContain("min-height: calc(var(--ribbon-reach) + 6px - var(--menu-pad))");
-  expect(rules.filter((r) => r.selector === ':root[data-look="book"]:has(.page-ribbon) .toc').map((r) => r.body)).toEqual([
+  expect(body(":root:has(.page-ribbon) .menu-head").join("")).toContain("min-height: calc(var(--ribbon-reach) + 6px - var(--menu-pad))");
+  expect(rules.filter((r) => r.selector === ":root:has(.page-ribbon) .toc").map((r) => r.body)).toEqual([
     expect.stringContaining("var(--ribbon-reach)"),
     expect.stringContaining("var(--ribbon-reach)"),
   ]);
-  // `--menu-pad` is the padding-top the menus have (in the book look they keep the toy look's).
+  // `--menu-pad` is the padding-top the menus have (menus.css, start-screen.css).
   const pad = (file: string, selector: string) =>
     rules.filter((r) => r.file === file && r.selector === selector).flatMap((r) => r.body.match(/padding:\s*max\((\d+px)/)?.[1] ?? []);
   const menuPad = (selector: string) => body(selector).flatMap((b) => b.match(/--menu-pad:\s*(\d+px)/)?.[1] ?? []);
-  expect(pad("styles/menus.css", ".home")).toEqual([
-    ...menuPad(':root[data-look="book"] .home'),
-    ...menuPad(':root[data-look="book"] :is(.home, .start-screen)'),
-  ]);
-  expect(pad("styles/start-screen.css", ".start-screen")).toEqual([
-    ...menuPad(':root[data-look="book"] .start-screen'),
-    ...menuPad(':root[data-look="book"] :is(.home, .start-screen)'),
-  ]);
+  expect(pad("styles/menus.css", ".home")).toEqual([...menuPad(":root .home"), ...menuPad(":root :is(.home, .start-screen)")]);
+  expect(pad("styles/start-screen.css", ".start-screen")).toEqual([...menuPad(":root .start-screen"), ...menuPad(":root :is(.home, .start-screen)")]);
 });
 
 // On a wide screen the ribbon lies in the margin beside the table of contents, as big as that margin allows (user
@@ -151,9 +144,7 @@ test("the ribbon reaches no further than the room the menus keep free for it", (
 // clear of the lines from the first width it does so: even its smallest size fits, with room for its sway and a scrollbar.
 test("on a wide screen the ribbon lies beside the table of contents, never over its lines", () => {
   const css = readFileSync("src/styles/book.css", "utf8");
-  const wide = css.match(
-    /@media \(min-width: (\d+)px\) and \(min-height: 600px\) \{\s*:root\[data-look="book"\]:has\(\.page-ribbon\):has\(\.toc\) \{([^}]*)\}/,
-  );
+  const wide = css.match(/@media \(min-width: (\d+)px\) and \(min-height: 600px\) \{\s*:root:has\(\.page-ribbon\):has\(\.toc\) \{([^}]*)\}/);
   const [, from, body] = wide ?? [];
   expect(css).toMatch(/\.toc \{[^}]*width: min\(100%, 900px\);/);
   expect(body).toContain("--toc-left: calc((100vw - 900px) / 2);");
@@ -168,7 +159,7 @@ test("on a wide screen the ribbon lies beside the table of contents, never over 
   expect((Number(from) - 900) / 2 - (gap ?? 0) - (smallest ?? 0)).toBeGreaterThanOrEqual(pageLeft);
 });
 
-// The arrow on the ribbon's disc is a plain arrow pointing back, as the toy look's round arrow: a straight shaft and a
+// The arrow on the ribbon's disc is a plain arrow pointing back, as the round arrow of MenuTop: a straight shaft and a
 // head of two equal strokes meeting at its tip (a bent shaft with uneven strokes was not seen as an arrow).
 test("the ribbon's arrow is a straight arrow with an even head", () => {
   const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
@@ -199,10 +190,10 @@ test("no start screen has an „Über das Spiel“", () => {
 
 // User feedback, October 2026: the animal families stand at the bottom of a menu's page, never in its top row beside
 // the title, where they were too small and in the way; the page keeps room for them under its cards.
-test("in the book look the families stand at the bottom of a menu's page, not in its head", () => {
+test("the families stand at the bottom of a menu's page, not in its head", () => {
   expect(readFileSync("src/components/MenuTop.tsx", "utf8")).not.toContain("BookFamil");
   expect(readFileSync("src/components/Sky.tsx", "utf8")).toContain("<BookFamilies />");
-  const family = cssRules().filter((r) => r.selector === ':root[data-look="book"] .book-family');
+  const family = cssRules().filter((r) => r.selector === ":root .book-family");
   expect(family.length).toBeGreaterThan(0);
   for (const rule of family) expect(rule.body).toMatch(/bottom:/);
   expect(readFileSync("src/lib/fitGrid.ts", "utf8")).toContain("--menu-floor");

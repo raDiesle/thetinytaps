@@ -166,6 +166,45 @@ export const PEEK_LOOKS: string[][] = [
 /** Which of `PEEK_LOOKS` an animal belongs to (its index). */
 export const lookOf = (item: ShadowItem) => PEEK_LOOKS.findIndex((ids) => ids.includes(item.id));
 
+/**
+ * Pictures whose black shadows can't be told apart on Apple's or Google's emojis (X-14): a pig, a sheep and a turtle
+ * are the same round blob on Android, a cat and a dog the same on an iPhone. They are never dealt together, so exactly
+ * one shadow fits. Measured by comparing every pair's outline in both fonts and looking at the closest ones (November
+ * 2026, `research.ts`); a new picture is looked at next to its closest outlines and added here when it is one of them.
+ */
+export const SHADOW_LOOKALIKES: [string, string][] = [
+  ["schwein", "schaf"],
+  ["schwein", "schildkroete"],
+  ["schaf", "schildkroete"],
+  ["schnecke", "schildkroete"],
+  ["katze", "hund"],
+  ["hund", "elefant"],
+  ["hund", "teddy"],
+  ["eule", "teddy"],
+  ["apfel", "erdbeere"],
+  ["apfel", "birne"],
+  ["birne", "erdbeere"],
+  ["pilz", "baum"],
+];
+
+/**
+ * Animals of "Wer schaut da raus?" whose peeking part looks the same (X-14): the cat's and the dog's tan tail and hind
+ * leg, the grey of an elephant next to a cow's or a sheep's, the grey-white fur of a rabbit and a mouse and the brown
+ * of a squirrel and a hedgehog through the gaps in the leaves. They are never offered together, so exactly one fits;
+ * the rest of a `PEEK_LOOKS` group still makes the harder steps harder.
+ */
+export const PEEK_LOOKALIKES: [string, string][] = [
+  ["katze", "hund"],
+  ["hase", "maus"],
+  ["eichhoernchen", "igel"],
+  ["kuh", "elefant"],
+  ["schaf", "elefant"],
+];
+
+/** Whether `a` and `b` are one of `pairs`, so they must not stand side by side to choose from. */
+export const lookAlike = (pairs: [string, string][], a: ShadowItem, b: ShadowItem) =>
+  pairs.some(([x, y]) => (x === a.id && y === b.id) || (x === b.id && y === a.id));
+
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** "seinen" or "ihren" Schatten. */

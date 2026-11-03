@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ITEMS, PEEK_ITEMS, PEEK_LOOKS, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
+import { ITEMS, lookAlike, PEEK_ITEMS, PEEK_LOOKALIKES, PEEK_LOOKS, SHADOW_LOOKALIKES, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
 import { GRID, pickPeepholes } from "./glyph";
 import { RUSSIAN_NAMES } from "./content.ru";
 import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
@@ -71,6 +71,32 @@ test("each step deals its number of shadows, the picture's own among them once, 
       expect(new Set(shadows).size).toBe(shadows.length);
       expect(shadows.filter((s) => s === item).length).toBe(1);
       expect(shadows.every((s) => pool.includes(s))).toBe(true);
+    }
+  }
+});
+
+test("exactly one shadow fits: no shadow that looks like the picture's own is dealt with it (X-14)", () => {
+  for (const level of SHADOW_LEVELS) {
+    for (const item of ITEMS) {
+      for (const pool of [ITEMS, ITEMS.filter((i) => i.theme === item.theme)]) {
+        for (const s of dealShadows(item, pool, level)) expect(lookAlike(SHADOW_LOOKALIKES, s, item), `${item.id} ${s.id}`).toBe(false);
+      }
+    }
+  }
+});
+
+test("the look-alike pairs name pictures that exist, each pair once", () => {
+  for (const [pairs, pool] of [
+    [SHADOW_LOOKALIKES, ITEMS],
+    [PEEK_LOOKALIKES, PEEK_ITEMS],
+  ] as const) {
+    const ids = new Set(pool.map((i) => i.id));
+    const seen = new Set<string>();
+    for (const [a, b] of pairs) {
+      expect(ids.has(a) && ids.has(b) && a !== b, `${a} ${b}`).toBe(true);
+      const key = [a, b].sort().join(" ");
+      expect(seen.has(key), key).toBe(false);
+      seen.add(key);
     }
   }
 });

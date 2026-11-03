@@ -46,10 +46,16 @@ const CARDS_NOTE: Localized = {
 
 /**
  * What a plan prints besides its sheet: a Jetzt – Dann with a marker none (every card stands on the sheet, the marker
- * is made at home), one with the „Jetzt“ field always its cards (its sheet is empty frames for them), the others as
- * the grown-up chose.
+ * is made at home), one with the „Jetzt“ field always its cards (its sheet is empty frames for them), a Countdown none
+ * (its moons are coloured in on the sheet), the others as the grown-up chose.
  */
-export const printsCards = (plan: Plan): "never" | "always" | "choice" => (plan.view !== "day" ? "choice" : plan.nowField ? "always" : "never");
+export const printsCards = (plan: Plan): "never" | "always" | "choice" =>
+  plan.view === "countdown" ? "never" : plan.view !== "day" ? "choice" : plan.nowField ? "always" : "never";
+
+/** Under a Countdown's print: what the moons on paper are for. */
+const COUNTDOWN_NOTE: Localized = {
+  de: "Gedruckt werden die Monde ab heute. Jeden Morgen malt Ihr Kind einen Mond aus oder streicht ihn durch – so sieht es, wie der große Tag näher kommt.",
+};
 
 /** The page's orientation: the grown-up's choice, or what suits the plan. */
 export const planOrientation = (plan: Plan, options: PlanPrintOptions, day: Date): "landscape" | "portrait" =>
@@ -159,7 +165,7 @@ export function PlanPrint({
         <p className="setting-note">
           {plan.view !== "week" && !plan.same && `${t(SHOWN_DAY)} `}
           {/* A marker's plan: nothing to cut out; the „Jetzt“ field's: its cards always come, the note says why. */}
-          {t(cards === "never" ? NOW_WAYS[0].note : cards === "always" ? NOW_WAYS[1].note : CARDS_NOTE)}
+          {t(plan.view === "countdown" ? COUNTDOWN_NOTE : cards === "never" ? NOW_WAYS[0].note : cards === "always" ? NOW_WAYS[1].note : CARDS_NOTE)}
           {cards !== "never" && <VelcroLink />}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>

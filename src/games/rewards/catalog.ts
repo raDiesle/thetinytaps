@@ -726,14 +726,17 @@ export const ACTIVITIES: CatalogTask[] = [
   { id: "turnen", emoji: "🤸", label: { de: "Turnen", en: "Gymnastics", zh: "体操", hi: "कसरत", es: "Gimnasia", ar: "الجمباز", ru: "Гимнастика" } },
   { id: "musik", emoji: "🎵", label: { de: "Musik", en: "Music", zh: "音乐", hi: "संगीत", es: "Música", ar: "الموسيقى", ru: "Музыка" } },
   { id: "arzt", emoji: "🩺", label: { de: "Zum Arzt", en: "Doctor", zh: "看医生", hi: "डॉक्टर के पास", es: "Al médico", ar: "إلى الطبيب", ru: "К врачу" } },
+  // The big days a Countdown waits for (H-41); Oma and Opa's visit is the card above.
+  { id: "geburtstag", emoji: "🎂", label: { de: "Geburtstag" } },
+  { id: "urlaub", emoji: "🏖️", label: { de: "Urlaub" } },
 ];
 
 /**
  * The views of a plan, each its own way of showing the same cards: Jetzt – Dann (the day's steps in their order on one
  * sheet, a marker on the one to do now – or, as a variant, that card in a „Jetzt“ field of its own), Erst – Dann
- * (pairs of two, up to four on a page) and the week.
+ * (pairs of two, up to four on a page), the week, and the Countdown (a moon for every night until a big day, H-41).
  */
-export type PlanView = "day" | "first-then" | "week";
+export type PlanView = "day" | "first-then" | "week" | "countdown";
 
 /** A view of a plan with what it shows, in one line for grown-ups. */
 export interface PlanViewInfo {
@@ -769,6 +772,12 @@ export const PLAN_VIEWS: PlanViewInfo[] = [
       ar: "ماذا في كل يوم – وكم نومة باقية",
       ru: "Что в какой день – и сколько раз ещё спать",
     },
+  },
+  {
+    id: "countdown",
+    emoji: "🌙",
+    label: { de: "Countdown" },
+    hint: { de: "Wie oft noch schlafen bis zum großen Tag – ein Mond für jede Nacht" },
   },
 ];
 
@@ -885,6 +894,16 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
       ar: "ماذا ومتى؟ الحضانة، الجدّة، السباحة – وكم نومة باقية",
       ru: "Что когда? Садик, бабушка, бассейн – и сколько раз ещё спать",
     },
+  },
+  {
+    id: "countdown",
+    emoji: "🌙",
+    label: { de: "Wie oft noch schlafen?" },
+    view: "countdown",
+    days: ["geburtstag"],
+    theme: "nacht",
+    title: { de: "Wie oft noch schlafen?" },
+    hint: { de: "Ein Mond für jede Nacht bis zum Geburtstag, zum Urlaub oder bis Oma kommt" },
   },
 ];
 

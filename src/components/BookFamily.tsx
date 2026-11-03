@@ -10,7 +10,7 @@ export const FAMILY_PICTURES: Record<Family, string | undefined> = {
 };
 
 /**
- * Both families at the bottom of a menu's page in the book look (Sky), the foxes in the left corner and the bears in the
+ * Both families at the bottom of a menu's page (Sky), the foxes in the left corner and the bears in the
  * right, so grown-ups see the book is to be read with the child: below the cards, in the room the page keeps free for
  * them (`--menu-floor`, `book.css`), or on a wide page's margins beside the cards. Never in the top row, beside the
  * title (user feedback, October 2026). Lazy, so a screen that hides them never downloads them.

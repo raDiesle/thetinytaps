@@ -277,8 +277,8 @@ export function WorldGround({ world }: { world: WorldId }) {
 }
 
 /**
- * A small piece of a world at the top of its home card, behind the collage of its games: 300 × 150, as wide as the
- * card, its things at both sides. Sky, wall, ground and table reach on beyond the edges, for cards of any shape.
+ * A small piece of a world on its picture book's cover on the shelf (Bookshelf): 300 × 150, its things at both sides.
+ * Sky, wall, ground and table reach on beyond the edges, for covers of any shape.
  */
 export function WorldCardScene({ world }: { world: WorldId }) {
   return (

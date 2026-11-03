@@ -102,7 +102,7 @@
   z-index: 10;
   display: flex;
   align-items: center;
-  /* As play starts (after the book look's page has turned), ⚙️ lights up softly twice so grown-ups see where the
+  /* As play starts (after the page has turned), ⚙️ lights up softly twice so grown-ups see where the
      options are, then stands still (user feedback, November 2026). The game plays at once, so its card's tap set it off. */
   animation: play-options-glow 1.3s ease-in-out var(--turn-time, 0.4s) 2;
 }

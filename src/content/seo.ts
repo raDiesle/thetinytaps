@@ -177,11 +177,32 @@ export const SEO_PAGES: PageSeo[] = [
     text: "Eine Belohnungstafel für Kleinkinder, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern.",
   },
   {
+    path: "/timer/",
+    title: "Visueller Timer für Kinder – Sanduhr, Zug und Kerze",
+    description:
+      "Ein Timer ohne Zahlen für Kleinkinder: ein Zug fährt zum Bahnhof, eine Sanduhr rinnt, eine Kerze brennt herunter. 1 bis 10 Minuten, am Ende winkt die Familie.",
+    text: "Ein visueller Timer für Kinder, die noch keine Uhr lesen: Ein Erwachsener stellt 1, 2, 3, 5 oder 10 Minuten ein, und das Kind sieht die Zeit vergehen – ein kleiner Zug rollt zum Bahnhof, wo die Bärenfamilie wartet, der Sand rinnt durch eine große Sanduhr, oder eine Kerze brennt herunter, bis das Bärenkind sie auspustet. Am Ende klingt eine fröhliche Melodie und die Familie winkt. Für „noch fünf Minuten spielen“, das Warten aufs Essen oder fürs Aufräumen; der Bildschirm bleibt dabei an, und der Timer läuft auch, wenn die Spielzeit vorbei ist.",
+  },
+  {
     path: "/tagesplan/",
     title: "Tagesplan für Kinder – Tag und Woche in Bildern",
     description:
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Mit Bildkarten zum Ausdrucken.",
     text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
+  },
+  {
+    path: "/schnullerfee/",
+    title: "Schnullerfee – Abschied vom Schnuller als Geschichte",
+    description:
+      "Die Schnullerfee holt die Schnuller: einsammeln, ins Kästchen oder an den Luftballon, Licht aus – am Morgen liegt ein Geschenk da. Zum Schnuller abgewöhnen.",
+    text: "Eine Geschichte zum Schnuller abgewöhnen, zum Spielen am Abend davor: Tapsi der Fuchs sammelt seine Schnuller ein und legt sie ins Schnullerkästchen auf die Fensterbank – oder bindet sie an einen Luftballon, der aus dem Fenster fliegt. Dann geht das Licht aus, Mama gibt einen Gute-Nacht-Kuss, und in der Nacht kommt die Schnullerfee durchs Fenster, glitzert und tauscht die Schnuller gegen ein Geschenk. Am Morgen weckt das Kind Tapsi, und das Geschenk wartet auf der Fensterbank. Welches Geschenk es ist und ob Kästchen oder Luftballon, stellen die Eltern ein, damit die Geschichte zum echten Abschied passt.",
+  },
+  {
+    path: "/abstillen/",
+    title: "Abstillen mit Geschichte – Tschüss, Mama-Milch",
+    description:
+      "Eine Bildgeschichte zum Abstillen für Kleinkinder: Tapsi der Fuchs sagt Tschüss zur Mama-Milch, ist traurig, kuschelt mit Mama und schläft ohne Stillen ein.",
+    text: "Eine Bildgeschichte zum Vorlesen, wenn das Stillen zu Ende geht: Tapsi der Fuchs war ein Baby und hat bei Mama getrunken, jetzt ist Tapsi groß, isst einen Apfel und trinkt aus dem Becher. Mama erzählt, dass die Mama-Milch bald alle ist, und Tapsi winkt ihr zum Abschied. Am Abend möchte Tapsi doch trinken und ist traurig – Mama ist ganz nah, nimmt Tapsi in den Arm, liest ein Buch vor und singt ein Schlaflied, bis Tapsi einschläft. Am Morgen sind Mama und Papa stolz. Jedes Tippen blättert eine Seite weiter, und der Satz jeder Seite steht klein darunter zum Vorlesen. Für sanftes Abstillen von Kleinkindern, ohne Druck und ohne Schimpfen.",
   },
   scene("baustelle", "Baustelle", "Bagger, Kran und Betonmischer"),
   scene("stadt", "Stadt", "Bus, Ampel und Polizeiauto"),

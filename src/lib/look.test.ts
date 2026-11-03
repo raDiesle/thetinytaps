@@ -1,11 +1,32 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "bun:test";
-import { TURN_SECONDS } from "./look";
+import { forgetOldLook, TURN_SECONDS } from "./look";
 
 const css = readFileSync("src/styles/book.css", "utf8");
 
 /** The number of seconds a `name: <n>s` (or a `const NAME = <n>`) in `text` gives. */
 const seconds = (text: string, pattern: RegExp) => Number(text.match(pattern)?.[1]);
+
+// There is only the picture book (user decision, November 2026): the toy-block look and its `?buch=aus` are gone, and no
+// second look comes back. A visit that once chose the toy look had it stored, and Claude's preview showed the old card
+// menu from it: what was stored is removed, never read, and nothing in the app tells looks apart any more.
+test("there is only the book look, whatever an old visit stored", () => {
+  const values = new Map([["tinytaps.look.v1", "toy"]]);
+  const real = globalThis.localStorage;
+  globalThis.localStorage = { removeItem: (key: string) => values.delete(key) } as unknown as Storage;
+  try {
+    forgetOldLook();
+  } finally {
+    globalThis.localStorage = real;
+  }
+  expect(values.size).toBe(0);
+  const look = readFileSync("src/lib/look.ts", "utf8");
+  expect(look).not.toMatch(/getItem|setItem|location\.search|"buch"/);
+  const sources = readdirSync("src", { recursive: true, encoding: "utf8" }).filter((f) => /\.(tsx?|css)$/.test(f) && !f.endsWith(".test.ts"));
+  const telling = sources.filter((f) => /data-look|dataset\.look|isBookLook|buch=aus/.test(readFileSync(join("src", f), "utf8")));
+  expect(telling).toEqual([]);
+});
 
 // The sound of a page lands when the page does: the turn on screen and its sound take the same time.
 test("a page turns as long as its sound says", () => {

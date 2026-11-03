@@ -89,6 +89,9 @@ const ACTIVITY_ACTIONS: Record<string, string> = {
   turnen: "does a forward roll on a blue gym mat, a small ball and a balance beam nearby",
   musik: "plays a small drum with two sticks, music notes in the air",
   arzt: "sits on an examination table while a friendly doctor bear with a stethoscope listens to its chest, Tapsi smiling",
+  geburtstag:
+    "sits at a little table in front of a round birthday cake with three lit candles (small yellow flames, no glow), a paper party hat on its head, beaming, two balloons behind it",
+  urlaub: "stands barefoot on a sunny sandy beach with a red bucket and spade, a small sandcastle beside it, blue sea waves behind",
 };
 
 /** What Tapsi (and its parents) do on each reward's picture, by catalogue id. */

@@ -110,7 +110,7 @@ export const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < P
 
 /**
  * Room the page keeps free under its cards for a picture standing there: `--menu-floor`, a registered length
- * (`@property` in `book.css`, so it reads as pixels), the book look's animal families at the bottom of the page.
+ * (`@property` in `book.css`, so it reads as pixels), the animal families at the bottom of the page.
  */
 const floorOf = (page: HTMLElement) => parseFloat(getComputedStyle(page).getPropertyValue("--menu-floor")) || 0;
 

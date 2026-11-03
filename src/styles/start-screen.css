@@ -499,8 +499,7 @@ kbd {
  * On a tablet or computer, all cards and the buttons under them fit on one
  * screen: useFitGrid picks the columns and row height, the cards scale with it.
  */
-.home:has(> .game-list.fit),
-.start-screen:has(.game-list.fit) {
+.home:has(> .game-list.fit) {
   padding-bottom: 32px;
 }
 
@@ -517,8 +516,7 @@ kbd {
 .game-list.fit .game-card {
   justify-content: center;
   gap: 4cqh;
-  /* Keeps the title clear of the ▶ button in the corner. */
-  padding: 5cqh 14px max(7cqh, 30px);
+  padding: 5cqh 14px;
 }
 
 .game-list.fit .game-emoji {
@@ -532,14 +530,6 @@ kbd {
   font-size: clamp(0.95rem, min(13cqh, 9cqw), 1.6rem);
   hyphens: auto;
   overflow-wrap: anywhere;
-}
-
-.game-list.fit .game-go {
-  width: 44px;
-  height: 44px;
-  right: -8px;
-  bottom: -12px;
-  font-size: 1.1rem;
 }
 
 /* Big screens: a bigger way back, still right next to the title, and more room for the cards. */
@@ -601,29 +591,19 @@ kbd {
     justify-content: flex-start;
     gap: 8px;
     padding: 6px 22px 6px 8px;
-    border-radius: 24px;
     text-align: left;
   }
 
   .game-list.fit .game-emoji {
     --size: min(96px, 70cqh, 30cqw);
-    border-width: 3px;
   }
 
   .game-list.fit .game-title {
     font-size: clamp(0.9rem, min(20cqh, 7cqw), 1.4rem);
   }
-
-  .game-list.fit .game-go {
-    width: 36px;
-    height: 36px;
-    right: -6px;
-    bottom: -8px;
-    font-size: 0.9rem;
-  }
 }
 
-/* A flat card too narrow for emoji, title and ▶ side by side (many pictures on a phone): emoji above a small title, no ▶. */
+/* A flat card too narrow for emoji and title side by side (many pictures on a phone): emoji above a small title. */
 @container (max-height: 129.98px) and (max-width: 179.98px) {
   .game-list.fit .game-card {
     flex-direction: column;
@@ -635,16 +615,11 @@ kbd {
 
   .game-list.fit .game-emoji {
     --size: min(48cqh, 34cqw);
-    border-width: 2px;
   }
 
   .game-list.fit .game-title {
     font-size: min(0.8rem, 10.5cqw);
     line-height: 1.05;
-  }
-
-  .game-list.fit .game-go {
-    display: none;
   }
 }
 
@@ -707,8 +682,7 @@ kbd {
     font-size: 1.6rem;
   }
 
-  .home:has(> .game-list.fit),
-  .start-screen:has(.game-list.fit) {
+  .home:has(> .game-list.fit) {
     padding-bottom: 12px;
   }
 

@@ -17,6 +17,7 @@ import { TRAIL_LEVELS } from "@/games/elevator/trail/levels";
 import type { Station, Way } from "@/games/elevator/trail/types";
 import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
 import { SITUATIONS } from "@/games/feelings/kita";
+import { SELF_SITUATIONS } from "@/games/feelings/selbst";
 import { MOOD_ANSWER, MOOD_QUESTION } from "@/games/feelings/mood";
 import { PRAISE as FEELINGS_PRAISE } from "@/games/feelings/shared";
 import type { Beat } from "@/games/feelings/story";
@@ -44,10 +45,12 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
 import teethFiles from "../games/teeth/stimme/*.mp3?glob";
+import weaningFiles from "../games/weaning/stimme/*.mp3?glob";
 
 /** Lines of one kind in a game, each once. */
 export interface VoiceGroup {
@@ -100,6 +103,7 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
     { text: "Schon fertig:", file: "src/games/rewards/PlanScreen.tsx" },
     { text: "Hier kommt rein, was fertig ist.", file: "src/games/rewards/PlanScreen.tsx" },
     { text: "Noch einmal schlafen", file: "src/games/rewards/PlanSheet.tsx" },
+    { text: "Heute ist es so weit:", file: "src/games/rewards/PlanScreen.tsx" },
   ],
 };
 
@@ -211,6 +215,12 @@ function feelings(): VoiceGroup[] {
     { label: "Kindergarten: Geschichte", lines: once(SITUATIONS.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))) },
     { label: "Kindergarten: Fragen", lines: once(SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
     { label: "Kindergarten: nicht so gute Ideen", lines: once(SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
+    {
+      label: "Mehr Gefühle: Geschichte",
+      lines: once(SELF_SITUATIONS.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))),
+    },
+    { label: "Mehr Gefühle: Fragen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
+    { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
     { label: "Lob", lines: once(FEELINGS_PRAISE.de) },
   ];
 }
@@ -283,6 +293,10 @@ function teeth(): VoiceGroup[] {
   ];
 }
 
+function weaning(): VoiceGroup[] {
+  return [{ label: "Seiten der Geschichte", lines: once(WEANING_LINES) }];
+}
+
 function potty(): VoiceGroup[] {
   const texts = POTTY_TEXTS.de;
   const name = TAPSI.name.de;
@@ -315,12 +329,17 @@ function rewards(): VoiceGroup[] {
       lines: once([...inline("/belohnungstafel/"), "Noch 2-mal schlafen:", "Noch 3-mal schlafen:"]),
       built: "Ein Satzanfang, danach der Name einer Aufgabe oder Belohnung",
     },
+    {
+      label: "Countdown: wie oft noch schlafen",
+      lines: ["Noch einmal schlafen, dann", "Noch 2-mal schlafen, dann", "Noch 3-mal schlafen, dann", "Noch 4-mal schlafen, dann", "Noch 5-mal schlafen, dann"],
+      built: "Wie oft noch schlafen, danach der Name des großen Tages (Geburtstag, Urlaub, Oma und Opa)",
+    },
   ];
 }
 
 /** The German recordings of the games in src/content/recordedLines.ts, by file name (the hash of the line). */
 const RECORDED = new Set(
-  [goodNightFiles, elevatorFiles, teethFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
+  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
 );
 
 /** The games and groups of `games` with only the lines that have no German recording yet. */
@@ -348,6 +367,7 @@ export function voiceLines(): VoiceGame[] {
     { href: "/kettenreaktion/", groups: marbles() },
     { href: "/zaehne/", groups: teeth() },
     { href: "/toepfchen/", groups: potty() },
+    { href: "/abstillen/", groups: weaning() },
     { href: "/socken/", groups: socks() },
     { href: "/belohnungstafel/", groups: rewards() },
     {

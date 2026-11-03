@@ -90,8 +90,23 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): der Hinweis zu „Erst – Dann“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx). Neu und nur Deutsch (1. November 2026): die Ansicht „Jetzt – Dann“ mit ihrem Hinweis, „Was wandert?“ mit „Pfeil wandert“ und „Karte wandert“, ihren Druckhinweisen „Nur eine Seite drucken“ / „Karten auch drucken und ausschneiden“ und ihren Hinweisen (catalog.ts, auch beim Drucken und unter „Gestalten“), „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Eine Karte weniger / mehr“ (ChartEditor.tsx) und der Hilfetext des Assistenten (Wizard.tsx). Neu und nur Deutsch (2. November 2026): das Bearbeiten direkt auf der Tafel, gleich im Assistenten und unter „Gestalten“ (ChartEditor.tsx) – „Zeitraum“, „Zähler“, der Schalter „Belohnung“, „Name des Kindes“, „Weitere Einstellungen“, die Fenster einer Karte („Sterne“, „Jeden Tag“ / „Nur Mo“, „Früher“, „Später“, „Entfernen“, „Tauschen gegen“), „Karte dazu“, der Belohnung („Sterne bis zur Belohnung“, „Ohne Belohnung“) und einer Aufgabe, „＋ Belohnung“ (BoardSheet.tsx, PlanSheet.tsx) und der neue Hilfetext (Wizard.tsx). Neu und nur Deutsch (2. November 2026, Editor): „Ein Stern weniger“, „Ein Stern mehr“, „Ganze Zeile entfernen“, „Rückgängig“, „Wiederholen“, „Rückgängig und Wiederholen“, „Direkt auf der Tafel ändern:“ mit seinem Satz, die Notiz zum freien Wechsel der Zeiträume, „Art der Tafel und Einstellungen“, „Zum Ausdrucken“ mit „auf A4 oder als Fotoabzug – oder hier am Bildschirm abhaken“. Neu und nur Deutsch (3. November 2026, Editor): die Fragen der Ecken-Knöpfe „„…“ löschen?“, „„…“ ändern“, „Zeichen löschen?“, „Belohnung ändern“, „Belohnung löschen?“, „„…“ davor“ (SheetAction.tsx, PlanSheet.tsx) und „Karten nummerieren“ (PlanEditor.tsx); „Zähler“, „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Ganze Zeile entfernen“ und der Schalter „Belohnung“ sind wieder weg.",
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): der Hinweis zu „Erst – Dann“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx). Neu und nur Deutsch (1. November 2026): die Ansicht „Jetzt – Dann“ mit ihrem Hinweis, „Was wandert?“ mit „Pfeil wandert“ und „Karte wandert“, ihren Druckhinweisen „Nur eine Seite drucken“ / „Karten auch drucken und ausschneiden“ und ihren Hinweisen (catalog.ts, auch beim Drucken und unter „Gestalten“), „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Eine Karte weniger / mehr“ (ChartEditor.tsx) und der Hilfetext des Assistenten (Wizard.tsx). Neu und nur Deutsch (2. November 2026): das Bearbeiten direkt auf der Tafel, gleich im Assistenten und unter „Gestalten“ (ChartEditor.tsx) – „Zeitraum“, „Zähler“, der Schalter „Belohnung“, „Name des Kindes“, „Weitere Einstellungen“, die Fenster einer Karte („Sterne“, „Jeden Tag“ / „Nur Mo“, „Früher“, „Später“, „Entfernen“, „Tauschen gegen“), „Karte dazu“, der Belohnung („Sterne bis zur Belohnung“, „Ohne Belohnung“) und einer Aufgabe, „＋ Belohnung“ (BoardSheet.tsx, PlanSheet.tsx) und der neue Hilfetext (Wizard.tsx). Neu und nur Deutsch (2. November 2026, Editor): „Ein Stern weniger“, „Ein Stern mehr“, „Ganze Zeile entfernen“, „Rückgängig“, „Wiederholen“, „Rückgängig und Wiederholen“, „Direkt auf der Tafel ändern:“ mit seinem Satz, die Notiz zum freien Wechsel der Zeiträume, „Art der Tafel und Einstellungen“, „Zum Ausdrucken“ mit „auf A4 oder als Fotoabzug – oder hier am Bildschirm abhaken“. Neu und nur Deutsch (3. November 2026, Editor): die Fragen der Ecken-Knöpfe „„…“ löschen?“, „„…“ ändern“, „Zeichen löschen?“, „Belohnung ändern“, „Belohnung löschen?“, „„…“ davor“ (SheetAction.tsx, PlanSheet.tsx) und „Karten nummerieren“ (PlanEditor.tsx); „Zähler“, „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Ganze Zeile entfernen“ und der Schalter „Belohnung“ sind wieder weg. Neu und nur Deutsch (3. November 2026, H-41): der Zeitraum „Countdown“ mit seinem Hinweis, die Vorlage „Wie oft noch schlafen?“ mit Hinweis, die Karten „Geburtstag“ und „Urlaub“, das Fenster „Der große Tag“ mit „Datum“, „Noch so oft schlafen“ und „Bild für den Tag“ (ChartEditor.tsx), die Überschrift „Wie oft schläft Lena noch?“ (board.ts), „…, dann Geburtstag“ und „Heute ist es so weit:“ (PlanSheet.tsx, PlanScreen.tsx) und der Druckhinweis zum Countdown (PlanPrint.tsx).",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+  },
+  {
+    href: "/timer/",
+    note: "Neu (3. November 2026), nur Deutsch: der Name „Timer“ und sein Satz im Regal, die Namen der drei Bilder und „Wie lange?“ mit den Minuten (content.ts, TimerGame.tsx). Sagt sonst nichts.",
+    languages: { de: "done" },
+  },
+  {
+    href: "/schnullerfee/",
+    note: "Neu im November 2026, nur Deutsch: der Name „Die Schnullerfee“ und der Satz auf dem Buchrücken, die Namen der Dinge (nur vorgelesen) und hinter ⚙️ „Abschied der Schnuller“ (Schnullerkästchen, Luftballon) und „Geschenk der Fee“ mit den acht Geschenken. Die Geschichte selbst kommt ohne Worte aus.",
+    languages: { de: "done" },
+  },
+  {
+    href: "/abstillen/",
+    note: "Neu und nur Deutsch (3. November 2026): die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ (WeaningPlay.tsx); noch ohne Aufnahme (🎙️ Stimmen).",
+    languages: { de: "done" },
   },
   {
     href: "/bilder/",
@@ -141,8 +156,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏖️ Die fünf neueren Wege und 🚒 Die Feuerwehr",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch aufgenommen; übersetzt am 30. Oktober 2026, die 734 Sätze der anderen Sprachen (≈ 2.600 Credits) warten auf ihre Aufnahme: bun run voice make --only kleine-abenteuer. Bis dahin sind diese Sätze in den anderen Sprachen still.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Übersetzt am 30. Oktober 2026, alle 734 Sätze der anderen Sprachen von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026, 2.881 Credits).",
       },
     ],
   },
@@ -158,6 +173,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Zu Hause",
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
         note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
+      },
+      {
+        label: "Mehr Gefühle",
+        languages: { de: "done" },
+        note: "Neu und nur Deutsch (3. November 2026): fünf Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt. Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
       },
     ],
   },
@@ -224,6 +244,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal, das Holzschild „Lernspiele“ unter den Bilderbüchern (Bookshelf.tsx) und die Schnitzerei „Für Groß & Klein, Seite an Seite“ mit „Der erste gemeinsame Schritt ins Digitale …“ und ihrem „mehr …“ (Bookshelf.tsx), das „Über Books for Both“ öffnet, mit ihr und dem Text für Suchmaschinen (RoomOptions.tsx), die Wahl „Spiel verlassen“ (✕ antippen oder gedrückt halten) unter ⏳ (HomeOptions.tsx) und „Zum Beenden auf ✕ tippen.“ unter „Gute Nacht“ (GameShell.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal, das Holzschild „Lernspiele“ unter den Bilderbüchern (Bookshelf.tsx) und die Schnitzerei „Für Groß & Klein“ mit „Der erste gemeinsame Schritt ins Digitale …“ und ihrem „mehr …“ (Bookshelf.tsx), das „Über Books for Both“ öffnet, mit ihr und dem Text für Suchmaschinen (RoomOptions.tsx), die Wahl „Spiel verlassen“ (✕ antippen oder gedrückt halten) unter ⏳ (HomeOptions.tsx) und „Zum Beenden auf ✕ tippen.“ unter „Gute Nacht“ (GameShell.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
   },
 ];

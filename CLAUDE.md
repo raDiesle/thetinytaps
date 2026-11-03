@@ -233,9 +233,8 @@ In a fresh worktree run `bun install` first.
   while a recording plays (`talking()`). The dev server keeps the file list of a `?glob` from its start: after
   recording (or adding any files to a globbed folder) restart it before checking, or the new files seem missing.
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
-  (in the book look things standing in the bookshelf, see the book look below).
-- **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
-  in the book look stickers of a fox girl and a bear boy on a wall inside the shelf, each with a little ♀ / ♂ beside
+  (things standing in the bookshelf, see the picture book below).
+- **A figure that stands for the child follows „Junge / Mädchen“** (stickers of a fox girl and a bear boy on a wall inside the shelf, each with a little ♀ / ♂ beside
   it so it is plain which is which, one tap on either chooses it – user decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -257,19 +256,18 @@ In a fresh worktree run `bun install` first.
   game in fullscreen shows nothing of it (user feedback, October 2026); leaving is the menus' button. Starting or leaving a game in fullscreen must not make the browser
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
   (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
-  lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
-  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them (in the book look the ✕
-  is the page's corner and the fullscreen button and ⚙️ are paper notes clipped on, see below). The way back from a menu is a big yellow
-  round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
-  cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
-  menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right. In the
-  book look the way back is instead the page's corner turned up in its top left, at the outer edge of the left page seen
+  lie over every game's picture, also dark ones (night, space), findable on both: the ✕ is the page's corner and the
+  fullscreen button and ⚙️ are paper notes clipped on (see below); a game never restyles them. Only Impressum,
+  Datenschutz and the management page, which are no book's pages, go back by a big yellow round arrow without words
+  (`MenuTop`, its target only as tooltip and read out), close to their title – never far off in the screen's corner,
+  where grown-ups on a big monitor didn't find it. A menu's title goes into `MenuHead`, which puts the fullscreen button
+  on the right and the way back as the page's corner turned up in its top left, at the outer edge of the left page seen
   (`PageCorner`, user feedback, October 2026), and a tap lifts that very page there and turns it back over the spine to
   the right: what is touched must be what moves, like a real book – a corner in the top right turned the other page, and
   grown-ups didn't look there for the way back. Back onto the shelf (a menu whose way back is the home page) no page
   turns: the book closes and goes back, so there the way back is the book's ribbon (Lesebändchen) coming out over the
   page's top edge and lying on the page with its shadow, a big round paper label on it with a tall, slim bookshelf in
-  colour and the yellow round arrow of the way back – the toy look's plain arrow, a straight shaft and an even head
+  colour and the yellow round arrow of the way back – a plain arrow, a straight shaft and an even head
   (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's corner, nor a cover's corner lying over
   the page, which floated where no cover can be: what stands for a part of the book lies where that part really is. It
   is much bigger than a page's corner (`--corner`; a shelf stamped small in gold, then a small label with a squat shelf,
@@ -278,17 +276,16 @@ In a fresh worktree run `bun install` first.
   and the lines). It never lies over a card, a line, a title or the text below: it scrolls with the paper, and where it
   hangs above the lines the menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means
   keeping that room free with it (`MenuTop.test.ts`).
-  Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
-  else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ that leaves is the
+  Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. No round arrow stands beside the title for it (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
+  else goes into that corner. Every way back inside a book is that corner: while playing, the ✕ that leaves is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), tapped or held just like the ✕ – held, it lifts further
   instead of a ring filling – with the fullscreen button right of it, clear of the room it lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it, and a game's own buttons and signs in the top
   left keep below it with `top: calc(… + var(--corner-clear, 0px))` (Schatten finden's picture choice lay under the ✕,
   user feedback, October 2026; `css.test.ts` checks).
-- The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
-  toy look a card per category): one first picks a book, and only inside it, on its first page, its table of contents,
+- The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
   category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
-  Töpfchen – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
+  Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
@@ -305,8 +302,7 @@ In a fresh worktree run `bun install` first.
   standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
   little below its board, never over a book on the board below. Beside the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
-  learning games and little helpers for the day, then that all of it is free („Alles kostenlos.“, a line of its own) –
-  and nothing else: no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
+  learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
   Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). It ends with a carved, underlined „mehr …“
   that opens the texts for grown-ups (`RoomNotes`, see below). The carving takes room of its own on the board
@@ -341,14 +337,13 @@ In a fresh worktree run `bun install` first.
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
   either (only read out; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
-  left corner (in the book look not on a phone, where it only crowds the cards); buttons for grown-ups never cover it (the
-  home page's sit on the right, a phone's way back in the middle). „Einstellungen“ (where a game still has them) is a
-  small sign without words (⚙️; the name as tooltip and read out) right next to the way back – in the book look a paper
-  note clipped beside the fullscreen note, see there – so it takes no row of its own; a panel opens right under the top row. A
+  left corner, stepped aside for the page's corner (not on a phone, where it only crowds the cards); buttons for grown-ups never cover it. „Einstellungen“ (where a game still has them) is a
+  small sign without words (⚙️; the name as tooltip and read out) – a paper
+  note clipped beside the fullscreen note, see the picture book below – so it takes no row of its own; a panel opens right under the top row. A
   menu has no „Über das Spiel“ (user decision, October 2026: „wir brauchen keine Infos im Menü“). When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
-  never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
-  install hint) waits below the first screen (`data-below-fold`), never fixed over it – except on the bookshelf, the
-  book look's home page, which never scrolls (user feedback, October 2026): there it opens from the carving's „mehr …“
+  never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (the words
+  for search engines) waits below the first screen (`data-below-fold`), never fixed over it – except on the bookshelf, the
+  home page, which never scrolls (user feedback, October 2026): there it opens from the carving's „mehr …“
   (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`). On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
   while there is more to scroll to. Buttons and cards in a menu never touch or overlap, also not with a tilted card's
@@ -373,7 +368,9 @@ In a fresh worktree run `bun install` first.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
-  or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do).
+  or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). A tool for the day
+  rather than a game (the Timer, like the Belohnungstafel) counts no play time and still opens when it is over:
+  `GameShell tool` and its address in `PlaytimeLock`.
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
   current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book; its picture is four cards,
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
@@ -448,8 +445,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
-- **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
-  brings back the old toy-block look, `src/lib/look.ts`): the home page is a room with a bookshelf (`Bookshelf`, D-20, user
+- **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`,
+  `src/lib/look.ts`). **It is the only look** (user decision, November 2026): the old toy-block look (cards on a sky,
+  buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one
+  sees – never bring back a second look or a switch between looks, and write new styles as the book's plain rules, with
+  no `data-look` or other branch (`look.test.ts`). Like this: the home page is a room with a bookshelf (`Bookshelf`, D-20, user
   decision, October 2026), the app's name „Books for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
   game sharing the page's height – a round picture, its name, dots leading to its page number (the first game on page 1,
@@ -457,8 +457,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   its world's colour and all of it the tap, never cards; every
   menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is
   always the book's **left** page: its outer edge on the left with the board and the table round it, the spine on the
-  right with the facing page in its shadow beyond it (`--page-left`, `--page-right`; `look.test.ts`). All of it is CSS
-  under `:root[data-look="book"]` in `src/styles/book.css` and `bookshelf.css`; games don't style for it.
+  right with the facing page in its shadow beyond it (`--page-left`, `--page-right`; `look.test.ts`). Most of it is CSS
+  in `src/styles/book.css` and `bookshelf.css`, whose rules begin with `:root` to win over the shared base styles; games
+  don't style for it.
   It should look real, not flat (user feedback, October 2026): the shelf is drawn in 3D (boards seen from the eye's
   height, walls going back, books as boxes with spines and page edges, other books standing with their spines out to
   fill it, some lying in stacks), still until tapped, and planned by `planShelf` (`shelfLayout.ts`) to fill the room on
@@ -491,9 +492,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Browsers show how to leave fullscreen over the
   middle of the screen's bottom (or top) edge for a while, again whenever fullscreen starts: so nothing to tap lies
   there (user feedback, November 2026). On a wide screen the shelf starts right under the fullscreen button's room and
-  stands on legs (`--legs`), leaving the bottom's middle to legs and floor, and the app's name is a painted sign hanging
+  stands on four legs at its corners, two in front and two behind them, never one in the middle (`--legs`, user
+  feedback, November 2026), leaving the bottom's middle to the floor, and the app's name is a painted sign hanging
   on its two little chains in front of the shelf, down into its top compartment (`SIGN_DIP`; standing on the floor at
-  the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it,
+  the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
+  and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
   the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
   wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
@@ -537,7 +540,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   a fox or bear in a role (the baker, the doctor) stands alone. The wall's picture keeps its two families (above).
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
-  book's cover on the shelf (the toy look's home card) shows a piece of it. A new category draws its world (`content.test.ts` checks).
+  book's cover on the shelf shows a piece of it. A new category draws its world (`content.test.ts` checks).
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it; on a
   picture book's cover it lies low, as far from the picture as the title (it once touched the picture, user feedback,
   November 2026).
@@ -548,7 +551,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
   (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
-  The title shows who „Both“ are (user feedback, October 2026): in the book look the o of „Both“ is a picture of Papa Fox
+  The title shows who „Both“ are (user feedback, October 2026): the o of „Both“ is a picture of Papa Fox
   sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
   up to them (`Logo`). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
   Georgia's bold o, which was then cut out) and lies over it so that Papa really sits on the letter – never floating above
@@ -570,7 +573,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
   it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
-  panel of its own (the book look's home page behind the carving's „mehr …“ instead); a new menu page does the same. Pages that must stay out of results get a
+  panel of its own (the home page behind the carving's „mehr …“ instead); a new menu page does the same. Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
   `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
@@ -578,7 +581,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
   cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
 - Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked small in the bookshelf room's
-  bottom right corner, in the toy look below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
+  bottom right corner; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
   stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
   and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`

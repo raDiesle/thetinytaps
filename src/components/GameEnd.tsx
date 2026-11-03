@@ -1,5 +1,5 @@
 import { useEffect, useState, type PointerEvent, type ReactNode } from "react";
-import { useLeaveGame } from "@/components/GameShell";
+import { useCountsPlaytime, useLeaveGame } from "@/components/GameShell";
 import { useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded } from "@/lib/playtime";
@@ -28,6 +28,7 @@ interface GameEndProps {
 export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEndProps) {
   const t = useT();
   const leave = useLeaveGame();
+  const counts = useCountsPlaytime();
   const [shown, setShown] = useState(delayMs <= 0);
 
   useEffect(() => {
@@ -38,8 +39,8 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEnd
 
   // With the last game of a game limit, the game says good night instead (GameShell).
   useEffect(() => {
-    if (shown) gameEnded();
-  }, [shown]);
+    if (shown && counts) gameEnded();
+  }, [shown, counts]);
 
   if (!shown) return null;
 
@@ -47,8 +48,8 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEnd
   // „Nochmal“ and „Weiter“ each start one more game, for a game limit.
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
-    countGame();
-    // In the book look the next round comes on a new page.
+    if (counts) countGame();
+    // The next round comes on a new page.
     turnPageWith("forward", action);
   };
 

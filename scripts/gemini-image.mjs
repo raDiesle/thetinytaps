@@ -543,7 +543,14 @@ if (opts.out === "status") {
     await save(job.transparent ? await cutOut(piece, job.key) : piece, { ...job, out: resolve(ROOT, job.outs[i]) });
   }
 } else if (opts.out === "queue") {
-  const plan = planQueue(PICTURE_QUEUE, opts.force === "all" ? "all" : (opts.force?.split(",") ?? []));
+  // A picture whose file exists is made, only not yet taken out: making it again cost a second request and replaced a
+  // good picture by a worse one, and its twin waited for it as if it were still missing.
+  const made = PICTURE_QUEUE.filter((p) => existsSync(resolve(ROOT, p.file)));
+  for (const p of made) console.log(`made already – take "${p.id}" out of src/content/pictureQueue.ts`);
+  const plan = planQueue(
+    PICTURE_QUEUE.filter((p) => !made.includes(p)),
+    opts.force === "all" ? "all" : (opts.force?.split(",") ?? []),
+  );
   const unknown = opts.force && opts.force !== "all" ? opts.force.split(",").filter((id) => !PICTURE_QUEUE.some((p) => p.id === id)) : [];
   if (unknown.length) fail(`not in the queue: ${unknown.join(", ")}`);
   printPlan(plan);

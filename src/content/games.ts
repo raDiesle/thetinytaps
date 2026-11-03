@@ -10,8 +10,8 @@ export interface Game {
   /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
   blurb: Localized;
   /**
-   * On the shelf (book look) the game stands as these books side by side in one slipcase, one for each part it opens on
-   * (`also`), each with its own name on its spine; in the toy look it stays one card.
+   * On the shelf the game stands as these books side by side in one slipcase, one for each part it opens on
+   * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
 }
@@ -120,6 +120,24 @@ export const CATEGORIES: Category[] = [
           ar: "لوحة المكافآت والجدول الزمني بالصور",
           ru: "Таблица наград и расписание в картинках",
         },
+      },
+      {
+        href: "/timer/",
+        emoji: "⏳",
+        title: { de: "Timer" },
+        blurb: { de: "Warten in Bildern: Zug, Sanduhr, Kerze" },
+      },
+      {
+        href: "/schnullerfee/",
+        emoji: "🧚",
+        title: { de: "Die Schnullerfee" },
+        blurb: { de: "Abschied vom Schnuller als Geschichte" },
+      },
+      {
+        href: "/abstillen/",
+        emoji: "🤱",
+        title: { de: "Abstillen" },
+        blurb: { de: "Tschüss, Mama-Milch – eine Geschichte" },
       },
     ],
   },
@@ -392,7 +410,7 @@ export function categoryOf(pathname: string) {
 export const gamePage = (index: number) => index + 1;
 
 /**
- * Where a menu is in its book, in the book look: its category's table of contents on page 0 (unnumbered), each game's
+ * Where a menu is in its book: its category's table of contents on page 0 (unnumbered), each game's
  * start screen on its `gamePage`. None for any other page (the shelf, a game while playing, a scene inside a game).
  */
 export function bookPage(pathname: string): { book: string; page: number } | undefined {

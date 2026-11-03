@@ -156,8 +156,8 @@ export function possessive(name: string): string {
   return /(s|ß|x|z|ce)$/i.test(name) ? `${name}’` : `${name}s`;
 }
 
-/** Which heading a chart gets when the grown-up wrote none: a board's view, or a plan's week (a plan's day is `day`). */
-export type TitleKind = BoardKind | "planWeek";
+/** Which heading a chart gets when the grown-up wrote none: a board's view, a plan's week or Countdown (a plan's day is `day`). */
+export type TitleKind = BoardKind | "planWeek" | "planCountdown";
 
 /**
  * The heading made from the child's name ("" for none), per language: each builds its own possessive („Lenas Tag“,
@@ -208,6 +208,9 @@ export const AUTO_TITLES: Record<TitleKind, Localized<(name: string) => string>>
     es: (n) => (n ? `La semana de ${n}` : "Mi semana"),
     ar: (n) => (n ? `أسبوع ${n}` : "أسبوعي"),
     ru: (n) => (n ? `${n}: моя неделя` : "Моя неделя"),
+  },
+  planCountdown: {
+    de: (n) => (n ? `Wie oft schläft ${n} noch?` : "Wie oft noch schlafen?"),
   },
 };
 

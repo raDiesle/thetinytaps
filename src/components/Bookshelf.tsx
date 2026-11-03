@@ -148,7 +148,7 @@ const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
 };
 
 /**
- * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
+ * The home page: a room with a bookshelf, the first thing a visit sees. Each category is a picture
  * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
  * app's name is a painted sign hanging on chains: in front of a wide shelf standing on legs, down into its top
@@ -259,10 +259,11 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
                 <span className="shelf-plinth" />
               </div>
               {!layout.upright && (
-                // Standing on legs, so the bottom of the screen's middle, where the browser shows how to leave
-                // fullscreen, holds nothing to tap.
+                // Standing on four legs at its corners, none in the middle, so the bottom of the screen's middle, where the
+                // browser shows how to leave fullscreen, holds nothing to tap. The back legs stand behind the front ones.
                 <span className="shelf-legs" aria-hidden>
-                  <span />
+                  <span className="back" />
+                  <span className="back" />
                   <span />
                   <span />
                 </span>
@@ -312,7 +313,6 @@ function DailyGroup({
           {!carving.short && (
             <>
               <span>{t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag." })}</span>
-              <span>{t({ de: "Alles kostenlos." })}</span>
             </>
           )}
           <RoomNotes />
@@ -390,7 +390,11 @@ function Compartment({
     "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
     "--sy": `${(cell.y + cell.h / 2 - layout.height * EYE_HEIGHT) * back}px`,
   } as CSSProperties;
-  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans) : undefined;
+  // The carved words move right to stand centred under the hanging sign, and the books spine out beside them make way –
+  // a little less than the words move, as there was room between them already.
+  const shift = cell.trail ? (layout.wordsShift ?? 0) : 0;
+  const spinesShift = Math.max(0, shift - 0.1 * layout.bookHeight);
+  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans, spinesShift) : undefined;
   const things = cell.things ?? [];
   // The stack of books lying flat goes to one end, the left in one compartment, the right in the next – never to the
   // wall with the stickers, which it would hide.
@@ -404,7 +408,12 @@ function Compartment({
       <span className="shelf-cell-ceiling" />
       <span className="shelf-cell-floor" />
       {ends && (
-        <div className="shelf-row" style={cell.trail ? ({ "--trail": `${cell.trail}px` } as CSSProperties) : undefined}>
+        <div
+          className="shelf-row"
+          style={
+            cell.trail ? ({ "--trail": `${cell.trail}px`, "--words-shift": `${shift}px`, "--spines-shift": `${spinesShift}px` } as CSSProperties) : undefined
+          }
+        >
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
             <Spines count={stackLeft ? ends.left - ends.stack : ends.left} seed={seed} />
@@ -452,7 +461,7 @@ function BooksLight({ cell, bh, spans }: { cell: ShelfCell; bh: number; spans: n
  * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each. The
  * right end keeps room free beside the wall with the stickers, so they are seen.
  */
-function endsFor(cell: ShelfCell, bh: number, spans: number[]) {
+function endsFor(cell: ShelfCell, bh: number, spans: number[], shift: number) {
   const n = cell.books?.length ?? 0;
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
   const trail = cell.trail ?? 0;
@@ -462,9 +471,10 @@ function endsFor(cell: ShelfCell, bh: number, spans: number[]) {
   const count = (room: number) => Math.max(0, Math.min(12, Math.floor(room / spine)));
   // A stack takes the room of this many spines, where there is room for it.
   const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
-  // The room kept for the sign hanging in front is the right end's, filled with books spine out as well.
+  // The room kept for the sign hanging in front is the right end's, filled with books spine out as well, less what the
+  // carved words moved into (`ShelfLayout.wordsShift`).
   const wall = cell.things?.includes("figure") ? STICKERS_ROOM * bh : 0;
-  return { left: count(end), right: count(end + trail - wall), stack };
+  return { left: count(end), right: count(end + trail - wall - shift), stack };
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */

@@ -7,10 +7,9 @@ import pictures from "./bilder/*.webp?glob";
 const FOX_O = pictures["logo-fuchs-o.webp"];
 
 /**
- * The app's name, "Books for Both", in bouncy letters, each in its own colour, and in the book look printed like a
- * book's title (book.css). What „Both“ means is drawn into the word: on its o sits Papa Fox with his child on his lap,
- * reading it a story, and a big and a small paw track run under the name up to them. The toy look's rounded letters go
- * without them (the foxes were drawn on Georgia's o). `secretProps` go onto the o with the foxes (the home page uses
+ * The app's name, "Books for Both", printed like a book's title (book.css). What „Both“ means is drawn into the word: on its o sits Papa Fox with his child on his lap,
+ * reading it a story, and a big and a small paw track run under the name up to them (the foxes were drawn on
+ * Georgia's o, the book face of the title). `secretProps` go onto the o with the foxes (the home page uses
  * them as the hidden way to the management page: hold them).
  */
 export function Logo({ secretProps }: { secretProps?: HTMLAttributes<HTMLSpanElement> }) {

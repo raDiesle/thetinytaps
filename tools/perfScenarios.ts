@@ -119,8 +119,16 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Was wird aus mir?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
+  { name: "schnullerfee", path: "/schnullerfee/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "abstillen", path: "/abstillen/", parts: [{ label: "Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
+  // The timer's three pictures, each running for a while with a tap now and then (the steam, the twinkling, the flame).
+  ...(["zug", "sanduhr", "kerze"] as const).map((name, i) => ({
+    name: `timer-${name}`,
+    path: "/timer/",
+    parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
+  })),
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Wie geht's dir?", before: [START, { wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },

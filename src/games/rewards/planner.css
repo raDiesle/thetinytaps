@@ -1053,3 +1053,142 @@
 .pl-wadd > .pl-add {
   aspect-ratio: auto;
 }
+
+/* Countdown (H-41): a moon for every night until the big day on a patch of night sky, an arrow, then the day's picture.
+   Wide sheets put the picture beside the moons, upright ones under them; on the day itself the picture fills the sheet. */
+.pl-countdown {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqmin;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pl-countdown.tall {
+  flex-direction: column;
+}
+
+.pl-moons-field {
+  display: grid;
+  flex: 1;
+  align-self: stretch;
+  place-items: center;
+  gap: 1cqmin;
+  min-width: 0;
+  min-height: 0;
+  padding: 2cqmin;
+  border-radius: 5cqmin;
+  background: #2b3170;
+}
+
+.rw-on-paper .pl-moons-field {
+  border: max(1px, 0.5cqmin) dashed #0006;
+  background: none;
+}
+
+.pl-editing .pl-moons-field {
+  cursor: pointer;
+}
+
+.pl-moon {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.pl-moon-pic {
+  width: 88cqmin;
+  height: 88cqmin;
+  overflow: visible;
+}
+
+.pl-moon-pic path:first-child {
+  fill: #ffd43b;
+  stroke: #2a1e5c;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.rw-grey .pl-moon-pic path:first-child {
+  fill: #fff;
+}
+
+.pl-moon-face {
+  fill: none;
+  stroke: #2a1e5c;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+/* Counted: the moon lights up and tips, one after the other (only after a tap). */
+.pl-moon.twinkle .pl-moon-pic {
+  animation: pl-moon-count 0.55s ease-out;
+}
+
+@keyframes pl-moon-count {
+  40% {
+    scale: 1.35;
+    rotate: -14deg;
+    filter: drop-shadow(0 0 6px #fff59d);
+  }
+}
+
+.pl-cd-arrow {
+  flex: none;
+  font-size: 9cqmin;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.pl-countdown.tall .pl-cd-arrow {
+  rotate: 90deg;
+}
+
+/* The big day's picture: square, outlined like the card to do now. */
+.pl-big-day {
+  flex: none;
+  height: min(72%, 60cqw);
+  aspect-ratio: 1;
+}
+
+.pl-countdown.tall .pl-big-day {
+  width: min(80%, 40cqh);
+  height: auto;
+}
+
+.pl-card.pl-big-day {
+  border-color: var(--rw-ink);
+  background: color-mix(in srgb, var(--rw-main) 35%, #fff);
+  box-shadow:
+    0 0 0 max(3px, 3.5cqmin) var(--rw-main),
+    0 max(3px, 3cqmin) 0 max(3px, 3.5cqmin) var(--rw-ink);
+}
+
+.pl-countdown.arrived .pl-big-day {
+  height: 92%;
+}
+
+/* The big day's picture fills its card as far as the card's edge allows: it is all the child looks at. */
+.pl-big-day .pl-emoji {
+  font-size: 64cqmin;
+}
+
+.pl-countdown.tall.arrived .pl-big-day {
+  width: min(92%, 84cqh);
+  height: auto;
+}
+
+.pl-countdown.arrived .pl-card.pl-big-day {
+  box-shadow:
+    0 0 0 max(3px, 3.5cqmin) var(--rw-main),
+    0 0 8cqmin 3cqmin #ffd43b;
+}
+
+.rw-on-paper .pl-card.pl-big-day {
+  box-shadow: none;
+}

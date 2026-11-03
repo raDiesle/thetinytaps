@@ -383,7 +383,7 @@ describe("one page for boards and plans", () => {
   // „Zeitraum“ is sorted by time (user feedback, November 2026): a day, a week and a month first, and Sammeln, which
   // counts stars whatever the day, last. Tag, Woche and Erst – Dann are plans, Monat and Sammeln boards, each with a Vorlage.
   test("the Zeitraum goes from the day to Sammeln, each span a view with a Vorlage", () => {
-    expect(SPANS.map((span) => span.id)).toEqual(["day", "week", "month", "first-then", "collect"]);
+    expect(SPANS.map((span) => span.id)).toEqual(["day", "week", "month", "countdown", "first-then", "collect"]);
     for (const span of SPANS) {
       if (span.type === "plan") expect(PLAN_TEMPLATES.some((tpl) => tpl.view === span.id)).toBe(true);
       else expect(TEMPLATES.some((tpl) => tpl.kind === span.id)).toBe(true);
@@ -406,7 +406,12 @@ describe("one page for boards and plans", () => {
       const chart = moved.type === "board" ? moved.board : moved.plan;
       expect(moved.type).toBe(span.type);
       expect([chart.childName, chart.theme, chart.reward?.catalog]).toEqual(["Lena", "meer", "spielplatz"]);
-      if (moved.type === "plan") expect(moved.plan.days.flat().every((step) => step.stars === 1)).toBe(true);
+      // A Countdown counts nights, never stars.
+      if (moved.type === "plan")
+        expect(
+          moved.plan.days.flat().every((step) => (step.stars ?? 0) === (span.id === "countdown" ? 0 : 1)),
+          span.id,
+        ).toBe(true);
     }
   });
 

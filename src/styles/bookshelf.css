@@ -1,5 +1,5 @@
 /*
- * ---------- The bookshelf: the home page in the book look (Bookshelf.tsx, RoomOptions.tsx, bookTravel.ts) ----------
+ * ---------- The bookshelf: the home page (Bookshelf.tsx, RoomOptions.tsx, bookTravel.ts) ----------
  *
  * A children's room: wallpaper, a wooden floor, and a bookshelf standing on it, drawn in 3D with one eye in front of
  * it (`perspective`), so the boards show their tops below the eye and their undersides above it, the walls inside go
@@ -602,7 +602,11 @@
   translate: -50% -100%;
 }
 
-/* The wide shelf's legs: turned wood, narrower at the foot, a soft shadow on the floor under each. */
+/*
+ * The wide shelf's four legs: turned wood, narrower at the foot, a soft shadow on the floor under each. Only at its
+ * corners, never one in the middle (user feedback, November 2026): the front two at its sides, and the back two behind
+ * them, a little further in, darker in the shelf's shadow and standing a little higher on the floor going back.
+ */
 .shelf-legs {
   position: absolute;
   top: 100%;
@@ -625,6 +629,19 @@
     linear-gradient(#00000059, #0000 18%),
     var(--wood-grain-v) 0 0 / 360px 1200px,
     var(--shelf-wood);
+}
+
+.shelf-legs > .back {
+  position: absolute;
+  top: 0;
+  left: calc(var(--post) * 1.4);
+  height: calc(100% - var(--floor) * 0.2);
+  filter: brightness(0.62);
+}
+
+.shelf-legs > .back + .back {
+  right: calc(var(--post) * 1.4);
+  left: auto;
 }
 
 .shelf-legs::after {
@@ -929,9 +946,16 @@
   justify-content: flex-start;
 }
 
-/* The right end also takes the room kept for the sign hanging in front of it (`ShelfCell.trail`). */
+/*
+ * The right end also takes the room kept for the sign hanging in front of it (`ShelfCell.trail`), its books spine out
+ * beginning where the carved words, moved to stand under the sign (`--words-shift`), end (`--spines-shift`).
+ */
 .shelf-end:last-child {
   flex-basis: var(--trail, 0px);
+}
+
+.shelf-end:last-child > .shelf-spines:first-child {
+  margin-left: var(--spines-shift, 0px);
 }
 
 .shelf-spines {
@@ -1412,7 +1436,7 @@
   text-shadow:
     0 1px 0 #f6dcaecc,
     0 -1px 0 #2a170866;
-  transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
+  transform: translate(calc(var(--sx) + var(--words-shift, 0px)), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
 }
 

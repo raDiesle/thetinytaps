@@ -5,6 +5,8 @@ import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./bo
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
+  bigDayStep,
+  COUNTDOWN_NIGHTS,
   counterOf,
   counting,
   currentStep,
@@ -12,7 +14,9 @@ import {
   fromOlder,
   exampleTicks,
   gameOf,
+  MAX_NIGHTS,
   MAX_STEPS,
+  moonsLeft,
   nightsUntil,
   nowSteps,
   pairsOf,
@@ -181,6 +185,11 @@ describe("plans", () => {
   test("example ticks show a plan in use, but never all of a day", () => {
     for (const tpl of PLAN_TEMPLATES) {
       const plan = planFromTemplate(tpl);
+      // A Countdown has nothing to tick: its moons go by themselves, one a night.
+      if (tpl.view === "countdown") {
+        expect(plan.examples, tpl.id).toBeFalsy();
+        continue;
+      }
       const ticks = exampleTicks(plan, WED);
       const steps = stepsOn(plan, WED);
       expect(Object.keys(ticks).length, tpl.id).toBeGreaterThan(0);
@@ -329,5 +338,22 @@ describe("a week's grid of stars", () => {
     const out = withEveryDay(plan, (steps) => steps.filter((step) => step.catalog !== "kita"));
     expect(out.days.flat().some((step) => step.catalog === "kita")).toBe(false);
     expect(out.days.length).toBe(7);
+  });
+
+  // H-41: a moon for every night until the big day, its picture big on the day itself – never a date, a clock or a
+  // count below none, and never more moons than a sheet holds.
+  test("a Countdown has a moon a night until its big day, none on the day, and prints no cards", () => {
+    const tpl = PLAN_TEMPLATES.find((t) => t.view === "countdown");
+    if (!tpl) throw new Error("no Countdown template");
+    const plan = planFromTemplate(tpl, "de", WED);
+    expect(plan.bigDay).toBe("2026-11-02");
+    expect(moonsLeft(plan, WED)).toBe(COUNTDOWN_NIGHTS);
+    expect(moonsLeft(plan, new Date("2026-11-01T07:00"))).toBe(1);
+    expect(moonsLeft(plan, new Date("2026-11-02T23:00"))).toBe(0);
+    expect(moonsLeft(plan, new Date("2026-11-09T12:00"))).toBe(0);
+    expect(moonsLeft({ ...plan, bigDay: "2027-06-01" }, WED)).toBe(MAX_NIGHTS);
+    expect(bigDayStep(plan)?.catalog).toBe("geburtstag");
+    expect(plan.days[0].every((step) => !step.stars)).toBe(true);
+    expect(printsCards(plan)).toBe("never");
   });
 });

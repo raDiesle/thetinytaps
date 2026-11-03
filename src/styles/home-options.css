@@ -1,16 +1,4 @@
-/* ---------- Home: play time and options for all games ---------- */
-
-/* All buttons on the right, where every menu has its fullscreen button, so the sun in the top left corner stays in sight; their menus open from there. */
-.home-bar {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: flex-start;
-  gap: 12px;
-  margin: -24px 0 8px;
-}
+/* ---------- Home: the menus of play time and the options for all games (HomeOptions.tsx) ---------- */
 
 .fullscreen-icon {
   width: 22px;
@@ -63,52 +51,6 @@
 
 .home-menu-button[aria-expanded="true"] {
   background: var(--sunshine);
-}
-
-/* Boy or girl: two big pictures side by side, the chosen one yellow. */
-.home-figures {
-  display: flex;
-  gap: 12px;
-  width: min(100%, 360px);
-}
-
-.home-figure {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px;
-  border: 3px solid var(--ink);
-  border-radius: 20px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  font-size: 1.1rem;
-  font-weight: 700;
-  box-shadow: 0 4px 0 var(--ink);
-  cursor: pointer;
-}
-
-.home-figure span {
-  font-family: var(--font-emoji);
-  font-size: 3.5rem;
-  line-height: 1.1;
-}
-
-.home-figure[aria-pressed="true"] {
-  background: var(--sunshine);
-}
-
-.home-figure:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--ink);
-}
-
-/* Music switched off: the button fades, so the state shows at a glance. */
-.home-music[aria-pressed="false"] {
-  color: color-mix(in srgb, var(--ink) 55%, transparent);
-  background: #ffffffb0;
 }
 
 .home-menu-button:active {
@@ -165,15 +107,9 @@
 }
 
 /*
- * Phones (shorter side under 600 px, like useFitGrid): the buttons sit right at the top, and a menu
- * covers the whole screen, its name and ✕ fixed on top, so its content gets all the room.
+ * Phones (shorter side under 600 px, like useFitGrid): a menu covers the whole screen, its name and ✕ fixed on top, so its content gets all the room.
  */
 @media (max-width: 599.98px), (max-height: 599.98px) {
-  .home-bar {
-    gap: 8px;
-    margin: 0 0 6px;
-  }
-
   .home-menu-panel {
     position: fixed;
     inset: 0;

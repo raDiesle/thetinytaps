@@ -8,10 +8,12 @@ import { DAY_NAMES, MARK_BY_ID, MARKS, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, ST
 import { ItemPic, MarkPic, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
 import {
+  bigDayStep,
   counting,
   MAX_PART_STEPS,
   MAX_STARS,
   MAX_STEPS,
+  moonsLeft,
   nightsUntil,
   nowSteps,
   pairsOf,
@@ -47,6 +49,11 @@ export const SLEEPS_LEFT: Localized<(nights: number) => string> = {
   ru: (n) => (n === 1 ? "Ещё разок поспать" : `Ещё ${n} ${new Intl.PluralRules("ru").select(n) === "few" ? "раза" : "раз"} поспать`),
 };
 
+/** „Noch 3-mal schlafen, dann Geburtstag“: a Countdown's moons and its big day, said to the child (H-41). */
+export const SLEEPS_UNTIL: Localized<(nights: number, what: string) => string> = {
+  de: (n, what) => `${SLEEPS_LEFT.de(n)}, dann ${what}`,
+};
+
 /** At most this many moons count the nights until a day of the week; further days are next week's anyway. */
 const MAX_MOONS = 6;
 
@@ -77,7 +84,7 @@ export function usePlanTitle() {
     const own = plan.title.trim();
     const template = PLAN_TEMPLATES.find((tpl) => tpl.id === plan.template)?.title;
     if (own) return isTemplateTitle(own, template) ? t(template) : own;
-    return t(AUTO_TITLES[plan.view === "week" ? "planWeek" : "day"])(plan.childName.trim());
+    return t(AUTO_TITLES[plan.view === "week" ? "planWeek" : plan.view === "countdown" ? "planCountdown" : "day"])(plan.childName.trim());
   };
 }
 
@@ -149,7 +156,8 @@ export function PlanSheet({
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
   const shown = look.print ? undefined : ticks;
   // Only a printed day of a plan whose weekdays differ says which day it is; the screen has the switch above.
-  const sub = look.print && plan.view !== "week" && !plan.same ? new Intl.DateTimeFormat(speechLang, { weekday: "long" }).format(day) : "";
+  const sub =
+    look.print && plan.view !== "week" && plan.view !== "countdown" && !plan.same ? new Intl.DateTimeFormat(speechLang, { weekday: "long" }).format(day) : "";
   const editing = edit && !look.print;
   const props: StepsProps = { plan, ticks: shown, linked, today, day, look, fresh, counts: counting(plan), edit: editing };
 
@@ -164,14 +172,16 @@ export function PlanSheet({
         {sub && <span className="rw-blank">{sub}</span>}
       </header>
       <div className="rw-body">
-        {plan.view === "week" ? (
+        {plan.view === "countdown" ? (
+          <Countdown {...props} aspect={aspect} />
+        ) : plan.view === "week" ? (
           <WeekColumns {...props} />
         ) : plan.view === "first-then" ? (
           <FirstThen {...props} aspect={aspect} />
         ) : (
           <DaySteps {...props} aspect={aspect} />
         )}
-        {props.counts && (plan.reward || editing) && <PlanGoal {...props} />}
+        {props.counts && plan.view !== "countdown" && (plan.reward || editing) && <PlanGoal {...props} />}
       </div>
     </div>
   );
@@ -887,6 +897,90 @@ function DayColumns(props: StepsProps) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * A moon for a night still to sleep, drawn as a crescent with a sleepy face: yellow on screen and in colour, white on a
+ * grey print, so the child can colour one in (or cross it out) every morning.
+ */
+function MoonPic() {
+  return (
+    <svg className="pl-moon-pic" viewBox="0 0 100 100" aria-hidden>
+      <path d="M70 15.4 A40 40 0 1 0 70 84.6 A36 36 0 0 1 70 15.4 Z" />
+      <path className="pl-moon-face" d="M21 47 q5 5 10 0 M27 62 q6 4 12 -1" />
+    </svg>
+  );
+}
+
+/** Where a tap opens the big day's window while the plan is made: its picture and its date (`data-edit="big-day"`). */
+const BIG_DAY_EDIT = { "data-edit": "big-day", role: "button", tabIndex: 0 } as const;
+
+/** What the window of the big day is called, also the tooltip of the places that open it. */
+export const BIG_DAY: Localized = { de: "Der große Tag" };
+
+/**
+ * The Countdown (H-41): „Wie oft noch schlafen?“ – a moon for every night until the big day, in rows read from the top
+ * left, then an arrow to the day's picture (Geburtstag, Urlaub, Oma kommt). Each morning one moon fewer; on the day
+ * itself the picture alone stands big in the middle. No date and no number: the child counts moons. On paper the moons
+ * of the day it is printed, to colour in or cross out one each morning. While it is made, a tap on the moons or the
+ * picture opens the big day's window (its date and its picture).
+ */
+function Countdown({ plan, day, look, edit, aspect }: StepsProps & { aspect: number }) {
+  const t = useT();
+  const label = useStepLabel();
+  const step = bigDayStep(plan);
+  const moons = moonsLeft(plan, day);
+  // Upright, the picture goes under the moons; wide, beside them – the moons get the room the picture leaves.
+  const tall = aspect < 1.25;
+  const { cols, rows } = planLayout(moons, tall ? aspect / 0.55 : Math.max(0.4, aspect - 0.95));
+  const sleeps = t(SLEEPS_LEFT)(moons);
+  return (
+    <div className={`pl-countdown${tall ? " tall" : ""}${moons === 0 ? " arrived" : ""}`}>
+      {moons > 0 && (
+        <>
+          <div
+            className="pl-moons-field"
+            style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+            role="img"
+            aria-label={sleeps}
+            title={look.print ? undefined : edit ? t(BIG_DAY) : sleeps}
+            {...(edit ? BIG_DAY_EDIT : {})}
+          >
+            {Array.from({ length: moons }, (_, i) => (
+              <span key={i} className="pl-moon" data-moon={look.print || edit ? undefined : i} data-tap={look.print || edit ? undefined : ""}>
+                <MoonPic />
+              </span>
+            ))}
+          </div>
+          <span className="pl-cd-arrow" aria-hidden>
+            ➜
+          </span>
+        </>
+      )}
+      {step ? (
+        <div
+          className="pl-card pl-big-day"
+          data-big-day={look.print || edit ? undefined : ""}
+          data-tap={look.print || edit ? undefined : "goal"}
+          role="img"
+          aria-label={label(step)}
+          title={look.print ? undefined : label(step)}
+          {...(edit ? BIG_DAY_EDIT : {})}
+        >
+          {edit && <SheetAction act="configure" ask={t(BIG_DAY)} data={{ "data-edit": "big-day" }} />}
+          <span className="pl-emoji" aria-hidden>
+            <ItemPic item={step} lines={look.print && !look.color} />
+          </span>
+        </div>
+      ) : edit ? (
+        <span className="pl-big-day pl-add" {...BIG_DAY_EDIT} aria-label={t(BIG_DAY)} title={t(BIG_DAY)}>
+          ＋
+        </span>
+      ) : (
+        <NoSteps />
+      )}
     </div>
   );
 }

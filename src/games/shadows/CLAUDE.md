@@ -16,6 +16,13 @@ Its card plays at once (`startMode`): there is nothing to choose before playing,
 - No options: no start screen before playing and no settings. Difficulty comes from `nextLevel`, the kind of pictures from the button while playing – the user asked for both.
 - A wrong shadow never shows or sounds as wrong; it only feeds `nextLevel`.
 - Harder means more shadows and closer outlines, never quicker: no clock, and time doesn't count for the difficulty.
+- Exactly one shadow fits (X-14): pictures whose black shadows can't be told apart on Apple's or Google's emojis
+  (pig, sheep and turtle on Android, cat and dog on an iPhone, apple and strawberry, mushroom and tree) are listed in
+  `SHADOW_LOOKALIKES` and never dealt together; `shadows.test.ts` checks every step. Closer outlines make a step harder
+  only while each can still be told apart. A new picture is looked at in black next to the pictures closest to it, in
+  both fonts (Noto Color Emoji from Google Fonts in the preview), and joins the list where it is one of them; the same
+  goes for „Wer schaut da raus?“ (`PEEK_LOOKALIKES`: what peeks out, in colour, at the hardest share and through the
+  gaps – the cat's and the dog's tail, grey elephant, cow and sheep, grey-white rabbit and mouse).
 
 ## Languages
 

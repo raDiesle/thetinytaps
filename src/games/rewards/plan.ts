@@ -66,6 +66,11 @@ export interface Plan {
    * say the order), switched on under „Weitere Einstellungen“.
    */
   numbers?: boolean;
+  /**
+   * Countdown only (H-41): the big day the moons count down to, YYYY-MM-DD; its picture is the plan's one card. Never
+   * shown on the sheet as a date – the child sees a moon for every night until then.
+   */
+  bigDay?: string;
 }
 
 /** A plan as an older version saved it: its two-card „Jetzt – Dann“ view is now a Jetzt – Dann plan with the „Jetzt“ field. */
@@ -129,7 +134,7 @@ export function templateLists(template: PlanTemplate): string[][] {
  * the part's time of day, as Zähne putzen comes in the morning and the evening), so the plan, made anew on every
  * load until something is saved, finds its ticks again.
  */
-export function planFromTemplate(template: PlanTemplate, language: TargetLanguageId = "de"): Plan {
+export function planFromTemplate(template: PlanTemplate, language: TargetLanguageId = "de", today = new Date()): Plan {
   const days = template.parts
     ? [template.parts.flatMap(({ slot, steps }) => steps.map((id) => ({ ...stepFromCatalog(id, slot), id: `${id}@${slot}`, part: slot })))]
     : templateLists(template).map((ids) => ids.map((id) => ({ ...stepFromCatalog(id, template.slots?.[id]), id })));
@@ -142,9 +147,28 @@ export function planFromTemplate(template: PlanTemplate, language: TargetLanguag
     days,
     same: days.length === 1,
     theme: template.theme,
-    examples: true,
+    // A Countdown has nothing to tick, so nothing to show as an example: its moons are there from the start.
+    ...(template.view === "countdown" ? { bigDay: dayKey(daysLater(today, COUNTDOWN_NIGHTS)) } : { examples: true }),
   };
 }
+
+/** The nights a new Countdown starts with: a big day within the week, which a toddler can still wait for. */
+export const COUNTDOWN_NIGHTS = 5;
+
+/** The most nights a Countdown counts: a month of moons still fits a sheet, and is as far as a child looks ahead. */
+export const MAX_NIGHTS = 31;
+
+/** A day `n` days after `day`, at noon (no trouble with the clock change). */
+export const daysLater = (day: Date, n: number): Date => new Date(day.getFullYear(), day.getMonth(), day.getDate() + n, 12);
+
+/** A Countdown's big day as a date (noon); without one, `COUNTDOWN_NIGHTS` after `today`. */
+export const bigDayOf = (plan: Plan, today: Date): Date => (plan.bigDay ? new Date(`${plan.bigDay}T12:00`) : daysLater(today, COUNTDOWN_NIGHTS));
+
+/** The card of a Countdown: the picture of its big day (Geburtstag, Urlaub, Oma kommt). */
+export const bigDayStep = (plan: Plan): PlanStep | undefined => plan.days[0]?.[0];
+
+/** Moons left on a day: one for every night until the big day, none on the day itself and after, at most `MAX_NIGHTS`. */
+export const moonsLeft = (plan: Plan, day: Date): number => Math.min(MAX_NIGHTS, Math.max(0, nightsUntil(day, bigDayOf(plan, day))));
 
 /** The parts of a day in two, in their order. */
 export const DAY_PARTS: Slot[] = ["morning", "evening"];

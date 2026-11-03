@@ -4,7 +4,7 @@ import { holdPreloads } from "@/lib/preloadPages";
 import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
 /*
- * The way into a book and back onto the shelf, in the book look (bookshelf.css): the home page is a bookshelf, and a
+ * The way into a book and back onto the shelf (bookshelf.css): the home page is a bookshelf, and a
  * tap on a book takes it out – it comes off its board towards you, into the middle, its cover swings open to the left,
  * and the left page, where the book's first menu is printed, comes close until it is the screen. No page turns on the
  * way in; pages turn only inside the book (look.ts). The way back is the same backwards: the page goes far, the cover
