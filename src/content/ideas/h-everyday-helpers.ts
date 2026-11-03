@@ -105,6 +105,8 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Eine Geschichte: Tapsi legt die Schnuller in ein Kästchen (oder bindet sie an einen Luftballon), nachts kommt die Schnullerfee und glitzert, am Morgen liegt ein Geschenk da. Eltern wählen das Geschenk als Bild und den Namen des Kindes; dazu ein Feenbrief zum Ausdrucken (H-02).",
       why: "Eltern suchen „schnullerfee brief pdf“, „schnullerfee video für kinder“, „schnuller abschied luftballon“ und „kind 2 jahre schnuller abgewöhnen“.",
       effort: "M",
+      partial:
+        "Gebaut als eigenes Buch der Alltagshelfer (/schnullerfee/, November 2026): Tapsi sammelt die Schnuller ins Kästchen oder an den Luftballon, Licht aus, die Schnullerfee (eine kleine Bärin mit Flügeln) glitzert und tauscht sie gegen ein Geschenk, am Morgen wird es ausgepackt. Kästchen oder Luftballon und das Geschenk (acht Bilder) wählen Eltern hinter ⚙️. Offen: der Name des Kindes und der Feenbrief zum Ausdrucken (H-02).",
     },
     {
       id: "H-12",

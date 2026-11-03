@@ -103,6 +103,12 @@ export const SEO_EN: SeoTranslation = {
         "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. With picture cards to print.",
       text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board. On the same page: a reward chart to collect stars.",
     },
+    "/schnullerfee/": {
+      title: "Pacifier Fairy – Saying Goodbye to the Pacifier",
+      description:
+        "The pacifier fairy comes: gather the pacifiers into a box or tie them to a balloon, lights out – and in the morning a present waits. For weaning off the binky.",
+      text: "A story for weaning off the pacifier, to play on the evening before: Tapsi the fox gathers his pacifiers and puts them into a little box on the windowsill – or ties them to a balloon that flies out of the window. Then the light goes out, mom gives a good-night kiss, and at night the pacifier fairy comes through the window, sparkles and swaps the pacifiers for a present. In the morning the child wakes Tapsi up, and the present waits on the windowsill. Parents choose which present it is and whether it is the box or the balloon, so the story matches the real goodbye.",
+    },
     "/bilder/baustelle/": scene("Construction Site", "excavator, crane and cement mixer"),
     "/bilder/stadt/": scene("City", "bus, traffic light and police car"),
     "/bilder/bauernhof/": scene("Farm", "cow, pig and tractor"),

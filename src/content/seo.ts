@@ -183,6 +183,13 @@ export const SEO_PAGES: PageSeo[] = [
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Mit Bildkarten zum Ausdrucken.",
     text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
   },
+  {
+    path: "/schnullerfee/",
+    title: "Schnullerfee – Abschied vom Schnuller als Geschichte",
+    description:
+      "Die Schnullerfee holt die Schnuller: einsammeln, ins Kästchen oder an den Luftballon, Licht aus – am Morgen liegt ein Geschenk da. Zum Schnuller abgewöhnen.",
+    text: "Eine Geschichte zum Schnuller abgewöhnen, zum Spielen am Abend davor: Tapsi der Fuchs sammelt seine Schnuller ein und legt sie ins Schnullerkästchen auf die Fensterbank – oder bindet sie an einen Luftballon, der aus dem Fenster fliegt. Dann geht das Licht aus, Mama gibt einen Gute-Nacht-Kuss, und in der Nacht kommt die Schnullerfee durchs Fenster, glitzert und tauscht die Schnuller gegen ein Geschenk. Am Morgen weckt das Kind Tapsi, und das Geschenk wartet auf der Fensterbank. Welches Geschenk es ist und ob Kästchen oder Luftballon, stellen die Eltern ein, damit die Geschichte zum echten Abschied passt.",
+  },
   scene("baustelle", "Baustelle", "Bagger, Kran und Betonmischer"),
   scene("stadt", "Stadt", "Bus, Ampel und Polizeiauto"),
   scene("bauernhof", "Bauernhof", "Kuh, Schwein und Traktor"),

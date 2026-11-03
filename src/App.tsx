@@ -24,6 +24,7 @@ const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
+const PacifierPage = page(() => import("@/pages/PacifierPage"), "PacifierPage", "/schnullerfee/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
 const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
@@ -49,6 +50,7 @@ export function App() {
         <Route path="bilder/:scene" element={<ScenePage />} />
         <Route path="zaehne" element={<TeethPage />} />
         <Route path="toepfchen" element={<PottyPage />} />
+        <Route path="schnullerfee" element={<PacifierPage />} />
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />

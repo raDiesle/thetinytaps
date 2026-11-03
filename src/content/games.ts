@@ -121,6 +121,12 @@ export const CATEGORIES: Category[] = [
           ru: "Таблица наград и расписание в картинках",
         },
       },
+      {
+        href: "/schnullerfee/",
+        emoji: "🧚",
+        title: { de: "Die Schnullerfee" },
+        blurb: { de: "Abschied vom Schnuller als Geschichte" },
+      },
     ],
   },
   {
