@@ -26,6 +26,9 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
   never a card of its own („Wo ist das B?“ is Wörter tippen's first letter, Zählen is Frei tippen's „Nur Zahlen“), and
   the panel shows only the options of the way being played. An option that changes what comes next (which words, the
   kind of pictures) brings a new word or letter at once (the play component's `key`).
+- The game plays at once in one way, so grown-ups wouldn't guess how many others wait behind ⚙️: as play starts a note
+  under it (`PlayOptions intro`) names them – letters, numbers, counting, whole words, „Wo ist das B?“. When a way to
+  play or a big variant is added, name it there too (user feedback, November 2026).
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the game's shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

@@ -63,14 +63,20 @@ test("what is on in the options is marked with a highlighter, not yellow paper",
   expect(rule(".settings .choice button.selected")).toContain("background-color: var(--paper)");
 });
 
-// The small grey gear on ⚙️'s note wasn't seen while playing (user feedback, November 2026): its note is bigger than
-// the fullscreen one beside it, and it lights up softly a few times as play starts, then stands still.
-test("⚙️ while playing is a bigger note that lights up only as play starts", () => {
+// The small grey gear on ⚙️'s note wasn't seen while playing, nor known for the options without words (user feedback,
+// November 2026): its note is much bigger than the fullscreen one beside it, carries its name in words always shown,
+// and it lights up softly a few times as play starts, then stands still.
+test("⚙️ while playing is a big note with its name that lights up only as play starts", () => {
   const slip = rule(".play-area .play-options-corner .play-options-button");
   const width = (decls: string) => Number(decls.match(/width:\s*(\d+)px/)?.[1]);
-  expect(width(slip)).toBeGreaterThan(width(rule(".play-area .play-fullscreen, .play-options-button)")));
-  expect(Number(slip.match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(1.6);
+  expect(width(slip)).toBeGreaterThan(2 * width(rule(".play-area .play-fullscreen, .play-options-button)")));
   const playing = readFileSync("src/styles/playing.css", "utf8");
+  const playingRule = (selector: string) => playing.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
+  expect(Number(playingRule(".play-options-gear").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(2.4);
+  expect(Number(playingRule(".play-options-label b").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(1.3);
+  // The name is always there, not only while held or under a mouse.
+  expect(playingRule(".play-options-label")).not.toMatch(/opacity:\s*0|display:\s*none/);
+  expect(readFileSync("src/components/PlayOptions.tsx", "utf8")).toContain('className="play-options-label"');
   const glow = playing.match(/\.play-options-corner \{[^}]*animation:\s*([^;]+);/)?.[1] ?? "";
   expect(glow).toContain("play-options-glow");
   // A number of times, never `infinite`: after it, nothing idles.

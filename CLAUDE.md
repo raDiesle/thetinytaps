@@ -42,7 +42,7 @@ In a fresh worktree run `bun install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `bun run verify`, commit on the branch, merge into **local** `main` without asking,
-  never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
+  never push (and don't offer to – pushing is the user's move). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
@@ -498,7 +498,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the 🌐 lines and the language's name on its foot (the language – never a light switch); stickers of the fox girl and
   the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
   where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
-  right inner side), and no books spine out stand against that wall to hide them. The texts that stood below
+  right inner side), and no books spine out stand against that wall to hide them. „Wer spielt?“ above them is carved into
+  the back panel beside that wall (`.shelf-figure-ask`, user request, November 2026): words go on the back panel, never
+  on a side wall, which is seen nearly edge-on and squeezes them past reading. The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
@@ -537,9 +539,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
-  findable on dark pictures). While playing, ⚙️'s note is the bigger one, its gear large, and as play starts it lights
-  up softly twice, then stands still – never a glow that keeps going or comes back while playing (user feedback, November
-  2026: the small grey gear wasn't seen; `look.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
+  findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large and its name
+  in words beside it, always shown („Einstellungen“, „halten“ under it), and as play starts it lights up softly twice,
+  then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
+  grey gear wasn't seen, and without words grown-ups didn't know it held the options; `look.test.ts`). A game with many
+  ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
+  be chosen there, that fades by itself after a few seconds, goes once the options were opened and lets taps through
+  (`PlayOptions.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
   grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
   `look.test.ts`); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on

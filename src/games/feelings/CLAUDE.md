@@ -24,8 +24,8 @@ a newcomer, fallen down, someone who doesn't stop (`kita.ts`, `KitaPlay.tsx`): w
 step, one after another.
 After them come stories of more feelings (`selbst.ts`, played by `KitaPlay` like the kindergarten's, ids `selbst-…`):
 disappointed (the cookie breaks), jealous (the bear baby is cuddled), disgust (broccoli), embarrassed (wet trousers in
-the kindergarten), excited (the first snow) – ideas C-05, C-12, C-16, C-17, C-18 – and a second round of 19 whose
-pictures are still planned (`bilder/README.md`): leaving the playground, a show that ends, no lolly at the checkout, a
+the kindergarten), excited (the first snow) – ideas C-05, C-12, C-16, C-17, C-18 – and a second round of 19
+(pictures made November 2026): leaving the playground, a show that ends, no lolly at the checkout, a
 jacket that won't go on, waiting for pancakes, the vacuum cleaner, a big dog, the doctor, washing hair, waking at night,
 the lost cuddly toy, not allowed to join in, a party too loud, proud on the climbing frame, missing grandma, shy with a
 visitor, bored on a rainy day, caring when the fox cries, startled by a bang (C-01 to C-15, C-23 to C-28). The little
