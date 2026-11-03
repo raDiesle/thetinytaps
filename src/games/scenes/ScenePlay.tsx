@@ -895,9 +895,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </div>
       )}
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
-      {!questMode && allDiscovered && (
-        <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
-      )}
+      {!questMode && allDiscovered && <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ name: nextScene.title, onNext: goToNextScene }} />}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
       {colouring && keysOn && !allDiscovered && (
         <button

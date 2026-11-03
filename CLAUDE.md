@@ -373,10 +373,12 @@ In a fresh worktree run `bun install` first.
   or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). A tool for the day
   rather than a game (the Timer, like the Belohnungstafel) counts no play time and still opens when it is over:
   `GameShell tool` and its address in `PlaytimeLock`.
-- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
-  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book; its picture is four cards,
-  `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
-  the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Menü“ (back to the
+  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book),
+  „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
+  the first, so there is always one). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+  and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
+  a big painted label taped onto the page, „Menü“ and „Nochmal“ two smaller paper slips stacked beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
