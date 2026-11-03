@@ -128,8 +128,8 @@ describe("inline texts against the language status", () => {
   });
 
   test("the scanner finds texts and their languages", () => {
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: the sample is source code with a template literal in it
     const found = inlineTexts(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the sample is source code with a template literal in it
       't({ de: `A ${b.c}`, en: "B" }); x = { de: "Hallo", ru: \'Привет\' }; y = { de: (n) => `${n}-mal`, en: (n) => n }; z = { de: n => n }; type L = { de: T };',
     );
     expect(found.map((f) => [f.german.slice(0, 3), f.keys])).toEqual([

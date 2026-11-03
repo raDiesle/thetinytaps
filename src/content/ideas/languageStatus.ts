@@ -157,8 +157,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "Mehr Gefühle",
-        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "24 Geschichten in selbst.ts. Übersetzt in kita.<Sprache>.ts (3. November 2026): die ersten fünf – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt. Neu und nur Deutsch (3. November 2026): die 19 weiteren vom Spielplatz bis zum lauten Knall (Bilder noch geplant).",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall (Bilder noch geplant) –, alle übersetzt in kita.<Sprache>.ts (3. November 2026).",
       },
     ],
   },
