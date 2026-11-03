@@ -222,7 +222,7 @@ In a fresh worktree run `bun install` first.
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
   (in the book look things standing in the bookshelf, see the book look below).
 - **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
-  in the book look stickers of a fox girl and a bear boy on the shelf's right inner side, each with a little ♀ / ♂ beside
+  in the book look stickers of a fox girl and a bear boy on a wall inside the shelf, each with a little ♀ / ♂ beside
   it so it is plain which is which, one tap on either chooses it – user decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -286,9 +286,11 @@ In a fresh worktree run `bun install` first.
   out furthest, glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
-  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a library's label with its name clipped on the
-  board's edge under it (`DailyGroup`, chosen from four drafts – bookend, sign, paper band – user decision, November
-  2026), and beside it words carved into the back panel tell grown-ups in short what
+  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
+  name screwed onto the board's edge under it (`DailyGroup`; a label from four drafts – bookend, sign, paper band – user
+  decision, November 2026, made of wood so it looks mounted, user feedback, November 2026), and the picture books
+  standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
+  little below its board, never over a book on the board below. Beside the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day, then that all of it is free („Alles kostenlos.“, a line of its own) –
   and nothing else: no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
@@ -465,19 +467,23 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
-  the hourglass (play time, the most needed), below it a wooden loudspeaker (music, one tap) with stickers of the fox girl
-  and the bear boy stuck on the inner side of the shelf's right wall beside it (the figure), at the bottom a globe with
-  the 🌐 lines and the language's name on its foot (the language – never a light switch). The texts that stood below
+  the hourglass (play time, the most needed), below it a wooden loudspeaker (music, one tap), at the bottom a globe with
+  the 🌐 lines and the language's name on its foot (the language – never a light switch); stickers of the fox girl and
+  the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
+  where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
+  right inner side), and no books spine out stand against that wall to hide them. The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
   closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Browsers show how to leave fullscreen over the
   middle of the screen's bottom (or top) edge for a while, again whenever fullscreen starts: so nothing to tap lies
   there (user feedback, November 2026). On a wide screen the shelf starts right under the fullscreen button's room and
-  stands on legs (`--legs`), leaving the bottom's middle to legs and floor, and the app's name is a painted sign standing
-  on the floor in front of the shelf's bottom left, the bottom board keeping its books clear of the sign and the foxes on
-  its o (`ShelfCell.lead`, `SIGN_REACH`) – never over a book. On an upright screen the sign still hangs on two little
-  chains above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
+  stands on legs (`--legs`), leaving the bottom's middle to legs and floor, and the app's name is a painted sign hanging
+  on its two little chains in front of the shelf, down into its top compartment (`SIGN_DIP`; standing on the floor at
+  the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it,
+  the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
+  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). On an upright screen it
+  hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
   with a bear child, one of the children a boy and one a girl – never a third grown-up or a child too many (user

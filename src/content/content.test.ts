@@ -220,13 +220,16 @@ describe("the app's name", () => {
   });
 
   // Browsers show how to leave fullscreen at the bottom (or top) of the screen's middle, over what lies there (user
-  // feedback, November 2026): a wide shelf starts high and stands on legs, its sign standing in front at the bottom left,
-  // so only legs and floor lie at the bottom's middle and only the shelf's top board at the top's.
-  test("a wide shelf stands on legs, its sign in front of it, leaving the bottom's middle to legs and floor", () => {
+  // feedback, November 2026): a wide shelf starts high and stands on legs, so only legs and floor lie at the bottom's
+  // middle; its sign hangs on its chains in front of it, down into its top compartment (user feedback, November 2026),
+  // where the plan puts it (shelfLayout.test.ts).
+  test("a wide shelf stands on legs, its sign hanging into it, leaving the bottom's middle to legs and floor", () => {
     const css = readFileSync("src/styles/bookshelf.css", "utf8");
     const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.[\]="]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
-    expect(rule('.room-scene[data-plan="wide"] .shelf-sign')).toMatch(/bottom: calc\([^;]*- var\(--legs\)/);
+    expect(rule('.room-scene[data-plan="wide"] .shelf-sign')).toContain("translate: -50% -100%;");
+    expect(css).not.toMatch(/\[data-plan="wide"\] \.shelf-sign::(before|after)/);
     const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
+    expect(shelf).toContain("top: layout.sign.y + layout.sign.h");
     expect(shelf).toContain('className="shelf-legs"');
     expect(shelf).toMatch(/"--legs": `\$\{layout\.legs\}px`/);
   });

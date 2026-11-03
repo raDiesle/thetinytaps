@@ -109,12 +109,12 @@ for (const entry of SHELF) {
 const SPINE_COLOURS = ["#5e4f44", "#475057", "#685e4b", "#515647", "#594c51", "#464750", "#645649", "#4d5450", "#5c574d", "#504a43"];
 
 /**
- * The sign with the app's name standing in front of a wide shelf: its letters' size for the room's height, and its
- * width and height in those (the name, the sign's padding and frame; from its feet up to the foxes' heads on its o).
+ * The sign with the app's name hanging in front of a wide shelf: its letters' size for the room's height, and its
+ * board's width and height in those (the name, the sign's padding and frame; the foxes on its o rise 0.4 above it).
  */
 const SIGN_SIZE = 0.09;
 const SIGN_EMS = 7.8;
-const SIGN_TALL = 2.2;
+const SIGN_BOARD = 1.5;
 
 /** The least height of a wide shelf's legs, for the room's: the bottom's middle where browsers note how to leave fullscreen. */
 const LEGS = 0.1;
@@ -151,7 +151,8 @@ const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
  * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
  * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
- * app's name is a painted sign: in front of a wide shelf standing on legs, above an upright one's. Drawn in 3D – each compartment a box going back, the boards seen from
+ * app's name is a painted sign hanging on chains: in front of a wide shelf standing on legs, down into its top
+ * compartment, above an upright one's. Drawn in 3D – each compartment a box going back, the boards seen from
  * the eye's height – but still: nothing moves until it is tapped. The room fills the screen and nothing follows below it:
  * `legal` (Impressum, Datenschutz) stands small in its bottom right corner.
  */
@@ -170,14 +171,15 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
       // The screen's shape decides, not the room's: the room's height follows the plan (`data-plan` in bookshelf.css).
       const upright = window.innerWidth / window.innerHeight < 0.95;
       const sign = Math.min(64, Math.max(20, height * SIGN_SIZE));
-      const options = { upright, sign: { width: sign * SIGN_EMS, height: sign * SIGN_TALL }, legs: Math.min(90, Math.max(28, height * LEGS)) };
-      const plain = planShelf(width, height, spansFor(undefined), options);
-      const carved = CARVINGS.map((carving) => ({ carving, layout: planShelf(width, height, spansFor(carving), options) })).find(
+      const options = { upright, sign: { width: sign * SIGN_EMS, height: sign * SIGN_BOARD }, legs: Math.min(90, Math.max(28, height * LEGS)) };
+      const planFor = (carving: Carving | undefined) => planShelf(width, height, spansFor(carving), { ...options, carved: carving?.span ?? 0 });
+      const plain = planFor(undefined);
+      const carved = CARVINGS.map((carving) => ({ carving, layout: planFor(carving) })).find(
         ({ carving, layout }) => layout.bookHeight >= Math.max(carving.minBook, plain.bookHeight * CARVING_SHRINK),
       );
       const last = CARVINGS[CARVINGS.length - 1];
       const carving = carved?.carving ?? last;
-      const layout = carved?.layout ?? planShelf(width, height, spansFor(last), options);
+      const layout = carved?.layout ?? planFor(last);
       setPlan({ layout, roomWidth: width, carving, spans: spansFor(carving), sign });
     };
     measure();
@@ -231,14 +233,14 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
         <div className="room-shelf-place" ref={room}>
           {layout && (
             <div className="shelf" style={style}>
-              {/* The app's name, painted on a sign: standing in front of a wide shelf, hanging above an upright one's. */}
-              <div className="shelf-sign">
+              {/* The app's name, painted on a sign: hanging in front of a wide shelf's top compartment, above an upright one's. */}
+              <div className="shelf-sign" style={layout.sign && { left: layout.sign.x + layout.sign.w / 2, top: layout.sign.y + layout.sign.h }}>
                 <Logo secretProps={secretProps} />
               </div>
               <div className="shelf-box" onPointerDown={nudge}>
                 <span className="shelf-back" />
                 {layout.cells.map((cell, i) => (
-                  <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5}>
+                  <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5} label={labelOf(cell, layout)}>
                     {cell.books?.map((b) =>
                       PLACES[b][0].colour ? (
                         <DailyGroup key={PLACES[b][0].id} books={PLACES[b]} carving={plan.carving} take={take} />
@@ -338,6 +340,23 @@ function Slipcase({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfB
   );
 }
 
+/** How much room the books spine out leave beside the wall with the stickers, in book heights. */
+const STICKERS_ROOM = 0.45;
+
+/** The name of the picture books' group (the everyday helpers' is their category's, `DailyGroup`). */
+const LEARNING: Localized = { de: "Lernspiele" };
+
+/**
+ * The name on a wooden sign under a compartment's books: „Lernspiele“ where all the picture books stand together on
+ * one board and nothing else does (user feedback, November 2026) – split over several boards there is no group to name.
+ */
+function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
+  const pictureBooks = (c: ShelfCell) => (c.books ?? []).filter((b) => !PLACES[b][0].colour).length;
+  const all = layout.cells.reduce((sum, c) => sum + pictureBooks(c), 0);
+  const own = pictureBooks(cell);
+  return own > 0 && own === cell.books?.length && own === all ? LEARNING : undefined;
+}
+
 /** A rectangle of the shelf's plan as a style. */
 const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w, height: r.h });
 
@@ -345,7 +364,22 @@ const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w
  * A compartment of the shelf, a box going back from its opening: walls, the board's underside above and its top below,
  * the shadow inside. In it either picture books (`children`) with books spine out filling its ends, or a grown-up's thing.
  */
-function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell; layout: ShelfLayout; spans: number[]; seed: number; children?: ReactNode }) {
+function Compartment({
+  cell,
+  layout,
+  spans,
+  seed,
+  label,
+  children,
+}: {
+  cell: ShelfCell;
+  layout: ShelfLayout;
+  spans: number[];
+  seed: number;
+  label?: Localized;
+  children?: ReactNode;
+}) {
+  const t = useT();
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
   const back = (layout.bookHeight * DEPTH) / EYE / 2;
@@ -358,10 +392,11 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
   } as CSSProperties;
   const ends = cell.books ? endsFor(cell, layout.bookHeight, spans) : undefined;
   const things = cell.things ?? [];
-  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next.
-  const stackLeft = seed % 2 === 0;
+  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next – never to the
+  // wall with the stickers, which it would hide.
+  const stackLeft = seed % 2 === 0 || things.includes("figure");
   return (
-    <div className={`shelf-cell${things.length ? ` thing ${things.join(" ")}` : ""}`} style={style}>
+    <div className={`shelf-cell${cell.books ? "" : ` thing ${things.join(" ")}`}`} style={style}>
       <span className="shelf-cell-shade" />
       {cell.books && <BooksLight cell={cell} bh={layout.bookHeight} spans={spans} />}
       <span className="shelf-wall left" />
@@ -369,7 +404,7 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
       <span className="shelf-cell-ceiling" />
       <span className="shelf-cell-floor" />
       {ends && (
-        <div className="shelf-row" style={cell.lead ? ({ "--lead": `${cell.lead}px` } as CSSProperties) : undefined}>
+        <div className="shelf-row" style={cell.trail ? ({ "--trail": `${cell.trail}px` } as CSSProperties) : undefined}>
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
             <Spines count={stackLeft ? ends.left - ends.stack : ends.left} seed={seed} />
@@ -381,8 +416,9 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
           </span>
         </div>
       )}
+      {label && <span className="shelf-group-label shelf-board-label">{t(label)}</span>}
       {things.includes("figure") && (
-        // The stickers of the child's figure, stuck on the compartment's right wall: the shelf's right inner side.
+        // The stickers of the child's figure, stuck on the compartment's right wall.
         <div className="shelf-side-stuck">
           <RoomStickers />
         </div>
@@ -407,27 +443,28 @@ function BooksLight({ cell, bh, spans }: { cell: ShelfCell; bh: number; spans: n
   const books = cell.books ?? [];
   const span = books.reduce((sum, b) => sum + spans[b], 0);
   const width = span * bh * BOOK_ASPECT + (books.length + 1) * BOOK_GAP * bh;
-  const lead = cell.lead ?? 0;
-  const left = lead + (cell.w - lead - width) / 2;
+  const left = (cell.w - (cell.trail ?? 0) - width) / 2;
   return <span className="shelf-light" style={{ left, width }} />;
 }
 
 /**
  * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
- * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each.
+ * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each. The
+ * right end keeps room free beside the wall with the stickers, so they are seen.
  */
 function endsFor(cell: ShelfCell, bh: number, spans: number[]) {
   const n = cell.books?.length ?? 0;
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
-  const lead = cell.lead ?? 0;
-  const end = (cell.w - lead - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh) / 2 - 2;
+  const trail = cell.trail ?? 0;
+  const end = (cell.w - trail - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh) / 2 - 2;
   // The widest spine's room, so that they never reach past the wall.
   const spine = bh * 0.17 + 1;
   const count = (room: number) => Math.max(0, Math.min(12, Math.floor(room / spine)));
   // A stack takes the room of this many spines, where there is room for it.
   const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
-  // The room kept free for the sign in front is the left end's, filled with books spine out as well.
-  return { left: count(end + lead), right: count(end), stack };
+  // The room kept for the sign hanging in front is the right end's, filled with books spine out as well.
+  const wall = cell.things?.includes("figure") ? STICKERS_ROOM * bh : 0;
+  return { left: count(end), right: count(end + trail - wall), stack };
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */

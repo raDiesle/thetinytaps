@@ -1,9 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, type ShelfRect, TAKE_OUT } from "./shelfLayout";
+import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, SIGN_CLEAR, SIGN_DIP, type ShelfRect, TAKE_OUT } from "./shelfLayout";
 
 /** The home page's places: the everyday helpers' books with the words carved beside them, then three picture books. */
-const BOOKS = [2.2, 1, 1, 1];
+const BOOKS = [2.7, 1, 1, 1];
+
+/** Of the everyday helpers' place, the words carved beside their books (`CARVINGS` in Bookshelf.tsx). */
+const CARVED = 1.4;
 
 /** A phone on its side, upright, a tablet, a laptop, a big monitor (the room the shelf gets in each). */
 const ROOMS = [
@@ -15,8 +18,11 @@ const ROOMS = [
   [740, 1000],
 ];
 
-/** What the home page asks for besides the room: the sign standing in front of a wide shelf, the legs' least height. */
-const OPTIONS = (height: number) => ({ sign: { width: Math.min(64, height * 0.09) * 7.8, height: Math.min(64, height * 0.09) * 2.2 }, legs: height * 0.1 });
+/** The letters' size of the sign with the app's name in a room this high (`SIGN_SIZE` in Bookshelf.tsx). */
+const SIGN = (height: number) => Math.min(64, Math.max(20, height * 0.09));
+
+/** What the home page asks for besides the room: the sign hanging in front of a wide shelf, the carved words, the legs' least height. */
+const OPTIONS = (height: number) => ({ sign: { width: SIGN(height) * 7.8, height: SIGN(height) * 1.5 }, carved: CARVED, legs: height * 0.1 });
 
 const overlap = (a: ShelfRect, b: ShelfRect) => a.x < b.x + b.w - 0.01 && b.x < a.x + a.w - 0.01 && a.y < b.y + b.h - 0.01 && b.y < a.y + a.h - 0.01;
 
@@ -28,16 +34,22 @@ describe("the bookshelf", () => {
   test.each(ROOMS)("each of the grown-ups' things stands in the shelf once in a %i × %i room", (width, height) => {
     const { cells } = planShelf(width, height, BOOKS);
     expect(cells.flatMap((c) => c.things ?? []).sort()).toEqual([...SHELF_THINGS].sort());
-    for (const cell of cells) expect(Boolean(cell.books) !== Boolean(cell.things?.length)).toBe(true);
+    for (const cell of cells) {
+      expect(Boolean(cell.books || cell.things?.length)).toBe(true);
+      // Among books there are only the stickers, on the compartment's wall: the other things stand on a board of their own.
+      if (cell.books) expect(cell.things?.filter((t) => t !== "figure") ?? []).toEqual([]);
+    }
   });
 
-  // The stickers of the child's figure are stuck on the shelf's right inner side, the globe in a compartment of its own
-  // (user feedback, October 2026): their compartment's right wall is the shelf's.
-  test.each(ROOMS)("the stickers' compartment lies at the shelf's right side, the globe apart from it, in a %i × %i room", (width, height) => {
-    const { cells, frame, width: w } = planShelf(width, height, BOOKS);
+  // The stickers of the child's figure are stuck on a compartment's right wall, the globe in a compartment of its own
+  // (user feedback, October 2026): on an upright shelf the shelf's right side; on a wide one the right wall of the big
+  // compartment on top, beside the everyday helpers, where they are seen better (user feedback, November 2026).
+  test.each(ROOMS)("the stickers are on the right wall of their compartment, the globe apart from them, in a %i × %i room", (width, height) => {
+    const { cells, frame, width: w, upright } = planShelf(width, height, BOOKS);
     const figure = cells.find((c) => c.things?.includes("figure"));
     const globe = cells.find((c) => c.things?.includes("language"));
-    expect(figure && figure.x + figure.w).toBeCloseTo(w - frame.post);
+    if (upright) expect(figure && figure.x + figure.w).toBeCloseTo(w - frame.post);
+    else expect(figure).toEqual(cells.find((c) => c.books));
     expect(globe).not.toEqual(figure);
   });
 
@@ -47,27 +59,38 @@ describe("the bookshelf", () => {
     "a wide shelf has the things in one column at its right, the hourglass on top, in a %i × %i room",
     (width, height) => {
       const { cells, frame, width: w } = planShelf(width, height, BOOKS);
-      const things = cells.filter((c) => c.things);
+      const things = cells.filter((c) => c.things && !c.books);
       for (const cell of things) expect(cell.x + cell.w).toBeCloseTo(w - frame.post);
-      expect(things.map((c) => c.things)).toEqual([["playtime"], ["music", "figure"], ["language"]]);
+      expect(things.map((c) => c.things)).toEqual([["playtime"], ["music"], ["language"]]);
       expect(things[0].y).toBeCloseTo(frame.crown);
       expect(things[0].h).toBe(Math.max(...things.map((c) => c.h)));
     },
   );
 
-  // The sign with the app's name stands in front of a wide shelf's bottom left (user decision, November 2026): the bottom
-  // board's books start right of it, so the foxes on its o never stand in front of a book.
-  // and the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only its legs.
-  test.each(ROOMS.filter(([w, h]) => w > h))("a wide shelf keeps the sign's room free of books in a %i × %i room", (width, height) => {
+  // The sign with the app's name hangs on its chains in front of a wide shelf, down into its top compartment over the
+  // carved words (user feedback, November 2026): never over a book to take or the wall with the stickers, its foxes
+  // still on the screen; and the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only
+  // the shelf's legs.
+  test.each(ROOMS.filter(([w, h]) => w > h))("a wide shelf's sign hangs into its top compartment, clear of the books, in a %i × %i room", (width, height) => {
     const options = OPTIONS(height);
-    const { cells, bookHeight, legs } = planShelf(width, height, BOOKS, options);
+    const { cells, bookHeight: bh, legs, sign } = planShelf(width, height, BOOKS, options);
     expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
-    const books = cells.filter((c) => c.books);
-    const last = books[books.length - 1];
-    // Either the foxes rise in front of the bottom board's left end, kept free of books, or the sign stands wholly below.
-    const before = (last.lead ?? 0) + BOOK_GAP * bookHeight >= options.sign.width * 0.86 - 0.01;
-    const below = legs >= options.sign.height - 0.01;
-    expect(before || below).toBe(true);
+    const top = cells.find((c) => c.books) as (typeof cells)[number];
+    expect(sign).toBeDefined();
+    if (!sign) return;
+    expect(sign.y + sign.h).toBeCloseTo(top.y + top.h * SIGN_DIP);
+    // The books stand together in the middle of what the trail leaves (`.shelf-row`): where the helpers' books end.
+    const books = top.books ?? [];
+    const span = books.reduce((sum, b) => sum + BOOKS[b], 0);
+    const free = top.w - 4 - span * BOOK_ASPECT * bh - (books.length + 1) * BOOK_GAP * bh - (top.trail ?? 0);
+    // Only the row's 2 px padding may be wanting, which the plan leaves out.
+    expect(free).toBeGreaterThanOrEqual(-4.01);
+    const helpersEnd = top.x + 2 + free / 2 + BOOK_GAP * bh + (BOOKS[0] - CARVED) * BOOK_ASPECT * bh;
+    expect(books[0]).toBe(0);
+    expect(sign.x).toBeGreaterThanOrEqual(helpersEnd + SIGN_CLEAR.books * bh - 0.01);
+    expect(sign.x + sign.w).toBeLessThanOrEqual(top.x + top.w - SIGN_CLEAR.wall * bh + 0.01);
+    // The foxes on its o rise 0.4 of its letters above it, below the room's top (at least 48 px, `--top`).
+    expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-48);
   });
 
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {
@@ -91,11 +114,11 @@ describe("the bookshelf", () => {
 
   // Books pressed together were hard to see and a child's tap could catch the neighbour (user feedback, October 2026).
   test.each(ROOMS)("the books stand with room round each and can be taken out in a %i × %i room", (width, height) => {
-    const { cells, bookHeight } = planShelf(width, height, BOOKS);
+    const { cells, bookHeight } = planShelf(width, height, BOOKS, OPTIONS(height));
     for (const cell of cells.filter((c) => c.books)) {
       const n = cell.books?.length ?? 0;
       const span = (cell.books ?? []).reduce((sum, b) => sum + BOOKS[b], 0);
-      expect((cell.lead ?? 0) + span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
+      expect((cell.trail ?? 0) + span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
       expect(bookHeight).toBeLessThanOrEqual(cell.h * TAKE_OUT + 0.01);
     }
   });
