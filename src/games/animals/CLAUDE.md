@@ -70,6 +70,9 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
     are left. Only gifts a child knows from the animal (no leather, no feathers), and a new gift means going through
     every giver's list.
   - Homes the same way: every animal with a home lists in `alsoLives` the other homes it lives in too (the rabbit's hutch, the bear's ice as an „Eisbär“, the fish's pond), `wrongHomes()` leaves them out and `content.test.ts` checks the list and that three wrong homes are left. A new home means going through every animal's list.
+  - Who peeks out the same way: animals whose peeking part looks the same (the cat's and the dog's tail, an
+    elephant's grey next to a cow's or a sheep's) are never offered together (`PEEK_LOOKALIKES` in
+    `src/games/shadows/content.ts`, `dealPeek`); see the shadows' `CLAUDE.md` for how a new animal is checked.
 
 ## Languages
 

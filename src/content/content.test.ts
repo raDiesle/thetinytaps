@@ -469,9 +469,17 @@ describe("Russian", () => {
 });
 
 // User feedback, November 2026: the everyday helpers are what parents need most, so they stand first on the shelf
-// (top left); the Belohnungstafel and the Zeitplan, the shelf's eye-catcher, stand in their slipcase right of Aufs Töpfchen.
+// (top left); the Belohnungstafel and the Zeitplan, the shelf's eye-catcher, stand in their slipcase right of Aufs Töpfchen,
+// and the newer helpers after them.
 test("the Alltagshelfer stand first on the shelf, the slipcase of Belohnungstafel & Zeitplan right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
-  expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual(["/zaehne/", "/toepfchen/", "/belohnungstafel/"]);
+  expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
+    "/zaehne/",
+    "/toepfchen/",
+    "/belohnungstafel/",
+    "/timer/",
+    "/schnullerfee/",
+    "/abstillen/",
+  ]);
   expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);
 });

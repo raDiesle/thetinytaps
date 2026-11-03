@@ -4,7 +4,7 @@
 
 import { PROD } from "@/lib/buildInfo";
 import { FEELINGS, type Feeling, type FeelingId } from "./bear";
-import { imageFor, storyImages } from "./images";
+import { imageFor, situationImages } from "./images";
 import { SITUATIONS, type Situation } from "./kita";
 import { SELF_SITUATIONS } from "./selbst";
 
@@ -15,9 +15,9 @@ export type Story = { id: string; emoji: string; title: string } & ({ kind: "hom
 export const STORIES: Story[] = [
   ...FEELINGS.map((feeling): Story => ({ id: `zuhause-${feeling.id}`, emoji: feeling.emoji, title: feeling.title, kind: "home", feeling })),
   ...SITUATIONS.map((situation): Story => ({ id: `kita-${situation.id}`, emoji: situation.emoji, title: situation.title, kind: "kita", situation })),
-  // A story whose pictures are all still planned would show players nothing but placeholders: the built site leaves it
-  // out until its first picture is made; the dev server shows it, so it can be looked at.
-  ...SELF_SITUATIONS.filter((situation) => !PROD || imageFor(storyImages.problem(situation.id))).map(
+  // A story whose pictures are still planned would show players placeholders: the built site leaves it out until all
+  // its pictures are made; the dev server shows it, so it can be looked at.
+  ...SELF_SITUATIONS.filter((situation) => !PROD || situationImages(situation).every(imageFor)).map(
     (situation): Story => ({ id: `selbst-${situation.id}`, emoji: situation.emoji, title: situation.title, kind: "kita", situation }),
   ),
 ];

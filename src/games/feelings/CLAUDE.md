@@ -140,9 +140,9 @@ for a little movement – in the big picture and on every card that can be chose
 `shared.tsx`), so the child sees what happens before it taps; a card that is done or waits stands still. A picture the game asks for that is not made yet shows a placeholder with its
 file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
 with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first and then
-make it with `/bild-erzeugen`. A story whose first picture is still planned would show players only placeholders: the
-built site leaves it off the start screen until that picture is made (`stories.ts`, `PROD`), the dev server shows it to
-look at. `feelings.test.ts` allows a missing picture only while it is listed there,
+make it with `/bild-erzeugen`. A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
+the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
+with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
 with a green tick or red cross, so children can choose without reading; „Menü“ (four cards like the start screen),
 „Nochmal“ and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in

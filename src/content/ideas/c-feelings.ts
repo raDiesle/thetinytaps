@@ -48,7 +48,7 @@ export const feelingsIdeas: IdeaArea = {
       why: "Kleine Enttäuschungen sind für Zweijährige riesig. Die Szene zeigt: Traurig sein darf sein, und man kann die Sache anders sehen – ein erster, einfacher Blickwechsel.",
       effort: "S",
       partial:
-        "Als Geschichte „Enttäuscht, Keks zerbrochen“ in Gefühle (selbst.ts), mit Becher statt Teller und „Zunge rausstrecken“ statt Keks wegnehmen (der Fuchs hat seinen schon gegessen). Die Bilder sind geplant (bilder/README.md); bis das erste gemacht ist, zeigt nur der Dev-Server sie.",
+        "Als Geschichte „Enttäuscht, Keks zerbrochen“ in Gefühle (selbst.ts), mit Becher statt Teller und „Zunge rausstrecken“ statt Keks wegnehmen (der Fuchs hat seinen schon gegessen). Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-06",
@@ -106,7 +106,7 @@ export const feelingsIdeas: IdeaArea = {
       why: "Eltern suchen „kind eifersüchtig auf baby“ und „kind 3 jahre eifersüchtig auf baby“. Ratgeber raten, dem Großen eine Aufgabe zu geben und sein Bedürfnis ernst zu nehmen – hier sagt das Kind selbst, was es braucht.",
       effort: "S",
       partial:
-        "Als Geschichte „Eifersüchtig aufs Baby“ in Gefühle (selbst.ts), mit dem großen Bären statt Mama Bär. Die Bilder sind geplant (bilder/README.md); bis das erste gemacht ist, zeigt nur der Dev-Server sie.",
+        "Als Geschichte „Eifersüchtig aufs Baby“ in Gefühle (selbst.ts), mit dem großen Bären statt Mama Bär. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-13",
@@ -140,7 +140,7 @@ export const feelingsIdeas: IdeaArea = {
       why: "Eltern suchen „kind mag kein gemüse was tun“. Ekel ist ein eigenes Gefühl, das bei Kleinen täglich vorkommt; „Nein, danke“ und Riechen ohne Druck sind gute Wege.",
       effort: "S",
       partial:
-        "Als Geschichte „Igitt, Brokkoli“ in Gefühle (selbst.ts), mit dem großen Bären am Tisch. Die Bilder sind geplant (bilder/README.md); bis das erste gemacht ist, zeigt nur der Dev-Server sie.",
+        "Als Geschichte „Igitt, Brokkoli“ in Gefühle (selbst.ts), mit dem großen Bären am Tisch. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-17",
@@ -150,7 +150,7 @@ export const feelingsIdeas: IdeaArea = {
       why: "Scham ist das Gefühl, über das am wenigsten gesprochen wird. Die Szene zeigt: ein Missgeschick ist nicht schlimm, und man kann selbst etwas tun.",
       effort: "S",
       partial:
-        "Als Geschichte „Hoppla, in die Hose“ in Gefühle (selbst.ts); statt „Hose verstecken“ (sich verkriechen ist das Gefühl selbst) „Nass weiterspielen“. Die Bilder sind geplant (bilder/README.md); bis das erste gemacht ist, zeigt nur der Dev-Server sie.",
+        "Als Geschichte „Hoppla, in die Hose“ in Gefühle (selbst.ts); statt „Hose verstecken“ (sich verkriechen ist das Gefühl selbst) „Nass weiterspielen“. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-18",
@@ -160,7 +160,7 @@ export const feelingsIdeas: IdeaArea = {
       why: "Auch große Freude will gelenkt werden; so wird das Spiel nicht nur traurig, und es zeigt, dass Aufregung nichts Schlechtes ist.",
       effort: "S",
       partial:
-        "Als Geschichte „Aufgeregt, es schneit“ in Gefühle (selbst.ts); der große Bär geht mit raus, der Schneeball trifft sein Gesicht. Die Bilder sind geplant (bilder/README.md); bis das erste gemacht ist, zeigt nur der Dev-Server sie.",
+        "Als Geschichte „Aufgeregt, es schneit“ in Gefühle (selbst.ts); der große Bär geht mit raus, der Schneeball trifft sein Gesicht. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-19",

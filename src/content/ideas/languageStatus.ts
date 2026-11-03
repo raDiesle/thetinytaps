@@ -94,6 +94,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
+    href: "/timer/",
+    note: "Neu (3. November 2026), nur Deutsch: der Name „Timer“ und sein Satz im Regal, die Namen der drei Bilder und „Wie lange?“ mit den Minuten (content.ts, TimerGame.tsx). Sagt sonst nichts.",
+    languages: { de: "done" },
+  },
+  {
+    href: "/schnullerfee/",
+    note: "Neu im November 2026, nur Deutsch: der Name „Die Schnullerfee“ und der Satz auf dem Buchrücken, die Namen der Dinge (nur vorgelesen) und hinter ⚙️ „Abschied der Schnuller“ (Schnullerkästchen, Luftballon) und „Geschenk der Fee“ mit den acht Geschenken. Die Geschichte selbst kommt ohne Worte aus.",
+    languages: { de: "done" },
+  },
+  {
+    href: "/abstillen/",
+    note: "Neu und nur Deutsch (3. November 2026): die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ (WeaningPlay.tsx); noch ohne Aufnahme (🎙️ Stimmen).",
+    languages: { de: "done" },
+  },
+  {
     href: "/bilder/",
     note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
     parts: [

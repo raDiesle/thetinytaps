@@ -4,7 +4,7 @@ import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GIFT_TEXTS, giverOf,
 import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
-import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
+import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
 import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
 import { KIND_SIGNS } from "./TopicBubble";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
@@ -157,8 +157,10 @@ test("every round offers exactly one right choice among as many as its step says
       expect(choices.filter((c) => c === item).length).toBe(1);
       // Easy steps offer animals that look quite different; harder ones as many alike as there are.
       const alike = choices.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
-      const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
+      const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item) && !lookAlike(PEEK_LOOKALIKES, c, item)).length;
       expect(alike).toBe(level.peek.alike ? Math.min(kin, level.peek.choices - 1) : 0);
+      // Exactly one fits: nothing whose peeking part looks like the hidden animal's is offered with it (X-14).
+      for (const c of choices) expect(lookAlike(PEEK_LOOKALIKES, c, item), `${item.id} ${c.id}`).toBe(false);
     }
   }
 });

@@ -121,6 +121,24 @@ export const CATEGORIES: Category[] = [
           ru: "Таблица наград и расписание в картинках",
         },
       },
+      {
+        href: "/timer/",
+        emoji: "⏳",
+        title: { de: "Timer" },
+        blurb: { de: "Warten in Bildern: Zug, Sanduhr, Kerze" },
+      },
+      {
+        href: "/schnullerfee/",
+        emoji: "🧚",
+        title: { de: "Die Schnullerfee" },
+        blurb: { de: "Abschied vom Schnuller als Geschichte" },
+      },
+      {
+        href: "/abstillen/",
+        emoji: "🤱",
+        title: { de: "Abstillen" },
+        blurb: { de: "Tschüss, Mama-Milch – eine Geschichte" },
+      },
     ],
   },
   {

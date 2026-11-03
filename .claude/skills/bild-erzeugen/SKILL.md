@@ -129,6 +129,10 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   `bun run frames --scenes` lists pictures whose border (the background) differs from
   the story's first picture; a look at the story side by side shows a missing or
   extra character.
+- **Describe only the characters that are in the picture.** A shared character list in the prompt (or in the queue's
+  `style`) with characters a picture doesn't have makes the model draw them anyway, „Nobody else“ notwithstanding: a
+  baby in a high chair and the big bear turned up at a table and in a kindergarten that had neither. Put each
+  character's description into that picture's own prompt, with „Exactly N characters, each once: …“.
 - **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
   character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are
   drawn from the picture where it already does so, not from the place's first picture: from the empty room the
