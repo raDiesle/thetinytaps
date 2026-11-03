@@ -196,7 +196,8 @@ In a fresh worktree run `bun install` first.
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
   The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
   a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world
-  (Lebendige Bilder's `spots`); a tap that sets something off gets a warm light where the finger was (`glow`) and the
+  (Lebendige Bilder's `spots`) – in the menus, start screens and on the bookshelf too (`MenuRipples`, mounted once in
+  `index.tsx`, which leaves out what answers by itself and the grown-ups' pages); a tap that sets something off gets a warm light where the finger was (`glow`) and the
   thing itself answers – never a random shape. Something done is celebrated calmly (`celebrate`): a few hearts, stars
   and notes rise slowly while everyone in the picture cheers – never a storm of confetti, shapes or fast movement
   (circles, triangles and squares popping up fitted neither, and were removed). `tapFeedback.test.ts` keeps it calm.
