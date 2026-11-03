@@ -118,6 +118,12 @@ export const SCENARIOS: Scenario[] = [
     storage: `localStorage.setItem("tinytaps.animals.v3", JSON.stringify({ peek: false, feed: false, gift: false, home: false, grow: true }))`,
     parts: [{ label: "Was wird aus mir?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
+  {
+    // „Was gehört zusammen?“: the right one tapped each time, so every pair and helper sets to work in turn.
+    name: "zusammen",
+    path: "/zusammen/",
+    parts: [{ label: "Was gehört zusammen?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
+  },
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
   { name: "schnullerfee", path: "/schnullerfee/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },

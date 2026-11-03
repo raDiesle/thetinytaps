@@ -288,6 +288,12 @@ export const CATEGORIES: Category[] = [
         blurb: { de: "Verstecke, Futter, Milch, Zuhause, Wachsen" },
       },
       {
+        href: "/zusammen/",
+        emoji: "🔑",
+        title: { de: "Was gehört zusammen?" },
+        blurb: { de: "Alltagsdinge, Helfer und ihr Werkzeug" },
+      },
+      {
         href: "/schatten/",
         emoji: "👤",
         title: { de: "Schatten finden", ru: "Найди тень", en: "Find the Shadow", zh: "找影子", hi: "परछाईं ढूँढो", es: "Busca la sombra", ar: "أين الظل؟" },

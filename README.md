@@ -55,6 +55,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/letters/` | Game „Buchstaben & Zahlen“: free typing, „Zählen“, „Wo ist das B?“ and „Wörter tippen“ (whole words or first letters; picture, colour and doing words). Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
 | `src/games/scenes/` | Game „Lebendige Bilder“: the Wimmelbild engine and all its pictures. Details in its [`CLAUDE.md`](src/games/scenes/CLAUDE.md) |
 | `src/games/animals/` | Game „Was gehört zum Tier?“: feed the animal, bring it home, „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/animals/CLAUDE.md) |
+| `src/games/together/` | Game „Was gehört zusammen?“: things of the day and helpers with their tools. Details in its [`CLAUDE.md`](src/games/together/CLAUDE.md) |
 | `src/games/shadows/` | Game „Schatten finden“: find the shadow of a picture; also hosts „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/shadows/CLAUDE.md) |
 | `src/games/socks/` | Game „Socken-Paare“: socks tumble out of the washing machine, two same ones hop onto the line. Details in its [`CLAUDE.md`](src/games/socks/CLAUDE.md) |
 | `src/games/potty/` | Game „Aufs Töpfchen“: an animal goes to the potty, one tap per step; „Hat geklappt!“ gives a star. Details in its [`CLAUDE.md`](src/games/potty/CLAUDE.md) |
@@ -165,3 +166,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 15. ~~Timer zum Zuschauen (Zug, Sanduhr, Kerze)~~
 16. ~~Die Schnullerfee~~
 17. ~~Abstillen (Bildgeschichte „Tschüss, Mama-Milch“)~~
+18. ~~Was gehört zusammen? (Dinge aus dem Alltag, Helfer und ihr Werkzeug)~~

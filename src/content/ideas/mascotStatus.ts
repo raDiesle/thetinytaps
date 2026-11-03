@@ -154,6 +154,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Fuchs und Fuchsbau", work: "drawing", effort: "S", state: "done" }],
   },
   {
+    href: "/zusammen/",
+    note: "SVG. Die fünf Helfer sind Fuchs- und Bär-Große in ihrer Rolle, beim Arzt, beim Friseur und beim Postboten ist ein Fuchs- oder Bärenkind dabei, und hinter der Tür warten ein Bär und sein Kind.",
+    tasks: [{ label: "Helfer als Fuchs und Bär, Kinder als Kunden", work: "drawing", effort: "M", state: "done" }],
+  },
+  {
     href: "/schatten/",
     note: "Emoji, Verstecke als SVG.",
     tasks: [

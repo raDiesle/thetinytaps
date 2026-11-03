@@ -32,6 +32,7 @@ export const matchingIdeas: IdeaArea = {
       text: "Dinge aus dem Alltag, die ein Paar sind: Zahnbürste und Zahnpasta, Schlüssel und Schloss, Topf und Deckel, Gießkanne und Blume, Stift und Papier. Oben liegt eines, unten zwei bis vier andere. Passt es, tun die beiden, wofür sie da sind: Die Zahnpasta drückt einen Klecks auf die Bürste, der Schlüssel dreht sich und die Tür geht auf.",
       why: "Genau das, was auf dem Buchdeckel steht – und das Kind erkennt seinen eigenen Alltag wieder.",
       effort: "M",
+      done: true,
     },
     {
       id: "Z-04",
@@ -113,6 +114,7 @@ export const matchingIdeas: IdeaArea = {
       text: "Helfer und ihr Werkzeug: Feuerwehr – Schlauch, Ärztin – Hörrohr, Bäcker – Brötchen, Friseurin – Schere, Postbote – Paket. Einige Helfer sind Fuchs- oder Bär-Große in ihrer Rolle. Das Kind gibt jedem sein Werkzeug, und sie legen gleich los: Der Schlauch spritzt, die Schere schnippelt.",
       why: "Berufe aus dem Alltag und aus Lebendige Bilder (Feuerwache, Kinderarzt); ähnlich wie Werkzeug für den Einsatz (G-18), aber als Zuordnen ohne Film.",
       effort: "M",
+      done: true,
     },
   ],
 };
