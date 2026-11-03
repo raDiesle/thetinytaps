@@ -31,6 +31,9 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
 
 - New picture or many new items: run `/neue-szene` (`.claude/skills/neue-szene/SKILL.md`); it has the full
   guide to depth, keys, drawing style, animations and the browser checks.
+- Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
+  small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
+  riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.
 - `scenes.test.ts` checks every picture's data (unique ids, articles, tap sizes, chains, keys,
   plural grammar in questions, roads). `bun test` after every change to items.
 - The mode labels for the row on `/bilder/` are `SCENE_MODES` in `settings.ts`, so their languages count for this game in

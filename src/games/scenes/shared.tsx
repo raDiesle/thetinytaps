@@ -65,8 +65,37 @@ export function Pane({ x, y, w, h, rx = 6, children }: { x: number; y: number; w
   );
 }
 
+/** The app's mascots as they turn up among the people of the pictures. */
+export type Mascot = "fox" | "bear";
+
 /** Head and shoulders of someone sitting inside; `cap` draws a cap or helmet instead of hair. */
-export function Rider({ cx, cy, shirt, hair = "#6b4423", cap }: { cx: number; cy: number; shirt: string; hair?: string; cap?: string }) {
+export function Rider({
+  cx,
+  cy,
+  shirt,
+  hair = "#6b4423",
+  cap,
+  animal,
+  child = false,
+}: {
+  cx: number;
+  cy: number;
+  shirt: string;
+  hair?: string;
+  cap?: string;
+  /** A fox or a bear instead of a person: the mascots come back in every picture as drivers and passengers. */
+  animal?: Mascot;
+  /** Smaller and sitting lower, a child beside its grown-up. */
+  child?: boolean;
+}) {
+  if (child) {
+    return (
+      <g transform={`translate(${cx} ${cy + 7}) scale(0.78) translate(${-cx} ${-cy})`}>
+        <Rider cx={cx} cy={cy} shirt={shirt} hair={hair} cap={cap} animal={animal} />
+      </g>
+    );
+  }
+  if (animal) return <MascotRider cx={cx} cy={cy} shirt={shirt} cap={cap} animal={animal} />;
   return (
     <>
       <rect x={cx - 15} y={cy + 11} width="30" height="22" rx="8" fill={shirt} />
@@ -85,6 +114,59 @@ export function Rider({ cx, cy, shirt, hair = "#6b4423", cap }: { cx: number; cy
       <circle cx={cx - 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
       <circle cx={cx + 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
       <path d={`M${cx - 4} ${cy + 6} Q${cx} ${cy + 9} ${cx + 4} ${cy + 6}`} stroke="#2b2d42" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    </>
+  );
+}
+
+const FOX_FUR = "#e8743b";
+const BEAR_FUR = "#a0663a";
+
+/** A fox or bear rider, the same size as a person's head so it fits every window; a cap sits small between the ears. */
+function MascotRider({ cx, cy, shirt, cap, animal }: { cx: number; cy: number; shirt: string; cap?: string; animal: Mascot }) {
+  const fox = animal === "fox";
+  const fur = fox ? FOX_FUR : BEAR_FUR;
+  // The head is drawn in a 100 × 100 box like the fox and bear heads elsewhere, then scaled to a person's head.
+  const head = `translate(${cx - 19} ${cy - 21.5}) scale(0.38)`;
+  return (
+    <>
+      <rect x={cx - 15} y={cy + 11} width="30" height="22" rx="8" fill={shirt} />
+      <g transform={head}>
+        {fox ? (
+          <>
+            <path fill={fur} d="M17 50 L21 9 L45 29 Z M83 50 L79 9 L55 29 Z" />
+            <path fill="#f7c9a8" d="M24 39 L26 18 L38 30 Z M76 39 L74 18 L62 30 Z" />
+            <path fill={fur} d="M13 52 C13 31 31 24 50 24 C69 24 87 31 87 52 C87 72 69 90 50 92 C31 90 13 72 13 52 Z" />
+            <path fill="#fff6ec" d="M21 61 C33 58 44 63 50 73 C56 63 67 58 79 61 C75 78 63 90 50 92 C37 90 25 78 21 61 Z" />
+          </>
+        ) : (
+          <>
+            <circle fill={fur} cx="22" cy="32" r="12" />
+            <circle fill={fur} cx="78" cy="32" r="12" />
+            <circle fill="#e3b98a" cx="22" cy="32" r="6" />
+            <circle fill="#e3b98a" cx="78" cy="32" r="6" />
+            <circle fill={fur} cx="50" cy="57" r="35" />
+            <ellipse fill="#e3b98a" cx="50" cy="72" rx="16" ry="12" />
+          </>
+        )}
+        {cap && (
+          <>
+            <path fill={cap} d="M27 38 C27 12 73 12 73 38 Z" />
+            <path fill={cap} d="M22 40 Q50 31 78 40 Q50 46 22 40 Z" />
+          </>
+        )}
+        <circle fill="#2b2d42" cx="37" cy="53" r="4.6" />
+        <circle fill="#2b2d42" cx="63" cy="53" r="4.6" />
+        <circle fill="#fff" cx="38.5" cy="51.5" r="1.4" />
+        <circle fill="#fff" cx="64.5" cy="51.5" r="1.4" />
+        <ellipse fill="#2b2d42" cx="50" cy={fox ? 72 : 66} rx="5.4" ry="3.8" />
+        <path
+          d={fox ? "M50 76 V79 M45 81 Q50 84 55 81" : "M50 70 V74 M44 76 Q50 80 56 76"}
+          fill="none"
+          stroke="#2b2d42"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+      </g>
     </>
   );
 }

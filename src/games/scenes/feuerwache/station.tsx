@@ -227,7 +227,7 @@ export function Tor() {
         <path d={SMALL_CAB} fill={GLASS} />
         <Inside d={SMALL_CAB}>
           <g className="fw-tor-driver">
-            <Rider cx={-520} cy={-148} shirt={NAVY} cap={STRIPE} />
+            <Rider animal="fox" cx={-520} cy={-148} shirt={NAVY} cap={STRIPE} />
           </g>
           <g className="fw-tor-mate" style={{ transformOrigin: "-436px -130px" }}>
             <Rider cx={-436} cy={-148} shirt={NAVY} cap={FIRE_RED} />

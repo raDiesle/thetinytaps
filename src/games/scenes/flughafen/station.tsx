@@ -49,7 +49,7 @@ export function Lok() {
       <path d={LOK_FRONT} fill={GLASS} />
       <Inside d={LOK_FRONT}>
         <g className="fh-lok-driver">
-          <Rider cx={-108} cy={-150} shirt={NAVY} cap={NAVY} />
+          <Rider animal="fox" cx={-108} cy={-150} shirt={NAVY} cap={NAVY} />
         </g>
       </Inside>
       <path d="M-118 -178 h8 L-132 -132 h-8 Z" fill="#fff" opacity="0.5" />
@@ -75,9 +75,9 @@ const COACH_BODY = "M-150 -196 H150 Q160 -196 160 -184 V-46 H-160 V-184 Q-160 -1
 
 const COACH_GUESTS = [
   { x: -146, shirt: "#ff5d73", hair: "#e9c46a" },
-  { x: -96, shirt: "#06d6a0", hair: "#2b2d42" },
-  { x: 16, shirt: "#9d4edd", hair: "#dee2e6" },
-  { x: 66, shirt: "#ffb703", hair: "#bc6c25" },
+  { x: -96, shirt: "#06d6a0", hair: "#2b2d42", animal: "bear" as const },
+  { x: 16, shirt: "#9d4edd", hair: "#dee2e6", animal: "fox" as const },
+  { x: 66, shirt: "#ffb703", hair: "#bc6c25", animal: "fox" as const, child: true },
   { x: 116, shirt: "#ff8fab", hair: "#6b4423" },
 ];
 
@@ -88,10 +88,10 @@ export function Wagen() {
       <path d={COACH_BODY} fill="#3a86ff" />
       <path d="M-160 -92 H160 V-82 H-160 Z" fill="#ffd60a" />
       <path d="M-150 -196 H150 Q160 -196 160 -184 V-182 H-160 V-184 Q-160 -196 -150 -196 Z" fill="#2667cc" />
-      {COACH_GUESTS.map(({ x, shirt, hair }, i) => (
+      {COACH_GUESTS.map(({ x, shirt, hair, ...mascot }, i) => (
         <Pane key={x} x={x} y={-170} w={40} h={46} rx={8}>
           <g className="fh-wagen-guest" style={nth(i)}>
-            <Rider cx={x + 20} cy={-140} shirt={shirt} hair={hair} />
+            <Rider cx={x + 20} cy={-140} shirt={shirt} hair={hair} {...mascot} />
           </g>
         </Pane>
       ))}

@@ -25,7 +25,26 @@ export type SituationId =
   | "baby"
   | "broccoli"
   | "oops"
-  | "snow";
+  | "snow"
+  | "leave"
+  | "screen"
+  | "checkout"
+  | "jacket"
+  | "pancake"
+  | "vacuum"
+  | "dog"
+  | "doctor"
+  | "hairwash"
+  | "night"
+  | "lost"
+  | "join"
+  | "loud"
+  | "proud"
+  | "miss"
+  | "shy"
+  | "bored"
+  | "empathy"
+  | "startle";
 
 /** The not-so-good idea next to a good step. */
 export interface KitaInstead {
