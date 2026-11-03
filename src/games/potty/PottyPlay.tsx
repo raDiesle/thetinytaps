@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -81,7 +81,7 @@ const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
-/** Taps this soon after a step began only sparkle, so a double tap doesn't skip a step. */
+/** Taps this soon after a step began only ripple, so a double tap doesn't skip a step. */
 const TAP_GUARD_MS = 350;
 const DONE = STEPS.findIndex((s) => s.id === "done");
 const SIT = STEPS.findIndex((s) => s.id === "sit");
@@ -118,7 +118,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [asking, setAsking] = useState(false);
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, glow, celebrate } = useTapFeedback();
 
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
@@ -247,7 +247,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         if (came !== "kaka") sound(0, playTrickle);
         if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
         sound(900, cheer);
-        for (let i = 0; i < 8; i++) later(600 + i * 120, () => spawn());
+        later(600, () => celebrate());
         break;
       case "wipe":
         sound(300, playRip);
@@ -267,7 +267,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       case "party":
         sound(0, cheer);
         sound(300, partyHorn);
-        for (let i = 0; i < 12; i++) later(i * 150, () => spawn());
+        celebrate();
         break;
       case "stars":
         if (star) {
@@ -336,14 +336,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   /**
    * A tap anywhere on the picture (not on a button) or a key: while sitting the next thought, everywhere else just what
    * „Weiter“ does, also while the step's sounds still run (what the child said stays as picked, unknown when nobody
-   * did). It only sparkles at the end, right after a step began (a double tap), and while a thought still runs.
+   * did). It only ripples at the end, right after a step began (a double tap), and while a thought still runs.
    */
   const act = (x?: number, y?: number) => {
     const { step: index, nothing } = atRef.current;
     const here = storyFor(nothing);
     const sittingNow = here[index].id === "sit";
     if (index >= here.length - 1 || (sittingNow ? busyRef.current : performance.now() - startedAt.current < TAP_GUARD_MS)) {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
       return;
     }
@@ -371,7 +371,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   /** A button while calling: what the child said is kept, and the story goes on with it at once – the only way on there. */
   const pick = (choice: Went, e: PointerEvent) => {
     if (settings.sounds) playPop();
-    spawn(e.clientX, e.clientY);
+    glow(e.clientX, e.clientY);
     setSaid(choice);
     stopTimers();
     begin(atRef.current.step + 1, { came: null, said: choice });
@@ -556,7 +556,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     data-tap="goal"
                     aria-label={texts.went[n]}
                     onPointerDown={(e) => {
-                      if (busyRef.current) return; // the tap goes on to sparkle
+                      if (busyRef.current) return; // the tap goes on to ripple
                       e.stopPropagation();
                       finish(n);
                     }}
@@ -572,7 +572,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                   data-tap
                   aria-label={texts.nothing}
                   onPointerDown={(e) => {
-                    if (busyRef.current) return; // the tap goes on to sparkle
+                    if (busyRef.current) return; // the tap goes on to ripple
                     e.stopPropagation();
                     finishWithNothing();
                   }}
@@ -596,7 +596,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       {/* There is one story only, so „Weiter“ would be „Nochmal“ again: only „Menü“ and „Nochmal“, small in the corners
           so the party picture stays free. */}
       {last && <GameEnd delayMs={step.ms} onAgain={restart} corners />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

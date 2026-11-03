@@ -9,7 +9,7 @@ A visual timer for the day, not a game: a grown-up picks the minutes in the row 
 - „Kerze“ 🕯️: a candle burns down on the table; at the end the bear child leans over and blows it out.
   At the end a friendly tune and the family waves and hops, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
-  flaring, colourful shapes where it was); nothing has to be tapped, so there is no glow or pointing hand.
+  flaring, soft ripples where it was); nothing has to be tapped, so there is no glow or pointing hand.
 
 Files: `TimerGame.tsx` (start screen: cards and minutes), `TimerPlay.tsx` (one run: the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end), `scenes.tsx` (all drawings and their layers), `timer.css`, `content.ts`

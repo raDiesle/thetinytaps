@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
@@ -52,7 +52,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
   const busy = useRef(false);
   /** Bumped to make the picture hop when it is tapped to ask once more. */
   const [nudge, setNudge] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
   /** Wrong ones picked in this round, for the difficulty. */
   const misses = useRef(0);
   const topRef = useRef<HTMLDivElement>(null);
@@ -84,12 +84,12 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
   // The question comes with the round; the round is mounted anew for every pair.
   useEffect(() => say(texts.question(round.pair)), []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   const choose = (index: number) => {
@@ -127,7 +127,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
     say(texts.right(round.pair));
     onSolved(misses.current);
     later(FLIGHT_MS + WORK_MS - 900, () => {
-      for (let i = 0; i < 8; i++) spawn();
+      celebrate();
     });
     later(FLIGHT_MS + WORK_MS, onNext);
   };
@@ -151,7 +151,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.choices.length;
@@ -179,7 +179,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
   });
 
   return (
-    <div className={`together-play kind-${round.kind}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className={`together-play kind-${round.kind}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <div className="tg-top">
         <div ref={topRef} className={`tg-above${nudge && !working ? ` tg-nudge-${nudge % 2}` : ""}`} data-tap onPointerDown={onTopDown}>
           <PairPicture pair={round.pair} working={working} label={texts.name(round.pair)} />
@@ -217,7 +217,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
           })}
         </div>
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

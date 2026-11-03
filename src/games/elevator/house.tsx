@@ -311,24 +311,3 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
     </>
   );
 }
-
-/** Confetti falling over the whole picture at the end of a story. */
-export function Confetti() {
-  const colours = ["#ff6b6b", "#ffd43b", "#51cf66", "#4dabf7", "#cc5de8", "#ff922b"];
-  return (
-    <g className="el-confetti">
-      {Array.from({ length: 48 }, (_, i) => (
-        <rect
-          key={i}
-          x={(i * 157) % VIEW_W}
-          y={-30}
-          width="16"
-          height="26"
-          rx="3"
-          fill={colours[i % colours.length]}
-          style={{ animationDelay: `${(i % 12) * 0.18}s`, animationDuration: `${2.4 + (i % 5) * 0.3}s` }}
-        />
-      ))}
-    </g>
-  );
-}

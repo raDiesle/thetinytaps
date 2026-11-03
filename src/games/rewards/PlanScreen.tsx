@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { dayKey } from "@/games/teeth/daytime";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { playChime, playCountNote, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
@@ -107,7 +107,7 @@ export function PlanScreen({
   const [won, setWon] = useState(false);
   const rewardLabel = useRewardLabel();
   const counts = counting(plan);
-  const { bursts, spawn } = useBursts();
+  const { effects, glow, celebrate } = useTapFeedback();
   const move = useRef<Move | null>(null);
   /** A Countdown's moons still to count: a new tap starts the count again. */
   const moonTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -217,7 +217,7 @@ export function PlanScreen({
       setWon(false);
       setParty(step.emoji);
       sound(playTusch);
-      for (let i = 0; i < 10; i++) setTimeout(() => spawn(), i * 90);
+      celebrate();
       say(
         `${t({ de: "Heute ist es so weit:", en: "Today is the day:", zh: "今天就是这一天：", hi: "आज वह दिन आ गया:", es: "¡Hoy es el día!", ar: "اليوم هو اليوم:", ru: "Сегодня этот день:" })} ${stepLabel(step)}`,
       );
@@ -301,7 +301,7 @@ export function PlanScreen({
     setUndo(key);
     sound(playChime);
     const rect = el.getBoundingClientRect();
-    spawn(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    glow(rect.left + rect.width / 2, rect.top + rect.height / 2);
     // The reward reached: its party, whatever else is left.
     if (counts && plan.reward && before.count < before.goal && after.count >= after.goal) {
       const reward = plan.reward;
@@ -309,7 +309,7 @@ export function PlanScreen({
         setWon(true);
         setParty(reward.emoji);
         sound(playTusch);
-        for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 90);
+        celebrate();
         say(
           `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(reward)}`,
         );
@@ -329,7 +329,7 @@ export function PlanScreen({
         setWon(false);
         setParty(step.emoji);
         sound(playTusch);
-        for (let i = 0; i < 10; i++) setTimeout(() => spawn(), i * 90);
+        celebrate();
         say(
           t({
             de: "Alles geschafft! Hurra!",
@@ -486,7 +486,7 @@ export function PlanScreen({
           </span>
         </button>
       )}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

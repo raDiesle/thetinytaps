@@ -269,3 +269,132 @@
   box-shadow: 0 4px 0 var(--ink);
   cursor: pointer;
 }
+
+/*
+ * Feedback for taps (`TapFeedback.tsx`). Each effect is a small HTML layer of its own that only moves by transform and
+ * opacity, so a phone never paints the game's picture again for it.
+ */
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* A tap that sets nothing off: two soft rings spread as on water, light enough for dark and pale pictures alike. */
+.fx-ripple-at {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.fx-ripple {
+  position: absolute;
+  left: -70px;
+  top: -70px;
+  width: 140px;
+  height: 140px;
+  border: 4px solid #fffffff2;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px #1d3b5a47,
+    inset 0 0 0 2px #1d3b5a38;
+  opacity: 0;
+  animation: fx-ripple 0.8s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+.fx-ripple.late {
+  animation-delay: 0.15s;
+  scale: 0.7;
+}
+
+@keyframes fx-ripple {
+  from {
+    opacity: 1;
+    transform: scale(0.15);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* A tap that set something off: a warm light where the finger was, the thing itself answers the rest. */
+.fx-glow {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6c4 0%, #ffd84d99 35%, #ffd84d00 70%);
+  opacity: 0;
+  animation: fx-glow 0.8s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fx-glow {
+  from {
+    opacity: 0.95;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+/* Something done: hearts, stars and notes rise slowly and sway a little, then fade – calm enough for a toddler. */
+.fx-rise {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  animation: fx-rise var(--rise-ms) linear var(--delay) forwards;
+  will-change: transform, opacity;
+}
+
+.fx-note {
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 0 #00000022;
+}
+
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(calc(var(--sway) * 0.5), calc(var(--rise) * 0.12)) scale(1);
+  }
+  40% {
+    transform: translate(var(--sway), calc(var(--rise) * 0.4)) scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(calc(var(--sway) * -0.4), calc(var(--rise) * 0.68)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--sway) * 0.3), var(--rise)) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-rise {
+    animation-name: fx-fade;
+  }
+}
+
+@keyframes fx-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 1;
+  }
+}

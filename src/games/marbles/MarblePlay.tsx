@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
@@ -85,7 +85,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
   const level = levelAt(index);
   const next = levelAt(index + 1);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -116,14 +116,14 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     setParty(true);
     // The good-night machine ends as calmly as it ran.
     sound(level.id === "night" ? playLullaby : playMelody);
-    for (let i = 0; i < 14; i++) timers.current.push(setTimeout(() => spawn(), i * 120));
+    celebrate();
     timers.current.push(
       setTimeout(() => {
         setParty(false);
         setEnded(true);
       }, PARTY_MS),
     );
-  }, [sound, spawn, level.id]);
+  }, [sound, celebrate, level.id]);
 
   const startLevel = (nextIndex: number) => {
     setEnded(false);
@@ -138,16 +138,16 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     if (ended) goOn();
   });
 
-  // While the party is on, taps make more shapes.
+  // While the party is on, taps make ripples.
   const onPointerDown = (e: PointerEvent) => {
-    if (party) spawn(e.clientX, e.clientY);
+    if (party) ripple(e.clientX, e.clientY);
   };
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
       <level.Level key={round} sound={sound} say={say} onDone={onDone} watch={settings.play === "watch"} />
       {ended && <GameEnd onAgain={again} next={{ emoji: next.emoji, name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

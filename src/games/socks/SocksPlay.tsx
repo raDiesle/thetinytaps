@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { DEV } from "@/lib/buildInfo";
 import {
   loadRecordings,
@@ -138,7 +138,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   /** The keyboard frame; appears with the first key. */
   const [focus, setFocus] = useState<number | null>(null);
   const [fit, setFit] = useState({ columns: 2, size: 100 });
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
 
   const gridRef = useRef<HTMLDivElement>(null);
   const sockRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -191,8 +191,8 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     return () => observer.disconnect();
   }, [round.socks.length]);
 
-  const funBurst = (x?: number, y?: number) => {
-    spawn(x, y);
+  const softTap = (x?: number, y?: number) => {
+    ripple(x, y);
     if (settings.sounds) playRandomNote();
   };
 
@@ -245,7 +245,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     setPhase("cheer");
     if (settings.sounds) playMelody();
     say(texts.done);
-    for (let i = 0; i < 10; i++) later(i * 120, () => spawn());
+    celebrate();
     later(CHEER_MS, () => {
       // Every wash is a game for a game limit: with the last one played, the game says good night (GameShell).
       gameEnded();
@@ -295,7 +295,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       // Stars at the line from the third pair in a row on.
       if (streak >= 3) {
         const target = slotRefs.current[slot * 2]?.getBoundingClientRect();
-        if (target) for (let i = 0; i < Math.min(streak - 1, 5); i++) spawn(target.right, target.top + target.height / 2);
+        if (target) celebrate({ at: { x: target.right, y: target.top + target.height / 2 } });
       }
     });
 
@@ -331,18 +331,18 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   const onSockDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
-    if (matchedRef.current.has(index)) funBurst(e.clientX, e.clientY);
+    if (matchedRef.current.has(index)) softTap(e.clientX, e.clientY);
     else pick(index);
   };
 
-  const onBackgroundDown = (e: PointerEvent) => funBurst(e.clientX, e.clientY);
+  const onBackgroundDown = (e: PointerEvent) => softTap(e.clientX, e.clientY);
 
   // Arrow keys (or any key) move the frame over the socks still on the floor, Space or Enter takes one, 1–9 straight away.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       if (phase !== "sorting") {
-        funBurst();
+        softTap();
         return;
       }
       const left = round.socks.map((_, i) => (matchedRef.current.has(i) ? -1 : i)).filter((i) => i >= 0);
@@ -359,7 +359,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
         if (left.includes(index)) {
           move(index);
           pick(index);
-        } else funBurst();
+        } else softTap();
       } else if (e.key === "Enter" || e.key === " ") {
         if (current === null) move(left[0]);
         else pick(current);
@@ -467,7 +467,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
         </div>
       </div>
 
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

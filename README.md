@@ -47,7 +47,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/components/GameShell.tsx` | Shared shell: parent start screen with a big card per way to play (mode or level; a tap picks it and starts) and the game's own options folded away, fullscreen + keyboard lock, the ✕ in the corner (a click leaves after half a second, „Zurück zum Menü“ shows next to it for a moment; Esc has to be held) |
 | `src/components/GameEnd.tsx` | End of a level: „Nochmal“ and „Weiter“ with the next level's picture, so a child plays on without the menu („Lebendige Bilder“ goes on to the next picture, „Kettenreaktion“ and „Laut und leise“ to the next level; „Gefühle“ has the same two buttons under its stories) |
 | `src/components/HomeOptions.tsx`, `src/lib/common.ts`, `src/lib/playtime.ts` | On the home page, for all games: the play time per day (every minute in any game counts, kept in localStorage per day; the last minute winds down, then „Gute Nacht“), and folded away language, read aloud, sounds and calm mode. Games read their own settings through `useGameSettings`, which fills in the shared ones |
-| `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
+| `src/components/TapFeedback.tsx` | Ripples for taps that do nothing, a glow for taps that do, hearts and stars rising for success |
 | `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
 | `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/styles/` (all loaded in order by `src/globals.css`) |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |

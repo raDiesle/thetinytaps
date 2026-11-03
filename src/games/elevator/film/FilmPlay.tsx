@@ -1,5 +1,5 @@
 import { type PointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { INK } from "@/games/scenes/shared";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -8,7 +8,6 @@ import { playPop, playRandomNote, playRecorded, playTusch } from "@/lib/sfx";
 import { tapState } from "@/lib/tapTargets";
 import { hush } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
-import { Confetti } from "../house";
 import { translationOf } from "../phrases";
 import { sayIn } from "../voice";
 import type { ElevatorSettings } from "../settings";
@@ -96,7 +95,7 @@ export function FilmPlay({
 }) {
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(view);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, glow, celebrate } = useTapFeedback();
   const t = useT();
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
@@ -290,7 +289,7 @@ export function FilmPlay({
     put({ party: true });
     say(film.end);
     sound(() => playRecorded("cheer", playTusch));
-    for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
+    celebrate();
     await wait(END_MS);
     put({ picking: true });
   };
@@ -299,8 +298,8 @@ export function FilmPlay({
     void play();
   }, []);
 
-  const funBurst = (x?: number, y?: number) => {
-    spawn(x, y);
+  const softTap = (x?: number, y?: number) => {
+    ripple(x, y);
     sound(playRandomNote);
   };
 
@@ -309,13 +308,13 @@ export function FilmPlay({
     const v = viewRef.current;
     if (v.picking || pausedRef.current) return;
     if (tapper.current) {
-      spawn(x, y);
+      glow(x, y);
       sound(playPop);
       return tapper.current();
     }
     if (chooser.current) put((w) => ({ nudge: w.nudge + 1 }));
     else if (v.busy && laterTap()) queued.current = true;
-    funBurst(x, y);
+    softTap(x, y);
   };
 
   /** Whether a beat of this scene still waits for a tap, so a tap now can be kept for it. */
@@ -329,7 +328,7 @@ export function FilmPlay({
     const choose = chooser.current;
     if (!choose || pausedRef.current) return;
     e.stopPropagation();
-    spawn(e.clientX, e.clientY);
+    glow(e.clientX, e.clientY);
     choose(id);
   };
 
@@ -393,11 +392,6 @@ export function FilmPlay({
         ))}
         {choice && view.hand && !view.picked && <Hand key={view.nudge} spot={choice.options[0]} again={view.nudge > 0} />}
       </svg>
-      {view.party && (
-        <svg className="fm-svg fm-confetti" viewBox="0 0 1400 900" preserveAspectRatio="none" aria-hidden>
-          <Confetti />
-        </svg>
-      )}
       <div className={`fm-strip${view.party ? " run" : ""}`} style={{ height: strip, bottom: STRIP.gap }} aria-hidden>
         {scenes.map((sc, i) => (
           <div key={sc.id} className={`fm-frame${i < view.scene ? " done" : i === view.scene ? " now" : ""}`} style={{ animationDelay: `${i * 0.35}s` }}>
@@ -427,7 +421,7 @@ export function FilmPlay({
         </button>
       )}
       {view.picking && <StoryEnd id={film.id} onPick={onPick} />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

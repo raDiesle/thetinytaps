@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import {
   playChime,
@@ -44,7 +44,7 @@ interface Story {
   tapped: boolean;
   /** Counts taps on Tapsi and Mama, so their little hop starts again each time. */
   hops: { tapsi: number; mama: number };
-  /** Something is moving that the next step waits for: taps on the step's thing only sparkle. */
+  /** Something is moving that the next step waits for: taps on the step’s thing only ripple. */
   busy: boolean;
 }
 
@@ -129,7 +129,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
   const storyRef = useRef(story);
   storyRef.current = story;
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, glow, celebrate } = useTapFeedback();
   const balloon = settings.farewell === "balloon";
   const gift = giftById(settings.gift);
 
@@ -150,9 +150,9 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
   /** The next step begins: its thing glows and the hand points at it. */
   const goTo = (step: StepId) => change({ step, tapped: false, busy: false });
 
-  /** Sparkles where the finger is (or somewhere, for a key), with a soft note: a tap that sets nothing off still does something. */
-  const sparkle = (e?: PointerEvent) => {
-    spawn(e?.clientX, e?.clientY);
+  /** Ripples where the finger is (or somewhere, for a key), with a soft note: a tap that sets nothing off still does something. */
+  const softTap = (e?: PointerEvent) => {
+    ripple(e?.clientX, e?.clientY);
     sound(playRandomNote);
   };
 
@@ -163,7 +163,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
     change({ taken, tapped: true });
     sound(playPop);
     later(650, () => sound(playPlop));
-    if (e) spawn(e.clientX, e.clientY);
+    if (e) glow(e.clientX, e.clientY);
     if (taken.length < PACIFIERS.length) return;
     // All three in: the box shuts with its bow (or the balloon is ready), then it is to be sent off.
     change({ taken, tapped: true, busy: true });
@@ -198,7 +198,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
     const glitters = storyRef.current.glitters + 1;
     change({ glitters, tapped: true });
     sound(playTwinkle);
-    spawn(e?.clientX, e?.clientY);
+    glow(e?.clientX, e?.clientY);
     if (glitters < GLITTERS) return;
     // The magic: the box (or the balloon she holds) goes in a puff, the present is there, she flies out again.
     change({ glitters, tapped: true, busy: true });
@@ -225,7 +225,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
     sound(playRip);
     later(450, () => {
       sound(playChime);
-      for (let i = 0; i < 10; i++) later(i * 90, () => spawn());
+      celebrate();
     });
     later(900, () => sound(playLaugh));
   };
@@ -233,7 +233,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
   /** Does what the step is waiting for: what every key does, and a tap on the step's thing. */
   const act = (e?: PointerEvent) => {
     const s = storyRef.current;
-    if (s.busy) return sparkle(e);
+    if (s.busy) return softTap(e);
     switch (s.step) {
       case "collect":
         return collect(
@@ -251,7 +251,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
       case "gift":
         return open();
       default:
-        return sparkle(e);
+        return softTap(e);
     }
   };
 
@@ -285,7 +285,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
   const goal = goalSpot(story, balloon);
 
   return (
-    <div className={`sf-play sf-at-${time}`} onPointerDown={(e) => sparkle(e)}>
+    <div className={`sf-play sf-at-${time}`} onPointerDown={(e) => softTap(e)}>
       <div className="sf-stage">
         {(["evening", "night", "morning"] as const).map((sky) => (
           <div key={sky} className={`sf-sky${time === sky ? " on" : ""}`} style={place({ x: 915, y: 145, w: 250, h: 270 })}>
@@ -308,7 +308,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
         <Piece
           spot={SPOTS.asleep}
           className={`sf-asleep${asleep ? " on" : ""} ${goalClass(at("wake"))}`}
-          onTap={asleep ? () => (at("wake") ? wake() : sparkle()) : undefined}
+          onTap={asleep ? () => (at("wake") ? wake() : softTap()) : undefined}
           tap={tapState({ goal: at("wake") })}
           label={t({ de: "Tapsi", en: "Tapsi", zh: "塔普西", hi: "टैप्सी", es: "Tapsi", ar: "تابسي", ru: "Тапси" })}
         >
@@ -384,7 +384,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
               spot={p.spot}
               className={`sf-pacifier${taken ? " taken" : ""} ${goalClass(at("collect") && !taken)}`}
               style={taken ? shift(to.x - from.x, to.y - from.y, 0.5) : undefined}
-              onTap={taken ? undefined : (e) => (step === "collect" ? collect(i, e) : sparkle(e))}
+              onTap={taken ? undefined : (e) => (step === "collect" ? collect(i, e) : softTap(e))}
               tap={tapState({ goal: at("collect") })}
               label={t({ de: "Schnuller", en: "Pacifier", zh: "奶嘴", hi: "चुसनी", es: "Chupete", ar: "اللهّاية", ru: "Пустышка" })}
             >
@@ -412,7 +412,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
             spot={SPOTS.fairy}
             className={`sf-fairy ${story.fairy} ${goalClass(at("fairy") && story.fairy === "in")}`}
             style={story.fairy === "in" ? undefined : toWindow(SPOTS.fairy)}
-            onTap={story.fairy === "in" ? (e) => (at("fairy") ? glitter(e) : sparkle(e)) : undefined}
+            onTap={story.fairy === "in" ? (e) => (at("fairy") ? glitter(e) : softTap(e)) : undefined}
             tap={tapState({ goal: at("fairy") })}
             label={t({
               de: "Schnullerfee",
@@ -440,7 +440,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
           <Piece
             spot={SPOTS.sill}
             className={`sf-present${story.opened ? " opened" : ""} ${goalClass(at("gift"))}`}
-            onTap={(e) => (at("gift") ? open() : sparkle(e))}
+            onTap={(e) => (at("gift") ? open() : softTap(e))}
             tap={tapState({ goal: at("gift") })}
             label={t({ de: "Geschenk", en: "Present", zh: "礼物", hi: "तोहफ़ा", es: "Regalo", ar: "هدية", ru: "Подарок" })}
           >
@@ -456,7 +456,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
 
         {goal && !story.tapped && !story.busy && <Hand spot={goal} />}
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
       {step === "party" && <GameEnd onAgain={restart} corners delayMs={2400} />}
     </div>
   );
