@@ -437,7 +437,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“, a small plain button beside the big ones so a
   child's hand goes elsewhere, lets a grown-up play upright for the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
-- Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
+- Updates: a page opened online always comes from the network, so it runs the newest build; the service worker answers
+  it from its cache only offline, on an error status or after 3 s without an answer (`src/sw.js`, `sw.test.ts`). Never
+  answer pages from the cache first: phones then kept the old build through several reloads, until the new worker had
+  downloaded every file in the background (user feedback, November 2026).
+  An installed app that stays open looks for a new version every hour and when it comes back, and restarts with it
   only between games, while it is in the background on a menu: menu pages call `useUpdateBetweenGames()`
   (`src/lib/pwa.ts`) – a new menu page does too, a game never. Never restart or reload on a tap: restarting when a
   menu card was tapped made the next menu take seconds to show.
