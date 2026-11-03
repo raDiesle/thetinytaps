@@ -66,6 +66,30 @@ export interface Research {
 
 export const RESEARCH: Research[] = [
   {
+    id: "aehnliche-umrisse",
+    date: "2026-11-03",
+    emoji: "☝️",
+    title: "Schatten und Verstecke: Welche Bilder sehen sich zu ähnlich?",
+    question:
+      "Bei Schatten finden und Wer schaut da raus? soll immer genau eine Antwort passen (X-14). Welche Bilder kann ein Kind als schwarzen Schatten oder als Teil, der aus dem Busch schaut, nicht auseinanderhalten?",
+    method:
+      "Im Browser jedes der 65 Bilder von Schatten finden in Apples Emojis (iPhone, Mac) und in Googles Noto Color Emoji (Android, von Google Fonts geladen) gezeichnet. Für die Schatten: der Umriss jedes Paars verglichen (Überdeckung, auf gleiche Größe gebracht) und die ähnlichsten Paare in beiden Schriften schwarz nebeneinander angesehen – die Zahl allein taugt nicht, sie hält alle runden Bilder für ähnlich (Erdbeere und Haus). Für Wer schaut da raus?: der sichtbare Teil (oben, links, rechts, bei 20 %) farbig in jeder Gruppe von PEEK_LOOKS verglichen (Umriss mal Farbe), dazu die Durchschnittsfarbe jedes Tiers für die Gucklöcher im Laub; die ähnlichsten groß angesehen. Entschieden nach Augenschein, ob ein Kind sie auseinanderhält.",
+    findings: [
+      "Schatten, die sich nicht unterscheiden lassen: Schwein, Schaf und Schildkröte (auf Android drei runde Kleckse auf kurzen Beinen), Schnecke und Schildkröte, Katze und Hund (auf dem iPhone), Hund und Elefant, Hund und Teddy, Eule und Teddy (auf Android), Apfel, Birne und Erdbeere, Pilz und Baum.",
+      "Teile, die aus dem Busch gleich aussehen: der hellbraune Schwanz mit Hinterbein von Katze und Hund, das Grau von Elefant neben Kuh oder Schaf, das grauweiße Fell von Hase und Maus und das Braun von Eichhörnchen und Igel durch die Gucklöcher.",
+      "Diese Paare kommen nie zusammen zur Auswahl (SHADOW_LOOKALIKES, PEEK_LOOKALIKES); die übrigen ähnlichen Bilder einer Art bleiben, damit die schweren Stufen schwer bleiben.",
+    ],
+    topics: [],
+    games: [],
+    excluded: [
+      { title: "Traktor und Feuerwehr, Auto und Traktor", why: "Ähnlich kastig, aber das große Hinterrad und die Leiter unterscheiden sie deutlich." },
+      { title: "Eule und Pinguin", why: "Farbig und als Schatten gut zu unterscheiden: der Pinguin steht schmal mit Schnabel zur Seite." },
+      { title: "Erdbeere und Haus", why: "Der Umrissvergleich hielt sie für am ähnlichsten, das Dach unterscheidet sie aber auf den ersten Blick." },
+    ],
+    ideas: ["X-14"],
+    sources: [],
+  },
+  {
     id: "gefuehle-selbst-regulieren",
     date: "2026-11-02",
     emoji: "🐻",
