@@ -136,10 +136,10 @@ export function useTapFeedback() {
   return { effects, ripple, glow, celebrate };
 }
 
-/** The layer the feedback is drawn in: put it last inside the game's play element. */
-export function FeedbackLayer({ effects }: { effects: Effect[] }) {
+/** The layer the feedback is drawn in: put it last inside the game's play element, or `fixed` over the whole window. */
+export function FeedbackLayer({ effects, fixed = false }: { effects: Effect[]; fixed?: boolean }) {
   return (
-    <div className="fx-layer" aria-hidden>
+    <div className={`fx-layer${fixed ? " fixed" : ""}`} aria-hidden>
       {effects.map((e) => {
         const style = { left: e.x, top: e.y, "--delay": `${e.delay}ms` } as CSSProperties;
         if (e.kind === "ripple")

@@ -170,14 +170,7 @@ function TimerRun({
         )}
       </div>
       <FeedbackLayer effects={effects} />
-      {phase === "done" && (
-        <GameEnd
-          delayMs={END_MS}
-          noFamily
-          onAgain={onAgain}
-          next={nextInfo && { emoji: nextInfo.emoji, name: t(nextInfo.name), onNext: () => onPicture(next) }}
-        />
-      )}
+      {phase === "done" && <GameEnd delayMs={END_MS} noFamily onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 // Drawings the machines share: ink and wood colours, and things on the wall.
 
+import { MascotHead } from "@/components/Mascot";
 import { BAR_COLORS } from "./parts";
 
 export const INK = "#2a1e5c";
@@ -112,24 +113,15 @@ export function Sparkles({ x, y, age, n = 10, spread = 220 }: { x: number; y: nu
  * the app's mascots drive the machines (D-18).
  */
 export function CabDriver({ cx, cy, r = 10, kind, hat }: { cx: number; cy: number; r?: number; kind: "fox" | "bear"; hat: string }) {
-  const fox = kind === "fox";
-  const fur = fox ? "#f08c3a" : "#a0663a";
+  // The app's one fox and bear head (components/Mascot.tsx), its 100 × 100 box scaled so the head is about `r` round.
   const k = r / 10;
   return (
     <g transform={`translate(${cx} ${cy}) scale(${k})`}>
-      {fox ? (
-        <path d="M-9 -4 L-15 -17 L-3 -9 Z M9 -4 L15 -17 L3 -9 Z" fill={fur} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-      ) : (
-        <g fill={fur} stroke={INK} strokeWidth="2">
-          <circle cx="-10" cy="-7" r="4.5" />
-          <circle cx="10" cy="-7" r="4.5" />
-        </g>
-      )}
-      <circle r="10" fill={fur} stroke={INK} strokeWidth="2" />
-      <ellipse cx="6" cy="4" rx="4.8" ry="3.6" fill={fox ? "#fff" : "#e3b98a"} />
-      <circle cx="2" cy="-1" r="1.8" fill={INK} />
-      <circle cx="10" cy="3" r="1.8" fill={INK} />
-      <path d="M-12 -4 Q0 -22 12 -4 Z" fill={hat} stroke={INK} strokeWidth="2" />
+      <g transform="translate(-14 -16) scale(0.28)">
+        <MascotHead kind={kind} />
+      </g>
+      <path d="M-11 -6 Q0 -23 11 -6 Z" fill={hat} stroke={INK} strokeWidth="2" />
+      <path d="M-13 -6 H13" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
     </g>
   );
 }

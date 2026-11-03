@@ -281,6 +281,12 @@
   pointer-events: none;
 }
 
+/* Over the menus (`MenuRipples`): above every page, its book and its option menus. */
+.fx-layer.fixed {
+  position: fixed;
+  z-index: 1000;
+}
+
 /* A tap that sets nothing off: two soft rings spread as on water, light enough for dark and pale pictures alike. */
 .fx-ripple-at {
   position: absolute;

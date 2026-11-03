@@ -7,7 +7,7 @@ import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling"
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
-import { speak } from "@/lib/speech";
+import { useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 
 /** Keys closer together than this only make ripples, so mashing doesn't race through the word. */
@@ -83,12 +83,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const action = current && isAction(current.word) ? current.word : null;
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
-    },
-    [settings.speech, pack.speechLang],
-  );
+  const say = useLettersSay();
 
   /** Says the letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
   const sayLetter = useCallback(
@@ -144,7 +139,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     doneAt.current = performance.now();
     if (settings.sounds) playChime();
     const word = current.word;
-    say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
+    say(`${word.word}!`, true);
+    say(isAction(word) ? pack.joinIn(word) : pick(pack.praise), true);
     if (isColor(word)) setBackground(word.color);
     celebrate();
   }, [current, done, letters, typed, pack, say, sayLetter, celebrate, settings.sounds]);

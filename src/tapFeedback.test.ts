@@ -27,3 +27,9 @@ test("no game brings back random shapes as tap feedback", () => {
   const offenders = files.filter((f) => /components\/Bursts|useBursts|BurstLayer/.test(readFileSync(join("src", f), "utf8")));
   expect(offenders).toEqual([]);
 });
+
+// Taps on nothing in a menu or on the bookshelf ripple too, so a child sees every tap was felt (user decision,
+// November 2026).
+test("menus ripple where a tap sets nothing off", () => {
+  expect(readFileSync("src/index.tsx", "utf8")).toContain("<MenuRipples />");
+});

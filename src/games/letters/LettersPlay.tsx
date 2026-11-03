@@ -5,9 +5,9 @@ import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
-import { useT } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { useAppLanguage, useT } from "@/lib/language";
 import { LetterCard, NumberCard } from "./Cards";
+import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 
 /** Presses closer together than this only make ripples, so mashing doesn't strobe. */
@@ -81,6 +81,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const [push, setPush] = useState<[number, number]>([0, 0]);
   const { effects, ripple } = useTapFeedback();
   const t = useT();
+  const { id: language } = useAppLanguage();
   const stepByStep = settings.numbers === "step";
   const numbersOnly = settings.numbersOnly;
   /** A number stops before its digit, which comes only when the same number is pressed again (`digitOnRepeat`). */
@@ -98,12 +99,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const hornCount = useRef(0);
   const cardBox = useRef<HTMLDivElement>(null);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
-    },
-    [settings.speech, pack.speechLang],
-  );
+  const say = useLettersSay();
 
   /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
   const byTap = useCallback((s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0, [settings.numbers]);
@@ -111,12 +107,16 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   /** The full sentence for a fully revealed letter or number. */
   const sentenceFor = useCallback(
     (s: Shown) => {
-      if (s.kind === "number") return s.n === 0 ? `${pack.numberWords[0]}!` : pack.countSentence(s.n, s.thing);
+      if (s.kind === "number") {
+        // A counting sentence not recorded yet („drei Äpfel!“) says the number alone.
+        const sentence = s.n === 0 ? `${pack.numberWords[0]}!` : pack.countSentence(s.n, s.thing);
+        return lettersVoice.has(sentence, language) ? sentence : `${pack.numberWords[s.n]}!`;
+      }
       if (settings.announce === "word") return `${s.word.word}!`;
       if (settings.announce === "letter") return `${s.letter.spoken}!`;
       return pack.letterSentence(s.letter, s.word);
     },
-    [pack, settings.announce],
+    [pack, settings.announce, language],
   );
 
   /** Speak and play the sound for reaching `stage`. */
@@ -130,7 +130,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         say(pack.zero.sentence, queue);
       } else {
         sound(() => playCountNote(stage - 1));
-        say(pack.numberWords[stage], queue);
+        say(`${pack.numberWords[stage]}!`, queue);
       }
     },
     [pack, say, sentenceFor, settings.sounds],

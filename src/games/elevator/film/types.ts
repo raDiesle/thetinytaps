@@ -81,8 +81,6 @@ export interface Film {
   id: string;
   /** German; shown through `titleIn` in the app language. */
   title: string;
-  /** Its picture, for the „Weiter“ button. */
-  picture: Picture;
   /** The scenes, given what the child has picked so far: up to the next scene whose choice is not picked yet, or
    * all of them to the end. */
   scenes: (picks: string[]) => Scene[];
