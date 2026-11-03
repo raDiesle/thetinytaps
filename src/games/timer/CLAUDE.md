@@ -12,7 +12,7 @@ A visual timer for the day, not a game: a grown-up picks the minutes in the row 
   flaring, soft ripples where it was); nothing has to be tapped, so there is no glow or pointing hand.
 
 Files: `TimerGame.tsx` (start screen: cards and minutes), `TimerPlay.tsx` (one run: the clock, the phases `running` →
-`blow` (candle only) → `done`, taps, the end), `scenes.tsx` (all drawings and their layers), `timer.css`, `content.ts`
+`blow` (candle only) → `done`, taps, the end), `scenes.tsx` (all drawings and their layers; the fox and bear are the shared `Mascot`, so its `GameEnd` has `noFamily`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
 
 ## Rules

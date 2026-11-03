@@ -2,7 +2,8 @@
 // line. Tapsi's lines in the Bewegungsabenteuer go into the story's stimme/ folder
 // (src/games/adventure/stories/<story>/stimme/<hash of the text>.mp3), and the same for every translation of
 // the lines (lines.<language>.ts → stimme/<language>/<language>-<hash>.mp3); the other games that are recorded
-// (Zähne putzen, Kleine Abenteuer, Abstillen, Was gehört zum Tier?, Gefühle, the good-night sentence) list their lines in every language in
+// (Zähne putzen, Kleine Abenteuer, Abstillen, Was gehört zum Tier?, Gefühle, Schatten finden, Was gehört zusammen?,
+// Kettenreaktion, Aufs Töpfchen, Socken-Paare, the good-night sentence) list their lines in every language in
 // src/content/recordedLines.ts, into the game's own stimme/ folder the same way. src/lib/voice.ts plays them;
 // a line without a recording stays silent.
 //
@@ -111,7 +112,7 @@ async function credits() {
 
 /**
  * Credits a character really costs with the turbo model, as measured in October 2026: 0.096 (10,399 characters for
- * 995), 0.078 (6,398 for 498), 0.102 (34,408 for 3,506) and, in November 2026, 0.109 (26,425 for 2,881). The service's own
+ * 995), 0.078 (6,398 for 498), 0.102 (34,408 for 3,506) and, in November 2026, 0.109 (26,425 for 2,881) and 0.085 (15,528 for 1,327). The service's own
  * `character_cost_multiplier` (0.5) is five times too high and once stopped a run that would have fit, so the check before
  * a run goes by this, a little above all of them.
  */

@@ -19,10 +19,10 @@ export const SOCK_COLORS: SockColor[] = [
   { id: "brown", main: "#a0673c", light: "#f0d9c4" },
 ];
 
-/** What is knitted onto a sock; "plain" has nothing. */
-export type SockPattern = "plain" | "stripes" | "dots" | "hearts" | "stars" | "zigzag";
+/** What is knitted onto a sock; "plain" has nothing, "foxes" and "bears" are the app's mascots' heads (D-18). */
+export type SockPattern = "plain" | "stripes" | "dots" | "hearts" | "stars" | "zigzag" | "foxes" | "bears";
 
-export const SOCK_PATTERNS: SockPattern[] = ["plain", "stripes", "dots", "hearts", "stars", "zigzag"];
+export const SOCK_PATTERNS: SockPattern[] = ["plain", "stripes", "dots", "hearts", "stars", "zigzag", "foxes", "bears"];
 
 /**
  * What hangs on the line: socks, and the new laundry of idea Z-10 – mittens, rain boots and slippers, which come as a
@@ -46,8 +46,8 @@ export interface SockLook {
 /** Two pairs with the same key look alike: only a left and a right of them belong together. */
 export const lookKey = (l: SockLook) => `${l.garment} ${l.color.id} ${l.pattern}`;
 
-/** The most pairs in one wash: 12 socks still fit on a phone, and every pattern is used once. */
-export const MAX_PAIRS = SOCK_PATTERNS.length;
+/** The most pairs in one wash: 12 socks still fit on a phone; a wash never shows a pattern on two pairs of one colour. */
+export const MAX_PAIRS = 6;
 
 /**
  * What tells the pairs apart, from easy to hard:
@@ -112,7 +112,9 @@ export function shuffle<T>(items: T[]): T[] {
 /** The pairs of one wash at `level`; no two look the same, except in `twins`, where every look comes twice. */
 export function dealPairs({ pairs, kind }: Pick<SockLevel, "pairs" | "kind">): SockLook[] {
   const colors = shuffle(SOCK_COLORS);
-  const patterns = shuffle(SOCK_PATTERNS);
+  // Foxes or bears, never both: the two faces are alike enough on a small sock that only one may be in a wash.
+  const left = oneOf(["foxes", "bears"] as const);
+  const patterns = shuffle(SOCK_PATTERNS.filter((p) => p !== left));
   const sock = (color: SockColor, pattern: SockPattern): SockLook => ({ garment: "sock", color, pattern });
   if (kind === "colors") return colors.slice(0, pairs).map((color) => sock(color, "plain"));
   if (kind === "patterns") return patterns.slice(0, pairs).map((pattern, i) => sock(colors[i], pattern));

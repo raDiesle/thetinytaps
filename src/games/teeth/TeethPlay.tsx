@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { MenuIcon } from "@/components/GameEnd";
+import { CheeringFamily } from "@/components/Mascot";
 import { useLeaveGame } from "@/components/GameShell";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
@@ -686,6 +687,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {done ? (
         ending === "rest" && (
           <div className="teeth-end">
+            {/* Tapsi jumps for joy with Mama or Papa Fox beside it: brushing is done. */}
+            <CheeringFamily kind="fox" className="teeth-family" />
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
             <div className="teeth-end-buttons">
               <button type="button" className="teeth-again teeth-menu" onClick={leave}>

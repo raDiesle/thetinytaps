@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage, voiceFor } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import type { TogetherRound } from "./levels";
 import { PairPicture, PartnerIcon } from "./PairPicture";
 import { TOGETHER_TEXTS, WORK_MS } from "./pairs";
 import type { TogetherSettings } from "./settings";
+import { togetherVoice } from "./voice";
 
 /** The picked partner's flight up into the picture, before the two set to work. */
 const FLIGHT_MS = 500;
@@ -72,14 +72,10 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string, queue = false) => togetherVoice.say(text, language.id, { queue }), [language.id]);
+  // Its few sentences load as the game starts, so even the first is heard right away.
+  useEffect(() => togetherVoice.loadAll(language.id), [language.id]);
 
   // The question comes with the round; the round is mounted anew for every pair.
   useEffect(() => say(texts.question(round.pair)), []);

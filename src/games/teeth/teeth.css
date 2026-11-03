@@ -1440,6 +1440,11 @@
   gap: 2vmin 4vmin;
 }
 
+/* Tapsi and its grown-up cheering beside the week chart and the buttons. */
+.teeth-family {
+  height: clamp(80px, 20vmin, 170px);
+}
+
 .teeth-week {
   display: flex;
   align-items: flex-end;

@@ -52,7 +52,12 @@ import goodNightFiles from "../components/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
 import feelingsFiles from "../games/feelings/stimme/*.mp3?glob";
+import marblesFiles from "../games/marbles/stimme/*.mp3?glob";
+import pottyFiles from "../games/potty/stimme/*.mp3?glob";
+import shadowsFiles from "../games/shadows/stimme/*.mp3?glob";
+import socksFiles from "../games/socks/stimme/*.mp3?glob";
 import teethFiles from "../games/teeth/stimme/*.mp3?glob";
+import togetherFiles from "../games/together/stimme/*.mp3?glob";
 import weaningFiles from "../games/weaning/stimme/*.mp3?glob";
 
 /** Lines of one kind in a game, each once. */
@@ -95,6 +100,11 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
     { text: "Der Korb ist voll!", file: "src/games/marbles/TrackLevel.tsx" },
     { text: "Bumm! Alles umgefallen!", file: "src/games/marbles/ToppleLevel.tsx" },
     { text: "Hatschi!", file: "src/games/marbles/SneezeLevel.tsx" },
+    { text: "Achtung, fertig – los!", file: "src/games/marbles/TrackLevel.tsx" },
+    { text: "Der Schneemann ist fertig!", file: "src/games/marbles/snowTrack.tsx" },
+    { text: "Alle sind im Becken!", file: "src/games/marbles/slideTrack.tsx" },
+    { text: "Voll! Der Kran hebt alles hoch!", file: "src/games/marbles/siteTrack.tsx" },
+    { text: "Alle sind auf dem Mond! Sternschnuppen!", file: "src/games/marbles/spaceTrack.tsx" },
   ],
   "/belohnungstafel/": [
     { text: "Geschafft! Hurra!", file: "src/games/rewards/BoardScreen.tsx" },
@@ -351,9 +361,19 @@ function rewards(): VoiceGroup[] {
 
 /** The German recordings of the games in src/content/recordedLines.ts, by file name (the hash of the line). */
 const RECORDED = new Set(
-  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles, animalsFiles, feelingsFiles].flatMap((files) =>
-    Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4)),
-  ),
+  [
+    goodNightFiles,
+    elevatorFiles,
+    teethFiles,
+    weaningFiles,
+    animalsFiles,
+    feelingsFiles,
+    shadowsFiles,
+    togetherFiles,
+    marblesFiles,
+    pottyFiles,
+    socksFiles,
+  ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
 );
 
 /** The games and groups of `games` with only the lines that have no German recording yet. */

@@ -14,13 +14,13 @@ import {
   playWash,
   playWhoosh,
 } from "@/lib/sfx";
-import { useAppLanguage, useT, voiceFor } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
-import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
 import { dealPairs, lookKey, nextLevel, oneOf, type Side, SOCK_LEVELS, SOCK_TEXTS, shuffle, type SockLook } from "./content";
 import { Basket, Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
+import { socksVoice } from "./voice";
 
 /** The full machine stands still for a moment before it starts on its own. */
 const INTRO_MS = 600;
@@ -168,14 +168,10 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string) => socksVoice.say(text, language.id), [language.id]);
+  // Its few sentences load as the game starts, so even the first is heard right away.
+  useEffect(() => socksVoice.loadAll(language.id), [language.id]);
 
   // The socks get as big as the floor allows, also when the screen turns.
   useLayoutEffect(() => {

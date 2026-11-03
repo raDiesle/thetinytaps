@@ -77,8 +77,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "🚽 Bilder und Texte",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
       },
       {
         label: "🎵 Warte-Lied (gesungen)",
@@ -122,8 +123,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/kettenreaktion/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Alle Bahnen und Maschinen, auch Schneebahn, Weltraumbahn, Wasserrutsche, Baustellen-Bahn und „Schranke und Weiche“ (übersetzt am 3. November 2026).",
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Alle Bahnen und Maschinen, auch Schneebahn, Weltraumbahn, Wasserrutsche, Baustellen-Bahn und „Schranke und Weiche“ (übersetzt am 3. November 2026). Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
   },
   {
     href: "/kleine-abenteuer/",
@@ -190,16 +192,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/zusammen/",
+    recorded: true,
     languages: { de: "done" },
-    note: "Neu (November 2026): nur auf Deutsch – die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase und die Einstellungen beim Spielen. Gesprochen wird noch nichts; die Sätze warten auf ihre Aufnahme.",
+    note: "Neu (November 2026): nur auf Deutsch – die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs (3. November 2026).",
   },
   {
     href: "/schatten/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
   },
   {
     href: "/socken/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
   },
   {
     href: "/buchstaben/",

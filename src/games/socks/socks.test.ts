@@ -76,6 +76,15 @@ test("sure goes up, many misses or a very long search goes down, and it stays wi
   expect(nextLevel(last, { pairs: 6, misses: 0, ms: 6000 })).toBe(last);
 });
 
+test("a wash has fox socks or bear socks, never both", () => {
+  for (const level of SOCK_LEVELS) {
+    for (let i = 0; i < 50; i++) {
+      const patterns = new Set(dealPairs(level).map((l) => l.pattern));
+      expect(patterns.has("foxes") && patterns.has("bears")).toBe(false);
+    }
+  }
+});
+
 test("there are enough colours and patterns for every step, and none twice", () => {
   expect(SOCK_COLORS.length).toBeGreaterThanOrEqual(MAX_PAIRS);
   expect(new Set(SOCK_COLORS.map((c) => c.id)).size).toBe(SOCK_COLORS.length);
