@@ -7,6 +7,7 @@ import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOOD_ID, WEATHERS } from "./mood";
+import { SELF_SITUATIONS } from "./selbst";
 import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
@@ -30,8 +31,13 @@ function expectPicture(name: string) {
   if (!imageFor(name)) expect(PLANNED_NAMES, `${name}: no picture in bilder/, and not planned in README.md`).toContain(name);
 }
 
+// The kindergarten stories and the stories of more feelings (selbst.ts) play alike and find their pictures by id.
+const ALL_SITUATIONS = [...SITUATIONS, ...SELF_SITUATIONS];
+
 test("every kindergarten story has its pictures", () => {
-  for (const { id, steps } of SITUATIONS) {
+  const ids = ALL_SITUATIONS.map((s) => s.id);
+  expect(new Set(ids).size, "a story id twice would share its pictures").toBe(ids.length);
+  for (const { id, steps } of ALL_SITUATIONS) {
     [storyImages.problem(id), storyImages.end(id), ...steps.flatMap((_, i) => [storyImages.step(id, i), storyImages.instead(id, i)])].forEach(expectPicture);
   }
 });
@@ -45,6 +51,12 @@ test("the bear has a picture for every feeling, every round and every comfort", 
     instead.forEach((_, i) => expectPicture(bearImages.instead(id, i)));
   }
   for (const id of Object.keys(COMFORTS)) expectPicture(bearImages.comfort(id));
+});
+
+// A not-so-good idea is never scolded: its answer starts softly with „Hmm,“ and then says what is better.
+test("every not-so-good answer starts with „Hmm,“", () => {
+  for (const { id, steps } of ALL_SITUATIONS) steps.forEach((step, i) => expect(step.instead.answer, `${id} step ${i + 1}`).toStartWith("Hmm, "));
+  for (const { id, instead } of FEELINGS) instead.forEach((idea, i) => expect(idea.answer, `${id} round ${i + 1}`).toStartWith("Hmm, "));
 });
 
 test("a planned picture that is made leaves „Geplant“", () => {
@@ -120,7 +132,7 @@ test("every choice asks who acts", () => {
     expect(feeling.questions.length, `${feeling.id} questions`).toBe(feeling.comforts.length);
     feeling.questions.forEach((q, i) => asks(q, `${feeling.id} round ${i + 1}`));
   }
-  for (const situation of SITUATIONS) situation.steps.forEach((step, i) => asks(step.question, `${situation.id} step ${i + 1}`));
+  for (const situation of ALL_SITUATIONS) situation.steps.forEach((step, i) => asks(step.question, `${situation.id} step ${i + 1}`));
 });
 
 // Translations come only on request, so a story may have none yet (it is told in German); one that has keeps the sounds.
