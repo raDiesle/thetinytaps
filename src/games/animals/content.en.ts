@@ -1,4 +1,6 @@
-import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./content";
+import type { Gift, GiftId } from "./gifts";
+import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
 
 // English texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in content.ts and
@@ -29,6 +31,7 @@ export const ENGLISH_ANIMALS: Record<string, string> = {
   schnecke: "snail",
   loewe: "lion",
   giraffe: "giraffe",
+  schaf: "sheep",
 };
 
 /** A food in English. */
@@ -107,5 +110,69 @@ export function englishTexts(german: AnimalTexts): AnimalTexts {
   };
 }
 
+/** A gift in English. */
+export interface EnglishGift {
+  /** Lower case, for screen readers: "milk". */
+  name: string;
+  /** What the animal gives us, for "The chicken gives us eggs.". */
+  gives: string;
+}
+
+/** What the animals give us, by gift id ("Was gibt uns das Tier?"); one without an entry is said in German. */
+export const ENGLISH_GIFTS: Partial<Record<GiftId, EnglishGift>> = {
+  milch: { name: "milk", gives: "milk" },
+  ei: { name: "egg", gives: "eggs" },
+  honig: { name: "honey", gives: "honey" },
+  wolle: { name: "wool", gives: "wool" },
+};
+
+/** "Was gibt uns das Tier?" in English; what has no English words yet is the whole German sentence. */
+export function englishGifts(german: GiftTexts): GiftTexts {
+  const animal = (a: Animal) => ENGLISH_ANIMALS[a.id];
+  const the = (a: Animal) => `the ${animal(a)}`;
+  const gift = (g: Gift) => ENGLISH_GIFTS[g.id];
+  return {
+    gift: (g) => (gift(g) ? capital(gift(g)!.name) : german.gift(g)),
+    whatGives: (a) => (animal(a) ? `What does ${the(a)} give us?` : german.whatGives(a)),
+    gives: (a, g) => (animal(a) && gift(g) ? `${capital(the(a))} gives us ${gift(g)!.gives}. Thank you!` : german.gives(a, g)),
+    comesFrom: (g, giver) => (animal(giver) && gift(g) ? `The ${gift(g)!.name} comes from ${the(giver)}!` : german.comesFrom(g, giver)),
+  };
+}
+
+/** A small one and what it becomes, in English ("Was wird aus mir?"). */
+export interface EnglishGrowth {
+  /** The small one, lower case: "caterpillar". */
+  young: string;
+  /** What it becomes, lower case: "butterfly". */
+  adult: string;
+  /** With "a" or "an": "a butterfly". */
+  a: string;
+}
+
+/** The small ones by their id; one without an entry is said in German. */
+export const ENGLISH_GROWTHS: Partial<Record<GrowthId, EnglishGrowth>> = {
+  raupe: { young: "caterpillar", adult: "butterfly", a: "a butterfly" },
+  ei: { young: "egg", adult: "chick", a: "a chick" },
+  samen: { young: "seed", adult: "sunflower", a: "a sunflower" },
+  kaulquappe: { young: "tadpole", adult: "frog", a: "a frog" },
+};
+
+/** "Was wird aus mir?" in English; a small one without its English words is the whole German sentence. */
+export function englishGrowth(german: GrowTexts): GrowTexts {
+  const word = (g: Growth) => ENGLISH_GROWTHS[g.id];
+  return {
+    young: (g) => (word(g) ? capital(word(g)!.young) : german.young(g)),
+    adult: (g) => (word(g) ? capital(word(g)!.adult) : german.adult(g)),
+    whatBecomes: (g) => (word(g) ? `What does the ${word(g)!.young} turn into?` : german.whatBecomes(g)),
+    becomes: (g) => (word(g) ? `The ${word(g)!.young} turns into ${word(g)!.a}. Great!` : german.becomes(g)),
+    comesFrom: (g) => (word(g) ? `The ${word(g)!.adult} comes from the ${word(g)!.young}!` : german.comesFrom(g)),
+  };
+}
+
 /** English, for the table of languages in content.ts. */
-export const ENGLISH: AnimalTranslation = { words: { animals: ENGLISH_ANIMALS, foods: ENGLISH_FOODS, homes: ENGLISH_HOMES }, texts: englishTexts };
+export const ENGLISH: AnimalTranslation = {
+  words: { animals: ENGLISH_ANIMALS, foods: ENGLISH_FOODS, homes: ENGLISH_HOMES },
+  texts: englishTexts,
+  gifts: englishGifts,
+  growth: englishGrowth,
+};

@@ -108,7 +108,15 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
           onChange={(stickers) => onChange({ stickers })}
         />
         <Toggle
-          label={t({ de: "Dazu: Aufgaben und Belohnung als Bildkarten zum Ausschneiden" })}
+          label={t({
+            de: "Dazu: Aufgaben und Belohnung als Bildkarten zum Ausschneiden",
+            en: "Also: tasks and reward as picture cards to cut out",
+            zh: "另附：任务和奖励的图片卡，可剪下",
+            hi: "साथ में: काम और इनाम काटने वाले तस्वीर कार्ड के रूप में",
+            es: "Además: tareas y premio como tarjetas con imágenes para recortar",
+            ar: "إضافةً إلى ذلك: المهام والمكافأة كبطاقات صور للقص",
+            ru: "Ещё: задания и награда карточками с картинками для вырезания",
+          })}
           checked={!!options.cards}
           onChange={(cards) => onChange({ cards })}
         />
@@ -125,7 +133,15 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
           <StickerLink />
           {options.cards && (
             <>
-              {` ${t({ de: "Die Bildkarten zeigen, wofür es Sterne gibt: laminiert und mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden) hängen sie neben der Tafel oder an einer Klett-Tafel." })}`}
+              {` ${t({
+                de: "Die Bildkarten zeigen, wofür es Sterne gibt: laminiert und mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden) hängen sie neben der Tafel oder an einer Klett-Tafel.",
+                en: "The picture cards show what the stars are for: laminated and with Velcro dots (no small magnets – children under three can swallow them), they hang beside the chart or on a Velcro board.",
+                zh: "图片卡显示做什么能得到星星：过塑后用魔术贴（不要用小磁铁——三岁以下的孩子可能会吞下去）挂在奖励表旁边或魔术贴板上。",
+                hi: "तस्वीर कार्ड दिखाते हैं कि सितारे किस बात के लिए मिलते हैं: लैमिनेट करके वेल्क्रो डॉट से (छोटे चुंबक नहीं – तीन साल से छोटे बच्चे उन्हें निगल सकते हैं) वे चार्ट के पास या वेल्क्रो बोर्ड पर लगते हैं।",
+                es: "Las tarjetas con imágenes muestran por qué hay estrellas: plastificadas y con puntos de velcro (nada de imanes pequeños: los menores de tres años pueden tragárselos), se cuelgan junto a la tabla o en un tablero de velcro.",
+                ar: "تُظهر بطاقات الصور على ماذا تُمنح النجوم: بعد تغليفها وتثبيتها بنقاط الفيلكرو (لا مغناطيسات صغيرة – قد يبتلعها الأطفال دون الثالثة) تُعلَّق بجانب اللوحة أو على لوحة فيلكرو.",
+                ru: "Карточки с картинками показывают, за что даются звёзды: в ламинате и на липучках (никаких маленьких магнитов – дети до трёх лет могут их проглотить) они висят рядом с таблицей или на доске с липучками.",
+              })}`}
               <VelcroLink />
             </>
           )}

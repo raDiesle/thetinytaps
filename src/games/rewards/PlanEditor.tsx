@@ -102,9 +102,27 @@ export function PlanEditor({
       </SettingsGroup>
 
       {plan.view === "day" && (
-        <SettingsGroup title={t({ de: "Was wandert?" })}>
+        <SettingsGroup
+          title={t({
+            de: "Was wandert?",
+            en: "What moves along?",
+            zh: "移动的是什么？",
+            hi: "क्या आगे बढ़ता है?",
+            es: "¿Qué se mueve?",
+            ar: "ما الذي يتحرّك؟",
+            ru: "Что передвигается?",
+          })}
+        >
           <Choice
-            label={t({ de: "Was wandert?" })}
+            label={t({
+              de: "Was wandert?",
+              en: "What moves along?",
+              zh: "移动的是什么？",
+              hi: "क्या आगे बढ़ता है?",
+              es: "¿Qué se mueve?",
+              ar: "ما الذي يتحرّك؟",
+              ru: "Что передвигается?",
+            })}
             value={plan.nowField ? "field" : "marker"}
             onChange={(value) => onChange({ ...plan, nowField: value === "field" })}
             options={NOW_WAYS.map((way) => ({ value: way.field ? "field" : "marker", label: `${way.emoji} ${t(way.label)}` }))}
@@ -117,7 +135,19 @@ export function PlanEditor({
       {plan.view !== "countdown" && (
         <SettingsGroup title={t({ de: "Schritte", en: "Steps", zh: "步骤", hi: "कदम", es: "Pasos", ar: "الخطوات", ru: "Шаги" })}>
           {/* Hidden here on purpose: the pictures say the order (user feedback, November 2026). */}
-          <Toggle label={t({ de: "Karten nummerieren" })} checked={!!plan.numbers} onChange={(numbers) => onChange({ ...plan, numbers })} />
+          <Toggle
+            label={t({
+              de: "Karten nummerieren",
+              en: "Number the cards",
+              zh: "给卡片编号",
+              hi: "कार्ड पर नंबर लगाएँ",
+              es: "Numerar las tarjetas",
+              ar: "ترقيم البطاقات",
+              ru: "Пронумеровать карточки",
+            })}
+            checked={!!plan.numbers}
+            onChange={(numbers) => onChange({ ...plan, numbers })}
+          />
           <Choice
             label={t({ de: "Welche Tage?", en: "Which days?", zh: "哪几天？", hi: "कौन-से दिन?", es: "¿Qué días?", ar: "أيّ الأيام؟", ru: "Какие дни?" })}
             value={plan.same ? "same" : "own"}

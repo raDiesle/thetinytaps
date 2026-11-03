@@ -72,7 +72,7 @@ export const SCENE_MODES: { value: SceneMode; label: Localized }[] = [
   { value: "colour", label: { de: "🖍️ Ausmalen", ru: "🖍️ Раскраска", en: "🖍️ Coloring", zh: "🖍️ 涂颜色", hi: "🖍️ रंग भरें", es: "🖍️ Colorear", ar: "🖍️ تلوين" } },
   { value: "find", label: { de: "🔍 Suchen", ru: "🔍 Поиск", en: "🔍 Find it", zh: "🔍 找一找", hi: "🔍 ढूँढें", es: "🔍 Buscar", ar: "🔍 بحث" } },
   { value: "questions", label: { de: "❓ Fragen", ru: "❓ Вопросы", en: "❓ Questions", zh: "❓ 问一问", hi: "❓ सवाल", es: "❓ Preguntas", ar: "❓ أسئلة" } },
-  { value: "torch", label: { de: "🔦 Taschenlampe" } },
+  { value: "torch", label: { de: "🔦 Taschenlampe", ru: "🔦 Фонарик", en: "🔦 Flashlight", zh: "🔦 手电筒", hi: "🔦 टॉर्च", es: "🔦 Linterna", ar: "🔦 كشّاف" } },
   // Short, so the six modes still fit in one row on a phone on its side (844 px).
-  { value: "road", label: { de: "🛣️ Straßen" } },
+  { value: "road", label: { de: "🛣️ Straßen", ru: "🛣️ Дороги", en: "🛣️ Roads", zh: "🛣️ 画路", hi: "🛣️ सड़कें", es: "🛣️ Caminos", ar: "🛣️ طرق" } },
 ];

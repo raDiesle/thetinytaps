@@ -5,8 +5,32 @@ export type Farewell = "box" | "balloon";
 
 /** The ways of saying goodbye a grown-up can pick behind ⚙️, the one they really do at home. */
 export const FAREWELLS: { id: Farewell; emoji: string; name: Localized }[] = [
-  { id: "box", emoji: "📦", name: { de: "Schnullerkästchen auf der Fensterbank" } },
-  { id: "balloon", emoji: "🎈", name: { de: "Luftballon aus dem Fenster" } },
+  {
+    id: "box",
+    emoji: "📦",
+    name: {
+      de: "Schnullerkästchen auf der Fensterbank",
+      en: "Pacifier box on the windowsill",
+      zh: "窗台上的奶嘴盒",
+      hi: "खिड़की पर चुसनी का डिब्बा",
+      es: "Cajita de chupetes en la ventana",
+      ar: "علبة اللهّايات على حافة النافذة",
+      ru: "Коробочка с пустышками на подоконнике",
+    },
+  },
+  {
+    id: "balloon",
+    emoji: "🎈",
+    name: {
+      de: "Luftballon aus dem Fenster",
+      en: "Balloon out of the window",
+      zh: "从窗口飞走的气球",
+      hi: "खिड़की से उड़ता गुब्बारा",
+      es: "Globo por la ventana",
+      ar: "بالون يطير من النافذة",
+      ru: "Воздушный шарик в окно",
+    },
+  },
 ];
 
 /** A present the fairy can leave, as a picture: grown-ups pick the one that really waits for the child in the morning. */
@@ -17,14 +41,26 @@ export interface Gift {
 }
 
 export const GIFTS: Gift[] = [
-  { id: "teddy", emoji: "🧸", name: { de: "Kuscheltier" } },
-  { id: "book", emoji: "📚", name: { de: "Buch" } },
-  { id: "car", emoji: "🚗", name: { de: "Auto" } },
-  { id: "ball", emoji: "⚽", name: { de: "Ball" } },
-  { id: "crayons", emoji: "🖍️", name: { de: "Malstifte" } },
-  { id: "train", emoji: "🚂", name: { de: "Eisenbahn" } },
-  { id: "dino", emoji: "🦖", name: { de: "Dino" } },
-  { id: "unicorn", emoji: "🦄", name: { de: "Einhorn" } },
+  {
+    id: "teddy",
+    emoji: "🧸",
+    name: { de: "Kuscheltier", en: "Cuddly toy", zh: "毛绒玩具", hi: "मुलायम खिलौना", es: "Peluche", ar: "دمية محشوّة", ru: "Мягкая игрушка" },
+  },
+  { id: "book", emoji: "📚", name: { de: "Buch", en: "Book", zh: "书", hi: "किताब", es: "Libro", ar: "كتاب", ru: "Книжка" } },
+  { id: "car", emoji: "🚗", name: { de: "Auto", en: "Car", zh: "小汽车", hi: "गाड़ी", es: "Coche", ar: "سيارة", ru: "Машинка" } },
+  { id: "ball", emoji: "⚽", name: { de: "Ball", en: "Ball", zh: "球", hi: "गेंद", es: "Pelota", ar: "كرة", ru: "Мяч" } },
+  {
+    id: "crayons",
+    emoji: "🖍️",
+    name: { de: "Malstifte", en: "Crayons", zh: "蜡笔", hi: "रंगीन पेंसिलें", es: "Ceras de colores", ar: "أقلام تلوين", ru: "Карандаши" },
+  },
+  {
+    id: "train",
+    emoji: "🚂",
+    name: { de: "Eisenbahn", en: "Train set", zh: "小火车", hi: "खिलौना रेलगाड़ी", es: "Tren de juguete", ar: "قطار لعبة", ru: "Железная дорога" },
+  },
+  { id: "dino", emoji: "🦖", name: { de: "Dino", en: "Dinosaur", zh: "恐龙", hi: "डायनासोर", es: "Dinosaurio", ar: "ديناصور", ru: "Динозавр" } },
+  { id: "unicorn", emoji: "🦄", name: { de: "Einhorn", en: "Unicorn", zh: "独角兽", hi: "यूनिकॉर्न", es: "Unicornio", ar: "حصان وحيد القرن", ru: "Единорог" } },
 ];
 
 /** The gift with that id, or the first one (an id saved before a gift was taken out). */
