@@ -24,11 +24,27 @@ export type SockPattern = "plain" | "stripes" | "dots" | "hearts" | "stars" | "z
 
 export const SOCK_PATTERNS: SockPattern[] = ["plain", "stripes", "dots", "hearts", "stars", "zigzag"];
 
-/** How one pair looks; both socks of a pair look exactly the same. */
+/**
+ * What hangs on the line: socks, and the new laundry of idea Z-10 – mittens, rain boots and slippers, which come as a
+ * left and a right that mirror each other.
+ */
+export type Garment = "sock" | "mitten" | "boot" | "slipper";
+
+/** The garments with a left and a right one. */
+export const MIRRORED: Garment[] = ["mitten", "boot", "slipper"];
+
+/** Which of a pair: a sock's two are the same, a mitten's or boot's right one is the left one mirrored. */
+export type Side = "left" | "right";
+
+/** How one pair looks; its two pieces look exactly the same (a mirrored garment's right one mirrored). */
 export interface SockLook {
+  garment: Garment;
   color: SockColor;
   pattern: SockPattern;
 }
+
+/** Two pairs with the same key look alike: only a left and a right of them belong together. */
+export const lookKey = (l: SockLook) => `${l.garment} ${l.color.id} ${l.pattern}`;
 
 /** The most pairs in one wash: 12 socks still fit on a phone, and every pattern is used once. */
 export const MAX_PAIRS = SOCK_PATTERNS.length;
@@ -38,9 +54,14 @@ export const MAX_PAIRS = SOCK_PATTERNS.length;
  * colors – plain socks, every pair its own colour;
  * patterns – a pattern per pair, and every pair still its own colour, so the colour helps;
  * sameColor – a pattern per pair in few colours, so pairs of the same colour sit side by side and only the pattern tells;
- * mixed – two colours times a few patterns, so every pair has one twin with its pattern and others with its colour.
+ * mixed – two colours times a few patterns, so every pair has one twin with its pattern and others with its colour;
+ * mirror – the new laundry (mittens, boots, slippers), a left and a right one per pair, every pair its own colour;
+ * twins – the new laundry with every look twice, so two left and two right ones lie alike and only mirrored they fit.
  */
-export type SockKind = "colors" | "patterns" | "sameColor" | "mixed";
+export type SockKind = "colors" | "patterns" | "sameColor" | "mixed" | "mirror" | "twins";
+
+/** The kinds from easy to hard, the order `SOCK_LEVELS` climbs them in. */
+export const SOCK_KINDS: SockKind[] = ["colors", "patterns", "sameColor", "mixed", "mirror", "twins"];
 
 /**
  * One step of the difficulty: how many pairs in the wash, what tells them apart, and how many socks a laundry basket
@@ -69,6 +90,13 @@ export const SOCK_LEVELS: SockLevel[] = [
   { pairs: 5, kind: "mixed", covered: 3 },
   { pairs: 6, kind: "mixed", covered: 4 },
   { pairs: 6, kind: "mixed", covered: 6 },
+  { pairs: 3, kind: "mirror", covered: 0 },
+  { pairs: 4, kind: "mirror", covered: 1 },
+  { pairs: 5, kind: "mirror", covered: 3 },
+  { pairs: 4, kind: "twins", covered: 0 },
+  { pairs: 4, kind: "twins", covered: 2 },
+  { pairs: 6, kind: "twins", covered: 2 },
+  { pairs: 6, kind: "twins", covered: 4 },
 ];
 
 /** A new list with the same items in random order. */
@@ -81,18 +109,25 @@ export function shuffle<T>(items: T[]): T[] {
   return result;
 }
 
-/** The pairs of one wash at `level`; no two look the same. */
+/** The pairs of one wash at `level`; no two look the same, except in `twins`, where every look comes twice. */
 export function dealPairs({ pairs, kind }: Pick<SockLevel, "pairs" | "kind">): SockLook[] {
   const colors = shuffle(SOCK_COLORS);
   const patterns = shuffle(SOCK_PATTERNS);
-  if (kind === "colors") return colors.slice(0, pairs).map((color) => ({ color, pattern: "plain" }));
-  if (kind === "patterns") return patterns.slice(0, pairs).map((pattern, i) => ({ color: colors[i], pattern }));
+  const sock = (color: SockColor, pattern: SockPattern): SockLook => ({ garment: "sock", color, pattern });
+  if (kind === "colors") return colors.slice(0, pairs).map((color) => sock(color, "plain"));
+  if (kind === "patterns") return patterns.slice(0, pairs).map((pattern, i) => sock(colors[i], pattern));
   if (kind === "sameColor") {
     // Every colour at least twice: 3 pairs in one colour, 4 in two, 5 in two.
     const used = Math.max(1, Math.floor(pairs / 2));
-    return shuffle(patterns.slice(0, pairs).map((pattern, i) => ({ color: colors[i % used], pattern })));
+    return shuffle(patterns.slice(0, pairs).map((pattern, i) => sock(colors[i % used], pattern)));
   }
-  return shuffle(Array.from({ length: pairs }, (_, i) => ({ color: colors[i % 2], pattern: patterns[Math.floor(i / 2)] })));
+  if (kind === "mixed") return shuffle(Array.from({ length: pairs }, (_, i) => sock(colors[i % 2], patterns[Math.floor(i / 2)])));
+  // The new laundry: its own colour per look, and the garments taking turns, so a wash has mittens, boots and slippers.
+  const garments = shuffle(MIRRORED);
+  const looks = (count: number) => colors.slice(0, count).map((color, i) => ({ garment: garments[i % garments.length], color, pattern: patterns[i] }));
+  if (kind === "mirror") return looks(pairs);
+  const twice = looks(pairs / 2);
+  return shuffle([...twice, ...twice]);
 }
 
 /** How one wash went: how many pairs, how often another sock was taken than the partner, and how long it took. */
