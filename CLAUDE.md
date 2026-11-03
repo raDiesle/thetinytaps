@@ -448,8 +448,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   height, walls going back, books as boxes with spines and page edges, other books standing with their spines out to
   fill it, some lying in stacks), still until tapped, and planned by `planShelf` (`shelfLayout.ts`) to fill the room on
   every screen. Every compartment holds something to tap – never a board only of filler books (users found it odd that
-  nothing up there could be tapped): the picture books stand two up top and two below on wider screens, each with clear
-  room round it so it is seen whole and a finger finds one book, never its neighbour (`BOOK_GAP`, `shelfLayout.test.ts`).
+  nothing up there could be tapped): on wider screens the everyday helpers with the carved words stand up top, for the
+  grown-ups, and the picture books side by side on the board below, where a child's eye finds them together, with warm
+  light on the back panel behind what can be taken and the books only filling the shelf in its shadow (`BooksLight`,
+  user decision, November 2026); each stands with clear room round it so it is seen whole and a finger finds one book, never its neighbour (`BOOK_GAP`, `shelfLayout.test.ts`).
   On each board the books stand together in the middle with just `BOOK_GAP` between them, and books spine out fill the
   ends up to them – never spread over a wide board with big empty room between them (on a big monitor they looked lost,
   user feedback, November 2026; `.shelf-row`, `endsFor`).
@@ -461,16 +463,21 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
   and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The grown-ups' options on the shelf's page are
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
-  loose around the room (`RoomOptions.tsx`, user feedback, October 2026): a wooden loudspeaker (music, one tap), an
-  hourglass (play time), a globe with the 🌐 lines and the language's name on its foot (the language – never a light
-  switch) in a compartment of its own with a board between it and the one above, stickers of the fox girl and the bear
-  boy stuck on the inner side of the shelf's right wall in that compartment above (the figure). The texts that stood below
+  loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
+  shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
+  the hourglass (play time, the most needed), below it a wooden loudspeaker (music, one tap) with stickers of the fox girl
+  and the bear boy stuck on the inner side of the shelf's right wall beside it (the figure), at the bottom a globe with
+  the 🌐 lines and the language's name on its foot (the language – never a light switch). The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
-  closed (`MenuButton keep`) so search engines read it (`RoomNotes`). The app's name is a painted sign
-  hanging on two little chains from above, with clear room between it and the shelf – it never touches or stands on the
-  shelf (user feedback, October 2026). A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
+  closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Browsers show how to leave fullscreen over the
+  middle of the screen's bottom (or top) edge for a while, again whenever fullscreen starts: so nothing to tap lies
+  there (user feedback, November 2026). On a wide screen the shelf starts right under the fullscreen button's room and
+  stands on legs (`--legs`), leaving the bottom's middle to legs and floor, and the app's name is a painted sign standing
+  on the floor in front of the shelf's bottom left, the bottom board keeping its books clear of the sign and the foxes on
+  its o (`ShelfCell.lead`, `SIGN_REACH`) – never over a book. On an upright screen the sign still hangs on two little
+  chains above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
   with a bear child, one of the children a boy and one a girl – never a third grown-up or a child too many (user
@@ -526,9 +533,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
   up to them (`Logo`). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
   Georgia's bold o, which was then cut out) and lies over it so that Papa really sits on the letter – never floating above
-  it (user feedback, October 2026, twice: look at the seat magnified, his thighs must lie on the letter's top stroke). The foxes are twice the letter's height, sitting above the sign on the wall. The
-  sign is big and has room above it for them (`--sign`, `--top` in `bookshelf.css`; the shelf gives up the height): at
-  the sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
+  it (user feedback, October 2026, twice: look at the seat magnified, his thighs must lie on the letter's top stroke). The foxes are twice the letter's height, rising above the sign. The
+  sign is big enough for them to be seen (`--sign`; `SIGN_SIZE` in `Bookshelf.tsx` in front of a wide shelf): at the
+  sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
   line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own

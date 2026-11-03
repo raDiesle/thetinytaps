@@ -32,8 +32,9 @@
  * The o of „Both“: Papa Fox on the letter with his child on his lap (Logo). The o is the title's own letter; the picture
  * holds only the foxes (drawn on Georgia's o, 271 px of the picture to the letter's 0.563em, the o then cut out). It hangs
  * from a point on the baseline, placed where the cut-out o lay and 0.18em lower, so Papa sits on the letter instead of
- * floating over it. The foxes, twice the letter's height, rise 1.5em above the baseline onto the wall above the shelf's
- * sign, which leaves them room (`--top` in bookshelf.css). Hold it to open the management page.
+ * floating over it. The foxes, twice the letter's height, rise 1.5em above the baseline, over the sign's top edge: onto
+ * the wall above a hanging sign, or in front of the shelf's books spine out where it stands before a wide shelf
+ * (`ShelfCell.lead`). Hold it to open the management page.
  */
 .logo-o {
   position: relative;

@@ -1,6 +1,6 @@
 /**
  * How the bookshelf of the home page (book look, Bookshelf.tsx) is laid out in the room it gets: its compartments, the
- * picture books standing in the middle ones and the grown-ups' things (RoomOptions) in narrow ones beside them, and how
+ * picture books standing in the wide ones and the grown-ups' things (RoomOptions) in narrow ones beside them, and how
  * big it all is. A pure function of the room's size, so it can be checked.
  */
 
@@ -20,17 +20,33 @@ export const BOOK_GAP = 0.3;
 export const TAKE_OUT = 0.9;
 
 /**
- * The things for grown-ups in the shelf's side compartments, one each (RoomOptions): the stickers of the child's figure
- * (`figure`) are stuck on the inner side of the shelf's right wall, in a compartment of their own above the globe's, so
- * the globe stands apart (user feedback, October 2026).
+ * The things for grown-ups in the shelf's compartments (RoomOptions): the stickers of the child's figure (`figure`) are
+ * stuck on the inner side of the shelf's right wall, the others stand on a board.
  */
 export type ShelfThing = "music" | "playtime" | "figure" | "language";
 
-/**
- * In this order where they stand in a row (on top of an upright screen's shelf), the stickers at the right side;
- * in columns the speaker and the hourglass stand on the left, the stickers above the globe on the right.
- */
+/** In this order where they stand in a row (on top of an upright screen's shelf), the stickers at the right side. */
 export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language", "figure"];
+
+/**
+ * On a screen wider than tall all of them stand in one column at the shelf's right side, one compartment over the other
+ * (user decision, November 2026): the hourglass on top in the tallest, the most needed; the speaker in the middle with
+ * the stickers on the shelf's right wall beside it; the globe at the bottom.
+ */
+const SIDE_COLUMN: { things: ShelfThing[]; share: number }[] = [
+  { things: ["playtime"], share: 0.38 },
+  { things: ["music", "figure"], share: 0.31 },
+  { things: ["language"], share: 0.31 },
+];
+
+/**
+ * The sign with the app's name, on a screen wider than tall: it stands on the floor in front of the shelf's bottom left
+ * corner, and Papa Fox with his child on the o of „Both“ (Logo) rises above it. Where the legs are short, they rise in
+ * front of the bottom board's left end, so the board keeps that much room free of books (`ShelfCell.lead`), in the
+ * sign's widths: up to the o. Where that would cost the books more (a screen nearly square), the legs grow instead and
+ * the sign with its foxes stands wholly below the shelf.
+ */
+const SIGN_REACH = 0.86;
 
 /** The shelf's planks, in px: the side posts, the walls between compartments, the top board, each board, the plinth. */
 export interface ShelfFrame {
@@ -49,11 +65,14 @@ export interface ShelfRect {
   h: number;
 }
 
-/** A compartment's opening: picture books standing in it, or one of the grown-ups' things. */
+/** A compartment's opening: picture books standing in it, or grown-ups' things. */
 export interface ShelfCell extends ShelfRect {
   /** The picture books in it, by their place in the list of books. */
   books?: number[];
-  thing?: ShelfThing;
+  /** The grown-ups' things in it: one standing on its board, and the stickers (`figure`) on its right wall. */
+  things?: ShelfThing[];
+  /** Room at its left kept free of books, in px: the sign standing in front of it covers it (`SIGN_REACH`). */
+  lead?: number;
 }
 
 /** The plan of the shelf. */
@@ -66,6 +85,20 @@ export interface ShelfLayout {
   planks: ShelfRect[];
   /** Each picture book's height (its width is `BOOK_ASPECT` of it). */
   bookHeight: number;
+  /** Whether it is planned for an upright screen: the things on top, the sign hanging above the shelf. */
+  upright: boolean;
+  /** How high the legs it stands on are, below its `height` (a wide shelf's; 0 for an upright one). */
+  legs: number;
+}
+
+/** What the plan is asked for besides the room's size. */
+export interface ShelfOptions {
+  /** The screen stands upright (its own shape, not the room's, so the room's size can't flip it back and forth). */
+  upright?: boolean;
+  /** The sign standing in front of a wide shelf, in px: its width, and its height from its feet to the foxes' heads. */
+  sign?: { width: number; height: number };
+  /** The least height of a wide shelf's legs, in px. */
+  legs?: number;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -102,6 +135,18 @@ function split(count: number, rows: number): number[][] {
   return out;
 }
 
+/**
+ * The places on two boards of a wide shelf: the everyday helpers' books (wider than a picture book) with the words
+ * carved beside them alone up top, the picture books together below, where a child's eye finds them side by side (user
+ * decision, November 2026). Evenly split where there are no such books or the picture books would be too many for one board.
+ */
+function boardsOf(spans: number[], rows: number): number[][] {
+  const wide = spans.flatMap((s, i) => (s > 1 ? [i] : []));
+  const rest = spans.flatMap((s, i) => (s > 1 ? [] : [i]));
+  if (rows !== 2 || !wide.length || !rest.length || rest.length > 4) return split(spans.length, rows);
+  return [wide, rest];
+}
+
 /** Of two ways, the one with more boards unless the other's books are much bigger: two books up top, not an empty board. */
 function prefer<T extends { bh: number }>(more: T, fewer: T) {
   return more.bh * 1.25 >= fewer.bh ? more : fewer;
@@ -109,57 +154,73 @@ function prefer<T extends { bh: number }>(more: T, fewer: T) {
 
 /**
  * The plan for a room of `width` × `height` and the places of the books, each `spans[i]` picture books wide (1 for a
- * picture book; the everyday helpers' books with the words carved beside them take more). A screen wider than tall gets a narrow column on
- * each side for the grown-ups' things – two compartments on each side, the stickers' above the globe's on the right –
- * and the books in the middle, two boards of them where that keeps them nearly as big (every board
- * holds books, none only fills the shelf). An upright screen gets the things in compartments on top and the books below.
+ * picture book; the everyday helpers' books with the words carved beside them take more). A screen wider than tall gets
+ * a narrow column at the right for the grown-ups' things (`SIDE_COLUMN`) and the books left of it, two boards of them
+ * where that keeps them nearly as big (every board holds books, none only fills the shelf). An upright screen gets the
+ * things in compartments on top and the books below.
  */
-export function planShelf(width: number, height: number, spans: number[]): ShelfLayout {
-  return width / height < 0.95 ? planUpright(width, height, spans) : planWide(width, height, spans);
+export function planShelf(width: number, height: number, spans: number[], options: ShelfOptions = {}): ShelfLayout {
+  const upright = options.upright ?? width / height < 0.95;
+  if (upright) return planUpright(width, height, spans);
+  const sign = options.sign ?? { width: 0, height: 0 };
+  const legs = options.legs ?? 0;
+  // The sign's foxes in front of the bottom board, or longer legs with the sign wholly below it: what keeps the books bigger.
+  const before = planWide(width, height - legs, spans, sign.width * SIGN_REACH, legs);
+  const tall = Math.max(legs, sign.height);
+  if (tall >= height * 0.4) return before;
+  const below = planWide(width, height - tall, spans, 0, tall);
+  return below.bookHeight > before.bookHeight ? below : before;
 }
 
-/** The places on `rows` boards and the biggest book they leave room for: the widest board decides. */
-function rowsOf(spans: number[], rows: number, width: number, tier: number) {
-  const boards = split(spans.length, rows);
-  const bh = Math.min(...boards.map((books) => bookFor(width, tier, spanOf(spans, books), books.length)));
-  return { boards, bh, middle: Math.max(...boards.map((books) => rowWidth(spanOf(spans, books), books.length, bh))) };
+/**
+ * The places on `rows` boards and the biggest book they leave room for: the widest board decides. A wide shelf's
+ * boards hold the books by kind (`boardsOf`), and its last keeps `lead` free at its left.
+ */
+function rowsOf(spans: number[], rows: number, width: number, tier: number, wide = false, lead = 0) {
+  const boards = wide ? boardsOf(spans, rows) : split(spans.length, rows);
+  const leadOf = (r: number) => (r === boards.length - 1 ? lead : 0);
+  const bh = Math.min(...boards.map((books, r) => bookFor(width - leadOf(r), tier, spanOf(spans, books), books.length)));
+  return { boards, bh, leadOf, middle: Math.max(...boards.map((books, r) => leadOf(r) + rowWidth(spanOf(spans, books), books.length, bh))) };
 }
 
-function planWide(width: number, height: number, spans: number[]): ShelfLayout {
+function planWide(width: number, height: number, spans: number[], reach: number, legs: number): ShelfLayout {
   const count = spans.length;
   const frame = frameFor(width, height);
   const { post, wall, crown, board } = frame;
   const inner = height - crown - frame.plinth;
   const side = clamp(width * 0.12, 62, 150);
-  const room = width - 2 * post - 2 * wall - 2 * side;
+  const room = width - 2 * post - wall - side;
   const option = (rows: number) => {
     const tier = (inner - (rows - 1) * board) / rows;
-    return { rows, tier, ...rowsOf(spans, rows, room, tier) };
+    // The sign's o reaches this far over the bottom board, less the room left of its first book anyway.
+    const first = rowsOf(spans, rows, room, tier, true, reach);
+    const lead = Math.max(0, reach - BOOK_GAP * first.bh);
+    return { rows, tier, lead, ...rowsOf(spans, rows, room, tier, true, lead) };
   };
   const plan = count > 1 ? prefer(option(2), option(1)) : option(1);
   const middle = Math.min(room, plan.middle);
-  const sideTier = (inner - board) / 2;
-  const left = post;
-  const mid = left + side + wall;
+  const mid = post;
   const right = mid + middle + wall;
   const cells: ShelfCell[] = [];
-  const planks: ShelfRect[] = [
-    { x: left + side, y: crown, w: wall, h: inner },
-    { x: mid + middle, y: crown, w: wall, h: inner },
-  ];
-  cells.push(
-    { x: left, y: crown, w: side, h: sideTier, thing: "music" },
-    { x: left, y: crown + sideTier + board, w: side, h: sideTier, thing: "playtime" },
-    { x: right, y: crown, w: side, h: sideTier, thing: "figure" },
-    { x: right, y: crown + sideTier + board, w: side, h: sideTier, thing: "language" },
-  );
-  planks.push({ x: left, y: crown + sideTier, w: side, h: board }, { x: right, y: crown + sideTier, w: side, h: board });
+  const planks: ShelfRect[] = [{ x: mid + middle, y: crown, w: wall, h: inner }];
+  const column = inner - (SIDE_COLUMN.length - 1) * board;
+  let y = crown;
+  SIDE_COLUMN.forEach(({ things, share }, i) => {
+    if (i > 0) {
+      planks.push({ x: right, y, w: side, h: board });
+      y += board;
+    }
+    const h = i === SIDE_COLUMN.length - 1 ? crown + inner - y : column * share;
+    cells.push({ x: right, y, w: side, h, things });
+    y += h;
+  });
   plan.boards.forEach((books, r) => {
     const y = crown + r * (plan.tier + board);
-    cells.push({ x: mid, y, w: middle, h: plan.tier, books });
+    const lead = plan.leadOf(r);
+    cells.push({ x: mid, y, w: middle, h: plan.tier, books, ...(lead > 0 && { lead }) });
     if (r > 0) planks.push({ x: mid, y: y - board, w: middle, h: board });
   });
-  return { width: right + side + post, height, frame, cells, planks, bookHeight: plan.bh };
+  return { width: right + side + post, height, frame, cells, planks, bookHeight: plan.bh, upright: false, legs };
 }
 
 function planUpright(width: number, height: number, spans: number[]): ShelfLayout {
@@ -188,10 +249,10 @@ function planUpright(width: number, height: number, spans: number[]): ShelfLayou
     const half = (middle - wall) / 2;
     const ch = (top - board) / 2;
     cells.push(
-      { x: post, y: crown, w: half, h: ch, thing: "music" },
-      { x: post, y: crown + ch + board, w: half, h: ch, thing: "playtime" },
-      { x: post + half + wall, y: crown, w: half, h: ch, thing: "figure" },
-      { x: post + half + wall, y: crown + ch + board, w: half, h: ch, thing: "language" },
+      { x: post, y: crown, w: half, h: ch, things: ["music"] },
+      { x: post, y: crown + ch + board, w: half, h: ch, things: ["playtime"] },
+      { x: post + half + wall, y: crown, w: half, h: ch, things: ["figure"] },
+      { x: post + half + wall, y: crown + ch + board, w: half, h: ch, things: ["language"] },
     );
     planks.push(
       { x: post + half, y: crown, w: wall, h: top },
@@ -200,7 +261,7 @@ function planUpright(width: number, height: number, spans: number[]): ShelfLayou
     );
   } else {
     SHELF_THINGS.forEach((thing, i) => {
-      cells.push({ x: post + i * (cw + wall), y: crown, w: cw, h: top, thing });
+      cells.push({ x: post + i * (cw + wall), y: crown, w: cw, h: top, things: [thing] });
       if (i > 0) planks.push({ x: post + i * (cw + wall) - wall, y: crown, w: wall, h: top });
     });
   }
@@ -209,5 +270,5 @@ function planUpright(width: number, height: number, spans: number[]): ShelfLayou
     cells.push({ x: post, y, w: middle, h: tier, books });
     planks.push({ x: post, y: y - board, w: middle, h: board });
   });
-  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: plan.bh };
+  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: plan.bh, upright: true, legs: 0 };
 }

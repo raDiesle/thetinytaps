@@ -212,11 +212,23 @@ describe("the app's name", () => {
     expect(home).toMatch(/<Bookshelf [^>]*legal=\{<LegalLinks \/>\} \/>/);
   });
 
-  test("the shelf's sign hangs above the shelf, never touching it", () => {
+  test("the shelf's sign hangs above an upright shelf, never touching it", () => {
     const css = readFileSync("src/styles/bookshelf.css", "utf8");
     const sign = css.match(/\n\.shelf-sign \{([^}]*)\}/)?.[1] ?? "";
     expect(sign).toMatch(/bottom: calc\(100% \+ [^;]+\);/);
     expect(css).toMatch(/\.shelf-sign::before/);
+  });
+
+  // Browsers show how to leave fullscreen at the bottom (or top) of the screen's middle, over what lies there (user
+  // feedback, November 2026): a wide shelf starts high and stands on legs, its sign standing in front at the bottom left,
+  // so only legs and floor lie at the bottom's middle and only the shelf's top board at the top's.
+  test("a wide shelf stands on legs, its sign in front of it, leaving the bottom's middle to legs and floor", () => {
+    const css = readFileSync("src/styles/bookshelf.css", "utf8");
+    const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.[\]="]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+    expect(rule('.room-scene[data-plan="wide"] .shelf-sign')).toMatch(/bottom: calc\([^;]*- var\(--legs\)/);
+    const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
+    expect(shelf).toContain('className="shelf-legs"');
+    expect(shelf).toMatch(/"--legs": `\$\{layout\.legs\}px`/);
   });
 
   // User feedback, November 2026: a game's name on its spine stands in one line, never broken („Zähne / putzen“); and

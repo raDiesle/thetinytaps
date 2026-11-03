@@ -44,6 +44,15 @@
   overflow: hidden;
 }
 
+/*
+ * A screen wider than tall: the shelf starts high, with only the fullscreen button's room above it, and stands on legs
+ * (`--legs`, from its plan, below the room's height it gets), its name on a sign in front of it at the bottom left (user decision, November 2026). So the bottom of the
+ * screen's middle, where browsers show how to leave fullscreen, holds only legs and floor, never a book.
+ */
+.room-scene[data-plan="wide"] {
+  --top: clamp(48px, 8.5vh, 72px);
+}
+
 /* Striped wallpaper with little dots, the lamp's light on it and a moulding under the ceiling. */
 .room-wall {
   position: absolute;
@@ -312,7 +321,7 @@
 }
 
 .room-sticker {
-  --s: min(66cqw, 38cqh);
+  --s: min(66cqw, 44cqh);
   position: relative;
   width: var(--s);
   height: var(--s);
@@ -581,6 +590,68 @@
   translate: 50% 0;
 }
 
+/* In front of a wide shelf the sign stands on two little feet on the floor at the shelf's bottom left, its chains gone. */
+.room-scene[data-plan="wide"] .shelf-sign {
+  bottom: calc(var(--sign) * 0.28 - var(--legs) - var(--floor) * 0.3);
+  left: 0;
+  z-index: 2;
+  translate: none;
+  border-radius: 6px;
+}
+
+.room-scene[data-plan="wide"] .shelf-sign::before,
+.room-scene[data-plan="wide"] .shelf-sign::after {
+  top: 100%;
+  bottom: auto;
+  left: 14%;
+  width: calc(var(--sign) * 0.2);
+  height: calc(var(--sign) * 0.3);
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, #ffffff33, #0000 40%, #00000040), #8a5d36;
+  box-shadow: 0 3px 4px #3a261466;
+}
+
+.room-scene[data-plan="wide"] .shelf-sign::after {
+  right: 14%;
+  left: auto;
+}
+
+/* The wide shelf's legs: turned wood, narrower at the foot, a soft shadow on the floor under each. */
+.shelf-legs {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  height: calc(var(--legs) + var(--floor) * 0.25);
+  padding: 0 calc(var(--post) * 0.15);
+  pointer-events: none;
+}
+
+.shelf-legs > span {
+  position: relative;
+  width: calc(var(--post) * 1.15);
+  height: 100%;
+  clip-path: polygon(0 0, 100% 0, 82% 70%, 74% 100%, 26% 100%, 18% 70%);
+  background:
+    linear-gradient(90deg, #ffffff40, #0000 30%, #0000 65%, #00000047),
+    linear-gradient(#00000059, #0000 18%),
+    var(--wood-grain-v) 0 0 / 360px 1200px,
+    var(--shelf-wood);
+}
+
+.shelf-legs::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -4px;
+  left: 0;
+  height: 10px;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, #3a261455, #0000);
+  z-index: -1;
+}
+
 .room .shelf .shelf-sign .logo {
   flex-wrap: nowrap;
   margin: 0;
@@ -621,6 +692,7 @@
   backface-visibility: hidden;
 }
 
+/* Darker than the wood in front, so the light behind the books to take stands out (`.shelf-light`). */
 .shelf-back {
   top: var(--crown);
   right: var(--post);
@@ -629,7 +701,19 @@
   transform: translateZ(calc(-1 * var(--d)));
   background:
     var(--wood-grain-h) 0 0 / 1200px 360px,
-    #b88654;
+    #9c6d42;
+}
+
+/*
+ * Warm light on the back panel behind the books that can be taken (BooksLight): the eye goes to them, and the books
+ * only filling the shelf stand in the dark beside it. Painted once, it never moves.
+ */
+.shelf-light {
+  top: 0;
+  bottom: 0;
+  transform: translateZ(calc(2px - var(--d)));
+  scale: 1.3 1;
+  background: radial-gradient(closest-side at 50% 58%, #ffe6a8d9, #ffd78f66 62%, #0000);
 }
 
 /* ----- A compartment: a box going back from its opening, lit from the front ----- */
@@ -856,6 +940,11 @@
 
 .shelf-end:last-child {
   justify-content: flex-start;
+}
+
+/* The left end also takes the room kept free for the sign standing in front of it (`ShelfCell.lead`). */
+.shelf-end:first-child {
+  flex-basis: var(--lead, 0px);
 }
 
 .shelf-spines {
