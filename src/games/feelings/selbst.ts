@@ -155,7 +155,7 @@ export const SELF_SITUATIONS: Situation[] = [
         caption: "Laut jubeln",
         question: "Es schneit! Der kleine Bär ist ganz aufgeregt. Was kann er tun?",
         beats: [{ narration: "Der kleine Bär jubelt ganz laut:", line: "Juhu! Schnee!" }],
-        instead: { caption: "Auf dem Sofa toben", answer: "Hmm, jetzt ist die Lampe umgefallen. Jubel lieber ganz laut: Juhu!", sound: "crash" },
+        instead: { caption: "Auf dem Sessel toben", answer: "Hmm, jetzt ist die Lampe umgefallen. Jubel lieber ganz laut: Juhu!", sound: "crash" },
       },
       {
         caption: "Stiefel und Jacke anziehen",

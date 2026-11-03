@@ -375,11 +375,15 @@ nur ein Frame, mit `baer-sad-gut` als `--ref` für den Bären.
 | `wetter-regen`    | A small rain cloud right above him, rain falls on him. The little bear is sad, shoulders down, a tear.             |
 | `wetter-gewitter` | A dark thunder cloud with lightning right above him. The little bear is angry: red face, fists clenched, stomping. |
 
-### Mehr Gefühle (`selbst.ts`) – die ersten Bilder
+### Mehr Gefühle (`selbst.ts`): enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt
 
-Gemacht am 3. November 2026, je mit `bye-ende` als einziger `--ref` für Aussehen und Stil und nur den Figuren des Bildes
-im Prompt (siehe „Nur die eigenen Figuren nennen“ unter „Geplant“). Die übrigen Bilder dieser Geschichten stehen unter
-„Geplant“ und werden aus diesen gezeichnet.
+Fünf Geschichten wie im Kindergarten (`…-passiert`, `…-1` bis `…-3`, `…-nein` bis `…-nein-3`, `…-ende`), in denen der
+kleine Bär das Gefühl hat und sich selbst hilft; im gebauten Spiel erscheint eine Geschichte erst, wenn alle ihre
+Bilder da sind (`stories.ts`). Alle gemacht am 3. November 2026: die ersten Bilder (`…-passiert`) je mit `bye-ende`
+als einziger `--ref` für Aussehen und Stil, jedes weitere mit dem „Redraw this exact picture as a later moment of the
+same story …“-Prompt aus „So bleibt die Szene gleich“ und dem `…-passiert` als einziger `--ref`, nur ein Frame. Tut
+der Bär es selbst, gehört „No hands, no arms come in from the edges“ dazu; eine nicht so gute Idee bekommt „This is
+the not-so-good idea: the action must be clearly visible, but gentle – no injuries, no blood.“
 
 | Datei               | Prompt                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -388,6 +392,83 @@ im Prompt (siehe „Nur die eigenen Figuren nennen“ unter „Geplant“). Die 
 | `broccoli-passiert` | Igitt, Brokkoli: At a dining table. The little bear sits in front of his plate with three green broccoli florets and two small potatoes and pulls a big disgusted face, tongue out a little, leaning back. Next to him the fox eats; opposite sits the big bear. Each exactly once; nobody else.                                                                                                                                                                             |
 | `oops-passiert`     | Hoppla, in die Hose: A kindergarten playroom. The little bear stands still with his knees together next to a small clear puddle on the floor, his trousers a little darker, looking down, embarrassed, ears low, paws in front of him. Behind him a shelf of cubbies, one with folded clothes, and a paper bag on a hook. The fox plays with blocks in the background. Each exactly once; no grown-ups. Gentle, nothing shameful shown.                                      |
 | `snow-passiert`     | Aufgeregt, es schneit: A living room in the morning. Through a big window the first snow is falling. The little bear in striped pyjamas stands at the window on tiptoe, nose almost at the glass, eyes wide, mouth open, bursting with excitement. A sofa with a standing lamp beside it; by the door a pair of red boots and a jacket on a hook. Only the little bear.                                                                                                      |
+
+Neue Figur (zu den Figuren oben): „The bear baby: a tiny bear baby, same warm brown fur, beige muzzle, in a pale-yellow
+romper, round and sleepy.“ Den großen Bären gibt es schon (grüner Strickpulli).
+
+**Nur die eigenen Figuren nennen:** Ein erstes Bild bekommt im Prompt nur die Figuren beschrieben, die darin sind – nie
+den ganzen Figurenblock. Mit allen Figuren im Prompt (großer Bär und Baby inklusive) malte Gemini sie in fast jedes
+Bild: ein Baby im Hochstuhl am Keks-Tisch, großer Bär und Baby im Kindergarten, wo noch kein Erwachsener sein darf.
+„Nobody else“ allein half nicht. Als Referenz für Aussehen und Stil reicht `bye-ende` (kleiner Bär, großer Bär, Fuchs),
+mit „a completely new place … nobody else from the reference“.
+
+**Enttäuscht, Keks zerbrochen (`cookie`)** – Küchentisch, der kleine Bär und der Fuchs, ein Kuscheltier-Hase auf dem
+Stuhl neben dem Bären, vor ihm ein Becher Milch.
+
+| Datei           | Prompt                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cookie-1`      | „Kuscheltier drücken“ – The little bear has picked up his plush bunny from the chair beside him, so that chair corner is empty now: there is just ONE bunny in the whole picture. He hugs it tight to his chest with both arms, eyes closed, calming down, a small brave smile; the two cookie halves lie on his plate. The fox watches kindly. No hands, no arms come in from the edges. |
+| `cookie-2`      | „Zwei Hälften zeigen“ – The little bear himself holds up the two cookie halves high, one in each paw, looking from one to the other with a big surprised happy smile, as if counting „one, two!“. The fox looks and smiles.                                                                                                                                                               |
+| `cookie-3`      | „Mit dem Fuchs teilen“ – The little bear himself holds out one cookie half to the fox, arm stretched towards him, friendly face; the fox reaches for it, delighted.                                                                                                                                                                                                                       |
+| `cookie-nein`   | „Becher umwerfen“ – The little bear angrily sweeps the cup of milk over with his paw; milk splashes across the table onto the fox, who is wet and starts to cry.                                                                                                                                                                                                                          |
+| `cookie-nein-2` | „Keks zerkrümeln“ – The little bear crushes both cookie halves in his fists; only crumbs rain down onto his plate, nothing is left. He looks at the crumbs, sad.                                                                                                                                                                                                                          |
+| `cookie-nein-3` | „Zunge rausstrecken“ – The little bear sticks his tongue out at the fox and holds both cookie halves away from him; the fox, with his empty plate, looks down, sad.                                                                                                                                                                                                                       |
+| `cookie-ende`   | The little bear and the fox each eat one cookie half side by side, both laughing. The plush bunny still sits on the chair beside the little bear, where it was – just ONE bunny in the whole picture, none on his lap or in his arms.                                                                                                                                                     |
+
+**Eifersüchtig aufs Baby (`baby`)** – Wohnzimmer, der große Bär auf dem Sofa mit dem Bärenbaby, am Boden Rassel,
+ein kleiner Stapel Windeln und eine Spielzeugtrommel.
+
+| Datei         | Prompt                                                                                                                                                                                                                                                                                                                                                |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baby-1`      | „„Ich will auch kuscheln!“ sagen“ – The little bear himself stands right in front of the big bear and reaches up with both arms, mouth open, asking; the big bear smiles at him and lifts his free arm to make room. No hands, no arms come in from the edges.                                                                                        |
+| `baby-2`      | „Windel holen“ – The little bear himself carries one nappy from the stack towards the big bear and the baby, proud face, holding it out; the big bear smiles.                                                                                                                                                                                         |
+| `baby-3`      | „Dem Baby vorsingen“ – The little bear himself stands by the baby and sings softly, mouth open in an „o“, eyes gentle, small music notes rising; the baby in the big bear's arms laughs.                                                                                                                                                              |
+| `baby-nein`   | „Das Baby hauen“ – The little bear raises his paw angrily towards the baby; the baby cries, the big bear turns the baby away, startled.                                                                                                                                                                                                               |
+| `baby-nein-2` | „Rassel wegnehmen“ – The baby still sits on the big bear's lap. The little bear stands close in front of them and has just pulled the rattle out of the baby's paws: he holds it up high and away, the only rattle in the picture (none lies on the rug any more). The baby reaches both empty paws after it and cries, the big bear looks surprised. |
+| `baby-nein-3` | „Laut trommeln“ – The little bear beats the toy drum hard right next to the sofa, sticks high; the baby cries with its mouth wide open, the big bear covers the baby's ear.                                                                                                                                                                           |
+| `baby-ende`   | On the sofa the big bear cuddles both: the little bear snuggled against one side, the baby in the other arm; all three smile, eyes soft.                                                                                                                                                                                                              |
+
+**Igitt, Brokkoli (`broccoli`)** – Esstisch, der kleine Bär, der Fuchs und der große Bär, auf dem Teller des Bären
+Brokkoli und Kartoffeln.
+
+| Datei             | Prompt                                                                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `broccoli-1`      | „„Nein, danke“ sagen“ – The little bear himself shakes his head politely, one paw raised a little, palm out, calm face, saying „no, thank you“; the big bear nods kindly. No hands, no arms come in from the edges. |
+| `broccoli-2`      | „Erst mal riechen“ – The little bear himself holds one broccoli floret on his fork close to his nose and sniffs carefully, eyes curious, eyebrows up.                                                               |
+| `broccoli-3`      | „An den Rand legen“ – The little bear himself pushes the broccoli to the edge of his plate with his fork and happily eats a potato.                                                                                 |
+| `broccoli-nein`   | „Teller runterwerfen“ – The little bear shoves his plate off the table; it is falling and breaking on the floor, broccoli and potatoes flying. The fox and the big bear startle.                                    |
+| `broccoli-nein-2` | „Auf den Tisch spucken“ – The little bear spits a bit of broccoli out onto the table, cheeks puffed; the fox leans away, grossed out.                                                                               |
+| `broccoli-nein-3` | „Brokkoli auf den Fuchs werfen“ – The little bear's arm is stretched out towards the fox, a broccoli floret has just left his paw and flies at the fox, who flinches and starts to cry.                             |
+| `broccoli-ende`   | All three eat happily; the little bear holds up a potato on his fork and laughs, the broccoli lies at the edge of his plate.                                                                                        |
+
+**Hoppla, in die Hose (`oops`)** – Spielzimmer im Kindergarten, hinten ein Regal mit Fächern (im Fach des Bären
+frische Kleidung), an einem Haken eine Tüte; der Fuchs spielt mit Bauklötzen. Sanft und ohne Scham: kein nackter Po,
+keine Flecken auf der Kleidung zu sehen außer einer etwas dunkleren Hose.
+
+| Datei         | Prompt                                                                                                                                                                                                                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `oops-1`      | „Der Erzieherin sagen“ – The little bear himself walks over to the teacher, who has just come in, and looks up at her, telling her; she bends down with a warm, reassuring smile.                                                                                                           |
+| `oops-2`      | „Frische Hose holen“ – The little bear himself takes folded dry trousers out of his cubby, standing on tiptoe, proud. The teacher watches, smiling.                                                                                                                                         |
+| `oops-3`      | „Nasse Hose einpacken“ – The little bear, now in fresh dry trousers, himself puts the folded wet trousers into the paper bag on the hook, pleased.                                                                                                                                          |
+| `oops-nein`   | „Nass weiterspielen“ – The little bear kneels at the blocks next to the fox and builds, still in his wet trousers (a big dark wet patch), but he shivers with cold: shoulders pulled up, teeth chattering, little shiver lines around him. The puddle is still on the floor where he stood. |
+| `oops-nein-2` | „Pfütze verwischen“ – The little bear smears the puddle across the floor with his foot; a long wet slippery streak, the fox nearly slips on it.                                                                                                                                             |
+| `oops-nein-3` | „Hose in die Ecke werfen“ – The little bear, in fresh trousers, throws the wet trousers into the corner with his arm stretched out, the trousers just leaving his paw; the bag on the hook stays empty.                                                                                     |
+| `oops-ende`   | The little bear in fresh trousers builds with the fox, both laughing; the floor is dry, the bag on the hook is full.                                                                                                                                                                        |
+
+**Aufgeregt, es schneit (`snow`)** – Wohnzimmer am Morgen, großes Fenster mit fallendem Schnee, ein Sessel mit einer
+Stehlampe daneben, an der Tür Stiefel und Jacke; der Bär im Schlafanzug. Ab `snow-3` draußen im verschneiten Garten,
+dort ist der große Bär dabei (er wird in Schritt 2 gerufen): `snow-3` ist das erste Garten-Bild (mit `snow-passiert`
+als `--ref` nur für die Figur, der Ort neu), `snow-nein-3` und `snow-ende` dann mit `snow-3` als einziger `--ref`. `bun run frames --scenes` meldet die Garten-Bilder und `snow-nein-2` (der Raum im kalten Licht der offenen Tür) als neue Szene – so gewollt.
+
+| Datei         | Prompt                                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `snow-1`      | „Laut jubeln“ – The little bear himself stands on the floor by the window and cheers, both arms thrown up high, mouth wide open, feet on the floor. No hands, no arms come in from the edges.                                      |
+| `snow-2`      | „Stiefel und Jacke anziehen“ – The little bear himself sits on the floor by the door and pulls on the red boots, the jacket already on over his pyjamas, concentrating, proud.                                                     |
+| `snow-3`      | „Schnee-Engel machen“ – Outside in a snowy garden. The little bear in jacket and red boots lies on his back in the snow and sweeps his arms and legs, making a snow angel, laughing; the big bear stands beside him, laughing too. |
+| `snow-nein`   | „Auf dem Sessel toben“ – The little bear jumps wildly on the armchair; the standing lamp beside it is tipping over and falling.                                                                                                    |
+| `snow-nein-2` | „Im Schlafanzug rausrennen“ – The little bear runs out of the open door in his pyjamas and bare feet into the snow, shivering, teeth chattering; the boots and jacket stay by the door.                                            |
+| `snow-nein-3` | „Schneeball ins Gesicht werfen“ – Outside in the snowy garden. The little bear's arm is stretched out, a snowball has just left his paw and hits the big bear's face; the big bear winces. Gentle, no injuries.                    |
+| `snow-ende`   | Outside in the snowy garden. The little bear and the big bear build a snowman together, both laughing.                                                                                                                             |
 
 ## Geplant (noch nicht erzeugt)
 
@@ -407,89 +488,3 @@ Runde für Runde steht die nicht so gute Idee neben der guten, die sie besser ma
 | `baer-scared-nein-2` | 2, Hand halten          | Night, thunderstorm. The little bear sits alone in his bed clutching a pillow, very scared; the door of the room is just closing, nobody there.                        |
 | `baer-happy-nein`    | 1, Mittanzen            | Birthday, balloons. A child's hand pops one of the bear's balloons with a pin, a small burst; the little bear in a party hat flinches, sad.                            |
 | `baer-happy-nein-2`  | 2, Luftschlangen werfen | Birthday. A child's hands take a wrapped present away from the little bear in a party hat; his smile is gone, he reaches after it.                                     |
-
-### Mehr Gefühle (`selbst.ts`): enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt
-
-Fünf Geschichten wie im Kindergarten (`…-passiert`, `…-1` bis `…-3`, `…-nein` bis `…-nein-3`, `…-ende`), in denen der
-kleine Bär das Gefühl hat und sich selbst hilft. Die fünf `…-passiert` sind gemacht (Tabelle oben); im gebauten
-Spiel erscheint eine Geschichte erst, wenn alle ihre Bilder da sind (`stories.ts`). Jedes weitere Bild mit dem „Redraw this exact picture as a later
-moment of the same story …“-Prompt aus „So bleibt die Szene gleich“ und dem `…-passiert` als einziger `--ref`, nur ein
-Frame. Tut der Bär es selbst, gehört „No hands, no arms come in from the edges“ dazu; eine nicht so gute Idee bekommt
-„This is the not-so-good idea: the action must be clearly visible, but gentle – no injuries, no blood.“
-
-Neue Figur (zu den Figuren oben): „The bear baby: a tiny bear baby, same warm brown fur, beige muzzle, in a pale-yellow
-romper, round and sleepy.“ Den großen Bären gibt es schon (grüner Strickpulli).
-
-**Nur die eigenen Figuren nennen:** Ein erstes Bild bekommt im Prompt nur die Figuren beschrieben, die darin sind – nie
-den ganzen Figurenblock. Mit allen Figuren im Prompt (großer Bär und Baby inklusive) malte Gemini sie in fast jedes
-Bild: ein Baby im Hochstuhl am Keks-Tisch, großer Bär und Baby im Kindergarten, wo noch kein Erwachsener sein darf.
-„Nobody else“ allein half nicht. Als Referenz für Aussehen und Stil reicht `bye-ende` (kleiner Bär, großer Bär, Fuchs),
-mit „a completely new place … nobody else from the reference“.
-
-**Enttäuscht, Keks zerbrochen (`cookie`)** – Küchentisch, der kleine Bär und der Fuchs, ein Kuscheltier-Hase auf dem
-Stuhl neben dem Bären, vor ihm ein Becher Milch.
-
-| Datei           | Prompt                                                                                                                                                                                                                                                            |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cookie-1`      | „Kuscheltier drücken“ – The little bear himself hugs his plush bunny tight to his chest with both arms, eyes closed, calming down, a small brave smile; the two cookie halves lie on his plate. The fox watches kindly. No hands, no arms come in from the edges. |
-| `cookie-2`      | „Zwei Hälften zeigen“ – The little bear himself holds up the two cookie halves high, one in each paw, looking from one to the other with a big surprised happy smile, as if counting „one, two!“. The fox looks and smiles.                                       |
-| `cookie-3`      | „Mit dem Fuchs teilen“ – The little bear himself holds out one cookie half to the fox, arm stretched towards him, friendly face; the fox reaches for it, delighted.                                                                                               |
-| `cookie-nein`   | „Becher umwerfen“ – The little bear angrily sweeps the cup of milk over with his paw; milk splashes across the table onto the fox, who is wet and starts to cry.                                                                                                  |
-| `cookie-nein-2` | „Keks zerkrümeln“ – The little bear crushes both cookie halves in his fists; only crumbs rain down onto his plate, nothing is left. He looks at the crumbs, sad.                                                                                                  |
-| `cookie-nein-3` | „Zunge rausstrecken“ – The little bear sticks his tongue out at the fox and holds both cookie halves away from him; the fox, with his empty plate, looks down, sad.                                                                                               |
-| `cookie-ende`   | The little bear and the fox each eat one cookie half side by side, both laughing, the plush bunny on the bear's lap.                                                                                                                                              |
-
-**Eifersüchtig aufs Baby (`baby`)** – Wohnzimmer, der große Bär auf dem Sofa mit dem Bärenbaby, am Boden Rassel,
-ein kleiner Stapel Windeln und eine Spielzeugtrommel.
-
-| Datei         | Prompt                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baby-1`      | „„Ich will auch kuscheln!“ sagen“ – The little bear himself stands right in front of the big bear and reaches up with both arms, mouth open, asking; the big bear smiles at him and lifts his free arm to make room. No hands, no arms come in from the edges. |
-| `baby-2`      | „Windel holen“ – The little bear himself carries one nappy from the stack towards the big bear and the baby, proud face, holding it out; the big bear smiles.                                                                                                  |
-| `baby-3`      | „Dem Baby vorsingen“ – The little bear himself stands by the baby and sings softly, mouth open in an „o“, eyes gentle, small music notes rising; the baby in the big bear's arms laughs.                                                                       |
-| `baby-nein`   | „Das Baby hauen“ – The little bear raises his paw angrily towards the baby; the baby cries, the big bear turns the baby away, startled.                                                                                                                        |
-| `baby-nein-2` | „Rassel wegnehmen“ – The little bear has snatched the rattle off the rug and holds it behind his back, turned away; the baby reaches after it and cries.                                                                                                       |
-| `baby-nein-3` | „Laut trommeln“ – The little bear beats the toy drum hard right next to the sofa, sticks high; the baby cries with its mouth wide open, the big bear covers the baby's ear.                                                                                    |
-| `baby-ende`   | On the sofa the big bear cuddles both: the little bear snuggled against one side, the baby in the other arm; all three smile, eyes soft.                                                                                                                       |
-
-**Igitt, Brokkoli (`broccoli`)** – Esstisch, der kleine Bär, der Fuchs und der große Bär, auf dem Teller des Bären
-Brokkoli und Kartoffeln.
-
-| Datei             | Prompt                                                                                                                                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `broccoli-1`      | „„Nein, danke“ sagen“ – The little bear himself shakes his head politely, one paw raised a little, palm out, calm face, saying „no, thank you“; the big bear nods kindly. No hands, no arms come in from the edges. |
-| `broccoli-2`      | „Erst mal riechen“ – The little bear himself holds one broccoli floret on his fork close to his nose and sniffs carefully, eyes curious, eyebrows up.                                                               |
-| `broccoli-3`      | „An den Rand legen“ – The little bear himself pushes the broccoli to the edge of his plate with his fork and happily eats a potato.                                                                                 |
-| `broccoli-nein`   | „Teller runterwerfen“ – The little bear shoves his plate off the table; it is falling and breaking on the floor, broccoli and potatoes flying. The fox and the big bear startle.                                    |
-| `broccoli-nein-2` | „Auf den Tisch spucken“ – The little bear spits a bit of broccoli out onto the table, cheeks puffed; the fox leans away, grossed out.                                                                               |
-| `broccoli-nein-3` | „Brokkoli auf den Fuchs werfen“ – The little bear's arm is stretched out towards the fox, a broccoli floret has just left his paw and flies at the fox, who flinches and starts to cry.                             |
-| `broccoli-ende`   | All three eat happily; the little bear holds up a potato on his fork and laughs, the broccoli lies at the edge of his plate.                                                                                        |
-
-**Hoppla, in die Hose (`oops`)** – Spielzimmer im Kindergarten, hinten ein Regal mit Fächern (im Fach des Bären
-frische Kleidung), an einem Haken eine Tüte; der Fuchs spielt mit Bauklötzen. Sanft und ohne Scham: kein nackter Po,
-keine Flecken auf der Kleidung zu sehen außer einer etwas dunkleren Hose.
-
-| Datei         | Prompt                                                                                                                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `oops-1`      | „Der Erzieherin sagen“ – The little bear himself walks over to the teacher, who has just come in, and looks up at her, telling her; she bends down with a warm, reassuring smile.                       |
-| `oops-2`      | „Frische Hose holen“ – The little bear himself takes folded dry trousers out of his cubby, standing on tiptoe, proud. The teacher watches, smiling.                                                     |
-| `oops-3`      | „Nasse Hose einpacken“ – The little bear, now in fresh dry trousers, himself puts the folded wet trousers into the paper bag on the hook, pleased.                                                      |
-| `oops-nein`   | „Nass weiterspielen“ – The little bear in his darker wet trousers sits down at the blocks next to the fox, shivering, unhappy; the puddle is still on the floor.                                        |
-| `oops-nein-2` | „Pfütze verwischen“ – The little bear smears the puddle across the floor with his foot; a long wet slippery streak, the fox nearly slips on it.                                                         |
-| `oops-nein-3` | „Hose in die Ecke werfen“ – The little bear, in fresh trousers, throws the wet trousers into the corner with his arm stretched out, the trousers just leaving his paw; the bag on the hook stays empty. |
-| `oops-ende`   | The little bear in fresh trousers builds with the fox, both laughing; the floor is dry, the bag on the hook is full.                                                                                    |
-
-**Aufgeregt, es schneit (`snow`)** – Wohnzimmer am Morgen, großes Fenster mit fallendem Schnee, ein Sofa mit einer
-Stehlampe daneben, an der Tür Stiefel und Jacke; der Bär im Schlafanzug. Ab `snow-3` draußen im verschneiten Garten,
-dort ist der große Bär dabei (er wird in Schritt 2 gerufen): `snow-3` ist das erste Garten-Bild (mit `snow-passiert`
-als `--ref` nur für die Figur, der Ort neu), `snow-nein-3` und `snow-ende` dann mit `snow-3` als einziger `--ref`.
-
-| Datei         | Prompt                                                                                                                                                                                                                             |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `snow-1`      | „Laut jubeln“ – The little bear himself stands on the floor by the window and cheers, both arms thrown up high, mouth wide open, feet on the floor. No hands, no arms come in from the edges.                                      |
-| `snow-2`      | „Stiefel und Jacke anziehen“ – The little bear himself sits on the floor by the door and pulls on the red boots, the jacket already on over his pyjamas, concentrating, proud.                                                     |
-| `snow-3`      | „Schnee-Engel machen“ – Outside in a snowy garden. The little bear in jacket and red boots lies on his back in the snow and sweeps his arms and legs, making a snow angel, laughing; the big bear stands beside him, laughing too. |
-| `snow-nein`   | „Auf dem Sofa toben“ – The little bear jumps wildly on the sofa; the standing lamp beside it is tipping over and falling.                                                                                                          |
-| `snow-nein-2` | „Im Schlafanzug rausrennen“ – The little bear runs out of the open door in his pyjamas and bare feet into the snow, shivering, teeth chattering; the boots and jacket stay by the door.                                            |
-| `snow-nein-3` | „Schneeball ins Gesicht werfen“ – Outside in the snowy garden. The little bear's arm is stretched out, a snowball has just left his paw and hits the big bear's face; the big bear winces. Gentle, no injuries.                    |
-| `snow-ende`   | Outside in the snowy garden. The little bear and the big bear build a snowman together, both laughing.                                                                                                                             |

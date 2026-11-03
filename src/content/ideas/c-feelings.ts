@@ -47,8 +47,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Am Tisch bricht dem kleinen Bären sein Keks in zwei Teile, er weint; neben ihm sitzt der Fuchs. 1) „Teller runterwerfen“ (Krach) oder sein Kuscheltier drücken und sagen: „Ich bin traurig.“ 2) „Den Keks zerkrümeln“ oder die zwei Hälften anschauen: „Jetzt hab ich zwei!“ 3) „Dem Fuchs seinen Keks wegnehmen“ oder eine Hälfte mit dem Fuchs teilen – beide lachen.",
       why: "Kleine Enttäuschungen sind für Zweijährige riesig. Die Szene zeigt: Traurig sein darf sein, und man kann die Sache anders sehen – ein erster, einfacher Blickwechsel.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Enttäuscht, Keks zerbrochen“ in Gefühle (selbst.ts), mit Becher statt Teller und „Zunge rausstrecken“ statt Keks wegnehmen (der Fuchs hat seinen schon gegessen). Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
+        "Als Geschichte „Enttäuscht, Keks zerbrochen“ in Gefühle (selbst.ts), mit Becher statt Teller und „Zunge rausstrecken“ statt Keks wegnehmen (der Fuchs hat seinen schon gegessen).",
     },
     {
       id: "C-06",
@@ -105,8 +106,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Mama Bär hält das Bärenbaby im Arm, der kleine Bär steht daneben und schaut eifersüchtig; auf dem Boden Rassel, Windeln und eine Trommel. 1) „Das Baby hauen“ (Aua) oder sagen: „Ich will auch kuscheln!“ 2) „Die Rassel wegnehmen“ oder selbst eine Windel holen. 3) „Laut trommeln, damit das Baby weint“ oder dem Baby ein Lied singen – zum Schluss kuscheln alle drei.",
       why: "Eltern suchen „kind eifersüchtig auf baby“ und „kind 3 jahre eifersüchtig auf baby“. Ratgeber raten, dem Großen eine Aufgabe zu geben und sein Bedürfnis ernst zu nehmen – hier sagt das Kind selbst, was es braucht.",
       effort: "S",
-      partial:
-        "Als Geschichte „Eifersüchtig aufs Baby“ in Gefühle (selbst.ts), mit dem großen Bären statt Mama Bär. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
+      done: true,
+      partial: "Als Geschichte „Eifersüchtig aufs Baby“ in Gefühle (selbst.ts), mit dem großen Bären statt Mama Bär.",
     },
     {
       id: "C-13",
@@ -139,8 +140,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Ein Brokkoli liegt auf dem Teller, der kleine Bär verzieht das Gesicht; neben ihm der Fuchs. 1) „Teller runterwerfen“ (Krach) oder sagen: „Nein, danke.“ 2) „Auf den Tisch spucken“ oder erst mal nur riechen. 3) „Den Brokkoli dem Fuchs auf den Teller werfen“ oder ihn an den Tellerrand legen – vielleicht ein andermal. Das Spiel sagt nie, dass man aufessen muss.",
       why: "Eltern suchen „kind mag kein gemüse was tun“. Ekel ist ein eigenes Gefühl, das bei Kleinen täglich vorkommt; „Nein, danke“ und Riechen ohne Druck sind gute Wege.",
       effort: "S",
-      partial:
-        "Als Geschichte „Igitt, Brokkoli“ in Gefühle (selbst.ts), mit dem großen Bären am Tisch. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
+      done: true,
+      partial: "Als Geschichte „Igitt, Brokkoli“ in Gefühle (selbst.ts), mit dem großen Bären am Tisch.",
     },
     {
       id: "C-17",
@@ -149,8 +150,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: In der Kita steht der kleine Bär in einer kleinen Pfütze und schämt sich; im Hintergrund sein Fach mit Wechselsachen und eine Tüte. 1) „Die Hose verstecken“ oder sagen: „Hoppla!“ und es der Erzieherin sagen. 2) „Mit der nassen Hose weiterspielen“ oder selbst eine frische Hose aus seinem Fach holen. 3) „Die Pfütze mit dem Fuß verwischen“ (Ausrutschen) oder die nasse Hose in die Tüte stecken. Ohne Scham, ohne Tadel; passt zu Aufs Töpfchen.",
       why: "Scham ist das Gefühl, über das am wenigsten gesprochen wird. Die Szene zeigt: ein Missgeschick ist nicht schlimm, und man kann selbst etwas tun.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Hoppla, in die Hose“ in Gefühle (selbst.ts); statt „Hose verstecken“ (sich verkriechen ist das Gefühl selbst) „Nass weiterspielen“. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
+        "Als Geschichte „Hoppla, in die Hose“ in Gefühle (selbst.ts); statt „Hose verstecken“ (sich verkriechen ist das Gefühl selbst) „Nass weiterspielen“.",
     },
     {
       id: "C-18",
@@ -159,8 +161,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Draußen fällt der erste Schnee, der kleine Bär hüpft auf dem Sofa, neben ihm eine Lampe, an der Tür seine Stiefel. 1) „Auf dem Sofa toben“ (die Lampe fällt, Krach) oder ganz laut jubeln: „Juhu!“ 2) „Im Schlafanzug rausrennen“ (kalt) oder erst die Stiefel anziehen. 3) „Schneeball ins Gesicht werfen“ (Aua) oder einen Schnee-Engel machen.",
       why: "Auch große Freude will gelenkt werden; so wird das Spiel nicht nur traurig, und es zeigt, dass Aufregung nichts Schlechtes ist.",
       effort: "S",
-      partial:
-        "Als Geschichte „Aufgeregt, es schneit“ in Gefühle (selbst.ts); der große Bär geht mit raus, der Schneeball trifft sein Gesicht. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
+      done: true,
+      partial: "Als Geschichte „Aufgeregt, es schneit“ in Gefühle (selbst.ts); der große Bär geht mit raus, der Schneeball trifft sein Gesicht.",
     },
     {
       id: "C-19",
