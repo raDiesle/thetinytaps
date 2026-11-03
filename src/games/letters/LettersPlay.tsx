@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
@@ -10,7 +10,7 @@ import { speak } from "@/lib/speech";
 import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
 
-/** Presses closer together than this only spawn shapes, so mashing doesn't strobe. */
+/** Presses closer together than this only make ripples, so mashing doesn't strobe. */
 const MIN_CHANGE_MS = 600;
 
 /** Enter: a real car horn and train whistle (src/lib/sounds/), synthesized until loaded. */
@@ -28,7 +28,6 @@ const PUSH_STEP = 8;
 const MAX_PUSH = 32;
 /** How many earlier letters and numbers Backspace can bring back. */
 const MAX_HISTORY = 20;
-const CONFETTI_PIECES = 10;
 
 const ARROWS: Record<string, [number, number]> = {
   ArrowLeft: [-1, 0],
@@ -80,7 +79,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const [tapped, setTapped] = useState<number[]>([]);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
   const [push, setPush] = useState<[number, number]>([0, 0]);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple } = useTapFeedback();
   const t = useT();
   const stepByStep = settings.numbers === "step";
   const numbersOnly = settings.numbersOnly;
@@ -137,12 +136,12 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     [pack, say, sentenceFor, settings.sounds],
   );
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   // Cycle through the letter's words so repeated presses stay interesting.
@@ -287,9 +286,9 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         const next: Shown = { ...shown, id: nextId.current++, word: pickWord(shown.letter) };
         present(next, lastStage(next));
       }
-      funBurst(e.clientX, e.clientY);
+      softTap(e.clientX, e.clientY);
     },
-    [shown, present, pickWord, funBurst],
+    [shown, present, pickWord, softTap],
   );
 
   /** Make the card move once. */
@@ -298,7 +297,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   }, []);
 
   /**
-   * Keys that are not letters or numbers each do their own thing: Space jumps with confetti,
+   * Keys that are not letters or numbers each do their own thing: Space jumps with a few raindrops,
    * Enter honks or whistles, arrows push the card, Backspace brings back the one before.
    * Returns false for keys without a meaning of their own.
    */
@@ -308,7 +307,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       if (key === " ") {
         sound(playBoing);
         animateCard([{ transform: "none" }, { transform: "translateY(-18%) scale(1.06)" }, { transform: "none" }], 600);
-        for (let i = 0; i < CONFETTI_PIECES; i++) spawn(undefined, Math.random() * window.innerHeight * 0.6);
+        for (let i = 0; i < 3; i++) ripple();
         return true;
       }
       if (key === "Enter") {
@@ -333,7 +332,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       }
       return false;
     },
-    [present, spawn, animateCard, settings.sounds],
+    [present, ripple, animateCard, settings.sounds],
   );
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -345,7 +344,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       if (holdDigit && shown?.kind === "number" && stage === shown.n && isSame(target, shown)) {
         const now = performance.now();
         if (now - lastChange.current < MIN_CHANGE_MS || (settings.finishCounting && now < countingUntil.current)) {
-          funBurst();
+          softTap();
           return;
         }
         lastChange.current = now;
@@ -357,7 +356,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       const revealing = shown !== null && stage < lastStage(shown);
       const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
       if ((stepByStep || byTap(shown)) && shown && isNextKey) {
-        if (!tryAdvance()) funBurst();
+        if (!tryAdvance()) softTap();
         return;
       }
       if (!target && specialKey(key)) return;
@@ -365,13 +364,13 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       const now = performance.now();
       const counting = settings.finishCounting && now < countingUntil.current;
       if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
-        funBurst();
+        softTap();
         return;
       }
       lastChange.current = now;
       show(target);
     },
-    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, funBurst, byTap, specialKey, stepByStep, settings.finishCounting],
+    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, softTap, byTap, specialKey, stepByStep, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -394,12 +393,12 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   }, []);
 
   // Step-by-step: any click reveals the next part. Otherwise tapping the card
-  // repeats what it says, and tapping elsewhere makes shapes. Counting by
+  // repeats what it says, and tapping elsewhere makes ripples. Counting by
   // tapping: only the things count; once all are counted, any click brings new ones.
   const onPlayAreaPointer = (e: PointerEvent) => {
     const waitingForTaps = shown?.kind === "number" && byTap(shown) && stage <= shown.n;
     if ((stepByStep || byTap(shown)) && shown && !waitingForTaps && tryAdvance()) return;
-    funBurst(e.clientX, e.clientY);
+    softTap(e.clientX, e.clientY);
   };
   const onItemPointer = (index: number, e: PointerEvent) => {
     if (countItem(index)) e.stopPropagation();
@@ -408,7 +407,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     e.stopPropagation();
     const counting = settings.finishCounting && performance.now() < countingUntil.current;
     if (shown && !counting) say(sentenceFor(shown));
-    funBurst(e.clientX, e.clientY);
+    softTap(e.clientX, e.clientY);
   };
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
@@ -477,7 +476,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         </div>
       </div>
       {touchKeys && <TouchKeyboard rows={rows} onKey={pressKey} label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)} />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

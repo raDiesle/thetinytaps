@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
@@ -61,7 +61,7 @@ export function BoardScreen({
   const [fresh, setFresh] = useState<string | null>(null);
   const [undo, setUndo] = useState<{ key: string | null } | null>(null);
   const [party, setParty] = useState(false);
-  const { bursts, spawn } = useBursts();
+  const { effects, glow, celebrate } = useTapFeedback();
   const today = new Date();
   const stars = log[board.id];
 
@@ -159,14 +159,14 @@ export function BoardScreen({
     const target = document.querySelector(`[data-field="${CSS.escape(pending.field)}"]`)?.getBoundingClientRect();
     const x = target ? target.left + target.width / 2 : undefined;
     const y = target ? target.top + target.height / 2 : undefined;
-    spawn(x, y);
+    glow(x, y);
     const goalReached = before.count < before.goal && after.count >= after.goal;
     if (goalReached) {
       // The big party: the reward, or just the joy of it.
       setTimeout(() => {
         setParty(true);
         sound(playTusch);
-        for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 90);
+        celebrate();
         say(
           board.reward
             ? `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(board.reward)}`
@@ -183,7 +183,7 @@ export function BoardScreen({
       }, 500);
     } else if ((board.kind === "week" || board.kind === "month") && !wasFull && dayFull(board, next[board.id], linked, pending.day)) {
       // A day with all its stars: a small party right there.
-      for (let i = 0; i < 5; i++) setTimeout(() => spawn(x, y), 120 + i * 110);
+      setTimeout(() => celebrate({ at: { x: x ?? window.innerWidth / 2, y: y ?? window.innerHeight / 2 } }), 120);
       setTimeout(() => sound(playChime), 300);
       say(
         t({
@@ -289,7 +289,7 @@ export function BoardScreen({
           </span>
         </button>
       )}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

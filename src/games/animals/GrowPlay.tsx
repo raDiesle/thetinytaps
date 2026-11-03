@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -51,7 +51,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
   const busy = useRef(false);
   /** Bumped to make the small one hop when it is tapped to ask once more. */
   const [nudge, setNudge] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
   /** Wrong ones picked in this round, for the difficulty. */
   const misses = useRef(0);
   const youngRef = useRef<HTMLDivElement>(null);
@@ -77,12 +77,12 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
   // The question comes with the round; the round is mounted anew for every small one.
   useEffect(() => say(texts.whatBecomes(round.growth)), []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   const choose = (index: number) => {
@@ -120,7 +120,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
     say(texts.becomes(round.growth));
     onSolved(misses.current);
     later(FLIGHT_MS + GROW_MS - 900, () => {
-      for (let i = 0; i < 8; i++) spawn();
+      celebrate();
     });
     later(FLIGHT_MS + GROW_MS, onNext);
   };
@@ -144,7 +144,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.grown.length;
@@ -172,7 +172,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
   });
 
   return (
-    <div className="animals-play kind-grow" onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className="animals-play kind-grow" onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <div className="ap-top">
         <div ref={youngRef} className={`ap-young${nudge && !growing ? ` nudge-${nudge % 2}` : ""}`} data-tap onPointerDown={onYoungDown}>
           <GrowthPicture growth={round.growth} growing={growing} label={growing ? texts.adult(round.growth) : texts.young(round.growth)} />
@@ -210,7 +210,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
           })}
         </div>
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

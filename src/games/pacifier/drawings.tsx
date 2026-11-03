@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { STAR_PATH } from "@/components/Bursts";
+import { STAR_PATH } from "@/components/TapFeedback";
 
 // The drawings of „Die Schnullerfee“, each in its own small svg: the room is drawn once and stands still, everything
 // that moves or changes (pacifiers, box, balloon, lamp, Tapsi, Mama, the fairy, the present) is a layer of its own
