@@ -9,7 +9,23 @@
 import type { Localized } from "@/lib/language";
 import type { Beat, OopsSound } from "./story";
 
-export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry" | "bye" | "new" | "fall" | "stop";
+/** The kindergarten stories, and the stories of more feelings in selbst.ts that play the same way. */
+export type SituationId =
+  | "push"
+  | "kick"
+  | "grab"
+  | "slide"
+  | "want"
+  | "angry"
+  | "bye"
+  | "new"
+  | "fall"
+  | "stop"
+  | "cookie"
+  | "baby"
+  | "broccoli"
+  | "oops"
+  | "snow";
 
 /** The not-so-good idea next to a good step. */
 export interface KitaInstead {

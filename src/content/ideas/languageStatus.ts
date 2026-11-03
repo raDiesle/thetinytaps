@@ -159,6 +159,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
         note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
       },
+      {
+        label: "Mehr Gefühle",
+        languages: { de: "done" },
+        note: "Neu und nur Deutsch (3. November 2026): fünf Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt. Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
+      },
     ],
   },
   {
