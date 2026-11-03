@@ -34,7 +34,11 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
   for the child's tap. So far only the marble run uses it (barrier up, switch flips by itself); a level that gets
   something else that waits for a tap should follow it too.
 - `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, en, zh, hi, es, ar, ru }`, written next to its moment;
-  `MarblePlay` speaks it through `spokenIn`: the app language with its voice, or the German line with the German voice where a translation is missing. Never pass a bare German string.
+  `MarblePlay` plays its ElevenLabs recording (`voice.ts`, files in `stimme/`) in the app language, or the German line's where a translation is missing. Never pass a bare German string.
+  Recorded in German only so far (November 2026): the other languages stay silent until the user asks for their
+  recordings. A new or changed line is listed on `/management/` (`voiceLines.ts`: machine events and level intros are
+  read from the data, a line written inline in a level goes into `INLINE_LINES`, or it is never recorded) and recorded
+  with `bun run voice make --only kettenreaktion`, only when the user asks.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
   name the helper differently (`tr`, or call `useT()(…)` directly).
 - New lines come in German only (`{ de: "…" }`); translations are added only when the user asks. When you change a German

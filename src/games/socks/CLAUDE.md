@@ -31,8 +31,11 @@ Keys: arrows (and any other key) move a frame over the socks still on the floor 
 
 ## Languages
 
-The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 / मोज़ा / جورب), speech in `language.speechLang`. Arabic talks to the child with "let's" (هيّا نبحث), Hindi with commands, Spanish with tú: nothing that changes for a boy or a girl.
+The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 / मोज़ा / جورب). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only so far
+(November 2026): a sentence in another language stays silent until the user asks for its recordings, a German fallback
+sentence plays its German one. A new or changed sentence is listed by `src/content/recordedLines.ts` (`socken`) and recorded with
+`bun run voice make --only socken`, only when the user asks. Arabic talks to the child with "let's" (هيّا نبحث), Hindi with commands, Spanish with tú: nothing that changes for a boy or a girl.
 - Translations come only when the user asks. A new or changed German line comes German-only; add the Russian only on request. Gaps are marked in `src/content/ideas/languageStatus.ts`.
 - When a German line changes its meaning, delete its Russian in the same change (a stale translation is worse than German).
-- The translated texts are `Partial<SockTexts>`: a sentence they lack is said in German, and `say` gives a sentence without the language's own letters to the German voice (`voiceFor`).
+- The translated texts are `Partial<SockTexts>`: a sentence they lack is said in German, from its German recording.
 - A number with a word („3 Paare“) needs its form per language (Russian and Arabic with `Intl.PluralRules`) and a check in `socks.test.ts`; none is shown at the moment. The tests check that no sentence is empty and that Chinese, Hindi and Arabic have no Latin letters.
