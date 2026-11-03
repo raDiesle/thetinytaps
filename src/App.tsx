@@ -32,6 +32,7 @@ const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bild
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
 const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
+const WeaningPage = page(() => import("@/pages/WeaningPage"), "WeaningPage", "/abstillen/");
 
 export function App() {
   // Where each way back can step back in the history (goBack.ts).
@@ -49,6 +50,7 @@ export function App() {
         <Route path="bilder/:scene" element={<ScenePage />} />
         <Route path="zaehne" element={<TeethPage />} />
         <Route path="toepfchen" element={<PottyPage />} />
+        <Route path="abstillen" element={<WeaningPage />} />
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />

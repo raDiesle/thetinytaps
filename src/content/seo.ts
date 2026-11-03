@@ -183,6 +183,13 @@ export const SEO_PAGES: PageSeo[] = [
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Mit Bildkarten zum Ausdrucken.",
     text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
   },
+  {
+    path: "/abstillen/",
+    title: "Abstillen mit Geschichte – Tschüss, Mama-Milch",
+    description:
+      "Eine Bildgeschichte zum Abstillen für Kleinkinder: Tapsi der Fuchs sagt Tschüss zur Mama-Milch, ist traurig, kuschelt mit Mama und schläft ohne Stillen ein.",
+    text: "Eine Bildgeschichte zum Vorlesen, wenn das Stillen zu Ende geht: Tapsi der Fuchs war ein Baby und hat bei Mama getrunken, jetzt ist Tapsi groß, isst einen Apfel und trinkt aus dem Becher. Mama erzählt, dass die Mama-Milch bald alle ist, und Tapsi winkt ihr zum Abschied. Am Abend möchte Tapsi doch trinken und ist traurig – Mama ist ganz nah, nimmt Tapsi in den Arm, liest ein Buch vor und singt ein Schlaflied, bis Tapsi einschläft. Am Morgen sind Mama und Papa stolz. Jedes Tippen blättert eine Seite weiter, und der Satz jeder Seite steht klein darunter zum Vorlesen. Für sanftes Abstillen von Kleinkindern, ohne Druck und ohne Schimpfen.",
+  },
   scene("baustelle", "Baustelle", "Bagger, Kran und Betonmischer"),
   scene("stadt", "Stadt", "Bus, Ampel und Polizeiauto"),
   scene("bauernhof", "Bauernhof", "Kuh, Schwein und Traktor"),

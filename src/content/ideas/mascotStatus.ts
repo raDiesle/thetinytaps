@@ -59,6 +59,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
   },
   {
+    href: "/abstillen/",
+    note: "SVG. Tapsi mit Mama Fuchs durch die ganze Geschichte, am Morgen jubelt Papa Fuchs mit; ein Teddybär liegt im Bett und steht im Regal.",
+    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "drawing", effort: "M", state: "done" }],
+  },
+  {
     href: "/bilder/",
     note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es nur als Tiere im Wald und im Winter.",
     tasks: [

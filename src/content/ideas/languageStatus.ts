@@ -94,6 +94,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
+    href: "/abstillen/",
+    note: "Neu und nur Deutsch (3. November 2026): die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ (WeaningPlay.tsx); noch ohne Aufnahme (🎙️ Stimmen).",
+    languages: { de: "done" },
+  },
+  {
     href: "/bilder/",
     note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
     parts: [

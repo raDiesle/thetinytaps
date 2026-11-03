@@ -121,6 +121,12 @@ export const CATEGORIES: Category[] = [
           ru: "Таблица наград и расписание в картинках",
         },
       },
+      {
+        href: "/abstillen/",
+        emoji: "🤱",
+        title: { de: "Abstillen" },
+        blurb: { de: "Tschüss, Mama-Milch – eine Geschichte" },
+      },
     ],
   },
   {

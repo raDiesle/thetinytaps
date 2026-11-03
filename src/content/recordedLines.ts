@@ -12,6 +12,7 @@ import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
 import { type Step, STEP_TRANSLATIONS, STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { STEPS as STEPS_WEANING } from "@/games/weaning/content";
 
 /** How a line is said: the recording script puts an audio tag for it in front. */
 export type RecordedKind = "instruction" | "praise" | "calm";
@@ -72,6 +73,10 @@ function elevator(language: TargetLanguageId): RecordedLine[] {
   );
 }
 
+function weaning(language: TargetLanguageId): RecordedLine[] {
+  return once(STEPS_WEANING.map((step) => step.line[language] !== undefined && { text: step.line[language]!, kind: "calm" as const }));
+}
+
 function goodNight(language: TargetLanguageId): RecordedLine[] {
   const text = GOOD_NIGHT[language];
   return text ? [{ text, kind: "calm" }] : [];
@@ -82,6 +87,7 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "zaehne", folder: "src/games/teeth/stimme", lines: teeth },
   { name: "kleine-abenteuer", folder: "src/games/elevator/stimme", lines: elevator },
   { name: "gute-nacht", folder: "src/components/stimme", lines: goodNight },
+  { name: "abstillen", folder: "src/games/weaning/stimme", lines: weaning },
 ];
 
 /** The languages these games are recorded in: the app's. */

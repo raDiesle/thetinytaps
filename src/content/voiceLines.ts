@@ -44,10 +44,12 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
 import teethFiles from "../games/teeth/stimme/*.mp3?glob";
+import weaningFiles from "../games/weaning/stimme/*.mp3?glob";
 
 /** Lines of one kind in a game, each once. */
 export interface VoiceGroup {
@@ -283,6 +285,10 @@ function teeth(): VoiceGroup[] {
   ];
 }
 
+function weaning(): VoiceGroup[] {
+  return [{ label: "Seiten der Geschichte", lines: once(WEANING_LINES) }];
+}
+
 function potty(): VoiceGroup[] {
   const texts = POTTY_TEXTS.de;
   const name = TAPSI.name.de;
@@ -320,7 +326,7 @@ function rewards(): VoiceGroup[] {
 
 /** The German recordings of the games in src/content/recordedLines.ts, by file name (the hash of the line). */
 const RECORDED = new Set(
-  [goodNightFiles, elevatorFiles, teethFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
+  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
 );
 
 /** The games and groups of `games` with only the lines that have no German recording yet. */
@@ -348,6 +354,7 @@ export function voiceLines(): VoiceGame[] {
     { href: "/kettenreaktion/", groups: marbles() },
     { href: "/zaehne/", groups: teeth() },
     { href: "/toepfchen/", groups: potty() },
+    { href: "/abstillen/", groups: weaning() },
     { href: "/socken/", groups: socks() },
     { href: "/belohnungstafel/", groups: rewards() },
     {

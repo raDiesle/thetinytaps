@@ -114,6 +114,7 @@ export const SCENARIOS: Scenario[] = [
   },
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "abstillen", path: "/abstillen/", parts: [{ label: "Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Wie geht's dir?", before: [START, { wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },

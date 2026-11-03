@@ -387,5 +387,16 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "Ratgeber zu Bildfahrplänen raten, den Plan zusammen durchzugehen; Zweijährige können nicht lesen, aber zuhören und zeigen.",
       effort: "S",
     },
+    {
+      id: "H-44",
+      emoji: "🤱",
+      title: "Abstillen: Tschüss, Mama-Milch",
+      text: "Eine Bildgeschichte zum gemeinsamen Anschauen: Tapsi war ein Baby und hat bei Mama getrunken, jetzt ist Tapsi groß, isst und trinkt aus dem Becher. Mama sagt, dass die Mama-Milch bald alle ist, und Tapsi winkt ihr Tschüss. Am Abend möchte Tapsi doch trinken und ist traurig – Mama ist da, kuschelt, liest vor und singt, bis Tapsi einschläft. Am Morgen sind alle stolz.",
+      why: "Eltern suchen „abstillen kleinkind“, „abstillen geschichte“, „abstillen buch kind“ und „nachts abstillen 2 jahre“. Was vorher erzählt wird, macht den Abschied leichter; traurig sein darf dazugehören.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als „Abstillen“ (/abstillen/): dreizehn SVG-Seiten mit Tapsi, Mama und Papa Fuchs, jedes Tippen blättert weiter, der Satz jeder Seite steht klein zum Vorlesen darunter. Offen: Aufnahmen der Sätze (ElevenLabs), Übersetzungen, eine Fassung nur fürs nächtliche Abstillen („Die Milch schläft nachts“).",
+    },
   ],
 };

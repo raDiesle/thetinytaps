@@ -103,6 +103,12 @@ export const SEO_EN: SeoTranslation = {
         "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. With picture cards to print.",
       text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board. On the same page: a reward chart to collect stars.",
     },
+    "/abstillen/": {
+      title: "Weaning Story for Toddlers – Bye-bye, Mommy's Milk",
+      description:
+        "A picture story for weaning toddlers: Tapsi the fox says goodbye to mommy's milk, feels sad, cuddles with mom and falls asleep without nursing.",
+      text: "A picture story to read aloud when breastfeeding comes to an end: Tapsi the fox was a baby and drank at mom's, now Tapsi is big, eats an apple and drinks from a cup. Mom tells Tapsi that her milk will soon be all gone, and Tapsi waves it goodbye. In the evening Tapsi still wants to nurse and is sad – mom stays close, holds Tapsi tight, reads a book and sings a lullaby until Tapsi falls asleep. In the morning mom and dad are proud. Every tap turns a page, and each page's sentence stands small below the picture for reading aloud. For gentle weaning of toddlers, without pressure or scolding.",
+    },
     "/bilder/baustelle/": scene("Construction Site", "excavator, crane and cement mixer"),
     "/bilder/stadt/": scene("City", "bus, traffic light and police car"),
     "/bilder/bauernhof/": scene("Farm", "cow, pig and tractor"),
