@@ -40,6 +40,25 @@
   animation: none;
 }
 
+/* The fox or bear family beside the buttons (D-12, `CheeringFamily`), as tall as a button. Upright the buttons alone
+   fill the width. */
+.game-end-family {
+  flex-shrink: 0;
+  align-self: flex-end;
+  height: clamp(90px, 30vh, 170px);
+}
+
+/* The buttons make room for it, so the row still fits a tablet's width. */
+.game-end:has(.game-end-family) .game-end-button {
+  min-width: clamp(130px, 20vw, 230px);
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .game-end-family {
+    display: none;
+  }
+}
+
 /* Small in the bottom corners (`corners`): „Menü“ left, the others right, the picture free between them. */
 .game-end.corners {
   left: max(12px, env(safe-area-inset-left));

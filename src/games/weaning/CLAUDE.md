@@ -12,7 +12,7 @@ and plays at once (`GameShell` `startMode`); ✕ and „Menü“ go back to the 
   y 90–820). One room (`Room`, built once per sky) with window, shelf, lamp, rug, chair and bed; Mama sits in the chair
   and the child lies or sits between her body and her arms (`Mama`'s children); `Figures` picks what stands where per page.
 - `WeaningPlay.tsx`: one page per tap or key (← and Backspace back, ◀ for the grown-up), each page's sounds (`SOUNDS`)
-  and its sentence (`recordedVoice`, silent until recorded), confetti on the morning, `GameEnd` small in the corners on the
+  and its sentence (`recordedVoice`, silent until recorded), hearts, stars and notes rising on the morning, `GameEnd` small in the corners on the
   last page (one story, so only „Menü“ and „Nochmal“).
 - `weaning.css`: classes `wn-`; every animation runs a few times as its page begins and then stands still.
 

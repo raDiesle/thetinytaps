@@ -1,4 +1,5 @@
 import { memo, type CSSProperties, type ReactNode } from "react";
+import { Mascot } from "@/components/Mascot";
 
 // Everything is drawn on a stage of STAGE_W × STAGE_H that covers the screen (`.tm-stage`): what matters stays within
 // x 200–1400 (cut off at 4:3) and y 80–820 (cut off on a phone on its side). What moves is an HTML layer of its own
@@ -51,58 +52,7 @@ function Draw({ w, h, children }: { w: number; h: number; children: ReactNode })
 // ---------------------------------------------------------------------------------------------------------------
 // The fox and the bear family: a grown-up and a child, standing still while they wait and waving at the end.
 
-/** A fox or a bear standing and facing us, 200 × 300, feet at the bottom; its right arm waves when its layer cheers. */
-export function Mascot({ kind, child = false }: { kind: "fox" | "bear"; child?: boolean }) {
-  const fox = kind === "fox";
-  const fur = fox ? "#f08c3a" : "#a0663a";
-  const light = fox ? "#fff8ef" : "#e3b98a";
-  const dark = fox ? "#7a3510" : "#6b3f1d";
-  return (
-    <svg viewBox="0 0 200 300">
-      {fox && <path d="M140 250 C200 250 200 170 172 150 C186 190 168 228 136 226 Z" fill={fur} stroke={INK} strokeWidth="4" strokeLinejoin="round" />}
-      {fox && <path d="M172 150 C186 172 184 196 176 210 C170 196 168 172 172 150 Z" fill="#fff" />}
-      <ellipse cx="78" cy="286" rx="22" ry="13" fill={dark} stroke={INK} strokeWidth="4" />
-      <ellipse cx="122" cy="286" rx="22" ry="13" fill={dark} stroke={INK} strokeWidth="4" />
-      <ellipse cx="100" cy="212" rx="56" ry="72" fill={fur} stroke={INK} strokeWidth="5" />
-      <ellipse cx="100" cy="224" rx="33" ry="48" fill={light} />
-      {child && <path d="M64 160 Q100 182 136 160 L132 176 Q100 196 68 176 Z" fill={kind === "fox" ? "#4dabf7" : "#ffd43b"} stroke={INK} strokeWidth="3" />}
-      {/* The arm that hangs: the left one, as we see it. */}
-      <path d="M56 178 Q40 210 46 240" stroke={INK} strokeWidth="24" fill="none" strokeLinecap="round" />
-      <path d="M56 178 Q40 210 46 240" stroke={fur} strokeWidth="16" fill="none" strokeLinecap="round" />
-      <g className="tm-arm">
-        <path d="M144 178 Q160 210 154 240" stroke={INK} strokeWidth="24" fill="none" strokeLinecap="round" />
-        <path d="M144 178 Q160 210 154 240" stroke={fur} strokeWidth="16" fill="none" strokeLinecap="round" />
-      </g>
-      <g transform="translate(40 40) scale(1.2)">
-        {fox ? (
-          <>
-            <path d="M17 50 L21 9 L45 29 Z M83 50 L79 9 L55 29 Z" fill={fur} stroke={INK} strokeWidth="3.4" strokeLinejoin="round" />
-            <path d="M24 39 L26 18 L38 30 Z M76 39 L74 18 L62 30 Z" fill={INK} />
-            <path d="M13 52 C13 31 31 24 50 24 C69 24 87 31 87 52 C87 72 69 90 50 92 C31 90 13 72 13 52 Z" fill={fur} stroke={INK} strokeWidth="3.4" />
-            <path d="M21 61 C33 58 44 63 50 73 C56 63 67 58 79 61 C75 78 63 90 50 92 C37 90 25 78 21 61 Z" fill="#fff" />
-          </>
-        ) : (
-          <>
-            <circle cx="22" cy="32" r="12" fill={fur} stroke={INK} strokeWidth="3.4" />
-            <circle cx="78" cy="32" r="12" fill={fur} stroke={INK} strokeWidth="3.4" />
-            <circle cx="22" cy="32" r="6" fill={light} />
-            <circle cx="78" cy="32" r="6" fill={light} />
-            <circle cx="50" cy="57" r="35" fill={fur} stroke={INK} strokeWidth="3.4" />
-            <ellipse cx="50" cy="71" rx="16" ry="12" fill={light} />
-          </>
-        )}
-        <circle cx="27" cy="67" r="5" fill="#ff8fa3" opacity="0.6" />
-        <circle cx="73" cy="67" r="5" fill="#ff8fa3" opacity="0.6" />
-        <circle cx="37" cy="53" r="4.6" fill={INK} />
-        <circle cx="63" cy="53" r="4.6" fill={INK} />
-        <ellipse cx="50" cy={fox ? 72 : 66} rx="5.4" ry="3.8" fill={INK} />
-        <path d={fox ? "M50 76 V79 M45 81 Q50 84 55 81" : "M50 70 V73 M44 75 Q50 79 56 75"} stroke={INK} strokeWidth="2.4" fill="none" strokeLinecap="round" />
-      </g>
-    </svg>
-  );
-}
-
-/** A grown-up with its child beside it, standing on `floor`; the whole family cheers with `.tm-cheer` on the stage. */
+/** A grown-up with its child beside it, standing on `floor`; the whole family cheers with `.tm-done` on the stage. */
 export function Family({ kind, x, floor, childLeft = false }: { kind: "fox" | "bear"; x: number; floor: number; childLeft?: boolean }) {
   const grown = { w: 190, h: 285 };
   const small = { w: 120, h: 180 };

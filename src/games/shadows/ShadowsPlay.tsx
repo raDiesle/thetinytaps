@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -92,7 +92,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const busy = useRef(false);
   /** Bumped to make the picture hop again, e.g. "drag me" when tapping isn't enough. */
   const [nudge, setNudge] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
 
   const nextId = useRef(0);
   const pictureRef = useRef<HTMLSpanElement>(null);
@@ -154,12 +154,12 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
   useEffect(() => nextRound(), []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   /** The child picked shadow `index`; `from` is how far the dragged picture already is from its place. */
@@ -210,7 +210,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     }
     say(texts.found(round.item));
     later(700, () => {
-      for (let i = 0; i < 8; i++) spawn();
+      celebrate();
     });
     later(CELEBRATE_MS, nextRound);
   };
@@ -322,7 +322,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || !round || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.shadows.length;
@@ -360,7 +360,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       className="shadows-play"
       onPointerDown={(e) => {
         setThemesOpen(false);
-        funBurst(e.clientX, e.clientY);
+        softTap(e.clientX, e.clientY);
       }}
     >
       <div className="sh-top">
@@ -459,7 +459,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
           )}
         </div>
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

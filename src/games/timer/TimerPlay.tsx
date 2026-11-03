@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { DEV } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
@@ -72,7 +72,7 @@ function TimerRun({
   const [endsAt] = useState(() => Date.now() + total);
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple } = useTapFeedback();
   useWakeLock(phase === "running");
 
   // The end: checked at least every second, and again whenever the page comes back (timers sleep in the background).
@@ -112,17 +112,17 @@ function TimerRun({
     }
   }, [phase, picture]);
 
-  /** A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and colourful shapes where it was. */
+  /** A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and soft ripples where it was. */
   const answer = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       setPoke((n) => n + 1);
       if (phase !== "running") return playTwinkle();
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
-    [phase, picture, spawn],
+    [phase, picture, ripple],
   );
 
   useEffect(() => {
@@ -169,9 +169,14 @@ function TimerRun({
           </>
         )}
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
       {phase === "done" && (
-        <GameEnd delayMs={END_MS} onAgain={onAgain} next={nextInfo && { emoji: nextInfo.emoji, name: t(nextInfo.name), onNext: () => onPicture(next) }} />
+        <GameEnd
+          delayMs={END_MS}
+          noFamily
+          onAgain={onAgain}
+          next={nextInfo && { emoji: nextInfo.emoji, name: t(nextInfo.name), onNext: () => onPicture(next) }}
+        />
       )}
     </div>
   );

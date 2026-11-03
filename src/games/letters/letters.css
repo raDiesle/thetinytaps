@@ -345,32 +345,6 @@
   animation: waiting 1.8s ease-in-out infinite;
 }
 
-.burst-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.burst {
-  position: absolute;
-  animation: burst var(--lifetime) ease-out forwards;
-}
-
-@keyframes burst {
-  0% {
-    opacity: 0;
-    transform: scale(0.2) rotate(0);
-  }
-  20% {
-    opacity: 1;
-    transform: scale(1.15) rotate(var(--rotate));
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-120px) scale(0.9) rotate(calc(var(--rotate) * 2));
-  }
-}
-
 /*
  * Phones on their side (Frei tippen, Zählen): letter, picture and word – or the things and their digit – side by side,
  * so each gets the height the on-screen keys leave, instead of three small ones stacked.

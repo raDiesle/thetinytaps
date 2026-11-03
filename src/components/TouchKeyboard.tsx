@@ -1,7 +1,7 @@
 import type { CSSProperties, PointerEvent } from "react";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
-import { BRIGHT_COLORS } from "./Bursts";
+import { BRIGHT_COLORS } from "./TapFeedback";
 import { Choice, SettingsGroup } from "./SettingControls";
 
 /** Show big keys on the screen: only on touch devices without mouse or trackpad ("auto"), always, or never. */

@@ -1,5 +1,5 @@
 import { useRef, type RefObject } from "react";
-import { STAR_PATH } from "@/components/Bursts";
+import { STAR_PATH } from "@/components/TapFeedback";
 import { useT } from "@/lib/language";
 import { playPuff, playRecorded, playSplash, playTwinkle } from "@/lib/sfx";
 import type { Cue } from "./cues";

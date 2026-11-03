@@ -1,4 +1,4 @@
-import { STAR_PATH } from "@/components/Bursts";
+import { STAR_PATH } from "@/components/TapFeedback";
 import { INK } from "./mouth";
 
 /**

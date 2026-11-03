@@ -37,7 +37,7 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
   side, not stacked: the on-screen keys leave little height, and stacked they would be tiny (`letters.css`, end).
 - One right key is all a round of „Wo ist das B?“ and „Wörter tippen“ takes: after a short celebration (`CELEBRATE_MS`)
   the next letter comes by itself (in „Wo ist das B?“), never waiting for another key or tap. Keys and taps during the
-  celebration only make shapes and sounds.
+  celebration only make ripples and sounds.
 
 ## Languages
 
