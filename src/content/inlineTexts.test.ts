@@ -16,6 +16,7 @@ const FOLDERS: Record<string, string[]> = {
   "/kettenreaktion/": ["src/games/marbles"],
   "/kleine-abenteuer/": ["src/games/elevator"],
   "/tiere/": ["src/games/animals"],
+  "/zusammen/": ["src/games/together"],
   "/schatten/": ["src/games/shadows"],
   "/socken/": ["src/games/socks"],
   "/buchstaben/": ["src/games/letters"],

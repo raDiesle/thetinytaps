@@ -139,6 +139,13 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Wer schaut da aus dem Busch? Der Hase will eine Möhre, die Kuh gibt uns Milch, der Hund sucht seine Hütte, aus der Raupe wird ein Schmetterling: Tier erkennen, Futter, Milch, Ei oder Zuhause antippen, das Tier freut sich und macht sein Geräusch. Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
+    path: "/zusammen/",
+    title: "Was gehört zusammen? – Zuordnen für Kleinkinder",
+    description:
+      "Zahnbürste und Zahnpasta, Schlüssel und Tür, die Feuerwehr und ihr Schlauch: Kleinkinder finden, was zusammengehört, und sehen es gleich wirken. Ohne Werbung.",
+    text: "Oben liegt die Zahnbürste, unten Zahnpasta, Schlüssel und Deckel: Das Kind tippt, was dazugehört, und die beiden legen los – die Zahnpasta drückt einen Klecks auf die Bürste, der Schlüssel dreht sich und die Tür geht auf. Dazwischen brauchen Helfer als Fuchs und Bär ihr Werkzeug: Die Feuerwehr löscht mit dem Schlauch, die Ärztin hört mit dem Hörrohr, die Friseurin schneidet mit der Schere. Das Spiel wird von selbst leichter oder schwerer.",
+  },
+  {
     path: "/schatten/",
     title: "Schatten finden – Zuordnungsspiel für Kinder",
     description: "Welcher Schatten gehört zur Giraffe? Ein Bild sucht seinen Schatten unter zwei bis sechs – erstes Zuordnen für Kleinkinder, ohne Werbung.",

@@ -184,6 +184,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026).",
   },
   {
+    href: "/zusammen/",
+    languages: { de: "done" },
+    note: "Neu (November 2026): nur auf Deutsch – die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase und die Einstellungen beim Spielen. Gesprochen wird noch nichts; die Sätze warten auf ihre Aufnahme.",
+  },
+  {
     href: "/schatten/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
