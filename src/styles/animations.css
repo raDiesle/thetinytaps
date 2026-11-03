@@ -66,3 +66,36 @@
     transform: translateX(0.06em);
   }
 }
+
+/* The fox or bear family cheering (`CheeringFamily`, src/components/Mascot.tsx): the child jumps twice beside its
+   grown-up, then both stand still. Its box sets the height; each figure is a small layer of its own. */
+.mascot-family {
+  display: inline-flex;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.mascot-family > span {
+  display: block;
+  height: 100%;
+  aspect-ratio: 2 / 3;
+  will-change: transform;
+}
+
+.mascot-family > .mascot-child {
+  height: 66%;
+  margin-left: -8%;
+  animation: mascot-jump 0.55s ease-out 0.35s 2;
+}
+
+.mascot-family svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes mascot-jump {
+  45% {
+    transform: translateY(-28%);
+  }
+}

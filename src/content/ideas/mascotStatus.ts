@@ -45,7 +45,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
       { label: "Tapsi putzt klein in der Ecke mit, Mama, Papa, Oma oder Opa Fuchs putzt nach", work: "drawing", effort: "M" },
-      { label: "Tapsi und sein Großer jubeln bei Medaille und Wochenplan", work: "drawing", effort: "S" },
+      {
+        label: "Tapsi und sein Großer jubeln bei Medaille und Wochenplan",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Am Ende neben Wochenplan und Knöpfen: Tapsi springt mit hochgerissenen Armen, Mama oder Papa Fuchs winkt (CheeringFamily).",
+      },
     ],
   },
   {
@@ -106,11 +112,23 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/kettenreaktion/",
-    note: "SVG. Ein 🦊 schaut schon auf der Schneebahn hervor.",
+    note: "SVG. Aus dem Tunnel schauen 🦊 und 🐻 auf der Kugelbahn und der Baustellenbahn, 🦊 und 🐻‍❄️ auf der Schneebahn; Bagger, Walze und Kran fahren ein Fuchs und zwei Bären, und die Zirkuspuppe ist ein Fuchs im Clownskostüm.",
     tasks: [
-      { label: "🦊 statt 👷 auf der Baustellenbahn, 🦊 bei den Gucker-Tieren jeder Bahn", work: "drawing", effort: "S", state: "partial" },
-      { label: "Fahrer der Baumaschinen werden Füchse oder Bären", work: "drawing", effort: "S" },
-      { label: "Die Clownpuppe im Zirkus wird eine Fuchs- oder Bärenpuppe", work: "drawing", effort: "S" },
+      {
+        label: "🦊 statt 👷 auf der Baustellenbahn, 🦊 bei den Gucker-Tieren jeder Bahn",
+        work: "drawing",
+        effort: "S",
+        state: "partial",
+        note: "Kugelbahn, Baustellen- und Schneebahn haben Fuchs und Bär; Weltraum (Außerirdische) und Wasserrutsche (Wassertiere) bleiben bei ihren Tieren.",
+      },
+      {
+        label: "Fahrer der Baumaschinen werden Füchse oder Bären",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "CabDriver in scenery.tsx, auch für weitere Fahrzeuge.",
+      },
+      { label: "Die Clownpuppe im Zirkus wird eine Fuchs- oder Bärenpuppe", work: "drawing", effort: "S", state: "done" },
     ],
   },
   {
@@ -163,7 +181,12 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/schatten/",
     note: "Emoji, Verstecke als SVG.",
     tasks: [
-      { label: "🦊 und 🐻 bei den Tieren", work: "drawing", effort: "S" },
+      {
+        label: "🦊 und 🐻 bei den Tieren",
+        work: "drawing",
+        effort: "S",
+        note: "Offen: 🦊 und 🐻 sind als Emoji nur Köpfe, Schatten finden nimmt aber ganze Körper (ein Kopf ist ein runder Fleck). Bräuchte eine eigene Zeichnung statt Emoji.",
+      },
       { label: "Fuchs- oder Bärenkind schaut bei „Wer schaut da raus?“ aus dem Busch, sein Großer winkt daneben", work: "drawing", effort: "S" },
     ],
   },
@@ -172,7 +195,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG: Waschmaschine, Socken, Handschuhe, Gummistiefel, Hausschuhe, Klammern, Korb.",
     tasks: [
       { label: "Hausschuhe mit Bärenkopf in der neuen Wäsche (Z-10)", work: "drawing", effort: "S", state: "done" },
-      { label: "Socken mit Fuchs- und Bärenmuster", work: "drawing", effort: "S" },
+      {
+        label: "Socken mit Fuchs- und Bärenmuster",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Zwei neue Muster mit Gesichtern (Augen und Nase), damit kein Fuchskopf wie ein Herz aussieht; in einer Wäsche nur Füchse oder Bären, nie beide.",
+      },
       { label: "Tapsi schaut aus dem Wäschekorb, Mama, Papa, Oma oder Opa Fuchs hängt lachend Wäsche auf", work: "drawing", effort: "M" },
     ],
   },
@@ -187,7 +216,14 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [
       { label: "Titel „Books for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
       { label: "Startseite als Wald mit Fuchsbau und Bärenhöhle, Fuchs oder Bär mit seinem Kind in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
-      { label: "Fuchs- oder Bärenkind und sein Großer klatschen am Ende jedes Spiels (GameEnd)", work: "drawing", effort: "S", idea: "D-12" },
+      {
+        label: "Fuchs- oder Bärenkind und sein Großer klatschen am Ende jedes Spiels (GameEnd)",
+        work: "drawing",
+        effort: "S",
+        idea: "D-12",
+        state: "done",
+        note: "CheeringFamily (components/Mascot.tsx) neben „Menü“, „Nochmal“, „Weiter“; das Kind springt zweimal, dann steht alles still. Nicht bei `corners` und beim Timer (`noFamily`), deren Bild die Familie schon zeigt.",
+      },
       { label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)", work: "picture", pictures: 4, effort: "S", idea: "D-21" },
     ],
   },

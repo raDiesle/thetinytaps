@@ -70,6 +70,9 @@ stand still, so nothing moves before the child acts.
   picture again in every frame, and the marble run and the machines stuttered on phones (November 2026).
   `camera.test.ts` checks every level; `bun run perf kugelbahn maschine` measures the camera following.
 - Each machine has its own world: never reuse an element of another machine.
+- Who drives or stands in a machine is one of the app's mascots, a fox or a bear (root `CLAUDE.md`): the Baustelle's
+  excavator, roller and crane have `CabDriver` (`scenery.tsx`, a head under a hard hat) at the wheel, the circus doll is
+  a fox in a clown's suit, and 🦊 and 🐻 look out of the tunnels. A new driver takes `CabDriver` rather than a person.
 - A machine runs about 35–45 s. It grows by new links, each set off visibly by the one before and setting off the next
   with a sound, never by stretching old moves or adding pauses; its test checks the new moments, hits and the length.
 - The still 👆 (`TapHint`) and whatever the child taps stay well inside the 1600 × 900 picture: `y` is the emoji's

@@ -16,6 +16,12 @@ Keys: arrows (and any other key) move a frame over the socks still on the floor 
 
 ## Rules
 
+- Every pattern is told apart from every other at a phone's size, as each wash may put any two side by side in one
+  colour (`sameColor`). A pattern of shapes gets something only it has: the fox and bear heads (`foxes`, `bears`, the
+  app's mascots) have eyes and a nose, since a fox's head alone looked like the hearts; and the fox and bear faces, too
+  alike on a small sock, never come in one wash (`dealPairs`, checked in `socks.test.ts`). A new pattern is looked at
+  next to the others at 844×390.
+
 - The game runs on by itself: no start screen before it, no tap to start the machine, no `GameEnd` between washes – the user asked for one flowing game. Leaving is only by ✕ (or Esc held).
 - Harder means harder to match (more pairs, more alike, more under baskets), never quicker: no clock, nothing that speeds up (the hops and the tumbling once got quicker with the child's runs – the user didn't want that). Time only lets a quick, sure wash skip a step; a slow, sure child still climbs.
 - A miss never shows or sounds as one; it only feeds `nextLevel` and ends the run of rising notes.

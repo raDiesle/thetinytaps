@@ -382,6 +382,10 @@ In a fresh worktree run `bun install` first.
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big. Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
+  Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
+  `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
+  already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
+  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own.
 
 ## Architecture
 

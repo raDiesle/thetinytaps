@@ -1,5 +1,6 @@
 import { useEffect, useState, type PointerEvent, type ReactNode } from "react";
 import { useCountsPlaytime, useLeaveGame } from "@/components/GameShell";
+import { CheeringFamily, type MascotKind } from "@/components/Mascot";
 import { useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded } from "@/lib/playtime";
@@ -19,17 +20,25 @@ interface GameEndProps {
    * the user's choice there); taps between them reach the game.
    */
   corners?: boolean;
+  /**
+   * Leaves out the fox or bear family cheering beside the buttons, where the end picture shows its own (the Timer's).
+   * In `corners` it is always left out: the picture there is the point.
+   */
+  noFamily?: boolean;
 }
 
 /**
  * The end of a level: three big buttons, back to the game's start screen
- * („Menü“), play it again („Nochmal“) or go on to the next („Weiter“, only where there is another).
+ * („Menü“), play it again („Nochmal“) or go on to the next („Weiter“, only where there is another),
+ * and beside them a fox or bear child jumping for joy with its grown-up waving (D-12).
  */
-export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEndProps) {
+export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false }: GameEndProps) {
   const t = useT();
   const leave = useLeaveGame();
   const counts = useCountsPlaytime();
   const [shown, setShown] = useState(delayMs <= 0);
+  // Fox or bear, by chance at every end, so a child meets both.
+  const [kind] = useState<MascotKind>(() => (Math.random() < 0.5 ? "fox" : "bear"));
 
   useEffect(() => {
     if (shown) return;
@@ -55,6 +64,7 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEnd
 
   return (
     <div className={`game-end${corners ? " corners" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
+      {!corners && !noFamily && <CheeringFamily kind={kind} className="game-end-family" />}
       {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
       <button type="button" className="game-end-button menu" onClick={leave}>
         <span className="game-end-emoji" aria-hidden>

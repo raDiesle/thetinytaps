@@ -1808,7 +1808,7 @@ export const WOODEN: TrackTheme = {
     ar: "السلة ممتلئة!",
     ru: "Корзина полна!",
   },
-  peekers: ["🐭", "🐸", "🐰", "🐱", "🐻", "🐥"],
+  peekers: ["🐭", "🐸", "🐰", "🦊", "🐻", "🐥"],
   magic: true,
   End: WoodenEnd,
 };

@@ -110,6 +110,8 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-12",
+      partial:
+        "Am Ende jedes Levels (GameEnd) jubelt jetzt ein Fuchs- oder Bärenkind mit hochgerissenen Armen neben den Knöpfen, sein Großer winkt daneben – mal Fuchs, mal Bär. Nicht in Spielen, deren Schlussbild die Familie schon zeigt (Timer, Töpfchen, Schnullerfee, Abstillen). Das „Ende“ in Schreibschrift fehlt noch.",
       emoji: "🎉",
       title: "Ende einer Geschichte wie eine letzte Seite",
       text: "Prüfung, was noch nicht zum Buch passt: Am Ende eines Levels steht statt Konfetti über dem Bild ein „Ende“ in Schreibschrift mit einem kleinen Bild der Tierfamilie, die klatscht; „Menü“, „Nochmal“ und „Weiter“ liegen darunter wie Karten.",

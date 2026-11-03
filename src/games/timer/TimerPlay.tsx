@@ -171,7 +171,12 @@ function TimerRun({
       </div>
       <BurstLayer bursts={bursts} />
       {phase === "done" && (
-        <GameEnd delayMs={END_MS} onAgain={onAgain} next={nextInfo && { emoji: nextInfo.emoji, name: t(nextInfo.name), onNext: () => onPicture(next) }} />
+        <GameEnd
+          delayMs={END_MS}
+          noFamily
+          onAgain={onAgain}
+          next={nextInfo && { emoji: nextInfo.emoji, name: t(nextInfo.name), onNext: () => onPicture(next) }}
+        />
       )}
     </div>
   );
