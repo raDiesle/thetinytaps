@@ -88,6 +88,7 @@ export const matchingIdeas: IdeaArea = {
       text: "Socken-Paare bekommt neue Wäsche: Handschuhe, Gummistiefel, Hausschuhe. Ein Paar sind ein linker und ein rechter, die sich spiegeln. Auf späteren Stufen liegen beide Handschuhe eines Musters da, aber nur gespiegelt gehören sie zusammen.",
       why: "Links und rechts zum ersten Mal sehen – genau wie beim Anziehen morgens.",
       effort: "M",
+      done: true,
     },
     {
       id: "Z-11",
