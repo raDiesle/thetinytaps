@@ -41,7 +41,7 @@ function sources(path: string): string[] {
     .filter((f) => !GERMAN_ONLY.test(f));
 }
 
-/** A literal text with a `de` key in a source file: where it starts and the keys next to it. */
+/** A literal text (or a function building one, `de: (n) => …`) with a `de` key in a source file: where it starts and the keys next to it. */
 interface InlineText {
   line: number;
   german: string;
@@ -49,7 +49,7 @@ interface InlineText {
 }
 
 /**
- * The object literals of `code` whose `de` is a string or template literal, with their own keys. A small scanner
+ * The object literals of `code` whose `de` is a string, a template literal or an arrow function, with their own keys. A small scanner
  * rather than a parser: it skips strings, templates and comments, and counts `key:` at the top level of each `{}`.
  */
 function inlineTexts(code: string): InlineText[] {
@@ -100,7 +100,7 @@ function inlineTexts(code: string): InlineText[] {
       const frame = stack[stack.length - 1];
       frame.keys.push(word);
       const value = code.slice(i + 1).trimStart();
-      if (word === "de" && /^["'`]/.test(value)) frame.german = value.slice(0, 60);
+      if (word === "de" && /^(["'`]|\([^()]*\)\s*=>|[\w$]+\s*=>)/.test(value)) frame.german = value.slice(0, 60);
       word = "";
       i++;
     } else {
@@ -129,10 +129,14 @@ describe("inline texts against the language status", () => {
 
   test("the scanner finds texts and their languages", () => {
     // biome-ignore lint/suspicious/noTemplateCurlyInString: the sample is source code with a template literal in it
-    const found = inlineTexts('t({ de: `A ${b.c}`, en: "B" }); x = { de: "Hallo", ru: \'Привет\' }; type L = { de: T };');
+    const found = inlineTexts(
+      't({ de: `A ${b.c}`, en: "B" }); x = { de: "Hallo", ru: \'Привет\' }; y = { de: (n) => `${n}-mal`, en: (n) => n }; z = { de: n => n }; type L = { de: T };',
+    );
     expect(found.map((f) => [f.german.slice(0, 3), f.keys])).toEqual([
       ["`A ", ["de", "en"]],
       ['"Ha', ["de", "ru"]],
+      ["(n)", ["de", "en"]],
+      ["n =", ["de"]],
     ]);
   });
 

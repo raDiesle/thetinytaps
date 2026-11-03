@@ -157,7 +157,7 @@ export function Schiff() {
       {/* The bridge at the front, with the captain */}
       <path d="M-120 -134 H-80 V-92 H-128 Z" fill="#f8f9fa" />
       <Pane x={-118} y={-128} w={34} h={26} rx={5}>
-        <Rider cx={-101} cy={-112} shirt="#1d3557" cap="#fff" />
+        <Rider animal="bear" cx={-101} cy={-112} shirt="#1d3557" cap="#fff" />
       </Pane>
       <g className="sd-schiff-arm" style={{ transformOrigin: "-120px -104px" }}>
         <path d="M-120 -104 L-138 -128" stroke="#1d3557" strokeWidth="8" strokeLinecap="round" />

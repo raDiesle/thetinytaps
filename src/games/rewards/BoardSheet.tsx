@@ -184,7 +184,11 @@ export function BoardSheet({
       </div>
       {board.kind !== "collect" && (board.reward || goal <= MAX_DOTS || editing) && (
         <footer className="rw-goal" data-edit={editing ? "reward" : undefined}>
-          {editing && !board.reward && <span className="rw-reward rw-reward-add">＋ {t({ de: "Belohnung" })}</span>}
+          {editing && !board.reward && (
+            <span className="rw-reward rw-reward-add">
+              ＋ {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
+            </span>
+          )}
           {board.reward && (
             <span className="rw-reward">
               {editing && <RewardActions />}
@@ -231,7 +235,13 @@ function EditTasks({ board }: { board: Board }) {
         </span>
       ))}
       {board.tasks.length < MAX_TASKS && (
-        <span className="rw-edit-task rw-edit-add" data-edit="add" role="button" tabIndex={0} aria-label={t({ de: "Aufgabe dazu" })}>
+        <span
+          className="rw-edit-task rw-edit-add"
+          data-edit="add"
+          role="button"
+          tabIndex={0}
+          aria-label={t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })}
+        >
           ＋
         </span>
       )}

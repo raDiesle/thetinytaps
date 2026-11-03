@@ -50,8 +50,32 @@ export function RewardActions() {
   const t = useT();
   return (
     <>
-      <SheetAction act="configure" ask={t({ de: "Belohnung ändern" })} data={{ "data-edit": "reward" }} />
-      <SheetAction act="delete" ask={t({ de: "Belohnung löschen?" })} data={{ "data-edit": "no-reward" }} />
+      <SheetAction
+        act="configure"
+        ask={t({
+          de: "Belohnung ändern",
+          en: "Change reward",
+          zh: "修改奖励",
+          hi: "इनाम बदलें",
+          es: "Cambiar premio",
+          ar: "تغيير المكافأة",
+          ru: "Изменить награду",
+        })}
+        data={{ "data-edit": "reward" }}
+      />
+      <SheetAction
+        act="delete"
+        ask={t({
+          de: "Belohnung löschen?",
+          en: "Delete reward?",
+          zh: "删除奖励？",
+          hi: "इनाम मिटाएँ?",
+          es: "¿Borrar el premio?",
+          ar: "حذف المكافأة؟",
+          ru: "Удалить награду?",
+        })}
+        data={{ "data-edit": "no-reward" }}
+      />
     </>
   );
 }

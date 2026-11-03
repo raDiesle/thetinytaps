@@ -71,7 +71,7 @@ export function Feuerwehrauto() {
       <path d={TRUCK_CAB} fill={GLASS} />
       <Inside d={TRUCK_CAB}>
         <g className="fw-truck-driver">
-          <Rider cx={168} cy={-146} shirt={NAVY} cap={STRIPE} />
+          <Rider animal="bear" cx={168} cy={-146} shirt={NAVY} cap={STRIPE} />
         </g>
       </Inside>
       <path d="M180 -172 h8 L172 -132 h-8 Z" fill="#fff" opacity="0.5" />
@@ -146,7 +146,7 @@ export function Krankenwagen() {
       <path d={AMBU_CAB} fill={GLASS} />
       <Inside d={AMBU_CAB}>
         <g className="fw-ambu-driver">
-          <Rider cx={122} cy={-128} shirt="#e63946" cap="#e63946" />
+          <Rider animal="fox" cx={122} cy={-128} shirt="#e63946" cap="#e63946" />
         </g>
       </Inside>
       <path d="M136 -156 h8 L128 -116 h-8 Z" fill="#fff" opacity="0.5" />

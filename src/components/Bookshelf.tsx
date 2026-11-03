@@ -309,10 +309,30 @@ function DailyGroup({
       {carving && (
         <span className="shelf-carving" data-short={carving.short || undefined}>
           {/* Kept whole, so a narrow carving never breaks it. */}
-          <span className="shelf-carving-big">{t({ de: "Für\u00a0Groß\u00a0&\u00a0Klein" })}</span>
+          <span className="shelf-carving-big">
+            {t({
+              de: "Für\u00a0Groß\u00a0&\u00a0Klein",
+              ru: "Для\u00a0всей\u00a0семьи",
+              en: "For\u00a0Big\u00a0&\u00a0Little",
+              zh: "给大人和孩子",
+              hi: "बड़ों\u00a0और\u00a0छोटों\u00a0के\u00a0लिए",
+              es: "Grandes\u00a0y\u00a0chicos",
+              ar: "للكبار\u00a0والصغار",
+            })}
+          </span>
           {!carving.short && (
             <>
-              <span>{t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag." })}</span>
+              <span>
+                {t({
+                  de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag.",
+                  ru: "Первый шаг в цифровой мир вместе – развивающие игры и помощники на каждый день.",
+                  en: "The first step into the digital world, taken together – with learning games and little helpers for the day.",
+                  zh: "一起迈向数字世界的第一步——有益智游戏，也有日常小帮手。",
+                  hi: "डिजिटल दुनिया में साथ मिलकर पहला क़दम – सीखने वाले खेलों और दिन भर के छोटे मददगारों के साथ।",
+                  es: "El primer paso juntos al mundo digital, con juegos para aprender y pequeños ayudantes para el día.",
+                  ar: "الخطوة الأولى معًا إلى العالم الرقمي – مع ألعاب تعليمية ومساعدين صغار لكل يوم.",
+                })}
+              </span>
             </>
           )}
           <RoomNotes />
@@ -344,7 +364,15 @@ function Slipcase({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfB
 const STICKERS_ROOM = 0.45;
 
 /** The name of the picture books' group (the everyday helpers' is their category's, `DailyGroup`). */
-const LEARNING: Localized = { de: "Lernspiele" };
+const LEARNING: Localized = {
+  de: "Lernspiele",
+  ru: "Развивающие игры",
+  en: "Learning Games",
+  zh: "益智游戏",
+  hi: "सीखने के खेल",
+  es: "Juegos para aprender",
+  ar: "ألعاب تعليمية",
+};
 
 /**
  * The name on a wooden sign under a compartment's books: „Lernspiele“ where all the picture books stand together on

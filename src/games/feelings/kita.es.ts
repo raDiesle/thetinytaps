@@ -292,4 +292,140 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     outro: [{ narration: "¡Muy bien! Alto quiere decir alto. Y luego juegan a algo que les guste a los dos." }],
     endCaption: "Osito y Zorrito chocan los cinco",
   },
+  // The stories of more feelings (selbst.ts), played like the kindergarten's.
+  cookie: {
+    title: "Desilusión, la galleta se rompió",
+    caption: "La galleta se rompió, Osito está triste",
+    intro: [{ narration: "Osito y Zorrito comen galletas." }, { narration: "¡Crac! La galleta de Osito se parte en dos. ¡Qué desilusión!" }],
+    steps: [
+      {
+        caption: "Apretar el peluche",
+        question: "La galleta se rompió y Osito está triste. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito aprieta muy fuerte su peluche.", line: "Estoy triste." }],
+        instead: { caption: "Tirar el vaso", answer: "Mmm, ahora la leche cayó sobre Zorrito. Mejor aprieta muy fuerte tu peluche." },
+      },
+      {
+        caption: "Mostrar las dos mitades",
+        question: "Osito todavía está un poquito triste. ¿Qué puede hacer él?",
+        beats: [{ narration: "Mira las mitades. ¡Una, dos!", line: "¡Ahora tengo dos galletas!" }],
+        instead: { caption: "Hacer migas la galleta", answer: "Mmm, ahora la galleta ya no está. Mejor mira: ¡ahora tienes dos!" },
+      },
+      {
+        caption: "Compartir con Zorrito",
+        question: "Zorrito ya no tiene galleta. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le da una mitad a Zorrito.", line: "¡Para ti!" }, { line: "¡Gracias, Osito!" }],
+        instead: { caption: "Sacar la lengua", answer: "Mmm, ahora Zorrito está triste. Mejor comparte con él." },
+      },
+    ],
+    outro: [{ narration: "¡Genial! Estar triste está bien. Apretar el peluche, mirar de otra forma, compartir." }],
+    endCaption: "Osito y Zorrito comen una mitad cada uno",
+  },
+  baby: {
+    title: "Celos del bebé",
+    caption: "El oso grande abraza al bebé, Osito tiene celos",
+    intro: [{ narration: "El oso grande abraza al bebé oso." }, { narration: "Osito mira. ¡Él también quiere! Tiene celos." }],
+    steps: [
+      {
+        caption: "Decir «¡Yo también quiero un abrazo!»",
+        question: "El oso grande abraza al bebé. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito dice:", line: "¡Yo también quiero un abrazo!" }, { line: "¡Ven aquí! Aquí hay lugar para ti." }],
+        instead: { caption: "Pegarle al bebé", answer: "Mmm, pegar duele. Mejor di: ¡Yo también quiero un abrazo!" },
+      },
+      {
+        caption: "Traer un pañal",
+        question: "El bebé necesita un pañal limpio. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito trae un pañal por su cuenta.", line: "¡Aquí está!" }, { line: "¡Gracias! Me ayudas mucho." }],
+        instead: { caption: "Quitarle la sonaja", answer: "Mmm, es la sonaja del bebé. Ahora llora. Mejor trae un pañal." },
+      },
+      {
+        caption: "Cantarle al bebé",
+        question: "El bebé tiene sueño. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le canta una canción al bebé." }, { narration: "El bebé se ríe. Y el oso grande abraza a los dos." }],
+        instead: { caption: "Tocar fuerte el tambor", answer: "Mmm, con tanto ruido el bebé llora. Mejor cántale una canción." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decir lo que necesitas, ayudar, cantar. Ahora se abrazan los tres." }],
+    endCaption: "El oso grande abraza a los dos",
+  },
+  broccoli: {
+    title: "Puaj, brócoli",
+    caption: "Brócoli en el plato, a Osito no le gusta",
+    intro: [{ narration: "Osito, Zorrito y el oso grande comen juntos." }, { narration: "En el plato hay brócoli. ¡Puaj! A Osito no le gusta." }],
+    steps: [
+      {
+        caption: "Decir «No, gracias»",
+        question: "A Osito no le gusta el brócoli. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito dice:", line: "No, gracias. No me gusta." }, { line: "Está bien. No tienes que comerlo." }],
+        instead: { caption: "Tirar el plato al piso", answer: "Mmm, ahora el plato está roto. Mejor di: No, gracias." },
+      },
+      {
+        caption: "Olerlo primero",
+        question: "El brócoli sigue ahí. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito lo huele con mucho cuidado. Snif, snif." }, { line: "Mmm. Huele como un arbolito." }],
+        instead: { caption: "Escupir en la mesa", answer: "Mmm, escupir le da asco a todos. Mejor huélelo primero." },
+      },
+      {
+        caption: "Ponerlo a un lado",
+        question: "Hoy Osito no quiere comérselo. ¿Qué puede hacer él?",
+        beats: [{ narration: "Pone el brócoli en la orilla del plato.", line: "Tal vez otro día." }, { narration: "Y se come sus papas." }],
+        instead: { caption: "Tirarle brócoli a Zorrito", answer: "Mmm, ahora Zorrito está todo sucio. Mejor ponlo a un lado." },
+      },
+    ],
+    outro: [{ narration: "¡Muy bien! Decir no, gracias, olerlo, ponerlo a un lado. A nadie le tiene que gustar todo." }],
+    endCaption: "Osito come papas, el brócoli a un lado",
+  },
+  oops: {
+    title: "Ups, se hizo pipí",
+    caption: "Un charquito, a Osito le da vergüenza",
+    intro: [{ narration: "Osito juega en la guardería." }, { narration: "¡Ups! Se hizo pipí en los pantalones. Le da vergüenza." }],
+    steps: [
+      {
+        caption: "Decirle a la maestra",
+        question: "Los pantalones están mojados. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito va con la maestra.", line: "¡Ups! Mis pantalones están mojados." }, { line: "No pasa nada. A todos nos pasa alguna vez." }],
+        instead: { caption: "Seguir jugando sin cambiarse", answer: "Mmm, con los pantalones mojados le da frío. Mejor dile a la maestra." },
+      },
+      {
+        caption: "Traer pantalones limpios",
+        question: "Osito necesita pantalones secos. ¿Qué puede hacer él?",
+        beats: [{ narration: "Saca unos pantalones limpios de su casillero por su cuenta." }, { line: "¡Muy bien, eso ya lo puedes hacer tú!" }],
+        instead: { caption: "Esparcir el charco", answer: "Mmm, ahora todo el piso está mojado y resbaloso. Mejor trae pantalones secos." },
+      },
+      {
+        caption: "Guardar los pantalones mojados",
+        question: "Ya no tiene puestos los pantalones mojados. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Mete los pantalones mojados en la bolsa. ¡Listo!" }],
+        instead: { caption: "Tirar los pantalones al rincón", answer: "Mmm, ahí se quedan tirados y mojados. Mejor mételos en la bolsa." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decirlo, cambiarse, guardarlos. Un ups no es nada grave." }],
+    endCaption: "Osito juega otra vez con pantalones limpios",
+  },
+  snow: {
+    title: "Emoción, está nevando",
+    caption: "La primera nieve, ¡qué emoción para Osito!",
+    intro: [{ narration: "Osito mira por la ventana." }, { narration: "¡Está nevando! ¡La primera nieve! Osito siente mucha emoción." }],
+    steps: [
+      {
+        caption: "Gritar de alegría",
+        question: "¡Está nevando! Osito siente mucha emoción. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito grita de alegría muy fuerte:", line: "¡Yupi! ¡Nieve!" }],
+        instead: { caption: "Brincar en el sillón", answer: "Mmm, ahora se cayó la lámpara. Mejor grita de alegría muy fuerte: ¡Yupi!" },
+      },
+      {
+        caption: "Ponerse botas y chaqueta",
+        question: "Osito quiere salir a la nieve. ¿Qué puede hacer él?",
+        beats: [{ narration: "Primero se pone las botas y la chaqueta por su cuenta.", line: "¡Ya! ¡Ven conmigo afuera!" }, { line: "¡Ya voy!" }],
+        instead: { caption: "Salir corriendo en pijama", answer: "Mmm, en pijama afuera hace muchísimo frío. Mejor ponte las botas y la chaqueta." },
+      },
+      {
+        caption: "Hacer un ángel de nieve",
+        question: "Afuera hay nieve. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Se acuesta en la nieve y hace un ángel de nieve." }],
+        instead: { caption: "Tirar una bola de nieve a la cara", answer: "Mmm, en la cara duele. Mejor haz un ángel de nieve." },
+      },
+    ],
+    outro: [{ narration: "¡Yupi! Gritar de alegría, vestirse, ángel de nieve. La alegría puede ser enorme." }],
+    endCaption: "Osito y el oso grande hacen un muñeco de nieve",
+  },
 };

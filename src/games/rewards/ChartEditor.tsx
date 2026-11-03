@@ -155,7 +155,7 @@ type Editing =
   | { what: "big-day" };
 
 /** „Zeitraum“: what time the chart covers. */
-const SPAN: Localized = { de: "Zeitraum" };
+const SPAN: Localized = { de: "Zeitraum", en: "Time span", zh: "时间范围", hi: "समय-अवधि", es: "Periodo", ar: "المدة", ru: "Период" };
 
 /** The chart itself of a draft: what changes when anything on it changes (the draft around it is made anew on every render). */
 const chartOf = (draft: Draft): Board | Plan => (draft.type === "board" ? draft.board : draft.plan);
@@ -326,7 +326,18 @@ export function ChartEditor({
 
   return (
     <div className="rw-chart-editor">
-      <section className="rw-options-band" aria-label={t({ de: "Art der Tafel und Einstellungen" })}>
+      <section
+        className="rw-options-band"
+        aria-label={t({
+          de: "Art der Tafel und Einstellungen",
+          en: "Kind of chart and settings",
+          zh: "表的类型和设置",
+          hi: "चार्ट का प्रकार और सेटिंग",
+          es: "Tipo de tabla y ajustes",
+          ar: "نوع اللوحة والإعدادات",
+          ru: "Вид таблицы и настройки",
+        })}
+      >
         {spans.length > 0 && (
           <div className="rw-spans" role="group" aria-label={t(SPAN)}>
             <span className="rw-band-label">{t(SPAN)}</span>
@@ -352,13 +363,31 @@ export function ChartEditor({
             </span>
             {t({
               de: "Wechseln Sie hier frei zwischen Tag, Woche, Monat, Countdown, Erst – Dann und Sammeln, und stellen Sie darunter alles ein. Auch später lässt sich alles ändern.",
+              en: "Switch freely here between Day, Week, Month, Countdown, First – Then and Collect, and set everything up below. You can change it all later, too.",
+              zh: "在这里可以随意切换日、周、月、倒数、先 – 然后和收集，并在下面设置一切。以后也都可以修改。",
+              hi: "यहाँ आप दिन, हफ़्ता, महीना, उलटी गिनती, पहले – फिर और जमा करना के बीच आसानी से बदल सकते हैं, और नीचे सब कुछ सेट कर सकते हैं। बाद में भी सब कुछ बदला जा सकता है।",
+              es: "Cambie aquí libremente entre Día, Semana, Mes, Cuenta atrás, Primero – Después y Juntar, y ajuste todo debajo. Más adelante también se puede cambiar todo.",
+              ar: "بدّلوا هنا بحرية بين يوم وأسبوع وشهر والعدّ التنازلي وأولًا – ثم وجمع، واضبطوا كل شيء في الأسفل. ويمكن تغيير كل شيء لاحقًا أيضًا.",
+              ru: "Здесь можно свободно переключаться между видами «День», «Неделя», «Месяц», «Обратный отсчёт», «Сначала – потом» и «Копилка», а ниже всё настроить. Позже всё тоже можно изменить.",
             })}
           </p>
         )}
         <div className="rw-options">
           {/* Only where nothing counts: with star fields the stars show what is done, and nothing moves. */}
           {plan?.view === "day" && !counts && (
-            <span className="rw-opt-segments" role="group" aria-label={t({ de: "Was wandert?" })}>
+            <span
+              className="rw-opt-segments"
+              role="group"
+              aria-label={t({
+                de: "Was wandert?",
+                en: "What moves along?",
+                zh: "移动的是什么？",
+                hi: "क्या आगे बढ़ता है?",
+                es: "¿Qué se mueve?",
+                ar: "ما الذي يتحرّك؟",
+                ru: "Что передвигается?",
+              })}
+            >
               {NOW_WAYS.map((way) => (
                 <button
                   key={way.emoji}
@@ -378,7 +407,11 @@ export function ChartEditor({
               ))}
             </span>
           )}
-          <span className="rw-opt-group rw-swatches" role="group" aria-label={t({ de: "Farben" })}>
+          <span
+            className="rw-opt-group rw-swatches"
+            role="group"
+            aria-label={t({ de: "Farben", en: "Colours", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" })}
+          >
             {THEMES.map((theme) => {
               const on = (draft.type === "board" ? draft.board.theme : draft.plan.theme) === theme.id;
               return (
@@ -408,7 +441,7 @@ export function ChartEditor({
             maxLength={24}
             aria-label={t(CHILD_NAME)}
             title={t(CHILD_NAME)}
-            placeholder={`👧 ${t({ de: "Name des Kindes" })}`}
+            placeholder={`👧 ${t({ de: "Name des Kindes", en: "Child’s name", zh: "孩子的名字", hi: "बच्चे का नाम", es: "Nombre", ar: "اسم الطفل", ru: "Имя ребёнка" })}`}
             onChange={(e) =>
               onChange(
                 draft.type === "board"
@@ -426,13 +459,53 @@ export function ChartEditor({
             ✏️
           </span>
           <span>
-            <strong>{t({ de: "Direkt auf der Tafel ändern:" })}</strong>{" "}
-            {t({ de: "Tippen Sie auf Karten, Sterne und Belohnung. So wie Sie die Tafel hier sehen, wird sie auch gedruckt." })}
+            <strong>
+              {t({
+                de: "Direkt auf der Tafel ändern:",
+                en: "Change it right on the chart:",
+                zh: "直接在表上修改：",
+                hi: "सीधे चार्ट पर बदलें:",
+                es: "Cambie directamente en la tabla:",
+                ar: "عدّلوا مباشرة على اللوحة:",
+                ru: "Меняйте прямо в таблице:",
+              })}
+            </strong>{" "}
+            {t({
+              de: "Tippen Sie auf Karten, Sterne und Belohnung. So wie Sie die Tafel hier sehen, wird sie auch gedruckt.",
+              en: "Tap cards, stars and the reward. The chart prints just as you see it here.",
+              zh: "点按卡片、星星和奖励。您在这里看到的样子，就是打印出来的样子。",
+              hi: "कार्ड, सितारों और इनाम पर टैप करें। चार्ट जैसा यहाँ दिखता है, वैसा ही प्रिंट होता है।",
+              es: "Toque las tarjetas, las estrellas y el premio. La tabla se imprime tal como la ve aquí.",
+              ar: "انقروا على البطاقات والنجوم والمكافأة. تُطبع اللوحة تمامًا كما ترونها هنا.",
+              ru: "Нажимайте на карточки, звёзды и награду. Таблица напечатается такой, какой вы видите её здесь.",
+            })}
           </span>
         </p>
-        <span className="rw-history" role="group" aria-label={t({ de: "Rückgängig und Wiederholen" })}>
-          <UndoButton sign="↶" label={t({ de: "Rückgängig" })} on={canUndo} onClick={back} />
-          <UndoButton sign="↷" label={t({ de: "Wiederholen" })} on={canRedo} onClick={forward} />
+        <span
+          className="rw-history"
+          role="group"
+          aria-label={t({
+            de: "Rückgängig und Wiederholen",
+            en: "Undo and redo",
+            zh: "撤销和重做",
+            hi: "पहले जैसा करें और फिर से करें",
+            es: "Deshacer y rehacer",
+            ar: "تراجع وإعادة",
+            ru: "Отменить и повторить",
+          })}
+        >
+          <UndoButton
+            sign="↶"
+            label={t({ de: "Rückgängig", en: "Undo", zh: "撤销", hi: "पहले जैसा करें", es: "Deshacer", ar: "تراجع", ru: "Отменить" })}
+            on={canUndo}
+            onClick={back}
+          />
+          <UndoButton
+            sign="↷"
+            label={t({ de: "Wiederholen", en: "Redo", zh: "重做", hi: "फिर से करें", es: "Rehacer", ar: "إعادة", ru: "Повторить" })}
+            on={canRedo}
+            onClick={forward}
+          />
         </span>
       </div>
 
@@ -467,7 +540,17 @@ export function ChartEditor({
 
       {more && (
         <details className="rw-more">
-          <summary>{t({ de: "Weitere Einstellungen" })}</summary>
+          <summary>
+            {t({
+              de: "Weitere Einstellungen",
+              en: "More settings",
+              zh: "更多设置",
+              hi: "और सेटिंग",
+              es: "Más ajustes",
+              ar: "إعدادات أخرى",
+              ru: "Другие настройки",
+            })}
+          </summary>
           {more}
         </details>
       )}
@@ -600,11 +683,21 @@ function Counter({
     <span className="rw-opt-counter" role="group" aria-label={label} title={label}>
       {emoji && <span aria-hidden>{emoji}</span>}
       {(wide || !emoji) && <span className="rw-opt-name">{label}</span>}
-      <button type="button" disabled={value <= min} aria-label={t({ de: "Weniger" })} onClick={() => onChange(value - 1)}>
+      <button
+        type="button"
+        disabled={value <= min}
+        aria-label={t({ de: "Weniger", en: "Fewer", zh: "减少", hi: "कम", es: "Menos", ar: "أقل", ru: "Меньше" })}
+        onClick={() => onChange(value - 1)}
+      >
         −
       </button>
       <span className="rw-opt-number">{value}</span>
-      <button type="button" disabled={value >= max} aria-label={t({ de: "Mehr" })} onClick={() => onChange(value + 1)}>
+      <button
+        type="button"
+        disabled={value >= max}
+        aria-label={t({ de: "Mehr", en: "More", zh: "增加", hi: "ज़्यादा", es: "Más", ar: "أكثر", ru: "Больше" })}
+        onClick={() => onChange(value + 1)}
+      >
         +
       </button>
     </span>
@@ -709,7 +802,7 @@ function CardDialog({
         <Counter
           emoji="⭐"
           wide
-          label={t({ de: "Sterne" })}
+          label={t({ de: "Sterne", en: "Stars", zh: "星星", hi: "सितारे", es: "Estrellas", ar: "النجوم", ru: "Звёзды" })}
           value={starsOf(step)}
           min={0}
           max={MAX_STARS}
@@ -717,10 +810,29 @@ function CardDialog({
         />
         {plan.view !== "week" && !every && (
           <Segments
-            label={t({ de: "Für welche Tage?" })}
+            label={t({
+              de: "Für welche Tage?",
+              en: "For which days?",
+              zh: "哪几天？",
+              hi: "किन दिनों के लिए?",
+              es: "¿Para qué días?",
+              ar: "لأيّ الأيام؟",
+              ru: "На какие дни?",
+            })}
             items={[
-              { id: "all", label: t({ de: "Jeden Tag" }) },
-              { id: "one", label: `${t({ de: "Nur" })} ${weekdayName}` },
+              { id: "all", label: t({ de: "Jeden Tag", en: "Every day", zh: "每天", hi: "हर दिन", es: "Todos los días", ar: "كل يوم", ru: "Каждый день" }) },
+              {
+                id: "one",
+                label: t({
+                  de: (d: string) => `Nur ${d}`,
+                  en: (d: string) => `Only ${d}`,
+                  zh: (d: string) => `仅${d}`,
+                  hi: (d: string) => `सिर्फ़ ${d}`,
+                  es: (d: string) => `Solo ${d}`,
+                  ar: (d: string) => `${d} فقط`,
+                  ru: (d: string) => `Только ${d}`,
+                })(weekdayName),
+              },
             ]}
             selected={onlyToday ? "one" : "all"}
             onPick={(id) => setOnlyToday(id === "one")}
@@ -742,10 +854,12 @@ function CardDialog({
             onClose();
           }}
         >
-          🗑️ {t({ de: "Entfernen" })}
+          🗑️ {t({ de: "Entfernen", en: "Remove", zh: "删除", hi: "हटाएँ", es: "Quitar", ar: "إزالة", ru: "Убрать" })}
         </button>
       </div>
-      <h4 className="rw-edit-sub">{t({ de: "Tauschen gegen" })}</h4>
+      <h4 className="rw-edit-sub">
+        {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
+      </h4>
       <CardPicks
         selected={step.catalog}
         onPick={(id) => {
@@ -793,7 +907,21 @@ function AddDialog({
       title={t({ de: "Karte dazu", en: "Add a card", zh: "添加卡片", hi: "कार्ड जोड़ें", es: "Añadir tarjeta", ar: "إضافة بطاقة", ru: "Добавить карточку" })}
       onClose={onClose}
     >
-      {steps.length >= stepLimit(steps) ? <p className="setting-note">{t({ de: "Mehr Karten passen nicht auf den Plan." })}</p> : <CardPicks onPick={add} />}
+      {steps.length >= stepLimit(steps) ? (
+        <p className="setting-note">
+          {t({
+            de: "Mehr Karten passen nicht auf den Plan.",
+            en: "No more cards fit on the plan.",
+            zh: "日程表上放不下更多卡片了。",
+            hi: "योजना में और कार्ड नहीं आ सकते।",
+            es: "No caben más tarjetas en el plan.",
+            ar: "لا تتسع الخطة لبطاقات أخرى.",
+            ru: "Больше карточек в план не поместится.",
+          })}
+        </p>
+      ) : (
+        <CardPicks onPick={add} />
+      )}
     </EditDialog>
   );
 }
@@ -830,7 +958,7 @@ function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan
       <div className="rw-edit-row">
         <label className="rw-opt-counter">
           <span aria-hidden>📅</span>
-          <span className="rw-opt-name">{t({ de: "Datum" })}</span>
+          <span className="rw-opt-name">{t({ de: "Datum", en: "Date", zh: "日期", hi: "तारीख़", es: "Fecha", ar: "التاريخ", ru: "Дата" })}</span>
           <input
             className="rw-big-day-date"
             type="date"
@@ -843,14 +971,32 @@ function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan
         <Counter
           emoji="🌙"
           wide
-          label={t({ de: "Noch so oft schlafen" })}
+          label={t({
+            de: "Noch so oft schlafen",
+            en: "Sleeps to go",
+            zh: "还要睡几觉",
+            hi: "कितनी बार और सोना है",
+            es: "Noches que faltan",
+            ar: "الليالي الباقية",
+            ru: "Сколько ещё спать",
+          })}
           value={moonsLeft(plan, today)}
           min={0}
           max={MAX_NIGHTS}
           onChange={(n) => on(dayKey(daysLater(today, n)))}
         />
       </div>
-      <h4 className="rw-edit-sub">{t({ de: "Bild für den Tag" })}</h4>
+      <h4 className="rw-edit-sub">
+        {t({
+          de: "Bild für den Tag",
+          en: "Picture for the day",
+          zh: "这一天的图片",
+          hi: "दिन के लिए तस्वीर",
+          es: "Imagen para el día",
+          ar: "صورة لهذا اليوم",
+          ru: "Картинка для этого дня",
+        })}
+      </h4>
       <CardPicks
         selected={step?.catalog}
         onPick={(id) => {
@@ -878,10 +1024,29 @@ function RewardDialog({ draft, day, onChange, onClose }: { draft: Draft; day: Da
           set: (n: number) => onChange({ type: "board", board: { ...draft.board, goal: n } }),
         };
   return (
-    <EditDialog title={reward ? rewardLabel(reward) : t({ de: "Belohnung" })} onClose={onClose}>
+    <EditDialog
+      title={reward ? rewardLabel(reward) : t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
+      onClose={onClose}
+    >
       <div className="rw-edit-row">
         {draft.type !== "board" || draft.board.kind !== "day" ? (
-          <Counter emoji="⭐" wide label={t({ de: "Sterne bis zur Belohnung" })} value={goal.value} min={1} max={Math.max(1, goal.max)} onChange={goal.set} />
+          <Counter
+            emoji="⭐"
+            wide
+            label={t({
+              de: "Sterne bis zur Belohnung",
+              en: "Stars to the reward",
+              zh: "得到奖励需要的星星",
+              hi: "इनाम तक सितारे",
+              es: "Estrellas hasta el premio",
+              ar: "النجوم حتى المكافأة",
+              ru: "Звёзд до награды",
+            })}
+            value={goal.value}
+            min={1}
+            max={Math.max(1, goal.max)}
+            onChange={goal.set}
+          />
         ) : null}
         {reward && (
           <button
@@ -892,7 +1057,7 @@ function RewardDialog({ draft, day, onChange, onClose }: { draft: Draft; day: Da
               onClose();
             }}
           >
-            🗑️ {t({ de: "Ohne Belohnung" })}
+            🗑️ {t({ de: "Ohne Belohnung", en: "No reward", zh: "不要奖励", hi: "बिना इनाम", es: "Sin premio", ar: "دون مكافأة", ru: "Без награды" })}
           </button>
         )}
       </div>
@@ -931,7 +1096,7 @@ function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId
             {taskLabel(task)}
           </>
         ) : (
-          t({ de: "Aufgabe dazu" })
+          t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })
         )
       }
       onClose={onClose}
@@ -950,12 +1115,16 @@ function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId
                 onClose();
               }}
             >
-              🗑️ {t({ de: "Entfernen" })}
+              🗑️ {t({ de: "Entfernen", en: "Remove", zh: "删除", hi: "हटाएँ", es: "Quitar", ar: "إزالة", ru: "Убрать" })}
             </button>
           )}
         </div>
       )}
-      {task && <h4 className="rw-edit-sub">{t({ de: "Tauschen gegen" })}</h4>}
+      {task && (
+        <h4 className="rw-edit-sub">
+          {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
+        </h4>
+      )}
       <div className="rw-picks rw-picks-tiles">
         {TASKS.map((item) => (
           <Pick

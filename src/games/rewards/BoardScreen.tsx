@@ -246,9 +246,20 @@ export function BoardScreen({
       {/* A line for grown-ups, never a tap a child sets off by chance: it only opens the panel. */}
       {!undo && suggestsCertificate(board, stars, linked, today) && (
         <div className="rw-example-note rw-cert-note">
-          <span>🏅 {t({ de: "Klappt es schon von selbst? Dann gibt es eine Urkunde." })}</span>
+          <span>
+            🏅{" "}
+            {t({
+              de: "Klappt es schon von selbst? Dann gibt es eine Urkunde.",
+              en: "Does it already work by itself? Then there’s a certificate.",
+              zh: "已经能自己做到了吗？那就发一张奖状吧。",
+              hi: "क्या यह अब अपने-आप होने लगा है? तो एक प्रमाण-पत्र बनता है।",
+              es: "¿Ya sale solo? Entonces toca un diploma.",
+              ar: "هل صار يتمّ من تلقاء نفسه؟ إذن هناك شهادة.",
+              ru: "Уже получается само? Тогда пора вручить грамоту.",
+            })}
+          </span>
           <button type="button" onClick={onCertificate}>
-            {t({ de: "Zur Urkunde" })}
+            {t({ de: "Zur Urkunde", en: "To the certificate", zh: "去看奖状", hi: "प्रमाण-पत्र देखें", es: "Ver el diploma", ar: "إلى الشهادة", ru: "К грамоте" })}
           </button>
         </div>
       )}

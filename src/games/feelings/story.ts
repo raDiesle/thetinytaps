@@ -1,7 +1,22 @@
 // What both parts of the feelings game are made of: short beats that are told
 // (or read aloud) while a big picture shows what happens.
 
-import { playAua, playBlow, playBoing, playChime, playCrash, playCry, playHum, playLaugh, playMelody, playPop, playRecorded, playRumble } from "@/lib/sfx";
+import {
+  playAua,
+  playBark,
+  playBlow,
+  playBoing,
+  playChime,
+  playCrash,
+  playCry,
+  playHum,
+  playLaugh,
+  playMelody,
+  playPop,
+  playRecorded,
+  playRumble,
+  playSplash,
+} from "@/lib/sfx";
 
 const recordings: string[] = [];
 
@@ -38,6 +53,10 @@ export const SOUNDS = {
   partyhorn: recorded("partyhorn", playPop),
   /** Breathing out slowly: blowing the fear or anger away. */
   breath: recorded("breath", playBlow),
+  /** A big dog barking. */
+  bark: recorded("bark", playBark),
+  /** Water splashing: rinsing in the bath. */
+  splash: recorded("splash", playSplash),
   /** The click of the light switch, then it is bright. */
   light: () => {
     playRecorded("switch", playPop);

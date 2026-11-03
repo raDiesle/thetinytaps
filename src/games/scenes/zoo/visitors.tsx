@@ -62,7 +62,7 @@ export function Bimmelbahn() {
         <rect x="58" y="-172" width="88" height="110" rx="10" fill="#d62839" />
         <Pane x={70} y={-160} w={64} h={46}>
           <g className="zo-bahn-driver" style={{ transformOrigin: "102px -110px" }}>
-            <Rider cx={102} cy={-136} shirt="#2a9d8f" cap="#2a9d8f" />
+            <Rider animal="bear" cx={102} cy={-136} shirt="#2a9d8f" cap="#2a9d8f" />
           </g>
         </Pane>
         <rect x="48" y="-188" width="108" height="18" rx="7" fill="#ffd60a" />
