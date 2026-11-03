@@ -127,7 +127,7 @@ export function Landefaehre() {
         <path d="M30 -246 H46 L72 -206 L62 -160 H44 Z" fill="#dee2e6" />
         <Pane x={-48} y={-232} w={36} h={30} rx={6}>
           <g className="wa-lander-pilot">
-            <Rider cx={-30} cy={-212} shirt={SUIT} />
+            <Rider animal="bear" cx={-30} cy={-212} shirt={SUIT} />
           </g>
         </Pane>
         <path d={hatch} fill="#343a40" />

@@ -46,12 +46,34 @@ export function MarbleGame() {
       level={
         // For all levels; so far only the marble run has something that waits for a tap (the barrier, K-02) or is set by the child (the switch, K-01).
         <Choice<MarbleSettings["play"]>
-          label={t({ de: "Schranke und Weiche" })}
+          label={t({
+            de: "Schranke und Weiche",
+            en: "Barrier and switch",
+            zh: "栏杆和道岔",
+            hi: "फाटक और कांटा",
+            es: "Barrera y desvío",
+            ar: "الحاجز والمحوّلة",
+            ru: "Шлагбаум и стрелка",
+          })}
           value={settings.play}
           onChange={(play) => update({ play })}
           options={[
-            { value: "join", label: t({ de: "👆 Kind tippt" }) },
-            { value: "watch", label: t({ de: "🔄 Von selbst" }) },
+            {
+              value: "join",
+              label: t({
+                de: "👆 Kind tippt",
+                en: "👆 Child taps",
+                zh: "👆 孩子来点",
+                hi: "👆 बच्चा छूता है",
+                es: "👆 Con un toque",
+                ar: "👆 الطفل ينقر",
+                ru: "👆 Нажимает ребёнок",
+              }),
+            },
+            {
+              value: "watch",
+              label: t({ de: "🔄 Von selbst", en: "🔄 By itself", zh: "🔄 自动", hi: "🔄 अपने-आप", es: "🔄 Automático", ar: "🔄 تلقائيًا", ru: "🔄 Само" }),
+            },
           ]}
         />
       }

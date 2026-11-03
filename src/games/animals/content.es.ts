@@ -1,4 +1,6 @@
-import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./content";
+import type { Gift, GiftId } from "./gifts";
+import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
 
 // Spanish texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in content.ts and
@@ -38,6 +40,7 @@ export const SPANISH_ANIMALS: Record<string, SpanishAnimal> = {
   schnecke: { name: "caracol", the: "el caracol" },
   loewe: { name: "león", the: "el león" },
   giraffe: { name: "jirafa", the: "la jirafa" },
+  schaf: { name: "ovejita", the: "la ovejita" },
 };
 
 /** A food in Spanish. */
@@ -123,5 +126,77 @@ export function spanishTexts(german: AnimalTexts): AnimalTexts {
   };
 }
 
+/** "de" with a word and its article: "del huevo", "de la vaca". */
+const fromThe = (the: string) => (the.startsWith("el ") ? `del ${the.slice(3)}` : `de ${the}`);
+
+/** A gift in Spanish. */
+export interface SpanishGift {
+  /** Lower case, without article, for screen readers: "huevo". */
+  name: string;
+  /** With its article, for "¡El huevo viene de la gallina!". */
+  the: string;
+  /** What the animal gives us, for "La gallina nos da huevos.". */
+  gives: string;
+}
+
+/** What the animals give us, by gift id ("Was gibt uns das Tier?"); one without an entry is said in German. */
+export const SPANISH_GIFTS: Partial<Record<GiftId, SpanishGift>> = {
+  milch: { name: "leche", the: "la leche", gives: "leche" },
+  ei: { name: "huevo", the: "el huevo", gives: "huevos" },
+  honig: { name: "miel", the: "la miel", gives: "miel" },
+  wolle: { name: "lana", the: "la lana", gives: "lana" },
+};
+
+/** "Was gibt uns das Tier?" in Spanish; what has no Spanish words yet is the whole German sentence. */
+export function spanishGifts(german: GiftTexts): GiftTexts {
+  const animal = (a: Animal) => SPANISH_ANIMALS[a.id];
+  const gift = (g: Gift) => SPANISH_GIFTS[g.id];
+  return {
+    gift: (g) => (gift(g) ? capital(gift(g)!.name) : german.gift(g)),
+    whatGives: (a) => (animal(a) ? `¿Qué nos da ${animal(a).the}?` : german.whatGives(a)),
+    gives: (a, g) => (animal(a) && gift(g) ? `${capital(animal(a).the)} nos da ${gift(g)!.gives}. ¡Gracias!` : german.gives(a, g)),
+    comesFrom: (g, giver) => (animal(giver) && gift(g) ? `¡${capital(gift(g)!.the)} viene ${fromThe(animal(giver).the)}!` : german.comesFrom(g, giver)),
+  };
+}
+
+/** A small one and what it becomes, in Spanish ("Was wird aus mir?"). */
+export interface SpanishGrowth {
+  /** The small one, lower case, without article: "oruga". */
+  young: string;
+  /** The small one with its article: "la oruga". */
+  theYoung: string;
+  /** What it becomes, lower case, without article: "mariposa". */
+  adult: string;
+  /** What it becomes with its article: "la mariposa". */
+  theAdult: string;
+  /** What it becomes with "un" or "una": "una mariposa". */
+  aAdult: string;
+}
+
+/** The small ones by their id; one without an entry is said in German. */
+export const SPANISH_GROWTHS: Partial<Record<GrowthId, SpanishGrowth>> = {
+  raupe: { young: "oruga", theYoung: "la oruga", adult: "mariposa", theAdult: "la mariposa", aAdult: "una mariposa" },
+  ei: { young: "huevo", theYoung: "el huevo", adult: "pollito", theAdult: "el pollito", aAdult: "un pollito" },
+  samen: { young: "semilla", theYoung: "la semilla", adult: "girasol", theAdult: "el girasol", aAdult: "un girasol" },
+  kaulquappe: { young: "renacuajo", theYoung: "el renacuajo", adult: "rana", theAdult: "la rana", aAdult: "una rana" },
+};
+
+/** "Was wird aus mir?" in Spanish; a small one without its Spanish words is the whole German sentence. */
+export function spanishGrowth(german: GrowTexts): GrowTexts {
+  const word = (g: Growth) => SPANISH_GROWTHS[g.id];
+  return {
+    young: (g) => (word(g) ? capital(word(g)!.young) : german.young(g)),
+    adult: (g) => (word(g) ? capital(word(g)!.adult) : german.adult(g)),
+    whatBecomes: (g) => (word(g) ? `¿En qué se convierte ${word(g)!.theYoung}?` : german.whatBecomes(g)),
+    becomes: (g) => (word(g) ? `${capital(word(g)!.theYoung)} se convierte en ${word(g)!.aAdult}. ¡Genial!` : german.becomes(g)),
+    comesFrom: (g) => (word(g) ? `¡${capital(word(g)!.theAdult)} sale ${fromThe(word(g)!.theYoung)}!` : german.comesFrom(g)),
+  };
+}
+
 /** Spanish, for the table of languages in content.ts. */
-export const SPANISH: AnimalTranslation = { words: { animals: SPANISH_ANIMALS, foods: SPANISH_FOODS, homes: SPANISH_HOMES }, texts: spanishTexts };
+export const SPANISH: AnimalTranslation = {
+  words: { animals: SPANISH_ANIMALS, foods: SPANISH_FOODS, homes: SPANISH_HOMES },
+  texts: spanishTexts,
+  gifts: spanishGifts,
+  growth: spanishGrowth,
+};

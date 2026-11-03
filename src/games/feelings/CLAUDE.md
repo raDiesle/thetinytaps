@@ -185,8 +185,8 @@ bear asks for a picture that is not in `bilder/`.
 
 The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic or Russian, chosen on the home
 page, `src/lib/language.ts`): start screen, captions and everything read aloud. The German data (`bear.ts`,
-`kita.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru) hold
-only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
+`kita.ts`, `selbst.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru;
+the stories of `selbst.ts` are in `kita.<lang>.ts` too, after the kindergarten's) hold only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
 `situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). Small texts
 (the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
 Everything said is played from its ElevenLabs recording (`useVoice` in `shared.tsx`, files in `stimme/`), recorded in

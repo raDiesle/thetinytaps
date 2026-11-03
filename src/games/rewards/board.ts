@@ -211,6 +211,12 @@ export const AUTO_TITLES: Record<TitleKind, Localized<(name: string) => string>>
   },
   planCountdown: {
     de: (n) => (n ? `Wie oft schläft ${n} noch?` : "Wie oft noch schlafen?"),
+    en: (n) => (n ? `How many more sleeps for ${n}?` : "How many more sleeps?"),
+    zh: (n) => `${n}还要睡几觉？`,
+    hi: (n) => (n ? `${n} को और कितनी बार सोना है?` : "और कितनी बार सोना है?"),
+    es: (n) => (n ? `¿Cuántas noches le faltan a ${n}?` : "¿Cuántas noches faltan?"),
+    ar: (n) => (n ? `كم نومة باقية لـ ${n}؟` : "كم نومة باقية؟"),
+    ru: (n) => (n ? `${n}: сколько ещё спать?` : "Сколько ещё спать?"),
   },
 };
 

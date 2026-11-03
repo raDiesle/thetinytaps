@@ -1,4 +1,6 @@
-import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./content";
+import type { Gift, GiftId } from "./gifts";
+import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
 
 // Arabic (Modern Standard, without vowel marks) texts for "Was gehört zum Tier?", by the ids of the animals, foods
@@ -38,6 +40,7 @@ export const ARABIC_ANIMALS: Record<string, ArabicAnimal> = {
   schnecke: { name: "حلزون" },
   loewe: { name: "أسد" },
   giraffe: { name: "زرافة", female: true },
+  schaf: { name: "خروف" },
 };
 
 /** A food in Arabic. */
@@ -116,5 +119,78 @@ export function arabicTexts(german: AnimalTexts): AnimalTexts {
   };
 }
 
+/** A gift in Arabic. */
+export interface ArabicGift {
+  /** Without article, for screen readers: "بيضة". */
+  name: string;
+  /** With article, one of it, for "البيضة من الدجاجة!". */
+  the: string;
+  /** With article, the kind of thing, for "الدجاجة تعطينا البيض.". */
+  gives: string;
+}
+
+/** What the animals give us, by gift id ("Was gibt uns das Tier?"); one without an entry is said in German. */
+export const ARABIC_GIFTS: Partial<Record<GiftId, ArabicGift>> = {
+  milch: { name: "حليب", the: "الحليب", gives: "الحليب" },
+  ei: { name: "بيضة", the: "البيضة", gives: "البيض" },
+  honig: { name: "عسل", the: "العسل", gives: "العسل" },
+  wolle: { name: "صوف", the: "الصوف", gives: "الصوف" },
+};
+
+/** "Was gibt uns das Tier?" in Arabic, the verb by the animal word's gender (يعطينا/تعطينا); what has no Arabic words yet is the whole German sentence. */
+export function arabicGifts(german: GiftTexts): GiftTexts {
+  const animal = (a: Animal) => ARABIC_ANIMALS[a.id];
+  const the = (a: Animal) => `ال${animal(a).name}`;
+  const gives = (a: Animal) => (animal(a).female ? "تعطينا" : "يعطينا");
+  const gift = (g: Gift) => ARABIC_GIFTS[g.id];
+  return {
+    gift: (g) => gift(g)?.name ?? german.gift(g),
+    whatGives: (a) => (animal(a) ? `ماذا ${gives(a)} ${the(a)}؟` : german.whatGives(a)),
+    gives: (a, g) => (animal(a) && gift(g) ? `${the(a)} ${gives(a)} ${gift(g)!.gives}. شكرا!` : german.gives(a, g)),
+    comesFrom: (g, giver) => (animal(giver) && gift(g) ? `${gift(g)!.the} من ${the(giver)}!` : german.comesFrom(g, giver)),
+  };
+}
+
+/** A small one and what it becomes, in Arabic ("Was wird aus mir?"). */
+export interface ArabicGrowth {
+  /** The small one, without article: "يرقة". */
+  young: string;
+  /** The small one is a feminine word, so the verb is "تتحول". */
+  youngFemale?: true;
+  /** What it becomes, without article: "فراشة". */
+  adult: string;
+  /** What it becomes, with article (or made definite otherwise): "الفراشة". */
+  theAdult: string;
+  /** What it becomes is a feminine word, so the verb is "تأتي". */
+  adultFemale?: true;
+}
+
+/** The small ones by their id; one without an entry is said in German. */
+export const ARABIC_GROWTHS: Partial<Record<GrowthId, ArabicGrowth>> = {
+  raupe: { young: "يرقة", youngFemale: true, adult: "فراشة", theAdult: "الفراشة", adultFemale: true },
+  ei: { young: "بيضة", youngFemale: true, adult: "كتكوت", theAdult: "الكتكوت" },
+  samen: { young: "بذرة", youngFemale: true, adult: "زهرة عباد الشمس", theAdult: "زهرة عباد الشمس", adultFemale: true },
+  kaulquappe: { young: "شرغوف", adult: "ضفدع", theAdult: "الضفدع" },
+};
+
+/** "Was wird aus mir?" in Arabic, its verbs by the words' gender; a small one without its Arabic words is the whole German sentence. */
+export function arabicGrowth(german: GrowTexts): GrowTexts {
+  const word = (g: Growth) => ARABIC_GROWTHS[g.id];
+  const turns = (g: Growth) => (word(g)!.youngFemale ? "تتحول" : "يتحول");
+  const comes = (g: Growth) => (word(g)!.adultFemale ? "تأتي" : "يأتي");
+  return {
+    young: (g) => word(g)?.young ?? german.young(g),
+    adult: (g) => word(g)?.adult ?? german.adult(g),
+    whatBecomes: (g) => (word(g) ? `إلى ماذا ${turns(g)} ال${word(g)!.young}؟` : german.whatBecomes(g)),
+    becomes: (g) => (word(g) ? `ال${word(g)!.young} ${turns(g)} إلى ${word(g)!.adult}. رائع!` : german.becomes(g)),
+    comesFrom: (g) => (word(g) ? `${word(g)!.theAdult} ${comes(g)} من ال${word(g)!.young}!` : german.comesFrom(g)),
+  };
+}
+
 /** Arabic, for the table of languages in content.ts. */
-export const ARABIC: AnimalTranslation = { words: { animals: ARABIC_ANIMALS, foods: ARABIC_FOODS, homes: ARABIC_HOMES }, texts: arabicTexts };
+export const ARABIC: AnimalTranslation = {
+  words: { animals: ARABIC_ANIMALS, foods: ARABIC_FOODS, homes: ARABIC_HOMES },
+  texts: arabicTexts,
+  gifts: arabicGifts,
+  growth: arabicGrowth,
+};

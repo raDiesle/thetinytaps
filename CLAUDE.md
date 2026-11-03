@@ -97,7 +97,9 @@ In a fresh worktree run `bun install` first.
   there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
   `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell, and
   `inlineTexts.test.ts` checks that every inline `t({ de: … })` of a game has each language its row marks as there
-  (so a German-only line in a translated game fails until its row says what is missing).
+  (so a German-only line in a translated game fails until its row says what is missing). A new game that comes German-only
+  into the translated menus keeps its card's title and blurb in its own folder (`names.ts`, imported by `games.ts`, like
+  `/zusammen/`), so its own row says they are missing, not the home page's.
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
   (🌐 on the home page, `useAppLanguage()`); no game or menu adds a language choice of its own (a „Spielsprache“ once
   put Russian letters under German menus). A language joins `APP_LANGUAGES` only once the menus and the letters and

@@ -19,7 +19,13 @@ function LegalLinks() {
   const t = useT();
   return (
     <>
-      <LegalLink to="/impressum/">{t({ de: "Impressum" })}</LegalLink> · <LegalLink to="/datenschutz/">{t({ de: "Datenschutz" })}</LegalLink>
+      <LegalLink to="/impressum/">
+        {t({ de: "Impressum", ru: "Выходные данные", en: "Legal notice", zh: "网站信息", hi: "कानूनी जानकारी", es: "Aviso legal", ar: "بيانات الموقع" })}
+      </LegalLink>{" "}
+      ·{" "}
+      <LegalLink to="/datenschutz/">
+        {t({ de: "Datenschutz", ru: "Конфиденциальность", en: "Privacy", zh: "隐私", hi: "गोपनीयता", es: "Privacidad", ar: "الخصوصية" })}
+      </LegalLink>
     </>
   );
 }

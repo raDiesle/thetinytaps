@@ -21,6 +21,7 @@ const translatedIn = (label: string) =>
     .map(([language]) => language);
 const TRANSLATED_HOME = translatedIn("Zu Hause");
 const TRANSLATED_KITA = translatedIn("Wie geht's dir? und Kindergarten");
+const TRANSLATED_SELF = translatedIn("Mehr Gefühle");
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
 // allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
@@ -92,7 +93,7 @@ test("every recorded sound of the stories has its file", () => {
 test("every translation of a kindergarten story matches the German beat for beat", () => {
   const beatParts = (beats: { narration?: string; line?: string }[]) => beats.map((b) => [!!b.narration, !!b.line]);
   for (const [language, texts] of Object.entries(SITUATION_TEXTS)) {
-    for (const situation of SITUATIONS) {
+    for (const situation of ALL_SITUATIONS) {
       const text = texts[situation.id];
       if (!text) continue;
       const where = `${language} ${situation.id}`;
@@ -167,6 +168,9 @@ test("every translated language has every story", () => {
   }
   for (const language of TRANSLATED_KITA) {
     for (const { id } of SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
+  }
+  for (const language of TRANSLATED_SELF) {
+    for (const { id } of SELF_SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
   }
 });
 

@@ -49,7 +49,7 @@ export function Traktor() {
       <path d={CAB} fill={GLASS} />
       <Inside d={CAB}>
         <g className="hf-traktor-driver" style={{ transformOrigin: "-66px -118px" }}>
-          <Rider cx={-66} cy={-150} shirt="#4895ef" cap="#2d6a4f" />
+          <Rider animal="bear" cx={-66} cy={-150} shirt="#4895ef" cap="#2d6a4f" />
         </g>
       </Inside>
       <path d="M-100 -192 h14 L-112 -116 h-14 Z" fill="#fff" opacity="0.5" />

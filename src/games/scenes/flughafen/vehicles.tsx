@@ -35,7 +35,7 @@ export function Treppenwagen() {
       <path d={STAIR_CAB} fill={GLASS} />
       <Inside d={STAIR_CAB}>
         <g className="fh-treppe-driver">
-          <Rider cx={-102} cy={-104} shirt={SIGNAL_ORANGE} hair="#6b4423" />
+          <Rider animal="fox" cx={-102} cy={-104} shirt={SIGNAL_ORANGE} hair="#6b4423" />
         </g>
       </Inside>
       <Beacon x={-98} y={-136} name="treppe" />
@@ -116,7 +116,7 @@ export function FollowMe() {
       <path d={FOLLOW_GLASS} fill={GLASS} />
       <Inside d={FOLLOW_GLASS}>
         <g className="fh-follow-driver">
-          <Rider cx={20} cy={-90} shirt={SIGNAL_ORANGE} cap={NAVY} />
+          <Rider animal="bear" cx={20} cy={-90} shirt={SIGNAL_ORANGE} cap={NAVY} />
         </g>
       </Inside>
       <rect x="-112" y="-82" width="224" height="56" rx="18" fill="#ffd60a" />
@@ -137,8 +137,8 @@ export function FollowMe() {
 
 const BUS_GUESTS = [
   { x: -40, shirt: "#ff5d73", hair: "#e9c46a" },
-  { x: 30, shirt: "#4361ee", hair: "#2b2d42" },
-  { x: 100, shirt: "#ffb703", hair: "#bc6c25" },
+  { x: 30, shirt: "#4361ee", hair: "#2b2d42", animal: "fox" as const },
+  { x: 100, shirt: "#ffb703", hair: "#bc6c25", animal: "fox" as const, child: true },
 ];
 
 const BUS_FRONT = "M-212 -186 H-160 V-104 H-212 Z";
@@ -154,7 +154,7 @@ export function Bus() {
       <path d={BUS_FRONT} fill={GLASS} />
       <Inside d={BUS_FRONT}>
         <g className="fh-bus-driver">
-          <Rider cx={-184} cy={-140} shirt="#3a86ff" cap={NAVY} />
+          <Rider animal="fox" cx={-184} cy={-140} shirt="#3a86ff" cap={NAVY} />
         </g>
       </Inside>
       <path d="M-196 -184 h8 L-202 -108 h-8 Z" fill="#fff" opacity="0.5" />
@@ -194,10 +194,10 @@ export function Bus() {
         strokeWidth="4"
         style={{ transformOrigin: "-102px -110px" }}
       />
-      {BUS_GUESTS.map(({ x, shirt, hair }, i) => (
+      {BUS_GUESTS.map(({ x, shirt, hair, ...mascot }, i) => (
         <Pane key={x} x={x} y={-186} w={60} h={70} rx={8}>
           <g className="fh-bus-passenger" style={nth(i)}>
-            <Rider cx={x + 30} cy={-148} shirt={shirt} hair={hair} />
+            <Rider cx={x + 30} cy={-148} shirt={shirt} hair={hair} {...mascot} />
           </g>
         </Pane>
       ))}
@@ -228,13 +228,13 @@ export function Taxi() {
       <path d={TAXI_FRONT} fill={GLASS} />
       <Inside d={TAXI_FRONT}>
         <g className="fh-taxi-driver">
-          <Rider cx={-32} cy={-92} shirt="#4361ee" hair="#2b2d42" />
+          <Rider animal="bear" cx={-32} cy={-92} shirt="#4361ee" hair="#2b2d42" />
         </g>
       </Inside>
       <path d={TAXI_BACK} fill={GLASS} />
       <Inside d={TAXI_BACK}>
         <g className="fh-taxi-guest">
-          <Rider cx={34} cy={-92} shirt="#ff5d73" hair="#e9c46a" />
+          <Rider animal="fox" cx={34} cy={-92} shirt="#ff5d73" hair="#e9c46a" />
         </g>
       </Inside>
       <path d="M-40 -106 h8 L-44 -78 h-8 Z M44 -106 h8 L40 -78 h-8 Z" fill="#fff" opacity="0.5" />

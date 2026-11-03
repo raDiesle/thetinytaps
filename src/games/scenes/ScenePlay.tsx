@@ -932,9 +932,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </button>
       )}
       {!questMode && !touched && (
-        <p className="scene-prompt">
-          {(colouring ? words.colourPrompts : lanes ? (words.roadPrompts ?? words.prompts) : words.prompts)[keysOn ? "keys" : "tap"]}
-        </p>
+        <p className="scene-prompt">{(colouring ? words.colourPrompts : lanes ? words.roadPrompts : words.prompts)[keysOn ? "keys" : "tap"]}</p>
       )}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
       <p className="scene-rotate">

@@ -65,7 +65,7 @@ export function Schneepflug() {
         <path d={PLOUGH_WINDOW} fill={GLASS} />
         <Inside d={PLOUGH_WINDOW}>
           <g className="bs-driver">
-            <Rider cx={-94} cy={-132} shirt="#ff8c42" cap="#264653" />
+            <Rider animal="bear" cx={-94} cy={-132} shirt="#ff8c42" cap="#264653" />
           </g>
         </Inside>
         <path d="M-86 -156 h9 L-90 -124 h-9 Z" fill="#fff" opacity="0.5" />
@@ -136,7 +136,7 @@ export function Streuwagen() {
         <path d={GRITTER_WINDOW} fill={GLASS} />
         <Inside d={GRITTER_WINDOW}>
           <g className="bs-driver">
-            <Rider cx={-66} cy={-110} shirt="#ffd60a" cap="#ffd60a" />
+            <Rider animal="fox" cx={-66} cy={-110} shirt="#ffd60a" cap="#ffd60a" />
           </g>
         </Inside>
         <path d="M-62 -130 h8 L-66 -104 h-8 Z" fill="#fff" opacity="0.5" />

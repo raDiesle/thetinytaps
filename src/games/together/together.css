@@ -1,0 +1,782 @@
+/* ---------- Was gehört zusammen? ---------- */
+
+.together-play {
+  --gap: min(4vw, 32px);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff4d6;
+}
+
+.together-play.kind-helper {
+  background: #e3f2fd;
+}
+
+.tg-top,
+.tg-ground {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.tg-top {
+  flex: 1.2;
+  align-items: flex-end;
+  padding-top: max(56px, env(safe-area-inset-top));
+}
+
+.tg-ground {
+  flex: 1;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #b5e48c;
+}
+
+.kind-helper .tg-ground {
+  background: #d8c3a5;
+}
+
+/* The one above, in a square box, so its layers can be placed in it in per cent. */
+.tg-above {
+  position: relative;
+  z-index: 3;
+  cursor: pointer;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tg-box {
+  position: relative;
+  display: block;
+  width: min(46vh, 56vw);
+  aspect-ratio: 1;
+}
+
+/* On a phone the picture takes the room the corner notes leave free in the middle above (most pictures
+   leave their box's top empty, so it may reach up to the top edge). */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .tg-top {
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+
+  .together-play > .tg-top .tg-box {
+    width: min(56vh, 56vw);
+  }
+}
+
+/* Every layer is a small HTML layer of its own: what moves moves as a whole, by transform or opacity. */
+.tg-layer {
+  position: absolute;
+  display: block;
+  overflow: visible;
+}
+
+.tg-tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+}
+
+.tg-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tg-emoji {
+  font-family: var(--font-emoji);
+  font-size: 86cqh;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Hidden until the two set to work. */
+.tg-paste,
+.tg-sparkles,
+.tg-hearts,
+.tg-heart,
+.tg-upright,
+.tg-drops,
+.tg-spray,
+.tg-smoke,
+.tg-puffs,
+.tg-glow,
+.tg-tray,
+.tg-line1,
+.tg-line2,
+.tg-fill {
+  opacity: 0;
+}
+
+.tg-nudge-0 {
+  animation: tg-hop 0.45s ease-in-out;
+}
+
+.tg-nudge-1 {
+  animation: tg-hop-again 0.45s ease-in-out;
+}
+
+/* What the round is about, for grown-ups (TopicBubble): a speech bubble at the left of the picture, its tail pointing in
+   to the middle, where the one above is; the sign big, the question small under it. Taps go through it to the game. */
+.tg-topic {
+  position: absolute;
+  z-index: 6;
+  top: calc(max(64px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
+  left: max(16px, 3vw, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: min(30vw, 240px);
+  padding: 0.35em 0.8em 0.45em;
+  border: var(--outline);
+  border-radius: 1.2em;
+  background: #fff;
+  pointer-events: none;
+  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tg-topic::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -11px;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  border-right: var(--outline);
+  border-bottom: var(--outline);
+  background: #fff;
+  rotate: -45deg;
+}
+
+.tg-topic-sign {
+  font-family: var(--font-emoji);
+  font-size: clamp(2rem, 12vh, 4.5rem);
+  line-height: 1.1;
+}
+
+.tg-topic-text {
+  color: var(--ink);
+  font-size: clamp(0.75rem, 2.6vh, 1.05rem);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* The partners to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
+.tg-options {
+  --cols: var(--n);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Phones upright: two per row, so they stay big enough for a finger. */
+@media (max-aspect-ratio: 4 / 5) {
+  .tg-options {
+    --cols: min(var(--n), 2);
+  }
+}
+
+.tg-option {
+  --size: min(20vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 190px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size);
+  height: var(--size);
+  border: var(--outline);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: var(--lift);
+  cursor: pointer;
+  touch-action: none;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.tg-option:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.tg-option:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.tg-option:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.tg-option.focused {
+  outline: 6px solid var(--sunshine);
+  outline-offset: 6px;
+}
+
+.tg-partner {
+  position: relative;
+  z-index: 4;
+  display: block;
+  width: calc(var(--size) * 0.74);
+  height: calc(var(--size) * 0.74);
+  container-type: size;
+}
+
+/* The right one flies up into the picture and is gone there, where the picture shows it at work. */
+.tg-partner.landed {
+  transition:
+    translate 0.45s ease-in,
+    scale 0.45s ease-in;
+  animation: tg-out 0.15s linear 0.4s forwards;
+}
+
+.tg-partner.refused {
+  animation: tg-hop 0.4s ease-in-out;
+}
+
+/* The one a wrong pick belongs to pops up over its plate for a moment. */
+.tg-owner {
+  position: absolute;
+  bottom: 86%;
+  left: 50%;
+  z-index: 5;
+  width: calc(var(--size) * 1.15);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: tg-peek 1.3s ease-in-out forwards;
+}
+
+.tg-owner .tg-box {
+  width: 100%;
+}
+
+/* ---------- The pairs at work (`.working` comes as the partner arrives) ---------- */
+
+.working .tg-tool {
+  animation: tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.working .tg-sparkles {
+  animation: tg-show-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s forwards;
+}
+
+.working .tg-hearts {
+  animation: tg-float 1.4s ease-out 2s forwards;
+}
+
+.working .tg-helper {
+  transform-origin: 50% 100%;
+  animation: tg-jump 0.5s ease-in-out 2.6s;
+}
+
+/* Toothbrush: the tube squeezes a blob onto the bristles, and the brush scrubs to and fro with the blob on it (both
+   layers move the same 8 of the picture's 200 units, `--scrub` in each one's own width). */
+.pair-zahnbuerste .tg-tool {
+  rotate: 90deg;
+}
+
+.pair-zahnbuerste.working .tg-tool {
+  animation:
+    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-squeeze 0.5s ease-in-out 0.4s 2,
+    tg-out 0.4s ease-in 1.5s forwards;
+}
+
+.pair-zahnbuerste.working .tg-paste {
+  --scrub: 14.8%;
+  transform-origin: 0 100%;
+  animation:
+    tg-grow-x 0.8s ease-out 0.5s forwards,
+    tg-scrub 0.35s ease-in-out 1.7s 3;
+}
+
+.pair-zahnbuerste.working .tg-brush {
+  --scrub: 4.5%;
+  animation: tg-scrub 0.35s ease-in-out 1.7s 3;
+}
+
+/* Door: the key turns, the door swings open, and the bear child behind it hops. */
+.pair-tuer .tg-door {
+  transform-origin: 0 50%;
+}
+
+.pair-tuer.working .tg-tool {
+  animation:
+    tg-arrive 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-turn 0.4s ease-in-out 0.3s forwards,
+    tg-out 0.2s linear 1s forwards;
+}
+
+.pair-tuer.working .tg-door {
+  animation: tg-open 1s ease-in-out 1.1s forwards;
+}
+
+.pair-tuer.working .tg-child {
+  transform-origin: 50% 100%;
+  animation: tg-jump 0.5s ease-in-out 1.9s 2;
+}
+
+/* Pot: the lid lands on it, the steam stops, and the lid rattles as it cooks. */
+.pair-topf.working .tg-tool {
+  transform-origin: 50% 60%;
+  animation:
+    tg-land 0.35s ease-in backwards,
+    tg-rattle 0.9s ease-in-out 0.9s 2;
+}
+
+.pair-topf.working .tg-steam {
+  animation: tg-out 0.4s ease-out 0.2s forwards;
+}
+
+.pair-topf.working .tg-puffs {
+  animation: tg-puff 1s ease-out 1.1s forwards;
+}
+
+/* Flower: the can pours, drops fall, the drooping flower stands up. */
+.pair-blume .tg-tool {
+  rotate: 30deg;
+}
+
+.pair-blume.working .tg-tool {
+  animation:
+    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-out 0.4s ease-in 1.9s forwards;
+}
+
+.pair-blume.working .tg-drops {
+  animation: tg-drip 0.5s ease-in 0.3s 3;
+}
+
+.pair-blume.working .tg-droop {
+  animation: tg-out 0.4s ease-in 1.5s forwards;
+}
+
+.pair-blume.working .tg-upright {
+  transform-origin: 50% 100%;
+  animation: tg-rise 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.6s forwards;
+}
+
+/* Paper: the crayon draws a heart, one half and then the other, and it fills with colour. */
+.pair-papier.working .tg-tool {
+  animation:
+    tg-arrive 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-draw 1.8s ease-in-out 0.2s forwards,
+    tg-out 0.3s ease-in 2.1s forwards;
+}
+
+.pair-papier.working .tg-line1 {
+  animation: tg-show 0.6s ease-in 0.35s forwards;
+}
+
+.pair-papier.working .tg-line2 {
+  animation: tg-show 0.6s ease-in 1.25s forwards;
+}
+
+.pair-papier.working .tg-fill {
+  animation: tg-show-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2s forwards;
+}
+
+/* Fire fighter: water sprays from the hose, the fire goes out in a puff of smoke. */
+.pair-feuerwehr.working .tg-tool {
+  animation:
+    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-out 0.3s ease-in 2.6s forwards;
+}
+
+.pair-feuerwehr.working .tg-spray {
+  transform-origin: 0 50%;
+  animation: tg-spray 2.2s ease-out 0.3s forwards;
+}
+
+.pair-feuerwehr .tg-fire {
+  transform-origin: 50% 100%;
+}
+
+.pair-feuerwehr.working .tg-fire {
+  animation: tg-quench 1.2s ease-in 0.9s forwards;
+}
+
+.pair-feuerwehr.working .tg-smoke {
+  animation: tg-puff 1.2s ease-out 1.8s forwards;
+}
+
+/* Doctor: she listens at the fox child's chest, its heart beats, and it hops. */
+.pair-aerztin.working .tg-tool {
+  animation:
+    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-reach-doctor 0.5s ease-in-out 0.4s forwards,
+    tg-out 0.3s ease-in 2.4s forwards;
+}
+
+.pair-aerztin.working .tg-heart {
+  animation: tg-beat 2s ease-in-out 0.6s forwards;
+}
+
+.pair-aerztin.working .tg-child {
+  transform-origin: 50% 100%;
+  animation: tg-jump 0.5s ease-in-out 2.5s;
+}
+
+.pair-aerztin.working .tg-hearts {
+  animation-delay: 2.5s;
+}
+
+/* Baker: the roll goes into the oven, it glows, and a tray of golden rolls comes out steaming. */
+.pair-baecker.working .tg-tool {
+  animation:
+    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-into-oven 0.7s ease-in 0.3s forwards;
+}
+
+.pair-baecker.working .tg-glow {
+  animation: tg-glow 1.4s ease-in-out 0.9s forwards;
+}
+
+.pair-baecker.working .tg-tray {
+  animation: tg-show-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2.1s forwards;
+}
+
+.pair-baecker.working .tg-smoke {
+  animation: tg-puff 1.2s ease-out 2.3s forwards;
+}
+
+/* Hairdresser: the scissors snip, the fox child's wild tuft falls, and it hops. */
+.pair-friseurin .tg-tuft {
+  transform-origin: 50% 100%;
+}
+
+.pair-friseurin.working .tg-tool {
+  animation:
+    tg-arrive 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-snip 0.3s ease-in-out 0.3s 3,
+    tg-out 0.3s ease-in 1.6s forwards;
+}
+
+.pair-friseurin.working .tg-tuft {
+  animation: tg-fall 0.8s ease-in 1.2s forwards;
+}
+
+.pair-friseurin.working .tg-child {
+  transform-origin: 50% 100%;
+  animation: tg-jump 0.5s ease-in-out 2.1s;
+}
+
+/* Postman: he hands the parcel to the bear child, who hops for joy. */
+.pair-post.working .tg-tool {
+  animation:
+    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-hand 0.8s ease-in-out 0.6s forwards;
+}
+
+.pair-post.working .tg-child {
+  transform-origin: 50% 100%;
+  animation: tg-jump 0.5s ease-in-out 1.5s 2;
+}
+
+.pair-post.working .tg-hearts {
+  animation-delay: 1.8s;
+}
+
+@keyframes tg-hop {
+  40% {
+    transform: translateY(-18%);
+  }
+}
+
+@keyframes tg-hop-again {
+  40% {
+    transform: translateY(-18%);
+  }
+}
+
+@keyframes tg-jump {
+  40% {
+    transform: translateY(-12%) scaleY(1.04);
+  }
+}
+
+@keyframes tg-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tg-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tg-show-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tg-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes tg-land {
+  from {
+    opacity: 0;
+    transform: translateY(-40%);
+  }
+}
+
+@keyframes tg-peek {
+  0% {
+    opacity: 0;
+    transform: translateY(30%) scale(0.4);
+  }
+  25%,
+  80% {
+    opacity: 1;
+    transform: translateY(-10%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30%) scale(0.4);
+  }
+}
+
+@keyframes tg-float {
+  0% {
+    opacity: 0;
+    transform: translateY(20%) scale(0.5);
+  }
+  25% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+}
+
+@keyframes tg-squeeze {
+  50% {
+    transform: scale(1.08, 0.82);
+  }
+}
+
+@keyframes tg-scrub {
+  25% {
+    transform: translateX(var(--scrub));
+  }
+  75% {
+    transform: translateX(calc(-1 * var(--scrub)));
+  }
+}
+
+@keyframes tg-grow-x {
+  from {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tg-turn {
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes tg-open {
+  to {
+    transform: perspective(600px) rotateY(-72deg);
+  }
+}
+
+@keyframes tg-rattle {
+  15%,
+  45%,
+  75% {
+    transform: translateY(-4%) rotate(-4deg);
+  }
+  30%,
+  60%,
+  90% {
+    transform: translateY(-2%) rotate(4deg);
+  }
+}
+
+@keyframes tg-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30%) scale(1.2);
+  }
+}
+
+@keyframes tg-drip {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+}
+
+@keyframes tg-rise {
+  from {
+    opacity: 1;
+    transform: scaleY(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The crayon's tip along the heart, from its point up the left half and down the right one (see pairs.tsx). */
+@keyframes tg-draw {
+  0% {
+    transform: translate(37%, 177%);
+  }
+  15% {
+    transform: translate(-57%, 27%);
+  }
+  28% {
+    transform: translate(-27%, -22%);
+  }
+  42% {
+    transform: translate(37%, 17%);
+  }
+  60% {
+    transform: translate(102%, -22%);
+  }
+  75% {
+    transform: translate(132%, 27%);
+  }
+  92%,
+  100% {
+    transform: translate(37%, 177%);
+  }
+}
+
+@keyframes tg-spray {
+  0% {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+  15%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes tg-quench {
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes tg-reach-doctor {
+  to {
+    transform: translate(130%, 39%) scale(0.85);
+  }
+}
+
+@keyframes tg-beat {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  10%,
+  40%,
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+  25%,
+  55% {
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30%);
+  }
+}
+
+@keyframes tg-into-oven {
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(211%, 44%) scale(0.5);
+  }
+}
+
+@keyframes tg-glow {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes tg-snip {
+  50% {
+    transform: rotate(-18deg) scale(1.1);
+  }
+}
+
+@keyframes tg-fall {
+  to {
+    opacity: 0;
+    transform: translateY(160%) rotate(50deg);
+  }
+}
+
+@keyframes tg-hand {
+  to {
+    transform: translate(216%, 55%);
+  }
+}

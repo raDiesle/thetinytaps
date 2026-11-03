@@ -87,7 +87,7 @@ export function Boot() {
       <path d="M-18 -98 H86 L78 -112 H-10 Z" fill="#457b9d" />
       <Pane x={0} y={-86} w={40} h={34} rx={6}>
         <g className="uw-boot-captain">
-          <Rider cx={20} cy={-66} shirt="#ffd166" cap="#e63946" />
+          <Rider animal="fox" cx={20} cy={-66} shirt="#ffd166" cap="#e63946" />
         </g>
       </Pane>
       <Pane x={48} y={-86} w={24} h={34} rx={6} />
