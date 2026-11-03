@@ -43,6 +43,14 @@ Fenster, Kamera. Springt der Hintergrund, schaut ein Kleinkind auf das Neue stat
   Im Prompt darum immer alle Figuren aufzählen, „each exactly once … Nobody else“.
 - **Dinge bleiben dieselben:** ein Spielzeugauto bleibt ein kleines Spielzeugauto, die Decke im Bett bleibt
   dieselbe Decke. Neue Dinge nur, wenn die Handlung sie braucht (der Ball beim Warten).
+- **Was sich bewegt, bleibt auch am alten Platz:** Verlässt eine Figur oder ein Ding seinen Platz aus dem ersten
+  Bild, malt das Lite-Modell es oft dort noch einmal – „each exactly once“ hin oder her. In der zweiten Runde kamen so
+  der kleine Bär oben auf der Rutsche und zugleich im Sandkasten, ein zweiter Fuchs, zwei Plüschhasen, die Ente auf dem
+  Regal und in der Pfote, der Kuchen auf dem Tisch und am Boden. Der Prompt sagt darum, dass der alte Platz jetzt leer
+  ist („the slide is empty“, „he has taken the bunny from the sofa, so the sofa is empty now“), und „exactly ONE … in
+  the whole picture“; bei vielen Kindern (die Party) jedes mit „only ONE“. Ebenso ausdrücklich: Pfoten um den Mund
+  „holds nothing“ (sonst ein Megafon), ein Schreck „no speech bubble, no sound word“ (sonst ein „Ah!“), und was platzt
+  oder reißt, fliegt als kleine Gummifetzen, „no red splashes“ – rote Fetzen eines Ballons sahen aus wie Blut.
 - **Ein neuer Ort nur, wenn die Geschichte hingeht:** beim Abschied von der Tür ans Fenster ins Spielzimmer.
 
 Prompt für jedes weitere Bild einer Geschichte (ohne Stilblock – den Stil bringt die Referenz mit):
@@ -470,30 +478,11 @@ als `--ref` nur für die Figur, der Ort neu), `snow-nein-3` und `snow-ende` dann
 | `snow-nein-3` | „Schneeball ins Gesicht werfen“ – Outside in the snowy garden. The little bear's arm is stretched out, a snowball has just left his paw and hits the big bear's face; the big bear winces. Gentle, no injuries.                    |
 | `snow-ende`   | Outside in the snowy garden. The little bear and the big bear build a snowman together, both laughing.                                                                                                                             |
 
-## Geplant (noch nicht erzeugt)
-
-Diese Bilder fragt das Spiel schon an; bis sie da sind, steht an ihrer Stelle ein Platzhalter mit dem Dateinamen
-(die Beschriftung darunter sagt, was er zeigen soll). Erst anschauen, dann erzeugen: jedes mit dem Raum-Prompt von
-„Zu Hause“ oben und dem Bild des Gefühls (`baer-…`) als einziger `--ref`, nur ein Frame. Ist ein Bild gemacht, wandert
-seine Zeile in die Tabelle „Zu Hause“ (`feelings.test.ts` prüft beides).
-
-Runde für Runde steht die nicht so gute Idee neben der guten, die sie besser macht:
-
-| Datei                | Runde, daneben          | Prompt                                                                                                                                                                 |
-| -------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baer-sad-nein`      | 1, Umarmen              | A child's hands push the sad little bear away; he tips backwards onto the rug and cries even harder, big tears. Gentle, no injuries.                                   |
-| `baer-sad-nein-2`    | 2, Streicheln           | A child's hands take the green toy dinosaur out of the toy box and break it in two right in front of the little bear; he cries even harder, reaching after it.         |
-| `baer-sad-nein-3`    | 3, Teddy geben          | A child's hands sweep away the wooden toy blocks from the rug next to the sad little bear and take them out of the picture; he cries even harder, reaching after them. |
-| `baer-scared-nein`   | 1, Umarmen              | Night, thunderstorm. A child's hand holds up a spooky monster hand puppet in front of the little bear in bed, „boo!“; he startles, very scared.                        |
-| `baer-scared-nein-2` | 2, Hand halten          | Night, thunderstorm. The little bear sits alone in his bed clutching a pillow, very scared; the door of the room is just closing, nobody there.                        |
-| `baer-happy-nein`    | 1, Mittanzen            | Birthday, balloons. A child's hand pops one of the bear's balloons with a pin, a small burst; the little bear in a party hat flinches, sad.                            |
-| `baer-happy-nein-2`  | 2, Luftschlangen werfen | Birthday. A child's hands take a wrapped present away from the little bear in a party hat; his smile is gone, he reaches after it.                                     |
-
-### Mehr Gefühle, zweite Runde (`selbst.ts`): 19 Geschichten, geplant am 3. November 2026
+### Mehr Gefühle, zweite Runde (`selbst.ts`): 19 Geschichten
 
 Neunzehn Geschichten wie „Mehr Gefühle“ oben (Ideen C-01 bis C-15 ohne die schon gebauten, und C-23 bis C-28), je acht
-Bilder, nur ein Frame. Im gebauten Spiel erscheint eine Geschichte erst, wenn alle ihre Bilder da sind. So zu machen
-wie oben: das erste Bild (`…-passiert`) mit Stilblock, **nur den Figuren dieses Bildes** und `bye-ende` als einziger
+Bilder, nur ein Frame, alle gemacht am 3. November 2026 (22 davon ein zweites Mal, siehe „Was sich bewegt, bleibt
+auch am alten Platz“ oben). So gemacht wie oben: das erste Bild (`…-passiert`) mit Stilblock, **nur den Figuren dieses Bildes** und `bye-ende` als einziger
 `--ref` („a completely new place … nobody else from the reference“), jedes weitere mit dem „Redraw this exact picture
 as a later moment of the same story …“-Prompt und dem `…-passiert` als einziger `--ref`, die Figuren aus dem ersten
 Bild aufgezählt. Alle Karten zeigt der kleine Bär selbst: zu jeder gehört „No hands, no arms come in from the edges“;
@@ -775,3 +764,22 @@ der Fuchs; neben dem kleinen Bären platzt ein Ballon.
 | `startle-nein-2`   | „Kuchen umwerfen“ – The little bear pushes the cake off the table; it falls and squashes on the floor.                                                                                                                                                                                                                                                                                               |
 | `startle-nein-3`   | „Den Fuchs anbrüllen“ – The little bear shouts at the fox, mouth wide; the fox flinches.                                                                                                                                                                                                                                                                                                             |
 | `startle-ende`     | The little bear and the fox laugh together with the small green balloon at the birthday table.                                                                                                                                                                                                                                                                                                       |
+
+## Geplant (noch nicht erzeugt)
+
+Diese Bilder fragt das Spiel schon an; bis sie da sind, steht an ihrer Stelle ein Platzhalter mit dem Dateinamen
+(die Beschriftung darunter sagt, was er zeigen soll). Erst anschauen, dann erzeugen: jedes mit dem Raum-Prompt von
+„Zu Hause“ oben und dem Bild des Gefühls (`baer-…`) als einziger `--ref`, nur ein Frame. Ist ein Bild gemacht, wandert
+seine Zeile in die Tabelle „Zu Hause“ (`feelings.test.ts` prüft beides).
+
+Runde für Runde steht die nicht so gute Idee neben der guten, die sie besser macht:
+
+| Datei                | Runde, daneben          | Prompt                                                                                                                                                                 |
+| -------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baer-sad-nein`      | 1, Umarmen              | A child's hands push the sad little bear away; he tips backwards onto the rug and cries even harder, big tears. Gentle, no injuries.                                   |
+| `baer-sad-nein-2`    | 2, Streicheln           | A child's hands take the green toy dinosaur out of the toy box and break it in two right in front of the little bear; he cries even harder, reaching after it.         |
+| `baer-sad-nein-3`    | 3, Teddy geben          | A child's hands sweep away the wooden toy blocks from the rug next to the sad little bear and take them out of the picture; he cries even harder, reaching after them. |
+| `baer-scared-nein`   | 1, Umarmen              | Night, thunderstorm. A child's hand holds up a spooky monster hand puppet in front of the little bear in bed, „boo!“; he startles, very scared.                        |
+| `baer-scared-nein-2` | 2, Hand halten          | Night, thunderstorm. The little bear sits alone in his bed clutching a pillow, very scared; the door of the room is just closing, nobody there.                        |
+| `baer-happy-nein`    | 1, Mittanzen            | Birthday, balloons. A child's hand pops one of the bear's balloons with a pin, a small burst; the little bear in a party hat flinches, sad.                            |
+| `baer-happy-nein-2`  | 2, Luftschlangen werfen | Birthday. A child's hands take a wrapped present away from the little bear in a party hat; his smile is gone, he reaches after it.                                     |

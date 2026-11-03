@@ -15,8 +15,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der große Bär wartet am Tor mit dem Laufrad, der kleine Bär sitzt oben auf der Rutsche und will nicht gehen. 1) „Wegrennen“ (zur Straße, gefährlich) oder „Tschüss, Rutsche!“ winken. 2) „Schaufel werfen“ (Aua) oder einen schönen Stein als Schatz in die Tasche stecken. 3) „Sand werfen“ oder das Laufrad selbst zum Tor schieben. Am Ende fährt er stolz los.",
       why: "Eltern suchen „kind will nicht vom spielplatz weg“. Aufhören und Wechseln gehört zu den häufigsten Auslösern von Wutanfällen; ein Abschieds-Ritual und etwas Eigenes zu tun macht den Übergang leichter.",
       effort: "S",
-      partial:
-        "Als Geschichte „Wütend, wir gehen heim“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Wütend, wir gehen heim“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-02",
@@ -25,8 +25,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Auf dem Tablet läuft der Abspann, der kleine Bär schaut traurig und wütend, neben ihm Kissen und seine Holzeisenbahn. 1) „Tablet werfen“ (Krach) oder „Tschüss!“ zum Bildschirm sagen und es selbst zuklappen. 2) „Am Tablet zerren“ oder ein Kissen ganz fest drücken. 3) „Kissen auf den Fuchs werfen“ oder mit der eigenen Eisenbahn nachspielen, was in der Sendung passiert ist.",
       why: "Bildschirm beenden ist ein Kernproblem der Eltern (siehe N-03). Mit etwas Echtem weiterspielen ist genau die Strategie, die Zweijährige am meisten nutzen und die sie am wenigsten weinen lässt.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Traurig, Sendung zu Ende“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Bei Schritt 2 „Gegen den Tisch treten“ statt „Am Tablet zerren“ – das Tablet ist da schon zu.",
+        "Als Geschichte „Traurig, Sendung zu Ende“ in Gefühle (selbst.ts), nur Deutsch. Bei Schritt 2 „Gegen den Tisch treten“ statt „Am Tablet zerren“ – das Tablet ist da schon zu.",
     },
     {
       id: "C-03",
@@ -35,8 +36,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär sitzt im Einkaufswagen und zeigt auf die Lollis an der Kasse, der große Bär schüttelt den Kopf; im Wagen liegen Bananen. 1) „Lollis aus dem Regal fegen“ (Krach) oder laut sagen: „Ich bin sauer!“ 2) „Treten“ (Aua) oder die Fäuste ganz fest drücken und wieder aufmachen. 3) „Lolli einstecken“ oder selbst die Bananen aufs Band legen. Die Kassiererin (Fuchs) lässt ihn danach den Knopf drücken, piep.",
       why: "Eltern suchen „kind wutanfall supermarkt“. Das Gefühl laut sagen und eine Aufgabe übernehmen sind Mittel, die ein Kind selbst in der Hand hat.",
       effort: "S",
-      partial:
-        "Als Geschichte „Sauer an der Kasse“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Sauer an der Kasse“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-04",
@@ -45,8 +46,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär kämpft mit der Jacke, ein Ärmel steckt verdreht, ein Schuh liegt daneben. 1) „Schuh wegwerfen“ (Krach) oder tief pusten: Puuuh. 2) „An der Jacke reißen“ oder den Jacken-Trick: Jacke auf den Boden, Arme rein, über den Kopf schwingen. 3) „Den großen Bären hauen“ (Aua) oder sagen: „Hilf mir bitte!“ – der große Bär hält nur den Reißverschluss, den Rest zieht der kleine Bär selbst hoch.",
       why: "Eltern suchen „kind wutanfall beim anziehen“, „kleinkind schnell frustriert“ und „kleinkind frustrationstoleranz“. Der Wille, es allein zu schaffen, ist oft größer als das Können – Pusten, anders probieren und um Hilfe bitten sind die drei Wege dagegen.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Frust, die Jacke klemmt“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Der geworfene Schuh trifft eine Vase, damit man sieht, was kaputtgeht.",
+        "Als Geschichte „Frust, die Jacke klemmt“ in Gefühle (selbst.ts), nur Deutsch. Der geworfene Schuh trifft eine Vase, damit man sieht, was kaputtgeht.",
     },
     {
       id: "C-05",
@@ -66,8 +68,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der große Bär brät Pfannkuchen, der kleine Bär sitzt hungrig am Tisch, daneben Löffel und sein Teller. 1) „Teller vom Tisch schieben“ (Krach) oder ein Lied singen (Spieluhr). 2) „In die Pfanne fassen“ (Aua, heiß) oder selbst die Löffel auf den Tisch legen. 3) „Mit dem Löffel auf den Tisch hauen“ oder aus dem Fenster gucken: Da fliegt ein Vogel! Dann kommt der Pfannkuchen. Kein Zeitdruck, keine Uhr.",
       why: "Warten ist die Situation, in der Kinderforschung Selbstregulation misst. Das häufigste und erfolgreichste Mittel von Zweijährigen: sich mit etwas anderem beschäftigen.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Ungeduldig, Warten aufs Essen“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. „Auf den Teller hauen“ (der Teller bekommt einen Sprung) statt auf den Tisch.",
+        "Als Geschichte „Ungeduldig, Warten aufs Essen“ in Gefühle (selbst.ts), nur Deutsch. „Auf den Teller hauen“ (der Teller bekommt einen Sprung) statt auf den Tisch.",
     },
     {
       id: "C-07",
@@ -76,8 +79,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der große Bär saugt, der kleine Bär steht erschrocken daneben, sein Kuscheltier auf dem Sofa. 1) „Staubsauger treten“ (Aua) oder sich die Ohren zuhalten. 2) „Am Kabel ziehen“ (gefährlich) oder aufs Sofa klettern und das Kuscheltier halten. 3) „Den Staubsauger anbrüllen“ oder selbst mit dem Fuß den Knopf drücken – brumm aus, brumm an, und der kleine Bär lacht. Genauso als Variante: der Föhn.",
       why: "Eltern suchen „kind 2 jahre hat angst vor staubsauger“ und „kind hat angst vor föhn“. Selbst ein- und ausschalten gibt Kontrolle, und Kontrolle macht Mut.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Angst vorm Staubsauger“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Bei Schritt 3 „Staubsauger umwerfen“ statt „anbrüllen“; der Föhn als Variante fehlt noch.",
+        "Als Geschichte „Angst vorm Staubsauger“ in Gefühle (selbst.ts), nur Deutsch. Bei Schritt 3 „Staubsauger umwerfen“ statt „anbrüllen“; der Föhn als Variante fehlt noch.",
     },
     {
       id: "C-08",
@@ -86,8 +90,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Park bellt ein großer Hund an der Leine, der kleine Bär erschrickt; ein Stock liegt am Weg, der große Bär steht ein paar Schritte weiter. 1) „Wegrennen“ (der Hund will hinterher) oder stehen wie ein Baum: Füße fest, Arme an den Bauch, ganz still. 2) „Stock werfen“ oder zum großen Bären gehen und seine Pfote nehmen (man sieht ihn hingehen). 3) „Hund am Schwanz ziehen“ oder von weitem winken: „Hallo, Hund!“ Der Hund wedelt.",
       why: "Eltern suchen „kind angst vor hunden“ und „kind hat angst vor hunden was tun“. „Steh wie ein Baum“ ist die Regel bekannter Programme gegen Hundebisse (Doggone Safe) – ein Körper-Mittel gegen Angst und Sicherheit zugleich.",
       effort: "S",
-      partial:
-        "Als Geschichte „Angst vorm großen Hund“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Den Hund führt eine Füchsin an der Leine.",
+      done: true,
+      partial: "Als Geschichte „Angst vorm großen Hund“ in Gefühle (selbst.ts), nur Deutsch. Den Hund führt eine Füchsin an der Leine.",
     },
     {
       id: "C-09",
@@ -96,8 +100,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Die Ärztin (ein Fuchs) hält das Hörrohr, der kleine Bär sitzt auf dem Schoß des großen Bären und hat Angst; neben ihm sein Kuscheltier und eine Dose Pflaster. 1) „Die Ärztin hauen“ (Aua) oder sein Kuscheltier ganz fest drücken. 2) „Das Hörrohr wegschlagen“ oder beim Abhören tief pusten: Puuuh. 3) „Weglaufen“ oder sich selbst ein Pflaster aussuchen. Zuerst ohne Spritze; ein Pieks erst, wenn die Bilder sanft genug geraten.",
       why: "Eltern suchen „kleinkind angst vor arzt“, „kleinkind angst vorm arzt nehmen“ und „kleinkind angst vor impfung“. Kuscheltier, Pusten und selbst wählen sind drei Dinge, die ein Kind beim echten Arzt auch tun kann.",
       effort: "S",
-      partial:
-        "Als Geschichte „Angst beim Kinderarzt“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Angst beim Kinderarzt“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-10",
@@ -106,8 +110,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär sitzt in der Wanne, Schaum auf dem Kopf, und hat Angst vor Wasser in den Augen; Waschlappen, Becher und eine Ente an der Fliese. 1) „Wasser aus der Wanne spritzen“ (Boden nass, Ausrutschen) oder sich den Waschlappen selbst auf die Augen drücken. 2) „Aus der Wanne klettern“ (Aua) oder hoch zur Ente gucken, Kopf in den Nacken. 3) „Den Becher wegwerfen“ oder selbst mit dem Becher spülen.",
       why: "Eltern suchen „kind 2 jahre angst vorm haare waschen“ und „kind hat panische angst vorm haare waschen“. Etwas selbst halten und selbst spülen gibt dem Kind die Kontrolle zurück.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Angst beim Haarewaschen“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Der große Bär wäscht; der geworfene Becher wirft die Flaschen um.",
+        "Als Geschichte „Angst beim Haarewaschen“ in Gefühle (selbst.ts), nur Deutsch. Der große Bär wäscht; der geworfene Becher wirft die Flaschen um.",
     },
     {
       id: "C-11",
@@ -116,8 +121,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Dunkles Zimmer, ein Schatten an der Wand, der kleine Bär sitzt wach im Bett, Nachtlicht und Kuscheltier daneben, Bauklötze am Boden. 1) „Bauklotz nach dem Schatten werfen“ (Krach) oder das Nachtlicht selbst anknipsen – der Schatten ist nur der Kleiderständer. 2) „Allein im Dunkeln die Treppe runterlaufen“ (gefährlich) oder das Kuscheltier drücken und leise summen. 3) „Das Kuscheltier aus dem Bett werfen“ oder rufen: „Mama!“ – Mama Bär kommt und setzt sich ans Bett.",
       why: "Eltern suchen „kind angst vor dunkelheit nehmen“ und „kleinkind nachts beruhigen“. Anders als „Angst bei Gewitter“ (das Kind tröstet den Bären) hilft sich der Bär hier selbst.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Angst, nachts aufgewacht“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Der kleine Bär ruft den großen Bären („Kannst du kommen?“) statt Mama.",
+        "Als Geschichte „Angst, nachts aufgewacht“ in Gefühle (selbst.ts), nur Deutsch. Der kleine Bär ruft den großen Bären („Kannst du kommen?“) statt Mama.",
     },
     {
       id: "C-12",
@@ -136,8 +142,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär steht vor seinem leeren Bett und weint; die Spielkiste, das Bett und ein Korb sind zu sehen. 1) „Alle Spielsachen aus der Kiste werfen“ (Krach) oder sagen: „Ich bin traurig.“ 2) „Dem Fuchs sein Kuscheltier wegnehmen“ oder selbst suchen: unter dem Bett, im Korb. 3) Gefunden! „Das Kuscheltier in die Ecke werfen“ oder ganz fest drücken: „Da bist du ja!“",
       why: "Eltern suchen „kind kuscheltier verloren“ und „kuscheltier verloren was tun“. Das Kuscheltier ist für Kinder bis drei das wichtigste Trostmittel, das sie selbst in der Hand haben.",
       effort: "S",
-      partial:
-        "Als Geschichte „Traurig, Kuscheltier weg“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Traurig, Kuscheltier weg“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-14",
@@ -146,8 +152,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Fuchs und Hase bauen in der Kita eine Sandburg, der kleine Bär steht daneben, der Igel spielt allein. 1) „Sandburg kaputt treten“ (Krach) oder fragen: „Darf ich mitspielen?“ 2) Der Fuchs sagt „Nein“: „Sand werfen“ (Aua) oder sagen: „Das macht mich traurig.“ 3) „Allein in der Ecke sitzen bleiben“ oder mit dem Igel etwas Eigenes bauen – bald kommen Fuchs und Hase dazu.",
       why: "Eltern suchen „kind darf in kita nicht mitspielen“ und „kind 3 jahre darf nicht mitspielen“. Fragen, das Gefühl sagen und sich ein anderes Spiel suchen kann ein Kind ganz allein.",
       effort: "S",
+      done: true,
       partial:
-        "Als Geschichte „Traurig, darf nicht mitspielen“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Bei Schritt 3 „Dem Igel die Schaufel wegnehmen“ statt „Allein in der Ecke sitzen“ – sich zurückziehen ist das Gefühl selbst.",
+        "Als Geschichte „Traurig, darf nicht mitspielen“ in Gefühle (selbst.ts), nur Deutsch. Bei Schritt 3 „Dem Igel die Schaufel wegnehmen“ statt „Allein in der Ecke sitzen“ – sich zurückziehen ist das Gefühl selbst.",
     },
     {
       id: "C-15",
@@ -156,8 +163,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Kita-Fest mit Musik, Luftballons und vielen Kindern, der kleine Bär hält sich die Ohren zu; in der Ecke eine Kuschelhöhle. 1) „Alle anschreien“ oder in die Kuschelhöhle krabbeln. 2) „Luftballons kaputt machen“ (Krach) oder drinnen das Kuscheltier halten und tief pusten. 3) „Gleich wieder wild losrennen“ oder langsam rauskommen und erst mit einem Kind spielen.",
       why: "Eltern suchen „überreiztes kleinkind beruhigen“ und „kleinkind schnell überreizt“. Viele Kitas haben dafür Ruheräume; sich zurückziehen ist ein Mittel, das ein Kind lernen kann.",
       effort: "S",
-      partial:
-        "Als Geschichte „Zu viel und zu laut“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Zu viel und zu laut“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-16",
@@ -229,8 +236,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär steht oben auf dem Klettergerüst, zum ersten Mal ganz allein, der große Bär unten. 1) „Die anderen runterschubsen, damit nur er oben ist“ (Aua) oder laut rufen: „Guck mal, ich bin oben!“ 2) „Den Fuchs auslachen, der es noch nicht kann“ oder die Arme hochreißen und sich selbst auf die Brust klopfen. 3) „Gleich ohne Festhalten runterspringen“ (gefährlich) oder dem Fuchs zeigen, wo man den Fuß hinstellt. Zum Schluss sind beide oben.",
       why: "Bisher sind die Gefühle der Geschichten fast alle schwer. Stolz ist ein Gefühl, das Kinder ab zwei stark erleben; die Szene zeigt, wie man sich freut, ohne andere kleinzumachen.",
       effort: "S",
-      partial:
-        "Als Geschichte „Stolz, ganz oben“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Stolz, ganz oben“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-24",
@@ -239,8 +246,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Die Tür ist gerade zu, durchs Fenster sieht man Oma Bär winkend wegfahren, der kleine Bär steht mit hängenden Ohren im Flur; auf dem Tisch Stifte und Papier, an der Wand ein Foto. 1) „Omas Tasse runterwerfen“ (Krach) oder sagen: „Ich vermisse Oma.“ 2) „Die Stifte durchbrechen“ (Krach) oder ein Bild für Oma malen. 3) „Das Foto abreißen“ oder das Foto anschauen und ihm einen Kuss geben. Am Ende ruft Oma kurz an, der Bär zeigt ihr sein Bild.",
       why: "Vermissen kommt bei jedem Abschied von Großeltern, beim Wechsel zwischen zwei Zuhausen oder wenn ein Elternteil verreist. Malen und Fotos anschauen sind Wege, die ein Kind selbst in der Hand hat.",
       effort: "S",
-      partial:
-        "Als Geschichte „Vermissen, Oma fährt weg“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Am Ende zeigt der Bär Oma sein Bild im Videoanruf.",
+      done: true,
+      partial: "Als Geschichte „Vermissen, Oma fährt weg“ in Gefühle (selbst.ts), nur Deutsch. Am Ende zeigt der Bär Oma sein Bild im Videoanruf.",
     },
     {
       id: "C-25",
@@ -249,8 +256,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Eine fremde große Füchsin kommt zu Besuch und beugt sich freundlich herunter, der kleine Bär versteckt sich halb hinter dem großen Bären. 1) „Die Füchsin anschreien: Geh weg!“ oder sich am großen Bären festhalten und erst mal nur gucken (sich verstecken ist hier das Gefühl, also gut). 2) „Mit dem Fuß nach ihr treten“ (Aua) oder winken statt etwas sagen. 3) „Ihr Geschenk aus der Hand reißen“ oder ihr sein Lieblingsauto zeigen. Niemand muss die Hand geben oder küssen.",
       why: "Schüchtern sein ist ein Temperament, kein Fehler. Die Szene zeigt Eltern und Kind: Abstand halten darf sein, und Winken oder etwas Zeigen ist ein kleiner Schritt, den das Kind selbst bestimmt.",
       effort: "S",
-      partial:
-        "Als Geschichte „Schüchtern, Besuch ist da“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Schüchtern, Besuch ist da“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-26",
@@ -259,8 +266,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Draußen regnet es, der kleine Bär liegt quer auf dem Sofa und starrt an die Decke; im Raum eine Decke, Kissen, ein Karton und Töpfe. 1) „Den Fuchs ärgern, damit was passiert“ oder sagen: „Mir ist langweilig.“ 2) „Mit den Töpfen gegen die Scheibe hauen“ (Krach) oder aus Decke und Kissen eine Höhle bauen. 3) „Den Karton zertreten“ oder den Karton zum Auto machen und losfahren. Kein Bildschirm als Ausweg.",
       why: "Langeweile ist das Gefühl, bei dem Eltern am schnellsten zum Tablet greifen. Die Szene zeigt, dass aus Langeweile Ideen wachsen – passt zu „Die Sendung ist zu Ende“ (C-02).",
       effort: "S",
-      partial:
-        "Als Geschichte „Langeweile am Regentag“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. „Den Fuchs am Ohr ziehen“ statt „ärgern“.",
+      done: true,
+      partial: "Als Geschichte „Langeweile am Regentag“ in Gefühle (selbst.ts), nur Deutsch. „Den Fuchs am Ohr ziehen“ statt „ärgern“.",
     },
     {
       id: "C-27",
@@ -269,8 +276,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Kindergarten ist der Luftballon des Fuchses geplatzt, der Fuchs weint; der kleine Bär hält seinen eigenen Ballon. 1) „Lachen und zeigen“ oder hingehen und fragen: „Bist du traurig?“ 2) „Den eigenen Ballon hochhalten: Meiner ist noch heil!“ oder dem Fuchs über den Rücken streicheln. 3) „Weglaufen und allein spielen“ oder den eigenen Ballon gemeinsam halten. Zum Schluss lachen beide.",
       why: "Bisher hat in den Geschichten immer der Bär das Gefühl. Hier erkennt er es bei einem anderen – der erste Schritt zu Empathie, die Kinder ab zwei zu zeigen beginnen.",
       effort: "S",
-      partial:
-        "Als Geschichte „Mitgefühl, der Fuchs weint“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind.",
+      done: true,
+      partial: "Als Geschichte „Mitgefühl, der Fuchs weint“ in Gefühle (selbst.ts), nur Deutsch.",
     },
     {
       id: "C-28",
@@ -279,8 +286,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Auf dem Geburtstag platzt ein Luftballon direkt neben dem kleinen Bären, er zuckt zusammen, Tränen schießen hoch; neben ihm sein Kuscheltier und der Kuchen. 1) „Alle anderen Ballons kaputt machen“ (Krach) oder die Ohren zuhalten. 2) „Den Kuchen umwerfen“ (Krach) oder tief pusten: Puuuh. 3) „Den Fuchs anbrüllen“ oder selbst einen kleinen Ballon ganz vorsichtig drücken, bis er quietscht, und lachen.",
       why: "Erschrecken ist kurz und heftig und kommt bei Kleinkindern täglich vor (Hunde, Sirenen, Knallen). Ohren zuhalten und Pusten sind Mittel, die schon Zweijährige selbst können.",
       effort: "S",
-      partial:
-        "Als Geschichte „Erschrocken, ein lauter Knall“ in Gefühle (selbst.ts), nur Deutsch; ihre acht Bilder sind in bilder/README.md geplant, Spielern zeigt sie sich erst, wenn alle gemacht sind. Ohne Kuscheltier im Bild.",
+      done: true,
+      partial: "Als Geschichte „Erschrocken, ein lauter Knall“ in Gefühle (selbst.ts), nur Deutsch. Ohne Kuscheltier im Bild.",
     },
   ],
 };

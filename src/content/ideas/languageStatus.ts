@@ -177,7 +177,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Mehr Gefühle",
         languages: { de: "done" },
-        note: "Neu und nur Deutsch (3. November 2026): 24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt, und 19 weitere vom Spielplatz bis zum lauten Knall (Bilder noch geplant). Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
+        note: "Neu und nur Deutsch (3. November 2026): 24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt, und 19 weitere vom Spielplatz bis zum lauten Knall. Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
       },
     ],
   },
