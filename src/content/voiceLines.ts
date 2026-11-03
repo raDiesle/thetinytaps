@@ -17,6 +17,7 @@ import { TRAIL_LEVELS } from "@/games/elevator/trail/levels";
 import type { Station, Way } from "@/games/elevator/trail/types";
 import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
 import { SITUATIONS } from "@/games/feelings/kita";
+import { SELF_SITUATIONS } from "@/games/feelings/selbst";
 import { MOOD_ANSWER, MOOD_QUESTION } from "@/games/feelings/mood";
 import { PRAISE as FEELINGS_PRAISE } from "@/games/feelings/shared";
 import type { Beat } from "@/games/feelings/story";
@@ -213,6 +214,12 @@ function feelings(): VoiceGroup[] {
     { label: "Kindergarten: Geschichte", lines: once(SITUATIONS.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))) },
     { label: "Kindergarten: Fragen", lines: once(SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
     { label: "Kindergarten: nicht so gute Ideen", lines: once(SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
+    {
+      label: "Mehr Gefühle: Geschichte",
+      lines: once(SELF_SITUATIONS.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))),
+    },
+    { label: "Mehr Gefühle: Fragen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
+    { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
     { label: "Lob", lines: once(FEELINGS_PRAISE.de) },
   ];
 }

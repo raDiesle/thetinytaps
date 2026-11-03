@@ -21,7 +21,9 @@ const FOLDERS: Record<string, string[]> = {
   "/buchstaben/": ["src/games/letters"],
   "/zaehne/": ["src/games/teeth"],
   "/toepfchen/": ["src/games/potty"],
+  "/timer/": ["src/games/timer"],
   "/belohnungstafel/": ["src/games/rewards"],
+  "/schnullerfee/": ["src/games/pacifier"],
   "/abstillen/": ["src/games/weaning"],
   "/": ["src/components", "src/pages", "src/lib", "src/content/games.ts"],
 };

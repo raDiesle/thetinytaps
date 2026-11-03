@@ -1,4 +1,4 @@
-import type { ShadowItem } from "./content";
+import { lookAlike, SHADOW_LOOKALIKES, type ShadowItem } from "./content";
 import { shuffle } from "./deck";
 
 /** One step of difficulty: how many shadows to choose from, and whether the others come from the picture's own theme. */
@@ -34,9 +34,12 @@ export function nextLevel(level: number, misses: number[], top = SHADOW_LEVELS.l
   return Math.max(0, Math.min(top, level + step));
 }
 
-/** The shadows of one round, `item`'s among them, in random order; the others from `pool` as `level` says. */
+/**
+ * The shadows of one round, `item`'s among them, in random order; the others from `pool` as `level` says, never one
+ * whose shadow looks like `item`'s (`SHADOW_LOOKALIKES`).
+ */
 export function dealShadows(item: ShadowItem, pool: ShadowItem[], level: ShadowLevel): ShadowItem[] {
-  const others = pool.filter((i) => i !== item);
+  const others = pool.filter((i) => i !== item && !lookAlike(SHADOW_LOOKALIKES, i, item));
   const alike = shuffle(others.filter((i) => i.theme === item.theme));
   const unlike = shuffle(others.filter((i) => i.theme !== item.theme));
   // With one theme only there are no others of another kind: then they come from the same one.

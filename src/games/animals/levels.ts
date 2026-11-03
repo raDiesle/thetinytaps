@@ -1,4 +1,4 @@
-import { lookOf, type ShadowItem } from "@/games/shadows/content";
+import { lookAlike, lookOf, PEEK_LOOKALIKES, type ShadowItem } from "@/games/shadows/content";
 import { shuffle } from "@/games/shadows/deck";
 import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./content";
 import { GIFTS, type Gift } from "./gifts";
@@ -131,9 +131,12 @@ export function dealGrow(growth: Growth, count: number): GrowRound {
   return { kind: "grow", growth, grown, correct: grown.indexOf(growth) };
 }
 
-/** The whole animals to choose from when `item` peeks out, in random order; the others as `level` says. */
+/**
+ * The whole animals to choose from when `item` peeks out, in random order; the others as `level` says, never one whose
+ * peeking part looks like `item`'s (`PEEK_LOOKALIKES`).
+ */
 export function dealPeek(item: ShadowItem, pool: ShadowItem[], level: PeekLevel): ShadowItem[] {
-  const others = pool.filter((i) => i !== item);
+  const others = pool.filter((i) => i !== item && !lookAlike(PEEK_LOOKALIKES, i, item));
   const alike = shuffle(others.filter((i) => lookOf(i) === lookOf(item)));
   const unlike = shuffle(others.filter((i) => lookOf(i) !== lookOf(item)));
   return shuffle([item, ...(level.alike ? [...alike, ...unlike] : unlike).slice(0, level.choices - 1)]);

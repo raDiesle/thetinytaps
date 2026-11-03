@@ -58,8 +58,10 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/shadows/` | Game „Schatten finden“: find the shadow of a picture; also hosts „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/shadows/CLAUDE.md) |
 | `src/games/socks/` | Game „Socken-Paare“: socks tumble out of the washing machine, two same ones hop onto the line. Details in its [`CLAUDE.md`](src/games/socks/CLAUDE.md) |
 | `src/games/potty/` | Game „Aufs Töpfchen“: an animal goes to the potty, one tap per step; „Hat geklappt!“ gives a star. Details in its [`CLAUDE.md`](src/games/potty/CLAUDE.md) |
+| `src/games/pacifier/` | Game „Die Schnullerfee“: a story to say goodbye to the pacifier – gather them, lights out, the fairy swaps them for a present. Details in its [`CLAUDE.md`](src/games/pacifier/CLAUDE.md) |
 | `src/games/weaning/` | „Abstillen“: a picture story, one page per tap, of Tapsi saying goodbye to Mama's milk and falling asleep without it. Details in its [`CLAUDE.md`](src/games/weaning/CLAUDE.md) |
 | `src/games/rewards/` | „Belohnungstafel & Zeitplan“: one page for the Belohnungstafel (a reward chart grown-ups design freely, stars on screen, printable as A4) and the Tagesplan (`/tagesplan/`, the day and week in picture cards to tick off and print), both made with one wizard that shows every choice as a picture. Details in its [`CLAUDE.md`](src/games/rewards/CLAUDE.md) |
+| `src/games/timer/` | „Timer“: a visual timer without numbers – a train rolls to the station, an hourglass runs, a candle burns down for 1–10 minutes. Details in its [`CLAUDE.md`](src/games/timer/CLAUDE.md) |
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/feelings/` | Game „Gefühle“: comfort the bear, kindergarten stories with picture choices. Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
 | `src/games/marbles/` | Game „Kettenreaktion“: the Klingende Kugelbahn (a long marble run with parts to swap), „Alles fällt um“, eight Rube Goldberg machines, and Nagelbrett, Hatschi-Kette and Wasserbahn to join in. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
@@ -160,4 +162,6 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 12. ~~Socken-Paare~~
 13. ~~Aufs Töpfchen~~
 14. ~~Belohnungstafel (gestalten und drucken)~~
-15. ~~Abstillen (Bildgeschichte „Tschüss, Mama-Milch“)~~
+15. ~~Timer zum Zuschauen (Zug, Sanduhr, Kerze)~~
+16. ~~Die Schnullerfee~~
+17. ~~Abstillen (Bildgeschichte „Tschüss, Mama-Milch“)~~

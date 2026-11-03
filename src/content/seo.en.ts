@@ -97,11 +97,23 @@ export const SEO_EN: SeoTranslation = {
         "Make your own reward chart for toddlers: day, week, month or a path of stars, with pictures, a name and a reward. Use it on a tablet or print it.",
       text: "A reward chart for toddlers, just as you like it: a week chart with tasks and days, a month chart as a calendar, a day chart for morning or evening, or a path of stars to the reward. Tasks as pictures (brushing teeth, potty, getting dressed, sleeping in their own bed …), the child’s name and a reward, best of all time together. A helper leads step by step to your own chart and shows every choice as a picture. On a tablet a grown-up holds a field and the child taps the star in; to print, landscape or portrait, in color or black and white, with fields to color and stars to cut out. No punishments, nothing is taken away. On the same page: a daily plan in pictures.",
     },
+    "/timer/": {
+      title: "Visual Timer for Kids – Hourglass, Train and Candle",
+      description:
+        "A timer without numbers for toddlers: a train rolls to the station, an hourglass runs, a candle burns down. 1 to 10 minutes, and the family waves at the end.",
+      text: "A visual timer for children who can’t read a clock yet: a grown-up sets 1, 2, 3, 5 or 10 minutes, and the child watches the time go by – a little train rolls to the station where the bear family waits, sand runs through a big hourglass, or a candle burns down until the bear child blows it out. At the end a happy tune plays and the family waves. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
+    },
     "/tagesplan/": {
       title: "Visual Schedule for Toddlers – Day and Week",
       description:
         "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. With picture cards to print.",
       text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board. On the same page: a reward chart to collect stars.",
+    },
+    "/schnullerfee/": {
+      title: "Pacifier Fairy – Saying Goodbye to the Pacifier",
+      description:
+        "The pacifier fairy comes: gather the pacifiers into a box or tie them to a balloon, lights out – and in the morning a present waits. For weaning off the binky.",
+      text: "A story for weaning off the pacifier, to play on the evening before: Tapsi the fox gathers his pacifiers and puts them into a little box on the windowsill – or ties them to a balloon that flies out of the window. Then the light goes out, mom gives a good-night kiss, and at night the pacifier fairy comes through the window, sparkles and swaps the pacifiers for a present. In the morning the child wakes Tapsi up, and the present waits on the windowsill. Parents choose which present it is and whether it is the box or the balloon, so the story matches the real goodbye.",
     },
     "/abstillen/": {
       title: "Weaning Story for Toddlers – Bye-bye, Mommy's Milk",
