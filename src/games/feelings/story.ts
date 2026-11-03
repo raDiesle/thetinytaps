@@ -80,8 +80,8 @@ export interface Beat {
   sound?: SoundName;
 }
 
-/** How long a beat stays before the next one: long enough to look at the picture, or to have it read aloud. */
-export function beatMs(beat: Beat, speech: boolean) {
+/** How long a beat stays before the next one: long enough to look at the picture, or to hear its recording (`spoken`). */
+export function beatMs(beat: Beat, spoken: boolean) {
   const chars = (beat.narration?.length ?? 0) + (beat.line?.length ?? 0);
-  return speech ? 1100 + chars * 62 : 1400 + chars * 22;
+  return spoken ? 1100 + chars * 62 : 1400 + chars * 22;
 }

@@ -33,6 +33,7 @@ const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bild
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
 const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
+const TogetherPage = page(() => import("@/pages/TogetherPage"), "TogetherPage", "/zusammen/");
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
 const WeaningPage = page(() => import("@/pages/WeaningPage"), "WeaningPage", "/abstillen/");
 
@@ -48,6 +49,7 @@ export function App() {
         {/* „Wörter tippen“ had a page of its own; it is a mode of Buchstaben & Zahlen now. */}
         <Route path="woerter" element={<Navigate to="/buchstaben/" replace />} />
         <Route path="tiere" element={<AnimalsPage />} />
+        <Route path="zusammen" element={<TogetherPage />} />
         <Route path="bilder" element={<ScenesMenu />} />
         <Route path="bilder/:scene" element={<ScenePage />} />
         <Route path="zaehne" element={<TeethPage />} />

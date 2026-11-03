@@ -10,6 +10,7 @@ import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, GIVERS } from "@/games/animals/conte
 import { GIFTS } from "@/games/animals/gifts";
 import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
 import { HOMES } from "@/games/animals/homes";
+import { PAIRS, TOGETHER_TEXTS } from "@/games/together/pairs";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
 import { FILMS } from "@/games/elevator/film/films";
 import type { Film } from "@/games/elevator/film/types";
@@ -48,7 +49,9 @@ import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
 import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
+import animalsFiles from "../games/animals/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
+import feelingsFiles from "../games/feelings/stimme/*.mp3?glob";
 import teethFiles from "../games/teeth/stimme/*.mp3?glob";
 import weaningFiles from "../games/weaning/stimme/*.mp3?glob";
 
@@ -205,6 +208,15 @@ function animals(): VoiceGroup[] {
   ];
 }
 
+function together(): VoiceGroup[] {
+  const texts = TOGETHER_TEXTS.de!;
+  return [
+    { label: "Frage", lines: once(PAIRS.map(texts.question)), built: "„Was gehört zur …?“ oder „Was braucht …?“ mit dem Ding oder Helfer" },
+    { label: "Richtig", lines: once(PAIRS.map(texts.right)), built: "Satz mit beiden" },
+    { label: "Falsch: wozu es gehört", lines: once(PAIRS.map(texts.belongs)), built: "Satz mit dem Gewählten und wozu es gehört" },
+  ];
+}
+
 function feelings(): VoiceGroup[] {
   return [
     { label: "Wie geht's dir?", lines: once([MOOD_QUESTION.de, MOOD_ANSWER.de]) },
@@ -339,7 +351,9 @@ function rewards(): VoiceGroup[] {
 
 /** The German recordings of the games in src/content/recordedLines.ts, by file name (the hash of the line). */
 const RECORDED = new Set(
-  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
+  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles, animalsFiles, feelingsFiles].flatMap((files) =>
+    Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4)),
+  ),
 );
 
 /** The games and groups of `games` with only the lines that have no German recording yet. */
@@ -362,6 +376,7 @@ export function voiceLines(): VoiceGame[] {
     { href: "/buchstaben/", groups: letters() },
     { href: "/schatten/", groups: shadows() },
     { href: "/tiere/", groups: animals() },
+    { href: "/zusammen/", groups: together() },
     { href: "/gefuehle/", groups: feelings() },
     { href: "/kleine-abenteuer/", groups: elevator() },
     { href: "/kettenreaktion/", groups: marbles() },

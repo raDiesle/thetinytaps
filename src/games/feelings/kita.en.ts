@@ -295,4 +295,146 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
     outro: [{ narration: "Well done! Stop means stop. And then you play something you both like." }],
     endCaption: "Little Bear and Little Fox high-five",
   },
+  // The stories of more feelings (selbst.ts), played like the kindergarten's.
+  cookie: {
+    title: "Disappointed, the cookie broke",
+    caption: "Cookie broken, Little Bear is sad",
+    intro: [
+      { narration: "Little Bear and Little Fox are eating cookies." },
+      { narration: "Crack! Little Bear's cookie breaks in two. He is so disappointed!" },
+    ],
+    steps: [
+      {
+        caption: "Squeeze the cuddly toy",
+        question: "The cookie is broken, Little Bear is sad. What can he do?",
+        beats: [{ narration: "Little Bear squeezes his cuddly toy really tight.", line: "I'm sad." }],
+        instead: { caption: "Knock over the cup", answer: "Hmm, now the milk is all over Little Fox. Squeeze your cuddly toy really tight instead." },
+      },
+      {
+        caption: "Show the two halves",
+        question: "Little Bear is still a little sad. What can he do?",
+        beats: [{ narration: "He looks at the halves. One, two!", line: "Now I have two cookies!" }],
+        instead: { caption: "Crumble the cookie", answer: "Hmm, now the cookie is all gone. Look instead: now you have two!" },
+      },
+      {
+        caption: "Share with Little Fox",
+        question: "Little Fox has no cookie left. What can Little Bear do?",
+        beats: [{ narration: "Little Bear gives Little Fox one half.", line: "For you!" }, { line: "Thank you, Little Bear!" }],
+        instead: { caption: "Stick out the tongue", answer: "Hmm, now Little Fox is sad. Share with him instead." },
+      },
+    ],
+    outro: [{ narration: "Great! Being sad is okay. Squeeze the cuddly toy, look again, share." }],
+    endCaption: "Little Bear and Little Fox each eat a half",
+  },
+  baby: {
+    title: "Jealous of the baby",
+    caption: "Big Bear cuddles the baby, Little Bear is jealous",
+    intro: [{ narration: "Big Bear is cuddling the baby bear." }, { narration: "Little Bear is watching. He wants a cuddle too! He is jealous." }],
+    steps: [
+      {
+        caption: "Say “I want a cuddle too!”",
+        question: "Big Bear is cuddling the baby. What can Little Bear do?",
+        beats: [{ narration: "Little Bear says:", line: "I want a cuddle too!" }, { line: "Come here! There's room for you." }],
+        instead: { caption: "Hit the baby", answer: "Hmm, hitting hurts. Say instead: I want a cuddle too!" },
+      },
+      {
+        caption: "Fetch a diaper",
+        question: "The baby needs a fresh diaper. What can Little Bear do?",
+        beats: [{ narration: "Little Bear fetches a diaper all by himself.", line: "Here!" }, { line: "Thank you! That helps me a lot." }],
+        instead: { caption: "Take the rattle", answer: "Hmm, that's the baby's rattle. Now the baby is crying. Fetch a diaper instead." },
+      },
+      {
+        caption: "Sing to the baby",
+        question: "The baby is tired. What can Little Bear do?",
+        beats: [{ narration: "Little Bear sings the baby a song." }, { narration: "The baby laughs. And Big Bear cuddles them both." }],
+        instead: { caption: "Drum loudly", answer: "Hmm, the noise makes the baby cry. Sing the baby a song instead." },
+      },
+    ],
+    outro: [{ narration: "Super! Say what you need, help, sing. Now all three are cuddling." }],
+    endCaption: "Big Bear cuddles them both",
+  },
+  broccoli: {
+    title: "Yuck, broccoli",
+    caption: "Broccoli on the plate, Little Bear doesn't like it",
+    intro: [
+      { narration: "Little Bear, Little Fox and Big Bear are eating together." },
+      { narration: "There is broccoli on the plate. Yuck! Little Bear doesn't like it." },
+    ],
+    steps: [
+      {
+        caption: "Say “No, thank you”",
+        question: "Little Bear doesn't like broccoli. What can he do?",
+        beats: [{ narration: "Little Bear says:", line: "No, thank you. I don't like that." }, { line: "Okay. You don't have to." }],
+        instead: { caption: "Throw the plate down", answer: "Hmm, now the plate is broken. Say instead: No, thank you." },
+      },
+      {
+        caption: "Smell it first",
+        question: "The broccoli is still there. What can Little Bear do?",
+        beats: [{ narration: "Little Bear sniffs it very carefully. Sniff, sniff." }, { line: "Hm. It smells like a little tree." }],
+        instead: { caption: "Spit on the table", answer: "Hmm, spitting is yucky for everyone. Smell it first instead." },
+      },
+      {
+        caption: "Put it at the edge",
+        question: "Today Little Bear doesn't want to eat it. What can he do?",
+        beats: [{ narration: "He puts the broccoli at the edge of his plate.", line: "Maybe another time." }, { narration: "And eats his potatoes." }],
+        instead: { caption: "Throw broccoli at Little Fox", answer: "Hmm, now Little Fox is all dirty. Put it at the edge instead." },
+      },
+    ],
+    outro: [{ narration: "Well done! Say no thank you, give it a sniff, put it at the edge. Nobody has to like everything." }],
+    endCaption: "Little Bear eats potatoes, the broccoli at the edge",
+  },
+  oops: {
+    title: "Oops, wet pants",
+    caption: "A little puddle, Little Bear is embarrassed",
+    intro: [{ narration: "Little Bear is playing at kindergarten." }, { narration: "Oops! He wet his pants. He feels embarrassed." }],
+    steps: [
+      {
+        caption: "Tell the teacher",
+        question: "His pants are wet. What can Little Bear do?",
+        beats: [{ narration: "Little Bear goes to the teacher.", line: "Oops! My pants are wet." }, { line: "That's okay. It happens to everyone." }],
+        instead: { caption: "Keep playing in wet pants", answer: "Hmm, in wet pants he gets cold. Tell the teacher instead." },
+      },
+      {
+        caption: "Get fresh pants",
+        question: "Little Bear needs dry pants. What can he do?",
+        beats: [{ narration: "He gets fresh pants from his cubby all by himself." }, { line: "Great, you can already do that by yourself!" }],
+        instead: { caption: "Smear the puddle", answer: "Hmm, now the whole floor is wet and slippery. Get dry pants instead." },
+      },
+      {
+        caption: "Pack the wet pants",
+        question: "The wet pants are off. What can Little Bear do?",
+        beats: [{ narration: "He puts the wet pants in the bag. Done!" }],
+        instead: { caption: "Throw the pants in the corner", answer: "Hmm, now they lie around wet. Put them in the bag instead." },
+      },
+    ],
+    outro: [{ narration: "Super! Say it, change, pack up. An oops is no big deal." }],
+    endCaption: "Little Bear in fresh pants plays again",
+  },
+  snow: {
+    title: "Excited, it's snowing",
+    caption: "First snow, Little Bear is so excited",
+    intro: [{ narration: "Little Bear looks out of the window." }, { narration: "It's snowing! The first snow! Little Bear is so excited." }],
+    steps: [
+      {
+        caption: "Cheer loudly",
+        question: "It's snowing! Little Bear is so excited. What can he do?",
+        beats: [{ narration: "Little Bear cheers really loudly:", line: "Yay! Snow!" }],
+        instead: { caption: "Romp on the armchair", answer: "Hmm, now the lamp has fallen over. Cheer really loudly instead: Yay!" },
+      },
+      {
+        caption: "Put on boots and jacket",
+        question: "Little Bear wants to go out in the snow. What can he do?",
+        beats: [{ narration: "First he puts on his boots and jacket all by himself.", line: "Ready! Come outside with me!" }, { line: "I'm coming!" }],
+        instead: { caption: "Run out in pajamas", answer: "Hmm, in pajamas it's freezing outside. Put on your boots and jacket instead." },
+      },
+      {
+        caption: "Make a snow angel",
+        question: "There is snow outside. What can Little Bear do?",
+        beats: [{ narration: "He lies down in the snow and makes a snow angel." }],
+        instead: { caption: "Throw a snowball in the face", answer: "Hmm, a snowball in the face hurts. Make a snow angel instead." },
+      },
+    ],
+    outro: [{ narration: "Yay! Cheer, get dressed, snow angel. Joy can be really big." }],
+    endCaption: "Little Bear and Big Bear build a snowman",
+  },
 };

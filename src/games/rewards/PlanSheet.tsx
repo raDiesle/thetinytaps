@@ -52,6 +52,12 @@ export const SLEEPS_LEFT: Localized<(nights: number) => string> = {
 /** „Noch 3-mal schlafen, dann Geburtstag“: a Countdown's moons and its big day, said to the child (H-41). */
 export const SLEEPS_UNTIL: Localized<(nights: number, what: string) => string> = {
   de: (n, what) => `${SLEEPS_LEFT.de(n)}, dann ${what}`,
+  en: (n, what) => `${(SLEEPS_LEFT.en ?? SLEEPS_LEFT.de)(n)}, then ${what}`,
+  zh: (n, what) => `${(SLEEPS_LEFT.zh ?? SLEEPS_LEFT.de)(n)}，然后就是${what}`,
+  hi: (n, what) => `${(SLEEPS_LEFT.hi ?? SLEEPS_LEFT.de)(n)}, फिर ${what}`,
+  es: (n, what) => `${(SLEEPS_LEFT.es ?? SLEEPS_LEFT.de)(n)} y luego llega: ${what}`,
+  ar: (n, what) => `${(SLEEPS_LEFT.ar ?? SLEEPS_LEFT.de)(n)}، ثم ${what}`,
+  ru: (n, what) => `${(SLEEPS_LEFT.ru ?? SLEEPS_LEFT.de)(n)}, а потом – ${what}`,
 };
 
 /** At most this many moons count the nights until a day of the week; further days are next week's anyway. */
@@ -283,8 +289,24 @@ function StepCard({
 const STAR = MARK_BY_ID.get("stern") ?? MARKS[0];
 
 /** − and ＋ at a card's stars. */
-const FEWER_STARS: Localized = { de: "Ein Stern weniger" };
-const MORE_STARS: Localized = { de: "Ein Stern mehr" };
+const FEWER_STARS: Localized = {
+  de: "Ein Stern weniger",
+  en: "One star fewer",
+  zh: "少一颗星",
+  hi: "एक सितारा कम",
+  es: "Una estrella menos",
+  ar: "نجمة أقل",
+  ru: "На звезду меньше",
+};
+const MORE_STARS: Localized = {
+  de: "Ein Stern mehr",
+  en: "One star more",
+  zh: "多一颗星",
+  hi: "एक सितारा ज़्यादा",
+  es: "Una estrella más",
+  ar: "نجمة أكثر",
+  ru: "На звезду больше",
+};
 
 /**
  * A card's star fields along its foot, one per star of its Zähler: big dashed rings like the Belohnungstafel's fields
@@ -350,14 +372,34 @@ function CardActions({ cell, label, every = false }: { cell: string; label: stri
   const where = { "data-cell": cell, "data-every": every ? "" : undefined };
   return (
     <>
-      <SheetAction act="configure" ask={t({ de: "„{name}“ ändern" }).replace("{name}", label)} data={{ "data-edit": "card", ...where }} />
+      <SheetAction
+        act="configure"
+        ask={t({
+          de: "„{name}“ ändern",
+          en: "Change “{name}”",
+          zh: "修改“{name}”",
+          hi: "“{name}” बदलें",
+          es: "Cambiar «{name}»",
+          ar: "تغيير «{name}»",
+          ru: "Изменить «{name}»",
+        }).replace("{name}", label)}
+        data={{ "data-edit": "card", ...where }}
+      />
       <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", ...where }} />
     </>
   );
 }
 
 /** The question beside a 🗑️ under the mouse, with the name of what it takes. */
-const DELETE_ASK: Localized = { de: "„{name}“ löschen?" };
+const DELETE_ASK: Localized = {
+  de: "„{name}“ löschen?",
+  en: "Delete “{name}”?",
+  zh: "删除“{name}”？",
+  hi: "“{name}” मिटाएँ?",
+  es: "¿Borrar «{name}»?",
+  ar: "حذف «{name}»؟",
+  ru: "Удалить «{name}»?",
+};
 
 /**
  * The reward at the end of a plan that counts stars: its picture and its name – no count of stars under it (user
@@ -374,7 +416,7 @@ function PlanGoal({ plan, ticks, linked, day, look, edit }: StepsProps) {
     return (
       <div className="pl-goal pl-goal-add" data-edit="reward" role="button" tabIndex={0}>
         <span aria-hidden>🎁</span>
-        <span className="pl-goal-label">＋ {t({ de: "Belohnung" })}</span>
+        <span className="pl-goal-label">＋ {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}</span>
       </div>
     );
   const label = rewardLabel(reward);
@@ -429,7 +471,19 @@ function PartName({ part, remove }: { part: Slot; remove?: "row" | "sign" }) {
         <SheetAction
           act="delete"
           side="left"
-          ask={remove === "row" ? t(DELETE_ASK).replace("{name}", t(slot.label)) : t({ de: "Zeichen löschen?" })}
+          ask={
+            remove === "row"
+              ? t(DELETE_ASK).replace("{name}", t(slot.label))
+              : t({
+                  de: "Zeichen löschen?",
+                  en: "Delete sign?",
+                  zh: "删除标记？",
+                  hi: "निशान मिटाएँ?",
+                  es: "¿Borrar el símbolo?",
+                  ar: "حذف الرمز؟",
+                  ru: "Удалить значок?",
+                })
+          }
           data={{ "data-edit": remove, "data-part": part }}
         />
       )}
@@ -448,7 +502,15 @@ function SignBack() {
       {(["morning", "evening"] as Slot[]).map((id) => {
         const slot = SLOT_BY_ID.get(id);
         if (!slot) return null;
-        const label = t({ de: "„{name}“ davor" }).replace("{name}", t(slot.label));
+        const label = t({
+          de: "„{name}“ davor",
+          en: "Put “{name}” in front",
+          zh: "前面加上“{name}”",
+          hi: "आगे “{name}” लगाएँ",
+          es: "Poner «{name}» delante",
+          ar: "وضع «{name}» في البداية",
+          ru: "Поставить «{name}» в начало",
+        }).replace("{name}", t(slot.label));
         return (
           <span key={id} className="pl-sign-add" data-edit="sign-back" data-part={id} role="button" tabIndex={0} aria-label={label} title={label}>
             {slot.emoji}
@@ -474,8 +536,8 @@ function AddCard({ part, day, small = false, every = false }: { part?: Slot; day
       data-every={every ? "" : undefined}
       role="button"
       tabIndex={0}
-      aria-label={t({ de: "Karte dazu" })}
-      title={t({ de: "Karte dazu" })}
+      aria-label={t({ de: "Karte dazu", en: "Add a card", zh: "添加卡片", hi: "कार्ड जोड़ें", es: "Añadir tarjeta", ar: "إضافة بطاقة", ru: "Добавить карточку" })}
+      title={t({ de: "Karte dazu", en: "Add a card", zh: "添加卡片", hi: "कार्ड जोड़ें", es: "Añadir tarjeta", ar: "إضافة بطاقة", ru: "Добавить карточку" })}
     >
       ＋
     </span>
@@ -918,7 +980,15 @@ function MoonPic() {
 const BIG_DAY_EDIT = { "data-edit": "big-day", role: "button", tabIndex: 0 } as const;
 
 /** What the window of the big day is called, also the tooltip of the places that open it. */
-export const BIG_DAY: Localized = { de: "Der große Tag" };
+export const BIG_DAY: Localized = {
+  de: "Der große Tag",
+  en: "The big day",
+  zh: "大日子",
+  hi: "बड़ा दिन",
+  es: "El gran día",
+  ar: "اليوم الكبير",
+  ru: "Большой день",
+};
 
 /**
  * The Countdown (H-41): „Wie oft noch schlafen?“ – a moon for every night until the big day, in rows read from the top

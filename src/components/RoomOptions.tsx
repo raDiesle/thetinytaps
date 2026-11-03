@@ -199,11 +199,28 @@ export function RoomStickers() {
   const [common, update] = useCommonSettings();
   // The signs in their text form (U+FE0E), never as an emoji.
   const heads: { id: Figure; name: string; sign: string; Head: () => React.JSX.Element }[] = [
-    { id: "girl", name: t({ de: "Mädchen" }), sign: "\u2640\uFE0E", Head: FoxGirlHead },
-    { id: "boy", name: t({ de: "Junge" }), sign: "\u2642\uFE0E", Head: BearBoyHead },
+    {
+      id: "girl",
+      name: t({ de: "Mädchen", ru: "Девочка", en: "Girl", zh: "女孩", hi: "लड़की", es: "Niña", ar: "بنت" }),
+      sign: "\u2640\uFE0E",
+      Head: FoxGirlHead,
+    },
+    { id: "boy", name: t({ de: "Junge", ru: "Мальчик", en: "Boy", zh: "男孩", hi: "लड़का", es: "Niño", ar: "ولد" }), sign: "\u2642\uFE0E", Head: BearBoyHead },
   ];
   return (
-    <div className="room-stickers" role="group" aria-label={t({ de: "Junge oder Mädchen" })}>
+    <div
+      className="room-stickers"
+      role="group"
+      aria-label={t({
+        de: "Junge oder Mädchen",
+        ru: "Мальчик или девочка",
+        en: "Boy or girl",
+        zh: "男孩还是女孩",
+        hi: "लड़का या लड़की",
+        es: "Niño o niña",
+        ar: "ولد أم بنت",
+      })}
+    >
       {heads.map(({ id, name, sign, Head }) => (
         <button
           key={id}
@@ -240,10 +257,18 @@ export function RoomNotes() {
   return (
     <MenuButton
       icon="ℹ️"
-      label={t({ de: "Über Books for Both" })}
+      label={t({
+        de: "Über Books for Both",
+        ru: "О Books for Both",
+        en: "About Books for Both",
+        zh: "关于 Books for Both",
+        hi: "Books for Both के बारे में",
+        es: "Acerca de Books for Both",
+        ar: "عن Books for Both",
+      })}
       className="room-thing shelf-carving-more"
       keep
-      art={<span aria-hidden>{t({ de: "mehr …" })}</span>}
+      art={<span aria-hidden>{t({ de: "mehr …", ru: "ещё …", en: "more …", zh: "更多 …", hi: "और …", es: "más …", ar: "المزيد …" })}</span>}
     >
       <SeoWords />
       <ParentsNote />

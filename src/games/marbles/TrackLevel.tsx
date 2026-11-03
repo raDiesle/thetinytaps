@@ -534,7 +534,15 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
     }
     g.openedAt = t;
     g.step = 0;
-    say({ de: "Achtung, fertig – los!" });
+    say({
+      de: "Achtung, fertig – los!",
+      en: "Ready, steady, go!",
+      zh: "预备——出发！",
+      hi: "एक, दो, तीन – चलो!",
+      es: "¡A la una, a las dos y a las tres!",
+      ar: "استعداد، انطلاق!",
+      ru: "На старт, внимание, марш!",
+    });
   };
 
   /** A tap on the basket makes the things in it jump, one after the other. */

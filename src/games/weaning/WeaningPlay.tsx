@@ -203,8 +203,16 @@ export function WeaningPlay() {
             <button
               type="button"
               className="wn-back"
-              aria-label={t({ de: "Zurückblättern" })}
-              title={t({ de: "Zurückblättern" })}
+              aria-label={t({
+                de: "Zurückblättern",
+                en: "Page back",
+                zh: "上一页",
+                hi: "पिछला पन्ना",
+                es: "Página anterior",
+                ar: "الصفحة السابقة",
+                ru: "Назад",
+              })}
+              title={t({ de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "पिछला पन्ना", es: "Página anterior", ar: "الصفحة السابقة", ru: "Назад" })}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 back();
@@ -217,7 +225,7 @@ export function WeaningPlay() {
             type="button"
             className={`wn-next${fresh ? " nudge" : ""}`}
             data-tap
-            aria-label={t({ de: "Weiter" })}
+            aria-label={t({ de: "Weiter", en: "Next", zh: "下一页", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" })}
             onPointerDown={(e) => {
               e.stopPropagation();
               act();

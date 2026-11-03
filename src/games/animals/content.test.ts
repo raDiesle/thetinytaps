@@ -44,11 +44,10 @@ test("no word of any language is left over from an animal, food or home that is 
   }
 });
 
-// An animal only in "Was gibt uns das Tier?" (the sheep) waits for that round's translation.
-test("the translated languages have words for every animal fed or housed, every food and home", () => {
+test("the translated languages have words for every animal, every food and home", () => {
   for (const language of COMPLETE) {
     const { words } = ANIMAL_TRANSLATIONS[language]!;
-    for (const { id } of ANIMALS.filter((a) => a.food || a.home)) expect(words.animals[id], `${language} ${id}`).toBeDefined();
+    for (const { id } of ANIMALS) expect(words.animals[id], `${language} ${id}`).toBeDefined();
     for (const { id } of FOODS) expect(words.foods[id], `${language} ${id}`).toBeDefined();
     for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id], `${language} ${id}`).toBeDefined();
   }
@@ -73,6 +72,29 @@ test("the sentences have no German left in them, and none in another script has 
   }
 });
 
+// "Was gibt uns das Tier?" and "Was wird aus mir?": every sentence of every gift and small one in each translated language.
+test("the gift and growth sentences are translated, and none in another script has Latin letters", () => {
+  for (const language of COMPLETE) {
+    const gift = GIFT_TEXTS[language]!;
+    const grow = GROW_TEXTS[language]!;
+    const shown: [string, string][] = [];
+    for (const animal of GIVERS) {
+      const given = GIFTS[animal.gives!];
+      shown.push([gift.whatGives(animal), GIFT_TEXTS.de.whatGives(animal)]);
+      shown.push([gift.gives(animal, given), GIFT_TEXTS.de.gives(animal, given)]);
+      shown.push([gift.comesFrom(given, animal), GIFT_TEXTS.de.comesFrom(given, animal)]);
+      shown.push([gift.gift(given), GIFT_TEXTS.de.gift(given)]);
+    }
+    for (const growth of GROWTHS) {
+      for (const key of ["young", "adult", "whatBecomes", "becomes", "comesFrom"] as const) shown.push([grow[key](growth), GROW_TEXTS.de![key](growth)]);
+    }
+    for (const [sentence, de] of shown) {
+      expect(sentence, language).not.toBe(de);
+      if (OWN_SCRIPT.includes(language)) expect(sentence, language).not.toMatch(/[A-Za-zäöüß]/);
+    }
+  }
+});
+
 test("an animal without its words gets the whole German sentence, in every language", () => {
   const withFood = ANIMALS.find((a) => a.food && a.home)!;
   const animal = { ...withFood, id: "not-translated" };
@@ -82,6 +104,10 @@ test("an animal without its words gets the whole German sentence, in every langu
     expect(texts.hungry(animal), language).toBe(de.hungry(animal));
     expect(texts.yummy(animal, withFood.food!), language).toBe(de.yummy(animal, withFood.food!));
     expect(texts.movedIn(animal, HOMES[withFood.home!]), language).toBe(de.movedIn(animal, HOMES[withFood.home!]));
+    const giver = { ...GIVERS[0], id: "not-translated" };
+    expect(GIFT_TEXTS[language]!.whatGives(giver), language).toBe(GIFT_TEXTS.de.whatGives(giver));
+    const growth = { ...GROWTHS[0], id: "not-translated" as (typeof GROWTHS)[number]["id"] };
+    expect(GROW_TEXTS[language]!.becomes(growth), language).toBe(GROW_TEXTS.de!.becomes(growth));
   }
 });
 

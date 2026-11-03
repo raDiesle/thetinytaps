@@ -1,4 +1,6 @@
-import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./content";
+import type { Gift, GiftId } from "./gifts";
+import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
 
 // Chinese (Simplified, Mandarin) texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in
@@ -30,6 +32,7 @@ export const CHINESE_ANIMALS: Record<string, string> = {
   schnecke: "蜗牛",
   loewe: "狮子",
   giraffe: "长颈鹿",
+  schaf: "小绵羊",
 };
 
 /** Foods by their id (one without an entry is said in German), for the plate and „……爱吃……“. */
@@ -97,5 +100,58 @@ export function chineseTexts(german: AnimalTexts): AnimalTexts {
   };
 }
 
+/** What the animals give us, by gift id ("Was gibt uns das Tier?"); one without an entry is said in German. */
+export const CHINESE_GIFTS: Partial<Record<GiftId, string>> = {
+  milch: "牛奶",
+  ei: "鸡蛋",
+  honig: "蜂蜜",
+  wolle: "羊毛",
+};
+
+/** "Was gibt uns das Tier?" in Chinese; what has no Chinese words yet is the whole German sentence. */
+export function chineseGifts(german: GiftTexts): GiftTexts {
+  const animal = (a: Animal) => CHINESE_ANIMALS[a.id];
+  const gift = (g: Gift) => CHINESE_GIFTS[g.id];
+  return {
+    gift: (g) => gift(g) ?? german.gift(g),
+    whatGives: (a) => (animal(a) ? `${animal(a)}给我们什么？` : german.whatGives(a)),
+    gives: (a, g) => (animal(a) && gift(g) ? `${animal(a)}给我们${gift(g)}。谢谢！` : german.gives(a, g)),
+    comesFrom: (g, giver) => (animal(giver) && gift(g) ? `${gift(g)}是${animal(giver)}给我们的！` : german.comesFrom(g, giver)),
+  };
+}
+
+/** A small one and what it becomes, in Chinese ("Was wird aus mir?"). */
+export interface ChineseGrowth {
+  /** The small one: "毛毛虫". */
+  young: string;
+  /** What it becomes: "蝴蝶". */
+  adult: string;
+}
+
+/** The small ones by their id; one without an entry is said in German. */
+export const CHINESE_GROWTHS: Partial<Record<GrowthId, ChineseGrowth>> = {
+  raupe: { young: "毛毛虫", adult: "蝴蝶" },
+  ei: { young: "鸡蛋", adult: "小鸡" },
+  samen: { young: "种子", adult: "向日葵" },
+  kaulquappe: { young: "小蝌蚪", adult: "小青蛙" },
+};
+
+/** "Was wird aus mir?" in Chinese; a small one without its Chinese words is the whole German sentence. */
+export function chineseGrowth(german: GrowTexts): GrowTexts {
+  const word = (g: Growth) => CHINESE_GROWTHS[g.id];
+  return {
+    young: (g) => word(g)?.young ?? german.young(g),
+    adult: (g) => word(g)?.adult ?? german.adult(g),
+    whatBecomes: (g) => (word(g) ? `${word(g)!.young}会变成什么？` : german.whatBecomes(g)),
+    becomes: (g) => (word(g) ? `${word(g)!.young}变成${word(g)!.adult}啦。真棒！` : german.becomes(g)),
+    comesFrom: (g) => (word(g) ? `${word(g)!.adult}是${word(g)!.young}变成的！` : german.comesFrom(g)),
+  };
+}
+
 /** Chinese, for the table of languages in content.ts. */
-export const CHINESE: AnimalTranslation = { words: { animals: CHINESE_ANIMALS, foods: CHINESE_FOODS, homes: CHINESE_HOMES }, texts: chineseTexts };
+export const CHINESE: AnimalTranslation = {
+  words: { animals: CHINESE_ANIMALS, foods: CHINESE_FOODS, homes: CHINESE_HOMES },
+  texts: chineseTexts,
+  gifts: chineseGifts,
+  growth: chineseGrowth,
+};

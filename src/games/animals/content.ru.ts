@@ -1,4 +1,6 @@
-import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./content";
+import type { Gift, GiftId } from "./gifts";
+import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
 
 // Russian texts for "Was gehört zum Tier?", by the ids of the animals, foods and
@@ -30,6 +32,7 @@ export const RUSSIAN_ANIMALS: Record<string, string> = {
   schnecke: "улитка",
   loewe: "лев",
   giraffe: "жираф",
+  schaf: "овечка",
 };
 
 /** A food in Russian. */
@@ -111,5 +114,78 @@ export function russianTexts(german: AnimalTexts): AnimalTexts {
   };
 }
 
+/** A gift in Russian. */
+export interface RussianGift {
+  /** Nominative, lower case, for screen readers and "Яйцо – от курочки!": "яйцо". */
+  name: string;
+  /** Accusative, for "Курочка даёт нам яйца.": plural where one gets many. */
+  gives: string;
+}
+
+/** What the animals give us, by gift id ("Was gibt uns das Tier?"); one without an entry is said in German. */
+export const RUSSIAN_GIFTS: Partial<Record<GiftId, RussianGift>> = {
+  milch: { name: "молоко", gives: "молоко" },
+  ei: { name: "яйцо", gives: "яйца" },
+  honig: { name: "мёд", gives: "мёд" },
+  wolle: { name: "шерсть", gives: "шерсть" },
+};
+
+/** The animals that give us something in the genitive, for "Яйцо – от курочки!"; one without an entry is said in German. */
+export const RUSSIAN_FROM: Record<string, string> = {
+  kuh: "коровы",
+  huhn: "курочки",
+  biene: "пчёлки",
+  schaf: "овечки",
+};
+
+/** "Was gibt uns das Tier?" in Russian; "даёт" doesn't follow the animal's gender. What has no Russian words yet is the whole German sentence. */
+export function russianGifts(german: GiftTexts): GiftTexts {
+  const animal = (a: Animal) => RUSSIAN_ANIMALS[a.id];
+  const gift = (g: Gift) => RUSSIAN_GIFTS[g.id];
+  return {
+    gift: (g) => (gift(g) ? capital(gift(g)!.name) : german.gift(g)),
+    whatGives: (a) => (animal(a) ? `Что нам даёт ${animal(a)}?` : german.whatGives(a)),
+    gives: (a, g) => (animal(a) && gift(g) ? `${capital(animal(a))} даёт нам ${gift(g)!.gives}. Спасибо!` : german.gives(a, g)),
+    comesFrom: (g, giver) => (RUSSIAN_FROM[giver.id] && gift(g) ? `${capital(gift(g)!.name)} – от ${RUSSIAN_FROM[giver.id]}!` : german.comesFrom(g, giver)),
+  };
+}
+
+/** A small one and what it becomes, in Russian ("Was wird aus mir?"). */
+export interface RussianGrowth {
+  /** The small one, nominative, lower case: "гусеница". */
+  young: string;
+  /** The small one in the genitive, for "Бабочка – из гусеницы!". */
+  ofYoung: string;
+  /** What it becomes, nominative, lower case: "бабочка". */
+  adult: string;
+  /** What it becomes in the accusative, for "Гусеница превращается в бабочку.". */
+  intoAdult: string;
+}
+
+/** The small ones by their id; one without an entry is said in German. */
+export const RUSSIAN_GROWTHS: Partial<Record<GrowthId, RussianGrowth>> = {
+  raupe: { young: "гусеница", ofYoung: "гусеницы", adult: "бабочка", intoAdult: "бабочку" },
+  ei: { young: "яйцо", ofYoung: "яйца", adult: "цыплёнок", intoAdult: "цыплёнка" },
+  samen: { young: "семечко", ofYoung: "семечка", adult: "подсолнух", intoAdult: "подсолнух" },
+  kaulquappe: { young: "головастик", ofYoung: "головастика", adult: "лягушка", intoAdult: "лягушку" },
+};
+
+/** "Was wird aus mir?" in Russian, in the present tense, so no verb follows a gender. */
+export function russianGrowth(german: GrowTexts): GrowTexts {
+  const word = (g: Growth) => RUSSIAN_GROWTHS[g.id];
+  return {
+    young: (g) => (word(g) ? capital(word(g)!.young) : german.young(g)),
+    adult: (g) => (word(g) ? capital(word(g)!.adult) : german.adult(g)),
+    whatBecomes: (g) => (word(g) ? `Во что превращается ${word(g)!.young}?` : german.whatBecomes(g)),
+    becomes: (g) => (word(g) ? `${capital(word(g)!.young)} превращается в ${word(g)!.intoAdult}. Здорово!` : german.becomes(g)),
+    comesFrom: (g) => (word(g) ? `${capital(word(g)!.adult)} – из ${word(g)!.ofYoung}!` : german.comesFrom(g)),
+  };
+}
+
 /** Russian, for the table of languages in content.ts. */
-export const RUSSIAN: AnimalTranslation = { words: { animals: RUSSIAN_ANIMALS, foods: RUSSIAN_FOODS, homes: RUSSIAN_HOMES }, texts: russianTexts };
+export const RUSSIAN: AnimalTranslation = {
+  words: { animals: RUSSIAN_ANIMALS, foods: RUSSIAN_FOODS, homes: RUSSIAN_HOMES },
+  texts: russianTexts,
+  gifts: russianGifts,
+  growth: russianGrowth,
+};

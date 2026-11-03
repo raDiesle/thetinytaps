@@ -65,6 +65,12 @@ export const SEO_EN: SeoTranslation = {
         "What does the animal need? Who peeks out of the bush, what does it eat, what does it give us, where does it live? With animal sounds, for toddlers, without ads.",
       text: "Who is peeking out of the bush? The rabbit wants a carrot, the cow gives us milk, the dog looks for its kennel, the caterpillar becomes a butterfly: spot the animal, tap the food, the milk, the egg or the home, and it is happy and makes its sound. The game gets easier or harder by itself.",
     },
+    "/zusammen/": {
+      title: "What Goes Together? – Matching Game for Toddlers",
+      description:
+        "Toothbrush and toothpaste, key and door, the fire fighter and the hose: toddlers find what goes together and see it work at once. Without ads.",
+      text: "The toothbrush lies above, toothpaste, a key and a lid below: the child taps what belongs to it, and the two get going – the toothpaste squeezes a blob onto the brush, the key turns and the door opens. In between, helpers drawn as fox and bear need their tools: the fire fighter puts out the fire with the hose, the doctor listens with the stethoscope, the hairdresser snips with the scissors. The game gets easier or harder by itself.",
+    },
     "/schatten/": {
       title: "Find the Shadow – Matching Game for Toddlers",
       description: "Which shadow belongs to the giraffe? A picture looks for its shadow among two to six – first matching for toddlers, without ads.",

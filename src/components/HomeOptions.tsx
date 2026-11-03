@@ -131,17 +131,48 @@ export function LeaveOptions() {
   const [common, update] = useCommonSettings();
   return (
     <section className="settings">
-      <SettingsGroup title={t({ de: "Spiel verlassen" })}>
+      <SettingsGroup
+        title={t({
+          de: "Spiel verlassen",
+          ru: "Выход из игры",
+          en: "Leaving a game",
+          zh: "退出游戏",
+          hi: "खेल से बाहर निकलना",
+          es: "Salir del juego",
+          ar: "الخروج من اللعبة",
+        })}
+      >
         <Choice<Leave>
-          label={t({ de: "✕ zum Verlassen eines Spiels" })}
+          label={t({
+            de: "✕ zum Verlassen eines Spiels",
+            ru: "✕ для выхода из игры",
+            en: "✕ to leave a game",
+            zh: "用 ✕ 退出游戏",
+            hi: "खेल से बाहर निकलने के लिए ✕",
+            es: "✕ para salir de un juego",
+            ar: "✕ للخروج من اللعبة",
+          })}
           value={common.leave}
           onChange={(leave) => update({ leave })}
           options={[
-            { value: "tap", label: t({ de: "Antippen" }) },
-            { value: "hold", label: t({ de: "Gedrückt halten" }) },
+            { value: "tap", label: t({ de: "Antippen", ru: "Нажать", en: "Tap", zh: "轻点", hi: "टैप करें", es: "Tocar", ar: "النقر" }) },
+            {
+              value: "hold",
+              label: t({ de: "Gedrückt halten", ru: "Удерживать", en: "Hold", zh: "按住", hi: "दबाए रखें", es: "Mantener pulsado", ar: "الضغط المطوّل" }),
+            },
           ]}
         />
-        <p className="setting-note">{t({ de: "Gedrückt halten: Ihr Kind beendet ein Spiel nicht aus Versehen. Esc muss immer gehalten werden." })}</p>
+        <p className="setting-note">
+          {t({
+            de: "Gedrückt halten: Ihr Kind beendet ein Spiel nicht aus Versehen. Esc muss immer gehalten werden.",
+            ru: "Удерживать: ваш ребёнок не закончит игру случайно. Esc всегда нужно удерживать.",
+            en: "Hold: your child won’t end a game by accident. Esc always has to be held.",
+            zh: "按住：孩子不会不小心结束游戏。Esc 键始终需要按住。",
+            hi: "दबाए रखें: आपका बच्चा गलती से खेल बंद नहीं करेगा। Esc को हमेशा दबाए रखना होता है।",
+            es: "Mantener pulsado: su peque no termina un juego sin querer. Esc siempre hay que mantenerla pulsada.",
+            ar: "الضغط المطوّل: لن ينهي طفلكم اللعبة عن غير قصد. يجب دائمًا الضغط مطوّلًا على Esc.",
+          })}
+        </p>
       </SettingsGroup>
     </section>
   );

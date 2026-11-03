@@ -457,7 +457,15 @@ function GoodNight() {
               es: "Se acabó el tiempo de juego. Para salir, mantenga pulsada la ✕.",
               ar: "انتهى وقت اللعب. للخروج اضغطوا مطولًا على ✕.",
             })
-          : t({ de: "Die Spielzeit ist vorbei. Zum Beenden auf ✕ tippen." })}
+          : t({
+              de: "Die Spielzeit ist vorbei. Zum Beenden auf ✕ tippen.",
+              ru: "Время игры закончилось. Чтобы выйти, нажмите ✕.",
+              en: "Play time is over. To leave, tap ✕.",
+              zh: "游戏时间结束了。轻点 ✕ 即可退出。",
+              hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ✕ पर टैप करें।",
+              es: "Se acabó el tiempo de juego. Para salir, toque la ✕.",
+              ar: "انتهى وقت اللعب. للخروج انقروا على ✕.",
+            })}
       </p>
     </div>
   );

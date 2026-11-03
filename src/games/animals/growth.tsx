@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { playBlub, playCrack, playPlop, playPop, playRustle, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { playCroak, playTweet } from "@/lib/realSounds";
+import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
 
 // Something small and what it becomes, for "Was wird aus mir?" (Z-12): caterpillar and butterfly, egg and chick,
@@ -276,7 +277,7 @@ export function GrowthPicture({ growth, growing = false, label }: { growth: Grow
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
-/** What "Was wird aus mir?" says, in one language (only German so far: its translations wait to be asked for). */
+/** What "Was wird aus mir?" says, in one language. */
 export interface GrowTexts {
   /** The small one's name, for screen readers: "Raupe". */
   young: (g: Growth) => string;
@@ -290,13 +291,13 @@ export interface GrowTexts {
   comesFrom: (g: Growth) => string;
 }
 
-/** The texts of "Was wird aus mir?" by app language: `pick(GROW_TEXTS, language.id)`. */
-export const GROW_TEXTS: Localized<GrowTexts> = {
-  de: {
-    young: (g) => g.young,
-    adult: (g) => g.adult,
-    whatBecomes: (g) => `Was wird aus ${g.fromThe}?`,
-    becomes: (g) => `Aus ${g.fromThe} wird ${g.a}. Toll!`,
-    comesFrom: (g) => `${capitalize(g.the)} kommt aus ${g.fromThe}!`,
-  },
+const GERMAN_GROW_TEXTS: GrowTexts = {
+  young: (g) => g.young,
+  adult: (g) => g.adult,
+  whatBecomes: (g) => `Was wird aus ${g.fromThe}?`,
+  becomes: (g) => `Aus ${g.fromThe} wird ${g.a}. Toll!`,
+  comesFrom: (g) => `${capitalize(g.the)} kommt aus ${g.fromThe}!`,
 };
+
+/** The texts of "Was wird aus mir?" by app language (the other languages in content.<lang>.ts, `growth`): `pick(GROW_TEXTS, language.id)`. */
+export const GROW_TEXTS: Localized<GrowTexts> = byLanguage((texts) => texts.animals?.growth(GERMAN_GROW_TEXTS), GERMAN_GROW_TEXTS);

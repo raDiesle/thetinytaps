@@ -25,7 +25,7 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
 - A tap on a waiting vehicle honks. Keys work as in „Freies Entdecken“ and also draw a road from the last waiting vehicle
   (or the bottom middle) to the key's item (`LaneControl.driveTo`).
 - Everything is still once the vehicles wait: wheels turn only while driving, and the frame loop stops.
-- Its prompt (`roadPrompts` in `phrases.ts`) is German only; other languages show the usual prompt.
+- Its prompt is `roadPrompts` in `phrases.ts`, in every language.
 
 ## Working on scenes
 

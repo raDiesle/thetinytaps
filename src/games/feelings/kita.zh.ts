@@ -281,4 +281,140 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
     outro: [{ narration: "真好！停就是停。然后玩两个都喜欢的游戏。" }],
     endCaption: "小熊和小狐狸击掌",
   },
+  // The stories of more feelings (selbst.ts), played like the kindergarten's.
+  cookie: {
+    title: "失望，饼干断了",
+    caption: "饼干断了，小熊很难过",
+    intro: [{ narration: "小熊和小狐狸在吃饼干。" }, { narration: "咔嚓！小熊的饼干断成了两半。他好失望！" }],
+    steps: [
+      {
+        caption: "抱紧毛绒玩具",
+        question: "饼干断了，小熊很难过。他可以怎么做？",
+        beats: [{ narration: "小熊紧紧地抱住他的毛绒玩具。", line: "我很难过。" }],
+        instead: { caption: "打翻杯子", answer: "嗯，现在牛奶洒到小狐狸身上了。还是紧紧抱住你的毛绒玩具吧。" },
+      },
+      {
+        caption: "看看两半",
+        question: "小熊还有一点点难过。他可以怎么做？",
+        beats: [{ narration: "他看看两半饼干。一，二！", line: "现在我有两块饼干啦！" }],
+        instead: { caption: "把饼干捏碎", answer: "嗯，现在饼干全没了。还是看一看吧：现在你有两块啦！" },
+      },
+      {
+        caption: "和小狐狸分享",
+        question: "小狐狸没有饼干了。小熊可以怎么做？",
+        beats: [{ narration: "小熊把一半给小狐狸。", line: "给你！" }, { line: "谢谢你，小熊！" }],
+        instead: { caption: "吐舌头", answer: "嗯，现在小狐狸难过了。还是和他分享吧。" },
+      },
+    ],
+    outro: [{ narration: "真棒！难过没关系。抱紧毛绒玩具，换个样子看，分享。" }],
+    endCaption: "小熊和小狐狸各吃一半",
+  },
+  baby: {
+    title: "吃宝宝的醋",
+    caption: "大熊抱着宝宝，小熊吃醋了",
+    intro: [{ narration: "大熊在抱熊宝宝。" }, { narration: "小熊在旁边看着。他也想要抱抱！他吃醋了。" }],
+    steps: [
+      {
+        caption: "说“我也要抱抱！”",
+        question: "大熊在抱宝宝。小熊可以怎么做？",
+        beats: [{ narration: "小熊说：", line: "我也要抱抱！" }, { line: "过来吧！这儿有你的位置。" }],
+        instead: { caption: "打宝宝", answer: "嗯，打人会疼。还是说：我也要抱抱！" },
+      },
+      {
+        caption: "拿尿布",
+        question: "宝宝需要一块干净的尿布。小熊可以怎么做？",
+        beats: [{ narration: "小熊自己去拿来一块尿布。", line: "给！" }, { line: "谢谢！这可帮了我大忙。" }],
+        instead: { caption: "拿走摇铃", answer: "嗯，这是宝宝的摇铃。现在宝宝哭了。还是去拿尿布吧。" },
+      },
+      {
+        caption: "给宝宝唱歌",
+        question: "宝宝困了。小熊可以怎么做？",
+        beats: [{ narration: "小熊给宝宝唱一首歌。" }, { narration: "宝宝笑了。大熊把他们两个都抱在怀里。" }],
+        instead: { caption: "大声敲鼓", answer: "嗯，太吵了，宝宝会哭。还是给宝宝唱首歌吧。" },
+      },
+    ],
+    outro: [{ narration: "太棒了！说出你需要什么，帮忙，唱歌。现在三个都抱在一起啦。" }],
+    endCaption: "大熊抱着他们两个",
+  },
+  broccoli: {
+    title: "呃，西兰花",
+    caption: "盘子里有西兰花，小熊不喜欢",
+    intro: [{ narration: "小熊、小狐狸和大熊一起吃饭。" }, { narration: "盘子里有西兰花。呃！小熊不喜欢。" }],
+    steps: [
+      {
+        caption: "说“不用了，谢谢”",
+        question: "小熊不喜欢西兰花。他可以怎么做？",
+        beats: [{ narration: "小熊说：", line: "不用了，谢谢。我不喜欢这个。" }, { line: "好的。你不用吃。" }],
+        instead: { caption: "把盘子扔到地上", answer: "嗯，现在盘子摔碎了。还是说：不用了，谢谢。" },
+      },
+      {
+        caption: "先闻一闻",
+        question: "西兰花还在那儿。小熊可以怎么做？",
+        beats: [{ narration: "小熊小心地闻一闻。嗅嗅，嗅嗅。" }, { line: "嗯。闻起来像一棵小树。" }],
+        instead: { caption: "往桌上吐", answer: "嗯，吐东西大家都觉得恶心。还是先闻一闻吧。" },
+      },
+      {
+        caption: "放到盘子边上",
+        question: "今天小熊不想吃它。他可以怎么做？",
+        beats: [{ narration: "他把西兰花放到盘子边上。", line: "下次再说吧。" }, { narration: "然后吃他的土豆。" }],
+        instead: { caption: "把西兰花扔向小狐狸", answer: "嗯，现在小狐狸弄得脏兮兮的。还是把它放到边上吧。" },
+      },
+    ],
+    outro: [{ narration: "真好！说不用了谢谢，闻一闻，放到边上。没有谁必须什么都喜欢。" }],
+    endCaption: "小熊吃土豆，西兰花放在边上",
+  },
+  oops: {
+    title: "哎呀，尿裤子了",
+    caption: "一小摊水，小熊不好意思",
+    intro: [{ narration: "小熊在幼儿园玩。" }, { narration: "哎呀！他尿裤子了。他觉得很不好意思。" }],
+    steps: [
+      {
+        caption: "告诉老师",
+        question: "裤子湿了。小熊可以怎么做？",
+        beats: [{ narration: "小熊走到老师那儿。", line: "哎呀！我的裤子湿了。" }, { line: "没关系。每个人都会有这种时候。" }],
+        instead: { caption: "穿着湿裤子接着玩", answer: "嗯，穿着湿裤子他会冷。还是告诉老师吧。" },
+      },
+      {
+        caption: "拿干净裤子",
+        question: "小熊需要一条干裤子。他可以怎么做？",
+        beats: [{ narration: "他自己从小柜子里拿出一条干净的裤子。" }, { line: "真棒，你已经会自己做啦！" }],
+        instead: { caption: "把水抹开", answer: "嗯，现在整个地板都湿了，好滑。还是去拿一条干裤子吧。" },
+      },
+      {
+        caption: "装好湿裤子",
+        question: "湿裤子脱下来了。小熊可以怎么做？",
+        beats: [{ narration: "他把湿裤子放进袋子里。好了！" }],
+        instead: { caption: "把裤子扔到角落", answer: "嗯，湿裤子就乱放在那儿了。还是把它放进袋子里吧。" },
+      },
+    ],
+    outro: [{ narration: "太棒了！说出来，换裤子，装起来。哎呀一下，没什么大不了。" }],
+    endCaption: "小熊穿着干净裤子又玩起来了",
+  },
+  snow: {
+    title: "激动，下雪了",
+    caption: "第一场雪，小熊好激动",
+    intro: [{ narration: "小熊往窗外看。" }, { narration: "下雪啦！第一场雪！小熊好激动。" }],
+    steps: [
+      {
+        caption: "大声欢呼",
+        question: "下雪啦！小熊好激动。他可以怎么做？",
+        beats: [{ narration: "小熊大声欢呼：", line: "好耶！下雪啦！" }],
+        instead: { caption: "在沙发椅上乱蹦", answer: "嗯，现在台灯倒了。还是大声欢呼吧：好耶！" },
+      },
+      {
+        caption: "穿靴子和外套",
+        question: "小熊想去雪地里玩。他可以怎么做？",
+        beats: [{ narration: "他先自己穿上靴子和外套。", line: "好了！跟我一起出去吧！" }, { line: "我来啦！" }],
+        instead: { caption: "穿着睡衣跑出去", answer: "嗯，穿着睡衣，外面冷极了。还是穿上靴子和外套吧。" },
+      },
+      {
+        caption: "做雪天使",
+        question: "外面有雪了。小熊可以怎么做？",
+        beats: [{ narration: "他躺在雪地里，做一个雪天使。" }],
+        instead: { caption: "往脸上扔雪球", answer: "嗯，雪球扔到脸上会疼。还是做一个雪天使吧。" },
+      },
+    ],
+    outro: [{ narration: "好耶！欢呼，穿好衣服，做雪天使。开心可以大大的。" }],
+    endCaption: "小熊和大熊在堆雪人",
+  },
 };

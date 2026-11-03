@@ -1,6 +1,6 @@
 // What the games with ElevenLabs recordings (besides Bewegungsabenteuer, whose stories list their own lines) say, in
-// every language they are translated into: the list scripts/elevenlabs-voice.mjs records from, one MP3 per line
-// in the game's stimme/ folder (src/lib/voice.ts plays them). German lines come from voiceLines.ts, the list on
+// every language they are translated into (or in German only so far, `germanOnly`): the list
+// scripts/elevenlabs-voice.mjs records from, one MP3 per line in the game's stimme/ folder (src/lib/voice.ts plays them). German lines come from voiceLines.ts, the list on
 // /management/; the other languages from each game's translations. A line a language has no translation of is said
 // in German, so only translated lines get a recording in that language.
 
@@ -77,6 +77,22 @@ function weaning(language: TargetLanguageId): RecordedLine[] {
   return once(STEPS_WEANING.map((step) => step.line[language] !== undefined && { text: step.line[language]!, kind: "calm" as const }));
 }
 
+/**
+ * A game recorded in German only so far (Was gehört zum Tier?, Gefühle, November 2026): its other languages are
+ * recorded only when the user asks (root CLAUDE.md), so until then they say nothing, and a `make` for other games
+ * spends no credits on them. Its praise is said proudly, everything else warmly.
+ */
+const germanOnly =
+  (href: string) =>
+  (language: TargetLanguageId): RecordedLine[] =>
+    language !== "de"
+      ? []
+      : once(
+          (voiceLines().find((g) => g.href === href)?.groups ?? []).flatMap((g) =>
+            g.lines.map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) })),
+          ),
+        );
+
 function goodNight(language: TargetLanguageId): RecordedLine[] {
   const text = GOOD_NIGHT[language];
   return text ? [{ text, kind: "calm" }] : [];
@@ -88,6 +104,8 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "kleine-abenteuer", folder: "src/games/elevator/stimme", lines: elevator },
   { name: "gute-nacht", folder: "src/components/stimme", lines: goodNight },
   { name: "abstillen", folder: "src/games/weaning/stimme", lines: weaning },
+  { name: "tiere", folder: "src/games/animals/stimme", lines: germanOnly("/tiere/") },
+  { name: "gefuehle", folder: "src/games/feelings/stimme", lines: germanOnly("/gefuehle/") },
 ];
 
 /** The languages these games are recorded in: the app's. */
