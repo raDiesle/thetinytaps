@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { useLeaveGame } from "@/components/GameShell";
 import { appLanguage, pick, useAppLanguage, useT, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { recordedVoice } from "@/lib/voice";
@@ -378,58 +377,5 @@ export function StepDots({ total, done, current }: { total: number; done: number
         </span>
       ))}
     </span>
-  );
-}
-
-/** At the end of a story: back to the start screen or play it again (small, white), or go on to the next one (big, yellow). Only pictures, no words. */
-export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: () => void }) {
-  const t = useT();
-  const leave = useLeaveGame();
-  // Pointer down, not click: it reacts right away, and the picture underneath doesn't get the tap.
-  const press = (action: () => void) => (e: PointerEvent) => {
-    e.stopPropagation();
-    action();
-  };
-
-  return (
-    <div className="fg-end" data-tap-root>
-      {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
-      <button
-        type="button"
-        className="fg-round menu"
-        aria-label={t({ de: "Menü", ru: "Меню", en: "Menu", zh: "菜单", hi: "मेन्यू", es: "Menú", ar: "القائمة" })}
-        onPointerDown={(e) => e.stopPropagation()}
-        onClick={leave}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden>
-          {/* Four cards, like the start screen – not a house, which would look like the home page. */}
-          <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
-          <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
-          <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
-          <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
-        </svg>
-      </button>
-      <button
-        type="button"
-        className="fg-round again"
-        aria-label={t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}
-        onPointerDown={press(onAgain)}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden>
-          <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />
-          <path d="M2.5 3.5v5h5" />
-        </svg>
-      </button>
-      <button
-        type="button"
-        className="fg-round next"
-        aria-label={t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}
-        onPointerDown={press(onNext)}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden>
-          <path d="M8 4.5v15l12-7.5z" />
-        </svg>
-      </button>
-    </div>
   );
 }

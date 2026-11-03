@@ -9,10 +9,10 @@ interface GameEndProps {
   /** Plays the same level (picture, story …) once more. */
   onAgain: () => void;
   /**
-   * The next level, after the last one the first again: its name, read out with „Weiter“. Left out only where there is
-   * no other level, so „Weiter“ would just be „Nochmal“.
+   * The next level, after the last one the first again, and its name, read out with „Weiter“. Left out only where there
+   * is no other level, so „Weiter“ would just be „Nochmal“.
    */
-  next?: { name: string; onNext: () => void };
+  next?: { name?: string; onNext: () => void };
   /** Waits this long before showing up, so the party can be watched first. */
   delayMs?: number;
   /**
@@ -25,6 +25,11 @@ interface GameEndProps {
    * In `corners` it is always left out: the picture there is the point.
    */
   noFamily?: boolean;
+  /**
+   * Lies in the game's own layout instead of over the picture's bottom, without the family: where a game places the
+   * buttons beside its own end picture (Gefühle's cards' room, Zähne putzen's week chart and cheering foxes).
+   */
+  inline?: boolean;
 }
 
 /**
@@ -33,7 +38,7 @@ interface GameEndProps {
  * (D-12). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Menü“ and
  * „Nochmal“ two smaller paper slips stacked beside it.
  */
-export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false }: GameEndProps) {
+export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false, inline = false }: GameEndProps) {
   const t = useT();
   const leave = useLeaveGame();
   const counts = useCountsPlaytime();
@@ -64,8 +69,8 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily 
   };
 
   return (
-    <div className={`game-end${corners ? " corners" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
-      {!corners && !noFamily && <CheeringFamily kind={kind} className="game-end-family" />}
+    <div className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
+      {!corners && !inline && !noFamily && <CheeringFamily kind={kind} className="game-end-family" />}
       <div className="game-end-small">
         {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
         <button type="button" className="game-end-button menu" onClick={leave}>
@@ -79,27 +84,14 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily 
         <button
           type="button"
           className="game-end-button next"
-          aria-label={`${t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}: ${next.name}`}
+          aria-label={[t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" }), next.name]
+            .filter(Boolean)
+            .join(": ")}
           onPointerDown={press(next.onNext)}
         >
           {t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}
         </button>
       )}
     </div>
-  );
-}
-
-/**
- * Four cards, like the game's own start screen where its modes are picked – not a house, which would look like the
- * home page. On Zähne putzen's own „Menü“; `GameEnd` has words only.
- */
-export function MenuIcon() {
-  return (
-    <svg className="menu-icon" viewBox="0 0 24 24" aria-hidden>
-      <rect x="2" y="2" width="9" height="9" rx="2" style={{ fill: "var(--ocean)" }} />
-      <rect x="13" y="2" width="9" height="9" rx="2" style={{ fill: "var(--mint)" }} />
-      <rect x="2" y="13" width="9" height="9" rx="2" style={{ fill: "var(--sunshine)" }} />
-      <rect x="13" y="13" width="9" height="9" rx="2" style={{ fill: "var(--berry)" }} />
-    </svg>
   );
 }

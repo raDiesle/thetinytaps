@@ -1,3 +1,4 @@
+import { GameEnd } from "@/components/GameEnd";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { imageFor, preloadImages, situationImages, storyImages } from "./images";
 import type { Situation } from "./kita";
@@ -5,7 +6,6 @@ import type { FeelingsSettings } from "./settings";
 import {
   CHEER_MS,
   ChoiceCard,
-  EndButtons,
   FloaterLayer,
   OOPS_MS,
   StepDots,
@@ -190,7 +190,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
   // Only what the child can choose from now is shown, big; while the happy end plays all good steps once more, small.
   let cards: ReactNode = null;
   if (run.phase === "done") {
-    cards = <EndButtons onAgain={startSituation} onNext={onNext} />;
+    cards = <GameEnd inline onAgain={startSituation} next={{ onNext }} />;
   } else if (run.phase === "outro") {
     cards = situation.steps.map((step, i) => (
       <ChoiceCard key={step.caption} image={storyImages.step(situation.id, i)} caption={step.caption} state="done" small />

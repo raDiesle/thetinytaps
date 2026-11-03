@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { MenuIcon } from "@/components/GameEnd";
+import { GameEnd } from "@/components/GameEnd";
 import { CheeringFamily } from "@/components/Mascot";
-import { useLeaveGame } from "@/components/GameShell";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
@@ -292,7 +291,6 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * and tapping the progress bar jumps there.
  */
 export function TeethPlay({ settings }: { settings: TeethSettings }) {
-  const leave = useLeaveGame();
   // Everything shown and said follows the app language; a line without a translation is said in German with the German voice (spoken.ts).
   const language = useAppLanguage();
   const t = useT();
@@ -690,14 +688,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             {/* Tapsi jumps for joy with Mama or Papa Fox beside it: brushing is done. */}
             <CheeringFamily kind="fox" className="teeth-family" />
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-            <div className="teeth-end-buttons">
-              <button type="button" className="teeth-again teeth-menu" onClick={leave}>
-                <MenuIcon /> {t({ de: "Menü", en: "Menu", zh: "菜单", hi: "मेन्यू", es: "Menú", ar: "القائمة", ru: "Меню" })}
-              </button>
-              <button type="button" className="teeth-again" onClick={again}>
-                🔁 {t({ de: "Nochmal", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى", ru: "Ещё раз" })}
-              </button>
-            </div>
+            <GameEnd inline onAgain={again} />
           </div>
         )
       ) : (
