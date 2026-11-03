@@ -97,6 +97,12 @@ export const SEO_EN: SeoTranslation = {
         "Make your own reward chart for toddlers: day, week, month or a path of stars, with pictures, a name and a reward. Use it on a tablet or print it.",
       text: "A reward chart for toddlers, just as you like it: a week chart with tasks and days, a month chart as a calendar, a day chart for morning or evening, or a path of stars to the reward. Tasks as pictures (brushing teeth, potty, getting dressed, sleeping in their own bed …), the child’s name and a reward, best of all time together. A helper leads step by step to your own chart and shows every choice as a picture. On a tablet a grown-up holds a field and the child taps the star in; to print, landscape or portrait, in color or black and white, with fields to color and stars to cut out. No punishments, nothing is taken away. On the same page: a daily plan in pictures.",
     },
+    "/timer/": {
+      title: "Visual Timer for Kids – Hourglass, Train and Candle",
+      description:
+        "A timer without numbers for toddlers: a train rolls to the station, an hourglass runs, a candle burns down. 1 to 10 minutes, and the family waves at the end.",
+      text: "A visual timer for children who can’t read a clock yet: a grown-up sets 1, 2, 3, 5 or 10 minutes, and the child watches the time go by – a little train rolls to the station where the bear family waits, sand runs through a big hourglass, or a candle burns down until the bear child blows it out. At the end a happy tune plays and the family waves. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
+    },
     "/tagesplan/": {
       title: "Visual Schedule for Toddlers – Day and Week",
       description:

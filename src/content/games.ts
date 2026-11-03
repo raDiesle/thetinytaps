@@ -121,6 +121,12 @@ export const CATEGORIES: Category[] = [
           ru: "Таблица наград и расписание в картинках",
         },
       },
+      {
+        href: "/timer/",
+        emoji: "⏳",
+        title: { de: "Timer" },
+        blurb: { de: "Warten in Bildern: Zug, Sanduhr, Kerze" },
+      },
     ],
   },
   {

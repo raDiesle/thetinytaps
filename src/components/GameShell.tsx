@@ -35,6 +35,12 @@ const LeaveGame = createContext<() => void>(() => {});
 /** The way back to the menu before the game, for the „Menü“ button at the end of a level. */
 export const useLeaveGame = () => useContext(LeaveGame);
 
+/** Whether what plays counts as play time: not a tool for the day (`GameShellProps.tool`) nor a routine's step. */
+const CountsPlaytime = createContext(true);
+
+/** Whether the game on screen counts as play time, for the „Nochmal“ and „Weiter“ at the end of a level. */
+export const useCountsPlaytime = () => useContext(CountsPlaytime);
+
 /** One way to play a game, picked on its start screen with a big card. */
 export interface GameMode {
   id: string;
@@ -75,6 +81,11 @@ interface GameShellProps {
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
   children: ReactNode;
+  /**
+   * A tool for the day rather than a game (the Timer): no play time counted or checked, so it still works when play
+   * time is over, like the Belohnungstafel (add its address to `PlaytimeLock` too).
+   */
+  tool?: boolean;
   /** Where the start screen's back link leads; by default the game's category on the home menu. */
   backHref?: string;
   backLabel?: string;
@@ -94,12 +105,14 @@ export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo"
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: the corner's ✕ (a tap, or held where
  * grown-ups chose so), or holding Esc – children press Esc while typing, so it is always held.
  */
-export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, level, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, level, settings, tool, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
   // Opened as a step of a routine (the Tagesplan): plays at once, without play time, and goes back there afterwards.
   const returnTo = routineReturn(location.state);
+  // Neither a routine's step nor a tool counts as play, nor stops when play time is over.
+  const free = !!returnTo || !!tool;
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
   const backText =
@@ -111,7 +124,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   const [playing, setPlaying] = useState(false);
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const playtime = usePlaytime(playing && !returnTo);
+  const playtime = usePlaytime(playing && !free);
   const groups = modes?.some((m) => m.kind) ? byKind(modes) : undefined;
   const grid = useFitGrid(
     modes?.length ?? 0,
@@ -126,7 +139,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   /** Starts playing; `turn` turns the page into the game in the book look (not when the page opens playing). */
   const start = async (turn = false) => {
     // The menus are locked then (PlaytimeLock); this also stops a key that slips past it. A routine's step is no game.
-    if (!returnTo) {
+    if (!free) {
       if (isPlaytimeOver()) return;
       countGame();
     }
@@ -196,7 +209,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
     started.current = true;
     if (startMode) onMode?.(startMode);
     // Play time is over: no start screen to wait on, so back to the menu, which the lock covers.
-    if (menu && !returnTo && isPlaytimeOver()) goBack(navigate, menu);
+    if (menu && !free && isPlaytimeOver()) goBack(navigate, menu);
     else void start();
   }, []);
 
@@ -204,8 +217,14 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>
-        {playtime.goodNight ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
-        {!playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
+        {playtime.goodNight ? (
+          <GoodNight />
+        ) : (
+          <LeaveGame value={stop}>
+            <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+          </LeaveGame>
+        )}
+        {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         {/* The edge of the book's page round the picture; shown only in the book look (`book.css`). */}
         <div className="book-frame" aria-hidden />
         <ExitButton
