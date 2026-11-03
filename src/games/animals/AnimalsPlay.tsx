@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
-import { pick, useAppLanguage, voiceFor } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { ANIMAL_TEXTS, ANIMALS, GIFT_TEXTS, giverOf } from "./content";
 import { GiftDrawing } from "./gifts";
 import { HomeDrawing } from "./homes";
 import type { FeedRound, GiftRound, HomeRound } from "./levels";
 import type { AnimalsSettings } from "./settings";
+import { animalsVoice } from "./voice";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
@@ -96,14 +96,8 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
 
   const prompt = (r: FeedRound | GiftRound | HomeRound) =>
     r.kind === "feed" ? texts.hungry(r.animal) : r.kind === "gift" ? giftTexts.whatGives(r.animal) : texts.whereLives(r.animal);

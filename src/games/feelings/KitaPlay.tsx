@@ -75,7 +75,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
   const nextKey = useRef(0);
   const [run, setRun] = useState<Run>(() => freshRun(nextKey.current++));
   const { later, clearAll } = useTimers();
-  const { say, sound } = useVoice(settings);
+  const { say, sound, voiced, preload } = useVoice(settings);
   const { floaters, float } = useFloaters();
 
   /** Plays the beats one after another, then calls `then`. */
@@ -84,16 +84,16 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
       setRun((r) => ({ ...r, busy: true }));
       let delay = 0;
       beats.forEach((beat, i) => {
+        const text = [beat.narration, beat.line].filter(Boolean).join(" ");
         later(() => {
           sound(beat.sound);
-          const text = [beat.narration, beat.line].filter(Boolean).join(" ");
           if (text) say(text, i > 0);
         }, delay);
-        delay += beatMs(beat, settings.speech);
+        delay += beatMs(beat, voiced(text));
       });
       later(then, delay);
     },
-    [later, say, sound, settings.speech],
+    [later, say, sound, voiced],
   );
 
   const ask = useCallback(
@@ -107,12 +107,14 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
   const startSituation = useCallback(() => {
     clearAll();
     preloadImages(situationImages(situation));
+    const beats = [...situation.intro, ...situation.steps.flatMap((st) => st.beats), ...situation.outro];
+    preload([...beats.map((b) => [b.narration, b.line].filter(Boolean).join(" ")), ...situation.steps.flatMap((st) => [st.question, st.instead.answer])]);
     setRun(freshRun(nextKey.current++));
     playBeats(situation.intro, () => {
       setRun((r) => ({ ...r, phase: "steps" }));
       ask(situation.steps[0].question);
     });
-  }, [situation, clearAll, playBeats, ask]);
+  }, [situation, clearAll, playBeats, ask, preload]);
 
   useEffect(() => startSituation(), []);
 
@@ -144,8 +146,8 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
     setRun((r) => ({ ...r, tried: true, trying: true, picked: null, busy: true }));
     say(answer);
     oops(heard, sound, float);
-    later(() => setRun((r) => ({ ...r, busy: false, trying: false })), Math.max(OOPS_MS, beatMs({ narration: answer }, settings.speech)));
-  }, [situation, run.stepsDone, say, sound, float, later, settings.speech]);
+    later(() => setRun((r) => ({ ...r, busy: false, trying: false })), Math.max(OOPS_MS, beatMs({ narration: answer }, voiced(answer))));
+  }, [situation, run.stepsDone, say, sound, float, later, voiced]);
 
   const ready = run.phase === "steps" && !run.busy;
 

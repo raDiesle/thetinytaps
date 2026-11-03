@@ -12,11 +12,12 @@ import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
 // The languages a part has been translated into whole, as the language table on /management/ says: a part marked
-// "done" there has every text, and changing a German line means marking it "partial" until it is translated again.
+// "done" (or "text", translated but not recorded yet) there has every text, and changing a German line means marking
+// it "partial" until it is translated again.
 const STATUS_PARTS = LANGUAGE_STATUS.find((row) => row.href === "/gefuehle/")?.parts ?? [];
 const translatedIn = (label: string) =>
   (Object.entries(STATUS_PARTS.find((part) => part.label === label)?.languages ?? {}) as [TargetLanguageId, string][])
-    .filter(([language, state]) => language !== "de" && state === "done")
+    .filter(([language, state]) => language !== "de" && (state === "done" || state === "text"))
     .map(([language]) => language);
 const TRANSLATED_HOME = translatedIn("Zu Hause");
 const TRANSLATED_KITA = translatedIn("Wie geht's dir? und Kindergarten");

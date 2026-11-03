@@ -77,7 +77,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   const happyAt = useRef(0);
   const [round, setRound] = useState<Round>(() => freshRound(nextKey.current++));
   const { later, clearAll } = useTimers();
-  const { say, sound } = useVoice(settings);
+  const { say, sound, voiced, preload } = useVoice(settings);
   const { floaters, float } = useFloaters();
   const { id: language } = useAppLanguage();
   const comforts = useMemo(() => comfortsIn(language), [language]);
@@ -93,10 +93,16 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
       ...feeling.instead.map((_, i) => bearImages.instead(feeling.id, i)),
       ...feeling.comforts.map(bearImages.comfort),
     ]);
+    preload([
+      ...feeling.questions,
+      ...feeling.comforts.map((c) => comforts[c].narration),
+      ...feeling.instead.map((i) => i.answer),
+      `${feeling.end.narration} ${feeling.end.line}`,
+    ]);
     setRound(freshRound(nextKey.current++));
     say(feeling.questions[0]);
     if (feeling.id === "scared") sound("rumble");
-  }, [feeling, clearAll, say, sound]);
+  }, [feeling, clearAll, say, sound, preload, comforts]);
 
   useEffect(() => startFeeling(), []);
 
@@ -133,9 +139,9 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
         sound("cheer");
         float(END_FLOAT[feeling.id] ?? "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
       },
-      CHEER_MS + Math.max(COMFORT_MS, beatMs({ narration: c.narration }, settings.speech)),
+      CHEER_MS + Math.max(COMFORT_MS, beatMs({ narration: c.narration }, voiced(c.narration))),
     );
-  }, [comforts, comfortId, index, feeling, say, sound, float, later, settings.speech]);
+  }, [comforts, comfortId, index, feeling, say, sound, float, later, voiced]);
 
   /** The not-so-good idea: shown big in a red frame that shakes, with crying or a crash, while it is told why it doesn't help; then the cards come back. */
   const tryInstead = useCallback(() => {
@@ -143,8 +149,8 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
     setRound((r) => ({ ...r, tried: true, trying: true, picked: null, busy: true }));
     say(answer);
     oops(heard, sound, float);
-    later(() => setRound((r) => ({ ...r, busy: false, trying: false })), Math.max(OOPS_MS, beatMs({ narration: answer }, settings.speech)));
-  }, [feeling, index, say, sound, float, later, settings.speech]);
+    later(() => setRound((r) => ({ ...r, busy: false, trying: false })), Math.max(OOPS_MS, beatMs({ narration: answer }, voiced(answer))));
+  }, [feeling, index, say, sound, float, later, voiced]);
 
   /** The first tap on a card shows it big, so the child sees what it chose; the second tap (on the card or the big picture) chooses it. */
   const pick = (card: Pick) => {
