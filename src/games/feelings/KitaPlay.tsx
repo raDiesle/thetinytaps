@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { imageFor, preloadImages, storyImages } from "./images";
+import { imageFor, preloadImages, situationImages, storyImages } from "./images";
 import type { Situation } from "./kita";
 import type { FeelingsSettings } from "./settings";
 import {
@@ -106,11 +106,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
 
   const startSituation = useCallback(() => {
     clearAll();
-    preloadImages([
-      storyImages.problem(situation.id),
-      storyImages.end(situation.id),
-      ...situation.steps.flatMap((_, i) => [storyImages.step(situation.id, i), storyImages.instead(situation.id, i)]),
-    ]);
+    preloadImages(situationImages(situation));
     setRun(freshRun(nextKey.current++));
     playBeats(situation.intro, () => {
       setRun((r) => ({ ...r, phase: "steps" }));

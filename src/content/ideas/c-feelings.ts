@@ -47,6 +47,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Am Tisch bricht dem kleinen Bären sein Keks in zwei Teile, er weint; neben ihm sitzt der Fuchs. 1) „Teller runterwerfen“ (Krach) oder sein Kuscheltier drücken und sagen: „Ich bin traurig.“ 2) „Den Keks zerkrümeln“ oder die zwei Hälften anschauen: „Jetzt hab ich zwei!“ 3) „Dem Fuchs seinen Keks wegnehmen“ oder eine Hälfte mit dem Fuchs teilen – beide lachen.",
       why: "Kleine Enttäuschungen sind für Zweijährige riesig. Die Szene zeigt: Traurig sein darf sein, und man kann die Sache anders sehen – ein erster, einfacher Blickwechsel.",
       effort: "S",
+      partial:
+        "Als Geschichte „Enttäuscht, Keks zerbrochen“ in Gefühle (selbst.ts), mit Becher statt Teller und „Zunge rausstrecken“ statt Keks wegnehmen (der Fuchs hat seinen schon gegessen). Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-06",
@@ -103,6 +105,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Mama Bär hält das Bärenbaby im Arm, der kleine Bär steht daneben und schaut eifersüchtig; auf dem Boden Rassel, Windeln und eine Trommel. 1) „Das Baby hauen“ (Aua) oder sagen: „Ich will auch kuscheln!“ 2) „Die Rassel wegnehmen“ oder selbst eine Windel holen. 3) „Laut trommeln, damit das Baby weint“ oder dem Baby ein Lied singen – zum Schluss kuscheln alle drei.",
       why: "Eltern suchen „kind eifersüchtig auf baby“ und „kind 3 jahre eifersüchtig auf baby“. Ratgeber raten, dem Großen eine Aufgabe zu geben und sein Bedürfnis ernst zu nehmen – hier sagt das Kind selbst, was es braucht.",
       effort: "S",
+      partial:
+        "Als Geschichte „Eifersüchtig aufs Baby“ in Gefühle (selbst.ts), mit dem großen Bären statt Mama Bär. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-13",
@@ -135,6 +139,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Ein Brokkoli liegt auf dem Teller, der kleine Bär verzieht das Gesicht; neben ihm der Fuchs. 1) „Teller runterwerfen“ (Krach) oder sagen: „Nein, danke.“ 2) „Auf den Tisch spucken“ oder erst mal nur riechen. 3) „Den Brokkoli dem Fuchs auf den Teller werfen“ oder ihn an den Tellerrand legen – vielleicht ein andermal. Das Spiel sagt nie, dass man aufessen muss.",
       why: "Eltern suchen „kind mag kein gemüse was tun“. Ekel ist ein eigenes Gefühl, das bei Kleinen täglich vorkommt; „Nein, danke“ und Riechen ohne Druck sind gute Wege.",
       effort: "S",
+      partial:
+        "Als Geschichte „Igitt, Brokkoli“ in Gefühle (selbst.ts), mit dem großen Bären am Tisch. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-17",
@@ -143,6 +149,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: In der Kita steht der kleine Bär in einer kleinen Pfütze und schämt sich; im Hintergrund sein Fach mit Wechselsachen und eine Tüte. 1) „Die Hose verstecken“ oder sagen: „Hoppla!“ und es der Erzieherin sagen. 2) „Mit der nassen Hose weiterspielen“ oder selbst eine frische Hose aus seinem Fach holen. 3) „Die Pfütze mit dem Fuß verwischen“ (Ausrutschen) oder die nasse Hose in die Tüte stecken. Ohne Scham, ohne Tadel; passt zu Aufs Töpfchen.",
       why: "Scham ist das Gefühl, über das am wenigsten gesprochen wird. Die Szene zeigt: ein Missgeschick ist nicht schlimm, und man kann selbst etwas tun.",
       effort: "S",
+      partial:
+        "Als Geschichte „Hoppla, in die Hose“ in Gefühle (selbst.ts); statt „Hose verstecken“ (sich verkriechen ist das Gefühl selbst) „Nass weiterspielen“. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-18",
@@ -151,6 +159,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Draußen fällt der erste Schnee, der kleine Bär hüpft auf dem Sofa, neben ihm eine Lampe, an der Tür seine Stiefel. 1) „Auf dem Sofa toben“ (die Lampe fällt, Krach) oder ganz laut jubeln: „Juhu!“ 2) „Im Schlafanzug rausrennen“ (kalt) oder erst die Stiefel anziehen. 3) „Schneeball ins Gesicht werfen“ (Aua) oder einen Schnee-Engel machen.",
       why: "Auch große Freude will gelenkt werden; so wird das Spiel nicht nur traurig, und es zeigt, dass Aufregung nichts Schlechtes ist.",
       effort: "S",
+      partial:
+        "Als Geschichte „Aufgeregt, es schneit“ in Gefühle (selbst.ts); der große Bär geht mit raus, der Schneeball trifft sein Gesicht. Das erste Bild ist gemacht, die übrigen sind geplant (bilder/README.md); bis alle da sind, zeigt nur der Dev-Server die Geschichte.",
     },
     {
       id: "C-19",
@@ -183,6 +193,54 @@ export const feelingsIdeas: IdeaArea = {
       text: "Eine Karte auf dem Startbild von Gefühle, ohne Geschichte: Der kleine Bär sitzt in seiner Höhle, um ihn herum seine Mittel als große Bilder – Kissen zum Drücken, Kerze zum Pusten, Trommel zum Stampfen, Kuscheltier, Ohrenschützer. Jedes Tippen lässt den Bären es tun, mit Ton. Passt zu H-09 (ruhig atmen mit dem Ballon).",
       why: "Mittel lernt man, wenn man ruhig ist, nicht mitten im Wutanfall. Eltern können im echten Moment sagen: „Weißt du noch, wie der Bär gepustet hat?“",
       effort: "M",
+    },
+    {
+      id: "C-23",
+      emoji: "🏆",
+      title: "Stolz: Ich hab's geschafft!",
+      text: "Erstes Bild: Der kleine Bär steht oben auf dem Klettergerüst, zum ersten Mal ganz allein, der große Bär unten. 1) „Die anderen runterschubsen, damit nur er oben ist“ (Aua) oder laut rufen: „Guck mal, ich bin oben!“ 2) „Den Fuchs auslachen, der es noch nicht kann“ oder die Arme hochreißen und sich selbst auf die Brust klopfen. 3) „Gleich ohne Festhalten runterspringen“ (gefährlich) oder dem Fuchs zeigen, wo man den Fuß hinstellt. Zum Schluss sind beide oben.",
+      why: "Bisher sind die Gefühle der Geschichten fast alle schwer. Stolz ist ein Gefühl, das Kinder ab zwei stark erleben; die Szene zeigt, wie man sich freut, ohne andere kleinzumachen.",
+      effort: "S",
+    },
+    {
+      id: "C-24",
+      emoji: "💌",
+      title: "Vermissen: Oma ist abgereist",
+      text: "Erstes Bild: Die Tür ist gerade zu, durchs Fenster sieht man Oma Bär winkend wegfahren, der kleine Bär steht mit hängenden Ohren im Flur; auf dem Tisch Stifte und Papier, an der Wand ein Foto. 1) „Omas Tasse runterwerfen“ (Krach) oder sagen: „Ich vermisse Oma.“ 2) „Die Stifte durchbrechen“ (Krach) oder ein Bild für Oma malen. 3) „Das Foto abreißen“ oder das Foto anschauen und ihm einen Kuss geben. Am Ende ruft Oma kurz an, der Bär zeigt ihr sein Bild.",
+      why: "Vermissen kommt bei jedem Abschied von Großeltern, beim Wechsel zwischen zwei Zuhausen oder wenn ein Elternteil verreist. Malen und Fotos anschauen sind Wege, die ein Kind selbst in der Hand hat.",
+      effort: "S",
+    },
+    {
+      id: "C-25",
+      emoji: "🫣",
+      title: "Schüchtern: Besuch ist da",
+      text: "Erstes Bild: Eine fremde große Füchsin kommt zu Besuch und beugt sich freundlich herunter, der kleine Bär versteckt sich halb hinter dem großen Bären. 1) „Die Füchsin anschreien: Geh weg!“ oder sich am großen Bären festhalten und erst mal nur gucken (sich verstecken ist hier das Gefühl, also gut). 2) „Mit dem Fuß nach ihr treten“ (Aua) oder winken statt etwas sagen. 3) „Ihr Geschenk aus der Hand reißen“ oder ihr sein Lieblingsauto zeigen. Niemand muss die Hand geben oder küssen.",
+      why: "Schüchtern sein ist ein Temperament, kein Fehler. Die Szene zeigt Eltern und Kind: Abstand halten darf sein, und Winken oder etwas Zeigen ist ein kleiner Schritt, den das Kind selbst bestimmt.",
+      effort: "S",
+    },
+    {
+      id: "C-26",
+      emoji: "🌧️",
+      title: "Langeweile am Regentag",
+      text: "Erstes Bild: Draußen regnet es, der kleine Bär liegt quer auf dem Sofa und starrt an die Decke; im Raum eine Decke, Kissen, ein Karton und Töpfe. 1) „Den Fuchs ärgern, damit was passiert“ oder sagen: „Mir ist langweilig.“ 2) „Mit den Töpfen gegen die Scheibe hauen“ (Krach) oder aus Decke und Kissen eine Höhle bauen. 3) „Den Karton zertreten“ oder den Karton zum Auto machen und losfahren. Kein Bildschirm als Ausweg.",
+      why: "Langeweile ist das Gefühl, bei dem Eltern am schnellsten zum Tablet greifen. Die Szene zeigt, dass aus Langeweile Ideen wachsen – passt zu „Die Sendung ist zu Ende“ (C-02).",
+      effort: "S",
+    },
+    {
+      id: "C-27",
+      emoji: "🫂",
+      title: "Mitgefühl: Der Fuchs weint",
+      text: "Erstes Bild: Im Kindergarten ist der Luftballon des Fuchses geplatzt, der Fuchs weint; der kleine Bär hält seinen eigenen Ballon. 1) „Lachen und zeigen“ oder hingehen und fragen: „Bist du traurig?“ 2) „Den eigenen Ballon hochhalten: Meiner ist noch heil!“ oder dem Fuchs über den Rücken streicheln. 3) „Weglaufen und allein spielen“ oder den eigenen Ballon gemeinsam halten. Zum Schluss lachen beide.",
+      why: "Bisher hat in den Geschichten immer der Bär das Gefühl. Hier erkennt er es bei einem anderen – der erste Schritt zu Empathie, die Kinder ab zwei zu zeigen beginnen.",
+      effort: "S",
+    },
+    {
+      id: "C-28",
+      emoji: "😲",
+      title: "Erschrocken: Ein lauter Knall",
+      text: "Erstes Bild: Auf dem Geburtstag platzt ein Luftballon direkt neben dem kleinen Bären, er zuckt zusammen, Tränen schießen hoch; neben ihm sein Kuscheltier und der Kuchen. 1) „Alle anderen Ballons kaputt machen“ (Krach) oder die Ohren zuhalten. 2) „Den Kuchen umwerfen“ (Krach) oder tief pusten: Puuuh. 3) „Den Fuchs anbrüllen“ oder selbst einen kleinen Ballon ganz vorsichtig drücken, bis er quietscht, und lachen.",
+      why: "Erschrecken ist kurz und heftig und kommt bei Kleinkindern täglich vor (Hunde, Sirenen, Knallen). Ohren zuhalten und Pusten sind Mittel, die schon Zweijährige selbst können.",
+      effort: "S",
     },
   ],
 };

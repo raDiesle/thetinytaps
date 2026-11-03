@@ -111,10 +111,11 @@ async function credits() {
 
 /**
  * Credits a character really costs with the turbo model, as measured in October 2026: 0.096 (10,399 characters for
- * 995), 0.078 (6,398 for 498) and 0.102 (34,408 for 3,506). The service's own `character_cost_multiplier` (0.5) is five times too high and once
- * stopped a run that would have fit, so the check before a run goes by this, a little above both.
+ * 995), 0.078 (6,398 for 498), 0.102 (34,408 for 3,506) and, in November 2026, 0.109 (26,425 for 2,881). The service's own
+ * `character_cost_multiplier` (0.5) is five times too high and once stopped a run that would have fit, so the check before
+ * a run goes by this, a little above all of them.
  */
-const CREDITS_PER_CHARACTER = 0.1;
+const CREDITS_PER_CHARACTER = 0.11;
 
 function readConfig() {
   if (!existsSync(CONFIG)) fail(`No voice yet: run "bun run voice design", listen, then "bun run voice save <1|2|3>"`);

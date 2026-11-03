@@ -146,8 +146,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏖️ Die fünf neueren Wege und 🚒 Die Feuerwehr",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch aufgenommen; übersetzt am 30. Oktober 2026, die 734 Sätze der anderen Sprachen (≈ 2.600 Credits) warten auf ihre Aufnahme: bun run voice make --only kleine-abenteuer. Bis dahin sind diese Sätze in den anderen Sprachen still.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Übersetzt am 30. Oktober 2026, alle 734 Sätze der anderen Sprachen von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026, 2.881 Credits).",
       },
     ],
   },
@@ -163,6 +163,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Zu Hause",
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
         note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
+      },
+      {
+        label: "Mehr Gefühle",
+        languages: { de: "done" },
+        note: "Neu und nur Deutsch (3. November 2026): fünf Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt. Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
       },
     ],
   },
