@@ -140,6 +140,8 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   there is only one of the thing. The same goes for a thing a character picks up in a later picture: say that its
   old place is empty now („picked up from the chair, so that chair corner is empty“). „Exactly one plush bunny“ alone
   still gave a second bunny in the bear's arms, beside the one left on the chair (Gefühle, the broken cookie).
+  A character that leaves its place is drawn twice just the same (the little bear still on top of the slide and in the
+  sandpit, a second fox at the party): say its old place is empty and „only ONE … in the whole picture“ for each.
 - **A moment before a picture** (trousers still up, about to sit down) is drawn from that picture as the only `--ref`,
   so the room stays the same – but the model keeps the reference's pose unless told plainly what is not so yet:
   "Tapsi is NOT sitting yet: stands upright …, a visible gap between …". With only the wanted pose described, the
