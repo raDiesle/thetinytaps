@@ -48,7 +48,9 @@ import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
 import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
+import animalsFiles from "../games/animals/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
+import feelingsFiles from "../games/feelings/stimme/*.mp3?glob";
 import teethFiles from "../games/teeth/stimme/*.mp3?glob";
 import weaningFiles from "../games/weaning/stimme/*.mp3?glob";
 
@@ -339,7 +341,9 @@ function rewards(): VoiceGroup[] {
 
 /** The German recordings of the games in src/content/recordedLines.ts, by file name (the hash of the line). */
 const RECORDED = new Set(
-  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
+  [goodNightFiles, elevatorFiles, teethFiles, weaningFiles, animalsFiles, feelingsFiles].flatMap((files) =>
+    Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4)),
+  ),
 );
 
 /** The games and groups of `games` with only the lines that have no German recording yet. */

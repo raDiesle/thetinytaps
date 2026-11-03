@@ -189,11 +189,15 @@ page, `src/lib/language.ts`): start screen, captions and everything read aloud. 
 only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
 `situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). Small texts
 (the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
-Speech uses the app language's voice, a line still in German the German one (`useVoice`). Rules:
+Everything said is played from its ElevenLabs recording (`useVoice` in `shared.tsx`, files in `stimme/`), recorded in
+German only so far (November 2026): a line in another language stays silent until the user asks for its recordings,
+a line still in German plays its German one. A beat with a recording stays long enough to be heard (`beatMs`), and a
+story loads its recordings when it starts (`preload`). A new or changed line is listed by `src/content/recordedLines.ts`
+(`gefuehle`) and recorded with `bun run voice make --only gefuehle`, only when the user asks. Rules:
 - New stories, feelings and kind things come in German only; their translations are written only when the user
   asks (a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German). A not-so-good idea at home
-  without its translation is `null` and told in German; `useVoice` speaks a line that is still German with the
-  German voice (`voiceFor`). But a story that has a translation must match the German step for step and beat for
+  without its translation is `null` and told in German; `useVoice` plays a line that is still German from its German
+  recording. But a story that has a translation must match the German step for step and beat for
   beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated story, change every
   `kita.<lang>.ts` too, or delete that story's entry there. `feelings.test.ts` fails when they don't match, when a
   language translated so far misses a story, feeling or kind thing, and when Russian, Chinese, Hindi or Arabic has

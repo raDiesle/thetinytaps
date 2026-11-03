@@ -167,17 +167,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "Wie geht's dir? und Kindergarten",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
       },
       {
         label: "Zu Hause",
+        recorded: true,
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
+        note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht. Deutsch von ElevenLabs gesprochen (3. November 2026), die anderen Sprachen noch nicht.",
       },
       {
         label: "Mehr Gefühle",
+        recorded: true,
         languages: { de: "done" },
-        note: "Neu und nur Deutsch (3. November 2026): 24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt, und 19 weitere vom Spielplatz bis zum lauten Knall (Bilder noch geplant). Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
+        note: "Neu und nur Deutsch (3. November 2026): 24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt, und 19 weitere vom Spielplatz bis zum lauten Knall (Bilder noch geplant), Deutsch schon von ElevenLabs gesprochen (3. November 2026). Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
       },
     ],
   },
@@ -200,7 +204,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/tiere/",
     parts: [
-      { label: "🐾 Das Spiel", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🐾 Das Spiel",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
+      },
       {
         label: "⚙️ Einstellungen beim Spielen",
         languages: { de: "done" },
@@ -213,11 +222,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "🥛 Was gibt uns das Tier?",
+        recorded: true,
         languages: { de: "done" },
         note: "Neu (Z-01, November 2026): Frage, Sätze, die Namen von Milch, Ei, Honig, Wolle und vom Schaf und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GIFT_TEXTS` in content.ts); Kuh, Huhn und Biene sprechen schon alle Sprachen.",
       },
       {
         label: "🦋 Was wird aus mir?",
+        recorded: true,
         languages: { de: "done" },
         note: "Neu (Z-12, November 2026): Frage, Sätze, die Namen von Raupe, Ei, Samen, Kaulquappe, Schmetterling, Küken, Sonnenblume, Frosch und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GROW_TEXTS` in growth.tsx).",
       },

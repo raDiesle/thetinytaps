@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage, voiceFor } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
 import { shuffle } from "./deck";
@@ -10,6 +9,7 @@ import { emojiGlyph, pickPeepholes, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
 import type { PeekLevel } from "@/games/animals/levels";
 import type { AnimalsSettings } from "@/games/animals/settings";
+import { animalsVoice } from "@/games/animals/voice";
 
 /** Time to watch the animal that came out before the next one hides. */
 const CELEBRATE_MS = 3000;
@@ -159,14 +159,8 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
 
   // The question comes with the round; the round is mounted anew for every animal.
   useEffect(() => say(texts.peek), []);

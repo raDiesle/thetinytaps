@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage, voiceFor } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { GROW_MS, GROW_TEXTS, GrowthPicture } from "./growth";
 import type { GrowRound } from "./levels";
 import type { AnimalsSettings } from "./settings";
+import { animalsVoice } from "./voice";
 
 /** The picked one's flight up into the small one, before it starts to become it. */
 const FLIGHT_MS = 500;
@@ -71,14 +71,8 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
 
   // The question comes with the round; the round is mounted anew for every small one.
   useEffect(() => say(texts.whatBecomes(round.growth)), []);
