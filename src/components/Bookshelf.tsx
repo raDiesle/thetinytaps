@@ -148,7 +148,7 @@ const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
 };
 
 /**
- * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
+ * The home page: a room with a bookshelf, the first thing a visit sees. Each category is a picture
  * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
  * app's name is a painted sign hanging on chains: in front of a wide shelf standing on legs, down into its top

@@ -8,11 +8,11 @@ import { type Figure, useCommonSettings } from "@/lib/common";
 import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
 
 /*
- * The grown-ups' options on the home page in the book look, as things standing in the bookshelf's own compartments
- * (Bookshelf.tsx) instead of buttons: a wooden loudspeaker (music), an hourglass (play time), a globe (the language),
- * stickers of a fox girl and a bear boy stuck on the shelf's right inner side (the child's figure), and „mehr …“ in the
- * words carved beside the everyday helpers with what the toy look has below its first screen (RoomNotes). Each opens the same menu as the toy look's
- * buttons (HomeOptions), or switches with one tap where that has none.
+ * The grown-ups' options on the home page, as things standing in the bookshelf's own compartments (Bookshelf.tsx)
+ * instead of buttons: a wooden loudspeaker (music), an hourglass (play time), a globe (the language), stickers of a fox
+ * girl and a bear boy stuck on the shelf's right inner side (the child's figure), and „mehr …“ in the words carved beside
+ * the everyday helpers with what grown-ups read about the app (RoomNotes). Each opens its menu (HomeOptions.tsx), or
+ * switches with one tap where that has none.
  */
 
 /** The wooden loudspeaker standing in the shelf: one tap switches the music of all games on or off. */

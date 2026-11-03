@@ -48,10 +48,10 @@ button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken �
 note with an arrow under the Zeitraum says one may switch freely between the kinds and set everything. Opened on a template from the
 gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
 
-In the book look the page is one tall page of the book that carries everything and scrolls with it (user feedback,
+The page is one tall page of the book that carries everything and scrolls with it (user feedback,
 November 2026): `<Sky />` lies in the page's box (`position: absolute`), not fixed to the window, the text for search
 engines is on it too, and the content keeps inside its paper margin. The wizard is printed on the page, no card laid on
-it; its buttons are paper (`:root[data-look="book"]` rules at the end of `rewards.css`, kept in the folder rather than in
+it; its buttons are paper (`:root` rules at the end of `rewards.css`, kept in the folder rather than in
 `book.css`, T-19). The families, the room's floor and its toys at the page's foot stay out here: the chart fills the page.
 
 No board or plan exists before the wizard made one (`DEFAULT_REWARDS_SETTINGS`, `DEFAULT_PLANNER_SETTINGS` are

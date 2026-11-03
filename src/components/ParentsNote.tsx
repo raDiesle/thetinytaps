@@ -1,8 +1,7 @@
 import { useT } from "@/lib/language";
 
 /**
- * For parents, a few words from us as parents (the home page's foot; in the book look behind the shelf's carved
- * „mehr …“, RoomNotes): why no age is named (each family decides
+ * For parents, a few words from us as parents (behind the shelf's carved „mehr …“ on the home page, RoomNotes): why no age is named (each family decides
  * when screens come in), that the real world comes first, then playing on a screen together, a learning game alone
  * later, and plain watching least – and that this book means to be that first step together.
  */

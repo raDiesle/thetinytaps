@@ -303,7 +303,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
 
   return (
     <main className={`start-screen rw-page-screen${computer ? " rw-computer" : ""}`}>
-      {/* The page of the book (in the book look) and the families reading at its foot, as on every menu. */}
+      {/* The page of the book and the families reading at its foot, as on every menu. */}
       <Sky />
       {/* The first screen: everything down to the chart, which fills what is left of it. */}
       <div className="rw-first">

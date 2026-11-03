@@ -57,7 +57,7 @@ describe("home menu", () => {
   });
 });
 
-// In the book look a book's table of contents numbers its games from 1 (user feedback, October 2026: not from 2), and
+// A book's table of contents numbers its games from 1 (user feedback, October 2026: not from 2), and
 // going between two of its pages turns as many pages as lie between them, in one go.
 describe("pages of a book", () => {
   const books = CATEGORIES.filter(hasPage);

@@ -1,5 +1,5 @@
 /**
- * How the bookshelf of the home page (book look, Bookshelf.tsx) is laid out in the room it gets: its compartments, the
+ * How the bookshelf of the home page (Bookshelf.tsx) is laid out in the room it gets: its compartments, the
  * picture books standing in the wide ones and the grown-ups' things (RoomOptions) in narrow ones beside them, and how
  * big it all is. A pure function of the room's size, so it can be checked.
  */
