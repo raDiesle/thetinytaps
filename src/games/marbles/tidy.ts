@@ -613,6 +613,7 @@ export function buildTidy() {
     bunnyAt,
     blanket,
     cameraTarget,
+    width: WORLD_W,
     /** The hose from the bellows under the shelf to the heap of socks. */
     hose: [...line({ x: BELLOWS.x1, y: FLOOR - 10 }, { x: BELLOWS.x1 + 30, y: FLOOR - 8 }), ...line({ x: BELLOWS.x1 + 30, y: FLOOR - 8 }, NOZZLE).slice(1)],
   };

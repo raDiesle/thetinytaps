@@ -8,11 +8,6 @@
   text-align: center;
 }
 
-/* The home page's buttons for grown-ups and its title: laid out as the page's own children, except in the book look (book.css). */
-.home-top {
-  display: contents;
-}
-
 .logo {
   display: flex;
   flex-wrap: wrap;
@@ -72,11 +67,6 @@
 
 .logo {
   overflow-x: clip;
-}
-
-/* The foxes were drawn on Georgia's o, the book look's letter: the toy look's rounded letters go without them. */
-:root:not([data-look="book"]) .logo-o-anchor {
-  display: none;
 }
 
 .logo-letter {
@@ -242,21 +232,6 @@ button.game-card:focus-visible {
   line-height: 1.15;
 }
 
-.game-go {
-  position: absolute;
-  right: -10px;
-  bottom: -14px;
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  padding-left: 4px;
-  border: var(--outline);
-  border-radius: 50%;
-  background: #fff;
-  font-size: 1.3rem;
-}
-
 /* The way back and, for grown-ups, small round signs (⚙️) next to it (MenuTop). */
 .menu-top {
   display: flex;
@@ -350,7 +325,7 @@ button.game-card:focus-visible {
   top: max(100%, 100dvh);
   right: 0;
   left: 0;
-  /* Room at the bottom so the last line clears the book's board round the page (book look). */
+  /* Room at the bottom so the last line clears the book's board round the page. */
   padding: 24px max(20px, env(safe-area-inset-right)) max(36px, calc(env(safe-area-inset-bottom) + 12px)) max(20px, env(safe-area-inset-left));
   text-align: center;
 }
@@ -383,13 +358,6 @@ button.game-card:focus-visible {
 
 .parents-note p {
   margin-bottom: 12px;
-}
-
-.home-version {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  opacity: 0.55;
 }
 
 .install-button {
@@ -480,14 +448,12 @@ button.game-card:focus-visible {
     flex-direction: row;
     gap: 10px;
     padding: 8px 26px 8px 8px;
-    border-radius: 24px;
     text-align: left;
   }
 
   .game-list:not(.fit) .game-emoji {
     width: 60px;
     height: 60px;
-    border-width: 3px;
     font-size: 2rem;
   }
 
@@ -495,13 +461,5 @@ button.game-card:focus-visible {
     font-size: 1rem;
     hyphens: auto;
     overflow-wrap: anywhere;
-  }
-
-  .game-list:not(.fit) .game-go {
-    right: -6px;
-    bottom: -8px;
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
   }
 }

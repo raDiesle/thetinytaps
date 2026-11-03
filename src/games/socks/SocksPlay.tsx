@@ -18,7 +18,7 @@ import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { dealPairs, nextLevel, oneOf, SOCK_LEVELS, SOCK_TEXTS, shuffle, type SockLook } from "./content";
+import { dealPairs, lookKey, nextLevel, oneOf, type Side, SOCK_LEVELS, SOCK_TEXTS, shuffle, type SockLook } from "./content";
 import { Basket, Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
 
@@ -50,9 +50,11 @@ const MAX_SOCK_PX = 170;
  */
 type Phase = "intro" | "washing" | "sorting" | "cheer" | "pull";
 
-/** One sock lying on the floor, a little crooked. */
+/** One sock (or mitten, boot, slipper) lying on the floor, a little crooked. */
 interface FloorSock {
-  pair: number;
+  /** Its look, an index into `Round.looks`: it fits a piece of the same look and the other side. */
+  look: number;
+  side: Side;
   rotate: number;
   /** Small shift inside its grid cell, in % of its own size, so the pile doesn't look like a grid. */
   shift: [number, number];
@@ -64,6 +66,7 @@ interface Round {
   id: number;
   /** The difficulty step it was dealt at (an index into `SOCK_LEVELS`). */
   level: number;
+  /** Every look once; in a `twins` wash two pairs share one, so four pieces lie alike but for their side. */
   looks: SockLook[];
   socks: FloorSock[];
 }
@@ -76,13 +79,17 @@ interface Flight {
 }
 
 function newRound(id: number, level: number): Round {
-  const looks = dealPairs(SOCK_LEVELS[level]);
-  const hidden = new Set(shuffle(looks.flatMap((_, pair) => [pair * 2, pair * 2 + 1])).slice(0, SOCK_LEVELS[level].covered));
-  const socks = shuffle(looks.flatMap((_, pair) => [pair, pair])).map((pair, i) => {
+  const pairs = dealPairs(SOCK_LEVELS[level]);
+  const keys = [...new Set(pairs.map(lookKey))];
+  const looks = keys.map((key) => pairs.find((l) => lookKey(l) === key) as SockLook);
+  const hidden = new Set(shuffle(pairs.flatMap((_, pair) => [pair * 2, pair * 2 + 1])).slice(0, SOCK_LEVELS[level].covered));
+  const pieces = pairs.flatMap((l) => (["left", "right"] as const).map((side) => ({ look: keys.indexOf(lookKey(l)), side })));
+  const socks = shuffle(pieces).map(({ look, side }, i) => {
     const covered = hidden.has(i);
     // A covered sock lies straight in the middle of its cell, so the basket covers all of it.
     return {
-      pair,
+      look,
+      side,
       covered,
       rotate: covered ? 0 : Math.round(Math.random() * 60 - 30),
       shift: (covered ? [0, 0] : [Math.round(Math.random() * 20 - 10), Math.round(Math.random() * 16 - 8)]) as [number, number],
@@ -102,6 +109,9 @@ function fitPile(count: number, width: number, height: number) {
   return best;
 }
 
+/** Two pieces belong together: the same look, one left and one right (a sock's two are called so too). */
+const fits = (a: FloorSock, b: FloorSock) => a.look === b.look && a.side !== b.side;
+
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
 
 /**
@@ -119,9 +129,9 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   const [selected, setSelected] = useState<number | null>(null);
   /** Bumped to make the selected sock wiggle again when it is tapped once more. */
   const [nudge, setNudge] = useState(0);
-  /** Pairs in the order they were found; the k-th one hangs in the k-th place on the line. */
-  const [lineOrder, setLineOrder] = useState<number[]>([]);
-  /** Pairs that have arrived on the line (their floor socks are gone). */
+  /** Pairs found, as their two pieces on the floor (left one first), in the order found: the k-th hangs in the k-th place. */
+  const [lineOrder, setLineOrder] = useState<[number, number][]>([]);
+  /** Pieces that have arrived on the line (gone from the floor), by their index on the floor. */
   const [landed, setLanded] = useState<number[]>([]);
   /** Socks on their way to the line, by their index on the floor. */
   const [flights, setFlights] = useState<Record<number, Flight>>({});
@@ -135,6 +145,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   const slotRefs = useRef<(HTMLSpanElement | null)[]>([]);
   // Refs as well as state: a fast second tap or key can come before React has rendered the first.
   const selectedRef = useRef<number | null>(null);
+  /** Pieces found a partner for, by their index on the floor. */
   const matchedRef = useRef(new Set<number>());
   const focusRef = useRef<number | null>(null);
   /** For the difficulty: when the socks of this wash lay on the floor, and how often another sock than the partner came. */
@@ -230,7 +241,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   /** All pairs hang: they jump for joy, then the line is pulled out of the picture and the next wash comes. */
   const finish = () => {
-    const level = nextLevel(round.level, { pairs: round.looks.length, misses: missesRef.current, ms: performance.now() - sortStartRef.current });
+    const level = nextLevel(round.level, { pairs: round.socks.length / 2, misses: missesRef.current, ms: performance.now() - sortStartRef.current });
     setPhase("cheer");
     if (settings.sounds) playMelody();
     say(texts.done);
@@ -246,14 +257,15 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     });
   };
 
-  /** Both socks of `pair` (found by the child) hop from the floor onto their place on the line. */
-  const hang = (pair: number, a: number, b: number) => {
-    matchedRef.current.add(pair);
+  /** The two pieces `a` and `b` on the floor (a pair found by the child) hop onto their place on the line, left one left. */
+  const hang = (a: number, b: number) => {
+    matchedRef.current.add(a).add(b);
     const streak = ++streakRef.current;
-    const slot = matchedRef.current.size - 1;
-    setLineOrder((order) => [...order, pair]);
+    const slot = matchedRef.current.size / 2 - 1;
+    const pieces: [number, number] = round.socks[a].side === "left" ? [a, b] : [b, a];
+    setLineOrder((order) => [...order, pieces]);
     const next: Record<number, Flight> = {};
-    [a, b].forEach((index, j) => {
+    pieces.forEach((index, j) => {
       const sock = sockRefs.current[index];
       const target = slotRefs.current[slot * 2 + j];
       const cell = sock?.parentElement;
@@ -274,7 +286,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     say(oneOf(texts.pair));
 
     later(FLY_MS, () => {
-      setLanded((l) => [...l, pair]);
+      setLanded((l) => [...l, ...pieces]);
       if (settings.sounds) {
         playKnock(1500);
         later(120, () => playKnock(1300));
@@ -287,26 +299,27 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       }
     });
 
-    if (matchedRef.current.size === round.looks.length) later(FLY_MS + 300, finish);
+    if (matchedRef.current.size === round.socks.length) later(FLY_MS + 300, finish);
   };
 
   /** The child tapped (or chose by key) the sock at `index` on the floor. */
   const pick = (index: number) => {
     const sock = round.socks[index];
-    if (phase !== "sorting" || matchedRef.current.has(sock.pair)) return;
+    if (phase !== "sorting" || matchedRef.current.has(index)) return;
     const before = selectedRef.current;
-    if (settings.sounds) playCountNote(sock.pair);
+    // Both pieces of a look sound the same, so the note never tells a left from a right one.
+    if (settings.sounds) playCountNote(sock.look);
     if (before === index) {
       setNudge((n) => n + 1);
       return;
     }
-    if (before !== null && round.socks[before].pair === sock.pair) {
+    if (before !== null && fits(round.socks[before], sock)) {
       selectedRef.current = null;
       setSelected(null);
-      hang(sock.pair, before, index);
+      hang(before, index);
       return;
     }
-    // A different one: the first goes back down (under its basket, if it has one), this one is lifted instead. No
+    // A different one (also the same look on the same side): the first goes back down (under its basket, if it has one), this one is lifted instead. No
     // "wrong" for the child; only the difficulty and the run of notes take note.
     if (before !== null) {
       missesRef.current++;
@@ -318,7 +331,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   const onSockDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
-    if (matchedRef.current.has(round.socks[index].pair)) funBurst(e.clientX, e.clientY);
+    if (matchedRef.current.has(index)) funBurst(e.clientX, e.clientY);
     else pick(index);
   };
 
@@ -332,7 +345,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
         funBurst();
         return;
       }
-      const left = round.socks.map((s, i) => (matchedRef.current.has(s.pair) ? -1 : i)).filter((i) => i >= 0);
+      const left = round.socks.map((_, i) => (matchedRef.current.has(i) ? -1 : i)).filter((i) => i >= 0);
       if (left.length === 0) return;
       const move = (to: number) => {
         focusRef.current = to;
@@ -357,7 +370,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
         // Under a basket its note would give it away: a knock on the basket instead.
         if (settings.sounds) {
           if (round.socks[to].covered && selectedRef.current !== to) playKnock(700);
-          else playCountNote(round.socks[to].pair);
+          else playCountNote(round.socks[to].look);
         }
       }
     };
@@ -369,14 +382,14 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   return (
     <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown} style={{ "--pull-ms": `${PULL_MS}ms` } as CSSProperties}>
-      <div className="sock-line" style={{ "--pairs": round.looks.length } as CSSProperties}>
+      <div className="sock-line" style={{ "--pairs": round.socks.length / 2 } as CSSProperties}>
         <span className="sock-post left" />
         <span className="sock-post right" />
         <span className="sock-rope" />
         <div className="sock-slots">
-          {round.looks.map((_, slot) => {
-            const pair = lineOrder[slot];
-            const shown = pair !== undefined && landed.includes(pair);
+          {Array.from({ length: round.socks.length / 2 }, (_, slot) => {
+            const pieces = lineOrder[slot];
+            const shown = pieces !== undefined && landed.includes(pieces[0]);
             return (
               <div key={`${round.id}-${slot}`} className={`sock-hang${shown ? " shown" : ""}`} style={{ "--slot": slot } as CSSProperties}>
                 {[0, 1].map((j) => (
@@ -389,7 +402,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
                   >
                     {shown && (
                       <>
-                        <SockDrawing look={round.looks[pair]} />
+                        <SockDrawing look={round.looks[round.socks[pieces[j]].look]} side={round.socks[pieces[j]].side} />
                         <Peg />
                       </>
                     )}
@@ -410,7 +423,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
             {!machineShut &&
               round.socks.map((sock, i) => {
                 const flight = flights[i];
-                const gone = landed.includes(sock.pair);
+                const gone = landed.includes(i);
                 const translate = flight
                   ? `calc(${sock.shift[0]}% + ${flight.x}px) calc(${sock.shift[1]}% + ${flight.y}px)`
                   : `${sock.shift[0]}% ${sock.shift[1]}%`;
@@ -433,10 +446,10 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
                       }
                       aria-label={texts.sock(i + 1)}
                       // With one sock in hand, its partner is the right one.
-                      data-tap={tapState({ goal: selected !== null && selected !== i && round.socks[selected].pair === sock.pair, done: gone })}
+                      data-tap={tapState({ goal: selected !== null && !matchedRef.current.has(i) && fits(round.socks[selected], sock), done: gone })}
                       onPointerDown={onSockDown(i)}
                     >
-                      <SockDrawing look={round.looks[sock.pair]} />
+                      <SockDrawing look={round.looks[sock.look]} side={sock.side} />
                     </button>
                     {sock.covered && (
                       <span

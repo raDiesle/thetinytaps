@@ -299,7 +299,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
           className={goalClass(at("sleep"))}
           onTap={at("sleep") ? () => sleep() : undefined}
           tap={tapState({ goal: true })}
-          label={t({ de: "Lampe" })}
+          label={t({ de: "Lampe", en: "Lamp", zh: "台灯", hi: "लैंप", es: "Lámpara", ar: "المصباح", ru: "Лампа" })}
         >
           <Lamp on={!story.night} />
         </Piece>
@@ -310,7 +310,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
           className={`sf-asleep${asleep ? " on" : ""} ${goalClass(at("wake"))}`}
           onTap={asleep ? () => (at("wake") ? wake() : sparkle()) : undefined}
           tap={tapState({ goal: at("wake") })}
-          label={t({ de: "Tapsi" })}
+          label={t({ de: "Tapsi", en: "Tapsi", zh: "塔普西", hi: "टैप्सी", es: "Tapsi", ar: "تابسي", ru: "Тапси" })}
         >
           <TapsiAsleep />
         </Piece>
@@ -319,7 +319,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
           className={`sf-figure${asleep ? " away" : ""}${step === "party" ? " sf-cheer" : ""}`}
           onTap={asleep ? undefined : () => hop("tapsi")}
           tap={tapState({})}
-          label={t({ de: "Tapsi" })}
+          label={t({ de: "Tapsi", en: "Tapsi", zh: "塔普西", hi: "टैप्सी", es: "Tapsi", ar: "تابسي", ru: "Тапси" })}
         >
           <div key={story.hops.tapsi} className={story.hops.tapsi ? "sf-hop" : undefined}>
             <TapsiStanding />
@@ -330,7 +330,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
           className={`sf-figure${mamaHere ? "" : " away"}${step === "party" ? " sf-cheer" : ""}`}
           onTap={mamaHere ? () => hop("mama") : undefined}
           tap={tapState({})}
-          label={t({ de: "Mama" })}
+          label={t({ de: "Mama", en: "Mommy", zh: "妈妈", hi: "मम्मी", es: "Mamá", ar: "ماما", ru: "Мама" })}
         >
           <div key={story.hops.mama} className={story.hops.mama ? "sf-hop" : undefined}>
             <MamaFox />
@@ -350,7 +350,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
             style={story.sent ? toWindow(SPOTS.balloon) : undefined}
             onTap={at("send") ? () => send() : undefined}
             tap={tapState({ goal: true })}
-            label={t({ de: "Luftballon" })}
+            label={t({ de: "Luftballon", en: "Balloon", zh: "气球", hi: "गुब्बारा", es: "Globo", ar: "البالون", ru: "Воздушный шарик" })}
           >
             <Balloon tied={story.taken.map((i) => PACIFIERS[i].colour)} />
           </Piece>
@@ -361,7 +361,15 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
             style={story.sent ? shift(SPOTS.sill.x - SPOTS.box.x, SPOTS.sill.y - SPOTS.box.y, story.magic ? 0.3 : 1) : undefined}
             onTap={at("send") ? () => send() : undefined}
             tap={tapState({ goal: true })}
-            label={t({ de: "Schnullerkästchen" })}
+            label={t({
+              de: "Schnullerkästchen",
+              en: "Pacifier box",
+              zh: "奶嘴盒",
+              hi: "चुसनी का डिब्बा",
+              es: "Cajita de chupetes",
+              ar: "علبة اللهّايات",
+              ru: "Коробочка для пустышек",
+            })}
           >
             <PacifierBox inside={story.taken.map((i) => PACIFIERS[i].colour)} shut={shut} />
           </Piece>
@@ -378,7 +386,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
               style={taken ? shift(to.x - from.x, to.y - from.y, 0.5) : undefined}
               onTap={taken ? undefined : (e) => (step === "collect" ? collect(i, e) : sparkle(e))}
               tap={tapState({ goal: at("collect") })}
-              label={t({ de: "Schnuller" })}
+              label={t({ de: "Schnuller", en: "Pacifier", zh: "奶嘴", hi: "चुसनी", es: "Chupete", ar: "اللهّاية", ru: "Пустышка" })}
             >
               <Pacifier colour={p.colour} />
             </Piece>
@@ -394,7 +402,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
             className={`sf-star ${goalClass(at("fairy"))}`}
             onTap={() => act()}
             tap={tapState({ goal: true })}
-            label={t({ de: "Stern" })}
+            label={t({ de: "Stern", en: "Star", zh: "星星", hi: "तारा", es: "Estrella", ar: "نجمة", ru: "Звезда" })}
           >
             <span aria-hidden>⭐</span>
           </Piece>
@@ -406,7 +414,15 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
             style={story.fairy === "in" ? undefined : toWindow(SPOTS.fairy)}
             onTap={story.fairy === "in" ? (e) => (at("fairy") ? glitter(e) : sparkle(e)) : undefined}
             tap={tapState({ goal: at("fairy") })}
-            label={t({ de: "Schnullerfee" })}
+            label={t({
+              de: "Schnullerfee",
+              en: "Pacifier fairy",
+              zh: "奶嘴仙子",
+              hi: "चुसनी परी",
+              es: "Hada del chupete",
+              ar: "جنّية اللهّاية",
+              ru: "Фея пустышек",
+            })}
           >
             <div key={story.glitters} className={story.glitters ? "sf-twirl" : undefined}>
               <Fairy balloon={balloon} />
@@ -426,7 +442,7 @@ export function PacifierPlay({ settings }: { settings: PacifierSettings }) {
             className={`sf-present${story.opened ? " opened" : ""} ${goalClass(at("gift"))}`}
             onTap={(e) => (at("gift") ? open() : sparkle(e))}
             tap={tapState({ goal: at("gift") })}
-            label={t({ de: "Geschenk" })}
+            label={t({ de: "Geschenk", en: "Present", zh: "礼物", hi: "तोहफ़ा", es: "Regalo", ar: "هدية", ru: "Подарок" })}
           >
             <Present />
             <div className="sf-lid">

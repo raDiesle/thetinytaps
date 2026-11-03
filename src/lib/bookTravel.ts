@@ -1,9 +1,10 @@
 import { bookIdOf, shelfEntryOf } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
+import { holdPreloads } from "@/lib/preloadPages";
 import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
 /*
- * The way into a book and back onto the shelf, in the book look (bookshelf.css): the home page is a bookshelf, and a
+ * The way into a book and back onto the shelf (bookshelf.css): the home page is a bookshelf, and a
  * tap on a book takes it out – it comes off its board towards you, into the middle, its cover swings open to the left,
  * and the left page, where the book's first menu is printed, comes close until it is the screen. No page turns on the
  * way in; pages turn only inside the book (look.ts). The way back is the same backwards: the page goes far, the cover
@@ -61,6 +62,9 @@ function copyScreen() {
   if (root) {
     const copy = root.cloneNode(true) as HTMLElement;
     copy.removeAttribute("id");
+    // What lies below the first screen is never seen on the page, but a page turned in 3D is painted whole, all the way
+    // down: without it the copy costs a phone a long frame less while the book flies.
+    for (const hidden of copy.querySelectorAll("[data-below-fold], .seo-text")) hidden.remove();
     print.append(copy);
   }
   return print;
@@ -185,7 +189,9 @@ const frames = (count: number) => new Promise<void>((resolve) => (count <= 0 ? r
 
 /**
  * Takes the shelf book `book` out, opens it and goes on to where it leads with `go`. The room stays on the layer as a
- * copy while the app changes under it, as soon as the cover starts opening, so the left page can show it printed.
+ * copy while the app changes under it, right as the book lifts off its board, so the left page can show it printed.
+ * Drawing the new page and copying it are the heavy part, so they come while the book still lifts slowly, never while
+ * it flies (a long frame there stuttered on phones), and no other page's code is loaded until the book is open.
  */
 export function takeOutBook(book: HTMLElement, go: () => void) {
   if (travelling || still()) {
@@ -193,6 +199,7 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
     return;
   }
   travelling = true;
+  holdPreloads(TOTAL + 300);
   // The cover lands on the left with the sound's last thud.
   playPageTurn((LIFT + FLY + OPEN) / 1000 / 0.85);
   const root = layer();
@@ -209,14 +216,16 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
   }
   root.append(built.book);
   const done = travel(built, m, "normal");
-  setTimeout(async () => {
+  void (async () => {
+    // First the moves reach the compositor, which plays them on while the page changes under the room's copy.
+    await frames(2);
     go();
     // The new page shows after React's next render (a game's menu fits its cards a frame later).
     await frames(3);
     const print = copyScreen();
     print.style.transform = m.print;
     built.left.append(print);
-  }, LIFT + FLY);
+  })();
   done.finally(() => {
     travelling = false;
     leave(root, m.fills ? 140 : 320);
@@ -236,6 +245,7 @@ export function putBookBack(from: string, go: () => void) {
     return;
   }
   travelling = true;
+  holdPreloads(TOTAL + 1800);
   // The screen as it is, still on top while the shelf comes in under it.
   const root = layer();
   const print = copyScreen();

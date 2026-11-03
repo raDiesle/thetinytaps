@@ -24,7 +24,7 @@ export interface CommonSettings {
    */
   figure: Figure;
   /**
-   * How a game is left with its ✕ (in the book look the page's corner): one tap, or held for half a second, so a
+   * How a game is left with its ✕ (the page's corner): one tap, or held for half a second, so a
    * child's tap can't end it. A tap by default (user decision, November 2026); grown-ups choose holding under ⏳.
    */
   leave: Leave;

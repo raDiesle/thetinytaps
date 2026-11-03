@@ -64,15 +64,39 @@ self.addEventListener("message", (event) => {
   );
 });
 
+/** How long a page waits for the network before it starts from the cache (a weak mobile signal). */
+const NETWORK_WAIT_MS = 3000;
+
+/** The page from the network, or the cached app when offline, on an error status or after NETWORK_WAIT_MS. */
+async function openPage(event, request) {
+  const fromCache = async () => (await (await caches.open(CACHE)).match(SHELL)) ?? (await caches.match(SHELL));
+  // The request is passed on as it is: a copy with other options would lose its "navigate" mode, which
+  // some browsers refuse, and the redirects (/zaehne → /zaehne/) it lets the browser follow itself.
+  const network = fetch(request);
+  // Keeps the worker alive until the network answers, even when the cache answered first.
+  event.waitUntil(network.catch(() => {}));
+  const page = network.then((response) => (response.ok || response.type === "opaqueredirect" ? response : Promise.reject()));
+  page.catch(() => {});
+  const late = new Promise((resolve) => setTimeout(resolve, NETWORK_WAIT_MS));
+  try {
+    const first = await Promise.race([page, late]);
+    if (first) return first;
+  } catch {
+    // Offline, or an error status (an unknown address answered with 404.html): the cached app.
+  }
+  return (await fromCache()) ?? network;
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
 
-  // Every page is the same app (deep links like /bilder/baustelle/ included):
-  // answer from the cache straight away. A new build is picked up by the
-  // browser's update check and used from the next start on.
+  // A page opened online comes from the network, so it always runs the newest build: answered from the
+  // cache, a phone kept showing the old one through several reloads, until this worker's successor had
+  // downloaded every file of the site in the background. Offline, or when the network takes too long,
+  // every page is the same app (deep links like /bilder/baustelle/ included) and comes from the cache.
   if (request.mode === "navigate") {
-    event.respondWith((async () => (await (await caches.open(CACHE)).match(SHELL)) ?? fetch(request))());
+    event.respondWith(openPage(event, request));
     return;
   }
 

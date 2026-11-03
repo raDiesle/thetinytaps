@@ -65,6 +65,22 @@
   height: 100%;
 }
 
+/* A world as big as it is, moved by the camera as a whole (`cameraLayer`): a layer of its own, never painted anew for a camera move. */
+.marble-camera {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  overflow: visible;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.marble-level:has(> .marble-camera),
+.run-level {
+  overflow: hidden;
+}
+
 /* The finger that says „tap here“ stands still: nothing moves before the child's first tap. */
 .marble-hint,
 .topple-hint {

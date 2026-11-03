@@ -682,5 +682,6 @@ export function buildKitchen() {
     knobY,
     toastAt,
     cameraTarget,
+    width: WORLD_W,
   };
 }

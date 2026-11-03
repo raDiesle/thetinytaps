@@ -19,7 +19,7 @@ Eleven Rube Goldberg machines: one tap, and for about 40 seconds one thing sets 
 - „Badezimmer" (`bath.ts`, `BathLevel.tsx`, R-05, about 38 s): the red button on the toothpaste tube is the one thing to tap; a blob tips the toothbrush into the tooth mug, the mug topples onto the squeaky duck (it wears a sailor's hat, so it isn't the Wasserbahn's), the duck bonks the bath tap's lever, and the tub – drawn cut open, so the child sees it fill – foams over. The wave carries the duck against the toilet roll, which rolls away unrolling a paper ribbon into the wind-up whale's key; the whale waddles to the hair dryer and spouts onto its switch, and the dryer blows the shower cap onto the ceiling lamp and soap bubbles out of the bubble wand, which pop one by one at the lamp.
 - „Bauernhof" (`farm.ts`, `FarmLevel.tsx`, R-06, about 38 s): every link is an animal – the rooster crows, the pig jumps into the puddle, the mud wakes the cat, her ball of wool rolls onto the cow's nose, the moo wakes the goat, who butts the milk can (the first time it only wobbles) into the kennel; the dog chases the ducks onto the donkey's back, the donkey brays and kicks the barn, which throws the ducks onto the roof; the doors swing open and the animals sing one after the other, then all together. The animals call with their recordings from `src/lib/sounds/`, loaded when the level opens (`FARM_SOUNDS`), the synthesized call until then; goat and donkey have no recording yet (`playBaa`; `playNeigh` then `playMoo`).
 - „Gute-Nacht-Maschine" (`night.ts`, `NightLevel.tsx`, R-07, about 45 s): the calm one – a children's room at dusk; the music box's crank nudges a golden star ball down a zigzag gutter into a basket, the basket sinks and its cord over two ceiling pulleys draws the curtain, and the curtain tips the rocking chair until its backrest taps the cuckoo clock's pendulum. The sleepy cuckoo calls a soft „kuckuck“ and yawns, and its beak pushes the arc lamp's pull chain: click, the light goes out, the moon rises in the round window, and teddy, moon, cuckoo, star and the carousel sheep fall asleep („z z z“) while the camera glides back to the music box. The room gets dark as a plain veil, and what is outside or glows is drawn over it. Slow pace and soft sounds only: no background song while it plays and its end plays `playLullaby` instead of the cheerful tune.
-- „Aufräum-Maschine" (`tidy.ts`, `TidyLevel.tsx`, R-08, about 33 s): an untidy children's room – the rocking horse kicks the football, which rolls the blocks into the toy chest and itself after them, the lid slams and sets off the wind-up truck, which pushes the books to the shelf, where they hop in. Then the truck bounces on the bellows: each puff runs along the hose and blows a sock into the laundry basket, and the last throws the rolled-up sock ball onto the full basket. It bounces off and rolls along the floor: the crayons it reaches hop into the pencil pot, each with its own note, and the jigsaw pieces hop into the puzzle board until the picture is whole. Last it knocks the plug out of the air cushion – pfffft, the cushion jumps like a balloon let go and throws the cuddly bunny into bed (a bunny, not a teddy, because the circus has the teddy); the blanket spreads over it and everything glitters. Its lines are German only so far.
+- „Aufräum-Maschine" (`tidy.ts`, `TidyLevel.tsx`, R-08, about 33 s): an untidy children's room – the rocking horse kicks the football, which rolls the blocks into the toy chest and itself after them, the lid slams and sets off the wind-up truck, which pushes the books to the shelf, where they hop in. Then the truck bounces on the bellows: each puff runs along the hose and blows a sock into the laundry basket, and the last throws the rolled-up sock ball onto the full basket. It bounces off and rolls along the floor: the crayons it reaches hop into the pencil pot, each with its own note, and the jigsaw pieces hop into the puzzle board until the picture is whole. Last it knocks the plug out of the air cushion – pfffft, the cushion jumps like a balloon let go and throws the cuddly bunny into bed (a bunny, not a teddy, because the circus has the teddy); the blanket spreads over it and everything glitters.
 
 Everything in a machine is a function of the seconds since the tap; in development `__machine.seek(seconds)` in the console jumps to a moment, and `?level=garden` in the address makes the first card tapped start that level.
 
@@ -32,7 +32,7 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
 - The row above the cards holds one choice for the whole game, „Schranke und Weiche“: „👆 Kind tippt“ (default) or
   „🔄 Von selbst“ (`MarbleSettings.play`, passed to every level as `LevelProps.watch`). With „Von selbst“ nothing waits
   for the child's tap. So far only the marble run uses it (barrier up, switch flips by itself); a level that gets
-  something else that waits for a tap should follow it too. Its texts are German only so far (`languageStatus.ts`).
+  something else that waits for a tap should follow it too.
 - `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, en, zh, hi, es, ar, ru }`, written next to its moment;
   `MarblePlay` speaks it through `spokenIn`: the app language with its voice, or the German line with the German voice where a translation is missing. Never pass a bare German string.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
@@ -64,6 +64,11 @@ stand still, so nothing moves before the child acts.
   The clock runs on after a seek, so a screenshot shows a later moment: to hold one, freeze the frames first
   (`const raf = requestAnimationFrame.bind(window); requestAnimationFrame = (cb) => raf((ts) => cb(window.__frozen ?? ts)); window.__frozen = performance.now()`),
   then seek; set `window.__frozen = undefined` to let it run again.
+- The camera is never a changing `viewBox` nor a moved `<g>`: the whole world is drawn once in one svg as big as the
+  world (`.marble-camera`, a layer of its own) and the camera moves and zooms that svg by a CSS transform
+  (`cameraLayer` in `level.ts`), so a phone only moves a finished picture. A changing viewBox had it paint the whole
+  picture again in every frame, and the marble run and the machines stuttered on phones (November 2026).
+  `camera.test.ts` checks every level; `bun run perf kugelbahn maschine` measures the camera following.
 - Each machine has its own world: never reuse an element of another machine.
 - A machine runs about 35–45 s. It grows by new links, each set off visibly by the one before and setting off the next
   with a sound, never by stretching old moves or adding pauses; its test checks the new moments, hits and the length.
@@ -163,7 +168,7 @@ when full, the animals in the tunnel, and its `End` (drawn behind and in front o
 - A new world is a new file with a `TrackTheme`, a `MarbleLevel`, a card in `MODES`, a `LEVELS` entry, `LEVEL_TEXTS` and
   `RUNS` in `MarblePlay.tsx` (no background music). Give it five things that look different from every other world's, and
   an end that does something of its own when full – never the wooden basket and flag again.
-- Their names, first lines and the line when full are German only so far (a part of its own in `languageStatus.ts`);
-  everything shared with the wooden run speaks every language. The tunnel's colour-changing magic is the wooden run's only
+- Their names, first lines and the line when full (`full` in each world's `TrackTheme`) speak every language, like
+  everything shared with the wooden run. The tunnel's colour-changing magic is the wooden run's only
   (`magic`); the other worlds keep each thing's own look.
 - `trackTheme.test.ts` checks each world's level, its texts, the tunnel animals and that its landing spots stay on the wall.

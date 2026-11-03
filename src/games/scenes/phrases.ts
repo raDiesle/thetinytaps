@@ -35,8 +35,8 @@ export interface ScenePhrases {
   prompts: Record<ScenePrompt, string>;
   /** The same in colour mode. */
   colourPrompts: Record<ScenePrompt, string>;
-  /** The same in road mode ("Straße malen"); German only so far, else `prompts`. */
-  roadPrompts?: Record<ScenePrompt, string>;
+  /** The same in road mode ("Straße malen"). */
+  roadPrompts: Record<ScenePrompt, string>;
   /** Said before the praise of a right answer, one at random. */
   praise: string[];
   /** The party when everything is coloured / discovered. */
@@ -144,6 +144,7 @@ const ruColour = (m: string, f: string, n: string, pl: string, emoji: string): T
 
 const ru: ScenePhrases = {
   prompts: { tap: "Нажми на что-нибудь! 👆", keys: "Нажми на клавишу! ⌨️" },
+  roadPrompts: { tap: "Нарисуй дорогу! ☝️", keys: "Нарисуй дорогу или нажми на клавишу! ⌨️" },
   colourPrompts: {
     tap: "Нажми на что-нибудь – и оно станет цветным! 🖍️",
 
@@ -204,6 +205,7 @@ function enTrait(question: string, answer: string, pluralAnswer: string, part: s
 
 const en: ScenePhrases = {
   prompts: { tap: "Tap something! 👆", keys: "Press a key! ⌨️" },
+  roadPrompts: { tap: "Draw a road! ☝️", keys: "Draw a road or press a key! ⌨️" },
   colourPrompts: {
     tap: "Tap something – it gets colorful! 🖍️",
 
@@ -261,6 +263,7 @@ const zhTrait = (question: string, answer: string, part: string | undefined, emo
 
 const zh: ScenePhrases = {
   prompts: { tap: "点一点！👆", keys: "按一个键！⌨️" },
+  roadPrompts: { tap: "画一条路！☝️", keys: "画一条路，或者按一个键！⌨️" },
   colourPrompts: {
     tap: "点一点，它就变成彩色的！🖍️",
 
@@ -325,6 +328,7 @@ function hiAdjective(question: string, m: string, f: string, pl: string, part: s
 
 const hi: ScenePhrases = {
   prompts: { tap: "कुछ भी छुओ! 👆", keys: "कोई भी बटन दबाओ! ⌨️" },
+  roadPrompts: { tap: "एक सड़क बनाओ! ☝️", keys: "एक सड़क बनाओ या कोई भी बटन दबाओ! ⌨️" },
   colourPrompts: {
     tap: "कुछ भी छुओ – उसमें रंग भर जाएगा! 🖍️",
 
@@ -407,6 +411,7 @@ function esAdjective(question: string, m: string, f: string, mPl: string, fPl: s
 
 const es: ScenePhrases = {
   prompts: { tap: "¡Toca algo! 👆", keys: "¡Pulsa una tecla! ⌨️" },
+  roadPrompts: { tap: "¡Dibuja un camino! ☝️", keys: "¡Dibuja un camino o pulsa una tecla! ⌨️" },
   colourPrompts: {
     tap: "¡Toca algo y se llena de color! 🖍️",
 
@@ -478,6 +483,7 @@ function arAdjective(question: string, m: string, f: string, mPl: string, part: 
 
 const ar: ScenePhrases = {
   prompts: { tap: "هيّا نلمس شيئا! 👆", keys: "هيّا نضغط على زر! ⌨️" },
+  roadPrompts: { tap: "هيّا نرسم طريقا! ☝️", keys: "هيّا نرسم طريقا أو نضغط على زر! ⌨️" },
   colourPrompts: {
     tap: "هيّا نلمس شيئا فيصبح ملونا! 🖍️",
 

@@ -5,7 +5,7 @@ import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
 import { SeoText } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
-import { categoryHref, categoryOf, pagesBetween } from "@/content/games";
+import { categoryHref, categoryOf, isUnfinished, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
@@ -18,7 +18,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
-import { isBookLook, turnPageWith } from "@/lib/look";
+import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
 import goodNightFiles from "./stimme/**/*.mp3?glob";
@@ -113,13 +113,17 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   const returnTo = routineReturn(location.state);
   // Neither a routine's step nor a tool counts as play, nor stops when play time is over.
   const free = !!returnTo || !!tool;
-  const category = categoryOf(location.pathname);
-  const back = backHref ?? (category ? categoryHref(category) : "/");
+  // A game still being built is opened from the management page only, so its way back leads there.
+  const unfinished = isUnfinished(location.pathname);
+  const category = unfinished ? undefined : categoryOf(location.pathname);
+  const back = backHref ?? (unfinished ? "/management/" : category ? categoryHref(category) : "/");
   const backText =
     backLabel ??
-    (category
-      ? t(category.title)
-      : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
+    (unfinished
+      ? "Management"
+      : category
+        ? t(category.title)
+        : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const menu = menuAfterPlay({ startMode, leaveTo }, back);
   const [playing, setPlaying] = useState(false);
   // The settings panel below the top row: folded away by default, so the start screen stays short.
@@ -136,7 +140,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   const playArea = useRef<HTMLDivElement>(null);
   useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
-  /** Starts playing; `turn` turns the page into the game in the book look (not when the page opens playing). */
+  /** Starts playing; `turn` turns the page into the game (not when the page opens playing). */
   const start = async (turn = false) => {
     // The menus are locked then (PlaytimeLock); this also stops a key that slips past it. A routine's step is no game.
     if (!free) {
@@ -162,9 +166,9 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
       if (returnTo) goBack(navigate, returnTo);
       else if (menu) goBack(navigate, menu);
     };
-    // In the book look the page turns back from the game to its menu: as many pages as lie between them, or the book
+    // The page turns back from the game to its menu: as many pages as lie between them, or the book
     // closes and goes back on the shelf.
-    if (!returnTo && menu === "/" && isBookLook()) putBookBack(location.pathname, leave);
+    if (!returnTo && menu === "/") putBookBack(location.pathname, leave);
     else turnPageWith("back", leave, !returnTo && menu ? pagesBetween(location.pathname, menu) : 1);
   };
   const stopRef = useRef(stop);
@@ -225,7 +229,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
           </LeaveGame>
         )}
         {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
-        {/* The edge of the book's page round the picture; shown only in the book look (`book.css`). */}
+        {/* The edge of the book's page round the picture (`book.css`). */}
         <div className="book-frame" aria-hidden />
         <ExitButton
           onExit={stop}
@@ -254,9 +258,6 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
           {m.emoji}
         </span>
         <span className="game-title">{m.title}</span>
-        <span className="game-go" aria-hidden>
-          ▶
-        </span>
         {m.id === mode && (modes?.length ?? 0) > 1 && (
           <span className="badge">
             {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
@@ -444,7 +445,7 @@ function GoodNight() {
       <p className="good-night-text">
         {t({ de: "Gute Nacht!", ru: "Спокойной ночи!", en: "Good night!", zh: "晚安！", hi: "शुभ रात्रि!", es: "¡Buenas noches!", ar: "ليلة سعيدة!" })}
       </p>
-      {/* No side named: the ✕ is top right, in the book look the page's corner top left. */}
+      {/* No side named: the ✕ is the page's corner, top left. */}
       <p className="good-night-hint">
         {leave === "hold"
           ? t({
@@ -456,7 +457,15 @@ function GoodNight() {
               es: "Se acabó el tiempo de juego. Para salir, mantenga pulsada la ✕.",
               ar: "انتهى وقت اللعب. للخروج اضغطوا مطولًا على ✕.",
             })
-          : t({ de: "Die Spielzeit ist vorbei. Zum Beenden auf ✕ tippen." })}
+          : t({
+              de: "Die Spielzeit ist vorbei. Zum Beenden auf ✕ tippen.",
+              ru: "Время игры закончилось. Чтобы выйти, нажмите ✕.",
+              en: "Play time is over. To leave, tap ✕.",
+              zh: "游戏时间结束了。轻点 ✕ 即可退出。",
+              hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ✕ पर टैप करें।",
+              es: "Se acabó el tiempo de juego. Para salir, toque la ✕.",
+              ar: "انتهى وقت اللعب. للخروج انقروا على ✕.",
+            })}
       </p>
     </div>
   );
@@ -477,7 +486,7 @@ const STARS: [number, number, number][] = [
 ];
 
 /**
- * The ✕ in the corner (in the book look the page's turned-up corner): one tap leaves the game, or – where grown-ups chose
+ * The ✕ in the corner (the page's turned-up corner): one tap leaves the game, or – where grown-ups chose
  * holding (`leave`, under ⏳ on the home page) – it has to be held for half a second while the ring fills (the corner
  * lifts), and letting go earlier keeps playing. No note beside it says what it does: grown-ups know ✕ and the corner
  * (user feedback, November 2026); its name is only read out.
@@ -536,12 +545,7 @@ function ExitCorner({ children }: { children: ReactNode }) {
   );
 }
 
-/** The ✕, or in the book look the page's turned-up corner instead (`book.css`), lifting further while held. */
+/** The ✕: the page's turned-up corner with a ✕ on it (`book.css`), lifting further while held. */
 function ExitSign() {
-  return (
-    <>
-      <span className="hold-exit-sign">✕</span>
-      <PageCornerArt sign="close" />
-    </>
-  );
+  return <PageCornerArt sign="close" />;
 }

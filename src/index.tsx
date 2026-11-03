@@ -8,7 +8,7 @@ import { ScreenHint } from "./components/ScreenHint";
 import { SeoHead } from "./components/SeoHead";
 import { applySavedFigure } from "./lib/common";
 import { loadAppLanguage } from "./lib/language";
-import { applyLook } from "./lib/look";
+import { forgetOldLook } from "./lib/look";
 import { routerBase } from "./lib/pageAddress";
 import { downloadMusicIfOn } from "./lib/musicFile";
 import { setUpPwa } from "./lib/pwa";
@@ -17,7 +17,7 @@ import "./globals.css";
 setUpPwa();
 downloadMusicIfOn();
 applySavedFigure();
-applyLook();
+forgetOldLook();
 
 // Only the app language's texts are downloaded, and they are there before the first screen (src/content/texts).
 await loadAppLanguage();

@@ -12,6 +12,9 @@ export const COMFORTS_ZH: Partial<Record<ComfortId, ComfortText>> = {
   teddy: { caption: "给泰迪熊", narration: "你给小熊一只泰迪熊抱抱。" },
   stomp: { caption: "跺跺脚", narration: "咚，咚！把生气都跺出去。" },
   blow: { caption: "深深吹气", narration: "深深吸一口气……再吹出来：呼——。" },
+  liedown: { caption: "躺下盖被子", narration: "小熊躺下来，自己盖好被子。暖暖和和的。" },
+  lullaby: { caption: "听摇篮曲", narration: "小熊闭上眼睛，听一首轻轻的摇篮曲。" },
+  cuddle: { caption: "抱泰迪熊", narration: "小熊紧紧地抱着他的泰迪熊。" },
   hand: { caption: "牵着手", narration: "你握着他的小爪子。你在这儿陪着他。" },
   light: { caption: "开灯", narration: "你把灯打开。现在亮亮的。" },
   dance: { caption: "一起跳舞", narration: "你们一起跳舞。跳呀跳！" },
@@ -43,6 +46,18 @@ export const FEELINGS_ZH: Partial<Record<FeelingId, FeelingText>> = {
     ],
     end: { narration: "生气没有了。小熊又平静下来了。", line: "谢谢！" },
     endCaption: "又平静了",
+  },
+  tired: {
+    title: "晚上困了",
+    questions: ["小熊困了，在打哈欠。他可以怎么做？", "小熊还睡不着。他可以怎么做？", "小熊快睡着了。他可以怎么做？"],
+    intro: "小熊困了。他在打哈欠。",
+    instead: [
+      { caption: "在床上蹦", answer: "嗯，一蹦一跳，小熊又精神了。还是躺下盖好被子吧。" },
+      { caption: "起来玩", answer: "嗯，现在小熊又一点也不困了。还是闭上眼睛听摇篮曲吧。" },
+      { caption: "哭", answer: "嗯，一哭，小熊又醒了。还是抱着你的泰迪熊吧。" },
+    ],
+    end: { narration: "小熊开开心心地睡着了。晚安！", line: "晚安……" },
+    endCaption: "睡着了",
   },
   scared: {
     title: "打雷害怕",

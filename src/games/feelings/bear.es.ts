@@ -12,6 +12,9 @@ export const COMFORTS_ES: Partial<Record<ComfortId, ComfortText>> = {
   teddy: { caption: "Dar un peluche", narration: "Le das a Osito un peluche para abrazar." },
   stomp: { caption: "Zapatear", narration: "¡Pum, pum! Que salga el enojo." },
   blow: { caption: "Soplar hondo", narration: "Respira hondo … y sopla: Fuuu." },
+  liedown: { caption: "Acostarse y taparse", narration: "Osito se acuesta y se tapa. Calientito." },
+  lullaby: { caption: "Escuchar una canción de cuna", narration: "Osito cierra los ojos y escucha una canción de cuna suave." },
+  cuddle: { caption: "Abrazar el peluche", narration: "Osito se acurruca con su peluche." },
   hand: { caption: "Tomarle la patita", narration: "Le tomas la patita. Estás a su lado." },
   light: { caption: "Encender la luz", narration: "Enciendes la luz. Ahora hay luz." },
   dance: { caption: "Bailar juntos", narration: "Bailas con Osito. ¡Salta, salta!" },
@@ -47,6 +50,22 @@ export const FEELINGS_ES: Partial<Record<FeelingId, FeelingText>> = {
     ],
     end: { narration: "El enojo se fue. Osito está tranquilo otra vez.", line: "¡Gracias!" },
     endCaption: "Tranquilo otra vez",
+  },
+  tired: {
+    title: "Sueño en la noche",
+    questions: [
+      "Osito tiene sueño y bosteza. ¿Qué puede hacer él?",
+      "Osito todavía no se puede dormir. ¿Qué puede hacer él?",
+      "Osito ya casi se duerme. ¿Qué puede hacer él?",
+    ],
+    intro: "Osito tiene sueño. Bosteza.",
+    instead: [
+      { caption: "Saltar en la cama", answer: "Mmm, saltando se le quita el sueño a Osito. Mejor acuéstate y tápate." },
+      { caption: "Levantarse a jugar", answer: "Mmm, ahora a Osito se le quitó el sueño. Mejor cierra los ojos y escucha la canción de cuna." },
+      { caption: "Llorar", answer: "Mmm, llorando Osito se despierta otra vez. Mejor acurrúcate con tu peluche." },
+    ],
+    end: { narration: "Osito se duerme feliz. ¡Buenas noches!", line: "Buenas noches …" },
+    endCaption: "Se duerme",
   },
   scared: {
     title: "Miedo a la tormenta",

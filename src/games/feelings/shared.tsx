@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLeaveGame } from "@/components/GameShell";
-import { appLanguage, pick, useAppLanguage, useT, voiceFor, type Localized } from "@/lib/language";
+import { appLanguage, pick, useAppLanguage, useT, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
-import { speak } from "@/lib/speech";
+import { recordedVoice } from "@/lib/voice";
 import { framesFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
+import voiceFiles from "./stimme/**/*.mp3?glob";
 
 /** How long each frame of a picture stays before the next one fades in. */
 const FRAME_MS = 900;
 
-/** Said with the laugh when a good idea is chosen (only when speech is on), one at random. */
+/** Said with the laugh when a good idea is chosen, one at random. */
 export const PRAISE: Localized<string[]> = {
   de: ["Juhu!", "Ja!", "Super!"],
   ru: ["Ура!", "Да!", "Молодец!"],
@@ -24,10 +25,10 @@ export const PRAISE: Localized<string[]> = {
 /** How long the green frame and the laugh stay before the bear does the good thing. */
 export const CHEER_MS = 1100;
 
-/** The red frame stays at least this long, even without speech: long enough to see what went wrong. */
+/** The red frame stays at least this long, even when nothing is said: long enough to see what went wrong. */
 export const OOPS_MS = 2600;
 
-/** A good idea was chosen: a laugh, stars, and „Juhu!“ when speech is on. */
+/** A good idea was chosen: a laugh, stars, and „Juhu!“. */
 export function cheer(say: (text: string) => void, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
   const praise = pick(PRAISE, appLanguage());
   sound("laugh");
@@ -70,18 +71,31 @@ export function useTimers() {
   return { later, clearAll };
 }
 
-/** Speech and sounds as the parent set them up; speech in the app language, a line not translated yet (still German) with the German voice. */
+// What the game says, from its ElevenLabs recordings (`bun run voice make --only gefuehle`, src/content/recordedLines.ts):
+// one file per line in stimme/ (German; the other languages only once the user asks for them). A line not recorded yet
+// stays silent.
+const voice = recordedVoice(voiceFiles);
+
+/**
+ * Speech and sounds: each line from its recording in the app language, a line not translated yet (still German) from
+ * its German one. `voiced` tells whether a line has a recording, so a story waits for it to be said.
+ */
 export function useVoice(settings: FeelingsSettings) {
   const language = useAppLanguage();
   useEffect(() => {
     if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
   }, [settings.sounds]);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, voiceFor(text, language), { queue, rate: 0.85 });
-    },
-    [settings.speech, language],
+  const say = useCallback((text: string, queue = false) => voice.say(text, language.id, { queue }), [language.id]);
+  const voiced = useCallback((text: string) => voice.has(text, language.id), [language.id]);
+  /** Starts loading the recordings of a story's lines, so each is said right when its picture comes. */
+  const preload = useCallback(
+    (texts: (string | undefined)[]) =>
+      voice.load(
+        texts.filter((t): t is string => !!t),
+        language.id,
+      ),
+    [language.id],
   );
 
   const sound = useCallback(
@@ -91,7 +105,7 @@ export function useVoice(settings: FeelingsSettings) {
     [settings.sounds],
   );
 
-  return { say, sound };
+  return { say, sound, voiced, preload };
 }
 
 interface Floater {

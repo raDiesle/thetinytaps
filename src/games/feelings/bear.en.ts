@@ -11,6 +11,9 @@ export const COMFORTS_EN: Partial<Record<ComfortId, ComfortText>> = {
   teddy: { caption: "Give a teddy", narration: "You give Little Bear a teddy to cuddle." },
   stomp: { caption: "Stomp", narration: "Stomp, stomp! Let the anger out." },
   blow: { caption: "Take a deep breath", narration: "Breathe in deeply … and blow out: Phoooo." },
+  liedown: { caption: "Lie down and tuck in", narration: "Little Bear lies down and tucks himself in. Nice and warm." },
+  lullaby: { caption: "Listen to a lullaby", narration: "Little Bear closes his eyes and listens to a soft lullaby." },
+  cuddle: { caption: "Cuddle the teddy", narration: "Little Bear cuddles up to his teddy." },
   hand: { caption: "Hold his paw", narration: "You hold his paw. You are right here." },
   light: { caption: "Turn on the light", narration: "You turn on the light. Now it is bright." },
   dance: { caption: "Dance along", narration: "You dance together. Hop, hop!" },
@@ -50,6 +53,22 @@ export const FEELINGS_EN: Partial<Record<FeelingId, FeelingText>> = {
     ],
     end: { narration: "The anger is gone. Little Bear is calm again.", line: "Thank you!" },
     endCaption: "Calm again",
+  },
+  tired: {
+    title: "Tired in the evening",
+    questions: [
+      "Little Bear is tired and yawning. What can he do?",
+      "Little Bear can't fall asleep yet. What can he do?",
+      "Little Bear is almost asleep. What can he do?",
+    ],
+    intro: "Little Bear is tired. He is yawning.",
+    instead: [
+      { caption: "Jump on the bed", answer: "Hmm, jumping makes Little Bear wide awake again. Lie down and tuck yourself in instead." },
+      { caption: "Get up and play", answer: "Hmm, now Little Bear is wide awake again. Close your eyes and listen to the lullaby instead." },
+      { caption: "Cry", answer: "Hmm, crying wakes Little Bear up again. Cuddle up to your teddy instead." },
+    ],
+    end: { narration: "Little Bear falls asleep happily. Good night!", line: "Good night …" },
+    endCaption: "Falling asleep",
   },
   scared: {
     title: "Scared of the storm",

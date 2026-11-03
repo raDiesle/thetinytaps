@@ -536,5 +536,6 @@ export function buildLight() {
     lampTurn,
     dark,
     cameraTarget,
+    width: WORLD_W,
   };
 }

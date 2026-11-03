@@ -255,29 +255,31 @@ function drawBox(box: Box, pose: Pose, w: Vec3, point: (p: Vec3) => { x: number;
 /** How quickly the brush turns to its next hold: unhurried, like a hand. */
 const FOLLOW_S = 0.3;
 
-/** The picture the brush is drawn over: its viewBox and how many picture units one screen pixel is. */
+/** The picture the brush is drawn over: the part of it the screen shows and how many picture units one screen pixel is. */
 export interface BrushFrame {
-  viewBox: string;
   box: { x: number; y: number; width: number; height: number };
   unit: number;
 }
 
 /**
  * The brush, in a layer of its own over the mirror. Its shape is drawn only when it turns or reaches the next spot
- * (with the clock's tick, or while the head turns); gliding there and scrubbing, circling or wiping are CSS
- * animations of that layer (`.brush-…` in teeth.css), which the browser moves without drawing anything again – drawn
+ * (or while the head turns); gliding there and scrubbing, circling or wiping are CSS animations of that layer (`.brush-…` in teeth.css), which the browser moves without drawing anything again – drawn
  * anew in every frame it made the brushing stutter on phones. The mouth is projected without perspective, so moving
  * the flat picture is exactly moving the brush in 3D.
  */
 export function Brush({
   anchor,
+  at,
   surface,
   tooth,
   motion,
   project,
   frame,
 }: {
+  /** The hold the brush takes, on the stop it is nearest. */
   anchor: BrushAnchor;
+  /** Where its working point is now, gliding from stop to stop. */
+  at: Vec3;
   surface: Surface;
   tooth: ToothId;
   motion: Motion;
@@ -305,9 +307,17 @@ export function Brush({
   const { box, unit } = frame;
   const middle = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   const anchorAt = project.point(pose.at);
+  // Where the drawing reaches, so its layer is only as big as the brush: a layer the size of the screen had a phone
+  // paint whole bands of the screen again each time the brush turned.
+  const reach = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
   const point = (p: Vec3) => {
     const q = project.point(p);
-    return { x: q.x - anchorAt.x + middle.x, y: q.y - anchorAt.y + middle.y };
+    const at = { x: q.x - anchorAt.x + middle.x, y: q.y - anchorAt.y + middle.y };
+    reach.left = Math.min(reach.left, at.x);
+    reach.top = Math.min(reach.top, at.y);
+    reach.right = Math.max(reach.right, at.x);
+    reach.bottom = Math.max(reach.bottom, at.y);
+    return at;
   };
   /** A 3D direction of `length` brush units on the screen, in px. */
   const onScreen = (v: Vec3, length: number) => {
@@ -324,7 +334,8 @@ export function Brush({
     <g className="brush-foam" fill="#fff" stroke="#bde0fe" strokeWidth={2}>
       {FOAM.slice(0, foamCount).map(([su, sw, sb], i) => {
         const p = point(brushPoint(pose, w, su, sw, sb));
-        return <circle key={i} cx={p.x} cy={p.y} r={(3.5 + (i % 3)) * project.zoom} />;
+        // Rounded like the paths, so a brush that holds still leaves the page as it is (each change is painted).
+        return <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r={((3.5 + (i % 3)) * project.zoom).toFixed(1)} />;
       })}
     </g>
   );
@@ -334,7 +345,8 @@ export function Brush({
   const up: Vec3 = tooth.jaw === "lower" ? [0, 1, 0] : [0, -1, 0];
   const first = motion === "wipe" ? onScreen(up, REACH.wipe) : onScreen(pose.u, REACH[motion]);
   const second = onScreen(across([0, 1, 0], pose.b), REACH.circle);
-  const offset = { x: (anchorAt.x - middle.x) / unit, y: (anchorAt.y - middle.y) / unit };
+  const glide = project.point(at);
+  const offset = { x: (glide.x - middle.x) / unit, y: (glide.y - middle.y) / unit };
   const vars = {
     "--brush-x": `${first.x.toFixed(1)}px`,
     "--brush-y": `${first.y.toFixed(1)}px`,
@@ -343,15 +355,34 @@ export function Brush({
     "--brush-s": `${STROKE_S}s`,
   } as CSSProperties;
 
+  // The shapes first, so `reach` knows the whole drawing; then the layer round it, with room for the outlines and foam.
+  const shapes = (
+    <>
+      {/* Seen from the back of the head, the foam is behind it. */}
+      {backShows && foam}
+      {order.map((i) => drawBox(BOXES[i], pose, w, point, project.facing, i))}
+      {!backShows && foam}
+    </>
+  );
+  const pad = 8 * project.zoom;
+  const left = reach.left - pad;
+  const top = reach.top - pad;
+  const width = reach.right - reach.left + 2 * pad;
+  const height = reach.bottom - reach.top + 2 * pad;
+  const px = (n: number) => `${(n / unit).toFixed(1)}px`;
+  const layer: CSSProperties = {
+    left: px(left - box.x),
+    top: px(top - box.y),
+    width: px(width),
+    height: px(height),
+    transform: `translate(${offset.x.toFixed(1)}px, ${offset.y.toFixed(1)}px)`,
+  };
   return (
-    <div className="brush-layer" style={{ transform: `translate(${offset.x.toFixed(1)}px, ${offset.y.toFixed(1)}px)` }} aria-hidden>
+    <div className="brush-layer" style={layer} aria-hidden>
       <div className={`brush-move ${motion}`} style={vars}>
         <div className="brush-move-across">
-          <svg className="mouth brush" viewBox={frame.viewBox}>
-            {/* Seen from the back of the head, the foam is behind it. */}
-            {backShows && foam}
-            {order.map((i) => drawBox(BOXES[i], pose, w, point, project.facing, i))}
-            {!backShows && foam}
+          <svg className="mouth brush" viewBox={`${left.toFixed(1)} ${top.toFixed(1)} ${width.toFixed(1)} ${height.toFixed(1)}`}>
+            {shapes}
           </svg>
         </div>
       </div>

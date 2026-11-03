@@ -31,7 +31,7 @@ export const Sky = memo(function Sky() {
         </>
       )}
       {world && <WorldGround world={world} />}
-      {/* In the book look: the fox and the bear family reading together at the bottom of the page. */}
+      {/* The fox and the bear family reading together at the bottom of the page. */}
       <BookFamilies />
     </div>
   );

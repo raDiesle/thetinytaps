@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { PictureQueue } from "@/components/PictureQueue";
-import { CATEGORIES } from "@/content/games";
+import { CATEGORIES, UNFINISHED } from "@/content/games";
 import {
   EFFORT_LABELS,
   MASCOT_STATUS,
@@ -69,6 +69,7 @@ const DEFAULTS = {
 
 /** The page's parts, linked from the contents line at the top. */
 const CONTENTS: { id: string; label: string }[] = [
+  { id: "in-arbeit", label: "🚧 In Arbeit" },
   { id: "uebersicht", label: "📊 Überblick" },
   { id: "sprachen", label: "🌍 Sprachen" },
   { id: "maskottchen", label: "🦊🐻 Fuchs & Bär" },
@@ -186,6 +187,8 @@ export function ManagementPage() {
       </nav>
 
       <NextPanel ideas={nextIdeas} noIdeas={noIdeas} onShow={showIdea} onMark={setMark} />
+
+      <Unfinished />
 
       <section id="uebersicht" className="ideas-panel">
         <h2>Überblick: Wo ist was offen?</h2>
@@ -401,6 +404,29 @@ function NextPanel({
 }
 
 /** A command for Claude and a button that copies it. */
+/** The games still being built (`Game.unfinished`): on no shelf and in no search result, so linked only here. */
+function Unfinished() {
+  if (UNFINISHED.length === 0) return null;
+  return (
+    <section id="in-arbeit" className="ideas-panel">
+      <h2>🚧 In Arbeit: Spiele, die noch nicht im Regal stehen</h2>
+      <p className="ideas-hint">
+        Nur von hier erreichbar, bis sie fertig sind; ✕ führt hierher zurück. Fertig: <code>unfinished</code> in games.ts entfernen.
+      </p>
+      <ul className="ideas-next-list">
+        {UNFINISHED.map((game) => (
+          <li key={game.href}>
+            <Link to={game.href}>
+              {game.emoji} {game.title.de}
+            </Link>
+            <span className="ideas-hint">{game.blurb.de}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function CopyCommand({ command }: { command: string }) {
   const [copied, setCopied] = useState(false);
   const copy = () => {

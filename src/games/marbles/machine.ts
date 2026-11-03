@@ -613,5 +613,6 @@ export function buildMachine() {
     planeAt,
     buttonPress,
     cameraTarget,
+    width: WORLD_W,
   };
 }

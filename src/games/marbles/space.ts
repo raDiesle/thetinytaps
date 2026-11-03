@@ -554,5 +554,6 @@ export function buildSpace() {
     rocketRise,
     flameAt,
     cameraTarget,
+    width: WORLD_W,
   };
 }

@@ -218,7 +218,9 @@ export function PlanScreen({
       setParty(step.emoji);
       sound(playTusch);
       for (let i = 0; i < 10; i++) setTimeout(() => spawn(), i * 90);
-      say(`${t({ de: "Heute ist es so weit:" })} ${stepLabel(step)}`);
+      say(
+        `${t({ de: "Heute ist es so weit:", en: "Today is the day:", zh: "今天就是这一天：", hi: "आज वह दिन आ गया:", es: "¡Hoy es el día!", ar: "اليوم هو اليوم:", ru: "Сегодня этот день:" })} ${stepLabel(step)}`,
+      );
       return;
     }
     const each = Math.min(MOON_MS, ALL_MOONS_MS / moons);

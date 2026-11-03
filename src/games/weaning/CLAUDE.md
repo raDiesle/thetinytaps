@@ -5,8 +5,8 @@ Route `/abstillen/` · idea H-44 („Abstillen: Tschüss, Mama-Milch“).
 A picture story for a child being weaned, read with a grown-up: Tapsi the fox was a baby and drank Mama's milk; now
 Tapsi is big, runs, eats an apple, drinks from a cup, hears from Mama that the milk will soon be gone and waves it
 goodbye. In the evening Tapsi wants it and is sad – Mama is close, cuddles, reads, sings a lullaby – Tapsi falls asleep
-and in the morning Mama and Papa are proud. It stands on the shelf as a spine book of its own among the Alltagshelfer
-and plays at once (`GameShell` `startMode`); ✕ and „Menü“ go back to the shelf.
+and in the morning Mama and Papa are proud. Once finished it stands on the shelf as a spine book of its own among the Alltagshelfer
+and plays at once (`GameShell` `startMode`); ✕ and „Menü“ go back to the page before it. While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
 - `content.ts`: the pages (`STEPS`) in order – id, sky (day, night, morning), the sentence, how long its moving part runs.
 - `scene.tsx`: everything drawn, in SVG (1600×900, cut like a cover picture; keep what matters within x 200–1400,
   y 90–820). One room (`Room`, built once per sky) with window, shelf, lamp, rug, chair and bed; Mama sits in the chair

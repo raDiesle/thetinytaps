@@ -49,7 +49,7 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEnd
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
     if (counts) countGame();
-    // In the book look the next round comes on a new page.
+    // The next round comes on a new page.
     turnPageWith("forward", action);
   };
 

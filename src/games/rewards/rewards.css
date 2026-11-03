@@ -2113,7 +2113,7 @@
 }
 
 /*
- * ---------- The book look: the page is a page of the book (`Sky`), the wizard a sheet of paper laid on it ----------
+ * ---------- The page is a page of the book (`Sky`), the wizard a sheet of paper laid on it ----------
  * Kept here rather than in book.css, so the chart's folder stays whole (it may become a site of its own, T-19).
  */
 /*
@@ -2121,27 +2121,27 @@
  * a page that stood still): here the page lies in the screen-high box of the content, not fixed to the window, and
  * the content keeps inside its paper margin.
  */
-:root[data-look="book"] .rw-page-screen > .sky {
+:root .rw-page-screen > .sky {
   position: absolute;
 }
 
-:root[data-look="book"] .rw-page-screen {
+:root .rw-page-screen {
   padding-right: calc(var(--page-right) + 16px);
   padding-bottom: calc(var(--page-bottom, 26px) + 24px);
   padding-left: calc(var(--page-left) + 16px);
 }
 
 /* What grown-ups read below the chart is on the page too, and the room's floor and toys at its foot stay out (the chart fills it). */
-:root[data-look="book"] .rw-page-screen > .page-foot {
+:root .rw-page-screen > .page-foot {
   position: static;
 }
 
-:root[data-look="book"] .rw-page-screen > .sky :is(.world-thing, .world-floor) {
+:root .rw-page-screen > .sky :is(.world-thing, .world-floor) {
   display: none;
 }
 
 /* The wizard is printed on the page itself, no card laid on it. */
-:root[data-look="book"] .rw-wizard {
+:root .rw-wizard {
   padding-inline: 0;
   border: 0;
   border-radius: 0;
@@ -2150,7 +2150,7 @@
 }
 
 /* Its head stays in sight on a strip of the page's paper, clear of the fullscreen note clipped on the top right. */
-:root[data-look="book"] .rw-wizard-head {
+:root .rw-wizard-head {
   margin-inline: -8px;
   padding-inline: 8px 64px;
   border-radius: 0 0 10px 10px;
@@ -2158,29 +2158,29 @@
   box-shadow: 0 6px 10px -8px #3d304566;
 }
 
-:root[data-look="book"] .rw-options-band {
+:root .rw-options-band {
   border-width: 2px;
   border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
   background: color-mix(in srgb, var(--sunshine) 22%, var(--paper));
 }
 
-:root[data-look="book"] :is(.rw-span, .rw-history-button, .rw-wizard-actions button) {
+:root :is(.rw-span, .rw-history-button, .rw-wizard-actions button) {
   border-width: 2px;
 }
 
-:root[data-look="book"] .rw-edit-dialog {
+:root .rw-edit-dialog {
   border-width: 2px;
   border-radius: 14px;
   background: var(--paper-grain), var(--paper-mottle), var(--paper);
 }
 
-:root[data-look="book"] .rw-tpl {
+:root .rw-tpl {
   border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
   box-shadow: 0 2px 0 #3d304559;
 }
 
 /* The chart fills the page down to its foot, where the families would stand half hidden behind it: they stay out. */
-:root[data-look="book"] .rw-page-screen .book-family {
+:root .rw-page-screen .book-family {
   display: none;
 }
 

@@ -24,10 +24,21 @@ export function TimerGame() {
       level={
         // The grown-up sets the minutes here; the child sees no numbers, only the picture running down.
         <Choice
-          label={t({ de: "Wie lange?" })}
+          label={t({ de: "Wie lange?", en: "How long?", zh: "多长时间？", hi: "कितनी देर?", es: "¿Cuánto tiempo?", ar: "كم من الوقت؟", ru: "Как долго?" })}
           value={String(minutes)}
           onChange={(value) => update({ minutes: Number(value) })}
-          options={TIMER_MINUTES.map((m) => ({ value: String(m), label: t({ de: `${m} Min.` }) }))}
+          options={TIMER_MINUTES.map((m) => ({
+            value: String(m),
+            label: t({
+              de: `${m} Min.`,
+              en: `${m} min`,
+              zh: `${m} 分钟`,
+              hi: `${m} मिनट`,
+              es: `${m} min`,
+              ar: `${m} ${m >= 3 && m <= 10 ? "دقائق" : "دقيقة"}`,
+              ru: `${m} мин`,
+            }),
+          }))}
         />
       }
     >

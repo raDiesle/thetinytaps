@@ -77,13 +77,13 @@ test("phone media queries use useFitGrid's phone size for width and height", () 
   expect(wrong).toEqual([]);
 });
 
-// In the book look the way out of a game is the page's corner in the top left (book.css): a game's own buttons and signs
+// The way out of a game is the page's corner in the top left (book.css): a game's own buttons and signs
 // put in the top left corner of the screen lay under it (Schatten finden's picture choice, user feedback, October 2026).
-// They keep below it with `--corner-clear`, which is 0 in the toy look. Aufs Töpfchen's thought bubble is round and has
+// They keep below it with `--corner-clear`. Aufs Töpfchen's thought bubble is round and has
 // nothing to tap, so its empty corner may lie under it.
 const UNDER_THE_CORNER = new Set([".pt-think"]);
 
-test("a game's controls in the top left corner keep clear of the book look's way out", () => {
+test("a game's controls in the top left corner keep clear of the way out", () => {
   const under: string[] = [];
   for (const file of cssFiles.filter((f) => f.startsWith(join("src", "games")))) {
     const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");

@@ -21,10 +21,11 @@ import {
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
 import { GIFTS, type Gift, type GiftId } from "./gifts";
+import type { GrowTexts } from "./growth";
 import { HOMES, type Home, type HomeId } from "./homes";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
-// who lives where (N-09) and what it gives us (Z-01). The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
+// who lives where (N-09) and what it gives us (Z-01); what the small ones become (Z-12) is in growth.tsx. The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
 
 export interface Food {
   /** Same id = same food, so two animals can share one (cat and penguin both like fish). */
@@ -249,7 +250,7 @@ export const ANIMALS: Animal[] = [
     food: food("salat", "🥬", "Salat"),
     alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais"],
   },
-  // Only in "Was gibt uns das Tier?" so far, and so said in German in every language until that round is translated.
+  // Only in "Was gibt uns das Tier?" so far.
   { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch"], sound: real("baa", playBaa) },
   {
     id: "loewe",
@@ -320,7 +321,7 @@ const GERMAN_TEXTS: AnimalTexts = {
   stars: (n) => `${n} geschafft`,
 };
 
-/** What "Was gibt uns das Tier?" says, in one language (only German so far: its translations wait to be asked for). */
+/** What "Was gibt uns das Tier?" says, in one language. */
 export interface GiftTexts {
   /** The gift's name, for screen readers: "Milch". */
   gift: (g: Gift) => string;
@@ -335,14 +336,11 @@ export interface GiftTexts {
 /** "vom Huhn", "von der Kuh": German's dative after „von“. */
 const fromThe = (a: Animal) => (a.the.startsWith("die ") ? `von der ${a.the.slice(4)}` : `vom ${a.the.slice(a.the.indexOf(" ") + 1)}`);
 
-/** The texts of "Was gibt uns das Tier?" by app language: `pick(GIFT_TEXTS, language.id)`. */
-export const GIFT_TEXTS: Localized<GiftTexts> = {
-  de: {
-    gift: (g) => g.name,
-    whatGives: (a) => `Was gibt uns ${a.the}?`,
-    gives: (a, g) => `${capitalize(a.the)} gibt uns ${g.gives}. Danke!`,
-    comesFrom: (g, giver) => `${capitalize(g.the)} kommt ${fromThe(giver)}!`,
-  },
+const GERMAN_GIFT_TEXTS: GiftTexts = {
+  gift: (g) => g.name,
+  whatGives: (a) => `Was gibt uns ${a.the}?`,
+  gives: (a, g) => `${capitalize(a.the)} gibt uns ${g.gives}. Danke!`,
+  comesFrom: (g, giver) => `${capitalize(g.the)} kommt ${fromThe(giver)}!`,
 };
 
 /** A language of the game besides German: its words by id and the sentences built from them with its grammar. */
@@ -354,6 +352,10 @@ export interface AnimalTranslation {
    * whole sentence comes from `german` (and is read by the German voice), never a German word inside another language.
    */
   texts: (german: AnimalTexts) => AnimalTexts;
+  /** What "Was gibt uns das Tier?" says; an animal or gift without its words gets the whole German sentence. */
+  gifts: (german: GiftTexts) => GiftTexts;
+  /** What "Was wird aus mir?" says; a small one without its words gets the whole German sentence. */
+  growth: (german: GrowTexts) => GrowTexts;
 }
 
 /** Every language besides German, by its id. */
@@ -361,3 +363,6 @@ export const ANIMAL_TRANSLATIONS: Partial<Record<TargetLanguageId, AnimalTransla
 
 /** The texts by app language: `pick(ANIMAL_TEXTS, language.id)`. */
 export const ANIMAL_TEXTS: Localized<AnimalTexts> = byLanguage((texts) => texts.animals?.texts(GERMAN_TEXTS), GERMAN_TEXTS);
+
+/** The texts of "Was gibt uns das Tier?" by app language: `pick(GIFT_TEXTS, language.id)`. */
+export const GIFT_TEXTS: Localized<GiftTexts> = byLanguage((texts) => texts.animals?.gifts(GERMAN_GIFT_TEXTS), GERMAN_GIFT_TEXTS);

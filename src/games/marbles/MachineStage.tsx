@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
 import { PROD } from "@/lib/buildInfo";
@@ -12,6 +12,8 @@ const CAMERA_FOLLOW = 2.6;
 export interface MachineBase {
   events: MachineEvent[];
   duration: number;
+  /** How wide the world is: all of it is drawn, and the camera moves it as a whole. */
+  width: number;
   /** The left edge of what the screen shows, `t` seconds after the tap (below 0 before it). */
   cameraTarget: (t: number) => number;
 }
@@ -35,6 +37,7 @@ export function MachineStage({
   const clock = useRef(-1);
   const fired = useRef(0);
   const camera = useRef(machine.cameraTarget(-1));
+  const box = useRef<HTMLDivElement>(null);
 
   // The real recordings among the machine's sounds, loaded at once so even the first one is real.
   useEffect(() => loadRealSounds(machine.events.map((e) => e.sound)), [machine]);
@@ -76,9 +79,14 @@ export function MachineStage({
   useAnyKey(start);
 
   return (
-    <div className="marble-level" onPointerDown={start}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
-        <g transform={`translate(${-camera.current} 0)`}>{children(clock.current)}</g>
+    <div className="marble-level" ref={box} onPointerDown={start}>
+      <svg
+        className="marble-camera"
+        viewBox={`0 0 ${machine.width} ${VIEW_H}`}
+        style={cameraLayer(box.current, { x: 0, y: 0, w: machine.width, h: VIEW_H }, { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H })}
+        aria-label={label}
+      >
+        {children(clock.current)}
       </svg>
     </div>
   );

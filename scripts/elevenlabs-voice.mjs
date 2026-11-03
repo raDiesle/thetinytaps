@@ -2,7 +2,7 @@
 // line. Tapsi's lines in the Bewegungsabenteuer go into the story's stimme/ folder
 // (src/games/adventure/stories/<story>/stimme/<hash of the text>.mp3), and the same for every translation of
 // the lines (lines.<language>.ts → stimme/<language>/<language>-<hash>.mp3); the other games that are recorded
-// (Zähne putzen, Kleine Abenteuer, the good-night sentence) list their lines in every language in
+// (Zähne putzen, Kleine Abenteuer, Abstillen, Was gehört zum Tier?, Gefühle, the good-night sentence) list their lines in every language in
 // src/content/recordedLines.ts, into the game's own stimme/ folder the same way. src/lib/voice.ts plays them;
 // a line without a recording stays silent.
 //

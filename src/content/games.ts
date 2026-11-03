@@ -1,3 +1,4 @@
+import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
 export interface Game {
@@ -10,10 +11,15 @@ export interface Game {
   /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
   blurb: Localized;
   /**
-   * On the shelf (book look) the game stands as these books side by side in one slipcase, one for each part it opens on
-   * (`also`), each with its own name on its spine; in the toy look it stays one card.
+   * On the shelf the game stands as these books side by side in one slipcase, one for each part it opens on
+   * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
+  /**
+   * Still being built: it stands neither on the shelf nor in its book and is in no search result or sitemap; only the
+   * management page links to it, and its way back leads there (user decision, November 2026). Drop the mark to publish it.
+   */
+  unfinished?: true;
 }
 
 /** One of a game's books in its slipcase on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
@@ -42,8 +48,24 @@ export const CATEGORIES: Category[] = [
   {
     id: "alltag",
     emoji: "🌞",
-    title: { de: "Alltagshelfer" },
-    blurb: { de: "Zähne putzen, Töpfchen, Tagesplan" },
+    title: {
+      de: "Alltagshelfer",
+      ru: "Помощники на каждый день",
+      en: "Everyday Helpers",
+      zh: "日常小帮手",
+      hi: "रोज़ के मददगार",
+      es: "Ayudantes del día a día",
+      ar: "مساعدون لكل يوم",
+    },
+    blurb: {
+      de: "Zähne putzen, Töpfchen, Tagesplan",
+      en: "Brushing teeth, potty, daily schedule",
+      zh: "刷牙、便盆、日程",
+      hi: "दाँत साफ़ करना, पॉटी, दिनचर्या",
+      es: "Dientes, orinal, horario",
+      ar: "تنظيف الأسنان والنونية وجدول اليوم",
+      ru: "Зубы, горшок, распорядок дня",
+    },
     // Each a book of its own on the shelf, its name on its spine (user decision, October 2026). First on the shelf, top
     // left: the everyday helpers are what parents need most; the Belohnungstafel's slipcase, the shelf's eye-catcher,
     // stands right of Aufs Töpfchen (user feedback, November 2026).
@@ -123,21 +145,56 @@ export const CATEGORIES: Category[] = [
       },
       {
         href: "/timer/",
+        unfinished: true,
         emoji: "⏳",
-        title: { de: "Timer" },
-        blurb: { de: "Warten in Bildern: Zug, Sanduhr, Kerze" },
+        title: { de: "Timer", ru: "Таймер", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت" },
+        blurb: {
+          de: "Warten in Bildern: Zug, Sanduhr, Kerze",
+          en: "Wait with a train, hourglass or candle",
+          zh: "用图画等待：火车、沙漏、蜡烛",
+          hi: "इंतज़ार: ट्रेन, रेत घड़ी, मोमबत्ती",
+          es: "Esperar con tren, reloj de arena o vela",
+          ar: "الانتظار بالصور: قطار وساعة رملية وشمعة",
+          ru: "Ожидание: поезд, песочные часы, свеча",
+        },
       },
       {
         href: "/schnullerfee/",
+        unfinished: true,
         emoji: "🧚",
-        title: { de: "Die Schnullerfee" },
-        blurb: { de: "Abschied vom Schnuller als Geschichte" },
+        title: {
+          de: "Die Schnullerfee",
+          ru: "Фея пустышек",
+          en: "The Pacifier Fairy",
+          zh: "奶嘴仙子",
+          hi: "चुसनी परी",
+          es: "El hada del chupete",
+          ar: "جنّية اللهّاية",
+        },
+        blurb: {
+          de: "Abschied vom Schnuller als Geschichte",
+          en: "Saying goodbye to the pacifier, as a story",
+          zh: "在故事里和奶嘴说再见",
+          hi: "कहानी के साथ चुसनी को अलविदा",
+          es: "Despedirse del chupete con un cuento",
+          ar: "وداع اللهّاية في قصة",
+          ru: "Прощаемся с пустышкой: история",
+        },
       },
       {
         href: "/abstillen/",
+        unfinished: true,
         emoji: "🤱",
-        title: { de: "Abstillen" },
-        blurb: { de: "Tschüss, Mama-Milch – eine Geschichte" },
+        title: { de: "Abstillen", ru: "Отлучение от груди", en: "Weaning", zh: "断奶", hi: "दूध छुड़ाना", es: "El destete", ar: "الفطام" },
+        blurb: {
+          de: "Tschüss, Mama-Milch – eine Geschichte",
+          en: "Bye-bye, Mommy’s milk – a story",
+          zh: "再见，妈妈的奶——一个故事",
+          hi: "टाटा, मम्मी का दूध – एक कहानी",
+          es: "Adiós, leche de mamá: un cuento",
+          ar: "وداعًا يا حليب ماما – قصة",
+          ru: "Пока, мамино молоко – история",
+        },
       },
     ],
   },
@@ -277,7 +334,21 @@ export const CATEGORIES: Category[] = [
           es: "¿Qué necesita el animal?",
           ar: "ماذا يحتاج الحيوان؟",
         },
-        blurb: { de: "Verstecke, Futter, Milch, Zuhause, Wachsen" },
+        blurb: {
+          de: "Verstecke, Futter, Milch, Zuhause, Wachsen",
+          en: "Hiding, food, milk, homes, growing up",
+          zh: "藏身处、食物、奶、家、长大",
+          hi: "छिपने की जगह, खाना, दूध, घर, बड़ा होना",
+          es: "Escondites, comida, leche, casas, crecer",
+          ar: "مخابئ وطعام وحليب وبيوت ونموّ",
+          ru: "Укрытия, корм, молоко, дом, рост",
+        },
+      },
+      {
+        href: "/zusammen/",
+        emoji: "🔑",
+        title: TOGETHER_TITLE,
+        blurb: TOGETHER_BLURB,
       },
       {
         href: "/schatten/",
@@ -370,10 +441,16 @@ export const CATEGORIES: Category[] = [
  * A book of one game has no page of its own: it opens straight on its game, a menu with a single card would only be one
  * tap more. Nor has a category whose games stand apart, each a book of its own.
  */
-export const hasPage = (category: Category) => !category.apart && category.games.length > 1;
+export const hasPage = (category: Category) => !category.apart && listedGames(category).length > 1;
+
+/** A category's games a child finds on the shelf or in its book: all but those still being built (`Game.unfinished`). */
+export const listedGames = (category: Category) => category.games.filter((game) => !game.unfinished);
+
+/** The games still being built (`Game.unfinished`), linked only from the management page. */
+export const UNFINISHED: Game[] = CATEGORIES.flatMap((category) => category.games.filter((game) => game.unfinished));
 
 /** Where the category's book on the shelf leads: its page, or its only game; the shelf for one whose games stand apart. */
-export const categoryHref = (category: Category) => (category.apart ? "/" : hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+export const categoryHref = (category: Category) => (category.apart ? "/" : hasPage(category) ? `/spiele/${category.id}/` : listedGames(category)[0].href);
 
 /** A book on the shelf: a category's, or a game's that stands apart (`Category.apart`), standing with its spine out. */
 export interface ShelfEntry {
@@ -391,7 +468,7 @@ export const bookIdOf = (href: string) => href.replaceAll("/", "");
 /** The books on the shelf, in order: one per category, or, for a category whose games stand apart, one per game. */
 export const SHELF: ShelfEntry[] = CATEGORIES.flatMap((category) =>
   category.apart
-    ? category.games.map((game) => ({ id: bookIdOf(game.href), href: game.href, category, game }))
+    ? listedGames(category).map((game) => ({ id: bookIdOf(game.href), href: game.href, category, game }))
     : [{ id: category.id, href: categoryHref(category), category }],
 );
 
@@ -399,6 +476,9 @@ export const SHELF: ShelfEntry[] = CATEGORIES.flatMap((category) =>
 const isGamePage = (game: Game, path: string) => [game.href, ...(game.also ?? [])].some((href) => path.startsWith(href));
 
 const withSlash = (pathname: string) => (pathname.endsWith("/") ? pathname : `${pathname}/`);
+
+/** Whether a page belongs to a game still being built (`Game.unfinished`). */
+export const isUnfinished = (pathname: string) => UNFINISHED.some((game) => isGamePage(game, withSlash(pathname)));
 
 /** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {
@@ -410,14 +490,14 @@ export function categoryOf(pathname: string) {
 export const gamePage = (index: number) => index + 1;
 
 /**
- * Where a menu is in its book, in the book look: its category's table of contents on page 0 (unnumbered), each game's
+ * Where a menu is in its book: its category's table of contents on page 0 (unnumbered), each game's
  * start screen on its `gamePage`. None for any other page (the shelf, a game while playing, a scene inside a game).
  */
 export function bookPage(pathname: string): { book: string; page: number } | undefined {
   const path = withSlash(pathname);
   for (const c of CATEGORIES.filter(hasPage)) {
     if (path === categoryHref(c)) return { book: c.id, page: 0 };
-    const index = c.games.findIndex((g) => g.href === path);
+    const index = listedGames(c).findIndex((g) => g.href === path);
     if (index >= 0) return { book: c.id, page: gamePage(index) };
   }
 }

@@ -24,7 +24,12 @@ a newcomer, fallen down, someone who doesn't stop (`kita.ts`, `KitaPlay.tsx`): w
 step, one after another.
 After them come stories of more feelings (`selbst.ts`, played by `KitaPlay` like the kindergarten's, ids `selbst-…`):
 disappointed (the cookie breaks), jealous (the bear baby is cuddled), disgust (broccoli), embarrassed (wet trousers in
-the kindergarten), excited (the first snow) – ideas C-05, C-12, C-16, C-17, C-18. The little bear has the feeling and
+the kindergarten), excited (the first snow) – ideas C-05, C-12, C-16, C-17, C-18 – and a second round of 19
+(pictures made November 2026): leaving the playground, a show that ends, no lolly at the checkout, a
+jacket that won't go on, waiting for pancakes, the vacuum cleaner, a big dog, the doctor, washing hair, waking at night,
+the lost cuddly toy, not allowed to join in, a party too loud, proud on the climbing frame, missing grandma, shy with a
+visitor, bored on a rainy day, caring when the fox cries, startled by a bang (C-01 to C-15, C-23 to C-28). The little
+bear has the feeling and
 helps himself (a body trick, saying how he feels, doing something else); the feeling itself is never the not-so-good
 idea, only what hurts someone or breaks something is (hiding when embarrassed is the feeling, so its not-so-good idea is
 playing on in wet trousers).
@@ -180,15 +185,19 @@ bear asks for a picture that is not in `bilder/`.
 
 The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic or Russian, chosen on the home
 page, `src/lib/language.ts`): start screen, captions and everything read aloud. The German data (`bear.ts`,
-`kita.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru) hold
-only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
+`kita.ts`, `selbst.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru;
+the stories of `selbst.ts` are in `kita.<lang>.ts` too, after the kindergarten's) hold only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
 `situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). Small texts
 (the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
-Speech uses the app language's voice, a line still in German the German one (`useVoice`). Rules:
+Everything said is played from its ElevenLabs recording (`useVoice` in `shared.tsx`, files in `stimme/`), recorded in
+German only so far (November 2026): a line in another language stays silent until the user asks for its recordings,
+a line still in German plays its German one. A beat with a recording stays long enough to be heard (`beatMs`), and a
+story loads its recordings when it starts (`preload`). A new or changed line is listed by `src/content/recordedLines.ts`
+(`gefuehle`) and recorded with `bun run voice make --only gefuehle`, only when the user asks. Rules:
 - New stories, feelings and kind things come in German only; their translations are written only when the user
   asks (a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German). A not-so-good idea at home
-  without its translation is `null` and told in German; `useVoice` speaks a line that is still German with the
-  German voice (`voiceFor`). But a story that has a translation must match the German step for step and beat for
+  without its translation is `null` and told in German; `useVoice` plays a line that is still German from its German
+  recording. But a story that has a translation must match the German step for step and beat for
   beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated story, change every
   `kita.<lang>.ts` too, or delete that story's entry there. `feelings.test.ts` fails when they don't match, when a
   language translated so far misses a story, feeling or kind thing, and when Russian, Chinese, Hindi or Arabic has

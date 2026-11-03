@@ -4,40 +4,25 @@ import { useLocation, useNavigate } from "react-router";
 import { pagesBetween } from "@/content/games";
 import { putBookBack } from "@/lib/bookTravel";
 import { goBack } from "@/lib/goBack";
+import { holdPreloads } from "@/lib/preloadPages";
 import { playPageTurn } from "@/lib/sfx";
 
 /**
- * The app's look: „Buch“ (picture books on a shelf – one to take out, paper pages, a page's edge round every game) or the
- * toy-block look it had before. The book is the default: `?buch=aus` turns it off, `?buch` on again, and the choice is
- * kept for the next visits. The look lives in CSS (`data-look` on html, `src/styles/book.css`), the home page's
- * bookshelf (Bookshelf.tsx) and the way a book is taken out and put back (bookTravel.ts).
+ * The way the app's pages turn. The app looks like a picture book, and only like that (user decision, November 2026: the
+ * toy-block look it had before is gone, with the address switch and the stored choice that brought it back): its CSS is in
+ * `src/styles/book.css`, the home page's bookshelf in Bookshelf.tsx and the way a book is taken out and put back in
+ * bookTravel.ts.
  */
-export type Look = "book" | "toy";
 
-const KEY = "tinytaps.look.v1";
+/** Where an old visit kept the look it chose (the toy look, or the book): no longer read, removed. */
+const OLD_LOOK_KEY = "tinytaps.look.v1";
 
-/** The look asked for in the address, saved for later visits; else the saved one; else the book. */
-function chosenLook(): Look {
-  const asked = new URLSearchParams(location.search).get("buch");
+/** Forgets the look an old visit chose, so nothing saved is left over from the toy look. */
+export function forgetOldLook() {
   try {
-    if (asked !== null) {
-      const look: Look = asked === "aus" || asked === "0" ? "toy" : "book";
-      localStorage.setItem(KEY, look);
-      return look;
-    }
-    return localStorage.getItem(KEY) === "toy" ? "toy" : "book";
-  } catch {
-    return "book";
-  }
+    localStorage.removeItem(OLD_LOOK_KEY);
+  } catch {}
 }
-
-/** Puts the chosen look on html, before the first screen shows. */
-export function applyLook() {
-  document.documentElement.dataset.look = chosenLook();
-}
-
-/** Whether the app looks like a book. */
-export const isBookLook = () => document.documentElement.dataset.look === "book";
 
 /** How long a page takes to turn: as long as `--turn-time` in `book.css` (`look.test.ts` checks), so its sound lands with it. */
 export const TURN_SECONDS = 1.6;
@@ -56,9 +41,8 @@ const MOST_PAGES = 6;
 let turning = 0;
 
 /**
- * Does `update` (a navigation, a game starting or ending) as the turn of a page in the book look: the sound comes at
- * once, the turn is a view transition round the change (`book.css`). In the toy look, or where a browser can't turn
- * pages, it just does it.
+ * Does `update` (a navigation, a game starting or ending) as the turn of a page: the sound comes at once, the turn is a
+ * view transition round the change (`book.css`). Where a browser can't turn pages, it just does it.
  *
  * `pages` more than one (from a game's page back to its book's table of contents, or on to a later game) turns them in
  * one go, as a grown-up takes a bundle of pages at once: under the page that turns, blank sheets of paper fan out a
@@ -67,15 +51,19 @@ let turning = 0;
  * it and the page beneath, which is the rest of the screen (`root`).
  */
 export function turnPageWith(direction: TurnDirection, update: () => void, pages = 1) {
-  if (!isBookLook() || !document.startViewTransition) {
+  if (!document.startViewTransition) {
     update();
     return;
   }
   playPageTurn(TURN_SECONDS);
+  holdPreloads(TURN_SECONDS * 1000 + 200);
   const html = document.documentElement;
   const turn = ++turning;
   html.dataset.turn = direction;
-  const sheets = pageBundle(Math.min(pages, MOST_PAGES) - 1);
+  // The shadow band on the page beneath (`.turn-shade`) turns with the page and the sheets, in the same state.
+  const shade = document.createElement("div");
+  shade.className = "turn-shade";
+  const sheets = [shade, ...pageBundle(Math.min(pages, MOST_PAGES) - 1)];
   const show = (on: boolean) => {
     if (on) html.dataset.turning = "";
     else delete html.dataset.turning;
@@ -108,11 +96,10 @@ function pageBundle(count: number) {
 }
 
 /**
- * The click handler of a link to another menu, which turns the page there in the book look (the router's own
- * `viewTransition` works only with a data router): as many pages at once as lie between the two in their book
- * (`pagesBetween`). Back to the home page, the bookshelf, no page turns: the book closes and goes back on the shelf
- * (bookTravel.ts). A way back steps back in the browser's history (`goBack`), in either look. A click that opens a new
- * tab is left alone.
+ * The click handler of a link to another menu, which turns the page there (the router's own `viewTransition` works only
+ * with a data router): as many pages at once as lie between the two in their book (`pagesBetween`). Back to the home
+ * page, the bookshelf, no page turns: the book closes and goes back on the shelf (bookTravel.ts). A way back steps back
+ * in the browser's history (`goBack`). A click that opens a new tab is left alone.
  */
 export function useTurnPage(to: string, direction: TurnDirection) {
   const navigate = useNavigate();
@@ -120,10 +107,8 @@ export function useTurnPage(to: string, direction: TurnDirection) {
   return (e: MouseEvent) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     const go = direction === "back" ? () => goBack(navigate, to) : () => navigate(to);
-    if (!isBookLook() && direction === "forward") return;
     e.preventDefault();
-    if (!isBookLook()) go();
-    else if (to === "/") putBookBack(pathname, go);
+    if (to === "/") putBookBack(pathname, go);
     else turnPageWith(direction, go, pagesBetween(pathname, to));
   };
 }

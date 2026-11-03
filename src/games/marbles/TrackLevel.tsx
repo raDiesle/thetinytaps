@@ -1,6 +1,6 @@
 import { memo, useContext, useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
-import { type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
+import { cameraLayer, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
 import { SITE_TRACK } from "./siteTrack";
 import { SLIDE_TRACK } from "./slideTrack";
@@ -155,6 +155,8 @@ const CAMERA_PULL = 4;
  * sit a bit lower in the picture, clear of the top edge and the ✕.
  */
 const TOP_ROOM = 160;
+/** All of the wall the camera can show, drawn once as a layer of its own that the camera moves. */
+const WALL = { x: 0, y: -TOP_ROOM, w: VIEW_W, h: TRACK_H + TOP_ROOM };
 /** With the camera's top lower than this on the wall, the shelf is cut off, and the ⬆ button shows. */
 const UP_SHOWN_BELOW = 40;
 
@@ -532,7 +534,15 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
     }
     g.openedAt = t;
     g.step = 0;
-    say({ de: "Achtung, fertig – los!" });
+    say({
+      de: "Achtung, fertig – los!",
+      en: "Ready, steady, go!",
+      zh: "预备——出发！",
+      hi: "एक, दो, तीन – चलो!",
+      es: "¡A la una, a las dos y a las tres!",
+      ar: "استعداد، انطلاق!",
+      ru: "На старт, внимание, марш!",
+    });
   };
 
   /** A tap on the basket makes the things in it jump, one after the other. */
@@ -692,7 +702,7 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   const follow = (dt: number) => {
     const cam = camera.current;
     const el = box.current;
-    if (el && el.clientWidth) cam.h = Math.min(TRACK_H + TOP_ROOM, Math.max(VIEW_H, (VIEW_W * el.clientHeight) / el.clientWidth));
+    if (el?.clientWidth) cam.h = Math.min(TRACK_H + TOP_ROOM, Math.max(VIEW_H, (VIEW_W * el.clientHeight) / el.clientWidth));
     // Things waiting behind the barrier aren't followed: the camera stays up there with them and the shelf.
     const ys = marbles.current.filter((m) => m.id >= followFrom.current && !m.waiting).map((m) => m.y);
     let middle = landed.current.length && !lookingUp.current && !queue.current.length ? TRACK_H : -TOP_ROOM;
@@ -816,7 +826,13 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
       <TrackLook.Provider value={look}>
-        <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
+        <svg
+          ref={svg}
+          className="marble-camera"
+          viewBox={`0 ${-TOP_ROOM} ${VIEW_W} ${TRACK_H + TOP_ROOM}`}
+          style={cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h })}
+          aria-label={label}
+        >
           <look.Backdrop />
 
           {/* The boards the spots sit on */}

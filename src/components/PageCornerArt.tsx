@@ -1,11 +1,11 @@
 import { useId } from "react";
 
 /**
- * The way back in the book look: the corner of the page before, lifted at the spine (the page's top left) as if a
+ * The way back: the corner of the page before, lifted at the spine (the page's top left) as if a
  * finger had taken it and were turning it back over to the right – which is how the page then turns (`book.css`,
  * `data-turn="back"`), so the corner that is touched is the page that moves (user feedback, October 2026). Its sign
  * tells where it leads: back out of a menu (`back`, an arrow: MenuHead's PageCorner) or out of a game (`close`, a ✕:
- * GameShell's ExitButton, held). Only drawn in the book look; it fills the box it is put in, its spine on the left.
+ * GameShell's ExitButton, held). It fills the box it is put in, its spine on the left.
  * The way out of a book back onto the shelf is no page turning but the book closing: `shelf` draws its ribbon instead.
  */
 export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
@@ -37,7 +37,7 @@ export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
  * can be (the open book's cover lies under its pages). So it is the book's ribbon, the Lesebändchen one lays in before
  * closing a book: a band of red satin coming out over the page's top edge from the book's head, lying on the page with
  * its shadow and ending in a swallowtail. Nearly all of it is a big round paper label with a tall, slim bookshelf on it
- * in colour, and the app's yellow round arrow of the way back over its edge, the same plain arrow as the toy look's –
+ * in colour, and the app's yellow round arrow of the way back over its edge, the same plain arrow as MenuTop's –
  * big and plain, so a grown-up sees at once where it leads (a shelf stamped small in gold, then a small label with a
  * squat shelf and a bent arrow, were not recognised). Drawn in a box 60 × 80, the page's edge at y 6.
  */
@@ -103,7 +103,7 @@ function RibbonArt() {
         <rect className="page-ribbon-wood" x="19" y="53" width="2.4" height="1.6" />
         <rect className="page-ribbon-wood" x="34.6" y="53" width="2.4" height="1.6" />
       </g>
-      {/* The way back's round yellow arrow, drawn as the toy look's round arrow (MenuTop's back-arrow). */}
+      {/* The way back's round yellow arrow, drawn as MenuTop's round arrow (its back-arrow). */}
       <circle className="page-ribbon-badge" cx="47.5" cy="62.5" r="12.5" />
       <path className="page-ribbon-arrow" d="M53.9 62.5H41.5M46.7 56.9L41.1 62.5L46.7 68.1" />
     </svg>

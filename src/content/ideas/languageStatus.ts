@@ -90,59 +90,40 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): der Hinweis zu „Erst – Dann“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, die Lupe „Groß ansehen“ mit „Auswählen“, „Ausgewählt“, „Vorige / Nächste Vorlage“ (Wizard.tsx); beim Drucken der Tafel „Aufgaben und Belohnung als Bildkarten zum Ausschneiden“ und ihr Hinweis (PrintPanel.tsx, T-20). Neu und nur Deutsch (1. November 2026): „🏅 Urkunde“ mit der Urkunde selbst und „Wie geht es weiter?“ (Certificate.tsx) und der Hinweis „Klappt es schon von selbst?“ unter der Tafel (BoardScreen.tsx). Neu und nur Deutsch (1. November 2026): die Ansicht „Jetzt – Dann“ mit ihrem Hinweis, „Was wandert?“ mit „Pfeil wandert“ und „Karte wandert“, ihren Druckhinweisen „Nur eine Seite drucken“ / „Karten auch drucken und ausschneiden“ und ihren Hinweisen (catalog.ts, auch beim Drucken und unter „Gestalten“), „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Eine Karte weniger / mehr“ (ChartEditor.tsx) und der Hilfetext des Assistenten (Wizard.tsx). Neu und nur Deutsch (2. November 2026): das Bearbeiten direkt auf der Tafel, gleich im Assistenten und unter „Gestalten“ (ChartEditor.tsx) – „Zeitraum“, „Zähler“, der Schalter „Belohnung“, „Name des Kindes“, „Weitere Einstellungen“, die Fenster einer Karte („Sterne“, „Jeden Tag“ / „Nur Mo“, „Früher“, „Später“, „Entfernen“, „Tauschen gegen“), „Karte dazu“, der Belohnung („Sterne bis zur Belohnung“, „Ohne Belohnung“) und einer Aufgabe, „＋ Belohnung“ (BoardSheet.tsx, PlanSheet.tsx) und der neue Hilfetext (Wizard.tsx). Neu und nur Deutsch (2. November 2026, Editor): „Ein Stern weniger“, „Ein Stern mehr“, „Ganze Zeile entfernen“, „Rückgängig“, „Wiederholen“, „Rückgängig und Wiederholen“, „Direkt auf der Tafel ändern:“ mit seinem Satz, die Notiz zum freien Wechsel der Zeiträume, „Art der Tafel und Einstellungen“, „Zum Ausdrucken“ mit „auf A4 oder als Fotoabzug – oder hier am Bildschirm abhaken“. Neu und nur Deutsch (3. November 2026, Editor): die Fragen der Ecken-Knöpfe „„…“ löschen?“, „„…“ ändern“, „Zeichen löschen?“, „Belohnung ändern“, „Belohnung löschen?“, „„…“ davor“ (SheetAction.tsx, PlanSheet.tsx) und „Karten nummerieren“ (PlanEditor.tsx); „Zähler“, „Tag aufteilen?“, „Morgens und abends“, „Am Stück“, „Anzahl Karten“, „Ganze Zeile entfernen“ und der Schalter „Belohnung“ sind wieder weg. Neu und nur Deutsch (3. November 2026, H-41): der Zeitraum „Countdown“ mit seinem Hinweis, die Vorlage „Wie oft noch schlafen?“ mit Hinweis, die Karten „Geburtstag“ und „Urlaub“, das Fenster „Der große Tag“ mit „Datum“, „Noch so oft schlafen“ und „Bild für den Tag“ (ChartEditor.tsx), die Überschrift „Wie oft schläft Lena noch?“ (board.ts), „…, dann Geburtstag“ und „Heute ist es so weit:“ (PlanSheet.tsx, PlanScreen.tsx) und der Druckhinweis zum Countdown (PlanPrint.tsx).",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/timer/",
-    note: "Neu (3. November 2026), nur Deutsch: der Name „Timer“ und sein Satz im Regal, die Namen der drei Bilder und „Wie lange?“ mit den Minuten (content.ts, TimerGame.tsx). Sagt sonst nichts.",
-    languages: { de: "done" },
+    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/schnullerfee/",
-    note: "Neu im November 2026, nur Deutsch: der Name „Die Schnullerfee“ und der Satz auf dem Buchrücken, die Namen der Dinge (nur vorgelesen) und hinter ⚙️ „Abschied der Schnuller“ (Schnullerkästchen, Luftballon) und „Geschenk der Fee“ mit den acht Geschenken. Die Geschichte selbst kommt ohne Worte aus.",
-    languages: { de: "done" },
+    note: "Name, Satz auf dem Buchrücken, die Namen der Dinge (nur vorgelesen) und hinter ⚙️ „Abschied der Schnuller“ und „Geschenk der Fee“ mit den acht Geschenken, übersetzt am 3. November 2026. Die Geschichte selbst kommt ohne Worte aus.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/abstillen/",
-    note: "Neu und nur Deutsch (3. November 2026): die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ (WeaningPlay.tsx); noch ohne Aufnahme (🎙️ Stimmen).",
-    languages: { de: "done" },
+    recorded: true,
+    note: "Die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ übersetzt am 3. November 2026; noch in keiner Sprache aufgenommen (🎙️ Stimmen, bun run voice make --only abstillen).",
+    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
     href: "/bilder/",
     note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
     parts: [
-      { label: "🖼️ Bilder und Spielarten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
       {
-        label: "🔦 Taschenlampe",
-        languages: { de: "done" },
-        note: "Nur der Name der Spielart im Menü (SCENE_MODES in settings.ts) ist neu; das Spiel selbst sagt nur, was die Bilder schon sagen.",
-      },
-      {
-        label: "🛣️ Straße malen",
-        languages: { de: "done" },
-        note: "Neu sind nur der Name der Spielart (SCENE_MODES) und der Hinweis „Mal eine Straße!“ (roadPrompts in phrases.ts); sonst sprechen nur die Bilder.",
+        label: "🖼️ Bilder und Spielarten",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Mit 🔦 Taschenlampe und 🛣️ Straße malen (übersetzt am 3. November 2026).",
       },
     ],
   },
   {
     href: "/kettenreaktion/",
-    parts: [
-      {
-        label: "🎢 Klingende Kugelbahn und die Maschinen",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-      },
-      {
-        label: "☃️ Schneebahn, 🪐 Weltraumbahn, 🛟 Wasserrutsche, 🏗️ Baustellen-Bahn",
-        languages: { de: "done" },
-        note: "Name, erster Satz und der Satz am Ende jeder Bahn (Oktober 2026) gibt es nur auf Deutsch; die Teile, die sie mit der Holzbahn teilen, sprechen alle Sprachen.",
-      },
-      {
-        label: "🚧 Schranke und Weiche der Kugelbahn",
-        languages: { de: "done" },
-        note: "Die Wahl „Schranke und Weiche: 👆 Kind tippt / 🔄 Von selbst“ und der Satz „Achtung, fertig – los!“ (K-01, K-02, Oktober 2026) gibt es nur auf Deutsch.",
-      },
-    ],
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Alle Bahnen und Maschinen, auch Schneebahn, Weltraumbahn, Wasserrutsche, Baustellen-Bahn und „Schranke und Weiche“ (übersetzt am 3. November 2026).",
   },
   {
     href: "/kleine-abenteuer/",
@@ -163,21 +144,25 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/gefuehle/",
-    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts (auch die Geschichten aus selbst.ts), Schritt für Schritt neben den deutschen Geschichten.",
     parts: [
       {
         label: "Wie geht's dir? und Kindergarten",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
       },
       {
         label: "Zu Hause",
-        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "Neu und nur Deutsch (2. November 2026): „Müde am Abend“ – der Bär legt sich selbst schlafen (Fragen, nicht so gute Ideen, „Hinlegen und zudecken“, „Schlaflied hören“, „Teddy kuscheln“); seine alten Übersetzungen sind gelöscht.",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "„Müde am Abend“ (der Bär legt sich selbst schlafen) neu übersetzt am 3. November 2026. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026), die Aufnahmen der anderen Sprachen fehlen noch.",
       },
       {
         label: "Mehr Gefühle",
-        languages: { de: "done" },
-        note: "Neu und nur Deutsch (3. November 2026): fünf Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt. Übersetzungen kämen wie im Kindergarten in kita.<Sprache>.ts.",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und alle übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch.",
       },
     ],
   },
@@ -199,34 +184,14 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/tiere/",
-    parts: [
-      { label: "🐾 Das Spiel", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
-      {
-        label: "⚙️ Einstellungen beim Spielen",
-        languages: { de: "done" },
-        note: "„Was drankommt“ und „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer) gibt es nur auf Deutsch (November 2026); die Namen der ersten drei Spielarten sprechen alle Sprachen.",
-      },
-      {
-        label: "💬 Frage in der Sprechblase",
-        languages: { de: "done" },
-        note: "Neu (November 2026): die Fragen der fünf Spielarten in der Sprechblase für Erwachsene („Wer versteckt sich da?“, „Was esse ich?“ …) gibt es nur auf Deutsch (`TopicBubble.tsx`).",
-      },
-      {
-        label: "🥛 Was gibt uns das Tier?",
-        languages: { de: "done" },
-        note: "Neu (Z-01, November 2026): Frage, Sätze, die Namen von Milch, Ei, Honig, Wolle und vom Schaf und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GIFT_TEXTS` in content.ts); Kuh, Huhn und Biene sprechen schon alle Sprachen.",
-      },
-      {
-        label: "🦋 Was wird aus mir?",
-        languages: { de: "done" },
-        note: "Neu (Z-12, November 2026): Frage, Sätze, die Namen von Raupe, Ei, Samen, Kaulquappe, Schmetterling, Küken, Sonnenblume, Frosch und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GROW_TEXTS` in growth.tsx).",
-      },
-      {
-        label: "📖 Zeile im Inhaltsverzeichnis",
-        languages: { de: "done" },
-        note: "Neu (2. November 2026): die Zeile unter dem Namen im Inhaltsverzeichnis, „Verstecke, Futter, Milch, Zuhause, Wachsen“, gibt es nur auf Deutsch (`blurb` in games.ts).",
-      },
-    ],
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
+  },
+  {
+    href: "/zusammen/",
+    languages: { de: "done" },
+    note: "Neu (November 2026): nur auf Deutsch – die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase und die Einstellungen beim Spielen. Gesprochen wird noch nichts; die Sätze warten auf ihre Aufnahme.",
   },
   {
     href: "/schatten/",
@@ -244,6 +209,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx) und im Buch-Look „Wer spielt?“ über den Stickern im Regal (Bookshelf.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal, das Holzschild „Lernspiele“ unter den Bilderbüchern (Bookshelf.tsx) und die Schnitzerei „Für Groß & Klein“ mit „Der erste gemeinsame Schritt ins Digitale …“ und ihrem „mehr …“ (Bookshelf.tsx), das „Über Books for Both“ öffnet, mit ihr und dem Text für Suchmaschinen (RoomOptions.tsx), die Wahl „Spiel verlassen“ (✕ antippen oder gedrückt halten) unter ⏳ (HomeOptions.tsx) und „Zum Beenden auf ✕ tippen.“ unter „Gute Nacht“ (GameShell.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Der Name „Books for Both“ bleibt in allen Sprachen gleich. Neu und nur Deutsch: im Buch-Look „Wer spielt?“ über den Stickern im Regal (Bookshelf.tsx).",
   },
 ];

@@ -51,6 +51,17 @@ export function afterLoad(task: () => void) {
   else addEventListener("load", idle, { once: true });
 }
 
+/**
+ * Whether this page's own script is missing from the newest cache, the one of the worker that just took over:
+ * the page then runs an older build. Every build's script has a name of its own (a hash).
+ */
+async function runsOldBuild() {
+  const script = document.querySelector<HTMLScriptElement>("script[type=module][src]")?.src;
+  const newest = (await caches.keys()).filter((key) => key.startsWith("tinytaps-")).at(-1);
+  if (!script || !newest) return true;
+  return !(await (await caches.open(newest)).match(script));
+}
+
 /** Called once at start-up. */
 export function setUpPwa() {
   if (!("serviceWorker" in navigator)) return;
@@ -66,10 +77,11 @@ export function setUpPwa() {
   });
   addEventListener("appinstalled", () => update({ installPrompt: null, installed: true }));
 
-  // The very first worker also takes over the page, but then nothing is old.
+  // The very first worker also takes over the page, but then nothing is old. Nor is it when the page
+  // already came from the network with the build the new worker keeps (src/sw.js opens pages so).
   const hadWorker = navigator.serviceWorker.controller !== null;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (hadWorker) update({ updateReady: true });
+    if (hadWorker) void runsOldBuild().then((old) => old && update({ updateReady: true }));
   });
 
   const base = `${BASE_URL.replace(/\/$/, "")}/`;

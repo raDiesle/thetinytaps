@@ -6,7 +6,7 @@ import { useTurnPage } from "@/lib/look";
 import { preloadPage } from "@/lib/preloadPages";
 
 /**
- * A book's first page in the book look, laid out as a picture book's table of contents (user feedback, October 2026):
+ * A book's first page, laid out as a picture book's table of contents (user feedback, October 2026):
  * one line per game, its picture, its name, the dots leading to the page it is on. Each line is as tall as the page
  * allows (the lines share the room under the title), and the whole line is the tap: it turns the page to the game.
  */

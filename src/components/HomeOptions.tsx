@@ -1,48 +1,18 @@
 import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FullscreenButton } from "@/components/FullscreenButton";
-import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { targetLanguageFor } from "@/content/targetLanguages";
-import { type Figure, type Leave, useCommonSettings } from "@/lib/common";
+import { type Leave, useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
 import { downloadMusic } from "@/lib/musicFile";
 
-/**
- * On the home page, for the grown-ups: small buttons in the top right corner –
- * the play time for all games and how a game is left, the language and the child's figure (boy or girl), each
- * opening its menu only when tapped, so the games fill the screen, then music and fullscreen (last, where
- * every menu has it), switched by one tap. All on the right, so the sun in the
- * top left corner stays in sight.
+/*
+ * The grown-ups' menus of the home page, opened from the things in the bookshelf (RoomOptions.tsx): how a game is left,
+ * the language, and the music's switch.
  */
-export function HomeOptions() {
-  const t = useT();
-  const language = useAppLanguage();
-  return (
-    <nav
-      className="home-bar"
-      aria-label={t({ de: "Für Erwachsene", ru: "Для взрослых", en: "For grown-ups", zh: "家长专用", hi: "बड़ों के लिए", es: "Para adultos", ar: "للكبار" })}
-    >
-      <MenuButton
-        icon="⏳"
-        label={t({ de: "Spielzeit", ru: "Время игры", en: "Play time", zh: "游戏时间", hi: "खेलने का समय", es: "Tiempo de juego", ar: "وقت اللعب" })}
-      >
-        <PlaytimeOptions />
-        <LeaveOptions />
-      </MenuButton>
-      {/* The language by its own name, so a grown-up who can't read the other one still finds theirs. */}
-      <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]}>
-        <AppLanguageOptions />
-      </MenuButton>
-      <FigureMenu />
-      <MusicButton />
-      <FullscreenButton />
-    </nav>
-  );
-}
 
 /**
- * A small button that drops down a menu; on a phone the menu covers the whole
+ * A thing in the bookshelf's room that opens a menu; on a phone the menu covers the whole
  * screen, with its name and ✕ on top. Tapping outside, ✕ or Escape closes it;
  * the tap that closes it lands on a see-through backdrop, so it never also
  * starts the game underneath. While there is more below, a bar at the bottom
@@ -52,15 +22,17 @@ export function MenuButton({
   icon,
   label,
   art,
-  className = "home-menu-button",
+  className,
   keep = false,
   children,
 }: {
+  /** The menu's sign beside its name, on top of it. */
   icon: string;
+  /** The thing's name, read out and on top of its menu. */
   label: string;
-  /** What the button shows instead of `icon` and `label` (a thing in the bookshelf's room); `label` is then its name. */
-  art?: ReactNode;
-  className?: string;
+  /** What the thing looks like in the shelf. */
+  art: ReactNode;
+  className: string;
   /** Text that stays in the page while closed, unseen: words search engines are to find (RoomNotes). */
   keep?: boolean;
   children: ReactNode;
@@ -139,23 +111,18 @@ export function MenuButton({
 
   return (
     <div className="home-menu">
-      <button type="button" className={className} aria-expanded={open} title={label} aria-label={art ? label : undefined} onClick={() => setOpen(!open)}>
-        {art ?? (
-          <>
-            <span aria-hidden>{icon}</span>
-            <span className="home-menu-label">{label}</span>
-          </>
-        )}
+      <button type="button" className={className} aria-expanded={open} title={label} aria-label={label} onClick={() => setOpen(!open)}>
+        {art}
       </button>
-      {/* A thing in the bookshelf's 3D room opens its menu outside it, over the whole screen (a transform would hold it in). */}
-      {art ? sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body) : sheet}
+      {/* The bookshelf's 3D room opens the menu outside it, over the whole screen (a transform would hold it in). */}
+      {sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body)}
       {keep && !open && <div hidden>{children}</div>}
     </div>
   );
 }
 
 /**
- * How a game is left with its ✕ (the page's corner in the book look), for all games: one tap, or held for a moment so a
+ * How a game is left with its ✕ (the page's corner), for all games: one tap, or held for a moment so a
  * child's tap can't end it. Beside the play time (⏳), the other rule grown-ups set for playing alone; not on the lock
  * over the menus, which only gives more time.
  */
@@ -164,17 +131,48 @@ export function LeaveOptions() {
   const [common, update] = useCommonSettings();
   return (
     <section className="settings">
-      <SettingsGroup title={t({ de: "Spiel verlassen" })}>
+      <SettingsGroup
+        title={t({
+          de: "Spiel verlassen",
+          ru: "Выход из игры",
+          en: "Leaving a game",
+          zh: "退出游戏",
+          hi: "खेल से बाहर निकलना",
+          es: "Salir del juego",
+          ar: "الخروج من اللعبة",
+        })}
+      >
         <Choice<Leave>
-          label={t({ de: "✕ zum Verlassen eines Spiels" })}
+          label={t({
+            de: "✕ zum Verlassen eines Spiels",
+            ru: "✕ для выхода из игры",
+            en: "✕ to leave a game",
+            zh: "用 ✕ 退出游戏",
+            hi: "खेल से बाहर निकलने के लिए ✕",
+            es: "✕ para salir de un juego",
+            ar: "✕ للخروج من اللعبة",
+          })}
           value={common.leave}
           onChange={(leave) => update({ leave })}
           options={[
-            { value: "tap", label: t({ de: "Antippen" }) },
-            { value: "hold", label: t({ de: "Gedrückt halten" }) },
+            { value: "tap", label: t({ de: "Antippen", ru: "Нажать", en: "Tap", zh: "轻点", hi: "टैप करें", es: "Tocar", ar: "النقر" }) },
+            {
+              value: "hold",
+              label: t({ de: "Gedrückt halten", ru: "Удерживать", en: "Hold", zh: "按住", hi: "दबाए रखें", es: "Mantener pulsado", ar: "الضغط المطوّل" }),
+            },
           ]}
         />
-        <p className="setting-note">{t({ de: "Gedrückt halten: Ihr Kind beendet ein Spiel nicht aus Versehen. Esc muss immer gehalten werden." })}</p>
+        <p className="setting-note">
+          {t({
+            de: "Gedrückt halten: Ihr Kind beendet ein Spiel nicht aus Versehen. Esc muss immer gehalten werden.",
+            ru: "Удерживать: ваш ребёнок не закончит игру случайно. Esc всегда нужно удерживать.",
+            en: "Hold: your child won’t end a game by accident. Esc always has to be held.",
+            zh: "按住：孩子不会不小心结束游戏。Esc 键始终需要按住。",
+            hi: "दबाए रखें: आपका बच्चा गलती से खेल बंद नहीं करेगा। Esc को हमेशा दबाए रखना होता है।",
+            es: "Mantener pulsado: su peque no termina un juego sin querer. Esc siempre hay que mantenerla pulsada.",
+            ar: "الضغط المطوّل: لن ينهي طفلكم اللعبة عن غير قصد. يجب دائمًا الضغط مطوّلًا على Esc.",
+          })}
+        </p>
       </SettingsGroup>
     </section>
   );
@@ -203,55 +201,6 @@ export function AppLanguageOptions() {
         />
       </SettingsGroup>
     </section>
-  );
-}
-
-/**
- * Whether the figure that stands for the child is a boy or a girl: chosen once here, it holds for every game
- * (`useFigure`). A menu rather than one tap that switches, so a child's tap on the bar doesn't change it.
- */
-function FigureMenu() {
-  const t = useT();
-  const [common, update] = useCommonSettings();
-  const figures: { id: Figure; emoji: string; name: string }[] = [
-    { id: "boy", emoji: "👦", name: t({ de: "Junge" }) },
-    { id: "girl", emoji: "👧", name: t({ de: "Mädchen" }) },
-  ];
-  const shown = figures.find((f) => f.id === common.figure) ?? figures[0];
-  return (
-    <MenuButton icon={shown.emoji} label={shown.name}>
-      <section className="settings">
-        <SettingsGroup title={t({ de: "Junge oder Mädchen" })}>
-          <div className="home-figures">
-            {figures.map((f) => (
-              <button key={f.id} type="button" className="home-figure" aria-pressed={common.figure === f.id} onClick={() => update({ figure: f.id })}>
-                <span aria-hidden>{f.emoji}</span>
-                {f.name}
-              </button>
-            ))}
-          </div>
-          <p className="setting-note">
-            {t({
-              de: "Die Figur, die für Ihr Kind steht, ist ein Junge oder ein Mädchen – in Kleine Abenteuer und im Spiegel beim Zähneputzen –, und die Menüs bekommen ihre Farben. Tiere und die Leute in den Bildern bleiben, wie sie sind.",
-            })}
-          </p>
-        </SettingsGroup>
-      </section>
-    </MenuButton>
-  );
-}
-
-/**
- * The background song in every game, on or off with one tap – no menu: read aloud and
- * sounds are no switches any more (`src/lib/common.ts`), so music is all there is to set.
- */
-function MusicButton() {
-  const music = useMusicSwitch();
-  return (
-    <button type="button" className="home-menu-button home-music" aria-pressed={music.on} title={music.title} onClick={music.toggle}>
-      <span aria-hidden>{music.on ? "🎵" : "🔇"}</span>
-      <span className="home-menu-label">{music.label}</span>
-    </button>
   );
 }
 

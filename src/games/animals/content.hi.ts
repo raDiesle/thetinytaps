@@ -1,4 +1,6 @@
-import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./content";
+import type { Gift, GiftId } from "./gifts";
+import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
 
 // Hindi texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in content.ts and homes.tsx.
@@ -39,6 +41,7 @@ export const HINDI_ANIMALS: Record<string, HindiAnimal> = {
   schnecke: { name: "घोंघा", of: "घोंघे" },
   loewe: { name: "शेर" },
   giraffe: { name: "जिराफ़" },
+  schaf: { name: "भेड़" },
 };
 
 /** A food in Hindi. */
@@ -110,5 +113,84 @@ export function hindiTexts(german: AnimalTexts): AnimalTexts {
   };
 }
 
+/** A gift in Hindi. */
+export interface HindiGift {
+  /** Shown for screen readers and in "अंडा मुर्गी से आता है!": "अंडा". */
+  name: string;
+  /** What we get, for "मुर्गी से हमें अंडे मिलते हैं।", where it differs from `name`: the plural where one gets many. */
+  gives?: string;
+  /** Plural, so the verb is "मिलते हैं". */
+  many?: true;
+  /** A feminine word (ऊन), so the verbs are "मिलती" and "आती". */
+  female?: true;
+}
+
+/** What the animals give us, by gift id ("Was gibt uns das Tier?"); one without an entry is said in German. */
+export const HINDI_GIFTS: Partial<Record<GiftId, HindiGift>> = {
+  milch: { name: "दूध" },
+  ei: { name: "अंडा", gives: "अंडे", many: true },
+  honig: { name: "शहद" },
+  wolle: { name: "ऊन", female: true },
+};
+
+/**
+ * "Was gibt uns das Tier?" in Hindi, built with से and मिलना ("गाय से हमें दूध मिलता है।"), so the verb follows the
+ * gift, never the animal. What has no Hindi words yet is the whole German sentence.
+ */
+export function hindiGifts(german: GiftTexts): GiftTexts {
+  const animal = (a: Animal) => HINDI_ANIMALS[a.id];
+  const of = (a: Animal) => animal(a).of ?? animal(a).name;
+  const gift = (g: Gift) => HINDI_GIFTS[g.id];
+  /** "मिलता है", "मिलते हैं" or "मिलती है", by what we get. */
+  const get = (g: Gift) => (gift(g)!.many ? "मिलते हैं" : gift(g)!.female ? "मिलती है" : "मिलता है");
+  /** "आता है" or "आती है", by the gift's name (one of it). */
+  const comes = (g: Gift) => (gift(g)!.female ? "आती है" : "आता है");
+  return {
+    gift: (g) => gift(g)?.name ?? german.gift(g),
+    whatGives: (a) => (animal(a) ? `${of(a)} से हमें क्या मिलता है?` : german.whatGives(a)),
+    gives: (a, g) => (animal(a) && gift(g) ? `${of(a)} से हमें ${gift(g)!.gives ?? gift(g)!.name} ${get(g)}। धन्यवाद!` : german.gives(a, g)),
+    comesFrom: (g, giver) => (animal(giver) && gift(g) ? `${gift(g)!.name} ${of(giver)} से ${comes(g)}!` : german.comesFrom(g, giver)),
+  };
+}
+
+/** A small one and what it becomes, in Hindi ("Was wird aus mir?"). */
+export interface HindiGrowth {
+  /** The small one: "इल्ली". */
+  young: string;
+  /** Before से (oblique), where it differs: "अंडे". */
+  of?: string;
+  /** What it becomes: "तितली". */
+  adult: string;
+  /** What it becomes is a feminine word (तितली), so the verb is "बनती". */
+  female?: true;
+}
+
+/** The small ones by their id; one without an entry is said in German. */
+export const HINDI_GROWTHS: Partial<Record<GrowthId, HindiGrowth>> = {
+  raupe: { young: "इल्ली", adult: "तितली", female: true },
+  ei: { young: "अंडा", of: "अंडे", adult: "चूज़ा" },
+  samen: { young: "बीज", adult: "सूरजमुखी" },
+  kaulquappe: { young: "बेंगची", adult: "मेंढक" },
+};
+
+/** "Was wird aus mir?" in Hindi, built with से and बनना ("इल्ली से तितली बनती है।"). */
+export function hindiGrowth(german: GrowTexts): GrowTexts {
+  const word = (g: Growth) => HINDI_GROWTHS[g.id];
+  const of = (g: Growth) => word(g)!.of ?? word(g)!.young;
+  const becomes = (g: Growth) => (word(g)!.female ? "बनती है" : "बनता है");
+  return {
+    young: (g) => word(g)?.young ?? german.young(g),
+    adult: (g) => word(g)?.adult ?? german.adult(g),
+    whatBecomes: (g) => (word(g) ? `${of(g)} से क्या बनता है?` : german.whatBecomes(g)),
+    becomes: (g) => (word(g) ? `${of(g)} से ${word(g)!.adult} ${becomes(g)}। बहुत बढ़िया!` : german.becomes(g)),
+    comesFrom: (g) => (word(g) ? `${word(g)!.adult} ${of(g)} से ${becomes(g)}!` : german.comesFrom(g)),
+  };
+}
+
 /** Hindi, for the table of languages in content.ts. */
-export const HINDI: AnimalTranslation = { words: { animals: HINDI_ANIMALS, foods: HINDI_FOODS, homes: HINDI_HOMES }, texts: hindiTexts };
+export const HINDI: AnimalTranslation = {
+  words: { animals: HINDI_ANIMALS, foods: HINDI_FOODS, homes: HINDI_HOMES },
+  texts: hindiTexts,
+  gifts: hindiGifts,
+  growth: hindiGrowth,
+};

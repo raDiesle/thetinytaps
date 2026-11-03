@@ -12,14 +12,16 @@ import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
 // The languages a part has been translated into whole, as the language table on /management/ says: a part marked
-// "done" there has every text, and changing a German line means marking it "partial" until it is translated again.
+// "done" (or "text", translated but not recorded yet) there has every text, and changing a German line means marking
+// it "partial" until it is translated again.
 const STATUS_PARTS = LANGUAGE_STATUS.find((row) => row.href === "/gefuehle/")?.parts ?? [];
 const translatedIn = (label: string) =>
   (Object.entries(STATUS_PARTS.find((part) => part.label === label)?.languages ?? {}) as [TargetLanguageId, string][])
-    .filter(([language, state]) => language !== "de" && state === "done")
+    .filter(([language, state]) => language !== "de" && (state === "done" || state === "text"))
     .map(([language]) => language);
 const TRANSLATED_HOME = translatedIn("Zu Hause");
 const TRANSLATED_KITA = translatedIn("Wie geht's dir? und Kindergarten");
+const TRANSLATED_SELF = translatedIn("Mehr Gefühle");
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
 // allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
@@ -91,7 +93,7 @@ test("every recorded sound of the stories has its file", () => {
 test("every translation of a kindergarten story matches the German beat for beat", () => {
   const beatParts = (beats: { narration?: string; line?: string }[]) => beats.map((b) => [!!b.narration, !!b.line]);
   for (const [language, texts] of Object.entries(SITUATION_TEXTS)) {
-    for (const situation of SITUATIONS) {
+    for (const situation of ALL_SITUATIONS) {
       const text = texts[situation.id];
       if (!text) continue;
       const where = `${language} ${situation.id}`;
@@ -166,6 +168,9 @@ test("every translated language has every story", () => {
   }
   for (const language of TRANSLATED_KITA) {
     for (const { id } of SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
+  }
+  for (const language of TRANSLATED_SELF) {
+    for (const { id } of SELF_SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
   }
 });
 

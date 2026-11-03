@@ -1,8 +1,6 @@
 import { expect, test } from "bun:test";
 import { APP_LANGUAGES, pick } from "@/lib/language";
-import { dealPairs, MAX_PAIRS, nextLevel, SOCK_COLORS, SOCK_LEVELS, SOCK_PATTERNS, SOCK_TEXTS, type SockLook } from "./content";
-
-const key = (l: SockLook) => `${l.color.id} ${l.pattern}`;
+import { dealPairs, lookKey as key, MAX_PAIRS, MIRRORED, nextLevel, SOCK_COLORS, SOCK_KINDS, SOCK_LEVELS, SOCK_PATTERNS, SOCK_TEXTS } from "./content";
 
 test("every wash has pairs that all look different, and what tells them apart is what its step says", () => {
   for (const level of SOCK_LEVELS) {
@@ -10,6 +8,17 @@ test("every wash has pairs that all look different, and what tells them apart is
       const looks = dealPairs(level);
       const name = `${level.kind} ${level.pairs}`;
       expect(looks, name).toHaveLength(level.pairs);
+      // Socks before the new laundry, mittens, boots and slippers (with a left and a right) after.
+      const mirrored = level.kind === "mirror" || level.kind === "twins";
+      for (const look of looks) expect(MIRRORED.includes(look.garment), name).toBe(mirrored);
+      if (level.kind === "twins") {
+        // Every look twice: two left and two right pieces alike, and only a left with a right one fits.
+        expect(level.pairs % 2, name).toBe(0);
+        for (const look of looks) expect(looks.filter((l) => key(l) === key(look)).length, name).toBe(2);
+        // Their colour alone tells the looks apart, so the side is the only thing to look for.
+        expect(new Set(looks.map((l) => l.color.id)).size, name).toBe(level.pairs / 2);
+        continue;
+      }
       expect(new Set(looks.map(key)).size, name).toBe(level.pairs);
       const colors = new Set(looks.map((l) => l.color.id)).size;
       const patterns = new Set(looks.map((l) => l.pattern)).size;
@@ -27,6 +36,11 @@ test("every wash has pairs that all look different, and what tells them apart is
         expect(colors, name).toBe(2);
         expect(patterns, name).toBeLessThan(level.pairs);
       }
+      if (level.kind === "mirror") {
+        expect(colors, name).toBe(level.pairs);
+        // Mittens, boots and slippers all come, as far as there are pairs for them.
+        expect(new Set(looks.map((l) => l.garment)).size, name).toBe(Math.min(level.pairs, MIRRORED.length));
+      }
     }
   }
 });
@@ -38,8 +52,9 @@ test("the steps start easy, never ask for more pairs than fit, and get harder on
     expect(level.covered).toBeGreaterThanOrEqual(0);
     expect(level.covered).toBeLessThanOrEqual(level.pairs * 2);
   }
-  const kinds = SOCK_LEVELS.map((l) => ["colors", "patterns", "sameColor", "mixed"].indexOf(l.kind));
+  const kinds = SOCK_LEVELS.map((l) => SOCK_KINDS.indexOf(l.kind));
   expect(kinds).toEqual([...kinds].sort((a, b) => a - b));
+  expect(new Set(kinds).size).toBe(SOCK_KINDS.length);
   // A new kind starts with few baskets; within a kind they only get more.
   for (let i = 1; i < SOCK_LEVELS.length; i++) {
     const [before, level] = [SOCK_LEVELS[i - 1], SOCK_LEVELS[i]];

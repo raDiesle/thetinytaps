@@ -693,5 +693,6 @@ export function buildGarden() {
     birdAt,
     butterflyAt,
     cameraTarget,
+    width: WORLD_W,
   };
 }

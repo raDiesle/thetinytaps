@@ -722,5 +722,6 @@ export function buildBuilding() {
     roofDrop,
     truckGone,
     cameraTarget,
+    width: WORLD_W,
   };
 }

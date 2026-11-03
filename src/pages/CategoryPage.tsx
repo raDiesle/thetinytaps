@@ -1,12 +1,9 @@
 import { Navigate, useParams } from "react-router";
 import { BookContents } from "@/components/BookContents";
-import { GameCard } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
-import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
-import { useFitGrid } from "@/lib/fitGrid";
+import { CATEGORIES, categoryHref, hasPage, listedGames } from "@/content/games";
 import { useT } from "@/lib/language";
-import { isBookLook } from "@/lib/look";
 import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
@@ -14,7 +11,7 @@ import { SeoText } from "@/components/SeoText";
 
 /**
  * One book of the home page's shelf, opened: its first page is the table of contents (BookContents), each game on a page
- * of its own. In the toy look its games are cards.
+ * of its own.
  */
 export function CategoryPage() {
   const { category: id } = useParams();
@@ -22,8 +19,7 @@ export function CategoryPage() {
   const t = useT();
   useTitle(category && t(category.title));
   useUpdateBetweenGames();
-  usePreloadPages(category?.games.map((g) => g.href) ?? []);
-  const grid = useFitGrid(category?.games.length ?? 0);
+  usePreloadPages(category ? listedGames(category).map((g) => g.href) : []);
   if (!category) return <Navigate to="/" replace />;
   // An old address of a category that has only one game now.
   if (!hasPage(category)) return <Navigate to={categoryHref(category)} replace />;
@@ -35,17 +31,7 @@ export function CategoryPage() {
         back={t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" })}
         title={t(category.title)}
       />
-      {isBookLook() ? (
-        <BookContents games={category.games} world={category.id} />
-      ) : (
-        <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
-          {category.games.map((g) => (
-            <li key={g.href}>
-              <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <BookContents games={listedGames(category)} world={category.id} />
       <SeoText />
     </main>
   );
