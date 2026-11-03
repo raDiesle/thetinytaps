@@ -252,23 +252,44 @@ async function writePages(template: string) {
 async function writeServiceWorker() {
   const all = await filesIn(OUT);
   const texts = Object.fromEntries(all.flatMap((file) => /^static\/texts-([a-z]{2})\.[^/]*\.js$/.exec(file)?.slice(1, 2).map((id) => [id, `./${file}`]) ?? []));
+  // Offline every address opens index.html (src/sw.js), so the other pages, written for search engines, stay out.
   const files = all.filter(
     (file) =>
-      file !== "404.html" &&
+      (file === "index.html" || !/\.(html|xml|txt)$/.test(file)) &&
       file !== "sw.js" &&
       `/${file}` !== PREVIEW_IMAGE.path &&
       !/\.(map|LICENSE\.txt)$/.test(file) &&
       !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file) &&
       !Object.values(texts).includes(`./${file}`),
   );
+  const shell = await shellFiles();
   const template = await readFile(join(ROOT, "src/sw.js"), "utf8");
   const hash = createHash("sha256").update(template);
   for (const file of files) hash.update(file).update(await readFile(join(OUT, file)));
   const worker = template
     .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
     .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
+    .replace("__SHELL__", JSON.stringify(shell.map((file) => `./${file}`)))
     .replace("__TEXTS__", JSON.stringify(texts));
   await writeFile(join(OUT, "sw.js"), worker);
+}
+
+/**
+ * What the service worker keeps at install, so the app starts offline on its home page even right after an update:
+ * index.html, the scripts and styles it links (Bun lists every chunk the start needs as a modulepreload) and the
+ * pictures those name (the shelf's covers, the logo) – not the sounds they name, which only a game plays.
+ */
+async function shellFiles() {
+  const html = await readFile(join(OUT, "index.html"), "utf8");
+  const linked = [...html.matchAll(/(?:href|src)="([^"]+)"/g)]
+    .map((match) => match[1])
+    .filter((ref) => ref.startsWith(`${base}/`) && !ref.endsWith("/"))
+    .map((ref) => ref.slice(base.length + 1));
+  const pictures = new Set<string>();
+  for (const file of linked.filter((file) => /\.(js|css)$/.test(file))) {
+    for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(/static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)/g)) pictures.add(match[0]);
+  }
+  return ["index.html", ...linked, ...pictures];
 }
 
 const started = performance.now();

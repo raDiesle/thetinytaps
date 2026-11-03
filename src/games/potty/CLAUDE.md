@@ -88,7 +88,12 @@ thought's picture lacks its second frame, or `bilder/` holds a picture of anybod
 
 German, English, Chinese, Hindi, Spanish, Arabic and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart
 inline `t({ … })`): another language goes next to them when asked for, and a new or changed German line loses its
-translations until then. Tapsi (`TAPSI.name` is `Localized`) is „Tapsi“ in English and Spanish, „塔普西“, „टैप्सी“,
+translations until then. Everything Tapsi's story says is played from its ElevenLabs recording (`voice.ts`, files in `stimme/`),
+recorded in German only so far (November 2026): the other languages stay silent until the user asks for their
+recordings, a thought not translated yet plays its German one. Two sentences in a row (what the child said, then the
+next step; a thought, then what the ✓ is for) go one after the other (`queue`), never as one joined sentence, which
+would have no recording. A new or changed line is listed by `src/content/recordedLines.ts` (`toepfchen`) and recorded
+with `bun run voice make --only toepfchen`, only when the user asks. Tapsi (`TAPSI.name` is `Localized`) is „Tapsi“ in English and Spanish, „塔普西“, „टैप्सी“,
 „تابسي“, „Тапси“. „Pipi“ and „Kaka“ are pee/poop, pipí/popó, 尿尿/便便, सू-सू/पॉटी, بيبي/كاكا, „пи-пи“/„ка-ка“ (as in the
 Russian song); the potty chair is potty, orinal, 小马桶, पॉटी-सीट, النونية, горшок. To the grown-up: usted, आप, Arabic
 plural, „вы“; to the child: tú, तुम, „ты“. Hindi verbs agree with the subject's gender, so Tapsi and the child are

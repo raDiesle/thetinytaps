@@ -244,12 +244,12 @@
 }
 
 /* The family stands still while it waits; at the end the grown-up and the child wave and hop. */
-.tm-arm {
+.tm-mascot .mascot-arm {
   transform-box: view-box;
   transform-origin: 144px 178px;
 }
 
-.tm-done .tm-arm {
+.tm-done .mascot-arm {
   animation: tm-wave 2.4s ease-in-out forwards;
 }
 

@@ -6,9 +6,11 @@ const SOCK_PATH = "M16 14 H44 V54 Q44 61 51 63 L54 64 Q63 68 61 79 Q59 90 48 89 
 
 const HEART = "M0 2 C-3 -2 -6 1 -4 4 L0 8 L4 4 C6 1 3 -2 0 2 Z";
 const STAR = "M0 -5 L1.5 -1.5 L5 -1.5 L2.2 0.8 L3.2 4.5 L0 2.3 L-3.2 4.5 L-2.2 0.8 L-5 -1.5 L-1.5 -1.5 Z";
+/** A fox's head: two pointed ears and a pointed chin. */
+const FOX = "M-7 -1 L-6.5 -8.5 L-2.4 -4.2 L2.4 -4.2 L6.5 -8.5 L7 -1 Q6 4.5 0 6.5 Q-6 4.5 -7 -1 Z";
 
-/** The knitted pattern as an SVG <pattern> tile, in the sock's lighter colour. */
-function PatternTile({ id, pattern, color }: { id: string; pattern: SockPattern; color: string }) {
+/** The knitted pattern as an SVG <pattern> tile, in the sock's lighter colour; the mascots' faces in `eyes`, its main one. */
+function PatternTile({ id, pattern, color, eyes }: { id: string; pattern: SockPattern; color: string; eyes: string }) {
   switch (pattern) {
     case "stripes":
       return (
@@ -43,6 +45,34 @@ function PatternTile({ id, pattern, color }: { id: string; pattern: SockPattern;
           <path d="M0 4 L3 8 L6 4 L9 8 L12 4" fill="none" stroke={color} strokeWidth="2.6" strokeLinejoin="round" />
         </pattern>
       );
+    // Faces, not only outlines: with eyes and a nose in the sock's colour, a fox's head is never taken for a heart.
+    case "foxes":
+    case "bears":
+      return (
+        <pattern id={id} width="24" height="24" patternUnits="userSpaceOnUse">
+          {[
+            [6.5, 7],
+            [18, 18.5],
+          ].map(([x, y]) => (
+            <g key={x} transform={`translate(${x} ${y})`}>
+              {pattern === "foxes" ? (
+                <path d={FOX} fill={color} />
+              ) : (
+                <g fill={color}>
+                  <circle cx="-4" cy="-3.6" r="2.4" />
+                  <circle cx="4" cy="-3.6" r="2.4" />
+                  <circle cy="0.6" r="5" />
+                </g>
+              )}
+              <g fill={eyes}>
+                <circle cx="-2.2" cy="-0.4" r="1" />
+                <circle cx="2.2" cy="-0.4" r="1" />
+                <circle cy="2.8" r="1.2" />
+              </g>
+            </g>
+          ))}
+        </pattern>
+      );
     case "plain":
       return null;
   }
@@ -71,7 +101,7 @@ export function SockDrawing({ look, side = "left" }: { look: SockLook; side?: Si
         <clipPath id={`${id}-clip`}>
           <path d={outline} />
         </clipPath>
-        <PatternTile id={`${id}-pattern`} pattern={pattern} color={color.light} />
+        <PatternTile id={`${id}-pattern`} pattern={pattern} color={color.light} eyes={color.main} />
       </defs>
       {/* The right one of a mirrored garment is the left one mirrored; a sock's two are the same. */}
       <g transform={side === "right" && garment !== "sock" ? "matrix(-1 0 0 1 64 0)" : undefined}>

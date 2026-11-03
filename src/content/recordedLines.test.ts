@@ -14,6 +14,11 @@ const PLAYERS: Record<string, string> = {
   "src/games/weaning/stimme": "src/games/weaning/WeaningPlay.tsx",
   "src/games/animals/stimme": "src/games/animals/voice.ts",
   "src/games/feelings/stimme": "src/games/feelings/shared.tsx",
+  "src/games/shadows/stimme": "src/games/shadows/voice.ts",
+  "src/games/together/stimme": "src/games/together/voice.ts",
+  "src/games/marbles/stimme": "src/games/marbles/voice.ts",
+  "src/games/potty/stimme": "src/games/potty/voice.ts",
+  "src/games/socks/stimme": "src/games/socks/voice.ts",
 };
 
 test("no two lines of a game share a recording", () => {

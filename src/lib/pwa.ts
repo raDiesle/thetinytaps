@@ -16,7 +16,7 @@ interface InstallPromptEvent extends Event {
 }
 
 const state = {
-  /** All files are in the browser; the games start without network. */
+  /** All files are in the browser (only an installed app keeps them all); the games start without network. */
   offlineReady: false,
   installPrompt: null as InstallPromptEvent | null,
   installed: false,
@@ -43,6 +43,15 @@ export const isStandalone = () =>
 
 /** iPhone / iPad Safari, where installing only works through the share menu. */
 export const isIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+
+/**
+ * The visitor asked to save data (Chrome's „Datensparmodus“, `Save-Data`) or is on a slow mobile network: then nothing
+ * is downloaded ahead that might never be used (other pages' code, the song), only what a tap asks for.
+ */
+export function savesData() {
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  return connection?.saveData === true || /(^|-)2g$/.test(connection?.effectiveType ?? "");
+}
 
 /** Runs `task` after the page has loaded, when the browser has nothing else to do (at the latest after 3 s). */
 export function afterLoad(task: () => void) {
@@ -75,19 +84,23 @@ export function setUpPwa() {
     event.preventDefault();
     update({ installPrompt: event as InstallPromptEvent });
   });
-  addEventListener("appinstalled", () => update({ installPrompt: null, installed: true }));
+  addEventListener("appinstalled", () => {
+    update({ installPrompt: null, installed: true });
+    keepAllOffline();
+  });
 
   // The very first worker also takes over the page, but then nothing is old. Nor is it when the page
   // already came from the network with the build the new worker keeps (src/sw.js opens pages so).
   const hadWorker = navigator.serviceWorker.controller !== null;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (hadWorker) void runsOldBuild().then((old) => old && update({ updateReady: true }));
+    // A newer worker took over, maybe while the old one was still downloading everything: it goes on.
+    if (isStandalone()) keepAllOffline();
   });
 
   const base = `${BASE_URL.replace(/\/$/, "")}/`;
-  // Only once the page has loaded and is idle: the new worker downloads every file of
-  // the site for offline use, and on a first visit that must not slow down the page
-  // itself (what the visitor and Google measure). Returning visitors already have it.
+  // Only once the page has loaded and is idle, so on a first visit the worker's start doesn't slow down the page
+  // itself (what the visitor and Google measure). It keeps only what is played; an installed app keeps everything.
   afterLoad(() =>
     navigator.serviceWorker
       .register(`${base}sw.js`, { scope: base, updateViaCache: "none" })
@@ -104,7 +117,23 @@ export function setUpPwa() {
         // E.g. private mode in Firefox: the site still works online.
       }),
   );
-  void navigator.serviceWorker.ready.then(() => update({ offlineReady: true }));
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data?.offlineReady) update({ offlineReady: true });
+  });
+  void navigator.serviceWorker.ready.then((registration) => {
+    // What this page loaded before the worker was there (on a first visit: all of it so far) is kept too.
+    const loaded = performance.getEntriesByType("resource").map((entry) => entry.name);
+    registration.active?.postMessage({ keep: loaded });
+  });
+  if (isStandalone()) keepAllOffline();
+}
+
+/**
+ * An installed app plays without network: its worker keeps every file of the site (src/sw.js). A page in a browser
+ * tab doesn't ask for that – most visitors never play offline, and it was 42 MB for each of them.
+ */
+function keepAllOffline() {
+  void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ keepAll: true }));
 }
 
 /**

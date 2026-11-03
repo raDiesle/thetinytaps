@@ -120,37 +120,118 @@
   }
 }
 
-.play-options-button {
-  font-family: var(--font-emoji);
-}
-
-.play-options-hint {
-  position: absolute;
-  left: calc(100% + 8px);
-  padding: 3px 10px;
+/*
+ * ⚙️ carries its name in words, big enough to be seen across the room: the bare gear, its name shown only while held,
+ * was not found by grown-ups (user feedback, November 2026). Still held like ✕, so a child's tap does nothing.
+ */
+.play-options-button.hold-exit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  height: auto;
+  min-height: 68px;
+  padding: 8px 22px 8px 12px;
   border-radius: 999px;
-  background: #ffffffd0;
   color: var(--ink);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font: inherit;
+}
+
+.play-options-gear {
+  font-family: var(--font-emoji);
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.play-options-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  text-align: left;
   white-space: nowrap;
-  opacity: 0;
-  translate: -6px 0;
+}
+
+.play-options-label b {
+  font-size: 1.45rem;
+}
+
+.play-options-label small {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+/*
+ * The intro note under ⚙️ as play starts (a game with many ways to play): it tells grown-ups what they can choose
+ * there, stays a few seconds, then fades and is gone (`INTRO_MS`); taps go through it to the game.
+ */
+.play-options-intro {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  width: max-content;
+  max-width: min(430px, 72vw);
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #fffffff2;
+  box-shadow:
+    0 0 0 1px #0000001f,
+    0 4px 14px #00000033;
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1.35;
   pointer-events: none;
-  transition:
-    opacity 0.4s,
-    translate 0.4s;
+  animation: play-options-intro var(--intro-ms) ease-out var(--turn-time, 0.4s) both;
 }
 
-.play-options-corner.hinted .play-options-hint {
-  opacity: 1;
-  translate: 0 0;
-  transition: none;
+.play-options-intro b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1.4rem;
 }
 
-@media (hover: hover) {
-  .play-options-corner:hover .play-options-hint {
+/* Phones keep the game's room: the note and its intro a step smaller. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .play-options-button.hold-exit {
+    min-height: 54px;
+    padding: 5px 14px 5px 8px;
+  }
+
+  .play-options-gear {
+    font-size: 2rem;
+  }
+
+  .play-options-label b {
+    font-size: 1.15rem;
+  }
+
+  .play-options-intro {
+    top: calc(100% + 8px);
+    max-width: min(340px, 60vw);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .play-options-intro b {
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes play-options-intro {
+  0% {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+
+  5%,
+  90% {
     opacity: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
     translate: 0 0;
   }
 }

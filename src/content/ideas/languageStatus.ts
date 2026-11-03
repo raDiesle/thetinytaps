@@ -77,8 +77,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "🚽 Bilder und Texte",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
       },
       {
         label: "🎵 Warte-Lied (gesungen)",
@@ -122,8 +123,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/kettenreaktion/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Alle Bahnen und Maschinen, auch Schneebahn, Weltraumbahn, Wasserrutsche, Baustellen-Bahn und „Schranke und Weiche“ (übersetzt am 3. November 2026).",
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Alle Bahnen und Maschinen, auch Schneebahn, Weltraumbahn, Wasserrutsche, Baustellen-Bahn und „Schranke und Weiche“ (übersetzt am 3. November 2026). Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
   },
   {
     href: "/kleine-abenteuer/",
@@ -190,25 +192,30 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/zusammen/",
+    recorded: true,
     languages: { de: "done" },
-    note: "Neu (November 2026): nur auf Deutsch – die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase und die Einstellungen beim Spielen. Gesprochen wird noch nichts; die Sätze warten auf ihre Aufnahme.",
+    note: "Neu (November 2026): nur auf Deutsch – die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs (3. November 2026).",
   },
   {
     href: "/schatten/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
   },
   {
     href: "/socken/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    recorded: true,
+    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
   },
   {
     href: "/buchstaben/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Noch nicht übersetzt: der Hinweis unter ⚙️ beim Spielstart („Hier gibt es viele Spielarten …“, November 2026). Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
   },
   {
     href: "/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Der Name „Books for Both“ bleibt in allen Sprachen gleich. Neu und nur Deutsch: im Buch-Look „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx).",
   },
 ];

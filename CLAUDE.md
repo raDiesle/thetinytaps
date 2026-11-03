@@ -382,6 +382,10 @@ In a fresh worktree run `bun install` first.
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big. Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
+  Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
+  `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
+  already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
+  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own.
 
 ## Architecture
 
@@ -447,6 +451,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   only between games, while it is in the background on a menu: menu pages call `useUpdateBetweenGames()`
   (`src/lib/pwa.ts`) – a new menu page does too, a game never. Never restart or reload on a tap: restarting when a
   menu card was tapped made the next menu take seconds to show.
+- Offline: the service worker keeps what a visit uses – at install only the start (`shellFiles` in `tools/build.ts`:
+  index.html, its scripts and styles and the pictures they name), then every file of the site once a page fetched it,
+  so a game played once plays offline – and the whole site only for an installed app (`keepAll`, `isStandalone`). A new
+  build takes over the files named by their content from the old cache instead of downloading them again. Never
+  download every file for every visitor again: it was 42 MB on each first visit and after each build, while few play
+  offline (November 2026; `sw.test.ts`). What is fetched ahead (other pages' code, the song) waits when the visitor
+  saves data (`savesData()` in `src/lib/pwa.ts`).
 - A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
@@ -491,7 +502,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the 🌐 lines and the language's name on its foot (the language – never a light switch); stickers of the fox girl and
   the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
   where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
-  right inner side), and no books spine out stand against that wall to hide them. The texts that stood below
+  right inner side), and no books spine out stand against that wall to hide them. „Wer spielt?“ stands small on that same wall
+  right above the first sticker's head, the fox's, in one line (`.shelf-figure-ask`, user feedback, November 2026:
+  carved big into the back panel beside the wall it was too far from the stickers it asks about). The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
@@ -530,9 +543,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
-  findable on dark pictures). While playing, ⚙️'s note is the bigger one, its gear large, and as play starts it lights
-  up softly twice, then stands still – never a glow that keeps going or comes back while playing (user feedback, November
-  2026: the small grey gear wasn't seen; `look.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
+  findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large and its name
+  in words beside it, always shown („Einstellungen“, „halten“ under it), and as play starts it lights up softly twice,
+  then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
+  grey gear wasn't seen, and without words grown-ups didn't know it held the options; `look.test.ts`). A game with many
+  ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
+  be chosen there, that fades by itself after a few seconds, goes once the options were opened and lets taps through
+  (`PlayOptions.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
   grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
   `look.test.ts`); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
