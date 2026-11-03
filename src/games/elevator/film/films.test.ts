@@ -48,6 +48,17 @@ for (const film of FILMS) {
       }
     });
 
+    test("each way comes out as a card of its own, a close-up with its own sound, not the strip's small picture", () => {
+      for (const scene of all.values()) {
+        const options = scene.choice?.options ?? [];
+        expect(new Set(options.map((o) => o.card)).size, scene.id).toBe(options.length);
+        for (const o of options) {
+          expect(o.card, `${scene.id} ${o.id}`).not.toBe(o.picture);
+          expect(o.sounds?.length, `${scene.id} ${o.id}`).toBeGreaterThan(0);
+        }
+      }
+    });
+
     test("what the child taps lies wholly in the part of the picture that is always seen", () => {
       for (const scene of all.values()) {
         for (const beat of scene.beats) if (beat.tap) expect(inside(scene.focus, beat.tap.at, beat.tap.r), `${scene.id} ${beat.ask}`).toBe(true);
