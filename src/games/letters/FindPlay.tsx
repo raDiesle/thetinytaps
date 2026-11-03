@@ -7,8 +7,8 @@ import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playRandomNote } from "@/lib/sfx";
-import { speak } from "@/lib/speech";
 import { LetterWord } from "./Cards";
+import { useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 
 /** Keys closer together than this only make ripples, so mashing the whole keyboard doesn't count as finding. */
@@ -64,12 +64,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const letters = useMemo(() => findableLetters(pack, settings.theme), [pack, settings.theme]);
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
-    },
-    [settings.speech, pack.speechLang],
-  );
+  const say = useLettersSay();
 
   const softTap = useCallback(
     (x?: number, y?: number) => {
@@ -141,7 +136,8 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       if (keyMatches(key, current.letter.upper, pack)) {
         setFound(true);
         if (settings.sounds) playChime();
-        say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
+        say(pack.letterSentence(current.letter, current.word));
+        say(pick(pack.praise), true);
         celebrate();
         return;
       }

@@ -19,6 +19,7 @@ const PLAYERS: Record<string, string> = {
   "src/games/marbles/stimme": "src/games/marbles/voice.ts",
   "src/games/potty/stimme": "src/games/potty/voice.ts",
   "src/games/socks/stimme": "src/games/socks/voice.ts",
+  "src/games/letters/stimme": "src/games/letters/voice.ts",
 };
 
 test("no two lines of a game share a recording", () => {
