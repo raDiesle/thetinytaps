@@ -1,0 +1,292 @@
+/* Timer (H-04): one picture runs down for the minutes set. Every moving part is an HTML layer moved by a CSS animation
+   as long as the timer (`--tm-ms`, set on the stage), so the still drawing behind it is painted once. */
+
+.tm-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  touch-action: none;
+  user-select: none;
+  background: #2b2d5c;
+}
+
+/* A 16:9 stage covering the screen, its middle in the middle; the drawings keep what matters well inside it. */
+.tm-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100cqw, calc(100cqh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
+}
+
+.tm-layer {
+  position: absolute;
+}
+
+.tm-layer > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-move {
+  will-change: transform;
+}
+
+/* Zug zum Bahnhof: the train rolls from its start to the buffers; at the end it stands there. */
+.tm-train {
+  animation: tm-roll var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-train {
+  animation: none;
+  transform: translateX(var(--tm-train));
+}
+
+@keyframes tm-roll {
+  to {
+    transform: translateX(var(--tm-train));
+  }
+}
+
+.tm-steam {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: tm-steam 1.2s ease-out forwards;
+}
+
+@keyframes tm-steam {
+  from {
+    opacity: 0.95;
+    transform: translateY(10px) scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-70px) scale(1.5);
+  }
+}
+
+/* Sanduhr: the top heap sinks out through the neck, the bottom heap rises; the stream runs while it does. */
+.tm-sand {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(#ffd8a8, #f4a95c);
+}
+
+.tm-sand-top {
+  top: 30%;
+  height: 70%;
+  animation: tm-sink var(--tm-ms) linear forwards;
+}
+
+.tm-sand-bottom {
+  top: 30%;
+  height: 70%;
+  border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+  transform: translateY(100%);
+  animation: tm-rise var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-sand-top {
+  animation: none;
+  transform: translateY(100%);
+}
+
+.tm-done .tm-sand-bottom {
+  animation: none;
+  transform: none;
+}
+
+@keyframes tm-sink {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes tm-rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.tm-stream {
+  overflow: hidden;
+}
+
+.tm-stream-grains {
+  position: absolute;
+  inset: -50% 0 0;
+  background: repeating-linear-gradient(#f4a95c 0 14px, #ffd8a8 14px 20px, #f4a95c 20px 28px);
+  border-radius: 4px;
+  animation: tm-pour 0.6s linear infinite;
+}
+
+@keyframes tm-pour {
+  to {
+    transform: translateY(28px);
+  }
+}
+
+/* Kerze: the wax shrinks from the bottom up, and its top with wick and flame goes down by as much. */
+.tm-wax {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #ffc9c9, #ffe3e3 40%, #fff0f0 55%, #ffc9c9);
+  border: 0.35cqw solid #3b2a20;
+  border-top: none;
+  border-radius: 0 0 8% 8% / 0 0 2% 2%;
+  transform-origin: 50% 100%;
+  animation: tm-burn var(--tm-ms) linear forwards;
+}
+
+.tm-flame-box {
+  /* The part that burns away, as a share of the candle's height (CANDLE: 510 high, 90 left). */
+  --tm-burnt: 82.35%;
+  animation: tm-burn-top var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-wax,
+.tm-blow .tm-wax {
+  animation: none;
+  transform: scaleY(0.1765);
+}
+
+.tm-done .tm-flame-box,
+.tm-blow .tm-flame-box {
+  animation: none;
+  transform: translateY(var(--tm-burnt));
+}
+
+@keyframes tm-burn {
+  to {
+    transform: scaleY(0.1765);
+  }
+}
+
+@keyframes tm-burn-top {
+  to {
+    transform: translateY(var(--tm-burnt));
+  }
+}
+
+.tm-flame {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 1.6%);
+  width: 66%;
+  aspect-ratio: 80 / 130;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: tm-flicker 1.4s ease-in-out infinite alternate;
+}
+
+/* The flame's warm light on the wall round it. */
+.tm-flame::before {
+  content: "";
+  position: absolute;
+  inset: -120% -180%;
+  background: radial-gradient(closest-side, rgb(255 214 120 / 0.45), transparent);
+  pointer-events: none;
+}
+
+.tm-flame > div,
+.tm-flame svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
+}
+
+@keyframes tm-flicker {
+  from {
+    transform: translateX(-50%) scale(1, 1) skewX(-2deg);
+  }
+  to {
+    transform: translateX(-50%) scale(0.94, 1.06) skewX(2deg);
+  }
+}
+
+.tm-flare {
+  animation: tm-flare 0.7s ease-out;
+}
+
+@keyframes tm-flare {
+  40% {
+    transform: scale(1.35, 1.6);
+  }
+}
+
+.tm-smoke {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 3%);
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(220 220 230 / 0.8);
+  transform: translateX(-50%);
+  animation: tm-smoke 1.6s ease-out forwards;
+}
+
+@keyframes tm-smoke {
+  to {
+    opacity: 0;
+    transform: translate(-30%, -260%) scale(2.4);
+  }
+}
+
+/* The family stands still while it waits; at the end the grown-up and the child wave and hop. */
+.tm-arm {
+  transform-box: view-box;
+  transform-origin: 144px 178px;
+}
+
+.tm-done .tm-arm {
+  animation: tm-wave 2.4s ease-in-out forwards;
+}
+
+.tm-done .tm-mascot {
+  animation: hop 0.6s ease-out 2;
+}
+
+.tm-done .tm-mascot-child {
+  animation-delay: 0.2s;
+}
+
+@keyframes tm-wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  20%,
+  50%,
+  80% {
+    transform: rotate(-160deg);
+  }
+  35%,
+  65% {
+    transform: rotate(-125deg);
+  }
+  100% {
+    transform: rotate(-145deg);
+  }
+}
+
+/* The bear child leans to the candle and blows it out. */
+.tm-blow .tm-mascot-child {
+  transform-origin: 50% 100%;
+  animation: tm-lean 0.7s ease-in-out forwards;
+}
+
+@keyframes tm-lean {
+  to {
+    transform: rotate(10deg) translateX(8%);
+  }
+}

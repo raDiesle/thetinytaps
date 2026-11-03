@@ -94,6 +94,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
+    href: "/timer/",
+    note: "Neu (3. November 2026), nur Deutsch: der Name „Timer“ und sein Satz im Regal, die Namen der drei Bilder und „Wie lange?“ mit den Minuten (content.ts, TimerGame.tsx). Sagt sonst nichts.",
+    languages: { de: "done" },
+  },
+  {
     href: "/schnullerfee/",
     note: "Neu im November 2026, nur Deutsch: der Name „Die Schnullerfee“ und der Satz auf dem Buchrücken, die Namen der Dinge (nur vorgelesen) und hinter ⚙️ „Abschied der Schnuller“ (Schnullerkästchen, Luftballon) und „Geschenk der Fee“ mit den acht Geschenken. Die Geschichte selbst kommt ohne Worte aus.",
     languages: { de: "done" },
@@ -146,8 +151,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏖️ Die fünf neueren Wege und 🚒 Die Feuerwehr",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch aufgenommen; übersetzt am 30. Oktober 2026, die 734 Sätze der anderen Sprachen (≈ 2.600 Credits) warten auf ihre Aufnahme: bun run voice make --only kleine-abenteuer. Bis dahin sind diese Sätze in den anderen Sprachen still.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Übersetzt am 30. Oktober 2026, alle 734 Sätze der anderen Sprachen von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026, 2.881 Credits).",
       },
     ],
   },

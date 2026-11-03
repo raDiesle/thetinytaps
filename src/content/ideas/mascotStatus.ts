@@ -59,6 +59,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
   },
   {
+    href: "/timer/",
+    note: "Alles SVG: beim Zug wartet die Bärenfamilie am Bahnhof, bei der Sanduhr steht die Fuchsfamilie daneben, bei der Kerze pustet das Bärenkind sie aus; am Ende winken alle.",
+    tasks: [{ label: "Fuchs- oder Bärenfamilie in jedem Bild, sie winkt am Ende", work: "drawing", effort: "S", state: "done" }],
+  },
+  {
     href: "/schnullerfee/",
     note: "SVG. Tapsi und Mama Fuchs im Kinderzimmer; die Schnullerfee ist eine kleine Bärin mit Flügeln – Fuchs und Bär sind beide da.",
     tasks: [{ label: "Tapsi, Mama Fuchs und die Bärenfee in der Geschichte", work: "drawing", effort: "M", state: "done" }],

@@ -19,8 +19,8 @@ const UNLOCK_HOLD_MS = 3000;
 export function PlaytimeLock() {
   const { over, inGame } = usePlaytimeState();
   const { pathname, state } = useLocation();
-  // The Belohnungstafel and the Tagesplan are tools for the day, not games: the evening routine still works.
-  const tool = ["/management", "/ideen", "/belohnungstafel", "/tagesplan"].some((path) => pathname.startsWith(path));
+  // The Belohnungstafel, the Tagesplan and the Timer are tools for the day, not games: the evening routine still works.
+  const tool = ["/management", "/ideen", "/belohnungstafel", "/tagesplan", "/timer"].some((path) => pathname.startsWith(path));
   const locked = over && !inGame && !tool && !routineReturn(state);
   return locked ? <Lock /> : null;
 }

@@ -47,6 +47,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Ein Großer stellt 1 bis 10 Minuten ein. Ohne Zahlen fürs Kind: Ein Zug fährt langsam zum Bahnhof, eine Sanduhr rinnt, eine Kerze brennt herunter. Am Ende ein freundlicher Ton und das Tier winkt. Für „noch fünf Minuten spielen“, Warten aufs Essen oder Aufräumen.",
       why: "Eltern suchen „visueller timer kinder online“, „sanduhr kinder“ und „timer kinder ampel“. Anders als A-03 begrenzt er nicht das Spiel, sondern hilft im Alltag.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als Timer (/timer/), ein eigenes Buch bei den Alltagshelfern: Zug zum Bahnhof, Sanduhr oder Kerze, 1, 2, 3, 5 oder 10 Minuten in der Reihe über den Karten. Am Ende eine Melodie und die Fuchs- oder Bärenfamilie winkt (bei der Kerze pustet das Bärenkind sie aus). Der Bildschirm bleibt an, und der Timer zählt keine Spielzeit.",
     },
     {
       id: "H-05",

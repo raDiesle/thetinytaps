@@ -177,6 +177,13 @@ export const SEO_PAGES: PageSeo[] = [
     text: "Eine Belohnungstafel für Kleinkinder, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern.",
   },
   {
+    path: "/timer/",
+    title: "Visueller Timer für Kinder – Sanduhr, Zug und Kerze",
+    description:
+      "Ein Timer ohne Zahlen für Kleinkinder: ein Zug fährt zum Bahnhof, eine Sanduhr rinnt, eine Kerze brennt herunter. 1 bis 10 Minuten, am Ende winkt die Familie.",
+    text: "Ein visueller Timer für Kinder, die noch keine Uhr lesen: Ein Erwachsener stellt 1, 2, 3, 5 oder 10 Minuten ein, und das Kind sieht die Zeit vergehen – ein kleiner Zug rollt zum Bahnhof, wo die Bärenfamilie wartet, der Sand rinnt durch eine große Sanduhr, oder eine Kerze brennt herunter, bis das Bärenkind sie auspustet. Am Ende klingt eine fröhliche Melodie und die Familie winkt. Für „noch fünf Minuten spielen“, das Warten aufs Essen oder fürs Aufräumen; der Bildschirm bleibt dabei an, und der Timer läuft auch, wenn die Spielzeit vorbei ist.",
+  },
+  {
     path: "/tagesplan/",
     title: "Tagesplan für Kinder – Tag und Woche in Bildern",
     description:

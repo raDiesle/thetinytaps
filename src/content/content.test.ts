@@ -476,6 +476,7 @@ test("the Alltagshelfer stand first on the shelf, the slipcase of Belohnungstafe
     "/zaehne/",
     "/toepfchen/",
     "/belohnungstafel/",
+    "/timer/",
     "/schnullerfee/",
   ]);
   expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);
