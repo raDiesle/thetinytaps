@@ -403,7 +403,7 @@ export function Traktor() {
         <rect x="-86" y="-58" width="8" height="12" rx="3" fill="#ffd60a" />
         <rect x="10" y="-124" width="76" height="94" rx="8" fill="#1971c2" />
         <Pane x={20} y={-116} w={56} h={44}>
-          <Rider cx={46} cy={-92} shirt="#e63946" cap="#2b2d42" />
+          <Rider animal="fox" cx={46} cy={-92} shirt="#e63946" cap="#2b2d42" />
         </Pane>
         {[
           [-56, -22, 22],

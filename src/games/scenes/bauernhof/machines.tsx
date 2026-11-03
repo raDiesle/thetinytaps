@@ -37,7 +37,7 @@ export function Traktor() {
         <rect x="6" y="-224" width="9" height="100" fill="#495057" />
         <Pane x={-103} y={-218} w={109} h={84} rx={4}>
           <g className="bh-driver">
-            <Rider cx={-50} cy={-170} shirt="#3a86ff" cap="#2d6a4f" />
+            <Rider animal="bear" cx={-50} cy={-170} shirt="#3a86ff" cap="#2d6a4f" />
           </g>
         </Pane>
         <rect x="-124" y="-136" width="140" height="78" rx="10" fill="#e63946" />
@@ -76,7 +76,7 @@ export function Maehdrescher() {
       <path d={CAB} fill="#bde0fe" />
       <Inside d={CAB}>
         <g className="bh-driver">
-          <Rider cx={-76} cy={-212} shirt="#e76f51" cap="#ffb703" />
+          <Rider animal="fox" cx={-76} cy={-212} shirt="#e76f51" cap="#ffb703" />
         </g>
       </Inside>
       <path d={CAB} stroke="#2d6a4f" strokeWidth="6" fill="none" />

@@ -27,8 +27,8 @@ const guard = (cx: number, cy: number, r: number) => `M${cx - r} ${cy} A${r} ${r
 
 const PASSENGERS = [
   { x: -92, shirt: "#ff5d73", hair: "#e9c46a" },
-  { x: -22, shirt: "#06d6a0", hair: "#2b2d42" },
-  { x: 48, shirt: "#9d4edd", hair: "#dee2e6" },
+  { x: -22, shirt: "#06d6a0", hair: "#2b2d42", animal: "bear" as const },
+  { x: 48, shirt: "#9d4edd", hair: "#dee2e6", animal: "bear" as const, child: true },
   { x: 118, shirt: "#ffb703", hair: "#bc6c25" },
 ];
 
@@ -42,7 +42,7 @@ export function Bus() {
       <rect x="-196" y="-201" width="392" height="9" rx="4" fill="#90e0ef" />
       <Pane x={-206} y={-186} w={50} h={86} rx={10}>
         <g className="st-bus-driver">
-          <Rider cx={-178} cy={-140} shirt="#3a86ff" cap="#1d3557" />
+          <Rider animal="fox" cx={-178} cy={-140} shirt="#3a86ff" cap="#1d3557" />
         </g>
       </Pane>
       {/* Behind the doors: a passenger getting on */}
@@ -81,10 +81,10 @@ export function Bus() {
         strokeWidth="4"
         style={{ transformOrigin: "-102px -110px" }}
       />
-      {PASSENGERS.map(({ x, shirt, hair }, i) => (
+      {PASSENGERS.map(({ x, shirt, hair, ...mascot }, i) => (
         <Pane key={x} x={x} y={-186} w={60} h={70} rx={8}>
           <g className="st-bus-passenger" style={nth(i)}>
-            <Rider cx={x + 30} cy={-148} shirt={shirt} hair={hair} />
+            <Rider cx={x + 30} cy={-148} shirt={shirt} hair={hair} {...mascot} />
           </g>
         </Pane>
       ))}
@@ -121,7 +121,7 @@ export function Polizei() {
       <path d={POLICE_FRONT} fill={GLASS} />
       <Inside d={POLICE_FRONT}>
         <g className="st-polizei-driver">
-          <Rider cx={-22} cy={-94} shirt="#1d3557" cap="#1d3557" />
+          <Rider animal="bear" cx={-22} cy={-94} shirt="#1d3557" cap="#1d3557" />
         </g>
       </Inside>
       <path d={POLICE_BACK} fill={GLASS} />
@@ -215,7 +215,7 @@ export function Feuerwehr() {
       <path d={FIRE_CAB} fill={GLASS} />
       <Inside d={FIRE_CAB}>
         <g className="st-feuer-driver">
-          <Rider cx={150} cy={-148} shirt="#1d3557" cap="#ffd60a" />
+          <Rider animal="fox" cx={150} cy={-148} shirt="#1d3557" cap="#ffd60a" />
         </g>
       </Inside>
       <path d="M170 -176 h8 L162 -132 h-8 Z" fill="#fff" opacity="0.5" />
@@ -249,7 +249,7 @@ export function Muellauto() {
         <path d={BIN_CAB} fill={GLASS} />
         <Inside d={BIN_CAB}>
           <g className="st-muell-driver">
-            <Rider cx={132} cy={-142} shirt="#ff8c42" hair="#8d5a2b" />
+            <Rider animal="bear" cx={132} cy={-142} shirt="#ff8c42" hair="#8d5a2b" />
           </g>
         </Inside>
         <path d="M150 -168 h8 L144 -128 h-8 Z" fill="#fff" opacity="0.5" />
