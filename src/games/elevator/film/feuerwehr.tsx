@@ -1294,7 +1294,6 @@ const home: Scene = {
 export const FEUERWEHR: Film = {
   id: "feuerwehr",
   title: "Die Feuerwehr",
-  picture: TRUCK_ICON,
   end: "Was für ein Tag! Alle sind froh.",
   scenes: (picks) => {
     const [first, second] = picks as Job[];

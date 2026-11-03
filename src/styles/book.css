@@ -499,18 +499,42 @@
   -webkit-text-stroke: 0.05em var(--ink);
 }
 
-/* The end of a level: three picture cards lying on the page, like the menu's cards. */
+/* The end of a level: „Menü“ and „Nochmal“ two paper slips lying askew, „Weiter“ a big label painted red and taped
+   onto the page like a card. */
 :root .game-end-button {
-  border-radius: 18px 24px 20px 26px / 24px 18px 26px 20px;
+  border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
+}
+
+:root .game-end-button.menu {
+  rotate: -2deg;
 }
 
 :root .game-end-button.again {
-  rotate: -1.5deg;
+  rotate: 1.5deg;
 }
 
 :root .game-end-button.next {
-  rotate: 1.5deg;
-  background-color: color-mix(in srgb, var(--sunshine) 75%, var(--paper));
+  rotate: -1.5deg;
+  border-radius: 20px 28px 22px 30px / 28px 20px 30px 22px;
+  background-color: color-mix(in srgb, var(--accent) 88%, var(--paper));
+}
+
+:root .game-end-button.next::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 38%;
+  height: 22px;
+  translate: -50% 0;
+  rotate: 3deg;
+  background: repeating-linear-gradient(90deg, #fff6c890 0 6px, #ffeeb090 6px 12px);
+  box-shadow: 0 1px 2px #0000001f;
+  pointer-events: none;
+}
+
+:root .game-end.corners .game-end-button {
+  rotate: none;
 }
 
 /* The name of a group of cards is a small ribbon, as a book's chapters are marked. */
