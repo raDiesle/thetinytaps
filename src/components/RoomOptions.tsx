@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { AppLanguageOptions, LeaveOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
+import { MascotHead } from "@/components/Mascot";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { SeoWords } from "@/components/SeoText";
@@ -277,46 +278,27 @@ export function RoomNotes() {
   );
 }
 
-/** A fox girl's head: orange, a white muzzle, lashes and a pink bow on her ear. */
+/** A fox girl's head (the app's fox, `MascotHead`): lashes and a pink bow on her ear. */
 function FoxGirlHead() {
   return (
     <svg viewBox="0 0 100 100" aria-hidden>
-      <path className="head-fox" d="M17 50 L21 9 L45 29 Z M83 50 L79 9 L55 29 Z" />
-      <path className="head-ear-in" d="M24 39 L26 18 L38 30 Z M76 39 L74 18 L62 30 Z" />
-      <path className="head-fox" d="M13 52 C13 31 31 24 50 24 C69 24 87 31 87 52 C87 72 69 90 50 92 C31 90 13 72 13 52 Z" />
-      <path className="head-muzzle" d="M21 61 C33 58 44 63 50 73 C56 63 67 58 79 61 C75 78 63 90 50 92 C37 90 25 78 21 61 Z" />
-      <circle className="head-cheek" cx="27" cy="66" r="5" />
-      <circle className="head-cheek" cx="73" cy="66" r="5" />
-      <circle className="head-eye" cx="37" cy="52" r="4.6" />
-      <circle className="head-eye" cx="63" cy="52" r="4.6" />
-      <path className="head-lash" d="M33 47 L30 44 M36 46 L35 42 M67 47 L70 44 M64 46 L65 42" />
-      <ellipse className="head-eye" cx="50" cy="72" rx="5.4" ry="3.8" />
-      <path className="head-line" d="M50 76 V79 M45 81 Q50 84 55 81" />
-      <path className="head-bow" d="M64 22 L76 15 L75 30 Z M64 22 L54 12 L52 27 Z" />
-      <circle className="head-bow" cx="64" cy="22" r="4" />
+      <MascotHead kind="fox" child lashes>
+        <path className="head-bow" d="M66 20 L78 13 L77 28 Z M66 20 L56 10 L54 25 Z" />
+        <circle className="head-bow" cx="66" cy="20" r="4" />
+      </MascotHead>
     </svg>
   );
 }
 
-/** A bear boy's head: brown, round ears and a blue cap. */
+/** A bear boy's head (the app's bear, `MascotHead`) with a blue cap. */
 function BearBoyHead() {
   return (
     <svg viewBox="0 0 100 100" aria-hidden>
-      <circle className="head-bear" cx="22" cy="32" r="12" />
-      <circle className="head-bear" cx="78" cy="32" r="12" />
-      <circle className="head-ear-bear" cx="22" cy="32" r="6" />
-      <circle className="head-ear-bear" cx="78" cy="32" r="6" />
-      <circle className="head-bear" cx="50" cy="57" r="35" />
-      <ellipse className="head-snout" cx="50" cy="71" rx="16" ry="12" />
-      <circle className="head-cheek" cx="27" cy="68" r="5" />
-      <circle className="head-cheek" cx="73" cy="68" r="5" />
-      <circle className="head-eye" cx="37" cy="53" r="4.4" />
-      <circle className="head-eye" cx="63" cy="53" r="4.4" />
-      <ellipse className="head-eye" cx="50" cy="65" rx="6" ry="4.4" />
-      <path className="head-line" d="M50 69 V73 M44 75 Q50 79 56 75" />
-      <path className="head-cap" d="M17 42 C17 14 83 14 83 42 Z" />
-      <path className="head-cap-brim" d="M14 43 Q50 34 86 43 Q50 50 14 43 Z" />
-      <circle className="head-cap-brim" cx="50" cy="19" r="3.4" />
+      <MascotHead kind="bear" child>
+        <path className="head-cap" d="M19 38 C19 10 81 10 81 38 Z" />
+        <path className="head-cap-brim" d="M16 39 Q50 30 84 39 Q50 46 16 39 Z" />
+        <circle className="head-cap-brim" cx="50" cy="15" r="3.4" />
+      </MascotHead>
     </svg>
   );
 }

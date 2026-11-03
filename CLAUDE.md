@@ -185,6 +185,13 @@ In a fresh worktree run `bun install` first.
   step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
   that gets its fox or bear marks it there in the same commit, and a new game or picture adds its row or task.
   Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
+  **Every fox or bear drawn in SVG has the one shared head** (`MascotHead`, or the whole `Mascot`, in
+  `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
+  pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
+  in the ears, the far side of the fur in shadow, brows, eyes with two lights, a shiny nose. Never a head of its own
+  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Hats, bows and glasses go
+  in as its `children`, clothes and bodies round it in its colours and line; a better fox or bear is made there, so
+  every game gets it. Toys (a teddy), wild animals of a scene and tiny patterns stay drawn on their own. `Mascot.test.ts` checks.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run

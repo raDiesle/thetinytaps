@@ -1,4 +1,5 @@
 import { memo, useId, useMemo } from "react";
+import { MascotHead } from "@/components/Mascot";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BASKET,
@@ -1010,27 +1011,11 @@ function Clown({ at, turn, wave }: { at: Pt; turn: number; wave: number }) {
       <circle cx="0" cy="2" r="5" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
       <circle cx="0" cy="18" r="5" fill="#3ec300" stroke={INK} strokeWidth="2" />
       <path d="M-28 -14 L-18 -22 L-8 -14 L2 -22 L12 -14 L22 -22 L30 -14 L22 -8 L-20 -8 Z" fill="#fff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
-      {/* A fox doll dressed as a clown (D-18): pointed ears, white cheeks, the clown's nose and hat. */}
-      <path
-        d={`M-22 ${-CLOWN.head - 8} L-30 ${-CLOWN.head - 40} L-6 ${-CLOWN.head - 22} Z M22 ${-CLOWN.head - 8} L30 ${-CLOWN.head - 40} L6 ${-CLOWN.head - 22} Z`}
-        fill="#f08c3a"
-        stroke={INK}
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
-      <path
-        d={`M-22 ${-CLOWN.head - 14} L-26 ${-CLOWN.head - 32} L-12 ${-CLOWN.head - 22} Z M22 ${-CLOWN.head - 14} L26 ${-CLOWN.head - 32} L12 ${-CLOWN.head - 22} Z`}
-        fill="#fff"
-      />
-      <circle cx="0" cy={-CLOWN.head} r="26" fill="#f08c3a" stroke={INK} strokeWidth="3" />
-      <path
-        d={`M-24 ${-CLOWN.head + 4} C-16 ${-CLOWN.head + 2} -6 ${-CLOWN.head + 6} 0 ${-CLOWN.head + 14} C6 ${-CLOWN.head + 6} 16 ${-CLOWN.head + 2} 24 ${-CLOWN.head + 4} C20 ${-CLOWN.head + 18} 10 ${-CLOWN.head + 25} 0 ${-CLOWN.head + 26} C-10 ${-CLOWN.head + 25} -20 ${-CLOWN.head + 18} -24 ${-CLOWN.head + 4} Z`}
-        fill="#fff"
-      />
-      <circle cx="-9" cy={-CLOWN.head - 6} r="3.5" fill={INK} />
-      <circle cx="9" cy={-CLOWN.head - 6} r="3.5" fill={INK} />
-      <path d={`M-12 ${-CLOWN.head + 8} Q0 ${-CLOWN.head + 20} 12 ${-CLOWN.head + 8}`} stroke="#ff3b3b" strokeWidth="4" fill="none" strokeLinecap="round" />
-      <circle cx="0" cy={-CLOWN.head + 2} r="7" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
+      {/* A fox doll dressed as a clown (D-18): the app's fox head (components/Mascot.tsx) with the clown's red nose and hat. */}
+      <g transform={`translate(-35 ${-CLOWN.head - 39.2}) scale(0.7)`}>
+        <MascotHead kind="fox" mouth="open" />
+      </g>
+      <circle cx="0" cy={-CLOWN.head + 6.5} r="6" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
       <path
         d={`M-16 ${-CLOWN.head - 20} L0 ${-CLOWN.head - 62} L16 ${-CLOWN.head - 20} Z`}
         fill="#3ec300"
