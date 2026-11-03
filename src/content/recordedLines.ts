@@ -78,7 +78,8 @@ function weaning(language: TargetLanguageId): RecordedLine[] {
 }
 
 /**
- * A game recorded in German only so far (Was gehört zum Tier?, Gefühle, November 2026): its other languages are
+ * A game recorded in German only so far (Was gehört zum Tier?, Gefühle, Schatten finden, Was gehört zusammen?,
+ * Kettenreaktion, Aufs Töpfchen, Socken-Paare, November 2026): its other languages are
  * recorded only when the user asks (root CLAUDE.md), so until then they say nothing, and a `make` for other games
  * spends no credits on them. Its praise is said proudly, everything else warmly.
  */
@@ -106,6 +107,11 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "abstillen", folder: "src/games/weaning/stimme", lines: weaning },
   { name: "tiere", folder: "src/games/animals/stimme", lines: germanOnly("/tiere/") },
   { name: "gefuehle", folder: "src/games/feelings/stimme", lines: germanOnly("/gefuehle/") },
+  { name: "schatten", folder: "src/games/shadows/stimme", lines: germanOnly("/schatten/") },
+  { name: "zusammen", folder: "src/games/together/stimme", lines: germanOnly("/zusammen/") },
+  { name: "kettenreaktion", folder: "src/games/marbles/stimme", lines: germanOnly("/kettenreaktion/") },
+  { name: "toepfchen", folder: "src/games/potty/stimme", lines: germanOnly("/toepfchen/") },
+  { name: "socken", folder: "src/games/socks/stimme", lines: germanOnly("/socken/") },
 ];
 
 /** The languages these games are recorded in: the app's. */

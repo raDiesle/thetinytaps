@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
-import { targetLanguageFor } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
-import { useAppLanguage, useT, voiceFor } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import {
   playBoing,
   playChime,
@@ -31,7 +30,6 @@ import {
   recorded,
 } from "@/lib/sfx";
 import { loadRealSounds, playGiggle, playWhistle } from "@/lib/realSounds";
-import { speak } from "@/lib/speech";
 import {
   expectedWent,
   iconFor,
@@ -54,6 +52,7 @@ import { framesFor, preloadImages } from "./images";
 import type { PottySettings } from "./settings";
 import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
+import { pottyVoice } from "./voice";
 import { WaitClock } from "./WaitClock";
 import { WeekStars } from "./WeekStars";
 import { useWaitingMusic } from "./waitMusic";
@@ -94,6 +93,8 @@ interface Begin {
   said?: Said;
   /** Whether nothing came (the other story). */
   nothing?: boolean;
+  /** The step's words wait for what is being said (what the child said, just picked). */
+  queue?: boolean;
 }
 
 /**
@@ -175,16 +176,12 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     preloadImages(names);
   }, [at.step, at.nothing, said, went, scenes]);
 
-  const say = (text: string) => {
-    if (settings.speech) speak(text, voiceFor(text, language));
-  };
-  /** A thought's line; one not translated yet is said in German with the German voice, then the rest in the app's. */
+  /** Says `text` from its ElevenLabs recording (a German one where it is not translated); `queue` waits for what is said. */
+  const say = (text: string, queue = false) => pottyVoice.say(text, language.id, { queue });
+  /** A thought's line, in German where it is not translated yet, and after it what the ✓ is for. */
   const sayScene = (id: string, withFinish: boolean) => {
-    const own = texts.scenes[id];
-    if (own !== undefined) return say(withFinish ? `${own} ${texts.finish}` : own);
-    if (!settings.speech) return;
-    speak(POTTY_TEXTS.de.scenes[id], targetLanguageFor("de").speechLang);
-    if (withFinish) speak(texts.finish, voiceFor(texts.finish, language), { queue: true });
+    say(texts.scenes[id] ?? POTTY_TEXTS.de.scenes[id]);
+    if (withFinish) say(texts.finish, true);
   };
   const sound = (ms: number, play: () => void) => {
     if (settings.sounds) later(ms, play);
@@ -206,7 +203,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /** Plays step `index`: its picture shows, its sounds and words come here. */
-  const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing }: Begin = {}) => {
+  const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing, queue = false }: Begin = {}) => {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
     startedAt.current = performance.now();
@@ -214,7 +211,11 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     const line = texts.steps[id](t(TAPSI.name), came ?? saidNow);
     // The end shows this week's stars, with a new one only when a ✓ said what really came in this round.
     const star = id === "stars" && checked.current && !starred.current;
-    say(star ? texts.star : nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
+    if (star) say(texts.star, queue);
+    else if (nothing && id === "wash") {
+      say(texts.nothing, queue);
+      say(line, true);
+    } else say(line, queue);
     switch (id) {
       case "eat":
         // In time with the pictures: eating first, drinking when its picture comes.
@@ -374,9 +375,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     spawn(e.clientX, e.clientY);
     setSaid(choice);
     stopTimers();
-    begin(atRef.current.step + 1, { came: null, said: choice });
-    // Said before the next step's words, which the speech queues after it.
+    // Said before the next step's words, which wait for it.
     say(texts.said[choice]);
+    begin(atRef.current.step + 1, { came: null, said: choice, queue: true });
   };
 
   /** A ✓ while sitting: a grown-up says what is in the potty, and the story goes on with it. */

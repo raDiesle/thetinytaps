@@ -3,8 +3,7 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
-import { type Localized, pick, spokenIn, useAppLanguage } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { type Localized, pick, useAppLanguage } from "@/lib/language";
 import { BathLevel } from "./BathLevel";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
@@ -23,6 +22,7 @@ import { SpaceLevel } from "./SpaceLevel";
 import { TidyLevel } from "./TidyLevel";
 import { ToppleLevel } from "./ToppleLevel";
 import { SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
+import { marblesVoice } from "./voice";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
@@ -96,18 +96,12 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     },
     [settings.sounds],
   );
-  // Every line is said in the app language, with that language's voice; a line not translated yet in German, with the German voice.
-  const say = useCallback(
-    (text: Localized) => {
-      if (!settings.speech) return;
-      const line = spokenIn(text, language);
-      speak(line.text, line.lang, { queue: true });
-    },
-    [settings.speech, language],
-  );
+  // Every line is said from its ElevenLabs recording in the app language; a line not translated yet in German. Lines wait
+  // for each other, but a level's first line cuts off what is still said from before.
+  const say = useCallback((text: Localized, queue = true) => marblesVoice.say(pick(text, language.id), language.id, { queue }), [language.id]);
 
   useEffect(() => {
-    say(LEVEL_TEXTS[level.id].intro);
+    say(LEVEL_TEXTS[level.id].intro, false);
   }, [level, round, say]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
