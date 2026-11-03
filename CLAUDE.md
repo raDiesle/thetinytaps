@@ -491,7 +491,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the 🌐 lines and the language's name on its foot (the language – never a light switch); stickers of the fox girl and
   the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
   where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
-  right inner side), and no books spine out stand against that wall to hide them. The texts that stood below
+  right inner side), and no books spine out stand against that wall to hide them. „Wer spielt?“ above them is carved into
+  the back panel beside that wall (`.shelf-figure-ask`, user request, November 2026): words go on the back panel, never
+  on a side wall, which is seen nearly edge-on and squeezes them past reading. The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
