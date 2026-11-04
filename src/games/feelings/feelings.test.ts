@@ -79,13 +79,11 @@ test("every story is in exactly one group", () => {
   expect(grouped.toSorted()).toEqual(STORIES.map((s) => s.id).toSorted());
 });
 
-// Every round says first whether the child is the bear or helps its friend the bear (user feedback, November 2026).
-test("every round says whose view it takes", () => {
+// Only the last step of a story shows its happy end.
+test("every story ends on its last step", () => {
   for (const story of STORIES) {
     for (let step = 0; step < stepsOf(story); step++) {
       const round = roundOf(story, step, "de");
-      expect(round.start.beats[0].narration, `${story.id} step ${step + 1}`).toMatch(/kleine Bär/);
-      // Only the last step of a story shows its happy end.
       expect(!!round.end, `${story.id} step ${step + 1} end`).toBe(step === stepsOf(story) - 1);
     }
   }
@@ -106,6 +104,17 @@ test("the game answers calmly", () => {
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
   for (const name of ["fg-hop", "fg-shake", "fg-call", "fg-glow", "fg-stamp", "pop-in", "wiggle"]) expect(css, name).not.toContain(name);
   expect(css.match(/infinite/g)?.length ?? 0, "only the picture's fade repeats").toBeLessThanOrEqual(1);
+});
+
+// A scene waits for a tap on its picture (▶), never for a timer; then the big picture stands still and the cards' frames
+// take turns, so only one thing moves at a time. Captions are never cut off with „…“ (user feedback, November 2026).
+test("a scene goes on with a tap, and one thing moves at a time", () => {
+  const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
+  expect(round).toContain('onNext={phase === "intro" ? goOn : undefined}');
+  expect(round).toContain('still={phase === "choose"}');
+  expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
+  expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain('<Frames name={image} moving={active} className="fg-card-image" />');
+  expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
 });
 
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.

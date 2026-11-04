@@ -27,11 +27,18 @@ The dots at the top are the pass's scenes.
 second tap, no hand tapping, no way back from a card. The not-so-good card shows big with a still red frame, a cross on
 the corner and what it leads to, heard, while the answer says why; then the starting picture with that card crossed
 out and the good one left. The good card gets a still green frame with a tick and a laugh („Juhu!“), then its picture.
-Keys: the left arrow picks the not-so-good idea, every other key the good one. Tapping the big picture does nothing.
+Keys: the left arrow picks the not-so-good idea, every other key the good one.
+
+**A scene goes on with a tap, never by a timer (user feedback, November 2026):** the starting picture is told and
+then waits, with ▶ in its bottom right corner; one tap anywhere on the picture (or any key) brings the two cards. The
+narration goes on meanwhile. Once the cards are there, tapping the big picture does nothing. After a choice the
+story still goes on by itself (the good idea's picture, the happy end, the next scene).
 
 **Calm (user feedback, November 2026):** nothing floats up (no hearts, stars, 💢, 💥, 💧, 💤, 🎉), nothing hops,
-shakes, pulses, glows, stamps or grows – not after a choice, not while waiting. The cards stand still (only their
-first frame); only the big picture's two frames fade slowly into each other (`FRAME_MS`, 1.5 s). The picture of the
+shakes, pulses, glows, stamps or grows – not after a choice, not while waiting. Only one thing moves at a time, its
+two frames fading slowly into each other (`FRAME_MS`, 1.5 s, `Frames` in `shared.tsx`): the big picture while the scene
+is shown and while a chosen idea plays, the two cards while the child chooses – then the big picture stands on its
+first frame (user feedback, November 2026). The picture of the
 choice – the relieved, happy bear – is the answer. `GameEnd`'s pop and „Weiter“'s breathing are switched off here too.
 `feelings.test.ts` fails on a `float(`, the old keyframes, or a second `infinite` animation.
 
@@ -41,17 +48,19 @@ happened. The questions written before (November 2026: „Der Bär ist noch trau
 in `bear.ts`, `kita.ts`, `selbst.ts`) still do; rewriting them means new recordings and translations, so it waits
 until the user asks.
 
-**Whose view a scene takes is said first (user feedback, November 2026):** every round starts with a line that tells
-grown-ups and child whether the child _is_ the little bear or _helps_ its friend the bear (`ROLE_LINES`: „Stell dir
-vor: Du bist der kleine Bär.“ / „Der kleine Bär ist dein Freund. Du hilfst ihm.“), shown as the starting picture's
-caption while the scene begins. At home the role follows who does the good thing (`Comfort.actor`: the child comforts
-→ friend; the bear stomps, blows, lies down → self), in the kindergarten and the stories of more feelings the child is
-the bear. A new story or kind thing sets this; the test checks every round starts with it.
+**The whole text at once, and it says whose view the scene takes (user feedback, November 2026):** the big picture's
+caption is the round's question from the moment the scene shows, never one sentence after another: what is the matter
+and who chooses, in one compact line – „Der Bär hat Angst. Was machst du?“ when the child helps him, „Der kleine Bär
+ist ganz oben. Was kann er tun?“ when the bear acts himself. A separate role sentence before it („Stell dir vor: Du
+bist der kleine Bär.“, `ROLE_LINES`) was tried and taken out again: two sentences in turn said less than one question.
+A caption, big or on a card, always shows whole: it takes a second line, never „…“ (`feelings.test.ts` checks).
 
 **Layout (user's choice, November 2026):** wide screens (from 6:5) put the picture in the middle, as big as the
 height allows unless the cards would get less than a quarter of the width (`--card-min`, 30 % on tablets), the
 not-so-good card at the bottom left and the good one at the top right, each lying a fifth of its width over a corner
-of the picture; the picture's tick or cross sits on its top left corner. No margins beyond 8 px. At the end „Menü“ and
+of the picture; the picture's tick or cross sits on its top left corner. No margins beyond 8 px – not even a phone's safe-area
+inset, which left an empty strip beside the card. Cards are never see-through, waiting or crossed out (pale by filter,
+not opacity): the big picture showed through and seemed to lie on top of them. At the end „Menü“ and
 „Nochmal“ stand left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
 below. Captions lie on the pictures' lower edge on wide or low screens. Look at 844×390, 1024×768 and 1280×720 after
 a change.
@@ -129,7 +138,9 @@ shows (`bilder/README.md`, „Jede Karte versteht man ohne Worte“, has the wor
   pusten“ looked like blowing out the candles or spitting on the cake). So pick a story's cause that no card seems to act on
   (the home's angry bear: a shoe that won't go on, no longer a fallen tower).
 - A good idea shows in the face that it helps: after blowing, breathing or a hug he looks relieved and happy (soft
-  closed eyes, a smile, no red face); only the first picture and the not-so-good ideas keep the angry face.
+  closed eyes, a smile, no red face); only the first picture and the not-so-good ideas keep the angry face. The others
+  in a good idea's picture are glad too: the fox the bear calls up or helps smiles, never looks worried (user feedback,
+  November 2026: on the climbing frame the fox looked sad on the good cards).
 - When he acts himself, the prompt says „No hands, no arms come in from the edges“ (the home's room prompt allows a
   child's hands, and Gemini drew one pointing at the bear throwing alone).
 
@@ -148,7 +159,8 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out
-for a little movement in the big picture (`useFrame` in `shared.tsx`); the cards show only their first frame. A picture the game asks for that is not made yet shows a placeholder with its
+for a little movement (`Frames` in `shared.tsx`): in the big picture while the scene is shown, on the cards while the
+child chooses. A picture the game asks for that is not made yet shows a placeholder with its
 file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
 with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first and then
 make it with `/bild-erzeugen`. A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:

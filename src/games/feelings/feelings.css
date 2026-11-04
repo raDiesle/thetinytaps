@@ -1,9 +1,9 @@
 /* The feelings game: a scene, one question, two picture cards – the not-so-good idea and the good one.
    The only words are small captions for grown-ups.
 
-   Calm (user feedback, November 2026): nothing hops, shakes, pulses, grows or floats up after a choice, and the cards
-   stand still – the picture that comes (a relieved, happy bear) is the answer. Only the big picture's two frames fade
-   slowly into each other.
+   Calm (user feedback, November 2026): nothing hops, shakes, pulses, grows or floats up after a choice – the picture
+   that comes (a relieved, happy bear) is the answer. Only one thing moves at a time, its two frames fading slowly into
+   each other: the big picture while the scene is shown, the two cards while the child chooses.
 
    The picture and the cards keep one size for the whole round: things that grow and shrink confuse small children.
    So their room is worked out from the screen alone (cq units of .story-play), never from what is in it.
@@ -15,10 +15,10 @@
   /* Edges and the space between cards. */
   --pad: 12px;
   --gap: clamp(12px, 2.4cqmin, 28px);
-  /* Under a card: its ring and shadow, a gap and one line of caption. */
-  --label: 38px;
-  /* The caption under the big picture, below the ring a chosen picture gets. */
-  --caption-h: 2.1rem;
+  /* Under a card: its ring and shadow, a gap and up to two lines of caption. */
+  --label: 52px;
+  /* The caption under the big picture, below the ring a chosen picture gets: room for two lines. */
+  --caption-h: 3.2rem;
   /* Upright: the picture as wide as the screen, but not more than about half its height; the cards get the rest. */
   --pic-h: min((100cqw - 2 * var(--pad)) * 0.75, 56cqh);
   --rest: calc(100cqh - var(--caption-h) - var(--pic-h) - 3 * var(--pad));
@@ -171,6 +171,41 @@
     0 0 0 10px var(--ink);
 }
 
+/* ▶ in the picture's bottom right corner while the scene is shown: the whole picture is tapped to go on, never a
+   timer (user feedback, November 2026). Still, like everything here. */
+.fg-next {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fg-next-sign {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: clamp(48px, 13%, 96px);
+  filter: drop-shadow(0 3px 0 var(--ink));
+}
+
+.fg-next-sign circle {
+  fill: var(--sunshine);
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.fg-next-sign path {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+
 /* Tick or cross on the corner of the frame, half outside it, so it covers next to nothing. */
 .fg-picture-mark {
   position: absolute;
@@ -261,19 +296,20 @@
 
   .fg-picture-caption {
     bottom: 8px;
+    border-radius: 12px;
   }
 
   .fg-choice .fg-caption {
-    top: calc(var(--card-w) * 0.75 - 1.6rem);
+    bottom: 8px;
+    border-radius: 10px;
   }
 }
 
-/* One line, so a long caption never pushes anything. */
+/* Always the whole text, never cut off with „…“ (user feedback, November 2026): a long caption takes a second line,
+   its lines kept even. */
 .fg-picture-caption,
 .fg-choice .fg-caption {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  text-wrap: balance;
 }
 
 /* ---------- Picture cards: what the bear can do ---------- */
@@ -343,16 +379,25 @@
   transition: opacity 0.3s;
 }
 
+/* A card's frames lie on top of each other like the big picture's; the first always shows. */
 .fg-card-image {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 18px;
   object-fit: cover;
+  opacity: 0;
   transition:
-    opacity 0.3s ease-in-out,
+    opacity 0.7s ease-in-out,
     filter 0.3s;
   user-select: none;
+}
+
+.fg-card-image:first-child,
+.fg-card-image.on {
+  opacity: 1;
 }
 
 /* What can be tapped now has a thick yellow ring – still, it doesn't call or pulse. */
@@ -369,14 +414,16 @@
   cursor: default;
 }
 
-.fg-card-rest {
-  opacity: 0.5;
+/* Waiting or crossed out: pale, but never see-through – the big picture would show through a card lying on it, as if
+   it lay on top (user feedback, November 2026). */
+.fg-card-rest .fg-card-image,
+.fg-card-rest .fg-placeholder {
+  filter: saturate(0.5) brightness(1.08);
 }
 
-/* Pale, but still to be recognised. */
 .fg-card-wrong .fg-card-image,
 .fg-card-wrong .fg-placeholder {
-  filter: grayscale(0.6) opacity(0.75);
+  filter: grayscale(0.7) brightness(1.1);
 }
 
 /* ---------- Tick and cross ---------- */
@@ -494,15 +541,17 @@
     gap: 0;
   }
 
-  /* The not-so-good idea at the bottom left, the good one at the top right (user's choice, November 2026). */
+  /* The not-so-good idea at the bottom left, the good one at the top right (user's choice, November 2026). Right at
+     the screen's edges, as their width is reckoned: a phone's safe-area inset (the notch's side, 47 px and more) left
+     an empty strip beside the card and pushed it further over the picture (user feedback, November 2026). */
   .story-choices .fg-choice:first-child {
     bottom: var(--card-edge);
-    left: max(var(--pad), env(safe-area-inset-left));
+    left: var(--pad);
   }
 
   .story-choices .fg-choice:last-child {
     top: var(--card-edge);
-    right: max(var(--pad), env(safe-area-inset-right));
+    right: var(--pad);
   }
 
   /* The tick or cross of the big picture moves to its top left corner: the good card lies on the top right one. */
