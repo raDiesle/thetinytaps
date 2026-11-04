@@ -310,7 +310,9 @@ In a fresh worktree run `bun install` first.
   category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
   Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
-  user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
+  user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
+  left corners (`--lean`, the slipcase as a whole), so the names running down their spines are read without bending the
+  head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
   that many books in one slipcase, each opening its part and found by the way back: Belohnungstafel and Zeitplan, right

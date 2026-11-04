@@ -79,7 +79,10 @@ function buildBook(book: HTMLElement) {
   const template = book.querySelector<HTMLElement>(".shelf-daily-book");
   const spine = template && book.querySelector<HTMLElement>(".box-front");
   const cover = book.querySelector<HTMLElement>(".shelf-book-cover");
-  const rect = (spine ?? cover ?? book).getBoundingClientRect();
+  // A book spine out leans on the shelf (alone or in its slipcase, `--lean`): measured standing up, it flies from there
+  // and straightens as it lifts, turning about the corner it leans on.
+  const leaning = spine && (book.closest<HTMLElement>(".shelf-slipcase") ?? book);
+  const { rect, lean, pivot } = spine && leaning ? upright(leaning, spine) : { rect: (cover ?? book).getBoundingClientRect(), lean: 0, pivot: null };
   const copy = (template ?? book).cloneNode(true) as HTMLElement;
   copy.className = "shelf-book bt-book";
   copy.hidden = false;
@@ -101,7 +104,28 @@ function buildBook(book: HTMLElement) {
   lid.append(left);
   copy.prepend(right);
   copy.append(lid);
-  return { book: copy, right, lid, left, w, h: rect.height, x, y: rect.top, turned: Boolean(spine) };
+  // Where the book leans on its corner, in the copy's own place (its origin at `x`, its top).
+  const px = pivot ? pivot.left - x : 0;
+  const py = pivot ? pivot.bottom - rect.top : 0;
+  return { book: copy, right, lid, left, w, h: rect.height, x, y: rect.top, turned: Boolean(spine), lean, px, py };
+}
+
+/**
+ * Measures the spine `spine` as it would stand without the lean of `leaning` (the book or its slipcase), and the box of
+ * `leaning` whose bottom left corner it leans on. The lean is taken off and put back before anything is drawn, and
+ * without its transition, so nothing on the shelf moves.
+ */
+function upright(leaning: HTMLElement, spine: HTMLElement) {
+  const lean = Number.parseFloat(getComputedStyle(leaning).getPropertyValue("--lean")) || 0;
+  leaning.style.transition = "none";
+  leaning.style.setProperty("--lean", "0deg");
+  const rect = spine.getBoundingClientRect();
+  const pivot = leaning.getBoundingClientRect();
+  leaning.style.removeProperty("--lean");
+  // Leaning again before the transition comes back, so it doesn't play the lean anew.
+  void getComputedStyle(leaning).transform;
+  leaning.style.removeProperty("transition");
+  return { rect, lean, pivot };
 }
 
 type Built = ReturnType<typeof buildBook>;
@@ -110,18 +134,22 @@ type Built = ReturnType<typeof buildBook>;
  * The book's moves, from its place on the shelf to its left page filling the screen, and the scale of that page then
  * (to print the screen on it at the right size).
  */
-function moves({ w, h, x, y, turned }: Built) {
+function moves({ w, h, x, y, turned, lean, px, py }: Built) {
   const vw = innerWidth;
   const vh = innerHeight;
   const margin = pageMargins();
-  // A book standing spine out turns its cover towards the eye as it comes out, done once it is in the middle.
-  const at = (dx: number, dy: number, s: number, z = 0, deg = 0) => `translate3d(${dx}px, ${dy}px, ${z}px) scale(${s})${turned ? ` rotateY(${deg}deg)` : ""}`;
+  // A book standing spine out turns its cover towards the eye as it comes out, done once it is in the middle; leaning
+  // on its corner (`tilt`), it stands up as it lifts.
+  const at = (dx: number, dy: number, s: number, z = 0, deg = 0, tilt = 0) =>
+    turned
+      ? `translate(${px}px, ${py}px) rotate(${tilt}deg) translate(${-px}px, ${-py}px) translate3d(${dx}px, ${dy}px, ${z}px) scale(${s}) rotateY(${deg}deg)`
+      : `translate3d(${dx}px, ${dy}px, ${z}px) scale(${s})`;
   // In the middle closed, as big as it fits open; open with the spine in the middle; close with its left page as the screen.
   const middle = Math.min((0.7 * vh) / h, (0.42 * vw) / w);
   const page = (vw - margin.left - margin.right) / w;
   const pageTop = vh / 2 - (page * h) / 2;
   const book = [
-    { offset: 0, transform: at(0, 0, 1, 0, 90), easing: "cubic-bezier(.3,0,.4,1)" },
+    { offset: 0, transform: at(0, 0, 1, 0, 90, lean), easing: "cubic-bezier(.3,0,.4,1)" },
     { offset: AT_LIFTED, transform: at(0, -0.09 * h, 1, turned ? 60 + w / 2 : 60, 50), easing: "cubic-bezier(.45,0,.35,1)" },
     { offset: AT_MIDDLE, transform: at(vw / 2 - (middle * w) / 2 - x, vh / 2 - (middle * h) / 2 - y, middle), easing: "cubic-bezier(.45,0,.35,1)" },
     { offset: AT_OPEN, transform: at(vw / 2 - x, vh / 2 - (middle * h) / 2 - y, middle), easing: "cubic-bezier(.55,0,.4,1)" },

@@ -1259,7 +1259,14 @@
 }
 
 /* The books themselves, and the slipcase of the Belohnungstafel and the Zeitplan among them. */
+/*
+ * The everyday helpers lean to the left, resting on their bottom left corners, as books do on a shelf that is not full:
+ * so the names running down their spines tilt towards the line one reads and are read without bending the head as far
+ * (user feedback, November 2026). Each book (and the slipcase as a whole) leans by the same angle about its own corner,
+ * so they stay parallel and clear of each other. Taken out, a book straightens as it lifts (bookTravel.ts).
+ */
 .shelf-daily-books {
+  --lean: -12deg;
   position: relative;
   display: flex;
   flex: none;
@@ -1277,8 +1284,8 @@
   height: calc(var(--bh) * 0.97);
   color: var(--ink);
   text-decoration: none;
-  transform-origin: 50% 100%;
-  transform: rotateX(-6deg);
+  transform-origin: 0 100%;
+  transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
   -webkit-tap-highlight-color: transparent;
 }
@@ -1321,8 +1328,8 @@
   min-width: 0;
   height: var(--bh);
   padding: var(--wall);
-  transform-origin: 50% 100%;
-  transform: translateZ(calc(var(--d) * 0.1)) rotateX(-8deg);
+  transform-origin: 0 100%;
+  transform: translateZ(calc(var(--d) * 0.1)) rotate(var(--lean, 0deg)) rotateX(-8deg);
 }
 
 .shelf-slipcase > :is(.box-left, .box-right) {
@@ -1348,7 +1355,9 @@
   transform: translateZ(1px);
 }
 
+/* Its books lean with the case, not again on their own. */
 .shelf-slipcase > .shelf-daily {
+  --lean: 0deg;
   height: auto;
   transform: none;
 }
@@ -1535,13 +1544,13 @@
 
 @media (hover: hover) {
   .shelf-daily:hover {
-    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotate(var(--lean, 0deg)) rotateX(-11deg);
   }
 }
 
 .shelf-daily:focus-visible {
   outline: none;
-  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotate(var(--lean, 0deg)) rotateX(-11deg);
 }
 
 .shelf-daily:focus-visible > .box-front {
