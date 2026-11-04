@@ -94,7 +94,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Fuchs- oder Bärenkind schaut aus den Verstecken, Mama, Papa, Oma oder Opa gleich dahinter",
         work: "drawing",
         effort: "S",
-        note: "Fuchs und Bär zu Katze, Maus, Hase … in hideout.tsx, dann in jeder Szene; das Kind vorn, der Große größer dahinter.",
+        state: "done",
+        note: "Familie Fuchs und Familie Bär sind zwei der Überraschungen in hideout.tsx (neben Katze, Maus, Hase …), also in jeder Szene mit Versteck: das Kind vorn mit den Pfoten am Rand, Mama Fuchs oder Papa Bär größer dahinter. „Da ist ja Familie Fuchs!“ gibt es erst auf Deutsch.",
       },
       {
         label: "Einige Erwachsene werden Füchse oder Bären: Erzieherin, Ärztin, Feuerwehr, Kassiererin, Bäckerin, Tierpfleger, Förster, Bauer …",
@@ -139,13 +140,15 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Feuerwehr, Nachbarin, Bewohner und Fahrer im Feuerwehr-Film werden Füchse oder Bären",
         work: "drawing",
         effort: "M",
-        note: "Ein Fuchs- und ein Bärenkopf in Grownup (film/people.tsx).",
+        state: "done",
+        note: "`animal` im Look (kid.tsx) gibt einem Großen den geteilten Kopf und Pfoten: die Crew ist ein Fuchs und eine Bärin, die Nachbarin mit der Katze eine Füchsin, der Bewohner ein Bär. Der Fahrer im Graben bleibt ein Mensch – Menschen dürfen bleiben.",
       },
       {
         label: "Mama oder Papa, die Briefträgerin und Oma im Brief-Film werden Füchse oder Bären",
         work: "drawing",
         effort: "S",
-        note: "Mit demselben Grownup wie im Feuerwehr-Film (film/brief.tsx).",
+        state: "partial",
+        note: "Die Briefträgerin ist eine Bärin. Mama oder Papa und Oma sind die Familie des Kindes, das ein Mensch bleibt: sie warten auf D-19 (ein Menschenkind mit Fuchs-Mama passt nicht).",
       },
       { label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen", work: "drawing", effort: "M" },
       { label: "Das Kind als Fuchs- oder Bärenkind", work: "drawing", effort: "M", idea: "D-19", note: "Erst entscheiden." },
@@ -161,9 +164,24 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/wie-gehts-dir/",
-    note: "Der kleine Bär unter dem Wetter (die vier Wetterbilder); danach spielen die Szenen von „Alltagssituationen“.",
+    note: "Acht Gefühle als Fuchs- oder Bärenkind mit Mama oder Papa (C-30); das Gesicht zum Nachmachen ist der gemeinsame MascotHead. Danach spielen die Szenen von „Alltagssituationen“.",
     tasks: [
-      { label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter)", work: "picture", pictures: 4, effort: "M", idea: "C-30" },
+      {
+        label: "Fuchs- oder Bärenkind macht das Gesicht des Gefühls groß vor und pustet mit (MascotHead)",
+        work: "drawing",
+        effort: "S",
+        idea: "C-35",
+        state: "done",
+      },
+      {
+        label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter), und wird in den Arm genommen",
+        work: "picture",
+        pictures: 16,
+        effort: "M",
+        idea: "C-30",
+        state: "partial",
+        note: "Gebaut; die 16 Bilder (gesicht-…) warten in der Bilder-Queue, bis dahin zeigt die gebaute Seite die vier Wetterkarten.",
+      },
     ],
   },
   {
@@ -215,13 +233,26 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         state: "done",
         note: "Zwei neue Muster mit Gesichtern (Augen und Nase), damit kein Fuchskopf wie ein Herz aussieht; in einer Wäsche nur Füchse oder Bären, nie beide.",
       },
-      { label: "Tapsi schaut aus dem Wäschekorb, Mama, Papa, Oma oder Opa Fuchs hängt lachend Wäsche auf", work: "drawing", effort: "M" },
+      {
+        label: "Tapsi schaut aus dem Wäschekorb, Mama, Papa, Oma oder Opa Fuchs hängt lachend Wäsche auf",
+        work: "drawing",
+        effort: "M",
+        state: "partial",
+        note: "Tapsi und Mama Fuchs stehen neben der großen Waschmaschine, solange sie wäscht, und gehen, wenn die Socken herauspurzeln. Im Wäschekorb und an der Leine nicht: die Körbe decken Socken zu (wie Memory), und die Leine braucht die ganze Breite.",
+      },
     ],
   },
   {
     href: "/buchstaben/",
     note: "Emoji-Wörter zum Lernen (Mama, Oma, Junge …) bleiben Menschen. „Fuchs 🦊“ gibt es beim F.",
-    tasks: [{ label: "Tapsi mit Mama, Papa, Oma oder Opa Fuchs auf Start und Ende", work: "drawing", effort: "S" }],
+    tasks: [
+      {
+        label: "Tapsi mit Mama, Papa, Oma oder Opa Fuchs auf Start und Ende",
+        work: "drawing",
+        effort: "S",
+        note: "Offen: das Spiel hat weder Startbild noch Ende (es spielt sofort und läuft frei weiter); bräuchte einen anderen Platz, etwa ein Bild zu „Fuchs“ beim F.",
+      },
+    ],
   },
   {
     href: "/",

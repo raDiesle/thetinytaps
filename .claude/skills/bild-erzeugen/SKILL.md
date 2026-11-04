@@ -41,7 +41,9 @@ sheet is full, and later sessions bring the partners.
    pictures that never share one (no `size`, bigger than a panel, `alone`) – waiting saves nothing there; *waiting for
    partners* are sheets not yet full, together with older pictures already waiting there; *after their reference* are
    pictures drawn from another one still in the queue.
-3. **Make the cheap part at once without asking**: `bun run image queue --make` (in the background, like every batch).
+3. **Make the cheap part at once without asking**: `bun run image queue --make` (in the background, like every batch) –
+   except pictures a game's rules keep for the user (Gefühle's „Geplant“, `src/games/feelings/CLAUDE.md`): those only
+   wait in the queue for a batch the user asks for.
 4. **For what waits, ask the user in the session** (AskUserQuestion, „warten“ first): wait for partners, or make it now
    for one request more (≈ $0.017). Now: `bun run image queue --make --force <id,…>` (or `all`) – the sheet's spare
    panels become variants of its pictures in `.image-raw/variants/`, to pick the best. Waiting: commit the queue entry

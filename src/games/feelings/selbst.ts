@@ -617,10 +617,10 @@ export const SELF_SITUATIONS: Situation[] = [
     intro: [{ narration: "Der kleine Bär klettert auf das Klettergerüst. Ganz allein!" }, { narration: "Jetzt ist er oben. Er ist so stolz!" }],
     steps: [
       {
-        caption: "„Guck mal!“ rufen",
+        caption: "„Komm doch auch hoch!“ rufen",
         question: "Der kleine Bär ist ganz oben. Was kann er tun?",
-        beats: [{ narration: "Er ruft:", line: "Guck mal, ich bin oben!" }, { line: "Wow! Ganz allein!" }],
-        instead: { caption: "Den Fuchs runterschubsen", answer: "Hmm, Schubsen tut weh. Ruf lieber: Guck mal!", sound: "aua" },
+        beats: [{ narration: "Er ruft dem Fuchs zu:", line: "Komm doch auch hoch!" }, { line: "Au ja, ich komme!" }],
+        instead: { caption: "Den Fuchs runterschubsen", answer: "Hmm, Schubsen tut weh. Ruf lieber: Komm doch auch hoch!", sound: "aua" },
       },
       {
         caption: "Jubeln",
@@ -638,7 +638,7 @@ export const SELF_SITUATIONS: Situation[] = [
         instead: { caption: "Runterspringen", answer: "Hmm, von so hoch springen tut weh. Zeig lieber dem Fuchs, wie es geht.", sound: "aua" },
       },
     ],
-    outro: [{ narration: "Juhu! Zeigen, jubeln, helfen. Jetzt sind beide stolz.", sound: "cheer" }],
+    outro: [{ narration: "Juhu! Rufen, jubeln, helfen. Jetzt sind beide stolz.", sound: "cheer" }],
     endCaption: "Bär und Fuchs zusammen oben",
   },
   {

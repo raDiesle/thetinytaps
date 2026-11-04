@@ -508,5 +508,14 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "Kinder hören an Strophen und Refrain, wie weit ein Lied ist, lange bevor sie Zeit einschätzen können; ein vertrautes Lied trägt durchs Aufräumen, ohne dass jemand zur Eile drängt.",
       effort: "M",
     },
+    {
+      id: "H-58",
+      emoji: "💛",
+      title: "Rituale im Tagesplan: Worte für die Eltern auf der Karte",
+      text: "Feste Momente des Tages als Karten im Zeitplan: Mutmach-Sätze am Morgen vor dem Spiegel („Ich bin gut so, wie ich bin“, „Ich schaffe das. Und wenn es schwer ist, hilft mir jemand“), Erzählen nach Kita oder Schule (Was war heute schön, blöd, neu?) und Gute-Nacht-Sätze im Bett. Tippt das Kind die Karte an, öffnen sich die Worte für den Erwachsenen zum Vorlesen; „Gemacht“ hakt sie ab. Gedruckt kommen sie als Karten zum Aufhängen am Spiegel oder am Bett mit. Dazu die Vorlage „Mein Tag mit Ritualen“, mit „Wie geht's dir?“ morgens und abends (C-33).",
+      why: "Eltern wollen solche Rituale oft einführen, wissen im Moment aber die Worte nicht; die Karte erinnert, wann, und sagt, was. Ein fester Ablauf jeden Tag gibt Halt, und konkrete Fragen bringen Kinder eher zum Erzählen als „Wie war's?“ (Recherche „rituale“).",
+      effort: "M",
+      done: true,
+    },
   ],
 };

@@ -310,13 +310,17 @@ In a fresh worktree run `bun install` first.
   category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
   Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
-  user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
+  user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
+  left corners (`--lean`), so the names running down their spines are read without bending the
+  head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
-  that many books in one slipcase, each opening its part and found by the way back: Belohnungstafel and Zeitplan, right
-  of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents need most, so they stand first,
-  top left (first in `CATEGORIES`), and that slipcase is the eye-catcher of the shelf: red cloth edged in gold, pulled
-  out furthest, glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. What can be taken is
+  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
+  Belohnungstafel and Zeitplan, right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
+  glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
+  its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
+  as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
   and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
@@ -353,6 +357,9 @@ In a fresh worktree run `bun install` first.
 - Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
   „🌳 Lebendige Welten“; `MenuHead` takes a string), and so is every heading inside a page – the emoji stays on the
   card or the book, not over it (`MenuTop.test.ts` checks).
+- A menu's cards, lines and books always stand in the same order (user feedback, November 2026): nothing moves to the
+  front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
+  last first; `GameShell.test.ts` checks).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
   choices may sit there.

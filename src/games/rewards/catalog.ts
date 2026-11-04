@@ -1,4 +1,5 @@
 import type { Localized } from "@/lib/language";
+import { RITUALS } from "./rituals";
 
 // What grown-ups pick from when they make a board: tasks, rewards, the mark that
 // goes into a field, colours and ready-made boards. Each has an emoji, and a picture
@@ -948,6 +949,23 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
     },
   },
   {
+    // H-58: the same day with its rituals – brave sentences in the morning, telling about the day after Kita or school,
+    // good-night sentences in bed, „Wie geht's dir?“ in the morning and the evening (C-33); each card opens its words
+    // for the grown-up, or its game (rituals.ts).
+    id: "rituale",
+    emoji: "💛",
+    label: { de: "Mein Tag mit Ritualen" },
+    view: "day",
+    parts: [
+      // At most MAX_STEPS in all: the rituals take the places of breakfast, the book and the bed (Gute-Nacht-Sätze are said in it).
+      { slot: "morning", steps: ["anziehen", "zaehne", "wiegehts", "mutmachen"] },
+      { slot: "evening", steps: ["erzaehlen", "zaehne", "wiegehts", "gutenacht"] },
+    ],
+    theme: "meer",
+    title: { de: "Mein Tag" },
+    hint: { de: "Mit Mutmach-Sätzen, „Wie geht's dir?“, Erzählen nach der Kita und Gute-Nacht-Sätzen – die Worte stehen auf der Karte" },
+  },
+  {
     id: "erst-dann",
     emoji: "➡️",
     label: { de: "Erst – Dann", en: "First – Then", zh: "先 – 然后", hi: "पहले – फिर", es: "Primero – Después", ar: "أولًا – ثم", ru: "Сначала – потом" },
@@ -1028,8 +1046,8 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
 ];
 
 export const TASK_BY_ID = new Map(TASKS.map((t) => [t.id, t]));
-/** Tasks and activities: everything a plan's step can come from. */
-export const STEP_BY_ID = new Map([...ACTIVITIES, ...TASKS].map((t) => [t.id, t]));
+/** Tasks, activities and rituals: everything a plan's step can come from. */
+export const STEP_BY_ID = new Map([...ACTIVITIES, ...RITUALS, ...TASKS].map((t) => [t.id, t]));
 export const REWARD_BY_ID = new Map(REWARDS.map((r) => [r.id, r]));
 export const MARK_BY_ID = new Map(MARKS.map((m) => [m.id, m]));
 export const THEME_BY_ID = new Map(THEMES.map((t) => [t.id, t]));
