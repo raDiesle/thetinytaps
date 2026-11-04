@@ -290,3 +290,343 @@
     transform: rotate(10deg) translateX(8%);
   }
 }
+
+/* Every second a small, soft step (H-63), so a long time never looks stuck: the train's wheels turn once and a puff of
+   steam rises, a big grain falls through the hourglass's neck, a drop of wax runs a little further. Each is a small
+   layer of its own moving by transform and opacity; at the end they stand still. */
+.tm-beat {
+  position: absolute;
+  will-change: transform, opacity;
+}
+
+.tm-done .tm-beat,
+.tm-blow .tm-beat {
+  animation: none;
+  opacity: 0;
+}
+
+.tm-done .tm-wheel,
+.tm-blow .tm-wheel {
+  opacity: 1;
+}
+
+.tm-wheel {
+  animation: tm-turn 1s ease-in-out infinite;
+}
+
+.tm-wheel svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.tm-chug {
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  animation: tm-chug 1s ease-out infinite;
+}
+
+@keyframes tm-chug {
+  from {
+    opacity: 0.9;
+    transform: translateY(30%) scale(0.35);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-110%) scale(1.15);
+  }
+}
+
+.tm-grain {
+  inset: 0;
+  border: 0.18cqw solid #3b2a20;
+  border-radius: 50%;
+  background: #d9822b;
+  animation: tm-fall 1s ease-in infinite;
+}
+
+@keyframes tm-fall {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(1000%);
+  }
+}
+
+.tm-drop {
+  left: 8%;
+  top: 2%;
+  width: 20%;
+  aspect-ratio: 3 / 4;
+  border: 0.2cqw solid #3b2a20;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: #ffb3c1;
+  animation: tm-drip 6s ease-in-out infinite;
+}
+
+/* Four small steps down, one a second, with a rest after each; then it melts into the candle and a new drop forms. */
+@keyframes tm-drip {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.3);
+  }
+  12%,
+  16.6% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  25%,
+  33.3% {
+    transform: translateY(55%);
+  }
+  41.6%,
+  50% {
+    transform: translateY(110%);
+  }
+  58.3%,
+  66.6% {
+    transform: translateY(165%);
+  }
+  75%,
+  88% {
+    opacity: 1;
+    transform: translateY(220%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(220%) scale(0.6, 0.3);
+  }
+}
+
+/* Where it came from and where it goes (H-64): the rail ahead of the train shines and shrinks towards the buffers as
+   the train rolls on; the glass the sand has left keeps a faint film; the wax that ran down spreads on the holder. */
+.tm-rail-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(#ffffff, #c5d0da 45%, #8d9aa6);
+  transform-origin: 100% 50%;
+  animation: tm-shine var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-rail-shine {
+  animation: none;
+  transform: scaleX(0);
+}
+
+@keyframes tm-shine {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.tm-sand-dust {
+  position: absolute;
+  left: 0;
+  top: 30%;
+  width: 100%;
+  height: 70%;
+  background:
+    radial-gradient(circle, #f4a95c66 0 22%, transparent 26%) 0 0 / 11% 8%,
+    #ffd8a838;
+}
+
+.tm-puddle {
+  position: absolute;
+  inset: 0;
+  border: 0.2cqw solid #3b2a20;
+  border-radius: 50%;
+  background: #ffb3c1;
+  transform: scale(0.62, 0.55);
+  animation: tm-spread var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-puddle,
+.tm-blow .tm-puddle {
+  animation: none;
+  transform: none;
+}
+
+@keyframes tm-spread {
+  to {
+    transform: none;
+  }
+}
+
+/* The sheet behind „Andere …“ (H-59, H-60), over the whole screen, and the question when a clock time is past. */
+.tm-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
+}
+
+.tm-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #2a1e5c80;
+}
+
+.tm-sheet .tm-sheet-panel {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  gap: 14px;
+  padding: 18px 22px;
+}
+
+.tm-steppers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 22px;
+}
+
+.tm-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tm-step {
+  width: 52px;
+  height: 52px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tm-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.tm-step-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 2.6em;
+  line-height: 1.1;
+}
+
+.tm-step-value b {
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tm-step-value small {
+  font-size: 0.85rem;
+}
+
+.tm-colon {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.tm-ready {
+  justify-content: center;
+}
+
+.tm-type {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tm-type input {
+  width: 9em;
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  font: inherit;
+  text-align: center;
+}
+
+.tm-type input[aria-invalid="true"] {
+  border-color: #c92a2a;
+}
+
+.tm-sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.tm-sheet-actions button {
+  min-height: 48px;
+  padding: 6px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tm-sheet-actions .tm-sheet-ok {
+  background: var(--sunshine);
+  font-weight: 700;
+}
+
+.tm-sheet-actions button:disabled {
+  opacity: 0.4;
+}
+
+.tm-sheet-ask p,
+.tm-ask p {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.tm-asking {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.tm-ask {
+  width: min(560px, 100%);
+}
+
+/* The time left behind ⚙️, for grown-ups only (H-62). */
+.tm-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 0;
+}
+
+.tm-left b {
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+}

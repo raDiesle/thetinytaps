@@ -135,6 +135,9 @@ export const timerIdeas: IdeaArea = {
       text: "In der Reihe „Wie lange?“ liegt hinter 10 Min. ein Zettel „Andere …“. Er öffnet ein Feld für Große mit großen + und − für Stunden, Minuten und Sekunden (von 10 Sekunden bis 3 Stunden) und fertigen Zetteln für oft Gebrauchtes: 15, 20, 30, 45 Minuten, 1 Stunde. Am Computer lässt sich die Zeit auch eintippen („7:30“, „45“). Die zuletzt eingestellte eigene Zeit bleibt als eigener Zettel in der Reihe, bis eine andere kommt, sodass „unsere 20 Minuten“ jeden Tag mit einem Tippen da sind.",
       why: "Eltern brauchen andere Zeiten als 1 bis 10 Minuten: 4 Minuten für die Eier, 20 Minuten Mittagsruhe, 45 Minuten bis Oma kommt, 30 Sekunden Hände waschen. Eine feste Auswahl zwingt zum Runden. Damit die Bilder auch bei langen Zeiten sichtbar laufen, gehören H-63 bis H-66 dazu.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut: „Andere …“ hinter 10 Min. öffnet ein Blatt für Große mit − und + für Stunden, Minuten und Sekunden (10 Sekunden bis 3 Stunden), fertigen Zetteln für 15, 20, 30, 45 Minuten und 1 Stunde und am Computer einem Feld zum Eintippen („7:30“, „45“). Die zuletzt eigene Zeit bleibt als Zettel in der Reihe.",
     },
     {
       id: "H-60",
@@ -143,6 +146,9 @@ export const timerIdeas: IdeaArea = {
       text: "Statt einer Dauer stellt ein Großer eine Uhrzeit ein: „bis 17:30“. Eine große runde Uhr, deren Zeiger man dreht (oder Ziffern mit + und −), der Timer rechnet die Dauer selbst aus. Liegt die Uhrzeit schon hinter uns, nimmt er die von morgen nicht, sondern fragt nach.",
       why: "Viele Wartezeiten haben eine Uhrzeit, keine Dauer: „Papa kommt um halb sechs“, „um zwölf gibt es Essen“, „der Bus fährt um 8:10“. Eltern müssten sonst selbst rechnen.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als „Bis um“ im selben Blatt: Ziffern mit − und + (Stunde, Minuten in Fünferschritten) oder am Computer eingetippt, keine drehbare Uhr. Ist die Uhrzeit schon vorbei, fragt das Blatt „Bis morgen um …?“, und ein gemerktes „bis 17:30“, das heute schon vorbei ist, fragt beim Start noch einmal.",
     },
     {
       id: "H-61",
@@ -159,6 +165,8 @@ export const timerIdeas: IdeaArea = {
       text: "Hält oder öffnet ein Großer ⚙️, steht dort klein die Restzeit in Ziffern („4:37 noch“, „bis 17:30“). Sonst sieht das Kind wie bisher nur das Bild, keine Zahl.",
       why: "Bei langen Zeiten wollen Große manchmal genau wissen, wie viel noch bleibt, ohne zu raten, wie weit der Zug ist. Hinter ⚙️ stört die Zahl das Kind nicht.",
       effort: "S",
+      done: true,
+      partial: "Gebaut: Hinter ⚙️ (gehalten) steht beim Timer die Restzeit („4:37 noch“, bei einer Uhrzeit dazu „bis 17:30“).",
     },
     {
       id: "H-63",
@@ -167,6 +175,9 @@ export const timerIdeas: IdeaArea = {
       text: "Jedes Bild bekommt einen ruhigen Takt, einmal pro Sekunde, über dem langsamen Ablauf: Beim Zug drehen sich die Räder einmal und eine kleine Dampfwolke steigt auf, in der Sanduhr fällt sichtbar ein einzelnes großes Körnchen durch den Hals, an der Kerze rinnt ein Tropfen Wachs ein Stück weiter. Der Takt ist eine weiche Bewegung, kein Aufblitzen. Technisch eine CSS-Animation von einer Sekunde in einer eigenen kleinen Ebene, nicht React pro Sekunde.",
       why: "Bei 30 Minuten oder einer Stunde rückt der Zug nur ein paar Pixel pro Minute vor, und das Bild wirkt stehen geblieben. Der Takt zeigt dem Kind (und den Großen) in jedem Augenblick: Es läuft.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut: Beim Zug drehen sich die Räder jede Sekunde einmal und eine kleine Dampfwolke steigt auf, in der Sanduhr fällt jede Sekunde ein großes Korn durch den Hals, an der Kerze rinnt ein Wachstropfen in kleinen Schritten hinunter – alles kleine eigene Ebenen mit CSS.",
     },
     {
       id: "H-64",
@@ -175,6 +186,9 @@ export const timerIdeas: IdeaArea = {
       text: "Hinter dem, was läuft, bleibt jede Sekunde etwas liegen, und vorne wartet sichtbar das Ziel: Das Fuchskind stapft durch frischen Schnee und lässt Pfotenabdrücke zurück, die Gleise hinter dem Zug werden dunkel und die vor ihm glänzen, am Wegrand sind die Blumen hinter ihm schon gepflückt. Start (ein kleines Haus) und Ziel (die wartende Familie) sind in jedem Bild zu sehen, und alles läuft in eine Richtung, von links nach rechts oder von voll nach leer.",
       why: "Ein Kind sieht so nicht nur, dass sich etwas bewegt, sondern wohin: Was hinten liegt, ist vorbei, was vorne liegt, kommt noch. Die Spur wächst jede Sekunde, auch wenn der Läufer nur ein kleines Stück weiterkommt.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut für die drei Bilder: Der Zug fährt an einem kleinen Haus los, die Schiene vor ihm glänzt und wird kürzer, hinter ihm ist sie dunkel; in der Sanduhr bleibt am Glas, wo der Sand war, ein feiner Sandfilm; unter der Kerze wächst eine Wachspfütze. Die Fuchs-Spur im Schnee wäre ein neues Bild.",
     },
     {
       id: "H-65",

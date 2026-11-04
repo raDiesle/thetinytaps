@@ -80,6 +80,9 @@ export const RAIL_Y = 650;
  */
 export const TRAIN = { x: 200, w: 360, h: 200, stop: 1060, family: 1205 } as const;
 
+/** The little house where the train sets off (H-64): behind its start, its roof and window above the train. */
+export const HOME = { x: 225, w: 210, top: 430 } as const;
+
 /** The countryside with the track and the station; drawn once. */
 export const TrainBackdrop = memo(function TrainBackdrop() {
   return (
@@ -106,8 +109,20 @@ export const TrainBackdrop = memo(function TrainBackdrop() {
         ))}
         <path d="M0 520 Q240 400 520 500 T1040 480 T1600 470 V900 H0 Z" fill="#9bd57a" />
         <path d="M0 600 Q400 540 820 590 T1600 580 V900 H0 Z" fill="#7cc35a" />
+        {/* The little house the train sets off from (H-64): it stays behind as the train rolls away. */}
+        <rect x={HOME.x} y={HOME.top} width={HOME.w} height={RAIL_Y - HOME.top} fill="#ffe3b3" stroke={INK} strokeWidth="5" />
+        <path
+          d={`M${HOME.x - 22} ${HOME.top + 10} L${HOME.x + HOME.w / 2} ${HOME.top - 85} L${HOME.x + HOME.w + 22} ${HOME.top + 10} Z`}
+          fill="#4c8fd6"
+          stroke={INK}
+          strokeWidth="5"
+          strokeLinejoin="round"
+        />
+        <rect x={HOME.x + 30} y={HOME.top + 22} width="50" height="44" rx="6" fill="#fff3bf" stroke={INK} strokeWidth="4" />
+        <rect x={HOME.x + 130} y={HOME.top + 22} width="50" height="44" rx="6" fill="#fff3bf" stroke={INK} strokeWidth="4" />
+        <rect x={HOME.x + 80} y={HOME.top + 90} width="50" height={RAIL_Y - HOME.top - 90} rx="6" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
         {/* Trees along the way, so the child sees how far the train has come. */}
-        {[360, 640, 920].map((x) => (
+        {[640, 890].map((x) => (
           <g key={x}>
             <rect x={x - 10} y="520" width="20" height="90" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
             <circle cx={x} cy="500" r="56" fill="#40a35a" stroke={INK} strokeWidth="4" />
@@ -125,7 +140,8 @@ export const TrainBackdrop = memo(function TrainBackdrop() {
         {Array.from({ length: 23 }, (_, i) => (
           <rect key={i} x={10 + i * 48} y={RAIL_Y + 2} width="26" height="18" rx="3" fill="#6b4a2b" />
         ))}
-        <rect x="0" y={RAIL_Y - 6} width="1100" height="10" rx="4" fill="#5c6670" />
+        {/* The rail is dark where the train has been; ahead of it a shining rail lies over it (`RailAhead`). */}
+        <rect x="0" y={RAIL_Y - 6} width="1100" height="10" rx="4" fill="#3d434a" />
         <rect x="1072" y={RAIL_Y - 70} width="22" height="70" fill="#e03131" stroke={INK} strokeWidth="4" />
         <rect x="1060" y={RAIL_Y - 64} width="16" height="22" rx="5" fill="#ffd43b" stroke={INK} strokeWidth="3" />
       </Draw>
@@ -133,42 +149,78 @@ export const TrainBackdrop = memo(function TrainBackdrop() {
   );
 });
 
-/** The train: a locomotive facing right with two wagons, TRAIN.w × TRAIN.h, its wheels on the rail; `puff` keys a steam cloud. */
+/** The wheels under the train: their middle in the train's units and their radius. */
+const WHEELS = [
+  { cx: 30, r: 18 },
+  { cx: 80, r: 18 },
+  { cx: 140, r: 18 },
+  { cx: 190, r: 18 },
+  { cx: 250, r: 22 },
+  { cx: 320, r: 22 },
+] as const;
+
+/** A box in the train's own units as a place in percent of it, for the layers riding along inside it. */
+function inTrain(x: number, y: number, w: number, h: number): CSSProperties {
+  return { left: `${(x / TRAIN.w) * 100}%`, top: `${(y / TRAIN.h) * 100}%`, width: `${(w / TRAIN.w) * 100}%`, height: `${(h / TRAIN.h) * 100}%` };
+}
+
+/**
+ * The train: a locomotive facing right with two wagons, TRAIN.w × TRAIN.h, its wheels on the rail; `puff` keys a steam
+ * cloud. Every second its wheels turn once and a small puff of steam rises from the chimney (H-63) – the wheels and the
+ * puff are small layers of their own riding in the train's, so the train's drawing is never painted again.
+ */
 export function Train({ puff }: { puff: number }) {
   const { w, h } = TRAIN;
-  const wheel = (cx: number, r = 22) => (
-    <g key={cx}>
-      <circle cx={cx} cy={h - r} r={r} fill="#495057" stroke={INK} strokeWidth="4" />
-      <circle cx={cx} cy={h - r} r={r / 3} fill="#ffd43b" />
-    </g>
-  );
   return (
-    <Draw w={w} h={h}>
-      {/* Two wagons, each with a window for a fox or bear passenger. */}
-      {[0, 110].map((x, i) => (
-        <g key={x}>
-          <rect x={x + 6} y={70} width="96" height="96" rx="12" fill={i ? "#4dabf7" : "#69db7c"} stroke={INK} strokeWidth="5" />
-          <rect x={x + 22} y={86} width="64" height="40" rx="8" fill="#e7f5ff" stroke={INK} strokeWidth="4" />
-          <rect x={x + 102} y={140} width="10" height="10" fill={INK} />
-        </g>
+    <>
+      <Draw w={w} h={h}>
+        {/* Two wagons, each with a window for a fox or bear passenger. */}
+        {[0, 110].map((x, i) => (
+          <g key={x}>
+            <rect x={x + 6} y={70} width="96" height="96" rx="12" fill={i ? "#4dabf7" : "#69db7c"} stroke={INK} strokeWidth="5" />
+            <rect x={x + 22} y={86} width="64" height="40" rx="8" fill="#e7f5ff" stroke={INK} strokeWidth="4" />
+            <rect x={x + 102} y={140} width="10" height="10" fill={INK} />
+          </g>
+        ))}
+        {/* The locomotive. */}
+        <rect x="220" y="56" width="70" height="110" rx="10" fill="#e03131" stroke={INK} strokeWidth="5" />
+        <rect x="234" y="72" width="42" height="36" rx="6" fill="#fff3bf" stroke={INK} strokeWidth="4" />
+        <path d="M214 56 H296 V44 H214 Z" fill={INK} />
+        <rect x="286" y="96" width="70" height="70" rx="14" fill="#e03131" stroke={INK} strokeWidth="5" />
+        <rect x="312" y="52" width="24" height="46" rx="4" fill="#343a40" stroke={INK} strokeWidth="4" />
+        <circle cx="350" cy="120" r="8" fill="#ffd43b" stroke={INK} strokeWidth="3" />
+        {puff > 0 && (
+          <g key={puff} className="tm-steam">
+            <circle cx="324" cy="30" r="22" fill="#fff" />
+            <circle cx="300" cy="14" r="18" fill="#fff" />
+            <circle cx="344" cy="10" r="16" fill="#fff" />
+          </g>
+        )}
+      </Draw>
+      <div className="tm-chug tm-beat" style={inTrain(306, 18, 36, 36)} />
+      {WHEELS.map(({ cx, r }) => (
+        <div key={cx} className="tm-wheel tm-beat" style={inTrain(cx - r, h - 2 * r, 2 * r, 2 * r)}>
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" fill="#495057" stroke={INK} strokeWidth="10" />
+            <path d="M50 12 V88 M12 50 H88 M23 23 L77 77 M77 23 L23 77" stroke="#adb5bd" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="50" cy="50" r="15" fill="#ffd43b" />
+          </svg>
+        </div>
       ))}
-      {/* The locomotive. */}
-      <rect x="220" y="56" width="70" height="110" rx="10" fill="#e03131" stroke={INK} strokeWidth="5" />
-      <rect x="234" y="72" width="42" height="36" rx="6" fill="#fff3bf" stroke={INK} strokeWidth="4" />
-      <path d="M214 56 H296 V44 H214 Z" fill={INK} />
-      <rect x="286" y="96" width="70" height="70" rx="14" fill="#e03131" stroke={INK} strokeWidth="5" />
-      <rect x="312" y="52" width="24" height="46" rx="4" fill="#343a40" stroke={INK} strokeWidth="4" />
-      <circle cx="350" cy="120" r="8" fill="#ffd43b" stroke={INK} strokeWidth="3" />
-      {[30, 80, 140, 190].map((cx) => wheel(cx, 18))}
-      {[250, 320].map((cx) => wheel(cx))}
-      {puff > 0 && (
-        <g key={puff} className="tm-steam">
-          <circle cx="324" cy="30" r="22" fill="#fff" />
-          <circle cx="300" cy="14" r="18" fill="#fff" />
-          <circle cx="344" cy="10" r="16" fill="#fff" />
-        </g>
-      )}
-    </Draw>
+    </>
+  );
+}
+
+/**
+ * The rail ahead of the train, shining (H-64): it lies over the dark rail from the train's front to the buffers and
+ * gets shorter as the train rolls on, so what lies behind is dark and what is still to come shines.
+ */
+export function RailAhead() {
+  const from = TRAIN.x + TRAIN.w;
+  return (
+    <Layer x={from} y={RAIL_Y - 6} w={TRAIN.stop - from} h={10}>
+      <div className="tm-rail-shine tm-move" />
+    </Layer>
   );
 }
 
@@ -267,17 +319,27 @@ export const SandFrame = memo(function SandFrame() {
   );
 });
 
-/** The sand: the top heap sinking, the thin stream through the neck and the bottom heap growing, each its own layer. */
+/**
+ * The sand: the top heap sinking, the thin stream through the neck and the bottom heap growing, each its own layer.
+ * Every second one big grain falls through the neck into the heap (H-63), and the glass the sand has left keeps a
+ * faint film of it (H-64), so what is over shows above and what is still to come below.
+ */
 export function Sand({ running }: { running: boolean }) {
   const left = GLASS.cx - GLASS.w / 2;
   return (
     <>
       <Layer x={left} y={GLASS.top} w={GLASS.w} h={GLASS.neck - GLASS.top} className="tm-bulb" style={{ clipPath: bulbPolygon(false) }}>
+        <div className="tm-sand-dust" />
         <div className="tm-sand tm-sand-top tm-move" />
       </Layer>
       {running && (
         <Layer x={GLASS.cx - 5} y={GLASS.neck - 4} w={10} h={GLASS.bottom - GLASS.neck} className="tm-stream">
           <div className="tm-stream-grains tm-move" />
+        </Layer>
+      )}
+      {running && (
+        <Layer x={GLASS.cx - 11} y={GLASS.neck - 8} w={22} h={22}>
+          <div className="tm-grain tm-beat" />
         </Layer>
       )}
       <Layer x={left} y={GLASS.neck} w={GLASS.w} h={GLASS.bottom - GLASS.neck} className="tm-bulb" style={{ clipPath: bulbPolygon(true) }}>
@@ -324,6 +386,18 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
   );
 });
 
+/**
+ * The wax that has run down, a puddle on the holder that grows as the candle burns (H-64): what has burnt lies
+ * below, what is still to burn stands above. Behind the candle, so it shows on both sides of it.
+ */
+export function WaxPuddle() {
+  return (
+    <Layer x={CANDLE.cx - 100} y={CANDLE.base - 14} w={200} h={28}>
+      <div className="tm-puddle tm-move" />
+    </Layer>
+  );
+}
+
 /** The candle's wax, shrinking from the bottom up as it burns (its CSS scales it). */
 export function CandleWax() {
   return (
@@ -346,6 +420,8 @@ export function CandleFlame({ out, flare }: { out: boolean; flare: number }) {
         <ellipse cx={w / 2} cy="0" rx={w / 2 - 2} ry="14" fill="#ffe3e3" stroke={INK} strokeWidth="4" />
         <path d={`M${w / 2} 0 V-22`} stroke={INK} strokeWidth="5" strokeLinecap="round" />
       </svg>
+      {/* A drop of wax running down the candle's side, a little further every second (H-63). */}
+      <div className="tm-drop tm-beat" />
       {out ? (
         <div className="tm-smoke" />
       ) : (
