@@ -328,6 +328,8 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "Nach dem Gefühl kommt eine zweite Frage mit drei Bildern: kuscheln, toben, etwas trinken, allein sein, ein Lied. Das Kind wählt, was ihm jetzt guttut – und der Erwachsene weiß, was er tun kann, auch ohne dass das Kind es sagen kann.",
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
+      partial:
+        "Gebaut (4. November 2026): nach dem Wetter drei Karten, die zum Gefühl passen (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken). Es fehlen die fünf Bilder (bilder/README.md, „Geplant“) – bis dahin fragt die gebaute Seite noch nicht – und die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-32",

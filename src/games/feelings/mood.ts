@@ -13,6 +13,8 @@ export interface Weather {
   caption: Localized;
   /** The group of scenes played next (`GROUPS`). */
   group: string;
+  /** The three things offered after it in „Was hilft dir jetzt?“, the one that fits this feeling best first. */
+  helps: [HelpId, HelpId, HelpId];
 }
 
 export const WEATHERS: Weather[] = [
@@ -20,21 +22,25 @@ export const WEATHERS: Weather[] = [
     id: "sonne",
     caption: { de: "Sonne, fröhlich", ru: "Солнце, весело", en: "Sun, happy", zh: "太阳，开心", hi: "धूप, खुश", es: "Sol, alegre", ar: "شمس، فرح" },
     group: "freude",
+    helps: ["toben", "lied", "kuscheln"],
   },
   {
     id: "wolke",
     caption: { de: "Wolke, müde", ru: "Облако, сонно", en: "Cloud, tired", zh: "多云，困了", hi: "बादल, थकान", es: "Nube, sueño", ar: "غيمة، تعب" },
     group: "muede",
+    helps: ["kuscheln", "trinken", "allein"],
   },
   {
     id: "regen",
     caption: { de: "Regen, traurig", ru: "Дождь, грустно", en: "Rain, sad", zh: "下雨，难过", hi: "बारिश, उदास", es: "Lluvia, triste", ar: "مطر، حزن" },
     group: "traurig",
+    helps: ["kuscheln", "lied", "allein"],
   },
   {
     id: "gewitter",
     caption: { de: "Gewitter, wütend", ru: "Гроза, сердито", en: "Storm, angry", zh: "打雷，生气", hi: "तूफ़ान, गुस्सा", es: "Tormenta, enojo", ar: "عاصفة، غضب" },
     group: "wuetend",
+    helps: ["toben", "allein", "trinken"],
   },
 ];
 
@@ -59,3 +65,30 @@ export const MOOD_ANSWER: Localized = {
   es: "¡A mí también me pasa!",
   ar: "أنا أيضا أعرف هذا الشعور!",
 };
+
+/** What can help a child now; each has its card in „Was hilft dir jetzt?“ (`moodImages.help`). */
+export type HelpId = "kuscheln" | "toben" | "trinken" | "allein" | "lied";
+
+/**
+ * One thing that can help: there is no wrong one, so the child shows what it needs, and the grown-up sees from the
+ * card's caption what to do – also when the child can't say it yet (idea C-31).
+ */
+export interface Help {
+  id: HelpId;
+  /** What the card shows, as short as a button, for grown-ups under it. */
+  caption: Localized;
+  /** Said when it is picked: that it is a good idea. */
+  answer: Localized;
+}
+
+/** The things that can help, by id. German only so far (November 2026): translations come when the user asks. */
+export const HELPS: Record<HelpId, Help> = {
+  kuscheln: { id: "kuscheln", caption: { de: "Kuscheln" }, answer: { de: "Kuscheln tut gut." } },
+  toben: { id: "toben", caption: { de: "Toben" }, answer: { de: "Toben tut gut." } },
+  trinken: { id: "trinken", caption: { de: "Etwas trinken" }, answer: { de: "Ein Schluck Wasser tut gut." } },
+  allein: { id: "allein", caption: { de: "Ein bisschen allein sein" }, answer: { de: "Ein bisschen Ruhe tut gut." } },
+  lied: { id: "lied", caption: { de: "Ein Lied singen" }, answer: { de: "Ein Lied tut gut." } },
+};
+
+/** Read aloud when the three cards of what helps come, after the weather. */
+export const HELP_QUESTION: Localized = { de: "Was hilft dir jetzt?" };

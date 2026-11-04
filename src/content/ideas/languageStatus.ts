@@ -187,6 +187,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Frage, Antwort und Wetter teilen sich Übersetzung und Aufnahmen mit „Alltagssituationen“ (stimme/).",
       },
       { label: "Zeile für Erwachsene", languages: { de: "done" }, note: "MOOD_BLURB in names.ts, nur Deutsch; der Titel ist übersetzt." },
+      {
+        label: "Was hilft dir jetzt?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-31), nur Deutsch und noch nicht aufgenommen: die Frage, die fünf Dinge, die helfen, und was zu jedem gesagt wird (HELPS in mood.ts).",
+      },
     ],
   },
   {

@@ -5,11 +5,16 @@ A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefu
 games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes area C:
 - **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`) plays at once: four weather
   cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show the bear under that weather, feeling the same. The child
-  picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then a pass of the matching group
-  plays (`Weather.group`: sun → Freude & Stolz, cloud → Müde & zu viel, rain → Traurig, storm → Wütend), without
+  picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then „Was hilft dir jetzt?“ (C-31)
+  offers three cards of the little bear doing what helps (`Weather.helps` from `HELPS`: kuscheln, toben, etwas
+  trinken, ein bisschen allein sein, ein Lied – the three that fit that feeling, none of them wrong, so the grown-up
+  sees what the child needs); the picked one shows big with its line („Kuscheln tut gut.“), then a pass of the
+  matching group plays (`Weather.group`: sun → Freude & Stolz, cloud → Müde & zu viel, rain → Traurig, storm → Wütend), without
   touching the place „Alltagssituationen“ goes on from (`remember={false}`). „Nochmal“ asks for the weather again.
-  Keys 1–4 pick a weather, any other key one at random. This game is meant to grow (ideas C-29 to C-36): more
-  feelings to show, faces, „Was hilft dir jetzt?“.
+  Keys 1–4 pick a weather (1–3 a help), any other key one at random. Like a new story, the built site asks „Was hilft
+  dir jetzt?“ only once all five `hilft-…` pictures are made (`ASKS_HELP` in `MoodPlay.tsx`); the dev server shows
+  their placeholders. This game is meant to grow (ideas C-29 to C-36): more
+  feelings to show, faces.
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
   (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
   Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The cards always stand in that fixed order;

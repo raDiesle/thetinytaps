@@ -355,6 +355,23 @@
   }
 }
 
+/* „Was hilft dir jetzt?“: three cards; on upright screens one over the other, as big as the height allows. The cq units
+   measure the whole play area, so the middle's padding comes off. */
+.mood-helps {
+  --card-w: min(100cqw - 2 * var(--pad), (100cqh - 3 * var(--label) - 2 * var(--gap) - 2 * var(--pad)) / 2.25);
+
+  grid-template-columns: auto;
+}
+
+/* Wide and low screens: the three in one row. */
+@media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
+  .mood-helps {
+    --card-w: min((100cqw - 2 * var(--gap) - 2 * var(--pad)) / 3, (100cqh - var(--label) - 2 * var(--pad)) / 0.75);
+
+    grid-template-columns: repeat(3, auto);
+  }
+}
+
 /* A card with its caption underneath, below the ring and shadow of the card. */
 .fg-choice {
   position: relative;

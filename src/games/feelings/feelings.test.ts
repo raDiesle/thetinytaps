@@ -6,7 +6,7 @@ import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { WEATHERS } from "./mood";
+import { HELPS, WEATHERS } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { roundOf, stepsOf } from "./rounds";
@@ -94,6 +94,21 @@ test("every weather has its card and leads to a group", () => {
     expect(imageFor(moodImages.weather(id)), moodImages.weather(id)).toBeDefined();
     expect(GROUPS.map((g) => g.id)).toContain(group);
   }
+});
+
+// „Was hilft dir jetzt?“ (C-31): three different things after every weather, each with its card; none is wrong.
+test("every weather offers three different helps, each with its card", () => {
+  for (const { id, helps } of WEATHERS) expect(new Set(helps).size, id).toBe(3);
+  for (const help of Object.values(HELPS)) {
+    expectPicture(moodImages.help(help.id));
+    expect(help.caption.de, help.id).not.toMatch(/[.!]$/);
+  }
+  const offered = new Set(WEATHERS.flatMap((w) => w.helps));
+  expect([...offered].toSorted(), "a help no weather offers is never seen").toEqual(
+    Object.values(HELPS)
+      .map((h) => h.id)
+      .toSorted(),
+  );
 });
 
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
