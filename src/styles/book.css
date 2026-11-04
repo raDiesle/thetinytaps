@@ -1472,9 +1472,9 @@
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .play-area .play-options-corner .play-options-button {
-    min-width: 150px;
-    min-height: 58px;
-    padding: 10px 34px 6px 10px;
+    min-width: 0;
+    min-height: 40px;
+    padding: 6px 24px 3px 7px;
   }
 }
 
@@ -1484,6 +1484,15 @@
   right: 9px;
   width: 16px;
   height: 48px;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root .play-area .play-options-corner .play-options-button::before {
+    top: -11px;
+    right: 6px;
+    width: 11px;
+    height: 32px;
+  }
 }
 
 /* The intro is a paper note too, lying askew under ⚙️'s slip. */

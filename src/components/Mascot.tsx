@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type PointerEvent, type ReactNode, useEffect, useRef, useState } from "react";
 
 // The app's two mascots, the fox and the bear, drawn once for every game: a head (`MascotHead`) that every drawing of a
 // fox or bear uses, whatever its body or clothes, and a whole figure standing (`Mascot`). They follow the families of
@@ -79,8 +79,8 @@ const BROWS: Record<MascotBrows, string> = {
 /** How the eyes are: open, wide open (excited, scared), half shut (tired), shut in sleep, or laughing (two arcs up). */
 export type MascotEyes = "open" | "wide" | "half" | "shut" | "happy";
 
-/** The mouth: a little smile, open with the tongue (cheering, laughing), turned down (sad, angry), or a round „o“ (a yawn, a fright, blowing). */
-export type MascotMouth = "smile" | "open" | "frown" | "o";
+/** The mouth: a little smile, open with the tongue (cheering, laughing), a wide grin showing its teeth, turned down (sad, angry), or a round „o“ (a yawn, a fright, blowing). */
+export type MascotMouth = "smile" | "open" | "grin" | "frown" | "o";
 
 /**
  * A fox's or a bear's head facing us in a 100 × 100 box (the head's middle at about 50, 56, its ears up to the top), to be
@@ -250,6 +250,29 @@ function Mouth({ mouth, bear }: { mouth: MascotMouth; bear: boolean }) {
       </>
     );
   }
+  if (mouth === "grin") {
+    // A wide grin showing a row of white teeth (clean ones, after brushing), the tongue below them: big enough to be
+    // seen on a small figure.
+    const outline = `M38 ${top - 0.5} Q50 ${top + 2.6} 62 ${top - 0.5} C61 ${top + 13} 39 ${top + 13} 38 ${top - 0.5} Z`;
+    return (
+      <>
+        <path d={outline} fill="#7a2c2e" />
+        <path d={`M39.6 ${top + 0.4} Q50 ${top + 3.2} 60.4 ${top + 0.4} L59.4 ${top + 5.6} Q50 ${top + 8} 40.6 ${top + 5.6} Z`} fill="#fff" />
+        <path
+          d={`M45 ${top + 2} V${top + 6.6} M50 ${top + 2.5} V${top + 7.3} M55 ${top + 2} V${top + 6.6}`}
+          stroke="#c9bcc6"
+          strokeWidth="0.9"
+          strokeLinecap="round"
+        />
+        <path
+          d={`M44.5 ${top + 9.6} Q50 ${top + 7.8} 55.5 ${top + 9.6} Q53.5 ${top + 11} 50 ${top + 11} Q46.5 ${top + 11} 44.5 ${top + 9.6} Z`}
+          fill="#f07b85"
+        />
+        <path d={outline} fill="none" stroke={MASCOT_INK} strokeWidth="1.8" strokeLinejoin="round" />
+        <path d={`M50 ${under} L50 ${top + 0.6}`} stroke={MASCOT_INK} strokeWidth="2" strokeLinecap="round" />
+      </>
+    );
+  }
   if (mouth === "open") {
     // A round, laughing mouth, wide at the top like a „D“ on its back, the tongue at its bottom.
     return (
@@ -289,7 +312,21 @@ export type MascotPose = "stand" | "wave" | "cheer" | "clap";
  * its right arm (`.mascot-arm`, turning at the shoulder) may be waved by the Timer, whose figures are small; elsewhere
  * the pose is drawn still. Cheering, it laughs with its mouth open.
  */
-export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKind; child?: boolean; pose?: MascotPose }) {
+export function Mascot({
+  kind,
+  child = false,
+  pose = "stand",
+  mouth,
+  armApart = false,
+}: {
+  kind: MascotKind;
+  child?: boolean;
+  pose?: MascotPose;
+  /** Another mouth than the pose's own (a grin showing the teeth). */
+  mouth?: MascotMouth;
+  /** Leaves out the raised arm of `wave`, drawn apart (`WavingArm`) behind the figure so it can wave as a layer of its own. */
+  armApart?: boolean;
+}) {
   const fox = kind === "fox";
   const c = MASCOT_COLORS[kind];
   // A child's head is bigger for its body, like a small child's.
@@ -324,12 +361,24 @@ export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKi
         </g>
       ) : pose === "clap" ? (
         <Arm from={[142, 178]} via={[156, 208]} to={[111, 190]} kind={kind} />
-      ) : (
-        <Arm from={[140, 176]} via={[166, 152]} to={[170, 114]} kind={kind} />
+      ) : pose === "wave" && armApart ? null : (
+        <Arm {...RAISED_ARM} kind={kind} />
       )}
       <g transform={head}>
-        <MascotHead kind={kind} child={child} mouth={pose === "cheer" ? "open" : "smile"} />
+        <MascotHead kind={kind} child={child} mouth={mouth ?? (pose === "cheer" ? "open" : "smile")} />
       </g>
+    </svg>
+  );
+}
+
+/** The right arm raised, to wave or cheer: from the shoulder, bent out, the paw up beside the head. */
+const RAISED_ARM = { from: [140, 176], via: [166, 152], to: [170, 114] } satisfies Record<string, [number, number]>;
+
+/** The raised arm of a figure drawn `armApart`, in the figure's 200 × 300 box: an svg of its own, to lie behind the figure and wave. */
+function WavingArm({ kind }: { kind: MascotKind }) {
+  return (
+    <svg viewBox="0 0 200 300">
+      <Arm {...RAISED_ARM} kind={kind} />
     </svg>
   );
 }
@@ -428,19 +477,56 @@ function Scarf({ color, stripe }: { color: string; stripe: string }) {
   );
 }
 
+/** How long the family waves and grins after a tap: four beats of a calm song. */
+const WAVE_MS = 2200;
+
 /**
  * A fox or bear child jumping for joy with both arms up, its grown-up beside it waving (D-12): for the end of a game.
  * Each is an HTML layer of its own, so the child's two hops (`mascot-jump`) move only its small picture; then both
  * stand still. It takes the height of its box (`.mascot-family`), the child about two thirds as tall.
+ * With `onTap` the family answers a tap: both wave, grinning with all their teeth, and the child hops again; the waving
+ * arms are small layers of their own behind each figure (`.mascot-wave-arm`), so nothing moves inside an svg.
  */
-export function CheeringFamily({ kind, className }: { kind: MascotKind; className?: string }) {
-  return (
-    <span className={`mascot-family${className ? ` ${className}` : ""}`} aria-hidden>
-      <span className="mascot-grown">
-        <Mascot kind={kind} pose="wave" />
+export function CheeringFamily({ kind, className, onTap }: { kind: MascotKind; className?: string; onTap?: (e: PointerEvent<HTMLElement>) => void }) {
+  const [taps, setTaps] = useState(0);
+  const [waving, setWaving] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  if (!onTap)
+    return (
+      <span className={`mascot-family${className ? ` ${className}` : ""}`} aria-hidden>
+        <span className="mascot-grown">
+          <Mascot kind={kind} pose="wave" />
+        </span>
+        <span className="mascot-child">
+          <Mascot kind={kind} child pose="cheer" />
+        </span>
       </span>
-      <span className="mascot-child">
-        <Mascot kind={kind} child pose="cheer" />
+    );
+  const tap = (e: PointerEvent<HTMLElement>) => {
+    onTap(e);
+    setTaps((n) => n + 1);
+    setWaving(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setWaving(false), WAVE_MS);
+  };
+  const mouth = waving ? "grin" : undefined;
+  return (
+    <span className={`mascot-family tappable${waving ? " waving" : ""}${className ? ` ${className}` : ""}`} aria-hidden data-tap onPointerDown={tap}>
+      <span className="mascot-grown">
+        <span className="mascot-wave-arm" key={taps}>
+          <WavingArm kind={kind} />
+        </span>
+        <Mascot kind={kind} pose="wave" armApart mouth={mouth} />
+      </span>
+      {/* A new key on every tap, so the child hops again. */}
+      <span className="mascot-child" key={taps}>
+        {waving && (
+          <span className="mascot-wave-arm">
+            <WavingArm kind={kind} />
+          </span>
+        )}
+        <Mascot kind={kind} child pose={waving ? "wave" : "cheer"} armApart mouth={mouth} />
       </span>
     </span>
   );

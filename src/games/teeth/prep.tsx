@@ -7,8 +7,8 @@ import type { Daytime } from "./daytime";
 import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
-// hand takes it out, then the tube comes over and squeezes a striped wave of
-// toothpaste along the bristles and lies down again. All of it is CSS
+// hand takes it out, then the tube comes over and squeezes a little striped dab of
+// toothpaste onto the bristles and lies down again. All of it is CSS
 // animation (teeth.css); the sounds (PREP_CUES) go by the brushing clock.
 // After brushing the same sink again: the brush is rinsed under the tap and
 // goes back into its cup. Through the window the sun comes up in the morning;
@@ -142,20 +142,17 @@ function Tube() {
   );
 }
 
-/** The striped wave of toothpaste on top of the bristles, in the toothbrush's coordinates. */
+/**
+ * A little dab of striped toothpaste in the middle of the bristles, in the toothbrush's coordinates: pea-sized, as
+ * much as a child's brush gets – never a stripe along the whole head (user feedback, November 2026).
+ */
 function Paste() {
   return (
-    <g className="prep-paste">
-      <clipPath id="prep-paste-reveal">
-        <rect className="prep-paste-reveal" x={-42} y={-48} width={74} height={36} />
-      </clipPath>
-      <g clipPath="url(#prep-paste-reveal)" stroke={INK} strokeLinejoin="round" strokeLinecap="round">
-        <path d="M-38 -14 C-40 -24 -32 -31 -24 -28 C-18 -36 -6 -36 -1 -29 C4 -36 16 -37 20 -29 C26 -30 30 -22 26 -14 Z" fill="#fff" strokeWidth={3} />
-        <path d="M-32 -20 C-24 -26 -12 -29 -2 -23 C6 -29 16 -28 22 -21" fill="none" stroke="#4cc9f0" strokeWidth={3.5} />
-        <path d="M-30 -16 C-22 -21 -12 -22 -2 -18 C6 -22 14 -22 22 -17" fill="none" stroke="#ff7088" strokeWidth={3} />
-        {/* The little curl where the tube lifted off. */}
-        <path d="M18 -30 C20 -40 30 -40 28 -32" fill="#fff" strokeWidth={3} />
-      </g>
+    <g className="prep-paste" stroke={INK} strokeLinejoin="round" strokeLinecap="round">
+      <path d="M-17 -14 C-19 -19 -15 -23 -10 -22 C-7 -27 0 -27 1 -21 C5 -20 6 -15 3 -14 Z" fill="#fff" strokeWidth={2.5} />
+      <path d="M-14 -17 C-10 -20 -5 -20 -2 -18 C0 -19 2 -19 3 -17" fill="none" stroke="#4cc9f0" strokeWidth={2.5} />
+      {/* The little curl where the tube lifted off. */}
+      <path d="M-5 -24 C-4 -29 2 -29 1 -25" fill="#fff" strokeWidth={2.5} />
     </g>
   );
 }
@@ -370,7 +367,7 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
             </g>
           ))}
         {part === "paste" && (
-          <g transform="translate(150 118) scale(0.3)">
+          <g transform="translate(130 128) scale(0.3)">
             <path className="prep-twinkle late" d={STAR_PATH} fill="#ffd23f" stroke={INK} strokeWidth={8} />
           </g>
         )}
