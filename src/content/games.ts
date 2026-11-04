@@ -1,3 +1,4 @@
+import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
@@ -271,20 +272,6 @@ export const CATEGORIES: Category[] = [
         },
       },
       {
-        href: "/gefuehle/",
-        emoji: "🐻",
-        title: { de: "Gefühle", ru: "Чувства", en: "Feelings", zh: "情绪", hi: "भावनाएँ", es: "Emociones", ar: "المشاعر" },
-        blurb: {
-          de: "Der kleine Bär und seine Gefühle",
-          en: "Little Bear and his feelings",
-          zh: "小熊和它的心情",
-          hi: "भालू और उसकी भावनाएँ",
-          es: "El osito y sus emociones",
-          ar: "الدبدوب ومشاعره",
-          ru: "Мишка и его чувства",
-        },
-      },
-      {
         href: "/abenteuer/",
         emoji: "🏝️",
         title: {
@@ -306,6 +293,17 @@ export const CATEGORIES: Category[] = [
           ru: "Прыгать, тянуться, красться – вместе",
         },
       },
+    ],
+  },
+  {
+    // A book of its own (user decision, November 2026): first the child says how it feels, then everyday scenes by feeling.
+    id: "gefuehle",
+    emoji: "🐻",
+    title: BOOK_TITLE,
+    blurb: BOOK_BLURB,
+    games: [
+      { href: "/wie-gehts-dir/", emoji: "🌦️", title: MOOD_TITLE, blurb: MOOD_BLURB },
+      { href: "/gefuehle/", emoji: "🐻", title: ALLTAG_TITLE, blurb: ALLTAG_BLURB },
     ],
   },
   {

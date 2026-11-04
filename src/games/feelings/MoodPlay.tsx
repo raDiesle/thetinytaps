@@ -1,20 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { useT } from "@/lib/language";
-import type { FeelingId } from "./bear";
 import { moodImages, preloadImages } from "./images";
 import { MOOD_ANSWER, MOOD_QUESTION, WEATHERS, type Weather } from "./mood";
 import type { FeelingsSettings } from "./settings";
-import { ChoiceCard, FloaterLayer, StoryPicture, useFloaters, useTimers, useVoice } from "./shared";
+import { ChoiceCard, StoryPicture, useTimers, useVoice } from "./shared";
 
-/** How long the picked weather stays big before the bear's story begins. */
+/** How long the picked weather stays big before the scenes of that feeling begin. */
 const ANSWER_MS = 2200;
 
-/** Wie geht's dir heute? Four weather cards; the picked one shows big, then `onPick` plays the bear's story with that feeling. */
-export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onPick: (feeling: FeelingId) => void }) {
+/** Wie geht's dir heute? Four weather cards; the picked one shows big, then `onPick` plays the scenes of that feeling (its group). */
+export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onPick: (group: string) => void }) {
   const [picked, setPicked] = useState<Weather>();
   const { later } = useTimers();
   const { say, sound } = useVoice(settings);
-  const { floaters, float } = useFloaters();
   const t = useT();
 
   useEffect(() => {
@@ -28,10 +26,9 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
       setPicked(weather);
       say(t(MOOD_ANSWER));
       sound("chime");
-      float(weather.float, 50, 55);
-      later(() => onPick(weather.feeling), ANSWER_MS);
+      later(() => onPick(weather.group), ANSWER_MS);
     },
-    [picked, say, sound, float, later, onPick, t],
+    [picked, say, sound, later, onPick, t],
   );
 
   // Keys 1 to 4 pick that weather; any other key picks one, so every key does something.
@@ -50,9 +47,7 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
     <div className="story-play mood-play">
       <main className="story-middle">
         {picked ? (
-          <StoryPicture name={moodImages.weather(picked.id)} caption={t(picked.caption)}>
-            <FloaterLayer floaters={floaters} />
-          </StoryPicture>
+          <StoryPicture name={moodImages.weather(picked.id)} caption={t(picked.caption)} />
         ) : (
           <div className="mood-cards">
             {WEATHERS.map((w) => (

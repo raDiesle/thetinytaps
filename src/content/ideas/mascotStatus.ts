@@ -152,6 +152,21 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/abenteuer/",
+    note: "Tapsi ist schon der Held in 3D und spricht. Der leuchtende Tänzer steht für das Kind und bleibt.",
+    tasks: [
+      { label: "Tapsi zeigt die Bewegungen", work: "drawing", effort: "S", state: "done" },
+      { label: "Mama, Papa, Oma oder Opa Fuchs macht bei Bewegungen zu zweit mit Tapsi vor", work: "drawing", effort: "M", idea: "M-05" },
+    ],
+  },
+  {
+    href: "/wie-gehts-dir/",
+    note: "Der kleine Bär unter dem Wetter (die vier Wetterbilder); danach spielen die Szenen von „Alltagssituationen“.",
+    tasks: [
+      { label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter)", work: "picture", pictures: 4, effort: "M", idea: "C-30" },
+    ],
+  },
+  {
     href: "/gefuehle/",
     note: "Gemini-Bilder mit Tierkindern (Bär, Fuchs, Hase, Igel). Im Kita-Teil ist der Fuchs der, der schubst, tritt, wegnimmt und umwirft.",
     tasks: [
@@ -163,14 +178,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Zu entscheiden: ein anderes Tier (Waschbär?) übernimmt Schubsen, Treten, Wegnehmen, Umwerfen (kita.ts und rund 56 Bilder); Fuchs und Bär, die Maskottchen, helfen und trösten.",
       },
       { label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten", work: "picture", pictures: 8, effort: "M" },
-    ],
-  },
-  {
-    href: "/abenteuer/",
-    note: "Tapsi ist schon der Held in 3D und spricht. Der leuchtende Tänzer steht für das Kind und bleibt.",
-    tasks: [
-      { label: "Tapsi zeigt die Bewegungen", work: "drawing", effort: "S", state: "done" },
-      { label: "Mama, Papa, Oma oder Opa Fuchs macht bei Bewegungen zu zweit mit Tapsi vor", work: "drawing", effort: "M", idea: "M-05" },
     ],
   },
   {

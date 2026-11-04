@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { appLanguage, pick, useAppLanguage, useT, type Localized } from "@/lib/language";
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { recordedVoice } from "@/lib/voice";
 import { framesFor } from "./images";
@@ -7,8 +7,8 @@ import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story
 import type { FeelingsSettings } from "./settings";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
-/** How long each frame of a picture stays before the next one fades in. */
-const FRAME_MS = 900;
+/** How long each frame of the big picture stays before the next one fades in: slow, so nothing blinks. */
+const FRAME_MS = 1500;
 
 /** Said with the laugh when a good idea is chosen, one at random. */
 export const PRAISE: Localized<string[]> = {
@@ -27,22 +27,19 @@ export const CHEER_MS = 1100;
 /** The red frame stays at least this long, even when nothing is said: long enough to see what went wrong. */
 export const OOPS_MS = 2600;
 
-/** A good idea was chosen: a laugh, stars, and „Juhu!“. */
-export function cheer(say: (text: string) => void, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
+/**
+ * A good idea was chosen: a laugh and „Juhu!“. Nothing floats up or hops: the picture of the good idea, with the
+ * bear relieved and happy, is the answer (user feedback, November 2026).
+ */
+export function cheer(say: (text: string) => void, sound: (name: SoundName) => void) {
   const praise = pick(PRAISE, appLanguage());
   sound("laugh");
   say(praise[Math.floor(Math.random() * praise.length)]);
-  float("⭐", 30, 25, 4);
-  float("✨", 70, 35, 4);
 }
 
-/** What floats up after a not-so-good idea, by what is heard. */
-const OOPS_FLOAT: Record<OopsSound | "cry", string> = { aua: "💢", crash: "💥", cry: "💧" };
-
-/** A not-so-good idea was chosen: what it leads to, heard and seen – „Aua!“, a crash, or crying. */
-export function oops(heard: OopsSound | undefined, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
+/** A not-so-good idea was chosen: what it leads to, heard – „Aua!“, a crash, or crying; its picture shows the rest. */
+export function oops(heard: OopsSound | undefined, sound: (name: SoundName) => void) {
   sound(heard ?? "cry");
-  float(OOPS_FLOAT[heard ?? "cry"], 50, 45, 3);
 }
 
 /** Timeouts that are all cleared when the game ends or a new story starts. */
@@ -107,63 +104,17 @@ export function useVoice(settings: FeelingsSettings) {
   return { say, sound, voiced, preload };
 }
 
-interface Floater {
-  id: number;
-  emoji: string;
-  /** In % of the stage. */
-  x: number;
-  y: number;
-}
-
-const FLOAT_MS = 1800;
-
-/** Hearts, notes or puffs that float up from somewhere on the stage and fade away. */
-export function useFloaters() {
-  const [floaters, setFloaters] = useState<Floater[]>([]);
-  const nextId = useRef(0);
-  const { later } = useTimers();
-
-  const float = useCallback(
-    (emoji: string, x: number, y: number, count = 4) => {
-      const fresh = Array.from({ length: count }, (_, i) => ({
-        id: nextId.current++,
-        emoji,
-        x: x + (i - (count - 1) / 2) * 7 + Math.random() * 4,
-        y: y + Math.random() * 8,
-      }));
-      setFloaters((prev) => [...prev.slice(-20), ...fresh]);
-      later(() => setFloaters((prev) => prev.filter((f) => !fresh.includes(f))), FLOAT_MS);
-    },
-    [later],
-  );
-
-  return { floaters, float };
-}
-
-export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
-  return (
-    <div className="fg-floaters" aria-hidden>
-      {floaters.map((f, i) => (
-        <span key={f.id} className="fg-floater" style={{ left: `${f.x}%`, bottom: `${f.y}%`, "--i": i % 4, "--float-ms": `${FLOAT_MS}ms` } as CSSProperties}>
-          {f.emoji}
-        </span>
-      ))}
-    </div>
-  );
-}
-
 /**
  * How the big picture looks. "story": what happens, as a framed photo. "quiet": the same while
  * the child chooses, paler, so the cards stand out and it doesn't look like one of them.
- * "option": a card the child tapped, looked at big, with the yellow ring of a card. "good" and
- * "bad": the answer to a choice, a green frame that hops or a red one that shakes.
+ * "good" and "bad": the answer to a choice, a still green or red frame with a tick or a cross.
  */
-export type PictureLook = "story" | "quiet" | "option" | "good" | "bad";
+export type PictureLook = "story" | "quiet" | "good" | "bad";
 
-/** Which of `count` frames shows now: they take turns while `moving`, like a tiny GIF; otherwise the first. */
-function useFrame(count: number, moving: boolean): number {
+/** Which of `count` frames shows now: they take turns, like a tiny GIF. */
+function useFrame(count: number): number {
   const [frame, setFrame] = useState(0);
-  const loops = moving && count > 1;
+  const loops = count > 1;
 
   useEffect(() => {
     if (!loops || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -174,79 +125,33 @@ function useFrame(count: number, moving: boolean): number {
   return loops ? frame % count : 0;
 }
 
-/** How long the picture of a tapped card takes to grow from the card to its place. */
-const ZOOM_MS = 320;
-
 /**
  * The big picture in the middle: what happens right now. Its frames fade into
  * each other in a loop, like a tiny GIF, so the animals seem to move a little.
- * Under it a short caption for grown-ups says what it shows.
+ * A short caption for grown-ups says what it shows.
  * Give it a new `key` with every new picture, so it starts at the first frame.
  */
 export function StoryPicture({
   name,
   caption,
   look = "story",
-  zoom = false,
-  back,
-  children,
-  onPointerDown,
 }: {
   name: string;
   /** What the picture shows, in a few words: for grown-ups, children don't read it. */
   caption: string;
   look?: PictureLook;
-  /** Grows out of the card with the same picture when it appears, so the child sees which card it is. */
-  zoom?: boolean;
-  /** While a card is looked at big: the picture to go back to (the story's first one), small in the corner, and what tapping it does. */
-  back?: { image: string; onBack: () => void };
-  /** Things on top of the picture: floating hearts. */
-  children?: ReactNode;
-  onPointerDown?: (e: PointerEvent) => void;
 }) {
   const frames = framesFor(name);
-  const shown = useFrame(frames.length, true);
-  const frameRef = useRef<HTMLDivElement>(null);
-
-  // Before the first paint: start where the card is and grow to the picture's place.
-  useLayoutEffect(() => {
-    const el = frameRef.current;
-    const card = document.querySelector(`.fg-card[data-card="${CSS.escape(name)}"]`);
-    if (!zoom || !el || !card || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const from = card.getBoundingClientRect();
-    const to = el.getBoundingClientRect();
-    const start = `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width})`;
-    const grow = el.animate(
-      [
-        { transform: start, transformOrigin: "0 0" },
-        { transform: "none", transformOrigin: "0 0" },
-      ],
-      {
-        duration: ZOOM_MS,
-        easing: "cubic-bezier(0.2, 0.8, 0.3, 1)",
-      },
-    );
-    return () => grow.cancel();
-  }, []);
+  const shown = useFrame(frames.length);
 
   return (
-    <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
+    <div className={`fg-frame fg-look-${look}`}>
       <div className="fg-picture">
         {frames.map((src, i) => (
           <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
         ))}
         {frames.length === 0 && <Placeholder name={name} />}
-        {children}
-        {/* A card looked at big: a hand taps it again and again, so the child knows one more tap chooses it. */}
-        {look === "option" && (
-          <span className="fg-tap-hint" aria-hidden>
-            <span className="fg-tap-ripple" />
-            <span className="fg-tap-hand">👆</span>
-          </span>
-        )}
       </div>
-      {/* A card looked at big, but not wanted: the first picture, small on the corner with an arrow back – tapped, it is big again. */}
-      {look === "option" && back && <BackButton image={back.image} onBack={back.onBack} />}
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
@@ -256,37 +161,33 @@ export function StoryPicture({
 }
 
 /**
- * "choose": the child can tap it. "picked": tapped once, shown big above; tapped again it is chosen.
- * "playing": chosen, the bear does it now. "done": done, with a tick. "wrong": the not-so-good idea, crossed out. "rest": waits.
+ * "choose": the child can tap it; one tap chooses it (user feedback, November 2026: no second tap to confirm).
+ * "playing": chosen, the bear does it now. "wrong": the not-so-good idea, crossed out. "rest": waits.
  */
-export type CardState = "choose" | "picked" | "playing" | "done" | "wrong" | "rest";
+export type CardState = "choose" | "playing" | "wrong" | "rest";
 
 /** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
   image,
   caption,
   state,
-  small = false,
   onChoose,
 }: {
-  /** Name of the picture, see images.ts. The big picture grows out of the card with the same name. */
+  /** Name of the picture, see images.ts. */
   image: string;
   /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
   caption: string;
   state: CardState;
-  small?: boolean;
   onChoose?: () => void;
 }) {
-  const active = state === "choose" || state === "picked";
-  // A card that can be chosen moves like the big picture, so the child sees what happens before choosing it.
-  const frames = framesFor(image);
-  const shown = useFrame(frames.length, active);
+  const active = state === "choose";
+  // Cards stand still: only the big picture moves a little, so not everything on the screen moves at once.
+  const src = framesFor(image)[0];
   return (
-    <div className={`fg-choice${small ? " small" : ""}`}>
+    <div className="fg-choice">
       <button
         type="button"
-        className={`fg-card fg-card-${state}${small ? " small" : ""}`}
-        data-card={image}
+        className={`fg-card fg-card-${state}`}
         // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
         data-tap
         disabled={!active}
@@ -296,49 +197,14 @@ export function ChoiceCard({
           if (active) onChoose?.();
         }}
       >
-        {frames.map((src, i) => (
-          <img key={src} className={`fg-card-image${i === shown ? " on" : ""}`} src={src} alt="" decoding="async" draggable={false} />
-        ))}
-        {frames.length === 0 && <Placeholder name={image} />}
-        {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
+        {src ? <img className="fg-card-image" src={src} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
+        {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
       <span className="fg-caption" aria-hidden>
         {caption}
       </span>
     </div>
-  );
-}
-
-/** Back to the story's first picture: a small copy of it with a ↩ on it, in the big picture's corner. */
-function BackButton({ image, onBack }: { image: string; onBack: () => void }) {
-  const t = useT();
-  const src = framesFor(image)[0];
-  return (
-    <button
-      type="button"
-      className="fg-back"
-      data-tap
-      aria-label={t({
-        de: "Zurück zum Bild",
-        ru: "Назад к картинке",
-        en: "Back to the picture",
-        zh: "回到图片",
-        hi: "तस्वीर पर वापस",
-        es: "Volver a la imagen",
-        ar: "العودة إلى الصورة",
-      })}
-      onPointerDown={(e: PointerEvent) => {
-        e.stopPropagation();
-        onBack();
-      }}
-    >
-      {src ? <img src={src} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
-      <svg className="fg-back-arrow" viewBox="0 0 24 24" aria-hidden>
-        <path d="M9 14 4 9l5-5" />
-        <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
-      </svg>
-    </button>
   );
 }
 

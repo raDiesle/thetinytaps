@@ -1,28 +1,68 @@
 # Gefühle
 
-Route `/gefuehle/`: one start screen (`FeelingsGame`) with
-„Wie geht's dir?“ first, then one card per story (`stories.ts`, `settings.story`): the
-bear's feelings at home, then the kindergarten stories. There are no sub-menus per place; the old addresses
-`/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
-`FeelingsPlay` plays one story after another, always in the start screen's order (user feedback, never
-shuffled): a picked story starts with itself (there is no „Alle“ card: „Weiter“ does that), and „Weiter“ brings the next one
-there, after the last the first (`storyAfter` in `stories.ts`, checked in `feelings.test.ts`).
+A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
+`cover-gefuehle.webp`; user decision, November 2026) with two games; their names are in `names.ts`:
+- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`) plays at once: four weather
+  cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show the bear under that weather, feeling the same. The child
+  picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then a pass of the matching group
+  plays (`Weather.group`: sun → Freude & Stolz, cloud → Müde & zu viel, rain → Traurig, storm → Wütend), without
+  touching the place „Alltagssituationen“ goes on from (`remember={false}`). „Nochmal“ asks for the weather again.
+  Keys 1–4 pick a weather, any other key one at random. This game is meant to grow (ideas C-29 to C-36): more
+  feelings to show, faces, „Was hilft dir jetzt?“.
+- **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
+  (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
+  Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The group played last comes first and
+  goes on with the scene where the child stopped (`settings.group`, `settings.scene`); the others follow in their
+  fixed order. The old addresses `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
 
-„Wie geht's dir?“ (`mood.ts`, `MoodPlay.tsx`, `settings.story` = `"mood"`, the default, never
-reached by „Weiter“): four weather cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show
-the bear under that weather, feeling the same. The child picks the one that fits;
-it shows big while the bear says „Das kenne ich auch!“, then the bear's story with
-that feeling plays (sun → birthday, cloud → tired, rain → sad, storm → angry) and
-„Weiter“ goes on in list order. Keys 1–4 pick a weather, any other key one at random.
+**One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
+step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
+the good one comes its picture (and, on the story's last step, its happy end), then straight on to the _next scene_ of
+the group (`PassPlay.tsx`) – never back to the same starting picture for another choice. A pass plays each scene of its
+group once; each story remembers its next step (`settings.steps`), so the next pass shows the same scenes with their
+other choices. After the last scene of a pass come „Menü“, „Nochmal“ (the group again) and „Weiter“ (the next group).
+The dots at the top are the pass's scenes.
 
-Zu Hause (`bear.ts`, `BearPlay.tsx`): the bear is sad, angry, tired or scared, and
-three comforts (hug, teddy, blowing …) make it happy again, one per round; on his birthday he is
+**One tap chooses** (user feedback, November 2026): no first tap that only shows a card big, no ring waiting for a
+second tap, no hand tapping, no way back from a card. The not-so-good card shows big with a still red frame, a cross on
+the corner and what it leads to, heard, while the answer says why; then the starting picture with that card crossed
+out and the good one left. The good card gets a still green frame with a tick and a laugh („Juhu!“), then its picture.
+Keys: the left arrow picks the not-so-good idea, every other key the good one. Tapping the big picture does nothing.
+
+**Calm (user feedback, November 2026):** nothing floats up (no hearts, stars, 💢, 💥, 💧, 💤, 🎉), nothing hops,
+shakes, pulses, glows, stamps or grows – not after a choice, not while waiting. The cards stand still (only their
+first frame); only the big picture's two frames fade slowly into each other (`FRAME_MS`, 1.5 s). The picture of the
+choice – the relieved, happy bear – is the answer. `GameEnd`'s pop and „Weiter“'s breathing are switched off here too.
+`feelings.test.ts` fails on a `float(`, the old keyframes, or a second `infinite` animation.
+
+A step's question and caption stand on their own: a step is played in its own pass, from the story's first picture,
+never right after the step before it. So a new question never says „noch“ or „wieder“ as if an earlier step had just
+happened. The questions written before (November 2026: „Der Bär ist noch traurig“, „Der Fuchs ist noch da“, about 15
+in `bear.ts`, `kita.ts`, `selbst.ts`) still do; rewriting them means new recordings and translations, so it waits
+until the user asks.
+
+**Whose view a scene takes is said first (user feedback, November 2026):** every round starts with a line that tells
+grown-ups and child whether the child _is_ the little bear or _helps_ its friend the bear (`ROLE_LINES`: „Stell dir
+vor: Du bist der kleine Bär.“ / „Der kleine Bär ist dein Freund. Du hilfst ihm.“), shown as the starting picture's
+caption while the scene begins. At home the role follows who does the good thing (`Comfort.actor`: the child comforts
+→ friend; the bear stomps, blows, lies down → self), in the kindergarten and the stories of more feelings the child is
+the bear. A new story or kind thing sets this; the test checks every round starts with it.
+
+**Layout (user's choice, November 2026):** wide screens (from 6:5) put the picture in the middle, as big as the
+height allows unless the cards would get less than a quarter of the width (`--card-min`, 30 % on tablets), the
+not-so-good card at the bottom left and the good one at the top right, each lying a fifth of its width over a corner
+of the picture; the picture's tick or cross sits on its top left corner. No margins beyond 8 px. At the end „Menü“ and
+„Nochmal“ stand left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
+below. Captions lie on the pictures' lower edge on wide or low screens. Look at 844×390, 1024×768 and 1280×720 after
+a change.
+
+The stories. Zu Hause (`bear.ts`): the bear is sad, angry, tired or scared, and
+three comforts (hug, teddy, blowing …) make it happy again, one per step; on his birthday he is
 happy already and the three kind things celebrate with him (dance, streamers,
 hug), asked with its own `Feeling.question`. And kindergarten stories – pushed,
 kicked, toy taken, slide full, wanting a toy, angry yourself, goodbye at the door,
-a newcomer, fallen down, someone who doesn't stop (`kita.ts`, `KitaPlay.tsx`): what happened, then the child picks the good next
-step, one after another.
-After them come stories of more feelings (`selbst.ts`, played by `KitaPlay` like the kindergarten's, ids `selbst-…`):
+a newcomer, fallen down, someone who doesn't stop (`kita.ts`): what happened, then the good next step.
+After them come stories of more feelings (`selbst.ts`, built into rounds like the kindergarten's, ids `selbst-…`):
 disappointed (the cookie breaks), jealous (the bear baby is cuddled), disgust (broccoli), embarrassed (wet trousers in
 the kindergarten), excited (the first snow) – ideas C-05, C-12, C-16, C-17, C-18 – and a second round of 19
 (pictures made November 2026): leaving the playground, a show that ends, no lolly at the checkout, a
@@ -33,13 +73,6 @@ bear has the feeling and
 helps himself (a body trick, saying how he feels, doing something else); the feeling itself is never the not-so-good
 idea, only what hurts someone or breaks something is (hiding when embarrassed is the feeling, so its not-so-good idea is
 playing on in wet trousers).
-
-**One starting picture, exactly two cards.** Before every choice the big picture shows the story's
-starting picture again (`baer-…` at home, `…-passiert` in the kindergarten) – the same one round after
-round is fine – and next to it are exactly two cards: one not-so-good idea and one good one. Never more
-cards, never the picture of the last step while choosing; a step's own picture shows only while it is
-looked at, chosen or done. At home every kind thing has its own not-so-good idea (`Feeling.instead[i]`
-next to `Feeling.comforts[i]`, `bearImages.instead(id, i)`), as every kindergarten step has.
 
 The bear stands for the child, and at home whoever comforts it is anyone there –
 usually a parent – so texts never say „Kind“. A feeling's title names the scene in
@@ -94,44 +127,12 @@ shows (`bilder/README.md`, „Jede Karte versteht man ohne Worte“, has the wor
 - When he acts himself, the prompt says „No hands, no arms come in from the edges“ (the home's room prompt allows a
   child's hands, and Gemini drew one pointing at the bear throwing alone).
 
-Every choice has a not-so-good idea next to it, so the child always really
-chooses: at home one per round (`Feeling.instead`), in the
-kindergarten one before each step (`KitaStep.instead`). The order is fixed: the
-not-so-good idea always first (left or on top), then the good one; the rounds bring the most fitting
-first (`Feeling.comforts` is in that order).
-Choosing takes two taps: the first grows the card into the big picture's place
-(yellow ring, the card lifted), so the child sees once more what it picked; the
-second – on that card or the big picture – chooses it. Tapping the other card shows
-that one instead. Keys do the same: the first press shows, the second chooses.
-That a second tap is needed must be seen without words (grown-ups found it unclear
-with the ring alone): while a card is shown big, a big hand 👆 taps the picture
-again and again with a white ring where the finger lands (`.fg-tap-hint`), and the
-other cards stop calling and fade a little, still to be tapped. Any step that waits
-for one more tap shows such a hand, never only a glow.
-A card looked at big can always be left without choosing it (user feedback): the first picture
-sits small on the big picture's top left corner with ↩ on it (`BackButton`, `StoryPicture`'s `back`),
-and tapping it – or Backspace – shows the first picture with the question again. Like the tick and the
-cross it sits half outside the frame and stays small (about a sixth of the picture's width), so it never
-covers much of the card shown big (grown-ups found a quarter of the width too much).
-Only then comes the answer, seen and heard (`cheer`/`oops` in `shared.tsx`): the
-good idea gets a green frame that hops, stars and a laugh („Juhu!“ when speech is
-on), then the bear does it; the not-so-good one a red frame that shakes and what it
-leads to, heard (`instead.sound`): „Aua!“ when someone gets hurt (`"aua"`: pushing,
-hitting, biting …), a crash when something breaks (`"crash"`), otherwise crying –
-never an error sound – with 💢, 💥 or 💧 floating up, while the answer says why; its
-card stays crossed out. Ticks and crosses sit on the corner, half outside, so the
-picture stays to be seen. Crying, the crash and the laugh are CC0 recordings
-(`cry.mp3`, `crash.mp3`, `laugh.mp3` in `src/lib/sounds/`, loaded when a story starts,
-`RECORDED_SOUNDS` in `story.ts`); „Aua!“ is synthesized (`playAua`) until an
-`aua.mp3` is found. Good moments sound like the real thing too (`SOUNDS` in
-`story.ts`, CC0 recordings, each falling back to a synthesized sound): children
-cheer when a story ends well (`cheer`), a slide whistle glides down the slide,
-a ball bounces, stomping stomps, the lullaby is a music box, streamers get a party
-horn, blowing is a real breath out, the light clicks on before it chimes. Every
-`recorded(…)` sound is loaded when a story starts (`RECORDED_SOUNDS`), and
-`feelings.test.ts` fails when its file is missing. At home and in the kindergarten
-the left arrow picks the not-so-good idea; every other key the good thing. Tapping the bear's big
-picture only makes him giggle (hearts, a pop); it never counts as a choice.
+Every choice has a not-so-good idea next to it, so the child always really chooses: at home one per round
+(`Feeling.instead`), in the kindergarten one per step (`KitaStep.instead`). Its answer starts softly with „Hmm,“ and
+says what is better; what it leads to is heard (`instead.sound`): „Aua!“ when someone gets hurt, a crash when something
+breaks, otherwise crying – never an error sound. Crying, the crash, the laugh and the good moments' sounds are CC0
+recordings (`SOUNDS`, `RECORDED_SOUNDS` in `story.ts`, loaded when a round starts; `feelings.test.ts` fails when a file
+is missing); „Aua!“ is synthesized (`playAua`) until an `aua.mp3` is found.
 
 The big picture of the story is a framed photo – white mat, soft shadow – and turns
 pale a moment after the child has to choose, so it never looks like one of the
@@ -140,33 +141,22 @@ cards (which have the yellow ring and stand out like buttons).
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
-`baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades in and out
-for a little movement – in the big picture and on every card that can be chosen (`useFrame` in
-`shared.tsx`), so the child sees what happens before it taps; a card that is done or waits stands still. A picture the game asks for that is not made yet shows a placeholder with its
+`baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out
+for a little movement in the big picture (`useFrame` in `shared.tsx`); the cards show only their first frame. A picture the game asks for that is not made yet shows a placeholder with its
 file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
 with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first and then
 make it with `/bild-erzeugen`. A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Menü“, „Nochmal“ and „Weiter“ at a story's
-end are the shared `GameEnd` (`inline`, in the cards' room), words only like in every game – the round picture buttons
-it had were taken out (user feedback, November 2026). Timing of a story's beats and its sounds in
+with a green tick or red cross, so children can choose without reading; „Menü“, „Nochmal“ and „Weiter“ at a pass's
+end are the shared `GameEnd` (`inline`), words only like in every game. Timing of a story's beats and its sounds in
 `story.ts`.
 
-The big picture and the cards keep one size for the whole story – nothing grows or
-shrinks when the child has to choose, and a new picture only fades in where the last
-one was (things changing size confuse small children). `feelings.css` works the room
-for the cards out from the screen alone (cq units of `.story-play`), the picture takes
-all that is left; home and kindergarten share one layout. Upright: the picture as wide as
-the screen on top, the two cards below side by side, on tall phones one above the other.
-Wide screens: the picture left, the cards right one above the other, about a third of the
-width. The small cards of the happy end and the end buttons fit into the same room.
-Nothing keeps room free for the ✕ (and the fullscreen button) or the step dots: they lie on
-top of the pictures. On low screens (phones on their side, ≤ 560 px high) the captions sit on
-the pictures' lower edge instead of below them. Look at 844×390 and 1024×768 after a change.
+The big picture and the cards keep one size for the whole round – nothing grows or shrinks, and a new picture only
+fades in where the last one was (`feelings.css` works the room out from the screen alone, cq units of `.story-play`).
 
-Under every picture, big or card (on low screens on it), a short caption says what it shows – for
+Under every picture, big or card (on wide and low screens on it), a short caption says what it shows – for
 grown-ups, to tell the story and give feedback on the pictures; the child chooses
 by the picture. Every picture has one (`caption`, `endCaption`, `instead.caption`,
 `Feeling.title`). Choices say what to do, as short as a button: „Hand halten“,

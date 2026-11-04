@@ -161,6 +161,35 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
+    href: "/abenteuer/",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch.",
+    parts: [
+      {
+        label: "🏝️ Die Schatzinsel",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+      },
+      {
+        label: "☁️ Die Wolkenreise",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+      },
+    ],
+  },
+  {
+    href: "/wie-gehts-dir/",
+    note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026); die Szenen nach dem Wetter sind die von /gefuehle/, mit deren Sprachen.",
+    parts: [
+      {
+        label: "Wetterfrage",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Frage, Antwort und Wetter teilen sich Übersetzung und Aufnahmen mit „Alltagssituationen“ (stimme/).",
+      },
+      { label: "Zeile für Erwachsene", languages: { de: "done" }, note: "MOOD_BLURB in names.ts, nur Deutsch; der Titel ist übersetzt." },
+    ],
+  },
+  {
     href: "/gefuehle/",
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts (auch die Geschichten aus selbst.ts), Schritt für Schritt neben den deutschen Geschichten.",
     parts: [
@@ -182,21 +211,10 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und alle übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch.",
       },
-    ],
-  },
-  {
-    href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch.",
-    parts: [
       {
-        label: "🏝️ Die Schatzinsel",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
-      },
-      {
-        label: "☁️ Die Wolkenreise",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+        label: "Buch, Gruppen und Rollen",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026), nur Deutsch, die Rollensätze noch nicht aufgenommen (🎙️ Stimmen): die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts) und die zwei Sätze, die sagen, ob das Kind der Bär ist oder ihm hilft (ROLE_LINES in rounds.ts) – bis zur Aufnahme stumm, als Bildunterschrift zu lesen.",
       },
     ],
   },

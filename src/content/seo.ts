@@ -88,8 +88,16 @@ export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/spiele/lebendige-welten/",
     title: "Wimmelbilder und Geschichten für Kleinkinder",
-    description: "Lebendige Wimmelbilder, Bewegungsspiele, Gefühle und kleine Abenteuer, die auf jedes Antippen antworten. Für Kleinkinder, ohne Werbung.",
-    text: "Bilder und Geschichten, die auf jedes Antippen antworten: Lebendige Bilder, Bewegungsabenteuer zum Mitmachen, Gefühle, Kettenreaktionen und Kleine Abenteuer.",
+    description:
+      "Lebendige Wimmelbilder, Bewegungsspiele, Kettenreaktionen und kleine Abenteuer, die auf jedes Antippen antworten. Für Kleinkinder, ohne Werbung.",
+    text: "Bilder und Geschichten, die auf jedes Antippen antworten: Lebendige Bilder, Bewegungsabenteuer zum Mitmachen, Kettenreaktionen und Kleine Abenteuer.",
+  },
+  {
+    path: "/spiele/gefuehle/",
+    title: "Gefühle-Spiele für Kleinkinder",
+    description:
+      "Wie geht's dir? Das Kind zeigt mit dem Wetter, wie es sich fühlt, und hilft dem kleinen Bären bei Wut, Angst und Traurigkeit. Kostenlos, ohne Werbung.",
+    text: "Ein Bilderbuch über Gefühle: Zuerst zeigt das Kind, wie es ihm geht – Sonne, Wolke, Regen oder Gewitter. Dann erlebt der kleine Bär Alltagssituationen, und das Kind wählt, was hilft.",
   },
   {
     path: "/spiele/zuordnen/",
@@ -113,10 +121,16 @@ export const SEO_TEXTS: PageSeo[] = [
   },
   {
     path: "/gefuehle/",
-    title: "Gefühle für Kinder erklärt – Spiel für Kleinkinder",
+    title: "Gefühle erklärt – Alltagssituationen für Kleinkinder",
     description:
-      "Wütend, traurig, fröhlich: Der kleine Bär erlebt Gefühle zu Hause und in der Kita, und das Kind hilft ihm. Gefühle Kindern spielerisch erklären.",
-    text: "Kleine Geschichten vom Bären: Er ist wütend, traurig oder froh, und das Kind entscheidet, was ihm hilft. Für Gespräche über Gefühle mit Kleinkindern.",
+      "Wütend, traurig, ängstlich, fröhlich: Der kleine Bär erlebt Alltagssituationen zu Hause und in der Kita, und das Kind wählt, was hilft. Ohne Werbung.",
+    text: "Kleine Szenen vom Bären, nach Gefühlen geordnet: Er ist wütend, traurig, hat Angst oder freut sich, und das Kind wählt zwischen zwei Ideen, was hilft. Für Gespräche über Gefühle mit Kleinkindern.",
+  },
+  {
+    path: "/wie-gehts-dir/",
+    title: "Wie geht's dir? Gefühle zeigen für Kleinkinder",
+    description: "Sonne, Wolke, Regen oder Gewitter: Das Kind zeigt mit einem Bild, wie es sich fühlt, und erlebt dann mit dem kleinen Bären, was hilft.",
+    text: "Ein Bild sagt, wie es mir geht: Das Kind tippt auf das Wetter, das zu seinem Gefühl passt, und der kleine Bär zeigt Szenen mit genau diesem Gefühl. Ein Anfang für Gespräche über Gefühle.",
   },
   {
     path: "/kettenreaktion/",

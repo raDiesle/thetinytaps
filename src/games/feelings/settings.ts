@@ -1,6 +1,10 @@
 export interface FeelingsSettings {
-  /** The story to begin with (an id from `STORIES`, or "mood"); „Weiter“ goes on with the next. Older saves may say "all": that begins with the first. */
-  story: string;
+  /** The group of „Alltagssituationen“ played last (an id from `GROUPS`): its card comes first, and it goes on where it stopped. */
+  group: string;
+  /** The scene of `group` a pass goes on with, counted from 0: where the child stopped last time. */
+  scene: number;
+  /** Per story id, which of its choices comes next (0, 1, 2 …), so a scene asks its other choices when it comes again. */
+  steps: Record<string, number>;
   /** Read the story, the bubbles and the praise aloud. */
   speech: boolean;
   /** Little sounds for hugs, stomping, lullabies. */
@@ -8,7 +12,9 @@ export interface FeelingsSettings {
 }
 
 export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
-  story: "mood",
+  group: "traurig",
+  scene: 0,
+  steps: {},
   speech: false,
   sounds: true,
 };

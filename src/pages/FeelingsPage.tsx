@@ -1,9 +1,10 @@
 import { FeelingsGame } from "@/games/feelings/FeelingsGame";
+import { ALLTAG_TITLE } from "@/games/feelings/names";
 import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
 export function FeelingsPage() {
   const t = useT();
-  useTitle(t({ de: "Gefühle", ru: "Чувства", en: "Feelings", zh: "情绪", hi: "भावनाएँ", es: "Emociones", ar: "المشاعر" }));
+  useTitle(t(ALLTAG_TITLE));
   return <FeelingsGame />;
 }

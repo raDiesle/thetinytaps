@@ -6,9 +6,11 @@ import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { MOOD_ID, WEATHERS } from "./mood";
+import { WEATHERS } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
-import { STORIES, storyAfter } from "./stories";
+import { GROUPS } from "./groups";
+import { roundOf, stepsOf } from "./rounds";
+import { STORIES } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
 // The languages a part has been translated into whole, as the language table on /management/ says: a part marked
@@ -63,24 +65,45 @@ test("a planned picture that is made leaves „Geplant“", () => {
   for (const name of PLANNED_NAMES) expect(imageFor(name), `${name} is made: move its row out of „Geplant“`).toBeUndefined();
 });
 
-test("every story on the start screen has its own id", () => {
+test("every story has its own id", () => {
   const ids = STORIES.map((s) => s.id);
   expect(new Set(ids).size).toBe(ids.length);
-  expect(ids).not.toContain("all");
-  expect(ids).not.toContain(MOOD_ID);
 });
 
-test("„Weiter“ goes through the stories in the start screen's order", () => {
-  const played = [STORIES[0]];
-  for (let i = 1; i <= STORIES.length; i++) played.push(storyAfter(played[i - 1]));
-  expect(played).toEqual([...STORIES, STORIES[0]]);
+// „Alltagssituationen“ plays a group's scenes one after another, so a story outside every group would never be seen.
+test("every story is in exactly one group", () => {
+  const grouped = GROUPS.flatMap((g) => g.stories);
+  expect(new Set(GROUPS.map((g) => g.id)).size, "a group id twice").toBe(GROUPS.length);
+  expect(grouped.toSorted()).toEqual(STORIES.map((s) => s.id).toSorted());
 });
 
-test("every weather has its card and leads to a feeling of the bear", () => {
-  for (const { id, feeling } of WEATHERS) {
-    expect(imageFor(moodImages.weather(id)), moodImages.weather(id)).toBeDefined();
-    expect(FEELINGS.map((f) => f.id)).toContain(feeling);
+// Every round says first whether the child is the bear or helps its friend the bear (user feedback, November 2026).
+test("every round says whose view it takes", () => {
+  for (const story of STORIES) {
+    for (let step = 0; step < stepsOf(story); step++) {
+      const round = roundOf(story, step, "de");
+      expect(round.start.beats[0].narration, `${story.id} step ${step + 1}`).toMatch(/kleine Bär/);
+      // Only the last step of a story shows its happy end.
+      expect(!!round.end, `${story.id} step ${step + 1} end`).toBe(step === stepsOf(story) - 1);
+    }
   }
+});
+
+test("every weather has its card and leads to a group", () => {
+  for (const { id, group } of WEATHERS) {
+    expect(imageFor(moodImages.weather(id)), moodImages.weather(id)).toBeDefined();
+    expect(GROUPS.map((g) => g.id)).toContain(group);
+  }
+});
+
+// Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
+// November 2026). The big picture's slow two-frame fade is the only thing that keeps going.
+test("the game answers calmly", () => {
+  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "PassPlay.tsx"].map((f) => readFileSync(`src/games/feelings/${f}`, "utf8"));
+  for (const code of files) expect(code).not.toMatch(/float\(|Floater/);
+  const css = readFileSync("src/games/feelings/feelings.css", "utf8");
+  for (const name of ["fg-hop", "fg-shake", "fg-call", "fg-glow", "fg-stamp", "pop-in", "wiggle"]) expect(css, name).not.toContain(name);
+  expect(css.match(/infinite/g)?.length ?? 0, "only the picture's fade repeats").toBeLessThanOrEqual(1);
 });
 
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.
@@ -101,7 +124,7 @@ test("every translation of a kindergarten story matches the German beat for beat
       expect(beatParts(text.outro), `${where} outro`).toEqual(beatParts(situation.outro));
       expect(text.steps.length, `${where} steps`).toBe(situation.steps.length);
       situation.steps.forEach((step, i) => expect(beatParts(text.steps[i].beats), `${where} step ${i + 1}`).toEqual(beatParts(step.beats)));
-      // The happy end shows the steps as cards keyed by caption.
+      // Every step's card has a caption of its own.
       expect(new Set(text.steps.map((s) => s.caption)).size, `${where} captions`).toBe(text.steps.length);
     }
   }

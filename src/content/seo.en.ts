@@ -23,8 +23,13 @@ export const SEO_EN: SeoTranslation = {
     },
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
-      description: "Living look-and-find pictures, movement games, feelings and little adventures that answer every tap. For toddlers, without ads.",
-      text: "Pictures and stories that answer every tap: Living Pictures, movement adventures to join in, feelings, chain reactions and Little Adventures.",
+      description: "Living look-and-find pictures, movement games, chain reactions and little adventures that answer every tap. For toddlers, without ads.",
+      text: "Pictures and stories that answer every tap: Living Pictures, movement adventures to join in, chain reactions and Little Adventures.",
+    },
+    "/spiele/gefuehle/": {
+      title: "Feelings Games for Toddlers",
+      description: "How are you? The child shows how it feels with the weather and helps the little bear with anger, fear and sadness. Free, no ads.",
+      text: "A picture book about feelings: first the child shows how it feels – sun, cloud, rain or thunderstorm. Then the little bear meets everyday situations, and the child picks what helps.",
     },
     "/spiele/zuordnen/": {
       title: "Matching Games for Toddlers",
@@ -44,10 +49,14 @@ export const SEO_EN: SeoTranslation = {
       text: "A movement story for indoors: Tapsi jumps, ducks and stretches, the child joins in, and the world answers. No reading needed, Tapsi says it all.",
     },
     "/gefuehle/": {
-      title: "Feelings for Toddlers – an Emotions Game",
-      description:
-        "Angry, sad, happy: the little bear has feelings at home and at daycare, and the child helps him. A playful way to explain emotions to toddlers.",
-      text: "Little stories about the bear: he is angry, sad or happy, and the child decides what helps him. For talking about feelings with toddlers.",
+      title: "Feelings for Toddlers – Everyday Situations",
+      description: "Angry, sad, scared, happy: the little bear meets everyday situations at home and at daycare, and the child picks what helps. No ads.",
+      text: "Little scenes with the bear, sorted by feeling: he is angry, sad, scared or happy, and the child picks between two ideas what helps. For talking about feelings with toddlers.",
+    },
+    "/wie-gehts-dir/": {
+      title: "How Are You? Showing Feelings for Toddlers",
+      description: "Sun, cloud, rain or thunderstorm: the child shows with a picture how it feels, then sees with the little bear what helps.",
+      text: "A picture says how I feel: the child taps the weather that fits its feeling, and the little bear shows scenes with just that feeling. A start for talking about feelings.",
     },
     "/kettenreaktion/": {
       title: "Chain Reaction and Marble Run for Kids",
