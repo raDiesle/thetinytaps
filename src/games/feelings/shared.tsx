@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { recordedVoice } from "@/lib/voice";
@@ -7,7 +7,7 @@ import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story
 import type { FeelingsSettings } from "./settings";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
-/** How long each frame of the big picture stays before the next one fades in: slow, so nothing blinks. */
+/** How long each frame of a moving picture stays before the next one fades in: slow, so nothing blinks. */
 const FRAME_MS = 1500;
 
 /** Said with the laugh when a good idea is chosen, one at random. */
@@ -111,7 +111,7 @@ export function useVoice(settings: FeelingsSettings) {
  */
 export type PictureLook = "story" | "quiet" | "good" | "bad";
 
-/** Which of `count` frames shows now: they take turns, like a tiny GIF. */
+/** Which of `count` frames shows now: they take turns, like a tiny GIF; with `count` 1 the first stays. */
 function useFrame(count: number): number {
   const [frame, setFrame] = useState(0);
   const loops = count > 1;
@@ -126,32 +126,65 @@ function useFrame(count: number): number {
 }
 
 /**
- * The big picture in the middle: what happens right now. Its frames fade into
- * each other in a loop, like a tiny GIF, so the animals seem to move a little.
- * A short caption for grown-ups says what it shows.
+ * The frames of a picture on top of each other; while `moving` they fade into each other in turn, otherwise the first
+ * stays. Only one thing moves at a time (user feedback, November 2026): the big picture while the scene is shown, the
+ * two cards while the child chooses.
+ */
+function Frames({ name, moving, className }: { name: string; moving: boolean; className?: string }) {
+  const frames = framesFor(name);
+  const shown = useFrame(moving ? frames.length : 1);
+  if (frames.length === 0) return <Placeholder name={name} />;
+  return frames.map((src, i) => (
+    <img key={src} className={`${className ?? ""}${i === shown ? " on" : ""}`} src={src} alt="" decoding="async" draggable={false} />
+  ));
+}
+
+/**
+ * The big picture in the middle: what happens right now. Unless `still`, its frames fade into each other in a loop,
+ * like a tiny GIF, so the animals seem to move a little. A short caption for grown-ups says what it shows.
+ * With `onNext` the whole picture is a button with ▶ in its bottom right corner: one tap goes on (user feedback,
+ * November 2026: no waiting until a scene has been told).
  * Give it a new `key` with every new picture, so it starts at the first frame.
  */
 export function StoryPicture({
   name,
+  art,
   caption,
   look = "story",
+  still = false,
+  onNext,
 }: {
   name: string;
+  /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
+  art?: ReactNode;
   /** What the picture shows, in a few words: for grown-ups, children don't read it. */
   caption: string;
   look?: PictureLook;
+  /** Shows only the first frame: while the child chooses, the cards move instead. */
+  still?: boolean;
+  /** Makes the picture the way on, marked by ▶. */
+  onNext?: () => void;
 }) {
-  const frames = framesFor(name);
-  const shown = useFrame(frames.length);
-
   return (
     <div className={`fg-frame fg-look-${look}`}>
-      <div className="fg-picture">
-        {frames.map((src, i) => (
-          <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
-        ))}
-        {frames.length === 0 && <Placeholder name={name} />}
-      </div>
+      <div className="fg-picture">{art ?? <Frames name={name} moving={!still} />}</div>
+      {onNext && (
+        <button
+          type="button"
+          className="fg-next"
+          data-tap="goal"
+          aria-label={caption}
+          onPointerDown={(e: PointerEvent) => {
+            e.stopPropagation();
+            onNext();
+          }}
+        >
+          <svg className="fg-next-sign" viewBox="0 0 100 100" aria-hidden>
+            <circle cx="50" cy="50" r="44" />
+            <path d="M40 30 L72 50 L40 70 Z" />
+          </svg>
+        </button>
+      )}
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
@@ -169,20 +202,21 @@ export type CardState = "choose" | "playing" | "wrong" | "rest";
 /** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
   image,
+  art,
   caption,
   state,
   onChoose,
 }: {
   /** Name of the picture, see images.ts. */
   image: string;
+  /** A drawing shown instead of the picture (the weather signs of „Wie doll ist es?“). */
+  art?: ReactNode;
   /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
   caption: string;
   state: CardState;
   onChoose?: () => void;
 }) {
   const active = state === "choose";
-  // Cards stand still: only the big picture moves a little, so not everything on the screen moves at once.
-  const src = framesFor(image)[0];
   return (
     <div className="fg-choice">
       <button
@@ -197,7 +231,8 @@ export function ChoiceCard({
           if (active) onChoose?.();
         }}
       >
-        {src ? <img className="fg-card-image" src={src} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
+        {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
+        {art ?? <Frames name={image} moving={active} className="fg-card-image" />}
         {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>

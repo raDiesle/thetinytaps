@@ -38,7 +38,10 @@ import {
   withStepStars,
   withSteps,
 } from "./plan";
-import { printsCards } from "./PlanPrint";
+import { printsCards, ritualsOf } from "./PlanPrint";
+import { RITUALS, ritualOf } from "./rituals";
+import { PICTURE_QUEUE } from "@/content/pictureQueue";
+import { existsSync } from "node:fs";
 import { planLayout } from "./PlanSheet";
 import { DEFAULT_PLANNER_SETTINGS, plannerDefaults } from "./planSettings";
 
@@ -55,8 +58,8 @@ const WED = new Date("2026-10-28T12:00");
 const SAT = new Date("2026-10-31T12:00");
 
 describe("plan catalogue", () => {
-  test("activities have their own ids, apart from the tasks'", () => {
-    const ids = [...ACTIVITIES, ...TASKS].map((x) => x.id);
+  test("activities and rituals have their own ids, apart from the tasks'", () => {
+    const ids = [...ACTIVITIES, ...RITUALS, ...TASKS].map((x) => x.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -112,8 +115,8 @@ describe("plan catalogue", () => {
     expect(printsCards(template("wochenplan"))).toBe("choice");
   });
 
-  test("every activity has a picture prompt, and a line-art twin to colour in", () => {
-    for (const { id } of ACTIVITIES) {
+  test("every activity and ritual has a picture prompt, and a line-art twin to colour in", () => {
+    for (const { id } of [...ACTIVITIES, ...RITUALS]) {
       expect(promptIds.has(`schritt-${id}`), id).toBe(true);
       expect(promptIds.has(`schritt-${id}-linie`), id).toBe(true);
     }
@@ -355,5 +358,55 @@ describe("a week's grid of stars", () => {
     expect(bigDayStep(plan)?.catalog).toBe("geburtstag");
     expect(plan.days[0].every((step) => !step.stars)).toBe(true);
     expect(printsCards(plan)).toBe("never");
+  });
+});
+
+// H-58, C-33: rituals are cards of the plan whose words help the grown-up; „Wie geht's dir?“ opens its game instead.
+describe("rituals", () => {
+  test("every ritual says when it belongs, who speaks and how it goes, in a few short lines", () => {
+    for (const ritual of RITUALS) {
+      expect(ritual.when.de, ritual.id).toBeTruthy();
+      expect(ritual.how.de.length, ritual.id).toBeLessThan(320);
+      expect(ritual.parts.length, ritual.id).toBeGreaterThan(0);
+      const lines = ritual.parts.flatMap((part) => part.lines);
+      // A ritual is a moment, not a lesson: few sentences, each short enough to say after a grown-up.
+      expect(lines.length, ritual.id).toBeLessThanOrEqual(5);
+      for (const line of lines) expect(line.text.de.split(" ").length, `${ritual.id}: ${line.text.de}`).toBeLessThanOrEqual(12);
+    }
+  });
+
+  test("a ritual's card finds its words; only a ritual with a game opens it, and that game is in the home menu", () => {
+    const games = new Set(CATEGORIES.flatMap((c) => c.games).map((g) => g.href));
+    for (const ritual of RITUALS) {
+      const card = stepFromCatalog(ritual.id);
+      expect(ritualOf(card), ritual.id).toBe(ritual);
+      expect(gameOf(card), ritual.id).toBe(ritual.game);
+      if (ritual.game) expect(games.has(ritual.game), ritual.game).toBe(true);
+    }
+    expect(gameOf(stepFromCatalog("wiegehts"))).toBe("/wie-gehts-dir/");
+    expect(ritualOf(stepFromCatalog("fruehstueck"))).toBeUndefined();
+  });
+
+  test("„Mein Tag mit Ritualen“ asks how the child is in the morning and in the evening, and prints every ritual's words once", () => {
+    const plan = template("rituale");
+    const steps = stepsOn(plan, WED);
+    const parts = partsOf(steps);
+    for (const part of parts)
+      expect(
+        part.steps.some((step) => step.catalog === "wiegehts"),
+        part.part,
+      ).toBe(true);
+    expect(
+      ritualsOf(plan)
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual(RITUALS.map((r) => r.id).sort());
+  });
+
+  test("a ritual's picture is made, or waits in the picture queue with its line-art twin", () => {
+    const queued = new Set(PICTURE_QUEUE.map((p) => p.file));
+    for (const { id } of RITUALS)
+      for (const file of [`src/games/rewards/bilder/schritt-${id}.webp`, `src/games/rewards/bilder/schritt-${id}-linie.webp`])
+        expect(existsSync(file) || queued.has(file), file).toBe(true);
   });
 });

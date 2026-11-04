@@ -641,7 +641,7 @@
 .shelf-spines,
 .shelf-daily-row,
 .shelf-daily-books,
-.shelf-slipcase,
+.shelf-bundle,
 .shelf-spine,
 .shelf-stack,
 .shelf-lying,
@@ -959,12 +959,12 @@
 
 /* ----- A book as a box: `.box-front` (or the cover), `.box-left`, `.box-right` and `.box-top`, `--depth` deep ----- */
 
-:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > :is(.box-left, .box-right, .box-top) {
+:is(.shelf-book, .shelf-spine, .shelf-lying) > :is(.box-left, .box-right, .box-top) {
   position: absolute;
   backface-visibility: hidden;
 }
 
-:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > .box-left {
+:is(.shelf-book, .shelf-spine, .shelf-lying) > .box-left {
   top: 0;
   right: 100%;
   bottom: 0;
@@ -973,7 +973,7 @@
   transform: rotateY(-90deg);
 }
 
-:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > .box-right {
+:is(.shelf-book, .shelf-spine, .shelf-lying) > .box-right {
   top: 0;
   bottom: 0;
   left: 100%;
@@ -982,7 +982,7 @@
   transform: rotateY(90deg);
 }
 
-:is(.shelf-book, .shelf-spine, .shelf-lying, .shelf-slipcase) > .box-top {
+:is(.shelf-book, .shelf-spine, .shelf-lying) > .box-top {
   right: 0;
   bottom: 100%;
   left: 0;
@@ -1258,8 +1258,15 @@
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
-/* The books themselves, and the slipcase of the Belohnungstafel and the Zeitplan among them. */
+/* The books themselves, and the Belohnungstafel and the Zeitplan tied together among them. */
+/*
+ * The everyday helpers lean to the left, resting on their bottom left corners, as books do on a shelf that is not full:
+ * so the names running down their spines tilt towards the line one reads and are read without bending the head as far
+ * (user feedback, November 2026). Each book leans by the same angle about its own corner, so they stay parallel and
+ * clear of each other, and the ribbon round two of them runs straight across both. Taken out, a book straightens as it lifts (bookTravel.ts).
+ */
 .shelf-daily-books {
+  --lean: -12deg;
   position: relative;
   display: flex;
   flex: none;
@@ -1277,8 +1284,8 @@
   height: calc(var(--bh) * 0.97);
   color: var(--ink);
   text-decoration: none;
-  transform-origin: 50% 100%;
-  transform: rotateX(-6deg);
+  transform-origin: 0 100%;
+  transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
   -webkit-tap-highlight-color: transparent;
 }
@@ -1306,71 +1313,85 @@
 }
 
 /*
- * The slipcase of the Belohnungstafel and the Zeitplan, two books of one game (`Slipcase`, user feedback, November 2026):
- * a box of red cloth open at the front, its edges framing the two spines, so they are read as one thing. It is what the
- * eye should find first: pulled out furthest, edged in gold and glowing brightest, the Belohnungstafel in it bound in
- * gold. Still, like everything on the shelf; a mouse over a book pulls that book a little out of its case.
+ * The Belohnungstafel and the Zeitplan, two books of one game (`BookBundle`), tied together with a red ribbon and a bow,
+ * so they are read as one thing, and standing on the board like their neighbours: a box round them, pulled out and
+ * tipped further, looked as if it floated (user feedback, November 2026). They are what the eye should find first: the
+ * Belohnungstafel bound in gold, both glowing brightest. Still, like everything on the shelf; tied, neither moves out
+ * under a mouse.
  */
-.shelf-slipcase {
-  --depth: calc(var(--bh) * 0.46);
-  --wall: calc(var(--bh) * 0.026);
+.shelf-bundle {
+  --tie: calc(var(--bh) * 0.012);
   position: relative;
   display: flex;
-  flex: calc(var(--volumes) + 0.3) 1 0;
-  gap: calc(var(--bh) * 0.01);
+  flex: var(--volumes) 1 0;
+  gap: var(--tie);
+  align-items: flex-end;
   min-width: 0;
-  height: var(--bh);
-  padding: var(--wall);
-  transform-origin: 50% 100%;
-  transform: translateZ(calc(var(--d) * 0.1)) rotateX(-8deg);
+  height: 100%;
 }
 
-.shelf-slipcase > :is(.box-left, .box-right) {
-  background: linear-gradient(90deg, #0000004d, #00000026), #9a2f2f;
-}
-
-.shelf-slipcase > .box-top {
-  background: linear-gradient(#00000026, #ffffff1a), #a83636;
-}
-
-/* The case's front edges round the spines, over them, and its glow. Taps go through to the books. */
-.shelf-slipcase-edge {
-  position: absolute;
-  inset: 0;
-  border: var(--wall) solid #a83636;
-  border-radius: 2px;
+.shelf-bundle > .shelf-daily > .box-front {
   box-shadow:
-    inset 0 0 0 1px #f3d27a,
-    inset 0 0 calc(var(--bh) * 0.03) #000000a6,
-    0 0 0 1px #f3d27a,
+    0 0 0 2px #fff6dccc,
     0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
-  pointer-events: none;
-  transform: translateZ(1px);
 }
 
-.shelf-slipcase > .shelf-daily {
-  height: auto;
-  transform: none;
-}
-
-.shelf-slipcase > .shelf-daily > .box-front {
-  box-shadow: none;
-}
-
-.shelf-slipcase > .shelf-daily:first-of-type > .box-front {
+.shelf-bundle > .shelf-daily:first-child > .box-front {
   background:
     linear-gradient(#0000 3.5%, #fff3b0 3.5% 5.5%, #0000 5.5% 94.5%, #fff3b0 94.5% 96.5%, #0000 96.5%),
     linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), var(--c);
 }
 
+/* Their labels end above the ribbon, which runs at the same height above the board on every book of the bundle. */
+.shelf-bundle .shelf-daily-label {
+  bottom: calc(var(--bh) * 0.19);
+}
+
+/* The ribbon across each spine, reaching over the gap to the next, so it runs on as one band. */
+.shelf-bundle > .shelf-daily::after {
+  position: absolute;
+  right: calc(var(--tie) * -0.5);
+  bottom: calc(var(--bh) * 0.1);
+  left: calc(var(--tie) * -0.5);
+  height: calc(var(--bh) * 0.055);
+  background:
+    linear-gradient(#0000 12%, #ffffff40 12% 20%, #0000 20% 80%, #0000004d 80% 88%, #0000 88%), linear-gradient(90deg, #00000033, #ffffff1f 45%, #00000026),
+    #c8323a;
+  box-shadow: 0 1px 2px #0000006b;
+  content: "";
+  pointer-events: none;
+  transform: translateZ(1px);
+}
+
+.shelf-bundle > .shelf-daily:first-child::after {
+  left: 0;
+}
+
+.shelf-bundle > .shelf-daily:last-child::after {
+  right: 0;
+}
+
+/* The bow, tied on the ribbon where the first two books meet, in front of both. */
+.shelf-bundle-bow {
+  position: absolute;
+  right: calc(var(--tie) * -0.5 - var(--bh) * 0.1);
+  bottom: calc(var(--bh) * 0.0475);
+  width: calc(var(--bh) * 0.2);
+  height: calc(var(--bh) * 0.16);
+  overflow: visible;
+  filter: drop-shadow(0 1px 1.5px #00000066);
+  pointer-events: none;
+  transform: translateZ(2px);
+}
+
 @media (hover: hover) {
-  .shelf-slipcase > .shelf-daily:hover {
-    transform: translateZ(calc(var(--d) * 0.08)) translateY(-3%);
+  .shelf-bundle > .shelf-daily:hover {
+    transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
   }
 }
 
-.shelf-slipcase > .shelf-daily:focus-visible {
-  transform: translateZ(calc(var(--d) * 0.08)) translateY(-3%);
+.shelf-bundle > .shelf-daily:focus-visible {
+  transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
 }
 
 /*
@@ -1535,13 +1556,13 @@
 
 @media (hover: hover) {
   .shelf-daily:hover {
-    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotate(var(--lean, 0deg)) rotateX(-11deg);
   }
 }
 
 .shelf-daily:focus-visible {
   outline: none;
-  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotate(var(--lean, 0deg)) rotateX(-11deg);
 }
 
 .shelf-daily:focus-visible > .box-front {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useId, type ComponentType, type CSSProperties } from "react";
 import type { Localized } from "@/lib/language";
+import { MASCOT_COLORS, MASCOT_INK, MascotHead, type MascotKind } from "@/components/Mascot";
 import { CHEEK, Eye, Face, INK, sparklePath } from "./shared";
 import type { SceneItem, SceneSound } from "./types";
 import "./hideout.css";
@@ -161,6 +162,39 @@ function Hund() {
   );
 }
 
+/**
+ * The app's mascots peeking out as a family (D-18): the fox or bear child in front, its paws on the edge, and its
+ * grown-up bigger just behind it – Mama Fuchs with lashes, Papa Bär without.
+ */
+function MascotFamily({ kind }: { kind: MascotKind }) {
+  const c = MASCOT_COLORS[kind];
+  const paw = kind === "fox" ? c.paw : c.fur;
+  const line = { stroke: MASCOT_INK, strokeWidth: 2.4 };
+  return (
+    <>
+      <ellipse cx="18" cy="-14" rx="30" ry="18" fill={c.fur} {...line} />
+      <g transform="translate(-20 -100) scale(0.74)">
+        <MascotHead kind={kind} lashes={kind === "fox"} />
+      </g>
+      <ellipse cx="-22" cy="-6" rx="22" ry="11" fill={c.fur} {...line} />
+      <g transform="translate(-52 -64) scale(0.6)">
+        <MascotHead kind={kind} child mouth="open" />
+      </g>
+      <ellipse cx="-36" cy="-3" rx="9" ry="6" fill={paw} {...line} />
+      <ellipse cx="-8" cy="-3" rx="9" ry="6" fill={paw} {...line} />
+      <ellipse cx="36" cy="-4" rx="11" ry="7" fill={paw} {...line} />
+    </>
+  );
+}
+
+function Fuchsfamilie() {
+  return <MascotFamily kind="fox" />;
+}
+
+function Baerenfamilie() {
+  return <MascotFamily kind="bear" />;
+}
+
 /** Everything that can be hiding; kept to friendly, well-known things a two-year-old can name. */
 export const SURPRISES: Surprise[] = [
   {
@@ -275,6 +309,9 @@ export const SURPRISES: Surprise[] = [
     sound: "bark",
     Art: Hund,
   },
+  // German only until the user asks for the other languages (languageStatus.ts marks the gap).
+  { id: "fuchsfamilie", found: { de: "Da ist ja Familie Fuchs!" }, sound: "giggle", Art: Fuchsfamilie },
+  { id: "baerenfamilie", found: { de: "Da ist ja Familie Bär!" }, sound: "giggle", Art: Baerenfamilie },
 ];
 
 /** While the item plays: what is hiding this time, and when it is out (in ms after the tap). */

@@ -38,7 +38,11 @@ A story told like television, from place to place with a cut in between, instead
 - `types.ts` – the format: `Film` with `scenes(picks)`, which gives the scenes up to the next unanswered choice (or all to the end) for the picks so far; `Beat`, `Choice`, `Option`, `Spot`, `Box`, `around`.
 - `FilmPlay.tsx` – the engine (iris, beats, taps, choices, hand, strip, party, end). `films.ts` – the films (`FILMS`), which `cards.tsx` adds to `CARDS` after the trail levels and `ElevatorGame.tsx` lists as modes of the kind „🎬 Filme“.
 - `move.tsx` – `Go` moves a thing along a path when its path changes (the first path only places it), `route(step, …)` picks the path for a step; so a scene draws where everything is at each step and `Go` animates in between.
-- `people.tsx` – the grown-ups (the crew, a neighbour, a resident, a driver), drawn with the children's poses; `places.tsx` – houses, trees, the road, the ditch; `truck.tsx` – the fire engine (ladder, blue light, wheels). The child is `Kid` from `kid.tsx` with the `fire` outfit (helmet, jacket, boots).
+- `people.tsx` – the grown-ups (the crew, a neighbour, a resident, a driver), drawn with the children's poses; a `Look`
+  with `animal` is one of the app's mascots (the shared `MascotHead` instead of face and hair, paws instead of hands,
+  `lashes` for a woman): the crew is a fox and a she-bear, the neighbour a vixen, the resident a bear, the postwoman of
+  „Ein Brief für Oma“ a she-bear. The child and its own family (Mama or Papa, Oma) stay people until D-19 is decided –
+  a human child with a fox mother doesn't fit; grown-ups in a role or next door may be foxes and bears; `places.tsx` – houses, trees, the road, the ditch; `truck.tsx` – the fire engine (ladder, blue light, wheels). The child is `Kid` from `kid.tsx` with the `fire` outfit (helmet, jacket, boots).
 - `film.css` – classes and keyframes `fm-` (`fm-br-` for „Ein Brief für Oma“); a duration that goes with the story is written `calc(… * var(--fm-pace))`.
 - `films.test.ts` checks every way through every film: it ends, a pick only adds scenes after those seen, no scene twice, two or three different options, every tap spot and option lies wholly in its scene's `focus`, every tap beat asks, every line is a German sentence, and the pace is calm (at most three sounds in a beat, at least 0.9 s apart as played, a beat that speaks at least 2.7 s).
 

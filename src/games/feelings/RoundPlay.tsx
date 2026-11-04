@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { preloadImages } from "./images";
-import { beatText, roundImages, roundLines, ROLE_LINES, type Round } from "./rounds";
+import { beatText, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 import { CHEER_MS, ChoiceCard, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
 import { beatMs, type Beat } from "./story";
-import { pick, useAppLanguage } from "@/lib/language";
 
 /**
- * "intro": the scene is told. "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
+ * "intro": the scene is shown and told until the child taps it (▶). "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
  * to. "good": the good idea is done. "end": the story's happy end. "done": the round is over and `ending` shows.
  */
 type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
@@ -41,7 +40,6 @@ export function RoundPlay({
   const [cheering, setCheering] = useState(false);
   const { later } = useTimers();
   const { say, sound, voiced, preload } = useVoice(settings);
-  const { id: language } = useAppLanguage();
 
   /** Plays the beats one after another, then calls `then`. */
   const playBeats = useCallback(
@@ -63,11 +61,11 @@ export function RoundPlay({
   useEffect(() => {
     preloadImages(roundImages(round));
     preload(roundLines(round));
-    playBeats(round.start.beats, () => {
-      setPhase("choose");
-      say(round.question, true);
-    });
+    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while.
+    playBeats(round.start.beats, () => say(round.question, true));
   }, []);
+
+  const goOn = () => setPhase((now) => (now === "intro" ? "choose" : now));
 
   const finish = useCallback(() => {
     onFinish();
@@ -109,6 +107,7 @@ export function RoundPlay({
   // The left arrow picks the not-so-good idea on the left; every other key the good one, so mashing keys still tells the story.
   const pressKey = (key: string) => {
     if (phase === "done") return onEndKey?.();
+    if (phase === "intro") return goOn();
     choose(!tried && key === "ArrowLeft" ? "instead" : "good");
   };
 
@@ -123,10 +122,10 @@ export function RoundPlay({
 
   // The big picture: the scene while it is told and chosen, a card's picture once chosen, at last the happy end.
   let shown: { image: string; caption: string } = round.start;
-  // While the scene is told the caption says whose view it takes; while the child chooses, the question (it names who acts).
-  let caption = pick(ROLE_LINES[round.role], language);
+  // The scene's whole text at once: its question, which says what is the matter and who acts (user feedback, November 2026).
+  let caption = round.question;
   let look: PictureLook = "story";
-  if (phase === "choose") [caption, look] = [round.question, "quiet"];
+  if (phase === "choose") look = "quiet";
   else if (phase === "trying") [shown, caption, look] = [round.instead, round.instead.caption, "bad"];
   else if (phase === "good" || ((phase === "done" || phase === "end") && !round.end)) [shown, caption] = [round.good, round.good.caption];
   else if (phase === "end" || phase === "done") [shown, caption] = [round.end!, round.end!.caption];
@@ -142,7 +141,15 @@ export function RoundPlay({
         <StepDots total={progress.total} done={progress.done + (doneHere ? 1 : 0)} current={!doneHere} />
       </header>
       <main className="story-middle">
-        <StoryPicture key={shown.image} name={shown.image} caption={caption} look={look} />
+        {/* Only one thing moves at a time: the scene while it is shown, then the cards while the child chooses. */}
+        <StoryPicture
+          key={shown.image}
+          name={shown.image}
+          caption={caption}
+          look={look}
+          still={phase === "choose"}
+          onNext={phase === "intro" ? goOn : undefined}
+        />
       </main>
       {/* The not-so-good idea always first (bottom left), the good one second (top right). */}
       <footer className={`story-choices${phase === "done" ? " ending" : ""}`}>

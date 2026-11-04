@@ -138,6 +138,26 @@ export const SCENARIOS: Scenario[] = [
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; „Wie geht's dir?“ plays at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
   { name: "wie-gehts-dir", path: "/wie-gehts-dir/", parts: [{ label: "Wetter wählen", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  // Wütend, „Ganz doll“: the breath's circle grows and shrinks round the big face (C-36).
+  {
+    name: "wie-gehts-dir-pusten",
+    path: "/wie-gehts-dir/",
+    parts: [
+      {
+        label: "Zusammen pusten",
+        before: [
+          { wait: 1500 },
+          // „Wütend“ as a face, or its weather card while the built site has no faces yet.
+          { tap: '.fg-card[aria-label="Wütend"], .fg-card[aria-label="Gewitter, wütend"]' },
+          { wait: 2600 },
+          ...key(" "),
+          { tap: '.fg-card[aria-label="Ganz doll"]' },
+          { waitFor: ".mood-breath" },
+        ],
+        ms: 8000,
+      },
+    ],
+  },
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },
   { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
