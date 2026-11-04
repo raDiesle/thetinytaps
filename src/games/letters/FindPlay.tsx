@@ -142,7 +142,6 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
         setFound(true);
         if (settings.sounds) playChime();
         say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
-        for (let i = 0; i < 8; i++) spawn();
         return;
       }
       funBurst();

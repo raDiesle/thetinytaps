@@ -119,9 +119,6 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
     }
     say(texts.becomes(round.growth));
     onSolved(misses.current);
-    later(FLIGHT_MS + GROW_MS - 900, () => {
-      for (let i = 0; i < 8; i++) spawn();
-    });
     later(FLIGHT_MS + GROW_MS, onNext);
   };
 
@@ -198,7 +195,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
                   ref={(el) => {
                     optionRefs.current[i] = el;
                   }}
-                  className={`ap-food ap-emoji${shown && outcome.ok ? " landed" : ""}${shown && !outcome.ok ? " refused" : ""}`}
+                  className={`ap-food ap-emoji${shown && outcome.ok ? " landed" : ""}`}
                   style={shown && outcome.ok && flight ? { translate: `${flight.x}px ${flight.y}px`, scale: "0.3" } : undefined}
                   role="img"
                   aria-label={texts.adult(g)}

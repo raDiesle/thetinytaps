@@ -144,32 +144,6 @@
   text-wrap: balance;
 }
 
-.ap-hearts {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.ap-hearts span {
-  position: absolute;
-  bottom: 50%;
-  left: calc(25% + var(--i, 0) * 25%);
-  font-family: var(--font-emoji);
-  font-size: clamp(1.6rem, 6vh, 3rem);
-  opacity: 0;
-  animation: ap-float 1.6s ease-out 0.8s forwards;
-}
-
-.ap-hearts span:nth-child(2) {
-  --i: 1;
-  animation-delay: 1s;
-}
-
-.ap-hearts span:nth-child(3) {
-  --i: 2;
-  animation-delay: 1.2s;
-}
-
 /* The things to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
 .ap-options {
   --cols: var(--n);
@@ -252,10 +226,6 @@
     translate 0.45s ease-in,
     scale 0.45s ease-in;
   animation: ap-gone 0.2s linear 0.45s forwards;
-}
-
-.ap-food.refused {
-  animation: ap-hop 0.4s ease-in-out;
 }
 
 /* A gift lies on its plate as a drawing; only it is dragged. */
@@ -351,14 +321,6 @@
 
 .ap-home.near {
   scale: 1.08;
-}
-
-.ap-home.happy .ap-home-box {
-  animation: wiggle 0.5s ease-in-out 0.7s 2;
-}
-
-.ap-home.peek .ap-home-box {
-  animation: wiggle 0.4s ease-in-out;
 }
 
 /* The animal goes into its home and stays in the doorway. */
@@ -578,20 +540,6 @@
 @keyframes ap-gone {
   to {
     opacity: 0;
-  }
-}
-
-@keyframes ap-float {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(0.5);
-  }
-  20% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-160%) scale(1.1);
   }
 }
 

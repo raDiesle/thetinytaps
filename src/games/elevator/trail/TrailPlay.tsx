@@ -1065,7 +1065,6 @@ export function TrailPlay({
     if (!pick || slot < 0) return;
     e.stopPropagation();
     chooser.current = null;
-    spawn(e.clientX, e.clientY);
     pick(slot);
   };
 
@@ -1086,7 +1085,6 @@ export function TrailPlay({
   const pressWay = (way: number) => (e: PointerEvent) => {
     if (!picker.current) return;
     e.stopPropagation();
-    spawn(e.clientX, e.clientY);
     pickWay(way);
   };
 
@@ -1099,7 +1097,6 @@ export function TrailPlay({
     const pick = chooser.current;
     if (pick && slot >= 0) {
       chooser.current = null;
-      spawn(e.clientX, e.clientY);
       return pick(slot);
     }
     if (tapper.current) {

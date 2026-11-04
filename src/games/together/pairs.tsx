@@ -131,22 +131,6 @@ const child = (fur: "fox" | "bear", x: number, coat: string) => critter(fur, x +
 
 const HEART = "M50 88 C20 65 5 48 5 30 C5 15 17 5 30 5 C40 5 47 11 50 18 C53 11 60 5 70 5 C83 5 95 15 95 30 C95 48 80 65 50 88 Z";
 
-/** Hearts (or one) floating up over a happy one: in the box's units, `at` as for a layer. */
-const hearts = (at: Rect, count = 2) => (
-  <>
-    {Array.from({ length: count }, (_, i) => (
-      <path
-        key={i}
-        d={HEART}
-        fill="#ff5d73"
-        stroke={OUT}
-        strokeWidth="5"
-        transform={`translate(${at[0] + i * (at[2] / count)} ${at[1] + (i % 2) * 8}) scale(${at[2] / count / 100})`}
-      />
-    ))}
-  </>
-);
-
 /** A small sparkle at `x`, `y`. */
 const sparkle = (x: number, y: number, r: number) => (
   <path
@@ -405,7 +389,6 @@ export const PAIRS: Pair[] = [
       { at: childAt(104), cls: "tg-child", draw: child("bear", 104, "#ffd43b") },
       { at: [38, 22, 124, 174], cls: "tg-door", draw: door },
       { at: [128, 112, 40, 40], cls: "tg-tool", tool: true },
-      { at: [114, 64, 60, 34], cls: "tg-hearts", draw: hearts([114, 64, 60, 34]) },
     ],
     sounds: [
       [200, playClick],
@@ -560,7 +543,6 @@ export const PAIRS: Pair[] = [
         cls: "tg-heart",
         draw: <path d={HEART} fill="#ff5d73" stroke={OUT} strokeWidth="6" transform="translate(140 70) scale(0.34 0.32)" />,
       },
-      { at: [120, 54, 70, 34], cls: "tg-hearts", draw: hearts([120, 54, 70, 34]) },
     ],
     sounds: [
       [500, playHeartbeat],
@@ -693,7 +675,6 @@ export const PAIRS: Pair[] = [
       },
       { at: childAt(128), cls: "tg-child", draw: child("bear", 128, "#ff8787") },
       { at: [60, 128, 38, 38], cls: "tg-tool", tool: true },
-      { at: [126, 62, 68, 36], cls: "tg-hearts", draw: hearts([126, 62, 68, 36]) },
     ],
     sounds: [
       [0, playDoorbell],

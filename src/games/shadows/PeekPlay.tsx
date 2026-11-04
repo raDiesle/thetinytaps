@@ -204,9 +204,6 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
     }
     say(texts.there(round.item));
     onSolved(misses.current);
-    later(800, () => {
-      for (let i = 0; i < 8; i++) spawn();
-    });
     later(CELEBRATE_MS, onNext);
   };
 

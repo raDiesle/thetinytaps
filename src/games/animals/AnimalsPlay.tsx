@@ -59,8 +59,6 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
   const language = useAppLanguage();
   const texts = pick(ANIMAL_TEXTS, language.id);
   const giftTexts = pick(GIFT_TEXTS, language.id);
-  /** The things below are taken to the animal (food, gifts); when looking for a home, the animal goes to them. */
-  const toAnimal = round.kind !== "home";
   const [drag, setDrag] = useState<{ who: Mover; x: number; y: number } | null>(null);
   /** The target the dragged thing is over, so it can lean towards it. */
   const [hover, setHover] = useState<Mover | null>(null);
@@ -199,9 +197,6 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     }
     if (settings.sounds) later(200, playChime);
     onSolved(misses.current);
-    later(700, () => {
-      for (let i = 0; i < 8; i++) spawn();
-    });
     later(round.kind === "gift" ? GIFT_CELEBRATE_MS : CELEBRATE_MS, onNext);
   };
 
@@ -347,13 +342,6 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
           <GiftDrawing gift={round.gifts[round.correct]} />
         </span>
       )}
-      {won && toAnimal && (
-        <span className="ap-hearts" aria-hidden>
-          <span>💖</span>
-          <span>💛</span>
-          <span>💖</span>
-        </span>
-      )}
     </div>
   );
 
@@ -380,7 +368,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
                   {giver.emoji}
                 </span>
               )}
-              <span className={`ap-food ap-gift${moverClass(i)}${giver ? " refused" : ""}`} style={moveStyle(offsetOf(i))}>
+              <span className={`ap-food ap-gift${moverClass(i)}`} style={moveStyle(offsetOf(i))}>
                 <GiftDrawing gift={gift} label={giftTexts.gift(gift)} />
               </span>
             </div>
@@ -402,12 +390,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
             onPointerUp={onMoverUp}
             onPointerCancel={onMoverCancel}
           >
-            <span
-              className={`ap-food ap-emoji${moverClass(i)}${outcome?.pick === i && !outcome.ok ? " refused" : ""}`}
-              style={moveStyle(offsetOf(i))}
-              role="img"
-              aria-label={texts.food(food)}
-            >
+            <span className={`ap-food ap-emoji${moverClass(i)}`} style={moveStyle(offsetOf(i))} role="img" aria-label={texts.food(food)}>
               {food.emoji}
             </span>
           </div>

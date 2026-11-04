@@ -16,7 +16,7 @@ The right one flies up and the two set to work (`.working`, `WORK_MS`): the toot
 which scrubs; the key turns and the door opens on a bear child; the lid lands and the pot steams; the can pours and the
 flower stands up; the crayon draws a heart; the hose puts out the fire; the stethoscope finds the fox child's heart;
 the rolls come out of the oven; the scissors cut the fox child's tuft; the parcel goes to the bear child. A wrong pick
-only hops back, and the one it belongs to peeks up over its plate for a moment (`.tg-owner`) – never shown as wrong.
+stays still on its plate, and the one it belongs to peeks up over its plate for a moment (`.tg-owner`) – never shown as wrong.
 
 Files: `pairs.tsx` holds the pairs, their drawings and sentences (`PAIRS`, `TOGETHER_TEXTS`); `PairPicture.tsx` draws one
 above in its 200 × 200 box; `TogetherPlay.tsx` is one round, `TogetherRounds.tsx` the turns, the step and the decks

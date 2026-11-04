@@ -146,7 +146,6 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     const word = current.word;
     say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
     if (isColor(word)) setBackground(word.color);
-    for (let i = 0; i < 8; i++) spawn();
   }, [current, done, letters, typed, pack, say, sayLetter, spawn, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */

@@ -369,9 +369,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   }, [at]);
 
   /** A button while calling: what the child said is kept, and the story goes on with it at once – the only way on there. */
-  const pick = (choice: Went, e: PointerEvent) => {
+  const pick = (choice: Went) => {
     if (settings.sounds) playPop();
-    spawn(e.clientX, e.clientY);
     setSaid(choice);
     stopTimers();
     begin(atRef.current.step + 1, { came: null, said: choice });
@@ -531,7 +530,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     aria-pressed={s.id === said}
                     onPointerDown={(e) => {
                       e.stopPropagation();
-                      pick(s.id, e);
+                      pick(s.id);
                     }}
                   >
                     {s.emoji}

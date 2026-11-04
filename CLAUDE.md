@@ -193,10 +193,18 @@ In a fresh worktree run `bun install` first.
 
 ## Rules for every game (toddlers play alone)
 
-- One tap or key = one immediate, visible and audible reaction. Every key does something.
+- One tap or key = one immediate, visible and audible reaction. Every key does something. A reaction, never a
+  firework: **after a choice or an answer the picture's change and its sound are the answer** – the faces turning
+  happy or relieved, the animal eating, the door opening. Nothing floats up then (no hearts, stars, sparkles, 💢 💥 💧,
+  no shower of `useBursts` shapes), and no card, button or frame hops, shakes, pulses, blinks or grows – not the one
+  picked, not the others, not „Weiter“ at the end (user feedback from Gefühle, November 2026: too much fast blinking
+  and movement for small children, for every game). What lives in the picture may still act (an animal shaking its
+  head at the wrong food, a hidden one coming out happy), and a level's end may still have its party; shapes stay for a
+  tap or key that hits nothing (`funBurst`). `src/calmAnswers.test.ts` checks the styles and the showers.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
-  feedback, November 2026): the sound says it, and what floats up is a music note (♪ ♫), a heart or a puff. Signs that
+  feedback, November 2026): the sound says it, and what floats up from a thing tapped in the picture is a music note
+  (♪ ♫), a heart or a puff of that thing – never after a choice or an answer (see above). Signs that
   belong to the drawn world (FEUERWEHR, TAXI) may stay. `src/soundWords.test.ts` checks the drawings. Where a
   game plays only synthesized noises, a real CC0 recording from Freesound is better: `src/lib/sounds/README.md` says how
   to cut one, and a game loads its recordings when it starts (`loadRecordings`), so even the first sound is the real one.

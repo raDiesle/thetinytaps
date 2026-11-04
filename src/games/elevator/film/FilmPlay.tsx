@@ -329,7 +329,6 @@ export function FilmPlay({
     const choose = chooser.current;
     if (!choose || pausedRef.current) return;
     e.stopPropagation();
-    spawn(e.clientX, e.clientY);
     choose(id);
   };
 

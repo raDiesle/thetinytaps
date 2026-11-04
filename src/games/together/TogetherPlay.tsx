@@ -126,9 +126,6 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
     }
     say(texts.right(round.pair));
     onSolved(misses.current);
-    later(FLIGHT_MS + WORK_MS - 900, () => {
-      for (let i = 0; i < 8; i++) spawn();
-    });
     later(FLIGHT_MS + WORK_MS, onNext);
   };
 
@@ -205,7 +202,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
                   ref={(el) => {
                     optionRefs.current[i] = el;
                   }}
-                  className={`tg-partner${shown && outcome.ok ? " landed" : ""}${shown && !outcome.ok ? " refused" : ""}`}
+                  className={`tg-partner${shown && outcome.ok ? " landed" : ""}`}
                   style={shown && outcome.ok && flight ? { translate: `${flight.x}px ${flight.y}px`, scale: "0.4" } : undefined}
                   role="img"
                   aria-label={texts.partner(p)}

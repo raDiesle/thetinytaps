@@ -32,9 +32,10 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
   (A / A a / a) are shared by every way to play – the words too („A a“ writes „Bär“).
 - On a phone on its side (Frei tippen, also with only numbers) letter, picture and word – or the things and the digit – stand side by
   side, not stacked: the on-screen keys leave little height, and stacked they would be tiny (`letters.css`, end).
-- One right key is all a round of „Wo ist das B?“ and „Wörter tippen“ takes: after a short celebration (`CELEBRATE_MS`)
-  the next letter comes by itself (in „Wo ist das B?“), never waiting for another key or tap. Keys and taps during the
-  celebration only make shapes and sounds.
+- One right key is all a round of „Wo ist das B?“ and „Wörter tippen“ takes: after a short moment (`CELEBRATE_MS`) the
+  next letter comes by itself (in „Wo ist das B?“), never waiting for another key or tap. The right key's answer is the
+  key pressed down and lit, the word said (and a colour word's colour, a doing word acted out) – no shower of shapes, no
+  hopping picture or letters (root `CLAUDE.md`). Keys and taps during that moment only make shapes and sounds.
 
 ## Languages
 

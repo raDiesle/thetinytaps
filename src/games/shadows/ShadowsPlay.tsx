@@ -215,9 +215,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       later(700, () => round.item.sound?.());
     }
     say(texts.found(round.item));
-    later(700, () => {
-      for (let i = 0; i < 8; i++) spawn();
-    });
     later(CELEBRATE_MS, nextRound);
   };
 
