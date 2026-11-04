@@ -17,6 +17,7 @@ import {
   type Effort,
   type Idea,
   type IdeaArea,
+  areaKey,
   type IdeaStatus,
   type LanguageState,
   languageStateOf,
@@ -134,7 +135,7 @@ export function ManagementPage() {
     if (saved.status === "todo" && !isOpen(idea)) return false;
     if (saved.status === "done" && !idea.done) return false;
     if (saved.efforts.length > 0 && !saved.efforts.includes(idea.effort)) return false;
-    if (saved.area && AREA_OF.get(idea.id)?.prefix !== saved.area) return false;
+    if (saved.area && areaKey(AREA_OF.get(idea.id) as IdeaArea) !== saved.area) return false;
     if (saved.mark === "undecided" ? mark : saved.mark !== "any" && mark !== saved.mark) return false;
     const haystack = `${idea.id} ${idea.title} ${idea.text} ${idea.why ?? ""} ${idea.partial ?? ""}`.toLowerCase();
     return words.every((w) => haystack.includes(w));
@@ -145,7 +146,7 @@ export function ManagementPage() {
   const shown = ALL_IDEAS.filter(visible);
   const sections: { key: string; title: string; intro?: string; ideas: Idea[] }[] =
     saved.groupBy === "area"
-      ? IDEA_AREAS.map((a) => ({ key: a.prefix, title: `${a.emoji} ${a.prefix} – ${a.title}`, intro: a.intro, ideas: a.ideas.filter(visible).sort(order) }))
+      ? IDEA_AREAS.map((a) => ({ key: areaKey(a), title: `${a.emoji} ${a.prefix} – ${a.title}`, intro: a.intro, ideas: a.ideas.filter(visible).sort(order) }))
       : EFFORTS.map((e) => ({ key: e, title: `Aufwand ${e} – ${EFFORT_LABELS[e]}`, ideas: shown.filter((i) => i.effort === e).sort(order) }));
 
   const marked = (mark: Mark) =>
@@ -292,7 +293,7 @@ export function ManagementPage() {
         />
         <Chips
           label="Bereich"
-          options={[{ value: "", label: "Alle" }, ...IDEA_AREAS.map((a) => ({ value: a.prefix, label: `${a.emoji} ${a.prefix}`, title: a.title }))]}
+          options={[{ value: "", label: "Alle" }, ...IDEA_AREAS.map((a) => ({ value: areaKey(a), label: `${a.emoji} ${a.prefix}`, title: a.title }))]}
           selected={[saved.area]}
           onToggle={(area) => update({ area })}
         />
@@ -454,7 +455,7 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
       </td>
     ) : (
       <td key={key}>
-        <button type="button" className={effort ? `effort-${effort}` : undefined} onClick={() => onPick(area.prefix, effort)}>
+        <button type="button" className={effort ? `effort-${effort}` : undefined} onClick={() => onPick(areaKey(area), effort)}>
           {ideas.length}
         </button>
       </td>
@@ -487,9 +488,9 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
             {group.areas.map((area) => {
               const open = area.ideas.filter(isOpen);
               return (
-                <tr key={area.prefix} className={open.length === 0 ? "ideas-overview-finished" : undefined}>
+                <tr key={areaKey(area)} className={open.length === 0 ? "ideas-overview-finished" : undefined}>
                   <th>
-                    <button type="button" onClick={() => onPick(area.prefix)}>
+                    <button type="button" onClick={() => onPick(areaKey(area))}>
                       {area.emoji} <b>{area.prefix}</b> {area.title}
                     </button>
                   </th>

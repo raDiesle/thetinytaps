@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES, SHELF, UNFINISHED, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
-import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
+import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SEO_TEXTS, SITE_NAME, SITE_PROMISE, fullTitle, splitLanguage } from "./seo";
@@ -86,9 +86,9 @@ describe("ideas", () => {
     for (const { area, idea } of ideas) expect(idea.id).toMatch(new RegExp(`^${area.prefix}-\\d{2,}$`));
   });
 
-  test("each area has its own prefix and sits in one group", () => {
-    const prefixes = IDEA_AREAS.map((area) => area.prefix);
-    expect(prefixes.filter((p, i) => prefixes.indexOf(p) !== i)).toEqual([]);
+  test("each area has its own key and sits in one group", () => {
+    const keys = IDEA_AREAS.map(areaKey);
+    expect(keys.filter((k, i) => keys.indexOf(k) !== i)).toEqual([]);
   });
 
   test("top picks name existing ideas", () => {

@@ -1,12 +1,12 @@
 import type { IdeaArea } from "./types";
 
-/** C: neue Szenen für Gefühle, in denen der kleine Bär sich selbst hilft (Recherche „gefuehle-selbst-regulieren“). */
+/** C: ideas for the Gefühle book's game „Alltagssituationen“: new scenes in which the little bear helps itself (research „gefuehle-selbst-regulieren“). */
 export const feelingsIdeas: IdeaArea = {
   prefix: "C",
   emoji: "🐻",
-  title: "Gefühle – neue Szenen, in denen der Bär sich selbst hilft",
+  title: "Alltagssituationen",
   intro:
-    "Für das Spiel Gefühle, gebaut wie die Kita-Geschichten: ein erstes Bild, dann drei Schritte mit je einer nicht so guten und einer guten Karte. In jeder Szene handelt der kleine Bär selbst („Was kann der kleine Bär tun?“), nicht ein Erwachsener für ihn – der große Bär (Mama, Papa, Oma oder Opa Bär) steht dabei, schaut zu oder kommt, wenn der Bär ihn ruft. Das Gefühl selbst ist nie die nicht so gute Karte: Weinen, Angst haben, wütend sein und sich verkriechen sind in Ordnung; nicht so gut ist nur, was jemandem wehtut oder etwas kaputt macht. Jede Szene hat mindestens ein Mittel mit dem Körper (stampfen, pusten, Fäuste drücken, Kuscheltier drücken, Ohren zuhalten) und eines, bei dem der Bär etwas anderes tut; Hilfe holen höchstens in einem Schritt (siehe Recherche). Was eine nicht so gute Karte wirft oder kaputt macht, zeigt schon das erste Bild. Bilder kommen zuerst als Plan in bilder/README.md.",
+    "Neue Szenen für das Spiel „Alltagssituationen“, gebaut wie die Kita-Geschichten: ein erstes Bild, dann drei Schritte mit je einer nicht so guten und einer guten Karte. In jeder Szene handelt der kleine Bär selbst („Was kann der kleine Bär tun?“), nicht ein Erwachsener für ihn – der große Bär (Mama, Papa, Oma oder Opa Bär) steht dabei, schaut zu oder kommt, wenn der Bär ihn ruft. Das Gefühl selbst ist nie die nicht so gute Karte: Weinen, Angst haben, wütend sein und sich verkriechen sind in Ordnung; nicht so gut ist nur, was jemandem wehtut oder etwas kaputt macht. Jede Szene hat mindestens ein Mittel mit dem Körper (stampfen, pusten, Fäuste drücken, Kuscheltier drücken, Ohren zuhalten) und eines, bei dem der Bär etwas anderes tut; Hilfe holen höchstens in einem Schritt (siehe Recherche). Was eine nicht so gute Karte wirft oder kaputt macht, zeigt schon das erste Bild. Bilder kommen zuerst als Plan in bilder/README.md.",
   ideas: [
     {
       id: "C-01",
@@ -204,6 +204,7 @@ export const feelingsIdeas: IdeaArea = {
       text: "Die Mittel des Bären kommen in vielen Szenen wieder: stampfen, pusten, Fäuste drücken, Kuscheltier drücken, Ohren zuhalten, Kuschelhöhle, „Stopp!“, „Ich bin …“ sagen, „Hilf mir bitte“, etwas anderes spielen. Jedes bekommt ein festes kleines Zeichen in der Ecke seiner Karte und eine feste Haltung des Bären, so dass ein Kind „das Pusten“ in jeder Szene wiedererkennt.",
       why: "Kinder übertragen ein Mittel leichter auf neue Lagen, wenn es immer gleich aussieht. Ratgeber empfehlen, Mittel in Ruhe zu lernen und im Ernstfall nur ein Zeichen zu zeigen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "C-20",
@@ -212,6 +213,7 @@ export const feelingsIdeas: IdeaArea = {
       text: "Wenn der Bär stampft, pustet oder die Fäuste drückt, macht das Kind mit: Stampfen ist viele schnelle Tipps (jeder rumst), Pusten geht ins Mikrofon wie X-06 (ohne Mikrofon reicht Halten), Fäuste drücken heißt den Finger halten und loslassen. Erst dann geht die Geschichte weiter. Über dem Bären zeigt eine Wolke sein Gefühl und wird mit jedem Mal kleiner und heller.",
       why: "Ein Mittel, das der Körper einmal gemacht hat, wird eher wieder benutzt. Die kleiner werdende Wolke zeigt ohne Worte, dass es hilft.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "C-21",
@@ -289,10 +291,24 @@ export const feelingsIdeas: IdeaArea = {
       done: true,
       partial: "Als Geschichte „Erschrocken, ein lauter Knall“ in Gefühle (selbst.ts), nur Deutsch. Ohne Kuscheltier im Bild.",
     },
+  ],
+};
+
+/**
+ * C as well, for the game „Wie geht's dir?“: it shares the prefix with „Alltagssituationen“, since its ideas were
+ * numbered there before the book got its own heading on /management/ – numbers stay fixed, so a new C idea takes the
+ * next free number of both.
+ */
+export const feelingsCheckInIdeas: IdeaArea = {
+  key: "C-wie",
+  prefix: "C",
+  emoji: "🌦️",
+  title: "Wie geht's dir?",
+  ideas: [
     {
       id: "C-29",
       emoji: "🌈",
-      title: "Wie geht's dir? Mehr Gefühle zum Zeigen",
+      title: "Mehr Gefühle zum Zeigen",
       text: "Zu Sonne, Wolke, Regen und Gewitter kommen weitere Wetter: Regenbogen (stolz), Wind (aufgeregt, zappelig), Nebel (müde, alles zu viel), Schneeflocken (ruhig, zufrieden), ein dunkler Wald (Angst). Jedes führt zu den Szenen der passenden Gruppe in „Alltagssituationen“.",
       why: "Vier Wetter decken nur froh, müde, traurig und wütend ab. Angst, Aufregung und Stolz kennen Kleinkinder genauso – und je feiner das Kind zeigen kann, wie es ihm geht, desto besser kann der Erwachsene darauf eingehen.",
       effort: "M",
@@ -300,7 +316,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-30",
       emoji: "🐻",
-      title: "Wie geht's dir? Gesichter statt Wetter",
+      title: "Gesichter statt Wetter",
       text: "Statt Wetterbildern zeigen die Karten ein Fuchs- oder Bärenkind mit Mama oder Papa daneben: fröhlich, traurig, wütend, ängstlich, müde. Das Kind tippt auf das Gesicht, das passt; der Erwachsene im Bild nickt und nimmt es in den Arm.",
       why: "Gesichter sind für Zweijährige leichter zu lesen als ein Wetter-Bild, und die Maskottchen kommen so auch hier als Familie vor.",
       effort: "M",
@@ -308,7 +324,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-31",
       emoji: "🤲",
-      title: "Wie geht's dir? Was hilft dir jetzt?",
+      title: "Was hilft dir jetzt?",
       text: "Nach dem Gefühl kommt eine zweite Frage mit drei Bildern: kuscheln, toben, etwas trinken, allein sein, ein Lied. Das Kind wählt, was ihm jetzt guttut – und der Erwachsene weiß, was er tun kann, auch ohne dass das Kind es sagen kann.",
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
@@ -316,7 +332,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-32",
       emoji: "🫀",
-      title: "Wie geht's dir? Wo spürst du es?",
+      title: "Wo spürst du es?",
       text: "Ein großer Bär im Umriss: Das Kind tippt, wo es das Gefühl spürt – Bauch, Kopf, Hände, Brust –, und dort leuchtet eine Farbe auf (rot für Wut, blau für traurig). Nichts ist falsch.",
       why: "Gefühle sitzen im Körper; Kinder, die das bemerken, können früher etwas tun (pusten, kuscheln). Es ist ein Spiel ohne richtige Antwort, das Gespräche öffnet.",
       effort: "M",
@@ -324,7 +340,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-33",
       emoji: "🌅",
-      title: "Wie geht's dir? Am Morgen und am Abend",
+      title: "Am Morgen und am Abend",
       text: "„Wie geht's dir?“ einmal am Morgen und einmal am Abend, als Schritt im Tagesplan (Belohnungstafel & Zeitplan). Am Abend sieht man beide Bilder nebeneinander: so ging es mir heute früh, so jetzt.",
       why: "Ein kurzes festes Ritual macht über Gefühle sprechen alltäglich. Der Vergleich zeigt dem Kind, dass Gefühle kommen und gehen.",
       effort: "M",
@@ -332,7 +348,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-34",
       emoji: "📖",
-      title: "Wie geht's dir? Was der Erwachsene danach sieht",
+      title: "Was der Erwachsene danach sieht",
       text: "Nach dem Spiel ein kleiner Satz für Erwachsene (nur auf Tablet und Computer, wie die Kartenzeile): welches Gefühl gewählt wurde und eine Frage, mit der man weiterreden kann („Was hat dich heute wütend gemacht?“). Ohne Speichern, ohne Verlauf.",
       why: "Das Kind zeigt etwas, aber der Erwachsene schaut vielleicht gerade nicht hin. Ein ruhiger Hinweis hilft, das Gespräch danach zu führen.",
       effort: "S",
@@ -340,7 +356,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-35",
       emoji: "😀",
-      title: "Wie geht's dir? Das Kind macht das Gesicht nach",
+      title: "Das Kind macht das Gesicht nach",
       text: "Nach der Wahl macht der kleine Bär das Gesicht des Gefühls groß vor (wütende Augenbrauen, Lachen, hängender Mund), und das Kind macht es nach – vor einem Spiegel oder dem Erwachsenen. Ohne Kamera.",
       why: "Gefühle nachmachen hilft, sie bei sich und anderen zu erkennen; mit dem Erwachsenen zusammen wird es ein Spiel.",
       effort: "S",
@@ -348,7 +364,7 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-36",
       emoji: "🎚️",
-      title: "Wie geht's dir? Wie stark ist es?",
+      title: "Wie stark ist es?",
       text: "Nach dem Gefühl ein Regler ohne Zahlen: eine kleine, eine mittlere oder eine große Gewitterwolke (oder Sonne). Das Kind tippt, wie stark es ist; bei einem großen Gefühl kommt zuerst etwas Beruhigendes (gemeinsam pusten).",
       why: "„Ein bisschen traurig“ und „ganz arg traurig“ brauchen verschiedene Hilfe. Schon Zweijährige können groß und klein unterscheiden.",
       effort: "M",

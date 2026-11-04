@@ -3,10 +3,10 @@ import type { IdeaArea } from "./types";
 /** J: new games for the book „Gefühle“, beside „Wie geht's dir?“ and „Alltagssituationen“ (idea round, 4 November 2026). */
 export const feelingsGamesIdeas: IdeaArea = {
   prefix: "J",
-  emoji: "💛",
-  title: "Gefühle – neue Spiele im Buch",
+  emoji: "✨",
+  title: "Neue Spiele für Gefühle",
   intro:
-    "Neue Spiele für das Buch „Gefühle“, neben „Wie geht's dir?“ und „Alltagssituationen“. Neue Szenen für die Geschichten stehen unter C. Jedes Spiel übt etwas anderes: Gefühle an Gesicht, Körper und Stimme erkennen, verstehen, woher sie kommen, Mut und Ruhe finden, sich mit anderen freuen. Es spielen die Fuchs- und die Bärenfamilie, immer ein Kind mit seinem Großen. Wo das Kind wählt, passt genau eine Antwort; was nicht passt, macht nichts falsch, die Figur schüttelt nur sanft den Kopf. Die Antwort ist das Bild selbst (ein Gesicht hellt sich auf, jemand wird getröstet), nichts fliegt hoch, nichts blinkt.",
+    "Neue Spiele für das Buch „Gefühle“, neben „Wie geht's dir?“ und „Alltagssituationen“. Neue Szenen für die Geschichten und Ideen für „Wie geht's dir?“ stehen unter C. Jedes Spiel übt etwas anderes: Gefühle an Gesicht, Körper und Stimme erkennen, verstehen, woher sie kommen, Mut und Ruhe finden, sich mit anderen freuen. Es spielen die Fuchs- und die Bärenfamilie, immer ein Kind mit seinem Großen. Wo das Kind wählt, passt genau eine Antwort; was nicht passt, macht nichts falsch, die Figur schüttelt nur sanft den Kopf. Die Antwort ist das Bild selbst (ein Gesicht hellt sich auf, jemand wird getröstet), nichts fliegt hoch, nichts blinkt.",
   ideas: [
     {
       id: "J-01",
