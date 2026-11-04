@@ -357,6 +357,9 @@ In a fresh worktree run `bun install` first.
 - Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
   „🌳 Lebendige Welten“; `MenuHead` takes a string), and so is every heading inside a page – the emoji stays on the
   card or the book, not over it (`MenuTop.test.ts` checks).
+- A menu's cards, lines and books always stand in the same order (user feedback, November 2026): nothing moves to the
+  front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
+  last first; `GameShell.test.ts` checks).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
   choices may sit there.
