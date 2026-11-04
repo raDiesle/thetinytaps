@@ -17,6 +17,7 @@ import {
 } from "../src/content/seo";
 import { SEO_EN } from "../src/content/seo.en";
 import { appPlugin, PRODUCTION } from "./appPlugin";
+import { BOOT_WAIT, chunkClosure, pageModuleFor, pageModules } from "./pageStart";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
 // After bundling it adds what GitHub Pages and an offline app need: public/, the manifest and icon links,
@@ -139,15 +140,19 @@ function staticBody({ language, page, text }: BuiltPage) {
   const others = SEO_LANGUAGES.filter((other) => other !== language).map(
     (other) => `<a href="${href(`${languagePrefix(other)}${page.path}`)}" hreflang="${other}">${LANGUAGE_NAMES[other]}</a>`,
   );
+  // First the title on a sheet of paper with the paw track coming and going, filling the screen while the app's code
+  // loads (tools/pageStart.ts); the text and links below it, for search engines.
   return [
     '<main class="seo-page">',
-    `<h1>${escapeHtml(text.title)}</h1>`,
+    `<div class="boot"><h1>${escapeHtml(text.title)}</h1>${BOOT_WAIT}</div>`,
+    '<div class="seo-page-text">',
     `<p>${escapeHtml(text.text)}</p>`,
     `<p>${escapeHtml(promise)}</p>`,
     "<nav><ul>",
     ...links.map((p) => `<li><a href="${href(`${languagePrefix(language)}${p.path}`)}">${escapeHtml(textIn(p, language).title)}</a></li>`),
     "</ul></nav>",
     `<p>${others.join(" · ")}</p>`,
+    "</div>",
     "</main>",
   ].join("");
 }
@@ -215,11 +220,12 @@ function headTags({ language, page, text }: BuiltPage) {
 async function writePages(template: string) {
   await writeFile(join(OUT, "404.html"), template);
   const built = SEO_LANGUAGES.flatMap((language) => SEO_PAGES.map((page): BuiltPage => ({ language, page, text: textIn(page, language) })));
+  const preloadsOf = await pagePreloads(template);
   for (const one of built) {
     let html = replaceOnce(template, '<html lang="de">', `<html lang="${one.language}">`);
     html = replaceOnce(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(one.text))}</title>`);
     html = replaceOnce(html, /<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${escapeHtml(one.text.description)}" />`);
-    html = replaceOnce(html, "</head>", `  ${headTags(one)}\n  </head>`);
+    html = replaceOnce(html, "</head>", `  ${[headTags(one), ...(await preloadsOf(one))].join("\n    ")}\n  </head>`);
     html = replaceOnce(html, '<div id="root"></div>', `<div id="root">${staticBody(one)}</div>`);
     const dir = join(OUT, languagePrefix(one.language), one.page.path);
     await mkdir(dir, { recursive: true });
@@ -239,6 +245,32 @@ async function writePages(template: string) {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
   );
   await writeFile(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
+}
+
+/**
+ * The chunks a page needs beyond the start's, as `<link rel="modulepreload">` tags: its own page's code (App.tsx loads
+ * it lazily, so without them it was fetched only after the start's code had run, one round trip after another) and, on
+ * a page in another language than German, that language's texts, which the app loads before its first screen. They
+ * come down together with the start's code, while the page's title waits on paper (`.boot`).
+ */
+async function pagePreloads(template: string) {
+  const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
+  const files = await filesIn(OUT);
+  const linked = new Set([...template.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]));
+  const read = (file: string) => readFile(join(OUT, file), "utf8");
+  const chunkOf = (name: string) => {
+    const found = files.filter((file) => new RegExp(`^static/${name}\\.[a-z0-9]+\\.js$`).test(file));
+    if (found.length !== 1) throw new Error(`build: ${found.length} chunks for ${name}`);
+    return found[0];
+  };
+  return async ({ language, page }: BuiltPage) => {
+    const module = pageModuleFor(page.path, modules);
+    if (module === undefined) throw new Error(`build: no page of App.tsx opens ${page.path}`);
+    const firsts = [...(module ? [chunkOf(module)] : []), ...(language === "de" ? [] : [chunkOf(`texts-${language}`)])];
+    const needed = new Set<string>();
+    for (const first of firsts) for (const file of await chunkClosure(first, read, `${base}/static/`)) needed.add(file);
+    return [...needed].filter((file) => !linked.has(href(`/${file}`))).map((file) => `<link rel="modulepreload" crossorigin href="${href(`/${file}`)}">`);
+  };
 }
 
 // Offline support (PWA): writes out/sw.js from src/sw.js with the list of all built files, so the

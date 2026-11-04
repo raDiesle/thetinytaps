@@ -1,10 +1,11 @@
 import type { OwnTime } from "./time";
 
 /**
- * What runs down while the child watches: a train going to the station, an hourglass, a candle, ants carrying a cookie
- * to their hill (H-68) – or „Abwechseln“ (H-52), two children taking turns with a toy, turn after turn.
+ * What runs down while the child watches: a train going to the station, apples falling into a basket, an hourglass, a
+ * caterpillar eating a leaf, a candle, ants carrying a cookie to their hill (H-68), a red disc – or „Abwechseln“ (H-52),
+ * two children taking turns with a toy, turn after turn.
  */
-export type TimerPicture = "train" | "sand" | "candle" | "ants" | "swap";
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "candle" | "ants" | "disc" | "swap";
 
 /** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
 export type SwapToy = "bobbycar" | "doll" | "ball";
