@@ -1,7 +1,8 @@
 # Gefühle
 
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
-`cover-gefuehle.webp`; user decision, November 2026) with two games; their names are in `names.ts`:
+`cover-gefuehle.webp`; user decision, November 2026) with two games; their names are in `names.ts`. Ideas for more
+games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes area C:
 - **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`) plays at once: four weather
   cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show the bear under that weather, feeling the same. The child
   picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then a pass of the matching group

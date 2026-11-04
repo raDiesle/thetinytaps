@@ -25,6 +25,7 @@ import { firstVisitIdeas } from "./v-first-visit";
 import { bookIdeas } from "./d-book";
 import { matchingIdeas } from "./z-matching";
 import { feelingsIdeas } from "./c-feelings";
+import { feelingsGamesIdeas } from "./j-feelings-games";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
@@ -50,7 +51,7 @@ export const IDEA_GROUPS: IdeaGroup[] = [
       otherGamesIdeas,
     ],
   },
-  { emoji: "✨", title: "Ganz neue Spiele", areas: [newGamesIdeas] },
+  { emoji: "✨", title: "Ganz neue Spiele", areas: [newGamesIdeas, feelingsGamesIdeas] },
   {
     emoji: "👪",
     title: "Für Eltern & Technik",
