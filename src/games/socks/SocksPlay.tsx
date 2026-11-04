@@ -286,12 +286,8 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       if (settings.sounds) {
         playKnock(1500);
         later(120, () => playKnock(1300));
+        // From the third pair in a row on a twinkle comes with it – a sound only, nothing floats up after an answer.
         if (streak >= 3) playTwinkle();
-      }
-      // Stars at the line from the third pair in a row on.
-      if (streak >= 3) {
-        const target = slotRefs.current[slot * 2]?.getBoundingClientRect();
-        if (target) celebrate({ at: { x: target.right, y: target.top + target.height / 2 } });
       }
     });
 

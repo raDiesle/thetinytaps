@@ -95,7 +95,6 @@
 /* Hidden until the two set to work. */
 .tg-paste,
 .tg-sparkles,
-.tg-hearts,
 .tg-heart,
 .tg-upright,
 .tg-drops,
@@ -235,10 +234,6 @@
   animation: tg-out 0.15s linear 0.4s forwards;
 }
 
-.tg-partner.refused {
-  animation: tg-hop 0.4s ease-in-out;
-}
-
 /* The one a wrong pick belongs to pops up over its plate for a moment. */
 .tg-owner {
   position: absolute;
@@ -263,10 +258,6 @@
 
 .working .tg-sparkles {
   animation: tg-show-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s forwards;
-}
-
-.working .tg-hearts {
-  animation: tg-float 1.4s ease-out 2s forwards;
 }
 
 .working .tg-helper {
@@ -422,10 +413,6 @@
   animation: tg-jump 0.5s ease-in-out 2.5s;
 }
 
-.pair-aerztin.working .tg-hearts {
-  animation-delay: 2.5s;
-}
-
 /* Baker: the roll goes into the oven, it glows, and a tray of golden rolls comes out steaming. */
 .pair-baecker.working .tg-tool {
   animation:
@@ -476,10 +463,6 @@
 .pair-post.working .tg-child {
   transform-origin: 50% 100%;
   animation: tg-jump 0.5s ease-in-out 1.5s 2;
-}
-
-.pair-post.working .tg-hearts {
-  animation-delay: 1.8s;
 }
 
 @keyframes tg-hop {
@@ -557,21 +540,6 @@
   100% {
     opacity: 0;
     transform: translateY(30%) scale(0.4);
-  }
-}
-
-@keyframes tg-float {
-  0% {
-    opacity: 0;
-    transform: translateY(20%) scale(0.5);
-  }
-  25% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-60%);
   }
 }
 

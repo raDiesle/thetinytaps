@@ -92,7 +92,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const busy = useRef(false);
   /** Bumped to make the picture hop again, e.g. "drag me" when tapping isn't enough. */
   const [nudge, setNudge] = useState(0);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
 
   const nextId = useRef(0);
   const pictureRef = useRef<HTMLSpanElement>(null);
@@ -209,9 +209,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       later(700, () => round.item.sound?.());
     }
     say(texts.found(round.item));
-    later(700, () => {
-      celebrate();
-    });
     later(CELEBRATE_MS, nextRound);
   };
 

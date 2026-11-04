@@ -141,7 +141,7 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
   const busy = useRef(false);
   /** Bumped when the hiding place is tapped: it rustles and the animal wiggles. */
   const [rustle, setRustle] = useState(0);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
   /** Wrong animals picked in this round, for the difficulty. */
   const misses = useRef(0);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -204,9 +204,6 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
     }
     say(texts.there(round.item));
     onSolved(misses.current);
-    later(800, () => {
-      celebrate();
-    });
     later(CELEBRATE_MS, onNext);
   };
 

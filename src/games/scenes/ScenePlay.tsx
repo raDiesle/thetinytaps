@@ -569,6 +569,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     if (isAnswer) {
       answeredRef.current = new Set(answeredRef.current).add(item.id);
       setAnswered(answeredRef.current);
+      // The item's own animation and the chime are the answer: no shapes fly up (root CLAUDE.md).
       animate(item);
       glow(x, y);
       if (soundsOn) playChime();

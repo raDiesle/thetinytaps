@@ -9,7 +9,14 @@
   align-items: flex-end;
   gap: clamp(12px, 3vw, 36px);
   translate: -50% 0;
-  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: game-end-in 0.5s ease-out;
+}
+
+/* The buttons come calmly after the picture's own ending: no growing, no bounce, and nothing that keeps calling. */
+@keyframes game-end-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* In the game's own layout (`inline`), where it places the buttons itself. */
@@ -60,12 +67,10 @@
   font-size: clamp(2.1rem, 13vh, 4.6rem);
   -webkit-text-stroke: 0.06em var(--ink);
   paint-order: stroke fill;
-  animation: breathe 2.4s ease-in-out infinite;
 }
 
 .game-end-button:active {
   translate: 0 4px;
-  animation: none;
 }
 
 /* The fox or bear family beside the buttons (D-12, `CheeringFamily`), as tall as a button. Upright the buttons alone

@@ -205,12 +205,19 @@ In a fresh worktree run `bun install` first.
   a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world
   (Lebendige Bilder's `spots`) – in the menus, start screens and on the bookshelf too (`MenuRipples`, mounted once in
   `index.tsx`, which leaves out what answers by itself and the grown-ups' pages); a tap that sets something off gets a warm light where the finger was (`glow`) and the
-  thing itself answers – never a random shape. Something done is celebrated calmly (`celebrate`): a few hearts, stars
-  and notes rise slowly while everyone in the picture cheers – never a storm of confetti, shapes or fast movement
-  (circles, triangles and squares popping up fitted neither, and were removed). `tapFeedback.test.ts` keeps it calm.
+  thing itself answers – never a random shape. A reaction, never a firework: **after a choice or an answer the
+  picture's change and its sound are the answer** – the faces turning happy or relieved, the animal eating, the door
+  opening. Nothing floats up then (no hearts, stars, sparkles, 💢 💥 💧, no `celebrate`), and no card, button or frame
+  hops, shakes, pulses, blinks or grows – not the one picked, not the others, not „Weiter“ at the end (user feedback
+  from Gefühle, November 2026: too much fast blinking and movement for small children, for every game). What lives in
+  the picture may still act (an animal shaking its head at the wrong food, a hidden one coming out happy). Only a
+  level's or a story's end is celebrated (`celebrate`), calmly: a few hearts, stars and notes rise slowly while
+  everyone in the picture cheers – never a storm of confetti, shapes or fast movement. `tapFeedback.test.ts` keeps it
+  calm, `calmAnswers.test.ts` keeps answers still and `celebrate` at the ends.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
-  feedback, November 2026): the sound says it, and what floats up is a music note (♪ ♫), a heart or a puff. Signs that
+  feedback, November 2026): the sound says it, and what floats up from a thing tapped in the picture is a music note
+  (♪ ♫), a heart or a puff of that thing – never after a choice or an answer (see above). Signs that
   belong to the drawn world (FEUERWEHR, TAXI) may stay. `src/soundWords.test.ts` checks the drawings. Where a
   game plays only synthesized noises, a real CC0 recording from Freesound is better: `src/lib/sounds/README.md` says how
   to cut one, and a game loads its recordings when it starts (`loadRecordings`), so even the first sound is the real one.

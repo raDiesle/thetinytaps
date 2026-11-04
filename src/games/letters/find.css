@@ -40,8 +40,9 @@
   color: #fff;
 }
 
+/* The pressed, lit key is the answer: the picture keeps still (root CLAUDE.md). */
 .find-card.done .picture {
-  animation: hop 0.5s ease-in-out 3;
+  animation: none;
 }
 
 /* A small picture of the real keyboard; keeps its space so the card doesn't jump when it appears. */

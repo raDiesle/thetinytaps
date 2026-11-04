@@ -64,7 +64,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [nudges, setNudges] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
 
   const lastType = useRef(0);
   const doneAt = useRef(0);
@@ -142,8 +142,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     say(`${word.word}!`, true);
     say(isAction(word) ? pack.joinIn(word) : pick(pack.praise), true);
     if (isColor(word)) setBackground(word.color);
-    celebrate();
-  }, [current, done, letters, typed, pack, say, sayLetter, celebrate, settings.sounds]);
+  }, [current, done, letters, typed, pack, say, sayLetter, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {

@@ -73,10 +73,6 @@
     scale 0.55s ease-in-out;
 }
 
-.sh-picture.wrong {
-  animation: shake 0.3s ease-in-out 3;
-}
-
 .sh-picture.nudge-0 {
   animation: sh-hop 0.45s ease-in-out;
 }
@@ -165,11 +161,8 @@
     opacity 0.35s;
 }
 
-/* A wrong shadow shows its colours for a moment: this is who it belongs to. */
-.sh-option.peek {
-  animation: wiggle 0.4s ease-in-out;
-}
-
+/* A wrong shadow shows its colours for a moment: this is who it belongs to – the colours are the answer, the card keeps
+   still (root CLAUDE.md). */
 .sh-option.peek .sh-shadow {
   filter: none;
   opacity: 1;
@@ -177,7 +170,6 @@
 
 .sh-option.matched {
   background: #fff3a8;
-  animation: wiggle 0.5s ease-in-out 0.6s 2;
 }
 
 /* Top left: the button for the kind of pictures. */
@@ -380,7 +372,6 @@
 }
 
 .pk-option.nope {
-  animation: shake 0.3s ease-in-out 3;
   opacity: 0.55;
 }
 

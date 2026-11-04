@@ -51,7 +51,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
   const busy = useRef(false);
   /** Bumped to make the small one hop when it is tapped to ask once more. */
   const [nudge, setNudge] = useState(0);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
   /** Wrong ones picked in this round, for the difficulty. */
   const misses = useRef(0);
   const youngRef = useRef<HTMLDivElement>(null);
@@ -119,9 +119,6 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
     }
     say(texts.becomes(round.growth));
     onSolved(misses.current);
-    later(FLIGHT_MS + GROW_MS - 900, () => {
-      celebrate();
-    });
     later(FLIGHT_MS + GROW_MS, onNext);
   };
 
@@ -198,7 +195,7 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
                   ref={(el) => {
                     optionRefs.current[i] = el;
                   }}
-                  className={`ap-food ap-emoji${shown && outcome.ok ? " landed" : ""}${shown && !outcome.ok ? " refused" : ""}`}
+                  className={`ap-food ap-emoji${shown && outcome.ok ? " landed" : ""}`}
                   style={shown && outcome.ok && flight ? { translate: `${flight.x}px ${flight.y}px`, scale: "0.3" } : undefined}
                   role="img"
                   aria-label={texts.adult(g)}
