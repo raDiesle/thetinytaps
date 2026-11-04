@@ -955,14 +955,8 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "Sopla muy hondo. Fuuuh." }, { narration: "El corazón se calma." }],
         instead: { caption: "Tirar el pastel", answer: "Mmm, ahora el pastel está arruinado. Mejor sopla muy hondo." },
       },
-      {
-        caption: "Hacer chillar el globito",
-        question: "Ahí hay un globito. ¿Qué puede hacer Osito?",
-        beats: [{ narration: "Lo aprieta con mucho cuidado. ¡Iiiiic!" }, { narration: "Osito se ríe." }],
-        instead: { caption: "Gritarle a Zorrito", answer: "Mmm, ahora Zorrito también se asusta. Mejor aprieta con cuidado el globito." },
-      },
+      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
+      null,
     ],
-    outro: [{ narration: "¡Súper! Taparse los oídos, soplar, y luego hacer chillar algo bajito." }],
-    endCaption: "Osito y Zorrito se ríen con el globito",
   },
 };

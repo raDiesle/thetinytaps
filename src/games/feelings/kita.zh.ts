@@ -923,14 +923,8 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "他深深地呼一口气。呼——" }, { narration: "心跳慢下来了。" }],
         instead: { caption: "打翻蛋糕", answer: "嗯，现在蛋糕坏了。还是深深地呼一口气吧。" },
       },
-      {
-        caption: "让小气球吱吱叫",
-        question: "那儿有个小气球。小熊可以怎么做？",
-        beats: [{ narration: "他轻轻地捏一捏。吱——" }, { narration: "小熊笑了。" }],
-        instead: { caption: "冲小狐狸大吼", answer: "嗯，现在小狐狸也吓了一跳。还是轻轻地捏一捏小气球吧。" },
-      },
+      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
+      null,
     ],
-    outro: [{ narration: "太棒了！捂住耳朵，呼气，再自己让小气球轻轻地吱吱叫。" }],
-    endCaption: "小熊和小狐狸拿着小气球笑",
   },
 };

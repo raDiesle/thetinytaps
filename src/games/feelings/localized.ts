@@ -33,15 +33,19 @@ export interface FeelingText {
 /** A beat's words in another language: the same parts as the German beat (narration, line or both); its sound stays the German one's. */
 export type BeatText = Pick<Beat, "narration" | "line">;
 
-/** A kindergarten story's words in another language: the German story's texts, beat for beat and step for step. */
+/**
+ * A kindergarten story's words in another language: the German story's texts, beat for beat and step for step. A step
+ * whose German changed is `null`, and a changed outro or end caption is left out: they are told in German until the
+ * translation is asked for (like a not-so-good idea at home that is `null`).
+ */
 export interface SituationText {
   title: string;
   caption: string;
   intro: BeatText[];
   /** `question` like the German step's; while it is missing, the general „Was kann der kleine Bär tun?“ stands in. */
-  steps: { caption: string; question?: string; beats: BeatText[]; instead: { caption: string; answer: string } }[];
-  outro: BeatText[];
-  endCaption: string;
+  steps: ({ caption: string; question?: string; beats: BeatText[]; instead: { caption: string; answer: string } } | null)[];
+  outro?: BeatText[];
+  endCaption?: string;
 }
 
 /** The translations of the kind things, by language. */
@@ -93,15 +97,19 @@ export function situationIn(situation: Situation, language: TargetLanguageId): S
     ...situation,
     title: text.title,
     caption: text.caption,
-    endCaption: text.endCaption,
+    endCaption: text.endCaption ?? situation.endCaption,
     intro: beatsIn(situation.intro, text.intro),
-    outro: beatsIn(situation.outro, text.outro),
-    steps: situation.steps.map((step, i) => ({
-      caption: text.steps[i].caption,
-      question: text.steps[i].question ?? pick(QUESTION, language),
-      beats: beatsIn(step.beats, text.steps[i].beats),
-      instead: { ...step.instead, ...text.steps[i].instead },
-    })),
+    outro: text.outro ? beatsIn(situation.outro, text.outro) : situation.outro,
+    steps: situation.steps.map((step, i) => {
+      const words = text.steps[i];
+      if (!words) return step;
+      return {
+        caption: words.caption,
+        question: words.question ?? pick(QUESTION, language),
+        beats: beatsIn(step.beats, words.beats),
+        instead: { ...step.instead, ...words.instead },
+      };
+    }),
   };
 }
 

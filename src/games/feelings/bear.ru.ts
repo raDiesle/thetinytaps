@@ -85,7 +85,8 @@ export const FEELINGS_RU: Partial<Record<FeelingId, FeelingText>> = {
     question: "Как ты отпразднуешь с ним?",
     instead: [
       { caption: "Лопнуть шарик", answer: "Хм, теперь его шарик лопнул. Лучше потанцуй с ним." },
-      { caption: "Забрать подарок", answer: "Хм, это его подарок. Теперь Мишке грустно. Лучше празднуй вместе с ним." },
+      // „Partyhut wegnehmen“ replaced „Geschenk wegnehmen“ (November 2026): told in German until translated.
+      null,
       { caption: "Забрать торт", answer: "Хм, это его праздничный торт. Теперь Мишке грустно. Лучше празднуй вместе с ним." },
     ],
     end: { narration: "Какой чудесный день рождения!", line: "Спасибо! Как здорово!" },

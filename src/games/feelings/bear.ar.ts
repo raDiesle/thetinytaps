@@ -86,7 +86,8 @@ export const FEELINGS_AR: Partial<Record<FeelingId, FeelingText>> = {
     question: "كيف نحتفل معه؟",
     instead: [
       { caption: "تفجير البالون", answer: "همم، الآن انفجر بالونه. الأفضل أن نرقص معه." },
-      { caption: "أخذ الهدية", answer: "همم، هذه هديته. الآن هو حزين. الأفضل أن نحتفل معه." },
+      // „Partyhut wegnehmen“ replaced „Geschenk wegnehmen“ (November 2026): told in German until translated.
+      null,
       { caption: "أخذ الكعكة", answer: "همم، هذه كعكة عيد ميلاده. الآن هو حزين. الأفضل أن نحتفل معه." },
     ],
     end: { narration: "يا له من عيد ميلاد جميل!", line: "شكرًا! كان رائعًا!" },

@@ -201,7 +201,7 @@ export const FEELINGS: Feeling[] = [
     comforts: ["dance", "streamers", "hug"],
     instead: [
       { caption: "Luftballon kaputt machen", answer: "Hmm, jetzt ist sein Luftballon kaputt. Tanz lieber mit ihm.", sound: "crash" },
-      { caption: "Geschenk wegnehmen", answer: "Hmm, das ist sein Geschenk. Jetzt ist er traurig. Feier lieber mit ihm." },
+      { caption: "Partyhut wegnehmen", answer: "Hmm, das ist sein Partyhut. Jetzt ist er traurig. Feier lieber mit ihm." },
       { caption: "Kuchen wegnehmen", answer: "Hmm, das ist sein Geburtstagskuchen. Jetzt ist er traurig. Feier lieber mit ihm." },
     ],
     end: { narration: "Was für ein schöner Geburtstag!", line: "Danke! Das war toll!" },

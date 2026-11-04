@@ -4,7 +4,7 @@ import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
-import { SITUATIONS } from "./kita";
+import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { WEATHERS } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
@@ -17,13 +17,15 @@ import { RECORDED_SOUNDS } from "./story";
 // "done" (or "text", translated but not recorded yet) there has every text, and changing a German line means marking
 // it "partial" until it is translated again.
 const STATUS_PARTS = LANGUAGE_STATUS.find((row) => row.href === "/gefuehle/")?.parts ?? [];
-const translatedIn = (label: string) =>
+/** The languages a part of the language table has, whole (`done`, `text`) or, with `partly`, also in part. */
+const translatedIn = (label: string, partly = false) =>
   (Object.entries(STATUS_PARTS.find((part) => part.label === label)?.languages ?? {}) as [TargetLanguageId, string][])
-    .filter(([language, state]) => language !== "de" && (state === "done" || state === "text"))
+    .filter(([language, state]) => language !== "de" && (state === "done" || state === "text" || (partly && state === "partial")))
     .map(([language]) => language);
 const TRANSLATED_HOME = translatedIn("Zu Hause");
+const TRANSLATED_HOME_PARTLY = translatedIn("Zu Hause", true);
 const TRANSLATED_KITA = translatedIn("Wie geht's dir? und Kindergarten");
-const TRANSLATED_SELF = translatedIn("Mehr Gefühle");
+const TRANSLATED_SELF = translatedIn("Mehr Gefühle", true);
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
 // allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
@@ -121,11 +123,16 @@ test("every translation of a kindergarten story matches the German beat for beat
       if (!text) continue;
       const where = `${language} ${situation.id}`;
       expect(beatParts(text.intro), `${where} intro`).toEqual(beatParts(situation.intro));
-      expect(beatParts(text.outro), `${where} outro`).toEqual(beatParts(situation.outro));
+      if (text.outro) expect(beatParts(text.outro), `${where} outro`).toEqual(beatParts(situation.outro));
       expect(text.steps.length, `${where} steps`).toBe(situation.steps.length);
-      situation.steps.forEach((step, i) => expect(beatParts(text.steps[i].beats), `${where} step ${i + 1}`).toEqual(beatParts(step.beats)));
+      // A step that is `null` is told in German until it is translated.
+      situation.steps.forEach((step, i) => {
+        const words = text.steps[i];
+        if (words) expect(beatParts(words.beats), `${where} step ${i + 1}`).toEqual(beatParts(step.beats));
+      });
       // Every step's card has a caption of its own.
-      expect(new Set(text.steps.map((s) => s.caption)).size, `${where} captions`).toBe(text.steps.length);
+      const captions = text.steps.flatMap((s) => (s ? [s.caption] : []));
+      expect(new Set(captions).size, `${where} captions`).toBe(captions.length);
     }
   }
 });
@@ -182,19 +189,26 @@ const stringsIn = (value: unknown): string[] =>
 // too) and kindergarten story, so none of them is told half in German.
 test("every translated language has every story", () => {
   expect(TRANSLATED_KITA.length, "the language table's parts of /gefuehle/").toBeGreaterThan(0);
-  for (const language of TRANSLATED_HOME) {
+  // A part marked `partial` has every story, with a changed line here and there told in German (`null`); a part
+  // marked translated has every line.
+  for (const language of TRANSLATED_HOME_PARTLY) {
     for (const id of Object.keys(COMFORTS) as ComfortId[]) expect(COMFORT_TEXTS[language]?.[id], `${language} comfort ${id}`).toBeDefined();
     for (const { id } of FEELINGS) {
       expect(FEELING_TEXTS[language]?.[id], `${language} feeling ${id}`).toBeDefined();
-      expect(FEELING_TEXTS[language]?.[id]?.instead, `${language} feeling ${id}`).not.toContain(null);
+      if (TRANSLATED_HOME.includes(language)) expect(FEELING_TEXTS[language]?.[id]?.instead, `${language} feeling ${id}`).not.toContain(null);
     }
   }
-  for (const language of TRANSLATED_KITA) {
-    for (const { id } of SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
-  }
+  const whole = (language: TargetLanguageId, id: SituationId) => {
+    const text = SITUATION_TEXTS[language]?.[id];
+    expect(text, `${language} story ${id}`).toBeDefined();
+    expect(text?.steps, `${language} story ${id}`).not.toContain(null);
+    expect(text?.outro && text.endCaption, `${language} story ${id} end`).toBeDefined();
+  };
+  for (const language of TRANSLATED_KITA) for (const { id } of SITUATIONS) whole(language, id);
   for (const language of TRANSLATED_SELF) {
     for (const { id } of SELF_SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
   }
+  for (const language of translatedIn("Mehr Gefühle")) for (const { id } of SELF_SITUATIONS) whole(language, id);
 });
 
 // A language in its own script has no word left in Latin letters (a name like Tapsi is written in its letters too).

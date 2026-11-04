@@ -949,14 +949,8 @@ export const SITUATIONS_HI: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "वह गहरी फूँक मारता है। फ़ूऊऊ।" }, { narration: "दिल शांत हो जाता है।" }],
         instead: { caption: "केक गिराना", answer: "हम्म, अब केक खराब हो गया। इसकी जगह गहरी फूँक मारो।" },
       },
-      {
-        caption: "छोटे गुब्बारे से चीं-चीं करना",
-        question: "वहाँ एक छोटा गुब्बारा पड़ा है। छोटा भालू क्या कर सकता है?",
-        beats: [{ narration: "वह उसे बहुत धीरे से दबाता है। चीं-ईं-ईं!" }, { narration: "छोटा भालू हँसता है।" }],
-        instead: { caption: "लोमड़ी पर चिल्लाना", answer: "हम्म, अब लोमड़ी भी डर गई। इसकी जगह छोटे गुब्बारे को बहुत धीरे से दबाओ।" },
-      },
+      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
+      null,
     ],
-    outro: [{ narration: "बहुत बढ़िया! कान बंद करना, फूँक मारना, और फिर खुद धीरे से चीं-चीं करना।" }],
-    endCaption: "भालू और लोमड़ी छोटे गुब्बारे के साथ हँसते हैं",
   },
 };

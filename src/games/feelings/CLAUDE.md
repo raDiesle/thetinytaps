@@ -107,9 +107,13 @@ child in that moment does itself (hops on the bed, gets up to play, cries), neve
 bear (pulling his blanket away, drumming next to his bed), which brings in someone who isn't there.
 
 A card only takes, throws or breaks what the story's first picture already shows (a teddy the
-bear doesn't hold can't be taken from him): pick another idea rather than redraw the first picture.
-A card may bring something new (the teddy from the toy box, the light). `bilder/README.md` lists what
-each first picture shows.
+bear doesn't hold can't be taken from him, nor a present the birthday picture doesn't show – „Geschenk wegnehmen“
+became „Partyhut wegnehmen“): pick another idea rather than redraw the first picture. A good idea, too, uses only what
+the first picture shows (the teddy from the toy box, the lamp, the cake on the table, the fox sitting there) and never
+something that could break, burst or startle (user feedback, November 2026: the balloon story's „Kleinen Ballon
+quietschen lassen“ used a small balloon the first picture hardly showed, and a balloon can burst – right after a bang;
+it became „Mit dem Fuchs Kuchen essen“). Only a not-so-good idea may bring a small new thing (the pin, the monster
+puppet). `bilder/README.md` lists what each first picture shows.
 
 **Every card tells one thing without its caption (user feedback, November 2026):** the angry bear's thrown toy car
 wasn't seen as thrown, his deep breath blew towards the fallen tower so he seemed to blow it over, his stomp with both
@@ -120,7 +124,9 @@ shows (`bilder/README.md`, „Jede Karte versteht man ohne Worte“, has the wor
   and the thing just leaving the paw, close to it; a stomp with him seen down to both feet, both soles hitting the
   floor together, both lifted in the second frame.
 - Nothing lies where the action goes: a breath, throw, kick or stomp goes into empty space (a breath rises upwards),
-  or it reads as blowing over, hitting or breaking that thing. So pick a story's cause that no card seems to act on
+  or it reads as blowing over, hitting or breaking that thing. A breath never goes towards a cake or any food: he
+  turns away from the table and blows upwards (user feedback, November 2026: beside the birthday cake his „Tief
+  pusten“ looked like blowing out the candles or spitting on the cake). So pick a story's cause that no card seems to act on
   (the home's angry bear: a shoe that won't go on, no longer a fallen tower).
 - A good idea shows in the face that it helps: after blowing, breathing or a hug he looks relieved and happy (soft
   closed eyes, a smile, no red face); only the first picture and the not-so-good ideas keep the angry face.
@@ -168,7 +174,9 @@ are listed in `bilder/README.md`. Grown-ups are only in a picture once a step fe
 them; a second frame only moves a little and is drawn from the first (`--ref`),
 never as a grid pair – `bun run frames` lists pairs that jump. Within a story only what
 the characters do changes: every picture is drawn from the story's first one
-(`…-passiert`, `baer-…`) as the only `--ref`, with the same cast and background –
+(`…-passiert`, `baer-…`) as the only `--ref`, with the same cast and background, and what the first picture shows
+happened stays seen in every later one (the burst balloon's scraps lie on the floor, the bear keeps his party hat –
+pictures that lost them were redrawn, user feedback, November 2026; name them in the prompt) –
 `bun run frames --scenes` lists pictures whose background drifted. `feelings.test.ts` fails when a story or the
 bear asks for a picture that is not in `bilder/`.
 

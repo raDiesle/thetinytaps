@@ -977,14 +977,8 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "He takes a deep breath and blows out: Phoooo." }, { narration: "His heart gets calmer." }],
         instead: { caption: "Knock over the cake", answer: "Hmm, now the cake is ruined. Take a deep breath and blow instead." },
       },
-      {
-        caption: "Make the little balloon squeak",
-        question: "There's a little balloon. What can Little Bear do?",
-        beats: [{ narration: "He squeezes it very gently. Squeeeak!" }, { narration: "Little Bear laughs." }],
-        instead: { caption: "Roar at Little Fox", answer: "Hmm, now Little Fox gets a fright too. Squeeze the little balloon very gently instead." },
-      },
+      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
+      null,
     ],
-    outro: [{ narration: "Super! Cover your ears, blow, and then make a very soft squeak yourself." }],
-    endCaption: "Little Bear and Little Fox laugh with the little balloon",
   },
 };

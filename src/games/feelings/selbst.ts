@@ -796,16 +796,13 @@ export const SELF_SITUATIONS: Situation[] = [
         instead: { caption: "Kuchen umwerfen", answer: "Hmm, jetzt ist der Kuchen kaputt. Puste lieber ganz tief.", sound: "crash" },
       },
       {
-        caption: "Kleinen Ballon quietschen lassen",
-        question: "Da liegt ein kleiner Ballon. Was kann der kleine Bär tun?",
-        beats: [
-          { narration: "Er drückt ihn ganz vorsichtig. Quiiietsch!", sound: "boing" },
-          { narration: "Der kleine Bär lacht.", sound: "laugh" },
-        ],
-        instead: { caption: "Den Fuchs anbrüllen", answer: "Hmm, jetzt erschrickt der Fuchs auch. Drück lieber ganz vorsichtig den kleinen Ballon." },
+        caption: "Mit dem Fuchs Kuchen essen",
+        question: "Der Fuchs wartet am Geburtstagstisch. Was kann der kleine Bär tun?",
+        beats: [{ narration: "Er geht zum Fuchs an den Tisch. Sie essen zusammen Kuchen." }, { line: "Mmh, lecker!", sound: "laugh" }],
+        instead: { caption: "Den Fuchs anbrüllen", answer: "Hmm, jetzt erschrickt der Fuchs auch. Geh lieber zu ihm und iss Kuchen mit ihm." },
       },
     ],
-    outro: [{ narration: "Super! Ohren zuhalten, pusten, und dann selbst ganz leise quietschen.", sound: "cheer" }],
-    endCaption: "Bär und Fuchs lachen mit dem kleinen Ballon",
+    outro: [{ narration: "Super! Ohren zuhalten, tief pusten und dann zusammen Kuchen essen.", sound: "cheer" }],
+    endCaption: "Bär und Fuchs essen zusammen Kuchen",
   },
 ];

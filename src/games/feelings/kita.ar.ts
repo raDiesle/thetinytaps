@@ -947,14 +947,8 @@ export const SITUATIONS_AR: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "ينفخ نفسًا عميقًا. فووو." }, { narration: "القلب يهدأ." }],
         instead: { caption: "إسقاط الكعكة", answer: "همم، الآن الكعكة خربت. الأفضل أن ينفخ بعمق." },
       },
-      {
-        caption: "جعل البالون الصغير يصرّ",
-        question: "هناك بالون صغير. ماذا يستطيع الدبدوب أن يفعل؟",
-        beats: [{ narration: "يضغطه بحذر شديد. إيييك!" }, { narration: "الدبدوب يضحك." }],
-        instead: { caption: "الصراخ على الثعلب الصغير", answer: "همم، الآن يفزع الثعلب الصغير أيضًا. الأفضل أن يضغط البالون الصغير بحذر شديد." },
-      },
+      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
+      null,
     ],
-    outro: [{ narration: "ممتاز! نسدّ الأذنين، ننفخ، ثم نجعل البالون يصرّ بهدوء بأنفسنا." }],
-    endCaption: "الدبدوب والثعلب الصغير يضحكان مع البالون الصغير",
   },
 };

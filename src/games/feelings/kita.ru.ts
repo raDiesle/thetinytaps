@@ -943,14 +943,8 @@ export const SITUATIONS_RU: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "Он глубоко-глубоко дует. Фууух." }, { narration: "Сердце стучит спокойнее." }],
         instead: { caption: "Опрокинуть торт", answer: "Хм, теперь торт испорчен. Лучше подуй глубоко-глубоко." },
       },
-      {
-        caption: "Пискнуть маленьким шариком",
-        question: "Тут лежит маленький шарик. Что может сделать Мишка?",
-        beats: [{ narration: "Он очень осторожно сжимает его. Пи-и-иск!" }, { narration: "Мишка смеётся." }],
-        instead: { caption: "Накричать на Лисёнка", answer: "Хм, теперь и Лисёнок испугался. Лучше осторожно сожми маленький шарик." },
-      },
+      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
+      null,
     ],
-    outro: [{ narration: "Супер! Закрыть уши, подуть, а потом тихонько пискнуть шариком." }],
-    endCaption: "Мишка и Лисёнок смеются с маленьким шариком",
   },
 };
