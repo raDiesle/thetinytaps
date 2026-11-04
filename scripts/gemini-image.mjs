@@ -28,9 +28,16 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
+import { plugin } from "bun";
 import sharp from "sharp";
-import { PICTURE_QUEUE } from "../src/content/pictureQueue.ts";
-import { jobOf, planQueue, REQUEST_PRICE } from "../src/content/pictureQueuePlan.ts";
+import { appPlugin } from "../tools/appPlugin.ts";
+
+// The queue gathers prompts kept by the games (the Belohnungstafel's, the Gefühle days'), whose data imports like the
+// app's (`…?glob`): the app's plugin comes first, then the queue – a static import would load it before the plugin
+// (`bun run image queue` failed on „Cannot find module './bilder/*.webp?glob'“, November 2026).
+plugin(appPlugin());
+const { PICTURE_QUEUE } = await import("../src/content/pictureQueue.ts");
+const { jobOf, planQueue, REQUEST_PRICE } = await import("../src/content/pictureQueuePlan.ts");
 
 const RAW_DIR = ".image-raw";
 const DEFAULT_MODEL = "gemini-3.1-flash-lite-image";
