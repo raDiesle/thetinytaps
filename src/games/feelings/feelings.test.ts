@@ -9,7 +9,7 @@ import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./locali
 import { BREATH_MS, HELPS, MOODS, morningMood, STRENGTHS, withMood } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
-import { roundOf, stepsOf } from "./rounds";
+import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
 import { STORIES } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
@@ -162,6 +162,25 @@ test("the voice switch is Alltagssituationen's alone, and held", () => {
   expect(button).toContain("useHold(onToggle");
   expect(button).not.toContain("onClick");
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");
+});
+
+// Grown-ups who read the scenes out themselves (the voice switched off) open the round's whole text from the picture's
+// bottom left corner (user wish, November 2026): it holds every line the voice would say, in Alltagssituationen only,
+// and like the loudspeaker it opens only when held.
+test("the text to read out holds every line a round says", () => {
+  for (const story of STORIES)
+    for (let step = 0; step < stepsOf(story); step++) {
+      const round = roundOf(story, step, "de");
+      const sheet = readAlong(round)
+        .map((part) => part.text)
+        .join(" ");
+      for (const line of roundLines(round).filter(Boolean)) expect(sheet, `${story.id} ${step}`).toContain(line);
+    }
+  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx"].filter((f) =>
+    readFileSync(`src/games/feelings/${f}`, "utf8").includes("readAlong={{"),
+  );
+  expect(users).toEqual(["FeelingsPlay.tsx"]);
+  expect(readFileSync("src/games/feelings/ReadAlong.tsx", "utf8")).toContain("useHold(onToggle");
 });
 
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.

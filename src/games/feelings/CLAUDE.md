@@ -51,6 +51,16 @@ already waiting stay silent too, and the beats keep the length of their recordin
 to tell them. „Wie geht's dir?“ always speaks (`MoodGame` sets `voice: true`) and has no such switch; no other game gets
 one (`feelings.test.ts`).
 
+**The text to read out (user wish, November 2026):** for grown-ups who tell the scenes themselves, above all with the
+voice switched off, a paper note with an open book lies on the big picture's bottom left corner (`ReadAlong.tsx`), on
+wide screens just right of where the not-so-good card lies over the picture, with „halten“ under it. Held for half a
+second (like the loudspeaker; a child's tap changes nothing) it opens a paper sheet over the picture's left side with
+everything the voice says in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea
+(red cross, its caption, its answer), the good one (tick, caption, what is told), the happy end. The part being told
+now is marked with the highlighter and scrolled into view; one tap on the note closes it. It stays open from scene to
+scene and visit to visit (`settings.text`). Only in „Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts`
+checks that the sheet holds every line a round says – a new kind of line said in a round goes into `readAlong` too.
+
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
 the good one comes its picture (and, on the story's last step, its happy end), then straight on to the _next scene_ of

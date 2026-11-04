@@ -19,6 +19,7 @@ export function PassPlay({
   remember = true,
   onAgain,
   next,
+  readAlong,
 }: {
   group: StoryGroup;
   /** The scene to begin with: where the child stopped last time. */
@@ -30,6 +31,8 @@ export function PassPlay({
   onAgain: () => void;
   /** The next group; left out where there is none to go on to. */
   next?: { name?: string; onNext: () => void };
+  /** The sign with the round's whole text for grown-ups („Alltagssituationen“ only, `ReadAlong`). */
+  readAlong?: { open: boolean; onToggle: () => void };
 }) {
   const { id: language } = useAppLanguage();
   const scenes = groupStories(group);
@@ -64,6 +67,7 @@ export function PassPlay({
       onFinish={finish}
       ending={last ? <GameEnd inline onAgain={onAgain} next={next} /> : undefined}
       onEndKey={next?.onNext ?? onAgain}
+      readAlong={readAlong}
     />
   );
 }

@@ -1,8 +1,11 @@
 import { useHold } from "@/lib/hold";
-import { useT } from "@/lib/language";
+import { type Localized, useT } from "@/lib/language";
 
 /** How long the switch has to be held: as long as ⚙️ while playing, so a child's tap changes nothing. */
-const HOLD_MS = 500;
+export const HOLD_MS = 500;
+
+/** „halten“ under a grown-ups' note held to change something. */
+export const HOLD_WORD: Localized<string> = { de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" };
 
 /**
  * „Alltagssituationen“ only (user decision, November 2026): a wooden loudspeaker with a speech bubble in the top left
@@ -14,7 +17,7 @@ export function VoiceSwitch({ on, onToggle }: { on: boolean; onToggle: () => voi
   const t = useT();
   const { holding, props } = useHold(onToggle, HOLD_MS);
   const label = on ? t({ de: "Stimme ausschalten" }) : t({ de: "Stimme einschalten" });
-  const hold = t({ de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" });
+  const hold = t(HOLD_WORD);
 
   return (
     <button
