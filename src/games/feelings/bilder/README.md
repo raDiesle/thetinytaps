@@ -789,6 +789,23 @@ der Luft).
 Bilder, die das Spiel schon anfragt, bevor sie gemacht sind; bis sie da sind, steht an ihrer Stelle ein Platzhalter mit
 dem Dateinamen (die Beschriftung darunter sagt, was er zeigen soll). Erst anschauen, dann erzeugen: zu Hause mit dem
 Raum-Prompt von „Zu Hause“ oben und dem Bild des Gefühls (`baer-…`) als einziger `--ref`, nur ein Frame. Ist ein Bild
-gemacht, wandert seine Zeile in ihre Tabelle oben (`feelings.test.ts` prüft beides).
+gemacht, wandert seine Zeile in ihre Tabelle oben (`feelings.test.ts` prüft beides). Jedes geplante Bild steht auch in der Bilder-Queue
+(`src/content/pictureQueue.ts`) und wartet dort, bis mehrere auf einmal gemacht werden.
 
-Zur Zeit keine: alle Bilder sind gemacht (4. November 2026).
+### Was hilft dir jetzt? (C-31, 4. November 2026)
+
+Die Karten nach dem Wetter in „Wie geht's dir?“ (`hilft-…`, `moodImages.help`): der kleine Bär tut selbst, was ihm
+guttut, im gemütlichen Zimmer von „Zu Hause“; wo ein Erwachsener dabei ist, ist es Mama oder Papa Bär (ein großer
+brauner Bär, nur einmal), der zuschaut oder mitmacht – der kleine Bär tut es. Je zwei in einem Auftrag
+(`--grid 1x2`, `--aspect 4:3`, `--size 800x600`), nur ein Frame, mit `baer-sad-gut` als einziger `--ref` für Zimmer und
+Bären. Jeder Prompt beginnt mit: „Redraw the little bear from this picture in the same cosy room, same style. He is
+happy and calm, no tears. No hands, no arms come in from the edges.“ Jede Karte zeigt ohne Worte eine Sache: zum
+Wetter kommen immer drei davon (`Weather.helps`), keine ist falsch.
+
+| Datei            | Prompt                                                                                                                                                                                                                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hilft-kuscheln` | „Kuscheln“ – Exactly two characters, each once: the little bear and Mama Bear, a big brown grown-up bear. She sits on the rug, and the little bear snuggles into her arms, his cheek on her chest; both have their eyes softly closed and smile.                                                        |
+| `hilft-toben`    | „Toben“ – Exactly two characters, each once: the little bear and Papa Bear, a big brown grown-up bear. The little bear jumps high from the rug into a heap of big soft cushions, both arms up, laughing; Papa Bear kneels beside the cushions and laughs with him. Nothing breaks, nothing flies about. |
+| `hilft-trinken`  | „Etwas trinken“ – Exactly two characters, each once: the little bear and Mama Bear, a big brown grown-up bear. The little bear sits on the rug and drinks from a big cup of water he holds in both paws, close to the front; Mama Bear sits beside him holding a jug of water, smiling. Only one cup.   |
+| `hilft-allein`   | „Ein bisschen allein sein“ – Only the little bear, nobody else. He sits alone, calm and content, in a small cosy cave of blankets in the corner of his room, holding his teddy, eyes half closed, a soft smile. The rest of the room is empty and quiet.                                                |
+| `hilft-lied`     | „Ein Lied singen“ – Exactly two characters, each once: the little bear and Papa Bear, a big brown grown-up bear. They sit side by side on the rug and sing together, mouths open in song, heads swaying; three music notes float in the air above them. No instrument.                                  |

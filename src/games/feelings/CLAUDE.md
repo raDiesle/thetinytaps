@@ -5,11 +5,16 @@ A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefu
 games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes area C:
 - **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`) plays at once: four weather
   cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show the bear under that weather, feeling the same. The child
-  picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then a pass of the matching group
-  plays (`Weather.group`: sun → Freude & Stolz, cloud → Müde & zu viel, rain → Traurig, storm → Wütend), without
+  picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then „Was hilft dir jetzt?“ (C-31)
+  offers three cards of the little bear doing what helps (`Weather.helps` from `HELPS`: kuscheln, toben, etwas
+  trinken, ein bisschen allein sein, ein Lied – the three that fit that feeling, none of them wrong, so the grown-up
+  sees what the child needs); the picked one shows big with its line („Kuscheln tut gut.“), then a pass of the
+  matching group plays (`Weather.group`: sun → Freude & Stolz, cloud → Müde & zu viel, rain → Traurig, storm → Wütend), without
   touching the place „Alltagssituationen“ goes on from (`remember={false}`). „Nochmal“ asks for the weather again.
-  Keys 1–4 pick a weather, any other key one at random. This game is meant to grow (ideas C-29 to C-36): more
-  feelings to show, faces, „Was hilft dir jetzt?“.
+  Keys 1–4 pick a weather (1–3 a help), any other key one at random. Like a new story, the built site asks „Was hilft
+  dir jetzt?“ only once all five `hilft-…` pictures are made (`ASKS_HELP` in `MoodPlay.tsx`); the dev server shows
+  their placeholders. This game is meant to grow (ideas C-29 to C-36): more
+  feelings to show, faces.
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
   (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
   Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The cards always stand in that fixed order;
@@ -163,8 +168,10 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 for a little movement (`Frames` in `shared.tsx`): in the big picture while the scene is shown, on the cards while the
 child chooses. A picture the game asks for that is not made yet shows a placeholder with its
 file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
-with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first and then
-make it with `/bild-erzeugen`. A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
+with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first, and into the
+picture queue (`src/content/pictureQueue.ts`), where it waits to be made together with other sessions' pictures in one
+batch when the user asks (`/bild-erzeugen`) – never `--make` it yourself, not even when its sheet is full (user
+feedback, November 2026). A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)

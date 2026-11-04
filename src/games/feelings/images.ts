@@ -58,4 +58,6 @@ export const bearImages = {
 /** Names of the weather cards of „Wie geht's dir?“. */
 export const moodImages = {
   weather: (id: string) => `wetter-${id}`,
+  /** A card of „Was hilft dir jetzt?“: the little bear doing what helps. */
+  help: (id: string) => `hilft-${id}`,
 };
