@@ -123,6 +123,12 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "M",
         note: "Ein Fuchs- und ein Bärenkopf in Grownup (film/people.tsx).",
       },
+      {
+        label: "Mama oder Papa, die Briefträgerin und Oma im Brief-Film werden Füchse oder Bären",
+        work: "drawing",
+        effort: "S",
+        note: "Mit demselben Grownup wie im Feuerwehr-Film (film/brief.tsx).",
+      },
       { label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen", work: "drawing", effort: "M" },
       { label: "Das Kind als Fuchs- oder Bärenkind", work: "drawing", effort: "M", idea: "D-19", note: "Erst entscheiden." },
     ],

@@ -1,4 +1,4 @@
-import { type PointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { INK } from "@/games/scenes/shared";
@@ -6,7 +6,7 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useT } from "@/lib/language";
 import { playPop, playRandomNote, playRecorded, playTusch } from "@/lib/sfx";
 import { tapState } from "@/lib/tapTargets";
-import { hush } from "@/lib/voice";
+import { hush, talking } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
 import { Confetti } from "../house";
 import { translationOf } from "../phrases";
@@ -14,19 +14,36 @@ import { sayIn } from "../voice";
 import type { ElevatorSettings } from "../settings";
 import { Fitted } from "../trail/items";
 import type { Cue } from "../trail/types";
-import type { Choice, Film, Spot } from "./types";
+import { type Choice, type Film, PACE, type Spot } from "./types";
 import "./film.css";
 
-/** Without a tap for so long, the hand points again and the question is asked again. */
-const NUDGE_MS = 7000;
+// The film keeps a calm pace (user feedback, November 2026): a line is never cut off by the next one, a quiet moment
+// lies between two lines, a question is asked again only after a long while and then less and less often, and the
+// sound of a beat comes a little after the click of the tap that set it off – a child of two is not flooded.
+
+/** Without a tap for so long, the hand points again and the question is asked again; each reminder waits longer. */
+const NUDGE_MS = 12000;
+const NUDGE_MORE_MS = 6000;
+/** A quiet moment after a line has been said, before the next line or question. */
+const REST_MS = 1100;
+/** Never wait longer than this for a line to end (a voice that hangs must not stop the film). */
+const LINE_MAX_MS = 9000;
+/** After a tap's click, before the beat's own sounds and line start. */
+const TAP_GAP_MS = 350;
+/** Taps with nothing to set off play a note at most this often. */
+const FREE_NOTE_MS = 900;
 /** A tap while a beat still goes on is kept: at the next tap the glow shows this long, then it goes on by itself. */
-const QUEUED_MS = 900;
+const QUEUED_MS = 1400;
 /** How long the iris takes to close, and again to open on the next scene. */
-const IRIS_MS = 450;
+const IRIS_MS = 800;
+/** The picture stands still this long after the iris opened, before anything happens. */
+const LOOK_MS = 600;
 /** After a pick, before the film goes on. */
-const PICKED_MS = 1600;
+const PICKED_MS = 2400;
 /** From the end of the film until „Nochmal“ and „Weiter“ come, while the strip runs through the scenes once more. */
-const END_MS = 6500;
+const END_MS = 9000;
+/** The strip's frames light up one after the other this far apart at the end. */
+const STRIP_RUN_MS = 600;
 /** The language a film speaks until it is translated. */
 const GERMAN = targetLanguageFor("de");
 
@@ -193,26 +210,41 @@ export function FilmPlay({
   /** A film not yet translated into the app language is said all in German, never in two languages. */
   const voice = translationOf(film.title, language.id) === undefined ? GERMAN : language;
 
+  /** Something was said since the last quiet moment. */
+  const spoke = useRef(false);
   /** Says a German line of the film in the app language, from its recording. */
-  const say = (german: string) => sayIn(german, voice);
+  const say = (german: string) => {
+    spoke.current = true;
+    sayIn(german, voice);
+  };
 
   const sound = (play: () => void) => {
     if (settings.sounds) play();
   };
 
-  const cue = (sounds: Cue[]) => sounds.forEach(([ms, play]) => later(ms, () => sound(play)));
+  /** Plays a beat's sounds, their times stretched by `PACE` like the beat, from `after` ms on. */
+  const cue = (sounds: Cue[], after = 0) => sounds.forEach(([ms, play]) => later(after + ms * PACE, () => sound(play)));
 
-  /** Asks again every `NUDGE_MS` until stopped: the hand points again and the question is said again. */
+  /** After a line: resolves once nothing is being said any more (or after `LINE_MAX_MS`), then after a quiet `REST_MS`. */
+  const quiet = async () => {
+    if (!spoke.current) return;
+    for (let waited = 0; talking() && waited < LINE_MAX_MS; waited += 150) await wait(150);
+    await wait(REST_MS);
+    spoke.current = false;
+  };
+
+  /** Asks again after `NUDGE_MS`, and then each time a little later, until stopped: the hand points again and the
+   * question is said again. */
   const remind = (ask?: string) => {
     let stop = () => {};
-    const next = () => {
-      stop = later(NUDGE_MS, () => {
+    const next = (n: number) => {
+      stop = later(NUDGE_MS + n * NUDGE_MORE_MS, () => {
         put((v) => ({ nudge: v.nudge + 1, hand: true }));
         if (ask) say(ask);
-        next();
+        next(n + 1);
       });
     };
-    next();
+    next(0);
     return () => stop();
   };
 
@@ -265,6 +297,7 @@ export function FilmPlay({
       const scene = film.scenes(picks)[i];
       if (!scene) break;
       if (i > 0) {
+        await quiet();
         put({ shut: true });
         await wait(IRIS_MS);
       }
@@ -272,25 +305,30 @@ export function FilmPlay({
       put({ scene: i, step: 0, busy: false, spot: null, choice: null, picked: null });
       await wait(60);
       put({ shut: false });
-      await wait(IRIS_MS);
+      await wait(IRIS_MS + LOOK_MS);
       for (const [j, beat] of scene.beats.entries()) {
+        if (beat.say || beat.ask) await quiet();
         if (beat.tap) await waitTap(beat.tap, beat.ask);
         put({ step: j + 1, busy: true });
-        if (beat.sounds) cue(beat.sounds);
-        if (beat.say) say(beat.say);
-        await wait(beat.ms);
+        const after = beat.tap ? TAP_GAP_MS : 0;
+        if (beat.sounds) cue(beat.sounds, after);
+        const line = beat.say;
+        if (line) later(after, () => say(line));
+        await wait(after + beat.ms * PACE);
         put({ busy: false });
       }
       if (scene.choice) {
+        await quiet();
         picks = [...picks, await waitChoice(scene.choice)];
         put({ picks });
         await wait(PICKED_MS);
       }
     }
+    await quiet();
     put({ party: true });
     say(film.end);
     sound(() => playRecorded("cheer", playTusch));
-    for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
+    for (let i = 0; i < 5; i++) later(i * 700, () => spawn());
     await wait(END_MS);
     put({ picking: true });
   };
@@ -299,8 +337,13 @@ export function FilmPlay({
     void play();
   }, []);
 
+  /** When a tap last played a note of its own. */
+  const lastNote = useRef(0);
   const funBurst = (x?: number, y?: number) => {
     spawn(x, y);
+    const now = performance.now();
+    if (now - lastNote.current < FREE_NOTE_MS) return;
+    lastNote.current = now;
     sound(playRandomNote);
   };
 
@@ -314,11 +357,12 @@ export function FilmPlay({
       return tapper.current();
     }
     if (chooser.current) put((w) => ({ nudge: w.nudge + 1 }));
-    else if (v.busy && laterTap()) queued.current = true;
+    else if (laterTap()) queued.current = true;
     funBurst(x, y);
   };
 
-  /** Whether a beat of this scene still waits for a tap, so a tap now can be kept for it. */
+  /** Whether a beat of this scene still waits for a tap, so a tap now (while a beat goes on, or in the quiet moment
+   * before the next question) can be kept for it. */
   const laterTap = () => {
     const v = viewRef.current;
     const scene = film.scenes(v.picks)[v.scene];
@@ -364,7 +408,7 @@ export function FilmPlay({
   const { spot, choice } = view;
   const goOn = t({ de: "Weiter", en: "Go on", zh: "继续", hi: "जारी रखें", es: "Seguir", ar: "متابعة", ru: "Дальше" });
   return (
-    <div ref={playEl} className="fm-play" onPointerDown={(e) => tap(e.clientX, e.clientY)}>
+    <div ref={playEl} className="fm-play" style={{ "--fm-pace": PACE } as CSSProperties} onPointerDown={(e) => tap(e.clientX, e.clientY)}>
       <svg className="fm-svg" viewBox={viewBox} preserveAspectRatio="xMidYMid meet" aria-hidden>
         <Draw step={view.step} busy={view.busy} picks={view.picks} />
         {spot && (
@@ -395,12 +439,16 @@ export function FilmPlay({
       </svg>
       {view.party && (
         <svg className="fm-svg fm-confetti" viewBox="0 0 1400 900" preserveAspectRatio="none" aria-hidden>
-          <Confetti />
+          <Confetti slow />
         </svg>
       )}
       <div className={`fm-strip${view.party ? " run" : ""}`} style={{ height: strip, bottom: STRIP.gap }} aria-hidden>
         {scenes.map((sc, i) => (
-          <div key={sc.id} className={`fm-frame${i < view.scene ? " done" : i === view.scene ? " now" : ""}`} style={{ animationDelay: `${i * 0.35}s` }}>
+          <div
+            key={sc.id}
+            className={`fm-frame${i < view.scene ? " done" : i === view.scene ? " now" : ""}`}
+            style={{ animationDelay: `${i * STRIP_RUN_MS}ms` }}
+          >
             <svg viewBox="-80 -60 160 120">
               <Fitted picture={sc.icon} width={130} height={100} />
             </svg>
@@ -409,7 +457,7 @@ export function FilmPlay({
         {/* More scenes follow, once the child has picked how */}
         {more && <div className="fm-frame more" />}
       </div>
-      <div className={`fm-iris${view.shut ? " shut" : ""}`} />
+      <div className={`fm-iris${view.shut ? " shut" : ""}`} style={{ transitionDuration: `${IRIS_MS}ms` }} />
       {!view.picking && (
         <button
           type="button"

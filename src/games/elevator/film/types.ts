@@ -7,6 +7,13 @@ export const FILM_W = 1600;
 export const FILM_H = 900;
 export const GROUND = 780;
 
+/**
+ * How much slower than written a film plays. Beat times, sound cues, `Go` moves, the ladder and the CSS of `fm-` that
+ * goes with them (`--fm-pace`) are written at a natural pace and all stretched by it, so they stay in step: a child of
+ * two follows a calm film better than a busy one (user feedback, November 2026).
+ */
+export const PACE = 1.5;
+
 /** A box of the picture: left, top, width, height. */
 export type Box = [number, number, number, number];
 

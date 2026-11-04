@@ -44,7 +44,7 @@ import {
   WarningTriangle,
 } from "./places";
 import { basketAt, FireTruck, LADDER_LEN, LADDER_PIVOT, type Ladder } from "./truck";
-import { around, type Beat, type Box, type Film, GROUND, type Option, type Scene, type SceneProps } from "./types";
+import { around, type Beat, type Box, type Film, GROUND, type Option, PACE, type Scene, type SceneProps } from "./types";
 
 // „Die Feuerwehr“: the child picks who needs the fire brigade (the cat in the tree, the burning house, the car in the
 // ditch), sees the call, slides down the pole at the station, rides out, helps, gets a second call on the radio and
@@ -328,8 +328,7 @@ function callScene(job: Job): Scene {
         ask: "Wer hilft? Ruf die Feuerwehr an!",
         sounds: [
           [0, playRing],
-          [450, playRing],
-          [900, playRing],
+          [1000, playRing],
         ],
         say: "Eins, eins, zwei. Hallo Feuerwehr, bitte kommt schnell!",
         ms: 3800,
@@ -586,11 +585,7 @@ const station: Scene = {
     {
       tap: { at: [300, 600], r: 170 },
       ask: "Jacke an, Helm auf!",
-      sounds: [
-        [0, playPop],
-        [250, playPop],
-        [500, playPop],
-      ],
+      sounds: [[300, playPop]],
       say: "Jacke an, Helm auf. Fertig!",
       ms: 2000,
     },
@@ -683,10 +678,7 @@ function drive(id: string): Scene {
       {
         tap: { at: [672, LANE - 252], r: 130 },
         ask: "Tatü-tata! Mach das Martinshorn an!",
-        sounds: [
-          [0, siren],
-          [2600, siren],
-        ],
+        sounds: [[0, siren]],
         say: "Tatü-tata! Alle Autos machen Platz.",
         ms: 2800,
       },
@@ -1165,7 +1157,7 @@ function HomeDraw({ step, busy, picks }: SceneProps) {
                 cx={-300 + (i % 6) * 120}
                 cy={-60 - Math.floor(i / 6) * 60}
                 r={34 - (i % 3) * 6}
-                style={{ animationDelay: `${(i % 6) * 120}ms` }}
+                style={{ animationDelay: `${(i % 6) * 120 * PACE}ms` }}
               />
             ))}
           </g>
@@ -1239,8 +1231,7 @@ const home: Scene = {
       ms: 3400,
       sounds: [
         [0, playBeeps],
-        [1100, playBeeps],
-        [2200, playBeeps],
+        [1600, playBeeps],
       ],
       say: "Zurück in der Feuerwache.",
     },

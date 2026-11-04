@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
 import { FireHelmet, KidHead, useHero } from "../kid";
 import { CREW } from "./people";
+import { PACE } from "./types";
 
 /** The turntable ladder's pivot on the truck's back, and how long one section is. */
 export const LADDER_PIVOT = [-250, -214] as const;
@@ -54,7 +55,7 @@ export function FireTruck({
 }) {
   const hero = useHero();
   const [px, py] = LADDER_PIVOT;
-  const turn = { transition: `transform ${ladder.ms}ms ease-in-out` };
+  const turn = { transition: `transform ${ladder.ms * PACE}ms ease-in-out` };
   return (
     <g className="fm-truck">
       <ellipse cx="0" cy="2" rx="380" ry="16" fill="#000" opacity="0.15" />

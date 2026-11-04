@@ -1,5 +1,6 @@
 /* Films of „Kleine Abenteuer“ (`film/`): the stage, the strip of scenes, the iris between scenes, and what moves in the
-   fire brigade's pictures. Classes and keyframes start with `fm-`. */
+   fire brigade's pictures. Classes and keyframes start with `fm-`. What goes with a beat lasts `calc(… * var(--fm-pace))`
+   (`PACE`, set on `.fm-play`), so it keeps in step with the beats; what loops (lights, flames, the bell) does so calmly. */
 
 .fm-play {
   position: absolute;
@@ -26,7 +27,7 @@
   fill-opacity: 0.18;
   stroke: #ffd43b;
   stroke-width: 12;
-  animation: fm-glow 1.1s ease-in-out infinite alternate;
+  animation: fm-glow 2s ease-in-out infinite alternate;
 }
 
 @keyframes fm-glow {
@@ -46,14 +47,14 @@
 }
 
 .fm-hand.again {
-  animation: pop-in 0.45s ease-out backwards;
+  animation: pop-in 0.7s ease-out backwards;
   transform-box: fill-box;
   transform-origin: 50% 0;
 }
 
 .fm-option {
   cursor: pointer;
-  transition: opacity 0.4s;
+  transition: opacity 0.8s;
 }
 
 .fm-option.off {
@@ -66,7 +67,7 @@
 }
 
 .fm-hop {
-  animation: fm-hop 0.5s ease-out;
+  animation: fm-hop 0.9s ease-in-out;
 }
 
 @keyframes fm-hop {
@@ -75,11 +76,11 @@
     transform: translateY(0);
   }
   40% {
-    transform: translateY(-40px);
+    transform: translateY(-28px);
   }
 }
 
-/* The iris: a dark ring round a hole that closes for a cut and opens on the next scene. */
+/* The iris: a dark ring round a hole that closes for a cut and opens on the next scene (its time is `IRIS_MS`). */
 .fm-iris {
   position: absolute;
   left: 50%;
@@ -89,7 +90,7 @@
   border-radius: 50%;
   box-shadow: 0 0 0 100vmax #212529;
   transform: translate(-50%, -50%) scale(1);
-  transition: transform 0.45s ease-in-out;
+  transition: transform 0.8s ease-in-out;
   pointer-events: none;
 }
 
@@ -183,7 +184,7 @@
 
 /* At the end the strip lights up scene by scene, as if the film ran through once more. */
 .fm-strip.run .fm-frame {
-  animation: fm-strip-run 0.7s ease-in-out backwards;
+  animation: fm-strip-run 1.2s ease-in-out backwards;
 }
 
 @keyframes fm-strip-run {
@@ -193,14 +194,14 @@
     box-shadow: none;
   }
   50% {
-    transform: translateY(-14px);
+    transform: translateY(-10px);
     box-shadow: 0 0 0 5px #ffd43b;
   }
 }
 
 /* Something that appears in a scene pops up from its feet. */
 .fm-pop {
-  animation: fm-pop-up 0.45s ease-out backwards;
+  animation: fm-pop-up calc(0.45s * var(--fm-pace)) ease-out backwards;
   transform-box: fill-box;
   transform-origin: 50% 100%;
 }
@@ -211,7 +212,7 @@
     opacity: 0;
   }
   70% {
-    transform: scale(1.08);
+    transform: scale(1.04);
     opacity: 1;
   }
   to {
@@ -222,16 +223,16 @@
 /* Getting into the engine: who has walked to its door is gone. */
 .fm-board {
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity calc(0.3s * var(--fm-pace));
 }
 
-/* The fire engine: the blue light flashes, the wheels turn. */
+/* The fire engine: the blue light flashes (slowly: a calm film, not a real alarm), the wheels turn as fast as it drives. */
 .fm-blue-glow {
   opacity: 0;
 }
 
 .fm-blue.on .fm-blue-glow {
-  animation: fm-blink 0.45s steps(2, jump-none) infinite alternate;
+  animation: fm-blink 0.9s ease-in-out infinite alternate;
 }
 
 .fm-blue.on rect {
@@ -253,7 +254,7 @@
 }
 
 .fm-wheel.spin {
-  animation: fm-roll 0.5s linear infinite;
+  animation: fm-roll calc(0.5s * var(--fm-pace)) linear infinite;
 }
 
 @keyframes fm-roll {
@@ -266,13 +267,13 @@
 .fm-flame-size {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  transition: transform 0.9s ease-in;
+  transition: transform calc(0.9s * var(--fm-pace)) ease-in;
 }
 
 .fm-flame {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: fm-flicker 0.6s ease-in-out infinite alternate;
+  animation: fm-flicker 1.1s ease-in-out infinite alternate;
 }
 
 @keyframes fm-flicker {
@@ -285,7 +286,7 @@
 }
 
 .fm-steam {
-  animation: fm-steam-up 1.8s ease-out forwards;
+  animation: fm-steam-up calc(1.8s * var(--fm-pace)) ease-out forwards;
 }
 
 @keyframes fm-steam-up {
@@ -301,7 +302,7 @@
 
 .fm-smoke {
   opacity: 0.8;
-  transition: opacity 2s;
+  transition: opacity calc(2s * var(--fm-pace));
 }
 
 .fm-smoke.gone {
@@ -309,7 +310,7 @@
 }
 
 .fm-smoke circle {
-  animation: fm-smoke-up 2.4s ease-in-out infinite alternate;
+  animation: fm-smoke-up 3.6s ease-in-out infinite alternate;
 }
 
 @keyframes fm-smoke-up {
@@ -323,20 +324,20 @@
 
 /* The station's alarm bell swings while it rings. */
 .fm-ring {
-  animation: fm-swing 0.16s ease-in-out infinite alternate;
+  animation: fm-swing 0.32s ease-in-out infinite alternate;
 }
 
 @keyframes fm-swing {
   from {
-    transform: rotate(-14deg);
+    transform: rotate(-10deg);
   }
   to {
-    transform: rotate(14deg);
+    transform: rotate(10deg);
   }
 }
 
 .fm-ring-lines {
-  animation: fm-flash 0.3s steps(2, jump-none) infinite alternate;
+  animation: fm-flash 0.64s ease-in-out infinite alternate;
 }
 
 @keyframes fm-flash {
@@ -350,18 +351,18 @@
 
 /* The roller gate rolls up into its box. */
 .fm-gate {
-  transition: transform 1.6s ease-in-out;
+  transition: transform calc(1.6s * var(--fm-pace)) ease-in-out;
 }
 
 /* A hose rolls out, and a water jet shoots from the nozzle (drawn along their length, `pathLength` 100). */
 .fm-hose {
   stroke-dasharray: 100;
-  animation: fm-draw 1.2s ease-out backwards;
+  animation: fm-draw calc(1.2s * var(--fm-pace)) ease-out backwards;
 }
 
 .fm-jet {
   stroke-dasharray: 100;
-  animation: fm-draw 0.45s ease-out backwards;
+  animation: fm-draw calc(0.45s * var(--fm-pace)) ease-out backwards;
 }
 
 @keyframes fm-draw {
@@ -376,12 +377,12 @@
 /* The car in the ditch tilts back onto the road while the winch pulls it. */
 .fm-tilt {
   transform-origin: 0 0;
-  transition: transform 3s ease-in-out 0.3s;
+  transition: transform calc(3s * var(--fm-pace)) ease-in-out calc(0.3s * var(--fm-pace));
 }
 
 /* Washing the engine: foam bubbles up, the mud goes. */
 .fm-mud {
-  transition: opacity 2.6s ease-in 0.4s;
+  transition: opacity calc(2.6s * var(--fm-pace)) ease-in calc(0.4s * var(--fm-pace));
 }
 
 .fm-mud.gone {
@@ -391,7 +392,7 @@
 .fm-foam circle {
   transform-box: fill-box;
   transform-origin: center;
-  animation: fm-foam 1.6s ease-in-out backwards;
+  animation: fm-foam calc(1.6s * var(--fm-pace)) ease-in-out backwards;
 }
 
 @keyframes fm-foam {
@@ -412,7 +413,86 @@
 .fm-candle {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: fm-flicker 0.5s ease-in-out infinite alternate;
+  animation: fm-flicker 1.1s ease-in-out infinite alternate;
+}
+
+/* „Ein Brief für Oma“: the picture draws itself line by line while the child paints, its colours filling in after. */
+.fm-br-drawing .fm-br-line {
+  stroke-dasharray: 100;
+  animation: fm-draw calc(1.6s * var(--fm-pace)) ease-in-out backwards;
+}
+
+.fm-br-drawing .fm-br-fill {
+  animation: fm-br-fill calc(0.8s * var(--fm-pace)) ease-in calc(1.4s * var(--fm-pace)) backwards;
+}
+
+@keyframes fm-br-fill {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The sheet folds small before it slides into the envelope; the envelope's flap closes over it. */
+.fm-br-fold {
+  transition: transform calc(0.8s * var(--fm-pace)) ease-in-out;
+}
+
+.fm-br-flap {
+  transition: d calc(0.6s * var(--fm-pace)) ease-in-out;
+}
+
+/* The postbox's door swings open on its left hinge. */
+.fm-br-door {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  transition: transform calc(0.6s * var(--fm-pace)) ease-in-out;
+}
+
+/* The cow lifts its head once to moo. */
+.fm-br-nod {
+  animation: fm-br-nod calc(1.2s * var(--fm-pace)) ease-in-out calc(0.9s * var(--fm-pace)) 2 alternate;
+}
+
+@keyframes fm-br-nod {
+  to {
+    transform: rotate(-12deg);
+  }
+}
+
+/* The phone rocks gently while it rings – slowly, never a rattle. */
+.fm-br-ring {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fm-br-ring 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes fm-br-ring {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+/* Hearts rise slowly and fade, once. */
+.fm-br-heart {
+  opacity: 0;
+  animation: fm-br-heart calc(2.6s * var(--fm-pace)) ease-out backwards;
+}
+
+@keyframes fm-br-heart {
+  0% {
+    transform: translateY(40px) scale(0.4);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-160px) scale(1);
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -422,6 +502,7 @@
   .fm-smoke circle,
   .fm-candle,
   .fm-ring,
+  .fm-br-ring,
   .fm-strip.run .fm-frame {
     animation: none;
   }
