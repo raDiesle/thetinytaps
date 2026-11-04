@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -141,7 +141,7 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
   const busy = useRef(false);
   /** Bumped when the hiding place is tapped: it rustles and the animal wiggles. */
   const [rustle, setRustle] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple } = useTapFeedback();
   /** Wrong animals picked in this round, for the difficulty. */
   const misses = useRef(0);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -165,12 +165,12 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
   // The question comes with the round; the round is mounted anew for every animal.
   useEffect(() => say(texts.peek), []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   const choose = (index: number) => {
@@ -226,7 +226,7 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.choices.length;
@@ -270,7 +270,7 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
   const behind = round.holes.length > 0 && phase === "hidden";
 
   return (
-    <div className="shadows-play peek-play" onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className="shadows-play peek-play" onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <div className="sh-top">
         <div className="pk-stage" data-tap onPointerDown={onHideoutDown}>
           {glyph.url ? (
@@ -341,7 +341,7 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
           ))}
         </div>
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

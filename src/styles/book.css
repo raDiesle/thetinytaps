@@ -499,18 +499,42 @@
   -webkit-text-stroke: 0.05em var(--ink);
 }
 
-/* The end of a level: three picture cards lying on the page, like the menu's cards. */
+/* The end of a level: „Menü“ and „Nochmal“ two paper slips lying askew, „Weiter“ a big label painted red and taped
+   onto the page like a card. */
 :root .game-end-button {
-  border-radius: 18px 24px 20px 26px / 24px 18px 26px 20px;
+  border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
+}
+
+:root .game-end-button.menu {
+  rotate: -2deg;
 }
 
 :root .game-end-button.again {
-  rotate: -1.5deg;
+  rotate: 1.5deg;
 }
 
 :root .game-end-button.next {
-  rotate: 1.5deg;
-  background-color: color-mix(in srgb, var(--sunshine) 75%, var(--paper));
+  rotate: -1.5deg;
+  border-radius: 20px 28px 22px 30px / 28px 20px 30px 22px;
+  background-color: color-mix(in srgb, var(--accent) 88%, var(--paper));
+}
+
+:root .game-end-button.next::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 38%;
+  height: 22px;
+  translate: -50% 0;
+  rotate: 3deg;
+  background: repeating-linear-gradient(90deg, #fff6c890 0 6px, #ffeeb090 6px 12px);
+  box-shadow: 0 1px 2px #0000001f;
+  pointer-events: none;
+}
+
+:root .game-end.corners .game-end-button {
+  rotate: none;
 }
 
 /* The name of a group of cards is a small ribbon, as a book's chapters are marked. */
@@ -1269,20 +1293,9 @@
   left: auto;
 }
 
-:root .play-area .play-options-hint {
-  right: calc(100% + 8px);
+:root .play-area .play-options-intro {
+  right: 0;
   left: auto;
-  translate: 6px 0;
-}
-
-:root .play-area .play-options-corner.hinted .play-options-hint {
-  translate: 0 0;
-}
-
-@media (hover: hover) {
-  :root .play-area .play-options-corner:hover .play-options-hint {
-    translate: 0 0;
-  }
 }
 
 /* ----- The animal families reading together at the bottom of a menu's page (BookFamilies, in Sky) ----- */
@@ -1421,21 +1434,43 @@
 }
 
 /*
- * ⚙️ while playing is the bigger slip, its gear twice the size and its clip grown with it: on the small one the grey
- * gear was hardly seen (user feedback, November 2026).
+ * ⚙️ while playing is the bigger slip, its gear twice the size and its name written on it beside the gear, its clip
+ * grown with it: on the small one the grey gear was hardly seen, and without words grown-ups didn't know it was the
+ * options (user feedback, November 2026).
  */
 :root .play-area .play-options-corner .play-options-button {
-  width: 54px;
-  height: 60px;
-  padding-top: 10px;
-  font-size: 1.9rem;
+  width: auto;
+  min-width: 190px;
+  height: auto;
+  min-height: 72px;
+  padding: 14px 40px 10px 14px;
 }
 
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root .play-area .play-options-corner .play-options-button {
+    min-width: 150px;
+    min-height: 58px;
+    padding: 10px 34px 6px 10px;
+  }
+}
+
+/* Its clip holds it at the right, in room of its own beside the words. */
 :root .play-area .play-options-corner .play-options-button::before {
   top: -16px;
-  right: 6px;
+  right: 9px;
   width: 16px;
   height: 48px;
+}
+
+/* The intro is a paper note too, lying askew under ⚙️'s slip. */
+:root .play-area .play-options-intro {
+  border: 1px solid #3d304566;
+  border-radius: 2px 3px 2px 4px;
+  background: var(--paper-grain), color-mix(in srgb, var(--paper) 55%, #fff);
+  box-shadow:
+    1px 2px 0 #5a3c1f26,
+    2px 6px 10px -2px #00000040;
+  rotate: 1.5deg;
 }
 
 /* The highlighter's stroke across the slip, drawn from left to right when it comes on. */

@@ -543,9 +543,18 @@ export function buildCircus() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
+  /** Where it waits for the child's tap (R-03): the seal with the marble on its nose, the monkey at the top of its swing, the teddy on its unicycle, the cannon. */
+  const stops = [
+    { at: tNod, x: NECK.x, y: ON_NOSE.y + 40 },
+    { at: tDrop, x: released.x, y: released.y },
+    { at: tUni, x: UNICYCLE.x0, y: PLATFORM.y - UNICYCLE.r - 60 },
+    { at: tFire, x: onBarrel(CANNON.len / 2, 0).x, y: onBarrel(CANNON.len / 2, 0).y },
+  ];
+
   return {
     events: sorted(),
     duration: tDone,
+    stops,
     trunkWay,
     drumTimes,
     tCymbal,

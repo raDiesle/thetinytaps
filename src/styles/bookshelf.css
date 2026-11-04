@@ -402,46 +402,6 @@
   }
 }
 
-.head-fox {
-  fill: #e98a43;
-  stroke: var(--ink);
-  stroke-width: 2.5;
-}
-
-.head-ear-in {
-  fill: #5a3a2c;
-}
-
-.head-muzzle {
-  fill: #fff6ea;
-}
-
-.head-bear {
-  fill: #a8693e;
-  stroke: var(--ink);
-  stroke-width: 2.5;
-}
-
-.head-ear-bear,
-.head-snout {
-  fill: #e8c49a;
-}
-
-.head-cheek {
-  fill: #f2a596aa;
-}
-
-.head-eye {
-  fill: #2b2230;
-}
-
-.head-lash,
-.head-line {
-  fill: none;
-  stroke: #2b2230;
-  stroke-width: 2;
-}
-
 .head-bow {
   fill: #ee7fae;
   stroke: var(--ink);
@@ -1438,6 +1398,41 @@
     0 -1px 0 #2a170866;
   transform: translate(calc(var(--sx) + var(--words-shift, 0px)), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
+}
+
+/*
+ * „Wer spielt?“ on the wall with the stickers, small, right above the first sticker's head (the fox girl's; user
+ * feedback, November 2026): the stickers stand centred on the wall, so its foot is half the wall up plus a sticker and
+ * half the gap between them (`.room-stickers`). In one line, a little darker than the carved words, since the wall
+ * is seen at a slant.
+ */
+.shelf-figure-ask {
+  --s: min(66cqw, 44cqh);
+  position: absolute;
+  right: 0;
+  bottom: calc(50cqh + var(--s) + 3cqh + 1.5cqh);
+  left: 0;
+  color: #3a2210;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: min(12cqw, 6cqh);
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow:
+    0 1px 0 #f6dcaecc,
+    0 -1px 0 #2a170866;
+  pointer-events: none;
+}
+
+/* Side by side on a low wall: the stickers' tops are only half a sticker above the middle. */
+@container (orientation: landscape) {
+  .shelf-figure-ask {
+    --s: min(38cqw, 66cqh);
+    bottom: calc(50cqh + var(--s) / 2 + 3cqh);
+    font-size: min(8cqw, 14cqh);
+  }
 }
 
 /* „mehr …“ (RoomNotes): carved like the words, underlined as a link, the one part of them that takes a tap. */

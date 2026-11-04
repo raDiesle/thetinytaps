@@ -563,9 +563,18 @@ export function buildTidy() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
+  /** Where it waits for the child's tap (R-03): the open lid with the ball in the chest, the truck before the full shelf, the sock ball come down on the floor, the sock ball at the cushion's plug. */
+  const stops = [
+    { at: tBallIn, x: (CHEST.x0 + LID_FOOT.x) / 2, y: (CHEST.top + FLOOR) / 2 },
+    { at: tRollOn, x: frontStop - TRUCK.len / 2, y: FLOOR - 60 },
+    { at: tBounce, x: bounce.x, y: bounce.y },
+    { at: tPop, x: (PLUG.x + CUSHION.x1) / 2, y: FLOOR - 50 },
+  ];
+
   return {
     events: sorted(),
     duration: tDone,
+    stops,
     tKick,
     tTop,
     tBallIn,

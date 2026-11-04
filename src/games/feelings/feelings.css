@@ -1,12 +1,15 @@
-/* The feelings game: comforting the bear at home, and the kindergarten stories.
-   A big picture in the middle, picture cards below; the only words are small captions for grown-ups.
+/* The feelings game: a scene, one question, two picture cards – the not-so-good idea and the good one.
+   The only words are small captions for grown-ups.
 
-   The picture and the cards keep one size for the whole story, whatever happens: things that grow
-   and shrink confuse small children. So the room for the cards is worked out from the screen alone
-   (cq units of .story-play), never from what is in it, and the picture takes all that is left.
-   Always two cards, at home and in the kindergarten. Upright screens: picture on top as wide as the
-   screen, cards below. Wide screens: picture left, cards right, one above the other. The ✕ and the
-   dots lie on top of the pictures and take no room; on low screens the captions do too. */
+   Calm (user feedback, November 2026): nothing hops, shakes, pulses, grows or floats up after a choice, and the cards
+   stand still – the picture that comes (a relieved, happy bear) is the answer. Only the big picture's two frames fade
+   slowly into each other.
+
+   The picture and the cards keep one size for the whole round: things that grow and shrink confuse small children.
+   So their room is worked out from the screen alone (cq units of .story-play), never from what is in it.
+   Wide screens: the picture in the middle, the not-so-good card at the bottom left and the good one at the top right,
+   each lying over a corner of the picture (user's choice). Upright screens: picture on top, the cards below.
+   The ✕ and the dots lie on top of the pictures and take no room. */
 
 .story-play {
   /* Edges and the space between cards. */
@@ -23,8 +26,6 @@
   --card-w: min((100cqw - 2 * var(--pad) - var(--gap)) / 2, (var(--rest) - var(--label)) / 0.75);
   --choices-h: calc(var(--card-w) * 0.75 + var(--label) + var(--pad));
   /* At the happy end the three good steps once more, in a row. */
-  --small-w: min((100cqw - 2 * var(--pad) - 2 * var(--gap)) / 3, var(--card-w));
-  --pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   position: absolute;
   inset: 0;
@@ -34,8 +35,9 @@
   container-type: size;
 }
 
-/* Low screens (phones on their side): every pixel of height counts, so the captions sit on the pictures' lower edge. */
-@media (max-height: 560px) {
+/* Low or wide screens: every pixel of height counts, and the cards lie on the picture, so the captions sit on the
+   pictures' lower edge. */
+@media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
   .story-play {
     --label: 14px;
     --caption-h: 0px;
@@ -75,7 +77,6 @@
 
 .fg-dot.done {
   background: var(--mint);
-  animation: pop-in 0.35s var(--pop);
 }
 
 .fg-dot.now {
@@ -101,14 +102,6 @@
   aspect-ratio: 4 / 3;
   margin-bottom: var(--caption-h);
   border-radius: 28px;
-  animation: fg-picture-in 0.25s ease-out;
-}
-
-/* A new picture fades in where the last one was, at the same size. */
-@keyframes fg-picture-in {
-  from {
-    opacity: 0.4;
-  }
 }
 
 /* What happens is a framed photo – a white mat, a soft shadow – not a button like the cards. */
@@ -135,8 +128,9 @@
   border-radius: 16px;
   object-fit: cover;
   opacity: 0;
+  /* Slow, so the picture seems to breathe rather than blink. */
   transition:
-    opacity 0.3s ease-in-out,
+    opacity 0.7s ease-in-out,
     filter 0.3s;
   user-select: none;
 }
@@ -150,213 +144,31 @@
 .fg-look-quiet .fg-picture img {
   filter: saturate(0.45) brightness(1.06) opacity(0.8);
   transition:
-    opacity 0.3s ease-in-out,
+    opacity 0.7s ease-in-out,
     filter 0.8s 1.2s;
 }
 
-/* A card looked at big, or a choice and its answer: the whole picture, without the mat, like a card. */
-.fg-look-option .fg-picture,
+/* The answer to a choice: the whole picture, without the mat, in a still green or red frame. */
 .fg-look-good .fg-picture,
 .fg-look-bad .fg-picture {
   --mat: 0px;
 }
 
-.fg-look-option .fg-picture img,
 .fg-look-good .fg-picture img,
 .fg-look-bad .fg-picture img {
   border-radius: 0;
 }
 
-/* Tapped once: the yellow ring of a card glows, waiting for the second tap. */
-.fg-look-option .fg-picture {
-  box-shadow:
-    0 0 0 7px var(--sunshine),
-    0 0 0 10px var(--ink);
-  animation: fg-glow 1.6s ease-in-out infinite;
-  cursor: pointer;
-}
-
-@keyframes fg-glow {
-  50% {
-    box-shadow:
-      0 0 0 7px var(--sunshine),
-      0 0 0 10px var(--ink),
-      0 0 34px 18px #ffd23fa0;
-  }
-}
-
-/* Tapped once: a big hand taps the picture again and again, with a ring where the finger lands – "tap once more".
-   It comes after the picture has grown, low on the right, so most of the picture stays to be seen. */
-.fg-tap-hint {
-  position: absolute;
-  right: 4%;
-  bottom: 2%;
-  z-index: 5;
-  width: 42cqh;
-  height: 42cqh;
-  pointer-events: none;
-  opacity: 0;
-  animation: fg-tap-show 0.3s 0.35s ease-out forwards;
-}
-
-@keyframes fg-tap-show {
-  to {
-    opacity: 1;
-  }
-}
-
-.fg-tap-hand {
-  position: absolute;
-  inset: 0;
-  font-family: var(--font-emoji);
-  font-size: 34cqh;
-  line-height: 1.2;
-  text-align: center;
-  filter: drop-shadow(0 0 0.6cqh #fff) drop-shadow(0 0 0.6cqh #fff) drop-shadow(0 0.8cqh 0 var(--ink));
-  animation: fg-tap-press 1.2s 0.35s ease-in-out infinite;
-}
-
-@keyframes fg-tap-press {
-  0%,
-  100% {
-    translate: 4% 8%;
-    scale: 1;
-  }
-  40% {
-    translate: 0 -6%;
-    scale: 0.88;
-  }
-  50% {
-    translate: 0 -6%;
-    scale: 0.88;
-  }
-}
-
-/* Where the fingertip lands: a white ring spreads, the moment the hand presses. */
-.fg-tap-ripple {
-  position: absolute;
-  top: -14%;
-  left: 50%;
-  width: 40%;
-  aspect-ratio: 1;
-  border: 1.4cqh solid #fff;
-  border-radius: 50%;
-  box-shadow: 0 0 0 0.5cqh var(--ink);
-  translate: -50% 0;
-  opacity: 0;
-  animation: fg-tap-ripple 1.2s 0.35s ease-out infinite;
-}
-
-@keyframes fg-tap-ripple {
-  0%,
-  40% {
-    opacity: 0;
-    scale: 0.4;
-  }
-  45% {
-    opacity: 1;
-    scale: 0.5;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.6;
-  }
-}
-
-/* Back to the first picture: a small copy of it on the top left corner of the frame, half outside like the tick,
-   with a round arrow on it – so it covers little of the card's picture. Its tap area is bigger than it looks (data-tap). */
-.fg-back {
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  z-index: 6;
-  width: clamp(60px, 16%, 128px);
-  aspect-ratio: 4 / 3;
-  padding: 0;
-  overflow: hidden;
-  border: 3px solid #fff;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow:
-    0 0 0 2px var(--ink),
-    0 4px 0 2px var(--ink);
-  cursor: pointer;
-  touch-action: manipulation;
-  opacity: 0;
-  animation: fg-tap-show 0.3s 0.35s ease-out forwards;
-}
-
-.fg-back img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(0.7);
-  user-select: none;
-}
-
-.fg-back-arrow {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 55%;
-  translate: -50% -50%;
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
-}
-
-/* A good idea: a green frame, and the picture hops for joy. */
 .fg-look-good .fg-picture {
   box-shadow:
     0 0 0 7px var(--mint),
-    0 0 0 10px var(--ink),
-    0 0 40px 16px #3ddc97a0;
+    0 0 0 10px var(--ink);
 }
 
-.fg-look-good {
-  animation: fg-hop 0.7s ease-out;
-}
-
-@keyframes fg-hop {
-  30% {
-    translate: 0 -16px;
-  }
-  55% {
-    translate: 0 0;
-  }
-  75% {
-    translate: 0 -6px;
-  }
-}
-
-/* A not-so-good idea: a red frame that shakes – the picture itself stays clear, so the child sees what went wrong. */
 .fg-look-bad .fg-picture {
   box-shadow:
     0 0 0 7px #ff4d4d,
-    0 0 0 10px var(--ink),
-    0 0 40px 16px #ff4d4d90;
-}
-
-.fg-look-bad {
-  animation: fg-shake 0.6s ease-in-out 2;
-}
-
-@keyframes fg-shake {
-  20% {
-    translate: -14px 0;
-  }
-  40% {
-    translate: 12px 0;
-  }
-  60% {
-    translate: -8px 0;
-  }
-  80% {
-    translate: 5px 0;
-  }
+    0 0 0 10px var(--ink);
 }
 
 /* Tick or cross on the corner of the frame, half outside it, so it covers next to nothing. */
@@ -366,7 +178,6 @@
   right: -14px;
   z-index: 3;
   width: clamp(52px, 15%, 120px);
-  animation: fg-stamp 0.45s var(--pop);
 }
 
 /* ---------- A picture planned but not made yet ---------- */
@@ -428,8 +239,8 @@
   font-size: clamp(0.85rem, 2.1vh, 1.1rem);
 }
 
-/* Low screens: on the lower edge of the picture or card, small, on a pale band. */
-@media (max-height: 560px) {
+/* Low or wide screens: on the lower edge of the picture or card, small, on a pale band. */
+@media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
   .fg-picture-caption,
   .fg-choice .fg-caption {
     position: absolute;
@@ -465,42 +276,9 @@
   text-overflow: ellipsis;
 }
 
-/* ---------- Floating hearts, notes and puffs ---------- */
-
-.fg-floaters {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-}
-
-.fg-floater {
-  position: absolute;
-  translate: -50% 0;
-  font-family: var(--font-emoji);
-  font-size: 10cqh;
-  opacity: 0;
-  animation: fg-float-up var(--float-ms) ease-out calc(var(--i) * 90ms) forwards;
-}
-
-@keyframes fg-float-up {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(0.5);
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(-20%) scale(1.1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-260%) scale(0.9);
-  }
-}
-
 /* ---------- Picture cards: what the bear can do ---------- */
 
-/* Always the same room, whatever is in it: two cards, the small cards at the end, or the round buttons. */
+/* Always the same room, whatever is in it: the two cards, or the end buttons. */
 .story-choices {
   grid-area: choices;
   display: flex;
@@ -520,10 +298,6 @@
 
   .story-choices {
     flex-direction: column;
-  }
-
-  .story-choices:has(.small) {
-    flex-direction: row;
   }
 }
 
@@ -555,10 +329,6 @@
   width: var(--card-w);
 }
 
-.fg-choice.small {
-  --card-w: var(--small-w);
-}
-
 .fg-card {
   position: relative;
   width: var(--card-w);
@@ -570,10 +340,7 @@
   box-shadow: 0 6px 0 var(--ink);
   cursor: pointer;
   touch-action: manipulation;
-  transition:
-    opacity 0.3s,
-    translate 0.15s,
-    box-shadow 0.15s;
+  transition: opacity 0.3s;
 }
 
 .fg-card-image {
@@ -588,58 +355,12 @@
   user-select: none;
 }
 
-/* A moving card: its frames lie on top of the first one and fade in in turn, like in the big picture. */
-.fg-card-image + .fg-card-image {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-}
-
-.fg-card-image + .fg-card-image.on {
-  opacity: 1;
-}
-
-.fg-card.small {
-  border-radius: 16px;
-}
-
-.fg-card.small .fg-card-image {
-  border-radius: 12px;
-}
-
-/* What can be tapped now has a thick yellow ring and calls gently. */
+/* What can be tapped now has a thick yellow ring – still, it doesn't call or pulse. */
 .fg-card-choose {
   box-shadow:
     0 0 0 6px var(--sunshine),
     0 0 0 9px var(--ink),
     0 12px 0 3px var(--ink);
-  animation: fg-call 1.8s ease-in-out infinite;
-}
-
-/* Tapped once and shown big above: lifted, a thicker ring, still – the next tap chooses it. */
-.fg-card-picked {
-  translate: 0 -4px;
-  box-shadow:
-    0 0 0 9px var(--sunshine),
-    0 0 0 12px var(--ink),
-    0 16px 0 4px var(--ink);
-}
-
-/* While one card is shown big, the others stop calling and fade a little – still to be tapped, but the eye goes to the chosen one. */
-.story-choices:has(.fg-card-picked) .fg-card-choose {
-  animation: none;
-  filter: saturate(0.5) opacity(0.75);
-}
-
-/* Cards to choose from take turns calling. */
-.fg-choice:nth-child(even) .fg-card-choose {
-  animation-delay: -0.9s;
-}
-
-@keyframes fg-call {
-  50% {
-    scale: 1.04;
-  }
 }
 
 .fg-card:disabled {
@@ -688,125 +409,137 @@
   left: -12px;
   z-index: 3;
   width: 30%;
-  animation: fg-stamp 0.45s var(--pop);
 }
 
-.fg-card.small .fg-card-mark {
-  top: -10px;
-  left: -10px;
-  width: 32%;
+/* ---------- Menü, Nochmal and Weiter (the shared `GameEnd`, inline) in the cards' room ---------- */
+
+/* Calm here too: the buttons come without a pop, and „Weiter“ doesn't breathe. */
+.story-play .game-end,
+.story-play .game-end-button.next {
+  animation: none;
 }
 
-@keyframes fg-stamp {
-  from {
-    opacity: 0;
-    scale: 2.2;
-    rotate: -25deg;
-  }
+/* Never wider than the room for the cards. */
+.story-play .game-end-button {
+  font-size: min(clamp(1.15rem, 5.6vh, 1.9rem), var(--card-w) / 7);
 }
 
-/* ---------- Again and next, as round picture buttons ---------- */
-
-/* Three round buttons in a row: as big as the cards allow, and never wider than the room for the cards. */
-.fg-end {
-  --end-gap: clamp(14px, 3cqmin, 40px);
-  --end-room: calc(100cqw - 2 * var(--pad));
-  --end-size: min(var(--card-w) * 0.8, 210px, (var(--end-room) - 2 * var(--end-gap)) / 2.5);
-
-  display: flex;
-  align-items: center;
-  gap: var(--end-gap);
-  animation: pop-in 0.4s var(--pop);
+.story-play .game-end-button.next {
+  font-size: min(clamp(2.1rem, 13vh, 4.6rem), var(--card-w) / 4.5);
 }
 
-.fg-round {
-  display: grid;
-  place-items: center;
-  width: var(--size);
-  height: var(--size);
-  padding: 0;
-  border: var(--outline);
-  border-radius: 50%;
-  box-shadow: 0 6px 0 var(--ink);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.fg-round:active {
-  translate: 0 4px;
-  box-shadow: 0 2px 0 var(--ink);
-}
-
-.fg-round svg {
-  width: 54%;
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* Back to the menu and playing it again are the quieter choices. */
-.fg-round.menu,
-.fg-round.again {
-  --size: calc(var(--end-size) * 0.75);
-  background: #fff;
-}
-
-/* Going on is big, yellow and calls. */
-.fg-round.next {
-  --size: var(--end-size);
-  background: var(--sunshine);
-  animation: fg-call 1.8s ease-in-out infinite;
-}
-
-.fg-round.next svg {
-  width: 50%;
-  margin-left: 8%;
-  fill: var(--ink);
-  stroke-width: 2;
-}
-
-/* ---------- Wide screens: picture left, cards right ---------- */
+/* ---------- Wide screens: the picture in the middle, the cards on two of its corners ---------- */
 
 @media (min-aspect-ratio: 6 / 5) {
   .story-play {
-    /* What is left of the width when the picture is as high as it can be. */
-    --free: calc(100cqw - (100cqh - var(--caption-h) - 2 * var(--pad)) * 4 / 3 - 3 * var(--pad));
-    /* Two cards one above the other, as high as the screen, and about a third of the width: big enough to tap and compare,
-       while the picture still gets the most. */
-    --card-w: min((100cqh - 2 * var(--pad) - 2 * var(--label) - var(--gap)) / 1.5, max(32cqw, var(--free)));
-    --choices-w: calc(var(--card-w) + 2 * var(--pad));
-    --small-w: calc((var(--card-w) * 1.5 - var(--label) - var(--gap)) / 2.25);
+    --pad: 8px;
+    /* The cards are at least this wide, so two can be compared and tapped; how much of a card lies over the picture. */
+    --card-min: 24cqw;
+    --over: 0.2;
+    /* The picture as high as the screen, unless that leaves the cards too little room beside it. */
+    --pic-w: min((100cqh - 2 * var(--pad)) * 4 / 3, 100cqw - 2 * var(--pad) - 2 * (1 - var(--over)) * var(--card-min));
+    --pic-top: calc((100cqh - var(--pic-w) * 3 / 4) / 2);
+    /* Each card fills its side and reaches a fifth of its width over the picture. */
+    --card-w: calc((100cqw - 2 * var(--pad) - var(--pic-w)) / (2 * (1 - var(--over))));
+    /* Up or down to the picture's edge, then a third of the card further, so it lies on the corner. */
+    --card-edge: max(var(--pad), var(--pic-top) - var(--card-w) * 0.75 * 0.3);
 
-    grid-template: "middle choices" minmax(0, 1fr) / minmax(0, 1fr) auto;
+    display: block;
+  }
+
+  /* Tablets (about 4:3) have room above and below the picture: bigger cards, a smaller picture. */
+  @media (max-aspect-ratio: 3 / 2) {
+    .story-play {
+      --card-min: 30cqw;
+    }
   }
 
   .story-middle {
-    padding: max(var(--pad), env(safe-area-inset-top)) 0 max(var(--pad), env(safe-area-inset-bottom)) max(var(--pad), env(safe-area-inset-left));
+    position: absolute;
+    inset: 0;
+    padding: 0;
   }
 
-  /* No room kept for the ✕: it lies on the upper card's corner. */
+  .fg-frame {
+    width: var(--pic-w);
+    margin: 0;
+  }
+
+  /* The question stays clear of the cards on the picture's corners. */
+  .fg-picture-caption {
+    max-width: 56%;
+  }
+
+  /* „Wie geht's dir?“: the four weathers keep a little room to the edges. */
+  .mood-play .story-middle {
+    padding: var(--pad);
+  }
+
+  /* The cards lie over the picture, but the room between them is the picture's: taps there reach nothing. */
   .story-choices {
-    flex-direction: column;
-    width: var(--choices-w);
+    position: absolute;
+    inset: 0;
+    z-index: 4;
     height: auto;
-    padding: max(var(--pad), env(safe-area-inset-top)) max(var(--pad), env(safe-area-inset-right)) max(var(--pad), env(safe-area-inset-bottom)) var(--pad);
+    padding: 0;
+    pointer-events: none;
   }
 
-  /* The cards stand one above the other, so the round buttons do too, as high as the screen allows. */
-  .story-play .fg-end {
-    --end-room: calc(100cqh - 2 * var(--pad));
-
-    flex-direction: column;
+  .story-choices > * {
+    pointer-events: auto;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .story-play .fg-card,
-  .story-play .fg-round,
-  .story-play .fg-frame,
-  .story-play .fg-picture {
-    animation: none;
+  .story-choices .fg-choice {
+    position: absolute;
+    gap: 0;
+  }
+
+  /* The not-so-good idea at the bottom left, the good one at the top right (user's choice, November 2026). */
+  .story-choices .fg-choice:first-child {
+    bottom: var(--card-edge);
+    left: max(var(--pad), env(safe-area-inset-left));
+  }
+
+  .story-choices .fg-choice:last-child {
+    top: var(--card-edge);
+    right: max(var(--pad), env(safe-area-inset-right));
+  }
+
+  /* The tick or cross of the big picture moves to its top left corner: the good card lies on the top right one. */
+  .fg-picture-mark {
+    right: auto;
+    left: -14px;
+  }
+
+  /* The end: „Menü“ and „Nochmal“ left of the picture, „Weiter“ right of it (user feedback, November 2026). */
+  .story-play .game-end {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .story-play .game-end > * {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    pointer-events: auto;
+  }
+
+  .story-play .game-end-small {
+    left: max(var(--pad), env(safe-area-inset-left));
+    align-items: center;
+    width: calc((100cqw - var(--pic-w)) / 2 - 2 * var(--pad));
+  }
+
+  .story-play .game-end-button.next {
+    right: max(var(--pad), env(safe-area-inset-right));
+  }
+
+  .story-play .game-end-button {
+    font-size: min(clamp(1.15rem, 5.6vh, 1.9rem), (100cqw - var(--pic-w)) / 15);
+  }
+
+  .story-play .game-end-button.next {
+    font-size: min(clamp(2.1rem, 13vh, 4.6rem), (100cqw - var(--pic-w)) / 10);
   }
 }

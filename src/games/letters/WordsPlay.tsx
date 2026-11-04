@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
+import { BRIGHT_COLORS, FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { isRightToLeftPack, keyMatches, keyOf, toLower, toUpper } from "@/content/languages";
@@ -7,10 +7,10 @@ import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling"
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
-import { speak } from "@/lib/speech";
+import { useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 
-/** Keys closer together than this only spawn shapes, so mashing doesn't race through the word. */
+/** Keys closer together than this only make ripples, so mashing doesn't race through the word. */
 const MIN_TYPE_MS = 300;
 /** Time to enjoy a finished word before a key or tap starts the next one. */
 const CELEBRATE_MS = 1500;
@@ -64,7 +64,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [nudges, setNudges] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple } = useTapFeedback();
 
   const lastType = useRef(0);
   const doneAt = useRef(0);
@@ -83,12 +83,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const action = current && isAction(current.word) ? current.word : null;
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
-    },
-    [settings.speech, pack.speechLang],
-  );
+  const say = useLettersSay();
 
   /** Says the letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
   const sayLetter = useCallback(
@@ -102,12 +97,12 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     [pack, say],
   );
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   // Go through all words in random order before any word comes again.
@@ -144,9 +139,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     doneAt.current = performance.now();
     if (settings.sounds) playChime();
     const word = current.word;
-    say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
+    say(`${word.word}!`, true);
+    say(isAction(word) ? pack.joinIn(word) : pick(pack.praise), true);
     if (isColor(word)) setBackground(word.color);
-  }, [current, done, letters, typed, pack, say, sayLetter, spawn, settings.sounds]);
+  }, [current, done, letters, typed, pack, say, sayLetter, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -172,18 +168,18 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     (key: string) => {
       if (!current) return;
       if (done) {
-        if (!tryNextWord()) funBurst();
+        if (!tryNextWord()) softTap();
         return;
       }
       if (keyMatches(key, unitKey(letters[typed]), pack)) {
-        if (!tryType()) funBurst();
+        if (!tryType()) softTap();
         return;
       }
-      funBurst();
+      softTap();
       if ((nudges + 1) % HINT_AFTER_WRONG === 0) sayLetter(letters[typed]);
       setNudges(nudges + 1);
     },
-    [current, done, letters, typed, nudges, pack, tryType, tryNextWord, funBurst, sayLetter],
+    [current, done, letters, typed, nudges, pack, tryType, tryNextWord, softTap, sayLetter],
   );
 
   useEffect(() => {
@@ -199,20 +195,20 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
 
   // Tapping the waiting letter types it, tapping the picture says the word,
-  // and once the word is done any tap moves on. Everywhere else makes shapes.
+  // and once the word is done any tap moves on. Everywhere else makes ripples.
   const onPlayAreaPointer = (e: PointerEvent) => {
     if (tryNextWord()) return;
-    funBurst(e.clientX, e.clientY);
+    softTap(e.clientX, e.clientY);
   };
   const onNextLetterPointer = (e: PointerEvent) => {
     e.stopPropagation();
-    if (!tryType()) funBurst(e.clientX, e.clientY);
+    if (!tryType()) softTap(e.clientX, e.clientY);
   };
   const onPicturePointer = (e: PointerEvent) => {
     if (done || !current) return;
     e.stopPropagation();
     say(`${current.word.word}!`);
-    funBurst(e.clientX, e.clientY);
+    softTap(e.clientX, e.clientY);
   };
 
   // The key for the next letter; "Ó" has none on the screen, so its "O" lights up (أ: ا, कि: क).
@@ -283,7 +279,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
           highlight={done ? undefined : wantedKey}
         />
       )}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

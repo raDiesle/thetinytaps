@@ -135,7 +135,9 @@ export const SCENARIOS: Scenario[] = [
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   })),
-  { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Wie geht's dir?", before: [START, { wait: 1500 }], ms: 8000, tap: TAPS }] },
+  // „Alltagssituationen“: the first group's scenes, one tap on a card each; „Wie geht's dir?“ plays at once.
+  { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
+  { name: "wie-gehts-dir", path: "/wie-gehts-dir/", parts: [{ label: "Wetter wählen", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },
   { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },

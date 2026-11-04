@@ -108,7 +108,16 @@ export function LettersGame() {
       ) : (
         <LettersPlay pack={pack} settings={play} />
       )}
-      <PlayOptions>
+      <PlayOptions
+        // The game plays at once in one way, so grown-ups would not guess how many others wait behind ⚙️: a note says
+        // so as play starts (user feedback, November 2026).
+        intro={
+          <>
+            <b>{t({ de: "Hier gibt es viele Spielarten" })}</b>
+            {t({ de: "Buchstaben, Zahlen, Zählen, ganze Wörter oder „Wo ist das B?“ – halten Sie ⚙️ gedrückt und wählen Sie aus." })}
+          </>
+        }
+      >
         <Choice<LettersMode>
           label={t({ de: "Spielart", en: "Way to play", zh: "玩法", hi: "खेलने का तरीका", es: "Modo de juego", ar: "طريقة اللعب", ru: "Как играем" })}
           value={settings.mode}

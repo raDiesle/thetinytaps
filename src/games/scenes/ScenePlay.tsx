@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
@@ -26,7 +26,7 @@ import { gust, poke, SPOTS, SpotEffectArt, spotAt, type SpotEffect } from "./spo
 import { litItems, TORCH_RADIUS, TORCH_STEP, TorchNight } from "./torch";
 import { placeBox, type Scene, type SceneItem } from "./types";
 
-/** Key presses closer together than this only spawn shapes. */
+/** Key presses closer together than this only make ripples. */
 const MIN_KEY_MS = 600;
 /** Find modes: a key press repeats the question at most this often. */
 const REPEAT_QUESTION_MS = 3000;
@@ -115,7 +115,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const [effects, setEffects] = useState<SpotEffect[]>([]);
   /** Colour mode: the space bar is held, so its cap on the screen goes down too. */
   const [spaceDown, setSpaceDown] = useState(false);
-  const { bursts, spawn } = useBursts();
+  const { effects: feedback, ripple, glow, celebrate } = useTapFeedback();
   const location = useLocation();
   const navigate = useNavigate();
   const roadsOn = settings.mode === "explore";
@@ -216,12 +216,12 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     return item.sentences[index % item.sentences.length];
   }, []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (soundsOn) playRandomNote();
     },
-    [spawn, soundsOn],
+    [ripple, soundsOn],
   );
 
   /** Hidden surprises: never the same twice in a row, neither in one hideout nor one after the other. */
@@ -315,17 +315,17 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setFocus(item);
   }, []);
 
-  /** Everything was discovered: all items dance at once, with shapes all over the screen. */
+  /** Everything was discovered: all items dance at once, with hearts, stars and notes rising slowly. */
   const party = () => {
     setPartying(true);
     if (soundsOn) playMelody();
     say(colouring ? words.allColoured : words.allFound);
     items.forEach((item, i) => later(() => animate(item, true), i * 40));
-    for (let i = 0; i < 14; i++) later(() => spawn(), i * 140);
+    celebrate();
     later(() => setPartying(false), PARTY_MS);
   };
 
-  /** Bedtime picture: everything is asleep, so the room goes dark – softly, without dancing or shapes. */
+  /** Bedtime picture: everything is asleep, so the room goes dark – softly, without dancing or rising hearts. */
   const goodNight = () => {
     setNight(true);
     if (soundsOn) playLullaby();
@@ -354,7 +354,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     discoveredRef.current = new Set(discoveredRef.current).add(item.id);
     setDiscovered(discoveredRef.current);
     // A splash of paint where the colour comes back.
-    if (colouring) for (let i = 0; i < 3; i++) spawn(x + (Math.random() - 0.5) * 120, y + (Math.random() - 0.5) * 120);
+    if (colouring) glow(x, y);
     if (discoveredRef.current.size !== scene.items.length) return;
     if (bedtime) later(goodNight, PARTY_AFTER_MS);
     else later(party, PARTY_AFTER_MS);
@@ -394,8 +394,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const matrix = svgRef.current?.getScreenCTM();
     if (!matrix) return;
     const { x, y } = new DOMPoint(spot.x, spot.y).matrixTransform(matrix);
-    funBurst(x, y);
-    for (let i = 0; i < 2; i++) spawn(x + (Math.random() - 0.5) * 120, y + (Math.random() - 0.5) * 120);
+    glow(x, y);
+    if (soundsOn) playRandomNote();
   };
 
   /** Chain reaction: the items after this one react one by one, each telling its part of the story. */
@@ -550,7 +550,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       if (started) {
         say(describe(item));
         if (item.hideout) say(words.peekaboo(pickLanguage(SURPRISES[lastSurprise.current.get(item.id)!].found, language.id)), true);
-      } else funBurst(x, y);
+      } else softTap(x, y);
       paint(x, y);
       discover(item, x, y);
       if (started) {
@@ -563,7 +563,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const isPart = !quest.answers.includes(item) && quest.colour !== undefined && hasColour(item, quest.colour);
     const isAnswer = quest.answers.includes(item) || isPart;
     if (celebrating.current || (isAnswer && answeredRef.current.has(item.id))) {
-      if (!animate(item)) funBurst(x, y);
+      if (!animate(item)) softTap(x, y);
       return;
     }
     if (isAnswer) {
@@ -571,6 +571,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       setAnswered(answeredRef.current);
       // The item's own animation and the chime are the answer: no shapes fly up (root CLAUDE.md).
       animate(item);
+      glow(x, y);
       if (soundsOn) playChime();
       setHint(false);
       setFound((n) => n + 1);
@@ -602,7 +603,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const moveLightRef = useRef(moveLight);
   moveLightRef.current = moveLight;
 
-  /** Where an item is on screen, for the shapes that fly out of it. */
+  /** Where an item is on screen, for the glow where it was tapped. */
   const screenPoint = useCallback((item: SceneItem): [number, number] => {
     const [x, y, w, h] = placeBox(item.box, item.place);
     const matrix = svgRef.current?.getScreenCTM();
@@ -636,7 +637,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const [x, y] = matrix ? pointIn(matrix, e.clientX, e.clientY) : [Number.NaN, Number.NaN];
     const index = spotAt(scene.spots, scene.width, scene.height, x, y);
     if (index < 0) {
-      funBurst(e.clientX, e.clientY);
+      softTap(e.clientX, e.clientY);
       return;
     }
     const turn = spotTaps.current.get(index) ?? 0;
@@ -714,7 +715,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
 
       const now = performance.now();
       if (now - lastKey.current < MIN_KEY_MS) {
-        funBurst();
+        softTap();
         return;
       }
       lastKey.current = now;
@@ -723,7 +724,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       const quest = questRef.current;
       if (quest) {
         if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask(quest);
-        else funBurst();
+        else softTap();
         return;
       }
       // Exploring: every key brings another item to life.
@@ -738,7 +739,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [scene, items, here, keys, screenPoint, colouring, torch, lanes, keyboard, keysOn, settings.sounds, ask, funBurst, moveFocus, language.id]);
+  }, [scene, items, here, keys, screenPoint, colouring, torch, lanes, keyboard, keysOn, settings.sounds, ask, softTap, moveFocus, language.id]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -895,9 +896,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </div>
       )}
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
-      {!questMode && allDiscovered && (
-        <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
-      )}
+      {!questMode && allDiscovered && <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ name: nextScene.title, onNext: goToNextScene }} />}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
       {colouring && keysOn && !allDiscovered && (
         <button
@@ -941,7 +940,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </span>
         {words.rotate}
       </p>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={feedback} />
     </div>
   );
 }

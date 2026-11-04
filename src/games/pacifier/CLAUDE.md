@@ -15,7 +15,7 @@ tap (`goalSpot`); every key does what the step waits for (`act`), a tap on anyth
    holding the balloon in the balloon story). Tapped three times (`GLITTERS`) she glitters, the box (or the balloon she
    holds) goes in a puff, a present stands on the windowsill, and she flies out of the window again.
 5. `wake` – sleeping Tapsi: morning comes, he gets up, Mama is back.
-6. `gift` – the present: the lid flies off, the gift jumps out big into the room, confetti, Tapsi and Mama cheer
+6. `gift` – the present: the lid flies off, the gift jumps out big into the room, hearts, stars and notes rise slowly, Tapsi and Mama cheer
    (`party`), then `GameEnd` small in the corners („Menü“ left, „Nochmal“ right; one story, so no „Weiter“).
 
 Behind ⚙️ while playing (`PlayOptions`, `PacifierGame.tsx`) grown-ups choose what they really do at home: „Abschied der

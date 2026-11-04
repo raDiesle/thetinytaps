@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { type Localized, pick, useAppLanguage, useT, voiceFor } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
 import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
+import { shadowsVoice } from "./voice";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
@@ -92,7 +92,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const busy = useRef(false);
   /** Bumped to make the picture hop again, e.g. "drag me" when tapping isn't enough. */
   const [nudge, setNudge] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple } = useTapFeedback();
 
   const nextId = useRef(0);
   const pictureRef = useRef<HTMLSpanElement>(null);
@@ -122,14 +122,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string, queue = false) => shadowsVoice.say(text, language.id, { queue }), [language.id]);
 
   const pool = useMemo(() => (theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === theme)), [theme]);
   const poolRef = useRef(pool);
@@ -160,12 +154,12 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
   useEffect(() => nextRound(), []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   /** The child picked shadow `index`; `from` is how far the dragged picture already is from its place. */
@@ -325,7 +319,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || !round || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.shadows.length;
@@ -363,7 +357,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       className="shadows-play"
       onPointerDown={(e) => {
         setThemesOpen(false);
-        funBurst(e.clientX, e.clientY);
+        softTap(e.clientX, e.clientY);
       }}
     >
       <div className="sh-top">
@@ -462,7 +456,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
           )}
         </div>
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

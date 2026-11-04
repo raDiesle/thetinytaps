@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App";
 import { BackgroundMusic } from "./components/BackgroundMusic";
+import { MenuRipples } from "./components/MenuRipples";
 import { PlaytimeLock } from "./components/PlaytimeLock";
 import { ScreenHint } from "./components/ScreenHint";
 import { SeoHead } from "./components/SeoHead";
@@ -30,6 +31,7 @@ createRoot(document.getElementById("root")!).render(
       <ScreenHint />
       <SeoHead />
       <BackgroundMusic />
+      <MenuRipples />
     </BrowserRouter>
   </StrictMode>,
 );

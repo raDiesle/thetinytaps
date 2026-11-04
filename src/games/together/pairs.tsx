@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MASCOT_COLORS, type MascotKind, MascotHead } from "@/components/Mascot";
 import type { Localized } from "@/lib/language";
 import { playGiggle, playSplash } from "@/lib/realSounds";
 import {
@@ -79,44 +80,25 @@ export interface Pair {
 }
 
 const OUT = "#5a4636";
-const FOX = "#f08c3a";
-const BEAR = "#a8743f";
 
 /**
  * A fox or bear standing, drawn in a frame 100 wide and 140 high whose top left lies at `x`, `y`, scaled by `s`;
  * `coat` colours its body, `hat` (in the frame's units) sits on its head, `extra` lies on its body.
  */
-function critter(fur: "fox" | "bear", x: number, y: number, s: number, coat: string, hat?: ReactNode, extra?: ReactNode) {
-  const colour = fur === "fox" ? FOX : BEAR;
+function critter(fur: MascotKind, x: number, y: number, s: number, coat: string, hat?: ReactNode, extra?: ReactNode) {
+  // A child is drawn smaller (`s`) and gets a child's bigger eyes.
+  const small = s < 0.7;
+  const paw = MASCOT_COLORS[fur].paw;
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`}>
       <path d="M20 140 C20 104 30 82 50 82 C70 82 80 104 80 140 Z" fill={coat} stroke={OUT} strokeWidth="3" />
       {extra}
-      {fur === "fox" ? (
-        <>
-          <path d="M24 40 L22 6 L46 26 Z" fill={colour} stroke={OUT} strokeWidth="3" strokeLinejoin="round" />
-          <path d="M76 40 L78 6 L54 26 Z" fill={colour} stroke={OUT} strokeWidth="3" strokeLinejoin="round" />
-          <path d="M27 32 L26 14 L39 26 Z M73 32 L74 14 L61 26 Z" fill="#5a3a28" />
-          <circle cx="50" cy="52" r="30" fill={colour} stroke={OUT} strokeWidth="3" />
-          <path d="M24 58 Q50 92 76 58 Q62 64 50 60 Q38 64 24 58 Z" fill="#fff4e6" />
-        </>
-      ) : (
-        <>
-          <circle cx="27" cy="28" r="12" fill={colour} stroke={OUT} strokeWidth="3" />
-          <circle cx="73" cy="28" r="12" fill={colour} stroke={OUT} strokeWidth="3" />
-          <circle cx="27" cy="28" r="6" fill="#e8c9a0" />
-          <circle cx="73" cy="28" r="6" fill="#e8c9a0" />
-          <circle cx="50" cy="52" r="30" fill={colour} stroke={OUT} strokeWidth="3" />
-          <ellipse cx="50" cy="63" rx="15" ry="11" fill="#e8c9a0" />
-        </>
-      )}
-      <circle cx="40" cy="47" r="4" fill={OUT} />
-      <circle cx="60" cy="47" r="4" fill={OUT} />
-      <ellipse cx="50" cy="59" rx="5.5" ry="4" fill={OUT} />
-      <path d="M44 68 Q50 74 56 68" stroke={OUT} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <g transform="translate(10 8.8) scale(0.8)">
+        <MascotHead kind={fur} child={small} />
+      </g>
       {hat}
-      <circle cx="36" cy="104" r="8" fill={colour} stroke={OUT} strokeWidth="3" />
-      <circle cx="64" cy="104" r="8" fill={colour} stroke={OUT} strokeWidth="3" />
+      <circle cx="36" cy="104" r="8" fill={paw} stroke={OUT} strokeWidth="3" />
+      <circle cx="64" cy="104" r="8" fill={paw} stroke={OUT} strokeWidth="3" />
     </g>
   );
 }

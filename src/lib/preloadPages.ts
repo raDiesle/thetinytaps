@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { savesData } from "@/lib/pwa";
 
 // Every game page is lazy-loaded (App.tsx), so tapping its card used to download and run its whole chunk first, while
 // the menu stood still. A menu loads the pages behind its cards while it waits for the tap instead.
@@ -63,7 +64,8 @@ export function usePreloadPages(hrefs: string[]) {
         });
     };
     const start = () => {
-      handle = idle(next);
+      // Saving data, only the card tapped loads its page (preloadPage, as the finger lands).
+      if (!savesData()) handle = idle(next);
     };
     // Not before the page has loaded: on a first visit the menu itself comes first.
     if (document.readyState === "complete") start();

@@ -199,7 +199,7 @@ export const SITE_TRACK: TrackTheme = {
     ar: "امتلأ! الرافعة ترفع كل شيء!",
     ru: "Полный! Кран поднимает всё наверх!",
   },
-  peekers: ["👷", "🐿️", "🦔", "🐌", "🐭", "🐦"],
+  peekers: ["🦊", "🐿️", "🦔", "🐌", "🐻", "🐦"],
   magic: false,
   End: SkipEnd,
   pileLift: liftAt,

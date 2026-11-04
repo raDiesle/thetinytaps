@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { FILMS } from "./films";
 import type { Point } from "../trail/types";
-import type { Box, Film, Scene } from "./types";
+import { type Box, type Film, PACE, type Scene } from "./types";
 
 /** Every way through a film: the picks of each, made one choice after the other. */
 function pathsOf(film: Film, picks: string[] = []): string[][] {
@@ -48,6 +48,17 @@ for (const film of FILMS) {
       }
     });
 
+    test("each way comes out as a card of its own, a close-up with its own sound, not the strip's small picture", () => {
+      for (const scene of all.values()) {
+        const options = scene.choice?.options ?? [];
+        expect(new Set(options.map((o) => o.card)).size, scene.id).toBe(options.length);
+        for (const o of options) {
+          expect(o.card, `${scene.id} ${o.id}`).not.toBe(o.picture);
+          expect(o.sounds?.length, `${scene.id} ${o.id}`).toBeGreaterThan(0);
+        }
+      }
+    });
+
     test("what the child taps lies wholly in the part of the picture that is always seen", () => {
       for (const scene of all.values()) {
         for (const beat of scene.beats) if (beat.tap) expect(inside(scene.focus, beat.tap.at, beat.tap.r), `${scene.id} ${beat.ask}`).toBe(true);
@@ -67,6 +78,18 @@ for (const film of FILMS) {
         if (scene.choice) lines.push(scene.choice.ask, ...scene.choice.options.map((o) => o.say));
       }
       for (const line of lines) expect(line.trim()).toMatch(/^[A-ZÄÖÜ„]/);
+    });
+
+    test("it keeps a calm pace: few sounds, well apart, and time to listen to every line", () => {
+      expect(PACE).toBeGreaterThanOrEqual(1.5);
+      for (const scene of all.values()) {
+        for (const beat of scene.beats) {
+          const at = (beat.sounds ?? []).map(([ms]) => ms * PACE);
+          expect(at.length, scene.id).toBeLessThanOrEqual(3);
+          for (let i = 1; i < at.length; i++) expect(at[i] - at[i - 1], `${scene.id}: sounds too close`).toBeGreaterThanOrEqual(900);
+          if (beat.say) expect(beat.ms * PACE, `${scene.id}: ${beat.say}`).toBeGreaterThanOrEqual(2700);
+        }
+      }
     });
   });
 }

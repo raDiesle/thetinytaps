@@ -30,6 +30,17 @@ describe("lines still to record", () => {
     }
   });
 
+  // Kettenreaktion's levels write some lines inline (`say({ de: … })`, a marble run's `full`): five were once missing
+  // from the list, so they were never recorded.
+  test("every line a Kettenreaktion level writes inline is on the list", () => {
+    const listed = new Set(GAMES.find((g) => g.href === "/kettenreaktion/")?.groups.flatMap((g) => g.lines));
+    for (const file of sources(join("src", "games", "marbles"))) {
+      const code = readFileSync(file, "utf8");
+      for (const [, text] of code.matchAll(/(?:say\(|full: )\{\s*de: "([^"]+)"/g))
+        expect({ file, text, listed: listed.has(text) }).toEqual({ file, text, listed: true });
+    }
+  });
+
   // The browser's voice speaks only for a line not recorded yet, and only in a game whose story is told by the voice
   // (root CLAUDE.md): src/lib/voice.ts does that for the games below. Every other call of it stays where the shared
   // read aloud option, which is always off, guards it – the good-night screen once spoke without it.

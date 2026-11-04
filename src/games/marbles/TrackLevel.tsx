@@ -1,5 +1,5 @@
 import { memo, useContext, useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
-import { BRIGHT_COLORS } from "@/components/Bursts";
+import { BRIGHT_COLORS } from "@/components/TapFeedback";
 import { cameraLayer, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
 import { SITE_TRACK } from "./siteTrack";
@@ -1808,7 +1808,7 @@ export const WOODEN: TrackTheme = {
     ar: "السلة ممتلئة!",
     ru: "Корзина полна!",
   },
-  peekers: ["🐭", "🐸", "🐰", "🐱", "🐻", "🐥"],
+  peekers: ["🐭", "🐸", "🐰", "🦊", "🐻", "🐥"],
   magic: true,
   End: WoodenEnd,
 };

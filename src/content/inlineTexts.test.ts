@@ -13,6 +13,8 @@ const FOLDERS: Record<string, string[]> = {
   "/bilder/": ["src/games/scenes"],
   "/abenteuer/": ["src/games/adventure"],
   "/gefuehle/": ["src/games/feelings"],
+  // A game of its own in the book „Gefühle“, sharing the folder: its own files only.
+  "/wie-gehts-dir/": ["src/games/feelings/MoodGame.tsx", "src/games/feelings/MoodPlay.tsx", "src/games/feelings/mood.ts"],
   "/kettenreaktion/": ["src/games/marbles"],
   "/kleine-abenteuer/": ["src/games/elevator"],
   "/tiere/": ["src/games/animals"],

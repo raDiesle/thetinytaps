@@ -47,5 +47,8 @@ Every six rounds count as a game for the play-time limit (`gameEnded`, `countGam
 
 ## Languages
 
-German only so far (`TOGETHER_TEXTS`, inline `t({ de })`); the voice lines wait on `/management/` (`voiceLines.ts`).
+German only so far (`TOGETHER_TEXTS`, inline `t({ de })`). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only so far
+(November 2026): a sentence in another language stays silent until the user asks for its recordings, a German fallback
+sentence plays its German one. A new or changed sentence is listed by `src/content/recordedLines.ts` (`zusammen`) and recorded with
+`bun run voice make --only zusammen`, only when the user asks.
 Translations and recordings only when the user asks; `languageStatus.ts` says what is missing.

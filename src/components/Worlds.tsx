@@ -3,18 +3,18 @@ import type { ReactNode } from "react";
 /*
  * Each home category has a world of its own (idea V-08), so a child finds „its“ area again by the picture: a meadow
  * with a farm for Lebendige Welten, a table with toys for Zuordnen, building blocks for Buchstaben & Zahlen and a
- * children's room for the Alltagshelfer. Its menus show it behind the cards (Sky), its book on the home page's shelf a
+ * children's room for the Alltagshelfer, a cosy living room with a sofa for Gefühle. Its menus show it behind the cards (Sky), its book on the home page's shelf a
  * small piece of it (WorldCardScene). The things are drawn once here, each in its own box, and placed by the two.
  */
 
 /** The categories that have a world drawn here: every one of the home menu (content.test.ts checks it). */
-export const WORLDS = ["lebendige-welten", "zuordnen", "buchstaben-zahlen", "alltag"] as const;
+export const WORLDS = ["lebendige-welten", "zuordnen", "buchstaben-zahlen", "alltag", "gefuehle"] as const;
 
 /** A category id that has a world drawn here. */
 export type WorldId = (typeof WORLDS)[number];
 
 /** Worlds inside a room: a wall with a window (the sun looks in) instead of the open sky with hills. */
-export const INDOOR: readonly string[] = ["zuordnen", "alltag"];
+export const INDOOR: readonly string[] = ["zuordnen", "alltag", "gefuehle"];
 
 /** A red barn with a white door; box 120 × 110. */
 function Barn() {
@@ -165,6 +165,33 @@ function Teddy() {
 }
 
 /** The sun of the menus, its rays turning; box 200 × 200. */
+/** A soft sofa with two cushions, where one sits close together; box 160 × 90. */
+function Sofa() {
+  return (
+    <g className="world-line">
+      <rect x="6" y="8" width="148" height="50" rx="18" fill="#7fb3e8" />
+      <rect x="2" y="40" width="156" height="36" rx="12" fill="#9cc6f0" />
+      <rect x="0" y="30" width="26" height="48" rx="12" fill="#7fb3e8" />
+      <rect x="134" y="30" width="26" height="48" rx="12" fill="#7fb3e8" />
+      <rect x="34" y="20" width="36" height="28" rx="10" fill="#ffd23f" />
+      <path d="M100 26 C100 18 112 16 114 24 C116 16 128 18 128 26 C128 36 114 44 114 44 C114 44 100 36 100 26 Z" fill="#ff7aa2" />
+      <rect x="14" y="76" width="10" height="12" rx="3" fill="#a8693f" />
+      <rect x="136" y="76" width="10" height="12" rx="3" fill="#a8693f" />
+    </g>
+  );
+}
+
+/** A standing lamp with a warm shade, for reading in the evening; box 50 × 130. */
+function Lamp() {
+  return (
+    <g className="world-line">
+      <path d="M8 40 L16 6 H34 L42 40 Z" fill="#ffe08a" />
+      <rect x="22" y="40" width="6" height="80" fill="#a8693f" />
+      <ellipse cx="25" cy="124" rx="18" ry="5" fill="#a8693f" />
+    </g>
+  );
+}
+
 export function Sun() {
   return (
     <>
@@ -273,6 +300,22 @@ export function WorldGround({ world }: { world: WorldId }) {
           </Thing>
         </>
       );
+    case "gefuehle":
+      return (
+        <>
+          <svg className="world-floor" viewBox="0 0 1200 100" preserveAspectRatio="none">
+            <path className="world-floor-boards" d="M-10 4 H1210 V110 H-10 Z" />
+            <path className="world-floor-lines" d="M-10 36 H1210 M-10 70 H1210" />
+            <ellipse className="world-rug world-rug-calm" cx="600" cy="62" rx="300" ry="30" />
+          </svg>
+          <Thing name="sofa" box="0 0 160 90">
+            <Sofa />
+          </Thing>
+          <Thing name="lamp" box="0 0 50 130">
+            <Lamp />
+          </Thing>
+        </>
+      );
   }
 }
 
@@ -319,6 +362,18 @@ export function WorldCardScene({ world }: { world: WorldId }) {
           </g>
           <g transform="translate(250 64) scale(0.5)">
             <Teddy />
+          </g>
+        </>
+      )}
+      {world === "gefuehle" && (
+        <>
+          <rect className="world-card-calm" x="-400" y="-300" width="1100" height="460" />
+          <path className="world-floor-boards" d="M-400 120 H700 V160 H-400 Z" />
+          <g transform="translate(6 70) scale(0.56)">
+            <Sofa />
+          </g>
+          <g transform="translate(262 52) scale(0.52)">
+            <Lamp />
           </g>
         </>
       )}

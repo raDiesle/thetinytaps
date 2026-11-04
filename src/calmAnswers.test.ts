@@ -61,16 +61,16 @@ test("the end buttons come calmly and never call", () => {
   expect(calling).toEqual([]);
 });
 
-// `spawn()` without a place showers shapes over the whole screen: a firework, only for a level's end or a story's
-// party, never after a choice or an answer. A shower somewhere new must be such an end and be added here on purpose.
-const SHOWERS = new Set([
+// `celebrate()` lets hearts, stars and notes rise: only for a level's or a story's end, never after a choice or an
+// answer. A celebration somewhere new must be such an end and be added here on purpose.
+const ENDS = new Set([
   "src/games/elevator/ElevatorPlay.tsx", // the story's party at its end
   "src/games/elevator/film/FilmPlay.tsx", // the film's party at its end
   "src/games/elevator/trail/TrailPlay.tsx", // the finale when the goal is back
   "src/games/marbles/MarblePlay.tsx", // the machine's party when it has run
   "src/games/pacifier/PacifierPlay.tsx", // the present unwrapped in the story
   "src/games/potty/PottyPlay.tsx", // it came, and the party at the end (Aufs Töpfchen's point)
-  "src/games/rewards/BoardScreen.tsx", // a full star chart
+  "src/games/rewards/BoardScreen.tsx", // a full star chart, a full day
   "src/games/rewards/PlanScreen.tsx", // the day's plan done
   "src/games/scenes/ScenePlay.tsx", // every item of a picture found
   "src/games/socks/SocksPlay.tsx", // the whole wash on the line
@@ -78,10 +78,11 @@ const SHOWERS = new Set([
   "src/games/weaning/WeaningPlay.tsx", // the morning at the story's end
 ]);
 
-test("shapes shower only at a level's or story's end", () => {
-  const showering = files
-    .filter((file) => /\.tsx?$/.test(file) && !file.endsWith(".test.ts"))
+test("things rise only at a level's or story's end", () => {
+  const celebrating = files
+    .filter((file) => file.endsWith(".tsx"))
     .map((file) => join("src", file))
-    .filter((file) => /\bspawn\(\)/.test(readFileSync(file, "utf8")));
-  expect(showering.filter((file) => !SHOWERS.has(file))).toEqual([]);
+    .filter((file) => /\bcelebrate\(/.test(readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")))
+    .filter((file) => !file.endsWith("TapFeedback.tsx"));
+  expect(celebrating.filter((file) => !ENDS.has(file))).toEqual([]);
 });

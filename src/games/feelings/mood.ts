@@ -1,12 +1,8 @@
 // Wie geht's dir heute? The child picks the weather that fits how it feels; the
-// bear says he knows that too, and then his own story with that feeling shows
-// what helps. Grown-ups learn on the way how the child is doing.
+// bear says he knows that too, and then the scenes of that feeling show what
+// helps. Grown-ups learn on the way how the child is doing.
 
 import type { Localized } from "@/lib/language";
-import type { FeelingId } from "./bear";
-
-/** The mode on the start screen that begins with the weather pictures. */
-export const MOOD_ID = "mood";
 
 export type WeatherId = "sonne" | "wolke" | "regen" | "gewitter";
 
@@ -15,36 +11,30 @@ export interface Weather {
   id: WeatherId;
   /** What the card shows, for grown-ups under it, in every language the game speaks. */
   caption: Localized;
-  /** The bear's story that is played next. */
-  feeling: FeelingId;
-  /** Floats up when it is picked. */
-  float: string;
+  /** The group of scenes played next (`GROUPS`). */
+  group: string;
 }
 
 export const WEATHERS: Weather[] = [
   {
     id: "sonne",
     caption: { de: "Sonne, fröhlich", ru: "Солнце, весело", en: "Sun, happy", zh: "太阳，开心", hi: "धूप, खुश", es: "Sol, alegre", ar: "شمس، فرح" },
-    feeling: "happy",
-    float: "☀️",
+    group: "freude",
   },
   {
     id: "wolke",
     caption: { de: "Wolke, müde", ru: "Облако, сонно", en: "Cloud, tired", zh: "多云，困了", hi: "बादल, थकान", es: "Nube, sueño", ar: "غيمة، تعب" },
-    feeling: "tired",
-    float: "☁️",
+    group: "muede",
   },
   {
     id: "regen",
     caption: { de: "Regen, traurig", ru: "Дождь, грустно", en: "Rain, sad", zh: "下雨，难过", hi: "बारिश, उदास", es: "Lluvia, triste", ar: "مطر، حزن" },
-    feeling: "sad",
-    float: "💧",
+    group: "traurig",
   },
   {
     id: "gewitter",
     caption: { de: "Gewitter, wütend", ru: "Гроза, сердито", en: "Storm, angry", zh: "打雷，生气", hi: "तूफ़ान, गुस्सा", es: "Tormenta, enojo", ar: "عاصفة، غضب" },
-    feeling: "angry",
-    float: "⚡",
+    group: "wuetend",
   },
 ];
 

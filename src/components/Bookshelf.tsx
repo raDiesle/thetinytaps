@@ -455,8 +455,12 @@ function Compartment({
       )}
       {label && <span className="shelf-group-label shelf-board-label">{t(label)}</span>}
       {things.includes("figure") && (
-        // The stickers of the child's figure, stuck on the compartment's right wall.
+        // The stickers of the child's figure, stuck on the compartment's right wall, and „Wer spielt?“ written small on
+        // that wall right above the fox's head (user feedback, November 2026).
         <div className="shelf-side-stuck">
+          <span className="shelf-figure-ask" aria-hidden>
+            {t({ de: "Wer spielt?" })}
+          </span>
           <RoomStickers />
         </div>
       )}

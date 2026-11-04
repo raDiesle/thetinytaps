@@ -29,6 +29,12 @@
   --w3: #d7b8ff;
 }
 
+[data-world="gefuehle"] {
+  --w1: #7fb3e8;
+  --w2: #ffb38a;
+  --w3: #b8e0c8;
+}
+
 .game-list li[data-world],
 .game-list[data-world] > li:nth-child(3n + 1),
 .game-list .mode-group[data-world] li:nth-child(3n + 1) {
@@ -120,6 +126,14 @@
     radial-gradient(circle, #fff 0 5px, transparent 6px) 0 0 / 56px 56px,
     radial-gradient(circle, #ffc2e0 0 4px, transparent 5px) 28px 28px / 56px 56px,
     #ffe3f1;
+}
+
+/* Gefühle: a living room in soft blue with little hearts, calm and warm. */
+.sky[data-world="gefuehle"] {
+  background:
+    radial-gradient(circle, #fff 0 4px, transparent 5px) 0 0 / 64px 64px,
+    radial-gradient(circle, #ffc6d6 0 4px, transparent 5px) 32px 32px / 64px 64px,
+    #e3efff;
 }
 
 .world-window {
@@ -239,6 +253,22 @@
   width: clamp(56px, 11vh, 120px);
 }
 
+.world-rug-calm {
+  fill: #b8e0c8;
+}
+
+.world-sofa {
+  bottom: calc(clamp(56px, 11vh, 120px) * 0.45);
+  left: 3%;
+  width: clamp(120px, 22vh, 260px);
+}
+
+.world-lamp {
+  right: 5%;
+  bottom: calc(clamp(56px, 11vh, 120px) * 0.45);
+  width: clamp(40px, 8vh, 84px);
+}
+
 /* ----- The cards ----- */
 
 /* A piece of the category's world on its picture book's cover (Bookshelf), inside the cover's border. */
@@ -265,6 +295,10 @@
 
 .world-card-room {
   fill: #ffe3f1;
+}
+
+.world-card-calm {
+  fill: #e3efff;
 }
 
 .world-card-scene .hill-back,

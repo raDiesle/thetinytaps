@@ -153,6 +153,12 @@ ffmpeg -i Song.wav -af "loudnorm=I=-16:TP=-1.5:LRA=11" -ar 44100 -c:a libmp3lame
   and keeps one only once a page has fetched it, so nothing is downloaded while
   music is off on the home page. 128 kbit/s stereo ≈ 1 MB per minute; keep songs at
   about 2–2.5 minutes.
+- **An instrumental loop in the background goes mono at 64 kbit/s** (`-ac 1 -b:a 64k` instead of `-b:a 128k`): it
+  plays quietly under the taps, where stereo isn't heard, and it halves both the download and the decoded song in the
+  phone's memory (the background song went from 2.5 to 1.3 MB, user feedback, November 2026). Stay with MP3 – every
+  browser decodes it, Opus would save only a little more and not every Safari decodes it. Cutting a Suno song into
+  repeated pieces doesn't work: its bars are rendered anew each time, no two are the same waveform. Songs that are sung
+  or that a game runs along (Zähneputzen-Lied) keep 128 kbit/s stereo.
 - `musik/README.md` in the game folder: file, source (Suno, date), terms. Commit the
   MP3, never the WAV.
 

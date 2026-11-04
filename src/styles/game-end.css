@@ -6,6 +6,7 @@
   left: 50%;
   z-index: 8;
   display: flex;
+  align-items: flex-end;
   gap: clamp(12px, 3vw, 36px);
   translate: -50% 0;
   animation: game-end-in 0.5s ease-out;
@@ -18,31 +19,72 @@
   }
 }
 
-.game-end-button {
+/* In the game's own layout (`inline`), where it places the buttons itself. */
+.game-end.inline {
+  position: static;
+  translate: none;
+}
+
+/* „Menü“ and „Nochmal“, stacked beside „Weiter“ and together as tall as it; side by side where there is no „Weiter“. */
+.game-end-small {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-width: clamp(140px, 24vw, 250px);
-  padding: 8px 24px 14px;
+  gap: clamp(8px, 2vh, 14px);
+}
+
+.game-end:not(:has(.next)) .game-end-small {
+  flex-direction: row;
+}
+
+/* Without „Weiter“ the two are the only way on, so they grow halfway to its size. */
+.game-end:not(:has(.next)) .game-end-button {
+  font-size: clamp(1.4rem, 8vh, 2.8rem);
+}
+
+/* Words only, no emoji or symbols (user feedback, November 2026). */
+.game-end-button {
+  position: relative;
+  padding: 0.35em 0.9em 0.4em;
   border: var(--outline);
-  border-radius: 32px;
+  border-radius: 24px;
   background: #fff;
   box-shadow: var(--lift);
   color: var(--ink);
   font: inherit;
-  font-size: clamp(1.3rem, 3.4vw, 2rem);
+  font-size: clamp(1.15rem, 5.6vh, 1.9rem);
   font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
   cursor: pointer;
   touch-action: manipulation;
 }
 
+/* „Weiter“, what most want next: twice as big, painted, and breathing a little. */
 .game-end-button.next {
-  background: var(--sunshine);
+  padding: 0.3em 0.85em 0.36em;
+  background: var(--tomato);
+  color: #fff;
+  font-size: clamp(2.1rem, 13vh, 4.6rem);
+  -webkit-text-stroke: 0.06em var(--ink);
+  paint-order: stroke fill;
 }
 
 .game-end-button:active {
-  translate: 0 6px;
-  box-shadow: 0 2px 0 var(--ink);
+  translate: 0 4px;
+}
+
+/* The fox or bear family beside the buttons (D-12, `CheeringFamily`), as tall as a button. Upright the buttons alone
+   fill the width. */
+.game-end-family {
+  flex-shrink: 0;
+  align-self: flex-end;
+  height: clamp(90px, 30vh, 170px);
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .game-end-family {
+    display: none;
+  }
 }
 
 /* Small in the bottom corners (`corners`): „Menü“ left, the others right, the picture free between them. */
@@ -55,29 +97,12 @@
   pointer-events: none;
 }
 
+/* Its buttons lie in the corners themselves, not stacked. */
+.game-end.corners .game-end-small {
+  display: contents;
+}
+
 .game-end.corners .game-end-button {
-  min-width: 0;
-  padding: 4px 14px 8px;
-  border-radius: 22px;
   font-size: clamp(0.95rem, 2.2vw, 1.25rem);
   pointer-events: auto;
-}
-
-.game-end.corners .game-end-emoji {
-  font-size: clamp(1.6rem, 7vh, 2.8rem);
-}
-
-/* „Menü“: four cards drawn in the size of an emoji. */
-.menu-icon {
-  width: 0.9em;
-  height: 0.9em;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-  vertical-align: -0.12em;
-}
-
-.game-end-emoji {
-  font-family: var(--font-emoji);
-  font-size: clamp(3.2rem, 13vh, 6.4rem);
-  line-height: 1.15;
 }

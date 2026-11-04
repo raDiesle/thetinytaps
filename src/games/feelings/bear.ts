@@ -12,8 +12,8 @@ export interface Comfort {
   /** What to do, in a word or two („Hand halten“): for grown-ups under the card, said by screen readers. */
   caption: string;
   narration: string;
-  /** Little things that float up from him. */
-  float: string;
+  /** Who does it: the child for the bear („Du nimmst den Bären in den Arm.“), or the bear himself („Stampf, stampf!“). */
+  actor: "child" | "bear";
   sound: SoundName;
 }
 
@@ -21,73 +21,73 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
   stroke: {
     caption: "Streicheln",
     narration: "Du streichelst den Bären. Ganz sanft.",
-    float: "💛",
+    actor: "child",
     sound: "hum",
   },
   hug: {
     caption: "Umarmen",
     narration: "Du nimmst den Bären fest in den Arm.",
-    float: "💛",
+    actor: "child",
     sound: "hum",
   },
   teddy: {
     caption: "Teddy geben",
     narration: "Du gibst dem Bären einen Teddy zum Kuscheln.",
-    float: "💛",
+    actor: "child",
     sound: "pop",
   },
   stomp: {
     caption: "Stampfen",
     narration: "Stampf, stampf! Die Wut darf raus.",
-    float: "💥",
+    actor: "bear",
     sound: "stomp",
   },
   blow: {
     caption: "Tief pusten",
     narration: "Tief einatmen … und auspusten: Puuuh.",
-    float: "💨",
+    actor: "bear",
     sound: "breath",
   },
   liedown: {
     caption: "Hinlegen und zudecken",
     narration: "Der Bär legt sich hin und deckt sich zu. Schön warm.",
-    float: "✨",
+    actor: "bear",
     sound: "hum",
   },
   lullaby: {
     caption: "Schlaflied hören",
     narration: "Der Bär macht die Augen zu und hört ein leises Schlaflied.",
-    float: "🎵",
+    actor: "bear",
     sound: "musicbox",
   },
   cuddle: {
     caption: "Teddy kuscheln",
     narration: "Der Bär kuschelt sich an seinen Teddy.",
-    float: "💛",
+    actor: "bear",
     sound: "hum",
   },
   hand: {
     caption: "Hand halten",
     narration: "Du hältst seine Pfote. Du bist da.",
-    float: "💛",
+    actor: "child",
     sound: "hum",
   },
   light: {
     caption: "Licht anmachen",
     narration: "Du machst Licht an. Jetzt ist es hell.",
-    float: "✨",
+    actor: "child",
     sound: "light",
   },
   dance: {
     caption: "Mittanzen",
     narration: "Ihr tanzt zusammen. Hüpf, hüpf!",
-    float: "🎵",
+    actor: "child",
     sound: "boing",
   },
   streamers: {
     caption: "Luftschlangen werfen",
     narration: "Du wirfst bunte Luftschlangen. Hurra!",
-    float: "🎉",
+    actor: "child",
     sound: "partyhorn",
   },
 };

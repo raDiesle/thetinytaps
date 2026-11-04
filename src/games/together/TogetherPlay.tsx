@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage, voiceFor } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import type { TogetherRound } from "./levels";
 import { PairPicture, PartnerIcon } from "./PairPicture";
 import { TOGETHER_TEXTS, WORK_MS } from "./pairs";
 import type { TogetherSettings } from "./settings";
+import { togetherVoice } from "./voice";
 
 /** The picked partner's flight up into the picture, before the two set to work. */
 const FLIGHT_MS = 500;
@@ -52,7 +52,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
   const busy = useRef(false);
   /** Bumped to make the picture hop when it is tapped to ask once more. */
   const [nudge, setNudge] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple } = useTapFeedback();
   /** Wrong ones picked in this round, for the difficulty. */
   const misses = useRef(0);
   const topRef = useRef<HTMLDivElement>(null);
@@ -72,24 +72,20 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      // A sentence not translated yet comes in German, and the German voice reads it.
-      const voice = voiceFor(text, language);
-      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
-    },
-    [settings.speech, language.id, language.speechLang],
-  );
+  // Its ElevenLabs recording; a sentence not translated yet is said in German.
+  const say = useCallback((text: string, queue = false) => togetherVoice.say(text, language.id, { queue }), [language.id]);
+  // Its few sentences load as the game starts, so even the first is heard right away.
+  useEffect(() => togetherVoice.loadAll(language.id), [language.id]);
 
   // The question comes with the round; the round is mounted anew for every pair.
   useEffect(() => say(texts.question(round.pair)), []);
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   const choose = (index: number) => {
@@ -148,7 +144,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       if (outcome) {
-        funBurst();
+        softTap();
         return;
       }
       const count = round.choices.length;
@@ -176,7 +172,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
   });
 
   return (
-    <div className={`together-play kind-${round.kind}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className={`together-play kind-${round.kind}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <div className="tg-top">
         <div ref={topRef} className={`tg-above${nudge && !working ? ` tg-nudge-${nudge % 2}` : ""}`} data-tap onPointerDown={onTopDown}>
           <PairPicture pair={round.pair} working={working} label={texts.name(round.pair)} />
@@ -214,7 +210,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
           })}
         </div>
       </div>
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

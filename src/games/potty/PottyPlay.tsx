@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
-import { targetLanguageFor } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
-import { useAppLanguage, useT, voiceFor } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import {
   playBoing,
   playChime,
@@ -31,7 +30,6 @@ import {
   recorded,
 } from "@/lib/sfx";
 import { loadRealSounds, playGiggle, playWhistle } from "@/lib/realSounds";
-import { speak } from "@/lib/speech";
 import {
   expectedWent,
   iconFor,
@@ -54,6 +52,7 @@ import { framesFor, preloadImages } from "./images";
 import type { PottySettings } from "./settings";
 import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
+import { pottyVoice } from "./voice";
 import { WaitClock } from "./WaitClock";
 import { WeekStars } from "./WeekStars";
 import { useWaitingMusic } from "./waitMusic";
@@ -81,7 +80,7 @@ const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
-/** Taps this soon after a step began only sparkle, so a double tap doesn't skip a step. */
+/** Taps this soon after a step began only ripple, so a double tap doesn't skip a step. */
 const TAP_GUARD_MS = 350;
 const DONE = STEPS.findIndex((s) => s.id === "done");
 const SIT = STEPS.findIndex((s) => s.id === "sit");
@@ -94,6 +93,8 @@ interface Begin {
   said?: Said;
   /** Whether nothing came (the other story). */
   nothing?: boolean;
+  /** The step's words wait for what is being said (what the child said, just picked). */
+  queue?: boolean;
 }
 
 /**
@@ -118,7 +119,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [asking, setAsking] = useState(false);
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, glow, celebrate } = useTapFeedback();
 
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
@@ -175,16 +176,12 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     preloadImages(names);
   }, [at.step, at.nothing, said, went, scenes]);
 
-  const say = (text: string) => {
-    if (settings.speech) speak(text, voiceFor(text, language));
-  };
-  /** A thought's line; one not translated yet is said in German with the German voice, then the rest in the app's. */
+  /** Says `text` from its ElevenLabs recording (a German one where it is not translated); `queue` waits for what is said. */
+  const say = (text: string, queue = false) => pottyVoice.say(text, language.id, { queue });
+  /** A thought's line, in German where it is not translated yet, and after it what the ✓ is for. */
   const sayScene = (id: string, withFinish: boolean) => {
-    const own = texts.scenes[id];
-    if (own !== undefined) return say(withFinish ? `${own} ${texts.finish}` : own);
-    if (!settings.speech) return;
-    speak(POTTY_TEXTS.de.scenes[id], targetLanguageFor("de").speechLang);
-    if (withFinish) speak(texts.finish, voiceFor(texts.finish, language), { queue: true });
+    say(texts.scenes[id] ?? POTTY_TEXTS.de.scenes[id]);
+    if (withFinish) say(texts.finish, true);
   };
   const sound = (ms: number, play: () => void) => {
     if (settings.sounds) later(ms, play);
@@ -206,7 +203,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /** Plays step `index`: its picture shows, its sounds and words come here. */
-  const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing }: Begin = {}) => {
+  const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing, queue = false }: Begin = {}) => {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
     startedAt.current = performance.now();
@@ -214,7 +211,11 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     const line = texts.steps[id](t(TAPSI.name), came ?? saidNow);
     // The end shows this week's stars, with a new one only when a ✓ said what really came in this round.
     const star = id === "stars" && checked.current && !starred.current;
-    say(star ? texts.star : nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
+    if (star) say(texts.star, queue);
+    else if (nothing && id === "wash") {
+      say(texts.nothing, queue);
+      say(line, true);
+    } else say(line, queue);
     switch (id) {
       case "eat":
         // In time with the pictures: eating first, drinking when its picture comes.
@@ -247,7 +248,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         if (came !== "kaka") sound(0, playTrickle);
         if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
         sound(900, cheer);
-        for (let i = 0; i < 8; i++) later(600 + i * 120, () => spawn());
+        later(600, () => celebrate());
         break;
       case "wipe":
         sound(300, playRip);
@@ -267,7 +268,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       case "party":
         sound(0, cheer);
         sound(300, partyHorn);
-        for (let i = 0; i < 12; i++) later(i * 150, () => spawn());
+        celebrate();
         break;
       case "stars":
         if (star) {
@@ -336,14 +337,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   /**
    * A tap anywhere on the picture (not on a button) or a key: while sitting the next thought, everywhere else just what
    * „Weiter“ does, also while the step's sounds still run (what the child said stays as picked, unknown when nobody
-   * did). It only sparkles at the end, right after a step began (a double tap), and while a thought still runs.
+   * did). It only ripples at the end, right after a step began (a double tap), and while a thought still runs.
    */
   const act = (x?: number, y?: number) => {
     const { step: index, nothing } = atRef.current;
     const here = storyFor(nothing);
     const sittingNow = here[index].id === "sit";
     if (index >= here.length - 1 || (sittingNow ? busyRef.current : performance.now() - startedAt.current < TAP_GUARD_MS)) {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
       return;
     }
@@ -369,13 +370,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   }, [at]);
 
   /** A button while calling: what the child said is kept, and the story goes on with it at once – the only way on there. */
-  const pick = (choice: Went) => {
+  const pick = (choice: Went, e: PointerEvent) => {
     if (settings.sounds) playPop();
+    glow(e.clientX, e.clientY);
     setSaid(choice);
     stopTimers();
-    begin(atRef.current.step + 1, { came: null, said: choice });
-    // Said before the next step's words, which the speech queues after it.
+    // Said before the next step's words, which wait for it.
     say(texts.said[choice]);
+    begin(atRef.current.step + 1, { came: null, said: choice, queue: true });
   };
 
   /** A ✓ while sitting: a grown-up says what is in the potty, and the story goes on with it. */
@@ -530,7 +532,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     aria-pressed={s.id === said}
                     onPointerDown={(e) => {
                       e.stopPropagation();
-                      pick(s.id);
+                      pick(s.id, e);
                     }}
                   >
                     {s.emoji}
@@ -555,7 +557,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     data-tap="goal"
                     aria-label={texts.went[n]}
                     onPointerDown={(e) => {
-                      if (busyRef.current) return; // the tap goes on to sparkle
+                      if (busyRef.current) return; // the tap goes on to ripple
                       e.stopPropagation();
                       finish(n);
                     }}
@@ -571,7 +573,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                   data-tap
                   aria-label={texts.nothing}
                   onPointerDown={(e) => {
-                    if (busyRef.current) return; // the tap goes on to sparkle
+                    if (busyRef.current) return; // the tap goes on to ripple
                     e.stopPropagation();
                     finishWithNothing();
                   }}
@@ -595,7 +597,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       {/* There is one story only, so „Weiter“ would be „Nochmal“ again: only „Menü“ and „Nochmal“, small in the corners
           so the party picture stays free. */}
       {last && <GameEnd delayMs={step.ms} onAgain={restart} corners />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

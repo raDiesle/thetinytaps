@@ -11,7 +11,7 @@ export interface LevelProps {
   say: (text: Localized) => void;
   /** The level is finished: the machine has run, everything has fallen over, or the marble run's basket is full. */
   onDone: () => void;
-  /** Nothing waits for the child: what would wait for a tap goes on by itself (the start screen's choice; so far the marble run's barrier and switch). */
+  /** Nothing waits for the child: what would wait for a tap goes on by itself (the start screen's choice: the marble run's barrier and switch, the machines' stops). */
   watch?: boolean;
 }
 

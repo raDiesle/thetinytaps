@@ -1,5 +1,5 @@
 import { useRef, type CSSProperties, type RefObject } from "react";
-import { STAR_PATH } from "@/components/Bursts";
+import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";

@@ -26,6 +26,9 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
   never a card of its own („Wo ist das B?“ is Wörter tippen's first letter, Zählen is Frei tippen's „Nur Zahlen“), and
   the panel shows only the options of the way being played. An option that changes what comes next (which words, the
   kind of pictures) brings a new word or letter at once (the play component's `key`).
+- The game plays at once in one way, so grown-ups wouldn't guess how many others wait behind ⚙️: as play starts a note
+  under it (`PlayOptions intro`) names them – letters, numbers, counting, whole words, „Wo ist das B?“. When a way to
+  play or a big variant is added, name it there too (user feedback, November 2026).
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the game's shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters
@@ -35,12 +38,19 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
 - One right key is all a round of „Wo ist das B?“ and „Wörter tippen“ takes: after a short moment (`CELEBRATE_MS`) the
   next letter comes by itself (in „Wo ist das B?“), never waiting for another key or tap. The right key's answer is the
   key pressed down and lit, the word said (and a colour word's colour, a doing word acted out) – no shower of shapes, no
-  hopping picture or letters (root `CLAUDE.md`). Keys and taps during that moment only make shapes and sounds.
+  hopping picture or letters (root `CLAUDE.md`). Keys and taps during that moment only make ripples and sounds.
 
 ## Languages
 
 The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`, `es`, `zh`, `hi`, `ar`). The game plays in the pack of
 the app language (🌐, `useLanguagePack()`), never in another one and never with a second one next to it; it has no language choice of its own.
+- What the game says is played from its ElevenLabs recording (`voice.ts`, `useLettersSay`, files in `stimme/`), recorded
+  in German only so far (November 2026); another language stays silent until the user asks for its recordings. A new
+  or changed line comes onto the list by `src/content/voiceLines.ts` (`letters()`), is recorded with `bun run voice make
+  --only buchstaben` only when the user asks, and must be said exactly as listed – `eins!` with its „!“, never `eins`,
+  or its recording is never found. Two lines in a row (a word, then the praise) are said one after the other (`queue`),
+  never joined into one sentence, which has no recording. The counting sentences („drei Äpfel!“, `waiting` in
+  `recordedLines.ts`) are not recorded yet: until they are, a number says its number word alone (`sentenceFor`).
 - Grown-up texts (start screen, options, hints on the play screen) go through `useT()` (`t({ de, ru, en, zh, hi, es, ar })`);
   new or changed lines come German-only until translations are asked for, marked in `languageStatus.ts`.
 - Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` types by key

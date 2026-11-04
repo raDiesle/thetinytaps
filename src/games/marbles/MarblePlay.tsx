@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
-import { type Localized, pick, spokenIn, useAppLanguage } from "@/lib/language";
-import { speak } from "@/lib/speech";
+import { type Localized, pick, useAppLanguage } from "@/lib/language";
 import { BathLevel } from "./BathLevel";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
@@ -23,33 +22,34 @@ import { SpaceLevel } from "./SpaceLevel";
 import { TidyLevel } from "./TidyLevel";
 import { ToppleLevel } from "./ToppleLevel";
 import { SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
+import { marblesVoice } from "./voice";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
 import { DEV } from "@/lib/buildInfo";
 
 /** The levels in turn (names and first lines in `content.ts`). */
-const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps> }[] = [
-  { id: "track", emoji: "🎢", Level: TrackLevel },
-  { id: "snowtrack", emoji: "☃️", Level: SnowTrackLevel },
-  { id: "spacetrack", emoji: "🪐", Level: SpaceTrackLevel },
-  { id: "slidetrack", emoji: "🛟", Level: SlideTrackLevel },
-  { id: "sitetrack", emoji: "🏗️", Level: SiteTrackLevel },
-  { id: "machine", emoji: "⚙️", Level: MachineLevel },
-  { id: "sneeze", emoji: "🤧", Level: SneezeLevel },
-  { id: "kitchen", emoji: "🍳", Level: KitchenLevel },
-  { id: "garden", emoji: "🌻", Level: GardenLevel },
-  { id: "pegs", emoji: "📍", Level: PegsLevel },
-  { id: "topple", emoji: "📚", Level: ToppleLevel },
-  { id: "building", emoji: "🚧", Level: BuildingLevel },
-  { id: "water", emoji: "🦆", Level: WaterLevel },
-  { id: "circus", emoji: "🎪", Level: CircusLevel },
-  { id: "space", emoji: "🚀", Level: SpaceLevel },
-  { id: "light", emoji: "🔦", Level: LightLevel },
-  { id: "bath", emoji: "🛁", Level: BathLevel },
-  { id: "farm", emoji: "🐓", Level: FarmLevel },
-  { id: "night", emoji: "🌙", Level: NightLevel },
-  { id: "tidy", emoji: "🧸", Level: TidyLevel },
+const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
+  { id: "track", Level: TrackLevel },
+  { id: "snowtrack", Level: SnowTrackLevel },
+  { id: "spacetrack", Level: SpaceTrackLevel },
+  { id: "slidetrack", Level: SlideTrackLevel },
+  { id: "sitetrack", Level: SiteTrackLevel },
+  { id: "machine", Level: MachineLevel },
+  { id: "sneeze", Level: SneezeLevel },
+  { id: "kitchen", Level: KitchenLevel },
+  { id: "garden", Level: GardenLevel },
+  { id: "pegs", Level: PegsLevel },
+  { id: "topple", Level: ToppleLevel },
+  { id: "building", Level: BuildingLevel },
+  { id: "water", Level: WaterLevel },
+  { id: "circus", Level: CircusLevel },
+  { id: "space", Level: SpaceLevel },
+  { id: "light", Level: LightLevel },
+  { id: "bath", Level: BathLevel },
+  { id: "farm", Level: FarmLevel },
+  { id: "night", Level: NightLevel },
+  { id: "tidy", Level: TidyLevel },
 ];
 
 /** The marble runs, the wooden one and its other worlds (K-18). */
@@ -85,7 +85,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
   const level = levelAt(index);
   const next = levelAt(index + 1);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -96,18 +96,12 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     },
     [settings.sounds],
   );
-  // Every line is said in the app language, with that language's voice; a line not translated yet in German, with the German voice.
-  const say = useCallback(
-    (text: Localized) => {
-      if (!settings.speech) return;
-      const line = spokenIn(text, language);
-      speak(line.text, line.lang, { queue: true });
-    },
-    [settings.speech, language],
-  );
+  // Every line is said from its ElevenLabs recording in the app language; a line not translated yet in German. Lines wait
+  // for each other, but a level's first line cuts off what is still said from before.
+  const say = useCallback((text: Localized, queue = true) => marblesVoice.say(pick(text, language.id), language.id, { queue }), [language.id]);
 
   useEffect(() => {
-    say(LEVEL_TEXTS[level.id].intro);
+    say(LEVEL_TEXTS[level.id].intro, false);
   }, [level, round, say]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -116,14 +110,14 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     setParty(true);
     // The good-night machine ends as calmly as it ran.
     sound(level.id === "night" ? playLullaby : playMelody);
-    for (let i = 0; i < 14; i++) timers.current.push(setTimeout(() => spawn(), i * 120));
+    celebrate();
     timers.current.push(
       setTimeout(() => {
         setParty(false);
         setEnded(true);
       }, PARTY_MS),
     );
-  }, [sound, spawn, level.id]);
+  }, [sound, celebrate, level.id]);
 
   const startLevel = (nextIndex: number) => {
     setEnded(false);
@@ -138,16 +132,16 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     if (ended) goOn();
   });
 
-  // While the party is on, taps make more shapes.
+  // While the party is on, taps make ripples.
   const onPointerDown = (e: PointerEvent) => {
-    if (party) spawn(e.clientX, e.clientY);
+    if (party) ripple(e.clientX, e.clientY);
   };
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
       <level.Level key={round} sound={sound} say={say} onDone={onDone} watch={settings.play === "watch"} />
-      {ended && <GameEnd onAgain={again} next={{ emoji: next.emoji, name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
-      <BurstLayer bursts={bursts} />
+      {ended && <GameEnd onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

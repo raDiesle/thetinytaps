@@ -2,67 +2,212 @@ import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-// The service worker (src/sw.js) decides which build a visitor sees. Answering every page from the cache kept phones
-// on the old build through several reloads (user feedback, November 2026): online, a page must come from the network,
-// and only offline, on an error status or a network too slow from the cache. These run the real worker in a fake
-// browser: one cache holding the old build's index.html, and a network that answers as each test says.
+// The service worker (src/sw.js) decides which build a visitor sees and what it downloads. Answering every page from
+// the cache kept phones on the old build through several reloads (user feedback, November 2026): online, a page must
+// come from the network, and only offline, on an error status or a network too slow from the cache. And downloading
+// every file of the site on a first visit cost every visitor 42 MB, after every new build again (November 2026): a
+// visit keeps only what it plays, and only an installed app keeps everything. These run the real worker in a fake
+// browser: caches kept in maps, and a network that answers as each test says.
 
 const SCOPE = "https://www.booksforboth.com/";
 const OLD_PAGE = "old build";
 
-type Handler = (event: { request: Request; respondWith(answer: Promise<Response>): void; waitUntil(work: Promise<unknown>): void }) => void;
+type Event = Record<string, unknown> & { waitUntil(work: Promise<unknown>): void };
+type Handler = (event: Event) => void;
+type Network = (request: { url: string }) => Promise<Response>;
 
-/** Loads the worker with `network` as its fetch and returns how it answers a page opened at `path`. */
-function worker(network: (request: Request) => Promise<Response>) {
-  const handlers: Record<string, Handler> = {};
-  const cache = new Map([[`${SCOPE}index.html`, new Response(OLD_PAGE)]]);
-  const caches = {
-    open: async () => ({ match: async (url: string) => cache.get(url)?.clone() }),
-    match: async (request: Request | string) => cache.get(typeof request === "string" ? request : request.url)?.clone(),
-    keys: async () => ["tinytaps-old"],
+/** Every cache of the fake browser by name, each a map from address to answer. */
+type Store = Map<string, Map<string, Response>>;
+
+const address = (request: string | { url: string }) => (typeof request === "string" ? new URL(request, SCOPE).href : request.url);
+
+/** The browser's CacheStorage over `store`, fetching through `network` for add and addAll. */
+function fakeCaches(store: Store, network: Network) {
+  const open = async (name: string) => {
+    if (!store.has(name)) store.set(name, new Map());
+    const cache = store.get(name) as Map<string, Response>;
+    const add = async (request: string | { url: string }) => {
+      const response = await network({ url: address(request) });
+      if (!response.ok) throw new TypeError("bad status");
+      cache.set(address(request), response);
+    };
+    return {
+      match: async (request: string | { url: string }) => cache.get(address(request))?.clone(),
+      put: async (request: string | { url: string }, response: Response) => void cache.set(address(request), response),
+      add,
+      addAll: async (requests: (string | { url: string })[]) => {
+        for (const request of requests) await add(request);
+      },
+      keys: async () => [...cache.keys()].map((url) => ({ url })),
+    };
   };
+  return {
+    open,
+    keys: async () => [...store.keys()],
+    match: async (request: string | { url: string }) => {
+      for (const cache of store.values()) {
+        const found = cache.get(address(request));
+        if (found) return found.clone();
+      }
+    },
+    delete: async (name: string) => store.delete(name),
+  };
+}
+
+/** Loads the worker of a build with these files into the fake browser, `network` as its fetch. */
+function worker(network: Network, { store = new Map() as Store, version = "new", files = [] as string[], shell = [] as string[] } = {}) {
+  const handlers: Record<string, Handler> = {};
   const self = {
     registration: { scope: SCOPE },
     location: { origin: new URL(SCOPE).origin },
     addEventListener: (type: string, handler: Handler) => {
       handlers[type] = handler;
     },
+    skipWaiting: async () => {},
+    clients: { claim: async () => {} },
   };
   const source = readFileSync(join(import.meta.dir, "sw.js"), "utf8")
-    .replace("__FILES__", "[]")
+    .replace('"__VERSION__"', JSON.stringify(version))
+    .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
+    .replace("__SHELL__", JSON.stringify(shell.map((file) => `./${file}`)))
     .replace("__TEXTS__", "{}");
   // The tests don't wait the whole time a phone would.
   const quick = source.replace(/NETWORK_WAIT_MS = \d+/, "NETWORK_WAIT_MS = 50");
   expect(quick).not.toBe(source);
-  new Function("self", "caches", "fetch", quick)(self, caches, network);
-  return async (path: string) => {
+  /** Only the address of a request matters here; the worker's relative ones resolve against its scope. */
+  class FakeRequest {
+    url: string;
+    constructor(url: string) {
+      this.url = address(url);
+    }
+  }
+  const fetch = (request: { url: string }) => network({ url: address(request) });
+  new Function("self", "caches", "fetch", "Request", quick)(self, fakeCaches(store, network), fetch, FakeRequest);
+
+  /** Sends the worker an event and waits for its answer and, unless `settle` is false, all the work it started. */
+  const dispatch = async (type: string, fields: Record<string, unknown>, settle = true) => {
+    const work: Promise<unknown>[] = [];
     let answer: Promise<Response> | undefined;
-    const request = { url: SCOPE + path, method: "GET", mode: "navigate" } as Request;
-    handlers.fetch?.({ request, respondWith: (given) => (answer = given), waitUntil: () => {} });
-    if (!answer) throw new Error("the worker left the page to the browser");
-    return (await answer).text();
+    handlers[type]?.({ ...fields, respondWith: (given: Promise<Response>) => (answer = given), waitUntil: (given) => void work.push(given) });
+    const response = answer && (await answer);
+    if (settle) await Promise.all(work.map((given) => given.catch(() => {})));
+    return response;
+  };
+  return {
+    store,
+    install: () => dispatch("install", {}),
+    message: (data: unknown) => dispatch("message", { data }),
+    /** What the worker answers for the file at `path`. */
+    file: async (path: string) => {
+      const response = await dispatch("fetch", { request: { url: SCOPE + path, method: "GET", mode: "no-cors" } });
+      if (!response) throw new Error("the worker left the file to the browser");
+      return response.text();
+    },
+    /** What the worker answers for a page opened at `path`. */
+    open: async (path: string) => {
+      // A page doesn't wait for the network the worker keeps waiting for in the background.
+      const response = await dispatch("fetch", { request: { url: SCOPE + path, method: "GET", mode: "navigate" } }, false);
+      if (!response) throw new Error("the worker left the page to the browser");
+      return response.text();
+    },
   };
 }
 
+/** A browser whose earlier build kept its index.html. */
+const withOldPage = (): Store => new Map([["tinytaps-old", new Map([[`${SCOPE}index.html`, new Response(OLD_PAGE)]])]]);
+
+/** A network that answers each file with its address and records what was asked for. */
+function online() {
+  const asked: string[] = [];
+  const network: Network = async ({ url }) => {
+    asked.push(url.replace(SCOPE, ""));
+    return new Response(`net ${url.replace(SCOPE, "")}`);
+  };
+  return { asked, network };
+}
+
+const offline: Network = () => Promise.reject(new TypeError("Failed to fetch"));
+
 test("online, a page comes from the network with the newest build", async () => {
-  const open = worker(async () => new Response("new build"));
+  const { open } = worker(async () => new Response("new build"), { store: withOldPage() });
   expect(await open("")).toBe("new build");
   expect(await open("zaehne/")).toBe("new build");
 });
 
 test("offline, a page is the cached app", async () => {
-  const open = worker(() => Promise.reject(new TypeError("Failed to fetch")));
+  const { open } = worker(offline, { store: withOldPage() });
   expect(await open("bilder/baustelle/")).toBe(OLD_PAGE);
 });
 
 test("an address the site doesn't know (404.html) is the cached app", async () => {
-  const open = worker(async () => new Response("not found", { status: 404 }));
+  const { open } = worker(async () => new Response("not found", { status: 404 }), { store: withOldPage() });
   expect(await open("bilder/baustelle/")).toBe(OLD_PAGE);
 });
 
 test("a network that takes too long gives way to the cache", async () => {
-  const open = worker(() => new Promise(() => {}));
+  const { open } = worker(() => new Promise(() => {}), { store: withOldPage() });
   const started = performance.now();
   expect(await open("")).toBe(OLD_PAGE);
   expect(performance.now() - started).toBeLessThan(1000);
+});
+
+const FILES = ["index.html", "static/app.a1.js", "static/cover.b2.webp", "static/zaehne.c3.js", "static/zahn.d4.webp"];
+const SHELL = ["index.html", "static/app.a1.js", "static/cover.b2.webp"];
+
+test("a first visit downloads what the home page needs, not every game", async () => {
+  const { asked, network } = online();
+  await worker(network, { files: FILES, shell: SHELL }).install();
+  expect(asked.sort()).toEqual([...SHELL].sort());
+});
+
+test("a file played once is kept and plays offline", async () => {
+  const { network } = online();
+  let up = true;
+  const sw = worker((request) => (up ? network(request) : offline(request)), { files: FILES, shell: SHELL });
+  await sw.install();
+  expect(await sw.file("static/zahn.d4.webp")).toBe("net static/zahn.d4.webp");
+  up = false;
+  expect(await sw.file("static/zahn.d4.webp")).toBe("net static/zahn.d4.webp");
+});
+
+test("a new build keeps what the old one had without downloading it again", async () => {
+  const before = online();
+  const old = worker(before.network, { version: "1", files: FILES, shell: SHELL });
+  await old.install();
+  await old.file("static/zahn.d4.webp");
+  const after = online();
+  const files = [...FILES.filter((file) => file !== "static/app.a1.js"), "static/app.e5.js"];
+  const shell = ["index.html", "static/app.e5.js", "static/cover.b2.webp"];
+  const next = worker(after.network, { store: old.store, version: "2", files, shell });
+  await next.install();
+  expect(after.asked.sort()).toEqual(["index.html", "static/app.e5.js"]);
+  expect([...(next.store.get("tinytaps-2")?.keys() ?? [])]).toContain(`${SCOPE}static/zahn.d4.webp`);
+});
+
+test("an installed app keeps every file, and so does its next build", async () => {
+  const first = online();
+  const old = worker(first.network, { version: "1", files: FILES, shell: SHELL });
+  await old.install();
+  await old.message({ keepAll: true });
+  expect(first.asked.sort()).toEqual([...FILES].sort());
+  const next = online();
+  const files = [...FILES, "static/neu.f6.webp"];
+  await worker(next.network, { store: old.store, version: "2", files, shell: SHELL }).install();
+  // index.html is fetched anew with every build; of the rest only the new file.
+  expect(next.asked.sort()).toEqual(["index.html", "static/neu.f6.webp"]);
+});
+
+test("an installed app's download that breaks off goes on from where it stopped", async () => {
+  const many = ["index.html", ...Array.from({ length: 60 }, (_, i) => `static/bild${i}.h${i}.webp`)];
+  const { asked, network } = online();
+  let budget = 40;
+  const sw = worker((request) => (budget-- > 0 ? network(request) : offline(request)), { files: many, shell: ["index.html"] });
+  await sw.install();
+  await sw.message({ keepAll: true });
+  budget = Infinity;
+  asked.length = 0;
+  await sw.message({ keepAll: true });
+  // The batches that came before the signal broke off are not downloaded again.
+  expect(asked.length).toBeLessThan(many.length - 24);
+  expect(await sw.file("static/bild59.h59.webp")).toBe("net static/bild59.h59.webp");
 });

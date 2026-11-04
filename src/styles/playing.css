@@ -120,37 +120,118 @@
   }
 }
 
-.play-options-button {
-  font-family: var(--font-emoji);
-}
-
-.play-options-hint {
-  position: absolute;
-  left: calc(100% + 8px);
-  padding: 3px 10px;
+/*
+ * ⚙️ carries its name in words, big enough to be seen across the room: the bare gear, its name shown only while held,
+ * was not found by grown-ups (user feedback, November 2026). Still held like ✕, so a child's tap does nothing.
+ */
+.play-options-button.hold-exit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  height: auto;
+  min-height: 68px;
+  padding: 8px 22px 8px 12px;
   border-radius: 999px;
-  background: #ffffffd0;
   color: var(--ink);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font: inherit;
+}
+
+.play-options-gear {
+  font-family: var(--font-emoji);
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.play-options-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+  text-align: left;
   white-space: nowrap;
-  opacity: 0;
-  translate: -6px 0;
+}
+
+.play-options-label b {
+  font-size: 1.45rem;
+}
+
+.play-options-label small {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+/*
+ * The intro note under ⚙️ as play starts (a game with many ways to play): it tells grown-ups what they can choose
+ * there, stays a few seconds, then fades and is gone (`INTRO_MS`); taps go through it to the game.
+ */
+.play-options-intro {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  width: max-content;
+  max-width: min(430px, 72vw);
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #fffffff2;
+  box-shadow:
+    0 0 0 1px #0000001f,
+    0 4px 14px #00000033;
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1.35;
   pointer-events: none;
-  transition:
-    opacity 0.4s,
-    translate 0.4s;
+  animation: play-options-intro var(--intro-ms) ease-out var(--turn-time, 0.4s) both;
 }
 
-.play-options-corner.hinted .play-options-hint {
-  opacity: 1;
-  translate: 0 0;
-  transition: none;
+.play-options-intro b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1.4rem;
 }
 
-@media (hover: hover) {
-  .play-options-corner:hover .play-options-hint {
+/* Phones keep the game's room: the note and its intro a step smaller. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .play-options-button.hold-exit {
+    min-height: 54px;
+    padding: 5px 14px 5px 8px;
+  }
+
+  .play-options-gear {
+    font-size: 2rem;
+  }
+
+  .play-options-label b {
+    font-size: 1.15rem;
+  }
+
+  .play-options-intro {
+    top: calc(100% + 8px);
+    max-width: min(340px, 60vw);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .play-options-intro b {
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes play-options-intro {
+  0% {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+
+  5%,
+  90% {
     opacity: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
     translate: 0 0;
   }
 }
@@ -187,4 +268,139 @@
   font-weight: 700;
   box-shadow: 0 4px 0 var(--ink);
   cursor: pointer;
+}
+
+/*
+ * Feedback for taps (`TapFeedback.tsx`). Each effect is a small HTML layer of its own that only moves by transform and
+ * opacity, so a phone never paints the game's picture again for it.
+ */
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Over the menus (`MenuRipples`): above every page, its book and its option menus. */
+.fx-layer.fixed {
+  position: fixed;
+  z-index: 1000;
+}
+
+/* A tap that sets nothing off: two soft rings spread as on water, light enough for dark and pale pictures alike. */
+.fx-ripple-at {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.fx-ripple {
+  position: absolute;
+  left: -70px;
+  top: -70px;
+  width: 140px;
+  height: 140px;
+  border: 4px solid #fffffff2;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px #1d3b5a47,
+    inset 0 0 0 2px #1d3b5a38;
+  opacity: 0;
+  animation: fx-ripple 0.8s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+.fx-ripple.late {
+  animation-delay: 0.15s;
+  scale: 0.7;
+}
+
+@keyframes fx-ripple {
+  from {
+    opacity: 1;
+    transform: scale(0.15);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* A tap that set something off: a warm light where the finger was, the thing itself answers the rest. */
+.fx-glow {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6c4 0%, #ffd84d99 35%, #ffd84d00 70%);
+  opacity: 0;
+  animation: fx-glow 0.8s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fx-glow {
+  from {
+    opacity: 0.95;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+/* Something done: hearts, stars and notes rise slowly and sway a little, then fade – calm enough for a toddler. */
+.fx-rise {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  animation: fx-rise var(--rise-ms) linear var(--delay) forwards;
+  will-change: transform, opacity;
+}
+
+.fx-note {
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 0 #00000022;
+}
+
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(calc(var(--sway) * 0.5), calc(var(--rise) * 0.12)) scale(1);
+  }
+  40% {
+    transform: translate(var(--sway), calc(var(--rise) * 0.4)) scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(calc(var(--sway) * -0.4), calc(var(--rise) * 0.68)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--sway) * 0.3), var(--rise)) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-rise {
+    animation-name: fx-fade;
+  }
+}
+
+@keyframes fx-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 1;
+  }
 }

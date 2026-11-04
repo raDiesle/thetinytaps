@@ -7,6 +7,13 @@ export const FILM_W = 1600;
 export const FILM_H = 900;
 export const GROUND = 780;
 
+/**
+ * How much slower than written a film plays. Beat times, sound cues, `Go` moves, the ladder and the CSS of `fm-` that
+ * goes with them (`--fm-pace`) are written at a natural pace and all stretched by it, so they stay in step: a child of
+ * two follows a calm film better than a busy one (user feedback, November 2026).
+ */
+export const PACE = 1.5;
+
 /** A box of the picture: left, top, width, height. */
 export type Box = [number, number, number, number];
 
@@ -37,13 +44,19 @@ export interface Option {
   picture: Picture;
   at: Point;
   r: number;
-  /** Draw it as a round picture sign; otherwise the scene draws it and only a glow goes round it. */
+  /** Draw it as a round picture sign; otherwise the scene draws it and a tap there picks it too. */
   sign?: boolean;
-  /** Said when it is picked. */
+  /** Its card in the choice, framed like a frame of film: a close-up of the trouble as the child saw it, so the
+   * three cards plainly are three different stories. Drawn standing on (0, 0), clipped to its `w` × `h`. */
+  card: Picture;
+  /** Heard as its card comes out of the picture. */
+  sounds?: Cue[];
+  /** Said as its card comes out, and again when it is picked. */
   say: string;
 }
 
-/** After its beats, a scene may let the child pick how the film goes on. Every option is right. */
+/** After its beats, a scene may let the child pick how the film goes on. Every option is right. The options' cards
+ * come out of the picture one after the other, each with its sound and line, then `ask` is said. */
 export interface Choice {
   ask: string;
   options: Option[];
@@ -75,8 +88,6 @@ export interface Film {
   id: string;
   /** German; shown through `titleIn` in the app language. */
   title: string;
-  /** Its picture, for the „Weiter“ button. */
-  picture: Picture;
   /** The scenes, given what the child has picked so far: up to the next scene whose choice is not picked yet, or
    * all of them to the end. */
   scenes: (picks: string[]) => Scene[];
