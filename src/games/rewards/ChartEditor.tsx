@@ -23,6 +23,7 @@ import { BoardSheet, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSh
 import {
   ACTIVITIES,
   type BoardKind,
+  type CatalogTask,
   type ChartType,
   DAY_NAMES,
   KINDS,
@@ -37,6 +38,7 @@ import {
   THEMES,
 } from "./catalog";
 import { SlotChips } from "./Editor";
+import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
 import { CHILD_NAME, Pick } from "./pageParts";
 import { ItemPic } from "./pictures";
@@ -926,21 +928,25 @@ function AddDialog({
   );
 }
 
-/** Every card to pick, as big pictures. */
+/** Every card to pick, as big pictures; first the rituals (H-58), whose cards bring their words for the grown-up. */
 function CardPicks({ selected, onPick }: { selected?: string; onPick: (id: string) => void }) {
   const t = useT();
+  const pick = (item: CatalogTask) => (
+    <Pick
+      key={item.id}
+      selected={item.id === selected}
+      onClick={() => onPick(item.id)}
+      emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} />}
+      label={t(item.label)}
+    />
+  );
   return (
-    <div className="rw-picks rw-picks-tiles">
-      {OFFERED.map((item) => (
-        <Pick
-          key={item.id}
-          selected={item.id === selected}
-          onClick={() => onPick(item.id)}
-          emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} />}
-          label={t(item.label)}
-        />
-      ))}
-    </div>
+    <>
+      <h4 className="rw-edit-sub">{t({ de: "Rituale – mit Worten für Sie auf der Karte" })}</h4>
+      <div className="rw-picks rw-picks-tiles">{RITUALS.map(pick)}</div>
+      <h4 className="rw-edit-sub">{t({ de: "Bilder für den Tag" })}</h4>
+      <div className="rw-picks rw-picks-tiles">{OFFERED.map(pick)}</div>
+    </>
   );
 }
 

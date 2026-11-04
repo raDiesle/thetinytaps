@@ -1,19 +1,38 @@
 import { useCallback, useEffect, useState } from "react";
 import { PROD } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
+import { finishRoutineStep } from "@/lib/routine";
 import { imageFor, moodImages, preloadImages } from "./images";
-import { HELP_QUESTION, HELPS, type Help, type HelpId, MOOD_ANSWER, MOOD_QUESTION, WEATHERS, type Weather } from "./mood";
+import {
+  HELP_QUESTION,
+  HELPS,
+  type Help,
+  type HelpId,
+  loadMoodDay,
+  MOOD_ANSWER,
+  MOOD_QUESTION,
+  morningMood,
+  NOW,
+  saveMoodDay,
+  THIS_MORNING,
+  WEATHERS,
+  type Weather,
+  withMood,
+} from "./mood";
 import type { FeelingsSettings } from "./settings";
 import { ChoiceCard, StoryPicture, useTimers, useVoice } from "./shared";
 
 /** How long the picked weather, and then the picked help, stay big before the next part begins. */
 const ANSWER_MS = 2200;
+/** In the evening beside the morning's weather a little longer, for the grown-up to talk about it. */
+const COMPARE_MS = 4500;
 
 /** Whether „Was hilft dir jetzt?“ is asked: the built site leaves it out until all its pictures are made, the dev server shows their placeholders. */
 const ASKS_HELP = !PROD || (Object.keys(HELPS) as HelpId[]).every((id) => imageFor(moodImages.help(id)));
 
 /**
- * Wie geht's dir heute? Four weather cards; the picked one shows big, then „Was hilft dir jetzt?“ offers three things
+ * Wie geht's dir heute? Four weather cards; the picked one shows big – in the evening beside the one picked this
+ * morning, „Heute früh“ and „Jetzt“ (C-33) – then „Was hilft dir jetzt?“ offers three things
  * that fit that feeling (idea C-31), the picked one shows big, and `onPick` plays the scenes of that feeling (its group).
  */
 export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onPick: (group: string) => void }) {
@@ -21,6 +40,8 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
   /** The three helps are on the screen. */
   const [asking, setAsking] = useState(false);
   const [help, setHelp] = useState<Help>();
+  /** In the evening, this morning's weather, shown beside the one just picked. */
+  const [morning, setMorning] = useState<Weather>();
   const { later } = useTimers();
   const { say, sound, preload } = useVoice(settings);
   const t = useT();
@@ -35,14 +56,22 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
     (picked: Weather) => {
       if (weather) return;
       setWeather(picked);
+      // The answer a plan's „Wie geht's dir?“ card waited for (the Tagesplan, rituals.ts): it is ticked on the way back.
+      finishRoutineStep();
+      const now = new Date();
+      const day = loadMoodDay();
+      const before = WEATHERS.find((w) => w.id === morningMood(day, now));
+      setMorning(before);
+      saveMoodDay(withMood(day, picked.id, now));
       say(t(MOOD_ANSWER));
       sound("chime");
-      if (!ASKS_HELP) return later(() => onPick(picked.group), ANSWER_MS);
+      const wait = before ? COMPARE_MS : ANSWER_MS;
+      if (!ASKS_HELP) return later(() => onPick(picked.group), wait);
       preloadImages(picked.helps.map(moodImages.help));
       later(() => {
         setAsking(true);
         say(t(HELP_QUESTION));
-      }, ANSWER_MS);
+      }, wait);
     },
     [weather, say, sound, later, onPick, t],
   );
@@ -84,6 +113,11 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
             {weather.helps.map((id) => (
               <ChoiceCard key={id} image={moodImages.help(id)} caption={t(HELPS[id].caption)} state="choose" onChoose={() => pickHelp(HELPS[id])} />
             ))}
+          </div>
+        ) : weather && morning ? (
+          <div className="mood-cards mood-compare">
+            <ChoiceCard image={moodImages.weather(morning.id)} caption={`${t(THIS_MORNING)}: ${t(morning.caption)}`} state="rest" />
+            <ChoiceCard image={moodImages.weather(weather.id)} caption={`${t(NOW)}: ${t(weather.caption)}`} state="rest" />
           </div>
         ) : weather ? (
           <StoryPicture key={weather.id} name={moodImages.weather(weather.id)} caption={t(weather.caption)} />

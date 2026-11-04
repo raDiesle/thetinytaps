@@ -346,6 +346,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "„Wie geht's dir?“ einmal am Morgen und einmal am Abend, als Schritt im Tagesplan (Belohnungstafel & Zeitplan). Am Abend sieht man beide Bilder nebeneinander: so ging es mir heute früh, so jetzt.",
       why: "Ein kurzes festes Ritual macht über Gefühle sprechen alltäglich. Der Vergleich zeigt dem Kind, dass Gefühle kommen und gehen.",
       effort: "M",
+      done: true,
     },
     {
       id: "C-34",

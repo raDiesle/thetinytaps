@@ -91,8 +91,19 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite.",
+    parts: [
+      {
+        label: "📅 Tafel, Zeitplan und Druck",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
+      },
+      {
+        label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“ – nur Deutsch.",
+      },
+    ],
   },
   {
     href: "/timer/",

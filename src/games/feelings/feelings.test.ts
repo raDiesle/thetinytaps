@@ -6,7 +6,7 @@ import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { HELPS, WEATHERS } from "./mood";
+import { HELPS, morningMood, WEATHERS, withMood } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { roundOf, stepsOf } from "./rounds";
@@ -241,4 +241,15 @@ test("translations in another script have no Latin letters", () => {
     const texts = [COMFORT_TEXTS[language], FEELING_TEXTS[language], SITUATION_TEXTS[language]].flatMap(stringsIn);
     for (const text of texts) expect(text, language).not.toMatch(/[A-Za-z]/);
   }
+});
+
+// C-33: in the evening the morning's weather stands beside the evening's – only today's, never yesterday's.
+test("the evening shows this morning's weather, never yesterday's, and never in the morning", () => {
+  const morning = new Date("2026-11-04T08:00");
+  const evening = new Date("2026-11-04T19:00");
+  const day = withMood(undefined, "regen", morning);
+  expect(morningMood(day, morning)).toBeUndefined();
+  expect(morningMood(withMood(day, "sonne", evening), evening)).toBe("regen");
+  expect(morningMood(day, new Date("2026-11-05T19:00"))).toBeUndefined();
+  expect(withMood(day, "wolke", new Date("2026-11-05T08:00"))).toEqual({ day: "2026-11-05", morning: "wolke" });
 });

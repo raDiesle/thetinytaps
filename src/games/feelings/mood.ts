@@ -2,6 +2,7 @@
 // bear says he knows that too, and then the scenes of that feeling show what
 // helps. Grown-ups learn on the way how the child is doing.
 
+import { type Daytime, dayKey, daytimeOf } from "@/games/teeth/daytime";
 import type { Localized } from "@/lib/language";
 
 export type WeatherId = "sonne" | "wolke" | "regen" | "gewitter";
@@ -92,3 +93,42 @@ export const HELPS: Record<HelpId, Help> = {
 
 /** Read aloud when the three cards of what helps come, after the weather. */
 export const HELP_QUESTION: Localized = { de: "Was hilft dir jetzt?" };
+
+/** The weathers picked today, in the morning and in the evening (C-33): kept on this device only, today's alone. */
+export type MoodDay = { day: string } & Partial<Record<Daytime, WeatherId>>;
+
+const MOOD_DAY_KEY = "tinytaps.mood.day.v1";
+
+/** Today with `weather` picked at `now`'s time of day (before two o'clock the morning, as for brushing); yesterday is dropped. */
+export function withMood(day: MoodDay | undefined, weather: WeatherId, now: Date): MoodDay {
+  const today = dayKey(now);
+  return { ...(day?.day === today ? day : { day: today }), [daytimeOf(now)]: weather };
+}
+
+/** In the evening, the weather picked this morning – shown beside the evening's, so the child sees feelings come and go. */
+export const morningMood = (day: MoodDay | undefined, now: Date): WeatherId | undefined =>
+  daytimeOf(now) === "evening" && day?.day === dayKey(now) ? day.morning : undefined;
+
+/** Today's weathers as saved, if any. */
+export function loadMoodDay(): MoodDay | undefined {
+  try {
+    const raw = localStorage.getItem(MOOD_DAY_KEY);
+    return raw ? (JSON.parse(raw) as MoodDay) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Keeps today's weathers for the evening. */
+export function saveMoodDay(day: MoodDay) {
+  try {
+    localStorage.setItem(MOOD_DAY_KEY, JSON.stringify(day));
+  } catch {
+    // No storage: the evening then shows only its own weather.
+  }
+}
+
+/** Over the morning's weather in the evening, for grown-ups (the captions under the cards). */
+export const THIS_MORNING: Localized = { de: "Heute früh" };
+/** Over the weather just picked, beside the morning's. */
+export const NOW: Localized = { de: "Jetzt" };

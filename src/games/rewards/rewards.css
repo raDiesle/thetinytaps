@@ -2077,6 +2077,38 @@
   filter: grayscale(1) contrast(1.15);
 }
 
+/* A plan's rituals on paper (RitualPages, H-58): each a card with a dashed line to cut along, always taller than wide
+   for its lines of words – two by two on a page standing, four in a row on a page lying (two by two there cut the
+   good-night card's last lines). After .rw-page, so its grid wins whatever order the stylesheets load in; the cards
+   themselves are styled in planner.css. */
+.rw-page.pl-ritual-page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 6mm;
+  font-size: 4.2mm;
+}
+
+.rw-page.pl-ritual-page.pl-ritual-lying {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 5mm;
+  font-size: 3.9mm;
+}
+
+.pl-ritual-page .pl-ritual {
+  box-sizing: border-box;
+  padding: 5mm;
+  overflow: hidden;
+  border: 0.5mm dashed #888;
+  border-radius: 5mm;
+  background: color-mix(in srgb, var(--rw-paper, #fff) 60%, #fff);
+}
+
+.rw-grey .pl-ritual-pic {
+  filter: grayscale(1) contrast(1.15);
+}
+
 /* Only while printing: the pages, and nothing else of the app. */
 .rw-print-root {
   display: none;

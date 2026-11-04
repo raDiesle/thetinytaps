@@ -1,6 +1,8 @@
 import type { PicturePrompt, PicturePromptSet } from "@/content/picturePrompts";
+import type { QueuedPicture } from "@/content/pictureQueue";
 import { ACTIVITIES, MARKS, REWARDS, TASKS, THEMES } from "../catalog";
 import { picture } from "../pictures";
+import { RITUALS } from "../rituals";
 
 // Every picture the Belohnungstafel may get, as prompts for the grown-up to check on
 // /management/ (Bildvorschläge) before any is made. All of them were made on 30 October 2026 (the user asked for them before
@@ -155,6 +157,24 @@ const STEP_PROMPTS: PicturePrompt[] = ACTIVITIES.map((a) => ({
   file: `${DIR}/schritt-${a.id}.webp`,
 }));
 
+/** What each ritual's card shows (H-58): Tapsi doing it with a grown-up beside it, as the book is read together. */
+const RITUAL_SCENES: Record<string, string> = {
+  mutmachen: `${TAPSI} stands in front of a round mirror with ${MAMA} kneeling beside it; both hold one paw on their heart, and Tapsi's reflection in the mirror smiles bravely`,
+  erzaehlen: `${TAPSI}, a little backpack still on its back, sits on a sofa next to ${PAPA} and tells him something with lively paws; Papa listens with a warm smile`,
+  wiegehts: `${TAPSI} points at a big picture card that shows a small sun and a small rain cloud side by side, ${MAMA} kneels beside it and listens kindly`,
+  gutenacht: `${TAPSI} lies in its small bed under a yellow blanket, ${PAPA} sits on the edge of the bed and gently strokes its head, a crescent moon in the window, both smiling softly`,
+};
+
+/** The ritual cards: like a step's picture, but with its grown-up; they wait in the picture queue until made. */
+const RITUAL_PROMPTS: PicturePrompt[] = RITUALS.map((r) => ({
+  id: `schritt-${r.id}`,
+  file: `${DIR}/schritt-${r.id}.webp`,
+  use: `Ritual-Karte „${r.label.de}“ im Tagesplan (statt ${r.emoji})`,
+  prompt: `${REF_ONLY}${STYLE} ${STICKER} ${RITUAL_SCENES[r.id]}. Only these two characters.`,
+  options: "--transparent --size 768",
+  ref: [TAPSI_REF],
+}));
+
 const REWARD_PROMPTS: PicturePrompt[] = REWARDS.map((r) => ({
   id: `belohnung-${r.id}`,
   file: `${DIR}/belohnung-${r.id}.webp`,
@@ -202,6 +222,11 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
       title: "Tagesplan-Karten",
       note: "Freigestellt, 768 px: die Schritte eines Tages (Essen, Kita, Schlafen …) für den Tagesplan und seine Bildkarten zum Ausschneiden; Aufgaben wie Zähne putzen nehmen die Bilder oben.",
       prompts: STEP_PROMPTS,
+    },
+    {
+      title: "Ritual-Karten",
+      note: "Freigestellt, 768 px: die Rituale des Tagesplans (H-58, C-33) – Tapsi mit Mama oder Papa. Warten in der Bilder-Warteschlange, bis sie günstig mit anderen erzeugt werden.",
+      prompts: RITUAL_PROMPTS,
     },
     { title: "Belohnungen", note: "Freigestellt, 768 px: im Ziel-Feld groß und beim Fest bildschirmfüllend.", prompts: REWARD_PROMPTS },
     {
@@ -258,7 +283,28 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
     {
       title: "Zum Ausmalen (Schwarz-weiß-Druck)",
       note: "Jedes Aufgaben-, Tagesplan- und Belohnungsbild noch einmal als Ausmalbild, mit dem farbigen als einziger Referenz – erst nachdem das farbige gelungen ist.",
-      prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
+      prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...RITUAL_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
     },
   ],
 });
+
+/**
+ * The ritual cards and their line-art twins as the picture queue takes them (src/content/pictureQueue.ts), until they
+ * are made.
+ */
+export const RITUAL_PICTURE_QUEUE: QueuedPicture[] = RITUAL_PROMPTS.flatMap((p) => [p, lineArt(p)])
+  // A made picture leaves the queue by itself.
+  .filter((p) => !picture(p.id))
+  .map((p) => ({
+    id: p.id,
+    file: p.file,
+    use: p.use,
+    prompt: p.prompt,
+    // The prompt already holds the style; nothing goes before it.
+    style: "",
+    aspect: "1:1",
+    size: p.options.match(/--size (\d+)/)?.[1],
+    ...(p.options.includes("--transparent") ? { transparent: true } : {}),
+    ref: p.ref,
+    date: "2026-11-04",
+  }));

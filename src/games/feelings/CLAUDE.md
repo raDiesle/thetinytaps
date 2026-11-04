@@ -13,7 +13,13 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
   touching the place „Alltagssituationen“ goes on from (`remember={false}`). „Nochmal“ asks for the weather again.
   Keys 1–4 pick a weather (1–3 a help), any other key one at random. Like a new story, the built site asks „Was hilft
   dir jetzt?“ only once all five `hilft-…` pictures are made (`ASKS_HELP` in `MoodPlay.tsx`); the dev server shows
-  their placeholders. This game is meant to grow (ideas C-29 to C-36): more
+  their placeholders. **Morning and evening** (C-33): the weather picked is kept per time of day (`MoodDay` under
+  `tinytaps.mood.day.v1`, `daytimeOf` from Zähne putzen: before 14:00 is morning); in the evening, where the child
+  picked one this morning, both stand side by side a little longer (`COMPARE_MS`) – „Heute früh: …“ paler, „Jetzt: …“
+  – so the grown-up can talk about how the day changed it. Only today's morning counts (`morningMood`), nothing older
+  is kept. The Tagesplan's „Wie geht's dir?“ card (a ritual, `rituals.ts` in `rewards/`) opens the game with
+  `{ returnTo }`, and the pick calls `finishRoutineStep()`, so back on the plan the card is ticked. The comparison is
+  the answer: still pictures, nothing floats up. This game is meant to grow (ideas C-29 to C-36): more
   feelings to show, faces.
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
   (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
