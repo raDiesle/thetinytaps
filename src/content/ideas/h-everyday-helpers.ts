@@ -1,12 +1,12 @@
 import type { IdeaArea } from "./types";
 
-/** H: Alltagshelfer – from what parents of toddlers often search on Google. */
+/** H: Alltagshelfer – from what parents of toddlers often search on Google. The Timer's ideas, also H, are in `h-timer.ts`; a new H idea takes the next free number of both. */
 export const everydayHelpersIdeas: IdeaArea = {
   prefix: "H",
   emoji: "🗓️",
   title: "Alltagshelfer für Eltern",
   intro:
-    "Aus einer Suche nach dem, was Eltern von Kleinkindern oft bei Google eingeben (Google-Autovervollständigung, Oktober 2026): Routinen, Belohnung, Töpfchen, Warten, Wut, Abschied. Was die Eltern einstellen, ist versteckt; das Kind sieht nur Bilder und tippt. Belohnung heißt hier Mitfreuen: keine Strafen, nichts geht verloren, kein leeres Feld als „nicht geschafft“.",
+    "Aus einer Suche nach dem, was Eltern von Kleinkindern oft bei Google eingeben (Google-Autovervollständigung, Oktober 2026): Routinen, Belohnung, Töpfchen, Warten, Wut, Abschied. Was die Eltern einstellen, ist versteckt; das Kind sieht nur Bilder und tippt. Belohnung heißt hier Mitfreuen: keine Strafen, nichts geht verloren, kein leeres Feld als „nicht geschafft“. Die Ideen zum Timer stehen unter „Timer“.",
   ideas: [
     {
       id: "H-01",
@@ -41,23 +41,15 @@ export const everydayHelpersIdeas: IdeaArea = {
         "Gebaut als Tagesplan (/tagesplan/): Karten in einer Reihe, „Jetzt“ leuchtet, das Kind tippt ab, Haken und Fest; Vorlagen für Morgen, Abend, Kita-Tag, Erst–Dann und Wochenplan; die Zähne-Karte öffnet Zähne putzen und kommt danach mit Haken zurück (auch nach der Spielzeit).",
     },
     {
-      id: "H-04",
-      emoji: "⏳",
-      title: "Timer zum Zuschauen",
-      text: "Ein Großer stellt 1 bis 10 Minuten ein. Ohne Zahlen fürs Kind: Ein Zug fährt langsam zum Bahnhof, eine Sanduhr rinnt, eine Kerze brennt herunter. Am Ende ein freundlicher Ton und das Tier winkt. Für „noch fünf Minuten spielen“, Warten aufs Essen oder Aufräumen.",
-      why: "Eltern suchen „visueller timer kinder online“, „sanduhr kinder“ und „timer kinder ampel“. Anders als A-03 begrenzt er nicht das Spiel, sondern hilft im Alltag.",
-      effort: "S",
-      done: true,
-      partial:
-        "Gebaut als Timer (/timer/), ein eigenes Buch bei den Alltagshelfern: Zug zum Bahnhof, Sanduhr oder Kerze, 1, 2, 3, 5 oder 10 Minuten in der Reihe über den Karten. Am Ende eine Melodie und die Fuchs- oder Bärenfamilie winkt (bei der Kerze pustet das Bärenkind sie aus). Der Bildschirm bleibt an, und der Timer zählt keine Spielzeit.",
-    },
-    {
       id: "H-05",
       emoji: "🌙",
       title: "Wie oft noch schlafen?",
       text: "Für etwas Großes, das kommt: Geburtstag, Urlaub, Oma kommt, erster Kita-Tag, Geschwisterchen. Eine Reihe kleiner Betten mit Mond; jeden Morgen tippt das Kind eins an, es wird zur Sonne. Beim letzten erscheint das Bild vom großen Tag. Der Adventskalender (N-47) ist ein Sonderfall davon.",
       why: "Eltern suchen „countdown kinder geburtstag“, „countdown kinder urlaub“ und „countdown kindergartenstart“. 2-Jährige verstehen „in drei Tagen“ nicht, „noch dreimal schlafen“ schon.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als Teil des Zeitplans, im Countdown (H-41), mit einem eigenen Buch im Schuber neben Belohnungstafel und Zeitplan: „Wie lange warten?“ (/wie-lange-warten/, November 2026). Für jede Nacht ein kleines Bett mit Mond; morgens leuchtet das Bett der vergangenen Nacht, das Kind tippt es an, der Hahn kräht und über dem Bett geht die Sonne auf. Nach dem letzten Morgen steht das Bild vom großen Tag groß da, mit einem kleinen Fest. Den Adventskalender (N-47) gibt es noch nicht.",
     },
     {
       id: "H-06",
@@ -403,110 +395,6 @@ export const everydayHelpersIdeas: IdeaArea = {
       done: true,
       partial:
         "Gebaut als „Abstillen“ (/abstillen/): dreizehn SVG-Seiten mit Tapsi, Mama und Papa Fuchs, jedes Tippen blättert weiter, der Satz jeder Seite steht klein zum Vorlesen darunter. Offen: Aufnahmen der Sätze (ElevenLabs), Übersetzungen, eine Fassung nur fürs nächtliche Abstillen („Die Milch schläft nachts“).",
-    },
-    {
-      id: "H-45",
-      emoji: "🍎",
-      title: "Timer: Stück für Stück statt fließend",
-      text: "Ein neues Timer-Bild: Am Baum hängen so viele Äpfel, wie Minuten eingestellt sind; jede Minute fällt einer mit einem Plopp in den Korb, den das Bärenkind hält. Dasselbe für den Zug: Auf dem Weg zum Bahnhof liegt pro Minute ein kleiner Halt, an dem er kurz bimmelt. So geht auch eine längere Zeit (15, 20, 30 Minuten für Mittagsruhe oder Autofahrt), ohne dass sich das Bild kaum bewegt.",
-      why: "Etwas Fließendes ist für Zweijährige schwer abzuschätzen, einzelne Dinge sehen sie sofort: „Wenn alle Äpfel im Korb sind, gehen wir.“ Eltern können zeigen statt Minuten zu nennen.",
-      effort: "S",
-    },
-    {
-      id: "H-46",
-      emoji: "🐛",
-      title: "Timer: Raupe frisst das Blatt",
-      text: "Eine kleine Raupe frisst sich durch ein großes Blatt, Bissen um Bissen wird es kleiner; das, was noch grün ist, ist die Zeit, die bleibt. Am Ende spinnt sie sich ein, und ein Schmetterling fliegt heraus, zu den Fuchskindern, die schon warten.",
-      why: "Wie die bekannte schrumpfende Fläche der Kita-Timer, nur als Bild, das Kinder aus Bilderbüchern kennen; das Ende ist ein schönes Ereignis, nicht bloß „vorbei“.",
-      effort: "S",
-    },
-    {
-      id: "H-47",
-      emoji: "🔴",
-      title: "Timer: rote Scheibe wie in der Kita",
-      text: "Das schlichteste Bild: eine große rote Scheibe, die wie ein Uhrzeiger im Kreis kleiner wird, bis nichts Rotes mehr bleibt. Als Variante für Kinder eine Pizza oder ein Kuchen, von dem die Fuchsfamilie Stück für Stück isst. Ohne Hintergrund, kräftige Farbe, auch quer durchs Zimmer zu erkennen.",
-      why: "Diese Scheibe (bekannt als „Time Timer“) nutzen viele Kitas, Logopäden und Eltern von Kindern, die Übergänge schwer finden: Ein Kind, das sie dort kennt, versteht sie hier sofort.",
-      effort: "S",
-    },
-    {
-      id: "H-48",
-      emoji: "🔭",
-      title: "Timer von Weitem gut sehen",
-      text: "Das Tablet steht auf dem Regal, während das Kind mit Bausteinen spielt oder isst. Nach ein paar Sekunden tritt alles Kleine im Timer-Bild zurück (dunkler, ruhiger), nur das, was abläuft, bleibt groß und hell: der Weg des Zuges, der Sand, die Flamme. Ein Tippen holt das ganze Bild kurz zurück.",
-      why: "Ein Timer, der das Kind fesselt, hält es vom Spielen ab, um das es geht. Aus drei Metern muss nur eines zu sehen sein: wie viel noch bleibt.",
-      effort: "S",
-    },
-    {
-      id: "H-49",
-      emoji: "🔔",
-      title: "Timer: Gleich ist es so weit",
-      text: "Kurz vor dem Ende sagt das Bild leise Bescheid: Am Bahnhof läutet einmal die Glocke und die Bärenfamilie steht auf und winkt von Weitem, der letzte Apfel leuchtet, die Kerze flackert. Eine Minute vorher, bei kurzen Zeiten etwa beim letzten Fünftel.",
-      why: "Übergänge fallen kleinen Kindern leichter, wenn sie angekündigt werden („gleich ist Schluss“); so kann das Kind sein Spiel noch zu Ende bringen, statt dass es plötzlich klingelt.",
-      effort: "S",
-    },
-    {
-      id: "H-50",
-      emoji: "🍽️",
-      title: "Timer: Was danach kommt",
-      text: "Ein Großer wählt vor dem Start ein Bild für danach: Essen, Anziehen, Baden, Schlafen, Rausgehen (die Bildkarten des Tagesplans). Es wartet sichtbar am Ziel: Der Zug fährt zum Bahnhof „Essen“, neben der Sanduhr liegt der Schlafanzug. Im Tagesplan kann eine Karte „Noch spielen“ den Timer starten und kommt danach mit Haken zurück, wie die Zähne-Karte.",
-      why: "„Erst – dann“ in einem Bild: Das Kind sieht nicht nur, dass etwas endet, sondern was dann kommt. Das hilft, wenn das Ende sonst nur „Spielen ist vorbei“ bedeutet.",
-      effort: "M",
-    },
-    {
-      id: "H-51",
-      emoji: "👆",
-      title: "Timer: Wie lange noch? Antippen",
-      text: "Tippt das Kind während des Laufens aufs Bild, leuchtet kurz auf, was noch bleibt: die Gleise bis zum Bahnhof, der Sand oben in der Sanduhr, die Äpfel am Baum wackeln. Statt nur Dampf und Glitzer bekommt die Frage „Ist es schon vorbei?“ eine Antwort, die das Kind selbst holen kann.",
-      why: "Kinder fragen immer wieder „Wie lange noch?“. Wenn das Bild es zeigt, können Eltern sagen „Schau nach“ und das Kind lernt, Restzeit selbst abzulesen.",
-      effort: "S",
-    },
-    {
-      id: "H-52",
-      emoji: "🔁",
-      title: "Abwechseln: erst du, dann ich",
-      text: "Ein Timer für zwei Kinder: Ein Spielzeug (Bobbycar, Schaukel, Puppe, als Bild gewählt) liegt beim Fuchskind, daneben rinnt die Sanduhr. Ist sie leer, wandert das Spielzeug mit einem Klang zum Bärenkind, und die Sanduhr dreht sich von selbst um. So geht es hin und her, bis ein Großer aufhört.",
-      why: "Streit ums Spielzeug unter Geschwistern oder Freunden gehört zum Alltag mit Zwei- und Dreijährigen; ein Bild, das unparteiisch zeigt, wann das andere Kind dran ist, nimmt den Eltern die Schiedsrichterrolle ab.",
-      effort: "M",
-    },
-    {
-      id: "H-53",
-      emoji: "🌻",
-      title: "Timer: Bilder, die wachsen",
-      text: "Zeit, die etwas bringt, statt abzulaufen: Das Bärenkind gießt einen Samen, er treibt aus, bekommt Knospen, und am Ende geht die Blume auf. Oder ein Kuchen im Ofen: Durchs Ofenfenster geht der Teig langsam auf und wird braun, am Ende holt Mama Fuchs ihn heraus. Für das Warten auf etwas Schönes (Oma kommt gleich, gleich gibt es Essen).",
-      why: "Nicht jedes Warten ist ein Ende: Beim Warten auf etwas Gutes passt ein Bild, das voller wird, besser als eines, das leer läuft.",
-      effort: "S",
-    },
-    {
-      id: "H-54",
-      emoji: "🌅",
-      title: "Timer: Die Sonne geht unter",
-      text: "Für „noch zehn Minuten, dann ist Schlafenszeit“: Die Sonne sinkt hinter die Hügel, der Himmel wird orange, dann blau, die ersten Sterne kommen, und der Bildschirm wird mit dem Bild ruhiger und dunkler. Am Ende steht der Mond oben, und die Fuchsfamilie gähnt.",
-      why: "Das Bild zeigt nicht nur die Zeit, es stimmt auch auf den Abend ein; ein helles, buntes Bild kurz vor dem Schlafen wäre das Gegenteil.",
-      effort: "S",
-    },
-    {
-      id: "H-55",
-      emoji: "🌙",
-      title: "Schlaflernuhr: Mond und Sonne",
-      text: "Für die Nacht und den Mittagsschlaf: Das Tablet zeigt fast schwarz einen Mond über der schlafenden Bärenfamilie. Zur eingestellten Uhrzeit (zum Beispiel 6:30) geht langsam die Sonne auf und das Bärenkind reckt sich: Jetzt darf es aufstehen. Ein Großer stellt die Uhrzeit ein; nachts leuchtet nur ganz wenig.",
-      why: "Kinderwecker, die mit Mond und Sonne oder einer Ampel zeigen, wann man aufstehen darf, sind eine eigene Gerätegattung; viele Familien haben ein altes Tablet, das das kann. Für Kinder, die um fünf am Bett der Eltern stehen.",
-      effort: "M",
-    },
-    {
-      id: "H-56",
-      emoji: "☀️",
-      title: "Tagesuhr: Wo im Tag sind wir?",
-      text: "Der Tag als Bogen von der Morgensonne bis zum Mond, darauf die Karten des Tagesplans an ihrer Zeit: Frühstück, Kita, Mittagessen, Mittagsschlaf, Abholen, Abendbrot. Ein kleiner Fuchs läuft mit der echten Uhr den Bogen entlang. Das Kind sieht, was schon war und was noch kommt: „Mama holt dich nach dem Schlafen ab.“",
-      why: "Zweijährige verstehen keine Uhrzeiten, aber Reihenfolgen; die Tagesuhr verbindet den Tagesplan mit der wirklichen Zeit.",
-      effort: "M",
-    },
-    {
-      id: "H-57",
-      emoji: "🎶",
-      title: "Timer: ein Lied so lang wie die Zeit",
-      text: "Zum Aufräumen oder Anziehen läuft ein Lied genau so lang wie die eingestellte Zeit (2, 3 oder 5 Minuten), und das Bild läuft mit: Bei jeder Strophe springt ein Spielzeug in die Kiste. Wenn das Lied aus ist, ist die Zeit um. Ein eigenes Suno-Lied pro Länge, wie das Zahnputzlied.",
-      why: "Kinder hören an Strophen und Refrain, wie weit ein Lied ist, lange bevor sie Zeit einschätzen können; ein vertrautes Lied trägt durchs Aufräumen, ohne dass jemand zur Eile drängt.",
-      effort: "M",
     },
     {
       id: "H-58",

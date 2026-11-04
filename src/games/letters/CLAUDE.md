@@ -1,39 +1,38 @@
 # Buchstaben & Zahlen
 
-Route `/buchstaben/` (the old `/woerter/` leads here). The only game of its book on the home page's shelf, so the book opens straight on it.
+The book „Buchstaben & Zahlen“ holds three games, each a page of its table of contents (`games.ts`), sharing this folder
+and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys stay as chosen in each):
+- Frei tippen, `/buchstaben/` (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its
+  things and digit at once, or optionally counts them aloud, step by step or by tapping each thing.
+- Zählen, `/zaehlen/` (`LettersPlay.tsx` with `numbersOnly`): only numbers come – a digit shows itself, any other key
+  without a meaning of its own (Space, Enter, arrows, Backspace keep theirs) brings a number from 1 to 9 by chance; on
+  touch screens only the digit keys. With `digitOnRepeat` (for „Alles sofort“ and „Vorzählen“, in both games) a number
+  shows its things first and its digit only when the same number is pressed again right after.
+- Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
+  mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
+  for a shown letter).
 
-Its book plays at once (`startMode`), in the way played last (Frei tippen at first), and it has no start screen: ✕ and
-„Menü“ go back to the shelf, the page before it (a start screen with two cards for the ways to play came after ✕ once,
-a menu the child had never seen, user feedback, November 2026). Two ways to play, switched behind ⚙️:
-- Frei tippen (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its things and
-  digit at once, or optionally counts them aloud, step by step or by tapping each thing. With „Nur Zahlen“
-  (`numbersOnly`, once the card Zählen) only numbers come: a digit shows itself, any other key without a meaning of its
-  own (Space, Enter, arrows, Backspace keep theirs) brings a number from 1 to 9 by chance; on touch screens only the
-  digit keys. With `digitOnRepeat` (for „Alles sofort“ and „Vorzählen“) a number shows its things first and its digit
-  only when the same number is pressed again right after.
-- Wörter tippen: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them mixed, all from
-  the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key for a shown
-  letter; once a card of its own).
-
-Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" | "find"`) are turned into these options once
-(`upgradeLegacyMode`).
+`LettersGame way={…}` is all three (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
+`names.ts`. Each plays at once (`startMode`) with no start screen: ✕ and „Menü“ go back to the book's table of contents,
+the page before it.
 
 ## Rules
 
+- The three are games of their own in the table of contents, never „Spielart“ or „Nur Zahlen“ choices behind one
+  game's ⚙️: they were folded into one game once and split again (user feedback, November 2026). A new thing to do with
+  letters or numbers is a new game in the book; a variant of one (which words, how numbers come) is an option of it.
 - Every option is changed while playing, never in the menu: ⚙️ in the top right corner (the way back, the page's corner, takes the left), always held (`PlayOptions`),
-  opens them over the game, which keeps playing behind; there is no start screen, no `level` row and no `settings`. The way
-  to play (Frei tippen / Wörter tippen) is one of these options too. A variant of a way to play is an option of it,
-  never a card of its own („Wo ist das B?“ is Wörter tippen's first letter, Zählen is Frei tippen's „Nur Zahlen“), and
-  the panel shows only the options of the way being played. An option that changes what comes next (which words, the
-  kind of pictures) brings a new word or letter at once (the play component's `key`).
-- The game plays at once in one way, so grown-ups wouldn't guess how many others wait behind ⚙️: as play starts a note
-  under it (`PlayOptions intro`) names them – letters, numbers, counting, whole words, „Wo ist das B?“. When a way to
-  play or a big variant is added, name it there too (user feedback, November 2026).
+  opens them over the game, which keeps playing behind; there is no start screen, no `level` row and no `settings`. The
+  panel shows only the options of the game being played (Zählen no letters). An option that changes what comes next
+  (which words, the kind of pictures) brings a new word or letter at once (the play component's `key`).
+- Each game plays at once, so grown-ups wouldn't guess what waits behind ⚙️: as play starts a note under it
+  (`PlayOptions intro`) names it – for Wörter tippen whole words, colours, doing words, „Wo ist das B?“. When a big
+  variant is added, name it there too (user feedback, November 2026).
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
-  it uses the game's shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters
-  (A / A a / a) are shared by every way to play – the words too („A a“ writes „Bär“).
-- On a phone on its side (Frei tippen, also with only numbers) letter, picture and word – or the things and the digit – stand side by
+  it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters
+  (A / A a / a) are shared by Frei tippen and Wörter tippen – the words too („A a“ writes „Bär“).
+- On a phone on its side (Frei tippen and Zählen) letter, picture and word – or the things and the digit – stand side by
   side, not stacked: the on-screen keys leave little height, and stacked they would be tiny (`letters.css`, end).
 - One right key is all a round of „Wo ist das B?“ and „Wörter tippen“ takes: after a short moment (`CELEBRATE_MS`) the
   next letter comes by itself (in „Wo ist das B?“), never waiting for another key or tap. The right key's answer is the

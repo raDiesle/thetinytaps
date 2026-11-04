@@ -34,6 +34,11 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
 - Two of the hidden surprises are the app's mascots as a family (`MascotFamily` in `hideout.tsx`): the fox or bear
   child in front with its paws on the edge, its grown-up bigger behind it, both with the shared `MascotHead`. A new
   surprise with a fox or bear comes the same way, never a lone fox or bear child.
+- Grown-ups in a role (the baker, the cashier, the teacher, the doctor, the forester) may be foxes or bears: `MascotFace`
+  (`shared.tsx`) puts the shared head where the person's round head was (its middle and radius), drawn without a line,
+  hats and glasses over it in the picture's coordinates, hands as paws in `MASCOT_COLORS`. Never draw a fox or bear
+  head of its own here. In a picture whose wild animals include a fox (Wald), the one in a role is a bear, so the
+  child doesn't take the forester for the fox of the wood. Mama, Papa, Oma and Opa next to a human child stay people.
 - Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
   small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
   riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.

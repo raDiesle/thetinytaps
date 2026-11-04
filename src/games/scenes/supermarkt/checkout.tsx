@@ -1,4 +1,5 @@
-import { Face, INK, Inside, SKIN, STEEL, Wheel, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { Face, INK, Inside, MascotFace, SKIN, STEEL, Wheel, nth } from "../shared";
 import { Lid, Lines, Notes, Sparkles } from "./parts";
 
 // The shopping cart with the child (CART coordinates, foot at (0, 0)) and the checkout
@@ -89,30 +90,26 @@ export function Kind() {
   );
 }
 
-/** The cashier behind the till; she waves, nods and her bun bounces. */
+/** The cashier behind the till, a vixen with a bow on her ear; she waves, nods and her bow bounces. */
 export function Kassiererin() {
+  const paw = MASCOT_COLORS.fox.paw;
   return (
     <g className="sm-kass-body" style={{ transformOrigin: "232px -190px" }}>
       <rect x="194" y="-264" width="76" height="80" rx="20" fill="#12b886" />
-      <path d="M220 -264 L232 -246 L244 -264" fill="#fff" />
+      <path d="M220 -264 L232 -246 L244 -264" fill={MASCOT_COLORS.fox.pale} />
       <rect x="246" y="-238" width="16" height="9" rx="2" fill="#fff" />
       <path d="M200 -232 L170 -204" stroke="#12b886" strokeWidth="13" strokeLinecap="round" />
-      <circle cx="166" cy="-202" r="8" fill={SKIN} />
+      <circle cx="166" cy="-202" r="8" fill={paw} />
       <g className="sm-kass-arm" style={{ transformOrigin: "264px -246px" }}>
         <path d="M264 -246 L290 -276" stroke="#12b886" strokeWidth="13" strokeLinecap="round" />
-        <circle cx="292" cy="-282" r="8" fill={SKIN} />
+        <circle cx="292" cy="-282" r="8" fill={paw} />
       </g>
       <g className="sm-kass-head" style={{ transformOrigin: "232px -266px" }}>
-        <g className="sm-kass-bun" style={{ transformOrigin: "232px -312px" }}>
-          <circle cx="232" cy="-322" r="13" fill="#5c3d2e" />
+        <MascotFace kind="fox" cx={232} cy={-288} r={27} lashes />
+        <g className="sm-kass-bun" style={{ transformOrigin: "254px -316px" }}>
+          <path d="M254 -316 L268 -326 L266 -306 Z M254 -316 L242 -328 L240 -308 Z" fill="#e64980" />
+          <circle cx="254" cy="-316" r="4.5" fill="#f783ac" />
         </g>
-        <circle cx="232" cy="-290" r="26" fill={SKIN} />
-        <path d="M206 -292 Q204 -318 232 -318 Q260 -318 258 -292 Q248 -306 232 -304 Q216 -306 206 -292 Z" fill="#5c3d2e" />
-        <Face cx={232} cy={-288} size={0.9} />
-        <Lid cx={225.7} cy={-288} r={3.1} fill={SKIN} />
-        <Lid cx={238.3} cy={-288} r={3.1} fill={SKIN} />
-        <circle cx="206" cy="-282" r="3.5" fill="#fcc419" />
-        <circle cx="258" cy="-282" r="3.5" fill="#fcc419" />
       </g>
     </g>
   );

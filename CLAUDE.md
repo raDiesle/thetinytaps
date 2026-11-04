@@ -73,12 +73,16 @@ In a fresh worktree run `bun install` first.
   A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
   for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)
   repeats this reminder with every message.
-- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
+- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
+  its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
+  area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
-  everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
+  everything goes that helps the user decide: ideas, the language table, and research. Scrolling down it always shows
+  every open idea: a tap above (the overview's numbers, the contents) jumps to its place and marks it, never filters, and
+  the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
@@ -189,7 +193,10 @@ In a fresh worktree run `bun install` first.
   `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
   pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
   in the ears, the far side of the fur in shadow, brows, eyes with two lights, a shiny nose. Never a head of its own
-  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Hats, bows and glasses go
+  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Cuddly and true to the
+  animal, for children (user feedback, November 2026): eyes a little below the head's middle with a warm brown iris
+  round the pupil (a child's bigger and lower), light in the fur as soft tufts, never a round plastic shine; bodies
+  round with chubby arms and round paws with toes, the fox's legs dark below the elbow as a real fox's. Hats, bows and glasses go
   in as its `children`, clothes and bodies round it in its colours and line; a better fox or bear is made there, so
   every game gets it. Toys (a teddy), wild animals of a scene and tiny patterns stay drawn on their own. `Mascot.test.ts` checks.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
@@ -244,7 +251,9 @@ In a fresh worktree run `bun install` first.
   one stays silent – except in a game whose story is told by the voice and can't be followed without it (Kleine
   Abenteuer, Bewegungsabenteuer): there the browser's voice (Google's) says a line until its recording is made
   (`recordedVoice(files, { browser: true })`, user decision, October 2026). Give a game that fallback only where it
-  really helps, never for a game that plays fine silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
+  really helps, never for a game that plays fine silent. Never add a switch for either again, with one exception: Gefühle's „Alltagssituationen“, where a grown-up
+  may want to tell the scenes to the child in their own words, has a held loudspeaker in its top left corner that
+  switches its voice off (`VoiceSwitch`, user decision, November 2026) – only there, never as a pattern for other games. Recordings are made only when the user asks (see Language).
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard, and on
@@ -316,7 +325,7 @@ In a fresh worktree run `bun install` first.
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
   that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
-  Belohnungstafel and Zeitplan, right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  Belohnungstafel, Zeitplan and „Wie lange warten?“ (the Zeitplan's Countdown), right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
@@ -346,7 +355,10 @@ In a fresh worktree run `bun install` first.
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
-  never a tap a child could make by chance.
+  never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
+  not the same game easier or with other words – are games of their own in the book's table of contents, never one
+  game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
+  split again, user feedback, November 2026).
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
@@ -434,7 +446,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
+  before playing (Socken-Paare finds its difficulty itself, Frei tippen changes everything behind ⚙️ while
   playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
   start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
   (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that

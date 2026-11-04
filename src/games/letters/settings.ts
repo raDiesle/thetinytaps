@@ -3,12 +3,6 @@ import type { ThemeId } from "@/content/types";
 
 export type LetterCase = "upper" | "both" | "lower";
 
-/**
- * "free": every key shows its letter or number (with `numbersOnly` only numbers). "words": a picture's word is typed
- * letter by letter, or with `wordTyping: "first"` a letter is shown and the child looks for its key („Wo ist das B?“).
- */
-export type LettersMode = "free" | "words";
-
 /** Which words „Wörter tippen“ plays: picture words, colour words, doing words, or all of them mixed. */
 export type WordKind = "nouns" | "all" | "colors" | "actions";
 
@@ -30,7 +24,6 @@ export type NumberReveal = "all" | "count" | "step" | "tap";
 export type Announce = "letterAndWord" | "word" | "letter";
 
 export interface LettersSettings {
-  mode: LettersMode;
   /** „Wo ist das B?“: after a few wrong keys, light up the wanted key on a little keyboard picture. */
   hints: boolean;
   letterCase: LetterCase;
@@ -51,8 +44,6 @@ export interface LettersSettings {
   numbers: NumberReveal;
   /** "count" only: ignore new letters/numbers until counting has finished. */
   finishCounting: boolean;
-  /** Frei tippen with numbers only (Zählen): any key that is no digit and has no meaning of its own brings a number. */
-  numbersOnly: boolean;
   /** "all" and "count": a number shows its things first, its digit only when the same number is pressed again. */
   digitOnRepeat: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
@@ -66,7 +57,6 @@ export interface LettersSettings {
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
-  mode: "free",
   hints: true,
   letterCase: "upper",
   letterFamily: true,
@@ -78,7 +68,6 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   sounds: true,
   numbers: "all",
   finishCounting: true,
-  numbersOnly: false,
   digitOnRepeat: false,
   touchKeys: "auto",
   wordKind: "nouns",
@@ -86,17 +75,6 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   wordLength: "4",
 };
 
-// v2: speech is off by default now, so old saved settings start fresh.
+// v2: speech is off by default now, so old saved settings start fresh. Shared by the book's three games, so letters,
+// pictures and keys stay as chosen in each.
 export const LETTERS_SETTINGS_KEY = "tinytaps.letters.v2";
-
-/**
- * Settings saved while Zählen and „Wo ist das B?“ were ways to play of their own: now they are Frei tippen with
- * `numbersOnly` and Wörter tippen's first letter. Returns the change to save, or null when there is none.
- */
-export function upgradeLegacyMode(settings: LettersSettings): Partial<LettersSettings> | null {
-  const mode: string = settings.mode;
-  if (mode === "count") return { mode: "free", numbersOnly: true };
-  if (mode === "find") return { mode: "words", wordTyping: "first" };
-  if (mode !== "free" && mode !== "words") return { mode: "free" };
-  return null;
-}

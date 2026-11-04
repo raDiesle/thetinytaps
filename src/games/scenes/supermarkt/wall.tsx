@@ -1,4 +1,5 @@
-import { Eye, Face, INK, Inside, SKIN, STEEL, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { Eye, Face, INK, Inside, MascotFace, SKIN, STEEL, nth } from "../shared";
 import { Lid, Lines, Mist, Notes, Sparkles } from "./parts";
 
 // Things on and at the back wall, drawn in picture coordinates: the loudspeaker, the sliding
@@ -169,7 +170,10 @@ export function Brezel() {
   );
 }
 
-/** The baker behind the counter; she waves and rings the little bell on the counter. */
+/** The baker's paws: she is a bear, one of the app's mascots in a role. */
+const BEAR_PAW = MASCOT_COLORS.bear.fur;
+
+/** The baker behind the counter, a bear in a chef's hat; she waves and rings the little bell on the counter. */
 export function Baeckerin() {
   return (
     <>
@@ -179,14 +183,10 @@ export function Baeckerin() {
         <circle cx="322" cy="232" r="4" fill="#ffd43b" />
         <g className="sm-baeckerin-arm" style={{ transformOrigin: "296px 224px" }}>
           <path d="M296 224 L276 196" stroke="#f783ac" strokeWidth="11" strokeLinecap="round" />
-          <circle cx="274" cy="191" r="7" fill={SKIN} />
+          <circle cx="274" cy="191" r="7" fill={BEAR_PAW} />
         </g>
         <g className="sm-baeckerin-head" style={{ transformOrigin: "322px 212px" }}>
-          <circle cx="322" cy="194" r="20" fill={SKIN} />
-          <path d="M303 192 Q301 176 322 176 Q343 176 341 192 Q333 182 322 184 Q311 182 303 192 Z" fill="#e8590c" />
-          <Face cx={322} cy={195} size={0.72} />
-          <Lid cx={316.96} cy={195} r={2.6} fill={SKIN} />
-          <Lid cx={327.04} cy={195} r={2.6} fill={SKIN} />
+          <MascotFace kind="bear" cx={322} cy={196} r={21} lashes />
           <g className="sm-baeckerin-hat" style={{ transformOrigin: "322px 178px" }}>
             <rect x="306" y="170" width="32" height="10" rx="3" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
             <circle cx="312" cy="162" r="10" fill="#fff" />
@@ -203,7 +203,7 @@ export function Baeckerin() {
       <rect className="sm-baeckerin-button" x="371" y="222" width="6" height="7" rx="2" fill="#e67700" />
       <g className="sm-baeckerin-ring" style={{ transformOrigin: "348px 224px" }}>
         <path d="M348 224 L368 216" stroke="#f783ac" strokeWidth="10" strokeLinecap="round" />
-        <circle cx="372" cy="215" r="6.5" fill={SKIN} />
+        <circle cx="372" cy="215" r="6.5" fill={BEAR_PAW} />
       </g>
       <g className="sm-baeckerin-dings" stroke="#fab005" strokeWidth="3" strokeLinecap="round">
         <path d="M356 220 l-8 -8" style={nth(0)} />

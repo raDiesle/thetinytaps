@@ -49,6 +49,12 @@ describe("home menu", () => {
     }
   });
 
+  test("Frei tippen, Zählen and Wörter tippen are three games in their book's table of contents, not ways to play of one", () => {
+    const book = CATEGORIES.find((category) => category.id === "buchstaben-zahlen");
+    expect(book && hasPage(book)).toBe(true);
+    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/woerter/"]);
+  });
+
   test("category ids and game addresses are unique", () => {
     const ids = CATEGORIES.map((category) => category.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -476,7 +482,7 @@ describe("Russian", () => {
 test("the Alltagshelfer stand first on the shelf, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual(["/zaehne/", "/toepfchen/", "/belohnungstafel/"]);
-  expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);
+  expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/", "/wie-lange-warten/"]);
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or

@@ -41,6 +41,16 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
   the group played last keeps its place, marked „zuletzt“, and goes on with the scene where the child stopped
   (`settings.group`, `settings.scene`). The old addresses `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
 
+**The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
+tell the scenes to the child in their own words. So while it plays, a wooden loudspeaker with a speech bubble stands in
+the top left corner below the ✕ (`VoiceSwitch.tsx`, drawn like the shelf's loudspeaker for the music), with „halten“
+under it: held for half a second (never a tap, a child taps it by chance) it switches off everything said – the scene,
+the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; held again, it speaks again. The sounds
+(crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
+already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
+to tell them. „Wie geht's dir?“ always speaks (`MoodGame` sets `voice: true`) and has no such switch; no other game gets
+one (`feelings.test.ts`).
+
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
 the good one comes its picture (and, on the story's last step, its happy end), then straight on to the _next scene_ of

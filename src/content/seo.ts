@@ -100,6 +100,13 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Ein Bilderbuch über Gefühle: Zuerst zeigt das Kind, wie es ihm geht – Sonne, Wolke, Regen oder Gewitter. Dann erlebt der kleine Bär Alltagssituationen, und das Kind wählt, was hilft.",
   },
   {
+    path: "/spiele/buchstaben-zahlen/",
+    title: "Buchstaben und Zahlen lernen – Tastatur-Spiele",
+    description:
+      "Frei tippen, Zählen und Wörter tippen: Jede Taste zeigt ihren Buchstaben mit Bild und Stimme, Zahlen kommen mit Dingen zum Zählen. Ohne Werbung.",
+    text: "Drei Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“.",
+  },
+  {
     path: "/spiele/zuordnen/",
     title: "Zuordnen lernen – Spiele für Kleinkinder",
     description:
@@ -173,9 +180,23 @@ export const SEO_TEXTS: PageSeo[] = [
   },
   {
     path: "/buchstaben/",
-    title: "Buchstaben und Zahlen lernen – Tastatur-Spiel",
-    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Dazu Zählen, „Wo ist das B?“ und erste Wörter tippen. Ohne Werbung.",
-    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Buchstaben mit Bild und Wort, Zahlen mit Dingen zum Zählen, Buchstaben suchen und erste Wörter, Farben und Tu-Wörter tippen.",
+    title: "Frei tippen – Buchstaben lernen mit der Tastatur",
+    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Zahlen kommen mit Dingen zum Zählen. Ein Tastatur-Spiel ohne Werbung.",
+    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Jeder Buchstabe kommt mit Bild und Wort, jede Zahl mit Dingen zum Zählen. Auf Wunsch große und kleine Buchstaben, Nachspuren mit dem Finger und Bilder zu einem Thema.",
+  },
+  {
+    path: "/zaehlen/",
+    title: "Zählen lernen – Zahlen-Spiel für Kleinkinder",
+    description:
+      "Jede Taste bringt eine Zahl mit so vielen Dingen zum Zählen: alles auf einmal, vorgezählt, Schritt für Schritt oder selbst gezählt. Ohne Werbung.",
+    text: "Ein Zahlen-Spiel auf der Tastatur oder dem Bildschirm: Jede Ziffer zeigt sich mit so vielen Dingen, jede andere Taste bringt eine Zahl von 1 bis 9. Die Dinge kommen alle auf einmal, werden vorgezählt, kommen Schritt für Schritt, oder das Kind tippt jedes an und zählt selbst.",
+  },
+  {
+    path: "/woerter/",
+    title: "Wörter tippen – erste Wörter für Kleinkinder",
+    description:
+      "Erste Wörter Buchstabe für Buchstabe tippen: Bär, Ball, Farben und Tu-Wörter. Oder „Wo ist das B?“ – die Taste zum Buchstaben finden. Ohne Werbung.",
+    text: "Ein Bild und sein Wort: Das Kind tippt es Buchstabe für Buchstabe auf der Tastatur oder dem Bildschirm. Bildwörter, Farben, Tu-Wörter oder alles gemischt, in drei Längen. Oder nur der erste Buchstabe: „Wo ist das B?“ – die Taste dazu finden.",
   },
   {
     path: "/zaehne/",
@@ -211,6 +232,13 @@ export const SEO_TEXTS: PageSeo[] = [
     description:
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Bildkarten zum Drucken und Ausmalen.",
     text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel – in Farbe oder schwarz-weiß, wo jede Karte als Ausmalbild mit klaren Linien gezeichnet ist, damit das Kind seinen Plan selbst ausmalt. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
+  },
+  {
+    path: "/wie-lange-warten/",
+    title: "Countdown für Kinder – Wie oft noch schlafen?",
+    description:
+      "Bis zum Geburtstag, zum Urlaub oder bis Oma kommt: ein kleines Bett mit Mond für jedes Mal Schlafen, und jeden Morgen tippt das Kind einen Mond zur Sonne.",
+    text: "Kleine Kinder verstehen „in fünf Tagen“ noch nicht, aber „noch fünfmal schlafen“ schon – und darum zählt dieser Countdown in Betten. Für jede Nacht bis zum großen Tag steht ein kleines Bett mit einem Mond darüber, und daneben wartet das Bild vom Tag selbst: Geburtstag, Urlaub, Oma und Opa, der erste Kita-Tag. Jeden Morgen leuchtet das Bett der vergangenen Nacht, das Kind tippt es an, der Hahn kräht, und über dem Bett geht die Sonne auf. So wachsen die Sonnen, und die Monde werden weniger, bis am großen Tag das Bild groß dasteht. Wir stellen den Tag und das Bild ein, und wer mag, druckt die Monde aus und malt jeden Morgen einen davon an. Im selben Regalfach: die Belohnungstafel und der Tagesplan in Bildern.",
   },
   {
     path: "/schnullerfee/",
