@@ -49,6 +49,12 @@ describe("home menu", () => {
     }
   });
 
+  test("Frei tippen, Zählen and Wörter tippen are three games in their book's table of contents, not ways to play of one", () => {
+    const book = CATEGORIES.find((category) => category.id === "buchstaben-zahlen");
+    expect(book && hasPage(book)).toBe(true);
+    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/woerter/"]);
+  });
+
   test("category ids and game addresses are unique", () => {
     const ids = CATEGORIES.map((category) => category.id);
     expect(new Set(ids).size).toBe(ids.length);

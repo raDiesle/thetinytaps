@@ -1,4 +1,5 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
+import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
@@ -407,30 +408,12 @@ export const CATEGORIES: Category[] = [
       ar: "الضغط على الأزرار وإيجاد الحروف",
       ru: "Нажимать клавиши, находить буквы",
     },
-    // One game, so the home card opens it directly (see categoryHref).
+    // Three games, each a page of the book's table of contents, never ways to play behind ⚙️ of one game (user
+    // feedback, November 2026).
     games: [
-      {
-        href: "/buchstaben/",
-        emoji: "🔤",
-        title: {
-          de: "Buchstaben & Zahlen",
-          ru: "Буквы и цифры",
-          en: "Letters & Numbers",
-          zh: "字母和数字",
-          hi: "अक्षर और अंक",
-          es: "Letras y números",
-          ar: "الحروف والأرقام",
-        },
-        blurb: {
-          de: "Tasten drücken, Buchstaben finden",
-          en: "Press keys, find letters",
-          zh: "按按键，找字母",
-          hi: "बटन दबाना, अक्षर ढूँढना",
-          es: "Pulsar teclas, encontrar letras",
-          ar: "الضغط على الأزرار وإيجاد الحروف",
-          ru: "Нажимать клавиши, находить буквы",
-        },
-      },
+      { href: "/buchstaben/", emoji: "⌨️", title: FREE_TITLE, blurb: FREE_BLURB },
+      { href: "/zaehlen/", emoji: "🔢", title: COUNT_TITLE, blurb: COUNT_BLURB },
+      { href: "/woerter/", emoji: "✍️", title: WORDS_TITLE, blurb: WORDS_BLURB },
     ],
   },
 ];

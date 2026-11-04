@@ -110,6 +110,16 @@ export const SCENARIOS: Scenario[] = [
     path: "/buchstaben/",
     parts: [{ label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } }],
   },
+  {
+    name: "zaehlen",
+    path: "/zaehlen/",
+    parts: [{ label: "Zahlen tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."3719524"], every: 700 } }],
+  },
+  {
+    name: "woerter",
+    path: "/woerter/",
+    parts: [{ label: "Wörter tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcdefghijklmnoprstu"], every: 400 } }],
+  },
   { name: "tiere", path: "/tiere/", parts: [{ label: "Wer schaut da raus? und Füttern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   {
     // „Was wird aus mir?“ alone, the right one tapped each time, so the small ones keep growing up.

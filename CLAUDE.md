@@ -342,7 +342,10 @@ In a fresh worktree run `bun install` first.
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
-  never a tap a child could make by chance.
+  never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
+  not the same game easier or with other words – are games of their own in the book's table of contents, never one
+  game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
+  split again, user feedback, November 2026).
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
@@ -427,7 +430,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
+  before playing (Socken-Paare finds its difficulty itself, Frei tippen changes everything behind ⚙️ while
   playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
   start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
   (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that
