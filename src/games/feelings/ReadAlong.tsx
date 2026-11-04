@@ -1,13 +1,14 @@
-import { type KeyboardEvent, type PointerEvent, type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { useT } from "@/lib/language";
 import { type ReadAlongPart, type ReadPart, readAlong, type Round } from "./rounds";
 import { Mark } from "./shared";
+import { tapProps } from "./VoiceSwitch";
 
 /**
  * „Alltagssituationen“ only (user wish, November 2026): in the screen's bottom right corner, beside the loudspeaker
  * (`VoiceSwitch`, passed as `children`), a paper note with an open book shows grown-ups everything the voice says in
  * this scene – the scene and its question, the not-so-good idea, the good one, the happy end – so they can read it out.
- * One tap opens it and one tap closes it (user feedback, November 2026: held, it was too slow to reach). The sheet opens
+ * One tap opens it and one tap closes it (`tapProps`; user feedback, November 2026: held, it was too slow to reach). The sheet opens
  * above the notes, in the corner where it covers least of the pictures, and stays open from scene to scene until
  * closed. While the voice tells the scene the part told now is marked; with the voice off the grown-up reads everything,
  * so all of it shows alike, nothing marked (`voice`).
@@ -39,24 +40,7 @@ export function ReadAlong({
     <>
       {open && !hidden && <Sheet parts={readAlong(round)} part={voice ? part : undefined} />}
       <div className="story-corner">
-        <button
-          type="button"
-          className="story-text"
-          aria-pressed={open}
-          aria-label={label}
-          title={label}
-          data-tap-keep
-          onPointerDown={(e: PointerEvent) => {
-            e.stopPropagation();
-            onToggle();
-          }}
-          onKeyDown={(e: KeyboardEvent) => {
-            if (e.key !== "Enter" && e.key !== " ") return;
-            e.preventDefault();
-            e.stopPropagation();
-            onToggle();
-          }}
-        >
+        <button type="button" className="story-text" aria-pressed={open} aria-label={label} title={label} data-tap-keep {...tapProps(onToggle)}>
           <svg viewBox="0 0 64 48" aria-hidden>
             {/* An open book: two pages with lines of text, bent down to the spine. */}
             <path className="story-text-page" d="M32 10 Q20 3 4 6 V42 Q20 39 32 46 Z" />

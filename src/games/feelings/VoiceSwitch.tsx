@@ -1,34 +1,36 @@
-import { useHold } from "@/lib/hold";
-import { type Localized, useT } from "@/lib/language";
-
-/** How long the switch has to be held: as long as ⚙️ while playing, so a child's tap changes nothing. */
-export const HOLD_MS = 500;
-
-/** „halten“ under a grown-ups' note held to change something. */
-export const HOLD_WORD: Localized<string> = { de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" };
+import type { KeyboardEvent, PointerEvent } from "react";
+import { useT } from "@/lib/language";
 
 /**
- * „Alltagssituationen“ only (user decision, November 2026): a wooden loudspeaker with a speech bubble in the top left
- * corner, below the ✕, drawn like the shelf's loudspeaker for the music. Held, it switches the voice that tells the
- * scene, asks the question and names the choices off or on, for grown-ups who would rather tell the story to the child
- * in their own words; the sounds (crying, laughing, a crash) stay. Off, the bubble gives way to a red cross.
+ * One tap on a grown-ups' note in the corner acts at once, as the finger lands (or Enter / Space): the loudspeaker and
+ * the book of the text to read out are tapped, never held (user feedback, November 2026: held, they were too slow).
+ */
+export const tapProps = (onTap: () => void) => ({
+  onPointerDown: (e: PointerEvent) => {
+    e.stopPropagation();
+    onTap();
+  },
+  onKeyDown: (e: KeyboardEvent) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    onTap();
+  },
+});
+
+/**
+ * „Alltagssituationen“ only (user decision, November 2026): a wooden loudspeaker with a speech bubble in the bottom
+ * right corner, beside the book of the text to read out, drawn like the shelf's loudspeaker for the music. One tap
+ * switches the voice that tells the scene, asks the question and names the choices off or on, for grown-ups who would
+ * rather tell the story to the child in their own words; the sounds (crying, laughing, a crash) stay. Off, the bubble
+ * gives way to a red cross.
  */
 export function VoiceSwitch({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   const t = useT();
-  const { holding, props } = useHold(onToggle, HOLD_MS);
   const label = on ? t({ de: "Stimme ausschalten" }) : t({ de: "Stimme einschalten" });
-  const hold = t(HOLD_WORD);
 
   return (
-    <button
-      type="button"
-      className={`story-voice${holding ? " holding" : ""}`}
-      aria-pressed={on}
-      aria-label={`${label} (${hold})`}
-      title={label}
-      data-tap-keep
-      {...props}
-    >
+    <button type="button" className="story-voice" aria-pressed={on} aria-label={label} title={label} data-tap-keep {...tapProps(onToggle)}>
       <svg viewBox="0 0 80 84" aria-hidden>
         {/* The box, its side and feet, one big cone: the shelf's loudspeaker, smaller. */}
         <path className="story-voice-side" d="M44 26 L49 29 V76 L44 80 Z" />
@@ -50,7 +52,6 @@ export function VoiceSwitch({ on, onToggle }: { on: boolean; onToggle: () => voi
           <path className="story-voice-off" d="M50 5 L70 25 M70 5 L50 25" />
         )}
       </svg>
-      <small>{hold}</small>
     </button>
   );
 }

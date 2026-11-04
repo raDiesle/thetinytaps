@@ -151,16 +151,16 @@ test("a scene goes on with a tap, and one thing moves at a time", () => {
 });
 
 // „Alltagssituationen“ alone has a switch for its voice, for grown-ups who tell the story themselves (user decision,
-// November 2026): held, never a tap a child makes by chance, and „Wie geht's dir?“ always speaks.
-test("the voice switch is Alltagssituationen's alone, and held", () => {
+// November 2026): one tap, like the book beside it (held, it was too slow, user feedback), and „Wie geht's dir?“ always speaks.
+test("the voice switch is Alltagssituationen's alone, and tapped", () => {
   const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "RoundPlay.tsx"].filter((f) =>
     readFileSync(`src/games/feelings/${f}`, "utf8").includes("<VoiceSwitch"),
   );
   expect(users).toEqual(["FeelingsPlay.tsx"]);
   expect(readFileSync("src/games/feelings/MoodGame.tsx", "utf8")).toContain("voice: true");
   const button = readFileSync("src/games/feelings/VoiceSwitch.tsx", "utf8");
-  expect(button).toContain("useHold(onToggle");
-  expect(button).not.toContain("onClick");
+  expect(button).toContain("{...tapProps(onToggle)}");
+  expect(button).not.toContain("useHold");
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");
 });
 
@@ -183,6 +183,7 @@ test("the text to read out holds every line a round says", () => {
   expect(users).toEqual(["FeelingsPlay.tsx"]);
   const note = readFileSync("src/games/feelings/ReadAlong.tsx", "utf8");
   expect(note).not.toContain("useHold");
+  expect(note).toContain("{...tapProps(onToggle)}");
   expect(note, "the loudspeaker stands in the same corner").toContain('className="story-corner"');
   expect(note, "with the voice off nothing is marked").toContain("part={voice ? part : undefined}");
   expect(readFileSync("src/games/feelings/FeelingsPlay.tsx", "utf8"), "switching the voice off opens the text").toContain("{ voice: false, text: true }");

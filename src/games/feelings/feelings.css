@@ -718,7 +718,7 @@
   gap: 8px;
 }
 
-/* Both are paper notes like the ones clipped to the page; the loudspeaker is held, the book a plain tap. */
+/* Both are paper notes like the ones clipped to the page, each switched by one tap. */
 .story-voice,
 .story-text {
   display: flex;
@@ -753,17 +753,6 @@
   display: block;
   width: calc(var(--note-w) - 12px);
   height: auto;
-}
-
-.story-voice small {
-  font-size: 0.7rem;
-  line-height: 1;
-  opacity: 0.75;
-}
-
-.story-voice.holding {
-  outline: 4px solid #7fd06a;
-  outline-offset: 2px;
 }
 
 .story-voice-box {
@@ -845,8 +834,8 @@
    its text, scrolled by itself when it is long. While the voice tells the scene (`.told`) the part told now is marked
    by the highlighter and the others are paler; with the voice off everything shows alike, to be read through. */
 .story-text-sheet {
-  /* The notes' height: the loudspeaker with „halten“ under it. */
-  --corner-h: calc((var(--note-w) - 14px) * 1.05 + 1.3rem);
+  /* The notes' height: the loudspeaker and its paper round it. */
+  --corner-h: calc((var(--note-w) - 14px) * 1.05 + 10px);
   --sheet-bottom: calc(var(--pad) + var(--corner-h) + 8px);
   --sheet-top: calc(var(--pad) + 36px);
 
@@ -896,10 +885,12 @@
 }
 
 /* Wide: the sheet starts below the good card on the top right and is as wide as the room right of the picture, but
-   never narrower than a readable line. */
+   never narrower than a readable line; its bottom stays above the notes and above ▶ on the picture's bottom right
+   corner (`.fg-next-sign`), which it reaches over. */
 @media (min-aspect-ratio: 6 / 5) {
   .story-text-sheet {
     --sheet-top: calc(var(--card-edge) + var(--card-w) * 0.75 + 10px);
+    --sheet-bottom: max(var(--pad) + var(--corner-h) + 8px, var(--pic-top) + 18px + clamp(48px, var(--pic-w) * 0.13, 96px));
 
     width: max(50cqw - var(--pic-w) / 2 - var(--pad), min(44cqw, 22rem));
   }
@@ -937,18 +928,10 @@
   .story-text {
     padding: 4px 3px 3px;
   }
-
-  .story-voice small {
-    font-size: 0.6rem;
-  }
 }
 
 @media (min-width: 900px) and (min-height: 600px) {
   .story-play {
     --note-w: 78px;
-  }
-
-  .story-voice small {
-    font-size: 0.8rem;
   }
 }

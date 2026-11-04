@@ -44,8 +44,9 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
 tell the scenes to the child in their own words. So while it plays, a wooden loudspeaker with a speech bubble stands in
 the screen's bottom right corner beside the book of the text to read out (`VoiceSwitch.tsx`, drawn like the shelf's
-loudspeaker for the music), with „halten“ under it: held for half a second (never a tap, a child taps it by chance) it switches off everything said – the scene,
-the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; held again, it speaks again. The sounds
+loudspeaker for the music). One tap on it (never held: held, it was too slow for grown-ups, user feedback, November
+2026) switches off everything said – the scene,
+the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; tapped again, it speaks again. The sounds
 (crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
 already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
 to tell them. „Wie geht's dir?“ always speaks (`MoodGame` sets `voice: true`) and has no such switch; no other game gets
@@ -63,7 +64,7 @@ now is marked with the highlighter and scrolled into view; **with the voice off 
 since the grown-up reads it all** – and switching the voice off opens the sheet by itself. It stays open from scene to
 scene and visit to visit (`settings.text`), but steps aside at a pass's end, where „Weiter“ stands. Only in
 „Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts` checks that the sheet holds every line a round says
-– a new kind of line said in a round goes into `readAlong` too – and that the note is tapped, not held.
+– a new kind of line said in a round goes into `readAlong` too – and that both notes are tapped, never held (`tapProps`).
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
