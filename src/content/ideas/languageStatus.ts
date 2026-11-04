@@ -179,6 +179,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "text" },
         note: "Neu (4. November 2026), nur Deutsch und noch nicht aufgenommen – bis dahin liest die Stimme des Browsers; die anderen Sprachen fehlen.",
       },
+      {
+        label: "🥨 Beim Bäcker",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu (4. November 2026), nur Deutsch und noch nicht aufgenommen – bis dahin liest die Stimme des Browsers; die anderen Sprachen fehlen.",
+      },
     ],
   },
   {

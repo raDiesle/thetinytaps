@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
 import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, handColor, KidHead, type Look } from "../kid";
+import { ChefHat } from "../things";
 
 // The grown-ups of the films, drawn from the front with their feet at (0, 0), facing right. They use the class
 // names of the children (`el-kid`, `pose-…`, `el-arm-r` …), so the poses of elevator.css move them the same way.
@@ -25,8 +26,8 @@ const ARMS = {
   ear: { d: "M24 -188 Q58 -196 36 -228", hand: [34, -230] },
 } as const;
 
-/** A grown-up; `face` -1 turns it left. With `wear` "fire" it is a firefighter, with "blanket" a warm blanket lies
- * round its shoulders. */
+/** A grown-up; `face` -1 turns it left. With `wear` "fire" it is a firefighter, with "baker" a baker in a white
+ * jacket and a baker's hat, with "blanket" a warm blanket lies round its shoulders. */
 export function Grownup({
   look,
   pose,
@@ -36,12 +37,13 @@ export function Grownup({
 }: {
   look: Look;
   pose: GrownPose;
-  wear?: ("fire" | "blanket")[];
+  wear?: ("fire" | "baker" | "blanket")[];
   face?: 1 | -1;
   holding?: ReactNode;
 }) {
   const fire = wear.includes("fire");
-  const shirt = fire ? FIRE_BLUE : look.shirt;
+  const baker = wear.includes("baker");
+  const shirt = fire ? FIRE_BLUE : baker ? "#f8f9fa" : look.shirt;
   const pants = fire ? FIRE_BLUE : look.pants;
   const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
   const left = ARMS[pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
@@ -69,6 +71,19 @@ export function Grownup({
         ))}
         <rect x="-32" y="-202" width="64" height="110" rx="22" fill={shirt} />
         {fire && <path d="M-32 -116 H32 M-32 -132 H32" stroke={FIRE_STRIPE} strokeWidth="6" />}
+        {baker && (
+          <g>
+            <rect x="-32" y="-202" width="64" height="110" rx="22" fill="none" stroke="#ced4da" strokeWidth="3" />
+            <g fill="#adb5bd">
+              {[-178, -154, -130].map((y) => (
+                <g key={y}>
+                  <circle cx="-10" cy={y} r="4" />
+                  <circle cx="10" cy={y} r="4" />
+                </g>
+              ))}
+            </g>
+          </g>
+        )}
         {arm(left, "el-arm-l", "-24px -188px", true)}
         {holding && <g transform="translate(0 -122)">{holding}</g>}
         {wear.includes("blanket") && (
@@ -83,6 +98,11 @@ export function Grownup({
           <g transform="translate(0 -120) scale(0.8)">
             <KidHead look={look} />
             {fire && <FireHelmet />}
+            {baker && (
+              <g transform="translate(0 -160) scale(0.95)">
+                <ChefHat />
+              </g>
+            )}
           </g>
         </g>
       </g>

@@ -150,6 +150,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         state: "partial",
         note: "Die Briefträgerin ist eine Bärin. Mama oder Papa und Oma sind die Familie des Kindes, das ein Mensch bleibt: sie warten auf D-19 (ein Menschenkind mit Fuchs-Mama passt nicht).",
       },
+      {
+        label: "Der Bäcker im Bäcker-Film ist ein Fuchs oder Bär",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Der Bäcker ist ein Bär mit weißer Jacke und Bäckermütze. Mama oder Papa und der Bruder sind die Familie des Kindes und warten auf D-19.",
+      },
       { label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen", work: "drawing", effort: "M" },
       { label: "Das Kind als Fuchs- oder Bärenkind", work: "drawing", effort: "M", idea: "D-19", note: "Erst entscheiden." },
     ],
