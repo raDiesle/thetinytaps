@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { INK, SKIN } from "@/games/scenes/shared";
-import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, KidHead, type Look } from "../kid";
+import { INK } from "@/games/scenes/shared";
+import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, handColor, KidHead, type Look } from "../kid";
 
 // The grown-ups of the films, drawn from the front with their feet at (0, 0), facing right. They use the class
 // names of the children (`el-kid`, `pose-…`, `el-arm-r` …), so the poses of elevator.css move them the same way.
@@ -9,13 +9,13 @@ import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, KidHead, type Look } from "../kid";
  * `hold` carries something in front of the chest (`holding`). */
 export type GrownPose = "stand" | "walk" | "cheer" | "phone" | "hold";
 
-/** The firefighters and the people they help. */
+/** The firefighters and the people they help: the app's mascots, a fox and a bear in the crew (D-18). */
 export const CREW: Look[] = [
-  { shirt: "#f76707", pants: "#495057", hair: "#5c3d2e" },
-  { shirt: "#12b886", pants: "#364fc7", hair: "#e8b04b", curly: true },
+  { shirt: "#f76707", pants: "#495057", hair: "#5c3d2e", animal: "fox" },
+  { shirt: "#12b886", pants: "#364fc7", hair: "#e8b04b", curly: true, animal: "bear", lashes: true },
 ];
-export const NEIGHBOUR: Look = { shirt: "#e64980", pants: "#5f3dc4", hair: "#343a40", curly: true };
-export const RESIDENT: Look = { shirt: "#fab005", pants: "#1971c2", hair: "#a0522d" };
+export const NEIGHBOUR: Look = { shirt: "#e64980", pants: "#5f3dc4", hair: "#343a40", curly: true, animal: "fox", lashes: true };
+export const RESIDENT: Look = { shirt: "#fab005", pants: "#1971c2", hair: "#a0522d", animal: "bear" };
 export const DRIVER: Look = { shirt: "#7950f2", pants: "#2b8a3e", hair: "#c2410c", curly: true };
 
 const ARMS = {
@@ -49,7 +49,7 @@ export function Grownup({
     <g className={`el-arm ${className}`} style={{ transformOrigin: origin }}>
       <g transform={mirror ? "scale(-1 1)" : undefined}>
         <path d={a.d} stroke={shirt} strokeWidth="17" strokeLinecap="round" fill="none" />
-        <circle cx={a.hand[0]} cy={a.hand[1]} r="10" fill={SKIN} />
+        <circle cx={a.hand[0]} cy={a.hand[1]} r="10" fill={handColor(look)} />
         {!mirror && pose === "phone" && (
           <rect x={a.hand[0] - 12} y={a.hand[1] - 22} width="16" height="34" rx="4" fill="#343a40" stroke={INK} strokeWidth="2" />
         )}
@@ -78,7 +78,7 @@ export function Grownup({
           </g>
         )}
         {arm(right, "el-arm-r", "24px -188px", false)}
-        <rect x="-8" y="-212" width="16" height="14" fill={SKIN} />
+        <rect x="-8" y="-212" width="16" height="14" fill={handColor(look)} />
         <g className="el-head" style={{ transformOrigin: "0px -206px" }}>
           <g transform="translate(0 -120) scale(0.8)">
             <KidHead look={look} />

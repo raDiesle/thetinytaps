@@ -5,6 +5,8 @@
   --machine-small: min(22vh, 26vw);
   position: absolute;
   inset: 0;
+  /* So the big machine and the family beside it can be sized and centred together (cqw, cqh). */
+  container-type: size;
   display: flex;
   flex-direction: column;
   background: linear-gradient(#dff1fb, #f3fafe 60%);
@@ -130,11 +132,13 @@
 }
 
 .sock-machine {
+  /* The big machine's height; with the family beside it (about 0.57 of it wide) the two stand centred together. */
+  --machine-big: min(88cqh, 52cqw);
   position: absolute;
   z-index: 2;
-  left: 50%;
+  left: calc(50cqw - 0.29 * var(--machine-big));
   top: 50%;
-  height: min(88%, 74vw);
+  height: var(--machine-big);
   aspect-ratio: 200 / 236;
   translate: -50% -50%;
   transition:
@@ -149,6 +153,49 @@
   top: calc(100% - var(--machine-small) - 2vh);
   height: var(--machine-small);
   translate: 0 0;
+}
+
+/* Tapsi and Mama Fuchs beside the big machine while it washes, sized by it; they go as it moves into the corner. */
+.sock-family {
+  position: absolute;
+  left: 103%;
+  bottom: 0;
+  height: 58%;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  transition: opacity 0.4s ease-in;
+}
+
+.sock-machine.open .sock-family {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease-out,
+    visibility 0s 0.3s;
+}
+
+.sock-family > span {
+  display: block;
+  aspect-ratio: 2 / 3;
+}
+
+.sock-family svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sock-family-child {
+  position: relative;
+  z-index: 1;
+  height: 66%;
+}
+
+.sock-family-grown {
+  height: 100%;
+  /* A little behind the child, as a grown-up stands by. */
+  translate: -14% 0;
 }
 
 .sock-machine-svg {
