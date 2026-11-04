@@ -28,3 +28,6 @@ Files: `TimerGame.tsx` (start screen: cards and minutes), `TimerPlay.tsx` (one r
   stage is 1600 × 900 covering the screen: keep what matters within x 200–1400 and y 80–820.
 - Development: `?sekunden=<n>` in the address makes a run take n seconds instead of the minutes chosen.
 - It says nothing, so there is no voice line to record.
+- Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
+  Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,
+  also over long times (H-45, H-63 to H-69), and new pictures. A new timer idea goes there, not into the Alltagshelfer.

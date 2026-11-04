@@ -73,7 +73,9 @@ In a fresh worktree run `bun install` first.
   A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
   for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)
   repeats this reminder with every message.
-- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
+- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
+  its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
+  area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
