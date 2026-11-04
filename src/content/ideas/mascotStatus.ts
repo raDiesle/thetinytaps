@@ -164,9 +164,24 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/wie-gehts-dir/",
-    note: "Der kleine Bär unter dem Wetter (die vier Wetterbilder); danach spielen die Szenen von „Alltagssituationen“.",
+    note: "Acht Gefühle als Fuchs- oder Bärenkind mit Mama oder Papa (C-30); das Gesicht zum Nachmachen ist der gemeinsame MascotHead. Danach spielen die Szenen von „Alltagssituationen“.",
     tasks: [
-      { label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter)", work: "picture", pictures: 4, effort: "M", idea: "C-30" },
+      {
+        label: "Fuchs- oder Bärenkind macht das Gesicht des Gefühls groß vor und pustet mit (MascotHead)",
+        work: "drawing",
+        effort: "S",
+        idea: "C-35",
+        state: "done",
+      },
+      {
+        label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter), und wird in den Arm genommen",
+        work: "picture",
+        pictures: 16,
+        effort: "M",
+        idea: "C-30",
+        state: "partial",
+        note: "Gebaut; die 16 Bilder (gesicht-…) warten in der Bilder-Queue, bis dahin zeigt die gebaute Seite die vier Wetterkarten.",
+      },
     ],
   },
   {

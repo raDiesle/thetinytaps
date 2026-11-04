@@ -193,6 +193,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       { label: "Zeile für Erwachsene", languages: { de: "done" }, note: "MOOD_BLURB in names.ts, nur Deutsch; der Titel ist übersetzt." },
       {
+        label: "Gesichter, Gesicht nachmachen, Wie doll ist es?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-29, C-30, C-35, C-36), nur Deutsch und noch nicht aufgenommen: die Namen der acht Gefühle, „Kannst du auch so gucken?“, die drei Stärken, das gemeinsame Pusten (MOODS, STRENGTHS, MOOD_LINES in mood.ts). Die vier Wetterkarten der gebauten Seite sind übersetzt.",
+      },
+      {
         label: "Was hilft dir jetzt?",
         languages: { de: "done" },
         note: "Neu (4. November 2026, C-31), nur Deutsch und noch nicht aufgenommen: die Frage, die fünf Dinge, die helfen, und was zu jedem gesagt wird (HELPS in mood.ts).",

@@ -3,18 +3,31 @@
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
 `cover-gefuehle.webp`; user decision, November 2026) with two games; their names are in `names.ts`. Ideas for more
 games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes area C:
-- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`) plays at once: four weather
-  cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show the bear under that weather, feeling the same. The child
-  picks the one that fits; it shows big while the bear says „Das kenne ich auch!“, then „Was hilft dir jetzt?“ (C-31)
-  offers three cards of the little bear doing what helps (`Weather.helps` from `HELPS`: kuscheln, toben, etwas
-  trinken, ein bisschen allein sein, ein Lied – the three that fit that feeling, none of them wrong, so the grown-up
-  sees what the child needs); the picked one shows big with its line („Kuscheln tut gut.“), then a pass of the
-  matching group plays (`Weather.group`: sun → Freude & Stolz, cloud → Müde & zu viel, rain → Traurig, storm → Wütend), without
-  touching the place „Alltagssituationen“ goes on from (`remember={false}`). „Nochmal“ asks for the weather again.
-  Keys 1–4 pick a weather (1–3 a help), any other key one at random. Like a new story, the built site asks „Was hilft
-  dir jetzt?“ only once all five `hilft-…` pictures are made (`ASKS_HELP` in `MoodPlay.tsx`); the dev server shows
-  their placeholders. This game is meant to grow (ideas C-29 to C-36): more
-  feelings to show, faces.
+- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`) plays at once,
+  one step after the other (ideas C-29 to C-36):
+  1. Eight cards of feelings (`MOODS`: fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich – C-29), each
+     a fox or bear child showing it in its face with Mama or Papa beside it (`gesicht-…`, C-30), four of each, so both
+     mascots are there. Picked, its grown-up takes the little one in its arms (`gesicht-…-arm`) while „Das kenne ich
+     auch!“ is said. Until all sixteen pictures are made, the built site shows the four old weather cards instead
+     (`wetter-…`, `Mood.weather`, `SHOWS_FACES`), the dev server their placeholders.
+  2. The little one makes the feeling's face big for the child to copy, for a mirror or the grown-up (C-35, `BigFace`):
+     the shared `MascotHead` with the feeling's brows, eyes and mouth (`Mood.face`) – drawn, so it is there at once.
+     „Kannst du auch so gucken?“ and ▶; it waits for a tap, since copying takes the child its time.
+  3. „Wie doll ist es?“ (C-36): the feeling's weather (`Mood.sky`: sun, rainbow, wind, snowflake, cloud, rain, storm,
+     dark forest – C-29's weathers live on here) drawn small, middling and big on three cards, no numbers. A hard
+     feeling (`Mood.hard`) „ganz doll“ first gets two slow breaths blown together: the little one blows with closed
+     eyes while a soft circle grows and shrinks round it (`.mood-breath`, its own layer, `BREATH_MS`), then
+     „Schon besser.“
+  4. „Was hilft dir jetzt?“ (C-31): three cards of the little bear doing what helps (`Mood.helps` from `HELPS`:
+     kuscheln, toben, etwas trinken, ein bisschen allein sein, ein Lied – the three that fit that feeling, none of them
+     wrong, so the grown-up sees what the child needs); the picked one shows big with its line („Kuscheln tut gut.“).
+     The built site asks it only once all five `hilft-…` pictures are made (`ASKS_HELP`).
+  5. A pass of the feeling's group plays (`Mood.group`), without touching the place „Alltagssituationen“ goes on from
+     (`remember={false}`). „Nochmal“ asks for the feeling again.
+     Keys: digits pick that card, any other key one at random (or goes on from the face). The face and the weather signs
+     are SVG drawings, not Gemini pictures: a face to copy and a size to compare must be plain and the same each time,
+     and they need no picture to wait for. A new feeling gets its face, sky, helps and group in `MOODS` and its two
+     pictures in `bilder/README.md` and the queue (`feelings.test.ts` checks).
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
   (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
   Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The cards always stand in that fixed order;
@@ -161,7 +174,8 @@ The big picture of the story is a framed photo – white mat, soft shadow – an
 pale a moment after the child has to choose, so it never looks like one of the
 cards (which have the yellow ring and stand out like buttons).
 
-Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
+Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only „Wie geht's dir?“'s face to copy
+and weather signs are drawn, see above).
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out
