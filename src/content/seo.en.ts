@@ -124,6 +124,12 @@ export const SEO_EN: SeoTranslation = {
         "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. Picture cards to print and color.",
       text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board – in color, or in black and white with every card drawn as a coloring page in clear lines, so the child colors their own plan. On the same page: a reward chart to collect stars.",
     },
+    "/wie-lange-warten/": {
+      title: "Countdown for Kids – How Many More Sleeps?",
+      description:
+        "Until the birthday, the holiday or Grandma’s visit: a little bed with a moon for every sleep, and each morning the child taps one moon into a sun.",
+      text: "Little children don’t understand “in five days” yet, but “five more sleeps” they do – so this countdown counts in beds. For every night until the big day there is a little bed with a moon over it, and beside them waits the picture of the day itself: a birthday, a holiday, Grandma and Grandpa, the first day at daycare. Each morning the bed of the night just slept lights up, the child taps it, the rooster crows, and the sun rises over the bed. So the suns grow and the moons get fewer, until on the big day its picture stands big. We set the day and the picture, and if you like, you print the moons and color one in each morning. On the same shelf: the reward chart and the daily plan in pictures.",
+    },
     "/schnullerfee/": {
       title: "Pacifier Fairy – Saying Goodbye to the Pacifier",
       description:

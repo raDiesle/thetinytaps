@@ -104,6 +104,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken (statt des übersetzten Schalters „In Farbe“) und die Zeile im Druck-Stempel des Assistenten – nur Deutsch.",
       },
       {
+        label: "🌙 Buch „Wie lange warten?“ (Countdown mit Betten, Mond und Sonne)",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts) und die Seite für Suchmaschinen (seo.ts, seo.en.ts) – nur Deutsch; Englisch gibt es nur für Suchmaschinen. Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",
+      },
+      {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
         languages: { de: "done" },
         note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“ – nur Deutsch.",

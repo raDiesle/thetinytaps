@@ -476,7 +476,7 @@ describe("Russian", () => {
 test("the Alltagshelfer stand first on the shelf, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual(["/zaehne/", "/toepfchen/", "/belohnungstafel/"]);
-  expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);
+  expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/", "/wie-lange-warten/"]);
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or

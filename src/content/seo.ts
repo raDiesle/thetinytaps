@@ -213,6 +213,13 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel – in Farbe oder schwarz-weiß, wo jede Karte als Ausmalbild mit klaren Linien gezeichnet ist, damit das Kind seinen Plan selbst ausmalt. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
   },
   {
+    path: "/wie-lange-warten/",
+    title: "Countdown für Kinder – Wie oft noch schlafen?",
+    description:
+      "Bis zum Geburtstag, zum Urlaub oder bis Oma kommt: ein kleines Bett mit Mond für jedes Mal Schlafen, und jeden Morgen tippt das Kind einen Mond zur Sonne.",
+    text: "Kleine Kinder verstehen „in fünf Tagen“ noch nicht, aber „noch fünfmal schlafen“ schon – und darum zählt dieser Countdown in Betten. Für jede Nacht bis zum großen Tag steht ein kleines Bett mit einem Mond darüber, und daneben wartet das Bild vom Tag selbst: Geburtstag, Urlaub, Oma und Opa, der erste Kita-Tag. Jeden Morgen leuchtet das Bett der vergangenen Nacht, das Kind tippt es an, der Hahn kräht, und über dem Bett geht die Sonne auf. So wachsen die Sonnen, und die Monde werden weniger, bis am großen Tag das Bild groß dasteht. Wir stellen den Tag und das Bild ein, und wer mag, druckt die Monde aus und malt jeden Morgen einen davon an. Im selben Regalfach: die Belohnungstafel und der Tagesplan in Bildern.",
+  },
+  {
     path: "/schnullerfee/",
     title: "Schnullerfee – Abschied vom Schnuller als Geschichte",
     description:

@@ -1,4 +1,5 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
+import { WAIT_BOOK } from "@/games/rewards/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
@@ -102,8 +103,9 @@ export const CATEGORIES: Category[] = [
       },
       {
         href: "/belohnungstafel/",
-        also: ["/tagesplan/"],
-        // On the shelf two books tied with a ribbon, each opening its own part (user feedback, November 2026).
+        also: ["/tagesplan/", "/wie-lange-warten/"],
+        // On the shelf books in one slipcase, each opening its own part (user feedback, November 2026): the third waits
+        // for a big day with a Countdown (H-05).
         volumes: [
           {
             href: "/belohnungstafel/",
@@ -123,6 +125,7 @@ export const CATEGORIES: Category[] = [
             emoji: "🗓️",
             title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
           },
+          { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
         ],
         emoji: "📅",
         title: {

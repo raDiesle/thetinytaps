@@ -57,6 +57,12 @@ const DAYS_AHEAD = 6;
 /** The wizard: closed, open on its first step, or on a template picked in the gallery. */
 type WizardState = null | { start?: WizardStart };
 
+/** What an address opens: a board, a plan of the day, or a Countdown to a big day („Wie lange warten?“, H-05). */
+export type PageKind = ChartType | "countdown";
+
+/** The wizard on a new Countdown, where „Wie lange warten?“ opens with none made yet. */
+const COUNTDOWN_TEMPLATE = PLAN_TEMPLATES.find((tpl) => tpl.view === "countdown");
+
 /**
  * The Belohnungstafel and the Tagesplan on one page: the grown-up's boards (stars to collect) and plans (the day in
  * pictures) side by side in one row on top, the one chosen as big as the screen allows. „＋ Neu“ opens the wizard,
@@ -65,9 +71,9 @@ type WizardState = null | { start?: WizardStart };
  * Sammeln, a plan's Tag and Woche) with arrows to earlier days; beside it on wide screens the Vorlagen of its kind. On
  * a computer „Gestalten“ and „Drucken“ lie open below (scroll down); on phones and tablets they open from the buttons
  * on top. Not a game: no GameShell, no play time counted, so the evening routine and its star still work when play
- * time is over. `/tagesplan/` opens the same page on a plan.
+ * time is over. `/tagesplan/` opens the same page on a plan, `/wie-lange-warten/` on a Countdown.
  */
-export function RewardsGame({ type: routeType = "board" }: { type?: ChartType }) {
+export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) {
   const t = useT();
   const location = useLocation();
   const category = categoryOf(location.pathname);
@@ -85,19 +91,31 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const boardTitle = useBoardTitle();
   const planTitle = usePlanTitle();
 
-  // Each address opens its own kind, as each has its own book on the shelf: `/tagesplan/` a plan, `/belohnungstafel/` a board.
-  const [wanted, setType] = useState<ChartType>(routeType);
+  // Each address opens its own kind, as each has its own book on the shelf: `/tagesplan/` a plan, `/belohnungstafel/` a
+  // board, `/wie-lange-warten/` a Countdown – until a tab or the wizard shows another chart.
+  const [wanted, setType] = useState<PageKind>(routeType);
+  const [chosen, setChosen] = useState(false);
   const board: Board | undefined = boards.boards.find((b) => b.id === boards.current) ?? boards.boards[0];
   // Plans as an older version saved them read as today's (its two-card „Jetzt – Dann“ view).
   const allPlans = plans.plans.map(fromOlder);
-  const currentPlan: Plan | undefined = allPlans.find((p) => p.id === plans.current) ?? allPlans[0];
+  const lastPlan: Plan | undefined = allPlans.find((p) => p.id === plans.current) ?? allPlans[0];
+  // The Countdown has a book of its own: the Zeitplan's book opens a plan of the day, „Wie lange warten?“ a Countdown –
+  // each the wizard on its kind where none is made, with the other charts behind it.
+  const countdownPlan = lastPlan?.view === "countdown" ? lastPlan : allPlans.find((p) => p.view === "countdown");
+  const dayPlan = lastPlan && lastPlan.view !== "countdown" ? lastPlan : allPlans.find((p) => p.view !== "countdown");
+  const waiting = wanted === "countdown";
+  const currentPlan = chosen ? lastPlan : waiting ? countdownPlan : dayPlan;
   // A plan whose cards count stars is a Belohnungstafel too: the Belohnungstafel's book opens on it where no board is made.
   const rewardPlan = currentPlan && counting(currentPlan) ? currentPlan : allPlans.find(counting);
   // Nothing made yet (a first visit): the page is the wizard, which can't be closed, as there is nothing behind it.
-  const empty = !board && !currentPlan;
+  const empty = !board && !lastPlan;
   // Only the other kind made (a plan, the Belohnungstafel's book opened): the wizard on the asked kind, the other behind it.
-  const start = pageStart(wanted, { board: !!board || !!rewardPlan, plan: !!currentPlan });
-  const wizard = wizardState ?? (start.wizard ? {} : null);
+  // A Countdown asked for and none made: the wizard on a new one, with the other charts behind it.
+  const start = waiting
+    ? { type: "plan" as const, wizard: !countdownPlan }
+    : pageStart(wanted === "board" ? "board" : "plan", { board: !!board || !!rewardPlan, plan: !!currentPlan });
+  const wizard =
+    wizardState ?? (start.wizard ? (waiting && COUNTDOWN_TEMPLATE ? { start: { type: "plan" as const, template: COUNTDOWN_TEMPLATE } } : {}) : null);
   const type: ChartType = start.type === "board" && !board ? "plan" : start.type;
   const plan = start.type === "board" && !board ? rewardPlan : currentPlan;
   const log = stored.log;
@@ -148,6 +166,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     setWizard(null);
     setDesigning(false);
     setType(shown);
+    setChosen(true);
   };
   const showBoard = (id: string) => {
     updateBoards({ current: id });
@@ -175,7 +194,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     setWizard({ start });
   };
   // Closing the wizard shows the chart behind it: where none of the kind asked for is made, the other kind's.
-  const closeWizard = () => show(type);
+  const closeWizard = () => show(waiting && !countdownPlan && !lastPlan ? "board" : type);
   /** A template from the gallery: the board or plan made from it before, with its stars, or the wizard on it. */
   const pickTemplate = (template: Template) => {
     const made = boards.boards.find((b) => b.template === template.id);

@@ -8,12 +8,13 @@ import { DAY_NAMES, MARK_BY_ID, MARKS, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, ST
 import { ItemPic, MarkPic, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
 import {
+  bigDayCome,
   bigDayStep,
   counting,
   MAX_PART_STEPS,
   MAX_STARS,
   MAX_STEPS,
-  moonsLeft,
+  nightsOf,
   nightsUntil,
   nowSteps,
   pairsOf,
@@ -991,24 +992,60 @@ export const BIG_DAY: Localized = {
 };
 
 /**
- * The Countdown (H-41): „Wie oft noch schlafen?“ – a moon for every night until the big day, in rows read from the top
- * left, then an arrow to the day's picture (Geburtstag, Urlaub, Oma kommt). Each morning one moon fewer; on the day
- * itself the picture alone stands big in the middle. No date and no number: the child counts moons. On paper the moons
- * of the day it is printed, to colour in or cross out one each morning. While it is made, a tap on the moons or the
- * picture opens the big day's window (its date and its picture).
+ * A sun over a bed whose morning the child tapped (H-05): round, with rays and a wide-awake face, so a row of beds tells
+ * the nights slept from the nights to come.
  */
-function Countdown({ plan, day, look, edit, aspect }: StepsProps & { aspect: number }) {
+function SunPic() {
+  return (
+    <svg className="pl-sun-pic" viewBox="0 0 100 100" aria-hidden>
+      <path className="pl-sun-rays" d="M50 4 v14 M50 82 v14 M4 50 h14 M82 50 h14 M17.5 17.5 l10 10 M72.5 72.5 l10 10 M17.5 82.5 l10 -10 M72.5 27.5 l10 -10" />
+      <circle cx="50" cy="50" r="26" />
+      <path className="pl-sun-face" d="M40 45 v3 M60 45 v3 M39 58 q11 9 22 0" />
+    </svg>
+  );
+}
+
+/** A little bed under each night's moon or sun: headboard, pillow and a blanket in the plan's colour. */
+function BedPic() {
+  return (
+    <svg className="pl-bed-pic" viewBox="0 0 100 52" aria-hidden>
+      <rect className="pl-bed-wood" x="4" y="4" width="11" height="44" rx="4" />
+      <rect className="pl-bed-wood" x="87" y="20" width="9" height="28" rx="3" />
+      <rect className="pl-bed-mattress" x="10" y="27" width="81" height="13" rx="3" />
+      <rect className="pl-bed-pillow" x="16" y="18" width="21" height="11" rx="5" />
+      <path className="pl-bed-blanket" d="M34 21 h50 q5 0 5 5 v14 h-55 z" />
+    </svg>
+  );
+}
+
+/**
+ * The Countdown (H-41, H-05): „Wie oft noch schlafen?“ – a little bed for every night until the big day, in rows read
+ * from the top left, then an arrow to the day's picture (Geburtstag, Urlaub, Oma kommt). A night still to sleep has a
+ * moon over its bed; each morning the bed of the night slept glows, and the child's tap turns its moon into a sun – so
+ * the suns grow and the moons get fewer. When the big day has come (its morning tapped), the picture alone stands big
+ * in the middle. No date and no number: the child counts moons. On paper only the nights from the day it is printed,
+ * to colour in or cross out one each morning. While it is made, a tap on the beds or the picture opens the big day's
+ * window (its date and its picture).
+ */
+function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps & { aspect: number }) {
   const t = useT();
   const label = useStepLabel();
   const step = bigDayStep(plan);
-  const moons = moonsLeft(plan, day);
-  // Upright, the picture goes under the moons; wide, beside them – the moons get the room the picture leaves.
+  const nights = look.print ? nightsOf(plan, day, undefined).filter((night) => night.state === "later") : nightsOf(plan, day, ticks);
+  // The last morning just tapped: its sun rises over the beds first, then the picture comes big (PlanScreen's party).
+  const come = look.print ? nights.length === 0 : bigDayCome(plan, day, ticks) && !nights.some((night) => night.key === fresh);
+  const shown = come ? [] : nights;
+  const moons = nights.filter((night) => night.state === "later").length;
+  const first = shown.findIndex((night) => night.state === "now");
+  const tappable = !look.print && !edit;
+  // Upright, the picture goes under the beds; wide, beside them – the beds get the room the picture leaves (the sheet's
+  // body is wider than the sheet with its heading, and the picture and the arrow take about its height).
   const tall = aspect < 1.25;
-  const { cols, rows } = planLayout(moons, tall ? aspect / 0.55 : Math.max(0.4, aspect - 0.95));
+  const { cols, rows } = planLayout(shown.length, tall ? aspect / 0.55 : Math.max(0.4, aspect * 1.2 - 0.85));
   const sleeps = t(SLEEPS_LEFT)(moons);
   return (
-    <div className={`pl-countdown${tall ? " tall" : ""}${moons === 0 ? " arrived" : ""}`}>
-      {moons > 0 && (
+    <div className={`pl-countdown${tall ? " tall" : ""}${come ? " arrived" : ""}`}>
+      {shown.length > 0 && (
         <>
           <div
             className="pl-moons-field"
@@ -1018,9 +1055,23 @@ function Countdown({ plan, day, look, edit, aspect }: StepsProps & { aspect: num
             title={look.print ? undefined : edit ? t(BIG_DAY) : sleeps}
             {...(edit ? BIG_DAY_EDIT : {})}
           >
-            {Array.from({ length: moons }, (_, i) => (
-              <span key={i} className="pl-moon" data-moon={look.print || edit ? undefined : i} data-tap={look.print || edit ? undefined : ""}>
-                <MoonPic />
+            {shown.map((night, i) => (
+              <span
+                key={night.key}
+                className={`pl-night ${night.state}${night.key === fresh ? " fresh" : ""}`}
+                data-night={tappable ? night.state : undefined}
+                data-key={tappable ? night.key : undefined}
+                data-tap={tappable ? tapState({ goal: night.state === "now", done: night.state === "done" }) : undefined}
+              >
+                <span className="pl-night-in">
+                  {i === first && (
+                    <span className="pl-night-hand" aria-hidden>
+                      👇
+                    </span>
+                  )}
+                  <span className="pl-night-sky">{night.state === "done" ? <SunPic /> : <MoonPic />}</span>
+                  <BedPic />
+                </span>
               </span>
             ))}
           </div>
@@ -1032,8 +1083,8 @@ function Countdown({ plan, day, look, edit, aspect }: StepsProps & { aspect: num
       {step ? (
         <div
           className="pl-card pl-big-day"
-          data-big-day={look.print || edit ? undefined : ""}
-          data-tap={look.print || edit ? undefined : "goal"}
+          data-big-day={tappable ? "" : undefined}
+          data-tap={tappable ? (first === -1 ? "goal" : "") : undefined}
           role="img"
           aria-label={label(step)}
           title={look.print ? undefined : label(step)}

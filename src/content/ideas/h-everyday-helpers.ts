@@ -47,6 +47,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Für etwas Großes, das kommt: Geburtstag, Urlaub, Oma kommt, erster Kita-Tag, Geschwisterchen. Eine Reihe kleiner Betten mit Mond; jeden Morgen tippt das Kind eins an, es wird zur Sonne. Beim letzten erscheint das Bild vom großen Tag. Der Adventskalender (N-47) ist ein Sonderfall davon.",
       why: "Eltern suchen „countdown kinder geburtstag“, „countdown kinder urlaub“ und „countdown kindergartenstart“. 2-Jährige verstehen „in drei Tagen“ nicht, „noch dreimal schlafen“ schon.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als Teil des Zeitplans, im Countdown (H-41), mit einem eigenen Buch im Schuber neben Belohnungstafel und Zeitplan: „Wie lange warten?“ (/wie-lange-warten/, November 2026). Für jede Nacht ein kleines Bett mit Mond; morgens leuchtet das Bett der vergangenen Nacht, das Kind tippt es an, der Hahn kräht und über dem Bett geht die Sonne auf. Nach dem letzten Morgen steht das Bild vom großen Tag groß da, mit einem kleinen Fest. Den Adventskalender (N-47) gibt es noch nicht.",
     },
     {
       id: "H-06",

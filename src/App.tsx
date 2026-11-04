@@ -29,6 +29,7 @@ const PacifierPage = page(() => import("@/pages/PacifierPage"), "PacifierPage", 
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
 const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
+const WaitPage = page(() => import("@/pages/RewardsPage"), "WaitPage", "/wie-lange-warten/");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bilder/");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
@@ -60,6 +61,7 @@ export function App() {
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />
+        <Route path="wie-lange-warten" element={<WaitPage />} />
         <Route path="timer" element={<TimerPage />} />
         <Route path="gefuehle" element={<FeelingsPage />} />
         <Route path="wie-gehts-dir" element={<MoodPage />} />
