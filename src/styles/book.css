@@ -499,14 +499,10 @@
   -webkit-text-stroke: 0.05em var(--ink);
 }
 
-/* The end of a level: „Menü“ and „Nochmal“ two paper slips lying askew, „Weiter“ a big label painted red and taped
-   onto the page like a card. */
+/* The end of a level: „Nochmal“ a paper slip lying askew, „Weiter“ a big label painted red and taped onto the page
+   like a card. */
 :root .game-end-button {
   border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
-}
-
-:root .game-end-button.menu {
-  rotate: -2deg;
 }
 
 :root .game-end-button.again {
@@ -1169,6 +1165,34 @@
   }
 }
 
+/*
+ * At the end of a level in a game that goes back onto the shelf, the corner is the book's ribbon, as in its menu
+ * (GameEnd, user feedback, November 2026): coming out over the page's top edge in the top left (its drawing has that
+ * edge at 6 of its 60 wide) and lying down onto the picture, bigger than the ✕ so it is found at once.
+ */
+:root .play-area {
+  --play-ribbon: calc(var(--play-corner) * 1.15);
+}
+
+:root .play-area .exit-corner .hold-exit.exit-ribbon {
+  width: var(--play-ribbon);
+  height: calc(var(--play-ribbon) * 80 / 60);
+  margin: calc(-1 * var(--frame) - 8px - var(--play-ribbon) * 6 / 60) 0 0 0;
+}
+
+:root .play-area .exit-ribbon .page-ribbon-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 8%;
+  transition: rotate 0.3s ease-out;
+}
+
+:root .play-area .exit-ribbon:hover .page-ribbon-art {
+  rotate: -5deg;
+}
+
 :root .play-area {
   --play-corner: 64px;
   /*
@@ -1448,9 +1472,9 @@
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .play-area .play-options-corner .play-options-button {
-    min-width: 150px;
-    min-height: 58px;
-    padding: 10px 34px 6px 10px;
+    min-width: 0;
+    min-height: 40px;
+    padding: 6px 24px 3px 7px;
   }
 }
 
@@ -1460,6 +1484,15 @@
   right: 9px;
   width: 16px;
   height: 48px;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root .play-area .play-options-corner .play-options-button::before {
+    top: -11px;
+    right: 6px;
+    width: 11px;
+    height: 32px;
+  }
 }
 
 /* The intro is a paper note too, lying askew under ⚙️'s slip. */

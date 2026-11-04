@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Face, INK, SKIN, nth, side } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { Face, INK, MascotFace, SKIN, nth, side } from "../shared";
 import { Drops, Hearts, Lids, Lines, Mouth, SleepFace, Sparkles, Zzz } from "./parts";
 
 // The children and the teacher. Each drawing has its foot point at (0, 0) and is placed with
@@ -10,17 +11,17 @@ export const SKIN_LIGHT = "#ffdbac";
 export const SKIN_DARK = "#a86b45";
 export const SKIN_BROWN = "#c68642";
 
-type HairStyle = "short" | "bob" | "pigtails" | "curly" | "bun";
+type HairStyle = "short" | "bob" | "pigtails" | "curly";
 
 interface Look {
   skin?: string;
   hair: string;
   style: HairStyle;
-  /** Colour of the hair bands (pigtails) or the bun's scrunchie. */
+  /** Colour of the hair bands (pigtails). */
   band?: string;
 }
 
-/** Hair on a head of radius r centred on (cx, cy). Pigtails and buns swing with the class `tail`. */
+/** Hair on a head of radius r centred on (cx, cy). Pigtails swing with the class `tail`. */
 function Hair({ cx, cy, r, look, tail }: { cx: number; cy: number; r: number; look: Look; tail?: string }) {
   const { hair, style, band = "#ff6b6b" } = look;
   const cap = `M${cx - r} ${cy - 2} Q${cx - r - 3} ${cy - r - 8} ${cx} ${cy - r - 5} Q${cx + r + 3} ${cy - r - 8} ${cx + r} ${cy - 2} Q${cx + r * 0.5} ${cy - r * 0.6} ${cx + r * 0.1} ${cy - r * 0.42} Q${cx - r * 0.5} ${cy - r * 0.62} ${cx - r} ${cy - 2} Z`;
@@ -52,20 +53,6 @@ function Hair({ cx, cy, r, look, tail }: { cx: number; cy: number; r: number; lo
           </g>
         ))}
         <path d={cap} fill={hair} />
-      </>
-    );
-  }
-  if (style === "bun") {
-    return (
-      <>
-        <g className={tail} style={{ transformOrigin: `${cx}px ${cy - r}px` }}>
-          <circle cx={cx} cy={cy - r - 12} r={r * 0.42} fill={hair} />
-          <rect x={cx - r * 0.3} y={cy - r - 1} width={r * 0.6} height={r * 0.14} rx={r * 0.07} fill={band} />
-        </g>
-        <path
-          d={`M${cx - r - 2} ${cy + 6} Q${cx - r - 6} ${cy - r - 6} ${cx} ${cy - r - 4} Q${cx + r + 6} ${cy - r - 6} ${cx + r + 2} ${cy + 6} Q${cx + r * 0.7} ${cy - r * 0.5} ${cx} ${cy - r * 0.55} Q${cx - r * 0.7} ${cy - r * 0.5} ${cx - r - 2} ${cy + 6} Z`}
-          fill={hair}
-        />
       </>
     );
   }
@@ -240,11 +227,12 @@ export function Winkekinder() {
 
 // ---------- The reading corner ----------
 
-const TEACHER: Look = { hair: "#c0603a", style: "bun", band: "#7950f2", skin: SKIN_LIGHT };
+// The teacher is a vixen, one of the app's mascots in a role: fur instead of skin, dark paws holding the book.
+const FUR = MASCOT_COLORS.fox.fur;
+const PAW = MASCOT_COLORS.fox.paw;
 
-/** The teacher on her chair, reading a picture book aloud; a page turns and she tells the story. */
+/** The teacher on her chair, a vixen with round glasses reading a picture book aloud; a page turns and she tells the story. */
 export function Erzieherin() {
-  const skin = TEACHER.skin;
   return (
     <>
       {/* Chair */}
@@ -262,21 +250,15 @@ export function Erzieherin() {
         {/* Body */}
         <rect x="-50" y="-282" width="100" height="160" rx="32" fill="#38d9a9" />
         <path d="M-26 -278 Q0 -252 26 -278" stroke="#fff" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.6" />
-        <rect x="-10" y="-298" width="20" height="22" fill={skin} />
+        <rect x="-10" y="-298" width="20" height="22" fill={FUR} />
         <g className="ki-erz-head" style={{ transformOrigin: "0px -290px" }}>
-          <circle cx="-46" cy="-326" r="8" fill={skin} />
-          <circle cx="46" cy="-326" r="8" fill={skin} />
-          <circle cx="0" cy="-330" r="46" fill={skin} />
-          <Face cx={0} cy={-326} size={1.35} />
-          <Lids cx={0} cy={-326} size={1.35} fill={skin} />
-          <Mouth cx={0} cy={-326} size={1.35} />
-          {/* Round glasses */}
+          <MascotFace kind="fox" cx={0} cy={-330} r={46} lashes />
+          {/* Round glasses over her eyes, like Papa Fox's in the family picture */}
           <g fill="#fff" fillOpacity="0.25" stroke="#7048e8" strokeWidth="3">
-            <circle cx="-14" cy="-326" r="13" />
-            <circle cx="14" cy="-326" r="13" />
+            <circle cx="-18.4" cy="-332.6" r="13.5" />
+            <circle cx="18.4" cy="-332.6" r="13.5" />
           </g>
-          <path d="M-2 -327 H2" stroke="#7048e8" strokeWidth="3" />
-          <Hair cx={0} cy={-330} r={46} look={TEACHER} tail="ki-erz-bun" />
+          <path d="M-5 -334 Q0 -337 5 -334" stroke="#7048e8" strokeWidth="3" fill="none" />
         </g>
         {/* Arms holding the book */}
         <path d="M-44 -262 Q-82 -220 -72 -176" stroke="#38d9a9" strokeWidth="20" strokeLinecap="round" fill="none" />
@@ -308,8 +290,8 @@ export function Erzieherin() {
           </g>
         </g>
         <path d="M0 -236 V-156" stroke="#e9ecef" strokeWidth="3" />
-        <circle cx="-72" cy="-172" r="12" fill={skin} />
-        <circle cx="72" cy="-172" r="12" fill={skin} />
+        <circle cx="-72" cy="-172" r="12" fill={PAW} />
+        <circle cx="72" cy="-172" r="12" fill={PAW} />
       </g>
       <Sparkles x={0} y={-272} spread={70} />
     </>

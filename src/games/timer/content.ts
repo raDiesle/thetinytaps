@@ -19,12 +19,21 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
       ru: "Поезд на станцию",
     },
   },
+  { id: "apple", emoji: "🍎", name: { de: "Apfelbaum" } },
   {
     id: "sand",
     emoji: "⏳",
     name: { de: "Sanduhr", en: "Hourglass", zh: "沙漏", hi: "रेत घड़ी", es: "Reloj de arena", ar: "الساعة الرملية", ru: "Песочные часы" },
   },
+  { id: "caterpillar", emoji: "🐛", name: { de: "Raupe" } },
+  { id: "flower", emoji: "🌸", name: { de: "Blume" } },
   { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
+  // German only until translations are asked for (see languageStatus.ts).
+  { id: "sunset", emoji: "🌅", name: { de: "Sonnenuntergang" } },
+  { id: "ants", emoji: "🐜", name: { de: "Ameisenstraße" } },
+  { id: "disc", emoji: "🔴", name: { de: "Rote Scheibe" } },
+  { id: "pizza", emoji: "🍕", name: { de: "Pizza" } },
+  { id: "swap", emoji: "🔁", name: { de: "Abwechseln" } },
 ];
 
 /** The picture after `id`, after the last the first, for „Weiter“. */

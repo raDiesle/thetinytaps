@@ -6,14 +6,14 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
-import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playDrumRoll, playLaugh, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { finishRoutineStep } from "@/lib/routine";
 import { hush, recordedVoice } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Medal } from "./medal";
-import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
+import { INK, Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
@@ -302,7 +302,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const [tickled, setTickled] = useState<number | null>(null);
   const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
-  const { effects, celebrate } = useTapFeedback();
+  const { effects, celebrate, glow } = useTapFeedback();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
@@ -370,7 +370,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   useEffect(() => {
     if (settings.sounds)
-      loadRecordings([...(settings.origin ? ORIGIN_RECORDINGS : []), ...(settings.prep ? PREP_RECORDINGS : []), ...TIDY_RECORDINGS, "cheer"]);
+      loadRecordings([...(settings.origin ? ORIGIN_RECORDINGS : []), ...(settings.prep ? PREP_RECORDINGS : []), ...TIDY_RECORDINGS, "cheer", "laugh"]);
   }, [settings.sounds, settings.origin, settings.prep]);
 
   // The sounds of the story, the sink and tidying up, each when the clock passes its moment; none of those a jump skips over.
@@ -467,6 +467,15 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     [settings.sounds],
   );
 
+  /** The fox family at the end, tapped: a warm light where the finger was and a laugh, while they wave and grin. */
+  const greet = useCallback(
+    (e: PointerEvent<HTMLElement>) => {
+      glow(e.clientX, e.clientY);
+      if (settings.sounds) playRecorded("laugh", playLaugh);
+    },
+    [glow, settings.sounds],
+  );
+
   const again = useCallback(() => {
     const t = performance.now();
     setClock({ banked: 0, since: t, until: song.ready ? undefined : waitAt(preludeOf(settings)) });
@@ -507,14 +516,18 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     [seek, prelude, introMs, stepStarts],
   );
 
-  /** Tapping or dragging on the progress bar jumps to that point of the brushing. */
+  /** The progress bar's parts on the clock, as [start, length] in ms: the time before the brushing (story, sink, mirror), then each step. */
+  const segments: [number, number][] = [[0, introMs], ...STEPS.map((_, k): [number, number] => [introMs + stepStarts[k], stepLength(k)])];
+
+  /** Tapping or dragging on the progress bar jumps to that point, before or while brushing. */
   const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
-    const segments = [...e.currentTarget.children];
-    const i = segments.findIndex((s, k) => k === segments.length - 1 || e.clientX < s.getBoundingClientRect().right);
-    const rect = segments[i].getBoundingClientRect();
+    const parts = [...e.currentTarget.children];
+    const i = parts.findIndex((s, k) => k === parts.length - 1 || e.clientX < s.getBoundingClientRect().right);
+    const rect = parts[i].getBoundingClientRect();
     const k = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const [start, length] = segments[i];
     // Stop just short of the end, so dragging to the right edge doesn't finish at once.
-    seek(introMs + Math.min(stepStarts[i] + k * stepLength(i), totalMs - SEEK_END_MS));
+    seek(Math.min(start + k * length, introMs + totalMs - SEEK_END_MS));
   };
 
   useEffect(() => {
@@ -571,88 +584,11 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       <span className="teeth-sky" aria-hidden>
         {daytime === "morning" ? "☀️" : "🌙"}
       </span>
-      {/* Before the brushing it counts down to its start; the brushing time left sits next to the progress bar. */}
-      {before && (
-        <p
-          className="teeth-clock"
-          aria-label={t({
-            de: "Zeit bis zum Start",
-            en: "Time until the start",
-            zh: "距开始的时间",
-            hi: "शुरू होने में बाकी समय",
-            es: "Tiempo hasta empezar",
-            ar: "الوقت حتى البداية",
-            ru: "Время до начала",
-          })}
-        >
-          🪥 {formatTime(-brushed)}
-        </p>
-      )}
-      {/* While brushing no text at all: the picture, the song and the voice say what to do, and the mouth gets the room. */}
-      {!step && (
-        <div className="teeth-heading" key={`${round}-${part}`}>
-          {before ? (
-            <h2 className="teeth-cue">{t(PRELUDE[before].title)}</h2>
-          ) : (
-            <h2 className="teeth-cue teeth-done">
-              <Medal
-                label={t({ de: "Goldmedaille", en: "Gold medal", zh: "金牌", hi: "स्वर्ण पदक", es: "Medalla de oro", ar: "ميدالية ذهبية", ru: "Золотая медаль" })}
-              />
-              {t({ de: "Geschafft!", en: "Done it!", zh: "成功啦！", hi: "हो गया!", es: "¡Lo logramos!", ar: "نجحنا!", ru: "Ура, получилось!" })}
-            </h2>
-          )}
-          {before === "paste" && (
-            <p className="teeth-mouth prep">
-              👌{" "}
-              {t({
-                de: "Erbsengroß",
-                en: "Pea-sized",
-                zh: "豌豆大小",
-                hi: "मटर के दाने जितना",
-                es: "Del tamaño de un guisante",
-                ar: "بحجم حبة البازلاء",
-                ru: "С горошину",
-              })}
-              <span className="teeth-hint">
-                {" "}
-                ·{" "}
-                {t({
-                  de: "unter 2 Jahren nur reiskorngroß",
-                  en: "under 2 years only rice-grain-sized",
-                  zh: "2岁以下只要米粒大小",
-                  hi: "2 साल से कम में सिर्फ़ चावल के दाने जितना",
-                  es: "antes de los 2 años, solo como un grano de arroz",
-                  ar: "تحت السنتين بحجم حبة الأرز فقط",
-                  ru: "до 2 лет — с рисовое зёрнышко",
-                })}
-              </span>
-            </p>
-          )}
-          {/* First spit out; when the brush is put away, the daytime's goodbye. */}
-          {ending === "rest" ? (
-            <p className="teeth-mouth goodbye" key="goodbye">
-              {daytimeText(daytime, "doneTitle", language).text}
-            </p>
-          ) : (
-            done && (
-              <p className="teeth-mouth spit">
-                💦 {t({ de: "Ausspucken", en: "Spit out", zh: "吐掉", hi: "थूकना", es: "Escupir", ar: "البصق", ru: "Сплюнуть" })}
-                <span className="teeth-hint">
-                  {" "}
-                  ·{" "}
-                  {t({
-                    de: "nicht mit Wasser nachspülen",
-                    en: "don't rinse with water",
-                    zh: "不要用水漱口",
-                    hi: "पानी से कुल्ला नहीं",
-                    es: "sin enjuagar con agua",
-                    ar: "دون المضمضة بالماء",
-                    ru: "водой не полоскать",
-                  })}
-                </span>
-              </p>
-            )
-          )}
+      {/* No words on the picture: the story, the sink, the song and the voice say what to do. At the end the gold medal
+          swings down, a picture of „well done“ a child sees without reading. */}
+      {done && (
+        <div className="teeth-heading" key={round}>
+          <Medal label={t({ de: "Geschafft!", en: "Done it!", zh: "成功啦！", hi: "हो गया!", es: "¡Lo logramos!", ar: "نجحنا!", ru: "Ура, получилось!" })} />
         </div>
       )}
 
@@ -685,8 +621,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {done ? (
         ending === "rest" && (
           <div className="teeth-end">
-            {/* Tapsi jumps for joy with Mama or Papa Fox beside it: brushing is done. */}
-            <CheeringFamily kind="fox" className="teeth-family" />
+            {/* Tapsi jumps for joy with Mama or Papa Fox beside it: brushing is done. Tapped, they wave and show their clean teeth. */}
+            <CheeringFamily kind="fox" className="teeth-family" onTap={greet} />
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
             <GameEnd inline onAgain={again} />
           </div>
@@ -702,7 +638,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
           <div className="teeth-controls">
             <button
               type="button"
-              className="teeth-pause"
+              className="teeth-button"
               onClick={togglePause}
               aria-label={
                 paused
@@ -710,15 +646,23 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
                   : t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })
               }
             >
-              {paused ? "▶️" : "⏸️"}
+              <ControlIcon kind={paused ? "play" : "pause"} />
+            </button>
+            <button
+              type="button"
+              className="teeth-button"
+              onClick={again}
+              aria-label={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}
+            >
+              <ControlIcon kind="again" />
             </button>
             <div
               className="teeth-progress"
               role="slider"
               aria-label={t({ de: "Fortschritt", en: "Progress", zh: "进度", hi: "प्रगति", es: "Progreso", ar: "التقدّم", ru: "Сколько уже почищено" })}
               aria-valuemin={0}
-              aria-valuemax={Math.round(totalMs / 1000)}
-              aria-valuenow={Math.round(Math.max(0, Math.min(brushed, totalMs)) / 1000)}
+              aria-valuemax={Math.round((introMs + totalMs) / 1000)}
+              aria-valuenow={Math.round(Math.max(0, Math.min(elapsed, introMs + totalMs)) / 1000)}
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
                 seekFromPointer(e);
@@ -727,6 +671,10 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
                 if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e);
               }}
             >
+              {/* Before the brushing: the story, the sink and the first look in the mirror, a part of its own with its own time. */}
+              <span className={`teeth-segment intro${before ? " now" : ""}`} title={prelude.map((p) => t(PRELUDE[p].title)).join(" · ")}>
+                <span style={{ transform: `scaleX(${Math.max(0, Math.min(1, elapsed / introMs))})` }} />
+              </span>
               {STEPS.map((s, i) => (
                 <span
                   key={i}
@@ -737,8 +685,24 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
                 </span>
               ))}
             </div>
-            {/* The brushing time left, for the grown-up; only where the screen is wide enough (teeth.css). */}
-            {!before && (
+            {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it
+                starts, then the brushing time left – two clocks in one place. */}
+            {before ? (
+              <span
+                className="teeth-time intro"
+                aria-label={t({
+                  de: "Zeit bis zum Start",
+                  en: "Time until the start",
+                  zh: "距开始的时间",
+                  hi: "शुरू होने में बाकी समय",
+                  es: "Tiempo hasta empezar",
+                  ar: "الوقت حتى البداية",
+                  ru: "Время до начала",
+                })}
+              >
+                {formatTime(-brushed)}
+              </span>
+            ) : (
               <span
                 className="teeth-time"
                 aria-label={t({
@@ -792,7 +756,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {paused && (
         <button type="button" className="teeth-paused" onClick={togglePause}>
           <span className="teeth-paused-icon" aria-hidden>
-            ⏸️
+            <ControlIcon kind="pause" />
           </span>
           {t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })}
           <small>
@@ -813,5 +777,26 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
       <FeedbackLayer effects={effects} />
     </div>
+  );
+}
+
+/** The drawn signs on the controls, in the game's ink: two round bars to pause, a round triangle to go on, a round arrow to start again. */
+function ControlIcon({ kind }: { kind: "pause" | "play" | "again" }) {
+  return (
+    <svg className="teeth-button-icon" viewBox="0 0 40 40" aria-hidden>
+      {kind === "pause" ? (
+        <g fill={INK}>
+          <rect x={10} y={9} width={7.5} height={22} rx={3} />
+          <rect x={22.5} y={9} width={7.5} height={22} rx={3} />
+        </g>
+      ) : kind === "play" ? (
+        <path d="M14 9.5 C14 7.8 15.8 6.9 17.2 7.8 L31 17.4 C32.3 18.3 32.3 21.7 31 22.6 L17.2 32.2 C15.8 33.1 14 32.2 14 30.5 Z" fill={INK} />
+      ) : (
+        <g fill="none" stroke={INK} strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M29.5 24.5 A10.5 10.5 0 1 1 27.4 12.3" />
+          <path d="M28.6 5.8 L28 13 L20.8 12.4" />
+        </g>
+      )}
+    </svg>
   );
 }

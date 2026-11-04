@@ -19,8 +19,7 @@ import type { Station, Way } from "@/games/elevator/trail/types";
 import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
 import { SITUATIONS } from "@/games/feelings/kita";
 import { SELF_SITUATIONS } from "@/games/feelings/selbst";
-import { MOOD_ANSWER, MOOD_QUESTION } from "@/games/feelings/mood";
-import { ROLE_LINES } from "@/games/feelings/rounds";
+import { HELP_QUESTION, HELPS, MOOD_LINES } from "@/games/feelings/mood";
 import { PRAISE as FEELINGS_PRAISE } from "@/games/feelings/shared";
 import type { Beat } from "@/games/feelings/story";
 import { buildBath } from "@/games/marbles/bath";
@@ -168,6 +167,7 @@ function letters(): VoiceGroup[] {
     },
     { label: "Suchen: Frage", lines: once(de.letters.map(de.findPrompt)), built: "„Wo ist das …?“ mit dem Buchstaben" },
     { label: "Mitmachen", lines: once(de.actions.map(de.joinIn)) },
+    { label: "Mitmachen mit Zahlen", lines: ["Stampf mit!"], note: "„Hüpf mit!“ und „Klatsch mit!“ kommen von den Tu-Wörtern; das Stampfen hat keins." },
     { label: "Lob", lines: once(de.praise) },
     { label: "Zahlwörter beim Zählen", lines: once(de.numberWords.map((n) => `${n}!`)) },
     {
@@ -232,8 +232,8 @@ function together(): VoiceGroup[] {
 function feelings(): VoiceGroup[] {
   return [
     // „Wie geht's dir?“ (/wie-gehts-dir/) is a game of its own in the book, but shares this game's recordings (stimme/).
-    { label: "Wie geht's dir?", lines: once([MOOD_QUESTION.de, MOOD_ANSWER.de]) },
-    { label: "Wer bist du in der Szene?", lines: once([ROLE_LINES.self.de, ROLE_LINES.friend.de]) },
+    { label: "Wie geht's dir?", lines: once(MOOD_LINES) },
+    { label: "Wie geht's dir?: was hilft", lines: once([HELP_QUESTION.de, ...Object.values(HELPS).map((h) => h.answer.de)]) },
     { label: "Zu Hause: Fragen", lines: once(FEELINGS.flatMap((f) => f.questions)) },
     { label: "Zu Hause: liebe Dinge", lines: once(FEELINGS.flatMap((f) => f.comforts.map((c) => COMFORTS[c].narration))) },
     { label: "Zu Hause: nicht so gute Ideen", lines: once(FEELINGS.flatMap((f) => f.instead.map((i) => i.answer))) },

@@ -4,11 +4,12 @@ import { useT } from "@/lib/language";
 import { newId, weekday } from "./board";
 import { ACTIVITIES, DAY_NAMES, NOW_WAYS, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
 import { ItemPic } from "./pictures";
+import { RITUALS } from "./rituals";
 import { joinLastPart, type Plan, type PlanStep, stepFromCatalog, stepLimit, stepsOn, withSame, withSteps } from "./plan";
 import { usePlanTitle, useStepLabel } from "./PlanSheet";
 
-/** Steps a plan offers to add: the day's activities first, then the tasks of the Belohnungstafel. */
-const OFFERED = [...ACTIVITIES, ...TASKS];
+/** Steps a plan offers to add: the rituals with their words (H-58), the day's activities, then the tasks of the Belohnungstafel. */
+const OFFERED = [...RITUALS, ...ACTIVITIES, ...TASKS];
 
 /**
  * Everything a grown-up can change on a plan: name and heading, every day the same or each weekday its own, the steps

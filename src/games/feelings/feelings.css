@@ -1,9 +1,9 @@
 /* The feelings game: a scene, one question, two picture cards – the not-so-good idea and the good one.
    The only words are small captions for grown-ups.
 
-   Calm (user feedback, November 2026): nothing hops, shakes, pulses, grows or floats up after a choice, and the cards
-   stand still – the picture that comes (a relieved, happy bear) is the answer. Only the big picture's two frames fade
-   slowly into each other.
+   Calm (user feedback, November 2026): nothing hops, shakes, pulses, grows or floats up after a choice – the picture
+   that comes (a relieved, happy bear) is the answer. Only one thing moves at a time, its two frames fading slowly into
+   each other: the big picture while the scene is shown, the two cards while the child chooses.
 
    The picture and the cards keep one size for the whole round: things that grow and shrink confuse small children.
    So their room is worked out from the screen alone (cq units of .story-play), never from what is in it.
@@ -15,10 +15,10 @@
   /* Edges and the space between cards. */
   --pad: 12px;
   --gap: clamp(12px, 2.4cqmin, 28px);
-  /* Under a card: its ring and shadow, a gap and one line of caption. */
-  --label: 38px;
-  /* The caption under the big picture, below the ring a chosen picture gets. */
-  --caption-h: 2.1rem;
+  /* Under a card: its ring and shadow, a gap and up to two lines of caption. */
+  --label: 52px;
+  /* The caption under the big picture, below the ring a chosen picture gets: room for two lines. */
+  --caption-h: 3.2rem;
   /* Upright: the picture as wide as the screen, but not more than about half its height; the cards get the rest. */
   --pic-h: min((100cqw - 2 * var(--pad)) * 0.75, 56cqh);
   --rest: calc(100cqh - var(--caption-h) - var(--pic-h) - 3 * var(--pad));
@@ -171,6 +171,41 @@
     0 0 0 10px var(--ink);
 }
 
+/* ▶ in the picture's bottom right corner while the scene is shown: the whole picture is tapped to go on, never a
+   timer (user feedback, November 2026). Still, like everything here. */
+.fg-next {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fg-next-sign {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: clamp(48px, 13%, 96px);
+  filter: drop-shadow(0 3px 0 var(--ink));
+}
+
+.fg-next-sign circle {
+  fill: var(--sunshine);
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.fg-next-sign path {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+
 /* Tick or cross on the corner of the frame, half outside it, so it covers next to nothing. */
 .fg-picture-mark {
   position: absolute;
@@ -261,19 +296,20 @@
 
   .fg-picture-caption {
     bottom: 8px;
+    border-radius: 12px;
   }
 
   .fg-choice .fg-caption {
-    top: calc(var(--card-w) * 0.75 - 1.6rem);
+    bottom: 8px;
+    border-radius: 10px;
   }
 }
 
-/* One line, so a long caption never pushes anything. */
+/* Always the whole text, never cut off with „…“ (user feedback, November 2026): a long caption takes a second line,
+   its lines kept even. */
 .fg-picture-caption,
 .fg-choice .fg-caption {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  text-wrap: balance;
 }
 
 /* ---------- Picture cards: what the bear can do ---------- */
@@ -319,6 +355,111 @@
   }
 }
 
+/* „Was hilft dir jetzt?“: three cards; on upright screens one over the other, as big as the height allows. The cq units
+   measure the whole play area, so the middle's padding comes off. */
+.mood-helps {
+  --card-w: min(100cqw - 2 * var(--pad), (100cqh - 3 * var(--label) - 2 * var(--gap) - 2 * var(--pad)) / 2.25);
+
+  grid-template-columns: auto;
+}
+
+/* In the evening the morning's weather beside the one just picked (C-33): two cards side by side, both still; the
+   morning's a little paler, as it has gone by. */
+.mood-compare {
+  --card-w: min((100cqw - var(--gap) - 2 * var(--pad)) / 2, (100cqh - var(--label) - 2 * var(--pad)) / 0.75);
+
+  grid-template-columns: repeat(2, auto);
+}
+
+.mood-compare .fg-choice:last-child :is(.fg-card-image, .fg-placeholder) {
+  filter: none;
+}
+
+/* Wide and low screens: the three in one row. */
+@media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
+  .mood-helps {
+    --card-w: min((100cqw - 2 * var(--gap) - 2 * var(--pad)) / 3, (100cqh - var(--label) - 2 * var(--pad)) / 0.75);
+
+    grid-template-columns: repeat(3, auto);
+  }
+}
+
+/* The eight faces (C-30): on upright screens two by four, on wide and low ones four by two. Their rows fill the height,
+   so they start below the ✕ in the top left corner (`--corner-clear`), never under it. */
+.mood-faces {
+  --card-w: min((100cqw - var(--gap) - 2 * var(--pad)) / 2, (100cqh - 4 * var(--label) - 3 * var(--gap) - 2 * var(--pad) - var(--corner-clear, 0px)) / 3);
+
+  margin-top: var(--corner-clear, 0px);
+}
+
+@media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
+  .mood-faces {
+    --card-w: min((100cqw - 3 * var(--gap) - 2 * var(--pad)) / 4, (100cqh - 2 * var(--label) - var(--gap) - 2 * var(--pad) - var(--corner-clear, 0px)) / 1.5);
+
+    grid-template-columns: repeat(4, auto);
+  }
+}
+
+/* The drawings of „Wie geht's dir?“ in a card or the big frame: the big face to copy (C-35), the weather signs of „Wie
+   doll ist es?“ (C-36) on warm paper. Still, apart from the breath's circle. */
+.mood-art {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 45%, #fffaf0, #fde7c4);
+}
+
+.fg-picture > .mood-art {
+  inset: var(--mat);
+  border-radius: 16px;
+}
+
+.mood-art svg {
+  position: relative;
+  width: 92%;
+  height: 92%;
+}
+
+.fg-card-rest .mood-art {
+  filter: saturate(0.5) brightness(1.08);
+}
+
+/* One slow breath blown together grows and shrinks this soft circle behind the face: a layer of its own, moved by
+   transform only; twice (BREATH_MS in MoodPlay.tsx), then it stands still. */
+.mood-breath {
+  position: absolute;
+  inset: 0;
+  height: 96%;
+  aspect-ratio: 1;
+  margin: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #a9d3f5 0 52%, #a9d3f500 71%);
+  transform: scale(0.55);
+  animation: mood-breathe 5s ease-in-out 2;
+  will-change: transform;
+}
+
+/* Blowing, the face is smaller, so the breath is seen growing round it. */
+.mood-breath + svg {
+  width: 62%;
+  height: 62%;
+}
+
+@keyframes mood-breathe {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mood-breath {
+    animation: none;
+  }
+}
+
 /* A card with its caption underneath, below the ring and shadow of the card. */
 .fg-choice {
   position: relative;
@@ -343,16 +484,25 @@
   transition: opacity 0.3s;
 }
 
+/* A card's frames lie on top of each other like the big picture's; the first always shows. */
 .fg-card-image {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 18px;
   object-fit: cover;
+  opacity: 0;
   transition:
-    opacity 0.3s ease-in-out,
+    opacity 0.7s ease-in-out,
     filter 0.3s;
   user-select: none;
+}
+
+.fg-card-image:first-child,
+.fg-card-image.on {
+  opacity: 1;
 }
 
 /* What can be tapped now has a thick yellow ring – still, it doesn't call or pulse. */
@@ -369,14 +519,16 @@
   cursor: default;
 }
 
-.fg-card-rest {
-  opacity: 0.5;
+/* Waiting or crossed out: pale, but never see-through – the big picture would show through a card lying on it, as if
+   it lay on top (user feedback, November 2026). */
+.fg-card-rest .fg-card-image,
+.fg-card-rest .fg-placeholder {
+  filter: saturate(0.5) brightness(1.08);
 }
 
-/* Pale, but still to be recognised. */
 .fg-card-wrong .fg-card-image,
 .fg-card-wrong .fg-placeholder {
-  filter: grayscale(0.6) opacity(0.75);
+  filter: grayscale(0.7) brightness(1.1);
 }
 
 /* ---------- Tick and cross ---------- */
@@ -494,15 +646,17 @@
     gap: 0;
   }
 
-  /* The not-so-good idea at the bottom left, the good one at the top right (user's choice, November 2026). */
+  /* The not-so-good idea at the bottom left, the good one at the top right (user's choice, November 2026). Right at
+     the screen's edges, as their width is reckoned: a phone's safe-area inset (the notch's side, 47 px and more) left
+     an empty strip beside the card and pushed it further over the picture (user feedback, November 2026). */
   .story-choices .fg-choice:first-child {
     bottom: var(--card-edge);
-    left: max(var(--pad), env(safe-area-inset-left));
+    left: var(--pad);
   }
 
   .story-choices .fg-choice:last-child {
     top: var(--card-edge);
-    right: max(var(--pad), env(safe-area-inset-right));
+    right: var(--pad);
   }
 
   /* The tick or cross of the big picture moves to its top left corner: the good card lies on the top right one. */
@@ -541,5 +695,243 @@
 
   .story-play .game-end-button.next {
     font-size: min(clamp(2.1rem, 13vh, 4.6rem), (100cqw - var(--pic-w)) / 10);
+  }
+}
+
+/* ---------- „Alltagssituationen“'s corner for grown-ups: the text to read out and the voice switch ---------- */
+
+/* The open book (ReadAlong) and the wooden loudspeaker (VoiceSwitch) stand side by side in the screen's bottom right
+   corner (user feedback, November 2026): on wide screens right of the picture, below the good card, where they and the
+   sheet cover least of the pictures. Still, like every note: nothing idles. */
+.story-play {
+  /* The width of the two notes; the sheet above them reads it too. */
+  --note-w: 64px;
+}
+
+.story-corner {
+  position: absolute;
+  right: var(--pad);
+  bottom: var(--pad);
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Both are paper notes like the ones clipped to the page, each switched by one tap. */
+.story-voice,
+.story-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: var(--note-w);
+  padding: 6px 4px 4px;
+  border: 1px solid #3d304566;
+  border-radius: 14px;
+  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf6ea) 70%, #fff);
+  box-shadow:
+    1px 2px 0 #5a3c1f26,
+    2px 4px 6px -2px #00000040;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.story-voice svg {
+  display: block;
+  width: calc(var(--note-w) - 14px);
+  height: auto;
+}
+
+.story-text svg {
+  display: block;
+  width: calc(var(--note-w) - 12px);
+  height: auto;
+}
+
+.story-voice-box {
+  fill: #b98552;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.story-voice-side {
+  fill: #8a5a33;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.story-voice-foot {
+  fill: #3a2f2a;
+}
+
+.story-voice-ring {
+  fill: #3e3236;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.story-voice-cone {
+  fill: #5d4c51;
+}
+
+.story-voice-cap {
+  fill: #7a676c;
+  stroke: #2b2230;
+  stroke-width: 1.2;
+}
+
+.story-voice-bubble path {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.story-voice-bubble circle {
+  fill: var(--ink);
+}
+
+.story-voice-off {
+  fill: none;
+  stroke: #b0473d;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+/* Switched off, the speaker pales a little, like the shelf's when the music is off. */
+.story-voice[aria-pressed="false"] .story-voice-box {
+  fill: #c9ab8a;
+}
+
+/* Open, the book's note is marked as on, like the grown-ups' chosen options: a highlighter stroke. */
+.story-text[aria-pressed="true"] {
+  background: var(--highlighter, #ffe14fd9);
+}
+
+.story-text-page {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.story-text-lines {
+  fill: none;
+  stroke: #6b5d63;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* The sheet: a page of paper right above the two notes, in the bottom right corner – on wide screens below the good
+   card, over the room right of the picture and only as far over the picture as a readable line needs. Only as tall as
+   its text, scrolled by itself when it is long. While the voice tells the scene (`.told`) the part told now is marked
+   by the highlighter and the others are paler; with the voice off everything shows alike, to be read through. */
+.story-text-sheet {
+  /* The notes' height: the loudspeaker and its paper round it. */
+  --corner-h: calc((var(--note-w) - 14px) * 1.05 + 10px);
+  --sheet-bottom: calc(var(--pad) + var(--corner-h) + 8px);
+  --sheet-top: calc(var(--pad) + 36px);
+
+  position: absolute;
+  right: var(--pad);
+  bottom: var(--sheet-bottom);
+  z-index: 6;
+  width: min(100cqw - 2 * var(--pad), 22rem);
+  max-height: calc(100cqh - var(--sheet-top) - var(--sheet-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 12px;
+  border: 1px solid #3d304566;
+  border-radius: 10px;
+  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf6ea) 88%, #fff);
+  box-shadow: 2px 4px 10px -2px #00000059;
+  color: var(--ink);
+  font-size: clamp(0.8rem, 2.4vh, 1.2rem);
+  line-height: 1.35;
+  touch-action: pan-y;
+}
+
+.story-text-sheet p {
+  margin: 0 0 0.5em;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.story-text-sheet p:last-child {
+  margin-bottom: 0;
+}
+
+.story-text-sheet.told p {
+  opacity: 0.6;
+}
+
+.story-text-sheet.told p.now {
+  background: var(--highlighter, #ffe14fd9);
+  opacity: 1;
+}
+
+.story-text-mark {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.3em;
+  vertical-align: -0.2em;
+}
+
+/* Wide: the sheet starts below the good card on the top right and is as wide as the room right of the picture, but
+   never narrower than a readable line; its bottom stays above the notes and above ▶ on the picture's bottom right
+   corner (`.fg-next-sign`), which it reaches over. */
+@media (min-aspect-ratio: 6 / 5) {
+  .story-text-sheet {
+    --sheet-top: calc(var(--card-edge) + var(--card-w) * 0.75 + 10px);
+    --sheet-bottom: max(var(--pad) + var(--corner-h) + 8px, var(--pic-top) + 18px + clamp(48px, var(--pic-w) * 0.13, 96px));
+
+    width: max(50cqw - var(--pic-w) / 2 - var(--pad), min(44cqw, 22rem));
+  }
+}
+
+/* Upright the cards fill the bottom: the notes stand on the picture's top right corner instead, below the dots (on a
+   narrow screen they reach that far), the sheet below them over the picture. */
+@media (max-aspect-ratio: 6 / 5) {
+  .story-play {
+    --corner-top: calc(max(4px, env(safe-area-inset-top)) + 34px);
+  }
+
+  .story-corner {
+    top: var(--corner-top);
+    bottom: auto;
+  }
+
+  .story-text-sheet {
+    top: calc(var(--corner-top) + var(--corner-h) + 8px);
+    bottom: auto;
+    max-height: calc(var(--pad) + var(--pic-h) - var(--corner-top) - var(--corner-h) - 8px);
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .story-play {
+    --note-w: 50px;
+  }
+
+  .story-corner {
+    gap: 6px;
+  }
+
+  .story-voice,
+  .story-text {
+    padding: 4px 3px 3px;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  .story-play {
+    --note-w: 78px;
   }
 }

@@ -1,5 +1,6 @@
+import { MASCOT_COLORS } from "@/components/Mascot";
 import { Hideout } from "../hideout";
-import { CHEEK, Eye, Face, INK, SKIN, STEEL, heartPath, nth, side, sparklePath } from "../shared";
+import { CHEEK, Eye, Face, INK, MascotFace, SKIN, STEEL, heartPath, nth, side, sparklePath } from "../shared";
 import { Hearts, Lid, Lines, Plaster, Sparkles } from "./parts";
 
 // The exam corner: the scale, the sink, the couch with the child, the doctor, the trolley with
@@ -183,7 +184,10 @@ export function Kind() {
   );
 }
 
-/** The doctor; she waves, nods, blinks behind her glasses and her clipboard tilts. */
+/** The doctor's paws: she is a bear, one of the app's mascots in a role, like the doctor of the Belohnungstafel. */
+const PAW = MASCOT_COLORS.bear.fur;
+
+/** The doctor, a bear in a white coat; she waves, nods behind her glasses and her clipboard tilts. */
 export function Aerztin() {
   return (
     <>
@@ -202,18 +206,14 @@ export function Aerztin() {
         <path d="M38 -300 V-318 M48 -300 V-314" stroke="#4dabf7" strokeWidth="4" strokeLinecap="round" />
         <rect x="-56" y="-330" width="34" height="20" rx="4" fill="#ffd43b" />
         <path d={heartPath(-39, -321, 6)} fill="#ff6b6b" />
-        <rect x="-10" y="-440" width="20" height="22" fill={SKIN} />
+        <rect x="-10" y="-440" width="20" height="22" fill={PAW} />
         <g className="ka-aerztin-head" style={{ transformOrigin: "0px -436px" }}>
-          <circle cx="0" cy="-484" r="44" fill={SKIN} />
-          <circle cx="0" cy="-540" r="20" fill="#5c3d2e" />
-          <path d="M-44 -480 Q-46 -530 0 -530 Q46 -530 44 -480 Q34 -506 0 -504 Q-34 -506 -44 -480 Z" fill="#5c3d2e" />
-          <Face cx={0} cy={-478} size={1.3} />
-          <Lid cx={-9.1} cy={-478} r={4.2} fill={SKIN} />
-          <Lid cx={9.1} cy={-478} r={4.2} fill={SKIN} />
-          <circle cx="-12" cy="-478" r="12" fill="#fff" fillOpacity="0.25" stroke="#7950f2" strokeWidth="3" />
-          <circle cx="12" cy="-478" r="12" fill="#fff" fillOpacity="0.25" stroke="#7950f2" strokeWidth="3" />
-          <path d="M0 -478 H0" stroke="#7950f2" strokeWidth="3" />
-          <path d="M-24 -480 H-40 M24 -480 H40" stroke="#7950f2" strokeWidth="3" />
+          <MascotFace kind="bear" cx={0} cy={-482} r={46} lashes />
+          {/* Round glasses over her eyes, their arms to her ears */}
+          <circle cx="-18.4" cy="-480" r="12.5" fill="#fff" fillOpacity="0.25" stroke="#7950f2" strokeWidth="3" />
+          <circle cx="18.4" cy="-480" r="12.5" fill="#fff" fillOpacity="0.25" stroke="#7950f2" strokeWidth="3" />
+          <path d="M-6 -482 Q0 -486 6 -482" stroke="#7950f2" strokeWidth="3" fill="none" />
+          <path d="M-31 -483 H-44 M31 -483 H44" stroke="#7950f2" strokeWidth="3" />
         </g>
         {/* Arm with the clipboard */}
         <path d="M-58 -404 Q-92 -330 -58 -282" stroke="#fff" strokeWidth="26" strokeLinecap="round" fill="none" />
@@ -224,12 +224,12 @@ export function Aerztin() {
           <circle cx="-44" cy="-306" r="10" fill="#ffd43b" />
           <path d="M-62 -282 H-26" stroke="#74c0fc" strokeWidth="4" strokeLinecap="round" />
         </g>
-        <circle cx="-48" cy="-282" r="12" fill={SKIN} />
+        <circle cx="-48" cy="-282" r="12" fill={PAW} />
         {/* Waving arm */}
         <g className="ka-aerztin-arm" style={{ transformOrigin: "56px -406px" }}>
           <path d="M56 -406 Q84 -340 70 -276" stroke="#fff" strokeWidth="26" strokeLinecap="round" fill="none" />
           <path d="M56 -406 Q84 -340 70 -276" stroke="#dee2e6" strokeWidth="2" fill="none" opacity="0.6" />
-          <circle cx="70" cy="-270" r="13" fill={SKIN} />
+          <circle cx="70" cy="-270" r="13" fill={PAW} />
         </g>
       </g>
       <Hearts x={0} y={-590} count={3} spread={50} />

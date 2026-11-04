@@ -1,10 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { groupStories, type StoryGroup } from "./groups";
 import { RoundPlay } from "./RoundPlay";
 import { roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
+
+/** „Alltagssituationen“'s bottom right corner for grown-ups: the note with the round's text, and the loudspeaker beside it. */
+export interface ReadAlongCorner {
+  /** Whether the sheet with the text is open. */
+  open: boolean;
+  onToggle: () => void;
+  /** The loudspeaker that switches the voice (`VoiceSwitch`), standing in the corner beside the book. */
+  voiceSwitch: ReactNode;
+}
 
 /**
  * One pass through a group: each of its scenes once, one choice each, straight on from one scene to the next. Every
@@ -19,6 +28,7 @@ export function PassPlay({
   remember = true,
   onAgain,
   next,
+  readAlong,
 }: {
   group: StoryGroup;
   /** The scene to begin with: where the child stopped last time. */
@@ -30,6 +40,8 @@ export function PassPlay({
   onAgain: () => void;
   /** The next group; left out where there is none to go on to. */
   next?: { name?: string; onNext: () => void };
+  /** The corner for grown-ups: the round's whole text and the loudspeaker („Alltagssituationen“ only, `ReadAlong`). */
+  readAlong?: ReadAlongCorner;
 }) {
   const { id: language } = useAppLanguage();
   const scenes = groupStories(group);
@@ -64,6 +76,7 @@ export function PassPlay({
       onFinish={finish}
       ending={last ? <GameEnd inline onAgain={onAgain} next={next} /> : undefined}
       onEndKey={next?.onNext ?? onAgain}
+      readAlong={readAlong}
     />
   );
 }

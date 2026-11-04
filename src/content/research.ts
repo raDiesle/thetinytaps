@@ -82,17 +82,17 @@ export const RESEARCH: Research[] = [
       "Baer und Frick-Baer geben Müdigkeit, Geborgenheit, Sehnsucht und Langeweile (neben Neugier) eigene Kapitel, gleichrangig mit Angst, Trauer, Wut, Scham, Schuld, Freude, Mitgefühl und Eifersucht. Das stützt „Müde & zu viel“ als eigene Gruppe.",
       "Die Ratgeber sind sich einig: Es gibt keine guten und schlechten Gefühle, nur Wege, mit ihnen umzugehen. Gottman: Gefühle früh ansprechen, solange sie klein sind, und als Gelegenheit zur Nähe sehen (sein erstes Beispiel ist ein Dreijähriger, der die Jacke für die Kita nicht anziehen will). Siegel und Bryson: Gefühle benennen („Name it to tame it“), Erschreckendes nacherzählen, bei großen Gefühlen erst den Körper bewegen. Graf und Seide: Wutanfälle kommen von unreifer Gefühlsregulation, nicht von Trotz; als Mittel tief atmen, zählen, laut singen, ins Wutkissen boxen, stampfen. Imlau: Gefühlsstarke Kinder erleben Freude so heftig wie Wut. Das passt zur Regel des Spiels, dass das Gefühl nie die nicht so gute Karte ist, und zu den Mitteln der Szenen.",
       "Zones of Regulation und das Mood Meter ordnen nach Energie und Wohlgefühl in vier Farben: Blau (müde, traurig, gelangweilt, krank), Grün (ruhig, froh), Gelb (aufgeregt, albern, frustriert), Rot (Wut, Panik). Für die Jüngsten empfehlen sie nur die Farben ohne Achsen; „Wie geht's dir?“ macht das schon mit dem Wetter. Für „Müde & zu viel“ heißt das: Kranksein und Erschöpfung nach dem Kindergarten gehören dazu, für „Freude“ auch albern und aufgeregt.",
-      "Selbstbezogene Gefühle (Verlegenheit, Eifersucht, Mitgefühl) beginnen gegen Ende des zweiten Lebensjahrs, Stolz, Scham und Schuld etwa ab drei (Lewis). Schuld zeigt sich darin, dass das Kind etwas wiedergutmachen will – die Vorlage für „Hoppla, Saft umgekippt“ mit Aufwischen und Neu-Malen.",
-      "Die Gruppen waren ungleich: Angst 21 Runden, Traurig, Wütend, Streit und Freunde & Familie je 18, Freude & Stolz und Müde & zu viel je 9, Igitt & Hoppla 6. Mit drei neuen Szenen für Freude & Stolz und Müde & zu viel und vier für Igitt & Hoppla haben alle Gruppen 18 Runden, Angst 21 (C-37).",
+      "Selbstbezogene Gefühle (Verlegenheit, Eifersucht, Mitgefühl) beginnen gegen Ende des zweiten Lebensjahrs, Stolz, Scham und Schuld etwa ab drei (Lewis). Schuld zeigt sich darin, dass das Kind etwas wiedergutmachen will – wie in „Ups, aus Versehen“ (C-43), wo der Bär sich entschuldigt und hilft.",
+      "Gebaut sind die Gruppen ungleich: Angst 21 Runden, Traurig, Wütend, Streit und Freunde & Familie je 18, Freude & Stolz und Müde & zu viel je 9, Igitt & Hoppla 6. Die am selben Tag gesammelten Szenen C-37 bis C-51 füllen vor allem Wütend und Angst; ordnet man alle ein, hätte Wütend elf Szenen. Mit einer neunten Karte „Frust & Warten“ (die Zones of Regulation und Zero to Three nennen Frust eigens) und den neuen Szenen für Freude, Müde und Igitt hat jede Gruppe sechs bis acht Szenen (C-54).",
       "Eltern suchen genau diese fehlenden Momente: „kind aufgeregt vor urlaub“, „kind aufgeregt vor geburtstag“, „kind zu aufgeregt zum schlafen“, „kleinkind freut sich nicht beim abholen“, „kind will morgens nicht aufstehen“, „kleinkind übermüdet schreit“, „kind will nach kita nicht nach hause“, „reizüberflutung kindergarten“, „kind überfordert mit kindergarten“, „kleinkind mag keine schmutzigen hände“, „kind schämt sich“.",
-      "Häufig gesucht, aber schon im Spiel oder in anderen Spielen: Angst vor Haare waschen und Friseur, vor lauten Geräuschen, vor Hunden, vor dem Dunkeln; „kind will nicht zähne putzen“ (Zähne putzen); „kind hat angst vor dem klo“ (Aufs Töpfchen); „kind will nicht teilen“ und „kleinkind beißt andere kinder“ (Streit im Kindergarten). Streit mit Geschwistern zu Hause fehlt (C-50).",
+      "Häufig gesucht, aber schon im Spiel oder in anderen Spielen: Angst vor Haare waschen und Friseur, vor lauten Geräuschen, vor Hunden, vor dem Dunkeln; „kind will nicht zähne putzen“ (Zähne putzen); „kind hat angst vor dem klo“ (Aufs Töpfchen); „kind will nicht teilen“ und „kleinkind beißt andere kinder“ (Streit im Kindergarten). Streit mit Geschwistern zu Hause fehlt (C-67).",
     ],
     topics: [
       {
         emoji: "🌞",
-        title: "Freude: Wiedersehen, albern, Vorfreude",
+        title: "Freude: Wiedersehen, albern, staunen",
         searches: ["kind aufgeregt vor urlaub", "kind aufgeregt vor geburtstag", "kind zu aufgeregt zum schlafen", "kleinkind freut sich nicht beim abholen"],
-        ideas: ["C-38", "C-39", "C-40", "C-47"],
+        ideas: ["C-55", "C-56", "C-57", "C-66"],
       },
       {
         emoji: "🌙",
@@ -104,19 +104,19 @@ export const RESEARCH: Research[] = [
           "reizüberflutung kindergarten",
           "kind überfordert mit kindergarten",
         ],
-        ideas: ["C-41", "C-42", "C-43", "C-48"],
+        ideas: ["C-58", "C-59", "C-60", "C-61"],
       },
       {
         emoji: "🤢",
         title: "Igitt & Hoppla: Ekel, Missgeschick, Schuld",
         searches: ["kleinkind mag keine schmutzigen hände", "kleinkind mag keine dreckigen hände", "kleinkind ekelt sich vor essen", "kind schämt sich"],
-        ideas: ["C-44", "C-45", "C-46", "C-49"],
+        ideas: ["C-62", "C-63", "C-64", "C-65"],
       },
       {
         emoji: "🖌️",
         title: "Streit mit Geschwistern",
         searches: ["kind will nicht teilen", "kind eifersüchtig auf baby"],
-        ideas: ["C-50"],
+        ideas: ["C-67"],
       },
     ],
     games: [
@@ -148,7 +148,7 @@ export const RESEARCH: Research[] = [
         why: "Wird oft gesucht („kind lacht wenn sich jemand weh tut“), ist aber Verlegenheit oder Unsicherheit, die ein Bild nicht zeigen kann, ohne dass es wie Auslachen aussieht.",
       },
     ],
-    ideas: ["C-37"],
+    ideas: ["C-54"],
     sources: [
       {
         label: "Papilio-U3 – Elternschätze: Gefühle: Bitte übertreiben! (Praxisheft Emotion Talk)",
@@ -195,6 +195,55 @@ export const RESEARCH: Research[] = [
       },
       { label: "NHS Borders – Zones of Regulation", url: "https://nhsborders.scot.nhs.uk/media/1001858/Zones-of-Regulation.pdf" },
       { label: "Stiftung Lesen – Vorleseideen Monster (Farbenmonster)", url: "https://www.stiftunglesen.de/fileadmin/PDFs/Vorleseideen/2022_01_Monster.pdf" },
+    ],
+  },
+  {
+    id: "rituale",
+    date: "2026-11-04",
+    emoji: "💛",
+    title: "Rituale für den Tagesplan: Erzählen nach der Kita, Mutmach- und Gute-Nacht-Sätze",
+    question:
+      "Welche festen Rituale empfehlen Eltern-Ratgeber für den Morgen, nach Kita oder Schule und vor dem Schlafen – und mit welchen Worten genau? Die Fragen nach dem Guten, dem Blöden und dem Neuen des Tages, und Sätze wie „Ich bin gut so, wie ich bin“ und „Ich schaffe das“.",
+    method:
+      "Websuche auf Deutsch und Englisch (Fragen nach der Schule, Rose/Thorn/Bud, Affirmationen für Kinder, Abendrituale), gelesen wurden Ratgeberseiten, Elternblogs und Pressetexte, die eine Fachperson zitieren. Belastbare Studien zu Affirmationen für Kleinkinder fanden sich nicht; was dazu gesagt wird, stammt aus Blogs. Aus der Fachliteratur bekannt (nicht neu gelesen): Selbstaussagen können bei Menschen mit wenig Selbstwert nach hinten losgehen (Wood u. a. 2009). Darum stehen auf den Karten bedingungslose Sätze („gut so, wie ich bin“, „geliebt“) und „Ich schaffe das“ immer mit „hilft mir jemand“.",
+    findings: [
+      "Gut, schlecht, neu ist als Rose, Thorn, Bud (Rose, Dorn, Knospe) oder „Highs and Lows“ ein verbreitetes Familienritual am Abendbrottisch; eine feste deutsche Formulierung gibt es nicht. Auf der Karte: „Was war heute schön? … blöd? … neu?“.",
+      "Statt „Wie war's?“ lieber konkret fragen (Prof. Tina Kretschmer, zitiert bei echo24), das Kind erst ankommen lassen, zu einer festen Zeit fragen und selbst auch vom eigenen Tag erzählen (Famigros).",
+      "Mutmach-Sätze für Kinder (Affirmationen) sind kurz, im Präsens und positiv: „Ich bin gut so, wie ich bin“, „Ich bin mutig“, „Ich kann das schaffen, auch wenn es schwer ist“, „Ich darf Fehler machen“. Die Ratgeber betonen: jeden Tag dieselben, lieber regelmäßig als viele, vor dem Spiegel oder mit der Hand aufs Herz, und das Kind nie zum Nachsprechen zwingen.",
+      "Vor dem Schlafen: ein Moment des Dankes („Worüber hast du dich heute gefreut?“), Zuneigung ohne Bedingung („Ich hab dich lieb, genau so, wie du bist“) und Sätze wie „Ich bin geliebt“ und „Morgen ist ein neuer Tag“; gleich jeden Abend, leise beim Kuscheln.",
+      "Daraus: vier Ritualkarten im Zeitplan mit den Worten für die Eltern (H-58) und „Wie geht's dir?“ morgens und abends mit dem Vergleich am Abend (C-33), zusammen in der Vorlage „Mein Tag mit Ritualen“.",
+    ],
+    topics: [],
+    games: [],
+    excluded: [
+      {
+        title: "Sätze, die Leistung versprechen („Ich bin der Beste“, „Ich kann alles“)",
+        why: "Sie stimmen für ein Kind oft nicht und können dann eher entmutigen; die Karten sagen, dass das Kind geliebt ist und Hilfe bekommt.",
+      },
+    ],
+    ideas: ["H-58", "C-33"],
+    sources: [
+      {
+        label: "echo24 – Viele Eltern stellen nach der Schule die falschen Fragen",
+        url: "https://www.echo24.de/welt/viele-eltern-stellen-ihren-kindern-nach-der-schule-die-falschen-fragen-zr-94467210.html",
+      },
+      {
+        label: "Famigros – Kinder zum Reden bringen",
+        url: "https://famigros.migros.ch/de/kinder-und-jugendliche/schule-und-ausbildung/schulanfang/kinder-zum-reden-bringen",
+      },
+      {
+        label: "Rose, Thorn, Bud am Familientisch",
+        url: "https://de.parent.com/blogs/conversations/2025-rose-thorn-bud-5-dinner-table-gratitude-games-for-kids",
+      },
+      {
+        label: "Stefanie Stahl Akademie – Affirmationen für Kinder",
+        url: "https://stefaniestahlakademie.de/affirmationen-fuer-kinder-10-wege-ihr-selbstwertgefuehl-zu-staerken/",
+      },
+      { label: "Daddylicious – Affirmationen für Kinder", url: "https://www.daddylicious.de/affirmationen-fuer-kinder/" },
+      {
+        label: "Saarpfalz-Kreis – Abendritual: Gute-Nacht-Box (PDF)",
+        url: "https://www.saarpfalz-kreis.de/images/Kinder_Jugend_Familie/Familien-_und_Jugendhilfe/Familienhilfezentren/Abendritual_-_Gute_Nacht_Box.pdf",
+      },
     ],
   },
   {

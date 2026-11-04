@@ -140,6 +140,41 @@ function MascotRider({ cx, cy, shirt, cap, animal }: { cx: number; cy: number; s
   );
 }
 
+/**
+ * A fox's or a bear's head in place of a person's round head (its middle at cx, cy, radius r): for a grown-up in a role
+ * (the baker, the forester), drawn without a line like the people here. Hats and glasses are drawn over it in the
+ * picture's own coordinates, as for the person it replaces; its hands become paws (`MASCOT_COLORS`).
+ */
+export function MascotFace({
+  kind,
+  cx,
+  cy,
+  r,
+  lashes = false,
+  child = false,
+  children,
+}: {
+  kind: Mascot;
+  cx: number;
+  cy: number;
+  r: number;
+  lashes?: boolean;
+  /** A fox or bear child's face: bigger eyes, a little lower. */
+  child?: boolean;
+  /** A cap or helmet drawn in the head's own box (100 wide), between or over the ears, like `MascotRider`'s cap. */
+  children?: ReactNode;
+}) {
+  // The head's face is about 70 of its 100 wide, with its middle at (50, 56): it fills the person's circle.
+  const s = r / 35;
+  return (
+    <g transform={`translate(${+(cx - 50 * s).toFixed(2)} ${+(cy - 56 * s).toFixed(2)}) scale(${+s.toFixed(4)})`}>
+      <MascotHead kind={kind} child={child} outline={false} lashes={lashes}>
+        {children}
+      </MascotHead>
+    </g>
+  );
+}
+
 /** An animal's eye with a highlight. */
 export function Eye({ cx, cy, r = 3.2 }: { cx: number; cy: number; r?: number }) {
   return (

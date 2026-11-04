@@ -110,6 +110,22 @@ export const SCENARIOS: Scenario[] = [
     path: "/buchstaben/",
     parts: [{ label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } }],
   },
+  {
+    name: "zaehlen",
+    path: "/zaehlen/",
+    parts: [{ label: "Zahlen tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."3719524"], every: 700 } }],
+  },
+  {
+    // Mitmachen: the child hops, claps and stamps on its own layer; keys during a round only ripple.
+    name: "mitmachen",
+    path: "/mitmachen/",
+    parts: [{ label: "Hüpfen, klatschen, stampfen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [..."3a2b"], every: 2200 } }],
+  },
+  {
+    name: "woerter",
+    path: "/woerter/",
+    parts: [{ label: "Wörter tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcdefghijklmnoprstu"], every: 400 } }],
+  },
   { name: "tiere", path: "/tiere/", parts: [{ label: "Wer schaut da raus? und Füttern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   {
     // „Was wird aus mir?“ alone, the right one tapped each time, so the small ones keep growing up.
@@ -129,8 +145,10 @@ export const SCENARIOS: Scenario[] = [
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
-  // The timer's three pictures, each running for a while with a tap now and then (the steam, the twinkling, the flame).
-  ...(["zug", "sanduhr", "kerze"] as const).map((name, i) => ({
+  // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
+  // steam, the twinkling, the flame, what is left lighting up), the ants marching, the sky growing dark over the sunset,
+  // the pizza's slices lifted off and in „Abwechseln“ the hourglass running.
+  ...(["zug", "apfelbaum", "sanduhr", "raupe", "blume", "kerze", "sonne", "ameisen", "scheibe", "pizza", "abwechseln"] as const).map((name, i) => ({
     name: `timer-${name}`,
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
@@ -138,6 +156,26 @@ export const SCENARIOS: Scenario[] = [
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; „Wie geht's dir?“ plays at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
   { name: "wie-gehts-dir", path: "/wie-gehts-dir/", parts: [{ label: "Wetter wählen", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  // Wütend, „Ganz doll“: the breath's circle grows and shrinks round the big face (C-36).
+  {
+    name: "wie-gehts-dir-pusten",
+    path: "/wie-gehts-dir/",
+    parts: [
+      {
+        label: "Zusammen pusten",
+        before: [
+          { wait: 1500 },
+          // „Wütend“ as a face, or its weather card while the built site has no faces yet.
+          { tap: '.fg-card[aria-label="Wütend"], .fg-card[aria-label="Gewitter, wütend"]' },
+          { wait: 2600 },
+          ...key(" "),
+          { tap: '.fg-card[aria-label="Ganz doll"]' },
+          { waitFor: ".mood-breath" },
+        ],
+        ms: 8000,
+      },
+    ],
+  },
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },
   { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },

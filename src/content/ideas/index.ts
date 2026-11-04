@@ -4,7 +4,9 @@
 // never a reused one.
 //
 // One file per area (`<prefix>-<name>.ts`); areas are sorted into IDEA_GROUPS,
-// whose order is the order on the page.
+// whose order is the order on the page. Areas may share a prefix and file when
+// they grew out of one (C: „Wie geht's dir?“ and „Alltagssituationen“), told apart
+// by their `key`; their ideas still count up one row of numbers.
 
 import { lettersIdeas } from "./l-letters";
 import { wordsIdeas } from "./w-words";
@@ -18,13 +20,15 @@ import { marblesIdeas } from "./k-marbles";
 import { chainReactionIdeas } from "./r-chain-reactions";
 import { parentPhoneIdeas } from "./e-parent-phone";
 import { everydayHelpersIdeas } from "./h-everyday-helpers";
+import { timerIdeas } from "./h-timer";
 import { allGamesIdeas } from "./a-all-games";
 import { figureIdeas } from "./f-figure";
 import { rewardChartIdeas } from "./t-reward-chart";
 import { firstVisitIdeas } from "./v-first-visit";
 import { bookIdeas } from "./d-book";
 import { matchingIdeas } from "./z-matching";
-import { feelingsIdeas } from "./c-feelings";
+import { feelingsCheckInIdeas, feelingsIdeas } from "./c-feelings";
+import { feelingsGamesIdeas } from "./j-feelings-games";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
@@ -46,15 +50,15 @@ export const IDEA_GROUPS: IdeaGroup[] = [
       adventureIdeas,
       littleAdventuresIdeas,
       matchingIdeas,
-      feelingsIdeas,
       otherGamesIdeas,
     ],
   },
   { emoji: "✨", title: "Ganz neue Spiele", areas: [newGamesIdeas] },
+  { emoji: "💛", title: "Gefühle", areas: [feelingsCheckInIdeas, feelingsIdeas, feelingsGamesIdeas] },
   {
     emoji: "👪",
     title: "Für Eltern & Technik",
-    areas: [everydayHelpersIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
+    areas: [everydayHelpersIdeas, timerIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
   },
 ];
 

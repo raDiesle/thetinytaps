@@ -963,10 +963,6 @@
   animation: ki-tilt 1.1s ease-in-out 0.3s 2;
 }
 
-.item-erzieherin.playing .ki-erz-bun {
-  animation: ki-wiggle 0.5s ease-in-out 0.4s 3;
-}
-
 .item-erzieherin.playing .ki-erz-body {
   animation: ki-wiggle-small 1.2s ease-in-out 0.2s 2;
 }
