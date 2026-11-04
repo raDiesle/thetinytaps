@@ -117,7 +117,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/timer/",
-    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts. Noch nur Deutsch: der Zettel „Andere …“ mit seinem Blatt (Wie lange / Bis um, Std., Min., Sek., die fertigen Zettel, Fertig, Bis morgen …), die Frage beim Start nach einer schon vergangenen Uhrzeit, die Restzeit hinter ⚙️ und die Namen der drei neuen Bilder „Apfelbaum“, „Raupe“ und „Rote Scheibe“.",
+    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts. Noch nur Deutsch: der Zettel „Andere …“ mit seinem Blatt (Wie lange / Bis um, Std., Min., Sek., die fertigen Zettel, Fertig, Bis morgen …), die Frage beim Start nach einer schon vergangenen Uhrzeit, die Restzeit hinter ⚙️, die Namen der Bilder „Apfelbaum“, „Raupe“, „Ameisenstraße“, „Rote Scheibe“ und „Abwechseln“ und bei „Abwechseln“ hinter ⚙️ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“.",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
@@ -256,7 +256,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Buch und Gruppen",
         languages: { de: "done" },
-        note: "Neu (4. November 2026), nur Deutsch: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts). Der Lautsprecher zum Ausschalten der Stimme (VoiceSwitch.tsx, 4. November 2026): „Stimme ausschalten“ / „Stimme einschalten“ nur Deutsch, „halten“ übersetzt.",
+        note: "Neu (4. November 2026), nur Deutsch: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts). Der Lautsprecher zum Ausschalten der Stimme (VoiceSwitch.tsx, 4. November 2026): „Stimme ausschalten“ / „Stimme einschalten“ nur Deutsch, „halten“ übersetzt. Das Buch mit dem Text zum Vorlesen (ReadAlong.tsx, 4. November 2026): „Text zum Vorlesen zeigen“ / „Text ausblenden“ nur Deutsch; der Text selbst kommt aus den Szenen in ihrer Sprache.",
       },
     ],
   },

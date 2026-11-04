@@ -1,7 +1,7 @@
 import { memo, type CSSProperties } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
 import { applePlaces } from "./pieces";
-import { Draw, Family, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Apfelbaum (H-45): as many apples hang on the tree as minutes are set, and every minute one falls with a plop into the
 // basket the bear child holds. Each apple is a small layer of its own whose fall is a CSS animation waiting for its
@@ -81,7 +81,7 @@ function Apple() {
  * layer moves across (`--tm-dx`), the inner box down (`--tm-dy`, faster and faster), and the one to fall next sways for
  * its whole minute, a soft swing every second.
  */
-export const Apples = memo(function Apples({ count, total }: { count: number; total: number }) {
+export const Apples = memo(function Apples({ count, total, glow }: { count: number; total: number; glow: number }) {
   const r = appleRadius(count);
   const unit = total / count;
   const places = applePlaces(count, CROWN.rx - r - 24, CROWN.ry - r - 24);
@@ -104,6 +104,8 @@ export const Apples = memo(function Apples({ count, total }: { count: number; to
             <div className="tm-apple-drop" style={{ animationDelay: `${fall}ms` }}>
               <div className="tm-apple-sway" style={{ animationDelay: `${i * unit}ms`, animationIterationCount: sways }}>
                 <Apple />
+                {/* A tap lights up the apples still on the tree (H-51); those in the basket glow hidden behind its front. */}
+                <LeftGlow n={glow} />
               </div>
             </div>
           </Layer>
@@ -170,13 +172,13 @@ export const BasketFront = memo(function BasketFront() {
 });
 
 /** The whole picture: the tree with its apples, the bear grown-up and the child with the basket. */
-export function AppleScene({ count, total }: { count: number; total: number }) {
+export function AppleScene({ count, total, glow }: { count: number; total: number; glow: number }) {
   return (
     <>
       <AppleBackdrop />
       <Family kind="bear" x={BASKET.cx + 50} floor={APPLE_FLOOR} childLeft />
       <AppleHeap />
-      <Apples count={count} total={total} />
+      <Apples count={count} total={total} glow={glow} />
       <BasketFront />
     </>
   );

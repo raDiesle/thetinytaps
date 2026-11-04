@@ -828,3 +828,150 @@
     font-size: 0.8rem;
   }
 }
+
+/* ---------- „Alltagssituationen“'s text to read out (ReadAlong): an open book on the picture's bottom left ---------- */
+
+/* A paper note like the loudspeaker's, on the picture's bottom left corner – on wide screens just right of where the
+   not-so-good card lies over the picture (`--over` of its width), so neither covers the other. Held to open (a green
+   ring while held), a tap closes. Still otherwise: nothing idles. */
+.story-text {
+  --text-left: calc(var(--card-w) * var(--over, 0) + 10px);
+
+  position: absolute;
+  bottom: 10px;
+  left: var(--text-left);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 56px;
+  padding: 5px 4px 3px;
+  border: 1px solid #3d304566;
+  border-radius: 12px;
+  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf6ea) 70%, #fff);
+  box-shadow:
+    1px 2px 0 #5a3c1f26,
+    2px 4px 6px -2px #00000040;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.story-text svg {
+  display: block;
+  width: 42px;
+  height: auto;
+}
+
+.story-text small {
+  font-size: 0.65rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.story-text.holding {
+  outline: 4px solid #7fd06a;
+  outline-offset: 2px;
+}
+
+/* Open, the note is marked as on, like the grown-ups' chosen options: a highlighter stroke. */
+.story-text[aria-pressed="true"] {
+  background: var(--highlighter, #ffe14fd9);
+}
+
+.story-text-page {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.story-text-lines {
+  fill: none;
+  stroke: #6b5d63;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* The sheet: a page of paper over the picture's left side, from below the dots and the tick or cross on the corner
+   (`.fg-picture-mark`, 15 % of the width, which is 20 % of the height) down to the note, scrolled by itself when the
+   text is long, only as tall as its text. The part told now is marked by the highlighter, the others paler. */
+.story-text-sheet {
+  --below: 84px;
+
+  position: absolute;
+  top: calc(clamp(52px, 20%, 120px) - 6px);
+  max-height: calc(100% - clamp(52px, 20%, 120px) + 6px - var(--below));
+  left: calc(var(--card-w) * var(--over, 0) + 10px);
+  z-index: 3;
+  width: min(46%, 28rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 12px;
+  border: 1px solid #3d304566;
+  border-radius: 10px;
+  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf6ea) 88%, #fff);
+  box-shadow: 2px 4px 10px -2px #00000059;
+  color: var(--ink);
+  font-size: clamp(0.8rem, 2.4vh, 1.2rem);
+  line-height: 1.35;
+  touch-action: pan-y;
+}
+
+.story-text-sheet p {
+  margin: 0 0 0.5em;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0.6;
+}
+
+.story-text-sheet p:last-child {
+  margin-bottom: 0;
+}
+
+.story-text-sheet p.now {
+  background: var(--highlighter, #ffe14fd9);
+  opacity: 1;
+}
+
+.story-text-mark {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.3em;
+  vertical-align: -0.2em;
+}
+
+/* Upright the picture is small and the loudspeaker lies on its top left corner: the sheet takes the width right of
+   it and of the note, from below the dots down to above ▶. */
+@media (max-aspect-ratio: 6 / 5) {
+  .story-text-sheet {
+    top: 36px;
+    left: 76px;
+    right: 10px;
+    width: auto;
+    max-height: calc(100% - 36px - 64px);
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  .story-text {
+    width: 70px;
+  }
+
+  .story-text svg {
+    width: 54px;
+  }
+
+  .story-text small {
+    font-size: 0.75rem;
+  }
+
+  .story-text-sheet {
+    --below: 100px;
+  }
+}

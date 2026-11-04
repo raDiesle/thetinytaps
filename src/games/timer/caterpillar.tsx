@@ -1,5 +1,5 @@
 import { memo, type CSSProperties } from "react";
-import { Draw, Family, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Raupe (H-46): a little caterpillar eats its way through a big leaf from the tip to the stalk, bite by bite; what is
 // still green is the time left. At the end it spins itself in on the branch and a butterfly flies out to the fox child.
@@ -98,8 +98,10 @@ export const LeafBackdrop = memo(function LeafBackdrop() {
  * The leaf in bands: each band is a box with a round right end, sliding back over the leaf by `EATEN` while the leaf in
  * it slides forward by as much, so the leaf stands still and only the bitten edge moves.
  */
-export const Leaf = memo(function Leaf() {
+export const Leaf = memo(function Leaf({ glow }: { glow: number }) {
   const band = LEAF.h / BANDS.length;
+  const whole = { top: 0, height: "100%", width: `${(EDGE * 100) / LEAF.w}%`, "--tm-eat": `${(-EATEN * 100) / EDGE}%` } as CSSProperties;
+  const wholeInner = { top: 0, width: `${(LEAF.w * 100) / EDGE}%`, height: "100%", "--tm-eat": `${(EATEN * 100) / LEAF.w}%` } as CSSProperties;
   return (
     <Layer x={LEAF.x} y={LEAF.y} w={LEAF.w} h={LEAF.h}>
       {BANDS.map((offset, i) => {
@@ -124,6 +126,12 @@ export const Leaf = memo(function Leaf() {
           </div>
         );
       })}
+      {/* A tap lights up what is still green (H-51): a light in a box sliding back like the bands, so it ends at the bite. */}
+      <div className="tm-band tm-eat tm-leaf-light" style={whole}>
+        <div className="tm-band-leaf tm-eat" style={wholeInner}>
+          <LeftGlow n={glow} />
+        </div>
+      </div>
     </Layer>
   );
 });
@@ -205,11 +213,11 @@ function Butterfly() {
 }
 
 /** The whole picture: the leaf with the caterpillar, and the fox family waiting on the meadow. */
-export function CaterpillarScene() {
+export function CaterpillarScene({ glow }: { glow: number }) {
   return (
     <>
       <LeafBackdrop />
-      <Leaf />
+      <Leaf glow={glow} />
       <Cocoon />
       <Caterpillar />
       <Family kind="fox" x={1200} floor={LEAF_FLOOR} childLeft />

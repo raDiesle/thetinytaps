@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Draw, Family, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Rote Scheibe (H-47): the plainest picture, as many Kitas know it from the „Time Timer“ – a big red disc on a white
 // face that gets smaller like a clock's hand going round, until nothing red is left. Bright colour on plain paper, to be
@@ -52,11 +52,14 @@ const DiscFace = memo(function DiscFace() {
 });
 
 /** The red disc and the two white halves that cover it from 12 o'clock round, the right half first, then the left. */
-function Red() {
+function Red({ glow }: { glow: number }) {
   const { cx, cy } = DISC;
   return (
     <>
-      <Layer x={cx - DISC.r} y={cy - DISC.r} w={2 * DISC.r} h={2 * DISC.r} className="tm-red" />
+      <Layer x={cx - DISC.r} y={cy - DISC.r} w={2 * DISC.r} h={2 * DISC.r} className="tm-red">
+        {/* A tap lights up the red still left (H-51); the white halves over it hide the rest of the light. */}
+        <LeftGlow n={glow} />
+      </Layer>
       <Layer x={cx} y={cy - COVER} w={COVER} h={2 * COVER} className="tm-half tm-half-right">
         <div className="tm-cover tm-move" />
       </Layer>
@@ -91,12 +94,12 @@ function Hand() {
 }
 
 /** The whole picture: the face with the red disc, and the fox family beside it. */
-export function DiscScene() {
+export function DiscScene({ glow }: { glow: number }) {
   return (
     <>
       <DiscBackdrop />
       <DiscFace />
-      <Red />
+      <Red glow={glow} />
       <Hand />
       <Family kind="fox" x={1200} floor={790} childLeft />
     </>

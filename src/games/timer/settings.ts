@@ -2,9 +2,13 @@ import type { OwnTime } from "./time";
 
 /**
  * What runs down while the child watches: a train going to the station, apples falling into a basket, an hourglass, a
- * caterpillar eating a leaf, a candle, a red disc.
+ * caterpillar eating a leaf, a candle, ants carrying a cookie to their hill (H-68), a red disc – or „Abwechseln“ (H-52),
+ * two children taking turns with a toy, turn after turn.
  */
-export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "candle" | "disc";
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "candle" | "ants" | "disc" | "swap";
+
+/** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
+export type SwapToy = "bobbycar" | "doll" | "ball";
 
 /** The minutes a grown-up can set, in the row above the cards. */
 export const TIMER_MINUTES = [1, 2, 3, 5, 10] as const;
@@ -18,6 +22,8 @@ export interface TimerSettings {
   own: OwnTime | null;
   /** Whether that own time is the one chosen, instead of `minutes`. */
   useOwn: boolean;
+  /** The toy in „Abwechseln“ (H-52). */
+  toy: SwapToy;
   /** Always off: the timer says nothing (see the root CLAUDE.md on voice). */
   speech: boolean;
   /** The whistle, chimes and the tune at the end. */
@@ -29,6 +35,7 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   minutes: 5,
   own: null,
   useOwn: false,
+  toy: "bobbycar",
   speech: false,
   sounds: true,
 };

@@ -27,7 +27,10 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
   },
   { id: "caterpillar", emoji: "🐛", name: { de: "Raupe" } },
   { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
+  // German only until translations are asked for (see languageStatus.ts).
+  { id: "ants", emoji: "🐜", name: { de: "Ameisenstraße" } },
   { id: "disc", emoji: "🔴", name: { de: "Rote Scheibe" } },
+  { id: "swap", emoji: "🔁", name: { de: "Abwechseln" } },
 ];
 
 /** The picture after `id`, after the last the first, for „Weiter“. */

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { preloadImages } from "./images";
-import { beatText, roundImages, roundLines, type Round } from "./rounds";
+import { ReadAlong } from "./ReadAlong";
+import { beatText, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 import { CHEER_MS, ChoiceCard, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
 import { beatMs, type Beat } from "./story";
@@ -24,6 +25,7 @@ export function RoundPlay({
   onFinish,
   ending,
   onEndKey,
+  readAlong,
 }: {
   round: Round;
   settings: FeelingsSettings;
@@ -34,6 +36,8 @@ export function RoundPlay({
   ending?: ReactNode;
   /** A key pressed while `ending` shows: every key does something. */
   onEndKey?: () => void;
+  /** „Alltagssituationen“: the sign that shows grown-ups the round's whole text to read out, and whether it is open. */
+  readAlong?: { open: boolean; onToggle: () => void };
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [tried, setTried] = useState(false);
@@ -130,6 +134,15 @@ export function RoundPlay({
   else if (phase === "good" || ((phase === "done" || phase === "end") && !round.end)) [shown, caption] = [round.good, round.good.caption];
   else if (phase === "end" || phase === "done") [shown, caption] = [round.end!, round.end!.caption];
   if (cheering) look = "good";
+  // The part of the text being told now, marked on the sheet for grown-ups who read it out.
+  const part: ReadPart =
+    phase === "trying"
+      ? "instead"
+      : phase === "good" || ((phase === "end" || phase === "done") && !round.end)
+        ? "good"
+        : phase === "end" || phase === "done"
+          ? "end"
+          : "start";
 
   const doneHere = phase === "good" || phase === "end" || phase === "done";
   const insteadState: CardState = tried ? "wrong" : phase === "choose" ? "choose" : "rest";
@@ -149,6 +162,7 @@ export function RoundPlay({
           look={look}
           still={phase === "choose"}
           onNext={phase === "intro" ? goOn : undefined}
+          corner={readAlong && <ReadAlong round={round} part={part} open={readAlong.open} onToggle={readAlong.onToggle} />}
         />
       </main>
       {/* The not-so-good idea always first (bottom left), the good one second (top right). */}
