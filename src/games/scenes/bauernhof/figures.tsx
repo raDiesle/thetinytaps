@@ -1,10 +1,13 @@
 import type { CSSProperties } from "react";
-import { Face, SKIN, nth } from "../shared";
-import { Lid } from "./animals";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { MascotFace, nth } from "../shared";
 
 // The farmer and the scarecrow. Foot point at (0, 0).
 
-/** Farmer in blue dungarees with a straw hat and a pitchfork; he waves. */
+/** The farmer's paws: he is a bear, one of the app's mascots in a role (a fox among the hens would be the wrong one). */
+const BEAR_PAW = MASCOT_COLORS.bear.fur;
+
+/** Farmer, a bear in blue dungarees with a straw hat and a pitchfork; he waves. */
 export function Bauer() {
   return (
     <g className="bh-bauer-body" style={{ transformOrigin: "0px 0px" }}>
@@ -23,18 +26,12 @@ export function Bauer() {
       <circle cx="16" cy="-106" r="3" fill="#ffd166" />
       <rect x="-10" y="-96" width="20" height="14" rx="3" fill="#2f6fd6" />
       <path d="M26 -122 Q40 -110 42 -96" stroke="#e63946" strokeWidth="13" strokeLinecap="round" fill="none" />
-      <circle cx="44" cy="-94" r="8" fill={SKIN} />
+      <circle cx="44" cy="-94" r="8" fill={BEAR_PAW} />
       <g className="bh-bauer-arm" style={{ transformOrigin: "-24px -122px" }}>
         <path d="M-24 -122 Q-44 -136 -48 -160" stroke="#e63946" strokeWidth="13" strokeLinecap="round" fill="none" />
-        <circle cx="-48" cy="-166" r="9" fill={SKIN} />
+        <circle cx="-48" cy="-166" r="9" fill={BEAR_PAW} />
       </g>
-      <circle cx="0" cy="-152" r="24" fill={SKIN} />
-      <circle cx="-23" cy="-150" r="5" fill={SKIN} />
-      <circle cx="23" cy="-150" r="5" fill={SKIN} />
-      <Face cx={0} cy={-154} size={1.05} />
-      <Lid cx={-7.35} cy={-154} r={4.4} fill={SKIN} />
-      <Lid cx={7.35} cy={-154} r={4.4} fill={SKIN} />
-      <path d="M-10 -138 Q0 -132 10 -138" stroke="#8d5a2b" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <MascotFace kind="bear" cx={0} cy={-150} r={25} />
       <g className="bh-bauer-hat" style={{ transformOrigin: "0px -172px" }}>
         <ellipse cx="0" cy="-170" rx="40" ry="9" fill="#e9c46a" />
         <path d="M-22 -172 Q-22 -196 0 -196 Q22 -196 22 -172 Z" fill="#e9c46a" />

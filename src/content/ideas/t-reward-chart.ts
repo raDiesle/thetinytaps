@@ -6,7 +6,7 @@ export const rewardChartIdeas: IdeaArea = {
   emoji: "🌟",
   title: "Belohnungstafel",
   intro:
-    "Eine Tafel, die Eltern frei gestalten, auf dem Bildschirm und genau gleich zum Ausdrucken (/belohnungstafel/). Belohnung heißt Mitfreuen: Sterne gehen nie verloren, keine Strafen, ein leeres Feld ist nur noch frei. Tapsi zeigt jede Aufgabe, Karte und Belohnung als Bild (Gemini, 🎨 Bildvorschläge); eigene Aufgaben behalten ihr Emoji.",
+    "Eine Tafel, die Eltern frei gestalten, auf dem Bildschirm und genau gleich zum Ausdrucken (/belohnungstafel/). Belohnung heißt Mitfreuen: Sterne gehen nie verloren, keine Strafen, ein leeres Feld ist nur noch frei. Tapsi zeigt jede Aufgabe, Karte und Belohnung als Bild (Gemini); eigene Aufgaben behalten ihr Emoji.",
   ideas: [
     {
       id: "T-01",
@@ -143,6 +143,7 @@ export const rewardChartIdeas: IdeaArea = {
       text: "Mehrere Kinder sammeln auf einem Weg zusammen zu einer gemeinsamen Belohnung, jedes mit eigenem Zeichen.",
       why: "Ein Wunsch aus App-Bewertungen; fördert Miteinander statt Wettbewerb.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "T-17",
@@ -150,6 +151,7 @@ export const rewardChartIdeas: IdeaArea = {
       title: "Urlaub und Pause",
       text: "Tage, an denen die Tafel ruht (krank, Urlaub, bei Oma), werden ganz ausgeblendet statt leer zu bleiben; eine Sammeltafel wartet einfach.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "T-18",

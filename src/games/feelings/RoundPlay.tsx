@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { preloadImages } from "./images";
-import { beatText, roundImages, roundLines, ROLE_LINES, type Round } from "./rounds";
+import { ReadAlong } from "./ReadAlong";
+import type { ReadAlongCorner } from "./PassPlay";
+import { beatText, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 import { CHEER_MS, ChoiceCard, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
 import { beatMs, type Beat } from "./story";
-import { pick, useAppLanguage } from "@/lib/language";
 
 /**
- * "intro": the scene is told. "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
+ * "intro": the scene is shown and told until the child taps it (▶). "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
  * to. "good": the good idea is done. "end": the story's happy end. "done": the round is over and `ending` shows.
  */
 type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
@@ -15,8 +16,8 @@ type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
 /**
  * One round: the scene, one question, two cards – the not-so-good idea and the good one; a tap on a card chooses it.
  * The not-so-good one shows what it leads to and is crossed out, then the good one is left to choose. After the good
- * one (and the story's happy end, on its last step) `onFinish` is called; with `ending` the round then stays on its
- * last picture and shows it (the end buttons of a pass), otherwise the next round follows.
+ * one (and the story's happy end, on its last step) `onFinish` is called, and the round stays on its last picture:
+ * with ▶ on it (`onDone`, the next scene), or with `ending` beside it (the end buttons of a pass).
  */
 export function RoundPlay({
   round,
@@ -24,7 +25,9 @@ export function RoundPlay({
   progress,
   onFinish,
   ending,
+  onDone,
   onEndKey,
+  readAlong,
 }: {
   round: Round;
   settings: FeelingsSettings;
@@ -33,15 +36,21 @@ export function RoundPlay({
   onFinish: () => void;
   /** Shown in the cards' room once the round is over, if it is the last of its pass. */
   ending?: ReactNode;
-  /** A key pressed while `ending` shows: every key does something. */
+  /** Once the round is over, a tap on its picture (▶) goes on with it: the next scene of the pass. */
+  onDone?: () => void;
+  /** A key pressed once the round is over: every key does something. */
   onEndKey?: () => void;
+  /**
+   * „Alltagssituationen“: the note in the bottom right corner that shows grown-ups the round's whole text to read out,
+   * whether it is open, and the loudspeaker standing beside it (`VoiceSwitch`).
+   */
+  readAlong?: ReadAlongCorner;
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [tried, setTried] = useState(false);
   const [cheering, setCheering] = useState(false);
   const { later } = useTimers();
   const { say, sound, voiced, preload } = useVoice(settings);
-  const { id: language } = useAppLanguage();
 
   /** Plays the beats one after another, then calls `then`. */
   const playBeats = useCallback(
@@ -63,16 +72,16 @@ export function RoundPlay({
   useEffect(() => {
     preloadImages(roundImages(round));
     preload(roundLines(round));
-    playBeats(round.start.beats, () => {
-      setPhase("choose");
-      say(round.question, true);
-    });
+    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while.
+    playBeats(round.start.beats, () => say(round.question, true));
   }, []);
+
+  const goOn = () => setPhase((now) => (now === "intro" ? "choose" : now));
 
   const finish = useCallback(() => {
     onFinish();
-    if (ending) setPhase("done");
-  }, [onFinish, ending]);
+    setPhase("done");
+  }, [onFinish]);
 
   // The good idea: a laugh and „Juhu!“ with a still green frame, then it is done; on the story's last step its happy end follows.
   const chooseGood = useCallback(() => {
@@ -109,6 +118,7 @@ export function RoundPlay({
   // The left arrow picks the not-so-good idea on the left; every other key the good one, so mashing keys still tells the story.
   const pressKey = (key: string) => {
     if (phase === "done") return onEndKey?.();
+    if (phase === "intro") return goOn();
     choose(!tried && key === "ArrowLeft" ? "instead" : "good");
   };
 
@@ -123,14 +133,23 @@ export function RoundPlay({
 
   // The big picture: the scene while it is told and chosen, a card's picture once chosen, at last the happy end.
   let shown: { image: string; caption: string } = round.start;
-  // While the scene is told the caption says whose view it takes; while the child chooses, the question (it names who acts).
-  let caption = pick(ROLE_LINES[round.role], language);
+  // The scene's whole text at once: its question, which says what is the matter and who acts (user feedback, November 2026).
+  let caption = round.question;
   let look: PictureLook = "story";
-  if (phase === "choose") [caption, look] = [round.question, "quiet"];
+  if (phase === "choose") look = "quiet";
   else if (phase === "trying") [shown, caption, look] = [round.instead, round.instead.caption, "bad"];
   else if (phase === "good" || ((phase === "done" || phase === "end") && !round.end)) [shown, caption] = [round.good, round.good.caption];
   else if (phase === "end" || phase === "done") [shown, caption] = [round.end!, round.end!.caption];
   if (cheering) look = "good";
+  // The part of the text being told now, marked on the sheet for grown-ups who read it out.
+  const part: ReadPart =
+    phase === "trying"
+      ? "instead"
+      : phase === "good" || ((phase === "end" || phase === "done") && !round.end)
+        ? "good"
+        : phase === "end" || phase === "done"
+          ? "end"
+          : "start";
 
   const doneHere = phase === "good" || phase === "end" || phase === "done";
   const insteadState: CardState = tried ? "wrong" : phase === "choose" ? "choose" : "rest";
@@ -142,7 +161,15 @@ export function RoundPlay({
         <StepDots total={progress.total} done={progress.done + (doneHere ? 1 : 0)} current={!doneHere} />
       </header>
       <main className="story-middle">
-        <StoryPicture key={shown.image} name={shown.image} caption={caption} look={look} />
+        {/* Only one thing moves at a time: the scene while it is shown, then the cards while the child chooses. */}
+        <StoryPicture
+          key={shown.image}
+          name={shown.image}
+          caption={caption}
+          look={look}
+          still={phase === "choose"}
+          onNext={phase === "intro" ? goOn : phase === "done" ? onDone : undefined}
+        />
       </main>
       {/* The not-so-good idea always first (bottom left), the good one second (top right). */}
       <footer className={`story-choices${phase === "done" ? " ending" : ""}`}>
@@ -155,6 +182,18 @@ export function RoundPlay({
               </>
             )}
       </footer>
+      {readAlong && (
+        <ReadAlong
+          round={round}
+          part={part}
+          open={readAlong.open}
+          onToggle={readAlong.onToggle}
+          voice={settings.voice}
+          hidden={phase === "done" && ending !== undefined}
+        >
+          {readAlong.voiceSwitch}
+        </ReadAlong>
+      )}
     </div>
   );
 }

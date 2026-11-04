@@ -1092,13 +1092,124 @@
   cursor: pointer;
 }
 
-.pl-moon {
+/* A night (H-05): its moon or sun over a little bed. A slept night's morning waits for the child's tap in a warm, still
+   light; tapped, its patch turns to day sky and a sun rises over the bed. */
+.pl-night {
   container-type: size;
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
   cursor: pointer;
+}
+
+/* Square whatever the cell, so its light and its day sky stay round. */
+.pl-night-in {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 96cqmin;
+  height: 96cqmin;
+  padding-bottom: 6cqmin;
+  border-radius: 22cqmin;
+}
+
+.pl-night-sky {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+}
+
+.pl-night .pl-moon-pic,
+.pl-night .pl-sun-pic {
+  width: 52cqmin;
+  height: 52cqmin;
+}
+
+.pl-bed-pic {
+  flex: none;
+  width: 88cqmin;
+  height: 46cqmin;
+  overflow: visible;
+}
+
+.pl-bed-wood {
+  fill: #c98b52;
+}
+
+.pl-bed-mattress,
+.pl-bed-pillow {
+  fill: #fff;
+}
+
+.pl-bed-blanket {
+  fill: var(--rw-main);
+}
+
+.pl-bed-pic > *,
+.pl-sun-pic circle {
+  stroke: #2a1e5c;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.rw-grey .pl-bed-pic > * {
+  fill: #fff;
+}
+
+.pl-night.now .pl-night-in {
+  background: radial-gradient(closest-side, #fff59d 0%, #ffd43b88 55%, transparent 100%);
+  box-shadow: 0 0 0 max(2px, 3cqmin) #ffd43b;
+}
+
+.pl-night.done .pl-night-in {
+  background: #a5dcff;
+}
+
+.pl-night-hand {
+  position: absolute;
+  top: 0;
+  right: 2cqmin;
+  font-size: 30cqmin;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.pl-sun-pic {
+  overflow: visible;
+}
+
+.pl-sun-pic circle {
+  fill: #ffd43b;
+}
+
+.pl-sun-rays {
+  fill: none;
+  stroke: #f59f00;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.pl-sun-face {
+  fill: none;
+  stroke: #2a1e5c;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+/* Just tapped: the sun comes up over the bed (only after a tap, never by itself). */
+.pl-night.fresh .pl-sun-pic {
+  animation: pl-sun-rise 0.9s ease-out backwards;
+}
+
+@keyframes pl-sun-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45%) scale(0.6);
+  }
 }
 
 .pl-moon-pic {
@@ -1126,8 +1237,13 @@
 }
 
 /* Counted: the moon lights up and tips, one after the other (only after a tap). */
-.pl-moon.twinkle .pl-moon-pic {
+.pl-night.twinkle .pl-moon-pic,
+.pl-night.twinkle .pl-sun-pic {
   animation: pl-moon-count 0.55s ease-out;
+}
+
+.pl-night.wiggle {
+  animation: wiggle 0.5s ease-in-out;
 }
 
 @keyframes pl-moon-count {
@@ -1191,4 +1307,152 @@
 
 .rw-on-paper .pl-card.pl-big-day {
   box-shadow: none;
+}
+
+/* A ritual's card (RitualCard.tsx, H-58): picture and name, then the words for the grown-up. Sized in em, so the screen's
+   window and the printed page each give it their own font size. */
+.pl-ritual {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  min-width: 0;
+  color: var(--ink, #2a1e5c);
+}
+
+.pl-ritual-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.pl-ritual-pic {
+  flex: none;
+  width: 3.4em;
+  font-family: var(--font-emoji);
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+.pl-ritual-pic > :not(img) {
+  font-size: 2.6em;
+}
+
+.pl-ritual-pic .rw-pic {
+  width: 3.4em;
+  height: 3.4em;
+  object-fit: contain;
+}
+
+.pl-ritual-name {
+  display: block;
+  font-size: 1.4em;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.pl-ritual-when {
+  display: block;
+  opacity: 0.75;
+  font-weight: 700;
+}
+
+.pl-ritual-part {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.pl-ritual-who {
+  margin: 0;
+  color: color-mix(in srgb, var(--rw-main, #6b4bb8) 70%, #000);
+  font-size: 0.9em;
+  font-weight: 800;
+}
+
+.pl-ritual-part ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pl-ritual-part li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.pl-ritual-sign {
+  flex: none;
+  font-family: var(--font-emoji);
+}
+
+.pl-ritual-how {
+  margin: 0;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* On screen: a sheet of paper over the plan, the grown-up reads from it. */
+.pl-ritual-dialog {
+  box-sizing: border-box;
+  width: min(560px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 16px 20px 20px;
+  overflow: auto;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: var(--paper-grain, none), var(--paper-mottle, none), var(--paper, #fff);
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.pl-ritual-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pl-ritual-dialog::backdrop {
+  background: #0006;
+}
+
+.pl-ritual-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pl-ritual-dialog .pl-ritual-head {
+  padding-right: 44px;
+}
+
+.pl-ritual-done {
+  align-self: center;
+  min-height: 48px;
+  padding: 4px 28px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #ffd84d;
+  color: inherit;
+  font: inherit;
+  font-size: 1.15em;
+  font-weight: 800;
+  box-shadow: 0 3px 0 var(--ink);
+  cursor: pointer;
 }

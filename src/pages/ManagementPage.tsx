@@ -1,7 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
-import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { PictureQueue } from "@/components/PictureQueue";
 import { CATEGORIES, UNFINISHED } from "@/content/games";
 import {
@@ -17,6 +16,7 @@ import {
   type Effort,
   type Idea,
   type IdeaArea,
+  areaKey,
   type IdeaStatus,
   type LanguageState,
   languageStateOf,
@@ -56,15 +56,23 @@ const countDone = (ideas: Idea[]) => ideas.filter((i) => i.done).length;
 /** Rejected ideas don't count towards the progress; they only show under their own filter. */
 const countActive = (ideas: Idea[]) => ideas.filter((i) => !i.rejected).length;
 
+/** What is saved per browser: the marks and how the list is ordered – never a filter (see `FILTERS`). */
 const DEFAULTS = {
   marks: {} as Record<string, Mark>,
   /** Stars from the first version of this page; read as "next" and cleared on the next change. */
   starred: [] as string[],
+  groupBy: "area" as GroupBy,
+};
+
+/**
+ * The list's filters, for this visit only: saved, a filter picked once kept the list short on every later visit,
+ * and scrolling down no longer showed all the ideas the overview counts (user feedback, November 2026).
+ */
+const FILTERS = {
   status: "todo" as StatusFilter,
   efforts: [] as Effort[],
   mark: "any" as MarkFilter,
   area: "" as string,
-  groupBy: "area" as GroupBy,
 };
 
 /** The page's parts, linked from the contents line at the top. */
@@ -76,7 +84,6 @@ const CONTENTS: { id: string; label: string }[] = [
   { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
   { id: "offene-bilder", label: "🖼️ Offene Bilder" },
-  { id: "bilder", label: "🎨 Bildvorschläge" },
   { id: "ideas-list", label: "💡 Alle Ideen" },
 ];
 
@@ -87,14 +94,19 @@ const VoiceList = lazy(() => import("@/components/VoiceList").then((module) => (
  * Hidden page for grown-ups that collects everything that helps decide what to
  * do next: the idea collection from content/ideas, the language table and the
  * research from content/research. An overview table shows where the open work is
- * (area × effort), filters narrow the list, and each idea can be marked
+ * (area × effort) and jumps to it in the list, filters narrow the list for this visit, and each idea can be marked
  * ⭐ / 🤔 / 👎. The ⭐ ones collect at the top, ready to copy as "mach N-01, …".
  * Reached by holding the "p" in the home page title.
  */
 export function ManagementPage() {
   useTitle("Management");
-  const [saved, update] = useStoredSettings("tinytaps.ideas.v1", DEFAULTS);
+  const [stored, updateStored] = useStoredSettings("tinytaps.ideas.v1", DEFAULTS);
+  const [filters, setFilters] = useState(FILTERS);
+  const saved = { ...stored, ...filters };
+  const update = (change: Partial<typeof FILTERS>) => setFilters((f) => ({ ...f, ...change }));
   const [query, setQuery] = useState("");
+  /** The overview's last pick, marked in the full list: its area, and its effort if a number was tapped. */
+  const [spot, setSpot] = useState<{ area: string; effort?: Effort }>();
   const marks: Record<string, Mark> = { ...Object.fromEntries(saved.starred.map((id) => [id, "next"])), ...saved.marks };
   const done = countDone(ALL_IDEAS);
   const active = countActive(ALL_IDEAS);
@@ -104,7 +116,7 @@ export function ManagementPage() {
     const next = { ...marks };
     if (next[id] === mark) delete next[id];
     else next[id] = mark;
-    update({ marks: next, starred: [] });
+    updateStored({ marks: next, starred: [] });
   };
 
   /** Shows an idea even when the filters hide it, then scrolls to it. */
@@ -120,11 +132,19 @@ export function ManagementPage() {
     });
   };
 
-  /** From the overview table: only this area (and effort), open ideas. */
+  /**
+   * From the overview table: jump to this area in the full list of open ideas and mark its ideas (of this effort)
+   * there – never a filter, so scrolling on still shows every idea the overview counts.
+   */
   const pick = (area: string, effort?: Effort) => {
     setQuery("");
-    update({ area, efforts: effort ? [effort] : [], status: "todo", mark: "any" });
-    setTimeout(() => document.getElementById("ideas-list")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    update(FILTERS);
+    updateStored({ groupBy: "area" });
+    setSpot({ area, effort });
+    setTimeout(() => {
+      const first = effort && document.querySelector(`#area-${area} .idea-card[data-effort="${effort}"]`);
+      (first || document.getElementById(`area-${area}`))?.scrollIntoView({ behavior: "smooth", block: first ? "center" : "start" });
+    });
   };
 
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -134,7 +154,7 @@ export function ManagementPage() {
     if (saved.status === "todo" && !isOpen(idea)) return false;
     if (saved.status === "done" && !idea.done) return false;
     if (saved.efforts.length > 0 && !saved.efforts.includes(idea.effort)) return false;
-    if (saved.area && AREA_OF.get(idea.id)?.prefix !== saved.area) return false;
+    if (saved.area && areaKey(AREA_OF.get(idea.id) as IdeaArea) !== saved.area) return false;
     if (saved.mark === "undecided" ? mark : saved.mark !== "any" && mark !== saved.mark) return false;
     const haystack = `${idea.id} ${idea.title} ${idea.text} ${idea.why ?? ""} ${idea.partial ?? ""}`.toLowerCase();
     return words.every((w) => haystack.includes(w));
@@ -145,7 +165,7 @@ export function ManagementPage() {
   const shown = ALL_IDEAS.filter(visible);
   const sections: { key: string; title: string; intro?: string; ideas: Idea[] }[] =
     saved.groupBy === "area"
-      ? IDEA_AREAS.map((a) => ({ key: a.prefix, title: `${a.emoji} ${a.prefix} – ${a.title}`, intro: a.intro, ideas: a.ideas.filter(visible).sort(order) }))
+      ? IDEA_AREAS.map((a) => ({ key: areaKey(a), title: `${a.emoji} ${a.prefix} – ${a.title}`, intro: a.intro, ideas: a.ideas.filter(visible).sort(order) }))
       : EFFORTS.map((e) => ({ key: e, title: `Aufwand ${e} – ${EFFORT_LABELS[e]}`, ideas: shown.filter((i) => i.effort === e).sort(order) }));
 
   const marked = (mark: Mark) =>
@@ -156,7 +176,7 @@ export function ManagementPage() {
   const nextIdeas = marked("next");
   const noIdeas = marked("no");
   const picks = TOP_PICKS.filter(({ id }) => isOpen(IDEA_BY_ID.get(id) as Idea));
-  const filtered = saved.status !== DEFAULTS.status || saved.efforts.length > 0 || saved.mark !== "any" || saved.area !== "" || words.length > 0;
+  const filtered = saved.status !== FILTERS.status || saved.efforts.length > 0 || saved.mark !== "any" || saved.area !== "" || words.length > 0;
   const markProps = { marks, onMark: setMark };
 
   return (
@@ -167,7 +187,7 @@ export function ManagementPage() {
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
       <p className="home-subtitle">
-        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, Bildvorschläge. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
+        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
         abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={active} />
@@ -192,7 +212,7 @@ export function ManagementPage() {
 
       <section id="uebersicht" className="ideas-panel">
         <h2>Überblick: Wo ist was offen?</h2>
-        <p className="ideas-hint">Zahlen = offene Ideen. Antippen zeigt genau diese Ideen unten.</p>
+        <p className="ideas-hint">Zahlen = offene Ideen. Antippen springt zu diesen Ideen in der Liste unten und markiert sie – die Liste bleibt ganz.</p>
         <Overview marks={marks} onPick={pick} />
       </section>
 
@@ -216,8 +236,6 @@ export function ManagementPage() {
       </section>
 
       <PictureQueue />
-
-      <PicturePromptReview />
 
       {picks.length > 0 && (
         <section className="ideas-panel">
@@ -292,7 +310,7 @@ export function ManagementPage() {
         />
         <Chips
           label="Bereich"
-          options={[{ value: "", label: "Alle" }, ...IDEA_AREAS.map((a) => ({ value: a.prefix, label: `${a.emoji} ${a.prefix}`, title: a.title }))]}
+          options={[{ value: "", label: "Alle" }, ...IDEA_AREAS.map((a) => ({ value: areaKey(a), label: `${a.emoji} ${a.prefix}`, title: a.title }))]}
           selected={[saved.area]}
           onToggle={(area) => update({ area })}
         />
@@ -303,7 +321,7 @@ export function ManagementPage() {
             { value: "effort", label: "Aufwand" },
           ]}
           selected={[saved.groupBy]}
-          onToggle={(groupBy) => update({ groupBy })}
+          onToggle={(groupBy) => updateStored({ groupBy })}
         />
         <div className="ideas-count">
           {shown.length} {shown.length === 1 ? "Idee" : "Ideen"}
@@ -313,7 +331,7 @@ export function ManagementPage() {
               className="ideas-reset"
               onClick={() => {
                 setQuery("");
-                update({ status: DEFAULTS.status, efforts: [], mark: "any", area: "" });
+                update(FILTERS);
               }}
             >
               Filter zurücksetzen
@@ -332,7 +350,13 @@ export function ManagementPage() {
               {intro && <p className="ideas-intro">{intro}</p>}
               <ul className="ideas-list">
                 {ideas.map((idea) => (
-                  <IdeaRow key={idea.id} idea={idea} area={saved.groupBy === "effort" ? AREA_OF.get(idea.id) : undefined} {...markProps} />
+                  <IdeaRow
+                    key={idea.id}
+                    idea={idea}
+                    area={saved.groupBy === "effort" ? AREA_OF.get(idea.id) : undefined}
+                    spotted={spot?.area === AREA_OF.get(idea.id)?.prefix && (!spot?.effort || spot.effort === idea.effort)}
+                    {...markProps}
+                  />
                 ))}
               </ul>
             </section>
@@ -454,7 +478,7 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
       </td>
     ) : (
       <td key={key}>
-        <button type="button" className={effort ? `effort-${effort}` : undefined} onClick={() => onPick(area.prefix, effort)}>
+        <button type="button" className={effort ? `effort-${effort}` : undefined} onClick={() => onPick(areaKey(area), effort)}>
           {ideas.length}
         </button>
       </td>
@@ -487,9 +511,9 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
             {group.areas.map((area) => {
               const open = area.ideas.filter(isOpen);
               return (
-                <tr key={area.prefix} className={open.length === 0 ? "ideas-overview-finished" : undefined}>
+                <tr key={areaKey(area)} className={open.length === 0 ? "ideas-overview-finished" : undefined}>
                   <th>
-                    <button type="button" onClick={() => onPick(area.prefix)}>
+                    <button type="button" onClick={() => onPick(areaKey(area))}>
                       {area.emoji} <b>{area.prefix}</b> {area.title}
                     </button>
                   </th>
@@ -915,18 +939,26 @@ function Progress({ done, total }: { done: number; total: number }) {
 function IdeaRow({
   idea,
   area,
+  spotted,
   marks,
   onMark,
 }: {
   idea: Idea;
   /** Shown as a tag when the list is not ordered by area. */
   area?: IdeaArea;
+  /** Among the ideas picked last in the overview. */
+  spotted?: boolean;
   marks: Record<string, Mark>;
   onMark: (id: string, mark: Mark) => void;
 }) {
   const mark = marks[idea.id];
   return (
-    <li id={idea.id} tabIndex={-1} className={`idea-card ${ideaStatus(idea)}${mark ? ` mark-${mark}` : ""}`}>
+    <li
+      id={idea.id}
+      tabIndex={-1}
+      data-effort={idea.effort}
+      className={`idea-card ${ideaStatus(idea)}${mark ? ` mark-${mark}` : ""}${spotted ? " idea-spotted" : ""}`}
+    >
       <div className="idea-head">
         <span className="idea-id">{idea.id}</span>
         <span className="idea-emoji" aria-hidden>

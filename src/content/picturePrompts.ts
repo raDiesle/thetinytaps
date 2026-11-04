@@ -1,8 +1,6 @@
-// Picture prompts waiting for the grown-up's look before anything is generated with
-// Gemini (/bild-erzeugen): a feature collects every picture it may want, the
-// management page shows them to read, change and mark as fine, and only then
-// they are made. Until then the feature shows emoji or drawings. A made picture
-// stays in its set with its prompt (to change and make again), shown as made.
+// The Gemini prompts of a feature's pictures (/bild-erzeugen), kept with the code so a picture can be changed and
+// made again. The management page doesn't show them for review any more (user decision, November 2026): a picture
+// to make goes into the queue (pictureQueue.ts), and the page shows only how many wait there.
 
 import { REWARDS_PICTURE_PROMPTS } from "@/games/rewards/bilder/prompts";
 
@@ -20,7 +18,7 @@ export interface PicturePrompt {
   options: string;
   /** Pictures passed as `--ref`, relative to the repository. */
   ref?: string[];
-  /** The picture's bundled URL once `file` is made; the review counts only those without as still to make. */
+  /** The picture's bundled URL once `file` is made; one without is still to make. */
   url?: string;
 }
 

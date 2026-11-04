@@ -602,6 +602,129 @@
   }
 }
 
+/* „Beim Bäcker“: the flour sack tips over the bowl on its corner and the flour streams in, then lies as a heap. */
+.fm-bk-tip {
+  animation: fm-bk-tip calc(3s * var(--fm-pace)) ease-in-out;
+}
+
+@keyframes fm-bk-tip {
+  20%,
+  75% {
+    transform: rotate(40deg);
+  }
+}
+
+.fm-bk-pour {
+  animation: fm-bk-pour calc(3s * var(--fm-pace)) linear both;
+}
+
+@keyframes fm-bk-pour {
+  0%,
+  18% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 0.95;
+  }
+  85%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.fm-bk-heap {
+  animation: fm-bk-heap calc(1.2s * var(--fm-pace)) ease-out calc(1s * var(--fm-pace)) backwards;
+}
+
+@keyframes fm-bk-heap {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* The dough is pressed and stretched on the board a few times, once it has got there. */
+.fm-bk-knead {
+  animation: fm-bk-knead calc(0.5s * var(--fm-pace)) ease-in-out calc(1.4s * var(--fm-pace)) 4 alternate;
+}
+
+@keyframes fm-bk-knead {
+  to {
+    transform: scale(1.18, 0.8);
+  }
+}
+
+/* Under the cloth the dough grows slowly, the cloth with it, once the cloth has come down. */
+.fm-bk-rise {
+  transition: transform calc(2.4s * var(--fm-pace)) ease-in-out calc(1.4s * var(--fm-pace));
+}
+
+/* What is done with (the cloth lifted away, the dough once shaped, the empty bag) fades after it has moved. */
+.fm-bk-gone {
+  animation: fm-bk-gone calc(0.6s * var(--fm-pace)) ease-in calc(0.9s * var(--fm-pace)) forwards;
+}
+
+@keyframes fm-bk-gone {
+  to {
+    opacity: 0;
+  }
+}
+
+/* The oven's door opens down on its bottom hinge while the tray goes in or comes out, then closes. */
+.fm-bk-door {
+  animation: fm-bk-door calc(3.4s * var(--fm-pace)) ease-in-out;
+}
+
+@keyframes fm-bk-door {
+  15%,
+  80% {
+    transform: scaleY(-0.25);
+  }
+}
+
+/* Behind the door's glass the oven glows warm while it bakes, and the goods turn brown, slowly. */
+.fm-bk-glow {
+  transition: opacity calc(1.2s * var(--fm-pace)) ease-in-out;
+}
+
+.fm-bk-brown {
+  transition: opacity calc(3s * var(--fm-pace)) ease-in-out calc(0.4s * var(--fm-pace));
+}
+
+/* The timer's bell rocks a little when it rings. */
+.fm-bk-ding {
+  animation: fm-bk-ding calc(0.35s * var(--fm-pace)) ease-in-out 4 alternate;
+}
+
+@keyframes fm-bk-ding {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+/* Warm steam rises from the fresh goods, once. */
+.fm-bk-steam {
+  animation: fm-bk-steam calc(2.4s * var(--fm-pace)) ease-out both;
+}
+
+@keyframes fm-bk-steam {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-spot,
   .fm-wheel.spin,

@@ -91,13 +91,34 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite.",
+    parts: [
+      {
+        label: "📅 Tafel, Zeitplan und Druck",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
+      },
+      {
+        label: "🖍️ Schwarz-weiß zum Ausmalen beworben",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken (statt des übersetzten Schalters „In Farbe“) und die Zeile im Druck-Stempel des Assistenten – nur Deutsch.",
+      },
+      {
+        label: "🌙 Buch „Wie lange warten?“ (Countdown mit Betten, Mond und Sonne)",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts) und die Seite für Suchmaschinen (seo.ts, seo.en.ts) – nur Deutsch; Englisch gibt es nur für Suchmaschinen. Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",
+      },
+      {
+        label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“ – nur Deutsch.",
+      },
+    ],
   },
   {
     href: "/timer/",
-    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts. Noch nur Deutsch: der Zettel „Andere …“ mit seinem Blatt (Wie lange / Bis um, Std., Min., Sek., die fertigen Zettel, Fertig, Bis morgen …), die Frage beim Start nach einer schon vergangenen Uhrzeit, die Restzeit hinter ⚙️, die Namen der Bilder „Apfelbaum“, „Raupe“, „Blume“, „Sonnenuntergang“, „Ameisenstraße“, „Rote Scheibe“, „Pizza“ und „Abwechseln“ und bei „Abwechseln“ hinter ⚙️ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“.",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
     href: "/schnullerfee/",
@@ -118,6 +139,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🖼️ Bilder und Spielarten",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Mit 🔦 Taschenlampe und 🛣️ Straße malen (übersetzt am 3. November 2026).",
+      },
+      {
+        label: "🦊🐻 Familie Fuchs und Familie Bär in den Verstecken",
+        languages: { de: "done" },
+        note: "„Da ist ja Familie Fuchs!“ und „Da ist ja Familie Bär!“ (4. November 2026), noch nicht übersetzt.",
       },
     ],
   },
@@ -158,6 +184,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "text" },
         note: "Neu (4. November 2026), nur Deutsch und noch nicht aufgenommen – bis dahin liest die Stimme des Browsers; die anderen Sprachen fehlen.",
       },
+      {
+        label: "🥨 Beim Bäcker",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu (4. November 2026), nur Deutsch und noch nicht aufgenommen – bis dahin liest die Stimme des Browsers; die anderen Sprachen fehlen.",
+      },
     ],
   },
   {
@@ -187,6 +219,16 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Frage, Antwort und Wetter teilen sich Übersetzung und Aufnahmen mit „Alltagssituationen“ (stimme/).",
       },
       { label: "Zeile für Erwachsene", languages: { de: "done" }, note: "MOOD_BLURB in names.ts, nur Deutsch; der Titel ist übersetzt." },
+      {
+        label: "Gesichter, Gesicht nachmachen, Wie doll ist es?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-29, C-30, C-35, C-36), nur Deutsch und noch nicht aufgenommen: die Namen der acht Gefühle, „Kannst du auch so gucken?“, die drei Stärken, das gemeinsame Pusten (MOODS, STRENGTHS, MOOD_LINES in mood.ts). Die vier Wetterkarten der gebauten Seite sind übersetzt.",
+      },
+      {
+        label: "Was hilft dir jetzt?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-31), nur Deutsch und noch nicht aufgenommen: die Frage, die fünf Dinge, die helfen, und was zu jedem gesagt wird (HELPS in mood.ts).",
+      },
     ],
   },
   {
@@ -209,12 +251,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Mehr Gefühle",
         recorded: true,
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Beim lauten Knall ist der dritte Schritt neu („Mit dem Fuchs Kuchen essen“ statt „Kleinen Ballon quietschen lassen“) und das Ende geändert (4. November 2026), ebenso bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“ statt „„Mir ist langweilig“ sagen“) und das Ende: nur Deutsch, noch nicht aufgenommen.",
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Beim lauten Knall ist der dritte Schritt neu („Mit dem Fuchs Kuchen essen“ statt „Kleinen Ballon quietschen lassen“) und das Ende geändert, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“ statt „„Guck mal!“ rufen“) und das Ende, bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“ statt „„Mir ist langweilig“ sagen“) und das Ende (4. November 2026): nur Deutsch, noch nicht aufgenommen. In „Traurig, Kuschelhase weg“ heißt das Kuscheltier des Bären jetzt „Kuschelhase“ und das des Fuchses „Kuschelhund“, damit man sie nicht verwechselt (4. November 2026): diese Sätze nur Deutsch und noch nicht aufgenommen, die Übersetzungen sagen noch „Kuscheltier“.",
       },
       {
-        label: "Buch, Gruppen und Rollen",
+        label: "Buch und Gruppen",
         languages: { de: "done" },
-        note: "Neu (4. November 2026), nur Deutsch, die Rollensätze noch nicht aufgenommen (🎙️ Stimmen): die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts) und die zwei Sätze, die sagen, ob das Kind der Bär ist oder ihm hilft (ROLE_LINES in rounds.ts) – bis zur Aufnahme stumm, als Bildunterschrift zu lesen.",
+        note: "Neu (4. November 2026), nur Deutsch: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts). Der Lautsprecher zum Ausschalten der Stimme (VoiceSwitch.tsx, 4. November 2026): „Stimme ausschalten“ / „Stimme einschalten“ nur Deutsch. Das Buch mit dem Text zum Vorlesen (ReadAlong.tsx, 4. November 2026): „Text zum Vorlesen zeigen“ / „Text ausblenden“ nur Deutsch; der Text selbst kommt aus den Szenen in ihrer Sprache.",
       },
     ],
   },
@@ -246,7 +288,25 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/buchstaben/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026) bis auf die 361 Zählsätze („drei Äpfel!“, ≈ 1.100 Credits), für die die Credits nicht mehr reichten: bis dahin sagt das Spiel nur die Zahl. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm. Noch nicht übersetzt: der Hinweis unter ⚙️ beim Spielstart („Hier gibt es viele Spielarten …“, November 2026). Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026) bis auf die 361 Zählsätze („drei Äpfel!“, ≈ 1.100 Credits), für die die Credits nicht mehr reichten: bis dahin sagt das Spiel nur die Zahl. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm. Noch nicht übersetzt: die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart („Hier lässt sich viel einstellen …“, November 2026). Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+  },
+  {
+    href: "/zaehlen/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Ein Spiel für sich seit November 2026 (vorher „Nur Zahlen“ in „Frei tippen“), mit dessen Zahlen und Texten. Deutsch von ElevenLabs gesprochen bis auf die Zählsätze („drei Äpfel!“): bis dahin sagt es nur die Zahl. Noch nicht übersetzt: der Name „Zählen“, die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm.",
+  },
+  {
+    href: "/mitmachen/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Neu (November 2026, L-15), mit den Zahlwörtern und Tu-Wörtern der Sprachpakete: „Hüpf mit!“, „Klatsch mit!“ und die Zahlwörter sind auf Deutsch von ElevenLabs gesprochen, „Stampf mit!“ fehlt noch (bis dahin still). Noch nicht übersetzt: der Name „Mitmachen“, die Zeile im Inhaltsverzeichnis und „Stampf mit!“. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm; Hindi hat kein „Klatsch mit!“ (zwei Wörter).",
+  },
+  {
+    href: "/woerter/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Ein Spiel für sich seit November 2026 (vorher eine Spielart von „Buchstaben & Zahlen“), mit „Wo ist das B?“; Wörter aus den Sprachpaketen wie bei „Frei tippen“. Deutsch von ElevenLabs gesprochen, die anderen Sprachen noch nicht aufgenommen. Noch nicht übersetzt: die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart.",
   },
   {
     href: "/",

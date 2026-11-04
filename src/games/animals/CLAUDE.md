@@ -3,7 +3,7 @@
 Route `/tiere/`.
 
 One flowing game, like Socken-Paare: its card plays at once (`startMode`), with no start screen, no cards and no `level`
-row; ✕ and „Menü“ go back to the table of contents. Its only options lie behind ⚙️ while playing (`PlayOptions`). `AnimalsRounds.tsx` lets five kinds of rounds take
+row; ✕ goes back to the table of contents. Its only options lie behind ⚙️ while playing (`PlayOptions`). `AnimalsRounds.tsx` lets five kinds of rounds take
 turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest:
 1. „Wer schaut da raus?“ (X-04, `PeekPlay` from `src/games/shadows/`, which shares the stage, pictures and glyphs with
    the shadows): a part of an animal peeks out of a bush or the pond, the child taps the whole animal below.

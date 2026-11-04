@@ -55,7 +55,14 @@ export const bearImages = {
   happy: (id: string) => `baer-${id}-gut`,
 };
 
-/** Names of the weather cards of „Wie geht's dir?“. */
+/** Names of the pictures of „Wie geht's dir?“. */
 export const moodImages = {
+  /** The old weather cards, shown by the built site until the faces are made. */
   weather: (id: string) => `wetter-${id}`,
+  /** A feeling's card: the fox or bear child showing it, Mama or Papa beside it (C-30). */
+  face: (id: string) => `gesicht-${id}`,
+  /** The same a moment later: the grown-up nods and takes the little one in its arms. */
+  hug: (id: string) => `gesicht-${id}-arm`,
+  /** A card of „Was hilft dir jetzt?“: the little bear doing what helps. */
+  help: (id: string) => `hilft-${id}`,
 };

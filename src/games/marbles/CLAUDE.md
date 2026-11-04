@@ -3,7 +3,7 @@
 Route `/kettenreaktion/` (`/kugelbahn/`, its old address and then the marble run's, leads here). The „Klingende Kugelbahn“
 was a game of its own for a while and is the first level here again, so marble run and machines are one game on the home menu.
 
-Twenty levels in turn, beginning with the one picked on the start screen; after each one „Menü“, „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
+Twenty levels in turn, beginning with the one picked on the start screen; after each one „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
 machines: the points-along-a-way helpers in `path.ts`, the marble and rail drawings in `parts.tsx`, `useFrames`/`useAnyKey` in `level.ts`.
 
 "Alles fällt um" (`ToppleLevel.tsx`): everyday things (`things.tsx`) stand in seven runs, each small to tall, and topple onto each other like dominoes; each round picks other things, and the last one is always the broom, which falls onto the drum, bang, and sparkles burst out of it.

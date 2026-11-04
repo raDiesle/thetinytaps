@@ -259,11 +259,14 @@ async function evaluate<T>(cdp: Cdp, expression: string): Promise<T> {
   return result.result.value;
 }
 
-/** The middle of the first element matching `selector`, or null. */
+/**
+ * The middle of the first element matching `selector`, scrolled into the window first, or null. A card below a phone's
+ * fold was once „tapped“ outside the window: nothing opened, and the menu was measured in place of the game.
+ */
 async function centerOf(cdp: Cdp, selector: string) {
   return evaluate<{ x: number; y: number } | null>(
     cdp,
-    `(() => { const e = [...document.querySelectorAll(${JSON.stringify(selector)})].find((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`,
+    `(() => { const e = [...document.querySelectorAll(${JSON.stringify(selector)})].find((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }); if (!e) return null; e.scrollIntoView({ block: "nearest", inline: "nearest" }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`,
   );
 }
 
@@ -301,6 +304,8 @@ async function runStep(cdp: Cdp, step: Step) {
       if (step.optional) return;
       throw new Error(`Nothing to tap: ${step.tap}`);
     }
+    const inside = await evaluate<boolean>(cdp, `${at.x} >= 0 && ${at.y} >= 0 && ${at.x} <= innerWidth && ${at.y} <= innerHeight`);
+    if (!inside) throw new Error(`Outside the window, nothing would be tapped: ${step.tap}`);
     await tapAt(cdp, at.x, at.y);
   } else if ("key" in step) await pressKey(cdp, step.key);
   else if ("eval" in step) await evaluate(cdp, step.eval);

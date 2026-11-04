@@ -800,12 +800,8 @@ export const SITUATIONS_AR: Partial<Record<SituationId, SituationText>> = {
     caption: "الدبدوب وحده في أعلى لعبة التسلق",
     intro: [{ narration: "الدبدوب يتسلّق لعبة التسلق. وحده تمامًا!" }, { narration: "الآن هو في الأعلى. إنه فخور جدًّا!" }],
     steps: [
-      {
-        caption: "النداء «انظر!»",
-        question: "الدبدوب في الأعلى تمامًا. ماذا يستطيع أن يفعل؟",
-        beats: [{ narration: "ينادي:", line: "انظر، أنا في الأعلى!" }, { line: "واو! وحدك تمامًا!" }],
-        instead: { caption: "دفع الثعلب الصغير إلى الأسفل", answer: "همم، الدفع يؤلم. الأفضل أن ينادي: انظر!" },
-      },
+      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
+      null,
       {
         caption: "الهتاف",
         question: "الدبدوب فرحان جدًّا. ماذا يستطيع أن يفعل؟",
@@ -819,7 +815,6 @@ export const SITUATIONS_AR: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "القفز إلى الأسفل", answer: "همم، القفز من هذا العلو يؤلم. الأفضل أن يُري الثعلب الصغير كيف يصعد." },
       },
     ],
-    outro: [{ narration: "يا سلام! نُري، نهتف، نساعد. الآن الاثنان فخوران." }],
     endCaption: "الدبدوب والثعلب الصغير معًا في الأعلى",
   },
   miss: {

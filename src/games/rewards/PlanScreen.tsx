@@ -5,18 +5,21 @@ import { dayKey } from "@/games/teeth/daytime";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { playChime, playCountNote, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
 import { type RoutineVisit, waitForStep } from "@/lib/routine";
+import { loadRealSounds, playCrow } from "@/lib/realSounds";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
 import { useRewardLabel } from "./BoardSheet";
 import { ItemPic, Pic, picture } from "./pictures";
 import {
+  bigDayCome,
   bigDayStep,
   counting,
   currentStep,
   exampleTicks,
   gameOf,
   moonsLeft,
+  nightsOf,
   nightsUntil,
   pairsOf,
   type Plan,
@@ -27,6 +30,8 @@ import {
   stepDone,
   stepsOn,
 } from "./plan";
+import { RitualDialog } from "./RitualCard";
+import { type Ritual, ritualOf } from "./rituals";
 import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, SLEEPS_UNTIL, type StepState, TODAY, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
@@ -68,9 +73,10 @@ function flyFrom(el: Element, from: DOMRect, scale: number, delay = 0) {
  * Fertig-Kiste instead of getting a tick, and „Von vorn“ takes them all out again. The teeth card under
  * „Jetzt“ opens Zähne putzen instead, which comes back here with the card done. A new plan shows example ticks until
  * the first tap. Where the cards count stars (a Zähler above 0), any open card of today takes a tap: one star per tap
- * pops into its fields until it has its Zähler's stars, and the reward's party comes when the goal is reached. A
- * Countdown has nothing to tick: a tap (or a key) counts its moons one by one, each with a rising note, and the big day's
- * picture jumps at the end – on the day itself the tap is its party.
+ * pops into its fields until it has its Zähler's stars, and the reward's party comes when the goal is reached. On a
+ * Countdown each morning's bed glows, and the child's tap turns its moon into a sun (H-05); a tap on a moon still to come,
+ * the big day's picture (or a key) counts the moons one by one, each with a rising note, and the picture jumps at the
+ * end. The last morning's tap is the big day's party.
  */
 export function PlanScreen({
   plan,
@@ -102,6 +108,8 @@ export function PlanScreen({
   const [fresh, setFresh] = useState<string | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
   const [party, setParty] = useState<string | null>(null);
+  /** A ritual's card open over the plan (H-58), for the card of that field key; „Gemacht“ ticks it. */
+  const [ritual, setRitual] = useState<{ ritual: Ritual; key: string } | null>(null);
   const bigDay = plan.view === "countdown" ? bigDayStep(plan) : undefined;
   /** The party is the reward's, its stars all there (else the day's, every card done). */
   const [won, setWon] = useState(false);
@@ -148,9 +156,15 @@ export function PlanScreen({
     setUndo(null);
     setFresh(null);
     setParty(null);
+    setRitual(null);
   }, [plan.id]);
 
   useEffect(() => () => moonTimers.current.forEach(clearTimeout), []);
+
+  // A Countdown's morning crows like a rooster: its recording is there before the first tap.
+  useEffect(() => {
+    if (plan.view === "countdown") loadRealSounds([playCrow]);
+  }, [plan.view]);
 
   // A card that just went into the box or came out of it flies there from where it was (only after a tap).
   useLayoutEffect(() => {
@@ -190,7 +204,7 @@ export function PlanScreen({
   // Keys: the card to do now wiggles and says itself; a key never ticks it, only the child's tap on it does.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || (e.target as Element).closest("input, textarea, button, a, select")) return;
+      if (ritual || e.repeat || e.metaKey || e.ctrlKey || e.altKey || (e.target as Element).closest("input, textarea, button, a, select")) return;
       unlockAudio();
       if (plan.view === "countdown") return countDown();
       const now = box.current?.querySelector("[data-state='now']") ?? box.current?.querySelector("[data-state='done']");
@@ -201,9 +215,29 @@ export function PlanScreen({
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
+  /** Says what is left: „Noch 3-mal schlafen, dann Geburtstag“, or on the day itself that it has come. */
+  const sayLeft = (moons: number, label: string) =>
+    say(
+      moons > 0
+        ? t(SLEEPS_UNTIL)(moons, label)
+        : `${t({ de: "Heute ist es so weit:", en: "Today is the day:", zh: "今天就是这一天：", hi: "आज वह दिन आ गया:", es: "¡Hoy es el día!", ar: "اليوم هو اليوم:", ru: "Сегодня этот день:" })} ${label}`,
+    );
+
+  /** The big day has come: its picture's party. */
+  const bigDayParty = () => {
+    const step = bigDayStep(plan);
+    if (!step) return;
+    setWon(false);
+    setParty(step.emoji);
+    sound(playTusch);
+    celebrate();
+    sayLeft(0, stepLabel(step));
+  };
+
   /**
-   * A Countdown tapped: its moons light up one after the other with rising notes, then the big day's picture jumps, and
-   * it says „Noch 3-mal schlafen, dann Geburtstag“. On the day itself the picture's party instead.
+   * A Countdown's moons or picture tapped (or a key): the moons of the nights to come light up one after the other with
+   * rising notes, then the big day's picture jumps, and it says „Noch 3-mal schlafen, dann Geburtstag“. While a morning
+   * waits for its tap, its bed wiggles instead; on the big day itself the picture's party.
    */
   const countDown = () => {
     const root = box.current;
@@ -211,21 +245,21 @@ export function PlanScreen({
     if (!root || !step) return;
     moonTimers.current.forEach(clearTimeout);
     const card = root.querySelector(".pl-big-day");
+    const waiting = root.querySelector("[data-night='now']");
     const moons = moonsLeft(plan, day);
     if (moons === 0) {
+      if (waiting) {
+        poke(waiting, "wiggle");
+        sound(playPop);
+        return;
+      }
       if (card) poke(card, "wiggle");
-      setWon(false);
-      setParty(step.emoji);
-      sound(playTusch);
-      celebrate();
-      say(
-        `${t({ de: "Heute ist es so weit:", en: "Today is the day:", zh: "今天就是这一天：", hi: "आज वह दिन आ गया:", es: "¡Hoy es el día!", ar: "اليوم هو اليوم:", ru: "Сегодня этот день:" })} ${stepLabel(step)}`,
-      );
+      bigDayParty();
       return;
     }
     const each = Math.min(MOON_MS, ALL_MOONS_MS / moons);
     const later = (ms: number, then: () => void) => moonTimers.current.push(setTimeout(then, ms));
-    root.querySelectorAll(".pl-moon").forEach((moon, i) =>
+    root.querySelectorAll("[data-night='later']").forEach((moon, i) =>
       later(i * each, () => {
         poke(moon, "twinkle");
         sound(() => playCountNote(i));
@@ -238,11 +272,48 @@ export function PlanScreen({
     say(t(SLEEPS_UNTIL)(moons, stepLabel(step)));
   };
 
+  /**
+   * A Countdown's bed tapped (H-05): a morning's bed that waits turns its moon into a sun – the oldest one waiting first,
+   * when a morning was missed –, a sun twinkles, a night to come counts the moons. The last morning is the big day's party.
+   */
+  const tapNight = (el: HTMLElement) => {
+    const step = bigDayStep(plan);
+    if (!step) return;
+    const state = el.dataset.night;
+    if (state === "later") return countDown();
+    if (state === "done") {
+      poke(el, "twinkle");
+      sound(playTwinkle);
+      return;
+    }
+    const nights = nightsOf(plan, today, ticks);
+    const key = nights.find((night) => night.state === "now")?.key;
+    if (!key) return;
+    const next = addStar(log, plan.id, key, today);
+    setLog(next);
+    setFresh(key);
+    setUndo(key);
+    sound(playCrow);
+    const rect = el.getBoundingClientRect();
+    glow(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    // The last morning: its sun rises, then the big day's picture comes big with its party.
+    if (bigDayCome(plan, today, next[plan.id]))
+      setTimeout(() => {
+        setFresh(null);
+        bigDayParty();
+      }, 1100);
+    else sayLeft(moonsLeft(plan, today), stepLabel(step));
+  };
+
   const onPointerDown = (e: React.PointerEvent) => {
     unlockAudio();
     unlockSpeech();
     if (plan.view === "countdown") {
-      if ((e.target as Element).closest("[data-moon], [data-big-day]")) countDown();
+      const night = (e.target as Element).closest<HTMLElement>("[data-night]");
+      // Only today's mornings turn into suns; on a day looked back at a tap counts the moons.
+      if (night && dayKey(day) === dayKey(today)) tapNight(night);
+      else if (night) countDown();
+      else if ((e.target as Element).closest("[data-big-day]")) countDown();
       return;
     }
     const header = (e.target as Element).closest<HTMLElement>("[data-day]");
@@ -290,7 +361,27 @@ export function PlanScreen({
       navigate(game, { state: { returnTo: pathname } satisfies RoutineVisit });
       return;
     }
-    // The card to do now: done, with a tick, and the next one glows – or, counting stars, one star more on it.
+    // A ritual opens its words for the grown-up; „Gemacht“ under them ticks it as this tap would.
+    const words = ritualOf(step);
+    if (words) {
+      sound(playPop);
+      setRitual({ ritual: words, key });
+      return;
+    }
+    tick(el, key);
+  };
+
+  /**
+   * The card to do now (its field key `key`, its element `el`): done, with a tick, and the next one glows – or,
+   * counting stars, one star more on it.
+   */
+  const tick = (el: HTMLElement, key: string) => {
+    const { day: stepDay, taskId } = parseCellKey(key);
+    const steps = stepsOn(plan, stepDay);
+    const index = steps.findIndex((s) => s.id === taskId);
+    const step = steps[index];
+    if (!step) return;
+    const label = stepLabel(step);
     const before = planProgress(plan, ticks, linked, stepDay);
     const next = addStar(log, plan.id, key, today, starsOf(step));
     const after = planProgress(plan, next[plan.id], linked, stepDay);
@@ -456,6 +547,16 @@ export function PlanScreen({
         <button type="button" className="rw-undo" onClick={takeBack}>
           ↶ {t({ de: "Zurück", en: "Undo", zh: "撤销", hi: "वापस", es: "Deshacer", ar: "تراجع", ru: "Отменить" })}
         </button>
+      )}
+      {ritual && (
+        <RitualDialog
+          ritual={ritual.ritual}
+          onClose={() => setRitual(null)}
+          onDone={() => {
+            const el = box.current?.querySelector<HTMLElement>(`[data-step="${ritual.key}"]`);
+            if (el) tick(el, ritual.key);
+          }}
+        />
       )}
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(null)}>

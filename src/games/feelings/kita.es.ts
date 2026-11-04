@@ -808,12 +808,8 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     caption: "Osito está hasta arriba del juego para trepar, sin ayuda",
     intro: [{ narration: "Osito sube al juego para trepar. ¡Sin ayuda!" }, { narration: "Ya está arriba. ¡Está muy orgulloso!" }],
     steps: [
-      {
-        caption: "Gritar «¡Mira!»",
-        question: "Osito está hasta arriba. ¿Qué puede hacer él?",
-        beats: [{ narration: "Grita:", line: "¡Mira, estoy arriba!" }, { line: "¡Guau! ¡Sin ayuda!" }],
-        instead: { caption: "Empujar a Zorrito para abajo", answer: "Mmm, empujar duele. Mejor grita: ¡Mira!" },
-      },
+      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
+      null,
       {
         caption: "Festejar",
         question: "Osito está feliz, feliz. ¿Qué puede hacer él?",
@@ -827,7 +823,6 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Saltar para abajo", answer: "Mmm, saltar desde tan alto duele. Mejor enséñale a Zorrito cómo se hace." },
       },
     ],
-    outro: [{ narration: "¡Yupi! Mostrar, festejar, ayudar. Ahora los dos están orgullosos." }],
     endCaption: "Osito y Zorrito juntos arriba",
   },
   miss: {

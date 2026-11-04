@@ -32,3 +32,17 @@ test("a game that plays at once leaves to the page before it, even with modes it
 test("a game started from its own start screen shows it again", () => {
   expect(menuAfterPlay({}, "/")).toBeUndefined();
 });
+
+// Gefühle put the group played last in front of the others, so the cards changed places from one visit to the next
+// (user feedback, November 2026): a menu's order never changes, „zuletzt“ only marks the card where it stands.
+test("no start screen moves the mode played last to the front", async () => {
+  const files = [...new Bun.Glob("src/games/**/*.tsx").scanSync()].filter((file) => !file.endsWith(".test.tsx"));
+  const moved: string[] = [];
+  for (const file of files) {
+    const source = await Bun.file(file).text();
+    for (const [, last] of source.matchAll(/<GameShell[\s\S]*?\bmode=\{(\w+)/g)) {
+      if (new RegExp(`\\[\\s*${last}\\b[^\\]]*,\\s*\\.\\.\\.`).test(source) || new RegExp(`\\bunshift\\(\\s*${last}\\b`).test(source)) moved.push(file);
+    }
+  }
+  expect(moved).toEqual([]);
+});

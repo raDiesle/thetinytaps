@@ -796,12 +796,8 @@ export const SITUATIONS_RU: Partial<Record<SituationId, SituationText>> = {
     caption: "Мишка один на самом верху лазалки",
     intro: [{ narration: "Мишка лезет на лазалку. Совсем сам!" }, { narration: "Теперь он наверху. Он так гордится!" }],
     steps: [
-      {
-        caption: "Крикнуть «Посмотри!»",
-        question: "Мишка на самом верху. Что он может сделать?",
-        beats: [{ narration: "Он кричит:", line: "Посмотри, я наверху!" }, { line: "Ух ты! Совсем сам!" }],
-        instead: { caption: "Столкнуть Лисёнка", answer: "Хм, толкаться больно. Лучше крикни: Посмотри!" },
-      },
+      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
+      null,
       {
         caption: "Радостно кричать",
         question: "Мишка очень-очень рад. Что он может сделать?",
@@ -815,7 +811,6 @@ export const SITUATIONS_RU: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Спрыгнуть вниз", answer: "Хм, прыгать с такой высоты больно. Лучше покажи Лисёнку, как залезть." },
       },
     ],
-    outro: [{ narration: "Ура! Показать, порадоваться, помочь. Теперь гордятся оба." }],
     endCaption: "Мишка и Лисёнок вместе наверху",
   },
   miss: {

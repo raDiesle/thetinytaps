@@ -827,12 +827,8 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
     caption: "Little Bear is at the top of the climbing frame all by himself",
     intro: [{ narration: "Little Bear climbs up the climbing frame. All by himself!" }, { narration: "Now he's at the top. He is so proud!" }],
     steps: [
-      {
-        caption: "Call “Look!”",
-        question: "Little Bear is right at the top. What can he do?",
-        beats: [{ narration: "He calls:", line: "Look, I'm at the top!" }, { line: "Wow! All by yourself!" }],
-        instead: { caption: "Push Little Fox down", answer: "Hmm, pushing hurts. Call instead: Look!" },
-      },
+      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
+      null,
       {
         caption: "Cheer",
         question: "Little Bear is so happy. What can he do?",
@@ -846,7 +842,6 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Jump down", answer: "Hmm, jumping from so high hurts. Show Little Fox how instead." },
       },
     ],
-    outro: [{ narration: "Yay! Show, cheer, help. Now they are both proud." }],
     endCaption: "Little Bear and Little Fox at the top together",
   },
   miss: {

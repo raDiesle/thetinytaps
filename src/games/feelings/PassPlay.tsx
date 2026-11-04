@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { groupStories, type StoryGroup } from "./groups";
@@ -6,10 +6,20 @@ import { RoundPlay } from "./RoundPlay";
 import { roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 
+/** „Alltagssituationen“'s bottom right corner for grown-ups: the note with the round's text, and the loudspeaker beside it. */
+export interface ReadAlongCorner {
+  /** Whether the sheet with the text is open. */
+  open: boolean;
+  onToggle: () => void;
+  /** The loudspeaker that switches the voice (`VoiceSwitch`), standing in the corner beside the book. */
+  voiceSwitch: ReactNode;
+}
+
 /**
- * One pass through a group: each of its scenes once, one choice each, straight on from one scene to the next. Every
- * scene asks its next step (`FeelingsSettings.steps`), so the next pass shows the same scenes with other choices.
- * After the last scene come „Menü“, „Nochmal“ and „Weiter“.
+ * One pass through a group: each of its scenes once, one choice each. After a scene's good idea its picture waits with
+ * ▶ until a tap brings the next scene (user feedback, November 2026). Every scene asks its next step
+ * (`FeelingsSettings.steps`), so the next pass shows the same scenes with other choices. After the last scene come
+ * „Nochmal“ and „Weiter“, which names the feeling it goes on to.
  */
 export function PassPlay({
   group,
@@ -19,6 +29,7 @@ export function PassPlay({
   remember = true,
   onAgain,
   next,
+  readAlong,
 }: {
   group: StoryGroup;
   /** The scene to begin with: where the child stopped last time. */
@@ -30,6 +41,8 @@ export function PassPlay({
   onAgain: () => void;
   /** The next group; left out where there is none to go on to. */
   next?: { name?: string; onNext: () => void };
+  /** The corner for grown-ups: the round's whole text and the loudspeaker („Alltagssituationen“ only, `ReadAlong`). */
+  readAlong?: ReadAlongCorner;
 }) {
   const { id: language } = useAppLanguage();
   const scenes = groupStories(group);
@@ -48,12 +61,13 @@ export function PassPlay({
   const story = scenes[now.index];
   const last = now.index === scenes.length - 1;
 
+  // The scene is done: its next step and the scene to go on from are kept at once, even if no one taps ▶.
   const finish = () => {
     steps.current = { ...steps.current, [story.id]: (now.step + 1) % stepsOf(story) };
-    const following = last ? 0 : now.index + 1;
-    update({ steps: steps.current, ...(remember ? { scene: following } : {}) });
-    if (!last) setNow({ index: following, step: stepOf(following) });
+    update({ steps: steps.current, ...(remember ? { scene: last ? 0 : now.index + 1 } : {}) });
   };
+
+  const goOn = () => setNow({ index: now.index + 1, step: stepOf(now.index + 1) });
 
   return (
     <RoundPlay
@@ -62,8 +76,10 @@ export function PassPlay({
       settings={settings}
       progress={{ total: scenes.length, done: now.index }}
       onFinish={finish}
-      ending={last ? <GameEnd inline onAgain={onAgain} next={next} /> : undefined}
-      onEndKey={next?.onNext ?? onAgain}
+      ending={last ? <GameEnd inline showNext onAgain={onAgain} next={next} /> : undefined}
+      onDone={last ? undefined : goOn}
+      onEndKey={last ? (next?.onNext ?? onAgain) : goOn}
+      readAlong={readAlong}
     />
   );
 }
