@@ -1,7 +1,10 @@
 import type { OwnTime } from "./time";
 
-/** What runs down while the child watches: a train going to the station, an hourglass, a candle. */
-export type TimerPicture = "train" | "sand" | "candle";
+/**
+ * What runs down while the child watches: a train going to the station, apples falling into a basket, an hourglass, a
+ * caterpillar eating a leaf, a candle, a red disc.
+ */
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "candle" | "disc";
 
 /** The minutes a grown-up can set, in the row above the cards. */
 export const TIMER_MINUTES = [1, 2, 3, 5, 10] as const;

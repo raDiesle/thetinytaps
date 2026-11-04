@@ -9,7 +9,7 @@ import { Mascot } from "@/components/Mascot";
 export const STAGE_W = 1600;
 export const STAGE_H = 900;
 
-const INK = "#3b2a20";
+export const INK = "#3b2a20";
 
 /** A piece of the picture as an HTML layer of its own, placed in stage units and drawn in its own units (0 0 w h). */
 export function Layer({
@@ -41,7 +41,7 @@ export function Layer({
 }
 
 /** An SVG filling its layer, in the layer's own units. */
-function Draw({ w, h, children }: { w: number; h: number; children: ReactNode }) {
+export function Draw({ w, h, children }: { w: number; h: number; children: ReactNode }) {
   return (
     <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
       {children}
@@ -210,6 +210,37 @@ export function Train({ puff }: { puff: number }) {
     </>
   );
 }
+
+/**
+ * The little stops along the track, one a minute (H-45): a post with a bell just ahead of where the train's front halts,
+ * so the child sees how many stretches are left. The last stop is the station itself, so `pieces - 1` posts.
+ */
+export const TrainStops = memo(function TrainStops({ pieces }: { pieces: number }) {
+  const from = TRAIN.x + TRAIN.w;
+  const way = TRAIN.stop - from;
+  return (
+    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-dims">
+      <Draw w={STAGE_W} h={STAGE_H}>
+        {Array.from({ length: pieces - 1 }, (_, i) => {
+          const x = from + ((i + 1) / pieces) * way + 12;
+          return (
+            <g key={i}>
+              <rect x={x - 4} y={RAIL_Y - 96} width="8" height="92" rx="3" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
+              <path
+                d={`M${x - 15} ${RAIL_Y - 96} Q${x - 15} ${RAIL_Y - 124} ${x} ${RAIL_Y - 126} Q${x + 15} ${RAIL_Y - 124} ${x + 15} ${RAIL_Y - 96} Z`}
+                fill="#ffd43b"
+                stroke={INK}
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+              <circle cx={x} cy={RAIL_Y - 92} r="4" fill={INK} />
+            </g>
+          );
+        })}
+      </Draw>
+    </Layer>
+  );
+});
 
 /**
  * The rail ahead of the train, shining (H-64): it lies over the dark rail from the train's front to the buffers and

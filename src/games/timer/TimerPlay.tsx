@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useLeaveGame } from "@/components/GameShell";
@@ -6,10 +6,14 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
-import { playBlow, playWhistle } from "@/lib/realSounds";
-import { playChime, playChimeNote, playMelody, playTwinkle } from "@/lib/sfx";
+import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
+import { playChime, playChimeNote, playDing, playLeaves, playMelody, playPlop, playTwinkle } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
+import { AppleScene } from "./apples";
+import { CaterpillarScene } from "./caterpillar";
 import { nextPicture, PICTURES } from "./content";
+import { DiscScene } from "./disc";
+import { haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, trainSteps } from "./pieces";
 import {
   CANDLE,
   CandleBackdrop,
@@ -26,6 +30,7 @@ import {
   TRAIN,
   Train,
   TrainBackdrop,
+  TrainStops,
   WaxPuddle,
 } from "./scenes";
 import type { TimerPicture, TimerSettings } from "./settings";
@@ -33,8 +38,11 @@ import { clockOn, digits, ownTimeMs } from "./time";
 
 /** The child blows the candle out this long after the time is up, and the flame goes out. */
 const BLOW_MS = 700;
-/** Then the family cheers, and „Nochmal“ and „Weiter“ come after this long. */
+/** Then the family cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
 const END_MS = 3200;
+const END_MS_CATERPILLAR = 5200;
+/** After this long without a tap, all that is small steps back and only what runs down stays bright (H-48). */
+const FAR_AFTER_MS = 8000;
 
 /** In development, `?sekunden=<n>` in the address makes every run take n seconds. */
 function devMs() {
@@ -43,8 +51,7 @@ function devMs() {
 }
 
 /** How long a run takes from now: the row's minutes or the own time – or `"past"`, a clock time already behind us today. */
-function planMs(settings: TimerSettings): number | "past" {
-  const dev = devMs();
+function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
   if (dev) return dev;
   if (settings.useOwn && settings.own) return ownTimeMs(settings.own, new Date());
   return settings.minutes * 60_000;
@@ -77,6 +84,9 @@ function TimerStart({ settings, onAgain, onPicture }: { settings: TimerSettings;
   const t = useT();
   const leave = useLeaveGame();
   const [total, setTotal] = useState(() => planMs(settings));
+  // The pieces (apples, the train's stops) come from the time set, also when `?sekunden=` shortens the run, so a
+  // five-minute run can be watched in a few seconds while developing.
+  const [minutes] = useState(() => planMs(settings, 0));
   const until = settings.useOwn && settings.own?.kind === "until" ? settings.own.at : undefined;
 
   if (total === "past" && until) {
@@ -96,7 +106,9 @@ function TimerStart({ settings, onAgain, onPicture }: { settings: TimerSettings;
       </div>
     );
   }
-  return <TimerRun picture={settings.picture} total={total === "past" ? 0 : total} until={until} onAgain={onAgain} onPicture={onPicture} />;
+  const ms = total === "past" ? 0 : total;
+  const set = typeof minutes === "number" ? minutes : ms;
+  return <TimerRun picture={settings.picture} total={ms} set={set} until={until} onAgain={onAgain} onPicture={onPicture} />;
 }
 
 /** The time left in digits, for grown-ups behind ⚙️ only (H-62): the child sees no number. Ticks only while it is shown. */
@@ -121,6 +133,7 @@ function TimeLeft({ endsAt, until }: { endsAt: number; until?: string }) {
 function TimerRun({
   picture,
   total,
+  set,
   until,
   onAgain,
   onPicture,
@@ -128,6 +141,8 @@ function TimerRun({
   picture: TimerPicture;
   /** How long it runs, in ms. */
   total: number;
+  /** How long a grown-up set it to run, in ms, which the pieces are cut from (the same as `total` but while developing). */
+  set: number;
   /** The clock time it runs to, when a grown-up set one („bis 17:30“). */
   until?: string;
   onAgain: () => void;
@@ -138,17 +153,45 @@ function TimerRun({
   const [endsAt] = useState(() => Date.now() + total);
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
+  const [far, setFar] = useState(false);
   const { effects, ripple } = useTapFeedback();
   useWakeLock(phase === "running");
+
+  // Piece by piece (H-45): an apple a minute, a stop on the track a minute – each with its plop or its bell.
+  const apples = pieceCount(set, MAX_APPLES);
+  const stops = pieceCount(set, MAX_STOPS);
+  const moments = useMemo(() => {
+    if (picture === "apple") return pieceMoments(total, apples);
+    if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
+    return [];
+  }, [picture, total, apples, stops]);
+  const nextMoment = useRef(0);
+
+  // Seen from afar (H-48): a while after the last tap the small things step back, and a tap brings them back.
+  useEffect(() => {
+    if (phase !== "running") return setFar(false);
+    setFar(false);
+    const timer = setTimeout(() => setFar(true), FAR_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [phase, poke]);
 
   // The end: checked at least every second, and again whenever the page comes back (timers sleep in the background).
   useEffect(() => {
     if (phase !== "running") return;
     let timer: ReturnType<typeof setTimeout>;
+    const startedAt = endsAt - total;
     const check = () => {
-      const left = endsAt - Date.now();
-      if (left <= 0) setPhase(picture === "candle" ? "blow" : "done");
-      else timer = setTimeout(check, Math.min(left, 1000));
+      const now = Date.now();
+      const left = endsAt - now;
+      if (left <= 0) return setPhase(picture === "candle" ? "blow" : "done");
+      // A piece done: one sound, also when several passed while the page was away.
+      if (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) {
+        while (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) nextMoment.current++;
+        if (picture === "apple") playPlop();
+        else playDing();
+      }
+      const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - now : Number.POSITIVE_INFINITY;
+      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment)));
     };
     const onVisible = () => {
       clearTimeout(timer);
@@ -160,7 +203,7 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, picture]);
+  }, [phase, endsAt, total, picture, moments]);
 
   useEffect(() => {
     if (phase === "blow") {
@@ -172,7 +215,9 @@ function TimerRun({
     }
     if (phase === "done") {
       if (picture === "train") playWhistle();
-      else if (picture === "sand") playChime();
+      else if (picture === "apple") playPlop();
+      else if (picture === "caterpillar") playTwinkle();
+      else if (picture === "sand" || picture === "disc") playChime();
       const timer = setTimeout(playMelody, picture === "candle" ? 500 : 900);
       return () => clearTimeout(timer);
     }
@@ -185,6 +230,8 @@ function TimerRun({
       setPoke((n) => n + 1);
       if (phase !== "running") return playTwinkle();
       if (picture === "train") playWhistle();
+      else if (picture === "apple") playLeaves();
+      else if (picture === "caterpillar") playMunch();
       else if (picture === "sand") playTwinkle();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
@@ -204,15 +251,23 @@ function TimerRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
-  const stage = { "--tm-ms": `${total}ms`, "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%` } as CSSProperties;
+  const stepped = picture === "train" && stops > 1;
+  const stage = {
+    "--tm-ms": `${total}ms`,
+    "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
+    "--tm-n": apples,
+    ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
+  } as CSSProperties;
 
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage tm-${phase}`} style={stage}>
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stage}>
           {picture === "train" && (
             <>
               <TrainBackdrop />
+              {stepped && <TrainStepKeyframes total={total} stops={stops} />}
+              {stepped && <TrainStops pieces={stops} />}
               <RailAhead />
               <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
                 <Train puff={poke} />
@@ -220,6 +275,9 @@ function TimerRun({
               <Family kind="bear" x={TRAIN.family} floor={628} childLeft />
             </>
           )}
+          {picture === "apple" && <AppleScene count={apples} total={total} />}
+          {picture === "caterpillar" && <CaterpillarScene />}
+          {picture === "disc" && <DiscScene />}
           {picture === "sand" && (
             <>
               <SandBackdrop />
@@ -240,12 +298,34 @@ function TimerRun({
         </div>
         <FeedbackLayer effects={effects} />
         {phase === "done" && (
-          <GameEnd delayMs={END_MS} noFamily onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />
+          <GameEnd
+            delayMs={picture === "caterpillar" ? END_MS_CATERPILLAR : END_MS}
+            noFamily
+            onAgain={onAgain}
+            next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }}
+          />
         )}
       </div>
       <PlayOptions>
         <TimeLeft endsAt={endsAt} until={until} />
       </PlayOptions>
     </>
+  );
+}
+
+/**
+ * The train's way stop by stop (H-45) as keyframes made for this run, since how many stops there are and when it halts
+ * depends on the time set: it rolls each stretch, eases into the stop and stands there before rolling on. The rail ahead
+ * shines in step with it. The stage names them in `--tm-roll` and `--tm-shine`.
+ */
+function TrainStepKeyframes({ total, stops }: { total: number; stops: number }) {
+  const steps = trainSteps(total, stops, haltMs(total, stops));
+  const frames = (name: string, at: (part: number) => string) =>
+    `@keyframes ${name} {${steps.map((s) => `${(s.at * 100).toFixed(3)}% { transform: ${at(s.part)}; animation-timing-function: ease-in-out; }`).join(" ")}}`;
+  return (
+    <style>
+      {frames("tm-roll-steps", (part) => `translateX(calc(var(--tm-train) * ${part}))`)}
+      {frames("tm-shine-steps", (part) => `scaleX(${1 - part})`)}
+    </style>
   );
 }

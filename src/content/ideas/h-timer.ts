@@ -31,6 +31,9 @@ export const timerIdeas: IdeaArea = {
       text: "Ein neues Timer-Bild: Am Baum hängen so viele Äpfel, wie Minuten eingestellt sind; jede Minute fällt einer mit einem Plopp in den Korb, den das Bärenkind hält. Dasselbe für den Zug: Auf dem Weg zum Bahnhof liegt pro Minute ein kleiner Halt, an dem er kurz bimmelt. So geht auch eine längere Zeit (15, 20, 30 Minuten für Mittagsruhe oder Autofahrt), ohne dass sich das Bild kaum bewegt.",
       why: "Etwas Fließendes ist für Zweijährige schwer abzuschätzen, einzelne Dinge sehen sie sofort: „Wenn alle Äpfel im Korb sind, gehen wir.“ Eltern können zeigen statt Minuten zu nennen.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut: ein neues Bild „Apfelbaum“ – so viele Äpfel wie Minuten (höchstens 30, darüber steht ein Apfel für etwas mehr als eine Minute), jede Minute fällt einer mit einem Plopp in den Korb des Bärenkinds, der nächste schaukelt jede Sekunde leicht, im Korb wächst der Haufen. Beim Zug steht ab 2 Minuten pro Minute ein Pfosten mit Glocke am Gleis (höchstens 12); dort hält er kurz und es bimmelt.",
     },
     {
       id: "H-46",
@@ -39,6 +42,9 @@ export const timerIdeas: IdeaArea = {
       text: "Eine kleine Raupe frisst sich durch ein großes Blatt, Bissen um Bissen wird es kleiner; das, was noch grün ist, ist die Zeit, die bleibt. Am Ende spinnt sie sich ein, und ein Schmetterling fliegt heraus, zu den Fuchskindern, die schon warten.",
       why: "Wie die bekannte schrumpfende Fläche der Kita-Timer, nur als Bild, das Kinder aus Bilderbüchern kennen; das Ende ist ein schönes Ereignis, nicht bloß „vorbei“.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als Bild „Raupe“: Die Raupe frisst das Blatt von der Spitze zum Stiel mit welligem Bissrand, ihr Kopf kaut jede Sekunde. Am Ende hängt der Kokon am Ast, wackelt, und ein Schmetterling fliegt zum Fuchskind; dann jubelt die Fuchsfamilie.",
     },
     {
       id: "H-47",
@@ -47,6 +53,8 @@ export const timerIdeas: IdeaArea = {
       text: "Das schlichteste Bild: eine große rote Scheibe, die wie ein Uhrzeiger im Kreis kleiner wird, bis nichts Rotes mehr bleibt. Als Variante für Kinder eine Pizza oder ein Kuchen, von dem die Fuchsfamilie Stück für Stück isst. Ohne Hintergrund, kräftige Farbe, auch quer durchs Zimmer zu erkennen.",
       why: "Diese Scheibe (bekannt als „Time Timer“) nutzen viele Kitas, Logopäden und Eltern von Kindern, die Übergänge schwer finden: Ein Kind, das sie dort kennt, versteht sie hier sofort.",
       effort: "S",
+      partial:
+        "Die rote Scheibe ist gebaut (Bild „Rote Scheibe“): weißes Zifferblatt mit Minutenstrichen, die rote Fläche wird mit einem Zeiger im Uhrzeigersinn kleiner, der Knopf in der Mitte dreht sich jede Sekunde ein Blütenblatt weiter, die Fuchsfamilie steht daneben. Noch offen: die Variante als Pizza oder Kuchen, von der die Fuchsfamilie Stück für Stück isst.",
     },
     {
       id: "H-48",
@@ -55,6 +63,9 @@ export const timerIdeas: IdeaArea = {
       text: "Das Tablet steht auf dem Regal, während das Kind mit Bausteinen spielt oder isst. Nach ein paar Sekunden tritt alles Kleine im Timer-Bild zurück (dunkler, ruhiger), nur das, was abläuft, bleibt groß und hell: der Weg des Zuges, der Sand, die Flamme. Ein Tippen holt das ganze Bild kurz zurück.",
       why: "Ein Timer, der das Kind fesselt, hält es vom Spielen ab, um das es geht. Aus drei Metern muss nur eines zu sehen sein: wie viel noch bleibt.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut für alle Bilder: Acht Sekunden nach dem letzten Tippen treten Hintergrund, Familie und die Pfosten am Gleis langsam ins Dunkle zurück; hell bleibt, was abläuft (Zug und glänzendes Gleis, Sand und Glas, Flamme, Äpfel und Korb, Blatt und Raupe, die Scheibe). Ein Tippen holt sofort alles zurück.",
     },
     {
       id: "H-49",

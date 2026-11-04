@@ -37,8 +37,9 @@
 }
 
 /* Zug zum Bahnhof: the train rolls from its start to the buffers; at the end it stands there. */
+/* With a stop a minute (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
 .tm-train {
-  animation: tm-roll var(--tm-ms) linear forwards;
+  animation: var(--tm-roll, tm-roll) var(--tm-ms) linear forwards;
 }
 
 .tm-done .tm-train {
@@ -419,7 +420,7 @@
   border-radius: 4px;
   background: linear-gradient(#ffffff, #c5d0da 45%, #8d9aa6);
   transform-origin: 100% 50%;
-  animation: tm-shine var(--tm-ms) linear forwards;
+  animation: var(--tm-shine, tm-shine) var(--tm-ms) linear forwards;
 }
 
 .tm-done .tm-rail-shine {
@@ -464,6 +465,376 @@
   to {
     transform: none;
   }
+}
+
+/* Apfelbaum (H-45): each apple waits for its minute (an inline animation-delay), then flies across (the layer) and
+   falls faster and faster (its inner box) into the basket; the one to fall next sways once a second for its minute.
+   The heap in the basket rises a step with each apple that lands. */
+.tm-apple {
+  animation: tm-apple-across 1.1s linear both;
+}
+
+.tm-apple-drop {
+  width: 100%;
+  height: 100%;
+  animation: tm-apple-down 1.1s ease-in both;
+}
+
+.tm-apple-sway {
+  width: 100%;
+  height: 100%;
+  transform-origin: 55% 8%;
+  animation: tm-apple-sway 1s ease-in-out;
+}
+
+.tm-apple-sway svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-apple-across {
+  to {
+    transform: translateX(var(--tm-dx));
+  }
+}
+
+@keyframes tm-apple-down {
+  to {
+    /* APPLE_LANDED in apples.tsx */
+    transform: translateY(var(--tm-dy)) scale(0.6);
+  }
+}
+
+@keyframes tm-apple-sway {
+  30% {
+    transform: rotate(9deg);
+  }
+  70% {
+    transform: rotate(-6deg);
+  }
+}
+
+.tm-done .tm-apple,
+.tm-done .tm-apple-drop,
+.tm-done .tm-apple-sway {
+  animation: none;
+  visibility: hidden;
+}
+
+.tm-heap-box {
+  overflow: hidden;
+}
+
+.tm-heap {
+  position: absolute;
+  inset: 0;
+  transform: translateY(55%);
+  animation: tm-heap var(--tm-ms) steps(var(--tm-n), end) forwards;
+}
+
+.tm-heap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-done .tm-heap {
+  animation: none;
+  transform: none;
+}
+
+@keyframes tm-heap {
+  from {
+    transform: translateY(55%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Raupe (H-46): every band of the leaf slides back as its leaf slides forward by as much (--tm-eat, set per element),
+   so only the bitten edge moves; the caterpillar goes back with it, chewing once a second. At the end it is gone, the
+   cocoon hangs on the branch, wiggles, and a butterfly flies out to the fox child, beats its wings a while and rests. */
+.tm-band {
+  position: absolute;
+  left: 0;
+  overflow: hidden;
+  border-radius: 0 999px 999px 0;
+}
+
+.tm-band-leaf {
+  position: absolute;
+  left: 0;
+}
+
+.tm-band-leaf svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-eat {
+  will-change: transform;
+  animation: tm-eat var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-eat {
+  animation: none;
+  transform: translateX(var(--tm-eat));
+}
+
+@keyframes tm-eat {
+  to {
+    transform: translateX(var(--tm-eat));
+  }
+}
+
+.tm-caterpillar {
+  animation: tm-eat var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-caterpillar {
+  transform: translateX(var(--tm-eat));
+  animation: tm-cat-hide 0.6s ease-in forwards;
+}
+
+@keyframes tm-cat-hide {
+  to {
+    opacity: 0;
+    transform: translateX(var(--tm-eat)) scale(0.4);
+  }
+}
+
+.tm-cat-head {
+  transform-origin: 30% 60%;
+  animation: tm-chew 1s ease-in-out infinite;
+}
+
+.tm-cat-head svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-chew {
+  35% {
+    transform: rotate(12deg) translateY(4%);
+  }
+  70% {
+    transform: none;
+  }
+}
+
+.tm-cocoon,
+.tm-butterfly {
+  opacity: 0;
+}
+
+.tm-done .tm-cocoon {
+  transform-origin: 50% 0;
+  animation: tm-cocoon 2.4s ease-in-out 0.4s forwards;
+}
+
+@keyframes tm-cocoon {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: none;
+  }
+  35% {
+    transform: rotate(8deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+  65%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tm-done .tm-butterfly {
+  animation: tm-fly 2.4s ease-in-out 1.6s forwards;
+}
+
+@keyframes tm-fly {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(0, -40%) scale(0.8);
+  }
+  40% {
+    transform: translate(calc(var(--tm-fly-x) * 0.35), -180%);
+  }
+  70% {
+    transform: translate(calc(var(--tm-fly-x) * 0.7), -60%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(var(--tm-fly-x), var(--tm-fly-y));
+  }
+}
+
+.tm-wings,
+.tm-butterfly-body {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-wings svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-done .tm-wings {
+  animation: tm-flap 0.25s ease-in-out 1.6s 12 alternate;
+}
+
+@keyframes tm-flap {
+  to {
+    transform: scaleX(0.35);
+  }
+}
+
+/* The fox family cheers when the butterfly has come. */
+[data-picture="caterpillar"] .tm-done .tm-mascot,
+[data-picture="caterpillar"] .tm-done .mascot-arm {
+  animation-delay: 4s;
+}
+
+[data-picture="caterpillar"] .tm-done .tm-mascot-child {
+  animation-delay: 4.2s;
+}
+
+/* Rote Scheibe (H-47): two white halves turn over the red, the right one in the first half of the time and the left one
+   in the second, each clipped by its half of the face; the hand goes round once, the knob turns a petal a second. */
+.tm-red {
+  border-radius: 50%;
+  background: #e03131;
+}
+
+.tm-done .tm-red {
+  opacity: 0;
+}
+
+.tm-half {
+  overflow: hidden;
+}
+
+.tm-cover {
+  position: absolute;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.tm-half-right .tm-cover {
+  left: -100%;
+  background: linear-gradient(90deg, #fff 50%, transparent 50%);
+  animation: tm-cover-right var(--tm-ms) linear forwards;
+}
+
+.tm-half-left .tm-cover {
+  left: 0;
+  background: linear-gradient(90deg, transparent 50%, #fff 50%);
+  animation: tm-cover-left var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-cover {
+  animation: none;
+  transform: rotate(180deg);
+}
+
+@keyframes tm-cover-right {
+  50%,
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes tm-cover-left {
+  0%,
+  50% {
+    transform: none;
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+.tm-hand {
+  animation: tm-hand var(--tm-ms) linear forwards;
+}
+
+.tm-hand-line {
+  position: absolute;
+  left: 49.4%;
+  top: 0;
+  width: 1.2%;
+  height: 50%;
+  border-radius: 999px;
+  background: #3b2a20;
+}
+
+.tm-done .tm-hand {
+  animation: none;
+  transform: rotate(1turn);
+}
+
+@keyframes tm-hand {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.tm-knob {
+  inset: 0;
+  animation: tm-knob 1s ease-in-out infinite;
+}
+
+.tm-knob svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-knob {
+  to {
+    transform: rotate(60deg);
+  }
+}
+
+/* Seen from afar (H-48): a while after the last tap the backdrop, the family and the little stops step back into the
+   dark, and only what runs down stays bright – the rail ahead and the train, the sand, the flame, the apples, the leaf,
+   the red. A tap brings everything back at once. */
+.tm-back,
+.tm-dims,
+.tm-mascot {
+  transition: opacity 0.4s ease-out;
+}
+
+.tm-far .tm-back,
+.tm-far .tm-dims {
+  opacity: 0.35;
+  transition-duration: 2.5s;
+}
+
+.tm-far .tm-mascot {
+  opacity: 0.3;
+  transition-duration: 2.5s;
 }
 
 /* The sheet behind „Andere …“ (H-59, H-60), over the whole screen, and the question when a clock time is past. */

@@ -66,7 +66,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/timer/",
-    note: "Alles SVG: beim Zug wartet die Bärenfamilie am Bahnhof, bei der Sanduhr steht die Fuchsfamilie daneben, bei der Kerze pustet das Bärenkind sie aus; am Ende winken alle.",
+    note: "Alles SVG: beim Zug wartet die Bärenfamilie am Bahnhof, beim Apfelbaum hält das Bärenkind den Korb, bei der Sanduhr und der roten Scheibe steht die Fuchsfamilie daneben, bei der Raupe fliegt der Schmetterling zum Fuchskind, bei der Kerze pustet das Bärenkind sie aus; am Ende winken alle.",
     tasks: [{ label: "Fuchs- oder Bärenfamilie in jedem Bild, sie winkt am Ende", work: "drawing", effort: "S", state: "done" }],
   },
   {
