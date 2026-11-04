@@ -25,7 +25,7 @@ const AWAY = -700;
 const BEYOND = 2700;
 
 const PARENT: Look = { shirt: "#20c997", pants: "#495057", hair: "#8d5a3b" };
-const POSTIE: Look = { shirt: "#1c7ed6", pants: "#364fc7", hair: "#e8b04b", curly: true };
+const POSTIE: Look = { shirt: "#1c7ed6", pants: "#364fc7", hair: "#e8b04b", curly: true, animal: "bear", lashes: true };
 const OMA: Look = { shirt: "#cc5de8", pants: "#5f3dc4", hair: "#dee2e6", curly: true };
 
 /** The child, in its own clothes. */

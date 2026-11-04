@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MASCOT_COLORS, MascotHead, type MascotKind } from "@/components/Mascot";
 import { CHEEK, INK, SKIN } from "@/games/scenes/shared";
 import { type Figure, useFigure } from "@/lib/common";
 import {
@@ -41,7 +42,15 @@ export interface Look {
   curly?: boolean;
   /** Two pigtails at the sides of the head, tied with bands of this colour (the girl). */
   pigtails?: string;
+  /** A grown-up of the films who is one of the app's mascots: the shared fox or bear head instead of a face and hair,
+   * paws instead of hands (never the child, who stays a boy or a girl). */
+  animal?: MascotKind;
+  /** The mascot head with lashes (a Mama, Oma or a woman in her role). */
+  lashes?: boolean;
 }
+
+/** The colour of a hand: skin, or the paw of a fox or a bear. */
+export const handColor = (look: Look): string => (look.animal ? MASCOT_COLORS[look.animal].fur : SKIN);
 
 const HEROES: Record<Figure, Look> = {
   boy: { shirt: "#ff922b", pants: "#4263eb", hair: "#8d5a3b" },
@@ -194,6 +203,13 @@ function Backpack({ open, bump }: { open: boolean; bump: number }) {
 
 /** Hair and face; also used alone in the bathtub, the bed and the bubble. */
 export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean }) {
+  // The shared head, its eyes where a child's are, so a helmet or hat sits on it the same way.
+  if (look.animal)
+    return (
+      <g transform="translate(-45 -186) scale(0.9)">
+        <MascotHead kind={look.animal} lashes={look.lashes} eyes={asleep ? "shut" : "open"} />
+      </g>
+    );
   return (
     <>
       {look.curly ? (

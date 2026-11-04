@@ -73,12 +73,16 @@ In a fresh worktree run `bun install` first.
   A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
   for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)
   repeats this reminder with every message.
-- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
+- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
+  its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
+  area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
-  everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
+  everything goes that helps the user decide: ideas, the language table, and research. Scrolling down it always shows
+  every open idea: a tap above (the overview's numbers, the contents) jumps to its place and marks it, never filters, and
+  the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
@@ -189,7 +193,10 @@ In a fresh worktree run `bun install` first.
   `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
   pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
   in the ears, the far side of the fur in shadow, brows, eyes with two lights, a shiny nose. Never a head of its own
-  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Hats, bows and glasses go
+  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Cuddly and true to the
+  animal, for children (user feedback, November 2026): eyes a little below the head's middle with a warm brown iris
+  round the pupil (a child's bigger and lower), light in the fur as soft tufts, never a round plastic shine; bodies
+  round with chubby arms and round paws with toes, the fox's legs dark below the elbow as a real fox's. Hats, bows and glasses go
   in as its `children`, clothes and bodies round it in its colours and line; a better fox or bear is made there, so
   every game gets it. Toys (a teddy), wild animals of a scene and tiny patterns stay drawn on their own. `Mascot.test.ts` checks.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
@@ -310,13 +317,17 @@ In a fresh worktree run `bun install` first.
   category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
   Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
-  user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
+  user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
+  left corners (`--lean`), so the names running down their spines are read without bending the
+  head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
-  that many books in one slipcase, each opening its part and found by the way back: Belohnungstafel and Zeitplan, right
-  of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents need most, so they stand first,
-  top left (first in `CATEGORIES`), and that slipcase is the eye-catcher of the shelf: red cloth edged in gold, pulled
-  out furthest, glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. What can be taken is
+  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
+  Belohnungstafel and Zeitplan, right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
+  glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
+  its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
+  as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
   and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
@@ -356,6 +367,9 @@ In a fresh worktree run `bun install` first.
 - Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
   „🌳 Lebendige Welten“; `MenuHead` takes a string), and so is every heading inside a page – the emoji stays on the
   card or the book, not over it (`MenuTop.test.ts` checks).
+- A menu's cards, lines and books always stand in the same order (user feedback, November 2026): nothing moves to the
+  front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
+  last first; `GameShell.test.ts` checks).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
   choices may sit there.

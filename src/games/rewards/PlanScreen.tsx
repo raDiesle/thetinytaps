@@ -27,6 +27,8 @@ import {
   stepDone,
   stepsOn,
 } from "./plan";
+import { RitualDialog } from "./RitualCard";
+import { type Ritual, ritualOf } from "./rituals";
 import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, SLEEPS_UNTIL, type StepState, TODAY, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
@@ -102,6 +104,8 @@ export function PlanScreen({
   const [fresh, setFresh] = useState<string | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
   const [party, setParty] = useState<string | null>(null);
+  /** A ritual's card open over the plan (H-58), for the card of that field key; „Gemacht“ ticks it. */
+  const [ritual, setRitual] = useState<{ ritual: Ritual; key: string } | null>(null);
   const bigDay = plan.view === "countdown" ? bigDayStep(plan) : undefined;
   /** The party is the reward's, its stars all there (else the day's, every card done). */
   const [won, setWon] = useState(false);
@@ -148,6 +152,7 @@ export function PlanScreen({
     setUndo(null);
     setFresh(null);
     setParty(null);
+    setRitual(null);
   }, [plan.id]);
 
   useEffect(() => () => moonTimers.current.forEach(clearTimeout), []);
@@ -190,7 +195,7 @@ export function PlanScreen({
   // Keys: the card to do now wiggles and says itself; a key never ticks it, only the child's tap on it does.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || (e.target as Element).closest("input, textarea, button, a, select")) return;
+      if (ritual || e.repeat || e.metaKey || e.ctrlKey || e.altKey || (e.target as Element).closest("input, textarea, button, a, select")) return;
       unlockAudio();
       if (plan.view === "countdown") return countDown();
       const now = box.current?.querySelector("[data-state='now']") ?? box.current?.querySelector("[data-state='done']");
@@ -290,7 +295,27 @@ export function PlanScreen({
       navigate(game, { state: { returnTo: pathname } satisfies RoutineVisit });
       return;
     }
-    // The card to do now: done, with a tick, and the next one glows – or, counting stars, one star more on it.
+    // A ritual opens its words for the grown-up; „Gemacht“ under them ticks it as this tap would.
+    const words = ritualOf(step);
+    if (words) {
+      sound(playPop);
+      setRitual({ ritual: words, key });
+      return;
+    }
+    tick(el, key);
+  };
+
+  /**
+   * The card to do now (its field key `key`, its element `el`): done, with a tick, and the next one glows – or,
+   * counting stars, one star more on it.
+   */
+  const tick = (el: HTMLElement, key: string) => {
+    const { day: stepDay, taskId } = parseCellKey(key);
+    const steps = stepsOn(plan, stepDay);
+    const index = steps.findIndex((s) => s.id === taskId);
+    const step = steps[index];
+    if (!step) return;
+    const label = stepLabel(step);
     const before = planProgress(plan, ticks, linked, stepDay);
     const next = addStar(log, plan.id, key, today, starsOf(step));
     const after = planProgress(plan, next[plan.id], linked, stepDay);
@@ -456,6 +481,16 @@ export function PlanScreen({
         <button type="button" className="rw-undo" onClick={takeBack}>
           ↶ {t({ de: "Zurück", en: "Undo", zh: "撤销", hi: "वापस", es: "Deshacer", ar: "تراجع", ru: "Отменить" })}
         </button>
+      )}
+      {ritual && (
+        <RitualDialog
+          ritual={ritual.ritual}
+          onClose={() => setRitual(null)}
+          onDone={() => {
+            const el = box.current?.querySelector<HTMLElement>(`[data-step="${ritual.key}"]`);
+            if (el) tick(el, ritual.key);
+          }}
+        />
       )}
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(null)}>

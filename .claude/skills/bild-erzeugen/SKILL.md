@@ -41,7 +41,9 @@ sheet is full, and later sessions bring the partners.
    pictures that never share one (no `size`, bigger than a panel, `alone`) – waiting saves nothing there; *waiting for
    partners* are sheets not yet full, together with older pictures already waiting there; *after their reference* are
    pictures drawn from another one still in the queue.
-3. **Make the cheap part at once without asking**: `bun run image queue --make` (in the background, like every batch).
+3. **Make the cheap part at once without asking**: `bun run image queue --make` (in the background, like every batch) –
+   except pictures a game's rules keep for the user (Gefühle's „Geplant“, `src/games/feelings/CLAUDE.md`): those only
+   wait in the queue for a batch the user asks for.
 4. **For what waits, ask the user in the session** (AskUserQuestion, „warten“ first): wait for partners, or make it now
    for one request more (≈ $0.017). Now: `bun run image queue --make --force <id,…>` (or `all`) – the sheet's spare
    panels become variants of its pictures in `.image-raw/variants/`, to pick the best. Waiting: commit the queue entry
@@ -49,9 +51,11 @@ sheet is full, and later sessions bring the partners.
 5. **A made picture leaves the queue** in the commit that adds it (the script reminds you; `pictureQueue.test.ts`
    fails while a queued file exists).
 
-Pictures that still wait for the user's word – the mascot pictures in `mascotStatus.ts`, prompts under review in
-`picturePrompts.ts` – come into the queue only once the user asks for them. „Offene Bilder“ on `/management/` shows the
-queue split the same way, with what forcing would cost.
+Pictures that still wait for the user's word – the mascot pictures in `mascotStatus.ts`, unmade prompts in
+`picturePrompts.ts` – come into the queue only once the user asks for them. „Offene Bilder“ on `/management/` shows how
+many pictures wait in the queue, split the same way, with what forcing would cost. The page shows no prompts to read,
+change or approve (a „Bildvorschläge“ review was removed, user decision, November 2026: the user only wants to know how
+many pictures are open) – never bring a prompt review back there; ask in the session when a prompt needs the user's look.
 
 ## Batches (the default)
 
@@ -212,8 +216,8 @@ names – use those.
    leave a placeholder in the game (the Gefühle game shows the file name, `Placeholder` in its `shared.tsx`)
    and list file name and prompt where the game keeps them (e.g. „Geplant“ in its `bilder/README.md`),
    so the user looks at the ideas first and then makes them with you.
-   Prompts collected for review on `/management/` (`src/content/picturePrompts.ts`) stay there once made, each with
-   the `url` of its picture, so the page shows it as made and not as missing (`picturePrompts.test.ts` checks it).
+   Prompts kept in `src/content/picturePrompts.ts` stay there once made, each with the `url` of its picture, so it
+   counts as made and not as missing (`picturePrompts.test.ts` checks it).
 1. Write the prompt in English: subject, pose, mood, what must be readable for a
    toddler. One clear subject; describe characters with the same words every time.
 2. For a recurring character, make a reference first (character sheet or the best

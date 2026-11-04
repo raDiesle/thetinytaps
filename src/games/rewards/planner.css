@@ -1192,3 +1192,151 @@
 .rw-on-paper .pl-card.pl-big-day {
   box-shadow: none;
 }
+
+/* A ritual's card (RitualCard.tsx, H-58): picture and name, then the words for the grown-up. Sized in em, so the screen's
+   window and the printed page each give it their own font size. */
+.pl-ritual {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  min-width: 0;
+  color: var(--ink, #2a1e5c);
+}
+
+.pl-ritual-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.pl-ritual-pic {
+  flex: none;
+  width: 3.4em;
+  font-family: var(--font-emoji);
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+.pl-ritual-pic > :not(img) {
+  font-size: 2.6em;
+}
+
+.pl-ritual-pic .rw-pic {
+  width: 3.4em;
+  height: 3.4em;
+  object-fit: contain;
+}
+
+.pl-ritual-name {
+  display: block;
+  font-size: 1.4em;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.pl-ritual-when {
+  display: block;
+  opacity: 0.75;
+  font-weight: 700;
+}
+
+.pl-ritual-part {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.pl-ritual-who {
+  margin: 0;
+  color: color-mix(in srgb, var(--rw-main, #6b4bb8) 70%, #000);
+  font-size: 0.9em;
+  font-weight: 800;
+}
+
+.pl-ritual-part ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pl-ritual-part li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.pl-ritual-sign {
+  flex: none;
+  font-family: var(--font-emoji);
+}
+
+.pl-ritual-how {
+  margin: 0;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* On screen: a sheet of paper over the plan, the grown-up reads from it. */
+.pl-ritual-dialog {
+  box-sizing: border-box;
+  width: min(560px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 16px 20px 20px;
+  overflow: auto;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: var(--paper-grain, none), var(--paper-mottle, none), var(--paper, #fff);
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.pl-ritual-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pl-ritual-dialog::backdrop {
+  background: #0006;
+}
+
+.pl-ritual-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pl-ritual-dialog .pl-ritual-head {
+  padding-right: 44px;
+}
+
+.pl-ritual-done {
+  align-self: center;
+  min-height: 48px;
+  padding: 4px 28px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #ffd84d;
+  color: inherit;
+  font: inherit;
+  font-size: 1.15em;
+  font-weight: 800;
+  box-shadow: 0 3px 0 var(--ink);
+  cursor: pointer;
+}

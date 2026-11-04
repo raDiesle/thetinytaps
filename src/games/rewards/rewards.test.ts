@@ -486,3 +486,27 @@ test("the print instructions link the user's stickers and Velcro dots", () => {
   expect(source("PrintPanel.tsx")).toContain("<StickerLink />");
   for (const file of ["PrintPanel.tsx", "PhotoPrint.tsx", "PlanPrint.tsx"]) expect(source(file)).toContain("<VelcroLink />");
 });
+
+describe("the black-and-white print to colour in is advertised", () => {
+  // Every picture has a `-linie` twin drawn for colouring in: a strength few charts have, so it is named where
+  // grown-ups decide – the search texts, the wizard's print stamp and the print panel (CLAUDE.md, Rules).
+  test("both search entries name it, in German and English", async () => {
+    const { SEO_TEXTS } = await import("@/content/seo");
+    const { SEO_EN } = await import("@/content/seo.en");
+    for (const path of ["/belohnungstafel/", "/tagesplan/"]) {
+      const de = SEO_TEXTS.find((page) => page.path === path);
+      expect(`${de?.description} ${de?.text}`, path).toMatch(/Ausmal/);
+      expect(de?.text, path).toMatch(/schwarz-weiß/i);
+      const en = SEO_EN.pages[path];
+      expect(`${en?.description} ${en?.text}`, path).toMatch(/colou?r(ing)? (in|page)|to color/);
+      expect(en?.text, path).toMatch(/black and white/);
+    }
+  });
+
+  test("the wizard's stamp and the print panel name it", () => {
+    expect(readFileSync(new URL("./Wizard.tsx", import.meta.url), "utf8")).toContain("rw-print-badge-ink");
+    const panel = readFileSync(new URL("./PrintPanel.tsx", import.meta.url), "utf8");
+    expect(panel).toContain("Schwarz-weiß zum Ausmalen");
+    expect(readFileSync(new URL("./PlanPrint.tsx", import.meta.url), "utf8")).toContain("<InkChoice");
+  });
+});

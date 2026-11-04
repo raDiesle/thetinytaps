@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import { waitingMascotPictures } from "@/content/ideas/mascotStatus";
-import { PICTURE_PROMPTS } from "@/content/picturePrompts";
 import { PICTURE_QUEUE, type QueuedPicture } from "@/content/pictureQueue";
 import { type Grid, planQueue, REQUEST_PRICE } from "@/content/pictureQueuePlan";
 
@@ -17,12 +16,12 @@ function kindOf(p: QueuedPicture) {
 /**
  * On the management page: every picture asked for that Gemini still has to make (content/pictureQueue.ts), split as
  * `bun run image queue` splits it – what is cheap now, what waits for partners to fill its sheet, and what waits for
- * its reference – and below how many pictures still wait for their prompt elsewhere on the page.
+ * its reference – with how many wait in all in its heading, the one number the user looks for, and below how many mascot
+ * pictures still wait for their word. Prompts are not shown here to check: the user only wants the count (November 2026).
  */
 export function PictureQueue() {
   const plan = planQueue(PICTURE_QUEUE);
   const mascots = waitingMascotPictures();
-  const unmade = PICTURE_PROMPTS.flatMap((set) => set.groups.flatMap((g) => g.prompts)).filter((p) => !p.url).length;
   const rows = (pictures: QueuedPicture[]) =>
     pictures.map((p) => (
       <tr key={p.id} className="ideas-languages-part">
@@ -37,7 +36,9 @@ export function PictureQueue() {
     ));
   return (
     <section id="offene-bilder" className="ideas-panel">
-      <h2>🖼️ Offene Bilder: was Gemini noch machen soll</h2>
+      <h2>
+        🖼️ Offene Bilder: {PICTURE_QUEUE.length} {PICTURE_QUEUE.length === 1 ? "wartet" : "warten"} auf Gemini
+      </h2>
       <p className="ideas-hint">
         Jedes Bild, um das gebeten wird, kommt erst hierher. Eine Anfrage an Gemini kostet gleich viel, ob sie ein Bild bringt oder einen Bogen aus zwei oder
         vier kleinen, die danach zerschnitten werden. Darum warten kleine Bilder derselben Art, bis ihr Bogen voll ist; was schon so günstig geht wie möglich
@@ -93,14 +94,8 @@ export function PictureQueue() {
         </div>
       )}
       <p className="ideas-hint">
-        Noch ohne fertigen Auftrag: {mascots} Bilder mit Fuchs und Bär (<a href="#maskottchen">Fuchs & Bär</a>)
-        {unmade > 0 && (
-          <>
-            {" "}
-            und {unmade} Bildvorschläge, die erst geprüft werden (<a href="#bilder">Bildvorschläge</a>)
-          </>
-        )}
-        . Sind sie gewünscht, kommen sie hier in die Liste.
+        Noch ohne fertigen Auftrag: {mascots} Bilder mit Fuchs und Bär (<a href="#maskottchen">Fuchs & Bär</a>) . Sind sie gewünscht, kommen sie hier in die
+        Liste.
       </p>
     </section>
   );

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES, SHELF, UNFINISHED, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
-import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
+import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SEO_TEXTS, SITE_NAME, SITE_PROMISE, fullTitle, splitLanguage } from "./seo";
@@ -92,9 +92,9 @@ describe("ideas", () => {
     for (const { area, idea } of ideas) expect(idea.id).toMatch(new RegExp(`^${area.prefix}-\\d{2,}$`));
   });
 
-  test("each area has its own prefix and sits in one group", () => {
-    const prefixes = IDEA_AREAS.map((area) => area.prefix);
-    expect(prefixes.filter((p, i) => prefixes.indexOf(p) !== i)).toEqual([]);
+  test("each area has its own key and sits in one group", () => {
+    const keys = IDEA_AREAS.map(areaKey);
+    expect(keys.filter((k, i) => keys.indexOf(k) !== i)).toEqual([]);
   });
 
   test("top picks name existing ideas", () => {
@@ -477,9 +477,9 @@ describe("Russian", () => {
 });
 
 // User feedback, November 2026: the everyday helpers are what parents need most, so they stand first on the shelf
-// (top left); the Belohnungstafel and the Zeitplan, the shelf's eye-catcher, stand in their slipcase right of Aufs Töpfchen,
+// (top left); the Belohnungstafel and the Zeitplan, the shelf's eye-catcher, stand tied together right of Aufs Töpfchen,
 // and the newer helpers after them once they are finished.
-test("the Alltagshelfer stand first on the shelf, the slipcase of Belohnungstafel & Zeitplan right of Aufs Töpfchen", () => {
+test("the Alltagshelfer stand first on the shelf, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual(["/zaehne/", "/toepfchen/", "/belohnungstafel/"]);
   expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);

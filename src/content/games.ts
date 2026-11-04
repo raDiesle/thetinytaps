@@ -13,7 +13,7 @@ export interface Game {
   /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
   blurb: Localized;
   /**
-   * On the shelf the game stands as these books side by side in one slipcase, one for each part it opens on
+   * On the shelf the game stands as these books side by side, tied with a ribbon, one for each part it opens on
    * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
@@ -24,7 +24,7 @@ export interface Game {
   unfinished?: true;
 }
 
-/** One of a game's books in its slipcase on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
+/** One of a game's books tied together on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
 export interface Volume {
   href: string;
   emoji: string;
@@ -69,7 +69,7 @@ export const CATEGORIES: Category[] = [
       ru: "Зубы, горшок, распорядок дня",
     },
     // Each a book of its own on the shelf, its name on its spine (user decision, October 2026). First on the shelf, top
-    // left: the everyday helpers are what parents need most; the Belohnungstafel's slipcase, the shelf's eye-catcher,
+    // left: the everyday helpers are what parents need most; the Belohnungstafel's books, the shelf's eye-catcher,
     // stands right of Aufs Töpfchen (user feedback, November 2026).
     apart: true,
     games: [
@@ -104,7 +104,7 @@ export const CATEGORIES: Category[] = [
       {
         href: "/belohnungstafel/",
         also: ["/tagesplan/"],
-        // On the shelf two books in one slipcase, each opening its own part (user feedback, November 2026).
+        // On the shelf two books tied with a ribbon, each opening its own part (user feedback, November 2026).
         volumes: [
           {
             href: "/belohnungstafel/",
