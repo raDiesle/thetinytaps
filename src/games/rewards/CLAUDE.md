@@ -362,7 +362,7 @@ never all; with the field pale cards in the box), and the first tap only ends th
 
 The teeth card, when it is the one to do, opens Zähne putzen instead of ticking (`gameOf`, `GAME_ROUTES` in `plan.ts`): the plan
 navigates there with `{ returnTo }` in the router state (`src/lib/routine.ts`), `GameShell` plays at once without the
-start screen, and leaving (✕, Esc, „Menü“) goes back to the plan. The plan first notes the card (`waitForStep`, per
+start screen, and leaving (✕, Esc) goes back to the plan. The plan first notes the card (`waitForStep`, per
 visit), the brushing's end calls `finishRoutineStep`, and back on the plan `takeFinishedStep` ticks exactly that card –
 also a morning routine's teeth brushed after 14:00, which Zähne putzen files as evening. Left early with ✕, the card
 stays „Jetzt“. Such a step is part of the day, not play: no game counted, no play time, and `PlaytimeLock` lets it through. Under

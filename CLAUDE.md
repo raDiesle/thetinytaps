@@ -397,11 +397,11 @@ In a fresh worktree run `bun install` first.
 - A game is left with one tap on its ✕, or by holding Esc (`GameShell`): holding ✕ for a moment was the only way once
   and got in the grown-ups' way (user decision, November 2026), so it is a choice now, „Spiel verlassen“ under ⏳ on
   the home page (`leave` in `src/lib/common.ts`, `LeaveOptions`), for parents whose child taps ✕ by chance. Esc is
-  always held, since children press it while typing. The only other way out is „Menü“ at the end of a level. Never add
-  another. Nothing beside ✕ says what it does, not when a game starts nor while it is pressed or under a mouse: a
+  always held, since children press it while typing. There is no other way out, also not at the end of a level (see
+  `GameEnd`). Never add another. Nothing beside ✕ says what it does, not when a game starts nor while it is pressed or under a mouse: a
   „Zurück zum Menü“ there was more than grown-ups needed (user feedback, November 2026; `css.test.ts`); its name is
   only read out.
-- **Back is always the screen seen before** (user feedback, November 2026): ✕, Esc, „Menü“ and a menu's way back lead
+- **Back is always the screen seen before** (user feedback, November 2026): ✕, Esc and a menu's way back lead
   to the menu the child came from, never to a menu it didn't pass on its way in. And they step back in the browser's
   history rather than adding a page to it, or the phone's own back button afterwards opened the game just left again,
   or the same menu twice, so that it seemed not to work: a way back goes through `goBack` (`src/lib/goBack.ts`) or
@@ -413,17 +413,18 @@ In a fresh worktree run `bun install` first.
   or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). A tool for the day
   rather than a game (the Timer, like the Belohnungstafel) counts no play time and still opens when it is over:
   `GameShell tool` and its address in `PlaytimeLock`.
-- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Menü“ (back to the
-  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book),
-  „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
-  the first, so there is always one). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Nochmal“ and „Weiter“
+  (the next level in the game's order, after the last the first, so there is always one). It has no „Menü“ button
+  (user feedback, November 2026): the way back is the page's corner in the top left, as in every menu – the ✕, which
+  leads to the game's own start screen or the page before it, and where that is the shelf the book's ribbon instead of
+  the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing. They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
   and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
-  a big painted label taped onto the page, „Menü“ and „Nochmal“ two smaller paper slips stacked beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+  a big painted label taped onto the page, „Nochmal“ a smaller paper slip beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's
   cards' room, Zähne putzen's week chart) passes `inline` (user feedback, November 2026; `GameEnd.test.ts`). Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
-  in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
+  in the bottom right corner instead, and only where that game's rules say so.
   Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
   `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
   already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or

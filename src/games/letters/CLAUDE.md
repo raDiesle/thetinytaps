@@ -18,7 +18,7 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   for a shown letter).
 
 `LettersGame way={…}` is all four (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
-`names.ts`. Each plays at once (`startMode`) with no start screen: ✕ and „Menü“ go back to the book's table of contents,
+`names.ts`. Each plays at once (`startMode`) with no start screen: ✕ goes back to the book's table of contents,
 the page before it.
 
 ## Rules
