@@ -416,7 +416,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   return (
     <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
-        {numbersOnly && <PointingFamily kind={family} pointer="child" className="letters-family" />}
+        {numbersOnly && <PointingFamily kind={family} pointer="child" className="letters-family" onTap={repeat} />}
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {shown === null && (
             <p className="letters-welcome">

@@ -232,7 +232,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   return (
     <div className={`words-play${color && done ? " colored" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
-        <PointingFamily kind={family} pointer="grown" className="letters-family" />
+        <PointingFamily kind={family} pointer="grown" className="letters-family" onTap={onPicturePointer} />
         {color && done && (
           <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>
             {parade.map((spot, i) => (

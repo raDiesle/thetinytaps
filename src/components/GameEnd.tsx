@@ -1,5 +1,5 @@
 import { useEffect, useState, type PointerEvent } from "react";
-import { useCountsPlaytime, useLeaveGame } from "@/components/GameShell";
+import { useCountsPlaytime, useEndShown } from "@/components/GameShell";
 import { CheeringFamily, type MascotKind } from "@/components/Mascot";
 import { useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
@@ -16,8 +16,8 @@ interface GameEndProps {
   /** Waits this long before showing up, so the party can be watched first. */
   delayMs?: number;
   /**
-   * Small buttons in the bottom corners, „Menü“ left and the others right, so the picture stays free (Aufs Töpfchen,
-   * the user's choice there); taps between them reach the game.
+   * Small buttons in the bottom right corner, so the picture stays free (Aufs Töpfchen, the user's choice there); taps
+   * beside them reach the game.
    */
   corners?: boolean;
   /**
@@ -33,14 +33,16 @@ interface GameEndProps {
 }
 
 /**
- * The end of a level: back to the game's start screen („Menü“), play it again („Nochmal“) or go on to the next
- * („Weiter“, only where there is another), and beside them a fox or bear child jumping for joy with its grown-up waving
- * (D-12). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Menü“ and
- * „Nochmal“ two smaller paper slips stacked beside it.
+ * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another), and
+ * beside them a fox or bear child jumping for joy with its grown-up waving (D-12). Words only, no emoji or symbols (user
+ * feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
+ * no button here but the page's corner in the top left, as in every menu – the ✕, or the book's ribbon where the game
+ * goes back onto the shelf (GameShell, told by `useEndShown`; a „Menü“ button was one way back too many, user feedback,
+ * November 2026).
  */
 export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false, inline = false }: GameEndProps) {
   const t = useT();
-  const leave = useLeaveGame();
+  const endShown = useEndShown();
   const counts = useCountsPlaytime();
   const [shown, setShown] = useState(delayMs <= 0);
   // Fox or bear, by chance at every end, so a child meets both.
@@ -57,6 +59,13 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily 
     if (shown && counts) gameEnded();
   }, [shown, counts]);
 
+  // While the end is on screen, the corner in the top left is the way back.
+  useEffect(() => {
+    if (!shown) return;
+    endShown(true);
+    return () => endShown(false);
+  }, [shown, endShown]);
+
   if (!shown) return null;
 
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
@@ -72,10 +81,6 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily 
     <div className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
       {!corners && !inline && !noFamily && <CheeringFamily kind={kind} className="game-end-family" />}
       <div className="game-end-small">
-        {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
-        <button type="button" className="game-end-button menu" onClick={leave}>
-          {t({ de: "Menü", ru: "Меню", en: "Menu", zh: "菜单", hi: "मेन्यू", es: "Menú", ar: "القائمة" })}
-        </button>
         <button type="button" className="game-end-button again" onPointerDown={press(onAgain)}>
           {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}
         </button>

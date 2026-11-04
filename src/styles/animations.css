@@ -113,3 +113,33 @@
     transform: translateY(-28%);
   }
 }
+
+/* A family that answers a tap (`CheeringFamily onTap`): the raised arms lie behind the figures as small layers of their
+   own and wave from the shoulder for four beats, while both grin. */
+.mascot-family.tappable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.mascot-family > span > svg {
+  position: relative;
+}
+
+.mascot-wave-arm {
+  position: absolute;
+  inset: 0;
+  transform-origin: 71% 59%;
+}
+
+.mascot-family.waving .mascot-wave-arm {
+  animation: mascot-wave 0.536s ease-in-out 4 alternate;
+}
+
+@keyframes mascot-wave {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}

@@ -29,11 +29,20 @@ const EXIT_DELAY_MS = 500;
 /** Esc has to be held, since children press it while typing. */
 const ESC_HOLD_MS = 1000;
 
-/** Leaves the game for the menu before it, like ✕; the end of a level offers it as „Menü“. */
+/** Leaves the game for the menu before it, like ✕. */
 const LeaveGame = createContext<() => void>(() => {});
 
-/** The way back to the menu before the game, for the „Menü“ button at the end of a level. */
+/** The way back to the menu before the game, for a game that has a way out of its own (the Timer). */
 export const useLeaveGame = () => useContext(LeaveGame);
+
+/**
+ * Tells GameShell whether the end of a level (`GameEnd`) is on screen: then the corner in the top left is the way back,
+ * with one tap – the ribbon onto the shelf where the game goes back there – and the end shows no „Menü“ button of its own.
+ */
+const EndShown = createContext<(shown: boolean) => void>(() => {});
+
+/** For `GameEnd`: says it is on screen (true) or gone again (false). */
+export const useEndShown = () => useContext(EndShown);
 
 /** Whether what plays counts as play time: not a tool for the day (`GameShellProps.tool`) nor a routine's step. */
 const CountsPlaytime = createContext(true);
@@ -126,6 +135,8 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
         : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const menu = menuAfterPlay({ startMode, leaveTo }, back);
   const [playing, setPlaying] = useState(false);
+  // The end of a level is on screen (GameEnd): the corner is then the way back, not a „Menü“ button.
+  const [ended, setEnded] = useState(false);
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const playtime = usePlaytime(playing && !free);
@@ -218,6 +229,17 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   }, []);
 
   if (playing) {
+    const backToMenu = t({
+      de: "Zurück zum Menü",
+      ru: "Назад в меню",
+      en: "Back to menu",
+      zh: "返回菜单",
+      hi: "मेन्यू पर वापस",
+      es: "Volver al menú",
+      ar: "العودة إلى القائمة",
+    });
+    // Leaving closes the book and puts it back on the shelf (see `stop`).
+    const toShelf = !returnTo && menu === "/";
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>
@@ -225,24 +247,37 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
           <GoodNight />
         ) : (
           <LeaveGame value={stop}>
-            <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+            <EndShown value={setEnded}>
+              <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+            </EndShown>
           </LeaveGame>
         )}
         {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         {/* The edge of the book's page round the picture (`book.css`). */}
         <div className="book-frame" aria-hidden />
-        <ExitButton
-          onExit={stop}
-          label={t({
-            de: "Zurück zum Menü",
-            ru: "Назад в меню",
-            en: "Back to menu",
-            zh: "返回菜单",
-            hi: "मेन्यू पर वापस",
-            es: "Volver al menú",
-            ar: "العودة إلى القائمة",
-          })}
-        />
+        {ended && !playtime.goodNight ? (
+          // At the end of a level the corner is the way back, as in a menu: one tap, held or not (the „Menü“ button it
+          // replaces was a tap too), and onto the shelf it is the book's ribbon, since the book closes and goes back.
+          <TapExit
+            onExit={stop}
+            shelf={toShelf}
+            label={
+              toShelf
+                ? t({
+                    de: "Zurück zum Bücherregal",
+                    ru: "Назад к книжной полке",
+                    en: "Back to the bookshelf",
+                    zh: "返回书架",
+                    hi: "किताबों की अलमारी पर वापस",
+                    es: "Volver a la estantería",
+                    ar: "العودة إلى رف الكتب",
+                  })
+                : backToMenu
+            }
+          />
+        ) : (
+          <ExitButton onExit={stop} label={backToMenu} />
+        )}
       </div>
     );
   }
@@ -496,13 +531,13 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   return leave === "hold" ? <HoldExit onExit={onExit} label={label} /> : <TapExit onExit={onExit} label={label} />;
 }
 
-/** The ✕ left with one tap. */
-function TapExit({ onExit, label }: { onExit: () => void; label: string }) {
+/** The ✕ left with one tap; `shelf` draws the book's ribbon instead, the way back onto the shelf. */
+function TapExit({ onExit, label, shelf = false }: { onExit: () => void; label: string; shelf?: boolean }) {
   return (
     <ExitCorner>
       <button
         type="button"
-        className="hold-exit"
+        className={shelf ? "hold-exit exit-ribbon" : "hold-exit"}
         aria-label={label}
         // Keeps the game from reacting to the tap on the button.
         onPointerDown={(e) => e.stopPropagation()}
@@ -510,7 +545,7 @@ function TapExit({ onExit, label }: { onExit: () => void; label: string }) {
         // A click, not pointer down: leaving on the way down would let the lifted finger tap the menu.
         onClick={onExit}
       >
-        <ExitSign />
+        {shelf ? <PageCornerArt sign="shelf" /> : <ExitSign />}
       </button>
     </ExitCorner>
   );

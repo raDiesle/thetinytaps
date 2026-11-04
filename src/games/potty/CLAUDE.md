@@ -13,7 +13,7 @@ grown-ups' buttons on the right next to it.
 
 The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both needs, since a child often can't tell beforehand.
 The game has no modes. Opening it (its tile on the home menu) starts the story at once (`GameShell`'s `startMode`); it has
-no start screen: ✕ and „Menü“ go back to the shelf, where the game stands as a book of its own. It opens on the first step, `eat`: Tapsi the fox
+no start screen: ✕ goes back to the shelf, where the game stands as a book of its own. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
 frames, moving at once).
 Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
@@ -32,9 +32,9 @@ The steps: eating and drinking, the bladder presses or the tummy rumbles (`need`
 unsure – before calling, nobody has said anything yet – Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows ❓),
 calling „Mama! Papa!“ – they come in together and stay in every picture from then on – into the bathroom together,
 trousers down, sit down, then the waiting, done (whatever the grown-up's ✓ chose is in the potty, the parents cheer),
-wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see below), then `GameEnd` with „Menü“ and „Nochmal“ only (one story, so „Weiter“
-would be „Nochmal“ again), small in the bottom corners (`GameEnd`'s `corners`: „Menü“ left, „Nochmal“ right, the party
-picture free between them), which starts a new round, unsure again. Only a tap within `TAP_GUARD_MS` of a step's start
+wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see below), then `GameEnd` with „Nochmal“ only (one story, so „Weiter“
+would be „Nochmal“ again), small in the bottom corner (`GameEnd`'s `corners`: „Nochmal“ bottom right, the party
+picture free beside it; the way back is the ribbon in the top left), which starts a new round, unsure again. Only a tap within `TAP_GUARD_MS` of a step's start
 sparkles (a double tap), and while sitting one while a thought still runs.
 
 When nothing comes, the „nichts“ next to the ✓ takes the other story (`NOTHING_STEPS`, `storyFor`, `At.nothing`):
@@ -136,7 +136,7 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   for what the child said); everything else there stays still, the child looks at the story.
 - A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way. The row
   is small and right at the bottom (the user's choice): it is for the grown-up, the picture is the story.
-- The end of the story keeps its picture free: „Menü“ and „Nochmal“ small in the bottom corners (`corners`), never big
+- The end of the story keeps its picture free: „Nochmal“ small in the bottom corner (`corners`), never big
   in the middle over the party.
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
   above the cards): „Muss mal!“ starts at once, what the child said is picked while Tapsi calls (💧, 💩, 💧💩)
