@@ -131,7 +131,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Gefühle erklärt – Alltagssituationen für Kleinkinder",
     description:
       "Wütend, traurig, ängstlich, fröhlich: Der kleine Bär erlebt Alltagssituationen zu Hause und in der Kita, und das Kind wählt, was hilft. Ohne Werbung.",
-    text: "Kleine Szenen vom Bären, nach Gefühlen geordnet: Er ist wütend, traurig, hat Angst oder freut sich, und das Kind wählt zwischen zwei Ideen, was hilft. Für Gespräche über Gefühle mit Kleinkindern.",
+    text: "Kleine Geschichten vom Bären, Tag für Tag vom Morgen bis zum Abend: Er ist wütend, traurig, hat Angst oder freut sich, und das Kind wählt zwischen zwei Ideen, was hilft. Die Szenen gibt es auch nach Gefühlen geordnet. Für Gespräche über Gefühle mit Kleinkindern.",
   },
   {
     path: "/wie-gehts-dir/",

@@ -1,12 +1,13 @@
 import type { QueuedPicture } from "@/content/pictureQueue";
 
 // The pictures of the days' pages of the story (`days.ts`, user idea, November 2026), as the picture queue takes them
-// until they are made (`/bild-erzeugen`, never made on your own). Each page shows a moment a little *before* the scene
+// until they are made (`/bild-erzeugen`, never made on your own); a made one leaves the list, its prompt kept in
+// `bilder/README.md` („Tagesgeschichten“). All 39 were made on 4 November 2026: a new page joins with `dayPage`. Each page shows a moment a little *before* the scene
 // it leads to, in that scene's place: so it is drawn from that scene's first picture (`firstImage`) as its only `--ref`,
 // keeping the place and the look of everyone, and only what the characters do changes – nothing has happened yet, all
 // are calm. The night that ends every day is the little bear's room at night. Plain data, with no picture imports, so
 // the management page that lists the queue doesn't load the game's pictures; `feelings.test.ts` checks that every page
-// has its entry here, drawn from its scene's first picture.
+// still to make has its entry here, drawn from its scene's first picture.
 
 const DIR = "src/games/feelings/bilder";
 
@@ -17,14 +18,17 @@ const EARLIER =
 /** The end of every page's prompt: calm and happy, no feeling of the scene yet. */
 const CALM = "Everyone is calm and content: nobody cries, nobody is angry or scared. No speech bubbles. No text, no letters.";
 
-/** A page before scene `scene` of day `day`, drawn from `ref` (the scene's first picture, without folder and .webp). */
-function page(day: number, scene: number, ref: string, use: string, cast: string, action: string): QueuedPicture {
+/**
+ * A page before scene `scene` of day `day`, drawn from `ref` (the scene's first picture, without folder and .webp):
+ * `cast` names everyone in it, `action` what they do. Ten of the first 39 got a double of someone („only ONE of each“).
+ */
+export function dayPage(day: number, scene: number, ref: string, use: string, cast: string, action: string): QueuedPicture {
   const id = `tag${day}-${scene}`;
   return {
     id,
     file: `${DIR}/${id}.webp`,
     use: `Gefühle, „Alltagssituationen“, Tag ${day}: ${use}`,
-    prompt: `${EARLIER} In the picture, each exactly once: ${cast}. Nobody else. Now this happens: ${action} ${CALM}`,
+    prompt: `${EARLIER} In the picture, each exactly once: ${cast}. Nobody else: only ONE of each in the whole picture, nobody more in a doorway, on the furniture or peeking in from an edge. Now this happens: ${action} ${CALM}`,
     aspect: "4:3",
     size: "1200x900",
     quality: 65,
@@ -34,334 +38,5 @@ function page(day: number, scene: number, ref: string, use: string, cast: string
   };
 }
 
-const BEAR = "the little bear";
-const BIG = "the big bear, a big brown grown-up bear";
-
-/** Every page of the days' stories and the night, still to make. */
-export const DAY_PICTURE_QUEUE: QueuedPicture[] = [
-  page(
-    1,
-    1,
-    "miss-passiert",
-    "Oma Bär ist zu Besuch",
-    `${BEAR}, ${BIG}, grandma bear`,
-    "Morning. Grandma bear sits at the table drinking from the flowery teacup; the little bear sits beside her and draws with the crayons, both smiling at each other. The big bear stands nearby, smiling. Outside the window the small red car is parked, empty. A small suitcase stands by the door.",
-  ),
-  page(
-    1,
-    2,
-    "grab-passiert",
-    "in den Kindergarten, zum Fuchs",
-    `${BEAR}, the fox, ${BIG}`,
-    "The big bear stands at the edge of the sandbox and waves goodbye; the little bear runs happily into the sandbox towards the fox, who sits in the sand and waves back. Exactly one red toy tractor in the whole picture, lying in the sand between them, nobody holds it.",
-  ),
-  page(
-    1,
-    3,
-    "fall-passiert",
-    "Fangen auf der Wiese",
-    `${BEAR}, the fox, the bunny, the little hedgehog`,
-    "No grown-ups. All four run across the grass playing tag, laughing; the little bear runs in front, the others after him. Nobody has fallen, no scrape.",
-  ),
-  page(
-    1,
-    4,
-    "broccoli-passiert",
-    "zum Abendessen",
-    `${BEAR}, the fox, ${BIG}`,
-    "The big bear puts a bowl of broccoli and potatoes in the middle of the table; the little bear and the fox climb onto their chairs, happy and hungry. Their plates are still empty.",
-  ),
-  page(
-    1,
-    5,
-    "baer-tired",
-    "der Fuchs wird abgeholt",
-    `${BEAR} in pyjamas, the fox in his coat`,
-    "Evening, the moon in the window. The fox stands at the open door of the room in his coat and waves goodbye; the little bear waves back, a little sleepy but smiling.",
-  ),
-  page(
-    2,
-    1,
-    "baer-angry",
-    "allein anziehen",
-    BEAR,
-    "Morning light. The little bear sits on the rug and proudly pulls on his trousers all by himself, smiling, determined. The pair of red shoes stands side by side on the rug beside him, not on yet.",
-  ),
-  page(
-    2,
-    2,
-    "bye-passiert",
-    "zusammen zum Kindergarten",
-    `${BEAR}, ${BIG}`,
-    "The big bear and the little bear come in through the door hand in hand; the little bear in his jacket looks around curiously.",
-  ),
-  page(
-    2,
-    3,
-    "new-passiert",
-    "der Fuchs wartet im Spielzimmer",
-    `${BEAR}, the fox`,
-    "The little bear comes in through the door; the fox sits with the colourful blocks on the rug and waves to him, happy. Nobody else stands at the door.",
-  ),
-  page(
-    2,
-    4,
-    "join-passiert",
-    "raus in den Sandkasten",
-    `${BEAR}, the fox, the bunny, the hedgehog`,
-    "No grown-ups. All four run to the sandpit with buckets and shovels, happy; the little bear runs behind the others. The sand is smooth, no sandcastle yet.",
-  ),
-  page(
-    2,
-    5,
-    "leave-passiert",
-    "der große Bär kommt zum Abholen",
-    `${BEAR}, ${BIG}`,
-    "The little bear slides down the slide, laughing, arms up. On the quiet street behind the fence the big bear walks towards the gate, pushing the small blue balance bike. The gate is still closed. Exactly one small red toy shovel in the sandpit.",
-  ),
-  page(
-    2,
-    6,
-    "hairwash-passiert",
-    "voller Sand in die Badewanne",
-    `${BEAR}, ${BIG}`,
-    "The little bear stands beside the bathtub, his fur dusty with sand, a little sand on the bath mat, grinning; the big bear kneels at the tub and lets water run in, a little foam on the water. The yellow rubber duck sits high up on the tile shelf. No foam on the little bear's head yet.",
-  ),
-  page(
-    3,
-    1,
-    "snow-passiert",
-    "aufgewacht, ins Wohnzimmer",
-    BEAR,
-    "Morning. The little bear in striped pyjamas has just come in through the door, sleepy, rubbing one eye, and hasn't looked at the window yet. Outside the first snowflakes fall.",
-  ),
-  page(
-    3,
-    2,
-    "cookie-passiert",
-    "der Fuchs kommt zum Aufwärmen",
-    `${BEAR}, the fox`,
-    "The fox comes in with rosy cheeks, a few snowflakes on his woolly hat and scarf; the little bear sits at the table and waves to him. Snow lies outside the window. On the table the little bear's plate with one whole round cookie and the cup of milk. The soft toy sits on the chair as before.",
-  ),
-  page(
-    3,
-    3,
-    "screen-passiert",
-    "eine Sendung schauen",
-    `${BEAR}, the fox`,
-    "The little bear and the fox climb onto the sofa side by side, happy and excited; the tablet on the low table shows bright colourful shapes, no letters. The wooden toy train stands on the rug.",
-  ),
-  page(
-    3,
-    4,
-    "night-passiert",
-    "schnell eingeschlafen",
-    BEAR,
-    "Late evening. The little bear lies flat in his bed fast asleep, tucked in, a soft smile, his small white plush bunny beside him. The night light glows softly. The coat stand in the corner throws no shadow; nothing spooky.",
-  ),
-  page(
-    4,
-    1,
-    "bored-passiert",
-    "Regen, der Fuchs ist zu Besuch",
-    `${BEAR}, the fox`,
-    "Rain streams down the big window. The little bear and the fox kneel side by side on the sofa, noses near the glass, watching the raindrops run down, curious. The big empty cardboard box and the two pots stand on the floor.",
-  ),
-  page(
-    4,
-    2,
-    "shy-passiert",
-    "der Fuchs geht nach Hause",
-    `${BEAR}, the fox in a raincoat, ${BIG}`,
-    "Rain outside the open front door. The fox in his raincoat waves goodbye in the doorway; the big bear stands beside the door. The little bear sits on the hallway floor with the small yellow toy car and waves to the fox, smiling. No visitor yet.",
-  ),
-  page(
-    4,
-    3,
-    "baby-passiert",
-    "das Bärenbaby wacht auf",
-    `${BEAR}, ${BIG}, the bear baby`,
-    "The bear baby lies in a little cradle beside the sofa and has just woken, stretching its arms; the big bear bends over the cradle, smiling at it. The little bear plays the toy drum on the rug. The rattle and the nappies lie on the rug.",
-  ),
-  page(
-    4,
-    4,
-    "pancake-passiert",
-    "der große Bär macht Pfannkuchen",
-    `${BEAR}, ${BIG}`,
-    "The big bear stands at the counter and stirs pancake batter in a big bowl; the little bear stands beside him on tiptoe and watches, interested and happy. The pan stands on the stove, empty. On the table the little bear's empty plate and two spoons.",
-  ),
-  page(
-    4,
-    5,
-    "baer-scared",
-    "draußen wird es dunkel",
-    BEAR,
-    "Evening, dark outside; heavy rain runs down the window, no lightning yet. The little bear in pyjamas sits on his bed and looks at the window, a little curious, holding his pillow. The little bear is the only character, seen whole. No hands, no arms come in from the edges.",
-  ),
-  page(
-    5,
-    1,
-    "vacuum-passiert",
-    "der große Bär räumt auf",
-    `${BEAR}, ${BIG}`,
-    "Morning. The big bear carries the vacuum cleaner into the living room, switched off, its cable rolled up on it; the little bear puts his toys into a box, cheerful. The small white plush bunny sits on the sofa.",
-  ),
-  page(
-    5,
-    2,
-    "jacket-passiert",
-    "zum Kinderarzt, die Jacke allein",
-    `${BEAR}, ${BIG}`,
-    "The big bear takes his coat from the hook by the front door; the little bear runs into the hallway carrying his red rain jacket in both arms, eager to put it on by himself. Both small rain boots stand side by side by the chest of drawers.",
-  ),
-  page(
-    5,
-    3,
-    "doctor-passiert",
-    "beim Kinderarzt dran",
-    `${BEAR}, ${BIG}, the doctor`,
-    "The doctor opens the door and smiles, a stethoscope round the neck; the big bear walks in holding the little bear's paw, and the little bear, holding his small white plush bunny, looks around curiously.",
-  ),
-  page(
-    5,
-    4,
-    "checkout-passiert",
-    "einkaufen",
-    `${BEAR}, ${BIG}, the cashier`,
-    "The big bear pushes the shopping trolley towards the checkout; the little bear sits in the child seat and holds the bunch of bananas, happy. The cashier smiles. The stand of lollipops is there as before; the little bear doesn't look at it.",
-  ),
-  page(
-    5,
-    5,
-    "dog-passiert",
-    "durch den Park nach Hause",
-    `${BEAR}, ${BIG}`,
-    "The big bear and the little bear walk along the park path side by side, content, the little bear swinging his arms. No dog anywhere. The stick lies on the path.",
-  ),
-  page(
-    5,
-    6,
-    "baer-sad",
-    "müde zu Hause",
-    BEAR,
-    "Evening light. The little bear has just come home and lets himself drop onto the rug, tired, yawning, his jacket half off. The little bear is the only character, seen whole. No hands, no arms come in from the edges.",
-  ),
-  page(
-    6,
-    1,
-    "baer-happy",
-    "Geburtstag!",
-    BEAR,
-    "Morning. The little bear in his pyjamas stands at the door and sees the birthday table for the first time: the balloons, the cake with its candles not lit yet; his mouth opens in a happy surprise. The party hat lies on the little table. The little bear is the only character, seen whole. No hands, no arms come in from the edges.",
-  ),
-  page(
-    6,
-    2,
-    "empathy-passiert",
-    "Luftballons für sich und den Fuchs",
-    `${BEAR}, the fox`,
-    "No grown-ups. The little bear comes in holding two balloons on strings, a red one and a blue one; the fox runs to him, delighted. Nothing has burst.",
-  ),
-  page(
-    6,
-    3,
-    "loud-passiert",
-    "der Kindergarten feiert ein Fest",
-    `${BEAR}, the fox, the bunny, the hedgehog`,
-    "No grown-ups. The four hang up paper garlands and balloons together, smiling; the small loudspeaker stands quiet. The cuddle cave stands in its corner as before.",
-  ),
-  page(
-    6,
-    4,
-    "startle-passiert",
-    "der Fuchs kommt, Geburtstagskuchen",
-    `${BEAR} in his party hat, the fox`,
-    "The little bear and the fox sit at the birthday table and smile at the cake with its burning candles. Four balloons are tied to the chairs, whole; the small half-blown green balloon lies on the table. Nothing bursts.",
-  ),
-  page(
-    6,
-    5,
-    "lost-passiert",
-    "Übernachtung, Schlafanzüge an",
-    `${BEAR}, the fox`,
-    "Evening. The little bear and the fox, both in pyjamas, do a little pyjama dance on the rug, laughing; the fox holds his own small plush dog. The bed is made. No plush bunny to be seen.",
-  ),
-  page(
-    7,
-    1,
-    "angry-passiert",
-    "die Bauklötze holen",
-    `${BEAR}, the fox`,
-    "No grown-ups. The little bear carries a big box of colourful blocks to the rug, happy; the fox sits on the rug and waits for him. No tower yet, no blocks on the floor.",
-  ),
-  page(
-    7,
-    2,
-    "oops-passiert",
-    "weiter im Spielzimmer",
-    `${BEAR}, the fox`,
-    "No grown-ups. The little bear kneels on the floor and plays with a small toy car, absorbed and happy; the fox plays with blocks in the background. The floor is dry.",
-  ),
-  page(
-    7,
-    3,
-    "slide-passiert",
-    "auf den Spielplatz",
-    `${BEAR}, the fox, the bunny`,
-    "No grown-ups. The three stand together on the grass in front of the slide, laughing and pointing at it. The slide and its ladder are empty.",
-  ),
-  page(
-    7,
-    4,
-    "kick-passiert",
-    "auf der Wiese",
-    `${BEAR}, the fox`,
-    "No grown-ups. The little bear and the fox play tag on the grass, laughing, a few steps apart.",
-  ),
-  page(
-    8,
-    1,
-    "want-passiert",
-    "alle spielen draußen",
-    `${BEAR}, the bunny`,
-    "No grown-ups. The bunny and the little bear come running out onto the playground, happy; the bunny carries the shiny red toy car in both paws. Exactly one red toy car.",
-  ),
-  page(
-    8,
-    2,
-    "push-passiert",
-    "zur Wiese mit dem Baum",
-    `${BEAR}, the fox`,
-    "No grown-ups. The little bear runs across the grass towards the big tree, happy, arms wide; the fox runs beside him, laughing.",
-  ),
-  page(
-    8,
-    3,
-    "stop-passiert",
-    "unter dem Baum ausruhen",
-    `${BEAR}, the fox`,
-    "No grown-ups. The little bear and the fox lie side by side in the grass under the tree, resting, smiling up at the sky.",
-  ),
-  page(
-    8,
-    4,
-    "proud-passiert",
-    "der große Bär kommt, Klettergerüst",
-    `${BEAR}, the fox, ${BIG}`,
-    "The big bear walks up, smiling; the little bear and the fox stand at the foot of the climbing frame's ladder and look up at the platform, excited. The platform is empty.",
-  ),
-  {
-    id: "tag-nacht",
-    file: `${DIR}/tag-nacht.webp`,
-    use: "Gefühle, „Alltagssituationen“: die letzte Seite jedes Tages, der kleine Bär schläft",
-    prompt:
-      "Redraw this exact picture late at night. Keep the room exactly as it is: the same walls, window, bed, furniture and toys at the same places, the same camera framing (no zoom, no shift), the same colours and line style. The little bear is the only character, seen whole. No hands, no arms come in from the edges. He lies flat in his bed, tucked in, fast asleep with a soft smile, head on the pillow; nothing hangs over the edge of the bed. The lamp is off; a big round moon and a few stars shine through the window, the room in soft dark blue. Peaceful and still. No speech bubbles, no sleeping letters, no text.",
-    aspect: "4:3",
-    size: "1200x900",
-    quality: 65,
-    ref: [`${DIR}/baer-tired-gut.webp`],
-    alone: "A page of a day's story, drawn from the bedroom's picture so the room stays the same",
-    date: "2026-11-04",
-  },
-];
+/** Every page of the days' stories and the night still to make (none now). */
+export const DAY_PICTURE_QUEUE: QueuedPicture[] = [];

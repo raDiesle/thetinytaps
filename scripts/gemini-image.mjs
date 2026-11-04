@@ -370,7 +370,9 @@ async function splitGrid(input, cols, rows, gapHex) {
   const gap = [0, 2, 4].map((i) => parseInt(gapHex.slice(i, i + 2), 16));
   const isGap = (x, y) => {
     const p = (y * w + x) * 3;
-    return Math.hypot(data[p] - gap[0], data[p + 1] - gap[1], data[p + 2] - gap[2]) < 110;
+    // Wide enough for the darker magenta the book's softened colours bring (198, 24, 147 left a band of gap on two
+    // pictures, November 2026); a cut still needs most of a whole row or column in it.
+    return Math.hypot(data[p] - gap[0], data[p + 1] - gap[1], data[p + 2] - gap[2]) < 150;
   };
   const columnGap = (x, y0 = 0, y1 = h) => {
     let n = 0;

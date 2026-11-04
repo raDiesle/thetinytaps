@@ -548,7 +548,7 @@ export const feelingsIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Acht Tage mit allen 39 Szenen (days.ts), nur Deutsch und noch nicht aufgenommen. Die 39 Bilder der Seiten der Geschichte warten in der Bilder-Queue; bis sie gemacht sind, zeigt die gebaute Seite nur „Nach Gefühlen“. Lücken im Tagesablauf füllen Szenen wie C-55 (Papa holt mich ab), C-56 (Badewanne), C-58 (Morgenmuffel), C-59 (Geschafft nach dem Kindergarten), C-61 (Auto), C-45 (Zu aufgeregt zum Schlafen) und C-39 (Freund geht heim) sowie C-69 bis C-72.",
+        "Acht Tage mit allen 39 Szenen (days.ts), nur Deutsch und noch nicht aufgenommen. Die 39 Bilder der Seiten sind gemacht (4. November 2026). Lücken im Tagesablauf füllen Szenen wie C-55 (Papa holt mich ab), C-56 (Badewanne), C-58 (Morgenmuffel), C-59 (Geschafft nach dem Kindergarten), C-61 (Auto), C-45 (Zu aufgeregt zum Schlafen) und C-39 (Freund geht heim) sowie C-69 bis C-72.",
     },
     {
       id: "C-69",
@@ -604,7 +604,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Vier Wetter decken nur froh, müde, traurig und wütend ab. Angst, Aufregung und Stolz kennen Kleinkinder genauso – und je feiner das Kind zeigen kann, wie es ihm geht, desto besser kann der Erwachsene darauf eingehen.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee (Sonne, Regenbogen, Wind, Schnee, Wolke, Regen, Gewitter, dunkler Wald) sind jetzt das Zeichen bei „Wie doll ist es?“ (C-36). Bis die Gesichtsbilder gemacht sind, zeigt die gebaute Seite die vier alten Wetterkarten.",
+        "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee (Sonne, Regenbogen, Wind, Schnee, Wolke, Regen, Gewitter, dunkler Wald) sind jetzt das Zeichen bei „Wie doll ist es?“ (C-36). Die Gesichtsbilder sind gemacht (4. November 2026).",
     },
     {
       id: "C-30",
@@ -614,7 +614,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Gesichter sind für Zweijährige leichter zu lesen als ein Wetter-Bild, und die Maskottchen kommen so auch hier als Familie vor.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Es fehlen die 16 Bilder (gesicht-…, in der Bilder-Queue) – bis dahin zeigt die gebaute Seite die vier Wetterkarten – und die Aufnahmen und Übersetzungen der neuen Sätze.",
+        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Die 16 Bilder sind gemacht (4. November 2026); es fehlen die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-31",
@@ -624,7 +624,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Es fehlen die fünf Bilder (bilder/README.md, „Geplant“) – bis dahin fragt die gebaute Seite noch nicht – und die Aufnahmen und Übersetzungen der neuen Sätze.",
+        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Die fünf Bilder sind gemacht (4. November 2026); es fehlen die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-32",

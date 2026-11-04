@@ -58,7 +58,7 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
   weather): a day keeps its weather (the snow day stays indoors after the snow, the rainy day ends in the storm) and a
   scene that needs something (the jacket) is not put where the scene before already did it.
 - A page's picture is the next scene's place a moment _earlier_, nothing has happened yet: drawn from that scene's first
-  picture (`firstImage`) as its only `--ref`, with the prompt start of `dayPictures.ts`, and queued there
+  picture (`firstImage`) as its only `--ref`, made with `dayPage` of `dayPictures.ts`, and queued there
   (`DAY_PICTURE_QUEUE`, `bilder/README.md` „Tagesgeschichten“; `feelings.test.ts` checks both).
 - A new scene gets its place in a day (or a new day) in the same commit, with its page. The built site shows a day only
   once all its pages' pictures and scenes are made (`playableDays`); with none, it shows no row and only the groups. When

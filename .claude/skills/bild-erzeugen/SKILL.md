@@ -36,7 +36,11 @@ sheet is full, and later sessions bring the partners.
 
 1. **Every picture asked for goes into `src/content/pictureQueue.ts` first** (id, file, German `use`, the prompt
    *without* the style block, aspect, size, `transparent`, `ref`, date; `alone` with the reason for a second frame or a
-   story picture that must keep its room – those never share a sheet).
+   story picture that must keep its room – those never share a sheet). A game may keep its prompts in its own folder
+   (`dayPictures.ts`, the Belohnungstafel's) and spread them in there; such a file is plain data, and when it or the
+   queue imports game data with `?glob`, the script needs the app's plugin first – a script or tool that loads game
+   data registers `appPlugin()` and then imports dynamically (`scripts/gemini-image.mjs`), never statically, or
+   `bun run image queue` fails on „Cannot find module './bilder/*.webp?glob'“.
 2. **`bun run image queue`** shows the plan (`src/content/pictureQueuePlan.ts`): *cheap now* are full sheets and
    pictures that never share one (no `size`, bigger than a panel, `alone`) – waiting saves nothing there; *waiting for
    partners* are sheets not yet full, together with older pictures already waiting there; *after their reference* are
@@ -136,7 +140,15 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
 - **Describe only the characters that are in the picture.** A shared character list in the prompt (or in the queue's
   `style`) with characters a picture doesn't have makes the model draw them anyway, „Nobody else“ notwithstanding: a
   baby in a high chair and the big bear turned up at a table and in a kindergarten that had neither. Put each
-  character's description into that picture's own prompt, with „Exactly N characters, each once: …“.
+  character's description into that picture's own prompt, with „Exactly N characters, each once: …“. Even then the
+  Lite model adds a double of one of them, most often in a doorway, on a sofa or at the edge: of 39 story pages drawn
+  with „each exactly once: … Nobody else“, ten had a second big bear, fox or bear child, a character in another look
+  (the dressed bunny as a plain rabbit) or one missing. Add „only ONE of each in the whole picture, nobody more in a
+  doorway, on the furniture or peeking in from an edge“, and count every character on every picture before keeping
+  it – a contact sheet of reference and result side by side makes that quick.
+- **A 1x2 or 2x2 sheet is cut where its gaps are magenta**: the book's softened colours sometimes darken the gap
+  (198, 24, 147), and a band of it stayed on two cards until the cut took darker magenta too (`splitGrid`). Look at
+  each piece's edges where the panels met; `--from .image-raw/<first>-grid1x2.png --grid 1x2 …` cuts again for free.
 - **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
   character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are
   drawn from the picture where it already does so, not from the place's first picture: from the empty room the

@@ -56,7 +56,7 @@ export const SEO_EN: SeoTranslation = {
     "/gefuehle/": {
       title: "Feelings for Toddlers – Everyday Situations",
       description: "Angry, sad, scared, happy: the little bear meets everyday situations at home and at daycare, and the child picks what helps. No ads.",
-      text: "Little scenes with the bear, sorted by feeling: he is angry, sad, scared or happy, and the child picks between two ideas what helps. For talking about feelings with toddlers.",
+      text: "Little stories of the bear, day by day from morning to night: he is angry, sad, scared or happy, and the child picks between two ideas what helps. The scenes also come sorted by feeling. For talking about feelings with toddlers.",
     },
     "/wie-gehts-dir/": {
       title: "How Are You? Showing Feelings for Toddlers",

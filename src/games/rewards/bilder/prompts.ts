@@ -160,7 +160,7 @@ const STEP_PROMPTS: PicturePrompt[] = ACTIVITIES.map((a) => ({
 /** What each ritual's card shows (H-58): Tapsi doing it with a grown-up beside it, as the book is read together. */
 const RITUAL_SCENES: Record<string, string> = {
   mutmachen: `${TAPSI} stands in front of a round mirror with ${MAMA} kneeling beside it; both hold one paw on their heart, and Tapsi's reflection in the mirror smiles bravely`,
-  erzaehlen: `${TAPSI}, a little backpack still on its back, sits on a sofa next to ${PAPA} and tells him something with lively paws; Papa listens with a warm smile`,
+  erzaehlen: `${TAPSI}, a little backpack still on its back, sits on a small blue sofa next to ${PAPA} and tells him something with lively paws; Papa listens with a warm smile`,
   wiegehts: `${TAPSI} points at a big picture card that shows a small sun and a small rain cloud side by side, ${MAMA} kneels beside it and listens kindly`,
   gutenacht: `${TAPSI} lies in its small bed under a yellow blanket, ${PAPA} sits on the edge of the bed and gently strokes its head, a crescent moon in the window, both smiling softly`,
 };
@@ -225,7 +225,7 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
     },
     {
       title: "Ritual-Karten",
-      note: "Freigestellt, 768 px: die Rituale des Tagesplans (H-58, C-33) – Tapsi mit Mama oder Papa. Warten in der Bilder-Warteschlange, bis sie günstig mit anderen erzeugt werden.",
+      note: "Freigestellt, 768 px: die Rituale des Tagesplans (H-58, C-33) – Tapsi mit Mama oder Papa, gemacht am 4. November 2026.",
       prompts: RITUAL_PROMPTS,
     },
     { title: "Belohnungen", note: "Freigestellt, 768 px: im Ziel-Feld groß und beim Fest bildschirmfüllend.", prompts: REWARD_PROMPTS },
