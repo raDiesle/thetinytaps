@@ -17,6 +17,9 @@ const MASCOT_DRAWINGS = [
   "src/games/marbles/CircusLevel.tsx",
   "src/games/timer/scenes.tsx",
   "src/games/teeth/TeethPlay.tsx",
+  "src/games/scenes/hideout.tsx",
+  "src/games/elevator/kid.tsx",
+  "src/games/socks/SocksPlay.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */

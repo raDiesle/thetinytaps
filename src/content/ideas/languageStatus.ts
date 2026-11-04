@@ -130,6 +130,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Mit 🔦 Taschenlampe und 🛣️ Straße malen (übersetzt am 3. November 2026).",
       },
+      {
+        label: "🦊🐻 Familie Fuchs und Familie Bär in den Verstecken",
+        languages: { de: "done" },
+        note: "„Da ist ja Familie Fuchs!“ und „Da ist ja Familie Bär!“ (4. November 2026), noch nicht übersetzt.",
+      },
     ],
   },
   {
