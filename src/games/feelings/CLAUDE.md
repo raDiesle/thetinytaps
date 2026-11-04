@@ -168,8 +168,10 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 for a little movement (`Frames` in `shared.tsx`): in the big picture while the scene is shown, on the cards while the
 child chooses. A picture the game asks for that is not made yet shows a placeholder with its
 file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
-with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first and then
-make it with `/bild-erzeugen`. A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
+with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first, and into the
+picture queue (`src/content/pictureQueue.ts`), where it waits to be made together with other sessions' pictures in one
+batch when the user asks (`/bild-erzeugen`) – never `--make` it yourself, not even when its sheet is full (user
+feedback, November 2026). A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
