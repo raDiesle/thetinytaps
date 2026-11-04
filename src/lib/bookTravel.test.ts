@@ -23,9 +23,9 @@ test("the games standing apart are books of their own, each found by its pages",
   for (const game of apart.filter((g) => !g.volumes)) for (const href of game.also ?? []) expect(shelfBookOf(href)).toBe(shelfBookOf(game.href));
 });
 
-// A game in a slipcase (Belohnungstafel & Zeitplan) has a book for each of its addresses: going back from a part puts
+// A game standing as several books (Belohnungstafel & Zeitplan) has a book for each of its addresses: going back from a part puts
 // that part's book back, not its neighbour.
-test("each volume in a slipcase is found by its own address", () => {
+test("each of a game's volumes is found by its own address", () => {
   const games = CATEGORIES.flatMap((c) => c.games).filter((g) => g.volumes);
   expect(games.length).toBeGreaterThan(0);
   for (const game of games) {

@@ -34,7 +34,7 @@ const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
  * The book on the shelf a page is in, by its `data-book`: its category's (its page and its games), a game's own, or the
- * volume of a game in a slipcase that the page opens (`Game.volumes`).
+ * volume of a game tied in a bundle that the page opens (`Game.volumes`).
  */
 export function shelfBookOf(pathname: string): string | undefined {
   const entry = shelfEntryOf(pathname);
@@ -79,10 +79,9 @@ function buildBook(book: HTMLElement) {
   const template = book.querySelector<HTMLElement>(".shelf-daily-book");
   const spine = template && book.querySelector<HTMLElement>(".box-front");
   const cover = book.querySelector<HTMLElement>(".shelf-book-cover");
-  // A book spine out leans on the shelf (alone or in its slipcase, `--lean`): measured standing up, it flies from there
-  // and straightens as it lifts, turning about the corner it leans on.
-  const leaning = spine && (book.closest<HTMLElement>(".shelf-slipcase") ?? book);
-  const { rect, lean, pivot } = spine && leaning ? upright(leaning, spine) : { rect: (cover ?? book).getBoundingClientRect(), lean: 0, pivot: null };
+  // A book spine out leans on the shelf (`--lean`): measured standing up, it flies from there and straightens as it
+  // lifts, turning about the corner it leans on.
+  const { rect, lean, pivot } = spine ? upright(book, spine) : { rect: (cover ?? book).getBoundingClientRect(), lean: 0, pivot: null };
   const copy = (template ?? book).cloneNode(true) as HTMLElement;
   copy.className = "shelf-book bt-book";
   copy.hidden = false;
@@ -111,8 +110,8 @@ function buildBook(book: HTMLElement) {
 }
 
 /**
- * Measures the spine `spine` as it would stand without the lean of `leaning` (the book or its slipcase), and the box of
- * `leaning` whose bottom left corner it leans on. The lean is taken off and put back before anything is drawn, and
+ * Measures the spine `spine` as it would stand without the lean of the book `leaning`, and the book's box, whose bottom
+ * left corner it leans on. The lean is taken off and put back before anything is drawn, and
  * without its transition, so nothing on the shelf moves.
  */
 function upright(leaning: HTMLElement, spine: HTMLElement) {
