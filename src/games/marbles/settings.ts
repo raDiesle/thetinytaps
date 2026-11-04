@@ -32,8 +32,8 @@ export interface MarbleSettings {
   /** Bell, xylophone, the knocks of falling things and the sounds along the marble run. */
   sounds: boolean;
   /**
-   * "join": the marble run's barrier waits for the child's tap and its switch stays where the child put it;
-   * "watch": the barrier stays open and the switch flips by itself after each marble, so nothing waits for a tap.
+   * "join": the marble run's barrier and the machines' stops wait for the child's tap, and the switch stays where the child put it;
+   * "watch": the barrier stays open, the switch flips by itself after each marble and the machines run straight through, so nothing waits for a tap.
    */
   play: "join" | "watch";
 }

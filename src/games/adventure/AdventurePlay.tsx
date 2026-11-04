@@ -59,7 +59,7 @@ export function AdventurePlay({
   language: TargetLanguage;
   settings: CommonSettings;
   /** The story „Weiter“ starts at the end. */
-  next: { emoji: string; name: string; onNext: () => void };
+  next: { name: string; onNext: () => void };
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);

@@ -31,7 +31,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Die Maschine hält an drei oder vier Stellen an. Dort leuchtet ein großer Knopf, Hebel oder eine Feder; ein Tipp, und der nächste Teil läuft. Ohne Tippen wartet sie geduldig. Eltern können es ausschalten, dann läuft alles am Stück.",
       why: "Aus Zuschauen wird Mitmachen: Das Kind ist der Funke für jeden Teil.",
       effort: "M",
-      partial: "In der Wasserbahn wartet die Ente an jedem Schleusentor, bis das Kind tippt. In den Maschinen fehlt es noch.",
+      done: true,
     },
     {
       id: "R-04",

@@ -1,4 +1,5 @@
 import { memo, useId, useMemo } from "react";
+import { MascotHead } from "@/components/Mascot";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BASKET,
@@ -987,7 +988,7 @@ function Cannon({ age }: { age: number }) {
   );
 }
 
-/** The clown doll, its middle `at`, turned `turn` degrees; `wave` counts the seconds since it landed. */
+/** The clown doll, a fox in a clown's suit, its middle `at`, turned `turn` degrees; `wave` counts the seconds since it landed. */
 function Clown({ at, turn, wave }: { at: Pt; turn: number; wave: number }) {
   const arm = wave > 0 ? -50 + 22 * Math.sin(wave * 9) : 0;
   return (
@@ -1010,13 +1011,11 @@ function Clown({ at, turn, wave }: { at: Pt; turn: number; wave: number }) {
       <circle cx="0" cy="2" r="5" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
       <circle cx="0" cy="18" r="5" fill="#3ec300" stroke={INK} strokeWidth="2" />
       <path d="M-28 -14 L-18 -22 L-8 -14 L2 -22 L12 -14 L22 -22 L30 -14 L22 -8 L-20 -8 Z" fill="#fff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
-      <circle cx="-26" cy={-CLOWN.head} r="12" fill="#00b4d8" stroke={INK} strokeWidth="2.5" />
-      <circle cx="26" cy={-CLOWN.head} r="12" fill="#00b4d8" stroke={INK} strokeWidth="2.5" />
-      <circle cx="0" cy={-CLOWN.head} r="26" fill="#ffe0bd" stroke={INK} strokeWidth="3" />
-      <circle cx="-9" cy={-CLOWN.head - 6} r="3.5" fill={INK} />
-      <circle cx="9" cy={-CLOWN.head - 6} r="3.5" fill={INK} />
-      <path d={`M-12 ${-CLOWN.head + 8} Q0 ${-CLOWN.head + 20} 12 ${-CLOWN.head + 8}`} stroke="#ff3b3b" strokeWidth="4" fill="none" strokeLinecap="round" />
-      <circle cx="0" cy={-CLOWN.head + 2} r="7" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
+      {/* A fox doll dressed as a clown (D-18): the app's fox head (components/Mascot.tsx) with the clown's red nose and hat. */}
+      <g transform={`translate(-35 ${-CLOWN.head - 39.2}) scale(0.7)`}>
+        <MascotHead kind="fox" mouth="open" />
+      </g>
+      <circle cx="0" cy={-CLOWN.head + 6.5} r="6" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
       <path
         d={`M-16 ${-CLOWN.head - 20} L0 ${-CLOWN.head - 62} L16 ${-CLOWN.head - 20} Z`}
         fill="#3ec300"

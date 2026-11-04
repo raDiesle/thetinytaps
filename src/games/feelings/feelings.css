@@ -705,66 +705,15 @@
   }
 }
 
-/* ---------- Again and next, as round picture buttons ---------- */
+/* ---------- Menü, Nochmal and Weiter (the shared `GameEnd`, inline) in the cards' room ---------- */
 
-/* Three round buttons in a row: as big as the cards allow, and never wider than the room for the cards. */
-.fg-end {
-  --end-gap: clamp(14px, 3cqmin, 40px);
-  --end-room: calc(100cqw - 2 * var(--pad));
-  --end-size: min(var(--card-w) * 0.8, 210px, (var(--end-room) - 2 * var(--end-gap)) / 2.5);
-
-  display: flex;
-  align-items: center;
-  gap: var(--end-gap);
-  animation: pop-in 0.4s var(--pop);
+/* Never wider than the room for the cards. */
+.story-play .game-end-button {
+  font-size: min(clamp(1.15rem, 5.6vh, 1.9rem), var(--card-w) / 11);
 }
 
-.fg-round {
-  display: grid;
-  place-items: center;
-  width: var(--size);
-  height: var(--size);
-  padding: 0;
-  border: var(--outline);
-  border-radius: 50%;
-  box-shadow: 0 6px 0 var(--ink);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.fg-round:active {
-  translate: 0 4px;
-  box-shadow: 0 2px 0 var(--ink);
-}
-
-.fg-round svg {
-  width: 54%;
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* Back to the menu and playing it again are the quieter choices. */
-.fg-round.menu,
-.fg-round.again {
-  --size: calc(var(--end-size) * 0.75);
-  background: #fff;
-}
-
-/* Going on is big, yellow and calls. */
-.fg-round.next {
-  --size: var(--end-size);
-  background: var(--sunshine);
-  animation: fg-call 1.8s ease-in-out infinite;
-}
-
-.fg-round.next svg {
-  width: 50%;
-  margin-left: 8%;
-  fill: var(--ink);
-  stroke-width: 2;
+.story-play .game-end-button.next {
+  font-size: min(clamp(2.1rem, 13vh, 4.6rem), var(--card-w) / 6.5);
 }
 
 /* ---------- Wide screens: picture left, cards right ---------- */
@@ -794,17 +743,19 @@
     padding: max(var(--pad), env(safe-area-inset-top)) max(var(--pad), env(safe-area-inset-right)) max(var(--pad), env(safe-area-inset-bottom)) var(--pad);
   }
 
-  /* The cards stand one above the other, so the round buttons do too, as high as the screen allows. */
-  .story-play .fg-end {
-    --end-room: calc(100cqh - 2 * var(--pad));
+  /* The cards stand one above the other: „Weiter“ on top, „Menü“ and „Nochmal“ side by side below it. */
+  .story-play .game-end {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
 
-    flex-direction: column;
+  .story-play .game-end-small {
+    flex-direction: row;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .story-play .fg-card,
-  .story-play .fg-round,
   .story-play .fg-frame,
   .story-play .fg-picture {
     animation: none;

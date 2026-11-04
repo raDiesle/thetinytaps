@@ -1,3 +1,4 @@
+import { GameEnd } from "@/components/GameEnd";
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { useAppLanguage } from "@/lib/language";
 import type { Feeling, FeelingId } from "./bear";
@@ -7,7 +8,6 @@ import type { FeelingsSettings } from "./settings";
 import {
   CHEER_MS,
   ChoiceCard,
-  EndButtons,
   FloaterLayer,
   OOPS_MS,
   StepDots,
@@ -229,7 +229,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
       </main>
       <footer className="story-choices">
         {happy ? (
-          <EndButtons onAgain={startFeeling} onNext={onNext} />
+          <GameEnd inline onAgain={startFeeling} next={{ onNext }} />
         ) : (
           // The not-so-good idea always on the left, the kind thing on the right.
           <>

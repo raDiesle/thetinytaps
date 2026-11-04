@@ -4,7 +4,7 @@ import { playEngine, playHonk, playMoo, playRing } from "@/lib/realSounds";
 import { playChime, playClick, playDoorbell, playPageTurn, playPlop, playPop, playRustle } from "@/lib/sfx";
 import { Kid, KidHead, type Look, type Pose, useHero } from "../kid";
 import type { Picture } from "../trail/items";
-import type { Point } from "../trail/types";
+import type { Cue, Point } from "../trail/types";
 import { Go, route } from "./move";
 import { Grownup } from "./people";
 import { BackHouse, Outdoors, Road, RoundTree } from "./places";
@@ -357,7 +357,24 @@ const PHONE_ICON = pic(200, 200, () => (
     <Phone />
   </g>
 ));
-const LETTER_ICON = pic(240, 160, () => <Letter s={2.6} />);
+/** The crayon each picture is painted with. */
+const ART_CRAYON: Record<Art, string> = { sonne: "#fab005", blume: "#e64980", regenbogen: "#7950f2" };
+/** A choice's card: a close-up of the table with the picture as the child will paint it, its crayon beside it. */
+const artCard = (art: Art): Picture =>
+  pic(420, 320, () => (
+    <g>
+      <rect x="-210" y="-160" width="420" height="320" fill="#e8b678" />
+      <path d="M-210 -60 H210 M-210 60 H210" stroke="#c08552" strokeWidth="4" />
+      <g transform="translate(-20 0) rotate(-3)">
+        <Sheet art={art} w={300} h={240} />
+      </g>
+      <g transform="translate(160 70) rotate(-35)">
+        <rect x="-10" y="-80" width="20" height="74" rx="6" fill={ART_CRAYON[art]} stroke={INK} strokeWidth="3" />
+        <path d="M-10 -6 L0 16 L10 -6 Z" fill="#ffe8cc" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      </g>
+    </g>
+  ));
+const ART_CARD: Record<Art, Picture> = { sonne: artCard("sonne"), blume: artCard("blume"), regenbogen: artCard("regenbogen") };
 
 const ART_SAY: Record<Art, string> = {
   sonne: "Eine Sonne!",
@@ -471,6 +488,8 @@ const home: Scene = {
     options: (["sonne", "blume", "regenbogen"] as Art[]).map((art, i) => ({
       id: art,
       picture: ART_ICON[art],
+      card: ART_CARD[art],
+      sounds: [[0, playRustle]] as Cue[],
       at: [560 + i * 240, 300] as Point,
       r: 110,
       sign: true,
@@ -1032,7 +1051,6 @@ const call: Scene = {
 export const BRIEF: Film = {
   id: "brief",
   title: "Ein Brief für Oma",
-  picture: LETTER_ICON,
   end: "Was für ein schöner Brief!",
   scenes: (picks) => (picks[0] ? [home, paint, postbox, field, atOma, call] : [home]),
 };

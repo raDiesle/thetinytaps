@@ -50,7 +50,7 @@ import {
 } from "./building";
 import { deg, rad } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
-import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
+import { CabDriver, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
 import { BAR_COLORS, Ball } from "./parts";
 
@@ -755,12 +755,10 @@ function Excavator({ machine, t }: { machine: Building; t: number }) {
         {[0, 1, 2].map((k) => (
           <line key={k} x1="-94" y1={-58 + k * 13} x2="-58" y2={-58 + k * 13} stroke="#3b4a5c" strokeWidth="4" strokeLinecap="round" />
         ))}
-        {/* The cab with its driver */}
+        {/* The cab with its driver, a fox or a bear */}
         <rect x="-22" y="-152" width="68" height="84" rx="9" fill={YELLOW} stroke={INK} strokeWidth="4" />
         <rect x="-12" y="-142" width="48" height="44" rx="6" fill="#bde9ff" stroke={INK} strokeWidth="2.5" />
-        <circle cx="14" cy="-112" r="10" fill="#c98a4b" stroke={INK} strokeWidth="2" />
-        <path d="M2 -116 Q14 -134 26 -116 Z" fill={ORANGE} stroke={INK} strokeWidth="2" />
-        <circle cx="18" cy="-111" r="1.8" fill={INK} />
+        <CabDriver cx={14} cy={-112} kind="fox" hat="#ffd23f" />
         <path d="M-6 -136 l14 -2" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
         {/* The arm: cylinder, boom, stick and scoop */}
         <line x1="36" y1="-24" x2={lift.x} y2={lift.y} stroke="#4a4a5e" strokeWidth="9" strokeLinecap="round" />
@@ -855,9 +853,7 @@ function Roller({ machine, t }: { machine: Building; t: number }) {
         ))}
         <rect x="-132" y="-120" width="28" height="20" rx="4" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
         <rect x="-124" y="-146" width="22" height="28" rx="6" fill={ORANGE} stroke={INK} strokeWidth="2.5" />
-        <circle cx="-112" cy="-156" r="11" fill="#c98a4b" stroke={INK} strokeWidth="2" />
-        <path d="M-125 -160 Q-112 -178 -99 -160 Z" fill="#fff" stroke={INK} strokeWidth="2" />
-        <circle cx="-107" cy="-155" r="1.8" fill={INK} />
+        <CabDriver cx={-112} cy={-156} r={11} kind="bear" hat="#fff" />
         <path d="M-98 -128 L-84 -116" stroke={INK} strokeWidth="4" strokeLinecap="round" />
         <ellipse cx="-84" cy="-116" rx="9" ry="3" fill="#4a4a5e" stroke={INK} strokeWidth="2" />
         {[-160, -64].map((px) => (
@@ -1005,12 +1001,10 @@ function Crane({ drop }: { drop: number }) {
       {[0, 1].map((k) => (
         <rect key={k} x={back + 6 + k * 48} y={jibY + 4} width="44" height="96" rx="4" fill="#b9bdd6" stroke={INK} strokeWidth="3" />
       ))}
-      {/* The cab with its driver */}
+      {/* The cab with its driver, a fox or a bear */}
       <rect x={x + 28} y={jibY + 4} width="78" height="66" rx="8" fill={YELLOW} stroke={INK} strokeWidth="3" />
       <rect x={x + 40} y={jibY + 14} width="54" height="34" rx="5" fill="#bde9ff" stroke={INK} strokeWidth="2.5" />
-      <circle cx={x + 67} cy={jibY + 38} r="10" fill="#c98a4b" stroke={INK} strokeWidth="2" />
-      <path d={`M${x + 55} ${jibY + 33} Q${x + 67} ${jibY + 16} ${x + 79} ${jibY + 33} Z`} fill="#ffd23f" stroke={INK} strokeWidth="2" />
-      <circle cx={x + 70} cy={jibY + 39} r="1.8" fill={INK} />
+      <CabDriver cx={x + 67} cy={jibY + 38} kind="bear" hat={ORANGE} />
       {/* The rope up the mast, along the jib and down to the hook */}
       <path
         d={`M${TOP_PULLEY.x} ${TOP_PULLEY.y - TOP_PULLEY.r} L${TROLLEY_X} ${TOP_PULLEY.y - TOP_PULLEY.r + 32} L${TROLLEY_X} ${hookY - 22}`}

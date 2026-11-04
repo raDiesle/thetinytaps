@@ -1,6 +1,6 @@
 import type { CSSProperties, HTMLAttributes } from "react";
 import { SITE_NAME } from "@/content/seo";
-import { BRIGHT_COLORS } from "./Bursts";
+import { BRIGHT_COLORS } from "./TapFeedback";
 import pictures from "./bilder/*.webp?glob";
 
 /** Papa Fox and his child (Gemini, `bilder/`), drawn sitting on Georgia's bold o, which was then cut out of the picture. */

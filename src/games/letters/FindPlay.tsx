@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { KeyboardMap } from "@/components/KeyboardMap";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
@@ -7,11 +7,11 @@ import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playRandomNote } from "@/lib/sfx";
-import { speak } from "@/lib/speech";
 import { LetterWord } from "./Cards";
+import { useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 
-/** Keys closer together than this only spawn shapes, so mashing the whole keyboard doesn't count as finding. */
+/** Keys closer together than this only make ripples, so mashing the whole keyboard doesn't count as finding. */
 const MIN_PRESS_MS = 300;
 /** Time to enjoy a found key before the next letter comes by itself – one right key is all it takes. */
 const CELEBRATE_MS = 1500;
@@ -54,7 +54,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const [wrong, setWrong] = useState(0);
   const [found, setFound] = useState(false);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
 
   const lastPress = useRef(0);
   const nextId = useRef(0);
@@ -64,19 +64,14 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const letters = useMemo(() => findableLetters(pack, settings.theme), [pack, settings.theme]);
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
-    },
-    [settings.speech, pack.speechLang],
-  );
+  const say = useLettersSay();
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   // Cycle through the letter's words, so a letter that comes again has a new picture.
@@ -128,12 +123,12 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
     (key: string) => {
       if (!current) return;
       if (found) {
-        funBurst();
+        softTap();
         return;
       }
       const now = performance.now();
       if (now - lastPress.current < MIN_PRESS_MS) {
-        funBurst();
+        softTap();
         return;
       }
       lastPress.current = now;
@@ -141,15 +136,16 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       if (keyMatches(key, current.letter.upper, pack)) {
         setFound(true);
         if (settings.sounds) playChime();
-        say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
-        for (let i = 0; i < 8; i++) spawn();
+        say(pack.letterSentence(current.letter, current.word));
+        say(pick(pack.praise), true);
+        celebrate();
         return;
       }
-      funBurst();
+      softTap();
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, say, spawn, funBurst, settings.sounds],
+    [current, found, wrong, pack, say, celebrate, softTap, settings.sounds],
   );
 
   useEffect(() => {
@@ -166,12 +162,12 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
 
   // Tapping the card asks again.
   const onPlayAreaPointer = (e: PointerEvent) => {
-    funBurst(e.clientX, e.clientY);
+    softTap(e.clientX, e.clientY);
   };
   const onCardPointer = (e: PointerEvent) => {
     e.stopPropagation();
     if (current && !found) say(pack.findPrompt(current.letter));
-    funBurst(e.clientX, e.clientY);
+    softTap(e.clientX, e.clientY);
   };
 
   const glyphs = current
@@ -203,7 +199,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       ) : (
         settings.hints && <KeyboardMap rows={pack.keyboardRows} highlight={current?.letter.upper} visible={showHint} />
       )}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

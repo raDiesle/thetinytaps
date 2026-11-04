@@ -1,5 +1,6 @@
 // Drawings the machines share: ink and wood colours, and things on the wall.
 
+import { MascotHead } from "@/components/Mascot";
 import { BAR_COLORS } from "./parts";
 
 export const INK = "#2a1e5c";
@@ -103,6 +104,24 @@ export function Sparkles({ x, y, age, n = 10, spread = 220 }: { x: number; y: nu
           />
         );
       })}
+    </g>
+  );
+}
+
+/**
+ * A fox's or a bear's head in a machine's cab, round `r` at (cx, cy), looking right under a hard hat of colour `hat`:
+ * the app's mascots drive the machines (D-18).
+ */
+export function CabDriver({ cx, cy, r = 10, kind, hat }: { cx: number; cy: number; r?: number; kind: "fox" | "bear"; hat: string }) {
+  // The app's one fox and bear head (components/Mascot.tsx), its 100 × 100 box scaled so the head is about `r` round.
+  const k = r / 10;
+  return (
+    <g transform={`translate(${cx} ${cy}) scale(${k})`}>
+      <g transform="translate(-14 -16) scale(0.28)">
+        <MascotHead kind={kind} />
+      </g>
+      <path d="M-11 -6 Q0 -23 11 -6 Z" fill={hat} stroke={INK} strokeWidth="2" />
+      <path d="M-13 -6 H13" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
     </g>
   );
 }

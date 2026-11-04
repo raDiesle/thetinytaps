@@ -44,17 +44,9 @@ export function MarbleGame() {
       mode={mode}
       onMode={(levels) => update({ levels: levels as MarbleLevel })}
       level={
-        // For all levels; so far only the marble run has something that waits for a tap (the barrier, K-02) or is set by the child (the switch, K-01).
+        // For all levels: whether what waits for a tap waits – the marble run's barrier (K-02) and switch (K-01), the machines' stops (R-03).
         <Choice<MarbleSettings["play"]>
-          label={t({
-            de: "Schranke und Weiche",
-            en: "Barrier and switch",
-            zh: "栏杆和道岔",
-            hi: "फाटक और कांटा",
-            es: "Barrera y desvío",
-            ar: "الحاجز والمحوّلة",
-            ru: "Шлагбаум и стрелка",
-          })}
+          label={t({ de: "Mitmachen" })}
           value={settings.play}
           onChange={(play) => update({ play })}
           options={[

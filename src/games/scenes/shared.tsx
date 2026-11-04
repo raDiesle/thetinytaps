@@ -1,4 +1,5 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { MascotHead } from "@/components/Mascot";
 
 // Drawing helpers shared by all scenes. Everything is drawn in absolute scene coordinates (1600 × 1000),
 // so the transform-origin of an animated part is simply its pivot point in the picture.
@@ -118,54 +119,22 @@ export function Rider({
   );
 }
 
-const FOX_FUR = "#e8743b";
-const BEAR_FUR = "#a0663a";
-
 /** A fox or bear rider, the same size as a person's head so it fits every window; a cap sits small between the ears. */
 function MascotRider({ cx, cy, shirt, cap, animal }: { cx: number; cy: number; shirt: string; cap?: string; animal: Mascot }) {
-  const fox = animal === "fox";
-  const fur = fox ? FOX_FUR : BEAR_FUR;
-  // The head is drawn in a 100 × 100 box like the fox and bear heads elsewhere, then scaled to a person's head.
-  const head = `translate(${cx - 19} ${cy - 21.5}) scale(0.38)`;
+  // The app's one fox and bear head (components/Mascot.tsx), drawn without its line like the people here, scaled to a person's head.
+  const head = `translate(${cx - 19} ${cy - 21}) scale(0.38)`;
   return (
     <>
       <rect x={cx - 15} y={cy + 11} width="30" height="22" rx="8" fill={shirt} />
       <g transform={head}>
-        {fox ? (
-          <>
-            <path fill={fur} d="M17 50 L21 9 L45 29 Z M83 50 L79 9 L55 29 Z" />
-            <path fill="#f7c9a8" d="M24 39 L26 18 L38 30 Z M76 39 L74 18 L62 30 Z" />
-            <path fill={fur} d="M13 52 C13 31 31 24 50 24 C69 24 87 31 87 52 C87 72 69 90 50 92 C31 90 13 72 13 52 Z" />
-            <path fill="#fff6ec" d="M21 61 C33 58 44 63 50 73 C56 63 67 58 79 61 C75 78 63 90 50 92 C37 90 25 78 21 61 Z" />
-          </>
-        ) : (
-          <>
-            <circle fill={fur} cx="22" cy="32" r="12" />
-            <circle fill={fur} cx="78" cy="32" r="12" />
-            <circle fill="#e3b98a" cx="22" cy="32" r="6" />
-            <circle fill="#e3b98a" cx="78" cy="32" r="6" />
-            <circle fill={fur} cx="50" cy="57" r="35" />
-            <ellipse fill="#e3b98a" cx="50" cy="72" rx="16" ry="12" />
-          </>
-        )}
-        {cap && (
-          <>
-            <path fill={cap} d="M27 38 C27 12 73 12 73 38 Z" />
-            <path fill={cap} d="M22 40 Q50 31 78 40 Q50 46 22 40 Z" />
-          </>
-        )}
-        <circle fill="#2b2d42" cx="37" cy="53" r="4.6" />
-        <circle fill="#2b2d42" cx="63" cy="53" r="4.6" />
-        <circle fill="#fff" cx="38.5" cy="51.5" r="1.4" />
-        <circle fill="#fff" cx="64.5" cy="51.5" r="1.4" />
-        <ellipse fill="#2b2d42" cx="50" cy={fox ? 72 : 66} rx="5.4" ry="3.8" />
-        <path
-          d={fox ? "M50 76 V79 M45 81 Q50 84 55 81" : "M50 70 V74 M44 76 Q50 80 56 76"}
-          fill="none"
-          stroke="#2b2d42"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
+        <MascotHead kind={animal} outline={false}>
+          {cap && (
+            <>
+              <path fill={cap} d="M29 34 C29 10 71 10 71 34 Z" />
+              <path fill={cap} d="M24 36 Q50 27 76 36 Q50 42 24 36 Z" />
+            </>
+          )}
+        </MascotHead>
       </g>
     </>
   );

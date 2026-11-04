@@ -149,8 +149,9 @@ make it with `/bild-erzeugen`. A new story (`selbst.ts`) whose pictures are stil
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Menü“ (four cards like the start screen),
-„Nochmal“ and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
+with a green tick or red cross, so children can choose without reading; „Menü“, „Nochmal“ and „Weiter“ at a story's
+end are the shared `GameEnd` (`inline`, in the cards' room), words only like in every game – the round picture buttons
+it had were taken out (user feedback, November 2026). Timing of a story's beats and its sounds in
 `story.ts`.
 
 The big picture and the cards keep one size for the whole story – nothing grows or
@@ -160,7 +161,7 @@ for the cards out from the screen alone (cq units of `.story-play`), the picture
 all that is left; home and kindergarten share one layout. Upright: the picture as wide as
 the screen on top, the two cards below side by side, on tall phones one above the other.
 Wide screens: the picture left, the cards right one above the other, about a third of the
-width. The small cards of the happy end and the round buttons fit into the same room.
+width. The small cards of the happy end and the end buttons fit into the same room.
 Nothing keeps room free for the ✕ (and the fullscreen button) or the step dots: they lie on
 top of the pictures. On low screens (phones on their side, ≤ 560 px high) the captions sit on
 the pictures' lower edge instead of below them. Look at 844×390 and 1024×768 after a change.

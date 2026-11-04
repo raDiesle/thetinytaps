@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { BurstLayer, useBursts } from "@/components/Bursts";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playDing, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
 import { playGiggle } from "@/lib/realSounds";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
-import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
+import { Backdrop, Buttons, CabinBack, CabinFront, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose, useHero } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
 import { sayIn } from "./voice";
@@ -125,7 +125,7 @@ export function ElevatorPlay({
   const hero = useHero();
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(START);
-  const { bursts, spawn } = useBursts();
+  const { effects, ripple, celebrate } = useTapFeedback();
 
   // A story is a script of waits; starting another one (or leaving) bumps the generation and drops its timers.
   const generation = useRef(0);
@@ -357,7 +357,7 @@ export function ElevatorPlay({
       put({ party: true, cleared: true });
       sound(playMelody);
       say(texts.party);
-      for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
+      celebrate();
       later(1200, () => {
         put((v) => ({ playing: null, used: [...v.used, last.prop] }));
         (["hero", "buddy"] as Who[]).forEach((who) => actor(who, { pose: "cheer", hidden: false }));
@@ -404,12 +404,12 @@ export function ElevatorPlay({
     sound(playGiggle);
   };
 
-  const funBurst = useCallback(
+  const softTap = useCallback(
     (x?: number, y?: number) => {
-      spawn(x, y);
+      ripple(x, y);
       if (settings.sounds) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [ripple, settings.sounds],
   );
 
   // The story picked on the start screen begins at once; „Nochmal“ and „Weiter“ come after it.
@@ -418,7 +418,7 @@ export function ElevatorPlay({
   }, []);
 
   // 1–4 fetch the lift or do the move in the room, arrows ride one floor up or down, any key at the end goes on to the next story,
-  // and any other key – or any key while a move does itself – makes a burst.
+  // and any other key – or any key while a move does itself – makes a ripple.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
@@ -428,11 +428,11 @@ export function ElevatorPlay({
         if (v.story) onPick(nextCard(v.story.id).id);
         return;
       }
-      if (v.task && v.call === null) funBurst();
+      if (v.task && v.call === null) softTap();
       else if (Number.isInteger(digit) && digit >= 1 && digit <= FLOORS) press(digit - 1);
       else if (e.key === "ArrowUp") press(Math.min(FLOORS - 1, v.cabin + 1));
       else if (e.key === "ArrowDown") press(Math.max(0, v.cabin - 1));
-      else funBurst();
+      else softTap();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -449,7 +449,7 @@ export function ElevatorPlay({
   });
 
   return (
-    <div className={`elevator-play weather-${weather}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className={`elevator-play weather-${weather}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <svg className="el-svg" viewBox={`${VIEW_L} 0 ${VIEW_W - VIEW_L} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
         <WeatherContext.Provider value={weather}>
           <Backdrop weather={weather} />
@@ -501,14 +501,13 @@ export function ElevatorPlay({
                 </g>
               )}
               <rect className={`el-night${view.night ? " on" : ""}`} x="-4000" y="-4000" width={VIEW_W + 8000} height={VIEW_H + 8000} fill="#0b1340" />
-              {view.party && <Confetti />}
             </>
           )}
         </WeatherContext.Provider>
       </svg>
 
       {view.picking && story && <StoryEnd id={story.id} onPick={onPick} />}
-      <BurstLayer bursts={bursts} />
+      <FeedbackLayer effects={effects} />
     </div>
   );
 }

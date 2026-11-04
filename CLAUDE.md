@@ -185,6 +185,13 @@ In a fresh worktree run `bun install` first.
   step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
   that gets its fox or bear marks it there in the same commit, and a new game or picture adds its row or task.
   Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
+  **Every fox or bear drawn in SVG has the one shared head** (`MascotHead`, or the whole `Mascot`, in
+  `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
+  pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
+  in the ears, the far side of the fur in shadow, brows, eyes with two lights, a shiny nose. Never a head of its own
+  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Hats, bows and glasses go
+  in as its `children`, clothes and bodies round it in its colours and line; a better fox or bear is made there, so
+  every game gets it. Toys (a teddy), wild animals of a scene and tiny patterns stay drawn on their own. `Mascot.test.ts` checks.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
@@ -194,6 +201,13 @@ In a fresh worktree run `bun install` first.
 ## Rules for every game (toddlers play alone)
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
+  The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
+  a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world
+  (Lebendige Bilder's `spots`) – in the menus, start screens and on the bookshelf too (`MenuRipples`, mounted once in
+  `index.tsx`, which leaves out what answers by itself and the grown-ups' pages); a tap that sets something off gets a warm light where the finger was (`glow`) and the
+  thing itself answers – never a random shape. Something done is celebrated calmly (`celebrate`): a few hearts, stars
+  and notes rise slowly while everyone in the picture cheers – never a storm of confetti, shapes or fast movement
+  (circles, triangles and squares popping up fitted neither, and were removed). `tapFeedback.test.ts` keeps it calm.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
   feedback, November 2026): the sound says it, and what floats up is a music note (♪ ♫), a heart or a puff. Signs that
@@ -373,15 +387,21 @@ In a fresh worktree run `bun install` first.
   or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). A tool for the day
   rather than a game (the Timer, like the Belohnungstafel) counts no play time and still opens when it is over:
   `GameShell tool` and its address in `PlaytimeLock`.
-- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
-  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book; its picture is four cards,
-  `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
-  the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Menü“ (back to the
+  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book),
+  „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
+  the first, so there is always one). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+  and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
+  a big painted label taped onto the page, „Menü“ and „Nochmal“ two smaller paper slips stacked beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
-  wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
-  it has a use for, just as big. Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
+  wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's
+  cards' room, Zähne putzen's week chart) passes `inline` (user feedback, November 2026; `GameEnd.test.ts`). Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
+  Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
+  `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
+  already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
+  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own.
 
 ## Architecture
 
