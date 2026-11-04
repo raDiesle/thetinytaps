@@ -18,17 +18,30 @@ export const PRINT_WORDS = {
   auto: { de: "Passend", en: "Automatic", zh: "自动", hi: "अपने-आप", es: "Automática", ar: "تلقائي", ru: "Автоматически" },
   landscape: { de: "Quer", en: "Landscape", zh: "横向", hi: "आड़ा", es: "Horizontal", ar: "أفقي", ru: "Альбомная" },
   portrait: { de: "Hochkant", en: "Portrait", zh: "纵向", hi: "खड़ा", es: "Vertical", ar: "عمودي", ru: "Книжная" },
-  color: {
-    de: "In Farbe (aus: Schwarz-weiß, spart Tinte)",
-    en: "In color (off: black and white, saves ink)",
-    zh: "彩色（关闭：黑白，省墨）",
-    hi: "रंगीन (बंद: श्वेत-श्याम, स्याही बचती है)",
-    es: "En color (desactivado: blanco y negro, ahorra tinta)",
-    ar: "بالألوان (عند الإيقاف: أبيض وأسود لتوفير الحبر)",
-    ru: "В цвете (выкл.: чёрно-белая, экономит чернила)",
-  },
+  ink: { de: "Druck" },
+  color: { de: "🎨 In Farbe" },
+  colorIn: { de: "🖍️ Schwarz-weiß zum Ausmalen – spart Tinte" },
   now: { de: "Jetzt drucken", en: "Print now", zh: "立即打印", hi: "अभी प्रिंट करें", es: "Imprimir ahora", ar: "الطباعة الآن", ru: "Печатать" },
 } satisfies Record<string, Localized>;
+
+/**
+ * Colour or black and white, as two choices side by side rather than a switch: the black-and-white print is no grey copy
+ * but every picture's twin drawn to colour in, so it is named for what it gives (user feedback, November 2026).
+ */
+export function InkChoice({ color, onChange }: { color: boolean; onChange: (color: boolean) => void }) {
+  const t = useT();
+  return (
+    <Choice
+      label={t(PRINT_WORDS.ink)}
+      value={color ? "color" : "lines"}
+      onChange={(value) => onChange(value === "color")}
+      options={[
+        { value: "color", label: t(PRINT_WORDS.color) },
+        { value: "lines", label: t(PRINT_WORDS.colorIn) },
+      ]}
+    />
+  );
+}
 
 /** A4 in millimetres. */
 export const A4 = { long: 297, short: 210 };
@@ -80,7 +93,7 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
             ]}
           />
         )}
-        <Toggle label={t(PRINT_WORDS.color)} checked={options.color} onChange={(color) => onChange({ color })} />
+        <InkChoice color={options.color} onChange={(color) => onChange({ color })} />
         <Toggle
           label={t({
             de: "Felder zum Ausmalen (statt leerer Kreise zum Bekleben)",

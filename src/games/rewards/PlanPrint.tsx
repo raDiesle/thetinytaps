@@ -8,7 +8,7 @@ import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
 import { MIN_CARD_MM, type PhotoFormat } from "./photo";
 import { PhotoPrint } from "./PhotoPrint";
 import { itemPicture, ItemPic } from "./pictures";
-import { A4, CutCardPages, PRINT_WORDS, Preview } from "./PrintPanel";
+import { A4, CutCardPages, InkChoice, PRINT_WORDS, Preview } from "./PrintPanel";
 import { RitualPages } from "./RitualCard";
 import { type Ritual, ritualOf } from "./rituals";
 import { VelcroLink } from "./shopLinks";
@@ -154,7 +154,7 @@ export function PlanPrint({
             { value: "portrait", label: t(PRINT_WORDS.portrait) },
           ]}
         />
-        <Toggle label={t(PRINT_WORDS.color)} checked={options.color} onChange={(color) => onChange({ color })} />
+        <InkChoice color={options.color} onChange={(color) => onChange({ color })} />
         {cards === "choice" && (
           <Toggle
             label={t({

@@ -568,6 +568,12 @@
   line-height: 1;
 }
 
+/* The black-and-white print to colour in, named on its own line and kept on phones (the rest of the stamp goes there). */
+.rw-print-badge-ink {
+  display: block;
+  font-weight: 700;
+}
+
 /* ---------- The chart changed right on it (`ChartEditor`): the wizard and „Gestalten“ alike ---------- */
 
 .rw-chart-editor {
