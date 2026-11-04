@@ -63,7 +63,7 @@ export function Draw({ w, h, children }: { w: number; h: number; children: React
 
 /**
  * A grown-up with its child beside it, standing on `floor`; the whole family cheers with `.tm-done` on the stage.
- * `laugh` has the child laugh with its arms up (the Ameisenstraße's end, H-68).
+ * `laugh` has the child laugh with its arms up (the Ameisenstraße's end, H-68); `sleepy` has both yawn (the sunset's end, H-54).
  */
 export function Family({
   kind,
@@ -71,12 +71,14 @@ export function Family({
   floor,
   childLeft = false,
   laugh = false,
+  sleepy = false,
 }: {
   kind: "fox" | "bear";
   x: number;
   floor: number;
   childLeft?: boolean;
   laugh?: boolean;
+  sleepy?: boolean;
 }) {
   const grown = { w: 190, h: 285 };
   const small = { w: 120, h: 180 };
@@ -84,10 +86,10 @@ export function Family({
   return (
     <>
       <Layer x={x} y={floor - grown.h} w={grown.w} h={grown.h} className="tm-mascot">
-        <Mascot kind={kind} />
+        <Mascot kind={kind} sleepy={sleepy} />
       </Layer>
       <Layer x={childX} y={floor - small.h} w={small.w} h={small.h} className="tm-mascot tm-mascot-child">
-        <Mascot kind={kind} child pose={laugh ? "cheer" : "stand"} />
+        <Mascot kind={kind} child pose={laugh ? "cheer" : "stand"} sleepy={sleepy} />
       </Layer>
     </>
   );

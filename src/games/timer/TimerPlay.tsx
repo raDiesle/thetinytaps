@@ -7,13 +7,15 @@ import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
-import { playChime, playChimeNote, playDing, playLeaves, playMelody, playPlop, playPop, playTwinkle } from "@/lib/sfx";
+import { playChime, playChimeNote, playDing, playDrops, playLeaves, playMelody, playPlop, playPop, playTwinkle, playYawn, playYum } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { CaterpillarScene } from "./caterpillar";
 import { nextPicture, PICTURES } from "./content";
 import { DiscScene } from "./disc";
-import { haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, trainSteps } from "./pieces";
+import { FlowerScene } from "./flower";
+import { haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { PizzaScene, SLICES } from "./pizza";
 import {
   AntHill,
   AntRoad,
@@ -41,6 +43,7 @@ import {
   WaxPuddle,
 } from "./scenes";
 import type { SwapToy, TimerPicture, TimerSettings } from "./settings";
+import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
 import { clockOn, digits, ownTimeMs } from "./time";
 
@@ -200,6 +203,9 @@ function TimerRun({
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
   const [far, setFar] = useState(false);
+  // Gleich ist es so weit (H-49): a while before the end the bell rings once and the family waves.
+  const [soon, setSoon] = useState(false);
+  const soonAt = endsAt - soonMs(total);
   const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(phase === "running");
 
@@ -209,9 +215,11 @@ function TimerRun({
   const moments = useMemo(() => {
     if (picture === "apple") return pieceMoments(total, apples);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
+    if (picture === "pizza") return pieceMoments(total, SLICES);
     return [];
   }, [picture, total, apples, stops]);
   const nextMoment = useRef(0);
+  const soonRang = useRef(false);
 
   // Seen from afar (H-48): a while after the last tap the small things step back, and a tap brings them back.
   useEffect(() => {
@@ -219,7 +227,7 @@ function TimerRun({
     if (phase !== "running") return;
     const timer = setTimeout(() => setFar(true), FAR_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [phase, poke]);
+  }, [phase, poke, soon]);
 
   // The end: checked at least every second, and again whenever the page comes back (timers sleep in the background).
   useEffect(() => {
@@ -230,14 +238,21 @@ function TimerRun({
       const now = Date.now();
       const left = endsAt - now;
       if (left <= 0) return setPhase(picture === "candle" ? "blow" : "done");
+      if (now >= soonAt && !soonRang.current) {
+        soonRang.current = true;
+        setSoon(true);
+        playDing();
+      }
       // A piece done: one sound, also when several passed while the page was away.
       if (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) {
         while (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) nextMoment.current++;
         if (picture === "apple") playPlop();
+        else if (picture === "pizza") playMunch();
         else playDing();
       }
       const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - now : Number.POSITIVE_INFINITY;
-      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment)));
+      const toSoon = soonRang.current ? Number.POSITIVE_INFINITY : soonAt - now;
+      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment, toSoon)));
     };
     const onVisible = () => {
       clearTimeout(timer);
@@ -249,7 +264,7 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, total, picture, moments]);
+  }, [phase, endsAt, total, picture, moments, soonAt]);
 
   useEffect(() => {
     if (phase === "blow") {
@@ -264,6 +279,9 @@ function TimerRun({
       else if (picture === "apple") playPlop();
       else if (picture === "caterpillar") playTwinkle();
       else if (picture === "sand" || picture === "ants" || picture === "disc") playChime();
+      else if (picture === "flower") playTwinkle();
+      else if (picture === "sunset") playYawn();
+      else if (picture === "pizza") playYum();
       const timer = setTimeout(playMelody, picture === "candle" ? 500 : 900);
       return () => clearTimeout(timer);
     }
@@ -286,7 +304,8 @@ function TimerRun({
       else if (picture === "sand") playTwinkle();
       else if (picture === "ants") playPop();
       else if (picture === "apple") playLeaves();
-      else if (picture === "caterpillar") playMunch();
+      else if (picture === "caterpillar" || picture === "pizza") playMunch();
+      else if (picture === "flower") playDrops();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow],
@@ -316,7 +335,7 @@ function TimerRun({
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stage}>
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}${soon ? " tm-soon" : ""}`} style={stage}>
           {picture === "train" && (
             <>
               <TrainBackdrop />
@@ -332,6 +351,9 @@ function TimerRun({
           {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
           {picture === "caterpillar" && <CaterpillarScene glow={poke} />}
           {picture === "disc" && <DiscScene glow={poke} />}
+          {picture === "pizza" && <PizzaScene glow={poke} />}
+          {picture === "flower" && <FlowerScene glow={poke} running={phase === "running"} />}
+          {picture === "sunset" && <SunsetScene glow={poke} done={phase === "done"} />}
           {picture === "sand" && (
             <>
               <SandBackdrop />

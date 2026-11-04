@@ -1168,3 +1168,338 @@
 .tm-toy-bear {
   transform: translateX(var(--tm-toy-way));
 }
+
+/* Gleich ist es so weit (H-49): a while before the end (a minute, or the last fifth of a short time) a bell rings once
+   and the family waves once – from afar too, since it brings the picture back (`tm-soon`, only while running). */
+.tm-running.tm-soon .mascot-arm {
+  animation: tm-wave-soon 2.4s ease-in-out;
+}
+
+.tm-running.tm-soon .tm-mascot-child .mascot-arm {
+  animation-delay: 0.3s;
+}
+
+@keyframes tm-wave-soon {
+  25%,
+  65% {
+    transform: rotate(-150deg);
+  }
+  45% {
+    transform: rotate(-120deg);
+  }
+}
+
+/* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
+.tm-sky-box {
+  overflow: hidden;
+}
+
+/* Sonnenuntergang (H-54): the sun sinks behind the hills and reddens, the moon rises, the evening's and then the night's
+   sky fade in over the day's, the land darkens, the stars come out one by one and the windows light up. */
+.tm-sun,
+.tm-moon {
+  position: absolute;
+}
+
+.tm-sun {
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #fff3bf, #ffd43b 55%, #fab005);
+  animation: tm-set var(--tm-ms) linear forwards;
+}
+
+.tm-sun-red {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #ffc078, #fd7e14 55%, #e8590c);
+  opacity: 0;
+  animation: tm-redden var(--tm-ms) linear forwards;
+}
+
+.tm-moon {
+  animation: tm-moonrise var(--tm-ms) linear forwards;
+}
+
+.tm-moon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-dusk-sky {
+  background: linear-gradient(#7b5ea7, #f783ac 45%, #ffa94d 80%);
+  opacity: 0;
+  animation: tm-evening var(--tm-ms) linear forwards;
+}
+
+.tm-night-sky {
+  background: linear-gradient(#0b1033, #1c2a5a 60%, #2f3f7a);
+  opacity: 0;
+  animation: tm-nightfall var(--tm-ms) linear forwards;
+}
+
+.tm-dusk-land {
+  opacity: 0;
+  animation: tm-dusk var(--tm-ms) linear forwards;
+}
+
+.tm-windows {
+  opacity: 0;
+  animation: tm-lights var(--tm-ms) linear forwards;
+}
+
+.tm-star {
+  opacity: 0;
+  animation: tm-star 4s ease-out both;
+  animation-delay: calc(var(--tm-ms) * var(--tm-at));
+}
+
+.tm-sails {
+  inset: 0;
+  animation: tm-sails 1s ease-in-out infinite;
+}
+
+.tm-sails svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-done .tm-sun {
+  animation: none;
+  transform: translateY(var(--tm-sun-set));
+}
+
+.tm-done .tm-moon,
+.tm-done .tm-dusk-sky,
+.tm-done .tm-night-sky,
+.tm-done .tm-dusk-land,
+.tm-done .tm-windows,
+.tm-done .tm-star,
+.tm-done .tm-sun-red {
+  animation: none;
+  transform: none;
+}
+
+.tm-done .tm-dusk-sky,
+.tm-done .tm-windows,
+.tm-done .tm-star,
+.tm-done .tm-sun-red,
+.tm-done .tm-sails {
+  opacity: 1;
+}
+
+.tm-done .tm-night-sky {
+  opacity: 0.92;
+}
+
+.tm-done .tm-dusk-land {
+  opacity: 0.6;
+}
+
+/* Night has come: the family only waves good night, sleepy, without hopping. */
+[data-picture="sunset"] .tm-done .tm-mascot {
+  animation: none;
+}
+
+@keyframes tm-set {
+  to {
+    transform: translateY(var(--tm-sun-set));
+  }
+}
+
+@keyframes tm-redden {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-moonrise {
+  from {
+    transform: translateY(var(--tm-moon-from));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes tm-evening {
+  45%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-nightfall {
+  40% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.92;
+  }
+}
+
+@keyframes tm-dusk {
+  30% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes tm-lights {
+  0%,
+  55% {
+    opacity: 0;
+  }
+  65%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-star {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tm-sails {
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+/* Blume (H-53): the stalk slides up out of the soil from a sprout to the ribbon, what is still to grow shrinks above it
+   along the stake, a drop falls from the watering can every second, and at the end the flower opens round the bud. */
+.tm-stalk,
+.tm-to-grow {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-stalk {
+  transform: translateY(var(--tm-sprout));
+  animation: tm-grow-up var(--tm-ms) linear forwards;
+}
+
+.tm-to-grow {
+  transform: translateY(var(--tm-sprout));
+  animation: tm-to-grow var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-stalk {
+  animation: none;
+  transform: none;
+}
+
+.tm-done .tm-to-grow {
+  animation: none;
+  transform: translateY(-100%);
+}
+
+@keyframes tm-grow-up {
+  from {
+    transform: translateY(var(--tm-sprout));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes tm-to-grow {
+  from {
+    transform: translateY(var(--tm-sprout));
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.tm-water {
+  inset: 0;
+  border: 0.15cqw solid #3b2a20;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: #74c0fc;
+  opacity: 0;
+  animation: tm-water 1s ease-in infinite;
+}
+
+@keyframes tm-water {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(var(--tm-fall)) scale(1.2, 0.6);
+  }
+}
+
+.tm-bloom {
+  opacity: 0;
+  transform: scale(0.25);
+}
+
+.tm-done .tm-bloom {
+  animation: tm-bloom 1.6s ease-out 0.2s forwards;
+}
+
+@keyframes tm-bloom {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Pizza (H-47): each slice is lifted off towards its side at its time and gone; a little steam rises every second. */
+.tm-slice {
+  animation: tm-slice 1.4s ease-in both;
+}
+
+.tm-done .tm-slice {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes tm-slice {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--tm-dx), var(--tm-dy)) scale(0.85);
+  }
+}
+
+.tm-steam-puff {
+  inset: 0;
+  opacity: 0;
+}
+
+.tm-sun .tm-left-glow,
+.tm-to-grow .tm-left-glow {
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
+}
+
+.tm-to-grow .tm-left-glow {
+  inset: 0;
+}
+
+.tm-slice .tm-left-glow {
+  inset: 0;
+  border-radius: 0;
+  background: rgb(255 240 170 / 0.55);
+}

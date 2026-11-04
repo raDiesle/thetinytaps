@@ -53,8 +53,9 @@ export const timerIdeas: IdeaArea = {
       text: "Das schlichteste Bild: eine große rote Scheibe, die wie ein Uhrzeiger im Kreis kleiner wird, bis nichts Rotes mehr bleibt. Als Variante für Kinder eine Pizza oder ein Kuchen, von dem die Fuchsfamilie Stück für Stück isst. Ohne Hintergrund, kräftige Farbe, auch quer durchs Zimmer zu erkennen.",
       why: "Diese Scheibe (bekannt als „Time Timer“) nutzen viele Kitas, Logopäden und Eltern von Kindern, die Übergänge schwer finden: Ein Kind, das sie dort kennt, versteht sie hier sofort.",
       effort: "S",
+      done: true,
       partial:
-        "Die rote Scheibe ist gebaut (Bild „Rote Scheibe“): weißes Zifferblatt mit Minutenstrichen, die rote Fläche wird mit einem Zeiger im Uhrzeigersinn kleiner, der Knopf in der Mitte dreht sich jede Sekunde ein Blütenblatt weiter, die Fuchsfamilie steht daneben. Noch offen: die Variante als Pizza oder Kuchen, von der die Fuchsfamilie Stück für Stück isst.",
+        "Gebaut: das Bild „Rote Scheibe“ (weißes Zifferblatt mit Minutenstrichen, die rote Fläche wird mit einem Zeiger im Uhrzeigersinn kleiner, der Knopf in der Mitte dreht sich jede Sekunde ein Blütenblatt weiter) und das Bild „Pizza“: acht Stücke auf einem Holzbrett, im Uhrzeigersinn ab zwölf Uhr wird jedes Achtel der Zeit eines mit einem Mampfen abgehoben, jede Sekunde steigt ein wenig Dampf auf; die Fuchsfamilie steht daneben.",
     },
     {
       id: "H-48",
@@ -74,6 +75,9 @@ export const timerIdeas: IdeaArea = {
       text: "Kurz vor dem Ende sagt das Bild leise Bescheid: Am Bahnhof läutet einmal die Glocke und die Bärenfamilie steht auf und winkt von Weitem, der letzte Apfel leuchtet, die Kerze flackert. Eine Minute vorher, bei kurzen Zeiten etwa beim letzten Fünftel.",
       why: "Übergänge fallen kleinen Kindern leichter, wenn sie angekündigt werden („gleich ist Schluss“); so kann das Kind sein Spiel noch zu Ende bringen, statt dass es plötzlich klingelt.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut für alle Bilder außer „Abwechseln“: eine Minute vor dem Ende (bei kurzen Zeiten im letzten Fünftel) läutet einmal eine Glocke und die Familie im Bild winkt einmal; war das Bild von Weitem zurückgetreten, kommt es dafür wieder hell. Eigene Zeichen je Bild (der letzte Apfel leuchtet, die Kerze flackert) gibt es noch nicht.",
     },
     {
       id: "H-50",
@@ -108,6 +112,8 @@ export const timerIdeas: IdeaArea = {
       text: "Zeit, die etwas bringt, statt abzulaufen: Das Bärenkind gießt einen Samen, er treibt aus, bekommt Knospen, und am Ende geht die Blume auf. Oder ein Kuchen im Ofen: Durchs Ofenfenster geht der Teig langsam auf und wird braun, am Ende holt Mama Fuchs ihn heraus. Für das Warten auf etwas Schönes (Oma kommt gleich, gleich gibt es Essen).",
       why: "Nicht jedes Warten ist ein Ende: Beim Warten auf etwas Gutes passt ein Bild, das voller wird, besser als eines, das leer läuft.",
       effort: "S",
+      partial:
+        "Die Blume ist gebaut (Bild „Blume“): Das Bärenkind gießt, jede Sekunde fällt ein Tropfen aus der Gießkanne, der Stängel wächst an einem Stab hinauf bis zur roten Schleife, die von Anfang an zeigt, wie weit er kommt, und am Ende geht die Blüte auf. Noch offen: der Kuchen im Ofen.",
     },
     {
       id: "H-54",
@@ -116,6 +122,9 @@ export const timerIdeas: IdeaArea = {
       text: "Für „noch zehn Minuten, dann ist Schlafenszeit“: Die Sonne sinkt hinter die Hügel, der Himmel wird orange, dann blau, die ersten Sterne kommen, und der Bildschirm wird mit dem Bild ruhiger und dunkler. Am Ende steht der Mond oben, und die Fuchsfamilie gähnt.",
       why: "Das Bild zeigt nicht nur die Zeit, es stimmt auch auf den Abend ein; ein helles, buntes Bild kurz vor dem Schlafen wäre das Gegenteil.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als Bild „Sonnenuntergang“: Die Sonne sinkt hinter die Hügel und wird rot, der Himmel wird orange, dann nachtblau, das Land dunkler, die Sterne kommen nacheinander, und im Häuschen gehen die Fenster an. Der Mond schaut von Anfang an über den Hügel und steigt, jede Sekunde dreht sich die Windmühle ein Stück. Am Ende gähnt die Fuchsfamilie und winkt gute Nacht.",
     },
     {
       id: "H-55",

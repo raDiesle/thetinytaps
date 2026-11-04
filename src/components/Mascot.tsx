@@ -287,9 +287,9 @@ export type MascotPose = "stand" | "wave" | "cheer" | "clap";
 /**
  * A fox or a bear standing and facing us, 200 × 300, feet at the bottom; a child has a bigger head and a scarf. Standing,
  * its right arm (`.mascot-arm`, turning at the shoulder) may be waved by the Timer, whose figures are small; elsewhere
- * the pose is drawn still. Cheering, it laughs with its mouth open.
+ * the pose is drawn still. Cheering, it laughs with its mouth open; `sleepy` yawns with half shut eyes (the Timer's sunset).
  */
-export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKind; child?: boolean; pose?: MascotPose }) {
+export function Mascot({ kind, child = false, pose = "stand", sleepy = false }: { kind: MascotKind; child?: boolean; pose?: MascotPose; sleepy?: boolean }) {
   const fox = kind === "fox";
   const c = MASCOT_COLORS[kind];
   // A child's head is bigger for its body, like a small child's.
@@ -328,7 +328,7 @@ export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKi
         <Arm from={[140, 176]} via={[166, 152]} to={[170, 114]} kind={kind} />
       )}
       <g transform={head}>
-        <MascotHead kind={kind} child={child} mouth={pose === "cheer" ? "open" : "smile"} />
+        <MascotHead kind={kind} child={child} eyes={sleepy ? "half" : "open"} mouth={sleepy ? "o" : pose === "cheer" ? "open" : "smile"} />
       </g>
     </svg>
   );

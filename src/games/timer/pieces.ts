@@ -66,3 +66,11 @@ export function applePlaces(count: number, rx: number, ry: number): { x: number;
   }
   return chosen.sort((a, b) => a.x - b.x || a.y - b.y);
 }
+
+/**
+ * Gleich ist es so weit (H-49): how long before the end the bell rings once and the family waves – a minute, or for a
+ * short time its last fifth, so a child can still finish what it is playing.
+ */
+export function soonMs(total: number): number {
+  return Math.min(60_000, total / 5);
+}

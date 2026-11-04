@@ -3,7 +3,10 @@ import { nextPicture, PICTURES } from "./content";
 import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
 import { DISC } from "./disc";
-import { applePlaces, haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, trainSteps } from "./pieces";
+import { FLOWER_FAMILY, FLOWER_FLOOR, SPROUT, STAKE, STALK } from "./flower";
+import { PIZZA, PIZZA_FAMILY, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
+import { MOON, ridgeAt, SKY_CUT, STARS, SUN, SUNSET_FAMILY, SUNSET_FLOOR } from "./sunset";
+import { applePlaces, haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { ANT_FAMILY, ANTS, CANDLE, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
 import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
@@ -142,5 +145,67 @@ describe("Timer", () => {
     expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_FAMILIES.bear - 120 + 10 + 10);
     expect(SWAP_GLASS.top).toBeGreaterThanOrEqual(80 + 140);
     expect(SWAP_FLOOR + 10).toBeLessThanOrEqual(820);
+  });
+
+  // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a family standing to 1380
+  // was cut off there, so the new pictures keep their families' right edge within 1340.
+  const RIGHT = 1340;
+
+  test("Sonnenuntergang: the sun and the moon move behind the ridge, the cut of their boxes always hidden below it (H-54)", () => {
+    for (const { cx, r } of [SUN, MOON]) for (let x = cx - r; x <= cx + r; x += 5) expect(ridgeAt(x)).toBeLessThan(SKY_CUT);
+    // The sun is wholly gone at the end, the moon peeks over the hill from the start and stands high at the end.
+    expect(SUN.set).toBeGreaterThanOrEqual(SKY_CUT);
+    expect(SUN.top).toBeGreaterThanOrEqual(80);
+    expect(MOON.start).toBeLessThan(ridgeAt(MOON.cx) - 20);
+    expect(MOON.top).toBeGreaterThanOrEqual(80);
+    // The stars come out in order through the second half, within the sky, never where the moon ends up.
+    expect(STARS.map((s) => s.at)).toEqual([...STARS.map((s) => s.at)].sort((a, b) => a - b));
+    for (const s of STARS) {
+      expect(s.at).toBeGreaterThanOrEqual(0.4);
+      expect(s.at).toBeLessThan(1);
+      expect(s.y).toBeLessThan(ridgeAt(s.x) - 30);
+      expect(Math.hypot(s.x - MOON.cx, s.y - (MOON.top + MOON.r))).toBeGreaterThan(MOON.r + 30);
+    }
+    expect(SUNSET_FAMILY - 110).toBeGreaterThan(MOON.cx + MOON.r);
+    expect(SUNSET_FAMILY + 190).toBeLessThanOrEqual(RIGHT);
+    expect(SUNSET_FLOOR).toBeLessThanOrEqual(820);
+  });
+
+  test("Blume: the stalk grows from a sprout to the ribbon, on every screen (H-53)", () => {
+    expect(STALK.top).toBeGreaterThan(STAKE.top);
+    expect(STAKE.top - 20).toBeGreaterThanOrEqual(80 + 100);
+    expect(STALK.soil).toBeLessThanOrEqual(820);
+    expect(SPROUT).toBeGreaterThan(0);
+    expect(SPROUT).toBeLessThan(0.2);
+    expect(FLOWER_FAMILY).toBeGreaterThanOrEqual(200);
+    // The bear child (right of its grown-up, 120 wide) stands left of the bed.
+    expect(FLOWER_FAMILY + 190 - 10 + 120).toBeLessThanOrEqual(STALK.cx - 190);
+    expect(FLOWER_FLOOR).toBeLessThanOrEqual(820);
+  });
+
+  test("Pizza: eight slices round the board, eaten at their eighths, the family beside it (H-47)", async () => {
+    let area = 0;
+    for (let i = 0; i < SLICES; i++) {
+      const s = slice(i);
+      expect(s.x).toBeGreaterThanOrEqual(200);
+      expect(s.y).toBeGreaterThanOrEqual(80);
+      expect(s.x + s.w).toBeLessThanOrEqual(RIGHT);
+      expect(s.y + s.h).toBeLessThanOrEqual(820);
+      area += s.to - s.from;
+    }
+    expect(area).toBeCloseTo(2 * Math.PI);
+    expect(PIZZA.cx + PIZZA.r + 34).toBeLessThan(PIZZA_FAMILY - 110);
+    expect(PIZZA_FAMILY + 190).toBeLessThanOrEqual(RIGHT);
+    expect(PIZZA_FLOOR).toBeLessThanOrEqual(820);
+    // A slice is gone at its moment: the CSS lifts it off in as many seconds as its delay takes away.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    expect(css).toContain(`animation: tm-slice ${SLICE_SECONDS}s ease-in both`);
+    expect(pieceMoments(8 * 60_000, SLICES)).toHaveLength(SLICES - 1);
+  });
+
+  test("Gleich ist es so weit: a minute before the end, or the last fifth of a short time (H-49)", () => {
+    expect(soonMs(10 * 60_000)).toBe(60_000);
+    expect(soonMs(60_000)).toBe(12_000);
+    expect(soonMs(10_000)).toBe(2000);
   });
 });
