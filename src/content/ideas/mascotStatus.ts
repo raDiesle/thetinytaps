@@ -256,6 +256,16 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/zaehlen/",
+    note: "Teilt die Dinge zum Zählen mit „Frei tippen“.",
+    tasks: [{ label: "Fuchs- oder Bärenkind zählt mit seinem Großen die Dinge mit", work: "drawing", effort: "S" }],
+  },
+  {
+    href: "/woerter/",
+    note: "Teilt die Bildwörter mit „Frei tippen“.",
+    tasks: [{ label: "Fuchs- oder Bärenkind tippt, sein Großer zeigt auf das Bild", work: "drawing", effort: "S" }],
+  },
+  {
     href: "/",
     note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Books for Both“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
     tasks: [

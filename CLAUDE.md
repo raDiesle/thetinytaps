@@ -80,7 +80,9 @@ In a fresh worktree run `bun install` first.
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
-  everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
+  everything goes that helps the user decide: ideas, the language table, and research. Scrolling down it always shows
+  every open idea: a tap above (the overview's numbers, the contents) jumps to its place and marks it, never filters, and
+  the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
@@ -351,7 +353,10 @@ In a fresh worktree run `bun install` first.
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
-  never a tap a child could make by chance.
+  never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
+  not the same game easier or with other words – are games of their own in the book's table of contents, never one
+  game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
+  split again, user feedback, November 2026).
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
@@ -439,7 +444,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
+  before playing (Socken-Paare finds its difficulty itself, Frei tippen changes everything behind ⚙️ while
   playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
   start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
   (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that

@@ -100,6 +100,13 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Ein Bilderbuch über Gefühle: Zuerst zeigt das Kind, wie es ihm geht – Sonne, Wolke, Regen oder Gewitter. Dann erlebt der kleine Bär Alltagssituationen, und das Kind wählt, was hilft.",
   },
   {
+    path: "/spiele/buchstaben-zahlen/",
+    title: "Buchstaben und Zahlen lernen – Tastatur-Spiele",
+    description:
+      "Frei tippen, Zählen und Wörter tippen: Jede Taste zeigt ihren Buchstaben mit Bild und Stimme, Zahlen kommen mit Dingen zum Zählen. Ohne Werbung.",
+    text: "Drei Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“.",
+  },
+  {
     path: "/spiele/zuordnen/",
     title: "Zuordnen lernen – Spiele für Kleinkinder",
     description:
@@ -173,9 +180,23 @@ export const SEO_TEXTS: PageSeo[] = [
   },
   {
     path: "/buchstaben/",
-    title: "Buchstaben und Zahlen lernen – Tastatur-Spiel",
-    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Dazu Zählen, „Wo ist das B?“ und erste Wörter tippen. Ohne Werbung.",
-    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Buchstaben mit Bild und Wort, Zahlen mit Dingen zum Zählen, Buchstaben suchen und erste Wörter, Farben und Tu-Wörter tippen.",
+    title: "Frei tippen – Buchstaben lernen mit der Tastatur",
+    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Zahlen kommen mit Dingen zum Zählen. Ein Tastatur-Spiel ohne Werbung.",
+    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Jeder Buchstabe kommt mit Bild und Wort, jede Zahl mit Dingen zum Zählen. Auf Wunsch große und kleine Buchstaben, Nachspuren mit dem Finger und Bilder zu einem Thema.",
+  },
+  {
+    path: "/zaehlen/",
+    title: "Zählen lernen – Zahlen-Spiel für Kleinkinder",
+    description:
+      "Jede Taste bringt eine Zahl mit so vielen Dingen zum Zählen: alles auf einmal, vorgezählt, Schritt für Schritt oder selbst gezählt. Ohne Werbung.",
+    text: "Ein Zahlen-Spiel auf der Tastatur oder dem Bildschirm: Jede Ziffer zeigt sich mit so vielen Dingen, jede andere Taste bringt eine Zahl von 1 bis 9. Die Dinge kommen alle auf einmal, werden vorgezählt, kommen Schritt für Schritt, oder das Kind tippt jedes an und zählt selbst.",
+  },
+  {
+    path: "/woerter/",
+    title: "Wörter tippen – erste Wörter für Kleinkinder",
+    description:
+      "Erste Wörter Buchstabe für Buchstabe tippen: Bär, Ball, Farben und Tu-Wörter. Oder „Wo ist das B?“ – die Taste zum Buchstaben finden. Ohne Werbung.",
+    text: "Ein Bild und sein Wort: Das Kind tippt es Buchstabe für Buchstabe auf der Tastatur oder dem Bildschirm. Bildwörter, Farben, Tu-Wörter oder alles gemischt, in drei Längen. Oder nur der erste Buchstabe: „Wo ist das B?“ – die Taste dazu finden.",
   },
   {
     path: "/zaehne/",

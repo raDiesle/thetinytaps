@@ -52,7 +52,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/styles/` (all loaded in order by `src/globals.css`) |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on the home page (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
-| `src/games/letters/` | Game „Buchstaben & Zahlen“: free typing, „Zählen“, „Wo ist das B?“ and „Wörter tippen“ (whole words or first letters; picture, colour and doing words). Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
+| `src/games/letters/` | The book „Buchstaben & Zahlen“: three games, „Frei tippen“, „Zählen“ and „Wörter tippen“ (whole words or „Wo ist das B?“; picture, colour and doing words). Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
 | `src/games/scenes/` | Game „Lebendige Bilder“: the Wimmelbild engine and all its pictures. Details in its [`CLAUDE.md`](src/games/scenes/CLAUDE.md) |
 | `src/games/animals/` | Game „Was gehört zum Tier?“: feed the animal, bring it home, „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/animals/CLAUDE.md) |
 | `src/games/together/` | Game „Was gehört zusammen?“: things of the day and helpers with their tools. Details in its [`CLAUDE.md`](src/games/together/CLAUDE.md) |
