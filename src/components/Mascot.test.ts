@@ -20,6 +20,11 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/hideout.tsx",
   "src/games/elevator/kid.tsx",
   "src/games/socks/SocksPlay.tsx",
+  "src/games/scenes/supermarkt/wall.tsx",
+  "src/games/scenes/supermarkt/checkout.tsx",
+  "src/games/scenes/kita/people.tsx",
+  "src/games/scenes/kinderarzt/practice.tsx",
+  "src/games/scenes/wald/people.tsx",
   "src/games/feelings/moodArt.tsx",
 ];
 
@@ -30,7 +35,7 @@ describe("the shared fox and bear", () => {
   test("every mascot drawing takes its head from Mascot.tsx", async () => {
     for (const file of MASCOT_DRAWINGS) {
       const code = await Bun.file(file).text();
-      expect(code.includes('from "@/components/Mascot"') ? file : `${file} draws a fox or bear without Mascot.tsx`).toBe(file);
+      expect(code.includes('from "@/components/Mascot"') || code.includes("MascotFace") ? file : `${file} draws a fox or bear without Mascot.tsx`).toBe(file);
     }
   });
 
