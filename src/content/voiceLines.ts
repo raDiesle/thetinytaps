@@ -167,6 +167,7 @@ function letters(): VoiceGroup[] {
     },
     { label: "Suchen: Frage", lines: once(de.letters.map(de.findPrompt)), built: "„Wo ist das …?“ mit dem Buchstaben" },
     { label: "Mitmachen", lines: once(de.actions.map(de.joinIn)) },
+    { label: "Mitmachen mit Zahlen", lines: ["Stampf mit!"], note: "„Hüpf mit!“ und „Klatsch mit!“ kommen von den Tu-Wörtern; das Stampfen hat keins." },
     { label: "Lob", lines: once(de.praise) },
     { label: "Zahlwörter beim Zählen", lines: once(de.numberWords.map((n) => `${n}!`)) },
     {

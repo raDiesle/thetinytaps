@@ -152,3 +152,21 @@ export function playPlink(i: number) {
   note({ from: freq, duration: 0.3, type: "triangle", volume: 0.12 });
   note({ from: freq * 3, duration: 0.07, type: "sine", volume: 0.04 });
 }
+
+/** A soft clap: two short bursts of noise, as two small hands meet. */
+export function playClap() {
+  hiss({ from: 2400, to: 1400, duration: 0.09, volume: 0.5, q: 0.9 });
+  hiss({ from: 1200, to: 800, duration: 0.06, volume: 0.25, q: 1.2, delay: 0.012 });
+}
+
+/** A hop: a springy rise, and a soft landing after `land` seconds. */
+export function playHop(land = 0.42) {
+  note({ from: 200, to: 560, duration: 0.3, type: "triangle", volume: 0.22 });
+  note({ from: 140, to: 70, duration: 0.18, type: "sine", volume: 0.3, delay: land });
+}
+
+/** A stamp: a low thump on the floor after `delay` seconds. */
+export function playStamp(delay = 0) {
+  note({ from: 120, to: 42, duration: 0.35, type: "sine", volume: 0.6, delay });
+  hiss({ from: 500, to: 150, duration: 0.16, volume: 0.16, q: 0.6, delay });
+}

@@ -192,6 +192,12 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Ein Zahlen-Spiel auf der Tastatur oder dem Bildschirm: Jede Ziffer zeigt sich mit so vielen Dingen, jede andere Taste bringt eine Zahl von 1 bis 9. Die Dinge kommen alle auf einmal, werden vorgezählt, kommen Schritt für Schritt, oder das Kind tippt jedes an und zählt selbst.",
   },
   {
+    path: "/mitmachen/",
+    title: "Zahlen zum Mitmachen – hüpfen, klatschen, stampfen",
+    description: "Bei jeder Zahl hüpft, klatscht oder stampft ein Fuchs- oder Bärenkind genau so oft und zählt laut mit – das Kind macht mit. Ohne Werbung.",
+    text: "Ein Zahlen-Spiel zum Mitbewegen: Jede Ziffer auf der Tastatur oder dem Bildschirm, jede andere Taste bringt eine Zahl von 1 bis 9. Ein Fuchs- oder Bärenkind lädt ein – „Hüpf mit!“ – und hüpft, klatscht oder stampft so oft, wie die Zahl sagt, neben ihm sein Großer. Jedes Mal wird laut mitgezählt und kurz gewartet, damit das Kind mitmachen kann. So wird die Zahl zur Menge im eigenen Körper.",
+  },
+  {
     path: "/woerter/",
     title: "Wörter tippen – erste Wörter für Kleinkinder",
     description:

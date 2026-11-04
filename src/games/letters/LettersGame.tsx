@@ -19,11 +19,12 @@ import {
 } from "./settings";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
+import { MovePlay } from "./MovePlay";
 import { type LettersWay, WAY_TITLES } from "./names";
 import { WordsPlay } from "./WordsPlay";
 
 /**
- * One of the book's three games – Frei tippen, Zählen or Wörter tippen –, each on its own page of the table of contents
+ * One of the book's four games – Frei tippen, Zählen, Mitmachen or Wörter tippen –, each on its own page of the table of contents
  * (user feedback, November 2026). They share their settings, so letters, pictures and keys stay as chosen.
  */
 export function LettersGame({ way }: { way: LettersWay }) {
@@ -64,9 +65,17 @@ export function LettersGame({ way }: { way: LettersWay }) {
   );
 
   const title = t(WAY_TITLES[way]);
+  if (way === "move") {
+    // Mitmachen has nothing to choose: no ⚙️, it plays at once with the shared on-screen keys.
+    return (
+      <GameShell title={title} startMode={way}>
+        <MovePlay pack={pack} settings={play} />
+      </GameShell>
+    );
+  }
   // Each game plays at once, so grown-ups would not guess what waits behind ⚙️: a note names it as play starts (user
   // feedback, November 2026).
-  const intro: Record<LettersWay, ReactNode> = {
+  const intro: Record<Exclude<LettersWay, "move">, ReactNode> = {
     free: t({ de: "Zahlen vorzählen, Nachspuren, große und kleine Buchstaben, Bilder – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
     count: t({ de: "Alles sofort, vorzählen, Schritt für Schritt oder selbst zählen – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
     words: t({ de: "Ganze Wörter, Farben, Tu-Wörter oder „Wo ist das B?“ – halten Sie ⚙️ gedrückt und wählen Sie aus." }),

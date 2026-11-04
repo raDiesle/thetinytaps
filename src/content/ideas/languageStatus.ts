@@ -297,6 +297,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Ein Spiel für sich seit November 2026 (vorher „Nur Zahlen“ in „Frei tippen“), mit dessen Zahlen und Texten. Deutsch von ElevenLabs gesprochen bis auf die Zählsätze („drei Äpfel!“): bis dahin sagt es nur die Zahl. Noch nicht übersetzt: der Name „Zählen“, die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm.",
   },
   {
+    href: "/mitmachen/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Neu (November 2026, L-15), mit den Zahlwörtern und Tu-Wörtern der Sprachpakete: „Hüpf mit!“, „Klatsch mit!“ und die Zahlwörter sind auf Deutsch von ElevenLabs gesprochen, „Stampf mit!“ fehlt noch (bis dahin still). Noch nicht übersetzt: der Name „Mitmachen“, die Zeile im Inhaltsverzeichnis und „Stampf mit!“. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm; Hindi hat kein „Klatsch mit!“ (zwei Wörter).",
+  },
+  {
     href: "/woerter/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },

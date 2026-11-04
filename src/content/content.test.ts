@@ -49,10 +49,10 @@ describe("home menu", () => {
     }
   });
 
-  test("Frei tippen, Zählen and Wörter tippen are three games in their book's table of contents, not ways to play of one", () => {
+  test("Frei tippen, Zählen, Mitmachen and Wörter tippen are four games in their book's table of contents, not ways to play of one", () => {
     const book = CATEGORIES.find((category) => category.id === "buchstaben-zahlen");
     expect(book && hasPage(book)).toBe(true);
-    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/woerter/"]);
+    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/mitmachen/", "/woerter/"]);
   });
 
   test("category ids and game addresses are unique", () => {

@@ -3,7 +3,7 @@ import { type LettersWay, WAY_TITLES } from "@/games/letters/names";
 import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
-/** One of the three games of the book „Buchstaben & Zahlen“, with its name in the browser tab. */
+/** One of the four games of the book „Buchstaben & Zahlen“, with its name in the browser tab. */
 function LettersWayPage({ way }: { way: LettersWay }) {
   const t = useT();
   useTitle(t(WAY_TITLES[way]));
@@ -15,6 +15,9 @@ export const LettersPage = () => <LettersWayPage way="free" />;
 
 /** Zählen, at `/zaehlen/`. */
 export const CountingPage = () => <LettersWayPage way="count" />;
+
+/** Mitmachen, at `/mitmachen/`. */
+export const MovePage = () => <LettersWayPage way="move" />;
 
 /** Wörter tippen, at `/woerter/`. */
 export const WordsPage = () => <LettersWayPage way="words" />;

@@ -1,6 +1,6 @@
 # Buchstaben & Zahlen
 
-The book „Buchstaben & Zahlen“ holds three games, each a page of its table of contents (`games.ts`), sharing this folder
+The book „Buchstaben & Zahlen“ holds four games, each a page of its table of contents (`games.ts`), sharing this folder
 and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys stay as chosen in each):
 - Frei tippen, `/buchstaben/` (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its
   things and digit at once, or optionally counts them aloud, step by step or by tapping each thing.
@@ -8,17 +8,22 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   without a meaning of its own (Space, Enter, arrows, Backspace keep theirs) brings a number from 1 to 9 by chance; on
   touch screens only the digit keys. With `digitOnRepeat` (for „Alles sofort“ and „Vorzählen“, in both games) a number
   shows its things first and its digit only when the same number is pressed again right after.
+- Mitmachen, `/mitmachen/` (`MovePlay.tsx`, `move.css`; L-15): a digit, or any other key for a number by chance, has a
+  fox or bear child hop, clap or stamp that many times (the three take turns), its grown-up standing beside it; it
+  invites first („Hüpf mit!“ – hop and clap from the pack's doing words, `joinIn`), then counts each one aloud with a
+  wait between (`BEAT_MS`), so the child can join in. A row of marks under the digit fills one by one. Keys during a
+  round only ripple; a tap on the family afterwards plays the same number again. No ⚙️: nothing to choose.
 - Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
   mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
   for a shown letter).
 
-`LettersGame way={…}` is all three (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
+`LettersGame way={…}` is all four (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
 `names.ts`. Each plays at once (`startMode`) with no start screen: ✕ and „Menü“ go back to the book's table of contents,
 the page before it.
 
 ## Rules
 
-- The three are games of their own in the table of contents, never „Spielart“ or „Nur Zahlen“ choices behind one
+- The four are games of their own in the table of contents, never „Spielart“ or „Nur Zahlen“ choices behind one
   game's ⚙️: they were folded into one game once and split again (user feedback, November 2026). A new thing to do with
   letters or numbers is a new game in the book; a variant of one (which words, how numbers come) is an option of it.
 - Every option is changed while playing, never in the menu: ⚙️ in the top right corner (the way back, the page's corner, takes the left), always held (`PlayOptions`),
@@ -28,6 +33,10 @@ the page before it.
 - Each game plays at once, so grown-ups wouldn't guess what waits behind ⚙️: as play starts a note under it
   (`PlayOptions intro`) names it – for Wörter tippen whole words, colours, doing words, „Wo ist das B?“. When a big
   variant is added, name it there too (user feedback, November 2026).
+- Mitmachen waits at every hop, clap or stamp long enough for a small child to do it too and land (`BEAT_MS`, 1.5 s)
+  – never a quick run of them: the child moving along is the point, not watching. The child figure moves on its own HTML
+  layers (`.mv-kid`, its clapping pose a layer above its standing one), animated by `element.animate`, never inside its
+  svg; the grown-up stands still.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

@@ -139,6 +139,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Bei einer Zahl hüpft der Frosch genau so oft und zählt laut mit: „Eins – zwei – drei!“. Er lädt ein: „Hüpf mit!“ und wartet bei jedem Sprung kurz. Genauso: dreimal klatschen, viermal stampfen.",
       why: "Zahl wird zur Menge im eigenen Körper; passt zum Bewegungsabenteuer (Bereich M).",
       effort: "S",
+      done: true,
     },
     {
       id: "L-16",

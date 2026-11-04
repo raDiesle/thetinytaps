@@ -57,7 +57,7 @@ describe("the shared fox and bear", () => {
           }
         }
       }
-      for (const pose of ["stand", "wave", "cheer"] as const) {
+      for (const pose of ["stand", "wave", "cheer", "clap"] as const) {
         expect(renderToStaticMarkup(createElement(Mascot, { kind, pose, child: pose === "cheer" }))).not.toContain("NaN");
       }
     }

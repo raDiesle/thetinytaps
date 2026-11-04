@@ -1,0 +1,111 @@
+/* Mitmachen (MovePlay.tsx): a digit and its marks beside a fox or bear child and its grown-up, on a meadow. */
+
+.mv-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(#e3f6ff 0 70%, #d3efbd 70% 100%);
+}
+
+/* Digit and marks on the left, the family on the right, both standing on the meadow's edge. */
+.mv-scene {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6cqw;
+  width: 94cqw;
+  height: 86cqh;
+}
+
+.mv-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  max-width: 44cqw;
+}
+
+.mv-digit {
+  font-size: min(48cqh, 30cqw);
+  font-weight: 800;
+  line-height: 1;
+  color: #ff922b;
+  -webkit-text-stroke: 0.04em var(--ink);
+  paint-order: stroke fill;
+}
+
+/* One mark for every hop, clap or stamp: faint until it is done, then there in full – the number as an amount. */
+.mv-marks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.15em;
+  max-width: 5.8em;
+  font-size: min(9cqh, 6cqw);
+  line-height: 1.1;
+}
+
+.mv-mark {
+  opacity: 0.22;
+  filter: grayscale(1);
+  transition:
+    opacity 0.25s,
+    filter 0.25s;
+}
+
+.mv-mark.mv-done {
+  opacity: 1;
+  filter: none;
+}
+
+/* The grown-up stands still; the child beside it, two thirds as tall, does the moving on a layer of its own. */
+.mv-family {
+  display: flex;
+  align-items: flex-end;
+  height: min(80cqh, 50cqw);
+  cursor: pointer;
+}
+
+.mv-grown,
+.mv-kid {
+  position: relative;
+  display: block;
+  height: 100%;
+  aspect-ratio: 2 / 3;
+}
+
+.mv-kid {
+  height: 68%;
+  margin-left: -4%;
+  will-change: transform;
+}
+
+.mv-family svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mv-pose {
+  position: absolute;
+  inset: 0;
+}
+
+/* The clapping pose waits unseen above the standing one; a clap shows it for a moment (MovePlay's `act`). */
+.mv-clap {
+  opacity: 0;
+}
+
+/* A puff of dust under the feet when the child stamps. */
+.mv-dust {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -3%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(160 120 80 / 0.7), rgb(160 120 80 / 0));
+  opacity: 0;
+}

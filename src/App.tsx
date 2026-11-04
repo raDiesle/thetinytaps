@@ -21,6 +21,7 @@ const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage", 
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage", "/gefuehle/");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/buchstaben/");
 const CountingPage = page(() => import("@/pages/LettersPage"), "CountingPage", "/zaehlen/");
+const MovePage = page(() => import("@/pages/LettersPage"), "MovePage", "/mitmachen/");
 const WordsPage = page(() => import("@/pages/LettersPage"), "WordsPage", "/woerter/");
 const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
@@ -51,6 +52,7 @@ export function App() {
         <Route path="spiele/:category" element={<CategoryPage />} />
         <Route path="buchstaben" element={<LettersPage />} />
         <Route path="zaehlen" element={<CountingPage />} />
+        <Route path="mitmachen" element={<MovePage />} />
         <Route path="woerter" element={<WordsPage />} />
         <Route path="tiere" element={<AnimalsPage />} />
         <Route path="zusammen" element={<TogetherPage />} />
