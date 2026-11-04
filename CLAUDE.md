@@ -252,7 +252,7 @@ In a fresh worktree run `bun install` first.
   Abenteuer, Bewegungsabenteuer): there the browser's voice (Google's) says a line until its recording is made
   (`recordedVoice(files, { browser: true })`, user decision, October 2026). Give a game that fallback only where it
   really helps, never for a game that plays fine silent. Never add a switch for either again, with one exception: Gefühle's „Alltagssituationen“, where a grown-up
-  may want to tell the scenes to the child in their own words, has a held loudspeaker in its top left corner that
+  may want to tell the scenes to the child in their own words, has a held loudspeaker in its bottom right corner that
   switches its voice off (`VoiceSwitch`, user decision, November 2026) – only there, never as a pattern for other games. Recordings are made only when the user asks (see Language).
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the

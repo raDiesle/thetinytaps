@@ -43,23 +43,27 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
 
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
 tell the scenes to the child in their own words. So while it plays, a wooden loudspeaker with a speech bubble stands in
-the top left corner below the ✕ (`VoiceSwitch.tsx`, drawn like the shelf's loudspeaker for the music), with „halten“
-under it: held for half a second (never a tap, a child taps it by chance) it switches off everything said – the scene,
+the screen's bottom right corner beside the book of the text to read out (`VoiceSwitch.tsx`, drawn like the shelf's
+loudspeaker for the music), with „halten“ under it: held for half a second (never a tap, a child taps it by chance) it switches off everything said – the scene,
 the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; held again, it speaks again. The sounds
 (crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
 already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
 to tell them. „Wie geht's dir?“ always speaks (`MoodGame` sets `voice: true`) and has no such switch; no other game gets
 one (`feelings.test.ts`).
 
-**The text to read out (user wish, November 2026):** for grown-ups who tell the scenes themselves, above all with the
-voice switched off, a paper note with an open book lies on the big picture's bottom left corner (`ReadAlong.tsx`), on
-wide screens just right of where the not-so-good card lies over the picture, with „halten“ under it. Held for half a
-second (like the loudspeaker; a child's tap changes nothing) it opens a paper sheet over the picture's left side with
-everything the voice says in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea
-(red cross, its caption, its answer), the good one (tick, caption, what is told), the happy end. The part being told
-now is marked with the highlighter and scrolled into view; one tap on the note closes it. It stays open from scene to
-scene and visit to visit (`settings.text`). Only in „Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts`
-checks that the sheet holds every line a round says – a new kind of line said in a round goes into `readAlong` too.
+**The text to read out (user wish and feedback, November 2026):** for grown-ups who tell the scenes themselves, a
+paper note with an open book stands in the screen's bottom right corner, left of the loudspeaker (`ReadAlong.tsx`,
+`.story-corner`; upright, where the cards fill the bottom, on the picture's top right corner below the dots). One tap
+opens it and one tap closes it – never held (held, it was too slow for grown-ups). It opens a paper sheet right above
+the two notes, in the corner where it covers least of the pictures: on wide screens below the good card, as wide as the
+room right of the picture and only as far over the picture as a readable line needs. It holds everything the voice says
+in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea (red cross, its caption,
+its answer), the good one (tick, caption, what is told), the happy end. While the voice tells the scene, the part told
+now is marked with the highlighter and scrolled into view; **with the voice off everything shows alike, nothing marked,
+since the grown-up reads it all** – and switching the voice off opens the sheet by itself. It stays open from scene to
+scene and visit to visit (`settings.text`), but steps aside at a pass's end, where „Weiter“ stands. Only in
+„Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts` checks that the sheet holds every line a round says
+– a new kind of line said in a round goes into `readAlong` too – and that the note is tapped, not held.
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After

@@ -164,9 +164,10 @@ test("the voice switch is Alltagssituationen's alone, and held", () => {
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");
 });
 
-// Grown-ups who read the scenes out themselves (the voice switched off) open the round's whole text from the picture's
-// bottom left corner (user wish, November 2026): it holds every line the voice would say, in Alltagssituationen only,
-// and like the loudspeaker it opens only when held.
+// Grown-ups who read the scenes out themselves (the voice switched off) open the round's whole text from the screen's
+// bottom right corner, beside the loudspeaker (user feedback, November 2026): it holds every line the voice would say,
+// in Alltagssituationen only; it opens with one tap, never held; switching the voice off opens it, and then nothing on
+// it is marked, since the grown-up reads it all.
 test("the text to read out holds every line a round says", () => {
   for (const story of STORIES)
     for (let step = 0; step < stepsOf(story); step++) {
@@ -180,7 +181,11 @@ test("the text to read out holds every line a round says", () => {
     readFileSync(`src/games/feelings/${f}`, "utf8").includes("readAlong={{"),
   );
   expect(users).toEqual(["FeelingsPlay.tsx"]);
-  expect(readFileSync("src/games/feelings/ReadAlong.tsx", "utf8")).toContain("useHold(onToggle");
+  const note = readFileSync("src/games/feelings/ReadAlong.tsx", "utf8");
+  expect(note).not.toContain("useHold");
+  expect(note, "the loudspeaker stands in the same corner").toContain('className="story-corner"');
+  expect(note, "with the voice off nothing is marked").toContain("part={voice ? part : undefined}");
+  expect(readFileSync("src/games/feelings/FeelingsPlay.tsx", "utf8"), "switching the voice off opens the text").toContain("{ voice: false, text: true }");
 });
 
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.

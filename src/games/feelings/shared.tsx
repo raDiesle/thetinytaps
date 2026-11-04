@@ -166,7 +166,6 @@ export function StoryPicture({
   look = "story",
   still = false,
   onNext,
-  corner,
 }: {
   name: string;
   /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
@@ -178,8 +177,6 @@ export function StoryPicture({
   still?: boolean;
   /** Makes the picture the way on, marked by ▶. */
   onNext?: () => void;
-  /** Lies on the picture's bottom left corner, for grown-ups (`ReadAlong`, the text to read out). */
-  corner?: ReactNode;
 }) {
   return (
     <div className={`fg-frame fg-look-${look}`}>
@@ -205,7 +202,6 @@ export function StoryPicture({
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
       <p className="fg-caption fg-picture-caption">{caption}</p>
-      {corner}
     </div>
   );
 }

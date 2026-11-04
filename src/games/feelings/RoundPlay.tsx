@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { preloadImages } from "./images";
 import { ReadAlong } from "./ReadAlong";
+import type { ReadAlongCorner } from "./PassPlay";
 import { beatText, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 import { CHEER_MS, ChoiceCard, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
@@ -36,8 +37,11 @@ export function RoundPlay({
   ending?: ReactNode;
   /** A key pressed while `ending` shows: every key does something. */
   onEndKey?: () => void;
-  /** „Alltagssituationen“: the sign that shows grown-ups the round's whole text to read out, and whether it is open. */
-  readAlong?: { open: boolean; onToggle: () => void };
+  /**
+   * „Alltagssituationen“: the note in the bottom right corner that shows grown-ups the round's whole text to read out,
+   * whether it is open, and the loudspeaker standing beside it (`VoiceSwitch`).
+   */
+  readAlong?: ReadAlongCorner;
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [tried, setTried] = useState(false);
@@ -162,7 +166,6 @@ export function RoundPlay({
           look={look}
           still={phase === "choose"}
           onNext={phase === "intro" ? goOn : undefined}
-          corner={readAlong && <ReadAlong round={round} part={part} open={readAlong.open} onToggle={readAlong.onToggle} />}
         />
       </main>
       {/* The not-so-good idea always first (bottom left), the good one second (top right). */}
@@ -176,6 +179,11 @@ export function RoundPlay({
               </>
             )}
       </footer>
+      {readAlong && (
+        <ReadAlong round={round} part={part} open={readAlong.open} onToggle={readAlong.onToggle} voice={settings.voice} hidden={phase === "done"}>
+          {readAlong.voiceSwitch}
+        </ReadAlong>
+      )}
     </div>
   );
 }
