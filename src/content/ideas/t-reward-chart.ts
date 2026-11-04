@@ -143,6 +143,7 @@ export const rewardChartIdeas: IdeaArea = {
       text: "Mehrere Kinder sammeln auf einem Weg zusammen zu einer gemeinsamen Belohnung, jedes mit eigenem Zeichen.",
       why: "Ein Wunsch aus App-Bewertungen; fördert Miteinander statt Wettbewerb.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "T-17",
@@ -150,6 +151,7 @@ export const rewardChartIdeas: IdeaArea = {
       title: "Urlaub und Pause",
       text: "Tage, an denen die Tafel ruht (krank, Urlaub, bei Oma), werden ganz ausgeblendet statt leer zu bleiben; eine Sammeltafel wartet einfach.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "T-18",
