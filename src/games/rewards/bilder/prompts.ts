@@ -2,8 +2,8 @@ import type { PicturePrompt, PicturePromptSet } from "@/content/picturePrompts";
 import { ACTIVITIES, MARKS, REWARDS, TASKS, THEMES } from "../catalog";
 import { picture } from "../pictures";
 
-// Every picture the Belohnungstafel may get, as prompts for the grown-up to check on
-// /management/ (Bildvorschläge) before any is made. All of them were made on 30 October 2026 (the user asked for them before
+// Every picture the Belohnungstafel has, as the Gemini prompt it was made from, kept to change and make again
+// (through the picture queue, /bild-erzeugen). All of them were made on 30 October 2026 (the user asked for them before
 // reviewing) and show in place of the catalogue's emoji (pictures.tsx). Tapsi is the fox of
 // „Aufs Töpfchen“, drawn after its first picture so it looks the same.
 

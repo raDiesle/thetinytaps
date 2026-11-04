@@ -32,7 +32,7 @@ const FOLDERS: Record<string, string[]> = {
 };
 
 /** Grown-ups' pages that stay German (CLAUDE.md): the management page. */
-const GERMAN_ONLY = /management|ManagementPage|PicturePromptReview/;
+const GERMAN_ONLY = /management|ManagementPage/;
 
 /** Every .ts/.tsx file below `path` (or `path` itself), tests left out. */
 function sources(path: string): string[] {

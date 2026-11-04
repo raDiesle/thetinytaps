@@ -108,8 +108,8 @@ targets) – keep it that way.
   plan, Tapsi with the star (`stern-halten`, unused since „Über die Tafel“ went, waiting for a new place), a theme's strip (`SheetStrip`) along the top of a
   colour print, and the `-linie` twins on grey prints. An `<img class="rw-pic">` takes its size from the font size the
   emoji had (`1.2em`, more where there is room). `tafel.webp` waits for pages with their own og:image (idea V-10).
-- `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026, shown on
-  `/management/`, 🎨 Bildvorschläge). A changed or new prompt is reviewed there first, then made. Card pictures are
+- `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026). A changed or
+  new prompt goes into the picture queue (`/bild-erzeugen`); `/management/` shows no prompts to review, only what waits. Card pictures are
   free-standing cut-outs (never „inside a circle“, `rewards.test.ts`), at least 600 px for photo prints; the `-linie`
   twins are drawn from the colour picture flattened onto white.
 

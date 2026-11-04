@@ -96,3 +96,14 @@ test("the skill's style block is the queue's", () => {
   const block = /## Style[\s\S]*?```\n([\s\S]*?)```/.exec(skill)?.[1] ?? "";
   expect(block.replace(/\s+/g, " ").trim()).toBe(BOOK_STYLE);
 });
+
+// The user only wants to know how many pictures wait, never to read and approve prompts there (November 2026).
+test("the management page shows how many pictures wait, and no prompts to review", () => {
+  const page = readFileSync("src/pages/ManagementPage.tsx", "utf8");
+  const queue = readFileSync("src/components/PictureQueue.tsx", "utf8");
+  expect(page).toContain("<PictureQueue />");
+  expect(queue).toMatch(/<h2>[\s\S]*?PICTURE_QUEUE\.length[\s\S]*?<\/h2>/);
+  for (const source of [page, queue]) {
+    expect(source).not.toMatch(/picturePrompts|PICTURE_PROMPTS|Bildvorschl/);
+  }
+});

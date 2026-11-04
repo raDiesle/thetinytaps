@@ -1,7 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
-import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { PictureQueue } from "@/components/PictureQueue";
 import { CATEGORIES, UNFINISHED } from "@/content/games";
 import {
@@ -76,7 +75,6 @@ const CONTENTS: { id: string; label: string }[] = [
   { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
   { id: "offene-bilder", label: "🖼️ Offene Bilder" },
-  { id: "bilder", label: "🎨 Bildvorschläge" },
   { id: "ideas-list", label: "💡 Alle Ideen" },
 ];
 
@@ -167,7 +165,7 @@ export function ManagementPage() {
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
       <p className="home-subtitle">
-        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, Bildvorschläge. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
+        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
         abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={active} />
@@ -216,8 +214,6 @@ export function ManagementPage() {
       </section>
 
       <PictureQueue />
-
-      <PicturePromptReview />
 
       {picks.length > 0 && (
         <section className="ideas-panel">
