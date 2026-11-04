@@ -7,15 +7,22 @@ import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
 import { playBlow, playWhistle } from "@/lib/realSounds";
-import { playChime, playChimeNote, playMelody, playTwinkle } from "@/lib/sfx";
+import { playChime, playChimeNote, playMelody, playPop, playTwinkle } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES } from "./content";
 import {
+  AntHill,
+  AntRoad,
+  ANT_FAMILY,
+  AntsBackdrop,
+  AntsHome,
   CANDLE,
+  Cookie,
   CandleBackdrop,
   CandleFlame,
   CandleWax,
   Family,
+  GROUND,
   Layer,
   RAIL_Y,
   RailAhead,
@@ -28,7 +35,8 @@ import {
   TrainBackdrop,
   WaxPuddle,
 } from "./scenes";
-import type { TimerPicture, TimerSettings } from "./settings";
+import type { SwapToy, TimerPicture, TimerSettings } from "./settings";
+import { SwapRun } from "./SwapPlay";
 import { clockOn, digits, ownTimeMs } from "./time";
 
 /** The child blows the candle out this long after the time is up, and the flame goes out. */
@@ -37,7 +45,7 @@ const BLOW_MS = 700;
 const END_MS = 3200;
 
 /** In development, `?sekunden=<n>` in the address makes every run take n seconds. */
-function devMs() {
+export function devMs() {
   const seconds = DEV ? Number(new URLSearchParams(window.location.search).get("sekunden")) : 0;
   return seconds > 0 ? seconds * 1000 : 0;
 }
@@ -59,21 +67,40 @@ type Phase = "running" | "blow" | "done";
  * a whistle, twinkling, the flame flaring). At the end a friendly tune and the family waving, then „Nochmal“ and
  * „Weiter“ (the next picture, the same minutes).
  */
-export function TimerPlay({ settings, onPicture }: { settings: TimerSettings; onPicture: (picture: TimerPicture) => void }) {
+export function TimerPlay({
+  settings,
+  onPicture,
+  onToy,
+}: {
+  settings: TimerSettings;
+  onPicture: (picture: TimerPicture) => void;
+  /** A grown-up picks another toy for „Abwechseln“ behind ⚙️. */
+  onToy: (toy: SwapToy) => void;
+}) {
   const [run, setRun] = useState(0);
   const again = () => setRun((n) => n + 1);
   const pick = (picture: TimerPicture) => {
     onPicture(picture);
     again();
   };
-  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} />;
+  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} />;
 }
 
 /**
  * One run's time, worked out as it starts. A clock time already behind us today (a „bis 17:30“ kept from yesterday, or
  * „Nochmal“ after it) is never quietly taken as tomorrow's: a grown-up is asked first (H-60).
  */
-function TimerStart({ settings, onAgain, onPicture }: { settings: TimerSettings; onAgain: () => void; onPicture: (picture: TimerPicture) => void }) {
+function TimerStart({
+  settings,
+  onAgain,
+  onPicture,
+  onToy,
+}: {
+  settings: TimerSettings;
+  onAgain: () => void;
+  onPicture: (picture: TimerPicture) => void;
+  onToy: (toy: SwapToy) => void;
+}) {
   const t = useT();
   const leave = useLeaveGame();
   const [total, setTotal] = useState(() => planMs(settings));
@@ -96,11 +123,30 @@ function TimerStart({ settings, onAgain, onPicture }: { settings: TimerSettings;
       </div>
     );
   }
+  if (settings.picture === "swap") {
+    // Abwechseln (H-52): the time set is one child's turn, and the turns go on until a grown-up stops – or, with a
+    // clock time set, until then, each turn as long as the row's minutes.
+    const turn = devMs() || (settings.useOwn && settings.own?.kind === "for" ? settings.own.seconds * 1000 : settings.minutes * 60_000);
+    return (
+      <SwapRun
+        turnMs={turn}
+        totalMs={until ? (total === "past" ? 0 : total) : undefined}
+        until={until}
+        toy={settings.toy}
+        onToy={onToy}
+        onAgain={onAgain}
+        onPicture={onPicture}
+      />
+    );
+  }
   return <TimerRun picture={settings.picture} total={total === "past" ? 0 : total} until={until} onAgain={onAgain} onPicture={onPicture} />;
 }
 
-/** The time left in digits, for grown-ups behind ⚙️ only (H-62): the child sees no number. Ticks only while it is shown. */
-function TimeLeft({ endsAt, until }: { endsAt: number; until?: string }) {
+/**
+ * The time left in digits, for grown-ups behind ⚙️ only (H-62): the child sees no number. Ticks only while it is shown.
+ * `title` names what it counts down to, when that is not the end (the next child's turn).
+ */
+export function TimeLeft({ endsAt, until, title }: { endsAt: number; until?: string; title?: string }) {
   const t = useT();
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
@@ -109,7 +155,7 @@ function TimeLeft({ endsAt, until }: { endsAt: number; until?: string }) {
   }, []);
   const left = endsAt - now;
   return (
-    <SettingsGroup title={t({ de: "Restzeit" })}>
+    <SettingsGroup title={title ?? t({ de: "Restzeit" })}>
       <p className="tm-left">
         <b>{left > 0 ? t({ de: `${digits(left)} noch` }) : t({ de: "Die Zeit ist um." })}</b>
         {until && <span>{t({ de: `bis ${until}` })}</span>}
@@ -138,7 +184,7 @@ function TimerRun({
   const [endsAt] = useState(() => Date.now() + total);
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
-  const { effects, ripple } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(phase === "running");
 
   // The end: checked at least every second, and again whenever the page comes back (timers sleep in the background).
@@ -172,23 +218,31 @@ function TimerRun({
     }
     if (phase === "done") {
       if (picture === "train") playWhistle();
-      else if (picture === "sand") playChime();
+      else if (picture === "sand" || picture === "ants") playChime();
       const timer = setTimeout(playMelody, picture === "candle" ? 500 : 900);
       return () => clearTimeout(timer);
     }
   }, [phase, picture]);
 
-  /** A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and soft ripples where it was. */
+  /**
+   * A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and what is still left lights up softly
+   * (H-51: the rail to the station, the sand on top, the wax, the cookie), so the child can look how long it still is.
+   * After the end, soft ripples where it was.
+   */
   const answer = useCallback(
     (x?: number, y?: number) => {
-      ripple(x, y);
+      if (phase !== "running") {
+        ripple(x, y);
+        return playTwinkle();
+      }
+      glow(x, y);
       setPoke((n) => n + 1);
-      if (phase !== "running") return playTwinkle();
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
+      else if (picture === "ants") playPop();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
-    [phase, picture, ripple],
+    [phase, picture, ripple, glow],
   );
 
   useEffect(() => {
@@ -213,7 +267,7 @@ function TimerRun({
           {picture === "train" && (
             <>
               <TrainBackdrop />
-              <RailAhead />
+              <RailAhead glow={poke} />
               <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
                 <Train puff={poke} />
               </Layer>
@@ -223,7 +277,7 @@ function TimerRun({
           {picture === "sand" && (
             <>
               <SandBackdrop />
-              <Sand running={phase === "running"} />
+              <Sand running={phase === "running"} glow={poke} />
               <SandFrame />
               <Family kind="fox" x={1000} floor={SAND_FLOOR + 10} />
             </>
@@ -232,9 +286,19 @@ function TimerRun({
             <>
               <CandleBackdrop />
               <WaxPuddle />
-              <CandleWax />
+              <CandleWax glow={poke} />
               <CandleFlame out={phase === "done"} flare={phase === "running" ? poke : 0} />
               <Family kind="bear" x={CANDLE.cx - CANDLE.w / 2 - 300} floor={CANDLE.base + 22} />
+            </>
+          )}
+          {picture === "ants" && (
+            <>
+              <AntsBackdrop />
+              <AntRoad />
+              <Cookie glow={poke} />
+              <AntHill />
+              <AntsHome />
+              <Family kind="fox" x={ANT_FAMILY} floor={GROUND + 30} childLeft laugh={phase === "done"} />
             </>
           )}
         </div>

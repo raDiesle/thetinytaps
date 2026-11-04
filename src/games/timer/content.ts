@@ -25,6 +25,9 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     name: { de: "Sanduhr", en: "Hourglass", zh: "沙漏", hi: "रेत घड़ी", es: "Reloj de arena", ar: "الساعة الرملية", ru: "Песочные часы" },
   },
   { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
+  // German only until translations are asked for (see languageStatus.ts).
+  { id: "ants", emoji: "🐜", name: { de: "Ameisenstraße" } },
+  { id: "swap", emoji: "🔁", name: { de: "Abwechseln" } },
 ];
 
 /** The picture after `id`, after the last the first, for „Weiter“. */

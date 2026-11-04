@@ -40,6 +40,15 @@ export function Layer({
   );
 }
 
+/**
+ * What is still left lights up softly for a moment when the child taps (H-51, „Wie lange noch?“): put inside the part
+ * that shrinks (the rail ahead, the top sand, the wax, the cookie), so the light is exactly as big as what is left.
+ * `n` keys it, a new tap lights it again; 0 shows nothing.
+ */
+export function LeftGlow({ n }: { n: number }) {
+  return n > 0 ? <div key={n} className="tm-left-glow" /> : null;
+}
+
 /** An SVG filling its layer, in the layer's own units. */
 function Draw({ w, h, children }: { w: number; h: number; children: ReactNode }) {
   return (
@@ -52,8 +61,23 @@ function Draw({ w, h, children }: { w: number; h: number; children: ReactNode })
 // ---------------------------------------------------------------------------------------------------------------
 // The fox and the bear family: a grown-up and a child, standing still while they wait and waving at the end.
 
-/** A grown-up with its child beside it, standing on `floor`; the whole family cheers with `.tm-done` on the stage. */
-export function Family({ kind, x, floor, childLeft = false }: { kind: "fox" | "bear"; x: number; floor: number; childLeft?: boolean }) {
+/**
+ * A grown-up with its child beside it, standing on `floor`; the whole family cheers with `.tm-done` on the stage.
+ * `laugh` has the child laugh with its arms up (the Ameisenstraße's end, H-68).
+ */
+export function Family({
+  kind,
+  x,
+  floor,
+  childLeft = false,
+  laugh = false,
+}: {
+  kind: "fox" | "bear";
+  x: number;
+  floor: number;
+  childLeft?: boolean;
+  laugh?: boolean;
+}) {
   const grown = { w: 190, h: 285 };
   const small = { w: 120, h: 180 };
   const childX = childLeft ? x - small.w + 10 : x + grown.w - 10;
@@ -63,7 +87,7 @@ export function Family({ kind, x, floor, childLeft = false }: { kind: "fox" | "b
         <Mascot kind={kind} />
       </Layer>
       <Layer x={childX} y={floor - small.h} w={small.w} h={small.h} className="tm-mascot tm-mascot-child">
-        <Mascot kind={kind} child />
+        <Mascot kind={kind} child pose={laugh ? "cheer" : "stand"} />
       </Layer>
     </>
   );
@@ -215,11 +239,13 @@ export function Train({ puff }: { puff: number }) {
  * The rail ahead of the train, shining (H-64): it lies over the dark rail from the train's front to the buffers and
  * gets shorter as the train rolls on, so what lies behind is dark and what is still to come shines.
  */
-export function RailAhead() {
+export function RailAhead({ glow }: { glow: number }) {
   const from = TRAIN.x + TRAIN.w;
   return (
     <Layer x={from} y={RAIL_Y - 6} w={TRAIN.stop - from} h={10}>
-      <div className="tm-rail-shine tm-move" />
+      <div className="tm-rail-shine tm-move">
+        <LeftGlow n={glow} />
+      </div>
     </Layer>
   );
 }
@@ -324,13 +350,15 @@ export const SandFrame = memo(function SandFrame() {
  * Every second one big grain falls through the neck into the heap (H-63), and the glass the sand has left keeps a
  * faint film of it (H-64), so what is over shows above and what is still to come below.
  */
-export function Sand({ running }: { running: boolean }) {
+export function Sand({ running, glow }: { running: boolean; glow: number }) {
   const left = GLASS.cx - GLASS.w / 2;
   return (
     <>
       <Layer x={left} y={GLASS.top} w={GLASS.w} h={GLASS.neck - GLASS.top} className="tm-bulb" style={{ clipPath: bulbPolygon(false) }}>
         <div className="tm-sand-dust" />
-        <div className="tm-sand tm-sand-top tm-move" />
+        <div className="tm-sand tm-sand-top tm-move">
+          <LeftGlow n={glow} />
+        </div>
       </Layer>
       {running && (
         <Layer x={GLASS.cx - 5} y={GLASS.neck - 4} w={10} h={GLASS.bottom - GLASS.neck} className="tm-stream">
@@ -399,10 +427,12 @@ export function WaxPuddle() {
 }
 
 /** The candle's wax, shrinking from the bottom up as it burns (its CSS scales it). */
-export function CandleWax() {
+export function CandleWax({ glow }: { glow: number }) {
   return (
     <Layer x={CANDLE.cx - CANDLE.w / 2} y={CANDLE.top} w={CANDLE.w} h={CANDLE.base - CANDLE.top} className="tm-wax-box">
-      <div className="tm-wax tm-move" />
+      <div className="tm-wax tm-move">
+        <LeftGlow n={glow} />
+      </div>
     </Layer>
   );
 }
@@ -435,5 +465,195 @@ export function CandleFlame({ out, flare }: { out: boolean; flare: number }) {
         </div>
       )}
     </Layer>
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Ameisenstraße (H-68): a big cookie lies on a picnic blanket, an anthill beside it. Every second an ant carries a
+// crumb over, the cookie gets smaller and the hill bigger; at the end the ants sit on the hill and the fox child laughs.
+
+/** The grass the cookie, the ants and the hill stand on. */
+export const GROUND = 720;
+
+/** The cookie on the blanket: its middle and size; it shrinks to nothing towards its bottom middle. */
+export const COOKIE = { cx: 365, w: 330, h: 176 } as const;
+
+/** The anthill: its middle and full size; it grows from `start` of it at its foot to its whole size. */
+export const HILL = { cx: 990, w: 340, h: 260, start: 0.75 } as const;
+
+/**
+ * The ants' road from under the cookie to the hill's foot: `n` ants walk it at once, `step` apart, each one step a
+ * second, so one ant reaches the hill every second (H-63). The CSS's `tm-march` has one keyframe per step.
+ */
+export const ANTS = { from: 385, n: 7, step: 66, w: 63, h: 42 } as const;
+
+/** Where the fox family watches, right of the hill. */
+export const ANT_FAMILY = 1210;
+
+/** The meadow with the picnic blanket and the crumbs that will be left; drawn once. */
+export const AntsBackdrop = memo(function AntsBackdrop() {
+  return (
+    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
+      <Draw w={STAGE_W} h={STAGE_H}>
+        <defs>
+          <linearGradient id="tm-ant-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#a5dcff" />
+            <stop offset="1" stopColor="#f1fbff" />
+          </linearGradient>
+        </defs>
+        <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-ant-sky)" />
+        <circle cx="1290" cy="170" r="64" fill="#ffe066" />
+        {[
+          [420, 160],
+          [820, 120],
+        ].map(([cx, cy]) => (
+          <g key={cx} fill="#fff">
+            <ellipse cx={cx} cy={cy} rx="70" ry="30" />
+            <ellipse cx={cx + 46} cy={cy - 18} rx="46" ry="30" />
+            <ellipse cx={cx - 40} cy={cy - 8} rx="36" ry="24" />
+          </g>
+        ))}
+        {/* A tree far back and the meadow. */}
+        <rect x="640" y="360" width="26" height="150" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
+        <circle cx="653" cy="330" r="80" fill="#40a35a" stroke={INK} strokeWidth="4" />
+        <path d="M0 520 Q300 450 640 500 T1200 490 T1600 480 V900 H0 Z" fill="#9bd57a" />
+        <path d={`M0 ${GROUND - 70} Q420 ${GROUND - 110} 820 ${GROUND - 80} T1600 ${GROUND - 90} V900 H0 Z`} fill="#7cc35a" />
+        {/* The picnic blanket under the cookie, red with white stripes. */}
+        <ellipse cx={COOKIE.cx} cy={GROUND + 6} rx="225" ry="46" fill="#e03131" stroke={INK} strokeWidth="5" />
+        <path
+          d={`M${COOKIE.cx - 120} ${GROUND - 30} L${COOKIE.cx - 60} ${GROUND + 46} M${COOKIE.cx - 20} ${GROUND - 38} L${COOKIE.cx + 40} ${GROUND + 48} M${COOKIE.cx + 80} ${GROUND - 34} L${COOKIE.cx + 130} ${GROUND + 40}`}
+          stroke="#fff"
+          strokeWidth="14"
+          opacity="0.85"
+        />
+        {/* The last crumbs, hidden under the cookie until it is gone. */}
+        {[
+          [-30, 4],
+          [8, 12],
+          [36, 0],
+        ].map(([dx, dy]) => (
+          <circle key={dx} cx={COOKIE.cx + dx} cy={GROUND + dy} r="7" fill="#d9a05b" stroke={INK} strokeWidth="2.5" />
+        ))}
+        {/* The ants' path: a trodden line in the grass from the blanket to the hill. */}
+        <path d={`M${ANTS.from + 60} ${GROUND + 2} H${HILL.cx - 80}`} stroke="#a58a5f" strokeWidth="14" strokeLinecap="round" opacity="0.5" />
+        <rect y={GROUND + 40} width={STAGE_W} height={STAGE_H} fill="#69b34c" />
+      </Draw>
+    </Layer>
+  );
+});
+
+/** The cookie, seen a little from above: a thick round biscuit with chocolate chips. It shrinks with the timer. */
+export function Cookie({ glow }: { glow: number }) {
+  const { cx, w, h } = COOKIE;
+  return (
+    <Layer x={cx - w / 2} y={GROUND - h + 10} w={w} h={h}>
+      <div className="tm-cookie tm-move">
+        {/* Drawn in 280 × 150 units, stretched to its box. */}
+        <svg viewBox="0 0 280 150" preserveAspectRatio="none">
+          <path d={`M6 70 V96 A134 50 0 0 0 274 96 V70 Z`} fill="#b7742f" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+          <ellipse cx="140" cy="70" rx="134" ry="52" fill="#e0a458" stroke={INK} strokeWidth="5" />
+          {[
+            [70, 60],
+            [130, 44],
+            [196, 62],
+            [110, 88],
+            [170, 92],
+            [226, 80],
+            [56, 84],
+          ].map(([x, y]) => (
+            <ellipse key={x} cx={x} cy={y} rx="11" ry="7" fill="#5c3a1e" />
+          ))}
+        </svg>
+        <LeftGlow n={glow} />
+      </div>
+    </Layer>
+  );
+}
+
+/** One ant facing right with a crumb on its back, in 48 × 32 units. */
+function Ant({ crumb = true }: { crumb?: boolean }) {
+  return (
+    <svg viewBox="0 0 48 32">
+      <g stroke={INK} strokeWidth="2" strokeLinecap="round" fill="none">
+        <path d="M16 20 L10 31 M22 21 L22 31 M28 20 L34 31" />
+        <path d="M40 10 Q44 2 47 3 M38 10 Q38 1 42 0" />
+      </g>
+      <ellipse cx="10" cy="19" rx="10" ry="8" fill="#3b2a20" />
+      <ellipse cx="24" cy="19" rx="7" ry="5.5" fill="#3b2a20" />
+      <circle cx="37" cy="15" r="6.5" fill="#3b2a20" />
+      <circle cx="39" cy="13.5" r="1.8" fill="#fff" />
+      {crumb && <rect x="15" y="1" width="16" height="12" rx="4" fill="#e0a458" stroke={INK} strokeWidth="2" transform="rotate(-8 23 7)" />}
+    </svg>
+  );
+}
+
+/**
+ * The ants' road: `ANTS.n` ants, each a small layer of its own walking the whole road in `ANTS.n` steps of a second,
+ * started a second apart, so they march in a row and one arrives at the hill every second. They come out from under
+ * the cookie and go into the hill, fading in and out there.
+ */
+export function AntRoad() {
+  return (
+    <>
+      {Array.from({ length: ANTS.n }, (_, i) => (
+        <Layer
+          key={i}
+          x={ANTS.from}
+          y={GROUND - ANTS.h + 4}
+          w={ANTS.w}
+          h={ANTS.h}
+          className="tm-ant tm-beat"
+          style={{ "--tm-ant-step": `${(ANTS.step / ANTS.w) * 100}%`, animationDelay: `${-i}s` } as CSSProperties}
+        >
+          <Ant />
+        </Layer>
+      ))}
+    </>
+  );
+}
+
+/** The anthill, growing from its foot as the crumbs come in. */
+export function AntHill() {
+  const { cx, w, h } = HILL;
+  return (
+    <Layer x={cx - w / 2} y={GROUND - h + 12} w={w} h={h}>
+      <div className="tm-hill tm-move">
+        <svg viewBox={`0 0 ${w} ${h}`}>
+          <path
+            d={`M4 ${h - 6} C40 ${h - 60} 100 30 ${w / 2} 22 C${w - 100} 30 ${w - 40} ${h - 60} ${w - 4} ${h - 6} Z`}
+            fill="#b07a45"
+            stroke={INK}
+            strokeWidth="5"
+          />
+          {[
+            [90, 150],
+            [150, 90],
+            [200, 140],
+            [240, 180],
+            [120, 196],
+            [180, 60],
+          ].map(([x, y]) => (
+            <circle key={x} cx={x} cy={y} r="5" fill="#8a5a2b" />
+          ))}
+          <ellipse cx="60" cy={h - 16} rx="20" ry="12" fill="#3b2a20" />
+        </svg>
+      </div>
+    </Layer>
+  );
+}
+
+/** The ants all home at the end, sitting on top of the hill; shown only once the cookie is gone (`.tm-done`). */
+export function AntsHome() {
+  const top = GROUND - HILL.h + 12 + 22;
+  return (
+    <>
+      {[-96, -50, 0, 50, 96].map((dx, i) => (
+        <Layer key={dx} x={HILL.cx + dx - ANTS.w / 2} y={top - ANTS.h + 4 + Math.abs(dx) * 0.42} w={ANTS.w} h={ANTS.h} className="tm-ant-home">
+          <div style={{ transform: i % 2 ? "scaleX(-1)" : undefined }}>
+            <Ant crumb={false} />
+          </div>
+        </Layer>
+      ))}
+    </>
   );
 }

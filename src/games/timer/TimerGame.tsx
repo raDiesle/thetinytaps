@@ -74,7 +74,7 @@ export function TimerGame() {
         </>
       }
     >
-      <TimerPlay settings={{ ...settings, minutes, useOwn }} onPicture={(picture) => update({ picture })} />
+      <TimerPlay settings={{ ...settings, minutes, useOwn }} onPicture={(picture) => update({ picture })} onToy={(toy) => update({ toy })} />
     </GameShell>
   );
 }

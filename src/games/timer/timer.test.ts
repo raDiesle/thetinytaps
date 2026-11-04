@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES } from "./content";
-import { CANDLE, GLASS, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { ANT_FAMILY, ANTS, CANDLE, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
 
 describe("Timer", () => {
@@ -49,5 +50,37 @@ describe("Timer", () => {
     const burnt = `${(((height - CANDLE.stub) / height) * 100).toFixed(2)}%`;
     expect(css).toContain(`scaleY(${left})`);
     expect(css).toContain(`--tm-burnt: ${burnt}`);
+  });
+
+  test("the Ameisenstraße stays on every screen, its ants walk from under the cookie into the hill, one step a second (H-68)", async () => {
+    expect(COOKIE.cx - COOKIE.w / 2).toBeGreaterThanOrEqual(190);
+    // The fox family right of the hill, the grown-up within x 1400 (190 wide).
+    expect(ANT_FAMILY + 190).toBeLessThanOrEqual(1400);
+    expect(GROUND + 40).toBeLessThanOrEqual(820);
+    expect(GROUND - HILL.h).toBeGreaterThanOrEqual(80 + 140);
+    // The road starts under the cookie and ends at the hill's foot while it is still small, so ants come and go hidden.
+    const end = ANTS.from + ANTS.n * ANTS.step;
+    expect(ANTS.from).toBeLessThan(COOKIE.cx + COOKIE.w / 2 - ANTS.w);
+    expect(end).toBeGreaterThanOrEqual(HILL.cx - (HILL.w / 2) * HILL.start - ANTS.w / 2);
+    expect(ANTS.step).toBeGreaterThan(ANTS.w);
+    // One keyframe per step, and the march lasts as many seconds as there are ants, one started each second.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (let k = 0; k <= ANTS.n; k++) expect(css).toContain(`translateX(calc(var(--tm-ant-step) * ${k}))`);
+    expect(css).not.toContain(`translateX(calc(var(--tm-ant-step) * ${ANTS.n + 1}))`);
+    expect(css).toContain(`animation: tm-march ${ANTS.n}s ease-in-out infinite`);
+  });
+
+  test("Abwechseln keeps both families, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
+    expect(SWAP_FAMILIES.fox).toBeGreaterThanOrEqual(200);
+    expect(SWAP_FAMILIES.bear + 190).toBeLessThanOrEqual(1400);
+    const glassLeft = SWAP_GLASS.cx - SWAP_GLASS.w / 2;
+    const glassRight = SWAP_GLASS.cx + SWAP_GLASS.w / 2;
+    expect(TOY.fox + TOY.w).toBeLessThanOrEqual(glassLeft + 10);
+    expect(TOY.bear).toBeGreaterThanOrEqual(glassRight - 10);
+    // The fox child stands right of its grown-up (120 wide), the bear child left of its grown-up.
+    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_FAMILIES.fox + 190 - 10 + 120 - 10);
+    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_FAMILIES.bear - 120 + 10 + 10);
+    expect(SWAP_GLASS.top).toBeGreaterThanOrEqual(80 + 140);
+    expect(SWAP_FLOOR + 10).toBeLessThanOrEqual(820);
   });
 });

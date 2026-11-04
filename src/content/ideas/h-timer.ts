@@ -79,6 +79,7 @@ export const timerIdeas: IdeaArea = {
       text: "Tippt das Kind während des Laufens aufs Bild, leuchtet kurz auf, was noch bleibt: die Gleise bis zum Bahnhof, der Sand oben in der Sanduhr, die Äpfel am Baum wackeln. Statt nur Dampf und Glitzer bekommt die Frage „Ist es schon vorbei?“ eine Antwort, die das Kind selbst holen kann.",
       why: "Kinder fragen immer wieder „Wie lange noch?“. Wenn das Bild es zeigt, können Eltern sagen „Schau nach“ und das Kind lernt, Restzeit selbst abzulesen.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-52",
@@ -87,6 +88,7 @@ export const timerIdeas: IdeaArea = {
       text: "Ein Timer für zwei Kinder: Ein Spielzeug (Bobbycar, Schaukel, Puppe, als Bild gewählt) liegt beim Fuchskind, daneben rinnt die Sanduhr. Ist sie leer, wandert das Spielzeug mit einem Klang zum Bärenkind, und die Sanduhr dreht sich von selbst um. So geht es hin und her, bis ein Großer aufhört.",
       why: "Streit ums Spielzeug unter Geschwistern oder Freunden gehört zum Alltag mit Zwei- und Dreijährigen; ein Bild, das unparteiisch zeigt, wann das andere Kind dran ist, nimmt den Eltern die Schiedsrichterrolle ab.",
       effort: "M",
+      done: true,
     },
     {
       id: "H-53",
@@ -221,6 +223,7 @@ export const timerIdeas: IdeaArea = {
       text: "Auf dem Tisch liegt ein großer Keks, daneben ein Ameisenhügel. Jede Sekunde trägt eine Ameise einen Krümel hinüber: Die Straße der Ameisen zeigt die Richtung, der Keks wird kleiner, der Hügel größer. Ist der Keks weg, sitzen alle Ameisen oben auf dem Hügel, und das Fuchskind, das zugeschaut hat, lacht.",
       why: "Eine Reihe, die immer in dieselbe Richtung läuft, macht „von da nach da“ ohne Worte deutlich, und es bewegt sich ständig etwas, auch wenn der Keks nur langsam schrumpft.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-69",
