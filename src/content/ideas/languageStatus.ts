@@ -104,6 +104,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken (statt des übersetzten Schalters „In Farbe“) und die Zeile im Druck-Stempel des Assistenten – nur Deutsch.",
       },
       {
+        label: "🌙 Buch „Wie lange warten?“ (Countdown mit Betten, Mond und Sonne)",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts) und die Seite für Suchmaschinen (seo.ts, seo.en.ts) – nur Deutsch; Englisch gibt es nur für Suchmaschinen. Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",
+      },
+      {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
         languages: { de: "done" },
         note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“ – nur Deutsch.",
@@ -277,7 +282,19 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/buchstaben/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026) bis auf die 361 Zählsätze („drei Äpfel!“, ≈ 1.100 Credits), für die die Credits nicht mehr reichten: bis dahin sagt das Spiel nur die Zahl. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm. Noch nicht übersetzt: der Hinweis unter ⚙️ beim Spielstart („Hier gibt es viele Spielarten …“, November 2026). Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026) bis auf die 361 Zählsätze („drei Äpfel!“, ≈ 1.100 Credits), für die die Credits nicht mehr reichten: bis dahin sagt das Spiel nur die Zahl. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm. Noch nicht übersetzt: die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart („Hier lässt sich viel einstellen …“, November 2026). Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+  },
+  {
+    href: "/zaehlen/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Ein Spiel für sich seit November 2026 (vorher „Nur Zahlen“ in „Frei tippen“), mit dessen Zahlen und Texten. Deutsch von ElevenLabs gesprochen bis auf die Zählsätze („drei Äpfel!“): bis dahin sagt es nur die Zahl. Noch nicht übersetzt: der Name „Zählen“, die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm.",
+  },
+  {
+    href: "/woerter/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Ein Spiel für sich seit November 2026 (vorher eine Spielart von „Buchstaben & Zahlen“), mit „Wo ist das B?“; Wörter aus den Sprachpaketen wie bei „Frei tippen“. Deutsch von ElevenLabs gesprochen, die anderen Sprachen noch nicht aufgenommen. Noch nicht übersetzt: die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart.",
   },
   {
     href: "/",

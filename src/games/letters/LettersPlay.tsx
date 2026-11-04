@@ -69,10 +69,10 @@ const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
 const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
 
 /**
- * Frei tippen: every key shows its letter or number. With `numbersOnly` (Zählen) only numbers come: a digit shows
- * itself, and any other key that has no meaning of its own a number by chance.
+ * Frei tippen: every key shows its letter or number. With `numbersOnly` it plays Zählen: only numbers come, a digit
+ * shows itself, and any other key that has no meaning of its own a number by chance.
  */
-export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
+export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: LanguagePack; settings: LettersSettings; numbersOnly?: boolean }) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
@@ -83,7 +83,6 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const t = useT();
   const { id: language } = useAppLanguage();
   const stepByStep = settings.numbers === "step";
-  const numbersOnly = settings.numbersOnly;
   /** A number stops before its digit, which comes only when the same number is pressed again (`digitOnRepeat`). */
   const holdDigit = settings.digitOnRepeat && (settings.numbers === "all" || settings.numbers === "count");
 

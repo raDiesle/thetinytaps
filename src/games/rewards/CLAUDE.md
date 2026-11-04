@@ -1,7 +1,7 @@
 # Belohnungstafel & Zeitplan: both on one page
 
-Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan: `also` in `games.ts`, so it keeps its
-own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
+Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan, and `/wie-lange-warten/`, opened on a
+Countdown: `also` in `games.ts`, so each keeps its own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
 „belohnungstafel“ in `src/content/research.ts`. One card, „📅 Belohnungstafel & Zeitplan“
 (both things it makes, a calendar as its sign – user decision, October 2026; the search entries keep „Tagesplan“, as
 parents search for it): the **Belohnungstafel**
@@ -15,9 +15,12 @@ row of tabs and one wizard.
 views there any more: the view (Tag, Woche, Monat, Countdown, Erst – Dann, Sammeln) is the „Zeitraum“ option of the editor (user
 feedback, November 2026). Beside it the Vorlagen of its kind, grouped under the names of their views; „Gestalten“,
 „Drucken“ (and a board's „Rückblick“) work on the one shown. Each address opens its own kind: `/belohnungstafel/` a board
-or a plan with a Zähler (below), `/tagesplan/` a plan (so the teeth card's return and a search visitor land there) – on
-the shelf each is a book of its own, the two tied with a ribbon (`Game.volumes`, user feedback, November 2026), so the book named
-Belohnungstafel opens a board, or the wizard where none is made yet (below). Nothing remembers which was shown last.
+or a plan with a Zähler (below), `/tagesplan/` a plan of the day, never a Countdown (so the teeth card's return and a
+search visitor land there), `/wie-lange-warten/` a Countdown (H-05, user request, November 2026) – on the shelf each is a
+book of its own, the three in one slipcase tied with a ribbon (`Game.volumes`, user feedback, November 2026), so the book
+named Belohnungstafel opens a board, or the wizard on its kind where none is made yet (below; „Wie lange warten?“ the
+wizard on the Vorlage „Wie oft noch schlafen?“), with the other charts behind it. Once a tab or the wizard showed
+another chart, the address no longer picks (`chosen` in `RewardsGame`). Nothing remembers which was shown last.
 
 **One editor, on the chart itself** (`ChartEditor.tsx`, user decision, November 2026: „exakt gleiche Seite für
 Assistent und Seite … alles gleich aussieht und funktioniert“): „＋ Neu“ (`Wizard.tsx`) and „✏️ Gestalten“ are the same
@@ -291,8 +294,9 @@ order, left to right and row by row, a row per part of the day where it has two;
 and a paper arrow cut out of card (`PaperArrow`) points up at the card to do from below it and moves on;
 or, as a variant, `nowField`, the card to do stands big on a panel of its own under „Jetzt“, the others smaller under
 „Dann“, and done cards go into the Fertig-Kiste), **Erst – Dann** (pairs of two, each a small board of its own, up to four on a
-page to cut apart) and the **Woche** (a column per day); the **Countdown** (H-41, „Wie oft noch schlafen?“) is a chart of
-its own: one card, the picture of a big day (Geburtstag, Urlaub, Oma und Opa), and a moon for every night until it. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
+page to cut apart) and the **Woche** (a column per day); the **Countdown** (H-41, H-05, „Wie oft noch schlafen?“, its own
+book „Wie lange warten?“ on the shelf) is a chart of its own: one card, the picture of a big day (Geburtstag, Urlaub, Oma
+und Opa), and a little bed for every night of the waiting, a moon over it until the child turns it into a sun. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
 shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the gallery's classes, the star log).
 
 ## Files
@@ -304,7 +308,8 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   `stepsOn`, `stepDone` (a tick in the log, or the linked game – brushing only for the step's `slot`), `currentStep`,
   `nowSteps` (the cards to do now: one, or on an Erst–Dann the first open one of every pair), `partsOf`, `pairsOf`,
   `splitDone` (the row and the Fertig-Kiste), `exampleTicks`, `restartDay` (a day, or only some of its steps),
-  `nightsUntil`, the Countdown's `bigDayOf`, `bigDayStep`, `moonsLeft` (`Plan.bigDay`, `COUNTDOWN_NIGHTS`, `MAX_NIGHTS`), `withSteps`, `withSame`, `joinLastPart` (a new card joins the last part), `distinctSteps` (the cards
+  `nightsUntil`, the Countdown's `bigDayOf`, `bigDayStep`, `moonsLeft`, `nightsOf` (its beds and their state),
+  `bigDayCome`, `withBigDay` (`Plan.bigDay`, `Plan.since`, `COUNTDOWN_NIGHTS`, `MAX_NIGHTS`), `withSteps`, `withSame`, `joinLastPart` (a new card joins the last part), `distinctSteps` (the cards
   to print, a card twice where one day has it twice).
 - `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS`, `NOW_WAYS` (marker or
   „Jetzt“ field, each with the note that says what it means to make) and `PLAN_TEMPLATES`: Mein Tag (Jetzt – Dann:
@@ -314,8 +319,8 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   rows and columns for one part, as many in a row as fit unless another row makes the cards clearly bigger, several
   parts get a line each with their ☀️ / 🌙 before it – with the paper arrow under the card to do; with the field
   the „Jetzt“ panel under a 👇, the other rows and on screen the Fertig-Kiste below, `DoneBox`, and on paper `FieldFrames`),
-  `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a day), `Countdown` (a field of moons ➜ the
-  big day's card; on the day itself only the card, big and golden). No date on the sheet: only a printed
+  `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a day), `Countdown` (a field of beds with their
+  moon or sun, `BedPic`, `MoonPic`, `SunPic` ➜ the big day's card; once the big day has come only the card, big and golden). No date on the sheet: only a printed
   plan whose weekdays differ names its weekday.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
   `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out
@@ -339,9 +344,13 @@ flies with a sound into the Fertig-Kiste at the bottom edge (H-42), as on a Velc
 shorter until only the last card (the bed) is left. The voice (if on) names what comes next, and the last one starts a
 small party. The flight (`PlanScreen`, Web Animations from the card's or the marker's old place, `flyFrom`) only
 follows a tap, and is left out with reduced motion. On a
-Countdown a tap on a moon or the big card counts the moons, each lighting up with a rising note, then the card wiggles
-and the voice (if on) says „Noch 3-mal schlafen, dann Geburtstag“; on the day itself a tap starts a party. Nothing
-is ticked: a moon goes by itself each night. In the
+Countdown (H-05) the bed of each night slept glows in the morning, a 👇 over the first: the child's tap turns its moon
+into a sun rising over it, on a patch of day sky, with the rooster's crow (`playCrow` from `realSounds`), and the voice (if
+on) says „Noch 3-mal schlafen, dann Geburtstag“. A tap on any glowing bed suns the oldest one waiting (a morning was
+missed). The tick is the morning's key with the task id `nacht`, so another picture keeps the suns. A tap on a moon still
+to come or on the big card counts the moons, each lighting up with a rising note, then the card wiggles; while a bed
+glows on the big day itself, that bed wiggles instead. The last morning's sun rises first, then the picture comes big
+with the party. „↶ Zurück“ takes a sun back like any tick. In the
 week the cards are small and stay in their column with a ✓. A done card (in the box) twinkles, the box itself names
 what is in it, a later one wiggles (in the week: „Noch N-mal schlafen“). With a Zähler (above) any open card of today takes a tap: one star per tap pops into its fields until it has
 them all, and the reward's party comes when its goal is reached. A key wiggles the „Jetzt“ card but
@@ -374,10 +383,14 @@ beside it close it without a tick. The plan prints every ritual it has as a card
 - Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most, or `MAX_PART_STEPS` in each part of a day
   in two parts (`stepLimit`); a template and every shape the wizard offers stay within it (`plan.test.ts`).
 - A Countdown is a chart of its own, never a view the Zeitraum switches into or out of on the page (its one card is
-  a day, not a routine). Its date and picture are set by a tap on its card in the editor (`BigDayDialog`: a date, or
-  − ＋ nights, and the picture), never in the band; it has no Zähler, no examples and no cards to cut out, and it never
-  counts more than `MAX_NIGHTS` moons (a month fits a sheet). On paper the moons are printed from the day of printing,
-  to colour in or cross out one each morning (`plan.test.ts`).
+  a day, not a routine), and has its own book and address („Wie lange warten?“, `/wie-lange-warten/`). Its date and
+  picture are set by a tap on its card in the editor (`BigDayDialog`: a date, or − ＋ nights, and the picture), never in
+  the band; it has no Zähler, no examples and no cards to cut out, and it never counts more than `MAX_NIGHTS` beds (a
+  month fits a sheet). On paper only the nights from the day of printing, with moons to colour in or cross out one each
+  morning (`plan.test.ts`).
+- A Countdown's moon turns into a sun only by the child's tap on its morning (H-05), never by itself: the waiting is
+  the child's to count. Each night of the waiting stays on the sheet (from `Plan.since`), so the suns grow as the moons
+  get fewer; a new big day after the old one is over starts a new waiting, a big day moved keeps the suns (`withBigDay`).
 - No clock times and no dates on a plan's sheet: order, „Jetzt – Dann“ and moons for the days to come; toddlers read
   no clock (the date in the corner was removed, user feedback, October 2026).
 - No words for the child on a plan's sheet (user feedback, November 2026): a card is its picture only (its word is the

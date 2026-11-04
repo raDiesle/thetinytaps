@@ -52,6 +52,7 @@ import {
   defaultReward,
   exampleTicks,
   MAX_NIGHTS,
+  withBigDay,
   MAX_STARS,
   moonsLeft,
   type Plan,
@@ -958,7 +959,7 @@ function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan
   const t = useT();
   const today = new Date();
   const step = bigDayStep(plan);
-  const on = (key: string) => onChange({ ...plan, bigDay: key });
+  const on = (key: string) => onChange(withBigDay(plan, key, today));
   return (
     <EditDialog title={t(BIG_DAY)} onClose={onClose}>
       <div className="rw-edit-row">

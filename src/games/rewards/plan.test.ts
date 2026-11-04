@@ -5,6 +5,7 @@ import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./bo
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
+  bigDayCome,
   bigDayStep,
   COUNTDOWN_NIGHTS,
   counterOf,
@@ -17,6 +18,7 @@ import {
   MAX_NIGHTS,
   MAX_STEPS,
   moonsLeft,
+  nightsOf,
   nightsUntil,
   nowSteps,
   pairsOf,
@@ -36,6 +38,7 @@ import {
   withEveryDay,
   withSame,
   withStepStars,
+  withBigDay,
   withSteps,
 } from "./plan";
 import { printsCards, ritualsOf } from "./PlanPrint";
@@ -358,6 +361,49 @@ describe("a week's grid of stars", () => {
     expect(bigDayStep(plan)?.catalog).toBe("geburtstag");
     expect(plan.days[0].every((step) => !step.stars)).toBe(true);
     expect(printsCards(plan)).toBe("never");
+  });
+
+  // H-05: a bed for every night of the waiting; each morning the child taps the night slept from moon to sun, the
+  // oldest first when a morning was missed, and the big day comes with its last morning tapped.
+  test("a Countdown's nights turn from moon to sun only by the child's tap, one each morning", () => {
+    const tpl = PLAN_TEMPLATES.find((t) => t.view === "countdown");
+    if (!tpl) throw new Error("no Countdown template");
+    const plan = planFromTemplate(tpl, "de", WED);
+    const at = (iso: string) => new Date(`${iso}T08:00`);
+    const states = (day: Date, ticks?: Record<string, number>) => nightsOf(plan, day, ticks).map((n) => n.state);
+    // Made today: five nights to come, nothing to tap yet.
+    expect(states(WED)).toEqual(["later", "later", "later", "later", "later"]);
+    // The next morning one bed waits; tapped, it is a sun – and the moons left are the nights still to come.
+    const thu = at("2026-10-29");
+    expect(states(thu)).toEqual(["now", "later", "later", "later", "later"]);
+    const first = nightsOf(plan, thu, {})[0].key;
+    const log = addStar({}, plan.id, first, thu);
+    expect(states(thu, log[plan.id])).toEqual(["done", "later", "later", "later", "later"]);
+    expect(moonsLeft(plan, thu)).toBe(4);
+    // A morning missed: two beds wait, and nothing turns into a sun by itself.
+    expect(states(at("2026-10-31"), log[plan.id])).toEqual(["done", "now", "now", "later", "later"]);
+    // On the big day it has come only once its last morning is tapped; after it, always.
+    const all = Object.fromEntries(nightsOf(plan, at("2026-11-02"), {}).map((n) => [n.key, 1]));
+    expect(bigDayCome(plan, at("2026-11-02"), {})).toBe(false);
+    expect(bigDayCome(plan, at("2026-11-02"), all)).toBe(true);
+    expect(bigDayCome(plan, at("2026-11-03"), {})).toBe(true);
+    // Another picture keeps the suns: a night's tick doesn't hang on the picture.
+    const other = { ...plan, days: [[stepFromCatalog("urlaub")]] };
+    expect(nightsOf(other, thu, log[plan.id])[0].state).toBe("done");
+    // A month at most, the last nights before the big day.
+    expect(nightsOf({ ...plan, bigDay: "2027-06-01" }, WED, {}).length).toBe(MAX_NIGHTS);
+  });
+
+  test("a new big day starts a new waiting once the old one is over, and a day moved keeps its suns", () => {
+    const tpl = PLAN_TEMPLATES.find((t) => t.view === "countdown");
+    if (!tpl) throw new Error("no Countdown template");
+    const plan = planFromTemplate(tpl, "de", WED);
+    expect(withBigDay(plan, "2026-11-05", new Date("2026-10-30T08:00")).since).toBe(plan.since);
+    expect(withBigDay(plan, "2026-11-20", new Date("2026-11-04T08:00")).since).toBe("2026-11-04");
+    // Made before H-05 (no start): its waiting begins now.
+    const { since: _, ...older } = plan;
+    expect(nightsOf(older, new Date("2026-10-30T08:00"), {}).map((n) => n.state)).toEqual(["now", "later", "later", "later"]);
+    expect(withBigDay(older, "2026-11-05", WED).since).toBe("2026-10-28");
   });
 });
 

@@ -20,6 +20,8 @@ const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage", "/t
 const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage", "/kleine-abenteuer/");
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage", "/gefuehle/");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/buchstaben/");
+const CountingPage = page(() => import("@/pages/LettersPage"), "CountingPage", "/zaehlen/");
+const WordsPage = page(() => import("@/pages/LettersPage"), "WordsPage", "/woerter/");
 const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
@@ -29,6 +31,7 @@ const PacifierPage = page(() => import("@/pages/PacifierPage"), "PacifierPage", 
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
 const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
+const WaitPage = page(() => import("@/pages/RewardsPage"), "WaitPage", "/wie-lange-warten/");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bilder/");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
@@ -47,8 +50,8 @@ export function App() {
         <Route index element={<Home />} />
         <Route path="spiele/:category" element={<CategoryPage />} />
         <Route path="buchstaben" element={<LettersPage />} />
-        {/* „Wörter tippen“ had a page of its own; it is a mode of Buchstaben & Zahlen now. */}
-        <Route path="woerter" element={<Navigate to="/buchstaben/" replace />} />
+        <Route path="zaehlen" element={<CountingPage />} />
+        <Route path="woerter" element={<WordsPage />} />
         <Route path="tiere" element={<AnimalsPage />} />
         <Route path="zusammen" element={<TogetherPage />} />
         <Route path="bilder" element={<ScenesMenu />} />
@@ -60,6 +63,7 @@ export function App() {
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />
+        <Route path="wie-lange-warten" element={<WaitPage />} />
         <Route path="timer" element={<TimerPage />} />
         <Route path="gefuehle" element={<FeelingsPage />} />
         <Route path="wie-gehts-dir" element={<MoodPage />} />

@@ -21,7 +21,10 @@ const FOLDERS: Record<string, string[]> = {
   "/zusammen/": ["src/games/together"],
   "/schatten/": ["src/games/shadows"],
   "/socken/": ["src/games/socks"],
+  // The book's three games share one folder: Frei tippen has it, the two others only their own play.
   "/buchstaben/": ["src/games/letters"],
+  "/zaehlen/": [],
+  "/woerter/": ["src/games/letters/WordsPlay.tsx", "src/games/letters/FindPlay.tsx"],
   "/zaehne/": ["src/games/teeth"],
   "/toepfchen/": ["src/games/potty"],
   "/timer/": ["src/games/timer"],

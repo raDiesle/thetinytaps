@@ -436,9 +436,9 @@ describe("one page for boards and plans", () => {
       ).toBe(true);
   });
 
-  test("the home menu has one card for both, and /tagesplan/ is another address of it", () => {
+  test("the home menu has one card for both, and /tagesplan/ and /wie-lange-warten/ are other addresses of it", () => {
     const games = CATEGORIES.flatMap((category) => category.games);
-    expect(games.find((game) => game.href === "/belohnungstafel/")?.also).toEqual(["/tagesplan/"]);
+    expect(games.find((game) => game.href === "/belohnungstafel/")?.also).toEqual(["/tagesplan/", "/wie-lange-warten/"]);
     expect(games.some((game) => game.href === "/tagesplan/")).toBe(false);
   });
 });

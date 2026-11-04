@@ -72,6 +72,12 @@ export interface Plan {
    * shown on the sheet as a date – the child sees a moon for every night until then.
    */
   bigDay?: string;
+  /**
+   * Countdown only (H-05): the day the waiting began, YYYY-MM-DD – a bed for every night from then until the big day,
+   * which the child turns from moon to sun each morning. Missing (made before H-05): yesterday, so each morning has one
+   * bed to tap.
+   */
+  since?: string;
 }
 
 /** A plan as an older version saved it: its two-card „Jetzt – Dann“ view is now a Jetzt – Dann plan with the „Jetzt“ field. */
@@ -149,7 +155,7 @@ export function planFromTemplate(template: PlanTemplate, language: TargetLanguag
     same: days.length === 1,
     theme: template.theme,
     // A Countdown has nothing to tick, so nothing to show as an example: its moons are there from the start.
-    ...(template.view === "countdown" ? { bigDay: dayKey(daysLater(today, COUNTDOWN_NIGHTS)) } : { examples: true }),
+    ...(template.view === "countdown" ? { bigDay: dayKey(daysLater(today, COUNTDOWN_NIGHTS)), since: dayKey(today) } : { examples: true }),
   };
 }
 
@@ -170,6 +176,53 @@ export const bigDayStep = (plan: Plan): PlanStep | undefined => plan.days[0]?.[0
 
 /** Moons left on a day: one for every night until the big day, none on the day itself and after, at most `MAX_NIGHTS`. */
 export const moonsLeft = (plan: Plan, day: Date): number => Math.min(MAX_NIGHTS, Math.max(0, nightsUntil(day, bigDayOf(plan, day))));
+
+/**
+ * One night of a Countdown's waiting (H-05, „Wie oft noch schlafen?“), drawn as a bed: `later` a moon over it, a night
+ * still to sleep; `now` slept, its morning come, the moon waiting for the child's tap; `done` tapped, a sun over it.
+ * `key` is its tick in the log: the morning after the night, with the big day's card.
+ */
+export interface Night {
+  key: string;
+  state: "done" | "now" | "later";
+}
+
+/** When a Countdown's waiting began (`Plan.since`), or yesterday for one made before. */
+/** The task id of a night's tick, whatever the big day's picture: choosing another one keeps the suns. */
+const NIGHT = "nacht";
+
+/**
+ * A Countdown given a new big day: the beds of a waiting already over (its big day today or gone) go, and the new
+ * waiting begins today; a day only moved (the trip a day later) keeps the suns tapped so far.
+ */
+export function withBigDay(plan: Plan, key: string, today: Date): Plan {
+  const over = !plan.since || nightsUntil(today, bigDayOf(plan, today)) <= 0;
+  return { ...plan, bigDay: key, since: over ? dayKey(today) : plan.since };
+}
+
+const sinceOf = (plan: Plan, today: Date): Date => (plan.since ? new Date(`${plan.since}T12:00`) : daysLater(today, -1));
+
+/**
+ * A Countdown's nights on `today`: one bed for every night from `since` to the big day, at most `MAX_NIGHTS` (the last
+ * ones). Mornings come and the child taps them, so a night slept is `now` until ticked, then `done`; nights to come are
+ * `later` (as many as `moonsLeft`).
+ */
+export function nightsOf(plan: Plan, today: Date, ticks: Record<string, number> | undefined): Night[] {
+  if (!bigDayStep(plan)) return [];
+  const big = bigDayOf(plan, today);
+  const count = Math.min(MAX_NIGHTS, Math.max(0, nightsUntil(sinceOf(plan, today), big)));
+  return Array.from({ length: count }, (_, i) => {
+    const morning = daysLater(big, i - count + 1);
+    const key = cellKey(morning, NIGHT);
+    return { key, state: nightsUntil(today, morning) > 0 ? "later" : ticks?.[key] ? "done" : "now" };
+  });
+}
+
+/** Whether the big day has come for the child: it is here and the last morning tapped, or it is over. */
+export function bigDayCome(plan: Plan, today: Date, ticks: Record<string, number> | undefined): boolean {
+  const nights = nightsUntil(today, bigDayOf(plan, today));
+  return nights < 0 || (nights === 0 && nightsOf(plan, today, ticks).every((night) => night.state === "done"));
+}
 
 /** The parts of a day in two, in their order. */
 export const DAY_PARTS: Slot[] = ["morning", "evening"];

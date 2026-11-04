@@ -325,7 +325,7 @@ In a fresh worktree run `bun install` first.
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
   that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
-  Belohnungstafel and Zeitplan, right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  Belohnungstafel, Zeitplan and „Wie lange warten?“ (the Zeitplan's Countdown), right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
@@ -355,7 +355,10 @@ In a fresh worktree run `bun install` first.
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
-  never a tap a child could make by chance.
+  never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
+  not the same game easier or with other words – are games of their own in the book's table of contents, never one
+  game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
+  split again, user feedback, November 2026).
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
@@ -443,7 +446,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
+  before playing (Socken-Paare finds its difficulty itself, Frei tippen changes everything behind ⚙️ while
   playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
   start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
   (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that
