@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { INK, MascotFace, nth } from "../shared";
 import { Hand, Head, Legs, NAVY, PuffCheeks, RAIL_RED, SIGNAL_ORANGE, Suitcase, Toot, VEST } from "./parts";
 
 // People. Each drawing has its foot point (between the feet, on the ground) at (0, 0).
@@ -137,7 +138,10 @@ export function Kind() {
   );
 }
 
-/** The pilot with her cap: she salutes, nods and her wings badge sparkles. She holds the dog's lead. */
+/** The pilot's paws: she is a bear, one of the app's mascots in a role. */
+const BEAR_PAW = MASCOT_COLORS.bear.fur;
+
+/** The pilot, a bear with her cap: she salutes, nods and her wings badge sparkles. She holds the dog's lead. */
 export function Pilotin() {
   return (
     <g transform="translate(70 0)">
@@ -152,19 +156,19 @@ export function Pilotin() {
         </g>
         <path d="M-26 -150 L-38 -108" stroke={NAVY} strokeWidth="14" strokeLinecap="round" />
         <path d="M-37 -116 h-6 M-38 -112 h-6" stroke="#ffd60a" strokeWidth="2" />
-        <Hand cx={-38} cy={-104} />
+        <Hand cx={-38} cy={-104} fill={BEAR_PAW} />
         <g className="fh-pilotin-head" style={{ transformOrigin: "0px -160px" }}>
-          <path d="M-20 -184 Q-30 -160 -22 -146 H22 Q30 -160 20 -184 Z" fill="#2b2d42" />
-          <Head cx={0} cy={-180} r={22} hair="#2b2d42">
-            <path d="M-24 -192 Q-22 -214 0 -214 Q22 -214 24 -192 Z" fill={NAVY} />
-            <rect x="-28" y="-196" width="56" height="8" rx="3" fill={INK} />
-            <path d="M-16 -194 H16" stroke="#ffd60a" strokeWidth="3" />
-            <circle cx="0" cy="-204" r="4" fill="#ffd60a" />
-          </Head>
+          {/* Her cap sits between her round ears, in the head's own box. */}
+          <MascotFace kind="bear" cx={0} cy={-178} r={24} lashes>
+            <path d="M28 32 C28 6 72 6 72 32 Z" fill={NAVY} />
+            <rect x="22" y="28" width="56" height="8" rx="3" fill={INK} />
+            <path d="M33 30 H67" stroke="#ffd60a" strokeWidth="3" />
+            <circle cx="50" cy="19" r="4" fill="#ffd60a" />
+          </MascotFace>
         </g>
         <g className="fh-pilotin-arm" style={{ transformOrigin: "26px -150px" }}>
           <path d="M26 -150 L38 -106" stroke={NAVY} strokeWidth="14" strokeLinecap="round" />
-          <Hand cx={39} cy={-102} />
+          <Hand cx={39} cy={-102} fill={BEAR_PAW} />
         </g>
         <g className="fh-pilotin-sparkle" fill="#fff">
           {[

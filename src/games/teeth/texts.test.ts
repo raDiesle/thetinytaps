@@ -50,7 +50,7 @@ test("a step or daytime text with Russian is there in en, zh, hi, es and ar too,
         (["title", "hint", "cue"] as const).filter((key) => STEP_TEXTS_RU[step.id]?.[key]).map((key) => stepText(step, key, language)),
       ),
       ...(["morning", "evening"] as const).flatMap((daytime) =>
-        (["hello", "grow", "doneTitle", "after"] as const).filter((key) => DAYTIME_RU[daytime][key]).map((key) => daytimeText(daytime, key, language)),
+        (["hello", "grow", "after"] as const).filter((key) => DAYTIME_RU[daytime][key]).map((key) => daytimeText(daytime, key, language)),
       ),
     ];
     for (const { text, lang } of lines) {

@@ -26,6 +26,14 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/kinderarzt/practice.tsx",
   "src/games/scenes/wald/people.tsx",
   "src/games/feelings/moodArt.tsx",
+  "src/games/scenes/family.tsx",
+  "src/games/scenes/feuerwache/parts.tsx",
+  "src/games/scenes/feuerwache/figures.tsx",
+  "src/games/scenes/zoo/visitors.tsx",
+  "src/games/scenes/bauernhof/figures.tsx",
+  "src/games/scenes/flughafen/people.tsx",
+  "src/games/letters/LettersPlay.tsx",
+  "src/games/letters/WordsPlay.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */
@@ -50,14 +58,14 @@ describe("the shared fox and bear", () => {
   test("every head and figure draws without broken numbers", () => {
     for (const kind of ["fox", "bear"] as const) {
       for (const eyes of ["open", "wide", "half", "shut", "happy"] as const) {
-        for (const mouth of ["smile", "open", "frown", "o"] as const) {
+        for (const mouth of ["smile", "open", "grin", "frown", "o"] as const) {
           for (const brows of ["soft", "sad", "angry", "up"] as const) {
             const svg = renderToStaticMarkup(createElement("svg", null, createElement(MascotHead, { kind, eyes, mouth, brows, lashes: true })));
             expect(svg).not.toContain("NaN");
           }
         }
       }
-      for (const pose of ["stand", "wave", "cheer", "clap"] as const) {
+      for (const pose of ["stand", "wave", "cheer", "clap", "point"] as const) {
         expect(renderToStaticMarkup(createElement(Mascot, { kind, pose, child: pose === "cheer" }))).not.toContain("NaN");
       }
     }

@@ -4,7 +4,7 @@ Route `/zusammen/`, in the Zuordnen book. Ideas Z-03 („Was gehört zusammen?�
 das?“, helpers and their tools), built as one game (user decision, November 2026).
 
 One flowing game, like Was gehört zum Tier?: its card plays at once (`startMode`), with no start screen, no cards and no
-`level` row; ✕ and „Menü“ go back to the table of contents. Two kinds of rounds take turns (`KIND_ORDER` in
+`level` row; ✕ goes back to the table of contents. Two kinds of rounds take turns (`KIND_ORDER` in
 `levels.ts`), each with a speech bubble for grown-ups at the left (`TopicBubble.tsx`, 🤝 „Was gehört zu mir?“ and 🦺 „Was
 brauche ich?“):
 1. Dinge aus dem Alltag (Z-03): a thing stands above – toothbrush, door, pot, flower pot, sheet of paper – and the child

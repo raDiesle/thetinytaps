@@ -71,7 +71,7 @@ export function Head({ cx, cy, r = 22, hair, children }: { cx: number; cy: numbe
 }
 
 /** A hand at the end of an arm. */
-export const Hand = ({ cx, cy, r = 8 }: { cx: number; cy: number; r?: number }) => <circle cx={cx} cy={cy} r={r} fill={SKIN} />;
+export const Hand = ({ cx, cy, r = 8, fill = SKIN }: { cx: number; cy: number; r?: number; fill?: string }) => <circle cx={cx} cy={cy} r={r} fill={fill} />;
 
 /** Rosy puffed cheeks, shown while someone blows a whistle. */
 export function PuffCheeks({ cx, cy, className }: { cx: number; cy: number; className: string }) {

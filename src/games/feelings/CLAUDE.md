@@ -70,7 +70,7 @@ step of its story: the starting picture, one question, exactly two cards – the
 the good one comes its picture (and, on the story's last step, its happy end), then straight on to the _next scene_ of
 the group (`PassPlay.tsx`) – never back to the same starting picture for another choice. A pass plays each scene of its
 group once; each story remembers its next step (`settings.steps`), so the next pass shows the same scenes with their
-other choices. After the last scene of a pass come „Menü“, „Nochmal“ (the group again) and „Weiter“ (the next group).
+other choices. After the last scene of a pass come „Nochmal“ (the group again) and „Weiter“ (the next group).
 The dots at the top are the pass's scenes.
 
 **One tap chooses** (user feedback, November 2026): no first tap that only shows a card big, no ring waiting for a
@@ -110,8 +110,8 @@ height allows unless the cards would get less than a quarter of the width (`--ca
 not-so-good card at the bottom left and the good one at the top right, each lying a fifth of its width over a corner
 of the picture; the picture's tick or cross sits on its top left corner. No margins beyond 8 px – not even a phone's safe-area
 inset, which left an empty strip beside the card. Cards are never see-through, waiting or crossed out (pale by filter,
-not opacity): the big picture showed through and seemed to lie on top of them. At the end „Menü“ and
-„Nochmal“ stand left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
+not opacity): the big picture showed through and seemed to lie on top of them. At the end „Nochmal“
+stands left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
 below. Captions lie on the pictures' lower edge on wide or low screens. Look at 844×390, 1024×768 and 1280×720 after
 a change.
 
@@ -220,7 +220,7 @@ feedback, November 2026). A new story (`selbst.ts`) whose pictures are still pla
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Menü“, „Nochmal“ and „Weiter“ at a pass's
+with a green tick or red cross, so children can choose without reading; „Nochmal“ and „Weiter“ at a pass's
 end are the shared `GameEnd` (`inline`), words only like in every game. Timing of a story's beats and its sounds in
 `story.ts`.
 
