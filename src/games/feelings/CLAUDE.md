@@ -170,6 +170,13 @@ quietschen lassen“ used a small balloon the first picture hardly showed, and a
 it became „Mit dem Fuchs Kuchen essen“). Only a not-so-good idea may bring a small new thing (the pin, the monster
 puppet). `bilder/README.md` lists what each first picture shows.
 
+**What a story is about is named so it can't be mixed up with anything in the picture (user feedback, November 2026):**
+in „Traurig, Kuschelhase weg“ the text said only „das Kuscheltier ist weg“ while the fox sat there holding his own plush
+dog, and with „Dem Fuchs seins wegnehmen“ a grown-up couldn't tell whether the fox had the bear's lost toy. Where
+another one in the picture has something of the same kind, every line names each by what it is (the bear's
+„Kuschelhase“, the fox's „Kuschelhund“), never by the kind alone („Kuscheltier“, „Spielzeug“, „seins“), and a card that
+takes the other one's thing says whose it is.
+
 **Every card tells one thing without its caption (user feedback, November 2026):** the angry bear's thrown toy car
 wasn't seen as thrown, his deep breath blew towards the fallen tower so he seemed to blow it over, his stomp with both
 feet couldn't be told, and he still blew with a red angry face. For every new story or level, before its pictures are
