@@ -108,8 +108,8 @@ targets) – keep it that way.
   plan, Tapsi with the star (`stern-halten`, unused since „Über die Tafel“ went, waiting for a new place), a theme's strip (`SheetStrip`) along the top of a
   colour print, and the `-linie` twins on grey prints. An `<img class="rw-pic">` takes its size from the font size the
   emoji had (`1.2em`, more where there is room). `tafel.webp` waits for pages with their own og:image (idea V-10).
-- `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026, shown on
-  `/management/`, 🎨 Bildvorschläge). A changed or new prompt is reviewed there first, then made. Card pictures are
+- `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026). A changed or
+  new prompt goes into the picture queue (`/bild-erzeugen`); `/management/` shows no prompts to review, only what waits. Card pictures are
   free-standing cut-outs (never „inside a circle“, `rewards.test.ts`), at least 600 px for photo prints; the `-linie`
   twins are drawn from the colour picture flattened onto white.
 
@@ -171,7 +171,7 @@ one. A full day gets a few hearts, stars and notes rising from it, the goal a pa
 `PrintPages` renders A4 pages (mm-sized, `@page` set per board) into `.rw-print-root` at the end of `<body>`; the print
 CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a month board prints its month, this one or
 the next); options: orientation
-(auto: portrait for a day board with up to two tasks), colour or grey (no inline colours, so `.rw-grey` wins), fields
+(auto: portrait for a day board with up to two tasks), colour or black and white to colour in (`InkChoice`; no inline colours, so `.rw-grey` wins), fields
 to colour in, a page of stickers to cut out, and a page of the tasks and the reward as picture cards to cut out
 (`cards`, T-20, for a Velcro board beside the chart). Both charts print such cards with the same `CutCardPages`
 (`PrintPanel.tsx`), never a page layout of their own. Any later print feature (H-02: Schnullerfee-Brief) can
@@ -226,6 +226,11 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   „quiet options“): a band of their own, the Zeitraum as big picture buttons (`SpanPic`, the shape of each chart) under
   its visible name, the chosen one yellow; what a choice means goes into its button in a few words with a visual sign,
   never a paragraph of notes under it.
+- What sets the charts apart is said where grown-ups decide, not only found deep in an option (user feedback, November
+  2026): the black-and-white print, whose every picture has its `-linie` twin drawn to colour in, is named in the
+  wizard's print stamp on every screen (`rw-print-badge-ink`), in both search texts (`seo.ts`, `seo.en.ts`) and in the
+  print panel as a choice named for what it gives, „🖍️ Schwarz-weiß zum Ausmalen“ beside „🎨 In Farbe“ (`InkChoice`),
+  never as a switch „In Farbe“ that only says what is lost when off.
 - The first screen says, without scrolling, that the chart prints (the stamp in the wizard's head, never „kostenlos“),
   that it is changed right on the sheet („Direkt auf der Tafel ändern“) and that the kinds can be switched freely (the
   note in the wizard); „✓ Tafel anlegen“ is the biggest button there and stays in sight while the page scrolls.

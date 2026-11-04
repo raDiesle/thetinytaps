@@ -384,6 +384,82 @@
   }
 }
 
+/* The eight faces (C-30): on upright screens two by four, on wide and low ones four by two. Their rows fill the height,
+   so they start below the ✕ in the top left corner (`--corner-clear`), never under it. */
+.mood-faces {
+  --card-w: min((100cqw - var(--gap) - 2 * var(--pad)) / 2, (100cqh - 4 * var(--label) - 3 * var(--gap) - 2 * var(--pad) - var(--corner-clear, 0px)) / 3);
+
+  margin-top: var(--corner-clear, 0px);
+}
+
+@media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
+  .mood-faces {
+    --card-w: min((100cqw - 3 * var(--gap) - 2 * var(--pad)) / 4, (100cqh - 2 * var(--label) - var(--gap) - 2 * var(--pad) - var(--corner-clear, 0px)) / 1.5);
+
+    grid-template-columns: repeat(4, auto);
+  }
+}
+
+/* The drawings of „Wie geht's dir?“ in a card or the big frame: the big face to copy (C-35), the weather signs of „Wie
+   doll ist es?“ (C-36) on warm paper. Still, apart from the breath's circle. */
+.mood-art {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 45%, #fffaf0, #fde7c4);
+}
+
+.fg-picture > .mood-art {
+  inset: var(--mat);
+  border-radius: 16px;
+}
+
+.mood-art svg {
+  position: relative;
+  width: 92%;
+  height: 92%;
+}
+
+.fg-card-rest .mood-art {
+  filter: saturate(0.5) brightness(1.08);
+}
+
+/* One slow breath blown together grows and shrinks this soft circle behind the face: a layer of its own, moved by
+   transform only; twice (BREATH_MS in MoodPlay.tsx), then it stands still. */
+.mood-breath {
+  position: absolute;
+  inset: 0;
+  height: 96%;
+  aspect-ratio: 1;
+  margin: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #a9d3f5 0 52%, #a9d3f500 71%);
+  transform: scale(0.55);
+  animation: mood-breathe 5s ease-in-out 2;
+  will-change: transform;
+}
+
+/* Blowing, the face is smaller, so the breath is seen growing round it. */
+.mood-breath + svg {
+  width: 62%;
+  height: 62%;
+}
+
+@keyframes mood-breathe {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mood-breath {
+    animation: none;
+  }
+}
+
 /* A card with its caption underneath, below the ring and shadow of the card. */
 .fg-choice {
   position: relative;

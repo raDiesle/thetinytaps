@@ -312,6 +312,8 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "Zu Sonne, Wolke, Regen und Gewitter kommen weitere Wetter: Regenbogen (stolz), Wind (aufgeregt, zappelig), Nebel (müde, alles zu viel), Schneeflocken (ruhig, zufrieden), ein dunkler Wald (Angst). Jedes führt zu den Szenen der passenden Gruppe in „Alltagssituationen“.",
       why: "Vier Wetter decken nur froh, müde, traurig und wütend ab. Angst, Aufregung und Stolz kennen Kleinkinder genauso – und je feiner das Kind zeigen kann, wie es ihm geht, desto besser kann der Erwachsene darauf eingehen.",
       effort: "M",
+      partial:
+        "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee (Sonne, Regenbogen, Wind, Schnee, Wolke, Regen, Gewitter, dunkler Wald) sind jetzt das Zeichen bei „Wie doll ist es?“ (C-36). Bis die Gesichtsbilder gemacht sind, zeigt die gebaute Seite die vier alten Wetterkarten.",
     },
     {
       id: "C-30",
@@ -320,6 +322,8 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "Statt Wetterbildern zeigen die Karten ein Fuchs- oder Bärenkind mit Mama oder Papa daneben: fröhlich, traurig, wütend, ängstlich, müde. Das Kind tippt auf das Gesicht, das passt; der Erwachsene im Bild nickt und nimmt es in den Arm.",
       why: "Gesichter sind für Zweijährige leichter zu lesen als ein Wetter-Bild, und die Maskottchen kommen so auch hier als Familie vor.",
       effort: "M",
+      partial:
+        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Es fehlen die 16 Bilder (gesicht-…, in der Bilder-Queue) – bis dahin zeigt die gebaute Seite die vier Wetterkarten – und die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-31",
@@ -329,7 +333,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): nach dem Wetter drei Karten, die zum Gefühl passen (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken). Es fehlen die fünf Bilder (bilder/README.md, „Geplant“) – bis dahin fragt die gebaute Seite noch nicht – und die Aufnahmen und Übersetzungen der neuen Sätze.",
+        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Es fehlen die fünf Bilder (bilder/README.md, „Geplant“) – bis dahin fragt die gebaute Seite noch nicht – und die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-32",
@@ -363,6 +367,9 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "Nach der Wahl macht der kleine Bär das Gesicht des Gefühls groß vor (wütende Augenbrauen, Lachen, hängender Mund), und das Kind macht es nach – vor einem Spiegel oder dem Erwachsenen. Ohne Kamera.",
       why: "Gefühle nachmachen hilft, sie bei sich und anderen zu erkennen; mit dem Erwachsenen zusammen wird es ein Spiel.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut (4. November 2026): nach dem Gefühl zeigt das Fuchs- oder Bärenkind sein Gesicht groß (der gemeinsame MascotHead mit neuen Augenbrauen, Augen und Mündern), „Kannst du auch so gucken?“, weiter mit einem Tipp. Die Sätze sind nur Deutsch und noch nicht aufgenommen.",
     },
     {
       id: "C-36",
@@ -371,6 +378,9 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "Nach dem Gefühl ein Regler ohne Zahlen: eine kleine, eine mittlere oder eine große Gewitterwolke (oder Sonne). Das Kind tippt, wie stark es ist; bei einem großen Gefühl kommt zuerst etwas Beruhigendes (gemeinsam pusten).",
       why: "„Ein bisschen traurig“ und „ganz arg traurig“ brauchen verschiedene Hilfe. Schon Zweijährige können groß und klein unterscheiden.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Die Sätze sind nur Deutsch und noch nicht aufgenommen.",
     },
   ],
 };

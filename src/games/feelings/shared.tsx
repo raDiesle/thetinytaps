@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { recordedVoice } from "@/lib/voice";
@@ -148,12 +148,15 @@ function Frames({ name, moving, className }: { name: string; moving: boolean; cl
  */
 export function StoryPicture({
   name,
+  art,
   caption,
   look = "story",
   still = false,
   onNext,
 }: {
   name: string;
+  /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
+  art?: ReactNode;
   /** What the picture shows, in a few words: for grown-ups, children don't read it. */
   caption: string;
   look?: PictureLook;
@@ -164,9 +167,7 @@ export function StoryPicture({
 }) {
   return (
     <div className={`fg-frame fg-look-${look}`}>
-      <div className="fg-picture">
-        <Frames name={name} moving={!still} />
-      </div>
+      <div className="fg-picture">{art ?? <Frames name={name} moving={!still} />}</div>
       {onNext && (
         <button
           type="button"
@@ -201,12 +202,15 @@ export type CardState = "choose" | "playing" | "wrong" | "rest";
 /** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
   image,
+  art,
   caption,
   state,
   onChoose,
 }: {
   /** Name of the picture, see images.ts. */
   image: string;
+  /** A drawing shown instead of the picture (the weather signs of „Wie doll ist es?“). */
+  art?: ReactNode;
   /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
   caption: string;
   state: CardState;
@@ -228,7 +232,7 @@ export function ChoiceCard({
         }}
       >
         {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
-        <Frames name={image} moving={active} className="fg-card-image" />
+        {art ?? <Frames name={image} moving={active} className="fg-card-image" />}
         {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>

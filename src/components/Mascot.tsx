@@ -62,15 +62,25 @@ const FOREHEAD_LIGHT = "M28 40 Q30 32 37 28 Q42 26 47 26 Q43 28.5 41.5 31 Q38.5 
 const FUR_FLICKS = "M47 27 Q49 31 48 34 M53 28 Q54 31 53 33 M22 47 Q25 49 25 52 M78 47 Q75 49 75 52";
 
 // Brows, lashes and the mouth's lines, for the left side (as we see it) and mirrored.
-const BROW = "M30.5 44.5 Q35.5 41.5 40.5 43.5";
 const LASH = "M31.6 51 L28 48.6 M33.6 49.2 L31.6 46";
 const CHILD_LASH = "M30.8 51.5 L27 49.2 M32.8 49.4 L30.6 46";
 
-/** How the eyes are: open, shut in sleep, or laughing (two arcs up). */
-export type MascotEyes = "open" | "shut" | "happy";
+/** How the brows are: soft and calm, raised in the middle (sad, worried), pulled down to the nose (angry), or raised high. */
+export type MascotBrows = "soft" | "sad" | "angry" | "up";
 
-/** The mouth: a little smile, or open with the tongue when cheering or laughing. */
-export type MascotMouth = "smile" | "open";
+/** The left brow (as we see it) of each kind; the right one is its mirror. */
+const BROWS: Record<MascotBrows, string> = {
+  soft: "M30.5 44.5 Q35.5 41.5 40.5 43.5",
+  sad: "M30.5 45 Q35.5 44 41 40",
+  angry: "M30 41 Q35.5 42 42 46.5",
+  up: "M30.5 41.5 Q35.5 37 40.5 39.5",
+};
+
+/** How the eyes are: open, wide open (excited, scared), half shut (tired), shut in sleep, or laughing (two arcs up). */
+export type MascotEyes = "open" | "wide" | "half" | "shut" | "happy";
+
+/** The mouth: a little smile, open with the tongue (cheering, laughing), turned down (sad, angry), or a round „o“ (a yawn, a fright, blowing). */
+export type MascotMouth = "smile" | "open" | "frown" | "o";
 
 /**
  * A fox's or a bear's head facing us in a 100 × 100 box (the head's middle at about 50, 56, its ears up to the top), to be
@@ -82,6 +92,7 @@ export function MascotHead({
   child = false,
   eyes = "open",
   mouth = "smile",
+  brows = "soft",
   lashes = false,
   outline = true,
   children,
@@ -90,6 +101,8 @@ export function MascotHead({
   child?: boolean;
   eyes?: MascotEyes;
   mouth?: MascotMouth;
+  /** The brows, which tell most of a feeling together with the mouth. */
+  brows?: MascotBrows;
   lashes?: boolean;
   outline?: boolean;
   children?: ReactNode;
@@ -137,9 +150,17 @@ export function MascotHead({
       {outline && <path d={head} fill="none" {...line} />}
       <ellipse cx="27" cy="66.5" rx="6" ry="3.8" fill="#ff8f8f" opacity={child ? 0.5 : 0.38} />
       <ellipse cx="73" cy="66.5" rx="6" ry="3.8" fill="#ff8f8f" opacity={child ? 0.5 : 0.38} />
-      <path d={`${BROW} ${mirror(BROW)}`} fill="none" stroke={c.shade} strokeWidth="2.4" strokeLinecap="round" />
+      <path
+        d={`${BROWS[brows]} ${mirror(BROWS[brows])}`}
+        fill="none"
+        stroke={brows === "soft" ? c.shade : MASCOT_INK}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
       <Eyes eyes={eyes} child={child} bear={!fox} />
-      {lashes && eyes === "open" && <path d={`${lash} ${mirror(lash)}`} fill="none" stroke={MASCOT_INK} strokeWidth="1.8" strokeLinecap="round" />}
+      {lashes && (eyes === "open" || eyes === "wide") && (
+        <path d={`${lash} ${mirror(lash)}`} fill="none" stroke={MASCOT_INK} strokeWidth="1.8" strokeLinecap="round" />
+      )}
       {fox && (
         <g fill={c.paleShade}>
           <circle cx="40" cy="70" r="0.9" />
@@ -163,20 +184,38 @@ function eyeY(child: boolean): number {
   return child ? 55 : 54;
 }
 
-/** Both eyes: a warm brown iris round a dark pupil with a big and a small light, a child's bigger; or shut, or laughing. */
+/** Both eyes: a warm brown iris round a dark pupil with a big and a small light, a child's bigger, wide ones bigger still;
+ * half shut under a heavy lid; or shut, or laughing. */
 function Eyes({ eyes, child, bear }: { eyes: MascotEyes; child: boolean; bear: boolean }) {
   const cy = eyeY(child);
-  if (eyes !== "open") {
+  if (eyes === "shut" || eyes === "happy") {
     const d = eyes === "shut" ? `M30 ${cy - 1} Q36 ${cy + 4.5} 42 ${cy - 1}` : `M30 ${cy + 1.5} Q36 ${cy - 5.5} 42 ${cy + 1.5}`;
     return <path d={`${d} ${mirror(d)}`} fill="none" stroke={MASCOT_INK} strokeWidth="2.8" strokeLinecap="round" />;
   }
-  const rx = (child ? 6 : 5) - (bear ? 0.4 : 0);
-  const ry = (child ? 6.9 : 5.9) - (bear ? 0.5 : 0);
+  const grow = eyes === "wide" ? 1.2 : 1;
+  const rx = ((child ? 6 : 5) - (bear ? 0.4 : 0)) * grow;
+  const ry = ((child ? 6.9 : 5.9) - (bear ? 0.5 : 0)) * grow;
+  const iris = bear ? "#4a2a1b" : "#6b3a20";
+  if (eyes === "half") {
+    // Only the lower half shows under a straight, heavy lid.
+    return (
+      <>
+        {[36, 64].map((cx) => (
+          <g key={cx}>
+            <path d={`M${cx - rx} ${cy} Q${cx} ${cy + ry * 1.1} ${cx + rx} ${cy} Z`} fill={iris} />
+            <path d={`M${cx - rx * 0.6} ${cy} Q${cx} ${cy + ry * 0.75} ${cx + rx * 0.6} ${cy} Z`} fill="#1f110b" />
+            <path d={`M${cx - rx - 1.5} ${cy} L${cx + rx + 1.5} ${cy}`} stroke={MASCOT_INK} strokeWidth="2.8" strokeLinecap="round" />
+          </g>
+        ))}
+      </>
+    );
+  }
   return (
     <>
       {[36, 64].map((cx) => (
         <g key={cx}>
-          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={bear ? "#4a2a1b" : "#6b3a20"} />
+          {eyes === "wide" && <ellipse cx={cx} cy={cy} rx={rx + 1.6} ry={ry + 1.6} fill="#fff" stroke={MASCOT_INK} strokeWidth="1.4" />}
+          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={iris} />
           <ellipse cx={cx} cy={cy + ry * 0.12} rx={rx * 0.62} ry={ry * 0.64} fill="#1f110b" />
           <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={MASCOT_INK} strokeWidth="1.2" />
           <circle cx={cx + rx * 0.3} cy={cy - ry * 0.36} r={rx * 0.42} fill="#fff" />
@@ -187,10 +226,30 @@ function Eyes({ eyes, child, bear }: { eyes: MascotEyes; child: boolean; bear: b
   );
 }
 
-/** The mouth under the nose: a soft „w“ smile, or open with a pink tongue. */
+/** The mouth under the nose: a soft „w“ smile, open with a pink tongue, turned down, or a round „o“. */
 function Mouth({ mouth, bear }: { mouth: MascotMouth; bear: boolean }) {
   const top = bear ? 74.5 : 73;
   const under = bear ? 71 : 69.5;
+  if (mouth === "frown") {
+    return (
+      <path
+        d={`M50 ${under} L50 ${top} M43 ${top + 5} Q50 ${top - 1} 57 ${top + 5}`}
+        fill="none"
+        stroke={MASCOT_INK}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    );
+  }
+  if (mouth === "o") {
+    return (
+      <>
+        <path d={`M50 ${under} L50 ${top}`} stroke={MASCOT_INK} strokeWidth="2" strokeLinecap="round" />
+        <ellipse cx="50" cy={top + 5} rx="4" ry="5" fill="#7a2c2e" stroke={MASCOT_INK} strokeWidth="1.8" />
+      </>
+    );
+  }
   if (mouth === "open") {
     // A round, laughing mouth, wide at the top like a „D“ on its back, the tongue at its bottom.
     return (

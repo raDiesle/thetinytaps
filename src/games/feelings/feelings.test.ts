@@ -6,7 +6,7 @@ import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { HELPS, morningMood, WEATHERS, withMood } from "./mood";
+import { BREATH_MS, HELPS, MOODS, morningMood, STRENGTHS, withMood } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { roundOf, stepsOf } from "./rounds";
@@ -89,22 +89,40 @@ test("every story ends on its last step", () => {
   }
 });
 
-test("every weather has its card and leads to a group", () => {
-  for (const { id, group } of WEATHERS) {
-    expect(imageFor(moodImages.weather(id)), moodImages.weather(id)).toBeDefined();
+// „Wie geht's dir?“ (C-29, C-30): every feeling has its face and the grown-up's hug, and leads to a group; the four
+// that had a weather card keep it for the built site until the faces are made.
+test("every feeling has its face and hug, and leads to a group", () => {
+  expect(new Set(MOODS.map((m) => m.id)).size, "a feeling twice").toBe(MOODS.length);
+  for (const { id, group, weather, caption } of MOODS) {
+    expectPicture(moodImages.face(id));
+    expectPicture(moodImages.hug(id));
+    if (weather) expect(imageFor(moodImages.weather(weather.picture)), moodImages.weather(weather.picture)).toBeDefined();
     expect(GROUPS.map((g) => g.id)).toContain(group);
+    expect(caption.de, id).not.toMatch(/[.!]$/);
   }
+  expect(MOODS.filter((m) => m.weather).length, "the built site's first screen before the faces").toBe(4);
+  // Both mascots show feelings, and each sign of „Wie doll ist es?“ belongs to one feeling only.
+  expect(new Set(MOODS.map((m) => m.kind))).toEqual(new Set(["fox", "bear"]));
+  expect(new Set(MOODS.map((m) => m.sky)).size).toBe(MOODS.length);
 });
 
-// „Was hilft dir jetzt?“ (C-31): three different things after every weather, each with its card; none is wrong.
-test("every weather offers three different helps, each with its card", () => {
-  for (const { id, helps } of WEATHERS) expect(new Set(helps).size, id).toBe(3);
+// „Wie doll ist es?“ (C-36): three sizes, small to big, and only the biggest of a hard feeling brings the breaths.
+test("the three sizes grow, and the breath's circle keeps time with the game", () => {
+  expect(STRENGTHS.map((s) => s.scale)).toEqual(STRENGTHS.map((s) => s.scale).toSorted((a, b) => a - b));
+  expect(STRENGTHS.length).toBe(3);
+  const css = readFileSync("src/games/feelings/feelings.css", "utf8");
+  expect(css).toContain(`mood-breathe ${BREATH_MS / 1000}s`);
+});
+
+// „Was hilft dir jetzt?“ (C-31): three different things after every feeling, each with its card; none is wrong.
+test("every feeling offers three different helps, each with its card", () => {
+  for (const { id, helps } of MOODS) expect(new Set(helps).size, id).toBe(3);
   for (const help of Object.values(HELPS)) {
     expectPicture(moodImages.help(help.id));
     expect(help.caption.de, help.id).not.toMatch(/[.!]$/);
   }
-  const offered = new Set(WEATHERS.flatMap((w) => w.helps));
-  expect([...offered].toSorted(), "a help no weather offers is never seen").toEqual(
+  const offered = new Set(MOODS.flatMap((m) => m.helps));
+  expect([...offered].toSorted(), "a help no feeling offers is never seen").toEqual(
     Object.values(HELPS)
       .map((h) => h.id)
       .toSorted(),
@@ -243,13 +261,13 @@ test("translations in another script have no Latin letters", () => {
   }
 });
 
-// C-33: in the evening the morning's weather stands beside the evening's – only today's, never yesterday's.
-test("the evening shows this morning's weather, never yesterday's, and never in the morning", () => {
+// C-33: in the evening the morning's feeling stands beside the evening's – only today's, never yesterday's.
+test("the evening shows this morning's feeling, never yesterday's, and never in the morning", () => {
   const morning = new Date("2026-11-04T08:00");
   const evening = new Date("2026-11-04T19:00");
-  const day = withMood(undefined, "regen", morning);
+  const day = withMood(undefined, "traurig", morning);
   expect(morningMood(day, morning)).toBeUndefined();
-  expect(morningMood(withMood(day, "sonne", evening), evening)).toBe("regen");
+  expect(morningMood(withMood(day, "froh", evening), evening)).toBe("traurig");
   expect(morningMood(day, new Date("2026-11-05T19:00"))).toBeUndefined();
-  expect(withMood(day, "wolke", new Date("2026-11-05T08:00"))).toEqual({ day: "2026-11-05", morning: "wolke" });
+  expect(withMood(day, "muede", new Date("2026-11-05T08:00"))).toEqual({ day: "2026-11-05", morning: "muede" });
 });

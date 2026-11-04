@@ -79,6 +79,8 @@ export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDon
 /**
  * That the chart prints, said on the first page a visitor sees (user feedback, November 2026): on A4, as photo prints
  * for a Velcro board, or used right here on the screen. A stamp, not a button – there is nothing to print before it is made.
+ * The black-and-white print is named on every screen, phones too: every picture has a twin drawn for colouring in, which
+ * few other charts offer (user feedback, November 2026).
  */
 function PrintBadge() {
   const t = useT();
@@ -99,7 +101,8 @@ function PrintBadge() {
             ar: "على الورق أو كصورة مطبوعة – أو ضعوا العلامات هنا على الشاشة",
             ru: "на A4 или фотоотпечатком – или отмечайте прямо на экране",
           })}
-        </span>
+        </span>{" "}
+        <span className="rw-print-badge-ink">{t({ de: "🖍️ auch schwarz-weiß, jedes Bild zum Ausmalen" })}</span>
       </span>
     </p>
   );

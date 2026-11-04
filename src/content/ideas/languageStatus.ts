@@ -99,6 +99,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
       },
       {
+        label: "🖍️ Schwarz-weiß zum Ausmalen beworben",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken (statt des übersetzten Schalters „In Farbe“) und die Zeile im Druck-Stempel des Assistenten – nur Deutsch.",
+      },
+      {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
         languages: { de: "done" },
         note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“ – nur Deutsch.",
@@ -203,6 +208,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Frage, Antwort und Wetter teilen sich Übersetzung und Aufnahmen mit „Alltagssituationen“ (stimme/).",
       },
       { label: "Zeile für Erwachsene", languages: { de: "done" }, note: "MOOD_BLURB in names.ts, nur Deutsch; der Titel ist übersetzt." },
+      {
+        label: "Gesichter, Gesicht nachmachen, Wie doll ist es?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-29, C-30, C-35, C-36), nur Deutsch und noch nicht aufgenommen: die Namen der acht Gefühle, „Kannst du auch so gucken?“, die drei Stärken, das gemeinsame Pusten (MOODS, STRENGTHS, MOOD_LINES in mood.ts). Die vier Wetterkarten der gebauten Seite sind übersetzt.",
+      },
       {
         label: "Was hilft dir jetzt?",
         languages: { de: "done" },
