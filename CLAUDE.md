@@ -84,6 +84,12 @@ In a fresh worktree run `bun install` first.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
   way or ask the user for before concluding, never guess or give an impression: guessed desk calendars at 4–7 € each
   were 0.72 €, and a flip calendar first called „eher kein Spielzeug“ is one by the EU's own guidance on books.
+  Research on how children feel, grow or are brought up starts from known literature and established sources – books
+  by recognised authors (Gottman, Siegel & Bryson, Juul, Renz-Polster, Imlau, Graf & Seide), programmes used in Kitas
+  (Papilio), and bodies like Zero to Three or the BZgA – read where they can be (a publisher's sample, a programme's
+  own booklet), and only then adds school pages, parents' blogs and search suggestions; the method says which were read
+  and which known only from summaries (user feedback, November 2026: a first round from Kita pages and Google
+  suggestions had to be done again from the literature).
 
 ## Language and style
 
