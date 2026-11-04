@@ -14,22 +14,6 @@
   background: linear-gradient(#c4f1ff, #fff4d6);
 }
 
-/* Before the brushing the clock counts down to its start, big enough for a grown-up to see across the bathroom. */
-.teeth-clock {
-  position: absolute;
-  top: calc(max(12px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
-  left: max(16px, env(safe-area-inset-left));
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-  padding: 0.1em 0.6em;
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--ink);
-  font-size: clamp(1.2rem, 4.5vmin, 2rem);
-  font-weight: 700;
-}
-
 /* 3, 2, 1, Los! – big in the middle, over the picture. */
 .teeth-count {
   position: absolute;
@@ -75,57 +59,11 @@
   }
 }
 
+/* At the end the gold medal swings down at the top, alone: no words on the picture. */
 .teeth-heading {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6vmin;
-  text-align: center;
-}
-
-/* A phone on its side: title and hint side by side, so the mouth keeps the height. */
-@media (orientation: landscape) and (max-height: 500px) {
-  .teeth-heading {
-    flex-direction: row;
-    gap: 2vmin;
-  }
-}
-
-.teeth-cue {
-  margin: 0;
-  font-size: clamp(1.8rem, 7.5vmin, 4rem);
-  font-weight: 700;
-  color: #fff;
-  -webkit-text-stroke: 0.07em var(--ink);
-  paint-order: stroke fill;
-  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.teeth-mouth {
-  margin: 0;
-  padding: 0.15em 0.8em;
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  font-size: clamp(1rem, 3.6vmin, 1.7rem);
-  font-weight: 700;
-  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
-}
-
-.teeth-mouth.spit {
-  background: #e3f9d6;
-}
-
-.teeth-mouth.goodbye {
-  background: #fff6c2;
-}
-
-/* „Geschafft!“ in gold, bigger than every other heading, with the medal swinging down beside it. */
-.teeth-cue.teeth-done {
-  display: flex;
-  align-items: center;
-  gap: 0.25em;
-  font-size: clamp(2.4rem, 11vmin, 6rem);
-  color: #ffd23f;
+  justify-content: center;
+  font-size: clamp(2.4rem, 12vmin, 6.5rem);
 }
 
 .teeth-medal {
@@ -165,11 +103,6 @@
   50% {
     transform: scale(1.5) rotate(36deg);
   }
-}
-
-.teeth-hint {
-  font-weight: 500;
-  opacity: 0.75;
 }
 
 /* The mirror (or the sink) fills the whole screen behind the heading and the controls; what matters
@@ -270,7 +203,6 @@
   z-index: 1;
 }
 
-.teeth-clock,
 .teeth-sky {
   z-index: 1;
 }
@@ -489,26 +421,51 @@
   width: min(90vw, 780px);
 }
 
-.teeth-pause {
+/* Pause (or go on) and start again: round white discs with drawn signs in the game's ink, no emoji. */
+.teeth-button {
   flex: none;
+  display: grid;
+  place-items: center;
   width: clamp(44px, 8vmin, 60px);
   height: clamp(44px, 8vmin, 60px);
+  padding: 0;
   border: 3px solid var(--ink);
   border-radius: 50%;
-  background: #fff;
-  font-size: clamp(1.2rem, 4vmin, 1.8rem);
-  line-height: 1;
+  background: radial-gradient(circle at 35% 30%, #fff 55%, #e4f6ff);
+  box-shadow: 0 3px 8px #2a1e5c33;
   cursor: pointer;
 }
 
-/* The brushing time left, right of the bar; on a narrow screen the bar keeps the room. */
+.teeth-button:active {
+  translate: 0 1px;
+  box-shadow: 0 1px 4px #2a1e5c33;
+}
+
+.teeth-button-icon {
+  display: block;
+  width: 62%;
+  height: 62%;
+}
+
+/* The time right of the bar: before the brushing the time until it starts (in the intro's lilac), then the brushing time
+   left. On a narrow screen the bar keeps the room. */
 .teeth-time {
   flex: none;
   min-width: 3.2em;
+  padding: 0.05em 0.5em;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  text-align: center;
   color: var(--ink);
   font-size: clamp(1.1rem, 4vmin, 1.8rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+.teeth-time.intro {
+  background: #ece5ff;
+  color: #5b3fb8;
 }
 
 @media (max-width: 600px) {
@@ -543,6 +500,11 @@
   /* Grows by scaling, not by its width: a width that changes lays out the bar again in every frame of its glide. */
   transform-origin: left;
   transition: transform 0.2s linear;
+}
+
+/* The time before the brushing: story, sink and the first look in the mirror. */
+.teeth-segment.intro > span {
+  background: #c9b8ff;
 }
 
 .teeth-segment.top > span {
@@ -585,7 +547,18 @@
 }
 
 .teeth-paused-icon {
-  font-size: 1.6em;
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.teeth-paused-icon .teeth-button-icon {
+  width: 60%;
+  height: 60%;
 }
 
 .teeth-paused small {
@@ -653,8 +626,6 @@
   .monster-body,
   .zone-glow,
   .tooth-sparkle,
-  .teeth-cue,
-  .teeth-mouth,
   .monster-glow {
     animation: none;
   }
@@ -716,10 +687,6 @@
   50% {
     transform: translateY(-14%);
   }
-}
-
-.teeth-mouth.prep {
-  background: #fff;
 }
 
 /* ---------- The story at the start: sweets, then the monsters grow (origin.tsx) ---------- */
@@ -1148,26 +1115,26 @@
   animation: tube-over 5.5s ease-in-out forwards;
 }
 
-/* Over to the tip of the brush, along the bristles while squeezing (like grown-ups do), lift off, lie down again. */
+/* Over to the middle of the bristles, a short squeeze for a pea-sized dab, lift off, lie down again. */
 @keyframes tube-over {
   0%,
   6% {
     transform: translate(190px, 266px) rotate(-90deg);
   }
   26% {
-    transform: translate(76px, 146px) rotate(35deg);
+    transform: translate(106px, 146px) rotate(35deg);
   }
   30% {
-    transform: translate(78px, 150px) rotate(35deg);
+    transform: translate(108px, 150px) rotate(35deg);
     animation-timing-function: linear;
   }
+  46% {
+    transform: translate(112px, 150px) rotate(35deg);
+  }
   58% {
-    transform: translate(150px, 150px) rotate(35deg);
+    transform: translate(124px, 118px) rotate(28deg);
   }
-  68% {
-    transform: translate(160px, 118px) rotate(28deg);
-  }
-  88%,
+  82%,
   100% {
     transform: translate(190px, 266px) rotate(-90deg);
   }
@@ -1181,31 +1148,31 @@
 @keyframes squeeze {
   0%,
   28%,
-  62%,
+  48%,
   100% {
     transform: scaleX(1);
   }
-  34%,
-  56% {
-    transform: scaleX(0.8);
+  33%,
+  43% {
+    transform: scaleX(0.85);
   }
 }
 
-/* The striped wave comes out from the tip of the brush towards the handle, as the tube goes along. */
-.prep-paste-reveal {
+/* The dab swells out of the tube onto the bristles while it is squeezed. */
+.prep-paste {
   transform-box: fill-box;
-  transform-origin: 0 50%;
-  animation: paste-out 5.5s linear forwards;
+  transform-origin: 50% 100%;
+  animation: paste-out 5.5s ease-out forwards;
 }
 
 @keyframes paste-out {
   0%,
   30% {
-    transform: scaleX(0);
+    transform: scale(0);
   }
-  60%,
+  46%,
   100% {
-    transform: scaleX(1);
+    transform: scale(1);
   }
 }
 
@@ -1375,10 +1342,10 @@
   background: linear-gradient(#a49be6, #c9b8ff 55%, #ffd9c7);
 }
 
-/* Next to the clock, away from the grown-ups' ✕ in the other corner. */
+/* Away from the grown-ups' ✕ in the other corner. */
 .teeth-sky {
   position: absolute;
-  top: calc(max(12px, env(safe-area-inset-top)) + clamp(1.4rem, 4vmin, 2rem) + var(--corner-clear, 0px));
+  top: calc(max(12px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
   font-size: clamp(2.4rem, 9vmin, 4.5rem);
   line-height: 1;

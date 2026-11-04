@@ -427,7 +427,9 @@ In a fresh worktree run `bun install` first.
   Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
   `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
   already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
-  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own.
+  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own. Where the
+  family stands in a game's own end layout, it answers a tap (`CheeringFamily onTap`: both wave and grin with their
+  teeth – a decoration a child taps must do something, user feedback from Zähne putzen, November 2026).
 
 ## Architecture
 
@@ -586,7 +588,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
   findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large and its name
-  in words beside it, always shown („Einstellungen“, „halten“ under it), and as play starts it lights up softly twice,
+  in words beside it, always shown („Einstellungen“, „halten“ under it) – on a phone clearly smaller, about as tall as ✕'s
+  corner, so it doesn't cover the picture (user feedback, November 2026) – and as play starts it lights up softly twice,
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen, and without words grown-ups didn't know it held the options; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
