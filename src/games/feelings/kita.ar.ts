@@ -881,12 +881,8 @@ export const SITUATIONS_AR: Partial<Record<SituationId, SituationText>> = {
     caption: "في الخارج مطر، والدبدوب يشعر بالملل",
     intro: [{ narration: "في الخارج تمطر. الدبدوب مستلقٍ على الكنبة." }, { narration: "إنه يشعر بملل شديد!" }],
     steps: [
-      {
-        caption: "قول «أشعر بالملل»",
-        question: "إنها تمطر. ماذا يستطيع الدبدوب أن يفعل؟",
-        beats: [{ narration: "الدبدوب يقول:", line: "أشعر بالملل!" }, { line: "وأنا أيضًا. ماذا نفعل؟" }],
-        instead: { caption: "شدّ أذن الثعلب الصغير", answer: "همم، هذا يؤلم الثعلب الصغير. الأفضل أن يقول: أشعر بالملل." },
-      },
+      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
+      null,
       {
         caption: "بناء كهف",
         question: "ماذا نلعب في الداخل؟ ماذا يستطيع الدبدوب أن يفعل؟",
@@ -900,7 +896,6 @@ export const SITUATIONS_AR: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "دعس الصندوق", answer: "همم، الآن الصندوق مكسور. الأفضل أن يصنع منه سيارة." },
       },
     ],
-    outro: [{ narration: "رائع! من الملل تأتي الأفكار. كهف، سيارة، وأشياء كثيرة أخرى." }],
     endCaption: "الدبدوب والثعلب الصغير يقودان سيارة الكرتون",
   },
   empathy: {

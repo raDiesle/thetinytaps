@@ -713,10 +713,13 @@ export const SELF_SITUATIONS: Situation[] = [
     intro: [{ narration: "Draußen regnet es. Der kleine Bär liegt auf dem Sofa." }, { narration: "Ihm ist so langweilig!" }],
     steps: [
       {
-        caption: "„Mir ist langweilig“ sagen",
+        caption: "Mit dem Fuchs Kochen spielen",
         question: "Es regnet. Was kann der kleine Bär tun?",
-        beats: [{ narration: "Der kleine Bär sagt:", line: "Mir ist langweilig!" }, { line: "Mir auch. Was machen wir?" }],
-        instead: { caption: "Den Fuchs am Ohr ziehen", answer: "Hmm, das tut dem Fuchs weh. Sag lieber: Mir ist langweilig.", sound: "aua" },
+        beats: [
+          { narration: "Er holt die Töpfe und kocht mit dem Fuchs eine Regensuppe. Rühren, rühren!", sound: "pop" },
+          { line: "Mmh, lecker! Jetzt koche ich!" },
+        ],
+        instead: { caption: "Den Fuchs am Ohr ziehen", answer: "Hmm, das tut dem Fuchs weh. Spiel lieber was mit ihm.", sound: "aua" },
       },
       {
         caption: "Eine Höhle bauen",
@@ -731,7 +734,7 @@ export const SELF_SITUATIONS: Situation[] = [
         instead: { caption: "Karton zertreten", answer: "Hmm, jetzt ist der Karton kaputt. Mach lieber ein Auto daraus." },
       },
     ],
-    outro: [{ narration: "Toll! Aus Langeweile werden Ideen. Höhle, Auto, und noch viel mehr.", sound: "cheer" }],
+    outro: [{ narration: "Toll! Aus Langeweile werden Ideen: zusammen kochen, eine Höhle bauen, Auto fahren.", sound: "cheer" }],
     endCaption: "Bär und Fuchs fahren im Karton-Auto",
   },
   {

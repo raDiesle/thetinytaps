@@ -263,7 +263,7 @@ export const feelingsIdeas: IdeaArea = {
       id: "C-26",
       emoji: "🌧️",
       title: "Langeweile am Regentag",
-      text: "Erstes Bild: Draußen regnet es, der kleine Bär liegt quer auf dem Sofa und starrt an die Decke; im Raum eine Decke, Kissen, ein Karton und Töpfe. 1) „Den Fuchs ärgern, damit was passiert“ oder sagen: „Mir ist langweilig.“ 2) „Mit den Töpfen gegen die Scheibe hauen“ (Krach) oder aus Decke und Kissen eine Höhle bauen. 3) „Den Karton zertreten“ oder den Karton zum Auto machen und losfahren. Kein Bildschirm als Ausweg.",
+      text: "Erstes Bild: Draußen regnet es, der kleine Bär liegt quer auf dem Sofa und starrt an die Decke; im Raum eine Decke, Kissen, ein Karton und Töpfe. 1) „Den Fuchs ärgern, damit was passiert“ oder mit dem Fuchs Kochen spielen (mit den Töpfen eine Regensuppe kochen; „Mir ist langweilig“ sagen war zu wenig, Rückmeldung November 2026). 2) „Mit den Töpfen gegen die Scheibe hauen“ (Krach) oder aus Decke und Kissen eine Höhle bauen. 3) „Den Karton zertreten“ oder den Karton zum Auto machen und losfahren. Kein Bildschirm als Ausweg.",
       why: "Langeweile ist das Gefühl, bei dem Eltern am schnellsten zum Tablet greifen. Die Szene zeigt, dass aus Langeweile Ideen wachsen – passt zu „Die Sendung ist zu Ende“ (C-02).",
       effort: "S",
       done: true,

@@ -908,12 +908,8 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
     caption: "It's raining outside, Little Bear is bored",
     intro: [{ narration: "It's raining outside. Little Bear is lying on the sofa." }, { narration: "He is so bored!" }],
     steps: [
-      {
-        caption: "Say “I'm bored”",
-        question: "It's raining. What can Little Bear do?",
-        beats: [{ narration: "Little Bear says:", line: "I'm bored!" }, { line: "Me too. What shall we do?" }],
-        instead: { caption: "Pull Little Fox's ear", answer: "Hmm, that hurts Little Fox. Say instead: I'm bored." },
-      },
+      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
+      null,
       {
         caption: "Build a den",
         question: "What can you play indoors? What can Little Bear do?",
@@ -927,7 +923,6 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Stomp the box flat", answer: "Hmm, now the box is broken. Make a car out of it instead." },
       },
     ],
-    outro: [{ narration: "Great! Being bored turns into ideas. A den, a car, and lots more." }],
     endCaption: "Little Bear and Little Fox ride in the box car",
   },
   empathy: {

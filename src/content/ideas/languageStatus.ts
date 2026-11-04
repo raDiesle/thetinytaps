@@ -209,7 +209,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Mehr Gefühle",
         recorded: true,
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Beim lauten Knall ist der dritte Schritt neu („Mit dem Fuchs Kuchen essen“ statt „Kleinen Ballon quietschen lassen“) und das Ende geändert (4. November 2026): nur Deutsch, noch nicht aufgenommen.",
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Beim lauten Knall ist der dritte Schritt neu („Mit dem Fuchs Kuchen essen“ statt „Kleinen Ballon quietschen lassen“) und das Ende geändert (4. November 2026), ebenso bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“ statt „„Mir ist langweilig“ sagen“) und das Ende: nur Deutsch, noch nicht aufgenommen.",
       },
       {
         label: "Buch, Gruppen und Rollen",

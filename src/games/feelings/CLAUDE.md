@@ -73,6 +73,11 @@ bear has the feeling and
 helps himself (a body trick, saying how he feels, doing something else); the feeling itself is never the not-so-good
 idea, only what hurts someone or breaks something is (hiding when embarrassed is the feeling, so its not-so-good idea is
 playing on in wet trousers).
+Saying how one feels is a good idea only where saying it changes something (it brings comfort, stops someone, asks for
+help). Where the feeling asks for something to do – bored on a rainy day – the good idea is the doing itself, best
+something creative played together with what the picture shows (cooking a rain soup with the pots, a blanket cave, a
+box car), never only naming the feeling („Mir ist langweilig“ sagen was too little a way out, user feedback, November
+2026).
 
 The bear stands for the child, and at home whoever comforts it is anyone there –
 usually a parent – so texts never say „Kind“. A feeling's title names the scene in

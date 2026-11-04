@@ -857,12 +857,8 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
     caption: "外面在下雨，小熊好无聊",
     intro: [{ narration: "外面在下雨。小熊躺在沙发上。" }, { narration: "他好无聊啊！" }],
     steps: [
-      {
-        caption: "说“我好无聊”",
-        question: "下雨了。小熊可以怎么做？",
-        beats: [{ narration: "小熊说：", line: "我好无聊！" }, { line: "我也是。我们玩什么呢？" }],
-        instead: { caption: "揪小狐狸的耳朵", answer: "嗯，那样小狐狸会疼。还是说：我好无聊。" },
-      },
+      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
+      null,
       {
         caption: "搭一个小窝",
         question: "在家里可以玩什么？小熊可以怎么做？",
@@ -876,7 +872,6 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "踩扁纸箱", answer: "嗯，现在纸箱坏了。还是把它变成汽车吧。" },
       },
     ],
-    outro: [{ narration: "真棒！无聊会变成好点子。小窝，汽车，还有好多好多。" }],
     endCaption: "小熊和小狐狸坐纸箱汽车",
   },
   empathy: {
