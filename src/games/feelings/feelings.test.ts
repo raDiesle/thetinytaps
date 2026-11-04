@@ -150,6 +150,20 @@ test("a scene goes on with a tap, and one thing moves at a time", () => {
   expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
 });
 
+// „Alltagssituationen“ alone has a switch for its voice, for grown-ups who tell the story themselves (user decision,
+// November 2026): held, never a tap a child makes by chance, and „Wie geht's dir?“ always speaks.
+test("the voice switch is Alltagssituationen's alone, and held", () => {
+  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "RoundPlay.tsx"].filter((f) =>
+    readFileSync(`src/games/feelings/${f}`, "utf8").includes("<VoiceSwitch"),
+  );
+  expect(users).toEqual(["FeelingsPlay.tsx"]);
+  expect(readFileSync("src/games/feelings/MoodGame.tsx", "utf8")).toContain("voice: true");
+  const button = readFileSync("src/games/feelings/VoiceSwitch.tsx", "utf8");
+  expect(button).toContain("useHold(onToggle");
+  expect(button).not.toContain("onClick");
+  expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");
+});
+
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.
 test("every recorded sound of the stories has its file", () => {
   for (const name of RECORDED_SOUNDS.filter((n) => n !== "aua")) expect(existsSync(`src/lib/sounds/${name}.mp3`), name).toBe(true);

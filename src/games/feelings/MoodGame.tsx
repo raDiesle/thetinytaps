@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { GameShell } from "@/components/GameShell";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
@@ -14,7 +14,9 @@ import "./feelings.css";
  * choice each. Nothing to choose before, so it plays at once; „Nochmal“ asks for the weather again.
  */
 export function MoodGame() {
-  const [settings, update] = useGameSettings(FEELINGS_SETTINGS_KEY, DEFAULT_FEELINGS_SETTINGS);
+  const [stored, update] = useGameSettings(FEELINGS_SETTINGS_KEY, DEFAULT_FEELINGS_SETTINGS);
+  // The voice switch is „Alltagssituationen“'s alone: here everything is always said.
+  const settings = useMemo(() => ({ ...stored, voice: true }), [stored]);
   const t = useT();
 
   return (

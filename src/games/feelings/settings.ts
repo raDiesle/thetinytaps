@@ -5,7 +5,12 @@ export interface FeelingsSettings {
   scene: number;
   /** Per story id, which of its choices comes next (0, 1, 2 …), so a scene asks its other choices when it comes again. */
   steps: Record<string, number>;
-  /** Read the story, the bubbles and the praise aloud. */
+  /**
+   * Whether „Alltagssituationen“ tells its scenes, questions, answers and praise aloud. Grown-ups who tell the story to
+   * the child themselves switch it off (`VoiceSwitch`); the sounds go on. „Wie geht's dir?“ always speaks.
+   */
+  voice: boolean;
+  /** Read aloud by the browser's voice: always off (`FIXED` in src/lib/common.ts), kept for the shared options. */
   speech: boolean;
   /** Little sounds for hugs, stomping, lullabies. */
   sounds: boolean;
@@ -15,6 +20,7 @@ export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
   group: "traurig",
   scene: 0,
   steps: {},
+  voice: true,
   speech: false,
   sounds: true,
 };

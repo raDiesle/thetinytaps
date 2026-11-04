@@ -1,7 +1,7 @@
 import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
-import { recordedVoice } from "@/lib/voice";
+import { hush, recordedVoice } from "@/lib/voice";
 import { framesFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
@@ -74,7 +74,8 @@ const voice = recordedVoice(voiceFiles);
 
 /**
  * Speech and sounds: each line from its recording in the app language, a line not translated yet (still German) from
- * its German one. `voiced` tells whether a line has a recording, so a story waits for it to be said.
+ * its German one. `voiced` tells whether a line has a recording, so a story waits for it to be said – also while the
+ * voice is switched off (`FeelingsSettings.voice`), so a grown-up telling the story has the same time for it.
  */
 export function useVoice(settings: FeelingsSettings) {
   const language = useAppLanguage();
@@ -82,7 +83,19 @@ export function useVoice(settings: FeelingsSettings) {
     if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
   }, [settings.sounds]);
 
-  const say = useCallback((text: string, queue = false) => voice.say(text, language.id, { queue }), [language.id]);
+  // Read when a line is due, not when it was planned: switched off mid-story, the lines already waiting stay silent too.
+  const speaking = useRef(settings.voice);
+  speaking.current = settings.voice;
+  useEffect(() => {
+    if (!settings.voice) hush();
+  }, [settings.voice]);
+
+  const say = useCallback(
+    (text: string, queue = false) => {
+      if (speaking.current) voice.say(text, language.id, { queue });
+    },
+    [language.id],
+  );
   const voiced = useCallback((text: string) => voice.has(text, language.id), [language.id]);
   /** Starts loading the recordings of a story's lines, so each is said right when its picture comes. */
   const preload = useCallback(
