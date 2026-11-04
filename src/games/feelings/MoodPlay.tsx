@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { PROD } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
+import { finishRoutineStep } from "@/lib/routine";
 import { imageFor, moodImages, preloadImages } from "./images";
 import {
   BREATH_MS,
@@ -14,13 +15,19 @@ import {
   type Help,
   type HelpId,
   HUG_CAPTION,
+  loadMoodDay,
   MOOD_ANSWER,
   MOOD_QUESTION,
   MOODS,
   type Mood,
+  morningMood,
+  NOW,
+  saveMoodDay,
   STRENGTH_QUESTION,
   STRENGTHS,
   type Strength,
+  THIS_MORNING,
+  withMood,
 } from "./mood";
 import { BigFace, SkySign } from "./moodArt";
 import type { FeelingsSettings } from "./settings";
@@ -28,6 +35,8 @@ import { ChoiceCard, StoryPicture, useTimers, useVoice } from "./shared";
 
 /** How long the hug, and then the picked help, stay big before the next part begins. */
 const ANSWER_MS = 2200;
+/** In the evening beside the morning's feeling a little longer, for the grown-up to talk about it. */
+const COMPARE_MS = 4500;
 
 /** How long a picked size keeps its tick before the next part. */
 const STRENGTH_MS = 1200;
@@ -50,14 +59,15 @@ const SHOWN = SHOWS_FACES ? MOODS : MOODS.filter((m) => m.weather);
 /** Where the child is: picking a feeling, held in the grown-up's arms, copying the face, how strong, breathing, what helps. */
 type Stage =
   | { at: "mood" }
-  | { at: "hug"; mood: Mood }
+  | { at: "hug"; mood: Mood; morning?: Mood }
   | { at: "face"; mood: Mood }
   | { at: "strength"; mood: Mood; picked?: Strength }
   | { at: "calm"; mood: Mood }
   | { at: "help"; mood: Mood; picked?: Help };
 
 /**
- * Wie geht's dir heute? Eight faces (C-29, C-30); the picked one's grown-up takes the little one in its arms, the
+ * Wie geht's dir heute? Eight faces (C-29, C-30); the picked one's grown-up takes the little one in its arms – in the
+ * evening the morning's card stands beside it instead, „Heute früh“ and „Jetzt“ (C-33) –, the
  * little one shows the face big to copy (C-35, waits for a tap), the child shows how strong it is on the feeling's
  * weather in three sizes (C-36) – a hard feeling „ganz doll“ first gets two slow breaths blown together –, then „Was
  * hilft dir jetzt?“ (C-31), and `onPick` plays the scenes of that feeling (its group).
@@ -95,14 +105,23 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
   const pickMood = useCallback(
     (mood: Mood) => {
       if (stage.at !== "mood") return;
-      setStage({ at: "hug", mood });
+      // The answer a plan's „Wie geht's dir?“ card waited for (the Tagesplan, rituals.ts): it is ticked on the way back.
+      finishRoutineStep();
+      const now = new Date();
+      const day = loadMoodDay();
+      const morning = MOODS.find((m) => m.id === morningMood(day, now));
+      saveMoodDay(withMood(day, mood.id, now));
+      setStage({ at: "hug", mood, morning });
       say(t(MOOD_ANSWER));
       sound("chime");
       if (ASKS_HELP) preloadImages(mood.helps.map(moodImages.help));
-      later(() => {
-        setStage({ at: "face", mood });
-        say(t(FACE_LINE));
-      }, ANSWER_MS);
+      later(
+        () => {
+          setStage({ at: "face", mood });
+          say(t(FACE_LINE));
+        },
+        morning ? COMPARE_MS : ANSWER_MS,
+      );
     },
     [stage.at, say, sound, later, t],
   );
@@ -173,7 +192,13 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
             ))}
           </div>
         )}
-        {stage.at === "hug" && (
+        {stage.at === "hug" && stage.morning && (
+          <div className="mood-cards mood-compare">
+            <ChoiceCard image={cardImage(stage.morning)} caption={`${t(THIS_MORNING)}: ${t(cardCaption(stage.morning))}`} state="rest" />
+            <ChoiceCard image={cardImage(stage.mood)} caption={`${t(NOW)}: ${t(cardCaption(stage.mood))}`} state="rest" />
+          </div>
+        )}
+        {stage.at === "hug" && !stage.morning && (
           <StoryPicture
             key="hug"
             name={SHOWS_FACES ? moodImages.hug(stage.mood.id) : cardImage(stage.mood)}

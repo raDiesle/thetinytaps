@@ -10,6 +10,13 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
      mascots are there. Picked, its grown-up takes the little one in its arms (`gesicht-…-arm`) while „Das kenne ich
      auch!“ is said. Until all sixteen pictures are made, the built site shows the four old weather cards instead
      (`wetter-…`, `Mood.weather`, `SHOWS_FACES`), the dev server their placeholders.
+     **Morning and evening** (C-33): the feeling picked is kept per time of day (`MoodDay` under
+     `tinytaps.mood.day.v2`, `daytimeOf` from Zähne putzen: before 14:00 is morning); in the evening, where the child
+     picked one this morning, both cards stand side by side instead of the hug, a little longer (`COMPARE_MS`) –
+     „Heute früh: …“ paler, „Jetzt: …“ – so the grown-up can talk about how the day changed it. Only today's morning
+     counts (`morningMood`), nothing older is kept. The Tagesplan's „Wie geht's dir?“ card (a ritual, `rituals.ts` in
+     `rewards/`) opens the game with `{ returnTo }`, and the pick calls `finishRoutineStep()`, so back on the plan the
+     card is ticked. The comparison is the answer: still pictures, nothing floats up.
   2. The little one makes the feeling's face big for the child to copy, for a mirror or the grown-up (C-35, `BigFace`):
      the shared `MascotHead` with the feeling's brows, eyes and mouth (`Mood.face`) – drawn, so it is there at once.
      „Kannst du auch so gucken?“ and ▶; it waits for a tap, since copying takes the child its time.

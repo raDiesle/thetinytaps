@@ -5,6 +5,7 @@
 // Grown-ups learn on the way how the child is doing.
 
 import type { MascotBrows, MascotEyes, MascotKind, MascotMouth } from "@/components/Mascot";
+import { type Daytime, dayKey, daytimeOf } from "@/games/teeth/daytime";
 import type { Localized } from "@/lib/language";
 
 export type MoodId = "froh" | "stolz" | "aufgeregt" | "ruhig" | "muede" | "traurig" | "wuetend" | "angst";
@@ -255,3 +256,43 @@ export const MOOD_LINES: string[] = [
   CALM_LINE.de,
   CALM_DONE.de,
 ];
+
+/** The feelings picked today, in the morning and in the evening (C-33): kept on this device only, today's alone. */
+export type MoodDay = { day: string } & Partial<Record<Daytime, MoodId>>;
+
+/** v2 since the eight feelings: v1 kept the four weathers' ids. */
+const MOOD_DAY_KEY = "tinytaps.mood.day.v2";
+
+/** Today with `mood` picked at `now`'s time of day (before two o'clock the morning, as for brushing); yesterday is dropped. */
+export function withMood(day: MoodDay | undefined, mood: MoodId, now: Date): MoodDay {
+  const today = dayKey(now);
+  return { ...(day?.day === today ? day : { day: today }), [daytimeOf(now)]: mood };
+}
+
+/** In the evening, the feeling picked this morning – shown beside the evening's, so the child sees feelings come and go. */
+export const morningMood = (day: MoodDay | undefined, now: Date): MoodId | undefined =>
+  daytimeOf(now) === "evening" && day?.day === dayKey(now) ? day.morning : undefined;
+
+/** Today's feelings as saved, if any. */
+export function loadMoodDay(): MoodDay | undefined {
+  try {
+    const raw = localStorage.getItem(MOOD_DAY_KEY);
+    return raw ? (JSON.parse(raw) as MoodDay) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Keeps today's feelings for the evening. */
+export function saveMoodDay(day: MoodDay) {
+  try {
+    localStorage.setItem(MOOD_DAY_KEY, JSON.stringify(day));
+  } catch {
+    // No storage: the evening then shows only its own feeling.
+  }
+}
+
+/** Over the morning's feeling in the evening, for grown-ups (the captions under the cards). */
+export const THIS_MORNING: Localized = { de: "Heute früh" };
+/** Over the feeling just picked, beside the morning's. */
+export const NOW: Localized = { de: "Jetzt" };

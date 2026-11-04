@@ -319,6 +319,11 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   `planSettings.ts` – plans, current one, print options
   (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick` (a picture card to choose in the editor's windows);
   `planner.css` – classes `pl-`.
+- `rituals.ts` – the rituals (H-58, research „rituale“): catalogue cards like the activities (`STEP_BY_ID` finds them,
+  `ritualOf(step)` tells one), each with when it belongs, its words for the grown-up in parts (what they ask, say, or
+  the child says after them) and how it goes best; `RitualCard.tsx` – those words as a card: `RitualDialog` on screen,
+  `RitualPages` on paper (two by two standing, four in a row lying). The editor offers them first, under their own
+  heading; the template „Mein Tag mit Ritualen“ puts all four on the day.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
 
 ## The tick flow
@@ -348,6 +353,11 @@ visit), the brushing's end calls `finishRoutineStep`, and back on the plan `take
 also a morning routine's teeth brushed after 14:00, which Zähne putzen files as evening. Left early with ✕, the card
 stays „Jetzt“. Such a step is part of the day, not play: no game counted, no play time, and `PlaytimeLock` lets it through. Under
 Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when the family brushes without the app.
+The ritual „Wie geht's dir?“ opens its game the same way (`Ritual.game`, C-33).
+
+A ritual's card (Mutmach-Sätze, Erzählen, Gute-Nacht-Sätze), tapped when it is the one to do, opens its words over the
+plan (`RitualDialog`) for the grown-up to read from; „✓ Gemacht“ ticks it like a tap on any other card, ✕, Esc or a tap
+beside it close it without a tick. The plan prints every ritual it has as a card after its pages (`ritualsOf`).
 
 ## Rules
 
@@ -390,6 +400,13 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
   (`photo.test.ts` checks). A generated picture that replaces an emoji must still be sharp there: at least 600 px
   square (5 cm at 300 dpi).
 - A new activity needs its `schritt-<id>` prompt and line-art twin in `bilder/prompts.ts` (`plan.test.ts` checks).
+- A ritual's words are for the grown-up, never on the child's card: the card is its picture like any other, the words
+  open on a tap and are printed on cards of their own. They say what to say, in the family's own voice („Ich hab dich
+  lieb, genau so, wie du bist“), never something that promises achievement („Ich bin der Beste“): self-statements a
+  child doesn't believe can backfire, so „Ich schaffe das“ always comes with „hilft mir jemand“ (research „rituale“).
+  The child is never made to repeat them; the card's `how` says so. Paper cards of words stay taller than wide on both
+  orientations: two by two on a page lying cut the good-night card's last lines – look at the print preview after
+  adding lines.
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the old first plan kept the fixed id `erster-plan`), as for the board.

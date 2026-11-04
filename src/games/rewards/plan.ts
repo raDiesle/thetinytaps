@@ -3,6 +3,7 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { type BoardReward, cellKey, type LinkedDays, newId, rewardFromCatalog, type StarLog, weekday } from "./board";
 import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
+import { ritualOf } from "./rituals";
 
 // A Tagesplan (a picture schedule, „Strukturtafel“): the steps of each day in their order, and which of today's
 // are done. Plain data and pure functions like board.ts; the ticks share its star log, keyed by plan id.
@@ -90,8 +91,8 @@ export const stepLimit = (steps: PlanStep[]): number => (steps.some((step) => st
 /** The game a linked card opens when the child taps it under „Jetzt“; it comes back to the plan afterwards. */
 const GAME_ROUTES: Partial<Record<LinkedGame, string>> = { teeth: "/zaehne/" };
 
-/** The page a step's tap opens (Zähne putzen for the teeth card), or none when a tap ticks it. */
-export const gameOf = (step: PlanStep): string | undefined => (step.linked && !step.noGame ? GAME_ROUTES[step.linked] : undefined);
+/** The page a step's tap opens (Zähne putzen for the teeth card, „Wie geht's dir?“ for its ritual), or none when a tap ticks it. */
+export const gameOf = (step: PlanStep): string | undefined => (step.noGame ? undefined : step.linked ? GAME_ROUTES[step.linked] : ritualOf(step)?.game);
 
 /** A card as the routine hands it to the game it opens (`waitForStep`): plan id and field key in one string. */
 export const routineStep = (planId: string, key: string) => `${planId}\n${key}`;

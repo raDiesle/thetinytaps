@@ -1,3 +1,5 @@
+import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
+
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
 // here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet of
 // small pictures, or a picture that never shares one) and leaves the rest until later sessions bring partners for
@@ -275,4 +277,6 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
     alone: "Drawn from its card, the same moment a little later",
     date: "2026-11-04",
   },
+  // The ritual cards of the Tagesplan (H-58, C-33) and their line-art twins, from their prompts.
+  ...RITUAL_PICTURE_QUEUE,
 ];

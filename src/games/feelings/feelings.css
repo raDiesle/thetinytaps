@@ -363,6 +363,18 @@
   grid-template-columns: auto;
 }
 
+/* In the evening the morning's weather beside the one just picked (C-33): two cards side by side, both still; the
+   morning's a little paler, as it has gone by. */
+.mood-compare {
+  --card-w: min((100cqw - var(--gap) - 2 * var(--pad)) / 2, (100cqh - var(--label) - 2 * var(--pad)) / 0.75);
+
+  grid-template-columns: repeat(2, auto);
+}
+
+.mood-compare .fg-choice:last-child :is(.fg-card-image, .fg-placeholder) {
+  filter: none;
+}
+
 /* Wide and low screens: the three in one row. */
 @media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
   .mood-helps {
