@@ -504,6 +504,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
+  Nothing ever loads in the dark (user feedback, November 2026: Zähne putzen opened straight from its address stood dark
+  for seconds on a phone, showing only the small words for search engines on the table): a built page shows its title
+  on a sheet of paper with a paw track coming and going (`.boot` in `base.css`, `BOOT_WAIT` in `tools/pageStart.ts`),
+  its words for search engines below it, and the app's `Suspense` shows the same paper and paws while a page's code still
+  loads (`PageLoading`), never nothing. A built page fetches its own page's code, and on an English page the English
+  texts, together with the start's (`modulepreload`, `pagePreloads` in `tools/build.ts`), not one after the other: a
+  new lazy page is a `page(…)` line in `App.tsx` with its addresses, and `pageStart.test.tsx` checks every page for
+  search engines finds its code. Fetching ahead stays as it is: after the page has loaded, in idle moments, never the
+  songs or every game for every visitor.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`,
   `src/lib/look.ts`). **It is the only look** (user decision, November 2026): the old toy-block look (cards on a sky,
   buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one
