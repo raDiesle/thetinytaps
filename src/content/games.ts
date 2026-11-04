@@ -1,5 +1,5 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
-import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
+import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
@@ -411,11 +411,12 @@ export const CATEGORIES: Category[] = [
       ar: "الضغط على الأزرار وإيجاد الحروف",
       ru: "Нажимать клавиши, находить буквы",
     },
-    // Three games, each a page of the book's table of contents, never ways to play behind ⚙️ of one game (user
+    // Four games, each a page of the book's table of contents, never ways to play behind ⚙️ of one game (user
     // feedback, November 2026).
     games: [
       { href: "/buchstaben/", emoji: "⌨️", title: FREE_TITLE, blurb: FREE_BLURB },
       { href: "/zaehlen/", emoji: "🔢", title: COUNT_TITLE, blurb: COUNT_BLURB },
+      { href: "/mitmachen/", emoji: "🐸", title: MOVE_TITLE, blurb: MOVE_BLURB },
       { href: "/woerter/", emoji: "✍️", title: WORDS_TITLE, blurb: WORDS_BLURB },
     ],
   },

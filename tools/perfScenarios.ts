@@ -116,6 +116,12 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Zahlen tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."3719524"], every: 700 } }],
   },
   {
+    // Mitmachen: the child hops, claps and stamps on its own layer; keys during a round only ripple.
+    name: "mitmachen",
+    path: "/mitmachen/",
+    parts: [{ label: "Hüpfen, klatschen, stampfen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [..."3a2b"], every: 2200 } }],
+  },
+  {
     name: "woerter",
     path: "/woerter/",
     parts: [{ label: "Wörter tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcdefghijklmnoprstu"], every: 400 } }],

@@ -268,6 +268,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Fuchs- oder Bärenkind zählt mit seinem Großen die Dinge mit", work: "drawing", effort: "S" }],
   },
   {
+    href: "/mitmachen/",
+    note: "Neu (L-15): das Fuchs- oder Bärenkind hüpft, klatscht und stampft die Zahl, sein Großer steht daneben (Mascot, Pose „clap“).",
+    tasks: [{ label: "Fuchs- oder Bärenkind macht die Zahl vor, sein Großer steht daneben", work: "drawing", effort: "S", state: "done" }],
+  },
+  {
     href: "/woerter/",
     note: "Teilt die Bildwörter mit „Frei tippen“.",
     tasks: [{ label: "Fuchs- oder Bärenkind tippt, sein Großer zeigt auf das Bild", work: "drawing", effort: "S" }],

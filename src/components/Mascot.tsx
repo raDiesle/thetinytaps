@@ -281,8 +281,8 @@ function Mouth({ mouth, bear }: { mouth: MascotMouth; bear: boolean }) {
   );
 }
 
-/** How the arms are: both down, the right one raised to wave, or both up in a cheer. */
-export type MascotPose = "stand" | "wave" | "cheer";
+/** How the arms are: both down, the right one raised to wave, both up in a cheer, or both paws together in front in a clap. */
+export type MascotPose = "stand" | "wave" | "cheer" | "clap";
 
 /**
  * A fox or a bear standing and facing us, 200 × 300, feet at the bottom; a child has a bigger head and a scarf. Standing,
@@ -313,6 +313,8 @@ export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKi
       {/* The left arm as we see it hangs (or cheers); the right one hangs, waves or cheers. */}
       {pose === "cheer" ? (
         <Arm from={[60, 176]} via={[34, 152]} to={[30, 114]} kind={kind} />
+      ) : pose === "clap" ? (
+        <Arm from={[58, 178]} via={[44, 208]} to={[89, 190]} kind={kind} />
       ) : (
         <Arm from={[58, 178]} via={[40, 210]} to={[46, 238]} kind={kind} />
       )}
@@ -320,6 +322,8 @@ export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKi
         <g className="mascot-arm">
           <Arm from={[142, 178]} via={[160, 210]} to={[154, 238]} kind={kind} />
         </g>
+      ) : pose === "clap" ? (
+        <Arm from={[142, 178]} via={[156, 208]} to={[111, 190]} kind={kind} />
       ) : (
         <Arm from={[140, 176]} via={[166, 152]} to={[170, 114]} kind={kind} />
       )}
