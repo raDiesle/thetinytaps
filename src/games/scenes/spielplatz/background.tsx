@@ -1,4 +1,5 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
+import { WalkingFamily } from "../family";
 import { Cloud } from "../shared";
 import { Poke } from "../spots";
 import { PUMP, SAND_LEFT, SAND_RIGHT, SAND_TOP, SWING, TOWER, pathHalf, pathY } from "./layout";
@@ -298,6 +299,10 @@ export function Background() {
       ))}
 
       <Path />
+      {/* Opa Bear and his child coming to play, far back by the bench */}
+      <g transform={`translate(210 480) scale(${depthScale(480)})`}>
+        <WalkingFamily kind="bear" clothes={{ top: "#868e96", legs: "#5c4033", childTop: "#ff6b6b", childLegs: "#4263eb" }} />
+      </g>
       <Chalk />
       <Sandpit />
       <Stream />

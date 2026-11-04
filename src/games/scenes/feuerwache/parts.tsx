@@ -1,4 +1,4 @@
-import { Face, SKIN, Wheel, nth } from "../shared";
+import { Face, MascotFace, SKIN, Wheel, nth, type Mascot } from "../shared";
 
 // Small parts used by several drawings of the fire station.
 
@@ -44,7 +44,22 @@ export function BlueLight({ x, y, w = 44, name }: { x: number; y: number; w?: nu
  * A firefighter's head: face, a helmet with a shining visor band and a neck guard.
  * `r` is the head radius; the helmet colour tells people apart.
  */
-export function HelmetHead({ cx, cy, r = 16, helmet, hair }: { cx: number; cy: number; r?: number; helmet: string; hair?: string }) {
+export function HelmetHead({
+  cx,
+  cy,
+  r = 16,
+  helmet,
+  hair,
+  animal,
+}: {
+  cx: number;
+  cy: number;
+  r?: number;
+  helmet: string;
+  hair?: string;
+  /** A fox or bear firefighter: the app's shared head under the helmet, its ears peeking out at the sides. */
+  animal?: Mascot;
+}) {
   return (
     <>
       {hair && (
@@ -55,8 +70,14 @@ export function HelmetHead({ cx, cy, r = 16, helmet, hair }: { cx: number; cy: n
         fill={helmet}
         opacity="0.85"
       />
-      <circle cx={cx} cy={cy} r={r} fill={SKIN} />
-      <Face cx={cx} cy={cy + r * 0.1} size={r / 26} />
+      {animal ? (
+        <MascotFace kind={animal} cx={cx} cy={cy} r={r} />
+      ) : (
+        <>
+          <circle cx={cx} cy={cy} r={r} fill={SKIN} />
+          <Face cx={cx} cy={cy + r * 0.1} size={r / 26} />
+        </>
+      )}
       <path
         d={`M${cx - r * 1.1} ${cy - r * 0.35} Q${cx - r * 1.1} ${cy - r * 1.45} ${cx} ${cy - r * 1.45} Q${cx + r * 1.1} ${cy - r * 1.45} ${cx + r * 1.1} ${cy - r * 0.35} Z`}
         fill={helmet}

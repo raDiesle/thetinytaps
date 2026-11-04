@@ -1,4 +1,4 @@
-/* ---------- End of a level: menu, again or on to the next (GameEnd.tsx) ---------- */
+/* ---------- End of a level: again or on to the next (GameEnd.tsx); the way back is the corner ---------- */
 
 .game-end {
   position: absolute;
@@ -25,18 +25,14 @@
   translate: none;
 }
 
-/* „Menü“ and „Nochmal“, stacked beside „Weiter“ and together as tall as it; side by side where there is no „Weiter“. */
+/* „Nochmal“ beside „Weiter“. */
 .game-end-small {
   display: flex;
   flex-direction: column;
   gap: clamp(8px, 2vh, 14px);
 }
 
-.game-end:not(:has(.next)) .game-end-small {
-  flex-direction: row;
-}
-
-/* Without „Weiter“ the two are the only way on, so they grow halfway to its size. */
+/* Without „Weiter“ it is the only way on, so it grows halfway to its size. */
 .game-end:not(:has(.next)) .game-end-button {
   font-size: clamp(1.4rem, 8vh, 2.8rem);
 }
@@ -87,12 +83,12 @@
   }
 }
 
-/* Small in the bottom corners (`corners`): „Menü“ left, the others right, the picture free between them. */
+/* Small in the bottom right corner (`corners`), the picture free beside it. */
 .game-end.corners {
   left: max(12px, env(safe-area-inset-left));
   right: max(12px, env(safe-area-inset-right));
   bottom: max(8px, env(safe-area-inset-bottom));
-  justify-content: space-between;
+  justify-content: flex-end;
   translate: none;
   pointer-events: none;
 }

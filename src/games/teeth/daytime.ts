@@ -23,8 +23,6 @@ export interface DaytimeTexts {
   hello: string;
   /** Said while the sugar crumbs grow into monsters: over the day before the evening brushing, over the night before the morning one. */
   grow: string;
-  /** The heading at the end. */
-  doneTitle: string;
   /** Said after spitting out at the end. */
   after: string;
 }
@@ -34,13 +32,11 @@ export const DAYTIME: Record<Daytime, DaytimeTexts> = {
   morning: {
     hello: "Guten Morgen!",
     grow: "In der Nacht wachsen daraus Zuckermonster.",
-    doneTitle: "☀️ Blitzeblank!",
     after: "Jetzt kann der Tag losgehen!",
   },
   evening: {
     hello: "Bald ist Schlafenszeit.",
     grow: "Den ganzen Tag über wachsen daraus Zuckermonster.",
-    doneTitle: "🌙 Gute Nacht!",
     after: "Jetzt ab ins Bett. Gute Nacht!",
   },
 };

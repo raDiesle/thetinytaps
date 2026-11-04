@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType } from "react";
 import { Navigate, Route, Routes } from "react-router";
+import { PageLoading } from "@/components/PageLoading";
 import { CategoryPage } from "@/pages/CategoryPage";
 import { useHistoryTrail } from "@/lib/goBack";
 import { registerPage } from "@/lib/preloadPages";
@@ -46,7 +47,8 @@ export function App() {
   // Where each way back can step back in the history (goBack.ts).
   useHistoryTrail();
   return (
-    <Suspense fallback={null}>
+    // While a page's code still loads, a sheet of paper with a paw track, never an empty screen (PageLoading).
+    <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route index element={<Home />} />
         <Route path="spiele/:category" element={<CategoryPage />} />

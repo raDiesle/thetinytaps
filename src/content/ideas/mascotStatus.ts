@@ -102,13 +102,14 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         work: "drawing",
         effort: "L",
         state: "partial",
-        note: "Mit `MascotFace` (scenes/shared.tsx), dem geteilten Kopf an Stelle eines Menschenkopfs: im Supermarkt ist die Bäckerin eine Bärin mit Kochmütze und die Kassiererin eine Füchsin mit Schleife am Ohr, in der Kita liest eine Füchsin mit runder Brille vor, beim Kinderarzt ist die Ärztin eine Bärin mit Brille (wie in der Belohnungstafel), im Wald die Försterin eine Bärin (der wilde Fuchs bleibt ein Fuchs). Offen: Feuerwehr, Tierpfleger, Bauer, Verkäufer, Pilotin. Szene für Szene, nicht alle – Menschen dürfen bleiben, die Kinder bleiben Kinder.",
+        note: "Mit `MascotFace` (scenes/shared.tsx), dem geteilten Kopf an Stelle eines Menschenkopfs: im Supermarkt ist die Bäckerin eine Bärin mit Kochmütze und die Kassiererin eine Füchsin mit Schleife am Ohr, in der Kita liest eine Füchsin mit runder Brille vor, beim Kinderarzt ist die Ärztin eine Bärin mit Brille (wie in der Belohnungstafel), im Wald die Försterin eine Bärin (der wilde Fuchs bleibt ein Fuchs), in der Feuerwache der Feuerwehrmann mit der Pfeife ein Fuchs unter dem Helm (die Feuerwehrfrau bleibt ein Mensch), im Zoo die Tierpflegerin eine Füchsin, auf dem Bauernhof der Bauer ein Bär (ein Fuchs bei den Hühnern wäre der falsche), am Flughafen die Pilotin eine Bärin mit Mütze zwischen den Ohren. Offen: Eisverkäufer, Einweiser, Schaffner … Szene für Szene, nicht alle – Menschen dürfen bleiben, die Kinder bleiben Kinder.",
       },
       {
         label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa in jeder Szene (Hand in Hand, auf den Schultern, auf der Bank daneben)",
         work: "drawing",
         effort: "M",
-        note: "Kita, Spielplatz, Stadt, Strand, Herbst, Winter, Ostern.",
+        state: "partial",
+        note: "`WalkingFamily` (scenes/family.tsx): Großer und Kind Hand in Hand, flach wie die Menschen der Bilder, mit dem geteilten Kopf; ein Ding des Hintergrunds, das beim Antippen hüpft, ohne Worte (so verliert kein Bild seine Übersetzungen). In der Stadt Papa Bär auf dem Gehweg, am Strand Mama Fuchs in Badesachen, auf dem Spielplatz Opa Bär hinten bei der Bank. Offen: Kita, Herbst, Winter, Ostern.",
       },
     ],
   },
@@ -265,7 +266,15 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/zaehlen/",
     note: "Teilt die Dinge zum Zählen mit „Frei tippen“.",
-    tasks: [{ label: "Fuchs- oder Bärenkind zählt mit seinem Großen die Dinge mit", work: "drawing", effort: "S" }],
+    tasks: [
+      {
+        label: "Fuchs- oder Bärenkind zählt mit seinem Großen die Dinge mit",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Unten links stehen Großer und Kind still (`PointingFamily`), das Kind zeigt auf die Dinge; Fuchs oder Bär bei jedem Besuch zufällig.",
+      },
+    ],
   },
   {
     href: "/mitmachen/",
@@ -275,7 +284,15 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/woerter/",
     note: "Teilt die Bildwörter mit „Frei tippen“.",
-    tasks: [{ label: "Fuchs- oder Bärenkind tippt, sein Großer zeigt auf das Bild", work: "drawing", effort: "S" }],
+    tasks: [
+      {
+        label: "Fuchs- oder Bärenkind tippt, sein Großer zeigt auf das Bild",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Unten links steht das Kind, sein Großer zeigt auf das Bild (`PointingFamily`, Pose „point“); beide still. Nicht bei „Wo ist das B?“.",
+      },
+    ],
   },
   {
     href: "/",

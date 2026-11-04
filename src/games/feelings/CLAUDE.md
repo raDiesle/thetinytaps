@@ -43,30 +43,34 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
 
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
 tell the scenes to the child in their own words. So while it plays, a wooden loudspeaker with a speech bubble stands in
-the top left corner below the ✕ (`VoiceSwitch.tsx`, drawn like the shelf's loudspeaker for the music), with „halten“
-under it: held for half a second (never a tap, a child taps it by chance) it switches off everything said – the scene,
+the screen's bottom right corner beside the book of the text to read out (`VoiceSwitch.tsx`, drawn like the shelf's
+loudspeaker for the music), with „halten“ under it: held for half a second (never a tap, a child taps it by chance) it switches off everything said – the scene,
 the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; held again, it speaks again. The sounds
 (crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
 already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
 to tell them. „Wie geht's dir?“ always speaks (`MoodGame` sets `voice: true`) and has no such switch; no other game gets
 one (`feelings.test.ts`).
 
-**The text to read out (user wish, November 2026):** for grown-ups who tell the scenes themselves, above all with the
-voice switched off, a paper note with an open book lies on the big picture's bottom left corner (`ReadAlong.tsx`), on
-wide screens just right of where the not-so-good card lies over the picture, with „halten“ under it. Held for half a
-second (like the loudspeaker; a child's tap changes nothing) it opens a paper sheet over the picture's left side with
-everything the voice says in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea
-(red cross, its caption, its answer), the good one (tick, caption, what is told), the happy end. The part being told
-now is marked with the highlighter and scrolled into view; one tap on the note closes it. It stays open from scene to
-scene and visit to visit (`settings.text`). Only in „Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts`
-checks that the sheet holds every line a round says – a new kind of line said in a round goes into `readAlong` too.
+**The text to read out (user wish and feedback, November 2026):** for grown-ups who tell the scenes themselves, a
+paper note with an open book stands in the screen's bottom right corner, left of the loudspeaker (`ReadAlong.tsx`,
+`.story-corner`; upright, where the cards fill the bottom, on the picture's top right corner below the dots). One tap
+opens it and one tap closes it – never held (held, it was too slow for grown-ups). It opens a paper sheet right above
+the two notes, in the corner where it covers least of the pictures: on wide screens below the good card, as wide as the
+room right of the picture and only as far over the picture as a readable line needs. It holds everything the voice says
+in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea (red cross, its caption,
+its answer), the good one (tick, caption, what is told), the happy end. While the voice tells the scene, the part told
+now is marked with the highlighter and scrolled into view; **with the voice off everything shows alike, nothing marked,
+since the grown-up reads it all** – and switching the voice off opens the sheet by itself. It stays open from scene to
+scene and visit to visit (`settings.text`), but steps aside at a pass's end, where „Weiter“ stands. Only in
+„Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts` checks that the sheet holds every line a round says
+– a new kind of line said in a round goes into `readAlong` too – and that the note is tapped, not held.
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
 the good one comes its picture (and, on the story's last step, its happy end), then straight on to the _next scene_ of
 the group (`PassPlay.tsx`) – never back to the same starting picture for another choice. A pass plays each scene of its
 group once; each story remembers its next step (`settings.steps`), so the next pass shows the same scenes with their
-other choices. After the last scene of a pass come „Menü“, „Nochmal“ (the group again) and „Weiter“ (the next group).
+other choices. After the last scene of a pass come „Nochmal“ (the group again) and „Weiter“ (the next group).
 The dots at the top are the pass's scenes.
 
 **One tap chooses** (user feedback, November 2026): no first tap that only shows a card big, no ring waiting for a
@@ -106,8 +110,8 @@ height allows unless the cards would get less than a quarter of the width (`--ca
 not-so-good card at the bottom left and the good one at the top right, each lying a fifth of its width over a corner
 of the picture; the picture's tick or cross sits on its top left corner. No margins beyond 8 px – not even a phone's safe-area
 inset, which left an empty strip beside the card. Cards are never see-through, waiting or crossed out (pale by filter,
-not opacity): the big picture showed through and seemed to lie on top of them. At the end „Menü“ and
-„Nochmal“ stand left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
+not opacity): the big picture showed through and seemed to lie on top of them. At the end „Nochmal“
+stands left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
 below. Captions lie on the pictures' lower edge on wide or low screens. Look at 844×390, 1024×768 and 1280×720 after
 a change.
 
@@ -170,6 +174,13 @@ quietschen lassen“ used a small balloon the first picture hardly showed, and a
 it became „Mit dem Fuchs Kuchen essen“). Only a not-so-good idea may bring a small new thing (the pin, the monster
 puppet). `bilder/README.md` lists what each first picture shows.
 
+**What a story is about is named so it can't be mixed up with anything in the picture (user feedback, November 2026):**
+in „Traurig, Kuschelhase weg“ the text said only „das Kuscheltier ist weg“ while the fox sat there holding his own plush
+dog, and with „Dem Fuchs seins wegnehmen“ a grown-up couldn't tell whether the fox had the bear's lost toy. Where
+another one in the picture has something of the same kind, every line names each by what it is (the bear's
+„Kuschelhase“, the fox's „Kuschelhund“), never by the kind alone („Kuscheltier“, „Spielzeug“, „seins“), and a card that
+takes the other one's thing says whose it is.
+
 **Every card tells one thing without its caption (user feedback, November 2026):** the angry bear's thrown toy car
 wasn't seen as thrown, his deep breath blew towards the fallen tower so he seemed to blow it over, his stomp with both
 feet couldn't be told, and he still blew with a red angry face. For every new story or level, before its pictures are
@@ -216,7 +227,7 @@ feedback, November 2026). A new story (`selbst.ts`) whose pictures are still pla
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Menü“, „Nochmal“ and „Weiter“ at a pass's
+with a green tick or red cross, so children can choose without reading; „Nochmal“ and „Weiter“ at a pass's
 end are the shared `GameEnd` (`inline`), words only like in every game. Timing of a story's beats and its sounds in
 `story.ts`.
 

@@ -191,19 +191,25 @@
   font-size: 1.4rem;
 }
 
-/* Phones keep the game's room: the note and its intro a step smaller. */
+/* Phones keep the game's room: the note and its intro clearly smaller, about as tall as ✕'s corner – at the size for
+   big screens it covered a good part of a phone's picture (user feedback, November 2026). */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .play-options-button.hold-exit {
-    min-height: 54px;
-    padding: 5px 14px 5px 8px;
+    gap: 5px;
+    min-height: 40px;
+    padding: 3px 10px 3px 6px;
   }
 
   .play-options-gear {
-    font-size: 2rem;
+    font-size: 1.4rem;
   }
 
   .play-options-label b {
-    font-size: 1.15rem;
+    font-size: 0.9rem;
+  }
+
+  .play-options-label small {
+    font-size: 0.7rem;
   }
 
   .play-options-intro {

@@ -18,7 +18,7 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   for a shown letter).
 
 `LettersGame way={…}` is all four (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
-`names.ts`. Each plays at once (`startMode`) with no start screen: ✕ and „Menü“ go back to the book's table of contents,
+`names.ts`. Each plays at once (`startMode`) with no start screen: ✕ goes back to the book's table of contents,
 the page before it.
 
 ## Rules
@@ -37,6 +37,11 @@ the page before it.
   – never a quick run of them: the child moving along is the point, not watching. The child figure moves on its own HTML
   layers (`.mv-kid`, its clapping pose a layer above its standing one), animated by `element.animate`, never inside its
   svg; the grown-up stands still.
+- In Zählen and Wörter tippen a fox or bear family stands still in the stage's bottom left corner (`PointingFamily`,
+  `.letters-family`, fox or bear by chance for the visit): in Zählen the child points at the things, in Wörter tippen
+  the grown-up points at the picture. It lies behind the card and leaves when the on-screen keys leave the stage too
+  low; it stands still until tapped, then the other one waves and both grin while the number or word is said again
+  (`onTap`, like the picture) – a decoration a child taps must do something.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters
