@@ -91,8 +91,24 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite.",
+    parts: [
+      {
+        label: "📅 Tafel, Zeitplan und Druck",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Alles übersetzt am 3. November 2026, auch Urkunde, „Jetzt – Dann“, das Bearbeiten auf der Tafel und der Countdown „Wie oft noch schlafen?“.",
+      },
+      {
+        label: "🖍️ Schwarz-weiß zum Ausmalen beworben",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken (statt des übersetzten Schalters „In Farbe“) und die Zeile im Druck-Stempel des Assistenten – nur Deutsch.",
+      },
+      {
+        label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
+        languages: { de: "done" },
+        note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“ – nur Deutsch.",
+      },
+    ],
   },
   {
     href: "/timer/",
@@ -118,6 +134,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🖼️ Bilder und Spielarten",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Mit 🔦 Taschenlampe und 🛣️ Straße malen (übersetzt am 3. November 2026).",
+      },
+      {
+        label: "🦊🐻 Familie Fuchs und Familie Bär in den Verstecken",
+        languages: { de: "done" },
+        note: "„Da ist ja Familie Fuchs!“ und „Da ist ja Familie Bär!“ (4. November 2026), noch nicht übersetzt.",
       },
     ],
   },
@@ -187,6 +208,16 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Frage, Antwort und Wetter teilen sich Übersetzung und Aufnahmen mit „Alltagssituationen“ (stimme/).",
       },
       { label: "Zeile für Erwachsene", languages: { de: "done" }, note: "MOOD_BLURB in names.ts, nur Deutsch; der Titel ist übersetzt." },
+      {
+        label: "Gesichter, Gesicht nachmachen, Wie doll ist es?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-29, C-30, C-35, C-36), nur Deutsch und noch nicht aufgenommen: die Namen der acht Gefühle, „Kannst du auch so gucken?“, die drei Stärken, das gemeinsame Pusten (MOODS, STRENGTHS, MOOD_LINES in mood.ts). Die vier Wetterkarten der gebauten Seite sind übersetzt.",
+      },
+      {
+        label: "Was hilft dir jetzt?",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026, C-31), nur Deutsch und noch nicht aufgenommen: die Frage, die fünf Dinge, die helfen, und was zu jedem gesagt wird (HELPS in mood.ts).",
+      },
     ],
   },
   {
@@ -209,12 +240,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Mehr Gefühle",
         recorded: true,
         languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Beim lauten Knall ist der dritte Schritt neu („Mit dem Fuchs Kuchen essen“ statt „Kleinen Ballon quietschen lassen“) und das Ende geändert (4. November 2026): nur Deutsch, noch nicht aufgenommen.",
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Beim lauten Knall ist der dritte Schritt neu („Mit dem Fuchs Kuchen essen“ statt „Kleinen Ballon quietschen lassen“) und das Ende geändert, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“ statt „„Guck mal!“ rufen“) und das Ende (4. November 2026): nur Deutsch, noch nicht aufgenommen.",
       },
       {
-        label: "Buch, Gruppen und Rollen",
+        label: "Buch und Gruppen",
         languages: { de: "done" },
-        note: "Neu (4. November 2026), nur Deutsch, die Rollensätze noch nicht aufgenommen (🎙️ Stimmen): die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts) und die zwei Sätze, die sagen, ob das Kind der Bär ist oder ihm hilft (ROLE_LINES in rounds.ts) – bis zur Aufnahme stumm, als Bildunterschrift zu lesen.",
+        note: "Neu (4. November 2026), nur Deutsch: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts).",
       },
     ],
   },

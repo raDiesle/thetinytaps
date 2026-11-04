@@ -8,7 +8,9 @@ import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
 import { MIN_CARD_MM, type PhotoFormat } from "./photo";
 import { PhotoPrint } from "./PhotoPrint";
 import { itemPicture, ItemPic } from "./pictures";
-import { A4, CutCardPages, PRINT_WORDS, Preview } from "./PrintPanel";
+import { A4, CutCardPages, InkChoice, PRINT_WORDS, Preview } from "./PrintPanel";
+import { RitualPages } from "./RitualCard";
+import { type Ritual, ritualOf } from "./rituals";
 import { VelcroLink } from "./shopLinks";
 
 /** How a plan is printed. */
@@ -152,7 +154,7 @@ export function PlanPrint({
             { value: "portrait", label: t(PRINT_WORDS.portrait) },
           ]}
         />
-        <Toggle label={t(PRINT_WORDS.color)} checked={options.color} onChange={(color) => onChange({ color })} />
+        <InkChoice color={options.color} onChange={(color) => onChange({ color })} />
         {cards === "choice" && (
           <Toggle
             label={t({
@@ -184,7 +186,16 @@ export function PlanPrint({
   );
 }
 
-/** The printed pages: the plan, then its pictures as cards to cut out (CutCardPages). */
+/** The rituals on a plan's cards, each once, in the order of the day: their words are printed after the plan (H-58). */
+export const ritualsOf = (plan: Plan): Ritual[] => [
+  ...new Set(
+    distinctSteps(plan)
+      .map(ritualOf)
+      .filter((r): r is Ritual => !!r),
+  ),
+];
+
+/** The printed pages: the plan, then its pictures as cards to cut out (CutCardPages), then its rituals' words. */
 function PlanPages({ plan, day, options, orientation }: { plan: Plan; day: Date; options: PlanPrintOptions; orientation: "landscape" | "portrait" }) {
   const label = useStepLabel();
   const landscape = orientation === "landscape";
@@ -204,6 +215,7 @@ function PlanPages({ plan, day, options, orientation }: { plan: Plan; day: Date;
         <PlanSheet plan={plan} ticks={undefined} linked={NO_LINKED} today={day} day={day} look={look} aspect={(width - 20) / (height - 40)} />
       </div>
       <CutCardPages cards={cards} orientation={orientation} color={look.color} theme={theme} />
+      <RitualPages rituals={ritualsOf(plan)} orientation={orientation} color={look.color} theme={theme} />
     </>
   );
 }

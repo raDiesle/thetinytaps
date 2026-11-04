@@ -8,16 +8,14 @@ import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY } from "./settings";
 import "./feelings.css";
 
 /**
- * „Alltagssituationen“: one card per feeling (`GROUPS`). The group played last comes first, and goes on with the
- * scene where the child stopped; the others follow in their fixed order.
+ * „Alltagssituationen“: one card per feeling (`GROUPS`), always in their fixed order. The group played last keeps its
+ * place, marked „zuletzt“, and goes on with the scene where the child stopped.
  */
 export function FeelingsGame() {
   const [settings, update] = useGameSettings(FEELINGS_SETTINGS_KEY, DEFAULT_FEELINGS_SETTINGS);
   const t = useT();
   const last = groupById(settings.group);
-  const groups = playableGroups();
-
-  const modes: GameMode[] = [last, ...groups.filter((g) => g !== last)].map(({ id, emoji, title }) => ({ id, emoji, title: t(title) }));
+  const modes: GameMode[] = playableGroups().map(({ id, emoji, title }) => ({ id, emoji, title: t(title) }));
 
   return (
     <GameShell

@@ -27,6 +27,8 @@ export type IdeaStatus = "done" | "partial" | "open" | "rejected";
 export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.rejected ? "rejected" : idea.partial ? "partial" : "open");
 
 export interface IdeaArea {
+  /** Tells areas apart that share a prefix (the Gefühle book's two games, both C); defaults to the prefix. */
+  key?: string;
   prefix: string;
   emoji: string;
   title: string;
@@ -34,6 +36,9 @@ export interface IdeaArea {
   intro?: string;
   ideas: Idea[];
 }
+
+/** What tells an area apart on /management/ (its filter, its row in the overview). */
+export const areaKey = (area: IdeaArea): string => area.key ?? area.prefix;
 
 /** A few areas of the same kind, shown under one heading. */
 export interface IdeaGroup {

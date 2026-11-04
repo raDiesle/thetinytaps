@@ -109,8 +109,8 @@ export const SEO_EN: SeoTranslation = {
     "/belohnungstafel/": {
       title: "Reward Chart for Toddlers – Make and Print",
       description:
-        "Make your own reward chart for toddlers: day, week, month or a path of stars, with pictures, a name and a reward. Use it on a tablet or print it.",
-      text: "A reward chart for toddlers, just as you like it: a week chart with tasks and days, a month chart as a calendar, a day chart for morning or evening, or a path of stars to the reward. Tasks as pictures (brushing teeth, potty, getting dressed, sleeping in their own bed …), the child’s name and a reward, best of all time together. A helper leads step by step to your own chart and shows every choice as a picture. On a tablet a grown-up holds a field and the child taps the star in; to print, landscape or portrait, in color or black and white, with fields to color and stars to cut out. No punishments, nothing is taken away. On the same page: a daily plan in pictures.",
+        "Make your own reward chart for toddlers: day, week, month or a path of stars, with pictures and a reward. Use it on a tablet or print it, also to color in.",
+      text: "A reward chart for toddlers, just as you like it: a week chart with tasks and days, a month chart as a calendar, a day chart for morning or evening, or a path of stars to the reward. Tasks as pictures (brushing teeth, potty, getting dressed, sleeping in their own bed …), the child’s name and a reward, best of all time together. A helper leads step by step to your own chart and shows every choice as a picture. On a tablet a grown-up holds a field and the child taps the star in; to print, landscape or portrait, with fields to color and stars to cut out. It prints in color or in black and white, and black and white is more than a gray copy: every picture of the chart is drawn once more as a coloring page, with clear, thick lines. That saves ink, and the child colors their own chart. No punishments, nothing is taken away. On the same page: a daily plan in pictures.",
     },
     "/timer/": {
       title: "Visual Timer for Kids – Hourglass, Train and Candle",
@@ -121,8 +121,8 @@ export const SEO_EN: SeoTranslation = {
     "/tagesplan/": {
       title: "Visual Schedule for Toddlers – Day and Week",
       description:
-        "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. With picture cards to print.",
-      text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board. On the same page: a reward chart to collect stars.",
+        "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. Picture cards to print and color.",
+      text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board – in color, or in black and white with every card drawn as a coloring page in clear lines, so the child colors their own plan. On the same page: a reward chart to collect stars.",
     },
     "/schnullerfee/": {
       title: "Pacifier Fairy – Saying Goodbye to the Pacifier",

@@ -6,7 +6,7 @@ export const rewardChartIdeas: IdeaArea = {
   emoji: "🌟",
   title: "Belohnungstafel",
   intro:
-    "Eine Tafel, die Eltern frei gestalten, auf dem Bildschirm und genau gleich zum Ausdrucken (/belohnungstafel/). Belohnung heißt Mitfreuen: Sterne gehen nie verloren, keine Strafen, ein leeres Feld ist nur noch frei. Tapsi zeigt jede Aufgabe, Karte und Belohnung als Bild (Gemini, 🎨 Bildvorschläge); eigene Aufgaben behalten ihr Emoji.",
+    "Eine Tafel, die Eltern frei gestalten, auf dem Bildschirm und genau gleich zum Ausdrucken (/belohnungstafel/). Belohnung heißt Mitfreuen: Sterne gehen nie verloren, keine Strafen, ein leeres Feld ist nur noch frei. Tapsi zeigt jede Aufgabe, Karte und Belohnung als Bild (Gemini); eigene Aufgaben behalten ihr Emoji.",
   ideas: [
     {
       id: "T-01",
