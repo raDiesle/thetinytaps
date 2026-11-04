@@ -101,7 +101,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Einige Erwachsene werden Füchse oder Bären: Erzieherin, Ärztin, Feuerwehr, Kassiererin, Bäckerin, Tierpfleger, Förster, Bauer …",
         work: "drawing",
         effort: "L",
-        note: "Jede Szene zeichnet ihre eigenen Leute; Szene für Szene, nicht alle – Menschen dürfen bleiben, die Kinder bleiben Kinder.",
+        state: "partial",
+        note: "Mit `MascotFace` (scenes/shared.tsx), dem geteilten Kopf an Stelle eines Menschenkopfs: im Supermarkt ist die Bäckerin eine Bärin mit Kochmütze und die Kassiererin eine Füchsin mit Schleife am Ohr, in der Kita liest eine Füchsin mit runder Brille vor, beim Kinderarzt ist die Ärztin eine Bärin mit Brille (wie in der Belohnungstafel), im Wald die Försterin eine Bärin (der wilde Fuchs bleibt ein Fuchs). Offen: Feuerwehr, Tierpfleger, Bauer, Verkäufer, Pilotin. Szene für Szene, nicht alle – Menschen dürfen bleiben, die Kinder bleiben Kinder.",
       },
       {
         label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa in jeder Szene (Hand in Hand, auf den Schultern, auf der Bank daneben)",
@@ -258,7 +259,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         work: "drawing",
         effort: "M",
         state: "done",
-        note: "Ein Kopf für alle (`MascotHead` in components/Mascot.tsx): Fellbüschel an den Wangen, Flausch in den Ohren, Schattenseite, Brauen, Augen mit Lichtern, glänzende Nase. Ihn nutzen Spielende, Timer, Fahrer in Lebendige Bilder, Schnullerfee, Sticker im Regal, die Helfer in „Was gehört zusammen?“, Baustelle und Zirkus in Kettenreaktion. Ein neuer Fuchs oder Bär nimmt ihn auch.",
+        note: "Ein Kopf für alle (`MascotHead` in components/Mascot.tsx): Fellbüschel an den Wangen, Flausch in den Ohren, Schattenseite, Brauen, Augen mit brauner Iris und zwei Lichtern etwas unter der Kopfmitte (beim Kind größer und tiefer), weiches Licht im Stirnfell statt Glanzfleck, glänzende Nase, runder lachender Mund; der Körper rundlich mit dicken Armen, runden Pfoten mit Zehen, beim Fuchs dunkle Unterarme wie bei echten Füchsen, und ein weicher Schatten unter den Füßen (November 2026 knuddeliger gemacht). Ihn nutzen Spielende, Timer, Fahrer in Lebendige Bilder, Schnullerfee, Sticker im Regal, die Helfer in „Was gehört zusammen?“, Baustelle und Zirkus in Kettenreaktion. Ein neuer Fuchs oder Bär nimmt ihn auch.",
       },
       { label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)", work: "picture", pictures: 4, effort: "S", idea: "D-21" },
     ],

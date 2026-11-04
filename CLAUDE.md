@@ -189,7 +189,10 @@ In a fresh worktree run `bun install` first.
   `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
   pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
   in the ears, the far side of the fur in shadow, brows, eyes with two lights, a shiny nose. Never a head of its own
-  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Hats, bows and glasses go
+  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Cuddly and true to the
+  animal, for children (user feedback, November 2026): eyes a little below the head's middle with a warm brown iris
+  round the pupil (a child's bigger and lower), light in the fur as soft tufts, never a round plastic shine; bodies
+  round with chubby arms and round paws with toes, the fox's legs dark below the elbow as a real fox's. Hats, bows and glasses go
   in as its `children`, clothes and bodies round it in its colours and line; a better fox or bear is made there, so
   every game gets it. Toys (a teddy), wild animals of a scene and tiny patterns stay drawn on their own. `Mascot.test.ts` checks.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
