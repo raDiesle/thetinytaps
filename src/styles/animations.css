@@ -88,6 +88,20 @@
   animation: mascot-jump 0.55s ease-out 0.35s 2;
 }
 
+/* Standing by (`PointingFamily`): nobody jumps; whoever stands second overlaps the first a little, a child or a grown-up. */
+.mascot-family.mascot-still > span {
+  margin-left: 0;
+  animation: none;
+}
+
+.mascot-family.mascot-still > span + span {
+  margin-left: -8%;
+}
+
+.mascot-family.mirror {
+  transform: scaleX(-1);
+}
+
 .mascot-family svg {
   display: block;
   width: 100%;

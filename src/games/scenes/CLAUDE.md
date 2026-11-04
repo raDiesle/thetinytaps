@@ -38,7 +38,12 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
   (`shared.tsx`) puts the shared head where the person's round head was (its middle and radius), drawn without a line,
   hats and glasses over it in the picture's coordinates, hands as paws in `MASCOT_COLORS`. Never draw a fox or bear
   head of its own here. In a picture whose wild animals include a fox (Wald), the one in a role is a bear, so the
-  child doesn't take the forester for the fox of the wood. Mama, Papa, Oma and Opa next to a human child stay people.
+  child doesn't take the forester for the fox of the wood (nor a fox among the farm's hens: the farmer is a bear).
+  Mama, Papa, Oma and Opa next to a human child stay people.
+- A fox or bear family out and about in a picture is `WalkingFamily` (`family.tsx`): grown-up and child hand in hand,
+  flat like the people, with the shared head, in clothes for the place. It is a thing of the background (a `<Poke>`
+  that hops), never an item, so it says nothing and no picture loses its translations; put it where nothing else
+  stands and no key badge lies on it, scaled with `depthScale` (Stadt, Strand, Spielplatz so far).
 - Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
   small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
   riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.

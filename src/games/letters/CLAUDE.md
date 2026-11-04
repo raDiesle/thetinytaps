@@ -37,6 +37,10 @@ the page before it.
   – never a quick run of them: the child moving along is the point, not watching. The child figure moves on its own HTML
   layers (`.mv-kid`, its clapping pose a layer above its standing one), animated by `element.animate`, never inside its
   svg; the grown-up stands still.
+- In Zählen and Wörter tippen a fox or bear family stands still in the stage's bottom left corner (`PointingFamily`,
+  `.letters-family`, fox or bear by chance for the visit): in Zählen the child points at the things, in Wörter tippen
+  the grown-up points at the picture. It lies behind the card, takes no taps and leaves when the on-screen keys leave
+  the stage too low; it never moves (only Mitmachen's family does).
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

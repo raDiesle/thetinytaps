@@ -281,8 +281,11 @@ function Mouth({ mouth, bear }: { mouth: MascotMouth; bear: boolean }) {
   );
 }
 
-/** How the arms are: both down, the right one raised to wave, both up in a cheer, or both paws together in front in a clap. */
-export type MascotPose = "stand" | "wave" | "cheer" | "clap";
+/**
+ * How the arms are: both down, the right one raised to wave, both up in a cheer, both paws together in front in a
+ * clap, or the right one stretched out to the side to point at something beside it (on our right).
+ */
+export type MascotPose = "stand" | "wave" | "cheer" | "clap" | "point";
 
 /**
  * A fox or a bear standing and facing us, 200 × 300, feet at the bottom; a child has a bigger head and a scarf. Standing,
@@ -295,7 +298,8 @@ export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKi
   // A child's head is bigger for its body, like a small child's.
   const head = child ? "translate(32.5 28) scale(1.35)" : "translate(40 40) scale(1.2)";
   return (
-    <svg viewBox="0 0 200 300">
+    // Pointing, the paw reaches past the picture's side.
+    <svg viewBox="0 0 200 300" overflow={pose === "point" ? "visible" : undefined}>
       <ellipse cx="100" cy="292" rx="66" ry="7" fill="#3a2418" opacity="0.14" />
       {fox && <FoxTail />}
       <Foot x={78} kind={kind} />
@@ -324,6 +328,8 @@ export function Mascot({ kind, child = false, pose = "stand" }: { kind: MascotKi
         </g>
       ) : pose === "clap" ? (
         <Arm from={[142, 178]} via={[156, 208]} to={[111, 190]} kind={kind} />
+      ) : pose === "point" ? (
+        <Arm from={[142, 178]} via={[172, 174]} to={[200, 160]} kind={kind} />
       ) : (
         <Arm from={[140, 176]} via={[166, 152]} to={[170, 114]} kind={kind} />
       )}
@@ -425,6 +431,30 @@ function Scarf({ color, stripe }: { color: string; stripe: string }) {
       <path d="M62 154 Q100 178 138 154 L134 172 Q100 194 66 172 Z" fill={color} />
       <path d="M80 168 L77 183 M100 172 L100 188 M120 168 L123 183 M112 190 L124 188" fill="none" stroke={stripe} strokeWidth="4" strokeLinecap="round" />
     </g>
+  );
+}
+
+/**
+ * A fox or bear child and its grown-up standing by, still, one of them pointing at what lies to their right (or, with
+ * `.mascot-family.mirror`, to their left): the child points at the things it counts, or the grown-up shows it the
+ * picture. The one pointing stands on that side, nearest to it. It takes the height of its box, like `CheeringFamily`.
+ */
+export function PointingFamily({ kind, pointer, className }: { kind: MascotKind; pointer: "child" | "grown"; className?: string }) {
+  const grown = (
+    <span className="mascot-grown">
+      <Mascot kind={kind} pose={pointer === "grown" ? "point" : "stand"} />
+    </span>
+  );
+  const child = (
+    <span className="mascot-child">
+      <Mascot kind={kind} child pose={pointer === "child" ? "point" : "stand"} />
+    </span>
+  );
+  return (
+    <span className={`mascot-family mascot-still${className ? ` ${className}` : ""}`} aria-hidden>
+      {pointer === "child" ? grown : child}
+      {pointer === "child" ? child : grown}
+    </span>
   );
 }
 

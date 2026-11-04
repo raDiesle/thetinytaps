@@ -427,7 +427,8 @@ In a fresh worktree run `bun install` first.
   Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
   `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
   already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
-  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own.
+  child, standing, waving, cheering, clapping or pointing): a game that wants one standing by takes it rather than
+  drawing its own, and a family standing still by what the child looks at is `PointingFamily` (Zählen, Wörter tippen).
 
 ## Architecture
 

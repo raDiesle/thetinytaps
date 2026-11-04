@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { PointingFamily, type MascotKind } from "@/components/Mascot";
 import { BRIGHT_COLORS, FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
@@ -64,6 +65,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [nudges, setNudges] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
+  /** The fox or bear grown-up showing its child the picture, picked by chance for the visit. */
+  const [family] = useState<MascotKind>(() => (Math.random() < 0.5 ? "fox" : "bear"));
   const { effects, ripple } = useTapFeedback();
 
   const lastType = useRef(0);
@@ -229,6 +232,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   return (
     <div className={`words-play${color && done ? " colored" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
+        <PointingFamily kind={family} pointer="grown" className="letters-family" />
         {color && done && (
           <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>
             {parade.map((spot, i) => (

@@ -22,6 +22,21 @@
   container-type: size;
 }
 
+/* The fox or bear family in the stage's bottom left corner (Zählen, Wörter tippen), behind the card and still. It
+   leaves the stage when the on-screen keys leave too little room beside the card. */
+.letters-family {
+  position: absolute;
+  left: max(2cqw, env(safe-area-inset-left));
+  bottom: 2cqh;
+  height: min(30cqh, 22cqw);
+}
+
+@container (max-height: 300px) {
+  .letters-family {
+    display: none;
+  }
+}
+
 /* ---------- On-screen keys (tablets) ---------- */
 
 .touch-keyboard {

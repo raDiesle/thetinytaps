@@ -1,5 +1,6 @@
+import { MASCOT_COLORS } from "@/components/Mascot";
 import { Hideout } from "../hideout";
-import { Face, INK, Pane, Rider, SKIN, Wheel, nth } from "../shared";
+import { Face, INK, MascotFace, Pane, Rider, SKIN, Wheel, nth } from "../shared";
 import { Drops, Lid } from "./parts";
 
 // People and things on the zoo path, and the balloon that flew away. Each drawing has its
@@ -93,7 +94,10 @@ export function Bimmelbahn() {
   );
 }
 
-/** The zoo keeper with a bucket of fish; she waves and throws a fish. */
+/** The zoo keeper's paws: she is a fox, one of the app's mascots in a role. */
+const FOX_PAW = MASCOT_COLORS.fox.paw;
+
+/** The zoo keeper, a fox with a bucket of fish; she waves and throws a fish. */
 export function Tierpfleger() {
   return (
     <g className="zo-pfleger-body" style={{ transformOrigin: "0px 0px" }}>
@@ -106,7 +110,7 @@ export function Tierpfleger() {
       <rect x="10" y="-140" width="14" height="12" rx="2" fill="#a98a52" />
       <g className="zo-pfleger-bucket" style={{ transformOrigin: "-28px -150px" }}>
         <path d="M-28 -150 Q-48 -120 -46 -88" stroke="#c9a66b" strokeWidth="13" strokeLinecap="round" fill="none" />
-        <circle cx="-46" cy="-84" r="7" fill={SKIN} />
+        <circle cx="-46" cy="-84" r="7" fill={FOX_PAW} />
         {/* The bucket of fish */}
         <path d="M-74 -84 Q-46 -110 -20 -84" stroke="#495057" strokeWidth="3" fill="none" />
         <path className="zo-pfleger-bucketfish" d="M-60 -84 l-6 -12 l12 4 Z M-40 -84 l4 -14 l6 12 Z" fill="#4dabf7" />
@@ -117,13 +121,9 @@ export function Tierpfleger() {
       </g>
       <g className="zo-pfleger-arm" style={{ transformOrigin: "26px -148px" }}>
         <path d="M26 -148 Q46 -124 44 -96" stroke="#c9a66b" strokeWidth="13" strokeLinecap="round" fill="none" />
-        <circle cx="44" cy="-90" r="7" fill={SKIN} />
+        <circle cx="44" cy="-90" r="7" fill={FOX_PAW} />
       </g>
-      <circle cx="0" cy="-186" r="24" fill={SKIN} />
-      <path d="M-22 -196 Q-26 -170 -18 -160 M22 -196 Q26 -170 18 -160" stroke="#6b4423" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <Face cx={0} cy={-188} size={0.9} />
-      <Lid cx={-6.3} cy={-188} r={2.9} fill={SKIN} />
-      <Lid cx={6.3} cy={-188} r={2.9} fill={SKIN} />
+      <MascotFace kind="fox" cx={0} cy={-184} r={25} lashes />
       <g className="zo-pfleger-hat" style={{ transformOrigin: "20px -204px" }}>
         <path d="M-40 -204 Q0 -214 40 -204 Q30 -196 0 -198 Q-30 -196 -40 -204 Z" fill="#a98a52" />
         <path d="M-22 -204 Q-20 -232 0 -232 Q20 -232 22 -204 Z" fill="#c9a66b" />
