@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { Mascot } from "@/components/Mascot";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { DEV } from "@/lib/buildInfo";
 import {
@@ -409,6 +410,15 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       <div className="sock-floor">
         <div className={`sock-machine${machineShut ? "" : " open"}`}>
           <WashingMachine looks={round.looks} />
+          {/* Tapsi and Mama Fuchs wait beside the machine while it washes (D-18), then step out of the way of the socks. */}
+          <span className="sock-family" aria-hidden>
+            <span className="sock-family-child">
+              <Mascot kind="fox" child />
+            </span>
+            <span className="sock-family-grown">
+              <Mascot kind="fox" />
+            </span>
+          </span>
         </div>
         <div className="sock-pile">
           <div ref={gridRef} className="sock-grid" style={{ "--cols": fit.columns, "--sock-h": `${fit.size}px` } as CSSProperties}>

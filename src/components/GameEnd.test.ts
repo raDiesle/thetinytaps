@@ -17,3 +17,15 @@ test("no game draws its own „Menü“ or „Nochmal“ button", async () => {
   }
   expect(own).toEqual([]);
 });
+
+// A „Menü“ button at the end was one way back too many (user feedback, November 2026): the way back is the page's
+// corner in the top left, as in every menu – the ✕, or the book's ribbon where the game goes back onto the shelf.
+test("the end of a level has no way back of its own: the corner is it", async () => {
+  const end = await Bun.file("src/components/GameEnd.tsx").text();
+  expect(end).not.toMatch(/de: "Menü"|useLeaveGame|className="game-end-button menu"/);
+  expect(end).toMatch(/useEndShown\(\)/);
+  const shell = await Bun.file("src/components/GameShell.tsx").text();
+  expect(shell).toMatch(/<EndShown value=\{setEnded\}>/);
+  expect(shell).toMatch(/ended && [^?]*\?\s*\(?[\s\S]{0,400}<TapExit[\s\S]{0,60}shelf=\{toShelf\}/);
+  expect(shell).toMatch(/sign="shelf"/);
+});

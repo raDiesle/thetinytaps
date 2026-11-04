@@ -3,7 +3,7 @@
 Route `/schnullerfee/` · idea H-11 (Alltagshelfer, a book of its own on the shelf once it is finished). While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
 
 A story without words for the evening before the pacifiers go, played by the child with a grown-up beside it. It
-plays at once (`startMode`), with no start screen; ✕ and „Menü“ go back to the page before it. One room, Tapsi's bedroom, from
+plays at once (`startMode`), with no start screen; ✕ goes back to the page before it. One room, Tapsi's bedroom, from
 evening to morning (`PacifierPlay.tsx`), one thing to tap per step, glowing, with a still pointing hand before its first
 tap (`goalSpot`); every key does what the step waits for (`act`), a tap on anything else sparkles with a soft note:
 1. `collect` – three pacifiers lie on the bed, the floor and the windowsill; each tapped one flies into the box beside
@@ -16,7 +16,7 @@ tap (`goalSpot`); every key does what the step waits for (`act`), a tap on anyth
    holds) goes in a puff, a present stands on the windowsill, and she flies out of the window again.
 5. `wake` – sleeping Tapsi: morning comes, he gets up, Mama is back.
 6. `gift` – the present: the lid flies off, the gift jumps out big into the room, hearts, stars and notes rise slowly, Tapsi and Mama cheer
-   (`party`), then `GameEnd` small in the corners („Menü“ left, „Nochmal“ right; one story, so no „Weiter“).
+   (`party`), then `GameEnd` small in the corners („Nochmal“ bottom right; one story, so no „Weiter“; the way back is the corner).
 
 Behind ⚙️ while playing (`PlayOptions`, `PacifierGame.tsx`) grown-ups choose what they really do at home: „Abschied der
 Schnuller“ (`FAREWELLS`: the box on the windowsill or the balloon) and „Geschenk der Fee“ (`GIFTS`, eight pictures).

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import type { ReactNode } from "react";
 import { GameShell } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
@@ -11,26 +11,24 @@ import {
   LETTERS_SETTINGS_KEY,
   type Announce,
   type LetterCase,
-  type LettersMode,
   type LettersSettings,
   type NumberReveal,
   type WordKind,
   type WordLength,
   type WordTyping,
-  upgradeLegacyMode,
 } from "./settings";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
+import { MovePlay } from "./MovePlay";
+import { type LettersWay, WAY_TITLES } from "./names";
 import { WordsPlay } from "./WordsPlay";
 
-export function LettersGame() {
-  const [saved, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
-  // Zählen and „Wo ist das B?“ saved as ways to play of their own become the options they are now, once.
-  const legacy = upgradeLegacyMode(saved);
-  useEffect(() => {
-    if (legacy) update(legacy);
-  }, []);
-  const settings: LettersSettings = legacy ? { ...saved, ...legacy } : saved;
+/**
+ * One of the book's four games – Frei tippen, Zählen, Mitmachen or Wörter tippen –, each on its own page of the table of contents
+ * (user feedback, November 2026). They share their settings, so letters, pictures and keys stay as chosen.
+ */
+export function LettersGame({ way }: { way: LettersWay }) {
+  const [settings, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
   const pack = useLanguagePack();
   // Hindi and Arabic letters have one form only: no choice of big and small letters, the games show that one.
   const cased = hasCase(pack);
@@ -41,31 +39,14 @@ export function LettersGame() {
   const a = pack.letters[0];
   const t = useT();
   const quote = (text: string) => t({ de: `„${text}“`, ru: `«${text}»`, en: `“${text}”`, zh: `“${text}”`, hi: `“${text}”`, es: `«${text}»`, ar: `«${text}»` });
-  const freeTitle = t({
-    de: "Frei tippen",
-    ru: "Печатать что хочешь",
-    en: "Free typing",
-    zh: "随便按",
-    hi: "आज़ाद टाइपिंग",
-    es: "Teclear libre",
-    ar: "كتابة حرة",
-  });
-  const wordsTitle = t({
-    de: "Wörter tippen",
-    ru: "Печатаем слова",
-    en: "Typing words",
-    zh: "拼词语",
-    hi: "शब्द टाइपिंग",
-    es: "Escribir palabras",
-    ar: "كتابة كلمات",
-  });
   const all = t({ de: "🌈 Alle", ru: "🌈 Все", en: "🌈 All", zh: "🌈 全部", hi: "🌈 सब", es: "🌈 Todas", ar: "🌈 الكل" });
-  // Free typing: the keys on every touch screen, Wörter tippen only on tablets.
-  const anyTouch = settings.mode === "free";
+  // Frei tippen and Zählen: the keys on every touch screen, Wörter tippen only on tablets.
+  const anyTouch = way !== "words";
   const touchKeys = useTouchKeys(settings.touchKeys, anyTouch);
   const pictureWords = settings.wordKind === "nouns" || settings.wordKind === "all";
   /** Wörter tippen with the first letter only: a letter and its picture, and the child finds its key („Wo ist das B?“). */
-  const findLetter = settings.mode === "words" && settings.wordTyping === "first";
+  const findLetter = way === "words" && settings.wordTyping === "first";
+  const numbersOnly = way === "count";
 
   const showWord = (
     <Toggle
@@ -83,66 +64,49 @@ export function LettersGame() {
     />
   );
 
+  const title = t(WAY_TITLES[way]);
+  if (way === "move") {
+    // Mitmachen has nothing to choose: no ⚙️, it plays at once with the shared on-screen keys.
+    return (
+      <GameShell title={title} startMode={way}>
+        <MovePlay pack={pack} settings={play} />
+      </GameShell>
+    );
+  }
+  // Each game plays at once, so grown-ups would not guess what waits behind ⚙️: a note names it as play starts (user
+  // feedback, November 2026).
+  const intro: Record<Exclude<LettersWay, "move">, ReactNode> = {
+    free: t({ de: "Zahlen vorzählen, Nachspuren, große und kleine Buchstaben, Bilder – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
+    count: t({ de: "Alles sofort, vorzählen, Schritt für Schritt oder selbst zählen – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
+    words: t({ de: "Ganze Wörter, Farben, Tu-Wörter oder „Wo ist das B?“ – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
+  };
+
   return (
     <GameShell
-      title={t({
-        de: "Buchstaben & Zahlen",
-        ru: "Буквы и цифры",
-        en: "Letters & Numbers",
-        zh: "字母和数字",
-        hi: "अक्षर और अंक",
-        es: "Letras y números",
-        ar: "حروف وأرقام",
-      })}
-      // Nothing to choose first: the book on the shelf plays the way played last at once, and every option, the way to
-      // play too, is changed while playing (⚙️ held in the top left corner). No start screen: ✕ and „Menü“ go back to
-      // the shelf, the page before the game (user feedback, November 2026).
-      startMode={settings.mode}
+      title={title}
+      // Nothing to choose first: the game plays at once, and every option is changed while playing (⚙️ held). No start
+      // screen: ✕ and „Menü“ go back to the book's table of contents, the page before the game (user feedback, November 2026).
+      startMode={way}
     >
       {findLetter ? (
         // A new kind of pictures brings a new letter at once.
         <FindPlay key={settings.theme} pack={pack} settings={play} />
-      ) : settings.mode === "words" ? (
+      ) : way === "words" ? (
         // New words to type bring a new word at once.
         <WordsPlay key={`${settings.wordKind}-${settings.wordLength}-${settings.theme}`} pack={pack} settings={play} />
       ) : (
-        <LettersPlay pack={pack} settings={play} />
+        <LettersPlay pack={pack} settings={play} numbersOnly={numbersOnly} />
       )}
       <PlayOptions
-        // The game plays at once in one way, so grown-ups would not guess how many others wait behind ⚙️: a note says
-        // so as play starts (user feedback, November 2026).
         intro={
           <>
-            <b>{t({ de: "Hier gibt es viele Spielarten" })}</b>
-            {t({ de: "Buchstaben, Zahlen, Zählen, ganze Wörter oder „Wo ist das B?“ – halten Sie ⚙️ gedrückt und wählen Sie aus." })}
+            <b>{t({ de: "Hier lässt sich viel einstellen" })}</b>
+            {intro[way]}
           </>
         }
       >
-        <Choice<LettersMode>
-          label={t({ de: "Spielart", en: "Way to play", zh: "玩法", hi: "खेलने का तरीका", es: "Modo de juego", ar: "طريقة اللعب", ru: "Как играем" })}
-          value={settings.mode}
-          onChange={(mode) => update({ mode })}
-          options={[
-            { value: "free", label: `⌨️ ${freeTitle}` },
-            { value: "words", label: `✍️ ${wordsTitle}` },
-          ]}
-        />
-
-        {settings.mode === "free" ? (
-          <SettingsGroup title={`⌨️ ${freeTitle}`}>
-            <Toggle
-              label={t({
-                de: "🔢 Nur Zahlen",
-                en: "🔢 Only numbers",
-                zh: "🔢 只有数字",
-                hi: "🔢 सिर्फ़ अंक",
-                es: "🔢 Solo números",
-                ar: "🔢 أرقام فقط",
-                ru: "🔢 Только цифры",
-              })}
-              checked={settings.numbersOnly}
-              onChange={(numbersOnly) => update({ numbersOnly })}
-            />
+        {way !== "words" ? (
+          <SettingsGroup title={title}>
             <Choice<NumberReveal>
               label={t({ de: "Zahlen", ru: "Цифры", en: "Numbers", zh: "数字", hi: "अंक", es: "Números", ar: "الأرقام" })}
               value={settings.numbers}
@@ -230,20 +194,24 @@ export function LettersGame() {
               />
             )}
             <Toggle
-              label={t({
-                de: "Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen",
-                ru: "Обводить: буква из точек, палец или мышка зажигает звёздочки",
-                en: "Tracing: the letter in dots, a finger or the mouse makes stars appear",
-                zh: "描一描：字母由点组成，手指或鼠标描过的地方出现星星",
-                hi: "ट्रेस करना: बिंदुओं से बना अक्षर, उँगली या माउस से सितारे निकलते हैं",
-                es: "Repasar: la letra de puntos, el dedo o el ratón hace salir estrellas",
-                ar: "التتبع: حرف من نقاط، وتظهر نجوم حيث يمر الإصبع أو الفأرة",
-              })}
+              label={
+                numbersOnly
+                  ? t({ de: "Nachspuren: Ziffer aus Punkten, Finger oder Maus lässt Sterne erscheinen" })
+                  : t({
+                      de: "Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen",
+                      ru: "Обводить: буква из точек, палец или мышка зажигает звёздочки",
+                      en: "Tracing: the letter in dots, a finger or the mouse makes stars appear",
+                      zh: "描一描：字母由点组成，手指或鼠标描过的地方出现星星",
+                      hi: "ट्रेस करना: बिंदुओं से बना अक्षर, उँगली या माउस से सितारे निकलते हैं",
+                      es: "Repasar: la letra de puntos, el dedo o el ratón hace salir estrellas",
+                      ar: "التتبع: حرف من نقاط، وتظهر نجوم حيث يمر الإصبع أو الفأرة",
+                    })
+              }
               checked={settings.trace}
               onChange={(trace) => update({ trace })}
             />
-            {!settings.numbersOnly && showWord}
-            {!settings.numbersOnly && play.letterCase === "both" && !settings.trace && (
+            {!numbersOnly && showWord}
+            {!numbersOnly && play.letterCase === "both" && !settings.trace && (
               <Toggle
                 label={t({
                   de: "Mama- und Baby-Buchstabe (mit Augen, an der Hand)",
@@ -258,7 +226,7 @@ export function LettersGame() {
                 onChange={(letterFamily) => update({ letterFamily })}
               />
             )}
-            {!settings.numbersOnly && settings.speech && (
+            {!numbersOnly && settings.speech && (
               <Choice<Announce>
                 label={t({ de: "Ansage", ru: "Что звучит", en: "What is said", zh: "播报内容", hi: "क्या बोला जाए", es: "Qué se dice", ar: "ما يقال" })}
                 value={settings.announce}
@@ -272,7 +240,7 @@ export function LettersGame() {
             )}
           </SettingsGroup>
         ) : (
-          <SettingsGroup title={`✍️ ${wordsTitle}`}>
+          <SettingsGroup title={title}>
             <Choice<WordTyping>
               label={t({
                 de: "Was tippen?",
@@ -382,7 +350,8 @@ export function LettersGame() {
         )}
 
         <SettingsGroup title={t({ de: "Anzeige", ru: "Что видно", en: "Display", zh: "显示", hi: "दिखावट", es: "Pantalla", ar: "العرض" })}>
-          {cased && (
+          {/* Zählen shows no letters. */}
+          {cased && !numbersOnly && (
             <Choice<LetterCase>
               label={t({ de: "Buchstaben", ru: "Буквы", en: "Letters", zh: "字母", hi: "अक्षर", es: "Letras", ar: "الحروف" })}
               value={settings.letterCase}

@@ -31,6 +31,11 @@ export const SEO_EN: SeoTranslation = {
       description: "How are you? The child shows how it feels with the weather and helps the little bear with anger, fear and sadness. Free, no ads.",
       text: "A picture book about feelings: first the child shows how it feels – sun, cloud, rain or thunderstorm. Then the little bear meets everyday situations, and the child picks what helps.",
     },
+    "/spiele/buchstaben-zahlen/": {
+      title: "Letters and Numbers – Keyboard Games",
+      description: "Free typing, counting and typing words: every key shows its letter with a picture and a voice, numbers come with things to count. No ads.",
+      text: "Three games on the keyboard or the screen: free typing with a letter, a picture and a word, counting with numbers and things, and typing words with first words, colors, action words and “Where is the B?”.",
+    },
     "/spiele/zuordnen/": {
       title: "Matching Games for Toddlers",
       description: "What goes together? Feed the animals, find the shadow and pair the socks – first matching games for toddlers, free and without ads.",
@@ -91,9 +96,28 @@ export const SEO_EN: SeoTranslation = {
       text: "The socks tumble out of the washing machine. Matching socks sound the same; a pair hops onto the line. First a few pairs in bright colors, then more, with patterns and under laundry baskets like memory – as the child gets sure.",
     },
     "/buchstaben/": {
-      title: "Letters and Numbers – Keyboard Game",
-      description: "Every key shows its letter with a picture and a voice. Plus counting, “Where is the B?” and typing first words. For toddlers, without ads.",
-      text: "Free typing on the keyboard or the screen: letters with a picture and a word, numbers with things to count, finding letters and typing first words, colors and action words.",
+      title: "Free Typing – Learning Letters on the Keyboard",
+      description:
+        "Every key shows its letter with a picture and a voice: B for bear. Numbers come with things to count. A keyboard game for toddlers, without ads.",
+      text: "Free typing on the keyboard or the screen: every letter comes with a picture and a word, every number with things to count. If you like, capital and small letters, tracing with a finger and pictures on one theme.",
+    },
+    "/zaehlen/": {
+      title: "Learning to Count – Number Game for Toddlers",
+      description:
+        "Every key brings a number with as many things to count: all at once, counted aloud, step by step or counted by tapping. For toddlers, without ads.",
+      text: "A number game on the keyboard or the screen: every digit shows itself with as many things, any other key brings a number from 1 to 9. The things come all at once, are counted aloud, come step by step, or the child taps each one and counts.",
+    },
+    "/mitmachen/": {
+      title: "Numbers to Join In – Hop, Clap, Stamp",
+      description:
+        "With every number a fox or bear child hops, claps or stamps just as often and counts aloud – and the child joins in. For toddlers, without ads.",
+      text: "A number game to move along with: every digit on the keyboard or the screen, any other key brings a number from 1 to 9. A fox or bear child invites – “Hop along!” – and hops, claps or stamps as often as the number says, its grown-up beside it. Each one is counted aloud, with a short wait so the child can join in. So the number becomes an amount in the child's own body.",
+    },
+    "/woerter/": {
+      title: "Typing Words – First Words for Toddlers",
+      description:
+        "Type first words letter by letter: bear, ball, colors and action words. Or “Where is the B?” – find the key for a letter. For toddlers, without ads.",
+      text: "A picture and its word: the child types it letter by letter on the keyboard or the screen. Picture words, colors, action words or all mixed, in three lengths. Or just the first letter: “Where is the B?” – find its key.",
     },
     "/zaehne/": {
       title: "Tooth Brushing for Kids – Song and Timer",
@@ -109,20 +133,26 @@ export const SEO_EN: SeoTranslation = {
     "/belohnungstafel/": {
       title: "Reward Chart for Toddlers – Make and Print",
       description:
-        "Make your own reward chart for toddlers: day, week, month or a path of stars, with pictures, a name and a reward. Use it on a tablet or print it.",
-      text: "A reward chart for toddlers, just as you like it: a week chart with tasks and days, a month chart as a calendar, a day chart for morning or evening, or a path of stars to the reward. Tasks as pictures (brushing teeth, potty, getting dressed, sleeping in their own bed …), the child’s name and a reward, best of all time together. A helper leads step by step to your own chart and shows every choice as a picture. On a tablet a grown-up holds a field and the child taps the star in; to print, landscape or portrait, in color or black and white, with fields to color and stars to cut out. No punishments, nothing is taken away. On the same page: a daily plan in pictures.",
+        "Make your own reward chart for toddlers: day, week, month or a path of stars, with pictures and a reward. Use it on a tablet or print it, also to color in.",
+      text: "A reward chart for toddlers, just as you like it: a week chart with tasks and days, a month chart as a calendar, a day chart for morning or evening, or a path of stars to the reward. Tasks as pictures (brushing teeth, potty, getting dressed, sleeping in their own bed …), the child’s name and a reward, best of all time together. A helper leads step by step to your own chart and shows every choice as a picture. On a tablet a grown-up holds a field and the child taps the star in; to print, landscape or portrait, with fields to color and stars to cut out. It prints in color or in black and white, and black and white is more than a gray copy: every picture of the chart is drawn once more as a coloring page, with clear, thick lines. That saves ink, and the child colors their own chart. No punishments, nothing is taken away. On the same page: a daily plan in pictures.",
     },
     "/timer/": {
       title: "Visual Timer for Kids – Hourglass, Train and Candle",
       description:
         "A timer without numbers for toddlers: a train rolls to the station, an hourglass runs, a candle burns down. 1 to 10 minutes, and the family waves at the end.",
-      text: "A visual timer for children who can’t read a clock yet: a grown-up sets 1, 2, 3, 5 or 10 minutes, and the child watches the time go by – a little train rolls to the station where the bear family waits, sand runs through a big hourglass, or a candle burns down until the bear child blows it out. At the end a happy tune plays and the family waves. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
+      text: "A visual timer for children who can’t read a clock yet: a grown-up sets 1, 2, 3, 5 or 10 minutes, and the child watches the time go by – a little train rolls to the station where the bear family waits, sand runs through a big hourglass, or a candle burns down until the bear child blows it out, or ants carry a cookie to their hill crumb by crumb. When the child taps the picture, what is left lights up for a moment. For taking turns between siblings, a toy lies by the fox child until the hourglass is empty, then it travels to the bear child and the hourglass turns itself over. At the end a happy tune plays and the family waves. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
     },
     "/tagesplan/": {
       title: "Visual Schedule for Toddlers – Day and Week",
       description:
-        "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. With picture cards to print.",
-      text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board. On the same page: a reward chart to collect stars.",
+        "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. Picture cards to print and color.",
+      text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board – in color, or in black and white with every card drawn as a coloring page in clear lines, so the child colors their own plan. On the same page: a reward chart to collect stars.",
+    },
+    "/wie-lange-warten/": {
+      title: "Countdown for Kids – How Many More Sleeps?",
+      description:
+        "Until the birthday, the holiday or Grandma’s visit: a little bed with a moon for every sleep, and each morning the child taps one moon into a sun.",
+      text: "Little children don’t understand “in five days” yet, but “five more sleeps” they do – so this countdown counts in beds. For every night until the big day there is a little bed with a moon over it, and beside them waits the picture of the day itself: a birthday, a holiday, Grandma and Grandpa, the first day at daycare. Each morning the bed of the night just slept lights up, the child taps it, the rooster crows, and the sun rises over the bed. So the suns grow and the moons get fewer, until on the big day its picture stands big. We set the day and the picture, and if you like, you print the moons and color one in each morning. On the same shelf: the reward chart and the daily plan in pictures.",
     },
     "/schnullerfee/": {
       title: "Pacifier Fairy – Saying Goodbye to the Pacifier",

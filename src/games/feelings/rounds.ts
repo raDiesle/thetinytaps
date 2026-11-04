@@ -5,23 +5,10 @@
 // Home stories (bear.ts) and kindergarten stories (kita.ts, selbst.ts) become the same kind of round here.
 
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { pick, type Localized } from "@/lib/language";
 import { bearImages, imageFor, storyImages } from "./images";
 import { comfortsIn, storyIn } from "./localized";
 import type { Story } from "./stories";
 import type { Beat, OopsSound } from "./story";
-
-/** Whose view the round takes: the child is the little bear („self“), or helps its friend the bear („friend“). */
-export type Role = "self" | "friend";
-
-/**
- * Said first in every round, and the start picture's caption while it is told, so it is plain whether the child is
- * the bear or helps him (user feedback, November 2026). German only so far, and not recorded yet.
- */
-export const ROLE_LINES: Record<Role, Localized> = {
-  self: { de: "Stell dir vor: Du bist der kleine Bär." },
-  friend: { de: "Der kleine Bär ist dein Freund. Du hilfst ihm." },
-};
 
 /** A picture with what it shows, in a few words for grown-ups. */
 export interface Shown {
@@ -34,10 +21,12 @@ export interface Round {
   storyId: string;
   /** Which of the story's steps is asked, counted from 0. */
   step: number;
-  role: Role;
   /** The scene: its picture and what is told while it shows. */
   start: Shown & { beats: Beat[] };
-  /** Read aloud and the caption while the child chooses; it names who acts. */
+  /**
+   * Read aloud after the scene and its picture's caption all along, whole at once: what is the matter and who acts –
+   * the child helping the bear („Was machst du?“) or the bear himself („Was kann er tun?“).
+   */
   question: string;
   /** The good idea: its card, and what is told while it is done. */
   good: Shown & { beats: Beat[] };
@@ -54,22 +43,19 @@ export const stepsOf = (story: Story): number => (story.kind === "home" ? story.
 export function roundOf(story: Story, step: number, language: TargetLanguageId): Round {
   const localized = storyIn(story, language);
   const last = step === stepsOf(story) - 1;
-  const roleBeat = (role: Role): Beat => ({ narration: pick(ROLE_LINES[role], language) });
 
   if (localized.kind === "home") {
     const { feeling } = localized;
     const comfortId = feeling.comforts[step];
     const comfort = comfortsIn(language)[comfortId];
-    const role: Role = comfort.actor === "child" ? "friend" : "self";
     return {
       storyId: story.id,
       step,
-      role,
       // The thunder rumbles while the scared bear's story starts.
       start: {
         image: bearImages.feeling(feeling.id),
         caption: feeling.title,
-        beats: [{ ...roleBeat(role), sound: feeling.id === "scared" ? "rumble" : undefined }],
+        beats: feeling.id === "scared" ? [{ sound: "rumble" }] : [],
       },
       question: feeling.questions[step],
       good: { image: bearImages.comfort(comfortId), caption: comfort.caption, beats: [{ narration: comfort.narration, sound: comfort.sound }] },
@@ -90,8 +76,7 @@ export function roundOf(story: Story, step: number, language: TargetLanguageId):
   return {
     storyId: story.id,
     step,
-    role: "self",
-    start: { image: storyImages.problem(id), caption: situation.caption, beats: [roleBeat("self"), ...situation.intro] },
+    start: { image: storyImages.problem(id), caption: situation.caption, beats: situation.intro },
     question: current.question,
     good: { image: storyImages.step(id, step), caption: current.caption, beats: current.beats },
     instead: { image: storyImages.instead(id, step), ...current.instead },
@@ -114,3 +99,25 @@ export const beatText = (beat: Beat): string => [beat.narration, beat.line].filt
 /** Every line a round may say, to load their recordings when it starts. */
 export const roundLines = (round: Round): string[] =>
   [...round.start.beats, ...round.good.beats, ...(round.end?.beats ?? [])].map(beatText).concat(round.question, round.instead.answer);
+
+/** The parts of a round in the order they are told: the scene with its question, the not-so-good idea, the good one, the happy end. */
+export type ReadPart = "start" | "instead" | "good" | "end";
+
+/** One part of a round's whole text, for grown-ups to read out (`ReadAlong`). */
+export interface ReadAlongPart {
+  id: ReadPart;
+  /** The card's caption, for the two ideas: which one the text belongs to. */
+  caption?: string;
+  /** Everything the voice says in this part, as it says it. */
+  text: string;
+}
+
+const told = (beats: Beat[]): string => beats.map(beatText).filter(Boolean).join(" ");
+
+/** Everything a round says, part by part, for grown-ups who read it out themselves (the voice switched off, `VoiceSwitch`). */
+export const readAlong = (round: Round): ReadAlongPart[] => [
+  { id: "start", text: [told(round.start.beats), round.question].filter(Boolean).join(" ") },
+  { id: "instead", caption: round.instead.caption, text: round.instead.answer },
+  { id: "good", caption: round.good.caption, text: told(round.good.beats) },
+  ...(round.end ? [{ id: "end" as const, text: told(round.end.beats) }] : []),
+];

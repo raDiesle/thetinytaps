@@ -5,6 +5,7 @@ import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./bo
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
+  bigDayCome,
   bigDayStep,
   COUNTDOWN_NIGHTS,
   counterOf,
@@ -17,6 +18,7 @@ import {
   MAX_NIGHTS,
   MAX_STEPS,
   moonsLeft,
+  nightsOf,
   nightsUntil,
   nowSteps,
   pairsOf,
@@ -36,9 +38,13 @@ import {
   withEveryDay,
   withSame,
   withStepStars,
+  withBigDay,
   withSteps,
 } from "./plan";
-import { printsCards } from "./PlanPrint";
+import { printsCards, ritualsOf } from "./PlanPrint";
+import { RITUALS, ritualOf } from "./rituals";
+import { PICTURE_QUEUE } from "@/content/pictureQueue";
+import { existsSync } from "node:fs";
 import { planLayout } from "./PlanSheet";
 import { DEFAULT_PLANNER_SETTINGS, plannerDefaults } from "./planSettings";
 
@@ -55,8 +61,8 @@ const WED = new Date("2026-10-28T12:00");
 const SAT = new Date("2026-10-31T12:00");
 
 describe("plan catalogue", () => {
-  test("activities have their own ids, apart from the tasks'", () => {
-    const ids = [...ACTIVITIES, ...TASKS].map((x) => x.id);
+  test("activities and rituals have their own ids, apart from the tasks'", () => {
+    const ids = [...ACTIVITIES, ...RITUALS, ...TASKS].map((x) => x.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -112,8 +118,8 @@ describe("plan catalogue", () => {
     expect(printsCards(template("wochenplan"))).toBe("choice");
   });
 
-  test("every activity has a picture prompt, and a line-art twin to colour in", () => {
-    for (const { id } of ACTIVITIES) {
+  test("every activity and ritual has a picture prompt, and a line-art twin to colour in", () => {
+    for (const { id } of [...ACTIVITIES, ...RITUALS]) {
       expect(promptIds.has(`schritt-${id}`), id).toBe(true);
       expect(promptIds.has(`schritt-${id}-linie`), id).toBe(true);
     }
@@ -355,5 +361,98 @@ describe("a week's grid of stars", () => {
     expect(bigDayStep(plan)?.catalog).toBe("geburtstag");
     expect(plan.days[0].every((step) => !step.stars)).toBe(true);
     expect(printsCards(plan)).toBe("never");
+  });
+
+  // H-05: a bed for every night of the waiting; each morning the child taps the night slept from moon to sun, the
+  // oldest first when a morning was missed, and the big day comes with its last morning tapped.
+  test("a Countdown's nights turn from moon to sun only by the child's tap, one each morning", () => {
+    const tpl = PLAN_TEMPLATES.find((t) => t.view === "countdown");
+    if (!tpl) throw new Error("no Countdown template");
+    const plan = planFromTemplate(tpl, "de", WED);
+    const at = (iso: string) => new Date(`${iso}T08:00`);
+    const states = (day: Date, ticks?: Record<string, number>) => nightsOf(plan, day, ticks).map((n) => n.state);
+    // Made today: five nights to come, nothing to tap yet.
+    expect(states(WED)).toEqual(["later", "later", "later", "later", "later"]);
+    // The next morning one bed waits; tapped, it is a sun – and the moons left are the nights still to come.
+    const thu = at("2026-10-29");
+    expect(states(thu)).toEqual(["now", "later", "later", "later", "later"]);
+    const first = nightsOf(plan, thu, {})[0].key;
+    const log = addStar({}, plan.id, first, thu);
+    expect(states(thu, log[plan.id])).toEqual(["done", "later", "later", "later", "later"]);
+    expect(moonsLeft(plan, thu)).toBe(4);
+    // A morning missed: two beds wait, and nothing turns into a sun by itself.
+    expect(states(at("2026-10-31"), log[plan.id])).toEqual(["done", "now", "now", "later", "later"]);
+    // On the big day it has come only once its last morning is tapped; after it, always.
+    const all = Object.fromEntries(nightsOf(plan, at("2026-11-02"), {}).map((n) => [n.key, 1]));
+    expect(bigDayCome(plan, at("2026-11-02"), {})).toBe(false);
+    expect(bigDayCome(plan, at("2026-11-02"), all)).toBe(true);
+    expect(bigDayCome(plan, at("2026-11-03"), {})).toBe(true);
+    // Another picture keeps the suns: a night's tick doesn't hang on the picture.
+    const other = { ...plan, days: [[stepFromCatalog("urlaub")]] };
+    expect(nightsOf(other, thu, log[plan.id])[0].state).toBe("done");
+    // A month at most, the last nights before the big day.
+    expect(nightsOf({ ...plan, bigDay: "2027-06-01" }, WED, {}).length).toBe(MAX_NIGHTS);
+  });
+
+  test("a new big day starts a new waiting once the old one is over, and a day moved keeps its suns", () => {
+    const tpl = PLAN_TEMPLATES.find((t) => t.view === "countdown");
+    if (!tpl) throw new Error("no Countdown template");
+    const plan = planFromTemplate(tpl, "de", WED);
+    expect(withBigDay(plan, "2026-11-05", new Date("2026-10-30T08:00")).since).toBe(plan.since);
+    expect(withBigDay(plan, "2026-11-20", new Date("2026-11-04T08:00")).since).toBe("2026-11-04");
+    // Made before H-05 (no start): its waiting begins now.
+    const { since: _, ...older } = plan;
+    expect(nightsOf(older, new Date("2026-10-30T08:00"), {}).map((n) => n.state)).toEqual(["now", "later", "later", "later"]);
+    expect(withBigDay(older, "2026-11-05", WED).since).toBe("2026-10-28");
+  });
+});
+
+// H-58, C-33: rituals are cards of the plan whose words help the grown-up; „Wie geht's dir?“ opens its game instead.
+describe("rituals", () => {
+  test("every ritual says when it belongs, who speaks and how it goes, in a few short lines", () => {
+    for (const ritual of RITUALS) {
+      expect(ritual.when.de, ritual.id).toBeTruthy();
+      expect(ritual.how.de.length, ritual.id).toBeLessThan(320);
+      expect(ritual.parts.length, ritual.id).toBeGreaterThan(0);
+      const lines = ritual.parts.flatMap((part) => part.lines);
+      // A ritual is a moment, not a lesson: few sentences, each short enough to say after a grown-up.
+      expect(lines.length, ritual.id).toBeLessThanOrEqual(5);
+      for (const line of lines) expect(line.text.de.split(" ").length, `${ritual.id}: ${line.text.de}`).toBeLessThanOrEqual(12);
+    }
+  });
+
+  test("a ritual's card finds its words; only a ritual with a game opens it, and that game is in the home menu", () => {
+    const games = new Set(CATEGORIES.flatMap((c) => c.games).map((g) => g.href));
+    for (const ritual of RITUALS) {
+      const card = stepFromCatalog(ritual.id);
+      expect(ritualOf(card), ritual.id).toBe(ritual);
+      expect(gameOf(card), ritual.id).toBe(ritual.game);
+      if (ritual.game) expect(games.has(ritual.game), ritual.game).toBe(true);
+    }
+    expect(gameOf(stepFromCatalog("wiegehts"))).toBe("/wie-gehts-dir/");
+    expect(ritualOf(stepFromCatalog("fruehstueck"))).toBeUndefined();
+  });
+
+  test("„Mein Tag mit Ritualen“ asks how the child is in the morning and in the evening, and prints every ritual's words once", () => {
+    const plan = template("rituale");
+    const steps = stepsOn(plan, WED);
+    const parts = partsOf(steps);
+    for (const part of parts)
+      expect(
+        part.steps.some((step) => step.catalog === "wiegehts"),
+        part.part,
+      ).toBe(true);
+    expect(
+      ritualsOf(plan)
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual(RITUALS.map((r) => r.id).sort());
+  });
+
+  test("a ritual's picture is made, or waits in the picture queue with its line-art twin", () => {
+    const queued = new Set(PICTURE_QUEUE.map((p) => p.file));
+    for (const { id } of RITUALS)
+      for (const file of [`src/games/rewards/bilder/schritt-${id}.webp`, `src/games/rewards/bilder/schritt-${id}-linie.webp`])
+        expect(existsSync(file) || queued.has(file), file).toBe(true);
   });
 });

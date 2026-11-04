@@ -14,4 +14,4 @@ export const OPERATOR = {
 };
 
 /** When the Datenschutzerklärung last changed: update it with the text. */
-export const PRIVACY_UPDATED = "31. Oktober 2026";
+export const PRIVACY_UPDATED = "4. November 2026";

@@ -776,12 +776,8 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
     caption: "小熊自己爬到了攀爬架最高处",
     intro: [{ narration: "小熊在爬攀爬架。全靠自己！" }, { narration: "现在他爬到上面了。他好骄傲！" }],
     steps: [
-      {
-        caption: "喊“快看！”",
-        question: "小熊爬到最高处了。他可以怎么做？",
-        beats: [{ narration: "他喊：", line: "快看，我爬上来了！" }, { line: "哇！全靠自己！" }],
-        instead: { caption: "把小狐狸推下去", answer: "嗯，推人会疼。还是喊：快看！" },
-      },
+      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
+      null,
       {
         caption: "欢呼",
         question: "小熊开心极了。他可以怎么做？",
@@ -795,7 +791,6 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "跳下去", answer: "嗯，从那么高跳下去会疼。还是教小狐狸怎么爬吧。" },
       },
     ],
-    outro: [{ narration: "好耶！给大家看，欢呼，帮忙。现在两个都很骄傲。" }],
     endCaption: "小熊和小狐狸一起在最上面",
   },
   miss: {

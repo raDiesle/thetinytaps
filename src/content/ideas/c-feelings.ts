@@ -1,12 +1,12 @@
 import type { IdeaArea } from "./types";
 
-/** C: neue Szenen für Gefühle, in denen der kleine Bär sich selbst hilft (Recherche „gefuehle-selbst-regulieren“). */
+/** C: ideas for the Gefühle book's game „Alltagssituationen“: new scenes in which the little bear helps itself (research „gefuehle-selbst-regulieren“). */
 export const feelingsIdeas: IdeaArea = {
   prefix: "C",
   emoji: "🐻",
-  title: "Gefühle – neue Szenen, in denen der Bär sich selbst hilft",
+  title: "Alltagssituationen",
   intro:
-    "Für das Spiel Gefühle, gebaut wie die Kita-Geschichten: ein erstes Bild, dann drei Schritte mit je einer nicht so guten und einer guten Karte. In jeder Szene handelt der kleine Bär selbst („Was kann der kleine Bär tun?“), nicht ein Erwachsener für ihn – der große Bär (Mama, Papa, Oma oder Opa Bär) steht dabei, schaut zu oder kommt, wenn der Bär ihn ruft. Das Gefühl selbst ist nie die nicht so gute Karte: Weinen, Angst haben, wütend sein und sich verkriechen sind in Ordnung; nicht so gut ist nur, was jemandem wehtut oder etwas kaputt macht. Jede Szene hat mindestens ein Mittel mit dem Körper (stampfen, pusten, Fäuste drücken, Kuscheltier drücken, Ohren zuhalten) und eines, bei dem der Bär etwas anderes tut; Hilfe holen höchstens in einem Schritt (siehe Recherche). Was eine nicht so gute Karte wirft oder kaputt macht, zeigt schon das erste Bild. Bilder kommen zuerst als Plan in bilder/README.md.",
+    "Neue Szenen für das Spiel „Alltagssituationen“, gebaut wie die Kita-Geschichten: ein erstes Bild, dann drei Schritte mit je einer nicht so guten und einer guten Karte. In jeder Szene handelt der kleine Bär selbst („Was kann der kleine Bär tun?“), nicht ein Erwachsener für ihn – der große Bär (Mama, Papa, Oma oder Opa Bär) steht dabei, schaut zu oder kommt, wenn der Bär ihn ruft. Das Gefühl selbst ist nie die nicht so gute Karte: Weinen, Angst haben, wütend sein und sich verkriechen sind in Ordnung; nicht so gut ist nur, was jemandem wehtut oder etwas kaputt macht. Jede Szene hat mindestens ein Mittel mit dem Körper (stampfen, pusten, Fäuste drücken, Kuscheltier drücken, Ohren zuhalten) und eines, bei dem der Bär etwas anderes tut; Hilfe holen höchstens in einem Schritt (siehe Recherche). Was eine nicht so gute Karte wirft oder kaputt macht, zeigt schon das erste Bild. Bilder kommen zuerst als Plan in bilder/README.md.",
   ideas: [
     {
       id: "C-01",
@@ -204,6 +204,7 @@ export const feelingsIdeas: IdeaArea = {
       text: "Die Mittel des Bären kommen in vielen Szenen wieder: stampfen, pusten, Fäuste drücken, Kuscheltier drücken, Ohren zuhalten, Kuschelhöhle, „Stopp!“, „Ich bin …“ sagen, „Hilf mir bitte“, etwas anderes spielen. Jedes bekommt ein festes kleines Zeichen in der Ecke seiner Karte und eine feste Haltung des Bären, so dass ein Kind „das Pusten“ in jeder Szene wiedererkennt.",
       why: "Kinder übertragen ein Mittel leichter auf neue Lagen, wenn es immer gleich aussieht. Ratgeber empfehlen, Mittel in Ruhe zu lernen und im Ernstfall nur ein Zeichen zu zeigen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "C-20",
@@ -212,6 +213,7 @@ export const feelingsIdeas: IdeaArea = {
       text: "Wenn der Bär stampft, pustet oder die Fäuste drückt, macht das Kind mit: Stampfen ist viele schnelle Tipps (jeder rumst), Pusten geht ins Mikrofon wie X-06 (ohne Mikrofon reicht Halten), Fäuste drücken heißt den Finger halten und loslassen. Erst dann geht die Geschichte weiter. Über dem Bären zeigt eine Wolke sein Gefühl und wird mit jedem Mal kleiner und heller.",
       why: "Ein Mittel, das der Körper einmal gemacht hat, wird eher wieder benutzt. Die kleiner werdende Wolke zeigt ohne Worte, dass es hilft.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "C-21",
@@ -290,33 +292,189 @@ export const feelingsIdeas: IdeaArea = {
       partial: "Als Geschichte „Erschrocken, ein lauter Knall“ in Gefühle (selbst.ts), nur Deutsch. Ohne Kuscheltier im Bild.",
     },
     {
+      id: "C-37",
+      emoji: "🧩",
+      title: "Frust: Das Puzzle passt nicht",
+      text: "Erstes Bild: Der kleine Bär sitzt am Tisch vor seinem Holzpuzzle mit Bauernhoftieren, die Kuh passt nicht in ihr Loch; der große Bär liest auf dem Sofa. 1) „Das Puzzle vom Tisch fegen“ (Krach) oder die Fäuste ganz fest drücken und wieder loslassen. 2) „Das Teil reinhauen“ (Krach) oder das Teil umdrehen und nochmal probieren. 3) „Den großen Bären anbrüllen“ oder „Hilf mir bitte!“ sagen – der große Bär zeigt auf die Ecke, und die Kuh passt. Zum Schluss ist das Puzzle fertig, und die Kuh muht.",
+      why: "„Frust, die Jacke klemmt“ zeigt Frust beim Anziehen; beim Spielen kommt er noch öfter. Die Szene zeigt die drei Wege, die Kleinkinder selbst gehen können: kurz Dampf ablassen, anders probieren, um Hilfe bitten.",
+      effort: "S",
+    },
+    {
+      id: "C-38",
+      emoji: "🏃",
+      title: "Verloren beim Wettrennen",
+      text: "Erstes Bild: Im Garten rennen der kleine Bär und der Fuchs um die Wette zum Apfelbaum; der Fuchs ist zuerst da und reißt die Arme hoch, der Bär bleibt stehen, die Unterlippe vorgeschoben. 1) „Den Fuchs schubsen“ (Aua) oder ganz fest auf den Boden stampfen. 2) „„Gilt nicht!“ schreien und weglaufen“ (der Fuchs ist traurig) oder rufen: „Nochmal!“ 3) „Den Fuchs am Ohr ziehen“ (Aua) oder dem Fuchs die Pfote zum Abklatschen hinhalten. Zum Schluss rennen beide nochmal, diesmal Hand in Hand.",
+      why: "Verlieren tut weh, und Wer-ist-zuerst-da spielen Kinder schon ganz früh. Die Szene zeigt, dass der Ärger sein darf und das Spiel trotzdem weitergeht.",
+      effort: "S",
+    },
+    {
+      id: "C-39",
+      emoji: "👋",
+      title: "Traurig, der Freund geht heim",
+      text: "Erstes Bild: An der Haustür zieht der Fuchs seine Mütze auf, sein Papa wartet draußen; der kleine Bär hält noch das Auto, mit dem sie gespielt haben, und weint. 1) „Dem Fuchs die Mütze wegnehmen, damit er bleibt“ (der Fuchs weint) oder den Fuchs zum Abschied fest umarmen. 2) „Das Auto hinterherwerfen“ (Krach) oder das Auto ganz fest an den Bauch drücken. 3) „Gegen die Tür treten“ (Krach) oder ans Fenster laufen und winken, bis der Fuchs um die Ecke ist. Zum Schluss winkt der Fuchs von draußen zurück, und der große Bär sagt: „Morgen wieder.“",
+      why: "„Abschied an der Tür“ zeigt den Bären, der gebracht wird; hier geht der Freund. Solche kleinen Abschiede gibt es fast jeden Tag, und sie enden oft in Tränen.",
+      effort: "S",
+    },
+    {
+      id: "C-40",
+      emoji: "✋",
+      title: "Ich will selber!",
+      text: "Erstes Bild: Am Frühstückstisch hat der große Bär dem kleinen Bären den Saft schon eingeschenkt – der wollte es selbst machen und ballt die Fäuste; auf dem Tisch stehen zwei Becher und die kleine Kanne. 1) „Den Becher umkippen“ (Platsch) oder laut sagen: „Ich will selber!“ 2) „Den großen Bären hauen“ (Aua) oder tief pusten, nach oben, vom Tisch weg. 3) „Die Kanne auf den Boden werfen“ (Krach) oder dem großen Bären selbst einschenken – der hält die Kanne nur ein bisschen mit. Zum Schluss trinken beide, und der kleine Bär strahlt.",
+      why: "„Selber!“ ist der Satz der Trotzphase: Wut, weil ein Großer etwas abgenommen hat, gehört zum Alltäglichsten. Die Szene zeigt Worte statt Wut und einen Weg, es doch noch selbst zu tun.",
+      effort: "S",
+    },
+    {
+      id: "C-41",
+      emoji: "🏡",
+      title: "Heimweh: Die erste Nacht bei Oma",
+      text: "Erstes Bild: Der kleine Bär liegt in Oma Bärs Gästebett, ein Nachtlicht leuchtet, sein Kuscheltier liegt neben ihm, an der Wand hängt ein Bild; Oma sitzt auf der Bettkante, und der Bär schaut traurig zur Tür. 1) „Das Nachtlicht runterwerfen“ (Krach) oder das Kuscheltier ganz fest drücken. 2) „Oma wegschubsen“ (Aua) oder sagen: „Ich vermisse Mama.“ – Oma nickt und streichelt ihm über den Kopf. 3) „Das Bild von der Wand reißen“ (Krach) oder die Augen zumachen und ganz langsam atmen, mit der Pfote auf dem Bauch. Zum Schluss schläft er, mit einem Lächeln.",
+      why: "„Vermissen, Oma fährt weg“ ist das Vermissen zu Hause; Heimweh an einem fremden Ort ist die andere Seite und kommt mit jeder ersten Übernachtung. Sagen, was man fühlt, hilft hier besonders.",
+      effort: "S",
+    },
+    {
+      id: "C-42",
+      emoji: "✂️",
+      title: "Angst beim Friseur",
+      text: "Erstes Bild: Der kleine Bär sitzt auf dem hohen Friseurstuhl, einen Umhang um den Hals, und schaut ängstlich in den Spiegel; hinter ihm die Friseurin, eine Füchsin, mit Kamm, auf der Ablage eine Sprühflasche, der große Bär sitzt auf dem Wartestuhl. 1) „Zappeln und die Füchsin treten“ (Aua) oder die Pfoten ganz fest um die Armlehnen drücken. 2) „Die Sprühflasche runterwerfen“ (Krach) oder im Spiegel zuschauen, wie ein Büschel fällt. 3) „Die Füchsin anbrüllen“ oder sagen: „Kurz Pause, bitte!“ – die Füchsin wartet, und der große Bär winkt ihm zu. Zum Schluss schaut er in den Spiegel und lacht über seinen neuen Schopf.",
+      why: "Der Friseur macht vielen Kleinkindern Angst: fremde Hände am Kopf, Geräusche hinter dem Ohr, stillsitzen. Pause sagen dürfen gibt ihnen ein Stück Kontrolle zurück.",
+      effort: "S",
+    },
+    {
+      id: "C-43",
+      emoji: "🫢",
+      title: "Ups, aus Versehen",
+      text: "Erstes Bild: In der Kita ist der kleine Bär beim Rennen gegen den Bauklotzturm des Fuchses gestoßen; die Klötze liegen herum, der Fuchs schaut traurig, der Bär hält erschrocken die Pfoten vor den Mund. 1) „Die restlichen Klötze auch umtreten“ (Krach) oder sagen: „Entschuldigung!“ 2) „Lachen und weiterrennen“ (der Fuchs weint) oder sich neben den Fuchs knien und tief pusten. 3) „Mit Klötzen werfen“ (Aua) oder dem Fuchs einen Klotz reichen und zusammen neu bauen. Zum Schluss steht ein neuer Turm, höher als der alte, und beide lachen.",
+      why: "Erschrecken über sich selbst und ein schlechtes Gewissen kennen schon Zweijährige. Bisher passiert dem Bären in den Kita-Geschichten immer etwas; hier macht er etwas kaputt und lernt, es wiedergutzumachen.",
+      effort: "S",
+    },
+    {
+      id: "C-44",
+      emoji: "😣",
+      title: "Gekränkt: Der Fuchs lacht über sein Bild",
+      text: "Erstes Bild: Am Maltisch der Kita zeigt der kleine Bär stolz sein Bild (ein bunter Kringel, das ist Mama Bär), der Fuchs zeigt darauf und lacht; auf dem Tisch Stifte und das Bild des Fuchses, daneben malt der Hase. 1) „Das Bild des Fuchses zerreißen“ (Ritsch, der Fuchs weint) oder laut sagen: „Das mag ich nicht!“ 2) „Mit Stiften werfen“ (Aua) oder die Fäuste drücken und tief pusten. 3) „Das eigene Bild zerknüllen“ (Knautsch) oder sich neben den Hasen setzen und weitermalen. Zum Schluss hängt sein Bild an der Wand, und der Fuchs schaut es sich an.",
+      why: "Ausgelacht werden tut weh, und Kinder zerstören dann oft gerade das, worauf sie eben noch stolz waren. Die Szene zeigt, dass man sich wehren darf und das eigene Bild trotzdem gut ist.",
+      effort: "S",
+    },
+    {
+      id: "C-45",
+      emoji: "🌙",
+      title: "Zu aufgeregt zum Schlafen",
+      text: "Erstes Bild: Der kleine Bär liegt im Bett, die Augen weit offen; neben dem Bett stehen der gepackte Kinderkoffer und ein Eimer mit Schaufel – morgen geht es ans Meer. 1) „Den Koffer wieder ausräumen“ (Rumms, alles fällt raus) oder die Pfote auf den Bauch legen und langsam atmen. 2) „Mit der Schaufel auf den Eimer trommeln“ (laut, nebenan wacht das Baby auf) oder dem Kuscheltier flüstern, was er morgen am Meer baut. 3) „Das Licht anmachen und spielen“ oder die Augen zumachen und den Wellen lauschen (leises Meeresrauschen). Zum Schluss schläft er, die Schaufel im Arm.",
+      why: "Bisher sind die frohen Gefühle der Geschichten einfach schön. Vorfreude kann aber auch zu viel sein – auch ein schönes Gefühl lässt sich beruhigen.",
+      effort: "S",
+    },
+    {
+      id: "C-46",
+      emoji: "🛴",
+      title: "Neidisch: Der Fuchs hat ein neues Laufrad",
+      text: "Erstes Bild: Auf dem Gehweg zeigt der Fuchs stolz sein neues rotes Laufrad mit Klingel, der kleine Bär steht mit seinem alten Roller daneben und schaut finster. 1) „Das Laufrad umschubsen“ (Krach) oder die Fäuste drücken und sagen: „Das will ich auch!“ 2) „Den Fuchs vom Laufrad ziehen“ (Aua) oder fragen: „Darf ich mal?“ 3) „Den eigenen Roller wegtreten“ (Krach) oder tauschen: Der Fuchs probiert den Roller, der Bär das Laufrad. Zum Schluss fahren beide nebeneinander, und der Bär klingelt.",
+      why: "Eifersucht aufs Baby ist schon da; Neid auf das Spielzeug eines anderen kommt im Kita-Alter täglich vor. Sagen, was man will, und fragen statt nehmen.",
+      effort: "S",
+    },
+    {
+      id: "C-47",
+      emoji: "🛒",
+      title: "Angst: Papa ist weg im Supermarkt",
+      text: "Erstes Bild: Zwischen hohen Regalen steht der kleine Bär allein, sein Kuscheltier im Arm; den großen Bären sieht er nicht mehr, vor ihm eine Kiste Äpfel und ein Turm aus Dosen. 1) „Das Regal hochklettern, um zu gucken“ (gefährlich, Krach) oder stehen bleiben wie ein Baum, die Füße fest auf dem Boden, und tief atmen. 2) „Den Dosenturm umwerfen“ (Krach) oder ganz laut rufen: „Papa!“ 3) „Die Äpfel aus der Kiste rollen lassen“ (Rumpeln) oder das Kuscheltier fest drücken und weiter da warten, wo er ist. Zum Schluss kommt der große Bär um die Ecke, und sie umarmen sich.",
+      why: "Verlorengehen ist eine der größten Ängste von Kindern und Eltern, und was man dann tut – stehen bleiben, laut rufen, warten –, sollen Kinder kennen, bevor es passiert. Für Größere passt eine Variante, in der der Bär an der Kasse fragt.",
+      effort: "S",
+    },
+    {
+      id: "C-48",
+      emoji: "🗣️",
+      title: "Wütend: Keiner versteht mich",
+      text: "Erstes Bild: In der Küche ruft der kleine Bär „Da! Da!“, der große Bär hält fragend einen Apfel hoch; der Bär will aber den Joghurt im offenen Kühlschrank. 1) „Den Apfel aus der Pfote schlagen“ (Rumms) oder mit dem Finger genau auf den Joghurt zeigen. 2) „Gegen den Kühlschrank treten“ (Krach) oder stampfen, ganz fest, und dann tief pusten. 3) „Schreien, bis sich alle die Ohren zuhalten“ oder den großen Bären an der Pfote zum Kühlschrank ziehen. Zum Schluss löffeln beide Joghurt.",
+      why: "Kleinkinder wissen oft genau, was sie wollen, haben aber noch nicht die Worte – eine der häufigsten Ursachen für Wut. Zeigen und hinführen sind Wege, die jedes Kind schon kann.",
+      effort: "S",
+    },
+    {
+      id: "C-49",
+      emoji: "🐝",
+      title: "Angst vor der Biene",
+      text: "Erstes Bild: Beim Picknick auf der Wiese summt eine Biene um den Saftbecher des kleinen Bären, er zieht die Schultern hoch; auf der Decke Becher, Brote und ein Ball, am Rand Blumen, der große Bär sitzt daneben. 1) „Nach der Biene schlagen“ (Aua, sie sticht) oder ganz still sitzen bleiben. 2) „Den Saft umkippen“ (Platsch) oder langsam aufstehen und ein paar Schritte weggehen. 3) „Mit dem Ball nach der Biene werfen“ oder zuschauen, wie sie zu den Blumen fliegt, und tief ausatmen. Zum Schluss sitzen alle wieder auf der Decke, die Biene summt in den Blumen.",
+      why: "Bienen und Wespen machen im Sommer fast allen Kleinkindern Angst, und Schlagen ist das, was sie dann tun – und genau das macht es schlimmer. Stillhalten und weggehen sind Mittel mit dem Körper.",
+      effort: "S",
+    },
+    {
+      id: "C-50",
+      emoji: "📞",
+      title: "Warten: Papa telefoniert",
+      text: "Erstes Bild: Der große Bär telefoniert in der Küche, der kleine Bär hält ihm sein neues Bild hin und zieht ihn am Hosenbein; auf dem Tisch Stifte, auf dem Stuhl sein Kuscheltier. 1) „Das Telefon wegreißen“ (Krach) oder den großen Bären leise am Arm antippen – der hebt die Pfote: „Gleich.“ 2) „Laut dazwischenschreien“ oder sich mit dem Kuscheltier auf den Stuhl setzen und an den Fingern zählen. 3) „Das Bild zerknüllen“ (Knautsch) oder das Bild schon mal schön auf den Tisch legen. Zum Schluss legt der große Bär auf und schaut sich das Bild ganz lange an.",
+      why: "Warten, wenn ein Großer beschäftigt ist, fällt Kleinkindern besonders schwer. Leise Bescheid sagen und sich selbst beschäftigen sind Wege, die Eltern sich jeden Tag wünschen.",
+      effort: "S",
+    },
+    {
+      id: "C-51",
+      emoji: "🩹",
+      title: "Gehauen – und jetzt?",
+      text: "Erstes Bild: Im Sandkasten der Kita hält sich der Fuchs den Arm und weint, zwischen ihnen liegt die Schaufel; der kleine Bär steht davor, die Pfote noch erhoben – er hat ihn im Streit um die Schaufel gehauen, und erschrickt. 1) „Nochmal hauen“ (Aua) oder die Pfoten runternehmen und tief pusten. 2) „Die Schaufel nehmen und weiterbuddeln“ (der Fuchs weint) oder sagen: „Entschuldigung!“ 3) „Lachen“ oder mit dem Fuchs zur Erzieherin gehen, die einen Kühlakku bringt. Zum Schluss buddeln beide zusammen, einer mit der Schaufel, einer mit dem Eimer.",
+      why: "Kinder hauen manchmal – wichtig ist, was danach kommt. In „Selbst wütend“ geht es um das Davor; hier um das Wiedergutmachen, das Kinder selten gezeigt bekommen.",
+      effort: "S",
+    },
+    {
+      id: "C-52",
+      emoji: "📅",
+      title: "Die Szene von heute",
+      text: "Hinter ⚙️ (gehalten, `PlayOptions`) eine Seite mit allen Szenen als kleine erste Bilder, nach Gruppen geordnet. Ein Erwachsener tippt die an, die heute passiert ist (in der Kita geschubst, beim Arzt gewesen), und genau diese Szene spielt, danach geht es wie gewohnt weiter. Die Karte „Erzählen“ nach der Kita im Zeitplan könnte dorthin führen.",
+      why: "Die Gruppen ordnen nach Gefühlen; Eltern wissen aber oft genau, was heute los war, und wollen genau diese Szene zum Darüberreden. Für das Kind ändert sich nichts.",
+      effort: "S",
+    },
+    {
+      id: "C-53",
+      emoji: "💬",
+      title: "Eine Frage zum Weiterreden",
+      text: "Unten im Text zum Vorlesen (`ReadAlong`), nach dem guten Ende, steht pro Szene eine Frage für den Erwachsenen: „Hast du schon mal eine Biene gesehen? Was hast du gemacht?“, „Wann hast du dich zuletzt so gefreut?“. Nicht vorgelesen, nur für den Großen, der die Szene mit dem Kind anschaut.",
+      why: "Eine Szene hilft am meisten, wenn sie zum eigenen Leben des Kindes führt. Die Frage ist da, wo der Erwachsene ohnehin liest, und braucht keine Aufnahme.",
+      effort: "S",
+    },
+  ],
+};
+
+/**
+ * C as well, for the game „Wie geht's dir?“: it shares the prefix with „Alltagssituationen“, since its ideas were
+ * numbered there before the book got its own heading on /management/ – numbers stay fixed, so a new C idea takes the
+ * next free number of both.
+ */
+export const feelingsCheckInIdeas: IdeaArea = {
+  key: "C-wie",
+  prefix: "C",
+  emoji: "🌦️",
+  title: "Wie geht's dir?",
+  ideas: [
+    {
       id: "C-29",
       emoji: "🌈",
-      title: "Wie geht's dir? Mehr Gefühle zum Zeigen",
+      title: "Mehr Gefühle zum Zeigen",
       text: "Zu Sonne, Wolke, Regen und Gewitter kommen weitere Wetter: Regenbogen (stolz), Wind (aufgeregt, zappelig), Nebel (müde, alles zu viel), Schneeflocken (ruhig, zufrieden), ein dunkler Wald (Angst). Jedes führt zu den Szenen der passenden Gruppe in „Alltagssituationen“.",
       why: "Vier Wetter decken nur froh, müde, traurig und wütend ab. Angst, Aufregung und Stolz kennen Kleinkinder genauso – und je feiner das Kind zeigen kann, wie es ihm geht, desto besser kann der Erwachsene darauf eingehen.",
       effort: "M",
+      partial:
+        "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee (Sonne, Regenbogen, Wind, Schnee, Wolke, Regen, Gewitter, dunkler Wald) sind jetzt das Zeichen bei „Wie doll ist es?“ (C-36). Bis die Gesichtsbilder gemacht sind, zeigt die gebaute Seite die vier alten Wetterkarten.",
     },
     {
       id: "C-30",
       emoji: "🐻",
-      title: "Wie geht's dir? Gesichter statt Wetter",
+      title: "Gesichter statt Wetter",
       text: "Statt Wetterbildern zeigen die Karten ein Fuchs- oder Bärenkind mit Mama oder Papa daneben: fröhlich, traurig, wütend, ängstlich, müde. Das Kind tippt auf das Gesicht, das passt; der Erwachsene im Bild nickt und nimmt es in den Arm.",
       why: "Gesichter sind für Zweijährige leichter zu lesen als ein Wetter-Bild, und die Maskottchen kommen so auch hier als Familie vor.",
       effort: "M",
+      partial:
+        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Es fehlen die 16 Bilder (gesicht-…, in der Bilder-Queue) – bis dahin zeigt die gebaute Seite die vier Wetterkarten – und die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-31",
       emoji: "🤲",
-      title: "Wie geht's dir? Was hilft dir jetzt?",
+      title: "Was hilft dir jetzt?",
       text: "Nach dem Gefühl kommt eine zweite Frage mit drei Bildern: kuscheln, toben, etwas trinken, allein sein, ein Lied. Das Kind wählt, was ihm jetzt guttut – und der Erwachsene weiß, was er tun kann, auch ohne dass das Kind es sagen kann.",
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
+      partial:
+        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Es fehlen die fünf Bilder (bilder/README.md, „Geplant“) – bis dahin fragt die gebaute Seite noch nicht – und die Aufnahmen und Übersetzungen der neuen Sätze.",
     },
     {
       id: "C-32",
       emoji: "🫀",
-      title: "Wie geht's dir? Wo spürst du es?",
+      title: "Wo spürst du es?",
       text: "Ein großer Bär im Umriss: Das Kind tippt, wo es das Gefühl spürt – Bauch, Kopf, Hände, Brust –, und dort leuchtet eine Farbe auf (rot für Wut, blau für traurig). Nichts ist falsch.",
       why: "Gefühle sitzen im Körper; Kinder, die das bemerken, können früher etwas tun (pusten, kuscheln). Es ist ein Spiel ohne richtige Antwort, das Gespräche öffnet.",
       effort: "M",
@@ -324,15 +482,16 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-33",
       emoji: "🌅",
-      title: "Wie geht's dir? Am Morgen und am Abend",
+      title: "Am Morgen und am Abend",
       text: "„Wie geht's dir?“ einmal am Morgen und einmal am Abend, als Schritt im Tagesplan (Belohnungstafel & Zeitplan). Am Abend sieht man beide Bilder nebeneinander: so ging es mir heute früh, so jetzt.",
       why: "Ein kurzes festes Ritual macht über Gefühle sprechen alltäglich. Der Vergleich zeigt dem Kind, dass Gefühle kommen und gehen.",
       effort: "M",
+      done: true,
     },
     {
       id: "C-34",
       emoji: "📖",
-      title: "Wie geht's dir? Was der Erwachsene danach sieht",
+      title: "Was der Erwachsene danach sieht",
       text: "Nach dem Spiel ein kleiner Satz für Erwachsene (nur auf Tablet und Computer, wie die Kartenzeile): welches Gefühl gewählt wurde und eine Frage, mit der man weiterreden kann („Was hat dich heute wütend gemacht?“). Ohne Speichern, ohne Verlauf.",
       why: "Das Kind zeigt etwas, aber der Erwachsene schaut vielleicht gerade nicht hin. Ein ruhiger Hinweis hilft, das Gespräch danach zu führen.",
       effort: "S",
@@ -340,18 +499,24 @@ export const feelingsIdeas: IdeaArea = {
     {
       id: "C-35",
       emoji: "😀",
-      title: "Wie geht's dir? Das Kind macht das Gesicht nach",
+      title: "Das Kind macht das Gesicht nach",
       text: "Nach der Wahl macht der kleine Bär das Gesicht des Gefühls groß vor (wütende Augenbrauen, Lachen, hängender Mund), und das Kind macht es nach – vor einem Spiegel oder dem Erwachsenen. Ohne Kamera.",
       why: "Gefühle nachmachen hilft, sie bei sich und anderen zu erkennen; mit dem Erwachsenen zusammen wird es ein Spiel.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut (4. November 2026): nach dem Gefühl zeigt das Fuchs- oder Bärenkind sein Gesicht groß (der gemeinsame MascotHead mit neuen Augenbrauen, Augen und Mündern), „Kannst du auch so gucken?“, weiter mit einem Tipp. Die Sätze sind nur Deutsch und noch nicht aufgenommen.",
     },
     {
       id: "C-36",
       emoji: "🎚️",
-      title: "Wie geht's dir? Wie stark ist es?",
+      title: "Wie stark ist es?",
       text: "Nach dem Gefühl ein Regler ohne Zahlen: eine kleine, eine mittlere oder eine große Gewitterwolke (oder Sonne). Das Kind tippt, wie stark es ist; bei einem großen Gefühl kommt zuerst etwas Beruhigendes (gemeinsam pusten).",
       why: "„Ein bisschen traurig“ und „ganz arg traurig“ brauchen verschiedene Hilfe. Schon Zweijährige können groß und klein unterscheiden.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Die Sätze sind nur Deutsch und noch nicht aufgenommen.",
     },
   ],
 };

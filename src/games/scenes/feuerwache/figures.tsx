@@ -1,3 +1,4 @@
+import { MASCOT_COLORS } from "@/components/Mascot";
 import { CHEEK, Face, INK, SKIN, nth } from "../shared";
 import { DARK_RED, FIRE_RED, HelmetHead, Jacket, NAVY, STRIPE, Toot } from "./parts";
 
@@ -50,19 +51,23 @@ export function Feuerwehrfrau() {
   );
 }
 
-/** The firefighter with the whistle: he waves, the visor comes down and he whistles. */
+/** The firefighter with the whistle's paws: he is a fox, one of the app's mascots in a role. */
+const FOX_PAW = MASCOT_COLORS.fox.paw;
+
+/** The firefighter with the whistle, a fox: he waves, the visor comes down and he whistles. */
 export function Feuerwehrmann() {
   return (
     <g className="fw-mann-body" style={{ transformOrigin: "0px 0px" }}>
       <Legs gap={8} />
       <Jacket x={-34} y={-158} w={68} h={86} />
       <path d="M-30 -146 L-44 -90" stroke={NAVY} strokeWidth="14" strokeLinecap="round" />
-      <circle cx="-45" cy="-86" r="8" fill={SKIN} />
+      <circle cx="-45" cy="-86" r="8" fill={FOX_PAW} />
       <g className="fw-mann-head" style={{ transformOrigin: "0px -160px" }}>
-        <HelmetHead cx={0} cy={-182} r={26} helmet={FIRE_RED} />
-        <g className="fw-mann-cheeks" fill={CHEEK}>
-          <circle cx="-12" cy="-172" r="7" />
-          <circle cx="12" cy="-172" r="7" />
+        <HelmetHead cx={0} cy={-182} r={26} helmet={FIRE_RED} animal="fox" />
+        {/* His white cheeks puff up as he whistles. */}
+        <g className="fw-mann-cheeks" fill={MASCOT_COLORS.fox.pale}>
+          <circle cx="-13" cy="-172" r="7" />
+          <circle cx="13" cy="-172" r="7" />
         </g>
         <path
           className="fw-mann-visor"
@@ -79,7 +84,7 @@ export function Feuerwehrmann() {
       </g>
       <g className="fw-mann-arm" style={{ transformOrigin: "30px -146px" }}>
         <path d="M30 -146 L52 -196" stroke={NAVY} strokeWidth="14" strokeLinecap="round" />
-        <circle cx="54" cy="-202" r="9" fill={SKIN} />
+        <circle cx="54" cy="-202" r="9" fill={FOX_PAW} />
       </g>
     </g>
   );

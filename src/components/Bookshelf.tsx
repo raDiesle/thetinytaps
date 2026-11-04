@@ -33,14 +33,14 @@ interface ShelfBook {
   games?: string[];
   /** The cloth of a book standing spine out. */
   colour?: string;
-  /** A game standing as several books in one slipcase (`Game.volumes`): those books, spine out. */
+  /** A game standing as several books tied together with a ribbon (`Game.volumes`): those books, spine out. */
   volumes?: ShelfBook[];
 }
 
 /** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
 const DAILY_COLOURS = ["#2f78a8", "#3f8a4a", "#b0457a", "#c77d4f", "#2f5d62"];
 
-/** The cloths of the books in a slipcase: the first (the Belohnungstafel) gold, the shelf's eye-catcher. */
+/** The cloths of the books tied together: the first (the Belohnungstafel) gold, the shelf's eye-catcher. */
 const VOLUME_COLOURS = ["#c8952c", "#7a4fa0", "#2f78a8"];
 
 /** How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to read. */
@@ -280,8 +280,8 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
 /**
  * The books of a category whose games stand apart, spines out side by side, marked as one group by a library's label
  * with its name clipped on the board's edge under them (chosen from four drafts, user decision, November 2026). A game
- * with several parts stands as a slipcase of books (`Slipcase`): the Belohnungstafel's, right of Aufs Töpfchen, gold
- * and pulled out a little further than the rest, so it is what the eye finds first (user feedback, November 2026).
+ * with several parts stands as its books tied together with a red ribbon (`BookBundle`): the Belohnungstafel's, right of
+ * Aufs Töpfchen, bound in gold and glowing brightest, so it is what the eye finds first (user feedback, November 2026).
  * Beside them words carved into the shelf's back panel tell grown-ups in short who the shelf is for and that it is a
  * first step into the digital world taken together – never an advert for one of its games (user feedback, November
  * 2026) – and their „mehr …“ opens all the texts for grown-ups (RoomNotes).
@@ -302,7 +302,7 @@ function DailyGroup({
     <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN } as CSSProperties}>
       <span className="shelf-daily-books">
         {books.map((book) =>
-          book.volumes ? <Slipcase key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
+          book.volumes ? <BookBundle key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
         )}
         <span className="shelf-group-label">{name}</span>
       </span>
@@ -343,20 +343,30 @@ function DailyGroup({
 }
 
 /**
- * Books standing in one slipcase, each a part of one game with its own name on its spine (Belohnungstafel and
- * Zeitplan): the case's edges frame their spines, so they are seen as belonging together, and each opens its own part.
+ * Books tied together with a red ribbon and a bow, each a part of one game with its own name on its spine
+ * (Belohnungstafel and Zeitplan): the ribbon shows they belong together, and each opens its own part. They stand on the
+ * board like the books beside them – a box round them looked as if it floated (user feedback, November 2026).
  */
-function Slipcase({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void }) {
+function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void }) {
   return (
-    <span className="shelf-slipcase" style={{ "--volumes": volumes.length } as CSSProperties}>
-      <span className="box-left" />
-      <span className="box-right" />
-      <span className="box-top" />
-      {volumes.map((book) => (
-        <SpineBook key={book.id} book={book} onClick={take(book)} />
+    <span className="shelf-bundle" style={{ "--volumes": volumes.length } as CSSProperties}>
+      {volumes.map((book, i) => (
+        <SpineBook key={book.id} book={book} onClick={take(book)} bow={i === 0 && volumes.length > 1} />
       ))}
-      <span className="shelf-slipcase-edge" />
     </span>
+  );
+}
+
+/** The ribbon's bow, tied where the first two books of a bundle meet: two loops, a knot and two ends. */
+function RibbonBow() {
+  return (
+    <svg className="shelf-bundle-bow" viewBox="0 0 40 32" aria-hidden>
+      <path d="M20 16 L9 30 L13 31 L20 18 L27 31 L31 30 Z" fill="#8f1f24" />
+      <path d="M20 16 C12 4 2 4 3 11 C4 18 12 19 20 16 Z" fill="#c8323a" stroke="#7a1a1f" strokeWidth="1.2" />
+      <path d="M20 16 C28 4 38 4 37 11 C36 18 28 19 20 16 Z" fill="#c8323a" stroke="#7a1a1f" strokeWidth="1.2" />
+      <path d="M9 9 C12 8 15 11 17 14 M31 9 C28 8 25 11 23 14" fill="none" stroke="#ffffff59" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="16.5" y="12.5" width="7" height="7" rx="2" fill="#b0262d" stroke="#7a1a1f" strokeWidth="1.2" />
+    </svg>
   );
 }
 
@@ -584,7 +594,7 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
  * like a book on a real shelf. It keeps the picture book it is hidden inside (`.shelf-daily-book`): taken out, that one
  * turns its cover out and opens (bookTravel.ts).
  */
-function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
+function SpineBook({ book, onClick, bow }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void; bow?: boolean }) {
   const t = useT();
   const style = { "--c": book.colour, "--w1": book.colour } as CSSProperties;
   return (
@@ -606,6 +616,7 @@ function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent
       <span className="box-left" />
       <span className="box-right" />
       <span className="box-top" />
+      {bow && <RibbonBow />}
       <span className="shelf-daily-book" data-world={book.world} data-spine style={style} hidden>
         <BookFaces book={book} spine />
       </span>

@@ -802,12 +802,8 @@ export const SITUATIONS_HI: Partial<Record<SituationId, SituationText>> = {
     caption: "भालू अकेले जंगल जिम के सबसे ऊपर है",
     intro: [{ narration: "छोटा भालू जंगल जिम पर चढ़ता है। बिल्कुल अकेले!" }, { narration: "अब वह ऊपर है। उसे बहुत गर्व है!" }],
     steps: [
-      {
-        caption: "“देखो!” पुकारना",
-        question: "छोटा भालू सबसे ऊपर है। वह क्या कर सकता है?",
-        beats: [{ narration: "वह पुकारता है:", line: "देखो, मैं ऊपर हूँ!" }, { line: "वाह! बिल्कुल अकेले!" }],
-        instead: { caption: "लोमड़ी को नीचे धकेलना", answer: "हम्म, धक्का देने से चोट लगती है। इसकी जगह पुकारो: देखो!" },
-      },
+      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
+      null,
       {
         caption: "खुशी मनाना",
         question: "छोटा भालू बहुत खुश है। वह क्या कर सकता है?",
@@ -821,7 +817,6 @@ export const SITUATIONS_HI: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "नीचे कूदना", answer: "हम्म, इतनी ऊँचाई से कूदने पर चोट लगती है। इसकी जगह लोमड़ी को दिखाओ कि कैसे चढ़ते हैं।" },
       },
     ],
-    outro: [{ narration: "हुर्रे! दिखाना, खुशी मनाना, मदद करना। अब दोनों को गर्व है।" }],
     endCaption: "भालू और लोमड़ी साथ में ऊपर",
   },
   miss: {

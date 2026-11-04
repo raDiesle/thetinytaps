@@ -64,10 +64,84 @@ html:has(.play-area) body {
 /* The page's text from the build (src/content/seo.ts), shown until the app replaces it
    and read by search engines; plain and calm, it is only there for a moment. */
 .seo-page {
+  line-height: 1.5;
+}
+
+.seo-page-text {
   max-width: 40rem;
   margin: 0 auto;
   padding: 48px 24px;
-  line-height: 1.5;
+}
+
+/*
+ * While code is loading – the app's before it starts (the built page's title, tools/build.ts) or a page's own later
+ * (`PageLoading`): a sheet of paper filling the screen, with a little paw track coming and going under the title, so
+ * a slow start looks like a book being opened, never like a dark, empty screen. The paws show only after a moment, so
+ * a quick start never flashes them; they fade (opacity, which a phone does without painting) and are gone once the
+ * page is there, so nothing idles.
+ */
+.boot {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 24px;
+  text-align: center;
+  background: var(--paper-grain, none), var(--paper, #fbf4e3);
+}
+
+.boot h1 {
+  margin: 0;
+  max-width: 34rem;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.boot-wait {
+  display: flex;
+  gap: 22px;
+  animation: boot-show 0.4s ease-out 0.6s backwards;
+}
+
+.boot-wait span {
+  width: 42px;
+  height: 42px;
+  background: var(--accent);
+  --paw: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cellipse cx='12' cy='16.5' rx='5.6' ry='4.6'/%3E%3Ccircle cx='5' cy='10' r='2.3'/%3E%3Ccircle cx='9.4' cy='5.6' r='2.3'/%3E%3Ccircle cx='14.6' cy='5.6' r='2.3'/%3E%3Ccircle cx='19' cy='10' r='2.3'/%3E%3C/svg%3E");
+  -webkit-mask: var(--paw) center / contain no-repeat;
+  mask: var(--paw) center / contain no-repeat;
+  /* A track walking to the right: the paws turned that way, one step up and one down. */
+  transform: rotate(90deg) translateX(8px);
+  animation: boot-paw 1.6s ease-in-out 0.6s infinite backwards;
+}
+
+.boot-wait span:nth-child(2) {
+  transform: rotate(90deg) translateX(-8px);
+  animation-delay: 1.13s;
+}
+
+.boot-wait span:nth-child(3) {
+  animation-delay: 1.66s;
+}
+
+@keyframes boot-show {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes boot-paw {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 
 .seo-page ul {

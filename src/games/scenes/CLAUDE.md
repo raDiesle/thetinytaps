@@ -2,7 +2,7 @@
 
 Routes `/bilder/` (menu) and `/bilder/<id>/`. The menu has the mode as a choice row above the pictures
 (`mode` in `settings.ts`), and a tap on a picture plays it at once in that mode: a picture has no start screen,
-no „Über das Spiel“ and no „Einstellungen“ (`GameShell` with `startMode` and `leaveTo`), and ✕, Esc and „Menü“ go
+no „Über das Spiel“ and no „Einstellungen“ (`GameShell` with `startMode` and `leaveTo`), and ✕ and Esc go
 back to `/bilder/`.
 
 Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds, speaks and is counted – and at the party the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Straße malen" (see below); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
@@ -31,6 +31,19 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
 
 - New picture or many new items: run `/neue-szene` (`.claude/skills/neue-szene/SKILL.md`); it has the full
   guide to depth, keys, drawing style, animations and the browser checks.
+- Two of the hidden surprises are the app's mascots as a family (`MascotFamily` in `hideout.tsx`): the fox or bear
+  child in front with its paws on the edge, its grown-up bigger behind it, both with the shared `MascotHead`. A new
+  surprise with a fox or bear comes the same way, never a lone fox or bear child.
+- Grown-ups in a role (the baker, the cashier, the teacher, the doctor, the forester) may be foxes or bears: `MascotFace`
+  (`shared.tsx`) puts the shared head where the person's round head was (its middle and radius), drawn without a line,
+  hats and glasses over it in the picture's coordinates, hands as paws in `MASCOT_COLORS`. Never draw a fox or bear
+  head of its own here. In a picture whose wild animals include a fox (Wald), the one in a role is a bear, so the
+  child doesn't take the forester for the fox of the wood (nor a fox among the farm's hens: the farmer is a bear).
+  Mama, Papa, Oma and Opa next to a human child stay people.
+- A fox or bear family out and about in a picture is `WalkingFamily` (`family.tsx`): grown-up and child hand in hand,
+  flat like the people, with the shared head, in clothes for the place. It is a thing of the background (a `<Poke>`
+  that hops), never an item, so it says nothing and no picture loses its translations; put it where nothing else
+  stands and no key badge lies on it, scaled with `depthScale` (Stadt, Strand, Spielplatz so far).
 - Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
   small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
   riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.
@@ -73,7 +86,8 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
   German sentence into `ScenePlay.tsx` or `quests.ts`. Adjectives and verbs agree with the item's gender/plural
   (Russian `agree`, `esAgree`, `hiAgree`, `arAgree`); nothing said to the child depends on it being a boy or a girl
   (Arabic says „let's“, هيّا, instead of an imperative). Start-screen texts are inline with `t({ de, ru, en, … })` in
-  `ScenesGame.tsx`; the surprises in a hideout have `found` in every language.
+  `ScenesGame.tsx`; the surprises in a hideout have `found` in every language, except the two mascot families (Familie Fuchs, Familie Bär),
+  German only until translations are asked for (marked in `languageStatus.ts`).
 - Speech uses the scene language's `speechLang`. Keys mode (`keys.ts`): an item wants the first letter of its whole
   translated name (put the noun first in a translation where you can), typed at its place on any keyboard
   (`pressedKey`), so a German keyboard types every language. Russian: the Cyrillic letters (`RUSSIAN_SCENE_KEYS`,

@@ -1,11 +1,15 @@
-import { Face, INK, SKIN, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { Face, INK, MascotFace, SKIN, nth } from "../shared";
 import { Lid } from "./parts";
 
 // The forester, the child collecting leaves and the signpost on the path. Foot point at (0, 0).
 
 const JACKET = "#40916c";
 
-/** The forester with binoculars, a hat with a feather and a braid; she looks through her binoculars, then waves and whistles. */
+/** The forester's paws: she is a bear, one of the app's mascots in a role (the wild fox of the wood stays a fox). */
+const PAW = MASCOT_COLORS.bear.fur;
+
+/** The forester, a bear with binoculars and a hat with a feather; she looks through her binoculars, then waves and whistles. */
 export function Foersterin() {
   return (
     <g className="wd-foerster-body">
@@ -17,19 +21,13 @@ export function Foersterin() {
       <rect x="-24" y="-104" width="14" height="12" rx="3" fill="#2d6a4f" />
       <rect x="10" y="-104" width="14" height="12" rx="3" fill="#2d6a4f" />
       <path d="M-20 -146 L-4 -118 M20 -146 L4 -118" stroke="#6b4423" strokeWidth="2.5" />
-      {/* Braid behind the shoulder */}
-      <path d="M-16 -168 Q-28 -150 -24 -126" stroke="#8d5524" strokeWidth="9" strokeLinecap="round" fill="none" />
-      <circle cx="-24" cy="-124" r="4" fill="#e63946" />
-      <circle cx="0" cy="-174" r="22" fill={SKIN} />
-      <path d="M-22 -176 Q-20 -196 0 -196 Q20 -196 22 -176 Q10 -186 -22 -176 Z" fill="#8d5524" />
-      <Face cx={0} cy={-174} size={0.7} />
-      <Lid cx={-4.9} cy={-174} r={2.3} fill={SKIN} />
-      <Lid cx={4.9} cy={-174} r={2.3} fill={SKIN} />
-      <g className="wd-foerster-hat" style={{ transformOrigin: "0px -190px" }}>
-        <ellipse cx="0" cy="-190" rx="32" ry="6" fill="#2d6a4f" />
-        <path d="M-18 -190 Q-18 -214 0 -214 Q18 -214 18 -190 Z" fill="#40916c" />
-        <rect x="-18" y="-196" width="36" height="5" fill="#6b4423" />
-        <path className="wd-foerster-feather" d="M14 -196 Q30 -222 22 -236 Q16 -218 10 -198 Z" fill="#e9c46a" style={{ transformOrigin: "12px -196px" }} />
+      <MascotFace kind="bear" cx={0} cy={-172} r={23} lashes />
+      {/* The hat sits between her round ears. */}
+      <g className="wd-foerster-hat" style={{ transformOrigin: "0px -194px" }}>
+        <ellipse cx="0" cy="-194" rx="22" ry="5" fill="#2d6a4f" />
+        <path d="M-13 -194 Q-13 -216 0 -216 Q13 -216 13 -194 Z" fill="#40916c" />
+        <rect x="-13" y="-200" width="26" height="5" fill="#6b4423" />
+        <path className="wd-foerster-feather" d="M10 -200 Q26 -226 18 -240 Q12 -222 6 -202 Z" fill="#e9c46a" style={{ transformOrigin: "8px -200px" }} />
       </g>
       <g className="wd-foerster-glass">
         <path d="M-6 -118 Q0 -122 6 -118" stroke={INK} strokeWidth="3" fill="none" />
@@ -40,11 +38,11 @@ export function Foersterin() {
       </g>
       <g className="wd-foerster-arm-l" style={{ transformOrigin: "-26px -140px" }}>
         <path d="M-26 -140 L-34 -88" stroke={JACKET} strokeWidth="14" strokeLinecap="round" />
-        <circle cx="-35" cy="-82" r="7" fill={SKIN} />
+        <circle cx="-35" cy="-82" r="7" fill={PAW} />
       </g>
       <g className="wd-foerster-arm-r" style={{ transformOrigin: "26px -140px" }}>
         <path d="M26 -140 L34 -88" stroke={JACKET} strokeWidth="14" strokeLinecap="round" />
-        <circle cx="35" cy="-82" r="7" fill={SKIN} />
+        <circle cx="35" cy="-82" r="7" fill={PAW} />
       </g>
       <g className="wd-foerster-notes" fill={INK} fontSize="24" fontWeight="700">
         <text x="26" y="-180" style={nth(0)}>

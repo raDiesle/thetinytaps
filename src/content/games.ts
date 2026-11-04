@@ -1,4 +1,6 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
+import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
+import { WAIT_BOOK } from "@/games/rewards/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
@@ -12,7 +14,7 @@ export interface Game {
   /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
   blurb: Localized;
   /**
-   * On the shelf the game stands as these books side by side in one slipcase, one for each part it opens on
+   * On the shelf the game stands as these books side by side, tied with a ribbon, one for each part it opens on
    * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
@@ -23,7 +25,7 @@ export interface Game {
   unfinished?: true;
 }
 
-/** One of a game's books in its slipcase on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
+/** One of a game's books tied together on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
 export interface Volume {
   href: string;
   emoji: string;
@@ -68,7 +70,7 @@ export const CATEGORIES: Category[] = [
       ru: "Зубы, горшок, распорядок дня",
     },
     // Each a book of its own on the shelf, its name on its spine (user decision, October 2026). First on the shelf, top
-    // left: the everyday helpers are what parents need most; the Belohnungstafel's slipcase, the shelf's eye-catcher,
+    // left: the everyday helpers are what parents need most; the Belohnungstafel's books, the shelf's eye-catcher,
     // stands right of Aufs Töpfchen (user feedback, November 2026).
     apart: true,
     games: [
@@ -102,8 +104,9 @@ export const CATEGORIES: Category[] = [
       },
       {
         href: "/belohnungstafel/",
-        also: ["/tagesplan/"],
-        // On the shelf two books in one slipcase, each opening its own part (user feedback, November 2026).
+        also: ["/tagesplan/", "/wie-lange-warten/"],
+        // On the shelf books in one slipcase, each opening its own part (user feedback, November 2026): the third waits
+        // for a big day with a Countdown (H-05).
         volumes: [
           {
             href: "/belohnungstafel/",
@@ -123,6 +126,7 @@ export const CATEGORIES: Category[] = [
             emoji: "🗓️",
             title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
           },
+          { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
         ],
         emoji: "📅",
         title: {
@@ -407,30 +411,13 @@ export const CATEGORIES: Category[] = [
       ar: "الضغط على الأزرار وإيجاد الحروف",
       ru: "Нажимать клавиши, находить буквы",
     },
-    // One game, so the home card opens it directly (see categoryHref).
+    // Four games, each a page of the book's table of contents, never ways to play behind ⚙️ of one game (user
+    // feedback, November 2026).
     games: [
-      {
-        href: "/buchstaben/",
-        emoji: "🔤",
-        title: {
-          de: "Buchstaben & Zahlen",
-          ru: "Буквы и цифры",
-          en: "Letters & Numbers",
-          zh: "字母和数字",
-          hi: "अक्षर और अंक",
-          es: "Letras y números",
-          ar: "الحروف والأرقام",
-        },
-        blurb: {
-          de: "Tasten drücken, Buchstaben finden",
-          en: "Press keys, find letters",
-          zh: "按按键，找字母",
-          hi: "बटन दबाना, अक्षर ढूँढना",
-          es: "Pulsar teclas, encontrar letras",
-          ar: "الضغط على الأزرار وإيجاد الحروف",
-          ru: "Нажимать клавиши, находить буквы",
-        },
-      },
+      { href: "/buchstaben/", emoji: "⌨️", title: FREE_TITLE, blurb: FREE_BLURB },
+      { href: "/zaehlen/", emoji: "🔢", title: COUNT_TITLE, blurb: COUNT_BLURB },
+      { href: "/mitmachen/", emoji: "🐸", title: MOVE_TITLE, blurb: MOVE_BLURB },
+      { href: "/woerter/", emoji: "✍️", title: WORDS_TITLE, blurb: WORDS_BLURB },
     ],
   },
 ];

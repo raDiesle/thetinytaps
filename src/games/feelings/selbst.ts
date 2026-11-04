@@ -519,31 +519,34 @@ export const SELF_SITUATIONS: Situation[] = [
   {
     id: "lost",
     emoji: "🧸",
-    title: "Traurig, Kuscheltier weg",
-    caption: "Kuscheltier ist weg, Bär weint",
-    intro: [{ narration: "Der kleine Bär will schlafen gehen." }, { narration: "Aber sein Kuscheltier ist weg! Er ist so traurig." }],
+    title: "Traurig, Kuschelhase weg",
+    caption: "Kuschelhase ist weg, Bär weint",
+    intro: [{ narration: "Der kleine Bär will schlafen gehen." }, { narration: "Aber sein Kuschelhase ist weg! Er ist so traurig." }],
     steps: [
       {
         caption: "„Ich bin traurig“ sagen",
-        question: "Das Kuscheltier ist weg. Was kann der kleine Bär tun?",
-        beats: [{ narration: "Der kleine Bär sagt:", line: "Ich bin traurig. Mein Kuscheltier ist weg." }, { line: "Oh. Das ist traurig." }],
+        question: "Sein Kuschelhase ist weg. Was kann der kleine Bär tun?",
+        beats: [{ narration: "Der kleine Bär sagt:", line: "Ich bin traurig. Mein Kuschelhase ist weg." }, { line: "Oh. Das ist traurig." }],
         instead: { caption: "Spielkiste auskippen", answer: "Hmm, jetzt liegt alles durcheinander. Sag lieber, wie es dir geht.", sound: "crash" },
       },
       {
         caption: "Selbst suchen",
-        question: "Wo kann das Kuscheltier sein? Was kann der kleine Bär tun?",
+        question: "Wo kann der Kuschelhase sein? Was kann der kleine Bär tun?",
         beats: [{ narration: "Er sucht selbst. Unter dem Bett? Nein." }, { narration: "Im Korb? Da!", sound: "chime" }],
-        instead: { caption: "Dem Fuchs seins wegnehmen", answer: "Hmm, jetzt ist der Fuchs traurig. Such lieber selbst." },
+        instead: {
+          caption: "Dem Fuchs den Hund wegnehmen",
+          answer: "Hmm, das ist der Kuschelhund vom Fuchs. Jetzt ist er traurig. Such lieber deinen Kuschelhasen.",
+        },
       },
       {
         caption: "Ganz fest drücken",
-        question: "Da ist das Kuscheltier! Was kann der kleine Bär tun?",
-        beats: [{ narration: "Er drückt es ganz fest.", line: "Da bist du ja!", sound: "pop" }],
-        instead: { caption: "In die Ecke werfen", answer: "Hmm, jetzt liegt es wieder allein in der Ecke. Drück es lieber ganz fest." },
+        question: "Da ist der Kuschelhase! Was kann der kleine Bär tun?",
+        beats: [{ narration: "Er drückt ihn ganz fest.", line: "Da bist du ja!", sound: "pop" }],
+        instead: { caption: "In die Ecke werfen", answer: "Hmm, jetzt liegt er wieder allein in der Ecke. Drück ihn lieber ganz fest." },
       },
     ],
     outro: [{ narration: "Schön! Sagen, wie es dir geht, selbst suchen, fest drücken.", sound: "cheer" }],
-    endCaption: "Bär kuschelt sein Kuscheltier im Bett",
+    endCaption: "Bär kuschelt seinen Kuschelhasen im Bett",
   },
   {
     id: "join",
@@ -617,10 +620,10 @@ export const SELF_SITUATIONS: Situation[] = [
     intro: [{ narration: "Der kleine Bär klettert auf das Klettergerüst. Ganz allein!" }, { narration: "Jetzt ist er oben. Er ist so stolz!" }],
     steps: [
       {
-        caption: "„Guck mal!“ rufen",
+        caption: "„Komm doch auch hoch!“ rufen",
         question: "Der kleine Bär ist ganz oben. Was kann er tun?",
-        beats: [{ narration: "Er ruft:", line: "Guck mal, ich bin oben!" }, { line: "Wow! Ganz allein!" }],
-        instead: { caption: "Den Fuchs runterschubsen", answer: "Hmm, Schubsen tut weh. Ruf lieber: Guck mal!", sound: "aua" },
+        beats: [{ narration: "Er ruft dem Fuchs zu:", line: "Komm doch auch hoch!" }, { line: "Au ja, ich komme!" }],
+        instead: { caption: "Den Fuchs runterschubsen", answer: "Hmm, Schubsen tut weh. Ruf lieber: Komm doch auch hoch!", sound: "aua" },
       },
       {
         caption: "Jubeln",
@@ -638,7 +641,7 @@ export const SELF_SITUATIONS: Situation[] = [
         instead: { caption: "Runterspringen", answer: "Hmm, von so hoch springen tut weh. Zeig lieber dem Fuchs, wie es geht.", sound: "aua" },
       },
     ],
-    outro: [{ narration: "Juhu! Zeigen, jubeln, helfen. Jetzt sind beide stolz.", sound: "cheer" }],
+    outro: [{ narration: "Juhu! Rufen, jubeln, helfen. Jetzt sind beide stolz.", sound: "cheer" }],
     endCaption: "Bär und Fuchs zusammen oben",
   },
   {

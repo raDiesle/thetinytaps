@@ -73,12 +73,16 @@ In a fresh worktree run `bun install` first.
   A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
   for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)
   repeats this reminder with every message.
-- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
+- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
+  its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
+  area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
-  everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
+  everything goes that helps the user decide: ideas, the language table, and research. Scrolling down it always shows
+  every open idea: a tap above (the overview's numbers, the contents) jumps to its place and marks it, never filters, and
+  the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
@@ -189,7 +193,10 @@ In a fresh worktree run `bun install` first.
   `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
   pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
   in the ears, the far side of the fur in shadow, brows, eyes with two lights, a shiny nose. Never a head of its own
-  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Hats, bows and glasses go
+  from circles and triangles: those flat heads looked poor (user feedback, November 2026). Cuddly and true to the
+  animal, for children (user feedback, November 2026): eyes a little below the head's middle with a warm brown iris
+  round the pupil (a child's bigger and lower), light in the fur as soft tufts, never a round plastic shine; bodies
+  round with chubby arms and round paws with toes, the fox's legs dark below the elbow as a real fox's. Hats, bows and glasses go
   in as its `children`, clothes and bodies round it in its colours and line; a better fox or bear is made there, so
   every game gets it. Toys (a teddy), wild animals of a scene and tiny patterns stay drawn on their own. `Mascot.test.ts` checks.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
@@ -244,7 +251,9 @@ In a fresh worktree run `bun install` first.
   one stays silent – except in a game whose story is told by the voice and can't be followed without it (Kleine
   Abenteuer, Bewegungsabenteuer): there the browser's voice (Google's) says a line until its recording is made
   (`recordedVoice(files, { browser: true })`, user decision, October 2026). Give a game that fallback only where it
-  really helps, never for a game that plays fine silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
+  really helps, never for a game that plays fine silent. Never add a switch for either again, with one exception: Gefühle's „Alltagssituationen“, where a grown-up
+  may want to tell the scenes to the child in their own words, has a loudspeaker in its bottom right corner, switched by one tap, that
+  switches its voice off (`VoiceSwitch`, user decision, November 2026) – only there, never as a pattern for other games. Recordings are made only when the user asks (see Language).
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard, and on
@@ -310,13 +319,17 @@ In a fresh worktree run `bun install` first.
   category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
   Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
-  user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
+  user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
+  left corners (`--lean`), so the names running down their spines are read without bending the
+  head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
-  that many books in one slipcase, each opening its part and found by the way back: Belohnungstafel and Zeitplan, right
-  of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents need most, so they stand first,
-  top left (first in `CATEGORIES`), and that slipcase is the eye-catcher of the shelf: red cloth edged in gold, pulled
-  out furthest, glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. What can be taken is
+  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
+  Belohnungstafel, Zeitplan and „Wie lange warten?“ (the Zeitplan's Countdown), right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
+  glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
+  its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
+  as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
   and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
@@ -342,7 +355,10 @@ In a fresh worktree run `bun install` first.
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
-  never a tap a child could make by chance.
+  never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
+  not the same game easier or with other words – are games of their own in the book's table of contents, never one
+  game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
+  split again, user feedback, November 2026).
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
@@ -353,6 +369,9 @@ In a fresh worktree run `bun install` first.
 - Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
   „🌳 Lebendige Welten“; `MenuHead` takes a string), and so is every heading inside a page – the emoji stays on the
   card or the book, not over it (`MenuTop.test.ts` checks).
+- A menu's cards, lines and books always stand in the same order (user feedback, November 2026): nothing moves to the
+  front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
+  last first; `GameShell.test.ts` checks).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
   choices may sit there.
@@ -378,11 +397,11 @@ In a fresh worktree run `bun install` first.
 - A game is left with one tap on its ✕, or by holding Esc (`GameShell`): holding ✕ for a moment was the only way once
   and got in the grown-ups' way (user decision, November 2026), so it is a choice now, „Spiel verlassen“ under ⏳ on
   the home page (`leave` in `src/lib/common.ts`, `LeaveOptions`), for parents whose child taps ✕ by chance. Esc is
-  always held, since children press it while typing. The only other way out is „Menü“ at the end of a level. Never add
-  another. Nothing beside ✕ says what it does, not when a game starts nor while it is pressed or under a mouse: a
+  always held, since children press it while typing. There is no other way out, also not at the end of a level (see
+  `GameEnd`). Never add another. Nothing beside ✕ says what it does, not when a game starts nor while it is pressed or under a mouse: a
   „Zurück zum Menü“ there was more than grown-ups needed (user feedback, November 2026; `css.test.ts`); its name is
   only read out.
-- **Back is always the screen seen before** (user feedback, November 2026): ✕, Esc, „Menü“ and a menu's way back lead
+- **Back is always the screen seen before** (user feedback, November 2026): ✕, Esc and a menu's way back lead
   to the menu the child came from, never to a menu it didn't pass on its way in. And they step back in the browser's
   history rather than adding a page to it, or the phone's own back button afterwards opened the game just left again,
   or the same menu twice, so that it seemed not to work: a way back goes through `goBack` (`src/lib/goBack.ts`) or
@@ -394,21 +413,25 @@ In a fresh worktree run `bun install` first.
   or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). A tool for the day
   rather than a game (the Timer, like the Belohnungstafel) counts no play time and still opens when it is over:
   `GameShell tool` and its address in `PlaytimeLock`.
-- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Menü“ (back to the
-  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book),
-  „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
-  the first, so there is always one). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Nochmal“ and „Weiter“
+  (the next level in the game's order, after the last the first, so there is always one). It has no „Menü“ button
+  (user feedback, November 2026): the way back is the page's corner in the top left, as in every menu – the ✕, which
+  leads to the game's own start screen or the page before it, and where that is the shelf the book's ribbon instead of
+  the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing. They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
   and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
-  a big painted label taped onto the page, „Menü“ and „Nochmal“ two smaller paper slips stacked beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+  a big painted label taped onto the page, „Nochmal“ a smaller paper slip beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's
   cards' room, Zähne putzen's week chart) passes `inline` (user feedback, November 2026; `GameEnd.test.ts`). Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
-  in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
+  in the bottom right corner instead, and only where that game's rules say so.
   Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
   `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
   already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
-  child, standing, waving or cheering): a game that wants one standing by takes it rather than drawing its own.
+  child, standing, waving, cheering, clapping or pointing): a game that wants one standing by takes it rather than
+  drawing its own, and a family standing still by what the child looks at is `PointingFamily` (Zählen, Wörter tippen).
+  Where the family stands in a game's own end layout, it answers a tap (`CheeringFamily onTap`: both wave and grin with
+  their teeth – a decoration a child taps must do something, user feedback from Zähne putzen, November 2026).
 
 ## Architecture
 
@@ -427,7 +450,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
+  before playing (Socken-Paare finds its difficulty itself, Frei tippen changes everything behind ⚙️ while
   playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
   start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
   (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that
@@ -485,6 +508,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
+  Nothing ever loads in the dark (user feedback, November 2026: Zähne putzen opened straight from its address stood dark
+  for seconds on a phone, showing only the small words for search engines on the table): a built page shows its title
+  on a sheet of paper with a paw track coming and going (`.boot` in `base.css`, `BOOT_WAIT` in `tools/pageStart.ts`),
+  its words for search engines below it, and the app's `Suspense` shows the same paper and paws while a page's code still
+  loads (`PageLoading`), never nothing. A built page fetches its own page's code, and on an English page the English
+  texts, together with the start's (`modulepreload`, `pagePreloads` in `tools/build.ts`), not one after the other: a
+  new lazy page is a `page(…)` line in `App.tsx` with its addresses, and `pageStart.test.tsx` checks every page for
+  search engines finds its code. Fetching ahead stays as it is: after the page has loaded, in idle moments, never the
+  songs or every game for every visitor.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`,
   `src/lib/look.ts`). **It is the only look** (user decision, November 2026): the old toy-block look (cards on a sky,
   buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one
@@ -567,7 +599,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
   findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large and its name
-  in words beside it, always shown („Einstellungen“, „halten“ under it), and as play starts it lights up softly twice,
+  in words beside it, always shown („Einstellungen“, „halten“ under it) – on a phone clearly smaller, about as tall as ✕'s
+  corner, so it doesn't cover the picture (user feedback, November 2026) – and as play starts it lights up softly twice,
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen, and without words grown-ups didn't know it held the options; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can

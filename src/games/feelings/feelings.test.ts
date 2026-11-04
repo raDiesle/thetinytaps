@@ -6,10 +6,10 @@ import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { WEATHERS } from "./mood";
+import { BREATH_MS, HELPS, MOODS, morningMood, STRENGTHS, withMood } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
-import { roundOf, stepsOf } from "./rounds";
+import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
 import { STORIES } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
@@ -79,23 +79,54 @@ test("every story is in exactly one group", () => {
   expect(grouped.toSorted()).toEqual(STORIES.map((s) => s.id).toSorted());
 });
 
-// Every round says first whether the child is the bear or helps its friend the bear (user feedback, November 2026).
-test("every round says whose view it takes", () => {
+// Only the last step of a story shows its happy end.
+test("every story ends on its last step", () => {
   for (const story of STORIES) {
     for (let step = 0; step < stepsOf(story); step++) {
       const round = roundOf(story, step, "de");
-      expect(round.start.beats[0].narration, `${story.id} step ${step + 1}`).toMatch(/kleine Bär/);
-      // Only the last step of a story shows its happy end.
       expect(!!round.end, `${story.id} step ${step + 1} end`).toBe(step === stepsOf(story) - 1);
     }
   }
 });
 
-test("every weather has its card and leads to a group", () => {
-  for (const { id, group } of WEATHERS) {
-    expect(imageFor(moodImages.weather(id)), moodImages.weather(id)).toBeDefined();
+// „Wie geht's dir?“ (C-29, C-30): every feeling has its face and the grown-up's hug, and leads to a group; the four
+// that had a weather card keep it for the built site until the faces are made.
+test("every feeling has its face and hug, and leads to a group", () => {
+  expect(new Set(MOODS.map((m) => m.id)).size, "a feeling twice").toBe(MOODS.length);
+  for (const { id, group, weather, caption } of MOODS) {
+    expectPicture(moodImages.face(id));
+    expectPicture(moodImages.hug(id));
+    if (weather) expect(imageFor(moodImages.weather(weather.picture)), moodImages.weather(weather.picture)).toBeDefined();
     expect(GROUPS.map((g) => g.id)).toContain(group);
+    expect(caption.de, id).not.toMatch(/[.!]$/);
   }
+  expect(MOODS.filter((m) => m.weather).length, "the built site's first screen before the faces").toBe(4);
+  // Both mascots show feelings, and each sign of „Wie doll ist es?“ belongs to one feeling only.
+  expect(new Set(MOODS.map((m) => m.kind))).toEqual(new Set(["fox", "bear"]));
+  expect(new Set(MOODS.map((m) => m.sky)).size).toBe(MOODS.length);
+});
+
+// „Wie doll ist es?“ (C-36): three sizes, small to big, and only the biggest of a hard feeling brings the breaths.
+test("the three sizes grow, and the breath's circle keeps time with the game", () => {
+  expect(STRENGTHS.map((s) => s.scale)).toEqual(STRENGTHS.map((s) => s.scale).toSorted((a, b) => a - b));
+  expect(STRENGTHS.length).toBe(3);
+  const css = readFileSync("src/games/feelings/feelings.css", "utf8");
+  expect(css).toContain(`mood-breathe ${BREATH_MS / 1000}s`);
+});
+
+// „Was hilft dir jetzt?“ (C-31): three different things after every feeling, each with its card; none is wrong.
+test("every feeling offers three different helps, each with its card", () => {
+  for (const { id, helps } of MOODS) expect(new Set(helps).size, id).toBe(3);
+  for (const help of Object.values(HELPS)) {
+    expectPicture(moodImages.help(help.id));
+    expect(help.caption.de, help.id).not.toMatch(/[.!]$/);
+  }
+  const offered = new Set(MOODS.flatMap((m) => m.helps));
+  expect([...offered].toSorted(), "a help no feeling offers is never seen").toEqual(
+    Object.values(HELPS)
+      .map((h) => h.id)
+      .toSorted(),
+  );
 });
 
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
@@ -108,12 +139,62 @@ test("the game answers calmly", () => {
   expect(css.match(/infinite/g)?.length ?? 0, "only the picture's fade repeats").toBeLessThanOrEqual(1);
 });
 
-// After the good choice the picture stays until „Weiter“ is tapped, and the „Weiter“ that changes the feeling names
-// the next one (user feedback, November 2026).
-test("a scene goes on only with „Weiter“, which names a new feeling", () => {
+// A scene waits for a tap on its picture (▶), never for a timer; then the big picture stands still and the cards' frames
+// take turns, so only one thing moves at a time. Captions are never cut off with „…“ (user feedback, November 2026).
+test("a scene goes on with a tap, and one thing moves at a time", () => {
+  const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
+  expect(round).toContain('onNext={phase === "intro" ? goOn : phase === "done" ? onDone : undefined}');
+  expect(round).toContain('still={phase === "choose"}');
+  expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
+  expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain('<Frames name={image} moving={active} className="fg-card-image" />');
+  expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
+});
+
+// „Alltagssituationen“ alone has a switch for its voice, for grown-ups who tell the story themselves (user decision,
+// November 2026): one tap, like the book beside it (held, it was too slow, user feedback), and „Wie geht's dir?“ always speaks.
+test("the voice switch is Alltagssituationen's alone, and tapped", () => {
+  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "RoundPlay.tsx"].filter((f) =>
+    readFileSync(`src/games/feelings/${f}`, "utf8").includes("<VoiceSwitch"),
+  );
+  expect(users).toEqual(["FeelingsPlay.tsx"]);
+  expect(readFileSync("src/games/feelings/MoodGame.tsx", "utf8")).toContain("voice: true");
+  const button = readFileSync("src/games/feelings/VoiceSwitch.tsx", "utf8");
+  expect(button).toContain("{...tapProps(onToggle)}");
+  expect(button).not.toContain("useHold");
+  expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");
+});
+
+// Grown-ups who read the scenes out themselves (the voice switched off) open the round's whole text from the screen's
+// bottom right corner, beside the loudspeaker (user feedback, November 2026): it holds every line the voice would say,
+// in Alltagssituationen only; it opens with one tap, never held; switching the voice off opens it, and then nothing on
+// it is marked, since the grown-up reads it all.
+test("the text to read out holds every line a round says", () => {
+  for (const story of STORIES)
+    for (let step = 0; step < stepsOf(story); step++) {
+      const round = roundOf(story, step, "de");
+      const sheet = readAlong(round)
+        .map((part) => part.text)
+        .join(" ");
+      for (const line of roundLines(round).filter(Boolean)) expect(sheet, `${story.id} ${step}`).toContain(line);
+    }
+  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx"].filter((f) =>
+    readFileSync(`src/games/feelings/${f}`, "utf8").includes("readAlong={{"),
+  );
+  expect(users).toEqual(["FeelingsPlay.tsx"]);
+  const note = readFileSync("src/games/feelings/ReadAlong.tsx", "utf8");
+  expect(note).not.toContain("useHold");
+  expect(note).toContain("{...tapProps(onToggle)}");
+  expect(note, "the loudspeaker stands in the same corner").toContain('className="story-corner"');
+  expect(note, "with the voice off nothing is marked").toContain("part={voice ? part : undefined}");
+  expect(readFileSync("src/games/feelings/FeelingsPlay.tsx", "utf8"), "switching the voice off opens the text").toContain("{ voice: false, text: true }");
+});
+
+// After the good choice its picture waits for ▶ too, never on to the next scene by a timer, and the „Weiter“ at a
+// pass's end that changes the feeling names the next one (user feedback, November 2026).
+test("after the good choice ▶ brings the next scene, and „Weiter“ names a new feeling", () => {
   const pass = readFileSync("src/games/feelings/PassPlay.tsx", "utf8");
-  expect(pass).toContain("<SceneNext onNext={goOn} />");
   expect(pass).toMatch(/<GameEnd inline showNext /);
+  expect(pass).toContain("onDone={last ? undefined : goOn}");
   const finish = pass.slice(pass.indexOf("const finish"), pass.indexOf("const goOn"));
   expect(finish, "finishing a scene doesn't move on by itself").not.toContain("setNow");
 });
@@ -227,4 +308,15 @@ test("translations in another script have no Latin letters", () => {
     const texts = [COMFORT_TEXTS[language], FEELING_TEXTS[language], SITUATION_TEXTS[language]].flatMap(stringsIn);
     for (const text of texts) expect(text, language).not.toMatch(/[A-Za-z]/);
   }
+});
+
+// C-33: in the evening the morning's feeling stands beside the evening's – only today's, never yesterday's.
+test("the evening shows this morning's feeling, never yesterday's, and never in the morning", () => {
+  const morning = new Date("2026-11-04T08:00");
+  const evening = new Date("2026-11-04T19:00");
+  const day = withMood(undefined, "traurig", morning);
+  expect(morningMood(day, morning)).toBeUndefined();
+  expect(morningMood(withMood(day, "froh", evening), evening)).toBe("traurig");
+  expect(morningMood(day, new Date("2026-11-05T19:00"))).toBeUndefined();
+  expect(withMood(day, "muede", new Date("2026-11-05T08:00"))).toEqual({ day: "2026-11-05", morning: "muede" });
 });
