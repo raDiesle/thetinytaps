@@ -117,7 +117,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/timer/",
-    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts. Noch nur Deutsch: der Zettel „Andere …“ mit seinem Blatt (Wie lange / Bis um, Std., Min., Sek., die fertigen Zettel, Fertig, Bis morgen …), die Frage beim Start nach einer schon vergangenen Uhrzeit und die Restzeit hinter ⚙️.",
+    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026. Sagt sonst nichts. Noch nur Deutsch: der Zettel „Andere …“ mit seinem Blatt (Wie lange / Bis um, Std., Min., Sek., die fertigen Zettel, Fertig, Bis morgen …), die Frage beim Start nach einer schon vergangenen Uhrzeit, die Restzeit hinter ⚙️, die Namen der Bilder „Ameisenstraße“ und „Abwechseln“ und bei „Abwechseln“ hinter ⚙️ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“.",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {

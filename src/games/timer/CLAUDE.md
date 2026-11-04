@@ -11,9 +11,19 @@ grown-ups (`TimeLeft`, H-62). The child sees no numbers, only the picture runnin
 - „Zug zum Bahnhof“ 🚂: a little train rolls along the track to the buffers at the station, where the bear family waits.
 - „Sanduhr“ ⏳: the sand runs from the top bulb into the bottom one; the fox family stands beside it.
 - „Kerze“ 🕯️: a candle burns down on the table; at the end the bear child leans over and blows it out.
+- „Ameisenstraße“ 🐜 (H-68): a big cookie lies on a picnic blanket, an anthill beside it; ants march from under the
+  cookie to the hill, each with a crumb, the cookie shrinks and the hill grows. At the end the ants sit on the hill, the
+  last crumbs lie on the blanket and the fox child laughs.
+- „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn: the toy lies by the fox child
+  while the hourglass runs, then it travels over to the bear child with a whoosh and a chime, and the hourglass turns
+  itself over – back and forth until a grown-up leaves with ✕ (with „bis um“ set, until then, each turn as long as the
+  row's minutes). Behind ⚙️: the toy (Bobbycar, Puppe, Ball, `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that
+  child's turn anew, for who begins) and the time to the change. The turn is worked out from the clock (`turnAt`).
   At the end a friendly tune and the family waves and hops, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
-  flaring, soft ripples where it was); nothing has to be tapped, so there is no glow or pointing hand.
+  flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
+  noch?“: the rail to the station, the sand on top, the wax, the cookie – `LeftGlow`, inside the shrinking part so it is
+  exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
 
 Every picture moves a small, soft step every second, so even an hour never looks stuck (H-63): the train's wheels turn
 once and a puff rises, a big grain falls through the hourglass's neck, a drop of wax runs a little further. And each
@@ -23,7 +33,8 @@ while the rail behind is dark, the glass the sand has left keeps a film of it, t
 Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `OwnTimeSheet.tsx` (the sheet behind
 „Andere …“), `time.ts` (own times: typing, clock times, labels, digits; tested in `time.test.ts`), `TimerPlay.tsx` (one
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
-`blow` (candle only) → `done`, taps, the end), `scenes.tsx` (all drawings and their layers; the fox and bear are the shared `Mascot`, so its `GameEnd` has `noFamily`), `timer.css`, `content.ts`
+`blow` (candle only) → `done`, taps, the end), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
+hourglass and toys), `scenes.tsx` (the other drawings and their layers; the fox and bear are the shared `Mascot`, so its `GameEnd` has `noFamily`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
 
 ## Rules
@@ -43,6 +54,11 @@ run: working out its length, the question when a clock time is past, the clock, 
 - **Every second a small step, never a blink** (H-63): what beats once a second is a small layer of its own (`.tm-beat`)
   moving by `transform` and `opacity` – the wheels are small layers riding in the train's, not groups in its svg – and
   stands still at the end (`.tm-done`). Anything new that moves the whole run long snaps to its last place there too.
+  A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
+  (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
+  a bigger layer.
+- **What a tap lights is what is left** (H-51): a glow inside the part that shrinks, never a sign or a number, and once
+  per tap, fading – never blinking. A new picture puts `LeftGlow` into its own shrinking part.
 - Development: `?sekunden=<n>` in the address makes a run take n seconds instead of the minutes chosen.
 - It says nothing, so there is no voice line to record.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
