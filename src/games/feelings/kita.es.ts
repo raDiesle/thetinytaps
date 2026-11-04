@@ -884,12 +884,8 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     caption: "Afuera llueve, Osito se aburre",
     intro: [{ narration: "Afuera llueve. Osito está acostado en el sillón." }, { narration: "¡Se aburre muchísimo!" }],
     steps: [
-      {
-        caption: "Decir «¡Me aburro!»",
-        question: "Está lloviendo. ¿Qué puede hacer Osito?",
-        beats: [{ narration: "Osito dice:", line: "¡Me aburro!" }, { line: "Yo también. ¿Qué hacemos?" }],
-        instead: { caption: "Jalarle la oreja a Zorrito", answer: "Mmm, eso le duele a Zorrito. Mejor di: Me aburro." },
-      },
+      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
+      null,
       {
         caption: "Hacer una cueva",
         question: "¿A qué se puede jugar adentro? ¿Qué puede hacer Osito?",
@@ -903,7 +899,6 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Aplastar la caja", answer: "Mmm, ahora la caja está rota. Mejor haz un carro con ella." },
       },
     ],
-    outro: [{ narration: "¡Genial! Del aburrimiento salen ideas. Cueva, carro, y mucho más." }],
     endCaption: "Osito y Zorrito manejan el carro de cartón",
   },
   empathy: {

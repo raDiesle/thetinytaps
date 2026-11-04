@@ -878,12 +878,8 @@ export const SITUATIONS_HI: Partial<Record<SituationId, SituationText>> = {
     caption: "बाहर बारिश हो रही है, भालू को बोरियत हो रही है",
     intro: [{ narration: "बाहर बारिश हो रही है। छोटा भालू सोफ़े पर लेटा है।" }, { narration: "उसे बहुत बोरियत हो रही है!" }],
     steps: [
-      {
-        caption: "“मुझे बोरियत हो रही है” कहना",
-        question: "बारिश हो रही है। छोटा भालू क्या कर सकता है?",
-        beats: [{ narration: "छोटा भालू कहता है:", line: "मुझे बोरियत हो रही है!" }, { line: "मुझे भी। क्या करें?" }],
-        instead: { caption: "लोमड़ी का कान खींचना", answer: "हम्म, इससे लोमड़ी को दर्द होता है। इसकी जगह कहो: मुझे बोरियत हो रही है।" },
-      },
+      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
+      null,
       {
         caption: "गुफ़ा बनाना",
         question: "अंदर क्या खेल सकते हैं? छोटा भालू क्या कर सकता है?",
@@ -897,7 +893,6 @@ export const SITUATIONS_HI: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "डिब्बा कुचलना", answer: "हम्म, अब डिब्बा टूट गया। इसकी जगह उससे एक गाड़ी बनाओ।" },
       },
     ],
-    outro: [{ narration: "बहुत बढ़िया! बोरियत से नए खेल बनते हैं। गुफ़ा, गाड़ी, और भी बहुत कुछ।" }],
     endCaption: "भालू और लोमड़ी डिब्बे की गाड़ी चलाते हैं",
   },
   empathy: {

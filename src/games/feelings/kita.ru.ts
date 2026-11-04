@@ -872,12 +872,8 @@ export const SITUATIONS_RU: Partial<Record<SituationId, SituationText>> = {
     caption: "На улице дождь, Мишке скучно",
     intro: [{ narration: "На улице идёт дождь. Мишка лежит на диване." }, { narration: "Ему так скучно!" }],
     steps: [
-      {
-        caption: "Сказать «Мне скучно»",
-        question: "Идёт дождь. Что может сделать Мишка?",
-        beats: [{ narration: "Мишка говорит:", line: "Мне скучно!" }, { line: "Мне тоже. Что будем делать?" }],
-        instead: { caption: "Дёрнуть Лисёнка за ухо", answer: "Хм, Лисёнку больно. Лучше скажи: Мне скучно." },
-      },
+      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
+      null,
       {
         caption: "Построить шалаш",
         question: "Во что можно играть дома? Что может сделать Мишка?",
@@ -891,7 +887,6 @@ export const SITUATIONS_RU: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Растоптать коробку", answer: "Хм, теперь коробка сломалась. Лучше сделай из неё машину." },
       },
     ],
-    outro: [{ narration: "Здорово! Из скуки рождаются идеи. Шалаш, машина и ещё много всего." }],
     endCaption: "Мишка и Лисёнок едут в машине из коробки",
   },
   empathy: {
