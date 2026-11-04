@@ -935,3 +935,171 @@
     --note-w: 78px;
   }
 }
+
+/* ---------- Tagesgeschichten: a page of the day's story between two scenes (DayPage) ---------- */
+
+/* Only told, never chosen in (user idea, November 2026), so it must never look like a scene: a page of a picture book
+   instead of a framed photo with cards round it – the picture printed on the paper, its edge fading into it, no mat,
+   no ring, no cards; the text beside it in the book's letters, its first letter big like a picture book's. Still. */
+.fg-day {
+  --pad: 12px;
+  --note-w: 64px;
+  --corner-top: calc(max(4px, env(safe-area-inset-top)) + 34px);
+
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: "picture" minmax(0, 1fr) "words" auto / minmax(0, 1fr);
+  gap: clamp(8px, 2.4cqmin, 24px);
+  padding: var(--corner-top) var(--pad) var(--pad);
+  background: var(--paper-grain, none), var(--paper, #fbf4e3);
+  container-type: size;
+}
+
+/* The whole page is tapped to turn to the scene; picture and text lie over it and let the tap through. */
+.fg-day-tap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fg-day-picture-room,
+.fg-day-words {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.fg-day-picture-room {
+  grid-area: picture;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  container-type: size;
+}
+
+.fg-day-picture {
+  position: relative;
+  width: min(100cqw, 100cqh * 4 / 3);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 26px;
+}
+
+.fg-day-picture img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+/* The edge fades into the paper, as if printed on the page. */
+.fg-day-picture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 14px 8px var(--paper, #fbf4e3);
+  pointer-events: none;
+}
+
+.fg-day-words {
+  grid-area: words;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 2cqmin, 20px);
+}
+
+.fg-day-text {
+  max-width: 34em;
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.05rem, 4.2cqmin, 2.1rem);
+  line-height: 1.35;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.fg-day-text::first-letter {
+  color: var(--tomato, #e8553f);
+  font-size: 1.6em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fg-day-next {
+  width: clamp(44px, 9cqmin, 84px);
+}
+
+/* The day's end: „Nochmal“ and „Weiter“ under the text, tapped – the page itself is not. */
+.fg-day-end .fg-day-words {
+  pointer-events: auto;
+}
+
+.fg-day .game-end,
+.fg-day .game-end-button.next {
+  animation: none;
+}
+
+.fg-day .game-end {
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fg-day .game-end-button {
+  font-size: clamp(1.1rem, min(5cqh, 4.5cqw), 1.8rem);
+}
+
+.fg-day .game-end-button.next {
+  font-size: clamp(1.6rem, min(10cqh, 8cqw), 3.6rem);
+}
+
+/* Wide screens: the picture on the left as big as the height allows, the text on the right, like a book's spread. */
+@media (min-aspect-ratio: 6 / 5) {
+  .fg-day {
+    grid-template: "picture words" minmax(0, 1fr) / minmax(0, 1.75fr) minmax(0, 1fr);
+    padding: var(--pad);
+  }
+
+  .fg-day-words {
+    justify-content: center;
+    padding: var(--corner-top) var(--pad) calc(var(--note-w) + var(--pad)) 0;
+  }
+
+  /* The text's column is narrow: „Weiter“, the big label, above „Nochmal“, never past the page's edge. */
+  .fg-day .game-end {
+    flex-direction: column-reverse;
+  }
+
+  .fg-day-text {
+    font-size: clamp(1rem, 5.2cqh, 2.1rem);
+  }
+
+  /* The loudspeaker in the bottom right corner, as in the scenes. */
+  .fg-day .story-corner {
+    top: auto;
+    bottom: var(--pad);
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .fg-day {
+    --note-w: 50px;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  .fg-day {
+    --note-w: 78px;
+  }
+}

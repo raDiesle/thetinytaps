@@ -143,7 +143,7 @@ function useFrame(count: number): number {
  * stays. Only one thing moves at a time (user feedback, November 2026): the big picture while the scene is shown, the
  * two cards while the child chooses.
  */
-function Frames({ name, moving, className }: { name: string; moving: boolean; className?: string }) {
+export function Frames({ name, moving, className }: { name: string; moving: boolean; className?: string }) {
   const frames = framesFor(name);
   const shown = useFrame(moving ? frames.length : 1);
   if (frames.length === 0) return <Placeholder name={name} />;

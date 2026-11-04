@@ -35,11 +35,37 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
      are SVG drawings, not Gemini pictures: a face to copy and a size to compare must be plain and the same each time,
      and they need no picture to wait for. A new feeling gets its face, sky, helps and group in `MOODS` and its two
      pictures in `bilder/README.md` and the queue (`feelings.test.ts` checks).
-- **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
+- **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
+  the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row
+  „Geschichten: 📅 Tage / 😊 Nach Gefühlen“ (`settings.order`) switches to one card per group of feelings
   (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
-  Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The cards always stand in that fixed order;
-  the group played last keeps its place, marked „zuletzt“, and goes on with the scene where the child stopped
-  (`settings.group`, `settings.scene`). The old addresses `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
+  Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`), played without the days' pages. The cards
+  always stand in their fixed order; the day or group played last keeps its place, marked „zuletzt“, and goes on with
+  the scene where the child stopped (`settings.day`/`dayScene`, `settings.group`/`scene`). The old addresses
+  `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
+
+**Tagesgeschichten (user idea, November 2026):** every scene stands in exactly one of eight days (`DAYS`, checked in
+`feelings.test.ts`), in the order of a day from getting up to going to sleep, and before each scene a **page of the
+story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it; after the last scene the night
+(`tag-nacht`) ends the day with „Nochmal“ and „Weiter“ (the next day, named under it). Rules:
+- A page of the story only tells, and **must never look like a scene to choose in**: a picture-book page – the picture
+  printed on the paper with its edge fading into it, no white mat, no cards, no question, no ✓ or ✗; the text beside it
+  (below it on an upright screen) in the book's serif letters with a big first letter. The whole page is one tap (or any
+  key) to the scene, with ▶ under the text; never a timer. The dots on top are the day's scenes.
+- A page never says how the scene before it ended: a scene asks another of its steps each time it is played
+  (`settings.steps`, shared with the groups), so „Der Turm steht wieder“ would be wrong two times out of three. It says
+  what comes next, and nothing in it may contradict the next scene's first picture (who is there, the place, the
+  weather): a day keeps its weather (the snow day stays indoors after the snow, the rainy day ends in the storm) and a
+  scene that needs something (the jacket) is not put where the scene before already did it.
+- A page's picture is the next scene's place a moment _earlier_, nothing has happened yet: drawn from that scene's first
+  picture (`firstImage`) as its only `--ref`, with the prompt start of `dayPictures.ts`, and queued there
+  (`DAY_PICTURE_QUEUE`, `bilder/README.md` „Tagesgeschichten“; `feelings.test.ts` checks both).
+- A new scene gets its place in a day (or a new day) in the same commit, with its page. The built site shows a day only
+  once all its pages' pictures and scenes are made (`playableDays`); with none, it shows no row and only the groups. When
+  the days go live in the built site, the search texts (`seo.ts`, `seo.en.ts`, which say „nach Gefühlen geordnet“) are
+  changed to tell of the days in the same commit.
+- Wide screens put the picture left and the words right like a book's spread; at a day's end „Weiter“ stands above
+  „Nochmal“ in the narrow column of words, never past the page's edge. Look at 844×390, 1024×768 and 1280×720.
 
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
 tell the scenes to the child in their own words. So while it plays, a wooden loudspeaker with a speech bubble stands in

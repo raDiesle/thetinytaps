@@ -258,6 +258,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done" },
         note: "Neu (4. November 2026), nur Deutsch: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts; der Titel „Wie geht's dir?“ und das Buch „Gefühle“ sind übersetzt), die acht Gruppen (groups.ts). Der Lautsprecher zum Ausschalten der Stimme (VoiceSwitch.tsx, 4. November 2026): „Stimme ausschalten“ / „Stimme einschalten“ nur Deutsch. Das Buch mit dem Text zum Vorlesen (ReadAlong.tsx, 4. November 2026): „Text zum Vorlesen zeigen“ / „Text ausblenden“ nur Deutsch; der Text selbst kommt aus den Szenen in ihrer Sprache.",
       },
+      {
+        label: "Tagesgeschichten",
+        languages: { de: "done" },
+        note: "Neu (4. November 2026), nur Deutsch und noch nicht aufgenommen: die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
+      },
     ],
   },
   {

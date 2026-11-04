@@ -3,6 +3,8 @@ import { expect, test } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
+import { DAY_PICTURE_QUEUE } from "./dayPictures";
+import { DAYS, dayImage, dayImages, firstImage, NIGHT_IMAGE } from "./days";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
@@ -132,7 +134,9 @@ test("every feeling offers three different helps, each with its card", () => {
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
 // November 2026). The big picture's slow two-frame fade is the only thing that keeps going.
 test("the game answers calmly", () => {
-  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "PassPlay.tsx"].map((f) => readFileSync(`src/games/feelings/${f}`, "utf8"));
+  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
+    readFileSync(`src/games/feelings/${f}`, "utf8"),
+  );
   for (const code of files) expect(code).not.toMatch(/float\(|Floater/);
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
   for (const name of ["fg-hop", "fg-shake", "fg-call", "fg-glow", "fg-stamp", "pop-in", "wiggle"]) expect(css, name).not.toContain(name);
@@ -153,7 +157,7 @@ test("a scene goes on with a tap, and one thing moves at a time", () => {
 // „Alltagssituationen“ alone has a switch for its voice, for grown-ups who tell the story themselves (user decision,
 // November 2026): one tap, like the book beside it (held, it was too slow, user feedback), and „Wie geht's dir?“ always speaks.
 test("the voice switch is Alltagssituationen's alone, and tapped", () => {
-  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "RoundPlay.tsx"].filter((f) =>
+  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "RoundPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].filter((f) =>
     readFileSync(`src/games/feelings/${f}`, "utf8").includes("<VoiceSwitch"),
   );
   expect(users).toEqual(["FeelingsPlay.tsx"]);
@@ -177,8 +181,9 @@ test("the text to read out holds every line a round says", () => {
         .join(" ");
       for (const line of roundLines(round).filter(Boolean)) expect(sheet, `${story.id} ${step}`).toContain(line);
     }
-  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx"].filter((f) =>
-    readFileSync(`src/games/feelings/${f}`, "utf8").includes("readAlong={{"),
+  // The corner is made once, for the passes by feeling and the days alike.
+  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx"].filter((f) =>
+    readFileSync(`src/games/feelings/${f}`, "utf8").includes("ReadAlongCorner = {"),
   );
   expect(users).toEqual(["FeelingsPlay.tsx"]);
   const note = readFileSync("src/games/feelings/ReadAlong.tsx", "utf8");
@@ -197,6 +202,38 @@ test("after the good choice ▶ brings the next scene, and „Weiter“ names a 
   expect(pass).toContain("onDone={last ? undefined : goOn}");
   const finish = pass.slice(pass.indexOf("const finish"), pass.indexOf("const goOn"));
   expect(finish, "finishing a scene doesn't move on by itself").not.toContain("setNow");
+});
+
+// The days (user idea, November 2026): every scene is in exactly one day, so the days tell all of them and none
+// twice; every page of a day's story has its picture or is planned, named by its day and place.
+test("every story is in exactly one day, and every page of a day has its picture", () => {
+  expect(new Set(DAYS.map((d) => d.id)).size, "a day id twice").toBe(DAYS.length);
+  const told = DAYS.flatMap((d) => d.scenes.map((s) => s.story));
+  expect(told.toSorted()).toEqual(STORIES.map((s) => s.id).toSorted());
+  DAYS.forEach((day, d) => {
+    day.scenes.forEach((scene, i) => expect(scene.before.image, day.id).toBe(dayImage(d + 1, i + 1)));
+    dayImages(day).forEach(expectPicture);
+    for (const text of [...day.scenes.map((s) => s.before.text), day.end]) expect(text, day.id).toMatch(/[.!]$/);
+    expect(day.end, "a day ends at night").toContain("Gute Nacht!");
+    // A page still to make waits in the queue, drawn from the first picture of the scene it leads to.
+    for (const { story, before } of day.scenes) {
+      if (imageFor(before.image)) continue;
+      const queued = DAY_PICTURE_QUEUE.find((p) => p.id === before.image);
+      expect(queued?.ref, before.image).toEqual([`src/games/feelings/bilder/${firstImage(story)}.webp`]);
+    }
+  });
+  if (!imageFor(NIGHT_IMAGE)) expect(DAY_PICTURE_QUEUE.map((p) => p.id)).toContain(NIGHT_IMAGE);
+});
+
+// A page of a day's story only tells: no cards, no question, never a timer – one tap (or key) turns to the scene, and
+// after a scene ▶ on its last picture brings the next page (user idea, November 2026).
+test("a page of a day's story only tells, and goes on with a tap", () => {
+  const page = readFileSync("src/games/feelings/DayPage.tsx", "utf8");
+  expect(page).not.toMatch(/ChoiceCard|setTimeout|\.question/);
+  const day = readFileSync("src/games/feelings/DayPlay.tsx", "utf8");
+  expect(day).toContain("onDone={goOn}");
+  expect(day).toMatch(/<GameEnd inline showNext /);
+  expect(day).not.toContain("setTimeout");
 });
 
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.

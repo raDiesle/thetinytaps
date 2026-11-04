@@ -17,6 +17,7 @@ import type { Film } from "@/games/elevator/film/types";
 import { TRAIL_LEVELS } from "@/games/elevator/trail/levels";
 import type { Station, Way } from "@/games/elevator/trail/types";
 import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
+import { DAYS } from "@/games/feelings/days";
 import { SITUATIONS } from "@/games/feelings/kita";
 import { SELF_SITUATIONS } from "@/games/feelings/selbst";
 import { HELP_QUESTION, HELPS, MOOD_LINES } from "@/games/feelings/mood";
@@ -248,6 +249,7 @@ function feelings(): VoiceGroup[] {
     { label: "Mehr Gefühle: Fragen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
     { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
     { label: "Lob", lines: once(FEELINGS_PRAISE.de) },
+    { label: "Tagesgeschichten", lines: once(DAYS.flatMap((d) => [...d.scenes.map((s) => s.before.text), d.end])) },
   ];
 }
 

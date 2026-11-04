@@ -1,4 +1,16 @@
+/** How „Alltagssituationen“ puts its scenes together: as days of the little bear, or by feeling. */
+export type FeelingsOrder = "tage" | "gefuehle";
+
 export interface FeelingsSettings {
+  /**
+   * „Tage“ (the default, user idea, November 2026): the scenes told as days, from morning to night, with pages of the
+   * story between them (`days.ts`). „Gefühle“: one card per feeling (`groups.ts`), as before.
+   */
+  order: FeelingsOrder;
+  /** The day played last (an id from `DAYS`): its card is marked, and it goes on where it stopped. */
+  day: string;
+  /** The scene of `day` it goes on with, counted from 0. */
+  dayScene: number;
   /** The group of „Alltagssituationen“ played last (an id from `GROUPS`): its card comes first, and it goes on where it stopped. */
   group: string;
   /** The scene of `group` a pass goes on with, counted from 0: where the child stopped last time. */
@@ -19,6 +31,9 @@ export interface FeelingsSettings {
 }
 
 export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
+  order: "tage",
+  day: "tag-1",
+  dayScene: 0,
   group: "traurig",
   scene: 0,
   steps: {},

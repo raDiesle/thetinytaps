@@ -1,3 +1,4 @@
+import { DAY_PICTURE_QUEUE } from "@/games/feelings/dayPictures";
 import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
@@ -279,4 +280,5 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   },
   // The ritual cards of the Tagesplan (H-58, C-33) and their line-art twins, from their prompts.
   ...RITUAL_PICTURE_QUEUE,
+  ...DAY_PICTURE_QUEUE,
 ];
