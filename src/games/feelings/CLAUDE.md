@@ -12,9 +12,9 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
   feelings to show, faces, „Was hilft dir jetzt?“.
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): one card per group of feelings
   (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
-  Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The group played last comes first and
-  goes on with the scene where the child stopped (`settings.group`, `settings.scene`); the others follow in their
-  fixed order. The old addresses `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
+  Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`). The cards always stand in that fixed order;
+  the group played last keeps its place, marked „zuletzt“, and goes on with the scene where the child stopped
+  (`settings.group`, `settings.scene`). The old addresses `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
