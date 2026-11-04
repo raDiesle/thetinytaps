@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES } from "./content";
+import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
+import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
+import { DISC } from "./disc";
+import { applePlaces, haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, trainSteps } from "./pieces";
 import { ANT_FAMILY, ANTS, CANDLE, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
 import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
@@ -50,6 +54,62 @@ describe("Timer", () => {
     const burnt = `${(((height - CANDLE.stub) / height) * 100).toFixed(2)}%`;
     expect(css).toContain(`scaleY(${left})`);
     expect(css).toContain(`--tm-burnt: ${burnt}`);
+  });
+
+  test("the new pictures keep what matters where every screen shows it too", () => {
+    expect(CROWN.cx - CROWN.rx).toBeGreaterThanOrEqual(200);
+    expect(CROWN.cy - CROWN.ry).toBeGreaterThanOrEqual(80);
+    expect(BASKET.cx + BASKET.w / 2).toBeLessThanOrEqual(1400);
+    expect(APPLE_FLOOR).toBeLessThanOrEqual(820);
+    expect(LEAF.x + LEAF.w).toBeLessThanOrEqual(1200);
+    // The leaf is eaten up to its stalk, never past it into the branch.
+    expect(EATEN).toBeLessThan(LEAF.w);
+    expect(LEAF_FLOOR).toBeLessThanOrEqual(820);
+    expect(DISC.cx - DISC.face).toBeGreaterThanOrEqual(200);
+    expect(DISC.cy - DISC.face).toBeGreaterThanOrEqual(80);
+    expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
+    // The fox family stands right of the face (its child from x 1090).
+    expect(DISC.cx + DISC.face).toBeLessThan(1090);
+  });
+
+  test("piece by piece: one a minute, at least one, never more than fit (H-45)", () => {
+    expect(pieceCount(60_000, MAX_APPLES)).toBe(1);
+    expect(pieceCount(5 * 60_000, MAX_APPLES)).toBe(5);
+    expect(pieceCount(20_000, MAX_APPLES)).toBe(1);
+    expect(pieceCount(3 * 3600_000, MAX_APPLES)).toBe(MAX_APPLES);
+    expect(pieceCount(30 * 60_000, MAX_STOPS)).toBe(MAX_STOPS);
+    expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
+    expect(pieceMoments(300_000, 1)).toEqual([]);
+  });
+
+  test("the train halts at every stop and reaches the station as the time is up", () => {
+    const total = 5 * 60_000;
+    const steps = trainSteps(total, 5, haltMs(total, 5));
+    expect(steps[0]).toEqual({ at: 0, part: 0 });
+    expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
+    for (let i = 1; i < steps.length; i++) {
+      expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
+      expect(steps[i].part).toBeGreaterThanOrEqual(steps[i - 1].part);
+    }
+    // Four halts on the way, each standing still for a while.
+    expect(steps.filter((s, i) => i > 0 && s.part === steps[i - 1].part)).toHaveLength(4);
+  });
+
+  test("every apple hangs inside the crown, apart from the others", () => {
+    for (const count of [1, 5, 12, 20, MAX_APPLES]) {
+      const r = appleRadius(count);
+      const places = applePlaces(count, CROWN.rx - r - 24, CROWN.ry - r - 24);
+      expect(places).toHaveLength(count);
+      for (const p of places) expect((p.x / (CROWN.rx - r)) ** 2 + (p.y / (CROWN.ry - r)) ** 2).toBeLessThanOrEqual(1);
+      for (const a of places) for (const b of places) if (a !== b) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThanOrEqual(2 * r);
+      // They fall from left to right.
+      expect(places.map((p) => p.x)).toEqual([...places.map((p) => p.x)].sort((a, b) => a - b));
+    }
+  });
+
+  test("the CSS shrinks a landing apple as much as the basket expects", async () => {
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    expect(css).toContain(`translateY(var(--tm-dy)) scale(${APPLE_LANDED})`);
   });
 
   test("the Ameisenstraße stays on every screen, its ants walk from under the cookie into the hill, one step a second (H-68)", async () => {
