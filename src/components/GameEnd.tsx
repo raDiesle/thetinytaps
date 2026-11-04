@@ -30,6 +30,11 @@ interface GameEndProps {
    * buttons beside its own end picture (Gefühle's cards' room, Zähne putzen's week chart and cheering foxes).
    */
   inline?: boolean;
+  /**
+   * Writes `next.name` under „Weiter“, where grown-ups should see what comes before they go on (Gefühle: the next
+   * feeling, user feedback, November 2026). Elsewhere the name is only read out.
+   */
+  showNext?: boolean;
 }
 
 /**
@@ -38,7 +43,7 @@ interface GameEndProps {
  * (D-12). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Menü“ and
  * „Nochmal“ two smaller paper slips stacked beside it.
  */
-export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false, inline = false }: GameEndProps) {
+export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false, inline = false, showNext = false }: GameEndProps) {
   const t = useT();
   const leave = useLeaveGame();
   const counts = useCountsPlaytime();
@@ -90,6 +95,7 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily 
           onPointerDown={press(next.onNext)}
         >
           {t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}
+          {showNext && next.name && <span className="game-end-next-name">{next.name}</span>}
         </button>
       )}
     </div>

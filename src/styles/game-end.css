@@ -69,6 +69,17 @@
   paint-order: stroke fill;
 }
 
+/* What „Weiter“ goes on to, small under it (`showNext`): words, no picture. „Weiter“ alone sets the button's width (a
+   long name like „Streit im Kindergarten“ reached over the picture), so the name breaks into lines within it. */
+.game-end-next-name {
+  display: block;
+  width: 0;
+  min-width: 100%;
+  white-space: normal;
+  font-size: 0.5em;
+  -webkit-text-stroke: 0.08em var(--ink);
+}
+
 .game-end-button:active {
   translate: 0 4px;
 }

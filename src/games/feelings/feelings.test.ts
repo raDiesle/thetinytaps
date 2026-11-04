@@ -108,6 +108,16 @@ test("the game answers calmly", () => {
   expect(css.match(/infinite/g)?.length ?? 0, "only the picture's fade repeats").toBeLessThanOrEqual(1);
 });
 
+// After the good choice the picture stays until „Weiter“ is tapped, and the „Weiter“ that changes the feeling names
+// the next one (user feedback, November 2026).
+test("a scene goes on only with „Weiter“, which names a new feeling", () => {
+  const pass = readFileSync("src/games/feelings/PassPlay.tsx", "utf8");
+  expect(pass).toContain("<SceneNext onNext={goOn} />");
+  expect(pass).toMatch(/<GameEnd inline showNext /);
+  const finish = pass.slice(pass.indexOf("const finish"), pass.indexOf("const goOn"));
+  expect(finish, "finishing a scene doesn't move on by itself").not.toContain("setNow");
+});
+
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.
 test("every recorded sound of the stories has its file", () => {
   for (const name of RECORDED_SOUNDS.filter((n) => n !== "aua")) expect(existsSync(`src/lib/sounds/${name}.mp3`), name).toBe(true);

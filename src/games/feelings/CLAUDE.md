@@ -17,10 +17,13 @@ A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefu
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
-the good one comes its picture (and, on the story's last step, its happy end), then straight on to the _next scene_ of
-the group (`PassPlay.tsx`) – never back to the same starting picture for another choice. A pass plays each scene of its
-group once; each story remembers its next step (`settings.steps`), so the next pass shows the same scenes with their
-other choices. After the last scene of a pass come „Menü“, „Nochmal“ (the group again) and „Weiter“ (the next group).
+the good one comes its picture (and, on the story's last step, its happy end), and it stays with „Weiter“ beside it
+until someone taps it (or presses a key): only then comes the _next scene_ of the group (`PassPlay.tsx`, `SceneNext`) –
+never on by itself, so grown-up and child can look and talk first (user feedback, November 2026), and never back to the
+same starting picture for another choice. A pass plays each scene of its group once; each story remembers its next step
+(`settings.steps`), so the next pass shows the same scenes with their other choices. After the last scene of a pass
+come „Menü“, „Nochmal“ (the group again) and „Weiter“ (the next group), which writes the next group's name under it
+(`GameEnd showNext`): where „Weiter“ changes the feeling, it says which one comes (user feedback, November 2026).
 The dots at the top are the pass's scenes.
 
 **One tap chooses** (user feedback, November 2026): no first tap that only shows a card big, no ring waiting for a

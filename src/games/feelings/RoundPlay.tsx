@@ -15,8 +15,8 @@ type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
 /**
  * One round: the scene, one question, two cards – the not-so-good idea and the good one; a tap on a card chooses it.
  * The not-so-good one shows what it leads to and is crossed out, then the good one is left to choose. After the good
- * one (and the story's happy end, on its last step) `onFinish` is called; with `ending` the round then stays on its
- * last picture and shows it (the end buttons of a pass), otherwise the next round follows.
+ * one (and the story's happy end, on its last step) `onFinish` is called, and the round stays on its last picture
+ * with `ending` (the pass's „Weiter“ to the next scene, or its end buttons) until someone goes on.
  */
 export function RoundPlay({
   round,
@@ -31,10 +31,10 @@ export function RoundPlay({
   /** The dots at the top: how many scenes the pass has and how many are done before this one. */
   progress: { total: number; done: number };
   onFinish: () => void;
-  /** Shown in the cards' room once the round is over, if it is the last of its pass. */
-  ending?: ReactNode;
+  /** Shown in the cards' room once the round is over: „Weiter“, or the end buttons after the pass's last scene. */
+  ending: ReactNode;
   /** A key pressed while `ending` shows: every key does something. */
-  onEndKey?: () => void;
+  onEndKey: () => void;
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [tried, setTried] = useState(false);
@@ -71,8 +71,8 @@ export function RoundPlay({
 
   const finish = useCallback(() => {
     onFinish();
-    if (ending) setPhase("done");
-  }, [onFinish, ending]);
+    setPhase("done");
+  }, [onFinish]);
 
   // The good idea: a laugh and „Juhu!“ with a still green frame, then it is done; on the story's last step its happy end follows.
   const chooseGood = useCallback(() => {
@@ -108,7 +108,7 @@ export function RoundPlay({
 
   // The left arrow picks the not-so-good idea on the left; every other key the good one, so mashing keys still tells the story.
   const pressKey = (key: string) => {
-    if (phase === "done") return onEndKey?.();
+    if (phase === "done") return onEndKey();
     choose(!tried && key === "ArrowLeft" ? "instead" : "good");
   };
 
