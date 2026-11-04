@@ -80,7 +80,9 @@ In a fresh worktree run `bun install` first.
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
-  everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
+  everything goes that helps the user decide: ideas, the language table, and research. Scrolling down it always shows
+  every open idea: a tap above (the overview's numbers, the contents) jumps to its place and marks it, never filters, and
+  the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
