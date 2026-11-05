@@ -86,8 +86,7 @@ export const FEELINGS_ES: Partial<Record<FeelingId, FeelingText>> = {
     question: "¿Cómo celebras tú con él?",
     instead: [
       { caption: "Reventar el globo", answer: "Mmm, ahora su globo se reventó. Mejor baila con él." },
-      // „Partyhut wegnehmen“ replaced „Geschenk wegnehmen“ (November 2026): told in German until translated.
-      null,
+      { caption: "Quitarle el gorro de fiesta", answer: "Mmm, es su gorro de fiesta. Ahora Osito está triste. Mejor celebra con él." },
       { caption: "Quitarle el pastel", answer: "Mmm, es su pastel de cumpleaños. Ahora Osito está triste. Mejor celebra con él." },
     ],
     end: { narration: "¡Qué cumpleaños tan bonito!", line: "¡Gracias! ¡Fue genial!" },

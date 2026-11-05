@@ -1,7 +1,9 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { dealRound, KIND_ORDER, nextKind, TOGETHER_LEVELS } from "./levels";
-import { PAIRS, pairsOf, TOGETHER_TEXTS, WORK_MS } from "./pairs";
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import type { TextsLanguageId } from "@/content/texts";
+import { PAIRS, type PairId, pairsOf, TOGETHER_TEXTS, TOGETHER_TRANSLATIONS, WORK_MS } from "./pairs";
 import { KIND_SIGNS } from "./TopicBubble";
 
 test("ids and partners are unique, and each pair has exactly one partner layer", () => {
@@ -64,6 +66,31 @@ test("every sentence is there and says the names", () => {
     expect(de.question(pair)).toContain(pair.kind === "pair" ? pair.toThe : pair.the);
     expect(de.right(pair).toLowerCase()).toContain(pair.partner.the.toLowerCase().split(" ")[1]);
     expect(de.belongs(pair).trim().length).toBeGreaterThan(0);
+  }
+});
+
+/** The languages translated whole so far: every pair has its sentences. */
+const COMPLETE: (TargetLanguageId & TextsLanguageId)[] = ["en", "zh", "hi", "es", "ar", "ru"];
+
+/** The languages in a script of their own: no Latin letter may be left in their sentences. */
+const OWN_SCRIPT: TargetLanguageId[] = ["zh", "hi", "ar", "ru"];
+
+test("the translated languages say every pair in their own words", () => {
+  const ids = new Set(PAIRS.map((p) => p.id));
+  for (const [language, sentences] of Object.entries(TOGETHER_TRANSLATIONS)) {
+    for (const id of Object.keys(sentences ?? {})) expect(ids.has(id as PairId), `${language} ${id}`).toBe(true);
+  }
+  for (const language of COMPLETE) {
+    const texts = TOGETHER_TEXTS[language]!;
+    const de = TOGETHER_TEXTS.de!;
+    for (const pair of PAIRS) {
+      expect(TOGETHER_TRANSLATIONS[language]?.[pair.id], `${language} ${pair.id}`).toBeDefined();
+      const said = (["name", "partner", "question", "right", "belongs"] as const).map((key) => [texts[key](pair), de[key](pair)]);
+      for (const [sentence, german] of said) {
+        expect(sentence, `${language} ${pair.id}`).not.toBe(german);
+        if (OWN_SCRIPT.includes(language)) expect(sentence, `${language} ${pair.id}`).not.toMatch(/[A-Za-zäöüß]/);
+      }
+    }
   }
 });
 

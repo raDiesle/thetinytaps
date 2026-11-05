@@ -954,7 +954,15 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
     // for the grown-up, or its game (rituals.ts).
     id: "rituale",
     emoji: "💛",
-    label: { de: "Mein Tag mit Ritualen" },
+    label: {
+      de: "Mein Tag mit Ritualen",
+      en: "My day with rituals",
+      zh: "带仪式的一天",
+      hi: "रस्मों के साथ मेरा दिन",
+      es: "Mi día con rituales",
+      ar: "يومي مع الطقوس",
+      ru: "Мой день с ритуалами",
+    },
     view: "day",
     parts: [
       // At most MAX_STEPS in all: the rituals take the places of breakfast, the book and the bed (Gute-Nacht-Sätze are said in it).
@@ -962,8 +970,16 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
       { slot: "evening", steps: ["erzaehlen", "zaehne", "wiegehts", "gutenacht"] },
     ],
     theme: "meer",
-    title: { de: "Mein Tag" },
-    hint: { de: "Mit Mutmach-Sätzen, „Wie geht's dir?“, Erzählen nach der Kita und Gute-Nacht-Sätzen – die Worte stehen auf der Karte" },
+    title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
+    hint: {
+      de: "Mit Mutmach-Sätzen, „Wie geht's dir?“, Erzählen nach der Kita und Gute-Nacht-Sätzen – die Worte stehen auf der Karte",
+      en: "With brave words, “How are you?”, sharing the day after daycare and good-night words – the words are on the card",
+      zh: "有鼓励的话、“心情怎么样？”、从幼儿园回来后聊聊今天和晚安的话——要说的话都写在卡片上",
+      hi: "हिम्मत वाले वाक्य, “कैसा लग रहा है?”, प्लेस्कूल के बाद दिन की बातें और शुभ रात्रि वाक्य – कहने की बातें कार्ड पर लिखी हैं",
+      es: "Con frases de ánimo, «¿Cómo estás?», contar el día después de la guardería y frases de buenas noches: las palabras están en la tarjeta",
+      ar: "مع عبارات التشجيع و«كيف حالك؟» والحكي عن اليوم بعد الحضانة وعبارات قبل النوم – الكلمات مكتوبة على البطاقة",
+      ru: "Со словами поддержки, «Как дела?», рассказом о дне после садика и словами на ночь – слова написаны на карточке",
+    },
   },
   {
     id: "erst-dann",

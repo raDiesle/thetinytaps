@@ -30,7 +30,7 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
   picture's `aria-label` (`useLevelName`). The start screen has only the level cards and the row above them: no „Über das Spiel“ and no „Einstellungen“ (removed October 2026 – the game
   explains itself by playing, and the shelf and the 🔧 spots are always on). Don't add either back.
 - The row above the cards holds one choice for the whole game, „Mitmachen“ (it was „Schranke und Weiche“ until the
-  machines got their stops; the new name is German only so far): „👆 Kind tippt“ (default) or
+  machines got their stops): „👆 Kind tippt“ (default) or
   „🔄 Von selbst“ (`MarbleSettings.play`, passed to every level as `LevelProps.watch`). With „Von selbst“ nothing waits
   for the child's tap: the marble run's barrier stays up and its switch flips by itself, and the machines run through
   without their stops. A level that gets something else that waits for a tap follows it too.

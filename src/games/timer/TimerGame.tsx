@@ -6,7 +6,7 @@ import { useT } from "@/lib/language";
 import { PICTURES, TIMER_TITLE } from "./content";
 import { OwnTimeSheet } from "./OwnTimeSheet";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
-import { lengthLabel, type OwnTime } from "./time";
+import { lengthWords, type OwnTime } from "./time";
 import { TimerPlay } from "./TimerPlay";
 import "./timer.css";
 
@@ -22,7 +22,18 @@ export function TimerGame() {
   const minutes = TIMER_MINUTES.includes(settings.minutes as (typeof TIMER_MINUTES)[number]) ? settings.minutes : DEFAULT_TIMER_SETTINGS.minutes;
   const own = settings.own;
   const useOwn = settings.useOwn && own !== null;
-  const ownLabel = (time: OwnTime) => (time.kind === "for" ? t({ de: lengthLabel(time.seconds) }) : t({ de: `bis ${time.at}` }));
+  const ownLabel = (time: OwnTime) =>
+    time.kind === "for"
+      ? t(lengthWords(time.seconds))
+      : t({
+          de: `bis ${time.at}`,
+          en: `until ${time.at}`,
+          zh: `到 ${time.at}`,
+          hi: `${time.at} बजे तक`,
+          es: `hasta las ${time.at}`,
+          ar: `حتى ${time.at}`,
+          ru: `до ${time.at}`,
+        });
 
   return (
     <GameShell
@@ -58,7 +69,7 @@ export function TimerGame() {
                 }),
               })),
               ...(own ? [{ value: OWN, label: ownLabel(own) }] : []),
-              { value: OTHER, label: t({ de: "Andere …" }) },
+              { value: OTHER, label: t({ de: "Andere …", en: "Other …", zh: "其他……", hi: "अन्य …", es: "Otro …", ar: "غير ذلك …", ru: "Другое …" }) },
             ]}
           />
           {sheet && (

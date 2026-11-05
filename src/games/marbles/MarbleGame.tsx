@@ -46,7 +46,7 @@ export function MarbleGame() {
       level={
         // For all levels: whether what waits for a tap waits – the marble run's barrier (K-02) and switch (K-01), the machines' stops (R-03).
         <Choice<MarbleSettings["play"]>
-          label={t({ de: "Mitmachen" })}
+          label={t({ de: "Mitmachen", en: "Join in", zh: "一起参与", hi: "साथ में खेलना", es: "Participar", ar: "المشاركة", ru: "Участие" })}
           value={settings.play}
           onChange={(play) => update({ play })}
           options={[

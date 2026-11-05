@@ -40,7 +40,15 @@ wenn es ausdrücklich gewünscht ist.
 Danach `bun run frames src/games/potty/bilder` (springt ein Frame?) und `bun run frames --scenes`-artig nebeneinander
 anschauen: gleiches Bad, gleiche Eltern, niemand doppelt, das Töpfchen bleibt türkis in der Mitte.
 
-Worauf achten: Hose runter zeigt nur Fell, das T-Shirt deckt den Bauch. In der Denkblase ist Tapsi immer ganz
+Ein einzelnes Bild neu zeichnen (ein Fehler darin): `prompts.py <stufe> fox <name>` nimmt nur dieses (`bath`,
+`frames-bath`, `think`, `frames-think`); fehlt das Rohbild in `.image-raw/`, nimmt `raw` das Bild des Spiels.
+
+Worauf achten: Wasser kommt immer aus einem Hahn, der im Raum ist – beim Händewaschen steht Tapsi am Waschbecken,
+die Pfoten im Wasser darüber (das erste `waschen` hatte einen zweiten Hahn mitten in der Luft, ein späterer Versuch
+Tapsi zweimal und einer die Pfoten neben dem Becken). Jedes Ding im Bad gibt es genau einmal – ein Waschbecken, ein
+Hahn, ein Klo, ein Töpfchen; zähle sie in jedem Bild (ein Versuch hatte zwei Waschbecken). Was am Rand des ganzen Bads
+steht (das Waschbecken rechts), zeichnet das Lite-Modell nicht mit den Figuren daran: dafür einen Ausschnitt von
+`fox-bad` als Vorlage nehmen (`wash` in `prompts.py`), statt den Prompt immer länger zu machen. Hose runter zeigt nur Fell, das T-Shirt deckt den Bauch. In der Denkblase ist Tapsi immer ganz
 angezogen, hellblaues T-Shirt und blaue Hose (der Tunnel kam einmal ohne T-Shirt, mit „wearing its trousers“ im Prompt;
 jetzt nennt `thought` beides). Kaka im Töpfchen ist ein kleiner brauner
 Kringel ohne Gesicht. Was zählt, steht in der Mitte – am Rand nur Wand und Boden, weil Handys oben und unten,

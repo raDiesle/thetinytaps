@@ -305,19 +305,13 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Tirar el vaso", answer: "Mmm, ahora la leche cayó sobre Zorrito. Mejor aprieta muy fuerte tu peluche." },
       },
       {
-        caption: "Mostrar las dos mitades",
-        question: "Osito todavía está un poquito triste. ¿Qué puede hacer él?",
-        beats: [{ narration: "Mira las mitades. ¡Una, dos!", line: "¡Ahora tengo dos galletas!" }],
-        instead: { caption: "Hacer migas la galleta", answer: "Mmm, ahora la galleta ya no está. Mejor mira: ¡ahora tienes dos!" },
-      },
-      {
         caption: "Compartir con Zorrito",
         question: "Zorrito ya no tiene galleta. ¿Qué puede hacer Osito?",
         beats: [{ narration: "Osito le da una mitad a Zorrito.", line: "¡Para ti!" }, { line: "¡Gracias, Osito!" }],
         instead: { caption: "Sacar la lengua", answer: "Mmm, ahora Zorrito está triste. Mejor comparte con él." },
       },
     ],
-    outro: [{ narration: "¡Genial! Estar triste está bien. Apretar el peluche, mirar de otra forma, compartir." }],
+    outro: [{ narration: "¡Genial! Estar triste está bien. Apretar el peluche y compartir." }],
     endCaption: "Osito y Zorrito comen una mitad cada uno",
   },
   baby: {
@@ -723,31 +717,34 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     endCaption: "Osito duerme otra vez, el oso grande está junto a la cama",
   },
   lost: {
-    title: "Tristeza, el peluche no está",
-    caption: "El peluche no está, Osito llora",
-    intro: [{ narration: "Osito quiere irse a dormir." }, { narration: "¡Pero su peluche no está! Está muy triste." }],
+    title: "Tristeza, el conejo de peluche no está",
+    caption: "El conejo de peluche no está, Osito llora",
+    intro: [{ narration: "Osito quiere irse a dormir." }, { narration: "¡Pero su conejo de peluche no está! Está muy triste." }],
     steps: [
       {
         caption: "Decir «Estoy triste»",
-        question: "El peluche no está. ¿Qué puede hacer Osito?",
-        beats: [{ narration: "Osito dice:", line: "Estoy triste. Mi peluche no está." }, { line: "Ay. Eso da tristeza." }],
+        question: "Su conejo de peluche no está. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito dice:", line: "Estoy triste. Mi conejo de peluche no está." }, { line: "Ay. Eso da tristeza." }],
         instead: { caption: "Vaciar la caja de juguetes", answer: "Mmm, ahora todo está revuelto. Mejor di cómo te sientes." },
       },
       {
         caption: "Buscarlo él mismo",
-        question: "¿Dónde puede estar el peluche? ¿Qué puede hacer Osito?",
+        question: "¿Dónde puede estar el conejo de peluche? ¿Qué puede hacer Osito?",
         beats: [{ narration: "Busca él mismo. ¿Debajo de la cama? No." }, { narration: "¿En la canasta? ¡Ahí está!" }],
-        instead: { caption: "Quitarle el suyo a Zorrito", answer: "Mmm, ahora Zorrito está triste. Mejor busca tú." },
+        instead: {
+          caption: "Quitarle el perro a Zorrito",
+          answer: "Mmm, es el perro de peluche de Zorrito. Ahora Zorrito está triste. Mejor busca tu conejo de peluche.",
+        },
       },
       {
         caption: "Abrazarlo muy fuerte",
-        question: "¡Ahí está el peluche! ¿Qué puede hacer Osito?",
+        question: "¡Ahí está el conejo de peluche! ¿Qué puede hacer Osito?",
         beats: [{ narration: "Lo abraza muy fuerte.", line: "¡Aquí estás!" }],
         instead: { caption: "Tirarlo al rincón", answer: "Mmm, ahora otra vez está solito en el rincón. Mejor abrázalo muy fuerte." },
       },
     ],
     outro: [{ narration: "¡Qué bien! Decir cómo te sientes, buscar, abrazar fuerte." }],
-    endCaption: "Osito abraza su peluche en la cama",
+    endCaption: "Osito abraza su conejo de peluche en la cama",
   },
   join: {
     title: "Tristeza, no lo dejan jugar",
@@ -808,8 +805,12 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     caption: "Osito está hasta arriba del juego para trepar, sin ayuda",
     intro: [{ narration: "Osito sube al juego para trepar. ¡Sin ayuda!" }, { narration: "Ya está arriba. ¡Está muy orgulloso!" }],
     steps: [
-      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
-      null,
+      {
+        caption: "Gritar «¡Sube tú también!»",
+        question: "Osito está hasta arriba. ¿Qué puede hacer él?",
+        beats: [{ narration: "Le grita a Zorrito:", line: "¡Sube tú también!" }, { line: "¡Sí, ya voy!" }],
+        instead: { caption: "Empujar a Zorrito para abajo", answer: "Mmm, empujar duele. Mejor grita: ¡Sube tú también!" },
+      },
       {
         caption: "Festejar",
         question: "Osito está feliz, feliz. ¿Qué puede hacer él?",
@@ -823,6 +824,7 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Saltar para abajo", answer: "Mmm, saltar desde tan alto duele. Mejor enséñale a Zorrito cómo se hace." },
       },
     ],
+    outro: [{ narration: "¡Yupi! Invitar, festejar, ayudar. Ahora los dos están orgullosos." }],
     endCaption: "Osito y Zorrito juntos arriba",
   },
   miss: {
@@ -884,8 +886,15 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     caption: "Afuera llueve, Osito se aburre",
     intro: [{ narration: "Afuera llueve. Osito está acostado en el sillón." }, { narration: "¡Se aburre muchísimo!" }],
     steps: [
-      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
-      null,
+      {
+        caption: "Jugar a cocinar con Zorrito",
+        question: "Está lloviendo. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Trae las ollas y cocina una sopa de lluvia con Zorrito. ¡A revolver, a revolver!" },
+          { line: "¡Mmm, qué rico! ¡Ahora cocino yo!" },
+        ],
+        instead: { caption: "Jalarle la oreja a Zorrito", answer: "Mmm, eso le duele a Zorrito. Mejor juega algo con él." },
+      },
       {
         caption: "Hacer una cueva",
         question: "¿A qué se puede jugar adentro? ¿Qué puede hacer Osito?",
@@ -899,6 +908,7 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Aplastar la caja", answer: "Mmm, ahora la caja está rota. Mejor haz un carro con ella." },
       },
     ],
+    outro: [{ narration: "¡Qué bien! Del aburrimiento salen ideas: cocinar juntos, hacer una cueva, manejar un carro." }],
     endCaption: "Osito y Zorrito manejan el carro de cartón",
   },
   empathy: {
@@ -945,8 +955,14 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "Sopla muy hondo. Fuuuh." }, { narration: "El corazón se calma." }],
         instead: { caption: "Tirar el pastel", answer: "Mmm, ahora el pastel está arruinado. Mejor sopla muy hondo." },
       },
-      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
-      null,
+      {
+        caption: "Comer pastel con Zorrito",
+        question: "Zorrito espera en la mesa del cumpleaños. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Va con Zorrito a la mesa. Comen pastel juntos." }, { line: "¡Mmm, qué rico!" }],
+        instead: { caption: "Gritarle a Zorrito", answer: "Mmm, ahora Zorrito también se asusta. Mejor ve con él y come pastel con él." },
+      },
     ],
+    outro: [{ narration: "¡Súper! Taparse los oídos, soplar hondo y luego comer pastel juntos." }],
+    endCaption: "Osito y Zorrito comen pastel juntos",
   },
 };

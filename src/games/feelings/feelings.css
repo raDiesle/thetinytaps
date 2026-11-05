@@ -83,6 +83,18 @@
   background: var(--sunshine);
 }
 
+/* A dot of a scene played or playing is tapped to play it again (user wish, November 2026); the ones to come are not. */
+.fg-dot-pick {
+  padding: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
 /* ---------- The big picture in the middle ---------- */
 
 .story-middle {
@@ -171,25 +183,34 @@
     0 0 0 10px var(--ink);
 }
 
-/* ▶ in the picture's bottom right corner while the scene is shown: the whole picture is tapped to go on, never a
-   timer (user feedback, November 2026). Still, like everything here. */
-.fg-next {
+/* The way on (`GoOn`): ▶ always at the same place, the screen's bottom right corner – in a scene, on a page of a day's
+   story and on the face to copy alike – and the whole screen tapped to go on, never a timer (user feedback, November
+   2026). The layer for the tap lies under everything else of the screen, which lets the tap through where it waits.
+   Still, like everything here. */
+.fg-go-on {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fg-next {
+  position: absolute;
+  right: var(--pad);
+  bottom: var(--pad);
+  z-index: 7;
+  width: var(--next-w);
   padding: 0;
   border: 0;
-  border-radius: inherit;
   background: none;
   cursor: pointer;
   touch-action: manipulation;
 }
 
 .fg-next-sign {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: clamp(48px, 13%, 96px);
+  display: block;
+  width: 100%;
   filter: drop-shadow(0 3px 0 var(--ink));
 }
 
@@ -703,19 +724,25 @@
 /* The open book (ReadAlong) and the wooden loudspeaker (VoiceSwitch) stand side by side in the screen's bottom right
    corner (user feedback, November 2026): on wide screens right of the picture, below the good card, where they and the
    sheet cover least of the pictures. Still, like every note: nothing idles. */
-.story-play {
+.story-play,
+.fg-day {
   /* The width of the two notes; the sheet above them reads it too. */
   --note-w: 64px;
+  /* ▶ in the bottom right corner, the same on every screen of the game. */
+  --next-w: calc(var(--note-w) + 10px);
 }
 
+/* Left of ▶, so ▶ keeps its place and nothing lies over it; the padding round them keeps a tap that just missed them
+   from going on (`GoOn`). */
 .story-corner {
   position: absolute;
-  right: var(--pad);
-  bottom: var(--pad);
+  right: calc(var(--next-w) + 2 * var(--pad) - 8px);
+  bottom: calc(var(--pad) - 8px);
   z-index: 6;
   display: flex;
   align-items: stretch;
   gap: 8px;
+  padding: 8px;
 }
 
 /* Both are paper notes like the ones clipped to the page, each switched by one tap. */
@@ -836,7 +863,7 @@
 .story-text-sheet {
   /* The notes' height: the loudspeaker and its paper round it. */
   --corner-h: calc((var(--note-w) - 14px) * 1.05 + 10px);
-  --sheet-bottom: calc(var(--pad) + var(--corner-h) + 8px);
+  --sheet-bottom: calc(var(--pad) + max(var(--corner-h), var(--next-w)) + 8px);
   --sheet-top: calc(var(--pad) + 36px);
 
   position: absolute;
@@ -885,12 +912,10 @@
 }
 
 /* Wide: the sheet starts below the good card on the top right and is as wide as the room right of the picture, but
-   never narrower than a readable line; its bottom stays above the notes and above ▶ on the picture's bottom right
-   corner (`.fg-next-sign`), which it reaches over. */
+   never narrower than a readable line; its bottom stays above the notes and ▶. */
 @media (min-aspect-ratio: 6 / 5) {
   .story-text-sheet {
     --sheet-top: calc(var(--card-edge) + var(--card-w) * 0.75 + 10px);
-    --sheet-bottom: max(var(--pad) + var(--corner-h) + 8px, var(--pic-top) + 18px + clamp(48px, var(--pic-w) * 0.13, 96px));
 
     width: max(50cqw - var(--pic-w) / 2 - var(--pad), min(44cqw, 22rem));
   }
@@ -904,7 +929,8 @@
   }
 
   .story-corner {
-    top: var(--corner-top);
+    top: calc(var(--corner-top) - 8px);
+    right: calc(var(--pad) - 8px);
     bottom: auto;
   }
 
@@ -916,7 +942,8 @@
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
-  .story-play {
+  .story-play,
+  .fg-day {
     --note-w: 50px;
   }
 
@@ -931,7 +958,8 @@
 }
 
 @media (min-width: 900px) and (min-height: 600px) {
-  .story-play {
+  .story-play,
+  .fg-day {
     --note-w: 78px;
   }
 }
@@ -943,7 +971,6 @@
    no ring, no cards; the text beside it in the book's letters, its first letter big like a picture book's. Still. */
 .fg-day {
   --pad: 12px;
-  --note-w: 64px;
   --corner-top: calc(max(4px, env(safe-area-inset-top)) + 34px);
 
   position: absolute;
@@ -956,18 +983,7 @@
   container-type: size;
 }
 
-/* The whole page is tapped to turn to the scene; picture and text lie over it and let the tap through. */
-.fg-day-tap {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
+/* Picture and text lie over the tap to turn the page (`GoOn`) and let it through. */
 .fg-day-picture-room,
 .fg-day-words {
   position: relative;
@@ -1010,12 +1026,14 @@
   pointer-events: none;
 }
 
+/* Clear of ▶ in the corner on both sides, so the text stays in the middle. */
 .fg-day-words {
   grid-area: words;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(8px, 2cqmin, 20px);
+  padding-inline: calc(var(--next-w) + 4px);
 }
 
 .fg-day-text {
@@ -1034,10 +1052,6 @@
   font-size: 1.6em;
   font-weight: 700;
   line-height: 1;
-}
-
-.fg-day-next {
-  width: clamp(44px, 9cqmin, 84px);
 }
 
 /* The day's end: „Nochmal“ and „Weiter“ under the text, tapped – the page itself is not. */
@@ -1073,7 +1087,7 @@
 
   .fg-day-words {
     justify-content: center;
-    padding: var(--corner-top) var(--pad) calc(var(--note-w) + var(--pad)) 0;
+    padding: var(--corner-top) var(--pad) calc(var(--next-w) + var(--pad)) 0;
   }
 
   /* The text's column is narrow: „Weiter“, the big label, above „Nochmal“, never past the page's edge. */
@@ -1083,23 +1097,5 @@
 
   .fg-day-text {
     font-size: clamp(1rem, 5.2cqh, 2.1rem);
-  }
-
-  /* The loudspeaker in the bottom right corner, as in the scenes. */
-  .fg-day .story-corner {
-    top: auto;
-    bottom: var(--pad);
-  }
-}
-
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  .fg-day {
-    --note-w: 50px;
-  }
-}
-
-@media (min-width: 900px) and (min-height: 600px) {
-  .fg-day {
-    --note-w: 78px;
   }
 }

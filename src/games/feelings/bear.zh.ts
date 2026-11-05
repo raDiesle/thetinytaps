@@ -78,8 +78,7 @@ export const FEELINGS_ZH: Partial<Record<FeelingId, FeelingText>> = {
     question: "你怎么和他一起庆祝？",
     instead: [
       { caption: "弄破气球", answer: "嗯，现在他的气球破了。还是和他一起跳舞吧。" },
-      // „Partyhut wegnehmen“ replaced „Geschenk wegnehmen“ (November 2026): told in German until translated.
-      null,
+      { caption: "拿走派对帽", answer: "嗯，这是他的派对帽。现在他难过了。还是和他一起庆祝吧。" },
       { caption: "拿走蛋糕", answer: "嗯，这是他的生日蛋糕。现在他难过了。还是和他一起庆祝吧。" },
     ],
     end: { narration: "多么美好的生日呀！", line: "谢谢！太棒了！" },

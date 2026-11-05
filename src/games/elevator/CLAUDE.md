@@ -75,7 +75,7 @@ Rules for films (from building the first one; follow them in the next):
   `card` (a close-up, not the strip's small icon) and its `sounds`; both choices of a film use the same close-ups, so
   the cat on the radio's card is the cat from the town.
 - **Every choice is right, and each option is what it shows**: picking is never a test. At most a choice at the start and one in the middle, so a film stays a few minutes.
-- New films and their lines come in German only (the title through `titleIn`, the voice German until the title is translated: `voice` in `FilmPlay.tsx`, like the trail levels). „Die Feuerwehr“ is translated into every app language; `phrases.test.ts` checks a film's lines along every way through it, like a level's.
+- New films and their lines come in German only (the title through `titleIn`, the voice German until the title is translated: `voice` in `FilmPlay.tsx`, like the trail levels). „Die Feuerwehr“, „Ein Brief für Oma“ and „Beim Bäcker“ are translated into every app language (the last two on request, 5 November 2026, not yet recorded in the other languages); `phrases.test.ts` checks a film's lines along every way through it, like a level's.
 
 ## Languages (German, English, Chinese, Hindi, Spanish, Arabic, Russian)
 

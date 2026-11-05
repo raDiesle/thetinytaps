@@ -1,6 +1,7 @@
 import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
+import { distanceToRect, TAP_SLOP_PX } from "@/lib/tapTargets";
 import { hush, recordedVoice } from "@/lib/voice";
 import { framesFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
@@ -155,8 +156,7 @@ export function Frames({ name, moving, className }: { name: string; moving: bool
 /**
  * The big picture in the middle: what happens right now. Unless `still`, its frames fade into each other in a loop,
  * like a tiny GIF, so the animals seem to move a little. A short caption for grown-ups says what it shows.
- * With `onNext` the whole picture is a button with ▶ in its bottom right corner: one tap goes on (user feedback,
- * November 2026: no waiting until a scene has been told).
+ * Where it waits for a tap to go on, `GoOn` lies beside it: ▶ in the screen's corner, the whole screen tapped.
  * Give it a new `key` with every new picture, so it starts at the first frame.
  */
 export function StoryPicture({
@@ -165,7 +165,6 @@ export function StoryPicture({
   caption,
   look = "story",
   still = false,
-  onNext,
 }: {
   name: string;
   /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
@@ -175,29 +174,10 @@ export function StoryPicture({
   look?: PictureLook;
   /** Shows only the first frame: while the child chooses, the cards move instead. */
   still?: boolean;
-  /** Makes the picture the way on, marked by ▶. */
-  onNext?: () => void;
 }) {
   return (
     <div className={`fg-frame fg-look-${look}`}>
       <div className="fg-picture">{art ?? <Frames name={name} moving={!still} />}</div>
-      {onNext && (
-        <button
-          type="button"
-          className="fg-next"
-          data-tap="goal"
-          aria-label={caption}
-          onPointerDown={(e: PointerEvent) => {
-            e.stopPropagation();
-            onNext();
-          }}
-        >
-          <svg className="fg-next-sign" viewBox="0 0 100 100" aria-hidden>
-            <circle cx="50" cy="50" r="44" />
-            <path d="M40 30 L72 50 L40 70 Z" />
-          </svg>
-        </button>
-      )}
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
@@ -281,15 +261,96 @@ export function Mark({ good, className = "" }: { good: boolean; className?: stri
   );
 }
 
-/** One dot per step at the top: green with a tick when done, yellow for the one that comes now. */
-export function StepDots({ total, done, current }: { total: number; done: number; current: boolean }) {
+/** What else a grown-up or child may tap on the screen: a tap this close to one of them is not a tap to go on. */
+const OTHER_TAPS = ":is(button, a, [data-tap], [data-tap-keep]):not(.fg-next)";
+
+/**
+ * The way on wherever „Gefühle“ waits for a tap (a scene told, a chosen idea's last picture, a page of a day's story,
+ * the face to copy): ▶ always at the same place, the screen's bottom right corner, and the whole screen tapped to go
+ * on – except right next to anything else that can be tapped (the dots, the grown-ups' notes, ✕), whose taps stay
+ * theirs (user feedback, November 2026: ▶ moved from scene to page and lay under the grown-ups' notes). Put it as a
+ * direct child of the screen's `.story-play` or `.fg-day`; what lies above it lets its taps through.
+ */
+export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
   return (
-    <span className="fg-dots" aria-hidden>
-      {Array.from({ length: total }, (_, i) => (
-        <span key={i} className={`fg-dot${i < done ? " done" : ""}${i === done && current ? " now" : ""}`}>
-          {i < done ? "✓" : ""}
-        </span>
-      ))}
+    <>
+      <div
+        className="fg-go-on"
+        aria-hidden
+        onPointerDown={(e: PointerEvent<HTMLDivElement>) => {
+          const near = [...document.querySelectorAll(OTHER_TAPS)].some((el) => {
+            const box = el.getBoundingClientRect();
+            return box.width > 0 && distanceToRect(e.clientX, e.clientY, box) <= TAP_SLOP_PX;
+          });
+          if (!near) onNext();
+        }}
+      />
+      <button
+        type="button"
+        className="fg-next"
+        data-tap="goal"
+        aria-label={label}
+        onPointerDown={(e: PointerEvent) => {
+          e.stopPropagation();
+          onNext();
+        }}
+      >
+        <svg className="fg-next-sign" viewBox="0 0 100 100" aria-hidden>
+          <circle cx="50" cy="50" r="44" />
+          <path d="M40 30 L72 50 L40 70 Z" />
+        </svg>
+      </button>
+    </>
+  );
+}
+
+/**
+ * One dot per scene at the top: green with a tick when done, yellow for the one that comes now. With `onPick` the
+ * dots up to `upTo` are tapped to play that scene again – one done before, or the one now from its start (user wish,
+ * November 2026: grown-ups want to go back or repeat); the ones still to come are not.
+ */
+export function StepDots({
+  total,
+  done,
+  current,
+  upTo = done,
+  onPick,
+}: {
+  total: number;
+  done: number;
+  current: boolean;
+  /** The last dot that can be tapped, counted from 0. */
+  upTo?: number;
+  onPick?: (index: number) => void;
+}) {
+  return (
+    <span className="fg-dots">
+      {Array.from({ length: total }, (_, i) => {
+        const className = `fg-dot${i < done ? " done" : ""}${i === done && current ? " now" : ""}`;
+        const mark = i < done ? "✓" : "";
+        if (!onPick || i > upTo)
+          return (
+            <span key={i} className={className} aria-hidden>
+              {mark}
+            </span>
+          );
+        return (
+          <button
+            key={i}
+            type="button"
+            className={`${className} fg-dot-pick`}
+            // The nearest dot wins, done or not: a dot played is no answer already given.
+            data-tap=""
+            aria-label={String(i + 1)}
+            onPointerDown={(e: PointerEvent) => {
+              e.stopPropagation();
+              onPick(i);
+            }}
+          >
+            {mark}
+          </button>
+        );
+      })}
     </span>
   );
 }

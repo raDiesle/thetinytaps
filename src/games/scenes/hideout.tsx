@@ -309,9 +309,34 @@ export const SURPRISES: Surprise[] = [
     sound: "bark",
     Art: Hund,
   },
-  // German only until the user asks for the other languages (languageStatus.ts marks the gap).
-  { id: "fuchsfamilie", found: { de: "Da ist ja Familie Fuchs!" }, sound: "giggle", Art: Fuchsfamilie },
-  { id: "baerenfamilie", found: { de: "Da ist ja Familie Bär!" }, sound: "giggle", Art: Baerenfamilie },
+  {
+    id: "fuchsfamilie",
+    found: {
+      de: "Da ist ja Familie Fuchs!",
+      ru: "Ой, тут семья лисичек!",
+      en: "Oh look, the fox family!",
+      zh: "原来是狐狸一家！",
+      hi: "अरे, यहाँ लोमड़ी परिवार है!",
+      es: "¡Mira, la familia Zorro!",
+      ar: "هنا عائلة الثعلب!",
+    },
+    sound: "giggle",
+    Art: Fuchsfamilie,
+  },
+  {
+    id: "baerenfamilie",
+    found: {
+      de: "Da ist ja Familie Bär!",
+      ru: "Ой, тут семья мишек!",
+      en: "Oh look, the bear family!",
+      zh: "原来是小熊一家！",
+      hi: "अरे, यहाँ भालू परिवार है!",
+      es: "¡Mira, la familia Oso!",
+      ar: "هنا عائلة الدب!",
+    },
+    sound: "giggle",
+    Art: Baerenfamilie,
+  },
 ];
 
 /** While the item plays: what is hiding this time, and when it is out (in ms after the tap). */

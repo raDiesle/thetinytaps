@@ -76,9 +76,34 @@ export function LettersGame({ way }: { way: LettersWay }) {
   // Each game plays at once, so grown-ups would not guess what waits behind ⚙️: a note names it as play starts (user
   // feedback, November 2026).
   const intro: Record<Exclude<LettersWay, "move">, ReactNode> = {
-    free: t({ de: "Zahlen vorzählen, Nachspuren, große und kleine Buchstaben, Bilder – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
-    count: t({ de: "Alles sofort, vorzählen, Schritt für Schritt oder selbst zählen – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
-    words: t({ de: "Ganze Wörter, Farben, Tu-Wörter oder „Wo ist das B?“ – halten Sie ⚙️ gedrückt und wählen Sie aus." }),
+    free: t({
+      de: "Zahlen vorzählen, Nachspuren, große und kleine Buchstaben, Bilder – halten Sie ⚙️ gedrückt und wählen Sie aus.",
+      ru: "Счёт вслух, обводка, большие и маленькие буквы, картинки – удерживайте ⚙️ и выбирайте.",
+      en: "Numbers counted aloud, tracing, capital and small letters, pictures – hold ⚙️ and choose.",
+      zh: "跟着数、描一描、大写和小写字母、图片——按住 ⚙️ 来选择。",
+      // Hindi and Arabic letters have one form only, so there is no choice of big and small letters to name.
+      hi: "अंक गिनकर सुनाना, ट्रेस करना, तस्वीरें – ⚙️ दबाए रखें और चुनें।",
+      es: "Contar en voz alta, repasar, mayúsculas y minúsculas, dibujos: mantenga pulsado ⚙️ y elija.",
+      ar: "العد بصوت عال، والتتبع، والصور – اضغطوا مطوّلا على ⚙️ واختاروا.",
+    }),
+    count: t({
+      de: "Alles sofort, vorzählen, Schritt für Schritt oder selbst zählen – halten Sie ⚙️ gedrückt und wählen Sie aus.",
+      ru: "Всё сразу, счёт вслух, шаг за шагом или считать пальчиком – удерживайте ⚙️ и выбирайте.",
+      en: "All at once, counted aloud, step by step or count by tapping – hold ⚙️ and choose.",
+      zh: "一下全出来、跟着数、一步一步或自己点着数——按住 ⚙️ 来选择。",
+      hi: "सब एक साथ, गिनकर सुनाना, एक-एक करके या ख़ुद गिनना – ⚙️ दबाए रखें और चुनें।",
+      es: "Todo a la vez, contar en voz alta, paso a paso o contar tocando: mantenga pulsado ⚙️ y elija.",
+      ar: "كل شيء فورا، أو العد بصوت عال، أو خطوة خطوة، أو العد باللمس – اضغطوا مطوّلا على ⚙️ واختاروا.",
+    }),
+    words: t({
+      de: "Ganze Wörter, Farben, Tu-Wörter oder „Wo ist das B?“ – halten Sie ⚙️ gedrückt und wählen Sie aus.",
+      ru: "Целые слова, цвета, слова-действия или поиск первой буквы – удерживайте ⚙️ и выбирайте.",
+      en: "Whole words, colors, doing words or “Where is the B?” – hold ⚙️ and choose.",
+      zh: "整个词、颜色、动作词或找第一个字母——按住 ⚙️ 来选择。",
+      hi: "पूरे शब्द, रंग, क्रिया-शब्द या पहला अक्षर ढूँढना – ⚙️ दबाए रखें और चुनें।",
+      es: "Palabras enteras, colores, acciones o «¿Dónde está la B?»: mantenga pulsado ⚙️ y elija.",
+      ar: "كلمات كاملة، وألوان، وحركات، أو البحث عن الحرف الأول – اضغطوا مطوّلا على ⚙️ واختاروا.",
+    }),
   };
 
   return (
@@ -100,7 +125,17 @@ export function LettersGame({ way }: { way: LettersWay }) {
       <PlayOptions
         intro={
           <>
-            <b>{t({ de: "Hier lässt sich viel einstellen" })}</b>
+            <b>
+              {t({
+                de: "Hier lässt sich viel einstellen",
+                ru: "Здесь многое можно настроить",
+                en: "There is a lot to set here",
+                zh: "这里有很多可以设置",
+                hi: "यहाँ बहुत कुछ बदला जा सकता है",
+                es: "Aquí se puede ajustar mucho",
+                ar: "هنا يمكنكم ضبط الكثير",
+              })}
+            </b>
             {intro[way]}
           </>
         }
@@ -196,7 +231,15 @@ export function LettersGame({ way }: { way: LettersWay }) {
             <Toggle
               label={
                 numbersOnly
-                  ? t({ de: "Nachspuren: Ziffer aus Punkten, Finger oder Maus lässt Sterne erscheinen" })
+                  ? t({
+                      de: "Nachspuren: Ziffer aus Punkten, Finger oder Maus lässt Sterne erscheinen",
+                      ru: "Обводить: цифра из точек, палец или мышка зажигает звёздочки",
+                      en: "Tracing: the digit in dots, a finger or the mouse makes stars appear",
+                      zh: "描一描：数字由点组成，手指或鼠标描过的地方出现星星",
+                      hi: "ट्रेस करना: बिंदुओं से बना अंक, उँगली या माउस से सितारे निकलते हैं",
+                      es: "Repasar: el número de puntos, el dedo o el ratón hace salir estrellas",
+                      ar: "التتبع: رقم من نقاط، وتظهر نجوم حيث يمر الإصبع أو الفأرة",
+                    })
                   : t({
                       de: "Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen",
                       ru: "Обводить: буква из точек, палец или мышка зажигает звёздочки",

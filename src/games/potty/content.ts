@@ -85,7 +85,7 @@ export const SIT_GUARD_MS = 1500;
 export const SCENE_MS = 900;
 
 /** How long a thought shows before the next one comes by itself. */
-export const WAIT_SCENE_MS = 2600;
+export const WAIT_SCENE_MS = 8000;
 
 export const STEPS: Step[] = [
   // Eating and drinking take turns as the step's frames, moving from the start; the first steps wait for „Weiter“.
@@ -143,25 +143,10 @@ export function picturesFor(step: Step, which: Which): string[] {
   return which === "unsure" || which === "both" ? [picture.pipi, picture.kaka] : [picture[which]];
 }
 
-/** The sound a waiting scene makes when it comes (see PottyPlay.tsx). */
-export type SceneSound =
-  | "trickle"
-  | "splash"
-  | "glug"
-  | "whoosh"
-  | "squeeze"
-  | "blow"
-  | "plop"
-  | "dance"
-  | "juggle"
-  | "peekaboo"
-  | "bubbles"
-  | "toot"
-  | "chime";
-
 /**
  * What Tapsi thinks of while it sits, in a thought bubble over the still bathroom picture: things that
- * flow and splash for pipi (letting go), things that are pressed for kaka, and plain silliness.
+ * flow and splash for pipi (letting go), things that are pressed for kaka, and plain silliness. They make no
+ * sound: the waiting song plays alone (sounds over it disturbed the user).
  */
 export interface WaitScene {
   /** Its picture's name after the animal's: `fox-denken-giesskanne`. */
@@ -170,61 +155,63 @@ export interface WaitScene {
   emoji: string;
   /** For which need it shows; "silly" ones are kept but not shown (see scenesFor). */
   need: Need | "silly";
-  sound: SceneSound;
 }
 
 export const WAIT_SCENES: WaitScene[] = [
-  { id: "giesskanne", emoji: "🌻💦", need: "pipi", sound: "trickle" },
-  { id: "brunnen", emoji: "⛲", need: "pipi", sound: "splash" },
-  { id: "ballon", emoji: "🎈💨", need: "pipi", sound: "whoosh" },
-  { id: "regen", emoji: "🌧️☔", need: "pipi", sound: "trickle" },
-  { id: "schlauch", emoji: "💦🦆", need: "pipi", sound: "splash" },
-  { id: "wasserrad", emoji: "💧🎡", need: "pipi", sound: "trickle" },
-  { id: "tee", emoji: "🫖☕", need: "pipi", sound: "glug" },
-  { id: "elefant", emoji: "🐘💦", need: "pipi", sound: "splash" },
-  { id: "wal", emoji: "🐳", need: "pipi", sound: "blow" },
-  { id: "trichter", emoji: "🫗", need: "pipi", sound: "trickle" },
-  { id: "rutsche", emoji: "🛝💦", need: "pipi", sound: "splash" },
-  { id: "schiffchen", emoji: "⛵🏞️", need: "pipi", sound: "trickle" },
-  { id: "eimer", emoji: "🪣🏰", need: "pipi", sound: "trickle" },
-  { id: "pusteblume", emoji: "🌬️🌼", need: "pipi", sound: "whoosh" },
-  { id: "pumpe", emoji: "🚰", need: "pipi", sound: "glug" },
-  { id: "sanduhr", emoji: "⏳", need: "pipi", sound: "trickle" },
-  { id: "drachen", emoji: "🪁", need: "pipi", sound: "whoosh" },
-  { id: "ketchup", emoji: "🍅🍝", need: "kaka", sound: "squeeze" },
-  { id: "aufblasen", emoji: "😤🎈", need: "kaka", sound: "blow" },
-  { id: "huhn", emoji: "🐔🥚", need: "kaka", sound: "plop" },
-  { id: "knete", emoji: "🟠🟣🟢", need: "kaka", sound: "squeeze" },
-  { id: "spritzbeutel", emoji: "🍰", need: "kaka", sound: "squeeze" },
-  { id: "erbsen", emoji: "🫛", need: "kaka", sound: "plop" },
-  { id: "moehre", emoji: "🥕", need: "kaka", sound: "plop" },
-  { id: "kueken", emoji: "🥚🐣", need: "kaka", sound: "plop" },
-  { id: "schubkarre", emoji: "🍂", need: "kaka", sound: "squeeze" },
-  { id: "honig", emoji: "🍯", need: "kaka", sound: "squeeze" },
-  { id: "kastanie", emoji: "🌰", need: "kaka", sound: "plop" },
+  { id: "giesskanne", emoji: "🌻💦", need: "pipi" },
+  { id: "brunnen", emoji: "⛲", need: "pipi" },
+  { id: "ballon", emoji: "🎈💨", need: "pipi" },
+  { id: "schlauch", emoji: "💦🦆", need: "pipi" },
+  { id: "wasserrad", emoji: "💧🎡", need: "pipi" },
+  { id: "tee", emoji: "🫖☕", need: "pipi" },
+  { id: "elefant", emoji: "🐘💦", need: "pipi" },
+  { id: "wal", emoji: "🐳", need: "pipi" },
+  { id: "trichter", emoji: "🫗", need: "pipi" },
+  { id: "eimer", emoji: "🪣🏰", need: "pipi" },
+  { id: "pumpe", emoji: "🚰", need: "pipi" },
+  { id: "sanduhr", emoji: "⏳", need: "pipi" },
+  { id: "ketchup", emoji: "🍅🍝", need: "kaka" },
+  { id: "aufblasen", emoji: "😤🎈", need: "kaka" },
+  { id: "huhn", emoji: "🐔🥚", need: "kaka" },
+  { id: "knete", emoji: "🟠🟣🟢", need: "kaka" },
+  { id: "spritzbeutel", emoji: "🍰", need: "kaka" },
+  { id: "erbsen", emoji: "🫛", need: "kaka" },
+  { id: "moehre", emoji: "🥕", need: "kaka" },
+  { id: "kueken", emoji: "🥚🐣", need: "kaka" },
+  { id: "honig", emoji: "🍯", need: "kaka" },
+  { id: "kastanie", emoji: "🌰", need: "kaka" },
   // Waiting until something comes out, without pressing: for children afraid of kaka.
-  { id: "tunnel", emoji: "🚂", need: "kaka", sound: "toot" },
-  { id: "schmetterling", emoji: "🦋", need: "kaka", sound: "chime" },
-  { id: "maulwurf", emoji: "🐾🟤", need: "kaka", sound: "plop" },
-  { id: "schildkroete", emoji: "🐢", need: "kaka", sound: "plop" },
-  { id: "roehre", emoji: "🛝", need: "kaka", sound: "whoosh" },
-  { id: "tanzen", emoji: "💃🕺", need: "silly", sound: "dance" },
-  { id: "jonglieren", emoji: "🤹", need: "silly", sound: "juggle" },
-  { id: "kuckuck", emoji: "🙈", need: "silly", sound: "peekaboo" },
-  { id: "seifenblasen", emoji: "🫧", need: "silly", sound: "bubbles" },
+  { id: "tunnel", emoji: "🚂", need: "kaka" },
+  { id: "schmetterling", emoji: "🦋", need: "kaka" },
+  { id: "maulwurf", emoji: "🐾🟤", need: "kaka" },
+  { id: "schildkroete", emoji: "🐢", need: "kaka" },
+  { id: "tanzen", emoji: "💃🕺", need: "silly" },
+  { id: "jonglieren", emoji: "🤹", need: "silly" },
+  { id: "kuckuck", emoji: "🙈", need: "silly" },
+  { id: "seifenblasen", emoji: "🫧", need: "silly" },
 ];
 
 /**
- * The waiting scenes for what the child said, in the order they come: only the scenes that help with that
- * need (the user's choice, so the waiting stays on letting go or pressing); for both or while nobody knows,
- * pipi and kaka scenes take turns. The silly ones are not shown.
+ * The thoughts that always come first, in this order (the user's choice, November 2026: the best pictures so far),
+ * each only where it fits what the child said; the others follow in a random order.
  */
-export function scenesFor(said: Said): WaitScene[] {
-  const of = (need: Need) => WAIT_SCENES.filter((s) => s.need === need);
-  if (said === "pipi" || said === "kaka") return of(said);
-  return of("pipi")
-    .flatMap((s, i) => [s, of("kaka")[i]])
-    .filter((s) => s !== undefined);
+export const FIRST_SCENES = ["huhn", "wal", "maulwurf", "sanduhr", "trichter"];
+
+/**
+ * The waiting scenes for what the child said, in the order they come: only the scenes that help with that
+ * need (the user's choice, so the waiting stays on letting go or pressing), both kinds for both or while nobody
+ * knows. `FIRST_SCENES` lead, the rest are shuffled with `random`. The silly ones are not shown.
+ */
+export function scenesFor(said: Said, random: () => number = Math.random): WaitScene[] {
+  const fits = (s: WaitScene) => s.need !== "silly" && (said === "both" || said === "unsure" || s.need === said);
+  const first = FIRST_SCENES.map((id) => WAIT_SCENES.find((s) => s.id === id)).filter((s): s is WaitScene => s !== undefined && fits(s));
+  const rest = WAIT_SCENES.filter((s) => fits(s) && !FIRST_SCENES.includes(s.id));
+  // Fisher–Yates, so every order is as likely.
+  for (let i = rest.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [rest[i], rest[j]] = [rest[j], rest[i]];
+  }
+  return [...first, ...rest];
 }
 
 /** The name of a waiting scene's picture in the thought bubble, after the animal's. */
@@ -291,7 +278,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "Tapsi gießt die Blume. Plitsch, platsch!",
       brunnen: "Der Brunnen sprudelt. Hörst du es plätschern?",
       ballon: "Tapsi lässt den Luftballon los. Pfffft!",
-      regen: "Es regnet. Platsch, in die Pfütze!",
       schlauch: "Tapsi spritzt mit dem Schlauch. Die Ente wird nass!",
       ketchup: "Tapsi drückt den Ketchup. Drücken, drücken!",
       aufblasen: "Tapsi bläst den Ballon auf. Ganz fest pusten!",
@@ -306,20 +292,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "Der Wal pustet Wasser hoch. Pfffft!",
       trichter: "Tapsi gießt Wasser in den Trichter. Unten läuft es raus!",
       schmetterling: "Der Schmetterling drückt sich raus. Jetzt fliegt er!",
-      rutsche: "Tapsi rutscht ins Wasser. Platsch!",
-      schiffchen: "Das Schiffchen schwimmt den Bach hinunter. Plätscher, plätscher!",
       eimer: "Tapsi kippt den Eimer aus. Das Wasser läuft in den Graben!",
-      pusteblume: "Tapsi pustet die Pusteblume. Die Schirmchen fliegen!",
       pumpe: "Tapsi pumpt. Das Wasser läuft!",
       sanduhr: "Der Sand rieselt. Rieselt und rieselt!",
-      drachen: "Tapsi lässt los. Der Drachen fliegt hoch!",
       moehre: "Tapsi zieht ganz fest. Plopp, die Möhre ist raus!",
       kueken: "Das Küken drückt und drückt. Knack, da ist es!",
-      schubkarre: "Tapsi schiebt ganz fest. Und oben: auskippen!",
       honig: "Tapsi drückt die Honigflasche. Langsam kommt der Honig!",
       maulwurf: "Der Maulwurf drückt und drückt. Hallo, da ist er!",
       schildkroete: "Tapsi wartet ganz ruhig. Da kommt die Schildkröte raus!",
-      roehre: "Tapsi rutscht durch die Röhre. Huiii, da kommt Tapsi raus!",
       kastanie: "Tapsi drückt die Schale. Plopp, die Kastanie!",
       tanzen: "Mama und Papa tanzen!",
       jonglieren: "Papa jongliert mit Klopapier!",
@@ -377,7 +357,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "Tapsi waters the flower. Splish, splash!",
       brunnen: "The fountain bubbles. Can you hear it splashing?",
       ballon: "Tapsi lets the balloon go. Pfffft!",
-      regen: "It's raining. Splash, into the puddle!",
       schlauch: "Tapsi sprays with the hose. The duck gets wet!",
       ketchup: "Tapsi squeezes the ketchup. Squeeze, squeeze!",
       aufblasen: "Tapsi blows up the balloon. Blow really hard!",
@@ -392,20 +371,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "The whale blows water up high. Pfffft!",
       trichter: "Tapsi pours water into the funnel. It runs out at the bottom!",
       schmetterling: "The butterfly squeezes out. Now it flies!",
-      rutsche: "Tapsi slides into the water. Splash!",
-      schiffchen: "The little boat floats down the stream. Splish, splash!",
       eimer: "Tapsi tips out the bucket. The water runs into the ditch!",
-      pusteblume: "Tapsi blows the dandelion. The little parachutes fly!",
       pumpe: "Tapsi pumps. The water flows!",
       sanduhr: "The sand trickles. Trickle, trickle!",
-      drachen: "Tapsi lets go. The kite flies up high!",
       moehre: "Tapsi pulls really hard. Pop, the carrot is out!",
       kueken: "The chick pushes and pushes. Crack, there it is!",
-      schubkarre: "Tapsi pushes really hard. And at the top: tip it out!",
       honig: "Tapsi squeezes the honey bottle. Slowly the honey comes!",
       maulwurf: "The mole pushes and pushes. Hello, there it is!",
       schildkroete: "Tapsi waits very calmly. Here comes the turtle!",
-      roehre: "Tapsi slides through the tube. Wheee, here comes Tapsi!",
       kastanie: "Tapsi squeezes the shell. Pop, the chestnut!",
       tanzen: "Mommy and Daddy are dancing!",
       jonglieren: "Daddy juggles toilet paper!",
@@ -459,7 +432,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "塔普西给花浇水。哗啦，哗啦！",
       brunnen: "喷泉在冒水。听到哗哗的水声了吗？",
       ballon: "塔普西松开气球。噗——！",
-      regen: "下雨啦。啪嗒，踩进水坑！",
       schlauch: "塔普西用水管喷水。小鸭子湿啦！",
       ketchup: "塔普西挤番茄酱。挤呀，挤呀！",
       aufblasen: "塔普西吹气球。使劲吹！",
@@ -474,20 +446,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "鲸鱼把水喷得高高的。噗——！",
       trichter: "塔普西往漏斗里倒水。水从下面流出来啦！",
       schmetterling: "蝴蝶使劲钻出来。现在它飞啦！",
-      rutsche: "塔普西滑进水里。扑通！",
-      schiffchen: "小船顺着小溪漂下去。哗啦，哗啦！",
       eimer: "塔普西把水桶倒空。水流进小沟里啦！",
-      pusteblume: "塔普西吹蒲公英。小伞飞起来啦！",
       pumpe: "塔普西压水泵。水流出来啦！",
       sanduhr: "沙子往下流。流呀流呀！",
-      drachen: "塔普西松开手。风筝飞高啦！",
       moehre: "塔普西使劲拔。啵，胡萝卜拔出来啦！",
       kueken: "小鸡使劲顶呀顶。咔嚓，它出来啦！",
-      schubkarre: "塔普西使劲推。到了上面：倒出来！",
       honig: "塔普西挤蜂蜜瓶。蜂蜜慢慢流出来啦！",
       maulwurf: "鼹鼠使劲钻呀钻。你好，它出来啦！",
       schildkroete: "塔普西静静地等。小乌龟出来啦！",
-      roehre: "塔普西滑过管子。呜——塔普西出来啦！",
       kastanie: "塔普西捏开外壳。啵，栗子出来啦！",
       tanzen: "妈妈和爸爸在跳舞！",
       jonglieren: "爸爸用卫生纸玩抛接！",
@@ -542,7 +508,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "फूल को पानी मिल रहा है। छप, छप!",
       brunnen: "फ़व्वारा चल रहा है। कल-कल सुनो!",
       ballon: "गुब्बारा छूट गया। फ़्फ़्फ़्फ़!",
-      regen: "बारिश हो रही है। छपाक, पानी में!",
       schlauch: "पाइप से पानी की धार। बत्तख भीग गई!",
       ketchup: "केचप की बोतल दबाओ। दबाओ, दबाओ!",
       aufblasen: "गुब्बारा फुलाओ। ज़ोर से फूँको!",
@@ -557,20 +522,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "व्हेल पानी ऊपर उछालती है। फ़्फ़्फ़्फ़!",
       trichter: "कीप में पानी डालो। नीचे से निकल जाता है!",
       schmetterling: "तितली बाहर निकल रही है। अब वो उड़ती है!",
-      rutsche: "फिसलपट्टी से सीधे पानी में। छपाक!",
-      schiffchen: "नाव नदी में नीचे बहती है। छप, छप!",
       eimer: "बाल्टी उलटो। पानी नाली में बह जाता है!",
-      pusteblume: "सिंहपर्णी पर फूँको। छोटी छतरियाँ उड़ती हैं!",
       pumpe: "पंप चलाओ। पानी बहता है!",
       sanduhr: "रेत गिरती है। गिरती जाती है, गिरती जाती है!",
-      drachen: "डोर छोड़ो। पतंग ऊपर उड़ती है!",
       moehre: "ज़ोर से खींचो। टप, गाजर बाहर!",
       kueken: "चूज़ा ज़ोर लगाता है। कड़क, ये रहा!",
-      schubkarre: "ठेला ज़ोर से धकेलो। और ऊपर: उलट दो!",
       honig: "शहद की बोतल दबाओ। धीरे-धीरे शहद आता है!",
       maulwurf: "छछूंदर ज़ोर लगाता है। नमस्ते, ये रहा!",
       schildkroete: "चुपचाप इंतज़ार करो। कछुआ बाहर आता है!",
-      roehre: "पाइप वाली फिसलपट्टी। वूऊ, टैप्सी बाहर!",
       kastanie: "छिलका दबाओ। टप, शाहबलूत!",
       tanzen: "मम्मी और पापा नाच रहे हैं!",
       jonglieren: "पापा टॉयलेट पेपर उछाल-उछालकर करतब दिखा रहे हैं!",
@@ -632,7 +591,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "Tapsi riega la flor. ¡Plis, plas!",
       brunnen: "La fuente burbujea. ¿Oyes cómo chapotea?",
       ballon: "Tapsi suelta el globo. ¡Pffff!",
-      regen: "Llueve. ¡Plas, al charco!",
       schlauch: "Tapsi echa agua con la manguera. ¡El pato se moja!",
       ketchup: "Tapsi aprieta el kétchup. ¡Aprieta, aprieta!",
       aufblasen: "Tapsi infla el globo. ¡Sopla muy fuerte!",
@@ -647,20 +605,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "La ballena echa agua hacia arriba. ¡Pffff!",
       trichter: "Tapsi echa agua en el embudo. ¡Sale por abajo!",
       schmetterling: "La mariposa sale apretando. ¡Ahora vuela!",
-      rutsche: "Tapsi se tira al agua por el tobogán. ¡Plaf!",
-      schiffchen: "El barquito baja por el arroyo. ¡Plis, plas!",
       eimer: "Tapsi vacía el cubo. ¡El agua corre por la zanja!",
-      pusteblume: "Tapsi sopla el diente de león. ¡Las semillitas vuelan!",
       pumpe: "Tapsi bombea. ¡Sale el agua!",
       sanduhr: "La arena cae. ¡Cae y cae!",
-      drachen: "Tapsi suelta. ¡La cometa sube alto!",
       moehre: "Tapsi tira muy fuerte. ¡Plop, sale la zanahoria!",
       kueken: "El pollito empuja y empuja. ¡Crac, ahí está!",
-      schubkarre: "Tapsi empuja muy fuerte. Y arriba: ¡a vaciar!",
       honig: "Tapsi aprieta el bote de miel. ¡La miel sale despacito!",
       maulwurf: "El topo empuja y empuja. ¡Hola, ahí está!",
       schildkroete: "Tapsi espera con calma. ¡Ahí sale la tortuga!",
-      roehre: "Tapsi se desliza por el tubo. ¡Uiii, ahí sale Tapsi!",
       kastanie: "Tapsi aprieta la cáscara. ¡Plop, la castaña!",
       tanzen: "¡Mamá y papá bailan!",
       jonglieren: "¡Papá hace malabares con papel higiénico!",
@@ -718,7 +670,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "إبريق الري يسقي الزهرة. طش، طش!",
       brunnen: "النافورة تفور. خرير، خرير!",
       ballon: "البالون يفلت. بففففت!",
-      regen: "المطر ينزل. طش، في البركة!",
       schlauch: "الماء يرشّ من الخرطوم. البطة تبتلّ!",
       ketchup: "نضغط زجاجة الكاتشب. نضغط، نضغط!",
       aufblasen: "ننفخ البالون. ننفخ بقوة!",
@@ -733,20 +684,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "الحوت ينفث الماء عاليًا. بففففت!",
       trichter: "نصبّ الماء في القمع. يخرج من الأسفل!",
       schmetterling: "الفراشة تخرج من الشرنقة. والآن تطير!",
-      rutsche: "نتزحلق إلى الماء. طشّ!",
-      schiffchen: "القارب الصغير يسبح مع الجدول. طش، طش!",
       eimer: "نفرغ الدلو. الماء يجري في القناة!",
-      pusteblume: "ننفخ زهرة الهندباء. المظلات الصغيرة تطير!",
       pumpe: "نضخّ الماء. الماء يجري!",
       sanduhr: "الرمل ينساب. ينساب وينساب!",
-      drachen: "نترك الخيط. الطائرة الورقية تطير عاليًا!",
       moehre: "نشدّ بقوة. بوب، خرجت الجزرة!",
       kueken: "الكتكوت يدفع ويدفع. طق، ها هو!",
-      schubkarre: "ندفع العربة بقوة. وفي الأعلى: نفرغها!",
       honig: "نضغط زجاجة العسل. العسل ينزل ببطء!",
       maulwurf: "الخلد يدفع ويدفع. مرحبًا، ها هو!",
       schildkroete: "ننتظر بهدوء. ها هي السلحفاة تخرج!",
-      roehre: "نتزحلق في الأنبوب. ووووه، ها هو تابسي!",
       kastanie: "نضغط القشرة. بوب، الكستناءة!",
       tanzen: "ماما وبابا يرقصان!",
       jonglieren: "بابا يرمي ورق الحمّام ويلتقطه!",
@@ -801,7 +746,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       giesskanne: "Тапси поливает цветок. Кап-кап!",
       brunnen: "Фонтан журчит. Слышишь, как плещется?",
       ballon: "Тапси отпускает шарик. Пффф!",
-      regen: "Идёт дождь. Шлёп – в лужу!",
       schlauch: "Тапси брызгает из шланга. Уточка мокрая!",
       ketchup: "Тапси жмёт кетчуп. Жмём, жмём!",
       aufblasen: "Тапси надувает шарик. Дуем сильно-сильно!",
@@ -816,20 +760,14 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       wal: "Кит пускает фонтан. Пффф!",
       trichter: "Тапси льёт воду в воронку. Внизу она вытекает!",
       schmetterling: "Бабочка выбирается наружу. Теперь она летит!",
-      rutsche: "Тапси съезжает в воду. Плюх!",
-      schiffchen: "Кораблик плывёт вниз по ручью. Буль-буль!",
       eimer: "Тапси выливает ведро. Вода бежит в канавку!",
-      pusteblume: "Тапси дует на одуванчик. Парашютики летят!",
       pumpe: "Тапси качает насос. Вода течёт!",
       sanduhr: "Песок сыплется. Сыплется и сыплется!",
-      drachen: "Тапси отпускает. Змей летит высоко!",
       moehre: "Тапси тянет сильно-сильно. Чпок – вот и морковка!",
       kueken: "Цыплёнок толкает и толкает. Крак – вот он!",
-      schubkarre: "Тапси толкает сильно-сильно. А наверху – высыпаем!",
       honig: "Тапси жмёт бутылочку с мёдом. Медленно течёт мёд!",
       maulwurf: "Крот толкает и толкает. Привет, вот он!",
       schildkroete: "Тапси спокойно ждёт. Вот выходит черепаха!",
-      roehre: "Тапси едет через трубу. У-ух, вот и Тапси!",
       kastanie: "Тапси сжимает скорлупку. Чпок – каштан!",
       tanzen: "Мама и папа танцуют!",
       jonglieren: "Папа жонглирует туалетной бумагой!",

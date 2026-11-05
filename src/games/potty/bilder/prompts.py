@@ -1,5 +1,5 @@
 """All prompts of the potty story (only Tapsi the fox). python3 prompts.py <stage> fox > jobs.json"""
-import json, sys
+import json, os, sys
 
 STYLE = ("Children's picture-book illustration for 2–4 year olds. Soft, flat, rounded shapes with thick dark-purple outlines (#2a1e5c), "
          "bright friendly colours, gentle shading. Simple, uncluttered background. No text, no letters, no numbers, no speech bubbles, no frames. ")
@@ -72,7 +72,7 @@ def bathroom(a):
    "abwischen": BATH_KEEP + cast(a) + f"Now this happens: {k} stands next to the potty, bent forward a little, and wipes the bottom from behind with a piece of toilet paper, the long tail lifted; " + NO_NUDITY + "Papa holds out the toilet paper roll and smiles. Mama watches and smiles. " + END,
    "hoch": BATH_KEEP + cast(a) + f"Now this happens: {k} stands next to the potty and pulls the trousers up, big proud smile. Mama and Papa stand together and smile. " + END,
    "abziehen": BATH_KEEP + cast(a) + f"Now this happens: {k} stands on tiptoes at the toilet and presses the flush button on the toilet with one paw; Papa holds the empty potty, just emptied into the toilet, so there is no potty on the floor any more – only the one in Papa's paws; the water in the toilet swirls. Mama stands beside them and smiles. Trousers are up. " + END,
-   "waschen": BATH_KEEP + cast(a) + f"Now this happens: {k} stands on a small step stool at the sink and washes the paws under running water with lots of white soap foam; Mama stands behind and helps, Papa holds a towel ready. Trousers are up. " + END,
+   # The first one had a second tap floating in the air in the middle of the room: the water must come from the sink's own tap.
    "party": BATH_KEEP + cast(a) + f"Now this happens: {k} jumps for joy in the middle of the bathroom with both arms up, Mama and Papa jump and cheer too, colourful confetti in the air. Trousers are up. " + END,
   }
 
@@ -120,7 +120,7 @@ MOVE = {
  "fertig-pipi": "Mama and Papa jump a little, the child's arm points higher",
  "fertig-kaka": "Mama and Papa jump a little, the child's arm points higher",
  "abziehen": "the water in the toilet swirls further, the child's paw is lifted from the button",
- "waschen": "the paws rub the other way, more foam bubbles",
+ "waschen": "the paws rub the other way under the sink's running water, more foam bubbles",
  "party": "everyone is in the air a bit higher, the confetti has moved",
  "spielen": "Tapsi now turns its head towards the door and looks at Mama and Papa with open eyes, one paw lifted holding a red block; Mama waves with her free paw",
  "warten-giesskanne": "the watering can is tipped further, more water pours, the plant has a new flower",
@@ -178,14 +178,14 @@ THOUGHTS = {
  "giesskanne": "Outside in a sunny garden, Tapsi waters a big yellow sunflower with a small red watering can; a thin stream of water pours from the spout onto the flower. Tapsi smiles.",
  "brunnen": "In a sunny park, a small round stone fountain bubbles: water shoots up in a high arc and splashes into its basin. Tapsi stands at the edge and holds one paw into the falling water, laughing.",
  "ballon": "Outside under a blue sky, Tapsi has just let go of a big red balloon: it whizzes up and away, twisting, with a little puff of air behind it. Tapsi looks up after it, mouth open in delight.",
- "regen": "Outside, a small grey cloud lets it rain onto a few flowers; Tapsi in yellow rain boots jumps into a big puddle, water splashing up. Tapsi laughs.",
  "schlauch": "In a sunny garden, Tapsi holds a green garden hose and sprays a long arc of water into a small blue paddling pool where a yellow rubber duck floats. Tapsi grins.",
  # Kaka: things that are pressed until something comes out.
  "ketchup": "At a small table outside, Tapsi squeezes a big red ketchup bottle with both paws, pressing hard with rosy cheeks; a long red stripe of ketchup comes out onto a plate of noodles.",
  "aufblasen": "Outside on a meadow, Tapsi blows up a big red balloon, cheeks puffed up round and red with effort, pressing hard, eyes squeezed.",
  "huhn": "On a farm, a plump brown hen sits in a straw nest and presses with a red face, eyes squeezed shut; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
  "wasserrad": "At a sunny water playground, a stream of water runs down a little wooden channel and turns a small wooden water wheel, splashing; Tapsi kneels beside it and watches, delighted, one paw pointing at the wheel.",
- "elefant": "At the zoo, a friendly grey elephant sprays a long arc of water from its trunk high into the air, drops sparkling; Tapsi stands next to the fence and looks up, laughing.",
+ "elefant": ("At the zoo, a friendly grey elephant sprays a long arc of water from its trunk high into the air, drops sparkling, falling back down far away from Tapsi; "
+             "Tapsi stands next to the fence, completely dry, and looks up, laughing; no water on Tapsi, no puddle on the ground."),
  "wal": "At the seaside, a friendly blue whale in the calm sea blows a tall fountain of water up from its head; Tapsi stands on the sandy beach in front and waves at it, delighted.",
  "trichter": "Outside at a small table, Tapsi pours water from a red cup into a big yellow funnel stuck in a clear bottle; the water runs out at the bottom of the funnel into the bottle. Tapsi watches closely, smiling.",
  "tee": "On a picnic blanket on a meadow, Tapsi holds a small white teapot with blue dots in both paws and pours a stream of tea into a little cup in front of a brown teddy bear; Tapsi smiles.",
@@ -194,59 +194,50 @@ THOUGHTS = {
  "erbsen": "In a vegetable garden, Tapsi presses a long green pea pod open with both thumbs, pressing hard with rosy cheeks; round green peas pop out of it and jump into the air above a small wooden bowl.",
  # Waiting until something comes out, without pressing.
  "schmetterling": "In a garden, a butterfly chrysalis hangs from a twig; a colourful butterfly is pressing its way out of it, half out, its wings still folded; Tapsi crouches below and watches, excited, both paws at its cheeks.",
- "tunnel": ("On a playroom floor, a wooden toy railway runs through a small toy tunnel in a green felt hill; only the back end of a red toy train still sticks out of the tunnel's left side, "
-            "the right side of the tunnel is an empty dark opening; Tapsi, in its light blue T-shirt and blue trousers, kneels beside it and peeks at the tunnel, curious."),
+ # The user wanted only the train coming out, never going in: the hill starts at the picture's left edge, its entrance unseen.
+ "tunnel": ("On a playroom floor, a big green felt hill with a toy tunnel through it fills the left third of the picture and runs off the picture's left edge, "
+            "so the tunnel's entrance is never seen; only its right opening shows, a round dark opening, empty, with wooden toy rails running out of it to the right. "
+            "No train is visible at all yet. Tapsi, in its light blue T-shirt and blue trousers, kneels on the floor to the right of the opening and peeks into it, curious, waiting."),
  # Pipi, added later (H-17 … H-34).
- "rutsche": "At a sunny outdoor pool, Tapsi whizzes down a curved blue water slide on its bottom, arms up, laughing; water runs down the slide into a small pool below.",
- "schiffchen": "At a little stream in a green meadow, Tapsi kneels on the bank and sets a white paper boat on the water; the clear water flows past with small ripples. Tapsi smiles.",
  "eimer": "On a sunny beach, Tapsi tips a small red bucket of water into the moat round a big sandcastle; the water pours out of the bucket into the moat. Tapsi watches, delighted.",
- "pusteblume": "On a green meadow, Tapsi holds a big round white dandelion clock and blows on it with round cheeks; a few little white seed parachutes fly off into the blue sky.",
  "pumpe": "In a garden, Tapsi pushes down the handle of an old green hand water pump with both paws; a stream of water pours from the spout into a small red watering can below.",
  "sanduhr": "On a little table, a big wooden hourglass with yellow sand stands upright, most sand still in the top; a thin stream of sand trickles into the bottom. Tapsi sits at the table, chin on its paws, and watches.",
- "drachen": "On a windy green meadow under a blue sky, Tapsi holds the string of a colourful kite with a long tail of bows; the kite rises high into the sky. Tapsi looks up, mouth open in delight.",
  # Kaka, added later (H-23 … H-39).
  "moehre": "In a vegetable garden, Tapsi pulls hard at the green leaves of a carrot stuck in the soil with both paws, leaning back, eyes squeezed, rosy cheeks; only the top of the orange carrot shows.",
  "kueken": "In a straw nest on a farm, a big white egg has a crack across it and a small piece of shell lifts off the top; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
- "schubkarre": "In an autumn garden, Tapsi pushes a small green wheelbarrow full of colourful leaves up a little grassy hill, leaning forward, pushing hard, rosy cheeks.",
  "honig": "At a small table, Tapsi squeezes a squeezy honey bottle with both paws over a slice of bread on a plate, pressing hard with rosy cheeks; a thick golden drop of honey just comes out of the tip.",
  "maulwurf": "On a green meadow, a small brown mound of earth bulges up, earth crumbs rolling down; Tapsi kneels in front of it and stares, curious, both paws on its knees.",
- "schildkroete": "On a green lawn, a friendly green tortoise has pulled its head and legs into its round shell; Tapsi lies on its tummy in front of it, chin on its paws, and waits calmly.",
- "roehre": "On a playground, a big curly red tube slide comes down from a small wooden tower; Tapsi sits at the top of the tower, legs already in the tube's upper opening, ready to slide, smiling; the round opening at the bottom is empty.",
+ "schildkroete": ("On a green lawn, a friendly green tortoise has pulled its head and all four legs completely inside its round shell: no head, no face, no eyes and no legs are visible at all, "
+                  "only the closed round shell resting on the grass. Tapsi lies on its tummy in front of it, chin on its paws, and waits calmly."),
  "kastanie": "Under a chestnut tree in autumn, Tapsi presses a spiky green chestnut case with both thumbs, pressing hard with rosy cheeks; the case has just begun to split open.",
 }
 THOUGHT_MOVES = {
  "giesskanne": "the watering can is tipped further, more water pours, the sunflower nods a little",
  "brunnen": "the water arc is a little higher, new splashes in the basin and on Tapsi's paw",
  "ballon": "the balloon is further up and smaller, twisting the other way",
- "regen": "Tapsi has landed, a big splash of the puddle flies up, more raindrops fall",
  "schlauch": "the water arc reaches further, the rubber duck bobs and splashes",
  "ketchup": "the bottle is squeezed flatter, the ketchup stripe on the noodles is much longer",
  "aufblasen": "the balloon is much bigger, the cheeks even rounder",
  "huhn": "plop: the hen has stood up a little, a white egg lies in the straw under it; Tapsi cheers with both arms up",
  "knete": "the dough sausages are much longer and curl onto the table, Tapsi presses further down",
  "wasserrad": "the water wheel has turned on (its paddles stand at other places), new splashes fly up, Tapsi claps both paws",
- "elefant": "the elephant has lifted its trunk higher, the water arc is longer and splashes down near Tapsi, Tapsi holds both paws up laughing",
+ "elefant": ("the elephant holds its trunk straight up and blows a tall fountain of water high up into the sky above itself, the drops fall back down onto the elephant, far away from Tapsi; "
+             "Tapsi stays completely dry, no water on Tapsi and no puddle anywhere on the ground; Tapsi only watches and claps both paws, laughing"),
  "wal": "the water fountain is much higher and splashes into the sea around the whale, Tapsi jumps with both arms up",
  "trichter": "the cup is tipped further, more water swirls in the funnel and the bottle is half full, Tapsi claps both paws",
  "tee": "the teapot is tipped further, the cup in front of the teddy is full to the brim with a little splash, Tapsi laughs",
  "spritzbeutel": "Tapsi has lifted its head and smiles proudly with open eyes and an open mouth, the cheeks no longer puffed; the piping bag is squeezed flat and empty; a second tall white cream swirl now sits on the cake next to the first",
  "erbsen": "the pod is wide open and empty, the peas have landed in the bowl, Tapsi laughs with both arms up",
  "schmetterling": "the butterfly is out and spreads its big colourful wings above the empty chrysalis, flying up; Tapsi cheers with both arms up",
- "tunnel": "the back of the train is gone from the left side; the red toy engine now comes out of the right side of the tunnel, Tapsi points at it and cheers",
- "rutsche": "Tapsi has landed in the pool at the bottom of the slide, a big splash of water flies up around Tapsi, who laughs with both arms up",
- "schiffchen": "the paper boat has floated a good way further down the stream, Tapsi waves after it with one paw",
+ "tunnel": "a red toy engine now comes out of the tunnel's right opening, its front already out on the rails, Tapsi points at it and cheers",
  "eimer": "the bucket is tipped upside down and empty, the water has run all the way round the sandcastle's moat, Tapsi claps both paws",
- "pusteblume": "the dandelion is bare, almost all seed parachutes fly high and far across the sky, Tapsi laughs with open eyes",
  "pumpe": "the pump handle is pushed down further, much more water pours, the watering can is half full and splashing",
  "sanduhr": "much more sand now lies in the bottom half and less is in the top, the sand stream still trickles",
- "drachen": "the kite has risen much higher and further away, smaller now, its tail fluttering the other way",
  "moehre": "plop: the whole long orange carrot is out of the soil and held up high in Tapsi's paws, Tapsi cheers, a few crumbs of earth fly",
  "kueken": "the shell has broken open in two halves and a fluffy yellow chick sits in the nest, beak open, peeping; Tapsi cheers with both arms up",
- "schubkarre": "Tapsi stands on top of the little hill and has tipped the wheelbarrow forward, the leaves tumble out and fly, Tapsi laughs",
  "honig": "a long thick golden stream of honey now curls onto the bread, Tapsi smiles proudly with open eyes",
  "maulwurf": "a small dark-grey mole with pink paws and a pink nose has popped its head out of the top of the mound, Tapsi waves at it with one paw, delighted",
- "schildkroete": "the tortoise has stuck its smiling head and its four legs out of the shell, Tapsi lifts its head and smiles at it",
- "roehre": "Tapsi is gone from the top of the tower and now whizzes out of the tube's bottom opening, arms up, laughing",
+ "schildkroete": "the tortoise stretches its smiling head far out of the shell on a long neck, as far as it can, and its four legs are out too; Tapsi lifts its head and smiles at it, delighted",
  "kastanie": "plop: the case has burst open in two halves and a shiny brown chestnut jumps out into the air above Tapsi's paws, Tapsi laughs",
 }
 
@@ -260,20 +251,40 @@ def second_of(what):
           "same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. "
           f"Nothing appears, disappears or moves except this small movement: {what}. No text, no letters.")
 
-raw = lambda a, n: f".image-raw/{a}-{n}.png"
+# The raw picture when this checkout has it, else the game's own (the raw ones of the first rounds are gone).
+raw = lambda a, n: f".image-raw/{a}-{n}.png" if os.path.exists(f".image-raw/{a}-{n}.png") else f"src/games/potty/bilder/{a}-{n}.webp"
 # A third argument names only some thoughts, so new ones are made without drawing the old ones again: think fox tee,erbsen
 wanted = lambda n: len(sys.argv) < 4 or n in sys.argv[3].split(",")
 
+# Washing hands is drawn closer, from the bathroom's sink corner: from the whole room (fox-bad) the Lite model kept the
+# family in the middle, far from the sink at the right edge, and gave Tapsi a tap of its own floating in the air there,
+# or a second basin – five tries. The reference is fox-bad cut to the sink corner:
+#   sharp("src/games/potty/bilder/fox-bad.webp").extract({ left: 541, top: 150, width: 835, height: 470 }).resize(1376, 774)
+#   → .image-raw/ref/bad-sink-wide.png
+SINK_REF = ".image-raw/ref/bad-sink-wide.png"
+def wash(a):
+  k = CAST[a]["kid_short"]
+  return ("Redraw this exact picture as a later moment of the same story: a closer view of the right corner of the family bathroom. "
+    "Keep the place exactly as it is: the same light blue tiled walls, the round mirror, the one small white sink with its tap and its pipe below, "
+    "the green potted plant, the wooden floor, the same camera framing (no zoom, no shift), the same colours and line style. "
+    "Only ONE sink, ONE basin and ONE tap in the whole picture, fixed on the wall where they are – nothing added to the walls, no tap, pipe or water in the air anywhere else. "
+    + cast(a) +
+    f"Now this happens: {k} stands on a small wooden step stool right in front of the sink, facing it (seen from the side, turned to the right towards the wall), "
+    "and holds both paws inside the basin right under the water that runs from the sink's tap, with lots of white soap foam on the paws. "
+    "Mama stands right behind Tapsi with a paw on its shoulder, Papa stands a step further left holding a towel ready for later. Trousers are up. "
+    "Only ONE fox child in the whole picture: Tapsi is at the sink and nowhere else. " + END)
+
 def stage(st, a):
+  if st == "wash": return [job(a, "waschen", wash(a), SINK_REF)]
   if st == "kitchen-first": return [job(a, "essen", kitchen(a)["essen"])]
   if st == "kitchen": return [job(a, n, p, raw(a, "essen")) for n, p in kitchen(a).items() if n != "essen"]
   if st == "bath-first": return [job(a, "bad", bathroom_first(a), raw(a, "rufen"))]  # a new room
-  if st == "bath": return [job(a, n, p, raw(a, "bad")) for n, p in bathroom(a).items()]
+  if st == "bath": return [job(a, n, p, raw(a, "bad")) for n, p in bathroom(a).items() if wanted(n)]
   if st == "play-first": return [job(a, "spielen", playroom_first(a), f"src/games/potty/bilder/{a}-rufen.webp")]  # a new room
   if st == "frames-play": return [job(a, "spielen-b", second("spielen"), raw(a, "spielen"))]
   if st == "wait": return [job(a, n, p, raw(a, "sitzen")) for n, p in waiting(a).items()]
   if st == "frames-kitchen": return [job(a, n + "-b", second(n), raw(a, n)) for n in ["essen", "trinken", "blase", "bauch", "rufen"]]
-  if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen", "spielen"] and not n.startswith("warten-")]
+  if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen", "spielen"] and not n.startswith("warten-") and wanted(n)]
   if st == "frames-wait": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n.startswith("warten-")]
   # From the game's own pictures: the raw ones of the first round are gone.
   if st == "think": return [job(a, "denken-" + n, thought(a, w), f"src/games/potty/bilder/{a}-essen.webp", "4:3", "1200") for n, w in THOUGHTS.items() if wanted(n)]

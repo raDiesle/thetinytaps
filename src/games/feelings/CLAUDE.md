@@ -51,7 +51,9 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
 - A page of the story only tells, and **must never look like a scene to choose in**: a picture-book page – the picture
   printed on the paper with its edge fading into it, no white mat, no cards, no question, no ✓ or ✗; the text beside it
   (below it on an upright screen) in the book's serif letters with a big first letter. The whole page is one tap (or any
-  key) to the scene, with ▶ under the text; never a timer. The dots on top are the day's scenes.
+  key) to the scene, with ▶ in the screen's bottom right corner as in the scenes (see „▶ has one place“); never a timer.
+  The dots on top are the day's scenes. The grown-ups' notes (the text to read out, the loudspeaker) are not on a page:
+  there they change nothing and only lay over ▶ (user feedback, November 2026).
 - A page never says how the scene before it ended: a scene asks another of its steps each time it is played
   (`settings.steps`, shared with the groups), so „Der Turm steht wieder“ would be wrong two times out of three. It says
   what comes next, and nothing in it may contradict the next scene's first picture (who is there, the place, the
@@ -68,8 +70,8 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
   „Nochmal“ in the narrow column of words, never past the page's edge. Look at 844×390, 1024×768 and 1280×720.
 
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
-tell the scenes to the child in their own words. So while it plays, a wooden loudspeaker with a speech bubble stands in
-the screen's bottom right corner beside the book of the text to read out (`VoiceSwitch.tsx`, drawn like the shelf's
+tell the scenes to the child in their own words. So while a scene plays (never on a page of a day's story), a wooden
+loudspeaker with a speech bubble stands at the screen's bottom, left of ▶, beside the book of the text to read out (`VoiceSwitch.tsx`, drawn like the shelf's
 loudspeaker for the music). One tap on it (never held: held, it was too slow for grown-ups, user feedback, November
 2026) switches off everything said – the scene,
 the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; tapped again, it speaks again. The sounds
@@ -100,7 +102,7 @@ group once; each story remembers its next step (`settings.steps`), so the next p
 other choices. After the last scene of a pass come „Nochmal“ (the group again) and „Weiter“ (the next group), which
 writes the next group's name under it (`GameEnd showNext`): where „Weiter“ changes the feeling, grown-ups see which one
 comes before they tap (user feedback, November 2026).
-The dots at the top are the pass's scenes.
+The dots at the top are the pass's scenes, tapped to play one again (see „The dots go back“).
 
 **One tap chooses** (user feedback, November 2026): no first tap that only shows a card big, no ring waiting for a
 second tap, no hand tapping, no way back from a card. The not-so-good card shows big with a still red frame, a cross on
@@ -108,11 +110,23 @@ the corner and what it leads to, heard, while the answer says why; then the star
 out and the good one left. The good card gets a still green frame with a tick and a laugh („Juhu!“), then its picture.
 Keys: the left arrow picks the not-so-good idea, every other key the good one.
 
+**▶ has one place, and the whole screen goes on (user feedback, November 2026):** wherever the game waits for a tap
+to go on – a scene told, a chosen idea's last picture, a page of a day's story, „Wie geht's dir?“'s face to copy – ▶
+stands at the same spot, the screen's bottom right corner, and a tap anywhere on the screen goes on (`GoOn` in
+`shared.tsx`), except within reach of anything else that can be tapped (the dots, the grown-ups' notes, ✕), whose taps
+stay theirs. Nothing else ever stands in that corner: the grown-ups' notes stand left of it (`feelings.test.ts`). ▶ on
+the picture's corner and ▶ under a page's text moved from screen to screen and lay under the notes.
+
+**The dots go back (user wish, November 2026):** the dots at the top are tapped – a ✓ plays that scene again with the
+choice it played this visit, the yellow one starts the scene now from its beginning; the dots still to come are not
+tapped. All of them are plain targets (`data-tap=""`), never `"done"`, so a tap just next to one finds the nearest, not
+the next one to come.
+
 **A scene goes on with a tap, never by a timer (user feedback, November 2026):** the starting picture is told and
-then waits, with ▶ in its bottom right corner; one tap anywhere on the picture (or any key) brings the two cards. The
+then waits, with ▶; one tap anywhere (or any key) brings the two cards. The
 narration goes on meanwhile. Once the cards are there, tapping the big picture does nothing. After the good choice the
 story goes on by itself only within the scene (the good idea's picture, the happy end); then that picture waits with ▶
-again, and only a tap on it (or any key) brings the next scene (`onDone`; user feedback, November 2026: it went on by
+again, and only a tap (or any key) brings the next scene (`onDone`; user feedback, November 2026: it went on by
 itself before one could look). The last scene of a pass waits with its end buttons instead.
 
 **Calm (user feedback, November 2026):** nothing floats up (no hearts, stars, 💢, 💥, 💧, 💤, 🎉), nothing hops,
@@ -169,6 +183,10 @@ bear has the feeling and
 helps himself (a body trick, saying how he feels, doing something else); the feeling itself is never the not-so-good
 idea, only what hurts someone or breaks something is (hiding when embarrassed is the feeling, so its not-so-good idea is
 playing on in wet trousers).
+A good idea does something that helps – comforts, calms, mends, shares – never only looks at what happened in another
+way: „Zwei Hälften zeigen“ („Jetzt hab ich zwei Kekse!“) made no sense to grown-ups and was taken out; the broken cookie
+is shared with the fox instead (user feedback, November 2026). Pictures are named by a step's place (`cookie-2`,
+`cookie-nein-2`), so a step taken out renames the pictures of the steps after it, in `bilder/` and `bilder/README.md`.
 Saying how one feels is a good idea only where saying it changes something (it brings comfort, stops someone, asks for
 help). Where the feeling asks for something to do – bored on a rainy day – the good idea is the doing itself, best
 something creative played together with what the picture shows (cooking a rain soup with the pots, a blanket cave, a
@@ -300,7 +318,9 @@ The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arab
 page, `src/lib/language.ts`): start screen, captions and everything read aloud. The German data (`bear.ts`,
 `kita.ts`, `selbst.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru;
 the stories of `selbst.ts` are in `kita.<lang>.ts` too, after the kindergarten's) hold only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
-`situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). Small texts
+`situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). The days' pages of the story are in `days.<lang>.ts` (by day id, one page per scene in the German order, and the
+day's end), laid over by `dayIn`; a scene added to or moved within a day changes every `days.<lang>.ts` too, or that
+day's entry there is deleted (it is then told in German; `feelings.test.ts` checks the pages match). Small texts
 (the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
 Everything said is played from its ElevenLabs recording (`useVoice` in `shared.tsx`, files in `stimme/`), recorded in
 German only so far (November 2026): a line in another language stays silent until the user asks for its recordings,

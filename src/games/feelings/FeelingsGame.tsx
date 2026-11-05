@@ -39,12 +39,23 @@ export function FeelingsGame() {
       level={
         days.length > 0 && (
           <Choice<FeelingsOrder>
-            label={t({ de: "Geschichten" })}
+            label={t({ de: "Geschichten", en: "Stories", zh: "故事", hi: "कहानियाँ", es: "Historias", ar: "القصص", ru: "Истории" })}
             value={byDay ? "tage" : "gefuehle"}
             onChange={(order) => update({ order })}
             options={[
-              { value: "tage", label: t({ de: "📅 Tage" }) },
-              { value: "gefuehle", label: t({ de: "😊 Nach Gefühlen" }) },
+              { value: "tage", label: t({ de: "📅 Tage", en: "📅 Days", zh: "📅 按天", hi: "📅 दिन", es: "📅 Días", ar: "📅 الأيام", ru: "📅 По дням" }) },
+              {
+                value: "gefuehle",
+                label: t({
+                  de: "😊 Nach Gefühlen",
+                  en: "😊 By feeling",
+                  zh: "😊 按心情",
+                  hi: "😊 भावनाओं के हिसाब से",
+                  es: "😊 Por emoción",
+                  ar: "😊 حسب الشعور",
+                  ru: "😊 По чувствам",
+                }),
+              },
             ]}
           />
         )

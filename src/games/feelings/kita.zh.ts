@@ -294,19 +294,13 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "打翻杯子", answer: "嗯，现在牛奶洒到小狐狸身上了。还是紧紧抱住你的毛绒玩具吧。" },
       },
       {
-        caption: "看看两半",
-        question: "小熊还有一点点难过。他可以怎么做？",
-        beats: [{ narration: "他看看两半饼干。一，二！", line: "现在我有两块饼干啦！" }],
-        instead: { caption: "把饼干捏碎", answer: "嗯，现在饼干全没了。还是看一看吧：现在你有两块啦！" },
-      },
-      {
         caption: "和小狐狸分享",
         question: "小狐狸没有饼干了。小熊可以怎么做？",
         beats: [{ narration: "小熊把一半给小狐狸。", line: "给你！" }, { line: "谢谢你，小熊！" }],
         instead: { caption: "吐舌头", answer: "嗯，现在小狐狸难过了。还是和他分享吧。" },
       },
     ],
-    outro: [{ narration: "真棒！难过没关系。抱紧毛绒玩具，换个样子看，分享。" }],
+    outro: [{ narration: "真棒！难过没关系。抱紧毛绒玩具，分享。" }],
     endCaption: "小熊和小狐狸各吃一半",
   },
   baby: {
@@ -691,31 +685,31 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
     endCaption: "小熊又睡着了，大熊坐在床边",
   },
   lost: {
-    title: "难过，毛绒玩具不见了",
-    caption: "毛绒玩具不见了，小熊哭了",
-    intro: [{ narration: "小熊要去睡觉了。" }, { narration: "可是他的毛绒玩具不见了！他好难过。" }],
+    title: "难过，兔子玩偶不见了",
+    caption: "兔子玩偶不见了，小熊哭了",
+    intro: [{ narration: "小熊要去睡觉了。" }, { narration: "可是他的兔子玩偶不见了！他好难过。" }],
     steps: [
       {
         caption: "说“我很难过”",
-        question: "毛绒玩具不见了。小熊可以怎么做？",
-        beats: [{ narration: "小熊说：", line: "我很难过。我的毛绒玩具不见了。" }, { line: "哦。真让人难过。" }],
+        question: "他的兔子玩偶不见了。小熊可以怎么做？",
+        beats: [{ narration: "小熊说：", line: "我很难过。我的兔子玩偶不见了。" }, { line: "哦。真让人难过。" }],
         instead: { caption: "把玩具箱倒空", answer: "嗯，现在东西乱成一团。还是说说你的感受吧。" },
       },
       {
         caption: "自己找",
-        question: "毛绒玩具会在哪儿呢？小熊可以怎么做？",
+        question: "兔子玩偶会在哪儿呢？小熊可以怎么做？",
         beats: [{ narration: "他自己找。在床底下吗？没有。" }, { narration: "在篮子里？在这儿！" }],
-        instead: { caption: "拿走小狐狸的", answer: "嗯，现在小狐狸难过了。还是自己找吧。" },
+        instead: { caption: "拿走小狐狸的小狗玩偶", answer: "嗯，这是小狐狸的小狗玩偶。现在他难过了。还是找你的兔子玩偶吧。" },
       },
       {
         caption: "紧紧抱住",
-        question: "毛绒玩具找到了！小熊可以怎么做？",
+        question: "兔子玩偶找到了！小熊可以怎么做？",
         beats: [{ narration: "他紧紧地抱住它。", line: "原来你在这儿！" }],
         instead: { caption: "扔到角落", answer: "嗯，现在它又孤零零地躺在角落里了。还是紧紧抱住它吧。" },
       },
     ],
     outro: [{ narration: "真好！说出你的感受，自己找，紧紧抱住。" }],
-    endCaption: "小熊在床上抱着毛绒玩具",
+    endCaption: "小熊在床上抱着兔子玩偶",
   },
   join: {
     title: "难过，不让一起玩",
@@ -776,8 +770,12 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
     caption: "小熊自己爬到了攀爬架最高处",
     intro: [{ narration: "小熊在爬攀爬架。全靠自己！" }, { narration: "现在他爬到上面了。他好骄傲！" }],
     steps: [
-      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
-      null,
+      {
+        caption: "喊“你也上来吧！”",
+        question: "小熊爬到最上面了。他可以怎么做？",
+        beats: [{ narration: "他对小狐狸喊：", line: "你也上来吧！" }, { line: "好呀，我来了！" }],
+        instead: { caption: "把小狐狸推下去", answer: "嗯，推人会疼。还是喊：你也上来吧！" },
+      },
       {
         caption: "欢呼",
         question: "小熊开心极了。他可以怎么做？",
@@ -791,6 +789,7 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "跳下去", answer: "嗯，从那么高跳下去会疼。还是教小狐狸怎么爬吧。" },
       },
     ],
+    outro: [{ narration: "好耶！喊一喊，欢呼，帮忙。现在两个都好骄傲。" }],
     endCaption: "小熊和小狐狸一起在最上面",
   },
   miss: {
@@ -852,8 +851,12 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
     caption: "外面在下雨，小熊好无聊",
     intro: [{ narration: "外面在下雨。小熊躺在沙发上。" }, { narration: "他好无聊啊！" }],
     steps: [
-      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
-      null,
+      {
+        caption: "和小狐狸玩做饭",
+        question: "下雨了。小熊可以怎么做？",
+        beats: [{ narration: "他拿来锅，和小狐狸一起煮一锅雨水汤。搅一搅，搅一搅！" }, { line: "嗯，真好吃！现在我来做饭！" }],
+        instead: { caption: "揪小狐狸的耳朵", answer: "嗯，这样小狐狸会疼。还是和他一起玩吧。" },
+      },
       {
         caption: "搭一个小窝",
         question: "在家里可以玩什么？小熊可以怎么做？",
@@ -867,6 +870,7 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "踩扁纸箱", answer: "嗯，现在纸箱坏了。还是把它变成汽车吧。" },
       },
     ],
+    outro: [{ narration: "真棒！无聊的时候会想出好主意：一起做饭，搭小窝，开汽车。" }],
     endCaption: "小熊和小狐狸坐纸箱汽车",
   },
   empathy: {
@@ -913,8 +917,14 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "他深深地呼一口气。呼——" }, { narration: "心跳慢下来了。" }],
         instead: { caption: "打翻蛋糕", answer: "嗯，现在蛋糕坏了。还是深深地呼一口气吧。" },
       },
-      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
-      null,
+      {
+        caption: "和小狐狸一起吃蛋糕",
+        question: "小狐狸在生日桌旁等着。小熊可以怎么做？",
+        beats: [{ narration: "他走到桌边找小狐狸。他们一起吃蛋糕。" }, { line: "嗯，真好吃！" }],
+        instead: { caption: "对小狐狸大吼", answer: "嗯，现在小狐狸也吓了一跳。还是走过去和他一起吃蛋糕吧。" },
+      },
     ],
+    outro: [{ narration: "真棒！捂住耳朵，深深呼气，然后一起吃蛋糕。" }],
+    endCaption: "小熊和小狐狸一起吃蛋糕",
   },
 };

@@ -1,3 +1,5 @@
+import type { Localized } from "@/lib/language";
+
 // The times a grown-up can set beyond the row's minutes (H-59, H-60): any length from 10 seconds to 3 hours, or a
 // clock time to end at. Plain functions, so the tests can check the typing and the arithmetic without a screen.
 
@@ -79,12 +81,36 @@ export function ownTimeMs(time: OwnTime, now: Date): number | "past" {
   return end > now.getTime() ? end - now.getTime() : "past";
 }
 
-/** A length as a grown-up reads it on a slip: „45 Sek.“, „7 Min. 30 Sek.“, „20 Min.“, „1 Std.“, „1 Std. 30 Min.“. */
-export function lengthLabel(seconds: number) {
+/** The languages a slip's length is written in. */
+export type LengthLanguage = "de" | "en" | "zh" | "hi" | "es" | "ar" | "ru";
+
+/** Arabic counts 3 to 10 with the plural, other numbers with the singular („3 دقائق“, „15 دقيقة“). */
+const arabic = (n: number, one: string, few: string) => `${n} ${n >= 3 && n <= 10 ? few : one}`;
+
+/** How each language writes hours, minutes and seconds on a slip, and what joins them. */
+const LENGTH_UNITS: Record<LengthLanguage, { h: (n: number) => string; m: (n: number) => string; s: (n: number) => string; join: string }> = {
+  de: { h: (n) => `${n} Std.`, m: (n) => `${n} Min.`, s: (n) => `${n} Sek.`, join: " " },
+  en: { h: (n) => `${n} hr`, m: (n) => `${n} min`, s: (n) => `${n} sec`, join: " " },
+  zh: { h: (n) => `${n}小时`, m: (n) => `${n}分钟`, s: (n) => `${n}秒`, join: "" },
+  hi: { h: (n) => `${n} ${n === 1 ? "घंटा" : "घंटे"}`, m: (n) => `${n} मिनट`, s: (n) => `${n} सेकंड`, join: " " },
+  es: { h: (n) => `${n} h`, m: (n) => `${n} min`, s: (n) => `${n} s`, join: " " },
+  ar: { h: (n) => arabic(n, "ساعة", "ساعات"), m: (n) => arabic(n, "دقيقة", "دقائق"), s: (n) => arabic(n, "ثانية", "ثوانٍ"), join: " و" },
+  ru: { h: (n) => `${n} ч`, m: (n) => `${n} мин`, s: (n) => `${n} сек`, join: " " },
+};
+
+/** A length as a grown-up reads it on a slip: „45 Sek.“, „7 Min. 30 Sek.“, „20 Min.“, „1 Std.“, „1 Std. 30 Min.“ in German. */
+export function lengthLabel(seconds: number, language: LengthLanguage = "de") {
+  const units = LENGTH_UNITS[language];
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
-  return [h && `${h} Std.`, m && `${m} Min.`, s && `${s} Sek.`].filter(Boolean).join(" ") || "0 Sek.";
+  return [h && units.h(h), m && units.m(m), s && units.s(s)].filter(Boolean).join(units.join) || units.s(0);
+}
+
+/** A length on a slip in every language, for `t(…)`. */
+export function lengthWords(seconds: number): Localized & Record<LengthLanguage, string> {
+  const words = (language: LengthLanguage) => lengthLabel(seconds, language);
+  return { de: words("de"), en: words("en"), zh: words("zh"), hi: words("hi"), es: words("es"), ar: words("ar"), ru: words("ru") };
 }
 
 /** Time left as digits for grown-ups: „0:45“, „4:37“, „1:04:37“, rounded up to the second. */

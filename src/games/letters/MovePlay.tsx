@@ -26,7 +26,15 @@ const DONE_MS = 700;
 const MOVE_MS = 620;
 
 /** The stamp's invitation; hop and clap take theirs from the language pack's doing words („Hüpf mit!“). */
-const STOMP_INVITE: Localized = { de: "Stampf mit!" };
+const STOMP_INVITE: Localized = {
+  de: "Stampf mit!",
+  ru: "Топай со мной!",
+  en: "Now you stomp!",
+  zh: "和我一起跺脚！",
+  hi: "मेरे साथ पैर पटको!",
+  es: "¡Zapatea conmigo!",
+  ar: "هيّا نضرب بأقدامنا معا!",
+};
 
 /** What a done hop, clap or stamp leaves in the row under the digit: the number as a count of things. */
 const MARKS: Record<Move, string> = { hop: "🐾", clap: "👏", stomp: "👣" };

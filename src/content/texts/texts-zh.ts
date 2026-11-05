@@ -24,12 +24,14 @@ import { ZH as winterbaustelle } from "@/games/scenes/winterbaustelle/zh";
 import { ZH as zoo } from "@/games/scenes/zoo/zh";
 import { ZH as elevator } from "@/games/elevator/zh";
 import { CHINESE as animals } from "@/games/animals/content.zh";
+import { CHINESE as together } from "@/games/together/content.zh";
 import { CHINESE as shadows } from "@/games/shadows/content.zh";
 import { CHINESE_TEXTS as socks } from "@/games/socks/content.zh";
 import { STEP_TEXTS_ZH as teethSteps } from "@/games/teeth/steps.zh";
 import { DAYTIME_ZH as teethDaytime } from "@/games/teeth/daytime.zh";
 import { COMFORTS_ZH as comforts, FEELINGS_ZH as feelings } from "@/games/feelings/bear.zh";
 import { SITUATIONS_ZH as situations } from "@/games/feelings/kita.zh";
+import { DAYS_ZH as days } from "@/games/feelings/days.zh";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.zh";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.zh";
 import type { LanguageTexts } from ".";
@@ -67,6 +69,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
+  together,
   shadows,
   socks,
   teethSteps,
@@ -74,5 +77,6 @@ export const TEXTS: LanguageTexts = {
   comforts,
   feelings,
   situations,
+  days,
   stories: { cloudTrip, treasureIsland },
 };

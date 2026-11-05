@@ -86,8 +86,7 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
   German sentence into `ScenePlay.tsx` or `quests.ts`. Adjectives and verbs agree with the item's gender/plural
   (Russian `agree`, `esAgree`, `hiAgree`, `arAgree`); nothing said to the child depends on it being a boy or a girl
   (Arabic says „let's“, هيّا, instead of an imperative). Start-screen texts are inline with `t({ de, ru, en, … })` in
-  `ScenesGame.tsx`; the surprises in a hideout have `found` in every language, except the two mascot families (Familie Fuchs, Familie Bär),
-  German only until translations are asked for (marked in `languageStatus.ts`).
+  `ScenesGame.tsx`; the surprises in a hideout have `found` in every language.
 - Speech uses the scene language's `speechLang`. Keys mode (`keys.ts`): an item wants the first letter of its whole
   translated name (put the noun first in a translation where you can), typed at its place on any keyboard
   (`pressedKey`), so a German keyboard types every language. Russian: the Cyrillic letters (`RUSSIAN_SCENE_KEYS`,

@@ -20,8 +20,8 @@ stays still on its plate, and the one it belongs to peeks up over its plate for 
 
 Files: `pairs.tsx` holds the pairs, their drawings and sentences (`PAIRS`, `TOGETHER_TEXTS`); `PairPicture.tsx` draws one
 above in its 200 × 200 box; `TogetherPlay.tsx` is one round, `TogetherRounds.tsx` the turns, the step and the decks
-(`useDeck`, so a thing comes again only after all of its kind); `together.css` all of the moving; `names.ts` the game's name and blurb, also for its card in `games.ts` (there while the
-game is German only, see Languages).
+(`useDeck`, so a thing comes again only after all of its kind); `together.css` all of the moving; `names.ts` the game's name and blurb, also for its card in `games.ts` (kept there so
+the game's own row in the language table answers for them).
 
 **Difficulty** (`TOGETHER_LEVELS`, `dealRound` in `levels.ts`): 2, 3, 3, 4, 4 things to choose from, with the step rule
 of Schatten finden (`nextLevel`). Every visit begins on the first step; `?level=N` starts on step N while developing.
@@ -47,8 +47,17 @@ Every six rounds count as a game for the play-time limit (`gameEnded`, `countGam
 
 ## Languages
 
-German only so far (`TOGETHER_TEXTS`, inline `t({ de })`). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only so far
-(November 2026): a sentence in another language stays silent until the user asks for its recordings, a German fallback
-sentence plays its German one. A new or changed sentence is listed by `src/content/recordedLines.ts` (`zusammen`) and recorded with
+The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; November 2026). Grown-ups'
+texts (name, blurb, ⚙️, the bubbles) are inline `t({ de, … })`; the sentences are `TOGETHER_TEXTS` (`pick(…, language.id)`),
+German built from the pairs' articles, every other language written out per pair in `content.<lang>.ts` (a
+`TogetherTranslation`: name, partner, question, right, belongs) and listed in `src/content/texts/texts-<lang>.ts`, never
+imported from game code. A pair without its sentences in a language is said wholly in German. Things "go with" each
+other, helpers "need" their tools; where a verb would follow someone's gender, the sentence is built so it follows the
+tool or no one (Hindi „… के लिए … चाहिए“, Russian „нужен / нужна / нужны“), and the helpers keep the German ones' gender
+(Spanish la doctora, Arabic تحتاج). A new pair gets its sentences in every language once translations are asked for;
+`content.test.ts` checks the languages translated so far have every pair, none German, none in another script with
+Latin letters. Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German
+only so far (November 2026): a sentence in another language stays silent until the user asks for its recordings, a
+German fallback sentence plays its German one. A new or changed sentence is listed by `src/content/recordedLines.ts` (`zusammen`) and recorded with
 `bun run voice make --only zusammen`, only when the user asks.
 Translations and recordings only when the user asks; `languageStatus.ts` says what is missing.

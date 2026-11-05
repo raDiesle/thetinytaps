@@ -29,12 +29,6 @@ export const SELF_SITUATIONS: Situation[] = [
         instead: { caption: "Becher umwerfen", answer: "Hmm, jetzt ist die Milch auf dem Fuchs. Drück lieber dein Kuscheltier ganz fest." },
       },
       {
-        caption: "Zwei Hälften zeigen",
-        question: "Der kleine Bär ist noch ein bisschen traurig. Was kann er tun?",
-        beats: [{ narration: "Er schaut die Hälften an. Eins, zwei!", line: "Jetzt hab ich zwei Kekse!" }],
-        instead: { caption: "Keks zerkrümeln", answer: "Hmm, jetzt ist der Keks ganz weg. Schau lieber: Jetzt hast du zwei!" },
-      },
-      {
         caption: "Mit dem Fuchs teilen",
         question: "Der Fuchs hat keinen Keks mehr. Was kann der kleine Bär tun?",
         beats: [
@@ -44,7 +38,7 @@ export const SELF_SITUATIONS: Situation[] = [
         instead: { caption: "Zunge rausstrecken", answer: "Hmm, jetzt ist der Fuchs traurig. Teil lieber mit ihm." },
       },
     ],
-    outro: [{ narration: "Toll! Traurig sein ist okay. Kuscheltier drücken, anders schauen, teilen.", sound: "cheer" }],
+    outro: [{ narration: "Toll! Traurig sein ist okay. Kuscheltier drücken und teilen.", sound: "cheer" }],
     endCaption: "Bär und Fuchs essen je eine Hälfte",
   },
   {

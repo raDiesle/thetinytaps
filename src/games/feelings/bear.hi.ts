@@ -87,8 +87,7 @@ export const FEELINGS_HI: Partial<Record<FeelingId, FeelingText>> = {
     question: "हम उसके साथ कैसे जश्न मनाएँ?",
     instead: [
       { caption: "गुब्बारा फोड़ना", answer: "हम्म, अब उसका गुब्बारा फूट गया। इसकी जगह उसके साथ नाचो।" },
-      // „Partyhut wegnehmen“ replaced „Geschenk wegnehmen“ (November 2026): told in German until translated.
-      null,
+      { caption: "पार्टी टोपी छीनना", answer: "हम्म, यह उसकी पार्टी टोपी है। अब वह उदास है। इसकी जगह उसके साथ जश्न मनाओ।" },
       { caption: "केक छीनना", answer: "हम्म, यह उसका जन्मदिन का केक है। अब वह उदास है। इसकी जगह उसके साथ जश्न मनाओ।" },
     ],
     end: { narration: "कितना प्यारा जन्मदिन!", line: "शुक्रिया! बहुत मज़ा आया!" },
