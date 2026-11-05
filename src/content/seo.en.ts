@@ -19,7 +19,7 @@ export const SEO_EN: SeoTranslation = {
     "/": {
       title: "Toddler Games – Free, No Ads, Offline",
       description: "Learning games for toddlers: look-and-find pictures, tooth brushing with a song, movement games, letters and animals. Free, no ads.",
-      text: "Books for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. Look-and-find pictures, tooth brushing with a song, movement adventures, feelings, letters and numbers, matching and more.",
+      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. Look-and-find pictures, tooth brushing with a song, movement adventures, feelings, letters and numbers, matching and more.",
     },
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",

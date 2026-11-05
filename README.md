@@ -1,4 +1,4 @@
-# Books for Both
+# Fun for Both
 
 Simple keyboard and touch games for toddlers, German first.
 
@@ -15,15 +15,15 @@ bun run preview    # serve the built site like GitHub Pages (tools/preview.ts)
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
-(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **booksforboth.com**, Enforce HTTPS).
-The domain is registered at Cloudflare; its DNS records are `tools/booksforboth.com.zone` (import it under
+(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **www.funforboth.com**, Enforce HTTPS).
+The domain is registered at Cloudflare; its DNS records are `tools/funforboth.com.zone` (import it under
 DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate).
-toddlerfox.com (the address until October 2026) and funforboth.com only redirect: import
+toddlerfox.com (the address until October 2026) and booksforboth.com (until November 2026) only redirect: import
 `tools/redirect-<domain>.zone` *with* „Proxy imported DNS records“ (delete the old GitHub records first), then
 Rules → Redirect Rules → a rule for all incoming requests, dynamic target
-`concat("https://booksforboth.com", http.request.uri.path)`, status 301, preserve query string.
+`concat("https://www.funforboth.com", http.request.uri.path)`, status 301, preserve query string.
 Visits are counted with Cloudflare Web Analytics (no cookies): Cloudflare → Analytics & Logs → Web Analytics →
-Add a site (booksforboth.com), manual setup, and its site token as the repository variable `CF_BEACON_TOKEN` (repo settings →
+Add a site (www.funforboth.com), manual setup, and its site token as the repository variable `CF_BEACON_TOKEN` (repo settings →
 Secrets and variables → Actions → Variables); without it the build counts nothing.
 
 Use **Bun** (not npm or yarn) for everything: installing, scripts, tests, bundling, dev server; dependencies are locked in `bun.lock`.

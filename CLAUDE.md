@@ -1,4 +1,4 @@
-# Books for Both – notes for Claude
+# Fun for Both – notes for Claude
 
 Keyboard and touch games for toddlers. A React 19 single-page app
 built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
@@ -528,7 +528,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one
   sees – never bring back a second look or a switch between looks, and write new styles as the book's plain rules, with
   no `data-look` or other branch (`look.test.ts`). Like this: the home page is a room with a bookshelf (`Bookshelf`, D-20, user
-  decision, October 2026), the app's name „Books for Both“ in its title, each category a picture book standing on it with its cover out;
+  decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
   game sharing the page's height – a round picture, its name, dots leading to its page number (the first game on page 1,
   `gamePage`, user feedback, October 2026) – each line a soft wash of
@@ -636,8 +636,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
-- The app is called „Books for Both“ and lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com
-  only redirect there; until then it was „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost).
+- The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
+  toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
+  „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
+  `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
   The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
   (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
@@ -658,7 +660,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
   screens, which „Ein paar Worte von uns“ on the home page (`ParentsNote`) tells: the real world first, then a screen together,
-  later a learning game alone, plain watching least – Books for Both meant as that first step together (user
+  later a learning game alone, plain watching least – Fun for Both meant as that first step together (user
   decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when

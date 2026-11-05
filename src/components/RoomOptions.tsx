@@ -259,13 +259,13 @@ export function RoomNotes() {
     <MenuButton
       icon="ℹ️"
       label={t({
-        de: "Über Books for Both",
-        ru: "О Books for Both",
-        en: "About Books for Both",
-        zh: "关于 Books for Both",
-        hi: "Books for Both के बारे में",
-        es: "Acerca de Books for Both",
-        ar: "عن Books for Both",
+        de: "Über Fun for Both",
+        ru: "О Fun for Both",
+        en: "About Fun for Both",
+        zh: "关于 Fun for Both",
+        hi: "Fun for Both के बारे में",
+        es: "Acerca de Fun for Both",
+        ar: "عن Fun for Both",
       })}
       className="room-thing shelf-carving-more"
       keep

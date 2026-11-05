@@ -9,7 +9,7 @@ import { join } from "node:path";
 // visit keeps only what it plays, and only an installed app keeps everything. These run the real worker in a fake
 // browser: caches kept in maps, and a network that answers as each test says.
 
-const SCOPE = "https://www.booksforboth.com/";
+const SCOPE = "https://www.funforboth.com/";
 const OLD_PAGE = "old build";
 
 type Event = Record<string, unknown> & { waitUntil(work: Promise<unknown>): void };

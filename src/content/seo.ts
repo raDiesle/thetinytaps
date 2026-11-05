@@ -12,7 +12,7 @@ import { isUnfinished } from "./games";
 // words parents search for belong in title, description and text instead.
 
 /** The site's name, after every title. */
-export const SITE_NAME = "Books for Both";
+export const SITE_NAME = "Fun for Both";
 
 /** Search engines and previews for one address. */
 export interface PageSeo {
@@ -83,7 +83,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/",
     title: "Spiele für Kleinkinder – kostenlos, ohne Werbung",
     description: "Lernspiele für Kleinkinder: Wimmelbilder, Zähneputzen mit Lied, Bewegungsspiele, Buchstaben und Tiere. Kostenlos, ohne Werbung, offline.",
-    text: "Books for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. Wimmelbilder, Zähneputzen mit Lied, Bewegungsabenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und mehr.",
+    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. Wimmelbilder, Zähneputzen mit Lied, Bewegungsabenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und mehr.",
   },
   {
     path: "/spiele/lebendige-welten/",

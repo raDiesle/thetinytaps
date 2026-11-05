@@ -165,7 +165,7 @@ export const feelingsGamesIdeas: IdeaArea = {
       emoji: "📖",
       title: "Wie fühlt er sich jetzt? – ein Vorlesebuch",
       text: "Eine kurze Bildergeschichte zum gemeinsamen Lesen, Seite für Seite umgeblättert wie im Buch: Der kleine Fuchs lässt mit Papa Fuchs seinen Drachen steigen (froh), der Wind reißt ihn weg (erschrocken), er hängt im Baum (traurig), der Bär und seine Mama kommen mit einer Leiter (Hoffnung), der Drachen fliegt wieder (froh). Auf jeder Seite stehen unten zwei klar verschiedene Gesichter des Fuchses; das Kind tippt, wie er sich gerade fühlt, und der Fuchs im Bild schaut genau so. Bei einem anderen Gesicht zeigt er nochmal auf das, was passiert ist.",
-      why: "Gefühle wechseln im Lauf einer Geschichte – genau das tun echte Bilderbücher, und ein Vorlesebuch passt wie nichts anderes zu „Books for Both“. Groß und Klein reden über jede Seite.",
+      why: "Gefühle wechseln im Lauf einer Geschichte – genau das tun echte Bilderbücher, und ein Vorlesebuch passt wie nichts anderes zu „Fun for Both“. Groß und Klein reden über jede Seite.",
       effort: "L",
     },
   ],
