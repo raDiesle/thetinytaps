@@ -318,7 +318,9 @@ The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arab
 page, `src/lib/language.ts`): start screen, captions and everything read aloud. The German data (`bear.ts`,
 `kita.ts`, `selbst.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru;
 the stories of `selbst.ts` are in `kita.<lang>.ts` too, after the kindergarten's) hold only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
-`situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). Small texts
+`situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). The days' pages of the story are in `days.<lang>.ts` (by day id, one page per scene in the German order, and the
+day's end), laid over by `dayIn`; a scene added to or moved within a day changes every `days.<lang>.ts` too, or that
+day's entry there is deleted (it is then told in German; `feelings.test.ts` checks the pages match). Small texts
 (the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
 Everything said is played from its ElevenLabs recording (`useVoice` in `shared.tsx`, files in `stimme/`), recorded in
 German only so far (November 2026): a line in another language stays silent until the user asks for its recordings,

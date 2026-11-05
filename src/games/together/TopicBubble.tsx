@@ -9,8 +9,24 @@ export const KIND_SIGNS: Record<RoundKind, string> = { pair: "🤝", helper: "�
 
 /** The round's question, as the one above would ask it. */
 const KIND_QUESTIONS: Record<RoundKind, Localized> = {
-  pair: { de: "Was gehört zu mir?" },
-  helper: { de: "Was brauche ich?" },
+  pair: {
+    de: "Was gehört zu mir?",
+    ru: "Что подходит ко мне?",
+    en: "What goes with me?",
+    zh: "什么和我是一对？",
+    hi: "मेरे लिए क्या चाहिए?",
+    es: "¿Qué va conmigo?",
+    ar: "ماذا يناسبني؟",
+  },
+  helper: {
+    de: "Was brauche ich?",
+    ru: "Что мне нужно?",
+    en: "What do I need?",
+    zh: "我需要什么？",
+    hi: "मुझे क्या चाहिए?",
+    es: "¿Qué necesito?",
+    ar: "إلى ماذا أحتاج؟",
+  },
 };
 
 /**

@@ -27,7 +27,7 @@ export interface Mood {
   id: MoodId;
   /** Who shows it on its card and makes its face: the fox child or the bear child, both found in every game. */
   kind: MascotKind;
-  /** Its name, for grown-ups under the card. German only so far (translations only on request). */
+  /** Its name, for grown-ups under the card. */
   caption: Localized;
   face: MoodFace;
   /** Its weather, the sign of „Wie doll ist es?“. */
@@ -50,7 +50,7 @@ export const MOODS: Mood[] = [
   {
     id: "froh",
     kind: "bear",
-    caption: { de: "Fröhlich" },
+    caption: { de: "Fröhlich", en: "Happy", zh: "开心", hi: "खुश", es: "Alegría", ar: "فرح", ru: "Радость" },
     face: { eyes: "happy", mouth: "open", brows: "soft" },
     sky: "sonne",
     hard: false,
@@ -64,7 +64,7 @@ export const MOODS: Mood[] = [
   {
     id: "stolz",
     kind: "fox",
-    caption: { de: "Stolz" },
+    caption: { de: "Stolz", en: "Proud", zh: "骄傲", hi: "गर्व", es: "Orgullo", ar: "فخر", ru: "Гордость" },
     face: { eyes: "happy", mouth: "smile", brows: "up", tilt: -12 },
     sky: "regenbogen",
     hard: false,
@@ -74,7 +74,7 @@ export const MOODS: Mood[] = [
   {
     id: "aufgeregt",
     kind: "fox",
-    caption: { de: "Aufgeregt" },
+    caption: { de: "Aufgeregt", en: "Excited", zh: "激动", hi: "उत्साह", es: "Emoción", ar: "حماس", ru: "Волнение" },
     face: { eyes: "wide", mouth: "open", brows: "up" },
     sky: "wind",
     hard: true,
@@ -84,7 +84,7 @@ export const MOODS: Mood[] = [
   {
     id: "ruhig",
     kind: "bear",
-    caption: { de: "Ruhig" },
+    caption: { de: "Ruhig", en: "Calm", zh: "平静", hi: "शांत", es: "Calma", ar: "هدوء", ru: "Спокойствие" },
     face: { eyes: "shut", mouth: "smile", brows: "soft" },
     sky: "schnee",
     hard: false,
@@ -94,7 +94,7 @@ export const MOODS: Mood[] = [
   {
     id: "muede",
     kind: "bear",
-    caption: { de: "Müde" },
+    caption: { de: "Müde", en: "Tired", zh: "困了", hi: "थकान", es: "Cansancio", ar: "تعب", ru: "Усталость" },
     face: { eyes: "half", mouth: "o", brows: "soft" },
     sky: "wolke",
     hard: false,
@@ -108,7 +108,7 @@ export const MOODS: Mood[] = [
   {
     id: "traurig",
     kind: "fox",
-    caption: { de: "Traurig" },
+    caption: { de: "Traurig", en: "Sad", zh: "难过", hi: "उदास", es: "Tristeza", ar: "حزن", ru: "Грусть" },
     face: { eyes: "open", mouth: "frown", brows: "sad" },
     sky: "regen",
     hard: true,
@@ -122,7 +122,7 @@ export const MOODS: Mood[] = [
   {
     id: "wuetend",
     kind: "bear",
-    caption: { de: "Wütend" },
+    caption: { de: "Wütend", en: "Angry", zh: "生气", hi: "गुस्सा", es: "Enojo", ar: "غضب", ru: "Злость" },
     face: { eyes: "open", mouth: "frown", brows: "angry" },
     sky: "gewitter",
     hard: true,
@@ -144,7 +144,7 @@ export const MOODS: Mood[] = [
   {
     id: "angst",
     kind: "fox",
-    caption: { de: "Ängstlich" },
+    caption: { de: "Ängstlich", en: "Scared", zh: "害怕", hi: "डर", es: "Miedo", ar: "خوف", ru: "Страх" },
     face: { eyes: "wide", mouth: "o", brows: "sad" },
     sky: "wald",
     hard: true,
@@ -176,13 +176,29 @@ export const MOOD_ANSWER: Localized = {
 };
 
 /** Under the picture of the grown-up's hug. */
-export const HUG_CAPTION: Localized = { de: "In den Arm nehmen" };
+export const HUG_CAPTION: Localized = { de: "In den Arm nehmen", en: "A hug", zh: "抱一抱", hi: "गले लगाना", es: "Un abrazo", ar: "عناق", ru: "Обнять" };
 
 /** Said while the little one shows the face big (C-35): the child copies it, for a mirror or the grown-up. */
-export const FACE_LINE: Localized = { de: "Kannst du auch so gucken?" };
+export const FACE_LINE: Localized = {
+  de: "Kannst du auch so gucken?",
+  en: "Can you make this face too?",
+  zh: "你也能做这个表情吗？",
+  hi: "चलो, तुम भी ऐसा चेहरा बनाओ!",
+  es: "¿Puedes poner esta cara tú también?",
+  ar: "هيّا نصنع هذا الوجه نحن أيضًا!",
+  ru: "А ты так можешь?",
+};
 
 /** Under the big face. */
-export const FACE_CAPTION: Localized = { de: "Gesicht nachmachen" };
+export const FACE_CAPTION: Localized = {
+  de: "Gesicht nachmachen",
+  en: "Copy the face",
+  zh: "学一学表情",
+  hi: "चेहरे की नकल करना",
+  es: "Imitar la cara",
+  ar: "تقليد الوجه",
+  ru: "Сделать такое же лицо",
+};
 
 /** How strong a feeling is (C-36): its weather small, middling or big, no numbers. */
 export type StrengthId = "klein" | "mittel" | "gross";
@@ -199,25 +215,72 @@ export interface Strength {
 }
 
 export const STRENGTHS: Strength[] = [
-  { id: "klein", scale: 0.42, caption: { de: "Ein bisschen" }, answer: { de: "Ein bisschen." } },
-  { id: "mittel", scale: 0.68, caption: { de: "Mittel" }, answer: { de: "Schon ziemlich." } },
-  { id: "gross", scale: 1, caption: { de: "Ganz doll" }, answer: { de: "Ganz doll!" } },
+  {
+    id: "klein",
+    scale: 0.42,
+    caption: { de: "Ein bisschen", en: "A little", zh: "一点点", hi: "थोड़ा-सा", es: "Un poquito", ar: "قليلًا", ru: "Чуть-чуть" },
+    answer: { de: "Ein bisschen.", en: "A little.", zh: "有一点点。", hi: "थोड़ा-सा।", es: "Un poquito.", ar: "قليلًا.", ru: "Чуть-чуть." },
+  },
+  {
+    id: "mittel",
+    scale: 0.68,
+    caption: { de: "Mittel", en: "In between", zh: "中等", hi: "बीच का", es: "Más o menos", ar: "متوسط", ru: "Средне" },
+    answer: { de: "Schon ziemlich.", en: "Quite a lot.", zh: "挺强的。", hi: "काफ़ी ज़्यादा।", es: "Bastante.", ar: "إلى حدّ ما.", ru: "Довольно сильно." },
+  },
+  {
+    id: "gross",
+    scale: 1,
+    caption: { de: "Ganz doll", en: "A lot", zh: "特别强", hi: "बहुत ज़्यादा", es: "Muchísimo", ar: "كثيرًا جدًّا", ru: "Очень сильно" },
+    answer: { de: "Ganz doll!", en: "A whole lot!", zh: "特别强！", hi: "बहुत ज़्यादा!", es: "¡Muchísimo!", ar: "كثيرًا جدًّا!", ru: "Очень сильно!" },
+  },
 ];
 
 /** Read aloud when the three sizes come. */
-export const STRENGTH_QUESTION: Localized = { de: "Wie doll ist es?" };
+export const STRENGTH_QUESTION: Localized = {
+  de: "Wie doll ist es?",
+  en: "How strong is it?",
+  zh: "有多强烈？",
+  hi: "यह कितना ज़्यादा है?",
+  es: "¿Qué tan fuerte es?",
+  ar: "كم هو قوي؟",
+  ru: "Насколько сильно?",
+};
 
 /** One slow breath, as long as the circle in `.mood-breath` (feelings.css) takes to grow and shrink. */
 export const BREATH_MS = 5000;
 
 /** Said when a hard feeling is big: first a breath together, before anything else. */
-export const CALM_LINE: Localized = { de: "Komm, wir pusten zusammen. Puuuh." };
+export const CALM_LINE: Localized = {
+  de: "Komm, wir pusten zusammen. Puuuh.",
+  en: "Come on, let's blow together. Phoooo.",
+  zh: "来，我们一起呼气。呼——",
+  hi: "आओ, साथ में फूँक मारें। फ़ूऊऊ।",
+  es: "Ven, soplamos tú y yo. Fuuuh.",
+  ar: "هيّا ننفخ معًا. فووو.",
+  ru: "Давай подуем вместе. Фууух.",
+};
 
 /** Under the picture while breathing together. */
-export const CALM_CAPTION: Localized = { de: "Zusammen pusten" };
+export const CALM_CAPTION: Localized = {
+  de: "Zusammen pusten",
+  en: "Blow together",
+  zh: "一起呼气",
+  hi: "साथ में फूँक मारना",
+  es: "Soplar a la par",
+  ar: "النفخ معًا",
+  ru: "Подуть вместе",
+};
 
 /** Said after the breaths. */
-export const CALM_DONE: Localized = { de: "Schon besser." };
+export const CALM_DONE: Localized = {
+  de: "Schon besser.",
+  en: "That's better.",
+  zh: "好多了。",
+  hi: "अब बेहतर है।",
+  es: "Ya está mejor.",
+  ar: "أحسن الآن.",
+  ru: "Уже лучше.",
+};
 
 /** What can help a child now; each has its card in „Was hilft dir jetzt?“ (`moodImages.help`). */
 export type HelpId = "kuscheln" | "toben" | "trinken" | "allein" | "lied";
@@ -234,17 +297,93 @@ export interface Help {
   answer: Localized;
 }
 
-/** The things that can help, by id. German only so far (November 2026): translations come when the user asks. */
+/** The things that can help, by id. */
 export const HELPS: Record<HelpId, Help> = {
-  kuscheln: { id: "kuscheln", caption: { de: "Kuscheln" }, answer: { de: "Kuscheln tut gut." } },
-  toben: { id: "toben", caption: { de: "Toben" }, answer: { de: "Toben tut gut." } },
-  trinken: { id: "trinken", caption: { de: "Etwas trinken" }, answer: { de: "Ein Schluck Wasser tut gut." } },
-  allein: { id: "allein", caption: { de: "Ein bisschen allein sein" }, answer: { de: "Ein bisschen Ruhe tut gut." } },
-  lied: { id: "lied", caption: { de: "Ein Lied singen" }, answer: { de: "Ein Lied tut gut." } },
+  kuscheln: {
+    id: "kuscheln",
+    caption: { de: "Kuscheln", en: "Cuddle", zh: "抱抱", hi: "गले लगना", es: "Abrazos", ar: "العناق", ru: "Обниматься" },
+    answer: {
+      de: "Kuscheln tut gut.",
+      en: "Cuddling feels good.",
+      zh: "抱抱真舒服。",
+      hi: "गले लगना अच्छा लगता है।",
+      es: "Los abrazos hacen bien.",
+      ar: "العناق يريحنا.",
+      ru: "Обниматься — это хорошо.",
+    },
+  },
+  toben: {
+    id: "toben",
+    caption: { de: "Toben", en: "Romp around", zh: "跑跑跳跳", hi: "उछल-कूद", es: "Correr y brincar", ar: "اللعب والقفز", ru: "Порезвиться" },
+    answer: {
+      de: "Toben tut gut.",
+      en: "Romping around feels good.",
+      zh: "跑跑跳跳真舒服。",
+      hi: "उछल-कूद करना अच्छा लगता है।",
+      es: "Correr y brincar hace bien.",
+      ar: "اللعب والقفز يريحنا.",
+      ru: "Порезвиться — это хорошо.",
+    },
+  },
+  trinken: {
+    id: "trinken",
+    caption: { de: "Etwas trinken", en: "Have a drink", zh: "喝点水", hi: "कुछ पीना", es: "Tomar algo", ar: "شرب شيء", ru: "Попить" },
+    answer: {
+      de: "Ein Schluck Wasser tut gut.",
+      en: "A sip of water feels good.",
+      zh: "喝口水真舒服。",
+      hi: "पानी का एक घूँट अच्छा लगता है।",
+      es: "Un trago de agua hace bien.",
+      ar: "رشفة ماء تريحنا.",
+      ru: "Глоток воды — это хорошо.",
+    },
+  },
+  allein: {
+    id: "allein",
+    caption: {
+      de: "Ein bisschen allein sein",
+      en: "Some time alone",
+      zh: "自己待一会儿",
+      hi: "थोड़ी देर अकेले रहना",
+      es: "Un ratito a solas",
+      ar: "وقت قصير على انفراد",
+      ru: "Немного уединиться",
+    },
+    answer: {
+      de: "Ein bisschen Ruhe tut gut.",
+      en: "A little quiet feels good.",
+      zh: "安静一会儿真舒服。",
+      hi: "थोड़ी शांति अच्छी लगती है।",
+      es: "Un poco de calma hace bien.",
+      ar: "قليل من الهدوء يريحنا.",
+      ru: "Немного тишины — это хорошо.",
+    },
+  },
+  lied: {
+    id: "lied",
+    caption: { de: "Ein Lied singen", en: "Sing a song", zh: "唱首歌", hi: "गाना गाना", es: "Cantar una canción", ar: "غناء أغنية", ru: "Спеть песенку" },
+    answer: {
+      de: "Ein Lied tut gut.",
+      en: "A song feels good.",
+      zh: "唱首歌真舒服。",
+      hi: "गाना गाना अच्छा लगता है।",
+      es: "Una canción hace bien.",
+      ar: "الأغنية تريحنا.",
+      ru: "Песенка — это хорошо.",
+    },
+  },
 };
 
 /** Read aloud when the three cards of what helps come. */
-export const HELP_QUESTION: Localized = { de: "Was hilft dir jetzt?" };
+export const HELP_QUESTION: Localized = {
+  de: "Was hilft dir jetzt?",
+  en: "What helps you now?",
+  zh: "现在什么能帮到你？",
+  hi: "अभी तुम्हें किससे मदद मिलेगी?",
+  es: "¿Qué te ayuda ahora?",
+  ar: "ما الذي يساعدنا الآن؟",
+  ru: "Что тебе сейчас поможет?",
+};
 
 /** Every line „Wie geht's dir?“ says in German, for the recordings list. */
 export const MOOD_LINES: string[] = [
@@ -293,6 +432,14 @@ export function saveMoodDay(day: MoodDay) {
 }
 
 /** Over the morning's feeling in the evening, for grown-ups (the captions under the cards). */
-export const THIS_MORNING: Localized = { de: "Heute früh" };
+export const THIS_MORNING: Localized = {
+  de: "Heute früh",
+  en: "This morning",
+  zh: "今天早上",
+  hi: "आज सुबह",
+  es: "Esta mañana",
+  ar: "صباح اليوم",
+  ru: "Сегодня утром",
+};
 /** Over the feeling just picked, beside the morning's. */
-export const NOW: Localized = { de: "Jetzt" };
+export const NOW: Localized = { de: "Jetzt", en: "Now", zh: "现在", hi: "अभी", es: "Ahora", ar: "الآن", ru: "Сейчас" };

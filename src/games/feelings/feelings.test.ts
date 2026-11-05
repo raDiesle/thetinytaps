@@ -7,7 +7,7 @@ import { DAY_PICTURE_QUEUE } from "./dayPictures";
 import { DAYS, dayImage, dayImages, firstImage, NIGHT_IMAGE } from "./days";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
-import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
+import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { BREATH_MS, HELPS, MOODS, morningMood, STRENGTHS, withMood } from "./mood";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
@@ -250,6 +250,20 @@ test("every story is in exactly one day, and every page of a day has its picture
   if (!imageFor(NIGHT_IMAGE)) expect(DAY_PICTURE_QUEUE.map((p) => p.id)).toContain(NIGHT_IMAGE);
 });
 
+// A day's translation tells the same day: one page per scene, every one a sentence, and the day ends at night.
+test("every translation of a day has one page per scene", () => {
+  for (const [language, texts] of Object.entries(DAY_TEXTS)) {
+    for (const [id, text] of Object.entries(texts ?? {})) {
+      const day = DAYS.find((d) => d.id === id);
+      expect(day, `${language} ${id}`).toBeDefined();
+      if (!day || !text) continue;
+      expect(text.pages.length, `${language} ${id} pages`).toBe(day.scenes.length);
+      for (const page of [...text.pages, text.end]) expect(page, `${language} ${id}`).toMatch(/[.!。！।]$/);
+      expect(dayIn(day, language as TargetLanguageId).end).toBe(text.end);
+    }
+  }
+});
+
 // A page of a day's story only tells: no cards, no question, never a timer – one tap (or key) turns to the scene, and
 // after a scene ▶ on its last picture brings the next page (user idea, November 2026).
 test("a page of a day's story only tells, and goes on with a tap", () => {
@@ -367,7 +381,7 @@ test("every translated language has every story", () => {
 // A language in its own script has no word left in Latin letters (a name like Tapsi is written in its letters too).
 test("translations in another script have no Latin letters", () => {
   for (const language of ["ru", "zh", "hi", "ar"] as const) {
-    const texts = [COMFORT_TEXTS[language], FEELING_TEXTS[language], SITUATION_TEXTS[language]].flatMap(stringsIn);
+    const texts = [COMFORT_TEXTS[language], FEELING_TEXTS[language], SITUATION_TEXTS[language], DAY_TEXTS[language]].flatMap(stringsIn);
     for (const text of texts) expect(text, language).not.toMatch(/[A-Za-z]/);
   }
 });

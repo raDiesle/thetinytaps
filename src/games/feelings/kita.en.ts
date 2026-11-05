@@ -730,31 +730,31 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
     endCaption: "Little Bear is asleep again, Big Bear sits by the bed",
   },
   lost: {
-    title: "Sad, the cuddly toy is gone",
-    caption: "The cuddly toy is gone, Little Bear is crying",
-    intro: [{ narration: "Little Bear wants to go to bed." }, { narration: "But his cuddly toy is gone! He is so sad." }],
+    title: "Sad, the cuddly rabbit is gone",
+    caption: "The cuddly rabbit is gone, Little Bear is crying",
+    intro: [{ narration: "Little Bear wants to go to bed." }, { narration: "But his cuddly rabbit is gone! He is so sad." }],
     steps: [
       {
         caption: "Say “I'm sad”",
-        question: "The cuddly toy is gone. What can Little Bear do?",
-        beats: [{ narration: "Little Bear says:", line: "I'm sad. My cuddly toy is gone." }, { line: "Oh. That is sad." }],
+        question: "His cuddly rabbit is gone. What can Little Bear do?",
+        beats: [{ narration: "Little Bear says:", line: "I'm sad. My cuddly rabbit is gone." }, { line: "Oh. That is sad." }],
         instead: { caption: "Tip out the toy box", answer: "Hmm, now everything is a big mess. Say how you feel instead." },
       },
       {
         caption: "Look for it",
-        question: "Where can the cuddly toy be? What can Little Bear do?",
+        question: "Where can the cuddly rabbit be? What can Little Bear do?",
         beats: [{ narration: "He looks all by himself. Under the bed? No." }, { narration: "In the basket? There!" }],
-        instead: { caption: "Take Little Fox's toy", answer: "Hmm, now Little Fox is sad. Look for it yourself instead." },
+        instead: { caption: "Take Little Fox's dog", answer: "Hmm, that's Little Fox's cuddly dog. Now he is sad. Look for your cuddly rabbit instead." },
       },
       {
         caption: "Squeeze it tight",
-        question: "There's the cuddly toy! What can Little Bear do?",
+        question: "There's the cuddly rabbit! What can Little Bear do?",
         beats: [{ narration: "He squeezes it really tight.", line: "There you are!" }],
         instead: { caption: "Throw it in the corner", answer: "Hmm, now it's lying all alone in the corner again. Squeeze it really tight instead." },
       },
     ],
     outro: [{ narration: "Lovely! Say how you feel, look by yourself, squeeze tight." }],
-    endCaption: "Little Bear cuddles his cuddly toy in bed",
+    endCaption: "Little Bear cuddles his cuddly rabbit in bed",
   },
   join: {
     title: "Sad, can't join in",
@@ -821,8 +821,12 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
     caption: "Little Bear is at the top of the climbing frame all by himself",
     intro: [{ narration: "Little Bear climbs up the climbing frame. All by himself!" }, { narration: "Now he's at the top. He is so proud!" }],
     steps: [
-      // „Komm doch auch hoch!“ rufen (4. November 2026): told in German until translated.
-      null,
+      {
+        caption: "Call “Come on up too!”",
+        question: "Little Bear is right at the top. What can he do?",
+        beats: [{ narration: "He calls to Little Fox:", line: "Come on up too!" }, { line: "Oh yes, I'm coming!" }],
+        instead: { caption: "Push Little Fox down", answer: "Hmm, pushing hurts. Call out instead: Come on up too!" },
+      },
       {
         caption: "Cheer",
         question: "Little Bear is so happy. What can he do?",
@@ -836,6 +840,7 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Jump down", answer: "Hmm, jumping from so high hurts. Show Little Fox how instead." },
       },
     ],
+    outro: [{ narration: "Yay! Call, cheer, help. Now they are both proud." }],
     endCaption: "Little Bear and Little Fox at the top together",
   },
   miss: {
@@ -897,8 +902,12 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
     caption: "It's raining outside, Little Bear is bored",
     intro: [{ narration: "It's raining outside. Little Bear is lying on the sofa." }, { narration: "He is so bored!" }],
     steps: [
-      // „Mit dem Fuchs Kochen spielen“ is new in German (November 2026): told in German until translated.
-      null,
+      {
+        caption: "Play cooking with Little Fox",
+        question: "It's raining. What can Little Bear do?",
+        beats: [{ narration: "He gets the pots and cooks a rain soup with Little Fox. Stir, stir!" }, { line: "Mmm, yummy! Now I'm cooking!" }],
+        instead: { caption: "Pull Little Fox's ear", answer: "Hmm, that hurts Little Fox. Play something with him instead." },
+      },
       {
         caption: "Build a den",
         question: "What can you play indoors? What can Little Bear do?",
@@ -912,6 +921,7 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Stomp the box flat", answer: "Hmm, now the box is broken. Make a car out of it instead." },
       },
     ],
+    outro: [{ narration: "Great! Boredom turns into ideas: cook together, build a den, drive a car." }],
     endCaption: "Little Bear and Little Fox ride in the box car",
   },
   empathy: {
@@ -961,8 +971,14 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         beats: [{ narration: "He takes a deep breath and blows out: Phoooo." }, { narration: "His heart gets calmer." }],
         instead: { caption: "Knock over the cake", answer: "Hmm, now the cake is ruined. Take a deep breath and blow instead." },
       },
-      // „Mit dem Fuchs Kuchen essen“ is new in German (November 2026): told in German until translated.
-      null,
+      {
+        caption: "Eat cake with Little Fox",
+        question: "Little Fox is waiting at the birthday table. What can Little Bear do?",
+        beats: [{ narration: "He goes to Little Fox at the table. They eat cake together." }, { line: "Mmm, yummy!" }],
+        instead: { caption: "Shout at Little Fox", answer: "Hmm, now Little Fox gets a fright too. Go to him and eat cake with him instead." },
+      },
     ],
+    outro: [{ narration: "Super! Cover your ears, take a deep breath, and then eat cake together." }],
+    endCaption: "Little Bear and Little Fox eat cake together",
   },
 };

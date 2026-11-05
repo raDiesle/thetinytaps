@@ -24,12 +24,14 @@ import { ES as winterbaustelle } from "@/games/scenes/winterbaustelle/es";
 import { ES as zoo } from "@/games/scenes/zoo/es";
 import { ES as elevator } from "@/games/elevator/es";
 import { SPANISH as animals } from "@/games/animals/content.es";
+import { SPANISH as together } from "@/games/together/content.es";
 import { SPANISH as shadows } from "@/games/shadows/content.es";
 import { SPANISH_TEXTS as socks } from "@/games/socks/content.es";
 import { STEP_TEXTS_ES as teethSteps } from "@/games/teeth/steps.es";
 import { DAYTIME_ES as teethDaytime } from "@/games/teeth/daytime.es";
 import { COMFORTS_ES as comforts, FEELINGS_ES as feelings } from "@/games/feelings/bear.es";
 import { SITUATIONS_ES as situations } from "@/games/feelings/kita.es";
+import { DAYS_ES as days } from "@/games/feelings/days.es";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.es";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.es";
 import type { LanguageTexts } from ".";
@@ -67,6 +69,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
+  together,
   shadows,
   socks,
   teethSteps,
@@ -74,5 +77,6 @@ export const TEXTS: LanguageTexts = {
   comforts,
   feelings,
   situations,
+  days,
   stories: { cloudTrip, treasureIsland },
 };

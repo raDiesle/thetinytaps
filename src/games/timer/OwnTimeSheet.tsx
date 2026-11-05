@@ -3,13 +3,16 @@ import { createPortal } from "react-dom";
 import { Choice } from "@/components/SettingControls";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
+import { OTHER_TIME, tomorrowAt } from "./content";
 import {
   clampSeconds,
   clock,
   clockMinutes,
   clockOn,
   dayKey,
+  type LengthLanguage,
   lengthLabel,
+  lengthWords,
   MAX_SECONDS,
   MIN_SECONDS,
   type OwnTime,
@@ -111,14 +114,16 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
+  /** The length set, written in `language`. */
+  const len = (language: LengthLanguage) => lengthLabel(seconds, language);
 
   return createPortal(
-    <div className="tm-sheet" role="dialog" aria-modal aria-label={t({ de: "Andere Zeit" })}>
+    <div className="tm-sheet" role="dialog" aria-modal aria-label={t(OTHER_TIME)}>
       {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the sheet closes it; Esc does the same */}
       <div className="tm-sheet-backdrop" onClick={onClose} />
       <section className="settings tm-sheet-panel">
         <Choice<OwnTime["kind"]>
-          label={t({ de: "Zeit" })}
+          label={t({ de: "Zeit", en: "Time", zh: "时间", hi: "समय", es: "Tiempo", ar: "الوقت", ru: "Время" })}
           value={kind}
           onChange={(k) => {
             setKind(k);
@@ -126,15 +131,18 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
             setAsking(false);
           }}
           options={[
-            { value: "for", label: t({ de: "Wie lange" }) },
-            { value: "until", label: t({ de: "Bis um" }) },
+            {
+              value: "for",
+              label: t({ de: "Wie lange", en: "How long", zh: "多长时间", hi: "कितनी देर", es: "Cuánto tiempo", ar: "كم من الوقت", ru: "Сколько" }),
+            },
+            { value: "until", label: t({ de: "Bis um", en: "Until", zh: "到几点", hi: "कितने बजे तक", es: "Hasta las", ar: "حتى الساعة", ru: "До" }) },
           ]}
         />
         {kind === "for" ? (
           <>
             <div className="tm-steppers">
               <Stepper
-                name={t({ de: "Std." })}
+                name={t({ de: "Std.", en: "hr", zh: "小时", hi: "घंटे", es: "h", ar: "ساعة", ru: "ч" })}
                 value={String(h)}
                 onMinus={() => addSeconds(-3600)}
                 onPlus={() => addSeconds(3600)}
@@ -142,7 +150,7 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
                 plus={seconds + 3600 <= MAX_SECONDS}
               />
               <Stepper
-                name={t({ de: "Min." })}
+                name={t({ de: "Min.", en: "min", zh: "分钟", hi: "मिनट", es: "min", ar: "دقيقة", ru: "мин" })}
                 value={String(m)}
                 onMinus={() => addSeconds(-60)}
                 onPlus={() => addSeconds(60)}
@@ -150,7 +158,7 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
                 plus={seconds + 60 <= MAX_SECONDS}
               />
               <Stepper
-                name={t({ de: "Sek." })}
+                name={t({ de: "Sek.", en: "sec", zh: "秒", hi: "सेकंड", es: "s", ar: "ثانية", ru: "сек" })}
                 value={String(s)}
                 onMinus={() => addSeconds(-10)}
                 onPlus={() => addSeconds(10)}
@@ -170,27 +178,41 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
                     setTyped("");
                   }}
                 >
-                  {lengthLabel(minutes * 60)}
+                  {t(lengthWords(minutes * 60))}
                 </button>
               ))}
             </div>
           </>
         ) : (
           <div className="tm-steppers">
-            <Stepper name={t({ de: "Uhr" })} value={at.slice(0, 2)} onMinus={() => addMinutes(-60)} onPlus={() => addMinutes(60)} />
+            <Stepper
+              name={t({ de: "Uhr", en: "Hour", zh: "点", hi: "बजे", es: "Hora", ar: "الساعة", ru: "Час" })}
+              value={at.slice(0, 2)}
+              onMinus={() => addMinutes(-60)}
+              onPlus={() => addMinutes(60)}
+            />
             <span className="tm-colon" aria-hidden>
               :
             </span>
-            <Stepper name={t({ de: "Min." })} value={at.slice(3)} onMinus={() => addMinutes(-5)} onPlus={() => addMinutes(5)} />
+            <Stepper
+              name={t({ de: "Min.", en: "min", zh: "分钟", hi: "मिनट", es: "min", ar: "دقيقة", ru: "мин" })}
+              value={at.slice(3)}
+              onMinus={() => addMinutes(-5)}
+              onPlus={() => addMinutes(5)}
+            />
           </div>
         )}
         {!touchOnly && (
           <label className="tm-type">
-            {t({ de: "Oder eintippen:" })}
+            {t({ de: "Oder eintippen:", en: "Or type:", zh: "或者输入：", hi: "या टाइप करें:", es: "O escriba:", ar: "أو اكتبوا:", ru: "Или введите:" })}
             <input
               value={typed}
               inputMode="numeric"
-              placeholder={kind === "for" ? t({ de: "7:30 oder 45" }) : t({ de: "17:30" })}
+              placeholder={
+                kind === "for"
+                  ? t({ de: "7:30 oder 45", en: "7:30 or 45", zh: "7:30 或 45", hi: "7:30 या 45", es: "7:30 o 45", ar: "7:30 أو 45", ru: "7:30 или 45" })
+                  : "17:30"
+              }
               aria-invalid={typedWrong}
               onChange={(e) => type(e.target.value)}
               onKeyDown={(e) => {
@@ -201,23 +223,51 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
         )}
         {asking ? (
           <div className="tm-sheet-ask">
-            <p>{t({ de: `Heute ist es schon nach ${at}.` })}</p>
+            <p>
+              {t({
+                de: `Heute ist es schon nach ${at}.`,
+                en: `It's already past ${at} today.`,
+                zh: `今天已经过了 ${at}。`,
+                hi: `आज ${at} बज चुके हैं।`,
+                es: `Hoy ya son más de las ${at}.`,
+                ar: `تجاوزت الساعة ${at} اليوم بالفعل.`,
+                ru: `Сегодня уже позже ${at}.`,
+              })}
+            </p>
             <div className="tm-sheet-actions">
               <button type="button" className="tm-sheet-secondary" onClick={() => setAsking(false)}>
-                {t({ de: "Andere Uhrzeit" })}
+                {t({ de: "Andere Uhrzeit", en: "Different time", zh: "换个时间", hi: "दूसरा समय", es: "Otra hora", ar: "وقت آخر", ru: "Другое время" })}
               </button>
               <button type="button" className="tm-sheet-ok" onClick={() => onDone({ kind: "until", at, tomorrowFrom: dayKey(new Date()) })}>
-                {t({ de: `Bis morgen um ${at}` })}
+                {t(tomorrowAt(at))}
               </button>
             </div>
           </div>
         ) : (
           <div className="tm-sheet-actions">
             <button type="button" className="tm-sheet-secondary" onClick={onClose}>
-              {t({ de: "Abbrechen" })}
+              {t({ de: "Abbrechen", en: "Cancel", zh: "取消", hi: "रद्द करें", es: "Cancelar", ar: "إلغاء", ru: "Отмена" })}
             </button>
             <button type="button" className="tm-sheet-ok" onClick={done} disabled={typedWrong}>
-              {kind === "for" ? t({ de: `${lengthLabel(seconds)} – fertig` }) : t({ de: `Bis ${at} – fertig` })}
+              {kind === "for"
+                ? t({
+                    de: `${len("de")} – fertig`,
+                    en: `${len("en")} – done`,
+                    zh: `${len("zh")}，好了`,
+                    hi: `${len("hi")} – हो गया`,
+                    es: `${len("es")}: listo`,
+                    ar: `${len("ar")} – تمّ`,
+                    ru: `${len("ru")} – готово`,
+                  })
+                : t({
+                    de: `Bis ${at} – fertig`,
+                    en: `Until ${at} – done`,
+                    zh: `到 ${at}，好了`,
+                    hi: `${at} बजे तक – हो गया`,
+                    es: `Hasta las ${at}: listo`,
+                    ar: `حتى ${at} – تمّ`,
+                    ru: `До ${at} – готово`,
+                  })}
             </button>
           </div>
         )}

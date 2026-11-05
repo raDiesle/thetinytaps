@@ -102,7 +102,17 @@ function PrintBadge() {
             ru: "на A4 или фотоотпечатком – или отмечайте прямо на экране",
           })}
         </span>{" "}
-        <span className="rw-print-badge-ink">{t({ de: "🖍️ auch schwarz-weiß, jedes Bild zum Ausmalen" })}</span>
+        <span className="rw-print-badge-ink">
+          {t({
+            de: "🖍️ auch schwarz-weiß, jedes Bild zum Ausmalen",
+            en: "🖍️ also in black and white, every picture to color in",
+            zh: "🖍️ 也可黑白打印，每张图都能涂色",
+            hi: "🖍️ काला-सफ़ेद भी, हर चित्र में रंग भरें",
+            es: "🖍️ también en blanco y negro, cada imagen para colorear",
+            ar: "🖍️ وبالأبيض والأسود أيضًا، كل صورة للتلوين",
+            ru: "🖍️ и чёрно-белая, каждую картинку можно раскрасить",
+          })}
+        </span>
       </span>
     </p>
   );

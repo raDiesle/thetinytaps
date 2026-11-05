@@ -11,7 +11,7 @@ import { playChime, playChimeNote, playDing, playDrops, playLeaves, playMelody, 
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { CaterpillarScene } from "./caterpillar";
-import { nextPicture, PICTURES } from "./content";
+import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
 import { haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
@@ -123,13 +123,23 @@ function TimerStart({
     return (
       <div className="tm-play tm-asking">
         <section className="settings tm-ask">
-          <p>{t({ de: `Es ist schon nach ${until}.` })}</p>
+          <p>
+            {t({
+              de: `Es ist schon nach ${until}.`,
+              en: `It's already past ${until}.`,
+              zh: `已经过了 ${until}。`,
+              hi: `${until} बज चुके हैं।`,
+              es: `Ya son más de las ${until}.`,
+              ar: `تجاوزت الساعة ${until} بالفعل.`,
+              ru: `Уже позже ${until}.`,
+            })}
+          </p>
           <div className="tm-sheet-actions">
             <button type="button" className="tm-sheet-secondary" onClick={leave}>
-              {t({ de: "Andere Zeit" })}
+              {t(OTHER_TIME)}
             </button>
             <button type="button" className="tm-sheet-ok" onClick={() => setTotal(clockOn(until, new Date(), true) - Date.now())}>
-              {t({ de: `Bis morgen um ${until}` })}
+              {t(tomorrowAt(until))}
             </button>
           </div>
         </section>
@@ -170,10 +180,46 @@ export function TimeLeft({ endsAt, until, title }: { endsAt: number; until?: str
   }, []);
   const left = endsAt - now;
   return (
-    <SettingsGroup title={title ?? t({ de: "Restzeit" })}>
+    <SettingsGroup
+      title={
+        title ?? t({ de: "Restzeit", en: "Time left", zh: "剩余时间", hi: "बचा हुआ समय", es: "Tiempo restante", ar: "الوقت المتبقي", ru: "Осталось времени" })
+      }
+    >
       <p className="tm-left">
-        <b>{left > 0 ? t({ de: `${digits(left)} noch` }) : t({ de: "Die Zeit ist um." })}</b>
-        {until && <span>{t({ de: `bis ${until}` })}</span>}
+        <b>
+          {left > 0
+            ? t({
+                de: `${digits(left)} noch`,
+                en: `${digits(left)} left`,
+                zh: `还剩 ${digits(left)}`,
+                hi: `${digits(left)} बाकी`,
+                es: `Quedan ${digits(left)}`,
+                ar: `بقي ${digits(left)}`,
+                ru: `Осталось ${digits(left)}`,
+              })
+            : t({
+                de: "Die Zeit ist um.",
+                en: "Time's up.",
+                zh: "时间到了。",
+                hi: "समय पूरा हुआ।",
+                es: "Se acabó el tiempo.",
+                ar: "انتهى الوقت.",
+                ru: "Время вышло.",
+              })}
+        </b>
+        {until && (
+          <span>
+            {t({
+              de: `bis ${until}`,
+              en: `until ${until}`,
+              zh: `到 ${until}`,
+              hi: `${until} बजे तक`,
+              es: `hasta las ${until}`,
+              ar: `حتى ${until}`,
+              ru: `до ${until}`,
+            })}
+          </span>
+        )}
       </p>
     </SettingsGroup>
   );

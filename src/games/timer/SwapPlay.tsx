@@ -6,7 +6,7 @@ import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { playChime, playMelody, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
-import { nextPicture, PICTURES } from "./content";
+import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import { Family } from "./scenes";
 import type { SwapToy, TimerPicture } from "./settings";
 import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_TOYS, SwapBackdrop, SwapHourglass, Toy } from "./swap";
@@ -149,25 +149,68 @@ export function SwapRun({
         {done && <GameEnd delayMs={3200} noFamily onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
-        <SettingsGroup title={t({ de: "Abwechseln" })}>
+        <SettingsGroup title={t(SWAP_NAME)}>
           <Choice
-            label={t({ de: "Spielzeug" })}
+            label={t({ de: "Spielzeug", en: "Toy", zh: "玩具", hi: "खिलौना", es: "Juguete", ar: "اللعبة", ru: "Игрушка" })}
             value={toy}
             onChange={onToy}
-            options={SWAP_TOYS.map((s) => ({ value: s.id, label: `${s.emoji} ${t({ de: s.de })}` }))}
+            options={SWAP_TOYS.map((s) => ({ value: s.id, label: `${s.emoji} ${t(s.name)}` }))}
           />
           <Choice
-            label={t({ de: "Wer ist dran?" })}
+            label={t({
+              de: "Wer ist dran?",
+              en: "Whose turn?",
+              zh: "轮到谁了？",
+              hi: "किसकी बारी?",
+              es: "¿A quién le toca?",
+              ar: "دور مَن؟",
+              ru: "Чья очередь?",
+            })}
             value={holder}
             // Starts that child's turn anew, with a full hourglass: for who begins, or to set it right.
             onChange={(first: Child) => setTurns({ start: Date.now(), first })}
             options={[
-              { value: "fox", label: t({ de: "🦊 Fuchskind" }) },
-              { value: "bear", label: t({ de: "🐻 Bärenkind" }) },
+              {
+                value: "fox",
+                label: t({
+                  de: "🦊 Fuchskind",
+                  en: "🦊 Little fox",
+                  zh: "🦊 小狐狸",
+                  hi: "🦊 लोमड़ी का बच्चा",
+                  es: "🦊 Zorrito",
+                  ar: "🦊 الثعلب الصغير",
+                  ru: "🦊 Лисёнок",
+                }),
+              },
+              {
+                value: "bear",
+                label: t({
+                  de: "🐻 Bärenkind",
+                  en: "🐻 Little bear",
+                  zh: "🐻 小熊",
+                  hi: "🐻 भालू का बच्चा",
+                  es: "🐻 Osito",
+                  ar: "🐻 الدبّ الصغير",
+                  ru: "🐻 Медвежонок",
+                }),
+              },
             ]}
           />
         </SettingsGroup>
-        {!done && <TimeLeft endsAt={turnStart + turnMs} title={t({ de: "Bis zum Wechsel" })} />}
+        {!done && (
+          <TimeLeft
+            endsAt={turnStart + turnMs}
+            title={t({
+              de: "Bis zum Wechsel",
+              en: "Until the switch",
+              zh: "距离换人",
+              hi: "बारी बदलने तक",
+              es: "Hasta el cambio",
+              ar: "حتى التبديل",
+              ru: "До смены",
+            })}
+          />
+        )}
         {endsAt !== undefined && <TimeLeft endsAt={endsAt} until={until} />}
       </PlayOptions>
     </>

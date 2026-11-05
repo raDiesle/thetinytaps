@@ -469,7 +469,7 @@ function Compartment({
         // that wall right above the fox's head (user feedback, November 2026).
         <div className="shelf-side-stuck">
           <span className="shelf-figure-ask" aria-hidden>
-            {t({ de: "Wer spielt?" })}
+            {t({ de: "Wer spielt?", ru: "Кто играет?", en: "Who’s playing?", zh: "谁来玩？", hi: "किसकी बारी?", es: "¿Quién juega?", ar: "من يلعب؟" })}
           </span>
           <RoomStickers />
         </div>

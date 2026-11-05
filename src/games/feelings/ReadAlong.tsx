@@ -34,7 +34,17 @@ export function ReadAlong({
   children?: ReactNode;
 }) {
   const t = useT();
-  const label = open ? t({ de: "Text ausblenden" }) : t({ de: "Text zum Vorlesen zeigen" });
+  const label = open
+    ? t({ de: "Text ausblenden", en: "Hide the text", zh: "隐藏文字", hi: "पाठ छिपाएँ", es: "Ocultar el texto", ar: "إخفاء النص", ru: "Скрыть текст" })
+    : t({
+        de: "Text zum Vorlesen zeigen",
+        en: "Show the text to read aloud",
+        zh: "显示朗读文字",
+        hi: "पढ़कर सुनाने का पाठ दिखाएँ",
+        es: "Mostrar el texto para leer en voz alta",
+        ar: "إظهار النص للقراءة بصوت عالٍ",
+        ru: "Показать текст для чтения вслух",
+      });
 
   return (
     <>

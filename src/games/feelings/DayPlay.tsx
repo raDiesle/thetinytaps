@@ -3,6 +3,7 @@ import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { DayPage } from "./DayPage";
 import { type Day, dayStories, NIGHT_IMAGE } from "./days";
+import { dayIn } from "./localized";
 import type { ReadAlongCorner } from "./PassPlay";
 import { RoundPlay } from "./RoundPlay";
 import { roundOf, stepsOf } from "./rounds";
@@ -77,7 +78,7 @@ export function DayPlay({
       <DayPage
         key="night"
         image={NIGHT_IMAGE}
-        text={day.end}
+        text={dayIn(day, language).end}
         settings={settings}
         progress={progress}
         ending={<GameEnd inline showNext onAgain={onAgain} next={next} />}
@@ -86,7 +87,7 @@ export function DayPlay({
       />
     );
 
-  const { before } = day.scenes[at.index];
+  const { before } = dayIn(day, language).scenes[at.index];
   if (at.page === "before")
     return (
       <DayPage

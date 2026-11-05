@@ -5,11 +5,13 @@ import type { LanguagePack } from "@/content/types";
 import type { StoryTranslation } from "@/games/adventure/stories/story";
 import type { AnimalTranslation } from "@/games/animals/content";
 import type { ComfortId, FeelingId } from "@/games/feelings/bear";
+import type { DayText } from "@/games/feelings/days";
 import type { SituationId } from "@/games/feelings/kita";
 import type { ComfortText, FeelingText, SituationText } from "@/games/feelings/localized";
 import type { SceneTranslation } from "@/games/scenes/types";
 import type { ShadowTranslation } from "@/games/shadows/content";
 import type { SockTexts } from "@/games/socks/content";
+import type { TogetherTranslation } from "@/games/together/pairs";
 import type { Daytime, DaytimeTexts } from "@/games/teeth/daytime";
 import type { StepId, StepTexts } from "@/games/teeth/steps";
 
@@ -40,6 +42,8 @@ export interface LanguageTexts {
   shadows?: ShadowTranslation;
   /** Socken-Paare (`socks/content.<id>.ts`); German fills the gaps. */
   socks?: Partial<SockTexts>;
+  /** Was gehört zusammen?: each pair's sentences (`together/content.<id>.ts`); German fills the gaps. */
+  together?: TogetherTranslation;
   /** Zähne putzen: the steps by step id (`teeth/steps.<id>.ts`). */
   teethSteps?: Partial<Record<StepId, Partial<StepTexts>>>;
   /** Zähne putzen: morning and evening (`teeth/daytime.<id>.ts`). */
@@ -49,6 +53,8 @@ export interface LanguageTexts {
   feelings?: Partial<Record<FeelingId, FeelingText>>;
   /** Gefühle, Im Kindergarten (`feelings/kita.<id>.ts`). */
   situations?: Partial<Record<SituationId, SituationText>>;
+  /** Gefühle, the days' pages of the story by day id (`feelings/days.<id>.ts`). */
+  days?: Partial<Record<string, DayText>>;
   /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
   seo?: SeoTranslation;
   /** Bewegungsabenteuer: Tapsi's lines by story folder (`adventure/stories/<story>/lines.<id>.ts`). */

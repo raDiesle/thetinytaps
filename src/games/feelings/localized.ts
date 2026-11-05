@@ -8,6 +8,7 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { byLanguage } from "@/content/texts";
 import { pick, type Localized } from "@/lib/language";
 import { COMFORTS, type Comfort, type ComfortId, type Feeling, type FeelingId } from "./bear";
+import type { Day, DayText } from "./days";
 import { QUESTION, type Situation, type SituationId } from "./kita";
 import type { Story } from "./stories";
 import type { Beat } from "./story";
@@ -54,6 +55,9 @@ export const COMFORT_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<Comf
 export const FEELING_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<FeelingId, FeelingText>>>> = byLanguage((texts) => texts.feelings);
 /** The translations of the kindergarten stories, by language. */
 export const SITUATION_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<SituationId, SituationText>>>> = byLanguage((texts) => texts.situations);
+
+/** The translations of the days' pages of the story, by language and day id. */
+export const DAY_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<string, DayText>>>> = byLanguage((texts) => texts.days);
 
 /** All kind things in `language`. */
 export function comfortsIn(language: TargetLanguageId): Record<ComfortId, Comfort> {
@@ -110,6 +114,17 @@ export function situationIn(situation: Situation, language: TargetLanguageId): S
         instead: { ...step.instead, ...words.instead },
       };
     }),
+  };
+}
+
+/** The day with the words of its pages in `language`. */
+export function dayIn(day: Day, language: TargetLanguageId): Day {
+  const text = DAY_TEXTS[language]?.[day.id];
+  if (!text) return day;
+  return {
+    ...day,
+    scenes: day.scenes.map((scene, i) => ({ ...scene, before: { ...scene.before, text: text.pages[i] ?? scene.before.text } })),
+    end: text.end,
   };
 }
 

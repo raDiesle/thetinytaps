@@ -12,8 +12,24 @@ import "./together.css";
 
 /** The names of the two kinds of rounds, for switching them on and off (after their sign, `KIND_SIGNS`). */
 const KIND_NAMES: Record<RoundKind, Localized> = {
-  pair: { de: "Dinge aus dem Alltag" },
-  helper: { de: "Helfer und ihr Werkzeug" },
+  pair: {
+    de: "Dinge aus dem Alltag",
+    ru: "Вещи на каждый день",
+    en: "Everyday things",
+    zh: "日常用品",
+    hi: "रोज़ की चीज़ें",
+    es: "Cosas de todos los días",
+    ar: "أشياء من الحياة اليومية",
+  },
+  helper: {
+    de: "Helfer und ihr Werkzeug",
+    ru: "Помощники и их инструменты",
+    en: "Helpers and their tools",
+    zh: "帮手和他们的工具",
+    hi: "मददगार और उनके औज़ार",
+    es: "Ayudantes y sus herramientas",
+    ar: "المساعدون وأدواتهم",
+  },
 };
 
 export function TogetherGame() {
@@ -31,7 +47,17 @@ export function TogetherGame() {
     >
       <TogetherRounds settings={settings} />
       <PlayOptions>
-        <SettingsGroup title={t({ de: "Was drankommt" })}>
+        <SettingsGroup
+          title={t({
+            de: "Was drankommt",
+            ru: "Что будет в игре",
+            en: "What comes up",
+            zh: "出现哪些内容",
+            hi: "क्या-क्या आएगा",
+            es: "Qué aparece",
+            ar: "ما الذي يظهر",
+          })}
+        >
           {KIND_ORDER.map((kind) => (
             <Toggle
               key={kind}
@@ -43,14 +69,14 @@ export function TogetherGame() {
           ))}
         </SettingsGroup>
         <Choice<Difficulty>
-          label={t({ de: "Schwierigkeit" })}
+          label={t({ de: "Schwierigkeit", ru: "Сложность", en: "Difficulty", zh: "难度", hi: "कठिनाई", es: "Dificultad", ar: "الصعوبة" })}
           value={settings.difficulty}
           onChange={(difficulty) => update({ difficulty })}
           options={[
-            { value: "auto", label: t({ de: "Von selbst" }) },
-            { value: "easy", label: t({ de: "Leicht" }) },
-            { value: "medium", label: t({ de: "Mittel" }) },
-            { value: "hard", label: t({ de: "Schwer" }) },
+            { value: "auto", label: t({ de: "Von selbst", ru: "Автоматически", en: "Automatic", zh: "自动", hi: "अपने-आप", es: "Automática", ar: "تلقائي" }) },
+            { value: "easy", label: t({ de: "Leicht", ru: "Легко", en: "Easy", zh: "简单", hi: "आसान", es: "Fácil", ar: "سهل" }) },
+            { value: "medium", label: t({ de: "Mittel", ru: "Средне", en: "Medium", zh: "中等", hi: "मध्यम", es: "Media", ar: "متوسط" }) },
+            { value: "hard", label: t({ de: "Schwer", ru: "Сложно", en: "Hard", zh: "困难", hi: "कठिन", es: "Difícil", ar: "صعب" }) },
           ]}
         />
       </PlayOptions>

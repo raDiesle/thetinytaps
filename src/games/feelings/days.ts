@@ -13,7 +13,7 @@ import type { Localized } from "@/lib/language";
 import { bearImages, imageFor, storyImages } from "./images";
 import { STORIES, type Story } from "./stories";
 
-/** A page of the story between two scenes: its picture and what is told. German only so far. */
+/** A page of the story between two scenes: its picture and what is told (in German; `days.<lang>.ts` hold the other languages). */
 export interface StoryPage {
   /** Name of its picture in bilder/ (`tag1-1` …), see `dayImages`. */
   image: string;
@@ -35,6 +35,17 @@ export interface Day {
   emoji: string;
   scenes: DayScene[];
   /** Told on the last page, the house at night (`NIGHT_IMAGE`): how the day ends. */
+  end: string;
+}
+
+/**
+ * A day's words in another language (`days.<lang>.ts`, by day id): its pages of the story in the order of its scenes,
+ * and its end. `dayIn` in `localized.ts` lays them over the German.
+ */
+export interface DayText {
+  /** One per scene, like `Day.scenes[i].before.text`. */
+  pages: string[];
+  /** Like `Day.end`. */
   end: string;
 }
 
@@ -145,8 +156,11 @@ export const DAYS: Day[] = [
   },
 ];
 
-/** The day's name on its card and under „Weiter“: „Tag 1“, „Tag 2“ … (German only so far). */
-export const dayTitle = (day: Day): Localized => ({ de: `Tag ${DAYS.indexOf(day) + 1}` });
+/** The day's name on its card and under „Weiter“: „Tag 1“, „Tag 2“ … */
+export const dayTitle = (day: Day): Localized => {
+  const n = DAYS.indexOf(day) + 1;
+  return { de: `Tag ${n}`, en: `Day ${n}`, zh: `第${n}天`, hi: `दिन ${n}`, es: `Día ${n}`, ar: `اليوم ${n}`, ru: `День ${n}` };
+};
 
 /** The day with this id, or the first. */
 export const dayById = (id: string): Day => DAYS.find((d) => d.id === id) ?? DAYS[0];

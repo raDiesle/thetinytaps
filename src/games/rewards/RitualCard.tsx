@@ -80,7 +80,7 @@ export function RitualDialog({ ritual, onDone, onClose }: { ritual: Ritual; onDo
           ref.current?.close();
         }}
       >
-        ✓ {t({ de: "Gemacht" })}
+        ✓ {t({ de: "Gemacht", en: "Done", zh: "做完了", hi: "हो गया", es: "Hecho", ar: "تمّ", ru: "Сделано" })}
       </button>
     </dialog>
   );

@@ -943,9 +943,29 @@ function CardPicks({ selected, onPick }: { selected?: string; onPick: (id: strin
   );
   return (
     <>
-      <h4 className="rw-edit-sub">{t({ de: "Rituale – mit Worten für Sie auf der Karte" })}</h4>
+      <h4 className="rw-edit-sub">
+        {t({
+          de: "Rituale – mit Worten für Sie auf der Karte",
+          en: "Rituals – with words for you on the card",
+          zh: "仪式——卡片上写着给您的话",
+          hi: "रस्में – कार्ड पर आपके लिए शब्द",
+          es: "Rituales: con palabras para usted en la tarjeta",
+          ar: "طقوس – مع كلمات لكم على البطاقة",
+          ru: "Ритуалы – со словами для вас на карточке",
+        })}
+      </h4>
       <div className="rw-picks rw-picks-tiles">{RITUALS.map(pick)}</div>
-      <h4 className="rw-edit-sub">{t({ de: "Bilder für den Tag" })}</h4>
+      <h4 className="rw-edit-sub">
+        {t({
+          de: "Bilder für den Tag",
+          en: "Pictures for the day",
+          zh: "一天的图片",
+          hi: "दिन के चित्र",
+          es: "Imágenes para el día",
+          ar: "صور لليوم",
+          ru: "Картинки для дня",
+        })}
+      </h4>
       <div className="rw-picks rw-picks-tiles">{OFFERED.map(pick)}</div>
     </>
   );

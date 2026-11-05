@@ -27,7 +27,25 @@ export const tapProps = (onTap: () => void) => ({
  */
 export function VoiceSwitch({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   const t = useT();
-  const label = on ? t({ de: "Stimme ausschalten" }) : t({ de: "Stimme einschalten" });
+  const label = on
+    ? t({
+        de: "Stimme ausschalten",
+        en: "Turn the voice off",
+        zh: "关闭语音",
+        hi: "आवाज़ बंद करें",
+        es: "Apagar la voz",
+        ar: "إيقاف صوت الراوي",
+        ru: "Выключить голос",
+      })
+    : t({
+        de: "Stimme einschalten",
+        en: "Turn the voice on",
+        zh: "打开语音",
+        hi: "आवाज़ चालू करें",
+        es: "Encender la voz",
+        ar: "تشغيل صوت الراوي",
+        ru: "Включить голос",
+      });
 
   return (
     <button type="button" className="story-voice" aria-pressed={on} aria-label={label} title={label} data-tap-keep {...tapProps(onToggle)}>

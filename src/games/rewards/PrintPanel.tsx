@@ -18,9 +18,17 @@ export const PRINT_WORDS = {
   auto: { de: "Passend", en: "Automatic", zh: "自动", hi: "अपने-आप", es: "Automática", ar: "تلقائي", ru: "Автоматически" },
   landscape: { de: "Quer", en: "Landscape", zh: "横向", hi: "आड़ा", es: "Horizontal", ar: "أفقي", ru: "Альбомная" },
   portrait: { de: "Hochkant", en: "Portrait", zh: "纵向", hi: "खड़ा", es: "Vertical", ar: "عمودي", ru: "Книжная" },
-  ink: { de: "Druck" },
-  color: { de: "🎨 In Farbe" },
-  colorIn: { de: "🖍️ Schwarz-weiß zum Ausmalen – spart Tinte" },
+  ink: { de: "Druck", en: "Print", zh: "打印", hi: "प्रिंट", es: "Impresión", ar: "الطباعة", ru: "Печать" },
+  color: { de: "🎨 In Farbe", en: "🎨 In color", zh: "🎨 彩色", hi: "🎨 रंगीन", es: "🎨 En color", ar: "🎨 بالألوان", ru: "🎨 В цвете" },
+  colorIn: {
+    de: "🖍️ Schwarz-weiß zum Ausmalen – spart Tinte",
+    en: "🖍️ Black and white to color in – saves ink",
+    zh: "🖍️ 黑白涂色版——省墨",
+    hi: "🖍️ रंग भरने के लिए काला-सफ़ेद – स्याही बचती है",
+    es: "🖍️ En blanco y negro para colorear: ahorra tinta",
+    ar: "🖍️ بالأبيض والأسود للتلوين – يوفّر الحبر",
+    ru: "🖍️ Чёрно-белая раскраска – экономит краску",
+  },
   now: { de: "Jetzt drucken", en: "Print now", zh: "立即打印", hi: "अभी प्रिंट करें", es: "Imprimir ahora", ar: "الطباعة الآن", ru: "Печатать" },
 } satisfies Record<string, Localized>;
 

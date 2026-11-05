@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { MASCOT_COLORS, type MascotKind, MascotHead } from "@/components/Mascot";
+import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
 import { playGiggle, playSplash } from "@/lib/realSounds";
 import {
@@ -673,7 +674,7 @@ export const pairsOf = (kind: RoundKind) => PAIRS.filter((p) => p.kind === kind)
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
-/** What "Was gehört zusammen?" says, in one language (only German so far: its translations wait to be asked for). */
+/** What "Was gehört zusammen?" says, in one language. */
 export interface TogetherTexts {
   /** The one above, for screen readers: "Zahnbürste". */
   name: (p: Pair) => string;
@@ -687,13 +688,45 @@ export interface TogetherTexts {
   belongs: (p: Pair) => string;
 }
 
-/** The texts of "Was gehört zusammen?" by app language: `pick(TOGETHER_TEXTS, language.id)`. */
-export const TOGETHER_TEXTS: Localized<TogetherTexts> = {
-  de: {
-    name: (p) => p.name,
-    partner: (p) => p.partner.name,
-    question: (p) => (p.kind === "pair" ? `Was gehört ${p.toThe}?` : `Was braucht ${p.the}?`),
-    right: (p) => (p.kind === "pair" ? `${capitalize(p.partner.the)} gehört ${p.toThe}. Toll!` : `${capitalize(p.the)} braucht ${p.partner.acc}. Toll!`),
-    belongs: (p) => (p.kind === "pair" ? `${capitalize(p.partner.the)} gehört ${p.toThe}!` : `${capitalize(p.the)} braucht ${p.partner.acc}!`),
-  },
+const GERMAN_TEXTS: TogetherTexts = {
+  name: (p) => p.name,
+  partner: (p) => p.partner.name,
+  question: (p) => (p.kind === "pair" ? `Was gehört ${p.toThe}?` : `Was braucht ${p.the}?`),
+  right: (p) => (p.kind === "pair" ? `${capitalize(p.partner.the)} gehört ${p.toThe}. Toll!` : `${capitalize(p.the)} braucht ${p.partner.acc}. Toll!`),
+  belongs: (p) => (p.kind === "pair" ? `${capitalize(p.partner.the)} gehört ${p.toThe}!` : `${capitalize(p.the)} braucht ${p.partner.acc}!`),
 };
+
+/**
+ * One pair in another language (`content.<lang>.ts`), written out sentence by sentence rather than built from words:
+ * there are only ten, and each language's grammar (cases, the partner's gender in its verb) is then plain to see.
+ */
+export interface PairTranslation {
+  /** The one above, for screen readers. */
+  name: string;
+  /** Its partner, for screen readers. */
+  partner: string;
+  /** The question, as `TogetherTexts.question`. */
+  question: string;
+  /** The right pick, with the praise, as `TogetherTexts.right`. */
+  right: string;
+  /** The partner belongs to the one above, said when it was picked wrongly, as `TogetherTexts.belongs`. */
+  belongs: string;
+}
+
+/** A language's sentences, every pair's; one without an entry is said in German. */
+export type TogetherTranslation = Partial<Record<PairId, PairTranslation>>;
+
+/** A language's texts from its sentences, German where a pair has none. */
+const textsOf = (sentences: TogetherTranslation): TogetherTexts => ({
+  name: (p) => sentences[p.id]?.name ?? GERMAN_TEXTS.name(p),
+  partner: (p) => sentences[p.id]?.partner ?? GERMAN_TEXTS.partner(p),
+  question: (p) => sentences[p.id]?.question ?? GERMAN_TEXTS.question(p),
+  right: (p) => sentences[p.id]?.right ?? GERMAN_TEXTS.right(p),
+  belongs: (p) => sentences[p.id]?.belongs ?? GERMAN_TEXTS.belongs(p),
+});
+
+/** Each language's sentences, filled as the language's texts load (`src/content/texts/texts-<lang>.ts`). */
+export const TOGETHER_TRANSLATIONS = byLanguage((texts) => texts.together);
+
+/** The texts of "Was gehört zusammen?" by app language: `pick(TOGETHER_TEXTS, language.id)`. */
+export const TOGETHER_TEXTS: Localized<TogetherTexts> = byLanguage((texts) => texts.together && textsOf(texts.together), GERMAN_TEXTS);

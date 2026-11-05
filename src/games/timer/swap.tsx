@@ -1,4 +1,5 @@
 import { memo, useState, type CSSProperties } from "react";
+import type { Localized } from "@/lib/language";
 import { bulbPolygon, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 import type { SwapToy } from "./settings";
 
@@ -141,10 +142,14 @@ export function SwapHourglass({ ms, startedAt, flip, running, glow }: { ms: numb
 }
 
 /** The toys a grown-up can pick behind ⚙️, in their order there. */
-export const SWAP_TOYS: { id: SwapToy; emoji: string; de: string }[] = [
-  { id: "bobbycar", emoji: "🚗", de: "Bobbycar" },
-  { id: "doll", emoji: "🪆", de: "Puppe" },
-  { id: "ball", emoji: "⚽", de: "Ball" },
+export const SWAP_TOYS: { id: SwapToy; emoji: string; name: Localized }[] = [
+  {
+    id: "bobbycar",
+    emoji: "🚗",
+    name: { de: "Bobbycar", en: "Ride-on car", zh: "扭扭车", hi: "खिलौना कार", es: "Correpasillos", ar: "سيارة الأطفال", ru: "Каталка" },
+  },
+  { id: "doll", emoji: "🪆", name: { de: "Puppe", en: "Doll", zh: "娃娃", hi: "गुड़िया", es: "Muñeca", ar: "الدمية", ru: "Кукла" } },
+  { id: "ball", emoji: "⚽", name: { de: "Ball", en: "Ball", zh: "球", hi: "गेंद", es: "Pelota", ar: "الكرة", ru: "Мяч" } },
 ];
 
 /** The toy's drawing, in TOY.w × TOY.h units, standing on its bottom edge. */
