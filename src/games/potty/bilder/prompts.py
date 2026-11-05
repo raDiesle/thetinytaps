@@ -73,18 +73,6 @@ def bathroom(a):
    "hoch": BATH_KEEP + cast(a) + f"Now this happens: {k} stands next to the potty and pulls the trousers up, big proud smile. Mama and Papa stand together and smile. " + END,
    "abziehen": BATH_KEEP + cast(a) + f"Now this happens: {k} stands on tiptoes at the toilet and presses the flush button on the toilet with one paw; Papa holds the empty potty, just emptied into the toilet, so there is no potty on the floor any more – only the one in Papa's paws; the water in the toilet swirls. Mama stands beside them and smiles. Trousers are up. " + END,
    # The first one had a second tap floating in the air in the middle of the room: the water must come from the sink's own tap.
-   "waschen": BATH_KEEP + cast(a) + (f"Now this happens: {k} stands on a small step stool right in front of the white sink below the round mirror on the right wall, "
-     "facing the sink (turned towards the wall, seen from the side), and holds both paws inside the basin right under the stream of water "
-     "that runs from that sink's own tap, with lots of white soap foam on the paws. "
-     # The third try had the water running in the sink while Tapsi rubbed its paws beside it, towards Papa's towel.
-     "The paws are in the water over the basin, not beside the sink. "
-     # The fourth try put a second, bigger basin in front of the sink and a new shelf on the left wall.
-     "The sink stays exactly the one small white sink of the reference picture, at its place and size: only ONE sink and ONE basin in the whole picture, "
-     "nothing added to the walls (no shelf, no towels on the wall). "
-     "There is only that one tap in the whole picture, fixed on the sink – no tap, pipe or water floating in the air anywhere else. "
-     "Mama stands right behind Tapsi and helps, Papa stands a step behind them, holding a towel ready for later. Trousers are up. "
-     # The second try drew Tapsi twice, once at the sink and once at Mama's paw in the middle.
-     "Only ONE fox child in the whole picture: Tapsi is at the sink and nowhere else – no second Tapsi at Mama's paw, in the middle of the room or peeking in from an edge. ") + END,
    "party": BATH_KEEP + cast(a) + f"Now this happens: {k} jumps for joy in the middle of the bathroom with both arms up, Mama and Papa jump and cheer too, colourful confetti in the air. Trousers are up. " + END,
   }
 
@@ -268,7 +256,26 @@ raw = lambda a, n: f".image-raw/{a}-{n}.png" if os.path.exists(f".image-raw/{a}-
 # A third argument names only some thoughts, so new ones are made without drawing the old ones again: think fox tee,erbsen
 wanted = lambda n: len(sys.argv) < 4 or n in sys.argv[3].split(",")
 
+# Washing hands is drawn closer, from the bathroom's sink corner: from the whole room (fox-bad) the Lite model kept the
+# family in the middle, far from the sink at the right edge, and gave Tapsi a tap of its own floating in the air there,
+# or a second basin – five tries. The reference is fox-bad cut to the sink corner:
+#   sharp("src/games/potty/bilder/fox-bad.webp").extract({ left: 541, top: 150, width: 835, height: 470 }).resize(1376, 774)
+#   → .image-raw/ref/bad-sink-wide.png
+SINK_REF = ".image-raw/ref/bad-sink-wide.png"
+def wash(a):
+  k = CAST[a]["kid_short"]
+  return ("Redraw this exact picture as a later moment of the same story: a closer view of the right corner of the family bathroom. "
+    "Keep the place exactly as it is: the same light blue tiled walls, the round mirror, the one small white sink with its tap and its pipe below, "
+    "the green potted plant, the wooden floor, the same camera framing (no zoom, no shift), the same colours and line style. "
+    "Only ONE sink, ONE basin and ONE tap in the whole picture, fixed on the wall where they are – nothing added to the walls, no tap, pipe or water in the air anywhere else. "
+    + cast(a) +
+    f"Now this happens: {k} stands on a small wooden step stool right in front of the sink, facing it (seen from the side, turned to the right towards the wall), "
+    "and holds both paws inside the basin right under the water that runs from the sink's tap, with lots of white soap foam on the paws. "
+    "Mama stands right behind Tapsi with a paw on its shoulder, Papa stands a step further left holding a towel ready for later. Trousers are up. "
+    "Only ONE fox child in the whole picture: Tapsi is at the sink and nowhere else. " + END)
+
 def stage(st, a):
+  if st == "wash": return [job(a, "waschen", wash(a), SINK_REF)]
   if st == "kitchen-first": return [job(a, "essen", kitchen(a)["essen"])]
   if st == "kitchen": return [job(a, n, p, raw(a, "essen")) for n, p in kitchen(a).items() if n != "essen"]
   if st == "bath-first": return [job(a, "bad", bathroom_first(a), raw(a, "rufen"))]  # a new room

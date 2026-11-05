@@ -51,6 +51,11 @@
   user-select: none;
 }
 
+/* Washing hands is drawn closer, the sink at the right: a tablet's narrower screen keeps the sink and the water whole. */
+.pt-at-wash .pt-picture img {
+  object-position: 70% 72%;
+}
+
 /* The base frame always shows, so the other only fades in over it – never a gap between the two. */
 .pt-picture img.base,
 .pt-picture img.on {
