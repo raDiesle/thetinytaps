@@ -400,13 +400,21 @@
 
 /* What Tapsi thinks of, top left on the wall: a big cloud with two small puffs leading towards Tapsi. A new
    thought pops in inside it, so only the bubble changes, never the room. As big as the room left of Tapsi allows
-   (Tapsi sits from about 38 % of the screen's width on every screen) and above the row of steps. */
+   (the user wanted it bigger, twice): it reaches right up to Tapsi's ear, found where the picture lies on this screen
+   (cut like .pt-scene: --pic-w × --pic-h, its middle in the screen's middle and 72 % down; Tapsi's ear at 40 % of
+   the picture's width), and as tall as the room above Tapsi's tail (75 % down the picture, the bubble's round corner
+   passing it) and the row of steps allow – never taller than wide, or the thought pictures lose their sides. */
 .pt-think {
+  --pic-w: max(100cqw, 100cqh * 1376 / 768);
+  --pic-h: max(100cqh, 100cqw * 768 / 1376);
+  --edge: max(10px, env(safe-area-inset-left));
+  --top: max(8px, env(safe-area-inset-top));
+  --w: min((100cqw - var(--pic-w)) / 2 + var(--pic-w) * 0.4 - var(--edge) - 14px, (100cqh - 76px) * 1.25, 900px);
   position: absolute;
-  left: max(16px, env(safe-area-inset-left));
-  top: max(12px, env(safe-area-inset-top));
-  width: min(36vw, (100dvh - 100px) * 1.2, 680px);
-  aspect-ratio: 6 / 5;
+  left: var(--edge);
+  top: var(--top);
+  width: var(--w);
+  height: clamp(var(--w) / 1.25, min((100cqh - var(--pic-h)) * 0.72 + var(--pic-h) * 0.75, 100cqh - 76px) - var(--top) - 8px, var(--w));
   border: 4px solid #2a1e5c;
   border-radius: 46% 54% 50% 50% / 55% 50% 50% 45%;
   background: #fff;
@@ -431,17 +439,18 @@
   background: #fff;
 }
 
+/* The puffs lead right from the bubble's lower edge to Tapsi's head, never down onto its tail. */
 .pt-think::before {
-  right: 4%;
-  bottom: -11%;
-  width: 9%;
+  right: -1%;
+  bottom: 17%;
+  width: 8%;
   aspect-ratio: 1;
 }
 
 .pt-think::after {
-  right: -4%;
-  bottom: -21%;
-  width: 5.5%;
+  right: -5%;
+  bottom: 11%;
+  width: 5%;
   aspect-ratio: 1;
 }
 

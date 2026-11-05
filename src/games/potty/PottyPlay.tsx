@@ -7,7 +7,6 @@ import {
   playBoing,
   playChime,
   playDrops,
-  playDrumRoll,
   playFlush,
   playGlug,
   playKnock,
@@ -20,16 +19,13 @@ import {
   playRumble,
   playScrub,
   playSplash,
-  playSqueak,
   playTrickle,
-  playTusch,
   playTwinkle,
-  playBlow,
   playWhoosh,
   loadRecordings,
   recorded,
 } from "@/lib/sfx";
-import { loadRealSounds, playGiggle, playWhistle } from "@/lib/realSounds";
+import { loadRealSounds, playGiggle } from "@/lib/realSounds";
 import {
   expectedWent,
   iconFor,
@@ -39,7 +35,6 @@ import {
   SAID,
   type Said,
   SCENE_MS,
-  type SceneSound,
   scenePicture,
   scenesFor,
   STEPS,
@@ -61,7 +56,6 @@ const flush = recorded("flush", playFlush);
 const splash = recorded("splash", playSplash);
 const scrub = recorded("scrub", playScrub);
 const munch = recorded("munch", playMunch);
-const blow = recorded("blow", playBlow);
 const cheer = recorded("cheer", playMelody);
 const partyHorn = recorded("partyhorn", playPop);
 
@@ -75,7 +69,7 @@ interface At {
   nothing: boolean;
 }
 
-/** The story opens on Tapsi eating and drinking, already moving but silent until the first tap. */
+/** The story opens on Tapsi eating and drinking, played at once (its line and sounds) when the game opens. */
 const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
@@ -109,7 +103,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [said, setSaid] = useState<Said>("unsure");
   /** What really came, chosen at the ✓; null before. */
   const [went, setWent] = useState<Went | null>(null);
-  const scenes = useMemo(() => scenesFor(said), [said]);
+  /** Bumped by „Nochmal“, so a new round shuffles the thoughts after the first ones anew. */
+  const [round, setRound] = useState(0);
+  // round only asks for a new shuffle.
+  const scenes = useMemo(() => scenesFor(said), [said, round]);
   const [at, setAt] = useState<At>(START);
   const [busy, setBusy] = useState(false);
   /**
@@ -147,14 +144,23 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   // The real recordings, loaded at once so even the first sound of each is real.
   useEffect(() => {
-    loadRecordings(["flush", "splash", "scrub", "munch", "blow", "cheer", "partyhorn"]);
-    loadRealSounds([playGiggle, playWhistle]);
+    loadRecordings(["flush", "splash", "scrub", "munch", "cheer", "partyhorn"]);
+    loadRealSounds([playGiggle]);
   }, []);
 
   useEffect(() => {
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
+
+  // The tap on the game's card started the story: its first step speaks and sounds at once, like every other one
+  // (it was silent until the first tap, so the eating line was never heard).
+  const opened = useRef(false);
+  useEffect(() => {
+    if (opened.current) return;
+    opened.current = true;
+    begin(0, { came: null, said: "unsure", nothing: false });
+  });
 
   const story = storyFor(at.nothing);
   const step = story[at.step];
@@ -241,9 +247,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       case "down":
         sound(moves ? 700 : 0, playWhoosh);
         break;
-      case "sit":
-        sound(moves ? 800 : 300, playPlop);
-        break;
+      // Sitting starts the waiting song, which plays alone: no plop over its first bars.
       case "done":
         if (came !== "kaka") sound(0, playTrickle);
         if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
@@ -290,34 +294,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     }
   };
 
-  const SCENE_SOUNDS: Record<SceneSound, () => void> = {
-    trickle: () => playTrickle(),
-    splash: () => splash(),
-    glug: () => {
-      playGlug();
-      later(600, playGlug);
-    },
-    whoosh: () => playWhoosh(),
-    squeeze: () => playSqueak(),
-    blow: () => blow(),
-    // The hen presses (a squeak), then the egg drops.
-    plop: () => {
-      playSqueak();
-      later(700, playPlop);
-    },
-    dance: () => {
-      playDrumRoll(0);
-      later(1000, playTusch);
-    },
-    juggle: () => [0, 300, 600].forEach((ms) => later(ms, playBoing)),
-    peekaboo: () => playGiggle(),
-    bubbles: () => [0, 250, 500, 750].forEach((ms) => later(ms, playPop)),
-    // The train whistles as it comes out of the tunnel.
-    toot: () => later(500, playWhistle),
-    // The butterfly is out and flies away.
-    chime: () => playChime(),
-  };
-
   /**
    * While sitting Tapsi thinks of the next thing, endlessly – the animal sits as long as it takes. It comes by itself
    * every few seconds, or at once on a tap; only a tapped one is said, so the voice doesn't talk all the time.
@@ -325,8 +301,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const nextScene = (tapped: boolean) => {
     const index = (atRef.current.scene + 1) % scenes.length;
     const scene = scenes[index];
+    // No sound: the waiting song plays alone (sounds over it disturbed the user).
     goTo({ ...atRef.current, scene: index }, SCENE_MS);
-    if (settings.sounds) SCENE_SOUNDS[scene.sound]();
     // Once per round the voice says what the ✓ is for; after that only tapped scenes speak.
     if (!toldFinish.current) {
       toldFinish.current = true;
@@ -345,7 +321,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     const sittingNow = here[index].id === "sit";
     if (index >= here.length - 1 || (sittingNow ? busyRef.current : performance.now() - startedAt.current < TAP_GUARD_MS)) {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      // While sitting the waiting song plays alone.
+      if (settings.sounds && !sittingNow) playRandomNote();
       return;
     }
     if (sittingNow) nextScene(true);
@@ -430,6 +407,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     checked.current = false;
     starred.current = false;
     setFresh(false);
+    setRound((r) => r + 1);
     begin(0, { came: null, said: "unsure", nothing: false });
   };
 

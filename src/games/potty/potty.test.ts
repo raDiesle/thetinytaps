@@ -11,6 +11,7 @@ import {
   type Said,
   SCENE_MS,
   scenePicture,
+  FIRST_SCENES,
   scenesFor,
   STEPS,
   TAPSI,
@@ -55,7 +56,8 @@ describe("Aufs Töpfchen", () => {
     // ❓ was the same as 💧💩 to the user: a button that means what another one means only makes a grown-up think.
     expect(SAID.map((s) => s.id)).toEqual(["pipi", "kaka", "both"]);
     expect(expectedWent("unsure")).toBe("both");
-    expect(scenesFor("unsure")).toEqual(scenesFor("both"));
+    const fixed = () => 0.5;
+    expect(scenesFor("unsure", fixed)).toEqual(scenesFor("both", fixed));
   });
 
   it("goes from sitting to washing hands and playing when nothing came, ending there", () => {
@@ -66,7 +68,7 @@ describe("Aufs Töpfchen", () => {
     expect(NOTHING_STEPS.at(-1)?.auto).toBeUndefined();
   });
 
-  it("brings only the waiting scenes of what was said, pipi and kaka taking turns for both or when nobody knows", () => {
+  it("brings only the waiting scenes of what was said, the best ones first, then the others in a random order", () => {
     for (const said of SAIDS) {
       const scenes = scenesFor(said);
       const fits = (s: (typeof WAIT_SCENES)[number]) => s.need === said || ((said === "both" || said === "unsure") && s.need !== "silly");
@@ -74,11 +76,25 @@ describe("Aufs Töpfchen", () => {
       // Never the same scene twice in a row, also when the round starts again.
       expect(scenes.filter((s, i) => s.id === scenes[(i + 1) % scenes.length].id)).toEqual([]);
     }
+    // The hen, the whale, the mole, the hourglass and the funnel always come first (the user's choice), as far as they fit.
+    expect(FIRST_SCENES.every((id) => WAIT_SCENES.some((s) => s.id === id))).toBe(true);
     expect(
       scenesFor("unsure")
-        .map((s) => s.need)
-        .slice(0, 4),
-    ).toEqual(["pipi", "kaka", "pipi", "kaka"]);
+        .slice(0, 5)
+        .map((s) => s.id),
+    ).toEqual(["huhn", "wal", "maulwurf", "sanduhr", "trichter"]);
+    expect(
+      scenesFor("pipi")
+        .slice(0, 3)
+        .map((s) => s.id),
+    ).toEqual(["wal", "sanduhr", "trichter"]);
+    expect(
+      scenesFor("kaka")
+        .slice(0, 2)
+        .map((s) => s.id),
+    ).toEqual(["huhn", "maulwurf"]);
+    // The rest are shuffled.
+    expect(scenesFor("unsure", () => 0).slice(5)).not.toEqual(scenesFor("unsure", () => 0.99).slice(5));
   });
 
   it("goes on by itself only where nothing real has to happen, and the waiting scenes stay longer than their sounds", () => {
@@ -93,6 +109,8 @@ describe("Aufs Töpfchen", () => {
     // The trousers go down again and again until the story goes on, after a pause longer than a frame.
     for (const step of ALL_STEPS) if (step.again !== undefined) expect(step.moves?.length).toBeGreaterThan(0);
     expect(WAIT_SCENE_MS).toBeGreaterThan(SCENE_MS);
+    // Long enough for a toddler to look at a thought: 2.6 s was far too short for the user.
+    expect(WAIT_SCENE_MS).toBeGreaterThanOrEqual(7000);
   });
 
   it("shows both need pictures in turn and ❓ in the row while nobody knows", () => {
@@ -168,6 +186,9 @@ describe("Aufs Töpfchen", () => {
     expect([...names].map((name) => `${TAPSI.pictures}-${name}.webp`).filter((f) => !files.includes(f))).toEqual([]);
     // Only Tapsi goes to the potty: pictures of other animals would only be downloaded for nothing.
     expect(files.filter((f) => !f.startsWith(`${TAPSI.pictures}-`))).toEqual([]);
+    // A thought taken out of the bubble takes its pictures with it (the user removed seven, November 2026).
+    const thinking = new Set(WAIT_SCENES.map((s) => `${TAPSI.pictures}-${scenePicture(s)}`));
+    expect(files.filter((f) => f.includes("-denken-") && !thinking.has(f.replace(/(-b)?\.webp$/, "")))).toEqual([]);
   });
 
   it("puts one more star on today and forgets days older than two weeks", () => {

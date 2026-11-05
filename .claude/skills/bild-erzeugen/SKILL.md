@@ -54,6 +54,10 @@ sheet is full, and later sessions bring the partners.
    with the feature, which shows a placeholder until then (see Workflow 0), and merge it, so the next session finds it.
 5. **A made picture leaves the queue** in the commit that adds it (the script reminds you; `pictureQueue.test.ts`
    fails while a queued file exists).
+6. **Redrawing a picture that is already in a game** (a mistake in it the user pointed out, a second frame to match a
+   redrawn first) skips the queue: its file exists, so `pictureQueue.test.ts` would fail, and such a picture is drawn
+   alone from its reference anyway, so waiting saves nothing. Make it at once with `--jobs` (a batch), the old file in
+   git until the new one is right.
 
 Pictures that still wait for the user's word – the mascot pictures in `mascotStatus.ts`, unmade prompts in
 `picturePrompts.ts` – come into the queue only once the user asks for them. „Offene Bilder“ on `/management/` shows how
