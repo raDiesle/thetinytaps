@@ -202,7 +202,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         work: "picture",
         pictures: 56,
         effort: "L",
-        note: "Zu entscheiden: ein anderes Tier (Waschbär?) übernimmt Schubsen, Treten, Wegnehmen, Umwerfen (kita.ts und rund 56 Bilder); Fuchs und Bär, die Maskottchen, helfen und trösten.",
+        note: "Entschieden (5. November 2026): ein Waschbär übernimmt Schubsen, Treten, Wegnehmen, Umwerfen; Fuchs und Bär, die Maskottchen, helfen und trösten. Neue Geschichten nehmen gleich den Waschbären. Die vorhandenen rund 56 Bilder und die Sätze in kita.ts (mit Übersetzungen und Aufnahmen) bleiben vorerst beim Fuchs, weil neue Bilder Geld kosten – erst neu machen, wenn der Große es sagt.",
       },
       {
         label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten",

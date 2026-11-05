@@ -146,6 +146,12 @@ stands left of the picture, „Weiter“ right of it. Upright screens keep the p
 below. Captions lie on the pictures' lower edge on wide or low screens. Look at 844×390, 1024×768 and 1280×720 after
 a change.
 
+**Who hurts is a raccoon, never fox or bear (user decision, November 2026):** in a new story the other child who
+pushes, kicks, takes something away or knocks it over is the raccoon (`bilder/README.md`, „Figuren“); fox and bear,
+the app's mascots, help and comfort. The kindergarten stories made before (`kita.ts` and about 56 pictures) keep their
+fox for now: redrawing them costs money, so neither their pictures nor their lines (with translations and recordings)
+are changed until the user asks (the task stays open in `mascotStatus.ts`).
+
 The stories. Zu Hause (`bear.ts`): the bear is sad, angry, tired or scared, and
 three comforts (hug, teddy, blowing …) make it happy again, one per step; on his birthday he is
 happy already and the three kind things celebrate with him (dance, streamers,

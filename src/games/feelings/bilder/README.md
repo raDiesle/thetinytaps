@@ -152,7 +152,13 @@ Characters (small animal children, toddler proportions, big round heads):
   beige muzzle, green knitted sweater, kind face.
 - The little hedgehog: a small hedgehog child, light-brown face, round dark-brown
   spikes, red t-shirt, yellow trousers.
+- The raccoon: a small raccoon child, grey fur, a black mask round the eyes, a
+  bushy tail with dark rings, orange-and-white striped t-shirt, brown trousers.
 ```
+
+The raccoon is the one who pushes, kicks, takes or knocks over in a new story – never the fox or a bear, the app's
+mascots (user decision, November 2026). The kindergarten pictures made before keep their fox until the user asks for
+them to be redrawn.
 
 ### Figurenbogen (als Erstes)
 
