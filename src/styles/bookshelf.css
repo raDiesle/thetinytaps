@@ -1336,7 +1336,7 @@
     0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
 }
 
-.shelf-bundle > .shelf-daily:first-child > .box-front {
+.shelf-bundle > .shelf-daily[data-gold] > .box-front {
   background:
     linear-gradient(#0000 3.5%, #fff3b0 3.5% 5.5%, #0000 5.5% 94.5%, #fff3b0 94.5% 96.5%, #0000 96.5%),
     linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), var(--c);

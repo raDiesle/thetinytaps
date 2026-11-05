@@ -1,5 +1,5 @@
 import pictureFiles from "./bilder/*.webp?glob";
-import { type CatalogMark, REWARD_BY_ID, STEP_BY_ID, TASK_BY_ID, type Theme } from "./catalog";
+import { type CatalogMark, type NightLook, REWARD_BY_ID, STEP_BY_ID, TASK_BY_ID, type Theme } from "./catalog";
 
 // The pictures of bilder/ (made with Gemini, prompts in bilder/prompts.ts) in place of the catalogue's emoji: a task,
 // a plan's step, a reward and a mark show their picture, a grey print the line-art twin to colour in. What grown-ups
@@ -50,4 +50,13 @@ export function SheetStrip({ theme }: { theme: Theme }) {
 /** A mark's sticker, or its emoji. */
 export function MarkPic({ mark }: { mark: CatalogMark }) {
   return <Pic src={markPicture(mark)} emoji={mark.emoji} />;
+}
+
+/**
+ * A Countdown's night (`NIGHT_LOOKS`): the fox child's is the Tagesplan's „Schlafen“, the others `nacht-<id>`; `lines`
+ * its twin to colour in. Its emoji until the picture is made.
+ */
+export function NightPic({ look, lines = false }: { look: NightLook; lines?: boolean }) {
+  const name = look.id === "fuchs" ? "schritt-schlafen" : `nacht-${look.id}`;
+  return <Pic src={PICTURES.get(`${name}${lines ? "-linie" : ""}`)} emoji={look.emoji} />;
 }

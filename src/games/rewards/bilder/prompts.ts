@@ -175,6 +175,33 @@ const RITUAL_PROMPTS: PicturePrompt[] = RITUALS.map((r) => ({
   ref: [TAPSI_REF],
 }));
 
+/** The picture of Tapsi asleep (the Tagesplan's „Schlafen“), the bed and the night every night look follows. */
+const SLEEP_REF = `${DIR}/schritt-schlafen.webp`;
+/** The bear family of the book's menus, for how a bear child looks. */
+const BEARS_REF = "src/components/bilder/buch-baeren.webp";
+
+/**
+ * A Countdown's nights (`NIGHT_LOOKS`, user feedback, November 2026: „das Kind sollte im Bett liegen“): the fox child's
+ * night is the Tagesplan's „Schlafen“ picture; these are the others, drawn like it so they stand side by side. Small
+ * enough to share one sheet of four.
+ */
+const NIGHT_SCENES: Record<string, string> = {
+  fuechsin: `a little fox girl like Tapsi in the first reference (orange fur, white muzzle, pointy ears), with two short pigtails tied with small pink bows and a light pink pyjama top, sleeps peacefully on her back in a small wooden bed under a light purple blanket, eyes closed, a soft smile, her bushy tail with a white tip over the blanket's edge`,
+  baer: `a little brown bear cub like the small bear in the second reference (round ears, light brown muzzle), in a light blue pyjama top, sleeps peacefully in a small wooden bed under a light blue blanket, eyes closed, a soft smile, hugging a small soft toy rabbit`,
+  zusammen: `a little fox cub like Tapsi in the first reference and a little brown bear cub like the small bear in the second reference sleep side by side in one small wooden bed under one shared yellow blanket, heads on two pillows, eyes closed, soft smiles, the fox's tail peeking out`,
+  mond: "a sleepy smiling crescent moon in soft yellow with closed eyes and a little nightcap, resting on a small fluffy cloud, three small golden stars around it; no animal",
+};
+
+/** The night looks besides the fox's, as cut-outs for the Countdown's fields. */
+const NIGHT_PROMPTS: PicturePrompt[] = Object.entries(NIGHT_SCENES).map(([id, scene]) => ({
+  id: `nacht-${id}`,
+  file: `${DIR}/nacht-${id}.webp`,
+  use: `Eine Nacht im Countdown „Wie lange warten?“: ${{ fuechsin: "Fuchsmädchen im Bett", baer: "Bärenkind im Bett", zusammen: "Fuchs und Bär zusammen im Bett", mond: "schlafender Mond" }[id]}`,
+  prompt: `${REF_ONLY}${STYLE} ${STICKER} ${scene}. The whole bed fits in the picture. Nobody else, only ONE of each character in the whole picture.`,
+  options: "--transparent --size 512",
+  ref: [SLEEP_REF, BEARS_REF],
+}));
+
 const REWARD_PROMPTS: PicturePrompt[] = REWARDS.map((r) => ({
   id: `belohnung-${r.id}`,
   file: `${DIR}/belohnung-${r.id}.webp`,
@@ -227,6 +254,11 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
       title: "Ritual-Karten",
       note: "Freigestellt, 768 px: die Rituale des Tagesplans (H-58, C-33) – Tapsi mit Mama oder Papa, gemacht am 4. November 2026.",
       prompts: RITUAL_PROMPTS,
+    },
+    {
+      title: "Nächte im Countdown",
+      note: "Freigestellt, 512 px: wie eine Nacht im Countdown „Wie lange warten?“ aussieht – das Kind im Bett (das Fuchskind ist „Schlafen“ vom Tagesplan) oder der Mond, gewählt mit einem Tippen auf eine Nacht. Bestellt am 5. November 2026.",
+      prompts: NIGHT_PROMPTS,
     },
     { title: "Belohnungen", note: "Freigestellt, 768 px: im Ziel-Feld groß und beim Fest bildschirmfüllend.", prompts: REWARD_PROMPTS },
     {
@@ -283,16 +315,17 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
     {
       title: "Zum Ausmalen (Schwarz-weiß-Druck)",
       note: "Jedes Aufgaben-, Tagesplan- und Belohnungsbild noch einmal als Ausmalbild, mit dem farbigen als einziger Referenz – erst nachdem das farbige gelungen ist.",
-      prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...RITUAL_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
+      prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...RITUAL_PROMPTS, ...NIGHT_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
     },
   ],
 });
 
 /**
- * The ritual cards and their line-art twins as the picture queue takes them (src/content/pictureQueue.ts), until they
- * are made.
+ * The ritual cards and the Countdown's nights with their line-art twins as the picture queue takes them
+ * (src/content/pictureQueue.ts), until they are made.
  */
-export const RITUAL_PICTURE_QUEUE: QueuedPicture[] = RITUAL_PROMPTS.flatMap((p) => [p, lineArt(p)])
+export const RITUAL_PICTURE_QUEUE: QueuedPicture[] = [...RITUAL_PROMPTS, ...NIGHT_PROMPTS]
+  .flatMap((p) => [p, lineArt(p)])
   // A made picture leaves the queue by itself.
   .filter((p) => !picture(p.id))
   .map((p) => ({
@@ -306,5 +339,5 @@ export const RITUAL_PICTURE_QUEUE: QueuedPicture[] = RITUAL_PROMPTS.flatMap((p) 
     size: p.options.match(/--size (\d+)/)?.[1],
     ...(p.options.includes("--transparent") ? { transparent: true } : {}),
     ref: p.ref,
-    date: "2026-11-04",
+    date: p.id.startsWith("nacht-") ? "2026-11-05" : "2026-11-04",
   }));

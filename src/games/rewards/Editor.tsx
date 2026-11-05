@@ -2,7 +2,7 @@ import { Choice, SettingsGroup, Slider, Toggle } from "@/components/SettingContr
 import { useT } from "@/lib/language";
 import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, newId, rewardFromCatalog, taskFromCatalog } from "./board";
 import { useBoardTitle, useRewardLabel, useTaskLabel } from "./BoardSheet";
-import { DAY_NAMES, MARKS, REWARDS, SLOTS, TASK_BY_ID, TASKS, THEMES } from "./catalog";
+import { DAY_NAMES, MARKS, REWARDS, SLOTS, TASK_BY_ID, TASKS } from "./catalog";
 import { ItemPic } from "./pictures";
 
 /**
@@ -49,22 +49,19 @@ export function SlotChips({ task, onChange }: { task: BoardTask; onChange: (patc
 }
 
 /**
- * Everything a grown-up can change on a board, live under the board's preview:
- * name and heading (the kind is the row of views above the board), tasks (from pictures or their own), weekdays, goal,
- * reward, mark and colours – and starting over or removing the board.
+ * What of a board is typed or chosen rather than tapped on its sheet („Weitere Einstellungen“): the heading, tasks
+ * (from pictures or their own), weekdays, goal, reward and mark – and starting over. The child's name and the colours
+ * are in the editor's band and deleting in its edit bar (`ChartEditor`), never here as well.
  */
 export function Editor({
   board,
   onChange,
   onStartOver,
-  onRemove,
 }: {
   board: Board;
   onChange: (patch: Partial<Board>) => void;
   /** Missing while the board is still being made (the wizard). */
   onStartOver?: () => void;
-  /** Missing when it is the only board. */
-  onRemove?: () => void;
 }) {
   const t = useT();
   const taskLabel = useTaskLabel();
@@ -84,45 +81,7 @@ export function Editor({
 
   return (
     <section className="settings rw-editor">
-      <SettingsGroup
-        title={t({
-          de: "Name und Überschrift",
-          en: "Name and heading",
-          zh: "名字和标题",
-          hi: "नाम और शीर्षक",
-          es: "Nombre y título",
-          ar: "الاسم والعنوان",
-          ru: "Имя и заголовок",
-        })}
-      >
-        <label className="rw-input">
-          <span>
-            {t({
-              de: "Name des Kindes (steht in der Überschrift, bleibt auf diesem Gerät)",
-              en: "Child’s name (shown in the heading, stays on this device)",
-              zh: "孩子的名字（显示在标题里，只保存在本设备上）",
-              hi: "बच्चे का नाम (शीर्षक में दिखेगा, इसी डिवाइस पर रहेगा)",
-              es: "Nombre del peque (aparece en el título y se queda en este dispositivo)",
-              ar: "اسم الطفل (يظهر في العنوان ويبقى على هذا الجهاز)",
-              ru: "Имя ребёнка (стоит в заголовке, хранится только на этом устройстве)",
-            })}
-          </span>
-          <input
-            type="text"
-            value={board.childName}
-            maxLength={24}
-            placeholder={t({
-              de: "z. B. Lena",
-              en: "e.g. Emma",
-              zh: "例如：小美",
-              hi: "जैसे: मीरा",
-              es: "p. ej., Lucía",
-              ar: "مثلًا: ليلى",
-              ru: "например, Лена",
-            })}
-            onChange={(e) => onChange({ childName: e.target.value })}
-          />
-        </label>
+      <SettingsGroup title={t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}>
         <label className="rw-input">
           <span>{t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}</span>
           <input type="text" value={board.title} maxLength={40} placeholder={autoTitle} onChange={(e) => onChange({ title: e.target.value })} />
@@ -519,12 +478,6 @@ export function Editor({
           onChange={(mark) => onChange({ mark })}
           options={MARKS.map((m) => ({ value: m.id, label: `${m.emoji} ${t(m.label)}` }))}
         />
-        <Choice
-          label={t({ de: "Farben", en: "Colours", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" })}
-          value={board.theme}
-          onChange={(theme) => onChange({ theme })}
-          options={THEMES.map((th) => ({ value: th.id, label: t(th.label) }))}
-        />
       </SettingsGroup>
 
       {onStartOver && (
@@ -588,35 +541,6 @@ export function Editor({
                 ru: "Убрать звёзды и начать заново",
               })}
             </button>
-            {onRemove && (
-              <button
-                type="button"
-                onClick={() =>
-                  window.confirm(
-                    t({
-                      de: "Diese Tafel ganz löschen?",
-                      en: "Delete this chart completely?",
-                      zh: "彻底删除这张奖励表吗？",
-                      hi: "यह चार्ट पूरी तरह मिटाएँ?",
-                      es: "¿Borrar esta tabla por completo?",
-                      ar: "حذف هذه اللوحة نهائيًا؟",
-                      ru: "Удалить эту таблицу полностью?",
-                    }),
-                  ) && onRemove()
-                }
-              >
-                🗑️{" "}
-                {t({
-                  de: "Diese Tafel löschen",
-                  en: "Delete this chart",
-                  zh: "删除这张奖励表",
-                  hi: "यह चार्ट मिटाएँ",
-                  es: "Borrar esta tabla",
-                  ar: "حذف هذه اللوحة",
-                  ru: "Удалить эту таблицу",
-                })}
-              </button>
-            )}
           </div>
         </SettingsGroup>
       )}

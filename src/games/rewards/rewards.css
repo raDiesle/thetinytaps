@@ -498,12 +498,14 @@
 
 /*
  * The wizard's head, on top and in sight while the page scrolls (user feedback, November 2026): that the chart prints,
- * and „✓ Tafel anlegen“ big and yellow on the right, where the eye ends the row – no longer small at the foot.
+ * and „✓ Tafel anlegen“ big and yellow on the right, where the eye ends the row – no longer small at the foot. It lies
+ * over everything on the sheet that scrolls under it, the ⚙️ / 🗑️ in the cards' corners (`.rw-act`, 3, or 4 while one
+ * is under the mouse) too.
  */
 .rw-wizard-head {
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: 5;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -876,6 +878,26 @@
   display: flex;
   flex: none;
   gap: 8px;
+}
+
+/* Deleting the whole chart: in the edit bar after ↶ ↷, red, and it asks first. */
+.rw-remove-chart {
+  flex: none;
+  min-height: 40px;
+  padding: 2px 14px;
+  border: 2px solid #c92a2a;
+  border-radius: 999px;
+  background: #fff;
+  color: #c92a2a;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-remove-chart:hover,
+.rw-remove-chart:focus-visible {
+  background: #fff0f0;
 }
 
 .rw-history-button {
@@ -1335,6 +1357,29 @@
   font-size: 6.4cqmin;
   font-weight: 800;
   line-height: 1.1;
+}
+
+/* While a plan is made its heading is typed where it stands, in its own size and colour: a dashed line under it says so. */
+.rw-title-input {
+  box-sizing: border-box;
+  width: min(100%, 24em);
+  padding: 0 0.2em;
+  border: none;
+  border-bottom: max(2px, 0.4cqmin) dashed var(--rw-ink, var(--ink));
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: center;
+}
+
+.rw-title-input::placeholder {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.rw-title-input:focus {
+  outline: none;
+  background: #fff8;
 }
 
 .rw-blank {

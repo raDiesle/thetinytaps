@@ -2,27 +2,26 @@ import { useState } from "react";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { newId, weekday } from "./board";
-import { ACTIVITIES, DAY_NAMES, NOW_WAYS, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
+import { ACTIVITIES, DAY_NAMES, NOW_WAYS, SLOTS, STEP_BY_ID, TASKS } from "./catalog";
 import { ItemPic } from "./pictures";
 import { RITUALS } from "./rituals";
 import { joinLastPart, type Plan, type PlanStep, stepFromCatalog, stepLimit, stepsOn, withSame, withSteps } from "./plan";
-import { usePlanTitle, useStepLabel } from "./PlanSheet";
+import { useStepLabel } from "./PlanSheet";
 
 /** Steps a plan offers to add: the rituals with their words (H-58), the day's activities, then the tasks of the Belohnungstafel. */
 const OFFERED = [...RITUALS, ...ACTIVITIES, ...TASKS];
 
 /**
- * Everything a grown-up can change on a plan: name and heading, every day the same or each weekday its own, the steps
- * of a day (from pictures or their own, in order), when a brushing counts, what a Jetzt – Dann's child moves (a marker
- * or the card into the „Jetzt“ field), colours – and starting today over or
- * removing the plan.
+ * What of a plan is typed rather than tapped on its sheet („Weitere Einstellungen“): every day the same or each
+ * weekday its own, the steps of a day (from pictures or their own, in order), when a brushing counts, what a Jetzt –
+ * Dann's child moves (a marker or the card into the „Jetzt“ field) – and starting today over. Name, heading, colours
+ * and deleting are on the sheet, in the band and the edit bar (`ChartEditor`), never here as well.
  */
 export function PlanEditor({
   plan,
   day,
   onChange,
   onRestartToday,
-  onRemove,
 }: {
   plan: Plan;
   /** The day shown: its weekday is edited first. */
@@ -30,12 +29,9 @@ export function PlanEditor({
   onChange: (plan: Plan) => void;
   /** Missing while the plan is still being made (the wizard). */
   onRestartToday?: () => void;
-  /** Missing when it is the only plan. */
-  onRemove?: () => void;
 }) {
   const t = useT();
   const stepLabel = useStepLabel();
-  const autoTitle = usePlanTitle()({ ...plan, title: "" });
   const [editDay, setEditDay] = useState(weekday(day));
   const dayNames = t(DAY_NAMES);
   // The weekday edited and Monday–Friday, in the app language's short names.
@@ -57,51 +53,6 @@ export function PlanEditor({
 
   return (
     <section className="settings rw-editor pl-editor">
-      <SettingsGroup
-        title={t({
-          de: "Name und Überschrift",
-          en: "Name and heading",
-          zh: "名字和标题",
-          hi: "नाम और शीर्षक",
-          es: "Nombre y título",
-          ar: "الاسم والعنوان",
-          ru: "Имя и заголовок",
-        })}
-      >
-        <label className="rw-input">
-          <span>
-            {t({
-              de: "Name des Kindes (steht in der Überschrift, bleibt auf diesem Gerät)",
-              en: "Child’s name (shown in the heading, stays on this device)",
-              zh: "孩子的名字（显示在标题里，只保存在本设备上）",
-              hi: "बच्चे का नाम (शीर्षक में दिखेगा, इसी डिवाइस पर रहेगा)",
-              es: "Nombre del peque (aparece en el título y se queda en este dispositivo)",
-              ar: "اسم الطفل (يظهر في العنوان ويبقى على هذا الجهاز)",
-              ru: "Имя ребёнка (стоит в заголовке, хранится только на этом устройстве)",
-            })}
-          </span>
-          <input
-            type="text"
-            value={plan.childName}
-            maxLength={24}
-            placeholder={t({
-              de: "z. B. Lena",
-              en: "e.g. Emma",
-              zh: "例如：小美",
-              hi: "जैसे: मीरा",
-              es: "p. ej., Lucía",
-              ar: "مثلًا: ليلى",
-              ru: "например, Лена",
-            })}
-            onChange={(e) => onChange({ ...plan, childName: e.target.value })}
-          />
-        </label>
-        <label className="rw-input">
-          <span>{t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}</span>
-          <input type="text" value={plan.title} maxLength={40} placeholder={autoTitle} onChange={(e) => onChange({ ...plan, title: e.target.value })} />
-        </label>
-      </SettingsGroup>
-
       {plan.view === "day" && (
         <SettingsGroup
           title={t({
@@ -453,44 +404,21 @@ export function PlanEditor({
         </SettingsGroup>
       )}
 
-      <SettingsGroup title={t({ de: "Farben", en: "Colours", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" })}>
-        <div className="rw-chips" role="group" aria-label={t({ de: "Farben", en: "Colours", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" })}>
-          {THEMES.map((theme) => (
-            <button
-              key={theme.id}
-              type="button"
-              className={plan.theme === theme.id ? "selected" : undefined}
-              aria-pressed={plan.theme === theme.id}
-              onClick={() => onChange({ ...plan, theme: theme.id })}
-            >
-              {t(theme.label)}
-            </button>
-          ))}
-        </div>
-      </SettingsGroup>
-
-      {onRestartToday && (
+      {onRestartToday && plan.view !== "countdown" && (
         <SettingsGroup title={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}>
           <div className="rw-chips">
-            {plan.view !== "countdown" && (
-              <button type="button" disabled={stepsOn(plan, new Date()).length === 0} onClick={onRestartToday}>
-                ↺{" "}
-                {t({
-                  de: "Heute noch einmal von vorn",
-                  en: "Start today again",
-                  zh: "今天从头再来",
-                  hi: "आज फिर से शुरू करें",
-                  es: "Empezar hoy otra vez",
-                  ar: "البدء اليوم من جديد",
-                  ru: "Начать сегодня заново",
-                })}
-              </button>
-            )}
-            {onRemove && (
-              <button type="button" onClick={onRemove}>
-                🗑️ {t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })}
-              </button>
-            )}
+            <button type="button" disabled={stepsOn(plan, new Date()).length === 0} onClick={onRestartToday}>
+              ↺{" "}
+              {t({
+                de: "Heute noch einmal von vorn",
+                en: "Start today again",
+                zh: "今天从头再来",
+                hi: "आज फिर से शुरू करें",
+                es: "Empezar hoy otra vez",
+                ar: "البدء اليوم من جديد",
+                ru: "Начать сегодня заново",
+              })}
+            </button>
           </div>
         </SettingsGroup>
       )}

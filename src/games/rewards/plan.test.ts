@@ -3,7 +3,7 @@ import { CATEGORIES } from "@/content/games";
 import { finishRoutineStep, routineReturn, takeFinishedStep, waitForStep } from "@/lib/routine";
 import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./board";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
-import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
+import { ACTIVITIES, NIGHT_LOOKS, nightLookOf, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
   bigDayCome,
   bigDayStep,
@@ -39,6 +39,7 @@ import {
   withSame,
   withStepStars,
   withBigDay,
+  withNightsLeft,
   withSteps,
 } from "./plan";
 import { printsCards, ritualsOf } from "./PlanPrint";
@@ -404,6 +405,32 @@ describe("a week's grid of stars", () => {
     const { since: _, ...older } = plan;
     expect(nightsOf(older, new Date("2026-10-30T08:00"), {}).map((n) => n.state)).toEqual(["now", "later", "later", "later"]);
     expect(withBigDay(older, "2026-11-05", WED).since).toBe("2026-10-28");
+  });
+
+  // ＋ and 🗑️ on the sheet: one night more or less, never past a month or below none, and the stars slept stay.
+  test("a night added or taken keeps the stars and stays within a month", () => {
+    const tpl = PLAN_TEMPLATES.find((t) => t.view === "countdown");
+    if (!tpl) throw new Error("no Countdown template");
+    const plan = planFromTemplate(tpl, "de", WED);
+    const thu = new Date("2026-10-29T08:00");
+    const log = addStar({}, plan.id, nightsOf(plan, thu, {})[0].key, thu)[plan.id];
+    const more = withNightsLeft(plan, 1, thu);
+    expect(moonsLeft(more, thu)).toBe(moonsLeft(plan, thu) + 1);
+    expect(nightsOf(more, thu, log)[0].state).toBe("done");
+    expect(moonsLeft(withNightsLeft(plan, -1, thu), thu)).toBe(moonsLeft(plan, thu) - 1);
+    expect(moonsLeft(withNightsLeft(plan, -99, thu), thu)).toBe(0);
+    expect(moonsLeft(withNightsLeft(plan, 99, thu), thu)).toBe(MAX_NIGHTS);
+  });
+
+  test("every look of the nights has its picture and line-art twin, and follows „Junge / Mädchen“ until one is picked", () => {
+    for (const { id } of NIGHT_LOOKS) {
+      const name = id === "fuchs" ? "schritt-schlafen" : `nacht-${id}`;
+      for (const file of [`src/games/rewards/bilder/${name}.webp`, `src/games/rewards/bilder/${name}-linie.webp`]) expect(existsSync(file), file).toBe(true);
+      expect(promptIds.has(name), name).toBe(true);
+    }
+    expect(nightLookOf(undefined, "girl").id).toBe("fuechsin");
+    expect(nightLookOf(undefined, "boy").id).toBe("baer");
+    expect(nightLookOf("mond", "girl").id).toBe("mond");
   });
 });
 

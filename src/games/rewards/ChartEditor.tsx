@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { dayKey } from "@/games/teeth/daytime";
+import { useFigure } from "@/lib/common";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import {
   type Board,
@@ -27,6 +28,8 @@ import {
   type ChartType,
   DAY_NAMES,
   KINDS,
+  NIGHT_LOOKS,
+  nightLookOf,
   NOW_WAYS,
   PLAN_TEMPLATES,
   PLAN_VIEWS,
@@ -41,7 +44,7 @@ import { SlotChips } from "./Editor";
 import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
 import { CHILD_NAME, Pick } from "./pageParts";
-import { ItemPic } from "./pictures";
+import { ItemPic, NightPic } from "./pictures";
 import {
   allStars,
   bigDayOf,
@@ -53,8 +56,8 @@ import {
   exampleTicks,
   MAX_NIGHTS,
   withBigDay,
+  withNightsLeft,
   MAX_STARS,
-  moonsLeft,
   type Plan,
   type PlanStep,
   planFromTemplate,
@@ -155,7 +158,8 @@ type Editing =
   | { what: "reward" }
   | { what: "task"; id: string }
   | { what: "add-task" }
-  | { what: "big-day" };
+  | { what: "big-day" }
+  | { what: "night" };
 
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum", en: "Time span", zh: "时间范围", hi: "समय-अवधि", es: "Periodo", ar: "المدة", ru: "Период" };
@@ -231,7 +235,9 @@ function useDraftHistory(draft: Draft, onChange: (draft: Draft) => void) {
  * in edit mode: each card and the reward have ⚙️ and 🗑️ in their corners (`SheetAction`), a card − ＋ at its stars; a
  * tap on a card swaps it, sets its stars for a day, moves or removes it; ＋ adds one; a part's sign takes its line
  * away (the last one only its sign, which ☀️ / 🌙 bring back); the reward is swapped, removed (the stars stay) or its
- * goal set. `more` holds the rest („Weitere Einstellungen“: own words, own emoji, weekdays).
+ * goal set; a plan's heading is typed where it stands. `more` holds only what needs typing and has no place on the sheet
+ * („Weitere Einstellungen“: own words, own emoji, weekdays) – a Countdown has none (user feedback, November 2026: what
+ * the sheet changes is never asked a second time below it). `onRemove` deletes the chart from the edit bar.
  */
 export function ChartEditor({
   draft,
@@ -241,6 +247,7 @@ export function ChartEditor({
   log,
   linked = NO_LINKED,
   more,
+  onRemove,
 }: {
   draft: Draft;
   onChange: (draft: Draft) => void;
@@ -253,6 +260,8 @@ export function ChartEditor({
   linked?: LinkedDays;
   /** „Weitere Einstellungen“, under the sheet. */
   more?: ReactNode;
+  /** Deletes the chart (after asking); missing in the wizard and for the only chart. */
+  onRemove?: () => void;
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
@@ -304,6 +313,9 @@ export function ChartEditor({
       setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId, every: all });
     else if (edit === "reward") setEditing({ what: "reward" });
     else if (edit === "big-day") setEditing({ what: "big-day" });
+    else if (draft.type === "plan" && (edit === "add-night" || edit === "delete-night"))
+      setPlan(withNightsLeft(draft.plan, edit === "add-night" ? 1 : -1, new Date()));
+    else if (edit === "night") setEditing({ what: "night" });
     else if (edit === "task" && task) setEditing({ what: "task", id: task });
     else if (step) setEditing({ what: "card", key: step, every: all });
   };
@@ -510,6 +522,32 @@ export function ChartEditor({
             onClick={forward}
           />
         </span>
+        {onRemove && (
+          <button
+            type="button"
+            className="rw-remove-chart"
+            onClick={() =>
+              window.confirm(
+                draft.type === "board"
+                  ? t({
+                      de: "Diese Tafel ganz löschen?",
+                      en: "Delete this chart completely?",
+                      zh: "彻底删除这张奖励表吗？",
+                      hi: "यह चार्ट पूरी तरह मिटाएँ?",
+                      es: "¿Borrar esta tabla por completo?",
+                      ar: "حذف هذه اللوحة نهائيًا؟",
+                      ru: "Удалить эту таблицу полностью?",
+                    })
+                  : t({ de: "Diesen Plan ganz löschen?" }),
+              ) && onRemove()
+            }
+          >
+            <span aria-hidden>🗑️</span>{" "}
+            {draft.type === "board"
+              ? t({ de: "Tafel löschen", en: "Delete chart", zh: "删除奖励表", hi: "चार्ट मिटाएँ", es: "Borrar tabla", ar: "حذف اللوحة", ru: "Удалить таблицу" })
+              : t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })}
+          </button>
+        )}
       </div>
 
       {/* In a row, like the chart on the page (`rw-main`): only there the sheet gets the box's whole height. */}
@@ -533,6 +571,7 @@ export function ChartEditor({
                 look={PLAN_SCREEN}
                 aspect={aspect}
                 edit
+                onTitle={(title) => setPlan({ ...draft.plan, title })}
               />
             ) : (
               <BoardSheet board={draft.board} stars={ticks} linked={linked} today={today} day={day} look={SCREEN_LOOK} aspect={aspect} edit />
@@ -573,6 +612,7 @@ export function ChartEditor({
       )}
       {editing && editing.what === "reward" && <RewardDialog draft={draft} day={day} onChange={onChange} onClose={() => setEditing(null)} />}
       {editing && plan && editing.what === "big-day" && <BigDayDialog plan={plan} onChange={setPlan} onClose={() => setEditing(null)} />}
+      {editing && plan && editing.what === "night" && <NightDialog plan={plan} onChange={setPlan} onClose={() => setEditing(null)} />}
       {editing && draft.type === "board" && (editing.what === "task" || editing.what === "add-task") && (
         <TaskDialog
           board={draft.board}
@@ -972,8 +1012,8 @@ function CardPicks({ selected, onPick }: { selected?: string; onPick: (id: strin
 }
 
 /**
- * A Countdown's big day tapped (its moons or its picture): when it is – by date, or by its nights with − + – and which
- * picture stands for it. The sheet never shows the date, only the moons.
+ * A Countdown's big day tapped: its date and which picture stands for it. The sheet never shows the date, only the
+ * nights – which are added and taken right on the sheet (＋, 🗑️), never here as well (one place for each change).
  */
 function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan: Plan) => void; onClose: () => void }) {
   const t = useT();
@@ -995,23 +1035,6 @@ function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan
             onChange={(e) => e.target.value && on(e.target.value)}
           />
         </label>
-        <Counter
-          emoji="🌙"
-          wide
-          label={t({
-            de: "Noch so oft schlafen",
-            en: "Sleeps to go",
-            zh: "还要睡几觉",
-            hi: "कितनी बार और सोना है",
-            es: "Noches que faltan",
-            ar: "الليالي الباقية",
-            ru: "Сколько ещё спать",
-          })}
-          value={moonsLeft(plan, today)}
-          min={0}
-          max={MAX_NIGHTS}
-          onChange={(n) => on(dayKey(daysLater(today, n)))}
-        />
       </div>
       <h4 className="rw-edit-sub">
         {t({
@@ -1031,6 +1054,33 @@ function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan
           onClose();
         }}
       />
+    </EditDialog>
+  );
+}
+
+/**
+ * A night's ⚙️ on a Countdown: how every night looks – the fox girl or the bear boy in bed (the one „Junge / Mädchen“
+ * chose is marked where none is chosen), the fox boy, both together, or the sleepy moon.
+ */
+function NightDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan: Plan) => void; onClose: () => void }) {
+  const t = useT();
+  const chosen = nightLookOf(plan.night, useFigure());
+  return (
+    <EditDialog title={t({ de: "Bild der Nächte" })} onClose={onClose}>
+      <div className="rw-picks rw-picks-tiles">
+        {NIGHT_LOOKS.map((look) => (
+          <Pick
+            key={look.id}
+            selected={look.id === chosen.id}
+            onClick={() => {
+              onChange({ ...plan, night: look.id });
+              onClose();
+            }}
+            emoji={<NightPic look={look} />}
+            label={t(look.label)}
+          />
+        ))}
+      </div>
     </EditDialog>
   );
 }

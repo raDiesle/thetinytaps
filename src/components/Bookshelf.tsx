@@ -40,8 +40,17 @@ interface ShelfBook {
 /** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
 const DAILY_COLOURS = ["#2f78a8", "#3f8a4a", "#b0457a", "#c77d4f", "#2f5d62"];
 
-/** The cloths of the books tied together: the first (the Belohnungstafel) gold, the shelf's eye-catcher. */
-const VOLUME_COLOURS = ["#c8952c", "#7a4fa0", "#2f78a8"];
+/** The gold cloth of the Belohnungstafel, with its gilded bands (`[data-gold]` in bookshelf.css). */
+const GOLD = "#c8952c";
+
+/**
+ * The cloths of the books tied together, by address: the Belohnungstafel gold, the shelf's eye-catcher, wherever it
+ * stands in the bundle; others take the next free colour.
+ */
+const VOLUME_COLOURS: Record<string, string> = { "/belohnungstafel/": GOLD, "/tagesplan/": "#7a4fa0", "/wie-lange-warten/": "#2f78a8" };
+
+/** A volume's cloth: its own, or one of the books standing spine out. */
+const volumeColour = (href: string, i: number) => VOLUME_COLOURS[href] ?? DAILY_COLOURS[i % DAILY_COLOURS.length];
 
 /** How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to read. */
 const DAILY_SPAN = 1.3;
@@ -93,7 +102,7 @@ for (const entry of SHELF) {
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
   };
   const volumes = entry.game?.volumes?.map(
-    (v, i): ShelfBook => ({ ...book, id: bookIdOf(v.href), href: v.href, title: v.title, emoji: v.emoji, colour: VOLUME_COLOURS[i % VOLUME_COLOURS.length] }),
+    (v, i): ShelfBook => ({ ...book, id: bookIdOf(v.href), href: v.href, title: v.title, emoji: v.emoji, colour: volumeColour(v.href, i) }),
   );
   const daily = (n: number): ShelfBook => ({ ...book, colour: DAILY_COLOURS[n % DAILY_COLOURS.length], volumes });
   if (!entry.game) PLACES.push([book]);
@@ -604,6 +613,7 @@ function SpineBook({ book, onClick, bow }: { book: ShelfBook; onClick: (e: Mouse
       style={style}
       data-book={book.id}
       data-world={book.world}
+      data-gold={book.colour === GOLD ? "" : undefined}
       data-tap
       aria-label={t(book.title)}
       title={t(book.blurb)}

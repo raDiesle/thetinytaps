@@ -104,9 +104,14 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken und die Zeile im Druck-Stempel des Assistenten, übersetzt am 5. November 2026.",
       },
       {
-        label: "🌙 Buch „Wie lange warten?“ (Countdown mit Betten, Mond und Sonne)",
+        label: "🌙 Buch „Wie lange warten?“ (Countdown)",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts), übersetzt am 5. November 2026; die Seite für Suchmaschinen (seo.ts, seo.en.ts) gibt es wie alle auf Deutsch und Englisch. Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",
+      },
+      {
+        label: "🛏️ Countdown direkt auf dem Blatt (Nachtbilder, ＋, 🗑️, Überschrift, Löschen)",
+        languages: { de: "done" },
+        note: "Seit 5. November 2026: jede Nacht ein Feld mit dem Kind im Bett und einem Sternkreis, „Einmal schlafen“, „Eine Nacht mehr / weniger?“, „Bild der Nächte“ mit seinen fünf Bildern, „Diesen Plan ganz löschen?“, der Druckhinweis und die Zeile der Vorlage „Wie oft noch schlafen?“ (deren alte Übersetzungen sprachen von Monden und sind gelöscht). Nur Deutsch.",
       },
       {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",

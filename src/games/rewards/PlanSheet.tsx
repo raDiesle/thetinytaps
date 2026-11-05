@@ -1,11 +1,12 @@
 import type { CSSProperties } from "react";
 import { dayKey, weekOf } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { useFigure } from "@/lib/common";
 import { tapState } from "@/lib/tapTargets";
 import { AUTO_TITLES, cellKey, isTemplateTitle, type LinkedDays, weekday } from "./board";
 import { useRewardLabel } from "./BoardSheet";
-import { DAY_NAMES, MARK_BY_ID, MARKS, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
-import { ItemPic, MarkPic, SheetStrip } from "./pictures";
+import { DAY_NAMES, MARK_BY_ID, MARKS, type NightLook, nightLookOf, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import { ItemPic, MarkPic, NightPic, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
 import {
   bigDayCome,
@@ -13,7 +14,9 @@ import {
   counting,
   MAX_PART_STEPS,
   MAX_STARS,
+  MAX_NIGHTS,
   MAX_STEPS,
+  type Night,
   nightsOf,
   nightsUntil,
   nowSteps,
@@ -139,6 +142,7 @@ export function PlanSheet({
   aspect,
   fresh,
   edit = false,
+  onTitle,
 }: {
   plan: Plan;
   /** Ticks shown: real ones and examples. */
@@ -155,9 +159,13 @@ export function PlanSheet({
   fresh?: string | null;
   /** Being made or changed: the places to add, take away and choose are drawn (`data-edit`), never on paper. */
   edit?: boolean;
+  /** While it is made: the heading is typed right where it stands (the child's name makes it where it is empty). */
+  onTitle?: (title: string) => void;
 }) {
   const { speechLang } = useAppLanguage();
-  const title = usePlanTitle()(plan);
+  const t = useT();
+  const planTitle = usePlanTitle();
+  const title = planTitle(plan);
   const theme = THEME_BY_ID.get(plan.theme) ?? THEMES[0];
   const grey = look.print && !look.color;
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
@@ -175,7 +183,20 @@ export function PlanSheet({
     >
       {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
-        <span className="rw-title">{title}</span>
+        {editing && onTitle ? (
+          <input
+            className="rw-title rw-title-input"
+            type="text"
+            value={plan.title.trim() ? title : ""}
+            maxLength={40}
+            placeholder={planTitle({ ...plan, title: "" })}
+            aria-label={t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}
+            title={t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}
+            onChange={(e) => onTitle(e.target.value)}
+          />
+        ) : (
+          <span className="rw-title">{title}</span>
+        )}
         {sub && <span className="rw-blank">{sub}</span>}
       </header>
       <div className="rw-body">
@@ -964,19 +985,6 @@ function DayColumns(props: StepsProps) {
   );
 }
 
-/**
- * A moon for a night still to sleep, drawn as a crescent with a sleepy face: yellow on screen and in colour, white on a
- * grey print, so the child can colour one in (or cross it out) every morning.
- */
-function MoonPic() {
-  return (
-    <svg className="pl-moon-pic" viewBox="0 0 100 100" aria-hidden>
-      <path d="M70 15.4 A40 40 0 1 0 70 84.6 A36 36 0 0 1 70 15.4 Z" />
-      <path className="pl-moon-face" d="M21 47 q5 5 10 0 M27 62 q6 4 12 -1" />
-    </svg>
-  );
-}
-
 /** Where a tap opens the big day's window while the plan is made: its picture and its date (`data-edit="big-day"`). */
 const BIG_DAY_EDIT = { "data-edit": "big-day", role: "button", tabIndex: 0 } as const;
 
@@ -991,89 +999,134 @@ export const BIG_DAY: Localized = {
   ru: "Большой день",
 };
 
+/** A night's name: its tooltip and what is read out. */
+const NIGHT_NAME: Localized = { de: "Einmal schlafen" };
+
 /**
- * A sun over a bed whose morning the child tapped (H-05): round, with rays and a wide-awake face, so a row of beds tells
- * the nights slept from the nights to come.
+ * One night of the Countdown as a card of its own (user feedback, November 2026: each night plainly a field): the child
+ * asleep in its bed (`NightPic`, the look chosen) and under it one star field like the Belohnungstafel's, filled with
+ * its star sticker when the child taps the morning after – on paper an empty ring for a sticker or a crayon. While the
+ * Countdown is made ⚙️ chooses the picture of every night, and 🗑️ on a night still to come takes one night away.
  */
-function SunPic() {
+function NightCard({
+  night,
+  look,
+  print,
+  grey,
+  hand,
+  edit,
+  fresh,
+  tappable,
+}: {
+  night: Night;
+  look: NightLook;
+  print: boolean;
+  grey: boolean;
+  /** The 👇 over the first morning waiting for its tap. */
+  hand: boolean;
+  edit: boolean;
+  fresh: boolean;
+  tappable: boolean;
+}) {
+  const t = useT();
+  const name = t(NIGHT_NAME);
   return (
-    <svg className="pl-sun-pic" viewBox="0 0 100 100" aria-hidden>
-      <path className="pl-sun-rays" d="M50 4 v14 M50 82 v14 M4 50 h14 M82 50 h14 M17.5 17.5 l10 10 M72.5 72.5 l10 10 M17.5 82.5 l10 -10 M72.5 27.5 l10 -10" />
-      <circle cx="50" cy="50" r="26" />
-      <path className="pl-sun-face" d="M40 45 v3 M60 45 v3 M39 58 q11 9 22 0" />
-    </svg>
+    <span className="pl-night-cell">
+      <span
+        className={`pl-card small has-stars pl-night ${night.state}${fresh ? " fresh" : ""}`}
+        data-night={tappable ? night.state : undefined}
+        data-key={tappable ? night.key : undefined}
+        data-tap={tappable ? tapState({ goal: night.state === "now", done: night.state === "done" }) : undefined}
+        role="img"
+        aria-label={name}
+        title={print ? undefined : name}
+      >
+        {hand && (
+          <span className="pl-night-hand" aria-hidden>
+            👇
+          </span>
+        )}
+        {edit && (
+          <>
+            <SheetAction act="configure" ask={t({ de: "Bild der Nächte ändern" })} data={{ "data-edit": "night" }} />
+            {night.state === "later" && <SheetAction act="delete" ask={t({ de: "Eine Nacht weniger?" })} data={{ "data-edit": "delete-night" }} />}
+          </>
+        )}
+        <span className="pl-emoji" aria-hidden>
+          <NightPic look={look} lines={grey} />
+        </span>
+        <StarFields stars={1} got={night.state === "done" ? 1 : 0} ghost={false} />
+      </span>
+    </span>
   );
 }
 
-/** A little bed under each night's moon or sun: headboard, pillow and a blanket in the plan's colour. */
-function BedPic() {
-  return (
-    <svg className="pl-bed-pic" viewBox="0 0 100 52" aria-hidden>
-      <rect className="pl-bed-wood" x="4" y="4" width="11" height="44" rx="4" />
-      <rect className="pl-bed-wood" x="87" y="20" width="9" height="28" rx="3" />
-      <rect className="pl-bed-mattress" x="10" y="27" width="81" height="13" rx="3" />
-      <rect className="pl-bed-pillow" x="16" y="18" width="21" height="11" rx="5" />
-      <path className="pl-bed-blanket" d="M34 21 h50 q5 0 5 5 v14 h-55 z" />
-    </svg>
-  );
-}
+/** The ＋ after the nights while a Countdown is made. */
+const ONE_MORE_NIGHT: Localized = { de: "Eine Nacht mehr" };
 
 /**
- * The Countdown (H-41, H-05): „Wie oft noch schlafen?“ – a little bed for every night until the big day, in rows read
- * from the top left, then an arrow to the day's picture (Geburtstag, Urlaub, Oma kommt). A night still to sleep has a
- * moon over its bed; each morning the bed of the night slept glows, and the child's tap turns its moon into a sun – so
- * the suns grow and the moons get fewer. When the big day has come (its morning tapped), the picture alone stands big
- * in the middle. No date and no number: the child counts moons. On paper only the nights from the day it is printed,
- * to colour in or cross out one each morning. While it is made, a tap on the beds or the picture opens the big day's
- * window (its date and its picture).
+ * The Countdown (H-41, H-05): „Wie oft noch schlafen?“ – a card for every night until the big day, the child asleep in
+ * its bed with a star field under it like the Belohnungstafel's, in rows read from the top left, then an arrow to the
+ * day's picture (Geburtstag, Urlaub, Oma kommt). Each morning the night slept glows, and the child's tap puts the star
+ * into its field – so the stars grow as the nights to come get fewer. When the big day has come (its morning tapped),
+ * the picture alone stands big in the middle. No date and no number: the child counts the nights. On paper only the
+ * nights from the day it is printed, with empty rings for a sticker or a crayon. While it is made everything is changed
+ * right here (user feedback, November 2026): ＋ after the nights adds one, 🗑️ on a night to come takes one, ⚙️ on a
+ * night chooses how the nights look, and the big day's picture opens its window (its date and its picture).
  */
 function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps & { aspect: number }) {
   const t = useT();
   const label = useStepLabel();
+  const figure = useFigure();
   const step = bigDayStep(plan);
+  const nightLook = nightLookOf(plan.night, figure);
   const nights = look.print ? nightsOf(plan, day, undefined).filter((night) => night.state === "later") : nightsOf(plan, day, ticks);
-  // The last morning just tapped: its sun rises over the beds first, then the picture comes big (PlanScreen's party).
-  const come = look.print ? nights.length === 0 : bigDayCome(plan, day, ticks) && !nights.some((night) => night.key === fresh);
+  // The last morning just tapped: its star lands first, then the picture comes big (PlanScreen's party). While it is
+  // made the nights stay, so a night can be added after the big day.
+  const come = !edit && (look.print ? nights.length === 0 : bigDayCome(plan, day, ticks) && !nights.some((night) => night.key === fresh));
   const shown = come ? [] : nights;
   const moons = nights.filter((night) => night.state === "later").length;
   const first = shown.findIndex((night) => night.state === "now");
   const tappable = !look.print && !edit;
-  // Upright, the picture goes under the beds; wide, beside them – the beds get the room the picture leaves (the sheet's
-  // body is wider than the sheet with its heading, and the picture and the arrow take about its height).
+  const adds = edit && moons < MAX_NIGHTS;
+  const cells = shown.length + (adds ? 1 : 0);
+  // Upright, the picture goes under the nights; wide, beside them – the nights get the room the picture leaves (the
+  // sheet's body is wider than the sheet with its heading, and the picture and the arrow take about its height). A
+  // night is a card taller than wide (`STAR_CARD`), so the rows are planned in its widths.
   const tall = aspect < 1.25;
-  const { cols, rows } = planLayout(shown.length, tall ? aspect / 0.55 : Math.max(0.4, aspect * 1.2 - 0.85));
+  const { cols, rows } = planLayout(cells, (tall ? aspect / 0.55 : Math.max(0.4, aspect * 1.2 - 0.85)) / STAR_CARD);
   const sleeps = t(SLEEPS_LEFT)(moons);
   return (
     <div className={`pl-countdown${tall ? " tall" : ""}${come ? " arrived" : ""}`}>
-      {shown.length > 0 && (
+      {cells > 0 && (
         <>
           <div
-            className="pl-moons-field"
+            className="pl-nights-field"
             style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
-            role="img"
+            role="group"
             aria-label={sleeps}
-            title={look.print ? undefined : edit ? t(BIG_DAY) : sleeps}
-            {...(edit ? BIG_DAY_EDIT : {})}
+            title={look.print || edit ? undefined : sleeps}
           >
             {shown.map((night, i) => (
-              <span
+              <NightCard
                 key={night.key}
-                className={`pl-night ${night.state}${night.key === fresh ? " fresh" : ""}`}
-                data-night={tappable ? night.state : undefined}
-                data-key={tappable ? night.key : undefined}
-                data-tap={tappable ? tapState({ goal: night.state === "now", done: night.state === "done" }) : undefined}
-              >
-                <span className="pl-night-in">
-                  {i === first && (
-                    <span className="pl-night-hand" aria-hidden>
-                      👇
-                    </span>
-                  )}
-                  <span className="pl-night-sky">{night.state === "done" ? <SunPic /> : <MoonPic />}</span>
-                  <BedPic />
+                night={night}
+                look={nightLook}
+                print={look.print}
+                grey={look.print && !look.color}
+                hand={i === first}
+                edit={edit}
+                fresh={night.key === fresh}
+                tappable={tappable}
+              />
+            ))}
+            {adds && (
+              <span className="pl-night-cell">
+                <span className="pl-add pl-night-add" data-edit="add-night" role="button" tabIndex={0} aria-label={t(ONE_MORE_NIGHT)} title={t(ONE_MORE_NIGHT)}>
+                  ＋
                 </span>
               </span>
-            ))}
+            )}
           </div>
           <span className="pl-cd-arrow" aria-hidden>
             ➜
@@ -1087,7 +1140,7 @@ function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps &
           data-tap={tappable ? (first === -1 ? "goal" : "") : undefined}
           role="img"
           aria-label={label(step)}
-          title={look.print ? undefined : label(step)}
+          title={look.print ? undefined : edit ? t(BIG_DAY) : label(step)}
           {...(edit ? BIG_DAY_EDIT : {})}
         >
           {edit && <SheetAction act="configure" ask={t(BIG_DAY)} data={{ "data-edit": "big-day" }} />}

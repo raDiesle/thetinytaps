@@ -1054,7 +1054,7 @@
   aspect-ratio: auto;
 }
 
-/* Countdown (H-41): a moon for every night until the big day on a patch of night sky, an arrow, then the day's picture.
+/* Countdown (H-41): a card for every night until the big day, an arrow, then the day's picture.
    Wide sheets put the picture beside the moons, upright ones under them; on the day itself the picture fills the sheet. */
 .pl-countdown {
   display: flex;
@@ -1070,186 +1070,71 @@
   flex-direction: column;
 }
 
-.pl-moons-field {
+/* The nights lie on a field of the plan's colour, each a white card of its own with a clear edge (user feedback,
+   November 2026: every night plainly a field) – the child asleep in bed above, the star field below. */
+.pl-nights-field {
   display: grid;
   flex: 1;
   align-self: stretch;
-  place-items: center;
-  gap: 1cqmin;
+  gap: 1.2cqmin;
   min-width: 0;
   min-height: 0;
-  padding: 2cqmin;
-  border-radius: 5cqmin;
-  background: #2b3170;
+  padding: 1.6cqmin;
+  border-radius: 4cqmin;
+  background: color-mix(in srgb, var(--rw-main) 30%, #fff);
 }
 
-.rw-on-paper .pl-moons-field {
-  border: max(1px, 0.5cqmin) dashed #0006;
+.rw-on-paper .pl-nights-field {
   background: none;
 }
 
-.pl-editing .pl-moons-field {
-  cursor: pointer;
-}
-
-/* A night (H-05): its moon or sun over a little bed. A slept night's morning waits for the child's tap in a warm, still
-   light; tapped, its patch turns to day sky and a sun rises over the bed. */
-.pl-night {
+/* A night's cell keeps its card taller than wide (`STAR_CARD`), whatever shape the grid gives it. */
+.pl-night-cell {
   container-type: size;
   display: grid;
   place-items: center;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-
-/* Square whatever the cell, so its light and its day sky stay round. */
-.pl-night-in {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  width: 96cqmin;
-  height: 96cqmin;
-  padding-bottom: 6cqmin;
-  border-radius: 22cqmin;
-}
-
-.pl-night-sky {
-  display: grid;
-  flex: 1;
-  place-items: center;
+  min-width: 0;
   min-height: 0;
 }
 
-.pl-night .pl-moon-pic,
-.pl-night .pl-sun-pic {
-  width: 52cqmin;
-  height: 52cqmin;
-}
-
-.pl-bed-pic {
+.pl-night-cell > .pl-card.pl-night,
+.pl-night-cell > .pl-night-add {
   flex: none;
-  width: 88cqmin;
-  height: 46cqmin;
-  overflow: visible;
+  width: min(100cqw, 80cqh);
+  height: min(125cqw, 100cqh);
 }
 
-.pl-bed-wood {
-  fill: #c98b52;
+.pl-night-cell > .pl-night-add {
+  aspect-ratio: auto;
+  border-radius: 12cqmin;
+  font-size: 34cqmin;
+  font-weight: 400;
 }
 
-.pl-bed-mattress,
-.pl-bed-pillow {
-  fill: #fff;
-}
-
-.pl-bed-blanket {
-  fill: var(--rw-main);
-}
-
-.pl-bed-pic > *,
-.pl-sun-pic circle {
-  stroke: #2a1e5c;
-  stroke-width: 3;
-  stroke-linejoin: round;
-}
-
-.rw-grey .pl-bed-pic > * {
-  fill: #fff;
-}
-
-.pl-night.now .pl-night-in {
-  background: radial-gradient(closest-side, #fff59d 0%, #ffd43b88 55%, transparent 100%);
-  box-shadow: 0 0 0 max(2px, 3cqmin) #ffd43b;
-}
-
-.pl-night.done .pl-night-in {
-  background: #a5dcff;
+/* Nights already slept stay as they are, their star tells them – never paled, the child counts the stars. */
+.pl-card.pl-night.done {
+  opacity: 1;
 }
 
 .pl-night-hand {
   position: absolute;
-  top: 0;
-  right: 2cqmin;
-  font-size: 30cqmin;
+  top: -6cqmin;
+  right: -4cqmin;
+  z-index: 1;
+  font-size: 34cqmin;
   line-height: 1;
   pointer-events: none;
 }
 
-.pl-sun-pic {
-  overflow: visible;
+/* Counted: the night's picture lights up and tips, one after the other (only after a tap). */
+.pl-night.twinkle .pl-emoji {
+  animation: pl-night-count 0.55s ease-out;
 }
 
-.pl-sun-pic circle {
-  fill: #ffd43b;
-}
-
-.pl-sun-rays {
-  fill: none;
-  stroke: #f59f00;
-  stroke-width: 7;
-  stroke-linecap: round;
-}
-
-.pl-sun-face {
-  fill: none;
-  stroke: #2a1e5c;
-  stroke-width: 4;
-  stroke-linecap: round;
-}
-
-/* Just tapped: the sun comes up over the bed (only after a tap, never by itself). */
-.pl-night.fresh .pl-sun-pic {
-  animation: pl-sun-rise 0.9s ease-out backwards;
-}
-
-@keyframes pl-sun-rise {
-  from {
-    opacity: 0;
-    transform: translateY(45%) scale(0.6);
-  }
-}
-
-.pl-moon-pic {
-  width: 88cqmin;
-  height: 88cqmin;
-  overflow: visible;
-}
-
-.pl-moon-pic path:first-child {
-  fill: #ffd43b;
-  stroke: #2a1e5c;
-  stroke-width: 4;
-  stroke-linejoin: round;
-}
-
-.rw-grey .pl-moon-pic path:first-child {
-  fill: #fff;
-}
-
-.pl-moon-face {
-  fill: none;
-  stroke: #2a1e5c;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-}
-
-/* Counted: the moon lights up and tips, one after the other (only after a tap). */
-.pl-night.twinkle .pl-moon-pic,
-.pl-night.twinkle .pl-sun-pic {
-  animation: pl-moon-count 0.55s ease-out;
-}
-
-.pl-night.wiggle {
-  animation: wiggle 0.5s ease-in-out;
-}
-
-@keyframes pl-moon-count {
+@keyframes pl-night-count {
   40% {
-    scale: 1.35;
-    rotate: -14deg;
+    scale: 1.2;
+    rotate: -8deg;
     filter: drop-shadow(0 0 6px #fff59d);
   }
 }

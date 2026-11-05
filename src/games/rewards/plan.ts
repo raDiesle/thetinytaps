@@ -78,6 +78,8 @@ export interface Plan {
    * bed to tap.
    */
   since?: string;
+  /** Countdown only: how a night looks (`NIGHT_LOOKS`); where missing the child in bed follows „Junge / Mädchen“. */
+  night?: string;
 }
 
 /** A plan as an older version saved it: its two-card „Jetzt – Dann“ view is now a Jetzt – Dann plan with the „Jetzt“ field. */
@@ -178,8 +180,9 @@ export const bigDayStep = (plan: Plan): PlanStep | undefined => plan.days[0]?.[0
 export const moonsLeft = (plan: Plan, day: Date): number => Math.min(MAX_NIGHTS, Math.max(0, nightsUntil(day, bigDayOf(plan, day))));
 
 /**
- * One night of a Countdown's waiting (H-05, „Wie oft noch schlafen?“), drawn as a bed: `later` a moon over it, a night
- * still to sleep; `now` slept, its morning come, the moon waiting for the child's tap; `done` tapped, a sun over it.
+ * One night of a Countdown's waiting (H-05, „Wie oft noch schlafen?“), drawn as a card of the child asleep in bed with
+ * one star field under it: `later` a night still to sleep; `now` slept, its morning come, its field waiting for the
+ * child's tap; `done` tapped, the star in its field.
  * `key` is its tick in the log: the morning after the night, with the big day's card.
  */
 export interface Night {
@@ -187,7 +190,6 @@ export interface Night {
   state: "done" | "now" | "later";
 }
 
-/** When a Countdown's waiting began (`Plan.since`), or yesterday for one made before. */
 /** The task id of a night's tick, whatever the big day's picture: choosing another one keeps the suns. */
 const NIGHT = "nacht";
 
@@ -200,6 +202,16 @@ export function withBigDay(plan: Plan, key: string, today: Date): Plan {
   return { ...plan, bigDay: key, since: over ? dayKey(today) : plan.since };
 }
 
+/**
+ * A Countdown with a night more or fewer to wait (＋ and 🗑️ on the sheet while it is made): the big day moves, the
+ * nights still to come stay between none and `MAX_NIGHTS`, and the suns tapped so far stay (`withBigDay`).
+ */
+export function withNightsLeft(plan: Plan, by: number, today: Date): Plan {
+  const left = Math.max(0, Math.min(MAX_NIGHTS, moonsLeft(plan, today) + by));
+  return withBigDay(plan, dayKey(daysLater(today, left)), today);
+}
+
+/** When a Countdown's waiting began (`Plan.since`), or yesterday for one made before. */
 const sinceOf = (plan: Plan, today: Date): Date => (plan.since ? new Date(`${plan.since}T12:00`) : daysLater(today, -1));
 
 /**

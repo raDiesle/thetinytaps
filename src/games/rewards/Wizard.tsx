@@ -67,7 +67,7 @@ export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDon
         more={
           draft.type === "board" ? (
             <Editor board={draft.board} onChange={(patch) => setDraft({ type: "board", board: { ...draft.board, ...patch } })} />
-          ) : (
+          ) : draft.plan.view === "countdown" ? undefined : (
             <PlanEditor plan={draft.plan} day={new Date()} onChange={(plan) => setDraft({ type: "plan", plan })} />
           )
         }

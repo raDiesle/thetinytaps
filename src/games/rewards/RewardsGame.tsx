@@ -231,24 +231,13 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
 
   const editor =
     type === "board"
-      ? board && (
-          <Editor
-            board={board}
-            onChange={changeBoard}
-            onStartOver={() => setLog(startOver(log, board, boardDay))}
-            onRemove={boards.boards.length > 1 ? () => removeBoard(board) : undefined}
-          />
-        )
-      : plan && (
-          <PlanEditor
-            key={plan.id}
-            plan={plan}
-            day={planDay}
-            onChange={changePlan}
-            onRestartToday={() => setLog(restartDay(log, plan.id, today))}
-            onRemove={allPlans.length > 1 ? () => removePlan(plan) : undefined}
-          />
+      ? board && <Editor board={board} onChange={changeBoard} onStartOver={() => setLog(startOver(log, board, boardDay))} />
+      : plan &&
+        // A Countdown is changed wholly on its sheet: nothing under it (user feedback, November 2026).
+        plan.view !== "countdown" && (
+          <PlanEditor key={plan.id} plan={plan} day={planDay} onChange={changePlan} onRestartToday={() => setLog(restartDay(log, plan.id, today))} />
         );
+  const remove = type === "board" ? board && boards.boards.length > 1 && (() => removeBoard(board)) : plan && allPlans.length > 1 && (() => removePlan(plan));
   const print =
     type === "board"
       ? board && <PrintPanel board={board} options={boards.print} onChange={(patch) => updateBoards({ print: { ...boards.print, ...patch } })} />
@@ -298,7 +287,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
       day={type === "board" ? boardDay : planDay}
       log={log}
       linked={linked}
-      more={editor}
+      more={editor || undefined}
+      onRemove={remove || undefined}
     />
   ) : !computer && panel === "print" ? (
     print

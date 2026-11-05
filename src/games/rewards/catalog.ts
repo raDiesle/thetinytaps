@@ -807,16 +807,35 @@ export const PLAN_VIEWS: PlanViewInfo[] = [
     emoji: "🌙",
     label: { de: "Countdown", en: "Countdown", zh: "倒数", hi: "उलटी गिनती", es: "Cuenta atrás", ar: "العدّ التنازلي", ru: "Обратный отсчёт" },
     hint: {
-      de: "Wie oft noch schlafen bis zum großen Tag – ein Mond für jede Nacht",
-      en: "How many sleeps until the big day – a moon for every night",
-      zh: "离大日子还要睡几觉——每晚一个月亮",
-      hi: "बड़े दिन तक और कितनी बार सोना है – हर रात के लिए एक चाँद",
-      es: "Cuántas noches faltan para el gran día: una luna por cada noche",
-      ar: "كم نومة باقية حتى اليوم الكبير – قمر لكل ليلة",
-      ru: "Сколько ещё спать до большого дня – по луне на каждую ночь",
+      de: "Wie oft noch schlafen bis zum großen Tag – ein Feld für jede Nacht",
     },
   },
 ];
+
+/**
+ * What a Countdown's night looks like (`Plan.night`, user feedback, November 2026: the moon over a little bed looked too
+ * plain): a fox or bear child asleep in its bed, both together, or the sleepy moon – a picture of `bilder/`
+ * (`nacht-<id>`, the fox boy's the Tagesplan's `schritt-schlafen`), its emoji until it is made. Chosen by a tap on a
+ * night's ⚙️ while the Countdown is made; where none is chosen the child in bed follows „Junge / Mädchen“
+ * (`nightLookOf`), like every figure that stands for the child.
+ */
+export interface NightLook {
+  id: string;
+  emoji: string;
+  label: Localized;
+}
+
+export const NIGHT_LOOKS: NightLook[] = [
+  { id: "fuechsin", emoji: "🦊", label: { de: "Fuchsmädchen im Bett" } },
+  { id: "baer", emoji: "🐻", label: { de: "Bärenjunge im Bett" } },
+  { id: "fuchs", emoji: "🦊", label: { de: "Fuchsjunge im Bett" } },
+  { id: "zusammen", emoji: "🛏️", label: { de: "Fuchs und Bär im Bett" } },
+  { id: "mond", emoji: "🌙", label: { de: "Schlafender Mond" } },
+];
+
+/** A Countdown's night look by id; where none is chosen (or it is gone) the shelf's figure: the fox girl or the bear boy. */
+export const nightLookOf = (id: string | undefined, figure: "boy" | "girl"): NightLook =>
+  NIGHT_LOOKS.find((look) => look.id === id) ?? NIGHT_LOOKS[figure === "girl" ? 0 : 1];
 
 /** How the child follows a Jetzt – Dann plan (`Plan.nowField`), chosen beside its picture on the wizard's first step. */
 export interface NowWay {
@@ -1050,13 +1069,7 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
       ru: "Сколько ещё спать?",
     },
     hint: {
-      de: "Ein Mond für jede Nacht bis zum Geburtstag, zum Urlaub oder bis Oma kommt",
-      en: "A moon for every night until the birthday, the holiday or Grandma’s visit",
-      zh: "每晚一个月亮，直到生日、度假或奶奶来",
-      hi: "जन्मदिन, छुट्टियों या दादी के आने तक हर रात के लिए एक चाँद",
-      es: "Una luna por cada noche hasta el cumpleaños, las vacaciones o la visita de la abuela",
-      ar: "قمر لكل ليلة حتى عيد الميلاد أو العطلة أو قدوم الجدّة",
-      ru: "По луне на каждую ночь до дня рождения, отпуска или приезда бабушки",
+      de: "Ein Feld für jede Nacht bis zum Geburtstag, zum Urlaub oder bis Oma kommt",
     },
   },
 ];

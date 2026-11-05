@@ -54,15 +54,9 @@ const CARDS_NOTE: Localized = {
 export const printsCards = (plan: Plan): "never" | "always" | "choice" =>
   plan.view === "countdown" ? "never" : plan.view !== "day" ? "choice" : plan.nowField ? "always" : "never";
 
-/** Under a Countdown's print: what the moons on paper are for. */
+/** Under a Countdown's print: what the nights on paper are for (German only since the nights became cards with a ring). */
 const COUNTDOWN_NOTE: Localized = {
-  de: "Gedruckt werden die Monde ab heute. Jeden Morgen malt Ihr Kind einen Mond aus oder streicht ihn durch – so sieht es, wie der große Tag näher kommt.",
-  en: "The moons are printed from today. Every morning your child colours in a moon or crosses it out – and sees the big day coming closer.",
-  zh: "从今天起的月亮会被打印出来。每天早上，孩子涂满一个月亮或把它划掉——就能看到大日子越来越近。",
-  hi: "आज से चाँद प्रिंट होते हैं। हर सुबह बच्चे के साथ एक चाँद में रंग भरें या उसे काट दें – ऐसे दिखता है कि बड़ा दिन पास आ रहा है।",
-  es: "Las lunas se imprimen a partir de hoy. Cada mañana su peque colorea una luna o la tacha, y así ve cómo se acerca el gran día.",
-  ar: "تُطبع الأقمار ابتداءً من اليوم. كل صباح يلوّن طفلكم قمرًا أو يشطبه – فيرى كيف يقترب اليوم الكبير.",
-  ru: "Луны печатаются начиная с сегодняшнего дня. Каждое утро ребёнок закрашивает одну луну или зачёркивает её – и видит, как приближается большой день.",
+  de: "Gedruckt werden die Nächte ab heute. Jeden Morgen klebt Ihr Kind einen Stern in den Kreis der Nacht oder malt ihn aus – so sieht es, wie der große Tag näher kommt.",
 };
 
 /** The page's orientation: the grown-up's choice, or what suits the plan. */

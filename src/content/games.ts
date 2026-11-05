@@ -105,9 +105,15 @@ export const CATEGORIES: Category[] = [
       {
         href: "/belohnungstafel/",
         also: ["/tagesplan/", "/wie-lange-warten/"],
-        // On the shelf books in one slipcase, each opening its own part (user feedback, November 2026): the third waits
-        // for a big day with a Countdown (H-05).
+        // On the shelf books tied together, each opening its own part (user feedback, November 2026): Zeitplan, then
+        // „Wie lange warten?“ (a Countdown to a big day, H-05) left of the Belohnungstafel, which stays bound in gold.
         volumes: [
+          {
+            href: "/tagesplan/",
+            emoji: "🗓️",
+            title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
+          },
+          { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
           {
             href: "/belohnungstafel/",
             emoji: "🌟",
@@ -121,12 +127,6 @@ export const CATEGORIES: Category[] = [
               ru: "Таблица наград",
             },
           },
-          {
-            href: "/tagesplan/",
-            emoji: "🗓️",
-            title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
-          },
-          { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
         ],
         emoji: "📅",
         title: {
