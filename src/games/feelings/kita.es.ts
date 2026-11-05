@@ -305,19 +305,13 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Tirar el vaso", answer: "Mmm, ahora la leche cayó sobre Zorrito. Mejor aprieta muy fuerte tu peluche." },
       },
       {
-        caption: "Mostrar las dos mitades",
-        question: "Osito todavía está un poquito triste. ¿Qué puede hacer él?",
-        beats: [{ narration: "Mira las mitades. ¡Una, dos!", line: "¡Ahora tengo dos galletas!" }],
-        instead: { caption: "Hacer migas la galleta", answer: "Mmm, ahora la galleta ya no está. Mejor mira: ¡ahora tienes dos!" },
-      },
-      {
         caption: "Compartir con Zorrito",
         question: "Zorrito ya no tiene galleta. ¿Qué puede hacer Osito?",
         beats: [{ narration: "Osito le da una mitad a Zorrito.", line: "¡Para ti!" }, { line: "¡Gracias, Osito!" }],
         instead: { caption: "Sacar la lengua", answer: "Mmm, ahora Zorrito está triste. Mejor comparte con él." },
       },
     ],
-    outro: [{ narration: "¡Genial! Estar triste está bien. Apretar el peluche, mirar de otra forma, compartir." }],
+    outro: [{ narration: "¡Genial! Estar triste está bien. Apretar el peluche y compartir." }],
     endCaption: "Osito y Zorrito comen una mitad cada uno",
   },
   baby: {

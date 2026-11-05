@@ -311,19 +311,13 @@ export const SITUATIONS_EN: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "Knock over the cup", answer: "Hmm, now the milk is all over Little Fox. Squeeze your cuddly toy really tight instead." },
       },
       {
-        caption: "Show the two halves",
-        question: "Little Bear is still a little sad. What can he do?",
-        beats: [{ narration: "He looks at the halves. One, two!", line: "Now I have two cookies!" }],
-        instead: { caption: "Crumble the cookie", answer: "Hmm, now the cookie is all gone. Look instead: now you have two!" },
-      },
-      {
         caption: "Share with Little Fox",
         question: "Little Fox has no cookie left. What can Little Bear do?",
         beats: [{ narration: "Little Bear gives Little Fox one half.", line: "For you!" }, { line: "Thank you, Little Bear!" }],
         instead: { caption: "Stick out the tongue", answer: "Hmm, now Little Fox is sad. Share with him instead." },
       },
     ],
-    outro: [{ narration: "Great! Being sad is okay. Squeeze the cuddly toy, look again, share." }],
+    outro: [{ narration: "Great! Being sad is okay. Squeeze the cuddly toy and share." }],
     endCaption: "Little Bear and Little Fox each eat a half",
   },
   baby: {

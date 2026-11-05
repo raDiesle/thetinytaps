@@ -19,7 +19,7 @@ export interface ReadAlongCorner {
  * One pass through a group: each of its scenes once, one choice each. After a scene's good idea its picture waits with
  * ▶ until a tap brings the next scene (user feedback, November 2026). Every scene asks its next step
  * (`FeelingsSettings.steps`), so the next pass shows the same scenes with other choices. After the last scene come
- * „Nochmal“ and „Weiter“, which names the feeling it goes on to.
+ * „Nochmal“ and „Weiter“, which names the feeling it goes on to. A tap on a dot at the top plays that scene again.
  */
 export function PassPlay({
   group,
@@ -49,9 +49,12 @@ export function PassPlay({
   // The steps as they are now: a round finishing writes the next one, while a timer of the last may still read them.
   const steps = useRef(settings.steps);
   const stepOf = (index: number) => (steps.current[scenes[index].id] ?? 0) % stepsOf(scenes[index]);
+  // The step each scene played in this pass, so a tap on its dot plays it again as it was.
+  const played = useRef<Record<number, number>>({});
+  // `run` restarts a scene played again from its dot.
   const [now, setNow] = useState(() => {
     const index = startAt < scenes.length ? startAt : 0;
-    return { index, step: stepOf(index) };
+    return { index, step: stepOf(index), run: 0 };
   });
 
   useEffect(() => {
@@ -63,15 +66,18 @@ export function PassPlay({
 
   // The scene is done: its next step and the scene to go on from are kept at once, even if no one taps ▶.
   const finish = () => {
+    played.current[now.index] = now.step;
     steps.current = { ...steps.current, [story.id]: (now.step + 1) % stepsOf(story) };
     update({ steps: steps.current, ...(remember ? { scene: last ? 0 : now.index + 1 } : {}) });
   };
 
-  const goOn = () => setNow({ index: now.index + 1, step: stepOf(now.index + 1) });
+  const goOn = () => setNow({ index: now.index + 1, step: stepOf(now.index + 1), run: now.run });
+  // A dot tapped: that scene again, with the choice it played (the one now from its start).
+  const replay = (index: number) => setNow({ index, step: played.current[index] ?? stepOf(index), run: now.run + 1 });
 
   return (
     <RoundPlay
-      key={`${now.index}-${now.step}`}
+      key={`${now.index}-${now.step}-${now.run}`}
       round={roundOf(story, now.step, language)}
       settings={settings}
       progress={{ total: scenes.length, done: now.index }}
@@ -79,6 +85,7 @@ export function PassPlay({
       ending={last ? <GameEnd inline showNext onAgain={onAgain} next={next} /> : undefined}
       onDone={last ? undefined : goOn}
       onEndKey={last ? (next?.onNext ?? onAgain) : goOn}
+      onPick={replay}
       readAlong={readAlong}
     />
   );

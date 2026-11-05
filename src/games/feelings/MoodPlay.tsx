@@ -31,7 +31,7 @@ import {
 } from "./mood";
 import { BigFace, SkySign } from "./moodArt";
 import type { FeelingsSettings } from "./settings";
-import { ChoiceCard, StoryPicture, useTimers, useVoice } from "./shared";
+import { ChoiceCard, GoOn, StoryPicture, useTimers, useVoice } from "./shared";
 
 /** How long the hug, and then the picked help, stay big before the next part begins. */
 const ANSWER_MS = 2200;
@@ -206,7 +206,7 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
           />
         )}
         {stage.at === "face" && (
-          <StoryPicture key="face" name="" art={<BigFace mood={stage.mood} />} caption={`${t(stage.mood.caption)}: ${t(FACE_CAPTION)}`} onNext={faceDone} />
+          <StoryPicture key="face" name="" art={<BigFace mood={stage.mood} />} caption={`${t(stage.mood.caption)}: ${t(FACE_CAPTION)}`} />
         )}
         {stage.at === "strength" && (
           <div className="mood-cards mood-helps">
@@ -234,6 +234,7 @@ export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onP
             </div>
           ))}
       </main>
+      {stage.at === "face" && <GoOn onNext={faceDone} label={`${t(stage.mood.caption)}: ${t(FACE_CAPTION)}`} />}
     </div>
   );
 }

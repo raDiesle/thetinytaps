@@ -294,19 +294,13 @@ export const SITUATIONS_ZH: Partial<Record<SituationId, SituationText>> = {
         instead: { caption: "打翻杯子", answer: "嗯，现在牛奶洒到小狐狸身上了。还是紧紧抱住你的毛绒玩具吧。" },
       },
       {
-        caption: "看看两半",
-        question: "小熊还有一点点难过。他可以怎么做？",
-        beats: [{ narration: "他看看两半饼干。一，二！", line: "现在我有两块饼干啦！" }],
-        instead: { caption: "把饼干捏碎", answer: "嗯，现在饼干全没了。还是看一看吧：现在你有两块啦！" },
-      },
-      {
         caption: "和小狐狸分享",
         question: "小狐狸没有饼干了。小熊可以怎么做？",
         beats: [{ narration: "小熊把一半给小狐狸。", line: "给你！" }, { line: "谢谢你，小熊！" }],
         instead: { caption: "吐舌头", answer: "嗯，现在小狐狸难过了。还是和他分享吧。" },
       },
     ],
-    outro: [{ narration: "真棒！难过没关系。抱紧毛绒玩具，换个样子看，分享。" }],
+    outro: [{ narration: "真棒！难过没关系。抱紧毛绒玩具，分享。" }],
     endCaption: "小熊和小狐狸各吃一半",
   },
   baby: {

@@ -147,7 +147,7 @@ test("the game answers calmly", () => {
 // take turns, so only one thing moves at a time. Captions are never cut off with „…“ (user feedback, November 2026).
 test("a scene goes on with a tap, and one thing moves at a time", () => {
   const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
-  expect(round).toContain('onNext={phase === "intro" ? goOn : phase === "done" ? onDone : undefined}');
+  expect(round).toContain('const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;');
   expect(round).toContain('still={phase === "choose"}');
   expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain('<Frames name={image} moving={active} className="fg-card-image" />');
@@ -202,6 +202,31 @@ test("after the good choice ▶ brings the next scene, and „Weiter“ names a 
   expect(pass).toContain("onDone={last ? undefined : goOn}");
   const finish = pass.slice(pass.indexOf("const finish"), pass.indexOf("const goOn"));
   expect(finish, "finishing a scene doesn't move on by itself").not.toContain("setNow");
+});
+
+// ▶ stands at the same place on every screen of the game, the screen's bottom right corner, and the whole screen goes
+// on unless a tap lands next to something else (user feedback, November 2026: on the pages of a day's story it lay
+// elsewhere, under the grown-ups' notes). Those notes are the scenes' alone: on a page they change nothing. The dots
+// at the top play a scene again (user wish, November 2026).
+test("▶ keeps one place, the notes stay off the pages, and the dots go back", () => {
+  const read = (f: string) => readFileSync(`src/games/feelings/${f}`, "utf8");
+  const shared = read("shared.tsx");
+  const picture = shared.slice(shared.indexOf("export function StoryPicture"), shared.indexOf("export type CardState"));
+  expect(picture, "the big picture is no button of its own").not.toContain("onNext");
+  for (const f of ["RoundPlay.tsx", "DayPage.tsx", "MoodPlay.tsx"]) expect(read(f), f).toContain("<GoOn ");
+  for (const f of ["RoundPlay.tsx", "DayPage.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx"]) expect(read(f), f).not.toContain("fg-next-sign");
+  const page = read("DayPage.tsx");
+  expect(page).not.toMatch(/story-corner|voiceSwitch|VoiceSwitch|ReadAlong/);
+  expect(read("DayPlay.tsx")).not.toContain("corner={");
+  const css = read("feelings.css");
+  const next = css.slice(css.indexOf(".fg-next {"), css.indexOf("}", css.indexOf(".fg-next {")));
+  expect(next, "▶ in the screen's corner").toMatch(/right: var\(--pad\);\s+bottom: var\(--pad\);/);
+  expect(css, "the notes stand left of ▶").toContain("right: calc(var(--next-w) + 2 * var(--pad) - 8px);");
+  for (const f of ["RoundPlay.tsx", "DayPage.tsx"]) expect(read(f), f).toContain("onPick={onPick}");
+  for (const f of ["PassPlay.tsx", "DayPlay.tsx"]) expect(read(f), f).toContain("onPick={replay}");
+  const dots = shared.slice(shared.indexOf("export function StepDots"));
+  expect(dots, "a tap next to a dot finds the nearest, done or not").toContain('data-tap=""');
+  expect(dots).not.toContain('"done"');
 });
 
 // The days (user idea, November 2026): every scene is in exactly one day, so the days tell all of them and none

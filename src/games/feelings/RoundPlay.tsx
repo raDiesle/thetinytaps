@@ -4,11 +4,11 @@ import { ReadAlong } from "./ReadAlong";
 import type { ReadAlongCorner } from "./PassPlay";
 import { beatText, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
-import { CHEER_MS, ChoiceCard, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
+import { CHEER_MS, ChoiceCard, GoOn, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
 import { beatMs, type Beat } from "./story";
 
 /**
- * "intro": the scene is shown and told until the child taps it (▶). "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
+ * "intro": the scene is shown and told until the child taps the screen (▶). "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
  * to. "good": the good idea is done. "end": the story's happy end. "done": the round is over and `ending` shows.
  */
 type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
@@ -17,7 +17,7 @@ type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
  * One round: the scene, one question, two cards – the not-so-good idea and the good one; a tap on a card chooses it.
  * The not-so-good one shows what it leads to and is crossed out, then the good one is left to choose. After the good
  * one (and the story's happy end, on its last step) `onFinish` is called, and the round stays on its last picture:
- * with ▶ on it (`onDone`, the next scene), or with `ending` beside it (the end buttons of a pass).
+ * with ▶ in the screen's corner (`onDone`, the next scene; `GoOn`), or with `ending` beside it (the end buttons of a pass).
  */
 export function RoundPlay({
   round,
@@ -27,6 +27,7 @@ export function RoundPlay({
   ending,
   onDone,
   onEndKey,
+  onPick,
   readAlong,
 }: {
   round: Round;
@@ -36,10 +37,12 @@ export function RoundPlay({
   onFinish: () => void;
   /** Shown in the cards' room once the round is over, if it is the last of its pass. */
   ending?: ReactNode;
-  /** Once the round is over, a tap on its picture (▶) goes on with it: the next scene of the pass. */
+  /** Once the round is over, a tap on the screen (▶) goes on with it: the next scene of the pass. */
   onDone?: () => void;
   /** A key pressed once the round is over: every key does something. */
   onEndKey?: () => void;
+  /** A tap on a dot at the top: that scene again, one before this or this one from its start. */
+  onPick?: (index: number) => void;
   /**
    * „Alltagssituationen“: the note in the bottom right corner that shows grown-ups the round's whole text to read out,
    * whether it is open, and the loudspeaker standing beside it (`VoiceSwitch`).
@@ -151,6 +154,8 @@ export function RoundPlay({
           ? "end"
           : "start";
 
+  // What a tap on the screen does now: the cards after the scene is told, the next scene after the last picture.
+  const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;
   const doneHere = phase === "good" || phase === "end" || phase === "done";
   const insteadState: CardState = tried ? "wrong" : phase === "choose" ? "choose" : "rest";
   const goodState: CardState = doneHere ? "playing" : phase === "choose" ? "choose" : "rest";
@@ -158,19 +163,14 @@ export function RoundPlay({
   return (
     <div className="story-play">
       <header className="story-top">
-        <StepDots total={progress.total} done={progress.done + (doneHere ? 1 : 0)} current={!doneHere} />
+        <StepDots total={progress.total} done={progress.done + (doneHere ? 1 : 0)} current={!doneHere} upTo={progress.done} onPick={onPick} />
       </header>
       <main className="story-middle">
         {/* Only one thing moves at a time: the scene while it is shown, then the cards while the child chooses. */}
-        <StoryPicture
-          key={shown.image}
-          name={shown.image}
-          caption={caption}
-          look={look}
-          still={phase === "choose"}
-          onNext={phase === "intro" ? goOn : phase === "done" ? onDone : undefined}
-        />
+        <StoryPicture key={shown.image} name={shown.image} caption={caption} look={look} still={phase === "choose"} />
       </main>
+      {/* The scene told, or the chosen idea's last picture: a tap anywhere goes on. */}
+      {next && <GoOn onNext={next} label={caption} />}
       {/* The not-so-good idea always first (bottom left), the good one second (top right). */}
       <footer className={`story-choices${phase === "done" ? " ending" : ""}`}>
         {phase === "done"
