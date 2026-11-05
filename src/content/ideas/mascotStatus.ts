@@ -204,7 +204,14 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "L",
         note: "Zu entscheiden: ein anderes Tier (Waschbär?) übernimmt Schubsen, Treten, Wegnehmen, Umwerfen (kita.ts und rund 56 Bilder); Fuchs und Bär, die Maskottchen, helfen und trösten.",
       },
-      { label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten", work: "picture", pictures: 8, effort: "M" },
+      {
+        label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten",
+        work: "picture",
+        pictures: 8,
+        effort: "M",
+        state: "done",
+        note: "Kam mit den Geschichten selbst, ohne eigene Bilder: der große Bär (Mama oder Papa des kleinen Bären) drückt ihn beim Abschied, kuschelt ihn mit dem Baby, hilft bei der Jacke, wartet am Spielplatztor und an der Kasse, spielt im Schnee und nimmt ihn in den Arm, als Oma Bär wegfährt; Füchsinnen helfen als Ärztin, Kassiererin und Besuch (gesehen am 5. November 2026).",
+      },
     ],
   },
   {
@@ -315,7 +322,15 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         state: "done",
         note: "Ein Kopf für alle (`MascotHead` in components/Mascot.tsx): Fellbüschel an den Wangen, Flausch in den Ohren, Schattenseite, Brauen, Augen mit brauner Iris und zwei Lichtern etwas unter der Kopfmitte (beim Kind größer und tiefer), weiches Licht im Stirnfell statt Glanzfleck, glänzende Nase, runder lachender Mund; der Körper rundlich mit dicken Armen, runden Pfoten mit Zehen, beim Fuchs dunkle Unterarme wie bei echten Füchsen, und ein weicher Schatten unter den Füßen (November 2026 knuddeliger gemacht). Ihn nutzen Spielende, Timer, Fahrer in Lebendige Bilder, Schnullerfee, Sticker im Regal, die Helfer in „Was gehört zusammen?“, Baustelle und Zirkus in Kettenreaktion. Ein neuer Fuchs oder Bär nimmt ihn auch.",
       },
-      { label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)", work: "picture", pictures: 4, effort: "S", idea: "D-21" },
+      {
+        label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)",
+        work: "picture",
+        pictures: 4,
+        effort: "S",
+        idea: "D-21",
+        state: "done",
+        note: "Unten auf den Menüseiten lesen von Besuch zu Besuch abwechselnd die Eltern, Oma oder Opa mit dem Kind (READERS in BookFamily.tsx), links Füchse, rechts Bären – nie dieselben Großen auf beiden Seiten.",
+      },
     ],
   },
 ];

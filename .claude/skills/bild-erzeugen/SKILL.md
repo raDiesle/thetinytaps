@@ -201,7 +201,11 @@ For `--transparent` drop "Simple, uncluttered background" and "printed on matte 
 cut-out) – the script adds the flat backdrop instruction itself. Never ask a cut-out for a shape behind its subject („a round sticker“, „inside a
 circle“): Gemini then draws a disc that keeps the magenta of the backdrop, a white ring, or a small circle on a white
 square, and the cut-out fails. Ask for a free-standing illustration with no circle, disc or frame behind it instead
-(only a sticker that *is* a shape, a star or a heart, is fine). Leave out light that spreads (a lamp's glow, sunbeams
+(only a sticker that *is* a shape, a star or a heart, is fine). Don't call it „a cut-out“ or „free-standing“ either:
+with those words Oma and Opa Fuchs came back as stickers with a thick white edge round them, unlike their reference
+family (November 2026). Say instead „no white outline, sticker edge or halo round them – their dark plum ink line is
+their outer edge, as in the reference picture“. An old fox or bear keeps the family's fur colour, with only a little
+grey round the muzzle or on the head: „grey around the muzzle“ alone made Oma Fuchs grey all over, more wolf than fox. Leave out light that spreads (a lamp's glow, sunbeams
 through a window): it came out magenta-pink. Ask for the whole thing to fit („the whole bathtub fits in the
 picture“), or the model cuts a tub or pool at the edge.
 A picture that takes a letter's place in a word (the o of „Both“ in the title) is drawn on that very letter: render

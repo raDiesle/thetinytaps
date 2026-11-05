@@ -26,7 +26,7 @@ export const bookIdeas: IdeaArea = {
     {
       id: "D-02",
       partial:
-        "Fuchs- und Bärenfamilie stehen unten auf jeder Menüseite, die Füchse links, die Bären rechts – auf breiten Bildschirmen (ab 1400 px) neben den Karten, auf Handys und Tablets unter den Karten, wo die Seite ihnen Platz lässt (statt Scheune und Bäumen). Fuchs- oder Bärenpaare passend zu jeder Welt und Oma und Opa (D-21) fehlen noch.",
+        "Fuchs- und Bärenfamilie stehen unten auf jeder Menüseite, die Füchse links, die Bären rechts – auf breiten Bildschirmen (ab 1400 px) neben den Karten, auf Handys und Tablets unter den Karten, wo die Seite ihnen Platz lässt (statt Scheune und Bäumen). Von Besuch zu Besuch lesen dort abwechselnd die Eltern, Oma und Opa (D-21). Fuchs- oder Bärenpaare passend zu jeder Welt fehlen noch.",
       emoji: "🦊",
       title: "Tiereltern am Seitenrand",
       text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchs- und die Bärenfamilie, und später in jeder Welt ein Großer mit seinem Kind, wie sie zu ihr passen (Papa Bär und das Bärenkind mit Bauhelm auf der Baustelle, Oma Fuchs und das Fuchskind in Gummistiefeln auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
@@ -188,6 +188,7 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-21",
+      done: true,
       emoji: "👵",
       title: "Oma und Opa lesen auch vor",
       text: "Neben den Karten und auf den Kapitelseiten liest nicht immer Mama oder Papa mit dem Kind: mal ist es Oma Fuchs, mal Opa Bär, die mit dem Fuchs- oder Bärenkind ins Buch schauen. Wer gerade vorliest, wechselt von Besuch zu Besuch; das Cover bleibt bei den zwei Familien. Vier Gemini-Bilder (Oma und Opa Fuchs, Oma und Opa Bär, jeweils mit dem Kind, freigestellt wie buch-fuechse.webp), im Sammel-Batch der Tabelle „🦊🐻 Fuchs & Bär“. In den Spielen kommen Oma und Opa wie Mama und Papa als der Große neben dem Tierkind vor (D-18).",
