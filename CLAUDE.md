@@ -660,6 +660,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
   „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
   `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
+  The custom domain in the repo's Pages settings (`gh api repos/raDiesle/thetinytaps/pages -q .cname`) must be the
+  host of `siteUrl`. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
+  from before the change. Check it with `curl -sI` (`age`, `x-cache: HIT`) and against GitHub directly
+  (`--resolve <host>:443:185.199.108.153`) before you suspect the build or the DNS. A new deploy clears that cache only
+  for the custom domain's host, not for the other name (November 2026: funforboth.com came back after a deploy, www stayed 404).
   The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
   (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
