@@ -1,8 +1,8 @@
 import { Choice, SettingsGroup, Slider, Toggle } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
-import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, newId, rewardFromCatalog, taskFromCatalog } from "./board";
-import { useBoardTitle, useRewardLabel, useTaskLabel } from "./BoardSheet";
-import { DAY_NAMES, MARKS, REWARDS, SLOTS, TASK_BY_ID, TASKS } from "./catalog";
+import { type Board, type BoardReward, type BoardTask, collectWays, fieldCount, MAX_TASKS, newId, taskFromCatalog, withWayReward } from "./board";
+import { useRewardLabel, useTaskLabel } from "./BoardSheet";
+import { DAY_NAMES, MARKS, SLOTS, TASK_BY_ID, TASKS } from "./catalog";
 import { ItemPic } from "./pictures";
 
 /**
@@ -49,9 +49,10 @@ export function SlotChips({ task, onChange }: { task: BoardTask; onChange: (patc
 }
 
 /**
- * What of a board is typed or chosen rather than tapped on its sheet („Weitere Einstellungen“): the heading, tasks
- * (from pictures or their own), weekdays, goal, reward and mark – and starting over. The child's name and the colours
- * are in the editor's band and deleting in its edit bar (`ChartEditor`), never here as well.
+ * What of a board is typed or chosen rather than tapped on its sheet („Weitere Einstellungen“): tasks (from pictures or
+ * their own), weekdays, a week's or month's goal, own words for the reward and the mark – and starting over. The
+ * heading, the rewards and a collecting way's rings are on the sheet, the colours above it and deleting in the edit bar
+ * (`ChartEditor`), never here as well.
  */
 export function Editor({
   board,
@@ -66,7 +67,6 @@ export function Editor({
   const t = useT();
   const taskLabel = useTaskLabel();
   const rewardLabel = useRewardLabel();
-  const autoTitle = useBoardTitle()({ ...board, title: "" });
   const fields = fieldCount(board, new Date());
   const unused = TASKS.filter((task) => !board.tasks.some((own) => own.catalog === task.id));
 
@@ -77,17 +77,19 @@ export function Editor({
     tasks.splice(index + by, 0, task);
     onChange({ tasks });
   };
+  // Own words for each reward: a collecting board's ways each have one, the other boards one (chosen on the sheet).
+  const rewards: { reward: BoardReward; set: (reward: BoardReward) => void }[] =
+    board.kind === "collect"
+      ? collectWays(board).flatMap((way) =>
+          way.reward ? [{ reward: way.reward, set: (reward: BoardReward) => onChange(withWayReward(board, way.index, reward)) }] : [],
+        )
+      : board.reward
+        ? [{ reward: board.reward, set: (reward: BoardReward) => onChange({ reward }) }]
+        : [];
   const addTask = (task: BoardTask) => board.tasks.length < MAX_TASKS && onChange({ tasks: [...board.tasks, task] });
 
   return (
     <section className="settings rw-editor">
-      <SettingsGroup title={t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}>
-        <label className="rw-input">
-          <span>{t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}</span>
-          <input type="text" value={board.title} maxLength={40} placeholder={autoTitle} onChange={(e) => onChange({ title: e.target.value })} />
-        </label>
-      </SettingsGroup>
-
       <SettingsGroup
         title={
           board.kind === "collect"
@@ -318,22 +320,6 @@ export function Editor({
           ru: "Цель и награда",
         })}
       >
-        {board.kind === "collect" && (
-          <Choice
-            label={t({
-              de: "Felder bis zur Belohnung",
-              en: "Fields to the reward",
-              zh: "到奖励的格数",
-              hi: "इनाम तक खाने",
-              es: "Casillas hasta el premio",
-              ar: "الخانات حتى المكافأة",
-              ru: "Клеток до награды",
-            })}
-            value={String(board.goal)}
-            onChange={(goal) => onChange({ goal: Number(goal) })}
-            options={COLLECT_GOALS.map((n) => ({ value: String(n), label: String(n) }))}
-          />
-        )}
         {(board.kind === "week" || board.kind === "month") && fields > 1 && (
           <Slider
             label={
@@ -381,44 +367,12 @@ export function Editor({
             })}
           </p>
         )}
-        <div
-          className="rw-chips"
-          role="group"
-          aria-label={t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
-        >
-          <button type="button" className={board.reward ? undefined : "selected"} aria-pressed={!board.reward} onClick={() => onChange({ reward: null })}>
-            🎉{" "}
-            {t({
-              de: "Nur zusammen freuen",
-              en: "Just celebrate together",
-              zh: "一起开心就好",
-              hi: "बस साथ में खुशी मनाना",
-              es: "Solo alegrarse en familia",
-              ar: "الفرح معًا فقط",
-              ru: "Просто порадоваться вместе",
-            })}
-          </button>
-          {REWARDS.map((reward) => {
-            const on = board.reward?.catalog === reward.id;
-            return (
-              <button
-                key={reward.id}
-                type="button"
-                className={on ? "selected" : undefined}
-                aria-pressed={on}
-                onClick={() => onChange({ reward: rewardFromCatalog(reward.id) })}
-              >
-                <ItemPic item={{ emoji: reward.emoji, catalog: reward.id }} kind="reward" /> {t(reward.label)}
-              </button>
-            );
-          })}
-        </div>
-        {board.reward && (
-          <div className="rw-task-edit">
+        {rewards.map(({ reward, set }, n) => (
+          <div key={n} className="rw-task-edit">
             <input
               type="text"
               className="rw-emoji-input"
-              value={board.reward.emoji}
+              value={reward.emoji}
               maxLength={8}
               aria-label={t({
                 de: "Bild der Belohnung (Emoji)",
@@ -429,14 +383,14 @@ export function Editor({
                 ar: "صورة المكافأة (إيموجي)",
                 ru: "Картинка награды (эмодзи)",
               })}
-              onChange={(e) => onChange({ reward: { ...board.reward, emoji: e.target.value } })}
+              onChange={(e) => set({ ...reward, emoji: e.target.value })}
             />
             <input
               type="text"
               className="rw-label-input"
-              value={board.reward.label ?? ""}
+              value={reward.label ?? ""}
               maxLength={32}
-              placeholder={rewardLabel(board.reward)}
+              placeholder={rewardLabel(reward)}
               aria-label={t({
                 de: "Eigene Worte für die Belohnung",
                 en: "Own words for the reward",
@@ -446,10 +400,10 @@ export function Editor({
                 ar: "كلمات خاصة للمكافأة",
                 ru: "Свои слова для награды",
               })}
-              onChange={(e) => onChange({ reward: { emoji: board.reward?.emoji ?? "🎁", catalog: board.reward?.catalog, label: e.target.value || undefined } })}
+              onChange={(e) => set({ emoji: reward.emoji, catalog: reward.catalog, label: e.target.value || undefined })}
             />
           </div>
-        )}
+        ))}
         <p className="setting-note">
           {t({
             de: "Am meisten freuen sich Kleine über Zeit zusammen: Spielplatz, ein Buch, backen. Die Belohnung kommt bald – bei Zweijährigen lieber nach wenigen Sternen als nach einer ganzen Woche.",

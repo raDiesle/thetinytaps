@@ -45,37 +45,25 @@ export function SheetAction({
   );
 }
 
-/** ⚙️ and 🗑️ in the reward's corners while the chart is made, the plan's and the board's alike. */
+/**
+ * ⚙️ in the reward's corner while the chart is made, the plan's and the board's alike. No 🗑️ (user feedback, November
+ * 2026): „Ohne Belohnung“ is a reward to pick in its window like the others, so a chart always has one chosen.
+ */
 export function RewardActions() {
   const t = useT();
   return (
-    <>
-      <SheetAction
-        act="configure"
-        ask={t({
-          de: "Belohnung ändern",
-          en: "Change reward",
-          zh: "修改奖励",
-          hi: "इनाम बदलें",
-          es: "Cambiar premio",
-          ar: "تغيير المكافأة",
-          ru: "Изменить награду",
-        })}
-        data={{ "data-edit": "reward" }}
-      />
-      <SheetAction
-        act="delete"
-        ask={t({
-          de: "Belohnung löschen?",
-          en: "Delete reward?",
-          zh: "删除奖励？",
-          hi: "इनाम मिटाएँ?",
-          es: "¿Borrar el premio?",
-          ar: "حذف المكافأة؟",
-          ru: "Удалить награду?",
-        })}
-        data={{ "data-edit": "no-reward" }}
-      />
-    </>
+    <SheetAction
+      act="configure"
+      ask={t({
+        de: "Belohnung ändern",
+        en: "Change reward",
+        zh: "修改奖励",
+        hi: "इनाम बदलें",
+        es: "Cambiar premio",
+        ar: "تغيير المكافأة",
+        ru: "Изменить награду",
+      })}
+      data={{ "data-edit": "reward" }}
+    />
   );
 }

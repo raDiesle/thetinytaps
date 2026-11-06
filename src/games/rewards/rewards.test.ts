@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import {
   addStar,
+  addWayStar,
   type Board,
   boardDays,
   boardDayParts,
@@ -11,12 +12,14 @@ import {
   dayFields,
   fourWeeks,
   cellKey,
+  collectWays,
   dayFull,
   exampleStars,
   fieldCount,
   isFilled,
   type LinkedDays,
   longerGoal,
+  MAX_COLLECT,
   monthOf,
   NO_LINKED,
   oncePerDay,
@@ -30,12 +33,16 @@ import {
   startOver,
   suggestsCertificate,
   takeBackStar,
+  takeBackWayStar,
   rewardFromCatalog,
   taskFromCatalog,
   taskInParts,
   withBoardDayParts,
   withKind,
   withStart,
+  wayCount,
+  withWayGoal,
+  withWayReward,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
 import { dayPartsOf } from "./plan";
@@ -146,6 +153,57 @@ describe("snake layout of a collecting board", () => {
 
   test("a wide sheet gets more columns than a tall one", () => {
     expect(snakeLayout(10, 2).cols).toBeGreaterThan(snakeLayout(10, 0.7).cols);
+  });
+
+  test("a wide, low way stays one row – never the reward alone in a flat second row", () => {
+    expect(snakeLayout(7, 6).rows).toBe(1);
+    expect(snakeLayout(7, 1.4).rows).toBe(2);
+  });
+});
+
+describe("ways of a collecting board (user feedback, November 2026)", () => {
+  const tpl = TEMPLATES.find((t) => t.kind === "collect") ?? TEMPLATES[0];
+  const one = { ...boardFromTemplate(tpl), id: "c", tasks: [taskFromCatalog(TASKS[0].id)] };
+  const two = { ...one, tasks: [...one.tasks, { ...taskFromCatalog(TASKS[1].id), goal: 3, reward: null }] };
+
+  test("each task is a way of its own, the first with the board's goal and reward", () => {
+    const ways = collectWays(two);
+    expect(ways.map((w) => w.key)).toEqual([`count|${two.tasks[0].id}`, `count|${two.tasks[1].id}`]);
+    expect(ways[0].goal).toBe(two.goal);
+    expect(ways[0].reward).toEqual(two.reward);
+    expect(ways[1]).toMatchObject({ goal: 3, reward: null });
+    expect(collectWays({ ...one, tasks: [] })).toEqual([{ index: 0, goal: one.goal, reward: one.reward, key: "count" }]);
+  });
+
+  test("an older board's stars stay on its first way", () => {
+    const [first, second] = collectWays(two);
+    expect(wayCount({ count: 2 }, first)).toBe(2);
+    expect(wayCount({ count: 2 }, second)).toBe(0);
+    const log = addWayStar({ c: { count: 2 } }, two, first);
+    expect(log.c).toEqual({ [first.key]: 3 });
+  });
+
+  test("stars on one way leave the others alone, never pass the goal and can be taken back", () => {
+    const [first, second] = collectWays(two);
+    let log: StarLog = {};
+    for (let i = 0; i < 5; i++) log = addWayStar(log, two, second);
+    expect(wayCount(log.c, second)).toBe(3);
+    expect(wayCount(log.c, first)).toBe(0);
+    log = takeBackWayStar(log, two, second);
+    expect(wayCount(log.c, second)).toBe(2);
+    expect(wayCount(takeBackWayStar({}, two, first).c, first)).toBe(0);
+  });
+
+  test("a way's circles and reward are its own, the first way's also the board's", () => {
+    expect(withWayGoal(two, 1, 99).tasks[1].goal).toBe(MAX_COLLECT);
+    expect(withWayGoal(two, 1, 0).tasks[1].goal).toBe(1);
+    expect(withWayGoal(two, 1, 4).goal).toBe(two.goal);
+    expect(withWayGoal(two, 0, 4).goal).toBe(4);
+    expect(withWayGoal({ ...one, tasks: [] }, 0, 6).goal).toBe(6);
+    const reward = rewardFromCatalog(REWARDS[0].id);
+    expect(withWayReward(two, 1, reward).tasks[1].reward).toEqual(reward);
+    expect(withWayReward(two, 1, reward).reward).toEqual(two.reward);
+    expect(withWayReward(two, 0, null).reward).toBe(null);
   });
 });
 

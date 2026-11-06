@@ -8,6 +8,11 @@ import {
   type BoardTask,
   boardDays,
   cellKey,
+  type CollectWay,
+  collectWays,
+  MAX_COLLECT,
+  MAX_WAYS,
+  wayCount,
   isFilled,
   isTemplateTitle,
   type LinkedDays,
@@ -26,6 +31,7 @@ import { DaySign, type DaySignSet } from "./daySigns";
 import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
+import { SheetTitle, titleMarkOf } from "./SheetTitle";
 
 /** „Woche vom ____“: the line on a printed week to write its first day on. */
 export const WEEK_OF: Localized = { de: "Woche vom", en: "Week of", zh: "起始日期", hi: "हफ़्ता शुरू", es: "Semana del", ar: "أسبوع يبدأ في", ru: "Неделя с" };
@@ -79,10 +85,14 @@ export function useRewardLabel() {
 /**
  * Where the fields of a collecting board go: a path that winds left to right, then right
  * to left, through a grid about as wide as the board, with the reward as the last stop.
- * Returns the grid size and the cell of each stop (`stops` = fields + 1).
+ * Returns the grid size and the cell of each stop (`stops` = fields + 1). The columns are the ones that give the
+ * biggest square cells in a box of that `aspect` – a guess from the square root once left a wide, low way with the
+ * reward alone in a flat second row.
  */
 export function snakeLayout(stops: number, aspect: number): { cols: number; rows: number; cells: { row: number; col: number }[] } {
-  const cols = Math.max(2, Math.min(stops, Math.round(Math.sqrt(stops * aspect))));
+  let cols = Math.min(2, stops);
+  const size = (c: number) => Math.min(aspect / c, 1 / Math.ceil(stops / c));
+  for (let c = cols + 1; c <= stops; c++) if (size(c) > size(cols)) cols = c;
   const rows = Math.ceil(stops / cols);
   const cells = Array.from({ length: stops }, (_, i) => {
     const row = Math.floor(i / cols);
@@ -110,6 +120,7 @@ export function BoardSheet({
   aspect,
   fresh,
   edit = false,
+  onTitle,
 }: {
   board: Board;
   stars: Record<string, number> | undefined;
@@ -127,10 +138,13 @@ export function BoardSheet({
   fresh?: string | null;
   /** Being made or changed: its tasks in a row to tap, and its reward to tap (`data-edit`), never on paper. */
   edit?: boolean;
+  /** While it is made: the heading typed right on the sheet. */
+  onTitle?: (title: string) => void;
 }) {
   const t = useT();
   const { speechLang } = useAppLanguage();
-  const title = useBoardTitle()(board);
+  const boardTitle = useBoardTitle();
+  const title = boardTitle(board);
   const editing = edit && !look.print;
   const rewardLabel = useRewardLabel();
   const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
@@ -138,7 +152,8 @@ export function BoardSheet({
   // Paper starts empty: the stars come on it with stickers or crayons.
   const real = look.print ? undefined : stars;
   const example = look.print || !examples ? undefined : examples;
-  const shown = example ? { ...example, ...real, count: Math.max(real?.count ?? 0, example.count ?? 0) } : real;
+  // Examples and real stars together; a collecting way's count is the greater of the two.
+  const shown = example ? { ...example, ...real, ...maxCounts(example, real) } : real;
   const { count, goal } = progress(board, shown, linked, day);
   const realCount = example ? progress(board, real, linked, day).count : count;
   // Grey prints take their colours from .rw-grey; inline ones would win over it.
@@ -154,12 +169,14 @@ export function BoardSheet({
     >
       {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
-        <span className="rw-title">
-          <span className="rw-title-mark" aria-hidden>
-            <MarkPic mark={mark} />
-          </span>{" "}
-          {title}
-        </span>
+        <SheetTitle
+          title={title}
+          own={!!board.title.trim()}
+          auto={boardTitle({ ...board, title: "" })}
+          mark={titleMarkOf(board.titleMark, board.mark)}
+          editing={editing}
+          onTitle={onTitle}
+        />
         {look.print && board.kind === "week" && <span className="rw-blank">{t(WEEK_OF)} ____________</span>}
         {look.print && board.kind === "day" && (
           <span className="rw-blank">{t({ de: "Datum", en: "Date", zh: "日期", hi: "तारीख़", es: "Fecha", ar: "التاريخ", ru: "Дата" })} ____________</span>
@@ -173,21 +190,14 @@ export function BoardSheet({
           </span>
         )}
       </header>
-      {editing && <EditTasks board={board} />}
+      {/* A collecting board's task stands big at the start of its own way, and is changed there. */}
+      {editing && board.kind !== "collect" && <EditTasks board={board} />}
       <div className="rw-body">
         {board.kind === "week" && <WeekGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "month" && <MonthSheet board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "day" && <DayCards board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "collect" && (
-          <CollectPath
-            board={board}
-            count={count}
-            real={Math.min(real?.count ?? 0, board.goal)}
-            aspect={aspect}
-            rewardLabel={rewardLabel}
-            edit={editing}
-            {...fieldProps}
-          />
+          <CollectWays board={board} shown={shown} real={real} aspect={aspect} rewardLabel={rewardLabel} edit={editing} {...fieldProps} />
         )}
       </div>
       {board.kind !== "collect" && board.reward && (
@@ -238,7 +248,7 @@ function EditTasks({ board }: { board: Board }) {
                 <ItemPic item={task} />
               </span>
               <span className="rw-edit-task-name">{taskLabel(task)}</span>
-              {(board.tasks.length > 1 || board.kind === "collect") && (
+              {board.tasks.length > 1 && (
                 <SheetAction act="delete" ask={t({ de: `„${taskLabel(task)}“ löschen?` })} data={{ "data-edit": "delete-task", "data-task": task.id }} />
               )}
             </span>
@@ -624,10 +634,22 @@ function DayCards(props: GridProps) {
   );
 }
 
-/** Fields along a winding path, from the tasks it is for to the reward. */
-function CollectPath({
+/** Per key, the greater of the example's count and the real one: a collecting way's stars (`count…` keys). */
+function maxCounts(example: Record<string, number>, real: Record<string, number> | undefined): Record<string, number> {
+  return Object.fromEntries(
+    Object.entries(example)
+      .filter(([key]) => key.startsWith("count"))
+      .map(([key, n]) => [key, Math.max(n, real?.[key] ?? 0)]),
+  );
+}
+
+/**
+ * A collecting board's ways, one under the other (user feedback, November 2026): one per task, each to its own reward,
+ * so a page holds several without one long path. While the board is made a ＋ under the last adds another.
+ */
+function CollectWays({
   board,
-  count,
+  shown,
   real,
   aspect,
   rewardLabel,
@@ -636,33 +658,117 @@ function CollectPath({
 }: FieldLook & {
   board: Board;
   /** Stars shown, examples included. */
+  shown: Record<string, number> | undefined;
+  /** Real stars: the next free field is the one after them. */
+  real: Record<string, number> | undefined;
+  aspect: number;
+  rewardLabel: (r: { label?: string; catalog?: string }) => string;
+  /** Being made or changed: the start, the ＋ − and the reward are taps. */
+  edit: boolean;
+}) {
+  const t = useT();
+  const ways = collectWays(board);
+  return (
+    <div className="rw-ways">
+      {ways.map((way) => (
+        <CollectPath
+          key={way.key}
+          board={board}
+          way={way}
+          many={ways.length > 1}
+          count={wayCount(shown, way)}
+          real={wayCount(real, way)}
+          aspect={(aspect * ways.length) / (edit && ways.length < MAX_WAYS ? 1.08 : 1)}
+          rewardLabel={rewardLabel}
+          edit={edit}
+          {...look}
+        />
+      ))}
+      {edit && ways.length < MAX_WAYS && (
+        <span className="rw-way-add" data-edit="add" role="button" tabIndex={0}>
+          ＋ {t({ de: "Noch ein Weg – für eine andere Aufgabe" })}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * One way to a reward: the task's picture as its first stop, as big as a field (user feedback, November 2026: what is to
+ * be done must be big), a dashed ring per star winding left to right and back, and the reward as the last stop. While
+ * it is made, the picture swaps the task (its 🗑️ takes the way, where there are more), ＋ − between the last ring and
+ * the reward set how many rings, and the reward swaps it – under the mouse each says so.
+ */
+function CollectPath({
+  board,
+  way,
+  many,
+  count,
+  real,
+  aspect,
+  rewardLabel,
+  edit,
+  ...look
+}: FieldLook & {
+  board: Board;
+  way: CollectWay;
+  /** More than one way: each can be taken away. */
+  many: boolean;
+  /** Stars shown, examples included. */
   count: number;
   /** Real stars: the next free field is the one after them. */
   real: number;
   aspect: number;
   rewardLabel: (r: { label?: string; catalog?: string }) => string;
-  /** Being made or changed: the reward at the end is a tap. */
+  /** Being made or changed: the start, the ＋ − and the reward are taps. */
   edit: boolean;
 }) {
-  const { cols, rows, cells } = snakeLayout(board.goal + 1, aspect);
+  const t = useT();
+  const taskLabel = useTaskLabel();
+  const lines = greyPrint(look.look);
+  // Stops: the task (where there is one), a field per star, the reward.
+  const start = way.task ? 1 : 0;
+  const { cols, rows, cells } = snakeLayout(start + way.goal + 1, aspect);
   const points = cells.map(({ row, col }) => `${col + 0.5},${row + 0.5}`).join(" ");
   const end = cells[cells.length - 1];
+  const last = cells[cells.length - 2];
+  const at = (a: number, b: number, n: number) => `${(((a + b) / 2 + 0.5) / n) * 100}%`;
+  const way0 = String(way.index);
   return (
-    <div className="rw-path" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}>
+    <div
+      className={`rw-path${edit ? " rw-path-editing" : ""}`}
+      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+    >
       <svg className="rw-path-line" viewBox={`0 0 ${cols} ${rows}`} preserveAspectRatio="none" aria-hidden>
         <polyline points={points} vectorEffect="non-scaling-stroke" />
       </svg>
-      {cells.slice(0, -1).map(({ row, col }, i) => (
-        <div key={i} className="rw-cell" style={{ gridRow: row + 1, gridColumn: col + 1 }}>
-          {i === 0 && board.tasks.length > 0 && (
-            <span className="rw-path-start" aria-hidden>
-              {board.tasks.map((task) => (
-                <ItemPic key={task.id} item={task} lines={greyPrint(look.look)} />
-              ))}
-            </span>
+      {way.task && (
+        <div
+          className="rw-cell rw-path-start"
+          data-edit={edit ? "task" : undefined}
+          data-task={way.task.id}
+          role={edit ? "button" : undefined}
+          tabIndex={edit ? 0 : undefined}
+          title={taskLabel(way.task)}
+          style={{ gridRow: cells[0].row + 1, gridColumn: cells[0].col + 1 }}
+        >
+          <span className="rw-path-start-pic" aria-hidden>
+            <ItemPic item={way.task} lines={lines} />
+          </span>
+          {edit && <SwapVeil />}
+          {edit && many && (
+            <SheetAction
+              act="delete"
+              ask={t({ de: `„${taskLabel(way.task)}“ mit seinem Weg löschen?` })}
+              data={{ "data-edit": "delete-task", "data-task": way.task.id }}
+            />
           )}
+        </div>
+      )}
+      {cells.slice(start, -1).map(({ row, col }, i) => (
+        <div key={i} className="rw-cell" style={{ gridRow: row + 1, gridColumn: col + 1 }}>
           <Field
-            id={`c${i}`}
+            id={`c${way.index}.${i}`}
             state={!look.look.print && i < count ? "filled" : "open"}
             isExample={!look.look.print && i >= real && i < count}
             next={!look.look.print && i === real}
@@ -670,13 +776,56 @@ function CollectPath({
           />
         </div>
       ))}
-      <div className="rw-cell rw-path-end" data-edit={edit ? "reward" : undefined} style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}>
-        {edit && board.reward && <RewardActions />}
-        <span className="rw-reward-emoji" aria-hidden>
-          {board.reward ? <ItemPic item={board.reward} kind="reward" lines={greyPrint(look.look)} /> : <Pic src={picture("fest")} emoji="🎉" />}
+      {edit && (
+        <span
+          className="rw-way-count"
+          role="group"
+          aria-label={t({ de: "Kreise bis zur Belohnung" })}
+          style={{ left: at(last.col, end.col, cols), top: at(last.row, end.row, rows) }}
+        >
+          {way.goal > 1 && (
+            <span className="rw-way-step" data-edit="way-goal" data-way={way0} data-by="-1" role="button" tabIndex={0} title={t({ de: "Ein Kreis weniger" })}>
+              −
+            </span>
+          )}
+          {way.goal < MAX_COLLECT && (
+            <span className="rw-way-step" data-edit="way-goal" data-way={way0} data-by="1" role="button" tabIndex={0} title={t({ de: "Ein Kreis mehr" })}>
+              ＋
+            </span>
+          )}
+          <span className="rw-path-hint">{t({ de: "Kreise" })}</span>
         </span>
-        {board.reward && <span className="rw-reward-label">{rewardLabel(board.reward)}</span>}
+      )}
+      <div
+        className="rw-cell rw-path-end"
+        data-edit={edit ? "reward" : undefined}
+        data-way={edit ? way0 : undefined}
+        role={edit ? "button" : undefined}
+        tabIndex={edit ? 0 : undefined}
+        style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}
+      >
+        <span className="rw-reward-emoji" aria-hidden>
+          {way.reward ? <ItemPic item={way.reward} kind="reward" lines={lines} /> : <Pic src={picture("fest")} emoji="🎉" />}
+        </span>
+        {way.reward && <span className="rw-reward-label">{rewardLabel(way.reward)}</span>}
+        {edit && <SwapVeil />}
       </div>
     </div>
+  );
+}
+
+/**
+ * What a tap on a way's picture or reward does, said on it under the mouse (variant C of four, user decision, November
+ * 2026): a light veil over the picture with ⇄ „Tauschen“ – plainly that the tap only swaps it; deleting is its 🗑️.
+ */
+function SwapVeil() {
+  const t = useT();
+  return (
+    <span className="rw-path-swap" aria-hidden>
+      <svg className="rw-path-swap-icon" viewBox="0 0 24 24" aria-hidden>
+        <path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4" />
+      </svg>
+      {t({ de: "Tauschen" })}
+    </span>
   );
 }

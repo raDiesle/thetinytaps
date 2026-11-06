@@ -20,6 +20,10 @@ export interface BoardTask {
   linked?: LinkedGame;
   /** A field for each of these times of day (brushing in the morning and the evening); none: one field a day. */
   slots?: Slot[];
+  /** Collecting board: the fields of this task's own way (missing: the board's `goal`). */
+  goal?: number;
+  /** Collecting board: the reward at the end of this task's way (missing: the board's; null: none, a party together). */
+  reward?: BoardReward | null;
 }
 
 /** What the stars lead to. */
@@ -37,6 +41,8 @@ export interface Board {
   childName: string;
   /** The heading; empty means one made from the kind and the name. */
   title: string;
+  /** The sign before the heading: a mark's id, `NO_TITLE_MARK` for none; missing: the board's own mark. */
+  titleMark?: string;
   tasks: BoardTask[];
   /** Weekdays of a week or month board, 0 = Monday. */
   days: number[];
@@ -167,8 +173,17 @@ export const NO_LINKED: LinkedDays = { teeth: {}, potty: {} };
 
 /** At most this many tasks; parents' guides advise one to three for toddlers. */
 export const MAX_TASKS = 8;
-/** Fields of a collecting board. */
+/** Sizes a collecting way grows through when it is wound down (`longerGoal`). */
 export const COLLECT_GOALS = [3, 5, 7, 10, 15, 20, 30];
+/** At most this many fields on one way of a collecting board, set with its ＋ − on the sheet. */
+export const MAX_COLLECT = 30;
+/**
+ * At most this many ways on one collecting board: a way per task, each to its own reward (user feedback, November 2026:
+ * one path with several tasks grew too big), printed together on one page.
+ */
+export const MAX_WAYS = 4;
+/** `titleMark` of a heading without a sign before it. */
+export const NO_TITLE_MARK = "none";
 /** Stars of a week board's day keys are kept this long, so a log never grows without end. */
 const KEEP_DAYS = 62;
 
@@ -393,7 +408,10 @@ export function fieldCount(board: Board, today: Date): number {
 /** Stars the board has now, and how many lead to the reward (never more than there are fields). */
 export function progress(board: Board, stars: Record<string, number> | undefined, linked: LinkedDays, today: Date): { count: number; goal: number } {
   const fields = fieldCount(board, today);
-  if (board.kind === "collect") return { count: Math.min(stars?.count ?? 0, board.goal), goal: board.goal };
+  if (board.kind === "collect") {
+    const ways = collectWays(board);
+    return { count: ways.reduce((n, way) => n + wayCount(stars, way), 0), goal: ways.reduce((n, way) => n + way.goal, 0) };
+  }
   const count = boardDays(board, today).reduce(
     (sum, day) => sum + board.tasks.reduce((n, task) => n + taskFilled(stars, linked, day, task).filter(Boolean).length, 0),
     0,
@@ -407,7 +425,7 @@ export function progress(board: Board, stars: Record<string, number> | undefined
  * field; two on a collecting board. Shown pale until the first real star, never saved and never printed.
  */
 export function exampleStars(board: Board, today: Date): Record<string, number> {
-  if (board.kind === "collect") return { count: Math.min(2, board.goal - 1) };
+  if (board.kind === "collect") return Object.fromEntries(collectWays(board).map((way) => [way.key, Math.min(2, way.goal - 1)]));
   const keys = (day: Date) => board.tasks.flatMap((task) => taskSlots(task).map((slot) => cellKey(day, task.id, slot)));
   const days = board.kind === "day" ? [today] : boardDays(board, today).slice(0, board.kind === "month" ? 4 : 2);
   const fields = days.flatMap((day, i) => {
@@ -514,7 +532,7 @@ export function oncePerDay(task: BoardTask): BoardTask {
  */
 export function addStar(log: StarLog, boardId: string, key: string | null, today: Date, most = 1): StarLog {
   const oldest = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - KEEP_DAYS));
-  const kept = Object.fromEntries(Object.entries(log[boardId] ?? {}).filter(([k]) => k === "count" || k.slice(0, 10) > oldest));
+  const kept = Object.fromEntries(Object.entries(log[boardId] ?? {}).filter(([k]) => k.startsWith("count") || k.slice(0, 10) > oldest));
   const next = key === null ? { ...kept, count: (kept.count ?? 0) + 1 } : { ...kept, [key]: Math.min(Math.max(1, most), (kept[key] ?? 0) + 1) };
   return { ...log, [boardId]: next };
 }
@@ -534,4 +552,67 @@ export function startOver(log: StarLog, board: Board, today: Date): StarLog {
   const week = new Set((board.kind === "month" ? periodDays(board, today) : weekOf(today)).map(dayKey));
   const kept = Object.fromEntries(Object.entries(log[board.id] ?? {}).filter(([k]) => !week.has(k.slice(0, 10))));
   return { ...log, [board.id]: kept };
+}
+
+/**
+ * One way of a collecting board (user feedback, November 2026): one task at its start, as big as a field, its own
+ * number of fields and its own reward at its end – „Ohne Belohnung“, a party together, is a reward like the others.
+ * Several ways stand one under the other on the sheet, so one page holds a way per task.
+ */
+export interface CollectWay {
+  /** Its place on the board, from the top. */
+  index: number;
+  /** The task it is for; missing on a board made without one. */
+  task?: BoardTask;
+  /** Fields until its reward. */
+  goal: number;
+  /** Its reward; null: none, a party together. */
+  reward: BoardReward | null;
+  /** Its count's key in the log. The first way also reads the board's old `count`, from before there were ways. */
+  key: string;
+}
+
+/** The ways of a collecting board: one per task, or a single one without a task. */
+export function collectWays(board: Board): CollectWay[] {
+  if (board.tasks.length === 0) return [{ index: 0, goal: board.goal, reward: board.reward, key: "count" }];
+  return board.tasks.map((task, index) => ({
+    index,
+    task,
+    goal: task.goal ?? board.goal,
+    reward: task.reward !== undefined ? task.reward : board.reward,
+    key: `count|${task.id}`,
+  }));
+}
+
+/** Stars on a way, never more than its fields. */
+export function wayCount(stars: Record<string, number> | undefined, way: CollectWay): number {
+  const legacy = way.index === 0 ? stars?.count : undefined;
+  return Math.min(way.goal, stars?.[way.key] ?? legacy ?? 0);
+}
+
+/** The log with one more star on a way (the first way's old `count` moves to its own key). */
+export function addWayStar(log: StarLog, board: Board, way: CollectWay): StarLog {
+  const own = log[board.id] ?? {};
+  const { count: _, ...rest } = own;
+  const kept = way.index === 0 && way.key !== "count" ? rest : own;
+  return { ...log, [board.id]: { ...kept, [way.key]: Math.min(way.goal, wayCount(own, way) + 1) } };
+}
+
+/** The log without the star just put on a way by mistake. */
+export function takeBackWayStar(log: StarLog, board: Board, way: CollectWay): StarLog {
+  const n = wayCount(log[board.id], way);
+  return { ...log, [board.id]: { ...(log[board.id] ?? {}), [way.key]: Math.max(0, n - 1) } };
+}
+
+/** The board with a way's number of fields (the first way's is the board's own goal as well). */
+export function withWayGoal(board: Board, index: number, goal: number): Board {
+  const n = Math.max(1, Math.min(MAX_COLLECT, goal));
+  if (board.tasks.length === 0) return { ...board, goal: n };
+  return { ...board, goal: index === 0 ? n : board.goal, tasks: board.tasks.map((task, i) => (i === index ? { ...task, goal: n } : task)) };
+}
+
+/** The board with a way's reward (the first way's is the board's own reward as well); null: none, a party together. */
+export function withWayReward(board: Board, index: number, reward: BoardReward | null): Board {
+  if (board.tasks.length === 0) return { ...board, reward };
+  return { ...board, reward: index === 0 ? reward : board.reward, tasks: board.tasks.map((task, i) => (i === index ? { ...task, reward } : task)) };
 }

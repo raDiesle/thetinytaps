@@ -44,21 +44,21 @@ export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDon
       className="rw-wizard"
       aria-label={t({ de: "Neu anlegen", en: "Create new", zh: "新建", hi: "नया बनाएँ", es: "Crear nuevo", ar: "إنشاء جديد", ru: "Создать" })}
     >
-      {/* On top and in sight while the page scrolls (user feedback, November 2026): printing, and the one button that makes it. */}
+      {/* On top and in sight while the page scrolls (user feedback, November 2026): the one button that makes it, on the left, and printing. */}
       <header className="rw-wizard-head">
-        <PrintBadge />
         <span className="rw-wizard-actions">
-          {onCancel && (
-            <button type="button" className="rw-wizard-back" onClick={onCancel}>
-              {t({ de: "Abbrechen", en: "Cancel", zh: "取消", hi: "रद्द करें", es: "Cancelar", ar: "إلغاء", ru: "Отмена" })}
-            </button>
-          )}
           {ready(draft) && (
             <button type="button" className="rw-wizard-done" onClick={() => onDone(draft)}>
               <span aria-hidden>✓</span> {done}
             </button>
           )}
+          {onCancel && (
+            <button type="button" className="rw-wizard-back" onClick={onCancel}>
+              {t({ de: "Abbrechen", en: "Cancel", zh: "取消", hi: "रद्द करें", es: "Cancelar", ar: "إلغاء", ru: "Отмена" })}
+            </button>
+          )}
         </span>
+        <PrintBadge />
       </header>
       <ChartEditor
         draft={draft}
