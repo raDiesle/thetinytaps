@@ -219,6 +219,16 @@ function whenAt(all: Leg[], reached: (pt: Pt) => boolean) {
 /* ---------- Stretches ---------- */
 
 /** Everything about one stretch, `t` seconds after its gate opened (below 0 while the duck waits at it). */
+/**
+ * The one gate on the way that waits for the child's tap (the slide round the tower). The first gate starts the run;
+ * every other gate opens by itself once the duck has settled before it, so letting the duck ride on never takes more
+ * than one tap (user feedback, November 2026).
+ */
+export const TAP_GATE = 2;
+
+/** Whether the duck waits at gate `i` for a tap: the first one, which starts the run, and `TAP_GATE` unless nothing waits („Von selbst“). */
+export const gateWaits = (i: number, watch = false) => i === 0 || (i === TAP_GATE && !watch);
+
 export interface Stretch {
   /** The basin the duck waits in, before the gate. */
   basin: Basin;
