@@ -622,10 +622,10 @@ export function buildGarden() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it waits for the child's tap (R-03): the apple over the slide, the molehill, the sleeping hedgehog, the sprinkler. */
+  /** Where it could wait for the child's tap (R-03): the apple over the slide, the molehill, the sleeping hedgehog, the sprinkler. Only the molehill waits; the machine runs through the others. */
   const stops = [
     { at: tStop, x: APPLE.x, y: APPLE.y },
-    { at: tKnock, x: MOLEHILL.x, y: FLOOR - MOLEHILL.h / 2 },
+    { at: tKnock, x: MOLEHILL.x, y: FLOOR - MOLEHILL.h / 2, active: true },
     { at: tPopB, x: HEDGEHOG.x, y: FLOOR - HEDGEHOG.r },
     { at: tSpray, x: SPRINKLER.x, y: SPRINKLER.headY },
   ];

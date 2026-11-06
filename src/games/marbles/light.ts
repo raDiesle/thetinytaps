@@ -489,10 +489,10 @@ export function buildLight() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it waits for the child's tap (R-03): the jar under the golden spot, the lava lamp's switch with the first firefly on it, the globe's button under the paper bird, the star lamp with all fireflies on it. */
+  /** Where it could wait for the child's tap (R-03): the jar under the golden spot, the lava lamp's switch with the first firefly on it, the globe's button under the paper bird, the star lamp with all fireflies on it. Only the lava lamp's switch waits; the machine runs through the others. */
   const stops = [
     { at: tJar, x: JAR.x, y: (JAR.top + JAR.bottom) / 2 },
-    { at: tSwitch, x: SWITCH.x, y: SWITCH.y },
+    { at: tSwitch, x: SWITCH.x, y: SWITCH.y, active: true },
     { at: tGlobe, x: GLOBE_BUTTON.x, y: GLOBE_BUTTON.y - 18 },
     { at: tLamp, x: LAMP.x, y: DOME_Y - LAMP.r / 2 },
   ];

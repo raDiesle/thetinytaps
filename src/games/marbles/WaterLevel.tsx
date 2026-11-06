@@ -37,6 +37,7 @@ import {
   WORLD_W,
   type Basin,
   type Pose,
+  gateWaits,
 } from "./water";
 import "./water.css";
 import { PROD } from "@/lib/buildInfo";
@@ -70,14 +71,15 @@ interface Ripple {
 
 /**
  * „Wasserbahn“: a yellow rubber duck rides a water run down a sunny hillside.
- * It waits, all still, at each closed lock gate until the child taps (or
- * presses a key) anywhere; then the gate lifts, the water rushes through and
+ * It waits, all still, at the first lock gate and at one more on the way
+ * (`gateWaits`) until the child taps (or presses a key) anywhere; the other
+ * gates open by themselves. As a gate lifts, the water rushes through and
  * carries it down to the next basin – past a water wheel ringing a bell, a
  * leaping fish and a frog, down a twisty slide and through a pipe – into the
  * paddling pool where its ducklings wait. While it is on its way, a tap on the
  * water splashes a ripple and any other tap or key makes the duck quack and hop.
  */
-export function WaterLevel({ sound, say, onDone }: LevelProps) {
+export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
   const label = useLevelName("water");
   useEffect(() => loadRealSounds([playCroak, playFlush, playQuack, playSplash]), []);
   const water = useMemo(buildWater, []);
@@ -123,11 +125,12 @@ export function WaterLevel({ sound, say, onDone }: LevelProps) {
       // The last stretch's clock runs on after the end, so the sparkles and the fountain's last drops fade away.
       clock.current = last ? clock.current + dt : Math.min(s.duration, clock.current + dt);
       fire();
-      // Settled: on to the next gate, where the duck waits again.
+      // Settled: on to the next gate, where the duck waits for the tap only at the one gate that waits (`gateWaits`).
       if (clock.current >= s.duration && !last) {
         step.current++;
         clock.current = -1;
         fired.current = 0;
+        if (!gateWaits(step.current, watch)) open();
       }
     }
     ripples.current = ripples.current.filter((r) => life.current - r.at < RIPPLE_S);

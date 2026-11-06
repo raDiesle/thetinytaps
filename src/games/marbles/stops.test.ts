@@ -9,14 +9,17 @@ import { VIEW_H, VIEW_W } from "./level";
 import { buildLight } from "./light";
 import { buildMachine } from "./machine";
 import type { MachineBase } from "./MachineStage";
-import { STOP_HINT, stopFinger } from "./MachineStage";
+import { activeStops, STOP_HINT, stopFinger } from "./MachineStage";
 import { buildNight } from "./night";
 import { buildSpace } from "./space";
 import { buildTidy } from "./tidy";
+import { BASINS, gateWaits, TAP_GATE } from "./water";
 
-// Every machine holds still at three or four stations on its way until the child taps (R-03). What glows there must be
-// on the screen while it waits – the camera stands still with the machine – and the 👇 beside it too, clear of the
-// picture's edges and the ✕ in the top left corner.
+// Every machine has three or four stations on its way where it could hold still until the child taps (R-03), and holds
+// at exactly one of them: letting a run go on never takes more than one tap (user feedback, November 2026). What glows
+// there must be on the screen while it waits – the camera stands still with the machine – and the 👇 beside it too,
+// clear of the picture's edges and the ✕ in the top left corner; that holds for the inactive ones too, so any of them
+// can be switched on.
 
 const MACHINES: Record<string, () => MachineBase> = {
   machine: buildMachine,
@@ -44,6 +47,10 @@ describe("machine stops", () => {
       for (let i = 1; i < times.length; i++) expect(times[i] - times[i - 1]).toBeGreaterThan(4);
     });
 
+    test(`${name}: exactly one stop waits for a tap`, () => {
+      expect(activeStops(machine).length).toBe(1);
+    });
+
     test(`${name}: each stop's glow and finger are on the screen while it waits`, () => {
       for (const stop of machine.stops) {
         const camera = machine.cameraTarget(stop.at);
@@ -67,4 +74,13 @@ describe("machine stops", () => {
       for (const stop of machine.stops) expect(stop.at).toBeLessThan(end);
     });
   }
+});
+
+describe("water run gates", () => {
+  test("besides the first gate, which starts the run, only one gate waits for a tap – and none with „Von selbst“", () => {
+    const waiting = BASINS.map((_, i) => i).filter((i) => i > 0 && gateWaits(i));
+    expect(waiting).toEqual([TAP_GATE]);
+    expect(BASINS.map((_, i) => i).filter((i) => i > 0 && gateWaits(i, true))).toEqual([]);
+    expect(gateWaits(0, true)).toBe(true);
+  });
 });
