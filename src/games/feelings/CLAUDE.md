@@ -49,13 +49,15 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
   `BigFace` (`moodArt.tsx`, the shared `MascotHead`). Don't delete them as unused.
 - **„Was brauche ich?“** (`/was-brauche-ich/`, `NeedsGame.tsx`, `NeedsPlay.tsx`, `needs.ts`, C-31): cards of what the
   child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
-  ausruhen, ein Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees
-  what the child needs. Every card is a picture of the little bear doing it (`brauche-…`, made 6 November 2026), never
+  ausruhen, ein Lied) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
+  ist es?“, and stay tappable to change it) and its line says it does good, so the grown-up sees what the child needs.
+  **A need never shows big** (user feedback, November 2026: the picture was not to be tapped open): no big picture,
+  no screen of its own, so the corner always leaves the game (`feelings.test.ts`). Every card is a picture of the little bear doing it (`brauche-…`, made 6 November 2026), never
   a drawn head among them: „Tief pusten“ was the bear's drawn face with a breathing circle and didn't fit the pictures
   beside it (user feedback, November 2026), so it became a scene too – the bear stamping on the floor and blowing out,
   the breath seen as a swirl rising upwards. Picked, it is done together (`Need.together`): „Komm, wir pusten
-  zusammen“, two slow breaths (`BREATH_MS`), then „Schon besser.“. A tap on the big picture (or any key) says it again;
-  the corner goes back.
+  zusammen“, two slow breaths (`BREATH_MS`), then „Schon besser.“. A tap on the picked card again says it again; digits
+  pick that card, any other key one at random.
 
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
   the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row

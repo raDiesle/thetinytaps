@@ -315,8 +315,10 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   instead of one huge one. A way starts with its task as a big picture – no small chip with picture and words above it
   – a tap there only swaps it, and its 🗑️ (only with two ways or more) takes the way. Its circles are changed by the − ＋
   between its last circle and its end (`.rw-way-count`, 1 to `MAX_COLLECT`), the end swaps its reward, and „＋ Noch ein
-  Weg – für eine andere Aufgabe“ under the ways adds one. Under the mouse each of the three says what a tap does („Bild
-  tauschen“, „Kreise“, „Belohnung tauschen“) in a dashed square, red over a 🗑️. A way's circles take the columns that
+  Weg – für eine andere Aufgabe“ under the ways adds one. Under the mouse the way marks all three (a dashed square round
+  picture and reward, „Kreise“ at the − ＋), and the picture or reward under it gets a light veil with ⇄ „Tauschen“
+  (`SwapVeil`, picked from four variants, user decision, November 2026) – a tap there only swaps, deleting is its 🗑️,
+  whose square turns red. A new thing on the sheet that a tap swaps shows the same veil. A way's circles take the columns that
   give the biggest cells (`snakeLayout`), so a low way stays one row.
 - A sheet in the editor stands in a row (`rw-main` round `rw-screen`), like the chart on the page: in a column under a
   box with only a min-height it got no height and shrank to a strip.

@@ -996,9 +996,11 @@
   }
 }
 
+/* Important: a part's rules set their animation with the shorthand (`.origin.at-grow .origin-brow.left`), which is more
+   specific and would reset the play state, so the sky and the brows ran on while paused. */
 .teeth-play.paused .origin,
 .teeth-play.paused .origin * {
-  animation-play-state: paused;
+  animation-play-state: paused !important;
 }
 
 /* ---------- Before brushing: get the brush, toothpaste on ---------- */
@@ -1316,10 +1318,11 @@
   animation-iteration-count: 3;
 }
 
+/* Important for the same reason as the story's: `.prep.at-paste .prep-tube > g` outranks it. */
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
 .teeth-play.paused .lip-arrow {
-  animation-play-state: paused;
+  animation-play-state: paused !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

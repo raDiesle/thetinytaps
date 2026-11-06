@@ -30,6 +30,12 @@ outside play time, and ✕ goes back to the plan, which the finished brushing ti
 - Every motion goes with the song (112 BPM): durations are beats (0.536 s), two beats or bars, and nothing loops faster than a beat (a tapped giggle may be quicker). Write new timings that way (`STROKE_S` in `brush.tsx`, the beat comment in `teeth.css`).
 - No words on the picture, ever – no heading („Süßes essen“, „Geschafft!“), no hint for grown-ups („Erbsengroß“, „Ausspucken“), no goodbye line (user feedback, November 2026): the picture, the song and the voice say it, the medal says „well done“. The names of the prelude parts and the steps live in the progress bar's tooltips. `controls.test.ts` checks.
 - The controls are drawn signs (`ControlIcon`), never emoji (⏸️ ▶️ looked poor, user feedback, November 2026); the time before brushing shows where the brushing time does, as the first part of the progress bar with its own clock, never in a corner of its own.
+- Everything follows the clock, also after a jump on the progress bar: the picture plays on from the point tapped,
+  never from the start of its part (user feedback, November 2026). The story's and the sink's pictures are CSS
+  animations that start with their part (`at-<part>`), so after every jump `TeethPlay` sets them to where the clock is
+  in it (`jumps`, `getAnimations`); a new animation there belongs to its part too, never runs on from an earlier one. Their pause
+  rules are `!important`, since a part's rule with the `animation` shorthand is more specific and kept them running.
+  `controls.test.ts` checks.
 - The toothpaste is a pea-sized dab, as much as a child's brush gets – never a stripe along the whole head (user feedback, November 2026).
 - A monster only sits where its tooth shows through the lip opening, at least `LIP_EDGE` inside it (`insideBy`, tested in `jaw.test.ts`); never on the lips. And the teeth being brushed always show whole, with their monsters: seen from the side the near corner of the mouth would hide the back teeth, so the corners are pulled open sideways as far as the step needs, as the brush pulls a cheek (`openCorners`, `TOOTH_CLEAR` in `jaw.ts`; `jaw.test.ts` checks every step – the corner once hid them, user feedback, November 2026). Never draw the lips so a step's teeth hide behind them.
 - The week chart always makes clear which day it is and whether it is morning or evening.

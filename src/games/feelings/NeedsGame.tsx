@@ -9,7 +9,7 @@ import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY } from "./settings";
 import "./feelings.css";
 
 /**
- * „Was brauche ich?“: the child picks what it needs or wants to do now, and it shows big. Plays at once. Opened from a
+ * „Was brauche ich?“: the child picks what it needs or wants to do now, and its card stays marked. Plays at once. Opened from a
  * feeling of „Wie geht's dir?“, its way back leads there again, the screen seen before.
  */
 export function NeedsGame() {

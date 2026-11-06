@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { CheeringFamily } from "@/components/Mascot";
@@ -316,6 +316,10 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
   const room = useRef<HTMLDivElement>(null);
+  /** Where the pictures are; a jump finds the picture shown in here. */
+  const stage = useRef<HTMLDivElement>(null);
+  /** Counts the jumps of the clock (progress bar, arrow keys), so the picture before the brushing can follow them. */
+  const [jumps, setJumps] = useState(0);
 
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
@@ -525,9 +529,20 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       const t = performance.now();
       setNow(t);
       setClock((c) => ({ banked: at, since: c.since === null ? null : t, until: c.until === undefined ? undefined : Math.max(waitAt(prelude), at) }));
+      setJumps((n) => n + 1);
     },
     [prelude],
   );
+
+  // The pictures before the brushing (the story, the sink) are CSS animations that start with their part, so after a
+  // jump into the middle of a part they would play it from its start while the clock, the song and the bar are further
+  // on. Each of their animations belongs to the part shown (`at-<part>`), so all of them are set to where the clock is in it.
+  useLayoutEffect(() => {
+    if (!jumps || !before) return;
+    const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep)");
+    const into = elapsed - preludeStart(prelude, before);
+    for (const animation of picture?.getAnimations({ subtree: true }) ?? []) animation.currentTime = into;
+  }, [jumps]);
 
   /** Jump to the start of a part: the prelude ones first, then the steps, then the end. */
   const jumpTo = useCallback(
@@ -614,7 +629,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
       {/* Before the picture, so it is there when the picture measures it. */}
       <div className="teeth-room" ref={room} />
-      <div className="teeth-stage">
+      <div className="teeth-stage" ref={stage}>
         <Scenes id={`${round}-${scene}`} kind={scene} paused={paused}>
           {scene === "story" ? (
             <Origin key={round} part={before === "sweets" ? "sweets" : "grow"} daytime={daytime} tickled={tickled} onTickle={tickle} free={room} />

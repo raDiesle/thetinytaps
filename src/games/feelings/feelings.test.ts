@@ -152,10 +152,20 @@ test("every need has its card and says it does good", () => {
   }
 });
 
-// From one thing big back to all of them is the page's corner, in each of the book's three small games (user feedback,
-// November 2026: there was no way back from a picked feeling).
-test("the corner goes back from one feeling or need to all of them", () => {
-  for (const f of ["MoodPlay.tsx", "NeedsPlay.tsx"]) expect(readFileSync(`src/games/feelings/${f}`, "utf8"), f).toContain("useInnerBack(");
+// From one thing big back to all of them is the page's corner (user feedback, November 2026: there was no way back from
+// a picked feeling).
+test("the corner goes back from one feeling to all of them", () => {
+  expect(readFileSync("src/games/feelings/MoodPlay.tsx", "utf8")).toContain("useInnerBack(");
+});
+
+// „Was brauche ich?“ never shows a need big (user feedback, November 2026): the cards stay, the one picked is only marked
+// where it stands (the others pale), so there is nothing to go back from.
+test("a picked need stays a card among the others", () => {
+  const play = readFileSync("src/games/feelings/NeedsPlay.tsx", "utf8");
+  expect(play).not.toContain("useInnerBack(");
+  expect(play).not.toMatch(/mood-big|StoryPicture|<Frames/);
+  expect(play).toContain("pale");
+  expect(readFileSync("src/games/feelings/feelings.css", "utf8")).toContain(".mood-need.pale .fg-card-image");
 });
 
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
