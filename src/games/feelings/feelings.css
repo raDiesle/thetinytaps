@@ -284,6 +284,30 @@
   user-select: none;
 }
 
+/* A note for grown-ups on a card („Heute früh“): a page marker of coloured film stuck on over its top edge, like
+   „zuletzt“ on a menu's card – never in the caption, where it took three lines over the bear's face. */
+.fg-card-marker {
+  position: absolute;
+  top: -16px;
+  right: 14px;
+  z-index: 3;
+  padding: 2px 10px 4px 16px;
+  border-radius: 2px 3px 3px 2px;
+  background: linear-gradient(90deg, #7584c4d9 0 8px, #0000 8px), linear-gradient(#ffffff40, #0000 60%), color-mix(in srgb, #7584c4 38%, #fff8e0d9);
+  box-shadow:
+    0 1px 1px #0000002e,
+    1px 4px 6px -3px #5a3c1f80;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  rotate: -5deg;
+  pointer-events: none;
+}
+
+.pleasant .fg-card-marker {
+  background: linear-gradient(90deg, #f5b400d9 0 8px, #0000 8px), linear-gradient(#ffffff40, #0000 60%), color-mix(in srgb, #f5b400 38%, #fff8e0d9);
+}
+
 /* Under the frame, in the room kept for it, and moving with the frame. */
 .fg-picture-caption {
   position: absolute;
@@ -542,10 +566,12 @@
 .mood-strengths {
   --band-h: clamp(18px, 6cqh, 34px);
   --ring: 18px;
+  /* The way on to „Was brauche ich?“ below them (`.mood-needs-link`), its room counted like the band's. */
+  --link-h: clamp(44px, 12cqh, 60px);
   --card-w: min(
     (100cqw - 2 * var(--pad) - 2 * var(--gap) - 3 * var(--ring)) /
     3,
-    (100cqh - var(--top) - var(--pad) - var(--band-h) - var(--gap) - 24px - var(--label)) /
+    (100cqh - var(--top) - var(--pad) - var(--band-h) - var(--link-h) - 2 * var(--gap) - 24px - var(--label)) /
     0.75
   );
 
@@ -582,6 +608,40 @@
   overflow: visible;
 }
 
+/* On to „Was brauche ich?“: a paper slip with the hug's round picture and the game's name, taped on in the bottom
+   right corner, unlike the three pictures above it so it is never taken for a fourth strength. */
+.mood-needs-link {
+  flex: none;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--link-h);
+  padding: 4px 16px 4px 4px;
+  border: var(--outline);
+  border-radius: 999px;
+  background: #fffdf6;
+  box-shadow: var(--lift);
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(0.9rem, 4.5cqh, 1.2rem);
+  font-weight: 700;
+  rotate: -2deg;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.mood-needs-link-picture {
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.mood-needs-link:active {
+  translate: 0 2px;
+}
+
 .mood-band path {
   stroke: var(--ink);
   stroke-width: 3;
@@ -599,7 +659,14 @@
 
 @media not ((max-height: 560px) or (min-aspect-ratio: 6 / 5)) {
   .mood-strengths {
-    --card-w: min(100cqw - 2 * var(--pad) - var(--ring), (100cqh - var(--top) - var(--pad) - 3 * 24px - 2 * var(--gap) - 3 * var(--label)) / 2.25);
+    --card-w: min(
+      100cqw -
+      2 *
+      var(--pad) -
+      var(--ring),
+      (100cqh - var(--top) - var(--pad) - var(--link-h) - 3 * 24px - 3 * var(--gap) - 3 * var(--label)) /
+      2.25
+    );
   }
 
   .mood-strength-row {

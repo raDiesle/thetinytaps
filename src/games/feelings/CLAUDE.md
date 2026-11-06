@@ -19,7 +19,9 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
      doll“) are the same moment drawn from it (`moodImages.strength`, prompts and how to
      draw them in `bilder/README.md`, „Wie doll ist es?“). A tap on one (digits, arrows, any other key steps on and back) plays a note, higher the
      stronger, and the voice says „Ein bisschen.“, „Schon ziemlich.“ or „Ganz doll!“; the other two go pale (by filter)
-     and stay tappable to change it. Under the row a still band from thin to thick in the group's colour tells grown-ups
+     and stay tappable to change it. In the bottom right corner a paper slip with the hug's round picture leads on to
+     „Was brauche ich?“ (`NeedsLink`, user wish, November 2026), turning a page forward; it passes `{ from }` in the
+     router state, so that game's ✕ comes back here (`needsCameFrom`, its `leaveTo`) – the screen seen before. Under the row a still band from thin to thick in the group's colour tells grown-ups
      the direction; upright the three stand one above the other without it. Captions are the answers without their
      marks (`asCaption`). It was a slider with a drawn bear (`FeelingBear`, removed 6 November 2026): the user wanted
      pictures, and three steps a child tells apart at a glance rather than five that differ little.
@@ -37,7 +39,9 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
      The corner in the top left is a round arrow back to all feelings while one is shown (`useInnerBack`, see the root
      `CLAUDE.md`), the ✕ again on the cards. **Morning and evening** (C-33): the feeling picked is kept per time of day
      (`MoodDay` under `tinytaps.mood.day.v2`, `daytimeOf` from Zähne putzen: before 14:00 is morning); in the evening the
-     card picked this morning says „Heute früh: …“ under it. Only today's morning counts (`morningMood`). The Tagesplan's
+     card picked this morning carries „Heute früh“ on a page marker of coloured film over its top edge (`ChoiceCard
+     marker`); its caption stays the feeling alone („Traurig“). A note for grown-ups never joins a card's caption: „Heute
+     früh: Traurig“ took three lines over the bear's face (user feedback, November 2026; `feelings.test.ts`). Only today's morning counts (`morningMood`). The Tagesplan's
      „Wie geht's dir?“ card (a ritual, `rituals.ts` in `rewards/`) opens the game with `{ returnTo }`, and the pick calls
      `finishRoutineStep()`, so back on the plan the card is ticked.
 - **„Gefühle nachmachen“ was removed** (C-35, user decision, 6 November 2026): the little bear's faces to copy in a

@@ -198,6 +198,7 @@ export function ChoiceCard({
   caption,
   state,
   onChoose,
+  marker,
 }: {
   /** Name of the picture, see images.ts. */
   image: string;
@@ -205,6 +206,11 @@ export function ChoiceCard({
   caption: string;
   state: CardState;
   onChoose?: () => void;
+  /**
+   * A note for grown-ups on a page marker over the card's top edge („Heute früh“), kept out of the caption so the
+   * caption stays the card's few words and never covers the picture.
+   */
+  marker?: string;
 }) {
   const active = state === "choose";
   return (
@@ -215,7 +221,7 @@ export function ChoiceCard({
         // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
         data-tap
         disabled={!active}
-        aria-label={caption}
+        aria-label={marker ? `${marker}: ${caption}` : caption}
         onPointerDown={(e: PointerEvent) => {
           e.stopPropagation();
           if (active) onChoose?.();
@@ -226,6 +232,11 @@ export function ChoiceCard({
         {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
+      {marker && (
+        <span className="fg-card-marker" aria-hidden>
+          {marker}
+        </span>
+      )}
       <span className="fg-caption" aria-hidden>
         {caption}
       </span>

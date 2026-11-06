@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { useInnerBack } from "@/components/GameShell";
+import { pagesBetween } from "@/content/games";
 import { useT } from "@/lib/language";
+import { turnPageWith } from "@/lib/look";
 import { finishRoutineStep } from "@/lib/routine";
 import { playCountNote } from "@/lib/sfx";
-import { moodImages, preloadImages } from "./images";
+import { imageFor, moodImages, preloadImages } from "./images";
 import {
   asCaption,
   loadMoodDay,
@@ -20,6 +23,7 @@ import {
   withMood,
 } from "./mood";
 import { MoodGroups, usePickKeys } from "./moodGroups";
+import { NEEDS_HREF, NEEDS_TITLE, type NeedsVisit } from "./needs";
 import type { FeelingsSettings } from "./settings";
 import { ChoiceCard, useVoice } from "./shared";
 
@@ -72,7 +76,8 @@ export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
     <ChoiceCard
       key={m.id}
       image={cardImage(m)}
-      caption={m.id === morning ? `${t(THIS_MORNING)}: ${t(m.caption)}` : t(m.caption)}
+      caption={t(m.caption)}
+      marker={m.id === morning ? t(THIS_MORNING) : undefined}
       state="choose"
       onChoose={() => pick(m)}
     />
@@ -143,6 +148,30 @@ function Strengths({ mood, say }: { mood: Mood; say: (text: string) => void }) {
       <svg className="mood-band" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden>
         <path d="M6 22 L394 4 Q398 20 394 36 L6 26 Z" />
       </svg>
+      <NeedsLink />
     </div>
+  );
+}
+
+/**
+ * On to „Was brauche ich?“ once a feeling is picked (user wish, November 2026): what helps with it is the next thing to
+ * ask. A paper slip with the hug's picture and the game's name, in the bottom right corner – never the middle of the
+ * bottom edge, where browsers show how to leave fullscreen. A page turns forward to it, and its way back comes here.
+ */
+function NeedsLink() {
+  const t = useT();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const picture = imageFor(moodImages.need("kuscheln"));
+  const go = (e: PointerEvent) => {
+    e.stopPropagation();
+    const visit: NeedsVisit = { from: pathname };
+    turnPageWith("forward", () => navigate(NEEDS_HREF, { state: visit }), pagesBetween(pathname, NEEDS_HREF));
+  };
+  return (
+    <button type="button" className="mood-needs-link" data-tap onPointerDown={go}>
+      {picture && <img className="mood-needs-link-picture" src={picture} alt="" draggable={false} />}
+      <span>{t(NEEDS_TITLE)}</span>
+    </button>
   );
 }

@@ -10,7 +10,7 @@ import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { asCaption, MOODS, morningMood, STRENGTH_ANSWERS, STRENGTHS, withMood } from "./mood";
 import { MOOD_PICTURE_QUEUE } from "./moodPictures";
-import { NEEDS } from "./needs";
+import { NEEDS, needsCameFrom } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
@@ -422,4 +422,20 @@ test("the evening shows this morning's feeling, never yesterday's, and never in 
   expect(morningMood(withMood(day, "froh", evening), evening)).toBe("traurig");
   expect(morningMood(day, new Date("2026-11-05T19:00"))).toBeUndefined();
   expect(withMood(day, "muede", new Date("2026-11-05T08:00"))).toEqual({ day: "2026-11-05", morning: "muede" });
+});
+
+// A card's caption is only its few words: a note for grown-ups („Heute früh“) on a marker over the card, never
+// joined into the caption, where „Heute früh: Traurig“ took three lines over the bear's face (user feedback, November 2026).
+test("the morning's feeling is marked beside its caption, never in it", () => {
+  const play = readFileSync("src/games/feelings/MoodPlay.tsx", "utf8");
+  expect(play).toContain("marker={m.id === morning ? t(THIS_MORNING)");
+  expect(play).not.toMatch(/caption=\{[^}]*THIS_MORNING/);
+});
+
+// „Wie geht's dir?“ leads on to „Was brauche ich?“, whose way back comes to it again (user wish, November 2026).
+test("a feeling's screen links to „Was brauche ich?“, and only it is gone back to from there", () => {
+  expect(readFileSync("src/games/feelings/MoodPlay.tsx", "utf8")).toContain("<NeedsLink />");
+  expect(needsCameFrom({ from: "/wie-gehts-dir/" })).toBe("/wie-gehts-dir/");
+  expect(needsCameFrom({ from: "//elsewhere.example/" })).toBeUndefined();
+  expect(needsCameFrom(null)).toBeUndefined();
 });

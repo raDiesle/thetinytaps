@@ -624,7 +624,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Was brauche ich?“: acht Karten (in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, etwas essen, ausruhen, ein Lied singen), ohne Gefühl davor; das Pusten zeichnet den kleinen Bären, die sieben Bilder sind gemacht (6. November 2026).",
+        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Was brauche ich?“: acht Karten (in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, etwas essen, ausruhen, ein Lied singen), ohne Gefühl davor; das Pusten zeichnet den kleinen Bären, die sieben Bilder sind gemacht (6. November 2026). Seit dem 6. November 2026 (Wunsch) führt in „Wie geht's dir?“ nach dem Gefühl ein Zettel unten rechts zu „Was brauche ich?“, und dessen ✕ wieder zurück.",
     },
     {
       id: "C-32",
