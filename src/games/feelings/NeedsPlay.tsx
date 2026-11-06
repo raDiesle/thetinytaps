@@ -1,8 +1,7 @@
 import { type PointerEvent, useCallback, useEffect, useState } from "react";
 import { useInnerBack } from "@/components/GameShell";
-import { PROD } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
-import { imageFor, madeOr, moodImages, preloadImages } from "./images";
+import { moodImages, preloadImages } from "./images";
 import { BigFace } from "./moodArt";
 import { useAnyKey, usePickKeys } from "./moodGroups";
 import { BREATH_MS, CALM_DONE, CALM_LINE, NEEDS, NEEDS_QUESTION, type Need } from "./needs";
@@ -12,11 +11,8 @@ import { ChoiceCard, Frames, useTimers, useVoice } from "./shared";
 /** Blowing out slowly, the bear's face for the card of „Tief pusten“: still, eyes shut, lips round. */
 const BLOWING = { eyes: "shut", mouth: "o", brows: "soft" } as const;
 
-/** A need's picture: the little bear doing it alone, or, in the built site until it is made, the card before. */
-const pictureOf = (need: Need) => madeOr(moodImages.need(need.id), moodImages.help(need.id));
-
-/** The needs a player sees: in the built site only those with a picture or a drawing, never a placeholder. */
-const SHOWN = NEEDS.filter((n) => !PROD || n.drawn || imageFor(pictureOf(n)));
+/** A need's picture: the little bear doing it alone. */
+const pictureOf = (need: Need) => moodImages.need(need.id);
 
 /**
  * Was brauche ich? (C-31, a game of its own since November 2026, user feedback): cards of what the child may need or
@@ -33,8 +29,8 @@ export function NeedsPlay({ settings }: { settings: FeelingsSettings }) {
   const t = useT();
 
   useEffect(() => {
-    preloadImages(SHOWN.filter((n) => !n.drawn).map(pictureOf));
-    preload([...SHOWN.map((n) => t(n.answer)), t(CALM_LINE), t(CALM_DONE)]);
+    preloadImages(NEEDS.filter((n) => !n.drawn).map(pictureOf));
+    preload([...NEEDS.map((n) => t(n.answer)), t(CALM_LINE), t(CALM_DONE)]);
   }, []);
 
   // The question each time the cards come, also back from one.
@@ -75,7 +71,7 @@ export function NeedsPlay({ settings }: { settings: FeelingsSettings }) {
     setRound((r) => r + 1);
     answer(need);
   }, [need, answer]);
-  usePickKeys(!need, SHOWN, pick);
+  usePickKeys(!need, NEEDS, pick);
   useAnyKey(!!need, again);
 
   return (
@@ -98,7 +94,7 @@ export function NeedsPlay({ settings }: { settings: FeelingsSettings }) {
         </div>
       ) : (
         <div className="mood-needs">
-          {SHOWN.map((n) => (
+          {NEEDS.map((n) => (
             <ChoiceCard
               key={n.id}
               image={pictureOf(n)}

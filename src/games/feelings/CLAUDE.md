@@ -11,9 +11,8 @@ what helps were steps of „Wie geht's dir?“ and became games of their own):
      two groups (`MoodGroups`, `moodGroups.tsx`): the pleasant ones on a warm yellow panel, the unpleasant ones on a cool
      blue-grey one, each named small for grown-ups („Angenehme / Unangenehme Gefühle“), side by side on wide screens and
      one above the other upright. Each card is the little bear alone with the feeling, in a moment that brings it
-     (`Mood.moment`, `gefuehl-…`, queued in `moodPictures.ts`). Until all eight are made the built site shows the cards
-     before (`gesicht-…`, a fox or bear child with Mama or Papa, `SHOWS_NEW`), never a mix; the dev server the new
-     placeholders. Digits pick that card, any other key one at random.
+     (`Mood.moment`, `gefuehl-…`, made 6 November 2026, prompts in `bilder/README.md`). Digits pick that card, any
+     other key one at random.
   2. A tap shows at once the card beside the little bear standing, drawn (`FeelingBear`), with a slider under him:
      „Wie doll ist es?“ (C-36). Sliding (or the arrow keys) goes from a little to a whole lot in `STRENGTH_STEPS` steps:
      his arms, his body and his face grow with the feeling (`GESTURES`: jumping for joy, paws on the hips, on tiptoes,
@@ -39,8 +38,7 @@ what helps were steps of „Wie geht's dir?“ and became games of their own):
   Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees what the child
   needs. „Tief pusten“ is drawn (`Need.drawn`): the bear blows two slow breaths with the soft circle round him
   (`.mood-breath`, its own layer, `BREATH_MS`), then „Schon besser.“. The cards are the little bear doing it
-  (`brauche-…`, queued); the built site shows the old `hilft-…` card till then (`madeOr`), and leaves out a need with
-  neither. A tap on the big picture (or any key) says it again; the corner goes back.
+  (`brauche-…`, made 6 November 2026). A tap on the big picture (or any key) says it again; the corner goes back.
 
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
   the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row

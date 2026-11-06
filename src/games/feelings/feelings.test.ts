@@ -94,13 +94,12 @@ test("every story ends on its last step", () => {
 });
 
 // „Wie geht's dir?“ (user feedback, November 2026): eight feelings, four pleasant ones first and four unpleasant ones,
-// each with its card of the little bear alone (or planned), and the card before kept for the built site till then.
+// each with its card of the little bear alone (or planned).
 test("every feeling has its card, in a group of four", () => {
   expect(new Set(MOODS.map((m) => m.id)).size, "a feeling twice").toBe(MOODS.length);
   expect(MOODS.map((m) => m.pleasant)).toEqual([true, true, true, true, false, false, false, false]);
   for (const { id, caption, moment } of MOODS) {
     expectPicture(moodImages.feeling(id));
-    expect(imageFor(moodImages.face(id)), `${id}: the built site's card until the new ones are made`).toBeDefined();
     expect(caption.de, id).not.toMatch(/[.!]$/);
     expect(moment, id).not.toBe("");
   }
@@ -111,12 +110,15 @@ test("the feelings are always the little bear, in his clothes", () => {
   const art = readFileSync("src/games/feelings/moodArt.tsx", "utf8");
   expect(art).not.toMatch(/kind=\{|kind="fox"/);
   expect(art).toContain("SHIRT");
-  for (const picture of MOOD_PICTURE_QUEUE) {
-    expect(picture.prompt, picture.id).toContain("light-blue T-shirt and dark blue-purple trousers");
-    expect(picture.ref, picture.id).toEqual(["src/games/feelings/bilder/baer-sad-gut.webp"]);
+  // Their prompts, waiting in the queue or kept in bilder/README.md once made.
+  const rows = [...README.matchAll(/^\| `((?:gefuehl|brauche)-[\w-]+)` +\| (.*)\|$/gm)].map((m) => ({ id: m[1], prompt: m[2] }));
+  const prompts = [...rows, ...MOOD_PICTURE_QUEUE.map((p) => ({ id: p.id, prompt: `${p.prompt} --ref ${p.ref?.join(" ")}` }))];
+  expect(prompts.length).toBeGreaterThanOrEqual(15);
+  for (const { id, prompt } of prompts) {
+    expect(prompt, id).toContain("light-blue T-shirt and dark blue-purple trousers");
+    expect(prompt, id).toContain("baer-sad-gut");
+    if (id.startsWith("gefuehl-")) expect(prompt, id).toContain("He is the only character: no grown-up");
   }
-  for (const picture of MOOD_PICTURE_QUEUE.filter((p) => p.id.startsWith("gefuehl-")))
-    expect(picture.prompt, picture.id).toContain("He is the only character: no grown-up");
 });
 
 // „Wie doll ist es?“ (C-36): a slider of a few steps, a little to a whole lot, whose answer grows with it; the breath's

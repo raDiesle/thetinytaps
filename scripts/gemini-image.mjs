@@ -374,6 +374,15 @@ async function splitGrid(input, cols, rows, gapHex) {
     // pictures, November 2026); a cut still needs most of a whole row or column in it.
     return Math.hypot(data[p] - gap[0], data[p + 1] - gap[1], data[p + 2] - gap[2]) < 150;
   };
+  // A pixel tinted by the gap colour: its strongest channels rise above its weakest as the gap's do (magenta: red and
+  // blue well above green), even where it is blended with the picture's paper.
+  const highs = [0, 1, 2].filter((i) => gap[i] > 128);
+  const lows = [0, 1, 2].filter((i) => gap[i] <= 128);
+  const isTint = (x, y) => {
+    const p = (y * w + x) * 3;
+    const top = Math.max(...lows.map((i) => data[p + i]));
+    return highs.length > 0 && lows.length > 0 && highs.every((i) => data[p + i] > 110 && data[p + i] - top > 45);
+  };
   const columnGap = (x, y0 = 0, y1 = h) => {
     let n = 0;
     for (let y = y0; y < y1; y++) n += isGap(x, y);
@@ -415,6 +424,31 @@ async function splitGrid(input, cols, rows, gapHex) {
       for (let n = 0; n < maxY && rowGap(y1 - 1, x0, x1) > 0.8; n++) y1--;
       for (let n = 0; n < maxX && columnGap(x0, y0, y1) > 0.8; n++) x0++;
       for (let n = 0; n < maxX && columnGap(x1 - 1, y0, y1) > 0.8; n++) x1--;
+      // A seam of gap colour only partly across a row or column, on any side (also the sheet's outer edge), is
+      // trimmed too: lines covering 16–54 % of a row stayed on four of 15 Gefühle cards (November 2026). Pictures keep
+      // magenta out of themselves, so a few pixels of it at the very edge are always seam.
+      // The seam is gap colour blended into the picture (a soft pink), so it is told by its tint, not its distance.
+      const [seamX, seamY] = [Math.round((x1 - x0) * 0.025), Math.round((y1 - y0) * 0.025)];
+      const tintRow = (y) => {
+        let n = 0;
+        for (let x = x0; x < x1; x++) n += isTint(x, y);
+        return n / (x1 - x0);
+      };
+      const tintColumn = (x) => {
+        let n = 0;
+        for (let y = y0; y < y1; y++) n += isTint(x, y);
+        return n / (y1 - y0);
+      };
+      // Two lines clean in a row end the seam: a single clean line can lie inside a soft one.
+      const trim = (from, step, limit, tint) => {
+        let at = from;
+        for (let n = 0; n < limit && (tint(at) > 0.03 || tint(at + step) > 0.03); n++) at += step;
+        return at;
+      };
+      y0 = trim(y0, 1, seamY, tintRow);
+      y1 = trim(y1 - 1, -1, seamY, tintRow) + 1;
+      x0 = trim(x0, 1, seamX, tintColumn);
+      x1 = trim(x1 - 1, -1, seamX, tintColumn) + 1;
       // The soft edge of a gap still has a tint of its colour: cut a little more where panels meet.
       const [insetX, insetY] = [Math.round((x1 - x0) * 0.012), Math.round((y1 - y0) * 0.012)];
       if (c > 0) x0 += insetX;

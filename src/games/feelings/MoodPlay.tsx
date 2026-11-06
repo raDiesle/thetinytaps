@@ -1,10 +1,9 @@
 import { type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useInnerBack } from "@/components/GameShell";
-import { PROD } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
 import { finishRoutineStep } from "@/lib/routine";
 import { playCountNote } from "@/lib/sfx";
-import { imageFor, moodImages, preloadImages } from "./images";
+import { moodImages, preloadImages } from "./images";
 import {
   loadMoodDay,
   MOOD_QUESTION,
@@ -23,15 +22,8 @@ import { FeelingBear } from "./moodArt";
 import type { FeelingsSettings } from "./settings";
 import { ChoiceCard, Frames, useVoice } from "./shared";
 
-/**
- * Whether the cards show the little bear alone with each feeling (user feedback, November 2026): the built site keeps
- * the cards before (a fox or bear child with Mama or Papa) until all eight are made, never a mix of both; the dev
- * server shows the new ones' placeholders.
- */
-const SHOWS_NEW = !PROD || MOODS.every((m) => imageFor(moodImages.feeling(m.id)));
-
-/** A feeling's card. */
-const cardImage = (mood: Mood) => (SHOWS_NEW ? moodImages.feeling(mood.id) : moodImages.face(mood.id));
+/** A feeling's card: the little bear alone with it, in a moment that brings it (user feedback, November 2026). */
+const cardImage = (mood: Mood) => moodImages.feeling(mood.id);
 
 /** Where the slider starts: in the middle, so it can go either way. */
 const START_STEP = Math.floor(STRENGTH_STEPS / 2);

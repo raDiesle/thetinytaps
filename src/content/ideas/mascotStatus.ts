@@ -182,7 +182,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "M",
         idea: "C-30",
         state: "done",
-        note: "Gebaut, die 16 Bilder (gesicht-…) gemacht am 4. November 2026; seit dem 6. November 2026 nur noch auf der gebauten Seite, bis die neuen Karten des kleinen Bären allein gemacht sind (die Bilder bleiben für später).",
+        note: "Gebaut, die 16 Bilder (gesicht-…) gemacht am 4. November 2026; seit dem 6. November 2026 ersetzt durch die Karten des kleinen Bären allein (die Bilder bleiben für später).",
       },
       {
         label: "Der kleine Bär allein in T-Shirt und Hose, nah und groß, in einem Moment jedes Gefühls (Geburtstagskuchen, Turm, offene Tür …)",
@@ -190,7 +190,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         pictures: 8,
         effort: "M",
         idea: "C-30",
-        note: "Wunsch vom 6. November 2026, in der Bilder-Warteschlange (gefuehl-…).",
+        state: "done",
+        note: "Wunsch vom 6. November 2026, gemacht am selben Tag (gefuehl-…).",
       },
       {
         label: "Der kleine Bär (MascotHead in T-Shirt und Hose) zeigt mit dem Regler, wie stark das Gefühl ist",
@@ -216,7 +217,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         pictures: 7,
         effort: "M",
         idea: "C-31",
-        note: "Wunsch vom 6. November 2026, in der Bilder-Warteschlange (brauche-…); bis dahin zeigt die gebaute Seite die alten hilft-… Bilder, wo es sie gibt.",
+        state: "done",
+        note: "Wunsch vom 6. November 2026, gemacht am selben Tag (brauche-…); die alten hilft-… Bilder bleiben für später.",
       },
       { label: "Bärenkind pustet mit (MascotHead)", work: "drawing", effort: "S", idea: "C-31", state: "done" },
     ],

@@ -151,8 +151,11 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   doorway, on the furniture or peeking in from an edge“, and count every character on every picture before keeping
   it – a contact sheet of reference and result side by side makes that quick.
 - **A 1x2 or 2x2 sheet is cut where its gaps are magenta**: the book's softened colours sometimes darken the gap
-  (198, 24, 147), and a band of it stayed on two cards until the cut took darker magenta too (`splitGrid`). Look at
-  each piece's edges where the panels met; `--from .image-raw/<first>-grid1x2.png --grid 1x2 …` cuts again for free.
+  (198, 24, 147), and a band of it stayed on two cards until the cut took darker magenta too (`splitGrid`). A seam
+  only partly across an edge, soft pink blended into the picture, also on a panel's outer sides, stayed on seven of 15
+  Gefühle cards (November 2026) until the cut trimmed rows and columns tinted by the gap colour on every side too. Look
+  at each piece's edges (a contact sheet of all of them on black shows a pink line at once); `--from
+  .image-raw/<first>-grid1x2.png --grid 1x2 …` cuts again for free – fix the cut there, never trim pieces by hand.
 - **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
   character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are
   drawn from the picture where it already does so, not from the place's first picture: from the empty room the

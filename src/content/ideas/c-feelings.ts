@@ -614,7 +614,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Gesichter sind für Zweijährige leichter zu lesen als ein Wetter-Bild, und die Maskottchen kommen so auch hier als Familie vor.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Seit dem 6. November 2026 (Rückmeldung): immer derselbe kleine Bär, angezogen und allein, groß im Bild in einer typischen Lage (Geburtstagskuchen, Turm, offene Tür, Bett, etwas kaputt, Lutscher zu hoch im Regal, Gewitter draußen); die acht Bilder warten in der Bilder-Warteschlange, bis dahin zeigt die Seite die alten. Die 16 alten Bilder bleiben für später aufgehoben.",
+        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Seit dem 6. November 2026 (Rückmeldung): immer derselbe kleine Bär, angezogen und allein, groß im Bild in einer typischen Lage (Geburtstagskuchen, Turm, offene Tür, Bett, etwas kaputt, Lutscher zu hoch im Regal, Gewitter draußen); die acht Bilder sind gemacht (6. November 2026). Die 16 alten Bilder bleiben für später aufgehoben.",
     },
     {
       id: "C-31",
@@ -624,7 +624,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Was brauche ich?“: acht Karten (in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, etwas essen, ausruhen, ein Lied singen), ohne Gefühl davor; das Pusten zeichnet den kleinen Bären, die neuen Bilder warten in der Warteschlange.",
+        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Was brauche ich?“: acht Karten (in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, etwas essen, ausruhen, ein Lied singen), ohne Gefühl davor; das Pusten zeichnet den kleinen Bären, die sieben Bilder sind gemacht (6. November 2026).",
     },
     {
       id: "C-32",

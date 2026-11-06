@@ -903,20 +903,14 @@ Wetterkarten von oben (`SHOWS_FACES` in `MoodPlay.tsx`).
 | `gesicht-angst`         | „Ängstlich“ (kleiner Fuchs, Papa, `--ref empathy-passiert.webp`) – Redraw the little fox from this picture, same style, now at home in a cosy room with a rug, a sofa and a window. No hands, no arms come in from the edges. Exactly two characters, each once: the little fox and Papa Fox, a big orange grown-up fox. The little fox stands close to the front, his face big and clear – the feeling is the biggest thing in the picture. He is scared: eyes wide, brows raised and drawn together, mouth a small „o“, shoulders pulled up, paws held to his chest. Nothing scary is in the picture. He kneels beside him and looks at him kindly and attentively, not touching him yet. |
 | `gesicht-angst-arm`     | „Ängstlich“, gewählt (`--ref gesicht-angst.webp`) – Redraw this exact picture a moment later, same room, same two characters, same style, nothing else changes. No hands, no arms come in from the edges. Papa Fox nods and takes the little fox in his arms in a warm, gentle hug; the little fox's face is still clearly seen and shows the same feeling, but softer and comforted.                                                                                                                                                                                                                                                                                                       |
 
-## Geplant (noch nicht erzeugt)
-
-Bilder, die das Spiel schon anfragt, bevor sie gemacht sind; bis sie da sind, steht an ihrer Stelle ein Platzhalter mit
-dem Dateinamen (die Beschriftung darunter sagt, was er zeigen soll). Erst anschauen, dann erzeugen: zu Hause mit dem
-Raum-Prompt von „Zu Hause“ oben und dem Bild des Gefühls (`baer-…`) als einziger `--ref`, nur ein Frame. Ist ein Bild
-gemacht, wandert seine Zeile in ihre Tabelle oben (`feelings.test.ts` prüft beides). Jedes geplante Bild steht auch in der Bilder-Queue
-(`src/content/pictureQueue.ts`) und wartet dort, bis mehrere auf einmal gemacht werden.
+## Der kleine Bär allein (Wie geht's dir?, Was brauche ich?)
 
 ### Wie geht's dir? Der kleine Bär allein (6. November 2026)
 
 Die Karten der acht Gefühle (`gefuehl-…`, `moodImages.feeling`, `moodPictures.ts`): immer derselbe kleine Bär, allein,
 in T-Shirt und Hose, nah und groß vor einem ruhigen Hintergrund, in einem Moment, der das Gefühl bringt (Wunsch vom
-6. November 2026). Mit `baer-sad-gut` als einziger `--ref`, `--aspect 4:3`, `--size 800x600`, nur ein Frame. Bis alle
-acht gemacht sind, zeigt die gebaute Seite die Gesichter-Karten (`gesicht-…`).
+6. November 2026). Mit `baer-sad-gut` als einziger `--ref`, `--aspect 4:3`, `--size 800x600`, nur ein Frame, je zwei
+auf einem Bogen (`--grid 1x2`). Gemacht am 6. November 2026.
 
 | Datei               | Prompt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -932,8 +926,8 @@ acht gemacht sind, zeigt die gebaute Seite die Gesichter-Karten (`gesicht-…`).
 ### Was brauche ich? (6. November 2026)
 
 Die Karten von „Was brauche ich?“ (`brauche-…`, `moodImages.need`): der kleine Bär tut selbst, was er braucht, groß und
-vorn; nur beim In-den-Arm-Nehmen ist Mama Bär dabei, angezogen. „Tief pusten“ ist gezeichnet und braucht kein Bild. Bis
-eine gemacht ist, zeigt die gebaute Seite ihre alte `hilft-…`-Karte, wo es eine gibt, sonst bleibt die Karte weg.
+vorn; nur beim In-den-Arm-Nehmen ist Mama Bär dabei, angezogen. „Tief pusten“ ist gezeichnet und braucht kein Bild.
+Gemacht am 6. November 2026.
 
 | Datei              | Prompt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -944,3 +938,13 @@ eine gemacht ist, zeigt die gebaute Seite ihre alte `hilft-…`-Karte, wo es ein
 | `brauche-essen`    | „Etwas essen“ (`--ref baer-sad-gut.webp`) – Redraw the little bear from this picture, same style, in his light-blue T-shirt and dark blue-purple trousers. He is in front and big, the picture is about him; the background is simple and calm, so nothing draws the eye away from him. No hands, no arms come in from the edges. Anyone else in the picture wears clothes too. Only the little bear, nobody else. He sits at a small table and bites into a big red apple he holds in both paws, content and happy. Only one apple, nothing else to eat.                                                                                                                 |
 | `brauche-ausruhen` | „Ausruhen“ (`--ref baer-sad-gut.webp`) – Redraw the little bear from this picture, same style, in his light-blue T-shirt and dark blue-purple trousers. He is in front and big, the picture is about him; the background is simple and calm, so nothing draws the eye away from him. No hands, no arms come in from the edges. Anyone else in the picture wears clothes too. Only the little bear, nobody else. He lies on a soft sofa under a light blanket, his head on a cushion, eyes softly closed, a content smile, resting in the afternoon light.                                                                                                                 |
 | `brauche-lied`     | „Ein Lied singen“ (`--ref baer-sad-gut.webp`) – Redraw the little bear from this picture, same style, in his light-blue T-shirt and dark blue-purple trousers. He is in front and big, the picture is about him; the background is simple and calm, so nothing draws the eye away from him. No hands, no arms come in from the edges. Anyone else in the picture wears clothes too. Only the little bear, nobody else. He stands on the rug and sings, mouth open in song, head swaying, one paw raised; three music notes float in the air above him. No instrument.                                                                                                     |
+
+## Geplant (noch nicht erzeugt)
+
+Bilder, die das Spiel schon anfragt, bevor sie gemacht sind; bis sie da sind, steht an ihrer Stelle ein Platzhalter mit
+dem Dateinamen (die Beschriftung darunter sagt, was er zeigen soll). Erst anschauen, dann erzeugen: zu Hause mit dem
+Raum-Prompt von „Zu Hause“ oben und dem Bild des Gefühls (`baer-…`) als einziger `--ref`, nur ein Frame. Ist ein Bild
+gemacht, wandert seine Zeile in ihre Tabelle oben (`feelings.test.ts` prüft beides). Jedes geplante Bild steht auch in der Bilder-Queue
+(`src/content/pictureQueue.ts`) und wartet dort, bis mehrere auf einmal gemacht werden.
+
+Zurzeit ist nichts geplant.
