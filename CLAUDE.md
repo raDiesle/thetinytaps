@@ -48,7 +48,8 @@ In a fresh worktree run `bun install` first.
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
   new exports between modules (a reload still threw „plannerDefaults is not a function“) or rules changed in a game's
   CSS (a merged `rewards.css` stayed old after a reload while its new JS came through – test a class's computed style
-  there, not only that the page loads),
+  there, not only that the page loads) or changed data in a module (a merged new order of `games.ts`'s `volumes` stayed
+  old after reloads while the new CSS and components came through – check the changed thing itself),
   so when it still shows the old state, say it must be restarted (`bun run dev` in the repo root) instead of handing over a stale URL.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
