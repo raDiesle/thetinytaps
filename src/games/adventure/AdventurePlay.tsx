@@ -4,6 +4,7 @@ import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import type { CommonSettings } from "@/lib/common";
 import { useAppLanguage, useT } from "@/lib/language";
+import { afterPageMotion } from "@/lib/pageMotion";
 import { playChime, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { loadRealSounds, playSplash, playTweet } from "@/lib/realSounds";
 import { useWakeLock } from "@/lib/wakeLock";
@@ -133,9 +134,16 @@ export function AdventurePlay({
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(canvas);
+    // The first picture is drawn at once, but the story and its music start only once the page has turned (pageMotion.ts).
+    const paused = player.paused;
+    player.paused = true;
     player.start();
-    if (settings.music) music.start();
+    const go = afterPageMotion(() => {
+      player.paused = paused;
+      if (settings.music) music.start();
+    });
     return () => {
+      go();
       observer.disconnect();
       music.stop();
       hush();

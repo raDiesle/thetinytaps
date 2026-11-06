@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { afterPageMotion } from "@/lib/pageMotion";
 import { preloadImages } from "./images";
 import { ReadAlong } from "./ReadAlong";
 import type { ReadAlongCorner } from "./PassPlay";
@@ -75,8 +76,9 @@ export function RoundPlay({
   useEffect(() => {
     preloadImages(roundImages(round));
     preload(roundLines(round));
-    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while.
-    playBeats(round.start.beats, () => say(round.question, true));
+    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while. Only
+    // once the page it opens on lies still (pageMotion.ts).
+    return afterPageMotion(() => playBeats(round.start.beats, () => say(round.question, true)));
   }, []);
 
   const goOn = () => setPhase((now) => (now === "intro" ? "choose" : now));

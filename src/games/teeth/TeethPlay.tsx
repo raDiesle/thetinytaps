@@ -7,6 +7,7 @@ import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
 import { loadRecordings, playChime, playCountNote, playDrumRoll, playLaugh, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
+import { pageMoving, usePageStill } from "@/lib/pageMotion";
 import { finishRoutineStep } from "@/lib/routine";
 import { hush, recordedVoice } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
@@ -296,7 +297,15 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const t = useT();
   // The song began loading in the menu; the story plays meanwhile, and the brushing waits for it (`until`).
   const song = useSongLoad(sungLanguageFor(language.id, SUNG_LANGUAGES));
-  const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now(), until: song.ready ? undefined : waitAt(preludeOf(settings)) }));
+  // The book opens (or its page turns) onto the brushing: the clock – the story, its sounds and words – starts only once
+  // the page lies still (pageMotion.ts), so it stands at its start meanwhile, not paused.
+  const still = usePageStill();
+  const [held, setHeld] = useState(!still);
+  const [clock, setClock] = useState<Clock>(() => ({
+    banked: 0,
+    since: still ? performance.now() : null,
+    until: song.ready ? undefined : waitAt(preludeOf(settings)),
+  }));
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
   const [tickled, setTickled] = useState<number | null>(null);
@@ -324,7 +333,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const stepStarts = useMemo(() => sungSteps(sungIn), [sungIn]);
   const stepLength = (k: number) => stepStarts[k + 1] - stepStarts[k];
   const totalMs = stepStarts[STEPS.length];
-  const paused = clock.since === null;
+  const paused = clock.since === null && !held;
   const elapsed = readClock(clock, now);
   /** The clock stands at `until` until the song is there. */
   const waiting = !paused && clock.until !== undefined && elapsed >= clock.until;
@@ -353,10 +362,18 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const ticking = ending !== "rest" && !waiting;
   const fastTick = before !== null || done;
   useEffect(() => {
-    if (!ticking || paused) return;
+    if (!held || !still) return;
+    const t = performance.now();
+    setHeld(false);
+    setNow(t);
+    setClock((c) => (c.since === null ? { ...c, since: t } : c));
+  }, [held, still]);
+
+  useEffect(() => {
+    if (!ticking || paused || held) return;
     const timer = setInterval(() => setNow(performance.now()), fastTick ? PRELUDE_TICK_MS : TICK_MS);
     return () => clearInterval(timer);
-  }, [ticking, paused, round, fastTick]);
+  }, [ticking, paused, held, round, fastTick]);
 
   // When the song is there, the clock goes on from where it waited.
   useEffect(() => {
@@ -478,7 +495,10 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   const again = useCallback(() => {
     const t = performance.now();
-    setClock({ banked: 0, since: t, until: song.ready ? undefined : waitAt(preludeOf(settings)) });
+    // „Nochmal“ turns the page: the new brushing waits for it to lie still, like the first one.
+    const moving = pageMoving();
+    setHeld(moving);
+    setClock({ banked: 0, since: moving ? null : t, until: song.ready ? undefined : waitAt(preludeOf(settings)) });
     setNow(t);
     setRound((r) => r + 1);
   }, [song.ready, settings.origin, settings.prep]);

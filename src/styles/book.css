@@ -643,6 +643,17 @@
 }
 
 /*
+ * While a book opens or a page turns (`data-page-moving`, pageMotion.ts), a game's animations wait on their first
+ * frame – also in the copy printed on the flying book's page – and start once the page lies still: nothing in a game
+ * moves before the child sees it (user feedback, November 2026). Its voice, songs and story wait in pageMotion.ts.
+ */
+:root[data-page-moving] .play-area *,
+:root[data-page-moving] .play-area *::before,
+:root[data-page-moving] .play-area *::after {
+  animation-play-state: paused !important;
+}
+
+/*
  * The page that turns is the app (`#root`) in the state that turns, a picture of its own over the rest of the screen
  * (`turnPageWith` in look.ts), so the table stays where it is; the page beneath is the screen of the other state.
  */

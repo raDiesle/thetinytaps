@@ -15,7 +15,8 @@ The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both nee
 The game has no modes. Opening it (its tile on the home menu) starts the story at once (`GameShell`'s `startMode`); it has
 no start screen: ✕ goes back to the shelf, where the game stands as a book of its own. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
-frames, moving at once), and plays it like every other step at once – its line „Mmh! Tapsi isst Nudeln und trinkt Wasser.“
+frames, moving at once), and plays it like every other step once the book lies open (never while it still flies, `usePageStill`; its
+step timers count from then too, `later`) – its line „Mmh! Tapsi isst Nudeln und trinkt Wasser.“
 and its sounds (the tap on the card was the act; until November 2026 it waited for a tap and the line was never heard).
 Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
 (`act`): „Weiter“ on every step, at once also while the step's sounds still run, and the next thought while sitting

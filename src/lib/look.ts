@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { pagesBetween } from "@/content/games";
 import { putBookBack } from "@/lib/bookTravel";
 import { goBack } from "@/lib/goBack";
+import { pageMoves } from "@/lib/pageMotion";
 import { holdPreloads } from "@/lib/preloadPages";
 import { playPageTurn } from "@/lib/sfx";
 
@@ -57,6 +58,8 @@ export function turnPageWith(direction: TurnDirection, update: () => void, pages
   }
   playPageTurn(TURN_SECONDS);
   holdPreloads(TURN_SECONDS * 1000 + 200);
+  // The page it turns to waits with its voice, songs and animations until it lies still (pageMotion.ts).
+  const still = pageMoves();
   const html = document.documentElement;
   const turn = ++turning;
   html.dataset.turn = direction;
@@ -79,6 +82,7 @@ export function turnPageWith(direction: TurnDirection, update: () => void, pages
   transition.finished.finally(() => {
     for (const sheet of sheets) sheet.remove();
     if (turn === turning) delete html.dataset.turning;
+    still();
   });
 }
 

@@ -1,4 +1,5 @@
 import { targetLanguageFor } from "@/content/targetLanguages";
+import { pageStill } from "@/lib/pageMotion";
 import { audioContext, loadSound } from "@/lib/sfx";
 import { speak, stopSpeaking } from "./speech";
 import { recordingName } from "./voiceName";
@@ -8,7 +9,8 @@ import { recordingName } from "./voiceName";
 // of the line's text (voiceName.ts). They play always, like a sound, without a switch. A line without a recording
 // (new or changed, not recorded yet) stays silent – unless the game's story is told by the voice and can't be
 // followed without it (`browser`): there the browser's voice (Google's, where there is one) says it until the
-// recording is made (user decision, October 2026).
+// recording is made (user decision, October 2026). Nothing is said while a book opens or a page turns: a line waits
+// until the page lies still (pageMotion.ts).
 
 /** The voice of one game: the recordings in its stimme/ folder and the folders below (a `?glob` import of their MP3s). */
 export interface RecordedVoice {
@@ -81,14 +83,19 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
     say: (text, language, { queue = false, speechLang } = {}) => {
       const url = urlOf(text, language);
       if (!queue) hush();
+      const at = generation;
       if (!url) {
-        if (browser) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
+        if (browser)
+          chain = chain.then(async () => {
+            await pageStill();
+            if (at === generation) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
+          });
         return;
       }
       if (!audioContext()) return;
-      const at = generation;
       const buffer = loadUrl(url);
       chain = chain.then(async () => {
+        await pageStill();
         const decoded = await buffer;
         if (decoded && at === generation) await play(decoded);
       });

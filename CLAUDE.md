@@ -257,7 +257,12 @@ In a fresh worktree run `bun install` first.
   choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
-  at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away.
+  at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
+  while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
+  moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
+  still (`src/lib/pageMotion.ts`): the voice (`recordedVoice`) and the background song do so by themselves, a game's
+  CSS animations stand on their first frame (`data-page-moving` in `book.css`), and a game's own story, clock or timers
+  start in `afterPageMotion` / `usePageStill` – a new game that starts by itself does the same (`pageMotion.test.ts`).
 - Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice speaks
   nothing of its own (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
   ElevenLabs recording (like Tapsi's lines in Bewegungsabenteuer), which always plays, like a sound; a line without

@@ -1,5 +1,6 @@
 import { bookIdOf, shelfEntryOf } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
+import { pageMoves } from "@/lib/pageMotion";
 import { holdPreloads } from "@/lib/preloadPages";
 import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
@@ -205,10 +206,10 @@ function layer() {
   return root;
 }
 
-/** Fades the layer away and removes it. */
+/** Fades the layer away and removes it; resolves when it is gone. */
 function leave(root: HTMLElement, ms: number) {
   root.style.pointerEvents = "none";
-  root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, fill: "both" }).finished.finally(() => root.remove());
+  return root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, fill: "both" }).finished.finally(() => root.remove());
 }
 
 /** Waits for the next frames, `count` of them. */
@@ -227,6 +228,9 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
   }
   travelling = true;
   holdPreloads(TOTAL + 300);
+  // The game or menu the book opens on waits with its voice, songs and animations until the book lies open and the
+  // layer is gone (pageMotion.ts): the child sees it start, never while the book still flies.
+  const lies = pageMoves();
   // The cover lands on the left with the sound's last thud.
   playPageTurn((LIFT + FLY + OPEN) / 1000 / 0.85);
   const root = layer();
@@ -255,7 +259,7 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
   })();
   done.finally(() => {
     travelling = false;
-    leave(root, m.fills ? 140 : 320);
+    void leave(root, m.fills ? 140 : 320).finally(lies);
   });
 }
 
@@ -273,6 +277,7 @@ export function putBookBack(from: string, go: () => void) {
   }
   travelling = true;
   holdPreloads(TOTAL + 1800);
+  const lies = pageMoves();
   // The screen as it is, still on top while the shelf comes in under it.
   const root = layer();
   const print = copyScreen();
@@ -289,7 +294,7 @@ export function putBookBack(from: string, go: () => void) {
   void findBook().then((book) => {
     if (!book) {
       travelling = false;
-      leave(root, 250);
+      void leave(root, 250).finally(lies);
       return;
     }
     const built = buildBook(book);
@@ -304,6 +309,7 @@ export function putBookBack(from: string, go: () => void) {
       delete book.dataset.away;
       travelling = false;
       root.remove();
+      lies();
     });
   });
 }

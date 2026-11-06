@@ -3,6 +3,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useAppLanguage, useT } from "@/lib/language";
+import { afterPageMotion, usePageStill } from "@/lib/pageMotion";
 import {
   playBoing,
   playChime,
@@ -121,7 +122,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
   const atRef = useRef<At>(START);
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  /** What waits to happen later in this step (`later`), each as the function that cancels it. */
+  const timers = useRef(new Set<() => void>());
   /** The ✓ was explained once in this round. */
   const toldFinish = useRef(false);
   /** When the step began, for `TAP_GUARD_MS`. */
@@ -134,12 +136,21 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   /** The star of this round pops in on the chart. */
   const [fresh, setFresh] = useState(false);
 
+  /** Runs `run` `ms` after the step began – counted from when the page lies still, never while it turns (pageMotion.ts). */
   const later = useCallback((ms: number, run: () => void) => {
-    const timer = setTimeout(() => {
-      timers.current.delete(timer);
-      run();
-    }, ms);
-    timers.current.add(timer);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const cancel = () => {
+      waiting();
+      clearTimeout(timer);
+      timers.current.delete(cancel);
+    };
+    const waiting = afterPageMotion(() => {
+      timer = setTimeout(() => {
+        timers.current.delete(cancel);
+        run();
+      }, ms);
+    });
+    timers.current.add(cancel);
   }, []);
 
   // The real recordings, loaded at once so even the first sound of each is real.
@@ -150,14 +161,16 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   useEffect(() => {
     const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
+    return () => pending.forEach((cancel) => cancel());
   }, []);
 
-  // The tap on the game's card started the story: its first step speaks and sounds at once, like every other one
-  // (it was silent until the first tap, so the eating line was never heard).
+  // The tap on the game's card started the story: its first step speaks and sounds like every other one (it was
+  // silent until the first tap, so the eating line was never heard) – once the book lies open, never while it still
+  // flies or its page turns (pageMotion.ts).
   const opened = useRef(false);
+  const still = usePageStill();
   useEffect(() => {
-    if (opened.current) return;
+    if (opened.current || !still) return;
     opened.current = true;
     begin(0, { came: null, said: "unsure", nothing: false });
   });
@@ -373,8 +386,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   /** Stops what the step before still had to play, so another one can begin at once. */
   const stopTimers = () => {
-    timers.current.forEach(clearTimeout);
-    timers.current.clear();
+    for (const cancel of [...timers.current]) cancel();
     busyRef.current = false;
   };
 
@@ -440,7 +452,15 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   return (
     <div className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
       {shown.before && <StoryPicture key={`before-${shown.before.join()}`} name={shown.before} moving={false} />}
-      <StoryPicture key={pictures.join()} name={pictures} moves={moves} again={step.again} moving className="pt-picture pt-picture-new" />
+      <StoryPicture
+        key={pictures.join()}
+        name={pictures}
+        moves={moves}
+        again={step.again}
+        moving={still}
+        // The book opens on the first picture, already there: only the pictures after it fade in.
+        className={beat > 1 ? "pt-picture pt-picture-new" : "pt-picture"}
+      />
 
       {/* Drawn on top of the picture: what the animal feels and says, without words. */}
       {step.id === "need" && (
@@ -454,7 +474,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         <div className="pt-think" aria-hidden>
           <div key={beat} className="pt-think-scene">
             {framesFor(thoughtPicture).length > 0 ? (
-              <StoryPicture name={thoughtPicture} moving className="pt-think-picture" />
+              <StoryPicture name={thoughtPicture} moving={still} className="pt-think-picture" />
             ) : (
               <span className="pt-think-emoji">{thought.emoji}</span>
             )}

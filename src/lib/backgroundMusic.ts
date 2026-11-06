@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { downloadMusic } from "@/lib/musicFile";
+import { afterPageMotion } from "@/lib/pageMotion";
 import { decodeSound, type Loop, playLoop, unlockAudio } from "@/lib/sfx";
 import { talking } from "@/lib/voice";
 
@@ -84,7 +85,10 @@ if (typeof window !== "undefined") {
     tapped = true;
     notify();
   };
-  window.addEventListener("pointerdown", onFirst, { capture: true });
+  // The song goes with the click, not as the finger lands: a tap on a book on the shelf takes it out only with its
+  // click, and the song must wait until that book lies open (pageMotion.ts), never start before it flies.
+  window.addEventListener("pointerdown", unlockAudio, { capture: true });
+  window.addEventListener("click", onFirst, { capture: true });
   window.addEventListener("keydown", onFirst, { capture: true });
 }
 
@@ -121,25 +125,36 @@ export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
 
   useEffect(() => {
     if (!on || !going || !visible || !buffer) return;
-    const from = stoppedAt;
-    const startedAt = performance.now();
-    const loop: Loop | null = playLoop(buffer, {
-      offset: from,
-      volume: speaking() ? DUCKED : VOLUME,
-      loopStart: SONG.start,
-      loopEnd: SONG.loopEnd,
-      fadeIn: 1.5,
-    });
-    let ducked = speaking();
-    const timer = setInterval(() => {
-      if (speaking() === ducked) return;
-      ducked = !ducked;
-      loop?.fade(ducked ? DUCKED : VOLUME, ducked ? 0.25 : 0.8);
-    }, DUCK_CHECK_MS);
+    let started: { loop: Loop | null; from: number; at: number; timer: ReturnType<typeof setInterval> } | null = null;
+    const begin = () => {
+      const from = stoppedAt;
+      const loop = playLoop(buffer, {
+        offset: from,
+        volume: speaking() ? DUCKED : VOLUME,
+        loopStart: SONG.start,
+        loopEnd: SONG.loopEnd,
+        fadeIn: 1.5,
+      });
+      let ducked = speaking();
+      const timer = setInterval(() => {
+        if (speaking() === ducked) return;
+        ducked = !ducked;
+        loop?.fade(ducked ? DUCKED : VOLUME, ducked ? 0.25 : 0.8);
+      }, DUCK_CHECK_MS);
+      started = { loop, from, at: performance.now(), timer };
+    };
+    // The song never starts while a book opens or a page turns, only once it lies still (pageMotion.ts); a song already
+    // playing plays on. The first click of a visit may be the one that takes a book out: the song looks only once
+    // every handler of that click has run.
+    let cancel = () => {};
+    const look = setTimeout(() => (cancel = afterPageMotion(begin)));
     return () => {
-      clearInterval(timer);
-      loop?.stop();
-      stoppedAt = songAt(from, (performance.now() - startedAt) / 1000);
+      clearTimeout(look);
+      cancel();
+      if (!started) return;
+      clearInterval(started.timer);
+      started.loop?.stop();
+      stoppedAt = songAt(started.from, (performance.now() - started.at) / 1000);
     };
   }, [on, going, visible, buffer]);
 }
