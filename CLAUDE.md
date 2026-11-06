@@ -35,7 +35,10 @@ never add configs with fixed ports. Bun's dev server can stay stuck on „Could 
 files with their importers; `tools/dev.ts` then restarts it on the same port (the page reloads), so a „Could not
 resolve“ that stays is a real typo or missing file – never work around it in the code. `preview-pages` serves the built site with
 the service worker. Sound and speech are muted when the browser
-is Claude's preview (`src/lib/silent.ts`).
+is Claude's preview (`src/lib/silent.ts`), also at the pane's phone sizes, which swap in an Android user agent without
+„Claude/“ – sounds once reached the user's headset that way (user feedback, November 2026; `silent.test.ts`). A sound
+must never play on the user's device while Claude tests: every sound goes through the one `AudioContext` of
+`src/lib/sfx/core.ts` and speech through `speak()`, which both honour `silent`; never play audio past them.
 In a fresh worktree run `bun install` first.
 
 ## Working here
@@ -196,6 +199,7 @@ In a fresh worktree run `bun install` first.
   step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
   that gets its fox or bear marks it there in the same commit, and a new game or picture adds its row or task.
   Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
+  In every picture a fox or bear wears clothes (user feedback, November 2026; the style blocks of `/bild-erzeugen` say so).
   **Every fox or bear drawn in SVG has the one shared head** (`MascotHead`, or the whole `Mascot`, in
   `src/components/Mascot.tsx`, with its colours `MASCOT_COLORS` for the body round it): drawn like the Gemini family
   pictures (`bilder/buch-fuechse.webp`, `buch-baeren.webp`) – a plum-brown line, the fox's white cheeks in tufts, fluff
@@ -416,7 +420,9 @@ In a fresh worktree run `bun install` first.
   to the menu the child came from, never to a menu it didn't pass on its way in. And they step back in the browser's
   history rather than adding a page to it, or the phone's own back button afterwards opened the game just left again,
   or the same menu twice, so that it seemed not to work: a way back goes through `goBack` (`src/lib/goBack.ts`) or
-  `useTurnPage(to, "back")`, never a plain `<Link>` or `navigate(to)`. A way back is never dropped while something
+  `useTurnPage(to, "back")`, never a plain `<Link>` or `navigate(to)`. Where a game shows one thing of several big (a feeling picked from
+  its cards), the corner becomes a round arrow back to them (`useInnerBack` from `GameShell`, one tap, Esc held too) – the
+  child's way back to all of them, never a button of the game's own (user feedback from Gefühle, November 2026). A way back is never dropped while something
   moves (a book still coming out, a page turning): it goes at once, without the animation if need be.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up

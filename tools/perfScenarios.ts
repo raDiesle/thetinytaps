@@ -154,25 +154,32 @@ export const SCENARIOS: Scenario[] = [
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   })),
-  // „Alltagssituationen“: the first group's scenes, one tap on a card each; „Wie geht's dir?“ plays at once.
+  // „Alltagssituationen“: the first group's scenes, one tap on a card each; the book's other games play at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
-  { name: "wie-gehts-dir", path: "/wie-gehts-dir/", parts: [{ label: "Wetter wählen", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
-  // Wütend, „Ganz doll“: the breath's circle grows and shrinks round the big face (C-36).
+  // „Wie geht's dir?“: a feeling's card, then the slider dragged back and forth, the bear's gestures changing (C-36).
   {
-    name: "wie-gehts-dir-pusten",
+    name: "wie-gehts-dir",
     path: "/wie-gehts-dir/",
+    parts: [
+      { label: "Gefühl wählen", before: [{ wait: 1500 }], ms: 4000, tap: TAPS },
+      {
+        label: "Regler schieben",
+        before: [{ tap: '.fg-card[aria-label="Wütend"]' }, { waitFor: ".mood-slider" }, { wait: 1500 }],
+        ms: 8000,
+        // The arrows slide it a step at a time, up and down again, the bear's gestures changing with each.
+        type: { keys: ["ArrowRight", "ArrowRight", "ArrowLeft", "ArrowLeft", "ArrowLeft", "ArrowLeft", "ArrowRight", "ArrowRight"], every: 700 },
+      },
+    ],
+  },
+  { name: "gefuehle-nachmachen", path: "/gefuehle-nachmachen/", parts: [{ label: "Gesicht wählen", before: [{ wait: 1500 }], ms: 6000, tap: TAPS }] },
+  // „Was brauche ich?“, „Tief pusten“: the breath's circle grows and shrinks round the big face.
+  {
+    name: "was-brauche-ich-pusten",
+    path: "/was-brauche-ich/",
     parts: [
       {
         label: "Zusammen pusten",
-        before: [
-          { wait: 1500 },
-          // „Wütend“ as a face, or its weather card while the built site has no faces yet.
-          { tap: '.fg-card[aria-label="Wütend"], .fg-card[aria-label="Gewitter, wütend"]' },
-          { wait: 2600 },
-          ...key(" "),
-          { tap: '.fg-card[aria-label="Ganz doll"]' },
-          { waitFor: ".mood-breath" },
-        ],
+        before: [{ wait: 1500 }, { tap: '.fg-card[aria-label="Tief pusten"]' }, { waitFor: ".mood-breath" }],
         ms: 8000,
       },
     ],

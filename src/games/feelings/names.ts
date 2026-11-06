@@ -1,5 +1,6 @@
-// The names of the two games of the book „Gefühle“, here in the game's folder rather than in the home page's
-// `games.ts`, so the game's own row in the language table says which are still missing.
+// The names of the book „Gefühle“ and of its games translated so far, here in the game's folder rather than in the home page's
+// `games.ts`, so the game's own row in the language table says which are still missing. The German-only names of
+// „Gefühle nachmachen“ and „Was brauche ich?“ are in their own files (`copy.ts`, `needs.ts`), read by their rows.
 
 import type { Localized } from "@/lib/language";
 
@@ -17,7 +18,7 @@ export const BOOK_BLURB: Localized = {
   ru: "Мишка и его чувства",
 };
 
-/** The child tells how it feels, by a weather. */
+/** The child tells how it feels: a feeling's card, then how strong it is. */
 export const MOOD_TITLE: Localized = {
   de: "Wie geht's dir?",
   ru: "Как дела?",

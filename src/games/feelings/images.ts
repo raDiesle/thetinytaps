@@ -2,6 +2,7 @@
 // A picture can have more frames for a little movement: "push-1" is the first,
 // "push-1-b" the second; they fade into each other in a loop.
 
+import { PROD } from "@/lib/buildInfo";
 import pictureFiles from "./bilder/*.webp?glob";
 
 const IMAGES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
@@ -55,14 +56,20 @@ export const bearImages = {
   happy: (id: string) => `baer-${id}-gut`,
 };
 
-/** Names of the pictures of „Wie geht's dir?“. */
+/** Names of the pictures of „Wie geht's dir?“ and „Was brauche ich?“. */
 export const moodImages = {
-  /** The old weather cards, shown by the built site until the faces are made. */
-  weather: (id: string) => `wetter-${id}`,
-  /** A feeling's card: the fox or bear child showing it, Mama or Papa beside it (C-30). */
+  /** A feeling's card: the little bear alone with it, close, in a moment that brings it (user feedback, November 2026). */
+  feeling: (id: string) => `gefuehl-${id}`,
+  /** A feeling's card before: a fox or bear child with Mama or Papa (C-30), kept for the built site until all eight new ones are made. */
   face: (id: string) => `gesicht-${id}`,
-  /** The same a moment later: the grown-up nods and takes the little one in its arms. */
-  hug: (id: string) => `gesicht-${id}-arm`,
-  /** A card of „Was hilft dir jetzt?“: the little bear doing what helps. */
+  /** A card of „Was brauche ich?“: the little bear doing what he needs. */
+  need: (id: string) => `brauche-${id}`,
+  /** That card before (C-31, with a grown-up drawn without clothes), kept for the built site until its new one is made. */
   help: (id: string) => `hilft-${id}`,
 };
+
+/**
+ * The picture to show for `name`, or, where it isn't made yet, the one it replaces – in the built site only, which never
+ * shows a placeholder; the dev server shows the new one's placeholder, to look at what is still missing.
+ */
+export const madeOr = (name: string, before: string) => (PROD && !imageFor(name) && imageFor(before) ? before : name);

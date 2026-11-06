@@ -9,11 +9,11 @@ import type { QueuedPicture } from "./pictureQueue";
 
 /** The book's style block, put before every picture's prompt (see the skill /bild-erzeugen). */
 export const BOOK_STYLE =
-  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache printed on matte paper – still clear and easy to tell apart, never dull or grey – gentle shading. Simple, uncluttered background. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
+  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache printed on matte paper – still clear and easy to tell apart, never dull or grey – gentle shading. Simple, uncluttered background. Every fox and bear wears clothes. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
 
 /** The style block for cut-outs: no background and no paper texture, which would spoil the cut. */
 export const CUTOUT_STYLE =
-  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache – still clear and easy to tell apart, never dull or grey – gentle shading. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
+  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache – still clear and easy to tell apart, never dull or grey – gentle shading. Every fox and bear wears clothes. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
 
 /** US dollars per request with the default model (gemini-3.1-flash-lite-image, October 2026): batch, and at once with `--now`. */
 export const REQUEST_PRICE = { batch: 0.017, now: 0.034 };

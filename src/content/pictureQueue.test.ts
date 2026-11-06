@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { PICTURE_QUEUE, type QueuedPicture } from "./pictureQueue";
-import { BOOK_STYLE, jobOf, PICTURE_1K, planQueue } from "./pictureQueuePlan";
+import { BOOK_STYLE, CUTOUT_STYLE, jobOf, PICTURE_1K, planQueue } from "./pictureQueuePlan";
 
 const picture = (id: string, more: Partial<QueuedPicture> = {}): QueuedPicture => ({
   id,
@@ -95,6 +95,11 @@ test("the skill's style block is the queue's", () => {
   const skill = readFileSync(".claude/skills/bild-erzeugen/SKILL.md", "utf8");
   const block = /## Style[\s\S]*?```\n([\s\S]*?)```/.exec(skill)?.[1] ?? "";
   expect(block.replace(/\s+/g, " ").trim()).toBe(BOOK_STYLE);
+});
+
+// Every fox and bear wears clothes (user feedback, November 2026): both style blocks say so, so no picture forgets it.
+test("both style blocks dress the fox and the bear", () => {
+  for (const style of [BOOK_STYLE, CUTOUT_STYLE]) expect(style).toContain("Every fox and bear wears clothes.");
 });
 
 // The user only wants to know how many pictures wait, never to read and approve prompts there (November 2026).

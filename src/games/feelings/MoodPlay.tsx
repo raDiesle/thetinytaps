@@ -1,249 +1,234 @@
-import { useCallback, useEffect, useState } from "react";
+import { type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useInnerBack } from "@/components/GameShell";
 import { PROD } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
 import { finishRoutineStep } from "@/lib/routine";
+import { playCountNote } from "@/lib/sfx";
 import { imageFor, moodImages, preloadImages } from "./images";
 import {
-  BREATH_MS,
-  CALM_CAPTION,
-  CALM_DONE,
-  CALM_LINE,
-  FACE_CAPTION,
-  FACE_LINE,
-  HELP_QUESTION,
-  HELPS,
-  type Help,
-  type HelpId,
-  HUG_CAPTION,
   loadMoodDay,
-  MOOD_ANSWER,
   MOOD_QUESTION,
   MOODS,
   type Mood,
   morningMood,
-  NOW,
   saveMoodDay,
   STRENGTH_QUESTION,
-  STRENGTHS,
-  type Strength,
+  STRENGTH_STEPS,
+  strengthAnswer,
   THIS_MORNING,
   withMood,
 } from "./mood";
-import { BigFace, SkySign } from "./moodArt";
+import { MoodGroups, usePickKeys } from "./moodGroups";
+import { FeelingBear } from "./moodArt";
 import type { FeelingsSettings } from "./settings";
-import { ChoiceCard, GoOn, StoryPicture, useTimers, useVoice } from "./shared";
-
-/** How long the hug, and then the picked help, stay big before the next part begins. */
-const ANSWER_MS = 2200;
-/** In the evening beside the morning's feeling a little longer, for the grown-up to talk about it. */
-const COMPARE_MS = 4500;
-
-/** How long a picked size keeps its tick before the next part. */
-const STRENGTH_MS = 1200;
-
-/** How many slow breaths are blown together. */
-const BREATHS = 2;
-
-/** Whether „Was hilft dir jetzt?“ is asked: the built site leaves it out until all its pictures are made, the dev server shows their placeholders. */
-const ASKS_HELP = !PROD || (Object.keys(HELPS) as HelpId[]).every((id) => imageFor(moodImages.help(id)));
+import { ChoiceCard, Frames, useVoice } from "./shared";
 
 /**
- * Whether the cards are faces (C-30): the built site keeps the four weather cards of before until every face and hug
- * is made, the dev server shows the faces' placeholders.
+ * Whether the cards show the little bear alone with each feeling (user feedback, November 2026): the built site keeps
+ * the cards before (a fox or bear child with Mama or Papa) until all eight are made, never a mix of both; the dev
+ * server shows the new ones' placeholders.
  */
-const SHOWS_FACES = !PROD || MOODS.every((m) => imageFor(moodImages.face(m.id)) && imageFor(moodImages.hug(m.id)));
+const SHOWS_NEW = !PROD || MOODS.every((m) => imageFor(moodImages.feeling(m.id)));
 
-/** The feelings on the first screen: all eight as faces, or the four that had a weather card. */
-const SHOWN = SHOWS_FACES ? MOODS : MOODS.filter((m) => m.weather);
+/** A feeling's card. */
+const cardImage = (mood: Mood) => (SHOWS_NEW ? moodImages.feeling(mood.id) : moodImages.face(mood.id));
 
-/** Where the child is: picking a feeling, held in the grown-up's arms, copying the face, how strong, breathing, what helps. */
-type Stage =
-  | { at: "mood" }
-  | { at: "hug"; mood: Mood; morning?: Mood }
-  | { at: "face"; mood: Mood }
-  | { at: "strength"; mood: Mood; picked?: Strength }
-  | { at: "calm"; mood: Mood }
-  | { at: "help"; mood: Mood; picked?: Help };
+/** Where the slider starts: in the middle, so it can go either way. */
+const START_STEP = Math.floor(STRENGTH_STEPS / 2);
 
 /**
- * Wie geht's dir heute? Eight faces (C-29, C-30); the picked one's grown-up takes the little one in its arms – in the
- * evening the morning's card stands beside it instead, „Heute früh“ and „Jetzt“ (C-33) –, the
- * little one shows the face big to copy (C-35, waits for a tap), the child shows how strong it is on the feeling's
- * weather in three sizes (C-36) – a hard feeling „ganz doll“ first gets two slow breaths blown together –, then „Was
- * hilft dir jetzt?“ (C-31), and `onPick` plays the scenes of that feeling (its group).
+ * Wie geht's dir heute? The eight feelings' cards in two groups, the pleasant ones apart from the unpleasant ones; a tap
+ * on one shows the little bear with it at once, and the child slides how strong it is – his gestures grow with it (C-36).
+ * The corner in the top left goes back to all feelings (`useInnerBack`). In the evening the card picked this morning
+ * says so under it (C-33). Copying the faces and what helps are games of their own (user feedback, November 2026).
  */
-export function MoodPlay({ settings, onPick }: { settings: FeelingsSettings; onPick: (group: string) => void }) {
-  const [stage, setStage] = useState<Stage>({ at: "mood" });
-  const { later } = useTimers();
-  const { say, sound, preload } = useVoice(settings);
+export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
+  const [mood, setMood] = useState<Mood>();
+  const { say, preload } = useVoice(settings);
   const t = useT();
+  // In the evening, the feeling picked this morning (C-33), read once.
+  const [morning] = useState(() => morningMood(loadMoodDay(), new Date()));
 
   useEffect(() => {
-    preloadImages(SHOWN.map(cardImage));
-    preload([
-      t(MOOD_ANSWER),
-      t(FACE_LINE),
-      t(STRENGTH_QUESTION),
-      ...STRENGTHS.map((s) => t(s.answer)),
-      t(CALM_LINE),
-      t(CALM_DONE),
-      ...(ASKS_HELP ? [t(HELP_QUESTION), ...Object.values(HELPS).map((h) => t(h.answer))] : []),
-    ]);
-    say(t(MOOD_QUESTION));
+    preloadImages(MOODS.map(cardImage));
+    preload([t(STRENGTH_QUESTION), ...[0, 2, 4].map((s) => t(strengthAnswer(s)))]);
   }, []);
 
-  /** After the size, or after the breaths: what helps, or the scenes when that isn't asked yet. */
-  const toHelp = useCallback(
-    (mood: Mood) => {
-      if (!ASKS_HELP) return onPick(mood.group);
-      setStage({ at: "help", mood });
-      say(t(HELP_QUESTION));
-    },
-    [onPick, say, t],
-  );
+  // The question each time the cards come, also back from a feeling.
+  useEffect(() => {
+    if (!mood) say(t(MOOD_QUESTION));
+  }, [mood]);
 
-  const pickMood = useCallback(
-    (mood: Mood) => {
-      if (stage.at !== "mood") return;
+  useInnerBack(mood ? () => setMood(undefined) : undefined);
+
+  const pick = useCallback(
+    (picked: Mood) => {
       // The answer a plan's „Wie geht's dir?“ card waited for (the Tagesplan, rituals.ts): it is ticked on the way back.
       finishRoutineStep();
       const now = new Date();
-      const day = loadMoodDay();
-      const morning = MOODS.find((m) => m.id === morningMood(day, now));
-      saveMoodDay(withMood(day, mood.id, now));
-      setStage({ at: "hug", mood, morning });
-      say(t(MOOD_ANSWER));
-      sound("chime");
-      if (ASKS_HELP) preloadImages(mood.helps.map(moodImages.help));
-      later(
-        () => {
-          setStage({ at: "face", mood });
-          say(t(FACE_LINE));
-        },
-        morning ? COMPARE_MS : ANSWER_MS,
-      );
+      saveMoodDay(withMood(loadMoodDay(), picked.id, now));
+      setMood(picked);
+      say(t(STRENGTH_QUESTION));
     },
-    [stage.at, say, sound, later, t],
+    [say, t],
   );
 
-  const faceDone = useCallback(() => {
-    if (stage.at !== "face") return;
-    setStage({ at: "strength", mood: stage.mood });
-    say(t(STRENGTH_QUESTION));
-  }, [stage, say, t]);
+  usePickKeys(!mood, MOODS, pick);
 
-  const pickStrength = useCallback(
-    (strength: Strength) => {
-      if (stage.at !== "strength" || stage.picked) return;
-      const { mood } = stage;
-      setStage({ at: "strength", mood, picked: strength });
-      say(t(strength.answer));
-      sound("chime");
-      const calming = mood.hard && strength.id === "gross";
-      later(() => {
-        if (!calming) return toHelp(mood);
-        setStage({ at: "calm", mood });
-        say(t(CALM_LINE));
-        later(() => {
-          say(t(CALM_DONE));
-          later(() => toHelp(mood), 1500);
-        }, BREATH_MS * BREATHS);
-      }, STRENGTH_MS);
-    },
-    [stage, say, sound, later, t, toHelp],
+  const card = (m: Mood) => (
+    <ChoiceCard
+      key={m.id}
+      image={cardImage(m)}
+      caption={m.id === morning ? `${t(THIS_MORNING)}: ${t(m.caption)}` : t(m.caption)}
+      state="choose"
+      onChoose={() => pick(m)}
+    />
   );
 
-  const pickHelp = useCallback(
-    (help: Help) => {
-      if (stage.at !== "help" || stage.picked) return;
-      setStage({ at: "help", mood: stage.mood, picked: help });
-      say(t(help.answer));
-      sound("chime");
-      later(() => onPick(stage.mood.group), ANSWER_MS);
+  return <main className="mood-play">{mood ? <Strength key={mood.id} mood={mood} say={say} /> : <MoodGroups card={card} />}</main>;
+}
+
+/**
+ * A feeling picked: its card and the little bear showing it, with the slider under him (C-36). Sliding changes his
+ * gestures step by step, a note for each step (higher the stronger); let go, the voice says how strong it is.
+ */
+function Strength({ mood, say }: { mood: Mood; say: (text: string) => void }) {
+  const t = useT();
+  const [step, setStep] = useState(START_STEP);
+  const [touched, setTouched] = useState(false);
+
+  const changeTo = useCallback((next: number) => {
+    setStep((now) => {
+      if (now !== next) playCountNote(next);
+      return next;
+    });
+  }, []);
+  const settle = useCallback(
+    (at: number) => {
+      setTouched(true);
+      say(t(strengthAnswer(at)));
     },
-    [stage, say, sound, later, onPick, t],
+    [say, t],
   );
 
-  // Digits pick that card; any other key picks one, or goes on from the face, so every key does something.
+  // The arrows slide it, every other key moves it on and back again: every key does something.
+  const way = useRef(1);
+  const stepRef = useRef(step);
+  stepRef.current = step;
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.repeat) return;
-      const choose = <T,>(list: T[]) => {
-        const digit = Number(e.key) - 1;
-        return list[digit >= 0 && digit < list.length ? digit : Math.floor(Math.random() * list.length)];
-      };
-      if (stage.at === "mood") pickMood(choose(SHOWN));
-      else if (stage.at === "face") faceDone();
-      else if (stage.at === "strength") pickStrength(choose(STRENGTHS));
-      else if (stage.at === "help") pickHelp(HELPS[choose(stage.mood.helps)]);
+      const now = stepRef.current;
+      let next: number;
+      if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = Math.max(0, now - 1);
+      else if (e.key === "ArrowRight" || e.key === "ArrowUp") next = Math.min(STRENGTH_STEPS - 1, now + 1);
+      else {
+        if (now + way.current < 0 || now + way.current >= STRENGTH_STEPS) way.current = -way.current;
+        next = now + way.current;
+      }
+      changeTo(next);
+      settle(next);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [stage, pickMood, faceDone, pickStrength, pickHelp]);
+  }, [changeTo, settle]);
 
   return (
-    <div className="story-play mood-play">
-      <main className="story-middle">
-        {stage.at === "mood" && (
-          <div className={`mood-cards${SHOWS_FACES ? " mood-faces" : ""}`}>
-            {SHOWN.map((m) => (
-              <ChoiceCard key={m.id} image={cardImage(m)} caption={t(cardCaption(m))} state="choose" onChoose={() => pickMood(m)} />
-            ))}
-          </div>
-        )}
-        {stage.at === "hug" && stage.morning && (
-          <div className="mood-cards mood-compare">
-            <ChoiceCard image={cardImage(stage.morning)} caption={`${t(THIS_MORNING)}: ${t(cardCaption(stage.morning))}`} state="rest" />
-            <ChoiceCard image={cardImage(stage.mood)} caption={`${t(NOW)}: ${t(cardCaption(stage.mood))}`} state="rest" />
-          </div>
-        )}
-        {stage.at === "hug" && !stage.morning && (
-          <StoryPicture
-            key="hug"
-            name={SHOWS_FACES ? moodImages.hug(stage.mood.id) : cardImage(stage.mood)}
-            caption={t(SHOWS_FACES ? HUG_CAPTION : cardCaption(stage.mood))}
-          />
-        )}
-        {stage.at === "face" && (
-          <StoryPicture key="face" name="" art={<BigFace mood={stage.mood} />} caption={`${t(stage.mood.caption)}: ${t(FACE_CAPTION)}`} />
-        )}
-        {stage.at === "strength" && (
-          <div className="mood-cards mood-helps">
-            {STRENGTHS.map((s) => (
-              <ChoiceCard
-                key={s.id}
-                image=""
-                art={<SkySign sky={stage.mood.sky} scale={s.scale} />}
-                caption={t(s.caption)}
-                state={!stage.picked ? "choose" : stage.picked === s ? "playing" : "rest"}
-                onChoose={() => pickStrength(s)}
-              />
-            ))}
-          </div>
-        )}
-        {stage.at === "calm" && <StoryPicture key="calm" name="" art={<BigFace mood={stage.mood} blowing />} caption={t(CALM_CAPTION)} />}
-        {stage.at === "help" &&
-          (stage.picked ? (
-            <StoryPicture key={stage.picked.id} name={moodImages.help(stage.picked.id)} caption={t(stage.picked.caption)} />
-          ) : (
-            <div className="mood-cards mood-helps">
-              {stage.mood.helps.map((id) => (
-                <ChoiceCard key={id} image={moodImages.help(id)} caption={t(HELPS[id].caption)} state="choose" onChoose={() => pickHelp(HELPS[id])} />
-              ))}
-            </div>
-          ))}
-      </main>
-      {stage.at === "face" && <GoOn onNext={faceDone} label={`${t(stage.mood.caption)}: ${t(FACE_CAPTION)}`} />}
+    <div className={`mood-strength ${mood.pleasant ? "pleasant" : "unpleasant"}`}>
+      <div className="mood-strength-card">
+        <div className="mood-pic">
+          <Frames name={cardImage(mood)} moving={false} className="fg-card-image" />
+        </div>
+        <span className="fg-caption">{t(mood.caption)}</span>
+      </div>
+      <div className="mood-strength-bear">
+        <FeelingBear mood={mood} step={step} steps={STRENGTH_STEPS} />
+        <StrengthSlider step={step} onStep={changeTo} onRelease={settle} hint={!touched} label={t(STRENGTH_QUESTION)} />
+      </div>
     </div>
   );
 }
 
-/** A feeling's card: its face, or its weather card where the built site has no faces yet. */
-function cardImage(mood: Mood): string {
-  return SHOWS_FACES || !mood.weather ? moodImages.face(mood.id) : moodImages.weather(mood.weather.picture);
-}
+/**
+ * The slider of „Wie doll ist es?“: a band from thin to thick, no numbers, and a big round knob slid along it or tapped
+ * to (user feedback, November 2026). The knob follows the finger as an HTML layer moved by a transform (`--at`), the
+ * bear changes only when a step is passed, and let go the knob settles on its step.
+ */
+function StrengthSlider({
+  step,
+  onStep,
+  onRelease,
+  hint,
+  label,
+}: {
+  step: number;
+  onStep: (step: number) => void;
+  onRelease: (step: number) => void;
+  /** Shows the still pointing hand under the knob, before the first slide. */
+  hint: boolean;
+  label: string;
+}) {
+  const track = useRef<HTMLDivElement>(null);
+  const band = useRef<SVGSVGElement>(null);
+  const dragging = useRef(false);
+  const last = STRENGTH_STEPS - 1;
 
-function cardCaption(mood: Mood) {
-  return SHOWS_FACES || !mood.weather ? mood.caption : mood.weather.caption;
+  /** Puts the knob where the finger is along the band, as an HTML layer moved by `--at`, and tells which step that is. */
+  const follow = (e: PointerEvent<HTMLDivElement>) => {
+    const box = band.current?.getBoundingClientRect();
+    if (!box || box.width === 0) return step;
+    const fraction = Math.min(1, Math.max(0, (e.clientX - box.left) / box.width));
+    track.current?.style.setProperty("--at", String(fraction));
+    const at = Math.round(fraction * last);
+    onStep(at);
+    return at;
+  };
+  /** The finger let go (or was taken away): the knob glides onto its step. */
+  const letGo = (at: number) => {
+    dragging.current = false;
+    track.current?.classList.remove("dragging");
+    track.current?.style.setProperty("--at", String(at / last));
+  };
+  // On its step whenever the step changes from elsewhere (a key).
+  useEffect(() => {
+    if (!dragging.current) track.current?.style.setProperty("--at", String(step / last));
+  }, [step, last]);
+
+  return (
+    <div
+      ref={track}
+      className="mood-slider"
+      data-tap-keep
+      role="slider"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={last}
+      aria-valuenow={step}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        dragging.current = true;
+        track.current?.classList.add("dragging");
+        follow(e);
+      }}
+      onPointerMove={(e) => {
+        if (dragging.current) follow(e);
+      }}
+      onPointerUp={(e) => {
+        if (!dragging.current) return;
+        const at = follow(e);
+        letGo(at);
+        onRelease(at);
+      }}
+      onPointerCancel={() => letGo(step)}
+    >
+      <svg ref={band} className="mood-band" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden>
+        <path d="M6 34 L394 6 Q398 30 394 54 L6 38 Z" />
+      </svg>
+      <span className="mood-knob" aria-hidden>
+        {hint && <span className="mood-hand">👆</span>}
+      </span>
+    </div>
+  );
 }

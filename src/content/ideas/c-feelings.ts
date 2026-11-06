@@ -604,7 +604,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Vier Wetter decken nur froh, müde, traurig und wütend ab. Angst, Aufregung und Stolz kennen Kleinkinder genauso – und je feiner das Kind zeigen kann, wie es ihm geht, desto besser kann der Erwachsene darauf eingehen.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee (Sonne, Regenbogen, Wind, Schnee, Wolke, Regen, Gewitter, dunkler Wald) sind jetzt das Zeichen bei „Wie doll ist es?“ (C-36). Die Gesichtsbilder sind gemacht (4. November 2026).",
+        "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee waren zuerst das Zeichen bei „Wie doll ist es?“ (C-36); seit dem 6. November 2026 zeigt das der Regler mit dem kleinen Bären. Die acht Gefühle stehen jetzt in zwei Gruppen, die angenehmen getrennt von den unangenehmen.",
     },
     {
       id: "C-30",
@@ -614,7 +614,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Gesichter sind für Zweijährige leichter zu lesen als ein Wetter-Bild, und die Maskottchen kommen so auch hier als Familie vor.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Die 16 Bilder sind gemacht (4. November 2026); es fehlen die Aufnahmen und Übersetzungen der neuen Sätze.",
+        "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Seit dem 6. November 2026 (Rückmeldung): immer derselbe kleine Bär, angezogen und allein, groß im Bild in einer typischen Lage (Geburtstagskuchen, Turm, offene Tür, Bett, etwas kaputt, Lutscher zu hoch im Regal, Gewitter draußen); die acht Bilder warten in der Bilder-Warteschlange, bis dahin zeigt die Seite die alten. Die 16 alten Bilder bleiben für später aufgehoben.",
     },
     {
       id: "C-31",
@@ -624,7 +624,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       why: "Ein Gefühl zu benennen ist der erste Schritt, sich selbst zu helfen der zweite. Für den Erwachsenen ist die Antwort ein klarer Hinweis.",
       effort: "M",
       partial:
-        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Die fünf Bilder sind gemacht (4. November 2026); es fehlen die Aufnahmen und Übersetzungen der neuen Sätze.",
+        "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Was brauche ich?“: acht Karten (in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, etwas essen, ausruhen, ein Lied singen), ohne Gefühl davor; das Pusten zeichnet den kleinen Bären, die neuen Bilder warten in der Warteschlange.",
     },
     {
       id: "C-32",
@@ -660,7 +660,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut (4. November 2026): nach dem Gefühl zeigt das Fuchs- oder Bärenkind sein Gesicht groß (der gemeinsame MascotHead mit neuen Augenbrauen, Augen und Mündern), „Kannst du auch so gucken?“, weiter mit einem Tipp. Die Sätze sind nur Deutsch und noch nicht aufgenommen.",
+        "Gebaut (4. November 2026): nach dem Gefühl zeigt das Fuchs- oder Bärenkind sein Gesicht groß (der gemeinsame MascotHead mit neuen Augenbrauen, Augen und Mündern), „Kannst du auch so gucken?“, weiter mit einem Tipp. Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Gefühle nachmachen“: die Köpfe des kleinen Bären mit allen acht Gefühlen, einer getippt wird groß.",
     },
     {
       id: "C-36",
@@ -671,7 +671,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Die Sätze sind nur Deutsch und noch nicht aufgenommen.",
+        "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Seit dem 6. November 2026 (Rückmeldung) ein Regler zum Schieben: ein Tipp auf das Gefühl zeigt sofort den kleinen Bären mit dem Regler, und seine Gesten werden mit jedem Schritt stärker (Arme hoch vor Freude, Fäuste und rote Backen vor Wut); das Pusten ist jetzt eine Karte in „Was brauche ich?“ (C-31).",
     },
   ],
 };

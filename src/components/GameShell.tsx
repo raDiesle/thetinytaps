@@ -44,6 +44,30 @@ const EndShown = createContext<(shown: boolean) => void>(() => {});
 /** For `GameEnd`: says it is on screen (true) or gone again (false). */
 export const useEndShown = () => useContext(EndShown);
 
+/**
+ * A screen inside the game to go back from (a feeling picked in „Wie geht's dir?“, back to all feelings): while a game
+ * sets one, the corner in the top left is the way back to the game's screen before, with one tap, and turns the page
+ * back – „Back is always the screen seen before“ (root CLAUDE.md, user feedback, November 2026).
+ */
+const InnerBack = createContext<(back: (() => void) | undefined) => void>(() => {});
+
+/**
+ * For a game with screens of its own inside (a card picked, then its page): `back` leads to the screen before, and
+ * while it is given the corner's ✕ becomes the way back to it (an arrow, one tap; holding Esc goes there too). Leave it
+ * undefined on the game's first screen, where the corner leaves the game as always.
+ */
+export function useInnerBack(back: (() => void) | undefined) {
+  const set = useContext(InnerBack);
+  const latest = useRef(back);
+  latest.current = back;
+  const on = !!back;
+  useEffect(() => {
+    if (!on) return;
+    set(() => latest.current?.());
+    return () => set(undefined);
+  }, [on, set]);
+}
+
 /** Whether what plays counts as play time: not a tool for the day (`GameShellProps.tool`) nor a routine's step. */
 const CountsPlaytime = createContext(true);
 
@@ -137,6 +161,19 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   const [playing, setPlaying] = useState(false);
   // The end of a level is on screen (GameEnd): the corner is then the way back, not a „Menü“ button.
   const [ended, setEnded] = useState(false);
+  // A screen inside the game to go back from (`useInnerBack`): the corner then goes there instead of leaving.
+  const innerBack = useRef<(() => void) | undefined>(undefined);
+  const [inner, setInner] = useState(false);
+  const setInnerBack = useRef((back: (() => void) | undefined) => {
+    innerBack.current = back;
+    setInner(!!back);
+  }).current;
+  const goInner = () => {
+    const back = innerBack.current;
+    if (back) turnPageWith("back", back);
+  };
+  const goInnerRef = useRef(goInner);
+  goInnerRef.current = goInner;
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const playtime = usePlaytime(playing && !free);
@@ -194,7 +231,11 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
       e.preventDefault();
       if (e.key !== "Escape") return;
       if (!e.repeat) escDownAt = performance.now();
-      else if (escDownAt !== null && performance.now() - escDownAt >= ESC_HOLD_MS) stopRef.current();
+      else if (escDownAt !== null && performance.now() - escDownAt >= ESC_HOLD_MS) {
+        escDownAt = null;
+        if (innerBack.current) goInnerRef.current();
+        else stopRef.current();
+      }
     };
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key === "Escape") escDownAt = null;
@@ -248,19 +289,24 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
         ) : (
           <LeaveGame value={stop}>
             <EndShown value={setEnded}>
-              <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+              <InnerBack value={setInnerBack}>
+                <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+              </InnerBack>
             </EndShown>
           </LeaveGame>
         )}
         {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         {/* The edge of the book's page round the picture (`book.css`). */}
         <div className="book-frame" aria-hidden />
-        {ended && !playtime.goodNight ? (
+        {inner && !ended && !playtime.goodNight ? (
+          // Back to the game's screen before (`useInnerBack`): one tap, held or not, since nothing is left.
+          <TapExit onExit={goInner} sign="back" label={t({ de: "Zurück", ru: "Назад", en: "Back", zh: "返回", hi: "वापस", es: "Atrás", ar: "رجوع" })} />
+        ) : ended && !playtime.goodNight ? (
           // At the end of a level the corner is the way back, as in a menu: one tap, held or not (the „Menü“ button it
           // replaces was a tap too), and onto the shelf it is the book's ribbon, since the book closes and goes back.
           <TapExit
             onExit={stop}
-            shelf={toShelf}
+            sign={toShelf ? "shelf" : "close"}
             label={
               toShelf
                 ? t({
@@ -531,8 +577,12 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   return leave === "hold" ? <HoldExit onExit={onExit} label={label} /> : <TapExit onExit={onExit} label={label} />;
 }
 
-/** The ✕ left with one tap; `shelf` draws the book's ribbon instead, the way back onto the shelf. */
-function TapExit({ onExit, label, shelf = false }: { onExit: () => void; label: string; shelf?: boolean }) {
+/**
+ * The ✕ left with one tap; `shelf` draws the book's ribbon instead, the way back onto the shelf, and `back` the page's
+ * corner with an arrow, back to the game's screen before (`useInnerBack`).
+ */
+function TapExit({ onExit, label, sign = "close" }: { onExit: () => void; label: string; sign?: "close" | "back" | "shelf" }) {
+  const shelf = sign === "shelf";
   return (
     <ExitCorner>
       <button
@@ -545,7 +595,7 @@ function TapExit({ onExit, label, shelf = false }: { onExit: () => void; label: 
         // A click, not pointer down: leaving on the way down would let the lifted finger tap the menu.
         onClick={onExit}
       >
-        {shelf ? <PageCornerArt sign="shelf" /> : <ExitSign />}
+        {sign === "close" ? <ExitSign /> : <PageCornerArt sign={sign} />}
       </button>
     </ExitCorner>
   );

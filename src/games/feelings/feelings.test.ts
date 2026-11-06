@@ -8,7 +8,9 @@ import { DAYS, dayImage, dayImages, firstImage, NIGHT_IMAGE } from "./days";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { BREATH_MS, HELPS, MOODS, morningMood, STRENGTHS, withMood } from "./mood";
+import { MOODS, morningMood, STRENGTH_ANSWERS, STRENGTH_STEPS, strengthAnswer, withMood } from "./mood";
+import { MOOD_PICTURE_QUEUE } from "./moodPictures";
+import { BREATH_MS, NEEDS } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
@@ -91,50 +93,62 @@ test("every story ends on its last step", () => {
   }
 });
 
-// „Wie geht's dir?“ (C-29, C-30): every feeling has its face and the grown-up's hug, and leads to a group; the four
-// that had a weather card keep it for the built site until the faces are made.
-test("every feeling has its face and hug, and leads to a group", () => {
+// „Wie geht's dir?“ (user feedback, November 2026): eight feelings, four pleasant ones first and four unpleasant ones,
+// each with its card of the little bear alone (or planned), and the card before kept for the built site till then.
+test("every feeling has its card, in a group of four", () => {
   expect(new Set(MOODS.map((m) => m.id)).size, "a feeling twice").toBe(MOODS.length);
-  for (const { id, group, weather, caption } of MOODS) {
-    expectPicture(moodImages.face(id));
-    expectPicture(moodImages.hug(id));
-    if (weather) expect(imageFor(moodImages.weather(weather.picture)), moodImages.weather(weather.picture)).toBeDefined();
-    expect(GROUPS.map((g) => g.id)).toContain(group);
+  expect(MOODS.map((m) => m.pleasant)).toEqual([true, true, true, true, false, false, false, false]);
+  for (const { id, caption, moment } of MOODS) {
+    expectPicture(moodImages.feeling(id));
+    expect(imageFor(moodImages.face(id)), `${id}: the built site's card until the new ones are made`).toBeDefined();
     expect(caption.de, id).not.toMatch(/[.!]$/);
+    expect(moment, id).not.toBe("");
   }
-  expect(MOODS.filter((m) => m.weather).length, "the built site's first screen before the faces").toBe(4);
-  // Both mascots show feelings, and each sign of „Wie doll ist es?“ belongs to one feeling only.
-  expect(new Set(MOODS.map((m) => m.kind))).toEqual(new Set(["fox", "bear"]));
-  expect(new Set(MOODS.map((m) => m.sky)).size).toBe(MOODS.length);
 });
 
-// „Wie doll ist es?“ (C-36): three sizes, small to big, and only the biggest of a hard feeling brings the breaths.
-test("the three sizes grow, and the breath's circle keeps time with the game", () => {
-  expect(STRENGTHS.map((s) => s.scale)).toEqual(STRENGTHS.map((s) => s.scale).toSorted((a, b) => a - b));
-  expect(STRENGTHS.length).toBe(3);
+// One figure for every feeling, the little bear, dressed (user feedback, November 2026): the drawings never take the fox.
+test("the feelings are always the little bear, in his clothes", () => {
+  const art = readFileSync("src/games/feelings/moodArt.tsx", "utf8");
+  expect(art).not.toMatch(/kind=\{|kind="fox"/);
+  expect(art).toContain("SHIRT");
+  for (const picture of MOOD_PICTURE_QUEUE) {
+    expect(picture.prompt, picture.id).toContain("light-blue T-shirt and dark blue-purple trousers");
+    expect(picture.ref, picture.id).toEqual(["src/games/feelings/bilder/baer-sad-gut.webp"]);
+  }
+  for (const picture of MOOD_PICTURE_QUEUE.filter((p) => p.id.startsWith("gefuehl-")))
+    expect(picture.prompt, picture.id).toContain("He is the only character: no grown-up");
+});
+
+// „Wie doll ist es?“ (C-36): a slider of a few steps, a little to a whole lot, whose answer grows with it; the breath's
+// circle of „Tief pusten“ keeps time with the game.
+test("the slider goes from a little to a whole lot, and the breath keeps time", () => {
+  expect(STRENGTH_STEPS).toBeGreaterThanOrEqual(3);
+  expect(strengthAnswer(0)).toBe(STRENGTH_ANSWERS[0]);
+  expect(strengthAnswer(STRENGTH_STEPS - 1)).toBe(STRENGTH_ANSWERS[2]);
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
   expect(css).toContain(`mood-breathe ${BREATH_MS / 1000}s`);
 });
 
-// „Was hilft dir jetzt?“ (C-31): three different things after every feeling, each with its card; none is wrong.
-test("every feeling offers three different helps, each with its card", () => {
-  for (const { id, helps } of MOODS) expect(new Set(helps).size, id).toBe(3);
-  for (const help of Object.values(HELPS)) {
-    expectPicture(moodImages.help(help.id));
-    expect(help.caption.de, help.id).not.toMatch(/[.!]$/);
+// „Was brauche ich?“ (C-31): different things, each with its card (or drawn), none of them wrong; its answer says it does good.
+test("every need has its card and says it does good", () => {
+  expect(new Set(NEEDS.map((n) => n.id)).size).toBe(NEEDS.length);
+  for (const need of NEEDS) {
+    if (!need.drawn) expectPicture(moodImages.need(need.id));
+    expect(need.caption.de, need.id).not.toMatch(/[.!]$/);
+    expect(need.answer.de, need.id).toMatch(/\.$/);
   }
-  const offered = new Set(MOODS.flatMap((m) => m.helps));
-  expect([...offered].toSorted(), "a help no feeling offers is never seen").toEqual(
-    Object.values(HELPS)
-      .map((h) => h.id)
-      .toSorted(),
-  );
+});
+
+// From one thing big back to all of them is the page's corner, in each of the book's three small games (user feedback,
+// November 2026: there was no way back from a picked feeling).
+test("the corner goes back from one feeling or need to all of them", () => {
+  for (const f of ["MoodPlay.tsx", "CopyPlay.tsx", "NeedsPlay.tsx"]) expect(readFileSync(`src/games/feelings/${f}`, "utf8"), f).toContain("useInnerBack(");
 });
 
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
 // November 2026). The big picture's slow two-frame fade is the only thing that keeps going.
 test("the game answers calmly", () => {
-  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
+  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "CopyPlay.tsx", "NeedsPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
     readFileSync(`src/games/feelings/${f}`, "utf8"),
   );
   for (const code of files) expect(code).not.toMatch(/float\(|Floater/);
@@ -213,7 +227,7 @@ test("▶ keeps one place, the notes stay off the pages, and the dots go back", 
   const shared = read("shared.tsx");
   const picture = shared.slice(shared.indexOf("export function StoryPicture"), shared.indexOf("export type CardState"));
   expect(picture, "the big picture is no button of its own").not.toContain("onNext");
-  for (const f of ["RoundPlay.tsx", "DayPage.tsx", "MoodPlay.tsx"]) expect(read(f), f).toContain("<GoOn ");
+  for (const f of ["RoundPlay.tsx", "DayPage.tsx"]) expect(read(f), f).toContain("<GoOn ");
   for (const f of ["RoundPlay.tsx", "DayPage.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx"]) expect(read(f), f).not.toContain("fg-next-sign");
   const page = read("DayPage.tsx");
   expect(page).not.toMatch(/story-corner|voiceSwitch|VoiceSwitch|ReadAlong/);

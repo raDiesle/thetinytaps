@@ -28,8 +28,8 @@ export const SEO_EN: SeoTranslation = {
     },
     "/spiele/gefuehle/": {
       title: "Feelings Games for Toddlers",
-      description: "How are you? The child shows how it feels with the weather and helps the little bear with anger, fear and sadness. Free, no ads.",
-      text: "A picture book about feelings: first the child shows how it feels – sun, cloud, rain or thunderstorm. Then the little bear meets everyday situations, and the child picks what helps.",
+      description: "How are you? The child shows its feeling and how strong it is, copies faces, says what it needs and helps the little bear. No ads.",
+      text: "A picture book about feelings: the child shows how it feels and how strongly, copies the little bear's faces and picks what does it good now. And the little bear meets everyday situations, where the child picks what helps.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Letters and Numbers – Keyboard Games",
@@ -60,8 +60,18 @@ export const SEO_EN: SeoTranslation = {
     },
     "/wie-gehts-dir/": {
       title: "How Are You? Showing Feelings for Toddlers",
-      description: "Sun, cloud, rain or thunderstorm: the child shows with a picture how it feels, then sees with the little bear what helps.",
-      text: "A picture says how I feel: the child taps the weather that fits its feeling, and the little bear shows scenes with just that feeling. A start for talking about feelings.",
+      description: "Happy, proud, tired or angry: the child taps the picture that fits its feeling and slides how strong it is. No ads.",
+      text: "Eight feelings in two groups, the pleasant and the unpleasant ones, each with the little bear in a moment children know. The child taps its feeling, then slides how strong it is – the bear shows it with his whole body. A start for talking about feelings.",
+    },
+    "/gefuehle-nachmachen/": {
+      title: "Copy the Feelings – Faces for Toddlers",
+      description: "Happy, sad, angry, scared: the little bear makes a face, and the child copies it, in front of a mirror or with a parent.",
+      text: "Eight faces of the little bear to copy, the pleasant feelings beside the unpleasant ones. One tap shows a face big, and the child tries it – a game that makes feelings visible.",
+    },
+    "/was-brauche-ich/": {
+      title: "What Do I Need? Showing Needs for Toddlers",
+      description: "A hug, time alone, romping, blowing, a drink or a rest: the child shows with a picture what does it good now. No ads.",
+      text: "When a feeling is big, it helps to know what you need. The child taps a picture – a hug, time alone, romping, blowing deeply, a drink, a snack, a rest or a song – and the parents see what does it good now.",
     },
     "/kettenreaktion/": {
       title: "Chain Reaction and Marble Run for Kids",

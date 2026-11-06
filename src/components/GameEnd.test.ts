@@ -26,6 +26,6 @@ test("the end of a level has no way back of its own: the corner is it", async ()
   expect(end).toMatch(/useEndShown\(\)/);
   const shell = await Bun.file("src/components/GameShell.tsx").text();
   expect(shell).toMatch(/<EndShown value=\{setEnded\}>/);
-  expect(shell).toMatch(/ended && [^?]*\?\s*\(?[\s\S]{0,400}<TapExit[\s\S]{0,60}shelf=\{toShelf\}/);
-  expect(shell).toMatch(/sign="shelf"/);
+  expect(shell).toMatch(/ended && [^?]*\?\s*\(?[\s\S]{0,400}<TapExit[\s\S]{0,60}sign=\{toShelf \? "shelf" : "close"\}/);
+  expect(shell).toMatch(/<PageCornerArt sign=\{sign\} \/>/);
 });

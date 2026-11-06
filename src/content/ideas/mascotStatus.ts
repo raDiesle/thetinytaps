@@ -173,15 +173,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/wie-gehts-dir/",
-    note: "Acht Gefühle als Fuchs- oder Bärenkind mit Mama oder Papa (C-30); das Gesicht zum Nachmachen ist der gemeinsame MascotHead. Danach spielen die Szenen von „Alltagssituationen“.",
+    note: "Immer derselbe kleine Bär, allein, in T-Shirt und Hose (6. November 2026): auf jeder Gefühlskarte in einem Moment, der das Gefühl bringt, und groß als Zeichnung (MascotHead), deren Gesten mit dem Regler stärker werden.",
     tasks: [
-      {
-        label: "Fuchs- oder Bärenkind macht das Gesicht des Gefühls groß vor und pustet mit (MascotHead)",
-        work: "drawing",
-        effort: "S",
-        idea: "C-35",
-        state: "done",
-      },
       {
         label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter), und wird in den Arm genommen",
         work: "picture",
@@ -189,8 +182,43 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "M",
         idea: "C-30",
         state: "done",
-        note: "Gebaut, die 16 Bilder (gesicht-…) gemacht am 4. November 2026.",
+        note: "Gebaut, die 16 Bilder (gesicht-…) gemacht am 4. November 2026; seit dem 6. November 2026 nur noch auf der gebauten Seite, bis die neuen Karten des kleinen Bären allein gemacht sind (die Bilder bleiben für später).",
       },
+      {
+        label: "Der kleine Bär allein in T-Shirt und Hose, nah und groß, in einem Moment jedes Gefühls (Geburtstagskuchen, Turm, offene Tür …)",
+        work: "picture",
+        pictures: 8,
+        effort: "M",
+        idea: "C-30",
+        note: "Wunsch vom 6. November 2026, in der Bilder-Warteschlange (gefuehl-…).",
+      },
+      {
+        label: "Der kleine Bär (MascotHead in T-Shirt und Hose) zeigt mit dem Regler, wie stark das Gefühl ist",
+        work: "drawing",
+        effort: "S",
+        idea: "C-36",
+        state: "done",
+      },
+    ],
+  },
+  {
+    href: "/gefuehle-nachmachen/",
+    note: "Der Kopf des kleinen Bären (MascotHead) mit dem Gesicht jedes Gefühls, zum Nachmachen.",
+    tasks: [{ label: "Bärenkind macht das Gesicht des Gefühls groß vor (MascotHead)", work: "drawing", effort: "S", idea: "C-35", state: "done" }],
+  },
+  {
+    href: "/was-brauche-ich/",
+    note: "Der kleine Bär tut, was er gerade braucht; ein Erwachsener nur dort, wo es dazugehört (in den Arm nehmen), angezogen.",
+    tasks: [
+      {
+        label: "Der kleine Bär in T-Shirt und Hose tut, was er braucht (kuscheln, allein sein, toben, trinken, essen, ausruhen, Lied)",
+        work: "picture",
+        pictures: 7,
+        effort: "M",
+        idea: "C-31",
+        note: "Wunsch vom 6. November 2026, in der Bilder-Warteschlange (brauche-…); bis dahin zeigt die gebaute Seite die alten hilft-… Bilder, wo es sie gibt.",
+      },
+      { label: "Bärenkind pustet mit (MascotHead)", work: "drawing", effort: "S", idea: "C-31", state: "done" },
     ],
   },
   {

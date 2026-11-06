@@ -392,8 +392,9 @@ function WavingArm({ kind }: { kind: MascotKind }) {
   );
 }
 
-// The body, a soft pear from the neck to the feet, and the pale belly on it: the fox's white chest in tufts, the bear's round.
-const BODY = "M100 142 C68 142 47 170 43 208 C39 248 58 278 100 279 C142 278 161 248 157 208 C153 170 132 142 100 142 Z";
+// The body, a soft pear from the neck to the feet (`BODY`, also for figures dressed in clothes round it), and the pale
+// belly on it: the fox's white chest in tufts, the bear's round.
+export const BODY = "M100 142 C68 142 47 170 43 208 C39 248 58 278 100 279 C142 278 161 248 157 208 C153 170 132 142 100 142 Z";
 const FOX_BELLY = "M82 150 Q90 160 100 156 Q110 160 118 150 C128 170 132 194 130 220 C128 248 116 266 100 266 C84 266 72 248 70 220 C68 194 72 170 82 150 Z";
 const BEAR_BELLY = "M100 166 C121 166 135 190 135 219 C135 247 120 266 100 266 C80 266 65 247 65 219 C65 190 79 166 100 166 Z";
 
@@ -414,8 +415,8 @@ function FoxTail() {
   );
 }
 
-/** One foot at `x`: the fox's dark paw with its toes, the bear's with pale pads on its sole. */
-function Foot({ x, kind }: { x: number; kind: MascotKind }) {
+/** One foot at `x` (in `Mascot`'s 200 × 300 box): the fox's dark paw with its toes, the bear's with pale pads on its sole. */
+export function Foot({ x, kind }: { x: number; kind: MascotKind }) {
   const c = MASCOT_COLORS[kind];
   return (
     <g>
@@ -434,8 +435,11 @@ function Foot({ x, kind }: { x: number; kind: MascotKind }) {
   );
 }
 
-/** One arm from the shoulder `from` bending through `via` to the paw at `to`: chubby fur with the line round it, and a round paw with toes. */
-function Arm({ from, via, to, kind }: { from: [number, number]; via: [number, number]; to: [number, number]; kind: MascotKind }) {
+/**
+ * One arm from the shoulder `from` bending through `via` to the paw at `to`: chubby fur with the line round it, and a round
+ * paw with toes – for a figure in `Mascot`'s box that takes poses of its own (Gefühle's bear showing how strong a feeling is).
+ */
+export function Arm({ from, via, to, kind }: { from: [number, number]; via: [number, number]; to: [number, number]; kind: MascotKind }) {
   const c = MASCOT_COLORS[kind];
   const d = `M${from[0]} ${from[1]} Q${via[0]} ${via[1]} ${to[0]} ${to[1]}`;
   const fox = kind === "fox";

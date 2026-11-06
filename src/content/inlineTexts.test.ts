@@ -13,8 +13,16 @@ const FOLDERS: Record<string, string[]> = {
   "/bilder/": ["src/games/scenes"],
   "/abenteuer/": ["src/games/adventure"],
   "/gefuehle/": ["src/games/feelings"],
-  // A game of its own in the book „Gefühle“, sharing the folder: its own files only.
-  "/wie-gehts-dir/": ["src/games/feelings/MoodGame.tsx", "src/games/feelings/MoodPlay.tsx", "src/games/feelings/mood.ts"],
+  // Games of their own in the book „Gefühle“, sharing the folder: their own files only, which the folder's row leaves out.
+  "/wie-gehts-dir/": [
+    "src/games/feelings/MoodGame.tsx",
+    "src/games/feelings/MoodPlay.tsx",
+    "src/games/feelings/mood.ts",
+    "src/games/feelings/moodArt.tsx",
+    "src/games/feelings/moodGroups.tsx",
+  ],
+  "/gefuehle-nachmachen/": ["src/games/feelings/CopyGame.tsx", "src/games/feelings/CopyPlay.tsx", "src/games/feelings/copy.ts"],
+  "/was-brauche-ich/": ["src/games/feelings/NeedsGame.tsx", "src/games/feelings/NeedsPlay.tsx", "src/games/feelings/needs.ts"],
   "/kettenreaktion/": ["src/games/marbles"],
   "/kleine-abenteuer/": ["src/games/elevator"],
   "/tiere/": ["src/games/animals"],
@@ -38,13 +46,16 @@ const FOLDERS: Record<string, string[]> = {
 /** Grown-ups' pages that stay German (CLAUDE.md): the management page. */
 const GERMAN_ONLY = /management|ManagementPage/;
 
-/** Every .ts/.tsx file below `path` (or `path` itself), tests left out. */
+/** Files a row names one by one: they are that game's, so a row naming their whole folder leaves them out. */
+const OWN_FILES = new Set(Object.values(FOLDERS).flatMap((paths) => paths.filter((p) => /\.tsx?$/.test(p))));
+
+/** Every .ts/.tsx file below `path` (or `path` itself), tests and other games' own files left out. */
 function sources(path: string): string[] {
   if (/\.tsx?$/.test(path)) return [path];
   return readdirSync(path, { recursive: true, encoding: "utf8" })
     .filter((f) => /\.tsx?$/.test(f) && !f.includes(".test."))
     .map((f) => `${path}/${f}`)
-    .filter((f) => !GERMAN_ONLY.test(f));
+    .filter((f) => !GERMAN_ONLY.test(f) && !OWN_FILES.has(f));
 }
 
 /** A literal text (or a function building one, `de: (n) => …`) with a `de` key in a source file: where it starts and the keys next to it. */

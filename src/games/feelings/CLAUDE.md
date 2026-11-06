@@ -1,40 +1,47 @@
 # Gefühle
 
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
-`cover-gefuehle.webp`; user decision, November 2026) with two games; their names are in `names.ts`. Ideas for more
-games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes area C:
-- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`) plays at once,
-  one step after the other (ideas C-29 to C-36):
-  1. Eight cards of feelings (`MOODS`: fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich – C-29), each
-     a fox or bear child showing it in its face with Mama or Papa beside it (`gesicht-…`, C-30), four of each, so both
-     mascots are there. Picked, its grown-up takes the little one in its arms (`gesicht-…-arm`) while „Das kenne ich
-     auch!“ is said. Until all sixteen pictures are made, the built site shows the four old weather cards instead
-     (`wetter-…`, `Mood.weather`, `SHOWS_FACES`), the dev server their placeholders.
-     **Morning and evening** (C-33): the feeling picked is kept per time of day (`MoodDay` under
-     `tinytaps.mood.day.v2`, `daytimeOf` from Zähne putzen: before 14:00 is morning); in the evening, where the child
-     picked one this morning, both cards stand side by side instead of the hug, a little longer (`COMPARE_MS`) –
-     „Heute früh: …“ paler, „Jetzt: …“ – so the grown-up can talk about how the day changed it. Only today's morning
-     counts (`morningMood`), nothing older is kept. The Tagesplan's „Wie geht's dir?“ card (a ritual, `rituals.ts` in
-     `rewards/`) opens the game with `{ returnTo }`, and the pick calls `finishRoutineStep()`, so back on the plan the
-     card is ticked. The comparison is the answer: still pictures, nothing floats up.
-  2. The little one makes the feeling's face big for the child to copy, for a mirror or the grown-up (C-35, `BigFace`):
-     the shared `MascotHead` with the feeling's brows, eyes and mouth (`Mood.face`) – drawn, so it is there at once.
-     „Kannst du auch so gucken?“ and ▶; it waits for a tap, since copying takes the child its time.
-  3. „Wie doll ist es?“ (C-36): the feeling's weather (`Mood.sky`: sun, rainbow, wind, snowflake, cloud, rain, storm,
-     dark forest – C-29's weathers live on here) drawn small, middling and big on three cards, no numbers. A hard
-     feeling (`Mood.hard`) „ganz doll“ first gets two slow breaths blown together: the little one blows with closed
-     eyes while a soft circle grows and shrinks round it (`.mood-breath`, its own layer, `BREATH_MS`), then
-     „Schon besser.“
-  4. „Was hilft dir jetzt?“ (C-31): three cards of the little bear doing what helps (`Mood.helps` from `HELPS`:
-     kuscheln, toben, etwas trinken, ein bisschen allein sein, ein Lied – the three that fit that feeling, none of them
-     wrong, so the grown-up sees what the child needs); the picked one shows big with its line („Kuscheln tut gut.“).
-     The built site asks it only once all five `hilft-…` pictures are made (`ASKS_HELP`).
-  5. A pass of the feeling's group plays (`Mood.group`), without touching the place „Alltagssituationen“ goes on from
-     (`remember={false}`). „Nochmal“ asks for the feeling again.
-     Keys: digits pick that card, any other key one at random (or goes on from the face). The face and the weather signs
-     are SVG drawings, not Gemini pictures: a face to copy and a size to compare must be plain and the same each time,
-     and they need no picture to wait for. A new feeling gets its face, sky, helps and group in `MOODS` and its two
-     pictures in `bilder/README.md` and the queue (`feelings.test.ts` checks).
+`cover-gefuehle.webp`; user decision, November 2026) with four games; the names of the translated ones are in
+`names.ts`, those still German-only in their own files (`copy.ts`, `needs.ts`), so each language row reads its own.
+Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
+area C. The first three are small games of their own, each doing one thing (user feedback, November 2026: copying faces and
+what helps were steps of „Wie geht's dir?“ and became games of their own):
+- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`) plays at once:
+  1. Eight cards of feelings (`MOODS`: fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich – C-29) in
+     two groups (`MoodGroups`, `moodGroups.tsx`): the pleasant ones on a warm yellow panel, the unpleasant ones on a cool
+     blue-grey one, each named small for grown-ups („Angenehme / Unangenehme Gefühle“), side by side on wide screens and
+     one above the other upright. Each card is the little bear alone with the feeling, in a moment that brings it
+     (`Mood.moment`, `gefuehl-…`, queued in `moodPictures.ts`). Until all eight are made the built site shows the cards
+     before (`gesicht-…`, a fox or bear child with Mama or Papa, `SHOWS_NEW`), never a mix; the dev server the new
+     placeholders. Digits pick that card, any other key one at random.
+  2. A tap shows at once the card beside the little bear standing, drawn (`FeelingBear`), with a slider under him:
+     „Wie doll ist es?“ (C-36). Sliding (or the arrow keys) goes from a little to a whole lot in `STRENGTH_STEPS` steps:
+     his arms, his body and his face grow with the feeling (`GESTURES`: jumping for joy, paws on the hips, on tiptoes,
+     paws on the tummy, rubbing an eye, hanging his head with a tear, fists up and red, making himself small); each
+     step passed plays a rising note, and let go the voice says „Ein bisschen.“, „Schon ziemlich.“ or „Ganz doll!“. The
+     slider is a band from thin to thick in the group's colour, no numbers, a big knob with a still 👆 under it before the
+     first slide; the knob is an HTML layer moved by `--at`, the bear is drawn again only when a step changes.
+     The cards' paper rings (9px round them, 15px below) lie outside their box: every size worked out in `feelings.css`
+     (`--card-w` of `.mood-groups`, `.mood-needs`) counts them, the panels' borders (`--rim`) and the gaps, so no ring
+     touches another, a group's name or the screen's edge (they did at 844×390 and ran past 1024×768 before).
+     The corner in the top left is a round arrow back to all feelings while one is shown (`useInnerBack`, see the root
+     `CLAUDE.md`), the ✕ again on the cards. **Morning and evening** (C-33): the feeling picked is kept per time of day
+     (`MoodDay` under `tinytaps.mood.day.v2`, `daytimeOf` from Zähne putzen: before 14:00 is morning); in the evening the
+     card picked this morning says „Heute früh: …“ under it. Only today's morning counts (`morningMood`). The Tagesplan's
+     „Wie geht's dir?“ card (a ritual, `rituals.ts` in `rewards/`) opens the game with `{ returnTo }`, and the pick calls
+     `finishRoutineStep()`, so back on the plan the card is ticked.
+- **„Gefühle nachmachen“** (`/gefuehle-nachmachen/`, `CopyGame.tsx`, `CopyPlay.tsx`, C-35): the little bear's head with
+  each feeling's face (`BigFace`, the shared `MascotHead` with `Mood.face`), in the same two groups. A tap shows it big
+  with „Kannst du auch so gucken?“, for a mirror or the grown-up; a tap on it (or any key) asks again; the corner goes
+  back. Drawn, so every face is there at once and the same each time.
+- **„Was brauche ich?“** (`/was-brauche-ich/`, `NeedsGame.tsx`, `NeedsPlay.tsx`, `needs.ts`, C-31): cards of what the
+  child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, tief pusten, trinken, essen, ausruhen, ein
+  Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees what the child
+  needs. „Tief pusten“ is drawn (`Need.drawn`): the bear blows two slow breaths with the soft circle round him
+  (`.mood-breath`, its own layer, `BREATH_MS`), then „Schon besser.“. The cards are the little bear doing it
+  (`brauche-…`, queued); the built site shows the old `hilft-…` card till then (`madeOr`), and leaves out a need with
+  neither. A tap on the big picture (or any key) says it again; the corner goes back.
+
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
   the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row
   „Geschichten: 📅 Tage / 😊 Nach Gefühlen“ (`settings.order`) switches to one card per group of feelings
@@ -43,6 +50,15 @@ games in the book are area J on `/management/` (`src/content/ideas/j-feelings-ga
   always stand in their fixed order; the day or group played last keeps its place, marked „zuletzt“, and goes on with
   the scene where the child stopped (`settings.day`/`dayScene`, `settings.group`/`scene`). The old addresses
   `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
+
+**Pictures of the feelings (user feedback, November 2026):** always the same figure, the little bear, never the fox or
+a changing child; alone – no grown-up beside him – unless the thing shown needs one (a hug); close and big, the
+feeling the biggest thing in the picture, with little background to distract; and in a moment children know that brings
+the feeling (a birthday cake in front of him, the tower he built, waiting at the open door, lying on the bed, a toy
+broken, the lollipop too high on the shelf, lightning outside). He and everyone else wears clothes, as in every picture
+of the app. The pictures made before (`gesicht-…`, `hilft-…`, `wetter-…`) are kept for later use, never deleted.
+`feelings.test.ts` checks the bear, his clothes and the groups. Good and unpleasant feelings always stand apart, as two
+groups, wherever the feelings are listed.
 
 **Tagesgeschichten (user idea, November 2026):** every scene stands in exactly one of eight days (`DAYS`, checked in
 `feelings.test.ts`), in the order of a day from getting up to going to sleep, and before each scene a **page of the
@@ -77,8 +93,8 @@ loudspeaker for the music). One tap on it (never held: held, it was too slow for
 the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; tapped again, it speaks again. The sounds
 (crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
 already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
-to tell them. „Wie geht's dir?“ always speaks (`MoodGame` sets `voice: true`) and has no such switch; no other game gets
-one (`feelings.test.ts`).
+to tell them. „Wie geht's dir?“, „Gefühle nachmachen“ and „Was brauche ich?“ always speak (their `…Game` sets `voice: true`) and
+have no such switch; no other game gets one (`feelings.test.ts`).
 
 **The text to read out (user wish and feedback, November 2026):** for grown-ups who tell the scenes themselves, a
 paper note with an open book stands in the screen's bottom right corner, left of the loudspeaker (`ReadAlong.tsx`,
@@ -91,7 +107,7 @@ its answer), the good one (tick, caption, what is told), the happy end. While th
 now is marked with the highlighter and scrolled into view; **with the voice off everything shows alike, nothing marked,
 since the grown-up reads it all** – and switching the voice off opens the sheet by itself. It stays open from scene to
 scene and visit to visit (`settings.text`), but steps aside at a pass's end, where „Weiter“ stands. Only in
-„Alltagssituationen“, never in „Wie geht's dir?“; `feelings.test.ts` checks that the sheet holds every line a round says
+„Alltagssituationen“, never in the book's other games; `feelings.test.ts` checks that the sheet holds every line a round says
 – a new kind of line said in a round goes into `readAlong` too – and that both notes are tapped, never held (`tapProps`).
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
@@ -111,7 +127,7 @@ out and the good one left. The good card gets a still green frame with a tick an
 Keys: the left arrow picks the not-so-good idea, every other key the good one.
 
 **▶ has one place, and the whole screen goes on (user feedback, November 2026):** wherever the game waits for a tap
-to go on – a scene told, a chosen idea's last picture, a page of a day's story, „Wie geht's dir?“'s face to copy – ▶
+to go on – a scene told, a chosen idea's last picture, a page of a day's story – ▶
 stands at the same spot, the screen's bottom right corner, and a tap anywhere on the screen goes on (`GoOn` in
 `shared.tsx`), except within reach of anything else that can be tapped (the dots, the grown-ups' notes, ✕), whose taps
 stay theirs. Nothing else ever stands in that corner: the grown-ups' notes stand left of it (`feelings.test.ts`). ▶ on
@@ -272,8 +288,8 @@ The big picture of the story is a framed photo – white mat, soft shadow – an
 pale a moment after the child has to choose, so it never looks like one of the
 cards (which have the yellow ring and stand out like buttons).
 
-Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only „Wie geht's dir?“'s face to copy
-and weather signs are drawn, see above).
+Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear standing with his
+slider, his face to copy and his blowing are drawn, see above).
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out

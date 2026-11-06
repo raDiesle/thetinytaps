@@ -182,8 +182,9 @@ Children's picture-book illustration for 2–4 year olds, like a page of a print
 picture book. Soft, flat, rounded shapes with thick dark plum ink outlines
 (#3d3045), warm friendly colours softened like gouache printed on matte paper –
 still clear and easy to tell apart, never dull or grey – gentle shading. Simple,
-uncluttered background. No text, no letters, no numbers, no speech bubbles,
-no frames, no book, page or paper edge drawn around the picture.
+uncluttered background. Every fox and bear wears clothes. No text, no letters,
+no numbers, no speech bubbles, no frames, no book, page or paper edge drawn
+around the picture.
 ```
 
 The app draws the book, its page and margin round every picture itself: never ask Gemini for them, and keep the
@@ -200,6 +201,10 @@ bear“ in `CLAUDE.md`): now and then a fox or bear grown-up instead of a person
 not in every picture. Pass a picture of Tapsi or the fox family (`src/components/bilder/buch-fuechse.webp`) or of the
 bear family (`buch-baeren.webp`) as `--ref`, so every fox and every bear is the same kind. A picture that a task in
 `src/content/ideas/mascotStatus.ts` asks for goes into the batch with the other waiting ones there, and the task is marked.
+**Every fox and bear wears clothes** (user feedback, November 2026: the grown-up bears of the old „Was hilft“ cards
+stood there naked): the block says so, and a prompt names what they wear – the little bear his light-blue T-shirt and
+dark blue-purple trousers, a grown-up a sweater, a dress or a shirt. A child the picture is about stands in front and
+big, alone unless what it shows needs someone else (a hug), on a calm background that doesn't draw the eye away.
 
 For `--transparent` drop "Simple, uncluttered background" and "printed on matte paper" (a paper texture spoils the
 cut-out) – the script adds the flat backdrop instruction itself. Never ask a cut-out for a shape behind its subject („a round sticker“, „inside a
