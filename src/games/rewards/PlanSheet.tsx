@@ -6,13 +6,14 @@ import { tapState } from "@/lib/tapTargets";
 import { AUTO_TITLES, cellKey, isTemplateTitle, type LinkedDays, weekday } from "./board";
 import { useRewardLabel } from "./BoardSheet";
 import { DAY_NAMES, MARK_BY_ID, MARKS, type NightLook, nightLookOf, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import { DaySign, type DaySignSet, PARTS_OF, SLOT_EMOJI } from "./daySigns";
 import { ItemPic, MarkPic, NightPic, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
 import {
   bigDayCome,
   bigDayStep,
   counting,
-  MAX_PART_STEPS,
+  dayPartsOf,
   MAX_STARS,
   MAX_NIGHTS,
   MAX_STEPS,
@@ -21,7 +22,7 @@ import {
   nightsUntil,
   nowSteps,
   pairsOf,
-  partsOf,
+  partIn,
   type Plan,
   type PlanStep,
   planProgress,
@@ -31,6 +32,7 @@ import {
   starsGot,
   starsOf,
   stepDone,
+  stepLimit,
   stepsOn,
 } from "./plan";
 
@@ -105,32 +107,11 @@ export function usePlanTitle() {
  * it makes the cards clearly bigger (`ROW_GAIN`, user feedback, November 2026). Reading order: left to right, then the
  * next row.
  *
- * A card more fills the last row before anything moves (user feedback, November 2026): the layout for `count` is the
- * one for a card less while it still has a free place, so ＋ on the sheet puts the new card where the ＋ was and the ＋
- * moves on to the next place. Only once the rows are full is the layout chosen anew – one row more with the same
- * columns, so the ＋ goes down into a new row and no card changes its row, unless another shape makes the cards much
- * bigger (`REFLOW_GAIN`; or the cards still fit in one line). It is a function of `count` alone, so a card taken away goes back the
- * same way.
+ * The cards always take the best layout for how many there are (user feedback, November 2026: no empty place kept for a
+ * ＋ card): a new card is put in with the ＋ at a card's edge, and only then the cards are laid out anew, as big as they
+ * can be again.
  */
-export function planLayout(count: number, aspect: number): { cols: number; rows: number } {
-  let layout = bestLayout(1, aspect);
-  for (let n = 2; n <= count; n++) {
-    if (n <= layout.cols * layout.rows) continue;
-    const line = bestLayout(n, aspect);
-    if (line.rows === 1) {
-      layout = line;
-      continue;
-    }
-    // Several rows either way: the biggest cards, with no leaning towards fewer rows, against one row more below.
-    const biggest = bestLayout(n, aspect, 1);
-    const below = { cols: layout.cols, rows: layout.rows + 1 };
-    layout = cardSize(biggest, aspect) > cardSize(below, aspect) * REFLOW_GAIN ? biggest : below;
-  }
-  return layout;
-}
-
-/** The layout with the biggest cards for `count` cards on its own, a row more only where it makes them `gain` times bigger. */
-function bestLayout(count: number, aspect: number, gain = ROW_GAIN): { cols: number; rows: number } {
+export function planLayout(count: number, aspect: number, gain = ROW_GAIN): { cols: number; rows: number } {
   let best = { cols: Math.max(1, count), rows: 1, size: 0 };
   for (let rows = 1; rows <= Math.max(1, count); rows++) {
     const cols = Math.ceil(count / rows);
@@ -147,9 +128,6 @@ function cardSize({ cols, rows }: { cols: number; rows: number }, aspect: number
 
 /** How much bigger the cards must get for another row: a day read in one line beats cards a little bigger. */
 const ROW_GAIN = 1.15;
-
-/** How much bigger the cards must get for the rows to be laid out anew rather than one more added below. */
-const REFLOW_GAIN = 1.35;
 
 /** Width / height of a card with star fields: taller than wide, the picture on top and the big fields below it. */
 const STAR_CARD = 0.8;
@@ -231,6 +209,9 @@ export function PlanSheet({
           <span className="rw-title">{title}</span>
         )}
         {sub && <span className="rw-blank">{sub}</span>}
+        {/* No reward by default, and none takes room on the sheet (user feedback, November 2026): while it is made a
+            small „＋ Belohnung“ in the heading's corner adds one. */}
+        {editing && props.counts && plan.view !== "countdown" && !plan.reward && <AddReward />}
       </header>
       <div className="rw-body">
         {plan.view === "countdown" ? (
@@ -242,7 +223,7 @@ export function PlanSheet({
         ) : (
           <DaySteps {...props} aspect={aspect} />
         )}
-        {props.counts && plan.view !== "countdown" && (plan.reward || editing) && <PlanGoal {...props} />}
+        {props.counts && plan.view !== "countdown" && plan.reward && <PlanGoal {...props} />}
       </div>
     </div>
   );
@@ -290,6 +271,8 @@ function StepCard({
   small = false,
   counts = false,
   edit = false,
+  insert,
+  every = false,
 }: {
   day: Date;
   step: PlanStep;
@@ -304,6 +287,10 @@ function StepCard({
   counts?: boolean;
   /** Being made or changed: ⚙️ and 🗑️ on it, and its own number of stars set right at them (`StarStep`). */
   edit?: boolean;
+  /** While it is made: the ＋ at its edges that put a new card before it (and, `last`, after it), across a line or down a column. */
+  insert?: { axis: "row" | "column"; last: boolean };
+  /** The ＋ at its edges put the new card into every day (a week alike every day). */
+  every?: boolean;
 }) {
   const t = useT();
   const label = useStepLabel()(step);
@@ -321,6 +308,7 @@ function StepCard({
     >
       {number !== undefined && <span className="pl-number">{number}</span>}
       {edit && <CardActions cell={key} label={label} />}
+      {edit && insert && <InsertCard cell={key} axis={insert.axis} last={insert.last} every={every} />}
       <span className="pl-emoji" aria-hidden>
         <ItemPic item={step} lines={look.print && !look.color} />
       </span>
@@ -368,7 +356,9 @@ const MORE_STARS: Localized = {
  * (user feedback, November 2026: the small dots of the generalised plan looked poorer than the board of before), filled
  * with its star sticker as the child taps, the newest popping in. On paper empty rings, for a sticker or a crayon.
  * While it is made (`edit`) − and ＋ stand at the row's ends – no number: the rings show how many (user feedback,
- * November 2026) –, and under the mouse ＋ shows the ring it would add (`ghost`) and − marks the one it would take.
+ * November 2026) –, and under the mouse ＋ shows the ring it would add (`ghost`) and − marks the one it would take. The
+ * ghost keeps its place unseen while the mouse is elsewhere, so neither − nor ＋ nor a ring moves when it shows (user
+ * feedback, November 2026).
  */
 function StarFields({ stars, got, edit, ghost = !!edit }: { stars: number; got: number; edit?: { cell: string; every?: boolean }; ghost?: boolean }) {
   return (
@@ -463,17 +453,10 @@ const DELETE_ASK: Localized = {
  * without it the stars stay, only the picture goes.
  */
 function PlanGoal({ plan, ticks, linked, day, look, edit }: StepsProps) {
-  const t = useT();
   const rewardLabel = useRewardLabel();
   const { count, goal } = planProgress(plan, ticks, linked, day);
   const reward = plan.reward;
-  if (!reward)
-    return (
-      <div className="pl-goal pl-goal-add" data-edit="reward" role="button" tabIndex={0}>
-        <span aria-hidden>🎁</span>
-        <span className="pl-goal-label">＋ {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}</span>
-      </div>
-    );
+  if (!reward) return null;
   const label = rewardLabel(reward);
   return (
     <div className={`pl-goal${!look.print && count >= goal ? " reached" : ""}`} data-edit={edit ? "reward" : undefined} title={label}>
@@ -511,74 +494,38 @@ function NoSteps() {
 }
 
 /**
- * A part's sign before its row: ☀️ for the morning, 🌙 for the evening – a picture, not a word („Morgens“ only read out),
- * big, as it stands for the whole row. While the plan is made a 🗑️ sits above it: with another part beside it, it takes
- * the whole line away (`remove="row"`); on the last part only the sign, so the day becomes one line (`"sign"`, user
- * feedback, November 2026). Under the mouse it asks („„Abends“ löschen?“) and marks red what would go.
+ * A part's sign before its line: the set chosen in the band (`Plan.signs`: a drawn sky, the child's pictures, sun and
+ * moon …), big, as it stands for the whole line; its name only read out. Without a set the line has no sign, only its
+ * tint. The parts themselves are chosen in the band („Tageszeiten“), never taken away here (user feedback, November 2026).
  */
-function PartName({ part, remove }: { part: Slot; remove?: "row" | "sign" }) {
+function PartName({ part, set, lines }: { part: Slot; set: DaySignSet; lines: boolean }) {
   const t = useT();
   const slot = SLOT_BY_ID.get(part);
   if (!slot) return null;
   return (
     <span className="pl-part">
-      {remove && (
-        <SheetAction
-          act="delete"
-          side="left"
-          ask={
-            remove === "row"
-              ? t(DELETE_ASK).replace("{name}", t(slot.label))
-              : t({
-                  de: "Zeichen löschen?",
-                  en: "Delete sign?",
-                  zh: "删除标记？",
-                  hi: "निशान मिटाएँ?",
-                  es: "¿Borrar el símbolo?",
-                  ar: "حذف الرمز؟",
-                  ru: "Удалить значок?",
-                })
-          }
-          data={{ "data-edit": remove, "data-part": part }}
-        />
-      )}
       <span className="pl-part-sign" role="img" aria-label={t(slot.label)} title={t(slot.label)}>
-        {slot.emoji}
+        <DaySign set={set} part={part} lines={lines} />
       </span>
     </span>
   );
 }
 
-/** While a day in one line is made: ☀️ and 🌙, pale, to give the line a sign again – its cards become the morning's or the evening's. */
-function SignBack() {
-  const t = useT();
-  return (
-    <span className="pl-part pl-sign-back">
-      {(["morning", "evening"] as Slot[]).map((id) => {
-        const slot = SLOT_BY_ID.get(id);
-        if (!slot) return null;
-        const label = t({
-          de: "„{name}“ davor",
-          en: "Put “{name}” in front",
-          zh: "前面加上“{name}”",
-          hi: "आगे “{name}” लगाएँ",
-          es: "Poner «{name}» delante",
-          ar: "وضع «{name}» في البداية",
-          ru: "Поставить «{name}» в начало",
-        }).replace("{name}", t(slot.label));
-        return (
-          <span key={id} className="pl-sign-add" data-edit="sign-back" data-part={id} role="button" tabIndex={0} aria-label={label} title={label}>
-            {slot.emoji}
-          </span>
-        );
-      })}
-    </span>
-  );
-}
+/** „Karte dazu“: the ＋ of a place to add a card, also what it reads out. */
+const ADD_CARD: Localized = {
+  de: "Karte dazu",
+  en: "Add a card",
+  zh: "添加卡片",
+  hi: "कार्ड जोड़ें",
+  es: "Añadir tarjeta",
+  ar: "إضافة بطاقة",
+  ru: "Добавить карточку",
+};
 
 /**
- * While a plan is made: where a card is added – at the end of a part's line, of a day's column in the week, or (`every`)
- * to every day of a week's grid.
+ * While a plan is made, where nothing stands yet: the one place to add a card to an empty day, an empty part of the
+ * day or an empty column of the week. Beside cards a new one comes with the ＋ at their edges (`InsertCard`), so no
+ * empty place is kept for it (user feedback, November 2026).
  */
 function AddCard({ part, day, small = false, every = false }: { part?: Slot; day?: string; small?: boolean; every?: boolean }) {
   const t = useT();
@@ -591,10 +538,54 @@ function AddCard({ part, day, small = false, every = false }: { part?: Slot; day
       data-every={every ? "" : undefined}
       role="button"
       tabIndex={0}
-      aria-label={t({ de: "Karte dazu", en: "Add a card", zh: "添加卡片", hi: "कार्ड जोड़ें", es: "Añadir tarjeta", ar: "إضافة بطاقة", ru: "Добавить карточку" })}
-      title={t({ de: "Karte dazu", en: "Add a card", zh: "添加卡片", hi: "कार्ड जोड़ें", es: "Añadir tarjeta", ar: "إضافة بطاقة", ru: "Добавить карточку" })}
+      aria-label={t(ADD_CARD)}
+      title={t(ADD_CARD)}
     >
       ＋
+    </span>
+  );
+}
+
+/**
+ * While a plan is made: a small round ＋ on a card's edge – before it, and on the last card after it too – that puts a
+ * new card right there (user feedback, November 2026: WYSIWYG, left or right of any card). Under the mouse a bar shows
+ * where the card goes. `axis` says whether the cards run across (a line) or down (a week's column).
+ */
+function InsertCard({ cell, axis, last, every }: { cell: string; axis: "row" | "column"; last: boolean; every: boolean }) {
+  const t = useT();
+  const sides: ("before" | "after")[] = last ? ["before", "after"] : ["before"];
+  const names: Record<"before" | "after", Localized> = {
+    before: axis === "row" ? { de: "Karte links davor einfügen" } : { de: "Karte darüber einfügen" },
+    after: axis === "row" ? { de: "Karte rechts dahinter einfügen" } : { de: "Karte darunter einfügen" },
+  };
+  return (
+    <>
+      {sides.map((side) => (
+        <span
+          key={side}
+          className={`pl-insert pl-insert-${axis} ${side}`}
+          data-edit="insert"
+          data-cell={cell}
+          data-side={side}
+          data-every={every ? "" : undefined}
+          role="button"
+          tabIndex={0}
+          aria-label={t(names[side])}
+          title={t(names[side])}
+        >
+          ＋
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** While a plan that counts is made and has no reward: a small „＋ 🎁 Belohnung“ in the heading's corner, taking no room of the sheet. */
+function AddReward() {
+  const t = useT();
+  return (
+    <span className="pl-reward-add" data-edit="reward" role="button" tabIndex={0}>
+      ＋ <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
     </span>
   );
 }
@@ -634,13 +625,18 @@ function DaySteps(props: StepsProps & { aspect: number }) {
   const { open, done } = field ? splitDone(steps, ticks, linked, day) : { open: steps, done: [] };
   const lead = field ? open.find((step) => states[steps.indexOf(step)] === "now") : undefined;
   const rest = open.filter((step) => step !== lead);
-  const parts = partsOf(rest);
-  // A part's name only where the day has more than one, also once the morning's cards are all done.
-  const named = partsOf(steps).length > 1;
+  // The day's parts as chosen in the band (`Plan.dayParts`): a line each, also while one is still empty – a part whose
+  // cards are all done stays out on screen, unless the plan is being made.
+  const n = dayPartsOf(plan);
+  const lines = PARTS_OF[n]
+    .map((part) => ({ part, steps: rest.filter((step) => partIn(step, n) === part) }))
+    .filter((line) => line.steps.length > 0 || (edit && steps.length > 0));
+  const named = n > 1;
+  const signs = named ? plan.signs : undefined;
   const box = field ? dayBox(props, steps, done, open) : null;
-  // The room for the rows: the sheet less its heading and the box, less the „Jetzt“ column and the reward; each part a row of it.
-  const width = (lead ? 0.62 : 1) * (counts && (plan.reward || edit) ? 0.82 : 1);
-  const card = (step: PlanStep) => (
+  // The room for the rows: the sheet less its heading and the box, less the „Jetzt“ column, the reward and the signs; each part a row of it.
+  const width = (lead ? 0.62 : 1) * (counts && plan.reward ? 0.82 : 1) * (signs ? 0.9 : 1);
+  const card = (step: PlanStep, line: PlanStep[]) => (
     <StepCard
       day={day}
       step={step}
@@ -651,12 +647,11 @@ function DaySteps(props: StepsProps & { aspect: number }) {
       got={starsGot(ticks, linked, day, step)}
       counts={counts}
       edit={edit}
+      insert={edit && steps.length < stepLimit(steps) ? { axis: "row", last: step === line.at(-1) } : undefined}
     />
   );
   // Cards with star fields stand taller than wide, so the fields under the picture are big (`STAR_CARD`).
   const cardAspect = counts ? STAR_CARD : 1;
-  // While it is made, a line can take another card where there is room for it.
-  const roomIn = (row: PlanStep[], part?: Slot) => edit && row.length < (part ? MAX_PART_STEPS : MAX_STEPS);
   return (
     <div className={`pl-dayview${field ? "" : " pl-marked"}${counts ? " pl-counts" : ""}`}>
       {steps.length === 0 &&
@@ -669,28 +664,29 @@ function DaySteps(props: StepsProps & { aspect: number }) {
         ) : (
           <NoSteps />
         ))}
-      {open.length > 0 && (
+      {open.length > 0 || (edit && steps.length > 0) ? (
         <div className={`pl-flow${lead ? " has-now" : ""}`}>
           {lead && (
             <div className="pl-now">
               <NowSign />
-              <div className="pl-slot">{card(lead)}</div>
+              <div className="pl-slot">{card(lead, [lead])}</div>
             </div>
           )}
-          {rest.length > 0 && (
+          {lines.length > 0 && (
             <div className="pl-then">
-              {parts.map(({ part, steps: row }, i) => {
-                // Several parts (morning, evening): each a line of cards as tall as its row, from the left.
-                const adding = roomIn(row, part);
-                const { cols, rows } = planLayout(row.length + (adding ? 1 : 0), (aspect * (box ? 1.5 : 1.12) * width) / cardAspect);
+              {lines.map(({ part, steps: row }) => {
+                // Several parts (morning, evening): each a line of cards as tall as its row, from the left, on its own tint.
+                const { cols, rows } = planLayout(Math.max(1, row.length), (aspect * (box ? 1.5 : 1.12) * width) / cardAspect);
                 return (
-                  <div key={`${part}-${i}`} className={`pl-row${(part && (named || edit)) || edit ? " pl-row-named" : ""}`}>
-                    {part && (named || edit) && <PartName part={part} remove={edit ? (named ? "row" : "sign") : undefined} />}
-                    {!part && edit && <SignBack />}
+                  <div
+                    key={part ?? "day"}
+                    className={`pl-row${signs ? " pl-row-named" : ""}${named ? ` pl-row-part rw-tint-${part === "noon" ? "day" : part}` : ""}`}
+                  >
+                    {part && signs && <PartName part={part} set={signs} lines={look.print && !look.color} />}
                     <ol
-                      className={`pl-steps${parts.length > 1 ? " pl-line" : ""}`}
+                      className={`pl-steps${lines.length > 1 ? " pl-line" : ""}`}
                       style={
-                        parts.length > 1
+                        lines.length > 1
                           ? undefined
                           : { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }
                       }
@@ -700,10 +696,11 @@ function DaySteps(props: StepsProps & { aspect: number }) {
                           {/* The marker the child moves on, under the card to do (never printed: on paper it is a real
                               one) – only where the cards count no stars, which show what is done by themselves. */}
                           {!field && !counts && !edit && !look.print && states[steps.indexOf(step)] === "now" && <PaperArrow className="pl-marker" />}
-                          {card(step)}
+                          {card(step, row)}
                         </li>
                       ))}
-                      {adding && (
+                      {/* An empty part of the day: the one place to put its first card. */}
+                      {row.length === 0 && (
                         <li className="pl-slot">
                           <AddCard part={part} />
                         </li>
@@ -715,24 +712,9 @@ function DaySteps(props: StepsProps & { aspect: number }) {
             </div>
           )}
         </div>
-      )}
-      {/* A day in two with one line taken away: while it is made, the missing part can come back. */}
-      {edit && named === false && steps.some((step) => step.part) && <MissingPart steps={steps} />}
+      ) : null}
       {box}
     </div>
-  );
-}
-
-/** While a plan is made: the part of the day whose line was taken away, as a ＋ before its sun or moon to bring it back. */
-function MissingPart({ steps }: { steps: PlanStep[] }) {
-  const t = useT();
-  const gone = (["morning", "evening"] as Slot[]).find((part) => !steps.some((step) => step.part === part));
-  const slot = gone && SLOT_BY_ID.get(gone);
-  if (!slot) return null;
-  return (
-    <span className="pl-part-back" data-edit="add" data-part={slot.id} role="button" tabIndex={0}>
-      ＋ {slot.emoji} {t(slot.label)}
-    </span>
   );
 }
 
@@ -799,9 +781,9 @@ function FirstThen(props: StepsProps & { aspect: number }) {
   const t = useT();
   const steps = stepsOn(plan, day);
   const states = statesOf(props, day, steps);
-  // While it is made, a pair more to fill where the page has room for one.
-  const more = props.edit && steps.length % 2 === 0 && steps.length < MAX_STEPS;
-  const pairs = more ? [...pairsOf(steps), []] : pairsOf(steps);
+  // No empty pair kept for the next card (user feedback, November 2026): the ＋ at a card's edge puts one anywhere, and
+  // only a pair still waiting for its „Dann“ shows the place for it; an empty plan has one to start with.
+  const pairs = props.edit && steps.length === 0 ? [[]] : pairsOf(steps);
   const { cols, rows } = pairLayout(pairs.length, aspect * 1.12);
   if (steps.length === 0 && !props.edit) return <NoSteps />;
   return (
@@ -821,6 +803,7 @@ function FirstThen(props: StepsProps & { aspect: number }) {
                     got={starsGot(props.ticks, props.linked, day, pair[i])}
                     counts={props.counts}
                     edit={props.edit}
+                    insert={props.edit && steps.length < MAX_STEPS ? { axis: "row", last: pair[i] === steps.at(-1) } : undefined}
                   />
                 ) : props.edit && (i === 0 || pair.length === 1) ? (
                   <AddCard />
@@ -890,13 +873,6 @@ function DayHead({ d, today, look }: { d: Date; today: Date; look: PlanLook }) {
     </span>
   );
 }
-
-/** A part of the day's sign at a week's row: ☀️ morning, 🌤️ the day, 🌙 evening. */
-const PART_SIGNS: { part: Slot; emoji: string; label: Localized }[] = [
-  { part: "morning", emoji: "☀️", label: { de: "morgens" } },
-  { part: "noon", emoji: "🌤️", label: { de: "am Tag" } },
-  { part: "evening", emoji: "🌙", label: { de: "abends" } },
-];
 
 /** The part of the day a card stands in, as a row's tint: morning, the day (midday or none), evening. */
 const partClass = (part: Slot | undefined) => (part === "morning" ? "morning" : part === "evening" ? "evening" : "day");
@@ -1001,18 +977,24 @@ function WeekCell({ plan, d, row, props, picture }: { plan: Plan; d: Date; row: 
 /**
  * While a week is made, the tools at a row's end (user feedback, November 2026: the circles' − ＋ never inside the
  * card, but beside it and plainly about circles): − ◯ ＋ for one circle less or more on every day, ▲ ▼ to move the row
- * within its part of the day, and ☀️ 🌤️ 🌙 for its time of day. In the look with pictures its 🗑️ is here too.
+ * within its part of the day, and – where the band parts the day („Tageszeiten“) – its time of day among those parts,
+ * by the chosen signs or sun and moon. In the look with pictures its 🗑️ and the ＋ to put a row before or after it are
+ * here too.
  */
-function RowTools({ plan, row, key0, withDelete }: { plan: Plan; row: PlanStep; key0: string; withDelete: boolean }) {
+function RowTools({ plan, row, key0, withDelete, last }: { plan: Plan; row: PlanStep; key0: string; withDelete: boolean; last: boolean }) {
   const t = useT();
   const label = useStepLabel()(row);
   const most = Math.max(0, ...plan.days.map((day) => day.find((s) => s.id === row.id)).map((s) => (s ? starsOf(s) : 0)));
   const least = Math.min(...plan.days.map((day) => day.find((s) => s.id === row.id)).flatMap((s) => (s ? [starsOf(s)] : [])));
-  const part = row.part ?? "noon";
+  const n = dayPartsOf(plan);
+  const part = partIn(row, n);
   return (
     <div className="pl-wtools" data-row={row.id}>
       {withDelete && (
-        <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", "data-cell": key0, "data-every": "" }} />
+        <>
+          <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", "data-cell": key0, "data-every": "" }} />
+          {weekRows(plan).length < MAX_STEPS && <InsertCard cell={key0} axis="column" last={last} every />}
+        </>
       )}
       <span className="pl-wtools-line">
         <RingStep
@@ -1050,30 +1032,33 @@ function RowTools({ plan, row, key0, withDelete }: { plan: Plan; row: PlanStep; 
           })}
         </span>
       </span>
-      <span className="pl-wtools-line pl-wparts" role="radiogroup" aria-label={t({ de: "Tageszeit" })}>
-        {PART_SIGNS.map((sign) => (
-          <span
-            key={sign.part}
-            className={`pl-wpart pl-wpart-${sign.part}${sign.part === part ? " on" : ""}`}
-            data-edit={sign.part === part ? undefined : "row-part"}
-            data-row={row.id}
-            data-part={sign.part}
-            role="radio"
-            aria-checked={sign.part === part}
-            tabIndex={0}
-            aria-label={t(sign.label)}
-            title={t(sign.label)}
-          >
-            {sign.emoji}
-          </span>
-        ))}
-      </span>
+      {n > 1 && (
+        <span className="pl-wtools-line pl-wparts" role="radiogroup" aria-label={t({ de: "Tageszeit" })}>
+          {PARTS_OF[n].map((id) => {
+            const slot = id && SLOT_BY_ID.get(id);
+            if (!slot) return null;
+            return (
+              <span
+                key={slot.id}
+                className={`pl-wpart pl-wpart-${slot.id}${slot.id === part ? " on" : ""}`}
+                data-edit={slot.id === part ? undefined : "row-part"}
+                data-row={row.id}
+                data-part={slot.id}
+                role="radio"
+                aria-checked={slot.id === part}
+                tabIndex={0}
+                aria-label={t(slot.label)}
+                title={t(slot.label)}
+              >
+                {plan.signs ? <DaySign set={plan.signs} part={slot.id} /> : SLOT_EMOJI[slot.id]}
+              </span>
+            );
+          })}
+        </span>
+      )}
     </div>
   );
 }
-
-/** The sign of a row's part of the day on a week, where the week has more than one part. */
-const SIGN_OF: Record<string, string> = { morning: "☀️", day: "🌤️", evening: "🌙" };
 
 /**
  * A week of stars: a plan with a Zähler drawn as a reward chart always was – a row per card (every card of the week once,
@@ -1083,7 +1068,8 @@ const SIGN_OF: Record<string, string> = { morning: "☀️", day: "🌤️", eve
  * (user feedback, November 2026). A day without a row's card leaves its cell empty. A cell is tapped like a card
  * (`data-step`), only off the editor: there a tap on the circles changes them and opens no window. While it is made a
  * row's picture swaps its card, 🗑️ takes the row out of the whole week, the tools at the row's end (`RowTools`) set its
- * circles, place and time of day, each day's cell its own circles, and ＋ below adds a card to every day.
+ * circles, place and time of day, each day's cell its own circles, and the ＋ on a row's top or bottom edge puts a new
+ * card into every day right there – no empty row kept for it (user feedback, November 2026).
  */
 function WeekStars(props: StepsProps) {
   const { plan, today, day, look, edit } = props;
@@ -1093,7 +1079,8 @@ function WeekStars(props: StepsProps) {
   const rows = weekRows(plan);
   const pictures = plan.weekLook === "pictures";
   const isToday = (d: Date) => !look.print && dayKey(d) === dayKey(today);
-  const tinted = new Set(rows.map((row) => partClass(row.part))).size > 1;
+  const n = dayPartsOf(plan);
+  const tinted = n > 1;
   // The first day that has a row's card names it in the keys of the row's own actions.
   const keyOf = (row: PlanStep) => cellKey(week.find((d) => stepsOn(plan, d).some((s) => s.id === row.id)) ?? day, row.id);
   const head = pictures ? 0 : 1.5;
@@ -1102,7 +1089,7 @@ function WeekStars(props: StepsProps) {
   const colWidth = 100 / (head + week.length + tools);
   const rowMax = colWidth * (pictures ? 2.2 : 1.4);
   const columns = `${pictures ? "" : "minmax(0, 1.5fr) "}repeat(7, minmax(0, 1fr))${edit ? " minmax(0, 1.6fr)" : ""}`;
-  const template = `auto repeat(${rows.length}, minmax(0, ${rowMax.toFixed(1)}cqw))${edit ? ` minmax(0, ${(colWidth * 0.55).toFixed(1)}cqw)` : ""}`;
+  const template = `auto repeat(${rows.length}, minmax(0, ${rowMax.toFixed(1)}cqw))`;
   return (
     <div className={`pl-wgrid${pictures ? " pl-wgrid-pics" : ""}`} style={{ gridTemplateColumns: columns, gridTemplateRows: template }}>
       {!pictures && <span />}
@@ -1112,9 +1099,9 @@ function WeekStars(props: StepsProps) {
         </span>
       ))}
       {edit && <span className="pl-wtools-head">{t({ de: "Kreise" })}</span>}
-      {rows.map((row) => (
+      {rows.map((row, i) => (
         // A row as one element for its 🗑️ to mark it whole, its cells still the grid's (display: contents).
-        <div key={row.id} className={`pl-wrow${tinted ? ` pl-tint-${partClass(row.part)}` : ""}`}>
+        <div key={row.id} className={`pl-wrow${tinted ? ` pl-tint-${partClass(partIn(row, n))}` : ""}`}>
           {!pictures && (
             <div className="pl-whead" data-row={row.id} role="img" aria-label={label(row)} title={look.print ? undefined : label(row)}>
               {edit && (
@@ -1124,9 +1111,10 @@ function WeekStars(props: StepsProps) {
                   data={{ "data-edit": "delete-card", "data-cell": keyOf(row), "data-every": "" }}
                 />
               )}
-              {tinted && (
+              {edit && rows.length < MAX_STEPS && <InsertCard cell={keyOf(row)} axis="column" last={i === rows.length - 1} every />}
+              {tinted && plan.signs && (
                 <span className="pl-whead-part" aria-hidden>
-                  {SIGN_OF[partClass(row.part)]}
+                  <DaySign set={plan.signs} part={partIn(row, n) ?? "noon"} lines={look.print && !look.color} />
                 </span>
               )}
               <span className="pl-emoji" aria-hidden data-edit={edit ? "swap" : undefined} data-cell={edit ? keyOf(row) : undefined}>
@@ -1137,14 +1125,9 @@ function WeekStars(props: StepsProps) {
           {week.map((d) => (
             <WeekCell key={dayKey(d)} plan={plan} d={d} row={row} props={props} picture={pictures} />
           ))}
-          {edit && <RowTools plan={plan} row={row} key0={keyOf(row)} withDelete={pictures} />}
+          {edit && <RowTools plan={plan} row={row} key0={keyOf(row)} withDelete={pictures} last={i === rows.length - 1} />}
         </div>
       ))}
-      {edit && rows.length < MAX_STEPS && (
-        <span className="pl-wadd">
-          <AddCard every />
-        </span>
-      )}
     </div>
   );
 }
@@ -1163,7 +1146,7 @@ function DayColumns(props: StepsProps) {
   const t = useT();
   const names = t(DAY_NAMES);
   const week = weekOf(day);
-  const most = Math.max(1, ...week.map((d) => stepsOn(plan, d).length + (edit ? 1 : 0)));
+  const most = Math.max(1, ...week.map((d) => stepsOn(plan, d).length));
   return (
     <div className="pl-week" style={{ "--pl-rows": most } as CSSProperties}>
       {week.map((d) => {
@@ -1192,10 +1175,11 @@ function DayColumns(props: StepsProps) {
                 got={starsGot(props.ticks, props.linked, d, step)}
                 counts={props.counts}
                 edit={edit}
+                insert={edit && steps.length < MAX_STEPS ? { axis: "column", last: i === steps.length - 1 } : undefined}
                 small
               />
             ))}
-            {edit && steps.length < MAX_STEPS && <AddCard day={dayKey(d)} small />}
+            {edit && steps.length === 0 && <AddCard day={dayKey(d)} small />}
           </div>
         );
       })}
@@ -1235,6 +1219,7 @@ function NightCard({
   edit,
   fresh,
   tappable,
+  addAfter = false,
 }: {
   night: Night;
   look: NightLook;
@@ -1245,6 +1230,8 @@ function NightCard({
   edit: boolean;
   fresh: boolean;
   tappable: boolean;
+  /** While it is made, on the last night: the ＋ on its right edge that adds a night after it. */
+  addAfter?: boolean;
 }) {
   const t = useT();
   const name = t(NIGHT_NAME);
@@ -1268,6 +1255,18 @@ function NightCard({
           <>
             <SheetAction act="configure" ask={t({ de: "Bild der Nächte ändern" })} data={{ "data-edit": "night" }} />
             {night.state === "later" && <SheetAction act="delete" ask={t({ de: "Eine Nacht weniger?" })} data={{ "data-edit": "delete-night" }} />}
+            {addAfter && (
+              <span
+                className="pl-insert pl-insert-row after"
+                data-edit="add-night"
+                role="button"
+                tabIndex={0}
+                aria-label={t(ONE_MORE_NIGHT)}
+                title={t(ONE_MORE_NIGHT)}
+              >
+                ＋
+              </span>
+            )}
           </>
         )}
         <span className="pl-emoji" aria-hidden>
@@ -1289,7 +1288,7 @@ const ONE_MORE_NIGHT: Localized = { de: "Eine Nacht mehr" };
  * into its field – so the stars grow as the nights to come get fewer. When the big day has come (its morning tapped),
  * the picture alone stands big in the middle. No date and no number: the child counts the nights. On paper only the
  * nights from the day it is printed, with empty rings for a sticker or a crayon. While it is made everything is changed
- * right here (user feedback, November 2026): ＋ after the nights adds one, 🗑️ on a night to come takes one, ⚙️ on a
+ * right here (user feedback, November 2026): ＋ on the last night's edge adds one, 🗑️ on a night to come takes one, ⚙️ on a
  * night chooses how the nights look, and the big day's picture opens its window (its date and its picture).
  */
 function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps & { aspect: number }) {
@@ -1307,7 +1306,8 @@ function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps &
   const first = shown.findIndex((night) => night.state === "now");
   const tappable = !look.print && !edit;
   const adds = edit && moons < MAX_NIGHTS;
-  const cells = shown.length + (adds ? 1 : 0);
+  // No empty place kept for the ＋ (user feedback, November 2026): it sits on the last night's edge, alone only with no night.
+  const cells = Math.max(shown.length, adds ? 1 : 0);
   // Upright, the picture goes under the nights; wide, beside them – the nights get the room the picture leaves (the
   // sheet's body is wider than the sheet with its heading, and the picture and the arrow take about its height). A
   // night is a card taller than wide (`STAR_CARD`), so the rows are planned in its widths.
@@ -1336,9 +1336,10 @@ function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps &
                 edit={edit}
                 fresh={night.key === fresh}
                 tappable={tappable}
+                addAfter={adds && i === shown.length - 1}
               />
             ))}
-            {adds && (
+            {adds && shown.length === 0 && (
               <span className="pl-night-cell">
                 <span className="pl-add pl-night-add" data-edit="add-night" role="button" tabIndex={0} aria-label={t(ONE_MORE_NIGHT)} title={t(ONE_MORE_NIGHT)}>
                   ＋

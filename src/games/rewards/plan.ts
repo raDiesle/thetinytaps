@@ -1,8 +1,9 @@
 import { dayKey, weekOf } from "@/games/teeth/daytime";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
-import { type BoardReward, cellKey, type LinkedDays, newId, rewardFromCatalog, type StarLog, weekday } from "./board";
+import { type BoardReward, cellKey, type LinkedDays, newId, type StarLog, weekday } from "./board";
 import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
+import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
 import { ritualOf } from "./rituals";
 
 // A Tagesplan (a picture schedule, „Strukturtafel“): the steps of each day in their order, and which of today's
@@ -86,6 +87,15 @@ export interface Plan {
    * what the cards are.
    */
   weekLook?: WeekLook;
+  /**
+   * How many parts the day has (user feedback, November 2026): the whole day in one line (missing, the default),
+   * morning and evening, or morning, midday and evening – a line (a day) or a group of rows (a week) each, chosen in the
+   * band („Tageszeiten“), never by taking a part's line away on the sheet. Older plans without it tell by their cards'
+   * parts (`dayPartsOf`).
+   */
+  dayParts?: DayParts;
+  /** The signs of the parts (`DAY_SIGN_SETS`); missing: none, the rows told apart by their tints. */
+  signs?: DaySignSet;
 }
 
 /** How a counting week is drawn: a card per row, or a picture over every day's circles. */
@@ -248,6 +258,65 @@ export function bigDayCome(plan: Plan, today: Date, ticks: Record<string, number
 /** The parts of a day in two, in their order. */
 export const DAY_PARTS: Slot[] = ["morning", "evening"];
 
+/** How many parts a plan's day has: its choice, or for an older plan what its cards say (a midday card makes three). */
+export function dayPartsOf(plan: Plan): DayParts {
+  if (plan.dayParts) return plan.dayParts;
+  const parts = new Set(plan.days.flat().map((step) => step.part));
+  return parts.has("noon") ? 3 : parts.has("morning") || parts.has("evening") ? 2 : 1;
+}
+
+/** The part a card stands in on a day of `n` parts: none on a whole day, the morning's or the evening's on two. */
+export function partIn(step: PlanStep, n: DayParts): Slot | undefined {
+  if (n === 1) return undefined;
+  if (n === 2) return step.part === "evening" ? "evening" : "morning";
+  return step.part ?? "noon";
+}
+
+/** A card put into a part of the day: a card its game ticks counts for that part's time (brushing in the evening). */
+export function inPart(step: PlanStep, part: Slot | undefined): PlanStep {
+  const { part: _, ...rest } = step;
+  if (!part) return rest;
+  return step.linked && part !== "noon" ? { ...rest, part, slot: part } : { ...rest, part };
+}
+
+/**
+ * The plan with its day in `n` parts (the band's „Tageszeiten“): one part takes every card's part away; from a whole
+ * day the cards are shared out in their order (the first half the morning, the rest the evening – „Mein Tag“ comes back
+ * as it was); from two to three the morning and the evening stay and midday starts empty; from three to two the midday
+ * cards join the morning. The same card is in the same part on every day.
+ */
+export function withDayParts(plan: Plan, n: DayParts): Plan {
+  const from = dayPartsOf(plan);
+  const parts = PARTS_OF[n];
+  const rows = weekRows(plan);
+  const partOf = new Map<string, Slot | undefined>(
+    rows.map((row, i) => [
+      row.id,
+      n === 1 ? undefined : from === 1 ? parts[Math.min(parts.length - 1, Math.floor((i * parts.length) / Math.max(1, rows.length)))] : partIn(row, n),
+    ]),
+  );
+  const next = withEveryDay(plan, (steps) => inDayOrder(steps.map((step) => inPart(step, partOf.get(step.id) ?? partIn(step, n)))));
+  const { dayParts: _, ...rest } = next;
+  return n === 1 ? rest : { ...rest, dayParts: n };
+}
+
+/**
+ * A card put into a day's list: beside the card `at` (before or after it, in its part) – the grown-up's ＋ at a card's
+ * edge (user feedback, November 2026: a new card anywhere, WYSIWYG) –, or without `at` at the end of its part, where
+ * the part's cards come in the day's order.
+ */
+export function withInserted(steps: PlanStep[], card: PlanStep, at?: { id: string; side: "before" | "after" }): PlanStep[] {
+  const anchor = at ? steps.findIndex((step) => step.id === at.id) : -1;
+  if (at && anchor >= 0) {
+    const placed = inPart(card, steps[anchor].part);
+    const i = at.side === "before" ? anchor : anchor + 1;
+    return [...steps.slice(0, i), placed, ...steps.slice(i)];
+  }
+  const rank = partRank(card.part);
+  const last = steps.findLastIndex((step) => partRank(step.part) <= rank);
+  return [...steps.slice(0, last + 1), card, ...steps.slice(last + 1)];
+}
+
 /** A card with its Zähler; 0 leaves it a plain card. */
 const withStars = (step: PlanStep, stars: number): PlanStep => {
   const { stars: _, ...plain } = step;
@@ -268,9 +337,6 @@ export const MAX_STARS = 5;
 
 /** The plan with every card's Zähler set to `stars` (0: a plain plan with the arrow). */
 export const withCounter = (plan: Plan, stars: number): Plan => ({ ...plan, days: plan.days.map((day) => day.map((step) => withStars(step, stars))) });
-
-/** The reward a plan gets when „Belohnung“ is switched on: the playground, the first of the catalogue. */
-export const defaultReward = (): BoardReward => rewardFromCatalog("spielplatz");
 
 /** Taps that make a card done: one per star, one for a card without. */
 const tapsFor = (step: PlanStep): number => Math.max(1, starsOf(step));
@@ -403,7 +469,7 @@ export function withEveryDay(plan: Plan, change: (steps: PlanStep[]) => PlanStep
 export const partRank = (part: Slot | undefined): number => (part === "morning" ? 0 : part === "evening" ? 2 : 1);
 
 /** A day's cards in the day's order (the morning's first, the evening's last), each part keeping its own order. */
-const inDayOrder = (steps: PlanStep[]): PlanStep[] => [...steps].sort((a, b) => partRank(a.part) - partRank(b.part));
+export const inDayOrder = (steps: PlanStep[]): PlanStep[] => [...steps].sort((a, b) => partRank(a.part) - partRank(b.part));
 
 /**
  * The rows of a week's grid: every card of the week once, in the day's order (the morning's first, then the day's, then

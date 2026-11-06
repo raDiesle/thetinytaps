@@ -1,3 +1,4 @@
+import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
 import { dayKey, weekOf } from "@/games/teeth/daytime";
 import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -60,6 +61,8 @@ export interface Board {
   start?: string;
   /** How a month board is drawn (`MONTH_LOOKS`); missing: the calendar. */
   look?: MonthLook;
+  /** The signs on the fields of the times of day (`DAY_SIGN_SETS`); missing: none, the parts told apart by their tints. */
+  signs?: DaySignSet;
 }
 
 /** A month board's time: four weeks without dates, or a calendar month. */
@@ -126,21 +129,27 @@ export function dayFields(board: Board): DayField[] {
   return DAY_ORDER.flatMap((part) => all.filter((field) => field.part === part));
 }
 
-/**
- * A task's times of day with one switched (☀️, 🌤️, 🌙 under its card while the board is made): a task without one is
- * shown as „am Tag“ (midday), so switching on the morning gives it a morning and a day field. The last one stays on,
- * and a task left with the day alone is once a day again (its fields keep their keys).
- */
-export function toggledSlots(task: BoardTask, slot: Slot): Slot[] | undefined {
-  const shown: Slot[] = task.slots?.length ? task.slots : ["noon"];
-  const next = shown.includes(slot) ? shown.filter((s) => s !== slot) : [...shown, slot];
-  if (next.length === 0) return task.slots;
-  const ordered = SLOTS.map((s) => s.id).filter((s) => next.includes(s));
-  return ordered.length === 1 && ordered[0] === "noon" ? undefined : ordered;
+/** How many parts a board's day has, by its tasks' times of day: none, morning and evening, or with midday. */
+export function boardDayParts(board: Board): DayParts {
+  const slots = new Set(board.tasks.flatMap((task) => task.slots ?? []));
+  return slots.has("noon") ? 3 : slots.size > 0 ? 2 : 1;
 }
 
-/** The times of day a task's switches show as on: its own, or the day for a task done once a day. */
-export const shownSlots = (task: BoardTask): Slot[] => (task.slots?.length ? task.slots : ["noon"]);
+/** The times of day a new task gets on a board of `n` parts: every part a field (none on a whole day). */
+export const slotsFor = (n: DayParts): Slot[] | undefined => (n === 1 ? undefined : (PARTS_OF[n] as Slot[]));
+
+/** A task with the times of day of a board of `n` parts. */
+export function taskInParts(task: BoardTask, n: DayParts): BoardTask {
+  const { slots: _, ...rest } = task;
+  const slots = slotsFor(n);
+  return slots ? { ...rest, slots: [...slots] } : rest;
+}
+
+/**
+ * The board with every task in `n` parts of the day (the band's „Tageszeiten“, user feedback, November 2026): one
+ * field a day, morning and evening, or morning, midday and evening – the same for every task, chosen once.
+ */
+export const withBoardDayParts = (board: Board, n: DayParts): Board => ({ ...board, tasks: board.tasks.map((task) => taskInParts(task, n)) });
 
 /** Stars per board: "YYYY-MM-DD|taskId" → 1 on week, month and day boards, "count" → n on a collecting board. */
 export type StarLog = Record<string, Record<string, number>>;
@@ -241,8 +250,8 @@ function withKindGoal(board: Board, kind: BoardKind, templateTitle: string): Boa
 export function taskFromCatalog(id: string): BoardTask {
   const task = TASK_BY_ID.get(id);
   if (!task) throw new Error(`No task ${id}`);
-  const made: BoardTask = { id: newId(), emoji: task.emoji, catalog: id, linked: task.linked };
-  return task.slots ? { ...made, slots: [...task.slots] } : made;
+  // Its times of day are the board's, chosen once for all tasks (`withBoardDayParts`), never the task's own.
+  return { id: newId(), emoji: task.emoji, catalog: id, linked: task.linked };
 }
 
 export function rewardFromCatalog(id: string): BoardReward {

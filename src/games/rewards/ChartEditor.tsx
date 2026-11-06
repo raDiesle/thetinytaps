@@ -6,6 +6,7 @@ import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import {
   type Board,
   type BoardReward,
+  boardDayParts,
   boardFromTemplate,
   COLLECT_GOALS,
   fieldCount,
@@ -20,8 +21,9 @@ import {
   rewardFromCatalog,
   type StarLog,
   taskFromCatalog,
-  toggledSlots,
+  taskInParts,
   weekday,
+  withBoardDayParts,
   withKind,
   withStart,
 } from "./board";
@@ -31,7 +33,6 @@ import {
   type BoardKind,
   type CatalogTask,
   type ChartType,
-  DAY_NAMES,
   KINDS,
   NIGHT_LOOKS,
   nightLookOf,
@@ -45,6 +46,7 @@ import {
   TEMPLATES,
   THEMES,
 } from "./catalog";
+import { DAY_PARTS_CHOICES, DAY_SIGN_SETS, DaySign, type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
 import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
 import { CHILD_NAME, Pick } from "./pageParts";
@@ -55,8 +57,8 @@ import {
   bigDayStep,
   counterOf,
   counting,
+  dayPartsOf,
   daysLater,
-  defaultReward,
   exampleTicks,
   MAX_NIGHTS,
   withBigDay,
@@ -74,7 +76,9 @@ import {
   withCounter,
   withSame,
   withCellStars,
+  withDayParts,
   withEveryDay,
+  withInserted,
   withRowMoved,
   withRowPart,
   withRowStars,
@@ -121,10 +125,13 @@ export const SPANS: Span[] = [
 /** The span a draft is in: its view, of either kind. */
 const spanOf = (draft: Draft): SpanId => (draft.type === "board" ? draft.board.kind : draft.plan.view);
 
-/** The first chart of the wizard (user decision, November 2026): „Mein Tag“, morning and evening on one sheet, a star a card and a reward. */
+/**
+ * The first chart of the wizard (user decision, November 2026): „Mein Tag“, a star a card – its day in one line with no
+ * signs and no reward (user feedback, November 2026: parts of the day, signs and a reward only where chosen).
+ */
 export function defaultDraft(language: TargetLanguageId): Draft {
   const template = PLAN_TEMPLATES.find((tpl) => tpl.view === "day") ?? PLAN_TEMPLATES[0];
-  return { type: "plan", plan: { ...withCounter(planFromTemplate(template, language), 1), reward: defaultReward() } };
+  return { type: "plan", plan: { ...withDayParts(withCounter(planFromTemplate(template, language), 1), 1), reward: null } };
 }
 
 /** The reward of a draft, null where there is none. */
@@ -137,6 +144,9 @@ const rewardOf = (draft: Draft): BoardReward | null => (draft.type === "board" ?
 export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId): Draft {
   const { childName, theme } = from.type === "board" ? from.board : from.plan;
   const reward = rewardOf(from);
+  // The Tageszeiten and their signs go along: „Ganzer Tag“ stays the whole day in every span (user feedback, November 2026).
+  const parts = from.type === "board" ? boardDayParts(from.board) : dayPartsOf(from.plan);
+  const signs = from.type === "board" ? from.board.signs : from.plan.signs;
   if (span.type === "plan") {
     const template = PLAN_TEMPLATES.find((tpl) => tpl.view === span.id) ?? PLAN_TEMPLATES[0];
     // A Countdown counts nights, not stars: its card has no Zähler (the reward stays kept for a span that counts).
@@ -145,10 +155,12 @@ export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId)
     // A week that counts stars is a reward chart's week: the same tasks every day, a row each (`WeekStars`), not the
     // Kita's Wochenplan, whose days differ.
     const week = span.id === "week" && stars > 0 ? rewardWeek(made) : made;
-    return { type: "plan", plan: { ...withCounter(week, stars), reward } };
+    const inParts = span.id === "day" || (span.id === "week" && stars > 0) ? { ...withDayParts(week, parts), signs } : week;
+    return { type: "plan", plan: { ...withCounter(inParts, stars), reward } };
   }
   const template = TEMPLATES.find((tpl) => tpl.kind === span.id) ?? TEMPLATES[0];
-  return { type: "board", board: { ...boardFromTemplate(template, language), id: newId(), childName, theme, reward } };
+  const board = { ...boardFromTemplate(template, language), id: newId(), childName, theme, reward };
+  return { type: "board", board: span.id === "collect" ? board : { ...withBoardDayParts(board, parts), signs } };
 }
 
 /** The Belohnungstafel's week as a plan: the board Vorlage „woche“'s tasks, the same every day. */
@@ -162,8 +174,8 @@ const OFFERED = [...ACTIVITIES, ...TASKS];
 
 /** What a tap on the sheet opened: a card, a place to add one, the reward, or a board's task. */
 type Editing =
-  | { what: "card"; key: string; every?: boolean; swap?: boolean }
-  | { what: "add"; part?: Slot; day?: string; every?: boolean }
+  | { what: "card"; key: string; every?: boolean }
+  | { what: "add"; part?: Slot; day?: string; every?: boolean; at?: { cell: string; side: "before" | "after" } }
   | { what: "reward" }
   | { what: "task"; id: string }
   | { what: "add-task" }
@@ -298,12 +310,10 @@ export function ChartEditor({
   const onClick = (event: React.MouseEvent) => {
     const el = (event.target as Element).closest<HTMLElement>("[data-edit], [data-step]");
     if (!el) return;
-    const { edit, part, day: dayId, task, step, cell, by, every, slot, row } = el.dataset;
+    const { edit, part, day: dayId, task, step, cell, by, every, row, side } = el.dataset;
     // A tap on a card's circles while it is made never opens its window (user feedback, November 2026).
     if (!edit && (event.target as Element).closest(".pl-stars")) return;
     const all = every !== undefined;
-    // The day's cards changed, as a part's sign or line does: the day shown, or every day where they are alike.
-    const dayChanged = (plan: Plan, edit: (steps: PlanStep[]) => PlanStep[]) => withSteps(plan, weekday(day), edit(stepsOn(plan, day)));
     if (draft.type === "plan" && edit === "stars" && cell) {
       // − ＋ at a card's stars: its own, on every day where the days are alike or in a week's grid, else that weekday's.
       const plan = draft.plan;
@@ -311,9 +321,8 @@ export function ChartEditor({
       const own = stepsOn(plan, cellDay).find((s) => s.id === taskId);
       if (!own) return;
       const n = Math.max(0, Math.min(MAX_STARS, starsOf(own) + Number(by)));
-      const next = withStepStars(plan, all || (plan.same && plan.view !== "week") ? null : weekday(cellDay), taskId, n);
-      // A plain plan's first star makes it count; one that never had a reward gets the default (Belohnung is on by default).
-      setPlan(!counting(plan) && plan.reward === undefined ? { ...next, reward: defaultReward() } : next);
+      // A plain plan's first star makes it count – without a reward until one is chosen (user feedback, November 2026).
+      setPlan(withStepStars(plan, all || (plan.same && plan.view !== "week") ? null : weekday(cellDay), taskId, n));
     } else if (draft.type === "plan" && edit === "cell-stars" && cell) {
       // One day's circles of a week's row; a day without the card gets it.
       const { day: cellDay, taskId } = parseCellKey(cell);
@@ -321,18 +330,13 @@ export function ChartEditor({
     } else if (draft.type === "plan" && edit === "row-stars" && row) setPlan(withRowStars(draft.plan, row, Number(by)));
     else if (draft.type === "plan" && edit === "row-move" && row) setPlan(withRowMoved(draft.plan, row, Number(by) < 0 ? -1 : 1));
     else if (draft.type === "plan" && edit === "row-part" && row && part) setPlan(withRowPart(draft.plan, row, part as Slot));
-    else if (draft.type === "plan" && edit === "swap" && cell) setEditing({ what: "card", key: cell, every: true, swap: true });
+    else if (draft.type === "plan" && edit === "swap" && cell) setEditing({ what: "card", key: cell, every: true });
+    else if (draft.type === "plan" && edit === "insert" && cell && (side === "before" || side === "after"))
+      setEditing({ what: "add", day: cell.split("|")[0], every: all, at: { cell, side } });
     else if (draft.type === "plan" && edit === "card" && cell) setEditing({ what: "card", key: cell, every: all });
     else if (draft.type === "plan" && edit === "delete-card" && cell) setPlan(withoutCard(draft.plan, cell, all));
     else if (edit === "no-reward") setReward(null);
-    else if (draft.type === "plan" && edit === "row" && part) {
-      setPlan(dayChanged(draft.plan, (steps) => steps.filter((s) => s.part !== part)));
-    } else if (draft.type === "plan" && edit === "sign") {
-      // The last part's sun or moon taken off: its cards stay, as a day in one.
-      setPlan(dayChanged(draft.plan, (steps) => steps.map(({ part: _, ...s }) => s)));
-    } else if (draft.type === "plan" && edit === "sign-back" && part) {
-      setPlan(dayChanged(draft.plan, (steps) => steps.map((s) => ({ ...s, part: part as Slot }))));
-    } else if (edit === "add")
+    else if (edit === "add")
       setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId, every: all });
     else if (edit === "reward") setEditing({ what: "reward" });
     else if (edit === "big-day") setEditing({ what: "big-day" });
@@ -341,10 +345,7 @@ export function ChartEditor({
     else if (edit === "night") setEditing({ what: "night" });
     else if (edit === "task" && task) setEditing({ what: "task", id: task });
     else if (draft.type === "board" && edit === "delete-task" && task) setBoard({ ...draft.board, tasks: draft.board.tasks.filter((own) => own.id !== task) });
-    else if (draft.type === "board" && edit === "slot" && task && slot) {
-      const tasks = draft.board.tasks.map((own) => (own.id === task ? { ...own, slots: toggledSlots(own, slot as Slot) } : own));
-      setBoard({ ...draft.board, tasks });
-    } else if (step) setEditing({ what: "card", key: step, every: all });
+    else if (step) setEditing({ what: "card", key: step, every: all });
   };
 
   // A Countdown is a chart of its own, like a board beside a plan: on the page it never turns into a day's plan or back.
@@ -365,6 +366,24 @@ export function ChartEditor({
   const plan = draft.type === "plan" ? draft.plan : undefined;
   const counts = plan ? counting(plan) : true;
   const ticks = draft.type === "plan" ? log?.[draft.plan.id] : log?.[draft.board.id];
+  // „Tageszeiten“ and their signs, chosen once for the whole chart (user feedback, November 2026): a day's plan, a
+  // week of rings, and a board of fields – never a reason to collect, which has no days.
+  const parts: { n: DayParts; signs?: DaySignSet; set: (n: DayParts) => void; setSigns: (signs?: DaySignSet) => void } | undefined =
+    plan && (plan.view === "day" || (plan.view === "week" && counts))
+      ? {
+          n: dayPartsOf(plan),
+          signs: plan.signs,
+          set: (n) => setPlan(withDayParts(plan, n)),
+          setSigns: (signs) => setPlan({ ...plan, signs }),
+        }
+      : draft.type === "board" && draft.board.kind !== "collect"
+        ? {
+            n: boardDayParts(draft.board),
+            signs: draft.board.signs,
+            set: (n) => setBoard(withBoardDayParts(draft.board, n)),
+            setSigns: (signs) => setBoard({ ...draft.board, signs }),
+          }
+        : undefined;
 
   return (
     <div className="rw-chart-editor">
@@ -485,6 +504,43 @@ export function ChartEditor({
                   { id: "pictures", label: t({ de: "Bild über jedem Kreis" }), pic: <LookPic id="pictures" /> },
                 ]}
                 onPick={(look) => setPlan({ ...plan, weekLook: look === "compact" ? undefined : look })}
+              />
+            </span>
+          )}
+          {parts && (
+            <span className="rw-opt-group">
+              <span className="rw-opt-name">{t({ de: "Tageszeiten" })}</span>
+              <Segments<`${DayParts}`>
+                label={t({ de: "Tageszeiten" })}
+                selected={`${parts.n}`}
+                items={DAY_PARTS_CHOICES.map((choice) => ({ id: `${choice.id}`, label: t(choice.label), pic: <PartsPic n={choice.id} /> }))}
+                onPick={(id) => parts.set(Number(id) as DayParts)}
+              />
+            </span>
+          )}
+          {parts && parts.n > 1 && (
+            <span className="rw-opt-group">
+              <span className="rw-opt-name">{t({ de: "Zeichen" })}</span>
+              <Segments<DaySignSet | "none">
+                label={t({ de: "Zeichen der Tageszeiten" })}
+                selected={parts.signs ?? "none"}
+                items={[
+                  { id: "none", label: t({ de: "Ohne" }) },
+                  ...DAY_SIGN_SETS.map((set) => ({
+                    id: set.id,
+                    label: t(set.label),
+                    pic: (
+                      <span className="rw-sign-pics" aria-hidden>
+                        {(PARTS_OF[parts.n] as Slot[]).map((part) => (
+                          <span key={part} className="rw-sign-pic">
+                            <DaySign set={set.id} part={part} />
+                          </span>
+                        ))}
+                      </span>
+                    ),
+                  })),
+                ]}
+                onPick={(id) => parts.setSigns(id === "none" ? undefined : id)}
               />
             </span>
           )}
@@ -664,7 +720,7 @@ export function ChartEditor({
       )}
 
       {editing && plan && editing.what === "card" && (
-        <CardDialog plan={plan} cellKey={editing.key} every={editing.every} swap={editing.swap} onChange={setPlan} onClose={() => setEditing(null)} />
+        <CardDialog plan={plan} cellKey={editing.key} every={editing.every} onChange={setPlan} onClose={() => setEditing(null)} />
       )}
       {editing && plan && editing.what === "add" && (
         <AddDialog
@@ -672,6 +728,7 @@ export function ChartEditor({
           day={editing.day ? parseCellKey(`${editing.day}|x`).day : day}
           part={editing.part}
           every={editing.every}
+          at={editing.at}
           onChange={setPlan}
           onClose={() => setEditing(null)}
         />
@@ -766,6 +823,24 @@ function Segments<I extends string>({
         </button>
       ))}
     </span>
+  );
+}
+
+/** A small picture of a day in one, two or three parts: as many tinted rows of rings. */
+function PartsPic({ n }: { n: DayParts }) {
+  const tints = n === 1 ? ["#e9ecef"] : n === 2 ? ["#ffe8a3", "#c5cae9"] : ["#ffe8a3", "#c8e6c9", "#c5cae9"];
+  const h = 20 / n;
+  return (
+    <svg className="rw-look-pic" viewBox="0 0 32 22" aria-hidden>
+      {tints.map((tint, row) => (
+        <g key={tint}>
+          <rect x={1} y={1 + row * h} width={30} height={h - 0.8} rx={1.5} fill={tint} stroke="none" />
+          {Array.from({ length: 5 }, (_, i) => (
+            <circle key={i} cx={5 + i * 5.5} cy={1 + row * h + (h - 0.8) / 2} r={Math.min(1.8, h / 4)} />
+          ))}
+        </g>
+      ))}
+    </svg>
   );
 }
 
@@ -909,12 +984,15 @@ const cardIn = (id: string, part: Slot | undefined, stars: number): PlanStep => 
   return { ...step, ...(part ? { part } : {}), ...(stars > 0 ? { stars } : {}) };
 };
 
-/** A card tapped: its stars (that day or every day), earlier or later, removed, or swapped for another picture. */
+/**
+ * A card's ⚙️ or picture tapped: only another card to swap it for (user feedback, November 2026). Everything else is
+ * done where it is seen – its stars with the − ＋ at its circles, its place with the ＋ at the cards' edges, removing
+ * with its 🗑️ – so the window never offers any of it a second time.
+ */
 function CardDialog({
   plan,
   cellKey,
   every = false,
-  swap = false,
   onChange,
   onClose,
 }: {
@@ -922,8 +1000,6 @@ function CardDialog({
   cellKey: string;
   /** Tapped at the head of a week's grid: the card of every day changes alike. */
   every?: boolean;
-  /** A week's row's picture tapped: only other cards to swap it for – its circles, place and time are on the sheet. */
-  swap?: boolean;
   onChange: (plan: Plan) => void;
   onClose: () => void;
 }) {
@@ -931,23 +1007,10 @@ function CardDialog({
   const stepLabel = useStepLabel();
   const { day, taskId } = parseCellKey(cellKey);
   const steps = stepsOn(plan, day);
-  const index = steps.findIndex((s) => s.id === taskId);
-  const step = steps[index];
-  const weekdayName = t(DAY_NAMES)[weekday(day)];
-  // In the week a card is that day's; on a day's plan alike every day the stars are every day's, or only this weekday's.
-  const [onlyToday, setOnlyToday] = useState(!every && (plan.view === "week" || !plan.same));
+  const step = steps.find((s) => s.id === taskId);
   if (!step) return null;
   /** The tapped day's cards changed, or with `every` each day's alike. */
   const change = (edit: (list: PlanStep[]) => PlanStep[]) => onChange(every ? withEveryDay(plan, edit) : withDay(plan, day, edit(steps)));
-  const move = (by: number) =>
-    change((list) => {
-      const at = list.findIndex((s) => s.id === step.id);
-      if (at < 0) return list;
-      const next = [...list];
-      next.splice(at, 1);
-      next.splice(at + by, 0, list[at]);
-      return next;
-    });
   return (
     <EditDialog
       title={
@@ -960,77 +1023,6 @@ function CardDialog({
       }
       onClose={onClose}
     >
-      {!swap && (
-        <>
-          <div className="rw-edit-row">
-            <Counter
-              emoji="⭐"
-              wide
-              label={t({ de: "Sterne", en: "Stars", zh: "星星", hi: "सितारे", es: "Estrellas", ar: "النجوم", ru: "Звёзды" })}
-              value={starsOf(step)}
-              min={0}
-              max={MAX_STARS}
-              onChange={(n) => onChange(withStepStars(plan, onlyToday ? weekday(day) : null, step.id, n))}
-            />
-            {plan.view !== "week" && !every && (
-              <Segments
-                label={t({
-                  de: "Für welche Tage?",
-                  en: "For which days?",
-                  zh: "哪几天？",
-                  hi: "किन दिनों के लिए?",
-                  es: "¿Para qué días?",
-                  ar: "لأيّ الأيام؟",
-                  ru: "На какие дни?",
-                })}
-                items={[
-                  {
-                    id: "all",
-                    label: t({ de: "Jeden Tag", en: "Every day", zh: "每天", hi: "हर दिन", es: "Todos los días", ar: "كل يوم", ru: "Каждый день" }),
-                  },
-                  {
-                    id: "one",
-                    label: t({
-                      de: (d: string) => `Nur ${d}`,
-                      en: (d: string) => `Only ${d}`,
-                      zh: (d: string) => `仅${d}`,
-                      hi: (d: string) => `सिर्फ़ ${d}`,
-                      es: (d: string) => `Solo ${d}`,
-                      ar: (d: string) => `${d} فقط`,
-                      ru: (d: string) => `Только ${d}`,
-                    })(weekdayName),
-                  },
-                ]}
-                selected={onlyToday ? "one" : "all"}
-                onPick={(id) => setOnlyToday(id === "one")}
-              />
-            )}
-          </div>
-          <div className="rw-edit-row">
-            <button type="button" className="rw-edit-button" disabled={index === 0 || steps[index - 1].part !== step.part} onClick={() => move(-1)}>
-              ‹ {t({ de: "Früher", en: "Move earlier", zh: "往前移", hi: "पहले करें", es: "Mover antes", ar: "تقديم", ru: "Раньше" })}
-            </button>
-            <button
-              type="button"
-              className="rw-edit-button"
-              disabled={index === steps.length - 1 || steps[index + 1].part !== step.part}
-              onClick={() => move(1)}
-            >
-              {t({ de: "Später", en: "Move later", zh: "往后移", hi: "बाद में करें", es: "Mover después", ar: "تأخير", ru: "Позже" })} ›
-            </button>
-            <button
-              type="button"
-              className="rw-edit-button"
-              onClick={() => {
-                change((list) => list.filter((s) => s.id !== step.id));
-                onClose();
-              }}
-            >
-              🗑️ {t({ de: "Entfernen", en: "Remove", zh: "删除", hi: "हटाएँ", es: "Quitar", ar: "إزالة", ru: "Убрать" })}
-            </button>
-          </div>
-        </>
-      )}
       <h4 className="rw-edit-sub">
         {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
       </h4>
@@ -1047,12 +1039,17 @@ function CardDialog({
   );
 }
 
-/** ＋ tapped: a card for that part of the day (or that day of the week, or with `every` every day of a week's grid), at its end. */
+/**
+ * ＋ tapped: a card right beside the card whose edge it was on (`at`, before or after it, in its part – user feedback,
+ * November 2026), or in an empty place for that part of the day, that day of the week, or with `every` every day of a
+ * week's grid.
+ */
 function AddDialog({
   plan,
   day,
   part,
   every = false,
+  at,
   onChange,
   onClose,
 }: {
@@ -1060,6 +1057,7 @@ function AddDialog({
   day: Date;
   part?: Slot;
   every?: boolean;
+  at?: { cell: string; side: "before" | "after" };
   onChange: (plan: Plan) => void;
   onClose: () => void;
 }) {
@@ -1067,12 +1065,8 @@ function AddDialog({
   const steps = stepsOn(plan, day);
   const add = (id: string) => {
     const card = cardIn(id, part, counterOf(plan));
-    // After the part's last card; a morning that was taken away comes back before the evening.
-    const placed = (list: PlanStep[]) => {
-      const last = list.findLastIndex((s) => s.part === part);
-      const at = last >= 0 ? last + 1 : part === "morning" ? 0 : list.length;
-      return [...list.slice(0, at), card, ...list.slice(at)];
-    };
+    const anchor = at && { id: parseCellKey(at.cell).taskId, side: at.side };
+    const placed = (list: PlanStep[]) => withInserted(list, card, anchor);
     onChange(every ? withEveryDay(plan, placed) : withDay(plan, day, placed(steps)));
     onClose();
   };
@@ -1321,7 +1315,7 @@ function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId
             selected={item.id === task?.catalog}
             disabled={!task && board.tasks.length >= MAX_TASKS}
             onClick={() => {
-              const made = taskFromCatalog(item.id);
+              const made = taskInParts(taskFromCatalog(item.id), boardDayParts(board));
               setTasks(task ? board.tasks.map((own) => (own.id === task.id ? made : own)) : [...board.tasks, made]);
               onClose();
             }}

@@ -29,14 +29,24 @@ component, the very sheet that will be used, changed right on it (WYSIWYG). Abov
 (`.rw-options-band`): **Zeitraum** (Tag, Woche, Monat, Countdown, Erst – Dann, Sammeln, `SPANS`; on the page only the views of the
 chart's own kind, since a plan's Tag and a board's Monat are different charts, and none on a Countdown, which is a chart of its own), „Pfeil wandert“ / „Karte wandert“ (only
 without a Zähler), the colours and the child's name – nothing the sheet already does with a tap (user feedback, November
-2026: the Zähler, a 🎁 Belohnung switch, „Tag aufteilen?“ and „Anzahl Karten“ stood there twice and went). On the
+2026: the Zähler, a 🎁 Belohnung switch, „Tag aufteilen?“ and „Anzahl Karten“ stood there twice and went), and the
+**Tageszeiten** – „Ganzer Tag“ (default), „Früh & Abend“ or „Früh, Mittag & Abend“, one, two or three lines (or a
+board's fields per day) for the whole chart (`Plan.dayParts`, `withDayParts`; a board's from its tasks' slots,
+`withBoardDayParts`) – with, from two parts on, their **Zeichen**: „Ohne“ (default, the lines told apart by their tints),
+a drawn sky, the Tagesplan's pictures, sun and moon, a landscape, or cock, plate and bed (`daySigns.tsx`, `Plan.signs`,
+`Board.signs`). Parts are never added or taken line by line on the sheet, and a task has no switches of its own for
+them (user feedback, November 2026: one layout option instead). On the
 sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) every card and the reward carry ⚙️ in their top left
-corner and 🗑️ in their top right (`SheetAction.tsx`): ⚙️ (or a tap on the card) opens its window – its own stars (every
-day or only this weekday), earlier / later in its part, remove, swap for another card – and 🗑️ takes it at once (↶
-brings it back); the reward's ⚙️ opens the goal and the rewards, its 🗑️ leaves the chart without one („＋ Belohnung“
-brings it back). ＋ adds a card to a part; a board shows its tasks as a strip of cards over the sheet (`EditTasks`):
-a tap swaps one, its 🗑️ takes it, ＋ adds one, and under each card its times of day as three switches ☀️ morgens,
-🌤️ am Tag, 🌙 abends in their tints (`toggledSlots`; the last one stays on). The heading is typed
+corner and 🗑️ in their top right (`SheetAction.tsx`): ⚙️ (or a tap on the card) opens its window, which only swaps it for another card –
+its stars are its − ＋, its place is where it was put, 🗑️ takes it at once (↶ brings it back): never a second way in
+the window to do what the sheet already does (user feedback, November 2026: „Früher / Später“, „Entfernen“, „Sterne“ and
+„Jeden Tag / Nur Freitag“ went); the reward's ⚙️ opens the goal and the rewards, its 🗑️ leaves the chart without one („＋ Belohnung“
+brings it back). A new card comes from a small ＋ on a card's edge
+(`InsertCard`, `withInserted`): before every card, and after the last one, left and right in a line, above and below in
+a week's column – under the mouse a blue bar shows where it goes, in that card's part. No empty ＋ card keeps a place:
+the cards always take the best layout, and are set out anew when one comes (user feedback, November 2026); only an
+empty day, line or column shows a ＋ place. A board shows its tasks as a strip of cards over the sheet (`EditTasks`): a
+tap swaps one, its 🗑️ takes it, ＋ adds one in the board's times of day. The heading is typed
 right on the sheet (`PlanSheet onTitle`, its automatic title as the placeholder), and „Tafel löschen“ / „Plan löschen“
 stands in the edit bar after ↶ ↷ (`ChartEditor onRemove`). What needs typing besides (own words, own emoji, times of day,
 „Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`) – and a Countdown has none of it, so it
@@ -45,12 +55,11 @@ auf der Tafel ändern“ says that the sheet is changed as it is seen and printe
 (`history.ts`, also Ctrl/⌘+Z, Ctrl+Shift+Z, Ctrl+Y outside a box for words; letters typed in a row undo as one word);
 the sheet has a dashed edge while it is changed. The stars are set where they are seen: − and ＋ stand at the ends of
 the card's row of star fields, no number between them (the fields are the count); under the mouse ＋ shows the next
-field pale and − pales the last. A plain plan's card has a small „＋⭐“, which makes it count (and brings a reward). A
-part's sign (☀️ / 🌙) stands big for its whole line with 🗑️ above it, „„Morgens“ löschen?“, which marks the line red
-under the mouse before it takes it. Where only one part is left its sign stays with its own 🗑️ („Zeichen löschen?“):
-then the cards stand without a part, and pale „＋ ☀️ / ＋ 🌙“ before the row put a sign back (`SignBack`). Cards are not
+field pale and − pales the last – that field keeps its room unseen all the time (`visibility`, never `display`), so
+nothing jumps under the mouse (user feedback, November 2026). A plain plan's card has a small „＋⭐“, which makes it
+count (without a reward). A part's sign, where one is chosen, stands big for its whole line (`PartName`). Cards are not
 numbered unless „Karten nummerieren“ under „Weitere Einstellungen“ says so (`Plan.numbers`, user feedback, November 2026). The wizard starts on **„Mein Tag“**
-(`defaultDraft`): morning and evening on one sheet, three cards each, a Zähler of 1 and a reward; a Zeitraum keeps
+(`defaultDraft`): its cards in one line („Ganzer Tag“), no signs, a Zähler of 1 and no reward; a Zeitraum keeps
 name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board Vorlage „woche“'s tasks, the same every
 day), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. The wizard's head (`.rw-wizard-head`, sticky on top) holds that
 button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4 oder als Fotoabzug“; in the wizard an open
@@ -166,10 +175,13 @@ of the board.
 
 ## Times of day
 
-A task can have a field per time of day (`BoardTask.slots`: morning, noon, evening; none means once a day), switched
-right under its card on the sheet (☀️ 🌤️ 🌙, `EditTasks`) and with `SlotChips` under „Weitere Einstellungen“. Brushing teeth comes with morning and evening. The week grid
+A task can have a field per time of day (`BoardTask.slots`: morning, noon, evening; none means once a day), chosen for
+all tasks at once with the band's „Tageszeiten“ (`withBoardDayParts`; a new task gets the board's, `taskInParts`) and
+still per task with `SlotChips` under „Weitere Einstellungen“. A catalogue task has no times of its own; the Vorlage
+„Zähne-Woche“ brushes morning and evening (`Template.slots`). The week grid
 gives such a task a row per time under one head, the month and day views put its fields side by side; every such
-field carries its sun or moon on its edge, filled or not, on screen and on paper. A day is full with every time.
+field carries the sign of its time on its edge, filled or not, on screen and on paper – the board's chosen set
+(`Board.signs`), none by default. A day is full with every time.
 A day always runs in its order – the morning's fields first, then the day's (midday or once a day), then the
 evening's (`dayFields`, `weekRows`) – each part on its own tint (`--rw-tint-morning`, `-day`, `-evening`, grey on a
 black-and-white print) where a sheet has more than one.
@@ -261,7 +273,7 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - **The circles are changed where they are, never inside a card or in a window** (user feedback, November 2026): in a
   counting week each day's cell has its own small ＋ and − beside its circles (`withCellStars`; − on the last takes the
   card off that day, a big pale ＋ ring brings it back), and the row's ＋ − for every day stand in a column of their own
-  right of the grid, headed „Kreise“, with ▲▼ and the row's time of day ☀️ 🌤️ 🌙 (`RowTools`). A tap on a circle while
+  right of the grid, headed „Kreise“, with ▲▼, a ＋ for a row above or below, and the row's time of day where the week has parts (`RowTools`). A tap on a circle while
   the chart is made opens nothing; the card's picture swaps it, its 🗑️ takes the row.
 - **The layout is chosen, never changed by what is tapped** (user feedback, November 2026: picking a card turned the
   week into a picture per day): the band's „Darstellung“ chooses it – a week „Eine Karte je Zeile“ (default) or „Bild
@@ -282,8 +294,10 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   weekday only (`withStepStars`, two stars on Monday for brushing), set right on the card with the − ＋ at its stars; in a
   week's grid the row's − ＋, ⚙️, 🗑️ and its picture change the card of every day alike (`withEveryDay`, `data-every`). A plan with a Zähler is a Belohnungstafel: „✓ Tafel
   anlegen“, and the Belohnungstafel's book opens it.
-- **One reward** for the whole chart, there by default (`defaultReward`). Its 🗑️ or „Ohne Belohnung“ takes away only
-  the reward (`Plan.reward` null) – the stars stay; „＋ Belohnung“ on the sheet brings it back.
+- **One reward** for the whole chart, none by default, and none takes room (user feedback, November 2026): without one
+  the sheet has no goal line and no footer, only a small „＋ 🎁 Belohnung“ tag in the heading while it is made
+  (`AddReward`, `.rw-reward-add`). Its 🗑️ or „Ohne Belohnung“ takes away only the reward (`Plan.reward` null) – the
+  stars stay.
 - A sheet in the editor stands in a row (`rw-main` round `rw-screen`), like the chart on the page: in a column under a
   box with only a min-height it got no height and shrank to a strip.
 - A button that can do nothing is left out, never shown greyed.
@@ -350,7 +364,7 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   Countdown to a birthday five nights away).
 - `PlanSheet.tsx` – the sheet for screen and print, one component per view: `DaySteps` (the rows – `planLayout` picks
   rows and columns for one part, as many in a row as fit unless another row makes the cards clearly bigger, several
-  parts get a line each with their ☀️ / 🌙 before it – with the paper arrow under the card to do; with the field
+  parts get a line each on their tint, with their chosen sign before it – with the paper arrow under the card to do; with the field
   the „Jetzt“ panel under a 👇, the other rows and on screen the Fertig-Kiste below, `DoneBox`, and on paper `FieldFrames`),
   `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a day), `Countdown` (a field of `NightCard`s,
   each the night's picture `NightPic` over one `StarFields` ring, ➜ the big day's card; once the big day has come only the card, big and golden). No date on the sheet: only a printed
@@ -463,10 +477,10 @@ beside it close it without a tick. The plan prints every ritual it has as a card
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the old first plan kept the fixed id `erster-plan`), as for the board.
-- A card added with ＋ fills the last row first (user feedback, November 2026): `planLayout` keeps the layout while it
-  has a free place, so the new card takes the ＋'s place and the ＋ moves on – into a new row below, same columns, when
-  the row was full. The rows are laid out anew only when the cards would get much bigger (`REFLOW_GAIN`) or still fit
-  one line, never with every ＋ (Countdown's nights, a day's cards; `plan.test.ts`). A new grid with a ＋ uses it.
+- Cards always stand in the best layout (user feedback, November 2026, replacing „a card added fills the last row
+  first“): `planLayout` counts only the cards, never a ＋ place, so no empty place is kept, and a card added may set
+  them out anew (`plan.test.ts`). New cards come from the ＋ on a card's edge (`InsertCard`), a new night from the ＋ at
+  the last night's edge.
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
 

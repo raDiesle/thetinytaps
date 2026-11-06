@@ -116,7 +116,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "📆 Woche und Monat direkt auf dem Blatt (4 Wochen, Darstellungen, Tageszeiten, Kreise je Tag)",
         languages: { de: "done" },
-        note: "Seit 6. November 2026: „Monat als: 4 Wochen / Kalendermonat“, „Darstellung“ (Kalender, Tabelle, Wochen; „Eine Karte je Zeile“, „Bild über jedem Kreis“), „1. Woche“ bis „4. Woche“, die Schalter „morgens / am Tag / abends“ unter jeder Aufgabe, die Spalte „Kreise“ und „Tauschen gegen“. Nur Deutsch.",
+        note: "Seit 6. November 2026: „Monat als: 4 Wochen / Kalendermonat“, „Darstellung“ (Kalender, Tabelle, Wochen; „Eine Karte je Zeile“, „Bild über jedem Kreis“), „1. Woche“ bis „4. Woche“, die Spalte „Kreise“ und „Tauschen gegen“. Nur Deutsch.",
+      },
+      {
+        label: "🌅 Tageszeiten und ihre Zeichen, Karten einfügen",
+        languages: { de: "done" },
+        note: "Seit 6. November 2026: „Tageszeiten“ (Ganzer Tag, Früh & Abend, Früh, Mittag & Abend), „Zeichen“ (Ohne, Himmel, Bilder, Sonne & Mond, Landschaft, Hahn, Teller, Bett) und die ＋ am Kartenrand („Karte links davor einfügen“ … „Karte darunter einfügen“). Nur Deutsch.",
       },
       {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",

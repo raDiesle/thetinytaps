@@ -10,6 +10,7 @@ import {
   COUNTDOWN_NIGHTS,
   counterOf,
   counting,
+  dayPartsOf,
   currentStep,
   distinctSteps,
   fromOlder,
@@ -28,6 +29,8 @@ import {
   restartDay,
   routineStep,
   sameCards,
+  withDayParts,
+  withInserted,
   splitDone,
   starsGot,
   stepDone,
@@ -254,19 +257,51 @@ describe("cards of a day", () => {
     }
   });
 
-  test("a card more fills the last row first: nothing moves while the layout still has a free place", () => {
+  // Cards always take the room best (user feedback, November 2026): no ＋ card keeps a place free, and a card added
+  // may set them out anew, so they fill the sheet again.
+  test("cards always stand in the best layout, never with a row left empty, and a card more may set them out anew", () => {
     for (const aspect of [0.5, 0.8, 1.4, 2, 3.5]) {
-      for (let n = 1; n < MAX_NIGHTS + 1; n++) {
-        const before = planLayout(n, aspect);
-        const after = planLayout(n + 1, aspect);
-        if (n < before.cols * before.rows) expect(after).toEqual(before);
-        // Never a grid with a row left empty.
-        expect(after.cols * (after.rows - 1)).toBeLessThan(n + 1);
+      for (let n = 1; n <= MAX_NIGHTS; n++) {
+        const { cols, rows } = planLayout(n, aspect);
+        expect(cols * (rows - 1)).toBeLessThan(n);
+        expect(cols).toBeLessThanOrEqual(n);
       }
     }
-    // Five nights and the ＋ fill two rows of three; ＋ pressed in the last place puts the night there and the ＋ below.
     expect(planLayout(6, 1.34)).toEqual({ cols: 3, rows: 2 });
-    expect(planLayout(7, 1.34)).toEqual({ cols: 3, rows: 3 });
+    expect(planLayout(7, 1.34)).toEqual({ cols: 4, rows: 2 });
+  });
+});
+
+// „Tageszeiten“ is one choice for the whole plan, never cards' parts added or taken one by one (user feedback,
+// November 2026), and a new card goes where the grown-up's ＋ at a card's edge was.
+describe("times of day and new cards", () => {
+  const day = planFromTemplate(PLAN_TEMPLATES.find((tpl) => tpl.view === "day") ?? PLAN_TEMPLATES[0]);
+  const whole = withDayParts(day, 1);
+
+  test("one part takes every card's part away, two share them out in order, three add an empty midday", () => {
+    expect(dayPartsOf(whole)).toBe(1);
+    expect(whole.days[0].every((step) => step.part === undefined)).toBe(true);
+    const two = withDayParts(whole, 2);
+    expect(dayPartsOf(two)).toBe(2);
+    const n = two.days[0].length;
+    expect(two.days[0].map((step) => step.part)).toEqual(two.days[0].map((_, i) => (i < n / 2 ? "morning" : "evening")));
+    const three = withDayParts(two, 3);
+    expect(dayPartsOf(three)).toBe(3);
+    expect(three.days[0].map((step) => step.part)).toEqual(two.days[0].map((step) => step.part));
+    // Back to two parts: the midday cards join the morning.
+    const noon = { ...three, days: [three.days[0].map((step, i) => (i === 0 ? { ...step, part: "noon" as const } : step))] };
+    expect(withDayParts(noon, 2).days[0].every((step) => step.part === "morning" || step.part === "evening")).toBe(true);
+  });
+
+  test("a card goes beside the card whose ＋ was tapped, in that card's part", () => {
+    const steps = withDayParts(whole, 2).days[0];
+    const card = { id: "neu", emoji: "🧸" };
+    const last = steps[steps.length - 1];
+    const before = withInserted(steps, card, { id: last.id, side: "before" });
+    expect(before[steps.length - 1]).toEqual({ ...card, part: "evening" });
+    const after = withInserted(steps, card, { id: steps[0].id, side: "after" });
+    expect(after[1]).toEqual({ ...card, part: "morning" });
+    expect(withInserted(whole.days[0], card).at(-1)).toEqual(card);
   });
 });
 

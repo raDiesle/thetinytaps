@@ -19,11 +19,11 @@ import {
   fourWeeks,
   periodDays,
   progress,
-  shownSlots,
   taskSlots,
   weekday,
 } from "./board";
-import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
+import { DaySign, type DaySignSet } from "./daySigns";
+import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
 
@@ -144,7 +144,7 @@ export function BoardSheet({
   // Grey prints take their colours from .rw-grey; inline ones would win over it.
   const grey = greyPrint(look);
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
-  const fieldProps = { mark, look, fresh, example };
+  const fieldProps = { mark, look, fresh, example, signs: board.signs };
   const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
 
   return (
@@ -166,6 +166,12 @@ export function BoardSheet({
         )}
         {!look.print && board.kind === "day" && <span className="rw-blank">{dateFormat({ weekday: "long", day: "numeric", month: "long" }).format(day)}</span>}
         {board.kind === "month" && !fourWeeks(board) && <span className="rw-blank">{dateFormat({ month: "long", year: "numeric" }).format(day)}</span>}
+        {/* No reward by default, and no room kept for one: only this small tag while the board is made (user feedback, November 2026). */}
+        {editing && board.kind !== "collect" && !board.reward && (
+          <span className="rw-reward-add" data-edit="reward" role="button" tabIndex={0}>
+            ＋ <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
+          </span>
+        )}
       </header>
       {editing && <EditTasks board={board} />}
       <div className="rw-body">
@@ -184,13 +190,8 @@ export function BoardSheet({
           />
         )}
       </div>
-      {board.kind !== "collect" && (board.reward || goal <= MAX_DOTS || editing) && (
+      {board.kind !== "collect" && board.reward && (
         <footer className="rw-goal" data-edit={editing ? "reward" : undefined}>
-          {editing && !board.reward && (
-            <span className="rw-reward rw-reward-add">
-              ＋ {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
-            </span>
-          )}
           {board.reward && (
             <span className="rw-reward">
               {editing && <RewardActions />}
@@ -219,26 +220,17 @@ export function BoardSheet({
   );
 }
 
-/** The times of day a task's switches offer, in the day's order, with the words under the mouse. */
-const SLOT_SWITCHES: { slot: Slot; emoji: string; label: Localized }[] = [
-  { slot: "morning", emoji: "☀️", label: { de: "morgens" } },
-  { slot: "noon", emoji: "🌤️", label: { de: "am Tag" } },
-  { slot: "evening", emoji: "🌙", label: { de: "abends" } },
-];
-
 /**
  * While a board is made or changed, its tasks as cards in a row over the sheet – a tap on the picture swaps it, 🗑️ in
- * its corner takes it, and under it ☀️ 🌤️ 🌙 switch its times of day right there, in the order of the day (user
- * feedback, November 2026: WYSIWYG, no window for it) – and ＋ for one more. A collecting board has no times of day.
+ * its corner takes it – and ＋ for one more. The times of day are the band's „Tageszeiten“, the same for every task
+ * (user feedback, November 2026: no switches under each card).
  */
 function EditTasks({ board }: { board: Board }) {
   const t = useT();
   const taskLabel = useTaskLabel();
-  const times = board.kind !== "collect";
   return (
     <div className="rw-edit-tasks">
       {board.tasks.map((task) => {
-        const on = shownSlots(task);
         return (
           <span key={task.id} className="rw-edit-task">
             <span className="rw-edit-task-card" data-edit="task" data-task={task.id} role="button" tabIndex={0} title={taskLabel(task)}>
@@ -246,39 +238,10 @@ function EditTasks({ board }: { board: Board }) {
                 <ItemPic item={task} />
               </span>
               <span className="rw-edit-task-name">{taskLabel(task)}</span>
-              {(board.tasks.length > 1 || !times) && (
+              {(board.tasks.length > 1 || board.kind === "collect") && (
                 <SheetAction act="delete" ask={t({ de: `„${taskLabel(task)}“ löschen?` })} data={{ "data-edit": "delete-task", "data-task": task.id }} />
               )}
             </span>
-            {times && (
-              <span className="rw-edit-slots">
-                {SLOT_SWITCHES.map(({ slot, emoji, label }) => {
-                  const active = on.includes(slot);
-                  // The last time of day stays: a task without one would have no field.
-                  const last = active && on.length === 1;
-                  return last ? (
-                    <span key={slot} className={`rw-edit-slot on fixed rw-slot-${slot}`} title={t(label)}>
-                      {emoji}
-                    </span>
-                  ) : (
-                    <span
-                      key={slot}
-                      className={`rw-edit-slot rw-slot-${slot}${active ? " on" : ""}`}
-                      data-edit="slot"
-                      data-task={task.id}
-                      data-slot={slot}
-                      role="switch"
-                      aria-checked={active}
-                      tabIndex={0}
-                      title={t(label)}
-                      aria-label={`${taskLabel(task)}: ${t(label)}`}
-                    >
-                      {emoji}
-                    </span>
-                  );
-                })}
-              </span>
-            )}
           </span>
         );
       })}
@@ -302,6 +265,8 @@ const greyPrint = (look: SheetLook) => look.print && !look.color;
 
 interface FieldLook {
   mark: CatalogMark;
+  /** The board's signs of the times of day; none: a field in parts shows no sign. */
+  signs?: DaySignSet;
   look: SheetLook;
   fresh?: string | null;
   /** Example stars shown, if any. */
@@ -322,6 +287,7 @@ function Field({
   next = false,
   hint,
   slot,
+  signs,
   isExample = false,
 }: FieldLook & { id: string; state: FieldState; next?: boolean; hint?: ReactNode; slot?: Slot; isExample?: boolean }) {
   const real = isExample ? (state === "filled" ? "open" : state) : state;
@@ -334,9 +300,9 @@ function Field({
       data-tap={look.print ? undefined : tap}
     >
       <span className="rw-ring">
-        {slot && (
+        {slot && signs && (
           <span className="rw-slot" aria-hidden>
-            {SLOT_BY_ID.get(slot)?.emoji}
+            <DaySign set={signs} part={slot} lines={greyPrint(look)} />
           </span>
         )}
         {state === "filled" ? (
@@ -395,7 +361,7 @@ function fieldOf({ stars, real, linked, today, look }: GridProps, day: Date, tas
 }
 
 /** The props of `Field` that come from the sheet, without the grid's own. */
-const fieldLook = ({ mark, look, fresh, example }: GridProps): FieldLook => ({ mark, look, fresh, example });
+const fieldLook = ({ mark, look, fresh, example, signs }: GridProps): FieldLook => ({ mark, look, fresh, example, signs });
 
 /** Tasks in rows (a row per time of day where a task has several), the chosen weekdays in columns, today's column marked on screen. */
 function WeekGrid(props: GridProps) {

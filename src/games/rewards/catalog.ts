@@ -59,8 +59,6 @@ export interface CatalogTask {
   label: Localized;
   /** The game that gives this task its star by itself (Zähne putzen, Aufs Töpfchen). */
   linked?: LinkedGame;
-  /** A field for each of these times of day instead of one a day, when the task is picked. */
-  slots?: Slot[];
 }
 
 /** Tasks for two- and three-year-olds, the most asked for first. */
@@ -70,7 +68,6 @@ export const TASKS: CatalogTask[] = [
     emoji: "🪥",
     label: { de: "Zähne putzen", en: "Brush teeth", zh: "刷牙", hi: "दाँत साफ़ करना", es: "Lavarse los dientes", ar: "تنظيف الأسنان", ru: "Чистить зубы" },
     linked: "teeth",
-    slots: ["morning", "evening"],
   },
   {
     id: "toepfchen",
@@ -485,7 +482,7 @@ export interface Template {
   mark: string;
   theme: string;
   title?: Localized;
-  /** Times of day of a task, where they differ from the catalogue's (Mein Morgen brushes only in the morning). */
+  /** Times of day of a task (Zähne-Woche brushes morning and evening); without: once a day, the board's default. */
   slots?: Record<string, Slot[]>;
   /** One line for grown-ups under its picture in the gallery and the wizard. */
   hint: Localized;
@@ -499,6 +496,7 @@ export const TEMPLATES: Template[] = [
     label: { de: "Zähne-Woche", en: "Teeth week", zh: "刷牙周", hi: "दाँतों का हफ़्ता", es: "Semana de dientes", ar: "أسبوع الأسنان", ru: "Неделя зубов" },
     kind: "week",
     tasks: ["zaehne"],
+    slots: { zaehne: ["morning", "evening"] },
     goal: 10,
     reward: "buch",
     mark: "stern",

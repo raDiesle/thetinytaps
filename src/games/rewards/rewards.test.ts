@@ -4,6 +4,7 @@ import {
   addStar,
   type Board,
   boardDays,
+  boardDayParts,
   boardFromTemplate,
   boardSame,
   boardShift,
@@ -29,12 +30,15 @@ import {
   startOver,
   suggestsCertificate,
   takeBackStar,
-  toggledSlots,
+  rewardFromCatalog,
+  taskFromCatalog,
+  taskInParts,
+  withBoardDayParts,
   withKind,
   withStart,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
-import { DAY_PARTS } from "./plan";
+import { dayPartsOf } from "./plan";
 import { defaultDraft, draftInSpan, SPANS } from "./ChartEditor";
 import {
   ACTIVITIES,
@@ -247,7 +251,7 @@ describe("a month of four weeks (user feedback, November 2026)", () => {
     expect(boardSame(month, wednesday, new Date(2026, 9, 25))).toBe(false);
   });
 
-  test("a day's fields stand morning, day, evening, and a task's times of day switch on and off", () => {
+  test("a day's fields stand morning, day, evening, and the board's times of day are chosen once for every task", () => {
     const [a, b] = week.tasks;
     const board = {
       ...week,
@@ -261,9 +265,16 @@ describe("a month of four weeks (user feedback, November 2026)", () => {
       [b.id, "day"],
       [a.id, "evening"],
     ]);
-    expect(toggledSlots({ ...b, slots: undefined }, "morning")).toEqual(["morning", "noon"]);
-    expect(toggledSlots({ ...b, slots: ["morning", "noon"] }, "morning")).toBeUndefined();
-    expect(toggledSlots({ ...b, slots: ["evening"] }, "evening")).toEqual(["evening"]);
+    expect(boardDayParts(week)).toBe(1);
+    expect(boardDayParts(board)).toBe(2);
+    const three = withBoardDayParts(board, 3);
+    expect(boardDayParts(three)).toBe(3);
+    expect(three.tasks.map((t) => t.slots)).toEqual([
+      ["morning", "noon", "evening"],
+      ["morning", "noon", "evening"],
+    ]);
+    expect(withBoardDayParts(three, 1).tasks.every((t) => !("slots" in t))).toBe(true);
+    expect(taskInParts({ ...b, slots: undefined }, 2).slots).toEqual(["morning", "evening"]);
   });
 });
 
@@ -279,8 +290,8 @@ describe("times of day", () => {
   const teethWeek = { ...boardFromTemplate(TEMPLATES[0]), id: "z" };
   const teeth = teethWeek.tasks[0];
 
-  test("brushing teeth has a field in the morning and one in the evening, everywhere it is picked", () => {
-    expect(TASK_BY_ID.get("zaehne")?.slots).toEqual(["morning", "evening"]);
+  test("the Zähne-Woche brushes in the morning and the evening; a task picked anew follows the board's times of day", () => {
+    expect(taskFromCatalog("zaehne").slots).toBeUndefined();
     expect(teeth.slots).toEqual(["morning", "evening"]);
     expect(fieldCount(teethWeek, wednesday)).toBe(14);
     // Mein Tag is the morning and the evening on one board: brushing at both, dressing in the morning, the bath at night.
@@ -445,22 +456,37 @@ describe("one page for boards and plans", () => {
     }
   });
 
-  // The wizard starts on „Mein Tag“ with a star a card and a reward (user decision, November 2026), and a new Zeitraum
-  // keeps the child's name, the colours and the reward.
-  test("the wizard starts on Mein Tag, 3 + 3 cards with a Zähler and a reward, and a span keeps name and reward", () => {
+  // The wizard starts on „Mein Tag“ with a star a card (user decision, November 2026) – the whole day in one line and no
+  // reward, which takes no room until one is added (user feedback, November 2026) – and a new Zeitraum keeps the
+  // child's name, the colours and the reward.
+  test("the wizard starts on Mein Tag, its cards in one line with a Zähler and no reward, and a span keeps name and reward", () => {
     const draft = defaultDraft("de");
     if (draft.type !== "plan") throw new Error("Mein Tag is a plan");
     expect(draft.plan.view).toBe("day");
-    expect(DAY_PARTS.map((part) => draft.plan.days[0].filter((step) => step.part === part).length)).toEqual([3, 3]);
+    expect(draft.plan.days[0]).toHaveLength(6);
+    expect(draft.plan.days[0].every((step) => step.part === undefined)).toBe(true);
+    expect(dayPartsOf(draft.plan)).toBe(1);
+    expect(draft.plan.signs).toBeUndefined();
     expect(draft.plan.days[0].every((step) => step.stars === 1)).toBe(true);
     expect(draft.plan.numbers).toBeFalsy();
-    expect(draft.plan.reward?.catalog).toBe("spielplatz");
-    const named: typeof draft = { type: "plan", plan: { ...draft.plan, childName: "Lena", theme: "meer" } };
+    expect(draft.plan.reward ?? null).toBeNull();
+    const named: typeof draft = { type: "plan", plan: { ...draft.plan, childName: "Lena", theme: "meer", reward: rewardFromCatalog("spielplatz") } };
     for (const span of SPANS) {
       const moved = draftInSpan(span, named, "de");
       const chart = moved.type === "board" ? moved.board : moved.plan;
       expect(moved.type).toBe(span.type);
       expect([chart.childName, chart.theme, chart.reward?.catalog]).toEqual(["Lena", "meer", "spielplatz"]);
+      // „Ganzer Tag“ goes along: no span comes in parts the grown-up didn't choose.
+      if (moved.type === "board")
+        expect(
+          moved.board.tasks.every((task) => !task.slots),
+          span.id,
+        ).toBe(true);
+      else
+        expect(
+          moved.plan.days.flat().every((step) => !step.part),
+          span.id,
+        ).toBe(true);
       // A Countdown counts nights, never stars.
       if (moved.type === "plan")
         expect(

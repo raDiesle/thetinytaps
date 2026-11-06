@@ -738,7 +738,7 @@
   font-size: clamp(0.9rem, 4cqmin, 1.6rem);
 }
 
-/* A part's sign stands for its whole line: big, with its 🗑️ above it while the chart is made. */
+/* A part's sign stands for its whole line: big, the set chosen in the band. */
 .pl-part {
   display: flex;
   flex-direction: column;
@@ -751,14 +751,7 @@
   line-height: 1;
 }
 
-/* The part's 🗑️ above its sign, in the flow: a whole line under the mouse turns red, or the last one's sign alone. */
-.pl-part > .rw-act {
-  --rw-act: clamp(20px, 6cqmin, 34px);
-  position: relative;
-  inset: auto;
-}
-
-.pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover),
+/* A week's row under the mouse on its 🗑️: red, its rings and picture faded. */
 .pl-wrow:has(.pl-whead > .rw-act-delete:hover) > *,
 .pl-wrow:has(.pl-wtools > .rw-act-delete:hover) > * {
   background: color-mix(in srgb, #e53935 14%, transparent);
@@ -766,45 +759,8 @@
   outline-offset: -1px;
 }
 
-.pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover) {
-  border-radius: 2cqmin;
-}
-
-.pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover) :is(.pl-card, .pl-part-sign),
-.pl-wrow:has(.pl-whead > .rw-act-delete:hover) :is(.pl-wcell .pl-stars, .pl-whead .pl-emoji),
-.pl-part:has(> .rw-act[data-edit="sign"]:hover) > .pl-part-sign {
+.pl-wrow:has(.pl-whead > .rw-act-delete:hover) :is(.pl-wcell .pl-stars, .pl-whead .pl-emoji) {
   opacity: 0.4;
-}
-
-.pl-part:has(> .rw-act[data-edit="sign"]:hover) > .pl-part-sign {
-  border-radius: 50%;
-  outline: max(2px, 0.5cqmin) dashed #c62828;
-  outline-offset: 2px;
-}
-
-/* A day in one line: ☀️ and 🌙, pale, to give it a sign again. */
-.pl-sign-back {
-  justify-content: center;
-}
-
-.pl-sign-add {
-  display: grid;
-  place-items: center;
-  width: 1.5em;
-  height: 1.5em;
-  border: max(2px, 0.4cqmin) dashed var(--rw-ink);
-  border-radius: 50%;
-  font-size: clamp(0.9rem, 5cqmin, 2.4rem);
-  opacity: 0.4;
-  filter: grayscale(0.7);
-  cursor: pointer;
-}
-
-.pl-sign-add:hover,
-.pl-sign-add:focus-visible {
-  background: #fff;
-  opacity: 1;
-  filter: none;
 }
 
 /* While it is made a card's top right corner is its 🗑️: an example's tick says nothing about the design anyway. */
@@ -836,7 +792,7 @@
   right: 3cqmin;
 }
 
-.pl-editing :is(.pl-card, .pl-whead, .pl-goal, .pl-part):has(.rw-act:hover, .rw-act:focus-visible) {
+.pl-editing :is(.pl-card, .pl-whead, .pl-goal):has(.rw-act:hover, .rw-act:focus-visible, .pl-insert:hover, .pl-insert:focus-visible) {
   z-index: 4;
 }
 
@@ -871,15 +827,19 @@
   visibility: hidden;
 }
 
-/* Two classes: `.rw-field` (rewards.css, loaded after this file on the dev server) shows it otherwise. */
+/*
+ * The ring ＋ would add keeps its place all the time, only unseen: shown under the mouse, nothing moves – neither the
+ * other rings nor − and ＋ (user feedback, November 2026). Two classes: `.rw-field` (rewards.css, loaded after this
+ * file on the dev server) shows it otherwise.
+ */
 .pl-star.pl-star-ghost {
-  display: none;
+  visibility: hidden;
   opacity: 0.55;
 }
 
 .pl-stars:has(> .pl-star-step.more:hover) > .pl-star.pl-star-ghost,
 .pl-wrow:has(.pl-star-step.more:hover) .pl-star.pl-star-ghost {
-  display: grid;
+  visibility: visible;
 }
 
 .pl-stars:has(> .pl-star-step.less:hover) > .pl-star-end,
@@ -926,17 +886,6 @@
 .pl-star-add:focus-visible {
   background: var(--rw-main);
   opacity: 1;
-}
-
-.pl-part-back {
-  align-self: flex-start;
-  padding: 0.6cqmin 2cqmin;
-  border: max(2px, 0.5cqmin) dashed var(--rw-ink);
-  border-radius: 999px;
-  font-size: clamp(0.8rem, 3cqmin, 1.4rem);
-  font-weight: 700;
-  opacity: 0.7;
-  cursor: pointer;
 }
 
 /* ---------- A week of stars: a row per card, a column per day, as a reward chart always was ---------- */
@@ -1043,16 +992,6 @@
 
 .pl-wcell.wiggle {
   animation: wiggle 0.45s ease-in-out;
-}
-
-.pl-wadd {
-  display: flex;
-  grid-column: 1 / -1;
-  min-height: 0;
-}
-
-.pl-wadd > .pl-add {
-  aspect-ratio: auto;
 }
 
 /* A week's rows in the day's order, each part of the day on its tint (rewards.css): the morning, the day, the evening. */
@@ -1601,4 +1540,134 @@
   font-weight: 800;
   box-shadow: 0 3px 0 var(--ink);
   cursor: pointer;
+}
+
+/*
+ * ＋ at a card's edge while a plan is made: a new card right there, before it or – at the last card – after it (user
+ * feedback, November 2026: WYSIWYG instead of an empty ＋ card keeping a place). Pale until the mouse comes, then a
+ * bar along the edge shows where the card will go. It lies over the gap between two cards, so nothing moves.
+ */
+.pl-insert {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: clamp(20px, 15cqmin, 34px);
+  height: clamp(20px, 15cqmin, 34px);
+  border: 2px solid var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink);
+  font-size: clamp(13px, 10cqmin, 22px);
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.45;
+  translate: -50% -50%;
+  cursor: pointer;
+}
+
+.pl-insert-row {
+  top: 50%;
+}
+
+.pl-insert-row.before {
+  left: 0;
+}
+
+.pl-insert-row.after {
+  left: 100%;
+}
+
+.pl-insert-column {
+  left: 50%;
+}
+
+.pl-insert-column.before {
+  top: 0;
+}
+
+.pl-insert-column.after {
+  top: 100%;
+}
+
+.pl-insert:hover,
+.pl-insert:focus-visible {
+  background: var(--rw-main);
+  opacity: 1;
+}
+
+/* The bar: where the new card goes, along the card's edge. */
+.pl-insert::before {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  border-radius: 999px;
+  /* A blue caret, as where text goes in: seen on any card's border, which is drawn in the chart's own colours. */
+  background: #1c7ed6;
+  box-shadow: 0 0 0 2px #fff;
+  content: "";
+  opacity: 0;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.pl-insert-row::before {
+  width: 5px;
+  height: 90cqh;
+}
+
+.pl-insert-column::before {
+  width: 90cqw;
+  height: 5px;
+}
+
+.pl-insert:hover::before,
+.pl-insert:focus-visible::before {
+  opacity: 1;
+}
+
+/* No reward until one is chosen, and no room kept for it: only this small tag in the heading while it is made – on a
+   plan at the heading's right end, over the line of the centred title, so it takes no line of its own. */
+.pl-sheet > .rw-head {
+  position: relative;
+}
+
+.pl-reward-add {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  translate: 0 -50%;
+}
+
+.pl-reward-add,
+.rw-reward-add {
+  padding: 0.2em 0.8em;
+  border: max(2px, 0.4cqmin) dashed var(--rw-ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: clamp(0.75rem, 2.6cqmin, 1.1rem);
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.pl-reward-add:hover,
+.pl-reward-add:focus-visible,
+.rw-reward-add:hover,
+.rw-reward-add:focus-visible {
+  background: var(--rw-main);
+  opacity: 1;
+}
+
+/* A part of the day on its tint (rewards.css), so the lines tell themselves apart also without signs. */
+.pl-row.pl-row-part {
+  padding: 1cqmin;
+  border-radius: 2cqmin;
+}
+
+.pl-row.pl-row-part + .pl-row.pl-row-part {
+  border-top: none;
 }

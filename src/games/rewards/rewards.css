@@ -1005,57 +1005,6 @@
   background: color-mix(in srgb, #e53935 14%, #fff);
 }
 
-/* ☀️ 🌤️ 🌙 under a task: its times of day, switched right there; the ones on stand out, the others wait pale. */
-.rw-edit-slots {
-  display: inline-flex;
-  gap: 0.6cqmin;
-}
-
-.rw-edit-slot {
-  display: grid;
-  place-items: center;
-  width: max(26px, 4.6cqmin);
-  height: max(26px, 4.6cqmin);
-  border: max(2px, 0.35cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
-  border-radius: 50%;
-  background: #fff;
-  font-family: var(--font-emoji);
-  font-size: max(14px, 2.6cqmin);
-  line-height: 1;
-  opacity: 0.45;
-  filter: grayscale(0.8);
-  cursor: pointer;
-}
-
-.rw-edit-slot.on {
-  border-style: solid;
-  border-color: var(--rw-ink);
-  background: var(--rw-tint-day);
-  opacity: 1;
-  filter: none;
-}
-
-.rw-edit-slot.on[data-slot="morning"],
-.rw-edit-slot.on.rw-slot-morning {
-  background: var(--rw-tint-morning);
-}
-
-.rw-edit-slot.on.rw-slot-evening {
-  background: var(--rw-tint-evening);
-}
-
-.rw-edit-slot.fixed {
-  cursor: default;
-}
-
-.rw-edit-slot:not(.fixed):hover,
-.rw-edit-slot:not(.fixed):focus-visible {
-  opacity: 1;
-  filter: none;
-  outline: max(2px, 0.4cqmin) dashed var(--rw-ink);
-  outline-offset: 2px;
-}
-
 .rw-edit-add {
   align-self: flex-start;
   justify-content: center;
@@ -1092,13 +1041,6 @@
 
 .rw-path-end > .rw-act-right {
   right: 2cqmin;
-}
-
-.rw-reward-add {
-  padding: 0.6cqmin 1.8cqmin;
-  border: max(2px, 0.4cqmin) dashed var(--rw-ink);
-  border-radius: 999px;
-  font-weight: 700;
 }
 
 /* „Weitere Einstellungen“: the editor of before, for own words and pictures, the weekdays and what to start over. */
@@ -1387,7 +1329,7 @@
   --rw-ink: #222;
 }
 
-.rw-grey :is(.rw-title-mark, .rw-task-emoji, .rw-reward-emoji, .rw-mark, .rw-path-start),
+.rw-grey :is(.rw-title-mark, .rw-task-emoji, .rw-reward-emoji, .rw-mark, .rw-path-start, .rw-sky-sign, .rw-slot, .pl-part-sign, .pl-whead-part),
 .rw-grey.rw-sticker-page .rw-sticker {
   filter: grayscale(1) contrast(1.15);
 }
@@ -1911,7 +1853,7 @@
   opacity: 0.5;
 }
 
-/* The time of day of a field, on its edge: a sun in the morning, a moon in the evening. */
+/* The time of day of a field, on its edge, in the set chosen in the band (`Board.signs`); none without one. */
 .rw-slot {
   position: absolute;
   top: -8%;
@@ -2842,4 +2784,22 @@
 
 :is(.pl-card, .pl-goal, .rw-reward, .rw-path-end):has(> .rw-act-delete:hover) > :is(.pl-emoji, .pl-stars, .pl-goal-pic, .rw-reward-emoji) {
   opacity: 0.4;
+}
+
+/* The drawn sky of a time of day (daySigns.tsx): as big as an emoji there, a little more. */
+.rw-sky-sign {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  color: var(--rw-ink, var(--ink));
+  vertical-align: -0.2em;
+}
+
+/* „Zeichen“ in the band: each set shows its signs side by side in its button. */
+.rw-sign-pics {
+  display: inline-flex;
+  gap: 2px;
+  font-family: var(--font-emoji);
+  font-size: 1.15em;
+  line-height: 1;
 }
