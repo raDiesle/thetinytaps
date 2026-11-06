@@ -17,7 +17,7 @@ feedback, November 2026). Beside it the Vorlagen of its kind, grouped under the 
 „Drucken“ (and a board's „Rückblick“) work on the one shown. Each address opens its own kind: `/belohnungstafel/` a board
 or a plan with a Zähler (below), `/tagesplan/` a plan of the day, never a Countdown (so the teeth card's return and a
 search visitor land there), `/wie-lange-warten/` a Countdown (H-05, user request, November 2026) – on the shelf each is a
-book of its own, the three tied with a ribbon in the order Zeitplan, „Wie lange warten?“, Belohnungstafel, the last bound
+book of its own, the three tied with a ribbon in the order „Wie lange warten?“, Zeitplan, Belohnungstafel, the last bound
 in gold by its address (`Game.volumes`, `GOLD` in `Bookshelf.tsx`, user feedback, November 2026), so the book
 named Belohnungstafel opens a board, or the wizard on its kind where none is made yet (below; „Wie lange warten?“ the
 wizard on the Vorlage „Wie oft noch schlafen?“), with the other charts behind it. Once a tab or the wizard showed

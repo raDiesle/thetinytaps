@@ -511,12 +511,12 @@ export function buildSpace() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it waits for the child's tap (R-03): the sleeping robot, the earth the buggy bumped, the hovering UFO, the countdown board with the iron ball in it. */
+  /** Where it could wait for the child's tap (R-03): the sleeping robot, the earth the buggy bumped, the hovering UFO, the countdown board with the iron ball in it. Only the countdown board waits; the machine runs through the others. */
   const stops = [
     { at: tRobot, x: ROBOT.cx, y: DECK.y - 110 },
     { at: tBump, x: planetSpot(earth, 0).x, y: earth.y },
     { at: tBeam, x: UFO_HOVER.x, y: UFO_HOVER.y },
-    { at: tWake, x: BOARD.x + BOARD.w / 2, y: BOARD.y + BOARD.h / 2 },
+    { at: tWake, x: BOARD.x + BOARD.w / 2, y: BOARD.y + BOARD.h / 2, active: true },
   ];
 
   return {

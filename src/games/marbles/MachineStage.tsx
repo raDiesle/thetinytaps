@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
@@ -10,15 +10,22 @@ import { playPop } from "@/lib/sfx";
 const CAMERA_FOLLOW = 2.6;
 
 /**
- * A station where the machine holds still until the child taps (R-03): at `at` seconds everything stops, the thing at
+ * A station where the machine may hold still until the child taps (R-03): at `at` seconds everything stops, the thing at
  * (`x`, `y`) – the one that sets off the next part – glows with a still 👇 beside it, and a tap or key lets it run on.
- * With „Von selbst“ (`LevelProps.watch`) the machine runs straight through.
+ * Only the one stop marked `active` waits; the others stay in the data, ready to be switched on, and the machine runs
+ * through them (at most one tap on the way, user feedback, November 2026). With „Von selbst“ (`LevelProps.watch`) the
+ * machine runs straight through.
  */
 export interface MachineStop {
   at: number;
   x: number;
   y: number;
+  /** This stop waits for the child's tap; at most one stop of a machine is active (`stops.test.ts`). */
+  active?: boolean;
 }
+
+/** The stops a machine really waits at: only the active one. */
+export const activeStops = (machine: MachineBase) => machine.stops.filter((s) => s.active);
 
 /** What the stage needs to know about a machine. */
 export interface MachineBase {
@@ -28,15 +35,15 @@ export interface MachineBase {
   width: number;
   /** The left edge of what the screen shows, `t` seconds after the tap (below 0 before it). */
   cameraTarget: (t: number) => number;
-  /** Where it waits for the child's tap on the way, in order; the camera shows each spot while it waits (`stops.test.ts`). */
+  /** Where it could wait for the child's tap on the way, in order, one of them `active`; the camera shows each spot while it waits (`stops.test.ts`). */
   stops: MachineStop[];
 }
 
 /**
  * The stage every Rube Goldberg machine runs on: waits for the tap (or a key),
  * then counts the seconds, plays the machine's sounds and lines at their
- * moments and lets the camera glide after the action. At each of the machine's
- * stops the clock holds until the next tap. `children` draws the machine at a
+ * moments and lets the camera glide after the action. At the machine's active
+ * stop the clock holds until the next tap. `children` draws the machine at a
  * moment, in world coordinates.
  */
 export function MachineStage({
@@ -56,6 +63,7 @@ export function MachineStage({
   const nextStop = useRef(0);
   const waiting = useRef(false);
   const camera = useRef(machine.cameraTarget(-1));
+  const stops = useMemo(() => (watch ? [] : activeStops(machine)), [machine, watch]);
   const box = useRef<HTMLDivElement>(null);
 
   // The real recordings among the machine's sounds, loaded at once so even the first one is real.
@@ -64,7 +72,7 @@ export function MachineStage({
   useFrames((dt) => {
     if (clock.current >= 0 && !waiting.current) {
       clock.current += dt;
-      const next = watch ? undefined : machine.stops[nextStop.current];
+      const next = stops[nextStop.current];
       if (next && clock.current >= next.at) {
         clock.current = next.at;
         waiting.current = true;
@@ -89,18 +97,18 @@ export function MachineStage({
     Object.assign(window, {
       __machine: {
         duration: machine.duration,
-        stops: machine.stops,
+        stops,
         seek(seconds: number) {
           clock.current = seconds;
           fired.current = machine.events.findIndex((e) => e.at > seconds);
           if (fired.current < 0) fired.current = machine.events.length;
           camera.current = machine.cameraTarget(seconds);
-          nextStop.current = machine.stops.filter((s) => s.at < seconds).length;
+          nextStop.current = stops.filter((s) => s.at < seconds).length;
           waiting.current = false;
         },
       },
     });
-  }, [machine]);
+  }, [machine, stops]);
 
   const start = () => {
     if (clock.current < 0) clock.current = 0;
@@ -110,7 +118,7 @@ export function MachineStage({
       sound(playPop);
     }
   };
-  const stop = waiting.current ? machine.stops[nextStop.current] : undefined;
+  const stop = waiting.current ? stops[nextStop.current] : undefined;
   useAnyKey(start);
 
   return (

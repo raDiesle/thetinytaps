@@ -105,15 +105,15 @@ export const CATEGORIES: Category[] = [
       {
         href: "/belohnungstafel/",
         also: ["/tagesplan/", "/wie-lange-warten/"],
-        // On the shelf books tied together, each opening its own part (user feedback, November 2026): Zeitplan, then
-        // „Wie lange warten?“ (a Countdown to a big day, H-05) left of the Belohnungstafel, which stays bound in gold.
+        // On the shelf books tied together, each opening its own part (user feedback, November 2026): „Wie lange
+        // warten?“ (a Countdown to a big day, H-05), then the Zeitplan, then the Belohnungstafel, which stays bound in gold.
         volumes: [
+          { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
           {
             href: "/tagesplan/",
             emoji: "🗓️",
             title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
           },
-          { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
           {
             href: "/belohnungstafel/",
             emoji: "🌟",

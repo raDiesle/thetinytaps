@@ -1258,15 +1258,15 @@
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
-/* The books themselves, and the Belohnungstafel and the Zeitplan tied together among them. */
+/* The books themselves, and the Belohnungstafel's books tied together among them. */
 /*
  * The everyday helpers lean to the left, resting on their bottom left corners, as books do on a shelf that is not full:
  * so the names running down their spines tilt towards the line one reads and are read without bending the head as far
- * (user feedback, November 2026). Each book leans by the same angle about its own corner, so they stay parallel and
- * clear of each other, and the ribbon round two of them runs straight across both. Taken out, a book straightens as it lifts (bookTravel.ts).
+ * (user feedback, November 2026). Each leans a little less than the one left of it, as real books never stand quite
+ * alike (user feedback, November 2026), so the gaps open towards their tops and none touches its neighbour; the books
+ * tied together stand upright (`.shelf-bundle`). Taken out, a book straightens as it lifts (bookTravel.ts).
  */
 .shelf-daily-books {
-  --lean: -12deg;
   position: relative;
   display: flex;
   flex: none;
@@ -1288,6 +1288,14 @@
   transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
   -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-daily-books > :nth-child(odd) {
+  --lean: -14deg;
+}
+
+.shelf-daily-books > :nth-child(even) {
+  --lean: -10.5deg;
 }
 
 .shelf-daily:nth-child(4n + 2) {
@@ -1313,14 +1321,22 @@
 }
 
 /*
- * The Belohnungstafel and the Zeitplan, two books of one game (`BookBundle`), tied together with a red ribbon and a bow,
- * so they are read as one thing, and standing on the board like their neighbours: a box round them, pulled out and
- * tipped further, looked as if it floated (user feedback, November 2026). They are what the eye should find first: the
- * Belohnungstafel bound in gold, both glowing brightest. Still, like everything on the shelf; tied, neither moves out
- * under a mouse.
+ * The Belohnungstafel's books, parts of one game (`BookBundle`), tied together with a red ribbon and a bow, so they are
+ * read as one thing, and standing on the board like their neighbours: a box round them, pulled out and tipped further,
+ * looked as if it floated (user feedback, November 2026). Tied, they are one block: pressed close and standing upright
+ * on the board – leaning, tied books looked unnatural (user feedback, November 2026) – and one ribbon runs round all of
+ * them – a band on each book looked like three small ribbons (user feedback, November 2026). They are what the eye
+ * should find first: the Belohnungstafel bound in gold, all glowing brightest. Still, like everything on the shelf;
+ * tied, none moves out under a mouse.
  */
+.shelf-daily-books > .shelf-bundle {
+  --lean: 0deg;
+}
+
 .shelf-bundle {
-  --tie: calc(var(--bh) * 0.012);
+  --tie: calc(var(--bh) * 0.004);
+  --band: calc(var(--bh) * 0.06);
+  --band-at: calc(var(--bh) * 0.1);
   position: relative;
   display: flex;
   flex: var(--volumes) 1 0;
@@ -1342,46 +1358,58 @@
     linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), var(--c);
 }
 
-/* Their labels end above the ribbon, which runs at the same height above the board on every book of the bundle. */
+/* Their labels end above the ribbon, which runs at the same height above the board round the whole block. */
 .shelf-bundle .shelf-daily-label {
-  bottom: calc(var(--bh) * 0.19);
+  bottom: calc(var(--band-at) + var(--band) + var(--bh) * 0.03);
 }
 
-/* The ribbon across each spine, reaching over the gap to the next, so it runs on as one band. */
-.shelf-bundle > .shelf-daily::after {
+/* The ribbon's look: satin with a light edge above and a shadow below. */
+.shelf-bundle-ribbon,
+.shelf-bundle > .shelf-daily:first-of-type > .box-left::after,
+.shelf-bundle > .shelf-daily:last-of-type > .box-right::after {
   position: absolute;
-  right: calc(var(--tie) * -0.5);
-  bottom: calc(var(--bh) * 0.1);
-  left: calc(var(--tie) * -0.5);
-  height: calc(var(--bh) * 0.055);
-  background:
-    linear-gradient(#0000 12%, #ffffff40 12% 20%, #0000 20% 80%, #0000004d 80% 88%, #0000 88%), linear-gradient(90deg, #00000033, #ffffff1f 45%, #00000026),
-    #c8323a;
-  box-shadow: 0 1px 2px #0000006b;
-  content: "";
+  bottom: var(--band-at);
+  height: var(--band);
+  background: linear-gradient(#0000 12%, #ffffff40 12% 20%, #0000 20% 80%, #0000004d 80% 88%, #0000 88%), #c8323a;
   pointer-events: none;
-  transform: translateZ(1px);
 }
 
-.shelf-bundle > .shelf-daily:first-child::after {
-  left: 0;
+/*
+ * The one ribbon across the block's front, pulled tight over the spines: a little wider than the block where it goes
+ * round its outer edges, a shade darker where it dips between two books.
+ */
+.shelf-bundle-ribbon {
+  left: calc(var(--bh) * -0.006);
+  right: calc(var(--bh) * -0.006);
+  border-radius: 2px;
+  background:
+    linear-gradient(#0000 12%, #ffffff40 12% 20%, #0000 20% 80%, #0000004d 80% 88%, #0000 88%),
+    linear-gradient(90deg, #0000004d, #0000 3%, #ffffff1f 30%, #0000 50%, #ffffff14 70%, #0000 97%, #0000004d), #c8323a;
+  box-shadow: 0 1px 2px #0000006b;
+  /* Tipped back with the spines about the board (their `rotateX`), and just in front of them, so the bow is not hidden. */
+  transform-origin: 50% calc(100% + var(--band-at));
+  transform: rotateX(-6deg) translateZ(4px);
 }
 
-.shelf-bundle > .shelf-daily:last-child::after {
+/* Round the block's outer sides, where it goes back towards the wall. */
+.shelf-bundle > .shelf-daily:first-of-type > .box-left::after,
+.shelf-bundle > .shelf-daily:last-of-type > .box-right::after {
   right: 0;
+  left: 0;
+  filter: brightness(0.7);
+  content: "";
 }
 
-/* The bow, tied on the ribbon where the first two books meet, in front of both. */
+/* The bow, tied in the ribbon's middle, in front of the block. */
 .shelf-bundle-bow {
   position: absolute;
-  right: calc(var(--tie) * -0.5 - var(--bh) * 0.1);
-  bottom: calc(var(--bh) * 0.0475);
-  width: calc(var(--bh) * 0.2);
-  height: calc(var(--bh) * 0.16);
+  left: 50%;
+  bottom: 50%;
+  width: calc(var(--bh) * 0.22);
+  height: calc(var(--bh) * 0.176);
   overflow: visible;
   filter: drop-shadow(0 1px 1.5px #00000066);
-  pointer-events: none;
-  transform: translateZ(2px);
+  transform: translate(-50%, 50%) translateZ(2px);
 }
 
 @media (hover: hover) {

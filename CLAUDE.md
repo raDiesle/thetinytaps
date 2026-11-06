@@ -48,7 +48,8 @@ In a fresh worktree run `bun install` first.
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
   new exports between modules (a reload still threw „plannerDefaults is not a function“) or rules changed in a game's
   CSS (a merged `rewards.css` stayed old after a reload while its new JS came through – test a class's computed style
-  there, not only that the page loads),
+  there, not only that the page loads) or changed data in a module (a merged new order of `games.ts`'s `volumes` stayed
+  old after reloads while the new CSS and components came through – check the changed thing itself),
   so when it still shows the old state, say it must be restarted (`bun run dev` in the repo root) instead of handing over a stale URL.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
@@ -331,7 +332,11 @@ In a fresh worktree run `bun install` first.
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
   that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
-  Zeitplan, „Wie lange warten?“ (the Zeitplan's Countdown) and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  „Wie lange warten?“ (the Zeitplan's Countdown), Zeitplan and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026).
+  Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
+  and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
+  three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger
+  (`DAILY_SPAN`), and lean a little differently, as books do. The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
@@ -578,7 +583,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
   and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
   the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
-  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). On an upright screen it
+  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang as near
+  the shelf's middle as can be: the top board's books move towards the left wall for it as far as their room there lets
+  them (the trail grows, `signOver`; user feedback, November 2026). On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent

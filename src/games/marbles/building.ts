@@ -675,10 +675,10 @@ export function buildBuilding() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it waits for the child's tap (R-03): the traffic cone, the sleeping excavator, the road roller, the jackhammer. */
+  /** Where it could wait for the child's tap (R-03): the traffic cone, the sleeping excavator, the road roller, the jackhammer. Only the sleeping excavator waits; the machine runs through the others. */
   const stops = [
     { at: tKnock, x: CONE.x, y: DECK1.y - CONE.h / 2 },
-    { at: tBonk, x: EXC.x, y: EXC.y - 60 },
+    { at: tBonk, x: EXC.x, y: EXC.y - 60, active: true },
     { at: tPat, x: ROLLER.x0 + ROLLER.patX, y: FLOOR - 110 },
     { at: tJack, x: JACK.x, y: FLOOR - JACK.h / 2 },
   ];

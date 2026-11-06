@@ -635,10 +635,10 @@ export function buildKitchen() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it waits for the child's tap (R-03): the rolling pin on the shelf's edge, the salad spinner, the wound-down egg timer, the toast in the toaster. */
+  /** Where it could wait for the child's tap (R-03): the rolling pin on the shelf's edge, the salad spinner, the wound-down egg timer, the toast in the toaster. Only the salad spinner waits; the machine runs through the others. */
   const stops = [
     { at: tPinHit, x: pin0.x, y: pin0.y },
-    { at: tCrank, x: SPINNER.cx, y: (SPINNER.top + COUNTER) / 2 },
+    { at: tCrank, x: SPINNER.cx, y: (SPINNER.top + COUNTER) / 2, active: true },
     { at: tRing, x: TIMER0.x, y: TIMER0.y },
     { at: tPop, x: TOASTER.slotX, y: TOAST_UP + TOAST_SINK },
   ];
