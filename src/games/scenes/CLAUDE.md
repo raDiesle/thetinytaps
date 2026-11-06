@@ -43,7 +43,11 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
 - A fox or bear family out and about in a picture is `WalkingFamily` (`family.tsx`): grown-up and child hand in hand,
   flat like the people, with the shared head, in clothes for the place. It is a thing of the background (a `<Poke>`
   that hops), never an item, so it says nothing and no picture loses its translations; put it where nothing else
-  stands and no key badge lies on it, scaled with `depthScale` (Stadt, Strand, Spielplatz so far).
+  stands and no key badge lies on it, scaled with `depthScale` (Stadt, Strand, Spielplatz, Herbst, Winter, Ostern; in
+  the Kita it walks in the garden seen through the window, drawn inside that item). Look for the key badges in the
+  preview after placing it: a badge sits at the top of its item's box, which can reach far above the drawing (the dog's
+  in Herbst lay on the family's feet at first). In a picture with a wild fox the family is bears (Winter), as for the
+  grown-ups in a role.
 - Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
   small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
   riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.
