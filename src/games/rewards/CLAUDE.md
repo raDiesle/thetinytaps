@@ -439,6 +439,10 @@ beside it close it without a tick. The plan prints every ritual it has as a card
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the old first plan kept the fixed id `erster-plan`), as for the board.
+- A card added with ＋ fills the last row first (user feedback, November 2026): `planLayout` keeps the layout while it
+  has a free place, so the new card takes the ＋'s place and the ＋ moves on – into a new row below, same columns, when
+  the row was full. The rows are laid out anew only when the cards would get much bigger (`REFLOW_GAIN`) or still fit
+  one line, never with every ＋ (Countdown's nights, a day's cards; `plan.test.ts`). A new grid with a ＋ uses it.
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
 

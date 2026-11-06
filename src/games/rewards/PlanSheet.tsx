@@ -103,20 +103,52 @@ export function usePlanTitle() {
  * square: a picture without words, as the child doesn't read). As many as fit stay in one row: another row only where
  * it makes the cards clearly bigger (`ROW_GAIN`, user feedback, November 2026). Reading order: left to right, then the
  * next row.
+ *
+ * A card more fills the last row before anything moves (user feedback, November 2026): the layout for `count` is the
+ * one for a card less while it still has a free place, so ＋ on the sheet puts the new card where the ＋ was and the ＋
+ * moves on to the next place. Only once the rows are full is the layout chosen anew – one row more with the same
+ * columns, so the ＋ goes down into a new row and no card changes its row, unless another shape makes the cards much
+ * bigger (`REFLOW_GAIN`; or the cards still fit in one line). It is a function of `count` alone, so a card taken away goes back the
+ * same way.
  */
 export function planLayout(count: number, aspect: number): { cols: number; rows: number } {
+  let layout = bestLayout(1, aspect);
+  for (let n = 2; n <= count; n++) {
+    if (n <= layout.cols * layout.rows) continue;
+    const line = bestLayout(n, aspect);
+    if (line.rows === 1) {
+      layout = line;
+      continue;
+    }
+    // Several rows either way: the biggest cards, with no leaning towards fewer rows, against one row more below.
+    const biggest = bestLayout(n, aspect, 1);
+    const below = { cols: layout.cols, rows: layout.rows + 1 };
+    layout = cardSize(biggest, aspect) > cardSize(below, aspect) * REFLOW_GAIN ? biggest : below;
+  }
+  return layout;
+}
+
+/** The layout with the biggest cards for `count` cards on its own, a row more only where it makes them `gain` times bigger. */
+function bestLayout(count: number, aspect: number, gain = ROW_GAIN): { cols: number; rows: number } {
   let best = { cols: Math.max(1, count), rows: 1, size: 0 };
   for (let rows = 1; rows <= Math.max(1, count); rows++) {
     const cols = Math.ceil(count / rows);
-    // Width of a card when the box is 1 high.
-    const size = Math.min(aspect / cols, 1 / rows);
-    if (size > best.size * ROW_GAIN) best = { cols, rows, size };
+    const size = cardSize({ cols, rows }, aspect);
+    if (size > best.size * gain + 1e-9) best = { cols, rows, size };
   }
   return { cols: best.cols, rows: best.rows };
 }
 
+/** Width of a card in a grid of `cols` × `rows` when the box is 1 high. */
+function cardSize({ cols, rows }: { cols: number; rows: number }, aspect: number): number {
+  return Math.min(aspect / cols, 1 / rows);
+}
+
 /** How much bigger the cards must get for another row: a day read in one line beats cards a little bigger. */
 const ROW_GAIN = 1.15;
+
+/** How much bigger the cards must get for the rows to be laid out anew rather than one more added below. */
+const REFLOW_GAIN = 1.35;
 
 /** Width / height of a card with star fields: taller than wide, the picture on top and the big fields below it. */
 const STAR_CARD = 0.8;

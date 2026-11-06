@@ -248,6 +248,21 @@ describe("cards of a day", () => {
       expect(cols * rows).toBeGreaterThanOrEqual(n);
     }
   });
+
+  test("a card more fills the last row first: nothing moves while the layout still has a free place", () => {
+    for (const aspect of [0.5, 0.8, 1.4, 2, 3.5]) {
+      for (let n = 1; n < MAX_NIGHTS + 1; n++) {
+        const before = planLayout(n, aspect);
+        const after = planLayout(n + 1, aspect);
+        if (n < before.cols * before.rows) expect(after).toEqual(before);
+        // Never a grid with a row left empty.
+        expect(after.cols * (after.rows - 1)).toBeLessThan(n + 1);
+      }
+    }
+    // Five nights and the ＋ fill two rows of three; ＋ pressed in the last place puts the night there and the ＋ below.
+    expect(planLayout(6, 1.34)).toEqual({ cols: 3, rows: 2 });
+    expect(planLayout(7, 1.34)).toEqual({ cols: 3, rows: 3 });
+  });
 });
 
 describe("a card that opens its game", () => {
