@@ -34,7 +34,12 @@ import {
   stepFromCatalog,
   stepsOn,
   templateLists,
+  weekRows,
+  withCellStars,
   withCounter,
+  withRowMoved,
+  withRowPart,
+  withRowStars,
   withEveryDay,
   withSame,
   withStepStars,
@@ -346,6 +351,48 @@ describe("Zähler", () => {
 describe("a week's grid of stars", () => {
   const week = PLAN_TEMPLATES.find((tpl) => tpl.id === "wochenplan");
   if (!week) throw new Error("no Wochenplan");
+
+  // User feedback, November 2026: the circles are changed right on the sheet – a day's own count in its cell, the
+  // row's for every day beside it – and the rows stand morning, day, evening.
+  test("a single day's circles change on that day only; its last one taken leaves the day's place empty", () => {
+    const plan = withCounter(
+      withEveryDay(planFromTemplate(week, "de"), () => planFromTemplate(week, "de").days[0]),
+      1,
+    );
+    const id = weekRows(plan)[0].id;
+    const more = withCellStars(plan, 2, id, 1);
+    expect(more.days[2].find((s) => s.id === id)?.stars).toBe(2);
+    expect(more.days[1].find((s) => s.id === id)?.stars).toBe(1);
+    const gone = withCellStars(plan, 2, id, -1);
+    expect(gone.days[2].some((s) => s.id === id)).toBe(false);
+    expect(weekRows(gone).map((r) => r.id)).toEqual(weekRows(plan).map((r) => r.id));
+    const back = withCellStars(gone, 2, id, 1);
+    expect(back.days[2].map((s) => s.id)).toEqual(plan.days[2].map((s) => s.id));
+    const row = withRowStars(plan, id, -1);
+    expect(row.days.every((day) => day.find((s) => s.id === id)?.stars === 1)).toBe(true);
+    expect(withRowStars(plan, id, 2).days.every((day) => day.find((s) => s.id === id)?.stars === 3)).toBe(true);
+  });
+
+  test("rows stand morning, day, evening, and move only within their time of day", () => {
+    const plan = withCounter(
+      withEveryDay(planFromTemplate(week, "de"), () => planFromTemplate(week, "de").days[0]),
+      1,
+    );
+    const [first, second] = weekRows(plan);
+    const evening = withRowPart(plan, first.id, "evening");
+    expect(weekRows(evening).at(-1)?.id).toBe(first.id);
+    const morning = withRowPart(evening, second.id, "morning");
+    expect(weekRows(morning)[0].id).toBe(second.id);
+    expect(withRowMoved(morning, second.id, 1)).toBe(morning);
+    expect(withRowMoved(morning, first.id, -1)).toBe(morning);
+    const flat = withEveryDay(plan, (steps) => steps.map(({ part: _, ...step }) => step));
+    const rows = weekRows(flat).map((r) => r.id);
+    expect(
+      weekRows(withRowMoved(flat, rows[0], 1))
+        .map((r) => r.id)
+        .slice(0, 2),
+    ).toEqual([rows[1], rows[0]]);
+  });
 
   test("sameCards: the same cards in the same order every day, whatever their stars", () => {
     const plan = planFromTemplate(week, "de");

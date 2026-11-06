@@ -51,7 +51,96 @@ export interface Board {
   template?: string;
   /** Shows example stars (Monday and Tuesday filled), so a new board looks like one in use; gone with the first real star. */
   examples?: boolean;
+  /**
+   * A month board's time (user feedback, November 2026): four weeks with no date on them (`"weeks"`, the default – a
+   * chart is rarely begun on the 1st), or a calendar month with its name and day numbers (`"month"`).
+   */
+  span?: MonthSpan;
+  /** Four weeks only: the Monday they begin on, YYYY-MM-DD; then the next four, and so on. Missing: `FOUR_WEEKS_EPOCH`. */
+  start?: string;
+  /** How a month board is drawn (`MONTH_LOOKS`); missing: the calendar. */
+  look?: MonthLook;
 }
+
+/** A month board's time: four weeks without dates, or a calendar month. */
+export type MonthSpan = "weeks" | "month";
+
+/**
+ * How a month board is drawn: a calendar (a box per day, its fields in it with their tasks' pictures), a table (a row
+ * per task and time of day, a column per day) or four week blocks (each a small week chart).
+ */
+export type MonthLook = "calendar" | "table" | "blocks";
+
+/** The looks of a month board, in the order of their switch. */
+export const MONTH_LOOKS: MonthLook[] = ["calendar", "table", "blocks"];
+
+/** Where four weeks begin when a board has no `start` of its own (made before it had one): a Monday. */
+export const FOUR_WEEKS_EPOCH = "2026-01-05";
+
+/** Days a month board of four weeks has. */
+export const FOUR_WEEKS = 28;
+
+/** Whether a board is a month board of four weeks without dates (the default), not a calendar month. */
+export const fourWeeks = (board: Pick<Board, "kind" | "span">): boolean => board.kind === "month" && board.span !== "month";
+
+/** The Monday of the week `day` is in, at noon (as `weekOf`). */
+const mondayOf = (day: Date): Date => new Date(day.getFullYear(), day.getMonth(), day.getDate() - weekday(day), 12);
+
+/** Whole days from `a` to `b`. */
+const daysBetween = (a: Date, b: Date): number =>
+  Math.round((new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime() - new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime()) / 86_400_000);
+
+/** The four weeks `day` lies in: from the board's start, four weeks after four weeks (before it, four weeks back alike). */
+export function fourWeeksOf(board: Pick<Board, "start">, day: Date): Date[] {
+  const anchor = new Date(`${board.start ?? FOUR_WEEKS_EPOCH}T12:00`);
+  const block = Math.floor(daysBetween(anchor, day) / FOUR_WEEKS);
+  const first = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() + block * FOUR_WEEKS, 12);
+  return Array.from({ length: FOUR_WEEKS }, (_, i) => new Date(first.getFullYear(), first.getMonth(), first.getDate() + i, 12));
+}
+
+/** Every day of a month board's time around `day`: its four weeks, or its calendar month. */
+export const periodDays = (board: Pick<Board, "kind" | "span" | "start">, day: Date): Date[] => (fourWeeks(board) ? fourWeeksOf(board, day) : monthOf(day));
+
+/** The board as a month of four weeks that begin this week, where it has no start yet. */
+export const withStart = (board: Board, today: Date): Board => (board.kind === "month" && !board.start ? { ...board, start: dayKey(mondayOf(today)) } : board);
+
+/** The time of day a field belongs to on the sheet, in the day's order: morning, the day (midday or once a day), evening. */
+export type DayPart = "morning" | "day" | "evening";
+
+/** The parts of a day in their order (user feedback, November 2026: first the morning's tasks, then the day's, then the evening's). */
+export const DAY_ORDER: DayPart[] = ["morning", "day", "evening"];
+
+/** Where a field stands in the day: a morning or evening field there, a midday field or a once-a-day task in the day. */
+export const dayPartOf = (slot: Slot | undefined): DayPart => (slot === "morning" ? "morning" : slot === "evening" ? "evening" : "day");
+
+/** One field of a day: a task at a time of day. */
+export interface DayField {
+  task: BoardTask;
+  slot?: Slot;
+  part: DayPart;
+}
+
+/** Every field of a day, the morning's first, then the day's, then the evening's – the tasks in their order within each. */
+export function dayFields(board: Board): DayField[] {
+  const all = board.tasks.flatMap((task) => taskSlots(task).map((slot) => ({ task, slot, part: dayPartOf(slot) })));
+  return DAY_ORDER.flatMap((part) => all.filter((field) => field.part === part));
+}
+
+/**
+ * A task's times of day with one switched (☀️, 🌤️, 🌙 under its card while the board is made): a task without one is
+ * shown as „am Tag“ (midday), so switching on the morning gives it a morning and a day field. The last one stays on,
+ * and a task left with the day alone is once a day again (its fields keep their keys).
+ */
+export function toggledSlots(task: BoardTask, slot: Slot): Slot[] | undefined {
+  const shown: Slot[] = task.slots?.length ? task.slots : ["noon"];
+  const next = shown.includes(slot) ? shown.filter((s) => s !== slot) : [...shown, slot];
+  if (next.length === 0) return task.slots;
+  const ordered = SLOTS.map((s) => s.id).filter((s) => next.includes(s));
+  return ordered.length === 1 && ordered[0] === "noon" ? undefined : ordered;
+}
+
+/** The times of day a task's switches show as on: its own, or the day for a task done once a day. */
+export const shownSlots = (task: BoardTask): Slot[] => (task.slots?.length ? task.slots : ["noon"]);
 
 /** Stars per board: "YYYY-MM-DD|taskId" → 1 on week, month and day boards, "count" → n on a collecting board. */
 export type StarLog = Record<string, Record<string, number>>;
@@ -89,7 +178,12 @@ export function isTemplateTitle(title: string, templateTitle: Localized | undefi
  * made before a language is known; their German heading shows in the app language anyway, see `isTemplateTitle`). Its tasks keep their catalogue ids (unique within a template), so
  * the default board, made anew on every load until something is saved, finds its stars again.
  */
-export function boardFromTemplate(template: Template, language: TargetLanguageId = "de"): Board {
+export function boardFromTemplate(template: Template, language: TargetLanguageId = "de", today = new Date()): Board {
+  return withStart(madeFromTemplate(template, language), today);
+}
+
+/** `boardFromTemplate` before a month gets its start. */
+function madeFromTemplate(template: Template, language: TargetLanguageId): Board {
   return {
     id: newId(),
     template: template.id,
@@ -118,8 +212,14 @@ const WEEKS_PER_MONTH = 4;
  * goal changes to fit: a week's stars times four for a month, a collecting board's fields from COLLECT_GOALS.
  * A heading that came with the ready-made board („Mein Morgen“) goes, the one for the new view comes instead.
  */
-export function withKind(board: Board, kind: BoardKind, templateTitle = ""): Board {
+export function withKind(board: Board, kind: BoardKind, templateTitle = "", today = new Date()): Board {
   if (kind === board.kind) return board;
+  if (kind === "month") return withStart(withKindGoal(board, kind, templateTitle), today);
+  return withKindGoal(board, kind, templateTitle);
+}
+
+/** `withKind` without a month's start. */
+function withKindGoal(board: Board, kind: BoardKind, templateTitle: string): Board {
   const goal =
     kind === "collect"
       ? COLLECT_GOALS.includes(board.goal)
@@ -236,7 +336,7 @@ export const weekday = (day: Date) => (day.getDay() + 6) % 7;
 export function boardDays(board: Board, today: Date): Date[] {
   if (board.kind === "day") return [today];
   if (board.kind === "collect") return [];
-  return (board.kind === "month" ? monthOf(today) : weekOf(today)).filter((day) => board.days.includes(weekday(day)));
+  return (board.kind === "month" ? periodDays(board, today) : weekOf(today)).filter((day) => board.days.includes(weekday(day)));
 }
 
 /** The fields a task has on a day: one per time of day, or a single one (`undefined`). */
@@ -316,6 +416,17 @@ export function shiftPeriod(kind: BoardKind, day: Date, by: number): Date {
   return new Date(day.getFullYear(), day.getMonth(), day.getDate() + by);
 }
 
+/** The first day of a board's period (day, week, its four weeks or month) `day` is in, `by` periods later. */
+export function boardShift(board: Pick<Board, "kind" | "span" | "start">, day: Date, by: number): Date {
+  if (!fourWeeks(board)) return shiftPeriod(board.kind, day, by);
+  const first = fourWeeksOf(board, day)[0];
+  return new Date(first.getFullYear(), first.getMonth(), first.getDate() + FOUR_WEEKS * by, 12);
+}
+
+/** Whether two days lie in the same period of a board. */
+export const boardSame = (board: Pick<Board, "kind" | "span" | "start">, a: Date, b: Date): boolean =>
+  dayKey(boardShift(board, a, 0)) === dayKey(boardShift(board, b, 0));
+
 /** Whether two days lie in the same day, week or month of a board. */
 export function samePeriod(kind: BoardKind, a: Date, b: Date): boolean {
   return dayKey(shiftPeriod(kind, a, 0)) === dayKey(shiftPeriod(kind, b, 0));
@@ -346,7 +457,7 @@ export function reviewPeriods(board: Board, stars: Record<string, number> | unde
   const kind = reviewKind(board.kind);
   const shown = withKind(board, kind);
   return Array.from({ length: OLDEST_BACK[kind] + 1 }, (_, back) => {
-    const day = shiftPeriod(kind, today, -back);
+    const day = boardShift(shown, today, -back);
     return { back, day, count: progress(shown, stars, linked, day).count };
   }).filter((period) => period.count > 0);
 }
@@ -411,7 +522,7 @@ export function takeBackStar(log: StarLog, boardId: string, key: string | null):
 /** The log with a board starting over: a collecting board empty, the others without this week's (or month's) stars. */
 export function startOver(log: StarLog, board: Board, today: Date): StarLog {
   if (board.kind === "collect") return { ...log, [board.id]: {} };
-  const week = new Set((board.kind === "month" ? monthOf(today) : weekOf(today)).map(dayKey));
+  const week = new Set((board.kind === "month" ? periodDays(board, today) : weekOf(today)).map(dayKey));
   const kept = Object.fromEntries(Object.entries(log[board.id] ?? {}).filter(([k]) => !week.has(k.slice(0, 10))));
   return { ...log, [board.id]: kept };
 }

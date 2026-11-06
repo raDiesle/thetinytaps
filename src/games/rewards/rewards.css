@@ -760,6 +760,25 @@
   height: 100%;
 }
 
+.rw-look-pic {
+  width: 30px;
+  height: 21px;
+  fill: color-mix(in srgb, var(--ink) 10%, #fff);
+  stroke: var(--ink);
+  stroke-width: 0.9;
+}
+
+.rw-opt-segments button[aria-pressed="true"] .rw-look-pic {
+  fill: #fff;
+}
+
+.rw-look-num {
+  fill: var(--ink);
+  stroke: none;
+  font-size: 4.5px;
+  font-weight: 800;
+}
+
 .rw-opt-print {
   font-family: var(--font-emoji);
   font-size: 0.85em;
@@ -956,23 +975,89 @@
 
 .rw-edit-task {
   display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqmin;
+}
+
+.rw-edit-task-card {
+  --rw-act: clamp(20px, 4.4cqmin, 30px);
+  position: relative;
+  display: inline-flex;
   align-items: center;
   gap: 0.8cqmin;
-  padding: 0.5cqmin 1.8cqmin 0.5cqmin 0.8cqmin;
+  padding: 0.5cqmin 2.4cqmin 0.5cqmin 0.8cqmin;
   border: max(2px, 0.4cqmin) solid var(--rw-ink);
   border-radius: 999px;
   background: #fff;
   font-size: max(13px, 2.6cqmin);
   font-weight: 700;
+  cursor: pointer;
 }
 
-.rw-edit-task-pic {
+.rw-edit-task-card > .rw-act-right {
+  top: -40%;
+  right: -10px;
+}
+
+.rw-edit-task:has(.rw-act-delete:hover) .rw-edit-task-card {
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  background: color-mix(in srgb, #e53935 14%, #fff);
+}
+
+/* ☀️ 🌤️ 🌙 under a task: its times of day, switched right there; the ones on stand out, the others wait pale. */
+.rw-edit-slots {
+  display: inline-flex;
+  gap: 0.6cqmin;
+}
+
+.rw-edit-slot {
+  display: grid;
+  place-items: center;
+  width: max(26px, 4.6cqmin);
+  height: max(26px, 4.6cqmin);
+  border: max(2px, 0.35cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
+  border-radius: 50%;
+  background: #fff;
   font-family: var(--font-emoji);
-  font-size: 1.4em;
+  font-size: max(14px, 2.6cqmin);
   line-height: 1;
+  opacity: 0.45;
+  filter: grayscale(0.8);
+  cursor: pointer;
+}
+
+.rw-edit-slot.on {
+  border-style: solid;
+  border-color: var(--rw-ink);
+  background: var(--rw-tint-day);
+  opacity: 1;
+  filter: none;
+}
+
+.rw-edit-slot.on[data-slot="morning"],
+.rw-edit-slot.on.rw-slot-morning {
+  background: var(--rw-tint-morning);
+}
+
+.rw-edit-slot.on.rw-slot-evening {
+  background: var(--rw-tint-evening);
+}
+
+.rw-edit-slot.fixed {
+  cursor: default;
+}
+
+.rw-edit-slot:not(.fixed):hover,
+.rw-edit-slot:not(.fixed):focus-visible {
+  opacity: 1;
+  filter: none;
+  outline: max(2px, 0.4cqmin) dashed var(--rw-ink);
+  outline-offset: 2px;
 }
 
 .rw-edit-add {
+  align-self: flex-start;
   justify-content: center;
   min-width: 2.6em;
   padding-inline: 0.8cqmin;
@@ -1495,6 +1580,182 @@
 
 .rw-mfields > .rw-cell {
   flex: 1;
+}
+
+/*
+ * The parts of a day on a month board and a week's rows (user feedback, November 2026): the morning's fields first on
+ * a warm tint, then the day's on a light sky, then the evening's on lavender; greys on a grey print.
+ */
+.rw-sheet,
+.pl-sheet {
+  --rw-tint-morning: #fff1c2;
+  --rw-tint-day: #ddeffc;
+  --rw-tint-evening: #e5ddf6;
+}
+
+.rw-grey {
+  --rw-tint-morning: #f4f4f4;
+  --rw-tint-day: #fff;
+  --rw-tint-evening: #e2e2e2;
+}
+
+.rw-tint-morning {
+  background: var(--rw-tint-morning);
+}
+
+.rw-tint-day {
+  background: var(--rw-tint-day);
+}
+
+.rw-tint-evening {
+  background: var(--rw-tint-evening);
+}
+
+/* Four weeks without dates: no day numbers, the boxes give all their room to the fields. */
+.rw-calendar:not(.dated) .rw-mday {
+  padding: 0.3cqmin;
+}
+
+.rw-mfields {
+  gap: 0.4cqmin;
+}
+
+.rw-mpart {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 1.2cqmin;
+}
+
+.rw-mpart > .rw-cell {
+  flex: 1;
+}
+
+/* A month's fields show their task's picture until the star comes: plainly, not as a pale shadow. */
+.rw-kind-month .rw-mark.pale {
+  font-size: 62cqmin;
+  opacity: 0.9;
+  filter: none;
+}
+
+.rw-kind-month .rw-field.future .rw-ring {
+  opacity: 0.7;
+}
+
+/* Month as a table: a row per task and time of day, a column per day, the weeks parted by a line. */
+.rw-table {
+  display: grid;
+  flex: 1;
+  align-content: center;
+  column-gap: 0.2cqmin;
+  row-gap: 0.5cqmin;
+  min-height: 0;
+}
+
+.rw-trow {
+  display: contents;
+}
+
+.rw-tday {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.2cqmin 0;
+  border-radius: 1cqmin 1cqmin 0 0;
+  font-size: 2.1cqmin;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.rw-tday > b {
+  font-size: 1.8cqmin;
+  font-weight: 600;
+}
+
+.rw-tcol.wk-end {
+  margin-right: 0.9cqmin;
+}
+
+.rw-tday.today,
+.rw-cell.rw-tcol.today {
+  background: color-mix(in srgb, var(--rw-main) 40%, transparent);
+}
+
+/* A row's cells take its tint, so the part of the day runs along it. */
+.rw-trow.rw-tint-morning > .rw-cell {
+  background: var(--rw-tint-morning);
+}
+
+.rw-trow.rw-tint-day > .rw-cell {
+  background: var(--rw-tint-day);
+}
+
+.rw-trow.rw-tint-evening > .rw-cell {
+  background: var(--rw-tint-evening);
+}
+
+.rw-trow > .rw-cell {
+  border-radius: 0.8cqmin;
+}
+
+.rw-mhead {
+  container-type: size;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  border: 0.4cqmin solid var(--rw-main);
+  border-radius: 1.5cqmin;
+  background: #fff;
+}
+
+.rw-mhead-pic {
+  font-family: var(--font-emoji);
+  font-size: 70cqmin;
+  line-height: 1;
+}
+
+.rw-mhead-part {
+  position: absolute;
+  top: -10%;
+  left: -6%;
+  font-family: var(--font-emoji);
+  font-size: 38cqmin;
+  line-height: 1;
+}
+
+/* Month as week blocks: two side by side, each a small week chart. */
+.rw-blocks {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.6cqmin 2.4cqmin;
+  min-height: 0;
+}
+
+.rw-block {
+  display: grid;
+  align-content: center;
+  gap: 0.4cqmin;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.6cqmin;
+  border: 0.3cqmin solid color-mix(in srgb, var(--rw-main) 70%, transparent);
+  border-radius: 1.6cqmin;
+  background: #fff;
+}
+
+.rw-block-name {
+  align-self: end;
+  font-size: 2cqmin;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.rw-tnone {
+  background: transparent !important;
 }
 
 /* Day: big cards side by side. */

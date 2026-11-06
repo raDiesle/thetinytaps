@@ -5,6 +5,10 @@ import {
   type Board,
   boardDays,
   boardFromTemplate,
+  boardSame,
+  boardShift,
+  dayFields,
+  fourWeeks,
   cellKey,
   dayFull,
   exampleStars,
@@ -25,7 +29,9 @@ import {
   startOver,
   suggestsCertificate,
   takeBackStar,
+  toggledSlots,
   withKind,
+  withStart,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
 import { DAY_PARTS } from "./plan";
@@ -183,7 +189,7 @@ describe("stars", () => {
   test("a month board has the chosen weekdays of this month, and starting over clears only this month", () => {
     expect(monthOf(wednesday)).toHaveLength(31);
     expect(monthOf(new Date(2026, 1, 10))).toHaveLength(28);
-    const month = { ...withKind(week, "month"), days: [0, 1, 2, 3, 4] };
+    const month = { ...withKind(week, "month", "", wednesday), span: "month" as const, days: [0, 1, 2, 3, 4] };
     const days = boardDays(month, wednesday);
     expect(days).toHaveLength(22);
     expect(days.every((d) => d.getMonth() === 9 && d.getDay() !== 0 && d.getDay() !== 6)).toBe(true);
@@ -214,6 +220,50 @@ describe("stars", () => {
   test("stars older than two months are dropped when a new one comes", () => {
     const log = addStar({ w: { "2026-01-01|zaehne": 1 } }, "w", "2026-10-28|zaehne", wednesday);
     expect(Object.keys(log.w)).toEqual(["2026-10-28|zaehne"]);
+  });
+});
+
+describe("a month of four weeks (user feedback, November 2026)", () => {
+  const wednesday = new Date(2026, 9, 28);
+  const week = { ...boardFromTemplate(TEMPLATES.find((t) => t.id === "woche") ?? TEMPLATES[0]), id: "w" };
+
+  test("a new month board is four weeks from this week's Monday, without dates; a calendar month is the option", () => {
+    const month = withKind(week, "month", "", wednesday);
+    expect(fourWeeks(month)).toBe(true);
+    expect(month.start).toBe("2026-10-26");
+    const days = boardDays({ ...month, days: [0, 1, 2, 3, 4, 5, 6] }, wednesday);
+    expect(days).toHaveLength(28);
+    expect(days[0]).toEqual(new Date(2026, 9, 26, 12));
+    expect(fourWeeks({ ...month, span: "month" })).toBe(false);
+    expect(withStart(month, new Date(2026, 11, 1))).toBe(month);
+  });
+
+  test("the four weeks follow one another from the start, also back before it", () => {
+    const month = withKind(week, "month", "", wednesday);
+    expect(boardShift(month, new Date(2026, 10, 22), 0)).toEqual(new Date(2026, 9, 26, 12));
+    expect(boardShift(month, new Date(2026, 10, 23), 0)).toEqual(new Date(2026, 10, 23, 12));
+    expect(boardShift(month, wednesday, -1)).toEqual(new Date(2026, 8, 28, 12));
+    expect(boardSame(month, wednesday, new Date(2026, 10, 22))).toBe(true);
+    expect(boardSame(month, wednesday, new Date(2026, 9, 25))).toBe(false);
+  });
+
+  test("a day's fields stand morning, day, evening, and a task's times of day switch on and off", () => {
+    const [a, b] = week.tasks;
+    const board = {
+      ...week,
+      tasks: [
+        { ...a, slots: ["evening", "morning"] as const },
+        { ...b, slots: undefined },
+      ].map((t) => ({ ...t, slots: t.slots && [...t.slots] })),
+    };
+    expect(dayFields(board).map((f) => [f.task.id, f.part])).toEqual([
+      [a.id, "morning"],
+      [b.id, "day"],
+      [a.id, "evening"],
+    ]);
+    expect(toggledSlots({ ...b, slots: undefined }, "morning")).toEqual(["morning", "noon"]);
+    expect(toggledSlots({ ...b, slots: ["morning", "noon"] }, "morning")).toBeUndefined();
+    expect(toggledSlots({ ...b, slots: ["evening"] }, "evening")).toEqual(["evening"]);
   });
 });
 
@@ -322,9 +372,14 @@ describe("looking back", () => {
     expect(periods[1].day).toEqual(new Date(2026, 9, 5));
     // A day board looks back by weeks, a month board by months, a collecting board not at all.
     expect(reviewPeriods({ ...week, kind: "day" }, log.w, NO_LINKED, wednesday).map((p) => p.back)).toEqual([0, 3]);
-    expect(reviewPeriods({ ...week, kind: "month" }, log.w, NO_LINKED, wednesday).map((p) => [p.back, p.count])).toEqual([
+    expect(reviewPeriods({ ...week, kind: "month", span: "month" }, log.w, NO_LINKED, wednesday).map((p) => [p.back, p.count])).toEqual([
       [0, 3],
       [2, 1],
+    ]);
+    // Four weeks from 12 October (the epoch's blocks): the 6th lies in the four weeks before, 1 August too far back.
+    expect(reviewPeriods({ ...week, kind: "month" }, log.w, NO_LINKED, wednesday).map((p) => [p.back, p.count])).toEqual([
+      [0, 2],
+      [1, 1],
     ]);
     expect(reviewPeriods({ ...week, kind: "collect" }, { count: 4 }, NO_LINKED, wednesday)).toEqual([]);
   });

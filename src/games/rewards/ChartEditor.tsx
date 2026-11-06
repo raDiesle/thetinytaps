@@ -11,14 +11,19 @@ import {
   fieldCount,
   type LinkedDays,
   MAX_TASKS,
+  MONTH_LOOKS,
+  type MonthLook,
+  type MonthSpan,
   NO_LINKED,
   newId,
   parseCellKey,
   rewardFromCatalog,
   type StarLog,
   taskFromCatalog,
+  toggledSlots,
   weekday,
   withKind,
+  withStart,
 } from "./board";
 import { BoardSheet, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import {
@@ -40,7 +45,6 @@ import {
   TEMPLATES,
   THEMES,
 } from "./catalog";
-import { SlotChips } from "./Editor";
 import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
 import { CHILD_NAME, Pick } from "./pageParts";
@@ -61,6 +65,7 @@ import {
   type Plan,
   type PlanStep,
   planFromTemplate,
+  type WeekLook,
   planGoal,
   starsOf,
   stepFromCatalog,
@@ -68,7 +73,11 @@ import {
   stepsOn,
   withCounter,
   withSame,
+  withCellStars,
   withEveryDay,
+  withRowMoved,
+  withRowPart,
+  withRowStars,
   withStepStars,
   withSteps,
 } from "./plan";
@@ -153,13 +162,16 @@ const OFFERED = [...ACTIVITIES, ...TASKS];
 
 /** What a tap on the sheet opened: a card, a place to add one, the reward, or a board's task. */
 type Editing =
-  | { what: "card"; key: string; every?: boolean }
+  | { what: "card"; key: string; every?: boolean; swap?: boolean }
   | { what: "add"; part?: Slot; day?: string; every?: boolean }
   | { what: "reward" }
   | { what: "task"; id: string }
   | { what: "add-task" }
   | { what: "big-day" }
   | { what: "night" };
+
+/** The names of a month board's looks. */
+const MONTH_LOOK_NAMES: Record<MonthLook, Localized> = { calendar: { de: "Kalender" }, table: { de: "Tabelle" }, blocks: { de: "Wochen" } };
 
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum", en: "Time span", zh: "时间范围", hi: "समय-अवधि", es: "Periodo", ar: "المدة", ru: "Период" };
@@ -273,6 +285,7 @@ export function ChartEditor({
   const setReward = (next: BoardReward | null) =>
     onChange(draft.type === "board" ? { type: "board", board: { ...draft.board, reward: next } } : { type: "plan", plan: { ...draft.plan, reward: next } });
   const setPlan = (next: Plan) => onChange({ type: "plan", plan: next });
+  const setBoard = (next: Board) => onChange({ type: "board", board: next });
 
   useEffect(() => {
     const el = box.current;
@@ -285,7 +298,9 @@ export function ChartEditor({
   const onClick = (event: React.MouseEvent) => {
     const el = (event.target as Element).closest<HTMLElement>("[data-edit], [data-step]");
     if (!el) return;
-    const { edit, part, day: dayId, task, step, cell, by, every } = el.dataset;
+    const { edit, part, day: dayId, task, step, cell, by, every, slot, row } = el.dataset;
+    // A tap on a card's circles while it is made never opens its window (user feedback, November 2026).
+    if (!edit && (event.target as Element).closest(".pl-stars")) return;
     const all = every !== undefined;
     // The day's cards changed, as a part's sign or line does: the day shown, or every day where they are alike.
     const dayChanged = (plan: Plan, edit: (steps: PlanStep[]) => PlanStep[]) => withSteps(plan, weekday(day), edit(stepsOn(plan, day)));
@@ -299,7 +314,15 @@ export function ChartEditor({
       const next = withStepStars(plan, all || (plan.same && plan.view !== "week") ? null : weekday(cellDay), taskId, n);
       // A plain plan's first star makes it count; one that never had a reward gets the default (Belohnung is on by default).
       setPlan(!counting(plan) && plan.reward === undefined ? { ...next, reward: defaultReward() } : next);
-    } else if (draft.type === "plan" && edit === "card" && cell) setEditing({ what: "card", key: cell, every: all });
+    } else if (draft.type === "plan" && edit === "cell-stars" && cell) {
+      // One day's circles of a week's row; a day without the card gets it.
+      const { day: cellDay, taskId } = parseCellKey(cell);
+      setPlan(withCellStars(draft.plan, weekday(cellDay), taskId, Number(by)));
+    } else if (draft.type === "plan" && edit === "row-stars" && row) setPlan(withRowStars(draft.plan, row, Number(by)));
+    else if (draft.type === "plan" && edit === "row-move" && row) setPlan(withRowMoved(draft.plan, row, Number(by) < 0 ? -1 : 1));
+    else if (draft.type === "plan" && edit === "row-part" && row && part) setPlan(withRowPart(draft.plan, row, part as Slot));
+    else if (draft.type === "plan" && edit === "swap" && cell) setEditing({ what: "card", key: cell, every: true, swap: true });
+    else if (draft.type === "plan" && edit === "card" && cell) setEditing({ what: "card", key: cell, every: all });
     else if (draft.type === "plan" && edit === "delete-card" && cell) setPlan(withoutCard(draft.plan, cell, all));
     else if (edit === "no-reward") setReward(null);
     else if (draft.type === "plan" && edit === "row" && part) {
@@ -317,7 +340,11 @@ export function ChartEditor({
       setPlan(withNightsLeft(draft.plan, edit === "add-night" ? 1 : -1, new Date()));
     else if (edit === "night") setEditing({ what: "night" });
     else if (edit === "task" && task) setEditing({ what: "task", id: task });
-    else if (step) setEditing({ what: "card", key: step, every: all });
+    else if (draft.type === "board" && edit === "delete-task" && task) setBoard({ ...draft.board, tasks: draft.board.tasks.filter((own) => own.id !== task) });
+    else if (draft.type === "board" && edit === "slot" && task && slot) {
+      const tasks = draft.board.tasks.map((own) => (own.id === task ? { ...own, slots: toggledSlots(own, slot as Slot) } : own));
+      setBoard({ ...draft.board, tasks });
+    } else if (step) setEditing({ what: "card", key: step, every: all });
   };
 
   // A Countdown is a chart of its own, like a board beside a plan: on the page it never turns into a day's plan or back.
@@ -420,6 +447,45 @@ export function ChartEditor({
                   </span>
                 </button>
               ))}
+            </span>
+          )}
+          {draft.type === "board" && draft.board.kind === "month" && (
+            <>
+              <span className="rw-opt-group">
+                <span className="rw-opt-name">{t({ de: "Monat als" })}</span>
+                <Segments<MonthSpan>
+                  label={t({ de: "Zeitraum des Monats" })}
+                  selected={draft.board.span ?? "weeks"}
+                  items={[
+                    { id: "weeks", label: t({ de: "4 Wochen" }), pic: <LookPic id="weeks" /> },
+                    { id: "month", label: t({ de: "Kalendermonat" }), pic: <LookPic id="month" /> },
+                  ]}
+                  onPick={(span) => setBoard(withStart({ ...draft.board, span: span === "weeks" ? undefined : span }, new Date()))}
+                />
+              </span>
+              <span className="rw-opt-group">
+                <span className="rw-opt-name">{t({ de: "Darstellung" })}</span>
+                <Segments<MonthLook>
+                  label={t({ de: "Darstellung des Monats" })}
+                  selected={draft.board.look ?? "calendar"}
+                  items={MONTH_LOOKS.map((id) => ({ id, label: t(MONTH_LOOK_NAMES[id]), pic: <LookPic id={id} /> }))}
+                  onPick={(look) => setBoard({ ...draft.board, look: look === "calendar" ? undefined : look })}
+                />
+              </span>
+            </>
+          )}
+          {plan?.view === "week" && counts && (
+            <span className="rw-opt-group">
+              <span className="rw-opt-name">{t({ de: "Darstellung" })}</span>
+              <Segments<WeekLook>
+                label={t({ de: "Darstellung der Woche" })}
+                selected={plan.weekLook ?? "compact"}
+                items={[
+                  { id: "compact", label: t({ de: "Eine Karte je Zeile" }), pic: <LookPic id="compact" /> },
+                  { id: "pictures", label: t({ de: "Bild über jedem Kreis" }), pic: <LookPic id="pictures" /> },
+                ]}
+                onPick={(look) => setPlan({ ...plan, weekLook: look === "compact" ? undefined : look })}
+              />
             </span>
           )}
           <span
@@ -598,7 +664,7 @@ export function ChartEditor({
       )}
 
       {editing && plan && editing.what === "card" && (
-        <CardDialog plan={plan} cellKey={editing.key} every={editing.every} onChange={setPlan} onClose={() => setEditing(null)} />
+        <CardDialog plan={plan} cellKey={editing.key} every={editing.every} swap={editing.swap} onChange={setPlan} onClose={() => setEditing(null)} />
       )}
       {editing && plan && editing.what === "add" && (
         <AddDialog
@@ -687,7 +753,7 @@ function Segments<I extends string>({
   onPick,
 }: {
   label: string;
-  items: { id: I; label: string }[];
+  items: { id: I; label: string; pic?: ReactNode }[];
   selected: I;
   onPick: (id: I) => void;
 }) {
@@ -695,10 +761,60 @@ function Segments<I extends string>({
     <span className="rw-opt-segments" role="group" aria-label={label}>
       {items.map((item) => (
         <button key={item.id} type="button" aria-pressed={item.id === selected} onClick={() => onPick(item.id)}>
+          {item.pic}
           {item.label}
         </button>
       ))}
     </span>
+  );
+}
+
+/** What a look option shows, as a small picture in its button. */
+type LookPicId = MonthSpan | MonthLook | WeekLook;
+
+/**
+ * A small picture of a look in its button (user feedback, November 2026: other ways to show the month to choose from):
+ * four rows of weeks without numbers, a month's calendar with its 1, a calendar of rings, a table, four week blocks,
+ * a week of cards with rings beside them, or a picture over every ring.
+ */
+function LookPic({ id }: { id: LookPicId }) {
+  const ring = (x: number, y: number, r: number, key?: string | number) => <circle key={key} cx={x} cy={y} r={r} />;
+  const box = (x: number, y: number, w: number, h: number, key?: string | number) => <rect key={key} x={x} y={y} width={w} height={h} rx={1} />;
+  return (
+    <svg className="rw-look-pic" viewBox="0 0 32 22" aria-hidden>
+      {id === "weeks" && Array.from({ length: 28 }, (_, i) => ring(3.5 + (i % 7) * 4.2, 3.5 + Math.floor(i / 7) * 5, 1.5, i))}
+      {id === "month" && (
+        <>
+          {Array.from({ length: 28 }, (_, i) => (i < 3 ? null : box(1.5 + (i % 7) * 4.2, 1.5 + Math.floor(i / 7) * 5, 3.4, 4, i)))}
+          <text x={13.8} y={5} className="rw-look-num">
+            1
+          </text>
+        </>
+      )}
+      {id === "calendar" && Array.from({ length: 12 }, (_, i) => box(1.5 + (i % 4) * 7.5, 1.5 + Math.floor(i / 4) * 6.8, 6.5, 6, i))}
+      {id === "calendar" && Array.from({ length: 12 }, (_, i) => ring(4.75 + (i % 4) * 7.5, 4.5 + Math.floor(i / 4) * 6.8, 1.6, `r${i}`))}
+      {id === "table" && (
+        <>
+          {[4, 11, 18].map((y) => box(1, y - 2.5, 5, 5, y))}
+          {[4, 11, 18].flatMap((y) => Array.from({ length: 7 }, (_, i) => ring(9.5 + i * 3.4, y, 1.3, `${y}-${i}`)))}
+        </>
+      )}
+      {id === "blocks" && [0, 1, 2, 3].map((b) => box(1.5 + (b % 2) * 15, 1.5 + Math.floor(b / 2) * 10, 13.5, 8.5, b))}
+      {id === "compact" && (
+        <>
+          {[5, 15].map((y) => box(1, y - 3.5, 7, 7, y))}
+          {[5, 15].flatMap((y) => Array.from({ length: 5 }, (_, i) => ring(12 + i * 4.5, y, 1.7, `${y}-${i}`)))}
+        </>
+      )}
+      {id === "pictures" && (
+        <>
+          {Array.from({ length: 5 }, (_, i) => box(2 + i * 6, 2, 4.5, 4.5, i))}
+          {Array.from({ length: 5 }, (_, i) => ring(4.25 + i * 6, 10, 1.8, `a${i}`))}
+          {Array.from({ length: 5 }, (_, i) => box(2 + i * 6, 13, 4.5, 4.5, `b${i}`))}
+          {Array.from({ length: 5 }, (_, i) => ring(4.25 + i * 6, 20, 1.6, `c${i}`))}
+        </>
+      )}
+    </svg>
   );
 }
 
@@ -798,6 +914,7 @@ function CardDialog({
   plan,
   cellKey,
   every = false,
+  swap = false,
   onChange,
   onClose,
 }: {
@@ -805,6 +922,8 @@ function CardDialog({
   cellKey: string;
   /** Tapped at the head of a week's grid: the card of every day changes alike. */
   every?: boolean;
+  /** A week's row's picture tapped: only other cards to swap it for – its circles, place and time are on the sheet. */
+  swap?: boolean;
   onChange: (plan: Plan) => void;
   onClose: () => void;
 }) {
@@ -841,65 +960,77 @@ function CardDialog({
       }
       onClose={onClose}
     >
-      <div className="rw-edit-row">
-        <Counter
-          emoji="⭐"
-          wide
-          label={t({ de: "Sterne", en: "Stars", zh: "星星", hi: "सितारे", es: "Estrellas", ar: "النجوم", ru: "Звёзды" })}
-          value={starsOf(step)}
-          min={0}
-          max={MAX_STARS}
-          onChange={(n) => onChange(withStepStars(plan, onlyToday ? weekday(day) : null, step.id, n))}
-        />
-        {plan.view !== "week" && !every && (
-          <Segments
-            label={t({
-              de: "Für welche Tage?",
-              en: "For which days?",
-              zh: "哪几天？",
-              hi: "किन दिनों के लिए?",
-              es: "¿Para qué días?",
-              ar: "لأيّ الأيام؟",
-              ru: "На какие дни?",
-            })}
-            items={[
-              { id: "all", label: t({ de: "Jeden Tag", en: "Every day", zh: "每天", hi: "हर दिन", es: "Todos los días", ar: "كل يوم", ru: "Каждый день" }) },
-              {
-                id: "one",
-                label: t({
-                  de: (d: string) => `Nur ${d}`,
-                  en: (d: string) => `Only ${d}`,
-                  zh: (d: string) => `仅${d}`,
-                  hi: (d: string) => `सिर्फ़ ${d}`,
-                  es: (d: string) => `Solo ${d}`,
-                  ar: (d: string) => `${d} فقط`,
-                  ru: (d: string) => `Только ${d}`,
-                })(weekdayName),
-              },
-            ]}
-            selected={onlyToday ? "one" : "all"}
-            onPick={(id) => setOnlyToday(id === "one")}
-          />
-        )}
-      </div>
-      <div className="rw-edit-row">
-        <button type="button" className="rw-edit-button" disabled={index === 0 || steps[index - 1].part !== step.part} onClick={() => move(-1)}>
-          ‹ {t({ de: "Früher", en: "Move earlier", zh: "往前移", hi: "पहले करें", es: "Mover antes", ar: "تقديم", ru: "Раньше" })}
-        </button>
-        <button type="button" className="rw-edit-button" disabled={index === steps.length - 1 || steps[index + 1].part !== step.part} onClick={() => move(1)}>
-          {t({ de: "Später", en: "Move later", zh: "往后移", hi: "बाद में करें", es: "Mover después", ar: "تأخير", ru: "Позже" })} ›
-        </button>
-        <button
-          type="button"
-          className="rw-edit-button"
-          onClick={() => {
-            change((list) => list.filter((s) => s.id !== step.id));
-            onClose();
-          }}
-        >
-          🗑️ {t({ de: "Entfernen", en: "Remove", zh: "删除", hi: "हटाएँ", es: "Quitar", ar: "إزالة", ru: "Убрать" })}
-        </button>
-      </div>
+      {!swap && (
+        <>
+          <div className="rw-edit-row">
+            <Counter
+              emoji="⭐"
+              wide
+              label={t({ de: "Sterne", en: "Stars", zh: "星星", hi: "सितारे", es: "Estrellas", ar: "النجوم", ru: "Звёзды" })}
+              value={starsOf(step)}
+              min={0}
+              max={MAX_STARS}
+              onChange={(n) => onChange(withStepStars(plan, onlyToday ? weekday(day) : null, step.id, n))}
+            />
+            {plan.view !== "week" && !every && (
+              <Segments
+                label={t({
+                  de: "Für welche Tage?",
+                  en: "For which days?",
+                  zh: "哪几天？",
+                  hi: "किन दिनों के लिए?",
+                  es: "¿Para qué días?",
+                  ar: "لأيّ الأيام؟",
+                  ru: "На какие дни?",
+                })}
+                items={[
+                  {
+                    id: "all",
+                    label: t({ de: "Jeden Tag", en: "Every day", zh: "每天", hi: "हर दिन", es: "Todos los días", ar: "كل يوم", ru: "Каждый день" }),
+                  },
+                  {
+                    id: "one",
+                    label: t({
+                      de: (d: string) => `Nur ${d}`,
+                      en: (d: string) => `Only ${d}`,
+                      zh: (d: string) => `仅${d}`,
+                      hi: (d: string) => `सिर्फ़ ${d}`,
+                      es: (d: string) => `Solo ${d}`,
+                      ar: (d: string) => `${d} فقط`,
+                      ru: (d: string) => `Только ${d}`,
+                    })(weekdayName),
+                  },
+                ]}
+                selected={onlyToday ? "one" : "all"}
+                onPick={(id) => setOnlyToday(id === "one")}
+              />
+            )}
+          </div>
+          <div className="rw-edit-row">
+            <button type="button" className="rw-edit-button" disabled={index === 0 || steps[index - 1].part !== step.part} onClick={() => move(-1)}>
+              ‹ {t({ de: "Früher", en: "Move earlier", zh: "往前移", hi: "पहले करें", es: "Mover antes", ar: "تقديم", ru: "Раньше" })}
+            </button>
+            <button
+              type="button"
+              className="rw-edit-button"
+              disabled={index === steps.length - 1 || steps[index + 1].part !== step.part}
+              onClick={() => move(1)}
+            >
+              {t({ de: "Später", en: "Move later", zh: "往后移", hi: "बाद में करें", es: "Mover después", ar: "تأخير", ru: "Позже" })} ›
+            </button>
+            <button
+              type="button"
+              className="rw-edit-button"
+              onClick={() => {
+                change((list) => list.filter((s) => s.id !== step.id));
+                onClose();
+              }}
+            >
+              🗑️ {t({ de: "Entfernen", en: "Remove", zh: "删除", hi: "हटाएँ", es: "Quitar", ar: "إزالة", ru: "Убрать" })}
+            </button>
+          </div>
+        </>
+      )}
       <h4 className="rw-edit-sub">
         {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
       </h4>
@@ -1156,7 +1287,7 @@ function RewardDialog({ draft, day, onChange, onClose }: { draft: Draft; day: Da
   );
 }
 
-/** A board's task tapped (or ＋): its times of day, removed, or swapped for another; or a new one. */
+/** A board's task tapped (or ＋): swapped for another, or a new one – its times of day and 🗑️ are on the sheet (`EditTasks`). */
 function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId?: string; onChange: (board: Board) => void; onClose: () => void }) {
   const t = useT();
   const taskLabel = useTaskLabel();
@@ -1178,25 +1309,6 @@ function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId
       }
       onClose={onClose}
     >
-      {task && (
-        <div className="rw-edit-row">
-          {board.kind !== "collect" && (
-            <SlotChips task={task} onChange={(patch) => setTasks(board.tasks.map((own) => (own.id === task.id ? { ...own, ...patch } : own)))} />
-          )}
-          {(board.tasks.length > 1 || board.kind === "collect") && (
-            <button
-              type="button"
-              className="rw-edit-button"
-              onClick={() => {
-                setTasks(board.tasks.filter((own) => own.id !== task.id));
-                onClose();
-              }}
-            >
-              🗑️ {t({ de: "Entfernen", en: "Remove", zh: "删除", hi: "हटाएँ", es: "Quitar", ar: "إزالة", ru: "Убрать" })}
-            </button>
-          )}
-        </div>
-      )}
       {task && (
         <h4 className="rw-edit-sub">
           {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}

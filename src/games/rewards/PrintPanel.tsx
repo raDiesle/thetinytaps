@@ -2,7 +2,7 @@ import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 
 import { createPortal } from "react-dom";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { type Localized, useT } from "@/lib/language";
-import { type Board, NO_LINKED } from "./board";
+import { type Board, fourWeeks, NO_LINKED } from "./board";
 import { BoardSheet, type SheetLook, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARK_BY_ID, MARKS, THEME_BY_ID, type Theme, THEMES } from "./catalog";
 import { MIN_STAR_MM, photoFormat, photoLayout } from "./photo";
@@ -90,7 +90,7 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
             { value: "portrait", label: t(PRINT_WORDS.portrait) },
           ]}
         />
-        {board.kind === "month" && (
+        {board.kind === "month" && !fourWeeks(board) && (
           <Choice
             label={t({ de: "Monat", en: "Month", zh: "月份", hi: "महीना", es: "Mes", ar: "الشهر", ru: "Месяц" })}
             value={options.nextMonth ? "next" : "this"}
@@ -222,8 +222,8 @@ function PrintPages({ board, options, look, orientation }: { board: Board; optio
   // The body of the sheet is roughly the page without heading and goal: what the path of a collecting board fits into.
   const aspect = (width - 20) / (height - 60);
   const now = new Date();
-  // Only a month board prints a date of its own: its calendar, this month's or the next one's.
-  const day = board.kind === "month" && options.nextMonth ? new Date(now.getFullYear(), now.getMonth() + 1, 1) : now;
+  // Only a calendar month prints a date of its own: this month's or the next one's (four weeks have none).
+  const day = board.kind === "month" && !fourWeeks(board) && options.nextMonth ? new Date(now.getFullYear(), now.getMonth() + 1, 1) : now;
   return (
     <>
       {/* @page can only be set by a stylesheet; this one comes and goes with the panel. */}

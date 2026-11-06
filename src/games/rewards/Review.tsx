@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { playWhoosh, unlockAudio } from "@/lib/sfx";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
-import { type Board, type LinkedDays, reviewKind, reviewPeriods, type StarLog, withKind } from "./board";
+import { type Board, fourWeeks, type LinkedDays, reviewKind, reviewPeriods, type StarLog, withKind } from "./board";
 import { BoardSheet, SCREEN_LOOK } from "./BoardSheet";
 import { TODAY } from "./PlanSheet";
 import { type BoardKind, MARK_BY_ID, MARKS } from "./catalog";
@@ -41,32 +41,41 @@ const WEEK_FROM: Localized<(date: string) => string> = {
 /** Width / height of a small picture in the strip, as in the gallery. */
 const THUMB_ASPECT = 1.45;
 
-/** The name of a day, week or month `back` periods ago: „Diese Woche“, „Letzte Woche“, „Woche vom 12.10.“, „September“. */
+/**
+ * The name of a day, week or month `back` periods ago: „Diese Woche“, „Letzte Woche“, „Woche vom 12.10.“, „September“
+ * – and of a month board's four weeks (`fourWeeks`): „Diese 4 Wochen“, „Vorige 4 Wochen“, „4 Wochen ab 12.10.“.
+ */
 export function usePeriodLabel() {
   const t = useT();
   const { speechLang } = useAppLanguage();
-  return (kind: BoardKind, back: number, day: Date) =>
-    back === 0
-      ? t(
-          kind === "day"
-            ? TODAY
-            : kind === "week"
-              ? { de: "Diese Woche", en: "This week", zh: "本周", hi: "इस हफ़्ते", es: "Esta semana", ar: "هذا الأسبوع", ru: "Эта неделя" }
-              : { de: "Dieser Monat", en: "This month", zh: "本月", hi: "इस महीने", es: "Este mes", ar: "هذا الشهر", ru: "Этот месяц" },
-        )
-      : back === 1
+  return (kind: BoardKind, back: number, day: Date, fourWeeks = false) =>
+    fourWeeks
+      ? back === 0
+        ? t({ de: "Diese 4 Wochen" })
+        : back === 1
+          ? t({ de: "Vorige 4 Wochen" })
+          : t({ de: `4 Wochen ab ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}` })
+      : back === 0
         ? t(
             kind === "day"
-              ? YESTERDAY
+              ? TODAY
               : kind === "week"
-                ? { de: "Letzte Woche", en: "Last week", zh: "上周", hi: "पिछले हफ़्ते", es: "La semana pasada", ar: "الأسبوع الماضي", ru: "Прошлая неделя" }
-                : { de: "Letzter Monat", en: "Last month", zh: "上个月", hi: "पिछले महीने", es: "El mes pasado", ar: "الشهر الماضي", ru: "Прошлый месяц" },
+                ? { de: "Diese Woche", en: "This week", zh: "本周", hi: "इस हफ़्ते", es: "Esta semana", ar: "هذا الأسبوع", ru: "Эта неделя" }
+                : { de: "Dieser Monat", en: "This month", zh: "本月", hi: "इस महीने", es: "Este mes", ar: "هذا الشهر", ru: "Этот месяц" },
           )
-        : kind === "month"
-          ? new Intl.DateTimeFormat(speechLang, { month: "long" }).format(day)
-          : kind === "week"
-            ? t(WEEK_FROM)(new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day))
-            : new Intl.DateTimeFormat(speechLang, { weekday: "short", day: "numeric", month: "numeric" }).format(day);
+        : back === 1
+          ? t(
+              kind === "day"
+                ? YESTERDAY
+                : kind === "week"
+                  ? { de: "Letzte Woche", en: "Last week", zh: "上周", hi: "पिछले हफ़्ते", es: "La semana pasada", ar: "الأسبوع الماضي", ru: "Прошлая неделя" }
+                  : { de: "Letzter Monat", en: "Last month", zh: "上个月", hi: "पिछले महीने", es: "El mes pasado", ar: "الشهر الماضي", ru: "Прошлый месяц" },
+            )
+          : kind === "month"
+            ? new Intl.DateTimeFormat(speechLang, { month: "long" }).format(day)
+            : kind === "week"
+              ? t(WEEK_FROM)(new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day))
+              : new Intl.DateTimeFormat(speechLang, { weekday: "short", day: "numeric", month: "numeric" }).format(day);
 }
 
 /**
@@ -124,7 +133,7 @@ export function Review({ board, log, linked, sounds, onClose }: { board: Board; 
         <h2 className="rw-panel-title">{t(REVIEW)}</h2>
         {current && (
           <span className="rw-review-now">
-            {label(kind, current.back, current.day)} · <span aria-hidden>{mark.emoji}</span> {current.count}
+            {label(kind, current.back, current.day, fourWeeks(shown))} · <span aria-hidden>{mark.emoji}</span> {current.count}
           </span>
         )}
         <button type="button" className="rw-review-close" onClick={onClose}>
@@ -172,7 +181,7 @@ export function Review({ board, log, linked, sounds, onClose }: { board: Board; 
                       <BoardSheet board={shown} stars={stars} linked={linked} today={today} day={period.day} look={SCREEN_LOOK} aspect={THUMB_ASPECT} />
                     </span>
                     <span className="rw-tpl-name">
-                      {label(kind, period.back, period.day)} · <span aria-hidden>{mark.emoji}</span> {period.count}
+                      {label(kind, period.back, period.day, fourWeeks(shown))} · <span aria-hidden>{mark.emoji}</span> {period.count}
                     </span>
                   </button>
                 </li>

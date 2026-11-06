@@ -8,11 +8,11 @@ import { useGameSettings } from "@/lib/common";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { takeFinishedStep } from "@/lib/routine";
 import { useStoredSettings } from "@/lib/storage";
-import { type Board, isTemplateTitle, parseCellKey, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
+import { type Board, boardSame, boardShift, fourWeeks, isTemplateTitle, parseCellKey, OLDEST_BACK, type StarLog, startOver, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
 import { Certificate, CERTIFICATE } from "./Certificate";
-import { type BoardKind, type ChartType, MARK_BY_ID, PLAN_TEMPLATES, type PlanTemplate, type Template, TEMPLATES } from "./catalog";
+import { type ChartType, MARK_BY_ID, PLAN_TEMPLATES, type PlanTemplate, type Template, TEMPLATES } from "./catalog";
 import { Editor } from "./Editor";
 import { TemplateGallery } from "./Gallery";
 import { loadLinkedDays } from "./linked";
@@ -121,7 +121,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   const log = stored.log;
   const setLog = (next: StarLog) => setStored({ log: next });
   const today = new Date();
-  const boardDay = back === 0 || !board ? today : shiftPeriod(board.kind, today, -back);
+  const boardDay = back === 0 || !board ? today : boardShift(board, today, -back);
   const planDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (plan && plan.view !== "week" ? -back : 0), 12);
 
   // Back from a game a plan's card opened (the brushing): that card gets its tick, whatever time of day the game counted.
@@ -342,7 +342,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
             {/* The view is chosen under „Gestalten“ (its Zeitraum); here only the way to earlier days. */}
             {!wizard && type === "board" && board && board.kind !== "collect" && panel !== "review" && (
               <div className="rw-switch">
-                <PeriodNav kind={board.kind} day={boardDay} back={back} setBack={setBack} />
+                <PeriodNav board={board} day={boardDay} back={back} setBack={setBack} />
               </div>
             )}
             {!wizard && type === "plan" && plan && plan.view !== "week" && (
@@ -410,15 +410,16 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
 }
 
 /** ‹ and › around the day, week or month of a board: back to earlier ones to add a forgotten star, never into the future. */
-function PeriodNav({ kind, day, back, setBack }: { kind: BoardKind; day: Date; back: number; setBack: (back: number) => void }) {
+function PeriodNav({ board, day, back, setBack }: { board: Board; day: Date; back: number; setBack: (back: number) => void }) {
   const t = useT();
   const label = usePeriodLabel();
+  const kind = board.kind;
   return (
     <span className="rw-period">
       <button type="button" aria-label={t(EARLIER)} disabled={back >= OLDEST_BACK[kind]} onClick={() => setBack(back + 1)}>
         ‹
       </button>
-      <span className={`rw-period-label${samePeriod(kind, day, new Date()) ? "" : " past"}`}>{label(kind, back, day)}</span>
+      <span className={`rw-period-label${boardSame(board, day, new Date()) ? "" : " past"}`}>{label(kind, back, day, fourWeeks(board))}</span>
       <button type="button" aria-label={t(LATER)} disabled={back === 0} onClick={() => setBack(back - 1)}>
         ›
       </button>

@@ -114,6 +114,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 5. November 2026: jede Nacht ein Feld mit dem Kind im Bett und einem Sternkreis, „Einmal schlafen“, „Eine Nacht mehr / weniger?“, „Bild der Nächte“ mit seinen fünf Bildern, „Diesen Plan ganz löschen?“, der Druckhinweis und die Zeile der Vorlage „Wie oft noch schlafen?“ (deren alte Übersetzungen sprachen von Monden und sind gelöscht). Nur Deutsch.",
       },
       {
+        label: "📆 Woche und Monat direkt auf dem Blatt (4 Wochen, Darstellungen, Tageszeiten, Kreise je Tag)",
+        languages: { de: "done" },
+        note: "Seit 6. November 2026: „Monat als: 4 Wochen / Kalendermonat“, „Darstellung“ (Kalender, Tabelle, Wochen; „Eine Karte je Zeile“, „Bild über jedem Kreis“), „1. Woche“ bis „4. Woche“, die Schalter „morgens / am Tag / abends“ unter jeder Aufgabe, die Spalte „Kreise“ und „Tauschen gegen“. Nur Deutsch.",
+      },
+      {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“, übersetzt am 5. November 2026. Die Sätze des Kindes sind so gefasst, dass sie für Jungen und Mädchen gleich lauten.",

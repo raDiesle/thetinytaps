@@ -12,14 +12,20 @@ import {
   isTemplateTitle,
   type LinkedDays,
   MAX_TASKS,
-  monthOf,
+  type DayField,
+  type DayPart,
+  DAY_ORDER,
+  dayFields,
+  fourWeeks,
+  periodDays,
   progress,
+  shownSlots,
   taskSlots,
   weekday,
 } from "./board";
 import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
-import { RewardActions } from "./SheetAction";
+import { RewardActions, SheetAction } from "./SheetAction";
 
 /** „Woche vom ____“: the line on a printed week to write its first day on. */
 export const WEEK_OF: Localized = { de: "Woche vom", en: "Week of", zh: "起始日期", hi: "हफ़्ता शुरू", es: "Semana del", ar: "أسبوع يبدأ في", ru: "Неделя с" };
@@ -140,7 +146,6 @@ export function BoardSheet({
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
   const fieldProps = { mark, look, fresh, example };
   const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
-  const week = board.kind === "week" ? boardDays({ ...board, days: [0, 1, 2, 3, 4, 5, 6] }, day) : [];
 
   return (
     <div
@@ -159,16 +164,13 @@ export function BoardSheet({
         {look.print && board.kind === "day" && (
           <span className="rw-blank">{t({ de: "Datum", en: "Date", zh: "日期", hi: "तारीख़", es: "Fecha", ar: "التاريخ", ru: "Дата" })} ____________</span>
         )}
-        {!look.print && board.kind === "week" && (
-          <span className="rw-blank">{dateFormat({ day: "numeric", month: "short" }).formatRange(week[0], week[6])}</span>
-        )}
         {!look.print && board.kind === "day" && <span className="rw-blank">{dateFormat({ weekday: "long", day: "numeric", month: "long" }).format(day)}</span>}
-        {board.kind === "month" && <span className="rw-blank">{dateFormat({ month: "long", year: "numeric" }).format(day)}</span>}
+        {board.kind === "month" && !fourWeeks(board) && <span className="rw-blank">{dateFormat({ month: "long", year: "numeric" }).format(day)}</span>}
       </header>
       {editing && <EditTasks board={board} />}
       <div className="rw-body">
         {board.kind === "week" && <WeekGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
-        {board.kind === "month" && <MonthGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
+        {board.kind === "month" && <MonthSheet board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "day" && <DayCards board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
         {board.kind === "collect" && (
           <CollectPath
@@ -217,26 +219,72 @@ export function BoardSheet({
   );
 }
 
+/** The times of day a task's switches offer, in the day's order, with the words under the mouse. */
+const SLOT_SWITCHES: { slot: Slot; emoji: string; label: Localized }[] = [
+  { slot: "morning", emoji: "☀️", label: { de: "morgens" } },
+  { slot: "noon", emoji: "🌤️", label: { de: "am Tag" } },
+  { slot: "evening", emoji: "🌙", label: { de: "abends" } },
+];
+
 /**
- * While a board is made or changed, its tasks in a row under the heading – every view shows them differently or not at
- * all (a month only as small pictures in its days) –, each a tap to swap or remove it, and ＋ for one more.
+ * While a board is made or changed, its tasks as cards in a row over the sheet – a tap on the picture swaps it, 🗑️ in
+ * its corner takes it, and under it ☀️ 🌤️ 🌙 switch its times of day right there, in the order of the day (user
+ * feedback, November 2026: WYSIWYG, no window for it) – and ＋ for one more. A collecting board has no times of day.
  */
 function EditTasks({ board }: { board: Board }) {
   const t = useT();
   const taskLabel = useTaskLabel();
+  const times = board.kind !== "collect";
   return (
     <div className="rw-edit-tasks">
-      {board.tasks.map((task) => (
-        <span key={task.id} className="rw-edit-task" data-edit="task" data-task={task.id} role="button" tabIndex={0} title={taskLabel(task)}>
-          <span className="rw-edit-task-pic" aria-hidden>
-            <ItemPic item={task} />
+      {board.tasks.map((task) => {
+        const on = shownSlots(task);
+        return (
+          <span key={task.id} className="rw-edit-task">
+            <span className="rw-edit-task-card" data-edit="task" data-task={task.id} role="button" tabIndex={0} title={taskLabel(task)}>
+              <span className="rw-edit-task-pic" aria-hidden>
+                <ItemPic item={task} />
+              </span>
+              <span className="rw-edit-task-name">{taskLabel(task)}</span>
+              {(board.tasks.length > 1 || !times) && (
+                <SheetAction act="delete" ask={t({ de: `„${taskLabel(task)}“ löschen?` })} data={{ "data-edit": "delete-task", "data-task": task.id }} />
+              )}
+            </span>
+            {times && (
+              <span className="rw-edit-slots">
+                {SLOT_SWITCHES.map(({ slot, emoji, label }) => {
+                  const active = on.includes(slot);
+                  // The last time of day stays: a task without one would have no field.
+                  const last = active && on.length === 1;
+                  return last ? (
+                    <span key={slot} className={`rw-edit-slot on fixed rw-slot-${slot}`} title={t(label)}>
+                      {emoji}
+                    </span>
+                  ) : (
+                    <span
+                      key={slot}
+                      className={`rw-edit-slot rw-slot-${slot}${active ? " on" : ""}`}
+                      data-edit="slot"
+                      data-task={task.id}
+                      data-slot={slot}
+                      role="switch"
+                      aria-checked={active}
+                      tabIndex={0}
+                      title={t(label)}
+                      aria-label={`${taskLabel(task)}: ${t(label)}`}
+                    >
+                      {emoji}
+                    </span>
+                  );
+                })}
+              </span>
+            )}
           </span>
-          {taskLabel(task)}
-        </span>
-      ))}
+        );
+      })}
       {board.tasks.length < MAX_TASKS && (
         <span
-          className="rw-edit-task rw-edit-add"
+          className="rw-edit-task-card rw-edit-add"
           data-edit="add"
           role="button"
           tabIndex={0}
@@ -390,21 +438,58 @@ function WeekGrid(props: GridProps) {
   );
 }
 
+/** The fields of a board's day, grouped by the part of the day (morning, the day, evening), only parts that have fields. */
+function dayGroups(board: Board): { part: DayPart; fields: DayField[] }[] {
+  const fields = dayFields(board);
+  return DAY_ORDER.map((part) => ({ part, fields: fields.filter((field) => field.part === part) })).filter((group) => group.fields.length > 0);
+}
+
 /**
- * A calendar of the month: weekdays in columns, a box per day with its number and one field per task and time of day
- * (the task's picture pale in it when there are several tasks). Weekdays the board leaves out stay as plain boxes.
+ * A month board: its days (four weeks without dates, or a calendar month) in the look the grown-up chose – a calendar,
+ * a table or week blocks. Every field shows its task's picture until it has its star, so no list of tasks is needed
+ * over it, and a day's fields stand in the day's order, the morning's first, each part on its own tint (user feedback,
+ * November 2026).
  */
-function MonthGrid(props: GridProps) {
+function MonthSheet(props: GridProps) {
+  const look = props.board.look ?? "calendar";
+  if (look === "table") return <MonthTable {...props} />;
+  if (look === "blocks") return <MonthBlocks {...props} />;
+  return <MonthCalendar {...props} />;
+}
+
+/** The days of a month board's sheet, and for a calendar month how many boxes stay empty before its first. */
+function monthDays(board: Board, day: Date): { days: Date[]; lead: number; dated: boolean } {
+  const days = periodDays(board, day);
+  return { days, lead: weekday(days[0]), dated: !fourWeeks(board) };
+}
+
+/** One field of a month board's day: the task's picture in its ring until the star comes. */
+function MonthField({ props, d, field }: { props: GridProps; d: Date; field: DayField }) {
+  return (
+    <span className="rw-cell">
+      <Field
+        id={cellKey(d, field.task.id, field.slot)}
+        slot={field.slot}
+        hint={<ItemPic item={field.task} lines={greyPrint(props.look)} />}
+        {...fieldOf(props, d, field.task, field.slot)}
+        {...fieldLook(props)}
+      />
+    </span>
+  );
+}
+
+/** A calendar: weekdays in columns, a box per day with its fields in the day's order, each part on its own tint. */
+function MonthCalendar(props: GridProps) {
   const { board, today, day, look } = props;
   const t = useT();
   const names = t(DAY_NAMES);
-  const days = monthOf(day);
-  const lead = weekday(days[0]);
+  const { days, lead, dated } = monthDays(board, day);
   const weeks = Math.ceil((lead + days.length) / 7);
   const todayKey = dayKey(today);
-  const several = board.tasks.length > 1;
+  const groups = dayGroups(board);
+  const tinted = groups.length > 1;
   return (
-    <div className="rw-calendar" style={{ gridTemplateRows: `auto repeat(${weeks}, minmax(0, 1fr))` }}>
+    <div className={`rw-calendar${dated ? " dated" : ""}`} style={{ gridTemplateRows: `auto repeat(${weeks}, minmax(0, 1fr))` }}>
       {names.map((name) => (
         <span key={name} className="rw-day">
           {name}
@@ -415,27 +500,138 @@ function MonthGrid(props: GridProps) {
         const isToday = !look.print && dayKey(d) === todayKey;
         return (
           <div key={dayKey(d)} className={`rw-mday${isToday ? " today" : ""}${on ? "" : " off"}`} style={i === 0 ? { gridColumnStart: lead + 1 } : undefined}>
-            <span className="rw-mnum">{d.getDate()}</span>
+            {dated && <span className="rw-mnum">{d.getDate()}</span>}
             {on && (
               <span className="rw-mfields">
-                {board.tasks.flatMap((task) =>
-                  taskSlots(task).map((slot) => (
-                    <span key={`${task.id}|${slot}`} className="rw-cell">
-                      <Field
-                        id={cellKey(d, task.id, slot)}
-                        slot={slot}
-                        hint={several ? <ItemPic item={task} lines={greyPrint(look)} /> : undefined}
-                        {...fieldOf(props, d, task, slot)}
-                        {...fieldLook(props)}
-                      />
-                    </span>
-                  )),
-                )}
+                {groups.map(({ part, fields }) => (
+                  <span key={part} className={`rw-mpart${tinted ? ` rw-tint-${part}` : ""}`} style={{ flexGrow: fields.length }}>
+                    {fields.map((field) => (
+                      <MonthField key={`${field.task.id}|${field.slot}`} props={props} d={d} field={field} />
+                    ))}
+                  </span>
+                ))}
               </span>
             )}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/** The sign of a part of the day: ☀️ morning, 🌤️ the day, 🌙 evening. */
+const PART_SIGN: Record<DayPart, string> = { morning: "☀️", day: "🌤️", evening: "🌙" };
+
+/** A field's head in a table or a week block: its task's picture, with its time of day's sign where the day has parts. */
+function FieldHead({ field, look, tinted }: { field: DayField; look: SheetLook; tinted: boolean }) {
+  const label = useTaskLabel()(field.task);
+  return (
+    <span className={`rw-mhead${tinted ? ` rw-tint-${field.part}` : ""}`} title={label}>
+      <span className="rw-mhead-pic" aria-hidden>
+        <ItemPic item={field.task} lines={greyPrint(look)} />
+      </span>
+      {tinted && (
+        <span className="rw-mhead-part" aria-hidden>
+          {PART_SIGN[field.part]}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** A table: a row per task and time of day (the morning's first), a column per day, the weeks parted by a line. */
+function MonthTable(props: GridProps) {
+  const { board, today, day, look } = props;
+  const t = useT();
+  const names = t(DAY_NAMES);
+  const { days, dated } = monthDays(board, day);
+  const shown = days.filter((d) => board.days.includes(weekday(d)));
+  const todayKey = dayKey(today);
+  const groups = dayGroups(board);
+  const tinted = groups.length > 1;
+  const fields = groups.flatMap((group) => group.fields);
+  const col = (d: Date) => `rw-tcol${weekday(d) === 6 ? " wk-end" : ""}${!look.print && dayKey(d) === todayKey ? " today" : ""}`;
+  return (
+    <div
+      className="rw-table"
+      style={{
+        gridTemplateColumns: `minmax(0, 2.4fr) repeat(${shown.length}, minmax(0, 1fr))`,
+        gridTemplateRows: `auto repeat(${fields.length}, minmax(0, 1fr))`,
+      }}
+    >
+      <span />
+      {shown.map((d) => (
+        <span key={dayKey(d)} className={`rw-tday ${col(d)}`}>
+          {names[weekday(d)].slice(0, 2)}
+          {dated && <b>{d.getDate()}</b>}
+        </span>
+      ))}
+      {fields.map((field) => (
+        <div key={`${field.task.id}|${field.slot}`} className={`rw-trow${tinted ? ` rw-tint-${field.part}` : ""}`}>
+          <FieldHead field={field} look={look} tinted={tinted} />
+          {shown.map((d) => (
+            <span key={dayKey(d)} className={`rw-cell ${col(d)}`}>
+              <Field id={cellKey(d, field.task.id, field.slot)} slot={field.slot} {...fieldOf(props, d, field.task, field.slot)} {...fieldLook(props)} />
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Week blocks: each week a small chart of its own (a row per task and time of day, a column per day), two side by side. */
+function MonthBlocks(props: GridProps) {
+  const { board, today, day, look } = props;
+  const t = useT();
+  const names = t(DAY_NAMES);
+  const { days, lead, dated } = monthDays(board, day);
+  const todayKey = dayKey(today);
+  const groups = dayGroups(board);
+  const tinted = groups.length > 1;
+  const fields = groups.flatMap((group) => group.fields);
+  // Weeks from Monday to Sunday; a calendar month's first and last week keep empty places outside the month.
+  const slots: (Date | null)[] = [...Array.from({ length: lead }, () => null), ...days];
+  const weeks = Array.from({ length: Math.ceil(slots.length / 7) }, (_, w) => Array.from({ length: 7 }, (_, i) => slots[w * 7 + i] ?? null));
+  const weekdays = [0, 1, 2, 3, 4, 5, 6].filter((wd) => board.days.includes(wd));
+  return (
+    <div className="rw-blocks" style={{ gridTemplateRows: `repeat(${Math.ceil(weeks.length / 2)}, minmax(0, 1fr))` }}>
+      {weeks.map((week, w) => (
+        <div
+          key={w}
+          className="rw-block"
+          style={{
+            gridTemplateColumns: `minmax(0, 1.6fr) repeat(${weekdays.length}, minmax(0, 1fr))`,
+            gridTemplateRows: `auto repeat(${fields.length}, minmax(0, 1fr))`,
+          }}
+        >
+          <span className="rw-block-name">{dated ? "" : t({ de: `${w + 1}. Woche` })}</span>
+          {weekdays.map((wd) => {
+            const d = week[wd];
+            return (
+              <span key={wd} className={`rw-tday${d && !look.print && dayKey(d) === todayKey ? " today" : ""}`}>
+                {names[wd].slice(0, 2)}
+                {dated && d && <b>{d.getDate()}</b>}
+              </span>
+            );
+          })}
+          {fields.map((field) => (
+            <div key={`${field.task.id}|${field.slot}`} className={`rw-trow${tinted ? ` rw-tint-${field.part}` : ""}`}>
+              <FieldHead field={field} look={look} tinted={tinted} />
+              {weekdays.map((wd) => {
+                const d = week[wd];
+                return d ? (
+                  <span key={wd} className={`rw-cell${!look.print && dayKey(d) === todayKey ? " today" : ""}`}>
+                    <Field id={cellKey(d, field.task.id, field.slot)} slot={field.slot} {...fieldOf(props, d, field.task, field.slot)} {...fieldLook(props)} />
+                  </span>
+                ) : (
+                  <span key={wd} className="rw-cell rw-tnone" />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

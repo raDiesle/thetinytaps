@@ -34,7 +34,9 @@ sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) every card and the 
 corner and 🗑️ in their top right (`SheetAction.tsx`): ⚙️ (or a tap on the card) opens its window – its own stars (every
 day or only this weekday), earlier / later in its part, remove, swap for another card – and 🗑️ takes it at once (↶
 brings it back); the reward's ⚙️ opens the goal and the rewards, its 🗑️ leaves the chart without one („＋ Belohnung“
-brings it back). ＋ adds a card to a part; a board shows its tasks as chips over the sheet to tap. The heading is typed
+brings it back). ＋ adds a card to a part; a board shows its tasks as a strip of cards over the sheet (`EditTasks`):
+a tap swaps one, its 🗑️ takes it, ＋ adds one, and under each card its times of day as three switches ☀️ morgens,
+🌤️ am Tag, 🌙 abends in their tints (`toggledSlots`; the last one stays on). The heading is typed
 right on the sheet (`PlanSheet onTitle`, its automatic title as the placeholder), and „Tafel löschen“ / „Plan löschen“
 stands in the edit bar after ↶ ↷ (`ChartEditor onRemove`). What needs typing besides (own words, own emoji, times of day,
 „Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`) – and a Countdown has none of it, so it
@@ -86,7 +88,9 @@ targets) – keep it that way.
   templates (each with a `hint`, and `slots` where a task has other times than in the catalogue: „Mein Tag“ dresses in
   the morning, bathes in the evening and brushes at both). Each entry has an
   emoji; its picture comes from `pictures.tsx`.
-- `board.ts` – a board and the star log, pure functions: days of a week or month board, field keys (`YYYY-MM-DD|task`,
+- `board.ts` – a board and the star log, pure functions: days of a week or month board (a month is four weeks from
+  `Board.start` without dates, `fourWeeks`/`fourWeeksOf`/`periodDays`/`boardShift`, or a calendar month with
+  `span: "month"`; its look `MonthLook`), a day's fields in the day's order (`dayFields`, `DAY_ORDER`), field keys (`YYYY-MM-DD|task`,
   with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
   of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
   stay, the goal fits), `exampleStars`, `shiftPeriod`/`samePeriod`/`OLDEST_BACK` for looking back, `reviewPeriods`
@@ -99,7 +103,8 @@ targets) – keep it that way.
 - `settings.ts` – boards, the current one and the print options (`tinytaps.rewards.v1`); stars live apart
   (`tinytaps.rewards.stars.v1`), so changing a board never loses them. The first board has the fixed id `erste`, so
   its stars stay before anything was saved.
-- `BoardSheet.tsx` – the sheet itself, used for screen and print alike: week grid, month calendar, day cards or a snaking path
+- `BoardSheet.tsx` – the sheet itself, used for screen and print alike: week grid, a month as calendar, table or
+  four week blocks (`MonthCalendar`, `MonthTable`, `MonthBlocks`), day cards or a snaking path
   (`snakeLayout`) to the reward, and the goal below. Sized in container units (`cq*`), so it fits any box.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
@@ -161,10 +166,13 @@ of the board.
 
 ## Times of day
 
-A task can have a field per time of day (`BoardTask.slots`: morning, noon, evening; none means once a day), chosen
-with `SlotChips` in the wizard and under Gestalten. Brushing teeth comes with morning and evening. The week grid
+A task can have a field per time of day (`BoardTask.slots`: morning, noon, evening; none means once a day), switched
+right under its card on the sheet (☀️ 🌤️ 🌙, `EditTasks`) and with `SlotChips` under „Weitere Einstellungen“. Brushing teeth comes with morning and evening. The week grid
 gives such a task a row per time under one head, the month and day views put its fields side by side; every such
 field carries its sun or moon on its edge, filled or not, on screen and on paper. A day is full with every time.
+A day always runs in its order – the morning's fields first, then the day's (midday or once a day), then the
+evening's (`dayFields`, `weekRows`) – each part on its own tint (`--rw-tint-morning`, `-day`, `-evening`, grey on a
+black-and-white print) where a sheet has more than one.
 
 ## The star flow
 
@@ -176,8 +184,8 @@ one. A full day gets a few hearts, stars and notes rising from it, the goal a pa
 ## Printing
 
 `PrintPages` renders A4 pages (mm-sized, `@page` set per board) into `.rw-print-root` at the end of `<body>`; the print
-CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a month board prints its month, this one or
-the next); options: orientation
+CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a calendar month prints its month, this one or
+the next; four weeks print „1. Woche“ to „4. Woche“ without dates); options: orientation
 (auto: portrait for a day board with up to two tasks), colour or black and white to colour in (`InkChoice`; no inline colours, so `.rw-grey` wins), fields
 to colour in, a page of stickers to cut out, and a page of the tasks and the reward as picture cards to cut out
 (`cards`, T-20, for a Velcro board beside the chart). Both charts print such cards with the same `CutCardPages`
@@ -247,8 +255,24 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   goes through the draft (`onChange`).
 - What a sheet shows for one card stays as nice in every view as the Belohnungstafel was before the charts were made
   one: star fields are the board's big rings with its star sticker (`StarFields`, `rw-field`), a counting card is taller
-  than wide (`STAR_CARD`), and a counting week whose days have the same cards is the old grid – a row per card, a column
-  per day (`WeekStars`, `sameCards`). Look at every Zeitraum with and without a Zähler after changing a sheet.
+  than wide (`STAR_CARD`), and a counting week is the old grid – a row per card, a column per day (`WeekStars`,
+  `weekRows`), also when single days differ (a day without a row's card leaves its place empty). Look at every
+  Zeitraum with and without a Zähler after changing a sheet.
+- **The circles are changed where they are, never inside a card or in a window** (user feedback, November 2026): in a
+  counting week each day's cell has its own small ＋ and − beside its circles (`withCellStars`; − on the last takes the
+  card off that day, a big pale ＋ ring brings it back), and the row's ＋ − for every day stand in a column of their own
+  right of the grid, headed „Kreise“, with ▲▼ and the row's time of day ☀️ 🌤️ 🌙 (`RowTools`). A tap on a circle while
+  the chart is made opens nothing; the card's picture swaps it, its 🗑️ takes the row.
+- **The layout is chosen, never changed by what is tapped** (user feedback, November 2026: picking a card turned the
+  week into a picture per day): the band's „Darstellung“ chooses it – a week „Eine Karte je Zeile“ (default) or „Bild
+  über jedem Kreis“ (`Plan.weekLook`), a month Kalender, Tabelle or Wochen (`Board.look`). A new look goes there too,
+  with its small picture (`LookPic`).
+- **A month shows its tasks in its fields, not above them** (user feedback, November 2026: tasks over the days and only
+  circles per day was unusual): each field carries its task's picture, plainly visible (`.rw-mark.pale` stays bright in
+  a month), in the day's order and tints. The tasks are named once – on the sheet's own fields or row heads.
+- **A month is four weeks without dates by default** (user feedback, November 2026): „1. Woche“ … „4. Woche“ from this
+  week's Monday (`withStart`), on and on in blocks of 28 days; „Monat als: Kalendermonat“ in the band makes it a dated
+  month (`span: "month"`). The week's sheet shows no dates either, only the weekdays.
 - No count of stars under the reward (user feedback, November 2026): on paper it is in the way, the fields show them.
 - A new class name is checked against the folder first (`grep`): the editor's ↶ ↷ were first called `rw-undo`, the
   class of „Stern zurück“, and stood fixed in the screen's corner.

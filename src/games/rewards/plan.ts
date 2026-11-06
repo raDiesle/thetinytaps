@@ -80,7 +80,16 @@ export interface Plan {
   since?: string;
   /** Countdown only: how a night looks (`NIGHT_LOOKS`); where missing the child in bed follows „Junge / Mädchen“. */
   night?: string;
+  /**
+   * A counting week's look (user feedback, November 2026): one card at the start of each row (`"compact"`, the
+   * default) or the card's picture over the circles of every day (`"pictures"`). Chosen in the band, never changed by
+   * what the cards are.
+   */
+  weekLook?: WeekLook;
 }
+
+/** How a counting week is drawn: a card per row, or a picture over every day's circles. */
+export type WeekLook = "compact" | "pictures";
 
 /** A plan as an older version saved it: its two-card „Jetzt – Dann“ view is now a Jetzt – Dann plan with the „Jetzt“ field. */
 export function fromOlder(plan: Plan): Plan {
@@ -388,6 +397,103 @@ export function withSteps(plan: Plan, weekdayIndex: number, steps: PlanStep[]): 
 /** The plan with every day's cards changed alike (`change` gets each day's list): the one list of a plan the same every day, or all seven. */
 export function withEveryDay(plan: Plan, change: (steps: PlanStep[]) => PlanStep[]): Plan {
   return { ...plan, days: plan.days.map(change) };
+}
+
+/** Where a part of the day stands in the day: the morning first, then the day (midday or none), then the evening. */
+export const partRank = (part: Slot | undefined): number => (part === "morning" ? 0 : part === "evening" ? 2 : 1);
+
+/** A day's cards in the day's order (the morning's first, the evening's last), each part keeping its own order. */
+const inDayOrder = (steps: PlanStep[]): PlanStep[] => [...steps].sort((a, b) => partRank(a.part) - partRank(b.part));
+
+/**
+ * The rows of a week's grid: every card of the week once, in the day's order (the morning's first, then the day's, then
+ * the evening's), each part in the order its cards first come. A day without a row's card leaves its place empty, so
+ * the grid keeps its shape whatever single days have (user feedback, November 2026: the layout never changes by
+ * itself when one day differs).
+ */
+export function weekRows(plan: Plan): PlanStep[] {
+  const rows: PlanStep[] = [];
+  for (const day of plan.same ? plan.days.slice(0, 1) : plan.days) {
+    for (const [i, step] of day.entries()) {
+      if (rows.some((row) => row.id === step.id)) continue;
+      // After the card it follows on its day, so a card only one day has stands where that day has it.
+      const before = day.slice(0, i).findLast((s) => rows.some((row) => row.id === s.id));
+      const at = before ? rows.findIndex((row) => row.id === before.id) + 1 : 0;
+      rows.splice(at, 0, step);
+    }
+  }
+  return inDayOrder(rows);
+}
+
+/** Each day's cards sorted as the rows `ids` stand (cards not in it keep their place at the end). */
+const inRowOrder = (plan: Plan, ids: string[]): Plan => {
+  const rank = (step: PlanStep) => {
+    const at = ids.indexOf(step.id);
+    return at < 0 ? ids.length : at;
+  };
+  return withEveryDay(plan, (steps) => [...steps].sort((a, b) => rank(a) - rank(b)));
+};
+
+/** A week's row one place up (`by` -1) or down within its part of the day; unchanged at the part's edge. */
+export function withRowMoved(plan: Plan, stepId: string, by: -1 | 1): Plan {
+  const rows = weekRows(plan);
+  const at = rows.findIndex((row) => row.id === stepId);
+  const to = at + by;
+  if (at < 0 || to < 0 || to >= rows.length || rows[to].part !== rows[at].part) return plan;
+  const ids = rows.map((row) => row.id);
+  [ids[at], ids[to]] = [ids[to], ids[at]];
+  return inRowOrder(plan, ids);
+}
+
+/** Whether a week's row can move up (`by` -1) or down within its part of the day. */
+export function canMoveRow(plan: Plan, stepId: string, by: -1 | 1): boolean {
+  return withRowMoved(plan, stepId, by) !== plan;
+}
+
+/** A week's row at another time of day (☀️ morning, 🌤️ the day, 🌙 evening), on every day, its rows in the day's order again. */
+export function withRowPart(plan: Plan, stepId: string, part: Slot): Plan {
+  const set = (step: PlanStep): PlanStep => {
+    if (step.id !== stepId) return step;
+    const { part: _, ...rest } = step;
+    return part === "noon" ? rest : { ...rest, part };
+  };
+  const moved = withEveryDay(plan, (steps) => steps.map(set));
+  return inRowOrder(
+    moved,
+    weekRows(moved).map((row) => row.id),
+  );
+}
+
+/** A week's row with one star more or less on every day it is on (at least 1: 🗑️ takes the row, never −). */
+export function withRowStars(plan: Plan, stepId: string, by: number): Plan {
+  return withEveryDay(plan, (steps) =>
+    steps.map((step) => (step.id === stepId ? withStars(step, Math.max(1, Math.min(MAX_STARS, starsOf(step) + by))) : step)),
+  );
+}
+
+/**
+ * One day's circles of a week's row, one more or less (user feedback, November 2026: a single day's count changed right
+ * on its circles): a day without the card gets it with one star, in its row's place; a day's last star taken leaves
+ * that day without the card (its place empty), the other days keep theirs.
+ */
+export function withCellStars(plan: Plan, weekdayIndex: number, stepId: string, by: number): Plan {
+  const parted = plan.same ? withSame(plan, false, weekdayIndex) : plan;
+  const rows = weekRows(plan);
+  const row = rows.find((r) => r.id === stepId);
+  if (!row) return plan;
+  const steps = parted.days[weekdayIndex] ?? [];
+  const own = steps.find((step) => step.id === stepId);
+  const n = Math.min(MAX_STARS, (own ? starsOf(own) : 0) + by);
+  if (own && n === starsOf(own)) return plan;
+  const next =
+    n <= 0
+      ? steps.filter((step) => step.id !== stepId)
+      : own
+        ? steps.map((step) => (step.id === stepId ? withStars(step, n) : step))
+        : [...steps, withStars({ ...row }, n)];
+  const ids = rows.map((r) => r.id);
+  const rank = (step: PlanStep) => ids.indexOf(step.id);
+  return { ...parted, days: parted.days.map((day, i) => (i === weekdayIndex ? [...next].sort((a, b) => rank(a) - rank(b)) : day)) };
 }
 
 /**

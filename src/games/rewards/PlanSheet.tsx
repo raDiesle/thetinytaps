@@ -25,7 +25,8 @@ import {
   type Plan,
   type PlanStep,
   planProgress,
-  sameCards,
+  canMoveRow,
+  weekRows,
   splitDone,
   starsGot,
   starsOf,
@@ -890,74 +891,256 @@ function DayHead({ d, today, look }: { d: Date; today: Date; look: PlanLook }) {
   );
 }
 
+/** A part of the day's sign at a week's row: ☀️ morning, 🌤️ the day, 🌙 evening. */
+const PART_SIGNS: { part: Slot; emoji: string; label: Localized }[] = [
+  { part: "morning", emoji: "☀️", label: { de: "morgens" } },
+  { part: "noon", emoji: "🌤️", label: { de: "am Tag" } },
+  { part: "evening", emoji: "🌙", label: { de: "abends" } },
+];
+
+/** The part of the day a card stands in, as a row's tint: morning, the day (midday or none), evening. */
+const partClass = (part: Slot | undefined) => (part === "morning" ? "morning" : part === "evening" ? "evening" : "day");
+
+/** − or ＋ drawn as a ring with its sign in it, so it plainly adds or takes a circle (user feedback, November 2026). */
+function RingStep({ by, data, off = false, label }: { by: 1 | -1; data: Record<`data-${string}`, string | undefined>; off?: boolean; label: string }) {
+  return (
+    <span
+      className={`pl-ring-step ${by > 0 ? "more" : "less"}${off ? " off" : ""}`}
+      {...(off ? {} : data)}
+      data-by={by}
+      role="button"
+      tabIndex={off ? -1 : 0}
+      aria-label={label}
+      aria-hidden={off}
+      title={label}
+    >
+      {by > 0 ? "＋" : "−"}
+    </span>
+  );
+}
+
 /**
- * A week of stars: the same cards every day (`sameCards`) with a Zähler, drawn as a reward chart always was – a row per
- * card with its picture at the start, a column per day, big star fields in each cell, today's column marked (user
- * feedback, November 2026: the week's columns of small cards looked poorer than the board of before). A cell is tapped
- * like a card (`data-step`). While it is made a row's picture (or its ⚙️) opens the card for every day, − ＋ under it set
- * its stars, marked in the row's fields under the mouse, and 🗑️ takes the row out of the whole week; ＋ below adds a
- * card to every day.
+ * One day's cell of a week's row: its circles, as many as that day's card has, laid out to be as big as the cell allows
+ * (two rows where that makes them bigger). While it is made a pale ring with ＋ adds one for this day only and − takes
+ * one (user feedback, November 2026: a single day's count changed right there); a day without the card shows only that
+ * ＋. With `picture` the card's picture stands over the circles (`Plan.weekLook`).
+ */
+function WeekCell({ plan, d, row, props, picture }: { plan: Plan; d: Date; row: PlanStep; props: StepsProps; picture: boolean }) {
+  const { today, look, fresh, edit, ticks, linked } = props;
+  const t = useT();
+  const label = useStepLabel()(row);
+  const own = stepsOn(plan, d).find((s) => s.id === row.id);
+  const key = cellKey(d, row.id);
+  const [state] = own ? statesOf(props, d, [own]) : ["later" as StepState];
+  const stars = own ? starsOf(own) : 0;
+  const isToday = !look.print && dayKey(d) === dayKey(today);
+  // As big as the cell allows: a cell about as tall as wide stacks two in a column, under a picture (wider) up to three in a row.
+  const rings = Math.max(1, stars);
+  const cols = picture && rings <= 3 ? rings : Math.ceil(rings / 2);
+  const dayName = t(DAY_NAMES)[weekday(d)];
+  const tappable = !look.print && !edit && !!own;
+  return (
+    <div
+      className={`pl-wcell ${own ? state : "none"}${isToday ? " today" : ""}${fresh === key ? " fresh" : ""}${picture ? " with-pic" : ""}`}
+      data-step={tappable ? key : undefined}
+      data-state={tappable ? state : undefined}
+      data-row={row.id}
+      data-tap={tappable ? tapState({ goal: state === "now", done: state === "done" }) : undefined}
+    >
+      {picture && own && (
+        <span
+          className="pl-wpic"
+          data-edit={edit ? "swap" : undefined}
+          data-cell={edit ? key : undefined}
+          title={look.print ? undefined : label}
+          aria-hidden={!edit}
+        >
+          <ItemPic item={own} lines={look.print && !look.color} />
+        </span>
+      )}
+      <span className="pl-stars pl-wstars" style={{ "--pl-cols": cols, "--pl-rows": Math.ceil(rings / cols) } as CSSProperties} aria-hidden>
+        {Array.from({ length: stars }, (_, i) => {
+          const got = look.print || !own ? 0 : starsGot(ticks, linked, d, own);
+          return (
+            <span key={i} className={`pl-star rw-field${i < got ? " filled" : ""}${i === got - 1 ? " last" : ""}${i === stars - 1 ? " pl-star-end" : ""}`}>
+              <span className="rw-ring">
+                {i < got && (
+                  <span className="rw-mark">
+                    <MarkPic mark={STAR} />
+                  </span>
+                )}
+              </span>
+            </span>
+          );
+        })}
+        {edit && stars === 0 && (
+          <span
+            className="pl-star rw-field pl-cell-add"
+            data-edit="cell-stars"
+            data-cell={key}
+            data-by={1}
+            role="button"
+            tabIndex={0}
+            aria-label={`${dayName}: ${t(MORE_STARS)}`}
+            title={`${dayName}: ${t(MORE_STARS)}`}
+          >
+            <span className="rw-ring">＋</span>
+          </span>
+        )}
+      </span>
+      {edit && stars > 0 && (
+        <span className="pl-cell-steps">
+          <RingStep by={1} off={stars >= MAX_STARS} data={{ "data-edit": "cell-stars", "data-cell": key }} label={`${dayName}: ${t(MORE_STARS)}`} />
+          <RingStep by={-1} data={{ "data-edit": "cell-stars", "data-cell": key }} label={`${dayName}: ${t(FEWER_STARS)}`} />
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * While a week is made, the tools at a row's end (user feedback, November 2026: the circles' − ＋ never inside the
+ * card, but beside it and plainly about circles): − ◯ ＋ for one circle less or more on every day, ▲ ▼ to move the row
+ * within its part of the day, and ☀️ 🌤️ 🌙 for its time of day. In the look with pictures its 🗑️ is here too.
+ */
+function RowTools({ plan, row, key0, withDelete }: { plan: Plan; row: PlanStep; key0: string; withDelete: boolean }) {
+  const t = useT();
+  const label = useStepLabel()(row);
+  const most = Math.max(0, ...plan.days.map((day) => day.find((s) => s.id === row.id)).map((s) => (s ? starsOf(s) : 0)));
+  const least = Math.min(...plan.days.map((day) => day.find((s) => s.id === row.id)).flatMap((s) => (s ? [starsOf(s)] : [])));
+  const part = row.part ?? "noon";
+  return (
+    <div className="pl-wtools" data-row={row.id}>
+      {withDelete && (
+        <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", "data-cell": key0, "data-every": "" }} />
+      )}
+      <span className="pl-wtools-line">
+        <RingStep
+          by={-1}
+          off={least <= 1}
+          data={{ "data-edit": "row-stars", "data-row": row.id }}
+          label={`${label}: ${t(FEWER_STARS)} (${t({ de: "jeden Tag" })})`}
+        />
+        <RingStep
+          by={1}
+          off={most >= MAX_STARS}
+          data={{ "data-edit": "row-stars", "data-row": row.id }}
+          label={`${label}: ${t(MORE_STARS)} (${t({ de: "jeden Tag" })})`}
+        />
+        <span className="pl-wtools-move">
+          {([-1, 1] as const).map((by) => {
+            const able = canMoveRow(plan, row.id, by);
+            const name = t(by < 0 ? { de: "Nach oben" } : { de: "Nach unten" });
+            return (
+              <span
+                key={by}
+                className={`pl-wmove${able ? "" : " off"}`}
+                data-edit={able ? "row-move" : undefined}
+                data-row={row.id}
+                data-by={by}
+                role="button"
+                tabIndex={able ? 0 : -1}
+                aria-hidden={!able}
+                aria-label={name}
+                title={name}
+              >
+                {by < 0 ? "▲" : "▼"}
+              </span>
+            );
+          })}
+        </span>
+      </span>
+      <span className="pl-wtools-line pl-wparts" role="radiogroup" aria-label={t({ de: "Tageszeit" })}>
+        {PART_SIGNS.map((sign) => (
+          <span
+            key={sign.part}
+            className={`pl-wpart pl-wpart-${sign.part}${sign.part === part ? " on" : ""}`}
+            data-edit={sign.part === part ? undefined : "row-part"}
+            data-row={row.id}
+            data-part={sign.part}
+            role="radio"
+            aria-checked={sign.part === part}
+            tabIndex={0}
+            aria-label={t(sign.label)}
+            title={t(sign.label)}
+          >
+            {sign.emoji}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+/** The sign of a row's part of the day on a week, where the week has more than one part. */
+const SIGN_OF: Record<string, string> = { morning: "☀️", day: "🌤️", evening: "🌙" };
+
+/**
+ * A week of stars: a plan with a Zähler drawn as a reward chart always was – a row per card (every card of the week once,
+ * `weekRows`, in the day's order: the morning's first, then the day's, then the evening's, each part on its own tint),
+ * a column per day, big star fields in each cell, today's column marked. Whether one card stands at each row's start or
+ * its picture over every day's circles is the grown-up's choice (`Plan.weekLook`), never changed by what the cards are
+ * (user feedback, November 2026). A day without a row's card leaves its cell empty. A cell is tapped like a card
+ * (`data-step`), only off the editor: there a tap on the circles changes them and opens no window. While it is made a
+ * row's picture swaps its card, 🗑️ takes the row out of the whole week, the tools at the row's end (`RowTools`) set its
+ * circles, place and time of day, each day's cell its own circles, and ＋ below adds a card to every day.
  */
 function WeekStars(props: StepsProps) {
-  const { plan, today, day, look, fresh, edit, ticks, linked } = props;
+  const { plan, today, day, look, edit } = props;
+  const t = useT();
   const label = useStepLabel();
   const week = weekOf(day);
-  const steps = stepsOn(plan, day);
+  const rows = weekRows(plan);
+  const pictures = plan.weekLook === "pictures";
   const isToday = (d: Date) => !look.print && dayKey(d) === dayKey(today);
+  const tinted = new Set(rows.map((row) => partClass(row.part))).size > 1;
+  // The first day that has a row's card names it in the keys of the row's own actions.
+  const keyOf = (row: PlanStep) => cellKey(week.find((d) => stepsOn(plan, d).some((s) => s.id === row.id)) ?? day, row.id);
+  const head = pictures ? 0 : 1.5;
+  const tools = edit ? 1.6 : 0;
   // A row is never much taller than a day's column is wide, so a week of one card keeps round fields in the middle.
-  const rowMax = 100 / (1.5 + week.length);
-  const rows = `auto repeat(${steps.length}, minmax(0, ${rowMax.toFixed(1)}cqw))${edit ? ` minmax(0, ${(rowMax * 0.55).toFixed(1)}cqw)` : ""}`;
+  const colWidth = 100 / (head + week.length + tools);
+  const rowMax = colWidth * (pictures ? 2.2 : 1.4);
+  const columns = `${pictures ? "" : "minmax(0, 1.5fr) "}repeat(7, minmax(0, 1fr))${edit ? " minmax(0, 1.6fr)" : ""}`;
+  const template = `auto repeat(${rows.length}, minmax(0, ${rowMax.toFixed(1)}cqw))${edit ? ` minmax(0, ${(colWidth * 0.55).toFixed(1)}cqw)` : ""}`;
   return (
-    <div className="pl-wgrid" style={{ gridTemplateRows: rows }}>
-      <span />
+    <div className={`pl-wgrid${pictures ? " pl-wgrid-pics" : ""}`} style={{ gridTemplateColumns: columns, gridTemplateRows: template }}>
+      {!pictures && <span />}
       {week.map((d) => (
         <span key={dayKey(d)} className={`pl-wday${isToday(d) ? " today" : ""}`}>
           <DayHead d={d} today={today} look={look} />
         </span>
       ))}
-      {steps.map((step) => (
-        // A row as one element for its 🗑️ and − ＋ to mark it whole, its cells still the grid's (display: contents).
-        <div key={step.id} className="pl-wrow">
-          <div
-            className="pl-whead"
-            data-step={edit ? cellKey(day, step.id) : undefined}
-            data-every={edit ? "" : undefined}
-            data-row={step.id}
-            role="img"
-            aria-label={label(step)}
-            title={look.print ? undefined : label(step)}
-          >
-            {edit && <CardActions cell={cellKey(day, step.id)} label={label(step)} every />}
-            <span className="pl-emoji" aria-hidden>
-              <ItemPic item={step} lines={look.print && !look.color} />
-            </span>
-            {edit && (
-              <span className="pl-whead-steps">
-                <StarStep cell={cellKey(day, step.id)} by={-1} off={starsOf(step) <= 0} every />
-                <StarStep cell={cellKey(day, step.id)} by={1} off={starsOf(step) >= MAX_STARS} every />
+      {edit && <span className="pl-wtools-head">{t({ de: "Kreise" })}</span>}
+      {rows.map((row) => (
+        // A row as one element for its 🗑️ to mark it whole, its cells still the grid's (display: contents).
+        <div key={row.id} className={`pl-wrow${tinted ? ` pl-tint-${partClass(row.part)}` : ""}`}>
+          {!pictures && (
+            <div className="pl-whead" data-row={row.id} role="img" aria-label={label(row)} title={look.print ? undefined : label(row)}>
+              {edit && (
+                <SheetAction
+                  act="delete"
+                  ask={t(DELETE_ASK).replace("{name}", label(row))}
+                  data={{ "data-edit": "delete-card", "data-cell": keyOf(row), "data-every": "" }}
+                />
+              )}
+              {tinted && (
+                <span className="pl-whead-part" aria-hidden>
+                  {SIGN_OF[partClass(row.part)]}
+                </span>
+              )}
+              <span className="pl-emoji" aria-hidden data-edit={edit ? "swap" : undefined} data-cell={edit ? keyOf(row) : undefined}>
+                <ItemPic item={row} lines={look.print && !look.color} />
               </span>
-            )}
-          </div>
-          {week.map((d) => {
-            const own = stepsOn(plan, d).find((s) => s.id === step.id) ?? step;
-            const key = cellKey(d, own.id);
-            const [state] = statesOf(props, d, [own]);
-            return (
-              <div
-                key={key}
-                className={`pl-wcell ${state}${isToday(d) ? " today" : ""}${fresh === key ? " fresh" : ""}`}
-                data-step={look.print ? undefined : key}
-                data-state={look.print ? undefined : state}
-                data-row={step.id}
-                data-tap={look.print ? undefined : tapState({ goal: state === "now", done: state === "done" })}
-              >
-                <StarFields stars={starsOf(own)} got={look.print ? 0 : starsGot(ticks, linked, d, own)} ghost={edit} />
-              </div>
-            );
-          })}
+            </div>
+          )}
+          {week.map((d) => (
+            <WeekCell key={dayKey(d)} plan={plan} d={d} row={row} props={props} picture={pictures} />
+          ))}
+          {edit && <RowTools plan={plan} row={row} key0={keyOf(row)} withDelete={pictures} />}
         </div>
       ))}
-      {edit && steps.length < MAX_STEPS && (
+      {edit && rows.length < MAX_STEPS && (
         <span className="pl-wadd">
           <AddCard every />
         </span>
@@ -966,9 +1149,12 @@ function WeekStars(props: StepsProps) {
   );
 }
 
-/** The week: a reward chart's grid where every day has the same cards and they count stars, else a column per day. */
+/**
+ * The week: with a Zähler a reward chart's grid, a row per card, whatever single days have – the layout never changes
+ * by itself (user feedback, November 2026) –, else a column per day.
+ */
 function WeekColumns(props: StepsProps) {
-  return props.counts && sameCards(props.plan) && stepsOn(props.plan, props.day).length > 0 ? <WeekStars {...props} /> : <DayColumns {...props} />;
+  return props.counts && weekRows(props.plan).length > 0 ? <WeekStars {...props} /> : <DayColumns {...props} />;
 }
 
 /** A column per day with its steps; today's marked, and moons over the days to come – one per night until then. */

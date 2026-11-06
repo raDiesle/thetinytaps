@@ -759,7 +759,8 @@
 }
 
 .pl-row:has(> .pl-part .rw-act[data-edit="row"]:hover),
-.pl-wrow:has(.pl-whead > .rw-act-delete:hover) > * {
+.pl-wrow:has(.pl-whead > .rw-act-delete:hover) > *,
+.pl-wrow:has(.pl-wtools > .rw-act-delete:hover) > * {
   background: color-mix(in srgb, #e53935 14%, transparent);
   outline: max(2px, 0.5cqmin) dashed #c62828;
   outline-offset: -1px;
@@ -1052,6 +1053,266 @@
 
 .pl-wadd > .pl-add {
   aspect-ratio: auto;
+}
+
+/* A week's rows in the day's order, each part of the day on its tint (rewards.css): the morning, the day, the evening. */
+.pl-wrow.pl-tint-morning > :is(.pl-wcell, .pl-whead) {
+  background: var(--rw-tint-morning);
+}
+
+.pl-wrow.pl-tint-day > :is(.pl-wcell, .pl-whead) {
+  background: var(--rw-tint-day);
+}
+
+.pl-wrow.pl-tint-evening > :is(.pl-wcell, .pl-whead) {
+  background: var(--rw-tint-evening);
+}
+
+.pl-wrow[class*="pl-tint-"] > .pl-wcell.today {
+  box-shadow: inset 0 0 0 max(2px, 0.6cqmin) color-mix(in srgb, var(--rw-main) 80%, transparent);
+}
+
+.pl-whead-part {
+  position: absolute;
+  top: 2cqmin;
+  left: 3cqmin;
+  font-family: var(--font-emoji);
+  font-size: 26cqmin;
+  line-height: 1;
+}
+
+/* A cell's circles as big as it allows: in rows of `--pl-cols`, two rows where that makes them bigger. */
+.pl-wcell > .pl-wstars {
+  display: grid;
+  grid-template-columns: repeat(var(--pl-cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--pl-rows), minmax(0, 1fr));
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  gap: 2cqmin;
+}
+
+.pl-wcell > .pl-wstars > .pl-star {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+}
+
+/* A day without the row's card: an empty place, plainly not a missed one. */
+.pl-wcell.none {
+  background: none;
+}
+
+/* The look with pictures: the card's picture over every day's circles. */
+.pl-wcell.with-pic {
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 1cqmin;
+}
+
+.pl-wpic {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-emoji);
+  font-size: min(38cqh, 62cqw);
+  line-height: 1;
+}
+
+.pl-wpic .rw-pic {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.pl-editing :is(.pl-wpic, .pl-whead > .pl-emoji) {
+  cursor: pointer;
+}
+
+.pl-editing :is(.pl-wpic, .pl-whead > .pl-emoji):hover {
+  outline: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  outline-offset: 2px;
+  border-radius: 2cqmin;
+}
+
+/* While a week is made: the ＋ ring of one day, pale until the mouse finds it, and − in the cell's corner. */
+.pl-wcell {
+  position: relative;
+}
+
+.pl-star.pl-cell-add {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.pl-star.pl-cell-add > .rw-ring {
+  border-color: var(--rw-ink);
+  background: transparent;
+  color: var(--rw-ink);
+  font-size: 46cqmin;
+  font-weight: 800;
+}
+
+.pl-star.pl-cell-add:hover,
+.pl-star.pl-cell-add:focus-visible {
+  opacity: 1;
+}
+
+.pl-star.pl-cell-add:hover > .rw-ring {
+  background: #fff;
+}
+
+/* A day's own ＋ and − on the cell's right edge, small, over its circles' corner. */
+.pl-cell-steps {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1cqmin;
+  pointer-events: none;
+}
+
+.pl-cell-steps > .pl-ring-step {
+  width: max(18px, 24cqmin);
+  height: max(18px, 24cqmin);
+  font-size: max(12px, 16cqmin);
+  pointer-events: auto;
+}
+
+.pl-wcell:has(.pl-ring-step.less:hover) .pl-star-end {
+  opacity: 0.25;
+}
+
+/* While it is made a cell's circles leave room for its ＋ and − on the right. */
+.pl-editing .pl-wcell:has(> .pl-cell-steps) > .pl-wstars {
+  width: calc(100% - max(18px, 24cqmin) * 0.7);
+  justify-self: start;
+}
+
+/* − and ＋ drawn as a dashed circle with its sign: they take or add a circle, plainly. */
+.pl-ring-step {
+  display: grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  width: max(26px, 2.6cqw);
+  height: max(26px, 2.6cqw);
+  border: max(2px, 0.25cqw) dashed var(--rw-ink);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink);
+  font-size: max(15px, 1.6cqw);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pl-ring-step:hover,
+.pl-ring-step:focus-visible {
+  border-style: solid;
+  background: var(--rw-main);
+}
+
+.pl-ring-step.off {
+  visibility: hidden;
+}
+
+/* The tools at a row's end while a week is made: − ◯ ＋ for every day, ▲ ▼, and ☀️ 🌤️ 🌙. */
+.pl-wtools-head {
+  align-self: end;
+  font-size: max(11px, 1.5cqw);
+  font-weight: 800;
+  text-align: center;
+}
+
+.pl-wtools {
+  --rw-act: clamp(20px, 2.6cqw, 32px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5cqw;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.3cqw;
+  border: max(2px, 0.2cqw) dashed color-mix(in srgb, var(--rw-ink) 35%, transparent);
+  border-radius: 1cqw;
+  background: #fff;
+}
+
+.pl-wtools > .rw-act-right {
+  top: -0.6cqw;
+  right: -0.6cqw;
+}
+
+.pl-wtools-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4cqw;
+}
+
+.pl-wtools-move {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.pl-wmove {
+  padding: 0 0.3em;
+  font-size: max(11px, 1.2cqw);
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.pl-wmove.off {
+  visibility: hidden;
+}
+
+.pl-wmove:hover {
+  color: var(--rw-main);
+}
+
+.pl-wpart {
+  display: grid;
+  place-items: center;
+  width: max(22px, 2.3cqw);
+  height: max(22px, 2.3cqw);
+  border: max(1.5px, 0.18cqw) dashed color-mix(in srgb, var(--rw-ink) 50%, transparent);
+  border-radius: 50%;
+  font-family: var(--font-emoji);
+  font-size: max(12px, 1.3cqw);
+  line-height: 1;
+  opacity: 0.45;
+  filter: grayscale(0.8);
+  cursor: pointer;
+}
+
+.pl-wpart.on {
+  border-style: solid;
+  border-color: var(--rw-ink);
+  background: var(--rw-tint-day);
+  opacity: 1;
+  filter: none;
+  cursor: default;
+}
+
+.pl-wpart.on.pl-wpart-morning {
+  background: var(--rw-tint-morning);
+}
+
+.pl-wpart.on.pl-wpart-evening {
+  background: var(--rw-tint-evening);
+}
+
+.pl-wpart:not(.on):hover {
+  opacity: 1;
+  filter: none;
+}
+
+.pl-wrow:has(.pl-ring-step[data-edit="row-stars"].less:hover) .pl-wcell .pl-star-end {
+  opacity: 0.25;
 }
 
 /* Countdown (H-41): a card for every night until the big day, an arrow, then the day's picture.
