@@ -290,18 +290,13 @@ const CHEEKS = (
   </>
 );
 
-/**
- * The little bear's face, big, making a feeling's face for the child to copy (C-35); `blowing` shows him blowing out
- * slowly instead, with a soft circle that grows and shrinks behind him for each breath („Tief pusten“).
- */
-export function BigFace({ face, blowing = false }: { face: MoodFace; blowing?: boolean }) {
-  const shown = blowing ? { eyes: "shut" as const, mouth: "o" as const, brows: "soft" as const } : face;
+/** The little bear's face, big, making a feeling's face for the child to copy (C-35). */
+export function BigFace({ face }: { face: MoodFace }) {
   return (
     <span className="mood-art mood-face" aria-hidden>
-      {blowing && <span className="mood-breath" />}
       <svg viewBox="0 4 100 92">
-        <g transform={`rotate(${blowing ? 0 : (face.tilt ?? 0)} 50 56)`}>
-          <MascotHead kind="bear" child eyes={shown.eyes} mouth={shown.mouth} brows={shown.brows} />
+        <g transform={`rotate(${face.tilt ?? 0} 50 56)`}>
+          <MascotHead kind="bear" child eyes={face.eyes} mouth={face.mouth} brows={face.brows} />
         </g>
       </svg>
     </span>

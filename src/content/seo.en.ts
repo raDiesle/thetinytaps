@@ -71,7 +71,7 @@ export const SEO_EN: SeoTranslation = {
     "/was-brauche-ich/": {
       title: "What Do I Need? Showing Needs for Toddlers",
       description: "A hug, time alone, romping, blowing, a drink or a rest: the child shows with a picture what does it good now. No ads.",
-      text: "When a feeling is big, it helps to know what you need. The child taps a picture – a hug, time alone, romping, blowing deeply, a drink, a snack, a rest or a song – and the parents see what does it good now.",
+      text: "When a feeling is big, it helps to know what you need. The child taps a picture – a hug, time alone, romping, stamping and blowing, a drink, a snack, a rest or a song – and the parents see what does it good now.",
     },
     "/kettenreaktion/": {
       title: "Chain Reaction and Marble Run for Kids",

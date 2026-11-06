@@ -10,7 +10,7 @@ import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOODS, morningMood, STRENGTH_ANSWERS, STRENGTH_STEPS, strengthAnswer, withMood } from "./mood";
 import { MOOD_PICTURE_QUEUE } from "./moodPictures";
-import { BREATH_MS, NEEDS } from "./needs";
+import { NEEDS } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
@@ -121,21 +121,19 @@ test("the feelings are always the little bear, in his clothes", () => {
   }
 });
 
-// „Wie doll ist es?“ (C-36): a slider of a few steps, a little to a whole lot, whose answer grows with it; the breath's
-// circle of „Tief pusten“ keeps time with the game.
-test("the slider goes from a little to a whole lot, and the breath keeps time", () => {
+// „Wie doll ist es?“ (C-36): a slider of a few steps, a little to a whole lot, whose answer grows with it.
+test("the slider goes from a little to a whole lot", () => {
   expect(STRENGTH_STEPS).toBeGreaterThanOrEqual(3);
   expect(strengthAnswer(0)).toBe(STRENGTH_ANSWERS[0]);
   expect(strengthAnswer(STRENGTH_STEPS - 1)).toBe(STRENGTH_ANSWERS[2]);
-  const css = readFileSync("src/games/feelings/feelings.css", "utf8");
-  expect(css).toContain(`mood-breathe ${BREATH_MS / 1000}s`);
 });
 
-// „Was brauche ich?“ (C-31): different things, each with its card (or drawn), none of them wrong; its answer says it does good.
+// „Was brauche ich?“ (C-31): different things, each with its picture card like the others (user feedback, November 2026:
+// the drawn head of „Tief pusten“ didn't fit them), none of them wrong; its answer says it does good.
 test("every need has its card and says it does good", () => {
   expect(new Set(NEEDS.map((n) => n.id)).size).toBe(NEEDS.length);
   for (const need of NEEDS) {
-    if (!need.drawn) expectPicture(moodImages.need(need.id));
+    expectPicture(moodImages.need(need.id));
     expect(need.caption.de, need.id).not.toMatch(/[.!]$/);
     expect(need.answer.de, need.id).toMatch(/\.$/);
   }

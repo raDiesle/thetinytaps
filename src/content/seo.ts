@@ -149,7 +149,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/was-brauche-ich/",
     title: "Was brauche ich? Bedürfnisse zeigen für Kleinkinder",
     description: "Kuscheln, allein sein, toben, pusten, trinken oder ausruhen: Das Kind zeigt mit einem Bild, was ihm jetzt guttut. Ohne Werbung.",
-    text: "Wenn ein Gefühl groß ist, hilft es zu wissen, was man braucht. Das Kind tippt auf ein Bild – in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, essen, ausruhen oder ein Lied – und die Eltern sehen, was ihm jetzt guttut.",
+    text: "Wenn ein Gefühl groß ist, hilft es zu wissen, was man braucht. Das Kind tippt auf ein Bild – in den Arm nehmen, allein sein, toben, stampfen und pusten, etwas trinken, essen, ausruhen oder ein Lied – und die Eltern sehen, was ihm jetzt guttut.",
   },
   {
     path: "/kettenreaktion/",

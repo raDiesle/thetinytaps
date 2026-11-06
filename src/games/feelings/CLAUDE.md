@@ -34,11 +34,14 @@ what helps were steps of „Wie geht's dir?“ and became games of their own):
   with „Kannst du auch so gucken?“, for a mirror or the grown-up; a tap on it (or any key) asks again; the corner goes
   back. Drawn, so every face is there at once and the same each time.
 - **„Was brauche ich?“** (`/was-brauche-ich/`, `NeedsGame.tsx`, `NeedsPlay.tsx`, `needs.ts`, C-31): cards of what the
-  child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, tief pusten, trinken, essen, ausruhen, ein
-  Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees what the child
-  needs. „Tief pusten“ is drawn (`Need.drawn`): the bear blows two slow breaths with the soft circle round him
-  (`.mood-breath`, its own layer, `BREATH_MS`), then „Schon besser.“. The cards are the little bear doing it
-  (`brauche-…`, made 6 November 2026). A tap on the big picture (or any key) says it again; the corner goes back.
+  child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
+  ausruhen, ein Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees
+  what the child needs. Every card is a picture of the little bear doing it (`brauche-…`, made 6 November 2026), never
+  a drawn head among them: „Tief pusten“ was the bear's drawn face with a breathing circle and didn't fit the pictures
+  beside it (user feedback, November 2026), so it became a scene too – the bear stamping on the floor and blowing out,
+  the breath seen as a swirl rising upwards. Picked, it is done together (`Need.together`): „Komm, wir pusten
+  zusammen“, two slow breaths (`BREATH_MS`), then „Schon besser.“. A tap on the big picture (or any key) says it again;
+  the corner goes back.
 
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
   the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row
@@ -287,7 +290,7 @@ pale a moment after the child has to choose, so it never looks like one of the
 cards (which have the yellow ring and stand out like buttons).
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear standing with his
-slider, his face to copy and his blowing are drawn, see above).
+slider and his face to copy are drawn, see above).
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out
