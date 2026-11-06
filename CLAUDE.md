@@ -331,7 +331,10 @@ In a fresh worktree run `bun install` first.
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
   that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
-  Zeitplan, „Wie lange warten?“ (the Zeitplan's Countdown) and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026). The Alltagshelfer are what parents
+  „Wie lange warten?“ (the Zeitplan's Countdown), Zeitplan and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026).
+  Tied, they are one block: they lean together as one, pressed close, and one ribbon runs round all of them with its bow
+  in their middle – never a band on each book, which looked like three small ribbons (user feedback, November 2026).
+  The books stand thick enough to hit with a finger (`DAILY_SPAN`), and lean a little differently, as books do. The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked

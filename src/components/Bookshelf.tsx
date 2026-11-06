@@ -52,8 +52,11 @@ const VOLUME_COLOURS: Record<string, string> = { "/belohnungstafel/": GOLD, "/ta
 /** A volume's cloth: its own, or one of the books standing spine out. */
 const volumeColour = (href: string, i: number) => VOLUME_COLOURS[href] ?? DAILY_COLOURS[i % DAILY_COLOURS.length];
 
-/** How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to read. */
-const DAILY_SPAN = 1.3;
+/**
+ * How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to
+ * read, and each thick enough for a child's finger (user feedback, November 2026).
+ */
+const DAILY_SPAN = 1.6;
 
 /** The words carved beside the everyday helpers: all of them, or only the first line where the room is small. */
 interface Carving {
@@ -353,20 +356,27 @@ function DailyGroup({
 
 /**
  * Books tied together with a red ribbon and a bow, each a part of one game with its own name on its spine
- * (Belohnungstafel and Zeitplan): the ribbon shows they belong together, and each opens its own part. They stand on the
- * board like the books beside them – a box round them looked as if it floated (user feedback, November 2026).
+ * („Wie lange warten?“, Zeitplan, Belohnungstafel): the ribbon shows they belong together, and each opens its own part.
+ * Tied, they are one block, leaning as one, and one ribbon runs round all of them – a band on each book looked like
+ * three small ribbons (user feedback, November 2026). They stand on the board like the books beside them – a box round
+ * them looked as if it floated (user feedback, November 2026).
  */
 function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void }) {
   return (
     <span className="shelf-bundle" style={{ "--volumes": volumes.length } as CSSProperties}>
-      {volumes.map((book, i) => (
-        <SpineBook key={book.id} book={book} onClick={take(book)} bow={i === 0 && volumes.length > 1} />
+      {volumes.map((book) => (
+        <SpineBook key={book.id} book={book} onClick={take(book)} />
       ))}
+      {volumes.length > 1 && (
+        <span className="shelf-bundle-ribbon" aria-hidden>
+          <RibbonBow />
+        </span>
+      )}
     </span>
   );
 }
 
-/** The ribbon's bow, tied where the first two books of a bundle meet: two loops, a knot and two ends. */
+/** The ribbon's bow, tied in the middle of a bundle's ribbon: two loops, a knot and two ends. */
 function RibbonBow() {
   return (
     <svg className="shelf-bundle-bow" viewBox="0 0 40 32" aria-hidden>
@@ -603,7 +613,7 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
  * like a book on a real shelf. It keeps the picture book it is hidden inside (`.shelf-daily-book`): taken out, that one
  * turns its cover out and opens (bookTravel.ts).
  */
-function SpineBook({ book, onClick, bow }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void; bow?: boolean }) {
+function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   const t = useT();
   const style = { "--c": book.colour, "--w1": book.colour } as CSSProperties;
   return (
@@ -626,7 +636,6 @@ function SpineBook({ book, onClick, bow }: { book: ShelfBook; onClick: (e: Mouse
       <span className="box-left" />
       <span className="box-right" />
       <span className="box-top" />
-      {bow && <RibbonBow />}
       <span className="shelf-daily-book" data-world={book.world} data-spine style={style} hidden>
         <BookFaces book={book} spine />
       </span>
