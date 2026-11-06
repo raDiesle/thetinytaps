@@ -38,16 +38,3 @@ export function usePickKeys<T>(active: boolean, items: readonly T[], pick: (item
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [active, items, pick]);
 }
-
-/** Any key while one thing is shown big: says its line again. */
-export function useAnyKey(active: boolean, onKey: () => void) {
-  useEffect(() => {
-    if (!active) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      if (!e.repeat) onKey();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [active, onKey]);
-}
