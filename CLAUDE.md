@@ -301,7 +301,8 @@ In a fresh worktree run `bun install` first.
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
 - The fullscreen button is always there to get back into fullscreen, which a phone leaves whenever another app was
-  opened in between: in every menu in the top right (`MenuHead`, the last of the home page's buttons) and next to ✕ while playing. A game shows it
+  opened in between: in every menu in the top right (`MenuHead`, the last of the home page's buttons) and while playing in the far top
+  right, with ⚙️ right beside it on its left (beside ✕ it hung on its own up there, user feedback, November 2026). A game shows it
   only while out of fullscreen, on every device, to get back in – never to leave it, so a child's tap can't end it and a
   game in fullscreen shows nothing of it (user feedback, October 2026); leaving is the menus' button. Starting or leaving a game in fullscreen must not make the browser
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
@@ -329,7 +330,7 @@ In a fresh worktree run `bun install` first.
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. No round arrow stands beside the title for it (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back inside a book is that corner: while playing, the ✕ that leaves is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), tapped or held just like the ✕ – held, it lifts further
-  instead of a ring filling – with the fullscreen button right of it, clear of the room it lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it, and a game's own buttons and signs in the top
+  instead of a ring filling – alone in that corner; a game's ⚙️ (`PlayOptions`) moves to the top right for it, beside the fullscreen button, and a game's own buttons and signs in the top
   left keep below it with `top: calc(… + var(--corner-clear, 0px))` (Schatten finden's picture choice lay under the ✕,
   user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
@@ -625,8 +626,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
   findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large and its name
-  in words beside it, always shown („Einstellungen“, „halten“ under it) – on a phone clearly smaller, about as tall as ✕'s
-  corner, so it doesn't cover the picture (user feedback, November 2026) – and as play starts it lights up softly twice,
+  in words beside it („Einstellungen“, „halten“ under it) on tablets and computers – on a phone only the gear, on a slip
+  as small as the fullscreen one, since the words even made small covered too much of the picture (user feedback,
+  November 2026) – and as play starts it lights up softly twice,
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen, and without words grown-ups didn't know it held the options; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
@@ -636,7 +638,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
   `look.test.ts`); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
   over its top edge; and the emoji of cards and the table of contents look printed into the paper (softer colours, the
-  paper's grain over them, `book.css`). While playing, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
+  paper's grain over them, `book.css`). While playing, the ✕ is the page's corner, lying flush in the screen's very corner with no gap to either edge, also
+  on a phone with a camera cut-out or rounded corners: it never steps in by the safe area (that left a strip of the
+  picture beside it), it grows by it instead (`--play-corner`, user feedback, November 2026; `MenuTop.test.ts`). Pictures of the fox and the bear family reading with their
   children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book.
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,

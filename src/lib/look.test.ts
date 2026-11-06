@@ -64,8 +64,9 @@ test("what is on in the options is marked with a highlighter, not yellow paper",
 });
 
 // The small grey gear on ⚙️'s note wasn't seen while playing, nor known for the options without words (user feedback,
-// November 2026): its note is much bigger than the fullscreen one beside it, carries its name in words always shown,
-// and it lights up softly a few times as play starts, then stands still.
+// November 2026): on tablets and computers its note is much bigger than the fullscreen one beside it and carries its
+// name in words, and it lights up softly a few times as play starts, then stands still. On a phone the words covered
+// too much of the picture: there it is only the gear, on a slip like the fullscreen one.
 test("⚙️ while playing is a big note with its name that lights up only as play starts", () => {
   const slip = rule(".play-area .play-options-corner .play-options-button");
   const width = (decls: string) => Number(decls.match(/width:\s*(\d+)px/)?.[1]);
@@ -74,8 +75,10 @@ test("⚙️ while playing is a big note with its name that lights up only as pl
   const playingRule = (selector: string) => playing.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
   expect(Number(playingRule(".play-options-gear").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(2.4);
   expect(Number(playingRule(".play-options-label b").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(1.3);
-  // The name is always there, not only while held or under a mouse.
+  // The name is there on big screens, not only while held or under a mouse – and left out on a phone.
   expect(playingRule(".play-options-label")).not.toMatch(/opacity:\s*0|display:\s*none/);
+  const phone = playing.slice(playing.indexOf("@media (max-width: 599.98px), (max-height: 599.98px)"));
+  expect(phone).toMatch(/\.play-options-label \{\s*display: none;/);
   expect(readFileSync("src/components/PlayOptions.tsx", "utf8")).toContain('className="play-options-label"');
   const glow = playing.match(/\.play-options-corner \{[^}]*animation:\s*([^;]+);/)?.[1] ?? "";
   expect(glow).toContain("play-options-glow");

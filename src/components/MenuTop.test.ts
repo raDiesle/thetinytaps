@@ -76,12 +76,30 @@ test("a game is left by the page's corner, top left", () => {
   const placed = (selector: string) => rules.filter((r) => r.selector === selector && /\btop:/.test(r.body));
   const exitCorner = placed(":root .play-area .exit-corner");
   expect(exitCorner.length).toBe(1);
-  expect(exitCorner[0]?.body).toMatch(/\bleft:\s*max\(/);
+  expect(exitCorner[0]?.body).toMatch(/\bleft:/);
   expect(exitCorner[0]?.body).toMatch(/\bright:\s*auto/);
-  const options = placed(":root .play-area .play-options-corner");
+  // Flush in the screen's very corner, also on a phone with a camera cut-out or rounded corners: moved in by the safe
+  // area, it left a strip of picture between it and the edge (user feedback, November 2026). It grows by it instead.
+  expect(exitCorner[0]?.body).not.toContain("safe-area");
+  const corner = rules.find((r) => r.selector === ":root .play-area .exit-corner .hold-exit")?.body ?? "";
+  expect(corner).toMatch(/margin:\s*calc\(-1 \* var\(--frame\) - 8px\) 0 0 calc\(-1 \* var\(--frame\) - 8px\)/);
+  expect(
+    rules.some(
+      (r) =>
+        r.selector === ":root .play-area" && /--play-corner:\s*calc\(var\(--play-corner-base\) \+ max\(var\(--safe-left\), var\(--safe-top\)\)/.test(r.body),
+    ),
+  ).toBe(true);
+  const options = placed(":root .play-area .play-options-corner,\n:root .play-area .play-fullscreen-corner");
   expect(options.length).toBe(1);
   expect(options[0]?.body).toMatch(/\bright:\s*max\(/);
   expect(options[0]?.body).toMatch(/\bleft:\s*auto/);
+  // The fullscreen slip is in the far top right, ⚙️ right beside it on its left – beside the ✕ it hung on its own up
+  // there (user feedback, November 2026). The ✕'s corner holds nothing else.
+  const exitCornerJsx = shell.match(/<div className="exit-corner" data-tap-keep>([\s\S]*?)<\/div>/)?.[1] ?? "";
+  expect(exitCornerJsx).toContain("{children}");
+  expect(exitCornerJsx).not.toContain("FullscreenButton");
+  expect(shell).toMatch(/<div className="play-fullscreen-corner" data-tap-keep>\s*\{[^}]*\}\s*<FullscreenButton/);
+  expect(rules.some((r) => r.selector === ":root .play-area:has(.play-fullscreen) .play-options-corner" && /\bright:\s*calc\(/.test(r.body))).toBe(true);
 });
 
 // The sun is in the top left corner, so the grown-ups' buttons (fullscreen, the home page's options) keep the top right one.

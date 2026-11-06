@@ -21,6 +21,14 @@
   gap: 8px;
 }
 
+/* Back into fullscreen, in the top right corner, right of ⚙️ (book.css places both on the picture's edge). */
+.play-fullscreen-corner {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 10;
+}
+
 /*
  * The ✕ and the fullscreen button sit on every game's picture, light or dark (night sky, space, a dark room):
  * a pale, see-through disc with a thin dark edge and a dark sign stays findable on both, and still quiet.
@@ -191,25 +199,22 @@
   font-size: 1.4rem;
 }
 
-/* Phones keep the game's room: the note and its intro clearly smaller, about as tall as ✕'s corner – at the size for
-   big screens it covered a good part of a phone's picture (user feedback, November 2026). */
+/* Phones keep the game's room: only the gear, on a note as small as the fullscreen one beside ✕ – its name in words,
+   even made small, covered too much of a phone's picture and looked crowded there (user feedback, November 2026). Its
+   name is still read out (`aria-label`); tablets and computers show it. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .play-options-button.hold-exit {
-    gap: 5px;
-    min-height: 40px;
-    padding: 3px 10px 3px 6px;
+    justify-content: center;
+    min-height: 0;
+    padding: 0;
   }
 
   .play-options-gear {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
-  .play-options-label b {
-    font-size: 0.9rem;
-  }
-
-  .play-options-label small {
-    font-size: 0.7rem;
+  .play-options-label {
+    display: none;
   }
 
   .play-options-intro {

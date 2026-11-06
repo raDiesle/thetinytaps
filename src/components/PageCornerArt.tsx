@@ -22,10 +22,12 @@ export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
           <stop offset="1" stopColor="#e2d3b0" />
         </linearGradient>
       </defs>
-      {/* Its shadow on this page, then the corner itself, bellying out where it bends over and curling at its tip. */}
+      {/* Its shadow on this page, then the corner itself, bellying out where it bends over and curling at its tip. Its
+          top and left edges run straight along the page's edges, so it lies flush in the corner with no gap above its
+          tip (user feedback, November 2026). */}
       <path className="page-corner-shadow" d="M0 0Q50 2 94 10Q62 58 0 100Z" />
-      <path className="page-corner-back" d="M0 0Q46 0 88 5Q56 52 0 94Z" fill={`url(#${id}b)`} />
-      <path d="M88 5Q70 22 56 30" fill="none" stroke="#fffaf0" strokeWidth="2.5" strokeLinecap="round" />
+      <path className="page-corner-back" d="M0 0H88Q56 52 0 94Z" fill={`url(#${id}b)`} />
+      <path d="M86 2Q70 22 56 30" fill="none" stroke="#fffaf0" strokeWidth="2.5" strokeLinecap="round" />
       <path className="page-corner-sign" d={sign === "back" ? "M50 36Q32 30 18 42M18 42l2-12M18 42l12 1" : "M16 24L34 42M34 24L16 42"} />
     </svg>
   );

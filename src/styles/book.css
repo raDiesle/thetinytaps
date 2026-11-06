@@ -1127,25 +1127,9 @@
 
 /*
  * Leaving a game (ExitButton): the ✕ is the same corner at the page's top left, tapped or held like the ✕ – held, it lifts
- * further while the finger stays (instead of a ring filling), and the page turns back. The fullscreen button stays beside
- * it, right of it on the picture's edge.
+ * further while the finger stays (instead of a ring filling), and the page turns back. It is alone there: the
+ * fullscreen button is in the top right, with ⚙️ beside it (below).
  */
-
-/* Room right of the corner for it to lift into, so it never covers the fullscreen button. */
-:root .play-area .exit-corner {
-  flex-direction: row-reverse;
-  align-items: flex-start;
-  gap: calc(var(--play-corner) * 0.4 + 4px);
-}
-
-:root .play-area .exit-corner > :not(.hold-exit) {
-  margin-top: 8px;
-}
-
-/* The fullscreen slip hangs from the picture's top edge, its clip over it (see the notes clipped on, below). */
-:root .play-area .exit-corner > .play-fullscreen {
-  margin-top: -5px;
-}
 
 :root .play-area .exit-corner .hold-exit {
   width: var(--play-corner);
@@ -1182,13 +1166,14 @@
  * edge at 6 of its 60 wide) and lying down onto the picture, bigger than the ✕ so it is found at once.
  */
 :root .play-area {
-  --play-ribbon: calc(var(--play-corner) * 1.15);
+  --play-ribbon: calc(var(--play-corner-base) * 1.15);
 }
 
 :root .play-area .exit-corner .hold-exit.exit-ribbon {
   width: var(--play-ribbon);
   height: calc(var(--play-ribbon) * 80 / 60);
-  margin: calc(-1 * var(--frame) - 8px - var(--play-ribbon) * 6 / 60) 0 0 0;
+  /* It hangs from the top edge, so it may stand in from the left: clear of a phone's camera cut-out. */
+  margin: calc(-1 * var(--frame) - 8px - var(--play-ribbon) * 6 / 60) 0 0 max(0px, calc(var(--safe-left) - var(--frame) - 8px));
 }
 
 :root .play-area .exit-ribbon .page-ribbon-art {
@@ -1205,7 +1190,16 @@
 }
 
 :root .play-area {
-  --play-corner: 64px;
+  --play-corner-base: 64px;
+  /*
+   * The ✕'s corner always starts in the screen's very corner, flush with both edges (user feedback, November 2026): on
+   * a phone with rounded corners or a camera cut-out (`viewport-fit=cover`), moving it in by the safe area left a strip
+   * of the picture between it and the edge, so it looked cut off. It grows by half the safe area instead, which brings
+   * its ✕ clear of the rounded corner.
+   */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --play-corner: calc(var(--play-corner-base) + max(var(--safe-left), var(--safe-top)) / 2);
   /*
    * How far a game's own buttons and signs in the top left stay below the way out, which is the page's corner there:
    * `top: calc(… + var(--corner-clear, 0px))`.
@@ -1215,13 +1209,13 @@
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .play-area {
-    --play-corner: 54px;
+    --play-corner-base: 54px;
   }
 }
 
 @media (min-width: 900px) and (min-height: 600px) {
   :root .play-area {
-    --play-corner: 76px;
+    --play-corner-base: 76px;
   }
 }
 
@@ -1314,18 +1308,27 @@
 
 /*
  * ✕, the fullscreen button and ⚙️ step in off the paper margin, onto the picture's corner: the way back on the left,
- * at the spine (above), so ⚙️ trades places with it and goes to the top right, its note to its left.
+ * at the spine (above), so ⚙️ trades places with it and goes to the top right, its note to its left. The ✕'s corner is
+ * pulled back out into the screen's corner by its margin and never stands in for a phone's safe area (it grows instead,
+ * `--play-corner`); the notes beside it are moved clear of it by that growth, and ⚙️ keeps clear of it itself.
  */
 :root .play-area .exit-corner {
-  top: max(calc(var(--frame) + 8px), env(safe-area-inset-top));
+  top: calc(var(--frame) + 8px);
   right: auto;
-  left: max(calc(var(--frame) + 8px), env(safe-area-inset-left));
+  left: calc(var(--frame) + 8px);
 }
 
-:root .play-area .play-options-corner {
+:root .play-area .play-options-corner,
+:root .play-area .play-fullscreen-corner {
   top: max(calc(var(--frame) + 3px), env(safe-area-inset-top));
   right: max(calc(var(--frame) + 8px), env(safe-area-inset-right));
   left: auto;
+}
+
+/* The fullscreen slip is the outermost, in the very top right, and ⚙️ hangs right beside it on its left
+   (user feedback, November 2026); without it (in fullscreen) ⚙️ takes the corner. */
+:root .play-area:has(.play-fullscreen) .play-options-corner {
+  right: calc(max(calc(var(--frame) + 8px), env(safe-area-inset-right)) + 42px + 12px);
 }
 
 :root .play-area .play-options-intro {
@@ -1481,11 +1484,15 @@
   padding: 14px 40px 10px 14px;
 }
 
+/* On a phone the gear alone, on a slip like the fullscreen one (playing.css). */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .play-area .play-options-corner .play-options-button {
+    width: 46px;
     min-width: 0;
-    min-height: 40px;
-    padding: 6px 24px 3px 7px;
+    height: 46px;
+    min-height: 0;
+    /* The gear a little left of the middle, clear of the clip at the right. */
+    padding: 8px 9px 0 0;
   }
 }
 
@@ -1499,10 +1506,10 @@
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .play-area .play-options-corner .play-options-button::before {
-    top: -11px;
-    right: 6px;
-    width: 11px;
-    height: 32px;
+    top: -13px;
+    right: 5px;
+    width: 13px;
+    height: 39px;
   }
 }
 

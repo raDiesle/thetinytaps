@@ -619,14 +619,21 @@ function HoldExit({ onExit, label }: { onExit: () => void; label: string }) {
   );
 }
 
-/** The corner the ✕ sits in, with the fullscreen button. */
+/**
+ * The corner the ✕ sits in, alone in the top left; the fullscreen button goes to the far top right, with ⚙️ (if the
+ * game has one) right beside it on its left (user feedback, November 2026: beside the ✕ it hung on its own up there).
+ */
 function ExitCorner({ children }: { children: ReactNode }) {
   return (
-    <div className="exit-corner" data-tap-keep>
-      {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
-      <FullscreenButton className="play-fullscreen" playing />
-      {children}
-    </div>
+    <>
+      <div className="exit-corner" data-tap-keep>
+        {children}
+      </div>
+      <div className="play-fullscreen-corner" data-tap-keep>
+        {/* Only to get back into fullscreen: a child's finger must not end it. */}
+        <FullscreenButton className="play-fullscreen" playing />
+      </div>
+    </>
   );
 }
 
