@@ -4,7 +4,24 @@ import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/s
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
-import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, suggestsCertificate, takeBackStar } from "./board";
+import {
+  addStar,
+  addWayStar,
+  type Board,
+  type BoardReward,
+  type CollectWay,
+  collectWays,
+  dayFull,
+  exampleStars,
+  type LinkedDays,
+  parseCellKey,
+  progress,
+  type StarLog,
+  suggestsCertificate,
+  takeBackStar,
+  takeBackWayStar,
+  wayCount,
+} from "./board";
 import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { ItemPic, Pic, picture } from "./pictures";
 
@@ -17,6 +34,8 @@ interface Landing {
   field: string;
   /** Its log key: a `cellKey`, or null on a collecting board. */
   key: string | null;
+  /** On a collecting board: the way it lands on. */
+  way?: CollectWay;
   /** Day of the field, for the „day full“ party. */
   day: Date;
 }
@@ -59,8 +78,9 @@ export function BoardScreen({
   const box = useRef<HTMLDivElement>(null);
   const [aspect, setAspect] = useState(1.6);
   const [fresh, setFresh] = useState<string | null>(null);
-  const [undo, setUndo] = useState<{ key: string | null } | null>(null);
-  const [party, setParty] = useState(false);
+  const [undo, setUndo] = useState<{ key: string | null; way?: CollectWay } | null>(null);
+  // The party's reward: a way's on a collecting board, else the board's; null for a party together.
+  const [party, setParty] = useState<{ reward: BoardReward | null } | null>(null);
   const { effects, glow, celebrate } = useTapFeedback();
   const today = new Date();
   const stars = log[board.id];
@@ -141,35 +161,42 @@ export function BoardScreen({
       return;
     }
     // An open field: its star comes at once; on a collecting board the next free field gets it, whichever was tapped.
-    if (board.kind === "collect") land({ field: `c${progress(board, stars, linked, today).count}`, key: null, day: today });
-    else if (task) land({ field, key: field, day: parseCellKey(field).day });
+    if (board.kind === "collect") {
+      const way = collectWays(board)[Number(field.slice(1).split(".")[0])];
+      if (way) land({ field: `c${way.index}.${wayCount(stars, way)}`, key: null, way, day: today });
+    } else if (task) land({ field, key: field, day: parseCellKey(field).day });
   };
 
   /** A star lands on its field: the log, a pop and a sound, and the parties of a full day or the goal. */
   const land = (pending: Landing) => {
     const before = progress(board, stars, linked, day);
     const wasFull = dayFull(board, stars, linked, pending.day);
-    const next = addStar(log, board.id, pending.key, today);
+    const next = pending.way ? addWayStar(log, board, pending.way) : addStar(log, board.id, pending.key, today);
     const after = progress(board, next[board.id], linked, day);
     setLog(next);
     if (board.examples) onExamplesOff();
     setFresh(pending.field);
-    setUndo({ key: pending.key });
+    setUndo({ key: pending.key, way: pending.way });
     sound(playChime);
     const target = document.querySelector(`[data-field="${CSS.escape(pending.field)}"]`)?.getBoundingClientRect();
     const x = target ? target.left + target.width / 2 : undefined;
     const y = target ? target.top + target.height / 2 : undefined;
     glow(x, y);
-    const goalReached = before.count < before.goal && after.count >= after.goal;
+    // A collecting way's end is its own goal, with its own reward.
+    const { way } = pending;
+    const goalReached = way
+      ? wayCount(stars, way) < way.goal && wayCount(next[board.id], way) >= way.goal
+      : before.count < before.goal && after.count >= after.goal;
+    const reward = way ? way.reward : board.reward;
     if (goalReached) {
       // The big party: the reward, or just the joy of it.
       setTimeout(() => {
-        setParty(true);
+        setParty({ reward });
         sound(playTusch);
         celebrate();
         say(
-          board.reward
-            ? `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(board.reward)}`
+          reward
+            ? `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(reward)}`
             : t({
                 de: "Geschafft! Hurra!",
                 en: "You did it! Hooray!",
@@ -203,7 +230,7 @@ export function BoardScreen({
 
   const takeBack = () => {
     if (!undo) return;
-    setLog(takeBackStar(log, board.id, undo.key));
+    setLog(undo.way ? takeBackWayStar(log, board, undo.way) : takeBackStar(log, board.id, undo.key));
     setUndo(null);
     setFresh(null);
   };
@@ -278,13 +305,13 @@ export function BoardScreen({
         </button>
       )}
       {party && (
-        <button type="button" className="rw-party" onClick={() => setParty(false)}>
+        <button type="button" className="rw-party" onClick={() => setParty(null)}>
           <span className="rw-party-emoji" aria-hidden>
-            {board.reward ? <ItemPic item={board.reward} kind="reward" /> : <Pic src={picture("fest")} emoji="🎉" />}
+            {party.reward ? <ItemPic item={party.reward} kind="reward" /> : <Pic src={picture("fest")} emoji="🎉" />}
           </span>
           <span className="rw-party-text">
-            {board.reward
-              ? rewardLabel(board.reward)
+            {party.reward
+              ? rewardLabel(party.reward)
               : t({ de: "Geschafft!", en: "You did it!", zh: "完成啦！", hi: "हो गया!", es: "¡Lo lograste!", ar: "نجحنا!", ru: "Получилось!" })}
           </span>
         </button>

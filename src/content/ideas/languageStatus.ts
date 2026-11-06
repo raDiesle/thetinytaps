@@ -124,6 +124,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 6. November 2026: „Tageszeiten“ (Ganzer Tag, Früh & Abend, Früh, Mittag & Abend), „Zeichen“ (Ohne, Himmel, Bilder, Sonne & Mond, Landschaft, Hahn, Teller, Bett) und die ＋ am Kartenrand („Karte links davor einfügen“ … „Karte darunter einfügen“). Nur Deutsch.",
       },
       {
+        label: "🏆 Sammeln: ein Weg je Aufgabe, Überschrift und ihr Zeichen",
+        languages: { de: "done" },
+        note: "Seit 6. November 2026: „Bild tauschen“, „Kreise“, „Belohnung tauschen“, „＋ Noch ein Weg – für eine andere Aufgabe“, „Ohne Belohnung“ als erste Wahl, „Zeichen vor der Überschrift ändern“ und „Ohne Zeichen“. Nur Deutsch.",
+      },
+      {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“, übersetzt am 5. November 2026. Die Sätze des Kindes sind so gefasst, dass sie für Jungen und Mädchen gleich lauten.",

@@ -41,6 +41,8 @@ export interface Plan {
   childName: string;
   /** The heading; empty means one made from the name. */
   title: string;
+  /** The sign before the heading: a mark's id; missing or `NO_TITLE_MARK`: none. */
+  titleMark?: string;
   /** Seven lists of steps, Monday first; with `same` only the first one, for every day. */
   days: PlanStep[][];
   /** Every day the same steps (a morning routine), or each weekday its own (a week with Kita). */

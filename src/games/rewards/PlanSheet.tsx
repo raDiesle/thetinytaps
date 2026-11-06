@@ -8,6 +8,7 @@ import { useRewardLabel } from "./BoardSheet";
 import { DAY_NAMES, MARK_BY_ID, MARKS, type NightLook, nightLookOf, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
 import { DaySign, type DaySignSet, PARTS_OF, SLOT_EMOJI } from "./daySigns";
 import { ItemPic, MarkPic, NightPic, SheetStrip } from "./pictures";
+import { SheetTitle, titleMarkOf } from "./SheetTitle";
 import { RewardActions, SheetAction } from "./SheetAction";
 import {
   bigDayCome,
@@ -174,7 +175,6 @@ export function PlanSheet({
   onTitle?: (title: string) => void;
 }) {
   const { speechLang } = useAppLanguage();
-  const t = useT();
   const planTitle = usePlanTitle();
   const title = planTitle(plan);
   const theme = THEME_BY_ID.get(plan.theme) ?? THEMES[0];
@@ -194,20 +194,14 @@ export function PlanSheet({
     >
       {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
-        {editing && onTitle ? (
-          <input
-            className="rw-title rw-title-input"
-            type="text"
-            value={plan.title.trim() ? title : ""}
-            maxLength={40}
-            placeholder={planTitle({ ...plan, title: "" })}
-            aria-label={t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}
-            title={t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" })}
-            onChange={(e) => onTitle(e.target.value)}
-          />
-        ) : (
-          <span className="rw-title">{title}</span>
-        )}
+        <SheetTitle
+          title={title}
+          own={!!plan.title.trim()}
+          auto={planTitle({ ...plan, title: "" })}
+          mark={titleMarkOf(plan.titleMark, undefined)}
+          editing={editing}
+          onTitle={onTitle}
+        />
         {sub && <span className="rw-blank">{sub}</span>}
         {/* No reward by default, and none takes room on the sheet (user feedback, November 2026): while it is made a
             small „＋ Belohnung“ in the heading's corner adds one. */}
