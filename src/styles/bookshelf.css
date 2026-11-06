@@ -1264,7 +1264,7 @@
  * so the names running down their spines tilt towards the line one reads and are read without bending the head as far
  * (user feedback, November 2026). Each leans a little less than the one left of it, as real books never stand quite
  * alike (user feedback, November 2026), so the gaps open towards their tops and none touches its neighbour; the books
- * tied together lean as one block (`.shelf-bundle`). Taken out, a book straightens as it lifts (bookTravel.ts).
+ * tied together stand upright (`.shelf-bundle`). Taken out, a book straightens as it lifts (bookTravel.ts).
  */
 .shelf-daily-books {
   position: relative;
@@ -1323,14 +1323,14 @@
 /*
  * The Belohnungstafel's books, parts of one game (`BookBundle`), tied together with a red ribbon and a bow, so they are
  * read as one thing, and standing on the board like their neighbours: a box round them, pulled out and tipped further,
- * looked as if it floated (user feedback, November 2026). Tied, they are one block: pressed close, leaning together on
- * the block's bottom left corner, less than the single books beside them, and one ribbon runs round all of them – a band
- * on each book looked like three small ribbons (user feedback, November 2026). They are what the eye should find first:
- * the Belohnungstafel bound in gold, all glowing brightest. Still, like everything on the shelf; tied, none moves out
- * under a mouse.
+ * looked as if it floated (user feedback, November 2026). Tied, they are one block: pressed close and standing upright
+ * on the board – leaning, tied books looked unnatural (user feedback, November 2026) – and one ribbon runs round all of
+ * them – a band on each book looked like three small ribbons (user feedback, November 2026). They are what the eye
+ * should find first: the Belohnungstafel bound in gold, all glowing brightest. Still, like everything on the shelf;
+ * tied, none moves out under a mouse.
  */
 .shelf-daily-books > .shelf-bundle {
-  --lean: -6deg;
+  --lean: 0deg;
 }
 
 .shelf-bundle {
@@ -1344,13 +1344,6 @@
   align-items: flex-end;
   min-width: 0;
   height: 100%;
-  transform-origin: 0 100%;
-  transform: rotate(var(--lean, 0deg));
-}
-
-/* The block leans, not each book in it. */
-.shelf-bundle > .shelf-daily {
-  --lean: 0deg;
 }
 
 .shelf-bundle > .shelf-daily > .box-front {

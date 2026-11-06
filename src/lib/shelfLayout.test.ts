@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, SIGN_CLEAR, SIGN_DIP, type ShelfRect, TAKE_OUT } from "./shelfLayout";
 
 /** The home page's places: the everyday helpers' books with the words carved beside them, then three picture books. */
-const BOOKS = [2.7, 1, 1, 1];
+const BOOKS = [3, 1, 1, 1];
 
 /** Of the everyday helpers' place, the words carved beside their books (`CARVINGS` in Bookshelf.tsx). */
 const CARVED = 1.4;
@@ -73,7 +73,7 @@ describe("the bookshelf", () => {
   // the shelf's legs.
   test.each(ROOMS.filter(([w, h]) => w > h))("a wide shelf's sign hangs into its top compartment, clear of the books, in a %i × %i room", (width, height) => {
     const options = OPTIONS(height);
-    const { cells, bookHeight: bh, legs, sign, wordsShift } = planShelf(width, height, BOOKS, options);
+    const { cells, bookHeight: bh, legs, sign, wordsShift, width: w } = planShelf(width, height, BOOKS, options);
     expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
     const top = cells.find((c) => c.books) as (typeof cells)[number];
     expect(sign).toBeDefined();
@@ -94,6 +94,13 @@ describe("the bookshelf", () => {
     expect(wordsMiddle).toBeCloseTo(sign.x + sign.w / 2, 0);
     // The foxes on its o rise 0.4 of its letters above it, below the room's top (at least 48 px, `--top`).
     expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-48);
+    // Sign and words hang as near the shelf's middle as can be (user feedback, November 2026): there, or the books at
+    // their left have no more room to move into, or the wall with the stickers keeps the sign from it.
+    const centre = sign.x + sign.w / 2;
+    const atMiddle = Math.abs(centre - w / 2) < 1;
+    const noRoomLeft = centre > w / 2 && free < 1;
+    const atWall = centre < w / 2 && sign.x + sign.w > top.x + top.w - SIGN_CLEAR.wall * bh - 1;
+    expect(atMiddle || noRoomLeft || atWall).toBe(true);
   });
 
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {
@@ -157,5 +164,13 @@ describe("the bookshelf", () => {
       expect(rule(place)).toContain("transform");
       expect(rule(place)).not.toContain("auto");
     }
+  });
+
+  // Leaning, the books tied together with a ribbon looked unnatural (user feedback, November 2026).
+  test("books tied together stand upright", () => {
+    const css = readFileSync(new URL("../styles/bookshelf.css", import.meta.url), "utf8");
+    const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+    expect(rule(".shelf-daily-books > .shelf-bundle")).toContain("--lean: 0deg");
+    expect(rule(".shelf-bundle")).not.toContain("rotate");
   });
 });

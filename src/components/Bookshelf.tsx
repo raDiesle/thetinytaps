@@ -357,7 +357,7 @@ function DailyGroup({
 /**
  * Books tied together with a red ribbon and a bow, each a part of one game with its own name on its spine
  * („Wie lange warten?“, Zeitplan, Belohnungstafel): the ribbon shows they belong together, and each opens its own part.
- * Tied, they are one block, leaning as one, and one ribbon runs round all of them – a band on each book looked like
+ * Tied, they are one block standing upright (leaning, they looked unnatural), and one ribbon runs round all of them – a band on each book looked like
  * three small ribbons (user feedback, November 2026). They stand on the board like the books beside them – a box round
  * them looked as if it floated (user feedback, November 2026).
  */

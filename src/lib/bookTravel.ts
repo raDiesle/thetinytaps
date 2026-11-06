@@ -81,9 +81,7 @@ function buildBook(book: HTMLElement) {
   const cover = book.querySelector<HTMLElement>(".shelf-book-cover");
   // A book spine out leans on the shelf (`--lean`): measured standing up, it flies from there and straightens as it
   // lifts, turning about the corner it leans on.
-  // Books tied together lean as one block, on the bundle's corner.
-  const leaning = book.closest<HTMLElement>(".shelf-bundle") ?? book;
-  const { rect, lean, pivot } = spine ? upright(leaning, spine) : { rect: (cover ?? book).getBoundingClientRect(), lean: 0, pivot: null };
+  const { rect, lean, pivot } = spine ? upright(book, spine) : { rect: (cover ?? book).getBoundingClientRect(), lean: 0, pivot: null };
   const copy = (template ?? book).cloneNode(true) as HTMLElement;
   copy.className = "shelf-book bt-book";
   copy.hidden = false;
@@ -112,8 +110,8 @@ function buildBook(book: HTMLElement) {
 }
 
 /**
- * Measures the spine `spine` as it would stand without the lean of the book `leaning` (or of the bundle it is tied in),
- * and that box, whose bottom left corner it leans on. The lean is taken off and put back before anything is drawn, and
+ * Measures the spine `spine` as it would stand without the lean of the book `leaning`, and the book's box, whose bottom
+ * left corner it leans on. The lean is taken off and put back before anything is drawn, and
  * without its transition, so nothing on the shelf moves.
  */
 function upright(leaning: HTMLElement, spine: HTMLElement) {
