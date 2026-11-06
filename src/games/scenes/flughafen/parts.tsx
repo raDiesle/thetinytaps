@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { CHEEK, Face, SKIN, Wheel, nth } from "../shared";
+import { Face, SKIN, Wheel, nth } from "../shared";
 
 // Small parts used by several drawings of the airport and the station.
 
@@ -72,16 +72,6 @@ export function Head({ cx, cy, r = 22, hair, children }: { cx: number; cy: numbe
 
 /** A hand at the end of an arm. */
 export const Hand = ({ cx, cy, r = 8, fill = SKIN }: { cx: number; cy: number; r?: number; fill?: string }) => <circle cx={cx} cy={cy} r={r} fill={fill} />;
-
-/** Rosy puffed cheeks, shown while someone blows a whistle. */
-export function PuffCheeks({ cx, cy, className }: { cx: number; cy: number; className: string }) {
-  return (
-    <g className={className} fill={CHEEK}>
-      <circle cx={cx - 11} cy={cy} r="7" />
-      <circle cx={cx + 11} cy={cy} r="7" />
-    </g>
-  );
-}
 
 /** A suitcase standing upright, with a handle on top; (x, y) is its top left corner. */
 export function Suitcase({

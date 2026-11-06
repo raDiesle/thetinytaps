@@ -184,11 +184,28 @@ export function Leg({
 }
 
 /** An arm in a sleeve from the shoulder (x1, y1) to the hand (x2, y2). */
-export function Arm({ x1, y1, x2, y2, sleeve, w = 10 }: { x1: number; y1: number; x2: number; y2: number; sleeve: string; w?: number }) {
+export function Arm({
+  x1,
+  y1,
+  x2,
+  y2,
+  sleeve,
+  w = 10,
+  hand = SKIN,
+}: {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  sleeve: string;
+  w?: number;
+  /** The hand's colour: a paw's for a fox or bear. */
+  hand?: string;
+}) {
   return (
     <>
       <path d={`M${x1} ${y1} L${x2} ${y2}`} stroke={sleeve} strokeWidth={w} strokeLinecap="round" />
-      <circle cx={x2} cy={y2} r={w * 0.55} fill={SKIN} />
+      <circle cx={x2} cy={y2} r={w * 0.55} fill={hand} />
     </>
   );
 }

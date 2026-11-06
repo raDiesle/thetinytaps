@@ -1,4 +1,5 @@
-import { INK, SKIN, Wheel, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { INK, MascotFace, SKIN, Wheel, nth } from "../shared";
 import { Arm, Head, Leg, Lid, Puffs } from "./parts";
 
 // Grown-ups and children on the playground: grandpa on the bench, the ice cream man, mum
@@ -66,16 +67,16 @@ export function Eiswagen() {
         />
         <circle cx="0" cy="-354" r="7" fill="#ffd60a" />
       </g>
-      {/* The ice cream man behind the cart */}
+      {/* The ice cream man behind the cart, a fox (one of the app's mascots in a role) with his paper hat between the ears */}
       <g className="sp-eis-man">
         <rect x="-92" y="-232" width="64" height="80" rx="20" fill="#f8f9fa" />
         <rect x="-82" y="-212" width="44" height="60" rx="6" fill="#ffc9e0" />
-        <Head cx={-60} cy={-256} r={23} hair="#2b2d42" />
-        <path d="M-82 -268 Q-84 -300 -60 -298 Q-36 -300 -38 -268 Z" fill="#fff" />
-        <rect x="-84" y="-274" width="48" height="10" rx="4" fill="#ffc9e0" />
-        <path d="M-60 -242 q-8 4 -12 0 M-60 -242 q8 4 12 0" stroke="#6b4423" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+        <MascotFace kind="fox" cx={-60} cy={-256} r={23}>
+          <path d="M30 30 Q28 4 50 6 Q72 4 70 30 Z" fill="#fff" />
+          <rect x="28" y="24" width="44" height="9" rx="4" fill="#ffc9e0" />
+        </MascotFace>
         <g className="sp-eis-arm" style={{ transformOrigin: "-34px -216px" }}>
-          <Arm x1={-34} y1={-216} x2={-6} y2={-256} sleeve="#f8f9fa" w={13} />
+          <Arm x1={-34} y1={-216} x2={-6} y2={-256} sleeve="#f8f9fa" w={13} hand={MASCOT_COLORS.fox.paw} />
         </g>
       </g>
       {/* The ice cream that pops out of the freezer */}

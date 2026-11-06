@@ -258,8 +258,20 @@
 /* 600 × 400 units: the hiding place stands on the meadow, the animal behind it. */
 /* The stage fills the sky above the meadow: only the corners hold ✕ and the sun, so it may reach up between them. */
 .peek-play .sh-top {
+  position: relative;
+  container-type: size;
   min-height: 0;
   padding-top: max(12px, env(safe-area-inset-top));
+}
+
+/* The fox or bear family stands on the meadow right of the stage, the grown-up pointing at the bush: as tall as the room
+   beside the stage allows (the stage is as wide as 1.5 × its height, at most the screen less 260px), never over it. */
+.pk-family {
+  --stage-w: min(1.5 * (100cqh - 12px - 2vh), 100vw - 260px);
+  position: absolute;
+  right: max(1.5cqw, env(safe-area-inset-right));
+  bottom: 1vh;
+  height: min(58cqh, (100cqw - var(--stage-w)) / 2 * 0.85);
 }
 
 .pk-stage {

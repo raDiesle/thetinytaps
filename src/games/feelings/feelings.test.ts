@@ -10,7 +10,7 @@ import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { asCaption, MOODS, morningMood, STRENGTH_ANSWERS, STRENGTHS, withMood } from "./mood";
 import { MOOD_PICTURE_QUEUE } from "./moodPictures";
-import { BREATH_MS, NEEDS } from "./needs";
+import { NEEDS } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
@@ -129,9 +129,8 @@ test("the feelings are always the little bear, in his clothes", () => {
 });
 
 // „Wie doll ist es?“ (C-36): three pictures of every feeling, a little to a whole lot (user wish, November 2026: pictures,
-// no slider) – the middle its card, the other two drawn from it; their captions are the answers said; the breath's
-// circle of „Tief pusten“ keeps time with the game.
-test("every feeling shows a little, quite a lot and a whole lot, and the breath keeps time", () => {
+// no slider) – the middle its card, the other two drawn from it; their captions are the answers said.
+test("every feeling shows a little, quite a lot and a whole lot", () => {
   expect(STRENGTHS).toEqual([0, 1, 2]);
   for (const mood of MOODS) {
     expect(moodImages.strength(mood.id, 1)).toBe(moodImages.feeling(mood.id));
@@ -140,14 +139,14 @@ test("every feeling shows a little, quite a lot and a whole lot, and the breath 
   for (const answer of STRENGTH_ANSWERS) for (const line of Object.values(answer)) expect(asCaption(line), line).not.toMatch(/[.!¡。！।]/u);
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
   expect(css).not.toContain("mood-slider");
-  expect(css).toContain(`mood-breathe ${BREATH_MS / 1000}s`);
 });
 
-// „Was brauche ich?“ (C-31): different things, each with its card (or drawn), none of them wrong; its answer says it does good.
+// „Was brauche ich?“ (C-31): different things, each with its picture card like the others (user feedback, November 2026:
+// the drawn head of „Tief pusten“ didn't fit them), none of them wrong; its answer says it does good.
 test("every need has its card and says it does good", () => {
   expect(new Set(NEEDS.map((n) => n.id)).size).toBe(NEEDS.length);
   for (const need of NEEDS) {
-    if (!need.drawn) expectPicture(moodImages.need(need.id));
+    expectPicture(moodImages.need(need.id));
     expect(need.caption.de, need.id).not.toMatch(/[.!]$/);
     expect(need.answer.de, need.id).toMatch(/\.$/);
   }

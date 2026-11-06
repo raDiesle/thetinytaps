@@ -288,7 +288,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Frage und was guttut",
         recorded: true,
         languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Tief pusten“, „Etwas essen“ und „Ausruhen“ nur deutsch; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
+        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ nur deutsch; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
       },
     ],
   },

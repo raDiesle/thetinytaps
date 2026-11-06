@@ -1,10 +1,13 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
 import { INK, MascotFace, nth } from "../shared";
-import { Hand, Head, Legs, NAVY, PuffCheeks, RAIL_RED, SIGNAL_ORANGE, Suitcase, Toot, VEST } from "./parts";
+import { Hand, Head, Legs, NAVY, RAIL_RED, SIGNAL_ORANGE, Suitcase, Toot, VEST } from "./parts";
 
 // People. Each drawing has its foot point (between the feet, on the ground) at (0, 0).
 
-/** The conductor: he lifts his signal disc and blows the whistle. */
+/** The conductor's paws: he is a fox, one of the app's mascots in a role. */
+const FOX_PAW = MASCOT_COLORS.fox.paw;
+
+/** The conductor, a fox with his cap between the ears: he lifts his signal disc and blows the whistle. */
 export function Schaffner() {
   return (
     <g className="fh-schaffner-body" style={{ transformOrigin: "0px 0px" }}>
@@ -17,18 +20,23 @@ export function Schaffner() {
       <rect x="10" y="-138" width="16" height="10" rx="2" fill="#ffd60a" />
       <g className="fh-schaffner-kelle" style={{ transformOrigin: "-26px -150px" }}>
         <path d="M-26 -150 L-44 -104" stroke={NAVY} strokeWidth="14" strokeLinecap="round" />
-        <Hand cx={-45} cy={-100} />
+        <Hand cx={-45} cy={-100} fill={FOX_PAW} />
         <path d="M-46 -98 V-60" stroke="#f8f9fa" strokeWidth="5" strokeLinecap="round" />
         <circle cx="-46" cy="-46" r="18" fill="#f8f9fa" />
         <circle cx="-46" cy="-46" r="12" fill="#2dc653" />
       </g>
       <g className="fh-schaffner-head" style={{ transformOrigin: "0px -160px" }}>
-        <Head cx={0} cy={-184} r={24}>
-          <path d="M-24 -196 Q-24 -222 0 -222 Q24 -222 24 -196 Z" fill={RAIL_RED} />
-          <rect x="-28" y="-200" width="56" height="8" rx="3" fill={INK} />
-          <circle cx="0" cy="-210" r="5" fill="#ffd60a" />
-        </Head>
-        <PuffCheeks cx={0} cy={-174} className="fh-schaffner-cheeks" />
+        {/* His red cap sits between his pointed ears, in the head's own box. */}
+        <MascotFace kind="fox" cx={0} cy={-184} r={24}>
+          <path d="M30 30 C30 6 70 6 70 30 Z" fill={RAIL_RED} />
+          <rect x="24" y="26" width="52" height="8" rx="3" fill={INK} />
+          <circle cx="50" cy="17" r="4" fill="#ffd60a" />
+        </MascotFace>
+        {/* His white cheeks puff up as he whistles. */}
+        <g className="fh-schaffner-cheeks" fill={MASCOT_COLORS.fox.pale}>
+          <circle cx="-11" cy="-172" r="7" />
+          <circle cx="11" cy="-172" r="7" />
+        </g>
         <g className="fh-schaffner-whistle">
           <rect x="0" y="-174" width="20" height="10" rx="4" fill="#adb5bd" />
           <circle cx="20" cy="-169" r="6" fill="#adb5bd" />
@@ -37,7 +45,7 @@ export function Schaffner() {
       </g>
       <g className="fh-schaffner-arm" style={{ transformOrigin: "26px -150px" }}>
         <path d="M26 -150 L36 -102" stroke={NAVY} strokeWidth="14" strokeLinecap="round" />
-        <Hand cx={37} cy={-98} />
+        <Hand cx={37} cy={-98} fill={FOX_PAW} />
       </g>
     </g>
   );
