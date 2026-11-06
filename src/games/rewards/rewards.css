@@ -1859,8 +1859,8 @@
 
 /*
  * What can be changed on a way is said where it is (user feedback, November 2026): under the mouse anywhere on the way,
- * its picture, its ＋ − and its reward light up with a word – „Bild tauschen“, „Kreise“, „Belohnung tauschen“ – and the
- * one under the mouse most of all.
+ * a dashed square marks its picture and its reward and „Kreise“ its ＋ −; the picture or reward under the mouse gets a
+ * light veil with ⇄ „Tauschen“ (`SwapVeil`, variant C, user decision), red over its 🗑️.
  */
 .rw-path-hint {
   position: absolute;
@@ -1912,7 +1912,44 @@
 
 .rw-path-editing :is(.rw-path-start, .rw-path-end):hover::before {
   border-color: var(--rw-ink);
-  background: color-mix(in srgb, var(--sunshine) 35%, transparent);
+}
+
+/* The veil lies in the same square as the frame, over the picture and under the 🗑️. */
+.rw-path-swap {
+  position: absolute;
+  inset: 2cqmin calc(50% - 48cqmin);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14cqmin;
+  background: color-mix(in srgb, #fff 68%, transparent);
+  color: var(--rw-ink);
+  font-size: clamp(13px, 14cqmin, 24px);
+  font-weight: 700;
+  line-height: 1.1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Drawn, not the ⇄ character, which the app's font draws as a hairline. */
+.rw-path-swap-icon {
+  width: 2.8em;
+  height: 2.8em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-path-editing :is(.rw-path-start, .rw-path-end):is(:hover, :focus-visible) > .rw-path-swap {
+  opacity: 1;
+}
+
+.rw-path-start:has(.rw-act-delete:hover) > .rw-path-swap {
+  opacity: 0;
 }
 
 .rw-path-start > .rw-act {

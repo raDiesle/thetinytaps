@@ -755,7 +755,7 @@ function CollectPath({
           <span className="rw-path-start-pic" aria-hidden>
             <ItemPic item={way.task} lines={lines} />
           </span>
-          {edit && <span className="rw-path-hint">{t({ de: "Bild tauschen" })}</span>}
+          {edit && <SwapVeil />}
           {edit && many && (
             <SheetAction
               act="delete"
@@ -808,8 +808,24 @@ function CollectPath({
           {way.reward ? <ItemPic item={way.reward} kind="reward" lines={lines} /> : <Pic src={picture("fest")} emoji="🎉" />}
         </span>
         {way.reward && <span className="rw-reward-label">{rewardLabel(way.reward)}</span>}
-        {edit && <span className="rw-path-hint">{t({ de: "Belohnung tauschen" })}</span>}
+        {edit && <SwapVeil />}
       </div>
     </div>
+  );
+}
+
+/**
+ * What a tap on a way's picture or reward does, said on it under the mouse (variant C of four, user decision, November
+ * 2026): a light veil over the picture with ⇄ „Tauschen“ – plainly that the tap only swaps it; deleting is its 🗑️.
+ */
+function SwapVeil() {
+  const t = useT();
+  return (
+    <span className="rw-path-swap" aria-hidden>
+      <svg className="rw-path-swap-icon" viewBox="0 0 24 24" aria-hidden>
+        <path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4" />
+      </svg>
+      {t({ de: "Tauschen" })}
+    </span>
   );
 }

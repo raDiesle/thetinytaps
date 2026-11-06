@@ -126,7 +126,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏆 Sammeln: ein Weg je Aufgabe, Überschrift und ihr Zeichen",
         languages: { de: "done" },
-        note: "Seit 6. November 2026: „Bild tauschen“, „Kreise“, „Belohnung tauschen“, „＋ Noch ein Weg – für eine andere Aufgabe“, „Ohne Belohnung“ als erste Wahl, „Zeichen vor der Überschrift ändern“ und „Ohne Zeichen“. Nur Deutsch.",
+        note: "Seit 6. November 2026: „⇄ Tauschen“ über Bild und Belohnung, „Kreise“, „＋ Noch ein Weg – für eine andere Aufgabe“, „Ohne Belohnung“ als erste Wahl, „Zeichen vor der Überschrift ändern“ und „Ohne Zeichen“. Nur Deutsch.",
       },
       {
         label: "💛 Rituale (Mutmach-Sätze, Erzählen, Wie geht's dir?, Gute-Nacht-Sätze)",
