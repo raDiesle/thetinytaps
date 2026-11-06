@@ -671,7 +671,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Seit dem 6. November 2026 (Rückmeldung) ein Regler zum Schieben: ein Tipp auf das Gefühl zeigt sofort den kleinen Bären mit dem Regler, und seine Gesten werden mit jedem Schritt stärker (Arme hoch vor Freude, Fäuste und rote Backen vor Wut); das Pusten ist jetzt eine Karte in „Was brauche ich?“ (C-31).",
+        "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Seit dem 6. November 2026 (Rückmeldung) ein Regler zum Schieben: ein Tipp auf das Gefühl zeigt sofort den kleinen Bären mit dem Regler, und seine Gesten werden mit jedem Schritt stärker (Arme hoch vor Freude, Fäuste und rote Backen vor Wut); das Pusten ist jetzt eine Karte in „Was brauche ich?“ (C-31). Seit dem 6. November 2026 (Wunsch) statt des Reglers drei Bilder nebeneinander: dasselbe Bild des Gefühls ein bisschen, schon ziemlich und ganz doll, jede Stufe deutlich anders.",
     },
   ],
 };

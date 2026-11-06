@@ -1,8 +1,8 @@
 // Wie geht's dir heute? The child picks the card that shows how it feels: the little bear alone with the feeling, in a
 // moment that brings it (a birthday cake, a tower built, lightning outside – user feedback, November 2026), the
-// pleasant feelings apart from the unpleasant ones. Picked, the bear stands big and the child slides how strong it is:
-// his gestures grow with it (C-36). What helps („Was brauche ich?“) is a game of
-// its own in the book.
+// pleasant feelings apart from the unpleasant ones. Picked, three pictures of the bear in that moment show it a little,
+// quite a lot and a whole lot, and the child taps how strong it is (C-36). What helps („Was brauche ich?“) is a game
+// of its own in the book.
 
 import type { MascotBrows, MascotEyes, MascotMouth } from "@/components/Mascot";
 import { type Daytime, dayKey, daytimeOf } from "@/games/teeth/daytime";
@@ -10,7 +10,7 @@ import type { Localized } from "@/lib/language";
 
 export type MoodId = "froh" | "stolz" | "aufgeregt" | "ruhig" | "muede" | "traurig" | "wuetend" | "angst";
 
-/** The face the little bear makes, drawn with the shared `MascotHead`: to copy, and on the slider's figure at its strongest. */
+/** The face the little bear makes, drawn big with the shared `MascotHead` (`BigFace`). */
 export interface MoodFace {
   eyes: MascotEyes;
   mouth: MascotMouth;
@@ -111,20 +111,23 @@ export const MOOD_QUESTION: Localized = {
   ar: "كيف حالك اليوم؟",
 };
 
-/** How many steps the slider of „Wie doll ist es?“ has (C-36): from a little (0) to a whole lot (`STRENGTH_STEPS - 1`). */
-export const STRENGTH_STEPS = 5;
+/** How strong a feeling is (C-36): a little, quite a lot, a whole lot – one picture each, no numbers. */
+export type Strength = 0 | 1 | 2;
 
-/** Said when the slider is let go: a little, quite a lot or a whole lot, no numbers. */
+/** The three strengths, a little first. */
+export const STRENGTHS: readonly Strength[] = [0, 1, 2];
+
+/** Said when a strength is tapped, and (without its marks) the caption under its picture. */
 export const STRENGTH_ANSWERS: [Localized, Localized, Localized] = [
   { de: "Ein bisschen.", en: "A little.", zh: "有一点点。", hi: "थोड़ा-सा।", es: "Un poquito.", ar: "قليلًا.", ru: "Чуть-чуть." },
   { de: "Schon ziemlich.", en: "Quite a lot.", zh: "挺强的。", hi: "काफ़ी ज़्यादा।", es: "Bastante.", ar: "إلى حدّ ما.", ru: "Довольно сильно." },
   { de: "Ganz doll!", en: "A whole lot!", zh: "特别强！", hi: "बहुत ज़्यादा!", es: "¡Muchísimo!", ar: "كثيرًا جدًّا!", ru: "Очень сильно!" },
 ];
 
-/** The answer for slider step `step`: the two lowest a little, the middle quite a lot, the two highest a whole lot. */
-export const strengthAnswer = (step: number) => STRENGTH_ANSWERS[step <= 1 ? 0 : step === 2 ? 1 : 2];
+/** A spoken answer as a caption: without its full stop or exclamation marks („Ganz doll“, „Muchísimo“). */
+export const asCaption = (line: string) => line.replace(/^[¡¿]/, "").replace(/[.!。！।]+$/u, "");
 
-/** Read aloud when a feeling is picked and its slider comes. */
+/** Read aloud when a feeling is picked and its three strengths come. */
 export const STRENGTH_QUESTION: Localized = {
   de: "Wie doll ist es?",
   en: "How strong is it?",

@@ -194,7 +194,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/wie-gehts-dir/",
-    note: "Immer derselbe kleine Bär, allein, in T-Shirt und Hose (6. November 2026): auf jeder Gefühlskarte in einem Moment, der das Gefühl bringt, und groß als Zeichnung (MascotHead), deren Gesten mit dem Regler stärker werden.",
+    note: "Immer derselbe kleine Bär, allein, in T-Shirt und Hose (6. November 2026): auf jeder Gefühlskarte in einem Moment, der das Gefühl bringt, und auf drei Bildern daraus, die zeigen, wie stark es ist (ein bisschen, schon ziemlich, ganz doll).",
     tasks: [
       {
         label: "Fuchs- oder Bärenkind mit Mama oder Papa zeigt, wie es ihm geht (statt Wetter), und wird in den Arm genommen",
@@ -220,6 +220,16 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "S",
         idea: "C-36",
         state: "done",
+        note: "Seit dem 6. November 2026 ersetzt durch die drei Bilder des nächsten Punkts (Wunsch).",
+      },
+      {
+        label: "Jedes Gefühl ein bisschen und ganz doll, aus seiner Karte gezeichnet – deutlich schwächer und deutlich stärker",
+        work: "picture",
+        pictures: 16,
+        effort: "M",
+        idea: "C-36",
+        state: "done",
+        note: "Wunsch vom 6. November 2026, gemacht am selben Tag (gefuehl-…-wenig, gefuehl-…-doll).",
       },
     ],
   },

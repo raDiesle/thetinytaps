@@ -250,7 +250,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/wie-gehts-dir/",
-    note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026), seit dem 6. November 2026 nur noch die Gefühlskarten und der Regler „Wie doll ist es?“; teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
+    note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026), seit dem 6. November 2026 nur noch die Gefühlskarten und „Wie doll ist es?“ mit drei Bildern; teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
     parts: [
       {
         label: "Frage „Wie geht's dir heute?“",
@@ -266,7 +266,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Gefühle und Wie doll ist es?",
         recorded: true,
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Die Namen der acht Gefühle, „Wie doll ist es?“ und die drei Antworten des Reglers (MOODS, STRENGTH_QUESTION, STRENGTH_ANSWERS in mood.ts), übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
+        note: "Die Namen der acht Gefühle, „Wie doll ist es?“ und die drei Antworten, zugleich die Bildunterschriften (MOODS, STRENGTH_QUESTION, STRENGTH_ANSWERS in mood.ts), übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
       },
       {
         label: "Gruppen „Angenehme / Unangenehme Gefühle“",

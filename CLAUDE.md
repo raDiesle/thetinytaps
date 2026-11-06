@@ -185,7 +185,9 @@ In a fresh worktree run `bun install` first.
   November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
   nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
-  `--profile` names the functions that cost, `--shots` shows what was measured). The build ships React's production code
+  `--profile` names the functions that cost, `--shots` shows what was measured). A stretch after one that taps everything starts wherever those taps left the game: start it
+  from a reload (`{ eval: "location.reload()" }`, a wait, then the fullscreen question's `.screen-hint-button`), as
+  „wie-gehts-dir“ does – its second stretch waited for a screen it never reached, and nobody saw it until it was run. The build ships React's production code
   (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.
   A scheduled task on the user's Mac (`tinytaps-perf-weekly`, Mondays) measures every game, keeps the numbers in
   `tools/perf-history/<date>.json` to compare with the week before, and turns a game over budget or clearly worse into

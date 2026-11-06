@@ -156,18 +156,25 @@ export const SCENARIOS: Scenario[] = [
   })),
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; the book's other games play at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
-  // „Wie geht's dir?“: a feeling's card, then the slider dragged back and forth, the bear's gestures changing (C-36).
+  // „Wie geht's dir?“: a feeling's card, then its three pictures, a little to a whole lot, picked in turn (C-36).
   {
     name: "wie-gehts-dir",
     path: "/wie-gehts-dir/",
     parts: [
       { label: "Gefühl wählen", before: [{ wait: 1500 }], ms: 4000, tap: TAPS },
       {
-        label: "Regler schieben",
-        before: [{ tap: '.fg-card[aria-label="Wütend"]' }, { waitFor: ".mood-slider" }, { wait: 1500 }],
+        label: "Wie doll",
+        // The taps before left a feeling open: the page starts again on the cards (waiting first, or the old page is
+        // found), its fullscreen question answered as at the start.
+        before: [
+          { eval: "location.reload()" },
+          { wait: 4000 },
+          { tap: ".screen-hint-button", optional: true },
+          { wait: 500 },
+          { waitFor: '.fg-card[aria-label="Wütend"]' }, { wait: 1500 }, { tap: '.fg-card[aria-label="Wütend"]' }, { waitFor: ".mood-strengths" }, { wait: 1500 }],
         ms: 8000,
-        // The arrows slide it a step at a time, up and down again, the bear's gestures changing with each.
-        type: { keys: ["ArrowRight", "ArrowRight", "ArrowLeft", "ArrowLeft", "ArrowLeft", "ArrowLeft", "ArrowRight", "ArrowRight"], every: 700 },
+        // The arrows pick a weaker or stronger picture, the other two going pale.
+        type: { keys: ["ArrowRight", "ArrowRight", "ArrowLeft", "ArrowLeft", "ArrowLeft", "ArrowRight", "ArrowRight", "ArrowRight"], every: 700 },
       },
     ],
   },

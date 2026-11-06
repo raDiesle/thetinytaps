@@ -14,13 +14,23 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
      one above the other upright. Each card is the little bear alone with the feeling, in a moment that brings it
      (`Mood.moment`, `gefuehl-…`, made 6 November 2026, prompts in `bilder/README.md`). Digits pick that card, any
      other key one at random.
-  2. A tap shows at once the card beside the little bear standing, drawn (`FeelingBear`), with a slider under him:
-     „Wie doll ist es?“ (C-36). Sliding (or the arrow keys) goes from a little to a whole lot in `STRENGTH_STEPS` steps:
-     his arms, his body and his face grow with the feeling (`GESTURES`: jumping for joy, paws on the hips, on tiptoes,
-     paws on the tummy, rubbing an eye, hanging his head with a tear, fists up and red, making himself small); each
-     step passed plays a rising note, and let go the voice says „Ein bisschen.“, „Schon ziemlich.“ or „Ganz doll!“. The
-     slider is a band from thin to thick in the group's colour, no numbers, a big knob with a still 👆 under it before the
-     first slide; the knob is an HTML layer moved by `--at`, the bear is drawn again only when a step changes.
+  2. A tap shows at once three pictures of that feeling side by side, weak to strong: „Wie doll ist es?“ (C-36). The
+     card's own picture is the middle („Schon ziemlich“); `gefuehl-<id>-wenig` („Ein bisschen“) and `-doll` („Ganz
+     doll“) are the same moment drawn from it (`moodImages.strength`, prompts and how to
+     draw them in `bilder/README.md`, „Wie doll ist es?“). A tap on one (digits, arrows, any other key steps on and back) plays a note, higher the
+     stronger, and the voice says „Ein bisschen.“, „Schon ziemlich.“ or „Ganz doll!“; the other two go pale (by filter)
+     and stay tappable to change it. Under the row a still band from thin to thick in the group's colour tells grown-ups
+     the direction; upright the three stand one above the other without it. Captions are the answers without their
+     marks (`asCaption`). It was a slider with a drawn bear (`FeelingBear`, removed 6 November 2026): the user wanted
+     pictures, and three steps a child tells apart at a glance rather than five that differ little.
+     **Every step differs plainly from the next** (user wish, November 2026): a little is calm in body and face (arms
+     down, a small smile or pout, no tears, no red), a whole lot changes the whole body (jumping off the floor, fists
+     high, crying with tears streaming, asleep under the blanket, hiding behind the curtain) – never the card again with
+     a slightly different mouth. Look at each feeling's three side by side before keeping them; the first batch gave a
+     „Ganz doll“ jumping that looked like the card, a „müde“ that only lay there again, and „Ein bisschen Angst“ hugging
+     its knees as on the card, so the prompt says what is NOT so any more („His legs are NOT pulled up“). Keep the
+     bear's head as it is: told „ears drooping“ or „ears pressed flat“, Gemini drew him as a puppy, so the prompt says
+     his small round ears stay up; and ask for red cheeks drawn flat, not a „red face“, which came out as a red smear.
      The cards' paper rings (9px round them, 15px below) lie outside their box: every size worked out in `feelings.css`
      (`--card-w` of `.mood-groups`, `.mood-needs`) counts them, the panels' borders (`--rim`) and the gaps, so no ring
      touches another, a group's name or the screen's edge (they did at 844×390 and ran past 1024×768 before).
@@ -286,8 +296,8 @@ The big picture of the story is a framed photo – white mat, soft shadow – an
 pale a moment after the child has to choose, so it never looks like one of the
 cards (which have the yellow ring and stand out like buttons).
 
-Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear standing with his
-slider, his face to copy and his blowing are drawn, see above).
+Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear's blowing in „Tief
+pusten“ is drawn, see above).
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out

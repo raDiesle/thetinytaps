@@ -8,7 +8,7 @@ import { DAYS, dayImage, dayImages, firstImage, NIGHT_IMAGE } from "./days";
 import { bearImages, imageFor, moodImages, situationImages } from "./images";
 import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
-import { MOODS, morningMood, STRENGTH_ANSWERS, STRENGTH_STEPS, strengthAnswer, withMood } from "./mood";
+import { asCaption, MOODS, morningMood, STRENGTH_ANSWERS, STRENGTHS, withMood } from "./mood";
 import { MOOD_PICTURE_QUEUE } from "./moodPictures";
 import { BREATH_MS, NEEDS } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
@@ -109,25 +109,37 @@ test("every feeling has its card, in a group of four", () => {
 test("the feelings are always the little bear, in his clothes", () => {
   const art = readFileSync("src/games/feelings/moodArt.tsx", "utf8");
   expect(art).not.toMatch(/kind=\{|kind="fox"/);
-  expect(art).toContain("SHIRT");
   // Their prompts, waiting in the queue or kept in bilder/README.md once made.
   const rows = [...README.matchAll(/^\| `((?:gefuehl|brauche)-[\w-]+)` +\| (.*)\|$/gm)].map((m) => ({ id: m[1], prompt: m[2] }));
   const prompts = [...rows, ...MOOD_PICTURE_QUEUE.map((p) => ({ id: p.id, prompt: `${p.prompt} --ref ${p.ref?.join(" ")}` }))];
   expect(prompts.length).toBeGreaterThanOrEqual(15);
   for (const { id, prompt } of prompts) {
     expect(prompt, id).toContain("light-blue T-shirt and dark blue-purple trousers");
+    // A feeling a little or a whole lot is drawn from its card, the same moment, the bear alone; every card from the bear.
+    const strength = id.match(/^(gefuehl-\w+)-(?:wenig|doll)$/);
+    if (strength) {
+      expect(prompt, id).toContain(`${strength[1]}.webp`);
+      expect(prompt, id).toContain("only ONE little bear");
+      expect(prompt, id).toContain("same camera framing");
+      continue;
+    }
     expect(prompt, id).toContain("baer-sad-gut");
     if (id.startsWith("gefuehl-")) expect(prompt, id).toContain("He is the only character: no grown-up");
   }
 });
 
-// „Wie doll ist es?“ (C-36): a slider of a few steps, a little to a whole lot, whose answer grows with it; the breath's
+// „Wie doll ist es?“ (C-36): three pictures of every feeling, a little to a whole lot (user wish, November 2026: pictures,
+// no slider) – the middle its card, the other two drawn from it; their captions are the answers said; the breath's
 // circle of „Tief pusten“ keeps time with the game.
-test("the slider goes from a little to a whole lot, and the breath keeps time", () => {
-  expect(STRENGTH_STEPS).toBeGreaterThanOrEqual(3);
-  expect(strengthAnswer(0)).toBe(STRENGTH_ANSWERS[0]);
-  expect(strengthAnswer(STRENGTH_STEPS - 1)).toBe(STRENGTH_ANSWERS[2]);
+test("every feeling shows a little, quite a lot and a whole lot, and the breath keeps time", () => {
+  expect(STRENGTHS).toEqual([0, 1, 2]);
+  for (const mood of MOODS) {
+    expect(moodImages.strength(mood.id, 1)).toBe(moodImages.feeling(mood.id));
+    for (const strength of STRENGTHS) expectPicture(moodImages.strength(mood.id, strength));
+  }
+  for (const answer of STRENGTH_ANSWERS) for (const line of Object.values(answer)) expect(asCaption(line), line).not.toMatch(/[.!¡。！।]/u);
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
+  expect(css).not.toContain("mood-slider");
   expect(css).toContain(`mood-breathe ${BREATH_MS / 1000}s`);
 });
 

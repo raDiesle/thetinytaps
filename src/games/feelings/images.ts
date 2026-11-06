@@ -59,6 +59,11 @@ export const bearImages = {
 export const moodImages = {
   /** A feeling's card: the little bear alone with it, close, in a moment that brings it (user feedback, November 2026). */
   feeling: (id: string) => `gefuehl-${id}`,
+  /**
+   * The feeling a little (0), quite a lot (1) or a whole lot (2), for „Wie doll ist es?“: the middle is its card, the
+   * other two are drawn from it, the same moment with the feeling clearly weaker or stronger (user wish, November 2026).
+   */
+  strength: (id: string, strength: 0 | 1 | 2) => (strength === 1 ? `gefuehl-${id}` : `gefuehl-${id}-${strength === 0 ? "wenig" : "doll"}`),
   /** A card of „Was brauche ich?“: the little bear doing what he needs. */
   need: (id: string) => `brauche-${id}`,
 };
