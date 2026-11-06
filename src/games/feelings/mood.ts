@@ -1,8 +1,8 @@
 // Wie geht's dir heute? The child picks the card that shows how it feels: the little bear alone with the feeling, in a
 // moment that brings it (a birthday cake, a tower built, lightning outside – user feedback, November 2026), the
 // pleasant feelings apart from the unpleasant ones. Picked, the bear stands big and the child slides how strong it is:
-// his gestures grow with it (C-36). Copying the faces („Gefühle nachmachen“) and what helps („Was brauche ich?“) are
-// games of their own in the book.
+// his gestures grow with it (C-36). What helps („Was brauche ich?“) is a game of
+// its own in the book.
 
 import type { MascotBrows, MascotEyes, MascotMouth } from "@/components/Mascot";
 import { type Daytime, dayKey, daytimeOf } from "@/games/teeth/daytime";
@@ -26,6 +26,10 @@ export interface Mood {
   pleasant: boolean;
   /** Its name, for grown-ups under the card. */
   caption: Localized;
+  /**
+   * The little bear's face for this feeling (`BigFace`). Shown by no game since „Gefühle nachmachen“ was removed
+   * (user decision, November 2026), kept so the eight drawn faces can be used again for something else.
+   */
   face: MoodFace;
   /** The moment its picture shows, in German for grown-ups looking at the card's idea (bilder/README.md). */
   moment: string;

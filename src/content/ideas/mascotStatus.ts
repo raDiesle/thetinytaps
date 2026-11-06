@@ -172,6 +172,27 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/gefuehle/",
+    note: "Gemini-Bilder mit Tierkindern (Bär, Fuchs, Hase, Igel). Im Kita-Teil ist der Fuchs der, der schubst, tritt, wegnimmt und umwirft.",
+    tasks: [
+      {
+        label: "Der Fuchs ist nicht mehr der Störenfried",
+        work: "picture",
+        pictures: 56,
+        effort: "L",
+        note: "Entschieden (5. November 2026): ein Waschbär übernimmt Schubsen, Treten, Wegnehmen, Umwerfen; Fuchs und Bär, die Maskottchen, helfen und trösten. Neue Geschichten nehmen gleich den Waschbären. Die vorhandenen rund 56 Bilder und die Sätze in kita.ts (mit Übersetzungen und Aufnahmen) bleiben vorerst beim Fuchs, weil neue Bilder Geld kosten – erst neu machen, wenn der Große es sagt.",
+      },
+      {
+        label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten",
+        work: "picture",
+        pictures: 8,
+        effort: "M",
+        state: "done",
+        note: "Kam mit den Geschichten selbst, ohne eigene Bilder: der große Bär (Mama oder Papa des kleinen Bären) drückt ihn beim Abschied, kuschelt ihn mit dem Baby, hilft bei der Jacke, wartet am Spielplatztor und an der Kasse, spielt im Schnee und nimmt ihn in den Arm, als Oma Bär wegfährt; Füchsinnen helfen als Ärztin, Kassiererin und Besuch (gesehen am 5. November 2026).",
+      },
+    ],
+  },
+  {
     href: "/wie-gehts-dir/",
     note: "Immer derselbe kleine Bär, allein, in T-Shirt und Hose (6. November 2026): auf jeder Gefühlskarte in einem Moment, der das Gefühl bringt, und groß als Zeichnung (MascotHead), deren Gesten mit dem Regler stärker werden.",
     tasks: [
@@ -203,11 +224,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
-    href: "/gefuehle-nachmachen/",
-    note: "Der Kopf des kleinen Bären (MascotHead) mit dem Gesicht jedes Gefühls, zum Nachmachen.",
-    tasks: [{ label: "Bärenkind macht das Gesicht des Gefühls groß vor (MascotHead)", work: "drawing", effort: "S", idea: "C-35", state: "done" }],
-  },
-  {
     href: "/was-brauche-ich/",
     note: "Der kleine Bär tut, was er gerade braucht; ein Erwachsener nur dort, wo es dazugehört (in den Arm nehmen), angezogen.",
     tasks: [
@@ -221,27 +237,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Wunsch vom 6. November 2026, gemacht am selben Tag (brauche-…); die alten hilft-… Bilder bleiben für später.",
       },
       { label: "Bärenkind pustet mit (MascotHead)", work: "drawing", effort: "S", idea: "C-31", state: "done" },
-    ],
-  },
-  {
-    href: "/gefuehle/",
-    note: "Gemini-Bilder mit Tierkindern (Bär, Fuchs, Hase, Igel). Im Kita-Teil ist der Fuchs der, der schubst, tritt, wegnimmt und umwirft.",
-    tasks: [
-      {
-        label: "Der Fuchs ist nicht mehr der Störenfried",
-        work: "picture",
-        pictures: 56,
-        effort: "L",
-        note: "Entschieden (5. November 2026): ein Waschbär übernimmt Schubsen, Treten, Wegnehmen, Umwerfen; Fuchs und Bär, die Maskottchen, helfen und trösten. Neue Geschichten nehmen gleich den Waschbären. Die vorhandenen rund 56 Bilder und die Sätze in kita.ts (mit Übersetzungen und Aufnahmen) bleiben vorerst beim Fuchs, weil neue Bilder Geld kosten – erst neu machen, wenn der Große es sagt.",
-      },
-      {
-        label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten",
-        work: "picture",
-        pictures: 8,
-        effort: "M",
-        state: "done",
-        note: "Kam mit den Geschichten selbst, ohne eigene Bilder: der große Bär (Mama oder Papa des kleinen Bären) drückt ihn beim Abschied, kuschelt ihn mit dem Baby, hilft bei der Jacke, wartet am Spielplatztor und an der Kasse, spielt im Schnee und nimmt ihn in den Arm, als Oma Bär wegfährt; Füchsinnen helfen als Ärztin, Kassiererin und Besuch (gesehen am 5. November 2026).",
-      },
     ],
   },
   {

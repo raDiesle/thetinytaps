@@ -95,9 +95,8 @@ export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/spiele/gefuehle/",
     title: "Gefühle-Spiele für Kleinkinder",
-    description:
-      "Wie geht's dir? Das Kind zeigt sein Gefühl und wie stark es ist, macht Gesichter nach, sagt, was es braucht, und hilft dem kleinen Bären. Ohne Werbung.",
-    text: "Ein Bilderbuch über Gefühle: Das Kind zeigt, wie es ihm geht und wie doll, macht die Gesichter des kleinen Bären nach und wählt, was ihm jetzt guttut. Dazu erlebt der Bär Alltagssituationen, und das Kind wählt, was hilft.",
+    description: "Wie geht's dir? Das Kind zeigt sein Gefühl und wie stark es ist, sagt, was es braucht, und hilft dem kleinen Bären. Ohne Werbung.",
+    text: "Ein Bilderbuch über Gefühle: Das Kind zeigt, wie es ihm geht und wie doll, und wählt, was ihm jetzt guttut. Dazu erlebt der Bär Alltagssituationen, und das Kind wählt, was hilft.",
   },
   {
     path: "/spiele/buchstaben-zahlen/",
@@ -138,12 +137,6 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Wie geht's dir? Gefühle zeigen für Kleinkinder",
     description: "Fröhlich, stolz, müde oder wütend: Das Kind tippt auf das Bild, das zu seinem Gefühl passt, und schiebt, wie stark es ist. Ohne Werbung.",
     text: "Acht Gefühle in zwei Gruppen, die angenehmen und die unangenehmen, jedes mit dem kleinen Bären in einem Moment, den Kinder kennen. Das Kind tippt auf sein Gefühl und schiebt dann, wie doll es ist – der Bär zeigt es mit dem ganzen Körper. Ein Anfang für Gespräche über Gefühle.",
-  },
-  {
-    path: "/gefuehle-nachmachen/",
-    title: "Gefühle nachmachen – Gesichter für Kleinkinder",
-    description: "Fröhlich, traurig, wütend, ängstlich: Der kleine Bär macht ein Gesicht, und das Kind macht es nach, vor dem Spiegel oder mit den Eltern.",
-    text: "Acht Gesichter des kleinen Bären zum Nachmachen, die angenehmen Gefühle neben den unangenehmen. Ein Tippen zeigt ein Gesicht groß, und das Kind probiert es selbst – ein Spiel, das Gefühle sichtbar macht.",
   },
   {
     path: "/was-brauche-ich/",

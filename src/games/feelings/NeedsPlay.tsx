@@ -12,7 +12,7 @@ const pictureOf = (need: Need) => moodImages.need(need.id);
 
 /**
  * Was brauche ich? (C-31, a game of its own since November 2026, user feedback): cards of what the child may need or
- * want now – a hug, being alone a little, romping, blowing deeply, a drink, something to eat, a rest, a song. None is
+ * want now – a hug, being alone a little, romping, stamping and blowing, a drink, something to eat, a rest, a song. None is
  * wrong; the one picked shows big and the voice says it does good, so the grown-up sees what the child needs.
  * „Stampfen und pusten“ blows two slow breaths together. The corner goes back to all the cards.
  */

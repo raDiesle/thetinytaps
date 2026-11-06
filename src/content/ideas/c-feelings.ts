@@ -658,9 +658,9 @@ export const feelingsCheckInIdeas: IdeaArea = {
       text: "Nach der Wahl macht der kleine Bär das Gesicht des Gefühls groß vor (wütende Augenbrauen, Lachen, hängender Mund), und das Kind macht es nach – vor einem Spiegel oder dem Erwachsenen. Ohne Kamera.",
       why: "Gefühle nachmachen hilft, sie bei sich und anderen zu erkennen; mit dem Erwachsenen zusammen wird es ein Spiel.",
       effort: "S",
-      done: true,
+      rejected: true,
       partial:
-        "Gebaut (4. November 2026): nach dem Gefühl zeigt das Fuchs- oder Bärenkind sein Gesicht groß (der gemeinsame MascotHead mit neuen Augenbrauen, Augen und Mündern), „Kannst du auch so gucken?“, weiter mit einem Tipp. Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Gefühle nachmachen“: die Köpfe des kleinen Bären mit allen acht Gefühlen, einer getippt wird groß.",
+        "Gebaut (4. November 2026): nach dem Gefühl zeigt das Fuchs- oder Bärenkind sein Gesicht groß (der gemeinsame MascotHead mit neuen Augenbrauen, Augen und Mündern), „Kannst du auch so gucken?“, weiter mit einem Tipp. Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Gefühle nachmachen“: die Köpfe des kleinen Bären mit allen acht Gefühlen, einer getippt wird groß. Am 6. November 2026 wieder entfernt (Rückmeldung); die acht gezeichneten Gesichter (Mood.face, BigFace) bleiben im Code, um sie für etwas anderes wiederzuverwenden.",
     },
     {
       id: "C-36",

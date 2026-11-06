@@ -214,67 +214,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
-    href: "/wie-gehts-dir/",
-    note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026), seit dem 6. November 2026 nur noch die Gefühlskarten und der Regler „Wie doll ist es?“; teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
-    parts: [
-      {
-        label: "Frage „Wie geht's dir heute?“",
-        recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-      },
-      {
-        label: "Zeile für Erwachsene",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "MOOD_BLURB in names.ts, übersetzt am 5. November 2026.",
-      },
-      {
-        label: "Gefühle und Wie doll ist es?",
-        recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Die Namen der acht Gefühle, „Wie doll ist es?“ und die drei Antworten des Reglers (MOODS, STRENGTH_QUESTION, STRENGTH_ANSWERS in mood.ts), übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
-      },
-      {
-        label: "Gruppen „Angenehme / Unangenehme Gefühle“",
-        languages: { de: "done" },
-        note: "Neu (6. November 2026): die kleinen Namen über den beiden Gruppen für Erwachsene (PLEASANT, UNPLEASANT in mood.ts), nur deutsch.",
-      },
-    ],
-  },
-  {
-    href: "/gefuehle-nachmachen/",
-    note: "Eigenes Spiel im Buch „Gefühle“ seit dem 6. November 2026 (vorher ein Schritt von „Wie geht's dir?“, C-35).",
-    parts: [
-      {
-        label: "Name und Zeile für Erwachsene",
-        languages: { de: "done" },
-        note: "COPY_TITLE, COPY_BLURB in names.ts, nur deutsch.",
-      },
-      {
-        label: "Kannst du auch so gucken?",
-        recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "FACE_LINE und die Namen der Gefühle in mood.ts, übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
-      },
-    ],
-  },
-  {
-    href: "/was-brauche-ich/",
-    note: "Eigenes Spiel im Buch „Gefühle“ seit dem 6. November 2026 (vorher „Was hilft dir jetzt?“ in „Wie geht's dir?“, C-31).",
-    parts: [
-      {
-        label: "Name und Zeile für Erwachsene",
-        languages: { de: "done" },
-        note: "NEEDS_TITLE, NEEDS_BLURB in names.ts, nur deutsch.",
-      },
-      {
-        label: "Frage und was guttut",
-        recorded: true,
-        languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ nur deutsch; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
-      },
-    ],
-  },
-  {
     href: "/gefuehle/",
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts (auch die Geschichten aus selbst.ts), Schritt für Schritt neben den deutschen Geschichten.",
     parts: [
@@ -306,6 +245,50 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         recorded: true,
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         note: "Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), in keiner Sprache aufgenommen: die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
+      },
+    ],
+  },
+  {
+    href: "/wie-gehts-dir/",
+    note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026), seit dem 6. November 2026 nur noch die Gefühlskarten und der Regler „Wie doll ist es?“; teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
+    parts: [
+      {
+        label: "Frage „Wie geht's dir heute?“",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+      },
+      {
+        label: "Zeile für Erwachsene",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "MOOD_BLURB in names.ts, übersetzt am 5. November 2026.",
+      },
+      {
+        label: "Gefühle und Wie doll ist es?",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Die Namen der acht Gefühle, „Wie doll ist es?“ und die drei Antworten des Reglers (MOODS, STRENGTH_QUESTION, STRENGTH_ANSWERS in mood.ts), übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
+      },
+      {
+        label: "Gruppen „Angenehme / Unangenehme Gefühle“",
+        languages: { de: "done" },
+        note: "Neu (6. November 2026): die kleinen Namen über den beiden Gruppen für Erwachsene (PLEASANT, UNPLEASANT in mood.ts), nur deutsch.",
+      },
+    ],
+  },
+  {
+    href: "/was-brauche-ich/",
+    note: "Eigenes Spiel im Buch „Gefühle“ seit dem 6. November 2026 (vorher „Was hilft dir jetzt?“ in „Wie geht's dir?“, C-31).",
+    parts: [
+      {
+        label: "Name und Zeile für Erwachsene",
+        languages: { de: "done" },
+        note: "NEEDS_TITLE, NEEDS_BLURB in names.ts, nur deutsch.",
+      },
+      {
+        label: "Frage und was guttut",
+        recorded: true,
+        languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ nur deutsch; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
       },
     ],
   },
