@@ -171,7 +171,6 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
   },
-  { name: "gefuehle-nachmachen", path: "/gefuehle-nachmachen/", parts: [{ label: "Gesicht wählen", before: [{ wait: 1500 }], ms: 6000, tap: TAPS }] },
   // „Was brauche ich?“, „Tief pusten“: the breath's circle grows and shrinks round the big face.
   {
     name: "was-brauche-ich-pusten",

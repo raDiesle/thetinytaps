@@ -1,5 +1,5 @@
-// The eight feelings in two groups, shared by „Wie geht's dir?“ and „Gefühle nachmachen“: the pleasant ones on a warm
-// panel, the unpleasant ones on a cool one, side by side or one above the other (user feedback, November 2026: good
+// The eight feelings in two groups, of „Wie geht's dir?“: the pleasant ones on a warm panel,
+// the unpleasant ones on a cool one, side by side or one above the other (user feedback, November 2026: good
 // and bad feelings apart, as categories). Each panel names its group small, for grown-ups.
 
 import { type ReactNode, useEffect } from "react";

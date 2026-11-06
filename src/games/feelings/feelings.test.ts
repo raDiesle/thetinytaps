@@ -144,13 +144,13 @@ test("every need has its card and says it does good", () => {
 // From one thing big back to all of them is the page's corner, in each of the book's three small games (user feedback,
 // November 2026: there was no way back from a picked feeling).
 test("the corner goes back from one feeling or need to all of them", () => {
-  for (const f of ["MoodPlay.tsx", "CopyPlay.tsx", "NeedsPlay.tsx"]) expect(readFileSync(`src/games/feelings/${f}`, "utf8"), f).toContain("useInnerBack(");
+  for (const f of ["MoodPlay.tsx", "NeedsPlay.tsx"]) expect(readFileSync(`src/games/feelings/${f}`, "utf8"), f).toContain("useInnerBack(");
 });
 
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
 // November 2026). The big picture's slow two-frame fade is the only thing that keeps going.
 test("the game answers calmly", () => {
-  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "CopyPlay.tsx", "NeedsPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
+  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "NeedsPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
     readFileSync(`src/games/feelings/${f}`, "utf8"),
   );
   for (const code of files) expect(code).not.toMatch(/float\(|Floater/);

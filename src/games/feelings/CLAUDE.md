@@ -1,11 +1,11 @@
 # Gefühle
 
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
-`cover-gefuehle.webp`; user decision, November 2026) with four games; the names of the translated ones are in
-`names.ts`, those still German-only in their own files (`copy.ts`, `needs.ts`), so each language row reads its own.
+`cover-gefuehle.webp`; user decision, November 2026) with three games; the names of the translated ones are in
+`names.ts`, the one still German-only in its own file (`needs.ts`), so each language row reads its own.
 Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
-area C. The first three are small games of their own, each doing one thing (user feedback, November 2026: copying faces and
-what helps were steps of „Wie geht's dir?“ and became games of their own):
+area C. The first two are small games of their own, each doing one thing (user feedback, November 2026: copying faces and
+what helps were steps of „Wie geht's dir?“ and became games of their own; „Gefühle nachmachen“ was then removed, see below):
 - **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`) plays at once:
   1. Eight cards of feelings (`MOODS`: fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich – C-29) in
      two groups (`MoodGroups`, `moodGroups.tsx`): the pleasant ones on a warm yellow panel, the unpleasant ones on a cool
@@ -29,10 +29,9 @@ what helps were steps of „Wie geht's dir?“ and became games of their own):
      card picked this morning says „Heute früh: …“ under it. Only today's morning counts (`morningMood`). The Tagesplan's
      „Wie geht's dir?“ card (a ritual, `rituals.ts` in `rewards/`) opens the game with `{ returnTo }`, and the pick calls
      `finishRoutineStep()`, so back on the plan the card is ticked.
-- **„Gefühle nachmachen“** (`/gefuehle-nachmachen/`, `CopyGame.tsx`, `CopyPlay.tsx`, C-35): the little bear's head with
-  each feeling's face (`BigFace`, the shared `MascotHead` with `Mood.face`), in the same two groups. A tap shows it big
-  with „Kannst du auch so gucken?“, for a mirror or the grown-up; a tap on it (or any key) asks again; the corner goes
-  back. Drawn, so every face is there at once and the same each time.
+- **„Gefühle nachmachen“ was removed** (C-35, user decision, 6 November 2026): the little bear's faces to copy in a
+  mirror. Its drawings stay to be used again for something else: each feeling's face (`Mood.face`) drawn big by
+  `BigFace` (`moodArt.tsx`, the shared `MascotHead`), which „Tief pusten“ still uses. Don't delete them as unused.
 - **„Was brauche ich?“** (`/was-brauche-ich/`, `NeedsGame.tsx`, `NeedsPlay.tsx`, `needs.ts`, C-31): cards of what the
   child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, tief pusten, trinken, essen, ausruhen, ein
   Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees what the child
@@ -91,7 +90,7 @@ loudspeaker for the music). One tap on it (never held: held, it was too slow for
 the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; tapped again, it speaks again. The sounds
 (crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
 already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
-to tell them. „Wie geht's dir?“, „Gefühle nachmachen“ and „Was brauche ich?“ always speak (their `…Game` sets `voice: true`) and
+to tell them. „Wie geht's dir?“ and „Was brauche ich?“ always speak (their `…Game` sets `voice: true`) and
 have no such switch; no other game gets one (`feelings.test.ts`).
 
 **The text to read out (user wish and feedback, November 2026):** for grown-ups who tell the scenes themselves, a

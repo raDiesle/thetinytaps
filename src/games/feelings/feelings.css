@@ -184,7 +184,7 @@
 }
 
 /* The way on (`GoOn`): ▶ always at the same place, the screen's bottom right corner – in a scene, on a page of a day's
-   story and on the face to copy alike – and the whole screen tapped to go on, never a timer (user feedback, November
+   story alike – and the whole screen tapped to go on, never a timer (user feedback, November
    2026). The layer for the tap lies under everything else of the screen, which lets the tap through where it waits.
    Still, like everything here. */
 .fg-go-on {
@@ -358,7 +358,7 @@
   }
 }
 
-/* The little bear's face drawn in a card or big (C-35, „Gefühle nachmachen“, and „Tief pusten“) on warm paper. Still,
+/* The little bear's face drawn in a card or big („Tief pusten“, and the faces kept from C-35) on warm paper. Still,
    apart from the breath's circle. */
 .mood-art {
   position: absolute;
@@ -409,7 +409,7 @@
   }
 }
 
-/* ---------- „Wie geht's dir?“, „Gefühle nachmachen“ and „Was brauche ich?“ ---------- */
+/* ---------- „Wie geht's dir?“ and „Was brauche ich?“ ---------- */
 
 /* Their own screen, not a scene's: cards in the middle, one thing big, or a feeling with its slider. The cq units of
    its children measure it. Captions lie on the cards' lower edge where the screen is wide or low (as in the scenes). */
@@ -541,7 +541,7 @@
   }
 }
 
-/* One thing big: the face to copy, or what the child needs. Tapped, it is said again, so it has the yellow ring. */
+/* One thing big: what the child needs. Tapped, it is said again, so it has the yellow ring. */
 .mood-big {
   display: flex;
   flex-direction: column;

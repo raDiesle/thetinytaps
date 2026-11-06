@@ -20,7 +20,6 @@ import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
 import { DAYS } from "@/games/feelings/days";
 import { SITUATIONS } from "@/games/feelings/kita";
 import { SELF_SITUATIONS } from "@/games/feelings/selbst";
-import { COPY_LINES } from "@/games/feelings/copy";
 import { MOOD_LINES } from "@/games/feelings/mood";
 import { NEEDS_LINES } from "@/games/feelings/needs";
 import { PRAISE as FEELINGS_PRAISE } from "@/games/feelings/shared";
@@ -234,10 +233,9 @@ function together(): VoiceGroup[] {
 
 function feelings(): VoiceGroup[] {
   return [
-    // „Wie geht's dir?“, „Gefühle nachmachen“ and „Was brauche ich?“ are games of their own in the book, but share this
-    // game's recordings (stimme/).
+    // „Wie geht's dir?“ and „Was brauche ich?“ are games of their own in the book, but share this game's recordings
+    // (stimme/).
     { label: "Wie geht's dir?", lines: once(MOOD_LINES) },
-    { label: "Gefühle nachmachen", lines: once(COPY_LINES) },
     { label: "Was brauche ich?", lines: once(NEEDS_LINES) },
     { label: "Zu Hause: Fragen", lines: once(FEELINGS.flatMap((f) => f.questions)) },
     { label: "Zu Hause: liebe Dinge", lines: once(FEELINGS.flatMap((f) => f.comforts.map((c) => COMFORTS[c].narration))) },

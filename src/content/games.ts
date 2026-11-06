@@ -1,4 +1,3 @@
-import { COPY_BLURB, COPY_TITLE } from "@/games/feelings/copy";
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { NEEDS_BLURB, NEEDS_TITLE } from "@/games/feelings/needs";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
@@ -302,15 +301,14 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    // A book of its own (user decision, November 2026): how the child feels and how strong, the faces to copy, what it
-    // needs now, then everyday scenes by feeling (user feedback, November 2026: copying and needs are games of their own).
+    // A book of its own (user decision, November 2026): how the child feels and how strong, what it needs now, then
+    // everyday scenes by feeling (user feedback, November 2026: needs are a game of their own; copying faces was removed).
     id: "gefuehle",
     emoji: "🐻",
     title: BOOK_TITLE,
     blurb: BOOK_BLURB,
     games: [
       { href: "/wie-gehts-dir/", emoji: "😊", title: MOOD_TITLE, blurb: MOOD_BLURB },
-      { href: "/gefuehle-nachmachen/", emoji: "🪞", title: COPY_TITLE, blurb: COPY_BLURB },
       { href: "/was-brauche-ich/", emoji: "🤗", title: NEEDS_TITLE, blurb: NEEDS_BLURB },
       { href: "/gefuehle/", emoji: "🐻", title: ALLTAG_TITLE, blurb: ALLTAG_BLURB },
     ],

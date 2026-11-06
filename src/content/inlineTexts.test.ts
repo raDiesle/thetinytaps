@@ -21,7 +21,6 @@ const FOLDERS: Record<string, string[]> = {
     "src/games/feelings/moodArt.tsx",
     "src/games/feelings/moodGroups.tsx",
   ],
-  "/gefuehle-nachmachen/": ["src/games/feelings/CopyGame.tsx", "src/games/feelings/CopyPlay.tsx", "src/games/feelings/copy.ts"],
   "/was-brauche-ich/": ["src/games/feelings/NeedsGame.tsx", "src/games/feelings/NeedsPlay.tsx", "src/games/feelings/needs.ts"],
   "/kettenreaktion/": ["src/games/marbles"],
   "/kleine-abenteuer/": ["src/games/elevator"],

@@ -203,11 +203,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
-    href: "/gefuehle-nachmachen/",
-    note: "Der Kopf des kleinen Bären (MascotHead) mit dem Gesicht jedes Gefühls, zum Nachmachen.",
-    tasks: [{ label: "Bärenkind macht das Gesicht des Gefühls groß vor (MascotHead)", work: "drawing", effort: "S", idea: "C-35", state: "done" }],
-  },
-  {
     href: "/was-brauche-ich/",
     note: "Der kleine Bär tut, was er gerade braucht; ein Erwachsener nur dort, wo es dazugehört (in den Arm nehmen), angezogen.",
     tasks: [

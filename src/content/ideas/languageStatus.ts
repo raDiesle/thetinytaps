@@ -241,23 +241,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
-    href: "/gefuehle-nachmachen/",
-    note: "Eigenes Spiel im Buch „Gefühle“ seit dem 6. November 2026 (vorher ein Schritt von „Wie geht's dir?“, C-35).",
-    parts: [
-      {
-        label: "Name und Zeile für Erwachsene",
-        languages: { de: "done" },
-        note: "COPY_TITLE, COPY_BLURB in names.ts, nur deutsch.",
-      },
-      {
-        label: "Kannst du auch so gucken?",
-        recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "FACE_LINE und die Namen der Gefühle in mood.ts, übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
-      },
-    ],
-  },
-  {
     href: "/was-brauche-ich/",
     note: "Eigenes Spiel im Buch „Gefühle“ seit dem 6. November 2026 (vorher „Was hilft dir jetzt?“ in „Wie geht's dir?“, C-31).",
     parts: [

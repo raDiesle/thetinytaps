@@ -1,5 +1,6 @@
 // The drawings of the book „Gefühle“: the little bear standing, his gestures as strong as the feeling the child slides
-// to in „Wie geht's dir?“ (C-36), and his face big to copy in „Gefühle nachmachen“ (C-35). Always the same little bear
+// to in „Wie geht's dir?“ (C-36), and his face big (`BigFace`: „Tief pusten“, and the eight feelings' faces kept
+// from the removed „Gefühle nachmachen“, C-35, to use again). Always the same little bear
 // in his light blue T-shirt and dark blue trousers, as in the pictures (user feedback, November 2026: one figure, and
 // fox and bear always wear clothes). Drawn once per step, still; only the breath's circle moves, an HTML layer of its own.
 
@@ -291,7 +292,8 @@ const CHEEKS = (
 );
 
 /**
- * The little bear's face, big, making a feeling's face for the child to copy (C-35); `blowing` shows him blowing out
+ * The little bear's face, big, making a feeling's face (`Mood.face`; drawn for the removed „Gefühle nachmachen“, C-35,
+ * and kept to use again); `blowing` shows him blowing out
  * slowly instead, with a soft circle that grows and shrinks behind him for each breath („Tief pusten“).
  */
 export function BigFace({ face, blowing = false }: { face: MoodFace; blowing?: boolean }) {
