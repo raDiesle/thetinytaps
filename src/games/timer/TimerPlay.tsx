@@ -6,15 +6,17 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
 import { useT } from "@/lib/language";
-import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
-import { playChime, playChimeNote, playDing, playDrops, playLeaves, playMelody, playPlop, playPop, playTwinkle, playYawn, playYum } from "@/lib/sfx";
+import { playBlow, playMunch, playSplash, playWhistle } from "@/lib/realSounds";
+import { playChime, playChimeNote, playDing, playDrops, playLeaves, playMelody, playPlink, playPlop, playPop, playTwinkle, playYawn, playYum } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
+import { BucketScene } from "./bucket";
+import { CakeScene } from "./cake";
 import { CaterpillarScene } from "./caterpillar";
 import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { haltMs, ladybugLaps, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PizzaScene, SLICES } from "./pizza";
 import {
   AntHill,
@@ -262,8 +264,10 @@ function TimerRun({
     if (picture === "apple") return pieceMoments(total, apples);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
     if (picture === "pizza") return pieceMoments(total, SLICES);
+    // The ladybug leaves a dot as it is back at the top (H-67).
+    if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
-  }, [picture, total, apples, stops]);
+  }, [picture, total, set, apples, stops]);
   const nextMoment = useRef(0);
   const soonRang = useRef(false);
 
@@ -294,6 +298,7 @@ function TimerRun({
         while (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) nextMoment.current++;
         if (picture === "apple") playPlop();
         else if (picture === "pizza") playMunch();
+        else if (picture === "disc") playPlink(nextMoment.current);
         else playDing();
       }
       const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - now : Number.POSITIVE_INFINITY;
@@ -326,6 +331,8 @@ function TimerRun({
       else if (picture === "caterpillar") playTwinkle();
       else if (picture === "sand" || picture === "ants" || picture === "disc") playChime();
       else if (picture === "flower") playTwinkle();
+      else if (picture === "bucket") playSplash();
+      else if (picture === "cake") playDing();
       else if (picture === "sunset") playYawn();
       else if (picture === "pizza") playYum();
       const timer = setTimeout(playMelody, picture === "candle" ? 500 : 900);
@@ -351,7 +358,7 @@ function TimerRun({
       else if (picture === "ants") playPop();
       else if (picture === "apple") playLeaves();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
-      else if (picture === "flower") playDrops();
+      else if (picture === "flower" || picture === "bucket") playDrops();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow],
@@ -396,9 +403,11 @@ function TimerRun({
           )}
           {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
           {picture === "caterpillar" && <CaterpillarScene glow={poke} />}
-          {picture === "disc" && <DiscScene glow={poke} />}
+          {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
           {picture === "pizza" && <PizzaScene glow={poke} />}
           {picture === "flower" && <FlowerScene glow={poke} running={phase === "running"} />}
+          {picture === "bucket" && <BucketScene glow={poke} running={phase === "running"} />}
+          {picture === "cake" && <CakeScene glow={poke} />}
           {picture === "sunset" && <SunsetScene glow={poke} done={phase === "done"} />}
           {picture === "sand" && (
             <>

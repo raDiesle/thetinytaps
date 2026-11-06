@@ -819,6 +819,46 @@
   }
 }
 
+/* The ladybug crawls round the rim about once a minute (H-67), never stopping; at the end it stands at the top. Its dots
+   come one by one at their round's end, each waiting on its own `animation-delay`, all there at the end. */
+.tm-ladybug {
+  animation: tm-crawl var(--tm-lap) linear infinite;
+}
+
+.tm-done .tm-ladybug {
+  animation: none;
+  transform: none;
+}
+
+@keyframes tm-crawl {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.tm-dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #343a40;
+  animation: tm-dot 0.6s ease-out both;
+}
+
+.tm-done .tm-dot {
+  animation: none;
+}
+
+@keyframes tm-dot {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Seen from afar (H-48): a while after the last tap the backdrop, the family and the little stops step back into the
    dark, and only what runs down stays bright – the rail ahead and the train, the sand, the flame, the apples, the leaf,
    the red. A tap brings everything back at once. */
@@ -1458,6 +1498,144 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Eimer (H-69): the water slides up inside the bucket from a little to the red line, a ring spreads where each drop
+   lands, and at the end the boat at the line floats on it, rocking a little before it lies still. */
+.tm-water-level {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#a5d8ff 0 3%, #74c0fc 3% 100%);
+  opacity: 0.9;
+  transform: translateY(var(--tm-from));
+  animation: tm-fill var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-water-level {
+  animation: none;
+  transform: translateY(var(--tm-to));
+}
+
+@keyframes tm-fill {
+  from {
+    transform: translateY(var(--tm-from));
+  }
+  to {
+    transform: translateY(var(--tm-to));
+  }
+}
+
+.tm-ring {
+  left: calc(var(--tm-drop) - 9%);
+  top: -2.5%;
+  width: 18%;
+  height: 5%;
+  border: 0.2cqw solid #fff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: tm-ring 1s ease-out infinite;
+}
+
+@keyframes tm-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+.tm-boat {
+  transform-origin: 50% 100%;
+}
+
+.tm-done .tm-boat {
+  animation: tm-float 2.6s ease-in-out forwards;
+}
+
+@keyframes tm-float {
+  25% {
+    transform: translateY(-3%) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-3%) rotate(4deg);
+  }
+  75% {
+    transform: translateY(-3%) rotate(-2deg);
+  }
+  to {
+    transform: translateY(-3%);
+  }
+}
+
+/* Kuchen (H-53): the dough slides up out of its tin like the flower's stalk (`tm-stalk`, `tm-to-grow`) and browns in
+   the second half; at the end the door opens down and the cake comes out over it onto the table. */
+.tm-cake-part {
+  position: absolute;
+}
+
+.tm-cake-part svg,
+.tm-cake-tin {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-baked {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-bake var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-baked {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes tm-bake {
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tm-door {
+  transform-origin: 50% 100%;
+}
+
+.tm-done .tm-door {
+  animation: tm-door 0.9s ease-in forwards;
+}
+
+@keyframes tm-door {
+  to {
+    transform: perspective(60cqw) rotateX(-78deg);
+  }
+}
+
+.tm-done .tm-cake {
+  animation: tm-cake-out 1.6s ease-in-out 0.9s both;
+}
+
+@keyframes tm-cake-out {
+  from {
+    transform: none;
+  }
+  30% {
+    transform: translate(-8%, -24%);
+  }
+  to {
+    transform: translate(var(--tm-out-x), var(--tm-out-y));
   }
 }
 

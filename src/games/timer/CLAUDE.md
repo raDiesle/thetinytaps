@@ -19,6 +19,10 @@ grown-ups (`TimeLeft`, H-62). The child sees no numbers, only the picture runnin
 - „Blume“ 🌸 (`flower.tsx`, H-53): the bear child waters a sprout in the flower bed, a drop from its can every second;
   the stalk slides up out of the soil along a stake to the red ribbon at its top (the goal, seen from the start), and at
   the end the flower opens. It fills up instead of running out, for waiting for something good.
+- „Eimer“ 🪣 (`bucket.tsx`, H-69): in the same garden a watering can hangs from a post over a clear bucket, a drop
+  falling every second and a ring spreading on the water; the water rises to a red line, where a little wooden boat
+  already hangs waiting on a string from a stick over the bucket (its keel a little under the line). At the end it
+  floats and rocks, the flower in the pot beside the bucket opens and the bear family waves.
 - „Kerze“ 🕯️: a candle burns down on the table; at the end the bear child leans over and blows it out.
 - „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): for the time before bed – the sun sinks behind the hills and reddens, the
   evening's and the night's sky fade in, the land darkens, the stars come out one by one (`STARS`, each at its share of
@@ -29,9 +33,16 @@ grown-ups (`TimeLeft`, H-62). The child sees no numbers, only the picture runnin
   last crumbs lie on the blanket and the fox child laughs.
 - „Rote Scheibe“ 🔴 (`disc.tsx`, H-47): the red disc Kitas know from the „Time Timer“, shrinking like a clock's hand goes
   round on a plain white face; the knob in the middle turns a petal each second. The fox family stands beside it.
+  A ladybug crawls round the face's rim about once a minute, like a second hand, and a dot comes outside the rim each
+  time it is back at the top, clockwise from 12 o'clock with a plink (H-67, `ladybugLaps`: the rounds fit the time
+  exactly; beyond 30 minutes a dot every second or third round, so they go round once at most, `MAX_DOTS`).
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): eight slices on a wooden board, one lifted off towards its side every
   eighth of the time from 12 o'clock round, with a munch (`SLICES`, `pieceMoments`); a little steam rises every second.
   Each slice is a small layer cut to its wedge by a still `clip-path`, so a tap lights exactly the slices left.
+- „Kuchen“ 🎂 (`cake.tsx`, H-53's second picture): through the oven's window the dough rises out of its tin up to the
+  dashed outline of the finished cake (the goal, seen from the start) and browns in the second half; a puff of warm air
+  rises from the vent every second. At the end the oven door opens down and the cake comes out onto the table by the
+  fox family. The dough moves like the flower's stalk (`tm-stalk`, `tm-to-grow`).
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn: the toy lies by the fox child
   while the hourglass runs, then it travels over to the bear child with a whoosh and a chime, and the hourglass turns
   itself over – back and forth until a grown-up leaves with ✕ (with „bis um“ set, until then, each turn as long as the
@@ -57,7 +68,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-hourglass and toys), `apples.tsx`, `caterpillar.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `scenes.tsx` (the other drawings
+hourglass and toys), `apples.tsx`, `caterpillar.tsx`, `disc.tsx`, `flower.tsx`, `bucket.tsx`, `sunset.tsx`, `pizza.tsx`, `cake.tsx` (one picture each), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `Family`, `LeftGlow`; the fox and bear are the shared `Mascot`, so its `GameEnd` has `noFamily`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
 
@@ -89,6 +100,8 @@ and the shared `Layer`, `Draw`, `Family`, `LeftGlow`; the fox and bear are the s
 - **What sinks or grows behind an edge moves in a box cut off there** (`.tm-sky-box`, `overflow: hidden`): the sun and the
   moon behind the hills' ridge, the stalk out of the soil – the cut lies below what covers it everywhere the thing
   passes (`SKY_CUT` under the ridge, `timer.test.ts` checks), so it never shows, and the thing is never stretched.
+  Where the edge is slanted (the bucket's walls), the box also gets a still `clip-path` to its shape – never an
+  animated one, which repaints the box every frame.
 - **Pieces wait on their own clock, not on React**: an apple's fall is a CSS animation with its minute as
   `animation-delay`, a heap rises by `steps(--tm-n)`, the train's halts are keyframes written once for the run. React
   only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute.

@@ -2,11 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES } from "./content";
 import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
-import { DISC } from "./disc";
+import { BOAT, BUCKET, BUCKET_FAMILY, bucketEdges, GOAL_Y, POT, SPOUT, WATER } from "./bucket";
+import { CAKE, CAKE_FAMILY, CAKE_FLOOR, DOUGH_START, OVEN, OVEN_WINDOW, TABLE } from "./cake";
+import { DISC, DOTS, dotAt } from "./disc";
 import { FLOWER_FAMILY, FLOWER_FLOOR, SPROUT, STAKE, STALK } from "./flower";
 import { PIZZA, PIZZA_FAMILY, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
 import { MOON, ridgeAt, SKY_CUT, STARS, SUN, SUNSET_FAMILY, SUNSET_FLOOR } from "./sunset";
-import { applePlaces, haltMs, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { applePlaces, haltMs, ladybugLaps, MAX_APPLES, MAX_DOTS, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { ANT_FAMILY, ANTS, CANDLE, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
 import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
@@ -201,6 +203,73 @@ describe("Timer", () => {
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     expect(css).toContain(`animation: tm-slice ${SLICE_SECONDS}s ease-in both`);
     expect(pieceMoments(8 * 60_000, SLICES)).toHaveLength(SLICES - 1);
+  });
+
+  test("Rote Scheibe: the ladybug leaves a dot a round, never more than once round the face, clear of the family (H-67)", () => {
+    expect(ladybugLaps(60_000)).toEqual({ dots: 1, every: 1, laps: 1 });
+    expect(ladybugLaps(5 * 60_000)).toEqual({ dots: 5, every: 1, laps: 5 });
+    expect(ladybugLaps(10_000)).toEqual({ dots: 1, every: 1, laps: 1 });
+    for (const minutes of [1, 2, 3, 5, 10, 17, 30, 31, 45, 60, 90, 180]) {
+      const { dots, every, laps } = ladybugLaps(minutes * 60_000);
+      expect(dots).toBeLessThanOrEqual(MAX_DOTS);
+      expect(laps).toBe(dots * every);
+      // About a minute a round, like a second hand.
+      expect((minutes / laps) * 60).toBeGreaterThan(40);
+      expect((minutes / laps) * 60).toBeLessThan(80);
+    }
+    expect(MAX_DOTS * DOTS.apart).toBeLessThanOrEqual(360);
+    for (let k = 0; k < MAX_DOTS; k++) {
+      const { x, y } = dotAt(k);
+      expect(x - DOTS.r).toBeGreaterThanOrEqual(200);
+      expect(y - DOTS.r).toBeGreaterThanOrEqual(80);
+      expect(y + DOTS.r).toBeLessThanOrEqual(820);
+      // The fox child stands from x 1090.
+      expect(x + DOTS.r).toBeLessThan(1090);
+    }
+  });
+
+  test("Eimer: the water rises from a little to the red line, where the boat waits; all on every screen (H-69)", () => {
+    expect(WATER.start).toBeGreaterThan(0);
+    expect(WATER.start).toBeLessThan(WATER.goal);
+    expect(WATER.goal).toBeLessThan(1);
+    expect(BUCKET.cx - BUCKET.wTop / 2).toBeGreaterThanOrEqual(200);
+    expect(BUCKET.bottom).toBeLessThanOrEqual(820);
+    // The boat hangs inside the bucket, its keel a little under the line, so the water reaches it only at the end.
+    const line = bucketEdges(GOAL_Y);
+    expect(BOAT.left).toBeGreaterThan(line.left);
+    expect(BOAT.right).toBeLessThan(line.right);
+    expect(BOAT.keel).toBeGreaterThan(GOAL_Y);
+    expect(BOAT.keel - GOAL_Y).toBeLessThan(20);
+    // The drops fall into the bucket, clear of the boat.
+    const rim = bucketEdges(BUCKET.top);
+    expect(SPOUT.x).toBeGreaterThan(rim.left + 20);
+    expect(SPOUT.x).toBeLessThan(BOAT.left - 30);
+    expect(SPOUT.y + SPOUT.fall).toBeGreaterThan(BUCKET.top);
+    // The pot between the bucket and the bear child (left of its grown-up, 120 wide), the family within the right edge.
+    expect(POT.cx - 44).toBeGreaterThan(rim.right + 14);
+    expect(POT.cx + 50).toBeLessThanOrEqual(BUCKET_FAMILY - 120 + 20);
+    expect(BUCKET_FAMILY + 190).toBeLessThanOrEqual(RIGHT);
+    expect(POT.floor).toBeLessThanOrEqual(820);
+  });
+
+  test("Kuchen: the dough rises inside the oven's window, and the cake comes out onto the table by the family (H-53)", () => {
+    expect(DOUGH_START).toBeGreaterThan(0);
+    expect(DOUGH_START).toBeLessThan(0.3);
+    // The cake, risen, is seen whole through the window.
+    expect(CAKE.x).toBeGreaterThanOrEqual(OVEN_WINDOW.x);
+    expect(CAKE.x + CAKE.w).toBeLessThanOrEqual(OVEN_WINDOW.x + OVEN_WINDOW.w);
+    expect(CAKE.y + CAKE.dough.y).toBeGreaterThan(OVEN_WINDOW.y);
+    expect(CAKE.y + CAKE.h).toBeLessThanOrEqual(OVEN_WINDOW.y + OVEN_WINDOW.h);
+    // The dough's box is cut behind the tin's front, never above its rim.
+    expect(CAKE.dough.y + CAKE.dough.h).toBeGreaterThan(CAKE.rim);
+    expect(OVEN.x + OVEN.w).toBeLessThanOrEqual(1340);
+    expect(OVEN.y).toBeGreaterThanOrEqual(80 + 140);
+    // The table lies between the family (its child right of its grown-up) and the oven, and holds the cake.
+    expect(CAKE_FAMILY).toBeGreaterThanOrEqual(200);
+    expect(CAKE_FAMILY + 190 - 10 + 120).toBeLessThanOrEqual(TABLE.x);
+    expect(TABLE.x + TABLE.w).toBeLessThan(OVEN.x);
+    expect(CAKE.w).toBeLessThan(TABLE.w);
+    expect(CAKE_FLOOR).toBeLessThanOrEqual(820);
   });
 
   test("Gleich ist es so weit: a minute before the end, or the last fifth of a short time (H-49)", () => {

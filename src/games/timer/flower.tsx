@@ -29,8 +29,8 @@ const SPOUT = { x: 700, y: 735, fall: 42 } as const;
 /** The flower as it opens at the end, round the bud. */
 const BLOOM = 230;
 
-/** Sky, garden fence and grass; drawn once. */
-const GardenBackdrop = memo(function GardenBackdrop() {
+/** Sky, garden fence and grass; drawn once. The bucket (H-69) stands in the same garden. */
+export const GardenBackdrop = memo(function GardenBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <Draw w={STAGE_W} h={STAGE_H}>

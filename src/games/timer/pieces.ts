@@ -74,3 +74,18 @@ export function applePlaces(count: number, rx: number, ry: number): { x: number;
 export function soonMs(total: number): number {
   return Math.min(60_000, total / 5);
 }
+
+/** At most this many dots the ladybug leaves round the red disc (H-67), 12° apart, so they go once round at most. */
+export const MAX_DOTS = 30;
+
+/**
+ * The ladybug's rounds on the red disc (H-67): it goes round about once a minute, like a clock's second hand, and leaves
+ * a dot after every `every` rounds – after each one up to 30 minutes, after every second or more beyond, so the dots
+ * never go further than once round. The rounds fit the time exactly, so a dot always comes as it is back at the top.
+ */
+export function ladybugLaps(ms: number): { dots: number; every: number; laps: number } {
+  const minutes = Math.max(1, Math.round(ms / 60_000));
+  const every = Math.ceil(minutes / MAX_DOTS);
+  const dots = Math.max(1, Math.round(minutes / every));
+  return { dots, every, laps: dots * every };
+}
