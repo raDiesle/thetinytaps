@@ -301,16 +301,17 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    // A book of its own (user decision, November 2026): how the child feels and how strong, what it needs now, then
-    // everyday scenes by feeling (user feedback, November 2026: needs are a game of their own; copying faces was removed).
+    // A book of its own (user decision, November 2026): everyday scenes by feeling first (user wish, November 2026),
+    // then how the child feels and how strong, and what it needs now (user feedback, November 2026: needs are a game
+    // of their own; copying faces was removed).
     id: "gefuehle",
     emoji: "🐻",
     title: BOOK_TITLE,
     blurb: BOOK_BLURB,
     games: [
+      { href: "/gefuehle/", emoji: "🐻", title: ALLTAG_TITLE, blurb: ALLTAG_BLURB },
       { href: "/wie-gehts-dir/", emoji: "😊", title: MOOD_TITLE, blurb: MOOD_BLURB },
       { href: "/was-brauche-ich/", emoji: "🤗", title: NEEDS_TITLE, blurb: NEEDS_BLURB },
-      { href: "/gefuehle/", emoji: "🐻", title: ALLTAG_TITLE, blurb: ALLTAG_BLURB },
     ],
   },
   {

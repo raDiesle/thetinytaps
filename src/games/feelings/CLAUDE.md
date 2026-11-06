@@ -3,7 +3,8 @@
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
 `cover-gefuehle.webp`; user decision, November 2026) with three games; the names of the translated ones are in
 `names.ts`, the one still German-only in its own file (`needs.ts`), so each language row reads its own.
-Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
+In its table of contents „Alltagssituationen“ stands first, then „Wie geht's dir?“ and „Was brauche ich?“ (user wish,
+November 2026; the order of `games` in `games.ts`). Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
 area C. The first two are small games of their own, each doing one thing (user feedback, November 2026: copying faces and
 what helps were steps of „Wie geht's dir?“ and became games of their own; „Gefühle nachmachen“ was then removed, see below):
 - **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`) plays at once:
@@ -33,11 +34,14 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
   mirror. Its drawings stay to be used again for something else: each feeling's face (`Mood.face`) drawn big by
   `BigFace` (`moodArt.tsx`, the shared `MascotHead`), which „Tief pusten“ still uses. Don't delete them as unused.
 - **„Was brauche ich?“** (`/was-brauche-ich/`, `NeedsGame.tsx`, `NeedsPlay.tsx`, `needs.ts`, C-31): cards of what the
-  child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, tief pusten, trinken, essen, ausruhen, ein
-  Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees what the child
-  needs. „Tief pusten“ is drawn (`Need.drawn`): the bear blows two slow breaths with the soft circle round him
-  (`.mood-breath`, its own layer, `BREATH_MS`), then „Schon besser.“. The cards are the little bear doing it
-  (`brauche-…`, made 6 November 2026). A tap on the big picture (or any key) says it again; the corner goes back.
+  child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
+  ausruhen, ein Lied) – none is wrong, the one picked shows big and its line says it does good, so the grown-up sees
+  what the child needs. Every card is a picture of the little bear doing it (`brauche-…`, made 6 November 2026), never
+  a drawn head among them: „Tief pusten“ was the bear's drawn face with a breathing circle and didn't fit the pictures
+  beside it (user feedback, November 2026), so it became a scene too – the bear stamping on the floor and blowing out,
+  the breath seen as a swirl rising upwards. Picked, it is done together (`Need.together`): „Komm, wir pusten
+  zusammen“, two slow breaths (`BREATH_MS`), then „Schon besser.“. A tap on the big picture (or any key) says it again;
+  the corner goes back.
 
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
   the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row
@@ -286,7 +290,7 @@ pale a moment after the child has to choose, so it never looks like one of the
 cards (which have the yellow ring and stand out like buttons).
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear standing with his
-slider, his face to copy and his blowing are drawn, see above).
+slider and his face to copy are drawn, see above).
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out

@@ -1,5 +1,5 @@
 // The drawings of the book „Gefühle“: the little bear standing, his gestures as strong as the feeling the child slides
-// to in „Wie geht's dir?“ (C-36), and his face big (`BigFace`: „Tief pusten“, and the eight feelings' faces kept
+// to in „Wie geht's dir?“ (C-36), and his face big (`BigFace`: the eight feelings' faces kept
 // from the removed „Gefühle nachmachen“, C-35, to use again). Always the same little bear
 // in his light blue T-shirt and dark blue trousers, as in the pictures (user feedback, November 2026: one figure, and
 // fox and bear always wear clothes). Drawn once per step, still; only the breath's circle moves, an HTML layer of its own.
@@ -293,17 +293,14 @@ const CHEEKS = (
 
 /**
  * The little bear's face, big, making a feeling's face (`Mood.face`; drawn for the removed „Gefühle nachmachen“, C-35,
- * and kept to use again); `blowing` shows him blowing out
- * slowly instead, with a soft circle that grows and shrinks behind him for each breath („Tief pusten“).
+ * and kept to use again).
  */
-export function BigFace({ face, blowing = false }: { face: MoodFace; blowing?: boolean }) {
-  const shown = blowing ? { eyes: "shut" as const, mouth: "o" as const, brows: "soft" as const } : face;
+export function BigFace({ face }: { face: MoodFace }) {
   return (
     <span className="mood-art mood-face" aria-hidden>
-      {blowing && <span className="mood-breath" />}
       <svg viewBox="0 4 100 92">
-        <g transform={`rotate(${blowing ? 0 : (face.tilt ?? 0)} 50 56)`}>
-          <MascotHead kind="bear" child eyes={shown.eyes} mouth={shown.mouth} brows={shown.brows} />
+        <g transform={`rotate(${face.tilt ?? 0} 50 56)`}>
+          <MascotHead kind="bear" child eyes={face.eyes} mouth={face.mouth} brows={face.brows} />
         </g>
       </svg>
     </span>

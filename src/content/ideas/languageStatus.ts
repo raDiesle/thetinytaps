@@ -214,6 +214,41 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
+    href: "/gefuehle/",
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts (auch die Geschichten aus selbst.ts), Schritt für Schritt neben den deutschen Geschichten.",
+    parts: [
+      {
+        label: "Wie geht's dir? und Kindergarten",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
+      },
+      {
+        label: "Zu Hause",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "„Müde am Abend“ (der Bär legt sich selbst schlafen) neu übersetzt am 3. November 2026. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026), die Aufnahmen der anderen Sprachen fehlen noch. „Partyhut wegnehmen“ beim Geburtstag (statt „Geschenk wegnehmen“, 4. November 2026) übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
+      },
+      {
+        label: "Mehr Gefühle",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Am 4. November 2026 geändert und am 5. November 2026 übersetzt, in keiner Sprache aufgenommen: beim lauten Knall der dritte Schritt („Mit dem Fuchs Kuchen essen“) und das Ende, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“) und das Ende, bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“) und das Ende, in „Traurig, Kuschelhase weg“ der „Kuschelhase“ des Bären und der „Kuschelhund“ des Fuchses.",
+      },
+      {
+        label: "Buch und Gruppen",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Neu (4. November 2026), übersetzt am 5. November 2026: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts), die acht Gruppen (groups.ts), „Stimme ausschalten“ / „Stimme einschalten“ des Lautsprechers (VoiceSwitch.tsx) und „Text zum Vorlesen zeigen“ / „Text ausblenden“ (ReadAlong.tsx); der Text selbst kommt aus den Szenen in ihrer Sprache.",
+      },
+      {
+        label: "Tagesgeschichten",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), in keiner Sprache aufgenommen: die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
+      },
+    ],
+  },
+  {
     href: "/wie-gehts-dir/",
     note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026), seit dem 6. November 2026 nur noch die Gefühlskarten und der Regler „Wie doll ist es?“; teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
     parts: [
@@ -253,42 +288,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Frage und was guttut",
         recorded: true,
         languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Tief pusten“, „Etwas essen“ und „Ausruhen“ nur deutsch; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
-      },
-    ],
-  },
-  {
-    href: "/gefuehle/",
-    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts (auch die Geschichten aus selbst.ts), Schritt für Schritt neben den deutschen Geschichten.",
-    parts: [
-      {
-        label: "Wie geht's dir? und Kindergarten",
-        recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
-      },
-      {
-        label: "Zu Hause",
-        recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "„Müde am Abend“ (der Bär legt sich selbst schlafen) neu übersetzt am 3. November 2026. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026), die Aufnahmen der anderen Sprachen fehlen noch. „Partyhut wegnehmen“ beim Geburtstag (statt „Geschenk wegnehmen“, 4. November 2026) übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
-      },
-      {
-        label: "Mehr Gefühle",
-        recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Am 4. November 2026 geändert und am 5. November 2026 übersetzt, in keiner Sprache aufgenommen: beim lauten Knall der dritte Schritt („Mit dem Fuchs Kuchen essen“) und das Ende, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“) und das Ende, bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“) und das Ende, in „Traurig, Kuschelhase weg“ der „Kuschelhase“ des Bären und der „Kuschelhund“ des Fuchses.",
-      },
-      {
-        label: "Buch und Gruppen",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts), die acht Gruppen (groups.ts), „Stimme ausschalten“ / „Stimme einschalten“ des Lautsprechers (VoiceSwitch.tsx) und „Text zum Vorlesen zeigen“ / „Text ausblenden“ (ReadAlong.tsx); der Text selbst kommt aus den Szenen in ihrer Sprache.",
-      },
-      {
-        label: "Tagesgeschichten",
-        recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), in keiner Sprache aufgenommen: die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
+        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ nur deutsch; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
       },
     ],
   },

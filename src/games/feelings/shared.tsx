@@ -195,15 +195,12 @@ export type CardState = "choose" | "playing" | "wrong" | "rest";
 /** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
   image,
-  art,
   caption,
   state,
   onChoose,
 }: {
   /** Name of the picture, see images.ts. */
   image: string;
-  /** A drawing shown instead of the picture (the weather signs of „Wie doll ist es?“). */
-  art?: ReactNode;
   /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
   caption: string;
   state: CardState;
@@ -225,7 +222,7 @@ export function ChoiceCard({
         }}
       >
         {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
-        {art ?? <Frames name={image} moving={active} className="fg-card-image" />}
+        <Frames name={image} moving={active} className="fg-card-image" />
         {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>

@@ -4,10 +4,10 @@
 
 import type { Localized } from "@/lib/language";
 
-/** One slow breath, as long as the circle in `.mood-breath` (feelings.css) takes to grow and shrink. */
+/** One slow breath blown together: „Schon besser.“ comes after two of them. */
 export const BREATH_MS = 5000;
 
-/** Said when „Tief pusten“ is picked: a breath blown together with the little bear. */
+/** Said when „Stampfen und pusten“ is picked: a breath blown together with the little bear. */
 export const CALM_LINE: Localized = {
   de: "Komm, wir pusten zusammen. Puuuh.",
   en: "Come on, let's blow together. Phoooo.",
@@ -56,8 +56,8 @@ export interface Need {
   caption: Localized;
   /** Said when it is picked: that it is a good idea. */
   answer: Localized;
-  /** Drawn rather than a picture: the little bear blowing, with the breath's circle (`BigFace blowing`). */
-  drawn?: boolean;
+  /** Done together rather than only said: `CALM_LINE`, two slow breaths, then `CALM_DONE` (stamping and blowing). */
+  together?: boolean;
 }
 
 /** The needs in the order of their cards: comfort and quiet first, then moving, eating and drinking, resting, a song. */
@@ -111,9 +111,10 @@ export const NEEDS: Need[] = [
   },
   {
     id: "pusten",
-    caption: { de: "Tief pusten" },
-    answer: { de: "Pusten tut gut." },
-    drawn: true,
+    // The bear stamps and blows the feeling out at once, the breath seen (user feedback, November 2026).
+    caption: { de: "Stampfen und pusten" },
+    answer: { de: "Stampfen und pusten tut gut." },
+    together: true,
   },
   {
     id: "trinken",
