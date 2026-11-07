@@ -32,6 +32,16 @@ Its card plays at once (`startMode`): there is nothing to choose before playing,
   colour is what gives animals away least through the gaps: the brown and tan ones (monkey, deer, kangaroo, camel, goat,
   horse), the grey ones and the green ones are paired there. A new animal goes into exactly one `PEEK_LOOKS` group and,
   when it lives in water, into `IN_THE_POND`; only whole bodies, never a face or a round blob (🐤 and 🐸 are faces). Of two animals that are the same shape (tiger and leopard, camel and dromedary, dolphin and shark) take one.
+- Shapes that fail most often in black (measured November 2026 on about 190 emojis, `research.ts`), so look at a new
+  picture against these first: Apple's vehicles seen at an angle from the front are all one box (bus, lorry, fire
+  engine, tram, police car – an ambulance would be a sixth, so it was left out); food in a box or a cup is a box
+  (chips, popcorn, cup, juice); a round head on a short stem is one shape (fried egg, lollipop, balloon, light bulb,
+  tree, peacock); shoes and socks are one leg with a foot; most fruit, vegetables, bread and sweets are round blobs and
+  stay out. An emoji drawn half see-through (🪼 on Apple) gives a grey shadow, not a black one: leave it out. Of two
+  alike, keep the one a small child knows better (the gondola went, the cable car stayed). Only things a small child
+  knows from its own day, never signs, letters, numbers or faces.
+- A German name in the plural (die Trauben, die Kirschen, die Spaghetti, die Handschuhe) is wrapped in `many(…)` in
+  `content.ts`, so its sentences say „suchen“, „haben“, „sind“ (`shadows.test.ts` checks the sentences).
 
 ## Languages
 

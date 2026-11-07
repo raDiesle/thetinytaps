@@ -339,7 +339,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/schatten/",
     recorded: true,
     languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. Nur Deutsch (7. November 2026, GERMAN_ONLY in content.ts): die 20 neuen Tiere, die auch in „Wer schaut da raus?“ spielen – Tiger, Zebra, Kamel, Nashorn, Nilpferd, Känguru, Affe, Gorilla, Ziege, Lama, Hirsch, Pfau, Papagei, Schwan, Delfin, Robbe, Marienkäfer, Ameise, Raupe, Eidechse; ihre Namen fehlen in den anderen Sprachen (ihre Sätze kommen bis dahin ganz auf Deutsch), und ihre deutschen Sätze sind noch nicht aufgenommen.",
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. Nur Deutsch (7. November 2026, GERMAN_ONLY in content.ts): die 20 neuen Tiere, die auch in „Wer schaut da raus?“ spielen – Tiger, Zebra, Kamel, Nashorn, Nilpferd, Känguru, Affe, Gorilla, Ziege, Lama, Hirsch, Pfau, Papagei, Schwan, Delfin, Robbe, Marienkäfer, Ameise, Raupe, Eidechse – und 94 weitere Bilder vom 7. November 2026: die Tiere T-Rex, Spinne, Wurm, Grashüpfer und Hummer (auch in „Wer schaut da raus?“), 13 Fahrzeuge (Bus bis Schlitten), 14 Bilder zum Essen (Trauben bis Hähnchenkeule) und 62 Dinge (Puzzle bis Feuer); ihre Namen fehlen in den anderen Sprachen (ihre Sätze kommen bis dahin ganz auf Deutsch), und ihre deutschen Sätze sind noch nicht aufgenommen.",
   },
   {
     href: "/socken/",

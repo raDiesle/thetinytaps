@@ -64,6 +64,18 @@ test("a picture without its name gets the whole German sentence, in every langua
   }
 });
 
+test("German sentences agree with plural names („Die Trauben suchen ihren Schatten“)", () => {
+  const de = SHADOW_TEXTS.de;
+  for (const item of ITEMS) {
+    const plural = item.many === true;
+    expect(de.search(item), item.id).toContain(plural ? " suchen " : " sucht ");
+    expect(de.found(item), item.id).toContain(plural ? " haben " : " hat ");
+    expect(de.thatIs(item), item.id).toStartWith(plural ? "Das sind " : "Das ist ");
+    if (plural) expect(item.the, item.id).toStartWith("die ");
+  }
+  for (const id of ["trauben", "kirschen", "spaghetti", "handschuhe"]) expect(ITEMS.find((i) => i.id === id)?.many, id).toBe(true);
+});
+
 const ANIMAL = ITEMS.find((i) => i.id === "elefant")!;
 
 test("each step deals its number of shadows, the picture's own among them once, and no shadow twice", () => {

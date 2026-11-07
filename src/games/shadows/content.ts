@@ -5,11 +5,17 @@ import {
   playBlub,
   playBuzz,
   playChatter,
+  playClick,
+  playCrackle,
   playCrow,
   playDolphin,
+  playDrops,
+  playDrum,
   playEngine,
+  playFlush,
   playHonk,
   playHoot,
+  playKnocks,
   playLaunch,
   playMeow,
   playMoo,
@@ -17,12 +23,20 @@ import {
   playOink,
   playQuack,
   playRing,
+  playRip,
   playRoar,
   playRotor,
+  playSaw,
+  playScrub,
   playSiren,
+  playSleigh,
+  playSlide,
   playSnap,
+  playSplash,
   playSqueak,
   playSquawk,
+  playTick,
+  playTrickle,
   playTrumpet,
   playTwinkle,
   playWhale,
@@ -48,6 +62,8 @@ export interface ShadowItem {
   the: string;
   theme: Exclude<ShadowTheme, "all">;
   sound?: () => void;
+  /** The German name is a plural ("die Trauben"), so its sentences say "suchen", "haben", "sind". */
+  many?: boolean;
 }
 
 const item =
@@ -60,6 +76,8 @@ const item =
     theme,
     sound,
   });
+/** A picture whose German name is a plural ("die Trauben"). */
+const many = (picture: ShadowItem): ShadowItem => ({ ...picture, many: true });
 const tier = item("animals");
 const fahrzeug = item("vehicles");
 const essen = item("food");
@@ -121,6 +139,11 @@ export const ITEMS: ShadowItem[] = [
   tier("ameise", "🐜", "die Ameise"),
   tier("raupe", "🐛", "die Raupe"),
   tier("eidechse", "🦎", "die Eidechse"),
+  tier("trex", "🦖", "der T-Rex"),
+  tier("spinne", "🕷️", "die Spinne"),
+  tier("wurm", "🪱", "der Wurm"),
+  tier("grashuepfer", "🦗", "der Grashüpfer"),
+  tier("hummer", "🦞", "der Hummer"),
 
   fahrzeug("auto", "🚗", "das Auto", real("honk", playHonk)),
   fahrzeug("fahrrad", "🚲", "das Fahrrad", real("ring", playRing)),
@@ -133,6 +156,19 @@ export const ITEMS: ShadowItem[] = [
   fahrzeug("roller", "🛴", "der Roller"),
   fahrzeug("feuerwehr", "🚒", "die Feuerwehr", real("siren", playSiren)),
   fahrzeug("motorrad", "🏍️", "das Motorrad", real("engine", playEngine)),
+  fahrzeug("bus", "🚌", "der Bus", real("honk", playHonk)),
+  fahrzeug("polizei", "🚓", "das Polizeiauto", real("siren", playSiren)),
+  fahrzeug("lastwagen", "🚛", "der Lastwagen", real("engine", playEngine)),
+  fahrzeug("strassenbahn", "🚋", "die Straßenbahn"),
+  fahrzeug("rennauto", "🏎️", "das Rennauto", real("engine", playEngine)),
+  fahrzeug("motorroller", "🛵", "der Motorroller", real("engine", playEngine)),
+  fahrzeug("motorboot", "🚤", "das Motorboot", real("engine", playEngine)),
+  fahrzeug("kanu", "🛶", "das Kanu", real("splash", playSplash)),
+  fahrzeug("schiff", "🚢", "das Schiff"),
+  fahrzeug("seilbahn", "🚡", "die Seilbahn"),
+  fahrzeug("fallschirm", "🪂", "der Fallschirm", playWhoosh),
+  fahrzeug("skateboard", "🛹", "das Skateboard"),
+  fahrzeug("schlitten", "🛷", "der Schlitten", playSleigh),
 
   essen("banane", "🍌", "die Banane"),
   essen("apfel", "🍎", "der Apfel"),
@@ -147,6 +183,20 @@ export const ITEMS: ShadowItem[] = [
   essen("mais", "🌽", "der Mais"),
   essen("brokkoli", "🥦", "der Brokkoli"),
   essen("pizza", "🍕", "die Pizza"),
+  many(essen("trauben", "🍇", "die Trauben")),
+  many(essen("kirschen", "🍒", "die Kirschen")),
+  essen("ananas", "🍍", "die Ananas"),
+  many(essen("spaghetti", "🍝", "die Spaghetti")),
+  essen("spiegelei", "🍳", "das Spiegelei"),
+  essen("keule", "🍗", "die Hähnchenkeule"),
+  essen("flaeschchen", "🍼", "das Fläschchen"),
+  essen("saft", "🧃", "der Saft"),
+  essen("becher", "🥤", "der Becher"),
+  essen("bonbon", "🍬", "das Bonbon", real("wrapper", playRip)),
+  essen("torte", "🎂", "die Torte"),
+  essen("kuchen", "🍰", "der Kuchen"),
+  essen("muffin", "🧁", "der Muffin"),
+  essen("donut", "🍩", "der Donut"),
 
   ding("stern", "⭐", "der Stern", playTwinkle),
   ding("schirm", "☂️", "der Schirm"),
@@ -162,12 +212,74 @@ export const ITEMS: ShadowItem[] = [
   ding("drachen", "🪁", "der Drachen"),
   ding("glocke", "🔔", "die Glocke", real("bells", playBells)),
   ding("herz", "❤️", "das Herz"),
+  ding("puzzle", "🧩", "das Puzzle"),
+  ding("stift", "✏️", "der Stift"),
+  ding("eimer", "🪣", "der Eimer"),
+  ding("rutsche", "🛝", "die Rutsche", real("slide", playSlide)),
+  ding("karussell", "🎠", "das Karussell"),
+  ding("riesenrad", "🎡", "das Riesenrad"),
+  ding("trompete", "🎺", "die Trompete"),
+  ding("trommel", "🥁", "die Trommel", playDrum),
+  ding("geige", "🎻", "die Geige"),
+  ding("kopfhoerer", "🎧", "der Kopfhörer"),
+  ding("zahnbuerste", "🪥", "die Zahnbürste", real("scrub", playScrub)),
+  ding("badewanne", "🛁", "die Badewanne", real("splash", playSplash)),
+  ding("dusche", "🚿", "die Dusche", playTrickle),
+  ding("klo", "🚽", "das Klo", real("flush", playFlush)),
+  ding("stuhl", "🪑", "der Stuhl"),
+  ding("bett", "🛏️", "das Bett"),
+  ding("sofa", "🛋️", "das Sofa"),
+  ding("kerze", "🕯️", "die Kerze"),
+  ding("gluehbirne", "💡", "die Glühbirne", real("switch", playClick)),
+  ding("wecker", "⏰", "der Wecker", real("tick", playTick)),
+  ding("geschenk", "🎁", "das Geschenk"),
+  ding("korb", "🧺", "der Korb"),
+  ding("einkaufswagen", "🛒", "der Einkaufswagen"),
+  ding("teekanne", "🫖", "die Teekanne"),
+  ding("tasse", "☕", "die Tasse"),
+  ding("loeffel", "🥄", "der Löffel"),
+  ding("besteck", "🍴", "das Besteck"),
+  ding("besen", "🧹", "der Besen"),
+  ding("hammer", "🔨", "der Hammer", playKnocks),
+  ding("saege", "🪚", "die Säge", real("saw", playSaw)),
+  ding("leiter", "🪜", "die Leiter"),
+  ding("kran", "🏗️", "der Kran"),
+  ding("tshirt", "👕", "das T-Shirt"),
+  ding("hose", "👖", "die Hose"),
+  ding("kleid", "👗", "das Kleid"),
+  ding("socke", "🧦", "die Socke"),
+  many(ding("handschuhe", "🧤", "die Handschuhe")),
+  ding("kappe", "🧢", "die Kappe"),
+  ding("hut", "🎩", "der Hut"),
+  ding("stiefel", "👢", "der Stiefel"),
+  ding("flipflop", "🩴", "der Flip-Flop"),
+  ding("schlittschuh", "⛸️", "der Schlittschuh"),
+  ding("rollschuh", "🛼", "der Rollschuh"),
+  ding("brille", "👓", "die Brille"),
+  ding("krone", "👑", "die Krone"),
+  ding("zelt", "⛺", "das Zelt"),
+  ding("burg", "🏰", "die Burg"),
+  ding("tanne", "🌲", "die Tanne"),
+  ding("palme", "🌴", "die Palme"),
+  ding("kaktus", "🌵", "der Kaktus"),
+  ding("sonnenblume", "🌻", "die Sonnenblume"),
+  ding("tulpe", "🌷", "die Tulpe"),
+  ding("blatt", "🍁", "das Blatt"),
+  ding("berg", "⛰️", "der Berg"),
+  ding("sonne", "☀️", "die Sonne"),
+  ding("wolke", "☁️", "die Wolke"),
+  ding("regenbogen", "🌈", "der Regenbogen"),
+  ding("blitz", "⚡", "der Blitz"),
+  ding("tropfen", "💧", "der Tropfen", playDrops),
+  ding("schneeflocke", "❄️", "die Schneeflocke"),
+  ding("schneemann", "⛄", "der Schneemann"),
+  ding("feuer", "🔥", "das Feuer", playCrackle),
 ];
 
 /** Where an animal hides in "Wer schaut da raus?" (X-04): behind a bush, or in the pond. */
 export type Hideout = "bush" | "pond";
 
-const IN_THE_POND = new Set(["ente", "fisch", "krebs", "tintenfisch", "krokodil", "wal", "schwan", "delfin", "robbe", "nilpferd"]);
+const IN_THE_POND = new Set(["ente", "fisch", "krebs", "tintenfisch", "krokodil", "wal", "schwan", "delfin", "robbe", "nilpferd", "hummer"]);
 
 export const PEEK_ITEMS = ITEMS.filter((i) => i.theme === "animals");
 
@@ -180,9 +292,27 @@ export const hideoutOf = (item: ShadowItem): Hideout => (IN_THE_POND.has(item.id
  */
 export const PEEK_LOOKS: string[][] = [
   ["hase", "katze", "hund", "maus", "eichhoernchen", "igel", "affe"],
-  ["pferd", "kuh", "schwein", "schaf", "elefant", "giraffe", "dino", "tiger", "zebra", "kamel", "nashorn", "ziege", "lama", "hirsch", "gorilla", "kaenguru"],
+  [
+    "pferd",
+    "kuh",
+    "schwein",
+    "schaf",
+    "elefant",
+    "giraffe",
+    "dino",
+    "tiger",
+    "zebra",
+    "kamel",
+    "nashorn",
+    "ziege",
+    "lama",
+    "hirsch",
+    "gorilla",
+    "kaenguru",
+    "trex",
+  ],
   ["hahn", "eule", "flamingo", "pinguin", "pfau", "papagei"],
-  ["schnecke", "schildkroete", "schmetterling", "biene", "marienkaefer", "ameise", "raupe", "eidechse"],
+  ["schnecke", "schildkroete", "schmetterling", "biene", "marienkaefer", "ameise", "raupe", "eidechse", "spinne", "wurm", "grashuepfer"],
   [...IN_THE_POND],
 ];
 
@@ -214,6 +344,51 @@ export const SHADOW_LOOKALIKES: [string, string][] = [
   ["nilpferd", "schwein"],
   ["pfau", "baum"],
   ["affe", "eichhoernchen"],
+  // Added November 2026 (94 more pictures): Apple's vehicles seen from the front at an angle are all the same box.
+  ["auto", "polizei"],
+  ["bus", "lastwagen"],
+  ["bus", "feuerwehr"],
+  ["lastwagen", "feuerwehr"],
+  ["strassenbahn", "bus"],
+  ["strassenbahn", "feuerwehr"],
+  ["strassenbahn", "trommel"],
+  // Shoes and socks: a leg with a foot.
+  ["rollschuh", "schlittschuh"],
+  ["stiefel", "schlittschuh"],
+  ["stiefel", "rollschuh"],
+  ["socke", "stiefel"],
+  // A round thing on a short stem or handle.
+  ["spiegelei", "ballon"],
+  ["spiegelei", "baum"],
+  ["spiegelei", "pfau"],
+  ["gluehbirne", "ballon"],
+  // Cakes and cups: a box or a cup.
+  ["torte", "muffin"],
+  ["kuchen", "kaese"],
+  ["kuchen", "haus"],
+  ["becher", "saft"],
+  ["eimer", "geschenk"],
+  ["korb", "geschenk"],
+  ["korb", "eimer"],
+  // Long thin things lying aslant.
+  ["stift", "raupe"],
+  ["flipflop", "raupe"],
+  ["zahnbuerste", "moehre"],
+  // Other outlines measured close in one of the fonts.
+  ["geige", "gitarre"],
+  ["karussell", "pferd"],
+  ["zelt", "berg"],
+  ["regenbogen", "mond"],
+  ["tropfen", "birne"],
+  ["tropfen", "feuer"],
+  ["blatt", "stern"],
+  ["blatt", "tanne"],
+  ["sonne", "schneeflocke"],
+  ["sonne", "sonnenblume"],
+  ["schneeflocke", "sonnenblume"],
+  ["fallschirm", "schirm"],
+  ["spinne", "marienkaefer"],
+  ["teekanne", "fisch"],
 ];
 
 /**
@@ -223,7 +398,9 @@ export const SHADOW_LOOKALIKES: [string, string][] = [
  * tan fur through the gaps (monkey, deer, kangaroo, camel, goat, horse), grey skin (rhino, elephant, gorilla; seal and
  * hippo out of the pond), black and white (zebra, cow), white wool (sheep, llama), orange with dark marks (tiger,
  * giraffe), green (peacock and parrot; turtle, lizard and caterpillar), the caterpillar's yellow and black bands like
- * the bee's, the monkey's curled tan tail like the dog's, and a blue back with a fin out of the water (dolphin, fish).
+ * the bee's, the monkey's curled tan tail like the dog's, and a blue back with a fin out of the water (dolphin, fish);
+ * the T-Rex's green skin like the dino's, the spider's thin dark legs like the ant's, the ladybird's and the
+ * grasshopper's, the grasshopper's brown like the snail's, and red out of the pond (lobster, crab, octopus).
  * They are never offered together, so exactly one fits; the rest of a `PEEK_LOOKS` group still makes the harder steps
  * harder.
  */
@@ -253,6 +430,13 @@ export const PEEK_LOOKALIKES: [string, string][] = [
   ["biene", "raupe"],
   ["delfin", "fisch"],
   ["robbe", "nilpferd"],
+  ["trex", "dino"],
+  ["spinne", "ameise"],
+  ["spinne", "marienkaefer"],
+  ["spinne", "grashuepfer"],
+  ["grashuepfer", "schnecke"],
+  ["hummer", "krebs"],
+  ["hummer", "tintenfisch"],
 ];
 
 /**
@@ -281,6 +465,100 @@ export const GERMAN_ONLY: string[] = [
   "ameise",
   "raupe",
   "eidechse",
+  "trex",
+  "spinne",
+  "wurm",
+  "grashuepfer",
+  "hummer",
+  "bus",
+  "polizei",
+  "lastwagen",
+  "strassenbahn",
+  "rennauto",
+  "motorroller",
+  "motorboot",
+  "kanu",
+  "schiff",
+  "seilbahn",
+  "fallschirm",
+  "skateboard",
+  "schlitten",
+  "trauben",
+  "kirschen",
+  "ananas",
+  "spaghetti",
+  "spiegelei",
+  "keule",
+  "flaeschchen",
+  "saft",
+  "becher",
+  "bonbon",
+  "torte",
+  "kuchen",
+  "muffin",
+  "donut",
+  "puzzle",
+  "stift",
+  "eimer",
+  "rutsche",
+  "karussell",
+  "riesenrad",
+  "trompete",
+  "trommel",
+  "geige",
+  "kopfhoerer",
+  "zahnbuerste",
+  "badewanne",
+  "dusche",
+  "klo",
+  "stuhl",
+  "bett",
+  "sofa",
+  "kerze",
+  "gluehbirne",
+  "wecker",
+  "geschenk",
+  "korb",
+  "einkaufswagen",
+  "teekanne",
+  "tasse",
+  "loeffel",
+  "besteck",
+  "besen",
+  "hammer",
+  "saege",
+  "leiter",
+  "kran",
+  "tshirt",
+  "hose",
+  "kleid",
+  "socke",
+  "handschuhe",
+  "kappe",
+  "hut",
+  "stiefel",
+  "flipflop",
+  "schlittschuh",
+  "rollschuh",
+  "brille",
+  "krone",
+  "zelt",
+  "burg",
+  "tanne",
+  "palme",
+  "kaktus",
+  "sonnenblume",
+  "tulpe",
+  "blatt",
+  "berg",
+  "sonne",
+  "wolke",
+  "regenbogen",
+  "blitz",
+  "tropfen",
+  "schneeflocke",
+  "schneemann",
+  "feuer",
 ];
 
 /** Whether `a` and `b` are one of `pairs`, so they must not stand side by side to choose from. */
@@ -289,7 +567,7 @@ export const lookAlike = (pairs: [string, string][], a: ShadowItem, b: ShadowIte
 
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
-/** "seinen" or "ihren" Schatten. */
+/** "seinen" or "ihren" Schatten ("die …" is a feminine word or a plural, both "ihren"). */
 const its = (item: ShadowItem) => (item.the.startsWith("die ") ? "ihren" : "seinen");
 
 /** Everything the shadows and "Wer schaut da raus?" say or show, in one language. */
@@ -309,11 +587,11 @@ export interface ShadowTexts {
 
 const GERMAN_TEXTS: ShadowTexts = {
   name: (item) => item.name,
-  search: (item) => `${capital(item.the)} sucht ${its(item)} Schatten.`,
-  found: (item) => `Juhu! ${capital(item.the)} hat ${its(item)} Schatten gefunden.`,
-  thatIs: (item) => `Das ist ${item.the}.`,
+  search: (item) => `${capital(item.the)} ${item.many ? "suchen" : "sucht"} ${its(item)} Schatten.`,
+  found: (item) => `Juhu! ${capital(item.the)} ${item.many ? "haben" : "hat"} ${its(item)} Schatten gefunden.`,
+  thatIs: (item) => `Das ${item.many ? "sind" : "ist"} ${item.the}.`,
   peek: "Wer schaut da raus?",
-  there: (item) => `Da ist ja ${item.the}!`,
+  there: (item) => `Da ${item.many ? "sind" : "ist"} ja ${item.the}!`,
   shadow: (n) => `Schatten ${n}`,
 };
 

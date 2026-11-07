@@ -288,6 +288,7 @@ export const RESEARCH: Research[] = [
       "Teile, die aus dem Busch gleich aussehen: der hellbraune Schwanz mit Hinterbein von Katze und Hund, das Grau von Elefant neben Kuh oder Schaf, das grauweiße Fell von Hase und Maus und das Braun von Eichhörnchen und Igel durch die Gucklöcher.",
       "Diese Paare kommen nie zusammen zur Auswahl (SHADOW_LOOKALIKES, PEEK_LOOKALIKES); die übrigen ähnlichen Bilder einer Art bleiben, damit die schweren Stufen schwer bleiben.",
       "Nachtrag 7. November 2026, 35 weitere Tiere ebenso geprüft (headless Chrome, Apple Color Emoji und Noto Color Emoji von Google Fonts, Umriss-Überdeckung jedes neuen Tiers mit allen Bildern, die nächsten schwarz nebeneinander; sichtbare Teile oben, links, rechts bei 25 % und die Durchschnittsfarbe je Gruppe): 20 kamen dazu. Gleiche Schatten: Zebra und Kuh, Nilpferd und Schwein, Pfau und Baum (auf Android), Affe und Eichhörnchen. Gleiche Teile: einfarbig braunes Fell durch die Gucklöcher (Affe, Hirsch, Känguru, Kamel, Ziege, Pferd), Grau (Nashorn, Elefant, Gorilla; Robbe und Nilpferd aus dem Teich), Schwarz-Weiß (Zebra, Kuh), weiße Wolle (Schaf, Lama), Orange mit dunklen Flecken (Tiger, Giraffe), Grün (Pfau und Papagei; Schildkröte, Eidechse und Raupe), die gelb-schwarzen Ringe von Raupe und Biene, der gebogene Schwanz von Affe und Hund und ein blauer Rücken mit Flosse aus dem Wasser (Delfin, Fisch).",
+      "Nachtrag 7. November 2026, zweite Runde: rund 190 Emojis aus Fahrzeugen, Essen, Dingen und Tieren ebenso geprüft (im Browser in Apple Color Emoji und Noto Color Emoji gezeichnet, Umriss-Überdeckung mit allen Bildern, die nächsten schwarz nebeneinander); 94 kamen dazu (13 Fahrzeuge, 14 zum Essen, 62 Dinge, 5 Tiere). Was am häufigsten scheitert: Apples Fahrzeuge schräg von vorn sind alle derselbe Kasten (Bus, Lastwagen, Feuerwehr, Straßenbahn, Polizeiauto, Auto, Krankenwagen), Essen in Schachtel oder Becher wird ein Kasten (Pommes, Popcorn, Becher, Saft), und vieles ist ein runder Kopf auf kurzem Stiel (Spiegelei, Lutscher, Ballon, Glühbirne, Baum, Pfau). Neue gleiche Schatten: diese Kästen untereinander, Schuhe und Socke (Stiefel, Rollschuh, Schlittschuh), Torte und Muffin, Kuchenstück mit Käse und Haus, Eimer, Korb und Geschenk, Stift, Flip-Flop und Raupe, Zahnbürste und Möhre, Geige und Gitarre, Karussell und Pferd, Zelt und Berg, Regenbogen und Mond, Tropfen mit Birne und Feuer, das Ahornblatt mit Stern und Tanne, Sonne, Schneeflocke und Sonnenblume, Fallschirm und Schirm, Spinne und Marienkäfer, Teekanne und Fisch. Gleiche Teile: T-Rex und Dino (grün), Spinne mit Ameise, Marienkäfer und Grashüpfer (dünne dunkle Beine), Grashüpfer und Schnecke (braun), Hummer mit Krebs und Tintenfisch (rot aus dem Teich).",
     ],
     topics: [],
     games: [],
@@ -302,6 +303,31 @@ export const RESEARCH: Research[] = [
       {
         title: "Küken, Frosch, Fledermaus, Faultier, Schlange, Truthahn",
         why: "Küken und Frosch sind Gesichter oder runde Kleckse; die anderen kennen kleine Kinder weniger oder wären in ihrer Gruppe allen anderen zu ähnlich (die grüne Schlange).",
+      },
+      {
+        title: "Krankenwagen, Pickup, Kleinbus, Fähre, Gondel, Schnellzug",
+        why: "Auf dem iPhone derselbe Kasten wie Bus, Lastwagen, Feuerwehr oder Polizeiauto, die Gondel wie die Seilbahn, die Fähre wie das Schiff; der Schnellzug ist ein Keil, den kein Kind erkennt.",
+      },
+      {
+        title:
+          "Zitrone, Orange, Tomate, Avocado, Paprika, Kartoffel, Ei, Zwiebel, Kiwi, Burger, Brot, Pfannkuchen, Sandwich, Hotdog, Schokolade, Gurke, Waffel, Pudding, Blaubeeren",
+        why: "Als Schatten runde oder längliche Kleckse ohne eigenen Umriss.",
+      },
+      {
+        title: "Pommes, Popcorn, Lutscher, Croissant, Honig, Baguette, Fleisch",
+        why: "Pommes und Popcorn sind auf dem iPhone ein Kasten wie Eimer und Geschenk, der Lutscher ein Kreis am Stiel wie Spiegelei und Ballon, das Croissant auf Android ein Klumpen wie Brokkoli, Honig ein runder Topf wie der Apfel, das Baguette ein Stab wie der Stift, das Fleisch wie die Hähnchenkeule.",
+      },
+      {
+        title: "Fernseher, Telefon, Kamera, Radio, Koffer, Rucksack, Klopapier, Vorhängeschloss, Pflaster, Mikrofon, Wachsmalstift, Pinsel",
+        why: "Kästen, Kleckse oder Stäbe (der Pinsel wie Zahnbürste und Möhre); das alte Telefon kennen kleine Kinder nicht, und „Schloss“ wäre neben der Burg doppeldeutig.",
+      },
+      {
+        title: "Magnet, Pokal, Planet, Welle, Schraubenschlüssel, Anker, Schleife, Kleeblatt, Wanderschuh",
+        why: "Kennen kleine Kinder kaum, oder der Umriss gleicht einem Bild, das schon da ist (der Wanderschuh dem Schuh).",
+      },
+      {
+        title: "Qualle, Esel, Gans, Widder, Käfer, Vogel, Kugelfisch, Biber",
+        why: "Die Qualle ist auf dem iPhone halb durchsichtig und ihr Schatten grau; Esel, Gans, Widder und Käfer stehen wie Zebra, Ente, Schaf und Marienkäfer, der Vogel ist auf dem iPhone ein Gesicht, Kugelfisch und Biber sind Kleckse.",
       },
     ],
     ideas: ["X-14"],
