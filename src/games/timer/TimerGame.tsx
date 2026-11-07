@@ -5,7 +5,7 @@ import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { PICTURES, SWAP_NOTE, TIMER_TITLE } from "./content";
 import { OwnTimeSheet } from "./OwnTimeSheet";
-import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
+import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
 import { lengthWords, type OwnTime } from "./time";
 import { TimerPlay } from "./TimerPlay";
 import "./timer.css";
@@ -22,7 +22,7 @@ export function TimerGame() {
   const modes = PICTURES.map((p) => ({ id: p.id, emoji: p.emoji, title: t(p.name), note: p.id === "swap" ? t(SWAP_NOTE) : undefined }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
   const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
-  const minutes = TIMER_MINUTES.includes(settings.minutes as (typeof TIMER_MINUTES)[number]) ? settings.minutes : DEFAULT_TIMER_SETTINGS.minutes;
+  const seconds = TIMER_SECONDS.includes(settings.seconds as (typeof TIMER_SECONDS)[number]) ? settings.seconds : DEFAULT_TIMER_SETTINGS.seconds;
   const own = settings.own;
   const useOwn = settings.useOwn && own !== null;
   const ownLabel = (time: OwnTime) =>
@@ -48,33 +48,24 @@ export function TimerGame() {
       onMode={(picture) => update({ picture: picture as TimerPicture })}
       level={
         // The grown-up sets the time here; the child sees no numbers, only the picture running down. Behind the
-        // minutes, the time set last behind „Andere …“ stays as a slip of its own until another comes (H-59).
+        // lengths, the time set last behind „Andere …“ stays as a slip of its own until another comes (H-59).
         <>
-          <Choice
-            label={t({ de: "Wie lange?", en: "How long?", zh: "多长时间？", hi: "कितनी देर?", es: "¿Cuánto tiempo?", ar: "كم من الوقت؟", ru: "Как долго?" })}
-            value={useOwn ? OWN : String(minutes)}
-            onChange={(value) => {
-              if (value === OTHER) setSheet(true);
-              else if (value === OWN) update({ useOwn: true });
-              else update({ minutes: Number(value), useOwn: false });
-            }}
-            options={[
-              ...TIMER_MINUTES.map((m) => ({
-                value: String(m),
-                label: t({
-                  de: `${m} Min.`,
-                  en: `${m} min`,
-                  zh: `${m} 分钟`,
-                  hi: `${m} मिनट`,
-                  es: `${m} min`,
-                  ar: `${m} ${m >= 3 && m <= 10 ? "دقائق" : "دقيقة"}`,
-                  ru: `${m} мин`,
-                }),
-              })),
-              ...(own ? [{ value: OWN, label: ownLabel(own) }] : []),
-              { value: OTHER, label: t({ de: "Andere …", en: "Other …", zh: "其他……", hi: "अन्य …", es: "Otro …", ar: "غير ذلك …", ru: "Другое …" }) },
-            ]}
-          />
+          <div className="tm-lengths">
+            <Choice
+              label={t({ de: "Wie lange?", en: "How long?", zh: "多长时间？", hi: "कितनी देर?", es: "¿Cuánto tiempo?", ar: "كم من الوقت؟", ru: "Как долго?" })}
+              value={useOwn ? OWN : String(seconds)}
+              onChange={(value) => {
+                if (value === OTHER) setSheet(true);
+                else if (value === OWN) update({ useOwn: true });
+                else update({ seconds: Number(value), useOwn: false });
+              }}
+              options={[
+                ...TIMER_SECONDS.map((s) => ({ value: String(s), label: t(lengthWords(s)) })),
+                ...(own ? [{ value: OWN, label: ownLabel(own) }] : []),
+                { value: OTHER, label: t({ de: "Andere …", en: "Other …", zh: "其他……", hi: "अन्य …", es: "Otro …", ar: "غير ذلك …", ru: "Другое …" }) },
+              ]}
+            />
+          </div>
           {sheet && (
             <OwnTimeSheet
               start={own}
@@ -89,10 +80,10 @@ export function TimerGame() {
       }
     >
       <TimerPlay
-        settings={{ ...settings, picture, minutes, useOwn }}
+        settings={{ ...settings, picture, seconds, useOwn }}
         onPicture={(picture) => update({ picture })}
         onToy={(toy) => update({ toy })}
-        onShown={(shown) => update({ shown })}
+        onShown={(showTime) => update({ showTime })}
       />
     </GameShell>
   );

@@ -2,15 +2,16 @@
 
 Route `/timer/` · idea H-04 („Timer zum Zuschauen“). A book of its own among the Alltagshelfer on the shelf once it is finished. While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
 
-A visual timer for the day, not a game: a grown-up picks the minutes in the row above the cards („Wie lange?“: 1, 2, 3,
-5 or 10 Min., `TIMER_MINUTES`) and a picture card starts it. Behind them „Andere …“ opens a sheet for grown-ups
+A visual timer for the day, not a game: a grown-up picks the length in the row above the cards („Wie lange?“: 10 or 30
+Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds asked for by the user, November 2026) and a picture card starts it. Behind them „Andere …“ opens a sheet for grown-ups
 (`OwnTimeSheet`, H-59, H-60): any length from 10 seconds to 3 hours (− and + for hours, minutes and seconds, ready slips
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
-grown-ups (`TimeLeft`, H-62), and its „Zeit im Bild“ (`shown.tsx`, kept as `shown`) puts the time left into the
-picture's bottom left corner too, on a small paper note: „Aus“ (the default), „Zahlen“ (digits) or „Striche“ (tally
-marks in bundles of five, each standing for 10 s up to 15 min, `markUnit`, at most `MAX_MARKS`; one goes as its time is
-used up). Without it the child sees no numbers, only the picture running down.
+grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
+note, as tally marks in bundles of five that go one by one (`shown.tsx`, kept as `showTime`; user request, November
+2026): by default „Striche in %“, ten marks each a tenth of the run (`PERCENT_MARKS`), so a short and a long timer look
+alike; behind ⚙️ its „Zeit im Bild“ switches to „Striche in Zeit“ (each mark 10 s up to 15 min, `markUnit`, at most
+`MAX_MARKS`), „Zahlen“ (digits) or „Aus“. The child sees no numbers, only the picture and the marks running down.
 The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
 there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
 screen), then the pictures that run until the time is up:
@@ -27,7 +28,8 @@ screen), then the pictures that run until the time is up:
   a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
   apples, also for a short time (`appleCount`, `MIN_APPLES` to `MAX_APPLES`, as many as the heap holds); the last lands
   as the time is up. A tap rustles the leaves, once the blossoms are out the bees buzz.
-- „Sanduhr“ ⏳: the sand runs from the top bulb into the bottom one.
+- „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
+  from the top bulb into the bottom one, where its heap rises with a round top (`BulbSand`, shared with Abwechseln).
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
   (`steps(var(--tm-secs))`, `runSeconds`), its head chewing and three leaf crumbs falling as it munches (`CRUMBS`); at the end a cocoon hangs on the branch and a butterfly flies out and settles on the meadow.
 - „Blume“ 🌸 (`flower.tsx`, H-53): the bear child waters a sprout in the flower bed with a garden hose coming from a
@@ -69,9 +71,9 @@ screen), then the pictures that run until the time is up:
   exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
 
 Every picture moves a small, soft step every second, so even an hour never looks stuck (H-63): the train's wheels turn
-once and a puff rises, a big grain falls through the hourglass's neck, a drop of wax runs a little further. And each
+once and a puff rises, the sand pours through the hourglass's neck, a drop of wax runs a little further. And each
 shows where it comes from and where it goes (H-64): the train sets off from a little house and the rail ahead shines
-while the rail behind is dark, the glass the sand has left keeps a film of it, the wax that ran down spreads on the holder.
+while the rail behind is dark, the hourglass's bottom heap grows, the wax that ran down spreads on the holder.
 Gleich ist es so weit (H-49): a minute before the end, or in the last fifth of a short time (`soonMs`), a bell rings
 once and the child, where there is one, waves once (`tm-soon`), and a picture stepped back from afar comes bright again for it.
 Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`), the child and small things
@@ -89,6 +91,8 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
 
 ## Rules
 
+- The row of lengths stays one line on a phone on its side (844×390), with the own time's slip too: when it wraps, the
+  last row of cards falls off the screen. A new length means narrower slips (`.tm-lengths`), never a second line.
 - **Progress is seen every second** (user feedback, November 2026): every picture moves a step a second that a child
   can see from the sofa – a bite, a crumb, an apple, a slice – not only a tiny wobble. Pieces come many, also for a
   short time (they come more often then, never fewer), the way to go is long (the train across the picture, the ants'
@@ -133,6 +137,16 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
   (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
   a bigger layer.
+- **Only what runs and where it goes** (user feedback, November 2026): the hourglass shows the sand still to run and
+  the heap below, nothing else – no film or grains on the glass the sand has left, no grain or disc over the stream at
+  the neck (both were taken out: they looked odd). A trace of what is over (H-64) is only drawn where it is plainly a
+  thing of its own (the dark rail, the wax puddle), never a pale copy of what was there.
+- **No `clip-path` round what is in view while the page turns**: a turning page is a picture of the app (view
+  transition), and in it the clip-path round a moving layer dropped out – the hourglass's sand showed as a square
+  before it began (user feedback, November 2026). A shape something moves inside is a still drawing of that shape in a
+  window with `overflow: hidden`: the window slides, the drawing in it slides back the same way and stays put, both by
+  `transform` (`BulbSand`, `bulbBelow`; `timer.test.ts` checks). A still clip-path is fine where nothing it cuts shows
+  as the page turns, or on a light mounted only after a tap.
 - **What a tap lights is what is left** (H-51): a glow inside the part that shrinks, never a sign or a number, and once
   per tap, fading – never blinking. A new picture puts `LeftGlow` into its own shrinking part; in a picture that grows
   (the flower) that is the way still to go (`StillToGrow`, a box over the stake whose lower end rises with the bud).
