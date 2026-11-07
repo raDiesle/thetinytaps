@@ -1367,184 +1367,193 @@
   overflow: hidden;
 }
 
-/* Sonnenuntergang (H-54): the sun sinks behind the hills and reddens, the moon rises, the evening's and then the night's
-   sky fade in over the day's, the land darkens, the stars come out one by one and the windows light up. */
+/* Sonnenuntergang (H-54): the big moon in the middle goes down behind the hill while the stars go out one by one, the
+   night's sky and then the morning's pink fade away over the day's, the land grows light, and the big sun rises at the
+   same place, red at first and yellow as it climbs. A soft ring of light widens round them every second (H-63). */
 .tm-sun,
 .tm-moon {
   position: absolute;
 }
 
-.tm-sun {
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 38%, #fff3bf, #ffd43b 55%, #fab005);
-  animation: tm-set var(--tm-ms) linear forwards;
+.tm-moon {
+  animation: tm-moonset var(--tm-ms) linear forwards;
 }
 
+.tm-moon svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-sun {
+  transform: translateY(var(--tm-sun-from));
+  animation: tm-sunrise var(--tm-ms) linear forwards;
+}
+
+.tm-sun-face,
 .tm-sun-red {
   position: absolute;
   inset: 0;
   border-radius: 50%;
+}
+
+.tm-sun-face {
+  background: radial-gradient(circle at 40% 38%, #fff3bf, #ffd43b 55%, #fab005);
+}
+
+.tm-sun-red {
   background: radial-gradient(circle at 40% 38%, #ffc078, #fd7e14 55%, #e8590c);
+  animation: tm-unredden var(--tm-ms) linear forwards;
+}
+
+/* The ring of light each second: a glow behind the moon or the sun that widens softly past its edge and fades, a
+   breath, never a blink (a ring drawn as a shadow left a dark gap at the edge). */
+.tm-ring {
+  inset: 0;
+  border-radius: 50%;
   opacity: 0;
-  animation: tm-redden var(--tm-ms) linear forwards;
+  animation: tm-ring 1s ease-out infinite;
 }
 
-.tm-moon {
-  animation: tm-moonrise var(--tm-ms) linear forwards;
+.tm-moon-ring {
+  background: radial-gradient(closest-side, rgb(255 243 191 / 0.6) 84%, transparent);
 }
 
-.tm-moon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.tm-sun-ring {
+  background: radial-gradient(closest-side, rgb(255 212 59 / 0.6) 84%, transparent);
 }
 
-.tm-dusk-sky {
+.tm-moon .tm-left-glow,
+.tm-sun .tm-left-glow {
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
+}
+
+.tm-dawn-sky {
   background: linear-gradient(#7b5ea7, #f783ac 45%, #ffa94d 80%);
   opacity: 0;
-  animation: tm-evening var(--tm-ms) linear forwards;
+  animation: tm-dawn var(--tm-ms) linear forwards;
 }
 
 .tm-night-sky {
   background: linear-gradient(#0b1033, #1c2a5a 60%, #2f3f7a);
-  opacity: 0;
-  animation: tm-nightfall var(--tm-ms) linear forwards;
+  opacity: 0.92;
+  animation: tm-daybreak var(--tm-ms) linear forwards;
 }
 
-.tm-dusk-land {
-  opacity: 0;
-  animation: tm-dusk var(--tm-ms) linear forwards;
-}
-
-.tm-windows {
-  opacity: 0;
-  animation: tm-lights var(--tm-ms) linear forwards;
+.tm-night-land {
+  opacity: 0.6;
+  animation: tm-land-light var(--tm-ms) linear forwards;
 }
 
 .tm-star {
-  opacity: 0;
-  animation: tm-star 4s ease-out both;
+  animation: tm-star-out 4s ease-in both;
   animation-delay: calc(var(--tm-ms) * var(--tm-at));
 }
 
-.tm-sails {
-  inset: 0;
-  animation: tm-sails 1s ease-in-out infinite;
+.tm-done .tm-moon {
+  animation: none;
+  transform: translateY(var(--tm-moon-set));
 }
 
-.tm-sails svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.tm-done .tm-sun,
+.tm-done .tm-sun-red,
+.tm-done .tm-dawn-sky,
+.tm-done .tm-night-sky,
+.tm-done .tm-night-land,
+.tm-done .tm-star {
+  animation: none;
+  transform: none;
+  opacity: 0;
 }
 
 .tm-done .tm-sun {
-  animation: none;
-  transform: translateY(var(--tm-sun-set));
-}
-
-.tm-done .tm-moon,
-.tm-done .tm-dusk-sky,
-.tm-done .tm-night-sky,
-.tm-done .tm-dusk-land,
-.tm-done .tm-windows,
-.tm-done .tm-star,
-.tm-done .tm-sun-red {
-  animation: none;
-  transform: none;
-}
-
-.tm-done .tm-dusk-sky,
-.tm-done .tm-windows,
-.tm-done .tm-star,
-.tm-done .tm-sun-red,
-.tm-done .tm-sails {
   opacity: 1;
 }
 
-.tm-done .tm-night-sky {
-  opacity: 0.92;
-}
-
-.tm-done .tm-dusk-land {
-  opacity: 0.6;
-}
-
-/* The sun has set at 55 % of the time (SUN_SET_AT); the moon waits behind the hill until 50 % (MOON_FROM) and rises then. */
-@keyframes tm-set {
-  55%,
+/* The moon has set at 48 % of the time (MOON_SET_AT); the sun waits behind the hill until 50 % (SUN_FROM) and rises then. */
+@keyframes tm-moonset {
+  48%,
   to {
-    transform: translateY(var(--tm-sun-set));
+    transform: translateY(var(--tm-moon-set));
   }
 }
 
-@keyframes tm-redden {
-  50%,
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes tm-moonrise {
+@keyframes tm-sunrise {
   from,
   50% {
-    transform: translateY(var(--tm-moon-from));
+    transform: translateY(var(--tm-sun-from));
   }
   to {
     transform: none;
   }
 }
 
-@keyframes tm-evening {
-  45%,
-  100% {
+@keyframes tm-unredden {
+  50% {
     opacity: 1;
+  }
+  85%,
+  to {
+    opacity: 0;
   }
 }
 
-@keyframes tm-nightfall {
-  40% {
-    opacity: 0;
+@keyframes tm-ring {
+  from {
+    opacity: 1;
+    transform: none;
   }
-  100% {
+  to {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
+@keyframes tm-daybreak {
+  25% {
     opacity: 0.92;
   }
-}
-
-@keyframes tm-dusk {
-  30% {
+  60%,
+  to {
     opacity: 0;
-  }
-  100% {
-    opacity: 0.6;
   }
 }
 
-@keyframes tm-lights {
-  0%,
-  55% {
+@keyframes tm-dawn {
+  25% {
     opacity: 0;
   }
-  65%,
-  100% {
+  50% {
     opacity: 1;
   }
+  85%,
+  to {
+    opacity: 0;
+  }
 }
 
-@keyframes tm-star {
-  from {
-    opacity: 0;
-    transform: scale(0.4);
+@keyframes tm-land-light {
+  20% {
+    opacity: 0.6;
   }
+  70%,
   to {
+    opacity: 0;
+  }
+}
+
+@keyframes tm-star-out {
+  from {
     opacity: 1;
     transform: none;
   }
-}
-
-@keyframes tm-sails {
   to {
-    transform: rotate(90deg);
+    opacity: 0;
+    transform: scale(0.4);
   }
 }
 
@@ -1695,7 +1704,6 @@
   opacity: 0;
 }
 
-.tm-sun .tm-left-glow,
 .tm-to-grow .tm-left-glow {
   inset: -20%;
   border-radius: 50%;

@@ -35,11 +35,13 @@ screen), then the pictures that run until the time is up:
 - „Kerze“ 🕯️: three tall candles on the table burn down one after the other (`CANDLE.xs`, each a third of the time,
   `--tm-i`/`--tm-of`), each one going out with a puff as the next lights; at the end the bear child leans over and blows
   the last one out.
-- „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): for the time before bed – one round hill over the whole picture, a big sun
-  sinking behind it and reddening (gone at `SUN_SET_AT`), the evening's and the night's sky fade in, the land darkens,
-  and once the sun is down the moon rises from behind the hill (`MOON_FROM`); the stars come out one by one (`STARS`,
-  each at its share of the time), the windows of the little house light up. Every
-  second the windmill's sails turn a step. At the end the house's windows are lit and the moon stands high.
+- „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): one round hill, its meadow full of flowers drawn as coloured dots
+  (`FLOWERS`), and a big moon exactly in the picture's middle. First the moon goes down behind the hill (gone at
+  `MOON_SET_AT`) while the stars go out one by one (`STARS`, each at its share of the time), the night's sky and then the
+  morning's pink fade away and the land grows light; then the big sun rises at the very same place (from `SUN_FROM`),
+  red at first and yellow as it climbs, and stands high over the meadow at the end (user feedback, November 2026: the
+  windmill and the little house taken out, sun and moon much bigger and in the middle, the moon setting first). Every
+  second a soft glow widens past the edge of the moon or the sun (`.tm-ring`).
 - „Ameisenstraße“ 🐜 (H-68): a big cookie lies on a picnic blanket at the left, an anthill far off at the right; ants march from under the
   cookie to the hill, each with a crumb, the cookie shrinks and the hill grows. At the end the ants sit on the hill, the
   last crumbs lie on the blanket.
@@ -97,7 +99,9 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   picture and the calm `celebrate` – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
-  user feedback, November 2026). A new picture is one whole small story a child knows from life.
+  user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing
+  beside it: what runs down stands big where the eye goes first, and things only standing by (a windmill and a little
+  house beside the moon and the sun) come out (user feedback, November 2026).
 - **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
   „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
 

@@ -5,7 +5,7 @@ import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { FLOWER_CHILD, FLOWER_FLOOR, GROWN_AT, SPOUT, SPROUT, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
-import { MOON, MOON_FROM, ridgeAt, SKY_CUT, STARS, SUN, SUN_SET_AT, SUNSET_FLOOR } from "./sunset";
+import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
 import {
   appleCount,
   applePlaces,
@@ -25,7 +25,7 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { ANTS, bulbBelow, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, PLATE, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { ANTS, bulbBelow, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
 import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
@@ -242,24 +242,34 @@ describe("Timer", () => {
   // was cut off there, so the new pictures keep what matters within 1340.
   const RIGHT = 1340;
 
-  test("Sonnenuntergang: the sun and the moon move behind the ridge, the cut of their boxes always hidden below it (H-54)", () => {
-    for (const { cx, r } of [SUN, MOON]) for (let x = cx - r; x <= cx + r; x += 5) expect(ridgeAt(x)).toBeLessThan(SKY_CUT);
-    // A big sun, wholly gone at the end; the moon hidden behind the hill until the sun is (nearly) down, high at the end.
-    expect(SUN.r).toBeGreaterThanOrEqual(150);
-    expect(SUN.set).toBeGreaterThanOrEqual(SKY_CUT);
-    expect(SUN.top).toBeGreaterThanOrEqual(80);
-    expect(MOON.start).toBeGreaterThanOrEqual(SKY_CUT);
-    expect(MOON_FROM).toBeGreaterThanOrEqual(SUN_SET_AT - 0.1);
+  test("Sonnenuntergang: a big moon and sun in the very middle, the moon setting first, then the sun rising, behind the ridge (H-54)", () => {
+    // Both exactly in the middle and big (user feedback, November 2026), and the cut of their boxes always hidden below the ridge.
+    for (const { cx, r } of [SUN, MOON]) {
+      expect(cx).toBe(STAGE_W / 2);
+      expect(r).toBeGreaterThanOrEqual(220);
+      for (let x = cx - r; x <= cx + r; x += 5) expect(ridgeAt(x)).toBeLessThan(SKY_CUT);
+    }
+    // Moon high at the start and wholly gone once set; the sun hidden until then and high, whole above the hill, at the end.
     expect(MOON.top).toBeGreaterThanOrEqual(80);
-    // The stars come out in order through the second half, within the sky, never where the moon ends up.
+    expect(MOON.set).toBeGreaterThanOrEqual(SKY_CUT);
+    expect(SUN.start).toBeGreaterThanOrEqual(SKY_CUT);
+    expect(SUN_FROM).toBeGreaterThanOrEqual(MOON_SET_AT);
+    expect(SUN.top).toBeGreaterThanOrEqual(80);
+    expect(SUN.top + 2 * SUN.r).toBeLessThan(ridgeAt(SUN.cx));
+    // The stars go out in order through the moon's half, within the sky, never where the moon or the sun passes.
     expect(STARS.map((s) => s.at)).toEqual([...STARS.map((s) => s.at)].sort((a, b) => a - b));
     for (const s of STARS) {
-      expect(s.at).toBeGreaterThanOrEqual(SUN_SET_AT);
-      expect(s.at).toBeLessThan(1);
+      expect(s.at).toBeGreaterThanOrEqual(0);
+      expect(s.at).toBeLessThan(SUN_FROM);
       expect(s.y).toBeLessThan(ridgeAt(s.x) - 30);
-      expect(Math.hypot(s.x - MOON.cx, s.y - (MOON.top + MOON.r))).toBeGreaterThan(MOON.r + 30);
+      expect(Math.abs(s.x - SUN.cx)).toBeGreaterThan(SUN.r + 30);
     }
-    expect(SUNSET_FLOOR).toBeLessThanOrEqual(820);
+    // Flowers, dots on the meadow below the ridge, within the part of the stage every screen shows.
+    expect(FLOWERS.length).toBeGreaterThanOrEqual(40);
+    for (const f of FLOWERS) {
+      expect(f.y).toBeGreaterThan(ridgeAt(f.x) + f.r);
+      expect(f.y).toBeLessThanOrEqual(820);
+    }
   });
 
   test("Blume: the stalk grows tall from a sprout to the ribbon, then opens; the water comes from a tap (H-53)", () => {
