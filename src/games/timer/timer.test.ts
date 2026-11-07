@@ -28,8 +28,9 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { ANTS, bulbBelow, CANDLE, COOKIE, FLAME_H, GLASS, GROUND, HILL, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
-import { SWAP_FLOOR, SWAP_GLASS, SWAP_SEATS, TOY } from "./swap";
+import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
+import { DRAW_STEPS } from "./SwapPlay";
+import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
 describe("Timer", () => {
@@ -41,8 +42,10 @@ describe("Timer", () => {
       expect(p.emoji).not.toBe("");
       expect(p.name.de.trim()).not.toBe("");
     }
-    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, Wecker.
-    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "swap", "candle", "apple", "pizza", "clock"]);
+    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
+    // Abwechseln last, in a group of its own.
+    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
+    expect(PICTURES.at(-1)?.id).toBe("swap");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Abwechseln runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
@@ -149,10 +152,10 @@ describe("Timer", () => {
     for (const gone of [".tm-sand-dust", ".tm-grain"]) expect(css).not.toContain(gone);
     for (const gone of ["tm-sand-dust", "tm-grain"]) expect(scenes).not.toContain(gone);
     // No white streaks for the glass's shine either: they looked bad (user feedback, November 2026), on both hourglasses.
-    const swap = await Bun.file(new URL("./swap.tsx", import.meta.url)).text();
-    const frame = scenes.slice(scenes.indexOf("export const SandFrame"), scenes.indexOf("export function BulbSand"));
-    const swapGlass = swap.slice(swap.indexOf("export function SwapHourglass"), swap.indexOf("export const SWAP_TOYS"));
-    for (const glass of [frame, swapGlass]) expect(glass).not.toContain('stroke="#fff"');
+    // Abwechseln draws the same hourglass (checked below), so its frame is the one to look at.
+    const frame = scenes.slice(scenes.indexOf("const GlassFrame"), scenes.indexOf("export function BulbSand"));
+    expect(frame.length).toBeGreaterThan(0);
+    expect(frame).not.toContain('stroke="#fff"');
     // A clip-path round a moving layer dropped out of a turning page's picture and showed the sand as a square.
     const sandRules = [...css.matchAll(/([^{}]*\.tm-(?:sand|bulb)[^{}]*)\{([^}]*)\}/g)];
     expect(sandRules.length).toBeGreaterThan(0);
@@ -394,22 +397,6 @@ describe("Timer", () => {
     }
   });
 
-  test("the Ameisenstraße stays on every screen, its ants walk from under the cookie into the hill, one step a second (H-68)", async () => {
-    expect(COOKIE.cx - COOKIE.w / 2).toBeGreaterThanOrEqual(190);
-    expect(GROUND + 40).toBeLessThanOrEqual(820);
-    expect(GROUND - HILL.h).toBeGreaterThanOrEqual(80 + 140);
-    // The road starts under the cookie and ends at the hill's foot while it is still small, so ants come and go hidden.
-    const end = ANTS.from + ANTS.n * ANTS.step;
-    expect(ANTS.from).toBeLessThan(COOKIE.cx + COOKIE.w / 2 - ANTS.w);
-    expect(end).toBeGreaterThanOrEqual(HILL.cx - (HILL.w / 2) * HILL.start - ANTS.w / 2);
-    expect(ANTS.step).toBeGreaterThan(ANTS.w);
-    // One keyframe per step, and the march lasts as many seconds as there are ants, one started each second.
-    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    for (let k = 0; k <= ANTS.n; k++) expect(css).toContain(`translateX(calc(var(--tm-ant-step) * ${k}))`);
-    expect(css).not.toContain(`translateX(calc(var(--tm-ant-step) * ${ANTS.n + 1}))`);
-    expect(css).toContain(`animation: tm-march ${ANTS.n}s ease-in-out infinite`);
-  });
-
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
   // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
@@ -420,18 +407,35 @@ describe("Timer", () => {
     }
   });
 
-  test("Abwechseln keeps both cushions, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
-    expect(SWAP_SEATS.fox).toBeGreaterThanOrEqual(200);
-    expect(SWAP_SEATS.bear + SWAP_SEATS.w).toBeLessThanOrEqual(RIGHT);
-    const glassLeft = SWAP_GLASS.cx - SWAP_GLASS.w / 2;
-    const glassRight = SWAP_GLASS.cx + SWAP_GLASS.w / 2;
-    expect(TOY.fox + TOY.w).toBeLessThanOrEqual(glassLeft + 10);
-    expect(TOY.bear).toBeGreaterThanOrEqual(glassRight - 10);
-    // The toy lies right beside the cushion of the child whose turn it is: right of the fox child's, left of the bear child's.
-    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_SEATS.fox + SWAP_SEATS.w - 10);
-    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_SEATS.bear + 10);
-    expect(SWAP_GLASS.top).toBeGreaterThanOrEqual(80 + 140);
-    expect(SWAP_FLOOR + 10).toBeLessThanOrEqual(820);
+  test("Abwechseln keeps both cushions with their lamps and the toy on every screen, the same way either side of the hourglass (H-52)", () => {
+    const half = SWAP_SEATS.w / 2;
+    expect(SWAP_SEATS.fox - half).toBeGreaterThanOrEqual(200);
+    expect(SWAP_SEATS.bear + half).toBeLessThanOrEqual(RIGHT);
+    // Neither cushion nor the toy on it reaches under the hourglass.
+    expect(SWAP_SEATS.fox + Math.max(half, TOY.w / 2)).toBeLessThanOrEqual(HOURGLASS_BOX.x);
+    expect(SWAP_SEATS.bear - Math.max(half, TOY.w / 2)).toBeGreaterThanOrEqual(HOURGLASS_BOX.x + HOURGLASS_BOX.w);
+    // Fair: both places as far from the hourglass's middle.
+    expect(GLASS.cx - SWAP_SEATS.fox).toBe(SWAP_SEATS.bear - GLASS.cx);
+    // The lamps' shades and the toy waiting in front of the hourglass are seen on a phone on its side too.
+    expect(LAMP.rim - 30).toBeGreaterThanOrEqual(80);
+    expect(TOY.waiting).toBeLessThanOrEqual(820);
+    expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
+  });
+
+  // User request, November 2026: Abwechseln's hourglass is the Sanduhr's own, not a second one built beside it.
+  test("Abwechseln and Sanduhr draw the one shared hourglass", async () => {
+    const swap = await Bun.file("src/games/timer/swap.tsx").text();
+    expect(swap).toContain("<Hourglass");
+    expect(swap).not.toMatch(/function bulbPath|BulbSand/);
+    expect(SWAP_FLOOR).toBe(SAND_FLOOR);
+  });
+
+  // User feedback, November 2026: who begins must be plain from the start. The lamps draw it, slower and slower, and
+  // an even count of changes ends on the lamp lit first – the one drawn.
+  test("the lamps' draw of who begins slows down and ends on the lamp lit first", () => {
+    expect(DRAW_STEPS.length % 2).toBe(0);
+    for (let i = 1; i < DRAW_STEPS.length; i++) expect(DRAW_STEPS[i]).toBeGreaterThanOrEqual(DRAW_STEPS[i - 1]);
+    expect(DRAW_STEPS.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(4000);
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380

@@ -247,7 +247,8 @@ export const timerIdeas: IdeaArea = {
       text: "Auf dem Tisch liegt ein großer Keks, daneben ein Ameisenhügel. Jede Sekunde trägt eine Ameise einen Krümel hinüber: Die Straße der Ameisen zeigt die Richtung, der Keks wird kleiner, der Hügel größer. Ist der Keks weg, sitzen alle Ameisen oben auf dem Hügel, und das Fuchskind, das zugeschaut hat, lacht.",
       why: "Eine Reihe, die immer in dieselbe Richtung läuft, macht „von da nach da“ ohne Worte deutlich, und es bewegt sich ständig etwas, auch wenn der Keks nur langsam schrumpft.",
       effort: "S",
-      done: true,
+      rejected: true,
+      partial: "Gebaut und am 7. November 2026 wieder herausgenommen: Die Ameisenstraße ist kein Bild des Timers mehr.",
     },
     {
       id: "H-70",

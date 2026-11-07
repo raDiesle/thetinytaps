@@ -56,6 +56,11 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 /** Every game of the home menu once, in menu order, then the home page. */
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
+    href: "/timer/",
+    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und der Name des Bilds „Wecker“ (7. November 2026, nur Deutsch). Sagt sonst nichts.",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+  },
+  {
     href: "/zaehne/",
     parts: [
       {
@@ -134,11 +139,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 4. November 2026 (H-58, C-33): die vier Ritual-Karten mit ihren Worten für Eltern (rituals.ts), ihre Auswahl im Editor, „Gemacht“ und die Vorlage „Mein Tag mit Ritualen“, übersetzt am 5. November 2026. Die Sätze des Kindes sind so gefasst, dass sie für Jungen und Mädchen gleich lauten.",
       },
     ],
-  },
-  {
-    href: "/timer/",
-    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und der Name des Bilds „Wecker“ (7. November 2026, nur Deutsch). Sagt sonst nichts.",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
     href: "/schnullerfee/",

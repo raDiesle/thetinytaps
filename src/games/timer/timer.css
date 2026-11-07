@@ -1490,7 +1490,6 @@
 
 .tm-sand-light .tm-left-glow,
 .tm-wax .tm-left-glow,
-.tm-cookie .tm-left-glow,
 .tm-apple-sway .tm-left-glow,
 .tm-red .tm-left-glow,
 .tm-clock-lit .tm-left-glow,
@@ -1514,123 +1513,17 @@
   display: none;
 }
 
-/* Ameisenstraße (H-68): the cookie shrinks to nothing at its foot, the hill grows from three quarters to whole, and
-   the ants march along the road one step a second, one reaching the hill every second; at the end they sit on top. */
-.tm-cookie,
-.tm-hill {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 100%;
-}
-
-.tm-cookie svg,
-.tm-hill svg,
-.tm-ant-home > div,
-.tm-ant-home svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.tm-cookie {
-  animation: tm-crumble var(--tm-ms) linear forwards;
-}
-
-.tm-hill {
-  transform: scale(0.75);
-  animation: tm-grow var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-cookie {
-  animation: none;
-  transform: scale(0);
-}
-
-.tm-done .tm-hill {
-  animation: none;
-  transform: none;
-}
-
-@keyframes tm-crumble {
-  to {
-    transform: scale(0);
-  }
-}
-
-@keyframes tm-grow {
-  from {
-    transform: scale(0.75);
-  }
-  to {
-    transform: none;
-  }
-}
-
-/* Each ant walks the road in ANTS.n steps (scenes.tsx), one a second with a rest, coming out at the start and going
-   into the hill at the end; every ant starts a second after the one before. */
-.tm-ant {
-  opacity: 0;
-  animation: tm-march 9s ease-in-out infinite;
-}
-
-@keyframes tm-march {
-  0% {
-    opacity: 0;
-    transform: translateX(calc(var(--tm-ant-step) * 0));
-  }
-  11.111% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 1));
-  }
-  22.222% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 2));
-  }
-  33.333% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 3));
-  }
-  44.444% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 4));
-  }
-  55.556% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 5));
-  }
-  66.667% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 6));
-  }
-  77.778% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 7));
-  }
-  88.889% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 8));
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(calc(var(--tm-ant-step) * 9));
-  }
-}
-
-.tm-ant-home {
-  opacity: 0;
-  transition: opacity 0.8s ease-out 0.3s;
-}
-
-.tm-done .tm-ant-home {
-  opacity: 1;
-}
-
-/* Abwechseln (H-52): the hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over for the
-   next; the toy travels across the floor to the child whose turn it is. */
+/* Abwechseln (H-52): the Sanduhr's hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over
+   for the next; while the lamps draw who begins it stands full and still (`.tm-wait`). The lamp over the child whose
+   turn it is shines on its cushion, the other side lies in soft shade, and the toy hops over onto the lit cushion. */
 .tm-swap-glass .tm-sand,
 .tm-swap-glass .tm-sand-fill {
   animation-delay: var(--tm-delay);
+}
+
+.tm-wait .tm-sand,
+.tm-wait .tm-sand-fill {
+  animation-play-state: paused;
 }
 
 .tm-flip {
@@ -1643,12 +1536,44 @@
   }
 }
 
-.tm-toy {
-  transition: transform 1.4s ease-in-out;
+.tm-swap-light,
+.tm-swap-shade {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
 }
 
-.tm-toy-bear {
-  transform: translateX(var(--tm-toy-way));
+.tm-swap-light.tm-on,
+.tm-swap-shade.tm-on {
+  opacity: 1;
+}
+
+.tm-swap-shade-fox {
+  background: linear-gradient(to right, rgb(34 36 80 / 0.42) 75%, rgb(34 36 80 / 0.12));
+}
+
+.tm-swap-shade-bear {
+  background: linear-gradient(to left, rgb(34 36 80 / 0.42) 75%, rgb(34 36 80 / 0.12));
+}
+
+.tm-toy {
+  transition: transform 1.2s ease-in-out;
+}
+
+.tm-toy > div,
+.tm-toy svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-toy-hop {
+  animation: tm-toy-hop 1.2s ease-in-out;
+}
+
+@keyframes tm-toy-hop {
+  50% {
+    transform: translateY(-70%);
+  }
 }
 
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */

@@ -41,7 +41,7 @@ export function Layer({
 
 /**
  * What is still left lights up softly for a moment when the child taps (H-51, „Wie lange noch?“): put inside the part
- * that shrinks (the rail ahead, the top sand, the wax, the cookie), so the light is exactly as big as what is left.
+ * that shrinks (the rail ahead, the top sand, the wax, the slices), so the light is exactly as big as what is left.
  * `n` keys it, a new tap lights it again; 0 shows nothing.
  */
 export function LeftGlow({ n }: { n: number }) {
@@ -351,7 +351,7 @@ function bulbPath(top: number, bottom: number, upsideDown: boolean) {
   return BULB.map(([x, y], i) => `${i ? "L" : "M"}${left + x * GLASS.w} ${upsideDown ? bottom - y * (bottom - top) : top + y * (bottom - top)}`).join(" ");
 }
 
-/** A room with a rug; the glass's pale inside is drawn here, behind the sand. Drawn once. */
+/** A room with a rug and a picture on the wall, the Sanduhr's backdrop. Drawn once. */
 export const SandBackdrop = memo(function SandBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
@@ -364,32 +364,60 @@ export const SandBackdrop = memo(function SandBackdrop() {
         <rect x="260" y="200" width="220" height="170" rx="10" fill="#e7f5ff" stroke="#9c6334" strokeWidth="12" />
         <path d="M266 330 Q370 270 474 330 V364 H266 Z" fill="#8ce99a" />
         <circle cx="420" cy="250" r="26" fill="#ffd43b" />
-        <path d={`${bulbPath(GLASS.top, GLASS.neck, false)} Z`} fill="#f1f8ff" />
-        <path d={`${bulbPath(GLASS.neck, GLASS.bottom, true)} Z`} fill="#f1f8ff" />
       </Draw>
     </Layer>
   );
 });
 
-/** The glass's outline and the wooden frame, in front of the sand. Drawn once. */
-export const SandFrame = memo(function SandFrame() {
+/** The hourglass's box on the stage: the glass with the posts and the wooden plates round it. */
+export const HOURGLASS_BOX = {
+  x: GLASS.cx - GLASS.w / 2 - 60,
+  y: GLASS.top - 4 - PLATE,
+  w: GLASS.w + 120,
+  h: GLASS.bottom - GLASS.top + 8 + 2 * PLATE,
+} as const;
+
+/** A box in stage units as a place in percent of the hourglass's box. */
+function inHourglass(x: number, y: number, w: number, h: number): CSSProperties {
+  const B = HOURGLASS_BOX;
+  return {
+    position: "absolute",
+    left: `${((x - B.x) / B.w) * 100}%`,
+    top: `${((y - B.y) / B.h) * 100}%`,
+    width: `${(w / B.w) * 100}%`,
+    height: `${(h / B.h) * 100}%`,
+  };
+}
+
+/** The glass's pale inside, behind the sand. */
+const GlassInside = memo(function GlassInside() {
+  const B = HOURGLASS_BOX;
+  return (
+    <svg viewBox={`${B.x} ${B.y} ${B.w} ${B.h}`} style={inHourglass(B.x, B.y, B.w, B.h)}>
+      <path d={`${bulbPath(GLASS.top, GLASS.neck, false)} Z`} fill="#f1f8ff" />
+      <path d={`${bulbPath(GLASS.neck, GLASS.bottom, true)} Z`} fill="#f1f8ff" />
+    </svg>
+  );
+});
+
+/** The glass's outline and the wooden frame, in front of the sand: no white streaks for its shine (user feedback, November 2026). */
+const GlassFrame = memo(function GlassFrame() {
+  const B = HOURGLASS_BOX;
   const left = GLASS.cx - GLASS.w / 2 - 50;
   const right = GLASS.cx + GLASS.w / 2 + 50;
   const { top, neck, bottom } = GLASS;
   return (
-    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
-      <Draw w={STAGE_W} h={STAGE_H}>
-        <g fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round">
-          <path d={bulbPath(top, neck, false)} />
-          <path d={bulbPath(neck, bottom, true)} />
-        </g>
-        {[left + 10, right - 30].map((x) => (
-          <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
-        ))}
-        <rect x={left - 10} y={top - 4 - PLATE} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
-        <rect x={left - 10} y={bottom + 4} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
-      </Draw>
-    </Layer>
+    <svg viewBox={`${B.x} ${B.y} ${B.w} ${B.h}`} style={inHourglass(B.x, B.y, B.w, B.h)}>
+      <g fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round">
+        <path d={bulbPath(top, neck, false)} />
+        <path d={bulbPath(neck, bottom, true)} />
+      </g>
+      {[left + 10, right - 30].map((x) => (
+        <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
+      ))}
+      <rect x={left - 10} y={top - 4 - PLATE} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+      <rect x={left - 10} y={bottom + 4} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+    </svg>
   );
 });
 
@@ -425,23 +453,31 @@ export function BulbSand({ bottom = false, glow = 0 }: { bottom?: boolean; glow?
   );
 }
 
-/** The sand: the top heap sinking, the thin stream through the neck and the bottom heap growing, each its own layer. */
-export function Sand({ running, glow }: { running: boolean; glow: number }) {
+/**
+ * The one hourglass of the timer, shared by „Sanduhr“ and „Abwechseln“ (user request, November 2026: one drawing, not
+ * two built side by side): the pale glass, the top heap sinking, the thin stream through the neck while `running`, the
+ * bottom heap growing, and the frame in front – one layer, so Abwechseln can turn it over as a whole. The sand runs over
+ * `--tm-ms` (set on the stage, or in `style`); `glow` lights the sand left (H-51).
+ */
+export function Hourglass({ running, glow = 0, className, style }: { running: boolean; glow?: number; className?: string; style?: CSSProperties }) {
   const left = GLASS.cx - GLASS.w / 2;
+  const B = HOURGLASS_BOX;
   return (
-    <>
-      <Layer x={left} y={GLASS.top} w={GLASS.w} h={GLASS.neck - GLASS.top} className="tm-bulb">
+    <Layer x={B.x} y={B.y} w={B.w} h={B.h} className={`tm-hourglass${className ? ` ${className}` : ""}`} style={style}>
+      <GlassInside />
+      <div style={inHourglass(left, GLASS.top, GLASS.w, GLASS.neck - GLASS.top)}>
         <BulbSand glow={glow} />
-      </Layer>
+      </div>
       {running && (
-        <Layer x={GLASS.cx - 6} y={GLASS.neck - 4} w={12} h={GLASS.bottom - GLASS.neck} className="tm-stream">
+        <div className="tm-stream" style={inHourglass(GLASS.cx - 6, GLASS.neck - 4, 12, GLASS.bottom - GLASS.neck)}>
           <div className="tm-stream-grains tm-move" />
-        </Layer>
+        </div>
       )}
-      <Layer x={left} y={GLASS.neck} w={GLASS.w} h={GLASS.bottom - GLASS.neck} className="tm-bulb">
+      <div style={inHourglass(left, GLASS.neck, GLASS.w, GLASS.bottom - GLASS.neck)}>
         <BulbSand bottom />
-      </Layer>
-    </>
+      </div>
+      <GlassFrame />
+    </Layer>
   );
 }
 
@@ -590,194 +626,6 @@ export function Candles({ out, flare, glow, startedAt, total }: { out: boolean; 
     <>
       {CANDLE.xs.map((_, i) => (
         <Candle key={i} i={i} out={out} flare={i === now ? flare : 0} glow={i >= now ? glow : 0} />
-      ))}
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------------------------------------------
-// Ameisenstraße (H-68): a big cookie lies on a picnic blanket, an anthill beside it. Every second an ant carries a
-// crumb over, the cookie gets smaller and the hill bigger; at the end the ants sit on the hill.
-
-/** The grass the cookie, the ants and the hill stand on. */
-export const GROUND = 720;
-
-/** The cookie on the blanket: its middle and size; it shrinks to nothing towards its bottom middle. */
-export const COOKIE = { cx: 420, w: 440, h: 232 } as const;
-
-/** The anthill: its middle and full size; it grows from `start` of it at its foot to its whole size. */
-export const HILL = { cx: 1160, w: 300, h: 240, start: 0.75 } as const;
-
-/**
- * The ants' road from under the cookie to the hill's foot: `n` ants walk it at once, `step` apart, each one step a
- * second, so one ant reaches the hill every second (H-63). The CSS's `tm-march` has one keyframe per step. A long way
- * and a big cookie (user feedback, November 2026), so the ants are seen carrying it off.
- */
-export const ANTS = { from: 470, n: 9, step: 66, w: 63, h: 42 } as const;
-
-/** The meadow with the picnic blanket and the crumbs that will be left; drawn once. */
-export const AntsBackdrop = memo(function AntsBackdrop() {
-  return (
-    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
-        <defs>
-          <linearGradient id="tm-ant-sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#a5dcff" />
-            <stop offset="1" stopColor="#f1fbff" />
-          </linearGradient>
-        </defs>
-        <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-ant-sky)" />
-        <circle cx="1290" cy="170" r="64" fill="#ffe066" />
-        {[
-          [420, 160],
-          [820, 120],
-        ].map(([cx, cy]) => (
-          <g key={cx} fill="#fff">
-            <ellipse cx={cx} cy={cy} rx="70" ry="30" />
-            <ellipse cx={cx + 46} cy={cy - 18} rx="46" ry="30" />
-            <ellipse cx={cx - 40} cy={cy - 8} rx="36" ry="24" />
-          </g>
-        ))}
-        {/* A tree far back and the meadow. */}
-        <rect x="790" y="360" width="26" height="150" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
-        <circle cx="803" cy="330" r="80" fill="#40a35a" stroke={INK} strokeWidth="4" />
-        <path d="M0 520 Q300 450 640 500 T1200 490 T1600 480 V900 H0 Z" fill="#9bd57a" />
-        <path d={`M0 ${GROUND - 70} Q420 ${GROUND - 110} 820 ${GROUND - 80} T1600 ${GROUND - 90} V900 H0 Z`} fill="#7cc35a" />
-        {/* The picnic blanket under the cookie, red with white stripes. */}
-        <ellipse cx={COOKIE.cx} cy={GROUND + 6} rx="290" ry="52" fill="#e03131" stroke={INK} strokeWidth="5" />
-        <path
-          d={`M${COOKIE.cx - 170} ${GROUND - 34} L${COOKIE.cx - 110} ${GROUND + 50} M${COOKIE.cx - 40} ${GROUND - 44} L${COOKIE.cx + 20} ${GROUND + 56} M${COOKIE.cx + 90} ${GROUND - 42} L${COOKIE.cx + 150} ${GROUND + 50}`}
-          stroke="#fff"
-          strokeWidth="14"
-          opacity="0.85"
-        />
-        {/* The last crumbs, hidden under the cookie until it is gone. */}
-        {[
-          [-30, 4],
-          [8, 12],
-          [36, 0],
-        ].map(([dx, dy]) => (
-          <circle key={dx} cx={COOKIE.cx + dx} cy={GROUND + dy} r="7" fill="#d9a05b" stroke={INK} strokeWidth="2.5" />
-        ))}
-        {/* The ants' path: a trodden line in the grass from the blanket to the hill. */}
-        <path d={`M${ANTS.from + 60} ${GROUND + 2} H${HILL.cx - 80}`} stroke="#a58a5f" strokeWidth="14" strokeLinecap="round" opacity="0.5" />
-        <rect y={GROUND + 40} width={STAGE_W} height={STAGE_H} fill="#69b34c" />
-      </Draw>
-    </Layer>
-  );
-});
-
-/** The cookie, seen a little from above: a thick round biscuit with chocolate chips. It shrinks with the timer. */
-export function Cookie({ glow }: { glow: number }) {
-  const { cx, w, h } = COOKIE;
-  return (
-    <Layer x={cx - w / 2} y={GROUND - h + 10} w={w} h={h}>
-      <div className="tm-cookie tm-move">
-        {/* Drawn in 280 × 150 units, stretched to its box. */}
-        <svg viewBox="0 0 280 150" preserveAspectRatio="none">
-          <path d={`M6 70 V96 A134 50 0 0 0 274 96 V70 Z`} fill="#b7742f" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
-          <ellipse cx="140" cy="70" rx="134" ry="52" fill="#e0a458" stroke={INK} strokeWidth="5" />
-          {[
-            [70, 60],
-            [130, 44],
-            [196, 62],
-            [110, 88],
-            [170, 92],
-            [226, 80],
-            [56, 84],
-          ].map(([x, y]) => (
-            <ellipse key={x} cx={x} cy={y} rx="11" ry="7" fill="#5c3a1e" />
-          ))}
-        </svg>
-        <LeftGlow n={glow} />
-      </div>
-    </Layer>
-  );
-}
-
-/** One ant facing right with a crumb on its back, in 48 × 32 units. */
-function Ant({ crumb = true }: { crumb?: boolean }) {
-  return (
-    <svg viewBox="0 0 48 32">
-      <g stroke={INK} strokeWidth="2" strokeLinecap="round" fill="none">
-        <path d="M16 20 L10 31 M22 21 L22 31 M28 20 L34 31" />
-        <path d="M40 10 Q44 2 47 3 M38 10 Q38 1 42 0" />
-      </g>
-      <ellipse cx="10" cy="19" rx="10" ry="8" fill="#3b2a20" />
-      <ellipse cx="24" cy="19" rx="7" ry="5.5" fill="#3b2a20" />
-      <circle cx="37" cy="15" r="6.5" fill="#3b2a20" />
-      <circle cx="39" cy="13.5" r="1.8" fill="#fff" />
-      {crumb && <rect x="15" y="1" width="16" height="12" rx="4" fill="#e0a458" stroke={INK} strokeWidth="2" transform="rotate(-8 23 7)" />}
-    </svg>
-  );
-}
-
-/**
- * The ants' road: `ANTS.n` ants, each a small layer of its own walking the whole road in `ANTS.n` steps of a second,
- * started a second apart, so they march in a row and one arrives at the hill every second. They come out from under
- * the cookie and go into the hill, fading in and out there.
- */
-export function AntRoad() {
-  return (
-    <>
-      {Array.from({ length: ANTS.n }, (_, i) => (
-        <Layer
-          key={i}
-          x={ANTS.from}
-          y={GROUND - ANTS.h + 4}
-          w={ANTS.w}
-          h={ANTS.h}
-          className="tm-ant tm-beat"
-          style={{ "--tm-ant-step": `${(ANTS.step / ANTS.w) * 100}%`, animationDelay: `${-i}s` } as CSSProperties}
-        >
-          <Ant />
-        </Layer>
-      ))}
-    </>
-  );
-}
-
-/** The anthill, growing from its foot as the crumbs come in. */
-export function AntHill() {
-  const { cx, w, h } = HILL;
-  return (
-    <Layer x={cx - w / 2} y={GROUND - h + 12} w={w} h={h}>
-      <div className="tm-hill tm-move">
-        <svg viewBox={`0 0 ${w} ${h}`}>
-          <path
-            d={`M4 ${h - 6} C40 ${h - 60} 100 30 ${w / 2} 22 C${w - 100} 30 ${w - 40} ${h - 60} ${w - 4} ${h - 6} Z`}
-            fill="#b07a45"
-            stroke={INK}
-            strokeWidth="5"
-          />
-          {[
-            [90, 150],
-            [150, 90],
-            [200, 140],
-            [240, 180],
-            [120, 196],
-            [180, 60],
-          ].map(([x, y]) => (
-            <circle key={x} cx={x} cy={y} r="5" fill="#8a5a2b" />
-          ))}
-          <ellipse cx="60" cy={h - 16} rx="20" ry="12" fill="#3b2a20" />
-        </svg>
-      </div>
-    </Layer>
-  );
-}
-
-/** The ants all home at the end, sitting on top of the hill; shown only once the cookie is gone (`.tm-done`). */
-export function AntsHome() {
-  const top = GROUND - HILL.h + 12 + 22;
-  return (
-    <>
-      {[-96, -50, 0, 50, 96].map((dx, i) => (
-        <Layer key={dx} x={HILL.cx + dx - ANTS.w / 2} y={top - ANTS.h + 4 + Math.abs(dx) * 0.42} w={ANTS.w} h={ANTS.h} className="tm-ant-home">
-          <div style={{ transform: i % 2 ? "scaleX(-1)" : undefined }}>
-            <Ant crumb={false} />
-          </div>
-        </Layer>
       ))}
     </>
   );
