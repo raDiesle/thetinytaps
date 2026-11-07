@@ -125,6 +125,7 @@ export function planQueue(queue: QueuedPicture[], force: string[] | "all" = []):
   for (const picture of queue) {
     const ref = picture.ref?.find((r) => queued.has(r) && r !== picture.file);
     if (ref) plan.blocked.push({ picture, ref });
+    else if (picture.panels) plan.now.push({ grid: picture.panels.length > 2 ? "2x2" : "1x2", pictures: [picture], variants: 0 });
     else if (!gridsFor(picture).length) plan.now.push({ pictures: [picture], variants: 0 });
     else groups.set(sheetKey(picture), [...(groups.get(sheetKey(picture)) ?? []), picture]);
   }
@@ -173,6 +174,14 @@ export function jobOf(sheet: Sheet): ImageJob {
   const { aspect, size, quality, transparent, key, ref } = first;
   const shared = Object.fromEntries(Object.entries({ aspect, size, quality, transparent, key, ref }).filter(([, v]) => v !== undefined));
   if (!sheet.grid) return { ...shared, out: [first.file], prompt: `${styleOf(first)} ${first.prompt}` };
+  if (first.panels)
+    return {
+      ...shared,
+      grid: sheet.grid,
+      out: first.panels.map((p) => p.file),
+      prompt: `${styleOf(first)} ${first.prompt}`,
+      panels: first.panels.map((p) => p.prompt),
+    };
   const spare = Array.from({ length: sheet.variants }, (_, i) => sheet.pictures[i % sheet.pictures.length]);
   return {
     ...shared,

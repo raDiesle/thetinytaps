@@ -34,6 +34,20 @@ Pictures are always made as cheap as they can be (user decision, November 2026).
 it brings one picture or a sheet of two or four small ones (`--grid`), so small pictures of one kind wait until their
 sheet is full, and later sessions bring the partners.
 
+**Never one picture per request where a sheet can hold it** (user feedback, November 2026, „das darf nicht nochmal
+passieren“: 14 scenes of „Was gehört zusammen?“ went out as two requests each, every frame alone, and their cut-out
+partners each alone with a reference – about twice what sheets would have cost). Before writing a queue entry or a
+`--jobs` file, go through these, cheapest first, and take the first that works:
+- small things, cut-outs and cards share 2x2 sheets: no `ref` and no `alone`, the prompt says what to draw by itself
+  (a partner's look comes from its own words, not „from this picture“);
+- pictures that belong together (the two moments of one scene, a story's steps) go in one request as `panels`
+  (`QueuedPicture.panels`, `--grid 1x2` / `2x2`), cut apart after;
+- only what a check proved can't share – a second frame that must keep a first already made, a redrawn picture –
+  is `alone` or drawn from a `ref`, and its `alone` names that reason (`pictureQueue.test.ts` takes only the reasons in
+  `ALONE_REASONS`).
+Then everything that is cheap goes out in **one** batch (`queue --make`), never pair by pair, and the plan's line
+„cheap now – N requests“ is read before sending: more requests than pictures ÷ 2 means something above was missed.
+
 1. **Every picture asked for goes into `src/content/pictureQueue.ts` first** (id, file, German `use`, the prompt
    *without* the style block, aspect, size, `transparent`, `ref`, date; `alone` with the reason for a second frame or a
    story picture that must keep its room – those never share a sheet). A game may keep its prompts in its own folder
@@ -121,8 +135,8 @@ the panels separated by magenta gaps and cuts it apart; one request, so each pic
 costs a half or a quarter. `--aspect` is the aspect of each panel; the files are
 comma-separated, one `--panel "<what differs>"` each, the prompt holds what is shared.
 
-- **Not for the two frames of a moving picture.** Drawn as one grid, Gemini draws the
-  scene twice: the camera zooms, characters stand elsewhere, balloons or a table vanish,
+- **Not for the two frames of a Lebendige-Bilder picture**, where only a small movement may change. Drawn as one
+  grid, Gemini draws the scene twice: the camera zooms, characters stand elsewhere, balloons or a table vanish,
   and the cross-fade looks restless. Make the first frame alone, then the second with
   the first as the only `--ref` and a prompt that names just the small movement
   ("Redraw this exact picture … Nothing appears, disappears or moves except …").

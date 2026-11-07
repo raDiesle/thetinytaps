@@ -323,16 +323,10 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Übersetzt am 5. November 2026: die neun ersten Paare (Zahnbürste bis Friseurin) mit Namen und Sätzen (content.<Sprache>.ts), die Fragen unter dem Bild und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs auf Deutsch (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
       },
       {
-        label: "🏠 Die vielen neuen Szenen (scenes/)",
+        label: "🎨 Die gemalten Paare und Helfer (painted/)",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu am 7. November 2026, am selben Tag übersetzt (content.scenes.<Sprache>.ts): die Paare und Helfer der Themen (Bad, Küche, Berufe, Bauen, Fahrzeuge, Musik, Sport …) mit Namen und Sätzen. Die Sätze sind in keiner Sprache aufgenommen und bleiben bis dahin stumm (🎙️ Stimmen).",
-      },
-      {
-        label: "🔄 Umgebaute Paare nach der Durchsicht",
-        recorded: true,
-        languages: { de: "text" },
-        note: "Am 7. November 2026 umgedreht oder mit neuem Gegenstück (GERMAN_ONLY in content.test.ts): Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin – Zahnarztspiegel, Weihnachtsmann – Rentier, Pizzabäcker – Pizzaschieber, Konditorin – Spritzbeutel. Ihre alten Übersetzungen wurden gestrichen; bis zur neuen Übersetzung sagen sie alles auf Deutsch.",
+        languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Am 7. November 2026 wurden die Emoji-Szenen durch gemalte Paare ersetzt (182, je zwei Bilder von Gemini; sie spielen, sobald ihre Bilder da sind). 109 davon behielten Namen und Gegenstück und damit ihre Übersetzung (content.scenes.<Sprache>.ts). Neu und nur auf Deutsch sind die übrigen 73 – darunter Tor – Ball, Haltestelle – Bus, Toaster – Toast, Straßenkehrer, Schäfer, Prinzessin, Sandmann – sowie die mit neuem Gegenstück: Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin, Weihnachtsmann, Pizzabäcker, Konditorin, Paketbotin, Krankenpfleger, Polizist, Koch, Eisverkäuferin, Kassierer, Kellnerin, Gärtner. Bis zur Übersetzung sagen sie alles auf Deutsch. Aufgenommen ist keiner der Sätze (🎙️ Stimmen).",
       },
       {
         label: "🗂️ Die Namen der Themen",

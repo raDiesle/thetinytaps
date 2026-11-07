@@ -33,7 +33,7 @@ export function dayPage(day: number, scene: number, ref: string, use: string, ca
     size: "1200x900",
     quality: 65,
     ref: [`${DIR}/${ref}.webp`],
-    alone: "A page of a day's story, drawn from its scene's first picture so the place stays the same",
+    alone: "story picture",
     date: "2026-11-04",
   };
 }

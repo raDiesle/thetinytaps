@@ -31,9 +31,14 @@ first, helpers of one place (the builder's bricks, the crane driver's crane) are
   scene with the partner at work, fading in over the first as the partner lands (`PairPicture`'s `live`, `.tg-framed`
   in `together.css`). A pair is written as plain data with its prompts (`before`, `after`, in English) and plays only
   once its pictures are made (`fromPainted`, `framesOf` in `frames.ts`); `picturePrompts.ts` puts the rest into the
-  picture queue (`bun run image queue --make`: the first frames with the fox and bear families as reference, then the
-  second frames drawn from the first, then the painted partners cut out of the second). Check each pair before and
-  after side by side, mark it `made`, and redraw what isn't clear (delete the file, sharpen its prompt).
+  picture queue, as cheap as it gets (user feedback, November 2026: the first 14 pairs went out one picture per
+  request and cost twice what they had to): a pair's two frames are **one** request, drawn one under the other with
+  the fox and bear families as reference and cut apart (`framesJob`, `panels`), and the painted partners share 2x2
+  sheets, drawn from their own words with no reference; all of it goes out in one batch (`bun run image queue
+  --make`), never pair by pair. `content.test.ts` fails on a picture drawn alone or a partner with a reference. Check
+  each pair before and after side by side (`bun run frames` too), mark it `made`, and redraw what isn't clear: a pair
+  whose two frames drift apart is redrawn as one request again, and only if that fails twice its second frame alone
+  from the first (`alone: "second frame"`, `/bild-erzeugen`).
 - **Scenes** (`scenes/<topic>.ts`, about 220, the older emoji scenes, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
   as a big emoji (or, for a helper, the fox or bear in its outfit, `Helper.tsx`, with what it works on), a few small
   emoji round it for context (`props`), the partner, and one of a few shared motions (`Act`: onto, into, beside, rub,
@@ -75,8 +80,8 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 - **Only partners that look one way**: a thing a child knows by one look (a carrot, a key, a life ring), never one that
   looks very different from home to home (a charging cable was removed).
 - **The partner on its plate looks like the partner in the second picture**: its emoji only where Apple's emoji
-  matches it (🍊, 🦌, 🥕), else a `part`, painted from the second frame (Apple's 🕯️ stands on a metal dish – birthday
-  candles don't).
+  matches it (🍊, 🦌, 🥕), else a `part` whose words describe it as the second frame shows it (Apple's 🕯️ stands on a
+  metal dish – birthday candles don't); check the plate against the frame and redraw the part where they differ.
 - One plain scene, the main thing big in the middle, a few things that tell the place, and only the characters named,
   each once (`CAST` in `picturePrompts.ts` says so to Gemini). Fox and bear take turns; a helper is a fox or bear
   grown-up in its role, children are fox or bear children, and everyone wears clothes. Things and children stay as the
@@ -93,8 +98,7 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   the obvious answer for its own one; where it also fits another pair of its kind, in any topic (no second thing a key
   opens, no other helper who uses scissors), the two name each other in `alsoFits` and are never dealt together. Ask
   it both ways: does this partner fit another thing, and does another partner fit this thing (a cushion on the chair,
-  a pine cone on the Christmas tree)? A partner that fits a whole group names every pair of it (the washing machine
-  everything worn, `CLOTHES` in `scenes/bad.ts`).
+  a pine cone on the Christmas tree)? A partner that fits a whole group names every pair of it (a coin every slot a coin goes into).
   Within a kind every emoji – partner or thing – is used once, and no context emoji is a partner (`content.test.ts`).
   No animals as things (Was gehört zum Tier? pairs animals with food and homes).
 - What stands above shows its context (user feedback, November 2026): the door in a house front, the hairdresser

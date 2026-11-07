@@ -11,6 +11,8 @@ import { TOPICS } from "./topics";
 import { KIND_SIGNS } from "./RoundTopic";
 import { framesOf, partImage } from "./frames";
 import { PAINTED } from "./painted";
+import { TOGETHER_PICTURE_QUEUE } from "./picturePrompts";
+import { planQueue } from "@/content/pictureQueuePlan";
 
 /** Every pair written down, also the painted ones whose pictures aren't made yet: its id, kind and partner's name. */
 const ALL = [
@@ -213,6 +215,20 @@ test("every layer's class is styled in together.css", () => {
 // The painted pairs (user decision, November 2026): a pair marked made has all its pictures (both frames, and its
 // painted partner where it has one) and one with all of them is marked made, so it left the picture queue; no picture
 // lies there without its pair; and the partner on its plate is an emoji or painted, exactly one of them.
+// The pictures cost as little as they can (user feedback, November 2026: frames and partners sent one per request cost
+// twice as much): a pair's two frames are one request, cut apart, and the painted partners share sheets of four.
+test("the painted pairs' pictures go out on shared sheets, never one per request", () => {
+  for (const p of TOGETHER_PICTURE_QUEUE) {
+    expect(p.alone, `${p.id} is drawn alone`).toBeUndefined();
+    if (p.transparent) expect(p.ref ?? [], `${p.id}: a partner is drawn from its words, so it can share a sheet`).toEqual([]);
+    else expect(p.panels?.length, `${p.id}: both frames in one request`).toBe(2);
+  }
+  const plan = planQueue(TOGETHER_PICTURE_QUEUE);
+  const sheets = [...plan.now, ...plan.waiting];
+  const parts = TOGETHER_PICTURE_QUEUE.filter((p) => p.transparent).length;
+  expect(sheets.length).toBeLessThanOrEqual(TOGETHER_PICTURE_QUEUE.length - parts + Math.ceil(parts / 4) + 1);
+});
+
 test("every painted pair has its pictures once made, and every picture its pair", () => {
   const byId = new Map(PAINTED.map((p) => [p.id, p]));
   for (const p of PAINTED) {

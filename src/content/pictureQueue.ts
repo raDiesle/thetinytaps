@@ -9,6 +9,21 @@ import { TOGETHER_PICTURE_QUEUE } from "@/games/together/picturePrompts";
 // its sheet – unless the grown-up says to make it now. The management page shows what waits and what for.
 // A made picture leaves the queue in the same commit (pictureQueue.test.ts fails while its file exists).
 
+/**
+ * The only reasons a picture may take a request of its own where a sheet could hold it (user feedback, November 2026:
+ * frames and cut-outs sent one by one cost twice what sheets would have). Small things share 2x2 sheets, the moments of
+ * one scene go in one request as `panels`; a new reason comes here only once a check proved a sheet fails for it.
+ */
+export const ALONE_REASONS = {
+  /** A second frame drawn from a first that is already made, so the two stay one scene (Lebendige Bilder). */
+  "second frame": "drawn from its first frame, which is already made",
+  /** A page of a story drawn from its scene's first picture, keeping the place (Gefühle's days). */
+  "story picture": "drawn from its scene's first picture, so the place stays the same",
+} as const;
+
+/** One of `ALONE_REASONS`. */
+export type AloneReason = keyof typeof ALONE_REASONS;
+
 /** One picture someone asked for, waiting to be made with `bun run image`. */
 export interface QueuedPicture {
   /** Unique in the queue; usually the file's name without folder and extension. */
@@ -33,8 +48,14 @@ export interface QueuedPicture {
   quality?: number;
   /** Pictures passed as `--ref`, relative to the repository; one still in the queue holds this one back until it is made. */
   ref?: string[];
-  /** Why it must be drawn alone (a second frame, a story picture keeping its room), so it never shares a sheet. */
-  alone?: string;
+  /**
+   * Pictures of one scene drawn together in one request, one under the other, and cut apart – the frames of a scene,
+   * so they match and cost one request: each panel's file and words. `file` is the first panel's, `prompt` what all
+   * panels share, and `aspect` and `size` are each panel's.
+   */
+  panels?: { file: string; prompt: string }[];
+  /** Why it must be drawn alone, so it never shares a sheet – only a reason from `ALONE_REASONS`. */
+  alone?: AloneReason;
   /** When it was asked for, YYYY-MM-DD. */
   date: string;
 }
