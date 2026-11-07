@@ -24,12 +24,14 @@ until the time is up:
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
   halts there briefly and it chimes (H-45), with keyframes made for the run (`TrainStepKeyframes`, `--tm-roll`).
 - „Apfelbaum“ 🍎 (`apples.tsx`, H-45): an apple tree's year (`appleTimes`, `APPLE_YEAR`; user feedback, November
-  2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), blossoms open all
-  over it (`bloomRank`, until 30 %) while three bees buzz round it from then on (`BEES`, each a small layer, its wings a
-  smaller one), each blossom drops as a small green apple swells and reddens at its place (until 45 %), then the bear
-  child pushes its little cart from the right under one apple after the other (`CartKeyframes`, written for the run,
-  the wheels turning with it); the apple sways a second at a time while the cart comes, falls straight down into it with
-  a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
+  2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), then its blossoms
+  open one after the other here and there over the crown (`bloomRank`, each in its own slot, until 30 %) while three
+  tiny bees buzz round it from then on (`BEES`, `BEE` smaller than a blossom, each a small layer, its wings a smaller
+  one), then each blossom in turn withers as a small green apple swells out of it and reddens (one at a time, until
+  45 %), then the bear child pushes its little cart back and forth, each time to the free apple farthest away
+  (`harvestOrder`, `CartKeyframes` written for the run, the wheels turning with it); the next apple sways a second at a
+  time while it waits its turn, and the cart rolls under it just as it lets go, so it falls straight down into the cart
+  with a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
   apples, also for a short time (`appleCount`, `MIN_APPLES` to `MAX_APPLES`, as many as the heap holds); the last lands
   as the time is up. A tap rustles the leaves, once the blossoms are out the bees buzz.
 - „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
@@ -123,10 +125,16 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   before its flame goes out (`CANDLE.stub` a thin rim, the going out after its turn, never before), and what follows
   an ending (the smoke) lingers slow and soft for seconds, never a puff gone at once. `timer.test.ts` checks the candle.
 - **What happens, happens as in life** (user feedback on the Apfelbaum, November 2026): things fall straight down,
-  never across to where they are wanted – what catches them comes under them first (the cart under the apple). What is
+  never across to where they are wanted – what catches them comes under them first (the cart under the apple), arriving
+  as the thing lets go, never standing under it for seconds before; it goes back and forth between pieces rather than
+  creeping along one way (`harvestOrder`). What is
   collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
   basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
   story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
+  Within a stage the pieces come one at a time, each finished before the next begins (every blossom opens on its own,
+  then every blossom becomes its apple on its own), never several half done at once, and a stage starts only once the
+  one before is over (`appleTimes`, `timer.test.ts` checks). Small helpers that only liven the picture (the bees) are
+  tiny beside what runs down, as in life – big bees took the eye from the blossoms (user feedback, November 2026).
 - **Abwechseln stands first, apart**: it runs without end, so its card comes first (its tooltip says so, `SWAP_NOTE`),
   and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
 - **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from

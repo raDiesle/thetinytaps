@@ -253,17 +253,22 @@ describe("Timer", () => {
       expect(places).toHaveLength(count);
       for (const p of places) expect((p.x / (CROWN.rx - r)) ** 2 + (p.y / (CROWN.ry - r)) ** 2).toBeLessThanOrEqual(1);
       for (const a of places) for (const b of places) if (a !== b) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThanOrEqual(2 * r);
-      // Harvested from the right, where the cart waits; an apple falls only once none hangs below it in its way.
-      const order = harvestOrder(places, r);
+      // The cart goes back and forth from where it waits at the right (user feedback, November 2026): first over to the
+      // left, then turning again and again; an apple falls only once none hangs below it in its way.
+      const start = CART_MIDDLE - CROWN.cx;
+      const order = harvestOrder(places, r, start);
       expect(order).toHaveLength(count);
-      expect(order[0].x).toBeGreaterThanOrEqual(order.at(-1)?.x ?? 0);
+      if (count > 1) expect(order[0].x).toBeLessThan(start);
+      const steps = [start, ...order.map((p) => p.x)].map((x, i, xs) => (i === 0 ? 0 : Math.sign(x - xs[i - 1]))).slice(1);
+      const turns = steps.filter((d, i) => i > 0 && d !== 0 && d === -steps[i - 1]).length;
+      if (count >= 5) expect(turns).toBeGreaterThanOrEqual(Math.floor(count / 2));
       order.forEach((p, k) => {
         for (const q of order.slice(k + 1)) expect(q.y > p.y && Math.abs(q.x - p.x) < 2 * r).toBe(false);
       });
     }
   });
 
-  test("Apfelbaum: the tree grows, blossoms, the apples ripen, then the cart comes under each before it falls; the last lands at the end", () => {
+  test("Apfelbaum: the tree grows, the blossoms open one by one, each becomes an apple in turn, the cart comes under each as it falls; the last lands at the end", () => {
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
       const count = appleCount(total);
       const t = appleTimes(total, count);
@@ -274,11 +279,23 @@ describe("Timer", () => {
         // Every apple is red before the first one is harvested.
         expect(t.ripen[i] + t.ripenMs).toBeLessThanOrEqual(t.harvest[0].leave + 1e-6);
       }
-      let before = t.harvest[0].leave;
+      // One at a time (user feedback, November 2026): a blossom is open before the next opens, an apple grown before
+      // the next comes out of its blossom, and the apples only after the last blossom.
+      const blooms = [...t.bloom].sort((a, b) => a - b);
+      const ripens = [...t.ripen].sort((a, b) => a - b);
+      for (let i = 1; i < count; i++) {
+        expect(blooms[i] - blooms[i - 1]).toBeGreaterThanOrEqual(t.openMs - 1e-6);
+        expect(ripens[i] - ripens[i - 1]).toBeGreaterThanOrEqual(t.ripenMs - 1e-6);
+      }
+      expect(ripens[0]).toBeGreaterThanOrEqual(blooms.at(-1)! + t.openMs - 1e-6);
+      let before = t.harvest[0].sway;
       for (const h of t.harvest) {
-        expect(h.leave).toBeGreaterThanOrEqual(before - 1e-6);
+        expect(h.sway).toBeGreaterThanOrEqual(before - 1e-6);
+        expect(h.leave).toBeGreaterThanOrEqual(h.sway - 1e-6);
         expect(h.under).toBeGreaterThan(h.leave);
+        // The cart is under the apple as it lets go, not waiting there for seconds before.
         expect(h.fall).toBeGreaterThanOrEqual(h.under);
+        expect(h.fall - h.under).toBeLessThanOrEqual(200);
         expect(h.land).toBeGreaterThan(h.fall);
         before = h.land;
       }
@@ -288,7 +305,7 @@ describe("Timer", () => {
     }
   });
 
-  test("Apfelbaum: each apple lies on its own in the cart, and the cart and the bees stay on the screen", () => {
+  test("Apfelbaum: each apple lies on its own in the cart, and the cart and the bees stay on the screen", async () => {
     expect(HEAP_ROWS.reduce((a, b) => a + b, 0)).toBe(MAX_APPLES);
     const half = (CART.box.right - CART.box.left) / 2;
     for (let n = 0; n < MAX_APPLES; n++) {
@@ -308,14 +325,18 @@ describe("Timer", () => {
     for (const count of [MIN_APPLES, 12, MAX_APPLES]) {
       for (const p of treeApples(count)) expect(p.x - CART_MIDDLE + CART.box.left).toBeGreaterThanOrEqual(190);
     }
-    // The bees' rounds (`tm-bee-fly`: up to 430 % right, 110 % up, 220 % down) stay over the meadow and under the sky's top.
+    // The bees are tiny beside a blossom (user feedback, November 2026: much smaller).
+    expect(BEE.w).toBeLessThanOrEqual(2.2 * appleRadius(MAX_APPLES) * 0.6);
+    // Their rounds (`tm-bee-fly`: up to 1000 % right, 250 % up, 510 % down) stay over the meadow and under the sky's top.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    expect(css).toContain("translate(1000%, 115%)");
     for (const b of BEES) {
-      const reach = 4.3 * BEE.w;
+      const reach = 10 * BEE.w;
       const xs = b.flip ? [b.x - reach, b.x + BEE.w] : [b.x, b.x + reach + BEE.w];
       expect(xs[0]).toBeGreaterThanOrEqual(200);
       expect(xs[1]).toBeLessThanOrEqual(RIGHT_EDGE);
-      expect(b.y - 1.1 * BEE.h).toBeGreaterThanOrEqual(80);
-      expect(b.y + 3.2 * BEE.h).toBeLessThanOrEqual(APPLE_FLOOR);
+      expect(b.y - 2.5 * BEE.h).toBeGreaterThanOrEqual(80);
+      expect(b.y + 5.1 * BEE.h).toBeLessThanOrEqual(APPLE_FLOOR);
     }
   });
 
