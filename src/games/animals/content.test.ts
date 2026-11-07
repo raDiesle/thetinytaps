@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GERMAN_ONLY, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
 import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
@@ -44,13 +44,32 @@ test("no word of any language is left over from an animal, food or home that is 
   }
 });
 
-test("the translated languages have words for every animal, every food and home", () => {
+test("the translated languages have words for every animal, every food and home, but none yet for those still German only", () => {
+  const known = (list: string[], id: string) => !list.includes(id);
   for (const language of COMPLETE) {
     const { words } = ANIMAL_TRANSLATIONS[language]!;
-    for (const { id } of ANIMALS) expect(words.animals[id], `${language} ${id}`).toBeDefined();
-    for (const { id } of FOODS) expect(words.foods[id], `${language} ${id}`).toBeDefined();
-    for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id], `${language} ${id}`).toBeDefined();
+    for (const { id } of ANIMALS) expect(words.animals[id] !== undefined, `${language} ${id}`).toBe(known(GERMAN_ONLY.animals, id));
+    for (const { id } of FOODS) expect(words.foods[id] !== undefined, `${language} ${id}`).toBe(known(GERMAN_ONLY.foods, id));
+    for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id] !== undefined, `${language} ${id}`).toBe(known(GERMAN_ONLY.homes, id));
   }
+  // The list names only what there is.
+  for (const id of GERMAN_ONLY.animals)
+    expect(
+      ANIMALS.some((a) => a.id === id),
+      id,
+    ).toBe(true);
+  for (const id of GERMAN_ONLY.foods)
+    expect(
+      FOODS.some((f) => f.id === id),
+      id,
+    ).toBe(true);
+  for (const id of GERMAN_ONLY.homes) expect(id in HOMES, id).toBe(true);
+  for (const id of GERMAN_ONLY.gifts) expect(id in GIFTS, id).toBe(true);
+  for (const id of GERMAN_ONLY.growths)
+    expect(
+      GROWTHS.some((g) => g.id === id),
+      id,
+    ).toBe(true);
 });
 
 test("the sentences have no German left in them, and none in another script has Latin letters", () => {
@@ -78,14 +97,15 @@ test("the gift and growth sentences are translated, and none in another script h
     const gift = GIFT_TEXTS[language]!;
     const grow = GROW_TEXTS[language]!;
     const shown: [string, string][] = [];
-    for (const animal of GIVERS) {
+    // Those still German only say the whole German sentence (checked below).
+    for (const animal of GIVERS.filter((a) => !GERMAN_ONLY.animals.includes(a.id) && !GERMAN_ONLY.gifts.includes(a.gives!))) {
       const given = GIFTS[animal.gives!];
       shown.push([gift.whatGives(animal), GIFT_TEXTS.de.whatGives(animal)]);
       shown.push([gift.gives(animal, given), GIFT_TEXTS.de.gives(animal, given)]);
       shown.push([gift.comesFrom(given, animal), GIFT_TEXTS.de.comesFrom(given, animal)]);
       shown.push([gift.gift(given), GIFT_TEXTS.de.gift(given)]);
     }
-    for (const growth of GROWTHS) {
+    for (const growth of GROWTHS.filter((g) => !GERMAN_ONLY.growths.includes(g.id))) {
       for (const key of ["young", "adult", "whatBecomes", "becomes", "comesFrom"] as const) shown.push([grow[key](growth), GROW_TEXTS.de![key](growth)]);
     }
     for (const [sentence, de] of shown) {

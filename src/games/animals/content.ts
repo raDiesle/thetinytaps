@@ -271,6 +271,19 @@ export const ANIMALS: Animal[] = [
   },
 ];
 
+/**
+ * Animals, foods, homes, gifts and small ones added after the last translation, by id: German only until the user asks
+ * for their translations (`languageStatus.ts` says what is missing). `content.test.ts` checks that every other one has
+ * its words in each translated language, and that these have none yet – once translated, take them off this list.
+ */
+export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
+  animals: [],
+  foods: [],
+  homes: [],
+  gifts: [],
+  growths: [],
+};
+
 /** Every food once, for the wrong choices next to the right one. */
 export const FOODS: Food[] = [...new Map(ANIMALS.flatMap((a) => (a.food ? [[a.food.id, a.food] as const] : []))).values()];
 
