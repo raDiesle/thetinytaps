@@ -120,6 +120,7 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "kettenreaktion", folder: "src/games/marbles/stimme", lines: germanOnly("/kettenreaktion/") },
   { name: "toepfchen", folder: "src/games/potty/stimme", lines: germanOnly("/toepfchen/") },
   { name: "socken", folder: "src/games/socks/stimme", lines: germanOnly("/socken/") },
+  { name: "timer", folder: "src/games/timer/stimme", lines: germanOnly("/timer/") },
   // Its 361 counting sentences („drei Äpfel!“, ≈ 1,100 credits) didn't fit into November 2026's credits: until they
   // are recorded the game says the number alone.
   { name: "buchstaben", folder: "src/games/letters/stimme", lines: germanOnly("/buchstaben/", { waiting: ["Zahl mit Dingen"] }) },

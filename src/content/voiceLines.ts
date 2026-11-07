@@ -49,6 +49,7 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { BEGINS, PICTURE_LINES, SOON_LINE, TURN_TO, WHO_BEGINS } from "@/games/timer/voice";
 import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
@@ -225,6 +226,20 @@ function animals(): VoiceGroup[] {
     {
       label: "Wer schaut da raus?",
       lines: once([SHADOW_TEXTS.de.peek, ...PEEK_ITEMS.map(SHADOW_TEXTS.de.there), ...PEEK_ITEMS.map(SHADOW_TEXTS.de.thatIs)]),
+    },
+  ];
+}
+
+function timer(): VoiceGroup[] {
+  const pictures = Object.values(PICTURE_LINES);
+  return [
+    { label: "Am Anfang eines Bildes", lines: once(pictures.map((p) => p.start)) },
+    { label: "Kurz vor dem Ende", lines: [SOON_LINE], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
+    { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => p.end)) },
+    {
+      label: "Abwechseln und Tennis",
+      lines: once([WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)]),
+      note: "„Wer fängt an?“, während die Lampen auslosen, dann wer anfängt; „Tauschen! …“ bei jedem Wechsel.",
     },
   ];
 }
@@ -426,6 +441,7 @@ export function voiceLines(): VoiceGame[] {
     { href: "/abstillen/", groups: weaning() },
     { href: "/socken/", groups: socks() },
     { href: "/belohnungstafel/", groups: rewards() },
+    { href: "/timer/", groups: timer() },
     {
       href: "",
       groups: [

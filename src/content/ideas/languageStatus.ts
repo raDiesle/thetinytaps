@@ -57,8 +57,19 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/timer/",
-    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und die Namen der Bilder „Wecker“ und „Tennis“ (7. November 2026, nur Deutsch). Sagt sonst nichts.",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    parts: [
+      {
+        label: "Bilder und Menü",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und die Namen der Bilder „Wecker“ und „Tennis“ (7. November 2026, nur Deutsch).",
+      },
+      {
+        label: "🗣️ Stimme",
+        languages: { de: "text" },
+        recorded: true,
+        note: "Was jedes Bild am Anfang und am Ende sagt, „Gleich ist es so weit!“ zur Glocke, und bei Abwechseln und Tennis „Wer fängt an?“, wer anfängt und „Tauschen! …“ (H-72, voice.ts, 7. November 2026): nur Deutsch, noch nicht aufgenommen (bun run voice make --only timer) – bis dahin still, keine Browserstimme.",
+      },
+    ],
   },
   {
     href: "/zaehne/",

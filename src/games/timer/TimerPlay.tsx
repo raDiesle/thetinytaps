@@ -5,7 +5,7 @@ import { useLeaveGame } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
 import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
@@ -26,6 +26,7 @@ import {
   playYum,
   recorded,
 } from "@/lib/sfx";
+import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { CaterpillarScene } from "./caterpillar";
@@ -41,6 +42,7 @@ import { TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
 import { clockOn, digits, ownTimeMs } from "./time";
+import { PICTURE_LINES, SOON_LINE, type TimedPicture, timerVoice } from "./voice";
 
 /** The last candle goes out with a puff this long after the time is up. */
 const BLOW_MS = 700;
@@ -256,7 +258,7 @@ function TimerRun({
   onAgain,
   onPicture,
 }: {
-  picture: TimerPicture;
+  picture: TimedPicture;
   /** How long it runs, in ms. */
   total: number;
   /** How long a grown-up set it to run, in ms, which the pieces are cut from (the same as `total` but while developing). */
@@ -281,6 +283,18 @@ function TimerRun({
   const { effects, ripple, glow, celebrate } = useTapFeedback();
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
+
+  // The voice (H-72): where the picture goes as it starts – once the page lies still, as `say` waits for that – the
+  // bell's „Gleich ist es so weit!“ and what is there at the end, queued so no line cuts another off. Silent until
+  // recorded; a grown-up leaving with ✕ stops it.
+  const language = useAppLanguage().id;
+  const lines = PICTURE_LINES[picture];
+  const say = useCallback((text: string, queue = false) => timerVoice.say(text, language, { queue }), [language]);
+  useEffect(() => {
+    timerVoice.load([lines.start, SOON_LINE, lines.end], language);
+    say(lines.start);
+  }, [lines, language, say]);
+  useEffect(() => hush, []);
 
   // Piece by piece (H-45): many apples landing in the cart, a stop on the track a minute – each with its plop or its bell.
   const apples = appleCount(set);
@@ -321,6 +335,7 @@ function TimerRun({
         soonRang.current = true;
         setSoon(true);
         playDing();
+        say(SOON_LINE, true);
       }
       // A piece done: one sound, also when several passed while the page was away.
       if (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) {
@@ -348,7 +363,7 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, total, picture, moments, soonAt]);
+  }, [phase, endsAt, total, picture, moments, soonAt, say]);
 
   useEffect(() => {
     if (phase === "blow") {
@@ -367,6 +382,7 @@ function TimerRun({
       else if (picture === "sunset") playYawn();
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
+      say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, a few hearts, stars and
       // notes rise slowly over the picture, which lights up warmly, and then the friendly tune.
       const cheer = setTimeout(() => {
@@ -379,7 +395,7 @@ function TimerRun({
         clearTimeout(tune);
       };
     }
-  }, [phase, picture, celebrate]);
+  }, [phase, picture, celebrate, say, lines]);
 
   /**
    * A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and what is still left lights up softly
