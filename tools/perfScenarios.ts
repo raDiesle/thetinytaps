@@ -148,8 +148,8 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the ants marching, the sky growing dark over the sunset,
   // the pizza's slices lifted off, the ladybug crawling
-  // round the red disc and in „Abwechseln“ (the first card) the hourglass running.
-  ...(["abwechseln", "zug", "apfelbaum", "sanduhr", "raupe", "blume", "kerze", "sonne", "ameisen", "scheibe", "pizza"] as const).map((name, i) => ({
+  // round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the hourglass running.
+  ...(["scheibe", "sanduhr", "abwechseln", "kerze", "apfelbaum", "pizza", "wecker", "zug", "raupe", "blume", "sonne", "ameisen"] as const).map((name, i) => ({
     name: `timer-${name}`,
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
@@ -158,7 +158,7 @@ export const SCENARIOS: Scenario[] = [
   {
     name: "timer-apfelbaum-ernte",
     path: "/timer/?sekunden=16",
-    parts: [{ label: "Ernte", before: [{ tap: ".mode-list > li:nth-child(3) .mode-card" }, { wait: 6000 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [{ label: "Ernte", before: [{ tap: ".mode-list > li:nth-child(5) .mode-card" }, { wait: 6000 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; the book's other games play at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },

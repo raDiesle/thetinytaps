@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
+import { BAR, CLOCK, CLOCK_FLOOR, clockText, DIGITS } from "./clock";
 import { DISC, DOTS, dotAt } from "./disc";
 import { FLOWER_CHILD, FLOWER_FLOOR, GROWN_AT, SPOUT, SPROUT, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
@@ -32,14 +33,18 @@ import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
 describe("Timer", () => {
-  test("every picture has its own id, an emoji and a German name, Abwechseln comes first and „Weiter“ goes round the others", () => {
+  const RIGHT_EDGE = 1340;
+
+  test("every picture has its own id, an emoji and a German name, they stand in the order the user asked for and „Weiter“ goes round all but Abwechseln", () => {
     expect(new Set(PICTURES.map((p) => p.id)).size).toBe(PICTURES.length);
     for (const p of PICTURES) {
       expect(p.emoji).not.toBe("");
       expect(p.name.de.trim()).not.toBe("");
     }
-    // Abwechseln runs without end, so it stands on top under its own line and „Weiter“ never leads into it.
-    expect(PICTURES[0].id).toBe("swap");
+    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, Wecker.
+    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "swap", "candle", "apple", "pizza", "clock"]);
+    expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
+    // Abwechseln runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
     expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 1);
     const seen = new Set<string>();
@@ -51,6 +56,30 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
+  });
+
+  test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
+    expect(clockText(300_000, 300_000)).toBe("5:00");
+    expect(clockText(299_001, 300_000)).toBe("5:00");
+    expect(clockText(299_000, 300_000)).toBe("4:59");
+    expect(clockText(9_000, 10_000)).toBe("0:09");
+    expect(clockText(0, 300_000)).toBe("0:00");
+    // From ten minutes on, a blank stands in front of one-digit minutes; from an hour on the hours stay in front.
+    expect(clockText(599_000, 600_000)).toBe(" 9:59");
+    expect(clockText(600_000, 600_000)).toBe("10:00");
+    expect(clockText(3_599_000, 5_400_000)).toBe("0:59:59");
+    expect(clockText(5_400_000, 5_400_000)).toBe("1:30:00");
+    for (const total of [10_000, 60_000, 600_000, 3_600_000, 10_800_000])
+      for (const left of [total, total / 2, 1, 0]) expect(clockText(left, total)).toHaveLength(clockText(total, total).length);
+    // It stands on the table within what every screen shows, its digits and blocks inside it.
+    expect(CLOCK.x).toBeGreaterThanOrEqual(200);
+    expect(CLOCK.x + CLOCK.w).toBeLessThanOrEqual(RIGHT_EDGE);
+    expect(CLOCK.y).toBeGreaterThanOrEqual(80);
+    expect(CLOCK_FLOOR).toBeLessThanOrEqual(820);
+    for (const box of [DIGITS, BAR]) {
+      expect(box.x).toBeGreaterThan(CLOCK.x);
+      expect(box.x + box.w).toBeLessThan(CLOCK.x + CLOCK.w);
+    }
   });
 
   test("the removed pictures stay removed (user feedback, November 2026: Eimer and Kuchen made no sense)", () => {
@@ -65,8 +94,6 @@ describe("Timer", () => {
     expect([...TIMER_SECONDS].sort((a, b) => a - b)).toEqual([...TIMER_SECONDS]);
     expect(TIMER_SECONDS).toContain(DEFAULT_TIMER_SETTINGS.seconds as (typeof TIMER_SECONDS)[number]);
   });
-
-  const RIGHT_EDGE = 1340;
 
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
     expect(TRAIN.x).toBeGreaterThanOrEqual(200);

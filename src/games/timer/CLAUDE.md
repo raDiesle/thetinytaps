@@ -7,15 +7,16 @@ Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds ask
 (`OwnTimeSheet`, H-59, H-60): any length from 10 seconds to 3 hours (− and + for hours, minutes and seconds, ready slips
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
-grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
+grown-ups (`TimeLeft`, H-62). Every timer but the Wecker (whose screen is the time left) shows the time left in the picture's bottom right corner on a small paper
 note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Zahlen“, `digits`, e.g. „4:37“; user
 request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
 for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
 `MAX_MARKS`) – or „Aus“.
-The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
-there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
-screen), then the pictures that run until the time is up:
+The start screen shows the pictures in the order the user chose (November 2026, `PICTURES`): Rote Scheibe, Sanduhr,
+Abwechseln, Kerze, Apfelbaum, Pizza, Wecker, then the others. „Abwechseln“'s card says „Läuft ohne Ende, jeder ist mal
+dran“ under its name where there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no
+longer fitted a phone's screen). The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
@@ -59,6 +60,13 @@ screen), then the pictures that run until the time is up:
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): 24 slices on a wooden board, one lifted off towards its side at each
   24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`); a little steam rises every second.
   Each slice is a small layer cut to its wedge by a still `clip-path`, so a tap lights exactly the slices left.
+- „Wecker“ ⏰ (`clock.tsx`, H-70, user request, November 2026): a children's digital radio alarm clock on the bedside
+  table – a chunky, rounded turquoise case with a big yellow snooze bar on top, little feet, a star and a heart sticker,
+  the radio mast and the alarm's bell glowing in the screen's corners – whose orange segment digits count the time left
+  down to 0:00 (`clockText`: the digits never shift, a blank before one-digit minutes from 10 minutes on, the hours in
+  front from an hour on). The digits are the time left, so it shows no note in the corner and has no „Zeit im Bild“
+  behind ⚙️. Under them a row of `CLOCK_BLOCKS` light blocks goes out one by one from the right, so a child who can't
+  read digits sees the time go too. A tap presses the snooze bar with a click; at the end it beeps and rings on its feet.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn: the toy lies by the fox child
   while the hourglass runs, then it travels over to the bear child with a whoosh and a chime, and the hourglass turns
   itself over – back and forth until a grown-up leaves with ✕ (with „bis um“ set, until then, each turn as long as the
@@ -86,7 +94,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-hourglass and toys), `apples.tsx`, `caterpillar.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
+hourglass and toys), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is the shared `Mascot`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -114,8 +122,11 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
   basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
   story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
-- **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
-  „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, then
+  the Wecker): keep it when adding a picture (a new one goes after these unless the user says otherwise), and move the
+  perf scenarios' list in `tools/perfScenarios.ts` with it – they tap cards by their place (`timer.test.ts` checks the
+  order). Abwechseln runs without end, so its card says so (`SWAP_NOTE`) and „Weiter“ never leads into it
+  (`TIMED_PICTURES`, `nextPicture`).
 
 - **A fox or bear child only where it does the picture's thing** (`Child`): it pushes the apples' cart, waters the
   flower, blows out the candle, takes its turn with the toy. Never a family standing by to watch or cheer: one stood

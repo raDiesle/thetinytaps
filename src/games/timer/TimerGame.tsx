@@ -18,7 +18,7 @@ export function TimerGame() {
   const t = useT();
   const [settings, update] = useGameSettings(TIMER_SETTINGS_KEY, DEFAULT_TIMER_SETTINGS);
   const [sheet, setSheet] = useState(false);
-  // „Abwechseln“ stands on its own above the others, with a line saying it goes on and on; the others run until the time is up.
+  // „Abwechseln“ carries a line saying it goes on and on; the others run until the time is up.
   const modes = PICTURES.map((p) => ({ id: p.id, emoji: p.emoji, title: t(p.name), note: p.id === "swap" ? t(SWAP_NOTE) : undefined }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
   const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;

@@ -1189,6 +1189,88 @@
   }
 }
 
+/* Wecker (H-70): the digits tick once a second in a small layer of their own; the row of light blocks is a window
+   sliding left a block at each share of the time while its drawing slides back and stays put; a tap presses the snooze
+   bar; at the end the clock rings on its feet a moment, then stands still. */
+.tm-clock-digits {
+  will-change: transform;
+  filter: drop-shadow(0 0 6px rgb(255 154 82 / 0.55));
+}
+
+.tm-clock-win {
+  overflow: hidden;
+  animation: tm-clock-win var(--tm-ms) steps(var(--tm-blocks), end) forwards;
+}
+
+.tm-clock-lit {
+  position: absolute;
+  inset: 0;
+  animation: tm-clock-lit var(--tm-ms) steps(var(--tm-blocks), end) forwards;
+}
+
+.tm-clock-lit svg,
+.tm-clock-snooze > div > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-done .tm-clock-win {
+  animation: none;
+  transform: translateX(-100%);
+}
+
+.tm-done .tm-clock-lit {
+  animation: none;
+  transform: translateX(100%);
+}
+
+@keyframes tm-clock-win {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes tm-clock-lit {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.tm-clock-snooze > div {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-clock-press {
+  animation: tm-clock-press 0.4s ease-out;
+}
+
+@keyframes tm-clock-press {
+  30% {
+    transform: translateY(26%);
+  }
+}
+
+.tm-clock {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.tm-done .tm-clock {
+  animation: tm-clock-ring 0.11s ease-in-out 12 alternate;
+}
+
+@keyframes tm-clock-ring {
+  from {
+    transform: rotate(-1.5deg);
+  }
+  to {
+    transform: rotate(1.5deg);
+  }
+}
+
 /* Seen from afar (H-48): a while after the last tap the backdrop, the child and the little stops step back into the
    dark, and only what runs down stays bright – the rail ahead and the train, the sand, the flame, the apples, the leaf,
    the red. A tap brings everything back at once. */
@@ -1391,6 +1473,7 @@
 .tm-cookie .tm-left-glow,
 .tm-apple-sway .tm-left-glow,
 .tm-red .tm-left-glow,
+.tm-clock-lit .tm-left-glow,
 .tm-leaf-light .tm-left-glow {
   inset: -6%;
   border-radius: 40%;
