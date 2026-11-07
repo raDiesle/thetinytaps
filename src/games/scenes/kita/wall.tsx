@@ -1,4 +1,3 @@
-import { WalkingFamily } from "../family";
 import { Hideout } from "../hideout";
 import { Cloud, Eye, Face, INK, Inside, SKIN, STEEL, nth } from "../shared";
 import { SLEEP_WINDOW, WINDOW, WINDOW_GLASS } from "./layout";
@@ -375,10 +374,6 @@ export function Fenster() {
         <circle cx="700" cy="184" r="28" fill="#51cf66" />
         <circle cx="684" cy="196" r="18" fill="#40c057" />
         <circle cx="716" cy="198" r="16" fill="#69db7c" />
-        {/* Out in the garden behind the fence, Papa Bear comes with his child to fetch it, like the other parents */}
-        <g transform="translate(734 244) scale(0.34)">
-          <WalkingFamily kind="bear" clothes={{ top: "#f08c00", legs: "#495057", childTop: "#e64980", childLegs: "#1971c2" }} />
-        </g>
         <g className="ki-fenster-papa" style={{ transformOrigin: "820px 250px" }}>
           <path d="M792 250 V222 Q792 202 820 202 Q848 202 848 222 V250 Z" fill="#4c6ef5" />
           <rect x="814" y="190" width="12" height="16" fill={SKIN} />

@@ -1,11 +1,11 @@
 import { memo, type CSSProperties } from "react";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Pizza (H-47, the children's way of the red disc): a pizza on a wooden board, eaten slice by slice round the clock from
 // 12 o'clock, as the Kita's disc gets smaller – what is still on the board is the time left. Each slice is a small
 // layer of its own, cut to its wedge (a still `clip-path`), lifted off towards its side and gone at its time: a CSS
 // animation with its moment as `animation-delay`, so React only plays the munch then (`pieceMoments`). Every second a
-// little steam rises from the pizza (H-63). The fox family stands beside it.
+// little steam rises from the pizza (H-63).
 
 /** The pizza: its middle and radius. */
 export const PIZZA = { cx: 700, cy: 445, r: 270 } as const;
@@ -16,9 +16,8 @@ export const SLICES = 8;
 /** How long it takes to lift a slice off, in seconds; it is gone at its moment. */
 export const SLICE_SECONDS = 1.4;
 
-/** The ground the fox family stands on, and the fox grown-up's place (its child left of it). */
+/** The ground the board stands on. */
 export const PIZZA_FLOOR = 790;
-export const PIZZA_FAMILY = 1140;
 
 /** A point on the pizza at `angle` (radians from 12 o'clock, clockwise) and `radius`, in stage units. */
 function at(angle: number, radius: number) {
@@ -127,7 +126,7 @@ function Steam() {
   );
 }
 
-/** The whole picture: the board, the slices, the steam and the fox family beside it. */
+/** The whole picture: the board, the slices and the steam. */
 export function PizzaScene({ glow }: { glow: number }) {
   return (
     <>
@@ -137,7 +136,6 @@ export function PizzaScene({ glow }: { glow: number }) {
         <Slice key={i} i={i} glow={glow} />
       ))}
       <Steam />
-      <Family kind="fox" x={PIZZA_FAMILY} floor={PIZZA_FLOOR} childLeft />
     </>
   );
 }

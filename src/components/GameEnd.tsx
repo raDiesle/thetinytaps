@@ -1,6 +1,5 @@
 import { useEffect, useState, type PointerEvent } from "react";
 import { useCountsPlaytime, useEndShown } from "@/components/GameShell";
-import { CheeringFamily, type MascotKind } from "@/components/Mascot";
 import { useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded } from "@/lib/playtime";
@@ -21,13 +20,8 @@ interface GameEndProps {
    */
   corners?: boolean;
   /**
-   * Leaves out the fox or bear family cheering beside the buttons, where the end picture shows its own (the Timer's).
-   * In `corners` it is always left out: the picture there is the point.
-   */
-  noFamily?: boolean;
-  /**
-   * Lies in the game's own layout instead of over the picture's bottom, without the family: where a game places the
-   * buttons beside its own end picture (Gefühle's cards' room, Zähne putzen's week chart and cheering foxes).
+   * Lies in the game's own layout instead of over the picture's bottom: where a game places the buttons beside its own
+   * end picture (Gefühle's cards' room, Zähne putzen's week chart).
    */
   inline?: boolean;
   /**
@@ -38,20 +32,18 @@ interface GameEndProps {
 }
 
 /**
- * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another), and
- * beside them a fox or bear child jumping for joy with its grown-up waving (D-12). Words only, no emoji or symbols (user
- * feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
+ * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another). Nothing
+ * stands beside them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken
+ * out again (user feedback, November 2026). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
  * no button here but the page's corner in the top left, as in every menu – the ✕, or the book's ribbon where the game
  * goes back onto the shelf (GameShell, told by `useEndShown`; a „Menü“ button was one way back too many, user feedback,
  * November 2026).
  */
-export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily = false, inline = false, showNext = false }: GameEndProps) {
+export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = false, showNext = false }: GameEndProps) {
   const t = useT();
   const endShown = useEndShown();
   const counts = useCountsPlaytime();
   const [shown, setShown] = useState(delayMs <= 0);
-  // Fox or bear, by chance at every end, so a child meets both.
-  const [kind] = useState<MascotKind>(() => (Math.random() < 0.5 ? "fox" : "bear"));
 
   useEffect(() => {
     if (shown) return;
@@ -84,7 +76,6 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, noFamily 
 
   return (
     <div className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
-      {!corners && !inline && !noFamily && <CheeringFamily kind={kind} className="game-end-family" />}
       <div className="game-end-small">
         <button type="button" className="game-end-button again" onPointerDown={press(onAgain)}>
           {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}

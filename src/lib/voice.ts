@@ -20,9 +20,12 @@ export interface RecordedVoice {
   loadAll: (language: string) => void;
   /**
    * Says `text`, a line in `language` – or the German line where the game had no translation and fell back to it.
-   * Cuts off what is being said unless `queue`, which waits for it.
+   * Cuts off what is being said unless `queue`, which waits for it. With `gap` (ms) it is a line that only accompanies
+   * the play (praise like „Ein Paar!“, `ASIDE_LINE_GAP_MS` in spacing.ts): said only when this voice's last such line
+   * lies at least `gap` back, and unless `queue`d only while nothing else is said or waiting – never cutting another
+   * line off, so quick answers don't chop line after line.
    */
-  say: (text: string, language: string, options?: { queue?: boolean; speechLang?: string }) => void;
+  say: (text: string, language: string, options?: { queue?: boolean; speechLang?: string; gap?: number }) => void;
   /** True when `text` has a recording in `language` (or in German). */
   has: (text: string, language: string) => boolean;
 }
@@ -43,6 +46,8 @@ let playing: AudioBufferSourceNode | null = null;
 let chain: Promise<void> = Promise.resolve();
 /** Counts up with every hush, so lines queued before it stay silent. */
 let generation = 0;
+/** Lines asked for and not yet over (still waiting for the page, loading or playing), in every game. */
+let pending = 0;
 
 function play(buffer: AudioBuffer) {
   const ac = audioContext();
@@ -69,6 +74,8 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
   const urls = new Map(Object.entries(files).map(([file, url]) => [file.slice(file.lastIndexOf("/") + 1, -4), url]));
   // A text with no recording in the language is a German fallback line of the game: its German recording.
   const urlOf = (text: string, language: string) => urls.get(recordingName(text, language)) ?? urls.get(recordingName(text, "de"));
+  /** When this voice's last line that only accompanies the play was said (`say`'s `gap`). */
+  let lastAside = Number.NEGATIVE_INFINITY;
   return {
     load: (texts, language) => {
       for (const text of texts) {
@@ -80,28 +87,50 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
       const own = language === "de" ? /^[0-9a-f]{8}$/ : new RegExp(`^(${language}-)?[0-9a-f]{8}$`);
       for (const [name, url] of urls) if (own.test(name)) void loadUrl(url);
     },
-    say: (text, language, { queue = false, speechLang } = {}) => {
+    say: (text, language, { queue = false, speechLang, gap } = {}) => {
+      if (gap !== undefined) {
+        const now = performance.now();
+        // Queued, it waits its turn behind the lines before it; else it would cut them off, so it stays silent.
+        if ((!queue && (pending > 0 || talking())) || now - lastAside < gap) return;
+        lastAside = now;
+      }
       const url = urlOf(text, language);
       if (!queue) hush();
       const at = generation;
       if (!url) {
         if (browser)
-          chain = chain.then(async () => {
-            await pageStill();
-            if (at === generation) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
-          });
+          chain = chain.then(
+            counted(async () => {
+              await pageStill();
+              if (at === generation) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
+            }),
+          );
         return;
       }
       if (!audioContext()) return;
       const buffer = loadUrl(url);
-      chain = chain.then(async () => {
-        await pageStill();
-        const decoded = await buffer;
-        if (decoded && at === generation) await play(decoded);
-      });
+      chain = chain.then(
+        counted(async () => {
+          await pageStill();
+          const decoded = await buffer;
+          if (decoded && at === generation) await play(decoded);
+        }),
+      );
     },
     has: (text, language) => urlOf(text, language) !== undefined,
   };
+}
+
+/**
+ * A line's turn on the chain, counted in `pending` from now until it is over. A line that fails stays silent and
+ * leaves the chain going, so the lines after it (and `pending`) are not stuck.
+ */
+function counted(run: () => Promise<void>) {
+  pending++;
+  return () =>
+    run()
+      .catch(() => undefined)
+      .finally(() => pending--);
 }
 
 /** Stops what is being said and everything waiting to be said, in every game. */

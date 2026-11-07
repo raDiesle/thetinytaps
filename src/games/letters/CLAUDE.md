@@ -9,10 +9,10 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   touch screens only the digit keys. With `digitOnRepeat` (for „Alles sofort“ and „Vorzählen“, in both games) a number
   shows its things first and its digit only when the same number is pressed again right after.
 - Mitmachen, `/mitmachen/` (`MovePlay.tsx`, `move.css`; L-15): a digit, or any other key for a number by chance, has a
-  fox or bear child hop, clap or stamp that many times (the three take turns), its grown-up standing beside it; it
+  fox or bear child hop, clap or stamp that many times (the three take turns), alone; it
   invites first („Hüpf mit!“ – hop and clap from the pack's doing words, `joinIn`), then counts each one aloud with a
   wait between (`BEAT_MS`), so the child can join in. A row of marks under the digit fills one by one. Keys during a
-  round only ripple; a tap on the family afterwards plays the same number again. No ⚙️: nothing to choose.
+  round only ripple; a tap on the child afterwards plays the same number again. No ⚙️: nothing to choose.
 - Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
   mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
   for a shown letter).
@@ -36,12 +36,11 @@ the page before it.
 - Mitmachen waits at every hop, clap or stamp long enough for a small child to do it too and land (`BEAT_MS`, 1.5 s)
   – never a quick run of them: the child moving along is the point, not watching. The child figure moves on its own HTML
   layers (`.mv-kid`, its clapping pose a layer above its standing one), animated by `element.animate`, never inside its
-  svg; the grown-up stands still.
-- In Zählen and Wörter tippen a fox or bear family stands still in the stage's bottom left corner (`PointingFamily`,
-  `.letters-family`, fox or bear by chance for the visit): in Zählen the child points at the things, in Wörter tippen
-  the grown-up points at the picture. It lies behind the card and leaves when the on-screen keys leave the stage too
-  low; it stands still until tapped, then the other one waves and both grin while the number or word is said again
-  (`onTap`, like the picture) – a decoration a child taps must do something.
+  svg. Only the child that moves stands there: a grown-up standing beside it was decoration and was taken out (user
+  feedback, November 2026).
+- No fox or bear stands by as decoration in these games: a family in Zählen's and Wörter tippen's corner, pointing at
+  the things or the picture, was taken out (user feedback, November 2026) – children wanted to tap it and thought it
+  belonged to the game. A fox or bear comes in only where it does the game's thing (Mitmachen's child, „Fuchs“ at F).
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

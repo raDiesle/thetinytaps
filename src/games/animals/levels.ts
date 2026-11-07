@@ -2,7 +2,7 @@ import { lookAlike, lookOf, PEEK_LOOKALIKES, type ShadowItem } from "@/games/sha
 import { shuffle } from "@/games/shadows/deck";
 import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./content";
 import { GIFTS, type Gift } from "./gifts";
-import { GROWTHS, type Growth } from "./growth";
+import { GROWTHS, growLookAlike, type Growth } from "./growth";
 import { HOMES, type Home } from "./homes";
 import type { Difficulty } from "./settings";
 
@@ -55,13 +55,10 @@ export const ANIMAL_LEVELS: AnimalLevel[] = [
 /** The step a fixed difficulty plays on (chosen behind ⚙️); „Von selbst“ climbs and falls instead. */
 export const FIXED_LEVELS: Record<Exclude<Difficulty, "auto">, number> = { easy: 0, medium: 3, hard: ANIMAL_LEVELS.length - 1 };
 
-/** The kind after `last` among those switched on, in `KIND_ORDER`; the first one switched on to begin with (all if none is). */
-export function nextKind(last: RoundKind | null, on: Record<RoundKind, boolean>): RoundKind {
-  const kinds = KIND_ORDER.filter((k) => on[k]);
-  const order = kinds.length > 0 ? kinds : KIND_ORDER;
-  if (last === null) return order[0];
-  const from = KIND_ORDER.indexOf(last);
-  return [...KIND_ORDER.slice(from + 1), ...KIND_ORDER.slice(0, from + 1)].find((k) => order.includes(k))!;
+/** The kind after `last` in `KIND_ORDER` when all take turns (the first to begin with), or the one kind chosen. */
+export function nextKind(last: RoundKind | null, kinds: "all" | RoundKind): RoundKind {
+  if (kinds !== "all") return kinds;
+  return last === null ? KIND_ORDER[0] : KIND_ORDER[(KIND_ORDER.indexOf(last) + 1) % KIND_ORDER.length];
 }
 
 /** A feeding round: `animal` is hungry, one of `foods` (at `correct`) is its own. */
@@ -122,12 +119,12 @@ export function dealHome(animal: Animal, count: number): HomeRound {
 }
 
 /**
- * What `growth` becomes among what `count - 1` others become, in random order. A caterpillar, an egg, a seed and a
- * tadpole each become something none of the others does, so all the others are wrong; there are only four, so at
- * most four to choose from.
+ * What `growth` becomes among what `count - 1` others become, in random order; never one a child could think comes
+ * out of `growth` too (`GROW_LOOKALIKES`: no plant next to another plant), so every other one is clearly wrong.
  */
 export function dealGrow(growth: Growth, count: number): GrowRound {
-  const grown = shuffle([growth, ...shuffle(GROWTHS.filter((g) => g !== growth)).slice(0, count - 1)]);
+  const others = GROWTHS.filter((g) => g !== growth && !growLookAlike(g, growth));
+  const grown = shuffle([growth, ...shuffle(others).slice(0, count - 1)]);
   return { kind: "grow", growth, grown, correct: grown.indexOf(growth) };
 }
 

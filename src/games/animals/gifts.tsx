@@ -2,9 +2,10 @@ import type { ReactNode } from "react";
 
 // What animals give us, for "Was gibt uns das Tier?" (Z-01). Each one is drawn in a 100 × 100 box, standing on its
 // bottom edge. The parts with an `ap-gift-…` class move while the animal makes it (`.ap-made` in animals.css): the
-// milk and the honey rise in their glass, the egg drops into the nest, the ball of wool rolls out.
+// milk and the honey rise in their glass, the egg drops into the nest, the ball of wool rolls out, the cheese drops onto
+// its board.
 
-export type GiftId = "milch" | "ei" | "honig" | "wolle";
+export type GiftId = "milch" | "ei" | "honig" | "wolle" | "kaese";
 
 export interface Gift {
   id: GiftId;
@@ -14,6 +15,11 @@ export interface Gift {
   the: string;
   /** What the animal gives us, for "Das Huhn gibt uns Eier.". */
   gives: string;
+  /**
+   * The id of the animal it comes from, the best-known one (the hen's egg, not the duck's): it pops up when the gift is
+   * given to another animal, „Das Ei kommt vom Huhn!“ (`giverOf`).
+   */
+  giver: string;
   drawing: ReactNode;
 }
 
@@ -71,11 +77,34 @@ const wolle = (
   </g>
 );
 
+// A wedge of cheese with its holes, on a round wooden board; the wedge drops onto the board.
+const kaese = (
+  <>
+    <ellipse cx="50" cy="86" rx="46" ry="10" fill="#8b5e3c" />
+    <ellipse cx="50" cy="82" rx="46" ry="10" fill="#c08552" stroke={OUTLINE} strokeWidth="3" />
+    <path d="M14 80 Q50 90 86 80" stroke="#e0b084" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <g className="ap-gift-cheese">
+      <path d="M64 54 L94 24 V56 L64 86 Z" fill="#f4a72c" />
+      <path d="M8 46 L64 54 V86 L8 78 Z" fill="#ffd04d" />
+      <path d="M8 46 L94 24 L64 54 Z" fill="#ffe589" />
+      <ellipse cx="24" cy="63" rx="7" ry="5" fill="#e3a92f" />
+      <ellipse cx="45" cy="74" rx="5" ry="4" fill="#e3a92f" />
+      <ellipse cx="52" cy="61" rx="3.5" ry="3" fill="#e3a92f" />
+      <ellipse cx="17" cy="75" rx="3" ry="2.5" fill="#e3a92f" />
+      <ellipse cx="62" cy="38" rx="7" ry="2.6" fill="#efc24c" />
+      <ellipse cx="38" cy="44" rx="4" ry="1.8" fill="#efc24c" />
+      <path d="M78 32 Q84 36 86 30" stroke="#fff" strokeOpacity="0.7" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <path d="M8 46 L94 24 V56 L64 86 L8 78 Z M64 54 V86 M8 46 L64 54 L94 24" fill="none" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    </g>
+  </>
+);
+
 export const GIFTS: Record<GiftId, Gift> = {
-  milch: { id: "milch", name: "Milch", the: "die Milch", gives: "Milch", drawing: milch },
-  ei: { id: "ei", name: "Ei", the: "das Ei", gives: "Eier", drawing: ei },
-  honig: { id: "honig", name: "Honig", the: "der Honig", gives: "Honig", drawing: honig },
-  wolle: { id: "wolle", name: "Wolle", the: "die Wolle", gives: "Wolle", drawing: wolle },
+  milch: { id: "milch", name: "Milch", the: "die Milch", gives: "Milch", giver: "kuh", drawing: milch },
+  ei: { id: "ei", name: "Ei", the: "das Ei", gives: "Eier", giver: "huhn", drawing: ei },
+  honig: { id: "honig", name: "Honig", the: "der Honig", gives: "Honig", giver: "biene", drawing: honig },
+  wolle: { id: "wolle", name: "Wolle", the: "die Wolle", gives: "Wolle", giver: "schaf", drawing: wolle },
+  kaese: { id: "kaese", name: "Käse", the: "der Käse", gives: "Käse", giver: "kuh", drawing: kaese },
 };
 
 /** The drawing of `gift`; `label` is its name in the app language, for screen readers. */

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { PointingFamily, type MascotKind } from "@/components/Mascot";
 import { BRIGHT_COLORS, FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
@@ -8,7 +7,7 @@ import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling"
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
-import { useLettersSay } from "./voice";
+import { useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 
 /** Keys closer together than this only make ripples, so mashing doesn't race through the word. */
@@ -65,8 +64,6 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [nudges, setNudges] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
-  /** The fox or bear grown-up showing its child the picture, picked by chance for the visit. */
-  const [family] = useState<MascotKind>(() => (Math.random() < 0.5 ? "fox" : "bear"));
   const { effects, ripple } = useTapFeedback();
 
   const lastType = useRef(0);
@@ -87,6 +84,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
 
   const say = useLettersSay();
+  const praise = useLettersPraise();
 
   /** Says the letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
   const sayLetter = useCallback(
@@ -143,9 +141,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     if (settings.sounds) playChime();
     const word = current.word;
     say(`${word.word}!`, true);
-    say(isAction(word) ? pack.joinIn(word) : pick(pack.praise), true);
+    if (isAction(word)) say(pack.joinIn(word), true);
+    else praise(pick(pack.praise));
     if (isColor(word)) setBackground(word.color);
-  }, [current, done, letters, typed, pack, say, sayLetter, settings.sounds]);
+  }, [current, done, letters, typed, pack, say, praise, sayLetter, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -232,7 +231,6 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   return (
     <div className={`words-play${color && done ? " colored" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
-        <PointingFamily kind={family} pointer="grown" className="letters-family" onTap={onPicturePointer} />
         {color && done && (
           <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>
             {parade.map((spot, i) => (

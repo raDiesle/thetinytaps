@@ -1,5 +1,5 @@
 import { memo, type CSSProperties } from "react";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Child, Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Blume (H-53): time that brings something instead of running out, for waiting for something good. The bear child
 // waters a little sprout in the flower bed, a drop every second (H-63); the stalk grows up along a stake to the red
@@ -16,11 +16,11 @@ export const SPROUT = 0.1;
 /** The stake the stalk grows along, right of it, with the ribbon at its top: where the flower will open. */
 export const STAKE = { x: 885, top: 205 } as const;
 
-/** The ground the bear family stands on. */
+/** The ground the bear child stands on. */
 export const FLOWER_FLOOR = 800;
 
-/** The bear grown-up's place; its child, right of it, holds the watering can over the bed. */
-export const FLOWER_FAMILY = 290;
+/** The bear child's place (its left edge); it holds the watering can over the bed. */
+export const FLOWER_CHILD = 470;
 
 /** The watering can in the bear child's hand, and where its drops fall from and to. */
 const CAN = { x: 570, y: 690, w: 130, h: 90 } as const;
@@ -191,7 +191,7 @@ export function FlowerScene({ glow, running }: { glow: number; running: boolean 
       <Stalk />
       <Bloom />
       <Bed />
-      <Family kind="bear" x={FLOWER_FAMILY} floor={FLOWER_FLOOR} />
+      <Child kind="bear" x={FLOWER_CHILD} floor={FLOWER_FLOOR} />
       <WateringCan running={running} />
     </>
   );

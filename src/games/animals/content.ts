@@ -7,15 +7,20 @@ import {
   playChatter,
   playCluck,
   playCroak,
+  playDolphin,
+  playHoot,
   playMeow,
   playMoo,
   playNeigh,
   playOink,
   playQuack,
   playRoar,
+  playSnap,
   playSquawk,
   playSqueak,
+  playTrumpet,
   playTweet,
+  playWhale,
   recorded,
 } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -81,7 +86,7 @@ export const ANIMALS: Animal[] = [
     name: "Hase",
     the: "der Hase",
     food: food("moehre", "🥕", "Möhre", "Möhren"),
-    alsoEats: ["salat", "apfel", "heu", "blaetter", "blume", "banane", "mais", "nuss", "bambus"],
+    alsoEats: ["salat", "apfel", "heu", "blaetter", "blume", "banane", "mais", "nuss", "bambus", "erdnuss", "trauben"],
     home: "bau",
     alsoLives: ["stall", "huette", "hoehle"],
   },
@@ -91,7 +96,7 @@ export const ANIMALS: Animal[] = [
     name: "Hund",
     the: "der Hund",
     food: food("knochen", "🦴", "Knochen"),
-    alsoEats: ["fleisch", "fisch", "kaese", "apfel", "moehre", "banane", "mais", "salat", "nuss", "honig", "fliege"],
+    alsoEats: ["fleisch", "fisch", "kaese", "apfel", "moehre", "banane", "mais", "salat", "nuss", "honig", "fliege", "erdnuss"],
     home: "huette",
     alsoLives: ["koerbchen"],
     sound: real("bark", playBark),
@@ -113,7 +118,7 @@ export const ANIMALS: Animal[] = [
     name: "Maus",
     the: "die Maus",
     food: food("kaese", "🧀", "Käse"),
-    alsoEats: ["nuss", "mais", "apfel", "moehre", "salat", "banane", "heu", "blaetter"],
+    alsoEats: ["nuss", "mais", "apfel", "moehre", "salat", "banane", "heu", "blaetter", "erdnuss", "trauben"],
     home: "mauseloch",
     alsoLives: ["bau", "stall", "hoehle", "nest"],
     sound: real("mouse", playSqueak),
@@ -124,9 +129,9 @@ export const ANIMALS: Animal[] = [
     name: "Vogel",
     the: "der Vogel",
     food: food("wurm", "🪱", "Wurm", "Würmer"),
-    alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch"],
+    alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch", "erdnuss", "trauben", "heu"],
     home: "nest",
-    alsoLives: ["baum", "stall", "huette", "koerbchen"],
+    alsoLives: ["baum", "stall", "huette", "koerbchen", "dschungel", "savanne", "bambuswald"],
     sound: real("tweet", playTweet),
   },
   {
@@ -135,9 +140,9 @@ export const ANIMALS: Animal[] = [
     name: "Bär",
     the: "der Bär",
     food: food("honig", "🍯", "Honig"),
-    alsoEats: ["fisch", "nuss", "apfel", "banane", "fleisch", "knochen", "mais", "wurm", "moehre", "blaetter", "bambus"],
+    alsoEats: ["fisch", "nuss", "apfel", "banane", "fleisch", "knochen", "mais", "wurm", "moehre", "blaetter", "bambus", "erdnuss", "trauben"],
     home: "hoehle",
-    alsoLives: ["bau", "eis"],
+    alsoLives: ["bau", "eis", "dschungel", "bambuswald"],
     sound: real("growl", playRoar),
   },
   {
@@ -161,7 +166,7 @@ export const ANIMALS: Animal[] = [
     food: food("fliege", "🪰", "Fliege", "Fliegen"),
     alsoEats: ["wurm"],
     home: "teich",
-    alsoLives: ["aquarium"],
+    alsoLives: ["aquarium", "dschungel"],
     sound: real("croak", playCroak),
   },
   {
@@ -170,11 +175,11 @@ export const ANIMALS: Animal[] = [
     name: "Kuh",
     the: "die Kuh",
     food: food("heu", "🌾", "Heu"),
-    alsoEats: ["salat", "blaetter", "moehre", "apfel", "mais", "banane", "blume", "bambus"],
+    alsoEats: ["salat", "blaetter", "moehre", "apfel", "mais", "banane", "blume", "bambus", "erdnuss", "trauben"],
     home: "stall",
     alsoLives: [],
     gives: "milch",
-    alsoGives: [],
+    alsoGives: ["kaese"],
     sound: real("moo", playMoo),
   },
   {
@@ -183,7 +188,7 @@ export const ANIMALS: Animal[] = [
     name: "Pferd",
     the: "das Pferd",
     food: food("apfel", "🍎", "Apfel", "Äpfel"),
-    alsoEats: ["moehre", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus"],
+    alsoEats: ["moehre", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus", "erdnuss", "trauben"],
     home: "stall",
     alsoLives: [],
     sound: real("neigh", playNeigh),
@@ -194,7 +199,7 @@ export const ANIMALS: Animal[] = [
     name: "Eichhörnchen",
     the: "das Eichhörnchen",
     food: food("nuss", "🌰", "Nuss", "Nüsse"),
-    alsoEats: ["mais", "apfel", "banane", "moehre", "blaetter"],
+    alsoEats: ["mais", "apfel", "banane", "moehre", "blaetter", "erdnuss", "trauben"],
     home: "baum",
     alsoLives: ["nest", "hoehle"],
   },
@@ -206,21 +211,43 @@ export const ANIMALS: Animal[] = [
     food: FISH,
     alsoEats: [],
     home: "eis",
-    alsoLives: ["teich", "aquarium"],
+    alsoLives: ["teich", "aquarium", "meer"],
     sound: real("penguin", playSquawk),
   },
-  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich"], sound: real("bubbles", playBlub) },
+  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich", "meer"], sound: real("bubbles", playBlub) },
   { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz", alsoLives: [] },
-  { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", alsoLives: ["stall", "nest"], sound: real("quack", playQuack) },
-  { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle"] },
+  {
+    id: "ente",
+    emoji: "🦆",
+    name: "Ente",
+    the: "die Ente",
+    home: "teich",
+    alsoLives: ["stall", "nest", "meer"],
+    gives: "ei",
+    alsoGives: [],
+    sound: real("quack", playQuack),
+  },
+  { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle", "wueste"] },
   { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [], sound: real("oink", playOink) },
+  // More animals with a home (November 2026).
+  { id: "biber", emoji: "🦫", name: "Biber", the: "der Biber", home: "biberburg", alsoLives: ["teich", "bau"] },
+  { id: "ameise", emoji: "🐜", name: "Ameise", the: "die Ameise", home: "ameisenhaufen", alsoLives: ["bau"] },
+  // The whale first: it peeks out of the sea.
+  { id: "wal", emoji: "🐳", name: "Wal", the: "der Wal", home: "meer", alsoLives: [], sound: real("whale", playWhale) },
+  { id: "krebs", emoji: "🦀", name: "Krebs", the: "der Krebs", home: "meer", alsoLives: ["aquarium"] },
+  { id: "schildkroete", emoji: "🐢", name: "Schildkröte", the: "die Schildkröte", home: "meer", alsoLives: ["teich", "aquarium"] },
+  { id: "kamel", emoji: "🐪", name: "Kamel", the: "das Kamel", home: "wueste", alsoLives: ["savanne", "stall"] },
+  { id: "eule", emoji: "🦉", name: "Eule", the: "die Eule", home: "baum", alsoLives: ["nest", "stall"], sound: real("hoot", playHoot) },
+  { id: "fledermaus", emoji: "🦇", name: "Fledermaus", the: "die Fledermaus", home: "hoehle", alsoLives: ["baum", "stall"] },
   {
     id: "affe",
     emoji: "🐵",
     name: "Affe",
     the: "der Affe",
     food: food("banane", "🍌", "Banane", "Bananen"),
-    alsoEats: ["apfel", "nuss", "blaetter", "mais", "moehre", "salat", "bambus", "wurm", "fliege"],
+    alsoEats: ["apfel", "nuss", "blaetter", "mais", "moehre", "salat", "bambus", "wurm", "fliege", "erdnuss", "trauben"],
+    home: "dschungel",
+    alsoLives: ["baum", "bambuswald", "savanne"],
     sound: real("chatter", playChatter),
   },
   {
@@ -229,7 +256,9 @@ export const ANIMALS: Animal[] = [
     name: "Huhn",
     the: "das Huhn",
     food: food("mais", "🌽", "Mais"),
-    alsoEats: ["wurm", "fliege", "salat", "apfel", "moehre", "nuss", "banane", "blaetter"],
+    alsoEats: ["wurm", "fliege", "salat", "apfel", "moehre", "nuss", "banane", "blaetter", "erdnuss", "trauben", "heu"],
+    home: "stall",
+    alsoLives: ["nest"],
     gives: "ei",
     alsoGives: [],
     sound: real("cluck", playCluck),
@@ -240,7 +269,9 @@ export const ANIMALS: Animal[] = [
     name: "Panda",
     the: "der Panda",
     food: food("bambus", "🎋", "Bambus"),
-    alsoEats: ["blaetter", "apfel", "honig", "moehre", "heu", "salat"],
+    alsoEats: ["blaetter", "apfel", "honig", "moehre", "heu", "salat", "trauben"],
+    home: "bambuswald",
+    alsoLives: ["dschungel", "hoehle", "baum"],
   },
   {
     id: "schnecke",
@@ -248,10 +279,24 @@ export const ANIMALS: Animal[] = [
     name: "Schnecke",
     the: "die Schnecke",
     food: food("salat", "🥬", "Salat"),
-    alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais"],
+    alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais", "trauben"],
   },
-  // Only in "Was gibt uns das Tier?" so far.
-  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch"], sound: real("baa", playBaa) },
+  {
+    id: "schaf",
+    emoji: "🐑",
+    name: "Schaf",
+    the: "das Schaf",
+    home: "stall",
+    alsoLives: [],
+    gives: "wolle",
+    alsoGives: ["milch", "kaese"],
+    sound: real("baa", playBaa),
+  },
+  // More animals that give us something (November 2026).
+  // The goat bleats with the sheep's recording, as on the farm; the goose quacks like the farm's goose.
+  { id: "ziege", emoji: "🐐", name: "Ziege", the: "die Ziege", gives: "kaese", alsoGives: ["milch", "wolle"], sound: real("baa", playBaa) },
+  { id: "gans", emoji: "🪿", name: "Gans", the: "die Gans", gives: "ei", alsoGives: [], sound: real("quack", playQuack) },
+  { id: "lama", emoji: "🦙", name: "Lama", the: "das Lama", gives: "wolle", alsoGives: [] },
   {
     id: "loewe",
     emoji: "🦁",
@@ -259,6 +304,8 @@ export const ANIMALS: Animal[] = [
     the: "der Löwe",
     food: food("fleisch", "🍖", "Fleisch"),
     alsoEats: ["knochen", "fisch"],
+    home: "savanne",
+    alsoLives: ["dschungel", "wueste", "hoehle"],
     sound: real("roar", playRoar),
   },
   {
@@ -267,9 +314,169 @@ export const ANIMALS: Animal[] = [
     name: "Giraffe",
     the: "die Giraffe",
     food: food("blaetter", "🍃", "Blätter"),
-    alsoEats: ["heu", "salat", "apfel", "moehre", "blume", "bambus", "banane", "mais"],
+    alsoEats: ["heu", "salat", "apfel", "moehre", "blume", "bambus", "banane", "mais", "trauben"],
+    home: "savanne",
+    alsoLives: ["wueste"],
+  },
+  // More animals to feed (November 2026).
+  {
+    id: "elefant",
+    emoji: "🐘",
+    name: "Elefant",
+    the: "der Elefant",
+    food: food("erdnuss", "🥜", "Erdnuss", "Erdnüsse"),
+    alsoEats: ["heu", "blaetter", "apfel", "banane", "moehre", "salat", "mais", "bambus", "nuss", "trauben", "blume"],
+    sound: real("trumpet", playTrumpet),
+  },
+  {
+    id: "gorilla",
+    emoji: "🦍",
+    name: "Gorilla",
+    the: "der Gorilla",
+    food: food("banane", "🍌", "Banane", "Bananen"),
+    alsoEats: ["blaetter", "apfel", "bambus", "salat", "moehre", "nuss", "erdnuss", "trauben", "mais", "blume", "wurm", "fliege"],
+  },
+  {
+    id: "koala",
+    emoji: "🐨",
+    name: "Koala",
+    the: "der Koala",
+    food: food("blaetter", "🍃", "Blätter"),
+    // Only eucalyptus leaves; bamboo and lettuce are green leaves too, so they never lie beside them as a wrong choice.
+    alsoEats: ["bambus", "salat"],
+  },
+  { id: "seehund", emoji: "🦭", name: "Seehund", the: "der Seehund", food: FISH, alsoEats: [] },
+  { id: "delfin", emoji: "🐬", name: "Delfin", the: "der Delfin", food: FISH, alsoEats: [], sound: real("dolphin", playDolphin) },
+  {
+    id: "eisbaer",
+    emoji: "🐻‍❄️",
+    name: "Eisbär",
+    the: "der Eisbär",
+    food: FISH,
+    // A „Bär“, so honey too, like the panda; seals' meat in reality, and berries and fruit where people feed it.
+    alsoEats: ["fleisch", "knochen", "honig", "apfel", "trauben"],
+    sound: real("growl", playRoar),
+  },
+  {
+    id: "krokodil",
+    emoji: "🐊",
+    name: "Krokodil",
+    the: "das Krokodil",
+    food: food("fleisch", "🍖", "Fleisch"),
+    alsoEats: ["fisch", "knochen"],
+    sound: playSnap,
+  },
+  {
+    id: "tiger",
+    emoji: "🐯",
+    name: "Tiger",
+    the: "der Tiger",
+    food: food("fleisch", "🍖", "Fleisch"),
+    alsoEats: ["knochen", "fisch"],
+    sound: real("roar", playRoar),
+  },
+  {
+    id: "wolf",
+    emoji: "🐺",
+    name: "Wolf",
+    the: "der Wolf",
+    food: food("fleisch", "🍖", "Fleisch"),
+    alsoEats: ["knochen", "fisch", "apfel", "trauben"],
+  },
+  {
+    id: "igel",
+    emoji: "🦔",
+    name: "Igel",
+    the: "der Igel",
+    food: food("wurm", "🪱", "Wurm", "Würmer"),
+    // Beetles and snails in reality, apples on its spines in picture books, fruit, nuts and cat food where people feed it.
+    alsoEats: ["fliege", "apfel", "trauben", "banane", "fleisch", "nuss", "erdnuss"],
+  },
+  {
+    id: "schmetterling",
+    emoji: "🦋",
+    name: "Schmetterling",
+    the: "der Schmetterling",
+    food: food("blume", "🌼", "Blume", "Blumen"),
+    // Nectar, and the juice of ripe fruit.
+    alsoEats: ["honig", "apfel", "banane", "trauben"],
+  },
+  {
+    id: "raupe",
+    emoji: "🐛",
+    name: "Raupe",
+    the: "die Raupe",
+    food: food("blaetter", "🍃", "Blätter"),
+    // Leaves and grass in reality, and all „Die kleine Raupe Nimmersatt“ eats its way through: fruit, cheese, sausage.
+    alsoEats: ["salat", "bambus", "heu", "blume", "moehre", "mais", "apfel", "banane", "trauben", "kaese", "fleisch"],
+  },
+  {
+    id: "papagei",
+    emoji: "🦜",
+    name: "Papagei",
+    the: "der Papagei",
+    food: food("trauben", "🍇", "Weintrauben"),
+    // Seeds and grain (🌾), nuts, fruit, flowers and nectar; a bird, so worms and flies as a child knows it.
+    alsoEats: ["nuss", "erdnuss", "apfel", "banane", "mais", "moehre", "salat", "blume", "blaetter", "wurm", "fliege", "honig", "heu"],
+    sound: real("squawk", playSquawk),
+  },
+  {
+    id: "zebra",
+    emoji: "🦓",
+    name: "Zebra",
+    the: "das Zebra",
+    food: food("heu", "🌾", "Heu"),
+    alsoEats: ["blaetter", "salat", "moehre", "apfel", "mais", "blume", "bambus", "banane", "trauben", "erdnuss"],
+  },
+  {
+    id: "esel",
+    emoji: "🫏",
+    name: "Esel",
+    the: "der Esel",
+    food: food("moehre", "🥕", "Möhre", "Möhren"),
+    alsoEats: ["apfel", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus", "trauben", "erdnuss"],
   },
 ];
+
+/**
+ * Animals, foods, homes, gifts and small ones added after the last translation, by id: German only until the user asks
+ * for their translations (`languageStatus.ts` says what is missing). `content.test.ts` checks that every other one has
+ * its words in each translated language, and that these have none yet – once translated, take them off this list.
+ */
+export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
+  animals: [
+    "biber",
+    "ameise",
+    "wal",
+    "krebs",
+    "schildkroete",
+    "kamel",
+    "eule",
+    "fledermaus",
+    "ziege",
+    "gans",
+    "lama",
+    "elefant",
+    "gorilla",
+    "koala",
+    "seehund",
+    "delfin",
+    "eisbaer",
+    "krokodil",
+    "tiger",
+    "wolf",
+    "igel",
+    "schmetterling",
+    "raupe",
+    "papagei",
+    "zebra",
+    "esel",
+  ],
+  foods: ["erdnuss", "trauben"],
+  homes: ["biberburg", "ameisenhaufen", "meer", "wueste", "dschungel", "savanne", "bambuswald"],
+  gifts: ["kaese"],
+  growths: ["eichel", "zwiebel", "kuerbiskern", "kokosnuss", "knospe"],
+};
 
 /** Every food once, for the wrong choices next to the right one. */
 export const FOODS: Food[] = [...new Map(ANIMALS.flatMap((a) => (a.food ? [[a.food.id, a.food] as const] : []))).values()];
@@ -286,8 +493,11 @@ export const GIVERS: Animal[] = ANIMALS.filter((a) => a.gives);
 /** The gifts that may lie next to an animal's gift as wrong choices: neither its own nor one it gives us too. */
 export const wrongGifts = (animal: Animal): Gift[] => Object.values(GIFTS).filter((g) => g.id !== animal.gives && !animal.alsoGives?.includes(g.id));
 
-/** The animal a gift comes from, the one that pops up when it is given to another: the first that gives it. */
-export const giverOf = (gift: Gift): Animal => GIVERS.find((a) => a.gives === gift.id)!;
+/**
+ * The animal a gift comes from, the one that pops up when it is given to another: the best-known one the gift names
+ * (`Gift.giver`: the hen's egg, not the duck's; the cow's cheese, though the cow is asked for its milk).
+ */
+export const giverOf = (gift: Gift): Animal => ANIMALS.find((a) => a.id === gift.giver)!;
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 

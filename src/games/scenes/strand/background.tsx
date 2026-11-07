@@ -1,5 +1,4 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
-import { WalkingFamily } from "../family";
 import { Cloud, nth } from "../shared";
 import { Poke } from "../spots";
 import { LIGHTHOUSE, TOWEL, shoreY } from "./layout";
@@ -226,10 +225,6 @@ export function Background() {
       <Sea />
       <Beach />
       <Towel />
-      {/* Mama Fox and her child in swimsuits, on their way to the water */}
-      <g transform={`translate(1370 780) scale(${depthScale(780)})`}>
-        <WalkingFamily kind="fox" clothes={{ top: "#f06595", legs: "#ea7a32", childTop: "#4dabf7", childLegs: "#ea7a32" }} />
-      </g>
     </>
   );
 }

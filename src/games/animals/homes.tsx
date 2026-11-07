@@ -16,7 +16,14 @@ export type HomeId =
   | "koerbchen"
   | "baum"
   | "netz"
-  | "eis";
+  | "eis"
+  | "biberburg"
+  | "ameisenhaufen"
+  | "meer"
+  | "wueste"
+  | "dschungel"
+  | "savanne"
+  | "bambuswald";
 
 export interface Home {
   id: HomeId;
@@ -239,6 +246,180 @@ const eis = (
   </>
 );
 
+const biberburg = (
+  <>
+    <path d="M10 104 Q14 50 60 40 Q106 50 110 104 Z" fill="#a47148" />
+    <path d="M72 42 Q106 54 110 104 H90 Q92 62 72 42 Z" fill="#8b5e3c" />
+    {["M18 92 L52 70", "M24 76 L60 58", "M40 52 L84 74", "M64 50 L100 66", "M70 90 L104 80", "M14 100 L44 86", "M50 46 L76 46", "M84 96 L108 94"].map((d) => (
+      <path key={d} d={d} stroke="#6f4e37" strokeWidth="4" strokeLinecap="round" />
+    ))}
+    {["M30 64 L36 40", "M56 44 L52 26", "M78 46 L92 30", "M98 70 L114 60", "M8 86 L22 78"].map((d) => (
+      <path key={d} d={d} stroke="#8b5e3c" strokeWidth="3.5" strokeLinecap="round" />
+    ))}
+    <path d="M42 104 V96 a18 16 0 0 1 36 0 V104 Z" fill={DARK} />
+    <path d="M0 102 H120 V118 H0 Z" fill="#4cc9f0" />
+    <path d="M86 102 H120 V118 H86 Z" fill="#3aa8d0" />
+    <path d="M8 110 Q20 106 32 110 M70 112 Q84 108 98 112" stroke="#fff" strokeOpacity="0.7" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+  </>
+);
+
+/** A tiny ant drawn on the anthill, at (x, y), facing right. */
+const ant = (x: number, y: number) => (
+  <g key={`${x} ${y}`} transform={`translate(${x} ${y})`}>
+    <path d="M-3 0 l-2 3 M0 0 l0 3.5 M3 0 l2 3 M-3 0 l-2 -3 M3 0 l2 -3" stroke={DARK} strokeWidth="1" strokeLinecap="round" />
+    <circle cx="-4" cy="0" r="2.2" fill={DARK} />
+    <circle cx="0" cy="0" r="1.6" fill={DARK} />
+    <circle cx="3.6" cy="-0.4" r="1.8" fill={DARK} />
+  </g>
+);
+
+const ameisenhaufen = (
+  <>
+    <path d="M4 114 Q8 74 34 52 Q60 30 86 52 Q112 74 116 114 Z" fill="#b5835a" />
+    <path d="M78 46 Q112 70 116 114 H92 Q94 72 78 46 Z" fill="#94653f" />
+    {[
+      [30, 92],
+      [44, 70],
+      [62, 54],
+      [54, 96],
+      [76, 80],
+      [22, 104],
+      [74, 104],
+      [52, 44],
+      [88, 98],
+      [36, 80],
+      [86, 64],
+      [100, 104],
+    ].map(([x, y], i) => (
+      <path key={x * y} d={`M${x} ${y} l${i % 2 ? 6 : -6} -3`} stroke={i % 3 ? "#e0b084" : "#6f4e37"} strokeWidth="2.5" strokeLinecap="round" />
+    ))}
+    <ellipse cx="40" cy="62" rx="4" ry="3" fill={DARK} />
+    <ellipse cx="84" cy="76" rx="4" ry="3" fill={DARK} />
+    <path d="M46 114 V104 a14 12 0 0 1 28 0 V114 Z" fill={DARK} />
+    {[ant(28, 70), ant(62, 70), ant(96, 92), ant(20, 96)]}
+    <rect x="4" y="113" width="112" height="5" rx="2.5" fill="#8ac926" />
+  </>
+);
+
+const meer = (
+  <>
+    <path d="M24 6 V28 H8 Z" fill="#fff" />
+    <path d="M27 8 V28 H42 Z" fill="#e3f6ff" />
+    <path d="M24 4 V30" stroke="#8b5e3c" strokeWidth="2.5" />
+    <path d="M6 30 H44 L38 38 H12 Z" fill="#e63946" />
+    <path d="M38 30 H44 L38 38 H34 Z" fill="#c1121f" />
+    <path d="M2 40 Q17 30 32 40 T62 40 T92 40 T118 38 V116 H2 Z" fill="#4cc9f0" />
+    <path d="M2 84 Q30 78 60 84 T118 82 V116 H2 Z" fill="#3aa8d0" />
+    <path d="M2 40 Q17 30 32 40 T62 40 T92 40 T118 38" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <path
+      d="M10 62 Q22 56 34 62 M70 58 Q82 52 94 58 M30 80 Q42 74 54 80"
+      stroke="#fff"
+      strokeOpacity="0.6"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      fill="none"
+    />
+    <path d="M2 104 Q30 96 60 104 T118 102 V116 H2 Z" fill="#f4d58d" />
+    <path d="M14 104 Q8 88 16 76 M18 104 Q26 92 20 82" stroke="#2a9d8f" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <path d="M100 112 l3 -8 l3 8 l8 0 l-6 5 l2 6 l-7 -4 l-7 4 l2 -6 l-6 -5 Z" fill="#f4845f" transform="translate(-6 -6)" />
+    <path d="M30 112 a7 7 0 0 1 14 0 Z" fill="#ffc2d1" />
+  </>
+);
+
+const wueste = (
+  <>
+    <circle cx="24" cy="24" r="12" fill="#ffd166" />
+    <path d="M2 116 V84 Q40 58 82 84 Q100 74 118 80 V116 Z" fill="#f6bd60" />
+    <path d="M82 84 Q100 74 118 80 V116 H96 Q96 92 82 84 Z" fill="#e9a23b" />
+    <path d="M2 116 V98 Q50 82 118 100 V116 Z" fill="#f4d58d" />
+    <path d="M84 116 Q100 98 118 100 V116 Z" fill="#f6bd60" />
+    <path d="M86 112 V54 a7 7 0 0 1 14 0 V112 Z" fill="#52b788" />
+    <path d="M94 112 V50 a6 7 0 0 1 6 4 V112 Z" fill="#40916c" />
+    <path d="M86 84 H78 a4 4 0 0 1 -4 -4 V68 a4 4 0 0 1 8 0 V76 H86 Z" fill="#52b788" />
+    <path d="M100 76 H106 V62 a4 4 0 0 1 8 0 V76 a6 6 0 0 1 -6 6 H100 Z" fill="#40916c" />
+    <path d="M90 64 V70 M90 86 V92 M96 76 V82" stroke="#2d6a4f" strokeWidth="1.8" strokeLinecap="round" />
+  </>
+);
+
+const dschungel = (
+  <>
+    <circle cx="30" cy="30" r="26" fill="#40916c" />
+    <circle cx="90" cy="30" r="26" fill="#2d6a4f" />
+    <circle cx="60" cy="20" r="22" fill="#52b788" />
+    <path d="M52 116 Q56 70 54 30 H68 Q66 70 72 116 Z" fill="#8b5e3c" />
+    <path d="M62 30 H68 Q66 70 72 116 H64 Q62 70 62 30 Z" fill="#6f4e37" />
+    {[
+      ["M22 46 Q18 64 24 82", 24, 82],
+      ["M106 50 Q112 64 106 78", 106, 78],
+    ].map(([d, x, y]) => (
+      <g key={String(d)}>
+        <path d={String(d)} stroke="#6a994e" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <ellipse cx={Number(x)} cy={Number(y)} rx="6" ry="3.5" fill="#6a994e" />
+      </g>
+    ))}
+    <path d="M88 44 q6 4 4 12 q-6 -2 -4 -12 Z M94 44 q8 2 8 10 q-6 0 -8 -10 Z M84 46 q2 8 -4 12 q-2 -8 4 -12 Z" fill="#ffd166" />
+    <path d="M90 40 V45" stroke="#6f4e37" strokeWidth="2.5" strokeLinecap="round" />
+    <path d="M2 116 Q0 82 30 88 Q40 100 46 116 Z" fill="#52b788" />
+    <path d="M30 88 Q40 100 46 116 H36 Q32 98 30 88 Z" fill="#40916c" />
+    <path d="M118 116 Q120 80 90 90 Q80 102 76 116 Z" fill="#40916c" />
+    <path d="M118 116 Q120 80 90 90 Q106 96 106 116 Z" fill="#2d6a4f" />
+    <path d="M8 104 Q20 96 32 98 M84 102 Q100 94 112 96" stroke="#2d6a4f" strokeWidth="2" fill="none" strokeLinecap="round" />
+    <circle cx="16" cy="60" r="4" fill="#ff8fab" />
+    <circle cx="16" cy="60" r="1.6" fill="#ffd166" />
+  </>
+);
+
+const savanne = (
+  <>
+    <circle cx="96" cy="26" r="12" fill="#ffb703" />
+    <path d="M58 104 Q60 80 54 58 H62 Q66 80 66 104 Z" fill="#8b5e3c" />
+    <path d="M62 58 Q66 80 66 104 H62 Q62 80 58 58 Z" fill="#6f4e37" />
+    <path d="M56 64 L40 50 M62 66 L80 50" stroke="#8b5e3c" strokeWidth="4" strokeLinecap="round" />
+    <path d="M14 50 Q20 34 44 36 Q60 26 80 36 Q102 34 108 50 Z" fill="#6a994e" />
+    <path d="M80 36 Q102 34 108 50 H88 Q88 42 80 36 Z" fill="#52794a" />
+    <path d="M2 116 V96 Q60 86 118 96 V116 Z" fill="#e9c46a" />
+    <path d="M94 92 Q108 93 118 96 V116 H98 Z" fill="#d4a94f" />
+    {[10, 30, 82, 104].map((x) => (
+      <path key={x} d={`M${x} 98 l3 -10 l3 10 l3 -8 l3 8`} stroke="#c9a03f" strokeWidth="2.5" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    ))}
+  </>
+);
+
+const bambuswald = (
+  <>
+    {[
+      [14, 20, "#8ac926", "#6a994e"],
+      [38, 6, "#6a994e", "#52794a"],
+      [74, 12, "#8ac926", "#6a994e"],
+      [98, 26, "#6a994e", "#52794a"],
+    ].map(([x, top, light, dark]) => (
+      <g key={String(x)}>
+        <rect x={Number(x)} y={Number(top)} width="10" height={114 - Number(top)} rx="3" fill={String(light)} />
+        <rect x={Number(x) + 6} y={Number(top)} width="4" height={114 - Number(top)} rx="2" fill={String(dark)} />
+        {[0, 1, 2, 3]
+          .map((i) => Number(top) + 18 + i * 24)
+          .filter((y) => y < 106)
+          .map((y) => (
+            <rect key={y} x={Number(x) - 1} y={y} width="12" height="3" rx="1.5" fill={String(dark)} />
+          ))}
+      </g>
+    ))}
+    {[
+      [24, 34, -30],
+      [36, 54, 30],
+      [48, 22, -20],
+      [84, 30, -30],
+      [72, 50, 30],
+      [108, 44, -25],
+      [96, 64, 30],
+      [12, 72, 25],
+    ].map(([x, y, a]) => (
+      <ellipse key={x * y} cx={x} cy={y} rx="11" ry="3.5" fill="#52b788" transform={`rotate(${a} ${x} ${y})`} />
+    ))}
+    <rect x="4" y="113" width="112" height="5" rx="2.5" fill="#8ac926" />
+  </>
+);
+
 export const HOMES: Record<HomeId, Home> = {
   huette: { id: "huette", name: "Hütte", inPhrase: "in der Hütte", spot: [60, 98], fit: 0.3, drawing: huette },
   nest: { id: "nest", name: "Nest", inPhrase: "im Nest", spot: [60, 60], fit: 0.38, drawing: nest },
@@ -253,6 +434,13 @@ export const HOMES: Record<HomeId, Home> = {
   baum: { id: "baum", name: "Baum", inPhrase: "im Baum", spot: [60, 82], fit: 0.24, drawing: baum },
   netz: { id: "netz", name: "Netz", inPhrase: "im Netz", spot: [60, 58], fit: 0.26, drawing: netz },
   eis: { id: "eis", name: "Eis", inPhrase: "auf dem Eis", spot: [60, 68], fit: 0.3, drawing: eis },
+  biberburg: { id: "biberburg", name: "Biberburg", inPhrase: "in der Biberburg", spot: [60, 96], fit: 0.26, drawing: biberburg },
+  ameisenhaufen: { id: "ameisenhaufen", name: "Ameisenhaufen", inPhrase: "im Ameisenhaufen", spot: [60, 104], fit: 0.16, drawing: ameisenhaufen },
+  meer: { id: "meer", name: "Meer", inPhrase: "im Meer", spot: [62, 72], fit: 0.4, drawing: meer },
+  wueste: { id: "wueste", name: "Wüste", inPhrase: "in der Wüste", spot: [44, 94], fit: 0.38, drawing: wueste },
+  dschungel: { id: "dschungel", name: "Dschungel", inPhrase: "im Dschungel", spot: [62, 72], fit: 0.3, drawing: dschungel },
+  savanne: { id: "savanne", name: "Savanne", inPhrase: "in der Savanne", spot: [38, 94], fit: 0.36, drawing: savanne },
+  bambuswald: { id: "bambuswald", name: "Bambuswald", inPhrase: "im Bambuswald", spot: [58, 94], fit: 0.36, drawing: bambuswald },
 };
 
 /** The drawing of `home`; `label` is its name in the app language, for screen readers. */

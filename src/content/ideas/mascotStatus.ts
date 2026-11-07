@@ -2,7 +2,10 @@ import type { Effort } from "./types";
 
 // Where the app's two mascots, the fox and the bear, could still turn up (D-18), game by game, shown
 // on the management page like the language table. Not every game needs them: they are a motif that
-// comes back, not a fox in every corner. The motif is always a grown-up with a child (Mama, Papa, Oma or
+// comes back, not a fox in every corner – and only where it belongs to the game (user feedback, November 2026): a figure
+// the game shows and that does something in it, or a role the picture already has; never decoration standing by
+// (a family watching, pointing, walking through a picture, cheering at the end), which children want to tap and which
+// only adds things to look at. Such tasks are kept as "removed", so nobody builds them again. The motif is always a grown-up with a child (Mama, Papa, Oma or
 // Opa with the fox or bear child), since grown-up and child look at the book together: the child does the
 // thing, the grown-up is beside it. Only a fox or bear in a role (the baker) stands alone. A drawing is code and can be done any time; a picture from
 // Gemini waits here until the grown-up asks for them, and then all waiting ones are made in one batch,
@@ -23,8 +26,8 @@ export interface MascotTask {
   pictures?: number;
   /** The idea it belongs to, when it has its own (else D-18). */
   idea?: string;
-  /** Already in the app; "partial" when only some of it is. */
-  state?: "done" | "partial";
+  /** Already in the app; "partial" when only some of it is; "removed" when it was only decoration and was taken out. */
+  state?: "done" | "partial" | "removed";
   /** What is special or still to decide. */
   note?: string;
 }
@@ -44,13 +47,19 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
-      { label: "Tapsi putzt klein in der Ecke mit, Mama, Papa, Oma oder Opa Fuchs putzt nach", work: "drawing", effort: "M" },
+      {
+        label: "Tapsi putzt klein in der Ecke mit, Mama, Papa, Oma oder Opa Fuchs putzt nach",
+        work: "drawing",
+        effort: "M",
+        state: "removed",
+        note: "Nicht bauen (Feedback November 2026): nur Deko neben dem Spiegel.",
+      },
       {
         label: "Tapsi und sein Großer jubeln bei Medaille und Wochenplan",
         work: "drawing",
         effort: "S",
-        state: "done",
-        note: "Am Ende neben Wochenplan und Knöpfen: Tapsi springt mit hochgerissenen Armen, Mama oder Papa Fuchs winkt (CheeringFamily).",
+        state: "removed",
+        note: "Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
       },
     ],
   },
@@ -66,8 +75,17 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/timer/",
-    note: "Alles SVG: beim Zug wartet die Bärenfamilie am Bahnhof, beim Apfelbaum hält das Bärenkind den Korb, bei der Sanduhr und der roten Scheibe steht die Fuchsfamilie daneben, bei der Raupe fliegt der Schmetterling zum Fuchskind, bei der Blume gießt das Bärenkind, beim Eimer steht die Bärenfamilie neben der Blume, die am Ende aufgeht, beim Kuchen kommt der Kuchen auf den Tisch neben der Fuchsfamilie, bei der Kerze pustet das Bärenkind sie aus, beim Sonnenuntergang gähnt die Fuchsfamilie am Ende, bei der Pizza steht die Fuchsfamilie daneben, bei der Ameisenstraße schaut die Fuchsfamilie zu und das Fuchskind lacht am Ende, beim Abwechseln stehen beide Familien, und das Spielzeug wandert zwischen Fuchskind und Bärenkind; am Ende winken alle.",
-    tasks: [{ label: "Fuchs- oder Bärenfamilie in jedem Bild, sie winkt am Ende", work: "drawing", effort: "S", state: "done" }],
+    note: "SVG. Ein Fuchs- oder Bärenkind nur, wo es selbst etwas tut: beim Apfelbaum hält das Bärenkind den Korb, bei der Blume gießt es, bei der Kerze pustet es sie aus, beim Abwechseln wandert das Spielzeug zwischen Fuchskind und Bärenkind (`Child`).",
+    tasks: [
+      { label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Korb, Gießkanne, Kerze, Abwechseln)", work: "drawing", effort: "S", state: "done" },
+      {
+        label: "Fuchs- oder Bärenfamilie steht in jedem Bild daneben und winkt am Ende",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
+      },
+    ],
   },
   {
     href: "/schnullerfee/",
@@ -81,7 +99,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/bilder/",
-    note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es nur als Tiere im Wald und im Winter.",
+    note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es als Tiere im Wald und im Winter, als Fahrer und Erwachsene in Rollen und als Überraschung im Versteck.",
     tasks: [
       {
         label: "Fahrer, Mitfahrer und Pilotinnen werden Füchse oder Bären",
@@ -108,8 +126,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa in jeder Szene (Hand in Hand, auf den Schultern, auf der Bank daneben)",
         work: "drawing",
         effort: "M",
-        state: "done",
-        note: "`WalkingFamily` (scenes/family.tsx): Großer und Kind Hand in Hand, flach wie die Menschen der Bilder, mit dem geteilten Kopf; ein Ding des Hintergrunds, das beim Antippen hüpft, ohne Worte (so verliert kein Bild seine Übersetzungen). In der Stadt Papa Bär auf dem Gehweg, am Strand Mama Fuchs in Badesachen, auf dem Spielplatz Opa Bär hinten bei der Bank, im Herbst Mama Fuchs auf dem Sandweg, im Winter Papa Bär auf dem Eis (Bären, weil dort der wilde Fuchs läuft), zu Ostern Mama Fuchs gleich hinter dem Gartentor, und in der Kita kommt Papa Bär draußen im Garten hinter dem Zaun zum Abholen (im Fenster, 6. November 2026).",
+        state: "removed",
+        note: "`WalkingFamily` (scenes/family.tsx): Großer und Kind Hand in Hand, flach wie die Menschen der Bilder, mit dem geteilten Kopf; ein Ding des Hintergrunds, das beim Antippen hüpft, ohne Worte (so verliert kein Bild seine Übersetzungen). In der Stadt Papa Bär auf dem Gehweg, am Strand Mama Fuchs in Badesachen, auf dem Spielplatz Opa Bär hinten bei der Bank, im Herbst Mama Fuchs auf dem Sandweg, im Winter Papa Bär auf dem Eis (Bären, weil dort der wilde Fuchs läuft), zu Ostern Mama Fuchs gleich hinter dem Gartentor, und in der Kita kommt Papa Bär draußen im Garten hinter dem Zaun zum Abholen (im Fenster, 6. November 2026). Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel; ein Ding mehr im Wimmelbild.",
       },
     ],
   },
@@ -159,7 +177,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         state: "done",
         note: "Der Bäcker ist ein Bär mit weißer Jacke und Bäckermütze. Mama oder Papa und der Bruder sind die Familie des Kindes und warten auf D-19.",
       },
-      { label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen", work: "drawing", effort: "M" },
+      {
+        label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen",
+        work: "drawing",
+        effort: "M",
+        state: "removed",
+        note: "Nicht bauen (Feedback November 2026): nur Deko neben dem Weg des Kindes.",
+      },
       { label: "Das Kind als Fuchs- oder Bärenkind", work: "drawing", effort: "M", idea: "D-19", note: "Erst entscheiden." },
     ],
   },
@@ -273,8 +297,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Fuchs- oder Bärenkind schaut bei „Wer schaut da raus?“ aus dem Busch, sein Großer winkt daneben",
         work: "drawing",
         effort: "S",
-        state: "done",
-        note: "Aus dem Busch schaut das Tier, das das Kind erraten soll – darum stehen Großer und Kind daneben auf der Wiese, still, und der Große zeigt auf den Busch (`PointingFamily`, Fuchs oder Bär je Besuch). Angetippt winken beide und grinsen, der Busch raschelt und das Tier ruft (6. November 2026).",
+        state: "removed",
+        note: "Großer und Kind standen neben dem Busch und zeigten darauf (6. November 2026). Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
       },
     ],
   },
@@ -294,8 +318,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Tapsi schaut aus dem Wäschekorb, Mama, Papa, Oma oder Opa Fuchs hängt lachend Wäsche auf",
         work: "drawing",
         effort: "M",
-        state: "partial",
-        note: "Tapsi und Mama Fuchs stehen neben der großen Waschmaschine, solange sie wäscht, und gehen, wenn die Socken herauspurzeln. Im Wäschekorb und an der Leine nicht: die Körbe decken Socken zu (wie Memory), und die Leine braucht die ganze Breite.",
+        state: "removed",
+        note: "Tapsi und Mama Fuchs standen neben der großen Waschmaschine. Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
       },
     ],
   },
@@ -307,7 +331,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Tapsi mit Mama, Papa, Oma oder Opa Fuchs auf Start und Ende",
         work: "drawing",
         effort: "S",
-        note: "Offen: das Spiel hat weder Startbild noch Ende (es spielt sofort und läuft frei weiter); bräuchte einen anderen Platz, etwa ein Bild zu „Fuchs“ beim F.",
+        state: "removed",
+        note: "Nicht bauen (Feedback November 2026): nur Deko. „Fuchs 🦊“ beim F bleibt, das ist ein Wort des Spiels.",
       },
     ],
   },
@@ -319,15 +344,24 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Fuchs- oder Bärenkind zählt mit seinem Großen die Dinge mit",
         work: "drawing",
         effort: "S",
-        state: "done",
-        note: "Unten links stehen Großer und Kind still (`PointingFamily`), das Kind zeigt auf die Dinge; Fuchs oder Bär bei jedem Besuch zufällig.",
+        state: "removed",
+        note: "Großer und Kind standen unten links und zeigten auf die Dinge. Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
       },
     ],
   },
   {
     href: "/mitmachen/",
-    note: "Neu (L-15): das Fuchs- oder Bärenkind hüpft, klatscht und stampft die Zahl, sein Großer steht daneben (Mascot, Pose „clap“).",
-    tasks: [{ label: "Fuchs- oder Bärenkind macht die Zahl vor, sein Großer steht daneben", work: "drawing", effort: "S", state: "done" }],
+    note: "L-15: das Fuchs- oder Bärenkind hüpft, klatscht und stampft die Zahl (Mascot, Pose „clap“) – es ist das Spiel.",
+    tasks: [
+      { label: "Fuchs- oder Bärenkind macht die Zahl vor", work: "drawing", effort: "S", state: "done" },
+      {
+        label: "Sein Großer steht still daneben",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
+      },
+    ],
   },
   {
     href: "/woerter/",
@@ -337,8 +371,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         label: "Fuchs- oder Bärenkind tippt, sein Großer zeigt auf das Bild",
         work: "drawing",
         effort: "S",
-        state: "done",
-        note: "Unten links steht das Kind, sein Großer zeigt auf das Bild (`PointingFamily`, Pose „point“); beide still. Nicht bei „Wo ist das B?“.",
+        state: "removed",
+        note: "Großer und Kind standen unten links, der Große zeigte auf das Bild. Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
       },
     ],
   },
@@ -353,15 +387,15 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         work: "drawing",
         effort: "S",
         idea: "D-12",
-        state: "done",
-        note: "CheeringFamily (components/Mascot.tsx) neben „Menü“, „Nochmal“, „Weiter“; das Kind springt zweimal, dann steht alles still. Nicht bei `corners` und beim Timer (`noFamily`), deren Bild die Familie schon zeigt.",
+        state: "removed",
+        note: "Stand neben „Nochmal“ und „Weiter“, das Kind sprang zweimal. Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
       },
       {
         label: "Alle gezeichneten Füchse und Bären bekommen einen schöneren, detaillierten Kopf und Körper im Stil der Gemini-Familienbilder",
         work: "drawing",
         effort: "M",
         state: "done",
-        note: "Ein Kopf für alle (`MascotHead` in components/Mascot.tsx): Fellbüschel an den Wangen, Flausch in den Ohren, Schattenseite, Brauen, Augen mit brauner Iris und zwei Lichtern etwas unter der Kopfmitte (beim Kind größer und tiefer), weiches Licht im Stirnfell statt Glanzfleck, glänzende Nase, runder lachender Mund; der Körper rundlich mit dicken Armen, runden Pfoten mit Zehen, beim Fuchs dunkle Unterarme wie bei echten Füchsen, und ein weicher Schatten unter den Füßen (November 2026 knuddeliger gemacht). Ihn nutzen Spielende, Timer, Fahrer in Lebendige Bilder, Schnullerfee, Sticker im Regal, die Helfer in „Was gehört zusammen?“, Baustelle und Zirkus in Kettenreaktion. Ein neuer Fuchs oder Bär nimmt ihn auch.",
+        note: "Ein Kopf für alle (`MascotHead` in components/Mascot.tsx): Fellbüschel an den Wangen, Flausch in den Ohren, Schattenseite, Brauen, Augen mit brauner Iris und zwei Lichtern etwas unter der Kopfmitte (beim Kind größer und tiefer), weiches Licht im Stirnfell statt Glanzfleck, glänzende Nase, runder lachender Mund; der Körper rundlich mit dicken Armen, runden Pfoten mit Zehen, beim Fuchs dunkle Unterarme wie bei echten Füchsen, und ein weicher Schatten unter den Füßen (November 2026 knuddeliger gemacht). Ihn nutzen Timer, Mitmachen, Fahrer in Lebendige Bilder, Schnullerfee, Sticker im Regal, die Helfer in „Was gehört zusammen?“, Baustelle und Zirkus in Kettenreaktion. Ein neuer Fuchs oder Bär nimmt ihn auch.",
       },
       {
         label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)",
@@ -378,5 +412,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
 
 /** The Gemini pictures still to make, for the batch: the sum over every task that is a picture and not done. */
 export function waitingMascotPictures(rows: MascotStatusRow[] = MASCOT_STATUS): number {
-  return rows.flatMap((row) => row.tasks).reduce((sum, task) => sum + (task.work === "picture" && task.state !== "done" ? (task.pictures ?? 1) : 0), 0);
+  return rows
+    .flatMap((row) => row.tasks)
+    .reduce((sum, task) => sum + (task.work === "picture" && task.state !== "done" && task.state !== "removed" ? (task.pictures ?? 1) : 0), 0);
 }

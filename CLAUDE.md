@@ -194,9 +194,15 @@ In a fresh worktree run `bun install` first.
   an idea „Leistung: <Spiel> …“ in `src/content/ideas/a-all-games.ts` – the user picks it, the run fixes nothing.
 - **The app's mascots are the fox and the bear** (Tapsi is a fox, the book's readers are a fox and a bear family; user
   decision, October 2026 – the fox alone was dropped with the address toddlerfox.com): they come back as a motif in
-  every game, so a child finds them again everywhere – a fox or bear grown-up instead of a drawn person here and there
-  (the baker, the doctor, the driver), a fox or bear child peeking out of the background, the two cheering at the end.
-  Not in every corner and not both everywhere: people may stay, and a bear is as welcome as a fox (never turn a bear
+  the games, so a child finds them again – but **only where they belong to the game** (user feedback, November 2026):
+  a figure the game shows and that acts in it (Mitmachen's child hopping the number, the Timer's child watering the
+  flower, a family that a hideout lets out when tapped, a part the child plays like Tapsi in Bewegungsabenteuer), or a
+  role the picture already has, taken by a fox or bear instead of a person (the baker, the doctor, the driver). **Never
+  as decoration**: no family standing by, pointing, watching, walking through a picture or cheering beside the end's
+  buttons – children want to tap it and think it belongs to the game, and a game wants as few things and movements as
+  it can have, so no child is flooded. Families like that (in Zählen, Wörter tippen, „Wer schaut da raus?“, Socken-Paare,
+  Mitmachen's grown-up, seven Lebendige Bilder, every Timer picture and every `GameEnd`) were taken out again;
+  `Mascot.test.ts` lists where a whole figure may stand and what it does there. People may stay, and a bear is as welcome as a fox (never turn a bear
   into a fox). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Games get them
   step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
   that gets its fox or bear marks it there in the same commit, and a new game or picture adds its row or task.
@@ -244,6 +250,13 @@ In a fresh worktree run `bun install` first.
   An animal, water or machine sound that has a recording is imported from `@/lib/realSounds` (same names as in
   `@/lib/sfx`, preloaded with `loadRealSounds`), not from `@/lib/sfx` – unless the recording doesn't fit the moment (a
   bicycle bell is no telephone, the farm's goat and donkey bend the synthesized sheep, horse and cow).
+- What a child can set off quickly, one answer after the other, never piles up into a din (user feedback from
+  Socken-Paare, November 2026): the answer's own sound always plays, but extras round it (a boing, a twinkle, a second
+  knock) come at most every `EXTRA_SOUND_GAP_MS`, and a line that only accompanies the play – praise like „Ein Paar!“,
+  „Toll!“, an end's „Alle … !“, never a line needed to follow the game – is said with `say(…, { gap:
+  ASIDE_LINE_GAP_MS })` (`src/lib/spacing.ts`, `voice.ts`): only when nothing else is said and the last such line lies
+  far enough back, never cutting another line off. Where a level's last answer leads straight into its end, it leaves
+  its praise and extras to the end's.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
@@ -390,8 +403,11 @@ In a fresh worktree run `bun install` first.
   Where a game's cards are only kinds or steps of one way to play (Was gehört zum Tier?'s Füttern, Wer wohnt wo? and
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
-  its card plays at once with no start screen. Grown-ups may still switch kinds off or fix the difficulty, behind ⚙️
-  while playing (`PlayOptions`), never on cards or a start screen (user feedback, November 2026).
+  its card plays at once with no start screen. Grown-ups may still pick the kinds or fix the difficulty, behind ⚙️
+  while playing (`PlayOptions`), never on cards or a start screen (user feedback, November 2026). Picking kinds or
+  categories (what comes up) is always „Gemischt“ – all of them – or exactly one, one `Choice`, never a mix of some
+  switched on and off one by one (user feedback, November 2026: Was gehört zum Tier? and Was gehört zusammen? had a
+  toggle per kind; Schatten finden's picture choice already worked so).
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
 - Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
@@ -455,13 +471,9 @@ In a fresh worktree run `bun install` first.
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's
   cards' room, Zähne putzen's week chart) passes `inline` (user feedback, November 2026; `GameEnd.test.ts`). Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom right corner instead, and only where that game's rules say so.
-  Beside the buttons a fox or bear child jumps for joy and its grown-up waves (`CheeringFamily` from
-  `src/components/Mascot.tsx`, D-12), fox or bear by chance; it is left out in `corners` and where the end picture
-  already shows the family (`noFamily`, the Timer). `Mascot` is the app's one drawn fox and bear standing (grown-up or
-  child, standing, waving, cheering, clapping or pointing): a game that wants one standing by takes it rather than
-  drawing its own, and a family standing still by what the child looks at is `PointingFamily` (Zählen, Wörter tippen).
-  Where the family stands in a game's own end layout, it answers a tap (`CheeringFamily onTap`: both wave and grin with
-  their teeth – a decoration a child taps must do something, user feedback from Zähne putzen, November 2026).
+    Nothing stands beside the buttons: a fox or bear family cheering there (D-12) was decoration and was taken out (user
+  feedback, November 2026). `Mascot` is the app's one drawn fox and bear standing (grown-up or child, standing, waving,
+  cheering, clapping or pointing): a game whose fox or bear does its thing takes it rather than drawing its own.
 
 ## Architecture
 
@@ -650,8 +662,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
   with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the
-  child does the thing (taps, brushes, blows, peeks out) and the grown-up is beside it, watching, helping, cheering; only
-  a fox or bear in a role (the baker, the doctor) stands alone. The wall's picture keeps its two families (above).
+    child does the thing (taps, brushes, blows, peeks out) and the grown-up is beside it, helping; inside a game the
+  grown-up comes only where it does something there too, never only to watch or cheer (see the mascots above), and a fox
+  or bear in a role (the baker, the doctor) or a child doing the game's thing stands alone. The wall's picture keeps its two families (above).
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
   book's cover on the shelf shows a piece of it. A new category draws its world (`content.test.ts` checks).

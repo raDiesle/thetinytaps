@@ -44,8 +44,9 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 
 ## Rules
 
-- Grown-ups change things only behind ⚙️ held while playing (`PlayOptions`): „Was drankommt“ (each kind on or off, the
-  last can't be switched off) and „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer). No other options.
+- Grown-ups change things only behind ⚙️ held while playing (`PlayOptions`): „Was drankommt“ („Gemischt“ or exactly one
+  kind, `settings.kinds` – never a mix of some, user feedback, November 2026) and „Schwierigkeit“ (Von selbst, Leicht,
+  Mittel, Schwer). No other options.
 - Exactly one choice fits. Kinds never mix in one round, and the wrong choices come from other topics first, each from
   a topic of its own (`dealRound`), so things of one topic may belong loosely together (soap and sponge in the
   bathroom) – requiring every partner of a topic to fit nothing else in it left a bathroom of two pairs. A partner is

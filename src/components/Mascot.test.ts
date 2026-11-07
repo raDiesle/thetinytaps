@@ -8,7 +8,6 @@ import { Mascot, MascotHead } from "./Mascot";
 
 /** The drawings of the app's fox and bear, each of which must take its head from Mascot.tsx. */
 const MASCOT_DRAWINGS = [
-  "src/components/GameEnd.tsx",
   "src/components/RoomOptions.tsx",
   "src/games/scenes/shared.tsx",
   "src/games/pacifier/drawings.tsx",
@@ -17,24 +16,20 @@ const MASCOT_DRAWINGS = [
   "src/games/marbles/scenery.tsx",
   "src/games/marbles/CircusLevel.tsx",
   "src/games/timer/scenes.tsx",
-  "src/games/teeth/TeethPlay.tsx",
   "src/games/scenes/hideout.tsx",
   "src/games/elevator/kid.tsx",
-  "src/games/socks/SocksPlay.tsx",
+  "src/games/letters/MovePlay.tsx",
   "src/games/scenes/supermarkt/wall.tsx",
   "src/games/scenes/supermarkt/checkout.tsx",
   "src/games/scenes/kita/people.tsx",
   "src/games/scenes/kinderarzt/practice.tsx",
   "src/games/scenes/wald/people.tsx",
   "src/games/feelings/moodArt.tsx",
-  "src/games/scenes/family.tsx",
   "src/games/scenes/feuerwache/parts.tsx",
   "src/games/scenes/feuerwache/figures.tsx",
   "src/games/scenes/zoo/visitors.tsx",
   "src/games/scenes/bauernhof/figures.tsx",
   "src/games/scenes/flughafen/people.tsx",
-  "src/games/letters/LettersPlay.tsx",
-  "src/games/letters/WordsPlay.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */
@@ -70,5 +65,24 @@ describe("the shared fox and bear", () => {
         expect(renderToStaticMarkup(createElement(Mascot, { kind, pose, child: pose === "cheer" }))).not.toContain("NaN");
       }
     }
+  });
+
+  // User feedback, November 2026: a fox or bear that only stood by in a game – a family watching beside the picture,
+  // cheering beside the end's buttons, walking through a Wimmelbild – was decoration children wanted to tap and thought
+  // part of the game, and only added things to look at; all of them were taken out. A whole standing figure comes only
+  // where it does the game's thing: a new place goes on this list with what the figure does there.
+  test("a whole fox or bear figure stands only where it does the game's thing", async () => {
+    const doing: Record<string, string> = {
+      "src/games/letters/MovePlay.tsx": "Mitmachen: the child hops, claps and stamps the number",
+      "src/games/timer/scenes.tsx": "Timer: the child holds the basket, waters the flower, blows out the candle, takes its turn",
+      "src/games/together/pairs.tsx":
+        "Was gehört zusammen?: the child the doctor listens to and the hairdresser cuts, and the family the key opens the door to",
+    };
+    for await (const file of new Bun.Glob("src/**/*.tsx").scan(".")) {
+      if (file.endsWith("Mascot.tsx")) continue;
+      const code = await Bun.file(file).text();
+      if (/<Mascot[\s/>]/.test(code)) expect(doing[file] ? file : `${file} stands a fox or bear by: only where it does the game's thing`).toBe(file);
+    }
+    expect(await Bun.file("src/components/GameEnd.tsx").text()).not.toContain("@/components/Mascot");
   });
 });

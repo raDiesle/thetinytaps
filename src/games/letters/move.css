@@ -60,7 +60,7 @@
   filter: none;
 }
 
-/* The grown-up stands still; the child beside it, two thirds as tall, does the moving on a layer of its own. */
+/* The child alone – no grown-up standing by (decoration, user feedback, November 2026) – moving on a layer of its own. */
 .mv-family {
   display: flex;
   align-items: flex-end;
@@ -68,17 +68,11 @@
   cursor: pointer;
 }
 
-.mv-grown,
 .mv-kid {
   position: relative;
   display: block;
   height: 100%;
   aspect-ratio: 2 / 3;
-}
-
-.mv-kid {
-  height: 68%;
-  margin-left: -4%;
   will-change: transform;
 }
 

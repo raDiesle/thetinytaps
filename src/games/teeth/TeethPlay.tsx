@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
-import { CheeringFamily } from "@/components/Mascot";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
-import { loadRecordings, playChime, playCountNote, playDrumRoll, playLaugh, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { pageMoving, usePageStill } from "@/lib/pageMotion";
 import { finishRoutineStep } from "@/lib/routine";
 import { hush, recordedVoice } from "@/lib/voice";
@@ -311,7 +310,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const [tickled, setTickled] = useState<number | null>(null);
   const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
-  const { effects, celebrate, glow } = useTapFeedback();
+  const { effects, celebrate } = useTapFeedback();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
@@ -488,15 +487,6 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     [settings.sounds],
   );
 
-  /** The fox family at the end, tapped: a warm light where the finger was and a laugh, while they wave and grin. */
-  const greet = useCallback(
-    (e: PointerEvent<HTMLElement>) => {
-      glow(e.clientX, e.clientY);
-      if (settings.sounds) playRecorded("laugh", playLaugh);
-    },
-    [glow, settings.sounds],
-  );
-
   const again = useCallback(() => {
     const t = performance.now();
     // „Nochmal“ turns the page: the new brushing waits for it to lie still, like the first one.
@@ -656,8 +646,6 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {done ? (
         ending === "rest" && (
           <div className="teeth-end">
-            {/* Tapsi jumps for joy with Mama or Papa Fox beside it: brushing is done. Tapped, they wave and show their clean teeth. */}
-            <CheeringFamily kind="fox" className="teeth-family" onTap={greet} />
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
             <GameEnd inline onAgain={again} />
           </div>

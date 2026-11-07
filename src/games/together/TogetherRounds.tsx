@@ -43,7 +43,7 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
     // While developing, `?pair=<id>` shows that pair first, to look at it.
     const shown = DEV && last === null ? PAIRS.find((p) => p.id === new URLSearchParams(window.location.search).get("pair")) : undefined;
     if (shown) return dealRound(shown, PAIRS, TOGETHER_LEVELS[levelRef.current]);
-    const kind = nextKind(last, settings);
+    const kind = nextKind(last, settings.kinds);
     const pair = kind === "pair" ? drawOfDay() : drawHelper();
     return dealRound(pair, PAIRS, TOGETHER_LEVELS[levelRef.current]);
   }

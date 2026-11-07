@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { Mascot } from "@/components/Mascot";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { DEV } from "@/lib/buildInfo";
 import {
@@ -17,6 +16,7 @@ import {
 } from "@/lib/sfx";
 import { useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
+import { ASIDE_LINE_GAP_MS, EXTRA_SOUND_GAP_MS, spaced } from "@/lib/spacing";
 import { tapState } from "@/lib/tapTargets";
 import { dealPairs, lookKey, nextLevel, oneOf, type Side, SOCK_LEVELS, SOCK_TEXTS, shuffle, type SockLook } from "./content";
 import { Basket, Peg, SockDrawing, WashingMachine } from "./drawings";
@@ -171,6 +171,11 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   // Its ElevenLabs recording; a sentence not translated yet is said in German.
   const say = useCallback((text: string) => socksVoice.say(text, language.id), [language.id]);
+  // Praise and the end's line only accompany the play: when pairs come quickly, most of them pass silently
+  // (root CLAUDE.md, user feedback November 2026), and they never cut another line off.
+  const aside = useCallback((text: string) => socksVoice.say(text, language.id, { gap: ASIDE_LINE_GAP_MS }), [language.id]);
+  // The boing, the second knock and the twinkle of a pair landing: kept apart, so quick pairs don't clatter.
+  const extras = useRef(spaced(EXTRA_SOUND_GAP_MS)).current;
   // Its few sentences load as the game starts, so even the first is heard right away.
   useEffect(() => socksVoice.loadAll(language.id), [language.id]);
 
@@ -241,7 +246,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     const level = nextLevel(round.level, { pairs: round.socks.length / 2, misses: missesRef.current, ms: performance.now() - sortStartRef.current });
     setPhase("cheer");
     if (settings.sounds) playMelody();
-    say(texts.done);
+    aside(texts.done);
     celebrate();
     later(CHEER_MS, () => {
       // Every wash is a game for a game limit: with the last one played, the game says good night (GameShell).
@@ -275,24 +280,28 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       next[index] = { x: to.x - from.x, y: to.y - from.y, scale: target.offsetHeight / sock.offsetHeight };
     });
     setFlights((f) => ({ ...f, ...next }));
+    // The last pair leaves its praise and extras to the end's melody and line, which follow right after it.
+    const last = matchedRef.current.size === round.socks.length;
+    // The rising note and one knock always answer a pair; the rest only when the last extras lie far enough back.
+    const flourish = !last && extras.pass();
     if (settings.sounds) {
       // Each pair in a row a note higher up the scale, so a quick run climbs like a tune.
       later(120, () => playCountNote(Math.min(streak - 1, 7)));
-      later(150, playBoing);
+      if (flourish) later(150, playBoing);
     }
-    say(oneOf(texts.pair));
+    if (!last) aside(oneOf(texts.pair));
 
     later(FLY_MS, () => {
       setLanded((l) => [...l, ...pieces]);
       if (settings.sounds) {
         playKnock(1500);
-        later(120, () => playKnock(1300));
+        if (flourish) later(120, () => playKnock(1300));
         // From the third pair in a row on a twinkle comes with it – a sound only, nothing floats up after an answer.
-        if (streak >= 3) playTwinkle();
+        if (flourish && streak >= 3) playTwinkle();
       }
     });
 
-    if (matchedRef.current.size === round.socks.length) later(FLY_MS + 300, finish);
+    if (last) later(FLY_MS + 300, finish);
   };
 
   /** The child tapped (or chose by key) the sock at `index` on the floor. */
@@ -410,15 +419,6 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       <div className="sock-floor">
         <div className={`sock-machine${machineShut ? "" : " open"}`}>
           <WashingMachine looks={round.looks} />
-          {/* Tapsi and Mama Fuchs wait beside the machine while it washes (D-18), then step out of the way of the socks. */}
-          <span className="sock-family" aria-hidden>
-            <span className="sock-family-child">
-              <Mascot kind="fox" child />
-            </span>
-            <span className="sock-family-grown">
-              <Mascot kind="fox" />
-            </span>
-          </span>
         </div>
         <div className="sock-pile">
           <div ref={gridRef} className="sock-grid" style={{ "--cols": fit.columns, "--sock-h": `${fit.size}px` } as CSSProperties}>

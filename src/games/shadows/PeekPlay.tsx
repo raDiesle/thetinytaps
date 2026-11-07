@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { PointingFamily, type MascotKind } from "@/components/Mascot";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
@@ -49,12 +48,6 @@ interface Round {
   choices: ShadowItem[];
   correct: number;
 }
-
-/**
- * The fox or bear family standing beside the bush, the grown-up showing the child where something peeks out: picked by
- * chance once per visit, since every round is mounted anew and the family should stay the same.
- */
-const FAMILY: MascotKind = Math.random() < 0.5 ? "fox" : "bear";
 
 /** The side of the last round, so the next one peeks out of another; kept between rounds, which are mounted anew. */
 let lastSide: Side | null = null;
@@ -331,7 +324,6 @@ export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNe
           </div>
         </div>
         {/* Tapped, they wave and grin while the bush rustles and the animal calls, like a tap on the bush. */}
-        <PointingFamily kind={FAMILY} pointer="grown" className="pk-family mirror" onTap={onHideoutDown} />
       </div>
       {topic}
       <div className="sh-ground">

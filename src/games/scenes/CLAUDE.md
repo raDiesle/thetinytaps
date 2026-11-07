@@ -40,14 +40,11 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
   head of its own here. In a picture whose wild animals include a fox (Wald), the one in a role is a bear, so the
   child doesn't take the forester for the fox of the wood (nor a fox among the farm's hens: the farmer is a bear).
   Mama, Papa, Oma and Opa next to a human child stay people.
-- A fox or bear family out and about in a picture is `WalkingFamily` (`family.tsx`): grown-up and child hand in hand,
-  flat like the people, with the shared head, in clothes for the place. It is a thing of the background (a `<Poke>`
-  that hops), never an item, so it says nothing and no picture loses its translations; put it where nothing else
-  stands and no key badge lies on it, scaled with `depthScale` (Stadt, Strand, Spielplatz, Herbst, Winter, Ostern; in
-  the Kita it walks in the garden seen through the window, drawn inside that item). Look for the key badges in the
-  preview after placing it: a badge sits at the top of its item's box, which can reach far above the drawing (the dog's
-  in Herbst lay on the family's feet at first). In a picture with a wild fox the family is bears (Winter), as for the
-  grown-ups in a role.
+- No fox or bear family stands or walks in a picture as decoration: families walking hand in hand (`WalkingFamily`,
+  in Stadt, Strand, Spielplatz, Herbst, Winter, Ostern and the Kita garden) were taken out again (user feedback,
+  November 2026) – children tapped them, thought they belonged to the game, and they only added things to look at.
+  Fox and bear come into a picture only as what the picture already has: a grown-up in a role (above), a surprise a
+  hideout lets out, a driver – never as one more figure of their own.
 - Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
   small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
   riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.

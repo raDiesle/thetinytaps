@@ -1,12 +1,13 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GERMAN_ONLY, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
 import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
-import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
+import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./growth";
 import { KIND_SIGNS } from "./RoundTopic";
+import { DEFAULT_ANIMALS_SETTINGS } from "./settings";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
@@ -44,13 +45,32 @@ test("no word of any language is left over from an animal, food or home that is 
   }
 });
 
-test("the translated languages have words for every animal, every food and home", () => {
+test("the translated languages have words for every animal, every food and home, but none yet for those still German only", () => {
+  const known = (list: string[], id: string) => !list.includes(id);
   for (const language of COMPLETE) {
     const { words } = ANIMAL_TRANSLATIONS[language]!;
-    for (const { id } of ANIMALS) expect(words.animals[id], `${language} ${id}`).toBeDefined();
-    for (const { id } of FOODS) expect(words.foods[id], `${language} ${id}`).toBeDefined();
-    for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id], `${language} ${id}`).toBeDefined();
+    for (const { id } of ANIMALS) expect(words.animals[id] !== undefined, `${language} ${id}`).toBe(known(GERMAN_ONLY.animals, id));
+    for (const { id } of FOODS) expect(words.foods[id] !== undefined, `${language} ${id}`).toBe(known(GERMAN_ONLY.foods, id));
+    for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id] !== undefined, `${language} ${id}`).toBe(known(GERMAN_ONLY.homes, id));
   }
+  // The list names only what there is.
+  for (const id of GERMAN_ONLY.animals)
+    expect(
+      ANIMALS.some((a) => a.id === id),
+      id,
+    ).toBe(true);
+  for (const id of GERMAN_ONLY.foods)
+    expect(
+      FOODS.some((f) => f.id === id),
+      id,
+    ).toBe(true);
+  for (const id of GERMAN_ONLY.homes) expect(id in HOMES, id).toBe(true);
+  for (const id of GERMAN_ONLY.gifts) expect(id in GIFTS, id).toBe(true);
+  for (const id of GERMAN_ONLY.growths)
+    expect(
+      GROWTHS.some((g) => g.id === id),
+      id,
+    ).toBe(true);
 });
 
 test("the sentences have no German left in them, and none in another script has Latin letters", () => {
@@ -78,14 +98,16 @@ test("the gift and growth sentences are translated, and none in another script h
     const gift = GIFT_TEXTS[language]!;
     const grow = GROW_TEXTS[language]!;
     const shown: [string, string][] = [];
-    for (const animal of GIVERS) {
+    // Those still German only say the whole German sentence (checked below).
+    for (const animal of GIVERS.filter((a) => !GERMAN_ONLY.animals.includes(a.id) && !GERMAN_ONLY.gifts.includes(a.gives!))) {
       const given = GIFTS[animal.gives!];
       shown.push([gift.whatGives(animal), GIFT_TEXTS.de.whatGives(animal)]);
       shown.push([gift.gives(animal, given), GIFT_TEXTS.de.gives(animal, given)]);
-      shown.push([gift.comesFrom(given, animal), GIFT_TEXTS.de.comesFrom(given, animal)]);
+      // A wrong gift names the animal it comes from (`giverOf`), the only one said after it.
+      shown.push([gift.comesFrom(given, giverOf(given)), GIFT_TEXTS.de.comesFrom(given, giverOf(given))]);
       shown.push([gift.gift(given), GIFT_TEXTS.de.gift(given)]);
     }
-    for (const growth of GROWTHS) {
+    for (const growth of GROWTHS.filter((g) => !GERMAN_ONLY.growths.includes(g.id))) {
       for (const key of ["young", "adult", "whatBecomes", "becomes", "comesFrom"] as const) shown.push([grow[key](growth), GROW_TEXTS.de![key](growth)]);
     }
     for (const [sentence, de] of shown) {
@@ -111,21 +133,19 @@ test("an animal without its words gets the whole German sentence, in every langu
   }
 });
 
-test("only the kinds switched on take turns, in their order, and none switched on plays all", () => {
-  const off = { peek: false, feed: false, gift: false, home: false, grow: false };
-  const turns = (on: Partial<Record<RoundKind, boolean>>) => {
-    const all = { ...off, ...on };
-    const kinds = [nextKind(null, all)];
-    for (let i = 0; i < 6; i++) kinds.push(nextKind(kinds[kinds.length - 1], all));
-    return kinds;
+// Grown-ups choose all kinds or exactly one, never a mix of some (user feedback, November 2026).
+test("all kinds take turns in their order, or only the one chosen; no kind is switched on or off on its own", () => {
+  const turns = (kinds: "all" | RoundKind) => {
+    const played = [nextKind(null, kinds)];
+    for (let i = 0; i < 6; i++) played.push(nextKind(played[played.length - 1], kinds));
+    return played;
   };
-  expect(turns({ peek: true, feed: true, gift: true, home: true, grow: true })).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
-  expect(turns({ feed: true, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home", "feed"]);
-  expect(turns({ peek: true })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek", "peek"]);
-  expect(turns({})).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
-  // A kind switched off while it plays: the turns go on with the next one switched on.
-  expect(nextKind("feed", { ...off, peek: true })).toBe("peek");
-  expect(nextKind("grow", { ...off, home: true })).toBe("home");
+  expect(turns("all")).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
+  expect(turns("home")).toEqual(["home", "home", "home", "home", "home", "home", "home"]);
+  // One kind chosen while another plays: the next round is the chosen one.
+  expect(nextKind("feed", "peek")).toBe("peek");
+  expect(DEFAULT_ANIMALS_SETTINGS.kinds).toBe("all");
+  for (const kind of KIND_ORDER) expect(kind in DEFAULT_ANIMALS_SETTINGS, kind).toBe(false);
   // The fixed difficulties are steps there are, easy to hard.
   expect(FIXED_LEVELS.easy).toBe(0);
   expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
@@ -223,6 +243,35 @@ test("every animal with a home has enough wrong homes it really doesn't live in"
   }
 });
 
+// A wrong home shows who lives there (the first animal with it as its home), so every home needs one; and the animal
+// moving in sits inside the drawing, standing no lower than its ground.
+test("every home has a resident to peek out, and the animal moving in fits inside it", () => {
+  for (const home of Object.values(HOMES)) {
+    expect(
+      ANIMALS.some((a) => a.home === home.id),
+      `${home.id} needs an animal living there`,
+    ).toBe(true);
+    const half = home.fit * 60;
+    expect(home.spot[0] - half, home.id).toBeGreaterThanOrEqual(0);
+    expect(home.spot[0] + half, home.id).toBeLessThanOrEqual(120);
+    expect(home.spot[1] - half, home.id).toBeGreaterThanOrEqual(0);
+    expect(home.spot[1] + half, home.id).toBeLessThanOrEqual(122);
+  }
+  // Two animals that look the same or share an id could not be told apart.
+  expect(new Set(ANIMALS.map((a) => a.id)).size).toBe(ANIMALS.length);
+  expect(new Set(ANIMALS.map((a) => a.emoji)).size).toBe(ANIMALS.length);
+});
+
+test("the German home sentences read right", () => {
+  const de = ANIMAL_TEXTS.de;
+  const by = (id: string) => ANIMALS.find((a) => a.id === id)!;
+  expect(de.movedIn(by("hund"), HOMES.huette)).toBe("Juhu! Der Hund wohnt in der Hütte.");
+  expect(de.movedIn(by("kamel"), HOMES.wueste)).toBe("Juhu! Das Kamel wohnt in der Wüste.");
+  expect(de.movedIn(by("wal"), HOMES.meer)).toBe("Juhu! Der Wal wohnt im Meer.");
+  expect(de.whereLives(by("fledermaus"))).toBe("Wo wohnt die Fledermaus?");
+  expect(de.livesHere(by("biber"))).toBe("Nein, hier wohnt der Biber!");
+});
+
 test("every animal that gives us something says what else it gives, and enough is left to choose from", () => {
   for (const animal of GIVERS) {
     expect(animal.alsoGives, `${animal.id} needs its alsoGives list`).toBeDefined();
@@ -234,8 +283,26 @@ test("every animal that gives us something says what else it gives, and enough i
     for (const id of animal.alsoGives!) expect(wrong, animal.id).not.toContain(id);
     expect(wrong.length, animal.id).toBeGreaterThanOrEqual(2);
   }
-  // Every gift has an animal it comes from, which pops up when it is given to another.
-  for (const gift of Object.values(GIFTS)) expect(giverOf(gift).gives).toBe(gift.id);
+  for (const gift of Object.values(GIFTS)) {
+    // Every gift has an animal it comes from, which pops up when it is given to another, and that animal gives it.
+    const giver = giverOf(gift);
+    expect(giver, gift.id).toBeDefined();
+    expect([giver.gives, ...(giver.alsoGives ?? [])], gift.id).toContain(gift.id);
+    // Every gift is some animal's own, so it is also a right answer and its making (`.ap-made`) is seen.
+    expect(
+      GIVERS.some((a) => a.gives === gift.id),
+      gift.id,
+    ).toBe(true);
+    // Every animal that gives it says so, in `gives` or `alsoGives`: the giver's own gift is never a wrong choice for it.
+    for (const animal of GIVERS) if (animal !== giver && animal.gives === gift.id) expect(wrongGifts(animal), animal.id).not.toContain(gift);
+  }
+});
+
+// The child tells the animals apart by their pictures: two with one emoji (a llama and an alpaca) would be one animal
+// with two names.
+test("no two animals share a picture", () => {
+  const emojis = ANIMALS.map((a) => a.emoji);
+  expect(emojis.filter((e, i) => emojis.indexOf(e) !== i)).toEqual([]);
 });
 
 test("the German gift sentences say „vom“ and „von der“ right", () => {
@@ -245,6 +312,13 @@ test("the German gift sentences say „vom“ and „von der“ right", () => {
   expect(de.gives(by("huhn"), GIFTS.ei)).toBe("Das Huhn gibt uns Eier. Danke!");
   expect(de.comesFrom(GIFTS.ei, by("huhn"))).toBe("Das Ei kommt vom Huhn!");
   expect(de.comesFrom(GIFTS.milch, by("kuh"))).toBe("Die Milch kommt von der Kuh!");
+  expect(de.whatGives(by("ziege"))).toBe("Was gibt uns die Ziege?");
+  expect(de.gives(by("ziege"), GIFTS.kaese)).toBe("Die Ziege gibt uns Käse. Danke!");
+  expect(de.gives(by("lama"), GIFTS.wolle)).toBe("Das Lama gibt uns Wolle. Danke!");
+  expect(de.comesFrom(GIFTS.kaese, giverOf(GIFTS.kaese))).toBe("Der Käse kommt von der Kuh!");
+  expect(de.comesFrom(GIFTS.wolle, by("lama"))).toBe("Die Wolle kommt vom Lama!");
+  // The best-known giver pops up: the hen's egg, not the duck's or the goose's.
+  expect(giverOf(GIFTS.ei).id).toBe("huhn");
 });
 
 test("what the small one becomes is the one right choice, and the others become something else", () => {
@@ -252,13 +326,31 @@ test("what the small one becomes is the one right choice, and the others become 
   expect(new Set(GROWTHS.map((g) => g.emoji)).size).toBe(GROWTHS.length);
   for (const level of ANIMAL_LEVELS) {
     for (const growth of GROWTHS) {
-      const round = dealGrow(growth, level.choices);
-      expect(round.grown.length).toBe(Math.min(level.choices, GROWTHS.length));
-      expect(new Set(round.grown).size).toBe(round.grown.length);
-      expect(round.grown.filter((g) => g === growth).length).toBe(1);
-      expect(round.grown[round.correct]).toBe(growth);
+      // Dealt many times, since the others are picked by chance.
+      for (let i = 0; i < 20; i++) {
+        const round = dealGrow(growth, level.choices);
+        expect(round.grown.length, growth.id).toBe(level.choices);
+        expect(new Set(round.grown).size).toBe(round.grown.length);
+        expect(round.grown.filter((g) => g === growth).length).toBe(1);
+        expect(round.grown[round.correct]).toBe(growth);
+        // Exactly one fits: nothing a child could think comes out of this small one too.
+        for (const g of round.grown) if (g !== growth) expect(growLookAlike(g, growth), `${growth.id} ${g.id}`).toBe(false);
+      }
     }
   }
+  // Every plant is alike to every other (flowers look alike, trees look alike, and no child can tell which seed, nut,
+  // bulb or bud becomes which plant); the lookalike groups name only small ones there are.
+  const animals = ["raupe", "ei", "kaulquappe"];
+  const plants = GROWTHS.filter((g) => !animals.includes(g.id));
+  for (const a of plants) for (const b of plants) if (a !== b) expect(growLookAlike(a, b), `${a.id} ${b.id}`).toBe(true);
+  for (const id of GROW_LOOKALIKES.flat())
+    expect(
+      GROWTHS.some((g) => g.id === id),
+      id,
+    ).toBe(true);
+  // Enough that aren't alike are left for the most choices a step offers.
+  const most = Math.max(...ANIMAL_LEVELS.map((l) => l.choices));
+  for (const growth of GROWTHS) expect(GROWTHS.filter((g) => g !== growth && !growLookAlike(g, growth)).length, growth.id).toBeGreaterThanOrEqual(most - 1);
   // What it becomes stands inside its box, and its sounds come while it grows.
   for (const g of GROWTHS) {
     for (const xy of g.spot) expect(xy, g.id).toBeGreaterThan(0);
@@ -274,6 +366,14 @@ test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „a
   expect(de.becomes(byId.ei)).toBe("Aus dem Ei wird ein Küken. Toll!");
   expect(de.becomes(byId.samen)).toBe("Aus dem Samen wird eine Sonnenblume. Toll!");
   expect(de.comesFrom(byId.kaulquappe)).toBe("Der Frosch kommt aus der Kaulquappe!");
+  expect(de.whatBecomes(byId.eichel)).toBe("Was wird aus der Eichel?");
+  expect(de.becomes(byId.eichel)).toBe("Aus der Eichel wird ein Baum. Toll!");
+  expect(de.comesFrom(byId.eichel)).toBe("Der Baum kommt aus der Eichel!");
+  expect(de.becomes(byId.zwiebel)).toBe("Aus der Zwiebel wird eine Tulpe. Toll!");
+  expect(de.becomes(byId.kuerbiskern)).toBe("Aus dem Kürbiskern wird ein Kürbis. Toll!");
+  expect(de.comesFrom(byId.kokosnuss)).toBe("Die Palme kommt aus der Kokosnuss!");
+  expect(de.whatBecomes(byId.knospe)).toBe("Was wird aus der Knospe?");
+  expect(de.becomes(byId.knospe)).toBe("Aus der Knospe wird eine Rose. Toll!");
 });
 
 // A round's sign stands before its name under ⚙️; were it one of the pictures to pick from, it would give the answer away
@@ -291,4 +391,13 @@ test("the round's topic while playing is plain text, without its sign", async ()
   const component = source.slice(source.indexOf("export function RoundTopic"));
   expect(component).not.toContain("KIND_SIGNS");
   expect(component).not.toContain("bubble");
+});
+
+// Two animals share a food by its id (cat and penguin both like fish): an animal added later writes it out again, and
+// a different picture or name under the same id would show one food two ways, or say the wrong word.
+test("a food shared by several animals looks and is named the same for each", () => {
+  for (const animal of ANIMALS.filter((a) => a.food)) {
+    const shared = FOODS.find((f) => f.id === animal.food!.id)!;
+    expect(animal.food, animal.id).toEqual(shared);
+  }
 });
