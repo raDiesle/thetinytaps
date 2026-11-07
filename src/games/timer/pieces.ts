@@ -15,7 +15,7 @@ export function appleCount(ms: number): number {
   return Math.max(MIN_APPLES, Math.min(MAX_APPLES, Math.round(ms / 2000)));
 }
 
-/** The whole seconds of a run, at least one: the pictures' steps a second (`--tm-secs`, the caterpillar's bites). */
+/** The whole seconds of a run, at least one: the caterpillar's bites, one a second. */
 export function runSeconds(ms: number): number {
   return Math.max(1, Math.round(ms / 1000));
 }
