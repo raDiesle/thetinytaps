@@ -77,6 +77,6 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now holds two wooden oars in the holders and rows; the boat glides away from the jetty with little waves behind it, and both children smile happily.",
     sounds: ["splash", "trickle"],
-    made: "frames",
+    made: true,
   },
 ];

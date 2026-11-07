@@ -123,6 +123,7 @@ export const PAINTED: PaintedPair[] = [
       "A cosy street corner in the evening: cobblestones, a glowing street lamp, the lit window of a café behind. A little bear child in a yellow raincoat stands nearby, waiting, looking up at her. Under the street lamp stands the musician, a grown-up fox woman with eyelashes in a black jacket with a golden scarf, her paws empty, looking at them, brows raised, mouth a small o.",
     after: "The musician now holds a golden saxophone and plays it, cheeks round, eyes happy. The bear child sways along, smiling.",
     sounds: ["melody"],
+    fromFirst: true,
   },
   {
     id: "floetenspieler",
@@ -154,6 +155,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A tall golden harp with many strings now stands beside the stool; the musician, still on the stool, plucks its strings with both paws, smiling. The fox child listens dreamily.",
     sounds: ["plink", "melody"],
+    fromFirst: true,
     made: "part",
   },
   {
@@ -170,7 +172,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A wooden xylophone with rainbow-coloured bars now lies on the rug in front of him, and he taps its bars with two mallets, smiling. The two children clap happily.",
     sounds: ["plink", "melody"],
-    made: "part",
+    made: true,
   },
   {
     id: "tubaspieler",

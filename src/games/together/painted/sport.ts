@@ -77,8 +77,9 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Schwimmbrille", the: "die Schwimmbrille", acc: "die Schwimmbrille", emoji: "🥽" },
     cast: "fox",
     before:
-      "An indoor swimming pool with clear blue water and lane ropes; a red diving ring lies on the bottom of the pool, deep down. On the edge of the pool stands a grown-up fox in blue swimming trunks and a blue swim shirt, rubbing his stinging eyes with both paws and squinting at the ring in the water, brows raised, mouth a small o.",
-    after: "The fox now wears swimming goggles over his eyes and dives down to the red ring with his eyes wide open, smiling.",
+      "An indoor swimming pool with clear blue water and lane ropes; a red diving ring lies on the bottom of the pool, deep down. On the edge of the pool stands a grown-up fox in blue swimming trunks and a blue swim shirt, his bare eyes squeezed half shut, nothing on his face or head, one paw pointing at the ring in the water, brows raised, mouth a small o.",
+    after:
+      "The fox now wears blue swimming goggles over his eyes, wide open behind them, and stands at the pool's edge where he was, ready to dive for the ring, smiling.",
     sounds: ["snap", "splash"],
     // Armbands and a life ring are for the water too, and one can look under water from a submarine.
     alsoFits: ["schwimmlehrer", "rettungsschwimmerin", "tiefseeforscherin"],
@@ -239,6 +240,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["ring", "whoosh"],
     // A motorbike and a unicycle go down a road too.
     alsoFits: ["motorradfahrerin", "einradfahrer"],
+    fromFirst: true,
   },
   {
     id: "kletterin",
@@ -256,6 +258,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["swirl", "snap"],
     // A sailor ties his boat with a rope, and a trapeze hangs from ropes.
     alsoFits: ["segler", "akrobatin"],
+    fromFirst: true,
     made: "part",
   },
   {
@@ -291,7 +294,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["squeak", "splash"],
     // A swimmer and a lifeguard need them too.
     alsoFits: ["schwimmer", "rettungsschwimmerin", "polizist"],
-    made: "part",
+    made: true,
   },
   {
     id: "gewichtheberin",

@@ -50,6 +50,7 @@ export const PAINTED: PaintedPair[] = [
       "A white rocket with red fins and a red tip now stands on the launch pad beside the tower and lifts off with a bright flame and clouds of smoke; the astronaut waves happily from its round window, her helmet on.",
     sounds: ["launch"],
     alsoFits: ["sternguckerin"],
+    fromFirst: true,
   },
   {
     id: "fensterputzer",
@@ -65,6 +66,7 @@ export const PAINTED: PaintedPair[] = [
       "The window cleaner now wipes the glass with a yellow sponge, foam on it; the wiped half of the window is clear and you can see through it, the other half still dusty. He smiles happily.",
     sounds: ["squeak", "scrub"],
     alsoFits: ["obstbaeuerin"],
+    fromFirst: true,
   },
   {
     id: "fotograf",
@@ -110,6 +112,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The jacket lies on the table where it was; the tailor now pushes a long silver needle with red thread through its sleeve at the rip, a wooden spool of red thread in her other paw, and half of the rip is already sewn shut with big red stitches. She smiles happily.",
     sounds: ["whirr"],
+    fromFirst: true,
     made: "part",
   },
   {

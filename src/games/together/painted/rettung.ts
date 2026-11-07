@@ -83,6 +83,7 @@ export const PAINTED: PaintedPair[] = [
       "A red rescue helicopter now stands on the landing pad, its rotor still and its side door open. The pilot and the lamb stay exactly where they were, both smiling at it.",
     sounds: ["rotor"],
     alsoFits: ["pilot", "sanitaeter", "feuerwehrfrau"],
+    fromFirst: true,
   },
   {
     id: "feuerwehrmann",
@@ -115,6 +116,6 @@ export const PAINTED: PaintedPair[] = [
       "A brown-and-black shepherd dog in a plain dark-blue harness with no letters is now on the leash; it sniffs into the bushes and pulls the teddy out. The fox child hugs the teddy, and the officer smiles happily.",
     sounds: ["rustle", "giggle"],
     alsoFits: ["polizist", "schaefer"],
-    made: "frames",
+    made: true,
   },
 ];

@@ -32,6 +32,7 @@ export const PAINTED: PaintedPair[] = [
       "The mechanic now holds a big silver spanner on the nut in the very middle of the wheel and turns it; the wheel stands straight on the car again. She smiles happily.",
     sounds: ["click", "rattle"],
     alsoFits: ["klempner", "handwerker", "abschleppfahrer"],
+    made: true,
   },
   {
     id: "tischlerin",
@@ -93,6 +94,7 @@ export const PAINTED: PaintedPair[] = [
       "A tall yellow tower crane now stands beside the house and lifts the pallet of bricks up high on its hook, its cab empty; the fox stands where he was, steering it with a small yellow control box in his paws, and smiles happily.",
     sounds: ["whirr", "thump"],
     alsoFits: ["bauarbeiterin", "baggerfahrer"],
+    fromFirst: true,
   },
   {
     id: "klempner",

@@ -34,6 +34,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["rustle", "pop"],
     // Sunglasses look like reading glasses.
     alsoFits: ["sonne-sonnenbrille"],
+    made: true,
   },
   {
     id: "schraube-schraubenzieher",
@@ -65,6 +66,7 @@ export const PAINTED: PaintedPair[] = [
       "The fox child now hits the nail with a hammer with a wooden handle and a grey metal head, the nail going down into the board; both foxes smile happily.",
     sounds: ["knocks"],
     alsoFits: ["schraube-schraubenzieher"],
+    fromFirst: true,
   },
   {
     id: "besen-kehrschaufel",

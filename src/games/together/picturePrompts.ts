@@ -50,10 +50,31 @@ export function framesJob(p: PaintedPair, before: string, after: string): Queued
   };
 }
 
+/** What a second frame drawn alone from its first says: the reference picture a moment later, only the named change. */
+const FROM_FIRST =
+  "The reference picture a moment later: the very same picture – the same place, background, furniture, framing and zoom, the same characters in the same clothes, colours and line style, nobody moved to another place – with only this change:";
+
+/** The second frame of a pair whose frames drifted apart twice as one request, drawn alone from its first (`fromFirst`). */
+export function secondFrameJob(p: PaintedPair, before: string, after: string): QueuedPicture {
+  return {
+    id: `zusammen-${p.id}-2`,
+    file: after,
+    use: `Was gehört zusammen?, „${p.name}“: das Bild nachher, aus dem Bild vorher`,
+    prompt: `${FROM_FIRST} ${p.after} Every character and every thing exactly once: a character that holds something new is the same one, not a second copy, and nothing is left at an old place. Feelings show only in faces and poses: no question mark, sparkle, star, glow, heart, letter or motion line.`,
+    aspect: "3:2",
+    size: "840x560",
+    quality: 72,
+    ref: [before],
+    alone: "second frame",
+    date: DATE,
+  };
+}
+
 /** The pictures of the painted pairs still to make, as the picture queue takes them: one request per pair for its two frames, and the painted partners four to a sheet. */
 export const TOGETHER_PICTURE_QUEUE: QueuedPicture[] = PAINTED.filter((p) => p.made !== true).flatMap((p): QueuedPicture[] => {
   const pictures: QueuedPicture[] = [];
-  if (p.made !== "frames") pictures.push(framesJob(p, `${DIR}/${p.id}-1.webp`, `${DIR}/${p.id}-2.webp`));
+  const [before, after] = [`${DIR}/${p.id}-1.webp`, `${DIR}/${p.id}-2.webp`];
+  if (p.made !== "frames") pictures.push(p.fromFirst ? secondFrameJob(p, before, after) : framesJob(p, before, after));
   if (p.part && p.made !== "part")
     pictures.push({
       id: `zusammen-teil-${p.id}`,

@@ -73,6 +73,11 @@ export interface PaintedPair {
   sounds: SoundName[];
   /** Other pairs of its kind whose partner fits this one too, or which this one's partner fits (see `SceneSpec`). */
   alsoFits?: string[];
+  /**
+   * Its two frames drifted apart twice when drawn together as one request (a figure doubled, the framing changed): the
+   * first is kept, and the second is drawn alone from it as its reference (`alone: "second frame"`, `picturePrompts.ts`).
+   */
+  fromFirst?: true;
   /** Its pictures are made and in `bilder/` (no longer queued), or only its two frames („frames“, its `part` still to come), or only its `part` („part“, its frames drawn again). */
   made?: true | "frames" | "part";
 }

@@ -47,6 +47,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["clonk", "twinkle"],
     // A king may carry a shield too.
     alsoFits: ["ritter"],
+    made: true,
   },
   {
     id: "ritter",
@@ -64,7 +65,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["clonk", "giggle"],
     // A king may carry the shield, and a knight rides a horse.
     alsoFits: ["koenig", "reiterin"],
-    made: "part",
+    made: true,
   },
   {
     id: "fee",
@@ -73,7 +74,7 @@ export const PAINTED: PaintedPair[] = [
     the: "die Fee",
     toThe: "die Fee",
     partner: { name: "Zauberstab", the: "der Zauberstab", acc: "den Zauberstab" },
-    part: "a slim white magic wand with a little golden star at its tip, nothing round it",
+    part: "a slim magic wand, its whole shaft white, a little golden star at its tip, nothing round it",
     cast: "fox",
     before:
       "A garden at night under a full moon, a big round orange pumpkin lying on the grass in the middle. Beside the pumpkin stands the fairy, a grown-up fox woman with eyelashes in a pink dress with gauzy lilac wings and a flower wreath in her hair, her paws empty, looking at the pumpkin, brows raised, mouth a small o.",
@@ -98,6 +99,7 @@ export const PAINTED: PaintedPair[] = [
       "The magician now holds a black top hat upside down on the table, and a little white rabbit peeks out of it; the magician beams and the bear child claps, laughing.",
     sounds: ["poof", "drumRoll"],
     alsoFits: ["fee"],
+    made: true,
   },
   {
     id: "hexe",
@@ -183,6 +185,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["click", "twinkle"],
     // A detective may search with a torch, and the dwarf's pickaxe fits a cave too.
     alsoFits: ["detektivin", "zwerg"],
+    made: true,
   },
   {
     id: "abenteurerin",
@@ -249,7 +252,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The old fox now sprinkles fine golden sand from a small brown cloth sack over the child, who lies with closed eyes, smiling in its sleep. The fox smiles contently.",
     sounds: ["trickle", "musicbox"],
-    made: "frames",
+    made: true,
   },
   {
     id: "frau-holle",
@@ -285,5 +288,6 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["plop", "hum"],
     // Swimming goggles let one look under water too.
     alsoFits: ["schwimmer"],
+    fromFirst: true,
   },
 ];

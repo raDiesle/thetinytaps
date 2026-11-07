@@ -34,7 +34,7 @@ export const PAINTED: PaintedPair[] = [
       "The fox child now holds a garden rake with a long wooden handle and a metal head with tines and rakes the leaves into a big pile; a strip of green lawn shows behind it. The fox child smiles happily.",
     sounds: ["leaves", "rustle"],
     alsoFits: ["besen-kehrschaufel"],
-    made: "frames",
+    made: true,
   },
   {
     id: "zelt-taschenlampe",
@@ -51,7 +51,7 @@ export const PAINTED: PaintedPair[] = [
       "The bear child now holds a grey torch whose yellow beam shines into the tent and lights up a rolled-out blue sleeping bag inside. The bear child smiles happily.",
     sounds: ["click", "chime"],
     alsoFits: ["feuerstelle-feuer", "laterne-licht"],
-    made: "frames",
+    made: true,
   },
   {
     id: "apfelbaum-leiter",

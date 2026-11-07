@@ -38,7 +38,8 @@ first, helpers of one place (the builder's bricks, the crane driver's crane) are
   --make`), never pair by pair. `content.test.ts` fails on a picture drawn alone or a partner with a reference. Check
   each pair before and after side by side (`bun run frames` too), mark it `made`, and redraw what isn't clear: a pair
   whose two frames drift apart is redrawn as one request again, and only if that fails twice its second frame alone
-  from the first (`alone: "second frame"`, `/bild-erzeugen`).
+  from the first (`fromFirst` on the pair keeps the first and queues `secondFrameJob`, `alone: "second frame"`; 17 pairs
+  needed it in November 2026, the test keeps it under a fifth).
 - **Scenes** (`scenes/<topic>.ts`, about 220, the older emoji scenes, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
   as a big emoji (or, for a helper, the fox or bear in its outfit, `Helper.tsx`, with what it works on), a few small
   emoji round it for context (`props`), the partner, and one of a few shared motions (`Act`: onto, into, beside, rub,

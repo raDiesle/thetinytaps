@@ -218,7 +218,15 @@ test("every layer's class is styled in together.css", () => {
 // The pictures cost as little as they can (user feedback, November 2026: frames and partners sent one per request cost
 // twice as much): a pair's two frames are one request, cut apart, and the painted partners share sheets of four.
 test("the painted pairs' pictures go out on shared sheets, never one per request", () => {
+  const fromFirst = new Set(PAINTED.filter((p) => p.fromFirst).map((p) => `zusammen-${p.id}-2`));
   for (const p of TOGETHER_PICTURE_QUEUE) {
+    if (fromFirst.has(p.id)) {
+      // Only a pair whose frames drifted apart twice as one request: its kept first frame is the reference.
+      expect(p.alone).toBe("second frame");
+      expect(p.ref?.length).toBe(1);
+      expect(existsSync(p.ref?.[0] ?? ""), `${p.id}: its first frame is kept`).toBe(true);
+      continue;
+    }
     expect(p.alone, `${p.id} is drawn alone`).toBeUndefined();
     if (p.transparent) expect(p.ref ?? [], `${p.id}: a partner is drawn from its words, so it can share a sheet`).toEqual([]);
     else expect(p.panels?.length, `${p.id}: both frames in one request`).toBe(2);
@@ -227,6 +235,7 @@ test("the painted pairs' pictures go out on shared sheets, never one per request
   const sheets = [...plan.now, ...plan.waiting];
   const parts = TOGETHER_PICTURE_QUEUE.filter((p) => p.transparent).length;
   expect(sheets.length).toBeLessThanOrEqual(TOGETHER_PICTURE_QUEUE.length - parts + Math.ceil(parts / 4) + 1);
+  expect(fromFirst.size, "a second frame alone is the exception").toBeLessThan(PAINTED.length / 5);
 });
 
 test("every painted pair has its pictures once made, and every picture its pair", () => {

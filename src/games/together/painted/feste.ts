@@ -35,6 +35,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["twinkle", "chime"],
     // Candles would go on a Christmas tree too.
     alsoFits: ["torte-kerze"],
+    fromFirst: true,
   },
   {
     id: "osterei-pinsel",
@@ -52,7 +53,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["swirl"],
     // The handmade paper's crayons would colour an egg too, and the Easter nest's eggs are painted ones.
     alsoFits: ["papier", "osternest-ostereier"],
-    made: "part",
+    made: true,
   },
   {
     id: "laterne-licht",
@@ -95,12 +96,12 @@ export const PAINTED: PaintedPair[] = [
     the: "das Osternest",
     toThe: "zum Osternest",
     partner: { name: "Ostereier", the: "die Ostereier", acc: "die Ostereier", plural: true },
-    part: "exactly three Easter eggs lying together, a red one, a blue one and a yellow one, each painted with white stripes and dots",
+    part: "four pastel Easter eggs lying together, pink, light blue, yellow and light green, each painted with stripes and dots in several colours",
     cast: "fox",
     before:
       "A spring garden with green grass, a bush and yellow daffodils. In the middle in the grass a round nest of straw, empty. A fox child in a light-green T-shirt kneels beside it with empty paws, looking into the empty nest, brows raised, mouth a small o.",
     after:
-      "Three Easter eggs now lie in the nest, a red one, a blue one and a yellow one, each painted with white stripes and dots, and the fox child points at them, smiling happily.",
+      "Four pastel Easter eggs, each painted with stripes and dots in several colours, now lie in the nest, and the fox child points at them, smiling happily.",
     sounds: ["plop", "twinkle"],
     alsoFits: ["osterei-pinsel"],
     made: "frames",

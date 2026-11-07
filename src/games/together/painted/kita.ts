@@ -67,6 +67,7 @@ export const PAINTED: PaintedPair[] = [
       "A Kita music corner with a soft round rug and a window. On the rug in the middle lies a toy xylophone with rainbow-coloured metal bars on a wooden frame. A fox child in a red sweater sits in front of it, its empty paws hovering over the bars, looking at them, brows raised, mouth a small o.",
     after: "The fox child now holds two wooden mallets with round red heads and plays on the colourful bars, laughing happily.",
     sounds: ["plink", "melody"],
+    made: true,
   },
   {
     id: "perlen-schnur",

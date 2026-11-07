@@ -129,8 +129,9 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A little waffle stand at a winter market with a wooden counter and a string of lights. On the counter a big bowl of golden batter with a ladle in it and an empty plate. A bear child in a red woolly hat stands at the counter holding the empty plate's edge, waiting. The waffle baker, a grown-up fox woman with eyelashes in a cream-coloured apron and a red headband, stands behind the counter with empty paws, looking at the batter, brows raised, mouth a small o.",
     after:
-      "An open round waffle iron now stands on the counter, a golden heart-shaped waffle steaming in it; the waffle baker lifts the waffle onto the child's plate. Both smile happily.",
+      "An open round black waffle iron with a long handle on each side now stands on the counter, a golden heart-shaped waffle steaming in it; the waffle baker lifts the waffle onto the child's plate. Both smile happily.",
     sounds: ["sizzle", "yum"],
+    fromFirst: true,
     made: "part",
   },
 ];
