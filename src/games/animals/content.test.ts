@@ -243,6 +243,35 @@ test("every animal with a home has enough wrong homes it really doesn't live in"
   }
 });
 
+// A wrong home shows who lives there (the first animal with it as its home), so every home needs one; and the animal
+// moving in sits inside the drawing, standing no lower than its ground.
+test("every home has a resident to peek out, and the animal moving in fits inside it", () => {
+  for (const home of Object.values(HOMES)) {
+    expect(
+      ANIMALS.some((a) => a.home === home.id),
+      `${home.id} needs an animal living there`,
+    ).toBe(true);
+    const half = home.fit * 60;
+    expect(home.spot[0] - half, home.id).toBeGreaterThanOrEqual(0);
+    expect(home.spot[0] + half, home.id).toBeLessThanOrEqual(120);
+    expect(home.spot[1] - half, home.id).toBeGreaterThanOrEqual(0);
+    expect(home.spot[1] + half, home.id).toBeLessThanOrEqual(122);
+  }
+  // Two animals that look the same or share an id could not be told apart.
+  expect(new Set(ANIMALS.map((a) => a.id)).size).toBe(ANIMALS.length);
+  expect(new Set(ANIMALS.map((a) => a.emoji)).size).toBe(ANIMALS.length);
+});
+
+test("the German home sentences read right", () => {
+  const de = ANIMAL_TEXTS.de;
+  const by = (id: string) => ANIMALS.find((a) => a.id === id)!;
+  expect(de.movedIn(by("hund"), HOMES.huette)).toBe("Juhu! Der Hund wohnt in der Hütte.");
+  expect(de.movedIn(by("kamel"), HOMES.wueste)).toBe("Juhu! Das Kamel wohnt in der Wüste.");
+  expect(de.movedIn(by("wal"), HOMES.meer)).toBe("Juhu! Der Wal wohnt im Meer.");
+  expect(de.whereLives(by("fledermaus"))).toBe("Wo wohnt die Fledermaus?");
+  expect(de.livesHere(by("biber"))).toBe("Nein, hier wohnt der Biber!");
+});
+
 test("every animal that gives us something says what else it gives, and enough is left to choose from", () => {
   for (const animal of GIVERS) {
     expect(animal.alsoGives, `${animal.id} needs its alsoGives list`).toBeDefined();

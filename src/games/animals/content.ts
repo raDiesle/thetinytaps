@@ -8,6 +8,7 @@ import {
   playCluck,
   playCroak,
   playDolphin,
+  playHoot,
   playMeow,
   playMoo,
   playNeigh,
@@ -19,6 +20,7 @@ import {
   playSqueak,
   playTrumpet,
   playTweet,
+  playWhale,
   recorded,
 } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -129,7 +131,7 @@ export const ANIMALS: Animal[] = [
     food: food("wurm", "🪱", "Wurm", "Würmer"),
     alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch", "erdnuss", "trauben", "heu"],
     home: "nest",
-    alsoLives: ["baum", "stall", "huette", "koerbchen"],
+    alsoLives: ["baum", "stall", "huette", "koerbchen", "dschungel", "savanne", "bambuswald"],
     sound: real("tweet", playTweet),
   },
   {
@@ -140,7 +142,7 @@ export const ANIMALS: Animal[] = [
     food: food("honig", "🍯", "Honig"),
     alsoEats: ["fisch", "nuss", "apfel", "banane", "fleisch", "knochen", "mais", "wurm", "moehre", "blaetter", "bambus", "erdnuss", "trauben"],
     home: "hoehle",
-    alsoLives: ["bau", "eis"],
+    alsoLives: ["bau", "eis", "dschungel", "bambuswald"],
     sound: real("growl", playRoar),
   },
   {
@@ -164,7 +166,7 @@ export const ANIMALS: Animal[] = [
     food: food("fliege", "🪰", "Fliege", "Fliegen"),
     alsoEats: ["wurm"],
     home: "teich",
-    alsoLives: ["aquarium"],
+    alsoLives: ["aquarium", "dschungel"],
     sound: real("croak", playCroak),
   },
   {
@@ -209,10 +211,10 @@ export const ANIMALS: Animal[] = [
     food: FISH,
     alsoEats: [],
     home: "eis",
-    alsoLives: ["teich", "aquarium"],
+    alsoLives: ["teich", "aquarium", "meer"],
     sound: real("penguin", playSquawk),
   },
-  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich"], sound: real("bubbles", playBlub) },
+  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich", "meer"], sound: real("bubbles", playBlub) },
   { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz", alsoLives: [] },
   {
     id: "ente",
@@ -220,13 +222,23 @@ export const ANIMALS: Animal[] = [
     name: "Ente",
     the: "die Ente",
     home: "teich",
-    alsoLives: ["stall", "nest"],
+    alsoLives: ["stall", "nest", "meer"],
     gives: "ei",
     alsoGives: [],
     sound: real("quack", playQuack),
   },
-  { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle"] },
+  { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle", "wueste"] },
   { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [], sound: real("oink", playOink) },
+  // More animals with a home (November 2026).
+  { id: "biber", emoji: "🦫", name: "Biber", the: "der Biber", home: "biberburg", alsoLives: ["teich", "bau"] },
+  { id: "ameise", emoji: "🐜", name: "Ameise", the: "die Ameise", home: "ameisenhaufen", alsoLives: ["bau"] },
+  // The whale first: it peeks out of the sea.
+  { id: "wal", emoji: "🐳", name: "Wal", the: "der Wal", home: "meer", alsoLives: [], sound: real("whale", playWhale) },
+  { id: "krebs", emoji: "🦀", name: "Krebs", the: "der Krebs", home: "meer", alsoLives: ["aquarium"] },
+  { id: "schildkroete", emoji: "🐢", name: "Schildkröte", the: "die Schildkröte", home: "meer", alsoLives: ["teich", "aquarium"] },
+  { id: "kamel", emoji: "🐪", name: "Kamel", the: "das Kamel", home: "wueste", alsoLives: ["savanne", "stall"] },
+  { id: "eule", emoji: "🦉", name: "Eule", the: "die Eule", home: "baum", alsoLives: ["nest", "stall"], sound: real("hoot", playHoot) },
+  { id: "fledermaus", emoji: "🦇", name: "Fledermaus", the: "die Fledermaus", home: "hoehle", alsoLives: ["baum", "stall"] },
   {
     id: "affe",
     emoji: "🐵",
@@ -234,6 +246,8 @@ export const ANIMALS: Animal[] = [
     the: "der Affe",
     food: food("banane", "🍌", "Banane", "Bananen"),
     alsoEats: ["apfel", "nuss", "blaetter", "mais", "moehre", "salat", "bambus", "wurm", "fliege", "erdnuss", "trauben"],
+    home: "dschungel",
+    alsoLives: ["baum", "bambuswald", "savanne"],
     sound: real("chatter", playChatter),
   },
   {
@@ -243,6 +257,8 @@ export const ANIMALS: Animal[] = [
     the: "das Huhn",
     food: food("mais", "🌽", "Mais"),
     alsoEats: ["wurm", "fliege", "salat", "apfel", "moehre", "nuss", "banane", "blaetter", "erdnuss", "trauben", "heu"],
+    home: "stall",
+    alsoLives: ["nest"],
     gives: "ei",
     alsoGives: [],
     sound: real("cluck", playCluck),
@@ -254,6 +270,8 @@ export const ANIMALS: Animal[] = [
     the: "der Panda",
     food: food("bambus", "🎋", "Bambus"),
     alsoEats: ["blaetter", "apfel", "honig", "moehre", "heu", "salat", "trauben"],
+    home: "bambuswald",
+    alsoLives: ["dschungel", "hoehle", "baum"],
   },
   {
     id: "schnecke",
@@ -263,8 +281,17 @@ export const ANIMALS: Animal[] = [
     food: food("salat", "🥬", "Salat"),
     alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais", "trauben"],
   },
-  // Only in "Was gibt uns das Tier?" so far.
-  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch", "kaese"], sound: real("baa", playBaa) },
+  {
+    id: "schaf",
+    emoji: "🐑",
+    name: "Schaf",
+    the: "das Schaf",
+    home: "stall",
+    alsoLives: [],
+    gives: "wolle",
+    alsoGives: ["milch", "kaese"],
+    sound: real("baa", playBaa),
+  },
   // More animals that give us something (November 2026).
   // The goat bleats with the sheep's recording, as on the farm; the goose quacks like the farm's goose.
   { id: "ziege", emoji: "🐐", name: "Ziege", the: "die Ziege", gives: "kaese", alsoGives: ["milch", "wolle"], sound: real("baa", playBaa) },
@@ -277,6 +304,8 @@ export const ANIMALS: Animal[] = [
     the: "der Löwe",
     food: food("fleisch", "🍖", "Fleisch"),
     alsoEats: ["knochen", "fisch"],
+    home: "savanne",
+    alsoLives: ["dschungel", "wueste", "hoehle"],
     sound: real("roar", playRoar),
   },
   {
@@ -286,6 +315,8 @@ export const ANIMALS: Animal[] = [
     the: "die Giraffe",
     food: food("blaetter", "🍃", "Blätter"),
     alsoEats: ["heu", "salat", "apfel", "moehre", "blume", "bambus", "banane", "mais", "trauben"],
+    home: "savanne",
+    alsoLives: ["wueste"],
   },
   // More animals to feed (November 2026).
   {
@@ -414,6 +445,14 @@ export const ANIMALS: Animal[] = [
  */
 export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
   animals: [
+    "biber",
+    "ameise",
+    "wal",
+    "krebs",
+    "schildkroete",
+    "kamel",
+    "eule",
+    "fledermaus",
     "ziege",
     "gans",
     "lama",
@@ -434,7 +473,7 @@ export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[];
     "esel",
   ],
   foods: ["erdnuss", "trauben"],
-  homes: [],
+  homes: ["biberburg", "ameisenhaufen", "meer", "wueste", "dschungel", "savanne", "bambuswald"],
   gifts: ["kaese"],
   growths: [],
 };
