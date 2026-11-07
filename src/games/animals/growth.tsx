@@ -1,20 +1,21 @@
 import type { ReactNode } from "react";
-import { playBlub, playCrack, playPlop, playPop, playRustle, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { playBlub, playCrack, playHop, playKnock, playLeaves, playPlop, playPop, playRustle, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { playCroak, playTweet } from "@/lib/realSounds";
 import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
 
 // Something small and what it becomes, for "Was wird aus mir?" (Z-12): caterpillar and butterfly, egg and chick,
-// seed and sunflower, tadpole and frog. The small one is drawn in a 200 × 200 box, standing on its bottom edge, in
-// two layers: `back` behind what it becomes (an emoji, as on the plates below) and `front` before it (the egg's lower
-// shell and the nest, the soil). The parts with an `ap-grow-…` class move once the box is `.growing` (animals.css):
-// the caterpillar climbs up and spins itself in, the egg wobbles and cracks, the seed sinks in and sprouts, the
-// tadpole grows legs and loses its tail.
+// seed and sunflower, tadpole and frog, acorn and tree, bulb and tulip, pumpkin seed and pumpkin, coconut and palm,
+// bud and rose. The small one is drawn in a 200 × 200 box, standing on its bottom edge, in two layers: `back` behind
+// what it becomes (an emoji, as on the plates below) and `front` before it (the egg's lower shell and the nest, the
+// soil, the pot). The parts with an `ap-grow-…` class move once the box is `.growing` (animals.css): the caterpillar
+// climbs up and spins itself in, the egg wobbles and cracks, the seeds, the acorn and the bulb sink in and sprout, the
+// tadpole grows legs and loses its tail, the coconut sprouts where it lies, the bud swells and opens.
 
 /** Time to watch it become it (after the picked one flew up into it) before the next round comes. */
 export const GROW_MS = 3900;
 
-export type GrowthId = "raupe" | "ei" | "samen" | "kaulquappe";
+export type GrowthId = "raupe" | "ei" | "samen" | "kaulquappe" | "eichel" | "zwiebel" | "kuerbiskern" | "kokosnuss" | "knospe";
 
 export interface Growth {
   id: GrowthId;
@@ -169,7 +170,216 @@ const tadpoleBack = (
   </>
 );
 
-/** The four small ones and what they become; each becomes something none of the others does. */
+/** An oak leaf with wavy edges, lying along x from 0 to 40: placed and turned with `transform`. */
+const OAK_LEAF = "M0 0 Q5 -8 10 -5 Q14 -12 20 -6 Q26 -13 31 -5 Q40 -8 40 0 Q40 8 31 5 Q26 13 20 6 Q14 12 10 5 Q5 8 0 0 Z";
+
+/** The acorn in its cap on the meadow, and the little oak it sprouts into before the tree stands there. */
+const acornBack = (
+  <>
+    <g className="ap-grow-sapling">
+      <path d="M100 172 C98 150 102 132 100 110" stroke="#7a5230" strokeWidth="6" strokeLinecap="round" fill="none" />
+      {[
+        [100, 142, -160],
+        [100, 124, -20],
+        [100, 112, -100],
+      ].map(([x, y, turn]) => (
+        <g key={turn} transform={`translate(${x} ${y}) rotate(${turn})`}>
+          <path d={OAK_LEAF} fill="#66bb6a" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+          <path d="M2 0 H34" stroke="#3f8a3a" strokeWidth="2" strokeLinecap="round" />
+        </g>
+      ))}
+    </g>
+    <g className="ap-grow-acorn">
+      <g transform="translate(100 168) scale(1.25) translate(-100 -168)">
+        <path d="M80 128 C80 152 92 164 100 168 C108 164 120 152 120 128 Z" fill="#c98a3c" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+        <ellipse cx="90" cy="146" rx="4" ry="9" fill="#e3b06a" />
+        <path d="M100 116 Q101 104 110 100" stroke={OUTLINE} strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path d="M74 132 C72 110 128 110 126 132 C114 137 86 137 74 132 Z" fill="#8a5a2e" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+        <path d="M84 120 l6 8 M96 116 l6 9 M108 116 l6 8 M90 129 l6 -9 M103 130 l6 -10 M115 128 l5 -7" stroke="#6b4220" strokeWidth="2" strokeLinecap="round" />
+      </g>
+    </g>
+  </>
+);
+
+/** The meadow with a patch of dug soil the acorn sinks into. */
+const acornFront = (
+  <>
+    <path d="M0 200 V172 C60 158 140 158 200 172 V200 Z" fill="#7cc457" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <ellipse cx="100" cy="168" rx="26" ry="6" fill="#8b5e3c" />
+    {[
+      [20, 174],
+      [46, 170],
+      [146, 170],
+      [172, 174],
+    ].map(([x, y]) => (
+      <path key={x} d={`M${x} ${y} l4 -10 l4 10`} stroke="#4e8a35" strokeWidth="2.5" strokeLinejoin="round" fill="none" />
+    ))}
+  </>
+);
+
+/** The tulip bulb on the soil in its pot, and the two long leaves that come out of the soil. */
+const bulbBack = (
+  <>
+    <ellipse cx="100" cy="136" rx="52" ry="9" fill="#5b3a26" stroke={OUTLINE} strokeWidth="3" />
+    <g className="ap-grow-blades">
+      <path d="M96 138 C76 118 70 94 80 62 C90 90 98 110 104 138 Z" fill="#5aa845" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M104 138 C124 118 130 94 120 62 C110 90 102 110 96 138 Z" fill="#5aa845" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    </g>
+    <g className="ap-grow-bulb">
+      <path d="M100 86 Q97 76 102 68" stroke="#5aa845" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path
+        d="M100 84 C104 96 126 104 128 122 C129 136 116 142 100 142 C84 142 71 136 72 122 C74 104 96 96 100 84 Z"
+        fill="#c79a6b"
+        stroke={OUTLINE}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      <path d="M100 90 Q90 110 92 138 M100 90 Q110 110 108 138" stroke="#9c6f45" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <ellipse cx="84" cy="118" rx="4" ry="9" fill="#e2bf93" />
+    </g>
+  </>
+);
+
+/** The flower pot the bulb sinks into. */
+const bulbFront = (
+  <>
+    <path d="M58 148 L142 148 L132 196 L68 196 Z" fill="#d9744a" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M62 172 Q100 178 137 172" stroke="#b85a34" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <rect x="44" y="134" width="112" height="20" rx="6" fill="#e8895c" stroke={OUTLINE} strokeWidth="3.5" />
+    <path d="M54 140 H96" stroke="#f4b08c" strokeWidth="3" strokeLinecap="round" />
+  </>
+);
+
+/** A round pumpkin leaf with three lobes, its stalk at 0 0. */
+const PUMPKIN_LEAF = "M0 0 C-20 -2 -26 -20 -14 -28 C-12 -40 4 -42 8 -32 C22 -32 26 -12 0 0 Z";
+
+/** The pumpkin seed standing in the bed, and the vine that creeps out along the ground. */
+const pipBack = (
+  <>
+    <g className="ap-grow-vine">
+      <path
+        d="M100 172 C80 176 60 164 38 170 C26 173 20 166 24 160 M100 172 C122 176 142 164 164 170 C176 173 182 164 176 158"
+        stroke="#4e8a35"
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {[
+        [56, 168, -10],
+        [146, 168, 10],
+        [80, 172, -30],
+      ].map(([x, y, turn]) => (
+        <g key={x} transform={`translate(${x} ${y}) rotate(${turn})`}>
+          <path d={PUMPKIN_LEAF} fill="#5aa845" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+          <path d="M0 0 L-8 -24 M0 0 L8 -26" stroke="#3f8a3a" strokeWidth="2" strokeLinecap="round" />
+        </g>
+      ))}
+    </g>
+    <g className="ap-grow-pip">
+      <g transform="translate(100 176) scale(1.35) translate(-100 -176) rotate(-12 100 150)">
+        <path d="M100 120 C118 130 120 160 100 178 C80 160 82 130 100 120 Z" fill="#f6e7b8" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+        <path d="M100 129 C111 138 112 160 100 170 C88 160 89 138 100 129 Z" fill="none" stroke="#d8c08a" strokeWidth="2.5" />
+      </g>
+    </g>
+  </>
+);
+
+/** The garden bed the pumpkin seed sinks into. */
+const pipFront = (
+  <>
+    <path d="M0 200 V180 C50 168 150 168 200 180 V200 Z" fill="#8b5e3c" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    {[
+      [30, 186],
+      [70, 190],
+      [118, 184],
+      [160, 192],
+      [184, 186],
+    ].map(([x, y]) => (
+      <circle key={x} cx={x} cy={y} r="4" fill="#6f4e37" />
+    ))}
+  </>
+);
+
+/** The sea behind the beach the coconut lies on. */
+const coconutBack = (
+  <>
+    <path d="M0 160 C30 152 60 164 100 158 C140 152 170 164 200 158 V200 H0 Z" fill="#74c0fc" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M18 170 Q30 165 42 170 M150 168 Q162 163 174 168" stroke="#d0ebff" strokeWidth="3" fill="none" strokeLinecap="round" />
+  </>
+);
+
+/** The sand, the coconut lying on it and the shoot it sprouts; the palm grows up from behind it. */
+const coconutFront = (
+  <>
+    <path d="M0 200 V184 C40 166 160 166 200 184 V200 Z" fill="#f2d58a" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <g className="ap-grow-coco">
+      <ellipse cx="100" cy="162" rx="30" ry="22" fill="#8b5a2b" stroke={OUTLINE} strokeWidth="3.5" />
+      <path
+        d="M78 154 Q88 148 96 154 M100 172 Q110 166 120 172 M80 170 Q88 165 96 170 M102 150 Q110 145 116 149"
+        stroke="#6b4220"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <ellipse cx="88" cy="150" rx="7" ry="3" fill="#ab7744" />
+      {[
+        [118, 158],
+        [124, 163],
+        [117, 166],
+      ].map(([x, y]) => (
+        <circle key={y} cx={x} cy={y} r="3" fill="#3b2412" />
+      ))}
+    </g>
+    <g className="ap-grow-shoot">
+      <path d="M100 142 Q88 126 78 120 Q96 124 104 141 Z" fill="#5aa845" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M100 142 Q100 120 104 106 Q112 124 105 142 Z" fill="#66bb6a" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M103 142 Q114 124 126 118 Q118 134 107 143 Z" fill="#5aa845" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+    </g>
+  </>
+);
+
+/** The rose's stem with its thorns and leaves, the closed bud on top, its green sepals around it. */
+const budBack = (
+  <g className="ap-grow-bush">
+    <path d="M100 196 C96 164 104 128 100 96" stroke="#3f8a3a" strokeWidth="7" strokeLinecap="round" fill="none" />
+    <path d="M98 170 l-9 -1 l8 -7 Z M102 140 l9 -1 l-8 -7 Z M98 116 l-8 -2 l8 -6 Z" fill="#3f8a3a" stroke={OUTLINE} strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M99 154 Q74 134 58 146 Q78 164 99 154 Z" fill="#5aa845" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    <path d="M101 128 Q126 110 142 122 Q122 140 101 128 Z" fill="#5aa845" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    <path d="M97 152 Q80 146 64 147 M103 127 Q120 120 136 122" stroke="#3f8a3a" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <g className="ap-grow-bud">
+      <path d="M100 42 C117 56 119 80 100 96 C81 80 83 56 100 42 Z" fill="#e63950" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+      <path d="M100 50 Q110 66 100 88 M93 60 Q90 74 96 86" stroke="#b3203a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path
+        className="ap-grow-sepal-l"
+        d="M100 98 C82 94 78 74 86 56 C90 76 95 88 100 98 Z"
+        fill="#5aa845"
+        stroke={OUTLINE}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      <path
+        className="ap-grow-sepal-r"
+        d="M100 98 C118 94 122 74 114 56 C110 76 105 88 100 98 Z"
+        fill="#5aa845"
+        stroke={OUTLINE}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+    </g>
+  </g>
+);
+
+/** The bit of lawn the rose stands in. */
+const budFront = (
+  <>
+    <path d="M0 200 V190 C60 182 140 182 200 190 V200 Z" fill="#7cc457" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    {[62, 84, 112, 134].map((x) => (
+      <path key={x} d={`M${x} 190 l4 -11 l4 11`} stroke="#4e8a35" strokeWidth="2.5" strokeLinejoin="round" fill="none" />
+    ))}
+  </>
+);
+
+/** The small ones and what they become; which of them are never offered together is `GROW_LOOKALIKES`. */
 export const GROWTHS: Growth[] = [
   {
     id: "raupe",
@@ -245,7 +455,116 @@ export const GROWTHS: Growth[] = [
     ],
     back: tadpoleBack,
   },
+  {
+    id: "eichel",
+    young: "Eichel",
+    fromThe: "der Eichel",
+    emoji: "🌳",
+    adult: "Baum",
+    the: "der Baum",
+    a: "ein Baum",
+    spot: [100, 108],
+    size: 0.62,
+    sounds: [
+      [0, () => playHop()],
+      [500, playPlop],
+      [2100, playLeaves],
+      [2800, playTwinkle],
+    ],
+    back: acornBack,
+    front: acornFront,
+  },
+  {
+    id: "zwiebel",
+    young: "Zwiebel",
+    fromThe: "der Zwiebel",
+    emoji: "🌷",
+    adult: "Tulpe",
+    the: "die Tulpe",
+    a: "eine Tulpe",
+    spot: [100, 90],
+    size: 0.56,
+    sounds: [
+      [0, playRustle],
+      [700, playPlop],
+      [1000, playTrill],
+      [1900, playPop],
+      [2300, playTwinkle],
+    ],
+    back: bulbBack,
+    front: bulbFront,
+  },
+  {
+    id: "kuerbiskern",
+    young: "Kürbiskern",
+    fromThe: "dem Kürbiskern",
+    emoji: "🎃",
+    adult: "Kürbis",
+    the: "der Kürbis",
+    a: "ein Kürbis",
+    spot: [100, 130],
+    size: 0.44,
+    sounds: [
+      [500, playPlop],
+      [700, playRustle],
+      [1700, playPop],
+      [2900, playTwinkle],
+    ],
+    back: pipBack,
+    front: pipFront,
+  },
+  {
+    id: "kokosnuss",
+    young: "Kokosnuss",
+    fromThe: "der Kokosnuss",
+    emoji: "🌴",
+    adult: "Palme",
+    the: "die Palme",
+    a: "eine Palme",
+    spot: [100, 92],
+    size: 0.66,
+    sounds: [
+      [0, () => playKnock(400)],
+      [400, () => playKnock(400)],
+      [800, playTrill],
+      [1900, playLeaves],
+      [2700, playTwinkle],
+    ],
+    back: coconutBack,
+    front: coconutFront,
+  },
+  {
+    id: "knospe",
+    young: "Knospe",
+    fromThe: "der Knospe",
+    emoji: "🌹",
+    adult: "Rose",
+    the: "die Rose",
+    a: "eine Rose",
+    spot: [100, 116],
+    size: 0.7,
+    sounds: [
+      [0, playRustle],
+      [900, playPop],
+      [1500, playTwinkle],
+    ],
+    back: budBack,
+    front: budFront,
+  },
 ];
+
+/**
+ * Small ones never offered together in one round (`dealGrow`): the grown one of each could, to a child, also come
+ * out of the other, so it would be a wrong choice the child could rightly pick. Any two in one group are never dealt
+ * together. Every plant is alike to every other: flowers look alike, trees look alike, and no child can see which
+ * seed, nut, bulb or bud becomes which plant. A new small one joins a group, or starts one with what it looks like
+ * (a second egg or larva would be alike to the egg or the caterpillar); every growth must keep at least three others
+ * it is not alike to, for the four choices of the hardest steps (`content.test.ts`).
+ */
+export const GROW_LOOKALIKES: GrowthId[][] = [["samen", "eichel", "zwiebel", "kuerbiskern", "kokosnuss", "knospe"]];
+
+/** Whether `a` and `b` are never offered together (`GROW_LOOKALIKES`). */
+export const growLookAlike = (a: Growth, b: Growth) => GROW_LOOKALIKES.some((group) => group.includes(a.id) && group.includes(b.id));
 
 /**
  * The small one in its box; `growing` sets it off becoming what it becomes, which shows at the end (`label` names it

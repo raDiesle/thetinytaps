@@ -390,12 +390,16 @@
   transform-box: view-box;
 }
 
-/* Hidden until it grows: the chrysalis, the egg's crack and broken edges, the stem, the tadpole's legs. */
+/* Hidden until it grows: the chrysalis, the egg's crack and broken edges, the stems, leaves and shoots, the tadpole's legs. */
 .ap-grow-cocoon,
 .ap-grow-crack,
 .ap-grow-edge,
 .ap-grow-stem,
-.ap-grow-legs {
+.ap-grow-legs,
+.ap-grow-sapling,
+.ap-grow-blades,
+.ap-grow-vine,
+.ap-grow-shoot {
   opacity: 0;
 }
 
@@ -471,6 +475,95 @@
 
 .grow-kaulquappe .ap-grow-adult {
   animation: ap-leap 1.4s ease-out 2.1s both;
+}
+
+/* The acorn hops, sinks into the meadow and sprouts a little oak; the tree grows up over it. */
+.growing .ap-grow-acorn {
+  transform-origin: 100px 168px;
+  animation: ap-plant 1s ease-in-out forwards;
+}
+
+.growing .ap-grow-sapling {
+  transform-origin: 100px 172px;
+  animation: ap-sapling 1.9s ease-out 0.8s both;
+}
+
+.grow-eichel .ap-grow-adult {
+  transform-origin: 50% 95%;
+  animation: ap-tree 1.6s ease-out 2.1s both;
+}
+
+/* The bulb wiggles and sinks into its pot, two long leaves come out of the soil, and the tulip rises between them. */
+.growing .ap-grow-bulb {
+  transform-origin: 100px 140px;
+  animation: ap-dig-in 1s ease-in-out forwards;
+}
+
+.growing .ap-grow-blades {
+  transform-origin: 100px 138px;
+  animation: ap-blades 1.2s ease-out 0.8s both;
+}
+
+.grow-zwiebel .ap-grow-adult {
+  transform-origin: 50% 100%;
+  animation: ap-tulip 1.5s ease-out 1.8s both;
+}
+
+/* The pumpkin seed wiggles and sinks into the bed, a vine creeps out both ways, and a small green pumpkin swells and turns orange. */
+.growing .ap-grow-pip {
+  transform-origin: 100px 176px;
+  animation: ap-dig-in 0.9s ease-in-out forwards;
+}
+
+.growing .ap-grow-vine {
+  transform-origin: 100px 172px;
+  animation: ap-creep 1.4s ease-out 0.5s both;
+}
+
+.grow-kuerbiskern .ap-grow-adult {
+  transform-origin: 50% 90%;
+  animation: ap-ripen 1.8s ease-in-out 1.6s both;
+}
+
+/* The coconut rocks on the sand, a shoot comes out of its top, and the palm grows up from behind it. */
+.growing .ap-grow-coco {
+  transform-origin: 100px 184px;
+  animation: ap-wobble 0.9s ease-in-out;
+}
+
+.growing .ap-grow-shoot {
+  transform-origin: 102px 142px;
+  animation: ap-shoot 2s ease-out 0.7s both;
+}
+
+.grow-kokosnuss .ap-grow-adult {
+  transform-origin: 50% 95%;
+  animation: ap-palm 1.7s ease-out 1.9s both;
+}
+
+/* The bud swells and sways, its green sepals fold open, and the rose opens where it was. */
+.growing .ap-grow-bud {
+  transform-origin: 100px 96px;
+  animation: ap-swell 1.2s ease-in-out forwards;
+}
+
+.growing .ap-grow-sepal-l,
+.growing .ap-grow-sepal-r {
+  transform-origin: 100px 98px;
+  animation: ap-sepal-l 0.6s ease-out 0.9s forwards;
+}
+
+.growing .ap-grow-sepal-r {
+  animation-name: ap-sepal-r;
+}
+
+.growing .ap-grow-bush {
+  animation: ap-gone 0.4s linear 1.6s forwards;
+}
+
+.grow-knospe .ap-grow-adult {
+  transform-origin: 50% 35%;
+  animation: ap-bloom 1.4s ease-out 1.5s both;
 }
 
 @keyframes ap-breathe {
@@ -807,6 +900,229 @@
   }
   60% {
     transform: translateY(-20%);
+  }
+}
+
+@keyframes ap-plant {
+  0%,
+  45% {
+    opacity: 1;
+    transform: none;
+  }
+  12% {
+    transform: scale(1.08, 0.88);
+  }
+  28% {
+    transform: translateY(-16px);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
+
+@keyframes ap-sapling {
+  0% {
+    opacity: 1;
+    transform: scale(0.3, 0);
+  }
+  40% {
+    transform: scale(0.7, 0.6);
+  }
+  70%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes ap-tree {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  80% {
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ap-dig-in {
+  0%,
+  45% {
+    opacity: 1;
+    transform: none;
+  }
+  15% {
+    transform: rotate(-7deg);
+  }
+  30% {
+    transform: rotate(7deg);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
+
+@keyframes ap-blades {
+  0% {
+    opacity: 1;
+    transform: scale(0.4, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ap-tulip {
+  0% {
+    opacity: 0;
+    transform: scale(0.3, 0);
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1.05, 1.08);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+  90% {
+    transform: rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ap-creep {
+  0% {
+    opacity: 1;
+    transform: scale(0, 0.3);
+  }
+  60% {
+    transform: scale(1, 0.7);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Small and green first, then big and orange: a filter on the emoji's own small layer. */
+@keyframes ap-ripen {
+  0% {
+    opacity: 0;
+    transform: scale(0.1);
+    filter: hue-rotate(65deg) saturate(1.2);
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    transform: scale(0.65);
+    filter: hue-rotate(65deg) saturate(1.2);
+  }
+  85% {
+    transform: scale(1.06);
+    filter: none;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes ap-shoot {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  35% {
+    transform: scale(1.12);
+  }
+  50%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes ap-palm {
+  0% {
+    opacity: 0;
+    transform: scale(0.15);
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1.04) rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+  90% {
+    transform: rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ap-swell {
+  25% {
+    transform: scale(1.08) rotate(-4deg);
+  }
+  50% {
+    transform: scale(1.14) rotate(4deg);
+  }
+  75% {
+    transform: scale(1.2) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes ap-sepal-l {
+  to {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes ap-sepal-r {
+  to {
+    transform: rotate(40deg);
   }
 }
 

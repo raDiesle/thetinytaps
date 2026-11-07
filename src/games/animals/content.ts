@@ -475,7 +475,7 @@ export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[];
   foods: ["erdnuss", "trauben"],
   homes: ["biberburg", "ameisenhaufen", "meer", "wueste", "dschungel", "savanne", "bambuswald"],
   gifts: ["kaese"],
-  growths: [],
+  growths: ["eichel", "zwiebel", "kuerbiskern", "kokosnuss", "knospe"],
 };
 
 /** Every food once, for the wrong choices next to the right one. */

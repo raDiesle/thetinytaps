@@ -2,7 +2,7 @@ import { lookAlike, lookOf, PEEK_LOOKALIKES, type ShadowItem } from "@/games/sha
 import { shuffle } from "@/games/shadows/deck";
 import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./content";
 import { GIFTS, type Gift } from "./gifts";
-import { GROWTHS, type Growth } from "./growth";
+import { GROWTHS, growLookAlike, type Growth } from "./growth";
 import { HOMES, type Home } from "./homes";
 import type { Difficulty } from "./settings";
 
@@ -119,12 +119,12 @@ export function dealHome(animal: Animal, count: number): HomeRound {
 }
 
 /**
- * What `growth` becomes among what `count - 1` others become, in random order. A caterpillar, an egg, a seed and a
- * tadpole each become something none of the others does, so all the others are wrong; there are only four, so at
- * most four to choose from.
+ * What `growth` becomes among what `count - 1` others become, in random order; never one a child could think comes
+ * out of `growth` too (`GROW_LOOKALIKES`: no plant next to another plant), so every other one is clearly wrong.
  */
 export function dealGrow(growth: Growth, count: number): GrowRound {
-  const grown = shuffle([growth, ...shuffle(GROWTHS.filter((g) => g !== growth)).slice(0, count - 1)]);
+  const others = GROWTHS.filter((g) => g !== growth && !growLookAlike(g, growth));
+  const grown = shuffle([growth, ...shuffle(others).slice(0, count - 1)]);
   return { kind: "grow", growth, grown, correct: grown.indexOf(growth) };
 }
 
