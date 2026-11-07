@@ -32,7 +32,8 @@ screen), then the pictures that run until the time is up:
   open one after the other (`PETALS`), the yellow middle last. It fills up instead of running out, for waiting for
   something good.
 - „Kerze“ 🕯️: three tall candles on the table burn down one after the other (`CANDLE.xs`, each a third of the time,
-  `--tm-i`/`--tm-of`), each one going out with a puff as the next lights; at the end the bear child leans over and blows
+  `--tm-i`/`--tm-of`), each burning all the way down into its puddle and only then going out, its smoke (`Smoke`: a
+  wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the bear child leans over and blows
   the last one out.
 - „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): for the time before bed – one round hill over the whole picture, a big sun
   sinking behind it and reddening (gone at `SUN_SET_AT`), the evening's and the night's sky fade in, the land darkens,
@@ -97,6 +98,9 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
   user feedback, November 2026). A new picture is one whole small story a child knows from life.
+- **What runs out runs out wholly before it ends** (user feedback, November 2026): a candle burns down to its puddle
+  before its flame goes out (`CANDLE.stub` a thin rim, the going out after its turn, never before), and what follows
+  an ending (the smoke) lingers slow and soft for seconds, never a puff gone at once. `timer.test.ts` checks the candle.
 - **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
   „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
 

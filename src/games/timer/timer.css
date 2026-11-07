@@ -156,15 +156,15 @@
 }
 
 .tm-flame-box {
-  /* The part that burns away, as a share of the candle's height (CANDLE: 570 high, 70 left). */
-  --tm-burnt: 87.72%;
+  /* The part that burns away, as a share of the candle's height (CANDLE: 570 high, 10 left in the puddle). */
+  --tm-burnt: 98.25%;
   animation: tm-burn-top var(--tm-turn) linear var(--tm-from) both;
 }
 
 .tm-done .tm-wax,
 .tm-blow .tm-wax {
   animation: none;
-  transform: scaleY(0.1228);
+  transform: scaleY(0.0175);
 }
 
 .tm-done .tm-flame-box,
@@ -178,7 +178,7 @@
     transform: none;
   }
   to {
-    transform: scaleY(0.1228);
+    transform: scaleY(0.0175);
   }
 }
 
@@ -191,8 +191,8 @@
   }
 }
 
-/* A candle's flame lights up at its turn and – but on the last, which the child blows out – goes out at its end with a
-   curl of smoke (tm-puff), as the next one lights. */
+/* A candle's flame lights up at its turn and – but on the last, which the child blows out – goes out only once its
+   candle is burnt down, at the end of its turn, with its smoke (tm-puff) rising as the next one lights. */
 .tm-lit {
   position: absolute;
   inset: 0;
@@ -202,7 +202,7 @@
 .tm-goes-out {
   animation:
     tm-light 0.6s ease-out var(--tm-from) both,
-    tm-go-out 0.5s ease-in calc(var(--tm-from) + var(--tm-turn) - 0.5s) forwards;
+    tm-go-out 0.6s ease-in calc(var(--tm-from) + var(--tm-turn)) forwards;
 }
 
 @keyframes tm-light {
@@ -224,22 +224,7 @@
 }
 
 .tm-puff {
-  animation: tm-puff 1.6s ease-out calc(var(--tm-from) + var(--tm-turn)) both;
-}
-
-@keyframes tm-puff {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.5);
-  }
-  10% {
-    opacity: 0.8;
-    transform: translateX(-50%);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-30%, -260%) scale(2.4);
-  }
+  --tm-smoke-at: calc(var(--tm-from) + var(--tm-turn));
 }
 
 .tm-done .tm-lit,
@@ -248,10 +233,9 @@
   opacity: 1;
 }
 
+/* The smoke of a candle burnt down just before the end rises on (its puffs end unseen by themselves). */
 .tm-done .tm-goes-out,
-.tm-blow .tm-goes-out,
-.tm-done .tm-puff,
-.tm-blow .tm-puff {
+.tm-blow .tm-goes-out {
   animation: none;
   opacity: 0;
 }
@@ -304,22 +288,84 @@
   }
 }
 
+/* The smoke of a candle gone out (`Smoke`): a box over the wick; in it a wisp curls up and soft puffs rise one after
+   the other (each its own small layer, `--d` its delay after `--tm-smoke-at`), drifting apart, growing and fading
+   slowly over several seconds. */
 .tm-smoke {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 3%);
-  width: 30%;
+  bottom: calc(100% + 1%);
+  width: 80%;
   aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgb(220 220 230 / 0.8);
   transform: translateX(-50%);
-  animation: tm-smoke 1.6s ease-out forwards;
+  pointer-events: none;
 }
 
-@keyframes tm-smoke {
+.tm-wisp {
+  position: absolute;
+  left: 29%;
+  bottom: 0;
+  width: 42%;
+  aspect-ratio: 40 / 160;
+  transform-origin: 50% 100%;
+  animation: tm-wisp 5s ease-out var(--tm-smoke-at, 0s) both;
+}
+
+.tm-wisp > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-wisp {
+  from {
+    opacity: 0;
+    transform: scaleY(0.15);
+  }
+  12% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.9;
+    transform: translateY(-10%) skewX(6deg);
+  }
+  65% {
+    opacity: 0.55;
+    transform: translate(8%, -35%) skewX(-8deg) scaleX(1.3);
+  }
   to {
     opacity: 0;
-    transform: translate(-30%, -260%) scale(2.4);
+    transform: translate(-6%, -90%) skewX(10deg) scaleX(1.8);
+  }
+}
+
+.tm-smoke-puff {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  width: var(--s);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(232 232 242 / 0.85), rgb(205 205 222 / 0.5) 55%, transparent);
+  animation: tm-smoke-puff 4.2s ease-out calc(var(--tm-smoke-at, 0s) + var(--d)) both;
+}
+
+@keyframes tm-smoke-puff {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.3);
+  }
+  15% {
+    opacity: 0.85;
+    transform: translate(-50%, -60%) scale(0.7);
+  }
+  55% {
+    opacity: 0.5;
+    transform: translate(calc(-50% + var(--dx) * 0.6), -340%) scale(1.5);
+  }
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), -680%) scale(2.6);
   }
 }
 

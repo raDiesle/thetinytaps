@@ -85,13 +85,21 @@ describe("Timer", () => {
     expect(STAGE_H).toBe(900);
   });
 
-  test("the CSS burns the candle down to its stub", async () => {
+  test("the CSS burns the candle all the way down before its flame goes out, and its smoke rises for seconds", async () => {
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     const height = CANDLE.base - CANDLE.top;
     const left = (CANDLE.stub / height).toFixed(4);
     const burnt = `${(((height - CANDLE.stub) / height) * 100).toFixed(2)}%`;
     expect(css).toContain(`scaleY(${left})`);
     expect(css).toContain(`--tm-burnt: ${burnt}`);
+    // Down into its puddle: only a thin rim of wax is left (user feedback, November 2026: they went out half a hand high).
+    expect(CANDLE.stub).toBeLessThanOrEqual(12);
+    // The flame goes out at the end of its candle's turn, when the wax is down – never before.
+    expect(css).toMatch(/tm-go-out [\d.]+s ease-in calc\(var\(--tm-from\) \+ var\(--tm-turn\)\) forwards/);
+    // The smoke lingers: several puffs and a wisp, each rising for seconds.
+    const seconds = [...css.matchAll(/animation: tm-(?:wisp|smoke-puff) ([\d.]+)s/g)].map((m) => Number(m[1]));
+    expect(seconds.length).toBe(2);
+    for (const s of seconds) expect(s).toBeGreaterThanOrEqual(4);
   });
 
   test("the new pictures keep what matters where every screen shows it too", () => {
