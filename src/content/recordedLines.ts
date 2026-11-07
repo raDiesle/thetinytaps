@@ -7,6 +7,7 @@
 import { APP_LANGUAGES, type Localized } from "@/lib/language";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { voiceLines } from "@/content/voiceLines";
+import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { GOOD_NIGHT } from "@/components/GameShell";
 import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
@@ -95,9 +96,12 @@ const germanOnly =
             .flatMap((g) => g.lines.map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) }))),
         );
 
-function goodNight(language: TargetLanguageId): RecordedLine[] {
-  const text = GOOD_NIGHT[language];
-  return text ? [{ text, kind: "calm" }] : [];
+/** What every game says: good night when play time is over, and the question at a level's end (GameEnd). */
+function allGames(language: TargetLanguageId): RecordedLine[] {
+  return once([
+    GOOD_NIGHT[language] !== undefined && { text: GOOD_NIGHT[language]!, kind: "calm" as const },
+    ...[AGAIN_OR_NEXT, AGAIN_ONLY].map((line) => line[language] !== undefined && { text: line[language]!, kind: "instruction" as const }),
+  ]);
 }
 
 /**
@@ -107,7 +111,7 @@ function goodNight(language: TargetLanguageId): RecordedLine[] {
 export const RECORDED_GAMES: RecordedGame[] = [
   { name: "zaehne", folder: "src/games/teeth/stimme", lines: teeth },
   { name: "kleine-abenteuer", folder: "src/games/elevator/stimme", lines: elevator },
-  { name: "gute-nacht", folder: "src/components/stimme", lines: goodNight },
+  { name: "alle-spiele", folder: "src/components/stimme", lines: allGames },
   { name: "abstillen", folder: "src/games/weaning/stimme", lines: weaning },
   { name: "tiere", folder: "src/games/animals/stimme", lines: germanOnly("/tiere/") },
   { name: "gefuehle", folder: "src/games/feelings/stimme", lines: germanOnly("/gefuehle/") },

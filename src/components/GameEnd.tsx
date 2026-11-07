@@ -1,8 +1,31 @@
 import { useEffect, useState, type PointerEvent } from "react";
 import { useCountsPlaytime, useEndShown } from "@/components/GameShell";
-import { useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
-import { countGame, gameEnded } from "@/lib/playtime";
+import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
+import { recordedVoice } from "@/lib/voice";
+import endFiles from "./stimme/**/*.mp3?glob";
+
+/**
+ * Asked once the end is shown, so a child who can't read hears what the two buttons offer (A-24, user wish, November
+ * 2026): from its recording in src/components/stimme/ (`bun run voice make --only alle-spiele`), silent until it is
+ * made. In the words of the two buttons, in every app language.
+ */
+export const AGAIN_OR_NEXT: Localized = {
+  de: "Nochmal oder weiter?",
+  ru: "Ещё раз или дальше?",
+  en: "Again or next?",
+  zh: "再来一次，还是下一个？",
+  hi: "फिर से या आगे?",
+  es: "¿Otra vez o siguiente?",
+  ar: "مرة أخرى أم التالي؟",
+};
+/** The same where there is no „Weiter“ (one story only, Aufs Töpfchen). */
+export const AGAIN_ONLY: Localized = { de: "Nochmal?", ru: "Ещё раз?", en: "Again?", zh: "再来一次？", hi: "फिर से?", es: "¿Otra vez?", ar: "مرة أخرى؟" };
+/** How long the question waits after the buttons came, so the game's own end line comes first. */
+const ASK_AFTER_MS = 1500;
+
+const endVoice = recordedVoice(endFiles);
 
 interface GameEndProps {
   /** Plays the same level (picture, story …) once more. */
@@ -41,6 +64,7 @@ interface GameEndProps {
  */
 export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = false, showNext = false }: GameEndProps) {
   const t = useT();
+  const language = useAppLanguage();
   const endShown = useEndShown();
   const counts = useCountsPlaytime();
   const [shown, setShown] = useState(delayMs <= 0);
@@ -55,6 +79,19 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
   useEffect(() => {
     if (shown && counts) gameEnded();
   }, [shown, counts]);
+
+  // Once, a moment after the buttons came, the question what they offer – queued behind what the game still says, and
+  // never when play time is over (the game says good night then, GameShell).
+  const hasNext = next !== undefined;
+  useEffect(() => {
+    if (!shown) return;
+    const timer = setTimeout(() => {
+      if (isPlaytimeOver()) return;
+      const line = hasNext ? AGAIN_OR_NEXT : AGAIN_ONLY;
+      endVoice.say(line[language.id] ?? line.de, language.id, { queue: true, english: line.en });
+    }, ASK_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [shown, hasNext, language.id]);
 
   // While the end is on screen, the corner in the top left is the way back.
   useEffect(() => {

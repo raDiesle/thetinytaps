@@ -5,6 +5,7 @@
 // few lines written inline in a component are copied here, and voiceLines.test.ts checks
 // that they are still in that file.
 
+import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { de } from "@/content/de";
 import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, giverOf, GIVERS } from "@/games/animals/content";
 import { GIFTS } from "@/games/animals/gifts";
@@ -432,6 +433,11 @@ export function voiceLines(): VoiceGame[] {
           label: "Wenn die Spielzeit vorbei ist (alle Spiele)",
           lines: ["Gute Nacht! Die Spielzeit ist vorbei."],
           note: "Hier ist die Liste der einzige Ort des Satzes: der Gute-Nacht-Bildschirm (GameShell) spielt bis zur Aufnahme nur das Schlaflied.",
+        },
+        {
+          label: "Am Ende eines Levels (alle Spiele)",
+          lines: [AGAIN_OR_NEXT.de, AGAIN_ONLY.de],
+          note: "Kurz nachdem „Nochmal“ und „Weiter“ erscheinen (GameEnd, A-24); „Nochmal?“ allein, wo es kein „Weiter“ gibt.",
         },
       ],
     },

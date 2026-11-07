@@ -3,7 +3,7 @@
 // (src/games/adventure/stories/<story>/stimme/<hash of the text>.mp3), and the same for every translation of
 // the lines (lines.<language>.ts → stimme/<language>/<language>-<hash>.mp3); the other games that are recorded
 // (Zähne putzen, Kleine Abenteuer, Abstillen, Was gehört zum Tier?, Gefühle, Schatten finden, Was gehört zusammen?,
-// Kettenreaktion, Aufs Töpfchen, Socken-Paare, Buchstaben & Zahlen, the good-night sentence) list their lines in every language in
+// Kettenreaktion, Aufs Töpfchen, Socken-Paare, Buchstaben & Zahlen, and what every game says: good night and the question at a level's end) list their lines in every language in
 // src/content/recordedLines.ts, into the game's own stimme/ folder the same way. src/lib/voice.ts plays them;
 // a line without a recording stays silent.
 //
@@ -11,7 +11,7 @@
 //   bun run voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
 //   bun run voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
 //   bun run voice try "<text>" [--kind turn] [--lang en]   one line with the voice, into .voice-raw/probe.mp3
-//   bun run voice make [--dry] [--lang de,en] [--only zaehne,gute-nacht] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
+//   bun run voice make [--dry] [--lang de,en] [--only zaehne,alle-spiele] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
 //                                            records every line that has no recording yet, in all
 //                                            languages or those of --lang, of every story and game or
 //                                            those of --only (and again: lines with that text part, of
