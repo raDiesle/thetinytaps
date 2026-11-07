@@ -126,6 +126,11 @@ interface GameShellProps {
   leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
+  /**
+   * Puts `level` into the menu's head, as Lebendige Bilder's menu does: on a phone on its side beside the way back, in
+   * the room the corner or ribbon takes anyway, so a menu with many cards (the Timer's twelve) still shows them all.
+   */
+  levelInHead?: boolean;
   /** Parent-facing options shown on the start screen; left out where the game needs none. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -154,7 +159,21 @@ export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo"
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: the corner's ✕ (a tap, or held where
  * grown-ups chose so), or holding Esc – children press Esc while typing, so it is always held.
  */
-export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, level, settings, tool, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({
+  title,
+  modes,
+  mode,
+  onMode,
+  startMode,
+  leaveTo,
+  level,
+  levelInHead,
+  settings,
+  tool,
+  children,
+  backHref,
+  backLabel,
+}: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
@@ -425,7 +444,9 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
             />
           )
         }
-      />
+      >
+        {levelInHead && level && <div className="mode-level">{level}</div>}
+      </MenuHead>
       {settingsOpen && settings && <section className="settings">{settings}</section>}
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
           cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}
@@ -443,7 +464,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
             ar: "اختيار طريقة اللعب",
           })}
         >
-          {level && <div className="mode-level">{level}</div>}
+          {!levelInHead && level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {groups
               ? groups.map((g, i) => (

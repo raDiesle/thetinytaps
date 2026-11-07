@@ -56,6 +56,7 @@ export function TimerGame() {
       modes={modes}
       mode={picture}
       onMode={(picture) => update({ picture: picture as TimerPicture })}
+      levelInHead
       level={
         // The grown-up sets the time here; the child sees no numbers, only the picture running down. Behind the
         // lengths, the time set last behind „Andere …“ stays as a slip of its own until another comes (H-59).

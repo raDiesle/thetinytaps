@@ -4,6 +4,7 @@
 //   bun run image <out.webp> "<prompt>" [--ref a.png ...] [--aspect 4:3] [--size 1200x900]
 //              [--transparent] [--key ff00ff] [--quality 80] [--model <id>]
 //   bun run image a.webp,b.webp "<prompt>" --grid 1x2 --panel "<a>" --panel "<b>" [options]
+//   … --grid 2x2 --transparent --frames      frames of one animation: each keeps its whole cell, so they line up
 //   bun run image --jobs jobs.json            many pictures in one batch
 //   bun run image <out.webp> --from <picture.png> [--transparent] [--size ...]
 //   bun run image status                      batches still running, in all checkouts
@@ -77,6 +78,7 @@ function parseArgs(argv) {
     else if (a === "--aspect") opts.aspect = next();
     else if (a === "--size") opts.size = next();
     else if (a === "--transparent") opts.transparent = true;
+    else if (a === "--frames") opts.frames = true;
     else if (a === "--key") opts.key = next().replace(/^#/, "");
     else if (a === "--quality") opts.quality = Number(next());
     else if (a === "--model") opts.model = next();
@@ -94,7 +96,7 @@ function parseArgs(argv) {
 
 /** One request: one picture, or one grid cut into several. Paths relative to the checkout. */
 /** The fields a job in --jobs may have; anything else is a typo that would be ignored silently. */
-const JOB_FIELDS = new Set(["out", "prompt", "ref", "refs", "panels", "aspect", "grid", "size", "quality", "transparent", "key"]);
+const JOB_FIELDS = new Set(["out", "prompt", "ref", "refs", "panels", "aspect", "grid", "size", "quality", "transparent", "key", "frames"]);
 
 /** A job read from a --jobs file, checked for fields this script doesn't know. */
 function checkedJob(o) {
@@ -122,7 +124,9 @@ function toJob(o) {
     quality: o.quality ?? 80,
     transparent: Boolean(o.transparent),
     key: (o.key ?? "ff00ff").replace(/^#/, ""),
+    frames: Boolean(o.frames),
   };
+  if (job.frames && !(job.grid && job.transparent)) fail("--frames is for the cut-out frames of one sheet: it needs --grid and --transparent");
   if (!/^[0-9a-f]{6}$/i.test(job.key)) fail("--key must be a colour like ff00ff");
   if (job.grid) {
     const [cols, rows] = parseGrid(job.grid);
@@ -359,11 +363,51 @@ async function finish(job, picture, root) {
   const raw = join(root, RAW_DIR, `${basename(job.outs[0], extname(job.outs[0]))}${job.grid ? `-grid${job.grid}` : ""}.png`);
   await sharp(picture).png().toFile(raw);
   console.log(`raw picture in ${relative(process.cwd(), raw)}`);
-  const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job), job.transparent) : [picture];
-  for (const [i, piece] of pieces.entries()) {
-    const out = resolve(root, job.outs[i]);
-    await save(job.transparent ? await cutOut(piece, job.key) : piece, { ...job, out });
+  const pieces = await cutPieces(job, picture);
+  for (const [i, piece] of pieces.entries()) await save(piece, { ...job, out: resolve(root, job.outs[i]) });
+}
+
+/**
+ * The pictures in what Gemini sent, cut out when asked: the whole, the panels of a grid, or a sheet of frames cut into
+ * equal cells and cropped all by one box round what any of them shows, so they still line up.
+ */
+async function cutPieces(job, picture) {
+  if (!job.grid) return [job.transparent ? await cutOut(picture, job.key) : picture];
+  if (!job.frames) {
+    const pieces = await splitGrid(picture, ...parseGrid(job.grid), gapColour(job), job.transparent);
+    return job.transparent ? Promise.all(pieces.map((piece) => cutOut(piece, job.key))) : pieces;
   }
+  const frames = await Promise.all((await splitCells(picture, ...parseGrid(job.grid))).map((cell) => cutOut(cell, job.key, false)));
+  const boxes = await Promise.all(frames.map(async (f) => (await sharp(f).trim({ threshold: 0 }).toBuffer({ resolveWithObject: true })).info));
+  const { width, height } = await sharp(frames[0]).metadata();
+  const left = Math.min(...boxes.map((b) => -b.trimOffsetLeft));
+  const top = Math.min(...boxes.map((b) => -b.trimOffsetTop));
+  const right = Math.max(...boxes.map((b) => -b.trimOffsetLeft + b.width));
+  const bottom = Math.max(...boxes.map((b) => -b.trimOffsetTop + b.height));
+  const pad = Math.round(Math.max(right - left, bottom - top) * 0.02);
+  const box = { left: Math.max(0, left - pad), top: Math.max(0, top - pad) };
+  Object.assign(box, { width: Math.min(width, right + pad) - box.left, height: Math.min(height, bottom + pad) - box.top });
+  return Promise.all(frames.map((f) => sharp(f).extract(box).png().toBuffer()));
+}
+
+// The frames of one animation drawn on one sheet (a child standing, hopping, clapping) are cut into equal cells and
+// keep them whole (`--frames`): Gemini places the body at the same spot in each cell, so stacked they line up. Cropped
+// to its outline each, a frame with raised arms came out a different size and shifted (Mitmachen, November 2026).
+async function splitCells(input, cols, rows) {
+  const { width, height } = await sharp(input).metadata();
+  const [w, h] = [Math.floor(width / cols), Math.floor(height / rows)];
+  const pieces = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      pieces.push(
+        await sharp(input)
+          .extract({ left: c * w, top: r * h, width: w, height: h })
+          .png()
+          .toBuffer(),
+      );
+    }
+  }
+  return pieces;
 }
 
 // Cuts a grid picture into its panels. The model never draws the gaps exactly
@@ -515,7 +559,7 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
 // Removes the flat background: flood fill from the edges over pixels close to
 // the key colour, a soft edge in between, and the key colour taken out of the
 // edge pixels so no coloured fringe is left.
-async function cutOut(input, keyHex) {
+async function cutOut(input, keyHex, crop = true) {
   const { data, info } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   let key = [0, 2, 4].map((i) => parseInt(keyHex.slice(i, i + 2), 16));
@@ -580,6 +624,10 @@ async function cutOut(input, keyHex) {
     }
   }
   if (x1 < 0) fail("the cut-out removed everything – is the key colour right?");
+  if (!crop)
+    return sharp(data, { raw: { width: w, height: h, channels: 4 } })
+      .png()
+      .toBuffer();
   const pad = Math.round(Math.max(x1 - x0, y1 - y0) * 0.02);
   const left = Math.max(0, x0 - pad);
   const top = Math.max(0, y0 - pad);
@@ -627,10 +675,8 @@ if (opts.out === "status") {
   if (!opts.out) fail("usage: bun run image <out.webp> --from <picture.png>");
   const job = toJob({ ...opts, prompt: "-" });
   const picture = readFileSync(opts.from);
-  const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job), job.transparent) : [picture];
-  for (const [i, piece] of pieces.entries()) {
-    await save(job.transparent ? await cutOut(piece, job.key) : piece, { ...job, out: resolve(ROOT, job.outs[i]) });
-  }
+  const pieces = await cutPieces(job, picture);
+  for (const [i, piece] of pieces.entries()) await save(piece, { ...job, out: resolve(ROOT, job.outs[i]) });
 } else if (opts.out === "queue") {
   // A picture whose file exists is made, only not yet taken out: making it again cost a second request and replaced a
   // good picture by a worse one, and its twin waited for it as if it were still missing.

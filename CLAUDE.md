@@ -435,7 +435,8 @@ In a fresh worktree run `bun install` first.
   choices may sit there.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
-  either (only read out; the home logo stays), and the
+  either (only read out; the home logo stays), a start screen with many cards puts its `level` row into the head beside
+  the corner (`levelInHead`, like Lebendige Bilder's menu), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
   left corner, stepped aside for the page's corner (not on a phone, where it only crowds the cards); buttons for grown-ups never cover it. „Einstellungen“ (where a game still has them) is a
   small sign without words (⚙️; the name as tooltip and read out) – a paper
