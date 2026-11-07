@@ -7,6 +7,9 @@ row; ✕ goes back to the table of contents. Its only options lie behind ⚙️ 
 turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest:
 1. „Wer schaut da raus?“ (X-04, `PeekPlay` from `src/games/shadows/`, which shares the stage, pictures and glyphs with
    the shadows): a part of an animal peeks out of a bush or the pond, the child taps the whole animal below.
+   The animals are Schatten finden's `PEEK_ITEMS` (47 since November 2026); a new one comes German only (`GERMAN_ONLY` in
+   `src/games/shadows/content.ts`), and the shadows' `CLAUDE.md` says how it is put into its `PEEK_LOOKS` group, the
+   pond and the lookalike pairs.
 2. Füttern (N-08): tap (or drag) the food to the hungry animal – the farm's and the wood's animals, and since November
    2026 zoo and sea animals too (elephant and peanuts, parrot and grapes, crocodile, tiger and wolf with meat, …).
 3. Was gibt uns das Tier? (Z-01): tap (or drag) what the animal gives us to it – cow and milk, hen, duck and goose and egg, bee

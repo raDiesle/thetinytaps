@@ -310,8 +310,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/tiere/",
     recorded: true,
-    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
+    languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm. Nur deutsch und noch nicht aufgenommen (7. November 2026, GERMAN_ONLY in content.ts): die neuen Tiere zum Füttern (Elefant, Gorilla, Koala, Seehund, Delfin, Eisbär, Krokodil, Tiger, Wolf, Igel, Schmetterling, Raupe, Papagei, Zebra, Esel) mit Erdnüssen und Weintrauben, die neuen Zuhause (Biberburg, Ameisenhaufen, Meer, Wüste, Dschungel, Savanne, Bambuswald) mit Biber, Ameise, Wal, Krebs, Schildkröte, Kamel, Eule und Fledermaus, Ziege, Gans und Lama mit dem Käse, und was aus Eichel, Zwiebel, Kürbiskern, Kokosnuss und Knospe wird; die neuen Tiere bei „Wer schaut da raus?“ stehen bei Schatten finden.",
   },
   {
     href: "/zusammen/",
