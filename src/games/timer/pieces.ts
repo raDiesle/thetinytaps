@@ -18,7 +18,7 @@ export function appleCount(ms: number): number {
 /**
  * The Apfelbaum's year as shares of the run (user feedback, November 2026: the timer should show more progress): the
  * tree grows until `grown`, blossoms open until `bloomed`, the blossoms turn into apples that ripen until `ripe`, and in
- * the rest of the time the bear child harvests them one by one.
+ * the rest of the time the cart harvests them one by one.
  */
 export const APPLE_YEAR = { grown: 0.15, bloomed: 0.3, ripe: 0.45 } as const;
 
@@ -88,7 +88,7 @@ export function appleTimes(total: number, count: number): AppleTimes {
   };
 }
 
-/** The whole seconds of a run, at least one: the pictures' steps a second (`--tm-secs`, the caterpillar's bites). */
+/** The whole seconds of a run, at least one: the caterpillar's bites, one a second. */
 export function runSeconds(ms: number): number {
   return Math.max(1, Math.round(ms / 1000));
 }
@@ -157,7 +157,7 @@ export function applePlaces(count: number, rx: number, ry: number): { x: number;
 }
 
 /**
- * The order apples of radius `r` are harvested in: the bear child pushes its cart from the right, where it waited, so
+ * The order apples of radius `r` are harvested in: the cart rolls in from the right, where it waited, so
  * the rightmost apple comes next – but never one with another apple still hanging below it, which it would fall
  * through on its way straight down (user feedback, November 2026: apples fall straight down, naturally).
  */

@@ -428,51 +428,6 @@
   }
 }
 
-/* The child stands still while it waits; at the end it waves and hops. */
-.tm-mascot .mascot-arm {
-  transform-box: view-box;
-  transform-origin: 144px 178px;
-}
-
-.tm-done .mascot-arm {
-  animation: tm-wave 2.4s ease-in-out forwards;
-}
-
-.tm-done .tm-mascot {
-  animation: hop 0.6s ease-out 2;
-}
-
-@keyframes tm-wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  20%,
-  50%,
-  80% {
-    transform: rotate(-160deg);
-  }
-  35%,
-  65% {
-    transform: rotate(-125deg);
-  }
-  100% {
-    transform: rotate(-145deg);
-  }
-}
-
-/* The bear child leans to the last candle and blows it out. */
-.tm-blow .tm-mascot {
-  transform-origin: 50% 100%;
-  animation: tm-lean 0.7s ease-in-out forwards;
-}
-
-/* It stands right of the candles, so it leans to the left. */
-@keyframes tm-lean {
-  to {
-    transform: rotate(-10deg) translateX(-8%);
-  }
-}
-
 /* Every second a small, soft step (H-63), so a long time never looks stuck: the train's wheels turn once and a puff of
    steam rises, the sand pours through the hourglass's neck, a drop of wax runs a little further. Each is a small
    layer of its own moving by transform and opacity; at the end they stand still. */
@@ -619,8 +574,8 @@
 }
 
 /* Apfelbaum (H-45): the tree's year (`appleTimes`). The tree grows from a sapling a step a second; blossoms open at the
-   apples' places (--tm-at) and drop off (--tm-off) as small green apples come, which grow and redden; then the bear
-   child pushes its cart under each apple (`tm-cart-way`, written for the run), the apple sways a second at a time while
+   apples' places (--tm-at) and drop off (--tm-off) as small green apples come, which grow and redden; then a little
+   cart rolls under each apple (`tm-cart-way`, written for the run), the apple sways a second at a time while
    the cart comes, falls straight down into it (--tm-dy, faster and faster) and is gone as the same apple lies in the
    heap. Bees buzz round the tree from the first blossoms on. */
 .tm-tree {
@@ -861,19 +816,25 @@
   transform: translateX(var(--tm-cart-end));
 }
 
-/* Raupe (H-46): every band of the leaf slides back as its leaf slides forward by as much (--tm-eat, set per element),
-   so only the bitten edge moves; the caterpillar goes back with it, chewing once a second. At the end it is gone, the
-   cocoon hangs on the branch, wiggles, and a butterfly flies out to the fox child, beats its wings a while and rests. */
+/* Raupe (H-46): one bite a second, worked out from the clock (`useBites` in caterpillar.tsx). Every band of the leaf is
+   a box with a round end, set back by a style change at its bite while the leaf in it is set forward by as much, so only
+   the bitten edge moves. The caterpillar's head, neck and body glide to their next place after each bite, the head
+   biting down as the bite comes. At the end it is gone, the cocoon hangs on the branch, wiggles and bursts open, and a
+   butterfly flutters out and flies back and forth in the air. */
 .tm-band {
   position: absolute;
   left: 0;
+  width: 100%;
   overflow: hidden;
   border-radius: 0 999px 999px 0;
+  will-change: transform;
 }
 
 .tm-band-leaf {
   position: absolute;
   left: 0;
+  width: 100%;
+  will-change: transform;
 }
 
 .tm-band-leaf svg {
@@ -882,35 +843,55 @@
   height: 100%;
 }
 
-/* A bite every second (user feedback, November 2026): the edge goes back in as many steps as the run has seconds. */
-.tm-eat {
+.tm-leaf-light {
+  position: absolute;
+  inset: 0;
+}
+
+/* After a bite the head stays a moment while the crumbs fall, then glides to the next spot well before its bite. */
+.tm-cat-glide {
   will-change: transform;
-  animation: tm-eat var(--tm-ms) steps(var(--tm-secs), end) forwards;
+  transition: transform 0.45s ease-in-out 0.2s;
 }
 
-.tm-done .tm-eat {
-  animation: none;
-  transform: translateX(var(--tm-eat));
+.tm-cat-head {
+  width: 100%;
+  height: 100%;
+  transform-origin: 30% 60%;
+  animation: tm-chomp 1s ease-out forwards;
 }
 
-@keyframes tm-eat {
-  to {
-    transform: translateX(var(--tm-eat));
+.tm-cat-head svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Restarted at every bite: it bites down at once, then lifts its head on the way and opens up for the next bite. */
+@keyframes tm-chomp {
+  0%,
+  15% {
+    transform: rotate(14deg) translateY(5%);
+  }
+  35%,
+  70% {
+    transform: none;
+  }
+  95%,
+  100% {
+    transform: rotate(-10deg);
   }
 }
 
-.tm-caterpillar {
-  animation: tm-eat var(--tm-ms) steps(var(--tm-secs), end) forwards;
-}
-
-/* Crumbs of leaf falling from the mouth with each bite, as the head bites down. */
+/* Crumbs of leaf falling from the spot just bitten. */
 .tm-crumb {
   aspect-ratio: 1;
   border: 0.1cqw solid #3b2a20;
   border-radius: 40% 60% 50% 45%;
   background: #58b947;
   opacity: 0;
-  animation: tm-crumb 1s ease-in infinite;
+  animation: tm-crumb 0.9s ease-in forwards;
 }
 
 @keyframes tm-crumb {
@@ -930,52 +911,26 @@
   }
 }
 
-.tm-done .tm-caterpillar {
-  transform: translateX(var(--tm-eat));
+.tm-done .tm-cat {
   animation: tm-cat-hide 0.6s ease-in forwards;
 }
 
 @keyframes tm-cat-hide {
   to {
     opacity: 0;
-    transform: translateX(var(--tm-eat)) scale(0.4);
-  }
-}
-
-.tm-cat-head {
-  transform-origin: 30% 60%;
-  animation: tm-chew 1s ease-in-out infinite;
-}
-
-.tm-cat-head svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* The head bites down as the second begins (when the edge steps back) and opens again for the next bite. */
-@keyframes tm-chew {
-  0%,
-  100% {
-    transform: rotate(12deg) translateY(4%);
-  }
-  20% {
-    transform: none;
-  }
-  60% {
-    transform: rotate(-8deg);
   }
 }
 
 .tm-cocoon,
+.tm-cocoon-open,
 .tm-butterfly {
   opacity: 0;
 }
 
+/* Spun, it wiggles, and as the butterfly comes out the closed cocoon gives way to the open one. */
 .tm-done .tm-cocoon {
   transform-origin: 50% 0;
-  animation: tm-cocoon 2.4s ease-in-out 0.4s forwards;
+  animation: tm-cocoon 1.8s ease-in-out 0.4s forwards;
 }
 
 @keyframes tm-cocoon {
@@ -983,41 +938,49 @@
     opacity: 0;
     transform: scale(0.4);
   }
-  20% {
+  25% {
     opacity: 1;
     transform: none;
   }
-  35% {
+  45% {
     transform: rotate(8deg);
   }
-  50% {
+  65% {
     transform: rotate(-8deg);
   }
-  65%,
-  100% {
+  85% {
     opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
     transform: none;
   }
 }
 
-.tm-done .tm-butterfly {
-  animation: tm-fly 2.4s ease-in-out 1.6s forwards;
+.tm-done .tm-cocoon-open {
+  animation: tm-cocoon-open 0.3s ease-out 1.9s forwards;
 }
 
-@keyframes tm-fly {
+@keyframes tm-cocoon-open {
+  to {
+    opacity: 1;
+  }
+}
+
+/* The butterfly slips out of the cocoon's bottom and flies up into the air ... */
+.tm-done .tm-butterfly {
+  animation: tm-emerge 1.8s ease-in-out 2s forwards;
+}
+
+@keyframes tm-emerge {
   0% {
     opacity: 0;
     transform: scale(0.3);
   }
-  12% {
+  15% {
     opacity: 1;
-    transform: translate(0, -40%) scale(0.8);
-  }
-  40% {
-    transform: translate(calc(var(--tm-fly-x) * 0.35), -180%);
-  }
-  70% {
-    transform: translate(calc(var(--tm-fly-x) * 0.7), -60%);
+    transform: translateY(15%) scale(0.7);
   }
   100% {
     opacity: 1;
@@ -1025,12 +988,38 @@
   }
 }
 
+.tm-sweep,
+.tm-bob,
 .tm-wings,
 .tm-butterfly-body {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/* ... then back and forth over the meadow, bobbing and leaning into its way, beating its wings. */
+.tm-done .tm-sweep {
+  animation: tm-sweep 7s ease-in-out 3.8s infinite alternate;
+}
+
+@keyframes tm-sweep {
+  to {
+    transform: translateX(var(--tm-sweep));
+  }
+}
+
+.tm-done .tm-bob {
+  animation: tm-bob 1.3s ease-in-out 2s infinite alternate;
+}
+
+@keyframes tm-bob {
+  from {
+    transform: translateY(20%) rotate(-6deg);
+  }
+  to {
+    transform: translateY(-30%) rotate(6deg);
+  }
 }
 
 .tm-wings svg {
@@ -1040,7 +1029,7 @@
 }
 
 .tm-done .tm-wings {
-  animation: tm-flap 0.25s ease-in-out 1.6s 12 alternate;
+  animation: tm-flap 0.3s ease-in-out 2s infinite alternate;
 }
 
 @keyframes tm-flap {
@@ -1275,19 +1264,13 @@
    dark, and only what runs down stays bright – the rail ahead and the train, the sand, the flame, the apples, the leaf,
    the red. A tap brings everything back at once. */
 .tm-back,
-.tm-dims,
-.tm-mascot {
+.tm-dims {
   transition: opacity 0.4s ease-out;
 }
 
 .tm-far .tm-back,
 .tm-far .tm-dims {
   opacity: 0.35;
-  transition-duration: 2.5s;
-}
-
-.tm-far .tm-mascot {
-  opacity: 0.3;
   transition-duration: 2.5s;
 }
 
@@ -1631,210 +1614,205 @@
   transform: translateX(var(--tm-toy-way));
 }
 
-/* Gleich ist es so weit (H-49): a while before the end (a minute, or the last fifth of a short time) a bell rings once
-   and the child (where there is one) waves once – from afar too, since it brings the picture back (`tm-soon`, only while running). */
-.tm-running.tm-soon .mascot-arm {
-  animation: tm-wave-soon 2.4s ease-in-out;
-}
-
-@keyframes tm-wave-soon {
-  25%,
-  65% {
-    transform: rotate(-150deg);
-  }
-  45% {
-    transform: rotate(-120deg);
-  }
-}
-
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
 .tm-sky-box {
   overflow: hidden;
 }
 
-/* Sonnenuntergang (H-54): the sun sinks behind the hills and reddens, the moon rises, the evening's and then the night's
-   sky fade in over the day's, the land darkens, the stars come out one by one and the windows light up. */
+/* Sonnenaufgang (H-54): the big moon in the middle goes down behind the hill while the stars go out one by one, the
+   night's sky and then the morning's pink fade away over the day's, the land grows light, and the big sun rises at the
+   same place, red at first and yellow as it climbs. A soft ring of light widens round them every second (H-63). */
 .tm-sun,
 .tm-moon {
   position: absolute;
 }
 
-.tm-sun {
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 38%, #fff3bf, #ffd43b 55%, #fab005);
-  animation: tm-set var(--tm-ms) linear forwards;
+.tm-moon {
+  animation: tm-moonset var(--tm-ms) linear forwards;
 }
 
+.tm-moon svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-sun {
+  transform: translateY(var(--tm-sun-from));
+  animation: tm-sunrise var(--tm-ms) linear forwards;
+}
+
+.tm-sun-face,
 .tm-sun-red {
   position: absolute;
   inset: 0;
   border-radius: 50%;
+}
+
+.tm-sun-face {
+  background: radial-gradient(circle at 40% 38%, #fff3bf, #ffd43b 55%, #fab005);
+}
+
+.tm-sun-red {
   background: radial-gradient(circle at 40% 38%, #ffc078, #fd7e14 55%, #e8590c);
+  animation: tm-unredden var(--tm-ms) linear forwards;
+}
+
+/* The ring of light each second: a glow behind the moon or the sun that widens softly past its edge and fades, a
+   breath, never a blink (a ring drawn as a shadow left a dark gap at the edge). */
+.tm-ring {
+  inset: 0;
+  border-radius: 50%;
   opacity: 0;
-  animation: tm-redden var(--tm-ms) linear forwards;
+  animation: tm-ring 1s ease-out infinite;
 }
 
-.tm-moon {
-  animation: tm-moonrise var(--tm-ms) linear forwards;
+.tm-moon-ring {
+  background: radial-gradient(closest-side, rgb(255 243 191 / 0.6) 84%, transparent);
 }
 
-.tm-moon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.tm-sun-ring {
+  background: radial-gradient(closest-side, rgb(255 212 59 / 0.6) 84%, transparent);
 }
 
-.tm-dusk-sky {
+.tm-moon .tm-left-glow,
+.tm-sun .tm-left-glow {
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
+}
+
+.tm-dawn-sky {
   background: linear-gradient(#7b5ea7, #f783ac 45%, #ffa94d 80%);
   opacity: 0;
-  animation: tm-evening var(--tm-ms) linear forwards;
+  animation: tm-dawn var(--tm-ms) linear forwards;
 }
 
 .tm-night-sky {
   background: linear-gradient(#0b1033, #1c2a5a 60%, #2f3f7a);
-  opacity: 0;
-  animation: tm-nightfall var(--tm-ms) linear forwards;
+  opacity: 0.92;
+  animation: tm-daybreak var(--tm-ms) linear forwards;
 }
 
-.tm-dusk-land {
-  opacity: 0;
-  animation: tm-dusk var(--tm-ms) linear forwards;
-}
-
-.tm-windows {
-  opacity: 0;
-  animation: tm-lights var(--tm-ms) linear forwards;
+.tm-night-land {
+  opacity: 0.6;
+  animation: tm-land-light var(--tm-ms) linear forwards;
 }
 
 .tm-star {
-  opacity: 0;
-  animation: tm-star 4s ease-out both;
+  animation: tm-star-out 4s ease-in both;
   animation-delay: calc(var(--tm-ms) * var(--tm-at));
 }
 
-.tm-sails {
-  inset: 0;
-  animation: tm-sails 1s ease-in-out infinite;
+.tm-done .tm-moon {
+  animation: none;
+  transform: translateY(var(--tm-moon-set));
 }
 
-.tm-sails svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.tm-done .tm-sun,
+.tm-done .tm-sun-red,
+.tm-done .tm-dawn-sky,
+.tm-done .tm-night-sky,
+.tm-done .tm-night-land,
+.tm-done .tm-star {
+  animation: none;
+  transform: none;
+  opacity: 0;
 }
 
 .tm-done .tm-sun {
-  animation: none;
-  transform: translateY(var(--tm-sun-set));
-}
-
-.tm-done .tm-moon,
-.tm-done .tm-dusk-sky,
-.tm-done .tm-night-sky,
-.tm-done .tm-dusk-land,
-.tm-done .tm-windows,
-.tm-done .tm-star,
-.tm-done .tm-sun-red {
-  animation: none;
-  transform: none;
-}
-
-.tm-done .tm-dusk-sky,
-.tm-done .tm-windows,
-.tm-done .tm-star,
-.tm-done .tm-sun-red,
-.tm-done .tm-sails {
   opacity: 1;
 }
 
-.tm-done .tm-night-sky {
-  opacity: 0.92;
-}
-
-.tm-done .tm-dusk-land {
-  opacity: 0.6;
-}
-
-/* The sun has set at 55 % of the time (SUN_SET_AT); the moon waits behind the hill until 50 % (MOON_FROM) and rises then. */
-@keyframes tm-set {
-  55%,
+/* The moon has set at 48 % of the time (MOON_SET_AT); the sun waits behind the hill until 50 % (SUN_FROM) and rises then. */
+@keyframes tm-moonset {
+  48%,
   to {
-    transform: translateY(var(--tm-sun-set));
+    transform: translateY(var(--tm-moon-set));
   }
 }
 
-@keyframes tm-redden {
-  50%,
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes tm-moonrise {
+@keyframes tm-sunrise {
   from,
   50% {
-    transform: translateY(var(--tm-moon-from));
+    transform: translateY(var(--tm-sun-from));
   }
   to {
     transform: none;
   }
 }
 
-@keyframes tm-evening {
-  45%,
-  100% {
+@keyframes tm-unredden {
+  50% {
     opacity: 1;
+  }
+  85%,
+  to {
+    opacity: 0;
   }
 }
 
-@keyframes tm-nightfall {
-  40% {
-    opacity: 0;
+@keyframes tm-ring {
+  from {
+    opacity: 1;
+    transform: none;
   }
-  100% {
+  to {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
+@keyframes tm-daybreak {
+  25% {
     opacity: 0.92;
   }
-}
-
-@keyframes tm-dusk {
-  30% {
+  60%,
+  to {
     opacity: 0;
-  }
-  100% {
-    opacity: 0.6;
   }
 }
 
-@keyframes tm-lights {
-  0%,
-  55% {
+@keyframes tm-dawn {
+  25% {
     opacity: 0;
   }
-  65%,
-  100% {
+  50% {
     opacity: 1;
   }
+  85%,
+  to {
+    opacity: 0;
+  }
 }
 
-@keyframes tm-star {
+@keyframes tm-land-light {
+  20% {
+    opacity: 0.6;
+  }
+  70%,
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tm-star-out {
   from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
     opacity: 0;
     transform: scale(0.4);
   }
-  to {
-    opacity: 1;
-    transform: none;
-  }
 }
 
-@keyframes tm-sails {
-  to {
-    transform: rotate(90deg);
-  }
-}
-
-/* Blume (H-53): the stalk slides up out of the soil from a sprout to the ribbon, what is still to grow shrinks above it
-   along the stake, a drop falls from the watering can every second, and at the end the flower opens round the bud. */
+/* Blume (H-53): the plant rises out of the soil from a sprout to the ribbon and grows as a whole as it rises – its foot
+   on the soil, scaled up from there, so stalk and leaves get thicker and bigger (user feedback, November 2026) – while
+   what is still to grow shrinks above it along the stake and a drop falls from the hose every second. The box it is in
+   is cut at the soil, so the part not yet grown waits below it. */
 .tm-stalk,
 .tm-to-grow {
   position: absolute;
@@ -1842,7 +1820,8 @@
 }
 
 .tm-stalk {
-  transform: translateY(var(--tm-sprout));
+  transform-origin: 50% 100%;
+  transform: translateY(var(--tm-sprout)) scale(var(--tm-sprout-size));
   animation: tm-grow-up var(--tm-ms) linear forwards;
 }
 
@@ -1861,10 +1840,12 @@
   transform: translateY(-100%);
 }
 
-/* The stalk grows in the first 70 % of the time (GROWN_AT in flower.tsx); then the flower opens. */
+/* The plant grows in the first 70 % of the time (GROWN_AT in flower.tsx); then the flower opens. Moving down by
+   (size − sprout) of its height while drawn at `size` leaves exactly the sprout above the soil, and both run linearly to
+   none, so its top rises evenly with what is still to grow. */
 @keyframes tm-grow-up {
   from {
-    transform: translateY(var(--tm-sprout));
+    transform: translateY(var(--tm-sprout)) scale(var(--tm-sprout-size));
   }
   70%,
   to {
@@ -1934,20 +1915,29 @@
   }
 }
 
-/* The petals open one after another, slowly, each in its share of the time after the stalk is grown. */
-.tm-petal {
+/* The flower grows from small to big round the bud, all its petals at once (user feedback, November 2026), in the
+   time after the plant is grown (GROWN_AT, 0.7, in flower.tsx) until the end. */
+.tm-bloom {
   opacity: 0;
-  transform: scale(0.15);
-  animation: tm-petal calc(var(--tm-ms) * var(--tm-share)) ease-out calc(var(--tm-ms) * var(--tm-at)) forwards;
+  transform: scale(0.2);
+  will-change: transform;
+  animation: tm-bloom calc(var(--tm-ms) * 0.3) linear calc(var(--tm-ms) * 0.7) forwards;
 }
 
-.tm-done .tm-petal {
+.tm-done .tm-bloom {
   animation: none;
   opacity: 1;
   transform: none;
 }
 
-@keyframes tm-petal {
+@keyframes tm-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  3% {
+    opacity: 1;
+  }
   to {
     opacity: 1;
     transform: none;
@@ -1980,7 +1970,6 @@
   opacity: 0;
 }
 
-.tm-sun .tm-left-glow,
 .tm-to-grow .tm-left-glow {
   inset: -20%;
   border-radius: 50%;
@@ -2066,4 +2055,33 @@
 
 :root .mode-level .tm-lengths .choice button {
   padding-inline: 10px;
+}
+
+/* The start screen's cards (`TimerCardArt`): each picture as it looks at its end, covering the card like a run covers
+   the screen, and standing still – no animation runs in the menu, and what one would leave at its end is put there. */
+.tm-card-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  pointer-events: none;
+}
+
+.tm-card-art * {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.tm-card-art .tm-cat {
+  opacity: 0;
+}
+
+.tm-card-art .tm-cocoon-open {
+  opacity: 1;
+}
+
+.tm-card-art .tm-butterfly {
+  opacity: 1;
+  transform: translate(var(--tm-fly-x), var(--tm-fly-y));
 }

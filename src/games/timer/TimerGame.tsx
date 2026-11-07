@@ -3,6 +3,7 @@ import { GameShell } from "@/components/GameShell";
 import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
+import { TimerCardArt } from "./cardArt";
 import { PICTURES, SWAP_NOTE, TIMER_TITLE } from "./content";
 import { OwnTimeSheet } from "./OwnTimeSheet";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
@@ -18,8 +19,15 @@ export function TimerGame() {
   const t = useT();
   const [settings, update] = useGameSettings(TIMER_SETTINGS_KEY, DEFAULT_TIMER_SETTINGS);
   const [sheet, setSheet] = useState(false);
-  // „Abwechseln“ carries a line saying it goes on and on; the others run until the time is up.
-  const modes = PICTURES.map((p) => ({ id: p.id, emoji: p.emoji, title: t(p.name), note: p.id === "swap" ? t(SWAP_NOTE) : undefined }));
+  // Each card is its picture as it looks at the end, with no words on it (user request, November 2026); its name, and
+  // for „Abwechseln“ the line saying it goes on and on, are only read out and its tooltip.
+  const modes = PICTURES.map((p) => ({
+    id: p.id,
+    emoji: p.emoji,
+    title: t(p.name),
+    note: p.id === "swap" ? t(SWAP_NOTE) : undefined,
+    art: <TimerCardArt picture={p.id} toy={settings.toy} />,
+  }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
   const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
   const seconds = TIMER_SECONDS.includes(settings.seconds as (typeof TIMER_SECONDS)[number]) ? settings.seconds : DEFAULT_TIMER_SETTINGS.seconds;

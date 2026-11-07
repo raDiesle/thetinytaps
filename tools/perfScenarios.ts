@@ -146,7 +146,7 @@ export const SCENARIOS: Scenario[] = [
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
-  // steam, the twinkling, the flame, what is left lighting up), the ants marching, the sky growing dark over the sunset,
+  // steam, the twinkling, the flame, what is left lighting up), the ants marching, the moon setting and the sun rising,
   // the pizza's slices lifted off, the ladybug crawling
   // round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the hourglass running.
   ...(["scheibe", "sanduhr", "abwechseln", "kerze", "apfelbaum", "pizza", "wecker", "zug", "raupe", "blume", "sonne", "ameisen"] as const).map((name, i) => ({
