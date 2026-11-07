@@ -39,11 +39,14 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const drawPeek = useDeck(PEEK_ITEMS);
   const drawGrowth = useDeck(GROWTHS);
   const lastAnimal = useRef<Animal | null>(null);
+  /** While developing, `?animal=<id>` feeds, houses or asks only that animal, to look at its rounds and its home. */
+  const [devAnimal] = useState(() => (DEV ? ANIMALS.find((a) => a.id === new URLSearchParams(window.location.search).get("animal")) : undefined));
   // The real animal sounds (and the munch), loaded at once so even the first round sounds real.
   useEffect(() => loadRecordings([...ANIMAL_RECORDINGS, ...SHADOW_RECORDINGS, "munch"]), []);
 
   /** The next animal to feed, house or ask, never the one of the round before (the kinds share some). */
-  const drawAnimal = (draw: () => Animal) => {
+  const drawAnimal = (draw: () => Animal, has: (a: Animal) => unknown) => {
+    if (devAnimal && has(devAnimal)) return devAnimal;
     let animal = draw();
     if (animal === lastAnimal.current) animal = draw();
     lastAnimal.current = animal;
@@ -65,8 +68,20 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
       return { kind, item, choices: dealPeek(item, PEEK_ITEMS, level.peek), level: level.peek } as const;
     }
     if (kind === "grow") return dealGrow(drawGrowth(), level.choices);
-    if (kind === "gift") return dealGift(drawAnimal(drawGiver), level.choices);
-    return kind === "feed" ? dealFeed(drawAnimal(drawFed), level.choices) : dealHome(drawAnimal(drawHoused), level.choices);
+    if (kind === "gift")
+      return dealGift(
+        drawAnimal(drawGiver, (a) => a.gives),
+        level.choices,
+      );
+    return kind === "feed"
+      ? dealFeed(
+          drawAnimal(drawFed, (a) => a.food),
+          level.choices,
+        )
+      : dealHome(
+          drawAnimal(drawHoused, (a) => a.home),
+          level.choices,
+        );
   }
   if (dealt.current?.turn !== turn) dealt.current = { turn, round: deal(dealt.current?.round.kind ?? null) };
   const round = dealt.current.round;
