@@ -31,6 +31,7 @@ import {
 import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
 import { DRAW_STEPS } from "./SwapPlay";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
+import { BALL, BOARD, COURT, FLIGHT_MS, NET, PLAYERS, playerBox, racketHead } from "./tennis";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
 describe("Timer", () => {
@@ -43,13 +44,14 @@ describe("Timer", () => {
       expect(p.name.de.trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln last, in a group of its own.
+    // Abwechseln and Tennis (H-71) last, in a group of their own.
     expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.at(-1)?.id).toBe("swap");
+    expect(PICTURES.slice(-2).map((p) => p.id)).toEqual(["swap", "tennis"]);
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
-    // Abwechseln runs without end, so „Weiter“ never leads into it.
+    // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 1);
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("tennis");
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 2);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -59,6 +61,7 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("tennis")).toBe(TIMED_PICTURES[0].id);
   });
 
   test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
@@ -376,9 +379,12 @@ describe("Timer", () => {
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
-  // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
+  // their story by themselves; Abwechseln's children are the real ones, their places two cushions. The one exception is
+  // Tennis (H-71, user request, November 2026: „zwei die Tennis spielen“): the two players are what the picture is
+  // about, standing still as the shared `Mascot` while only their rackets and the ball move.
   test("no timer picture draws a fox or bear figure", async () => {
     for await (const file of new Bun.Glob("src/games/timer/*.tsx").scan(".")) {
+      if (file.endsWith("tennis.tsx")) continue;
       const code = await Bun.file(file).text();
       expect(/<Mascot(Head)?[\s/>]|MASCOT_COLORS\.\w+\.paw/.test(code) ? `${file} draws a fox or bear` : file).toBe(file);
     }
@@ -397,6 +403,31 @@ describe("Timer", () => {
     expect(LAMP.rim - 30).toBeGreaterThanOrEqual(80);
     expect(TOY.waiting).toBeLessThanOrEqual(820);
     expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
+  });
+
+  test("Tennis keeps both players, the net, the board and the ball's whole flight on every screen, the same either side of the net (H-71)", () => {
+    for (const kind of ["fox", "bear"] as const) {
+      const box = playerBox(kind);
+      expect(box.x).toBeGreaterThanOrEqual(200);
+      expect(box.x + box.w).toBeLessThanOrEqual(RIGHT);
+      expect(box.y).toBeGreaterThanOrEqual(80);
+      // The racket's head leans towards the net and the ball meets it there, on the player's own side.
+      const [hx] = racketHead(kind);
+      expect(kind === "fox" ? hx < NET.left : hx > NET.right).toBe(true);
+    }
+    // Fair: both players and their rackets as far from the net.
+    expect(COURT.net - PLAYERS.fox).toBe(PLAYERS.bear - COURT.net);
+    expect(COURT.net - racketHead("fox")[0]).toBeCloseTo(racketHead("bear")[0] - COURT.net);
+    // The ball flies clearly over the net and below the board, and hops on the racket below it too.
+    const peak = BALL.contact - BALL.arc - BALL.r;
+    expect(BALL.contact + BALL.r).toBeLessThan(NET.top);
+    expect(peak).toBeGreaterThan(BOARD.y + BOARD.h);
+    expect(BALL.contact - BALL.hop - BALL.r).toBeGreaterThan(BOARD.y + BOARD.h);
+    expect(BALL.waiting.y + BALL.r).toBeLessThanOrEqual(820);
+    expect(BOARD.y).toBeGreaterThanOrEqual(80);
+    expect(BOARD.x + BOARD.w / 2).toBe(COURT.net);
+    // It flies slowly, so a child can follow it to whose turn it is.
+    expect(FLIGHT_MS).toBeGreaterThanOrEqual(2000);
   });
 
   // User request, November 2026: Abwechseln's hourglass is the Sanduhr's own, not a second one built beside it.

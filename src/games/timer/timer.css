@@ -1598,6 +1598,140 @@
   }
 }
 
+/* Tennis (H-71): the side with the ball lies in the light, the other in shade (`.tm-swap-shade`), and the shade
+   changes sides as the ball crosses the net (`--tm-cross`, half its flight). The ball travels by a transition as long
+   as its flight (`--tm-flight`), rising and falling in a high arc on its way (`--tm-arc`), then hops up from the racket
+   of the child whose turn it is once a second (`--tm-hop`), the racket flicking as it lands; the child who hit it over
+   swings its racket through. The board's lights go out one by one over the turn, the rightmost first. */
+.tm-swap-shade.tm-cross {
+  transition-delay: var(--tm-cross);
+}
+
+.tm-ball {
+  transition: transform var(--tm-flight) linear;
+}
+
+.tm-ball > div,
+.tm-ball > div > div,
+.tm-ball svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-ball svg {
+  overflow: visible;
+}
+
+.tm-ball-arc {
+  animation: tm-ball-arc var(--tm-flight) linear;
+}
+
+@keyframes tm-ball-arc {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+  }
+  50% {
+    transform: translateY(var(--tm-arc));
+    animation-timing-function: cubic-bezier(0.33, 0, 0.66, 0.34);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.tm-ball-bounce {
+  animation: tm-ball-bounce 1s linear var(--tm-flight) infinite;
+}
+
+@keyframes tm-ball-bounce {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+  }
+  50% {
+    transform: translateY(var(--tm-hop));
+    animation-timing-function: cubic-bezier(0.33, 0, 0.66, 0.34);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.tm-racket {
+  will-change: transform;
+}
+
+.tm-racket-fox {
+  --tm-flick: -7deg;
+  --tm-swing: 30deg;
+}
+
+.tm-racket-bear {
+  --tm-flick: 7deg;
+  --tm-swing: -30deg;
+}
+
+.tm-racket-bounce {
+  animation: tm-racket-flick 1s ease-out var(--tm-flight) infinite;
+}
+
+@keyframes tm-racket-flick {
+  0% {
+    transform: rotate(var(--tm-flick));
+  }
+  30%,
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.tm-racket-swing {
+  animation: tm-racket-swing 0.9s ease-out;
+}
+
+@keyframes tm-racket-swing {
+  20% {
+    transform: rotate(var(--tm-swing));
+  }
+}
+
+.tm-tennis-light {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, #fffde6, #ffe066 45%, #f59f00);
+  box-shadow: 0 0 1.2cqh 0.4cqh rgb(255 224 102 / 0.75);
+  animation: tm-light-out calc(var(--tm-ms) / var(--tm-lights)) linear forwards;
+  animation-delay: calc(var(--tm-ms) / var(--tm-lights) * var(--tm-i) + var(--tm-delay));
+}
+
+@keyframes tm-light-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.tm-tennis-board.tm-wait .tm-tennis-light {
+  animation-play-state: paused;
+}
+
+.tm-tennis-light .tm-left-glow {
+  inset: -60%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 250 200 / 0.95), rgb(255 230 140 / 0.5) 60%, transparent);
+}
+
+.tm-done .tm-ball-bounce,
+.tm-done .tm-racket {
+  animation: none;
+}
+
+.tm-done .tm-tennis-light {
+  animation: none;
+  opacity: 0;
+}
+
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
 .tm-sky-box {
   overflow: hidden;

@@ -1,5 +1,5 @@
 import type { Localized } from "@/lib/language";
-import type { TimerPicture } from "./settings";
+import type { TimerPicture, TurnPicture } from "./settings";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
 export const TIMER_TITLE: Localized = { de: "Timer", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت", ru: "Таймер" };
@@ -71,20 +71,25 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     name: { de: "Sonnenaufgang" },
   },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
+  // Taking turns at tennis (H-71, user request, November 2026), beside „Abwechseln“ in its group.
+  { id: "tennis", emoji: "🎾", name: { de: "Tennis" } },
 ];
 
 /**
- * The line on „Abwechseln“'s card, last on the start screen, for grown-ups: it runs on without an end, and each child
- * gets its turn (user feedback, November 2026).
+ * The line on the cards of „Abwechseln“ and Tennis, last on the start screen, for grown-ups: they run on without an
+ * end, and each child gets its turn (user feedback, November 2026).
  */
 export const SWAP_NOTE: Localized = { de: "Läuft ohne Ende, jeder ist mal dran" };
 
-/** The pictures that run until the time is up, in their order: all but „Abwechseln“. */
-export const TIMED_PICTURES = PICTURES.filter((p) => p.id !== "swap");
+/** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "tennis";
+
+/** The pictures that run until the time is up, in their order: all but those of taking turns. */
+export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));
 
 /**
  * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
- * „Abwechseln“, which goes on without an end; from „Abwechseln“ the first.
+ * „Abwechseln“ or Tennis, which go on without an end; from them the first.
  */
 export function nextPicture(id: TimerPicture): TimerPicture {
   const i = TIMED_PICTURES.findIndex((p) => p.id === id);
