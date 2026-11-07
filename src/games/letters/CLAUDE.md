@@ -34,13 +34,23 @@ the page before it.
   (`PlayOptions intro`) names it – for Wörter tippen whole words, colours, doing words, „Wo ist das B?“. When a big
   variant is added, name it there too (user feedback, November 2026).
 - Mitmachen waits at every hop, clap or stamp long enough for a small child to do it too and land (`BEAT_MS`, 1.5 s)
-  – never a quick run of them: the child moving along is the point, not watching. The child figure moves on its own HTML
-  layers (`.mv-kid`, its clapping pose a layer above its standing one), animated by `element.animate`, never inside its
-  svg. Only the child that moves stands there: a grown-up standing beside it was decoration and was taken out (user
+  – never a quick run of them: the child moving along is the point, not watching. The child is a Gemini picture in two
+  frames per move (user request, November 2026; `bilder/<fuchs|baer>-<stehen|huepfen|klatschen|stampfen>.webp`): standing
+  is every move's first frame, the move's own frame lies over it on the same HTML layer (`.mv-kid`) and is cut in hard
+  for the moment of the move (`MOVE_SHOWN`), never cross-faded (both children would show at once); the layer itself
+  hops or dips by `element.animate`. The marks under the digit are the move's symbol, also from Gemini in two frames
+  (`bilder/zeichen-<move>-1|2.webp`): the first faint while to do, the second once done. All four poses of one child
+  come from one 2x2 sheet, with the family picture as `--ref`, so the child stays the same; a new move gets its frame
+  drawn from `<kind>-stehen.webp` as the only `--ref`. Only the child that moves stands there: a grown-up standing beside it was decoration and was taken out (user
   feedback, November 2026).
 - No fox or bear stands by as decoration in these games: a family in Zählen's and Wörter tippen's corner, pointing at
   the things or the picture, was taken out (user feedback, November 2026) – children wanted to tap it and thought it
   belonged to the game. A fox or bear comes in only where it does the game's thing (Mitmachen's child, „Fuchs“ at F).
+- Pressing keys quickly never turns into a din (user feedback, November 2026): in Frei tippen and Zählen a new letter or
+  number comes at most every `MIN_CHANGE_MS` (1 s), the same key again – and a tap on the card or its picture again –
+  only after `REPEAT_PAUSE_MS` (`repeats`, Space, Enter, arrows and Backspace too: the card still moves, silently), and
+  the soft note of a press that sets nothing off at most every `EXTRA_SOUND_GAP_MS` in all four games (`useSoftTap`).
+  Presses the game asks for again (the next step, tapping each thing, the digit of `digitOnRepeat`) keep answering at once.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

@@ -1,4 +1,5 @@
 import { hi as pack } from "@/content/hi";
+import { SEO_HI as seo } from "@/content/seo.hi";
 import { HI as badezimmer } from "@/games/scenes/badezimmer/hi";
 import { HI as bauernhof } from "@/games/scenes/bauernhof/hi";
 import { HI as baustelle } from "@/games/scenes/baustelle/hi";
@@ -79,5 +80,6 @@ export const TEXTS: LanguageTexts = {
   feelings,
   situations,
   days,
+  seo,
   stories: { cloudTrip, treasureIsland },
 };

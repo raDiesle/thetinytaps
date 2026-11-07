@@ -1,4 +1,5 @@
 import { ar as pack } from "@/content/ar";
+import { SEO_AR as seo } from "@/content/seo.ar";
 import { AR as badezimmer } from "@/games/scenes/badezimmer/ar";
 import { AR as bauernhof } from "@/games/scenes/bauernhof/ar";
 import { AR as baustelle } from "@/games/scenes/baustelle/ar";
@@ -79,5 +80,6 @@ export const TEXTS: LanguageTexts = {
   feelings,
   situations,
   days,
+  seo,
   stories: { cloudTrip, treasureIsland },
 };

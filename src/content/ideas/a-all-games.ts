@@ -195,5 +195,13 @@ export const allGamesIdeas: IdeaArea = {
       effort: "S",
       done: true,
     },
+    {
+      id: "A-24",
+      emoji: "🗣️",
+      title: "Am Ende eines Levels: ein passender Satz und „Nochmal oder weiter?“",
+      text: "Ist ein Level oder eine Geschichte zu Ende (das gemeinsame Ende mit „Nochmal“ und „Weiter“), sagt die Stimme zuerst einen Satz, der zu dem passt, was das Kind gerade geschafft hat. Viele Spiele haben so einen Satz schon: Zähne putzen, die Filme in Kleine Abenteuer, Bewegungsabenteuer, die Bahnen in Kettenreaktion („Der Korb ist voll!“), die Tagesgeschichten in Gefühle. Wo einer fehlt, kommt einer dazu, etwa nach der Party in Aufs Töpfchen („Geschafft! Hände sind gewaschen.“); für den Timer siehe H-72, Lebendige Bilder bleibt geparkt. Danach fragt die Stimme einmal, wenn sonst nichts mehr gesagt wird: „Nochmal oder weiter?“, wo es nur „Nochmal“ gibt (Aufs Töpfchen) nur „Nochmal?“. Die Frage ist für alle Spiele dieselbe, einmal in allen sieben Sprachen aufgenommen (wie der Gute-Nacht-Satz, src/components/stimme): zwei Sätze, zusammen ≈ 30 Credits. Dabei hüpft und blinkt nichts, die Knöpfe bleiben still. Beim letzten Spiel der Spielzeit sagt das Spiel stattdessen Gute Nacht. Spiele, die von selbst weiterlaufen (Socken-Paare, Was gehört zum Tier?, Was gehört zusammen?, Erkennen), haben kein solches Ende und brauchen die Frage nicht.",
+      why: "Ein Kind, das nicht liest, weiß nicht, was auf den beiden Knöpfen steht. Hört es die Frage, kann es selbst wählen, statt auf einen Großen zu warten. Der Satz davor sagt ihm, was es geschafft hat, ruhiger als jedes Feuerwerk.",
+      effort: "S",
+    },
   ],
 };

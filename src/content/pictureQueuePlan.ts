@@ -159,6 +159,8 @@ export interface ImageJob {
   transparent?: boolean;
   key?: string;
   ref?: string[];
+  /** Cut-out frames of one animation: each keeps its whole cell, so they line up (`--frames`). */
+  frames?: boolean;
 }
 
 /** Where a spare panel's other version of a picture goes: kept out of the game, to choose from. */
@@ -178,6 +180,7 @@ export function jobOf(sheet: Sheet): ImageJob {
     return {
       ...shared,
       grid: sheet.grid,
+      ...(first.transparent && { frames: true }),
       out: first.panels.map((p) => p.file),
       prompt: `${styleOf(first)} ${first.prompt}`,
       panels: first.panels.map((p) => p.prompt),

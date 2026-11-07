@@ -1,4 +1,4 @@
-/* Mitmachen (MovePlay.tsx): a digit and its marks beside a fox or bear child and its grown-up, on a meadow. */
+/* Mitmachen (MovePlay.tsx): a digit and its marks beside a fox or bear child, on a meadow – pictures from Gemini (bilder/). */
 
 .mv-play {
   position: absolute;
@@ -42,13 +42,18 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.15em;
-  max-width: 5.8em;
+  max-width: 9em;
   font-size: min(9cqh, 6cqw);
   line-height: 1.1;
 }
 
+/* The symbol of the move: its first picture faint while still to do, its second (the move done) in full once done. */
 .mv-mark {
-  opacity: 0.22;
+  display: block;
+  width: 1.7em;
+  height: 1.5em;
+  object-fit: contain;
+  opacity: 0.3;
   filter: grayscale(1);
   transition:
     opacity 0.25s,
@@ -60,7 +65,8 @@
   filter: none;
 }
 
-/* The child alone – no grown-up standing by (decoration, user feedback, November 2026) – moving on a layer of its own. */
+/* The child alone – no grown-up standing by (decoration, user feedback, November 2026) – moving on a layer of its own,
+   its two pictures stacked: standing, and the move's own over it, shown for a moment at each move (MovePlay's `act`). */
 .mv-family {
   display: flex;
   align-items: flex-end;
@@ -76,19 +82,18 @@
   will-change: transform;
 }
 
-.mv-family svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 .mv-pose {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* The clapping pose waits unseen above the standing one; a clap shows it for a moment (MovePlay's `act`). */
-.mv-clap {
+.mv-moving {
   opacity: 0;
 }
 
