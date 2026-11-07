@@ -13,7 +13,7 @@ function current() {
   return splitLanguage(pathname.startsWith(base) ? pathname.slice(base.length) || "/" : pathname);
 }
 
-/** The language of the address the visit is on: English under /en/, else German. */
+/** The language of the address the visit is on: English under /en/, Russian under /ru/ and so on, else German. */
 export const addressLanguage = (): SeoLanguage => current().language;
 
 /** Where the router's addresses start: the base path and, for a page in another language, its prefix. */

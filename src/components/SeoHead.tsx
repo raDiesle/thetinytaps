@@ -18,7 +18,7 @@ function headTag<T extends HTMLElement>(selector: string, make: () => T) {
  * Keeps description, canonical link and robots tag of the head in step with the
  * address while the app moves between pages, as each built page has them from the
  * start (tools/build.ts). Google reads the page after it ran, so both must agree.
- * They follow the address's language (/en/ is English), as the built page does.
+ * They follow the address's language (/en/ is English, /ru/ Russian …), as the built page does.
  */
 export function SeoHead() {
   const { pathname } = useLocation();
