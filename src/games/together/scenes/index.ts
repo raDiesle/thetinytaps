@@ -10,6 +10,13 @@ import { SCENES as wetter } from "./wetter";
 import { SCENES as unterwegs } from "./unterwegs";
 import { SCENES as feste } from "./feste";
 import { SCENES as berufe } from "./berufe";
+import { SCENES as bauen } from "./bauen";
+import { SCENES as verkehr } from "./verkehr";
+import { SCENES as gesundheit } from "./gesundheit";
+import { SCENES as rettung } from "./rettung";
+import { SCENES as laden } from "./laden";
+import { SCENES as hof } from "./hof";
+import { SCENES as musik } from "./musik";
 import { SCENES as sport } from "./sport";
 import { SCENES as fantasie } from "./fantasie";
 
@@ -28,6 +35,13 @@ export const SCENES: SceneSpec[] = [
   ...unterwegs,
   ...feste,
   ...berufe,
+  ...bauen,
+  ...verkehr,
+  ...gesundheit,
+  ...rettung,
+  ...laden,
+  ...hof,
+  ...musik,
   ...sport,
   ...fantasie,
 ];

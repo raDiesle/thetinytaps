@@ -17,14 +17,16 @@ for a moment (`.tg-owner`) – never shown as wrong.
 
 ## The pairs
 
-Each pair belongs to a **topic** (`topics.ts`: Im Bad, Küche & Essen, Zu Hause, Anziehen, Kita & Schule, Spielen,
-Garten, Wetter, Unterwegs, Feste – things of the day; Berufe, Sport, Märchen & Abenteuer – helpers), so grown-ups may one day choose
-topics behind ⚙️. There are two sorts:
+Each pair belongs to a **topic** (`topics.ts`: Im Bad, Küche & Essen, Zu Hause, Anziehen, Kita & Schule, Spielen, Garten, Wetter,
+Unterwegs, Feste – things of the day; Berufe, Bauen & Reparieren, Fahrzeuge, Arzt & Krankenhaus, Feuerwehr, Polizei &
+Rettung, Laden, Café & Küche, Bauernhof & Wald, Musik & Bühne, Sport, Märchen & Abenteuer – helpers), so grown-ups may
+one day choose topics behind ⚙️. Helpers are split by place on purpose: since the wrong choices come from other topics
+first, helpers of one place (the builder's bricks, the crane driver's crane) are rarely dealt together. There are two sorts:
 - **Handmade** (`HANDMADE` in `pairs.tsx`, nine: Zahnbürste, Tür, Topf, Blume, Papier, Feuerwehr, Ärztin, Bäcker,
   Friseurin): drawn layer by layer with motions of their own in `together.css` (`.pair-<id>`), the only ones translated
   so far (`content.<lang>.ts`). Drawn in their old 200 × 200 units and moved into the middle of the wide box
   (`handmade`), on a backdrop.
-- **Scenes** (`scenes/<topic>.ts`, about 190, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
+- **Scenes** (`scenes/<topic>.ts`, about 230, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
   as a big emoji (or, for a helper, the fox or bear in its outfit, `Helper.tsx`, with what it works on), a few small
   emoji round it for context (`props`), the partner, and one of a few shared motions (`Act`: onto, into, beside, rub,
   pour, tap, turn, light, hold; `.act-<act>` in `together.css`). A helper's tool lands in its paw first and is carried
@@ -76,7 +78,15 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   moves as a whole layer, by `transform` or `opacity` (phones, see the root `CLAUDE.md`). What must stay when something
   goes (the logs under the fire) is a layer of its own, and a layer drawn behind another comes first (the salon chair
   before the child sitting on it). Every layer's class is styled in `together.css` (`content.test.ts`).
-- A partner is an emoji or a drawing; draw it where the emoji vanishes on the picture (🩺 on a green coat).
+- A partner is an emoji or a drawing; draw it where the emoji vanishes on the picture (🩺 on a green coat), and where
+  there is no emoji or only one newer than Unicode 13 (🛟, 🛞, 🪏 and 🪈 show as empty boxes on older phones): such tools
+  are drawn in `tools.tsx`, big and plain in the 100 × 100 box, and checked at the size of a choice on a phone.
+- A tool that should still be seen at work moves `onto`, `beside` or with `rub` / `tap` / `turn`; `into` makes it
+  vanish (the letter in its box, the pizza in the oven), so use it only where vanishing is the point (the chimney
+  sweep's brush vanished into the chimney and the scene showed nothing).
+- A helper is named by what the child sees it do with its tool: players by their instrument (Trommler, Geigerin –
+  never a „Musiker“ several instruments would fit), and a role whose usual tool another helper has gets another of its
+  own (the witch has the broom, so the cleaner has a vacuum cleaner).
 - After the right pick the picture's change and its sound are the answer: nothing floats up (no sparkles, the old
   ones were removed), only the thing and the helper hop.
 - Nothing to read in the picture; names only below the choices (for grown-ups) and as `aria-label`. No stars or count

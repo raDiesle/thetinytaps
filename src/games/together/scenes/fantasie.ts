@@ -1,9 +1,10 @@
 import type { SceneSpec } from "../scene";
+import { hotAirBalloon } from "../tools";
 
 // The helpers of the topic „Märchen & Abenteuer“ (topics.ts): fairy-tale and play roles a child dresses up as, and
 // adventurers, each with the one thing everyone knows them by. Magic comes in three: the fairy has the wand, the
 // wizard the crystal ball, the magician the top hat – a wand would fit all three, so they name each other in
-// `alsoFits`. Jobs are in berufe.ts, sports people (the sledge, the angler's rod) in sport.ts.
+// `alsoFits`. Jobs are in berufe.ts and the other helper topics, sports people (the sledge, the angler's rod) in sport.ts.
 
 export const SCENES: SceneSpec[] = [
   {
@@ -221,5 +222,53 @@ export const SCENES: SceneSpec[] = [
     sounds: ["rustle", "thump"],
     // An explorer and a hiker sleep in a tent too.
     alsoFits: ["entdecker", "wanderer"],
+  },
+  {
+    id: "zwerg",
+    topic: "fantasie",
+    name: "Zwerg",
+    the: "der Zwerg",
+    toThe: "der Zwerg",
+    partner: { name: "Spitzhacke", the: "die Spitzhacke", acc: "die Spitzhacke", emoji: "⛏️" },
+    helper: { fur: "bear", outfit: { coat: "#2b8a3e", hat: "zipfel", detail: "belt" } },
+    // Deep in the mine, the pick knocks on the gem on its rock.
+    thing: "💎",
+    thingAt: [222, 124, 52],
+    backdrop: "bergwerk",
+    act: "tap",
+    sounds: ["knock", "knock", "twinkle"],
+    // A cave explorer and a builder may dig with a pick too.
+    alsoFits: ["hoehlenforscher", "bauarbeiterin"],
+  },
+  {
+    id: "nikolaus",
+    topic: "fantasie",
+    name: "Nikolaus",
+    the: "der Nikolaus",
+    toThe: "der Nikolaus",
+    partner: { name: "Schokolade", the: "die Schokolade", acc: "die Schokolade", emoji: "🍫" },
+    helper: { fur: "fox", outfit: { coat: "#f8f9fa", hat: "mitre", detail: "cape", detailColor: "#e03131" } },
+    // The chocolate goes into the boot left out by the door.
+    thing: "👢",
+    thingAt: [222, 140, 64],
+    backdrop: "flur",
+    act: "into",
+    sounds: ["plop", "twinkle"],
+    // Father Christmas brings sweets too.
+    alsoFits: ["weihnachtsmann"],
+  },
+  {
+    id: "ballonfahrerin",
+    topic: "fantasie",
+    name: "Ballonfahrerin",
+    the: "die Ballonfahrerin",
+    toThe: "die Ballonfahrerin",
+    partner: { name: "Heißluftballon", the: "der Heißluftballon", acc: "den Heißluftballon", draw: hotAirBalloon },
+    helper: { fur: "bear", outfit: { coat: "#fab005", hat: "aviator", detail: "scarf", detailColor: "#e03131" }, lashes: true },
+    // The balloon comes to float over the mountain meadow.
+    backdrop: "berg",
+    act: "onto",
+    spot: [222, 92, 92],
+    sounds: ["hiss", "whoosh"],
   },
 ];

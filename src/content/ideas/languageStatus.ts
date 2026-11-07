@@ -326,7 +326,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🏠 Die vielen neuen Szenen (scenes/)",
         recorded: true,
         languages: { de: "text" },
-        note: "Neu am 7. November 2026, nur auf Deutsch: die Paare und Helfer der Themen (Bad, Küche, Berufe, Sport …) mit ihren Sätzen. Die deutschen Sätze sind noch nicht aufgenommen und bleiben bis dahin stumm (🎙️ Stimmen); in den anderen Sprachen kommen die Namen unter den Knöpfen auf Deutsch.",
+        note: "Neu am 7. November 2026, nur auf Deutsch: die Paare und Helfer der Themen (Bad, Küche, Berufe, Bauen, Fahrzeuge, Musik, Sport …) mit ihren Sätzen und die Namen der Themen. Die deutschen Sätze sind noch nicht aufgenommen und bleiben bis dahin stumm (🎙️ Stimmen); in den anderen Sprachen kommen die Namen unter den Knöpfen auf Deutsch.",
       },
       {
         label: "🗂️ Die Namen der Themen",

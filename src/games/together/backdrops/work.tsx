@@ -970,7 +970,263 @@ const gemuesebeet = () => {
   );
 };
 
+/** A country road: hills and fields far back, a tree at each side, the road along the bottom with its dashed middle line. */
+const landstrasse = () => (
+  <>
+    <rect width="300" height="200" fill="#dcefff" />
+    {cloud(90, 34, 1)}
+    {cloud(226, 22, 0.8)}
+    <path d="M0 112 Q70 76 150 100 Q220 80 300 102 V150 H0 Z" fill="#cfe3b4" stroke={OUT} strokeWidth="2.5" />
+    {/* fields in stripes */}
+    <path d="M0 128 Q90 112 170 124 Q240 114 300 122 V150 H0 Z" fill="#e8dca0" stroke={OUT} strokeWidth="2" />
+    <path d="M0 138 Q90 124 170 134 Q240 126 300 132" stroke="#d1bf72" strokeWidth="2.5" fill="none" />
+    {/* a round tree at each side */}
+    {[
+      [20, 120, 1],
+      [286, 116, 0.8],
+    ].map(([x, y, s]) => (
+      <g key={x}>
+        <rect x={x - 3 * s} y={y - 6} width={6 * s} height={30 * s} fill="#9c7653" stroke={OUT} strokeWidth="2.2" />
+        <circle cx={x} cy={y - 14 * s} r={18 * s} fill="#8cc58a" stroke={OUT} strokeWidth="2.5" />
+      </g>
+    ))}
+    {/* the road */}
+    <rect y="150" width="300" height="34" fill="#b8b3ad" />
+    <path d="M0 150 H300 M0 184 H300" stroke={OUT} strokeWidth="3" />
+    <path
+      d={range(8)
+        .map((i) => `M${i * 40 + 6} 167 h22`)
+        .join(" ")}
+      stroke="#fbf7ee"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+    />
+    <rect y="184" width="300" height="16" fill="#a9cf8e" />
+  </>
+);
+
+/** A hospital room: a window and a curtain on its rail, a bed with its pillow at the right, a bedside table. */
+const krankenhaus = () => (
+  <>
+    <rect width="300" height="200" fill="#e7f1f7" />
+    <rect y="104" width="300" height="56" fill="#d9e9f2" />
+    <path d="M0 104 H300" stroke={OUT} strokeWidth="2" />
+    {windowAt(118, 16, 60, 54)}
+    {/* the curtain on its rail at the left */}
+    <path d="M4 10 H96" stroke={OUT} strokeWidth="3" strokeLinecap="round" />
+    <path d="M8 12 Q14 70 6 150 H40 Q34 70 40 12 Z" fill="#b6dccb" stroke={OUT} strokeWidth="2.5" strokeLinejoin="round" />
+    <path d="M18 16 Q22 80 18 146 M30 16 Q26 80 30 146" stroke={SOFT} strokeWidth="1.5" fill="none" />
+    {/* floor */}
+    <rect y="160" width="300" height="40" fill="#cfdde3" />
+    <path d="M0 176 H300 M0 190 H300" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
+    <path d="M0 160 H300" stroke={OUT} strokeWidth="3" />
+    {/* the bedside table */}
+    <rect x="152" y="122" width="26" height="44" rx="3" fill="#f3e7d3" stroke={OUT} strokeWidth="2.5" />
+    <path d="M152 142 H178" stroke={OUT} strokeWidth="2" />
+    <circle cx="165" cy="132" r="1.8" fill={OUT} />
+    {/* the bed at the right: its head end, the mattress and blanket, the pillow */}
+    <path d="M190 132 V178 M294 100 V178" stroke={OUT} strokeWidth="4" />
+    <path d="M190 132 V178 M294 100 V178" stroke="#adb5bd" strokeWidth="2" />
+    <rect x="282" y="96" width="18" height="48" rx="4" fill="#dee2e6" stroke={OUT} strokeWidth="2.5" />
+    <rect x="186" y="134" width="108" height="16" rx="5" fill="#fbfbf8" stroke={OUT} strokeWidth="2.5" />
+    <path d="M186 140 H246 V152 Q216 156 186 152 Z" fill="#a5d8ff" stroke={OUT} strokeWidth="2.5" strokeLinejoin="round" />
+    <path d="M254 118 Q252 112 262 112 H278 Q286 112 284 120 L282 134 H256 Z" fill="#fbfbf8" stroke={OUT} strokeWidth="2.5" strokeLinejoin="round" />
+  </>
+);
+
+/** A chemist's: tall shelves of little drawers and bottles along the wall, a counter along the bottom at the right. */
+const apotheke = () => {
+  const drawers = (x: number, y: number, cols: number, rows: number) => (
+    <g>
+      <rect x={x} y={y} width={cols * 18} height={rows * 14} fill="#e9d2b0" stroke={OUT} strokeWidth="2.5" />
+      {range(cols).map((c) =>
+        range(rows).map((r) => (
+          <g key={`${c}-${r}`}>
+            <rect x={x + c * 18 + 2} y={y + r * 14 + 2} width="14" height="10" rx="1" fill="#f6e6cc" stroke={SOFT} strokeWidth="1.2" />
+            <circle cx={x + c * 18 + 9} cy={y + r * 14 + 7} r="1.4" fill={OUT} />
+          </g>
+        )),
+      )}
+    </g>
+  );
+  return (
+    <>
+      <rect width="300" height="200" fill="#eef5ec" />
+      {drawers(4, 14, 4, 8)}
+      {drawers(222, 14, 4, 4)}
+      {/* a shelf of bottles at the top right */}
+      <rect x="220" y="86" width="80" height="6" rx="2" fill="#c99566" stroke={OUT} strokeWidth="2.5" />
+      {bottle(234, 86, 16, "#b2f2bb")}
+      {bottle(250, 86, 22, "#a5d8ff")}
+      {bottle(266, 86, 14, "#ffd8a8")}
+      {bottle(284, 86, 20, "#d0bfff")}
+      {plant(150, 60, 0.7)}
+      <rect x="128" y="58" width="44" height="5" rx="2" fill="#c99566" stroke={OUT} strokeWidth="2.2" />
+      {/* floor */}
+      <rect y="162" width="300" height="38" fill="#d9d2c4" />
+      <path d="M0 162 H300" stroke={OUT} strokeWidth="3" />
+      {/* the counter */}
+      <rect x="168" y="126" width="136" height="44" fill="#e2c49c" stroke={OUT} strokeWidth="3" />
+      <path d="M212 130 V168 M258 130 V168" stroke={SOFT} strokeWidth="2" />
+      <rect x="164" y="118" width="140" height="9" rx="3" fill="#b9825a" stroke={OUT} strokeWidth="3" />
+    </>
+  );
+};
+
+/** A pizzeria: tiles, a shelf with jars at the left, the round brick oven at the right with the fire glowing in its mouth. */
+const pizzeria = () => (
+  <>
+    <rect width="300" height="200" fill="#fbeedd" />
+    <rect y="96" width="300" height="66" fill="#fff6e8" />
+    {tileLines(0, 96, 300, 66, 14)}
+    <path d="M0 96 H300" stroke={OUT} strokeWidth="2.5" />
+    <rect x="8" y="44" width="96" height="6" rx="2" fill="#c99566" stroke={OUT} strokeWidth="2.5" />
+    {bottle(24, 44, 18, "#f4a261")}
+    {bottle(40, 44, 26, "#9ad0ec")}
+    {plant(66, 44, 0.7)}
+    {bottle(90, 44, 16, "#ffe066")}
+    {/* floor */}
+    <rect y="162" width="300" height="38" fill="#e3a982" />
+    <path d="M0 162 H300" stroke={OUT} strokeWidth="3" />
+    {/* the brick oven: its dome, the dark mouth with the fire, the chimney */}
+    <rect x="238" y="8" width="20" height="40" fill="#b5654a" stroke={OUT} strokeWidth="2.5" />
+    <path d="M180 164 V112 C180 64 296 64 296 112 V164 Z" fill="#d9825f" stroke={OUT} strokeWidth="3" strokeLinejoin="round" />
+    <path
+      d="M184 98 Q238 78 292 98 M182 120 H294 M182 142 H294 M206 98 V120 M238 86 V120 M270 98 V120 M222 120 V142 M254 120 V142 M206 142 V164 M270 142 V164"
+      stroke="rgba(90,70,54,0.3)"
+      strokeWidth="1.5"
+      fill="none"
+    />
+    <path d="M208 162 V136 Q208 112 238 112 Q268 112 268 136 V162 Z" fill="#3b2a24" stroke={OUT} strokeWidth="3" />
+    <path d="M216 160 Q222 140 230 152 Q236 132 244 150 Q252 138 260 160 Z" fill="#ff922b" />
+    <path d="M226 160 Q232 148 238 156 Q244 146 250 160 Z" fill="#ffd43b" />
+    <path d="M214 160 H262" stroke="#8b5e3c" strokeWidth="5" strokeLinecap="round" />
+    <rect x="176" y="160" width="124" height="8" rx="2" fill="#b5654a" stroke={OUT} strokeWidth="2.5" />
+  </>
+);
+
+/** A café: a big window with its striped awning far back, lamps hanging, a little round table at the right. */
+const cafe = () => (
+  <>
+    <rect width="300" height="200" fill="#f6ead8" />
+    <path
+      d={range(16)
+        .map((i) => `M${i * 20 + 6} 0 V150`)
+        .join(" ")}
+      stroke="#f0dfc6"
+      strokeWidth="7"
+    />
+    {windowAt(126, 26, 88, 60)}
+    {/* the lamps hanging */}
+    {[60, 250].map((x) => (
+      <g key={x}>
+        <path d={`M${x} 0 V22`} stroke={OUT} strokeWidth="2" />
+        <path d={`M${x - 14} 34 Q${x} 14 ${x + 14} 34 Z`} fill="#f2c45a" stroke={OUT} strokeWidth="2.5" strokeLinejoin="round" />
+      </g>
+    ))}
+    {plant(28, 150, 1)}
+    {/* floor */}
+    <rect y="150" width="300" height="50" fill="#c9a77e" />
+    {range(15).map((col) =>
+      range(4).map((row) => ((col + row) % 2 ? null : <rect key={`${col}-${row}`} x={col * 20} y={150 + row * 13} width="20" height="13" fill="#b8936a" />)),
+    )}
+    <path d="M0 150 H300" stroke={OUT} strokeWidth="3" />
+    {/* a chair behind the table, then the round table with its cloth */}
+    <path d="M262 108 V178 M262 146 H290 V178" stroke={OUT} strokeWidth="5" strokeLinecap="round" fill="none" />
+    <path d="M262 108 V178 M262 146 H290 V178" stroke="#a0663a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <path d="M228 140 V184 M212 186 H244" stroke={OUT} strokeWidth="4" strokeLinecap="round" />
+    <path d="M192 132 Q228 124 264 132 L258 148 Q228 154 198 148 Z" fill="#fbfbf8" stroke={OUT} strokeWidth="2.5" strokeLinejoin="round" />
+    <path d="M204 146 L208 136 M222 150 L224 138 M240 150 L240 138 M254 146 L250 136" stroke="#ffa8a8" strokeWidth="2" />
+  </>
+);
+
+/** A mine: rough rock walls, wooden posts and a beam holding the roof, rails going back, a rock at the right. */
+const bergwerk = () => (
+  <>
+    <rect width="300" height="200" fill="#8a7a6c" />
+    {/* the tunnel going back into the dark */}
+    <path d="M110 150 V80 Q150 46 190 80 V150 Z" fill="#4a3f38" stroke={OUT} strokeWidth="3" />
+    <path
+      d="M10 20 Q30 12 52 24 M70 40 Q86 30 104 42 M210 30 Q236 20 258 34 M260 70 Q280 62 298 74 M16 90 Q36 82 56 94 M222 104 Q246 96 270 108"
+      stroke="rgba(40,30,24,0.35)"
+      strokeWidth="3"
+      fill="none"
+    />
+    {/* the wooden frame holding the roof */}
+    <path d="M70 160 V44 M230 160 V44" stroke={OUT} strokeWidth="13" />
+    <path d="M70 160 V44 M230 160 V44" stroke="#a0663a" strokeWidth="8" />
+    <rect x="56" y="34" width="188" height="14" rx="3" fill="#a0663a" stroke={OUT} strokeWidth="3" />
+    {/* the ground and the rails going back */}
+    <path d="M0 150 H300 V200 H0 Z" fill="#a39382" />
+    <path d="M0 150 H300" stroke={OUT} strokeWidth="3" />
+    <path d="M136 150 L104 200 M164 150 L196 200" stroke="#868e96" strokeWidth="4" />
+    <path d="M140 160 H160 M134 174 H166 M126 190 H174" stroke="#7a5a3c" strokeWidth="4" />
+    {/* the rock at the right that the gem sits on */}
+    <path d="M178 176 Q176 150 196 144 Q222 136 248 146 Q270 154 268 178 Z" fill="#9c8f84" stroke={OUT} strokeWidth="3" strokeLinejoin="round" />
+    <path d="M196 160 Q210 154 226 158" stroke="rgba(40,30,24,0.3)" strokeWidth="2.5" fill="none" />
+  </>
+);
+
+/** Up on the roofs: a pale sky, roofs and chimneys far off, a flat roof to stand on and a tall brick chimney at the right. */
+const dach = () => (
+  <>
+    <rect width="300" height="200" fill="#dcecf6" />
+    {cloud(70, 30, 1)}
+    {cloud(170, 18, 0.7)}
+    {/* roofs far off */}
+    <path
+      d="M0 140 L30 110 L60 140 Z M50 140 L90 104 L130 140 Z M240 140 L270 112 L300 140 Z"
+      fill="#e7a98f"
+      stroke={OUT}
+      strokeWidth="2.5"
+      strokeLinejoin="round"
+    />
+    <rect x="280" y="104" width="9" height="18" fill="#c97b63" stroke={OUT} strokeWidth="2" />
+    <rect x="0" y="140" width="300" height="20" fill="#f0e2cf" stroke={OUT} strokeWidth="2" />
+    {/* the flat roof */}
+    <rect y="160" width="300" height="40" fill="#a7a19a" />
+    <path d="M0 160 H300" stroke={OUT} strokeWidth="3" />
+    <path d="M0 172 H300" stroke="rgba(90,70,54,0.2)" strokeWidth="2" />
+    {/* the tall chimney */}
+    <rect x="198" y="74" width="54" height="90" fill="#c4634d" stroke={OUT} strokeWidth="3" />
+    <path
+      d="M198 92 H252 M198 110 H252 M198 128 H252 M198 146 H252 M214 74 V92 M236 92 V110 M214 110 V128 M236 128 V146 M214 146 V164"
+      stroke="rgba(90,70,54,0.35)"
+      strokeWidth="1.6"
+    />
+    <rect x="192" y="64" width="66" height="12" rx="2" fill="#a84f3c" stroke={OUT} strokeWidth="3" />
+    <rect x="210" y="58" width="30" height="8" rx="2" fill="#3b2a24" stroke={OUT} strokeWidth="2.5" />
+  </>
+);
+
+/** A room being painted: the old wall at the left, the fresh blue already rolled on at the right, a sheet on the floor. */
+const renovieren = () => (
+  <>
+    <rect width="300" height="200" fill="#efe3c8" />
+    <path d="M176 0 H300 V160 H176 Q182 140 174 120 Q182 100 176 80 Q182 60 174 40 Q182 20 176 0 Z" fill="#cde7f8" />
+    <path d="M176 0 Q182 20 174 40 Q182 60 176 80 Q182 100 174 120 Q182 140 176 160" stroke="#a5d0ee" strokeWidth="3" fill="none" />
+    {windowAt(60, 30, 50, 50)}
+    {/* the floor and the sheet lying over it */}
+    <rect y="160" width="300" height="40" fill="#c9a77e" />
+    <path d="M0 160 H300" stroke={OUT} strokeWidth="3" />
+    <path d="M120 164 Q200 158 300 166 V200 H110 Z" fill="#e9ecef" stroke={OUT} strokeWidth="2.5" strokeLinejoin="round" />
+    <path d="M150 170 Q170 182 160 196 M220 168 Q236 184 228 198" stroke={SOFT} strokeWidth="2" fill="none" />
+    {/* a tin of paint on the sheet */}
+    <path d="M262 166 V190 Q274 194 286 190 V166 Z" fill="#a5d8ff" stroke={OUT} strokeWidth="2.5" />
+    <ellipse cx="274" cy="166" rx="12" ry="4" fill="#74c0fc" stroke={OUT} strokeWidth="2.5" />
+    <path d="M262 168 Q274 150 286 168" stroke={OUT} strokeWidth="2" fill="none" />
+  </>
+);
+
 export const WORK_BACKDROPS = {
+  landstrasse,
+  krankenhaus,
+  apotheke,
+  pizzeria,
+  cafe,
+  bergwerk,
+  dach,
+  renovieren,
   praxis,
   salon,
   baeckerei,

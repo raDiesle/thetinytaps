@@ -7,20 +7,10 @@ import type { RoundKind } from "./levels";
 // together (soap and sponge in the bathroom); a partner that also fits another pair is named in `alsoFits`.
 
 /** A topic's id, the key of its file in `scenes/`. */
-export type TopicId =
-  | "bad"
-  | "kueche"
-  | "zuhause"
-  | "kleidung"
-  | "kita"
-  | "spielen"
-  | "garten"
-  | "wetter"
-  | "unterwegs"
-  | "feste"
-  | "berufe"
-  | "sport"
-  | "fantasie";
+export type TopicId = "bad" | "kueche" | "zuhause" | "kleidung" | "kita" | "spielen" | "garten" | "wetter" | "unterwegs" | "feste" | HelperTopicId;
+
+/** The topics of the helpers, by where they work: one each, so the wrong choices come from other places. */
+type HelperTopicId = "berufe" | "bauen" | "verkehr" | "gesundheit" | "rettung" | "laden" | "hof" | "musik" | "sport" | "fantasie";
 
 /** One topic: its kind of round and its name for grown-ups. */
 export interface Topic {
@@ -41,6 +31,13 @@ export const TOPICS: Record<TopicId, Topic> = {
   unterwegs: { kind: "pair", name: { de: "Unterwegs" } },
   feste: { kind: "pair", name: { de: "Feste & Feiern" } },
   berufe: { kind: "helper", name: { de: "Berufe" } },
+  bauen: { kind: "helper", name: { de: "Bauen & Reparieren" } },
+  verkehr: { kind: "helper", name: { de: "Fahrzeuge" } },
+  gesundheit: { kind: "helper", name: { de: "Arzt & Krankenhaus" } },
+  rettung: { kind: "helper", name: { de: "Feuerwehr, Polizei & Rettung" } },
+  laden: { kind: "helper", name: { de: "Laden, Café & Küche" } },
+  hof: { kind: "helper", name: { de: "Bauernhof & Wald" } },
+  musik: { kind: "helper", name: { de: "Musik & Bühne" } },
   sport: { kind: "helper", name: { de: "Sport" } },
   fantasie: { kind: "helper", name: { de: "Märchen & Abenteuer" } },
 };

@@ -1,10 +1,12 @@
 import type { CSSProperties } from "react";
 import {
   playBells,
+  playBuzz,
   playEngine,
   playGiggle,
   playHonk,
   playLaunch,
+  playNeigh,
   playRing,
   playSaw,
   playSiren,
@@ -14,9 +16,9 @@ import {
   playWhistle,
 } from "@/lib/realSounds";
 import {
+  playBeeps,
   playBlow,
   playBoing,
-  playBuzz,
   playChime,
   playClap,
   playClick,
@@ -49,6 +51,7 @@ import {
   playRattle,
   playRip,
   playRotor,
+  playRumble,
   playRustle,
   playScrub,
   playSizzle,
@@ -62,6 +65,7 @@ import {
   playTrain,
   playTrickle,
   playTrill,
+  playTusch,
   playTwinkle,
   playWhirr,
   playWhoosh,
@@ -98,10 +102,11 @@ export type Act = "onto" | "into" | "beside" | "rub" | "pour" | "tap" | "turn" |
 
 /** The sounds a scene may play, by name: the real recording where there is one (`@/lib/realSounds`), else synthesized. */
 export const SOUNDS = {
+  beeps: playBeeps,
   blow: playBlow,
   bells: playBells,
-  boing: playBoing,
   buzz: playBuzz,
+  boing: playBoing,
   chime: playChime,
   clap: playClap,
   click: playClick,
@@ -130,6 +135,7 @@ export const SOUNDS = {
   melody: playMelody,
   munch: playMunch,
   musicbox: playMusicbox,
+  neigh: playNeigh,
   plink: () => playPlink(3),
   plop: playPlop,
   poof: playPoof,
@@ -139,6 +145,7 @@ export const SOUNDS = {
   ring: playRing,
   rip: playRip,
   rotor: playRotor,
+  rumble: playRumble,
   rustle: playRustle,
   saw: playSaw,
   scrub: playScrub,
@@ -155,6 +162,7 @@ export const SOUNDS = {
   train: playTrain,
   trickle: playTrickle,
   trill: playTrill,
+  tusch: playTusch,
   tweet: playTweet,
   twinkle: playTwinkle,
   wash: playWash,

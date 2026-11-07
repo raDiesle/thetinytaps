@@ -1,10 +1,12 @@
 import type { SceneSpec } from "../scene";
+import { binLorry, sweepBrush, vacuum } from "../tools";
 
-// The helpers of the topic „Berufe“ (topics.ts) and what they need, written as data (see scene.tsx). The fire
-// fighter, the doctor, the baker and the hairdresser are handmade in pairs.tsx: none of these may need their hose,
-// stethoscope, roll or scissors. Sports people are in sport.ts (the angler too), fairy-tale and play roles in
-// fantasie.ts (the witch has the broom, so there is no cleaner with one). Each helper's tool is the one a child
-// knows from picture books; where it would fit another helper too, `alsoFits` keeps the two apart.
+// The helpers of the topic „Berufe“ (topics.ts) and what they need, written as data (see scene.tsx): the jobs that
+// have no place of their own among the other helper topics (building, vehicles, the doctor's, rescue, shop and café,
+// farm and forest, music – each in its own file). The hairdresser is handmade in pairs.tsx: no one here may need
+// scissors. Sports people are in sport.ts (the angler too), fairy-tale and play roles in fantasie.ts (the witch has the
+// broom, so the cleaner has a vacuum cleaner). Each helper's tool is the one a child knows from picture books; where it
+// would fit another helper too, `alsoFits` keeps the two apart.
 
 export const SCENES: SceneSpec[] = [
   {
@@ -36,94 +38,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["swirl", "scrub"],
   },
   {
-    id: "koch",
-    topic: "berufe",
-    name: "Koch",
-    the: "der Koch",
-    toThe: "der Koch",
-    partner: { name: "Kochlöffel", the: "der Kochlöffel", acc: "den Kochlöffel", emoji: "🥄" },
-    helper: { fur: "bear", outfit: { coat: "#f8f9fa", hat: "chef", detail: "scarf", detailColor: "#e03131" } },
-    // The spoon stirs the soup on the worktop.
-    thing: "🍲",
-    backdrop: "kueche",
-    act: "turn",
-    sounds: ["swirl", "yum"],
-    // A baker stirs his dough with a wooden spoon too.
-    alsoFits: ["baecker"],
-  },
-  {
-    id: "baeuerin",
-    topic: "berufe",
-    name: "Bäuerin",
-    the: "die Bäuerin",
-    toThe: "die Bäuerin",
-    partner: { name: "Traktor", the: "der Traktor", acc: "den Traktor", emoji: "🚜" },
-    helper: { fur: "fox", outfit: { coat: "#e8590c", hat: "straw", detail: "straps", detailColor: "#1c7ed6" }, lashes: true },
-    // The tractor drives to and fro over the field.
-    thing: "🌾",
-    backdrop: "bauernhof",
-    act: "rub",
-    sounds: ["engine"],
-  },
-  {
-    id: "polizist",
-    topic: "berufe",
-    name: "Polizist",
-    the: "der Polizist",
-    toThe: "der Polizist",
-    partner: { name: "Polizeiauto", the: "das Polizeiauto", acc: "das Polizeiauto", emoji: "🚓" },
-    helper: { fur: "bear", outfit: { coat: "#1d4e89", hat: "peaked", detail: "badge" } },
-    // The police car comes down onto the road.
-    backdrop: "strasse",
-    act: "onto",
-    spot: [222, 156, 80],
-    sounds: ["siren"],
-  },
-  {
-    id: "bauarbeiterin",
-    topic: "berufe",
-    name: "Bauarbeiterin",
-    the: "die Bauarbeiterin",
-    toThe: "die Bauarbeiterin",
-    partner: { name: "Steine", the: "die Steine", acc: "die Steine", plural: true, emoji: "🧱" },
-    helper: { fur: "fox", outfit: { coat: "#ff922b", hat: "hardhat", detail: "vest", detailColor: "#ffd43b" }, lashes: true },
-    // The bricks are put down on the building site, beside the half-built wall.
-    backdrop: "baustelle",
-    act: "onto",
-    spot: [222, 140, 52],
-    sounds: ["thump", "clonk"],
-  },
-  {
-    id: "mechanikerin",
-    topic: "berufe",
-    name: "Mechanikerin",
-    the: "die Mechanikerin",
-    toThe: "die Mechanikerin",
-    partner: { name: "Schraubenschlüssel", the: "der Schraubenschlüssel", acc: "den Schraubenschlüssel", emoji: "🔧" },
-    helper: { fur: "bear", outfit: { coat: "#adb5bd", hat: "cap", hatColor: "#e03131", detail: "straps", detailColor: "#1c7ed6" }, lashes: true },
-    // The spanner turns a nut on the car.
-    thing: "🚗",
-    backdrop: "werkstatt",
-    act: "turn",
-    sounds: ["click", "rattle"],
-    // A plumber turns his pipes with a spanner too.
-    alsoFits: ["klempner"],
-  },
-  {
-    id: "pilot",
-    topic: "berufe",
-    name: "Pilot",
-    the: "der Pilot",
-    toThe: "der Pilot",
-    partner: { name: "Flugzeug", the: "das Flugzeug", acc: "das Flugzeug", emoji: "✈️" },
-    helper: { fur: "fox", outfit: { coat: "#f8f9fa", hat: "peaked", detail: "tie", detailColor: "#1d3557" } },
-    // The plane lands on the runway.
-    backdrop: "flughafen",
-    act: "onto",
-    spot: [222, 150, 90],
-    sounds: ["jet"],
-  },
-  {
     id: "astronautin",
     topic: "berufe",
     name: "Astronautin",
@@ -138,32 +52,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["launch"],
   },
   {
-    id: "musiker",
-    topic: "berufe",
-    name: "Musiker",
-    the: "der Musiker",
-    toThe: "der Musiker",
-    partner: { name: "Gitarre", the: "die Gitarre", acc: "die Gitarre", emoji: "🎸" },
-    helper: { fur: "fox", outfit: { coat: "#5f3dc4", detail: "scarf", detailColor: "#ffd43b" } },
-    backdrop: "buehne",
-    act: "hold",
-    sounds: ["plink", "melody"],
-  },
-  {
-    id: "saengerin",
-    topic: "berufe",
-    name: "Sängerin",
-    the: "die Sängerin",
-    toThe: "die Sängerin",
-    partner: { name: "Mikrofon", the: "das Mikrofon", acc: "das Mikrofon", emoji: "🎤" },
-    helper: { fur: "bear", outfit: { coat: "#e64980", detail: "collar", detailColor: "#ffd43b" }, lashes: true },
-    backdrop: "buehne",
-    act: "hold",
-    sounds: ["trill", "melody"],
-    // A musician may sing into it too.
-    alsoFits: ["musiker"],
-  },
-  {
     id: "lehrerin",
     topic: "berufe",
     name: "Lehrerin",
@@ -174,20 +62,6 @@ export const SCENES: SceneSpec[] = [
     backdrop: "schule",
     act: "hold",
     sounds: ["rustle"],
-  },
-  {
-    id: "zahnaerztin",
-    topic: "berufe",
-    name: "Zahnärztin",
-    the: "die Zahnärztin",
-    toThe: "die Zahnärztin",
-    partner: { name: "Zahnbürste", the: "die Zahnbürste", acc: "die Zahnbürste", emoji: "🪥" },
-    helper: { fur: "bear", outfit: { coat: "#e7f5ff", detail: "collar", detailColor: "#74c0fc" }, lashes: true },
-    // The toothbrush scrubs the tooth.
-    thing: "🦷",
-    backdrop: "praxis",
-    act: "rub",
-    sounds: ["scrub", "squeak"],
   },
   {
     id: "fensterputzer",
@@ -204,65 +78,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["squeak", "scrub"],
   },
   {
-    id: "busfahrerin",
-    topic: "berufe",
-    name: "Busfahrerin",
-    the: "die Busfahrerin",
-    toThe: "die Busfahrerin",
-    partner: { name: "Bus", the: "der Bus", acc: "den Bus", emoji: "🚌" },
-    helper: { fur: "fox", outfit: { coat: "#1c7ed6", hat: "cap", hatColor: "#1d3557", detail: "collar" }, lashes: true },
-    // The bus stops beside the bus stop.
-    thing: "🚏",
-    thingAt: [196, 122, 72],
-    backdrop: "strasse",
-    act: "beside",
-    sounds: ["engine", "honk"],
-  },
-  {
-    id: "lokfuehrer",
-    topic: "berufe",
-    name: "Lokführer",
-    the: "der Lokführer",
-    toThe: "der Lokführer",
-    partner: { name: "Lok", the: "die Lok", acc: "die Lok", emoji: "🚂" },
-    helper: { fur: "bear", outfit: { coat: "#364fc7", hat: "peaked", hatColor: "#212529", detail: "buttons" } },
-    // The engine comes down onto the rails.
-    backdrop: "bahnhof",
-    act: "onto",
-    spot: [222, 118, 80],
-    sounds: ["train"],
-  },
-  {
-    id: "tischlerin",
-    topic: "berufe",
-    name: "Tischlerin",
-    the: "die Tischlerin",
-    toThe: "die Tischlerin",
-    partner: { name: "Säge", the: "die Säge", acc: "die Säge", emoji: "🪚" },
-    helper: { fur: "fox", outfit: { coat: "#74c0fc", hat: "bandana", hatColor: "#2b8a3e", detail: "apron", detailColor: "#b5835a" }, lashes: true },
-    // The saw goes to and fro over the log.
-    thing: "🪵",
-    backdrop: "werkstatt",
-    act: "rub",
-    sounds: ["saw"],
-  },
-  {
-    id: "handwerker",
-    topic: "berufe",
-    name: "Handwerker",
-    the: "der Handwerker",
-    toThe: "der Handwerker",
-    partner: { name: "Hammer", the: "der Hammer", acc: "den Hammer", emoji: "🔨" },
-    helper: { fur: "bear", outfit: { coat: "#495057", hat: "cap", hatColor: "#f08c00", detail: "belt" } },
-    // The hammer knocks the wobbly chair's nail in.
-    thing: "🪑",
-    backdrop: "kinderzimmer",
-    act: "tap",
-    sounds: ["knock", "knock"],
-    // A carpenter, a builder and a mechanic all may need a hammer.
-    alsoFits: ["tischlerin", "bauarbeiterin", "mechanikerin"],
-  },
-  {
     id: "fotograf",
     topic: "berufe",
     name: "Fotograf",
@@ -275,66 +90,6 @@ export const SCENES: SceneSpec[] = [
     backdrop: "wiese",
     act: "light",
     sounds: ["click"],
-  },
-  {
-    id: "elektrikerin",
-    topic: "berufe",
-    name: "Elektrikerin",
-    the: "die Elektrikerin",
-    toThe: "die Elektrikerin",
-    partner: { name: "Glühbirne", the: "die Glühbirne", acc: "die Glühbirne", emoji: "💡" },
-    helper: { fur: "fox", outfit: { coat: "#fab005", hat: "hardhat", hatColor: "#f8f9fa", detail: "belt" }, lashes: true },
-    // The bulb touches the dark house in the evening, and it lights up.
-    thing: "🏠",
-    backdrop: "nacht",
-    act: "light",
-    sounds: ["click", "ding"],
-  },
-  {
-    id: "taxifahrer",
-    topic: "berufe",
-    name: "Taxifahrer",
-    the: "der Taxifahrer",
-    toThe: "der Taxifahrer",
-    partner: { name: "Taxi", the: "das Taxi", acc: "das Taxi", emoji: "🚕" },
-    helper: { fur: "fox", outfit: { coat: "#f8f9fa", hat: "cap", hatColor: "#212529", detail: "vest", detailColor: "#ffd43b" } },
-    // The taxi comes down onto the road.
-    backdrop: "strasse",
-    act: "onto",
-    spot: [222, 156, 80],
-    sounds: ["engine", "honk"],
-  },
-  {
-    id: "sanitaeter",
-    topic: "berufe",
-    name: "Sanitäter",
-    the: "der Sanitäter",
-    toThe: "der Sanitäter",
-    partner: { name: "Krankenwagen", the: "der Krankenwagen", acc: "den Krankenwagen", emoji: "🚑" },
-    helper: { fur: "bear", outfit: { coat: "#ff6b6b", detail: "stripes", detailColor: "#f8f9fa" } },
-    // The ambulance comes down onto the road.
-    backdrop: "strasse",
-    act: "onto",
-    spot: [222, 156, 80],
-    sounds: ["siren"],
-    // A doctor may ride in it too.
-    alsoFits: ["aerztin"],
-  },
-  {
-    id: "tieraerztin",
-    topic: "berufe",
-    name: "Tierärztin",
-    the: "die Tierärztin",
-    toThe: "die Tierärztin",
-    partner: { name: "Pflaster", the: "das Pflaster", acc: "das Pflaster", emoji: "🩹" },
-    helper: { fur: "fox", outfit: { coat: "#f8f9fa", detail: "cross", detailColor: "#40c057" }, lashes: true },
-    // The plaster goes onto the little dog's head.
-    thing: "🐶",
-    backdrop: "praxis",
-    act: "onto",
-    sounds: ["plop", "giggle"],
-    // A doctor and a paramedic need plasters too.
-    alsoFits: ["aerztin", "sanitaeter"],
   },
   {
     id: "paketbotin",
@@ -353,70 +108,6 @@ export const SCENES: SceneSpec[] = [
     alsoFits: ["postbote", "weihnachtsmann"],
   },
   {
-    id: "kapitaen",
-    topic: "berufe",
-    name: "Kapitän",
-    the: "der Kapitän",
-    toThe: "der Kapitän",
-    partner: { name: "Schiff", the: "das Schiff", acc: "das Schiff", emoji: "🚢" },
-    helper: { fur: "bear", outfit: { coat: "#1d3557", hat: "peaked", hatColor: "#f8f9fa", detail: "buttons" } },
-    // The ship comes down onto the water of the harbour.
-    backdrop: "hafen",
-    act: "onto",
-    spot: [210, 126, 84],
-    sounds: ["splash", "honk"],
-    // A pirate and a sailor need a ship too.
-    alsoFits: ["pirat", "segler"],
-  },
-  {
-    id: "kranfuehrer",
-    topic: "berufe",
-    name: "Kranführer",
-    the: "der Kranführer",
-    toThe: "der Kranführer",
-    partner: { name: "Kran", the: "der Kran", acc: "den Kran", emoji: "🏗️" },
-    helper: { fur: "fox", outfit: { coat: "#fd7e14", hat: "hardhat", hatColor: "#f8f9fa", detail: "vest", detailColor: "#ffd43b" } },
-    // The crane is set down on the building site.
-    backdrop: "baustelle",
-    act: "onto",
-    spot: [214, 116, 80],
-    sounds: ["whirr", "thump"],
-    // A builder works with the crane too.
-    alsoFits: ["bauarbeiterin"],
-  },
-  {
-    id: "hubschrauberpilotin",
-    topic: "berufe",
-    name: "Hubschrauberpilotin",
-    the: "die Hubschrauberpilotin",
-    toThe: "die Hubschrauberpilotin",
-    partner: { name: "Hubschrauber", the: "der Hubschrauber", acc: "den Hubschrauber", emoji: "🚁" },
-    helper: { fur: "bear", outfit: { coat: "#e03131", hat: "cap", hatColor: "#f8f9fa", detail: "strap", detailColor: "#ffd43b" }, lashes: true },
-    // The helicopter lands on the meadow in the mountains.
-    backdrop: "berg",
-    act: "onto",
-    spot: [222, 120, 80],
-    sounds: ["rotor"],
-    // A pilot may fly it too, and a paramedic rides in it.
-    alsoFits: ["pilot", "sanitaeter"],
-  },
-  {
-    id: "gaertner",
-    topic: "berufe",
-    name: "Gärtner",
-    the: "der Gärtner",
-    toThe: "der Gärtner",
-    partner: { name: "Pflänzchen", the: "das Pflänzchen", acc: "das Pflänzchen", emoji: "🌱" },
-    helper: { fur: "fox", outfit: { coat: "#94d82d", hat: "straw", detail: "apron", detailColor: "#2b8a3e" } },
-    // The little plant is set into the bed.
-    backdrop: "gemuesebeet",
-    act: "onto",
-    spot: [222, 148, 50],
-    sounds: ["rustle", "plop"],
-    // A farmer plants too.
-    alsoFits: ["baeuerin"],
-  },
-  {
     id: "schneiderin",
     topic: "berufe",
     name: "Schneiderin",
@@ -429,30 +120,6 @@ export const SCENES: SceneSpec[] = [
     backdrop: "laden",
     act: "rub",
     sounds: ["whirr"],
-  },
-  {
-    id: "eisverkaeuferin",
-    topic: "berufe",
-    name: "Eisverkäuferin",
-    the: "die Eisverkäuferin",
-    toThe: "die Eisverkäuferin",
-    partner: { name: "Eis", the: "das Eis", acc: "das Eis", emoji: "🍦" },
-    helper: { fur: "fox", outfit: { coat: "#ffc9c9", hat: "cap", hatColor: "#f8f9fa", detail: "apron" }, lashes: true },
-    backdrop: "strand",
-    act: "hold",
-    sounds: ["ring", "yum"],
-  },
-  {
-    id: "kassierer",
-    topic: "berufe",
-    name: "Kassierer",
-    the: "der Kassierer",
-    toThe: "der Kassierer",
-    partner: { name: "Geld", the: "das Geld", acc: "das Geld", emoji: "💶" },
-    helper: { fur: "bear", outfit: { coat: "#4dabf7", detail: "apron", detailColor: "#f8f9fa" } },
-    backdrop: "laden",
-    act: "hold",
-    sounds: ["ding", "rustle"],
   },
   {
     id: "forscherin",
@@ -483,17 +150,67 @@ export const SCENES: SceneSpec[] = [
     alsoFits: ["lehrerin"],
   },
   {
-    id: "klempner",
+    id: "schornsteinfeger",
     topic: "berufe",
-    name: "Klempner",
-    the: "der Klempner",
-    toThe: "der Klempner",
-    partner: { name: "Saugglocke", the: "die Saugglocke", acc: "die Saugglocke", emoji: "🪠" },
-    helper: { fur: "fox", outfit: { coat: "#1971c2", hat: "cap", hatColor: "#e03131", detail: "straps", detailColor: "#495057" } },
-    // The plunger pumps the toilet free.
-    thing: "🚽",
-    backdrop: "bad",
-    act: "tap",
-    sounds: ["squeak", "glug"],
+    name: "Schornsteinfeger",
+    the: "der Schornsteinfeger",
+    toThe: "der Schornsteinfeger",
+    partner: { name: "Kaminbesen", the: "der Kaminbesen", acc: "den Kaminbesen", draw: sweepBrush },
+    helper: { fur: "fox", outfit: { coat: "#343a40", hat: "tophat", detail: "buttons", detailColor: "#ffd43b" } },
+    // Up on the roof, the brush sweeps to and fro in the top of the tall chimney.
+    backdrop: "dach",
+    act: "rub",
+    spot: [225, 44, 44],
+    sounds: ["whoosh", "rustle"],
+    // A witch's broom sweeps too.
+    alsoFits: ["hexe"],
+  },
+  {
+    id: "muellwerker",
+    topic: "berufe",
+    name: "Müllwerker",
+    the: "der Müllwerker",
+    toThe: "der Müllwerker",
+    partner: { name: "Müllauto", the: "das Müllauto", acc: "das Müllauto", draw: binLorry },
+    helper: { fur: "bear", outfit: { coat: "#fd7e14", hat: "cap", hatColor: "#fd7e14", detail: "stripes", detailColor: "#e9ecef" } },
+    // The rubbish lorry comes down onto the road.
+    backdrop: "strasse",
+    act: "onto",
+    spot: [214, 146, 104],
+    sounds: ["rumble", "beeps"],
+    // A lorry driver may drive it too.
+    alsoFits: ["lkw-fahrerin"],
+  },
+  {
+    id: "hausmeister",
+    topic: "berufe",
+    name: "Hausmeister",
+    the: "der Hausmeister",
+    toThe: "der Hausmeister",
+    partner: { name: "Schlüssel", the: "der Schlüssel", acc: "den Schlüssel", emoji: "🔑" },
+    helper: { fur: "fox", outfit: { coat: "#868e96", hat: "cap", hatColor: "#1d4e89", detail: "belt" } },
+    // The key turns in the lock of the Kita's door.
+    thing: "🚪",
+    thingAt: [220, 116, 100],
+    backdrop: "schule",
+    act: "turn",
+    spot: [244, 124, 34],
+    sounds: ["click", "creak"],
+  },
+  {
+    id: "raumpflegerin",
+    topic: "berufe",
+    name: "Raumpflegerin",
+    the: "die Raumpflegerin",
+    toThe: "die Raumpflegerin",
+    partner: { name: "Staubsauger", the: "der Staubsauger", acc: "den Staubsauger", draw: vacuum },
+    helper: { fur: "bear", outfit: { coat: "#da77f2", hat: "bandana", hatColor: "#4dabf7", detail: "apron" }, lashes: true },
+    // The vacuum cleaner goes to and fro over the rug.
+    backdrop: "wohnzimmer",
+    act: "rub",
+    spot: [226, 150, 74],
+    sounds: ["hum", "whirr"],
+    // A witch's broom and a window cleaner's sponge clean too.
+    alsoFits: ["hexe", "fensterputzer"],
   },
 ];

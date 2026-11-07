@@ -64,7 +64,15 @@ export type BackdropId =
   | "zirkus" // circus: a ring with red and white tent stripes, a round podium edge, lights
   | "schloss" // castle: grey towers with flags, a drawbridge, green hills
   | "party" // birthday party: garlands of flags, a table with a cloth, a festive wall (no balloons, no cake)
-  | "gemuesebeet"; // vegetable garden: rows of soil with small green shoots, a shed, a fence
+  | "gemuesebeet" // vegetable garden: rows of soil with small green shoots, a shed, a fence
+  | "landstrasse" // country road: hills and fields far back, a tree at each side, the road with its dashed line
+  | "krankenhaus" // hospital room: a window, a curtain, a bed with its pillow at the right, a bedside table
+  | "apotheke" // chemist's: shelves of little drawers and bottles, a counter at the right
+  | "pizzeria" // pizzeria: tiles, a shelf with jars, the round brick oven with the fire in its mouth at the right
+  | "cafe" // café: a window, lamps hanging, a little round table with its cloth at the right (no cups, no cake)
+  | "bergwerk" // mine: rock walls, a wooden frame holding the roof, rails going back, a rock at the right
+  | "dach" // up on the roofs: roofs far off, a flat roof to stand on, a tall brick chimney at the right
+  | "renovieren"; // a room being painted: the old wall, the fresh blue at the right, a sheet and a tin of paint on the floor
 
 /** Every backdrop's drawing, in the 300 × 200 box. */
 export const BACKDROPS: Record<BackdropId, () => ReactNode> = { ...HOME_BACKDROPS, ...OUTSIDE_BACKDROPS, ...WORK_BACKDROPS };

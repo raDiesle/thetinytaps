@@ -1,4 +1,5 @@
 import type { SceneSpec } from "../scene";
+import { armbands, barbell, surfboard } from "../tools";
 
 // The helpers of the topic „Sport“ (topics.ts) and what they need, written as data (see scene.tsx): fox and bear
 // grown-ups in their sport's clothes and place. Where gear fits another helper too (rackets, skates, gloves, shoes),
@@ -394,5 +395,77 @@ export const SCENES: SceneSpec[] = [
     sounds: ["whirr", "whoosh"],
     // Skates on wheels or on blades: the skater on the ice may take either.
     alsoFits: ["eislaeufer", "skater"],
+  },
+  {
+    id: "rollerfahrerin",
+    topic: "sport",
+    name: "Rollerfahrerin",
+    the: "die Rollerfahrerin",
+    toThe: "die Rollerfahrerin",
+    partner: { name: "Roller", the: "der Roller", acc: "den Roller", emoji: "🛴" },
+    helper: { fur: "fox", outfit: { coat: "#20c997", hat: "helmet", hatColor: "#7048e8", detail: "stripes", detailColor: "#fff" }, lashes: true },
+    // The scooter comes down onto the playground.
+    backdrop: "spielplatz",
+    act: "onto",
+    spot: [222, 148, 70],
+    sounds: ["whirr", "boing"],
+    // Skateboard and roller skates roll too.
+    alsoFits: ["skater", "rollschuhlaeuferin"],
+  },
+  {
+    id: "reiterin",
+    topic: "sport",
+    name: "Reiterin",
+    the: "die Reiterin",
+    toThe: "die Reiterin",
+    partner: { name: "Pferd", the: "das Pferd", acc: "das Pferd", emoji: "🐎" },
+    helper: { fur: "bear", outfit: { coat: "#2b8a3e", hat: "cap", hatColor: "#212529", detail: "buttons", detailColor: "#ffd43b" }, lashes: true },
+    // The horse comes down onto the farm's meadow.
+    backdrop: "bauernhof",
+    act: "onto",
+    spot: [222, 140, 88],
+    sounds: ["neigh", "hop"],
+    // A knight rides a horse, and a farmer may have one.
+    alsoFits: ["ritter", "baeuerin"],
+  },
+  {
+    id: "schwimmlehrer",
+    topic: "sport",
+    name: "Schwimmlehrer",
+    the: "der Schwimmlehrer",
+    toThe: "der Schwimmlehrer",
+    partner: { name: "Schwimmflügel", the: "die Schwimmflügel", acc: "die Schwimmflügel", plural: true, draw: armbands },
+    helper: { fur: "bear", outfit: { coat: "#f8f9fa", hat: "cap", hatColor: "#1c7ed6", detail: "strap", detailColor: "#1c7ed6" } },
+    backdrop: "schwimmbad",
+    act: "hold",
+    sounds: ["squeak", "splash"],
+    // A swimmer and a lifeguard need them too.
+    alsoFits: ["schwimmer", "rettungsschwimmerin"],
+  },
+  {
+    id: "gewichtheberin",
+    topic: "sport",
+    name: "Gewichtheberin",
+    the: "die Gewichtheberin",
+    toThe: "die Gewichtheberin",
+    partner: { name: "Hantel", the: "die Hantel", acc: "die Hantel", draw: barbell },
+    helper: { fur: "fox", outfit: { coat: "#e64980", hat: "headband", hatColor: "#fab005" }, lashes: true },
+    backdrop: "sportplatz",
+    act: "hold",
+    sounds: ["thump", "tusch"],
+  },
+  {
+    id: "surfer",
+    topic: "sport",
+    name: "Surfer",
+    the: "der Surfer",
+    toThe: "der Surfer",
+    partner: { name: "Surfbrett", the: "das Surfbrett", acc: "das Surfbrett", draw: surfboard },
+    helper: { fur: "bear", outfit: { coat: "#15aabf", detail: "stripes", detailColor: "#ffd43b" } },
+    // The surfboard comes down onto the sea.
+    backdrop: "strand",
+    act: "onto",
+    spot: [222, 116, 70],
+    sounds: ["splash", "whoosh"],
   },
 ];

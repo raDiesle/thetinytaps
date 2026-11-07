@@ -494,7 +494,7 @@ const HANDMADE: Pair[] = [
     {
       id: "feuerwehr",
       kind: "helper",
-      topic: "berufe",
+      topic: "rettung",
       name: "Feuerwehr",
       the: "die Feuerwehr",
       toThe: "zur Feuerwehr",
@@ -532,7 +532,7 @@ const HANDMADE: Pair[] = [
     {
       id: "aerztin",
       kind: "helper",
-      topic: "berufe",
+      topic: "gesundheit",
       name: "Ärztin",
       the: "die Ärztin",
       toThe: "zur Ärztin",
@@ -560,7 +560,7 @@ const HANDMADE: Pair[] = [
     {
       id: "baecker",
       kind: "helper",
-      topic: "berufe",
+      topic: "laden",
       name: "Bäcker",
       the: "der Bäcker",
       toThe: "zum Bäcker",
