@@ -48,7 +48,7 @@ export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
     preloadImages(MOODS.map(cardImage));
     // The weaker and stronger pictures after the cards, so a feeling's three show at once when it is tapped.
     preloadImages(MOODS.flatMap((m) => [moodImages.strength(m.id, 0), moodImages.strength(m.id, 2)]));
-    preload([t(STRENGTH_QUESTION), ...STRENGTH_ANSWERS.map((a) => t(a))]);
+    preload([...MOODS.map((m) => t(m.caption)), t(STRENGTH_QUESTION), ...STRENGTH_ANSWERS.map((a) => t(a))]);
   }, []);
 
   // The question each time the cards come, also back from a feeling.
@@ -65,7 +65,9 @@ export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
       const now = new Date();
       saveMoodDay(withMood(loadMoodDay(), picked.id, now));
       setMood(picked);
-      say(t(STRENGTH_QUESTION));
+      // The feeling's name first, so the child hears what it picked, then the question (C-73).
+      say(t(picked.caption));
+      say(t(STRENGTH_QUESTION), true);
     },
     [say, t],
   );
