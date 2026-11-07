@@ -6,10 +6,11 @@ import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard
 import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
-import { playChime, playRandomNote } from "@/lib/sfx";
+import { playChime } from "@/lib/sfx";
 import { LetterWord } from "./Cards";
 import { useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
+import { useSoftTap } from "./softTap";
 
 /** Keys closer together than this only make ripples, so mashing the whole keyboard doesn't count as finding. */
 const MIN_PRESS_MS = 300;
@@ -67,13 +68,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const say = useLettersSay();
   const praise = useLettersPraise();
 
-  const softTap = useCallback(
-    (x?: number, y?: number) => {
-      ripple(x, y);
-      if (settings.sounds) playRandomNote();
-    },
-    [ripple, settings.sounds],
-  );
+  const softTap = useSoftTap(ripple, settings.sounds);
 
   // Cycle through the letter's words, so a letter that comes again has a new picture.
   const pickWord = useCallback(
