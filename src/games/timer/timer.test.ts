@@ -27,8 +27,9 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { ANTS, bulbBelow, CANDLE, COOKIE, FLAME_H, GLASS, GROUND, HILL, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
-import { SWAP_FLOOR, SWAP_GLASS, SWAP_SEATS, TOY } from "./swap";
+import { ANTS, bulbBelow, CANDLE, COOKIE, FLAME_H, GLASS, GROUND, HILL, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
+import { DRAW_STEPS } from "./SwapPlay";
+import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
 describe("Timer", () => {
@@ -344,18 +345,35 @@ describe("Timer", () => {
     }
   });
 
-  test("Abwechseln keeps both cushions, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
-    expect(SWAP_SEATS.fox).toBeGreaterThanOrEqual(200);
-    expect(SWAP_SEATS.bear + SWAP_SEATS.w).toBeLessThanOrEqual(RIGHT);
-    const glassLeft = SWAP_GLASS.cx - SWAP_GLASS.w / 2;
-    const glassRight = SWAP_GLASS.cx + SWAP_GLASS.w / 2;
-    expect(TOY.fox + TOY.w).toBeLessThanOrEqual(glassLeft + 10);
-    expect(TOY.bear).toBeGreaterThanOrEqual(glassRight - 10);
-    // The toy lies right beside the cushion of the child whose turn it is: right of the fox child's, left of the bear child's.
-    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_SEATS.fox + SWAP_SEATS.w - 10);
-    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_SEATS.bear + 10);
-    expect(SWAP_GLASS.top).toBeGreaterThanOrEqual(80 + 140);
-    expect(SWAP_FLOOR + 10).toBeLessThanOrEqual(820);
+  test("Abwechseln keeps both cushions with their lamps and the toy on every screen, the same way either side of the hourglass (H-52)", () => {
+    const half = SWAP_SEATS.w / 2;
+    expect(SWAP_SEATS.fox - half).toBeGreaterThanOrEqual(200);
+    expect(SWAP_SEATS.bear + half).toBeLessThanOrEqual(RIGHT);
+    // Neither cushion nor the toy on it reaches under the hourglass.
+    expect(SWAP_SEATS.fox + Math.max(half, TOY.w / 2)).toBeLessThanOrEqual(HOURGLASS_BOX.x);
+    expect(SWAP_SEATS.bear - Math.max(half, TOY.w / 2)).toBeGreaterThanOrEqual(HOURGLASS_BOX.x + HOURGLASS_BOX.w);
+    // Fair: both places as far from the hourglass's middle.
+    expect(GLASS.cx - SWAP_SEATS.fox).toBe(SWAP_SEATS.bear - GLASS.cx);
+    // The lamps' shades and the toy waiting in front of the hourglass are seen on a phone on its side too.
+    expect(LAMP.rim - 30).toBeGreaterThanOrEqual(80);
+    expect(TOY.waiting).toBeLessThanOrEqual(820);
+    expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
+  });
+
+  // User request, November 2026: Abwechseln's hourglass is the Sanduhr's own, not a second one built beside it.
+  test("Abwechseln and Sanduhr draw the one shared hourglass", async () => {
+    const swap = await Bun.file("src/games/timer/swap.tsx").text();
+    expect(swap).toContain("<Hourglass");
+    expect(swap).not.toMatch(/function bulbPath|BulbSand/);
+    expect(SWAP_FLOOR).toBe(SAND_FLOOR);
+  });
+
+  // User feedback, November 2026: who begins must be plain from the start. The lamps draw it, slower and slower, and
+  // an even count of changes ends on the lamp lit first – the one drawn.
+  test("the lamps' draw of who begins slows down and ends on the lamp lit first", () => {
+    expect(DRAW_STEPS.length % 2).toBe(0);
+    for (let i = 1; i < DRAW_STEPS.length; i++) expect(DRAW_STEPS[i]).toBeGreaterThanOrEqual(DRAW_STEPS[i - 1]);
+    expect(DRAW_STEPS.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(4000);
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380
