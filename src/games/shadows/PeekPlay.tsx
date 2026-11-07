@@ -5,11 +5,10 @@ import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
 import { shuffle } from "./deck";
-import { choiceRows } from "./levels";
+import { choiceRows, type PeekLevel } from "./levels";
 import { emojiGlyph, pickPeepholes, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
-import type { PeekLevel } from "@/games/animals/levels";
-import type { AnimalsSettings } from "@/games/animals/settings";
+import type { ShadowsSettings } from "./settings";
 import { animalsVoice } from "@/games/animals/voice";
 
 /** Time to watch the animal that came out before the next one hides. */
@@ -110,9 +109,9 @@ const HIDE_DIRECTION: Record<Side, { x: number; y: number }> = {
   right: { x: -1, y: 0 },
 };
 
-/** What a round of "Wer schaut da raus?" gets from "Was gehört zum Tier?", which plays it in turn with the others. */
+/** What a round of "Wer schaut da raus?" gets from „Erkennen“ (`ShadowsPlay`), which plays it in turn with the shadows. */
 export interface PeekPlayProps {
-  settings: Pick<AnimalsSettings, "speech" | "sounds">;
+  settings: Pick<ShadowsSettings, "speech" | "sounds">;
   /** The animal that hides. */
   item: ShadowItem;
   /** The whole animals to choose from, `item` among them. */
@@ -128,8 +127,8 @@ export interface PeekPlayProps {
 
 /**
  * "Wer schaut da raus?" (X-04), one round: a part of an animal peeks out of a bush or the pond (on the hardest steps
- * only bits of it show through gaps in the leaves); tap the whole animal below. A kind of round of "Was gehört zum
- * Tier?", but it lives here since it shares the stage, pictures and glyphs with the shadows.
+ * only bits of it show through gaps in the leaves); tap the whole animal below. The other kind of round of
+ * „Erkennen“, next to the shadows, with which it shares the stage, pictures and glyphs.
  */
 export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNext }: PeekPlayProps) {
   const language = useAppLanguage();

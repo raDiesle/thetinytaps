@@ -162,7 +162,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Tiere füttern – Tierspiel für Kleinkinder",
     description:
       "Was gehört zum Tier? Wer schaut aus dem Busch, was frisst das Tier, was gibt es uns, wo wohnt es? Mit Tiergeräuschen, für Kleinkinder, ohne Werbung.",
-    text: "Wer schaut da aus dem Busch? Der Hase will eine Möhre, die Kuh gibt uns Milch, der Hund sucht seine Hütte, aus der Raupe wird ein Schmetterling: Tier erkennen, Futter, Milch, Ei oder Zuhause antippen, das Tier freut sich und macht sein Geräusch. Das Spiel wird von selbst leichter oder schwerer.",
+    text: "Der Hase will eine Möhre, die Kuh gibt uns Milch, der Hund sucht seine Hütte, aus der Raupe wird ein Schmetterling: Tier erkennen, Futter, Milch, Ei oder Zuhause antippen, das Tier freut sich und macht sein Geräusch. Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/zusammen/",
@@ -173,9 +173,9 @@ export const SEO_TEXTS: PageSeo[] = [
   },
   {
     path: "/schatten/",
-    title: "Schatten finden – Zuordnungsspiel für Kinder",
-    description: "Welcher Schatten gehört zur Giraffe? Ein Bild sucht seinen Schatten unter zwei bis sechs – erstes Zuordnen für Kleinkinder, ohne Werbung.",
-    text: "Tiere, Fahrzeuge, Essen und Dinge suchen ihren Schatten. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist. Erst zwei ganz verschiedene Schatten, dann mehr und ähnlichere, sobald das Kind sicher wird.",
+    title: "Erkennen – Schatten und Tiere für Kinder",
+    description: "Welcher Schatten gehört zur Giraffe? Wer schaut da aus dem Busch? Erstes Erkennen für Kleinkinder, ohne Werbung.",
+    text: "Ein Bild sucht seinen Schatten unter zwei bis sechs; danach schaut ein Tier aus dem Busch oder dem Teich, und das Kind tippt, wer es ist. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist. Erst wenige ganz verschiedene Bilder, dann mehr und ähnlichere, sobald das Kind sicher wird.",
   },
   {
     path: "/socken/",

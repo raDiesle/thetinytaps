@@ -2,6 +2,7 @@ import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TI
 import { NEEDS_BLURB, NEEDS_TITLE } from "@/games/feelings/needs";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
+import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Localized } from "@/lib/language";
 
@@ -359,16 +360,8 @@ export const CATEGORIES: Category[] = [
       {
         href: "/schatten/",
         emoji: "👤",
-        title: { de: "Schatten finden", ru: "Найди тень", en: "Find the Shadow", zh: "找影子", hi: "परछाईं ढूँढो", es: "Busca la sombra", ar: "أين الظل؟" },
-        blurb: {
-          de: "Welcher Schatten passt zum Bild?",
-          en: "Which shadow fits the picture?",
-          zh: "哪个影子和图片一样？",
-          hi: "कौन-सी परछाईं तस्वीर से मिलती है?",
-          es: "¿Qué sombra va con el dibujo?",
-          ar: "أي ظل يناسب الصورة؟",
-          ru: "Какая тень подходит к картинке?",
-        },
+        title: SHADOWS_TITLE,
+        blurb: SHADOWS_BLURB,
       },
       {
         href: "/socken/",

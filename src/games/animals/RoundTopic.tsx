@@ -5,19 +5,10 @@ import type { RoundKind } from "./levels";
  * The sign of each kind of round, before its name under ⚙️ (never while playing). Never something the child picks from
  * (no 🥕, no 🦋), or it would give the answer away or look like one more choice.
  */
-export const KIND_SIGNS: Record<RoundKind, string> = { peek: "🔍", feed: "🍽️", gift: "🎁", home: "🏠", grow: "🌱" };
+export const KIND_SIGNS: Record<RoundKind, string> = { feed: "🍽️", gift: "🎁", home: "🏠", grow: "🌱" };
 
 /** The round's question, as the animal (or the small one) would ask it. */
 const KIND_QUESTIONS: Record<RoundKind, Localized> = {
-  peek: {
-    de: "Wer versteckt sich da?",
-    ru: "Кто там прячется?",
-    en: "Who is hiding there?",
-    zh: "谁藏在那里？",
-    hi: "वहाँ कौन छिपा है?",
-    es: "¿Quién se esconde ahí?",
-    ar: "من يختبئ هناك؟",
-  },
   feed: { de: "Was esse ich?", ru: "Что я ем?", en: "What do I eat?", zh: "我吃什么？", hi: "मुझे क्या खाना पसंद है?", es: "¿Qué como?", ar: "ماذا آكل؟" },
   gift: {
     de: "Was produziere ich?",

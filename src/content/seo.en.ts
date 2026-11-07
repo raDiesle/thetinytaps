@@ -91,9 +91,9 @@ export const SEO_EN: SeoTranslation = {
       text: "The toothbrush lies above, toothpaste, a key and a lid below: the child taps what belongs to it, and the two get going – the toothpaste squeezes a blob onto the brush, the key turns and the door opens. In between, helpers drawn as fox and bear need their tools: the fire fighter puts out the fire with the hose, the doctor listens with the stethoscope, the hairdresser snips with the scissors. The game gets easier or harder by itself.",
     },
     "/schatten/": {
-      title: "Find the Shadow – Matching Game for Toddlers",
-      description: "Which shadow belongs to the giraffe? A picture looks for its shadow among two to six – first matching for toddlers, without ads.",
-      text: "Animals, vehicles, food and things look for their shadow. Tap or drag; a wrong shadow briefly shows who it is. First two very different shadows, then more and more alike as the child gets sure.",
+      title: "Recognise – Shadows and Animals for Toddlers",
+      description: "Which shadow belongs to the giraffe? Who is peeking out of the bush? First recognising for toddlers, without ads.",
+      text: "A picture looks for its shadow among two to six; then an animal peeks out of a bush or the pond and the child taps who it is. Tap or drag; a wrong shadow briefly shows who it is. First a few very different pictures, then more and more alike as the child gets sure.",
     },
     "/socken/": {
       title: "Sock Pairs – Matching Game for Toddlers",

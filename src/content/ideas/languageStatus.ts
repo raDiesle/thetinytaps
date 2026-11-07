@@ -311,7 +311,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/tiere/",
     recorded: true,
     languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm. Auch alles, was am 7. November 2026 dazukam (die neuen Tiere, Zuhause, Futter, Geschenke und Entwicklungen aus GERMAN_ONLY in content.ts), am selben Tag übersetzt; die deutschen Sätze dazu sind noch nicht aufgenommen; die neuen Tiere bei „Wer schaut da raus?“ stehen bei Schatten finden.",
+    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm. Auch alles, was am 7. November 2026 dazukam (die neuen Tiere, Zuhause, Futter, Geschenke und Entwicklungen aus GERMAN_ONLY in content.ts), am selben Tag übersetzt; die deutschen Sätze dazu sind noch nicht aufgenommen; „Wer schaut da raus?“ ist zu „Erkennen“ (Schatten finden) umgezogen.",
   },
   {
     href: "/zusammen/",
@@ -337,10 +337,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/schatten/",
-    recorded: true,
-    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. Die 114 neuen Bilder vom 7. November 2026 (20 Tiere, T-Rex, Spinne, Wurm, Grashüpfer, Hummer, 13 Fahrzeuge, 14 Bilder zum Essen, 62 Dinge) am selben Tag übersetzt; ihre deutschen Sätze sind noch nicht aufgenommen.",
+    parts: [
+      {
+        label: "Name und Zeile des Spiels",
+        languages: { de: "done" },
+        note: "Seit dem Umzug von „Wer schaut da raus?“ heißt das Spiel „Erkennen“ (7. November 2026); Name und Zeile im Inhaltsverzeichnis sind noch nur Deutsch, die alten Übersetzungen von „Schatten finden“ wurden gestrichen.",
+      },
+      {
+        label: "Bilder, Sätze und Stimme",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. Die 114 neuen Bilder vom 7. November 2026 (20 Tiere, T-Rex, Spinne, Wurm, Grashüpfer, Hummer, 13 Fahrzeuge, 14 Bilder zum Essen, 62 Dinge) am selben Tag übersetzt; ihre deutschen Sätze sind noch nicht aufgenommen.",
+      },
+    ],
   },
+
   {
     href: "/socken/",
     recorded: true,

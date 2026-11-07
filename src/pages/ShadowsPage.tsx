@@ -1,4 +1,5 @@
-import { SHADOWS_TITLE, ShadowsGame } from "@/games/shadows/ShadowsGame";
+import { ShadowsGame } from "@/games/shadows/ShadowsGame";
+import { SHADOWS_TITLE } from "@/games/shadows/names";
 import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
