@@ -7,7 +7,7 @@ Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds ask
 (`OwnTimeSheet`, H-59, H-60): any length from 10 seconds to 3 hours (− and + for hours, minutes and seconds, ready slips
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
-grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
+grown-ups (`TimeLeft`, H-62). Every timer but the Wecker (whose screen is the time left) shows the time left in the picture's bottom right corner on a small paper
 note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Zahlen“, `digits`, e.g. „4:37“; user
 request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
@@ -16,20 +16,22 @@ for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to
 The start screen's cards are the pictures themselves as they look at their end, with no words on them (user request,
 November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
 cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
-the picture (`ART_ASPECT`). Names are only read out and their tooltip. „Abwechseln“ comes first, the fox child's lamp on,
-the toy on its cushion and the hourglass; that it runs on without end is said in its tooltip (`SWAP_NOTE`). Then the pictures that run
-until the time is up:
+the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Abwechseln (the fox child's lamp on, the toy on its cushion and the hourglass; that it runs on
+without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecker, then the others. The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
   halts there briefly and it chimes (H-45), with keyframes made for the run (`TrainStepKeyframes`, `--tm-roll`).
 - „Apfelbaum“ 🍎 (`apples.tsx`, H-45): an apple tree's year (`appleTimes`, `APPLE_YEAR`; user feedback, November
-  2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), blossoms open all
-  over it (`bloomRank`, until 30 %) while three bees buzz round it from then on (`BEES`, each a small layer, its wings a
-  smaller one), each blossom drops as a small green apple swells and reddens at its place (until 45 %), then a little
-  cart rolls from the right under one apple after the other (`CartKeyframes`, written for the run,
-  the wheels turning with it); the apple sways a second at a time while the cart comes, falls straight down into it with
-  a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
+  2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), then its blossoms
+  open one after the other here and there over the crown (`bloomRank`, each in its own slot, until 30 %) while three
+  tiny bees buzz round it from then on (`BEES`, `BEE` smaller than a blossom, each a small layer, its wings a smaller
+  one), then each blossom in turn withers as a small green apple swells out of it and reddens (one at a time, until
+  45 %), then a little cart rolls back and forth, each time to the free apple farthest away
+  (`harvestOrder`, `CartKeyframes` written for the run, the wheels turning with it); the next apple sways a second at a
+  time while it waits its turn, and the cart rolls under it just as it lets go, so it falls straight down into the cart
+  with a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
   apples, also for a short time (`appleCount`, `MIN_APPLES` to `MAX_APPLES`, as many as the heap holds); the last lands
   as the time is up. A tap rustles the leaves, once the blossoms are out the bees buzz.
 - „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
@@ -66,12 +68,22 @@ until the time is up:
   last crumbs lie on the blanket.
 - „Rote Scheibe“ 🔴 (`disc.tsx`, H-47): the red disc Kitas know from the „Time Timer“, shrinking like a clock's hand goes
   round on a plain white face; the knob in the middle turns a petal each second.
-  A ladybug crawls round the face's rim about once a minute, like a second hand, and a dot comes outside the rim each
+  A ladybug crawls round the face's rim about once a minute, like a second hand – a real seven-spot one seen from above
+  (black head with short feelers, the black shield with its two white patches, shiny red wing cases parted by their
+  seam, seven spots), its two sets of three legs stepping in turn and its body swaying a little, each a small layer in
+  the box riding round (`.tm-bug`; user feedback, November 2026: a flat round bug only slid round) – and a dot comes outside the rim each
   time it is back at the top, clockwise from 12 o'clock with a plink (H-67, `ladybugLaps`: the rounds fit the time
   exactly; beyond 30 minutes a dot every second or third round, so they go round once at most, `MAX_DOTS`).
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): 24 slices on a wooden board, one lifted off towards its side at each
   24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`); a little steam rises every second.
   Each slice is a small layer cut to its wedge by a still `clip-path`, so a tap lights exactly the slices left.
+- „Wecker“ ⏰ (`clock.tsx`, H-70, user request, November 2026): a children's digital radio alarm clock on the bedside
+  table – a chunky, rounded turquoise case with a big yellow snooze bar on top, little feet, a star and a heart sticker,
+  the radio mast and the alarm's bell glowing in the screen's corners – whose orange segment digits count the time left
+  down to 0:00 (`clockText`: the digits never shift, a blank before one-digit minutes from 10 minutes on, the hours in
+  front from an hour on). The digits are the time left, so it shows no note in the corner and has no „Zeit im Bild“
+  behind ⚙️. Under them a row of `CLOCK_BLOCKS` light blocks goes out one by one from the right, so a child who can't
+  read digits sees the time go too. A tap presses the snooze bar with a click; at the end it beeps and rings on its feet.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -106,7 +118,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: the draw and its turns, and its room,
-lamps, cushions and toys), `apples.tsx`, `caterpillar.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
+lamps, cushions and toys), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -132,10 +144,16 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   before its flame goes out (`CANDLE.stub` a thin rim, the going out after its turn, never before), and what follows
   an ending (the smoke) lingers slow and soft for seconds, never a puff gone at once. `timer.test.ts` checks the candle.
 - **What happens, happens as in life** (user feedback on the Apfelbaum, November 2026): things fall straight down,
-  never across to where they are wanted – what catches them comes under them first (the cart under the apple). What is
+  never across to where they are wanted – what catches them comes under them first (the cart under the apple), arriving
+  as the thing lets go, never standing under it for seconds before; it goes back and forth between pieces rather than
+  creeping along one way (`harvestOrder`). What is
   collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
   basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
   story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
+  Within a stage the pieces come one at a time, each finished before the next begins (every blossom opens on its own,
+  then every blossom becomes its apple on its own), never several half done at once, and a stage starts only once the
+  one before is over (`appleTimes`, `timer.test.ts` checks). Small helpers that only liven the picture (the bees) are
+  tiny beside what runs down, as in life – big bees took the eye from the blossoms (user feedback, November 2026).
 - **Whose turn it is, is seen from across the room, from the very first second** (user feedback, November 2026: a
   toy lying beside one of two small cushions did not tell it): the child's whole side changes – its lamp on and its
   light on the cushion, the other side in shade – and the toy sits on that cushion, not beside it. Who begins is never
@@ -143,8 +161,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   keeps that: a big change of the whole side, never a small sign.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
-- **Abwechseln stands first, apart**: it runs without end, so its card comes first (its tooltip says so, `SWAP_NOTE`),
-  and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, then
+  the Wecker): keep it when adding a picture (a new one goes after these unless the user says otherwise), and move the
+  perf scenarios' list in `tools/perfScenarios.ts` with it – they tap cards by their place (`timer.test.ts` checks the
+  order). Abwechseln runs without end, so its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it
+  (`TIMED_PICTURES`, `nextPicture`).
 - **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
   `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
   is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
@@ -182,9 +203,16 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
   (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
   a bigger layer.
+- **A drawing never touches its svg's edge unless that svg lets it out** (user feedback, November 2026: the knob's flower
+  in the Rote Scheibe's middle lost the tips of its top and bottom petals): an svg cuts off what lies past its
+  `viewBox`, half a stroke's width too, wherever it sits (only `.tm-layer > svg` is `overflow: visible`). A small
+  drawing inside a `div` of its own gets `overflow: visible` on its svg or keeps its strokes inside the `viewBox`, and
+  something that turns is looked at magnified in the preview at several angles.
+- **A creature that goes somewhere walks** (user feedback, November 2026): legs that step in turn and a body that
+  sways a little, as small layers moving by `transform`, never a stiff figure sliding along (the ladybug).
 - **Only what runs and where it goes** (user feedback, November 2026): the hourglass shows the sand still to run and
   the heap below, nothing else – no film or grains on the glass the sand has left, no grain or disc over the stream at
-  the neck (both were taken out: they looked odd). A trace of what is over (H-64) is only drawn where it is plainly a
+  the neck, no white streaks for the glass's shine (all taken out: they looked odd or bad; Abwechseln's hourglass too). A trace of what is over (H-64) is only drawn where it is plainly a
   thing of its own (the dark rail, the wax puddle), never a pale copy of what was there.
 - **No `clip-path` round what is in view while the page turns**: a turning page is a picture of the app (view
   transition), and in it the clip-path round a moving layer dropped out – the hourglass's sand showed as a square

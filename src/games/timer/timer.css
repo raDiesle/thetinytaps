@@ -573,11 +573,12 @@
   }
 }
 
-/* Apfelbaum (H-45): the tree's year (`appleTimes`). The tree grows from a sapling a step a second; blossoms open at the
-   apples' places (--tm-at) and drop off (--tm-off) as small green apples come, which grow and redden; then a little
-   cart rolls under each apple (`tm-cart-way`, written for the run), the apple sways a second at a time while
-   the cart comes, falls straight down into it (--tm-dy, faster and faster) and is gone as the same apple lies in the
-   heap. Bees buzz round the tree from the first blossoms on. */
+/* Apfelbaum (H-45): the tree's year (`appleTimes`). The tree grows from a sapling a step a second; then the blossoms
+   open one after the other at the apples' places (--tm-at), then each in turn withers (--tm-off) as a small green apple
+   swells out of it, grows and reddens; then a little cart rolls back and forth under each apple
+   (`tm-cart-way`, written for the run), the next apple sways a second at a time while it waits, falls straight down into
+   the cart as it comes under it (--tm-dy, faster and faster) and is gone as the same apple lies in the heap. Tiny bees
+   buzz round the tree from the first blossoms on. */
 .tm-tree {
   transform-origin: 50% 100%;
   will-change: transform;
@@ -595,8 +596,8 @@
 
 .tm-blossom {
   animation:
-    tm-blossom-open 0.5s ease-out var(--tm-at) both,
-    tm-blossom-drop 0.8s ease-in var(--tm-off) forwards;
+    tm-blossom-open var(--tm-open-ms) ease-out var(--tm-at) both,
+    tm-blossom-drop var(--tm-drop-ms) ease-in var(--tm-off) forwards;
 }
 
 @keyframes tm-blossom-open {
@@ -608,14 +609,14 @@
   }
 }
 
-/* Its petals fall off as the little apple comes. */
+/* It withers where it is as the little apple swells out of its middle. */
 @keyframes tm-blossom-drop {
   from {
     transform: none;
     opacity: 1;
   }
   to {
-    transform: translateY(70%) rotate(50deg) scale(0.5);
+    transform: rotate(40deg) scale(0.35);
     opacity: 0;
   }
 }
@@ -662,11 +663,11 @@
   position: relative;
   width: 100%;
   height: 100%;
-  transform-origin: 55% 20%;
+  transform-origin: 50% 55%;
   animation: tm-apple-grow var(--tm-grow-ms) ease-out var(--tm-at) both;
 }
 
-/* Out of sight until its blossom drops, then a small green apple swells where it was. */
+/* Out of sight until its blossom withers, then a small green apple swells out of its middle. */
 @keyframes tm-apple-grow {
   from {
     transform: scale(0.15);
@@ -756,29 +757,30 @@
   }
 }
 
-/* A round past the blossoms and back, turning to face the way it flies. */
+/* A round past the blossoms and back, turning to face the way it flies; in units of the tiny bee's own size, so the
+   round is as wide as the crown's blossoms. */
 @keyframes tm-bee-fly {
   0%,
   100% {
     transform: none;
   }
   22% {
-    transform: translate(230%, -110%);
+    transform: translate(530%, -250%);
   }
   44% {
-    transform: translate(430%, 50%);
+    transform: translate(1000%, 115%);
   }
   50% {
-    transform: translate(410%, 120%) scaleX(-1);
+    transform: translate(950%, 280%) scaleX(-1);
   }
   72% {
-    transform: translate(160%, 220%) scaleX(-1);
+    transform: translate(370%, 510%) scaleX(-1);
   }
   92% {
-    transform: translate(-20%, 60%) scaleX(-1);
+    transform: translate(-45%, 140%) scaleX(-1);
   }
   97% {
-    transform: translate(-10%, 20%);
+    transform: translate(-25%, 45%);
   }
 }
 
@@ -1130,6 +1132,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 @keyframes tm-knob {
@@ -1155,6 +1158,62 @@
   }
 }
 
+/* In its small box at the top the ladybug faces the way it crawls; its two sets of three legs step in turn, pushing
+   back and swinging forward, and its body sways a little with them – small layers moved by `transform` only. */
+.tm-bug {
+  position: absolute;
+  transform: rotate(90deg);
+}
+
+.tm-bug-part {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-bug-part svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-bug-legs {
+  animation: tm-bug-step var(--tm-step) ease-in-out infinite;
+}
+
+.tm-bug-legs-b {
+  animation-delay: calc(var(--tm-step) / -2);
+}
+
+.tm-bug-body {
+  animation: tm-bug-sway var(--tm-step) ease-in-out infinite;
+}
+
+.tm-done .tm-bug-legs,
+.tm-done .tm-bug-body {
+  animation: none;
+}
+
+@keyframes tm-bug-step {
+  0%,
+  100% {
+    transform: translateY(-4%) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(4%) rotate(3deg);
+  }
+}
+
+@keyframes tm-bug-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
 .tm-dot {
   position: absolute;
   inset: 0;
@@ -1175,6 +1234,88 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Wecker (H-70): the digits tick once a second in a small layer of their own; the row of light blocks is a window
+   sliding left a block at each share of the time while its drawing slides back and stays put; a tap presses the snooze
+   bar; at the end the clock rings on its feet a moment, then stands still. */
+.tm-clock-digits {
+  will-change: transform;
+  filter: drop-shadow(0 0 6px rgb(255 154 82 / 0.55));
+}
+
+.tm-clock-win {
+  overflow: hidden;
+  animation: tm-clock-win var(--tm-ms) steps(var(--tm-blocks), end) forwards;
+}
+
+.tm-clock-lit {
+  position: absolute;
+  inset: 0;
+  animation: tm-clock-lit var(--tm-ms) steps(var(--tm-blocks), end) forwards;
+}
+
+.tm-clock-lit svg,
+.tm-clock-snooze > div > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-done .tm-clock-win {
+  animation: none;
+  transform: translateX(-100%);
+}
+
+.tm-done .tm-clock-lit {
+  animation: none;
+  transform: translateX(100%);
+}
+
+@keyframes tm-clock-win {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes tm-clock-lit {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.tm-clock-snooze > div {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-clock-press {
+  animation: tm-clock-press 0.4s ease-out;
+}
+
+@keyframes tm-clock-press {
+  30% {
+    transform: translateY(26%);
+  }
+}
+
+.tm-clock {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.tm-done .tm-clock {
+  animation: tm-clock-ring 0.11s ease-in-out 12 alternate;
+}
+
+@keyframes tm-clock-ring {
+  from {
+    transform: rotate(-1.5deg);
+  }
+  to {
+    transform: rotate(1.5deg);
   }
 }
 
@@ -1374,6 +1515,7 @@
 .tm-cookie .tm-left-glow,
 .tm-apple-sway .tm-left-glow,
 .tm-red .tm-left-glow,
+.tm-clock-lit .tm-left-glow,
 .tm-leaf-light .tm-left-glow {
   inset: -6%;
   border-radius: 40%;

@@ -20,7 +20,7 @@ export function TimerGame() {
   const [settings, update] = useGameSettings(TIMER_SETTINGS_KEY, DEFAULT_TIMER_SETTINGS);
   const [sheet, setSheet] = useState(false);
   // Each card is its picture as it looks at the end, with no words on it (user request, November 2026); its name, and
-  // for „Abwechseln“ (first) the line saying it goes on and on, are only read out and its tooltip.
+  // for „Abwechseln“ the line saying it goes on and on, are only read out and its tooltip.
   const modes = PICTURES.map((p) => ({
     id: p.id,
     emoji: p.emoji,

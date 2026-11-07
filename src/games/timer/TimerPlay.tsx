@@ -9,9 +9,11 @@ import { useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
+  playBeeps,
   playBuzz,
   playChime,
   playChimeNote,
+  playClick,
   playDing,
   playDrops,
   playLeaves,
@@ -28,6 +30,7 @@ import {
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { CaterpillarScene } from "./caterpillar";
+import { ClockScene } from "./clock";
 import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
@@ -380,6 +383,7 @@ function TimerRun({
       else if (picture === "flower") playTwinkle();
       else if (picture === "sunset") playYawn();
       else if (picture === "pizza") playYum();
+      else if (picture === "clock") playBeeps();
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, a few hearts, stars and
       // notes rise slowly over the picture, which lights up warmly, and then the friendly tune.
       const cheer = setTimeout(() => {
@@ -414,6 +418,8 @@ function TimerRun({
       else if (picture === "apple") (Date.now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
       else if (picture === "flower") playDrops();
+      // The snooze bar is pressed down.
+      else if (picture === "clock") playClick();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -432,6 +438,7 @@ function TimerRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
+  const clock = picture === "clock";
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
@@ -439,7 +446,8 @@ function TimerRun({
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
-        <TimeShownNote shown={phase === "running" ? shown : "off"} endsAt={endsAt} total={total} />
+        {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner. */}
+        <TimeShownNote shown={phase === "running" && !clock ? shown : "off"} endsAt={endsAt} total={total} />
         <FeedbackLayer effects={effects} />
         {phase === "done" && (
           <GameEnd
@@ -451,7 +459,7 @@ function TimerRun({
       </div>
       <PlayOptions>
         <TimeLeft endsAt={endsAt} until={until} />
-        <TimeShownChoice value={shown} onChange={onShown} />
+        {!clock && <TimeShownChoice value={shown} onChange={onShown} />}
       </PlayOptions>
     </>
   );
@@ -507,6 +515,7 @@ export function SceneParts({
       {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
+      {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}
       {picture === "sand" && (

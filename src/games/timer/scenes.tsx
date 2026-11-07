@@ -400,35 +400,18 @@ const GlassInside = memo(function GlassInside() {
   );
 });
 
-/** The glass's outline and shine and the wooden frame, in front of the sand. */
+/** The glass's outline and the wooden frame, in front of the sand: no white streaks for its shine (user feedback, November 2026). */
 const GlassFrame = memo(function GlassFrame() {
   const B = HOURGLASS_BOX;
   const left = GLASS.cx - GLASS.w / 2 - 50;
   const right = GLASS.cx + GLASS.w / 2 + 50;
-  const { cx, w, top, neck, bottom } = GLASS;
-  const bulb = neck - top;
+  const { top, neck, bottom } = GLASS;
   return (
     <svg viewBox={`${B.x} ${B.y} ${B.w} ${B.h}`} style={inHourglass(B.x, B.y, B.w, B.h)}>
       <g fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round">
         <path d={bulbPath(top, neck, false)} />
         <path d={bulbPath(neck, bottom, true)} />
       </g>
-      <path
-        d={`M${cx - 0.39 * w} ${top + 0.11 * bulb} Q${cx - 0.42 * w} ${top + 0.46 * bulb} ${cx - 0.26 * w} ${top + 0.76 * bulb}`}
-        stroke="#fff"
-        strokeWidth="12"
-        fill="none"
-        strokeLinecap="round"
-        opacity="0.8"
-      />
-      <path
-        d={`M${cx - 0.26 * w} ${bottom - 0.76 * bulb} Q${cx - 0.42 * w} ${bottom - 0.46 * bulb} ${cx - 0.39 * w} ${bottom - 0.11 * bulb}`}
-        stroke="#fff"
-        strokeWidth="12"
-        fill="none"
-        strokeLinecap="round"
-        opacity="0.8"
-      />
       {[left + 10, right - 30].map((x) => (
         <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
       ))}

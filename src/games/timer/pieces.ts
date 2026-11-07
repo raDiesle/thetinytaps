@@ -17,8 +17,8 @@ export function appleCount(ms: number): number {
 
 /**
  * The Apfelbaum's year as shares of the run (user feedback, November 2026: the timer should show more progress): the
- * tree grows until `grown`, blossoms open until `bloomed`, the blossoms turn into apples that ripen until `ripe`, and in
- * the rest of the time the cart harvests them one by one.
+ * tree grows until `grown`, then the blossoms open one after the other until `bloomed`, then each blossom in turn becomes
+ * an apple that swells and reddens until `ripe`, and in the rest of the time the apples fall one by one into the cart.
  */
 export const APPLE_YEAR = { grown: 0.15, bloomed: 0.3, ripe: 0.45 } as const;
 
@@ -28,8 +28,13 @@ export const APPLE_FALL_MS = 700;
 /** How long the cart takes at most to go from one apple to the next, in ms. */
 export const CART_MOVE_MS = 1500;
 
-/** One apple's harvest, in ms after the start: the cart sets off to it, stands under it, the apple falls and lands. */
+/** How long a blossom takes at most to open, in ms (less when blossoms come quickly, so one is open before the next). */
+export const BLOSSOM_OPEN_MS = 600;
+
+/** One apple's harvest, in ms after the start: it waits its turn swaying, the cart sets off to it, stands under it, the apple falls and lands. */
 export interface AppleHarvest {
+  /** The apple before has landed: this one is next and sways a second at a time until it falls. */
+  sway: number;
   /** The cart sets off from the apple before (or from where it waited). */
   leave: number;
   /** The cart stands under the apple. */
@@ -44,9 +49,11 @@ export interface AppleHarvest {
 export interface AppleTimes {
   /** The tree is fully grown. */
   grown: number;
-  /** When each apple's blossom opens (by the apple's index). */
+  /** When each apple's blossom starts to open (by the apple's index), one after the other. */
   bloom: number[];
-  /** When each blossom turns into a small green apple that grows and reddens for `ripenMs` (by the apple's index). */
+  /** How long a blossom takes to open. */
+  openMs: number;
+  /** When each blossom turns into a small green apple that grows and reddens for `ripenMs` (by the apple's index), one after the other. */
   ripen: number[];
   ripenMs: number;
   /** The harvest, apple by apple in the order the apples are given (the cart's way). */
@@ -63,26 +70,34 @@ export function bloomRank(count: number): number[] {
   return keys.map((k) => sorted.indexOf(k));
 }
 
-/** Works out the Apfelbaum's year (`APPLE_YEAR`) for a run of `total` ms with `count` apples; the last apple lands at the end. */
+/**
+ * Works out the Apfelbaum's year (`APPLE_YEAR`) for a run of `total` ms with `count` apples; the last apple lands at the
+ * end. Each blossom opens in its own slot and each apple comes out of its blossom in its own slot, never several at once
+ * (user feedback, November 2026). In the harvest the cart rolls under the next apple just as it lets go, so it is under
+ * the apple all through its fall; between apples it stands where it caught the last one.
+ */
 export function appleTimes(total: number, count: number): AppleTimes {
   const grown = total * APPLE_YEAR.grown;
   const bloomed = total * APPLE_YEAR.bloomed;
   const ripe = total * APPLE_YEAR.ripe;
   const rank = bloomRank(count);
-  // Each apple grows for half the ripening time, the last one starting halfway, so all are red before the harvest.
-  const ripenMs = (ripe - bloomed) / 2;
+  const bloomSlot = (bloomed - grown) / count;
+  const ripenMs = (ripe - bloomed) / count;
   const unit = (total - ripe) / count;
   const fall = Math.min(APPLE_FALL_MS, unit * 0.35);
-  const move = Math.min(CART_MOVE_MS, (unit - fall) * 0.6);
+  const move = Math.min(CART_MOVE_MS, unit * 0.45);
+  const pause = Math.min(200, unit * 0.05);
   const harvest = Array.from({ length: count }, (_, k) => {
-    const leave = ripe + k * unit;
+    const sway = ripe + k * unit;
     const land = ripe + (k + 1) * unit;
-    return { leave, under: leave + move, fall: land - fall, land };
+    const under = land - fall - pause;
+    return { sway, leave: Math.max(sway, under - move), under, fall: land - fall, land };
   });
   return {
     grown,
-    bloom: rank.map((r) => grown + (r * (bloomed - grown)) / count),
-    ripen: rank.map((r) => bloomed + (r * ripenMs) / count),
+    bloom: rank.map((r) => grown + r * bloomSlot),
+    openMs: Math.min(BLOSSOM_OPEN_MS, bloomSlot),
+    ripen: rank.map((r) => bloomed + r * ripenMs),
     ripenMs,
     harvest,
   };
@@ -157,18 +172,21 @@ export function applePlaces(count: number, rx: number, ry: number): { x: number;
 }
 
 /**
- * The order apples of radius `r` are harvested in: the cart rolls in from the right, where it waited, so
- * the rightmost apple comes next – but never one with another apple still hanging below it, which it would fall
- * through on its way straight down (user feedback, November 2026: apples fall straight down, naturally).
+ * The order apples of radius `r` are harvested in: the cart goes back and forth (user feedback, November 2026), each
+ * time to the apple farthest from where it stands, starting from `start` (the cart's middle at rest, right of the tree)
+ * – but never to one with another apple still hanging below it, which it would fall through on its way straight down
+ * (user feedback, November 2026: apples fall straight down, naturally).
  */
-export function harvestOrder<P extends { x: number; y: number }>(places: P[], r: number): P[] {
+export function harvestOrder<P extends { x: number; y: number }>(places: P[], r: number, start: number): P[] {
   const left = [...places];
   const order: P[] = [];
+  let at = start;
   while (left.length > 0) {
     const free = left.filter((p) => !left.some((q) => q !== p && q.y > p.y && Math.abs(q.x - p.x) < 2 * r));
-    const next = free.reduce((best, p) => (p.x > best.x ? p : best));
+    const next = free.reduce((best, p) => (Math.abs(p.x - at) > Math.abs(best.x - at) ? p : best));
     order.push(next);
     left.splice(left.indexOf(next), 1);
+    at = next.x;
   }
   return order;
 }

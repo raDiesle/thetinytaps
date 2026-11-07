@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
+import { BAR, CLOCK, CLOCK_FLOOR, clockText, DIGITS } from "./clock";
 import { BANDS, BITE_ORDER, BUTTERFLY, biteSpot, bitesPerBand, bodyFront, edgesAt, LEAF, LEAF_FLOOR, leafSpan, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
@@ -33,14 +34,18 @@ import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
 describe("Timer", () => {
-  test("every picture has its own id, an emoji and a German name, Abwechseln comes first and „Weiter“ goes round the others", () => {
+  const RIGHT_EDGE = 1340;
+
+  test("every picture has its own id, an emoji and a German name, they stand in the order the user asked for and „Weiter“ goes round all but Abwechseln", () => {
     expect(new Set(PICTURES.map((p) => p.id)).size).toBe(PICTURES.length);
     for (const p of PICTURES) {
       expect(p.emoji).not.toBe("");
       expect(p.name.de.trim()).not.toBe("");
     }
-    // Abwechseln runs without end, so it stands on top under its own line and „Weiter“ never leads into it.
-    expect(PICTURES[0].id).toBe("swap");
+    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, Wecker.
+    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "swap", "candle", "apple", "pizza", "clock"]);
+    expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
+    // Abwechseln runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
     expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 1);
     const seen = new Set<string>();
@@ -52,6 +57,30 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
+  });
+
+  test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
+    expect(clockText(300_000, 300_000)).toBe("5:00");
+    expect(clockText(299_001, 300_000)).toBe("5:00");
+    expect(clockText(299_000, 300_000)).toBe("4:59");
+    expect(clockText(9_000, 10_000)).toBe("0:09");
+    expect(clockText(0, 300_000)).toBe("0:00");
+    // From ten minutes on, a blank stands in front of one-digit minutes; from an hour on the hours stay in front.
+    expect(clockText(599_000, 600_000)).toBe(" 9:59");
+    expect(clockText(600_000, 600_000)).toBe("10:00");
+    expect(clockText(3_599_000, 5_400_000)).toBe("0:59:59");
+    expect(clockText(5_400_000, 5_400_000)).toBe("1:30:00");
+    for (const total of [10_000, 60_000, 600_000, 3_600_000, 10_800_000])
+      for (const left of [total, total / 2, 1, 0]) expect(clockText(left, total)).toHaveLength(clockText(total, total).length);
+    // It stands on the table within what every screen shows, its digits and blocks inside it.
+    expect(CLOCK.x).toBeGreaterThanOrEqual(200);
+    expect(CLOCK.x + CLOCK.w).toBeLessThanOrEqual(RIGHT_EDGE);
+    expect(CLOCK.y).toBeGreaterThanOrEqual(80);
+    expect(CLOCK_FLOOR).toBeLessThanOrEqual(820);
+    for (const box of [DIGITS, BAR]) {
+      expect(box.x).toBeGreaterThan(CLOCK.x);
+      expect(box.x + box.w).toBeLessThan(CLOCK.x + CLOCK.w);
+    }
   });
 
   test("the removed pictures stay removed (user feedback, November 2026: Eimer and Kuchen made no sense)", () => {
@@ -75,8 +104,6 @@ describe("Timer", () => {
     expect([...TIMER_SECONDS].sort((a, b) => a - b)).toEqual([...TIMER_SECONDS]);
     expect(TIMER_SECONDS).toContain(DEFAULT_TIMER_SETTINGS.seconds as (typeof TIMER_SECONDS)[number]);
   });
-
-  const RIGHT_EDGE = 1340;
 
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
     expect(TRAIN.x).toBeGreaterThanOrEqual(200);
@@ -122,6 +149,11 @@ describe("Timer", () => {
     const scenes = await Bun.file(new URL("./scenes.tsx", import.meta.url)).text();
     for (const gone of [".tm-sand-dust", ".tm-grain"]) expect(css).not.toContain(gone);
     for (const gone of ["tm-sand-dust", "tm-grain"]) expect(scenes).not.toContain(gone);
+    // No white streaks for the glass's shine either: they looked bad (user feedback, November 2026), on both hourglasses.
+    // Abwechseln draws the same hourglass (checked below), so its frame is the one to look at.
+    const frame = scenes.slice(scenes.indexOf("const GlassFrame"), scenes.indexOf("export function BulbSand"));
+    expect(frame.length).toBeGreaterThan(0);
+    expect(frame).not.toContain('stroke="#fff"');
     // A clip-path round a moving layer dropped out of a turning page's picture and showed the sand as a square.
     const sandRules = [...css.matchAll(/([^{}]*\.tm-(?:sand|bulb)[^{}]*)\{([^}]*)\}/g)];
     expect(sandRules.length).toBeGreaterThan(0);
@@ -254,17 +286,22 @@ describe("Timer", () => {
       expect(places).toHaveLength(count);
       for (const p of places) expect((p.x / (CROWN.rx - r)) ** 2 + (p.y / (CROWN.ry - r)) ** 2).toBeLessThanOrEqual(1);
       for (const a of places) for (const b of places) if (a !== b) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThanOrEqual(2 * r);
-      // Harvested from the right, where the cart waits; an apple falls only once none hangs below it in its way.
-      const order = harvestOrder(places, r);
+      // The cart goes back and forth from where it waits at the right (user feedback, November 2026): first over to the
+      // left, then turning again and again; an apple falls only once none hangs below it in its way.
+      const start = CART_MIDDLE - CROWN.cx;
+      const order = harvestOrder(places, r, start);
       expect(order).toHaveLength(count);
-      expect(order[0].x).toBeGreaterThanOrEqual(order.at(-1)?.x ?? 0);
+      if (count > 1) expect(order[0].x).toBeLessThan(start);
+      const steps = [start, ...order.map((p) => p.x)].map((x, i, xs) => (i === 0 ? 0 : Math.sign(x - xs[i - 1]))).slice(1);
+      const turns = steps.filter((d, i) => i > 0 && d !== 0 && d === -steps[i - 1]).length;
+      if (count >= 5) expect(turns).toBeGreaterThanOrEqual(Math.floor(count / 2));
       order.forEach((p, k) => {
         for (const q of order.slice(k + 1)) expect(q.y > p.y && Math.abs(q.x - p.x) < 2 * r).toBe(false);
       });
     }
   });
 
-  test("Apfelbaum: the tree grows, blossoms, the apples ripen, then the cart comes under each before it falls; the last lands at the end", () => {
+  test("Apfelbaum: the tree grows, the blossoms open one by one, each becomes an apple in turn, the cart comes under each as it falls; the last lands at the end", () => {
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
       const count = appleCount(total);
       const t = appleTimes(total, count);
@@ -275,11 +312,23 @@ describe("Timer", () => {
         // Every apple is red before the first one is harvested.
         expect(t.ripen[i] + t.ripenMs).toBeLessThanOrEqual(t.harvest[0].leave + 1e-6);
       }
-      let before = t.harvest[0].leave;
+      // One at a time (user feedback, November 2026): a blossom is open before the next opens, an apple grown before
+      // the next comes out of its blossom, and the apples only after the last blossom.
+      const blooms = [...t.bloom].sort((a, b) => a - b);
+      const ripens = [...t.ripen].sort((a, b) => a - b);
+      for (let i = 1; i < count; i++) {
+        expect(blooms[i] - blooms[i - 1]).toBeGreaterThanOrEqual(t.openMs - 1e-6);
+        expect(ripens[i] - ripens[i - 1]).toBeGreaterThanOrEqual(t.ripenMs - 1e-6);
+      }
+      expect(ripens[0]).toBeGreaterThanOrEqual(blooms.at(-1)! + t.openMs - 1e-6);
+      let before = t.harvest[0].sway;
       for (const h of t.harvest) {
-        expect(h.leave).toBeGreaterThanOrEqual(before - 1e-6);
+        expect(h.sway).toBeGreaterThanOrEqual(before - 1e-6);
+        expect(h.leave).toBeGreaterThanOrEqual(h.sway - 1e-6);
         expect(h.under).toBeGreaterThan(h.leave);
+        // The cart is under the apple as it lets go, not waiting there for seconds before.
         expect(h.fall).toBeGreaterThanOrEqual(h.under);
+        expect(h.fall - h.under).toBeLessThanOrEqual(200);
         expect(h.land).toBeGreaterThan(h.fall);
         before = h.land;
       }
@@ -289,7 +338,7 @@ describe("Timer", () => {
     }
   });
 
-  test("Apfelbaum: each apple lies on its own in the cart, and the cart and the bees stay on the screen", () => {
+  test("Apfelbaum: each apple lies on its own in the cart, and the cart and the bees stay on the screen", async () => {
     expect(HEAP_ROWS.reduce((a, b) => a + b, 0)).toBe(MAX_APPLES);
     const half = (CART.box.right - CART.box.left) / 2;
     for (let n = 0; n < MAX_APPLES; n++) {
@@ -308,14 +357,18 @@ describe("Timer", () => {
     for (const count of [MIN_APPLES, 12, MAX_APPLES]) {
       for (const p of treeApples(count)) expect(p.x - CART_MIDDLE + CART.box.left).toBeGreaterThanOrEqual(190);
     }
-    // The bees' rounds (`tm-bee-fly`: up to 430 % right, 110 % up, 220 % down) stay over the meadow and under the sky's top.
+    // The bees are tiny beside a blossom (user feedback, November 2026: much smaller).
+    expect(BEE.w).toBeLessThanOrEqual(2.2 * appleRadius(MAX_APPLES) * 0.6);
+    // Their rounds (`tm-bee-fly`: up to 1000 % right, 250 % up, 510 % down) stay over the meadow and under the sky's top.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    expect(css).toContain("translate(1000%, 115%)");
     for (const b of BEES) {
-      const reach = 4.3 * BEE.w;
+      const reach = 10 * BEE.w;
       const xs = b.flip ? [b.x - reach, b.x + BEE.w] : [b.x, b.x + reach + BEE.w];
       expect(xs[0]).toBeGreaterThanOrEqual(200);
       expect(xs[1]).toBeLessThanOrEqual(RIGHT_EDGE);
-      expect(b.y - 1.1 * BEE.h).toBeGreaterThanOrEqual(80);
-      expect(b.y + 3.2 * BEE.h).toBeLessThanOrEqual(APPLE_FLOOR);
+      expect(b.y - 2.5 * BEE.h).toBeGreaterThanOrEqual(80);
+      expect(b.y + 5.1 * BEE.h).toBeLessThanOrEqual(APPLE_FLOOR);
     }
   });
 

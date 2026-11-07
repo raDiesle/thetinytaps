@@ -3,9 +3,10 @@ import { type AppleTimes, appleTimes, applePlaces, harvestOrder } from "./pieces
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Apfelbaum (H-45): an apple tree's year, so the time shows its progress in stages (user feedback, November 2026) –
-// the tree grows out of the meadow, blossoms open all over it while bees buzz round them, each blossom turns into a
-// small green apple that grows and reddens, and then a little cart rolls under one apple after the other,
-// which falls straight down into it and stays there, each apple on its own in the heap. Every piece is a small layer
+// the tree grows out of the meadow, then its blossoms open one after the other all over it while tiny bees buzz round
+// them, then each blossom in turn becomes a small green apple that swells and reddens, and then a little cart rolls
+// back and forth, under one apple after the other just as it lets go, so it falls straight down into the cart
+// and stays there, each apple on its own in the heap. Every piece is a small layer
 // of its own on its own clock (`animation-delay` from `appleTimes`), so nothing is drawn again while it runs; the cart's
 // way is keyframes written once for the run (`CartKeyframes`).
 
@@ -65,7 +66,10 @@ export function appleRadius(count: number) {
 /** Where each apple hangs, in the order the cart harvests them (`harvestOrder`). */
 export function treeApples(count: number) {
   const r = appleRadius(count);
-  return harvestOrder(applePlaces(count, CROWN.rx - r - 24, CROWN.ry - r - 24), r).map((p) => ({ x: CROWN.cx + p.x, y: CROWN.cy + p.y }));
+  return harvestOrder(applePlaces(count, CROWN.rx - r - 24, CROWN.ry - r - 24), r, CART_MIDDLE - CROWN.cx).map((p) => ({
+    x: CROWN.cx + p.x,
+    y: CROWN.cy + p.y,
+  }));
 }
 
 /** Sky, clouds, meadow with a few flowers; drawn once. */
@@ -205,9 +209,10 @@ function Blossom() {
 }
 
 /**
- * The blossoms and apples on the tree. At an apple's place its blossom opens (`--tm-at`) and later falls off as a small
- * green apple comes (`--tm-off`), which grows and reddens; while the cart comes under it, it sways once a second, then
- * it falls straight down into the cart (`--tm-dy`) and is gone there, as the same apple lies in the heap.
+ * The blossoms and apples on the tree. At an apple's place its blossom opens (`--tm-at`) and later withers as a small
+ * green apple swells out of it (`--tm-off`), grows and reddens; from the moment the apple before it lands it sways once
+ * a second, then the cart rolls under it and it falls straight down into the cart (`--tm-dy`) and is gone there, as the
+ * same apple lies in the heap.
  */
 export const TreeApples = memo(function TreeApples({ count, times, glow }: { count: number; times: AppleTimes; glow: number }) {
   const r = appleRadius(count);
@@ -224,10 +229,10 @@ export const TreeApples = memo(function TreeApples({ count, times, glow }: { cou
           "--tm-land-at": `${h.land}ms`,
         } as CSSProperties;
         const grow = { "--tm-at": `${times.ripen[k]}ms`, "--tm-grow-ms": `${times.ripenMs}ms` } as CSSProperties;
-        const sways = Math.max(0, Math.floor((h.fall - h.leave) / 1000));
+        const sways = Math.max(1, Math.floor((h.fall - h.sway) / 1000));
         return (
           <Layer key={k} x={p.x - r} y={p.y - r} w={2 * r} h={2 * r} className="tm-apple" style={style}>
-            <div className="tm-apple-sway" style={{ animationDelay: `${h.leave}ms`, animationIterationCount: sways }}>
+            <div className="tm-apple-sway" style={{ animationDelay: `${h.sway}ms`, animationIterationCount: sways }}>
               <div className="tm-apple-grow" style={grow}>
                 <Apple green />
                 <div className="tm-apple-red">
@@ -248,7 +253,14 @@ export const TreeApples = memo(function TreeApples({ count, times, glow }: { cou
           w={2.2 * r}
           h={2.2 * r}
           className="tm-blossom"
-          style={{ "--tm-at": `${times.bloom[k]}ms`, "--tm-off": `${times.ripen[k]}ms` } as CSSProperties}
+          style={
+            {
+              "--tm-at": `${times.bloom[k]}ms`,
+              "--tm-open-ms": `${times.openMs}ms`,
+              "--tm-off": `${times.ripen[k]}ms`,
+              "--tm-drop-ms": `${Math.min(800, times.ripenMs)}ms`,
+            } as CSSProperties
+          }
         >
           <Blossom />
         </Layer>
@@ -379,8 +391,8 @@ export const Cart = memo(function Cart({ times, end }: { times: AppleTimes; end:
 
 /**
  * The cart's way as keyframes made for this run, since where the apples hang and when they fall depends on the time
- * set: it waits at the right while the tree grows and blossoms, then for each apple it rolls under it, stands there
- * while the apple falls in, and rolls on to the next. The wheels turn as far as it rolls. At the end (`.tm-done`) the
+ * set: it waits at the right while the tree grows and blossoms, then it goes back and forth (`harvestOrder`), for each
+ * apple rolling under it just as it lets go and standing there, where it caught it, until it sets off for the next. The wheels turn as far as it rolls. At the end (`.tm-done`) the
  * cart stands at its way's end, `--tm-cart-end` (`cartEnd`).
  */
 export function CartKeyframes({ total, count, times }: { total: number; count: number; times: AppleTimes }) {
@@ -411,15 +423,15 @@ export function cartEnd(count: number): string {
   return `${(((last ? last.x - CART_MIDDLE : 0) / CART.w) * 100).toFixed(3)}%`;
 }
 
-/** Where the bees fly round, how long a round takes (s), and whether the round is flown mirrored. */
+/** Where the bees fly round, how long a round takes (s), and whether the round is flown mirrored (`tm-bee-fly`). */
 export const BEES = [
   { x: 380, y: 170, s: 7, flip: false },
   { x: 700, y: 360, s: 9, flip: true },
   { x: 330, y: 420, s: 8, flip: false },
 ] as const;
 
-/** A bee's size on the stage. */
-export const BEE = { w: 70, h: 56 } as const;
+/** A bee's size on the stage: tiny beside the blossoms, as a real bee (user feedback, November 2026: much smaller). */
+export const BEE = { w: 30, h: 24 } as const;
 
 /** A bee, side on, facing right: striped body and a little sting; its wings beat in a layer of their own. */
 function Bee() {
@@ -443,7 +455,7 @@ function Bee() {
 }
 
 /**
- * Bees buzzing round the tree from when the first blossoms open: each a small layer flying its round (`tm-bee-fly`),
+ * Tiny bees buzzing round the tree from when the first blossoms open: each a small layer flying its round (`tm-bee-fly`),
  * its wings beating in a smaller one – never a group moved inside a big svg.
  */
 const Bees = memo(function Bees({ from }: { from: number }) {
