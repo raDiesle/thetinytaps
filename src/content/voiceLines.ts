@@ -11,6 +11,8 @@ import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, giverOf, GIVERS } from "@/games/anim
 import { GIFTS } from "@/games/animals/gifts";
 import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
 import { HOMES } from "@/games/animals/homes";
+import { KIND_ORDER } from "@/games/animals/levels";
+import { KIND_QUESTIONS } from "@/games/animals/RoundTopic";
 import { PAIRS, TOGETHER_TEXTS } from "@/games/together/pairs";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
 import { FILMS } from "@/games/elevator/film/films";
@@ -203,7 +205,9 @@ function animals(): VoiceGroup[] {
   const housed = ANIMALS.filter((a) => a.home);
   const residents = Object.keys(HOMES).flatMap((id) => ANIMALS.find((a) => a.home === id) ?? []);
   return [
+    { label: "Art der Runde", lines: once(KIND_ORDER.map((kind) => KIND_QUESTIONS[kind].de!)), note: "Einmal, wenn die Art der Runde wechselt (Z-24)." },
     { label: "Füttern: Hunger", lines: once(fed.map(texts.hungry)), built: "Satz mit dem Tier" },
+    { label: "Füttern: Frage", lines: once(fed.map(texts.whatEats)), built: "Satz mit dem Tier", note: "Gleich nach „… hat Hunger!“ (Z-24)." },
     { label: "Füttern: richtig", lines: once(fed.map((a) => texts.yummy(a, a.food!))), built: "Satz mit Tier und Futter" },
     { label: "Füttern: falsch", lines: once(fed.map(texts.yuck)), built: "Satz mit dem Tier" },
     { label: "Was gibt uns das Tier?: Frage", lines: once(GIVERS.map(GIFT_TEXTS.de.whatGives)), built: "Satz mit dem Tier" },

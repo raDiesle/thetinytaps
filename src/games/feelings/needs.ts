@@ -227,5 +227,8 @@ export const NEEDS_QUESTION: Localized = {
   ru: "Что тебе сейчас нужно?",
 };
 
+/** Every line „Was brauche ich?“ says, in all its languages. */
+export const NEEDS_SAID: Localized[] = [NEEDS_QUESTION, ...NEEDS.map((n) => n.answer), CALM_LINE, CALM_DONE];
+
 /** Every line „Was brauche ich?“ says in German, for the recordings list. */
-export const NEEDS_LINES: string[] = [NEEDS_QUESTION.de, ...NEEDS.map((n) => n.answer.de), CALM_LINE.de, CALM_DONE.de];
+export const NEEDS_LINES: string[] = NEEDS_SAID.map((line) => line.de);

@@ -27,6 +27,8 @@ export interface GrowPlayProps {
   round: GrowRound;
   /** What the round is about, for grown-ups: shown under the picture. */
   topic?: ReactNode;
+  /** The kind's question („Was wird aus mir?“), said before the round's own when the kind of round changes (Z-24). */
+  intro?: string;
   /** The right one was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
   /** Its becoming has been watched: the next round may come. */
@@ -39,7 +41,7 @@ export interface GrowPlayProps {
  * becomes it: the caterpillar spins itself in and a butterfly flies out, the egg cracks, the seed grows into a
  * sunflower, the tadpole grows legs and hops onto a lily pad as a frog. A wrong pick shows the small one it comes from.
  */
-export function GrowPlay({ settings, round, topic, onSolved, onNext }: GrowPlayProps) {
+export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: GrowPlayProps) {
   const language = useAppLanguage();
   const texts = pick(GROW_TEXTS, language.id);
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -77,8 +79,12 @@ export function GrowPlay({ settings, round, topic, onSolved, onNext }: GrowPlayP
   // Its ElevenLabs recording; a sentence not translated yet is said in German.
   const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
 
-  // The question comes with the round; the round is mounted anew for every small one.
-  useEffect(() => say(texts.whatBecomes(round.growth)), []);
+  // The kind's question when the kind changed and the round's question come with the round; the round is mounted anew
+  // for every small one.
+  useEffect(() => {
+    if (intro) say(intro);
+    say(texts.whatBecomes(round.growth), Boolean(intro));
+  }, []);
 
   const softTap = useCallback(
     (x?: number, y?: number) => {

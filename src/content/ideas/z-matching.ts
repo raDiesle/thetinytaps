@@ -122,6 +122,8 @@ export const matchingIdeas: IdeaArea = {
       emoji: "🗣️",
       title: "Was gehört zum Tier?: Die Stimme sagt die Frage jeder Runde",
       text: "Jede Runde beginnt mit ihrer Frage, gesprochen von der Stimme statt nur klein unter dem Bild: „Wo wohnt der Hase?“, „Was gibt uns die Kuh?“, „Was wird aus der Raupe?“. Diese Sätze gibt es schon, sie sind nur noch nicht aufgenommen. Beim Füttern fehlt die Frage selbst: Bisher sagt das Tier nur „Der Hase hat Hunger!“, neu dazu „Was isst der Hase gern?“ (37 Sätze). Und wenn die Art der Runde wechselt (Füttern, Was gibt uns das Tier?, Wo lebe ich?, Was wird aus mir?), sagt die Stimme einmal die Frage der Kategorie, wie sie unter dem Bild steht („Was esse ich?“). Die gibt es schon in allen sieben Sprachen. Kosten auf Deutsch: die vorhandenen Fragen ≈ 520 Credits, die neuen Fütter-Fragen ≈ 120, die vier Kategorien ≈ 5.",
+      partial:
+        "Eingebaut (7. November 2026): die Fütter-Frage „Was isst der Hase gern?“ für alle 55 Tiere gleich nach „… hat Hunger!“ (und nach einem falschen Futter), und die Frage der Art der Runde („Was esse ich?“, „Was produziere ich?“, „Wo lebe ich?“, „Was wird aus mir?“), wenn sie wechselt – noch nicht aufgenommen, bis dahin still. Die Fütter-Frage gibt es nur auf Deutsch.",
       why: "Die Arten der Runden wechseln sich ab, und ohne Stimme weiß ein Kind, das nicht liest, beim Wechsel nicht, ob es jetzt füttern, ein Zuhause finden oder das Große zum Kleinen suchen soll. Die gesprochene Frage sagt es ihm, ohne dass ein Großer vorlesen muss.",
       effort: "S",
     },

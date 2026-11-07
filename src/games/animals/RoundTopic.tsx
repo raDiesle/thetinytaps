@@ -7,8 +7,11 @@ import type { RoundKind } from "./levels";
  */
 export const KIND_SIGNS: Record<RoundKind, string> = { feed: "🍽️", gift: "🎁", home: "🏠", grow: "🌱" };
 
-/** The round's question, as the animal (or the small one) would ask it. */
-const KIND_QUESTIONS: Record<RoundKind, Localized> = {
+/**
+ * The round's question, as the animal (or the small one) would ask it: shown under the picture, and said once by the
+ * voice when the kind of round changes (Z-24, `AnimalsRounds`).
+ */
+export const KIND_QUESTIONS: Record<RoundKind, Localized> = {
   feed: { de: "Was esse ich?", ru: "Что я ем?", en: "What do I eat?", zh: "我吃什么？", hi: "मुझे क्या खाना पसंद है?", es: "¿Qué como?", ar: "ماذا آكل؟" },
   gift: {
     de: "Was produziere ich?",

@@ -167,6 +167,8 @@ export function englishTexts(german: AnimalTexts): AnimalTexts {
     food: (f) => (food(f) ? capital(food(f).name) : german.food(f)),
     home: (h) => (home(h) ? capital(home(h)!.name) : german.home(h)),
     hungry: (a) => (animal(a) ? `${capital(the(a))} is hungry!` : german.hungry(a)),
+    // German only so far (Z-24, November 2026): silent in this language until it is translated and recorded.
+    whatEats: german.whatEats,
     yummy: (a, f) => (animal(a) && food(f) ? `Mmm, yummy! ${capital(the(a))} likes ${food(f).likes}. Thank you!` : german.yummy(a, f)),
     yuck: (a) => (animal(a) ? `Yuck! ${capital(the(a))} doesn't like that.` : german.yuck(a)),
     whereLives: (a) => (animal(a) ? `Where does ${the(a)} live?` : german.whereLives(a)),
