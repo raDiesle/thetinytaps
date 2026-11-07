@@ -95,6 +95,8 @@ export interface Spoken<T = string> {
   text: T;
   /** Speech language, e.g. "ru-RU". */
   lang: string;
+  /** The same line in English, for a voice that has no recording of `text` (`say`'s `english`); none in German or English. */
+  english?: string;
 }
 
 /**
@@ -103,7 +105,8 @@ export interface Spoken<T = string> {
  */
 export function spokenIn<T>(texts: Localized<T>, language: TargetLanguage): Spoken<T> {
   const own = texts[language.id];
-  return own === undefined ? { text: texts.de, lang: targetLanguageFor("de").speechLang } : { text: own, lang: language.speechLang };
+  const english = language.id !== "en" && language.id !== "de" && typeof texts.en === "string" ? texts.en : undefined;
+  return own === undefined ? { text: texts.de, lang: targetLanguageFor("de").speechLang, english } : { text: own, lang: language.speechLang, english };
 }
 
 /** The script of each language not written in Latin letters: a sentence without it was not translated. */

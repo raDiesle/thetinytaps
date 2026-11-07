@@ -20,7 +20,8 @@ export function translationOf(german: string, id: TargetLanguageId): string | un
 export const titleIn = (german: string, id: TargetLanguageId) => translationOf(german, id) ?? german;
 
 /** What to speak for `german` in `language`: the text and the speech language that reads it. */
-export function spokenIn(german: string, language: TargetLanguage): { text: string; speechLang: string } {
+export function spokenIn(german: string, language: TargetLanguage): { text: string; speechLang: string; english?: string } {
   const text = translationOf(german, language.id);
-  return text === undefined ? { text: german, speechLang: GERMAN.speechLang } : { text, speechLang: language.speechLang };
+  const english = language.id === "en" ? undefined : translationOf(german, "en");
+  return text === undefined ? { text: german, speechLang: GERMAN.speechLang, english } : { text, speechLang: language.speechLang, english };
 }

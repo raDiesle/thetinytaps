@@ -123,7 +123,14 @@ export const STEP_TRANSLATIONS: Partial<Record<TargetLanguageId, Partial<Record<
 
 /** Title, hint or cue of `step` in `language` and the voice for it; the German one with the German voice where there is no translation. */
 export const stepText = (step: Step, key: keyof StepTexts, language: TargetLanguage): Spoken =>
-  spokenIn({ de: step[key], [language.id]: language.id === "de" ? step[key] : STEP_TRANSLATIONS[language.id]?.[step.id]?.[key] }, language);
+  spokenIn(
+    {
+      de: step[key],
+      en: STEP_TRANSLATIONS.en?.[step.id]?.[key],
+      [language.id]: language.id === "de" ? step[key] : STEP_TRANSLATIONS[language.id]?.[step.id]?.[key],
+    },
+    language,
+  );
 
 /** While the monsters arrive and when everything is clean: a big grin. */
 export const GRIN_VIEW = CLOSED_FRONT;

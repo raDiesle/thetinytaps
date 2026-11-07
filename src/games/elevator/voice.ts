@@ -11,6 +11,6 @@ const voice = recordedVoice(voiceFiles, { browser: true });
 
 /** Says a German sentence of the game in `language`, or in German where its phrasebook has no translation. */
 export function sayIn(german: string, language: TargetLanguage) {
-  const { text, speechLang } = spokenIn(german, language);
-  voice.say(text, language.id, { speechLang });
+  const { text, speechLang, english } = spokenIn(german, language);
+  voice.say(text, language.id, { speechLang, english });
 }

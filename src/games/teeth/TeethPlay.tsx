@@ -357,7 +357,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const count = brushed < 0 && -brushed <= COUNTDOWN * 1000 ? Math.ceil(-brushed / 1000) : null;
 
   /** Says a line from its recording: in the app language, or the German line where it has no translation. */
-  const say = useCallback(({ text }: Spoken, queue = false) => voice.say(text, language.id, { queue }), [language.id]);
+  const say = useCallback(({ text, english }: Spoken, queue = false) => voice.say(text, language.id, { queue, english }), [language.id]);
 
   useWakeLock(ending !== "rest");
 

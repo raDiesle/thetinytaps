@@ -503,7 +503,7 @@ function GoodNight() {
   const [{ leave }] = useCommonSettings();
   useEffect(() => {
     playLullaby();
-    const timer = setTimeout(() => goodNightVoice.say(GOOD_NIGHT[language.id] ?? GOOD_NIGHT.de, language.id), 1200);
+    const timer = setTimeout(() => goodNightVoice.say(GOOD_NIGHT[language.id] ?? GOOD_NIGHT.de, language.id, { english: GOOD_NIGHT.en }), 1200);
     return () => {
       clearTimeout(timer);
       hushVoice();

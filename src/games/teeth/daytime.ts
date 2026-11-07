@@ -47,7 +47,11 @@ export const DAYTIME_TRANSLATIONS: Partial<Record<TargetLanguageId, Record<Dayti
 /** One of the daytime's texts in `language` and the voice for it; the German one with the German voice where there is no translation. */
 export const daytimeText = (daytime: Daytime, key: keyof DaytimeTexts, language: TargetLanguage): Spoken =>
   spokenIn(
-    { de: DAYTIME[daytime][key], [language.id]: language.id === "de" ? DAYTIME[daytime][key] : DAYTIME_TRANSLATIONS[language.id]?.[daytime][key] },
+    {
+      de: DAYTIME[daytime][key],
+      en: DAYTIME_TRANSLATIONS.en?.[daytime][key],
+      [language.id]: language.id === "de" ? DAYTIME[daytime][key] : DAYTIME_TRANSLATIONS[language.id]?.[daytime][key],
+    },
     language,
   );
 

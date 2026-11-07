@@ -135,9 +135,13 @@ In a fresh worktree run `bun install` first.
   (`texts.test.ts` checks this). Inline texts stay in the code with all their languages: moving them into the language
   chunks at build time was tried (October 2026) and saved too little for what it cost (the app waiting for its
   language, a reload on every switch, a build step), so don't do it again.
-  A text without a translation shows and speaks in German, with the German voice – never German words with another
-  language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`), never a
-  fixed `de-DE`. When the meaning of a German line changes, delete its translations (they fall back to German) rather
+  A text without a translation shows in German; a browser voice speaks it with the German voice – never German words
+  with another language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`),
+  never a fixed `de-DE`. **A recording missing in the app language is replaced by the English one, else nothing plays,
+  never the German one** (user decision, November 2026: a child hearing Russian or Spanish can't follow German;
+  `recordingUrl` in `src/lib/voice.ts`, `voice.test.ts`): a line with several languages passes its English text as
+  `say(…, { english })` (`spokenIn` and the elevator's phrasebook do), and only the games told by their voice fall
+  back to the browser's voice after that. When the meaning of a German line changes, delete its translations (they fall back to German) rather
   than leaving wrong ones. For the child: present tense, informal (ты, tú, तुम, 你), and nothing that changes for boy or
   girl – Spanish without adjectives about the child, Hindi with requests or „let's“ instead of gendered verbs, Arabic
   with „let's“ (هيّا ن…) instead of an imperative. Grown-ups: вы, usted, आप, Arabic plural. Names the voice says
