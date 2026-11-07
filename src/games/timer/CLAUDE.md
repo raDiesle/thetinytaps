@@ -179,7 +179,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   a bigger layer.
 - **Only what runs and where it goes** (user feedback, November 2026): the hourglass shows the sand still to run and
   the heap below, nothing else – no film or grains on the glass the sand has left, no grain or disc over the stream at
-  the neck (both were taken out: they looked odd). A trace of what is over (H-64) is only drawn where it is plainly a
+  the neck, no white streaks for the glass's shine (all taken out: they looked odd or bad; Abwechseln's hourglass too). A trace of what is over (H-64) is only drawn where it is plainly a
   thing of its own (the dark rail, the wax puddle), never a pale copy of what was there.
 - **No `clip-path` round what is in view while the page turns**: a turning page is a picture of the app (view
   transition), and in it the clip-path round a moving layer dropped out – the hourglass's sand showed as a square

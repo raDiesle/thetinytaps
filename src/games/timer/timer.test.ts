@@ -148,6 +148,11 @@ describe("Timer", () => {
     const scenes = await Bun.file(new URL("./scenes.tsx", import.meta.url)).text();
     for (const gone of [".tm-sand-dust", ".tm-grain"]) expect(css).not.toContain(gone);
     for (const gone of ["tm-sand-dust", "tm-grain"]) expect(scenes).not.toContain(gone);
+    // No white streaks for the glass's shine either: they looked bad (user feedback, November 2026), on both hourglasses.
+    const swap = await Bun.file(new URL("./swap.tsx", import.meta.url)).text();
+    const frame = scenes.slice(scenes.indexOf("export const SandFrame"), scenes.indexOf("export function BulbSand"));
+    const swapGlass = swap.slice(swap.indexOf("export function SwapHourglass"), swap.indexOf("export const SWAP_TOYS"));
+    for (const glass of [frame, swapGlass]) expect(glass).not.toContain('stroke="#fff"');
     // A clip-path round a moving layer dropped out of a turning page's picture and showed the sand as a square.
     const sandRules = [...css.matchAll(/([^{}]*\.tm-(?:sand|bulb)[^{}]*)\{([^}]*)\}/g)];
     expect(sandRules.length).toBeGreaterThan(0);

@@ -371,12 +371,11 @@ export const SandBackdrop = memo(function SandBackdrop() {
   );
 });
 
-/** The glass's outline and shine and the wooden frame, in front of the sand. Drawn once. */
+/** The glass's outline and the wooden frame, in front of the sand. Drawn once. */
 export const SandFrame = memo(function SandFrame() {
   const left = GLASS.cx - GLASS.w / 2 - 50;
   const right = GLASS.cx + GLASS.w / 2 + 50;
-  const { cx, w, top, neck, bottom } = GLASS;
-  const bulb = neck - top;
+  const { top, neck, bottom } = GLASS;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
       <Draw w={STAGE_W} h={STAGE_H}>
@@ -384,22 +383,6 @@ export const SandFrame = memo(function SandFrame() {
           <path d={bulbPath(top, neck, false)} />
           <path d={bulbPath(neck, bottom, true)} />
         </g>
-        <path
-          d={`M${cx - 0.39 * w} ${top + 0.11 * bulb} Q${cx - 0.42 * w} ${top + 0.46 * bulb} ${cx - 0.26 * w} ${top + 0.76 * bulb}`}
-          stroke="#fff"
-          strokeWidth="12"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        <path
-          d={`M${cx - 0.26 * w} ${bottom - 0.76 * bulb} Q${cx - 0.42 * w} ${bottom - 0.46 * bulb} ${cx - 0.39 * w} ${bottom - 0.11 * bulb}`}
-          stroke="#fff"
-          strokeWidth="12"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
         {[left + 10, right - 30].map((x) => (
           <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
         ))}
