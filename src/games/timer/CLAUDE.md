@@ -65,7 +65,10 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
   last crumbs lie on the blanket.
 - „Rote Scheibe“ 🔴 (`disc.tsx`, H-47): the red disc Kitas know from the „Time Timer“, shrinking like a clock's hand goes
   round on a plain white face; the knob in the middle turns a petal each second.
-  A ladybug crawls round the face's rim about once a minute, like a second hand, and a dot comes outside the rim each
+  A ladybug crawls round the face's rim about once a minute, like a second hand – a real seven-spot one seen from above
+  (black head with short feelers, the black shield with its two white patches, shiny red wing cases parted by their
+  seam, seven spots), its two sets of three legs stepping in turn and its body swaying a little, each a small layer in
+  the box riding round (`.tm-bug`; user feedback, November 2026: a flat round bug only slid round) – and a dot comes outside the rim each
   time it is back at the top, clockwise from 12 o'clock with a plink (H-67, `ladybugLaps`: the rounds fit the time
   exactly; beyond 30 minutes a dot every second or third round, so they go round once at most, `MAX_DOTS`).
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): 24 slices on a wooden board, one lifted off towards its side at each
@@ -177,6 +180,13 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
   (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
   a bigger layer.
+- **A drawing never touches its svg's edge unless that svg lets it out** (user feedback, November 2026: the knob's flower
+  in the Rote Scheibe's middle lost the tips of its top and bottom petals): an svg cuts off what lies past its
+  `viewBox`, half a stroke's width too, wherever it sits (only `.tm-layer > svg` is `overflow: visible`). A small
+  drawing inside a `div` of its own gets `overflow: visible` on its svg or keeps its strokes inside the `viewBox`, and
+  something that turns is looked at magnified in the preview at several angles.
+- **A creature that goes somewhere walks** (user feedback, November 2026): legs that step in turn and a body that
+  sways a little, as small layers moving by `transform`, never a stiff figure sliding along (the ladybug).
 - **Only what runs and where it goes** (user feedback, November 2026): the hourglass shows the sand still to run and
   the heap below, nothing else – no film or grains on the glass the sand has left, no grain or disc over the stream at
   the neck (both were taken out: they looked odd). A trace of what is over (H-64) is only drawn where it is plainly a

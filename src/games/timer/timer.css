@@ -1130,6 +1130,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 @keyframes tm-knob {
@@ -1152,6 +1153,62 @@
 @keyframes tm-crawl {
   to {
     transform: rotate(1turn);
+  }
+}
+
+/* In its small box at the top the ladybug faces the way it crawls; its two sets of three legs step in turn, pushing
+   back and swinging forward, and its body sways a little with them – small layers moved by `transform` only. */
+.tm-bug {
+  position: absolute;
+  transform: rotate(90deg);
+}
+
+.tm-bug-part {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-bug-part svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-bug-legs {
+  animation: tm-bug-step var(--tm-step) ease-in-out infinite;
+}
+
+.tm-bug-legs-b {
+  animation-delay: calc(var(--tm-step) / -2);
+}
+
+.tm-bug-body {
+  animation: tm-bug-sway var(--tm-step) ease-in-out infinite;
+}
+
+.tm-done .tm-bug-legs,
+.tm-done .tm-bug-body {
+  animation: none;
+}
+
+@keyframes tm-bug-step {
+  0%,
+  100% {
+    transform: translateY(-4%) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(4%) rotate(3deg);
+  }
+}
+
+@keyframes tm-bug-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
   }
 }
 
