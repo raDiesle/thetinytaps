@@ -26,7 +26,13 @@ export type HatId =
   | "space"
   | "swim"
   | "headband"
-  | "tiara";
+  | "tiara"
+  | "mitre"
+  | "zipfel"
+  | "sailor"
+  | "biker"
+  | "shako"
+  | "aviator";
 
 /** What lies on a helper's coat. */
 export type DetailId =
@@ -43,7 +49,9 @@ export type DetailId =
   | "dots"
   | "vest"
   | "cape"
-  | "scarf";
+  | "scarf"
+  | "bowtie"
+  | "checks";
 
 /** A helper's clothes: its coat's colour, a hat and a detail, each with a colour of its own where it has one. */
 export interface Outfit {
@@ -227,6 +235,63 @@ function Hat({ hat, color }: { hat: HatId; color?: string }) {
       );
     case "headband":
       return <path d="M16 36 Q50 24 84 36 L84 44 Q50 32 16 44 Z" fill={color ?? "#f03e3e"} {...line} strokeWidth={2.4} />;
+    case "mitre":
+      // Saint Nicholas's tall hat, with its gold bands.
+      return (
+        <>
+          <path d="M26 34 L26 4 Q30 -24 50 -38 Q70 -24 74 4 L74 34 Q50 28 26 34 Z" fill={color ?? "#e03131"} {...line} />
+          <path d="M50 -36 V30 M27 20 Q50 14 73 20" stroke="#ffd43b" strokeWidth="6" fill="none" />
+          <path d="M26 4 L26 34 Q50 28 74 34 L74 4" stroke={INK} strokeWidth="3" fill="none" />
+        </>
+      );
+    case "zipfel":
+      // A dwarf's long pointed cap, its tip flopping over to the side with a bobble.
+      return (
+        <>
+          <path d="M18 34 Q20 2 54 -16 Q80 -30 100 -8 Q88 -8 80 2 Q84 18 82 34 Q50 26 18 34 Z" fill={color ?? "#e03131"} {...line} />
+          <path d="M16 30 Q50 22 84 30 L84 40 Q50 32 16 40 Z" fill="#f1f3f5" {...line} strokeWidth={2.4} />
+          <circle cx="100" cy="-8" r="7" fill="#f1f3f5" {...line} strokeWidth={2.4} />
+        </>
+      );
+    case "sailor":
+      // A sailor's cap: a flat white top over a dark band, its two ribbons hanging behind.
+      return (
+        <>
+          <path d="M76 32 L90 50 L84 54 L72 36 Z M80 32 L96 44 L92 50 L76 36 Z" fill={color ?? "#1d3557"} {...line} strokeWidth={2} />
+          <path d="M22 22 L78 22 L80 36 Q50 30 20 36 Z" fill={color ?? "#1d3557"} {...line} />
+          <path d="M12 20 Q50 0 88 20 Q88 28 50 28 Q12 28 12 20 Z" fill="#f8f9fa" {...line} />
+        </>
+      );
+    case "biker":
+      // A round motorbike helmet over the head and ears, the visor pushed up.
+      return (
+        <>
+          <path d="M8 62 C6 18 26 -2 50 -2 C74 -2 94 18 92 62 L80 62 C80 44 70 34 50 34 C30 34 20 44 20 62 Z" fill={color ?? "#e03131"} {...line} />
+          <path d="M18 36 Q50 20 82 36 L80 44 Q50 30 20 44 Z" fill="#495057" {...line} strokeWidth={2.4} />
+          <path d="M30 8 Q44 2 58 4" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+        </>
+      );
+    case "shako":
+      // A marching band's tall hat with a plume.
+      return (
+        <>
+          <path d="M28 34 L30 -14 L70 -14 L72 34 Z" fill={color ?? "#e03131"} {...line} />
+          <path d="M29 -2 H71 M29 6 H71" stroke="#ffd43b" strokeWidth="4" />
+          <path d="M24 34 Q50 42 76 34 L72 30 Q50 36 28 30 Z" fill="#212529" {...line} strokeWidth={2.4} />
+          <path d="M50 -14 Q38 -34 50 -44 Q62 -34 50 -14 Z" fill="#f8f9fa" {...line} strokeWidth={2.4} />
+        </>
+      );
+    case "aviator":
+      // An old flyer's leather cap with ear flaps and goggles on the forehead.
+      return (
+        <>
+          <path d="M16 36 C16 10 32 4 50 4 C68 4 84 10 84 36 Z" fill={color ?? "#a0663a"} {...line} />
+          <path d="M16 30 Q12 50 20 60 L30 56 Q26 44 28 32 Z M84 30 Q88 50 80 60 L70 56 Q74 44 72 32 Z" fill={color ?? "#a0663a"} {...line} />
+          <path d="M18 26 Q50 16 82 26" stroke="#5c3d2e" strokeWidth="5" fill="none" />
+          <circle cx="38" cy="22" r="8" fill="#a5d8ff" {...line} strokeWidth={2.4} />
+          <circle cx="62" cy="22" r="8" fill="#a5d8ff" {...line} strokeWidth={2.4} />
+        </>
+      );
   }
 }
 
@@ -313,6 +378,23 @@ function Detail({ detail, color }: { detail: DetailId; color?: string }) {
           <path d="M118 166 L128 204 Q121 209 113 206 L108 172 Z" fill={color ?? "#4dabf7"} />
           <path d="M62 150 Q100 174 138 150 L134 168 Q100 190 66 168 Z" fill={color ?? "#4dabf7"} />
         </g>
+      );
+    case "bowtie":
+      return (
+        <g fill={color ?? "#e03131"} {...line} strokeWidth={2}>
+          <path d="M82 144 L100 152 L82 162 Z M118 144 L100 152 L118 162 Z" />
+          <circle cx="100" cy="152" r="4.5" />
+        </g>
+      );
+    case "checks":
+      // A checked shirt, as a woodcutter wears it: dark bands across and down the coat.
+      return (
+        <path
+          d="M40 166 H160 M40 202 H160 M40 238 H160 M40 274 H160 M64 140 V290 M100 140 V290 M136 140 V290"
+          stroke={color ?? "#212529"}
+          strokeWidth="9"
+          opacity="0.4"
+        />
       );
     case "cape":
       // Drawn behind the body instead (`Helper`).

@@ -280,7 +280,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/zusammen/",
-    note: "SVG. Die fünf Helfer sind Fuchs- und Bär-Große in ihrer Rolle, beim Arzt, beim Friseur und beim Postboten ist ein Fuchs- oder Bärenkind dabei, und hinter der Tür warten ein Bär und sein Kind.",
+    note: "SVG. Alle Helfer (rund 120, von der Feuerwehr bis zum Zwerg) sind Fuchs- und Bär-Große in ihrer Rolle und Kleidung, abwechselnd Fuchs und Bär; beim Arzt, beim Friseur und beim Postboten ist ein Fuchs- oder Bärenkind dabei, und hinter der Tür warten ein Bär und sein Kind.",
     tasks: [{ label: "Helfer als Fuchs und Bär, Kinder als Kunden", work: "drawing", effort: "M", state: "done" }],
   },
   {

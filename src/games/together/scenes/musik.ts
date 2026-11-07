@@ -1,0 +1,123 @@
+import type { SceneSpec } from "../scene";
+import { recorder } from "../tools";
+
+// The helpers of the topic „Musik & Bühne“ (topics.ts), written as data (see scene.tsx). Each is named by its own
+// instrument (der Gitarrist, die Trompeterin), never just „Musiker“, whom every instrument would fit. They hold it and
+// play, each in a place of its own (a stage, a castle's fanfare, a harbour, a meadow).
+
+export const SCENES: SceneSpec[] = [
+  {
+    id: "gitarrist",
+    topic: "musik",
+    name: "Gitarrist",
+    the: "der Gitarrist",
+    toThe: "der Gitarrist",
+    partner: { name: "Gitarre", the: "die Gitarre", acc: "die Gitarre", emoji: "🎸" },
+    helper: { fur: "fox", outfit: { coat: "#5f3dc4", detail: "scarf", detailColor: "#ffd43b" } },
+    backdrop: "buehne",
+    act: "hold",
+    sounds: ["plink", "melody"],
+  },
+  {
+    id: "saengerin",
+    topic: "musik",
+    name: "Sängerin",
+    the: "die Sängerin",
+    toThe: "die Sängerin",
+    partner: { name: "Mikrofon", the: "das Mikrofon", acc: "das Mikrofon", emoji: "🎤" },
+    helper: { fur: "bear", outfit: { coat: "#e64980", detail: "collar", detailColor: "#ffd43b" }, lashes: true },
+    backdrop: "buehne",
+    act: "hold",
+    sounds: ["trill", "melody"],
+    // A guitarist may sing into it too.
+    alsoFits: ["gitarrist"],
+  },
+  {
+    id: "trommler",
+    topic: "musik",
+    name: "Trommler",
+    the: "der Trommler",
+    toThe: "der Trommler",
+    partner: { name: "Trommel", the: "die Trommel", acc: "die Trommel", emoji: "🥁" },
+    helper: { fur: "bear", outfit: { coat: "#1c7ed6", hat: "shako", detail: "buttons" } },
+    backdrop: "zirkus",
+    act: "hold",
+    sounds: ["drum", "drum", "drum"],
+  },
+  {
+    id: "trompeterin",
+    topic: "musik",
+    name: "Trompeterin",
+    the: "die Trompeterin",
+    toThe: "die Trompeterin",
+    partner: { name: "Trompete", the: "die Trompete", acc: "die Trompete", emoji: "🎺" },
+    helper: { fur: "fox", outfit: { coat: "#e03131", hat: "beret", hatColor: "#1d3557", detail: "buttons" }, lashes: true },
+    // The fanfare at the castle.
+    backdrop: "schloss",
+    act: "hold",
+    sounds: ["tusch"],
+  },
+  {
+    id: "geiger",
+    topic: "musik",
+    name: "Geiger",
+    the: "der Geiger",
+    toThe: "der Geiger",
+    partner: { name: "Geige", the: "die Geige", acc: "die Geige", emoji: "🎻" },
+    helper: { fur: "bear", outfit: { coat: "#343a40", detail: "bowtie" } },
+    backdrop: "wohnzimmer",
+    act: "hold",
+    sounds: ["melody"],
+  },
+  {
+    id: "pianistin",
+    topic: "musik",
+    name: "Pianistin",
+    the: "die Pianistin",
+    toThe: "die Pianistin",
+    partner: { name: "Klavier", the: "das Klavier", acc: "das Klavier", emoji: "🎹" },
+    helper: { fur: "fox", outfit: { coat: "#9775fa", detail: "collar", detailColor: "#f8f9fa" }, lashes: true },
+    backdrop: "party",
+    act: "hold",
+    sounds: ["plink", "melody"],
+  },
+  {
+    id: "akkordeonspieler",
+    topic: "musik",
+    name: "Akkordeonspieler",
+    the: "der Akkordeonspieler",
+    toThe: "der Akkordeonspieler",
+    partner: { name: "Akkordeon", the: "das Akkordeon", acc: "das Akkordeon", emoji: "🪗" },
+    helper: { fur: "bear", outfit: { coat: "#f8f9fa", hat: "beret", hatColor: "#343a40", detail: "stripes", detailColor: "#1d3557" } },
+    // Playing at the harbour.
+    backdrop: "hafen",
+    act: "hold",
+    sounds: ["melody"],
+  },
+  {
+    id: "saxofonistin",
+    topic: "musik",
+    name: "Saxofonistin",
+    the: "die Saxofonistin",
+    toThe: "die Saxofonistin",
+    partner: { name: "Saxofon", the: "das Saxofon", acc: "das Saxofon", emoji: "🎷" },
+    helper: { fur: "fox", outfit: { coat: "#343a40", detail: "scarf", detailColor: "#fab005" }, lashes: true },
+    // Playing in the street in the evening.
+    backdrop: "nacht",
+    act: "hold",
+    sounds: ["melody"],
+  },
+  {
+    id: "floetenspieler",
+    topic: "musik",
+    name: "Flötenspieler",
+    the: "der Flötenspieler",
+    toThe: "der Flötenspieler",
+    partner: { name: "Blockflöte", the: "die Blockflöte", acc: "die Blockflöte", draw: recorder },
+    helper: { fur: "bear", outfit: { coat: "#69db7c", hat: "straw", detail: "collar" } },
+    // Playing in the meadow.
+    backdrop: "wiese",
+    act: "hold",
+    sounds: ["trill", "melody"],
+  },
+];
