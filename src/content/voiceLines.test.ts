@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES } from "./games";
+import { RECORDED_GAMES } from "./recordedLines";
 import { INLINE_LINES, voiceLines } from "./voiceLines";
 
 const GAMES = voiceLines();
@@ -16,6 +17,15 @@ const sources = (dir: string): string[] =>
   });
 
 describe("lines still to record", () => {
+  // Lebendige Bilder answers with its sounds and narrates nothing; its lines are parked until the user orders exactly
+  // their recording (user decision, November 2026), so no recording run may pick them up by itself.
+  test("a parked game is never recorded unasked", () => {
+    expect(GAMES.filter((g) => g.parked).map((g) => g.href)).toContain("/bilder/");
+    const scenes = join("src", "games", "scenes");
+    expect(RECORDED_GAMES.filter((g) => g.folder.startsWith(scenes)).map((g) => g.name)).toEqual([]);
+    expect(existsSync(join(scenes, "stimme"))).toBe(false);
+  });
+
   test("every game on the list exists, and every group has lines", () => {
     for (const game of GAMES) {
       expect({ href: game.href, known: game.href === "" || HREFS.has(game.href) }).toEqual({ href: game.href, known: true });

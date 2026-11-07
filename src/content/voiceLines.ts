@@ -82,6 +82,12 @@ export interface VoiceGame {
   /** The game's route, as in `CATEGORIES` (src/content/games.ts). */
   href: string;
   groups: VoiceGroup[];
+  /**
+   * Set when the game's lines are parked (user decision): why, for the management page. A parked game is never
+   * recorded – not in RECORDED_GAMES, so `bun run voice make` passes it by – until the user orders exactly its
+   * recording, and its lines count neither as open nor in the credits still needed.
+   */
+  parked?: string;
 }
 
 /** A line copied from a component, where it is written inline: voiceLines.test.ts checks it is still there. */
@@ -401,7 +407,12 @@ export const stillToRecord = (games: VoiceGame[]): VoiceGame[] =>
  */
 export function voiceLines(): VoiceGame[] {
   return [
-    { href: "/bilder/", groups: scenes() },
+    {
+      href: "/bilder/",
+      groups: scenes(),
+      parked:
+        "Geparkt (Entscheidung November 2026): Die Bilder antworten mit ihren Geräuschen, die gut passen, und erzählen nichts. Aufgenommen würden höchstens Sätze, die Menschen im Bild selbst sagen („Hallo, hier ist der Kinderarzt!“) – und auch die nur, wenn du es ausdrücklich für Lebendige Bilder sagst.",
+    },
     { href: "/buchstaben/", groups: letters() },
     { href: "/schatten/", groups: shadows() },
     { href: "/tiere/", groups: animals() },
