@@ -84,7 +84,7 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
 
   return (
     <>
-      <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} topic={<RoundTopic kind={round.kind} />} />
+      <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} topic={<RoundTopic pair={round.pair} />} />
       <DevTag code={pairCode(round.pair)} id={round.pair.id} />
     </>
   );

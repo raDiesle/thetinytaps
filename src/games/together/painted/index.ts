@@ -57,6 +57,11 @@ export interface PaintedPair {
   the: string;
   /** After „gehört“, for „Was gehört zur Saftpresse?“ (things of the day; for a helper the same as `the`). */
   toThe: string;
+  /**
+   * What the one above wants to do, said as the round's question (Z-25): „Die Feuerwehr will das Feuer löschen.“,
+   * „Die Blume hat Durst.“ It never names the partner, so the child thinks what it needs; exactly one choice fits it.
+   */
+  wish: string;
   partner: PaintedPartner;
   /**
    * Where the partner has no fitting emoji: what to paint alone for its plate, in English („a wooden pizza peel, long

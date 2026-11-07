@@ -10,8 +10,12 @@ One flowing game, like Was gehört zum Tier?: its card plays at once (`startMode
 2. Helfer und ihr Werkzeug (Z-13): a fox or bear grown-up stands in its role and place – the fire fox by the burning
    shed, the bear hairdresser by mirror and chair, the fox postman by the letter box – and the child taps the tool.
 
-Under the picture a quiet line tells grown-ups what the round is about (`RoundTopic.tsx`: „Was gehört zu mir?“, „Was
-brauche ich?“); each choice has its name small below it. The right one flies up into the picture and the two set to
+Each round begins with its **wish** (Z-25, `wish` on every pair): the voice says what the one above wants to do or what
+is the matter, never the thing it needs – „Die Feuerwehr will das Feuer löschen.“, „Die Blume hat Durst.“, „Die Tür ist
+zu. Wir wollen rein.“ – so the child thinks what it is for. In German it is the question (`TogetherTexts.question`), said
+when the round comes, after a wrong pick and on a tap on the picture, and it stands as the quiet line under the picture
+for grown-ups (`RoundTopic.tsx`); the other languages still say their translated „What goes with …?“ and show the kind's
+„What goes with me?“ / „What do I need?“ until the wishes are translated. Each choice has its name small below it. The right one flies up into the picture and the two set to
 work (`.working`, `WORK_MS`). A wrong pick stays still on its plate, and the one it belongs to peeks up over its plate
 for a moment (`.tg-owner`) – never shown as wrong.
 
@@ -152,6 +156,20 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   ones were removed), only the thing and the helper hop.
 - Nothing to read in the picture; names only below the choices (for grown-ups) and as `aria-label`. No stars or count
   of rounds.
+- **A wish never names its partner** (Z-25, the user's words: what the person wants to do, „ohne den Gegenstand zu
+  nennen“): not the word, not a word holding it („Kamin“ for the Kaminbesen, „Pizza“ for the Pizzaschieber, „Feuer“
+  for the Feuerlöscher), and not the one above's name where that holds it – say „Der Bär will …“ for the Geiger, the
+  Kranführer, the Surfer, or name the person by what it does instead („Der Verkäufer“ for the Kassierer).
+  `content.test.ts` (`namesPartner`) catches the word and its stem; read the sentence for the meaning too. It says
+  the aim, not the tool („will das Loch in der Jacke zunähen“, not „braucht etwas zum Nähen“), in short present-tense
+  German a child understands, the helpers keeping their gender.
+- **Exactly one choice fits the wish**: ask which partners of the other topics (the wrong choices come from there) would
+  also do what it says, and narrow the sentence („mit vielen Leuten weit weg fliegen“ for the plane, not the rocket or
+  the balloon), or name each other in `alsoFits` where the partner really fits both (a horse could pull Father
+  Christmas's sleigh, so `weihnachtsmann` and `reiterin`). Never name another pair's partner in a wish either
+  („Schlitten“ in Father Christmas's would point at the Rodlerin's).
+- A new pair comes with its wish in the same commit (`content.test.ts` wants one on every pair, also painted pairs not
+  made yet), German only and unrecorded until the user asks.
 
 ## Languages
 
@@ -159,7 +177,7 @@ The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arab
 texts (name, blurb, ⚙️, the topic line) are inline `t({ de, … })`; the sentences are `TOGETHER_TEXTS` (`pick(…, language.id)`),
 German built from the pairs' articles (`GERMAN_SAYS`: „gehört“, „gehören“ for a `plural` partner, „braucht“), every
 other language written out per pair in `content.<lang>.ts` (a `TogetherTranslation`: name, partner, question, right,
-belongs) and listed in `src/content/texts/texts-<lang>.ts`, never imported from game code. A pair without its sentences
+belongs – its question is still the old „What goes with …?“, since the German one became the wish) and listed in `src/content/texts/texts-<lang>.ts`, never imported from game code. A pair without its sentences
 in a language is said wholly in German, and its name under the choice shows in German. Things "go with" each other,
 helpers "need" their tools; where a verb would follow someone's gender, the sentence is built so it follows the tool or
 no one (Hindi „… के लिए … चाहिए“, Russian „нужен / нужна / нужны“), and the helpers keep the German ones' gender

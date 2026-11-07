@@ -9,6 +9,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Feuerwehrfrau",
     the: "die Feuerwehrfrau",
     toThe: "die Feuerwehrfrau",
+    wish: "Das Kätzchen sitzt oben im Baum fest. Die Feuerwehrfrau will es holen.",
     partner: { name: "Feuerwehrauto", the: "das Feuerwehrauto", acc: "das Feuerwehrauto", emoji: "🚒" },
     cast: "bear",
     before:
@@ -25,6 +26,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Rettungsschwimmerin",
     the: "die Rettungsschwimmerin",
     toThe: "die Rettungsschwimmerin",
+    wish: "Die Rettungsschwimmerin will dem Kind im Wasser etwas zuwerfen.",
     partner: { name: "Rettungsring", the: "der Rettungsring", acc: "den Rettungsring" },
     part: "a red-and-white life ring with a short coiled rope",
     cast: "both",
@@ -42,6 +44,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Polizist",
     the: "der Polizist",
     toThe: "der Polizist",
+    wish: "Der Polizist will den Autos zeigen, wann sie fahren dürfen.",
     partner: { name: "Trillerpfeife", the: "die Trillerpfeife", acc: "die Trillerpfeife" },
     part: "a shiny silver whistle on a short red cord",
     cast: "bear",
@@ -59,6 +62,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Sanitäter",
     the: "der Sanitäter",
     toThe: "der Sanitäter",
+    wish: "Der Sanitäter will das Kind schnell ins Krankenhaus fahren.",
     partner: { name: "Krankenwagen", the: "der Krankenwagen", acc: "den Krankenwagen", emoji: "🚑" },
     cast: "both",
     before:
@@ -75,6 +79,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Hubschrauberpilotin",
     the: "die Hubschrauberpilotin",
     toThe: "die Hubschrauberpilotin",
+    wish: "Das Lamm hat sich wehgetan. Die Pilotin will es schnell ins Tal fliegen.",
     partner: { name: "Hubschrauber", the: "der Hubschrauber", acc: "den Hubschrauber", emoji: "🚁" },
     cast: "bear",
     before:
@@ -91,6 +96,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Feuerwehrmann",
     the: "der Feuerwehrmann",
     toThe: "der Feuerwehrmann",
+    wish: "Der Grill brennt! Der Feuerwehrmann will die Flammen ausmachen.",
     partner: { name: "Feuerlöscher", the: "der Feuerlöscher", acc: "den Feuerlöscher", emoji: "🧯" },
     cast: "fox",
     before:
@@ -107,6 +113,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Polizistin",
     the: "die Polizistin",
     toThe: "die Polizistin",
+    wish: "Die Polizistin sucht den Teddy. Eine gute Nase soll ihr helfen.",
     partner: { name: "Polizeihund", the: "der Polizeihund", acc: "den Polizeihund" },
     part: "a brown-and-black shepherd dog in a plain dark-blue harness with no letters, sitting upright, ears pricked",
     cast: "both",

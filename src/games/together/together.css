@@ -105,9 +105,11 @@
 }
 
 /* What the round is about, for grown-ups (RoundTopic): plain small text centred under the picture, quiet – no sign, no
-   bubble, no frame (user feedback, November 2026). Taps go through it to the game. */
+   bubble, no frame (user feedback, November 2026). Taps go through it to the game. In German it is the pair's wish, a
+   sentence or two, so it may break into balanced lines within the picture's width. */
 .tg-topic {
   flex: none;
+  max-width: 100%;
   margin: 0;
   padding-top: 0.5em;
   color: var(--ink);
@@ -115,7 +117,7 @@
   font-weight: 700;
   line-height: 1.25;
   text-align: center;
-  white-space: nowrap;
+  text-wrap: balance;
   opacity: 0.7;
   pointer-events: none;
 }

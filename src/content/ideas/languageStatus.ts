@@ -323,6 +323,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Übersetzt am 5. November 2026: die neun ersten Paare (Zahnbürste bis Friseurin) mit Namen und Sätzen (content.<Sprache>.ts), die Fragen unter dem Bild und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs auf Deutsch (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
       },
       {
+        label: "🗣️ Was jemand vorhat (Z-25): ein Satz je Paar statt der Frage",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Seit 7. November 2026 sagt die Stimme auf Deutsch, was jemand vorhat, ohne das Gegenstück zu nennen („Die Blume hat Durst.“, „Die Feuerwehr will das Feuer löschen.“), und er steht klein unter dem Bild – 190 Sätze, für jedes Paar einer, in pairs.tsx und painted/. Nur auf Deutsch und noch nicht aufgenommen (🎙️ Stimmen), bis dahin bleibt die Frage stumm. Die anderen Sprachen sagen weiter ihre übersetzte Frage („What goes with the toothbrush?“) und zeigen „Was gehört zu mir?“ / „Was brauche ich?“, bis die Sätze übersetzt werden.",
+      },
+      {
         label: "🎨 Die gemalten Paare und Helfer (painted/)",
         recorded: true,
         languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },

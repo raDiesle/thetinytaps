@@ -11,6 +11,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Fußballerin",
     the: "die Fußballerin",
     toThe: "die Fußballerin",
+    wish: "Die Füchsin will ein Tor schießen.",
     partner: { name: "Fußball", the: "der Fußball", acc: "den Fußball", emoji: "⚽" },
     cast: "fox",
     before:
@@ -27,6 +28,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Basketballspieler",
     the: "der Basketballspieler",
     toThe: "der Basketballspieler",
+    wish: "Der Bär will in den Korb treffen.",
     partner: { name: "Basketball", the: "der Basketball", acc: "den Basketball", emoji: "🏀" },
     cast: "bear",
     before:
@@ -42,6 +44,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Tennisspielerin",
     the: "die Tennisspielerin",
     toThe: "die Tennisspielerin",
+    wish: "Die Tennisspielerin will aufschlagen.",
     partner: { name: "Tennisball", the: "der Tennisball", acc: "den Tennisball", emoji: "🎾" },
     cast: "bear",
     before:
@@ -58,6 +61,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Federballspieler",
     the: "der Federballspieler",
     toThe: "der Federballspieler",
+    wish: "Der Fuchs will über das hohe Netz spielen.",
     partner: { name: "Federball", the: "der Federball", acc: "den Federball" },
     part: "a white shuttlecock with a feathered skirt and a round cork tip",
     cast: "both",
@@ -74,6 +78,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Schwimmer",
     the: "der Schwimmer",
     toThe: "der Schwimmer",
+    wish: "Der Fuchs will unter Wasser die Augen aufmachen.",
     partner: { name: "Schwimmbrille", the: "die Schwimmbrille", acc: "die Schwimmbrille", emoji: "🥽" },
     cast: "fox",
     before:
@@ -91,6 +96,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Skifahrerin",
     the: "die Skifahrerin",
     toThe: "die Skifahrerin",
+    wish: "Die Füchsin will den verschneiten Berg hinuntersausen.",
     partner: { name: "Skier", the: "die Skier", acc: "die Skier", plural: true },
     part: "a pair of long red skis",
     cast: "fox",
@@ -108,6 +114,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Eisläufer",
     the: "der Eisläufer",
     toThe: "der Eisläufer",
+    wish: "Der Eisläufer will über das Eis gleiten.",
     partner: { name: "Schlittschuhe", the: "die Schlittschuhe", acc: "die Schlittschuhe", plural: true, emoji: "⛸️" },
     cast: "bear",
     before:
@@ -124,6 +131,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Rodlerin",
     the: "die Rodlerin",
     toThe: "die Rodlerin",
+    wish: "Die Rodlerin will mit dem Kind den Hügel hinunterrutschen.",
     partner: { name: "Schlitten", the: "der Schlitten", acc: "den Schlitten" },
     part: "a wooden sledge with curved runners",
     cast: "bear",
@@ -140,6 +148,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Segler",
     the: "der Segler",
     toThe: "der Segler",
+    wish: "Der Fuchs will mit dem Wind über das Wasser fahren.",
     partner: { name: "Segelboot", the: "das Segelboot", acc: "das Segelboot", emoji: "⛵" },
     cast: "fox",
     before:
@@ -157,6 +166,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Rennfahrerin",
     the: "die Rennfahrerin",
     toThe: "die Rennfahrerin",
+    wish: "Die Rennfahrerin will ganz schnell im Kreis fahren.",
     partner: { name: "Rennauto", the: "das Rennauto", acc: "das Rennauto", emoji: "🏎️" },
     cast: "fox",
     before:
@@ -173,6 +183,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Skater",
     the: "der Skater",
     toThe: "der Skater",
+    wish: "Der Bär will die Rampe hinunterrollen.",
     partner: { name: "Skateboard", the: "das Skateboard", acc: "das Skateboard" },
     part: "a skateboard with a wooden deck and orange wheels",
     cast: "bear",
@@ -188,6 +199,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Ballerina",
     the: "die Ballerina",
     toThe: "die Ballerina",
+    wish: "Die Ballerina will auf den Zehenspitzen tanzen.",
     partner: { name: "Ballettschuhe", the: "die Ballettschuhe", acc: "die Ballettschuhe", plural: true, emoji: "🩰" },
     cast: "fox",
     before:
@@ -204,6 +216,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Angler",
     the: "der Angler",
     toThe: "der Angler",
+    wish: "Der Bär will einen Fisch fangen.",
     partner: { name: "Angel", the: "die Angel", acc: "die Angel", emoji: "🎣" },
     cast: "bear",
     before:
@@ -218,6 +231,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Eishockeyspieler",
     the: "der Eishockeyspieler",
     toThe: "der Eishockeyspieler",
+    wish: "Der Eishockeyspieler will den Puck ins Tor schießen.",
     partner: { name: "Eishockeyschläger", the: "der Eishockeyschläger", acc: "den Eishockeyschläger", emoji: "🏒" },
     cast: "bear",
     before:
@@ -233,6 +247,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Radfahrerin",
     the: "die Radfahrerin",
     toThe: "die Radfahrerin",
+    wish: "Die Bärin will auf zwei Rädern davonfahren.",
     partner: { name: "Fahrrad", the: "das Fahrrad", acc: "das Fahrrad", emoji: "🚲" },
     cast: "bear",
     before:
@@ -248,6 +263,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Kletterin",
     the: "die Kletterin",
     toThe: "die Kletterin",
+    wish: "Die Kletterin will sicher die Wand hinaufklettern.",
     partner: { name: "Seil", the: "das Seil", acc: "das Seil" },
     part: "a coil of red climbing rope",
     cast: "bear",
@@ -267,6 +283,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Reiterin",
     the: "die Reiterin",
     toThe: "die Reiterin",
+    wish: "Die Reiterin will über das Hindernis springen.",
     partner: { name: "Pferd", the: "das Pferd", acc: "das Pferd" },
     part: "a brown horse with a saddle and bridle, standing",
     cast: "bear",
@@ -274,8 +291,9 @@ export const PAINTED: PaintedPair[] = [
       "A paddock with a white wooden fence, a low jump of red-and-white poles in its middle and a red stable behind. In front of the jump stands a grown-up bear woman with eyelashes in a green jacket, white trousers, tall black boots and a black riding helmet, her paws empty, looking at the jump, brows raised, mouth a small o.",
     after: "She now rides a brown horse with a saddle and bridle, which leaps over the jump; she smiles happily.",
     sounds: ["neigh", "hop"],
-    // A knight rides a horse, a farmer may have one, and it could carry the princess to the castle.
-    alsoFits: ["ritter", "baeuerin", "prinzessin"],
+    // A knight rides a horse, a farmer may have one, it could carry the princess to the castle, and it could pull
+    // Father Christmas's sleigh (his wish only says something must pull it).
+    alsoFits: ["ritter", "baeuerin", "prinzessin", "weihnachtsmann"],
     made: true,
   },
   {
@@ -284,6 +302,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Schwimmlehrer",
     the: "der Schwimmlehrer",
     toThe: "der Schwimmlehrer",
+    wish: "Das Fuchskind will ins tiefe Wasser und soll oben bleiben.",
     partner: { name: "Schwimmflügel", the: "die Schwimmflügel", acc: "die Schwimmflügel", plural: true },
     part: "a pair of orange inflatable armbands",
     cast: "both",
@@ -302,6 +321,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Gewichtheberin",
     the: "die Gewichtheberin",
     toThe: "die Gewichtheberin",
+    wish: "Die Gewichtheberin will etwas ganz Schweres hochheben.",
     partner: { name: "Hantel", the: "die Hantel", acc: "die Hantel" },
     part: "a black barbell with big round weights at both ends",
     cast: "fox",
@@ -317,6 +337,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Surfer",
     the: "der Surfer",
     toThe: "der Surfer",
+    wish: "Der Bär will auf der großen Welle reiten.",
     partner: { name: "Surfbrett", the: "das Surfbrett", acc: "das Surfbrett" },
     part: "a yellow surfboard with a red stripe",
     cast: "bear",
@@ -332,6 +353,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Einradfahrer",
     the: "der Einradfahrer",
     toThe: "der Einradfahrer",
+    wish: "Der Bär will auf dem Platz balancieren und herumfahren.",
     partner: { name: "Einrad", the: "das Einrad", acc: "das Einrad" },
     part: "a red unicycle: one wheel with a seat on a tall post",
     cast: "both",
@@ -348,6 +370,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Akrobatin",
     the: "die Akrobatin",
     toThe: "die Akrobatin",
+    wish: "Die Akrobatin will hoch oben durch das Zelt schwingen.",
     partner: { name: "Trapez", the: "das Trapez", acc: "das Trapez" },
     part: "a circus trapeze: a short wooden bar hanging from two long ropes",
     cast: "fox",
@@ -365,6 +388,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Ruderin",
     the: "die Ruderin",
     toThe: "die Ruderin",
+    wish: "Die Bärin will über den See zur Insel fahren.",
     partner: { name: "Ruder", the: "die Ruder", acc: "die Ruder", plural: true },
     part: "a pair of wooden oars",
     cast: "bear",

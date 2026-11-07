@@ -11,6 +11,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Toilette",
     the: "die Toilette",
     toThe: "zur Toilette",
+    wish: "Fertig auf der Toilette! Jetzt wollen wir uns abputzen.",
     partner: { name: "Klopapier", the: "das Klopapier", acc: "das Klopapier", emoji: "🧻" },
     cast: "bear",
     before:
@@ -25,6 +26,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Wasserhahn",
     the: "der Wasserhahn",
     toThe: "zum Wasserhahn",
+    wish: "Die Pfoten sind voller Matsch. Wir wollen sie sauber waschen.",
     partner: { name: "Seife", the: "die Seife", acc: "die Seife", emoji: "🧼" },
     cast: "fox",
     before:
@@ -40,6 +42,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Eimer",
     the: "der Eimer",
     toThe: "zum Eimer",
+    wish: "Lauter schmutzige Pfotenspuren! Wir wollen sie wegschrubben.",
     partner: { name: "Schwamm", the: "der Schwamm", acc: "den Schwamm", emoji: "🧽" },
     cast: "bear",
     before:
@@ -57,6 +60,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Handtuchhalter",
     the: "der Handtuchhalter",
     toThe: "zum Handtuchhalter",
+    wish: "Die Pfoten sind nass. Wir wollen sie abtrocknen.",
     partner: { name: "Handtuch", the: "das Handtuch", acc: "das Handtuch" },
     part: "a fluffy light-green hand towel, folded once",
     cast: "fox",
@@ -73,6 +77,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Badewanne",
     the: "die Badewanne",
     toThe: "zur Badewanne",
+    wish: "Die Wanne ist voll. Wir wollen etwas schwimmen lassen.",
     partner: { name: "Badeente", the: "die Badeente", acc: "die Badeente" },
     part: "a yellow rubber duck with an orange beak",
     cast: "bear",

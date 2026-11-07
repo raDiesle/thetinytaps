@@ -9,6 +9,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Zauberhut",
     the: "der Zauberhut",
     toThe: "zum Zauberhut",
+    wish: "Hokuspokus! Wir wollen etwas aus dem Hut holen.",
     partner: { name: "Zauberstab", the: "der Zauberstab", acc: "den Zauberstab", emoji: "🪄" },
     cast: "fox",
     before:
@@ -24,6 +25,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Burg",
     the: "die Burg",
     toThe: "zur Burg",
+    wish: "Oben auf dem Turm soll etwas flattern.",
     partner: { name: "Fahne", the: "die Fahne", acc: "die Fahne", emoji: "🚩" },
     cast: "bear",
     before:
@@ -39,6 +41,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Tor",
     the: "das Tor",
     toThe: "zum Tor",
+    wish: "Wir wollen ein Tor schießen.",
     partner: { name: "Fußball", the: "der Fußball", acc: "den Fußball", emoji: "⚽" },
     cast: "fox",
     before:
@@ -53,6 +56,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Puzzle",
     the: "das Puzzle",
     toThe: "zum Puzzle",
+    wish: "Ein Stück fehlt noch. Wir wollen das Bild fertig machen.",
     partner: { name: "Puzzleteil", the: "das Puzzleteil", acc: "das Puzzleteil", emoji: "🧩" },
     cast: "bear",
     before:
@@ -67,6 +71,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Trommel",
     the: "die Trommel",
     toThe: "zur Trommel",
+    wish: "Wir wollen laut Bumm, bumm machen.",
     partner: { name: "Trommelstöcke", the: "die Trommelstöcke", acc: "die Trommelstöcke", plural: true },
     part: "two wooden drumsticks with round tips, crossed",
     cast: "fox",
