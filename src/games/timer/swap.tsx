@@ -175,14 +175,6 @@ export function SwapHourglass({ ms, startedAt, flip, running, glow }: { ms: numb
           <path d={bulbPath(glassTop, neck, false)} />
           <path d={bulbPath(neck, glassBottom, true)} />
         </g>
-        <path
-          d={`M${glassX + 26} ${glassTop + 22} Q${glassX + 20} ${glassTop + 90} ${glassX + 44} ${glassTop + 150}`}
-          stroke="#fff"
-          strokeWidth="9"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
         {[14, w - 30].map((x) => (
           <rect key={x} x={x} y={glassTop - 8} width="16" height={glassBottom - glassTop + 16} rx="6" fill="#b5651d" stroke={INK} strokeWidth="4" />
         ))}
