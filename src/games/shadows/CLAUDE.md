@@ -24,7 +24,10 @@ rustles, like a tap on the bush; never inside the stage, where the animal comes 
   only while each can still be told apart. A new picture is looked at in black next to the pictures closest to it, in
   both fonts (Noto Color Emoji from Google Fonts in the preview), and joins the list where it is one of them; the same
   goes for „Wer schaut da raus?“ (`PEEK_LOOKALIKES`: what peeks out, in colour, at the hardest share and through the
-  gaps – the cat's and the dog's tail, grey elephant, cow and sheep, grey-white rabbit and mouse).
+  gaps – the cat's and the dog's tail, grey elephant, cow and sheep, grey-white rabbit and mouse). Plain fur of one
+  colour is what gives animals away least through the gaps: the brown and tan ones (monkey, deer, kangaroo, camel, goat,
+  horse), the grey ones and the green ones are paired there. A new animal goes into exactly one `PEEK_LOOKS` group and,
+  when it lives in water, into `IN_THE_POND`; only whole bodies, never a face or a round blob (🐤 and 🐸 are faces). Of two animals that are the same shape (tiger and leopard, camel and dromedary, dolphin and shark) take one.
 
 ## Languages
 
@@ -33,6 +36,7 @@ Both games speak the app language (German, English, Chinese, Hindi, Spanish, Ara
 sentence plays its German one. A new or changed sentence is listed by `src/content/recordedLines.ts` (`schatten`) and recorded with
 `bun run voice make --only schatten`, only when the user asks. „Wer schaut da raus?“ speaks with Was gehört zum Tier?'s recordings (`animalsVoice`). Each other language is a `content.<lang>.ts` (en, zh, hi, es, ar, ru), listed in `src/content/texts/texts-<lang>.ts` (which fills `SHADOW_TRANSLATIONS`): the pictures' names by id in the shape its grammar needs – English and Spanish `many` for plural words („scissors are“, „las tijeras buscan“), Spanish the article („del elefante“); Hindi the oblique form before की (कछुए की) and sentences without gendered verbs („… की परछाईं कहाँ है?“, „यह … है।“); Arabic `female` for the verb and pronoun (يبحث عن ظله / تبحث عن ظلها) and `the` where ال can't simply go in front; Russian the genitive for „Вот тень слона!“ and `many` („ножницы ищут“).
 - Translations come only when the user asks. A new or changed German line comes German-only; add the other languages only on request. Gaps are marked in `src/content/ideas/languageStatus.ts`.
+- A new picture comes German only: its id goes on `GERMAN_ONLY` in `content.ts` (November 2026: twenty animals of „Wer schaut da raus?“, from the tiger to the lizard), `shadows.test.ts` checks that the translated languages name every other picture and none of these yet, and the Schatten finden row in `languageStatus.ts` says what is missing. Once the user asks for their translations, they come off the list.
 - When a German line changes its meaning, delete its translations in the same change (a stale translation is worse than German).
 - A picture without its name in a language is said entirely in German (the language's texts function takes the whole German sentence, and `say` plays that German sentence's German recording). `shadows.test.ts` checks that no id is stale, that the languages translated so far name every picture, that Russian, Chinese, Hindi and Arabic have no Latin letters, and that the fallback works.
 - Sentences must not use the past tense or depend on the picture's gender where the language can avoid it (no „нашёл/нашла“, no „его/её“; Hindi without रहा/रही); use the stored forms.

@@ -287,6 +287,7 @@ export const RESEARCH: Research[] = [
       "Schatten, die sich nicht unterscheiden lassen: Schwein, Schaf und Schildkröte (auf Android drei runde Kleckse auf kurzen Beinen), Schnecke und Schildkröte, Katze und Hund (auf dem iPhone), Hund und Elefant, Hund und Teddy, Eule und Teddy (auf Android), Apfel, Birne und Erdbeere, Pilz und Baum.",
       "Teile, die aus dem Busch gleich aussehen: der hellbraune Schwanz mit Hinterbein von Katze und Hund, das Grau von Elefant neben Kuh oder Schaf, das grauweiße Fell von Hase und Maus und das Braun von Eichhörnchen und Igel durch die Gucklöcher.",
       "Diese Paare kommen nie zusammen zur Auswahl (SHADOW_LOOKALIKES, PEEK_LOOKALIKES); die übrigen ähnlichen Bilder einer Art bleiben, damit die schweren Stufen schwer bleiben.",
+      "Nachtrag 7. November 2026, 35 weitere Tiere ebenso geprüft (headless Chrome, Apple Color Emoji und Noto Color Emoji von Google Fonts, Umriss-Überdeckung jedes neuen Tiers mit allen Bildern, die nächsten schwarz nebeneinander; sichtbare Teile oben, links, rechts bei 25 % und die Durchschnittsfarbe je Gruppe): 20 kamen dazu. Gleiche Schatten: Zebra und Kuh, Nilpferd und Schwein, Pfau und Baum (auf Android), Affe und Eichhörnchen. Gleiche Teile: einfarbig braunes Fell durch die Gucklöcher (Affe, Hirsch, Känguru, Kamel, Ziege, Pferd), Grau (Nashorn, Elefant, Gorilla; Robbe und Nilpferd aus dem Teich), Schwarz-Weiß (Zebra, Kuh), weiße Wolle (Schaf, Lama), Orange mit dunklen Flecken (Tiger, Giraffe), Grün (Pfau und Papagei; Schildkröte, Eidechse und Raupe), die gelb-schwarzen Ringe von Raupe und Biene, der gebogene Schwanz von Affe und Hund und ein blauer Rücken mit Flosse aus dem Wasser (Delfin, Fisch).",
     ],
     topics: [],
     games: [],
@@ -294,6 +295,14 @@ export const RESEARCH: Research[] = [
       { title: "Traktor und Feuerwehr, Auto und Traktor", why: "Ähnlich kastig, aber das große Hinterrad und die Leiter unterscheiden sie deutlich." },
       { title: "Eule und Pinguin", why: "Farbig und als Schatten gut zu unterscheiden: der Pinguin steht schmal mit Schnabel zur Seite." },
       { title: "Erdbeere und Haus", why: "Der Umrissvergleich hielt sie für am ähnlichsten, das Dach unterscheidet sie aber auf den ersten Blick." },
+      {
+        title: "Leopard, Dromedar, Hai, Otter, Stier, Bison, Taube und Adler",
+        why: "Haben denselben Umriss wie ein anderes Tier (Tiger, Kamel, Delfin, Robbe, Kuh, Schwein, untereinander) – von zweien gleich aussehenden kam nur eins dazu.",
+      },
+      {
+        title: "Küken, Frosch, Fledermaus, Faultier, Schlange, Truthahn",
+        why: "Küken und Frosch sind Gesichter oder runde Kleckse; die anderen kennen kleine Kinder weniger oder wären in ihrer Gruppe allen anderen zu ähnlich (die grüne Schlange).",
+      },
     ],
     ideas: ["X-14"],
     sources: [],
