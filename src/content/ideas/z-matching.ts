@@ -119,3 +119,99 @@ export const matchingIdeas: IdeaArea = {
     },
   ],
 };
+
+/**
+ * Z as well, for Schatten finden as the book's game of recognising (user proposal, November 2026): a thing shows only a
+ * clue – its shadow, a part peeking out, its sound – and the child taps the whole. Its own heading on /management/, so
+ * its ideas aren't lost among the book's; the numbers count on with the book's Z row.
+ */
+export const recognisingIdeas: IdeaArea = {
+  key: "Z-erkennen",
+  prefix: "Z",
+  emoji: "👂",
+  title: "Schatten finden – erkennen",
+  intro:
+    "Vorschlag vom November 2026: Schatten finden wird das Spiel fürs einfache Zuordnen nach einem Hinweis. Von einem Ding ist nur etwas zu sehen oder zu hören – sein Schatten, ein Stück hinter dem Busch, sein Geräusch –, und das Kind tippt unten das Ganze. Die Arten wechseln sich ab wie bei Was gehört zum Tier?, die Schwierigkeit findet das Spiel selbst (nextLevel); Große wählen hinter ⚙️ „Gemischt“ oder genau eine Art. Was hörbar ist, ist erst still: Ein Vorhang, eine Tür oder ein Sack wartet mit der zeigenden Hand, erst ein Tippen darauf spielt das Geräusch, und jedes weitere Tippen spielt es noch einmal. Genau eine Antwort passt (X-14): Was ähnlich klingt, kommt nie zusammen dran, wie die ähnlichen Umrisse. Aus dem Buch passen auch Wessen Fell? (Z-06) und Die andere Hälfte (Z-07) hierher. Das Geräusch-Rätsel in Lebendige Bilder (B-02, ein Ding in einem vollen Bild suchen) und das Geräusche-Buch (N-31) wurden abgelehnt; hier ist es eine Wahl aus zwei bis fünf, wie bei den Schatten.",
+  ideas: [
+    {
+      id: "Z-14",
+      emoji: "🙈",
+      title: "Wer schaut da raus? zieht zu Schatten finden",
+      text: "Wer schaut da raus? (X-04) verlässt Was gehört zum Tier? und wird eine zweite Art Runde in Schatten finden, im Wechsel mit den Schatten und auf einer gemeinsamen Treppe der Schwierigkeit: erst wenige, klar verschiedene Bilder, dann ähnliche, gedrehte, Stücke hinter Lücken im Busch. Hinter ⚙️ „Was drankommt“: Gemischt, Schatten oder Wer schaut da raus?. Was gehört zum Tier? behält Füttern, Was gibt uns das Tier?, Wer wohnt wo? und Was wird aus mir? – alles, was zum Tier gehört. Der Name der Karte kann dann über beides sprechen (etwa „Wer ist das?“); das entscheidet sich beim Umsetzen.",
+      why: "Beides ist dasselbe Zuordnen: aus einem Teil das Ganze erkennen. PeekPlay, die Bühne und glyph.ts liegen schon in src/games/shadows/, und die Treppe von Schatten finden kennt schon ähnliche Umrisse. Was gehört zum Tier? wird dadurch klarer.",
+      effort: "M",
+    },
+    {
+      id: "Z-15",
+      emoji: "🔊",
+      title: "Wer macht das Geräusch?",
+      text: "Oben hängt ein Vorhang an einer kleinen Bühne. Tippt das Kind ihn an, wackelt er und dahinter muht, bellt oder quakt es. Unten stehen zwei bis fünf Tiere; das Kind tippt, wer das war, der Vorhang geht auf, und das Tier steht da und macht sein Geräusch noch einmal. Echte Aufnahmen gibt es schon für Kuh, Schaf, Schwein, Pferd, Hund, Katze, Ente, Hahn, Huhn, Frosch, Eule, Löwe, Elefant, Wal, Delfin, Pinguin, Maus, Taube, Kuckuck, Biene und Papagei. Schwerer: mehr Tiere, dann Tiere, die gleich aussehen, aber verschieden klingen (Hahn und Huhn).",
+      why: "Hinhören statt hinschauen – Tiergeräusche sind das Erste, was Kleine nachmachen. Die Aufnahmen sind da, das Spiel braucht keine neuen Bilder.",
+      effort: "S",
+    },
+    {
+      id: "Z-16",
+      emoji: "🚒",
+      title: "Was fährt da vorbei?",
+      text: "Eine Straße mit einer Hausecke. Ein Tippen auf die Ecke, und dahinter klingt es: Tatütata, ein Hupen, ein Hubschrauber, ein Zug pfeift, eine Rakete startet. Das Kind tippt unten das Fahrzeug, und es fährt, fliegt oder rollt mit seinem Geräusch hinter der Ecke hervor durchs Bild. Nur Fahrzeuge, die man am Klang auseinanderhält (nie Feuerwehr und Polizei mit derselben Sirene zusammen).",
+      why: "Fahrzeuge sind das Lieblingsthema vieler Zweijähriger, und draußen hören sie Sirene und Hubschrauber oft, bevor sie sie sehen. Aufnahmen für Sirene, Motor, Hupe, Hubschrauber, Pfeife und Start gibt es schon.",
+      effort: "S",
+    },
+    {
+      id: "Z-17",
+      emoji: "🚪",
+      title: "Was klingt da im Haus?",
+      text: "Eine geschlossene Tür. Tippt das Kind sie an, klingt dahinter etwas aus dem Alltag: die Klospülung, die Waschmaschine, der Wecker, die Türklingel, die Uhr tickt, jemand putzt Zähne, es plätschert in der Wanne. Unten liegen die Dinge, das Kind tippt das richtige, die Tür geht auf, und das Ding tut es noch einmal.",
+      why: "Das Kind erkennt sein eigenes Zuhause am Klang – ein Aha, das es nachher in der Wohnung wiederfindet. Die meisten Aufnahmen liegen schon in src/lib/sounds/.",
+      effort: "S",
+    },
+    {
+      id: "Z-18",
+      emoji: "🥁",
+      title: "Welches Instrument klingt da?",
+      text: "Hinter dem Vorhang spielt jemand ein paar Töne: Trommel, Trompete, Glocken, Spieluhr, Flöte, Rassel. Das Kind tippt das Instrument, der Vorhang geht auf, und ein Fuchs oder Bär in der Rolle des Musikers spielt die Töne noch einmal darauf. Nur Instrumente, die deutlich verschieden klingen.",
+      why: "Erstes Hinhören auf Klangfarben; passt zum Thema Musik in Was gehört zusammen? und braucht nur kurze Klänge.",
+      effort: "M",
+    },
+    {
+      id: "Z-19",
+      emoji: "🐾",
+      title: "Wessen Spuren?",
+      text: "Im Schnee oder im Matsch führen Spuren hinter einen Busch: die Füße eines Huhns, die Schwimmfüße einer Ente, Hufe, Pfoten, Gummistiefel. Das Kind tippt, wer da gelaufen ist, und es kommt hinter dem Busch hervor und läuft die Spur zurück. Nie zwei Pfoten zusammen (Hund, Katze und Fuchs sehen gleich aus), sondern Spuren, die man klar unterscheidet.",
+      why: "Kinder sehen Spuren im Schnee und am Strand und fragen „Wer war das?“. Ein neuer Hinweis, der wie der Schatten nur eine Form ist.",
+      effort: "M",
+    },
+    {
+      id: "Z-20",
+      emoji: "🔦",
+      title: "Mit der Taschenlampe",
+      text: "Das Bild oben ist dunkel, nur der runde Lichtkreis einer Taschenlampe zeigt ein Stück: ein Ohr, ein Rad, einen Schwanz. Tippt das Kind ins Dunkle, wandert das Licht dorthin und zeigt ein anderes Stück. Unten tippt es das Ganze, und das Licht geht an. Schwerer: ein kleinerer Lichtkreis.",
+      why: "Selbst entscheiden, wohin man schaut, wie bei den Lücken im Busch von Wer schaut da raus?, aber das Kind lenkt den Blick. Nutzt dieselben Bilder und glyph.ts.",
+      effort: "M",
+    },
+    {
+      id: "Z-21",
+      emoji: "🎒",
+      title: "Was ist im Sack?",
+      text: "Ein Stoffsack, durch den sich die Form eines Dings drückt: ein Ball, eine Banane, ein Schlüsselbund, eine Rassel. Tippt das Kind den Sack an, wackelt er, und das Ding darin macht sein Geräusch (der Ball hüpft, die Schlüssel klimpern, die Rassel rasselt). Unten tippt es das Ding, und es hüpft aus dem Sack.",
+      why: "Wie der Fühlsack aus der Kita: Form und Klang zusammen. Ein Hinweis, der zwei Sinne verbindet, und doch nur ein Tippen.",
+      effort: "M",
+    },
+    {
+      id: "Z-22",
+      emoji: "🌧️",
+      title: "Welches Wetter klingt so?",
+      text: "Ein Fenster mit geschlossenem Vorhang. Tippt das Kind ihn an, hört es draußen Regen prasseln, Donner grollen, den Wind pfeifen oder Vögel an einem Sonnentag zwitschern. Unten liegen kleine Fenster mit dem Wetter, das Kind tippt eines, der Vorhang geht auf, und draußen regnet, stürmt oder scheint es.",
+      why: "Wetter ist für Kleine jeden Tag Thema (Gummistiefel oder Sandalen?), und den Regen hört man oft, bevor man ihn sieht.",
+      effort: "M",
+    },
+    {
+      id: "Z-23",
+      emoji: "➕",
+      title: "Zwei Hinweise",
+      text: "Auf den letzten Stufen steht oben ein Schatten, unten stehen die bunten Bilder – darunter zwei, deren Schatten man nicht unterscheiden kann: Katze und Hund, Schaf und Schwein. Tippt das Kind den Schatten an, macht er sein Geräusch. Erst beides zusammen sagt, wer es ist, und so passt wieder genau eine Antwort.",
+      why: "Schwerer, ohne schneller zu werden: Das Kind muss zwei Hinweise zusammendenken. Die Liste der ähnlichen Umrisse (SHADOW_LOOKALIKES) wird so zu einer Stufe statt nur zu einem Verbot.",
+      effort: "S",
+    },
+  ],
+};
