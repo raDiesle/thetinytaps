@@ -9,6 +9,7 @@ import { useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
+  playBuzz,
   playChime,
   playChimeNote,
   playDing,
@@ -30,7 +31,7 @@ import { CaterpillarScene } from "./caterpillar";
 import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { appleCount, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, runSeconds, soonMs, trainSteps } from "./pieces";
+import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PizzaScene, SLICES } from "./pizza";
 import {
   AntHill,
@@ -61,7 +62,7 @@ import { clockOn, digits, ownTimeMs } from "./time";
 
 /** The child blows the candle out this long after the time is up, and the flame goes out. */
 const BLOW_MS = 700;
-/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
+/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to come out). */
 const END_MS = 4200;
 const END_MS_CATERPILLAR = 5600;
 /** The cheer at the end comes this long after the picture's own sound, so both are heard. */
@@ -181,7 +182,7 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
-        timeShown={settings.showTime}
+        timeShown={settings.timeNote}
         onShown={onShown}
         onAgain={onAgain}
         onPicture={onPicture}
@@ -196,7 +197,7 @@ function TimerStart({
       total={ms}
       set={set}
       until={until}
-      shown={settings.showTime}
+      shown={settings.timeNote}
       onShown={onShown}
       onAgain={onAgain}
       onPicture={onPicture}
@@ -298,11 +299,14 @@ function TimerRun({
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
 
-  // Piece by piece (H-45): many apples, a stop on the track a minute – each with its plop or its bell.
+  // Piece by piece (H-45): many apples landing in the cart, a stop on the track a minute – each with its plop or its bell.
   const apples = appleCount(set);
   const stops = pieceCount(set, MAX_STOPS);
   const moments = useMemo(() => {
-    if (picture === "apple") return pieceMoments(total, apples);
+    if (picture === "apple")
+      return appleTimes(total, apples)
+        .harvest.slice(0, -1)
+        .map((h) => h.land);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
     if (picture === "pizza") return pieceMoments(total, SLICES);
     // The ladybug leaves a dot as it is back at the top (H-67).
@@ -409,12 +413,13 @@ function TimerRun({
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
       else if (picture === "ants") playPop();
-      else if (picture === "apple") playLeaves();
+      // The leaves rustle; once the blossoms are out, the bees buzz.
+      else if (picture === "apple") (Date.now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
       else if (picture === "flower") playDrops();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
-    [phase, picture, ripple, glow],
+    [phase, picture, ripple, glow, endsAt, total, apples],
   );
 
   useEffect(() => {
@@ -430,59 +435,11 @@ function TimerRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
-  const stepped = picture === "train" && stops > 1;
-  const stage = {
-    "--tm-ms": `${total}ms`,
-    "--tm-secs": runSeconds(total),
-    "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
-    "--tm-n": apples,
-    ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
-  } as CSSProperties;
-
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}${soon ? " tm-soon" : ""}`} style={stage}>
-          {picture === "train" && (
-            <>
-              <TrainBackdrop />
-              {stepped && <TrainStepKeyframes total={total} stops={stops} />}
-              {stepped && <TrainStops pieces={stops} />}
-              <RailAhead glow={poke} />
-              <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
-                <Train puff={poke} />
-              </Layer>
-            </>
-          )}
-          {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
-          {picture === "caterpillar" && <CaterpillarScene glow={poke} />}
-          {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
-          {picture === "pizza" && <PizzaScene glow={poke} />}
-          {picture === "flower" && <FlowerScene glow={poke} total={total} />}
-          {picture === "sunset" && <SunsetScene glow={poke} />}
-          {picture === "sand" && (
-            <>
-              <SandBackdrop />
-              <Sand running={phase === "running"} glow={poke} />
-              <SandFrame />
-            </>
-          )}
-          {picture === "candle" && (
-            <>
-              <CandleBackdrop />
-              <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={endsAt - total} total={total} />
-              <Child kind="bear" x={CANDLE.xs[CANDLE.xs.length - 1] + CANDLE.w / 2 + 24} floor={CANDLE.base + 22} />
-            </>
-          )}
-          {picture === "ants" && (
-            <>
-              <AntsBackdrop />
-              <AntRoad />
-              <Cookie glow={poke} />
-              <AntHill />
-              <AntsHome />
-            </>
-          )}
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}${soon ? " tm-soon" : ""}`} style={stageStyle(picture, total, stops)}>
+          <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
         <TimeShownNote shown={phase === "running" ? shown : "off"} endsAt={endsAt} total={total} />
@@ -499,6 +456,85 @@ function TimerRun({
         <TimeLeft endsAt={endsAt} until={until} />
         <TimeShownChoice value={shown} onChange={onShown} />
       </PlayOptions>
+    </>
+  );
+}
+
+/** The stage's lengths for the CSS: the run's, its seconds, the train's way, and the train's own keyframes when it halts. */
+export function stageStyle(picture: TimerPicture, total: number, stops: number) {
+  const stepped = picture === "train" && stops > 1;
+  return {
+    "--tm-ms": `${total}ms`,
+    "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
+    ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
+  } as CSSProperties;
+}
+
+/**
+ * One picture's drawing on the stage, for a run of `total` ms cut into the pieces of `set` ms: in a run, and at its end
+ * on the start screen's card (`TimerCardArt`).
+ */
+export function SceneParts({
+  picture,
+  phase,
+  total,
+  set,
+  poke,
+  startedAt,
+}: {
+  picture: TimerPicture;
+  phase: Phase;
+  total: number;
+  set: number;
+  /** Counts the taps, each lighting what is left. */
+  poke: number;
+  startedAt: number;
+}) {
+  const apples = appleCount(set);
+  const stops = pieceCount(set, MAX_STOPS);
+  const stepped = picture === "train" && stops > 1;
+  return (
+    <>
+      {picture === "train" && (
+        <>
+          <TrainBackdrop />
+          {stepped && <TrainStepKeyframes total={total} stops={stops} />}
+          {stepped && <TrainStops pieces={stops} />}
+          <RailAhead glow={poke} />
+          <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
+            <Train puff={poke} />
+          </Layer>
+        </>
+      )}
+      {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
+      {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} />}
+      {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
+      {picture === "pizza" && <PizzaScene glow={poke} />}
+      {picture === "flower" && <FlowerScene glow={poke} total={total} />}
+      {picture === "sunset" && <SunsetScene glow={poke} />}
+      {picture === "sand" && (
+        <>
+          <SandBackdrop />
+          <Sand running={phase === "running"} glow={poke} />
+          <SandFrame />
+        </>
+      )}
+      {picture === "candle" && (
+        <>
+          <CandleBackdrop />
+          <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={startedAt} total={total} />
+          <Child kind="bear" x={CANDLE.xs[CANDLE.xs.length - 1] + CANDLE.w / 2 + 24} floor={CANDLE.base + 22} />
+        </>
+      )}
+      {picture === "ants" && (
+        <>
+          <AntsBackdrop />
+          <AntRoad />
+          <Cookie glow={poke} />
+          <AntHill />
+          <AntsHome />
+        </>
+      )}
     </>
   );
 }

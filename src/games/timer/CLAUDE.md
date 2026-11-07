@@ -8,24 +8,40 @@ Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds ask
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
 grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
-note, as tally marks in bundles of five that go one by one (`shown.tsx`, kept as `showTime`; user request, November
-2026): by default „Striche in %“, ten marks each a tenth of the run (`PERCENT_MARKS`), so a short and a long timer look
-alike; behind ⚙️ its „Zeit im Bild“ switches to „Striche in Zeit“ (each mark 10 s up to 15 min, `markUnit`, at most
-`MAX_MARKS`), „Zahlen“ (digits) or „Aus“. The child sees no numbers, only the picture and the marks running down.
-The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
-there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
-screen), then the pictures that run until the time is up:
+note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Zahlen“, `digits`, e.g. „4:37“; user
+request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
+in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
+for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
+`MAX_MARKS`) – or „Aus“.
+The start screen's cards are the pictures themselves as they look at their end, with no words on them (user request,
+November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
+cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
+the picture (`ART_ASPECT`). Names are only read out and their tooltip. „Abwechseln“ comes first, its two children with
+the toy and the hourglass; that it runs on without end is said in its tooltip (`SWAP_NOTE`). Then the pictures that run
+until the time is up:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
   halts there briefly and it chimes (H-45), with keyframes made for the run (`TrainStepKeyframes`, `--tm-roll`).
-- „Apfelbaum“ 🍎 (`apples.tsx`, H-45): always many apples, also for a short time (`appleCount`: one every two seconds,
-  at least `MIN_APPLES`, at most `MAX_APPLES`) – they only fall more often – each with a plop into the basket the bear
-  child holds (the plops spaced, `PIECE_SOUND_GAP_MS`); the heap in it rises a step per apple, the next apple sways each second.
+- „Apfelbaum“ 🍎 (`apples.tsx`, H-45): an apple tree's year (`appleTimes`, `APPLE_YEAR`; user feedback, November
+  2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), blossoms open all
+  over it (`bloomRank`, until 30 %) while three bees buzz round it from then on (`BEES`, each a small layer, its wings a
+  smaller one), each blossom drops as a small green apple swells and reddens at its place (until 45 %), then the bear
+  child pushes its little cart from the right under one apple after the other (`CartKeyframes`, written for the run,
+  the wheels turning with it); the apple sways a second at a time while the cart comes, falls straight down into it with
+  a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
+  apples, also for a short time (`appleCount`, `MIN_APPLES` to `MAX_APPLES`, as many as the heap holds); the last lands
+  as the time is up. A tap rustles the leaves, once the blossoms are out the bees buzz.
 - „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
   from the top bulb into the bottom one, where its heap rises with a round top (`BulbSand`, shared with Abwechseln).
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
-  (`steps(var(--tm-secs))`, `runSeconds`), its head chewing and three leaf crumbs falling as it munches (`CRUMBS`); at the end a cocoon hangs on the branch and a butterfly flies out and settles on the meadow.
+  (`runSeconds`, `useBites`). The leaf is cut in six bands (`BANDS`), each eaten from the leaf's outline at the tip to
+  its outline at the stalk, so every bite takes leaf and what is left still looks like a leaf; the bites go down the
+  edge and back up (`BITE_ORDER`), and the head goes to each spot before it bites it off (`biteSpot`), its neck
+  stretching after it from the body crawling back along the midrib (`bodyFront`, never further than `REACH`), and three
+  leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
+  and the butterfly slips out and flies back and forth in the air above the meadow, bobbing, as long as the end is shown
+  (`BUTTERFLY`, user request, November 2026).
 - „Blume“ 🌸 (`flower.tsx`, H-53): the bear child waters a sprout in the flower bed with a garden hose coming from a
   tap on a post (`TAP`; a can that never ran dry made no sense, user feedback, November 2026), a drop from its nozzle
   every second; the stalk slides up out of the soil, pushing soil crumbs aside each second (`SoilCrumbs`), along a tall
@@ -33,7 +49,8 @@ screen), then the pictures that run until the time is up:
   open one after the other (`PETALS`), the yellow middle last. It fills up instead of running out, for waiting for
   something good.
 - „Kerze“ 🕯️: three tall candles on the table burn down one after the other (`CANDLE.xs`, each a third of the time,
-  `--tm-i`/`--tm-of`), each one going out with a puff as the next lights; at the end the bear child leans over and blows
+  `--tm-i`/`--tm-of`), each burning all the way down into its puddle and only then going out, its smoke (`Smoke`: a
+  wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the bear child leans over and blows
   the last one out.
 - „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): one round hill, its meadow full of flowers drawn as coloured dots
   (`FLOWERS`), and a big moon exactly in the picture's middle. First the moon goes down behind the hill (gone at
@@ -75,7 +92,7 @@ once and the child, where there is one, waves once (`tm-soon`), and a picture st
 Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`), the child and small things
 (`.tm-dims`) fade into the dark and only what runs down stays bright; a tap brings it all back (`tm-far`).
 
-Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `OwnTimeSheet.tsx` (the sheet behind
+Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `cardArt.tsx` (a card's picture), `OwnTimeSheet.tsx` (the sheet behind
 „Andere …“), `time.ts` (own times: typing, clock times, labels, digits; tested in `time.test.ts`), `TimerPlay.tsx` (one
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
@@ -102,10 +119,21 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing
   beside it: what runs down stands big where the eye goes first, and things only standing by (a windmill and a little
   house beside the moon and the sun) come out (user feedback, November 2026).
-- **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
-  „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **What runs out runs out wholly before it ends** (user feedback, November 2026): a candle burns down to its puddle
+  before its flame goes out (`CANDLE.stub` a thin rim, the going out after its turn, never before), and what follows
+  an ending (the smoke) lingers slow and soft for seconds, never a puff gone at once. `timer.test.ts` checks the candle.
+- **What happens, happens as in life** (user feedback on the Apfelbaum, November 2026): things fall straight down,
+  never across to where they are wanted – what catches them comes under them first (the cart under the apple). What is
+  collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
+  basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
+  story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
+- **Abwechseln stands first, apart**: it runs without end, so its card comes first (its tooltip says so, `SWAP_NOTE`),
+  and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
+  `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
+  is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
 
-- **A fox or bear child only where it does the picture's thing** (`Child`): it holds the apples' basket, waters the
+- **A fox or bear child only where it does the picture's thing** (`Child`): it pushes the apples' cart, waters the
   flower, blows out the candle, takes its turn with the toy. Never a family standing by to watch or cheer: one stood
   beside every picture and was taken out (user feedback, November 2026) – children wanted to tap it, and a timer to
   watch needs as few things and movements as can be.
@@ -122,8 +150,11 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   off there (`RIGHT` in `timer.test.ts`).
 - **A clock time behind us is never quietly tomorrow's** (H-60): the sheet asks „Bis morgen um …?“ and keeps the answer
   for that day only (`tomorrowFrom`); a kept „bis 17:30“ started after 17:30 asks again before it runs (`TimerStart`).
-  Numbers are for grown-ups: in the row, the sheet and behind ⚙️; in the picture only when a grown-up chose „Zeit im
-  Bild“ there (off by default, user request, November 2026), small in the bottom left corner, letting taps through.
+  The time left stands small in the picture's bottom right corner, letting taps through: minutes and seconds by default,
+  tally marks or nothing when a grown-up chooses so behind ⚙️ („Zeit im Bild“).
+- **Tally marks start many** (user feedback, November 2026: ten were too few to see them go): every way of marks starts
+  with a full row or, for a short time, one a second (10 s: ten marks), never a handful (`timer.test.ts` checks). A
+  changed default of `timeNote` gets the field a new name, or everyone who played before keeps the old one.
 - **Every second a small step, never a blink** (H-63): what beats once a second is a small layer of its own (`.tm-beat`)
   moving by `transform` and `opacity` – the wheels are small layers riding in the train's, not groups in its svg – and
   stands still at the end (`.tm-done`). Anything new that moves the whole run long snaps to its last place there too.
@@ -148,14 +179,22 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   passes (`SKY_CUT` under the ridge, `timer.test.ts` checks), so it never shows, and the thing is never stretched.
   Where the edge is slanted, the box also gets a still `clip-path` to its shape – never an
   animated one, which repaints the box every frame.
-- **Pieces wait on their own clock, not on React**: an apple's fall is a CSS animation with its minute as
-  `animation-delay`, a heap rises by `steps(--tm-n)`, the train's halts are keyframes written once for the run. React
-  only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute.
+- **Pieces wait on their own clock, not on React**: an apple's blossom, growing and fall are CSS animations with their
+  moments as `animation-delay`, each apple in the cart appears at its landing, the cart's way and the train's halts are
+  keyframes written once for the run. React
+  only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute. The one exception is
+  the caterpillar, whose head must know where the next bite is: there the bites are counted from the clock once a
+  second (`useBites`) and the bands, head, neck and body are set by a style change a second, the figure gliding by a
+  CSS transition – small layers, a change a second, never per frame, and the leaf's drawing `memo` so it is never drawn
+  again (`bun run perf timer-raupe`).
+- **What takes a piece goes to it first** (user request, November 2026): the caterpillar's head moves to each spot of
+  the leaf before that spot goes, and bites it off there – never a head chewing in one place while the leaf goes
+  somewhere else. A new picture where someone eats, picks or carries pieces does the same.
 - **Seen from afar only what runs down stays bright** (H-48): a new picture puts its backdrop in `.tm-back` and its
   small helpers (posts, decorations) in `.tm-dims`; what runs down gets neither. A clipped edge drawn in the background's
   colour would show once that fades – cut edges with clipping boxes instead (the leaf's bands, the disc's halves).
 - Development: `?sekunden=<n>` in the address makes a run take n seconds instead of the minutes chosen; the
-  pieces still come from the minutes chosen (5 Min. with `?sekunden=20`: five apples, one every four seconds).
+  pieces still come from the minutes chosen (2 Min. with `?sekunden=25`: twenty apples, its whole year in 25 seconds).
 - It says nothing, so there is no voice line to record.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,

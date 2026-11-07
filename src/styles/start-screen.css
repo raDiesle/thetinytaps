@@ -417,6 +417,20 @@ kbd {
   font-size: 1.35rem;
 }
 
+/* A card whose picture says it all (GameMode.art): the picture fills it inside a narrow edge of the card, no words –
+   laid over the card, so the card's flat or upright layout for emoji and title doesn't matter. */
+.mode-art {
+  position: absolute;
+  inset: 7px;
+  overflow: hidden;
+  border: 2px solid #3d304599;
+  border-radius: 10px 14px 12px 16px / 14px 10px 16px 12px;
+}
+
+.game-list:not(.fit) .mode-art-card {
+  aspect-ratio: 1.6;
+}
+
 /* A card's line for grown-ups (GameMode.note): small and quiet under its name, left out where the card is small. */
 .game-note {
   display: block;

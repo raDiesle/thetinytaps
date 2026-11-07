@@ -154,6 +154,12 @@ export const SCENARIOS: Scenario[] = [
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   })),
+  // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.
+  {
+    name: "timer-apfelbaum-ernte",
+    path: "/timer/?sekunden=16",
+    parts: [{ label: "Ernte", before: [{ tap: ".mode-list > li:nth-child(3) .mode-card" }, { wait: 6000 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
+  },
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; the book's other games play at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
   // „Wie geht's dir?“: a feeling's card, then its three pictures, a little to a whole lot, picked in turn (C-36).
