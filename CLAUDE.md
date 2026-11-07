@@ -266,6 +266,11 @@ In a fresh worktree run `bun install` first.
   ASIDE_LINE_GAP_MS })` (`src/lib/spacing.ts`, `voice.ts`): only when nothing else is said and the last such line lies
   far enough back, never cutting another line off. Where a level's last answer leads straight into its end, it leaves
   its praise and extras to the end's.
+  The same key (or the same thing tapped) pressed again and again is said and sounded again only after a pause
+  (`repeatPause`, `REPEAT_PAUSE_MS` in `src/lib/spacing.ts`), and meanwhile only ripples, silently; the soft note of a
+  press that sets nothing off is such an extra too (user feedback from Buchstaben & Zahlen, November 2026: hammering B
+  said „B wie Ball!“ and played a note at every press). A press the game asks for again (the next step, the digit that
+  comes when the same number is pressed again) is no repeat.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.

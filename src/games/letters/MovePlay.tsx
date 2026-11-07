@@ -4,11 +4,12 @@ import { Mascot, type MascotKind } from "@/components/Mascot";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyOf } from "@/content/languages";
 import type { Action, LanguagePack } from "@/content/types";
-import { playChime, playClap, playCountNote, playHop, playRandomNote, playStamp } from "@/lib/sfx";
+import { playChime, playClap, playCountNote, playHop, playStamp } from "@/lib/sfx";
 import { useAppLanguage, useT, type Localized } from "@/lib/language";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import "./move.css";
+import { useSoftTap } from "./softTap";
 
 /** The three ways a number is done with the body, taking turns: hop, clap, stamp. */
 export type Move = "hop" | "clap" | "stomp";
@@ -178,13 +179,7 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
     [stop, say, pack, invite, act, settings.sounds],
   );
 
-  const softTap = useCallback(
-    (x?: number, y?: number) => {
-      ripple(x, y);
-      if (settings.sounds) playRandomNote();
-    },
-    [ripple, settings.sounds],
-  );
+  const softTap = useSoftTap(ripple, settings.sounds);
 
   /** A digit plays its number; any other key a number by chance, never the one on screen. */
   const pressKey = useCallback(
