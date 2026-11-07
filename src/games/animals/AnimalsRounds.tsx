@@ -12,7 +12,7 @@ import { GrowPlay } from "./GrowPlay";
 import { GROWTHS } from "./growth";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import type { AnimalsSettings } from "./settings";
-import { TopicBubble } from "./TopicBubble";
+import { RoundTopic } from "./RoundTopic";
 
 const FED = ANIMALS.filter((a) => a.food);
 const HOUSED = ANIMALS.filter((a) => a.home);
@@ -21,8 +21,8 @@ const HOUSED = ANIMALS.filter((a) => a.home);
  * "Was gehört zum Tier?" as one flowing game: who peeks out, feeding, what the animal gives us, who lives where and
  * what the small one becomes take turns in that order,
  * and the difficulty follows how the child plays (`ANIMAL_LEVELS`). Grown-ups may switch kinds off or fix the
- * difficulty while playing; that counts from the next round. Each round is mounted anew under a bubble saying
- * what it is about; the step and the animals still to come live here.
+ * difficulty while playing; that counts from the next round. Each round is mounted anew, with a line under its
+ * picture saying what it is about; the step and the animals still to come live here.
  */
 export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const [turn, setTurn] = useState(0);
@@ -94,16 +94,13 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
     setTurn(turn + 1);
   }, [turn]);
 
-  return (
-    <>
-      {round.kind === "peek" ? (
-        <PeekPlay key={turn} settings={settings} item={round.item} choices={round.choices} level={round.level} onSolved={onSolved} onNext={onNext} />
-      ) : round.kind === "grow" ? (
-        <GrowPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} />
-      ) : (
-        <AnimalsPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} />
-      )}
-      <TopicBubble key={`topic-${turn}`} kind={round.kind} />
-    </>
+  // What the round is about, as plain text under its picture.
+  const topic = <RoundTopic kind={round.kind} />;
+  return round.kind === "peek" ? (
+    <PeekPlay key={turn} settings={settings} item={round.item} choices={round.choices} level={round.level} topic={topic} onSolved={onSolved} onNext={onNext} />
+  ) : round.kind === "grow" ? (
+    <GrowPlay key={turn} settings={settings} round={round} topic={topic} onSolved={onSolved} onNext={onNext} />
+  ) : (
+    <AnimalsPlay key={turn} settings={settings} round={round} topic={topic} onSolved={onSolved} onNext={onNext} />
   );
 }

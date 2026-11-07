@@ -1,5 +1,16 @@
+import type { CSSProperties } from "react";
 import { lookAlike, SHADOW_LOOKALIKES, type ShadowItem } from "./content";
 import { shuffle } from "./deck";
+
+/**
+ * How `n` choices lie in their rows, for the CSS sizing them as big as the room allows: all side by side (`--n`), and on
+ * a phone held upright two to a row while that leaves at most two rows, else three (`--tall-cols`, `--tall-rows`).
+ * Shared by Schatten finden and every round of „Was gehört zum Tier?“.
+ */
+export function choiceRows(n: number): CSSProperties {
+  const tallCols = n > 4 ? 3 : Math.min(n, 2);
+  return { "--n": n, "--tall-cols": tallCols, "--tall-rows": Math.ceil(n / tallCols) } as CSSProperties;
+}
 
 /** One step of difficulty: how many shadows to choose from, and whether the others come from the picture's own theme. */
 export interface ShadowLevel {

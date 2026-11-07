@@ -255,6 +255,11 @@ In a fresh worktree run `bun install` first.
   brings it back.
 - Where the child picks one of several (Zuordnen, Schatten, a quiz), exactly one choice fits: never offer a wrong
   choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
+  The choices are as big as the room below (or beside) the picture allows – sized from that room as a size container,
+  never from fixed `vh` caps – with clear room between them; each has its name small and quiet below it for grown-ups
+  (one line, the same words as its `aria-label`), and what a round is about („Was brauche ich?“) stands as plain small
+  text under the picture: no emoji, no bubble, no frame (user feedback from the Zuordnen games, November 2026: small
+  buttons with room to spare, a loud topic bubble; `choiceRows` in `src/games/shadows/levels.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { PointingFamily, type MascotKind } from "@/components/Mascot";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
@@ -6,6 +6,7 @@ import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
 import { shuffle } from "./deck";
+import { choiceRows } from "./levels";
 import { emojiGlyph, pickPeepholes, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
 import type { PeekLevel } from "@/games/animals/levels";
@@ -124,6 +125,8 @@ export interface PeekPlayProps {
   /** The whole animals to choose from, `item` among them. */
   choices: ShadowItem[];
   level: PeekLevel;
+  /** What the round is about, for grown-ups: shown under the stage. */
+  topic?: ReactNode;
   /** The right animal was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
   /** Its coming out has been watched: the next round may come. */
@@ -135,7 +138,7 @@ export interface PeekPlayProps {
  * only bits of it show through gaps in the leaves); tap the whole animal below. A kind of round of "Was gehört zum
  * Tier?", but it lives here since it shares the stage, pictures and glyphs with the shadows.
  */
-export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: PeekPlayProps) {
+export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNext }: PeekPlayProps) {
   const language = useAppLanguage();
   const texts = pick(SHADOW_TEXTS, language.id);
   const [round] = useState(() => hideAnimal(item, choices, level));
@@ -330,8 +333,9 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
         {/* Tapped, they wave and grin while the bush rustles and the animal calls, like a tap on the bush. */}
         <PointingFamily kind={FAMILY} pointer="grown" className="pk-family mirror" onTap={onHideoutDown} />
       </div>
+      {topic}
       <div className="sh-ground">
-        <div className="sh-options" style={{ "--n": round.choices.length } as CSSProperties}>
+        <div className="sh-options" style={choiceRows(round.choices.length)}>
           {round.choices.map((c, i) => (
             <div
               key={c.id}
@@ -345,6 +349,9 @@ export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: P
             >
               <span className="pk-choice sh-emoji" aria-hidden>
                 {c.emoji}
+              </span>
+              <span className="sh-name" aria-hidden>
+                {texts.name(c)}
               </span>
             </div>
           ))}

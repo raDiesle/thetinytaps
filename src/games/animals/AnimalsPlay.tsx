@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
+import { choiceRows } from "@/games/shadows/levels";
 import { ANIMAL_TEXTS, ANIMALS, GIFT_TEXTS, giverOf } from "./content";
 import { GiftDrawing } from "./gifts";
 import { HomeDrawing } from "./homes";
@@ -45,6 +46,8 @@ const moveStyle = (o: Offset | null): CSSProperties | undefined =>
 export interface AnimalsPlayProps {
   settings: Pick<AnimalsSettings, "speech" | "sounds">;
   round: FeedRound | GiftRound | HomeRound;
+  /** What the round is about, for grown-ups: shown under the picture. */
+  topic?: ReactNode;
   /** The right food, gift or home was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
   /** The munching or moving in has been watched: the next round may come. */
@@ -55,7 +58,7 @@ export interface AnimalsPlayProps {
  * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), what the animal gives us to it (Z-01), or
  * the animal to its home (N-09). Tapping is enough; dragging works too.
  */
-export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayProps) {
+export function AnimalsPlay({ settings, round, topic, onSolved, onNext }: AnimalsPlayProps) {
   const language = useAppLanguage();
   const texts = pick(ANIMAL_TEXTS, language.id);
   const giftTexts = pick(GIFT_TEXTS, language.id);
@@ -347,7 +350,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
 
   const options =
     round.kind === "gift" ? (
-      <div className="ap-options" style={{ "--n": round.gifts.length } as CSSProperties}>
+      <div className="ap-options" style={choiceRows(round.gifts.length)}>
         {round.gifts.map((gift, i) => {
           const giver = outcome?.pick === i && !outcome.ok ? giverOf(gift) : undefined;
           return (
@@ -371,12 +374,15 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
               <span className={`ap-food ap-gift${moverClass(i)}`} style={moveStyle(offsetOf(i))}>
                 <GiftDrawing gift={gift} label={giftTexts.gift(gift)} />
               </span>
+              <span className="ap-name" aria-hidden>
+                {giftTexts.gift(gift)}
+              </span>
             </div>
           );
         })}
       </div>
     ) : round.kind === "feed" ? (
-      <div className="ap-options" style={{ "--n": round.foods.length } as CSSProperties}>
+      <div className="ap-options" style={choiceRows(round.foods.length)}>
         {round.foods.map((food, i) => (
           <div
             key={food.id}
@@ -393,11 +399,14 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
             <span className={`ap-food ap-emoji${moverClass(i)}`} style={moveStyle(offsetOf(i))} role="img" aria-label={texts.food(food)}>
               {food.emoji}
             </span>
+            <span className="ap-name" aria-hidden>
+              {texts.food(food)}
+            </span>
           </div>
         ))}
       </div>
     ) : (
-      <div className="ap-options" style={{ "--n": round.homes.length } as CSSProperties}>
+      <div className="ap-options" style={choiceRows(round.homes.length)}>
         {round.homes.map((home, i) => {
           const peek = outcome?.pick === i && !outcome.ok;
           const resident = peek ? ANIMALS.find((a) => a.home === home.id) : undefined;
@@ -431,6 +440,9 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
                   </span>
                 )}
               </div>
+              <span className="ap-name" aria-hidden>
+                {texts.home(home)}
+              </span>
             </div>
           );
         })}
@@ -440,8 +452,13 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
   return (
     <div className={`animals-play kind-${round.kind}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       {/* Up in the picture things stand on the horizon; the ground in front is where the child's things are. */}
+      {/* The topic stands under the animal: below the sky's picture, or on the ground when the homes fill the sky. */}
       <div className="ap-top">{round.kind === "home" ? options : animal}</div>
-      <div className="ap-ground">{round.kind === "home" ? animal : options}</div>
+      {round.kind !== "home" && topic}
+      <div className="ap-ground">
+        {round.kind === "home" ? animal : options}
+        {round.kind === "home" && topic}
+      </div>
       <FeedbackLayer effects={effects} />
     </div>
   );

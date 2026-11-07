@@ -6,7 +6,7 @@ import { type Localized, useT } from "@/lib/language";
 import "@/games/shadows/shadows.css";
 import { AnimalsRounds } from "./AnimalsRounds";
 import { KIND_ORDER, type RoundKind } from "./levels";
-import { KIND_SIGNS } from "./TopicBubble";
+import { KIND_SIGNS } from "./RoundTopic";
 import { ANIMALS_SETTINGS_KEY, DEFAULT_ANIMALS_SETTINGS, type Difficulty } from "./settings";
 import "./animals.css";
 

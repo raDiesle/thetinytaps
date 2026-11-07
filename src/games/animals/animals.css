@@ -2,6 +2,10 @@
 
 .animals-play {
   --gap: min(4vw, 32px);
+  /* The name under each choice, for grown-ups: its size, the gap above it and the room it takes below a choice. */
+  --name-size: clamp(0.8rem, 2.4vh, 1rem);
+  --name-gap: 10px;
+  --name-room: calc(var(--name-gap) + var(--name-size) * 1.25);
   position: absolute;
   inset: 0;
   display: flex;
@@ -20,21 +24,33 @@
   padding: 0 16px;
 }
 
+/* Both are size containers: the choices in them (the homes up top, the rest on the ground) are as big as their room. */
 .ap-top {
   flex: 1.1;
+  min-height: 0;
   align-items: flex-end;
   padding-top: max(64px, env(safe-area-inset-top));
+  container-type: size;
 }
 
 .ap-ground {
   flex: 1;
+  min-height: 0;
   align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: min(2vh, 14px);
+  /* Clear of the page's paper margin over the picture's edge (`--frame`), so the names below the choices stay whole. */
+  padding-bottom: max(calc(var(--frame, 0px) + min(1.5vh, 10px)), env(safe-area-inset-bottom));
   background: #b5e48c;
+  container-type: size;
 }
 
 .kind-home .ap-top {
   flex: 1.3;
+}
+
+/* Looking for its home, the animal stands on the ground with the round's topic under it. */
+.kind-home .ap-ground {
+  flex-direction: column;
 }
 
 .ap-emoji {
@@ -94,74 +110,53 @@
   animation: shake 0.3s ease-in-out 3;
 }
 
-/* What the round is about, for grown-ups (TopicBubble): a speech bubble at the left of the picture, its tail pointing in
-   to the middle, where the animal is; the sign big, the question small under it. Taps go through it to the game. */
+/* What the round is about, for grown-ups (RoundTopic): plain small text centred under the picture, quiet – no sign, no
+   bubble, no frame (user feedback, November 2026). Taps go through it to the game. */
 .ap-topic {
-  position: absolute;
-  z-index: 6;
-  top: calc(max(64px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
-  left: max(16px, 3vw, env(safe-area-inset-left));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  max-width: min(30vw, 240px);
-  padding: 0.35em 0.8em 0.45em;
-  border: var(--outline);
-  border-radius: 1.2em;
-  background: #fff;
-  pointer-events: none;
-  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* The tail: a square turned on its corner, half out of the bubble's right edge, only its two outer edges drawn. */
-.ap-topic::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -11px;
-  width: 20px;
-  height: 20px;
-  margin-top: -10px;
-  border-right: var(--outline);
-  border-bottom: var(--outline);
-  background: #fff;
-  rotate: -45deg;
-}
-
-.ap-topic-sign {
-  font-family: var(--font-emoji);
-  font-size: clamp(2rem, 12vh, 4.5rem);
-  line-height: 1.1;
-}
-
-.ap-topic-text {
+  flex: none;
+  margin: 0;
+  padding: 0.25em 16px;
   color: var(--ink);
-  font-size: clamp(0.75rem, 2.6vh, 1.05rem);
+  font-size: clamp(0.75rem, 2.4vh, 1rem);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
   text-align: center;
   text-wrap: balance;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
-/* The things to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
+/* The things to choose from, in one row, each with its name below it (the room for it between the rows and below the
+   last one); they are as big as their room allows for 2, 3 or 4 side by side (user feedback, November 2026). */
 .ap-options {
   --cols: var(--n);
+  --rows: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: calc(var(--gap) + var(--name-room)) var(--gap);
   align-items: flex-end;
   justify-content: center;
+  padding-bottom: var(--name-room);
 }
 
-/* Phones upright: two per row, so they stay big enough for a finger. */
+/* Phones upright: two per row (`choiceRows`), so they stay big enough for a finger. */
 @media (max-aspect-ratio: 4 / 5) {
   .ap-options {
-    --cols: min(var(--n), 2);
+    --cols: var(--tall-cols);
+    --rows: var(--tall-rows);
   }
 }
 
 .ap-option {
+  /* As big as the container round the row allows (the ground, or the sky for the homes): its height less the names'
+     room, shared by the rows, and its width shared by the columns, clear of the page's paper margin (`--frame`). */
+  --size: min(
+    (100cqh - var(--rows) * var(--name-room) - (var(--rows) - 1) * var(--gap)) /
+    var(--rows),
+    (100cqw - (var(--cols) - 1) * var(--gap) - 2 * var(--frame, 0px)) /
+    var(--cols),
+    300px
+  );
   position: relative;
   display: flex;
   flex-direction: column;
@@ -187,13 +182,30 @@
 }
 
 .ap-option.focused {
-  outline: 6px solid var(--sunshine);
-  outline-offset: 6px;
+  outline: 5px solid var(--sunshine);
+  outline-offset: 4px;
+}
+
+/* Its name below it, small and quiet, for grown-ups; it stays with the plate while the food or gift flies off. */
+.ap-name {
+  position: absolute;
+  top: calc(100% + var(--name-gap));
+  left: 50%;
+  max-width: calc(var(--size) + var(--gap));
+  overflow: hidden;
+  translate: -50% 0;
+  color: var(--ink);
+  font-size: var(--name-size);
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 /* A food lies on a plate; only the food is dragged, the plate stays. */
 .ap-plate {
-  --size: min(20vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 190px);
   justify-content: center;
   width: var(--size);
   min-height: var(--size);
@@ -301,7 +313,6 @@
 
 /* A home; the drawing is a square, so the animal's spot can be given in per cent. */
 .ap-home {
-  --size: min(30vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 300px);
   width: var(--size);
 }
 

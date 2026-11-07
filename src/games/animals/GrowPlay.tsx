@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
+import { choiceRows } from "@/games/shadows/levels";
 import { GROW_MS, GROW_TEXTS, GrowthPicture } from "./growth";
 import type { GrowRound } from "./levels";
 import type { AnimalsSettings } from "./settings";
@@ -24,6 +25,8 @@ const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height /
 export interface GrowPlayProps {
   settings: Pick<AnimalsSettings, "speech" | "sounds">;
   round: GrowRound;
+  /** What the round is about, for grown-ups: shown under the picture. */
+  topic?: ReactNode;
   /** The right one was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
   /** Its becoming has been watched: the next round may come. */
@@ -36,7 +39,7 @@ export interface GrowPlayProps {
  * becomes it: the caterpillar spins itself in and a butterfly flies out, the egg cracks, the seed grows into a
  * sunflower, the tadpole grows legs and hops onto a lily pad as a frog. A wrong pick shows the small one it comes from.
  */
-export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
+export function GrowPlay({ settings, round, topic, onSolved, onNext }: GrowPlayProps) {
   const language = useAppLanguage();
   const texts = pick(GROW_TEXTS, language.id);
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -175,8 +178,9 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
           <GrowthPicture growth={round.growth} growing={growing} label={growing ? texts.adult(round.growth) : texts.young(round.growth)} />
         </div>
       </div>
+      {topic}
       <div className="ap-ground">
-        <div className="ap-options" style={{ "--n": round.grown.length } as CSSProperties}>
+        <div className="ap-options" style={choiceRows(round.grown.length)}>
           {round.grown.map((g, i) => {
             const shown = outcome?.pick === i;
             return (
@@ -201,6 +205,9 @@ export function GrowPlay({ settings, round, onSolved, onNext }: GrowPlayProps) {
                   aria-label={texts.adult(g)}
                 >
                   {g.emoji}
+                </span>
+                <span className="ap-name" aria-hidden>
+                  {texts.adult(g)}
                 </span>
               </div>
             );

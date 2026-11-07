@@ -14,7 +14,13 @@ rustles, like a tap on the bush; never inside the stage, where the animal comes 
 
 ## Rules
 
-- No text on the screen while playing: no question, no names under the pictures or on a wrong shadow, no numbers. What is said comes only with Vorlesen; the pictures carry their names only as `aria-label`.
+- Nothing to read for the child while playing: no question, no numbers, nothing on a wrong shadow. Only for grown-ups,
+  each shadow (and each whole animal in „Wer schaut da raus?“) has its name small and quiet below it (`.sh-name`, the
+  picture's name from `texts.name`, in the app language), one line, centred (user feedback, November 2026).
+- The shadows are as big as the meadow below the picture allows – 2 to 6 in a row (2 or 3 to a row on a phone held
+  upright, `choiceRows` in `levels.ts`), clear of the page's paper margin, with room kept below for their names
+  (`--name-room`); sizes come from the meadow as a size container (`--size` in `shadows.css`), never from fixed `vh`
+  caps (user feedback, November 2026: the buttons were small with room to spare).
 - No options: no start screen before playing and no settings. Difficulty comes from `nextLevel`, the kind of pictures from the button while playing – the user asked for both.
 - A wrong shadow never shows or sounds as wrong; it only feeds `nextLevel`.
 - Harder means more shadows and closer outlines, never quicker: no clock, and time doesn't count for the difficulty.

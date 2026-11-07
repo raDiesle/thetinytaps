@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
-import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
+import { choiceRows, dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
 import { shadowsVoice } from "./voice";
 
@@ -381,11 +381,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
         </div>
       </div>
       <div className="sh-ground">
-        <div
-          className="sh-options"
-          // Upright, two in a row while that leaves at most two rows, else three.
-          style={{ "--n": round.shadows.length, "--tall-cols": round.shadows.length > 4 ? 3 : Math.min(round.shadows.length, 2) } as CSSProperties}
-        >
+        <div className="sh-options" style={choiceRows(round.shadows.length)}>
           {round.shadows.map((s, i) => {
             const peek = outcome?.pick === i && !outcome.ok;
             return (
@@ -410,6 +406,9 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
                   aria-hidden
                 >
                   {s.emoji}
+                </span>
+                <span className="sh-name" aria-hidden>
+                  {texts.name(s)}
                 </span>
               </div>
             );

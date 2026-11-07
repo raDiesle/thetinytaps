@@ -2,6 +2,10 @@
 
 .shadows-play {
   --gap: min(4vw, 32px);
+  /* The name under each choice, for grown-ups: its size, the gap above it and the room it takes below a choice. */
+  --name-size: clamp(0.8rem, 2.4vh, 1rem);
+  --name-gap: 10px;
+  --name-room: calc(var(--name-gap) + var(--name-size) * 1.25);
   position: absolute;
   inset: 0;
   display: flex;
@@ -23,11 +27,16 @@
   padding-bottom: 2vh;
 }
 
+/* A size container: the choices on it are as big as its room. */
 .sh-ground {
   flex: 1;
+  min-height: 0;
   align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: min(2vh, 14px);
+  /* Clear of the page's paper margin over the picture's edge (`--frame`), so the names below the choices stay whole. */
+  padding-bottom: max(calc(var(--frame, 0px) + min(1.5vh, 10px)), env(safe-area-inset-bottom));
   background: #b5e48c;
+  container-type: size;
 }
 
 .sh-emoji {
@@ -81,24 +90,37 @@
   animation: sh-hop-again 0.45s ease-in-out;
 }
 
-/* The shadows to choose from, in one row; they shrink to fit 2 to 6 side by side. */
+/* The shadows (or whole animals) to choose from, in one row, each with its name below it (the room for it between the
+   rows and below the last one); they are as big as their room allows for 2 to 6 side by side (user feedback, November
+   2026). */
 .sh-options {
   --cols: var(--n);
+  --rows: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: calc(var(--gap) + var(--name-room)) var(--gap);
   justify-content: center;
+  padding-bottom: var(--name-room);
 }
 
-/* Phones upright: two or three per row (`--tall-cols`), so they stay big enough for a finger. */
+/* Phones upright: two or three per row (`choiceRows`), so they stay big enough for a finger. */
 @media (max-aspect-ratio: 4 / 5) {
   .sh-options {
     --cols: var(--tall-cols);
+    --rows: var(--tall-rows);
   }
 }
 
 .sh-option {
-  --size: min(22vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 220px);
+  /* As big as the ground allows: its height less the names' room, shared by the rows, and its width by the columns
+     clear of the page's paper margin (`--frame`). */
+  --size: min(
+    (100cqh - var(--rows) * var(--name-room) - (var(--rows) - 1) * var(--gap)) /
+    var(--rows),
+    (100cqw - (var(--cols) - 1) * var(--gap) - 2 * var(--frame, 0px)) /
+    var(--cols),
+    280px
+  );
   position: relative;
   display: flex;
   align-items: center;
@@ -113,13 +135,6 @@
   touch-action: none;
   transition: scale 0.25s;
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-
-/* Phones upright: two rows of shadows have to fit into the meadow. */
-@media (max-aspect-ratio: 4 / 5) {
-  .sh-option {
-    --size: min(18vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 220px);
-  }
 }
 
 .sh-option:nth-child(2) {
@@ -143,8 +158,27 @@
 }
 
 .sh-option.focused {
-  outline: 6px solid var(--sunshine);
-  outline-offset: 6px;
+  outline: 5px solid var(--sunshine);
+  outline-offset: 4px;
+}
+
+/* Its name below it, small and quiet, for grown-ups (user feedback, November 2026); a shadow's name stays while the
+   picture lands on it, and fades with a whole animal that isn't the one hiding. */
+.sh-name {
+  position: absolute;
+  top: calc(100% + var(--name-gap));
+  left: 50%;
+  max-width: calc(var(--size) + var(--gap));
+  overflow: hidden;
+  translate: -50% 0;
+  color: var(--ink);
+  font-size: var(--name-size);
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .sh-option.near {

@@ -6,7 +6,7 @@ import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
 import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
-import { KIND_SIGNS } from "./TopicBubble";
+import { KIND_SIGNS } from "./RoundTopic";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
@@ -276,10 +276,19 @@ test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „a
   expect(de.comesFrom(byId.kaulquappe)).toBe("Der Frosch kommt aus der Kaulquappe!");
 });
 
-// The bubble's sign tells grown-ups what a round is about; were it one of the pictures to pick from, it would give the
-// answer away or look like one more choice.
+// A round's sign stands before its name under ⚙️; were it one of the pictures to pick from, it would give the answer away
+// or look like one more choice.
 test("no round's sign is a picture the child picks from", () => {
   const pictures = new Set([...ANIMALS, ...FOODS, ...PEEK_ITEMS, ...GROWTHS].map((thing) => thing.emoji));
   expect(Object.values(KIND_SIGNS).filter((sign) => pictures.has(sign))).toEqual([]);
   expect(Object.keys(KIND_SIGNS).sort()).toEqual([...KIND_ORDER].sort());
+});
+
+// While playing, the round's kind is plain small text under the picture, never its sign in a bubble (user feedback,
+// November 2026).
+test("the round's topic while playing is plain text, without its sign", async () => {
+  const source = await Bun.file(new URL("./RoundTopic.tsx", import.meta.url)).text();
+  const component = source.slice(source.indexOf("export function RoundTopic"));
+  expect(component).not.toContain("KIND_SIGNS");
+  expect(component).not.toContain("bubble");
 });

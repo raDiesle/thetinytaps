@@ -25,8 +25,8 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest:
    clearly wrong choice; there are only four, so at most four to choose from.
 
 Each round is mounted anew (`key={turn}`) and reports `onSolved(misses)` when the right thing is picked and `onNext()`
-when the reaction has been watched; the step and the animals still to come live in `AnimalsRounds`, which also shows
-each round's `TopicBubble`. Every five rounds (one of each kind) count as a game for the play-time limit (`gameEnded`,
+when the reaction has been watched; the step and the animals still to come live in `AnimalsRounds`, which also hands
+each round its `RoundTopic` (`topic`) to show under its picture. Every five rounds (one of each kind) count as a game for the play-time limit (`gameEnded`,
 `countGame`). Homes are drawn in `homes.tsx`, gifts in `gifts.tsx`, the small ones and their growing in `growth.tsx`; animals, foods, gifts' givers and sentences are in `content.ts`.
 
 **Difficulty** (`ANIMAL_LEVELS`, `dealFeed`, `dealGift`, `dealHome`, `dealPeek`, `dealGrow` in `levels.ts`; the step rule is `nextLevel` from
@@ -54,12 +54,19 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
 - Harder means more to choose from and less to see, never quicker: no clock, and time doesn't count for the difficulty.
 - A wrong pick is never shown as wrong (the animal says „Bäh!“, the real resident peeks out, the animal shown says who
   it is); it only feeds `nextLevel`.
-- What a round is about stands for grown-ups in a speech bubble at the left of the picture (`TopicBubble.tsx`, user
-  feedback, November 2026): the kind's sign big (`KIND_SIGNS`, also before its name under ⚙️), its question small below
-  it, as the animal or the small one asks it – „Wer versteckt sich da?“, „Was esse ich?“, „Was produziere ich?“, „Wo
-  lebe ich?“, „Was wird aus mir?“. A sign is never a picture the child picks from (`content.test.ts`), and the bubble
-  lets every tap through. Otherwise nothing to read: no names under the things; the pictures carry their names only as
-  `aria-label`.
+- What a round is about stands for grown-ups as plain small text centred right under the picture (`RoundTopic.tsx`; in
+  „Wer wohnt wo?“, where the homes fill the sky, under the animal on the ground): its question as the animal or the
+  small one asks it – „Wer versteckt sich da?“, „Was esse ich?“, „Was produziere ich?“, „Wo lebe ich?“, „Was wird aus
+  mir?“ –, quiet (small, muted ink), with no emoji, no bubble, no frame and nothing hopping in, letting every tap
+  through (user feedback, November 2026: the bubble with its big sign was too loud; `content.test.ts`). The kind's
+  sign (`KIND_SIGNS`) stands only before its name under ⚙️ and is never a picture the child picks from.
+- The choices (plates, homes, the animals to pick) are as big as the room below the picture allows – for homes the sky
+  above the animal – on a tablet, a computer and a phone on its side alike, in one row of 2 to 5 (two to a row on a
+  phone held upright, `choiceRows`), clear of the page's paper margin, with clear room between them. Each has its name
+  small and quiet below it for grown-ups (`.ap-name`, `.sh-name`: the same words as its `aria-label`, in the app
+  language), one line, centred; the name stays with its plate when the food or gift flies off (user feedback,
+  November 2026). Sizes come from the container round the row (`container-type: size`, `--size` in `animals.css`),
+  never from fixed `vh` caps; the names' room (`--name-room`) is kept free below every row.
 - No stars or other count of rounds played (user feedback, November 2026): the game flows on, nothing to collect.
 - Only one choice may fit: a wrong food or home must clearly not belong to the animal (no lettuce or apple next to the rabbit's carrot, no fish next to the bear's honey, no pond next to the fish's aquarium). `content.test.ts` checks that every step deals exactly one right choice among as many as it says.
   - Foods: every fed animal lists in `alsoEats` everything else among the foods it eats, in reality or as a child knows it (the panda is a „Pandabär“, so honey; the lion a big cat, so fish) – when in doubt, list it. `wrongFoods()` leaves those out of the wrong choices, and `content.test.ts` checks that the list is there and that at least three wrong foods are left. A new food means going through every animal's list; a new animal gets its list with its food.
