@@ -59,7 +59,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
       resultsRef.current = [];
     }
     const level = ANIMAL_LEVELS[levelRef.current];
-    const kind = nextKind(last, settings);
+    const kind = nextKind(last, settings.kinds);
     if (kind === "peek") {
       const item = drawPeek();
       return { kind, item, choices: dealPeek(item, PEEK_ITEMS, level.peek), level: level.peek } as const;

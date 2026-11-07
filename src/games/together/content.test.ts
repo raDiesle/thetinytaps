@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { dealRound, KIND_ORDER, nextKind, TOGETHER_LEVELS } from "./levels";
+import { DEFAULT_TOGETHER_SETTINGS } from "./settings";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { TextsLanguageId } from "@/content/texts";
 import { PAIRS, type PairId, pairsOf, TOGETHER_TEXTS, TOGETHER_TRANSLATIONS, WORK_MS } from "./pairs";
@@ -45,12 +46,15 @@ test("every step deals exactly one right partner among as many as it says, all o
   }
 });
 
-test("the kinds take turns, and only those switched on", () => {
-  expect(nextKind(null, { pair: true, helper: true })).toBe("pair");
-  expect(nextKind("pair", { pair: true, helper: true })).toBe("helper");
-  expect(nextKind("helper", { pair: true, helper: true })).toBe("pair");
-  expect(nextKind("pair", { pair: true, helper: false })).toBe("pair");
-  expect(nextKind(null, { pair: false, helper: true })).toBe("helper");
+// Grown-ups choose all kinds or exactly one, never a mix of some (user feedback, November 2026).
+test("the kinds take turns, or only the one chosen; no kind is switched on or off on its own", () => {
+  expect(nextKind(null, "all")).toBe("pair");
+  expect(nextKind("pair", "all")).toBe("helper");
+  expect(nextKind("helper", "all")).toBe("pair");
+  expect(nextKind("pair", "pair")).toBe("pair");
+  expect(nextKind(null, "helper")).toBe("helper");
+  expect(DEFAULT_TOGETHER_SETTINGS.kinds).toBe("all");
+  for (const kind of KIND_ORDER) expect(kind in DEFAULT_TOGETHER_SETTINGS, kind).toBe(false);
 });
 
 // The bubble's sign tells grown-ups what a round is about; were it one of the pictures to pick from, it would give the

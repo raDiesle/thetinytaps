@@ -29,8 +29,8 @@ Every six rounds count as a game for the play-time limit (`gameEnded`, `countGam
 
 ## Rules
 
-- Grown-ups change things only behind ⚙️ held while playing (`PlayOptions`): „Was drankommt“ (each kind on or off, the
-  last can't be switched off) and „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer). No other options.
+- Grown-ups change things only behind ⚙️ held while playing (`PlayOptions`): „Was drankommt“ („Gemischt“ or exactly one kind,
+  `settings.kinds` – never a mix of some, user feedback, November 2026) and „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer). No other options.
 - Kinds never mix in one round: the wrong choices are partners of the same kind (`dealRound`), and each partner belongs
   to exactly one thing or helper, so exactly one choice fits. A new pair must not fit another one above (no second thing
   a key opens, no helper who also uses scissors); `content.test.ts` checks ids, partners and the dealing.

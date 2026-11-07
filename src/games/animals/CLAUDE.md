@@ -46,8 +46,9 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
 - No start screen and no cards for the five kinds: by default all five take turns and the game finds the difficulty
   itself (user decision, November 2026). Grown-ups change that only behind ⚙️ held while playing (user feedback,
   November 2026), and a change counts from the next round:
-  - „Was drankommt“: each kind on or off (`settings.peek/feed/gift/home/grow`); the turns go on with the next kind switched on
-    (`nextKind`), and the last one can't be switched off.
+  - „Was drankommt“: „Gemischt“ (all five take turns, the default) or exactly one kind (`settings.kinds`, `nextKind`) –
+    never a mix of some switched on and off one by one (user feedback, November 2026; `content.test.ts` checks the
+    settings have no switch per kind).
   - „Schwierigkeit“: „Von selbst“ (the default, `nextLevel`) or a fixed step, Leicht · Mittel · Schwer (`FIXED_LEVELS`);
     back on „Von selbst“ the game climbs on from the fixed step.
     No other options (names, dragging instead of tapping were left out on purpose).

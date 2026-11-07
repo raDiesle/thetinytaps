@@ -40,7 +40,7 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
       levelRef.current = FIXED_LEVELS[settings.difficulty];
       resultsRef.current = [];
     }
-    const kind = nextKind(last, settings);
+    const kind = nextKind(last, settings.kinds);
     const pair = kind === "pair" ? drawOfDay() : drawHelper();
     return dealRound(pair, PAIRS, TOGETHER_LEVELS[levelRef.current]);
   }

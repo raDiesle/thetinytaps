@@ -1,6 +1,6 @@
 import { GameShell } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
-import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
+import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
 import { TOGETHER_TITLE } from "./names";
@@ -10,7 +10,10 @@ import { TogetherRounds } from "./TogetherRounds";
 import { KIND_SIGNS } from "./TopicBubble";
 import "./together.css";
 
-/** The names of the two kinds of rounds, for switching them on and off (after their sign, `KIND_SIGNS`). */
+/** All kinds taking turns, the first choice of „Was drankommt“ (worded as Schatten finden's „Gemischt“). */
+const MIXED: Localized = { de: "Gemischt", ru: "Вперемешку", en: "Mixed", zh: "混合", hi: "मिले-जुले", es: "Mezclado", ar: "منوعة" };
+
+/** The names of the two kinds of rounds, to choose one of them (after their sign, `KIND_SIGNS`). */
 const KIND_NAMES: Record<RoundKind, Localized> = {
   pair: {
     de: "Dinge aus dem Alltag",
@@ -35,7 +38,6 @@ const KIND_NAMES: Record<RoundKind, Localized> = {
 export function TogetherGame() {
   const t = useT();
   const [settings, update] = useGameSettings(TOGETHER_SETTINGS_KEY, DEFAULT_TOGETHER_SETTINGS);
-  const kindsOn = KIND_ORDER.filter((k) => settings[k]).length;
 
   return (
     <GameShell
@@ -47,8 +49,8 @@ export function TogetherGame() {
     >
       <TogetherRounds settings={settings} />
       <PlayOptions>
-        <SettingsGroup
-          title={t({
+        <Choice<"all" | RoundKind>
+          label={t({
             de: "Was drankommt",
             ru: "Что будет в игре",
             en: "What comes up",
@@ -57,17 +59,11 @@ export function TogetherGame() {
             es: "Qué aparece",
             ar: "ما الذي يظهر",
           })}
-        >
-          {KIND_ORDER.map((kind) => (
-            <Toggle
-              key={kind}
-              label={`${KIND_SIGNS[kind]} ${t(KIND_NAMES[kind])}`}
-              checked={settings[kind]}
-              // One kind always stays on: the last one can't be switched off.
-              onChange={(on) => (on || kindsOn > 1) && update({ [kind]: on })}
-            />
-          ))}
-        </SettingsGroup>
+          value={settings.kinds}
+          onChange={(kinds) => update({ kinds })}
+          // All kinds taking turns, or just one – never a mix of some (user feedback, November 2026).
+          options={[{ value: "all", label: t(MIXED) }, ...KIND_ORDER.map((kind) => ({ value: kind, label: `${KIND_SIGNS[kind]} ${t(KIND_NAMES[kind])}` }))]}
+        />
         <Choice<Difficulty>
           label={t({ de: "Schwierigkeit", ru: "Сложность", en: "Difficulty", zh: "难度", hi: "कठिनाई", es: "Dificultad", ar: "الصعوبة" })}
           value={settings.difficulty}

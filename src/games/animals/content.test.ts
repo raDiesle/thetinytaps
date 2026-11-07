@@ -6,6 +6,7 @@ import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
 import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
+import { DEFAULT_ANIMALS_SETTINGS } from "./settings";
 import { KIND_SIGNS } from "./TopicBubble";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
@@ -131,21 +132,19 @@ test("an animal without its words gets the whole German sentence, in every langu
   }
 });
 
-test("only the kinds switched on take turns, in their order, and none switched on plays all", () => {
-  const off = { peek: false, feed: false, gift: false, home: false, grow: false };
-  const turns = (on: Partial<Record<RoundKind, boolean>>) => {
-    const all = { ...off, ...on };
-    const kinds = [nextKind(null, all)];
-    for (let i = 0; i < 6; i++) kinds.push(nextKind(kinds[kinds.length - 1], all));
-    return kinds;
+// Grown-ups choose all kinds or exactly one, never a mix of some (user feedback, November 2026).
+test("all kinds take turns in their order, or only the one chosen; no kind is switched on or off on its own", () => {
+  const turns = (kinds: "all" | RoundKind) => {
+    const played = [nextKind(null, kinds)];
+    for (let i = 0; i < 6; i++) played.push(nextKind(played[played.length - 1], kinds));
+    return played;
   };
-  expect(turns({ peek: true, feed: true, gift: true, home: true, grow: true })).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
-  expect(turns({ feed: true, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home", "feed"]);
-  expect(turns({ peek: true })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek", "peek"]);
-  expect(turns({})).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
-  // A kind switched off while it plays: the turns go on with the next one switched on.
-  expect(nextKind("feed", { ...off, peek: true })).toBe("peek");
-  expect(nextKind("grow", { ...off, home: true })).toBe("home");
+  expect(turns("all")).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
+  expect(turns("home")).toEqual(["home", "home", "home", "home", "home", "home", "home"]);
+  // One kind chosen while another plays: the next round is the chosen one.
+  expect(nextKind("feed", "peek")).toBe("peek");
+  expect(DEFAULT_ANIMALS_SETTINGS.kinds).toBe("all");
+  for (const kind of KIND_ORDER) expect(kind in DEFAULT_ANIMALS_SETTINGS, kind).toBe(false);
   // The fixed difficulties are steps there are, easy to hard.
   expect(FIXED_LEVELS.easy).toBe(0);
   expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
