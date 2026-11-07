@@ -1,6 +1,6 @@
 import { memo, type CSSProperties } from "react";
 import { GardenBackdrop } from "./flower";
-import { Family, INK, Layer, LeftGlow } from "./scenes";
+import { INK, Layer, LeftGlow } from "./scenes";
 
 // Eimer (H-69): time that fills up, for waiting for something good. A watering can hangs over a clear bucket in the
 // garden and a drop falls from it every second (H-63), rippling the water; the water rises to a red line, where a little
@@ -23,9 +23,8 @@ export const BOAT = { left: 700, right: 820, keel: GOAL_Y + 10 } as const;
 /** The spout's tip, where a drop falls from every second, and how far it falls before it is in the bucket. */
 export const SPOUT = { x: 610, y: 388, fall: 70 } as const;
 
-/** The pot with the flower beside the bucket, and the bear family right of it (its child left of its grown-up). */
+/** The pot with the flower beside the bucket. */
 export const POT = { cx: 950, floor: 800, bud: 640 } as const;
-export const BUCKET_FAMILY = 1100;
 
 /** The bucket's left and right inner edge at height `y`. */
 export function bucketEdges(y: number) {
@@ -291,7 +290,6 @@ export function BucketScene({ glow, running }: { glow: number; running: boolean 
       {running && <Drop />}
       <Pot />
       <PotBloom />
-      <Family kind="bear" x={BUCKET_FAMILY} floor={POT.floor} childLeft />
     </>
   );
 }

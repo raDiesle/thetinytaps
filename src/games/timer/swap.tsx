@@ -23,8 +23,8 @@ export const SWAP_GLASS = { cx: 800, top: SWAP_FLOOR - 440, w: 210, h: 440, glas
  */
 export const TOY = { w: 160, h: 130, fox: 530, bear: 910 } as const;
 
-/** Where the families stand: the fox grown-up at the left with its child right of it, the bear grown-up at the right with its child left of it. */
-export const SWAP_FAMILIES = { fox: 220, bear: 1190 } as const;
+/** Where the two children stand (their left edges): the fox child at the left, the bear child at the right. */
+export const SWAP_CHILDREN = { fox: 400, bear: 1080 } as const;
 
 /** A box in the hourglass's own units as a place in percent of it. */
 function inGlass(x: number, y: number, w: number, h: number): CSSProperties {

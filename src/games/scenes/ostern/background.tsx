@@ -1,6 +1,5 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
 import { Cloud, INK } from "../shared";
-import { WalkingFamily } from "../family";
 import { Poke } from "../spots";
 import type { Box } from "../types";
 import { BUSH, POT, TABLE, TREE, WILLOW } from "./layout";
@@ -268,10 +267,6 @@ export function Background() {
             <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
           </Poke>
         ))}
-      </g>
-      {/* Mama Fox and her child, just in through the garden gate, under the cherry tree */}
-      <g transform={`translate(1052 462) scale(${depthScale(462)})`}>
-        <WalkingFamily kind="fox" clothes={{ top: "#cc5de8", legs: "#495057", childTop: "#ffd43b", childLegs: "#51cf66" }} />
       </g>
       {/* Roots of the cherry tree on the lawn */}
       <g transform={transformOf(TREE)} fill="#8d5f45">

@@ -1,10 +1,10 @@
 import { memo, type CSSProperties } from "react";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Kuchen (H-53): time that brings something, like the flower – a cake in the oven. Through the oven's window the dough
 // rises out of its tin up to the dashed outline of the finished cake (H-64: the goal is seen from the start) and turns
 // brown in the second half; every second a puff of warm air rises from the vent (H-63). At the end the door opens and
-// the cake comes out onto the table by the fox family, who cheer. The dough is one drawing sliding up out of a box cut
+// the cake comes out onto the table. The dough is one drawing sliding up out of a box cut
 // off behind the tin's front (`overflow: hidden`, moved by `transform`), never drawn again or stretched.
 
 /** The oven's body, standing on the floor right of the table. */
@@ -19,9 +19,8 @@ export const CAKE = { x: 970, y: 480, w: 220, h: 220, rim: 160, dough: { x: 10, 
 /** How much of the dough shows above the tin at the start: a flat little bump. */
 export const DOUGH_START = 0.2;
 
-/** The table the cake is put on at the end, and the fox family left of it (its child right of its grown-up). */
+/** The table the cake is put on at the end. */
 export const TABLE = { x: 560, w: 260, top: 615 } as const;
-export const CAKE_FAMILY = 220;
 export const CAKE_FLOOR = 800;
 
 /** The dome of the risen cake in the dough box's units, also its dashed outline. */
@@ -174,7 +173,6 @@ export function CakeScene({ glow }: { glow: number }) {
       <Cake glow={glow} />
       <Door />
       <Vent />
-      <Family kind="fox" x={CAKE_FAMILY} floor={CAKE_FLOOR} />
     </>
   );
 }

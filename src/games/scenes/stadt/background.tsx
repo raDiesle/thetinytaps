@@ -1,5 +1,4 @@
 import { HORIZON, depthScale, towardsHorizon } from "../layout";
-import { WalkingFamily } from "../family";
 import { Cloud, INK } from "../shared";
 import { Poke } from "../spots";
 import { HOUSES, PARK_X, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, ZEBRA } from "./layout";
@@ -234,10 +233,6 @@ export function Background() {
       {/* Front pavement */}
       <rect y={PAVEMENT} width="1600" height={1000 - PAVEMENT} fill="url(#st-front)" />
       <Tiles x1={-200} x2={1800} y1={PAVEMENT} y2={1000} stroke="#ced4da" />
-      {/* Papa Bear and his child out for a walk on the pavement */}
-      <g transform={`translate(790 915) scale(${depthScale(915)})`}>
-        <WalkingFamily kind="bear" clothes={{ top: "#4dabf7", legs: "#495057", childTop: "#ffd43b", childLegs: "#e8590c" }} />
-      </g>
       {/* A tree pit with a little bush, and bollards by the crossing */}
       <Poke kind="sway">
         <g transform={`translate(1380 872) scale(${depthScale(872)})`}>

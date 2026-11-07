@@ -1,10 +1,10 @@
 import { memo, type CSSProperties } from "react";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Sonnenuntergang (H-54): for „noch zehn Minuten, dann ist Schlafenszeit“ – the sun sinks behind the hills, the sky
 // goes orange, then blue, the first stars come out and the land grows dark with it, so the screen gets calmer as the
 // time runs out. The moon peeks over the hills from the start (where it goes, H-64) and rises as the sun goes down;
-// at the end it stands high, the windows of the little house are lit and the fox family yawns. Every second the
+// at the end it stands high, the windows of the little house are lit. Every second the
 // windmill's sails turn a step (H-63). Sky and land darken by big layers fading in (`opacity`), the sun and moon move
 // by `transform` inside boxes cut off below the hills' ridge (`overflow: hidden`), never by drawing again.
 
@@ -17,11 +17,8 @@ export const MOON = { cx: 900, r: 66, top: 165, start: 560 } as const;
 /** Where the boxes holding the sun and the moon end below: under the hills' ridge everywhere they pass, so no cut shows. */
 export const SKY_CUT = 625;
 
-/** The ground the fox family stands on, on the front hill. */
+/** The ground of the front hill. */
 export const SUNSET_FLOOR = 790;
-
-/** The fox grown-up's place, its child left of it. */
-export const SUNSET_FAMILY = 1130;
 
 /** The windmill on the far hill: where its sails turn. */
 const MILL = { cx: 735, cy: 470, sails: 190 } as const;
@@ -234,8 +231,8 @@ function Windows() {
   );
 }
 
-/** The whole picture; `done` has the fox family yawn. */
-export function SunsetScene({ glow, done }: { glow: number; done: boolean }) {
+/** The whole picture. */
+export function SunsetScene({ glow }: { glow: number }) {
   return (
     <>
       <DaySky />
@@ -249,7 +246,6 @@ export function SunsetScene({ glow, done }: { glow: number; done: boolean }) {
       <Sails />
       <Dusk />
       <Windows />
-      <Family kind="fox" x={SUNSET_FAMILY} floor={SUNSET_FLOOR} childLeft sleepy={done} />
     </>
   );
 }

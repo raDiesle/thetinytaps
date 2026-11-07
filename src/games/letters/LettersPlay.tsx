@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { PointingFamily, type MascotKind } from "@/components/Mascot";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyOf, toLower, toUpper } from "@/content/languages";
@@ -79,8 +78,6 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   /** Counting by tapping: indices of the tapped things, in order. */
   const [tapped, setTapped] = useState<number[]>([]);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
-  /** Zählen: the fox or bear family counting along beside the things, picked by chance for the visit. */
-  const [family] = useState<MascotKind>(() => (Math.random() < 0.5 ? "fox" : "bear"));
   const [push, setPush] = useState<[number, number]>([0, 0]);
   const { effects, ripple } = useTapFeedback();
   const t = useT();
@@ -416,7 +413,6 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   return (
     <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
-        {numbersOnly && <PointingFamily kind={family} pointer="child" className="letters-family" onTap={repeat} />}
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {shown === null && (
             <p className="letters-welcome">

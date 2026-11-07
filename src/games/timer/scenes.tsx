@@ -59,52 +59,32 @@ export function Draw({ w, h, children }: { w: number; h: number; children: React
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// The fox and the bear family: a grown-up and a child, standing still while they wait and waving at the end.
+// The fox or bear child, only where it does the picture's thing itself: holds the apples' basket, waters the flower,
+// blows out the candle, takes its turn with the toy. Nobody stands by only to watch: a family beside every picture was
+// decoration a child wanted to tap, and was taken out (user feedback, November 2026).
 
-/**
- * A grown-up with its child beside it, standing on `floor`; the whole family cheers with `.tm-done` on the stage.
- * `laugh` has the child laugh with its arms up (the Ameisenstraße's end, H-68); `sleepy` has both yawn (the sunset's end, H-54).
- */
-export function Family({
-  kind,
-  x,
-  floor,
-  childLeft = false,
-  laugh = false,
-  sleepy = false,
-}: {
-  kind: "fox" | "bear";
-  x: number;
-  floor: number;
-  childLeft?: boolean;
-  laugh?: boolean;
-  sleepy?: boolean;
-}) {
-  const grown = { w: 190, h: 285 };
-  const small = { w: 120, h: 180 };
-  const childX = childLeft ? x - small.w + 10 : x + grown.w - 10;
+/** The child's width and height on the stage. */
+export const CHILD = { w: 120, h: 180 } as const;
+
+/** A fox or bear child with its left edge at `x`, standing on `floor`; it waves and hops with `.tm-done` on the stage. */
+export function Child({ kind, x, floor }: { kind: "fox" | "bear"; x: number; floor: number }) {
   return (
-    <>
-      <Layer x={x} y={floor - grown.h} w={grown.w} h={grown.h} className="tm-mascot">
-        <Mascot kind={kind} sleepy={sleepy} />
-      </Layer>
-      <Layer x={childX} y={floor - small.h} w={small.w} h={small.h} className="tm-mascot tm-mascot-child">
-        <Mascot kind={kind} child pose={laugh ? "cheer" : "stand"} sleepy={sleepy} />
-      </Layer>
-    </>
+    <Layer x={x} y={floor - CHILD.h} w={CHILD.w} h={CHILD.h} className="tm-mascot">
+      <Mascot kind={kind} child />
+    </Layer>
   );
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Zug zum Bahnhof: a little train rolls along the track to the station, where the bear family waits.
+// Zug zum Bahnhof: a little train rolls along the track to the station.
 
 /** The track's top; the train's wheels stand on it. */
 export const RAIL_Y = 650;
 /**
- * Where the train starts (its left end) and where its front stops, at the buffers before the station; `family` is where
- * the bear grown-up stands on the platform, its child left of it – all within x 1400, where a tablet cuts the picture.
+ * Where the train starts (its left end) and where its front stops, at the buffers before the station – within x 1400,
+ * where a tablet cuts the picture.
  */
-export const TRAIN = { x: 200, w: 360, h: 200, stop: 1060, family: 1205 } as const;
+export const TRAIN = { x: 200, w: 360, h: 200, stop: 1060 } as const;
 
 /** The little house where the train sets off (H-64): behind its start, its roof and window above the train. */
 export const HOME = { x: 225, w: 210, top: 430 } as const;
@@ -284,12 +264,12 @@ export function RailAhead({ glow }: { glow: number }) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Sanduhr: a big hourglass whose sand runs from the top into the bottom; the fox family stands beside it.
+// Sanduhr: a big hourglass whose sand runs from the top into the bottom.
 
 /** The hourglass's glass: its middle, the top and bottom bulbs (between the wooden plates) and the neck. */
 export const GLASS = { cx: 800, w: 230, top: 190, neck: 452, bottom: 715 } as const;
 
-/** The room's floor, where the hourglass and the fox family stand. */
+/** The room's floor, where the hourglass stands. */
 export const SAND_FLOOR = GLASS.bottom + 48;
 
 /** The top bulb's outline as fractions of its box (x, y), from top left round to top right; the bottom one is it upside down. */
@@ -503,7 +483,7 @@ export function CandleFlame({ out, flare }: { out: boolean; flare: number }) {
 
 // ---------------------------------------------------------------------------------------------------------------
 // Ameisenstraße (H-68): a big cookie lies on a picnic blanket, an anthill beside it. Every second an ant carries a
-// crumb over, the cookie gets smaller and the hill bigger; at the end the ants sit on the hill and the fox child laughs.
+// crumb over, the cookie gets smaller and the hill bigger; at the end the ants sit on the hill.
 
 /** The grass the cookie, the ants and the hill stand on. */
 export const GROUND = 720;
@@ -519,9 +499,6 @@ export const HILL = { cx: 990, w: 340, h: 260, start: 0.75 } as const;
  * second, so one ant reaches the hill every second (H-63). The CSS's `tm-march` has one keyframe per step.
  */
 export const ANTS = { from: 385, n: 7, step: 66, w: 63, h: 42 } as const;
-
-/** Where the fox family watches, right of the hill. */
-export const ANT_FAMILY = 1210;
 
 /** The meadow with the picnic blanket and the crumbs that will be left; drawn once. */
 export const AntsBackdrop = memo(function AntsBackdrop() {

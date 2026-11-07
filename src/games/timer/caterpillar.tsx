@@ -1,8 +1,8 @@
 import { memo, type CSSProperties } from "react";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Raupe (H-46): a little caterpillar eats its way through a big leaf from the tip to the stalk, bite by bite; what is
-// still green is the time left. At the end it spins itself in on the branch and a butterfly flies out to the fox child.
+// still green is the time left. At the end it spins itself in on the branch and a butterfly flies out and settles on the meadow.
 // The leaf is cut in bands, each clipped by a box with a round end that slides back over it (`overflow: hidden`, moved
 // by `transform` while the leaf inside moves the other way), so the bitten edge is wavy and nothing is painted again.
 
@@ -16,7 +16,7 @@ export const EATEN = 700;
 const BANDS = [10, 34, 0, 26, 6, 30];
 const EDGE = LEAF.w - 10;
 
-/** The ground the fox family stands on. */
+/** The meadow's front, where the butterfly settles. */
 export const LEAF_FLOOR = 790;
 
 /** The branch the leaf grows on: its height at the stalk, and where the cocoon hangs. */
@@ -26,8 +26,8 @@ const COCOON = { x: 300, y: BRANCH_Y + 6, w: 64, h: 116 } as const;
 /** The caterpillar's box: its head at the right end, near the bitten edge. */
 const CATERPILLAR = { w: 180, h: 84 } as const;
 
-/** Where the butterfly sits at the end: above the fox child's head (the child stands left of the grown-up at 1200). */
-const BUTTERFLY = { w: 110, h: 90, toX: 1095, toY: 505 } as const;
+/** Where the butterfly sits at the end: on the meadow below the cocoon, left of where the end's buttons come. */
+const BUTTERFLY = { w: 110, h: 90, toX: 240, toY: LEAF_FLOOR - 110 } as const;
 
 /** The leaf's outline in its own units, with its midrib and veins; the stalk reaches to x 0. */
 function LeafDrawing() {
@@ -186,7 +186,7 @@ function Cocoon() {
   );
 }
 
-/** The butterfly that comes out of the cocoon and flies to the fox child (only at the end); its wings beat a while, then rest. */
+/** The butterfly that comes out of the cocoon and flies down to the meadow (only at the end); its wings beat a while, then rest. */
 function Butterfly() {
   const { w, h, toX, toY } = BUTTERFLY;
   const x = COCOON.x - w / 2;
@@ -212,7 +212,7 @@ function Butterfly() {
   );
 }
 
-/** The whole picture: the leaf with the caterpillar, and the fox family waiting on the meadow. */
+/** The whole picture: the leaf with the caterpillar on its branch over the meadow. */
 export function CaterpillarScene({ glow }: { glow: number }) {
   return (
     <>
@@ -220,7 +220,6 @@ export function CaterpillarScene({ glow }: { glow: number }) {
       <Leaf glow={glow} />
       <Cocoon />
       <Caterpillar />
-      <Family kind="fox" x={1200} floor={LEAF_FLOOR} childLeft />
       <Butterfly />
     </>
   );

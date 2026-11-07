@@ -76,14 +76,9 @@ const KID_MOTION: Record<Move, Keyframe[]> = {
   ],
 };
 
-/** Its grown-up standing beside it, still, while the child does the moving. */
-const Grown = memo(function Grown({ kind }: { kind: MascotKind }) {
-  return <Mascot kind={kind} />;
-});
-
 /**
  * Mitmachen (L-15): a digit, or any other key for a number by chance, has a fox or bear child hop, clap or stamp that
- * many times, its grown-up beside it, counting each one aloud. It invites the child first („Hüpf mit!“) and waits at each
+ * many times, counting each one aloud. It invites the child first („Hüpf mit!“) and waits at each
  * one, so the child can hop along: the number becomes an amount in its own body.
  */
 export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
@@ -267,9 +262,6 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
               </span>
             </div>
             <div className="mv-family" data-tap onPointerDown={again}>
-              <span className="mv-grown">
-                <Grown kind={kind} />
-              </span>
               <span className="mv-kid" ref={kid}>
                 <span className="mv-dust" ref={dust} />
                 <KidLayers kind={kind} clap={clap} stand={stand} />

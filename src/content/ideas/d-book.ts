@@ -110,8 +110,9 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-12",
+      rejected: true,
       partial:
-        "Am Ende jedes Levels (GameEnd) jubelt jetzt ein Fuchs- oder Bärenkind mit hochgerissenen Armen neben den Knöpfen, sein Großer winkt daneben – mal Fuchs, mal Bär. Nicht in Spielen, deren Schlussbild die Familie schon zeigt (Timer, Töpfchen, Schnullerfee, Abstillen). Das „Ende“ in Schreibschrift fehlt noch.",
+        "Gebaut und wieder herausgenommen (Feedback November 2026): Die jubelnde Fuchs- oder Bärenfamilie neben „Nochmal“ und „Weiter“ war nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel. Neben den Knöpfen steht nichts mehr.",
       emoji: "🎉",
       title: "Ende einer Geschichte wie eine letzte Seite",
       text: "Prüfung, was noch nicht zum Buch passt: Am Ende eines Levels steht statt Konfetti über dem Bild ein „Ende“ in Schreibschrift mit einem kleinen Bild der Tierfamilie, die klatscht; „Menü“, „Nochmal“ und „Weiter“ liegen darunter wie Karten.",
@@ -165,7 +166,7 @@ export const bookIdeas: IdeaArea = {
       id: "D-18",
       emoji: "🗂️",
       title: "Fuchs und Bär als Maskottchen in allen Spielen",
-      text: "Fuchs und Bär tauchen als wiederkehrendes Muster in allen Spielen auf, Spiel für Spiel nach Aufwand – nicht in jeder Ecke, aber so, dass Kinder sie überall wiederfinden. Das Muster ist immer ein Paar aus Großem und Kind: Das Fuchs- oder Bärenkind tut, was das Kind im Spiel tut (putzt mit, pustet mit, schaut aus dem Versteck), und Mama, Papa, Oma oder Opa sind dabei, helfen, staunen und klatschen am Ende mit ihm. Allein steht ein Fuchs oder Bär nur in einer Rolle, als Erwachsener statt eines gezeichneten Menschen (Bäckerin, Ärztin, Feuerwehr). Menschen dürfen bleiben. Die Aufgaben stehen in der Tabelle „🦊🐻 Fuchs & Bär“ oben (mascotStatus.ts), getrennt nach Zeichnung (im Code, jederzeit) und Gemini-Bild (wartet und wird gesammelt in einem Batch gemacht, das ist günstiger).",
+      text: "Fuchs und Bär tauchen als wiederkehrendes Muster in allen Spielen auf, Spiel für Spiel nach Aufwand – nicht in jeder Ecke, aber so, dass Kinder sie überall wiederfinden. Das Muster ist immer ein Paar aus Großem und Kind: Das Fuchs- oder Bärenkind tut, was das Kind im Spiel tut (putzt mit, pustet mit, schaut aus dem Versteck), und Mama, Papa, Oma oder Opa sind dabei, wo sie auch etwas tun. Allein steht ein Fuchs oder Bär nur in einer Rolle, als Erwachsener statt eines gezeichneten Menschen (Bäckerin, Ärztin, Feuerwehr). Menschen dürfen bleiben. Aber nur, wo sie zum Spiel gehören (Feedback November 2026): als Figur, die das Spiel zeigt und die darin etwas tut, oder in einer Rolle, die das Bild schon hat – nie als Deko daneben (eine Familie, die zuschaut, zeigt, spazieren geht oder am Ende jubelt). Kinder wollen auf Deko drücken und denken, sie gehöre zum Spiel, und jedes Ding mehr ist ein Reiz mehr. Die Aufgaben stehen in der Tabelle „🦊🐻 Fuchs & Bär“ oben (mascotStatus.ts), getrennt nach Zeichnung (im Code, jederzeit) und Gemini-Bild (wartet und wird gesammelt in einem Batch gemacht, das ist günstiger).",
       why: "Aus vielen einzelnen Spielen wird eine Welt mit zwei Familien, die Kinder überall wiederfinden – und jedes Mal sehen Kind und Großer vor dem Bildschirm sich selbst darin: ein Kind, das etwas tut, und einen Großen, der dabei ist.",
       effort: "L",
     },
