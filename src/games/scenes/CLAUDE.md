@@ -99,6 +99,12 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
 
 ## Rules
 
+- **The pictures answer with their sounds, not with a voice** (user decision, November 2026): the sounds fit well, and
+  the sentences (`sentences`, chains, find and trait questions, praise) are never recorded with ElevenLabs. They stay
+  in the data (and on `/management/`'s voice list, marked 🅿️ parked, `parked` in `src/content/voiceLines.ts`), and
+  Lebendige Bilder stays out of `RECORDED_GAMES` (`voiceLines.test.ts` checks): no `bun run voice make` picks them up.
+  Should they ever be recorded, then only what people in the picture say themselves („Hallo, hier ist der Kinderarzt!“),
+  never the narration – and only when the user orders exactly that for Lebendige Bilder.
 - The picture keeps its count of what was found: „⭐ found/all“ (`scene-goal`) and the stars in Suchen (`find-stars`).
   Grown-ups need both (user decision, November 2026), though other games lost their stars; never remove them.
 - No options for grown-ups on a picture: what the start screen once offered (counting with a party, vehicles

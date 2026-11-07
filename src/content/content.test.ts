@@ -127,6 +127,18 @@ describe("search engine texts (seo.ts)", () => {
     expect(page.text.length).toBeGreaterThan(60);
   });
 
+  // A book's page is found by the games in it, so its text names each of them, in German and English (where the game
+  // has an English name): when a game came into a book or was renamed, the book's text was easily left behind
+  // (Mitmachen was missing from „Buchstaben & Zahlen“, November 2026).
+  test.each(CATEGORIES.filter(hasPage).map((category) => [category.id, category] as const))("/spiele/%s/ names each of its games", (id, category) => {
+    const de = SEO_TEXTS.find((page) => page.path === `/spiele/${id}/`);
+    const en = SEO_EN.pages[`/spiele/${id}/`];
+    for (const game of category.games.filter((game) => !game.unfinished)) {
+      expect(de?.text.toLowerCase(), game.title.de).toContain(game.title.de.toLowerCase());
+      if (game.title.en) expect(en?.text.toLowerCase(), game.title.en).toContain(game.title.en.toLowerCase());
+    }
+  });
+
   test("titles and descriptions are not shared between pages", () => {
     for (const key of ["title", "description"] as const) {
       const values = SEO_TEXTS.map((page) => page[key]);
