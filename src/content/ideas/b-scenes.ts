@@ -22,7 +22,6 @@ export const scenesIdeas: IdeaArea = {
       text: "Neuer Such-Modus: Nur das Geräusch wird gespielt (Hund bellt, Bagger brummt) – wer war das? Nutzt die vorhandenen sfx-Klänge.",
       why: "Genaues Hinhören; funktioniert auch ohne Sprachausgabe.",
       effort: "S",
-      rejected: true,
     },
     {
       id: "B-03",
