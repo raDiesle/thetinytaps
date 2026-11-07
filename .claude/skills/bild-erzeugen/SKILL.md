@@ -41,7 +41,9 @@ partners each alone with a reference – about twice what sheets would have cost
 - small things, cut-outs and cards share 2x2 sheets: no `ref` and no `alone`, the prompt says what to draw by itself
   (a partner's look comes from its own words, not „from this picture“);
 - pictures that belong together (the two moments of one scene, a story's steps) go in one request as `panels`
-  (`QueuedPicture.panels`, `--grid 1x2` / `2x2`), cut apart after;
+  (`QueuedPicture.panels`, `--grid 1x2` / `2x2`), cut apart after – a before and after drawn so changed 8–12 % of the
+  picture and 1 % of its edge, as steady as a second frame drawn from its first (measured with `bun run frames`,
+  November 2026, „Was gehört zusammen?“);
 - only what a check proved can't share – a second frame that must keep a first already made, a redrawn picture –
   is `alone` or drawn from a `ref`, and its `alone` names that reason (`pictureQueue.test.ts` takes only the reasons in
   `ALONE_REASONS`).
@@ -170,6 +172,12 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   Gefühle cards (November 2026) until the cut trimmed rows and columns tinted by the gap colour on every side too. Look
   at each piece's edges (a contact sheet of all of them on black shows a pink line at once); `--from
   .image-raw/<first>-grid1x2.png --grid 1x2 …` cuts again for free – fix the cut there, never trim pieces by hand.
+  A `--transparent` sheet is one flat backdrop with no gap lines (the prompt asks so; boxes or frames round each thing
+  stayed in the cut-outs): the cut lies in the middle of the backdrop between them, so a wide thing (a bus) or one
+  reaching into the gap (a wheelchair's footrest) keeps its tip, and a sheet whose panels came out magenta with white
+  lines between them is cut at those lines (November 2026). Look at the cut-outs on grey (#6a6a6a), not only the raw
+  sheet. A border warning of 75–90 % on such a sheet is the backdrop's darker vignette, not a fault, as long as the
+  piece looks clean.
 - **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
   character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are
   drawn from the picture where it already does so, not from the place's first picture: from the empty room the

@@ -195,13 +195,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     right: "الخوذة تناسب الدراجة. رائع!",
     belongs: "الخوذة تناسب الدراجة!",
   },
-  "einkaufswagen-muenze": {
-    name: "عربة تسوق",
-    partner: "عملة معدنية",
-    question: "ماذا يناسب عربة التسوق؟",
-    right: "العملة المعدنية تناسب عربة التسوق. رائع!",
-    belongs: "العملة المعدنية تناسب عربة التسوق!",
-  },
   "briefkasten-brief": {
     name: "صندوق بريد",
     partner: "رسالة",

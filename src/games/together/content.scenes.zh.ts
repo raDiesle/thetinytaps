@@ -86,13 +86,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
   "schnee-schlitten": { name: "雪", partner: "雪橇", question: "什么和雪是一对？", right: "雪橇和雪是一对。真棒！", belongs: "雪橇和雪是一对！" },
   "drachen-wind": { name: "风筝", partner: "风", question: "什么和风筝是一对？", right: "风和风筝是一对。真棒！", belongs: "风和风筝是一对！" },
   "fahrrad-helm": { name: "自行车", partner: "头盔", question: "什么和自行车是一对？", right: "头盔和自行车是一对。真棒！", belongs: "头盔和自行车是一对！" },
-  "einkaufswagen-muenze": {
-    name: "购物车",
-    partner: "硬币",
-    question: "什么和购物车是一对？",
-    right: "硬币和购物车是一对。真棒！",
-    belongs: "硬币和购物车是一对！",
-  },
   "briefkasten-brief": { name: "邮筒", partner: "信", question: "什么和邮筒是一对？", right: "信和邮筒是一对。真棒！", belongs: "信和邮筒是一对！" },
   "tannenbaum-weihnachtsstern": {
     name: "圣诞树",

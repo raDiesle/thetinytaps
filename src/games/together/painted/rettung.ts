@@ -12,7 +12,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Feuerwehrauto", the: "das Feuerwehrauto", acc: "das Feuerwehrauto", emoji: "🚒" },
     cast: "bear",
     before:
-      "A street in front of a house with a tall leafy tree on the pavement. High up on a branch of the tree sits a small grey kitten. Under the tree stands the firefighter, a grown-up bear woman with eyelashes in a dark firefighter uniform with yellow reflective stripes and a red helmet, looking up at the kitten, both empty paws raised, puzzled: the branch is far too high.",
+      "A street in front of a house with a tall leafy tree on the pavement. High up on a branch of the tree sits a small grey kitten. Under the tree stands the firefighter, a grown-up bear woman with eyelashes in a dark firefighter uniform with yellow reflective stripes and a red helmet, looking up at the kitten, both empty paws raised, brows raised, mouth a small o: the branch is far too high.",
     after:
       "A red fire engine now stands on the street beside the tree, its long ladder raised up to the branch. The bear firefighter stands at the top of the ladder holding the kitten safely in her arms; both are happy. The branch where the kitten sat is empty now.",
     sounds: ["siren"],
@@ -46,10 +46,11 @@ export const PAINTED: PaintedPair[] = [
     part: "a shiny silver whistle on a short red cord",
     cast: "bear",
     before:
-      "A town crossroads whose traffic light is broken and dark. From all four sides small cars stand jammed nose to nose, nobody knowing who may go. In the middle of the crossing stands the police officer, a grown-up bear in a dark-blue police uniform, a peaked police cap and white gloves, his paws empty, looking from one car to the next, puzzled.",
+      "A town crossroads whose traffic light is broken and dark. From all four sides small cars stand jammed nose to nose, nobody knowing who may go. In the middle of the crossing stands the police officer, a grown-up bear in a dark-blue police uniform, a peaked police cap and white gloves, his paws empty, looking from one car to the next, brows raised, mouth a small o.",
     after:
       "The police officer now blows a silver whistle on a red cord and points with his white-gloved arm: the cars on one side drive on in a neat row while the others wait. He and the drivers smile.",
     sounds: ["whistle", "engine"],
+    made: true,
     alsoFits: ["rettungsschwimmerin", "schwimmlehrer", "polizistin"],
   },
   {
@@ -61,7 +62,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Krankenwagen", the: "der Krankenwagen", acc: "den Krankenwagen", emoji: "🚑" },
     cast: "both",
     before:
-      "A playground with a slide and a sandpit, a road along its edge. At the foot of the slide sits a fox child in a green T-shirt, holding its knee with both paws, a little teary. The paramedic, a grown-up bear in a red jacket with white reflective stripes, kneels beside the child with empty paws, looking along the empty road, puzzled.",
+      "A playground with a slide and a sandpit, a road along its edge. At the foot of the slide sits a fox child in a green T-shirt, holding its knee with both paws, a little teary. The paramedic, a grown-up bear in a red jacket with white reflective stripes, kneels beside the child with empty paws, looking along the empty road, brows raised, mouth a small o.",
     after:
       "A white ambulance with a red stripe and a blue light on its roof now stands on the road at the playground's edge, its back doors open; the paramedic carries the child to it, and the child smiles a little.",
     sounds: ["siren"],
@@ -76,7 +77,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Hubschrauber", the: "der Hubschrauber", acc: "den Hubschrauber", emoji: "🚁" },
     cast: "bear",
     before:
-      "High mountains under a blue sky. Halfway up a steep rocky cliff a little white lamb stands stuck on a narrow ledge, bleating. At the foot of the cliff stands the rescue pilot, a grown-up bear woman with eyelashes in a red flight suit and a white flying helmet, her paws empty, looking up at the lamb, puzzled: the ledge is far too high.",
+      "High mountains under a blue sky. Halfway up a steep rocky cliff a little white lamb stands stuck on a narrow ledge, bleating. At the foot of the cliff stands the rescue pilot, a grown-up bear woman with eyelashes in a red flight suit and a white flying helmet, her paws empty, looking up at the lamb, brows raised, mouth a small o: the ledge is far too high.",
     after:
       "A red rescue helicopter now hovers beside the ledge, the pilot in its cockpit; a rope hangs down from it and the lamb is lifted up safely in a harness. The pilot and the lamb are happy.",
     sounds: ["rotor"],
@@ -107,7 +108,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a brown-and-black shepherd dog in a dark police harness, sitting upright, ears pricked",
     cast: "both",
     before:
-      "A big park with tall grass and thick bushes. A fox child in a blue T-shirt stands sadly at the bushes, pointing into them: its teddy is lost somewhere in there. Beside it stands the police officer, a grown-up bear woman with eyelashes in a dark-blue police uniform and a police cap, holding an empty leash with nothing on it, looking at the thick bushes, puzzled.",
+      "A big park with tall grass and thick bushes. A fox child in a blue T-shirt stands sadly at the bushes, pointing into them: its teddy is lost somewhere in there. Beside it stands the police officer, a grown-up bear woman with eyelashes in a dark-blue police uniform and a police cap, holding an empty leash with nothing on it, looking at the thick bushes, brows raised, mouth a small o.",
     after:
       "A brown-and-black shepherd dog in a police harness is now on the leash; it sniffs into the bushes and pulls the teddy out. The fox child hugs the teddy, and the officer smiles happily.",
     sounds: ["rustle", "giggle"],

@@ -14,9 +14,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Fußball", the: "der Fußball", acc: "den Fußball", emoji: "⚽" },
     cast: "fox",
     before:
-      "A football pitch with green grass and white lines; a white goal with a net stands ahead, and the white penalty spot in front of it is empty. On the penalty spot stands a grown-up fox woman with eyelashes in a red-and-white striped football shirt, shorts and football boots, her paws empty, looking from the empty spot to the goal, puzzled.",
+      "A football pitch with green grass and white lines; a white goal with a net stands ahead, and the white penalty spot in front of it is empty. On the penalty spot stands a grown-up fox woman with eyelashes in a red-and-white striped football shirt, shorts and football boots, her paws empty, looking from the empty spot to the goal, brows raised, mouth a small o.",
     after: "She now kicks a black-and-white football, which flies into the goal's net; she cheers with both arms up.",
     sounds: ["thump", "whoosh"],
+    made: true,
     // Any ball may go into a goal or be juggled.
     alsoFits: ["basketballspieler", "jongleur"],
   },
@@ -29,9 +30,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Basketball", the: "der Basketball", acc: "den Basketball", emoji: "🏀" },
     cast: "bear",
     before:
-      "An outdoor basketball court with painted lines and a tall hoop with an orange rim and a white net on a pole. Under the hoop stands a grown-up bear in an orange jersey with a dark-blue collar and shorts, his empty paws raised, looking up at the hoop, puzzled.",
+      "An outdoor basketball court with painted lines and a tall hoop with an orange rim and a white net on a pole. Under the hoop stands a grown-up bear in an orange jersey with a dark-blue collar and shorts, his empty paws raised, looking up at the hoop, brows raised, mouth a small o.",
     after: "He now throws an orange basketball, which drops through the hoop's net; he jumps for joy.",
     sounds: ["boing", "thump"],
+    made: true,
     alsoFits: ["fussballerin", "jongleur"],
   },
   {
@@ -43,9 +45,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Tennisball", the: "der Tennisball", acc: "den Tennisball", emoji: "🎾" },
     cast: "bear",
     before:
-      "A red clay tennis court with a white net across it. At the back line stands a grown-up bear woman with eyelashes in a white tennis dress with a light-blue collar and a red headband, a racket in her right paw; her left paw is empty and open, and she looks at it, puzzled.",
+      "A red clay tennis court with a white net across it. At the back line stands a grown-up bear woman with eyelashes in a white tennis dress with a light-blue collar and a red headband, a racket in her right paw; her left paw is empty and open, and she looks at it, brows raised, mouth a small o.",
     after: "She now tosses a yellow tennis ball up and hits it over the net with her racket, smiling.",
     sounds: ["pop", "boing"],
+    made: true,
     // A shuttlecock goes over a net with a racket too, and tennis balls can be juggled.
     alsoFits: ["badmintonspieler", "jongleur"],
   },
@@ -59,9 +62,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a white shuttlecock with a feathered skirt and a round cork tip",
     cast: "both",
     before:
-      "A sunny garden lawn with a low net stretched between two poles, a hedge behind. On one side of the net stands a grown-up fox in a yellow T-shirt and a blue cap, a light racket in his right paw, his left paw empty, looking at it, puzzled. On the other side of the net a little bear child holds a racket too, waiting.",
+      "A sunny garden lawn with a low net stretched between two poles, a hedge behind. On one side of the net stands a grown-up fox in a yellow T-shirt and a blue cap, a light racket in his right paw, his left paw empty, looking at it, brows raised, mouth a small o. On the other side of the net a little bear child holds a racket too, waiting.",
     after: "The fox now hits a white shuttlecock over the net with his racket; the bear child reaches up for it, laughing.",
     sounds: ["pop", "whoosh"],
+    made: "frames",
     alsoFits: ["tennisspielerin"],
   },
   {
@@ -73,7 +77,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Schwimmbrille", the: "die Schwimmbrille", acc: "die Schwimmbrille", emoji: "🥽" },
     cast: "fox",
     before:
-      "An indoor swimming pool with clear blue water and lane ropes; a red diving ring lies on the bottom of the pool, deep down. On the edge of the pool stands a grown-up fox in blue swimming trunks and a blue swim shirt, rubbing his stinging eyes with both paws and squinting at the ring in the water, puzzled.",
+      "An indoor swimming pool with clear blue water and lane ropes; a red diving ring lies on the bottom of the pool, deep down. On the edge of the pool stands a grown-up fox in blue swimming trunks and a blue swim shirt, rubbing his stinging eyes with both paws and squinting at the ring in the water, brows raised, mouth a small o.",
     after: "The fox now wears swimming goggles over his eyes and dives down to the red ring with his eyes wide open, smiling.",
     sounds: ["snap", "splash"],
     // Armbands and a life ring are for the water too, and one can look under water from a submarine.
@@ -89,9 +93,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a pair of long red skis",
     cast: "fox",
     before:
-      "A snowy mountain slope under a blue sky, fir trees along it and a little wooden hut far below at its bottom. At the top of the slope stands a grown-up fox woman with eyelashes in a padded purple winter suit, a red bobble hat and a red scarf, two poles in her paws, sunk up to her knees in the deep snow, looking down the slope, puzzled.",
+      "A snowy mountain slope under a blue sky, fir trees along it and a little wooden hut far below at its bottom. At the top of the slope stands a grown-up fox woman with eyelashes in a padded purple winter suit, a red bobble hat and a red scarf, two poles in her paws, sunk up to her knees in the deep snow, looking down the slope, brows raised, mouth a small o.",
     after: "She now stands on a pair of long red skis and glides down the slope, poles raised, laughing.",
     sounds: ["whoosh", "swirl"],
+    made: "frames",
     // A sledge goes down a snowy slope too, and the cable car takes skiers up.
     alsoFits: ["rodlerin", "seilbahnfuehrerin"],
   },
@@ -104,9 +109,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Schlittschuhe", the: "die Schlittschuhe", acc: "die Schlittschuhe", plural: true, emoji: "⛸️" },
     cast: "bear",
     before:
-      "A frozen pond in winter with smooth shiny ice, snow-covered trees round it. On a wooden bench at its edge sits a grown-up bear in a blue jumper with a yellow bobble hat and a yellow scarf, his feet in thick woolly socks, looking at the ice, puzzled.",
+      "A frozen pond in winter with smooth shiny ice, snow-covered trees round it. On a wooden bench at its edge sits a grown-up bear in a blue jumper with a yellow bobble hat and a yellow scarf, his feet in thick woolly socks, looking at the ice, brows raised, mouth a small o.",
     after: "The bear now wears white ice skates and glides over the ice on one leg, arms spread out, smiling. The bench is empty.",
     sounds: ["slide", "swirl"],
+    made: true,
     // The ice hockey player wears skates too, and a ballerina's shoes go on feet as well.
     alsoFits: ["eishockeyspieler", "ballerina"],
   },
@@ -120,9 +126,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a wooden sledge with curved runners",
     cast: "bear",
     before:
-      "A snowy hill under a pale winter sky, a few snow-covered fir trees at its bottom. At the top of the hill stand a grown-up bear woman with eyelashes in a green winter jacket, a pink bobble hat and a pink scarf, and a little bear child in a red snowsuit holding her paw. Both look down the long smooth slope, puzzled, their other paws empty.",
+      "A snowy hill under a pale winter sky, a few snow-covered fir trees at its bottom. At the top of the hill stand a grown-up bear woman with eyelashes in a green winter jacket, a pink bobble hat and a pink scarf, and a little bear child in a red snowsuit holding her paw. Both look down the long smooth slope, brows raised, mouth a small o, their other paws empty.",
     after: "The bear woman and the bear child now sit one behind the other on a wooden sledge with curved runners and slide down the hill, laughing.",
     sounds: ["slide", "giggle"],
+    made: "frames",
     alsoFits: ["skifahrerin"],
   },
   {
@@ -134,10 +141,11 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Segelboot", the: "das Segelboot", acc: "das Segelboot", emoji: "⛵" },
     cast: "fox",
     before:
-      "A wooden jetty on a blue lake on a windy day: little waves on the water, a flag on a pole at the jetty fluttering stiffly in the wind, white clouds racing. At the end of the jetty stands a grown-up fox in a navy jacket, a white cap and an orange life vest, his paws empty, looking out over the empty water, puzzled.",
+      "A wooden jetty on a blue lake on a windy day: little waves on the water, a flag on a pole at the jetty fluttering stiffly in the wind, white clouds racing. At the end of the jetty stands a grown-up fox in a navy jacket, a white cap and an orange life vest, his paws empty, looking out over the empty water, brows raised, mouth a small o.",
     after:
       "A small sailboat with a white sail and a brown wooden hull now floats at the jetty, its sail full of wind; the fox sits in it at the tiller and sails off, smiling.",
     sounds: ["splash", "whoosh"],
+    made: true,
     // A captain's ship and a sailor's anchor fit, and a sailor ties up with a rope.
     alsoFits: ["kapitaen", "matrose", "kletterin"],
   },
@@ -150,9 +158,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Rennauto", the: "das Rennauto", acc: "das Rennauto", emoji: "🏎️" },
     cast: "fox",
     before:
-      "A racetrack with a chequered start line painted across the asphalt, red-and-white kerbs and a grandstand with flags behind. On the start line stands a grown-up fox woman with eyelashes in a red racing suit with a black belt, a white helmet under one arm, her other paw empty, looking down the empty track, puzzled.",
+      "A racetrack with a chequered start line painted across the asphalt, red-and-white kerbs and a grandstand with flags behind. On the start line stands a grown-up fox woman with eyelashes in a red racing suit with a black belt, a white helmet under one arm, her other paw empty, looking down the empty track, brows raised, mouth a small o.",
     after: "She now sits in a red racing car with big black tyres, her helmet on, and races off from the start line, waving one paw happily.",
     sounds: ["engine", "whoosh"],
+    made: true,
     // A motorbike may race too.
     alsoFits: ["motorradfahrerin"],
   },
@@ -166,7 +175,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a skateboard with a wooden deck and orange wheels",
     cast: "bear",
     before:
-      "A skate park on a sunny day: a curved wooden ramp and a smooth concrete bowl. At the top of the ramp stands a grown-up bear in a purple hoodie, a yellow cap, knee pads and elbow pads, his paws empty, looking down the ramp, puzzled.",
+      "A skate park on a sunny day: a curved wooden ramp and a smooth concrete bowl. At the top of the ramp stands a grown-up bear in a purple hoodie, a yellow cap, knee pads and elbow pads, his paws empty, looking down the ramp, brows raised, mouth a small o.",
     after: "The bear now rides a skateboard with a wooden deck and orange wheels down the ramp, arms spread out, laughing.",
     sounds: ["rattle", "whoosh"],
   },
@@ -179,9 +188,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Ballettschuhe", the: "die Ballettschuhe", acc: "die Ballettschuhe", plural: true, emoji: "🩰" },
     cast: "fox",
     before:
-      "A ballet studio: a long wooden barre along the wall, a big mirror and a polished wooden floor. In the middle stands a grown-up fox woman with eyelashes in a pink tutu, her hair in a bun with a pink ribbon, her feet bare, looking down at her bare feet, puzzled.",
+      "A ballet studio: a long wooden barre along the wall, a big mirror and a polished wooden floor. In the middle stands a grown-up fox woman with eyelashes in a pink tutu, her hair in a bun with a pink ribbon, her feet bare, looking down at her bare feet, brows raised, mouth a small o.",
     after: "She now wears pink ballet shoes with ribbons tied round her ankles and dances on her tiptoes, arms raised in a circle, smiling.",
     sounds: ["musicbox"],
+    made: true,
     // Skates go on bare feet too.
     alsoFits: ["eislaeufer"],
   },
@@ -194,9 +204,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Angel", the: "die Angel", acc: "die Angel", emoji: "🎣" },
     cast: "bear",
     before:
-      "A calm lake with reeds along its bank; out on the water fish jump, making little rings. On a small wooden jetty sits a grown-up bear in a yellow raincoat and a yellow rain hat, an empty bucket beside him, his paws empty, looking at the jumping fish, puzzled.",
+      "A calm lake with reeds along its bank; out on the water fish jump, making little rings. On a small wooden jetty sits a grown-up bear in a yellow raincoat and a yellow rain hat, an empty bucket beside him, his paws empty, looking at the jumping fish, brows raised, mouth a small o.",
     after: "The bear now holds a fishing rod, its line in the water, and pulls up a little fish on it, smiling happily.",
     sounds: ["whoosh", "plop", "splash"],
+    made: true,
   },
   {
     id: "eishockeyspieler",
@@ -207,9 +218,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Eishockeyschläger", the: "der Eishockeyschläger", acc: "den Eishockeyschläger", emoji: "🏒" },
     cast: "bear",
     before:
-      "An ice rink with a small red goal with a net at one end and a black puck lying on the ice in front of it. On the ice stands a grown-up bear in a dark-blue ice hockey jersey with white stripes, a white helmet and skates, his paws empty, looking at the puck, puzzled.",
+      "An ice rink with a small red goal with a net at one end and a black puck lying on the ice in front of it. On the ice stands a grown-up bear in a dark-blue ice hockey jersey with white stripes, a white helmet and skates, his paws empty, looking at the puck, brows raised, mouth a small o.",
     after: "The bear now holds a wooden ice hockey stick and shoots the puck into the goal's net, cheering.",
     sounds: ["knock", "slide"],
+    made: true,
     alsoFits: ["eislaeufer"],
   },
   {
@@ -221,7 +233,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Fahrrad", the: "das Fahrrad", acc: "das Fahrrad", emoji: "🚲" },
     cast: "bear",
     before:
-      "A country road winding through green hills to a little village far away. At the roadside stands a grown-up bear woman with eyelashes in a yellow sports shirt with green stripes and a green helmet, her paws empty, looking down the long road to the far village, puzzled.",
+      "A country road winding through green hills to a little village far away. At the roadside stands a grown-up bear woman with eyelashes in a yellow sports shirt with green stripes and a green helmet, her paws empty, looking down the long road to the far village, brows raised, mouth a small o.",
     after: "She now rides a green bicycle down the road, smiling happily.",
     sounds: ["ring", "whoosh"],
     // A motorbike and a unicycle go down a road too.
@@ -237,7 +249,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a coil of red climbing rope",
     cast: "bear",
     before:
-      "At the foot of a tall grey rock wall with a few small ledges, a metal ring fixed high up at its top. At the bottom stands a grown-up bear woman with eyelashes in an orange shirt, a blue harness belt and a yellow helmet, her paws empty, looking up at the high wall, puzzled.",
+      "At the foot of a tall grey rock wall with a few small ledges, a metal ring fixed high up at its top. At the bottom stands a grown-up bear woman with eyelashes in an orange shirt, a blue harness belt and a yellow helmet, her paws empty, looking up at the high wall, brows raised, mouth a small o.",
     after: "A red climbing rope now runs from her harness up through the ring at the top; she climbs up the wall, holding on to the rope, smiling.",
     sounds: ["swirl", "snap"],
     // A sailor ties his boat with a rope, and a trapeze hangs from ropes.
@@ -253,9 +265,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a brown horse with a saddle and bridle, standing",
     cast: "bear",
     before:
-      "A paddock with a white wooden fence, a low jump of red-and-white poles in its middle and a red stable behind. In front of the jump stands a grown-up bear woman with eyelashes in a green jacket, white trousers, tall black boots and a black riding helmet, her paws empty, looking at the jump, puzzled.",
+      "A paddock with a white wooden fence, a low jump of red-and-white poles in its middle and a red stable behind. In front of the jump stands a grown-up bear woman with eyelashes in a green jacket, white trousers, tall black boots and a black riding helmet, her paws empty, looking at the jump, brows raised, mouth a small o.",
     after: "She now rides a brown horse with a saddle and bridle, which leaps over the jump; she smiles happily.",
     sounds: ["neigh", "hop"],
+    made: "frames",
     // A knight rides a horse, a farmer may have one, and it could carry the princess to the castle.
     alsoFits: ["ritter", "baeuerin", "prinzessin"],
   },
@@ -285,9 +298,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a black barbell with big round weights at both ends",
     cast: "fox",
     before:
-      "A sports hall with a square wooden platform on a rubber mat in its middle, the platform empty. On the platform stands a grown-up fox woman with eyelashes in a pink sports suit and a yellow headband, flexing her strong arms, her paws empty, looking down at the empty platform, puzzled.",
+      "A sports hall with a square wooden platform on a rubber mat in its middle, the platform empty. On the platform stands a grown-up fox woman with eyelashes in a pink sports suit and a yellow headband, flexing her strong arms, her paws empty, looking down at the empty platform, brows raised, mouth a small o.",
     after: "She now lifts a black barbell with big round weights at both ends high above her head, beaming proudly.",
     sounds: ["thump", "tusch"],
+    made: "frames",
   },
   {
     id: "surfer",
@@ -299,7 +313,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a yellow surfboard with a red stripe",
     cast: "bear",
     before:
-      "A sunny beach with big blue waves rolling in, white foam on their crests, a palm tree at the side. At the edge of the water stands a grown-up bear in a turquoise wetsuit with yellow stripes, his paws empty, looking at the big waves, puzzled.",
+      "A sunny beach with big blue waves rolling in, white foam on their crests, a palm tree at the side. At the edge of the water stands a grown-up bear in a turquoise wetsuit with yellow stripes, his paws empty, looking at the big waves, brows raised, mouth a small o.",
     after: "The bear now rides a yellow surfboard with a red stripe on a big wave, arms spread out, laughing.",
     sounds: ["splash", "whoosh"],
   },
@@ -313,9 +327,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a red unicycle: one wheel with a seat on a tall post",
     cast: "both",
     before:
-      "A sunny town square with cobblestones, a round fountain and colourful bunting strung between the houses. On the edge of the fountain sits a little fox child, waiting for the show. In the middle of the square stands a grown-up bear in a blue-and-red striped circus costume and a small round red hat, his paws empty, looking at the open square, puzzled.",
+      "A sunny town square with cobblestones, a round fountain and colourful bunting strung between the houses. On the edge of the fountain sits a little fox child, waiting for the show. In the middle of the square stands a grown-up bear in a blue-and-red striped circus costume and a small round red hat, his paws empty, looking at the open square, brows raised, mouth a small o.",
     after: "The bear now rides a red unicycle round the square, arms spread out for balance, laughing; the fox child cheers.",
     sounds: ["whirr", "boing"],
+    made: "frames",
     alsoFits: ["radfahrerin"],
   },
   {
@@ -328,9 +343,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a circus trapeze: a short wooden bar hanging from two long ropes",
     cast: "fox",
     before:
-      "High up under the roof of a red-and-white striped circus tent: a small wooden platform on a tall pole, a second platform far across the empty air on the other side, a safety net far below. On the first platform stands a grown-up fox woman with eyelashes in a sparkly turquoise costume and a feather headband, her empty paws stretched towards the far platform, puzzled.",
+      "High up under the roof of a red-and-white striped circus tent: a small wooden platform on a tall pole, a second platform far across the empty air on the other side, a safety net far below. On the first platform stands a grown-up fox woman with eyelashes in a sparkly turquoise costume and a feather headband, her empty paws stretched towards the far platform, brows raised, mouth a small o.",
     after: "She now swings across the tent on a trapeze – a wooden bar hanging from two long ropes – holding it with both paws, legs stretched out, smiling.",
     sounds: ["whoosh", "clap"],
+    made: "frames",
     // A rope could carry her across too.
     alsoFits: ["kletterin"],
   },
@@ -344,8 +360,9 @@ export const PAINTED: PaintedPair[] = [
     part: "a pair of wooden oars",
     cast: "bear",
     before:
-      "A calm lake with reeds and water lilies, a little island with a tree in its middle. At the shore floats a small wooden boat with an empty round oarlock on each side. In the boat sits a grown-up bear woman with eyelashes in a striped top and a straw hat, her paws empty, looking across the water at the island, puzzled.",
+      "A calm lake with reeds and water lilies, a little island with a tree in its middle. At the shore floats a small wooden boat with an empty round oarlock on each side. In the boat sits a grown-up bear woman with eyelashes in a striped top and a straw hat, her paws empty, looking across the water at the island, brows raised, mouth a small o.",
     after: "She now pulls a pair of wooden oars, one on each side, and the boat glides across the lake towards the island; she smiles happily.",
     sounds: ["splash", "trickle"],
+    made: "frames",
   },
 ];

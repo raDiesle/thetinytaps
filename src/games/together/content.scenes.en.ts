@@ -194,13 +194,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     right: "The bike helmet goes with the bike. Great!",
     belongs: "The bike helmet goes with the bike!",
   },
-  "einkaufswagen-muenze": {
-    name: "Shopping cart",
-    partner: "Coin",
-    question: "What goes with the shopping cart?",
-    right: "The coin goes with the shopping cart. Great!",
-    belongs: "The coin goes with the shopping cart!",
-  },
   "briefkasten-brief": {
     name: "Mailbox",
     partner: "Letter",

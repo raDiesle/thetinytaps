@@ -14,9 +14,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Klopapier", the: "das Klopapier", acc: "das Klopapier", emoji: "🧻" },
     cast: "bear",
     before:
-      "A small bright bathroom with light tiles. In the middle a white toilet with its lid up; on the wall beside it a toilet roll holder – the holder is bare, nothing hangs on it. A little bear child in a striped T-shirt and dark blue trousers stands beside the toilet, one paw reaching towards the bare holder, looking at it, puzzled.",
+      "A small bright bathroom with light tiles. In the middle a white toilet with its lid up; on the wall beside it a toilet roll holder – the holder is bare, nothing hangs on it. A little bear child in a striped T-shirt and dark blue trousers stands beside the toilet, one paw reaching towards the bare holder, looking at it, brows raised, mouth a small o.",
     after: "A white roll of toilet paper now hangs on the holder, a strip of it hanging down. The bear child tears off a piece and smiles happily.",
     sounds: ["rustle", "splash"],
+    made: true,
   },
   {
     id: "wasserhahn-seife",
@@ -27,9 +28,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Seife", the: "die Seife", acc: "die Seife", emoji: "🧼" },
     cast: "fox",
     before:
-      "A bathroom washbasin under a mirror, its tap running with a stream of water, an empty white soap dish on the basin's edge. A fox child in a green T-shirt with rolled-up sleeves stands on a little step stool at the basin, holding its muddy brown paws under the water – the mud stays on – and looks at the empty soap dish, puzzled.",
+      "A bathroom washbasin under a mirror, its tap running with a stream of water, an empty white soap dish on the basin's edge. A fox child in a green T-shirt with rolled-up sleeves stands on a little step stool at the basin, holding its muddy brown paws under the water – the mud stays on – and looks at the empty soap dish, brows raised, mouth a small o.",
     after: "The fox child now rubs a pink bar of soap between its paws, white foam all over them, the mud washing away, and smiles happily.",
     sounds: ["trickle", "wash"],
+    made: true,
     alsoFits: ["eimer-schwamm", "badewanne-badeente"],
   },
   {
@@ -41,10 +43,11 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Schwamm", the: "der Schwamm", acc: "den Schwamm", emoji: "🧽" },
     cast: "bear",
     before:
-      "A bathroom with a white bathtub; muddy brown paw prints run across the tiled floor and up the tub's white side. On the floor in front of it a blue bucket full of soapy water with white foam on top. A bear child in yellow dungarees with rolled-up sleeves kneels beside the bucket with empty paws, looking at the muddy prints, puzzled.",
+      "A bathroom with a white bathtub; muddy brown paw prints run across the tiled floor and up the tub's white side. On the floor in front of it a blue bucket full of soapy water with white foam on top. A bear child in yellow dungarees with rolled-up sleeves kneels beside the bucket with empty paws, looking at the muddy prints, brows raised, mouth a small o.",
     after:
       "The bear child now dips a big yellow sponge into the foam and scrubs the paw prints off the tub's side; half of them are gone already, and it smiles happily.",
     sounds: ["splash", "scrub"],
+    made: true,
     // Soap scrubs too, the sponge goes into the bath, and a blackboard is wiped with it.
     alsoFits: ["wasserhahn-seife", "badewanne-badeente", "tafel-kreide"],
   },
@@ -58,7 +61,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a fluffy light-green hand towel, folded once",
     cast: "fox",
     before:
-      "A bathroom washbasin with a mirror above it, its tap turned off. On the tiled wall beside the basin a towel rail – bare, nothing hangs on it. A fox child in a light-blue pyjama top stands at the basin holding up its dripping wet paws, water drops falling from them, and looks at the bare rail, puzzled.",
+      "A bathroom washbasin with a mirror above it, its tap turned off. On the tiled wall beside the basin a towel rail – bare, nothing hangs on it. A fox child in a light-blue pyjama top stands at the basin holding up its dripping wet paws, water drops falling from them, and looks at the bare rail, brows raised, mouth a small o.",
     after: "A fluffy light-green towel now hangs from the rail, and the fox child dries its paws in it, smiling happily.",
     sounds: ["swirl", "rustle"],
     alsoFits: ["badewanne-badeente"],
@@ -73,9 +76,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a yellow rubber duck with an orange beak",
     cast: "bear",
     before:
-      "A cosy bathroom with light tiles and a little window. In the middle a white bathtub filled with warm water and a soft heap of white foam; between the foam the water lies calm and bare, nothing floats on it. A bear child in a white bathrobe kneels at the tub, its arms on the rim, looking at the bare water, puzzled.",
+      "A cosy bathroom with light tiles and a little window. In the middle a white bathtub filled with warm water and a soft heap of white foam; between the foam the water lies calm and bare, nothing floats on it. A bear child in a white bathrobe kneels at the tub, its arms on the rim, looking at the bare water, brows raised, mouth a small o.",
     after: "A yellow rubber duck with an orange beak now floats on the water among the foam; the bear child pushes it along with one paw and laughs happily.",
     sounds: ["splash", "squeak"],
+    made: "frames",
     // Soap, the sponge and the towel belong to the bath too.
     alsoFits: ["wasserhahn-seife", "eimer-schwamm", "handtuchhalter-handtuch"],
   },

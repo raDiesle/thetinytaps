@@ -13,7 +13,7 @@ export const PAINTED: PaintedPair[] = [
     part: "three thin birthday candles with spiral stripes in pink, yellow and light blue, each with a small flame, standing together – no cake, no holder, no plate",
     cast: "fox",
     before:
-      "A birthday party: a table with a light tablecloth, a paper garland of little flags on the wall behind. On the table in the middle a big round birthday cake with white icing and strawberries on top – nothing stands on it. Behind the table a fox child in a paper party hat and a light-blue T-shirt looks at the cake, puzzled, one paw at its chin.",
+      "A birthday party: a table with a light tablecloth, a paper garland of little flags on the wall behind. On the table in the middle a big round birthday cake with white icing and strawberries on top – nothing stands on it. Behind the table a fox child in a paper party hat and a light-blue T-shirt looks at the cake, brows raised, mouth a small o, one paw at its chin.",
     after:
       "Three thin birthday candles with spiral stripes now stand on top of the cake, each with a small burning flame. The fox child smiles happily with shining eyes, cheeks puffed, about to blow.",
     sounds: ["clonk", "twinkle"],
@@ -29,7 +29,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Weihnachtsstern", the: "der Weihnachtsstern", acc: "den Weihnachtsstern", emoji: "🌟" },
     cast: "fox",
     before:
-      "A cosy living room at Christmas with a window showing falling snow outside. In the middle a big Christmas tree decorated with red and golden baubles and a garland; the very tip of its top is bare. A grown-up fox in a red jumper lifts a fox child in green pyjamas up towards the top of the tree; the child's paws are empty, and both look at the bare tip, puzzled.",
+      "A cosy living room at Christmas with a window showing falling snow outside. In the middle a big Christmas tree decorated with red and golden baubles and a garland; the very tip of its top is bare. A grown-up fox in a red jumper lifts a fox child in green pyjamas up towards the top of the tree; the child's paws are empty, and both look at the bare tip, brows raised, mouth a small o.",
     after: "The fox child now puts a big shining golden star onto the tree's tip, and it glows. The child and the grown-up fox smile happily.",
     sounds: ["twinkle", "chime"],
     // Candles would go on a Christmas tree too.
@@ -45,7 +45,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a thin paintbrush with a wooden handle, a little red paint on its bristles",
     cast: "bear",
     before:
-      "A kitchen table at Easter, a window with spring sunshine behind. In the middle a plain white egg in an egg cup, beside it three little open pots of paint: red, blue and yellow. A bear child in a striped T-shirt and a little apron sits at the table with empty paws, looking at the white egg and the paint pots, puzzled.",
+      "A kitchen table at Easter, a window with spring sunshine behind. In the middle a plain white egg in an egg cup, beside it three little open pots of paint: red, blue and yellow. A bear child in a striped T-shirt and a little apron sits at the table with empty paws, looking at the white egg and the paint pots, brows raised, mouth a small o.",
     after: "The bear child now holds a thin paintbrush with a wooden handle and paints colourful stripes and dots on the egg, smiling happily.",
     sounds: ["swirl"],
     // The handmade paper's crayons would colour an egg too, and the Easter nest's eggs are painted ones.
@@ -60,10 +60,11 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Licht", the: "das Licht", acc: "das Licht", emoji: "💡" },
     cast: "fox",
     before:
-      "St. Martin's evening on a street: the sky dark blue, the dark shapes of houses and trees behind. In the middle a fox child in a warm jacket and a woolly hat holds up a round orange paper lantern on a thin stick; the lantern is dark inside. The child looks at the dark lantern, puzzled. Everything around is dark.",
+      "St. Martin's evening on a street: the sky dark blue, the dark shapes of houses and trees behind. In the middle a fox child in a warm jacket and a woolly hat holds up a round orange paper lantern on a thin stick; the lantern is dark inside. The child looks at the dark lantern, brows raised, mouth a small o. Everything around is dark.",
     after:
       "A small yellow light bulb now glows inside the lantern, seen through its thin paper, and the lantern shines warm orange in the dark. The fox child smiles happily, holding it up high.",
     sounds: ["click", "chime"],
+    made: true,
     // The birthday candles, the campfire's flame and the torch would light a lantern too.
     alsoFits: ["torte-kerze", "feuerstelle-feuer", "zelt-taschenlampe"],
   },
@@ -77,9 +78,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a tall blue glass vase",
     cast: "bear",
     before:
-      "A sunny living room, a window behind and a table with a white tablecloth. In the middle of the table a bunch of colourful tulips and daisies tied with a ribbon lies flat, its flower heads beginning to droop. A bear child in a light-blue T-shirt stands at the table with empty paws, looking at the drooping flowers, puzzled.",
+      "A sunny living room, a window behind and a table with a white tablecloth. In the middle of the table a bunch of colourful tulips and daisies tied with a ribbon lies flat, its flower heads beginning to droop. A bear child in a light-blue T-shirt stands at the table with empty paws, looking at the drooping flowers, brows raised, mouth a small o.",
     after: "The flowers now stand upright and fresh in a tall blue glass vase full of water. The bear child smiles happily, both paws on the vase.",
     sounds: ["rustle", "plop"],
+    made: "frames",
     // The handmade flower's watering can would water a bouquet too.
     alsoFits: ["blume"],
   },
@@ -93,9 +95,10 @@ export const PAINTED: PaintedPair[] = [
     part: "three colourful Easter eggs painted with stripes and dots",
     cast: "fox",
     before:
-      "A spring garden with green grass, a bush and yellow daffodils. In the middle in the grass a round nest of straw, empty. A fox child in a light-green T-shirt kneels beside it with empty paws, looking into the empty nest, puzzled.",
+      "A spring garden with green grass, a bush and yellow daffodils. In the middle in the grass a round nest of straw, empty. A fox child in a light-green T-shirt kneels beside it with empty paws, looking into the empty nest, brows raised, mouth a small o.",
     after: "Three colourful Easter eggs painted with stripes and dots now lie in the nest, and the fox child points at them, smiling happily.",
     sounds: ["plop", "twinkle"],
+    made: "frames",
     alsoFits: ["osterei-pinsel"],
   },
   {
@@ -108,7 +111,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a star-shaped metal biscuit cutter",
     cast: "bear",
     before:
-      "A kitchen at Christmas time, a window with snow outside. On the table in the middle a smooth rolled-out sheet of biscuit dough on a floured board, a rolling pin beside it and an empty baking tray. A bear child in a red apron stands at the table with empty paws beside a grown-up bear in a green apron; both look at the plain dough, puzzled.",
+      "A kitchen at Christmas time, a window with snow outside. On the table in the middle a smooth rolled-out sheet of biscuit dough on a floured board, a rolling pin beside it and an empty baking tray. A bear child in a red apron stands at the table with empty paws beside a grown-up bear in a green apron; both look at the plain dough, brows raised, mouth a small o.",
     after:
       "The bear child now presses a star-shaped metal biscuit cutter into the dough; star-shaped biscuits lie on the baking tray, and star-shaped holes are left in the dough. Both bears smile happily.",
     sounds: ["stamp", "yum"],
@@ -123,9 +126,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a round red foam clown nose",
     cast: "fox",
     before:
-      "A children's room on carnival day with colourful paper streamers on the wall. In the middle a fox child in a colourful clown costume with big dots, a ruffled collar and a small pointed clown hat stands touching its own plain dark nose with one empty paw, puzzled.",
+      "A children's room on carnival day with colourful paper streamers on the wall. In the middle a fox child in a colourful clown costume with big dots, a ruffled collar and a small pointed clown hat stands touching its own plain dark nose with one empty paw, brows raised, mouth a small o.",
     after: "The fox child now wears a round red clown nose over its own nose and laughs happily, arms spread out.",
     sounds: ["boing", "giggle"],
+    made: "frames",
     // A red nose could be a snowman's nose too.
     alsoFits: ["schneemann-karotte"],
   },

@@ -12,7 +12,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Steine", the: "die Steine", acc: "die Steine", plural: true, emoji: "🧱" },
     cast: "fox",
     before:
-      "A building site behind a red-and-white barrier: the walls of a little house half built of red bricks, a cement mixer and a wheelbarrow. In front of the unfinished wall stands the builder, a grown-up fox woman with eyelashes in an orange work jacket, a yellow safety vest and a yellow hard hat, a mason's trowel in one paw and a bucket of mortar at her feet. The wooden pallet beside her is empty, and she looks round puzzled.",
+      "A building site behind a red-and-white barrier: the walls of a little house half built of red bricks, a cement mixer and a wheelbarrow. In front of the unfinished wall stands the builder, a grown-up fox woman with eyelashes in an orange work jacket, a yellow safety vest and a yellow hard hat, a mason's trowel in one paw and a bucket of mortar at her feet. The wooden pallet beside her is empty, and she looks round unsure.",
     after: "A stack of red bricks now stands on the pallet beside her, and she sets one brick onto the wall with her trowel, smiling happily.",
     sounds: ["thump", "clonk"],
     alsoFits: ["handwerker", "kranfuehrer", "baggerfahrer", "zwerg"],
@@ -27,7 +27,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Schraubenschlüssel", the: "der Schraubenschlüssel", acc: "den Schraubenschlüssel", emoji: "🔧" },
     cast: "bear",
     before:
-      "A car workshop with tyres stacked against the wall. In the middle a small red car, its front wheel sitting loose and crooked on the car, tilted out at the top, as if it might fall off. The mechanic, a grown-up bear woman with eyelashes in grey overalls with blue straps and a red cap, crouches beside the wheel with empty paws, looking at it, puzzled.",
+      "A car workshop with tyres stacked against the wall. In the middle a small red car, its front wheel sitting loose and crooked on the car, tilted out at the top, as if it might fall off. The mechanic, a grown-up bear woman with eyelashes in grey overalls with blue straps and a red cap, crouches beside the wheel with empty paws, looking at it, brows raised, mouth a small o.",
     after: "The mechanic now turns the wheel's nut tight with a big silver spanner; the wheel stands straight on the car again. She smiles happily.",
     sounds: ["click", "rattle"],
     alsoFits: ["klempner", "handwerker", "abschleppfahrer"],
@@ -41,10 +41,11 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Säge", the: "die Säge", acc: "die Säge", emoji: "🪚" },
     cast: "fox",
     before:
-      "A carpenter's workshop with wooden boards leaning against the wall. In the middle a long wooden plank lies across two trestles, a pencil line drawn across its middle. The carpenter, a grown-up fox woman with eyelashes in a light-blue shirt, a green bandana and a brown leather apron, stands at the plank with empty paws, looking at the pencil line, puzzled.",
+      "A carpenter's workshop with wooden boards leaning against the wall. In the middle a long wooden plank lies across two trestles, a pencil line drawn across its middle. The carpenter, a grown-up fox woman with eyelashes in a light-blue shirt, a green bandana and a brown leather apron, stands at the plank with empty paws, looking at the pencil line, brows raised, mouth a small o.",
     after:
       "The carpenter now saws through the plank along the pencil line with a saw with a wooden handle; sawdust falls, the cut is half done. She smiles happily.",
     sounds: ["saw"],
+    made: true,
     alsoFits: ["handwerker", "holzfaeller"],
   },
   {
@@ -56,7 +57,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Hammer", the: "der Hammer", acc: "den Hammer", emoji: "🔨" },
     cast: "bear",
     before:
-      "A child's room with a toy shelf. In the middle a small wooden chair, wobbly, one of its legs come loose with a nail sticking halfway out of it. The handyman, a grown-up bear in a dark-grey work shirt, an orange cap and a tool belt with empty loops, holds the chair steady with empty paws, looking at the sticking-out nail, puzzled.",
+      "A child's room with a toy shelf. In the middle a small wooden chair, wobbly, one of its legs come loose with a nail sticking halfway out of it. The handyman, a grown-up bear in a dark-grey work shirt, an orange cap and a tool belt with empty loops, holds the chair steady with empty paws, looking at the sticking-out nail, brows raised, mouth a small o.",
     after: "The handyman now knocks the nail into the chair's leg with a hammer with a wooden handle; the chair stands firm. He smiles happily.",
     sounds: ["knock", "knock"],
     alsoFits: ["tischlerin", "bauarbeiterin", "mechanikerin"],
@@ -70,9 +71,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Glühbirne", the: "die Glühbirne", acc: "die Glühbirne", emoji: "💡" },
     cast: "fox",
     before:
-      "A room in the evening, dim and grey, the window dark blue. From the ceiling hangs a lamp with an empty socket: nothing in it, no light. Under it stands a small stepladder, and on it the electrician, a grown-up fox woman with eyelashes in a yellow work jacket, a white hard hat and a tool belt, reaching up with empty paws towards the empty socket, puzzled.",
+      "A room in the evening, dim and grey, the window dark blue. From the ceiling hangs a lamp with an empty socket: nothing in it, no light. Under it stands a small stepladder, and on it the electrician, a grown-up fox woman with eyelashes in a yellow work jacket, a white hard hat and a tool belt, reaching up with empty paws towards the empty socket, brows raised, mouth a small o.",
     after: "The electrician now screws a light bulb into the socket, and it glows bright yellow: the whole room is warm and light. She smiles happily.",
     sounds: ["click", "ding"],
+    made: true,
     alsoFits: ["obstbaeuerin"],
   },
   {
@@ -84,7 +86,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Kran", the: "der Kran", acc: "den Kran", emoji: "🏗️" },
     cast: "fox",
     before:
-      "A building site behind a red-and-white barrier: a tall house, its walls built up to the third floor, its top still open. On the ground in front lies a heavy pallet of red bricks with chains round it. The driver, a grown-up fox in an orange work jacket, a yellow safety vest and a white hard hat, stands beside the pallet with empty paws, looking up to the top of the house, puzzled: far too high to carry the bricks up.",
+      "A building site behind a red-and-white barrier: a tall house, its walls built up to the third floor, its top still open. On the ground in front lies a heavy pallet of red bricks with chains round it. The driver, a grown-up fox in an orange work jacket, a yellow safety vest and a white hard hat, stands beside the pallet with empty paws, looking up to the top of the house, brows raised, mouth a small o: far too high to carry the bricks up.",
     after:
       "A tall yellow tower crane now stands beside the house and lifts the pallet of bricks up high on its hook; the fox sits in the crane's cab and smiles happily.",
     sounds: ["whirr", "thump"],
@@ -99,9 +101,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Saugglocke", the: "die Saugglocke", acc: "die Saugglocke", emoji: "🪠" },
     cast: "fox",
     before:
-      "A bathroom with tiles and a washbasin. In the middle a white toilet, blocked, its water standing up to the rim, a small puddle on the floor beside it. The plumber, a grown-up fox in blue overalls with grey straps and a red cap, stands beside the toilet with empty paws, looking at the high water, puzzled.",
+      "A bathroom with tiles and a washbasin. In the middle a white toilet, blocked, its water standing up to the rim, a small puddle on the floor beside it. The plumber, a grown-up fox in blue overalls with grey straps and a red cap, stands beside the toilet with empty paws, looking at the high water, brows raised, mouth a small o.",
     after: "The plumber now pumps a red rubber plunger with a wooden handle in the toilet; the water gurgles away and the puddle is gone. He smiles happily.",
     sounds: ["squeak", "glug"],
+    made: true,
     alsoFits: ["mechanikerin"],
   },
   {
@@ -114,7 +117,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a yellow digger with black tracks, a cab, and a long arm ending in a toothed bucket",
     cast: "bear",
     before:
-      "A building site behind a red-and-white barrier, a plain patch of flat earth in the middle, marked out with four little wooden stakes and a string where a deep hole for a house is to be dug. The driver, a grown-up bear in a blue work jacket, a yellow safety vest and an orange hard hat, stands at the string with empty paws, looking at the hard ground, puzzled.",
+      "A building site behind a red-and-white barrier, a plain patch of flat earth in the middle, marked out with four little wooden stakes and a string where a deep hole for a house is to be dug. The driver, a grown-up bear in a blue work jacket, a yellow safety vest and an orange hard hat, stands at the string with empty paws, looking at the hard ground, brows raised, mouth a small o.",
     after:
       "A yellow digger now stands at the marked patch and digs a hole with its toothed bucket, a heap of earth beside it; the bear sits in its cab and smiles happily.",
     sounds: ["rumble", "beeps"],
@@ -130,9 +133,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a paint roller: a fluffy roller soaked in blue paint on a bent metal handle",
     cast: "fox",
     before:
-      "An empty room being redone: a big bare grey wall, the floor covered with a sheet, an open bucket of blue paint with a paint tray beside it. The painter, a grown-up fox in paint-spotted white overalls and a white cap, stands at the wall with empty paws, looking from the paint to the grey wall, puzzled.",
+      "An empty room being redone: a big bare grey wall, the floor covered with a sheet, an open bucket of blue paint with a paint tray beside it. The painter, a grown-up fox in paint-spotted white overalls and a white cap, stands at the wall with empty paws, looking from the paint to the grey wall, brows raised, mouth a small o.",
     after: "The painter now rolls blue paint up the wall with a paint roller; a wide blue stripe already covers the grey. He smiles happily.",
     sounds: ["swirl", "scrub"],
+    made: "frames",
     alsoFits: ["malerin"],
   },
   {
@@ -145,9 +149,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a yellow road roller: a little cab, a big smooth steel drum at its front and one at its back",
     cast: "bear",
     before:
-      "A road being built behind red-and-white barriers: in the middle a strip of fresh black asphalt, lumpy and bumpy, still steaming a little; the finished smooth road goes on behind it. The road worker, a grown-up bear woman with eyelashes in orange work clothes, a yellow safety vest and a white hard hat, stands at the bumpy strip with empty paws, looking at the lumps, puzzled.",
+      "A road being built behind red-and-white barriers: in the middle a strip of fresh black asphalt, lumpy and bumpy, still steaming a little; the finished smooth road goes on behind it. The road worker, a grown-up bear woman with eyelashes in orange work clothes, a yellow safety vest and a white hard hat, stands at the bumpy strip with empty paws, looking at the lumps, brows raised, mouth a small o.",
     after:
       "A yellow road roller with a big smooth steel drum now rolls over the asphalt, the bear in its seat; behind it the road is flat and smooth. She smiles happily.",
     sounds: ["rumble", "hiss"],
+    made: "frames",
   },
 ];

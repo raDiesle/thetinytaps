@@ -12,7 +12,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Karotte", the: "die Karotte", acc: "die Karotte", emoji: "🥕" },
     cast: "bear",
     before:
-      "A snowy garden with a few snow-covered fir trees. In the middle a big snowman of three snowballs with coal eyes, a coal smile and twig arms – where its nose should be there is nothing. Beside it a little bear child in a red winter jacket, a woolly hat and mittens looks at the snowman's face, puzzled.",
+      "A snowy garden with a few snow-covered fir trees. In the middle a big snowman of three snowballs with coal eyes, a coal smile and twig arms – where its nose should be there is nothing. Beside it a little bear child in a red winter jacket, a woolly hat and mittens looks at the snowman's face, brows raised, mouth a small o.",
     after: "An orange carrot now sits in the snowman's face as its nose. The bear child claps its mittens, laughing happily.",
     sounds: ["pop"],
     made: true,
@@ -43,10 +43,11 @@ export const PAINTED: PaintedPair[] = [
     part: "a pair of yellow rubber boots",
     cast: "bear",
     before:
-      "A country path after the rain: wet grass at the sides, the grey sky clearing to blue. In the middle of the path a big brown puddle. A bear child in a red jumper and blue trousers stands in its white socks on a flat stone at the puddle's edge, one foot lifted as if to jump, looking at the puddle, puzzled.",
+      "A country path after the rain: wet grass at the sides, the grey sky clearing to blue. In the middle of the path a big brown puddle. A bear child in a red jumper and blue trousers stands in its white socks on a flat stone at the puddle's edge, one foot lifted as if to jump, looking at the puddle, brows raised, mouth a small o.",
     after:
       "The bear child now wears a pair of yellow rubber boots and jumps into the middle of the puddle, the brown water splashing up high. The bear child laughs happily.",
     sounds: ["splash"],
+    made: "frames",
     alsoFits: ["regen-regenschirm", "schuh-socken"],
   },
   {
@@ -74,7 +75,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a wooden sledge with red metal runners and a rope at its front",
     cast: "bear",
     before:
-      "A snowy hill on a winter day with a few snow-covered fir trees beside it. At the top of the long white slope in the middle stands a bear child in a blue winter jacket and a red woolly hat, empty-pawed, looking down the slope, puzzled.",
+      "A snowy hill on a winter day with a few snow-covered fir trees beside it. At the top of the long white slope in the middle stands a bear child in a blue winter jacket and a red woolly hat, empty-pawed, looking down the slope, brows raised, mouth a small o.",
     after: "The bear child now sits on a wooden sledge with red runners and slides down the slope, snow spraying up, laughing happily.",
     sounds: ["slide", "whoosh"],
     alsoFits: ["see-schlittschuhe", "schal-handschuhe"],
@@ -88,7 +89,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Wind", the: "der Wind", acc: "den Wind", emoji: "💨" },
     cast: "fox",
     before:
-      "A wide green meadow on a still, calm day: the grass stands straight, the leaves of a tree at the side hang still, a few clouds stand motionless in the blue sky. In the middle on the grass lies a colourful diamond-shaped kite with a long tail of bows, flat on the ground. A fox child in a yellow jumper and blue trousers holds the kite's string, which hangs slack, looking at the kite lying on the grass, puzzled.",
+      "A wide green meadow on a still, calm day: the grass stands straight, the leaves of a tree at the side hang still, a few clouds stand motionless in the blue sky. In the middle on the grass lies a colourful diamond-shaped kite with a long tail of bows, flat on the ground. A fox child in a yellow jumper and blue trousers holds the kite's string, which hangs slack, looking at the kite lying on the grass, brows raised, mouth a small o.",
     after:
       "A strong wind now blows across the meadow, shown as white swirling wind lines coming from the left; the grass and the tree's leaves lean with it, and the kite flies high in the sky on its taut string. The fox child holds the string tight and laughs happily.",
     sounds: ["blow", "whoosh"],
@@ -102,9 +103,10 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Schlittschuhe", the: "die Schlittschuhe", acc: "die Schlittschuhe", plural: true, emoji: "⛸️" },
     cast: "bear",
     before:
-      "A frozen pond on a cold winter day, its ice smooth and light blue, snow on its banks and on a few bare trees. A bear child in a purple winter jacket, a woolly hat and plain brown boots stands at the edge of the ice, empty-pawed, looking out over the smooth ice, puzzled.",
+      "A frozen pond on a cold winter day, its ice smooth and light blue, snow on its banks and on a few bare trees. A bear child in a purple winter jacket, a woolly hat and plain brown boots stands at the edge of the ice, empty-pawed, looking out over the smooth ice, brows raised, mouth a small o.",
     after: "The bear child now wears a pair of white ice skates with silver blades and glides across the ice on one leg, arms spread out, laughing happily.",
     sounds: ["slide", "twinkle"],
+    made: true,
     // A sledge slides on the ice too.
     alsoFits: ["schnee-schlitten"],
   },
@@ -118,7 +120,7 @@ export const PAINTED: PaintedPair[] = [
     part: "a snow shovel with a wide red plastic blade and a long wooden handle",
     cast: "fox",
     before:
-      "A house front on a winter morning: a wooden front door, and from the door to the garden gate a path buried under deep fresh snow. A fox child in a green snowsuit and a woolly hat and a grown-up fox in a red winter coat stand at the door, empty-pawed, looking at the deep snow on the path, puzzled.",
+      "A house front on a winter morning: a wooden front door, and from the door to the garden gate a path buried under deep fresh snow. A fox child in a green snowsuit and a woolly hat and a grown-up fox in a red winter coat stand at the door, empty-pawed, looking at the deep snow on the path, brows raised, mouth a small o.",
     after:
       "The fox child now pushes a snow shovel with a wide red blade along the path, the grown-up fox helping with one paw on the handle; a cleared strip of path lies behind them. Both smile happily.",
     sounds: ["crunch", "slide"],

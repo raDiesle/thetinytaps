@@ -194,13 +194,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     right: "Шлем подходит к велосипеду. Здорово!",
     belongs: "Шлем подходит к велосипеду!",
   },
-  "einkaufswagen-muenze": {
-    name: "Тележка",
-    partner: "Монетка",
-    question: "Что подходит к тележке?",
-    right: "Монетка подходит к тележке. Здорово!",
-    belongs: "Монетка подходит к тележке!",
-  },
   "briefkasten-brief": {
     name: "Почтовый ящик",
     partner: "Письмо",

@@ -25,7 +25,7 @@ import { PAINTED as fantasie } from "./fantasie";
 // cake that already had candles, a letter box whose emoji already showed the letter). Each pair is two frames of ONE
 // scene, painted with Gemini (`picturePrompts.ts`, `/bild-erzeugen`) and shown by `PairPicture`:
 // 1. before: the thing in its place, plainly missing its partner, or the helper in its role and place, empty-pawed,
-//    looking round puzzled or searching – and whoever is in the picture waits for it;
+//    looking round unsure or searching – and whoever is in the picture waits for it;
 // 2. after: the very same picture, drawn from the first as its only reference, the partner now in use, and everyone
 //    in it glad to have it.
 // Plain data, one file per topic like `scenes/`, so the picture queue on the management page loads no pictures and

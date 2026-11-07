@@ -168,7 +168,12 @@ function buildRequest(job) {
     const [cols, rows] = parseGrid(job.grid);
     const names = POSITIONS[`${cols}x${rows}`] ?? job.panels.map((_, i) => `row ${Math.floor(i / cols) + 1}, column ${(i % cols) + 1}`);
     aspect = gridAspect(job.aspect, cols, rows);
-    text += `\n\nDraw this as ONE image made of ${job.panels.length} separate pictures in a grid of ${cols} column(s) and ${rows} row(s). All panels are exactly the same size${job.aspect ? ` (each ${job.aspect})` : ""} and separated by straight, solid #${gapColour(job)} gaps; no borders, no numbers, no labels. Every panel is a complete picture with its own background filling the panel edge to edge.`;
+    // Cut-outs share one flat backdrop, which is their gap too: told to give each panel its own background as scenes
+    // do, Gemini painted coloured panels and white frame lines round the things, and let them run into the cell's edge
+    // (most partners of „Was gehört zusammen?“, November 2026).
+    text += job.transparent
+      ? `\n\nDraw this as ONE image: ${job.panels.length} separate things side by side in a grid of ${cols} column(s) and ${rows} row(s), all on ONE continuous, flat, solid #${job.key} background. No panels, no boxes, no frames, no lines, no coloured or white areas behind a thing – only the one flat background between and around them. Each thing stands alone in the middle of its cell, whole, and small enough to leave a wide empty margin of background (a fifth of the cell) on every side; nothing touches or crosses into another cell. No numbers, no labels.`
+      : `\n\nDraw this as ONE image made of ${job.panels.length} separate pictures in a grid of ${cols} column(s) and ${rows} row(s). All panels are exactly the same size${job.aspect ? ` (each ${job.aspect})` : ""} and separated by straight, solid #${gapColour(job)} gaps; no borders, no numbers, no labels. Every panel is a complete picture with its own background filling the panel edge to edge: no white margin, no frame line, no rounded corners inside a panel.`;
     job.panels.forEach((panel, i) => (text += `\nPanel ${i + 1} (${names[i]}): ${panel}`));
   }
   if (job.transparent) {
@@ -354,7 +359,7 @@ async function finish(job, picture, root) {
   const raw = join(root, RAW_DIR, `${basename(job.outs[0], extname(job.outs[0]))}${job.grid ? `-grid${job.grid}` : ""}.png`);
   await sharp(picture).png().toFile(raw);
   console.log(`raw picture in ${relative(process.cwd(), raw)}`);
-  const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job)) : [picture];
+  const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job), job.transparent) : [picture];
   for (const [i, piece] of pieces.entries()) {
     const out = resolve(root, job.outs[i]);
     await save(job.transparent ? await cutOut(piece, job.key) : piece, { ...job, out });
@@ -364,7 +369,7 @@ async function finish(job, picture, root) {
 // Cuts a grid picture into its panels. The model never draws the gaps exactly
 // where asked, so each cut goes along the line with most gap colour near where
 // it should be, and gap colour left at a panel's edges is trimmed away.
-async function splitGrid(input, cols, rows, gapHex) {
+async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
   const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   const gap = [0, 2, 4].map((i) => parseInt(gapHex.slice(i, i + 2), 16));
@@ -399,12 +404,32 @@ async function splitGrid(input, cols, rows, gapHex) {
     for (let i = 1; i < count; i++) {
       const expected = Math.round((length * i) / count);
       const reach = Math.round(length * 0.08);
-      let best = expected;
-      for (let p = expected - reach; p <= expected + reach; p++) if (gapness(p) > gapness(best)) best = p;
-      let [a, b] = [best, best];
-      if (gapness(best) > 0.8) {
-        while (a > 0 && gapness(a - 1) > 0.8) a--;
-        while (b < length - 1 && gapness(b + 1) > 0.8) b++;
+      const [lo, hi] = [expected - reach, expected + reach];
+      let a;
+      let b;
+      let line = expected;
+      for (let p = lo; p <= hi; p++) if (gapness(p) < gapness(line)) line = p;
+      if (gapness(lo) > 0.8 && gapness(hi) > 0.8 && gapness(line) < 0.2) {
+        // The panels' own background is the gap colour and the gap another one, a clean line of it across the sheet
+        // (white gaps between magenta panels, November 2026 – a cut spreading over all that magenta took whole panels
+        // away): the gap is that line. A cut-out sheet on one flat backdrop has no such line, and is cut in its middle.
+        [a, b] = [line, line];
+        while (a > lo && gapness(a - 1) < 0.5) a--;
+        while (b < hi && gapness(b + 1) < 0.5) b++;
+      } else {
+        let best = expected;
+        for (let p = lo; p <= hi; p++) if (gapness(p) > gapness(best)) best = p;
+        [a, b] = [best, best];
+        // Spread only over lines nearly as clean as the cleanest: on one flat backdrop a wide thing (a bus) fills
+        // only a fifth of its columns, which still counted as gap at 80 % and cut its front off (November 2026).
+        const clean = Math.max(0.8, gapness(best) - 0.03);
+        if (gapness(best) > 0.8) {
+          while (a > lo && gapness(a - 1) > clean) a--;
+          while (b < hi && gapness(b + 1) > clean) b++;
+        }
+        // A sheet cut out afterwards is cut in the backdrop's middle: the cut-out takes the backdrop away, and cutting
+        // at the gap's edges took the tip of what reached into it (a wheelchair's footrest, November 2026).
+        if (cutOutLater) [a, b] = [(a + b) >> 1, ((a + b) >> 1) - 1];
       }
       result.push([a, b + 1]);
     }
@@ -418,7 +443,10 @@ async function splitGrid(input, cols, rows, gapHex) {
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       let [x0, x1, y0, y1] = [xs[c][1], xs[c + 1][0], ys[r][1], ys[r + 1][0]];
-      const most = 0.06;
+      // Rows and columns wholly of gap colour are trimmed: a border round the whole sheet was 50 px on top, more than
+      // the 6 % once allowed, and stayed in the scene (November 2026). Only a panel cut out later keeps the cap, since
+      // its own background is the gap colour and the cut-out takes it away.
+      const most = cutOutLater ? 0.06 : 0.3;
       const [maxX, maxY] = [Math.round((x1 - x0) * most), Math.round((y1 - y0) * most)];
       for (let n = 0; n < maxY && rowGap(y0, x0, x1) > 0.8; n++) y0++;
       for (let n = 0; n < maxY && rowGap(y1 - 1, x0, x1) > 0.8; n++) y1--;
@@ -445,16 +473,19 @@ async function splitGrid(input, cols, rows, gapHex) {
         for (let n = 0; n < limit && (tint(at) > 0.03 || tint(at + step) > 0.03); n++) at += step;
         return at;
       };
-      y0 = trim(y0, 1, seamY, tintRow);
-      y1 = trim(y1 - 1, -1, seamY, tintRow) + 1;
-      x0 = trim(x0, 1, seamX, tintColumn);
-      x1 = trim(x1 - 1, -1, seamX, tintColumn) + 1;
-      // The soft edge of a gap still has a tint of its colour: cut a little more where panels meet.
-      const [insetX, insetY] = [Math.round((x1 - x0) * 0.012), Math.round((y1 - y0) * 0.012)];
-      if (c > 0) x0 += insetX;
-      if (c < cols - 1) x1 -= insetX;
-      if (r > 0) y0 += insetY;
-      if (r < rows - 1) y1 -= insetY;
+      // A sheet cut out afterwards keeps its edges: the cut-out takes the seam away with the backdrop.
+      if (!cutOutLater) {
+        y0 = trim(y0, 1, seamY, tintRow);
+        y1 = trim(y1 - 1, -1, seamY, tintRow) + 1;
+        x0 = trim(x0, 1, seamX, tintColumn);
+        x1 = trim(x1 - 1, -1, seamX, tintColumn) + 1;
+        // The soft edge of a gap still has a tint of its colour: cut a little more where panels meet.
+        const [insetX, insetY] = [Math.round((x1 - x0) * 0.012), Math.round((y1 - y0) * 0.012)];
+        if (c > 0) x0 += insetX;
+        if (c < cols - 1) x1 -= insetX;
+        if (r > 0) y0 += insetY;
+        if (r < rows - 1) y1 -= insetY;
+      }
       pieces.push(
         await sharp(input)
           .extract({ left: x0, top: y0, width: x1 - x0, height: y1 - y0 })
@@ -581,7 +612,7 @@ if (opts.out === "status") {
   if (!opts.out) fail("usage: bun run image <out.webp> --from <picture.png>");
   const job = toJob({ ...opts, prompt: "-" });
   const picture = readFileSync(opts.from);
-  const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job)) : [picture];
+  const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job), job.transparent) : [picture];
   for (const [i, piece] of pieces.entries()) {
     await save(job.transparent ? await cutOut(piece, job.key) : piece, { ...job, out: resolve(ROOT, job.outs[i]) });
   }

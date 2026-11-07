@@ -63,8 +63,10 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 
 - **The first picture plainly lacks the partner, and shows nothing else that would do its job.** No cake that already
   has candles, no letter box with a letter in it, no present that already has its bow, no building site where the
-  bricks already lie ready. Whoever is there shows it waits: a fox or bear empty-pawed, puzzled or searching, looking
-  at what is missing – feelings only in faces and poses, never a „?“ or other sign floating in the air.
+  bricks already lie ready. Whoever is there shows it waits: a fox or bear empty-pawed, unsure or searching, looking
+  at what is missing – feelings only in faces and poses, never a „?“ or other sign floating in the air. Write the face
+  („brows raised, mouth a small o“), never „puzzled“ or „confused“: Gemini drew a „?“ over the head for that word in a
+  quarter of 166 pairs, whatever else the prompt said (review, November 2026).
 - **The second picture is the very same scene a moment later**: the partner in use (the candles burning on the cake,
   the brush down in the chimney held by its rope, the reindeer pulling the sleigh) and everyone glad to have it.
   Nothing else changes. A partner that is merely there, lying beside someone with empty paws, is no answer: the
@@ -78,10 +80,18 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   the beach, a mine with its cart on rails, a kitten up a tree for the fire engine's ladder. Name the few things that
   tell the place in `before`, nothing more.
 - **Only partners that look one way**: a thing a child knows by one look (a carrot, a key, a life ring), never one that
-  looks very different from home to home (a charging cable was removed).
+  looks very different from home to home (a charging cable was removed). Emblems on things (a shield, a flag, a coat)
+  are neutral – a star, a paw, stripes – never a religious or national sign, since children in every app language play
+  it (the knight's shield had a cross and was redrawn with a star, November 2026).
 - **The partner on its plate looks like the partner in the second picture**: its emoji only where Apple's emoji
   matches it (🍊, 🦌, 🥕), else a `part` whose words describe it as the second frame shows it (Apple's 🕯️ stands on a
   metal dish – birthday candles don't); check the plate against the frame and redraw the part where they differ.
+- **Review every made pair before marking it `made`**, frame by frame and the plate on grey (a contact sheet of
+  before | after | plate; subagents can share the looking): of the first 166 drawn as one request each, 70 needed
+  their frames again (a character or the partner twice in the second, the partner already somewhere in the first, a
+  „?“, a drawn frame, a changed framing) and 77 their plate (white frame lines, a coloured panel left behind, cut off at
+  its cell's edge – the sheet prompt for cut-outs was wrong then). `TWO_FRAMES` in `picturePrompts.ts` now says each
+  of these per panel; a fault that comes back often goes there, not into each pair's words.
 - One plain scene, the main thing big in the middle, a few things that tell the place, and only the characters named,
   each once (`CAST` in `picturePrompts.ts` says so to Gemini). Fox and bear take turns; a helper is a fox or bear
   grown-up in its role, children are fox or bear children, and everyone wears clothes. Things and children stay as the

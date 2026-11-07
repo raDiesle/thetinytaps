@@ -194,13 +194,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     right: "El casco va con la bicicleta. ¡Genial!",
     belongs: "¡El casco va con la bicicleta!",
   },
-  "einkaufswagen-muenze": {
-    name: "Carrito de compras",
-    partner: "Moneda",
-    question: "¿Qué va con el carrito de compras?",
-    right: "La moneda va con el carrito de compras. ¡Genial!",
-    belongs: "¡La moneda va con el carrito de compras!",
-  },
   "briefkasten-brief": {
     name: "Buzón",
     partner: "Carta",

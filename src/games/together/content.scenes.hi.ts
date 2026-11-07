@@ -195,13 +195,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     right: "साइकिल के लिए हेलमेट चाहिए। बहुत बढ़िया!",
     belongs: "साइकिल के लिए हेलमेट चाहिए!",
   },
-  "einkaufswagen-muenze": {
-    name: "ट्रॉली",
-    partner: "सिक्का",
-    question: "ट्रॉली के लिए क्या चाहिए?",
-    right: "ट्रॉली के लिए सिक्का चाहिए। बहुत बढ़िया!",
-    belongs: "ट्रॉली के लिए सिक्का चाहिए!",
-  },
   "briefkasten-brief": {
     name: "लेटरबॉक्स",
     partner: "चिट्ठी",
