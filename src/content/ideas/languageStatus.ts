@@ -57,7 +57,7 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/timer/",
-    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und der Name des Bilds „Wecker“ (7. November 2026, nur Deutsch). Sagt sonst nichts.",
+    note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und die Namen der Bilder „Wecker“ und „Tennis“ (7. November 2026, nur Deutsch). Sagt sonst nichts.",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
@@ -111,7 +111,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🌙 Buch „Wie lange warten?“ (Countdown)",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts), übersetzt am 5. November 2026; die Seite für Suchmaschinen (seo.ts, seo.en.ts) gibt es wie alle auf Deutsch und Englisch. Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",
+        note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts), übersetzt am 5. November 2026; die Seite für Suchmaschinen gibt es wie alle in allen sieben Sprachen (seo.ts, seo.<Sprache>.ts). Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",
       },
       {
         label: "🛏️ Countdown direkt auf dem Blatt (Nachtbilder, ＋, 🗑️, Überschrift, Löschen)",
@@ -385,6 +385,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Der Name „Fun for Both“ bleibt in allen Sprachen gleich. „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx) übersetzt am 5. November 2026; auf Hindi „किसकी बारी?“, da „wer spielt“ dort nach Junge oder Mädchen ginge.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es in allen sieben Sprachen (/en/, /zh/, /hi/, /es/, /ar/, /ru/, A-22; die fünf weiteren seit 7. November 2026). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Der Name „Fun for Both“ bleibt in allen Sprachen gleich. „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx) übersetzt am 5. November 2026; auf Hindi „किसकी बारी?“, da „wer spielt“ dort nach Junge oder Mädchen ginge.",
   },
 ];

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { spaced } from "./spacing";
+import { repeatPause, spaced } from "./spacing";
 
 describe("spaced", () => {
   test("lets one through, then none until the gap has passed", () => {
@@ -15,6 +15,38 @@ describe("spaced", () => {
     // Measured from the last pass, not from the last try: quick taps don't keep it shut for good.
     now += 100;
     expect(gate.pass()).toBe(true);
+  });
+});
+
+describe("repeatPause", () => {
+  test("the same key passes again only after the pause, another key at once", () => {
+    let now = 1000;
+    const gate = repeatPause(3000, () => now);
+    expect(gate.pass("B")).toBe(true);
+    now += 500;
+    expect(gate.pass("B")).toBe(false);
+    now += 2000;
+    expect(gate.pass("B")).toBe(false);
+    // Hammering doesn't keep it shut for good: measured from the last pass.
+    now += 500;
+    expect(gate.pass("B")).toBe(true);
+    now += 100;
+    expect(gate.pass("K")).toBe(true);
+    now += 100;
+    expect(gate.pass("B")).toBe(true);
+  });
+
+  // A child hammering one key heard its line and a note at every press (Buchstaben & Zahlen, November 2026).
+  test("Buchstaben & Zahlen pauses a repeated key and spaces its soft notes", () => {
+    const letters = new URL("../games/letters/", import.meta.url);
+    const play = readFileSync(new URL("LettersPlay.tsx", letters), "utf8");
+    expect(play).toContain("repeatPause()");
+    expect(play).toContain("repeats.pass(toUpper(key, pack))");
+    for (const file of ["LettersPlay.tsx", "WordsPlay.tsx", "FindPlay.tsx", "MovePlay.tsx"]) {
+      const source = readFileSync(new URL(file, letters), "utf8");
+      expect(source, file).toContain("useSoftTap(");
+      expect(source, file).not.toContain("playRandomNote");
+    }
   });
 });
 

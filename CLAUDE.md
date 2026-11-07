@@ -154,7 +154,7 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
+  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines come in all seven languages (see Search engines).
 - Texts for parents (the home page's foot, the SEO texts' prose) speak as the parents who made the app: warm,
   flowing sentences in our own words, the way one parent tells another. The user's notes on what to say are a rough
   guide, never wording to copy or to turn into a list of steps (user feedback, October 2026).
@@ -266,6 +266,11 @@ In a fresh worktree run `bun install` first.
   ASIDE_LINE_GAP_MS })` (`src/lib/spacing.ts`, `voice.ts`): only when nothing else is said and the last such line lies
   far enough back, never cutting another line off. Where a level's last answer leads straight into its end, it leaves
   its praise and extras to the end's.
+  The same key (or the same thing tapped) pressed again and again is said and sounded again only after a pause
+  (`repeatPause`, `REPEAT_PAUSE_MS` in `src/lib/spacing.ts`), and meanwhile only ripples, silently; the soft note of a
+  press that sets nothing off is such an extra too (user feedback from Buchstaben & Zahlen, November 2026: hammering B
+  said „B wie Ball!“ and played a note at every press). A press the game asks for again (the next step, the digit that
+  comes when the same number is pressed again) is no repeat.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
@@ -686,7 +691,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
 - The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
   toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
   „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
@@ -707,15 +712,19 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   sign is big enough for them to be seen (`--sign`; `SIGN_SIZE` in `Bookshelf.tsx` in front of a wide shelf): at the
   sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
-  and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
-  line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own
-  `index.html` per entry and language – German at `/zaehne/`, English at `/en/zaehne/`, joined by hreflang (GitHub
+  and in every other language of the app in `seo.<lang>.ts` (`SEO_LANGUAGES` = `APP_LANGUAGES`: the pages are part
+  of being found, A-22 – English since October, the other five since November 2026, user request). So, unlike other
+  translations, a new entry or a changed meaning gets its lines in all seven in the same commit: search texts are
+  short, and a page missing a language would leave a hole in the hreflang set (`content.test.ts` checks every
+  language has every page, lengths – Chinese half, Hindi more, since Google cuts by width – and no Latin letters in
+  Russian, Chinese, Hindi and Arabic but the site's name). The build writes an own `index.html` per entry and
+  language – German at `/zaehne/`, the others at `/en/zaehne/`, `/zh/zaehne/` …, joined by hreflang (GitHub
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
-  and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
-  `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
+  and head in step (`useTitle`, `SeoHead`). Under `/en/`, `/ru/` … the router runs below the prefix (`routerBase()`,
+  `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
   browser's language. Texts say only what the page really does, and keep saying it: a change that adds, removes or
   renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
-  text in both languages in the same commit, and its book's and the home page's where they name it – they had fallen
+  text in every language in the same commit, and its book's and the home page's where they name it – they had fallen
   behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
   feedback, November 2026; `content.test.ts` checks that a book's text names each of its games). No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with

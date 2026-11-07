@@ -4,7 +4,7 @@ import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { TimerCardArt } from "./cardArt";
-import { PICTURES, SWAP_NAME, SWAP_NOTE, TIMER_TITLE } from "./content";
+import { isTurns, PICTURES, SWAP_NAME, SWAP_NOTE, TIMER_TITLE } from "./content";
 import { OwnTimeSheet } from "./OwnTimeSheet";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
 import { lengthWords, type OwnTime } from "./time";
@@ -26,8 +26,8 @@ export function TimerGame() {
     id: p.id,
     emoji: p.emoji,
     title: t(p.name),
-    note: p.id === "swap" ? t(SWAP_NOTE) : undefined,
-    kind: p.id === "swap" ? t(SWAP_NAME) : undefined,
+    note: isTurns(p.id) ? t(SWAP_NOTE) : undefined,
+    kind: isTurns(p.id) ? t(SWAP_NAME) : undefined,
     art: <TimerCardArt picture={p.id} toy={settings.toy} />,
   }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.

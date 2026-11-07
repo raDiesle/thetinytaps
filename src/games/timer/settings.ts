@@ -4,9 +4,12 @@ import type { OwnTime } from "./time";
  * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
  * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
  * digital alarm clock counting down (H-70) – or „Abwechseln“ (H-52), two children taking
- * turns with a toy, turn after turn.
+ * turns with a toy, turn after turn, or the same as two children playing tennis (H-71).
  */
-export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | "swap";
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | TurnPicture;
+
+/** The pictures of taking turns, which run on without end: the toy between two cushions, and tennis. */
+export type TurnPicture = "swap" | "tennis";
 
 /** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
 export type SwapToy = "bobbycar" | "doll" | "ball";

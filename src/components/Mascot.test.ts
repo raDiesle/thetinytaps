@@ -73,6 +73,7 @@ describe("the shared fox and bear", () => {
     const doing: Record<string, string> = {
       "src/games/together/pairs.tsx":
         "Was gehört zusammen?: the child the doctor listens to and the hairdresser cuts, and the family the key opens the door to",
+      "src/games/timer/tennis.tsx": "Timer, Tennis (H-71): the two children taking turns, hitting the ball over the net",
     };
     for await (const file of new Bun.Glob("src/**/*.tsx").scan(".")) {
       if (file.endsWith("Mascot.tsx")) continue;

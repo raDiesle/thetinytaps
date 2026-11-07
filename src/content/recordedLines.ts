@@ -100,7 +100,10 @@ function goodNight(language: TargetLanguageId): RecordedLine[] {
   return text ? [{ text, kind: "calm" }] : [];
 }
 
-/** Every game recorded this way. */
+/**
+ * Every game recorded this way. Lebendige Bilder is not here and must not come without the user ordering it: its lines
+ * are parked (`parked` in voiceLines.ts, src/games/scenes/CLAUDE.md).
+ */
 export const RECORDED_GAMES: RecordedGame[] = [
   { name: "zaehne", folder: "src/games/teeth/stimme", lines: teeth },
   { name: "kleine-abenteuer", folder: "src/games/elevator/stimme", lines: elevator },
