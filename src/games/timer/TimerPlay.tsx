@@ -9,6 +9,7 @@ import { useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
+  playBuzz,
   playChime,
   playChimeNote,
   playDing,
@@ -30,7 +31,7 @@ import { CaterpillarScene } from "./caterpillar";
 import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { appleCount, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PizzaScene, SLICES } from "./pizza";
 import {
   AntHill,
@@ -80,11 +81,11 @@ export function devMs() {
   return seconds > 0 ? seconds * 1000 : 0;
 }
 
-/** How long a run takes from now: the row's minutes or the own time – or `"past"`, a clock time already behind us today. */
+/** How long a run takes from now: the row's length or the own time – or `"past"`, a clock time already behind us today. */
 function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
   if (dev) return dev;
   if (settings.useOwn && settings.own) return ownTimeMs(settings.own, new Date());
-  return settings.minutes * 60_000;
+  return settings.seconds * 1000;
 }
 
 /** running: the picture runs down; blow: the time is up, the candle is blown out; done: the picture's end. */
@@ -172,8 +173,8 @@ function TimerStart({
   }
   if (settings.picture === "swap") {
     // Abwechseln (H-52): the time set is one child's turn, and the turns go on until a grown-up stops – or, with a
-    // clock time set, until then, each turn as long as the row's minutes.
-    const turn = devMs() || (settings.useOwn && settings.own?.kind === "for" ? settings.own.seconds * 1000 : settings.minutes * 60_000);
+    // clock time set, until then, each turn as long as the row's length.
+    const turn = devMs() || (settings.useOwn && settings.own?.kind === "for" ? settings.own.seconds * 1000 : settings.seconds * 1000);
     return (
       <SwapRun
         turnMs={turn}
@@ -181,7 +182,7 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
-        timeShown={settings.shown}
+        timeShown={settings.showTime}
         onShown={onShown}
         onAgain={onAgain}
         onPicture={onPicture}
@@ -191,7 +192,16 @@ function TimerStart({
   const ms = total === "past" ? 0 : total;
   const set = typeof minutes === "number" ? minutes : ms;
   return (
-    <TimerRun picture={settings.picture} total={ms} set={set} until={until} shown={settings.shown} onShown={onShown} onAgain={onAgain} onPicture={onPicture} />
+    <TimerRun
+      picture={settings.picture}
+      total={ms}
+      set={set}
+      until={until}
+      shown={settings.showTime}
+      onShown={onShown}
+      onAgain={onAgain}
+      onPicture={onPicture}
+    />
   );
 }
 
@@ -289,11 +299,14 @@ function TimerRun({
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
 
-  // Piece by piece (H-45): many apples, a stop on the track a minute – each with its plop or its bell.
+  // Piece by piece (H-45): many apples landing in the cart, a stop on the track a minute – each with its plop or its bell.
   const apples = appleCount(set);
   const stops = pieceCount(set, MAX_STOPS);
   const moments = useMemo(() => {
-    if (picture === "apple") return pieceMoments(total, apples);
+    if (picture === "apple")
+      return appleTimes(total, apples)
+        .harvest.slice(0, -1)
+        .map((h) => h.land);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
     if (picture === "pizza") return pieceMoments(total, SLICES);
     // The ladybug leaves a dot as it is back at the top (H-67).
@@ -400,12 +413,13 @@ function TimerRun({
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
       else if (picture === "ants") playPop();
-      else if (picture === "apple") playLeaves();
+      // The leaves rustle; once the blossoms are out, the bees buzz.
+      else if (picture === "apple") (Date.now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
       else if (picture === "flower") playDrops();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
-    [phase, picture, ripple, glow],
+    [phase, picture, ripple, glow, endsAt, total, apples],
   );
 
   useEffect(() => {
@@ -425,7 +439,6 @@ function TimerRun({
   const stage = {
     "--tm-ms": `${total}ms`,
     "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
-    "--tm-n": apples,
     ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
   } as CSSProperties;
 

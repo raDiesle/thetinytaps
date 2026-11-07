@@ -200,7 +200,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut: Beim Zug drehen sich die Räder jede Sekunde einmal und eine kleine Dampfwolke steigt auf, in der Sanduhr fällt jede Sekunde ein großes Korn durch den Hals, an der Kerze rinnt ein Wachstropfen in kleinen Schritten hinunter – alles kleine eigene Ebenen mit CSS.",
+        "Gebaut: Beim Zug drehen sich die Räder jede Sekunde einmal und eine kleine Dampfwolke steigt auf, in der Sanduhr rinnt der Sand sichtbar durch den Hals (ein großes Korn darüber sah komisch aus und kam wieder weg), an der Kerze rinnt ein Wachstropfen in kleinen Schritten hinunter – alles kleine eigene Ebenen mit CSS.",
     },
     {
       id: "H-64",
@@ -211,7 +211,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut für die drei Bilder: Der Zug fährt an einem kleinen Haus los, die Schiene vor ihm glänzt und wird kürzer, hinter ihm ist sie dunkel; in der Sanduhr bleibt am Glas, wo der Sand war, ein feiner Sandfilm; unter der Kerze wächst eine Wachspfütze. Die Fuchs-Spur im Schnee wäre ein neues Bild.",
+        "Gebaut für die drei Bilder: Der Zug fährt an einem kleinen Haus los, die Schiene vor ihm glänzt und wird kürzer, hinter ihm ist sie dunkel; in der Sanduhr wächst unten der Haufen (ein Sandfilm am leeren Glas sah komisch aus und kam wieder weg); unter der Kerze wächst eine Wachspfütze. Die Fuchs-Spur im Schnee wäre ein neues Bild.",
     },
     {
       id: "H-65",
