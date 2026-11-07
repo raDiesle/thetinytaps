@@ -207,6 +207,11 @@ export interface SceneSpec {
   the: string;
   /** After „gehört“, for „Was gehört zum Schuh?“ (things of the day only; for a helper the same as `the`). */
   toThe: string;
+  /**
+   * What the one above wants to do, said as the round's question (Z-25): „Die Feuerwehr will das Feuer löschen.“,
+   * „Die Blume hat Durst.“ It never names the partner, so the child thinks what it needs; exactly one choice fits it.
+   */
+  wish: string;
   partner: Partner;
   /** The thing above (things of the day) or what the helper works on (optional for a helper): an emoji. */
   thing?: string;
@@ -321,6 +326,7 @@ export function fromScene(spec: SceneSpec): Pair {
     name: spec.name,
     the: spec.the,
     toThe: spec.toThe,
+    wish: spec.wish,
     partner: spec.partner,
     layers,
     act,
@@ -345,6 +351,7 @@ export function fromPainted(spec: PaintedPair): Pair | undefined {
     name: spec.name,
     the: spec.the,
     toThe: spec.toThe,
+    wish: spec.wish,
     partner: spec.part ? { ...spec.partner, image: spec.id } : spec.partner,
     layers: [],
     frames,

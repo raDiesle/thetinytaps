@@ -9,6 +9,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Schneemann",
     the: "der Schneemann",
     toThe: "zum Schneemann",
+    wish: "Der Schneemann will eine Nase haben.",
     partner: { name: "Karotte", the: "die Karotte", acc: "die Karotte", emoji: "🥕" },
     cast: "bear",
     before:
@@ -23,6 +24,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Regen",
     the: "der Regen",
     toThe: "zum Regen",
+    wish: "Es regnet. Wir wollen trocken bleiben.",
     partner: { name: "Regenschirm", the: "der Regenschirm", acc: "den Regenschirm" },
     part: "an open red umbrella with a curved handle",
     cast: "fox",
@@ -39,6 +41,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Pfütze",
     the: "die Pfütze",
     toThe: "zur Pfütze",
+    wish: "Wir wollen in die Pfütze springen und trockene Füße behalten.",
     partner: { name: "Gummistiefel", the: "der Gummistiefel", acc: "den Gummistiefel" },
     part: "a pair of yellow rubber boots",
     cast: "bear",
@@ -56,6 +59,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Sonne",
     the: "die Sonne",
     toThe: "zur Sonne",
+    wish: "Es ist so hell draußen. Die Augen kneifen zu.",
     partner: { name: "Sonnenbrille", the: "die Sonnenbrille", acc: "die Sonnenbrille", emoji: "🕶️" },
     cast: "fox",
     before:
@@ -72,6 +76,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Schnee",
     the: "der Schnee",
     toThe: "zum Schnee",
+    wish: "Wir wollen den Berg hinunterrutschen.",
     partner: { name: "Schlitten", the: "der Schlitten", acc: "den Schlitten" },
     part: "a wooden sledge with red metal runners and a rope at its front",
     cast: "bear",
@@ -90,6 +95,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Drachen",
     the: "der Drachen",
     toThe: "zum Drachen",
+    wish: "Der Drachen will hoch in den Himmel fliegen.",
     partner: { name: "Wind", the: "der Wind", acc: "den Wind", emoji: "💨" },
     cast: "fox",
     before:
@@ -105,6 +111,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Zugefrorener See",
     the: "der zugefrorene See",
     toThe: "zum zugefrorenen See",
+    wish: "Der See ist zugefroren. Wir wollen über das Eis gleiten.",
     partner: { name: "Schlittschuhe", the: "die Schlittschuhe", acc: "die Schlittschuhe", plural: true, emoji: "⛸️" },
     cast: "bear",
     before:
@@ -121,6 +128,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Verschneiter Weg",
     the: "der verschneite Weg",
     toThe: "zum verschneiten Weg",
+    wish: "Der Weg ist ganz zugeschneit. Wir wollen ihn frei räumen.",
     partner: { name: "Schneeschieber", the: "der Schneeschieber", acc: "den Schneeschieber" },
     part: "a snow shovel with a wide red plastic blade and a long wooden handle",
     cast: "fox",

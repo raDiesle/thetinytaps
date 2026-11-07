@@ -251,7 +251,8 @@ function timer(): VoiceGroup[] {
 function together(): VoiceGroup[] {
   const texts = TOGETHER_TEXTS.de!;
   return [
-    { label: "Frage", lines: once(PAIRS.map(texts.question)), built: "„Was gehört zur …?“ oder „Was braucht …?“ mit dem Ding oder Helfer" },
+    // Z-25: the question is the pair's wish, what the one above wants to do, never naming the partner.
+    { label: "Was jemand vorhat", lines: once(PAIRS.map(texts.question)), built: "„Die Blume hat Durst.“ – ein Satz je Paar, ohne das Gegenstück zu nennen" },
     { label: "Richtig", lines: once(PAIRS.map(texts.right)), built: "Satz mit beiden" },
     { label: "Falsch: wozu es gehört", lines: once(PAIRS.map(texts.belongs)), built: "Satz mit dem Gewählten und wozu es gehört" },
   ];

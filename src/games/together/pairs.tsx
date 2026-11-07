@@ -91,6 +91,11 @@ export interface Pair {
   the: string;
   /** After „gehört“, for "Was gehört zur Zahnbürste?". */
   toThe: string;
+  /**
+   * What the one above wants to do, said as the round's question (Z-25): „Die Feuerwehr will das Feuer löschen.“,
+   * „Die Blume hat Durst.“ It never names the partner, so the child thinks what it needs; exactly one choice fits it.
+   */
+  wish: string;
   partner: Partner;
   /** Back to front; one of them is the partner (`tool`), which shows only once it is there. */
   layers: Layer[];
@@ -365,6 +370,7 @@ const HANDMADE: Pair[] = [
       name: "Zahnbürste",
       the: "die Zahnbürste",
       toThe: "zur Zahnbürste",
+      wish: "Wir wollen Zähne putzen.",
       partner: { name: "Zahnpasta", the: "die Zahnpasta", acc: "die Zahnpasta", draw: toothpaste },
       layers: [
         { at: [0, 0, 200, 200], cls: "tg-base", draw: <rect x="8" y="152" width="184" height="16" rx="4" fill="#e9ecef" stroke={OUT} strokeWidth="3.5" /> },
@@ -398,6 +404,7 @@ const HANDMADE: Pair[] = [
       name: "Tür",
       the: "die Tür",
       toThe: "zur Tür",
+      wish: "Die Tür ist zu. Wir wollen rein.",
       partner: { name: "Schlüssel", the: "der Schlüssel", acc: "den Schlüssel", emoji: "🔑" },
       layers: [
         { at: [30, 14, 140, 184], cls: "tg-base", draw: doorBack },
@@ -424,6 +431,7 @@ const HANDMADE: Pair[] = [
       name: "Topf",
       the: "der Topf",
       toThe: "zum Topf",
+      wish: "Der Topf ist offen. Wir wollen ihn zumachen.",
       partner: { name: "Deckel", the: "der Deckel", acc: "den Deckel", draw: lid },
       layers: [
         { at: [0, 0, 200, 200], cls: "tg-base", draw: pot },
@@ -449,6 +457,7 @@ const HANDMADE: Pair[] = [
       name: "Blume",
       the: "die Blume",
       toThe: "zur Blume",
+      wish: "Die Blume hat Durst.",
       partner: { name: "Gießkanne", the: "die Gießkanne", acc: "die Gießkanne", draw: wateringCan },
       layers: [
         { at: [60, 138, 80, 60], cls: "tg-base", draw: flowerPot },
@@ -478,6 +487,7 @@ const HANDMADE: Pair[] = [
       name: "Papier",
       the: "das Papier",
       toThe: "zum Papier",
+      wish: "Wir wollen ein Bild malen.",
       partner: { name: "Stift", the: "der Stift", acc: "den Stift", emoji: "🖍️" },
       layers: [
         { at: [0, 0, 200, 200], cls: "tg-base", draw: paper },
@@ -503,6 +513,7 @@ const HANDMADE: Pair[] = [
       name: "Feuerwehr",
       the: "die Feuerwehr",
       toThe: "zur Feuerwehr",
+      wish: "Die Feuerwehr will das Feuer löschen.",
       partner: { name: "Schlauch", the: "der Schlauch", acc: "den Schlauch", draw: hose },
       layers: [
         { at: [140, 170, 58, 26], cls: "tg-base", draw: logs },
@@ -541,6 +552,7 @@ const HANDMADE: Pair[] = [
       name: "Ärztin",
       the: "die Ärztin",
       toThe: "zur Ärztin",
+      wish: "Die Ärztin will dein Herz hören.",
       partner: { name: "Hörrohr", the: "das Hörrohr", acc: "das Hörrohr", draw: stethoscope },
       layers: [
         grownUp("bear", { coat: "#f8f9fa", detail: "cross" }, true),
@@ -569,6 +581,7 @@ const HANDMADE: Pair[] = [
       name: "Bäcker",
       the: "der Bäcker",
       toThe: "zum Bäcker",
+      wish: "Der Bäcker will etwas Leckeres zum Frühstück backen.",
       partner: { name: "Brötchen", the: "das Brötchen", acc: "das Brötchen", draw: roll },
       layers: [
         { at: [110, 78, 88, 118], cls: "tg-base", draw: oven },
@@ -623,6 +636,7 @@ const HANDMADE: Pair[] = [
       name: "Friseurin",
       the: "die Friseurin",
       toThe: "zur Friseurin",
+      wish: "Die Friseurin will Haare schneiden.",
       partner: { name: "Schere", the: "die Schere", acc: "die Schere", emoji: "✂️" },
       layers: [
         grownUp("bear", { coat: "#f7a1c4", detail: "apron", detailColor: "#495057" }, true),
@@ -658,7 +672,11 @@ export interface TogetherTexts {
   name: (p: Pair) => string;
   /** Its partner, for screen readers: "Zahnpasta". */
   partner: (p: Pair) => string;
-  /** The question: "Was gehört zur Zahnbürste?", "Was braucht die Ärztin?". */
+  /**
+   * The round's question. In German the pair's wish (Z-25): what the one above wants to do, never naming the partner
+   * („Wir wollen Zähne putzen.“); in the other languages still „What goes with the toothbrush?“ until they are
+   * translated.
+   */
   question: (p: Pair) => string;
   /** The right pick: "Die Zahnpasta gehört zur Zahnbürste. Toll!". */
   right: (p: Pair) => string;
@@ -673,7 +691,7 @@ const GERMAN_SAYS = (p: Pair) =>
 const GERMAN_TEXTS: TogetherTexts = {
   name: (p) => p.name,
   partner: (p) => p.partner.name,
-  question: (p) => (p.kind === "pair" ? `Was gehört ${p.toThe}?` : `Was braucht ${p.the}?`),
+  question: (p) => p.wish,
   right: (p) => `${GERMAN_SAYS(p)}. Toll!`,
   belongs: (p) => `${GERMAN_SAYS(p)}!`,
 };
@@ -687,7 +705,7 @@ export interface PairTranslation {
   name: string;
   /** Its partner, for screen readers. */
   partner: string;
-  /** The question, as `TogetherTexts.question`. */
+  /** The question, as `TogetherTexts.question`: still „What goes with …?“, written before the German became a wish (Z-25). */
   question: string;
   /** The right pick, with the praise, as `TogetherTexts.right`. */
   right: string;

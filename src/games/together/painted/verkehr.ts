@@ -9,6 +9,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Pilot",
     the: "der Pilot",
     toThe: "der Pilot",
+    wish: "Der Pilot will mit vielen Leuten weit weg fliegen.",
     partner: { name: "Flugzeug", the: "das Flugzeug", acc: "das Flugzeug", emoji: "✈️" },
     cast: "fox",
     before:
@@ -25,6 +26,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Busfahrerin",
     the: "die Busfahrerin",
     toThe: "die Busfahrerin",
+    wish: "Die Fahrerin will viele Leute durch die Stadt fahren.",
     partner: { name: "Bus", the: "der Bus", acc: "den Bus", emoji: "🚌" },
     cast: "both",
     before:
@@ -40,6 +42,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Lokführer",
     the: "der Lokführer",
     toThe: "der Lokführer",
+    wish: "Der Bär will mit den Wagen auf den Schienen losfahren.",
     partner: { name: "Lok", the: "die Lok", acc: "die Lok", emoji: "🚂" },
     cast: "bear",
     before:
@@ -55,6 +58,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Taxifahrer",
     the: "der Taxifahrer",
     toThe: "der Taxifahrer",
+    wish: "Der Fuchs will das Kind mit seinem Koffer zum Bahnhof fahren.",
     partner: { name: "Taxi", the: "das Taxi", acc: "das Taxi", emoji: "🚕" },
     cast: "both",
     before:
@@ -70,6 +74,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Kapitän",
     the: "der Kapitän",
     toThe: "der Kapitän",
+    wish: "Der Kapitän will mit vielen Leuten übers Meer fahren.",
     partner: { name: "Schiff", the: "das Schiff", acc: "das Schiff", emoji: "🚢" },
     cast: "bear",
     before:
@@ -86,6 +91,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Lkw-Fahrerin",
     the: "die Lkw-Fahrerin",
     toThe: "die Lkw-Fahrerin",
+    wish: "Die Fahrerin will die vielen Kisten weit wegfahren.",
     partner: { name: "Lastwagen", the: "der Lastwagen", acc: "den Lastwagen", emoji: "🚛" },
     cast: "bear",
     before:
@@ -101,6 +107,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Straßenbahnfahrer",
     the: "der Straßenbahnfahrer",
     toThe: "der Straßenbahnfahrer",
+    wish: "Der Fuchs will auf den Schienen durch die Stadt fahren.",
     partner: { name: "Straßenbahn", the: "die Straßenbahn", acc: "die Straßenbahn", emoji: "🚊" },
     cast: "fox",
     before:
@@ -117,6 +124,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Motorradfahrerin",
     the: "die Motorradfahrerin",
     toThe: "die Motorradfahrerin",
+    wish: "Die Fahrerin hat den Helm schon auf und will auf der Straße losbrausen.",
     partner: { name: "Motorrad", the: "das Motorrad", acc: "das Motorrad", emoji: "🏍️" },
     cast: "fox",
     before:
@@ -132,6 +140,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Matrose",
     the: "der Matrose",
     toThe: "der Matrose",
+    wish: "Der Matrose will, dass das Schiff hier stehen bleibt.",
     partner: { name: "Anker", the: "der Anker", acc: "den Anker", emoji: "⚓" },
     cast: "bear",
     before:
@@ -147,6 +156,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Seilbahnführerin",
     the: "die Seilbahnführerin",
     toThe: "die Seilbahnführerin",
+    wish: "Die Bärin will die Leute in einer Kabine hoch auf den Berg bringen.",
     partner: { name: "Seilbahn", the: "die Seilbahn", acc: "die Seilbahn", emoji: "🚡" },
     cast: "bear",
     before:
@@ -162,6 +172,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Abschleppfahrer",
     the: "der Abschleppfahrer",
     toThe: "der Abschleppfahrer",
+    wish: "Der Bär will das kaputte Auto wegziehen.",
     partner: { name: "Abschleppwagen", the: "der Abschleppwagen", acc: "den Abschleppwagen" },
     part: "a yellow tow truck seen from the side: a cab with an orange light on top and a crane arm with a hook at its back",
     cast: "bear",
@@ -179,6 +190,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Schneepflugfahrer",
     the: "der Schneepflugfahrer",
     toThe: "der Schneepflugfahrer",
+    wish: "Die Straße ist ganz zugeschneit. Der Fuchs will sie frei machen.",
     partner: { name: "Schneepflug", the: "der Schneepflug", acc: "den Schneepflug" },
     part: "an orange snowplough lorry seen from the side with a big slanted orange blade at its front",
     cast: "fox",

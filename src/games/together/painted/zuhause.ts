@@ -11,6 +11,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Bett",
     the: "das Bett",
     toThe: "zum Bett",
+    wish: "Wir wollen einschlafen, mit etwas zum Kuscheln.",
     partner: { name: "Teddy", the: "der Teddy", acc: "den Teddy", emoji: "🧸" },
     cast: "bear",
     before:
@@ -25,6 +26,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Zeitung",
     the: "die Zeitung",
     toThe: "zur Zeitung",
+    wish: "Opa will die Zeitung lesen, aber die Buchstaben sind so klein.",
     partner: { name: "Brille", the: "die Brille", acc: "die Brille", emoji: "👓" },
     cast: "fox",
     before:
@@ -42,6 +44,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Schraube",
     the: "die Schraube",
     toThe: "zur Schraube",
+    wish: "Wir wollen das hier ganz fest ins Holz drehen.",
     partner: { name: "Schraubenzieher", the: "der Schraubenzieher", acc: "den Schraubenzieher" },
     part: "a big toy screwdriver with a chunky red plastic handle",
     cast: "bear",
@@ -58,6 +61,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Nagel",
     the: "der Nagel",
     toThe: "zum Nagel",
+    wish: "Wir wollen den Nagel ins Brett klopfen.",
     partner: { name: "Hammer", the: "der Hammer", acc: "den Hammer", emoji: "🔨" },
     cast: "fox",
     before:
@@ -75,6 +79,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Besen",
     the: "der Besen",
     toThe: "zum Besen",
+    wish: "Wir wollen den Krümelhaufen aufsammeln.",
     partner: { name: "Kehrschaufel", the: "die Kehrschaufel", acc: "die Kehrschaufel" },
     part: "an orange dustpan with a short handle",
     cast: "fox",
@@ -92,6 +97,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Roboter",
     the: "der Roboter",
     toThe: "zum Roboter",
+    wish: "Der Roboter will wieder laufen, aber er hat keine Kraft mehr.",
     partner: { name: "Batterie", the: "die Batterie", acc: "die Batterie" },
     part: "a cylindrical battery, black with a copper-coloured top",
     cast: "bear",

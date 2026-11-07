@@ -134,6 +134,8 @@ export const matchingIdeas: IdeaArea = {
       text: "Statt „Was braucht die Feuerwehr?“ oder „Was gehört zur Zahnbürste?“ sagt die Stimme, was die Person tun will oder was gerade los ist, ohne den Gegenstand zu nennen: „Die Feuerwehr will das Feuer löschen.“, „Die Ärztin will dein Herz hören.“, „Die Friseurin will Haare schneiden.“, „Der Schornsteinfeger will den Kamin sauber machen.“, „Die Malerin will die Wand anmalen.“, „Wir wollen Zähne putzen.“, „Die Tür ist zu. Wir wollen rein.“, „Die Blume hat Durst.“ Ein Satz für jedes der 183 Paare (112 mit einer Person, 71 Dinge), in pairs.tsx neben dem Namen. Er ersetzt die Frage, sodass die bisherigen „Was braucht …?“-Sätze gar nicht erst aufgenommen werden müssen. Jeder Satz muss so gebaut sein, dass genau eine Karte passt: Wenn das Bild zeigt, dass die Feuerwehr ein Feuer löscht, darf daneben kein Eimer liegen. Kosten auf Deutsch ≈ 900 Credits, in allen sieben Sprachen ≈ 5.000; dafür entfallen die bisherigen Fragen (≈ 700 auf Deutsch).",
       why: "Das Kind denkt dann selbst nach, womit man ein Feuer löscht, statt einen Namen zu hören und das Bild dazu zu suchen. So lernt es, wozu die Dinge da sind. Gesagt wird nur das Vorhaben, nie die Antwort.",
       effort: "M",
+      partial:
+        "Gebaut am 7. November 2026: alle 190 Sätze (auch die sieben Paare, deren Bilder noch fehlen) stehen als `wish` bei den Paaren, ersetzen auf Deutsch die gesprochene Frage und stehen klein unter dem Bild; ein Test prüft, dass keiner sein Gegenstück nennt. Noch nicht aufgenommen, darum vorerst stumm; die anderen Sprachen behalten ihre Frage, bis die Sätze übersetzt werden.",
     },
   ],
 };

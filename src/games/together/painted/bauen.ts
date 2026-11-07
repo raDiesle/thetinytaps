@@ -9,6 +9,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Bauarbeiterin",
     the: "die Bauarbeiterin",
     toThe: "die Bauarbeiterin",
+    wish: "Die Bauarbeiterin will die Mauer weiterbauen.",
     partner: { name: "Steine", the: "die Steine", acc: "die Steine", plural: true, emoji: "🧱" },
     cast: "fox",
     before:
@@ -24,6 +25,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Mechanikerin",
     the: "die Mechanikerin",
     toThe: "die Mechanikerin",
+    wish: "Die Mechanikerin will das Rad am Auto festdrehen.",
     partner: { name: "Schraubenschlüssel", the: "der Schraubenschlüssel", acc: "den Schraubenschlüssel", emoji: "🔧" },
     cast: "bear",
     before:
@@ -40,6 +42,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Tischlerin",
     the: "die Tischlerin",
     toThe: "die Tischlerin",
+    wish: "Die Tischlerin will das Brett in zwei Stücke teilen.",
     partner: { name: "Säge", the: "die Säge", acc: "die Säge", emoji: "🪚" },
     cast: "fox",
     before:
@@ -56,6 +59,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Handwerker",
     the: "der Handwerker",
     toThe: "der Handwerker",
+    wish: "Der Handwerker will den Nagel ins Stuhlbein klopfen.",
     partner: { name: "Hammer", the: "der Hammer", acc: "den Hammer", emoji: "🔨" },
     cast: "bear",
     before:
@@ -71,6 +75,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Elektrikerin",
     the: "die Elektrikerin",
     toThe: "die Elektrikerin",
+    wish: "Die Elektrikerin will, dass oben an der Decke wieder Licht ist.",
     partner: { name: "Glühbirne", the: "die Glühbirne", acc: "die Glühbirne", emoji: "💡" },
     cast: "fox",
     before:
@@ -86,6 +91,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Kranführer",
     the: "der Kranführer",
     toThe: "der Kranführer",
+    wish: "Der Fuchs will die schweren Steine hoch aufs Haus heben.",
     partner: { name: "Kran", the: "der Kran", acc: "den Kran", emoji: "🏗️" },
     cast: "fox",
     before:
@@ -103,6 +109,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Klempner",
     the: "der Klempner",
     toThe: "der Klempner",
+    wish: "Der Klempner will das verstopfte Klo wieder frei machen.",
     partner: { name: "Saugglocke", the: "die Saugglocke", acc: "die Saugglocke", emoji: "🪠" },
     cast: "fox",
     before:
@@ -118,6 +125,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Baggerfahrer",
     the: "der Baggerfahrer",
     toThe: "der Baggerfahrer",
+    wish: "Der Bär will ein riesiges Loch graben und ganz viel Erde wegheben.",
     partner: { name: "Bagger", the: "der Bagger", acc: "den Bagger" },
     part: "a yellow digger with black tracks, a cab, and a long arm ending in a toothed bucket",
     cast: "bear",
@@ -135,6 +143,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Anstreicher",
     the: "der Anstreicher",
     toThe: "der Anstreicher",
+    wish: "Der Anstreicher will die graue Wand blau streichen.",
     partner: { name: "Farbrolle", the: "die Farbrolle", acc: "die Farbrolle" },
     part: "a paint roller: a fluffy roller soaked in blue paint on a bent metal handle",
     cast: "fox",
@@ -151,6 +160,7 @@ export const PAINTED: PaintedPair[] = [
     name: "Straßenbauerin",
     the: "die Straßenbauerin",
     toThe: "die Straßenbauerin",
+    wish: "Die Straßenbauerin will den frischen Teer ganz glatt drücken.",
     partner: { name: "Straßenwalze", the: "die Straßenwalze", acc: "die Straßenwalze" },
     part: "a yellow road roller: a little cab, a big smooth steel drum at its front and one at its back",
     cast: "bear",

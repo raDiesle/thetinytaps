@@ -16,8 +16,8 @@ import { planQueue } from "@/content/pictureQueuePlan";
 
 /** Every pair written down, also the painted ones whose pictures aren't made yet: its id, kind and partner's name. */
 const ALL = [
-  ...PAIRS.map((p) => ({ id: p.id, kind: p.kind, partner: p.partner.name })),
-  ...PAINTED.filter((p) => !PAIRS.some((q) => q.id === p.id)).map((p) => ({ id: p.id, kind: TOPICS[p.topic].kind, partner: p.partner.name })),
+  ...PAIRS.map((p) => ({ id: p.id, kind: p.kind, partner: p.partner.name, wish: p.wish })),
+  ...PAINTED.filter((p) => !PAIRS.some((q) => q.id === p.id)).map((p) => ({ id: p.id, kind: TOPICS[p.topic].kind, partner: p.partner.name, wish: p.wish })),
 ];
 
 test("ids and partners are unique, and each pair has exactly one partner layer", () => {
@@ -123,12 +123,48 @@ test("the wrong choices come from other topics where there are enough", () => {
   }
 });
 
-test("every sentence is there and says the names", () => {
+test("every sentence is there, the question is the pair's wish, and the answers say the names", () => {
   const de = TOGETHER_TEXTS.de!;
   for (const pair of PAIRS) {
-    expect(de.question(pair)).toContain(pair.kind === "pair" ? pair.toThe : pair.the);
+    expect(de.question(pair)).toBe(pair.wish);
     expect(de.right(pair).toLowerCase()).toContain(pair.partner.the.toLowerCase().split(" ")[1]);
     expect(de.belongs(pair).trim().length).toBeGreaterThan(0);
+  }
+});
+
+/** A German word without its ending, so „Kerzen“ and „Kerze“, „Geiger“ and „Geige“ meet. Kept whole when that leaves under four letters („Kran“). */
+const stem = (word: string) => {
+  const cut = word.replace(/(innen|in|en|er|e|n|s)$/, "");
+  return cut.length >= 4 ? cut : word;
+};
+
+/** The word of a wish that names its partner, or nothing: the word itself, its stem, a part of it, or a name holding it („Trompeterin“). */
+const namesPartner = (wish: string, partner: string) => {
+  const whole = partner.toLowerCase();
+  const short = stem(whole);
+  return wish
+    .toLowerCase()
+    .split(/[^a-zäöüß-]+/)
+    .find((word) => {
+      if (!word) return false;
+      const own = stem(word);
+      if (word === whole || own === short) return true;
+      if (short.length >= 3 && (word.startsWith(short) || word.endsWith(short))) return true;
+      return (own.length >= 4 && whole.includes(own)) || (short.length >= 4 && word.includes(short));
+    });
+};
+
+// Z-25: the voice says what the one above wants to do and leaves the thing to the child, so a wish never names its
+// partner – nor in a word holding it, as the name of the one who plays it does („Der Geiger …“).
+test("each pair has a wish that never names its partner", () => {
+  expect(namesPartner("Der Geiger will spielen.", "Geige")).toBe("geiger");
+  expect(namesPartner("Der Kranführer will heben.", "Kran")).toBe("kranführer");
+  expect(namesPartner("Wir wollen pusten.", "Kerzen")).toBeUndefined();
+  for (const pair of ALL) {
+    expect(pair.wish.trim().length > 10 ? pair.id : `${pair.id} has no wish`).toBe(pair.id);
+    expect(/^[A-ZÄÖÜ].*[.!]$/.test(pair.wish) ? pair.id : `${pair.id}: „${pair.wish}“ is no sentence`).toBe(pair.id);
+    const named = namesPartner(pair.wish, pair.partner);
+    expect(named ? `${pair.id}: „${pair.wish}“ names ${pair.partner} („${named}“)` : "").toBe("");
   }
 });
 
