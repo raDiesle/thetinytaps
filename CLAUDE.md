@@ -59,6 +59,10 @@ In a fresh worktree run `bun install` first.
   Before building something bigger in a game, merge local `main` into your branch and read the game's latest
   commits and `CLAUDE.md`: another session may already be building the same thing (two sweets stories once
   had to be folded into one), and its new rules apply to your work too.
+- **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
+  `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
+  code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
+  that kind mounts one (so far Was gehört zusammen? and Gefühle).
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { DevTag, letterCode } from "@/components/DevTag";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { preloadImages } from "./images";
 import { ReadAlong } from "./ReadAlong";
 import type { ReadAlongCorner } from "./PassPlay";
+import { STORIES } from "./stories";
 import { beatText, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 import { CHEER_MS, ChoiceCard, GoOn, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
@@ -164,6 +166,15 @@ export function RoundPlay({
 
   return (
     <div className="story-play">
+      <DevTag
+        code={`${letterCode(
+          Math.max(
+            0,
+            STORIES.findIndex((s) => s.id === round.storyId),
+          ),
+        )}${round.step + 1}`}
+        id={`${round.storyId} · Schritt ${round.step + 1}`}
+      />
       <header className="story-top">
         <StepDots total={progress.total} done={progress.done + (doneHere ? 1 : 0)} current={!doneHere} upTo={progress.done} onPick={onPick} />
       </header>

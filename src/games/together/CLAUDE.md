@@ -38,7 +38,7 @@ file each for home, outside and places of work) tell where a thing or helper is:
 stands in front, the middle kept quiet, no people, no words and never a thing that could be an answer (rules at the
 top of `backdrops/index.ts`). A new scene picks a backdrop that tells its place; a new place gets a backdrop there.
 
-While developing, `?pair=<id>` shows that pair first and `?level=N` starts on difficulty step N.
+While developing, a `DevTag` at the bottom right names the pair on screen (`C07`: its topic's letter and its place in the topic, plus the id), and `?pair=<id>` shows that pair first and `?level=N` starts on difficulty step N.
 
 **Difficulty** (`TOGETHER_LEVELS`, `dealRound` in `levels.ts`): 2, 3, 3, 4, 4 things to choose from, with the step rule
 of Schatten finden (`nextLevel`). Every visit begins on the first step. Every six rounds count as a game for the

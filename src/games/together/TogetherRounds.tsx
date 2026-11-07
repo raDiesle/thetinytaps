@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { DevTag, letterCode } from "@/components/DevTag";
 import { useDeck } from "@/games/shadows/deck";
 import { nextLevel } from "@/games/shadows/levels";
 import { DEV } from "@/lib/buildInfo";
@@ -6,12 +7,20 @@ import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { loadRealSounds } from "@/lib/realSounds";
 import { dealRound, FIXED_LEVELS, nextKind, ROUNDS_PER_GAME, TOGETHER_LEVELS, type RoundKind } from "./levels";
 import { PAIRS, pairsOf } from "./pairs";
+import { TOPICS } from "./topics";
 import type { TogetherSettings } from "./settings";
 import { TogetherPlay } from "./TogetherPlay";
 import { RoundTopic } from "./RoundTopic";
 
 const OF_DAY = pairsOf("pair");
 const HELPERS = pairsOf("helper");
+
+/** Developer code of a pair ("C07": its topic's letter, its place among that topic's pairs), to name a scene in feedback. */
+function pairCode(pair: (typeof PAIRS)[number]): string {
+  const topic = Object.keys(TOPICS).indexOf(pair.topic);
+  const place = PAIRS.filter((p) => p.topic === pair.topic).indexOf(pair) + 1;
+  return `${letterCode(topic)}${String(place).padStart(2, "0")}`;
+}
 
 /**
  * "Was gehört zusammen?" as one flowing game: a thing of the day and a helper take turns, and the difficulty follows
@@ -73,5 +82,10 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
     setTurn(turn + 1);
   }, [turn]);
 
-  return <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} topic={<RoundTopic kind={round.kind} />} />;
+  return (
+    <>
+      <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} topic={<RoundTopic kind={round.kind} />} />
+      <DevTag code={pairCode(round.pair)} id={round.pair.id} />
+    </>
+  );
 }
