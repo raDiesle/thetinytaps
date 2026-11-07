@@ -78,7 +78,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren.",
     tasks: [
       {
-        label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Korb, Gartenschlauch, Kerze, Abwechseln)",
+        label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
         work: "drawing",
         effort: "S",
         state: "removed",
