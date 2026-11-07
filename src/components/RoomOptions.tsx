@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { AppLanguageOptions, LeaveOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
+import { ContactLink } from "@/components/ContactLink";
 import { InstallHint } from "@/components/InstallHint";
 import { MascotHead } from "@/components/Mascot";
 import { ParentsNote } from "@/components/ParentsNote";
@@ -273,6 +274,9 @@ export function RoomNotes() {
     >
       <SeoWords />
       <ParentsNote />
+      <p className="room-notes-contact">
+        <ContactLink />
+      </p>
       <InstallHint />
     </MenuButton>
   );

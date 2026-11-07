@@ -8,6 +8,7 @@ import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
+import { ContactLink } from "@/components/ContactLink";
 import { playKnock } from "@/lib/sfx";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
@@ -284,6 +285,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
           )}
         </div>
         {legal && <nav className="room-legal">{legal}</nav>}
+        <ContactLink className="room-contact" />
       </div>
     </main>
   );

@@ -524,6 +524,19 @@
   color: inherit;
 }
 
+/* The makers' mail address, small in the room's bottom left corner, mirroring the legal links. */
+.room-contact {
+  position: absolute;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(1px, env(safe-area-inset-bottom));
+  z-index: 3;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fbf3dfd9;
+  text-shadow: 0 1px 2px #2a1a0e99;
+}
+
 /* The install hint behind the carving's „mehr …“ (RoomNotes), below its texts. */
 .home-menu-panel .install-hint {
   margin: 12px 0 0;

@@ -360,6 +360,11 @@ button.game-card:focus-visible {
   margin-bottom: 12px;
 }
 
+.room-notes-contact {
+  margin: 12px 0 0;
+  text-align: left;
+}
+
 .install-button {
   display: inline-flex;
   align-items: center;
