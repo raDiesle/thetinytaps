@@ -358,7 +358,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/mitmachen/",
-    note: "L-15: das Fuchs- oder Bärenkind hüpft, klatscht und stampft die Zahl (Mascot, Pose „clap“) – es ist das Spiel.",
+    note: "L-15: das Fuchs- oder Bärenkind hüpft, klatscht und stampft die Zahl – es ist das Spiel. Seit November 2026 Bilder von Gemini (`letters/bilder/`): je Kind Stehen, Hüpfen, Klatschen, Stampfen, dazu die Zeichen der Bewegungen in zwei Bildern.",
     tasks: [
       { label: "Fuchs- oder Bärenkind macht die Zahl vor", work: "drawing", effort: "S", state: "done" },
       {

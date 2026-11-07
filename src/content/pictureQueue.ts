@@ -51,7 +51,8 @@ export interface QueuedPicture {
   /**
    * Pictures of one scene drawn together in one request, one under the other, and cut apart – the frames of a scene,
    * so they match and cost one request: each panel's file and words. `file` is the first panel's, `prompt` what all
-   * panels share, and `aspect` and `size` are each panel's.
+   * panels share, and `aspect` and `size` are each panel's. Cut out (`transparent`), they are frames of one animation
+   * and keep their whole cells, so they line up (`--frames`).
    */
   panels?: { file: string; prompt: string }[];
   /** Why it must be drawn alone, so it never shares a sheet – only a reason from `ALONE_REASONS`. */

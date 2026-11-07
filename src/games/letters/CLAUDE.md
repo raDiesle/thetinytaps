@@ -34,9 +34,14 @@ the page before it.
   (`PlayOptions intro`) names it – for Wörter tippen whole words, colours, doing words, „Wo ist das B?“. When a big
   variant is added, name it there too (user feedback, November 2026).
 - Mitmachen waits at every hop, clap or stamp long enough for a small child to do it too and land (`BEAT_MS`, 1.5 s)
-  – never a quick run of them: the child moving along is the point, not watching. The child figure moves on its own HTML
-  layers (`.mv-kid`, its clapping pose a layer above its standing one), animated by `element.animate`, never inside its
-  svg. Only the child that moves stands there: a grown-up standing beside it was decoration and was taken out (user
+  – never a quick run of them: the child moving along is the point, not watching. The child is a Gemini picture in two
+  frames per move (user request, November 2026; `bilder/<fuchs|baer>-<stehen|huepfen|klatschen|stampfen>.webp`): standing
+  is every move's first frame, the move's own frame lies over it on the same HTML layer (`.mv-kid`) and is cut in hard
+  for the moment of the move (`MOVE_SHOWN`), never cross-faded (both children would show at once); the layer itself
+  hops or dips by `element.animate`. The marks under the digit are the move's symbol, also from Gemini in two frames
+  (`bilder/zeichen-<move>-1|2.webp`): the first faint while to do, the second once done. All four poses of one child
+  come from one 2x2 sheet, with the family picture as `--ref`, so the child stays the same; a new move gets its frame
+  drawn from `<kind>-stehen.webp` as the only `--ref`. Only the child that moves stands there: a grown-up standing beside it was decoration and was taken out (user
   feedback, November 2026).
 - No fox or bear stands by as decoration in these games: a family in Zählen's and Wörter tippen's corner, pointing at
   the things or the picture, was taken out (user feedback, November 2026) – children wanted to tap it and thought it

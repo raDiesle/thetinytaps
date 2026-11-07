@@ -191,6 +191,15 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   so the room stays the same – but the model keeps the reference's pose unless told plainly what is not so yet:
   "Tapsi is NOT sitting yet: stands upright …, a visible gap between …". With only the wanted pose described, the
   child sat on the potty again and the trousers were at the ankles again. Look at each one: does the pose really differ?
+- **Cut-out frames of one animation** (a figure standing, hopping, clapping; a symbol before and after) are drawn on
+  one sheet and cut with `--frames` (`frames` in `--jobs`; the queue sets it for `transparent` `panels`): equal cells,
+  all cropped by one shared box, so stacked they line up. Without it every piece is cropped to its own outline, and a
+  pose with raised arms came out smaller and shifted against the standing one (Mitmachen, November 2026). Gemini puts
+  the body at the same spot in each cell; check it on a contact sheet. A `3x2` sheet holds three pairs of frames.
+- **Never start a panel's words with a label and a colon** („Standing ready: upright …“): Gemini wrote the labels as
+  words under the figures, despite „No text“ (Mitmachen, November 2026). Describe the pose plainly („Upright, both feet
+  …“). Words drawn into a sheet anyway are painted over in the raw `.image-raw/` sheet with its backdrop colour and cut
+  again with `--from`, never cropped off piece by piece.
 - **`2x2` only for pictures that are never shown big** (icons, stickers, small
   cards): each panel is only about 590 px wide.
 - Check both pieces: nothing cut off at the inner edges, no pink seam left.

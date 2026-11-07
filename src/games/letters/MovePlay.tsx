@@ -1,6 +1,5 @@
-import { memo, type PointerEvent, type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { Mascot, type MascotKind } from "@/components/Mascot";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyOf } from "@/content/languages";
 import type { Action, LanguagePack } from "@/content/types";
@@ -8,6 +7,7 @@ import { playChime, playClap, playCountNote, playHop, playRandomNote, playStamp 
 import { useAppLanguage, useT, type Localized } from "@/lib/language";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
+import pictureFiles from "./bilder/*.webp?glob";
 import "./move.css";
 
 /** The three ways a number is done with the body, taking turns: hop, clap, stamp. */
@@ -36,8 +36,27 @@ const STOMP_INVITE: Localized = {
   ar: "هيّا نضرب بأقدامنا معا!",
 };
 
-/** What a done hop, clap or stamp leaves in the row under the digit: the number as a count of things. */
-const MARKS: Record<Move, string> = { hop: "🐾", clap: "👏", stomp: "👣" };
+/** Who does the moves: a fox or a bear child, by chance, so both come. */
+type Kind = "fox" | "bear";
+
+/** The file names' words for the kinds and moves (`bilder/fuchs-huepfen.webp`, `bilder/zeichen-klatschen-2.webp`). */
+const KIND_FILE: Record<Kind, string> = { fox: "fuchs", bear: "baer" };
+const MOVE_FILE: Record<Move, string> = { hop: "huepfen", clap: "klatschen", stomp: "stampfen" };
+
+/** The url of a picture in `bilder/` (Gemini, `/bild-erzeugen`), by its name without `.webp`. */
+const picture = (name: string) => pictureFiles[`${name}.webp`] as string;
+
+/**
+ * The child's two pictures for a move: standing ready, then the move itself (in the air, paws together, knee up) –
+ * the standing one is the first picture of all three moves.
+ */
+const kidFrames = (kind: Kind, move: Move) => [picture(`${KIND_FILE[kind]}-stehen`), picture(`${KIND_FILE[kind]}-${MOVE_FILE[move]}`)];
+
+/**
+ * The symbol of a move in the row under the digit, in its two pictures: before (paws apart, shoe lifted) while still
+ * to do, and the move done (paws together, shoe down) once done – the number as a count of things.
+ */
+const markFrames = (move: Move) => [picture(`zeichen-${MOVE_FILE[move]}-1`), picture(`zeichen-${MOVE_FILE[move]}-2`)];
 
 /** The sound of each move, landing with the figure: the hop's landing and the stamp's thump come at the motion's low point. */
 const SOUNDS: Record<Move, () => void> = {
@@ -55,22 +74,28 @@ interface Round {
   n: number;
   move: Move;
   done: number;
-  kind: MascotKind;
+  kind: Kind;
 }
 
-/** The figure's motion for each move, played on its own HTML layer (never inside its svg). */
+/**
+ * When the move's own picture shows during one move (the rest of it the standing one): in the air from take-off to
+ * landing, the paws together at the clap, the knee up until the foot comes down.
+ */
+const MOVE_SHOWN: Record<Move, [number, number]> = { hop: [0.12, 0.86], clap: [0.3, 0.6], stomp: [0, 0.5] };
+
+/** The figure's motion for each move, played on its own HTML layer round its two pictures. */
 const KID_MOTION: Record<Move, Keyframe[]> = {
   hop: [
     { transform: "none", offset: 0 },
     { transform: "translateY(4%) scale(1.04, 0.94)", offset: 0.14 },
-    { transform: "translateY(-38%) scale(0.97, 1.04)", offset: 0.5 },
+    { transform: "translateY(-24%) scale(0.97, 1.04)", offset: 0.5 },
     { transform: "translateY(3%) scale(1.05, 0.93)", offset: 0.86 },
     { transform: "none", offset: 1 },
   ],
   clap: [{ transform: "none" }, { transform: "translateY(-3%) scale(1.02)" }, { transform: "none" }],
   stomp: [
     { transform: "none", offset: 0 },
-    { transform: "translateY(-12%) rotate(-5deg)", offset: 0.35 },
+    { transform: "translateY(-4%) rotate(-3deg)", offset: 0.35 },
     { transform: "translateY(2%) scale(1.04, 0.95)", offset: 0.55 },
     { transform: "none", offset: 1 },
   ],
@@ -93,8 +118,8 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const nextMove = useRef(0);
   const kid = useRef<HTMLSpanElement>(null);
   const dust = useRef<HTMLSpanElement>(null);
-  const clap = useRef<HTMLSpanElement>(null);
-  const stand = useRef<HTMLSpanElement>(null);
+  const moving = useRef<HTMLImageElement>(null);
+  const stand = useRef<HTMLImageElement>(null);
 
   const invite = useCallback(
     (move: Move) => {
@@ -106,23 +131,35 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
     [pack, t],
   );
 
+  // All pictures are fetched at once, so no round's child or symbols pop in empty.
+  useEffect(() => {
+    for (const src of Object.values(pictureFiles)) new Image().src = src as string;
+  }, []);
+
   // The number words and invitations are loaded at once, so even the first round speaks in time with the moves.
   useEffect(() => {
     lettersVoice.load([...pack.numberWords.map((w) => `${w}!`), ...MOVES.flatMap((m) => invite(m) ?? [])], language);
   }, [pack, invite, language]);
 
-  /** The figure does one hop, clap or stamp: its layers move, never its drawing. */
+  /** The figure does one hop, clap or stamp: its layer moves and its move's picture shows over the standing one. */
   const act = useCallback((move: Move) => {
     const options = { duration: MOVE_MS, easing: "linear" };
     kid.current?.animate(KID_MOTION[move], options);
-    if (move === "clap") {
-      const shown = [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 1, offset: 0.6 }, { opacity: 0 }];
-      clap.current?.animate(shown, options);
-      stand.current?.animate(
-        shown.map((k) => ({ ...k, opacity: 1 - (k.opacity as number) })),
-        options,
-      );
-    }
+    const [from, to] = MOVE_SHOWN[move];
+    // A hard cut between the two pictures, as in a flip book: a cross-fade would show both children at once.
+    const shown = [
+      { opacity: 0, offset: 0 },
+      { opacity: 0, offset: from },
+      { opacity: 1, offset: from },
+      { opacity: 1, offset: to },
+      { opacity: 0, offset: to },
+      { opacity: 0, offset: 1 },
+    ];
+    moving.current?.animate(shown, options);
+    stand.current?.animate(
+      shown.map((k) => ({ ...k, opacity: 1 - k.opacity })),
+      options,
+    );
     if (move === "stomp") {
       dust.current?.animate(
         [
@@ -143,7 +180,7 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
 
   /** Starts a round: the digit and its empty marks, the invitation, then one move per beat, each counted aloud. */
   const start = useCallback(
-    (n: number, move: Move, kind: MascotKind) => {
+    (n: number, move: Move, kind: Kind) => {
       stop();
       const id = nextId.current++;
       setRound({ id, n, move, done: 0, kind });
@@ -223,7 +260,6 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
     else softTap(e.clientX, e.clientY);
   };
 
-  const kind = round?.kind ?? "fox";
   return (
     <div className="mv-play" onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <div className="stage">
@@ -255,16 +291,21 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
               <span className="mv-digit">{round.n}</span>
               <span className="mv-marks" aria-hidden>
                 {Array.from({ length: round.n }, (_, i) => (
-                  <span key={`${round.id}-${i}`} className={i < round.done ? "mv-mark mv-done" : "mv-mark"}>
-                    {MARKS[round.move]}
-                  </span>
+                  <img
+                    key={`${round.id}-${i}`}
+                    className={i < round.done ? "mv-mark mv-done" : "mv-mark"}
+                    src={markFrames(round.move)[i < round.done ? 1 : 0]}
+                    alt=""
+                    draggable={false}
+                  />
                 ))}
               </span>
             </div>
             <div className="mv-family" data-tap onPointerDown={again}>
               <span className="mv-kid" ref={kid}>
                 <span className="mv-dust" ref={dust} />
-                <KidLayers kind={kind} clap={clap} stand={stand} />
+                <img className="mv-pose" ref={stand} src={kidFrames(round.kind, round.move)[0]} alt="" draggable={false} />
+                <img className="mv-pose mv-moving" ref={moving} src={kidFrames(round.kind, round.move)[1]} alt="" draggable={false} />
               </span>
             </div>
           </div>
@@ -275,22 +316,3 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
     </div>
   );
 }
-
-/** The child's two pose layers, with refs so the clap can swap them. */
-function KidLayers({ kind, clap, stand }: { kind: MascotKind; clap: RefObject<HTMLSpanElement | null>; stand: RefObject<HTMLSpanElement | null> }) {
-  return (
-    <>
-      <span className="mv-pose" ref={stand}>
-        <KidPose kind={kind} pose="stand" />
-      </span>
-      <span className="mv-pose mv-clap" ref={clap}>
-        <KidPose kind={kind} pose="clap" />
-      </span>
-    </>
-  );
-}
-
-/** One pose of the child, drawn once. */
-const KidPose = memo(function KidPose({ kind, pose }: { kind: MascotKind; pose: "stand" | "clap" }) {
-  return <Mascot kind={kind} child pose={pose} />;
-});
