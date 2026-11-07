@@ -9,6 +9,8 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { voiceLines } from "@/content/voiceLines";
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { GOOD_NIGHT } from "@/components/GameShell";
+import { MOOD_SAID } from "@/games/feelings/mood";
+import { NEEDS_SAID } from "@/games/feelings/needs";
 import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
 import { type Step, STEP_TRANSLATIONS, STEPS } from "@/games/teeth/steps";
@@ -79,7 +81,7 @@ function weaning(language: TargetLanguageId): RecordedLine[] {
 }
 
 /**
- * A game recorded in German only so far (Was gehört zum Tier?, Gefühle, Schatten finden, Was gehört zusammen?,
+ * A game recorded in German only so far (Was gehört zum Tier?, Gefühle's stories, Schatten finden, Was gehört zusammen?,
  * Kettenreaktion, Aufs Töpfchen, Socken-Paare, Buchstaben & Zahlen, November 2026): its other languages are
  * recorded only when the user asks (root CLAUDE.md), so until then they say nothing, and a `make` for other games
  * spends no credits on them. Its praise is said proudly, everything else warmly. Groups in `waiting` (by their label on
@@ -95,6 +97,15 @@ const germanOnly =
             .filter((g) => !waiting.includes(g.label))
             .flatMap((g) => g.lines.map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) }))),
         );
+
+/**
+ * Gefühle: the stories in German only so far; „Wie geht's dir?“ and „Was brauche ich?“ in every language they are
+ * translated into (C-73, user wish, November 2026), since a child picking a feeling should hear it in its own language.
+ */
+function feelings(language: TargetLanguageId): RecordedLine[] {
+  if (language === "de") return germanOnly("/gefuehle/")(language);
+  return once([...MOOD_SAID, ...NEEDS_SAID].map((line) => line[language] !== undefined && { text: line[language]!, kind: "instruction" as const }));
+}
 
 /** What every game says: good night when play time is over, and the question at a level's end (GameEnd). */
 function allGames(language: TargetLanguageId): RecordedLine[] {
@@ -114,12 +125,13 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "alle-spiele", folder: "src/components/stimme", lines: allGames },
   { name: "abstillen", folder: "src/games/weaning/stimme", lines: weaning },
   { name: "tiere", folder: "src/games/animals/stimme", lines: germanOnly("/tiere/") },
-  { name: "gefuehle", folder: "src/games/feelings/stimme", lines: germanOnly("/gefuehle/") },
+  { name: "gefuehle", folder: "src/games/feelings/stimme", lines: feelings },
   { name: "schatten", folder: "src/games/shadows/stimme", lines: germanOnly("/schatten/") },
   { name: "zusammen", folder: "src/games/together/stimme", lines: germanOnly("/zusammen/") },
   { name: "kettenreaktion", folder: "src/games/marbles/stimme", lines: germanOnly("/kettenreaktion/") },
   { name: "toepfchen", folder: "src/games/potty/stimme", lines: germanOnly("/toepfchen/") },
   { name: "socken", folder: "src/games/socks/stimme", lines: germanOnly("/socken/") },
+  { name: "timer", folder: "src/games/timer/stimme", lines: germanOnly("/timer/") },
   // Its 361 counting sentences („drei Äpfel!“, ≈ 1,100 credits) didn't fit into November 2026's credits: until they
   // are recorded the game says the number alone.
   { name: "buchstaben", folder: "src/games/letters/stimme", lines: germanOnly("/buchstaben/", { waiting: ["Zahl mit Dingen"] }) },

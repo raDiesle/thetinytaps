@@ -157,6 +157,8 @@ export function chineseTexts(german: AnimalTexts): AnimalTexts {
     food: (f) => food(f) ?? german.food(f),
     home: (h) => home(h)?.name ?? german.home(h),
     hungry: (a) => (animal(a) ? `${animal(a)}饿了！` : german.hungry(a)),
+    // German only so far (Z-24, November 2026): silent in this language until it is translated and recorded.
+    whatEats: german.whatEats,
     yummy: (a, f) => (animal(a) && food(f) ? `嗯，真好吃！${animal(a)}爱吃${food(f)}。谢谢！` : german.yummy(a, f)),
     yuck: (a) => (animal(a) ? `咦！${animal(a)}不爱吃这个。` : german.yuck(a)),
     whereLives: (a) => (animal(a) ? `${animal(a)}住在哪里？` : german.whereLives(a)),

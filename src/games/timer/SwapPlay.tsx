@@ -3,9 +3,10 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { loadRecordings, playChime, playClick, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
+import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
@@ -13,6 +14,7 @@ import { TimeShownChoice, TimeShownNote } from "./shown";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { Ball, COURT, FLIGHT_MS, Racket, TennisBackdrop, TennisBoard, TennisPlayers, tennisStyle } from "./tennis";
 import { TimeLeft } from "./TimerPlay";
+import { BEGINS, timerVoice, TURN_TO, WHO_BEGINS } from "./voice";
 
 /** Children cheering at the clock time set (a recording, else a flourish). */
 const playCheer = recorded("cheer", playTusch);
@@ -113,6 +115,13 @@ export function SwapRun({
   useWakeLock(!done);
   useEffect(() => loadRecordings(["cheer"]), []);
 
+  // The voice (H-72): „Wer fängt an?“ as the lamps draw, who begins as they have, and „Tauschen! …“ at every change.
+  // Silent until recorded; a grown-up leaving with ✕ stops it.
+  const language = useAppLanguage().id;
+  const say = useCallback((text: string, queue = false) => timerVoice.say(text, language, { queue }), [language]);
+  useEffect(() => timerVoice.load([WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)], language), [language]);
+  useEffect(() => hush, []);
+
   /** A child's turn begins now (or after the toy's hop): the toy hops over to its cushion with a whoosh and a chime. */
   const begin = useCallback(
     (first: Holder, after: number) => {
@@ -143,6 +152,7 @@ export function SwapRun({
       let at = 0;
       setDrawn(winner);
       playClick();
+      say(WHO_BEGINS);
       DRAW_STEPS.forEach((gap, i) => {
         at += gap;
         timers.push(
@@ -152,13 +162,18 @@ export function SwapRun({
           }, at),
         );
       });
-      timers.push(setTimeout(() => begin(winner, moveMs), at + DRAW_HOLD_MS));
+      timers.push(
+        setTimeout(() => {
+          begin(winner, moveMs);
+          say(BEGINS[winner], true);
+        }, at + DRAW_HOLD_MS),
+      );
     });
     return () => {
       cancel();
       for (const timer of drawTimers.current) clearTimeout(timer);
     };
-  }, [begin, endsAt, moveMs]);
+  }, [begin, endsAt, moveMs, say]);
 
   // The turn, checked at least every second and again when the page comes back (timers sleep in the background).
   useEffect(() => {
@@ -198,11 +213,13 @@ export function SwapRun({
     if (turn === 0) return;
     setFrom(holderNow.current === "fox" ? "bear" : "fox");
     setHop((n) => n + 1);
+    // Rendered already, so `holderNow` is the child whose turn it is now.
+    if (holderNow.current) say(TURN_TO[holderNow.current]);
     if (tennis) playHit();
     else playWhoosh();
     const timer = setTimeout(tennis ? playLand : playChime, tennis ? FLIGHT_MS : 700);
     return () => clearTimeout(timer);
-  }, [turn, tennis]);
+  }, [turn, tennis, say]);
   // At the clock time set, the end is plain like every timer's: children cheer and a few things rise slowly.
   useEffect(() => {
     if (!done) return;
@@ -315,7 +332,10 @@ export function SwapRun({
             })}
             value={holder ?? drawn ?? "fox"}
             // Starts that child's turn anew, with a full hourglass: for who begins, or to set it right.
-            onChange={(first: Holder) => begin(first, 0)}
+            onChange={(first: Holder) => {
+              begin(first, 0);
+              say(TURN_TO[first]);
+            }}
             options={[
               {
                 value: "fox",

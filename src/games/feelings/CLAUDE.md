@@ -359,7 +359,10 @@ Everything said is played from its ElevenLabs recording (`useVoice` in `shared.t
 German only so far (November 2026): a line in another language stays silent until the user asks for its recordings,
 a line still in German plays its German one. A beat with a recording stays long enough to be heard (`beatMs`), and a
 story loads its recordings when it starts (`preload`). A new or changed line is listed by `src/content/recordedLines.ts`
-(`gefuehle`) and recorded with `bun run voice make --only gefuehle`, only when the user asks. Rules:
+(`gefuehle`) and recorded with `bun run voice make --only gefuehle`, only when the user asks. „Wie geht's dir?“ and
+„Was brauche ich?“ are on that list in every language they are translated into (C-73, `MOOD_SAID`, `NEEDS_SAID`): a
+child picking a feeling hears it in its own language; a new line said there goes into those lists with all its languages.
+A feeling's card, tapped, says its name („Traurig“) before „Wie doll ist es?“. Rules:
 - New stories, feelings and kind things come in German only; their translations are written only when the user
   asks (a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German). A not-so-good idea at home
   without its translation is `null` and told in German; `useVoice` plays a line that is still German from its German
