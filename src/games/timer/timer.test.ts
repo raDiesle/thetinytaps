@@ -28,7 +28,7 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { ANTS, bulbBelow, CANDLE, COOKIE, FLAME_H, GLASS, GROUND, HILL, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
+import { bulbBelow, CANDLE, FLAME_H, GLASS, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
 import { SWAP_FLOOR, SWAP_GLASS, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
@@ -41,8 +41,10 @@ describe("Timer", () => {
       expect(p.emoji).not.toBe("");
       expect(p.name.de.trim()).not.toBe("");
     }
-    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, Wecker.
-    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "swap", "candle", "apple", "pizza", "clock"]);
+    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
+    // Abwechseln last, in a group of its own.
+    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
+    expect(PICTURES.at(-1)?.id).toBe("swap");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Abwechseln runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
@@ -369,22 +371,6 @@ describe("Timer", () => {
       expect(b.y - 2.5 * BEE.h).toBeGreaterThanOrEqual(80);
       expect(b.y + 5.1 * BEE.h).toBeLessThanOrEqual(APPLE_FLOOR);
     }
-  });
-
-  test("the Ameisenstraße stays on every screen, its ants walk from under the cookie into the hill, one step a second (H-68)", async () => {
-    expect(COOKIE.cx - COOKIE.w / 2).toBeGreaterThanOrEqual(190);
-    expect(GROUND + 40).toBeLessThanOrEqual(820);
-    expect(GROUND - HILL.h).toBeGreaterThanOrEqual(80 + 140);
-    // The road starts under the cookie and ends at the hill's foot while it is still small, so ants come and go hidden.
-    const end = ANTS.from + ANTS.n * ANTS.step;
-    expect(ANTS.from).toBeLessThan(COOKIE.cx + COOKIE.w / 2 - ANTS.w);
-    expect(end).toBeGreaterThanOrEqual(HILL.cx - (HILL.w / 2) * HILL.start - ANTS.w / 2);
-    expect(ANTS.step).toBeGreaterThan(ANTS.w);
-    // One keyframe per step, and the march lasts as many seconds as there are ants, one started each second.
-    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    for (let k = 0; k <= ANTS.n; k++) expect(css).toContain(`translateX(calc(var(--tm-ant-step) * ${k}))`);
-    expect(css).not.toContain(`translateX(calc(var(--tm-ant-step) * ${ANTS.n + 1}))`);
-    expect(css).toContain(`animation: tm-march ${ANTS.n}s ease-in-out infinite`);
   });
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the

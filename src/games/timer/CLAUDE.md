@@ -17,8 +17,12 @@ The start screen's cards are the pictures themselves as they look at their end, 
 November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
 cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Abwechseln (its two children with the toy and the hourglass; that it runs on
-without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecker, then the others. The pictures:
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then the others, on one frame with
+no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
+with the toy and the hourglass, and that it runs on without end is said in its tooltip (`SWAP_NOTE`). Where there is
+room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
+cards still fit on one screen. The Ameisenstraße (H-68) was
+taken out (user request, November 2026). The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
@@ -62,9 +66,6 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
   red at first and yellow as it climbs, and stands high over the meadow at the end (user feedback, November 2026: the
   windmill and the little house taken out, sun and moon much bigger and in the middle, the moon setting first). Every
   second a soft glow widens past the edge of the moon or the sun (`.tm-ring`).
-- „Ameisenstraße“ 🐜 (H-68): a big cookie lies on a picnic blanket at the left, an anthill far off at the right; ants march from under the
-  cookie to the hill, each with a crumb, the cookie shrinks and the hill grows. At the end the ants sit on the hill, the
-  last crumbs lie on the blanket.
 - „Rote Scheibe“ 🔴 (`disc.tsx`, H-47): the red disc Kitas know from the „Time Timer“, shrinking like a clock's hand goes
   round on a plain white face; the knob in the middle turns a petal each second.
   A ladybug crawls round the face's rim about once a minute, like a second hand – a real seven-spot one seen from above
@@ -93,7 +94,7 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
   picture (`.tm-done-light`) and a few hearts, stars and notes rise slowly (`celebrate`), a friendly tune after it, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
-  noch?“: the rail to the station, the sand on top, the wax, the cookie – `LeftGlow`, inside the shrinking part so it is
+  noch?“: the rail to the station, the sand on top, the wax, the slices – `LeftGlow`, inside the shrinking part so it is
   exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
 
 Every picture moves a small, soft step every second, so even an hour never looks stuck (H-63): the train's wheels turn
@@ -121,8 +122,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   last row of cards falls off the screen. A new length means narrower slips (`.tm-lengths`), never a second line.
 - **Progress is seen every second** (user feedback, November 2026): every picture moves a step a second that a child
   can see from the sofa – a bite, a crumb, an apple, a slice – not only a tiny wobble. Pieces come many, also for a
-  short time (they come more often then, never fewer), the way to go is long (the train across the picture, the ants'
-  road, the stalk nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
+  short time (they come more often then, never fewer), the way to go is long (the train across the picture, the stalk
+  nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
   over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
@@ -146,11 +147,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   then every blossom becomes its apple on its own), never several half done at once, and a stage starts only once the
   one before is over (`appleTimes`, `timer.test.ts` checks). Small helpers that only liven the picture (the bees) are
   tiny beside what runs down, as in life – big bees took the eye from the blossoms (user feedback, November 2026).
-- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, then
-  the Wecker): keep it when adding a picture (a new one goes after these unless the user says otherwise), and move the
-  perf scenarios' list in `tools/perfScenarios.ts` with it – they tap cards by their place (`timer.test.ts` checks the
-  order). Abwechseln runs without end, so its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it
-  (`TIMED_PICTURES`, `nextPicture`).
+- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
+  Wecker; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
+  name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
+  is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
+  November 2026), its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
 - **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
   `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
   is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
@@ -185,9 +187,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **Every second a small step, never a blink** (H-63): what beats once a second is a small layer of its own (`.tm-beat`)
   moving by `transform` and `opacity` – the wheels are small layers riding in the train's, not groups in its svg – and
   stands still at the end (`.tm-done`). Anything new that moves the whole run long snaps to its last place there too.
-  A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
-  (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
-  a bigger layer.
+  A row of things walking in step is a small layer per thing, all one keyframe walk a second apart (one keyframe per
+  step), never one strip of them moved inside a bigger layer.
 - **A drawing never touches its svg's edge unless that svg lets it out** (user feedback, November 2026: the knob's flower
   in the Rote Scheibe's middle lost the tips of its top and bottom petals): an svg cuts off what lies past its
   `viewBox`, half a stroke's width too, wherever it sits (only `.tm-layer > svg` is `overflow: visible`). A small

@@ -726,8 +726,11 @@ kbd {
     gap: 14px;
   }
 
+  /* A phone's names take no track of their own: they lie across the frame's top edge, so a few groups of cards still fit
+     on one screen (the Timer's two did not). */
   .mode-list {
     --group-pad: 4px;
+    --group-label: 0px;
     --group-label-drop: 9px;
   }
 
