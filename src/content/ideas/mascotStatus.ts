@@ -44,6 +44,27 @@ export interface MascotStatusRow {
 /** Every game of the home menu once, in menu order, then the home page. */
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
+    href: "/timer/",
+    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren.",
+    tasks: [
+      {
+        label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Rausgenommen (Feedback November 2026): die SVG-Kinder sahen in den ruhigen Bildern komisch aus.",
+      },
+      { label: "Sitzkissen in Fuchs- und Bärenfarbe beim Abwechseln", work: "drawing", effort: "S", state: "done" },
+      {
+        label: "Fuchs- oder Bärenfamilie steht in jedem Bild daneben und winkt am Ende",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
+      },
+    ],
+  },
+  {
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
@@ -72,27 +93,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/belohnungstafel/",
     note: "Gemini-Bilder mit Tapsi, Mama, Papa und Oma Fuchs; die Ärztin ist ein Bär, Freunde sind Hase und Bär – Fuchs und Bär sind schon beide da.",
     tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
-  },
-  {
-    href: "/timer/",
-    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren.",
-    tasks: [
-      {
-        label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
-        work: "drawing",
-        effort: "S",
-        state: "removed",
-        note: "Rausgenommen (Feedback November 2026): die SVG-Kinder sahen in den ruhigen Bildern komisch aus.",
-      },
-      { label: "Sitzkissen in Fuchs- und Bärenfarbe beim Abwechseln", work: "drawing", effort: "S", state: "done" },
-      {
-        label: "Fuchs- oder Bärenfamilie steht in jedem Bild daneben und winkt am Ende",
-        work: "drawing",
-        effort: "S",
-        state: "removed",
-        note: "Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
-      },
-    ],
   },
   {
     href: "/schnullerfee/",

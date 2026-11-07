@@ -206,11 +206,11 @@ function trailFor(sign: { width: number }, bh: number, words: number) {
 /**
  * Where the sign hangs in front of the top compartment `top` of a wide shelf: over the carved words' middle where it can,
  * else as near to it as the books to take at its left and the wall with the stickers at its right let it – and how far
- * the words then move right to stand centred under it. The board's books and words move towards the shelf's middle
- * (`centre`) as far as the room at their left lets them, so the sign and the words under it hang as near the middle of
- * the shelf as can be (user feedback, November 2026): `top.trail` grows by twice what they move left.
+ * the words then move right to stand centred under it. The board's books and words move right as far as the wall with
+ * the stickers lets the sign, so the sign and the words under it hang far right and the books at their left come
+ * towards the shelf's middle (user feedback, November 2026): `top.trail` shrinks by twice what they move right.
  */
-function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: number; height: number }, carved: number, centre: number) {
+function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: number; height: number }, carved: number) {
   // Where the last book to take ends: the books stand together in the middle of what the trail leaves (`.shelf-row` in
   // bookshelf.css: 2 px padding, `BOOK_GAP` between each and the ends), the carved words the end of the helpers' place.
   const books = top.books ?? [];
@@ -220,7 +220,7 @@ function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: nu
   const endOf = () => top.x + 2 + freeOf() / 2 + books.length * BOOK_GAP * bh + span * BOOK_ASPECT * bh;
   if (words > 0) {
     const trail = top.trail ?? 0;
-    const target = Math.min(centre, top.x + top.w - SIGN_CLEAR.wall * bh - sign.width / 2);
+    const target = top.x + top.w - SIGN_CLEAR.wall * bh - sign.width / 2;
     // Moving right, they take room from the trail, and the sign at their right must still keep clear of the wall.
     const slack = top.x + top.w - SIGN_CLEAR.wall * bh - sign.width - (endOf() - words + SIGN_CLEAR.books * bh);
     // The sign's middle: over the words' where it can, else kept clear of the books (as below).
@@ -291,7 +291,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     bookHeight: plan.bh,
     upright: false,
     legs,
-    ...(sign.width > 0 && signOver(top, spans, plan.bh, sign, carved, (right + side + post) / 2)),
+    ...(sign.width > 0 && signOver(top, spans, plan.bh, sign, carved)),
   };
 }
 
