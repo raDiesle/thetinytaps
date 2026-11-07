@@ -778,6 +778,32 @@ function nacht() {
   );
 }
 
+/** Dusk: the sky gone dark blue with a pale band where the sun set, dark hills, a tree and a house with a lit window – no moon and no stars yet, so neither is shown before it is picked. */
+function abend() {
+  const dark = { leaf: "#5d8770", shade: "#507863", light: "#6a957d", trunk: "#7b6551" };
+  return (
+    <>
+      <Fill c="#55689f" />
+      {/* the last light low over the hills */}
+      <rect x="-4" y="96" width="308" height="40" fill="#8a87b8" />
+      <rect x="-4" y="112" width="308" height="24" fill="#d7a7a6" />
+      <Cloud x={62} y={34} s={0.8} c="#7180b0" />
+      <Cloud x={232} y={52} s={0.55} c="#7180b0" />
+      <path d={treeline(124, 10, 26)} fill="#56708f" {...line(2.5)} />
+      <Ground y={150} c="#668f72" wave={4} />
+      <Tree x={34} y={158} s={1} {...dark} />
+      <Bush x={86} y={158} s={0.66} c="#5d8770" shade="#507863" />
+      {/* the house with a lit window at the right */}
+      <rect x="220" y="100" width="72" height="58" fill="#938cb0" {...line(3)} />
+      <path d="M212 102 L256 66 L300 102 Z" fill="#74678c" {...line(3)} />
+      <rect x="230" y="114" width="20" height="18" rx="2" fill="#ffd97a" {...line(2.5)} />
+      <path d="M240 114 V132 M230 123 H250" stroke={OUT} strokeWidth="2" />
+      <rect x="264" y="126" width="18" height="32" rx="3" fill="#6d5a4c" {...line(2.5)} />
+      <Tuft x={150} y={188} c="#557c62" />
+    </>
+  );
+}
+
 export const OUTSIDE_BACKDROPS = {
   garten,
   wiese,
@@ -794,4 +820,5 @@ export const OUTSIDE_BACKDROPS = {
   unterwasser,
   weltraum,
   nacht,
+  abend,
 } satisfies Partial<Record<BackdropId, () => ReactNode>>;

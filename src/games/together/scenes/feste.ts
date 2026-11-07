@@ -42,7 +42,7 @@ export const SCENES: SceneSpec[] = [
     props: [["🎁", 252, 150, 26]],
     act: "onto",
     sounds: ["twinkle", "chime"],
-    // The moon's star would sit on the tree too.
+    // The moon's star would sit on the tree too, and a pine cone hang in it: „mond-stern“ and „tanne-tannenzapfen“ name it.
   },
   {
     id: "osterei-pinsel",

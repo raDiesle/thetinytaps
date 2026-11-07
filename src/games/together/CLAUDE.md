@@ -17,14 +17,14 @@ for a moment (`.tg-owner`) – never shown as wrong.
 
 ## The pairs
 
-Each pair belongs to a **topic** (`topics.ts`: Im Bad, Küche & Essen, Zu Hause, Anziehen, Spielen, Garten, Wetter,
-Unterwegs, Feste – things of the day; Berufe, Sport, Märchen & Abenteuer – helpers), so grown-ups may one day choose
+Each pair belongs to a **topic** (`topics.ts`: Im Bad, Küche & Essen, Zu Hause, Anziehen, Kita & Schule, Spielen,
+Garten, Wetter, Unterwegs, Feste – things of the day; Berufe, Sport, Märchen & Abenteuer – helpers), so grown-ups may one day choose
 topics behind ⚙️. There are two sorts:
 - **Handmade** (`HANDMADE` in `pairs.tsx`, nine: Zahnbürste, Tür, Topf, Blume, Papier, Feuerwehr, Ärztin, Bäcker,
   Friseurin): drawn layer by layer with motions of their own in `together.css` (`.pair-<id>`), the only ones translated
   so far (`content.<lang>.ts`). Drawn in their old 200 × 200 units and moved into the middle of the wide box
   (`handmade`), on a backdrop.
-- **Scenes** (`scenes/<topic>.ts`, about 170, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
+- **Scenes** (`scenes/<topic>.ts`, about 190, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
   as a big emoji (or, for a helper, the fox or bear in its outfit, `Helper.tsx`, with what it works on), a few small
   emoji round it for context (`props`), the partner, and one of a few shared motions (`Act`: onto, into, beside, rub,
   pour, tap, turn, light, hold; `.act-<act>` in `together.css`). A helper's tool lands in its paw first and is carried
@@ -51,7 +51,10 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   a topic of its own (`dealRound`), so things of one topic may belong loosely together (soap and sponge in the
   bathroom) – requiring every partner of a topic to fit nothing else in it left a bathroom of two pairs. A partner is
   the obvious answer for its own one; where it also fits another pair of its kind, in any topic (no second thing a key
-  opens, no other helper who uses scissors), the two name each other in `alsoFits` and are never dealt together.
+  opens, no other helper who uses scissors), the two name each other in `alsoFits` and are never dealt together. Ask
+  it both ways: does this partner fit another thing, and does another partner fit this thing (a cushion on the chair,
+  a pine cone on the Christmas tree)? A partner that fits a whole group names every pair of it (the washing machine
+  everything worn, `CLOTHES` in `scenes/bad.ts`).
   Within a kind every emoji – partner or thing – is used once, and no context emoji is a partner (`content.test.ts`).
   No animals as things (Was gehört zum Tier? pairs animals with food and homes).
 - What stands above shows its context (user feedback, November 2026): the door in a house front, the hairdresser
@@ -59,8 +62,10 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   child was removed).
 - Neither the thing nor its backdrop already shows the answer: no police car whose emoji has its blue light, no
   building site with a crane and a pile of bricks, no space with a ringed planet, no moon with the night's stars, no
-  second bed or jacket in the room behind (all taken out in the review of the many scenes, November 2026). An emoji
-  that looks like a photo or a sign (🏞️, 🛣️) or carries letters or numbers (🏪's „24“) is no thing either.
+  second bed or jacket in the room behind, no paint box or brushes on the painting table (all taken out in the reviews
+  of the many scenes, November 2026). Look at the emoji itself, magnified, before choosing it: Apple's 🛶 holds its
+  own paddle, so the canoe was left out. An emoji that looks like a photo or a sign (🏞️, 🛣️) or carries letters or
+  numbers (🏪's „24“, 📓's printed label – 📒 instead) is no thing either.
 - Look at every new scene before it goes in, at the end of its motion (`?pair=<id>`; in a hidden preview pane call
   `finish()` on `document.getAnimations()`): the partner stands plainly on, in or beside the thing, big enough to see
   – a helper's vehicle as big as what it stands on (`spot`), never a small one by the paw.

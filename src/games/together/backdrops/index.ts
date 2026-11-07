@@ -46,6 +46,7 @@ export type BackdropId =
   | "unterwasser" // under water: blue water, sand, seaweed, bubbles, a rock
   | "weltraum" // space: a dark blue sky with stars, a planet with a ring, the moon's grey ground below
   | "nacht" // evening outside: a dark blue sky, the moon and stars, the dark garden and a house with a lit window
+  | "abend" // dusk: a dark blue sky with a pale band low down, dark hills, a house with a lit window – no moon, no stars
   // Places of work and play (work.tsx)
   | "praxis" // doctor's room: an examination couch, a chart of shapes on the wall, a cabinet with a red cross
   | "salon" // hairdresser's: a big mirror on the wall at the right, a shelf with bottles, a tiled floor

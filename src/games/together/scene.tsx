@@ -16,6 +16,7 @@ import {
 import {
   playBlow,
   playBoing,
+  playBuzz,
   playChime,
   playClap,
   playClick,
@@ -100,6 +101,7 @@ export const SOUNDS = {
   blow: playBlow,
   bells: playBells,
   boing: playBoing,
+  buzz: playBuzz,
   chime: playChime,
   clap: playClap,
   click: playClick,

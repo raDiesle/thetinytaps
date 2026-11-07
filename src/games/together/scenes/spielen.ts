@@ -1,7 +1,25 @@
+import { createElement as h } from "react";
 import type { SceneSpec } from "../scene";
 
 // The pairs of the topic „spielen“ (topics.ts), written as data (see scene.tsx): games and toys, painting, music at
-// home and building. Sports gear is the topic „sport“'s.
+// home and building. Sports gear is the topic „sport“'s. The bubble bottle has no emoji and is drawn here in the
+// partners' 100 × 100 box.
+
+const OUT = "#5a4636";
+
+/** A bottle of soap bubbles, a little askew: a round-shouldered bottle with its cap and the wand's ring sticking out. */
+const bubbleBottle = h(
+  "g",
+  { transform: "rotate(10 50 50)", stroke: OUT, strokeWidth: 3, strokeLinejoin: "round" },
+  h("path", { d: "M56 32 L66 6", fill: "none", strokeWidth: 3.5, strokeLinecap: "round" }),
+  h("circle", { cx: 70, cy: 8, r: 7, fill: "none", stroke: "#e64980", strokeWidth: 4 }),
+  h("rect", { x: 36, y: 24, width: 28, height: 14, rx: 3, fill: "#e64980" }),
+  h("path", { d: "M38 38 Q26 46 26 60 V86 Q26 94 34 94 H66 Q74 94 74 86 V60 Q74 46 62 38 Z", fill: "#99e9f2" }),
+  h("path", { d: "M27 64 H73 V86 Q73 93 66 93 H34 Q27 93 27 86 Z", fill: "#66d9e8", stroke: "none" }),
+  h("circle", { cx: 42, cy: 76, r: 6, fill: "#fff", strokeWidth: 2 }),
+  h("circle", { cx: 56, cy: 70, r: 4, fill: "#fff", strokeWidth: 2 }),
+  h("circle", { cx: 58, cy: 83, r: 3, fill: "#fff", strokeWidth: 2 }),
+);
 
 export const SCENES: SceneSpec[] = [
   {
@@ -156,5 +174,19 @@ export const SCENES: SceneSpec[] = [
     backdrop: "baustelle",
     act: "beside",
     sounds: ["whirr", "clonk"],
+  },
+  {
+    id: "seifenblasen-dose",
+    topic: "spielen",
+    name: "Seifenblasen",
+    the: "die Seifenblasen",
+    toThe: "zu den Seifenblasen",
+    partner: { name: "Seifenblasendose", the: "die Seifenblasendose", acc: "die Seifenblasendose", draw: bubbleBottle },
+    thing: "🫧",
+    backdrop: "wiese",
+    act: "beside",
+    sounds: ["blow", "pop"],
+    // Bubbles come from soap and shower gel too.
+    alsoFits: ["wasserhahn-seife", "dusche-duschgel"],
   },
 ];

@@ -406,7 +406,10 @@ const hausfront = () => (
   </>
 );
 
-/** A painting table from a little above: children's drawings on the wall at the top, a paint box and a jar of brushes. */
+/**
+ * A painting table from a little above: children's drawings on the wall at the top and old splashes of paint on the
+ * wood. No paint box and no brushes: those are the answers of the egg, the picture and the painter that sit here.
+ */
 const maltisch = () => (
   <>
     <rect width="300" height="34" fill="#f3ead9" />
@@ -434,18 +437,8 @@ const maltisch = () => (
     <ellipse cx="54" cy="70" rx="7" ry="4" fill="#bcd9ef" opacity="0.7" />
     <ellipse cx="248" cy="160" rx="8" ry="4" fill="#f4c2c2" opacity="0.7" />
     <ellipse cx="236" cy="96" rx="5" ry="3" fill="#cfe5b4" opacity="0.8" />
-    {/* the paint box at the bottom left */}
-    <rect x="6" y="150" width="62" height="38" rx="5" fill="#a8c4dc" {...LINE} />
-    {["#f08080", "#ffd25e", "#7cc08a", "#7ab0e6", "#c69be0", "#f6a95a"].map((fill, i) => (
-      <rect key={fill} x={13 + (i % 3) * 18} y={i < 3 ? 156 : 171} width="13" height="11" rx="3" fill={fill} {...THIN} />
-    ))}
-    {/* the jar of brushes at the top right */}
-    <path d="M266 44 L262 30 M278 42 L284 26 M272 42 V24" stroke={OUT} strokeWidth="5" strokeLinecap="round" />
-    <path d="M266 44 L262 30 M278 42 L284 26 M272 42 V24" stroke="#d9a066" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M261 31 L259 22 Q262 20 264 29 Z M272 25 L272 16 Q275 18 274 25 Z M283 27 L287 18 Q289 21 286 28 Z" fill="#5a4636" />
-    <path d="M258 42 H288 L286 74 Q273 78 260 74 Z" fill="#dcecf3" {...LINE} />
-    <path d="M260 60 H286 L286 74 Q273 78 260 74 Z" fill="#b9d8ea" />
-    <path d="M258 42 H288 L286 74 Q273 78 260 74 Z" fill="none" {...LINE} />
+    <ellipse cx="40" cy="166" rx="9" ry="4" fill="#ffe08a" opacity="0.7" />
+    <ellipse cx="268" cy="58" rx="6" ry="3" fill="#d7c4ef" opacity="0.8" />
   </>
 );
 
