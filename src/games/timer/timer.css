@@ -861,19 +861,25 @@
   transform: translateX(var(--tm-cart-end));
 }
 
-/* Raupe (H-46): every band of the leaf slides back as its leaf slides forward by as much (--tm-eat, set per element),
-   so only the bitten edge moves; the caterpillar goes back with it, chewing once a second. At the end it is gone, the
-   cocoon hangs on the branch, wiggles, and a butterfly flies out to the fox child, beats its wings a while and rests. */
+/* Raupe (H-46): one bite a second, worked out from the clock (`useBites` in caterpillar.tsx). Every band of the leaf is
+   a box with a round end, set back by a style change at its bite while the leaf in it is set forward by as much, so only
+   the bitten edge moves. The caterpillar's head, neck and body glide to their next place after each bite, the head
+   biting down as the bite comes. At the end it is gone, the cocoon hangs on the branch, wiggles and bursts open, and a
+   butterfly flutters out and flies back and forth in the air. */
 .tm-band {
   position: absolute;
   left: 0;
+  width: 100%;
   overflow: hidden;
   border-radius: 0 999px 999px 0;
+  will-change: transform;
 }
 
 .tm-band-leaf {
   position: absolute;
   left: 0;
+  width: 100%;
+  will-change: transform;
 }
 
 .tm-band-leaf svg {
@@ -882,35 +888,55 @@
   height: 100%;
 }
 
-/* A bite every second (user feedback, November 2026): the edge goes back in as many steps as the run has seconds. */
-.tm-eat {
+.tm-leaf-light {
+  position: absolute;
+  inset: 0;
+}
+
+/* After a bite the head stays a moment while the crumbs fall, then glides to the next spot well before its bite. */
+.tm-cat-glide {
   will-change: transform;
-  animation: tm-eat var(--tm-ms) steps(var(--tm-secs), end) forwards;
+  transition: transform 0.45s ease-in-out 0.2s;
 }
 
-.tm-done .tm-eat {
-  animation: none;
-  transform: translateX(var(--tm-eat));
+.tm-cat-head {
+  width: 100%;
+  height: 100%;
+  transform-origin: 30% 60%;
+  animation: tm-chomp 1s ease-out forwards;
 }
 
-@keyframes tm-eat {
-  to {
-    transform: translateX(var(--tm-eat));
+.tm-cat-head svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Restarted at every bite: it bites down at once, then lifts its head on the way and opens up for the next bite. */
+@keyframes tm-chomp {
+  0%,
+  15% {
+    transform: rotate(14deg) translateY(5%);
+  }
+  35%,
+  70% {
+    transform: none;
+  }
+  95%,
+  100% {
+    transform: rotate(-10deg);
   }
 }
 
-.tm-caterpillar {
-  animation: tm-eat var(--tm-ms) steps(var(--tm-secs), end) forwards;
-}
-
-/* Crumbs of leaf falling from the mouth with each bite, as the head bites down. */
+/* Crumbs of leaf falling from the spot just bitten. */
 .tm-crumb {
   aspect-ratio: 1;
   border: 0.1cqw solid #3b2a20;
   border-radius: 40% 60% 50% 45%;
   background: #58b947;
   opacity: 0;
-  animation: tm-crumb 1s ease-in infinite;
+  animation: tm-crumb 0.9s ease-in forwards;
 }
 
 @keyframes tm-crumb {
@@ -930,52 +956,26 @@
   }
 }
 
-.tm-done .tm-caterpillar {
-  transform: translateX(var(--tm-eat));
+.tm-done .tm-cat {
   animation: tm-cat-hide 0.6s ease-in forwards;
 }
 
 @keyframes tm-cat-hide {
   to {
     opacity: 0;
-    transform: translateX(var(--tm-eat)) scale(0.4);
-  }
-}
-
-.tm-cat-head {
-  transform-origin: 30% 60%;
-  animation: tm-chew 1s ease-in-out infinite;
-}
-
-.tm-cat-head svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* The head bites down as the second begins (when the edge steps back) and opens again for the next bite. */
-@keyframes tm-chew {
-  0%,
-  100% {
-    transform: rotate(12deg) translateY(4%);
-  }
-  20% {
-    transform: none;
-  }
-  60% {
-    transform: rotate(-8deg);
   }
 }
 
 .tm-cocoon,
+.tm-cocoon-open,
 .tm-butterfly {
   opacity: 0;
 }
 
+/* Spun, it wiggles, and as the butterfly comes out the closed cocoon gives way to the open one. */
 .tm-done .tm-cocoon {
   transform-origin: 50% 0;
-  animation: tm-cocoon 2.4s ease-in-out 0.4s forwards;
+  animation: tm-cocoon 1.8s ease-in-out 0.4s forwards;
 }
 
 @keyframes tm-cocoon {
@@ -983,41 +983,49 @@
     opacity: 0;
     transform: scale(0.4);
   }
-  20% {
+  25% {
     opacity: 1;
     transform: none;
   }
-  35% {
+  45% {
     transform: rotate(8deg);
   }
-  50% {
+  65% {
     transform: rotate(-8deg);
   }
-  65%,
-  100% {
+  85% {
     opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
     transform: none;
   }
 }
 
-.tm-done .tm-butterfly {
-  animation: tm-fly 2.4s ease-in-out 1.6s forwards;
+.tm-done .tm-cocoon-open {
+  animation: tm-cocoon-open 0.3s ease-out 1.9s forwards;
 }
 
-@keyframes tm-fly {
+@keyframes tm-cocoon-open {
+  to {
+    opacity: 1;
+  }
+}
+
+/* The butterfly slips out of the cocoon's bottom and flies up into the air ... */
+.tm-done .tm-butterfly {
+  animation: tm-emerge 1.8s ease-in-out 2s forwards;
+}
+
+@keyframes tm-emerge {
   0% {
     opacity: 0;
     transform: scale(0.3);
   }
-  12% {
+  15% {
     opacity: 1;
-    transform: translate(0, -40%) scale(0.8);
-  }
-  40% {
-    transform: translate(calc(var(--tm-fly-x) * 0.35), -180%);
-  }
-  70% {
-    transform: translate(calc(var(--tm-fly-x) * 0.7), -60%);
+    transform: translateY(15%) scale(0.7);
   }
   100% {
     opacity: 1;
@@ -1025,12 +1033,38 @@
   }
 }
 
+.tm-sweep,
+.tm-bob,
 .tm-wings,
 .tm-butterfly-body {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/* ... then back and forth over the meadow, bobbing and leaning into its way, beating its wings. */
+.tm-done .tm-sweep {
+  animation: tm-sweep 7s ease-in-out 3.8s infinite alternate;
+}
+
+@keyframes tm-sweep {
+  to {
+    transform: translateX(var(--tm-sweep));
+  }
+}
+
+.tm-done .tm-bob {
+  animation: tm-bob 1.3s ease-in-out 2s infinite alternate;
+}
+
+@keyframes tm-bob {
+  from {
+    transform: translateY(20%) rotate(-6deg);
+  }
+  to {
+    transform: translateY(-30%) rotate(6deg);
+  }
 }
 
 .tm-wings svg {
@@ -1040,7 +1074,7 @@
 }
 
 .tm-done .tm-wings {
-  animation: tm-flap 0.25s ease-in-out 1.6s 12 alternate;
+  animation: tm-flap 0.3s ease-in-out 2s infinite alternate;
 }
 
 @keyframes tm-flap {

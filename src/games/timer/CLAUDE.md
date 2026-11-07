@@ -32,7 +32,13 @@ screen), then the pictures that run until the time is up:
 - „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
   from the top bulb into the bottom one, where its heap rises with a round top (`BulbSand`, shared with Abwechseln).
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
-  (`steps(var(--tm-secs))`, `runSeconds`), its head chewing and three leaf crumbs falling as it munches (`CRUMBS`); at the end a cocoon hangs on the branch and a butterfly flies out and settles on the meadow.
+  (`runSeconds`, `useBites`). The leaf is cut in six bands (`BANDS`), each eaten from the leaf's outline at the tip to
+  its outline at the stalk, so every bite takes leaf and what is left still looks like a leaf; the bites go down the
+  edge and back up (`BITE_ORDER`), and the head goes to each spot before it bites it off (`biteSpot`), its neck
+  stretching after it from the body crawling back along the midrib (`bodyFront`, never further than `REACH`), and three
+  leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
+  and the butterfly slips out and flies back and forth in the air above the meadow, bobbing, as long as the end is shown
+  (`BUTTERFLY`, user request, November 2026).
 - „Blume“ 🌸 (`flower.tsx`, H-53): the bear child waters a sprout in the flower bed with a garden hose coming from a
   tap on a post (`TAP`; a can that never ran dry made no sense, user feedback, November 2026), a drop from its nozzle
   every second; the stalk slides up out of the soil, pushing soil crumbs aside each second (`SoilCrumbs`), along a tall
@@ -166,7 +172,14 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
 - **Pieces wait on their own clock, not on React**: an apple's blossom, growing and fall are CSS animations with their
   moments as `animation-delay`, each apple in the cart appears at its landing, the cart's way and the train's halts are
   keyframes written once for the run. React
-  only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute.
+  only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute. The one exception is
+  the caterpillar, whose head must know where the next bite is: there the bites are counted from the clock once a
+  second (`useBites`) and the bands, head, neck and body are set by a style change a second, the figure gliding by a
+  CSS transition – small layers, a change a second, never per frame, and the leaf's drawing `memo` so it is never drawn
+  again (`bun run perf timer-raupe`).
+- **What takes a piece goes to it first** (user request, November 2026): the caterpillar's head moves to each spot of
+  the leaf before that spot goes, and bites it off there – never a head chewing in one place while the leaf goes
+  somewhere else. A new picture where someone eats, picks or carries pieces does the same.
 - **Seen from afar only what runs down stays bright** (H-48): a new picture puts its backdrop in `.tm-back` and its
   small helpers (posts, decorations) in `.tm-dims`; what runs down gets neither. A clipped edge drawn in the background's
   colour would show once that fades – cut edges with clipping boxes instead (the leaf's bands, the disc's halves).

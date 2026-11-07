@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
-import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
+import { BANDS, BITE_ORDER, BUTTERFLY, biteSpot, bitesPerBand, bodyFront, edgesAt, LEAF, LEAF_FLOOR, leafSpan, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { FLOWER_CHILD, FLOWER_FLOOR, GROWN_AT, SPOUT, SPROUT, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
@@ -133,7 +133,11 @@ describe("Timer", () => {
     expect(APPLE_FLOOR).toBeLessThanOrEqual(820);
     expect(LEAF.x + LEAF.w).toBeLessThanOrEqual(1200);
     // The leaf is eaten up to its stalk, never past it into the branch.
-    expect(EATEN).toBeLessThan(LEAF.w);
+    for (const band of BANDS) expect(band.end).toBeGreaterThan(0);
+    // The butterfly flies back and forth in the air, clear of the ✕ and the book's right margin.
+    expect(BUTTERFLY.left).toBeGreaterThanOrEqual(200);
+    expect(BUTTERFLY.right + BUTTERFLY.w).toBeLessThanOrEqual(1340);
+    expect(BUTTERFLY.y).toBeGreaterThanOrEqual(80);
     expect(LEAF_FLOOR).toBeLessThanOrEqual(820);
     expect(DISC.cx - DISC.face).toBeGreaterThanOrEqual(200);
     expect(DISC.cy - DISC.face).toBeGreaterThanOrEqual(80);
@@ -157,11 +161,40 @@ describe("Timer", () => {
     expect(MIN_APPLES).toBeGreaterThanOrEqual(6);
   });
 
-  test("a step every second: the caterpillar bites once a second, as many bites as the run has seconds", async () => {
+  test("a step every second: the caterpillar bites once a second, as many bites as the run has seconds", () => {
     expect(runSeconds(20_000)).toBe(20);
     expect(runSeconds(400)).toBe(1);
-    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    expect(css).toContain("tm-eat var(--tm-ms) steps(var(--tm-secs), end)");
+    for (const count of [60, 137, 600]) {
+      expect(bitesPerBand(count).reduce((a, b) => a + b, 0)).toBe(count);
+      // Every band is eaten from its start to its end, exactly by the last bite.
+      expect(edgesAt(0, count)).toEqual(BANDS.map((b) => b.start));
+      edgesAt(count, count).forEach((edge, i) => expect(edge).toBeCloseTo(BANDS[i].end, 6));
+      for (let bites = 0; bites < count; bites++) {
+        const band = BITE_ORDER[bites % BITE_ORDER.length];
+        const before = edgesAt(bites, count);
+        const after = edgesAt(bites + 1, count);
+        // One bite a second, on one band only.
+        before.forEach((edge, i) => (i === band ? expect(after[i]).toBeLessThan(edge) : expect(after[i]).toBe(edge)));
+      }
+    }
+  });
+
+  test("Raupe: the head goes to each spot it bites, on the leaf, within reach of the body (user request, November 2026)", () => {
+    for (const count of [10, 60, 600]) {
+      for (let bites = 0; bites < count; bites++) {
+        const spot = biteSpot(bites, count);
+        const band = BANDS[BITE_ORDER[bites % BITE_ORDER.length]];
+        // In the band that loses the bite, at its edge, where there is leaf.
+        expect(spot.y).toBeGreaterThanOrEqual(band.top - 0.01);
+        expect(spot.y).toBeLessThanOrEqual(band.top + LEAF.h / BANDS.length + 0.01);
+        expect(spot.x).toBeLessThanOrEqual(edgesAt(bites, count)[BITE_ORDER[bites % BITE_ORDER.length]]);
+        const span = leafSpan(spot.y);
+        expect(span).toBeDefined();
+        if (span) expect(spot.x).toBeGreaterThanOrEqual(span[0] - 30);
+        const front = bodyFront(bites, count);
+        expect(Math.hypot(spot.x - front.x, spot.y - front.y)).toBeLessThanOrEqual(REACH);
+      }
+    }
   });
 
   test("Zeit im Bild: tally marks never more than fit, each one still begun counts, none at the end", () => {

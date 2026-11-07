@@ -88,7 +88,7 @@ export function appleTimes(total: number, count: number): AppleTimes {
   };
 }
 
-/** The whole seconds of a run, at least one: the pictures' steps a second (`--tm-secs`, the caterpillar's bites). */
+/** The whole seconds of a run, at least one: the caterpillar's bites, one a second. */
 export function runSeconds(ms: number): number {
   return Math.max(1, Math.round(ms / 1000));
 }

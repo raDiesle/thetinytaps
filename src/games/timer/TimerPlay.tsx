@@ -31,7 +31,7 @@ import { CaterpillarScene } from "./caterpillar";
 import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, runSeconds, soonMs, trainSteps } from "./pieces";
+import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PizzaScene, SLICES } from "./pizza";
 import {
   AntHill,
@@ -62,7 +62,7 @@ import { clockOn, digits, ownTimeMs } from "./time";
 
 /** The child blows the candle out this long after the time is up, and the flame goes out. */
 const BLOW_MS = 700;
-/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
+/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to come out). */
 const END_MS = 4200;
 const END_MS_CATERPILLAR = 5600;
 /** The cheer at the end comes this long after the picture's own sound, so both are heard. */
@@ -438,7 +438,6 @@ function TimerRun({
   const stepped = picture === "train" && stops > 1;
   const stage = {
     "--tm-ms": `${total}ms`,
-    "--tm-secs": runSeconds(total),
     "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
     ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
   } as CSSProperties;
@@ -459,7 +458,7 @@ function TimerRun({
             </>
           )}
           {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
-          {picture === "caterpillar" && <CaterpillarScene glow={poke} />}
+          {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={endsAt - total} total={total} done={phase === "done"} />}
           {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
           {picture === "pizza" && <PizzaScene glow={poke} />}
           {picture === "flower" && <FlowerScene glow={poke} total={total} />}
