@@ -1,6 +1,5 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { Cloud } from "../shared";
-import { WalkingFamily } from "../family";
 import { Poke } from "../spots";
 import type { Box } from "../types";
 import { FallenLeaves, LEAF_COLOURS, Leaf } from "../weather";
@@ -134,9 +133,6 @@ export const PATH_BOXES: Box[] = [
   [790, 780, 250, 220],
 ];
 
-/** Where Mama Fox and her child walk on the path (the grown-up's foot point). */
-const FAMILY_AT: [number, number] = [918, 572];
-
 /** The sandy path from the front up to the pumpkin stall. */
 function Path() {
   const d = "M700 1010 C760 880 870 790 846 680 C828 600 850 520 872 452 L936 452 C948 520 968 600 976 690 C990 820 1060 900 1130 1010 Z";
@@ -228,10 +224,6 @@ export function Background() {
       <ellipse cx={BOY.x} cy={BOY.y + 6} rx="128" ry="34" fill="#a9bd60" />
       <ellipse cx={BOY.x - 20} cy={BOY.y - 4} rx="80" ry="16" fill="#c7d57e" opacity="0.7" />
       <Path />
-      {/* Mama Fox and her child walking along the sandy path */}
-      <g transform={`translate(${FAMILY_AT[0]} ${FAMILY_AT[1]}) scale(${depthScale(FAMILY_AT[1])})`}>
-        <WalkingFamily kind="fox" clothes={{ top: "#2f9e44", legs: "#5c4033", childTop: "#fab005", childLegs: "#1c7ed6" }} />
-      </g>
       {/* Small puddles from the last rain */}
       <Poke kind="wobble">
         <ellipse cx="420" cy="716" rx="40" ry="8" fill="#9cc3dd" opacity="0.8" />

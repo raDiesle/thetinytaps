@@ -2,15 +2,15 @@ import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES } from "./content";
 import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
-import { BOAT, BUCKET, BUCKET_FAMILY, bucketEdges, GOAL_Y, POT, SPOUT, WATER } from "./bucket";
-import { CAKE, CAKE_FAMILY, CAKE_FLOOR, DOUGH_START, OVEN, OVEN_WINDOW, TABLE } from "./cake";
+import { BOAT, BUCKET, bucketEdges, GOAL_Y, POT, SPOUT, WATER } from "./bucket";
+import { CAKE, CAKE_FLOOR, DOUGH_START, OVEN, OVEN_WINDOW, TABLE } from "./cake";
 import { DISC, DOTS, dotAt } from "./disc";
-import { FLOWER_FAMILY, FLOWER_FLOOR, SPROUT, STAKE, STALK } from "./flower";
-import { PIZZA, PIZZA_FAMILY, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
-import { MOON, ridgeAt, SKY_CUT, STARS, SUN, SUNSET_FAMILY, SUNSET_FLOOR } from "./sunset";
+import { FLOWER_CHILD, FLOWER_FLOOR, SPROUT, STAKE, STALK } from "./flower";
+import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
+import { MOON, ridgeAt, SKY_CUT, STARS, SUN, SUNSET_FLOOR } from "./sunset";
 import { applePlaces, haltMs, ladybugLaps, MAX_APPLES, MAX_DOTS, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
-import { ANT_FAMILY, ANTS, CANDLE, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
-import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
+import { ANTS, CANDLE, CHILD, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
 
 describe("Timer", () => {
@@ -40,9 +40,6 @@ describe("Timer", () => {
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
     expect(TRAIN.x).toBeGreaterThanOrEqual(200);
     expect(TRAIN.stop).toBeLessThanOrEqual(1400);
-    // The bear family at the station was cut off on a tablet when it stood right of x 1400 (grown-up 190 wide).
-    expect(TRAIN.family + 190).toBeLessThanOrEqual(1400);
-    expect(TRAIN.family - 110).toBeGreaterThan(TRAIN.stop);
     expect(GLASS.cx - GLASS.w / 2).toBeGreaterThanOrEqual(200);
     // With a margin: at 80 and 820 the hourglass's plates touched the screen's edges on a phone on its side.
     expect(GLASS.top - 44).toBeGreaterThanOrEqual(130);
@@ -73,8 +70,6 @@ describe("Timer", () => {
     expect(DISC.cx - DISC.face).toBeGreaterThanOrEqual(200);
     expect(DISC.cy - DISC.face).toBeGreaterThanOrEqual(80);
     expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
-    // The fox family stands right of the face (its child from x 1090).
-    expect(DISC.cx + DISC.face).toBeLessThan(1090);
   });
 
   test("piece by piece: one a minute, at least one, never more than fit (H-45)", () => {
@@ -119,8 +114,6 @@ describe("Timer", () => {
 
   test("the Ameisenstraße stays on every screen, its ants walk from under the cookie into the hill, one step a second (H-68)", async () => {
     expect(COOKIE.cx - COOKIE.w / 2).toBeGreaterThanOrEqual(190);
-    // The fox family right of the hill, the grown-up within x 1400 (190 wide).
-    expect(ANT_FAMILY + 190).toBeLessThanOrEqual(1400);
     expect(GROUND + 40).toBeLessThanOrEqual(820);
     expect(GROUND - HILL.h).toBeGreaterThanOrEqual(80 + 140);
     // The road starts under the cookie and ends at the hill's foot while it is still small, so ants come and go hidden.
@@ -135,22 +128,22 @@ describe("Timer", () => {
     expect(css).toContain(`animation: tm-march ${ANTS.n}s ease-in-out infinite`);
   });
 
-  test("Abwechseln keeps both families, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
-    expect(SWAP_FAMILIES.fox).toBeGreaterThanOrEqual(200);
-    expect(SWAP_FAMILIES.bear + 190).toBeLessThanOrEqual(1400);
+  test("Abwechseln keeps both children, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
+    expect(SWAP_CHILDREN.fox).toBeGreaterThanOrEqual(200);
+    expect(SWAP_CHILDREN.bear + CHILD.w).toBeLessThanOrEqual(1400);
     const glassLeft = SWAP_GLASS.cx - SWAP_GLASS.w / 2;
     const glassRight = SWAP_GLASS.cx + SWAP_GLASS.w / 2;
     expect(TOY.fox + TOY.w).toBeLessThanOrEqual(glassLeft + 10);
     expect(TOY.bear).toBeGreaterThanOrEqual(glassRight - 10);
-    // The fox child stands right of its grown-up (120 wide), the bear child left of its grown-up.
-    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_FAMILIES.fox + 190 - 10 + 120 - 10);
-    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_FAMILIES.bear - 120 + 10 + 10);
+    // The toy lies right beside the child whose turn it is: right of the fox child, left of the bear child.
+    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_CHILDREN.fox + CHILD.w - 10);
+    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_CHILDREN.bear + 10);
     expect(SWAP_GLASS.top).toBeGreaterThanOrEqual(80 + 140);
     expect(SWAP_FLOOR + 10).toBeLessThanOrEqual(820);
   });
 
-  // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a family standing to 1380
-  // was cut off there, so the new pictures keep their families' right edge within 1340.
+  // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380
+  // was cut off there, so the new pictures keep what matters within 1340.
   const RIGHT = 1340;
 
   test("Sonnenuntergang: the sun and the moon move behind the ridge, the cut of their boxes always hidden below it (H-54)", () => {
@@ -168,8 +161,6 @@ describe("Timer", () => {
       expect(s.y).toBeLessThan(ridgeAt(s.x) - 30);
       expect(Math.hypot(s.x - MOON.cx, s.y - (MOON.top + MOON.r))).toBeGreaterThan(MOON.r + 30);
     }
-    expect(SUNSET_FAMILY - 110).toBeGreaterThan(MOON.cx + MOON.r);
-    expect(SUNSET_FAMILY + 190).toBeLessThanOrEqual(RIGHT);
     expect(SUNSET_FLOOR).toBeLessThanOrEqual(820);
   });
 
@@ -179,13 +170,13 @@ describe("Timer", () => {
     expect(STALK.soil).toBeLessThanOrEqual(820);
     expect(SPROUT).toBeGreaterThan(0);
     expect(SPROUT).toBeLessThan(0.2);
-    expect(FLOWER_FAMILY).toBeGreaterThanOrEqual(200);
-    // The bear child (right of its grown-up, 120 wide) stands left of the bed.
-    expect(FLOWER_FAMILY + 190 - 10 + 120).toBeLessThanOrEqual(STALK.cx - 190);
+    // The bear child stands left of the bed.
+    expect(FLOWER_CHILD).toBeGreaterThanOrEqual(200);
+    expect(FLOWER_CHILD + CHILD.w).toBeLessThanOrEqual(STALK.cx - 190);
     expect(FLOWER_FLOOR).toBeLessThanOrEqual(820);
   });
 
-  test("Pizza: eight slices round the board, eaten at their eighths, the family beside it (H-47)", async () => {
+  test("Pizza: eight slices round the board, eaten at their eighths (H-47)", async () => {
     let area = 0;
     for (let i = 0; i < SLICES; i++) {
       const s = slice(i);
@@ -196,8 +187,7 @@ describe("Timer", () => {
       area += s.to - s.from;
     }
     expect(area).toBeCloseTo(2 * Math.PI);
-    expect(PIZZA.cx + PIZZA.r + 34).toBeLessThan(PIZZA_FAMILY - 110);
-    expect(PIZZA_FAMILY + 190).toBeLessThanOrEqual(RIGHT);
+    expect(PIZZA.cx + PIZZA.r).toBeLessThanOrEqual(RIGHT);
     expect(PIZZA_FLOOR).toBeLessThanOrEqual(820);
     // A slice is gone at its moment: the CSS lifts it off in as many seconds as its delay takes away.
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
@@ -205,7 +195,7 @@ describe("Timer", () => {
     expect(pieceMoments(8 * 60_000, SLICES)).toHaveLength(SLICES - 1);
   });
 
-  test("Rote Scheibe: the ladybug leaves a dot a round, never more than once round the face, clear of the family (H-67)", () => {
+  test("Rote Scheibe: the ladybug leaves a dot a round, never more than once round the face (H-67)", () => {
     expect(ladybugLaps(60_000)).toEqual({ dots: 1, every: 1, laps: 1 });
     expect(ladybugLaps(5 * 60_000)).toEqual({ dots: 5, every: 1, laps: 5 });
     expect(ladybugLaps(10_000)).toEqual({ dots: 1, every: 1, laps: 1 });
@@ -223,8 +213,6 @@ describe("Timer", () => {
       expect(x - DOTS.r).toBeGreaterThanOrEqual(200);
       expect(y - DOTS.r).toBeGreaterThanOrEqual(80);
       expect(y + DOTS.r).toBeLessThanOrEqual(820);
-      // The fox child stands from x 1090.
-      expect(x + DOTS.r).toBeLessThan(1090);
     }
   });
 
@@ -245,14 +233,13 @@ describe("Timer", () => {
     expect(SPOUT.x).toBeGreaterThan(rim.left + 20);
     expect(SPOUT.x).toBeLessThan(BOAT.left - 30);
     expect(SPOUT.y + SPOUT.fall).toBeGreaterThan(BUCKET.top);
-    // The pot between the bucket and the bear child (left of its grown-up, 120 wide), the family within the right edge.
+    // The pot beside the bucket, within the right edge.
     expect(POT.cx - 44).toBeGreaterThan(rim.right + 14);
-    expect(POT.cx + 50).toBeLessThanOrEqual(BUCKET_FAMILY - 120 + 20);
-    expect(BUCKET_FAMILY + 190).toBeLessThanOrEqual(RIGHT);
+    expect(POT.cx + 50).toBeLessThanOrEqual(RIGHT);
     expect(POT.floor).toBeLessThanOrEqual(820);
   });
 
-  test("Kuchen: the dough rises inside the oven's window, and the cake comes out onto the table by the family (H-53)", () => {
+  test("Kuchen: the dough rises inside the oven's window, and the cake comes out onto the table (H-53)", () => {
     expect(DOUGH_START).toBeGreaterThan(0);
     expect(DOUGH_START).toBeLessThan(0.3);
     // The cake, risen, is seen whole through the window.
@@ -264,9 +251,8 @@ describe("Timer", () => {
     expect(CAKE.dough.y + CAKE.dough.h).toBeGreaterThan(CAKE.rim);
     expect(OVEN.x + OVEN.w).toBeLessThanOrEqual(1340);
     expect(OVEN.y).toBeGreaterThanOrEqual(80 + 140);
-    // The table lies between the family (its child right of its grown-up) and the oven, and holds the cake.
-    expect(CAKE_FAMILY).toBeGreaterThanOrEqual(200);
-    expect(CAKE_FAMILY + 190 - 10 + 120).toBeLessThanOrEqual(TABLE.x);
+    // The table stands left of the oven and holds the cake.
+    expect(TABLE.x).toBeGreaterThanOrEqual(200);
     expect(TABLE.x + TABLE.w).toBeLessThan(OVEN.x);
     expect(CAKE.w).toBeLessThan(TABLE.w);
     expect(CAKE_FLOOR).toBeLessThanOrEqual(820);

@@ -632,7 +632,7 @@ function Languages() {
 }
 
 const MASCOT_WORK: Record<MascotTask["work"], string> = { drawing: "✏️ Zeichnung", picture: "🖼️ Gemini-Bild" };
-const MASCOT_STATE: Record<NonNullable<MascotTask["state"]>, string> = { done: "✅", partial: "🟡" };
+const MASCOT_STATE: Record<NonNullable<MascotTask["state"]>, string> = { done: "✅", partial: "🟡", removed: "🚫" };
 
 /**
  * Where the app's mascots, the fox and the bear, could still turn up (content/ideas/mascotStatus.ts), game by game:
@@ -644,10 +644,11 @@ function Mascots({ onShow }: { onShow: (id: string) => void }) {
     <section id="maskottchen" className="ideas-panel">
       <h2>🦊🐻 Fuchs & Bär: wo die Maskottchen der App noch vorkommen könnten</h2>
       <p className="ideas-hint">
-        Fuchs und Bär kommen in den Spielen immer wieder vor, aber nicht überall – Spiel für Spiel, nach Aufwand, und immer als Großer mit Kind (Mama, Papa, Oma
-        oder Opa mit dem Fuchs- oder Bärenkind): Das Kind tut die Sache, der Große ist dabei. ✏️ Zeichnungen sind Code und gehen jederzeit; 🖼️ Gemini-Bilder
-        warten und werden zusammen in einem Batch gemacht, das ist günstiger – sag dann z. B. „mach die wartenden Fuchs- und Bärenbilder“. ✅ fertig, 🟡
-        teilweise, · offen. Ideen dazu: D-16 bis D-21.
+        Fuchs und Bär kommen in den Spielen immer wieder vor, aber nur, wo sie zum Spiel gehören: als Figur, die das Spiel zeigt und die darin etwas tut, oder
+        in einer Rolle, die das Bild schon hat (Bäcker, Fahrerin). Nie als Deko, die daneben steht, zuschaut oder jubelt – Kinder wollen sie antippen und
+        denken, sie gehöre zum Spiel, und jedes Ding mehr ist ein Reiz mehr. Das Kind tut die Sache, ein Großer nur, wo er auch etwas tut. ✏️ Zeichnungen sind
+        Code und gehen jederzeit; 🖼️ Gemini-Bilder warten und werden zusammen in einem Batch gemacht, das ist günstiger – sag dann z. B. „mach die wartenden
+        Fuchs- und Bärenbilder“. ✅ fertig, 🟡 teilweise, 🚫 als Deko wieder herausgenommen oder nicht zu bauen, · offen. Ideen dazu: D-16 bis D-21.
       </p>
       <div className="ideas-overview-scroll">
         <table className="ideas-overview ideas-languages ideas-mascots">
@@ -695,7 +696,8 @@ function Mascots({ onShow }: { onShow: (id: string) => void }) {
           <tfoot>
             <tr>
               <th colSpan={5}>
-                Fertig {tasks.filter((t) => t.state === "done").length}/{tasks.length} · Gemini-Bilder für den nächsten Batch: {waitingMascotPictures()}
+                Fertig {tasks.filter((t) => t.state === "done").length}/{tasks.filter((t) => t.state !== "removed").length} · Gemini-Bilder für den nächsten
+                Batch: {waitingMascotPictures()}
               </th>
             </tr>
           </tfoot>

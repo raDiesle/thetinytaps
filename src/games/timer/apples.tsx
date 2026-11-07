@@ -1,7 +1,7 @@
 import { memo, type CSSProperties } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
 import { applePlaces } from "./pieces";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Child, Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Apfelbaum (H-45): as many apples hang on the tree as minutes are set, and every minute one falls with a plop into the
 // basket the bear child holds. Each apple is a small layer of its own whose fall is a CSS animation waiting for its
@@ -11,7 +11,7 @@ import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 /** The tree's crown: its middle and radii. */
 export const CROWN = { cx: 560, cy: 320, rx: 310, ry: 220 } as const;
 
-/** The ground the tree, the family and the basket stand on. */
+/** The ground the tree, the child and the basket stand on. */
 export const APPLE_FLOOR = 770;
 
 /** The basket in front of the bear child: its middle, width, the rim's height and its bottom. */
@@ -171,12 +171,12 @@ export const BasketFront = memo(function BasketFront() {
   );
 });
 
-/** The whole picture: the tree with its apples, the bear grown-up and the child with the basket. */
+/** The whole picture: the tree with its apples and the bear child with the basket. */
 export function AppleScene({ count, total, glow }: { count: number; total: number; glow: number }) {
   return (
     <>
       <AppleBackdrop />
-      <Family kind="bear" x={BASKET.cx + 50} floor={APPLE_FLOOR} childLeft />
+      <Child kind="bear" x={BASKET.cx - 60} floor={APPLE_FLOOR} />
       <AppleHeap />
       <Apples count={count} total={total} glow={glow} />
       <BasketFront />

@@ -8,7 +8,7 @@ import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playRandomNote } from "@/lib/sfx";
 import { LetterWord } from "./Cards";
-import { useLettersSay } from "./voice";
+import { useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 
 /** Keys closer together than this only make ripples, so mashing the whole keyboard doesn't count as finding. */
@@ -65,6 +65,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
 
   const say = useLettersSay();
+  const praise = useLettersPraise();
 
   const softTap = useCallback(
     (x?: number, y?: number) => {
@@ -137,14 +138,14 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
         setFound(true);
         if (settings.sounds) playChime();
         say(pack.letterSentence(current.letter, current.word));
-        say(pick(pack.praise), true);
+        praise(pick(pack.praise));
         return;
       }
       softTap();
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, say, softTap, settings.sounds],
+    [current, found, wrong, pack, say, praise, softTap, settings.sounds],
   );
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { memo, type CSSProperties } from "react";
 import { ladybugLaps } from "./pieces";
-import { Draw, Family, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Rote Scheibe (H-47): the plainest picture, as many Kitas know it from the „Time Timer“ – a big red disc on a white
 // face that gets smaller like a clock's hand going round, until nothing red is left. Bright colour on plain paper, to be
@@ -161,7 +161,7 @@ const Dots = memo(function Dots({ dots, total }: { dots: number; total: number }
 });
 
 /**
- * The whole picture: the face with the red disc, the ladybug going round it and its dots, and the fox family beside it.
+ * The whole picture: the face with the red disc, the ladybug going round it and its dots.
  * `total` is how long it runs, `set` how long a grown-up set (the rounds are cut from it).
  */
 export function DiscScene({ glow, total, set }: { glow: number; total: number; set: number }) {
@@ -174,7 +174,6 @@ export function DiscScene({ glow, total, set }: { glow: number; total: number; s
       <Hand />
       <Dots dots={dots} total={total} />
       <Ladybug lap={total / laps} />
-      <Family kind="fox" x={1200} floor={790} childLeft />
     </>
   );
 }

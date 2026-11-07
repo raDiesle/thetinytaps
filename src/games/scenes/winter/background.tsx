@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { HORIZON, depthScale } from "../layout";
 import { Cloud } from "../shared";
-import { WalkingFamily } from "../family";
 import { Poke } from "../spots";
 import { Snow } from "../weather";
 import { Cap, SNOW, SNOW_SHADE } from "../winterbaustelle/parts";
@@ -324,10 +323,6 @@ export function Background() {
         </OnGround>
       </Poke>
       <Pond />
-      {/* Papa Bear and his child on the ice, hand in hand (bears: the picture's wild fox stays the only fox) */}
-      <g transform={`translate(392 688) scale(${depthScale(688)})`}>
-        <WalkingFamily kind="bear" clothes={{ top: "#e03131", legs: "#343a40", childTop: "#4dabf7", childLegs: "#7048e8" }} />
-      </g>
       <Hill />
       <Path />
       {/* The church stands on a little white rise; snow lies on the low wall around it. */}

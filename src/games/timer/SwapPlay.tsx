@@ -7,18 +7,18 @@ import { useT } from "@/lib/language";
 import { playChime, playMelody, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
-import { Family } from "./scenes";
+import { Child } from "./scenes";
 import type { SwapToy, TimerPicture } from "./settings";
-import { SWAP_FAMILIES, SWAP_FLOOR, SWAP_TOYS, SwapBackdrop, SwapHourglass, Toy } from "./swap";
+import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_TOYS, SwapBackdrop, SwapHourglass, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
 
 /** Who has the toy. */
-type Child = "fox" | "bear";
+type Holder = "fox" | "bear";
 
 /** The turns so far: counted from `start`, the first one being `first`'s. */
 interface Turns {
   start: number;
-  first: Child;
+  first: Holder;
 }
 
 /** The turn running at `now`, counted from 0. */
@@ -103,7 +103,7 @@ export function SwapRun({
     return () => clearTimeout(timer);
   }, [done]);
 
-  const holder: Child = (turn % 2 === 0) === (turns.first === "fox") ? "fox" : "bear";
+  const holder: Holder = (turn % 2 === 0) === (turns.first === "fox") ? "fox" : "bear";
   const flip = shown.current;
   useEffect(() => {
     shown.current = true;
@@ -140,13 +140,13 @@ export function SwapRun({
       <div className="tm-play" data-picture="swap" onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
         <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
           <SwapBackdrop />
-          <Family kind="fox" x={SWAP_FAMILIES.fox} floor={SWAP_FLOOR + 10} />
-          <Family kind="bear" x={SWAP_FAMILIES.bear} floor={SWAP_FLOOR + 10} childLeft />
+          <Child kind="fox" x={SWAP_CHILDREN.fox} floor={SWAP_FLOOR + 10} />
+          <Child kind="bear" x={SWAP_CHILDREN.bear} floor={SWAP_FLOOR + 10} />
           <SwapHourglass key={`${turns.start}-${turn}`} ms={turnMs} startedAt={turnStart} flip={flip} running={!done} glow={poke} />
           <Toy toy={toy} bear={holder === "bear"} />
         </div>
         <FeedbackLayer effects={effects} />
-        {done && <GameEnd delayMs={3200} noFamily onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
+        {done && <GameEnd delayMs={3200} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>
@@ -168,7 +168,7 @@ export function SwapRun({
             })}
             value={holder}
             // Starts that child's turn anew, with a full hourglass: for who begins, or to set it right.
-            onChange={(first: Child) => setTurns({ start: Date.now(), first })}
+            onChange={(first: Holder) => setTurns({ start: Date.now(), first })}
             options={[
               {
                 value: "fox",

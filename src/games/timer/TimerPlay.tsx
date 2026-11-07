@@ -21,7 +21,6 @@ import { PizzaScene, SLICES } from "./pizza";
 import {
   AntHill,
   AntRoad,
-  ANT_FAMILY,
   AntsBackdrop,
   AntsHome,
   CANDLE,
@@ -29,13 +28,11 @@ import {
   CandleBackdrop,
   CandleFlame,
   CandleWax,
-  Family,
-  GROUND,
+  Child,
   Layer,
   RAIL_Y,
   RailAhead,
   Sand,
-  SAND_FLOOR,
   SandBackdrop,
   SandFrame,
   TRAIN,
@@ -51,7 +48,7 @@ import { clockOn, digits, ownTimeMs } from "./time";
 
 /** The child blows the candle out this long after the time is up, and the flame goes out. */
 const BLOW_MS = 700;
-/** Then the family cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
+/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
 const END_MS = 3200;
 const END_MS_CATERPILLAR = 5200;
 /** After this long without a tap, all that is small steps back and only what runs down stays bright (H-48). */
@@ -70,13 +67,13 @@ function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
   return settings.minutes * 60_000;
 }
 
-/** running: the picture runs down; blow: the time is up, the candle is blown out; done: the family cheers. */
+/** running: the picture runs down; blow: the time is up, the candle is blown out; done: the picture's end. */
 type Phase = "running" | "blow" | "done";
 
 /**
  * The timer: one picture runs down for the minutes a grown-up set, with no numbers for the child – the train rolls to
  * the station, the sand runs through the hourglass, the candle burns down. Every tap or key gets an answer (steam and
- * a whistle, twinkling, the flame flaring). At the end a friendly tune and the family waving, then „Nochmal“ and
+ * a whistle, twinkling, the flame flaring). At the end a friendly tune, then „Nochmal“ and
  * „Weiter“ (the next picture, the same minutes).
  */
 export function TimerPlay({
@@ -251,7 +248,7 @@ function TimerRun({
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
   const [far, setFar] = useState(false);
-  // Gleich ist es so weit (H-49): a while before the end the bell rings once and the family waves.
+  // Gleich ist es so weit (H-49): a while before the end the bell rings once and the child (where there is one) waves.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
   const { effects, ripple, glow } = useTapFeedback();
@@ -398,7 +395,6 @@ function TimerRun({
               <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
                 <Train puff={poke} />
               </Layer>
-              <Family kind="bear" x={TRAIN.family} floor={628} childLeft />
             </>
           )}
           {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
@@ -408,13 +404,12 @@ function TimerRun({
           {picture === "flower" && <FlowerScene glow={poke} running={phase === "running"} />}
           {picture === "bucket" && <BucketScene glow={poke} running={phase === "running"} />}
           {picture === "cake" && <CakeScene glow={poke} />}
-          {picture === "sunset" && <SunsetScene glow={poke} done={phase === "done"} />}
+          {picture === "sunset" && <SunsetScene glow={poke} />}
           {picture === "sand" && (
             <>
               <SandBackdrop />
               <Sand running={phase === "running"} glow={poke} />
               <SandFrame />
-              <Family kind="fox" x={1000} floor={SAND_FLOOR + 10} />
             </>
           )}
           {picture === "candle" && (
@@ -423,7 +418,7 @@ function TimerRun({
               <WaxPuddle />
               <CandleWax glow={poke} />
               <CandleFlame out={phase === "done"} flare={phase === "running" ? poke : 0} />
-              <Family kind="bear" x={CANDLE.cx - CANDLE.w / 2 - 300} floor={CANDLE.base + 22} />
+              <Child kind="bear" x={CANDLE.cx - CANDLE.w / 2 - 120} floor={CANDLE.base + 22} />
             </>
           )}
           {picture === "ants" && (
@@ -433,7 +428,6 @@ function TimerRun({
               <Cookie glow={poke} />
               <AntHill />
               <AntsHome />
-              <Family kind="fox" x={ANT_FAMILY} floor={GROUND + 30} childLeft laugh={phase === "done"} />
             </>
           )}
         </div>
@@ -441,7 +435,6 @@ function TimerRun({
         {phase === "done" && (
           <GameEnd
             delayMs={picture === "caterpillar" ? END_MS_CATERPILLAR : END_MS}
-            noFamily
             onAgain={onAgain}
             next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }}
           />

@@ -244,7 +244,7 @@
   }
 }
 
-/* The family stands still while it waits; at the end the grown-up and the child wave and hop. */
+/* The child stands still while it waits; at the end it waves and hops. */
 .tm-mascot .mascot-arm {
   transform-box: view-box;
   transform-origin: 144px 178px;
@@ -256,10 +256,6 @@
 
 .tm-done .tm-mascot {
   animation: hop 0.6s ease-out 2;
-}
-
-.tm-done .tm-mascot-child {
-  animation-delay: 0.2s;
 }
 
 @keyframes tm-wave {
@@ -281,7 +277,7 @@
 }
 
 /* The bear child leans to the candle and blows it out. */
-.tm-blow .tm-mascot-child {
+.tm-blow .tm-mascot {
   transform-origin: 50% 100%;
   animation: tm-lean 0.7s ease-in-out forwards;
 }
@@ -709,16 +705,6 @@
   }
 }
 
-/* The fox family cheers when the butterfly has come. */
-[data-picture="caterpillar"] .tm-done .tm-mascot,
-[data-picture="caterpillar"] .tm-done .mascot-arm {
-  animation-delay: 4s;
-}
-
-[data-picture="caterpillar"] .tm-done .tm-mascot-child {
-  animation-delay: 4.2s;
-}
-
 /* Rote Scheibe (H-47): two white halves turn over the red, the right one in the first half of the time and the left one
    in the second, each clipped by its half of the face; the hand goes round once, the knob turns a petal a second. */
 .tm-red {
@@ -859,7 +845,7 @@
   }
 }
 
-/* Seen from afar (H-48): a while after the last tap the backdrop, the family and the little stops step back into the
+/* Seen from afar (H-48): a while after the last tap the backdrop, the child and the little stops step back into the
    dark, and only what runs down stays bright – the rail ahead and the train, the sand, the flame, the apples, the leaf,
    the red. A tap brings everything back at once. */
 .tm-back,
@@ -1210,13 +1196,9 @@
 }
 
 /* Gleich ist es so weit (H-49): a while before the end (a minute, or the last fifth of a short time) a bell rings once
-   and the family waves once – from afar too, since it brings the picture back (`tm-soon`, only while running). */
+   and the child (where there is one) waves once – from afar too, since it brings the picture back (`tm-soon`, only while running). */
 .tm-running.tm-soon .mascot-arm {
   animation: tm-wave-soon 2.4s ease-in-out;
-}
-
-.tm-running.tm-soon .tm-mascot-child .mascot-arm {
-  animation-delay: 0.3s;
 }
 
 @keyframes tm-wave-soon {
@@ -1335,11 +1317,6 @@
 
 .tm-done .tm-dusk-land {
   opacity: 0.6;
-}
-
-/* Night has come: the family only waves good night, sleepy, without hopping. */
-[data-picture="sunset"] .tm-done .tm-mascot {
-  animation: none;
 }
 
 @keyframes tm-set {
