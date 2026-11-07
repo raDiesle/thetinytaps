@@ -713,7 +713,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
   and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
   `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
-  browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
+  browser's language. Texts say only what the page really does, and keep saying it: a change that adds, removes or
+  renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
+  text in both languages in the same commit, and its book's and the home page's where they name it – they had fallen
+  behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
+  feedback, November 2026; `content.test.ts` checks that a book's text names each of its games). No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
   screens, which „Ein paar Worte von uns“ on the home page (`ParentsNote`) tells: the real world first, then a screen together,
   later a learning game alone, plain watching least – Fun for Both meant as that first step together (user
