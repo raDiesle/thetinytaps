@@ -673,5 +673,13 @@ export const feelingsCheckInIdeas: IdeaArea = {
       partial:
         "Gebaut (4. November 2026): das Wetter des Gefühls klein, mittel oder groß („Ein bisschen“, „Mittel“, „Ganz doll“); bei „Ganz doll“ und einem schweren Gefühl (traurig, wütend, ängstlich, aufgeregt) pusten Kind und Fuchs oder Bär erst zweimal langsam zusammen, ein Kreis wächst und schrumpft dazu. Seit dem 6. November 2026 (Rückmeldung) ein Regler zum Schieben: ein Tipp auf das Gefühl zeigt sofort den kleinen Bären mit dem Regler, und seine Gesten werden mit jedem Schritt stärker (Arme hoch vor Freude, Fäuste und rote Backen vor Wut); das Pusten ist jetzt eine Karte in „Was brauche ich?“ (C-31). Seit dem 6. November 2026 (Wunsch) statt des Reglers drei Bilder nebeneinander: dasselbe Bild des Gefühls ein bisschen, schon ziemlich und ganz doll, jede Stufe deutlich anders.",
     },
+    {
+      id: "C-73",
+      emoji: "🗣️",
+      title: "„Wie geht's dir?“ und „Was brauche ich?“ mit Stimme, in jeder Sprache",
+      text: "Beide Spiele sprechen immer, haben aber noch keine Aufnahme und bleiben darum stumm. Ihre 16 Sätze („Wie geht's dir heute?“, „Wie doll ist es?“, „Ein bisschen.“ bis „Ganz doll!“, „Was brauchst du jetzt?“, „Kuscheln tut gut.“ und die sieben anderen, „Komm, wir pusten zusammen. Puuuh.“, „Schon besser.“) sind schon in allen sieben Sprachen geschrieben. Bisher würde nur Deutsch aufgenommen; für die anderen Sprachen müssen sie in die Aufnahmeliste (recordedLines.ts). Neu dazu: Tippt das Kind ein Gefühl an, sagt die Stimme seinen Namen, bevor sie fragt, wie doll es ist („Traurig. Wie doll ist es?“). Die Namen stehen schon in jeder Sprache unter den Karten. Kosten: die 16 Sätze in allen sieben Sprachen ≈ 340 Credits (Deutsch allein ≈ 50), die acht Namen ≈ 90 Credits.",
+      why: "Ein Gefühl zu benennen ist der erste Schritt, es zu lenken. Ein Kind, das noch nicht liest, hört so das Wort zu seinem Bild, und die Fragen führen es ohne den Großen durch beide Spiele. „Wie geht's dir?“ ist ein Schritt im Tagesplan und läuft morgens und abends: Hier lohnt eine Aufnahme besonders.",
+      effort: "S",
+    },
   ],
 };

@@ -262,6 +262,17 @@ export const timerIdeas: IdeaArea = {
         "Gebaut als Bild „Wecker“ (Wunsch 7. November 2026): ein türkiser Wecker mit gelber Schlummertaste, lila Knöpfen, Füßchen, Stern- und Herzaufkleber, im Bildschirm orange Segmentziffern, Funkmast und Weckerglocke. Unter den Ziffern gehen 20 Leuchtkästchen eins nach dem anderen von rechts aus. Ein Tippen drückt die Schlummertaste, am Ende piept er dreimal und wackelt klingelnd auf seinen Füßen.",
     },
     {
+      id: "H-71",
+      emoji: "🎾",
+      title: "Abwechseln beim Tennis",
+      text: "Noch ein Timer zum Abwechseln, bei dem man von Weitem sieht, wer dran ist: Fuchskind und Bärenkind spielen Tennis. Der Ball liegt auf dem Schläger dessen, der dran ist, und seine Seite des Platzes liegt im Licht, die andere im Schatten. Ist die Zeit um, schlägt das Kind den Ball, und er fliegt langsam in hohem Bogen übers Netz zum anderen.",
+      why: "Ein Ball, der hin und her geht, ist für Kinder das Bild fürs Abwechseln schlechthin; wohin er fliegt, verfolgen sie mit den Augen, und wer ihn hat, ist dran.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Tennis“ in der Gruppe Abwechseln (Wunsch 7. November 2026): ein blauer Platz mit Netz vor einem grünen Zaun, die beiden Kinder stehen still mit ihren Schlägern. Zu Beginn leuchten die Seiten abwechselnd auf, langsamer und langsamer, bis eine bleibt. Der Ball hüpft auf dem Schläger dessen, der dran ist; eine Anzeigetafel über dem Netz hat zehn Lichter, die eins nach dem anderen ausgehen. Ist die Zeit um, schwingt der Schläger, der Ball fliegt in gut zwei Sekunden übers Netz, und die Schatten wechseln, sobald er das Netz überquert.",
+    },
+    {
       id: "H-69",
       emoji: "💧",
       title: "Tropfen füllen den Eimer",
@@ -271,6 +282,14 @@ export const timerIdeas: IdeaArea = {
       rejected: true,
       partial:
         "Abgelehnt und wieder herausgenommen (Feedback 7. November 2026: „macht für mich keinen Sinn“ – woher das Schiff, warum die Blume blüht, woher das ganze Wasser aus der Kanne kommt). Gebaut war es als Bild „Eimer“: Die Gießkanne hängt an einem Pfosten über einem durchsichtigen Eimer im Garten, jede Sekunde fällt ein Tropfen, und auf dem Wasser breitet sich ein Ring aus. Das Wasser steigt bis zum roten Strich, wo das Holzschiff an einem Faden von einem Stock über dem Eimer schon wartet. Am Ende schwimmt es und schaukelt kurz, und die Blume im Topf neben dem Eimer geht auf; die Bärenfamilie steht daneben und winkt (das Bärenkind gießt nicht selbst mit dem Eimer).",
+    },
+    {
+      id: "H-72",
+      emoji: "🗣️",
+      title: "Timer: Die Stimme sagt Ziel, „gleich“ und „fertig“",
+      text: "Der Timer sagt bisher nichts. Mit Tapsis Stimme (ElevenLabs, wie Zähne putzen) sagt jedes Bild drei kurze Sätze: am Anfang, sobald die Seite stillliegt, wohin es geht; eine Minute vor dem Ende, zur Glocke von H-49, „Gleich ist es so weit!“; und am Ende, was jetzt da ist. Vorschläge: Zug „Der Zug fährt zum Bahnhof.“ – „Der Zug ist am Bahnhof!“ · Apfelbaum „Der Apfelbaum wächst.“ – „Alle Äpfel sind im Wagen!“ · Sanduhr „Der Sand rieselt.“ – „Der Sand ist durch!“ · Raupe „Die Raupe frisst das Blatt.“ – „Das Blatt ist weg. Ein Schmetterling!“ · Blume „Die Blume bekommt Wasser.“ – „Die Blume blüht!“ · Kerze „Die Kerzen brennen.“ – „Alle Kerzen sind aus!“ · Sonnenaufgang „Der Mond geht schlafen.“ – „Die Sonne ist da!“ · Rote Scheibe „Die rote Scheibe wird kleiner.“ – „Die Scheibe ist weg!“ · Pizza „Wir essen die Pizza.“ – „Die Pizza ist aufgegessen!“ · Wecker „Der Wecker zählt.“ – „Der Wecker klingelt!“ · Abwechseln „Wer fängt an?“ beim Auslosen, dann bei jedem Wechsel „Tauschen! Jetzt ist das Fuchskind dran.“ oder „… das Bärenkind dran.“ Zusammen 25 Sätze, etwa 800 Zeichen: auf Deutsch ≈ 90 Credits, in allen sieben Sprachen ≈ 500.",
+      why: "Kleine Kinder nehmen ein Ende leichter an, wenn es angekündigt und benannt wird: „Der Zug ist am Bahnhof!“ sagt, warum es jetzt weitergeht, auch wenn der Große gerade nicht hinschaut. Der Satz am Anfang sagt, worauf das Kind wartet, und das Bild zeigt es dann.",
+      effort: "S",
     },
   ],
 };

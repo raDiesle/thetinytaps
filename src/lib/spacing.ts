@@ -24,3 +24,28 @@ export function spaced(gapMs: number, now: () => number = () => performance.now(
     },
   };
 }
+
+/**
+ * How long one key (or one thing tapped) pressed again and again waits before it is said and sounded again: a child
+ * hammering B heard „B wie Ball!“ and a note at every press (user feedback from Buchstaben & Zahlen, November 2026).
+ */
+export const REPEAT_PAUSE_MS = 3000;
+
+/**
+ * A gate for presses of the same key: `pass(key)` is true for another key than the last one passed, and for that same
+ * key again only once `gapMs` lie since it passed. Measured from the last pass, so a child hammering one key still
+ * hears it now and then. `now` is for tests.
+ */
+export function repeatPause(gapMs: number = REPEAT_PAUSE_MS, now: () => number = () => performance.now()) {
+  let lastKey: string | null = null;
+  let last = Number.NEGATIVE_INFINITY;
+  return {
+    pass: (key: string) => {
+      const at = now();
+      if (key === lastKey && at - last < gapMs) return false;
+      lastKey = key;
+      last = at;
+      return true;
+    },
+  };
+}

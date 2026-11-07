@@ -5,12 +5,13 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
-import { loadRecordings, playChime, playClick, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
+import { loadRecordings, playChime, playClick, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
-import type { SwapToy, TimeShown, TimerPicture } from "./settings";
+import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
+import { Ball, COURT, FLIGHT_MS, Racket, TennisBackdrop, TennisBoard, TennisPlayers, tennisStyle } from "./tennis";
 import { TimeLeft } from "./TimerPlay";
 
 /** Children cheering at the clock time set (a recording, else a flourish). */
@@ -28,6 +29,14 @@ const DRAW_HOLD_MS = 500;
 
 /** How long the toy's hop takes: the first turn starts as it lands. */
 const HOP_MS = 1200;
+
+/** Tennis: the hit as the ball leaves a racket ("plock"), and its landing on the other racket, softer. */
+function playHit() {
+  playKnock(1000);
+}
+function playLand() {
+  playKnock(760);
+}
 
 /** The turns so far: counted from `start`, the first one being `first`'s. */
 interface Turns {
@@ -50,8 +59,11 @@ const other = (h: Holder): Holder => (h === "fox" ? "bear" : "fox");
  * grown-up leaves with ✕ – or until the clock time set, then both lamps shine, children cheer and „Nochmal“ and „Weiter“
  * come. Real time like every timer: the turn is worked out from the clock, so a phone that slept shows the right child.
  * Behind ⚙️ grown-ups pick the toy, say whose turn it is (which starts that turn anew) and see the time to the change.
+ * Tennis (`picture` "tennis") takes turns the same way: the side in the light is the one with the ball, which the child
+ * bounces on its racket until it hits it slowly over the net, and a board's lights go out over the turn.
  */
 export function SwapRun({
+  picture,
   turnMs,
   totalMs,
   until,
@@ -62,6 +74,8 @@ export function SwapRun({
   onAgain,
   onPicture,
 }: {
+  /** How the turns are shown: the toy between two cushions, or two children playing tennis. */
+  picture: TurnPicture;
   /** One child's turn, in ms. */
   turnMs: number;
   /** With a clock time set: how long until then, in ms; otherwise it goes on until a grown-up stops it. */
@@ -88,22 +102,37 @@ export function SwapRun({
   const [poke, setPoke] = useState(0);
   /** Counts the toy's moves, so it hops each time. */
   const [hop, setHop] = useState(0);
+  /** Where the toy or ball came from on its last move (Tennis: the child who hit it swings its racket). */
+  const [from, setFrom] = useState<Holder | "middle">("middle");
+  const tennis = picture === "tennis";
+  /** How long the move onto the first child's place takes: the turn starts as it lands. */
+  const moveMs = tennis ? FLIGHT_MS : HOP_MS;
+  const holderNow = useRef<Holder | null>(null);
   const drawTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { effects, ripple, glow, celebrate } = useTapFeedback();
   useWakeLock(!done);
   useEffect(() => loadRecordings(["cheer"]), []);
 
   /** A child's turn begins now (or after the toy's hop): the toy hops over to its cushion with a whoosh and a chime. */
-  const begin = useCallback((first: Holder, after: number) => {
-    for (const timer of drawTimers.current) clearTimeout(timer);
-    drawTimers.current = [];
-    setDrawn(null);
-    setRunning(false);
-    setTurns({ start: Date.now() + after, first });
-    setHop((n) => n + 1);
-    playWhoosh();
-    drawTimers.current.push(setTimeout(playChime, 700));
-  }, []);
+  const begin = useCallback(
+    (first: Holder, after: number) => {
+      for (const timer of drawTimers.current) clearTimeout(timer);
+      drawTimers.current = [];
+      setDrawn(null);
+      setRunning(false);
+      setTurns({ start: Date.now() + after, first });
+      setFrom(holderNow.current ?? "middle");
+      setHop((n) => n + 1);
+      if (tennis) {
+        playHit();
+        drawTimers.current.push(setTimeout(playLand, FLIGHT_MS));
+        return;
+      }
+      playWhoosh();
+      drawTimers.current.push(setTimeout(playChime, 700));
+    },
+    [tennis],
+  );
 
   // The lamps draw who begins, once the page lies still: on and off in turn with a click, slower and slower.
   useEffect(() => {
@@ -123,13 +152,13 @@ export function SwapRun({
           }, at),
         );
       });
-      timers.push(setTimeout(() => begin(winner, HOP_MS), at + DRAW_HOLD_MS));
+      timers.push(setTimeout(() => begin(winner, moveMs), at + DRAW_HOLD_MS));
     });
     return () => {
       cancel();
       for (const timer of drawTimers.current) clearTimeout(timer);
     };
-  }, [begin, endsAt]);
+  }, [begin, endsAt, moveMs]);
 
   // The turn, checked at least every second and again when the page comes back (timers sleep in the background).
   useEffect(() => {
@@ -160,17 +189,20 @@ export function SwapRun({
     };
   }, [turns, turnMs, endsAt, done]);
 
-  // The toy hops over with a whoosh and a chime as the next turn starts.
+  // The toy hops over with a whoosh and a chime as the next turn starts – or the ball is hit over the net with a plock
+  // and lands on the other racket.
   const lastTurn = useRef(turn);
   useEffect(() => {
     if (turn === lastTurn.current) return;
     lastTurn.current = turn;
     if (turn === 0) return;
+    setFrom(holderNow.current === "fox" ? "bear" : "fox");
     setHop((n) => n + 1);
-    playWhoosh();
-    const timer = setTimeout(playChime, 700);
+    if (tennis) playHit();
+    else playWhoosh();
+    const timer = setTimeout(tennis ? playLand : playChime, tennis ? FLIGHT_MS : 700);
     return () => clearTimeout(timer);
-  }, [turn]);
+  }, [turn, tennis]);
   // At the clock time set, the end is plain like every timer's: children cheer and a few things rise slowly.
   useEffect(() => {
     if (!done) return;
@@ -187,6 +219,7 @@ export function SwapRun({
   }, [done, celebrate]);
 
   const holder: Holder | null = turns ? ((turn % 2 === 0) === (turns.first === "fox") ? "fox" : "bear") : null;
+  holderNow.current = holder;
   /** The lamp that shines: the drawing one, then the child's whose turn it is; at the end both. */
   const lit = (kind: Holder) => done || (holder ?? drawn) === kind;
 
@@ -213,43 +246,63 @@ export function SwapRun({
   const down = (e: PointerEvent) => answer(e.clientX, e.clientY);
   const turnStart = turns ? turns.start + turn * turnMs : 0;
   const ticking = running && !done;
-  const next = nextPicture("swap");
+  const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
-  const name = PICTURES.find((p) => p.id === "swap")?.name;
+  const name = PICTURES.find((p) => p.id === picture)?.name;
+  /** Tennis: the child who has just hit the ball over swings its racket through. */
+  const hitter = from !== "middle" && holder && from !== holder ? from : null;
 
   return (
     <>
-      <div className="tm-play" data-picture="swap" onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
-          <SwapBackdrop />
-          <SwapLight kind="fox" on={lit("fox")} />
-          <SwapLight kind="bear" on={lit("bear")} />
-          <SwapCushions />
-          <SwapShade kind="fox" on={!lit("fox")} />
-          <SwapShade kind="bear" on={!lit("bear")} />
-          <SwapHourglass
-            key={running && turns ? `${turns.start}-${turn}` : "wait"}
-            ms={turnMs}
-            startedAt={turnStart}
-            flip={running && turn > 0}
-            waiting={!running}
-            glow={poke}
-          />
-          <Toy toy={toy} place={holder ?? "middle"} hop={hop} />
-          {done && <div className="tm-done-light" />}
-        </div>
+      <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
+        {tennis ? (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`} style={tennisStyle()}>
+            <TennisBackdrop />
+            {(["fox", "bear"] as const).map((kind) => (
+              <Racket key={kind} kind={kind} bouncing={holder === kind} swing={hitter === kind ? hop : 0} />
+            ))}
+            <TennisPlayers />
+            {(["fox", "bear"] as const).map((kind) => (
+              <SwapShade key={kind} kind={kind} on={!lit(kind)} edge={COURT.net} cross={turns !== null} />
+            ))}
+            <TennisBoard key={running && turns ? `${turns.start}-${turn}` : "wait"} ms={turnMs} startedAt={turnStart} waiting={!running} glow={poke} />
+            <Ball place={holder ?? "middle"} hop={hop} />
+            {done && <div className="tm-done-light" />}
+          </div>
+        ) : (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
+            <SwapBackdrop />
+            <SwapLight kind="fox" on={lit("fox")} />
+            <SwapLight kind="bear" on={lit("bear")} />
+            <SwapCushions />
+            <SwapShade kind="fox" on={!lit("fox")} />
+            <SwapShade kind="bear" on={!lit("bear")} />
+            <SwapHourglass
+              key={running && turns ? `${turns.start}-${turn}` : "wait"}
+              ms={turnMs}
+              startedAt={turnStart}
+              flip={running && turn > 0}
+              waiting={!running}
+              glow={poke}
+            />
+            <Toy toy={toy} place={holder ?? "middle"} hop={hop} />
+            {done && <div className="tm-done-light" />}
+          </div>
+        )}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
         {done && <GameEnd delayMs={4200} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>
-          <Choice
-            label={t({ de: "Spielzeug", en: "Toy", zh: "玩具", hi: "खिलौना", es: "Juguete", ar: "اللعبة", ru: "Игрушка" })}
-            value={toy}
-            onChange={onToy}
-            options={SWAP_TOYS.map((s) => ({ value: s.id, label: `${s.emoji} ${t(s.name)}` }))}
-          />
+          {!tennis && (
+            <Choice
+              label={t({ de: "Spielzeug", en: "Toy", zh: "玩具", hi: "खिलौना", es: "Juguete", ar: "اللعبة", ru: "Игрушка" })}
+              value={toy}
+              onChange={onToy}
+              options={SWAP_TOYS.map((s) => ({ value: s.id, label: `${s.emoji} ${t(s.name)}` }))}
+            />
+          )}
           <Choice
             label={t({
               de: "Wer ist dran?",

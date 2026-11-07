@@ -41,6 +41,11 @@ the page before it.
 - No fox or bear stands by as decoration in these games: a family in Zählen's and Wörter tippen's corner, pointing at
   the things or the picture, was taken out (user feedback, November 2026) – children wanted to tap it and thought it
   belonged to the game. A fox or bear comes in only where it does the game's thing (Mitmachen's child, „Fuchs“ at F).
+- Pressing keys quickly never turns into a din (user feedback, November 2026): in Frei tippen and Zählen a new letter or
+  number comes at most every `MIN_CHANGE_MS` (1 s), the same key again – and a tap on the card or its picture again –
+  only after `REPEAT_PAUSE_MS` (`repeats`, Space, Enter, arrows and Backspace too: the card still moves, silently), and
+  the soft note of a press that sets nothing off at most every `EXTRA_SOUND_GAP_MS` in all four games (`useSoftTap`).
+  Presses the game asks for again (the next step, tapping each thing, the digit of `digitOnRepeat`) keep answering at once.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

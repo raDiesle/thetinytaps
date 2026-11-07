@@ -30,7 +30,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
-import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
+import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
 import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
@@ -153,12 +153,13 @@ function TimerStart({
       </div>
     );
   }
-  if (settings.picture === "swap") {
+  if (isTurns(settings.picture)) {
     // Abwechseln (H-52): the time set is one child's turn, and the turns go on until a grown-up stops – or, with a
     // clock time set, until then, each turn as long as the row's length.
     const turn = devMs() || (settings.useOwn && settings.own?.kind === "for" ? settings.own.seconds * 1000 : settings.seconds * 1000);
     return (
       <SwapRun
+        picture={settings.picture}
         turnMs={turn}
         totalMs={until ? (total === "past" ? 0 : total) : undefined}
         until={until}
