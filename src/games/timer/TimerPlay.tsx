@@ -9,9 +9,11 @@ import { useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
+  playBeeps,
   playBuzz,
   playChime,
   playChimeNote,
+  playClick,
   playDing,
   playDrops,
   playLeaves,
@@ -28,6 +30,7 @@ import {
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { CaterpillarScene } from "./caterpillar";
+import { ClockScene } from "./clock";
 import { nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
@@ -38,11 +41,9 @@ import {
   AntRoad,
   AntsBackdrop,
   AntsHome,
-  CANDLE,
   Cookie,
   CandleBackdrop,
   Candles,
-  Child,
   Layer,
   RAIL_Y,
   RailAhead,
@@ -60,9 +61,9 @@ import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
 import { clockOn, digits, ownTimeMs } from "./time";
 
-/** The child blows the candle out this long after the time is up, and the flame goes out. */
+/** The last candle goes out with a puff this long after the time is up. */
 const BLOW_MS = 700;
-/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to come out). */
+/** Then children cheer, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to come out). */
 const END_MS = 4200;
 const END_MS_CATERPILLAR = 5600;
 /** The cheer at the end comes this long after the picture's own sound, so both are heard. */
@@ -88,7 +89,7 @@ function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
   return settings.seconds * 1000;
 }
 
-/** running: the picture runs down; blow: the time is up, the candle is blown out; done: the picture's end. */
+/** running: the picture runs down; blow: the time is up, the last candle goes out with a puff; done: the picture's end. */
 type Phase = "running" | "blow" | "done";
 
 /**
@@ -292,7 +293,7 @@ function TimerRun({
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
   const [far, setFar] = useState(false);
-  // Gleich ist es so weit (H-49): a while before the end the bell rings once and the child (where there is one) waves.
+  // Gleich ist es so weit (H-49): a while before the end the bell rings once, and a picture stepped back from afar comes bright again.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
   const { effects, ripple, glow, celebrate } = useTapFeedback();
@@ -383,6 +384,7 @@ function TimerRun({
       else if (picture === "flower") playTwinkle();
       else if (picture === "sunset") playYawn();
       else if (picture === "pizza") playYum();
+      else if (picture === "clock") playBeeps();
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, a few hearts, stars and
       // notes rise slowly over the picture, which lights up warmly, and then the friendly tune.
       const cheer = setTimeout(() => {
@@ -417,6 +419,8 @@ function TimerRun({
       else if (picture === "apple") (Date.now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
       else if (picture === "flower") playDrops();
+      // The snooze bar is pressed down.
+      else if (picture === "clock") playClick();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -435,14 +439,16 @@ function TimerRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
+  const clock = picture === "clock";
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}${soon ? " tm-soon" : ""}`} style={stageStyle(picture, total, stops)}>
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total, stops)}>
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
-        <TimeShownNote shown={phase === "running" ? shown : "off"} endsAt={endsAt} total={total} />
+        {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner. */}
+        <TimeShownNote shown={phase === "running" && !clock ? shown : "off"} endsAt={endsAt} total={total} />
         <FeedbackLayer effects={effects} />
         {phase === "done" && (
           <GameEnd
@@ -454,7 +460,7 @@ function TimerRun({
       </div>
       <PlayOptions>
         <TimeLeft endsAt={endsAt} until={until} />
-        <TimeShownChoice value={shown} onChange={onShown} />
+        {!clock && <TimeShownChoice value={shown} onChange={onShown} />}
       </PlayOptions>
     </>
   );
@@ -510,6 +516,7 @@ export function SceneParts({
       {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
+      {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}
       {picture === "sand" && (
@@ -523,7 +530,6 @@ export function SceneParts({
         <>
           <CandleBackdrop />
           <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={startedAt} total={total} />
-          <Child kind="bear" x={CANDLE.xs[CANDLE.xs.length - 1] + CANDLE.w / 2 + 24} floor={CANDLE.base + 22} />
         </>
       )}
       {picture === "ants" && (

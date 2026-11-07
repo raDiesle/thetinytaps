@@ -7,7 +7,7 @@ Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds ask
 (`OwnTimeSheet`, H-59, H-60): any length from 10 seconds to 3 hours (− and + for hours, minutes and seconds, ready slips
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
-grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
+grown-ups (`TimeLeft`, H-62). Every timer but the Wecker (whose screen is the time left) shows the time left in the picture's bottom right corner on a small paper
 note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Zahlen“, `digits`, e.g. „4:37“; user
 request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
@@ -16,9 +16,9 @@ for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to
 The start screen's cards are the pictures themselves as they look at their end, with no words on them (user request,
 November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
 cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
-the picture (`ART_ASPECT`). Names are only read out and their tooltip. „Abwechseln“ comes first, its two children with
-the toy and the hourglass; that it runs on without end is said in its tooltip (`SWAP_NOTE`). Then the pictures that run
-until the time is up:
+the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Abwechseln (its two children with the toy and the hourglass; that it runs on
+without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecker, then the others. The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
@@ -28,7 +28,7 @@ until the time is up:
   open one after the other here and there over the crown (`bloomRank`, each in its own slot, until 30 %) while three
   tiny bees buzz round it from then on (`BEES`, `BEE` smaller than a blossom, each a small layer, its wings a smaller
   one), then each blossom in turn withers as a small green apple swells out of it and reddens (one at a time, until
-  45 %), then the bear child pushes its little cart back and forth, each time to the free apple farthest away
+  45 %), then a little cart rolls back and forth, each time to the free apple farthest away
   (`harvestOrder`, `CartKeyframes` written for the run, the wheels turning with it); the next apple sways a second at a
   time while it waits its turn, and the cart rolls under it just as it lets go, so it falls straight down into the cart
   with a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
@@ -44,16 +44,17 @@ until the time is up:
   leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
   and the butterfly slips out and flies back and forth in the air above the meadow, bobbing, as long as the end is shown
   (`BUTTERFLY`, user request, November 2026).
-- „Blume“ 🌸 (`flower.tsx`, H-53): the bear child waters a sprout in the flower bed with a garden hose coming from a
-  tap on a post (`TAP`; a can that never ran dry made no sense, user feedback, November 2026), a drop from its nozzle
-  every second; the stalk slides up out of the soil, pushing soil crumbs aside each second (`SoilCrumbs`), along a tall
-  stake to the red ribbon at its top (the goal, seen from the start), grown at `GROWN_AT` of the time; then its petals
-  open one after the other (`PETALS`), the yellow middle last. It fills up instead of running out, for waiting for
-  something good.
+- „Blume“ 🌸 (`flower.tsx`, H-53): a garden hose coming from a tap on a post (`TAP`; a can that never ran dry made no
+  sense, user feedback, November 2026), laid in a forked stick at the bed's edge (`HOLDER`), drips onto a sprout in the
+  flower bed, a drop every second; the plant rises out of the soil, pushing soil crumbs aside each second
+  (`SoilCrumbs`), along a tall stake to the red ribbon at its top (the goal, seen from the start), grown at `GROWN_AT`
+  of the time, and grows as a whole as it rises (`SPROUT_SIZE` to full: stalk thicker, leaves bigger, the lower leaves
+  bigger than the upper ones); then its flower grows from small to big round the bud, all petals at once, until the
+  end. It fills up instead of running out, for waiting for something good.
 - „Kerze“ 🕯️: three tall candles on the table burn down one after the other (`CANDLE.xs`, each a third of the time,
   `--tm-i`/`--tm-of`), each burning all the way down into its puddle and only then going out, its smoke (`Smoke`: a
-  wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the bear child leans over and blows
-  the last one out.
+  wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the last one goes out with a puff
+  too (`blow`).
 - „Sonnenaufgang“ 🌅 (`sunset.tsx`, id `sunset`, H-54; „Sonnenuntergang“ until the moon came first, November 2026): one round hill, its meadow full of flowers drawn as coloured dots
   (`FLOWERS`), and a big moon exactly in the picture's middle. First the moon goes down behind the hill (gone at
   `MOON_SET_AT`) while the stars go out one by one (`STARS`, each at its share of the time), the night's sky and then the
@@ -72,14 +73,21 @@ until the time is up:
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): 24 slices on a wooden board, one lifted off towards its side at each
   24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`); a little steam rises every second.
   Each slice is a small layer cut to its wedge by a still `clip-path`, so a tap lights exactly the slices left.
-- „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn: the toy lies by the fox child
-  while the hourglass runs, then it travels over to the bear child with a whoosh and a chime, and the hourglass turns
+- „Wecker“ ⏰ (`clock.tsx`, H-70, user request, November 2026): a children's digital radio alarm clock on the bedside
+  table – a chunky, rounded turquoise case with a big yellow snooze bar on top, little feet, a star and a heart sticker,
+  the radio mast and the alarm's bell glowing in the screen's corners – whose orange segment digits count the time left
+  down to 0:00 (`clockText`: the digits never shift, a blank before one-digit minutes from 10 minutes on, the hours in
+  front from an hour on). The digits are the time left, so it shows no note in the corner and has no „Zeit im Bild“
+  behind ⚙️. Under them a row of `CLOCK_BLOCKS` light blocks goes out one by one from the right, so a child who can't
+  read digits sees the time go too. A tap presses the snooze bar with a click; at the end it beeps and rings on its feet.
+- „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn: the toy lies by the fox child's
+  floor cushion (orange, with pointed ears sewn on; `SWAP_SEATS`) while the hourglass runs, then it travels over to the
+  bear child's (brown, round ears) with a whoosh and a chime, and the hourglass turns
   itself over – back and forth until a grown-up leaves with ✕ (with „bis um“ set, until then, each turn as long as the
   row's minutes). Behind ⚙️: the toy (Bobbycar, Puppe, Ball, `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that
   child's turn anew, for who begins) and the time to the change. The turn is worked out from the clock (`turnAt`).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
-  picture (`.tm-done-light`) and a few hearts, stars and notes rise slowly (`celebrate`), a friendly tune after it (and
-  the child, where there is one, waves and hops), then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
+  picture (`.tm-done-light`) and a few hearts, stars and notes rise slowly (`celebrate`), a friendly tune after it, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
   noch?“: the rail to the station, the sand on top, the wax, the cookie – `LeftGlow`, inside the shrinking part so it is
@@ -90,8 +98,8 @@ once and a puff rises, the sand pours through the hourglass's neck, a drop of wa
 shows where it comes from and where it goes (H-64): the train sets off from a little house and the rail ahead shines
 while the rail behind is dark, the hourglass's bottom heap grows, the wax that ran down spreads on the holder.
 Gleich ist es so weit (H-49): a minute before the end, or in the last fifth of a short time (`soonMs`), a bell rings
-once and the child, where there is one, waves once (`tm-soon`), and a picture stepped back from afar comes bright again for it.
-Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`), the child and small things
+once, and a picture stepped back from afar comes bright again for it.
+Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`) and small things
 (`.tm-dims`) fade into the dark and only what runs down stays bright; a tap brings it all back (`tm-far`).
 
 Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `cardArt.tsx` (a card's picture), `OwnTimeSheet.tsx` (the sheet behind
@@ -99,9 +107,9 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-hourglass and toys), `apples.tsx`, `caterpillar.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
+hourglass and toys), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
-and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is the shared `Mascot`), `timer.css`, `content.ts`
+and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
 
 ## Rules
@@ -135,16 +143,24 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   then every blossom becomes its apple on its own), never several half done at once, and a stage starts only once the
   one before is over (`appleTimes`, `timer.test.ts` checks). Small helpers that only liven the picture (the bees) are
   tiny beside what runs down, as in life – big bees took the eye from the blossoms (user feedback, November 2026).
-- **Abwechseln stands first, apart**: it runs without end, so its card comes first (its tooltip says so, `SWAP_NOTE`),
-  and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, then
+  the Wecker): keep it when adding a picture (a new one goes after these unless the user says otherwise), and move the
+  perf scenarios' list in `tools/perfScenarios.ts` with it – they tap cards by their place (`timer.test.ts` checks the
+  order). Abwechseln runs without end, so its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it
+  (`TIMED_PICTURES`, `nextPicture`).
 - **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
   `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
   is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
 
-- **A fox or bear child only where it does the picture's thing** (`Child`): it pushes the apples' cart, waters the
-  flower, blows out the candle, takes its turn with the toy. Never a family standing by to watch or cheer: one stood
-  beside every picture and was taken out (user feedback, November 2026) – children wanted to tap it, and a timer to
-  watch needs as few things and movements as can be.
+- **No fox or bear figure in any picture** (user feedback, November 2026): first a family standing by every picture was
+  taken out (children wanted to tap it, and a timer to watch needs as few things and movements as can be), then the
+  children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
+  brown circles for paws on the hose. A picture tells its story by itself (the cart rolling by itself, the hose in a forked
+  stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
+  stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one.
+- **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk
+  thicker, its leaves bigger – scaled from its foot (`transform-origin` at the soil, never stretched one way), and a
+  flower grows open from small to big with all its petals at once, never petal after petal.
 
 - **A tool, not a game** (`GameShell tool`, `/timer` in `PlaytimeLock`): it counts no play time, never says good night
   and still runs when play time is over – „noch fünf Minuten spielen“ is about the real world. Its „Nochmal“ and

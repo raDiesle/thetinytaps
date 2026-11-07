@@ -250,6 +250,17 @@ export const timerIdeas: IdeaArea = {
       done: true,
     },
     {
+      id: "H-70",
+      emoji: "⏰",
+      title: "Wecker mit Ziffern",
+      text: "Ein Timer, der aussieht wie ein ganz normaler digitaler Funkwecker, nur wie einer fürs Kinderzimmer: bunt, rundlich, mit großer Schlummertaste oben. Auf seinem Bildschirm zählen leuchtende Ziffern die Zeit herunter bis 0:00, darum braucht er unten rechts keine Zeitangabe. Am Ende piept er und klingelt.",
+      why: "Viele Kinder kennen den Wecker der Eltern und wollen ihn ernst nehmen; Große lesen die Restzeit auf einen Blick, und eine Reihe Leuchtkästchen darunter zeigt dem Kind, wie viel noch bleibt.",
+      effort: "S",
+      done: true,
+      partial:
+        "Gebaut als Bild „Wecker“ (Wunsch 7. November 2026): ein türkiser Wecker mit gelber Schlummertaste, lila Knöpfen, Füßchen, Stern- und Herzaufkleber, im Bildschirm orange Segmentziffern, Funkmast und Weckerglocke. Unter den Ziffern gehen 20 Leuchtkästchen eins nach dem anderen von rechts aus. Ein Tippen drückt die Schlummertaste, am Ende piept er dreimal und wackelt klingelnd auf seinen Füßen.",
+    },
+    {
       id: "H-69",
       emoji: "💧",
       title: "Tropfen füllen den Eimer",

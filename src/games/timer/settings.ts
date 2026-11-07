@@ -3,10 +3,11 @@ import type { OwnTime } from "./time";
 /**
  * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
  * caterpillar eating a leaf, a flower growing (H-53), a candle, the sun going down (H-54), ants carrying a cookie to
- * their hill (H-68), a red disc, a pizza eaten slice by slice (H-47) – or „Abwechseln“ (H-52), two children taking
+ * their hill (H-68), a red disc, a pizza eaten slice by slice (H-47), a children's
+ * digital alarm clock counting down (H-70) – or „Abwechseln“ (H-52), two children taking
  * turns with a toy, turn after turn.
  */
-export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "ants" | "disc" | "pizza" | "swap";
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "ants" | "disc" | "pizza" | "clock" | "swap";
 
 /** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
 export type SwapToy = "bobbycar" | "doll" | "ball";
@@ -44,7 +45,7 @@ export interface TimerSettings {
 }
 
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
-  picture: "train",
+  picture: "disc",
   seconds: 300,
   own: null,
   useOwn: false,

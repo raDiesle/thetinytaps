@@ -1,12 +1,11 @@
 import { memo, useMemo, type CSSProperties, type ReactNode } from "react";
-import { Mascot } from "@/components/Mascot";
 import { type AppleTimes, appleTimes, applePlaces, harvestOrder } from "./pieces";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Apfelbaum (H-45): an apple tree's year, so the time shows its progress in stages (user feedback, November 2026) –
 // the tree grows out of the meadow, then its blossoms open one after the other all over it while tiny bees buzz round
-// them, then each blossom in turn becomes a small green apple that swells and reddens, and then the bear child pushes
-// its cart back and forth, under one apple after the other just as it lets go, so it falls straight down into the cart
+// them, then each blossom in turn becomes a small green apple that swells and reddens, and then a little cart rolls
+// back and forth, under one apple after the other just as it lets go, so it falls straight down into the cart
 // and stays there, each apple on its own in the heap. Every piece is a small layer
 // of its own on its own clock (`animation-delay` from `appleTimes`), so nothing is drawn again while it runs; the cart's
 // way is keyframes written once for the run (`CartKeyframes`).
@@ -14,15 +13,16 @@ import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 /** The tree's crown: its middle and radii. */
 export const CROWN = { cx: 600, cy: 300, rx: 300, ry: 200 } as const;
 
-/** The ground the tree, the child and the cart stand on. */
+/** The ground the tree and the cart stand on. */
 export const APPLE_FLOOR = 770;
 
 /** The tree's layer, from the crown's bumps to the ground; it grows from the trunk's foot (`.tm-tree`). */
 const TREE = { x: CROWN.cx - CROWN.rx - 60, y: CROWN.cy - CROWN.ry - 60, w: 2 * CROWN.rx + 120, h: APPLE_FLOOR + 10 - (CROWN.cy - CROWN.ry - 60) } as const;
 
 /**
- * The bear child's cart where it waits, right of the tree, while the tree grows and blossoms: the layer (cart, heap and
- * the child pushing it from behind) and in it, in stage units at rest, the box, its wheels and the child.
+ * The little cart where it waits, right of the tree, while the tree grows and blossoms: the layer (cart, heap and
+ * handle) and in it, in stage units at rest, the box and its wheels. Nobody pushes it: the bear child that did looked
+ * odd as a drawing and was taken out (user feedback, November 2026).
  */
 export const CART = {
   x: 860,
@@ -32,15 +32,10 @@ export const CART = {
   box: { left: 860, right: 1150, rim: 680, bottom: 735 },
   /** The wheels' middles and radius. */
   wheels: { xs: [905, 1105], cy: APPLE_FLOOR - 22, r: 22 },
-  /** The child's left edge, behind the cart's handle. */
-  child: 1220,
 } as const;
 
 /** The middle of the cart's box at rest: it goes under an apple by moving this point under it. */
 export const CART_MIDDLE = (CART.box.left + CART.box.right) / 2;
-
-/** The child's size in the cart's layer, as `Child` draws it elsewhere. */
-const KID = { w: 120, h: 180 } as const;
 
 /** An apple's radius in the cart: they lie side by side in rows (`HEAP_ROWS`), each one to be seen. */
 export const HEAP_R = 22;
@@ -68,7 +63,7 @@ export function appleRadius(count: number) {
   return count <= 6 ? 40 : count <= 12 ? 34 : 27;
 }
 
-/** Where each apple hangs, in the order the bear child harvests them (`harvestOrder`). */
+/** Where each apple hangs, in the order the cart harvests them (`harvestOrder`). */
 export function treeApples(count: number) {
   const r = appleRadius(count);
   return harvestOrder(applePlaces(count, CROWN.rx - r - 24, CROWN.ry - r - 24), r, CART_MIDDLE - CROWN.cx).map((p) => ({
@@ -325,14 +320,14 @@ function Wheel() {
 }
 
 /**
- * The bear child pushing its little cart: the heap's apples (each its own small layer, coming as its apple lands), the
- * box's front, the wheels and the handle, and the child behind it. The whole layer rolls along its keyframes
+ * The little cart: the heap's apples (each its own small layer, coming as its apple lands), the box's front, the wheels
+ * and its handle. The whole layer rolls along its keyframes
  * (`CartKeyframes`), the wheels turning with it.
  */
 export const Cart = memo(function Cart({ times, end }: { times: AppleTimes; end: string }) {
   const { box, wheels } = CART;
   const front = { w: box.right - box.left, h: box.bottom - box.rim + 8 };
-  const handle = { x: box.right - 10, y: box.bottom - 40, w: CART.child + 30 - box.right + 10, h: 70 };
+  const handle = { x: box.right - 10, y: box.rim - 50, w: 120, h: 110 };
   return (
     <Layer
       x={CART.x}
@@ -358,11 +353,22 @@ export const Cart = memo(function Cart({ times, end }: { times: AppleTimes; end:
           </CartPart>
         );
       })}
-      {/* The handle reaches back to the child's paw, behind the child. */}
+      {/* The handle, a pole up to a round grip, as on a child's cart. */}
       <CartPart x={handle.x} y={handle.y} w={handle.w} h={handle.h}>
         <Draw w={handle.w} h={handle.h}>
-          <path d={`M4 26 L${handle.w - 34} 50`} stroke={INK} strokeWidth="16" strokeLinecap="round" />
-          <path d={`M4 26 L${handle.w - 34} 50`} stroke="#c48a4f" strokeWidth="8" strokeLinecap="round" />
+          <path d={`M6 ${handle.h - 20} L${handle.w - 30} 24`} stroke={INK} strokeWidth="16" strokeLinecap="round" />
+          <path d={`M6 ${handle.h - 20} L${handle.w - 30} 24`} stroke="#c48a4f" strokeWidth="8" strokeLinecap="round" />
+          <rect
+            x={handle.w - 52}
+            y="6"
+            width="44"
+            height="22"
+            rx="11"
+            fill="#d9643a"
+            stroke={INK}
+            strokeWidth="5"
+            transform={`rotate(-38 ${handle.w - 30} 17)`}
+          />
         </Draw>
       </CartPart>
       <CartPart x={box.left} y={box.rim - 8} w={front.w} h={front.h}>
@@ -379,9 +385,6 @@ export const Cart = memo(function Cart({ times, end }: { times: AppleTimes; end:
           <Wheel />
         </CartPart>
       ))}
-      <CartPart x={CART.child} y={APPLE_FLOOR - KID.h} w={KID.w} h={KID.h} className="tm-mascot">
-        <Mascot kind="bear" child />
-      </CartPart>
     </Layer>
   );
 });
@@ -469,7 +472,7 @@ const Bees = memo(function Bees({ from }: { from: number }) {
   );
 });
 
-/** The whole picture: the tree's year, the bees and the bear child with its cart. */
+/** The whole picture: the tree's year, the bees and the cart. */
 export function AppleScene({ count, total, glow }: { count: number; total: number; glow: number }) {
   // Worked out once for the run, so the memoised parts are not drawn again when a tap lights the apples.
   const times = useMemo(() => appleTimes(total, count), [total, count]);
