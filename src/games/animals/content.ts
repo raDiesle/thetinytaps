@@ -475,7 +475,24 @@ export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[];
   foods: ["erdnuss", "trauben"],
   homes: ["biberburg", "ameisenhaufen", "meer", "wueste", "dschungel", "savanne", "bambuswald"],
   gifts: ["kaese"],
-  growths: ["eichel", "zwiebel", "kuerbiskern", "kokosnuss", "knospe"],
+  growths: [
+    "eichel",
+    "zwiebel",
+    "kuerbiskern",
+    "kokosnuss",
+    "knospe",
+    "schildkroetenei",
+    "krokodilei",
+    "dinoei",
+    "pinguinei",
+    "schlangenei",
+    "fischei",
+    "larve",
+    "karottensamen",
+    "maiskorn",
+    "schirmchen",
+    "erdbeersamen",
+  ],
 };
 
 /** Every food once, for the wrong choices next to the right one. */

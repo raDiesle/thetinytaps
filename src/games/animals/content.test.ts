@@ -339,10 +339,17 @@ test("what the small one becomes is the one right choice, and the others become 
     }
   }
   // Every plant is alike to every other (flowers look alike, trees look alike, and no child can tell which seed, nut,
-  // bulb or bud becomes which plant); the lookalike groups name only small ones there are.
-  const animals = ["raupe", "ei", "kaulquappe"];
-  const plants = GROWTHS.filter((g) => !animals.includes(g.id));
+  // bulb or bud becomes which plant), and so is every egg to every other egg; the lookalike groups name only small ones
+  // there are.
+  const plants = GROWTHS.filter((g) => g.plant);
   for (const a of plants) for (const b of plants) if (a !== b) expect(growLookAlike(a, b), `${a.id} ${b.id}`).toBe(true);
+  const eggs = GROWTHS.filter((g) => g.young === "Ei");
+  for (const a of eggs) for (const b of eggs) if (a !== b) expect(growLookAlike(a, b), `${a.id} ${b.id}`).toBe(true);
+  // A plant is never alike to an animal: the grouping that keeps plants apart keeps them in their own group.
+  for (const group of GROW_LOOKALIKES) {
+    const kinds = new Set(group.map((id) => GROWTHS.find((g) => g.id === id)?.plant === true));
+    expect(kinds.size, group.join(" ")).toBe(1);
+  }
   for (const id of GROW_LOOKALIKES.flat())
     expect(
       GROWTHS.some((g) => g.id === id),
@@ -374,6 +381,13 @@ test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „a
   expect(de.comesFrom(byId.kokosnuss)).toBe("Die Palme kommt aus der Kokosnuss!");
   expect(de.whatBecomes(byId.knospe)).toBe("Was wird aus der Knospe?");
   expect(de.becomes(byId.knospe)).toBe("Aus der Knospe wird eine Rose. Toll!");
+  expect(de.becomes(byId.schildkroetenei)).toBe("Aus dem Ei wird eine Schildkröte. Toll!");
+  expect(de.comesFrom(byId.krokodilei)).toBe("Das Krokodil kommt aus dem Ei!");
+  expect(de.whatBecomes(byId.larve)).toBe("Was wird aus der Larve?");
+  expect(de.becomes(byId.larve)).toBe("Aus der Larve wird eine Biene. Toll!");
+  expect(de.becomes(byId.maiskorn)).toBe("Aus dem Maiskorn wird Mais. Toll!");
+  expect(de.comesFrom(byId.maiskorn)).toBe("Der Mais kommt aus dem Maiskorn!");
+  expect(de.comesFrom(byId.schirmchen)).toBe("Der Löwenzahn kommt aus dem Schirmchen!");
 });
 
 // A round's sign stands before its name under ⚙️; were it one of the pictures to pick from, it would give the answer away

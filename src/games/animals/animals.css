@@ -401,16 +401,25 @@
   transform-box: view-box;
 }
 
-/* Hidden until it grows: the chrysalis, the egg's crack and broken edges, the stems, leaves and shoots, the tadpole's legs. */
+/* Hidden until it grows: the chrysalis, the eggs' cracks, broken edges and slit, the stems, leaves, shoots and flowers,
+   the tadpole's legs, the bees' wax lid. */
 .ap-grow-cocoon,
 .ap-grow-crack,
 .ap-grow-edge,
+.ap-grow-slit,
 .ap-grow-stem,
 .ap-grow-legs,
 .ap-grow-sapling,
 .ap-grow-blades,
 .ap-grow-vine,
-.ap-grow-shoot {
+.ap-grow-shoot,
+.ap-grow-cap,
+.ap-grow-greens,
+.ap-grow-stalk,
+.ap-grow-rosette,
+.ap-grow-dstem,
+.ap-grow-plant,
+.ap-grow-flower {
   opacity: 0;
 }
 
@@ -575,6 +584,142 @@
 .grow-knospe .ap-grow-adult {
   transform-origin: 50% 35%;
   animation: ap-bloom 1.4s ease-out 1.5s both;
+}
+
+/* The eggs crack like the hen's (crackingEgg in growth.tsx); what comes out moves its own way. */
+
+/* The turtle's egg cracks in the sand, its lid tips over, and the little turtle climbs out and crawls down to the sea. */
+.grow-schildkroetenei.growing .ap-grow-lid {
+  animation-name: ap-lid-tip;
+}
+
+.grow-schildkroetenei .ap-grow-adult {
+  transform-origin: 50% 80%;
+  animation: ap-crawl-out 2.2s ease-in-out 1.5s both;
+}
+
+/* The crocodile's egg cracks in its nest, and the little crocodile rises out of it, grows long and floats in the river. */
+.grow-krokodilei .ap-grow-adult {
+  transform-origin: 50% 60%;
+  animation: ap-float-up 1.9s ease-out 1.5s both;
+}
+
+/* The big egg bumps twice on the ground, cracks, and the dinosaur rises and stretches its long neck up. */
+.grow-dinoei.growing .ap-grow-egg {
+  animation-name: ap-thump;
+}
+
+.grow-dinoei .ap-grow-adult {
+  transform-origin: 50% 90%;
+  animation: ap-stretch 2s ease-out 1.5s both;
+}
+
+/* The penguin's egg cracks on the ice, and the chick pops up in its shell and rocks from side to side in it. */
+.grow-pinguinei .ap-grow-adult {
+  transform-origin: 50% 95%;
+  animation: ap-waddle 2.1s ease-in-out 1.5s both;
+}
+
+/* The snake's soft egg bulges, gets a slit, and the snake slithers out of it; the egg sags, empty. */
+.growing .ap-grow-sack {
+  transform-origin: 96px 179px;
+  animation: ap-bulge 1.6s ease-in-out forwards;
+}
+
+.growing .ap-grow-slit {
+  animation: ap-appear 0.2s linear 0.9s forwards;
+}
+
+.grow-schlangenei .ap-grow-adult {
+  transform-origin: 50% 70%;
+  animation: ap-slither 2.2s ease-in-out 1.2s both;
+}
+
+/* The little fish wriggles in its clear egg, the egg bursts, and the fish swims out, growing as it goes. */
+.growing .ap-grow-fry {
+  transform-origin: 92px 124px;
+  animation: ap-wriggle 1.4s ease-in-out forwards;
+}
+
+.growing .ap-grow-roe {
+  transform-origin: 92px 124px;
+  animation: ap-burst 1.5s ease-in-out forwards;
+}
+
+.grow-fischei .ap-grow-adult {
+  animation: ap-swim-out 2.2s ease-in-out 1.3s both;
+}
+
+/* The larva wriggles in its cell, the bees' wax lid closes over it, and a bee breaks it open and flies out. */
+.growing .ap-grow-larva {
+  transform-origin: 100px 126px;
+  animation: ap-larva 1.2s ease-in-out forwards;
+}
+
+.growing .ap-grow-cap {
+  transform-origin: 100px 124px;
+  animation: ap-cap 1.2s ease-out 0.7s both;
+}
+
+.grow-larve .ap-grow-adult {
+  animation: ap-buzz-out 1.9s ease-in-out 1.8s both;
+}
+
+/* The carrot's seed sinks into the bed, its feathery green comes up, and the carrot is pulled out of the soil. */
+.growing .ap-grow-greens {
+  transform-origin: 100px 166px;
+  animation: ap-greens 2.4s ease-out 0.5s both;
+}
+
+.grow-karottensamen .ap-grow-adult {
+  animation: ap-pull 1.6s ease-in-out 1.9s both;
+}
+
+/* The maize kernel sinks into the field, the tall stalk grows with its long leaves, and a cob comes out at its side. */
+.growing .ap-grow-stalk {
+  transform-origin: 100px 178px;
+  animation: ap-sprout 1.8s ease-out 0.5s both;
+}
+
+.grow-maiskorn .ap-grow-adult {
+  transform-origin: 0% 100%;
+  animation: ap-cob 1.4s ease-out 2.2s both;
+}
+
+/* The dandelion's seed floats down on its umbrella and lands in the lawn; leaves and a stem grow, the flower opens. */
+.growing .ap-grow-fluff {
+  transform-origin: 100px 40px;
+  animation: ap-float-down 1.6s ease-in-out forwards;
+}
+
+.growing .ap-grow-rosette {
+  transform-origin: 100px 178px;
+  animation: ap-blades 0.8s ease-out 1.4s both;
+}
+
+.growing .ap-grow-dstem {
+  transform-origin: 100px 178px;
+  animation: ap-blades 0.9s ease-out 1.7s both;
+}
+
+.grow-schirmchen .ap-grow-adult {
+  animation: ap-bloom 1.4s ease-out 2.4s both;
+}
+
+/* The strawberry's seed sinks in, the plant grows, a white flower opens and falls, and the berry swells and turns red. */
+.growing .ap-grow-plant {
+  transform-origin: 100px 176px;
+  animation: ap-blades 1s ease-out 0.5s both;
+}
+
+.growing .ap-grow-flower {
+  transform-origin: 146px 124px;
+  animation: ap-flower 1.3s ease-out 1.2s both;
+}
+
+.grow-erdbeersamen .ap-grow-adult {
+  transform-origin: 50% 20%;
+  animation: ap-berry 1.6s ease-in-out 2.2s both;
 }
 
 @keyframes ap-breathe {
@@ -1134,6 +1279,457 @@
 @keyframes ap-sepal-r {
   to {
     transform: rotate(40deg);
+  }
+}
+
+/* The turtle egg's lid tips over onto the sand and stays there. */
+@keyframes ap-lid-tip {
+  to {
+    transform: translate(-30px, 16px) rotate(-95deg);
+  }
+}
+
+/* Up out of the egg in the sand, then step by step down the beach towards the sea, growing as it comes. */
+@keyframes ap-crawl-out {
+  0% {
+    opacity: 0;
+    transform: translate(-88%, 15%) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-88%, -16%) scale(0.55);
+  }
+  30% {
+    transform: translate(-74%, -8%) scale(0.62) rotate(-8deg);
+  }
+  45% {
+    transform: translate(-56%, -4%) scale(0.72) rotate(6deg);
+  }
+  60% {
+    transform: translate(-38%, -2%) scale(0.82) rotate(-6deg);
+  }
+  75% {
+    transform: translate(-19%, 0) scale(0.92) rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Up out of the egg, small and short, then long and floating, bobbing on the water. */
+@keyframes ap-float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40%) scale(0.2);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(30%) scale(0.4, 0.45);
+  }
+  45% {
+    transform: translateY(-12%) scale(0.75, 0.85);
+  }
+  62% {
+    transform: translateY(4%) scale(1.04, 0.96);
+  }
+  78% {
+    transform: translateY(-4%);
+  }
+  90% {
+    transform: translateY(2%);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A heavy egg bumping on the ground twice. */
+@keyframes ap-thump {
+  20% {
+    transform: translateY(-10px) scale(0.97, 1.03);
+  }
+  35% {
+    transform: scale(1.05, 0.95);
+  }
+  60% {
+    transform: translateY(-8px) scale(0.98, 1.02);
+  }
+  75% {
+    transform: scale(1.04, 0.96);
+  }
+}
+
+/* Up out of the egg, crouched, then stretching tall. */
+@keyframes ap-stretch {
+  0% {
+    opacity: 0;
+    transform: translateY(32%) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(8%) scale(0.75, 0.6);
+  }
+  70% {
+    transform: scale(1.04, 1.1);
+  }
+  85% {
+    transform: scale(0.98, 0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Up in the egg with a pop, then rocking from side to side in it. */
+@keyframes ap-waddle {
+  0% {
+    opacity: 0;
+    transform: translateY(19%) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+  }
+  35% {
+    transform: translateY(-10%) scale(1);
+  }
+  45% {
+    transform: none;
+  }
+  57% {
+    transform: translateX(-6%) rotate(-10deg);
+  }
+  71% {
+    transform: translateX(6%) rotate(10deg);
+  }
+  85% {
+    transform: translateX(-3%) rotate(-6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The soft egg bulges this way and that, then sags once it is empty. */
+@keyframes ap-bulge {
+  15% {
+    transform: scale(1.06, 0.94);
+  }
+  30% {
+    transform: scale(0.96, 1.05);
+  }
+  45% {
+    transform: scale(1.06, 0.94);
+  }
+  60% {
+    transform: none;
+  }
+  100% {
+    transform: scale(1.03, 0.86);
+  }
+}
+
+/* Out of the slit, winding from side to side as it slithers up, growing. */
+@keyframes ap-slither {
+  0% {
+    opacity: 0;
+    transform: translate(-24%, 43%) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-20%, 36%) scale(0.45) rotate(-14deg);
+  }
+  35% {
+    transform: translate(-14%, 24%) scale(0.62) rotate(12deg);
+  }
+  55% {
+    transform: translate(-8%, 12%) scale(0.8) rotate(-10deg);
+  }
+  75% {
+    transform: translate(-3%, 4%) scale(0.94) rotate(6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The little fish curled in its egg wriggles, then is gone with the egg. */
+@keyframes ap-wriggle {
+  15% {
+    transform: rotate(-14deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  45% {
+    transform: rotate(-12deg);
+  }
+  60% {
+    transform: rotate(10deg);
+  }
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* The clear egg wobbles with the fish in it, then bursts open. */
+@keyframes ap-burst {
+  20% {
+    transform: scale(1.04, 0.97);
+  }
+  40% {
+    transform: scale(0.97, 1.04);
+  }
+  60% {
+    transform: scale(1.04, 0.97);
+  }
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* Out of the egg, then swimming up and away in a gentle wave, growing as it goes. */
+@keyframes ap-swim-out {
+  0% {
+    opacity: 0;
+    transform: translate(-59%, 32%) scale(0.2);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-59%, 32%) scale(0.35);
+  }
+  40% {
+    transform: translate(-36%, 8%) scale(0.6) rotate(-10deg);
+  }
+  60% {
+    transform: translate(-18%, 18%) scale(0.8) rotate(8deg);
+  }
+  80% {
+    transform: translate(-4%, -4%) scale(0.95) rotate(-4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The larva wriggles in its cell, then lies still under the wax lid. */
+@keyframes ap-larva {
+  15% {
+    transform: rotate(-10deg);
+  }
+  30% {
+    transform: rotate(10deg);
+  }
+  45% {
+    transform: rotate(-8deg);
+  }
+  60%,
+  95% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The wax lid closes over the cell, stays a while, and breaks open. */
+@keyframes ap-cap {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  25% {
+    transform: scale(1.08);
+  }
+  35%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) rotate(20deg);
+  }
+}
+
+/* Out of the cell, then a loop through the air to land beside the honeycomb. */
+@keyframes ap-buzz-out {
+  0% {
+    opacity: 0;
+    transform: translate(-81%, 122%) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-81%, 112%) scale(0.7);
+  }
+  35% {
+    transform: translate(-64%, 64%) rotate(-10deg);
+  }
+  55% {
+    transform: translate(-22%, 80%) rotate(10deg);
+  }
+  72% {
+    transform: translate(-34%, 26%) rotate(-8deg);
+  }
+  88% {
+    transform: translate(8%, -8%) rotate(6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The carrot's green grows up out of the soil and goes when the carrot, green and all, is pulled out. */
+@keyframes ap-greens {
+  0% {
+    opacity: 1;
+    transform: scale(0.2, 0);
+  }
+  40%,
+  78% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* Deep in the soil, tugged this way and that, then out with a pop. */
+@keyframes ap-pull {
+  0% {
+    opacity: 0;
+    transform: translateY(62%);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(50%);
+  }
+  30% {
+    transform: translateY(46%) rotate(-7deg);
+  }
+  45% {
+    transform: translateY(42%) rotate(7deg);
+  }
+  65% {
+    transform: translateY(-14%) rotate(-3deg);
+  }
+  82% {
+    transform: translateY(3%);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The cob unfolds from the stalk's side and swells. */
+@keyframes ap-cob {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-40deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1.1) rotate(6deg);
+  }
+  80% {
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* On its little umbrella, swaying down to the lawn, where the seed goes into the ground. */
+@keyframes ap-float-down {
+  0% {
+    transform: none;
+  }
+  20% {
+    transform: translate(-14px, 24px) rotate(-10deg);
+  }
+  40% {
+    transform: translate(12px, 52px) rotate(8deg);
+  }
+  60% {
+    transform: translate(-8px, 82px) rotate(-6deg);
+  }
+  82% {
+    opacity: 1;
+    transform: translate(0, 110px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 124px);
+  }
+}
+
+/* The white flower opens, and falls once the berry starts to grow. */
+@keyframes ap-flower {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  30% {
+    transform: scale(1.1);
+  }
+  40%,
+  72% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.7);
+  }
+}
+
+/* Small and pale green where the flower was, then big and red: a filter on the emoji's own small layer. */
+@keyframes ap-berry {
+  0% {
+    opacity: 0;
+    transform: scale(0.1);
+    filter: hue-rotate(100deg) saturate(0.5) brightness(1.2);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.6);
+    filter: hue-rotate(100deg) saturate(0.5) brightness(1.2);
+  }
+  85% {
+    transform: scale(1.06);
+    filter: none;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }
 
