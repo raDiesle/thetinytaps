@@ -21,7 +21,8 @@ screen), then the pictures that run until the time is up:
 - „Apfelbaum“ 🍎 (`apples.tsx`, H-45): always many apples, also for a short time (`appleCount`: one every two seconds,
   at least `MIN_APPLES`, at most `MAX_APPLES`) – they only fall more often – each with a plop into the basket the bear
   child holds (the plops spaced, `PIECE_SOUND_GAP_MS`); the heap in it rises a step per apple, the next apple sways each second.
-- „Sanduhr“ ⏳: the sand runs from the top bulb into the bottom one.
+- „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
+  from the top bulb into the bottom one, where its heap rises with a round top (`BulbSand`, shared with Abwechseln).
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
   (`steps(var(--tm-secs))`, `runSeconds`), its head chewing and three leaf crumbs falling as it munches (`CRUMBS`); at the end a cocoon hangs on the branch and a butterfly flies out and settles on the meadow.
 - „Blume“ 🌸 (`flower.tsx`, H-53): the bear child waters a sprout in the flower bed with a garden hose coming from a
@@ -63,9 +64,9 @@ screen), then the pictures that run until the time is up:
   exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
 
 Every picture moves a small, soft step every second, so even an hour never looks stuck (H-63): the train's wheels turn
-once and a puff rises, a big grain falls through the hourglass's neck, a drop of wax runs a little further. And each
+once and a puff rises, the sand pours through the hourglass's neck, a drop of wax runs a little further. And each
 shows where it comes from and where it goes (H-64): the train sets off from a little house and the rail ahead shines
-while the rail behind is dark, the glass the sand has left keeps a film of it, the wax that ran down spreads on the holder.
+while the rail behind is dark, the hourglass's bottom heap grows, the wax that ran down spreads on the holder.
 Gleich ist es so weit (H-49): a minute before the end, or in the last fifth of a short time (`soonMs`), a bell rings
 once and the child, where there is one, waves once (`tm-soon`), and a picture stepped back from afar comes bright again for it.
 Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`), the child and small things
@@ -122,6 +123,16 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
   (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
   a bigger layer.
+- **Only what runs and where it goes** (user feedback, November 2026): the hourglass shows the sand still to run and
+  the heap below, nothing else – no film or grains on the glass the sand has left, no grain or disc over the stream at
+  the neck (both were taken out: they looked odd). A trace of what is over (H-64) is only drawn where it is plainly a
+  thing of its own (the dark rail, the wax puddle), never a pale copy of what was there.
+- **No `clip-path` round what is in view while the page turns**: a turning page is a picture of the app (view
+  transition), and in it the clip-path round a moving layer dropped out – the hourglass's sand showed as a square
+  before it began (user feedback, November 2026). A shape something moves inside is a still drawing of that shape in a
+  window with `overflow: hidden`: the window slides, the drawing in it slides back the same way and stays put, both by
+  `transform` (`BulbSand`, `bulbBelow`; `timer.test.ts` checks). A still clip-path is fine where nothing it cuts shows
+  as the page turns, or on a light mounted only after a tap.
 - **What a tap lights is what is left** (H-51): a glow inside the part that shrinks, never a sign or a number, and once
   per tap, fading – never blinking. A new picture puts `LeftGlow` into its own shrinking part; in a picture that grows
   (the flower) that is the way still to go (`StillToGrow`, a box over the stake whose lower end rises with the bud).

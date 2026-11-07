@@ -70,41 +70,91 @@
   }
 }
 
-/* Sanduhr: the top heap sinks out through the neck, the bottom heap rises; the stream runs while it does. */
+/* Sanduhr: the top's sand sinks out through the neck, the bottom heap rises; the stream runs while it does. Each bulb's
+   sand is drawn still in the bulb's shape (`.tm-sand-fill`), and a window over it (`.tm-sand`, overflow hidden) slides
+   from the sand's level (`--tm-level`) down to the neck, or up from the bottom to it, while the drawing slides back the
+   other way – only transforms, no clip-path (a clip-path round a moving layer dropped out of a turning page's picture,
+   and the sand showed as a square). */
 .tm-sand {
   position: absolute;
-  left: 0;
+  inset: 0;
+  overflow: hidden;
+}
+
+.tm-sand-fill {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-sand-fill > svg {
+  display: block;
   width: 100%;
-  background: linear-gradient(#ffd8a8, #f4a95c);
+  height: 100%;
+}
+
+/* What a tap lights in the top's sand (H-51): mounted only after a tap, cut to the bulb by a still clip-path. */
+.tm-sand-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .tm-sand-top {
-  top: 30%;
-  height: 70%;
   animation: tm-sink var(--tm-ms) linear forwards;
 }
 
+.tm-sand-top > .tm-sand-fill {
+  animation: tm-sink-back var(--tm-ms) linear forwards;
+}
+
+/* The heap's top is round, as sand piles up. */
 .tm-sand-bottom {
-  top: 30%;
-  height: 70%;
-  border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+  border-radius: 50% 50% 0 0 / 16% 16% 0 0;
   transform: translateY(100%);
   animation: tm-rise var(--tm-ms) linear forwards;
 }
 
-.tm-done .tm-sand-top {
+.tm-sand-bottom > .tm-sand-fill {
+  transform: translateY(-100%);
+  animation: tm-rise-back var(--tm-ms) linear forwards;
+}
+
+.tm-done .tm-sand,
+.tm-done .tm-sand-fill {
   animation: none;
+}
+
+.tm-done .tm-sand-top {
   transform: translateY(100%);
 }
 
+.tm-done .tm-sand-top > .tm-sand-fill {
+  transform: translateY(-100%);
+}
+
 .tm-done .tm-sand-bottom {
-  animation: none;
-  transform: none;
+  transform: translateY(var(--tm-level));
+}
+
+.tm-done .tm-sand-bottom > .tm-sand-fill {
+  transform: translateY(calc(-1 * var(--tm-level)));
 }
 
 @keyframes tm-sink {
+  from {
+    transform: translateY(var(--tm-level));
+  }
   to {
     transform: translateY(100%);
+  }
+}
+
+@keyframes tm-sink-back {
+  from {
+    transform: translateY(calc(-1 * var(--tm-level)));
+  }
+  to {
+    transform: translateY(-100%);
   }
 }
 
@@ -113,7 +163,16 @@
     transform: translateY(100%);
   }
   to {
-    transform: none;
+    transform: translateY(var(--tm-level));
+  }
+}
+
+@keyframes tm-rise-back {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(calc(-1 * var(--tm-level)));
   }
 }
 
@@ -124,7 +183,7 @@
 .tm-stream-grains {
   position: absolute;
   inset: -50% 0 0;
-  background: repeating-linear-gradient(#f4a95c 0 14px, #ffd8a8 14px 20px, #f4a95c 20px 28px);
+  background: repeating-linear-gradient(#f4a95c 0 14px, #f8bf82 14px 20px, #f4a95c 20px 28px);
   border-radius: 4px;
   animation: tm-pour 0.6s linear infinite;
 }
@@ -369,7 +428,7 @@
 }
 
 /* Every second a small, soft step (H-63), so a long time never looks stuck: the train's wheels turn once and a puff of
-   steam rises, a big grain falls through the hourglass's neck, a drop of wax runs a little further. Each is a small
+   steam rises, the sand pours through the hourglass's neck, a drop of wax runs a little further. Each is a small
    layer of its own moving by transform and opacity; at the end they stand still. */
 .tm-beat {
   position: absolute;
@@ -421,28 +480,6 @@
   }
 }
 
-.tm-grain {
-  inset: 0;
-  border: 0.18cqw solid #3b2a20;
-  border-radius: 50%;
-  background: #d9822b;
-  animation: tm-fall 1s ease-in infinite;
-}
-
-@keyframes tm-fall {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  80% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    transform: translateY(1000%);
-  }
-}
-
 .tm-drop {
   left: 8%;
   top: 2%;
@@ -489,7 +526,7 @@
 }
 
 /* Where it came from and where it goes (H-64): the rail ahead of the train shines and shrinks towards the buffers as
-   the train rolls on; the glass the sand has left keeps a faint film; the wax that ran down spreads on the holder. */
+   the train rolls on; the wax that ran down spreads on the holder. */
 .tm-rail-shine {
   position: absolute;
   inset: 0;
@@ -508,17 +545,6 @@
   to {
     transform: scaleX(0);
   }
-}
-
-.tm-sand-dust {
-  position: absolute;
-  left: 0;
-  top: 30%;
-  width: 100%;
-  height: 70%;
-  background:
-    radial-gradient(circle, #f4a95c66 0 22%, transparent 26%) 0 0 / 11% 8%,
-    #ffd8a838;
 }
 
 .tm-puddle {
@@ -1158,7 +1184,7 @@
   animation: tm-left 1.6s ease-out;
 }
 
-.tm-sand .tm-left-glow,
+.tm-sand-light .tm-left-glow,
 .tm-wax .tm-left-glow,
 .tm-cookie .tm-left-glow,
 .tm-apple-sway .tm-left-glow,
@@ -1297,7 +1323,8 @@
 
 /* Abwechseln (H-52): the hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over for the
    next; the toy travels across the floor to the child whose turn it is. */
-.tm-swap-glass .tm-sand {
+.tm-swap-glass .tm-sand,
+.tm-swap-glass .tm-sand-fill {
   animation-delay: var(--tm-delay);
 }
 

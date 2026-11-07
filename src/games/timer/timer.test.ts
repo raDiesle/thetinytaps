@@ -24,7 +24,7 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { ANTS, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { ANTS, bulbBelow, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, PLATE, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
 import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
 
@@ -73,8 +73,11 @@ describe("Timer", () => {
     expect(TRAIN.stop).toBeLessThanOrEqual(RIGHT_EDGE);
     expect(GLASS.cx - GLASS.w / 2).toBeGreaterThanOrEqual(200);
     // With a margin: at 80 and 820 the hourglass's plates touched the screen's edges on a phone on its side.
-    expect(GLASS.top - 44).toBeGreaterThanOrEqual(130);
-    expect(SAND_FLOOR + 10).toBeLessThanOrEqual(790);
+    expect(GLASS.top - 4 - PLATE).toBeGreaterThanOrEqual(110);
+    expect(GLASS.bottom + 4 + PLATE).toBeLessThanOrEqual(790);
+    expect(SAND_FLOOR).toBeLessThanOrEqual(810);
+    // Tall, so the heap is seen growing (user feedback, November 2026).
+    expect(GLASS.bottom - GLASS.top).toBeGreaterThanOrEqual(590);
     expect(CANDLE.base).toBeLessThanOrEqual(820);
     // Tall candles, their flames still on the screen; three of them burning one after the other.
     expect(CANDLE.top - FLAME_H).toBeGreaterThanOrEqual(80);
@@ -91,6 +94,25 @@ describe("Timer", () => {
     const burnt = `${(((height - CANDLE.stub) / height) * 100).toFixed(2)}%`;
     expect(css).toContain(`scaleY(${left})`);
     expect(css).toContain(`--tm-burnt: ${burnt}`);
+  });
+
+  test("Sanduhr: only the sand left and the heap show – no film, no grain, no clip-path on what moves (user feedback, November 2026)", async () => {
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    const scenes = await Bun.file(new URL("./scenes.tsx", import.meta.url)).text();
+    for (const gone of [".tm-sand-dust", ".tm-grain"]) expect(css).not.toContain(gone);
+    for (const gone of ["tm-sand-dust", "tm-grain"]) expect(scenes).not.toContain(gone);
+    // A clip-path round a moving layer dropped out of a turning page's picture and showed the sand as a square.
+    const sandRules = [...css.matchAll(/([^{}]*\.tm-(?:sand|bulb)[^{}]*)\{([^}]*)\}/g)];
+    expect(sandRules.length).toBeGreaterThan(0);
+    for (const [, , body] of sandRules) expect(body).not.toContain("clip-path");
+    const sand = scenes.slice(scenes.indexOf("export function BulbSand"), scenes.indexOf("// Kerze"));
+    expect(sand.match(/clipPath/g) ?? []).toHaveLength(1); // only the tap's light, mounted after a tap
+    // The sand's outline: the full top from its level down to the neck, the full bottom from the same level to the floor.
+    const ys = (d: string) => [...d.matchAll(/[ML]\S+ (\S+)/g)].map((m) => Number(m[1]));
+    expect(Math.min(...ys(bulbBelow(0.3, false)))).toBeCloseTo(30);
+    expect(Math.max(...ys(bulbBelow(0.3, false)))).toBeCloseTo(100);
+    expect(Math.min(...ys(bulbBelow(0.3, true)))).toBeCloseTo(30);
+    expect(Math.max(...ys(bulbBelow(0.3, true)))).toBeCloseTo(100);
   });
 
   test("the new pictures keep what matters where every screen shows it too", () => {
