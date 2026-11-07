@@ -23,7 +23,15 @@ export type HomeId =
   | "wueste"
   | "dschungel"
   | "savanne"
-  | "bambuswald";
+  | "bambuswald"
+  | "kaefig"
+  | "laubhaufen"
+  | "wiese"
+  | "garten"
+  | "fluss"
+  | "berg"
+  | "wald"
+  | "riff";
 
 export interface Home {
   id: HomeId;
@@ -420,6 +428,260 @@ const bambuswald = (
   </>
 );
 
+// More homes (November 2026): a pet's cage, a pile of leaves, a meadow, a garden, a river, a mountain, a forest and a reef.
+
+/** The bars of the cage, between its roof and its tray. */
+const BARS = [26, 38, 50, 62, 74, 86, 98];
+
+const kaefig = (
+  <>
+    <path d="M48 30 Q60 14 72 30" stroke="#8d99ae" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <rect x="14" y="30" width="92" height="70" rx="10" fill="#e3f6ff" fillOpacity="0.6" />
+    {BARS.map((x) => (
+      <path key={x} d={`M${x} 32 V98`} stroke="#adb5bd" strokeWidth="2" />
+    ))}
+    <rect x="14" y="30" width="92" height="70" rx="10" fill="none" stroke="#8d99ae" strokeWidth="4" />
+    <circle cx="86" cy="76" r="16" fill="#fff" fillOpacity="0.5" stroke="#f77f00" strokeWidth="4" />
+    <path d="M86 60 V92 M70 76 H102 M75 65 L97 87 M97 65 L75 87" stroke="#f9a03f" strokeWidth="1.8" />
+    <path d="M86 76 L94 98 M86 76 L78 98" stroke="#8d99ae" strokeWidth="3" strokeLinecap="round" />
+    <rect x="20" y="40" width="9" height="24" rx="4" fill="#bde0fe" stroke="#8d99ae" strokeWidth="1.5" />
+    <path d="M24.5 64 V72" stroke="#8d99ae" strokeWidth="2.5" strokeLinecap="round" />
+    <rect x="8" y="94" width="104" height="22" rx="5" fill="#4cc9f0" />
+    <path d="M90 94 H107 a5 5 0 0 1 5 5 V111 a5 5 0 0 1 -5 5 H90 Z" fill="#3aa8d0" />
+    <path d="M12 96 Q22 90 32 95 Q44 89 56 95 Q70 90 82 95 Q96 90 108 96 Z" fill="#f4d58d" />
+  </>
+);
+
+/** A leaf of the pile at (x, y), turned by `a`, in an autumn colour. */
+const leaf = (x: number, y: number, a: number, colour: string) => (
+  <g key={`${x} ${y}`} transform={`translate(${x} ${y}) rotate(${a})`}>
+    <path d="M-8 0 Q0 -6 8 0 Q0 6 -8 0 Z" fill={colour} />
+    <path d="M-9 0 H7" stroke="#6f4e37" strokeWidth="1" strokeOpacity="0.6" />
+  </g>
+);
+
+const laubhaufen = (
+  <>
+    <path d="M4 114 Q8 74 36 58 Q60 44 84 58 Q112 74 116 114 Z" fill="#f4a261" />
+    <path d="M84 58 Q112 74 116 114 H94 Q96 78 84 58 Z" fill="#e76f51" />
+    <path d="M80 50 L98 30 M92 37 l8 -2" stroke="#6f4e37" strokeWidth="3" strokeLinecap="round" />
+    {[
+      leaf(30, 70, -20, "#e63946"),
+      leaf(52, 56, 15, "#ffd166"),
+      leaf(74, 62, -35, "#bc6c25"),
+      leaf(20, 92, 30, "#ffd166"),
+      leaf(44, 80, -10, "#bc6c25"),
+      leaf(90, 82, 25, "#e63946"),
+      leaf(66, 84, 40, "#ffd166"),
+      leaf(100, 102, -25, "#bc6c25"),
+      leaf(14, 108, 10, "#e63946"),
+      leaf(62, 46, -5, "#e63946"),
+    ]}
+    <path d="M42 114 V106 a18 14 0 0 1 36 0 V114 Z" fill={DARK} />
+    <rect x="4" y="113" width="112" height="5" rx="2.5" fill="#8ac926" />
+  </>
+);
+
+/** A flower on the meadow: its stalk from the grass up to a head of petals at (x, y). */
+const flower = (x: number, y: number, petals: string, heart: string) => (
+  <g key={`${x} ${y}`}>
+    <path d={`M${x} ${y} V${y + 16}`} stroke="#52794a" strokeWidth="2" />
+    {[0, 72, 144, 216, 288].map((a) => (
+      <circle key={a} cx={x + 4 * Math.cos((a * Math.PI) / 180)} cy={y + 4 * Math.sin((a * Math.PI) / 180)} r="3.2" fill={petals} />
+    ))}
+    <circle cx={x} cy={y} r="2.4" fill={heart} />
+  </g>
+);
+
+const wiese = (
+  <>
+    <path d="M0 64 Q30 46 62 56 Q92 46 120 54 V120 H0 Z" fill="#b5e48c" />
+    <path d="M0 76 Q34 64 64 72 Q94 80 120 68 V120 H0 Z" fill="#8ac926" />
+    <path d="M92 76 Q106 74 120 68 V120 H98 Z" fill="#6a994e" />
+    {[8, 26, 44, 86, 104].map((x, i) => (
+      <path
+        key={x}
+        d={`M${x} 118 q2 -14 ${i % 2 ? 6 : -4} -22 M${x + 6} 118 q0 -10 4 -16`}
+        stroke="#52794a"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+    ))}
+    {[
+      flower(16, 74, "#fff", "#ffd166"),
+      flower(36, 88, "#e63946", "#2b2d42"),
+      flower(96, 84, "#fff", "#ffd166"),
+      flower(108, 62, "#ffd166", "#f77f00"),
+      flower(84, 100, "#ff8fab", "#ffd166"),
+      flower(22, 102, "#ffd166", "#f77f00"),
+      flower(48, 62, "#ff8fab", "#ffd166"),
+    ]}
+  </>
+);
+
+/** A picket of the garden's fence, at x. */
+const picket = (x: number) => <path key={x} d={`M${x} 80 V48 l6 -7 l6 7 V80 Z`} fill="#e9b872" stroke="#d49a52" strokeWidth="1.5" />;
+
+const garten = (
+  <>
+    <path d="M102 80 V30" stroke="#52794a" strokeWidth="3" />
+    <path d="M102 50 q8 -6 12 -2 q-6 6 -12 2 Z" fill="#6a994e" />
+    {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+      <ellipse
+        key={a}
+        cx={102 + 9 * Math.cos((a * Math.PI) / 180)}
+        cy={24 + 9 * Math.sin((a * Math.PI) / 180)}
+        rx="5"
+        ry="3"
+        fill="#ffd166"
+        transform={`rotate(${a} ${102 + 9 * Math.cos((a * Math.PI) / 180)} ${24 + 9 * Math.sin((a * Math.PI) / 180)})`}
+      />
+    ))}
+    <circle cx="102" cy="24" r="6" fill="#8b5e3c" />
+    {[4, 20, 36, 52, 68, 84].map(picket)}
+    <rect x="2" y="54" width="98" height="5" fill="#d49a52" />
+    <rect x="2" y="70" width="98" height="5" fill="#d49a52" />
+    <rect x="0" y="78" width="120" height="42" fill="#8ac926" />
+    <rect x="96" y="78" width="24" height="42" fill="#6a994e" />
+    <rect x="8" y="84" width="104" height="18" rx="8" fill="#8b5e3c" />
+    <path d="M90 84 H104 a8 8 0 0 1 8 8 V94 a8 8 0 0 1 -8 8 H90 Z" fill="#6f4e37" />
+    {[22, 42].map((x) => (
+      <g key={x}>
+        <circle cx={x} cy="86" r="9" fill="#6a994e" />
+        <circle cx={x - 2} cy="84" r="6" fill="#8ac926" />
+        <circle cx={x - 3} cy="83" r="3" fill="#b5e48c" />
+      </g>
+    ))}
+    {[74, 90].map((x) => (
+      <g key={x}>
+        <path d={`M${x} 88 l-5 -12 M${x} 88 V74 M${x} 88 l5 -12`} stroke="#52b788" strokeWidth="2.5" strokeLinecap="round" />
+        <path d={`M${x - 4} 87 h8 l-4 9 Z`} fill="#f77f00" />
+      </g>
+    ))}
+  </>
+);
+
+const fluss = (
+  <>
+    <path d="M0 46 Q20 26 44 40 Q70 22 96 38 Q108 30 120 36 V60 H0 Z" fill="#52b788" />
+    <path d="M0 50 Q30 42 60 46 Q90 42 120 48 V120 H0 Z" fill="#8ac926" />
+    <path d="M100 46 Q112 46 120 48 V120 H104 Z" fill="#6a994e" />
+    <path d="M54 46 Q48 58 58 68 Q74 84 34 120 H102 Q112 88 82 68 Q66 56 64 46 Z" fill="#4cc9f0" />
+    <path d="M64 46 Q66 56 82 68 Q112 88 102 120 H92 Q104 88 76 70 Q62 58 62 46 Z" fill="#3aa8d0" />
+    <path
+      d="M58 58 Q62 56 64 60 M66 76 Q74 72 80 78 M48 100 Q60 94 72 100 M76 108 Q84 104 92 108"
+      stroke="#fff"
+      strokeOpacity="0.7"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      fill="none"
+    />
+    <ellipse cx="22" cy="98" rx="9" ry="5" fill="#9e9e9e" />
+    <ellipse cx="25" cy="96" rx="4" ry="2" fill="#bdbdbd" />
+    <ellipse cx="108" cy="72" rx="7" ry="4" fill="#7d7d7d" />
+    {/* Cattails at the banks: a stalk with a leaf and a brown head on top. */}
+    {[
+      [10, 86, 22],
+      [17, 88, 28],
+      [105, 104, 24],
+      [112, 102, 30],
+    ].map(([x, y, h]) => (
+      <g key={x}>
+        <path d={`M${x} ${y} Q${x + 7} ${y - h * 0.4} ${x + 6} ${y - h * 0.6}`} stroke="#6a994e" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d={`M${x} ${y} V${y - h}`} stroke="#52794a" strokeWidth="2" strokeLinecap="round" />
+        <rect x={x - 2.2} y={y - h + 2} width="4.4" height="10" rx="2.2" fill="#8d5524" />
+      </g>
+    ))}
+  </>
+);
+
+const berg = (
+  <>
+    <path d="M58 112 L90 30 L122 112 Z" fill="#9e9e9e" />
+    <path d="M90 30 L122 112 H100 Z" fill="#7d7d7d" />
+    <path d="M90 30 L80 56 L86 52 L92 58 L100 50 Z" fill="#fff" />
+    <path d="M-2 112 L46 12 L94 112 Z" fill="#adb5bd" />
+    <path d="M46 12 L94 112 H70 Z" fill="#8d99ae" />
+    <path d="M46 12 L32 42 L40 36 L46 44 L54 36 L60 42 Z" fill="#fff" />
+    <path d="M46 12 L60 42 L54 36 L50 40 Z" fill="#e3f6ff" />
+    <path d="M0 120 V96 Q30 84 64 92 Q94 98 120 88 V120 Z" fill="#8ac926" />
+    <path d="M98 94 Q110 92 120 88 V120 H100 Z" fill="#6a994e" />
+    {[14, 34, 84].map((x) => (
+      <circle key={x} cx={x} cy={x === 84 ? 104 : 100} r="2.5" fill="#fff" />
+    ))}
+  </>
+);
+
+/** A fir of the forest, its tip at (x, y), `h` tall. */
+const fir = (x: number, y: number, h: number, light: string, dark: string) => (
+  <g key={x}>
+    <rect x={x - 3} y={y + h - 4} width="6" height={118 - y - h} fill="#6f4e37" />
+    {[0, 1, 2].map((tier) => {
+      const top = y + (tier * h) / 4;
+      const bottom = y + ((tier + 2) * h) / 4;
+      const half = ((tier + 2) * h) / 9;
+      return (
+        <g key={tier}>
+          <path d={`M${x} ${top} L${x + half} ${bottom} H${x - half} Z`} fill={light} />
+          <path d={`M${x} ${top} L${x + half} ${bottom} H${x} Z`} fill={dark} />
+        </g>
+      );
+    })}
+  </g>
+);
+
+const wald = (
+  <>
+    {fir(60, 4, 64, "#40916c", "#2d6a4f")}
+    <rect x="0" y="100" width="120" height="20" fill="#6a994e" />
+    {fir(22, 14, 84, "#52b788", "#40916c")}
+    {fir(100, 18, 80, "#52b788", "#40916c")}
+    <rect x="0" y="112" width="120" height="8" fill="#52794a" />
+    <path d="M86 112 V104" stroke="#f2e8cf" strokeWidth="4" />
+    <path d="M78 106 a8 7 0 0 1 16 0 Z" fill="#e63946" />
+    <circle cx="83" cy="102" r="1.4" fill="#fff" />
+    <circle cx="89" cy="103" r="1.2" fill="#fff" />
+  </>
+);
+
+/** A coral of the reef: a branch with twigs from its foot at (x, 112). */
+const coral = (x: number, colour: string) => (
+  <path
+    key={x}
+    d={`M${x} 112 V84 M${x} 100 l-9 -10 V80 M${x} 94 l8 -8 V76 M${x} 84 l-4 -6`}
+    stroke={colour}
+    strokeWidth="5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    fill="none"
+  />
+);
+
+const riff = (
+  <>
+    <path d="M2 14 Q17 8 32 14 T62 14 T92 14 T118 12 V116 H2 Z" fill="#4cc9f0" />
+    <path d="M2 60 Q30 54 60 60 T118 58 V116 H2 Z" fill="#3aa8d0" />
+    <path d="M30 14 L18 60 M64 14 L58 54" stroke="#fff" strokeOpacity="0.35" strokeWidth="7" strokeLinecap="round" />
+    {[
+      [90, 30, 3],
+      [94, 22, 2],
+      [26, 40, 2.5],
+    ].map(([cx, cy, r]) => (
+      <circle key={cx * cy} cx={cx} cy={cy} r={r} fill="#fff" fillOpacity="0.8" />
+    ))}
+    <path d="M2 106 Q30 98 60 104 T118 102 V116 H2 Z" fill="#f4d58d" />
+    {coral(18, "#ff8fab")}
+    {coral(100, "#f4845f")}
+    <path d="M30 112 a14 12 0 0 1 28 0 Z" fill="#f6bd60" />
+    <path d="M34 108 q10 -8 20 0 M37 103 q7 -5 14 0" stroke="#e9a23b" strokeWidth="2" fill="none" />
+    <path d="M72 112 Q66 96 72 84 M78 112 Q86 98 80 88" stroke="#2a9d8f" strokeWidth="4" strokeLinecap="round" fill="none" />
+    {[-12, -6, 0, 6, 12].map((dx) => (
+      <path key={dx} d={`M88 110 q${dx / 2} -8 ${dx} -12`} stroke="#c77dff" strokeWidth="3" strokeLinecap="round" fill="none" />
+    ))}
+  </>
+);
+
 export const HOMES: Record<HomeId, Home> = {
   huette: { id: "huette", name: "Hütte", inPhrase: "in der Hütte", spot: [60, 98], fit: 0.3, drawing: huette },
   nest: { id: "nest", name: "Nest", inPhrase: "im Nest", spot: [60, 60], fit: 0.38, drawing: nest },
@@ -441,7 +703,26 @@ export const HOMES: Record<HomeId, Home> = {
   dschungel: { id: "dschungel", name: "Dschungel", inPhrase: "im Dschungel", spot: [62, 72], fit: 0.3, drawing: dschungel },
   savanne: { id: "savanne", name: "Savanne", inPhrase: "in der Savanne", spot: [38, 94], fit: 0.36, drawing: savanne },
   bambuswald: { id: "bambuswald", name: "Bambuswald", inPhrase: "im Bambuswald", spot: [58, 94], fit: 0.36, drawing: bambuswald },
+  kaefig: { id: "kaefig", name: "Käfig", inPhrase: "im Käfig", spot: [46, 82], fit: 0.3, drawing: kaefig },
+  laubhaufen: { id: "laubhaufen", name: "Laubhaufen", inPhrase: "im Laubhaufen", spot: [60, 100], fit: 0.28, drawing: laubhaufen },
+  wiese: { id: "wiese", name: "Wiese", inPhrase: "auf der Wiese", spot: [64, 88], fit: 0.32, drawing: wiese },
+  garten: { id: "garten", name: "Garten", inPhrase: "im Garten", spot: [60, 102], fit: 0.26, drawing: garten },
+  fluss: { id: "fluss", name: "Fluss", inPhrase: "im Fluss", spot: [68, 96], fit: 0.36, drawing: fluss },
+  berg: { id: "berg", name: "Berg", inPhrase: "auf dem Berg", spot: [56, 94], fit: 0.36, drawing: berg },
+  wald: { id: "wald", name: "Wald", inPhrase: "im Wald", spot: [60, 96], fit: 0.38, drawing: wald },
+  riff: { id: "riff", name: "Korallenriff", inPhrase: "im Korallenriff", spot: [60, 62], fit: 0.34, drawing: riff },
 };
+
+/**
+ * Homes that look alike to a child – landscapes of water, of dry grass and sand, of many trees: an animal living in
+ * one of a group lives in all of them (`alsoLives`), so none of them is ever a wrong choice next to another
+ * (`content.test.ts` checks).
+ */
+export const HOME_LOOKALIKES: HomeId[][] = [
+  ["teich", "meer", "fluss", "riff"],
+  ["savanne", "wueste"],
+  ["dschungel", "bambuswald", "wald"],
+];
 
 /** The drawing of `home`; `label` is its name in the app language, for screen readers. */
 export function HomeDrawing({ home, label }: { home: Home; label: string }) {

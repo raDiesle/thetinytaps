@@ -3,7 +3,7 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GERMAN_ONLY, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
 import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
-import { HOMES, type HomeId } from "./homes";
+import { HOME_LOOKALIKES, HOMES, type HomeId } from "./homes";
 import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
 import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./growth";
 import { KIND_SIGNS } from "./RoundTopic";
@@ -240,6 +240,17 @@ test("every animal with a home has enough wrong homes it really doesn't live in"
     expect(wrong, animal.id).not.toContain(animal.home!);
     for (const id of animal.alsoLives!) expect(wrong, animal.id).not.toContain(id);
     expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
+  }
+});
+
+// Landscapes that look alike to a child (water, dry grass and sand, many trees) are never wrong next to each other: an
+// animal living in one lives in all of its group (the whale's pond, the frog's sea, the fox's savanna).
+test("an animal living in one of a group of look-alike homes lives in all of them", () => {
+  for (const group of HOME_LOOKALIKES) for (const id of group) expect(id in HOMES, id).toBe(true);
+  for (const animal of ANIMALS.filter((a) => a.home)) {
+    const lives = [animal.home!, ...animal.alsoLives!];
+    for (const group of HOME_LOOKALIKES)
+      if (group.some((id) => lives.includes(id))) for (const id of group) expect(lives, `${animal.id} lives in ${group.join("/")}`).toContain(id);
   }
 });
 
