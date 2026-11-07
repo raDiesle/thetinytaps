@@ -17,17 +17,17 @@ export type SwapToy = "bobbycar" | "doll" | "ball";
  */
 export type TimeShown = "off" | "digits" | "marks";
 
-/** The minutes a grown-up can set, in the row above the cards. */
-export const TIMER_MINUTES = [1, 2, 3, 5, 10] as const;
+/** The lengths a grown-up can set in the row above the cards, in seconds: 10 and 30 seconds, then 1 to 10 minutes. */
+export const TIMER_SECONDS = [10, 30, 60, 120, 180, 300, 600] as const;
 
 export interface TimerSettings {
   /** The picture played last, marked on its card; „Weiter“ goes on with the next. */
   picture: TimerPicture;
-  /** How long the timer runs, one of `TIMER_MINUTES`, unless `useOwn`. */
-  minutes: number;
+  /** How long the timer runs in seconds, one of `TIMER_SECONDS`, unless `useOwn`. */
+  seconds: number;
   /** The time a grown-up set last behind „Andere …“ (H-59, H-60): it stays as a slip of its own in the row until another comes. */
   own: OwnTime | null;
-  /** Whether that own time is the one chosen, instead of `minutes`. */
+  /** Whether that own time is the one chosen, instead of `seconds`. */
   useOwn: boolean;
   /** The toy in „Abwechseln“ (H-52). */
   toy: SwapToy;
@@ -41,7 +41,7 @@ export interface TimerSettings {
 
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   picture: "train",
-  minutes: 5,
+  seconds: 300,
   own: null,
   useOwn: false,
   toy: "bobbycar",

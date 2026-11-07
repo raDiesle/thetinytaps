@@ -26,7 +26,7 @@ import {
 } from "./pieces";
 import { ANTS, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
 import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
-import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
+import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 
 describe("Timer", () => {
   test("every picture has its own id, an emoji and a German name, Abwechseln comes first and „Weiter“ goes round the others", () => {
@@ -56,11 +56,11 @@ describe("Timer", () => {
     expect(ids).not.toContain("cake");
   });
 
-  test("the minutes are 1 to 10, rising, and the default is one of them", () => {
-    expect(TIMER_MINUTES[0]).toBe(1);
-    expect(TIMER_MINUTES.at(-1)).toBe(10);
-    expect([...TIMER_MINUTES].sort((a, b) => a - b)).toEqual([...TIMER_MINUTES]);
-    expect(TIMER_MINUTES).toContain(DEFAULT_TIMER_SETTINGS.minutes as (typeof TIMER_MINUTES)[number]);
+  test("the lengths are 10 seconds to 10 minutes, with 10 and 30 seconds (user request, November 2026), rising, and the default is one of them", () => {
+    expect(TIMER_SECONDS.slice(0, 3)).toEqual([10, 30, 60]);
+    expect(TIMER_SECONDS.at(-1)).toBe(600);
+    expect([...TIMER_SECONDS].sort((a, b) => a - b)).toEqual([...TIMER_SECONDS]);
+    expect(TIMER_SECONDS).toContain(DEFAULT_TIMER_SETTINGS.seconds as (typeof TIMER_SECONDS)[number]);
   });
 
   const RIGHT_EDGE = 1340;
