@@ -315,9 +315,25 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/zusammen/",
-    recorded: true,
-    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-    note: "Neu (November 2026), übersetzt am 5. November 2026: die Namen der Dinge und Helfer für Vorleseprogramme, die Fragen in der Sprechblase, die Sätze (content.<Sprache>.ts) und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs auf Deutsch (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
+    parts: [
+      {
+        label: "🤝 Die ersten Paare und Helfer, Fragen und Einstellungen",
+        recorded: true,
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Übersetzt am 5. November 2026: die neun ersten Paare (Zahnbürste bis Friseurin) mit Namen und Sätzen (content.<Sprache>.ts), die Fragen unter dem Bild und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs auf Deutsch (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
+      },
+      {
+        label: "🏠 Die vielen neuen Szenen (scenes/)",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu am 7. November 2026, nur auf Deutsch: die Paare und Helfer der Themen (Bad, Küche, Berufe, Sport …) mit ihren Sätzen. Die deutschen Sätze sind noch nicht aufgenommen und bleiben bis dahin stumm (🎙️ Stimmen); in den anderen Sprachen kommen die Namen unter den Knöpfen auf Deutsch.",
+      },
+      {
+        label: "🗂️ Die Namen der Themen",
+        languages: { de: "done" },
+        note: "Nur auf Deutsch (topics.ts, 7. November 2026): „Im Bad“, „Berufe“, „Unterwegs“ … – für eine spätere Wahl der Themen hinter ⚙️.",
+      },
+    ],
   },
   {
     href: "/schatten/",

@@ -1,7 +1,13 @@
 /* ---------- Was gehört zusammen? ---------- */
 
 .together-play {
-  --gap: min(4vw, 32px);
+  --gap: min(3.5vw, 28px);
+  /* The name under each choice, for grown-ups: its size, the gap above it and the room it takes below a choice. */
+  --name-size: clamp(0.78rem, 2.3vh, 1rem);
+  --name-gap: 8px;
+  --name-room: calc(var(--name-gap) + var(--name-size) * 1.25);
+  /* The quiet line under the picture saying what the round is about. */
+  --topic-room: calc(clamp(0.75rem, 2.3vh, 1rem) * 1.25 + 0.5em);
   position: absolute;
   inset: 0;
   display: flex;
@@ -13,23 +19,30 @@
   background: #e3f2fd;
 }
 
+/* Both are size containers: the picture and the choices in them are as big as their room. */
 .tg-top,
 .tg-ground {
   display: flex;
-  justify-content: center;
-  padding: 0 16px;
+  min-height: 0;
+  min-width: 0;
+  container-type: size;
 }
 
 .tg-top {
-  flex: 1.2;
-  align-items: flex-end;
-  padding-top: max(56px, env(safe-area-inset-top));
+  flex: 1.25;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: max(56px, env(safe-area-inset-top)) 16px 0;
 }
 
 .tg-ground {
   flex: 1;
   align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
+  justify-content: center;
+  padding: min(2vh, 14px) 16px;
+  /* Clear of the page's paper margin over the picture's edge (`--frame`), so the names below the choices stay whole. */
+  padding-bottom: max(calc(var(--frame, 0px) + min(1.5vh, 10px)), env(safe-area-inset-bottom));
   background: #b5e48c;
 }
 
@@ -37,10 +50,11 @@
   background: #d8c3a5;
 }
 
-/* The one above, in a square box, so its layers can be placed in it in per cent. */
+/* The one above, in its wide box (3 : 2), so its layers can be placed in it in per cent. */
 .tg-above {
   position: relative;
   z-index: 3;
+  flex: none;
   cursor: pointer;
   animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -48,20 +62,62 @@
 .tg-box {
   position: relative;
   display: block;
-  width: min(46vh, 56vw);
-  aspect-ratio: 1;
+  overflow: hidden;
+  width: 300px;
+  aspect-ratio: 3 / 2;
+  border-radius: 18px;
 }
 
-/* On a phone the picture takes the room the corner notes leave free in the middle above (most pictures
-   leave their box's top empty, so it may reach up to the top edge). */
+/* Above, the picture is as big as the room left over the quiet line under it allows. */
+.tg-top .tg-box {
+  width: min(100cqw, (100cqh - var(--topic-room)) * 1.5);
+  border: var(--outline);
+  box-shadow: var(--lift);
+}
+
+/* On a phone the picture takes the room the corner notes leave free in the middle above. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .tg-top {
     padding-top: max(8px, env(safe-area-inset-top));
   }
+}
 
-  .together-play > .tg-top .tg-box {
-    width: min(56vh, 56vw);
+/* A phone on its side: the picture at the left, as tall as the screen, the choices beside it two to a row – both much
+   bigger than one above the other in so low a screen. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  @media (min-aspect-ratio: 19 / 10) {
+    .together-play {
+      flex-direction: row;
+    }
+
+    .tg-top {
+      flex: 1.35;
+      justify-content: center;
+      /* Below the page's corner (the ✕), which would lie over the picture's corner. */
+      padding: calc(var(--corner-clear, 0px) + 2px) 8px max(calc(var(--frame, 0px) + 4px), env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+
+    /* Below the notes in the top right corner (fullscreen, ⚙️), which are as high as the ✕ corner. */
+    .tg-ground {
+      padding: calc(var(--corner-clear, 0px) + 2px) max(16px, env(safe-area-inset-right)) max(calc(var(--frame, 0px) + 4px), env(safe-area-inset-bottom)) 8px;
+    }
   }
+}
+
+/* What the round is about, for grown-ups (RoundTopic): plain small text centred under the picture, quiet – no sign, no
+   bubble, no frame (user feedback, November 2026). Taps go through it to the game. */
+.tg-topic {
+  flex: none;
+  margin: 0;
+  padding-top: 0.5em;
+  color: var(--ink);
+  font-size: clamp(0.75rem, 2.3vh, 1rem);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 /* Every layer is a small HTML layer of its own: what moves moves as a whole, by transform or opacity. */
@@ -92,9 +148,57 @@
   text-align: center;
 }
 
+/* A scene's still parts: the backdrop behind everything, the small emoji round the thing, the thing itself big. */
+.tg-backdrop,
+.tg-props {
+  pointer-events: none;
+}
+
+.tg-prop {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-emoji);
+  /* Its size in the box (`--s`, a share of the box's height), measured on the props' layer, which is the whole box. */
+  font-size: calc(var(--s) * 86cqh);
+  line-height: 1;
+}
+
+.tg-thing,
+.tg-props {
+  container-type: size;
+}
+
+.tg-thing .tg-emoji,
+.tg-props .tg-prop {
+  filter: drop-shadow(0 2px 0 rgb(90 70 54 / 0.25));
+}
+
+.tg-flip {
+  transform: scaleX(-1);
+}
+
+/* The fox or bear grown-up, its child, and the helper of a scene: drawn figures filling their layer. */
+.tg-helper > svg,
+.tg-child > svg,
+.tg-base-grown > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* A lamp's or candle's warm light behind the thing, until the partner lights it. */
+.tg-shine-glow {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 236 153 / 0.95) 0%, rgb(255 212 59 / 0.55) 40%, rgb(255 212 59 / 0) 70%);
+}
+
 /* Hidden until the two set to work. */
 .tg-paste,
-.tg-sparkles,
 .tg-heart,
 .tg-upright,
 .tg-drops,
@@ -105,7 +209,9 @@
 .tg-tray,
 .tg-line1,
 .tg-line2,
-.tg-fill {
+.tg-fill,
+.tg-shine,
+.tg-pour {
   opacity: 0;
 }
 
@@ -117,82 +223,57 @@
   animation: tg-hop-again 0.45s ease-in-out;
 }
 
-/* What the round is about, for grown-ups (TopicBubble): a speech bubble at the left of the picture, its tail pointing in
-   to the middle, where the one above is; the sign big, the question small under it. Taps go through it to the game. */
-.tg-topic {
-  position: absolute;
-  z-index: 6;
-  top: calc(max(64px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
-  left: max(16px, 3vw, env(safe-area-inset-left));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  max-width: min(30vw, 240px);
-  padding: 0.35em 0.8em 0.45em;
-  border: var(--outline);
-  border-radius: 1.2em;
-  background: #fff;
-  pointer-events: none;
-  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.tg-topic::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -11px;
-  width: 20px;
-  height: 20px;
-  margin-top: -10px;
-  border-right: var(--outline);
-  border-bottom: var(--outline);
-  background: #fff;
-  rotate: -45deg;
-}
-
-.tg-topic-sign {
-  font-family: var(--font-emoji);
-  font-size: clamp(2rem, 12vh, 4.5rem);
-  line-height: 1.1;
-}
-
-.tg-topic-text {
-  color: var(--ink);
-  font-size: clamp(0.75rem, 2.6vh, 1.05rem);
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: center;
-  text-wrap: balance;
-}
-
-/* The partners to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
+/* The partners to choose from, as big as the ground allows: in one row (2 to 4), two to a row on a phone held upright
+   or beside the picture (`choiceRows`), each with its name below it in the room kept between the rows and below the
+   last (user feedback, November 2026). */
 .tg-options {
   --cols: var(--n);
+  --rows: 1;
+  /* The ground's height less the names' room, shared by the rows; its width shared by the columns, clear of the frame. */
+  --size: min(
+    (100cqh - var(--rows) * var(--name-room) - (var(--rows) - 1) * var(--gap)) /
+    var(--rows),
+    (100cqw - (var(--cols) - 1) * var(--gap) - 2 * var(--frame, 0px)) /
+    var(--cols),
+    300px
+  );
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: calc(var(--gap) + var(--name-room)) var(--gap);
   align-items: flex-end;
   justify-content: center;
+  max-width: calc(var(--cols) * var(--size) + (var(--cols) - 1) * var(--gap) + 1px);
+  padding-bottom: var(--name-room);
 }
 
-/* Phones upright: two per row, so they stay big enough for a finger. */
+/* Phones upright, and a phone on its side with the choices beside the picture: two per row, so they stay big enough
+   for a finger. */
 @media (max-aspect-ratio: 4 / 5) {
   .tg-options {
-    --cols: min(var(--n), 2);
+    --cols: var(--tall-cols);
+    --rows: var(--tall-rows);
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  @media (min-aspect-ratio: 19 / 10) {
+    .tg-options {
+      --cols: var(--tall-cols);
+      --rows: var(--tall-rows);
+    }
   }
 }
 
 .tg-option {
-  --size: min(20vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 190px);
   position: relative;
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   width: var(--size);
   height: var(--size);
   border: var(--outline);
-  border-radius: 28px;
+  border-radius: min(28px, calc(var(--size) * 0.18));
   background: #fff;
   box-shadow: var(--lift);
   cursor: pointer;
@@ -221,9 +302,27 @@
   position: relative;
   z-index: 4;
   display: block;
-  width: calc(var(--size) * 0.74);
-  height: calc(var(--size) * 0.74);
+  width: calc(var(--size) * 0.72);
+  height: calc(var(--size) * 0.72);
   container-type: size;
+}
+
+/* Its name, small and quiet, centred below the plate, in one line. It stays when the partner flies off. */
+.tg-name {
+  position: absolute;
+  top: calc(100% + var(--name-gap));
+  left: 50%;
+  max-width: calc(var(--size) + var(--gap));
+  overflow: hidden;
+  translate: -50% 0;
+  color: var(--ink);
+  font-size: var(--name-size);
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 /* The right one flies up into the picture and is gone there, where the picture shows it at work. */
@@ -240,7 +339,7 @@
   bottom: 86%;
   left: 50%;
   z-index: 5;
-  width: calc(var(--size) * 1.15);
+  width: calc(var(--size) * 1.5);
   translate: -50% 0;
   pointer-events: none;
   animation: tg-peek 1.3s ease-in-out forwards;
@@ -248,19 +347,128 @@
 
 .tg-owner .tg-box {
   width: 100%;
+  border: var(--outline);
+  box-shadow: var(--lift);
 }
 
-/* ---------- The pairs at work (`.working` comes as the partner arrives) ---------- */
+/* ---------- The scenes at work (scene.tsx): one motion per act, `--t` after the partner arrived ---------- */
+
+/* The partner pops up where it works; a helper's tool first in the helper's paw, then carried over to the thing. */
+.scene .tg-tool {
+  --from-x: 0%;
+  --from-y: 0%;
+}
+
+.scene.working .tg-tool {
+  animation:
+    tg-pop-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+    tg-carry 0.65s ease-in-out 0.4s backwards;
+}
+
+.scene .tg-act {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The thing answers with a hop once the partner did its work, and the helper is glad after it. */
+.scene .tg-thing,
+.scene .tg-helper {
+  transform-origin: 50% 100%;
+}
+
+.scene.working .tg-thing {
+  animation: tg-jump 0.5s ease-in-out calc(var(--t) + 1.5s) 2;
+}
+
+.scene.working .tg-helper {
+  animation: tg-jump 0.5s ease-in-out calc(var(--t) + 1.9s);
+}
+
+/* onto: it comes down onto the thing and settles. */
+.act-onto.working .tg-act {
+  animation: tg-act-onto 0.55s cubic-bezier(0.5, 0, 0.6, 1.4) var(--t) backwards;
+}
+
+/* into: it sinks into the thing and is gone. */
+.act-into.working .tg-act {
+  animation: tg-act-into 0.8s ease-in var(--t) forwards;
+}
+
+/* beside: it slides up beside the thing, and the two lean together. */
+.act-beside .tg-act {
+  transform-origin: 50% 100%;
+}
+
+.act-beside.working .tg-act {
+  animation:
+    tg-act-slide 0.5s ease-out var(--t) backwards,
+    tg-lean-left 1s ease-in-out calc(var(--t) + 0.6s);
+}
+
+.act-beside.working .tg-thing {
+  animation:
+    tg-lean-right 1s ease-in-out calc(var(--t) + 0.6s),
+    tg-jump 0.5s ease-in-out calc(var(--t) + 1.7s);
+}
+
+/* rub: to and fro over the thing. */
+.act-rub.working .tg-act {
+  animation: tg-act-rub 0.32s ease-in-out var(--t) 4;
+}
+
+/* pour: it tips over the thing, and drops fall. */
+.act-pour .tg-act {
+  transform-origin: 30% 70%;
+}
+
+.act-pour.working .tg-act {
+  animation: tg-act-pour 1.6s ease-in-out var(--t) forwards;
+}
+
+.act-pour.working .tg-pour {
+  animation: tg-drip 0.45s ease-in calc(var(--t) + 0.35s) 3;
+}
+
+/* tap: it swings down onto the thing three times. */
+.act-tap .tg-act {
+  transform-origin: 75% 80%;
+}
+
+.act-tap.working .tg-act {
+  animation: tg-act-tap 0.36s ease-in var(--t) 3;
+}
+
+/* turn: it turns on the thing. */
+.act-turn.working .tg-act {
+  animation: tg-turn 0.5s ease-in-out var(--t) forwards;
+}
+
+/* light: it touches the thing, which lights up. */
+.act-light.working .tg-act {
+  animation: tg-act-touch 0.6s ease-in-out var(--t) forwards;
+}
+
+.act-light.working .tg-shine {
+  animation: tg-show 0.6s ease-out calc(var(--t) + 0.4s) forwards;
+}
+
+/* hold: it wiggles in the helper's paw. */
+.act-hold .tg-act {
+  transform-origin: 30% 80%;
+}
+
+.act-hold.working .tg-act {
+  animation: tg-act-hold 0.5s ease-in-out var(--t) 3;
+}
+
+/* ---------- The handmade pairs at work (`.working` comes as the partner arrives) ---------- */
 
 .working .tg-tool {
   animation: tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
-.working .tg-sparkles {
-  animation: tg-show-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s forwards;
-}
-
-.working .tg-helper {
+.working:not(.scene) .tg-helper {
   transform-origin: 50% 100%;
   animation: tg-jump 0.5s ease-in-out 2.6s;
 }
@@ -453,16 +661,90 @@
   animation: tg-jump 0.5s ease-in-out 2.1s;
 }
 
-/* Postman: he hands the parcel to the bear child, who hops for joy. */
-.pair-post.working .tg-tool {
-  animation:
-    tg-arrive 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
-    tg-hand 0.8s ease-in-out 0.6s forwards;
+@keyframes tg-pop-arrive {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
 }
 
-.pair-post.working .tg-child {
-  transform-origin: 50% 100%;
-  animation: tg-jump 0.5s ease-in-out 1.5s 2;
+@keyframes tg-carry {
+  from {
+    translate: var(--from-x) var(--from-y);
+  }
+}
+
+@keyframes tg-act-onto {
+  from {
+    transform: translateY(-55%);
+  }
+}
+
+@keyframes tg-act-into {
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(40%) scale(0.3);
+  }
+}
+
+@keyframes tg-act-slide {
+  from {
+    transform: translateX(45%);
+  }
+}
+
+@keyframes tg-lean-left {
+  40%,
+  60% {
+    transform: rotate(-9deg);
+  }
+}
+
+@keyframes tg-lean-right {
+  40%,
+  60% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes tg-act-rub {
+  25% {
+    transform: translateX(18%) rotate(6deg);
+  }
+  75% {
+    transform: translateX(-18%) rotate(-6deg);
+  }
+}
+
+@keyframes tg-act-pour {
+  25%,
+  75% {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes tg-act-tap {
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+
+@keyframes tg-act-touch {
+  50% {
+    transform: translateX(-30%);
+  }
+}
+
+@keyframes tg-act-hold {
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
 }
 
 @keyframes tg-hop {
@@ -712,7 +994,7 @@
   }
   to {
     opacity: 0;
-    transform: translate(211%, 44%) scale(0.5);
+    transform: translate(161%, 33%) scale(0.5);
   }
 }
 
@@ -740,11 +1022,5 @@
   to {
     opacity: 0;
     transform: translateY(160%) rotate(50deg);
-  }
-}
-
-@keyframes tg-hand {
-  to {
-    transform: translate(216%, 55%);
   }
 }

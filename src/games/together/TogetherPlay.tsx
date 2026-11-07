@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { choiceRows } from "@/games/shadows/levels";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
@@ -29,6 +30,8 @@ export interface TogetherPlayProps {
   onSolved: (misses: number) => void;
   /** The two have done what they are for: the next round may come. */
   onNext: () => void;
+  /** What the round is about, for grown-ups: shown small under the picture (`RoundTopic`). */
+  topic: ReactNode;
 }
 
 /**
@@ -37,7 +40,7 @@ export interface TogetherPlayProps {
  * onto the brush, the key turns and the door opens, the hose puts out the fire, the scissors snip. A wrong pick shows
  * the one it belongs to over its plate; it is never shown as wrong.
  */
-export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlayProps) {
+export function TogetherPlay({ settings, round, onSolved, onNext, topic }: TogetherPlayProps) {
   const language = useAppLanguage();
   const texts = pick(TOGETHER_TEXTS, language.id);
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -177,9 +180,10 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
         <div ref={topRef} className={`tg-above${nudge && !working ? ` tg-nudge-${nudge % 2}` : ""}`} data-tap onPointerDown={onTopDown}>
           <PairPicture pair={round.pair} working={working} label={texts.name(round.pair)} />
         </div>
+        {topic}
       </div>
       <div className="tg-ground">
-        <div className="tg-options" style={{ "--n": round.choices.length } as CSSProperties}>
+        <div className="tg-options" style={choiceRows(round.choices.length)}>
           {round.choices.map((p, i) => {
             const shown = outcome?.pick === i;
             return (
@@ -204,6 +208,10 @@ export function TogetherPlay({ settings, round, onSolved, onNext }: TogetherPlay
                   aria-label={texts.partner(p)}
                 >
                   <PartnerIcon partner={p.partner} />
+                </span>
+                {/* Its name, small, for grown-ups; the child plays from the pictures. */}
+                <span className="tg-name" aria-hidden>
+                  {texts.partner(p)}
                 </span>
               </div>
             );

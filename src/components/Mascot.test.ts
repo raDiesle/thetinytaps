@@ -13,6 +13,7 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/shared.tsx",
   "src/games/pacifier/drawings.tsx",
   "src/games/together/pairs.tsx",
+  "src/games/together/Helper.tsx",
   "src/games/marbles/scenery.tsx",
   "src/games/marbles/CircusLevel.tsx",
   "src/games/timer/scenes.tsx",

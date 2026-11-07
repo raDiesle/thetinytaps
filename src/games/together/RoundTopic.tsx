@@ -2,8 +2,8 @@ import { type Localized, useT } from "@/lib/language";
 import type { RoundKind } from "./levels";
 
 /**
- * The sign of each kind of round, in its bubble while playing and before its name under ⚙️. Never something the child
- * picks from (no 🔑, no ✂️), or the bubble would give the answer away or look like one more choice.
+ * The sign of each kind of round, before its name under ⚙️ (never while playing). Never something the child picks from
+ * (no 🔑, no ✂️), or it would give the answer away or look like one more choice.
  */
 export const KIND_SIGNS: Record<RoundKind, string> = { pair: "🤝", helper: "🦺" };
 
@@ -30,17 +30,11 @@ const KIND_QUESTIONS: Record<RoundKind, Localized> = {
 };
 
 /**
- * A speech bubble telling grown-ups what this round is about: the kind's sign big, its question small below it. The
- * child needs neither – it plays from the pictures – so it stays out of the way of every tap.
+ * What this round is about, for grown-ups: its question as plain small text under the picture – no sign, no bubble, no
+ * frame (user feedback, November 2026). The child needs none of it – it plays from the pictures – so it stays quiet and
+ * lets every tap through.
  */
-export function TopicBubble({ kind }: { kind: RoundKind }) {
+export function RoundTopic({ kind }: { kind: RoundKind }) {
   const t = useT();
-  return (
-    <div className="tg-topic">
-      <span className="tg-topic-sign" aria-hidden>
-        {KIND_SIGNS[kind]}
-      </span>
-      <span className="tg-topic-text">{t(KIND_QUESTIONS[kind])}</span>
-    </div>
-  );
+  return <p className="tg-topic">{t(KIND_QUESTIONS[kind])}</p>;
 }

@@ -399,7 +399,7 @@ const FOX_BELLY = "M82 150 Q90 160 100 156 Q110 160 118 150 C128 170 132 194 130
 const BEAR_BELLY = "M100 166 C121 166 135 190 135 219 C135 247 120 266 100 266 C80 266 65 247 65 219 C65 190 79 166 100 166 Z";
 
 /** The fox's big bushy tail behind it on the right, with its white tip in tufts and its far side in shadow. */
-function FoxTail() {
+export function FoxTail() {
   const c = MASCOT_COLORS.fox;
   const tail = "M128 256 C176 258 198 218 188 176 Q187 160 179 146 Q174 152 169 150 Q167 158 161 160 C168 196 158 222 128 230 Z";
   return (

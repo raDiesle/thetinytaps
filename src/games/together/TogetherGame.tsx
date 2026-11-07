@@ -7,7 +7,7 @@ import { TOGETHER_TITLE } from "./names";
 import { KIND_ORDER, type RoundKind } from "./levels";
 import { DEFAULT_TOGETHER_SETTINGS, type Difficulty, TOGETHER_SETTINGS_KEY } from "./settings";
 import { TogetherRounds } from "./TogetherRounds";
-import { KIND_SIGNS } from "./TopicBubble";
+import { KIND_SIGNS } from "./RoundTopic";
 import "./together.css";
 
 /** The names of the two kinds of rounds, for switching them on and off (after their sign, `KIND_SIGNS`). */

@@ -39,10 +39,24 @@ export interface TogetherRound {
 
 /**
  * `pair`'s partner among the partners of `count - 1` others of its kind, in random order. Each partner belongs to
- * its own pair only (`pairs.ts` keeps it so), so every other one is a clearly wrong choice.
+ * its own pair only (`pairs.tsx` keeps it so); the others come from other topics first and each from a topic of its
+ * own where there are enough (a sock beside a toothbrush, not beside a shoe's laces), so a wrong one is clearly wrong.
  */
 export function dealRound(pair: Pair, pool: Pair[], count: number): TogetherRound {
-  const others = pool.filter((p) => p !== pair && p.kind === pair.kind);
-  const choices = shuffle([pair, ...shuffle(others).slice(0, count - 1)]);
+  // Never one whose partner would fit too, or which this one's partner fits (`alsoFits`, either way round).
+  const fits = (a: Pair, b: Pair) => a.alsoFits?.includes(b.id) || b.alsoFits?.includes(a.id);
+  const others = shuffle(pool.filter((p) => p !== pair && p.kind === pair.kind && !fits(pair, p)));
+  const picked: Pair[] = [];
+  const topics = new Set([pair.topic]);
+  // First one per other topic, then any other topic, then the pair's own topic if nothing else is left.
+  for (const fits of [(p: Pair) => !topics.has(p.topic), (p: Pair) => p.topic !== pair.topic, () => true]) {
+    for (const p of others) {
+      if (picked.length === count - 1) break;
+      if (picked.includes(p) || !fits(p)) continue;
+      picked.push(p);
+      topics.add(p.topic);
+    }
+  }
+  const choices = shuffle([pair, ...picked]);
   return { kind: pair.kind, pair, choices, correct: choices.indexOf(pair) };
 }

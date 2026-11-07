@@ -8,7 +8,7 @@ import { dealRound, FIXED_LEVELS, nextKind, ROUNDS_PER_GAME, TOGETHER_LEVELS, ty
 import { PAIRS, pairsOf } from "./pairs";
 import type { TogetherSettings } from "./settings";
 import { TogetherPlay } from "./TogetherPlay";
-import { TopicBubble } from "./TopicBubble";
+import { RoundTopic } from "./RoundTopic";
 
 const OF_DAY = pairsOf("pair");
 const HELPERS = pairsOf("helper");
@@ -16,7 +16,7 @@ const HELPERS = pairsOf("helper");
 /**
  * "Was gehört zusammen?" as one flowing game: a thing of the day and a helper take turns, and the difficulty follows
  * how the child plays (`TOGETHER_LEVELS`). Grown-ups may switch a kind off or fix the difficulty while playing; that
- * counts from the next round. Each round is mounted anew under a bubble saying what it is about.
+ * counts from the next round. Each round is mounted anew, with a quiet line under its picture saying what it is about.
  */
 export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
   const [turn, setTurn] = useState(0);
@@ -40,6 +40,9 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
       levelRef.current = FIXED_LEVELS[settings.difficulty];
       resultsRef.current = [];
     }
+    // While developing, `?pair=<id>` shows that pair first, to look at it.
+    const shown = DEV && last === null ? PAIRS.find((p) => p.id === new URLSearchParams(window.location.search).get("pair")) : undefined;
+    if (shown) return dealRound(shown, PAIRS, TOGETHER_LEVELS[levelRef.current]);
     const kind = nextKind(last, settings);
     const pair = kind === "pair" ? drawOfDay() : drawHelper();
     return dealRound(pair, PAIRS, TOGETHER_LEVELS[levelRef.current]);
@@ -70,10 +73,5 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
     setTurn(turn + 1);
   }, [turn]);
 
-  return (
-    <>
-      <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} />
-      <TopicBubble key={`topic-${turn}`} kind={round.kind} />
-    </>
-  );
+  return <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} topic={<RoundTopic kind={round.kind} />} />;
 }

@@ -68,11 +68,4 @@ export const ENGLISH: TogetherTranslation = {
     right: "The hairdresser needs the scissors. Great!",
     belongs: "The hairdresser needs the scissors!",
   },
-  post: {
-    name: "Postman",
-    partner: "Parcel",
-    question: "What does the postman need?",
-    right: "The postman needs the parcel. Great!",
-    belongs: "The postman needs the parcel!",
-  },
 };

@@ -14,5 +14,4 @@ export const CHINESE: TogetherTranslation = {
   aerztin: { name: "医生", partner: "听诊器", question: "医生需要什么？", right: "医生需要听诊器。真棒！", belongs: "医生需要听诊器！" },
   baecker: { name: "面包师", partner: "小面包", question: "面包师需要什么？", right: "面包师需要小面包。真棒！", belongs: "面包师需要小面包！" },
   friseurin: { name: "理发师", partner: "剪刀", question: "理发师需要什么？", right: "理发师需要剪刀。真棒！", belongs: "理发师需要剪刀！" },
-  post: { name: "邮递员", partner: "包裹", question: "邮递员需要什么？", right: "邮递员需要包裹。真棒！", belongs: "邮递员需要包裹！" },
 };

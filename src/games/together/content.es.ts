@@ -68,11 +68,4 @@ export const SPANISH: TogetherTranslation = {
     right: "La peluquera necesita las tijeras. ¡Genial!",
     belongs: "¡La peluquera necesita las tijeras!",
   },
-  post: {
-    name: "Cartero",
-    partner: "Paquete",
-    question: "¿Qué necesita el cartero?",
-    right: "El cartero necesita el paquete. ¡Genial!",
-    belongs: "¡El cartero necesita el paquete!",
-  },
 };
