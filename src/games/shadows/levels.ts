@@ -12,14 +12,26 @@ export function choiceRows(n: number): CSSProperties {
   return { "--n": n, "--tall-cols": tallCols, "--tall-rows": Math.ceil(n / tallCols) } as CSSProperties;
 }
 
-/** One step of difficulty: how many shadows to choose from, and whether the others come from the picture's own theme. */
+/** One step of difficulty: how many shadows to choose from, and what makes them harder to tell apart or to find. */
 export interface ShadowLevel {
   shadows: number;
   /** The other shadows are of the same kind (a cow among animals), so their outlines are closer; else of other kinds. */
   alike: boolean;
+  /** The shadows lie turned, each by up to this many degrees to one side or the other: the child has to see a shape turned. */
+  turn?: number;
+  /** Some shadows lie mirrored, facing the other way than the picture. */
+  mirror?: boolean;
+  /** The shadows lie under paper flaps, like memory cards: a tap lifts one flap and shows its shadow (the one lifted before
+   * goes down again), a tap on the shadow lifted picks it. The child has to remember where it saw which. */
+  covered?: boolean;
 }
 
-/** The steps the game climbs (or goes back down) by how the child plays, see `nextLevel`; the first is where it begins. */
+/**
+ * The steps the game climbs (or goes back down) by how the child plays, see `nextLevel`; the first is where it begins.
+ * First more shadows and closer ones, then new ways to look (user feedback, November 2026: harder, by itself): the
+ * shadows lie turned, then mirrored too, then hidden under flaps to remember. Each new way starts again with fewer
+ * shadows, so it is a new thing to learn rather than a wall.
+ */
 export const SHADOW_LEVELS: ShadowLevel[] = [
   { shadows: 2, alike: false },
   { shadows: 3, alike: false },
@@ -27,17 +39,52 @@ export const SHADOW_LEVELS: ShadowLevel[] = [
   { shadows: 4, alike: true },
   { shadows: 5, alike: true },
   { shadows: 6, alike: true },
+  { shadows: 4, alike: true, turn: 40 },
+  { shadows: 5, alike: true, turn: 40, mirror: true },
+  { shadows: 6, alike: true, turn: 60, mirror: true },
+  { shadows: 3, alike: true, covered: true },
+  { shadows: 4, alike: true, covered: true, turn: 40 },
+  { shadows: 5, alike: true, covered: true, turn: 40, mirror: true },
+  { shadows: 6, alike: true, covered: true, turn: 60, mirror: true },
 ];
+
+/**
+ * The first steps a child who knows the game leaves after one picture without a wrong shadow, not two: so it soon
+ * reaches the steps that ask something of it, and the game finds where it stands by itself.
+ */
+export const QUICK_STEPS = 3;
+
+/** How a shadow lies: turned by `angle` degrees, and mirrored or not. */
+export interface ShadowPose {
+  angle: number;
+  flip: boolean;
+}
+
+/**
+ * How each of `n` shadows lies on `level`: turned by at least half its `turn` and at most all of it, to either side
+ * (so a turned one is plainly turned), and mirrored by chance where it says `mirror` – at least one of them, so the
+ * step shows what it is about. Straight and unmirrored where the level says nothing.
+ */
+export function poseShadows(n: number, level: ShadowLevel, random = Math.random): ShadowPose[] {
+  const poses = Array.from({ length: n }, () => {
+    const turn = level.turn ?? 0;
+    const angle = turn ? Math.round((turn / 2 + (random() * turn) / 2) * (random() < 0.5 ? -1 : 1)) : 0;
+    return { angle, flip: !!level.mirror && random() < 0.5 };
+  });
+  if (level.mirror && n > 0 && !poses.some((p) => p.flip)) poses[Math.floor(random() * n)].flip = true;
+  return poses;
+}
 
 /**
  * The step after a picture, from the wrong shadows tapped in each picture on the current step (newest last): two
  * pictures without one go one up; two in one picture, or one in each of two pictures in a row, go one down. Time
  * plays no part: a slow but sure child climbs too, and nothing asks it to be quick. `top` is the last step; "Was gehört
- * zum Tier?" climbs its own steps by the same rule.
+ * zum Tier?" climbs its own steps by the same rule. Below step `quick` one picture without a wrong shadow is enough.
  */
-export function nextLevel(level: number, misses: number[], top = SHADOW_LEVELS.length - 1): number {
+export function nextLevel(level: number, misses: number[], top = SHADOW_LEVELS.length - 1, quick = 0): number {
   const last = misses.at(-1);
   if (last === undefined) return level;
+  if (level < quick && last === 0) return Math.min(top, level + 1);
   const recent = misses.slice(-2);
   let step = 0;
   if (last >= 2 || (recent.length === 2 && recent.every((m) => m > 0))) step = -1;

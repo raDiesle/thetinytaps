@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { DEV } from "@/lib/buildInfo";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { loadRecordings, playChime, playPop, playRandomNote, playRustle } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
-import { choiceRows, dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
+import { choiceRows, dealShadows, nextLevel, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel, type ShadowPose } from "./levels";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
 import { shadowsVoice } from "./voice";
 
@@ -51,12 +52,29 @@ interface Round {
   item: ShadowItem;
   shadows: ShadowItem[];
   correct: number;
+  /** The step it was dealt on: whether its shadows lie turned, mirrored or under flaps. */
+  level: ShadowLevel;
+  /** How each shadow lies. */
+  poses: ShadowPose[];
 }
 
 interface Offset {
   x: number;
   y: number;
   scale?: number;
+  /** Landing on a turned or mirrored shadow, the picture turns with it to fit it exactly. */
+  pose?: ShadowPose;
+}
+
+/** Where the picture is while dragged or landing: moved, and on landing shrunk, turned and mirrored like its shadow. */
+function landedStyle(offset: Offset, landed: Offset | null) {
+  const scale = landed?.scale;
+  const pose = landed?.pose;
+  return {
+    translate: `${offset.x}px ${offset.y}px`,
+    scale: scale === undefined ? undefined : `${pose?.flip ? -scale : scale} ${scale}`,
+    rotate: pose?.angle ? `${pose.angle}deg` : undefined,
+  };
 }
 
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -90,6 +108,10 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const focusRef = useRef<number | null>(null);
   /** Set from a pick until the child may pick again; a ref, since a key can come before the next render. */
   const busy = useRef(false);
+  /** The flap lifted on a step with covered shadows (`ShadowLevel.covered`). */
+  const [opened, setOpened] = useState<number | null>(null);
+  /** No flap was lifted yet this visit: a still hand points at the first one. */
+  const [flapsNew, setFlapsNew] = useState(true);
   /** Bumped to make the picture hop again, e.g. "drag me" when tapping isn't enough. */
   const [nudge, setNudge] = useState(0);
   const { effects, ripple } = useTapFeedback();
@@ -102,8 +124,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   // Refs, since `nextRound` is also called from timers set before a change: it always deals at the current ones.
   const themeRef = useRef(theme);
-  /** The difficulty step (an index into `SHADOW_LEVELS`); every visit begins on the first. */
-  const levelRef = useRef(0);
+  /** The difficulty step (an index into `SHADOW_LEVELS`); every visit begins on the first (while developing, `?level=N` on step N). */
+  const levelRef = useRef(Math.min(SHADOW_LEVELS.length - 1, Number(DEV && new URLSearchParams(window.location.search).get("level")) || 0));
   /** The wrong shadows tapped in each picture on the current step, newest last; cleared on each step up or down. */
   const resultsRef = useRef<number[]>([]);
   /** Wrong shadows tapped in the current picture. */
@@ -135,14 +157,16 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
 
   const nextRound = useCallback(() => {
     const item = drawRef.current();
-    const shadows = dealShadows(item, poolRef.current, SHADOW_LEVELS[levelRef.current]);
-    const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item) };
+    const level = SHADOW_LEVELS[levelRef.current];
+    const shadows = dealShadows(item, poolRef.current, level);
+    const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item), level, poses: poseShadows(shadows.length, level) };
     missesRef.current = 0;
     setRound(next);
     setDrag(null);
     setHover(null);
     setLanded(null);
     setOutcome(null);
+    setOpened(null);
     setFocus(null);
     focusRef.current = null;
     busy.current = false;
@@ -188,7 +212,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
 
     // How this picture went decides the next one's step.
     const results = [...resultsRef.current, missesRef.current];
-    const level = nextLevel(levelRef.current, results);
+    const level = nextLevel(levelRef.current, results, SHADOW_LEVELS.length - 1, QUICK_STEPS);
     resultsRef.current = level === levelRef.current ? results : [];
     levelRef.current = level;
 
@@ -202,6 +226,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
         x: end.x - start.x + from.x,
         y: end.y - start.y + from.y,
         scale: shadow.offsetHeight / picture.offsetHeight,
+        pose: round.poses[index],
       });
     }
     if (settings.sounds) {
@@ -210,6 +235,26 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     }
     say(texts.found(round.item));
     later(CELEBRATE_MS, nextRound);
+  };
+
+  /** Whether shadow `index` still lies under its flap: a tap or a drop there lifts the flap instead of picking it. */
+  const hidden = (index: number) => !!round?.level.covered && opened !== index;
+
+  /** Lifts the flap over shadow `index`; the one lifted before goes down again. */
+  const lift = (index: number) => {
+    if (!round || busy.current) return;
+    setOpened(index);
+    setFlapsNew(false);
+    if (settings.sounds) playRustle();
+  };
+
+  /** A tap, key or drop on shadow `index`: lifts its flap while it is covered, else picks it. */
+  const touch = (index: number, from?: Offset) => {
+    if (hidden(index)) {
+      setDrag(null);
+      setHover(null);
+      lift(index);
+    } else choose(index, from);
   };
 
   /** Tapping the picture asks again; it makes its noise and hops. */
@@ -268,7 +313,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       // Back to its place.
       setDrag(null);
       setHover(null);
-    } else choose(target, { x: e.clientX - p.x, y: e.clientY - p.y });
+    } else touch(target, { x: e.clientX - p.x, y: e.clientY - p.y });
   };
 
   const onPictureCancel = () => {
@@ -280,7 +325,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const onShadowDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
     setThemesOpen(false);
-    choose(index);
+    touch(index);
   };
 
   const onThemesDown = (e: PointerEvent) => {
@@ -333,10 +378,10 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       if (themesOpen) setThemesOpen(false);
       if (Number.isInteger(digit) && digit >= 1 && digit <= count) {
         move(digit - 1);
-        choose(digit - 1);
+        touch(digit - 1);
       } else if (e.key === "Enter" || e.key === " ") {
         if (current === null) move(0);
-        else choose(current);
+        else touch(current);
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         move(((current ?? 0) - 1 + count) % count);
       } else {
@@ -367,7 +412,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
             className={`sh-picture sh-emoji${drag ? " dragging" : ""}${landed ? " landed" : ""}${
               outcome?.ok === false ? " wrong" : ""
             }${!drag && !outcome && nudge ? ` nudge-${nudge % 2}` : ""}`}
-            style={offset ? { translate: `${offset.x}px ${offset.y}px`, scale: landed?.scale?.toString() } : undefined}
+            style={offset ? landedStyle(offset, landed) : undefined}
             role="img"
             aria-label={texts.name(round.item)}
             data-tap
@@ -384,6 +429,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
         <div className="sh-options" style={choiceRows(round.shadows.length)}>
           {round.shadows.map((s, i) => {
             const peek = outcome?.pick === i && !outcome.ok;
+            const pose = round.poses[i];
+            const covered = round.level.covered;
             return (
               <div
                 key={`${round.id}-${s.id}`}
@@ -392,7 +439,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
                 }}
                 className={`sh-option${focus === i ? " focused" : ""}${hover === i ? " near" : ""}${
                   won && outcome.pick === i ? " matched" : ""
-                }${peek ? " peek" : ""}`}
+                }${peek ? " peek" : ""}${covered ? " covered" : ""}${covered && opened === i ? " open" : ""}`}
                 role="button"
                 aria-label={peek ? texts.name(s) : texts.shadow(i + 1)}
                 data-tap={tapState({ goal: i === round.correct })}
@@ -403,10 +450,16 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
                     shadowRefs.current[i] = el;
                   }}
                   className="sh-shadow sh-emoji"
+                  style={pose.angle || pose.flip ? { rotate: `${pose.angle}deg`, scale: pose.flip ? "-1 1" : undefined } : undefined}
                   aria-hidden
                 >
                   {s.emoji}
                 </span>
+                {covered && (
+                  <span className="sh-flap" aria-hidden>
+                    {flapsNew && i === 0 && <span className="sh-flap-hand">👆</span>}
+                  </span>
+                )}
                 <span className="sh-name" aria-hidden>
                   {texts.name(s)}
                 </span>

@@ -79,7 +79,8 @@
 .sh-picture.landed {
   transition:
     translate 0.55s cubic-bezier(0.45, 0, 0.3, 1.15),
-    scale 0.55s ease-in-out;
+    scale 0.55s ease-in-out,
+    rotate 0.55s ease-in-out;
 }
 
 .sh-picture.nudge-0 {
@@ -204,6 +205,45 @@
 
 .sh-option.matched {
   background: #fff3a8;
+}
+
+/* On the hardest steps each shadow lies under a flap of paper, hinged at its left like a book's page (`covered`): a tap
+   opens it over the hinge and the shadow shows; the one open before closes again. Plainly marked by a warm glow, and
+   before the first flap of the visit is lifted a still hand points at the first one. */
+.sh-flap {
+  position: absolute;
+  z-index: 2;
+  inset: -2px;
+  border: var(--outline);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.55) 0 7%, transparent 7.5%) 0 0 / 34% 34%,
+    linear-gradient(160deg, #f6d98b, #eebf62);
+  box-shadow: 0 0 0 5px rgb(255 214 90 / 0.45);
+  transform-origin: left center;
+  transition: transform 0.55s cubic-bezier(0.45, 0, 0.3, 1);
+  backface-visibility: hidden;
+  pointer-events: none;
+}
+
+.sh-option.open .sh-flap,
+.sh-option.matched .sh-flap,
+.sh-option.peek .sh-flap {
+  transform: perspective(900px) rotateY(-112deg);
+}
+
+/* A covered shadow's name waits under its flap too, so the grown-up reading along finds it with the child. */
+.sh-option.covered:not(.open, .matched) .sh-name {
+  visibility: hidden;
+}
+
+.sh-flap-hand {
+  position: absolute;
+  right: 6%;
+  bottom: -4%;
+  font-size: calc(var(--size) * 0.34);
+  rotate: -12deg;
+  backface-visibility: hidden;
 }
 
 /* Top left: the button for the kind of pictures. */

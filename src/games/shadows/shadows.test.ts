@@ -3,7 +3,7 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { GERMAN_ONLY, ITEMS, lookAlike, PEEK_ITEMS, PEEK_LOOKALIKES, PEEK_LOOKS, SHADOW_LOOKALIKES, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
 import { GRID, pickPeepholes } from "./glyph";
 import { RUSSIAN_NAMES } from "./content.ru";
-import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
+import { dealShadows, nextLevel, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -125,11 +125,35 @@ test("mixed pictures: the early steps show shadows of other kinds, the later one
 });
 
 test("the steps only get harder, and the first is the easiest", () => {
+  // How hard a step is to see: closer outlines, then turned, then mirrored, then under flaps; within one way, more shadows.
+  const way = (l: ShadowLevel) => (l.covered ? 4 : 0) + (l.mirror ? 2 : l.turn ? 1 : 0);
   SHADOW_LEVELS.slice(1).forEach((level, i) => {
     const before = SHADOW_LEVELS[i];
-    expect(level.shadows > before.shadows || (level.shadows === before.shadows && level.alike && !before.alike)).toBe(true);
+    const more = level.shadows > before.shadows || (level.shadows === before.shadows && level.alike && !before.alike);
+    expect(way(level) > way(before) || (way(level) === way(before) && more)).toBe(true);
   });
   expect(SHADOW_LEVELS[0]).toEqual({ shadows: 2, alike: false });
+});
+
+test("a new way to look (turned, under flaps) starts again with fewer shadows than the step before", () => {
+  SHADOW_LEVELS.slice(1).forEach((level, i) => {
+    const before = SHADOW_LEVELS[i];
+    if ((level.covered && !before.covered) || (level.turn && !before.turn && !before.covered)) expect(level.shadows).toBeLessThan(before.shadows);
+  });
+});
+
+test("turned shadows are plainly turned, mirrored steps show at least one mirrored, plain steps lie straight", () => {
+  for (const level of SHADOW_LEVELS) {
+    for (let k = 0; k < 50; k++) {
+      const poses = poseShadows(level.shadows, level);
+      expect(poses).toHaveLength(level.shadows);
+      for (const { angle } of poses) {
+        if (level.turn) expect(Math.abs(angle)).toBeGreaterThanOrEqual(level.turn / 2 - 0.5);
+        expect(Math.abs(angle)).toBeLessThanOrEqual(level.turn ?? 0);
+      }
+      expect(poses.some((p) => p.flip)).toBe(!!level.mirror);
+    }
+  }
 });
 
 test("sure goes up, unsure goes down, never past the ends", () => {
@@ -141,6 +165,15 @@ test("sure goes up, unsure goes down, never past the ends", () => {
   expect(nextLevel(2, [1])).toBe(2);
   expect(nextLevel(2, [1, 1])).toBe(1);
   expect(nextLevel(0, [3])).toBe(0);
+});
+
+test("the first steps are left after one sure picture, so a child who knows them soon reaches the harder ones", () => {
+  const top = SHADOW_LEVELS.length - 1;
+  expect(nextLevel(0, [0], top, QUICK_STEPS)).toBe(1);
+  expect(nextLevel(QUICK_STEPS - 1, [0], top, QUICK_STEPS)).toBe(QUICK_STEPS);
+  expect(nextLevel(QUICK_STEPS, [0], top, QUICK_STEPS)).toBe(QUICK_STEPS);
+  expect(nextLevel(1, [2], top, QUICK_STEPS)).toBe(0);
+  expect(QUICK_STEPS).toBeLessThan(SHADOW_LEVELS.findIndex((l) => l.turn));
 });
 
 test("every peeking animal looks like exactly one group of „Wer schaut da raus?“", () => {
