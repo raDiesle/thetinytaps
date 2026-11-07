@@ -4,7 +4,7 @@ import { seoWords } from "@/lib/seoText";
 
 /**
  * Below the first screen of a menu, for grown-ups who scroll down: what the page is, in the words search
- * engines get (src/content/seo.ts), in the app language where it has them (German, English). Google reads
+ * engines get (src/content/seo.ts), in the app language. Google reads
  * the page after the app has started, which replaces the built page's text, so without this a start screen
  * would say four words. The home page has its words behind the carving's „mehr …“ instead (RoomNotes).
  */

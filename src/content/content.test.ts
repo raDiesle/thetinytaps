@@ -4,8 +4,25 @@ import { CATEGORIES, SHELF, UNFINISHED, bookPage, categoryHref, categoryOf, hasP
 import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
-import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SEO_TEXTS, SITE_NAME, SITE_PROMISE, fullTitle, splitLanguage } from "./seo";
+import {
+  NO_INDEX_PATHS,
+  PREVIEW_IMAGE,
+  SEO_LANGUAGES,
+  SEO_PAGES,
+  SEO_TEXTS,
+  SITE_NAME,
+  SITE_PROMISE,
+  type SeoTranslation,
+  fullTitle,
+  splitLanguage,
+} from "./seo";
+import { SEO_AR } from "./seo.ar";
 import { SEO_EN } from "./seo.en";
+import { SEO_ES } from "./seo.es";
+import { SEO_HI } from "./seo.hi";
+import { SEO_RU } from "./seo.ru";
+import { SEO_ZH } from "./seo.zh";
+import { APP_LANGUAGES } from "../lib/language";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
@@ -107,6 +124,20 @@ describe("ideas", () => {
   });
 });
 
+/** Every language's search texts besides German, as the build has them. */
+const TRANSLATIONS: Record<string, SeoTranslation> = { en: SEO_EN, zh: SEO_ZH, hi: SEO_HI, es: SEO_ES, ar: SEO_AR, ru: SEO_RU };
+
+/**
+ * How long a title (with the site's name) and a description may be, in characters as JavaScript counts them: Google
+ * cuts by width, so Chinese, twice as wide a character, gets half, and Hindi, whose vowel signs count as characters
+ * of their own, more.
+ */
+const SEO_LIMITS: Record<string, { title: number; min: number; max: number }> = {
+  default: { title: 70, min: 80, max: 160 },
+  zh: { title: 70, min: 40, max: 90 },
+  hi: { title: 85, min: 80, max: 200 },
+};
+
 describe("search engine texts (seo.ts)", () => {
   const paths = SEO_TEXTS.map((page) => page.path);
 
@@ -127,18 +158,6 @@ describe("search engine texts (seo.ts)", () => {
     expect(page.text.length).toBeGreaterThan(60);
   });
 
-  // A book's page is found by the games in it, so its text names each of them, in German and English (where the game
-  // has an English name): when a game came into a book or was renamed, the book's text was easily left behind
-  // (Mitmachen was missing from „Buchstaben & Zahlen“, November 2026).
-  test.each(CATEGORIES.filter(hasPage).map((category) => [category.id, category] as const))("/spiele/%s/ names each of its games", (id, category) => {
-    const de = SEO_TEXTS.find((page) => page.path === `/spiele/${id}/`);
-    const en = SEO_EN.pages[`/spiele/${id}/`];
-    for (const game of category.games.filter((game) => !game.unfinished)) {
-      expect(de?.text.toLowerCase(), game.title.de).toContain(game.title.de.toLowerCase());
-      if (game.title.en) expect(en?.text.toLowerCase(), game.title.en).toContain(game.title.en.toLowerCase());
-    }
-  });
-
   test("titles and descriptions are not shared between pages", () => {
     for (const key of ["title", "description"] as const) {
       const values = SEO_TEXTS.map((page) => page[key]);
@@ -146,28 +165,63 @@ describe("search engine texts (seo.ts)", () => {
     }
   });
 
-  test("English has every page and nothing else, fitting in a search result like German", () => {
-    expect(Object.keys(SEO_EN.pages).sort()).toEqual([...paths].sort());
-    for (const [path, page] of Object.entries(SEO_EN.pages)) {
-      expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(70);
-      expect(page.description.length, `${path}: ${page.description}`).toBeGreaterThanOrEqual(80);
-      expect(page.description.length, `${path}: ${page.description}`).toBeLessThanOrEqual(160);
-      expect(page.text.length, path).toBeGreaterThan(60);
+  test("every language of the app has pages for search engines", () => {
+    expect([...SEO_LANGUAGES].sort() as string[]).toEqual([...APP_LANGUAGES].sort());
+    expect(Object.keys(TRANSLATIONS).sort()).toEqual(SEO_LANGUAGES.filter((id) => id !== "de").sort());
+  });
+
+  // A book's page is found by the games in it, so its text names each of them, in every language where the game has
+  // a name of its own: when a game came into a book or was renamed, the book's text was easily left behind
+  // (Mitmachen was missing from „Buchstaben & Zahlen“, November 2026).
+  test.each(CATEGORIES.filter(hasPage).map((category) => [category.id, category] as const))("/spiele/%s/ names each of its games", (id, category) => {
+    const texts: [string, string | undefined][] = [
+      ["de", SEO_TEXTS.find((page) => page.path === `/spiele/${id}/`)?.text],
+      ...Object.entries(TRANSLATIONS).map(([language, seo]): [string, string | undefined] => [language, seo.pages[`/spiele/${id}/`]?.text]),
+    ];
+    for (const game of category.games.filter((game) => !game.unfinished)) {
+      for (const [language, text] of texts) {
+        const name = (game.title as Record<string, string | undefined>)[language];
+        if (name) expect(text?.toLowerCase(), `${language}: ${name}`).toContain(name.toLowerCase());
+      }
     }
-    for (const key of ["title", "description"] as const) {
-      const values = Object.values(SEO_EN.pages).map((page) => page[key]);
-      expect(values.filter((v, i) => values.indexOf(v) !== i)).toEqual([]);
-    }
+  });
+
+  describe.each(Object.entries(TRANSLATIONS))("%s", (language, seo) => {
+    const { title, min, max } = SEO_LIMITS[language] ?? SEO_LIMITS.default;
+
+    test("has every page and nothing else, fitting in a search result like German", () => {
+      expect(Object.keys(seo.pages).sort()).toEqual([...paths].sort());
+      for (const [path, page] of Object.entries(seo.pages)) {
+        expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(title);
+        expect(page.description.length, `${path}: ${page.description}`).toBeGreaterThanOrEqual(min);
+        expect(page.description.length, `${path}: ${page.description}`).toBeLessThanOrEqual(max);
+        expect(page.text.length, path).toBeGreaterThan(min / 2);
+      }
+      for (const key of ["title", "description"] as const) {
+        const values = Object.values(seo.pages).map((page) => page[key]);
+        expect(values.filter((v, i) => values.indexOf(v) !== i)).toEqual([]);
+      }
+    });
+
+    // Russian, Chinese, Hindi and Arabic write names in their own script (Tapsi → Тапси), never Latin letters inside
+    // a sentence; only the site's name stays as it is.
+    test.if(["ru", "zh", "hi", "ar"].includes(language))("has no Latin letters but the site's name", () => {
+      for (const text of [seo.promise, seo.imageAlt, ...Object.values(seo.pages).flatMap((page) => [page.title, page.description, page.text])]) {
+        expect(text.replaceAll(SITE_NAME, "").match(/[A-Za-z]+/g), text).toBeNull();
+      }
+    });
   });
 
   test("an address finds its language and page", () => {
     expect(splitLanguage("/en/zaehne/")).toEqual({ language: "en", path: "/zaehne/" });
     expect(splitLanguage("/en/")).toEqual({ language: "en", path: "/" });
     expect(splitLanguage("/en")).toEqual({ language: "en", path: "/" });
+    expect(splitLanguage("/zh/timer/")).toEqual({ language: "zh", path: "/timer/" });
+    expect(splitLanguage("/ar/")).toEqual({ language: "ar", path: "/" });
     expect(splitLanguage("/zaehne/")).toEqual({ language: "de", path: "/zaehne/" });
     // A German address that merely starts with the letters of a prefix stays German.
     expect(splitLanguage("/entdecken/")).toEqual({ language: "de", path: "/entdecken/" });
-    for (const path of paths) expect(path.startsWith("/en/"), path).toBe(false);
+    for (const path of paths) expect(splitLanguage(path).language, path).toBe("de");
   });
 
   test("the picture for link previews is there, in the size the tags give", async () => {
@@ -189,13 +243,16 @@ describe("search engine texts (seo.ts)", () => {
 describe("no age to start at", () => {
   // Each family decides when its child starts with screens (the home page's foot says so), so nothing about the site
   // names an age it is for – no „ab 2“, „2- bis 3-Jährige“, „Ages 2+“ (user decision, October 2026).
-  const AGE = /\b(ab|aged?|ages|from|für) (2|zwei|two)\b|\b2\s*(-|–| bis | to | and )\s*3\b|-Jährige|year.?olds?|Ages? \d\+/i;
+  const AGE =
+    /\b(ab|aged?|ages|from|für) (2|zwei|two)\b|\b2\s*(-|–| bis | to | and )\s*3\b|-Jährige|year.?olds?|Ages? \d\+|\d\s*(лет|года|años|岁|周岁|साल|वर्ष|سنوات|سنة)/i;
 
   test.each([
     ["SITE_PROMISE", SITE_PROMISE],
-    ["SEO_EN.promise", SEO_EN.promise],
+    ...Object.entries(TRANSLATIONS).map(([language, seo]) => [`SEO_${language.toUpperCase()}.promise`, seo.promise]),
     ...SEO_TEXTS.map((page) => [page.path, `${page.title} ${page.description} ${page.text}`]),
-    ...Object.entries(SEO_EN.pages).map(([path, page]) => [`/en${path}`, `${page.title} ${page.description} ${page.text}`]),
+    ...Object.entries(TRANSLATIONS).flatMap(([language, seo]) =>
+      Object.entries(seo.pages).map(([path, page]) => [`/${language}${path}`, `${page.title} ${page.description} ${page.text}`]),
+    ),
     ...["index.html", "public/manifest.webmanifest", "README.md", "src/pages/LegalPage.tsx", "src/pages/Home.tsx"].map((file) => [
       file,
       readFileSync(file, "utf8"),

@@ -1,4 +1,5 @@
 import { zh as pack } from "@/content/zh";
+import { SEO_ZH as seo } from "@/content/seo.zh";
 import { ZH as badezimmer } from "@/games/scenes/badezimmer/zh";
 import { ZH as bauernhof } from "@/games/scenes/bauernhof/zh";
 import { ZH as baustelle } from "@/games/scenes/baustelle/zh";
@@ -79,5 +80,6 @@ export const TEXTS: LanguageTexts = {
   feelings,
   situations,
   days,
+  seo,
   stories: { cloudTrip, treasureIsland },
 };

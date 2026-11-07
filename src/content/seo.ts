@@ -34,8 +34,11 @@ export const PREVIEW_IMAGE = {
   alt: "Eine Fuchs- und eine Bärenfamilie lesen auf einer Picknickdecke zusammen ein Bilderbuch.",
 };
 
-/** Languages with pages of their own for search engines, German first (it has no prefix). */
-export const SEO_LANGUAGES = ["de", "en"] as const;
+/**
+ * Languages with pages of their own for search engines, German first (it has no prefix): every language of the app
+ * (APP_LANGUAGES), so parents searching in their own language find it there (A-22; all seven since November 2026).
+ */
+export const SEO_LANGUAGES = ["de", "en", "zh", "hi", "es", "ar", "ru"] as const;
 
 /** A language with pages of its own for search engines. */
 export type SeoLanguage = (typeof SEO_LANGUAGES)[number];
