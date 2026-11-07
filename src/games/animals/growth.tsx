@@ -1,21 +1,59 @@
 import type { ReactNode } from "react";
-import { playBlub, playCrack, playHop, playKnock, playLeaves, playPlop, playPop, playRustle, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
-import { playCroak, playTweet } from "@/lib/realSounds";
+import {
+  playBlub,
+  playCrack,
+  playHiss,
+  playHop,
+  playKnock,
+  playLeaves,
+  playPlop,
+  playPop,
+  playRustle,
+  playSwirl,
+  playThump,
+  playTrill,
+  playTwinkle,
+  playWhoosh,
+} from "@/lib/sfx";
+import { playBuzz, playCroak, playSplash, playTweet } from "@/lib/realSounds";
 import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
 
 // Something small and what it becomes, for "Was wird aus mir?" (Z-12): caterpillar and butterfly, egg and chick,
 // seed and sunflower, tadpole and frog, acorn and tree, bulb and tulip, pumpkin seed and pumpkin, coconut and palm,
-// bud and rose. The small one is drawn in a 200 × 200 box, standing on its bottom edge, in two layers: `back` behind
-// what it becomes (an emoji, as on the plates below) and `front` before it (the egg's lower shell and the nest, the
-// soil, the pot). The parts with an `ap-grow-…` class move once the box is `.growing` (animals.css): the caterpillar
-// climbs up and spins itself in, the egg wobbles and cracks, the seeds, the acorn and the bulb sink in and sprout, the
-// tadpole grows legs and loses its tail, the coconut sprouts where it lies, the bud swells and opens.
+// bud and rose; the eggs of the turtle, crocodile, dinosaur, penguin, snake and fish, the bee's larva, and the seeds of
+// carrot, maize, dandelion and strawberry. The small one is drawn in a 200 × 200 box, standing on its bottom edge, in
+// two layers: `back` behind what it becomes (an emoji, as on the plates below) and `front` before it (the egg's lower
+// shell and the nest, the soil, the pot). The parts with an `ap-grow-…` class move once the box is `.growing`
+// (animals.css): the caterpillar climbs up and spins itself in, the eggs wobble and crack (`crackingEgg`), the snake's
+// soft egg bulges and splits, the fish wriggles out of its clear egg, the larva is capped in its cell, the seeds, the
+// acorn and the bulb sink in and sprout, the dandelion's seed floats down on its umbrella, the tadpole grows legs and
+// loses its tail, the coconut sprouts where it lies, the bud swells and opens.
 
 /** Time to watch it become it (after the picked one flew up into it) before the next round comes. */
 export const GROW_MS = 3900;
 
-export type GrowthId = "raupe" | "ei" | "samen" | "kaulquappe" | "eichel" | "zwiebel" | "kuerbiskern" | "kokosnuss" | "knospe";
+export type GrowthId =
+  | "raupe"
+  | "ei"
+  | "samen"
+  | "kaulquappe"
+  | "eichel"
+  | "zwiebel"
+  | "kuerbiskern"
+  | "kokosnuss"
+  | "knospe"
+  | "schildkroetenei"
+  | "krokodilei"
+  | "dinoei"
+  | "pinguinei"
+  | "schlangenei"
+  | "fischei"
+  | "larve"
+  | "karottensamen"
+  | "maiskorn"
+  | "schirmchen"
+  | "erdbeersamen";
 
 export interface Growth {
   id: GrowthId;
@@ -31,6 +69,8 @@ export interface Growth {
   the: string;
   /** With „ein“, „ein Schmetterling“, for "Aus der Raupe wird ein Schmetterling.". */
   a: string;
+  /** A plant: alike to every other plant for a child (`GROW_LOOKALIKES`), so never dealt with one. */
+  plant?: true;
   /** Where what it becomes stands at the end, in the box's units (its middle), and how wide, as a share of the box. */
   spot: [number, number];
   size: number;
@@ -379,6 +419,562 @@ const budFront = (
   </>
 );
 
+/** A number rounded to a tenth, for paths worked out from an egg's size. */
+const tenth = (n: number) => Math.round(n * 10) / 10;
+
+/** An egg to crack, as the hen's: where it stands, how big, its colour and its spots ([x, y, r], kept clear of the crack). */
+interface EggLook {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  fill: string;
+  spots?: [number, number, number][];
+  spotFill?: string;
+}
+
+/**
+ * An egg that cracks like the hen's (the same classes, so the same wobble, crack and lid in animals.css), drawn
+ * anywhere and at any size: `lid` is its upper half for the `back` layer, `shell` its lower half, outline and crack
+ * for the `front` one. They turn round the egg's own bottom and middle.
+ */
+function crackingEgg({ cx, cy, rx, ry, fill, spots = [], spotFill = "#c9b28a" }: EggLook) {
+  const k = ry / 50;
+  const y0 = cy - 7 * k;
+  const end = rx * Math.sqrt(1 - ((y0 - cy) / ry) ** 2);
+  const [left, right] = [tenth(cx - end), tenth(cx + end)];
+  const teeth = [-0.6, -0.3, 0, 0.3, 0.6].map((f, i) => `L${tenth(cx + rx * f)} ${tenth(y0 + (i % 2 ? 5 : -9) * k)}`).join(" ");
+  const top = `M${left} ${tenth(y0)} ${teeth} L${right} ${tenth(y0)} A${rx} ${ry} 0 0 0 ${left} ${tenth(y0)} Z`;
+  const bottom = `M${left} ${tenth(y0)} ${teeth} L${right} ${tenth(y0)} A${rx} ${ry} 0 1 1 ${left} ${tenth(y0)} Z`;
+  const crack = `M${tenth(cx - 0.75 * rx)} ${tenth(y0 - 5 * k)} ${teeth} L${tenth(cx + 0.75 * rx)} ${tenth(y0 - 5 * k)}`;
+  const wobble = { transformOrigin: `${cx}px ${cy + ry}px` };
+  const dots = (upper: boolean) =>
+    spots.filter(([, y]) => y < y0 === upper).map(([x, y, r]) => <ellipse key={`${x} ${y}`} cx={x} cy={y} rx={r} ry={r * 0.8} fill={spotFill} />);
+  return {
+    lid: (
+      <g className="ap-grow-egg" style={wobble}>
+        <g className="ap-grow-lid" style={{ transformOrigin: `${cx}px ${tenth(y0 - 0.3 * ry)}px` }}>
+          <path d={top} fill={fill} />
+          {dots(true)}
+          <path className="ap-grow-edge" d={top} fill="none" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+          <ellipse cx={tenth(cx - 0.35 * rx)} cy={tenth(cy - 0.5 * ry)} rx={tenth(0.17 * rx)} ry={tenth(0.22 * ry)} fill="#fff" opacity="0.8" />
+        </g>
+      </g>
+    ),
+    shell: (
+      <g className="ap-grow-egg" style={wobble}>
+        <path d={bottom} fill={fill} />
+        {dots(false)}
+        <path className="ap-grow-edge" d={bottom} fill="none" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+        <ellipse className="ap-grow-whole" cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={OUTLINE} strokeWidth="3" />
+        <path className="ap-grow-crack" d={crack} fill="none" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+      </g>
+    ),
+  };
+}
+
+/** A five-pointed star round `x y`, for the starfish on the beach. */
+const star = (x: number, y: number, r: number) =>
+  `M${Array.from({ length: 10 }, (_, i) => {
+    const angle = (Math.PI / 5) * i - Math.PI / 2;
+    const reach = i % 2 ? r * 0.45 : r;
+    return `${tenth(x + reach * Math.cos(angle))} ${tenth(y + reach * Math.sin(angle))}`;
+  }).join(" L")} Z`;
+
+const turtleEgg = crackingEgg({ cx: 62, cy: 146, rx: 27, ry: 29, fill: "#fbf6ea" });
+
+/** The sea behind the beach, the sand with the pit the turtle's egg lies in, and the egg's upper half. */
+const turtleBack = (
+  <>
+    <path d="M0 84 C34 76 66 90 100 82 C134 74 166 88 200 80 V130 H0 Z" fill="#74c0fc" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M24 96 Q36 91 48 96 M130 92 Q142 87 154 92" stroke="#d0ebff" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M0 200 V116 C50 104 150 106 200 118 V200 Z" fill="#f2d58a" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <ellipse cx="62" cy="170" rx="38" ry="9" fill="#d9b464" />
+    {turtleEgg.lid}
+  </>
+);
+
+/** The egg's lower half, the sand heaped round it, and a starfish. */
+const turtleFront = (
+  <>
+    {turtleEgg.shell}
+    <path d="M16 178 Q62 160 108 178 Q110 194 62 196 Q14 194 16 178 Z" fill="#f2d58a" />
+    <path d="M18 178 Q62 161 106 178" stroke={OUTLINE} strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d={star(24, 186, 11)} fill="#f4a261" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+    {[
+      [86, 190],
+      [150, 188],
+      [176, 170],
+    ].map(([x, y]) => (
+      <circle key={x} cx={x} cy={y} r="2.5" fill="#d9b464" />
+    ))}
+  </>
+);
+
+const crocEgg = crackingEgg({ cx: 100, cy: 140, rx: 23, ry: 31, fill: "#f4efe2" });
+
+/** A bulrush in the reeds by the river, standing at `x`. */
+const bulrush = (x: number, top: number) => (
+  <g key={x}>
+    <path d={`M${x} 142 Q${x + 4} ${(142 + top) / 2} ${x + 2} ${top}`} stroke="#5aa845" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <rect x={x - 3} y={top + 4} width="10" height="22" rx="5" fill="#8b5a2b" stroke={OUTLINE} strokeWidth="2.5" />
+  </g>
+);
+
+/** The river with its reeds, the muddy bank, the back of the nest the crocodile's egg lies in, and its upper half. */
+const crocBack = (
+  <>
+    <path d="M0 86 C40 78 80 94 120 86 C160 78 180 90 200 84 V140 H0 Z" fill="#8cc7c4" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M60 100 Q72 95 84 100 M118 104 Q130 99 142 104" stroke="#d6f0ee" strokeWidth="3" fill="none" strokeLinecap="round" />
+    {[bulrush(12, 52), bulrush(28, 66), bulrush(170, 62), bulrush(186, 50)]}
+    <path d="M0 200 V128 C60 116 140 118 200 130 V200 Z" fill="#a98b62" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M42 158 C54 130 80 122 100 122 C120 122 146 130 158 158 Z" fill="#7a5a3a" />
+    <path d="M42 158 C54 130 80 122 100 122 C120 122 146 130 158 158" stroke={OUTLINE} strokeWidth="3" strokeLinecap="round" fill="none" />
+    {crocEgg.lid}
+  </>
+);
+
+/** The egg's lower half and the nest's front, a mound of mud and dry leaves. */
+const crocFront = (
+  <>
+    {crocEgg.shell}
+    <ellipse cx="100" cy="190" rx="84" ry="7" fill="#8a6e4c" />
+    <path d="M18 190 C28 162 68 152 100 152 C132 152 172 162 182 190 Z" fill="#8b6a45" />
+    <path d="M18 190 C28 162 68 152 100 152 C132 152 172 162 182 190" stroke={OUTLINE} strokeWidth="3.5" strokeLinecap="round" fill="none" />
+    {["M50 170 L68 162", "M80 178 L96 170", "M112 172 L130 178", "M140 164 L156 172", "M64 186 L84 184", "M118 188 L138 184"].map((d) => (
+      <path key={d} d={d} stroke="#d4ad72" strokeWidth="3" strokeLinecap="round" />
+    ))}
+  </>
+);
+
+const dinoEgg = crackingEgg({
+  cx: 96,
+  cy: 130,
+  rx: 36,
+  ry: 46,
+  fill: "#e8f0d6",
+  spots: [
+    [80, 100, 6],
+    [104, 94, 5],
+    [114, 106, 4.5],
+    [84, 152, 6],
+    [112, 160, 5],
+    [70, 140, 4],
+    [122, 140, 4.5],
+  ],
+  spotFill: "#9cc36b",
+});
+
+/** A fern leaning out from `x`, its leaflets in pairs up the stem. */
+const fern = (x: number, lean: number) => (
+  <g key={x}>
+    <path d={`M${x} 152 Q${x + lean / 3} 110 ${x + lean} 76`} stroke="#4e8a35" strokeWidth="4" strokeLinecap="round" fill="none" />
+    {[0.15, 0.32, 0.5, 0.68, 0.84].map((t) => {
+      const px = x + lean * t * t;
+      const py = 152 - 76 * t;
+      const reach = 18 * (1 - t * 0.6);
+      return (
+        <path
+          key={t}
+          d={`M${tenth(px)} ${tenth(py)} q${tenth(-reach)} -2 ${tenth(-reach)} -9 M${tenth(px)} ${tenth(py)} q${tenth(reach)} -2 ${tenth(reach)} -9`}
+          stroke="#66bb6a"
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+        />
+      );
+    })}
+  </g>
+);
+
+/** A volcano far off with a puff of smoke, ferns, the meadow and the big spotted egg's upper half. */
+const dinoBack = (
+  <>
+    <path d="M116 132 L146 60 Q154 54 162 60 L194 132 Z" fill="#a1887f" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M146 62 Q154 70 162 62" stroke="#e57c3a" strokeWidth="4" strokeLinecap="round" fill="none" />
+    {[
+      [156, 42, 9],
+      [146, 30, 7],
+      [160, 20, 6],
+    ].map(([x, y, r]) => (
+      <circle key={y} cx={x} cy={y} r={r} fill="#ebe7e2" stroke={OUTLINE} strokeWidth="2.5" />
+    ))}
+    <path d="M0 200 V140 C60 130 140 130 200 140 V200 Z" fill="#a5c46e" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    {[fern(30, -12), fern(170, 10)]}
+    {dinoEgg.lid}
+  </>
+);
+
+/** The egg's lower half and a ring of stones round its foot. */
+const dinoFront = (
+  <>
+    {dinoEgg.shell}
+    {[
+      [58, 174, 11],
+      [78, 182, 12],
+      [102, 184, 12],
+      [124, 181, 11],
+      [140, 172, 10],
+    ].map(([x, y, r]) => (
+      <ellipse key={x} cx={x} cy={y} rx={r} ry={r * 0.6} fill="#b8b0a4" stroke={OUTLINE} strokeWidth="3" />
+    ))}
+  </>
+);
+
+const penguinEgg = crackingEgg({ cx: 100, cy: 142, rx: 22, ry: 28, fill: "#eef2e2" });
+
+/** The cold sea with an iceberg, the ice the penguin's egg lies on, and its upper half. */
+const penguinBack = (
+  <>
+    <path d="M0 112 C40 106 80 118 120 110 C160 102 180 112 200 108 V152 H0 Z" fill="#5b9bd5" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M8 118 L24 70 L38 84 L54 58 L74 118 Z" fill="#f4fbff" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    <path d="M54 58 L48 90 L62 118 M24 70 L30 96" stroke="#bfe0f5" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d="M0 200 V150 C50 140 150 140 200 150 V200 Z" fill="#eef8fc" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <path d="M22 170 L40 166 L52 174 M150 168 L166 176 L182 170" stroke="#bfe0f5" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    {penguinEgg.lid}
+  </>
+);
+
+/** The egg's lower half and the snow heaped round it. */
+const penguinFront = (
+  <>
+    {penguinEgg.shell}
+    <path d="M60 178 Q100 160 140 178 Q140 188 100 189 Q60 188 60 178 Z" fill="#fdfefe" />
+    <path d="M60 178 Q100 160 140 178" stroke={OUTLINE} strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d="M76 180 Q88 176 96 179" stroke="#d6ecf8" strokeWidth="3" strokeLinecap="round" fill="none" />
+  </>
+);
+
+/** A fallen leaf lying at `x y`, turned by `turn` degrees. */
+const leaf = (x: number, y: number, turn: number, fill: string) => (
+  <g key={`${x} ${y}`} transform={`translate(${x} ${y}) rotate(${turn})`}>
+    <path d="M-12 0 Q0 -9 12 0 Q0 9 -12 0 Z" fill={fill} stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+    <path d="M-12 0 H10" stroke={OUTLINE} strokeWidth="1.5" strokeLinecap="round" />
+  </g>
+);
+
+/** The forest floor with a mossy log behind; the snake comes out of its egg in front. */
+const snakeBack = (
+  <>
+    <path d="M0 200 V148 C60 138 140 138 200 148 V200 Z" fill="#9c7a54" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    <rect x="6" y="108" width="74" height="36" rx="18" fill="#8b5a2b" stroke={OUTLINE} strokeWidth="3.5" />
+    <ellipse cx="72" cy="126" rx="10" ry="17" fill="#d4a373" stroke={OUTLINE} strokeWidth="3" />
+    <ellipse cx="72" cy="126" rx="4" ry="8" fill="none" stroke="#a87a4a" strokeWidth="2" />
+    <path d="M14 112 Q30 102 44 110 Q54 102 64 110" stroke="#7cb342" strokeWidth="6" strokeLinecap="round" fill="none" />
+    {[160, 176, 188].map((x, i) => (
+      <path
+        key={x}
+        d={`M${x} 146 q-4 -${14 + i * 4} -10 -${20 + i * 4} M${x} 146 q4 -${16 + i * 3} 10 -${22 + i * 3}`}
+        stroke="#5aa845"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+    ))}
+  </>
+);
+
+/** The snake's leathery egg, which bulges, gets a slit and sags once the snake is out, and fallen leaves before it. */
+const snakeFront = (
+  <>
+    <g className="ap-grow-sack">
+      <ellipse cx="96" cy="158" rx="33" ry="21" fill="#f3ecd9" stroke={OUTLINE} strokeWidth="3.5" />
+      <ellipse cx="82" cy="150" rx="9" ry="5" fill="#fff" opacity="0.8" />
+      <path d="M78 168 Q92 172 108 168" stroke="#e0d4b8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path className="ap-grow-slit" d="M108 144 Q118 156 110 170" stroke={OUTLINE} strokeWidth="4" strokeLinecap="round" fill="none" />
+    </g>
+    {[leaf(34, 182, -20, "#e9a03b"), leaf(58, 192, 15, "#c96f3a"), leaf(168, 188, 30, "#e9c03b")]}
+  </>
+);
+
+/** The pond seen from the side: the water, the sandy bottom, water weed with a little bunch of eggs on it. */
+const fishBack = (
+  <>
+    <path
+      d="M4 64 C40 54 70 72 100 62 C130 52 160 70 196 60 V188 Q196 198 186 198 H14 Q4 198 4 188 Z"
+      fill="#9bd4f5"
+      stroke={OUTLINE}
+      strokeWidth="3.5"
+      strokeLinejoin="round"
+    />
+    <path d="M6 176 C60 166 140 168 194 176 V188 Q194 196 186 196 H14 Q6 196 6 188 Z" fill="#f2d58a" />
+    <path d="M6 176 C60 166 140 168 194 176" stroke="#d9b464" strokeWidth="3" fill="none" />
+    <path d="M40 176 C30 150 52 130 40 104 C30 84 46 72 42 62" stroke="#4e8a35" strokeWidth="6" strokeLinecap="round" fill="none" />
+    <path d="M58 176 C68 156 52 142 62 120" stroke="#66bb6a" strokeWidth="5" strokeLinecap="round" fill="none" />
+    {[
+      [152, 92, 5],
+      [162, 80, 3.5],
+      [150, 72, 3],
+    ].map(([x, y, r]) => (
+      <circle key={y} cx={x} cy={y} r={r} fill="none" stroke="#e7f5ff" strokeWidth="2.5" />
+    ))}
+    {[
+      [64, 140, 9],
+      [56, 156, 8],
+      [72, 158, 7],
+    ].map(([x, y, r]) => (
+      <g key={y}>
+        <circle cx={x} cy={y} r={r} fill="#eaf7ff" fillOpacity="0.7" stroke={OUTLINE} strokeWidth="2" />
+        <path d={`M${x - 4} ${y + 3} Q${x - 3} ${y - 4} ${x + 3} ${y - 3}`} stroke="#9a8a62" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        <circle cx={x + 2.5} cy={y - 3} r="1.3" fill="#1a1a1a" />
+      </g>
+    ))}
+    <g className="ap-grow-roe">
+      <circle cx="92" cy="124" r="21" fill="#eaf7ff" fillOpacity="0.7" stroke={OUTLINE} strokeWidth="3" />
+      <ellipse cx="84" cy="114" rx="5" ry="3.5" fill="#fff" />
+    </g>
+    <g className="ap-grow-fry">
+      <path d="M80 130 Q82 114 98 116 Q108 122 100 132" stroke="#9a8a62" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <circle cx="97" cy="118" r="3.5" fill="#1a1a1a" />
+    </g>
+  </>
+);
+
+/** Water weed and pebbles before the water. */
+const fishFront = (
+  <>
+    <path d="M176 192 C168 172 184 158 176 136" stroke="#4e8a35" strokeWidth="6" strokeLinecap="round" fill="none" />
+    {[
+      [120, 188, 9],
+      [140, 191, 6],
+      [24, 190, 7],
+    ].map(([x, y, r]) => (
+      <ellipse key={x} cx={x} cy={y} rx={r} ry={r * 0.65} fill="#b8b0a4" stroke={OUTLINE} strokeWidth="2.5" />
+    ))}
+  </>
+);
+
+/** A cell of the honeycomb with six sides, its middle at `x y`. */
+const hexagon = (x: number, y: number, r: number) =>
+  `M${Array.from({ length: 6 }, (_, i) => `${tenth(x + r * Math.cos((Math.PI / 3) * i))} ${tenth(y + r * Math.sin((Math.PI / 3) * i))}`).join(" L")} Z`;
+
+/** The honeycomb's cells round the middle one: honey in some, wax lids on others. */
+const COMB: [number, number, "honey" | "lid"][] = [
+  [100, 75.5, "lid"],
+  [142, 99.8, "honey"],
+  [142, 148.3, "lid"],
+  [100, 172.5, "honey"],
+  [58, 148.3, "lid"],
+  [58, 99.8, "honey"],
+];
+
+/** The honeycomb with the bee's larva curled in its middle cell, and the wax lid the bees put on it. */
+const larvaBack = (
+  <>
+    {COMB.map(([x, y, kind]) => (
+      <g key={`${x} ${y}`}>
+        <path d={hexagon(x, y, 28)} fill="#f6c453" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+        <path d={hexagon(x, y, 19)} fill={kind === "honey" ? "#f0a020" : "#fbe3a0"} stroke="#c98a2a" strokeWidth="2" strokeLinejoin="round" />
+        {kind === "honey" ? <ellipse cx={x - 6} cy={y - 6} rx="4" ry="6" fill="#ffd27a" /> : <ellipse cx={x - 5} cy={y - 7} rx="6" ry="3.5" fill="#fff4cf" />}
+      </g>
+    ))}
+    <path d={hexagon(100, 124, 28)} fill="#f6c453" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    <path d={hexagon(100, 124, 19)} fill="#c98a2a" stroke="#a86f1c" strokeWidth="2" strokeLinejoin="round" />
+    <g className="ap-grow-larva">
+      <path d="M89 118 C86 134 108 140 113 126" stroke={OUTLINE} strokeWidth="14" strokeLinecap="round" fill="none" />
+      <path d="M89 118 C86 134 108 140 113 126" stroke="#fffaf0" strokeWidth="9" strokeLinecap="round" fill="none" />
+      <path d="M91 128 l4 -3 M98 133 l2 -4 M106 133 l-1 -4" stroke="#e0d6c0" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="88" cy="117" r="1.8" fill={OUTLINE} />
+    </g>
+    <g className="ap-grow-cap">
+      <path d={hexagon(100, 124, 20)} fill="#f3d27a" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+      <ellipse cx="95" cy="117" rx="6" ry="3.5" fill="#fff4cf" />
+    </g>
+  </>
+);
+
+/** The garden bed's soil, which the seeds sink into. */
+const bed = (top: number, clods: [number, number][]) => (
+  <>
+    <path d={`M0 200 V${top} C60 ${top - 10} 140 ${top - 10} 200 ${top} V200 Z`} fill="#8b5e3c" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    {clods.map(([x, y]) => (
+      <circle key={x} cx={x} cy={y} r="4" fill="#6f4e37" />
+    ))}
+  </>
+);
+
+/** The carrot's seed on the bed, and the feathery green that comes up before the carrot itself is pulled out. */
+const carrotBack = (
+  <>
+    <g className="ap-grow-greens">
+      {[
+        [78, 90],
+        [100, 80],
+        [122, 92],
+      ].map(([x, y]) => (
+        <g key={x}>
+          <path d={`M100 166 Q${(100 + x) / 2} ${(166 + y) / 2 + 6} ${x} ${y}`} stroke="#4e8a35" strokeWidth="4" strokeLinecap="round" fill="none" />
+          {[0.35, 0.55, 0.75, 0.92].map((t) => {
+            const px = 100 + (x - 100) * t;
+            const py = 166 + (y - 166) * t;
+            return (
+              <path
+                key={t}
+                d={`M${tenth(px)} ${tenth(py)} l-9 -7 M${tenth(px)} ${tenth(py)} l9 -7`}
+                stroke="#66bb6a"
+                strokeWidth="5"
+                strokeLinecap="round"
+                fill="none"
+              />
+            );
+          })}
+        </g>
+      ))}
+    </g>
+    <g className="ap-grow-seed">
+      <g transform="translate(100 146) rotate(-20)">
+        <ellipse rx="9" ry="14" fill="#b07d4f" stroke={OUTLINE} strokeWidth="3" />
+        <path d="M-4 -8 V8 M3 -9 V9" stroke="#e2bf93" strokeWidth="2" strokeLinecap="round" />
+      </g>
+    </g>
+  </>
+);
+
+const carrotFront = bed(166, [
+  [30, 180],
+  [64, 188],
+  [138, 182],
+  [172, 190],
+]);
+
+/** The maize kernel on the field, and the tall stalk with its long leaves and tassel that grows from it. */
+const cornBack = (
+  <>
+    <g className="ap-grow-stalk">
+      <path d="M100 178 C98 132 102 90 100 42" stroke="#7cb342" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M100 150 C80 120 56 116 32 132 C58 130 82 140 100 164 Z" fill="#7cb342" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M100 120 C122 90 148 88 170 104 C144 102 120 112 100 136 Z" fill="#8bc34a" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M100 90 C84 64 64 58 44 70 C66 70 86 82 100 104 Z" fill="#8bc34a" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M100 44 L90 22 M100 44 L100 16 M100 44 L110 24 M100 50 L118 36" stroke="#e0c060" strokeWidth="3.5" strokeLinecap="round" />
+    </g>
+    <g className="ap-grow-seed">
+      <path d="M90 140 Q100 132 110 140 L107 158 Q100 165 93 158 Z" fill="#f6c945" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+      <ellipse cx="96" cy="145" rx="3" ry="5" fill="#fbe39a" />
+    </g>
+  </>
+);
+
+/** The field, with a furrow. */
+const cornFront = (
+  <>
+    {bed(172, [
+      [26, 186],
+      [70, 192],
+      [140, 186],
+    ])}
+    <path d="M110 186 Q140 182 176 186" stroke="#6f4e37" strokeWidth="3" strokeLinecap="round" fill="none" />
+  </>
+);
+
+/** A dandelion leaf with teeth along it, lying from 0 0 out to the left: placed and turned with `transform`. */
+const DANDELION_LEAF = "M0 0 L-12 -6 L-14 -1 L-26 -10 L-28 -3 L-42 -14 L-44 -5 L-58 -12 Q-52 2 0 4 Z";
+
+/** The dandelion's seed on its little umbrella in the air, and the leaves and the stem that grow where it lands. */
+const fluffBack = (
+  <>
+    <g className="ap-grow-rosette">
+      {[
+        [96, 178, 8],
+        [104, 178, 172],
+        [98, 180, -12],
+      ].map(([x, y, turn]) => (
+        <path
+          key={turn}
+          transform={`translate(${x} ${y}) rotate(${turn})`}
+          d={DANDELION_LEAF}
+          fill={turn === -12 ? "#4e9a3a" : "#5aa845"}
+          stroke={OUTLINE}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+      ))}
+    </g>
+    <g className="ap-grow-dstem">
+      <path d="M100 178 C98 140 102 110 100 80" stroke="#7cb342" strokeWidth="5" strokeLinecap="round" fill="none" />
+    </g>
+    <g className="ap-grow-fluff">
+      {[-160, -138, -116, -90, -64, -42, -20].map((angle) => {
+        const rad = (angle * Math.PI) / 180;
+        const x = tenth(100 + 24 * Math.cos(rad));
+        const y = tenth(40 + 24 * Math.sin(rad));
+        return (
+          <g key={angle}>
+            <path d={`M100 40 L${x} ${y}`} stroke="#a89c86" strokeWidth="1.8" strokeLinecap="round" />
+            <circle cx={x} cy={y} r="4" fill="#fff" stroke={OUTLINE} strokeWidth="1.5" />
+          </g>
+        );
+      })}
+      <path d="M100 40 V62" stroke="#a89c86" strokeWidth="2" strokeLinecap="round" />
+      <path d="M100 60 L96 70 L100 80 L104 70 Z" fill="#8b5e3c" stroke={OUTLINE} strokeWidth="2.5" strokeLinejoin="round" />
+    </g>
+  </>
+);
+
+/** The lawn the seed lands in. */
+const fluffFront = (
+  <>
+    <path d="M0 200 V180 C60 172 140 172 200 180 V200 Z" fill="#7cc457" stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round" />
+    {[30, 52, 148, 170].map((x) => (
+      <path key={x} d={`M${x} 182 l4 -11 l4 11`} stroke="#4e8a35" strokeWidth="2.5" strokeLinejoin="round" fill="none" />
+    ))}
+  </>
+);
+
+/** A strawberry leaf of three rounded leaflets at the end of a stalk from `x y`. */
+const strawberryLeaf = (x: number, y: number, turn: number) => (
+  <g key={turn}>
+    <path d={`M100 176 Q${(100 + x) / 2} ${y + 20} ${x} ${y}`} stroke="#4e8a35" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+    <g transform={`translate(${x} ${y}) rotate(${turn})`}>
+      {[-50, 0, 50].map((spread) => (
+        <g key={spread} transform={`rotate(${spread})`}>
+          <ellipse cx="0" cy="-12" rx="8" ry="12" fill="#5aa845" stroke={OUTLINE} strokeWidth="2.5" />
+          <path d="M0 -2 V-20" stroke="#3f8a3a" strokeWidth="1.5" strokeLinecap="round" />
+        </g>
+      ))}
+    </g>
+  </g>
+);
+
+/** The strawberry's seed on the bed, its plant with a white flower, where the berry grows once the flower has gone. */
+const strawberryBack = (
+  <>
+    <g className="ap-grow-plant">
+      {[strawberryLeaf(62, 128, -40), strawberryLeaf(96, 112, -5), strawberryLeaf(78, 150, -70)]}
+      <path d="M100 176 C118 160 136 146 146 124" stroke="#4e8a35" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+    </g>
+    <g className="ap-grow-flower">
+      {[0, 72, 144, 216, 288].map((turn) => (
+        <circle
+          key={turn}
+          cx={tenth(146 + 9 * Math.cos((turn * Math.PI) / 180))}
+          cy={tenth(124 + 9 * Math.sin((turn * Math.PI) / 180))}
+          r="7.5"
+          fill="#fff"
+          stroke={OUTLINE}
+          strokeWidth="2"
+        />
+      ))}
+      <circle cx="146" cy="124" r="6" fill="#f6c945" stroke={OUTLINE} strokeWidth="2" />
+    </g>
+    <g className="ap-grow-seed">
+      <path d="M100 136 Q108 146 100 158 Q92 146 100 136 Z" fill="#e8b94a" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+    </g>
+  </>
+);
+
+/** The bed, with straw laid on it as under strawberries. */
+const strawberryFront = (
+  <>
+    {bed(170, [
+      [40, 190],
+      [150, 192],
+    ])}
+    {["M14 168 L40 174", "M50 176 L76 168", "M120 170 L148 176", "M160 168 L188 174", "M88 182 L112 178"].map((d) => (
+      <path key={d} d={d} stroke="#e8c86a" strokeWidth="3.5" strokeLinecap="round" />
+    ))}
+  </>
+);
+
 /** The small ones and what they become; which of them are never offered together is `GROW_LOOKALIKES`. */
 export const GROWTHS: Growth[] = [
   {
@@ -424,6 +1020,7 @@ export const GROWTHS: Growth[] = [
     fromThe: "dem Samen",
     emoji: "🌻",
     adult: "Sonnenblume",
+    plant: true,
     the: "die Sonnenblume",
     a: "eine Sonnenblume",
     spot: [100, 54],
@@ -461,6 +1058,7 @@ export const GROWTHS: Growth[] = [
     fromThe: "der Eichel",
     emoji: "🌳",
     adult: "Baum",
+    plant: true,
     the: "der Baum",
     a: "ein Baum",
     spot: [100, 108],
@@ -480,6 +1078,7 @@ export const GROWTHS: Growth[] = [
     fromThe: "der Zwiebel",
     emoji: "🌷",
     adult: "Tulpe",
+    plant: true,
     the: "die Tulpe",
     a: "eine Tulpe",
     spot: [100, 90],
@@ -500,6 +1099,7 @@ export const GROWTHS: Growth[] = [
     fromThe: "dem Kürbiskern",
     emoji: "🎃",
     adult: "Kürbis",
+    plant: true,
     the: "der Kürbis",
     a: "ein Kürbis",
     spot: [100, 130],
@@ -519,6 +1119,7 @@ export const GROWTHS: Growth[] = [
     fromThe: "der Kokosnuss",
     emoji: "🌴",
     adult: "Palme",
+    plant: true,
     the: "die Palme",
     a: "eine Palme",
     spot: [100, 92],
@@ -539,6 +1140,7 @@ export const GROWTHS: Growth[] = [
     fromThe: "der Knospe",
     emoji: "🌹",
     adult: "Rose",
+    plant: true,
     the: "die Rose",
     a: "eine Rose",
     spot: [100, 116],
@@ -551,6 +1153,229 @@ export const GROWTHS: Growth[] = [
     back: budBack,
     front: budFront,
   },
+  {
+    id: "schildkroetenei",
+    young: "Ei",
+    fromThe: "dem Ei",
+    emoji: "🐢",
+    adult: "Schildkröte",
+    the: "die Schildkröte",
+    a: "eine Schildkröte",
+    spot: [132, 140],
+    size: 0.4,
+    sounds: [
+      [900, playCrack],
+      [1400, playPop],
+      [1900, playRustle],
+      [2600, playRustle],
+      [3300, playSplash],
+    ],
+    back: turtleBack,
+    front: turtleFront,
+  },
+  {
+    id: "krokodilei",
+    young: "Ei",
+    fromThe: "dem Ei",
+    emoji: "🐊",
+    adult: "Krokodil",
+    the: "das Krokodil",
+    a: "ein Krokodil",
+    spot: [100, 100],
+    size: 0.5,
+    sounds: [
+      [900, playCrack],
+      [1400, playPop],
+      [2300, playSplash],
+      [3000, playBlub],
+    ],
+    back: crocBack,
+    front: crocFront,
+  },
+  {
+    id: "dinoei",
+    young: "Ei",
+    fromThe: "dem Ei",
+    emoji: "🦕",
+    adult: "Dinosaurier",
+    the: "der Dinosaurier",
+    a: "ein Dinosaurier",
+    spot: [96, 92],
+    size: 0.6,
+    sounds: [
+      [100, playThump],
+      [500, playThump],
+      [900, playCrack],
+      [1400, playPop],
+      [2300, playTrill],
+      [3100, playTwinkle],
+    ],
+    back: dinoBack,
+    front: dinoFront,
+  },
+  {
+    id: "pinguinei",
+    young: "Ei",
+    fromThe: "dem Ei",
+    emoji: "🐧",
+    adult: "Pinguin",
+    the: "der Pinguin",
+    a: "ein Pinguin",
+    spot: [100, 128],
+    size: 0.36,
+    sounds: [
+      [900, playCrack],
+      [1400, playPop],
+      [2600, () => playHop()],
+      [2900, () => playHop()],
+      [3300, playTwinkle],
+    ],
+    back: penguinBack,
+    front: penguinFront,
+  },
+  {
+    id: "schlangenei",
+    young: "Ei",
+    fromThe: "dem Ei",
+    emoji: "🐍",
+    adult: "Schlange",
+    the: "die Schlange",
+    a: "eine Schlange",
+    spot: [140, 118],
+    size: 0.42,
+    sounds: [
+      [200, playRustle],
+      [900, playCrack],
+      [1300, playPop],
+      [2000, playHiss],
+      [3000, playTwinkle],
+    ],
+    back: snakeBack,
+    front: snakeFront,
+  },
+  {
+    id: "fischei",
+    young: "Ei",
+    fromThe: "dem Ei",
+    emoji: "🐟",
+    adult: "Fisch",
+    the: "der Fisch",
+    a: "ein Fisch",
+    spot: [132, 102],
+    size: 0.34,
+    sounds: [
+      [0, playBlub],
+      [800, playBlub],
+      [1300, playPop],
+      [2100, playSwirl],
+      [3000, playTwinkle],
+    ],
+    back: fishBack,
+    front: fishFront,
+  },
+  {
+    id: "larve",
+    young: "Larve",
+    fromThe: "der Larve",
+    emoji: "🐝",
+    adult: "Biene",
+    the: "die Biene",
+    a: "eine Biene",
+    spot: [152, 46],
+    size: 0.32,
+    sounds: [
+      [0, playRustle],
+      [800, playPop],
+      [1700, playCrack],
+      [2000, playBuzz],
+      [3200, playTwinkle],
+    ],
+    back: larvaBack,
+  },
+  {
+    id: "karottensamen",
+    young: "Samen",
+    fromThe: "dem Samen",
+    emoji: "🥕",
+    adult: "Karotte",
+    the: "die Karotte",
+    a: "eine Karotte",
+    plant: true,
+    spot: [100, 118],
+    size: 0.46,
+    sounds: [
+      [200, playPlop],
+      [700, playTrill],
+      [2000, playRustle],
+      [2700, playPop],
+      [3200, playTwinkle],
+    ],
+    back: carrotBack,
+    front: carrotFront,
+  },
+  {
+    id: "maiskorn",
+    young: "Maiskorn",
+    fromThe: "dem Maiskorn",
+    emoji: "🌽",
+    adult: "Mais",
+    the: "der Mais",
+    a: "Mais",
+    plant: true,
+    spot: [124, 108],
+    size: 0.3,
+    sounds: [
+      [200, playPlop],
+      [700, playTrill],
+      [1600, playLeaves],
+      [2400, playPop],
+      [3100, playTwinkle],
+    ],
+    back: cornBack,
+    front: cornFront,
+  },
+  {
+    id: "schirmchen",
+    young: "Schirmchen",
+    fromThe: "dem Schirmchen",
+    emoji: "🌼",
+    adult: "Löwenzahn",
+    the: "der Löwenzahn",
+    a: "ein Löwenzahn",
+    plant: true,
+    spot: [100, 70],
+    size: 0.36,
+    sounds: [
+      [0, playWhoosh],
+      [1500, playPlop],
+      [1800, playTrill],
+      [2600, playPop],
+      [3200, playTwinkle],
+    ],
+    back: fluffBack,
+    front: fluffFront,
+  },
+  {
+    id: "erdbeersamen",
+    young: "Samen",
+    fromThe: "dem Samen",
+    emoji: "🍓",
+    adult: "Erdbeere",
+    the: "die Erdbeere",
+    a: "eine Erdbeere",
+    plant: true,
+    spot: [146, 134],
+    size: 0.28,
+    sounds: [
+      [200, playPlop],
+      [600, playTrill],
+      [1400, playPop],
+      [2500, playRustle],
+      [3200, playTwinkle],
+    ],
+    back: strawberryBack,
+    front: strawberryFront,
+  },
 ];
 
 /**
@@ -558,10 +1383,19 @@ export const GROWTHS: Growth[] = [
  * out of the other, so it would be a wrong choice the child could rightly pick. Any two in one group are never dealt
  * together. Every plant is alike to every other: flowers look alike, trees look alike, and no child can see which
  * seed, nut, bulb or bud becomes which plant. A new small one joins a group, or starts one with what it looks like
- * (a second egg or larva would be alike to the egg or the caterpillar); every growth must keep at least three others
- * it is not alike to, for the four choices of the hardest steps (`content.test.ts`).
+ * (every egg is alike to every other egg, the bee's larva to the caterpillar); every growth must keep at least three
+ * others it is not alike to, for the four choices of the hardest steps (`content.test.ts`).
  */
-export const GROW_LOOKALIKES: GrowthId[][] = [["samen", "eichel", "zwiebel", "kuerbiskern", "kokosnuss", "knospe"]];
+export const GROW_LOOKALIKES: GrowthId[][] = [
+  // Every plant (`plant`).
+  ["samen", "eichel", "zwiebel", "kuerbiskern", "kokosnuss", "knospe", "karottensamen", "maiskorn", "schirmchen", "erdbeersamen"],
+  // Every egg: a child can't tell which egg the chick, the turtle or the dinosaur comes out of.
+  ["ei", "schildkroetenei", "krokodilei", "dinoei", "pinguinei", "schlangenei", "fischei"],
+  // The larvae: the caterpillar's and the bee's.
+  ["raupe", "larve"],
+  // What comes out of the water by the pond or the river: the frog comes from eggs in the water too.
+  ["kaulquappe", "fischei", "krokodilei"],
+];
 
 /** Whether `a` and `b` are never offered together (`GROW_LOOKALIKES`). */
 export const growLookAlike = (a: Growth, b: Growth) => GROW_LOOKALIKES.some((group) => group.includes(a.id) && group.includes(b.id));

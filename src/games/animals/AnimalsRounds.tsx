@@ -38,6 +38,8 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const drawGiver = useDeck(GIVERS);
   const drawPeek = useDeck(PEEK_ITEMS);
   const drawGrowth = useDeck(GROWTHS);
+  /** While developing, `?grow=<id>` plays only „Was wird aus mir?“ with that small one, to watch it grow again and again. */
+  const devGrowth = useRef(DEV ? GROWTHS.find((g) => g.id === new URLSearchParams(window.location.search).get("grow")) : undefined);
   const lastAnimal = useRef<Animal | null>(null);
   /** While developing, `?animal=<id>` feeds, houses or asks only that animal, to look at its rounds and its home. */
   const [devAnimal] = useState(() => (DEV ? ANIMALS.find((a) => a.id === new URLSearchParams(window.location.search).get("animal")) : undefined));
@@ -62,6 +64,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
       resultsRef.current = [];
     }
     const level = ANIMAL_LEVELS[levelRef.current];
+    if (devGrowth.current) return dealGrow(devGrowth.current, level.choices);
     const kind = nextKind(last, settings.kinds);
     if (kind === "peek") {
       const item = drawPeek();

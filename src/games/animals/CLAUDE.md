@@ -25,18 +25,31 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest:
    (snail, caterpillar), the river (crocodile, hippo, otter), the mountain (goat, llama, eagle), the forest (deer, wolf,
    elk, boar, raccoon) and the coral reef (pufferfish, octopus).
 5. Was wird aus mir? (Z-12, `GrowPlay.tsx`, drawn in `growth.tsx`): something small stands above – a caterpillar, an
-   egg, a seed, a tadpole, an acorn, a bulb, a pumpkin seed, a coconut, a rose bud – and the child taps what it
-   becomes below (butterfly, chick, sunflower, frog, tree, tulip, pumpkin, palm, rose; tapping only, like „Wer schaut
-   da raus?“). It flies up into the small one, which becomes it (`.growing`): the caterpillar climbs
+   egg, a seed, a tadpole, an acorn, a bulb, a pumpkin seed, a coconut, a rose bud, the eggs of a turtle, a crocodile,
+   a dinosaur, a penguin, a snake and a fish, a bee's larva, the seeds of a carrot, maize, a dandelion and a strawberry –
+   and the child taps what it becomes below (butterfly, chick, sunflower, frog, tree, tulip, pumpkin, palm, rose,
+   turtle, crocodile, dinosaur, penguin, snake, fish, bee, carrot, maize, dandelion, strawberry; tapping only, like
+   „Wer schaut da raus?“). It flies up into the small one, which becomes it (`.growing`): the caterpillar climbs
    to the twig, spins itself in and a butterfly flutters out; the egg wobbles, cracks and the chick comes up out of
    its shell; the seed sinks into the soil, sprouts and grows into a sunflower; the tadpole grows legs, loses its tail
    and hops onto the lily pad as a frog; the acorn hops and sinks into the meadow, a sapling and then the tree grow; the
    bulb wiggles into its pot and a tulip rises between two leaves; the pumpkin seed sinks, a vine creeps out and the
    pumpkin swells and ripens from green to orange; the coconut rocks, fronds pop out and a palm grows behind it; the
-   bud swells, its sepals open and the rose blooms. Each small one is two layers of drawing with the emoji of what it becomes
-   between them (`back`, `front`: the egg's lower shell and the nest, the soil). A wrong pick: the small one it comes
-   from pops up over that plate. Plants are never dealt together (`GROW_LOOKALIKES`, see the rules), so a plant's
-   wrong choices are the butterfly, the chick and the frog.
+   bud swells, its sepals open and the rose blooms. The other eggs crack like the hen's (`crackingEgg`), each in its
+   own place, and what comes out moves its own way: the turtle crawls from its pit in the sand towards the sea, the
+   crocodile rises out of its nest mound by the river, the big dinosaur egg bumps twice among the stones and the
+   dinosaur stretches up before the volcano, the penguin pops up in its shell on the ice and rocks. The snake's soft
+   egg bulges, gets a slit and the snake slithers out by the mossy log; the fish wriggles in its clear egg among the
+   roe, the egg bursts and the fish swims out; the bee's larva wriggles in its honeycomb cell, a wax lid closes over it
+   and the bee breaks out and flies off. The carrot's seed sinks into the bed, its feathery green comes up and the
+   carrot is pulled out; the maize kernel sinks into the field, the tall stalk grows and a cob comes out at its side;
+   the dandelion's seed floats down on its umbrella, leaves and a stem grow and the flower opens; the strawberry's seed
+   sinks, the plant grows, a white flower opens and the berry swells and turns red. Each small one is two layers of
+   drawing with the emoji of what it becomes between them (`back`, `front`: the egg's lower shell and the nest, the
+   soil). A wrong pick: the small one it comes from pops up over that plate. Plants are never dealt together, nor eggs
+   (`GROW_LOOKALIKES`, see the rules), so a plant's wrong choices are animals and an egg's are plants, the caterpillar,
+   the larva or the tadpole. `?grow=<id>` plays only „Was wird aus mir?“ with that small one while developing, to
+   watch it grow again and again.
 
 Each round is mounted anew (`key={turn}`) and reports `onSolved(misses)` when the right thing is picked and `onNext()`
 when the reaction has been watched; the step and the animals still to come live in `AnimalsRounds`, which also hands
@@ -96,7 +109,8 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
   - Homes the same way: every animal with a home lists in `alsoLives` the other homes it lives in too (the rabbit's hutch, the bear's ice as an „Eisbär“, the fish's pond), `wrongHomes()` leaves them out and `content.test.ts` checks the list and that three wrong homes are left. A new home means going through every animal's list. Every home has at least one animal with it as its `home` (the first one peeks out on a wrong pick), the animal at `spot`/`fit` stays inside the drawing (`content.test.ts`), and landscapes that look alike to a child never count as a wrong choice for each other's animals: they are a group in `HOME_LOOKALIKES` (`homes.tsx`: Teich, Meer, Fluss and Korallenriff; Savanne and Wüste; Dschungel, Bambuswald and Wald), and an animal living in one lists all of its group (`content.test.ts`). A new home that looks like another joins that group. A new home is drawn so it doesn't look like an old one, or it joins its group (a beach or terrarium was left out, too close to sea and desert).
   - A picture counts by what it shows, not only by its name (🌾 „Heu“ shows grain, so birds and hens list it in `alsoEats`), and an animal a child knows from a famous picture book counts what it eats there (the Raupe Nimmersatt's fruit, cheese and sausage); a bear of any kind counts honey. A food shared by several animals is written the same for each (`content.test.ts`).
   - Two animals never share an emoji (no alpaca beside the llama), and only animals with an emoji of their own take part – no woodpecker or mole drawn as another bird or animal (`content.test.ts`).
-  - What the small one becomes the same way: small ones whose grown ones a child could mix up are in one group of `GROW_LOOKALIKES` (`growth.tsx`) and never dealt together (`dealGrow`). Every plant is alike to every other (no child can tell which seed, nut, bulb or bud becomes which plant), so a plant's wrong choices are the butterfly, the chick and the frog. A new small one joins a group or starts one and keeps at least three others it isn't alike to (`content.test.ts`).
+  - What the small one becomes the same way: small ones whose grown ones a child could mix up are in one group of `GROW_LOOKALIKES` (`growth.tsx`) and never dealt together (`dealGrow`). Every plant is alike to every other (no child can tell which seed, nut, bulb or bud becomes which plant; `plant` marks one), and every egg to every other egg (no child can tell which egg the chick, the turtle or the dinosaur comes out of); the bee's larva is alike to the caterpillar, and the fish's and the crocodile's eggs to the tadpole (all from the water). A plant and an animal are never in one group. A new small one joins a group or starts one and keeps at least three others it isn't alike to (`content.test.ts`).
+  - A grown one's emoji is drawn differently on each platform, so its motion never depends on which way it faces or on a whole body showing: Apple's 🐢 and 🐟 look left, its 🐊 is seen from above and its 🐧 is only a head. Let it rise, stretch, rock or move a little sideways rather than walk a long way in one direction, and seat a head-only emoji in its shell or nest. Look at each new one in the preview at its end and mid-way (`?grow=<id>`, seeking the animations) before calling it done.
   - Who peeks out the same way: animals whose peeking part looks the same (the cat's and the dog's tail, an
     elephant's grey next to a cow's or a sheep's) are never offered together (`PEEK_LOOKALIKES` in
     `src/games/shadows/content.ts`, `dealPeek`); see the shadows' `CLAUDE.md` for how a new animal is checked.

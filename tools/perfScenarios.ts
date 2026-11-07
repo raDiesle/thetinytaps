@@ -131,7 +131,7 @@ export const SCENARIOS: Scenario[] = [
     // „Was wird aus mir?“ alone, the right one tapped each time, so the small ones keep growing up.
     name: "tiere-werden",
     path: "/tiere/",
-    storage: `localStorage.setItem("tinytaps.animals.v3", JSON.stringify({ peek: false, feed: false, gift: false, home: false, grow: true }))`,
+    storage: `localStorage.setItem("tinytaps.animals.v3", JSON.stringify({ kinds: "grow" }))`,
     parts: [{ label: "Was wird aus mir?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
   {
