@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ITEMS, lookAlike, PEEK_ITEMS, PEEK_LOOKALIKES, PEEK_LOOKS, SHADOW_LOOKALIKES, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
+import { GERMAN_ONLY, ITEMS, lookAlike, PEEK_ITEMS, PEEK_LOOKALIKES, PEEK_LOOKS, SHADOW_LOOKALIKES, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
 import { GRID, pickPeepholes } from "./glyph";
 import { RUSSIAN_NAMES } from "./content.ru";
 import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
@@ -28,11 +28,15 @@ test("no name of any language is left over from a picture that is gone", () => {
   }
 });
 
-test("the translated languages name every picture", () => {
+test("the translated languages name every picture, but none yet of those still German only", () => {
   for (const language of COMPLETE) {
     const { names } = SHADOW_TRANSLATIONS[language]!;
-    for (const { id } of ITEMS) expect(names[id], `${language} ${id}`).toBeDefined();
+    for (const { id } of ITEMS) expect(names[id] !== undefined, `${language} ${id}`).toBe(!GERMAN_ONLY.includes(id));
   }
+  // The list names only pictures there are, each once.
+  const ids = new Set(ITEMS.map((i) => i.id));
+  for (const id of GERMAN_ONLY) expect(ids.has(id), id).toBe(true);
+  expect(new Set(GERMAN_ONLY).size).toBe(GERMAN_ONLY.length);
 });
 
 test("the sentences have no German left in them, and none in another script has Latin letters", () => {

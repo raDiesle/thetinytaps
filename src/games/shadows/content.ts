@@ -4,7 +4,9 @@ import {
   playBells,
   playBlub,
   playBuzz,
+  playChatter,
   playCrow,
+  playDolphin,
   playEngine,
   playHonk,
   playHoot,
@@ -15,6 +17,7 @@ import {
   playOink,
   playQuack,
   playRing,
+  playRoar,
   playRotor,
   playSiren,
   playSnap,
@@ -98,6 +101,26 @@ export const ITEMS: ShadowItem[] = [
   tier("flamingo", "🦩", "der Flamingo"),
   tier("pinguin", "🐧", "der Pinguin", real("penguin", playSquawk)),
   tier("maus", "🐁", "die Maus", real("mouse", playSqueak)),
+  tier("tiger", "🐅", "der Tiger", real("roar", playRoar)),
+  tier("zebra", "🦓", "das Zebra"),
+  tier("kamel", "🐫", "das Kamel"),
+  tier("nashorn", "🦏", "das Nashorn"),
+  tier("nilpferd", "🦛", "das Nilpferd"),
+  tier("kaenguru", "🦘", "das Känguru"),
+  tier("affe", "🐒", "der Affe", real("chatter", playChatter)),
+  tier("gorilla", "🦍", "der Gorilla"),
+  tier("ziege", "🐐", "die Ziege"),
+  tier("lama", "🦙", "das Lama"),
+  tier("hirsch", "🦌", "der Hirsch"),
+  tier("pfau", "🦚", "der Pfau", playSquawk),
+  tier("papagei", "🦜", "der Papagei", real("squawk", playSquawk)),
+  tier("schwan", "🦢", "der Schwan"),
+  tier("delfin", "🐬", "der Delfin", real("dolphin", playDolphin)),
+  tier("robbe", "🦭", "die Robbe"),
+  tier("marienkaefer", "🐞", "der Marienkäfer"),
+  tier("ameise", "🐜", "die Ameise"),
+  tier("raupe", "🐛", "die Raupe"),
+  tier("eidechse", "🦎", "die Eidechse"),
 
   fahrzeug("auto", "🚗", "das Auto", real("honk", playHonk)),
   fahrzeug("fahrrad", "🚲", "das Fahrrad", real("ring", playRing)),
@@ -144,7 +167,7 @@ export const ITEMS: ShadowItem[] = [
 /** Where an animal hides in "Wer schaut da raus?" (X-04): behind a bush, or in the pond. */
 export type Hideout = "bush" | "pond";
 
-const IN_THE_POND = new Set(["ente", "fisch", "krebs", "tintenfisch", "krokodil", "wal"]);
+const IN_THE_POND = new Set(["ente", "fisch", "krebs", "tintenfisch", "krokodil", "wal", "schwan", "delfin", "robbe", "nilpferd"]);
 
 export const PEEK_ITEMS = ITEMS.filter((i) => i.theme === "animals");
 
@@ -152,14 +175,14 @@ export const hideoutOf = (item: ShadowItem): Hideout => (IN_THE_POND.has(item.id
 
 /**
  * Animals that look alike when only a part of them shows, for the harder steps of "Wer schaut da raus?": small furry
- * ones, big ones on four legs, birds, small crawling or flying ones – and the pond's own, since the pond already tells
+ * ones, big ones (mostly on four legs), birds, small crawling or flying ones – and the pond's own, since the pond already tells
  * that it is one of them. Every peeking animal is in exactly one (`shadows.test.ts`).
  */
 export const PEEK_LOOKS: string[][] = [
-  ["hase", "katze", "hund", "maus", "eichhoernchen", "igel"],
-  ["pferd", "kuh", "schwein", "schaf", "elefant", "giraffe", "dino"],
-  ["hahn", "eule", "flamingo", "pinguin"],
-  ["schnecke", "schildkroete", "schmetterling", "biene"],
+  ["hase", "katze", "hund", "maus", "eichhoernchen", "igel", "affe"],
+  ["pferd", "kuh", "schwein", "schaf", "elefant", "giraffe", "dino", "tiger", "zebra", "kamel", "nashorn", "ziege", "lama", "hirsch", "gorilla", "kaenguru"],
+  ["hahn", "eule", "flamingo", "pinguin", "pfau", "papagei"],
+  ["schnecke", "schildkroete", "schmetterling", "biene", "marienkaefer", "ameise", "raupe", "eidechse"],
   [...IN_THE_POND],
 ];
 
@@ -170,7 +193,9 @@ export const lookOf = (item: ShadowItem) => PEEK_LOOKS.findIndex((ids) => ids.in
  * Pictures whose black shadows can't be told apart on Apple's or Google's emojis (X-14): a pig, a sheep and a turtle
  * are the same round blob on Android, a cat and a dog the same on an iPhone. They are never dealt together, so exactly
  * one shadow fits. Measured by comparing every pair's outline in both fonts and looking at the closest ones (November
- * 2026, `research.ts`); a new picture is looked at next to its closest outlines and added here when it is one of them.
+ * 2026, `research.ts`); a new picture is looked at next to its closest outlines and added here when it is one of them
+ * (the zebra stands like the cow on an iPhone, the hippo like the pig, the peacock is a round crown on a stem like the
+ * tree on Android, the monkey sits with its tail up like the squirrel).
  */
 export const SHADOW_LOOKALIKES: [string, string][] = [
   ["schwein", "schaf"],
@@ -185,13 +210,22 @@ export const SHADOW_LOOKALIKES: [string, string][] = [
   ["apfel", "birne"],
   ["birne", "erdbeere"],
   ["pilz", "baum"],
+  ["zebra", "kuh"],
+  ["nilpferd", "schwein"],
+  ["pfau", "baum"],
+  ["affe", "eichhoernchen"],
 ];
 
 /**
  * Animals of "Wer schaut da raus?" whose peeking part looks the same (X-14): the cat's and the dog's tan tail and hind
  * leg, the grey of an elephant next to a cow's or a sheep's, the grey-white fur of a rabbit and a mouse and the brown
- * of a squirrel and a hedgehog through the gaps in the leaves. They are never offered together, so exactly one fits;
- * the rest of a `PEEK_LOOKS` group still makes the harder steps harder.
+ * of a squirrel and a hedgehog through the gaps in the leaves. The same for the animals added later: plain brown or
+ * tan fur through the gaps (monkey, deer, kangaroo, camel, goat, horse), grey skin (rhino, elephant, gorilla; seal and
+ * hippo out of the pond), black and white (zebra, cow), white wool (sheep, llama), orange with dark marks (tiger,
+ * giraffe), green (peacock and parrot; turtle, lizard and caterpillar), the caterpillar's yellow and black bands like
+ * the bee's, the monkey's curled tan tail like the dog's, and a blue back with a fin out of the water (dolphin, fish).
+ * They are never offered together, so exactly one fits; the rest of a `PEEK_LOOKS` group still makes the harder steps
+ * harder.
  */
 export const PEEK_LOOKALIKES: [string, string][] = [
   ["katze", "hund"],
@@ -199,6 +233,54 @@ export const PEEK_LOOKALIKES: [string, string][] = [
   ["eichhoernchen", "igel"],
   ["kuh", "elefant"],
   ["schaf", "elefant"],
+  ["affe", "hund"],
+  ["affe", "eichhoernchen"],
+  ["hirsch", "kaenguru"],
+  ["kamel", "kaenguru"],
+  ["kamel", "hirsch"],
+  ["ziege", "hirsch"],
+  ["ziege", "kaenguru"],
+  ["pferd", "kamel"],
+  ["pferd", "hirsch"],
+  ["nashorn", "elefant"],
+  ["nashorn", "gorilla"],
+  ["zebra", "kuh"],
+  ["schaf", "lama"],
+  ["tiger", "giraffe"],
+  ["pfau", "papagei"],
+  ["schildkroete", "eidechse"],
+  ["schildkroete", "raupe"],
+  ["biene", "raupe"],
+  ["delfin", "fisch"],
+  ["robbe", "nilpferd"],
+];
+
+/**
+ * Pictures added after the last translation, by id: German only until the user asks for their translations
+ * (`languageStatus.ts` says what is missing). `shadows.test.ts` checks that every other picture has its name in each
+ * translated language, and that these have none yet – once translated, take them off this list.
+ */
+export const GERMAN_ONLY: string[] = [
+  "tiger",
+  "zebra",
+  "kamel",
+  "nashorn",
+  "nilpferd",
+  "kaenguru",
+  "affe",
+  "gorilla",
+  "ziege",
+  "lama",
+  "hirsch",
+  "pfau",
+  "papagei",
+  "schwan",
+  "delfin",
+  "robbe",
+  "marienkaefer",
+  "ameise",
+  "raupe",
+  "eidechse",
 ];
 
 /** Whether `a` and `b` are one of `pairs`, so they must not stand side by side to choose from. */
