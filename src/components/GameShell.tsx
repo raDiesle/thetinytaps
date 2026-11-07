@@ -86,7 +86,15 @@ export interface GameMode {
   kind?: string;
   /** A short line for grown-ups under the card's name (what is special about it), shown only where the card has room. */
   note?: string;
+  /**
+   * A picture filling the card in place of its emoji, name and note, which are then only read out and its tooltip – for
+   * cards whose picture says it all (the Timer's pictures as they look at their end).
+   */
+  art?: ReactNode;
 }
+
+/** How much wider than tall a card that is a picture (`GameMode.art`) looks best: about a screen's shape. */
+const ART_ASPECT = 1.6;
 
 /** The modes in runs of one `kind` each, in the order the kinds first come; one run without kinds when none has one. */
 function byKind(modes: GameMode[]) {
@@ -183,6 +191,8 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   const grid = useFitGrid(
     modes?.length ?? 0,
     groups?.map((g) => g.modes.length),
+    // Cards that are a picture come about as wide as a screen, the shape of the picture.
+    modes?.some((m) => m.art) ? ART_ASPECT : undefined,
   );
   // The background song runs on from the menus into the game (BackgroundMusic), until the play time is over.
   useNoBackgroundMusic(playing && playtime.goodNight);
@@ -336,14 +346,26 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   /** One mode's card. */
   const card = (m: GameMode) => (
     <li key={m.id}>
-      <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
-        <span className="game-emoji" aria-hidden>
-          {m.emoji}
-        </span>
-        <span className="game-title">
-          {m.title}
-          {m.note && <small className="game-note">{m.note}</small>}
-        </span>
+      <button
+        type="button"
+        className={`game-card mode-card${m.art ? " mode-art-card" : ""}`}
+        onClick={() => pick(m.id)}
+        aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
+        title={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
+      >
+        {m.art ? (
+          <span className="mode-art">{m.art}</span>
+        ) : (
+          <>
+            <span className="game-emoji" aria-hidden>
+              {m.emoji}
+            </span>
+            <span className="game-title">
+              {m.title}
+              {m.note && <small className="game-note">{m.note}</small>}
+            </span>
+          </>
+        )}
         {m.id === mode && (modes?.length ?? 0) > 1 && (
           <span className="badge">
             {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}

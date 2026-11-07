@@ -12,9 +12,12 @@ note, as tally marks in bundles of five that go one by one (`shown.tsx`, kept as
 2026): by default „Striche in %“, ten marks each a tenth of the run (`PERCENT_MARKS`), so a short and a long timer look
 alike; behind ⚙️ its „Zeit im Bild“ switches to „Striche in Zeit“ (each mark 10 s up to 15 min, `markUnit`, at most
 `MAX_MARKS`), „Zahlen“ (digits) or „Aus“. The child sees no numbers, only the picture and the marks running down.
-The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
-there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
-screen), then the pictures that run until the time is up:
+The start screen's cards are the pictures themselves as they look at their end, with no words on them (user request,
+November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
+cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
+the picture (`ART_ASPECT`). Names are only read out and their tooltip. „Abwechseln“ comes first, its two children with
+the toy and the hourglass; that it runs on without end is said in its tooltip (`SWAP_NOTE`). Then the pictures that run
+until the time is up:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
@@ -79,7 +82,7 @@ once and the child, where there is one, waves once (`tm-soon`), and a picture st
 Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`), the child and small things
 (`.tm-dims`) fade into the dark and only what runs down stays bright; a tap brings it all back (`tm-far`).
 
-Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `OwnTimeSheet.tsx` (the sheet behind
+Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `cardArt.tsx` (a card's picture), `OwnTimeSheet.tsx` (the sheet behind
 „Andere …“), `time.ts` (own times: typing, clock times, labels, digits; tested in `time.test.ts`), `TimerPlay.tsx` (one
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
@@ -109,8 +112,11 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
   basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
   story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
-- **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
-  „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **Abwechseln stands first, apart**: it runs without end, so its card comes first (its tooltip says so, `SWAP_NOTE`),
+  and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
+  `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
+  is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
 
 - **A fox or bear child only where it does the picture's thing** (`Child`): it pushes the apples' cart, waters the
   flower, blows out the candle, takes its turn with the toy. Never a family standing by to watch or cheer: one stood

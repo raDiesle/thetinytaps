@@ -1938,3 +1938,33 @@
 :root .mode-level .tm-lengths .choice button {
   padding-inline: 10px;
 }
+
+/* The start screen's cards (`TimerCardArt`): each picture as it looks at its end, covering the card like a run covers
+   the screen, and standing still – no animation runs in the menu, and what one would leave at its end is put there. */
+.tm-card-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+  pointer-events: none;
+}
+
+.tm-card-art * {
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.tm-card-art .tm-caterpillar {
+  opacity: 0;
+}
+
+.tm-card-art .tm-cocoon {
+  opacity: 1;
+  transform: none;
+}
+
+.tm-card-art .tm-butterfly {
+  opacity: 1;
+  transform: translate(var(--tm-fly-x), var(--tm-fly-y));
+}

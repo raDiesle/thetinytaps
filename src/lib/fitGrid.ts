@@ -60,8 +60,11 @@ export function packGroups(sizes: number[], columns: number): { places: GroupPla
   return { places: places.map((p) => ({ ...p, row: firstRow(p.line) })), lines: heights };
 }
 
-/** Columns and row height that give `count` cards the most room; with `groups` (their sizes) every group keeps together. */
-function bestFit(count: number, width: number, height: number, phone: boolean, groups?: number[]): Fit | null {
+/**
+ * Columns and row height that give `count` cards the most room; with `groups` (their sizes) every group keeps together.
+ * `aspect` is how much wider than tall the cards look best, when it isn't the usual (cards that are a picture).
+ */
+function bestFit(count: number, width: number, height: number, phone: boolean, groups?: number[], aspect?: number): Fit | null {
   const minRow = phone ? MIN_ROW_PHONE : MIN_ROW;
   const minWidth = phone ? MIN_WIDTH_PHONE : MIN_WIDTH;
   const gap = phone ? GAP_PHONE : GAP;
@@ -75,7 +78,7 @@ function bestFit(count: number, width: number, height: number, phone: boolean, g
     const cardWidth = (width - (columns - 1) * gap) / columns;
     const row = (height - labels - (rows - 1) * gap) / rows;
     if (row < minRow || cardWidth < minWidth) continue;
-    const size = Math.min(cardWidth / (row < FLAT_ROW ? FLAT_ASPECT : CARD_ASPECT), row);
+    const size = Math.min(cardWidth / (aspect ?? (row < FLAT_ROW ? FLAT_ASPECT : CARD_ASPECT)), row);
     if (size > bestSize) {
       bestSize = size;
       best = { columns, row: Math.floor(Math.min(row, MAX_ROW)) };
@@ -129,9 +132,10 @@ export function roomFor(part: HTMLElement, page: HTMLElement) {
  * What is marked `data-below-fold` (the install hint for grown-ups) is left out:
  * it waits below the cards until a grown-up scrolls down.
  * With `groups` (the sizes of runs of cards that belong together, in order) each group is kept in one rectangle
- * with its name above it: `places` gives each group's place in the grid.
+ * with its name above it: `places` gives each group's place in the grid. Cards that are a picture (`GameMode.art`) pass
+ * its `aspect`, so they come as wide as the picture.
  */
-export function useFitGrid(count: number, groups?: number[]) {
+export function useFitGrid(count: number, groups?: number[], aspect?: number) {
   // Kept as state, so a menu shown again (e.g. after playing) is measured anew.
   const [list, setList] = useState<HTMLUListElement | null>(null);
   const [fit, setFit] = useState<Fit | null>(null);
@@ -143,7 +147,7 @@ export function useFitGrid(count: number, groups?: number[]) {
       // An open settings panel grows the page below the cards; they keep their size.
       if (page.querySelector(":is(.panel-button, .panel-icon)[aria-expanded='true']")) return;
       const phone = isPhone();
-      const next = bestFit(count, list.clientWidth, roomFor(list, page), phone, groups);
+      const next = bestFit(count, list.clientWidth, roomFor(list, page), phone, groups, aspect);
       setFit((prev) => (prev?.columns === next?.columns && prev?.row === next?.row ? prev : next));
     };
     measure();
@@ -155,7 +159,7 @@ export function useFitGrid(count: number, groups?: number[]) {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [list, count, groups?.join()]);
+  }, [list, count, groups?.join(), aspect]);
 
   const packed = fit && groups ? packGroups(groups, fit.columns) : undefined;
   // A track for the names above each line of groups, then the line's card rows.
