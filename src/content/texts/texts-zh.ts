@@ -24,7 +24,8 @@ import { ZH as winterbaustelle } from "@/games/scenes/winterbaustelle/zh";
 import { ZH as zoo } from "@/games/scenes/zoo/zh";
 import { ZH as elevator } from "@/games/elevator/zh";
 import { CHINESE as animals } from "@/games/animals/content.zh";
-import { CHINESE as together } from "@/games/together/content.zh";
+import { CHINESE as togetherHandmade } from "@/games/together/content.zh";
+import { CHINESE_SCENES as togetherScenes } from "@/games/together/content.scenes.zh";
 import { CHINESE as shadows } from "@/games/shadows/content.zh";
 import { CHINESE_TEXTS as socks } from "@/games/socks/content.zh";
 import { STEP_TEXTS_ZH as teethSteps } from "@/games/teeth/steps.zh";
@@ -69,7 +70,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
-  together,
+  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,

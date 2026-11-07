@@ -96,9 +96,25 @@ export const MOODS: Mood[] = [
 ];
 
 /** Over the pleasant feelings' group, small, for grown-ups. */
-export const PLEASANT: Localized = { de: "Angenehme Gefühle" };
+export const PLEASANT: Localized = {
+  de: "Angenehme Gefühle",
+  en: "Pleasant feelings",
+  zh: "愉快的情绪",
+  hi: "सुखद भावनाएँ",
+  es: "Emociones agradables",
+  ar: "مشاعر لطيفة",
+  ru: "Приятные чувства",
+};
 /** Over the unpleasant feelings' group. */
-export const UNPLEASANT: Localized = { de: "Unangenehme Gefühle" };
+export const UNPLEASANT: Localized = {
+  de: "Unangenehme Gefühle",
+  en: "Unpleasant feelings",
+  zh: "不愉快的情绪",
+  hi: "अप्रिय भावनाएँ",
+  es: "Emociones desagradables",
+  ar: "مشاعر غير لطيفة",
+  ru: "Неприятные чувства",
+};
 
 /** Read aloud when the cards of the feelings come. */
 export const MOOD_QUESTION: Localized = {

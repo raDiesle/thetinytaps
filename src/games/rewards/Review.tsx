@@ -51,10 +51,26 @@ export function usePeriodLabel() {
   return (kind: BoardKind, back: number, day: Date, fourWeeks = false) =>
     fourWeeks
       ? back === 0
-        ? t({ de: "Diese 4 Wochen" })
+        ? t({ de: "Diese 4 Wochen", en: "These 4 weeks", zh: "这4周", hi: "ये 4 हफ़्ते", es: "Estas 4 semanas", ar: "هذه الأسابيع الأربعة", ru: "Эти 4 недели" })
         : back === 1
-          ? t({ de: "Vorige 4 Wochen" })
-          : t({ de: `4 Wochen ab ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}` })
+          ? t({
+              de: "Vorige 4 Wochen",
+              en: "Previous 4 weeks",
+              zh: "上4周",
+              hi: "पिछले 4 हफ़्ते",
+              es: "Las 4 semanas anteriores",
+              ar: "الأسابيع الأربعة السابقة",
+              ru: "Предыдущие 4 недели",
+            })
+          : t({
+              de: `4 Wochen ab ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}`,
+              en: `4 weeks from ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}`,
+              zh: `${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}起的4周`,
+              hi: `${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)} से 4 हफ़्ते`,
+              es: `4 semanas desde el ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}`,
+              ar: `4 أسابيع من ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}`,
+              ru: `4 недели с ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}`,
+            })
       : back === 0
         ? t(
             kind === "day"

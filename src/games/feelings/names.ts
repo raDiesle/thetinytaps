@@ -1,5 +1,5 @@
 // The names of the book „Gefühle“ and of its games translated so far, here in the game's folder rather than in the home page's
-// `games.ts`, so the game's own row in the language table says which are still missing. The German-only names of
+// `games.ts`, so the game's own row in the language table says which are still missing. The names of
 // „Was brauche ich?“ are in its own file (`needs.ts`), read by its row.
 
 import type { Localized } from "@/lib/language";

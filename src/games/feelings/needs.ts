@@ -57,11 +57,27 @@ export interface NeedsVisit {
 /** Where this game's way back leads when „Wie geht's dir?“ opened it; none when opened from the book. */
 export const needsCameFrom = (state: unknown): string | undefined => ((state as Partial<NeedsVisit> | null)?.from === MOOD_HREF ? MOOD_HREF : undefined);
 
-/** The game's name (C-31, a game of its own since November 2026). German only so far: translations wait for the user. */
-export const NEEDS_TITLE: Localized = { de: "Was brauche ich?" };
+/** The game's name (C-31, a game of its own since November 2026). */
+export const NEEDS_TITLE: Localized = {
+  de: "Was brauche ich?",
+  en: "What do I need?",
+  zh: "我需要什么？",
+  hi: "मुझे क्या चाहिए?",
+  es: "¿Qué necesito?",
+  ar: "ماذا أحتاج؟",
+  ru: "Что мне нужно?",
+};
 
 /** Its line for grown-ups. */
-export const NEEDS_BLURB: Localized = { de: "Kuscheln, toben, trinken – was guttut" };
+export const NEEDS_BLURB: Localized = {
+  de: "Kuscheln, toben, trinken – was guttut",
+  en: "Cuddling, romping, a drink – what helps",
+  zh: "抱抱、跑跑跳跳、喝水——什么让人舒服",
+  hi: "गले लगना, उछल-कूद, पानी – जो अच्छा लगे",
+  es: "Abrazos, correr, beber: lo que hace bien",
+  ar: "عناق ولعب وشرب – ما يريحنا",
+  ru: "Обнять, порезвиться, попить — что помогает",
+};
 
 /** One thing the child may need or want to do. */
 export interface Need {
@@ -126,8 +142,24 @@ export const NEEDS: Need[] = [
   {
     id: "pusten",
     // The bear stamps and blows the feeling out at once, the breath seen (user feedback, November 2026).
-    caption: { de: "Stampfen und pusten" },
-    answer: { de: "Stampfen und pusten tut gut." },
+    caption: {
+      de: "Stampfen und pusten",
+      en: "Stomp and blow",
+      zh: "跺跺脚，呼呼气",
+      hi: "पैर पटकना और फूँक मारना",
+      es: "Pisar fuerte y soplar",
+      ar: "ضرب الأرض بالقدم والنفخ",
+      ru: "Потопать и подуть",
+    },
+    answer: {
+      de: "Stampfen und pusten tut gut.",
+      en: "Stomping and blowing feels good.",
+      zh: "跺跺脚、呼呼气真舒服。",
+      hi: "पैर पटकना और फूँक मारना अच्छा लगता है।",
+      es: "Pisar fuerte y soplar hace bien.",
+      ar: "ضرب الأرض بالقدم والنفخ يريحنا.",
+      ru: "Потопать и подуть — это хорошо.",
+    },
     together: true,
   },
   {
@@ -143,8 +175,32 @@ export const NEEDS: Need[] = [
       ru: "Глоток воды — это хорошо.",
     },
   },
-  { id: "essen", caption: { de: "Etwas essen" }, answer: { de: "Etwas essen tut gut." } },
-  { id: "ausruhen", caption: { de: "Ausruhen" }, answer: { de: "Ausruhen tut gut." } },
+  {
+    id: "essen",
+    caption: { de: "Etwas essen", en: "Eat something", zh: "吃点东西", hi: "कुछ खाना", es: "Comer algo", ar: "أكل شيء", ru: "Поесть" },
+    answer: {
+      de: "Etwas essen tut gut.",
+      en: "Something to eat feels good.",
+      zh: "吃点东西真舒服。",
+      hi: "कुछ खाना अच्छा लगता है।",
+      es: "Comer algo hace bien.",
+      ar: "الأكل يريحنا.",
+      ru: "Поесть — это хорошо.",
+    },
+  },
+  {
+    id: "ausruhen",
+    caption: { de: "Ausruhen", en: "Rest", zh: "休息一会儿", hi: "आराम करना", es: "Descansar", ar: "الاستراحة", ru: "Отдохнуть" },
+    answer: {
+      de: "Ausruhen tut gut.",
+      en: "Resting feels good.",
+      zh: "休息一会儿真舒服。",
+      hi: "आराम करना अच्छा लगता है।",
+      es: "Descansar hace bien.",
+      ar: "الاستراحة تريحنا.",
+      ru: "Отдохнуть — это хорошо.",
+    },
+  },
   {
     id: "lied",
     caption: { de: "Ein Lied singen", en: "Sing a song", zh: "唱首歌", hi: "गाना गाना", es: "Cantar una canción", ar: "غناء أغنية", ru: "Спеть песенку" },
@@ -161,7 +217,15 @@ export const NEEDS: Need[] = [
 ];
 
 /** Read aloud when the cards come. */
-export const NEEDS_QUESTION: Localized = { de: "Was brauchst du jetzt?" };
+export const NEEDS_QUESTION: Localized = {
+  de: "Was brauchst du jetzt?",
+  en: "What do you need right now?",
+  zh: "你现在需要什么？",
+  hi: "तुम्हें अभी क्या चाहिए?",
+  es: "¿Qué necesitas ahora?",
+  ar: "ماذا نحتاج الآن؟",
+  ru: "Что тебе сейчас нужно?",
+};
 
 /** Every line „Was brauche ich?“ says in German, for the recordings list. */
 export const NEEDS_LINES: string[] = [NEEDS_QUESTION.de, ...NEEDS.map((n) => n.answer.de), CALM_LINE.de, CALM_DONE.de];

@@ -249,7 +249,19 @@ function EditTasks({ board }: { board: Board }) {
               </span>
               <span className="rw-edit-task-name">{taskLabel(task)}</span>
               {board.tasks.length > 1 && (
-                <SheetAction act="delete" ask={t({ de: `„${taskLabel(task)}“ löschen?` })} data={{ "data-edit": "delete-task", "data-task": task.id }} />
+                <SheetAction
+                  act="delete"
+                  ask={t({
+                    de: `„${taskLabel(task)}“ löschen?`,
+                    en: `Delete “${taskLabel(task)}”?`,
+                    zh: `删除“${taskLabel(task)}”？`,
+                    hi: `“${taskLabel(task)}” मिटाएँ?`,
+                    es: `¿Borrar «${taskLabel(task)}»?`,
+                    ar: `حذف «${taskLabel(task)}»؟`,
+                    ru: `Удалить «${taskLabel(task)}»?`,
+                  })}
+                  data={{ "data-edit": "delete-task", "data-task": task.id }}
+                />
               )}
             </span>
           </span>
@@ -581,7 +593,19 @@ function MonthBlocks(props: GridProps) {
             gridTemplateRows: `auto repeat(${fields.length}, minmax(0, 1fr))`,
           }}
         >
-          <span className="rw-block-name">{dated ? "" : t({ de: `${w + 1}. Woche` })}</span>
+          <span className="rw-block-name">
+            {dated
+              ? ""
+              : t({
+                  de: `${w + 1}. Woche`,
+                  en: `Week ${w + 1}`,
+                  zh: `第${w + 1}周`,
+                  hi: `हफ़्ता ${w + 1}`,
+                  es: `Semana ${w + 1}`,
+                  ar: `الأسبوع ${w + 1}`,
+                  ru: `${w + 1}-я неделя`,
+                })}
+          </span>
           {weekdays.map((wd) => {
             const d = week[wd];
             return (
@@ -686,7 +710,16 @@ function CollectWays({
       ))}
       {edit && ways.length < MAX_WAYS && (
         <span className="rw-way-add" data-edit="add" role="button" tabIndex={0}>
-          ＋ {t({ de: "Noch ein Weg – für eine andere Aufgabe" })}
+          ＋{" "}
+          {t({
+            de: "Noch ein Weg – für eine andere Aufgabe",
+            en: "One more path – for another task",
+            zh: "再加一条路——给另一个任务",
+            hi: "एक और रास्ता – किसी दूसरे काम के लिए",
+            es: "Otro camino, para otra tarea",
+            ar: "طريق آخر – لمهمة أخرى",
+            ru: "Ещё одна дорожка – для другого задания",
+          })}
         </span>
       )}
     </div>
@@ -759,7 +792,15 @@ function CollectPath({
           {edit && many && (
             <SheetAction
               act="delete"
-              ask={t({ de: `„${taskLabel(way.task)}“ mit seinem Weg löschen?` })}
+              ask={t({
+                de: `„${taskLabel(way.task)}“ mit seinem Weg löschen?`,
+                en: `Delete “${taskLabel(way.task)}” with its path?`,
+                zh: `删除“${taskLabel(way.task)}”及其路径？`,
+                hi: `“${taskLabel(way.task)}” को उसके रास्ते के साथ मिटाएँ?`,
+                es: `¿Borrar «${taskLabel(way.task)}» con su camino?`,
+                ar: `حذف «${taskLabel(way.task)}» مع طريقها؟`,
+                ru: `Удалить «${taskLabel(way.task)}» вместе с дорожкой?`,
+              })}
               data={{ "data-edit": "delete-task", "data-task": way.task.id }}
             />
           )}
@@ -780,20 +821,60 @@ function CollectPath({
         <span
           className="rw-way-count"
           role="group"
-          aria-label={t({ de: "Kreise bis zur Belohnung" })}
+          aria-label={t({
+            de: "Kreise bis zur Belohnung",
+            en: "Circles until the reward",
+            zh: "到奖励为止的圆圈",
+            hi: "इनाम तक के गोले",
+            es: "Círculos hasta el premio",
+            ar: "الدوائر حتى المكافأة",
+            ru: "Кружки до награды",
+          })}
           style={{ left: at(last.col, end.col, cols), top: at(last.row, end.row, rows) }}
         >
           {way.goal > 1 && (
-            <span className="rw-way-step" data-edit="way-goal" data-way={way0} data-by="-1" role="button" tabIndex={0} title={t({ de: "Ein Kreis weniger" })}>
+            <span
+              className="rw-way-step"
+              data-edit="way-goal"
+              data-way={way0}
+              data-by="-1"
+              role="button"
+              tabIndex={0}
+              title={t({
+                de: "Ein Kreis weniger",
+                en: "One circle fewer",
+                zh: "少一个圆圈",
+                hi: "एक गोला कम",
+                es: "Un círculo menos",
+                ar: "دائرة أقل",
+                ru: "На один кружок меньше",
+              })}
+            >
               −
             </span>
           )}
           {way.goal < MAX_COLLECT && (
-            <span className="rw-way-step" data-edit="way-goal" data-way={way0} data-by="1" role="button" tabIndex={0} title={t({ de: "Ein Kreis mehr" })}>
+            <span
+              className="rw-way-step"
+              data-edit="way-goal"
+              data-way={way0}
+              data-by="1"
+              role="button"
+              tabIndex={0}
+              title={t({
+                de: "Ein Kreis mehr",
+                en: "One more circle",
+                zh: "多一个圆圈",
+                hi: "एक गोला और",
+                es: "Un círculo más",
+                ar: "دائرة أخرى",
+                ru: "Ещё один кружок",
+              })}
+            >
               ＋
             </span>
           )}
-          <span className="rw-path-hint">{t({ de: "Kreise" })}</span>
+          <span className="rw-path-hint">{t({ de: "Kreise", en: "Circles", zh: "圆圈", hi: "गोले", es: "Círculos", ar: "الدوائر", ru: "Кружки" })}</span>
         </span>
       )}
       <div
@@ -825,7 +906,7 @@ function SwapVeil() {
       <svg className="rw-path-swap-icon" viewBox="0 0 24 24" aria-hidden>
         <path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4" />
       </svg>
-      {t({ de: "Tauschen" })}
+      {t({ de: "Tauschen", en: "Swap", zh: "更换", hi: "बदलें", es: "Cambiar", ar: "استبدال", ru: "Заменить" })}
     </span>
   );
 }

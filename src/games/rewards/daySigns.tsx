@@ -18,9 +18,23 @@ export const PARTS_OF: Record<DayParts, (Slot | undefined)[]> = {
 
 /** The choices of „Tageszeiten“, in the order of their switch. */
 export const DAY_PARTS_CHOICES: { id: DayParts; label: Localized }[] = [
-  { id: 1, label: { de: "Ganzer Tag" } },
-  { id: 2, label: { de: "Früh & Abend" } },
-  { id: 3, label: { de: "Früh, Mittag & Abend" } },
+  { id: 1, label: { de: "Ganzer Tag", en: "Whole day", zh: "整天", hi: "पूरा दिन", es: "Todo el día", ar: "اليوم كله", ru: "Весь день" } },
+  {
+    id: 2,
+    label: { de: "Früh & Abend", en: "Morning & evening", zh: "早上和晚上", hi: "सुबह और शाम", es: "Mañana y noche", ar: "صباحًا ومساءً", ru: "Утро и вечер" },
+  },
+  {
+    id: 3,
+    label: {
+      de: "Früh, Mittag & Abend",
+      en: "Morning, midday & evening",
+      zh: "早上、中午和晚上",
+      hi: "सुबह, दोपहर और शाम",
+      es: "Mañana, mediodía y noche",
+      ar: "صباحًا وظهرًا ومساءً",
+      ru: "Утро, день и вечер",
+    },
+  },
 ];
 
 /** A set of signs for the times of day. */
@@ -42,11 +56,22 @@ const PICTURE_STEPS: Record<Slot, { emoji: string; catalog: string }> = {
 
 /** The sets of „Zeichen“, in the order of their switch; „Ohne“ (none) comes before them. */
 export const DAY_SIGN_SETS: { id: DaySignSet; label: Localized }[] = [
-  { id: "sky", label: { de: "Himmel" } },
-  { id: "pictures", label: { de: "Bilder" } },
-  { id: "sun", label: { de: "Sonne & Mond" } },
-  { id: "landscape", label: { de: "Landschaft" } },
-  { id: "routine", label: { de: "Hahn, Teller, Bett" } },
+  { id: "sky", label: { de: "Himmel", en: "Sky", zh: "天空", hi: "आसमान", es: "Cielo", ar: "السماء", ru: "Небо" } },
+  { id: "pictures", label: { de: "Bilder", en: "Pictures", zh: "图片", hi: "तस्वीरें", es: "Imágenes", ar: "صور", ru: "Картинки" } },
+  { id: "sun", label: { de: "Sonne & Mond", en: "Sun & moon", zh: "太阳和月亮", hi: "सूरज और चाँद", es: "Sol y luna", ar: "الشمس والقمر", ru: "Солнце и луна" } },
+  { id: "landscape", label: { de: "Landschaft", en: "Landscape", zh: "风景", hi: "दृश्य", es: "Paisaje", ar: "منظر طبيعي", ru: "Пейзаж" } },
+  {
+    id: "routine",
+    label: {
+      de: "Hahn, Teller, Bett",
+      en: "Rooster, plate, bed",
+      zh: "公鸡、盘子、床",
+      hi: "मुर्गा, थाली, बिस्तर",
+      es: "Gallo, plato, cama",
+      ar: "ديك وصحن وسرير",
+      ru: "Петух, тарелка, кровать",
+    },
+  },
 ];
 
 /** The classic emoji of a time of day, where a sign is needed whatever set was chosen (the editor's own switches). */

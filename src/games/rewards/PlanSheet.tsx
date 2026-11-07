@@ -549,8 +549,46 @@ function InsertCard({ cell, axis, last, every }: { cell: string; axis: "row" | "
   const t = useT();
   const sides: ("before" | "after")[] = last ? ["before", "after"] : ["before"];
   const names: Record<"before" | "after", Localized> = {
-    before: axis === "row" ? { de: "Karte links davor einfügen" } : { de: "Karte darüber einfügen" },
-    after: axis === "row" ? { de: "Karte rechts dahinter einfügen" } : { de: "Karte darunter einfügen" },
+    before:
+      axis === "row"
+        ? {
+            de: "Karte links davor einfügen",
+            en: "Insert a card on the left",
+            zh: "在左边插入卡片",
+            hi: "बाईं ओर कार्ड जोड़ें",
+            es: "Insertar una tarjeta a la izquierda",
+            ar: "إدراج بطاقة على اليسار",
+            ru: "Вставить карточку слева",
+          }
+        : {
+            de: "Karte darüber einfügen",
+            en: "Insert a card above",
+            zh: "在上面插入卡片",
+            hi: "ऊपर कार्ड जोड़ें",
+            es: "Insertar una tarjeta arriba",
+            ar: "إدراج بطاقة في الأعلى",
+            ru: "Вставить карточку выше",
+          },
+    after:
+      axis === "row"
+        ? {
+            de: "Karte rechts dahinter einfügen",
+            en: "Insert a card on the right",
+            zh: "在右边插入卡片",
+            hi: "दाईं ओर कार्ड जोड़ें",
+            es: "Insertar una tarjeta a la derecha",
+            ar: "إدراج بطاقة على اليمين",
+            ru: "Вставить карточку справа",
+          }
+        : {
+            de: "Karte darunter einfügen",
+            en: "Insert a card below",
+            zh: "在下面插入卡片",
+            hi: "नीचे कार्ड जोड़ें",
+            es: "Insertar una tarjeta abajo",
+            ar: "إدراج بطاقة في الأسفل",
+            ru: "Вставить карточку ниже",
+          },
   };
   return (
     <>
@@ -1006,7 +1044,11 @@ function RowTools({ plan, row, key0, withDelete, last }: { plan: Plan; row: Plan
         <span className="pl-wtools-move">
           {([-1, 1] as const).map((by) => {
             const able = canMoveRow(plan, row.id, by);
-            const name = t(by < 0 ? { de: "Nach oben" } : { de: "Nach unten" });
+            const name = t(
+              by < 0
+                ? { de: "Nach oben", en: "Move up", zh: "上移", hi: "ऊपर ले जाएँ", es: "Subir", ar: "نقل إلى الأعلى", ru: "Выше" }
+                : { de: "Nach unten", en: "Move down", zh: "下移", hi: "नीचे ले जाएँ", es: "Bajar", ar: "نقل إلى الأسفل", ru: "Ниже" },
+            );
             return (
               <span
                 key={by}
@@ -1027,7 +1069,11 @@ function RowTools({ plan, row, key0, withDelete, last }: { plan: Plan; row: Plan
         </span>
       </span>
       {n > 1 && (
-        <span className="pl-wtools-line pl-wparts" role="radiogroup" aria-label={t({ de: "Tageszeit" })}>
+        <span
+          className="pl-wtools-line pl-wparts"
+          role="radiogroup"
+          aria-label={t({ de: "Tageszeit", en: "Time of day", zh: "时段", hi: "दिन का समय", es: "Momento del día", ar: "وقت اليوم", ru: "Время суток" })}
+        >
           {PARTS_OF[n].map((id) => {
             const slot = id && SLOT_BY_ID.get(id);
             if (!slot) return null;
@@ -1092,7 +1138,7 @@ function WeekStars(props: StepsProps) {
           <DayHead d={d} today={today} look={look} />
         </span>
       ))}
-      {edit && <span className="pl-wtools-head">{t({ de: "Kreise" })}</span>}
+      {edit && <span className="pl-wtools-head">{t({ de: "Kreise", en: "Circles", zh: "圆圈", hi: "गोले", es: "Círculos", ar: "الدوائر", ru: "Кружки" })}</span>}
       {rows.map((row, i) => (
         // A row as one element for its 🗑️ to mark it whole, its cells still the grid's (display: contents).
         <div key={row.id} className={`pl-wrow${tinted ? ` pl-tint-${partClass(partIn(row, n))}` : ""}`}>
@@ -1196,7 +1242,7 @@ export const BIG_DAY: Localized = {
 };
 
 /** A night's name: its tooltip and what is read out. */
-const NIGHT_NAME: Localized = { de: "Einmal schlafen" };
+const NIGHT_NAME: Localized = { de: "Einmal schlafen", en: "One sleep", zh: "睡一觉", hi: "एक बार सोना", es: "Una noche", ar: "نومة واحدة", ru: "Одна ночь" };
 
 /**
  * One night of the Countdown as a card of its own (user feedback, November 2026: each night plainly a field): the child
@@ -1247,8 +1293,34 @@ function NightCard({
         )}
         {edit && (
           <>
-            <SheetAction act="configure" ask={t({ de: "Bild der Nächte ändern" })} data={{ "data-edit": "night" }} />
-            {night.state === "later" && <SheetAction act="delete" ask={t({ de: "Eine Nacht weniger?" })} data={{ "data-edit": "delete-night" }} />}
+            <SheetAction
+              act="configure"
+              ask={t({
+                de: "Bild der Nächte ändern",
+                en: "Change the picture of the nights",
+                zh: "更换夜晚的图片",
+                hi: "रातों की तस्वीर बदलें",
+                es: "Cambiar la imagen de las noches",
+                ar: "تغيير صورة الليالي",
+                ru: "Сменить картинку ночей",
+              })}
+              data={{ "data-edit": "night" }}
+            />
+            {night.state === "later" && (
+              <SheetAction
+                act="delete"
+                ask={t({
+                  de: "Eine Nacht weniger?",
+                  en: "One night fewer?",
+                  zh: "少一个晚上？",
+                  hi: "एक रात कम?",
+                  es: "¿Una noche menos?",
+                  ar: "ليلة أقل؟",
+                  ru: "На одну ночь меньше?",
+                })}
+                data={{ "data-edit": "delete-night" }}
+              />
+            )}
             {addAfter && (
               <span
                 className="pl-insert pl-insert-row after"
@@ -1273,7 +1345,15 @@ function NightCard({
 }
 
 /** The ＋ after the nights while a Countdown is made. */
-const ONE_MORE_NIGHT: Localized = { de: "Eine Nacht mehr" };
+const ONE_MORE_NIGHT: Localized = {
+  de: "Eine Nacht mehr",
+  en: "One more night",
+  zh: "多一个晚上",
+  hi: "एक रात और",
+  es: "Una noche más",
+  ar: "ليلة أخرى",
+  ru: "Ещё одна ночь",
+};
 
 /**
  * The Countdown (H-41, H-05): „Wie oft noch schlafen?“ – a card for every night until the big day, the child asleep in

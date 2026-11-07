@@ -102,9 +102,12 @@ belongs) and listed in `src/content/texts/texts-<lang>.ts`, never imported from 
 in a language is said wholly in German, and its name under the choice shows in German. Things "go with" each other,
 helpers "need" their tools; where a verb would follow someone's gender, the sentence is built so it follows the tool or
 no one (Hindi „… के लिए … चाहिए“, Russian „нужен / нужна / нужны“), and the helpers keep the German ones' gender
-(Spanish la doctora, Arabic تحتاج). Only the nine handmade pairs are translated (`TRANSLATED` in `content.test.ts`,
-which checks those languages have every one of them); the scenes and the topics' names are German only until the user
-asks. Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only for
+(Spanish la doctora, Arabic تحتاج). Every pair is translated in all six languages (the nine handmade ones in `content.<lang>.ts`, the scenes in
+`content.scenes.<lang>.ts`; both are merged in `src/content/texts/texts-<lang>.ts`, and `content.test.ts` checks that every
+pair has its sentences in each language, which differ from the German, the names of things excepted in languages with
+Latin letters: Pizza, Computer). The topics' names are translated inline in `topics.ts`. A new scene or topic comes in German
+only until the user asks for its translations; then the pairs are added to each `content.scenes.<lang>.ts` and the test
+is relaxed for them like `GERMAN_ONLY` in the other games (the test wants all pairs again once they are translated). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only for
 the handmade pairs so far: a sentence without its recording stays silent. New sentences are listed by
 `src/content/recordedLines.ts` (`zusammen`) and recorded with `bun run voice make --only zusammen`, only when the user
 asks. `languageStatus.ts` says what is missing.

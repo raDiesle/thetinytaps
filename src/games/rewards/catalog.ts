@@ -806,6 +806,12 @@ export const PLAN_VIEWS: PlanViewInfo[] = [
     label: { de: "Countdown", en: "Countdown", zh: "倒数", hi: "उलटी गिनती", es: "Cuenta atrás", ar: "العدّ التنازلي", ru: "Обратный отсчёт" },
     hint: {
       de: "Wie oft noch schlafen bis zum großen Tag – ein Feld für jede Nacht",
+      en: "How many more sleeps until the big day – a field for every night",
+      zh: "离大日子还要睡几觉——每个晚上一格",
+      hi: "बड़े दिन तक कितनी बार सोना है – हर रात के लिए एक खाना",
+      es: "Cuántas noches faltan para el gran día: una casilla por noche",
+      ar: "كم نومة باقية حتى اليوم الكبير – خانة لكل ليلة",
+      ru: "Сколько ещё спать до большого дня – по клеточке на каждую ночь",
     },
   },
 ];
@@ -824,11 +830,63 @@ export interface NightLook {
 }
 
 export const NIGHT_LOOKS: NightLook[] = [
-  { id: "fuechsin", emoji: "🦊", label: { de: "Fuchsmädchen im Bett" } },
-  { id: "baer", emoji: "🐻", label: { de: "Bärenjunge im Bett" } },
-  { id: "fuchs", emoji: "🦊", label: { de: "Fuchsjunge im Bett" } },
-  { id: "zusammen", emoji: "🛏️", label: { de: "Fuchs und Bär im Bett" } },
-  { id: "mond", emoji: "🌙", label: { de: "Schlafender Mond" } },
+  {
+    id: "fuechsin",
+    emoji: "🦊",
+    label: {
+      de: "Fuchsmädchen im Bett",
+      en: "Fox girl in bed",
+      zh: "床上的小狐狸女孩",
+      hi: "बिस्तर में लोमड़ी की बच्ची",
+      es: "Zorrita en la cama",
+      ar: "ثعلبة صغيرة في السرير",
+      ru: "Лисичка в кроватке",
+    },
+  },
+  {
+    id: "baer",
+    emoji: "🐻",
+    label: {
+      de: "Bärenjunge im Bett",
+      en: "Bear boy in bed",
+      zh: "床上的小熊男孩",
+      hi: "बिस्तर में भालू का बच्चा",
+      es: "Osito en la cama",
+      ar: "دب صغير في السرير",
+      ru: "Медвежонок в кроватке",
+    },
+  },
+  {
+    id: "fuchs",
+    emoji: "🦊",
+    label: {
+      de: "Fuchsjunge im Bett",
+      en: "Fox boy in bed",
+      zh: "床上的小狐狸男孩",
+      hi: "बिस्तर में लोमड़ी का बच्चा",
+      es: "Zorrito en la cama",
+      ar: "ثعلب صغير في السرير",
+      ru: "Лисёнок в кроватке",
+    },
+  },
+  {
+    id: "zusammen",
+    emoji: "🛏️",
+    label: {
+      de: "Fuchs und Bär im Bett",
+      en: "Fox and bear in bed",
+      zh: "床上的狐狸和小熊",
+      hi: "बिस्तर में लोमड़ी और भालू",
+      es: "Zorro y oso en la cama",
+      ar: "ثعلب ودب في السرير",
+      ru: "Лиса и медведь в кроватке",
+    },
+  },
+  {
+    id: "mond",
+    emoji: "🌙",
+    label: { de: "Schlafender Mond", en: "Sleeping moon", zh: "睡着的月亮", hi: "सोता हुआ चाँद", es: "Luna dormida", ar: "قمر نائم", ru: "Спящая луна" },
+  },
 ];
 
 /** A Countdown's night look by id; where none is chosen (or it is gone) the shelf's figure: the fox girl or the bear boy. */
@@ -1068,6 +1126,12 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
     },
     hint: {
       de: "Ein Feld für jede Nacht bis zum Geburtstag, zum Urlaub oder bis Oma kommt",
+      en: "A field for every night until the birthday, the holiday or until Grandma comes",
+      zh: "每个晚上一格，直到生日、假期或奶奶来的那天",
+      hi: "जन्मदिन, छुट्टी या दादी के आने तक हर रात के लिए एक खाना",
+      es: "Una casilla por noche hasta el cumpleaños, las vacaciones o la visita de la abuela",
+      ar: "خانة لكل ليلة حتى عيد الميلاد أو العطلة أو قدوم الجدّة",
+      ru: "По клеточке на каждую ночь до дня рождения, отпуска или приезда бабушки",
     },
   },
 ];

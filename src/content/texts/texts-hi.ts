@@ -24,7 +24,8 @@ import { HI as winterbaustelle } from "@/games/scenes/winterbaustelle/hi";
 import { HI as zoo } from "@/games/scenes/zoo/hi";
 import { HI as elevator } from "@/games/elevator/hi";
 import { HINDI as animals } from "@/games/animals/content.hi";
-import { HINDI as together } from "@/games/together/content.hi";
+import { HINDI as togetherHandmade } from "@/games/together/content.hi";
+import { HINDI_SCENES as togetherScenes } from "@/games/together/content.scenes.hi";
 import { HINDI as shadows } from "@/games/shadows/content.hi";
 import { HINDI_TEXTS as socks } from "@/games/socks/content.hi";
 import { STEP_TEXTS_HI as teethSteps } from "@/games/teeth/steps.hi";
@@ -69,7 +70,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
-  together,
+  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,

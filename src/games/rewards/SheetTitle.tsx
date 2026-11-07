@@ -45,8 +45,32 @@ export function SheetTitle({
           data-edit={editing ? "title-mark" : undefined}
           role={editing ? "button" : undefined}
           tabIndex={editing ? 0 : undefined}
-          title={editing ? t({ de: "Zeichen vor der Überschrift ändern" }) : undefined}
-          aria-label={editing ? t({ de: "Zeichen vor der Überschrift ändern" }) : undefined}
+          title={
+            editing
+              ? t({
+                  de: "Zeichen vor der Überschrift ändern",
+                  en: "Change the sign before the heading",
+                  zh: "更换标题前的标志",
+                  hi: "शीर्षक से पहले का चिह्न बदलें",
+                  es: "Cambiar el símbolo antes del título",
+                  ar: "تغيير العلامة قبل العنوان",
+                  ru: "Сменить знак перед заголовком",
+                })
+              : undefined
+          }
+          aria-label={
+            editing
+              ? t({
+                  de: "Zeichen vor der Überschrift ändern",
+                  en: "Change the sign before the heading",
+                  zh: "更换标题前的标志",
+                  hi: "शीर्षक से पहले का चिह्न बदलें",
+                  es: "Cambiar el símbolo antes del título",
+                  ar: "تغيير العلامة قبل العنوان",
+                  ru: "Сменить знак перед заголовком",
+                })
+              : undefined
+          }
         >
           {mark ? <MarkPic mark={mark} /> : "＋"}
         </span>

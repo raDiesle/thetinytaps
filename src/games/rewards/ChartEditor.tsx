@@ -189,7 +189,11 @@ type Editing =
   | { what: "night" };
 
 /** The names of a month board's looks. */
-const MONTH_LOOK_NAMES: Record<MonthLook, Localized> = { calendar: { de: "Kalender" }, table: { de: "Tabelle" }, blocks: { de: "Wochen" } };
+const MONTH_LOOK_NAMES: Record<MonthLook, Localized> = {
+  calendar: { de: "Kalender", en: "Calendar", zh: "日历", hi: "कैलेंडर", es: "Calendario", ar: "تقويم", ru: "Календарь" },
+  table: { de: "Tabelle", en: "Table", zh: "表格", hi: "तालिका", es: "Tabla", ar: "جدول", ru: "Таблица" },
+  blocks: { de: "Wochen", en: "Weeks", zh: "按周", hi: "हफ़्ते", es: "Semanas", ar: "أسابيع", ru: "Недели" },
+};
 
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum", en: "Time span", zh: "时间范围", hi: "समय-अवधि", es: "Periodo", ar: "المدة", ru: "Период" };
@@ -468,7 +472,15 @@ export function ChartEditor({
                       ar: "حذف هذه اللوحة نهائيًا؟",
                       ru: "Удалить эту таблицу полностью?",
                     })
-                  : t({ de: "Diesen Plan ganz löschen?" }),
+                  : t({
+                      de: "Diesen Plan ganz löschen?",
+                      en: "Delete this plan completely?",
+                      zh: "彻底删除这个日程表吗？",
+                      hi: "यह योजना पूरी तरह मिटाएँ?",
+                      es: "¿Borrar este plan por completo?",
+                      ar: "حذف هذه الخطة نهائيًا؟",
+                      ru: "Удалить этот план полностью?",
+                    }),
               ) && onRemove()
             }
           >
@@ -531,21 +543,57 @@ export function ChartEditor({
             {draft.type === "board" && draft.board.kind === "month" && (
               <>
                 <span className="rw-opt-group">
-                  <span className="rw-opt-name">{t({ de: "Monat als" })}</span>
+                  <span className="rw-opt-name">
+                    {t({ de: "Monat als", en: "Month as", zh: "月份显示为", hi: "महीना इस रूप में", es: "Mes como", ar: "الشهر على شكل", ru: "Месяц как" })}
+                  </span>
                   <Segments<MonthSpan>
-                    label={t({ de: "Zeitraum des Monats" })}
+                    label={t({
+                      de: "Zeitraum des Monats",
+                      en: "Span of the month",
+                      zh: "月份的范围",
+                      hi: "महीने की अवधि",
+                      es: "Periodo del mes",
+                      ar: "مدة الشهر",
+                      ru: "Период месяца",
+                    })}
                     selected={draft.board.span ?? "weeks"}
                     items={[
-                      { id: "weeks", label: t({ de: "4 Wochen" }), pic: <LookPic id="weeks" /> },
-                      { id: "month", label: t({ de: "Kalendermonat" }), pic: <LookPic id="month" /> },
+                      {
+                        id: "weeks",
+                        label: t({ de: "4 Wochen", en: "4 weeks", zh: "4周", hi: "4 हफ़्ते", es: "4 semanas", ar: "4 أسابيع", ru: "4 недели" }),
+                        pic: <LookPic id="weeks" />,
+                      },
+                      {
+                        id: "month",
+                        label: t({
+                          de: "Kalendermonat",
+                          en: "Calendar month",
+                          zh: "日历月",
+                          hi: "कैलेंडर का महीना",
+                          es: "Mes del calendario",
+                          ar: "شهر تقويمي",
+                          ru: "Календарный месяц",
+                        }),
+                        pic: <LookPic id="month" />,
+                      },
                     ]}
                     onPick={(span) => setBoard(withStart({ ...draft.board, span: span === "weeks" ? undefined : span }, new Date()))}
                   />
                 </span>
                 <span className="rw-opt-group">
-                  <span className="rw-opt-name">{t({ de: "Darstellung" })}</span>
+                  <span className="rw-opt-name">
+                    {t({ de: "Darstellung", en: "Display", zh: "显示方式", hi: "दिखावट", es: "Presentación", ar: "العرض", ru: "Вид" })}
+                  </span>
                   <Segments<MonthLook>
-                    label={t({ de: "Darstellung des Monats" })}
+                    label={t({
+                      de: "Darstellung des Monats",
+                      en: "Display of the month",
+                      zh: "月份的显示方式",
+                      hi: "महीने की दिखावट",
+                      es: "Presentación del mes",
+                      ar: "عرض الشهر",
+                      ru: "Вид месяца",
+                    })}
                     selected={draft.board.look ?? "calendar"}
                     items={MONTH_LOOKS.map((id) => ({ id, label: t(MONTH_LOOK_NAMES[id]), pic: <LookPic id={id} /> }))}
                     onPick={(look) => setBoard({ ...draft.board, look: look === "calendar" ? undefined : look })}
@@ -555,13 +603,47 @@ export function ChartEditor({
             )}
             {plan?.view === "week" && counts && (
               <span className="rw-opt-group">
-                <span className="rw-opt-name">{t({ de: "Darstellung" })}</span>
+                <span className="rw-opt-name">
+                  {t({ de: "Darstellung", en: "Display", zh: "显示方式", hi: "दिखावट", es: "Presentación", ar: "العرض", ru: "Вид" })}
+                </span>
                 <Segments<WeekLook>
-                  label={t({ de: "Darstellung der Woche" })}
+                  label={t({
+                    de: "Darstellung der Woche",
+                    en: "Display of the week",
+                    zh: "周的显示方式",
+                    hi: "हफ़्ते की दिखावट",
+                    es: "Presentación de la semana",
+                    ar: "عرض الأسبوع",
+                    ru: "Вид недели",
+                  })}
                   selected={plan.weekLook ?? "compact"}
                   items={[
-                    { id: "compact", label: t({ de: "Eine Karte je Zeile" }), pic: <LookPic id="compact" /> },
-                    { id: "pictures", label: t({ de: "Bild über jedem Kreis" }), pic: <LookPic id="pictures" /> },
+                    {
+                      id: "compact",
+                      label: t({
+                        de: "Eine Karte je Zeile",
+                        en: "One card per row",
+                        zh: "每行一张卡片",
+                        hi: "हर पंक्ति में एक कार्ड",
+                        es: "Una tarjeta por fila",
+                        ar: "بطاقة واحدة في كل صف",
+                        ru: "По одной карточке в строке",
+                      }),
+                      pic: <LookPic id="compact" />,
+                    },
+                    {
+                      id: "pictures",
+                      label: t({
+                        de: "Bild über jedem Kreis",
+                        en: "Picture above each circle",
+                        zh: "每个圆圈上方有图片",
+                        hi: "हर गोले के ऊपर तस्वीर",
+                        es: "Imagen sobre cada círculo",
+                        ar: "صورة فوق كل دائرة",
+                        ru: "Картинка над каждым кружком",
+                      }),
+                      pic: <LookPic id="pictures" />,
+                    },
                   ]}
                   onPick={(look) => setPlan({ ...plan, weekLook: look === "compact" ? undefined : look })}
                 />
@@ -569,9 +651,19 @@ export function ChartEditor({
             )}
             {parts && (
               <span className="rw-opt-group">
-                <span className="rw-opt-name">{t({ de: "Tageszeiten" })}</span>
+                <span className="rw-opt-name">
+                  {t({ de: "Tageszeiten", en: "Times of day", zh: "时段", hi: "दिन के समय", es: "Momentos del día", ar: "أوقات اليوم", ru: "Время суток" })}
+                </span>
                 <Segments<`${DayParts}`>
-                  label={t({ de: "Tageszeiten" })}
+                  label={t({
+                    de: "Tageszeiten",
+                    en: "Times of day",
+                    zh: "时段",
+                    hi: "दिन के समय",
+                    es: "Momentos del día",
+                    ar: "أوقات اليوم",
+                    ru: "Время суток",
+                  })}
                   selected={`${parts.n}`}
                   items={DAY_PARTS_CHOICES.map((choice) => ({ id: `${choice.id}`, label: t(choice.label), pic: <PartsPic n={choice.id} /> }))}
                   onPick={(id) => parts.set(Number(id) as DayParts)}
@@ -580,12 +672,20 @@ export function ChartEditor({
             )}
             {parts && parts.n > 1 && (
               <span className="rw-opt-group">
-                <span className="rw-opt-name">{t({ de: "Zeichen" })}</span>
+                <span className="rw-opt-name">{t({ de: "Zeichen", en: "Signs", zh: "标志", hi: "चिह्न", es: "Símbolos", ar: "علامات", ru: "Знаки" })}</span>
                 <Segments<DaySignSet | "none">
-                  label={t({ de: "Zeichen der Tageszeiten" })}
+                  label={t({
+                    de: "Zeichen der Tageszeiten",
+                    en: "Signs for the times of day",
+                    zh: "时段的标志",
+                    hi: "दिन के समय के चिह्न",
+                    es: "Símbolos de los momentos del día",
+                    ar: "علامات أوقات اليوم",
+                    ru: "Знаки времени суток",
+                  })}
                   selected={parts.signs ?? "none"}
                   items={[
-                    { id: "none", label: t({ de: "Ohne" }) },
+                    { id: "none", label: t({ de: "Ohne", en: "None", zh: "无", hi: "कोई नहीं", es: "Ninguno", ar: "بدون", ru: "Без знаков" }) },
                     ...DAY_SIGN_SETS.map((set) => ({
                       id: set.id,
                       label: t(set.label),
@@ -1186,7 +1286,18 @@ function NightDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan:
   const t = useT();
   const chosen = nightLookOf(plan.night, useFigure());
   return (
-    <EditDialog title={t({ de: "Bild der Nächte" })} onClose={onClose}>
+    <EditDialog
+      title={t({
+        de: "Bild der Nächte",
+        en: "Picture of the nights",
+        zh: "夜晚的图片",
+        hi: "रातों की तस्वीर",
+        es: "Imagen de las noches",
+        ar: "صورة الليالي",
+        ru: "Картинка ночей",
+      })}
+      onClose={onClose}
+    >
       <div className="rw-picks rw-picks-tiles">
         {NIGHT_LOOKS.map((look) => (
           <Pick
@@ -1288,9 +1399,25 @@ function TitleMarkDialog({ draft, onChange, onClose }: { draft: Draft; onChange:
     onClose();
   };
   return (
-    <EditDialog title={t({ de: "Zeichen vor der Überschrift" })} onClose={onClose}>
+    <EditDialog
+      title={t({
+        de: "Zeichen vor der Überschrift",
+        en: "Sign before the heading",
+        zh: "标题前的标志",
+        hi: "शीर्षक से पहले का चिह्न",
+        es: "Símbolo antes del título",
+        ar: "علامة قبل العنوان",
+        ru: "Знак перед заголовком",
+      })}
+      onClose={onClose}
+    >
       <div className="rw-picks rw-picks-tiles">
-        <Pick selected={current === NO_TITLE_MARK} onClick={() => set(NO_TITLE_MARK)} emoji="∅" label={t({ de: "Ohne Zeichen" })} />
+        <Pick
+          selected={current === NO_TITLE_MARK}
+          onClick={() => set(NO_TITLE_MARK)}
+          emoji="∅"
+          label={t({ de: "Ohne Zeichen", en: "No sign", zh: "没有标志", hi: "बिना चिह्न", es: "Sin símbolo", ar: "بدون علامة", ru: "Без знака" })}
+        />
         {MARKS.map((mark) => (
           <Pick key={mark.id} selected={current === mark.id} onClick={() => set(mark.id)} emoji={<MarkPic mark={mark} />} label={t(mark.label)} />
         ))}
@@ -1316,7 +1443,15 @@ function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId
             {taskLabel(task)}
           </>
         ) : board.kind === "collect" ? (
-          t({ de: "Noch ein Weg – für welche Aufgabe?" })
+          t({
+            de: "Noch ein Weg – für welche Aufgabe?",
+            en: "One more path – for which task?",
+            zh: "再加一条路——给哪个任务？",
+            hi: "एक और रास्ता – किस काम के लिए?",
+            es: "Otro camino: ¿para qué tarea?",
+            ar: "طريق آخر – لأي مهمة؟",
+            ru: "Ещё одна дорожка – для какого задания?",
+          })
         ) : (
           t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })
         )

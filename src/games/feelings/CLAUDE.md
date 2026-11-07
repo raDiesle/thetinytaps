@@ -2,7 +2,7 @@
 
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
 `cover-gefuehle.webp`; user decision, November 2026) with three games; the names of the translated ones are in
-`names.ts`, the one still German-only in its own file (`needs.ts`), so each language row reads its own.
+`names.ts`, „Was brauche ich?“ in its own file (`needs.ts`), so each language row reads its own.
 In its table of contents „Alltagssituationen“ stands first, then „Wie geht's dir?“ and „Was brauche ich?“ (user wish,
 November 2026; the order of `games` in `games.ts`). Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
 area C. The first two are small games of their own, each doing one thing (user feedback, November 2026: copying faces and

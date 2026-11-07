@@ -24,7 +24,8 @@ import { RU as winterbaustelle } from "@/games/scenes/winterbaustelle/ru";
 import { RU as zoo } from "@/games/scenes/zoo/ru";
 import { RU as elevator } from "@/games/elevator/ru";
 import { RUSSIAN as animals } from "@/games/animals/content.ru";
-import { RUSSIAN as together } from "@/games/together/content.ru";
+import { RUSSIAN as togetherHandmade } from "@/games/together/content.ru";
+import { RUSSIAN_SCENES as togetherScenes } from "@/games/together/content.scenes.ru";
 import { RUSSIAN as shadows } from "@/games/shadows/content.ru";
 import { RUSSIAN_TEXTS as socks } from "@/games/socks/content.ru";
 import { STEP_TEXTS_RU as teethSteps } from "@/games/teeth/steps.ru";
@@ -69,7 +70,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
-  together,
+  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,

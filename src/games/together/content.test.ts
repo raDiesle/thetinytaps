@@ -153,10 +153,7 @@ test("every scene is of its topic's kind: a helper has its fox or bear, a thing 
   }
 });
 
-/** The handmade pairs, translated (November 2026); the scenes are German only until translations are asked for. */
-const TRANSLATED = new Set(["zahnbuerste", "tuer", "topf", "blume", "papier", "feuerwehr", "aerztin", "baecker", "friseurin"]);
-
-/** The languages translated whole so far: every pair has its sentences. */
+/** The languages translated whole (the handmade pairs in `content.<lang>.ts`, the scenes in `content.scenes.<lang>.ts`, November 2026): every pair has its sentences. */
 const COMPLETE: (TargetLanguageId & TextsLanguageId)[] = ["en", "zh", "hi", "es", "ar", "ru"];
 
 /** The languages in a script of their own: no Latin letter may be left in their sentences. */
@@ -170,11 +167,12 @@ test("the translated languages say every pair in their own words", () => {
   for (const language of COMPLETE) {
     const texts = TOGETHER_TEXTS[language]!;
     const de = TOGETHER_TEXTS.de!;
-    for (const pair of PAIRS.filter((p) => TRANSLATED.has(p.id))) {
+    for (const pair of PAIRS) {
       expect(TOGETHER_TRANSLATIONS[language]?.[pair.id], `${language} ${pair.id}`).toBeDefined();
-      const said = (["name", "partner", "question", "right", "belongs"] as const).map((key) => [texts[key](pair), de[key](pair)]);
-      for (const [sentence, german] of said) {
-        expect(sentence, `${language} ${pair.id}`).not.toBe(german);
+      const said = (["name", "partner", "question", "right", "belongs"] as const).map((key) => [key, texts[key](pair), de[key](pair)]);
+      for (const [key, sentence, german] of said) {
+        // A name may be the German word in a language with Latin letters (Pizza, Computer, Piñata); a sentence never is.
+        if (!(OWN_SCRIPT.includes(language) === false && (key === "name" || key === "partner"))) expect(sentence, `${language} ${pair.id}`).not.toBe(german);
         if (OWN_SCRIPT.includes(language)) expect(sentence, `${language} ${pair.id}`).not.toMatch(/[A-Za-zäöüß]/);
       }
     }

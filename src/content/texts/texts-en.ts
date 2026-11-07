@@ -25,7 +25,8 @@ import { EN as winterbaustelle } from "@/games/scenes/winterbaustelle/en";
 import { EN as zoo } from "@/games/scenes/zoo/en";
 import { EN as elevator } from "@/games/elevator/en";
 import { ENGLISH as animals } from "@/games/animals/content.en";
-import { ENGLISH as together } from "@/games/together/content.en";
+import { ENGLISH as togetherHandmade } from "@/games/together/content.en";
+import { ENGLISH_SCENES as togetherScenes } from "@/games/together/content.scenes.en";
 import { ENGLISH as shadows } from "@/games/shadows/content.en";
 import { ENGLISH_TEXTS as socks } from "@/games/socks/content.en";
 import { STEP_TEXTS_EN as teethSteps } from "@/games/teeth/steps.en";
@@ -70,7 +71,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
-  together,
+  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,

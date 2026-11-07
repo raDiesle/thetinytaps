@@ -54,9 +54,15 @@ const CARDS_NOTE: Localized = {
 export const printsCards = (plan: Plan): "never" | "always" | "choice" =>
   plan.view === "countdown" ? "never" : plan.view !== "day" ? "choice" : plan.nowField ? "always" : "never";
 
-/** Under a Countdown's print: what the nights on paper are for (German only since the nights became cards with a ring). */
+/** Under a Countdown's print: what the nights on paper are for. */
 const COUNTDOWN_NOTE: Localized = {
   de: "Gedruckt werden die Nächte ab heute. Jeden Morgen klebt Ihr Kind einen Stern in den Kreis der Nacht oder malt ihn aus – so sieht es, wie der große Tag näher kommt.",
+  en: "The nights from today on are printed. Every morning your child sticks a star into the night's circle or colors it in – so they can see the big day coming closer.",
+  zh: "打印出来的是从今天起的每个夜晚。每天早上，您的孩子把一颗星星贴进当晚的圆圈里，或者把它涂上颜色——这样孩子就能看到大日子一天天临近。",
+  hi: "आज से आगे की रातें छापी जाती हैं। हर सुबह आपका बच्चा उस रात के गोले में एक तारा चिपकाता है या उसमें रंग भरता है – इस तरह उसे दिखता है कि बड़ा दिन पास आ रहा है।",
+  es: "Se imprimen las noches a partir de hoy. Cada mañana su peque pega una estrella en el círculo de la noche o lo colorea: así ve cómo se acerca el gran día.",
+  ar: "تُطبع الليالي ابتداءً من اليوم. كل صباح يُلصق طفلكم نجمة في دائرة الليلة أو يلوّنها – فيرى كيف يقترب اليوم الكبير.",
+  ru: "Печатаются ночи, начиная с сегодняшней. Каждое утро ваш ребёнок наклеивает звёздочку в кружок ночи или раскрашивает его – так он видит, как приближается большой день.",
 };
 
 /** The page's orientation: the grown-up's choice, or what suits the plan. */

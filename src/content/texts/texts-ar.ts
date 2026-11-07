@@ -24,7 +24,8 @@ import { AR as winterbaustelle } from "@/games/scenes/winterbaustelle/ar";
 import { AR as zoo } from "@/games/scenes/zoo/ar";
 import { AR as elevator } from "@/games/elevator/ar";
 import { ARABIC as animals } from "@/games/animals/content.ar";
-import { ARABIC as together } from "@/games/together/content.ar";
+import { ARABIC as togetherHandmade } from "@/games/together/content.ar";
+import { ARABIC_SCENES as togetherScenes } from "@/games/together/content.scenes.ar";
 import { ARABIC as shadows } from "@/games/shadows/content.ar";
 import { ARABIC_TEXTS as socks } from "@/games/socks/content.ar";
 import { STEP_TEXTS_AR as teethSteps } from "@/games/teeth/steps.ar";
@@ -69,7 +70,7 @@ export const TEXTS: LanguageTexts = {
   },
   elevator,
   animals,
-  together,
+  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,
