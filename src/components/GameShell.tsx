@@ -14,6 +14,7 @@ import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { useCommonSettings } from "@/lib/common";
 import { goBack } from "@/lib/goBack";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
+import { track } from "@/lib/analytics";
 import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
@@ -212,6 +213,10 @@ export function GameShell({
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const playtime = usePlaytime(playing && !free);
+  // How often the day's play time runs out in a game, for the grown-ups who make the app (src/lib/analytics.ts).
+  useEffect(() => {
+    if (playtime.goodNight) track("gute-nacht", { spiel: location.pathname });
+  }, [playtime.goodNight, location.pathname]);
   const groups = modes?.some((m) => m.kind) ? byKind(modes) : undefined;
   const grid = useFitGrid(
     modes?.length ?? 0,

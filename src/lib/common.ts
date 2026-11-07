@@ -4,6 +4,7 @@
 // in from here (see withCommon).
 
 import { useCallback, useSyncExternalStore } from "react";
+import { track } from "@/lib/analytics";
 import { loadStored, useStoredSettings } from "@/lib/storage";
 
 export interface CommonSettings {
@@ -82,6 +83,9 @@ export function useCommonSettings() {
   const value = useSyncExternalStore(subscribe, current);
   const update = useCallback((patch: Partial<Pick<CommonSettings, "music" | "figure" | "leave">>) => {
     common = showFigure({ ...current(), ...patch });
+    // Which options grown-ups choose for all games (analytics.ts).
+    for (const [name, value] of Object.entries(patch))
+      track("einstellung", { name, wert: typeof value === "boolean" ? (value ? "an" : "aus") : String(value) });
     try {
       localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(common));
     } catch {

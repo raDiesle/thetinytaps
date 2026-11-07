@@ -110,9 +110,16 @@ const APP_LINKS = [
 // GitHub, passed in by deploy.yml); without it, as in every local build, nothing is counted.
 const beaconToken = process.env.CF_BEACON_TOKEN?.trim();
 if (beaconToken && !/^[0-9a-f]{32}$/i.test(beaconToken)) throw new Error("build: CF_BEACON_TOKEN is not a Cloudflare Web Analytics site token");
-const ANALYTICS = beaconToken
-  ? [`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${beaconToken}", "spa": true}'></script>`]
-  : [];
+// How long each game is played is sent to Umami Cloud (src/lib/analytics.ts), which sets no cookies either. Its
+// website id is no secret (it stands in every page), so it lives here; the script counts only on the site's own
+// host, so a build looked at locally sends nothing, and it leaves out the address's query (?level=…).
+const UMAMI_WEBSITE_ID = "f51dbbd5-9252-4b5b-addc-267b2bb89f67";
+const ANALYTICS = [
+  ...(beaconToken
+    ? [`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${beaconToken}", "spa": true}'></script>`]
+    : []),
+  `<script defer src="https://cloud.umami.is/script.js" data-website-id="${UMAMI_WEBSITE_ID}" data-domains="${new URL(siteUrl).hostname}" data-exclude-search="true"></script>`,
+];
 
 /** One built page: a page of seo.ts in one language. */
 interface BuiltPage {

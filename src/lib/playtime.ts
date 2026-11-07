@@ -8,6 +8,7 @@
 // it afresh.
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { track } from "@/lib/analytics";
 
 export const PLAYTIME_SETTINGS_KEY = "tt-playtime";
 
@@ -178,6 +179,8 @@ export function usePlaytimeSettings() {
   const { settings: value } = usePlaytimeState();
   const update = useCallback((patch: Partial<PlaytimeSettings>) => {
     settings = { ...currentSettings(), ...patch };
+    // Which kind of limit grown-ups set (analytics.ts) – not each step of its slider, which would be one event per step.
+    if (patch.by) track("einstellung", { name: "spielzeit", wert: patch.by });
     write(PLAYTIME_SETTINGS_KEY, settings);
     changed();
   }, []);
@@ -192,6 +195,7 @@ export function resetPlaytime() {
 /** A little more for today, when the limit is reached: a few minutes, or one more game. */
 export function morePlaytime() {
   const s = currentSettings();
+  track("mehr-spielzeit", { grenze: s.by });
   const p = currentPlayed();
   if (s.by === "time") savePlayed({ ...p, ms: Math.max(0, (s.minutes - EXTRA_MINUTES) * 60_000) });
   else if (s.by === "games") savePlayed({ ...p, games: Math.max(0, s.games - 1) });

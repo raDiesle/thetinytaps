@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-// Toddlers play here, so visits are counted only by Cloudflare Web Analytics, which sets no cookies and
-// needs no consent banner (user decision, October 2026: no Google Analytics). This fails when a tracker
-// that sets cookies or follows people across sites is added to the page, the build or the app.
+// Toddlers play here, so visits are counted only by Cloudflare Web Analytics and Umami Cloud, which set no cookies
+// and need no consent banner (user decisions, October and November 2026: no Google Analytics, not even in its consent
+// mode). This fails when a tracker that sets cookies or follows people across sites is added to the page, the build or the app.
 
 const ROOT = join(import.meta.dir, "..");
 const TRACKERS = /googletagmanager|google-analytics|gtag\(|\bfbq\(|connect\.facebook|hotjar|clarity\.ms|segment\.(io|com)|mixpanel|amplitude/i;
@@ -16,7 +16,7 @@ function sources(dir: string): string[] {
     .map((file) => join(dir, file));
 }
 
-test("no tracker but Cloudflare Web Analytics", () => {
+test("no tracker but Cloudflare Web Analytics and Umami", () => {
   const files = [join(ROOT, "index.html"), ...sources(join(ROOT, "src")), ...sources(join(ROOT, "tools"))];
   for (const file of files) expect(readFileSync(file, "utf8").match(TRACKERS)?.[0], file).toBeUndefined();
 });
@@ -31,6 +31,7 @@ test("the Datenschutzerklärung names what the site uses", () => {
     .join("\n");
   const uses: [RegExp, string][] = [
     [/cloudflareinsights/, "Cloudflare Web Analytics"],
+    [/cloud\.umami\.is/, "Umami"],
     [/getUserMedia\(\{[^}]*audio/, "Mikrofon"],
     [/getUserMedia\(\{[^}]*video|capture=/, "Kamera"],
     [/geolocation\./, "Standort"],

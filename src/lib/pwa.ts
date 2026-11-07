@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { track } from "@/lib/analytics";
 import { BASE_URL, BUILD_TIME, PROD } from "@/lib/buildInfo";
 
 // Offline and "install as app" (PWA). The service worker itself is src/sw.js.
@@ -86,6 +87,7 @@ export function setUpPwa() {
   });
   addEventListener("appinstalled", () => {
     update({ installPrompt: null, installed: true });
+    track("installiert");
     keepAllOffline();
   });
 

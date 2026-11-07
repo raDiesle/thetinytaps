@@ -739,9 +739,16 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
   `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
-- Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
-  repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
-  cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
+- Visits are counted only by Cloudflare Web Analytics (the build adds it with the repository variable
+  `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
+  time on each page, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
+  its website id in `tools/build.ts`, counting only on the site's own host), both
+  without cookies or a consent banner: never add Google Analytics (not even in its consent mode, which still sends to
+  Google and shows almost nothing without consent) or another tracker that sets cookies, needs consent or records
+  sessions (user decisions, October and November 2026; `tracking.test.ts` checks). New things to measure go through
+  `track()` with a name added to its `EventName`, and send only coarse facts (page, duration, language, which option),
+  never what a child typed or chose; never one event per tap or per slider step – keep Umami's free 100 000 events a
+  month in mind (every page shown counts too) – and name each new kind in the Datenschutzerklärung.
 - Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked small in the bookshelf room's
   bottom right corner; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
   stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung

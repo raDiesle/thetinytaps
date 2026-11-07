@@ -2,6 +2,7 @@ import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "re
 import { createPortal } from "react-dom";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { targetLanguageFor } from "@/content/targetLanguages";
+import { track } from "@/lib/analytics";
 import { type Leave, useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
 import { downloadMusic } from "@/lib/musicFile";
@@ -196,7 +197,10 @@ export function AppLanguageOptions() {
             ar: "لغة التطبيق والألعاب",
           })}
           value={language.id}
-          onChange={(id) => setAppLanguage(targetLanguageFor(id).id)}
+          onChange={(id) => {
+            setAppLanguage(targetLanguageFor(id).id);
+            track("einstellung", { name: "sprache", wert: targetLanguageFor(id).id });
+          }}
           options={APP_LANGUAGES.map((id) => ({ value: id, label: OWN_NAMES[id] }))}
         />
       </SettingsGroup>

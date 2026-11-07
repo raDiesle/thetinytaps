@@ -90,7 +90,7 @@ export function PrivacyPage() {
         <p>
           Fun for Both braucht kein Konto, setzt keine Cookies und zeigt keine Werbung. Was Ihr Kind spielt und was Sie einstellen, bleibt auf Ihrem Gerät. Beim
           Aufruf der Seite sieht der Anbieter, der sie ausliefert (GitHub), technisch nötige Daten wie Ihre IP-Adresse, und wir zählen die Besuche mit
-          Cloudflare Web Analytics, ohne Cookies.
+          Cloudflare Web Analytics und Umami, beide ohne Cookies.
         </p>
       </section>
 
@@ -136,6 +136,30 @@ export function PrivacyPage() {
         <p>
           Cloudflare ist nach dem EU-US Data Privacy Framework zertifiziert (Art. 45 DSGVO). Mehr dazu in der{" "}
           <Out href="https://www.cloudflare.com/de-de/privacypolicy/">Datenschutzerklärung von Cloudflare</Out>.
+        </p>
+      </section>
+
+      <section className="legal-panel">
+        <h2>Wie die Spiele genutzt werden (Umami)</h2>
+        <p>
+          Um zu sehen, welche Spiele gern gespielt werden und wie lange welche Seite angesehen wird, nutzen wir außerdem Umami Cloud der Umami Software, Inc.,
+          San Francisco, USA. Ein kleines Skript meldet dabei, welche Seite aufgerufen wurde, von welcher Seite Sie kamen, Browser, Betriebssystem, Gerätetyp,
+          Bildschirmgröße und Sprache und das Land, das Umami aus Ihrer IP-Adresse ableitet. Dazu meldet die App: wie lange eine Seite zu sehen war, in welcher
+          Sprache und ob als installierte App; wenn ein Spiel bis zum Ende gespielt wurde und ob danach „Nochmal“ oder „Weiter“ gewählt wurde; wenn die
+          Spielzeit des Tages abgelaufen ist oder verlängert wurde; welche Einstellung für alle Spiele gewählt wurde (Sprache, Musik, Junge oder Mädchen, wie
+          ein Spiel verlassen wird, Art der Spielzeit-Grenze); und wenn die App installiert wurde. Was Ihr Kind im Spiel tippt oder wählt und was Sie in
+          Belohnungstafel oder Tagesplan eintragen, wird nicht gemeldet.
+        </p>
+        <p>
+          Umami setzt keine Cookies und verfolgt Sie nicht über andere Seiten hinweg. Um einen Besuch zusammenzuhalten, bildet Umami aus Ihrer IP-Adresse, Ihrem
+          Browser und einem Wert, der jeden Monat wechselt, eine Prüfsumme; Ihre IP-Adresse selbst wird nicht in den Statistiken gespeichert. Wir sehen nur
+          zusammengefasste Zahlen. Die Daten werden 6 Monate aufbewahrt. Rechtsgrundlage ist unser berechtigtes Interesse, die Spiele zu verbessern (Art. 6 Abs.
+          1 lit. f DSGVO). Sie können widersprechen, indem Sie das Skript mit einem Inhaltsblocker sperren oder uns schreiben.
+        </p>
+        <p>
+          Umami verarbeitet die Daten in unserem Auftrag (Art. 28 DSGVO); seine Server stehen in der EU und den USA. Für die Übermittlung in die USA gelten die
+          Standardvertragsklauseln der EU-Kommission (Art. 46 DSGVO). Mehr dazu in der <Out href="https://umami.is/privacy">Datenschutzerklärung von Umami</Out>
+          .
         </p>
       </section>
 

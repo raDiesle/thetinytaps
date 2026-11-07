@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 import { App } from "./App";
 import { BackgroundMusic } from "./components/BackgroundMusic";
 import { MenuRipples } from "./components/MenuRipples";
+import { PageTime } from "./lib/analytics";
 import { PlaytimeLock } from "./components/PlaytimeLock";
 import { ScreenHint } from "./components/ScreenHint";
 import { SeoHead } from "./components/SeoHead";
@@ -32,6 +33,7 @@ createRoot(document.getElementById("root")!).render(
       <SeoHead />
       <BackgroundMusic />
       <MenuRipples />
+      <PageTime />
     </BrowserRouter>
   </StrictMode>,
 );

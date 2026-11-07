@@ -1,5 +1,7 @@
 import { useEffect, useState, type PointerEvent } from "react";
+import { useLocation } from "react-router";
 import { useCountsPlaytime, useEndShown } from "@/components/GameShell";
+import { track } from "@/lib/analytics";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
@@ -75,6 +77,12 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
     return () => clearTimeout(timer);
   }, [shown, delayMs]);
 
+  // Which games are played to their end, and whether the child wants the same once more or goes on (analytics.ts).
+  const { pathname } = useLocation();
+  useEffect(() => {
+    if (shown) track("ende", { spiel: pathname });
+  }, [shown, pathname]);
+
   // With the last game of a game limit, the game says good night instead (GameShell).
   useEffect(() => {
     if (shown && counts) gameEnded();
@@ -104,8 +112,9 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
 
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
   // „Nochmal“ and „Weiter“ each start one more game, for a game limit.
-  const press = (action: () => void) => (e: PointerEvent) => {
+  const press = (event: "nochmal" | "weiter", action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
+    track(event, { spiel: pathname });
     if (counts) countGame();
     // The next round comes on a new page.
     turnPageWith("forward", action);
@@ -114,7 +123,7 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
   return (
     <div className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
       <div className="game-end-small">
-        <button type="button" className="game-end-button again" onPointerDown={press(onAgain)}>
+        <button type="button" className="game-end-button again" onPointerDown={press("nochmal", onAgain)}>
           {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}
         </button>
       </div>
@@ -125,7 +134,7 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
           aria-label={[t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" }), next.name]
             .filter(Boolean)
             .join(": ")}
-          onPointerDown={press(next.onNext)}
+          onPointerDown={press("weiter", next.onNext)}
         >
           {t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}
           {showNext && next.name && <span className="game-end-next-name">{next.name}</span>}
