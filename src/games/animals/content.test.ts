@@ -102,7 +102,8 @@ test("the gift and growth sentences are translated, and none in another script h
       const given = GIFTS[animal.gives!];
       shown.push([gift.whatGives(animal), GIFT_TEXTS.de.whatGives(animal)]);
       shown.push([gift.gives(animal, given), GIFT_TEXTS.de.gives(animal, given)]);
-      shown.push([gift.comesFrom(given, animal), GIFT_TEXTS.de.comesFrom(given, animal)]);
+      // A wrong gift names the animal it comes from (`giverOf`), the only one said after it.
+      shown.push([gift.comesFrom(given, giverOf(given)), GIFT_TEXTS.de.comesFrom(given, giverOf(given))]);
       shown.push([gift.gift(given), GIFT_TEXTS.de.gift(given)]);
     }
     for (const growth of GROWTHS.filter((g) => !GERMAN_ONLY.growths.includes(g.id))) {
@@ -254,8 +255,26 @@ test("every animal that gives us something says what else it gives, and enough i
     for (const id of animal.alsoGives!) expect(wrong, animal.id).not.toContain(id);
     expect(wrong.length, animal.id).toBeGreaterThanOrEqual(2);
   }
-  // Every gift has an animal it comes from, which pops up when it is given to another.
-  for (const gift of Object.values(GIFTS)) expect(giverOf(gift).gives).toBe(gift.id);
+  for (const gift of Object.values(GIFTS)) {
+    // Every gift has an animal it comes from, which pops up when it is given to another, and that animal gives it.
+    const giver = giverOf(gift);
+    expect(giver, gift.id).toBeDefined();
+    expect([giver.gives, ...(giver.alsoGives ?? [])], gift.id).toContain(gift.id);
+    // Every gift is some animal's own, so it is also a right answer and its making (`.ap-made`) is seen.
+    expect(
+      GIVERS.some((a) => a.gives === gift.id),
+      gift.id,
+    ).toBe(true);
+    // Every animal that gives it says so, in `gives` or `alsoGives`: the giver's own gift is never a wrong choice for it.
+    for (const animal of GIVERS) if (animal !== giver && animal.gives === gift.id) expect(wrongGifts(animal), animal.id).not.toContain(gift);
+  }
+});
+
+// The child tells the animals apart by their pictures: two with one emoji (a llama and an alpaca) would be one animal
+// with two names.
+test("no two animals share a picture", () => {
+  const emojis = ANIMALS.map((a) => a.emoji);
+  expect(emojis.filter((e, i) => emojis.indexOf(e) !== i)).toEqual([]);
 });
 
 test("the German gift sentences say „vom“ and „von der“ right", () => {
@@ -265,6 +284,13 @@ test("the German gift sentences say „vom“ and „von der“ right", () => {
   expect(de.gives(by("huhn"), GIFTS.ei)).toBe("Das Huhn gibt uns Eier. Danke!");
   expect(de.comesFrom(GIFTS.ei, by("huhn"))).toBe("Das Ei kommt vom Huhn!");
   expect(de.comesFrom(GIFTS.milch, by("kuh"))).toBe("Die Milch kommt von der Kuh!");
+  expect(de.whatGives(by("ziege"))).toBe("Was gibt uns die Ziege?");
+  expect(de.gives(by("ziege"), GIFTS.kaese)).toBe("Die Ziege gibt uns Käse. Danke!");
+  expect(de.gives(by("lama"), GIFTS.wolle)).toBe("Das Lama gibt uns Wolle. Danke!");
+  expect(de.comesFrom(GIFTS.kaese, giverOf(GIFTS.kaese))).toBe("Der Käse kommt von der Kuh!");
+  expect(de.comesFrom(GIFTS.wolle, by("lama"))).toBe("Die Wolle kommt vom Lama!");
+  // The best-known giver pops up: the hen's egg, not the duck's or the goose's.
+  expect(giverOf(GIFTS.ei).id).toBe("huhn");
 });
 
 test("what the small one becomes is the one right choice, and the others become something else", () => {

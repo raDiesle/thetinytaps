@@ -257,7 +257,8 @@
   animation: ap-peek 1.3s ease-in-out forwards;
 }
 
-/* Beside the animal its gift is made anew: the glass fills, the egg drops into the nest, the ball of wool rolls out. */
+/* Beside the animal its gift is made anew: the glass fills, the egg drops into the nest, the ball of wool rolls out,
+   the cheese drops onto its board. */
 .ap-made {
   position: absolute;
   bottom: 2%;
@@ -289,6 +290,12 @@
   transform-box: fill-box;
   transform-origin: 50% 50%;
   animation: ap-roll 1.1s ease-out 0.4s backwards;
+}
+
+.ap-made .ap-gift-cheese {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: ap-cheese 0.9s ease-in 0.8s backwards;
 }
 
 .nudge-0 {
@@ -525,6 +532,26 @@
   }
   85% {
     transform: translate(0, -10%) scale(1);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The cheese falls from above onto its board, squashes a little and stands. */
+@keyframes ap-cheese {
+  0% {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(0) scale(1.08, 0.88);
+  }
+  80% {
+    transform: translateY(-6%) scale(0.97, 1.03);
   }
   100% {
     transform: none;

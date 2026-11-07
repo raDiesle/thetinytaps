@@ -174,7 +174,7 @@ export const ANIMALS: Animal[] = [
     home: "stall",
     alsoLives: [],
     gives: "milch",
-    alsoGives: [],
+    alsoGives: ["kaese"],
     sound: real("moo", playMoo),
   },
   {
@@ -211,7 +211,17 @@ export const ANIMALS: Animal[] = [
   },
   { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich"], sound: real("bubbles", playBlub) },
   { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz", alsoLives: [] },
-  { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", alsoLives: ["stall", "nest"], sound: real("quack", playQuack) },
+  {
+    id: "ente",
+    emoji: "🦆",
+    name: "Ente",
+    the: "die Ente",
+    home: "teich",
+    alsoLives: ["stall", "nest"],
+    gives: "ei",
+    alsoGives: [],
+    sound: real("quack", playQuack),
+  },
   { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle"] },
   { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [], sound: real("oink", playOink) },
   {
@@ -251,7 +261,12 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais"],
   },
   // Only in "Was gibt uns das Tier?" so far.
-  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch"], sound: real("baa", playBaa) },
+  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch", "kaese"], sound: real("baa", playBaa) },
+  // More animals that give us something (November 2026).
+  // The goat bleats with the sheep's recording, as on the farm; the goose quacks like the farm's goose.
+  { id: "ziege", emoji: "🐐", name: "Ziege", the: "die Ziege", gives: "kaese", alsoGives: ["milch", "wolle"], sound: real("baa", playBaa) },
+  { id: "gans", emoji: "🪿", name: "Gans", the: "die Gans", gives: "ei", alsoGives: [], sound: real("quack", playQuack) },
+  { id: "lama", emoji: "🦙", name: "Lama", the: "das Lama", gives: "wolle", alsoGives: [] },
   {
     id: "loewe",
     emoji: "🦁",
@@ -277,10 +292,10 @@ export const ANIMALS: Animal[] = [
  * its words in each translated language, and that these have none yet – once translated, take them off this list.
  */
 export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
-  animals: [],
+  animals: ["ziege", "gans", "lama"],
   foods: [],
   homes: [],
-  gifts: [],
+  gifts: ["kaese"],
   growths: [],
 };
 
@@ -299,8 +314,11 @@ export const GIVERS: Animal[] = ANIMALS.filter((a) => a.gives);
 /** The gifts that may lie next to an animal's gift as wrong choices: neither its own nor one it gives us too. */
 export const wrongGifts = (animal: Animal): Gift[] => Object.values(GIFTS).filter((g) => g.id !== animal.gives && !animal.alsoGives?.includes(g.id));
 
-/** The animal a gift comes from, the one that pops up when it is given to another: the first that gives it. */
-export const giverOf = (gift: Gift): Animal => GIVERS.find((a) => a.gives === gift.id)!;
+/**
+ * The animal a gift comes from, the one that pops up when it is given to another: the best-known one the gift names
+ * (`Gift.giver`: the hen's egg, not the duck's; the cow's cheese, though the cow is asked for its milk).
+ */
+export const giverOf = (gift: Gift): Animal => ANIMALS.find((a) => a.id === gift.giver)!;
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
