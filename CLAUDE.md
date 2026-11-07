@@ -672,7 +672,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   paper's grain over them, `book.css`). While playing, the ✕ is the page's corner, lying flush in the screen's very corner with no gap to either edge, also
   on a phone with a camera cut-out or rounded corners: it never steps in by the safe area (that left a strip of the
   picture beside it), it grows by it instead (`--play-corner`, user feedback, November 2026; `MenuTop.test.ts`). Pictures of the fox and the bear family reading with their
-  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book.
+  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book – a tap on the sun turns its rays once round clockwise (user request, November 2026; `spinSunAt` in `Sky.tsx`, asked by `MenuRipples`, since the sky lies behind the page), with the rays a layer of their own.
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
   with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the
@@ -762,5 +762,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    Sound is muted there, so "I hear no music" can't be checked by ear: wrap
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
+   Look only at the localhost servers of `.claude/launch.json`, never at this Mac's network address or another host to
+   see how the real site behaves (the user declines it, November 2026): what depends on the host (`canTestUnfinished`)
+   gets a unit test instead.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
    (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/` (the card tapped starts that level), `?level=<n>` on `/socken/`.

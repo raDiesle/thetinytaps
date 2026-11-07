@@ -59,8 +59,8 @@ export function AdventurePlay({
   story: Story;
   language: TargetLanguage;
   settings: CommonSettings;
-  /** The story „Weiter“ starts at the end. */
-  next: { name: string; onNext: () => void };
+  /** The story „Weiter“ starts at the end; none where only one story can be played. */
+  next?: { name: string; onNext: () => void };
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);

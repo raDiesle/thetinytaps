@@ -16,6 +16,16 @@
   left: -30px;
   /* Small enough on a tablet that the way back next to a long title stays clear of its face. */
   width: clamp(130px, 18vw, 240px);
+  aspect-ratio: 1;
+}
+
+/* Rays and face, one over the other: the rays are a layer of their own, which a tap turns (`spinSunAt`). */
+.sky-sun > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .sky-sun circle,

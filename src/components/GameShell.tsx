@@ -18,6 +18,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
+import { canTestUnfinished } from "@/lib/localTest";
 import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
@@ -91,6 +92,11 @@ export interface GameMode {
    * cards whose picture says it all (the Timer's pictures as they look at their end).
    */
   art?: ReactNode;
+  /**
+   * Still being built: the card says „in Bearbeitung“ and starts only where it may be tested (`canTestUnfinished`: the
+   * dev server or this computer); on the real site it stands greyed out and does nothing.
+   */
+  unfinished?: true;
 }
 
 /** How much wider than tall a card that is a picture (`GameMode.art`) looks best: about a screen's shape. */
@@ -343,37 +349,58 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   // Nothing to show before the game starts at once, or after it was left.
   if (menu) return null;
 
-  /** One mode's card. */
-  const card = (m: GameMode) => (
-    <li key={m.id}>
-      <button
-        type="button"
-        className={`game-card mode-card${m.art ? " mode-art-card" : ""}`}
-        onClick={() => pick(m.id)}
-        aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
-        title={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
-      >
-        {m.art ? (
-          <span className="mode-art">{m.art}</span>
-        ) : (
-          <>
-            <span className="game-emoji" aria-hidden>
-              {m.emoji}
-            </span>
-            <span className="game-title">
-              {m.title}
-              {m.note && <small className="game-note">{m.note}</small>}
-            </span>
-          </>
-        )}
-        {m.id === mode && (modes?.length ?? 0) > 1 && (
-          <span className="badge">
-            {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
-          </span>
-        )}
-      </button>
-    </li>
+  /** „in Bearbeitung“ on a card still being built (`GameMode.unfinished`). */
+  const unfinishedBadge = (
+    <span className="badge">
+      {t({ de: "in Bearbeitung", ru: "в работе", en: "in progress", zh: "制作中", hi: "तैयार हो रहा है", es: "en preparación", ar: "قيد الإعداد" })}
+    </span>
   );
+
+  /** One mode's card; one still being built stands greyed out where it can't be tested. */
+  const card = (m: GameMode) =>
+    m.unfinished && !canTestUnfinished() ? (
+      <li key={m.id}>
+        <div className="game-card mode-card disabled" aria-disabled>
+          <span className="game-emoji" aria-hidden>
+            {m.emoji}
+          </span>
+          <span className="game-title">{m.title}</span>
+          {unfinishedBadge}
+        </div>
+      </li>
+    ) : (
+      <li key={m.id}>
+        <button
+          type="button"
+          className={`game-card mode-card${m.art ? " mode-art-card" : ""}`}
+          onClick={() => pick(m.id)}
+          aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
+          title={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
+        >
+          {m.art ? (
+            <span className="mode-art">{m.art}</span>
+          ) : (
+            <>
+              <span className="game-emoji" aria-hidden>
+                {m.emoji}
+              </span>
+              <span className="game-title">
+                {m.title}
+                {m.note && <small className="game-note">{m.note}</small>}
+              </span>
+            </>
+          )}
+          {m.unfinished
+            ? unfinishedBadge
+            : m.id === mode &&
+              (modes?.length ?? 0) > 1 && (
+                <span className="badge">
+                  {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
+                </span>
+              )}
+        </button>
+      </li>
+    );
 
   const pick = (id: string) => {
     onMode?.(id);
