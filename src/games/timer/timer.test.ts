@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
 import { BAR, CLOCK, CLOCK_FLOOR, clockText, DIGITS } from "./clock";
-import { BANDS, BITE_ORDER, BUTTERFLY, biteSpot, bitesPerBand, bodyFront, edgesAt, LEAF, LEAF_FLOOR, leafSpan, REACH } from "./caterpillar";
+import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
@@ -173,8 +173,6 @@ describe("Timer", () => {
     expect(CART.x + CART.w).toBeLessThanOrEqual(1400);
     expect(APPLE_FLOOR).toBeLessThanOrEqual(820);
     expect(LEAF.x + LEAF.w).toBeLessThanOrEqual(1200);
-    // The leaf is eaten up to its stalk, never past it into the branch.
-    for (const band of BANDS) expect(band.end).toBeGreaterThan(0);
     // The butterfly flies back and forth in the air, clear of the ✕ and the book's right margin.
     expect(BUTTERFLY.left).toBeGreaterThanOrEqual(200);
     expect(BUTTERFLY.right + BUTTERFLY.w).toBeLessThanOrEqual(1340);
@@ -202,37 +200,62 @@ describe("Timer", () => {
     expect(MIN_APPLES).toBeGreaterThanOrEqual(6);
   });
 
-  test("a step every second: the caterpillar bites once a second, as many bites as the run has seconds", () => {
+  test("a step every second: the caterpillar bites once a second, the leaf going evenly and gone with the last bite", () => {
     expect(runSeconds(20_000)).toBe(20);
     expect(runSeconds(400)).toBe(1);
-    for (const count of [60, 137, 600]) {
-      expect(bitesPerBand(count).reduce((a, b) => a + b, 0)).toBe(count);
-      // Every band is eaten from its start to its end, exactly by the last bite.
-      expect(edgesAt(0, count)).toEqual(BANDS.map((b) => b.start));
-      edgesAt(count, count).forEach((edge, i) => expect(edge).toBeCloseTo(BANDS[i].end, 6));
-      for (let bites = 0; bites < count; bites++) {
-        const band = BITE_ORDER[bites % BITE_ORDER.length];
-        const before = edgesAt(bites, count);
-        const after = edgesAt(bites + 1, count);
-        // One bite a second, on one band only.
-        before.forEach((edge, i) => (i === band ? expect(after[i]).toBeLessThan(edge) : expect(after[i]).toBe(edge)));
-      }
+    for (const count of [60, 137, 600, 3600]) {
+      const plan = planBites(count, 42);
+      expect(plan.length).toBe(count);
+      for (const share of [0.1, 0.25, 0.5, 0.75, 0.9]) expect(Math.abs(leafLeft(plan, Math.round(count * share)) - (1 - share))).toBeLessThan(0.02);
+      expect(leafLeft(plan, count)).toBeLessThan(0.01);
     }
+  });
+
+  test("Raupe: it starts at the tip and bites uneven round notches that stand apart (user feedback, November 2026)", () => {
+    for (const count of [60, 300]) {
+      const plan = planBites(count, 7);
+      // The first bite takes the very tip, and the first tenth stay at the front of the leaf.
+      expect(plan[0].spot.x).toBeGreaterThan(LEAF.w - 20);
+      for (const b of plan.slice(0, count / 10)) expect(b.spot.x).toBeGreaterThan(LEAF.w * 0.6);
+      // Real bites, never tiny: as big as the leaf shared out allows, of different sizes, a step apart from the last.
+      const sizes = plan.map((b) => b.r);
+      expect(Math.min(...sizes)).toBeGreaterThanOrEqual(BITE_R.min);
+      expect(Math.max(...sizes) / Math.min(...sizes)).toBeGreaterThan(1.3);
+      const steps = plan.slice(1).map((b, i) => Math.abs(b.y - plan[i].y));
+      expect(steps.filter((d) => d > 1.2 * BITE_R.min).length).toBeGreaterThan(steps.length * 0.6);
+    }
+  });
+
+  test("Raupe: the leaf is one piece, drawn as it is left – no bands, no clip path while it runs (user feedback, November 2026)", async () => {
+    const code = await Bun.file(new URL("./caterpillar.tsx", import.meta.url)).text();
+    const leaf = code.slice(code.indexOf("function Leaf("), code.indexOf("/** One round segment"));
+    // A band's hairline let the sky through; a clip path (CSS or in the svg) showed the whole leaf as the page turned.
+    expect(code).not.toContain("tm-band");
+    expect(leaf).not.toContain("<clipPath");
+    expect(leaf.match(/clipPath/g) ?? []).toHaveLength(1);
+    expect(leaf).toMatch(/glow > 0 && \(\s*<div className="tm-leaf-light" style=\{\{ clipPath: /);
+    // Its green and lines end at the bites: nothing of it lies right of the bitten edge.
+    const plan = planBites(60, 3);
+    const front = frontAfter(plan, 30);
+    const xs = (d: string) => [...d.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])] as const);
+    for (const [x, y] of xs(leafShape(front))) expect(x).toBeLessThanOrEqual(front[Math.round(y / 2)] + 0.1);
+    expect(leafShape(frontAfter(plan, 0))).not.toBe("");
+    expect(leafShape(frontAfter(plan, 60).map(() => 0))).toBe("");
   });
 
   test("Raupe: the head goes to each spot it bites, on the leaf, within reach of the body (user request, November 2026)", () => {
     for (const count of [10, 60, 600]) {
+      const plan = planBites(count);
       for (let bites = 0; bites < count; bites++) {
-        const spot = biteSpot(bites, count);
-        const band = BANDS[BITE_ORDER[bites % BITE_ORDER.length]];
-        // In the band that loses the bite, at its edge, where there is leaf.
-        expect(spot.y).toBeGreaterThanOrEqual(band.top - 0.01);
-        expect(spot.y).toBeLessThanOrEqual(band.top + LEAF.h / BANDS.length + 0.01);
-        expect(spot.x).toBeLessThanOrEqual(edgesAt(bites, count)[BITE_ORDER[bites % BITE_ORDER.length]]);
+        const spot = biteSpot(plan, bites);
+        // At the edge, where there is leaf.
         const span = leafSpan(spot.y);
         expect(span).toBeDefined();
-        if (span) expect(spot.x).toBeGreaterThanOrEqual(span[0] - 30);
-        const front = bodyFront(bites, count);
+        if (span) {
+          expect(spot.x).toBeGreaterThanOrEqual(span[0] - 30);
+          expect(spot.x).toBeLessThanOrEqual(span[1]);
+        }
+        const front = bodyFront(plan, bites);
         expect(Math.hypot(spot.x - front.x, spot.y - front.y)).toBeLessThanOrEqual(REACH);
       }
     }

@@ -37,11 +37,14 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
 - „Sanduhr“ ⏳: a tall hourglass (`GLASS`, about two thirds of the picture's height), the sand runs in a thin stream
   from the top bulb into the bottom one, where its heap rises with a round top (`BulbSand`, shared with Abwechseln).
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
-  (`runSeconds`, `useBites`). The leaf is cut in six bands (`BANDS`), each eaten from the leaf's outline at the tip to
-  its outline at the stalk, so every bite takes leaf and what is left still looks like a leaf; the bites go down the
-  edge and back up (`BITE_ORDER`), and the head goes to each spot before it bites it off (`biteSpot`), its neck
-  stretching after it from the body crawling back along the midrib (`bodyFront`, never further than `REACH`), and three
-  leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
+  (`runSeconds`, `useBites`). The bites are planned once for the run (`planBites`): it starts with the very tip and
+  works back to the stalk, always biting where the leaf reaches furthest out, each bite a round notch about as deep as
+  its radius, stepping up or down the edge by well over a bite's width, so the edge is a row of uneven scallops with
+  points of leaf between them, as a real caterpillar leaves it (user feedback, November 2026). Each bite takes as much
+  leaf as the clock asks for (`leafLeft`), so the leaf goes evenly and is gone with the last; a very long run takes
+  nibbles. The leaf is drawn as it is left, once a second: its green, outline, midrib and veins cut off at the bites as plain paths (`leafShape`, `cutLine`), a thin dark line along the bites – never a clip path, which dropped out while the page turned. The head goes to each spot before it bites
+  it off (`biteSpot`), its neck stretching after it from the body crawling back along the midrib (`bodyFront`, never
+  further than `REACH`), and three leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
   and the butterfly slips out and flies back and forth in the air above the meadow, bobbing, as long as the end is shown
   (`BUTTERFLY`, user request, November 2026).
 - „Blume“ 🌸 (`flower.tsx`, H-53): a garden hose coming from a tap on a post (`TAP`; a can that never ran dry made no
@@ -203,8 +206,15 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   transition), and in it the clip-path round a moving layer dropped out – the hourglass's sand showed as a square
   before it began (user feedback, November 2026). A shape something moves inside is a still drawing of that shape in a
   window with `overflow: hidden`: the window slides, the drawing in it slides back the same way and stays put, both by
-  `transform` (`BulbSand`, `bulbBelow`; `timer.test.ts` checks). A still clip-path is fine where nothing it cuts shows
-  as the page turns, or on a light mounted only after a tap.
+  `transform` (`BulbSand`, `bulbBelow`; `timer.test.ts` checks). Every clip path drops out there, also on a layer that
+  stands still and also a `<clipPath>` inside the svg: the Raupe's bitten leaf showed whole again while the page turned
+  (November 2026). A cut that changes as the picture runs is drawn into the shape itself (`leafShape`; `timer.test.ts`
+  checks). A still clip-path is fine
+  where nothing it cuts shows as the page turns, or on a light mounted only after a tap.
+- **What is eaten or cut looks as in life, and one thing stays one piece** (user feedback on the Raupe, November
+  2026): bites are uneven round notches that stand apart, starting where an animal really starts (the leaf's tip),
+  never a row of even round fingers. A thing cut away bit by bit is one drawing with one cut, never strips or bands
+  laid side by side – between two boxes the background shone through as a hairline across the leaf.
 - **What a tap lights is what is left** (H-51): a glow inside the part that shrinks, never a sign or a number, and once
   per tap, fading – never blinking. A new picture puts `LeftGlow` into its own shrinking part; in a picture that grows
   (the flower) that is the way still to go (`StillToGrow`, a box over the stake whose lower end rises with the bud).
@@ -218,7 +228,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   keyframes written once for the run. React
   only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute. The one exception is
   the caterpillar, whose head must know where the next bite is: there the bites are counted from the clock once a
-  second (`useBites`) and the bands, head, neck and body are set by a style change a second, the figure gliding by a
+  second (`useBites`) and the leaf's paths, head, neck and body are set once a second, the figure gliding by a
   CSS transition – small layers, a change a second, never per frame, and the leaf's drawing `memo` so it is never drawn
   again (`bun run perf timer-raupe`).
 - **What takes a piece goes to it first** (user request, November 2026): the caterpillar's head moves to each spot of
@@ -226,7 +236,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   somewhere else. A new picture where someone eats, picks or carries pieces does the same.
 - **Seen from afar only what runs down stays bright** (H-48): a new picture puts its backdrop in `.tm-back` and its
   small helpers (posts, decorations) in `.tm-dims`; what runs down gets neither. A clipped edge drawn in the background's
-  colour would show once that fades – cut edges with clipping boxes instead (the leaf's bands, the disc's halves).
+  colour would show once that fades – cut edges with clipping boxes instead (the leaf drawn as it is left, the disc's halves).
 - Development: `?sekunden=<n>` in the address makes a run take n seconds instead of the minutes chosen; the
   pieces still come from the minutes chosen (2 Min. with `?sekunden=25`: twenty apples, its whole year in 25 seconds).
 - It says nothing, so there is no voice line to record.
