@@ -7,7 +7,20 @@ import type { RoundKind } from "./levels";
 // together (soap and sponge in the bathroom); a partner that also fits another pair is named in `alsoFits`.
 
 /** A topic's id, the key of its file in `scenes/`. */
-export type TopicId = "bad" | "kueche" | "zuhause" | "kleidung" | "spielen" | "garten" | "wetter" | "unterwegs" | "feste" | "berufe" | "sport" | "fantasie";
+export type TopicId =
+  | "bad"
+  | "kueche"
+  | "zuhause"
+  | "kleidung"
+  | "kita"
+  | "spielen"
+  | "garten"
+  | "wetter"
+  | "unterwegs"
+  | "feste"
+  | "berufe"
+  | "sport"
+  | "fantasie";
 
 /** One topic: its kind of round and its name for grown-ups. */
 export interface Topic {
@@ -21,6 +34,7 @@ export const TOPICS: Record<TopicId, Topic> = {
   kueche: { kind: "pair", name: { de: "Küche & Essen" } },
   zuhause: { kind: "pair", name: { de: "Zu Hause" } },
   kleidung: { kind: "pair", name: { de: "Anziehen" } },
+  kita: { kind: "pair", name: { de: "Kita & Schule" } },
   spielen: { kind: "pair", name: { de: "Spielen, Malen & Musik" } },
   garten: { kind: "pair", name: { de: "Garten & Natur" } },
   wetter: { kind: "pair", name: { de: "Wetter & Jahreszeiten" } },

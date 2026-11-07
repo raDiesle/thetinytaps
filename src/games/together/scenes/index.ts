@@ -3,6 +3,7 @@ import { SCENES as bad } from "./bad";
 import { SCENES as kueche } from "./kueche";
 import { SCENES as zuhause } from "./zuhause";
 import { SCENES as kleidung } from "./kleidung";
+import { SCENES as kita } from "./kita";
 import { SCENES as spielen } from "./spielen";
 import { SCENES as garten } from "./garten";
 import { SCENES as wetter } from "./wetter";
@@ -20,6 +21,7 @@ export const SCENES: SceneSpec[] = [
   ...kueche,
   ...zuhause,
   ...kleidung,
+  ...kita,
   ...spielen,
   ...garten,
   ...wetter,

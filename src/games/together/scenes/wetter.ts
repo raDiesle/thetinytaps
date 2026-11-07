@@ -127,4 +127,20 @@ export const SCENES: SceneSpec[] = [
     // The sledge goes with the snowy mountain too, and the skis with the snow.
     alsoFits: ["schnee-schlitten"],
   },
+  {
+    id: "mond-stern",
+    topic: "wetter",
+    name: "Mond",
+    the: "der Mond",
+    toThe: "zum Mond",
+    partner: { name: "Stern", the: "der Stern", acc: "den Stern", emoji: "⭐" },
+    thing: "🌙",
+    // Dusk with no moon and no star in its sky yet.
+    backdrop: "abend",
+    thingAt: [134, 74, 92],
+    act: "beside",
+    sounds: ["twinkle", "chime"],
+    // The Christmas tree's star could shine by the moon too, and the moon is out in space with the planet.
+    alsoFits: ["tannenbaum-weihnachtsstern", "rakete-planet"],
+  },
 ];

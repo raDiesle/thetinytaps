@@ -1,8 +1,35 @@
+import { createElement as h } from "react";
 import type { SceneSpec } from "../scene";
 
 // The pairs of the topic „kueche“ (topics.ts), written as data (see scene.tsx): what is eaten or drunk and what goes
 // with it. The pot and its lid are handmade in pairs.tsx. Where a partner fits another dish too (cheese on bread and
 // pizza, the spoon in muesli, soup and pudding), the two name each other in `alsoFits`, so they are never dealt together.
+// The ketchup and the turner have no emoji and are drawn here in the partners' 100 × 100 box.
+
+const OUT = "#5a4636";
+const LINE = { stroke: OUT, strokeWidth: 3, strokeLinejoin: "round", strokeLinecap: "round" } as const;
+
+/** A squeeze bottle of ketchup, a little askew: red, with a white cap and its pointed tip, and a pale label. */
+const ketchup = h(
+  "g",
+  { transform: "rotate(12 50 50)" },
+  h("path", { d: "M46 4 L54 4 L57 16 L43 16 Z", fill: "#f8f9fa", ...LINE }),
+  h("rect", { x: 35, y: 15, width: 30, height: 12, rx: 3, fill: "#f8f9fa", ...LINE }),
+  h("path", { d: "M36 27 Q26 34 26 48 V86 Q26 95 36 95 H64 Q74 95 74 86 V48 Q74 34 64 27 Z", fill: "#e03131", ...LINE }),
+  h("rect", { x: 31, y: 52, width: 38, height: 26, rx: 5, fill: "#fff4e6", ...LINE, strokeWidth: 2 }),
+  h("path", { d: "M37 65 Q43 58 50 65 T63 65", fill: "none", stroke: "#e03131", strokeWidth: 4, strokeLinecap: "round" }),
+  h("path", { d: "M32 40 Q31 56 32 72", fill: "none", stroke: "#ff8787", strokeWidth: 4, strokeLinecap: "round" }),
+);
+
+/** A kitchen turner, a little askew: a wooden handle and a wide dark blade with three slots. */
+const turner = h(
+  "g",
+  { transform: "rotate(-24 50 50)" },
+  h("rect", { x: 45, y: 4, width: 10, height: 50, rx: 5, fill: "#c08552", ...LINE }),
+  h("rect", { x: 47, y: 50, width: 6, height: 10, fill: "#868e96", ...LINE, strokeWidth: 2 }),
+  h("path", { d: "M30 60 H70 L74 92 Q50 98 26 92 Z", fill: "#495057", ...LINE }),
+  h("path", { d: "M40 68 V86 M50 68 V88 M60 68 V86", stroke: "#212529", strokeWidth: 4, strokeLinecap: "round" }),
+);
 
 export const SCENES: SceneSpec[] = [
   {
@@ -212,5 +239,34 @@ export const SCENES: SceneSpec[] = [
     backdrop: "kueche",
     act: "beside",
     sounds: ["pop", "glug"],
+  },
+  {
+    id: "burger-ketchup",
+    topic: "kueche",
+    name: "Burger",
+    the: "der Burger",
+    toThe: "zum Burger",
+    partner: { name: "Ketchup", the: "der Ketchup", acc: "den Ketchup", draw: ketchup },
+    thing: "🍔",
+    backdrop: "esstisch",
+    act: "beside",
+    sounds: ["squeak", "yum"],
+    // Ketchup goes with the sausage and its chips, and the burger has cheese, tomato and gherkin in it.
+    alsoFits: ["wuerstchen-pommes", "spaghetti-kaese", "pizza-tomate", "salat-gurke"],
+  },
+  {
+    id: "pfanne-pfannenwender",
+    topic: "kueche",
+    name: "Pfanne",
+    the: "die Pfanne",
+    toThe: "zur Pfanne",
+    partner: { name: "Pfannenwender", the: "der Pfannenwender", acc: "den Pfannenwender", draw: turner },
+    thing: "🍳",
+    backdrop: "kueche",
+    // The turner goes to and fro in the pan.
+    act: "rub",
+    sounds: ["sizzle"],
+    // Pancakes are turned with it, butter goes into the pan, a pan has a lid and is stirred with a spoon too.
+    alsoFits: ["pfannkuchen-honig", "brot-butter", "topf", "suppe-loeffel"],
   },
 ];
