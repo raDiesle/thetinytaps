@@ -1,30 +1,21 @@
-import { memo, useEffect, useState, type CSSProperties } from "react";
+import { memo, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { runSeconds } from "./pieces";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Raupe (H-46): a little caterpillar eats a big leaf, one bite a second. Its head goes to each spot before it bites it
-// off (user request, November 2026): the leaf is cut in bands, and each second one band loses a bite, the head
-// reaching up and down the bitten edge in turn, its neck stretching after it. Every band is eaten from the leaf's
-// outline at the tip to its outline at the stalk over the whole run, so every bite takes leaf, never air, and what is
-// left always looks like a smaller leaf. At the end it spins itself in on the branch, the cocoon bursts open and a
-// butterfly flutters out and flies back and forth in the air.
+// off (user request, November 2026), reaching up and down the bitten edge, its neck stretching after it. It starts at
+// the leaf's tip and works back to the stalk, each bite a round crescent of its own size taken out of the edge, a
+// little higher or lower than the last – so the edge is a row of uneven scallops with points between them, as a real
+// caterpillar leaves it (user feedback, November 2026: even, round fingers of leaf looked unnatural). At the end it
+// spins itself in on the branch, the cocoon bursts open and a butterfly flutters out and flies back and forth in the air.
 //
-// The bites are worked out once a second from the clock (`useBites`): the bands' clipping boxes step back by a style
-// change, and the head, neck and body glide to their next place by a CSS transition – a change a second on small
-// layers, never React drawing per frame. Each band is a box with a round end sliding back over the leaf while the leaf
-// inside slides forward by as much (`overflow: hidden`), so the leaf stands still and nothing is painted again.
+// The bites are planned once for the run (`planBites`) and counted once a second from the clock (`useBites`): the leaf
+// is drawn as it is left, its shape and lines cut at the bites, once a second, and the head, neck and body glide to
+// their next place by a CSS transition – a change a second on small layers, never React drawing per frame. The leaf is
+// one piece: cutting it into bands let the sky shine through a hairline between them (user feedback, November 2026).
 
 /** The leaf: where it lies on the stage (its stalk at the left, its tip at the right). */
 export const LEAF = { x: 400, y: 250, w: 760, h: 320 } as const;
-
-/** How many bands the leaf is cut into, top to bottom; each band's edge is one spot the head bites. */
-export const BAND_COUNT = 6;
-const BAND_H = LEAF.h / BAND_COUNT;
-/** The round end of a band's clipping box. */
-const BAND_R = BAND_H / 2;
-
-/** The order the head bites the bands in: down the edge and back up again, so it never jumps from bottom to top. */
-export const BITE_ORDER = [0, 1, 2, 3, 4, 5, 4, 3, 2, 1] as const;
 
 /** The meadow's front. */
 export const LEAF_FLOOR = 790;
@@ -59,16 +50,6 @@ const UPPER: [number, number][] = Array.from({ length: 801 }, (_, i) => {
   return [bez(40, 160, 560, TIP), bez(MID, -20, -10, MID)];
 });
 
-/** The leaf's upper edge at `x` (its lower edge is `LEAF.h` minus it); `MID` beyond its ends. */
-export function leafTop(x: number): number {
-  if (x <= UPPER[0][0] || x >= UPPER[UPPER.length - 1][0]) return MID;
-  let i = 1;
-  while (UPPER[i][0] < x) i++;
-  const [x0, y0] = UPPER[i - 1];
-  const [x1, y1] = UPPER[i];
-  return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
-}
-
 /** From where to where the leaf reaches at height `y`, stroke included; undefined above or below it. */
 export function leafSpan(y: number): [number, number] | undefined {
   const up = y > MID ? LEAF.h - y : y;
@@ -82,73 +63,285 @@ export function leafSpan(y: number): [number, number] | undefined {
   return from <= to ? [from - STROKE, to + STROKE] : undefined;
 }
 
-/** How far a band's round end reaches left of its tip at height `dy` from the band's middle. */
-function roundIn(dy: number): number {
-  return BAND_R - Math.sqrt(Math.max(0, BAND_R * BAND_R - dy * dy));
-}
-
-/**
- * Each band's edge (the tip of its round end, in the leaf's units) at the start and at the end: at the start just far
- * enough out that the box holds all of the band's leaf, at the end just far enough in that it holds none of it.
- */
-export const BANDS = Array.from({ length: BAND_COUNT }, (_, i) => {
-  const top = i * BAND_H;
-  let start = 0;
-  let end: number = LEAF.w;
-  for (let k = 0; k <= 40; k++) {
-    const y = top + (k / 40) * BAND_H;
-    const span = leafSpan(y);
-    if (!span) continue;
-    const dy = y - (top + BAND_R);
-    start = Math.max(start, span[1] + roundIn(dy));
-    end = Math.min(end, span[0] + roundIn(dy));
-  }
-  return { top, start: start + 1, end: end - 1 };
-});
-
 // ---------------------------------------------------------------------------------------------------------------
-// The bites: bite j (1 … the run's seconds) comes half a second before second j ends, on band BITE_ORDER[(j - 1) % 10].
+// The bites. The leaf is looked at in thin rows; what is left of a row is the leaf left of its edge `front[k]`. A bite
+// is a circle: it moves every row it covers back to the circle's left rim, taking a crescent out of the edge.
 
-/** How many of the first `bites` bites fall on each band. */
-export function bitesPerBand(bites: number): number[] {
-  const rounds = Math.floor(bites / BITE_ORDER.length);
-  const counts = Array.from({ length: BAND_COUNT }, (_, i) => rounds * BITE_ORDER.filter((b) => b === i).length);
-  for (let j = 0; j < bites % BITE_ORDER.length; j++) counts[BITE_ORDER[j]]++;
-  return counts;
+/** The rows' height, in the leaf's units. */
+const ROW = 2;
+/** Each row's height in the leaf, top to bottom. */
+const ROW_Y = Array.from({ length: LEAF.h / ROW + 1 }, (_, k) => k * ROW);
+/** Where the leaf reaches in each row (undefined where it has none). */
+const ROW_SPAN = ROW_Y.map(leafSpan);
+/** The whole leaf's area, in the leaf's units. */
+const LEAF_AREA = ROW_SPAN.reduce((sum, span) => sum + (span ? (span[1] - span[0]) * ROW : 0), 0);
+
+/** One bite: the circle taken out, and the spot on the edge where the mouth bites. */
+export type Bite = { x: number; y: number; r: number; spot: { x: number; y: number } };
+
+/** How much leaf a row still has, with its edge at `front`. */
+function rowLeft(k: number, front: number): number {
+  const span = ROW_SPAN[k];
+  return span ? Math.max(0, Math.min(front, span[1]) - span[0]) : 0;
 }
 
-/** Every band's edge after `bites` of the run's `count` bites; at the end (`done`) every band is eaten. */
-export function edgesAt(bites: number, count: number, done = false): number[] {
-  const all = bitesPerBand(count);
-  const had = bitesPerBand(bites);
-  return BANDS.map((b, i) => (done || all[i] === 0 ? (done ? b.end : b.start) : b.start - ((b.start - b.end) * had[i]) / all[i]));
+/** Where the leaf ends on the right in a row, with its edge at `front`; -Infinity where nothing is left. */
+function rowEdge(k: number, front: number): number {
+  const span = ROW_SPAN[k];
+  return span && rowLeft(k, front) > 0 ? Math.min(front, span[1]) : Number.NEGATIVE_INFINITY;
 }
 
-/** Where the mouth bites next: at the band's edge, in the middle of the leaf there is left in the band. */
-export function biteSpot(bites: number, count: number): { x: number; y: number } {
-  const band = BITE_ORDER[Math.min(bites, count - 1) % BITE_ORDER.length];
-  const before = edgesAt(Math.min(bites, count - 1), count)[band];
-  const { top } = BANDS[band];
-  const x0 = before - 4;
-  const leafUp = leafTop(x0);
-  const from = Math.max(top, leafUp);
-  const to = Math.min(top + BAND_H, LEAF.h - leafUp);
-  const y = from < to ? (from + to) / 2 : band < BAND_COUNT / 2 ? top + BAND_H : top;
-  const reach = leafSpan(y)?.[1] ?? x0;
-  return { x: Math.min(x0, reach - 2), y };
+/** Takes a bite out of the rows' edges, returning how much leaf it took. */
+function bite(front: number[], x: number, y: number, r: number, apply: boolean): number {
+  let taken = 0;
+  const from = Math.max(0, Math.ceil((y - r) / ROW));
+  const to = Math.min(ROW_Y.length - 1, Math.floor((y + r) / ROW));
+  for (let k = from; k <= to; k++) {
+    const rim = x - Math.sqrt(Math.max(0, r * r - (ROW_Y[k] - y) ** 2));
+    if (rim >= front[k]) continue;
+    taken += (rowLeft(k, front[k]) - rowLeft(k, rim)) * ROW;
+    if (apply) front[k] = rim;
+  }
+  return taken;
+}
+
+/** A small random generator, so a run's bites are uneven yet the same every second it is drawn. */
+function random(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** The smallest and biggest bite's radius, in the leaf's units. */
+export const BITE_R = { min: 10, max: 120 } as const;
+
+/** The bites' usual radius for a run of `count` bites: a half round bite taking the leaf shared out over them. */
+function biteRadius(count: number): number {
+  return Math.min(BITE_R.max, Math.max(BITE_R.min, Math.sqrt((2 * LEAF_AREA) / count / Math.PI)));
 }
 
 /**
- * Where the body's front segment sits: on the midrib, a little behind the bitten edge's middle – but always within
+ * The run's `count` bites, planned once. Each bite takes as much leaf as the clock asks for, so the leaf goes evenly
+ * and is gone with the last one. It starts at the tip and always bites where the leaf reaches furthest out (the rows
+ * whose edge is near the outermost one), stepping up or down the edge from the last bite by well over a bite's width,
+ * so the bites stand apart with points of leaf between them, and turning where that part of the edge ends. Each bite
+ * is a round notch about as deep as its radius, its size following the clock; depth and step vary a little. A long
+ * run, whose bites would be smaller than `BITE_R.min`, takes shallow nibbles instead.
+ */
+export function planBites(count: number, seed = count): Bite[] {
+  const rand = random(seed);
+  const front = ROW_Y.map(() => LEAF.w + 10);
+  const base = biteRadius(count);
+  let left = LEAF_AREA;
+  let y = MID;
+  let r = base;
+  let dir = rand() < 0.5 ? -1 : 1;
+  const bites: Bite[] = [];
+  for (let j = 1; j <= count; j++) {
+    const edges = front.map((f, k) => rowEdge(k, f));
+    const outer = Math.max(...edges);
+    if (outer === Number.NEGATIVE_INFINITY) {
+      bites.push({ x: -r, y, r, spot: bites[bites.length - 1]?.spot ?? { x: LEAF.w, y } });
+      continue;
+    }
+    // The part of the edge near the outermost: the rows the caterpillar bites in now.
+    const near = edges.map((e) => e >= outer - 2.5 * base);
+    const lo = ROW_Y[near.indexOf(true)];
+    const hi = ROW_Y[near.lastIndexOf(true)];
+    // The first bite takes the very tip.
+    if (j > 1) y += dir * r * (1.3 + 0.6 * rand());
+    if (y >= hi) [y, dir] = [hi - rand() * base * 0.4, -1];
+    if (y <= lo) [y, dir] = [lo + rand() * base * 0.4, 1];
+    y = Math.min(hi, Math.max(lo, y));
+    // The edge where the mouth lands: the row nearest `y` that still has leaf.
+    const at = Math.round(y / ROW);
+    let k = at;
+    for (let d = 0; edges[k] === Number.NEGATIVE_INFINITY; d++) k = edges[at + d] > Number.NEGATIVE_INFINITY ? at + d : at - d;
+    const edge = edges[k];
+    const want = left - LEAF_AREA * (1 - j / count);
+    // A round notch `deep` radii deep, as big as the clock asks for.
+    const deep = 0.8 + 0.3 * rand();
+    const takes = (size: number) => bite(front, edge + (1 - deep) * size, y, size, false);
+    let x: number;
+    if (takes(BITE_R.min) >= want) {
+      // A nibble: the smallest bite, only as deep as the clock asks.
+      r = BITE_R.min;
+      let inner = edge - r;
+      let outer = edge + r;
+      for (let n = 0; n < 24; n++) {
+        const mid = (inner + outer) / 2;
+        if (bite(front, mid, y, r, false) > want) inner = mid;
+        else outer = mid;
+      }
+      x = outer;
+    } else {
+      let small: number = BITE_R.min;
+      let big: number = BITE_R.max;
+      for (let n = 0; n < 24; n++) {
+        const mid = (small + big) / 2;
+        if (takes(mid) > want) big = mid;
+        else small = mid;
+      }
+      r = small;
+      x = edge + (1 - deep) * r;
+    }
+    left -= bite(front, x, y, r, true);
+    bites.push({ x, y, r, spot: { x: edge - 3, y: ROW_Y[k] } });
+  }
+  return bites;
+}
+
+/** The rows' edges after the first `n` bites of a plan. */
+export function frontAfter(bites: readonly Bite[], n: number): number[] {
+  const front = ROW_Y.map(() => LEAF.w + 10);
+  for (const b of bites.slice(0, n)) bite(front, b.x, b.y, b.r, true);
+  return front;
+}
+
+/** How much leaf is left after the first `n` bites of a plan, as a share of the whole leaf. */
+export function leafLeft(bites: readonly Bite[], n: number): number {
+  return frontAfter(bites, n).reduce((sum, f, k) => sum + rowLeft(k, f) * ROW, 0) / LEAF_AREA;
+}
+
+/** Where the mouth bites next: the spot of the next bite, or of the last one once all are done. */
+export function biteSpot(bites: readonly Bite[], n: number): { x: number; y: number } {
+  return bites[Math.min(n, bites.length - 1)].spot;
+}
+
+/**
+ * Where the body's front segment sits: on the midrib, a little behind the middle of the bitten edge – but always within
  * reach of the next spot and never in front of it, so the head never stretches further than `REACH` nor bites behind it.
  */
-export function bodyFront(bites: number, count: number): { x: number; y: number } {
-  const edges = edgesAt(bites, count);
+export function bodyFront(bites: readonly Bite[], n: number): { x: number; y: number } {
+  const edges = frontAfter(bites, n)
+    .map((f, k) => rowEdge(k, f))
+    .filter((e) => e > Number.NEGATIVE_INFINITY);
+  const spot = biteSpot(bites, n);
   const y = MID - 8;
-  const spot = biteSpot(bites, count);
+  const middle = edges.length ? edges.reduce((a, b) => a + b, 0) / edges.length : spot.x;
   const dx = Math.sqrt(Math.max(0, (REACH - 10) ** 2 - (spot.y - y) ** 2));
-  const x = Math.min(Math.max(edges.reduce((a, b) => a + b, 0) / edges.length - 60, spot.x - dx), spot.x - 20);
+  const x = Math.min(Math.max(middle - 60, spot.x - dx), spot.x - 20);
   return { x, y };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The leaf as it is left: its shape, outline, midrib and veins cut off at the rows' edges, drawn as plain paths. No
+// clip path: while a page turns, the app is taken as a picture of its own, and in it every clip path – a CSS one or one
+// inside the svg – dropped out and showed the whole leaf again (user feedback, November 2026).
+
+type Pt = readonly [number, number];
+
+/** A quadratic or cubic curve from its points, sampled into `n` steps. */
+function curve(points: Pt[], n = 32): Pt[] {
+  return Array.from({ length: n + 1 }, (_, i) => {
+    const t = i / n;
+    let ps = points;
+    while (ps.length > 1) ps = ps.slice(1).map((p, j): Pt => [ps[j][0] + (p[0] - ps[j][0]) * t, ps[j][1] + (p[1] - ps[j][1]) * t]);
+    return ps[0];
+  });
+}
+
+/** The leaf's outline: the upper edge from stalk to tip, then the lower edge (its mirror) back. */
+const OUTLINE: Pt[] = [
+  ...UPPER.filter((_, i) => i % 4 === 0),
+  ...UPPER.filter((_, i) => i % 4 === 0)
+    .map(([x, y]): Pt => [x, LEAF.h - y])
+    .reverse(),
+];
+/** The soft light along the leaf's upper half. */
+const SHINE = curve([
+  [40, MID],
+  [160, 30],
+  [520, 30],
+  [LEAF.w - 40, MID - 4],
+]);
+/** The midrib from the stalk to the tip. */
+const RIB = curve([
+  [40, MID],
+  [400, MID - 10],
+  [LEAF.w - 12, MID],
+]);
+/** The veins, a pair from each of these places along the midrib. */
+const VEINS = [150, 270, 390, 510, 620].flatMap((x) =>
+  [-1, 1].map((s) =>
+    curve(
+      [
+        [x, MID + s * 3],
+        [x + 50, MID + s * 60],
+        [x + 90, MID + s * (100 - (x > 500 ? 40 : 0))],
+      ],
+      16,
+    ),
+  ),
+);
+
+/** The rows' edge at height `y`. */
+function frontAt(front: readonly number[], y: number): number {
+  return front[Math.min(front.length - 1, Math.max(0, Math.round(y / ROW)))];
+}
+
+/** The pieces of a line left of the rows' edges, each ending exactly at the edge. */
+export function cutLine(line: readonly Pt[], front: readonly number[]): Pt[][] {
+  const runs: Pt[][] = [];
+  let run: Pt[] = [];
+  const room = (p: Pt) => frontAt(front, p[1]) - p[0];
+  line.forEach((p, i) => {
+    const prev = line[i - 1];
+    if (prev && room(prev) > 0 !== room(p) > 0) {
+      const t = room(prev) / (room(prev) - room(p));
+      run.push([prev[0] + (p[0] - prev[0]) * t, prev[1] + (p[1] - prev[1]) * t]);
+      if (room(p) <= 0) {
+        runs.push(run);
+        run = [];
+      }
+    }
+    if (room(p) > 0) run.push(p);
+  });
+  if (run.length) runs.push(run);
+  return runs.filter((r) => r.length > 1);
+}
+
+/** Lines as one path. */
+function pathOf(runs: readonly Pt[][], close = false): string {
+  return runs.map((r) => `M${r.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L")}${close ? " Z" : ""}`).join(" ");
+}
+
+/** What is left of the leaf's green: each row from the leaf's left outline to its edge or right outline. */
+export function leafShape(front: readonly number[]): string {
+  const rows = ROW_Y.flatMap((y, k) => {
+    const span = ROW_SPAN[k];
+    if (!span) return [];
+    const from = span[0] + STROKE;
+    return [{ y, from, to: Math.max(from, Math.min(front[k], span[1] - STROKE)) }];
+  });
+  if (!rows.some((r) => r.to > r.from)) return "";
+  return pathOf([[...rows.map((r): Pt => [r.to, r.y]), ...rows.reverse().map((r): Pt => [r.from, r.y])]], true);
+}
+
+/** The bitten edges: where a row's edge lies inside the leaf. */
+function bittenEdge(front: readonly number[]): Pt[][] {
+  const runs: Pt[][] = [];
+  let run: Pt[] = [];
+  ROW_Y.forEach((y, k) => {
+    const span = ROW_SPAN[k];
+    if (span && front[k] > span[0] + STROKE && front[k] < span[1] - STROKE) run.push([front[k], y]);
+    else if (run.length) {
+      runs.push(run);
+      run = [];
+    }
+  });
+  if (run.length) runs.push(run);
+  return runs.filter((r) => r.length > 1);
+}
+
+/** The same as a CSS polygon, in percent of the leaf's box. */
+function leafPolygon(front: readonly number[]): string {
+  const pc = (v: number, of: number) => `${((Math.min(of, Math.max(0, v)) / of) * 100).toFixed(2)}%`;
+  return `polygon(0% 0%, ${front.map((f, k) => `${pc(f, LEAF.w)} ${pc(ROW_Y[k], LEAF.h)}`).join(", ")}, 0% 100%)`;
 }
 
 /** The bites done so far, counted by the clock once a second (and again when the page comes back), all at the end. */
@@ -184,24 +377,6 @@ function at(x: number, y: number, w: number, h: number): CSSProperties {
 
 // ---------------------------------------------------------------------------------------------------------------
 // The drawings.
-
-/** The leaf's outline in its own units, with its midrib and veins; drawn once and shown through every band. */
-const LeafDrawing = memo(function LeafDrawing() {
-  const { w, h } = LEAF;
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-      <path d={`M40 ${MID} C160 -20 560 -10 ${TIP} ${MID} C560 ${h + 10} 160 ${h + 20} 40 ${MID} Z`} fill="#58b947" stroke={INK} strokeWidth="6" />
-      <path d={`M40 ${MID} C160 30 520 30 ${w - 40} ${MID - 4}`} fill="none" stroke="#7fd36b" strokeWidth="14" opacity="0.6" />
-      <path d={`M40 ${MID} Q400 ${MID - 10} ${w - 12} ${MID}`} stroke="#3d8a32" strokeWidth="7" fill="none" />
-      {[150, 270, 390, 510, 620].map((x) => (
-        <g key={x} stroke="#3d8a32" strokeWidth="5" fill="none" strokeLinecap="round">
-          <path d={`M${x} ${MID - 3} Q${x + 50} ${MID - 60} ${x + 90} ${MID - 100 + (x > 500 ? 40 : 0)}`} />
-          <path d={`M${x} ${MID + 3} Q${x + 50} ${MID + 60} ${x + 90} ${MID + 100 - (x > 500 ? 40 : 0)}`} />
-        </g>
-      ))}
-    </svg>
-  );
-});
 
 /** Sky, meadow, the branch the leaf hangs from and the leaf's stalk; drawn once. */
 export const LeafBackdrop = memo(function LeafBackdrop() {
@@ -250,28 +425,37 @@ export const LeafBackdrop = memo(function LeafBackdrop() {
 });
 
 /**
- * The leaf in bands, each box with a round right end at its band's edge, the leaf inside it moved back by as much so it
- * stands still. A tap lights up what is still green (H-51): a light inside every band, so it ends at the bites.
+ * The leaf as it is left, drawn anew once a second as plain paths (no clip path, see `leafShape`), with a thin dark
+ * line along the bites. A tap lights up what is still green (H-51): a light mounted only after a tap, cut to the same
+ * edge by a still CSS polygon, so it ends at the bites.
  */
-function Leaf({ edges, glow }: { edges: number[]; glow: number }) {
-  const { w, h } = LEAF;
+function Leaf({ front, glow }: { front: readonly number[]; glow: number }) {
+  const parts = useMemo(
+    () => ({
+      shape: leafShape(front),
+      outline: pathOf(cutLine(OUTLINE, front)),
+      shine: pathOf(cutLine(SHINE, front)),
+      rib: pathOf(cutLine(RIB, front)),
+      veins: pathOf(VEINS.flatMap((v) => cutLine(v, front))),
+      bitten: pathOf(bittenEdge(front)),
+    }),
+    [front],
+  );
   return (
-    <Layer x={LEAF.x} y={LEAF.y} w={w} h={h}>
-      {edges.map((edge, i) => {
-        const shift = ((edge - w) / w) * 100;
-        const box = { top: `${(BANDS[i].top * 100) / h}%`, height: `${(BAND_H * 100) / h}%`, transform: `translateX(${shift.toFixed(3)}%)` };
-        const inner = { top: `${-i * 100}%`, height: `${BAND_COUNT * 100}%`, transform: `translateX(${(-shift).toFixed(3)}%)` };
-        return (
-          <div key={i} className="tm-band" style={box}>
-            <div className="tm-band-leaf" style={inner}>
-              <LeafDrawing />
-              <div className="tm-leaf-light">
-                <LeftGlow n={glow} />
-              </div>
-            </div>
-          </div>
-        );
-      })}
+    <Layer x={LEAF.x} y={LEAF.y} w={LEAF.w} h={LEAF.h}>
+      <svg viewBox={`0 0 ${LEAF.w} ${LEAF.h}`} preserveAspectRatio="none">
+        <path d={parts.shape} fill="#58b947" />
+        <path d={parts.shine} fill="none" stroke="#7fd36b" strokeWidth="14" opacity="0.6" />
+        <path d={parts.rib} stroke="#3d8a32" strokeWidth="7" fill="none" />
+        <path d={parts.veins} stroke="#3d8a32" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <path d={parts.bitten} stroke="#3d8a32" strokeWidth="3" fill="none" strokeLinejoin="round" />
+        <path d={parts.outline} stroke={INK} strokeWidth="6" fill="none" strokeLinejoin="round" />
+      </svg>
+      {glow > 0 && (
+        <div className="tm-leaf-light" style={{ clipPath: leafPolygon(front) }}>
+          <LeftGlow n={glow} />
+        </div>
+      )}
     </Layer>
   );
 }
@@ -294,11 +478,11 @@ const CRUMB_BOX = 40;
  * bites it off – reaching up and down the bitten edge, its neck stretching after it – and crumbs of leaf falling from
  * the spot bitten. Every part is a small layer of its own gliding to its place once a second.
  */
-function Caterpillar({ bites, count }: { bites: number; count: number }) {
-  const mouth = biteSpot(bites, count);
-  const front = bodyFront(bites, count);
+function Caterpillar({ plan, bites }: { plan: readonly Bite[]; bites: number }) {
+  const mouth = biteSpot(plan, bites);
+  const front = bodyFront(plan, bites);
   const neckEnd = { x: mouth.x - HEAD.mouth.x + HEAD.neck.x, y: mouth.y - HEAD.mouth.y + HEAD.neck.y };
-  const last = bites > 0 ? biteSpot(bites - 1, count) : undefined;
+  const last = bites > 0 ? biteSpot(plan, bites - 1) : undefined;
   return (
     <>
       <Layer
@@ -462,12 +646,14 @@ function Butterfly() {
 export function CaterpillarScene({ glow, startedAt, total, done }: { glow: number; startedAt: number; total: number; done: boolean }) {
   const count = runSeconds(total);
   const bites = useBites(startedAt, count, !done);
+  const plan = useMemo(() => planBites(count, startedAt), [count, startedAt]);
+  const front = useMemo(() => (done ? ROW_Y.map(() => 0) : frontAfter(plan, bites)), [plan, bites, done]);
   return (
     <>
       <LeafBackdrop />
-      <Leaf edges={edgesAt(bites, count, done)} glow={glow} />
+      <Leaf front={front} glow={glow} />
       <Cocoon />
-      <Caterpillar bites={bites} count={count} />
+      <Caterpillar plan={plan} bites={bites} />
       <Butterfly />
     </>
   );

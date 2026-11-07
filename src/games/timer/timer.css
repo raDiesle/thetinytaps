@@ -818,33 +818,11 @@
   transform: translateX(var(--tm-cart-end));
 }
 
-/* Raupe (H-46): one bite a second, worked out from the clock (`useBites` in caterpillar.tsx). Every band of the leaf is
-   a box with a round end, set back by a style change at its bite while the leaf in it is set forward by as much, so only
-   the bitten edge moves. The caterpillar's head, neck and body glide to their next place after each bite, the head
-   biting down as the bite comes. At the end it is gone, the cocoon hangs on the branch, wiggles and bursts open, and a
-   butterfly flutters out and flies back and forth in the air. */
-.tm-band {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 0 999px 999px 0;
-  will-change: transform;
-}
-
-.tm-band-leaf {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  will-change: transform;
-}
-
-.tm-band-leaf svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
+/* Raupe (H-46): one bite a second, planned for the run and counted from the clock (`planBites`, `useBites` in
+   caterpillar.tsx). The leaf is drawn as it is left after each bite (a clip path, CSS or SVG,
+   dropped out of a turning page's picture). The caterpillar's head, neck and body glide to their next place
+   after each bite, the head biting down as the bite comes. At the end it is gone, the cocoon hangs on the branch,
+   wiggles and bursts open, and a butterfly flutters out and flies back and forth in the air. */
 .tm-leaf-light {
   position: absolute;
   inset: 0;
@@ -1512,7 +1490,6 @@
 
 .tm-sand-light .tm-left-glow,
 .tm-wax .tm-left-glow,
-.tm-cookie .tm-left-glow,
 .tm-apple-sway .tm-left-glow,
 .tm-red .tm-left-glow,
 .tm-clock-lit .tm-left-glow,
@@ -1534,118 +1511,6 @@
 .tm-done .tm-left-glow,
 .tm-blow .tm-left-glow {
   display: none;
-}
-
-/* Ameisenstraße (H-68): the cookie shrinks to nothing at its foot, the hill grows from three quarters to whole, and
-   the ants march along the road one step a second, one reaching the hill every second; at the end they sit on top. */
-.tm-cookie,
-.tm-hill {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 100%;
-}
-
-.tm-cookie svg,
-.tm-hill svg,
-.tm-ant-home > div,
-.tm-ant-home svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.tm-cookie {
-  animation: tm-crumble var(--tm-ms) linear forwards;
-}
-
-.tm-hill {
-  transform: scale(0.75);
-  animation: tm-grow var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-cookie {
-  animation: none;
-  transform: scale(0);
-}
-
-.tm-done .tm-hill {
-  animation: none;
-  transform: none;
-}
-
-@keyframes tm-crumble {
-  to {
-    transform: scale(0);
-  }
-}
-
-@keyframes tm-grow {
-  from {
-    transform: scale(0.75);
-  }
-  to {
-    transform: none;
-  }
-}
-
-/* Each ant walks the road in ANTS.n steps (scenes.tsx), one a second with a rest, coming out at the start and going
-   into the hill at the end; every ant starts a second after the one before. */
-.tm-ant {
-  opacity: 0;
-  animation: tm-march 9s ease-in-out infinite;
-}
-
-@keyframes tm-march {
-  0% {
-    opacity: 0;
-    transform: translateX(calc(var(--tm-ant-step) * 0));
-  }
-  11.111% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 1));
-  }
-  22.222% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 2));
-  }
-  33.333% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 3));
-  }
-  44.444% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 4));
-  }
-  55.556% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 5));
-  }
-  66.667% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 6));
-  }
-  77.778% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 7));
-  }
-  88.889% {
-    opacity: 1;
-    transform: translateX(calc(var(--tm-ant-step) * 8));
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(calc(var(--tm-ant-step) * 9));
-  }
-}
-
-.tm-ant-home {
-  opacity: 0;
-  transition: opacity 0.8s ease-out 0.3s;
-}
-
-.tm-done .tm-ant-home {
-  opacity: 1;
 }
 
 /* Abwechseln (H-52): the Sanduhr's hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over

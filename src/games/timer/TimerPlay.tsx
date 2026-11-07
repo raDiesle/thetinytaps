@@ -20,7 +20,6 @@ import {
   playMelody,
   playPlink,
   playPlop,
-  playPop,
   playTusch,
   playTwinkle,
   playYawn,
@@ -36,24 +35,7 @@ import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
 import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PizzaScene, SLICES } from "./pizza";
-import {
-  AntHill,
-  AntRoad,
-  AntsBackdrop,
-  AntsHome,
-  Cookie,
-  CandleBackdrop,
-  Candles,
-  Hourglass,
-  Layer,
-  RAIL_Y,
-  RailAhead,
-  SandBackdrop,
-  TRAIN,
-  Train,
-  TrainBackdrop,
-  TrainStops,
-} from "./scenes";
+import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
 import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
@@ -379,7 +361,7 @@ function TimerRun({
       if (picture === "train") playWhistle();
       else if (picture === "apple") playPlop();
       else if (picture === "caterpillar") playTwinkle();
-      else if (picture === "sand" || picture === "ants" || picture === "disc") playChime();
+      else if (picture === "sand" || picture === "disc") playChime();
       else if (picture === "flower") playTwinkle();
       else if (picture === "sunset") playYawn();
       else if (picture === "pizza") playYum();
@@ -400,7 +382,7 @@ function TimerRun({
 
   /**
    * A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and what is still left lights up softly
-   * (H-51: the rail to the station, the sand on top, the wax, the cookie), so the child can look how long it still is.
+   * (H-51: the rail to the station, the sand on top, the wax, the slices), so the child can look how long it still is.
    * After the end, soft ripples where it was.
    */
   const answer = useCallback(
@@ -413,7 +395,6 @@ function TimerRun({
       setPoke((n) => n + 1);
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
-      else if (picture === "ants") playPop();
       // The leaves rustle; once the blossoms are out, the bees buzz.
       else if (picture === "apple") (Date.now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
@@ -528,15 +509,6 @@ export function SceneParts({
         <>
           <CandleBackdrop />
           <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={startedAt} total={total} />
-        </>
-      )}
-      {picture === "ants" && (
-        <>
-          <AntsBackdrop />
-          <AntRoad />
-          <Cookie glow={poke} />
-          <AntHill />
-          <AntsHome />
         </>
       )}
     </>

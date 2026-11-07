@@ -146,26 +146,40 @@ export const SCENARIOS: Scenario[] = [
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
-  // steam, the twinkling, the flame, what is left lighting up), the ants marching, the moon setting and the sun rising,
-  // the pizza's slices lifted off, the ladybug crawling
-  // round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the lamps drawing who begins and the hourglass running.
-  ...(["scheibe", "sanduhr", "abwechseln", "kerze", "apfelbaum", "pizza", "wecker", "zug", "raupe", "blume", "sonne", "ameisen"] as const).map((name, i) => ({
+  // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
+  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the
+  // lamps drawing who begins and the hourglass running. Each card is tapped by its name (its tooltip), so the cards' order and groups may change.
+  ...(
+    [
+      ["scheibe", "Rote Scheibe"],
+      ["sanduhr", "Sanduhr"],
+      ["kerze", "Kerze"],
+      ["apfelbaum", "Apfelbaum"],
+      ["blume", "Blume"],
+      ["pizza", "Pizza"],
+      ["wecker", "Wecker"],
+      ["zug", "Zug zum Bahnhof"],
+      ["raupe", "Raupe"],
+      ["sonne", "Sonnenaufgang"],
+      ["abwechseln", "Abwechseln"],
+    ] as const
+  ).map(([name, title]) => ({
     name: `timer-${name}`,
     path: "/timer/",
-    parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [{ label: "Läuft", before: [{ tap: `.mode-card[title^="${title}"]` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   })),
   // „Abwechseln“ with short turns: the lamps drawing who begins, the toy hopping over, the lamps changing and the
   // hourglass turning itself over.
   {
     name: "timer-abwechseln-wechsel",
     path: "/timer/?sekunden=5",
-    parts: [{ label: "Auslosen und Wechsel", before: [{ tap: ".mode-list > li:nth-child(3) .mode-card" }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [{ label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Abwechseln"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.
   {
     name: "timer-apfelbaum-ernte",
     path: "/timer/?sekunden=16",
-    parts: [{ label: "Ernte", before: [{ tap: ".mode-list > li:nth-child(5) .mode-card" }, { wait: 6000 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [{ label: "Ernte", before: [{ tap: `.mode-card[title^="Apfelbaum"]` }, { wait: 6000 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; the book's other games play at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },

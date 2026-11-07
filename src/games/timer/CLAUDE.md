@@ -17,8 +17,12 @@ The start screen's cards are the pictures themselves as they look at their end, 
 November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
 cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Abwechseln (the fox child's lamp on, the toy on its cushion and the hourglass; that it runs on
-without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecker, then the others. The pictures:
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then the others, on one frame with
+no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
+with the toy, the lamps and the hourglass, and that it runs on without end is said in its tooltip (`SWAP_NOTE`). Where there is
+room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
+cards still fit on one screen. The Ameisenstraße (H-68) was
+taken out (user request, November 2026). The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
@@ -38,11 +42,14 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
   from the top bulb into the bottom one, where its heap rises with a round top (`Hourglass`, one layer, shared with
   Abwechseln, which turns it over as a whole).
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
-  (`runSeconds`, `useBites`). The leaf is cut in six bands (`BANDS`), each eaten from the leaf's outline at the tip to
-  its outline at the stalk, so every bite takes leaf and what is left still looks like a leaf; the bites go down the
-  edge and back up (`BITE_ORDER`), and the head goes to each spot before it bites it off (`biteSpot`), its neck
-  stretching after it from the body crawling back along the midrib (`bodyFront`, never further than `REACH`), and three
-  leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
+  (`runSeconds`, `useBites`). The bites are planned once for the run (`planBites`): it starts with the very tip and
+  works back to the stalk, always biting where the leaf reaches furthest out, each bite a round notch about as deep as
+  its radius, stepping up or down the edge by well over a bite's width, so the edge is a row of uneven scallops with
+  points of leaf between them, as a real caterpillar leaves it (user feedback, November 2026). Each bite takes as much
+  leaf as the clock asks for (`leafLeft`), so the leaf goes evenly and is gone with the last; a very long run takes
+  nibbles. The leaf is drawn as it is left, once a second: its green, outline, midrib and veins cut off at the bites as plain paths (`leafShape`, `cutLine`), a thin dark line along the bites – never a clip path, which dropped out while the page turned. The head goes to each spot before it bites
+  it off (`biteSpot`), its neck stretching after it from the body crawling back along the midrib (`bodyFront`, never
+  further than `REACH`), and three leaf crumbs fall from the spot bitten (`CRUMBS`). At the end the cocoon hangs on the branch, wiggles and bursts open,
   and the butterfly slips out and flies back and forth in the air above the meadow, bobbing, as long as the end is shown
   (`BUTTERFLY`, user request, November 2026).
 - „Blume“ 🌸 (`flower.tsx`, H-53): a garden hose coming from a tap on a post (`TAP`; a can that never ran dry made no
@@ -63,9 +70,6 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
   red at first and yellow as it climbs, and stands high over the meadow at the end (user feedback, November 2026: the
   windmill and the little house taken out, sun and moon much bigger and in the middle, the moon setting first). Every
   second a soft glow widens past the edge of the moon or the sun (`.tm-ring`).
-- „Ameisenstraße“ 🐜 (H-68): a big cookie lies on a picnic blanket at the left, an anthill far off at the right; ants march from under the
-  cookie to the hill, each with a crumb, the cookie shrinks and the hill grows. At the end the ants sit on the hill, the
-  last crumbs lie on the blanket.
 - „Rote Scheibe“ 🔴 (`disc.tsx`, H-47): the red disc Kitas know from the „Time Timer“, shrinking like a clock's hand goes
   round on a plain white face; the knob in the middle turns a petal each second.
   A ladybug crawls round the face's rim about once a minute, like a second hand – a real seven-spot one seen from above
@@ -101,7 +105,7 @@ without end is said in its tooltip, `SWAP_NOTE`), Kerze, Apfelbaum, Pizza, Wecke
   picture (`.tm-done-light`) and a few hearts, stars and notes rise slowly (`celebrate`), a friendly tune after it, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
-  noch?“: the rail to the station, the sand on top, the wax, the cookie – `LeftGlow`, inside the shrinking part so it is
+  noch?“: the rail to the station, the sand on top, the wax, the slices – `LeftGlow`, inside the shrinking part so it is
   exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
 
 Every picture moves a small, soft step every second, so even an hour never looks stuck (H-63): the train's wheels turn
@@ -129,8 +133,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   last row of cards falls off the screen. A new length means narrower slips (`.tm-lengths`), never a second line.
 - **Progress is seen every second** (user feedback, November 2026): every picture moves a step a second that a child
   can see from the sofa – a bite, a crumb, an apple, a slice – not only a tiny wobble. Pieces come many, also for a
-  short time (they come more often then, never fewer), the way to go is long (the train across the picture, the ants'
-  road, the stalk nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
+  short time (they come more often then, never fewer), the way to go is long (the train across the picture, the stalk
+  nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
   over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
@@ -161,11 +165,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   keeps that: a big change of the whole side, never a small sign.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
-- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Abwechseln, Kerze, Apfelbaum, Pizza, then
-  the Wecker): keep it when adding a picture (a new one goes after these unless the user says otherwise), and move the
-  perf scenarios' list in `tools/perfScenarios.ts` with it – they tap cards by their place (`timer.test.ts` checks the
-  order). Abwechseln runs without end, so its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it
-  (`TIMED_PICTURES`, `nextPicture`).
+- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
+  Wecker; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
+  name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
+  is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
+  November 2026), its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
 - **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
   `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
   is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
@@ -200,9 +205,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **Every second a small step, never a blink** (H-63): what beats once a second is a small layer of its own (`.tm-beat`)
   moving by `transform` and `opacity` – the wheels are small layers riding in the train's, not groups in its svg – and
   stands still at the end (`.tm-done`). Anything new that moves the whole run long snaps to its last place there too.
-  A row of things walking in step (the ants) is a small layer per thing, all one keyframe walk a second apart
-  (`tm-march`, one keyframe per step, `ANTS.n` of them – `timer.test.ts` checks), never one strip of them moved inside
-  a bigger layer.
+  A row of things walking in step is a small layer per thing, all one keyframe walk a second apart (one keyframe per
+  step), never one strip of them moved inside a bigger layer.
 - **A drawing never touches its svg's edge unless that svg lets it out** (user feedback, November 2026: the knob's flower
   in the Rote Scheibe's middle lost the tips of its top and bottom petals): an svg cuts off what lies past its
   `viewBox`, half a stroke's width too, wherever it sits (only `.tm-layer > svg` is `overflow: visible`). A small
@@ -218,8 +222,15 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   transition), and in it the clip-path round a moving layer dropped out – the hourglass's sand showed as a square
   before it began (user feedback, November 2026). A shape something moves inside is a still drawing of that shape in a
   window with `overflow: hidden`: the window slides, the drawing in it slides back the same way and stays put, both by
-  `transform` (`BulbSand`, `bulbBelow`; `timer.test.ts` checks). A still clip-path is fine where nothing it cuts shows
-  as the page turns, or on a light mounted only after a tap.
+  `transform` (`BulbSand`, `bulbBelow`; `timer.test.ts` checks). Every clip path drops out there, also on a layer that
+  stands still and also a `<clipPath>` inside the svg: the Raupe's bitten leaf showed whole again while the page turned
+  (November 2026). A cut that changes as the picture runs is drawn into the shape itself (`leafShape`; `timer.test.ts`
+  checks). A still clip-path is fine
+  where nothing it cuts shows as the page turns, or on a light mounted only after a tap.
+- **What is eaten or cut looks as in life, and one thing stays one piece** (user feedback on the Raupe, November
+  2026): bites are uneven round notches that stand apart, starting where an animal really starts (the leaf's tip),
+  never a row of even round fingers. A thing cut away bit by bit is one drawing with one cut, never strips or bands
+  laid side by side – between two boxes the background shone through as a hairline across the leaf.
 - **What a tap lights is what is left** (H-51): a glow inside the part that shrinks, never a sign or a number, and once
   per tap, fading – never blinking. A new picture puts `LeftGlow` into its own shrinking part; in a picture that grows
   (the flower) that is the way still to go (`StillToGrow`, a box over the stake whose lower end rises with the bud).
@@ -233,7 +244,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   keyframes written once for the run. React
   only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute. The one exception is
   the caterpillar, whose head must know where the next bite is: there the bites are counted from the clock once a
-  second (`useBites`) and the bands, head, neck and body are set by a style change a second, the figure gliding by a
+  second (`useBites`) and the leaf's paths, head, neck and body are set once a second, the figure gliding by a
   CSS transition – small layers, a change a second, never per frame, and the leaf's drawing `memo` so it is never drawn
   again (`bun run perf timer-raupe`).
 - **What takes a piece goes to it first** (user request, November 2026): the caterpillar's head moves to each spot of
@@ -241,7 +252,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   somewhere else. A new picture where someone eats, picks or carries pieces does the same.
 - **Seen from afar only what runs down stays bright** (H-48): a new picture puts its backdrop in `.tm-back` and its
   small helpers (posts, decorations) in `.tm-dims`; what runs down gets neither. A clipped edge drawn in the background's
-  colour would show once that fades – cut edges with clipping boxes instead (the leaf's bands, the disc's halves).
+  colour would show once that fades – cut edges with clipping boxes instead (the leaf drawn as it is left, the disc's halves).
 - Development: `?sekunden=<n>` in the address makes a run take n seconds instead of the minutes chosen; the
   pieces still come from the minutes chosen (2 Min. with `?sekunden=25`: twenty apples, its whole year in 25 seconds).
 - It says nothing, so there is no voice line to record.
