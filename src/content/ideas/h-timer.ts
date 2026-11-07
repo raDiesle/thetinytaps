@@ -262,6 +262,17 @@ export const timerIdeas: IdeaArea = {
         "Gebaut als Bild „Wecker“ (Wunsch 7. November 2026): ein türkiser Wecker mit gelber Schlummertaste, lila Knöpfen, Füßchen, Stern- und Herzaufkleber, im Bildschirm orange Segmentziffern, Funkmast und Weckerglocke. Unter den Ziffern gehen 20 Leuchtkästchen eins nach dem anderen von rechts aus. Ein Tippen drückt die Schlummertaste, am Ende piept er dreimal und wackelt klingelnd auf seinen Füßen.",
     },
     {
+      id: "H-71",
+      emoji: "🎾",
+      title: "Abwechseln beim Tennis",
+      text: "Noch ein Timer zum Abwechseln, bei dem man von Weitem sieht, wer dran ist: Fuchskind und Bärenkind spielen Tennis. Der Ball liegt auf dem Schläger dessen, der dran ist, und seine Seite des Platzes liegt im Licht, die andere im Schatten. Ist die Zeit um, schlägt das Kind den Ball, und er fliegt langsam in hohem Bogen übers Netz zum anderen.",
+      why: "Ein Ball, der hin und her geht, ist für Kinder das Bild fürs Abwechseln schlechthin; wohin er fliegt, verfolgen sie mit den Augen, und wer ihn hat, ist dran.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Tennis“ in der Gruppe Abwechseln (Wunsch 7. November 2026): ein blauer Platz mit Netz vor einem grünen Zaun, die beiden Kinder stehen still mit ihren Schlägern. Zu Beginn leuchten die Seiten abwechselnd auf, langsamer und langsamer, bis eine bleibt. Der Ball hüpft auf dem Schläger dessen, der dran ist; eine Anzeigetafel über dem Netz hat zehn Lichter, die eins nach dem anderen ausgehen. Ist die Zeit um, schwingt der Schläger, der Ball fliegt in gut zwei Sekunden übers Netz, und die Schatten wechseln, sobald er das Netz überquert.",
+    },
+    {
       id: "H-69",
       emoji: "💧",
       title: "Tropfen füllen den Eimer",

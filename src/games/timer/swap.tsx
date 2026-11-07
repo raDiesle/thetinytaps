@@ -141,11 +141,16 @@ export function SwapLight({ kind, on }: { kind: Holder; on: boolean }) {
   );
 }
 
-/** The soft shade over one side of the room while it is the other child's turn (or the other lamp's, while they draw). */
-export function SwapShade({ kind, on }: { kind: Holder; on: boolean }) {
-  const x = kind === "fox" ? 0 : SHADE.bear;
-  const w = kind === "fox" ? SHADE.fox : STAGE_W - SHADE.bear;
-  return <Layer x={x} y={0} w={w} h={STAGE_H} className={`tm-swap-shade tm-swap-shade-${kind}${on ? " tm-on" : ""}`} />;
+/**
+ * The soft shade over one side of the room while it is the other child's turn (or the other lamp's, while they draw):
+ * up to the hourglass's frame, or up to `edge` where the two sides meet (Tennis: the net). With `cross` it changes a
+ * moment later, as the ball crosses the net (`--tm-cross`).
+ */
+export function SwapShade({ kind, on, edge, cross = false }: { kind: Holder; on: boolean; edge?: number; cross?: boolean }) {
+  const right = edge ?? SHADE.bear;
+  const x = kind === "fox" ? 0 : right;
+  const w = kind === "fox" ? (edge ?? SHADE.fox) : STAGE_W - right;
+  return <Layer x={x} y={0} w={w} h={STAGE_H} className={`tm-swap-shade tm-swap-shade-${kind}${on ? " tm-on" : ""}${cross ? " tm-cross" : ""}`} />;
 }
 
 /**

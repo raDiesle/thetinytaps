@@ -45,16 +45,25 @@ export interface GroupPlace {
  * Lays groups of cards out in lines, each group a rectangle of whole rows. A group that fits in one row shares a line
  * with others while there is room (the first line with room, so a small group may sit beside an earlier one);
  * a longer group fills the whole width and has its lines to itself – or, with `reserve`, leaves that many columns free
- * at its right, where one-row groups after it stand (the Timer's „Abwechseln“ beside its ten pictures: below them, in
- * a line of its own, it made every card too small to fit on a tablet).
+ * at its right, where shorter groups after it stand, in several rows if need be (the Timer's „Abwechseln“ beside its
+ * ten pictures: below them, in a line of its own, it made every card too small to fit on a tablet).
  */
 export function packGroups(sizes: number[], columns: number, reserve = 0): { places: GroupPlace[]; lines: number[] } {
   const lines: { used: number; height: number }[] = [];
   const places = sizes.map((size, i) => {
     const room = size > columns && i < sizes.length - 1 && reserve < columns ? columns - reserve : columns;
-    const width = Math.min(size, room);
-    const height = Math.ceil(size / room);
+    let width = Math.min(size, room);
+    let height = Math.ceil(size / room);
     let line = height === 1 ? lines.findIndex((l) => l.used + width <= columns) : -1;
+    // A short group with no room in one row may still stand in the columns a longer group left free, in as many rows
+    // as that group has (the Timer's two ways of taking turns, one above the other beside its pictures).
+    if (line < 0 && size <= columns) {
+      line = lines.findIndex((l) => l.used < columns && Math.ceil(size / (columns - l.used)) <= l.height);
+      if (line >= 0) {
+        width = Math.min(size, columns - lines[line].used);
+        height = Math.ceil(size / width);
+      }
+    }
     if (line < 0) line = lines.push({ used: 0, height }) - 1;
     const column = lines[line].used;
     lines[line].used += width;
