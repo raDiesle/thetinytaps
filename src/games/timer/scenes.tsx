@@ -482,12 +482,13 @@ export function Sand({ running, glow }: { running: boolean; glow: number }) {
 
 // ---------------------------------------------------------------------------------------------------------------
 // Kerze: three tall candles on the table burn down one after another (user feedback, November 2026: taller, and
-// several, so more of the time shows); when one is down to its stub it goes out with a curl of smoke and the next
-// lights up. At the end the bear child leans over and blows the last one out. Each candle burns in its third of the
+// several, so more of the time shows); each burns all the way down into its puddle on the holder, and only then goes
+// out, its smoke rising slowly for a few seconds while the next lights up (user feedback, November 2026: they went out
+// with a good piece still standing, and the puff was gone at once). At the end the bear child leans over and blows the last one out. Each candle burns in its third of the
 // time: the same animations as one candle, each with a third of the time as duration and its turn as delay.
 
-/** The candles when new: their middles, width, top and the table they stand on; at the end only `stub` of each is left. */
-export const CANDLE = { xs: [600, 800, 1000], w: 110, top: 215, base: 785, stub: 70 } as const;
+/** The candles when new: their middles, width, top and the table they stand on; at the end only a thin `stub` of each is left in its puddle. */
+export const CANDLE = { xs: [600, 800, 1000], w: 110, top: 215, base: 785, stub: 10 } as const;
 
 /** How tall the flame stands above a candle's top, so the first candle's flame stays on every screen. */
 export const FLAME_H = 130;
@@ -539,7 +540,7 @@ function turn(i: number): CSSProperties {
  * One candle: the wax that has run down, a puddle on the holder that grows as it burns (H-64), behind it; the wax,
  * shrinking from the bottom up (its CSS scales it); and its top with wick and flame going down with the wax – a layer as
  * tall as the candle, moved down by the part that burns away. The flame lights up at the candle's turn and, but on the
- * last, goes out with a curl of smoke at its end. `out` puts the last one's flame out; `flare` keys the flame flaring
+ * last, goes out once it is burnt down, with a slow curl of smoke. `out` puts the last one's flame out; `flare` keys the flame flaring
  * up at a tap; `glow` lights the wax still to burn (H-51), given only to the candles not yet burnt.
  */
 function Candle({ i, out, flare, glow }: { i: number; out: boolean; flare: number; glow: number }) {
@@ -566,7 +567,7 @@ function Candle({ i, out, flare, glow }: { i: number; out: boolean; flare: numbe
           {/* A drop of wax running down the candle's side, a little further every second (H-63). */}
           <div className="tm-drop tm-beat" />
           {out ? (
-            <div className="tm-smoke" />
+            <Smoke />
           ) : (
             <div className="tm-flame">
               <div key={flare} className={flare ? "tm-flare" : undefined}>
@@ -578,9 +579,39 @@ function Candle({ i, out, flare, glow }: { i: number; out: boolean; flare: numbe
             </div>
           )}
         </div>
-        {!last && <div className="tm-smoke tm-puff" />}
+        {!last && <Smoke puff />}
       </Layer>
     </>
+  );
+}
+
+/** The smoke's soft puffs: their width (% of the smoke's box), when they rise (s) and how far they drift sideways (%). */
+const SMOKE_PUFFS = [
+  { size: 40, at: 0, dx: -40 },
+  { size: 55, at: 0.5, dx: 60 },
+  { size: 35, at: 1.1, dx: -80 },
+  { size: 60, at: 1.8, dx: 30 },
+  { size: 45, at: 2.6, dx: -20 },
+] as const;
+
+/**
+ * The smoke of a candle gone out: a thin wisp curling up from the wick, and soft puffs rising one after the other,
+ * drifting apart and fading – each a small layer of its own moved by transform and opacity. `puff` waits for the end
+ * of the candle's turn (a candle burnt down), else it rises at once (the last one, blown out).
+ */
+function Smoke({ puff }: { puff?: boolean }) {
+  return (
+    <div className={`tm-smoke${puff ? " tm-puff" : ""}`}>
+      <div className="tm-wisp">
+        <svg viewBox="0 0 40 160">
+          <path d="M20 160 C6 136 34 120 20 96 C6 72 32 58 22 34 C16 20 26 10 20 0" fill="none" stroke="#e2e2ee" strokeWidth="6" strokeLinecap="round" />
+          <path d="M22 150 C32 128 12 112 24 90 C34 70 14 54 26 30" fill="none" stroke="#c4c4d6" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      </div>
+      {SMOKE_PUFFS.map((p, i) => (
+        <div key={i} className="tm-smoke-puff" style={{ "--s": `${p.size}%`, "--d": `${p.at}s`, "--dx": `${p.dx}%` } as CSSProperties} />
+      ))}
+    </div>
   );
 }
 
