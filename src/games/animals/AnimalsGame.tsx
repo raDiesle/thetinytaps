@@ -24,17 +24,8 @@ export const ANIMALS_TITLE: Localized = {
 /** All kinds taking turns, the first choice of „Was drankommt“ (worded as Schatten finden's „Gemischt“). */
 const MIXED: Localized = { de: "Gemischt", ru: "Вперемешку", en: "Mixed", zh: "混合", hi: "मिले-जुले", es: "Mezclado", ar: "منوعة" };
 
-/** The names of the five kinds of rounds, to choose one of them (after their sign, `KIND_SIGNS`). */
+/** The names of the four kinds of rounds, to choose one of them (after their sign, `KIND_SIGNS`). */
 const KIND_NAMES: Record<RoundKind, Localized> = {
-  peek: {
-    de: "Wer schaut da raus?",
-    ru: "Кто там выглядывает?",
-    en: "Who's peeking out?",
-    zh: "谁在偷偷看？",
-    hi: "कौन झाँक रहा है?",
-    es: "¿Quién se asoma?",
-    ar: "من يطل من هناك؟",
-  },
   feed: {
     de: "Tiere füttern",
     ru: "Покорми зверюшку",
@@ -80,7 +71,7 @@ export function AnimalsGame() {
   return (
     <GameShell
       title={t(ANIMALS_TITLE)}
-      // Nothing to choose first: its five kinds of rounds take turns and the game finds the difficulty itself, so its
+      // Nothing to choose first: its four kinds of rounds take turns and the game finds the difficulty itself, so its
       // card plays at once; ✕ and „Menü“ go back to the table of contents (GameShell), there is no start screen.
       // Grown-ups change both while playing (⚙️ held in the corner).
       startMode="play"

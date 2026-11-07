@@ -1,20 +1,10 @@
 import { GameShell } from "@/components/GameShell";
 import { useGameSettings } from "@/lib/common";
-import { type Localized, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
+import { SHADOWS_TITLE } from "./names";
 import { ShadowsPlay } from "./ShadowsPlay";
 import { DEFAULT_SHADOWS_SETTINGS, SHADOWS_SETTINGS_KEY } from "./settings";
 import "./shadows.css";
-
-/** The game's name, on its start screen and in the browser tab. */
-export const SHADOWS_TITLE: Localized = {
-  de: "Schatten finden",
-  ru: "Найди тень",
-  en: "Find the Shadow",
-  zh: "找影子",
-  hi: "परछाईं ढूँढो",
-  es: "Busca la sombra",
-  ar: "أين الظل؟",
-};
 
 export function ShadowsGame() {
   const t = useT();

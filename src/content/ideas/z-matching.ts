@@ -136,6 +136,7 @@ export const recognisingIdeas: IdeaArea = {
     {
       id: "Z-14",
       emoji: "🙈",
+      done: true,
       title: "Wer schaut da raus? zieht zu Schatten finden",
       text: "Wer schaut da raus? (X-04) verlässt Was gehört zum Tier? und wird eine zweite Art Runde in Schatten finden, im Wechsel mit den Schatten und auf einer gemeinsamen Treppe der Schwierigkeit: erst wenige, klar verschiedene Bilder, dann ähnliche, gedrehte, Stücke hinter Lücken im Busch. Hinter ⚙️ „Was drankommt“: Gemischt, Schatten oder Wer schaut da raus?. Was gehört zum Tier? behält Füttern, Was gibt uns das Tier?, Wer wohnt wo? und Was wird aus mir? – alles, was zum Tier gehört. Der Name der Karte kann dann über beides sprechen (etwa „Wer ist das?“); das entscheidet sich beim Umsetzen.",
       why: "Beides ist dasselbe Zuordnen: aus einem Teil das Ganze erkennen. PeekPlay, die Bühne und glyph.ts liegen schon in src/games/shadows/, und die Treppe von Schatten finden kennt schon ähnliche Umrisse. Was gehört zum Tier? wird dadurch klarer.",

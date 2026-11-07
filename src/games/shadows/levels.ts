@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { lookAlike, SHADOW_LOOKALIKES, type ShadowItem } from "./content";
+import { lookAlike, lookOf, PEEK_LOOKALIKES, SHADOW_LOOKALIKES, type ShadowItem } from "./content";
 import { shuffle } from "./deck";
 
 /**
@@ -103,4 +103,44 @@ export function dealShadows(item: ShadowItem, pool: ShadowItem[], level: ShadowL
   // With one theme only there are no others of another kind: then they come from the same one.
   const picks = (level.alike ? [...alike, ...unlike] : [...unlike, ...alike]).slice(0, level.shadows - 1);
   return shuffle([item, ...picks]);
+}
+
+/** How "Wer schaut da raus?" is played on a step. */
+export interface PeekLevel {
+  /** Whole animals to choose from below. */
+  choices: number;
+  /** The share of the animal that peeks out of the bush or the pond. */
+  show: number;
+  /** The other animals look like the hidden one (`PEEK_LOOKS`); else they look quite different. */
+  alike: boolean;
+  /**
+   * The animal hides wholly behind the bush and shows only through this many round gaps in its leaves, `r` stage
+   * units wide each. Out of the pond it still peeks out, by `show`.
+   */
+  holes?: { count: number; r: number };
+}
+
+/**
+ * The steps of „Wer schaut da raus?“, climbed by the same rule as the shadows' (`nextLevel`, on the rounds of this
+ * kind only) while the two kinds take turns: more animals to choose from and less to see, never quicker.
+ */
+export const PEEK_LEVELS: PeekLevel[] = [
+  { choices: 2, show: 0.5, alike: false },
+  { choices: 3, show: 0.42, alike: false },
+  { choices: 3, show: 0.32, alike: true },
+  { choices: 4, show: 0.3, alike: true },
+  { choices: 4, show: 0.22, alike: true },
+  { choices: 5, show: 0.22, alike: true, holes: { count: 3, r: 34 } },
+  { choices: 5, show: 0.18, alike: true, holes: { count: 2, r: 30 } },
+];
+
+/**
+ * The whole animals to choose from when `item` peeks out, in random order; the others as `level` says, never one whose
+ * peeking part looks like `item`'s (`PEEK_LOOKALIKES`).
+ */
+export function dealPeek(item: ShadowItem, pool: ShadowItem[], level: PeekLevel): ShadowItem[] {
+  const others = pool.filter((i) => i !== item && !lookAlike(PEEK_LOOKALIKES, i, item));
+  const alike = shuffle(others.filter((i) => lookOf(i) === lookOf(item)));
+  const unlike = shuffle(others.filter((i) => lookOf(i) !== lookOf(item)));
+  return shuffle([item, ...(level.alike ? [...alike, ...unlike] : unlike).slice(0, level.choices - 1)]);
 }

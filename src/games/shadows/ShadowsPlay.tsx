@@ -4,9 +4,22 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote, playRustle } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
-import { ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
+import { ITEMS, PEEK_ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
-import { choiceRows, dealShadows, nextLevel, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel, type ShadowPose } from "./levels";
+import {
+  choiceRows,
+  dealPeek,
+  dealShadows,
+  nextLevel,
+  PEEK_LEVELS,
+  poseShadows,
+  QUICK_STEPS,
+  SHADOW_LEVELS,
+  type PeekLevel,
+  type ShadowLevel,
+  type ShadowPose,
+} from "./levels";
+import { PeekPlay } from "./PeekPlay";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
 import { shadowsVoice } from "./voice";
 
@@ -85,9 +98,18 @@ function near(r: DOMRect, x: number, y: number) {
   return x > r.left - margin && x < r.right + margin && y > r.top - margin && y < r.bottom + margin;
 }
 
+/** A round of „Wer schaut da raus?“, which takes its turn after every picture that looked for its shadow. */
+interface PeekRound {
+  id: number;
+  item: ShadowItem;
+  choices: ShadowItem[];
+  level: PeekLevel;
+}
+
 /**
- * "Schatten finden" (N-07): drag the picture onto its shadow, or tap the right shadow. More shadows, and closer
- * ones, come as the child gets quicker and surer; fewer when it gets hard.
+ * „Erkennen“ (N-07 and X-04, Z-14): a picture looks for its shadow (drag it onto the shadow, or tap the right one), and
+ * after it an animal peeks out of a bush or the pond and the child taps the whole animal (`PeekPlay`) – the two kinds
+ * take turns, each climbing its own steps by how the child plays: more to choose from and closer ones, fewer when it gets hard.
  */
 export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const language = useAppLanguage();
@@ -95,6 +117,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const texts = pick(SHADOW_TEXTS, language.id);
   const [round, setRound] = useState<Round | null>(null);
   const [theme, setTheme] = useState<ShadowTheme>("all");
+  /** The round of „Wer schaut da raus?“ being played; null while a picture looks for its shadow. */
+  const [peek, setPeek] = useState<PeekRound | null>(null);
   /** The theme menu is open. */
   const [themesOpen, setThemesOpen] = useState(false);
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
@@ -130,6 +154,11 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const resultsRef = useRef<number[]>([]);
   /** Wrong shadows tapped in the current picture. */
   const missesRef = useRef(0);
+  /** The same for „Wer schaut da raus?“: its step (an index into `PEEK_LEVELS`) and the wrong animals in each round on it. */
+  const peekLevelRef = useRef(Math.min(PEEK_LEVELS.length - 1, Number(DEV && new URLSearchParams(window.location.search).get("level")) || 0));
+  const peekResultsRef = useRef<number[]>([]);
+  const peekId = useRef(0);
+  const drawPeek = useDeck(PEEK_ITEMS);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -161,6 +190,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     const shadows = dealShadows(item, poolRef.current, level);
     const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item), level, poses: poseShadows(shadows.length, level) };
     missesRef.current = 0;
+    setPeek(null);
     setRound(next);
     setDrag(null);
     setHover(null);
@@ -173,6 +203,27 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     say(texts.search(item));
     if (settings.sounds) later(400, () => item.sound?.());
   }, [settings.sounds, say, later]);
+
+  /** After a picture found its shadow: an animal peeks out, but only where animals are among the pictures; else the next picture. */
+  const advance = useCallback(() => {
+    if (themeRef.current !== "all" && themeRef.current !== "animals") {
+      nextRound();
+      return;
+    }
+    const item = drawPeek();
+    const level = PEEK_LEVELS[peekLevelRef.current];
+    setPeek({ id: peekId.current++, item, choices: dealPeek(item, PEEK_ITEMS, level), level });
+  }, [nextRound, drawPeek]);
+  const advanceRef = useRef(advance);
+  advanceRef.current = advance;
+
+  /** The right animal was picked after `misses` wrong ones: its round sets its own next step. */
+  const peekSolved = useCallback((misses: number) => {
+    const results = [...peekResultsRef.current, misses];
+    const level = nextLevel(peekLevelRef.current, results, PEEK_LEVELS.length - 1);
+    peekResultsRef.current = level === peekLevelRef.current ? results : [];
+    peekLevelRef.current = level;
+  }, []);
 
   // Start with a picture right away; settings can't change while playing.
   useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
@@ -234,7 +285,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       later(700, () => round.item.sound?.());
     }
     say(texts.found(round.item));
-    later(CELEBRATE_MS, nextRound);
+    later(CELEBRATE_MS, () => advanceRef.current());
   };
 
   /** Whether shadow `index` still lies under its flap: a tap or a drop there lifts the flap instead of picking it. */
@@ -362,7 +413,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   // Arrow keys (or any key) move the frame, Space or Enter picks, 1–4 pick straight away.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || !round || e.key === "Escape") return;
+      if (e.repeat || !round || peek || e.key === "Escape") return;
       if (outcome) {
         softTap();
         return;
@@ -393,6 +444,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   });
 
   if (!round) return null;
+  if (peek)
+    return <PeekPlay key={peek.id} settings={settings} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />;
 
   const won = outcome?.ok === true;
   const offset = landed ?? drag;

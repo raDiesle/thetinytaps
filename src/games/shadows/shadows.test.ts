@@ -1,9 +1,20 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { GERMAN_ONLY, ITEMS, lookAlike, PEEK_ITEMS, PEEK_LOOKALIKES, PEEK_LOOKS, SHADOW_LOOKALIKES, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
+import {
+  GERMAN_ONLY,
+  ITEMS,
+  lookAlike,
+  lookOf,
+  PEEK_ITEMS,
+  PEEK_LOOKALIKES,
+  PEEK_LOOKS,
+  SHADOW_LOOKALIKES,
+  SHADOW_TEXTS,
+  SHADOW_TRANSLATIONS,
+} from "./content";
 import { GRID, pickPeepholes } from "./glyph";
 import { RUSSIAN_NAMES } from "./content.ru";
-import { dealShadows, nextLevel, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel } from "./levels";
+import { dealPeek, dealShadows, nextLevel, PEEK_LEVELS, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -192,4 +203,29 @@ test("peepholes lie on drawn cells and never overlap", () => {
     for (const a of holes) for (const b of holes) if (a !== b) expect(Math.hypot((a.x - b.x) * 180, (a.y - b.y) * 180)).toBeGreaterThanOrEqual(60);
   }
   expect(pickPeepholes(new Array(GRID * GRID).fill(0), 180, 180, 3, 60)).toEqual([]);
+});
+
+test("the steps of „Wer schaut da raus?“ only get harder, and every round offers exactly one right animal", () => {
+  PEEK_LEVELS.forEach((level, i) => {
+    const before = PEEK_LEVELS[i - 1];
+    expect(level.choices).toBeLessThanOrEqual(5);
+    if (before) {
+      expect(level.choices).toBeGreaterThanOrEqual(before.choices);
+      expect(level.show).toBeLessThanOrEqual(before.show);
+      expect(before.alike && !level.alike).toBe(false);
+    }
+    for (const item of PEEK_ITEMS) {
+      const choices = dealPeek(item, PEEK_ITEMS, level);
+      expect(choices.length).toBe(level.choices);
+      expect(new Set(choices).size).toBe(choices.length);
+      expect(choices.filter((c) => c === item).length).toBe(1);
+      // Easy steps offer animals that look quite different; harder ones as many alike as there are.
+      const alike = choices.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
+      const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item) && !lookAlike(PEEK_LOOKALIKES, c, item)).length;
+      expect(alike).toBe(level.alike ? Math.min(kin, level.choices - 1) : 0);
+      // Exactly one fits: nothing whose peeking part looks like the hidden animal's is offered with it (X-14).
+      for (const c of choices) expect(lookAlike(PEEK_LOOKALIKES, c, item), `${item.id} ${c.id}`).toBe(false);
+    }
+  });
+  expect(PEEK_LEVELS[0]).toMatchObject({ choices: 2, alike: false });
 });

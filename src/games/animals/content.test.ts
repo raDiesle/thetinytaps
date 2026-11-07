@@ -4,11 +4,11 @@ import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GERMAN_ONLY, GIFT_TE
 import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOME_LOOKALIKES, HOMES, type HomeId } from "./homes";
-import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
+import { PEEK_ITEMS } from "@/games/shadows/content";
 import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./growth";
 import { KIND_SIGNS } from "./RoundTopic";
 import { DEFAULT_ANIMALS_SETTINGS } from "./settings";
-import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
+import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -140,10 +140,10 @@ test("all kinds take turns in their order, or only the one chosen; no kind is sw
     for (let i = 0; i < 6; i++) played.push(nextKind(played[played.length - 1], kinds));
     return played;
   };
-  expect(turns("all")).toEqual(["peek", "feed", "gift", "home", "grow", "peek", "feed"]);
+  expect(turns("all")).toEqual(["feed", "gift", "home", "grow", "feed", "gift", "home"]);
   expect(turns("home")).toEqual(["home", "home", "home", "home", "home", "home", "home"]);
   // One kind chosen while another plays: the next round is the chosen one.
-  expect(nextKind("feed", "peek")).toBe("peek");
+  expect(nextKind("feed", "grow")).toBe("grow");
   expect(DEFAULT_ANIMALS_SETTINGS.kinds).toBe("all");
   for (const kind of KIND_ORDER) expect(kind in DEFAULT_ANIMALS_SETTINGS, kind).toBe(false);
   // The fixed difficulties are steps there are, easy to hard.
@@ -152,22 +152,18 @@ test("all kinds take turns in their order, or only the one chosen; no kind is sw
   expect(FIXED_LEVELS.hard).toBe(ANIMAL_LEVELS.length - 1);
 });
 
-test("the rounds take turns starting with who peeks out, and the steps only get harder", () => {
-  expect(KIND_ORDER[0]).toBe("peek");
-  expect(new Set(KIND_ORDER).size).toBe(5);
+test("the rounds take turns starting with feeding, and the steps only get harder", () => {
+  expect(KIND_ORDER[0]).toBe("feed");
+  expect(new Set(KIND_ORDER).size).toBe(4);
   ANIMAL_LEVELS.forEach((level, i) => {
     const before = ANIMAL_LEVELS[i - 1];
     expect(level.choices).toBeGreaterThanOrEqual(2);
     expect(level.choices).toBeLessThanOrEqual(4);
-    expect(level.peek.choices).toBeLessThanOrEqual(5);
     if (!before) return;
     expect(level.choices).toBeGreaterThanOrEqual(before.choices);
-    expect(level.peek.choices).toBeGreaterThanOrEqual(before.peek.choices);
-    expect(level.peek.show).toBeLessThanOrEqual(before.peek.show);
-    expect(before.peek.alike && !level.peek.alike).toBe(false);
   });
   // The easiest round comes first.
-  expect(ANIMAL_LEVELS[0]).toMatchObject({ choices: 2, peek: { choices: 2, alike: false } });
+  expect(ANIMAL_LEVELS[0]).toMatchObject({ choices: 2 });
 });
 
 test("every round offers exactly one right choice among as many as its step says", () => {
@@ -195,18 +191,6 @@ test("every round offers exactly one right choice among as many as its step says
       expect(new Set(r.gifts).size).toBe(r.gifts.length);
       expect(r.gifts[r.correct].id).toBe(animal.gives!);
       for (const g of r.gifts) if (g.id !== animal.gives) expect(animal.alsoGives, animal.id).not.toContain(g.id);
-    }
-    for (const item of PEEK_ITEMS) {
-      const choices = dealPeek(item, PEEK_ITEMS, level.peek);
-      expect(choices.length).toBe(level.peek.choices);
-      expect(new Set(choices).size).toBe(choices.length);
-      expect(choices.filter((c) => c === item).length).toBe(1);
-      // Easy steps offer animals that look quite different; harder ones as many alike as there are.
-      const alike = choices.filter((c) => c !== item && lookOf(c) === lookOf(item)).length;
-      const kin = PEEK_ITEMS.filter((c) => c !== item && lookOf(c) === lookOf(item) && !lookAlike(PEEK_LOOKALIKES, c, item)).length;
-      expect(alike).toBe(level.peek.alike ? Math.min(kin, level.peek.choices - 1) : 0);
-      // Exactly one fits: nothing whose peeking part looks like the hidden animal's is offered with it (X-14).
-      for (const c of choices) expect(lookAlike(PEEK_LOOKALIKES, c, item), `${item.id} ${c.id}`).toBe(false);
     }
   }
 });
