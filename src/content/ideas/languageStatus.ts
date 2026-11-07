@@ -236,7 +236,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "Wie geht's dir? und Kindergarten",
         recorded: true,
         languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. „Wie geht's dir?“ und „Was brauche ich?“ stehen seit dem 7. November 2026 (C-73) in allen Sprachen auf der Aufnahmeliste (`bun run voice make --only gefuehle`); neu dazu sagt die Stimme den Namen des getippten Gefühls („Traurig“), noch in keiner Sprache aufgenommen.",
       },
       {
         label: "Zu Hause",
