@@ -52,7 +52,7 @@ until the time is up:
   `--tm-i`/`--tm-of`), each burning all the way down into its puddle and only then going out, its smoke (`Smoke`: a
   wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the bear child leans over and blows
   the last one out.
-- „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): one round hill, its meadow full of flowers drawn as coloured dots
+- „Sonnenaufgang“ 🌅 (`sunset.tsx`, id `sunset`, H-54; „Sonnenuntergang“ until the moon came first, November 2026): one round hill, its meadow full of flowers drawn as coloured dots
   (`FLOWERS`), and a big moon exactly in the picture's middle. First the moon goes down behind the hill (gone at
   `MOON_SET_AT`) while the stars go out one by one (`STARS`, each at its share of the time), the night's sky and then the
   morning's pink fade away and the land grows light; then the big sun rises at the very same place (from `SUN_FROM`),

@@ -59,7 +59,9 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
   {
     id: "sunset",
     emoji: "🌅",
-    name: { de: "Sonnenuntergang", en: "Sunset", zh: "日落", hi: "सूर्यास्त", es: "Atardecer", ar: "غروب الشمس", ru: "Закат" },
+    // Renamed from „Sonnenuntergang“ when the picture turned into a sunrise (November 2026); its id stays, so a kept choice
+    // still finds it. The old translations meant a sunset and were dropped until translations are asked for.
+    name: { de: "Sonnenaufgang" },
   },
   {
     id: "ants",

@@ -1,7 +1,7 @@
 import { memo, type CSSProperties, type ReactNode } from "react";
 import { Draw, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
-// Sonnenuntergang (H-54): one round hill with a meadow full of flowers, drawn as coloured dots, and one big moon right
+// Sonnenaufgang (H-54, once „Sonnenuntergang“; its id and this file keep the old name `sunset`): one round hill with a meadow full of flowers, drawn as coloured dots, and one big moon right
 // in the picture's middle. First the moon goes down behind the hill while the stars go out one by one, the night's sky
 // gives way to the morning's pink and the land grows light; then the big sun rises at the very same place, red at
 // first and yellow as it climbs, until it stands high over the meadow at the end (user feedback, November 2026: no

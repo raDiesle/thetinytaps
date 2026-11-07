@@ -125,7 +125,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als Bild „Sonnenuntergang“, später umgedreht (Wunsch, November 2026): Ein großer Mond steht genau in der Mitte über einer Wiese voller Blumenpunkte und geht hinter dem Hügel unter, die Sterne gehen nacheinander aus, der Himmel wird morgenrosa und hell, dann geht an derselben Stelle die große Sonne auf, erst rot, dann gelb. Windmühle und Häuschen sind wieder weg. Jede Sekunde leuchtet ein weicher Lichtkranz um Mond oder Sonne auf.",
+        "Gebaut als Bild „Sonnenuntergang“, später umgedreht und „Sonnenaufgang“ genannt (Wunsch, November 2026): Ein großer Mond steht genau in der Mitte über einer Wiese voller Blumenpunkte und geht hinter dem Hügel unter, die Sterne gehen nacheinander aus, der Himmel wird morgenrosa und hell, dann geht an derselben Stelle die große Sonne auf, erst rot, dann gelb. Windmühle und Häuschen sind wieder weg. Jede Sekunde leuchtet ein weicher Lichtkranz um Mond oder Sonne auf.",
     },
     {
       id: "H-55",

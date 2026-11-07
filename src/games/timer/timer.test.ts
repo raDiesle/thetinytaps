@@ -353,7 +353,7 @@ describe("Timer", () => {
   // was cut off there, so the new pictures keep what matters within 1340.
   const RIGHT = 1340;
 
-  test("Sonnenuntergang: a big moon and sun in the very middle, the moon setting first, then the sun rising, behind the ridge (H-54)", () => {
+  test("Sonnenaufgang: a big moon and sun in the very middle, the moon setting first, then the sun rising, behind the ridge (H-54)", () => {
     // Both exactly in the middle and big (user feedback, November 2026), and the cut of their boxes always hidden below the ridge.
     for (const { cx, r } of [SUN, MOON]) {
       expect(cx).toBe(STAGE_W / 2);
