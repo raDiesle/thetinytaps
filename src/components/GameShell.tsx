@@ -18,6 +18,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
+import { canTestUnfinished } from "@/lib/localTest";
 import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
@@ -91,6 +92,11 @@ export interface GameMode {
    * cards whose picture says it all (the Timer's pictures as they look at their end).
    */
   art?: ReactNode;
+  /**
+   * Still being built: the card says „in Bearbeitung“ and starts only where it may be tested (`canTestUnfinished`: the
+   * dev server or this computer); on the real site it stands greyed out and does nothing.
+   */
+  unfinished?: true;
 }
 
 /** How much wider than tall a card that is a picture (`GameMode.art`) looks best: about a screen's shape. */
@@ -120,6 +126,11 @@ interface GameShellProps {
   leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
+  /**
+   * Puts `level` into the menu's head, as Lebendige Bilder's menu does: on a phone on its side beside the way back, in
+   * the room the corner or ribbon takes anyway, so a menu with many cards (the Timer's twelve) still shows them all.
+   */
+  levelInHead?: boolean;
   /** Parent-facing options shown on the start screen; left out where the game needs none. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -148,7 +159,21 @@ export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo"
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: the corner's ✕ (a tap, or held where
  * grown-ups chose so), or holding Esc – children press Esc while typing, so it is always held.
  */
-export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, level, settings, tool, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({
+  title,
+  modes,
+  mode,
+  onMode,
+  startMode,
+  leaveTo,
+  level,
+  levelInHead,
+  settings,
+  tool,
+  children,
+  backHref,
+  backLabel,
+}: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
@@ -343,37 +368,58 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
   // Nothing to show before the game starts at once, or after it was left.
   if (menu) return null;
 
-  /** One mode's card. */
-  const card = (m: GameMode) => (
-    <li key={m.id}>
-      <button
-        type="button"
-        className={`game-card mode-card${m.art ? " mode-art-card" : ""}`}
-        onClick={() => pick(m.id)}
-        aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
-        title={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
-      >
-        {m.art ? (
-          <span className="mode-art">{m.art}</span>
-        ) : (
-          <>
-            <span className="game-emoji" aria-hidden>
-              {m.emoji}
-            </span>
-            <span className="game-title">
-              {m.title}
-              {m.note && <small className="game-note">{m.note}</small>}
-            </span>
-          </>
-        )}
-        {m.id === mode && (modes?.length ?? 0) > 1 && (
-          <span className="badge">
-            {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
-          </span>
-        )}
-      </button>
-    </li>
+  /** „in Bearbeitung“ on a card still being built (`GameMode.unfinished`). */
+  const unfinishedBadge = (
+    <span className="badge">
+      {t({ de: "in Bearbeitung", ru: "в работе", en: "in progress", zh: "制作中", hi: "तैयार हो रहा है", es: "en preparación", ar: "قيد الإعداد" })}
+    </span>
   );
+
+  /** One mode's card; one still being built stands greyed out where it can't be tested. */
+  const card = (m: GameMode) =>
+    m.unfinished && !canTestUnfinished() ? (
+      <li key={m.id}>
+        <div className="game-card mode-card disabled" aria-disabled>
+          <span className="game-emoji" aria-hidden>
+            {m.emoji}
+          </span>
+          <span className="game-title">{m.title}</span>
+          {unfinishedBadge}
+        </div>
+      </li>
+    ) : (
+      <li key={m.id}>
+        <button
+          type="button"
+          className={`game-card mode-card${m.art ? " mode-art-card" : ""}`}
+          onClick={() => pick(m.id)}
+          aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
+          title={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
+        >
+          {m.art ? (
+            <span className="mode-art">{m.art}</span>
+          ) : (
+            <>
+              <span className="game-emoji" aria-hidden>
+                {m.emoji}
+              </span>
+              <span className="game-title">
+                {m.title}
+                {m.note && <small className="game-note">{m.note}</small>}
+              </span>
+            </>
+          )}
+          {m.unfinished
+            ? unfinishedBadge
+            : m.id === mode &&
+              (modes?.length ?? 0) > 1 && (
+                <span className="badge">
+                  {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
+                </span>
+              )}
+        </button>
+      </li>
+    );
 
   const pick = (id: string) => {
     onMode?.(id);
@@ -398,7 +444,9 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
             />
           )
         }
-      />
+      >
+        {levelInHead && level && <div className="mode-level">{level}</div>}
+      </MenuHead>
       {settingsOpen && settings && <section className="settings">{settings}</section>}
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
           cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}
@@ -416,7 +464,7 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
             ar: "اختيار طريقة اللعب",
           })}
         >
-          {level && <div className="mode-level">{level}</div>}
+          {!levelInHead && level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {groups
               ? groups.map((g, i) => (

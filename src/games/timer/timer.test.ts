@@ -453,6 +453,12 @@ describe("Timer", () => {
     expect(FLIGHT_MS).toBeGreaterThanOrEqual(2000);
   });
 
+  // November 2026: below the head, the row of lengths left a phone on its side too little room for the twelve cards, and
+  // the Abwechseln group fell below the screen. In the head it stands beside the ribbon, in room taken anyway.
+  test("the row of lengths stands in the menu's head, so every card fits on a phone on its side", async () => {
+    expect(await Bun.file("src/games/timer/TimerGame.tsx").text()).toMatch(/<GameShell\s(?:(?!<\/GameShell|\/>\n)[\s\S])*?\slevelInHead\b/);
+  });
+
   // User request, November 2026: Abwechseln's hourglass is the Sanduhr's own, not a second one built beside it.
   test("Abwechseln and Sanduhr draw the one shared hourglass", async () => {
     const swap = await Bun.file("src/games/timer/swap.tsx").text();

@@ -21,7 +21,9 @@ the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stan
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then Tennis, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
-cards still fit on one screen. The Ameisenstraße (H-68) was
+cards still fit on one screen. The row of lengths stands in the menu's head (`levelInHead`), on a phone on its side
+beside the ribbon: under the head it left the cards too little room there, and the Abwechseln group fell below the
+screen (November 2026; `timer.test.ts` checks). The Ameisenstraße (H-68) was
 taken out (user request, November 2026). The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
