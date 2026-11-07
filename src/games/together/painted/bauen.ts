@@ -95,6 +95,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["whirr", "thump"],
     alsoFits: ["bauarbeiterin", "baggerfahrer"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "klempner",

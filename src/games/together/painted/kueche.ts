@@ -98,7 +98,7 @@ export const PAINTED: PaintedPair[] = [
       "The fox child now holds a kitchen turner with a silver slotted blade, the blade under the pancake in the pan, lifting it a little so its golden underside shows; the grown-up fox's paw lies over the child's paw on the handle. Both laugh happily.",
     sounds: ["sizzle", "whoosh"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
   {
     id: "toaster-toast",

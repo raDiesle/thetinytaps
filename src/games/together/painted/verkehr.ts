@@ -109,6 +109,7 @@ export const PAINTED: PaintedPair[] = [
       "A tram now stands on the rails at the platform, its pole touching the wire above and its front door open; the fox stays on the platform where he was, one paw on the open door, smiling happily.",
     sounds: ["bells", "train"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "motorradfahrerin",

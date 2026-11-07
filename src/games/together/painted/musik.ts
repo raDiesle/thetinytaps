@@ -91,10 +91,11 @@ export const PAINTED: PaintedPair[] = [
     part: "a shiny black grand piano with its lid propped open and its black and white keys, black and white only, no other colour",
     cast: "both",
     before:
-      "A festive hall with garlands and a polished wooden floor. In its middle stands a round black stool all alone, a big empty space in front of it. On a chair at the side sits a little bear child in a party hat, waiting. On the stool sits the musician, a grown-up fox woman with eyelashes in a lilac dress with a white collar, her empty paws in her lap, looking at the empty space in front of her, brows raised, mouth a small o.",
+      "A festive hall with garlands and a polished wooden floor. In its middle stands a round black stool all alone, a big empty space in front of it, no piano anywhere. On a chair at the side sits a little bear child in a party hat, waiting. Nothing floats above anyone's head. On the stool sits the musician, a grown-up fox woman with eyelashes in a lilac dress with a white collar, her empty paws in her lap, looking at the empty space in front of her, brows raised, mouth a small o.",
     after:
       "A shiny black grand piano now stands in front of the stool, its lid propped open; the musician, still on the stool, plays its black and white keys, smiling. The bear child bobs along happily.",
     sounds: ["plink", "melody"],
+    made: "part",
   },
   {
     id: "akkordeonspieler",
@@ -124,6 +125,7 @@ export const PAINTED: PaintedPair[] = [
     after: "The musician now holds a golden saxophone and plays it, cheeks round, eyes happy. The bear child sways along, smiling.",
     sounds: ["melody"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "floetenspieler",
@@ -156,7 +158,7 @@ export const PAINTED: PaintedPair[] = [
       "A tall golden harp with many strings now stands beside the stool; the musician, still on the stool, plucks its strings with both paws, smiling. The fox child listens dreamily.",
     sounds: ["plink", "melody"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
   {
     id: "xylofonspieler",

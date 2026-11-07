@@ -80,7 +80,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A green mountain meadow under a blue sky, snowy peaks behind. On the right lies an empty round landing pad, a flat grey circle with a white ring painted on it. On the left stands the rescue pilot, a grown-up bear woman with eyelashes in a red flight suit and a white flying helmet, her paws empty; beside her a little white lamb with a bandaged front leg sits on a blue blanket. Both look at the empty landing pad, brows raised, mouth a small o.",
     after:
-      "A red rescue helicopter now stands on the landing pad, its rotor still and its side door open. The pilot and the lamb stay exactly where they were, both smiling at it.",
+      "A plain red rescue helicopter with no cross, flag or emblem on it now stands on the landing pad, its rotor still and its side door open. The pilot and the lamb stay exactly where they were, both smiling at it.",
     sounds: ["rotor"],
     alsoFits: ["pilot", "sanitaeter", "feuerwehrfrau"],
     fromFirst: true,

@@ -82,7 +82,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["slide", "whoosh"],
     alsoFits: ["see-schlittschuhe", "schal-handschuhe"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
   {
     id: "drachen-wind",
@@ -130,6 +130,6 @@ export const PAINTED: PaintedPair[] = [
       "The fox child now pushes a snow shovel with a wide red blade along the path, the grown-up fox helping with one paw on the handle; a cleared strip of path lies behind them. Both smile happily.",
     sounds: ["crunch", "slide"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
 ];

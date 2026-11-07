@@ -36,6 +36,7 @@ export const PAINTED: PaintedPair[] = [
     // Candles would go on a Christmas tree too.
     alsoFits: ["torte-kerze"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "osterei-pinsel",
@@ -104,7 +105,7 @@ export const PAINTED: PaintedPair[] = [
       "Four pastel Easter eggs, each painted with stripes and dots in several colours, now lie in the nest, and the fox child points at them, smiling happily.",
     sounds: ["plop", "twinkle"],
     alsoFits: ["osterei-pinsel"],
-    made: "frames",
+    made: true,
   },
   {
     id: "plaetzchenteig-ausstechform",

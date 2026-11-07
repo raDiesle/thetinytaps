@@ -84,9 +84,10 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   the beach, a mine with its cart on rails, a kitten up a tree for the fire engine's ladder. Name the few things that
   tell the place in `before`, nothing more.
 - **Only partners that look one way**: a thing a child knows by one look (a carrot, a key, a life ring), never one that
-  looks very different from home to home (a charging cable was removed). Emblems on things (a shield, a flag, a coat)
+  looks very different from home to home (a charging cable was removed). Emblems on things (a shield, a flag, a coat, a vehicle)
   are neutral – a star, a paw, stripes – never a religious or national sign, since children in every app language play
-  it (the knight's shield had a cross and was redrawn with a star, November 2026).
+  it (the knight's shield had a cross and was redrawn with a star, a rescue helicopter came with a Swiss cross; November
+  2026) – say so in the words of anything that often carries one.
 - **The partner on its plate looks like the partner in the second picture**: its emoji only where Apple's emoji
   matches it (🍊, 🦌, 🥕), else a `part` whose words describe it as the second frame shows it (Apple's 🕯️ stands on a
   metal dish – birthday candles don't); check the plate against the frame and redraw the part where they differ.

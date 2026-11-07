@@ -49,6 +49,7 @@ export const PAINTED: PaintedPair[] = [
       "A restaurant kitchen with a steel counter. On the stove a big pot of steaming orange soup; on the counter a row of three empty white bowls. At the counter waits a fox child in a striped T-shirt, holding out an empty bowl with both paws, hungry. The cook, a grown-up bear in a white chef's coat, a white chef's hat and a red neckerchief, stands at the pot with empty paws, looking from the soup to the empty bowls, brows raised, mouth a small o.",
     after: "The cook now ladles soup with a big silver ladle into the child's bowl; steam rises, and the child and the cook smile happily.",
     sounds: ["trickle", "yum"],
+    fromFirst: true,
     made: "part",
   },
   {
@@ -132,6 +133,6 @@ export const PAINTED: PaintedPair[] = [
       "An open round black waffle iron with a long handle on each side now stands on the counter, a golden heart-shaped waffle steaming in it; the waffle baker lifts the waffle onto the child's plate. Both smile happily.",
     sounds: ["sizzle", "yum"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
 ];

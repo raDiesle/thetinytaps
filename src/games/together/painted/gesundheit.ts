@@ -66,6 +66,6 @@ export const PAINTED: PaintedPair[] = [
     after:
       "An eye chart with rows of simple black pictures (a house, an apple, a car, a star), each row smaller, no letters, now hangs on the bare wall; the eye doctor points at the house with her stick and the fox child names it, happily.",
     sounds: ["ding", "giggle"],
-    made: "frames",
+    made: true,
   },
 ];

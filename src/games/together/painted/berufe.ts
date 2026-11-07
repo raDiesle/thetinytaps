@@ -47,7 +47,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A launch site at dusk: a tall steel launch tower beside an empty round concrete launch pad, a big round moon low in the sky above. The astronaut, a grown-up bear woman with eyelashes in a plain white spacesuit with no badge, logo, flag or letters, holds her round helmet under one arm, the other paw empty, and looks from the empty launch pad up to the moon, brows raised, mouth a small o.",
     after:
-      "A white rocket with red fins and a red tip now stands on the launch pad beside the tower and lifts off with a bright flame and clouds of smoke; the astronaut waves happily from its round window, her helmet on.",
+      "A white rocket with red fins and a red tip now stands on the launch pad beside the tower and stands still, ready to fly, nobody inside it and nothing in its windows; the astronaut stays where she was, her helmet under her arm, and smiles happily at it.",
     sounds: ["launch"],
     alsoFits: ["sternguckerin"],
     fromFirst: true,
@@ -67,6 +67,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["squeak", "scrub"],
     alsoFits: ["obstbaeuerin"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "fotograf",
@@ -113,7 +114,7 @@ export const PAINTED: PaintedPair[] = [
       "The jacket lies on the table where it was; the tailor now pushes a long silver needle with red thread through its sleeve at the rip, a wooden spool of red thread in her other paw, and half of the rip is already sewn shut with big red stitches. She smiles happily.",
     sounds: ["whirr"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
   {
     id: "forscherin",

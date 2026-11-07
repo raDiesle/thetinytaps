@@ -74,7 +74,7 @@ export const PAINTED: PaintedPair[] = [
     the: "die Fee",
     toThe: "die Fee",
     partner: { name: "Zauberstab", the: "der Zauberstab", acc: "den Zauberstab" },
-    part: "a slim magic wand, its whole shaft white, a little golden star at its tip, nothing round it",
+    part: "a slim white stick with a small solid golden star on its tip, a fairy's wand; no glow, no light and no rays round it",
     cast: "fox",
     before:
       "A garden at night under a full moon, a big round orange pumpkin lying on the grass in the middle. Beside the pumpkin stands the fairy, a grown-up fox woman with eyelashes in a pink dress with gauzy lilac wings and a flower wreath in her hair, her paws empty, looking at the pumpkin, brows raised, mouth a small o.",
@@ -289,5 +289,6 @@ export const PAINTED: PaintedPair[] = [
     // Swimming goggles let one look under water too.
     alsoFits: ["schwimmer"],
     fromFirst: true,
+    made: "frames",
   },
 ];

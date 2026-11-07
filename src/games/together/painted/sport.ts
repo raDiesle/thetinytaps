@@ -83,6 +83,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["snap", "splash"],
     // Armbands and a life ring are for the water too, and one can look under water from a submarine.
     alsoFits: ["schwimmlehrer", "rettungsschwimmerin", "tiefseeforscherin"],
+    made: true,
   },
   {
     id: "skifahrerin",
@@ -235,12 +236,11 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Fahrrad", the: "das Fahrrad", acc: "das Fahrrad", emoji: "🚲" },
     cast: "bear",
     before:
-      "A country road winding through green hills to a little village far away. At the roadside stands a grown-up bear woman with eyelashes in a yellow sports shirt with green stripes and a green helmet, her paws empty, looking down the long road to the far village, brows raised, mouth a small o.",
+      "A country road winding through green hills to a little village far away. At the roadside, seen whole from her helmet to her feet with room round her, stands a grown-up bear woman with eyelashes in a yellow sports shirt with green stripes and a green helmet, her paws empty, looking down the long road to the far village, brows raised, mouth a small o.",
     after: "She now stands where she was, astride a green bicycle, both paws on its handlebars and one foot on a pedal, ready to ride off, smiling happily.",
     sounds: ["ring", "whoosh"],
     // A motorbike and a unicycle go down a road too.
     alsoFits: ["motorradfahrerin", "einradfahrer"],
-    fromFirst: true,
   },
   {
     id: "kletterin",
@@ -259,7 +259,7 @@ export const PAINTED: PaintedPair[] = [
     // A sailor ties his boat with a rope, and a trapeze hangs from ropes.
     alsoFits: ["segler", "akrobatin"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
   {
     id: "reiterin",

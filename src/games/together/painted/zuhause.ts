@@ -67,6 +67,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["knocks"],
     alsoFits: ["schraube-schraubenzieher"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "besen-kehrschaufel",
