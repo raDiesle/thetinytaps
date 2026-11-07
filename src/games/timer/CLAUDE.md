@@ -8,10 +8,11 @@ Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds ask
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
 grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
-note, as tally marks in bundles of five that go one by one (`shown.tsx`, kept as `showTime`; user request, November
-2026): by default „Striche in %“, ten marks each a tenth of the run (`PERCENT_MARKS`), so a short and a long timer look
-alike; behind ⚙️ its „Zeit im Bild“ switches to „Striche in Zeit“ (each mark 10 s up to 15 min, `markUnit`, at most
-`MAX_MARKS`), „Zahlen“ (digits) or „Aus“. The child sees no numbers, only the picture and the marks running down.
+note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Zahlen“, `digits`, e.g. „4:37“; user
+request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
+in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
+for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
+`MAX_MARKS`) – or „Aus“.
 The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
 there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
 screen), then the pictures that run until the time is up:
@@ -133,8 +134,11 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   off there (`RIGHT` in `timer.test.ts`).
 - **A clock time behind us is never quietly tomorrow's** (H-60): the sheet asks „Bis morgen um …?“ and keeps the answer
   for that day only (`tomorrowFrom`); a kept „bis 17:30“ started after 17:30 asks again before it runs (`TimerStart`).
-  Numbers are for grown-ups: in the row, the sheet and behind ⚙️; in the picture only when a grown-up chose „Zeit im
-  Bild“ there (off by default, user request, November 2026), small in the bottom left corner, letting taps through.
+  The time left stands small in the picture's bottom right corner, letting taps through: minutes and seconds by default,
+  tally marks or nothing when a grown-up chooses so behind ⚙️ („Zeit im Bild“).
+- **Tally marks start many** (user feedback, November 2026: ten were too few to see them go): every way of marks starts
+  with a full row or, for a short time, one a second (10 s: ten marks), never a handful (`timer.test.ts` checks). A
+  changed default of `timeNote` gets the field a new name, or everyone who played before keeps the old one.
 - **Every second a small step, never a blink** (H-63): what beats once a second is a small layer of its own (`.tm-beat`)
   moving by `transform` and `opacity` – the wheels are small layers riding in the train's, not groups in its svg – and
   stands still at the end (`.tm-done`). Anything new that moves the whole run long snaps to its last place there too.

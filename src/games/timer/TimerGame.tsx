@@ -83,7 +83,7 @@ export function TimerGame() {
         settings={{ ...settings, picture, seconds, useOwn }}
         onPicture={(picture) => update({ picture })}
         onToy={(toy) => update({ toy })}
-        onShown={(showTime) => update({ showTime })}
+        onShown={(timeNote) => update({ timeNote })}
       />
     </GameShell>
   );

@@ -182,7 +182,7 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
-        timeShown={settings.showTime}
+        timeShown={settings.timeNote}
         onShown={onShown}
         onAgain={onAgain}
         onPicture={onPicture}
@@ -197,7 +197,7 @@ function TimerStart({
       total={ms}
       set={set}
       until={until}
-      shown={settings.showTime}
+      shown={settings.timeNote}
       onShown={onShown}
       onAgain={onAgain}
       onPicture={onPicture}

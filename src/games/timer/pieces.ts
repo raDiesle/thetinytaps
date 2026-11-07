@@ -196,14 +196,22 @@ export function ladybugLaps(ms: number): { dots: number; every: number; laps: nu
   return { dots, every, laps: dots * every };
 }
 
-/** What a tally mark can stand for, from short to long; the shortest is taken that needs no more than `MAX_MARKS`. */
-export const MARK_UNITS = [10_000, 30_000, 60_000, 5 * 60_000, 10 * 60_000, 15 * 60_000] as const;
+/**
+ * What a tally mark can stand for, from short to long; the shortest is taken that needs no more than `MAX_MARKS`, so
+ * a short timer starts with many marks too (10 s: ten marks of a second, not a single one).
+ */
+export const MARK_UNITS = [1000, 2000, 5000, 10_000, 30_000, 60_000, 5 * 60_000, 10 * 60_000, 15 * 60_000] as const;
 
 /** At most this many tally marks stand at the start, so they fit in a row of six bundles of five. */
 export const MAX_MARKS = 30;
 
-/** How many tally marks stand at the start with „Striche in %“, the default: one for each tenth of the run. */
-export const PERCENT_MARKS = 10;
+/**
+ * How many tally marks stand at the start with „Striche in %“: many, a full row (ten were too few, user feedback,
+ * November 2026), but never more than one per second of the run, so none goes quicker than a second.
+ */
+export function percentMarks(total: number): number {
+  return Math.max(1, Math.min(MAX_MARKS, Math.round(total / 1000)));
+}
 
 /** How long one tally mark stands for in a run of `total` ms („Zeit im Bild: Striche in Zeit“). */
 export function markUnit(total: number): number {

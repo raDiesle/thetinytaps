@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Choice } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
-import { markUnit, marksLeft, PERCENT_MARKS } from "./pieces";
+import { markUnit, marksLeft, percentMarks } from "./pieces";
 import type { TimeShown } from "./settings";
 import { digits } from "./time";
 
 // „Zeit im Bild“ (user requests, November 2026): the time left stands in the picture's bottom right corner, by default
-// as ten tally marks that go one by one, each a tenth of the run – so every timer, short or long, shows how much is
-// left the same way. Behind ⚙️ grown-ups may switch to marks for a stretch of time each, to digits, or off. A small
-// paper note of its own outside the stage, ticking once a second, so the big drawing is never painted again.
+// as minutes and seconds. Behind ⚙️ grown-ups may switch to tally marks that go one by one – a full row of them, each a
+// share of the run, or each a stretch of time – or off. A small paper note of its own outside the stage, ticking once
+// a second, so the big drawing is never painted again.
 
 /** The choice behind ⚙️ while a timer runs: the time left in the picture or not, and how. */
 export function TimeShownChoice({ value, onChange }: { value: TimeShown; onChange: (shown: TimeShown) => void }) {
@@ -19,9 +19,9 @@ export function TimeShownChoice({ value, onChange }: { value: TimeShown; onChang
       value={value}
       onChange={(v) => onChange(v as TimeShown)}
       options={[
+        { value: "digits", label: t({ de: "Zahlen" }) },
         { value: "percent", label: t({ de: "Striche in %" }) },
         { value: "marks", label: t({ de: "Striche in Zeit" }) },
-        { value: "digits", label: t({ de: "Zahlen" }) },
         { value: "off", label: t({ de: "Aus" }) },
       ]}
     />
@@ -47,7 +47,7 @@ function Tally({ count }: { count: number }) {
 
 /**
  * The time left to `endsAt`, shown as `shown` says (nothing when off or once the time is up); `total` is the whole
- * run, which sets what a tally mark stands for: a tenth of it, or a stretch of time (`markUnit`).
+ * run, which sets what a tally mark stands for: a share of it (`percentMarks`), or a stretch of time (`markUnit`).
  */
 export function TimeShownNote({ shown, endsAt, total }: { shown: TimeShown; endsAt: number; total: number }) {
   const [now, setNow] = useState(Date.now);
@@ -62,7 +62,7 @@ export function TimeShownNote({ shown, endsAt, total }: { shown: TimeShown; ends
   if (shown === "off" || left <= 0) return null;
   return (
     <div className={`tm-shown tm-shown-${shown === "percent" ? "marks" : shown}`} aria-hidden>
-      {shown === "digits" ? <b>{digits(left)}</b> : <Tally count={marksLeft(left, shown === "percent" ? total / PERCENT_MARKS : markUnit(total))} />}
+      {shown === "digits" ? <b>{digits(left)}</b> : <Tally count={marksLeft(left, shown === "percent" ? total / percentMarks(total) : markUnit(total))} />}
     </div>
   );
 }

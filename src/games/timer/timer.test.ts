@@ -20,7 +20,7 @@ import {
   MIN_APPLES,
   markUnit,
   marksLeft,
-  PERCENT_MARKS,
+  percentMarks,
   pieceCount,
   pieceMoments,
   runSeconds,
@@ -170,18 +170,21 @@ describe("Timer", () => {
       expect(marksLeft(total, markUnit(total))).toBeLessThanOrEqual(MAX_MARKS);
       expect(marksLeft(total, markUnit(total))).toBeGreaterThan(0);
     }
-    expect(markUnit(60_000)).toBe(10_000);
+    expect(markUnit(60_000)).toBe(2000);
+    expect(markUnit(10_000)).toBe(1000);
     expect(marksLeft(55_000, 10_000)).toBe(6);
     expect(marksLeft(1, 10_000)).toBe(1);
     expect(marksLeft(0, 10_000)).toBe(0);
   });
 
-  test("Zeit im Bild: by default ten tally marks, each a tenth of the run, in the bottom right corner (user request, November 2026)", async () => {
-    expect(DEFAULT_TIMER_SETTINGS.showTime).toBe("percent");
+  test("Zeit im Bild: by default minutes and seconds in the bottom right corner; marks start many (user requests, November 2026)", async () => {
+    expect(DEFAULT_TIMER_SETTINGS.timeNote).toBe("digits");
     for (const total of [10_000, 30_000, 5 * 60_000, 3 * 60 * 60_000]) {
-      expect(marksLeft(total, total / PERCENT_MARKS)).toBe(10);
-      expect(marksLeft(total * 0.55, total / PERCENT_MARKS)).toBe(6);
+      // Never just ten: a full row, or one a second for a short time.
+      expect(marksLeft(total, total / percentMarks(total))).toBe(Math.min(MAX_MARKS, total / 1000));
+      expect(marksLeft(total, markUnit(total))).toBeGreaterThanOrEqual(10);
     }
+    expect(marksLeft(5 * 60_000 * 0.55, (5 * 60_000) / percentMarks(5 * 60_000))).toBe(17);
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     const rule = css.slice(css.indexOf(".tm-shown {"), css.indexOf("}", css.indexOf(".tm-shown {")));
     expect(rule).toContain("right:");
