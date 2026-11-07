@@ -328,3 +328,12 @@ test("no round's sign is a picture the child picks from", () => {
   expect(Object.values(KIND_SIGNS).filter((sign) => pictures.has(sign))).toEqual([]);
   expect(Object.keys(KIND_SIGNS).sort()).toEqual([...KIND_ORDER].sort());
 });
+
+// Two animals share a food by its id (cat and penguin both like fish): an animal added later writes it out again, and
+// a different picture or name under the same id would show one food two ways, or say the wrong word.
+test("a food shared by several animals looks and is named the same for each", () => {
+  for (const animal of ANIMALS.filter((a) => a.food)) {
+    const shared = FOODS.find((f) => f.id === animal.food!.id)!;
+    expect(animal.food, animal.id).toEqual(shared);
+  }
+});
