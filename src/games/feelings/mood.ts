@@ -154,8 +154,11 @@ export const STRENGTH_QUESTION: Localized = {
   ru: "Насколько сильно?",
 };
 
+/** Every line „Wie geht's dir?“ says, in all its languages: the question, a feeling's name when its card is tapped (C-73), the strengths. */
+export const MOOD_SAID: Localized[] = [MOOD_QUESTION, ...MOODS.map((m) => m.caption), STRENGTH_QUESTION, ...STRENGTH_ANSWERS];
+
 /** Every line „Wie geht's dir?“ says in German, for the recordings list. */
-export const MOOD_LINES: string[] = [MOOD_QUESTION.de, STRENGTH_QUESTION.de, ...STRENGTH_ANSWERS.map((a) => a.de)];
+export const MOOD_LINES: string[] = MOOD_SAID.map((line) => line.de);
 
 /** The feelings picked today, in the morning and in the evening (C-33): kept on this device only, today's alone. */
 export type MoodDay = { day: string } & Partial<Record<Daytime, MoodId>>;

@@ -114,7 +114,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als zwei Bilder. „Blume“: Das Bärenkind gießt, jede Sekunde fällt ein Tropfen aus der Gießkanne, der Stängel wächst an einem Stab hinauf bis zur roten Schleife, die von Anfang an zeigt, wie weit er kommt, und am Ende geht die Blüte auf. „Kuchen“: Durchs Ofenfenster geht der Teig aus seiner Form auf, bis zum gestrichelten Umriss des fertigen Kuchens, und wird in der zweiten Hälfte braun; jede Sekunde steigt ein Wölkchen warme Luft aus dem Ofen. Am Ende klappt die Ofentür auf, der Kuchen kommt auf den Tisch neben der Fuchsfamilie, und alle jubeln (Mama Fuchs holt ihn nicht selbst heraus, sie steht am Tisch).",
+        "Gebaut als zwei Bilder. „Blume“: Das Bärenkind gießt, jede Sekunde fällt ein Tropfen aus der Gießkanne, der Stängel wächst an einem Stab hinauf bis zur roten Schleife, die von Anfang an zeigt, wie weit er kommt, und am Ende geht die Blüte auf. „Kuchen“ (am 7. November 2026 wieder herausgenommen, Feedback): Durchs Ofenfenster geht der Teig aus seiner Form auf, bis zum gestrichelten Umriss des fertigen Kuchens, und wird in der zweiten Hälfte braun; jede Sekunde steigt ein Wölkchen warme Luft aus dem Ofen. Am Ende klappt die Ofentür auf, der Kuchen kommt auf den Tisch neben der Fuchsfamilie, und alle jubeln (Mama Fuchs holt ihn nicht selbst heraus, sie steht am Tisch).",
     },
     {
       id: "H-54",
@@ -125,7 +125,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als Bild „Sonnenuntergang“: Die Sonne sinkt hinter die Hügel und wird rot, der Himmel wird orange, dann nachtblau, das Land dunkler, die Sterne kommen nacheinander, und im Häuschen gehen die Fenster an. Der Mond schaut von Anfang an über den Hügel und steigt, jede Sekunde dreht sich die Windmühle ein Stück. Am Ende gähnt die Fuchsfamilie und winkt gute Nacht.",
+        "Gebaut als Bild „Sonnenuntergang“, später umgedreht und „Sonnenaufgang“ genannt (Wunsch, November 2026): Ein großer Mond steht genau in der Mitte über einer Wiese voller Blumenpunkte und geht hinter dem Hügel unter, die Sterne gehen nacheinander aus, der Himmel wird morgenrosa und hell, dann geht an derselben Stelle die große Sonne auf, erst rot, dann gelb. Windmühle und Häuschen sind wieder weg. Jede Sekunde leuchtet ein weicher Lichtkranz um Mond oder Sonne auf.",
     },
     {
       id: "H-55",
@@ -200,7 +200,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut: Beim Zug drehen sich die Räder jede Sekunde einmal und eine kleine Dampfwolke steigt auf, in der Sanduhr fällt jede Sekunde ein großes Korn durch den Hals, an der Kerze rinnt ein Wachstropfen in kleinen Schritten hinunter – alles kleine eigene Ebenen mit CSS.",
+        "Gebaut: Beim Zug drehen sich die Räder jede Sekunde einmal und eine kleine Dampfwolke steigt auf, in der Sanduhr rinnt der Sand sichtbar durch den Hals (ein großes Korn darüber sah komisch aus und kam wieder weg), an der Kerze rinnt ein Wachstropfen in kleinen Schritten hinunter – alles kleine eigene Ebenen mit CSS.",
     },
     {
       id: "H-64",
@@ -211,7 +211,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut für die drei Bilder: Der Zug fährt an einem kleinen Haus los, die Schiene vor ihm glänzt und wird kürzer, hinter ihm ist sie dunkel; in der Sanduhr bleibt am Glas, wo der Sand war, ein feiner Sandfilm; unter der Kerze wächst eine Wachspfütze. Die Fuchs-Spur im Schnee wäre ein neues Bild.",
+        "Gebaut für die drei Bilder: Der Zug fährt an einem kleinen Haus los, die Schiene vor ihm glänzt und wird kürzer, hinter ihm ist sie dunkel; in der Sanduhr wächst unten der Haufen (ein Sandfilm am leeren Glas sah komisch aus und kam wieder weg); unter der Kerze wächst eine Wachspfütze. Die Fuchs-Spur im Schnee wäre ein neues Bild.",
     },
     {
       id: "H-65",
@@ -247,7 +247,30 @@ export const timerIdeas: IdeaArea = {
       text: "Auf dem Tisch liegt ein großer Keks, daneben ein Ameisenhügel. Jede Sekunde trägt eine Ameise einen Krümel hinüber: Die Straße der Ameisen zeigt die Richtung, der Keks wird kleiner, der Hügel größer. Ist der Keks weg, sitzen alle Ameisen oben auf dem Hügel, und das Fuchskind, das zugeschaut hat, lacht.",
       why: "Eine Reihe, die immer in dieselbe Richtung läuft, macht „von da nach da“ ohne Worte deutlich, und es bewegt sich ständig etwas, auch wenn der Keks nur langsam schrumpft.",
       effort: "S",
+      rejected: true,
+      partial: "Gebaut und am 7. November 2026 wieder herausgenommen: Die Ameisenstraße ist kein Bild des Timers mehr.",
+    },
+    {
+      id: "H-70",
+      emoji: "⏰",
+      title: "Wecker mit Ziffern",
+      text: "Ein Timer, der aussieht wie ein ganz normaler digitaler Funkwecker, nur wie einer fürs Kinderzimmer: bunt, rundlich, mit großer Schlummertaste oben. Auf seinem Bildschirm zählen leuchtende Ziffern die Zeit herunter bis 0:00, darum braucht er unten rechts keine Zeitangabe. Am Ende piept er und klingelt.",
+      why: "Viele Kinder kennen den Wecker der Eltern und wollen ihn ernst nehmen; Große lesen die Restzeit auf einen Blick, und eine Reihe Leuchtkästchen darunter zeigt dem Kind, wie viel noch bleibt.",
+      effort: "S",
       done: true,
+      partial:
+        "Gebaut als Bild „Wecker“ (Wunsch 7. November 2026): ein türkiser Wecker mit gelber Schlummertaste, lila Knöpfen, Füßchen, Stern- und Herzaufkleber, im Bildschirm orange Segmentziffern, Funkmast und Weckerglocke. Unter den Ziffern gehen 20 Leuchtkästchen eins nach dem anderen von rechts aus. Ein Tippen drückt die Schlummertaste, am Ende piept er dreimal und wackelt klingelnd auf seinen Füßen.",
+    },
+    {
+      id: "H-71",
+      emoji: "🎾",
+      title: "Abwechseln beim Tennis",
+      text: "Noch ein Timer zum Abwechseln, bei dem man von Weitem sieht, wer dran ist: Fuchskind und Bärenkind spielen Tennis. Der Ball liegt auf dem Schläger dessen, der dran ist, und seine Seite des Platzes liegt im Licht, die andere im Schatten. Ist die Zeit um, schlägt das Kind den Ball, und er fliegt langsam in hohem Bogen übers Netz zum anderen.",
+      why: "Ein Ball, der hin und her geht, ist für Kinder das Bild fürs Abwechseln schlechthin; wohin er fliegt, verfolgen sie mit den Augen, und wer ihn hat, ist dran.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Tennis“ in der Gruppe Abwechseln (Wunsch 7. November 2026): ein blauer Platz mit Netz vor einem grünen Zaun, die beiden Kinder stehen still mit ihren Schlägern. Zu Beginn leuchten die Seiten abwechselnd auf, langsamer und langsamer, bis eine bleibt. Der Ball hüpft auf dem Schläger dessen, der dran ist; eine Anzeigetafel über dem Netz hat zehn Lichter, die eins nach dem anderen ausgehen. Ist die Zeit um, schwingt der Schläger, der Ball fliegt in gut zwei Sekunden übers Netz, und die Schatten wechseln, sobald er das Netz überquert.",
     },
     {
       id: "H-69",
@@ -256,9 +279,19 @@ export const timerIdeas: IdeaArea = {
       text: "Aus der Gießkanne fällt jede Sekunde ein Tropfen in einen Eimer, und das Wasser steigt bis zu einem Strich, an dem ein kleines Holzschiff schon wartet: Dort ist die Zeit um. Am Ende schwimmt das Schiff, und das Bärenkind gießt mit dem Eimer eine Blume (wie H-53).",
       why: "Jeder Tropfen ist eine sichtbare Sekunde, und der Strich zeigt von Anfang an, wohin es geht. Für das Warten auf etwas Gutes passt ein Bild, das voller wird.",
       effort: "S",
-      done: true,
+      rejected: true,
       partial:
-        "Gebaut als Bild „Eimer“: Die Gießkanne hängt an einem Pfosten über einem durchsichtigen Eimer im Garten, jede Sekunde fällt ein Tropfen, und auf dem Wasser breitet sich ein Ring aus. Das Wasser steigt bis zum roten Strich, wo das Holzschiff an einem Faden von einem Stock über dem Eimer schon wartet. Am Ende schwimmt es und schaukelt kurz, und die Blume im Topf neben dem Eimer geht auf; die Bärenfamilie steht daneben und winkt (das Bärenkind gießt nicht selbst mit dem Eimer).",
+        "Abgelehnt und wieder herausgenommen (Feedback 7. November 2026: „macht für mich keinen Sinn“ – woher das Schiff, warum die Blume blüht, woher das ganze Wasser aus der Kanne kommt). Gebaut war es als Bild „Eimer“: Die Gießkanne hängt an einem Pfosten über einem durchsichtigen Eimer im Garten, jede Sekunde fällt ein Tropfen, und auf dem Wasser breitet sich ein Ring aus. Das Wasser steigt bis zum roten Strich, wo das Holzschiff an einem Faden von einem Stock über dem Eimer schon wartet. Am Ende schwimmt es und schaukelt kurz, und die Blume im Topf neben dem Eimer geht auf; die Bärenfamilie steht daneben und winkt (das Bärenkind gießt nicht selbst mit dem Eimer).",
+    },
+    {
+      id: "H-72",
+      emoji: "🗣️",
+      title: "Timer: Die Stimme sagt Ziel, „gleich“ und „fertig“",
+      text: "Der Timer sagt bisher nichts. Mit Tapsis Stimme (ElevenLabs, wie Zähne putzen) sagt jedes Bild drei kurze Sätze: am Anfang, sobald die Seite stillliegt, wohin es geht; eine Minute vor dem Ende, zur Glocke von H-49, „Gleich ist es so weit!“; und am Ende, was jetzt da ist. Vorschläge: Zug „Der Zug fährt zum Bahnhof.“ – „Der Zug ist am Bahnhof!“ · Apfelbaum „Der Apfelbaum wächst.“ – „Alle Äpfel sind im Wagen!“ · Sanduhr „Der Sand rieselt.“ – „Der Sand ist durch!“ · Raupe „Die Raupe frisst das Blatt.“ – „Das Blatt ist weg. Ein Schmetterling!“ · Blume „Die Blume bekommt Wasser.“ – „Die Blume blüht!“ · Kerze „Die Kerzen brennen.“ – „Alle Kerzen sind aus!“ · Sonnenaufgang „Der Mond geht schlafen.“ – „Die Sonne ist da!“ · Rote Scheibe „Die rote Scheibe wird kleiner.“ – „Die Scheibe ist weg!“ · Pizza „Wir essen die Pizza.“ – „Die Pizza ist aufgegessen!“ · Wecker „Der Wecker zählt.“ – „Der Wecker klingelt!“ · Abwechseln „Wer fängt an?“ beim Auslosen, dann bei jedem Wechsel „Tauschen! Jetzt ist das Fuchskind dran.“ oder „… das Bärenkind dran.“ Zusammen 25 Sätze, etwa 800 Zeichen: auf Deutsch ≈ 90 Credits, in allen sieben Sprachen ≈ 500.",
+      why: "Kleine Kinder nehmen ein Ende leichter an, wenn es angekündigt und benannt wird: „Der Zug ist am Bahnhof!“ sagt, warum es jetzt weitergeht, auch wenn der Große gerade nicht hinschaut. Der Satz am Anfang sagt, worauf das Kind wartet, und das Bild zeigt es dann.",
+      effort: "S",
+      partial:
+        "Eingebaut (7. November 2026, src/games/timer/voice.ts): jedes Bild sagt seinen Satz am Anfang, sobald die Seite stillliegt, „Gleich ist es so weit!“ zur Glocke und seinen Satz am Ende; Abwechseln und Tennis sagen „Wer fängt an?“, „Das Fuchskind fängt an!“ / „Das Bärenkind fängt an!“ und bei jedem Wechsel „Tauschen! Jetzt ist das … dran.“. 26 Sätze, nur Deutsch, noch nicht aufgenommen (bun run voice make --only timer), bis dahin still.",
     },
   ],
 };

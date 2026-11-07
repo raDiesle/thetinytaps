@@ -1,7 +1,7 @@
 import { memo, type CSSProperties } from "react";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
-// Pizza (H-47, the children's way of the red disc): a pizza on a wooden board, eaten slice by slice round the clock from
+// Pizza (H-47, the children's way of the red disc): a pizza on a wooden board, cut in many slices, eaten one by one round the clock from
 // 12 o'clock, as the Kita's disc gets smaller – what is still on the board is the time left. Each slice is a small
 // layer of its own, cut to its wedge (a still `clip-path`), lifted off towards its side and gone at its time: a CSS
 // animation with its moment as `animation-delay`, so React only plays the munch then (`pieceMoments`). Every second a
@@ -10,8 +10,11 @@ import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 /** The pizza: its middle and radius. */
 export const PIZZA = { cx: 700, cy: 445, r: 270 } as const;
 
-/** How many slices it is cut into; one is eaten every eighth of the time. */
-export const SLICES = 8;
+/**
+ * How many slices it is cut into, one eaten after another: many (user feedback, November 2026: eight were too few to
+ * see the time go), so a slice goes every few seconds in a minute.
+ */
+export const SLICES = 24;
 
 /** How long it takes to lift a slice off, in seconds; it is gone at its moment. */
 export const SLICE_SECONDS = 1.4;
@@ -82,8 +85,8 @@ function Slice({ i, glow }: { i: number; glow: number }) {
   const c = local({ x: PIZZA.cx, y: PIZZA.cy });
   const a = local(at(s.from, PIZZA.r));
   const b = local(at(s.to, PIZZA.r));
-  const salami = local(at(mid, PIZZA.r * 0.62));
-  const olive = local(at(mid + 0.08, PIZZA.r * 0.32));
+  const salami = local(at(mid, PIZZA.r * 0.66));
+  const olive = local(at(mid, PIZZA.r * 0.36));
   const crust = (radius: number) => {
     const p = local(at(s.from, radius));
     const q = local(at(s.to, radius));
@@ -107,10 +110,10 @@ function Slice({ i, glow }: { i: number; glow: number }) {
         />
         <path d={crust(PIZZA.r - 12)} fill="none" stroke="#d08b3c" strokeWidth="26" />
         <path d={crust(PIZZA.r)} fill="none" stroke={INK} strokeWidth="5" />
-        <circle cx={salami.x} cy={salami.y} r="30" fill="#d9480f" stroke={INK} strokeWidth="4" />
-        <circle cx={salami.x - 8} cy={salami.y - 6} r="5" fill="#ffa8a8" />
-        <circle cx={olive.x} cy={olive.y} r="11" fill="#343a40" />
-        <circle cx={olive.x} cy={olive.y} r="4" fill="#ffd166" />
+        <circle cx={salami.x} cy={salami.y} r="19" fill="#d9480f" stroke={INK} strokeWidth="3.5" />
+        <circle cx={salami.x - 5} cy={salami.y - 4} r="3.5" fill="#ffa8a8" />
+        <circle cx={olive.x} cy={olive.y} r="8" fill="#343a40" />
+        <circle cx={olive.x} cy={olive.y} r="3" fill="#ffd166" />
       </svg>
       <LeftGlow n={glow} />
     </Layer>

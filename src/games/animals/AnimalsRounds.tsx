@@ -3,6 +3,7 @@ import { SHADOW_RECORDINGS } from "@/games/shadows/content";
 import { useDeck } from "@/games/shadows/deck";
 import { nextLevel } from "@/games/shadows/levels";
 import { DEV } from "@/lib/buildInfo";
+import { useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { loadRecordings } from "@/lib/sfx";
 import { AnimalsPlay } from "./AnimalsPlay";
@@ -11,7 +12,7 @@ import { GrowPlay } from "./GrowPlay";
 import { GROWTHS } from "./growth";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import type { AnimalsSettings } from "./settings";
-import { RoundTopic } from "./RoundTopic";
+import { KIND_QUESTIONS, RoundTopic } from "./RoundTopic";
 
 const FED = ANIMALS.filter((a) => a.food);
 const HOUSED = ANIMALS.filter((a) => a.home);
@@ -38,6 +39,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   /** While developing, `?grow=<id>` plays only „Was wird aus mir?“ with that small one, to watch it grow again and again. */
   const devGrowth = useRef(DEV ? GROWTHS.find((g) => g.id === new URLSearchParams(window.location.search).get("grow")) : undefined);
   const lastAnimal = useRef<Animal | null>(null);
+  const t = useT();
   /** While developing, `?animal=<id>` feeds, houses or asks only that animal, to look at its rounds and its home. */
   const [devAnimal] = useState(() => (DEV ? ANIMALS.find((a) => a.id === new URLSearchParams(window.location.search).get("animal")) : undefined));
   // The real animal sounds (and the munch), loaded at once so even the first round sounds real.
@@ -53,7 +55,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   };
 
   // Dealt once per turn: the round must stay the same while it is played, however often this renders.
-  const dealt = useRef<{ turn: number; round: ReturnType<typeof deal> } | null>(null);
+  const dealt = useRef<{ turn: number; round: ReturnType<typeof deal>; newKind: boolean } | null>(null);
   function deal(last: RoundKind | null) {
     // A fixed difficulty plays its step; switched back to „Von selbst“, the game climbs on from there.
     if (settings.difficulty !== "auto" && levelRef.current !== FIXED_LEVELS[settings.difficulty]) {
@@ -79,7 +81,11 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
           level.choices,
         );
   }
-  if (dealt.current?.turn !== turn) dealt.current = { turn, round: deal(dealt.current?.round.kind ?? null) };
+  if (dealt.current?.turn !== turn) {
+    const last = dealt.current?.round.kind ?? null;
+    const next = deal(last);
+    dealt.current = { turn, round: next, newKind: next.kind !== last };
+  }
   const round = dealt.current.round;
 
   const auto = settings.difficulty === "auto";
@@ -107,9 +113,11 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
 
   // What the round is about, as plain text under its picture.
   const topic = <RoundTopic kind={round.kind} />;
+  // When the kind of round changes (also the first round), the voice says its question once before the round's own (Z-24).
+  const intro = dealt.current.newKind ? t(KIND_QUESTIONS[round.kind]) : undefined;
   return round.kind === "grow" ? (
-    <GrowPlay key={turn} settings={settings} round={round} topic={topic} onSolved={onSolved} onNext={onNext} />
+    <GrowPlay key={turn} settings={settings} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
   ) : (
-    <AnimalsPlay key={turn} settings={settings} round={round} topic={topic} onSolved={onSolved} onNext={onNext} />
+    <AnimalsPlay key={turn} settings={settings} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
   );
 }

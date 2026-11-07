@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useLocation } from "react-router";
 import { BookFamilies } from "@/components/BookFamily";
-import { INDOOR, Sun, type WorldId, WorldGround, WorldWindow } from "@/components/Worlds";
+import { INDOOR, SunFace, SunRays, type WorldId, WorldGround, WorldWindow } from "@/components/Worlds";
 import { worldOf } from "@/content/games";
 
 /**
@@ -18,9 +18,15 @@ export const Sky = memo(function Sky() {
         <WorldWindow />
       ) : (
         <>
-          <svg className="sky-sun" viewBox="0 0 200 200">
-            <Sun />
-          </svg>
+          {/* The rays are a layer of their own, so a tap turns them as a whole (`spinSunAt`) without the phone painting the sun again in every frame. */}
+          <div className="sky-sun">
+            <svg className="sky-sun-ray-layer" viewBox="0 0 200 200">
+              <SunRays />
+            </svg>
+            <svg className="sky-sun-face" viewBox="0 0 200 200">
+              <SunFace />
+            </svg>
+          </div>
           <Cloud className="sky-cloud c1" />
           <Cloud className="sky-cloud c2" />
           <Cloud className="sky-cloud c3" />
@@ -36,6 +42,31 @@ export const Sky = memo(function Sky() {
     </div>
   );
 });
+
+/** How long the rays take for one turn after a tap on the sun. */
+const SUN_SPIN_MS = 2400;
+
+/**
+ * Turns the menu's sun's rays once round clockwise when (x, y) lies on the sun – face or rays – and says whether it did.
+ * The sky lies behind the page, so a tap never lands on it: the menus' one tap listener (`MenuRipples`) asks here. A tap
+ * while they turn gives them one more turn from where they are, so the rays never jump.
+ */
+export function spinSunAt(x: number, y: number): boolean {
+  const sun = document.querySelector<HTMLElement>(".sky .sky-sun");
+  const rays = sun?.querySelector<SVGSVGElement>(".sky-sun-ray-layer");
+  if (!sun || !rays) return false;
+  const box = sun.getBoundingClientRect();
+  if (box.width === 0) return false;
+  // The rays reach 96 of the box's 100 from its middle: only a tap on the sun counts, not the box's empty corners.
+  const r = (box.width / 2) * 0.96;
+  if (Math.hypot(x - (box.left + box.width / 2), y - (box.top + box.height / 2)) > r) return false;
+  const now = Number.parseFloat(getComputedStyle(rays).rotate) || 0;
+  for (const spin of rays.getAnimations()) spin.cancel();
+  // Ending on a whole ray's step: once the turn is over the rays stand as before, so dropping the turn shows no jump.
+  const end = Math.ceil((now + 360) / 30) * 30;
+  rays.animate([{ rotate: `${now}deg` }, { rotate: `${end}deg` }], { duration: SUN_SPIN_MS, easing: "cubic-bezier(.3,0,.25,1)" });
+  return true;
+}
 
 function Cloud({ className }: { className: string }) {
   return (

@@ -15,7 +15,12 @@ import {
   SITE_NAME,
   SITE_PROMISE,
 } from "../src/content/seo";
+import { SEO_AR } from "../src/content/seo.ar";
 import { SEO_EN } from "../src/content/seo.en";
+import { SEO_ES } from "../src/content/seo.es";
+import { SEO_HI } from "../src/content/seo.hi";
+import { SEO_RU } from "../src/content/seo.ru";
+import { SEO_ZH } from "../src/content/seo.zh";
 import { appPlugin, PRODUCTION } from "./appPlugin";
 import { BOOT_WAIT, chunkClosure, pageModuleFor, pageModules } from "./pageStart";
 
@@ -119,7 +124,7 @@ interface BuiltPage {
 }
 
 /** A language's texts besides German (seo.<id>.ts). */
-const TRANSLATIONS: Record<Exclude<SeoLanguage, "de">, SeoTranslation> = { en: SEO_EN };
+const TRANSLATIONS: Record<Exclude<SeoLanguage, "de">, SeoTranslation> = { en: SEO_EN, zh: SEO_ZH, hi: SEO_HI, es: SEO_ES, ar: SEO_AR, ru: SEO_RU };
 
 const textIn = (page: PageSeo, language: SeoLanguage): PageText => {
   if (language === "de") return page;
@@ -158,7 +163,7 @@ function staticBody({ language, page, text }: BuiltPage) {
 }
 
 /** Each language by its own name, for the link to the same page in it. */
-const LANGUAGE_NAMES: Record<SeoLanguage, string> = { de: "Deutsch", en: "English" };
+const LANGUAGE_NAMES: Record<SeoLanguage, string> = { de: "Deutsch", en: "English", zh: "中文", hi: "हिन्दी", es: "Español", ar: "العربية", ru: "Русский" };
 
 /** Tags for search engines and link previews (WhatsApp, Messenger) in the page's head. */
 function headTags({ language, page, text }: BuiltPage) {

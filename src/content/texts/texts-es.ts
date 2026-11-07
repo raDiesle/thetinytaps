@@ -1,4 +1,5 @@
 import { es as pack } from "@/content/es";
+import { SEO_ES as seo } from "@/content/seo.es";
 import { ES as badezimmer } from "@/games/scenes/badezimmer/es";
 import { ES as bauernhof } from "@/games/scenes/bauernhof/es";
 import { ES as baustelle } from "@/games/scenes/baustelle/es";
@@ -79,5 +80,6 @@ export const TEXTS: LanguageTexts = {
   feelings,
   situations,
   days,
+  seo,
   stories: { cloudTrip, treasureIsland },
 };

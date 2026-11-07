@@ -5,11 +5,14 @@
 // few lines written inline in a component are copied here, and voiceLines.test.ts checks
 // that they are still in that file.
 
+import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { de } from "@/content/de";
 import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, giverOf, GIVERS } from "@/games/animals/content";
 import { GIFTS } from "@/games/animals/gifts";
 import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
 import { HOMES } from "@/games/animals/homes";
+import { KIND_ORDER } from "@/games/animals/levels";
+import { KIND_QUESTIONS } from "@/games/animals/RoundTopic";
 import { PAIRS, TOGETHER_TEXTS } from "@/games/together/pairs";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
 import { FILMS } from "@/games/elevator/film/films";
@@ -48,6 +51,7 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { BEGINS, PICTURE_LINES, SOON_LINE, TURN_TO, WHO_BEGINS } from "@/games/timer/voice";
 import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
@@ -82,6 +86,12 @@ export interface VoiceGame {
   /** The game's route, as in `CATEGORIES` (src/content/games.ts). */
   href: string;
   groups: VoiceGroup[];
+  /**
+   * Set when the game's lines are parked (user decision): why, for the management page. A parked game is never
+   * recorded – not in RECORDED_GAMES, so `bun run voice make` passes it by – until the user orders exactly its
+   * recording, and its lines count neither as open nor in the credits still needed.
+   */
+  parked?: string;
 }
 
 /** A line copied from a component, where it is written inline: voiceLines.test.ts checks it is still there. */
@@ -195,7 +205,9 @@ function animals(): VoiceGroup[] {
   const housed = ANIMALS.filter((a) => a.home);
   const residents = Object.keys(HOMES).flatMap((id) => ANIMALS.find((a) => a.home === id) ?? []);
   return [
+    { label: "Art der Runde", lines: once(KIND_ORDER.map((kind) => KIND_QUESTIONS[kind].de!)), note: "Einmal, wenn die Art der Runde wechselt (Z-24)." },
     { label: "Füttern: Hunger", lines: once(fed.map(texts.hungry)), built: "Satz mit dem Tier" },
+    { label: "Füttern: Frage", lines: once(fed.map(texts.whatEats)), built: "Satz mit dem Tier", note: "Gleich nach „… hat Hunger!“ (Z-24)." },
     { label: "Füttern: richtig", lines: once(fed.map((a) => texts.yummy(a, a.food!))), built: "Satz mit Tier und Futter" },
     { label: "Füttern: falsch", lines: once(fed.map(texts.yuck)), built: "Satz mit dem Tier" },
     { label: "Was gibt uns das Tier?: Frage", lines: once(GIVERS.map(GIFT_TEXTS.de.whatGives)), built: "Satz mit dem Tier" },
@@ -218,6 +230,20 @@ function animals(): VoiceGroup[] {
     {
       label: "Wer schaut da raus?",
       lines: once([SHADOW_TEXTS.de.peek, ...PEEK_ITEMS.map(SHADOW_TEXTS.de.there), ...PEEK_ITEMS.map(SHADOW_TEXTS.de.thatIs)]),
+    },
+  ];
+}
+
+function timer(): VoiceGroup[] {
+  const pictures = Object.values(PICTURE_LINES);
+  return [
+    { label: "Am Anfang eines Bildes", lines: once(pictures.map((p) => p.start)) },
+    { label: "Kurz vor dem Ende", lines: [SOON_LINE], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
+    { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => p.end)) },
+    {
+      label: "Abwechseln und Tennis",
+      lines: once([WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)]),
+      note: "„Wer fängt an?“, während die Lampen auslosen, dann wer anfängt; „Tauschen! …“ bei jedem Wechsel.",
     },
   ];
 }
@@ -401,7 +427,12 @@ export const stillToRecord = (games: VoiceGame[]): VoiceGame[] =>
  */
 export function voiceLines(): VoiceGame[] {
   return [
-    { href: "/bilder/", groups: scenes() },
+    {
+      href: "/bilder/",
+      groups: scenes(),
+      parked:
+        "Geparkt (Entscheidung November 2026): Die Bilder antworten mit ihren Geräuschen, die gut passen, und erzählen nichts. Aufgenommen würden höchstens Sätze, die Menschen im Bild selbst sagen („Hallo, hier ist der Kinderarzt!“) – und auch die nur, wenn du es ausdrücklich für Lebendige Bilder sagst.",
+    },
     { href: "/buchstaben/", groups: letters() },
     { href: "/schatten/", groups: shadows() },
     { href: "/tiere/", groups: animals() },
@@ -414,6 +445,7 @@ export function voiceLines(): VoiceGame[] {
     { href: "/abstillen/", groups: weaning() },
     { href: "/socken/", groups: socks() },
     { href: "/belohnungstafel/", groups: rewards() },
+    { href: "/timer/", groups: timer() },
     {
       href: "",
       groups: [
@@ -421,6 +453,11 @@ export function voiceLines(): VoiceGame[] {
           label: "Wenn die Spielzeit vorbei ist (alle Spiele)",
           lines: ["Gute Nacht! Die Spielzeit ist vorbei."],
           note: "Hier ist die Liste der einzige Ort des Satzes: der Gute-Nacht-Bildschirm (GameShell) spielt bis zur Aufnahme nur das Schlaflied.",
+        },
+        {
+          label: "Am Ende eines Levels (alle Spiele)",
+          lines: [AGAIN_OR_NEXT.de, AGAIN_ONLY.de],
+          note: "Kurz nachdem „Nochmal“ und „Weiter“ erscheinen (GameEnd, A-24); „Nochmal?“ allein, wo es kein „Weiter“ gibt.",
         },
       ],
     },

@@ -1,72 +1,86 @@
-import { memo, type CSSProperties } from "react";
-import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { memo, type CSSProperties, type ReactNode } from "react";
+import { Draw, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
-// Sonnenuntergang (H-54): for „noch zehn Minuten, dann ist Schlafenszeit“ – the sun sinks behind the hills, the sky
-// goes orange, then blue, the first stars come out and the land grows dark with it, so the screen gets calmer as the
-// time runs out. The moon peeks over the hills from the start (where it goes, H-64) and rises as the sun goes down;
-// at the end it stands high, the windows of the little house are lit. Every second the
-// windmill's sails turn a step (H-63). Sky and land darken by big layers fading in (`opacity`), the sun and moon move
-// by `transform` inside boxes cut off below the hills' ridge (`overflow: hidden`), never by drawing again.
+// Sonnenaufgang (H-54, once „Sonnenuntergang“; its id and this file keep the old name `sunset`): one round hill with a meadow full of flowers, drawn as coloured dots, and one big moon right
+// in the picture's middle. First the moon goes down behind the hill while the stars go out one by one, the night's sky
+// gives way to the morning's pink and the land grows light; then the big sun rises at the very same place, red at
+// first and yellow as it climbs, until it stands high over the meadow at the end (user feedback, November 2026: no
+// windmill and no house, flowers as dots, sun and moon much bigger and exactly in the middle, the moon setting first,
+// then the sun rising). Every second a soft ring of light widens round the moon or the sun (H-63). Sky and land change
+// by big layers fading (`opacity`), the sun and moon move by `transform` inside boxes cut off below the hill's ridge
+// (`overflow: hidden`), never by drawing again.
 
-/** The sun: its middle, radius, its top at the start, and its top at the end – below `SKY_CUT`, so it is gone. */
-export const SUN = { cx: 430, r: 105, top: 150, set: 640 } as const;
+/** The middle of the picture, where the moon sets and the sun rises. */
+const MIDDLE = STAGE_W / 2;
 
-/** The moon: its middle, radius, its top at the end, and its top at the start – just peeking over the hills. */
-export const MOON = { cx: 900, r: 66, top: 165, start: 560 } as const;
+/** The moon: its middle, radius, its top at the start (high), and its top once it has set – below `SKY_CUT`, so it is gone. */
+export const MOON = { cx: MIDDLE, r: 240, top: 100, set: 650 } as const;
 
-/** Where the boxes holding the sun and the moon end below: under the hills' ridge everywhere they pass, so no cut shows. */
-export const SKY_CUT = 625;
+/** The share of the time the moon takes to set; the sun rises after it. */
+export const MOON_SET_AT = 0.48;
 
-/** The ground of the front hill. */
-export const SUNSET_FLOOR = 790;
+/** The sun: its middle, radius, its top at the end (high), and its top at the start – hidden behind the hill. */
+export const SUN = { cx: MIDDLE, r: 260, top: 85, start: 650 } as const;
 
-/** The windmill on the far hill: where its sails turn. */
-const MILL = { cx: 735, cy: 470, sails: 190 } as const;
+/** When the sun starts to rise from behind the hill, a share of the time. */
+export const SUN_FROM = 0.5;
 
-/** The little house on the front hill and its two windows, lit as night comes. */
-const HOUSE = { x: 250, y: 590, w: 150, h: 120 } as const;
+/** Where the boxes holding the sun and the moon end below: under the hill's ridge everywhere they pass, so no cut shows. */
+export const SKY_CUT = 645;
 
-/** The far hills' ridge as curves (each from the end of the one before), in front of the sun and the moon. */
-const RIDGE: { ctrl: [number, number]; to: [number, number] }[] = [
-  { ctrl: [260, 520], to: [520, 590] },
-  { ctrl: [780, 660], to: [1040, 560] },
-  { ctrl: [1320, 460], to: [1600, 545] },
-];
-const RIDGE_START: [number, number] = [0, 600];
+/** The hill's ridge, one curve over the whole picture: its ends and its control point (halfway in x). */
+const RIDGE = { end: 700, ctrl: 550 } as const;
 
-/** The ridge's height at `x`, worked out from its curves (for the checks that the sun and the moon set behind it). */
+/** The ridge's height at `x` (for the checks that the sun and the moon set behind it and the flowers stand on the meadow). */
 export function ridgeAt(x: number): number {
-  let from = RIDGE_START;
-  for (const { ctrl, to } of RIDGE) {
-    if (x <= to[0]) {
-      // The curves' controls lie halfway in x, so x grows evenly with t.
-      const t = (x - from[0]) / (to[0] - from[0]);
-      return (1 - t) ** 2 * from[1] + 2 * t * (1 - t) * ctrl[1] + t ** 2 * to[1];
-    }
-    from = to;
-  }
-  return from[1];
+  const t = x / STAGE_W;
+  return (1 - t) ** 2 * RIDGE.end + 2 * t * (1 - t) * RIDGE.ctrl + t ** 2 * RIDGE.end;
 }
 
-/** The far hills, and the front hill, drawn in front of the sun and the moon. */
-const FAR_HILLS = `M${RIDGE_START.join(" ")} ${RIDGE.map(({ ctrl, to }) => `Q${ctrl.join(" ")} ${to.join(" ")}`).join(" ")} V900 H0 Z`;
-const FRONT_HILL = "M0 700 Q400 640 820 700 T1600 690 V900 H0 Z";
+/** The hill, in front of the sun and the moon. */
+const HILL = `M0 ${RIDGE.end} Q${STAGE_W / 2} ${RIDGE.ctrl} ${STAGE_W} ${RIDGE.end} V900 H0 Z`;
+
+/** The flowers' colours: white, yellow, pink, red and lilac. */
+const FLOWER_COLORS = ["#ffffff", "#ffd43b", "#f783ac", "#fa5252", "#b197fc"] as const;
 
 /**
- * The stars, coming out one after another in the second half (`at`: the part of the time when each begins to shine),
- * kept clear of the sun's and the moon's ways.
+ * The flowers on the meadow, each a coloured dot with a light middle: in rows from the ridge down, smaller further
+ * back, a little shifted so they don't stand in lines. Drawn once with the hill.
+ */
+export const FLOWERS: { x: number; y: number; r: number; color: string }[] = (() => {
+  const out: { x: number; y: number; r: number; color: string }[] = [];
+  let seed = 7;
+  const rand = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+  for (let row = 0; row < 6; row++) {
+    const r = 6 + row * 1.6;
+    for (let x = 150 + row * 37; x < 1450; x += 92 + row * 10) {
+      const fx = x + (rand() - 0.5) * 50;
+      const fy = ridgeAt(fx) + 26 + row * 26 + (rand() - 0.5) * 14;
+      if (fy > 815) continue;
+      out.push({ x: Math.round(fx), y: Math.round(fy), r: Math.round(r * 10) / 10, color: FLOWER_COLORS[Math.floor(rand() * FLOWER_COLORS.length)] });
+    }
+  }
+  return out;
+})();
+
+/**
+ * The stars, shining at the start and going out one after another as the morning comes (`at`: the part of the time
+ * when each begins to fade), kept clear of the moon and the sun in the middle.
  */
 export const STARS: { x: number; y: number; at: number }[] = [
-  { x: 1180, y: 140, at: 0.5 },
-  { x: 880, y: 110, at: 0.56 },
-  { x: 1330, y: 250, at: 0.62 },
-  { x: 640, y: 170, at: 0.67 },
-  { x: 1420, y: 120, at: 0.72 },
-  { x: 260, y: 100, at: 0.77 },
-  { x: 760, y: 300, at: 0.81 },
-  { x: 1240, y: 380, at: 0.85 },
-  { x: 590, y: 400, at: 0.89 },
-  { x: 1060, y: 430, at: 0.93 },
+  { x: 1180, y: 140, at: 0.06 },
+  { x: 300, y: 130, at: 0.1 },
+  { x: 1420, y: 230, at: 0.14 },
+  { x: 460, y: 260, at: 0.18 },
+  { x: 1120, y: 330, at: 0.22 },
+  { x: 250, y: 380, at: 0.26 },
+  { x: 1340, y: 420, at: 0.3 },
+  { x: 480, y: 470, at: 0.34 },
+  { x: 1450, y: 110, at: 0.38 },
+  { x: 220, y: 250, at: 0.42 },
 ];
 
 /** The day's sky behind everything; drawn once. */
@@ -82,8 +96,8 @@ const DaySky = memo(function DaySky() {
         </defs>
         <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-day)" />
         {[
-          [700, 150],
-          [1250, 250],
+          [300, 200],
+          [1250, 260],
         ].map(([cx, cy]) => (
           <g key={cx} fill="#fff" opacity="0.85">
             <ellipse cx={cx} cy={cy} rx="66" ry="26" />
@@ -95,17 +109,17 @@ const DaySky = memo(function DaySky() {
   );
 });
 
-/** The evening's and the night's sky, each a layer fading in over the day's (their gradients in the CSS). */
+/** The morning's and the night's sky, each a layer over the day's: the night fades first, then the morning's pink (gradients in the CSS). */
 function SkyLight() {
   return (
     <>
-      <Layer x={0} y={0} w={STAGE_W} h={SKY_CUT + 40} className="tm-dusk-sky tm-move" />
-      <Layer x={0} y={0} w={STAGE_W} h={SKY_CUT + 40} className="tm-night-sky tm-move" />
+      <Layer x={0} y={0} w={STAGE_W} h={SKY_CUT + 60} className="tm-dawn-sky tm-move" />
+      <Layer x={0} y={0} w={STAGE_W} h={SKY_CUT + 60} className="tm-night-sky tm-move" />
     </>
   );
 }
 
-/** One star, a small layer of its own that comes out at its time. */
+/** One star, a small layer of its own that goes out at its time. */
 function Star({ x, y, at }: { x: number; y: number; at: number }) {
   return (
     <Layer x={x - 16} y={y - 16} w={32} h={32} className="tm-star tm-move" style={{ "--tm-at": at } as CSSProperties}>
@@ -116,120 +130,85 @@ function Star({ x, y, at }: { x: number; y: number; at: number }) {
   );
 }
 
-/** The top of the boxes the sun and the moon move in. */
-const SKY_TOP = 80;
+/** The room on each side of the sun and the moon in their boxes, for the ring of light widening round them each second. */
+const RING_PAD = 70;
 
-/** Where a round thing of radius `r` with its top at `top` sits in a box `pad` wider than it on each side, in percent. */
-function inBox(r: number, top: number, pad: number): CSSProperties {
-  const w = 2 * r + 2 * pad;
-  const h = SKY_CUT - SKY_TOP;
-  return { left: `${(pad / w) * 100}%`, top: `${((top - SKY_TOP) / h) * 100}%`, width: `${((2 * r) / w) * 100}%`, height: `${((2 * r) / h) * 100}%` };
+/** Where a round thing of radius `r` with its top at `top` sits in its box (from the stage's top to `SKY_CUT`), in percent. */
+function inBox(r: number, top: number): CSSProperties {
+  const w = 2 * r + 2 * RING_PAD;
+  return { left: `${(RING_PAD / w) * 100}%`, top: `${(top / SKY_CUT) * 100}%`, width: `${((2 * r) / w) * 100}%`, height: `${((2 * r) / SKY_CUT) * 100}%` };
 }
 
-/** The sun going down behind the hills, getting redder; a tap lights what is still above them (H-51). */
-function Sun({ glow }: { glow: number }) {
-  const size = 2 * SUN.r;
-  const pad = 40;
-  const style = { ...inBox(SUN.r, SUN.top, pad), "--tm-sun-set": `${((SUN.set - SUN.top) / size) * 100}%` } as CSSProperties;
+/** The box a round thing of radius `r` in the middle moves in, cut off below the ridge. */
+function SkyBox({ r, children }: { r: number; children: ReactNode }) {
   return (
-    <Layer x={SUN.cx - SUN.r - pad} y={SKY_TOP} w={size + 2 * pad} h={SKY_CUT - SKY_TOP} className="tm-sky-box">
-      <div className="tm-sun tm-move" style={style}>
-        <div className="tm-sun-red tm-move" />
-        <LeftGlow n={glow} />
-      </div>
+    <Layer x={MIDDLE - r - RING_PAD} y={0} w={2 * r + 2 * RING_PAD} h={SKY_CUT} className="tm-sky-box">
+      {children}
     </Layer>
   );
 }
 
-/** The moon rising from behind the hills, where it peeked out from the start. */
-function Moon() {
-  const size = 2 * MOON.r;
-  const style = { ...inBox(MOON.r, MOON.top, 0), "--tm-moon-from": `${((MOON.start - MOON.top) / size) * 100}%` } as CSSProperties;
+/** The big moon going down behind the hill first; a tap lights what is still above it (H-51). */
+function Moon({ glow }: { glow: number }) {
+  const style = { ...inBox(MOON.r, MOON.top), "--tm-moon-set": `${((MOON.set - MOON.top) / (2 * MOON.r)) * 100}%` } as CSSProperties;
   return (
-    <Layer x={MOON.cx - MOON.r} y={SKY_TOP} w={size} h={SKY_CUT - SKY_TOP} className="tm-sky-box">
+    <SkyBox r={MOON.r}>
       <div className="tm-moon tm-move" style={style}>
+        <div className="tm-ring tm-moon-ring tm-beat" />
         <svg viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="48" fill="#fff3bf" />
+          <circle cx="50" cy="50" r="49" fill="#fff3bf" />
           <circle cx="34" cy="38" r="9" fill="#f1e2a0" />
           <circle cx="62" cy="62" r="12" fill="#f1e2a0" />
           <circle cx="66" cy="30" r="6" fill="#f1e2a0" />
         </svg>
+        <LeftGlow n={glow} />
       </div>
-    </Layer>
+    </SkyBox>
   );
 }
 
-/** The hills with the windmill's tower and the little house, in front of the sun and the moon; drawn once. */
-const Hills = memo(function Hills() {
+/** The big sun rising from behind the hill once the moon is gone, red at first and yellow as it climbs. */
+function Sun({ glow }: { glow: number }) {
+  const style = { ...inBox(SUN.r, SUN.top), "--tm-sun-from": `${((SUN.start - SUN.top) / (2 * SUN.r)) * 100}%` } as CSSProperties;
+  return (
+    <SkyBox r={SUN.r}>
+      <div className="tm-sun tm-move" style={style}>
+        <div className="tm-ring tm-sun-ring tm-beat" />
+        <div className="tm-sun-face" />
+        <div className="tm-sun-red tm-move" />
+        <LeftGlow n={glow} />
+      </div>
+    </SkyBox>
+  );
+}
+
+/** The hill with its flowers, in front of the sun and the moon; drawn once. */
+const Hill = memo(function Hill() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
       <Draw w={STAGE_W} h={STAGE_H}>
-        <path d={FAR_HILLS} fill="#86c95f" />
-        <path
-          d={`M${MILL.cx - 26} ${MILL.cy + 150} L${MILL.cx - 16} ${MILL.cy} H${MILL.cx + 16} L${MILL.cx + 26} ${MILL.cy + 150} Z`}
-          fill="#f1e3c8"
-          stroke={INK}
-          strokeWidth="5"
-        />
-        <path d={`M${MILL.cx - 22} ${MILL.cy + 4} L${MILL.cx} ${MILL.cy - 24} L${MILL.cx + 22} ${MILL.cy + 4} Z`} fill="#c0504d" stroke={INK} strokeWidth="5" />
-        <path d={FRONT_HILL} fill="#6fb24c" />
-        {/* The little house, its windows dark until night comes (the lit ones are a layer of their own). */}
-        <rect x={HOUSE.x} y={HOUSE.y} width={HOUSE.w} height={HOUSE.h} fill="#ffe3b3" stroke={INK} strokeWidth="5" />
-        <path
-          d={`M${HOUSE.x - 18} ${HOUSE.y + 6} L${HOUSE.x + HOUSE.w / 2} ${HOUSE.y - 70} L${HOUSE.x + HOUSE.w + 18} ${HOUSE.y + 6} Z`}
-          fill="#c0504d"
-          stroke={INK}
-          strokeWidth="5"
-          strokeLinejoin="round"
-        />
-        <rect x={HOUSE.x + 22} y={HOUSE.y + 28} width="40" height="40" fill="#3b4a7a" stroke={INK} strokeWidth="4" />
-        <rect x={HOUSE.x + 88} y={HOUSE.y + 28} width="40" height="40" fill="#3b4a7a" stroke={INK} strokeWidth="4" />
-        <circle cx="520" cy="640" r="46" fill="#4f9a3a" stroke={INK} strokeWidth="4" />
-        <rect x="512" y="676" width="16" height="40" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
+        <path d={HILL} fill="#7cc35a" />
+        {FLOWERS.map((f, i) => (
+          <g key={i}>
+            <circle cx={f.x} cy={f.y} r={f.r} fill={f.color} />
+            <circle cx={f.x} cy={f.y} r={f.r * 0.38} fill={f.color === "#ffd43b" ? "#f08c00" : "#ffe066"} />
+          </g>
+        ))}
       </Draw>
     </Layer>
   );
 });
 
-/** The windmill's sails, a step round every second (H-63). */
-function Sails() {
-  const s = MILL.sails;
+/** The land dark at night and growing light with the morning, a layer of the hill's shape fading out over it. */
+const NightLand = memo(function NightLand() {
   return (
-    <Layer x={MILL.cx - s / 2} y={MILL.cy - s / 2} w={s} h={s}>
-      <div className="tm-sails tm-beat">
-        <svg viewBox="0 0 100 100">
-          {[0, 90, 180, 270].map((a) => (
-            <rect key={a} x="45" y="4" width="10" height="44" rx="2" fill="#fff" stroke={INK} strokeWidth="3" transform={`rotate(${a} 50 50)`} />
-          ))}
-          <circle cx="50" cy="50" r="7" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
-        </svg>
-      </div>
-    </Layer>
-  );
-}
-
-/** The land growing dark as night comes, a layer of the hills' shape fading in over them. */
-const Dusk = memo(function Dusk() {
-  return (
-    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-dusk-land tm-move">
+    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-night-land tm-move">
       <Draw w={STAGE_W} h={STAGE_H}>
-        <path d={FAR_HILLS} fill="#141a3c" />
+        <path d={HILL} fill="#141a3c" />
       </Draw>
     </Layer>
   );
 });
-
-/** The house's windows lighting up as it gets dark. */
-function Windows() {
-  return (
-    <Layer x={HOUSE.x + 22} y={HOUSE.y + 28} w={106} h={40} className="tm-windows tm-move">
-      <svg viewBox="0 0 106 40">
-        <rect x="0" y="0" width="40" height="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
-        <rect x="66" y="0" width="40" height="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
-      </svg>
-    </Layer>
-  );
-}
 
 /** The whole picture. */
 export function SunsetScene({ glow }: { glow: number }) {
@@ -240,12 +219,10 @@ export function SunsetScene({ glow }: { glow: number }) {
       {STARS.map((s) => (
         <Star key={s.x} {...s} />
       ))}
+      <Moon glow={glow} />
       <Sun glow={glow} />
-      <Moon />
-      <Hills />
-      <Sails />
-      <Dusk />
-      <Windows />
+      <Hill />
+      <NightLand />
     </>
   );
 }

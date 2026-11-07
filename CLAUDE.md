@@ -154,7 +154,7 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
+  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines come in all seven languages (see Search engines).
 - Texts for parents (the home page's foot, the SEO texts' prose) speak as the parents who made the app: warm,
   flowing sentences in our own words, the way one parent tells another. The user's notes on what to say are a rough
   guide, never wording to copy or to turn into a list of steps (user feedback, October 2026).
@@ -203,13 +203,14 @@ In a fresh worktree run `bun install` first.
 - **The app's mascots are the fox and the bear** (Tapsi is a fox, the book's readers are a fox and a bear family; user
   decision, October 2026 – the fox alone was dropped with the address toddlerfox.com): they come back as a motif in
   the games, so a child finds them again – but **only where they belong to the game** (user feedback, November 2026):
-  a figure the game shows and that acts in it (Mitmachen's child hopping the number, the Timer's child watering the
-  flower, a family that a hideout lets out when tapped, a part the child plays like Tapsi in Bewegungsabenteuer), or a
+  a figure the game shows and that acts in it (Mitmachen's child hopping the number, a family that a hideout lets out
+  when tapped, a part the child plays like Tapsi in Bewegungsabenteuer), or a
   role the picture already has, taken by a fox or bear instead of a person (the baker, the doctor, the driver). **Never
   as decoration**: no family standing by, pointing, watching, walking through a picture or cheering beside the end's
   buttons – children want to tap it and think it belongs to the game, and a game wants as few things and movements as
   it can have, so no child is flooded. Families like that (in Zählen, Wörter tippen, „Wer schaut da raus?“, Socken-Paare,
-  Mitmachen's grown-up, seven Lebendige Bilder, every Timer picture and every `GameEnd`) were taken out again;
+  Mitmachen's grown-up, seven Lebendige Bilder, every Timer picture and every `GameEnd`) were taken out again – and the
+  Timer's children that did act (basket, hose, candle) looked odd as drawings in its calm pictures and went too;
   `Mascot.test.ts` lists where a whole figure may stand and what it does there. People may stay, and a bear is as welcome as a fox (never turn a bear
   into a fox). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Games get them
   step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
@@ -265,6 +266,11 @@ In a fresh worktree run `bun install` first.
   ASIDE_LINE_GAP_MS })` (`src/lib/spacing.ts`, `voice.ts`): only when nothing else is said and the last such line lies
   far enough back, never cutting another line off. Where a level's last answer leads straight into its end, it leaves
   its praise and extras to the end's.
+  The same key (or the same thing tapped) pressed again and again is said and sounded again only after a pause
+  (`repeatPause`, `REPEAT_PAUSE_MS` in `src/lib/spacing.ts`), and meanwhile only ripples, silently; the soft note of a
+  press that sets nothing off is such an extra too (user feedback from Buchstaben & Zahlen, November 2026: hammering B
+  said „B wie Ball!“ and played a note at every press). A press the game asks for again (the next step, the digit that
+  comes when the same number is pressed again) is no repeat.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
@@ -361,8 +367,8 @@ In a fresh worktree run `bun install` first.
   user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
-  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
-  Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
+  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Zähne putzen, Töpfchen, Belohnungstafel &
+  Zeitplan – user decision, October 2026; the Timer the very first book, top left, November 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
   left corners (`--lean`), so the names running down their spines are read without bending the
@@ -429,7 +435,8 @@ In a fresh worktree run `bun install` first.
   choices may sit there.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
-  either (only read out; the home logo stays), and the
+  either (only read out; the home logo stays), a start screen with many cards puts its `level` row into the head beside
+  the corner (`levelInHead`, like Lebendige Bilder's menu), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
   left corner, stepped aside for the page's corner (not on a phone, where it only crowds the cards); buttons for grown-ups never cover it. „Einstellungen“ (where a game still has them) is a
   small sign without words (⚙️; the name as tooltip and read out) – a paper
@@ -622,9 +629,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
   and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
   the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
-  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang as near
-  the shelf's middle as can be: the top board's books move towards the left wall for it as far as their room there lets
-  them (the trail grows, `signOver`; user feedback, November 2026). On an upright screen it
+  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang far right, at the
+  wall with the stickers, so the top board's books come towards the shelf's middle (the trail shrinks, `signOver`; user
+  feedback, November 2026 – hanging them in the shelf's middle pushed the books to the left wall). On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
@@ -666,7 +673,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   paper's grain over them, `book.css`). While playing, the ✕ is the page's corner, lying flush in the screen's very corner with no gap to either edge, also
   on a phone with a camera cut-out or rounded corners: it never steps in by the safe area (that left a strip of the
   picture beside it), it grows by it instead (`--play-corner`, user feedback, November 2026; `MenuTop.test.ts`). Pictures of the fox and the bear family reading with their
-  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book.
+  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book – a tap on the sun turns its rays once round clockwise (user request, November 2026; `spinSunAt` in `Sky.tsx`, asked by `MenuRipples`, since the sky lies behind the page), with the rays a layer of their own.
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
   with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the
@@ -685,7 +692,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
 - The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
   toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
   „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
@@ -706,13 +713,21 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   sign is big enough for them to be seen (`--sign`; `SIGN_SIZE` in `Bookshelf.tsx` in front of a wide shelf): at the
   sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
-  and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
-  line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own
-  `index.html` per entry and language – German at `/zaehne/`, English at `/en/zaehne/`, joined by hreflang (GitHub
+  and in every other language of the app in `seo.<lang>.ts` (`SEO_LANGUAGES` = `APP_LANGUAGES`: the pages are part
+  of being found, A-22 – English since October, the other five since November 2026, user request). So, unlike other
+  translations, a new entry or a changed meaning gets its lines in all seven in the same commit: search texts are
+  short, and a page missing a language would leave a hole in the hreflang set (`content.test.ts` checks every
+  language has every page, lengths – Chinese half, Hindi more, since Google cuts by width – and no Latin letters in
+  Russian, Chinese, Hindi and Arabic but the site's name). The build writes an own `index.html` per entry and
+  language – German at `/zaehne/`, the others at `/en/zaehne/`, `/zh/zaehne/` …, joined by hreflang (GitHub
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
-  and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
-  `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
-  browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
+  and head in step (`useTitle`, `SeoHead`). Under `/en/`, `/ru/` … the router runs below the prefix (`routerBase()`,
+  `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
+  browser's language. Texts say only what the page really does, and keep saying it: a change that adds, removes or
+  renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
+  text in every language in the same commit, and its book's and the home page's where they name it – they had fallen
+  behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
+  feedback, November 2026; `content.test.ts` checks that a book's text names each of its games). No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
   screens, which „Ein paar Worte von uns“ on the home page (`ParentsNote`) tells: the real world first, then a screen together,
   later a learning game alone, plain watching least – Fun for Both meant as that first step together (user
@@ -748,5 +763,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    Sound is muted there, so "I hear no music" can't be checked by ear: wrap
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
+   Look only at the localhost servers of `.claude/launch.json`, never at this Mac's network address or another host to
+   see how the real site behaves (the user declines it, November 2026): what depends on the host (`canTestUnfinished`)
+   gets a unit test instead.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
    (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/` (the card tapped starts that level), `?level=<n>` on `/socken/`.

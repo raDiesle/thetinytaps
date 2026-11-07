@@ -169,6 +169,8 @@ export function hindiTexts(german: AnimalTexts): AnimalTexts {
     food: (f) => food(f)?.name ?? german.food(f),
     home: (h) => home(h) ?? german.home(h),
     hungry: (a) => (animal(a) ? `${of(a)} को भूख लगी है!` : german.hungry(a)),
+    // German only so far (Z-24, November 2026): silent in this language until it is translated and recorded.
+    whatEats: german.whatEats,
     yummy: (a, f) =>
       animal(a) && food(f) ? `वाह, स्वादिष्ट! ${of(a)} को ${food(f).likes ?? food(f).name} पसंद ${food(f).many ? "हैं" : "है"}। धन्यवाद!` : german.yummy(a, f),
     yuck: (a) => (animal(a) ? `छी! ${of(a)} को यह पसंद नहीं।` : german.yuck(a)),

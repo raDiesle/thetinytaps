@@ -34,8 +34,11 @@ export const PREVIEW_IMAGE = {
   alt: "Eine Fuchs- und eine Bärenfamilie lesen auf einer Picknickdecke zusammen ein Bilderbuch.",
 };
 
-/** Languages with pages of their own for search engines, German first (it has no prefix). */
-export const SEO_LANGUAGES = ["de", "en"] as const;
+/**
+ * Languages with pages of their own for search engines, German first (it has no prefix): every language of the app
+ * (APP_LANGUAGES), so parents searching in their own language find it there (A-22; all seven since November 2026).
+ */
+export const SEO_LANGUAGES = ["de", "en", "zh", "hi", "es", "ar", "ru"] as const;
 
 /** A language with pages of its own for search engines. */
 export type SeoLanguage = (typeof SEO_LANGUAGES)[number];
@@ -68,7 +71,8 @@ export function splitLanguage(pathname: string): { language: SeoLanguage; path: 
 }
 
 /** What every page says about the whole site, after its own text. */
-export const SITE_PROMISE = "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline. Mit Touch oder Tastatur, am besten zusammen mit einem Erwachsenen.";
+export const SITE_PROMISE =
+  "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline, in sieben Sprachen. Mit Touch oder Tastatur, am besten zusammen mit einem Erwachsenen.";
 
 const scene = (id: string, title: string, things: string): PageSeo => ({
   path: `/bilder/${id}/`,
@@ -81,36 +85,37 @@ const scene = (id: string, title: string, things: string): PageSeo => ({
 export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/",
-    title: "Spiele für Kleinkinder – kostenlos, ohne Werbung",
-    description: "Lernspiele für Kleinkinder: Wimmelbilder, Zähneputzen mit Lied, Bewegungsspiele, Buchstaben und Tiere. Kostenlos, ohne Werbung, offline.",
-    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. Wimmelbilder, Zähneputzen mit Lied, Bewegungsabenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und mehr.",
+    title: "Spiele & Alltagshelfer für Kleinkinder – kostenlos",
+    description:
+      "Lernspiele und Alltagshelfer für Kleinkinder: Wimmelbilder, Gefühle, Buchstaben, Timer, Zähneputzen, Töpfchen, Belohnungstafel. Ohne Werbung.",
+    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. In den Büchern warten Wimmelbilder, Bewegungsabenteuer, Kettenreaktionen und kleine Abenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und Erkennen. Und weil der Tag mit einem kleinen Kind seine eigenen kleinen Hürden hat, stehen gleich daneben unsere Alltagshelfer: ein Timer, der die Zeit in Bildern zeigt, Zähneputzen mit Lied, das Töpfchen-Spiel, eine Belohnungstafel, ein Tagesplan in Bildern und ein Countdown „Wie oft noch schlafen?“ – am Tablet oder zum Ausdrucken.",
   },
   {
     path: "/spiele/lebendige-welten/",
     title: "Wimmelbilder und Geschichten für Kleinkinder",
     description:
       "Lebendige Wimmelbilder, Bewegungsspiele, Kettenreaktionen und kleine Abenteuer, die auf jedes Antippen antworten. Für Kleinkinder, ohne Werbung.",
-    text: "Bilder und Geschichten, die auf jedes Antippen antworten: Lebendige Bilder, Bewegungsabenteuer zum Mitmachen, Kettenreaktionen und Kleine Abenteuer.",
+    text: "Bilder und Geschichten, die auf jedes Antippen antworten: über zwanzig Lebendige Bilder, Bewegungsabenteuer zum Mitmachen mit dem Fuchs Tapsi, zwanzig Kettenreaktionen und Kugelbahnen, und Kleine Abenteuer mit dem Aufzug, auf Wegen und in kleinen Filmen – mit der Feuerwehr, beim Bäcker oder mit einem Brief für Oma.",
   },
   {
     path: "/spiele/gefuehle/",
     title: "Gefühle-Spiele für Kleinkinder",
-    description: "Wie geht's dir? Das Kind zeigt sein Gefühl und wie stark es ist, sagt, was es braucht, und hilft dem kleinen Bären. Ohne Werbung.",
-    text: "Ein Bilderbuch über Gefühle: Das Kind zeigt, wie es ihm geht und wie doll, und wählt, was ihm jetzt guttut. Dazu erlebt der Bär Alltagssituationen, und das Kind wählt, was hilft.",
+    description: "Alltagssituationen mit dem kleinen Bären, Wie geht's dir? und Was brauche ich? – das Kind zeigt sein Gefühl, wie doll es ist und was hilft.",
+    text: "Ein Bilderbuch über Gefühle mit drei Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut.",
   },
   {
     path: "/spiele/buchstaben-zahlen/",
     title: "Buchstaben und Zahlen lernen – Tastatur-Spiele",
     description:
-      "Frei tippen, Zählen und Wörter tippen: Jede Taste zeigt ihren Buchstaben mit Bild und Stimme, Zahlen kommen mit Dingen zum Zählen. Ohne Werbung.",
-    text: "Drei Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“.",
+      "Frei tippen, Zählen, Mitmachen und Wörter tippen: Jede Taste zeigt ihren Buchstaben mit Bild und Stimme, Zahlen kommen zum Zählen und Hüpfen.",
+    text: "Vier Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, Mitmachen, bei dem ein Fuchs- oder Bärenkind jede Zahl hüpft, klatscht oder stampft, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“.",
   },
   {
     path: "/spiele/zuordnen/",
     title: "Zuordnen lernen – Spiele für Kleinkinder",
     description:
-      "Was gehört zusammen? Tiere füttern, Schatten finden und Socken-Paare suchen – erste Zuordnungsspiele für Kleinkinder, kostenlos und ohne Werbung.",
-    text: "Erste Zuordnungsspiele: Futter zum Tier bringen, den passenden Schatten finden, Socken-Paare an die Leine hängen. Antippen oder hinziehen, ohne Fehler.",
+      "Was gehört zum Tier, was gehört zusammen, welcher Schatten passt, welche Socken sind gleich? Erste Zuordnungsspiele für Kleinkinder, ohne Werbung.",
+    text: "Vier erste Zuordnungsspiele: Bei „Was gehört zum Tier?“ bekommt das Tier sein Futter und sein Zuhause, bei „Was gehört zusammen?“ finden Zahnbürste und Zahnpasta oder die Feuerwehr und ihr Schlauch zueinander, bei „Erkennen“ sucht das Kind Schatten und Tiere im Busch, und bei „Socken-Paare“ hängen gleiche Socken an die Leine. Antippen oder hinziehen, ohne Fehler – und jedes Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/bilder/",
@@ -130,13 +135,13 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Gefühle erklärt – Alltagssituationen für Kleinkinder",
     description:
       "Wütend, traurig, ängstlich, fröhlich: Der kleine Bär erlebt Alltagssituationen zu Hause und in der Kita, und das Kind wählt, was hilft. Ohne Werbung.",
-    text: "Kleine Geschichten vom Bären, Tag für Tag vom Morgen bis zum Abend: Er ist wütend, traurig, hat Angst oder freut sich, und das Kind wählt zwischen zwei Ideen, was hilft. Die Szenen gibt es auch nach Gefühlen geordnet. Für Gespräche über Gefühle mit Kleinkindern.",
+    text: "Kleine Geschichten vom Bären, erzählt als Tage vom Morgen bis zum Abend: Er ist wütend, traurig, hat Angst oder freut sich, und das Kind wählt zwischen zwei Ideen, was hilft. Die Szenen gibt es auch nach Gefühlen geordnet. Wer die Geschichte lieber selbst erzählt, schaltet die Stimme mit einem Tippen aus und öffnet den ganzen Text zum Vorlesen. Für Gespräche über Gefühle mit Kleinkindern.",
   },
   {
     path: "/wie-gehts-dir/",
     title: "Wie geht's dir? Gefühle zeigen für Kleinkinder",
-    description: "Fröhlich, stolz, müde oder wütend: Das Kind tippt auf das Bild, das zu seinem Gefühl passt, und schiebt, wie stark es ist. Ohne Werbung.",
-    text: "Acht Gefühle in zwei Gruppen, die angenehmen und die unangenehmen, jedes mit dem kleinen Bären in einem Moment, den Kinder kennen. Das Kind tippt auf sein Gefühl und schiebt dann, wie doll es ist – der Bär zeigt es mit dem ganzen Körper. Ein Anfang für Gespräche über Gefühle.",
+    description: "Fröhlich, stolz, müde oder wütend: Das Kind tippt auf das Bild, das zu seinem Gefühl passt, und zeigt, wie doll es gerade ist. Ohne Werbung.",
+    text: "Acht Gefühle in zwei Gruppen, die angenehmen und die unangenehmen, jedes mit dem kleinen Bären in einem Moment, den Kinder kennen. Das Kind tippt auf sein Gefühl, dann zeigen drei Bilder dasselbe Gefühl ein bisschen, schon ziemlich und ganz doll, und das Kind wählt, wie doll es gerade ist. Von dort geht es weiter zu „Was brauche ich?“. Ein Anfang für Gespräche über Gefühle.",
   },
   {
     path: "/was-brauche-ich/",
@@ -148,40 +153,40 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/kettenreaktion/",
     title: "Kettenreaktion und Kugelbahn für Kinder",
     description: "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kleinkinder, ohne Werbung.",
-    text: "Zwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine fallen, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion – zum Staunen und Nochmal-Machen.",
+    text: "Zwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine und Alltagsdinge fallen um, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt – zum Staunen und Nochmal-Machen.",
   },
   {
     path: "/kleine-abenteuer/",
     title: "Kleine Abenteuer – Bildergeschichten für Kleinkinder",
     description:
-      "Kurze Bilder-Abenteuer für Kleinkinder: mit dem Aufzug fahren, einen Weg entlanglaufen, Dinge einsammeln. Jedes Tippen bringt die Geschichte weiter.",
-    text: "Abenteuer von wenigen Minuten: Aufzug fahren und auf jedem Stockwerk etwas entdecken, oder einen Weg entlanglaufen und am Ende feiern.",
+      "Kurze Bilder-Abenteuer für Kleinkinder: Aufzug fahren, Wege entlanglaufen und kleine Filme wie beim Bäcker. Jedes Tippen bringt die Geschichte weiter.",
+    text: "Abenteuer von wenigen Minuten: mit dem Aufzug fahren und auf jedem Stockwerk etwas entdecken, einen Weg entlanglaufen – dem Ball, dem Drachen oder der kleinen Lok hinterher – und am Ende feiern, oder einen kleinen Film erleben: mit der Feuerwehr ausrücken, einen Brief zu Oma bringen oder beim Bäcker Brötchen, eine Brezel oder einen Kuchen backen. Unterwegs entscheidet das Kind mit.",
   },
   {
     path: "/tiere/",
     title: "Tiere füttern – Tierspiel für Kleinkinder",
     description:
-      "Was gehört zum Tier? Wer schaut aus dem Busch, was frisst das Tier, was gibt es uns, wo wohnt es? Mit Tiergeräuschen, für Kleinkinder, ohne Werbung.",
-    text: "Der Hase will eine Möhre, die Kuh gibt uns Milch, der Hund sucht seine Hütte, aus der Raupe wird ein Schmetterling: Tier erkennen, Futter, Milch, Ei oder Zuhause antippen, das Tier freut sich und macht sein Geräusch. Das Spiel wird von selbst leichter oder schwerer.",
+      "Was gehört zum Tier? Was frisst es, was gibt es uns, wo wohnt es, und was wird aus der Raupe? Mit Tiergeräuschen, für Kleinkinder, ohne Werbung.",
+    text: "Der Hase will eine Möhre, der Elefant Erdnüsse, die Kuh gibt uns Milch, der Biber sucht seine Burg, aus der Raupe wird ein Schmetterling und aus dem Samen eine Sonnenblume: Futter, Milch, Ei oder Zuhause antippen, und das Tier freut sich und macht sein Geräusch. Viele Tiere vom Bauernhof, aus Wald, Zoo und Meer. Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/zusammen/",
     title: "Was gehört zusammen? – Zuordnen für Kleinkinder",
     description:
       "Zahnbürste und Zahnpasta, Schlüssel und Tür, die Feuerwehr und ihr Schlauch: Kleinkinder finden, was zusammengehört, und sehen es gleich wirken. Ohne Werbung.",
-    text: "Oben liegt die Zahnbürste, unten Zahnpasta, Schlüssel und Deckel: Das Kind tippt, was dazugehört, und die beiden legen los – die Zahnpasta drückt einen Klecks auf die Bürste, der Schlüssel dreht sich und die Tür geht auf. Dazwischen brauchen Helfer als Fuchs und Bär ihr Werkzeug: Die Feuerwehr löscht mit dem Schlauch, die Ärztin hört mit dem Hörrohr, die Friseurin schneidet mit der Schere. Das Spiel wird von selbst leichter oder schwerer.",
+    text: "Oben liegt die Zahnbürste, unten Zahnpasta, Schlüssel und Deckel: Das Kind tippt, was dazugehört, und die beiden legen los – die Zahnpasta drückt einen Klecks auf die Bürste, der Schlüssel dreht sich und die Tür geht auf. Dazwischen brauchen Helfer als Fuchs und Bär ihr Werkzeug: Die Feuerwehr löscht mit dem Schlauch, die Ärztin hört mit dem Hörrohr, die Friseurin schneidet mit der Schere. Fast 200 Paare in über zwanzig Themen, vom Bad über die Kita bis zum Bauernhof. Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/schatten/",
     title: "Erkennen – Schatten und Tiere für Kinder",
     description: "Welcher Schatten gehört zur Giraffe? Wer schaut da aus dem Busch? Erstes Erkennen für Kleinkinder, ohne Werbung.",
-    text: "Ein Bild sucht seinen Schatten unter zwei bis sechs; danach schaut ein Tier aus dem Busch oder dem Teich, und das Kind tippt, wer es ist. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist. Erst wenige ganz verschiedene Bilder, dann mehr und ähnlichere, sobald das Kind sicher wird.",
+    text: "Ein Bild sucht seinen Schatten unter zwei bis sechs – Tiere, Fahrzeuge, Essen und Dinge; danach schaut ein Tier aus dem Busch oder dem Teich, und das Kind tippt, wer es ist. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist. Erst wenige ganz verschiedene Bilder, dann mehr und ähnlichere, sobald das Kind sicher wird, später gedrehte und gespiegelte Schatten und welche unter Papierklappen zum Merken.",
   },
   {
     path: "/socken/",
     title: "Socken-Paare finden – Spiel für Kleinkinder",
     description: "Die Waschmaschine ist fertig: Socken-Paare finden und an die Wäscheleine hängen. Erstes Paare-Suchen für Kleinkinder, ohne Werbung.",
-    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr, mit Mustern und unter Wäschekörben wie bei Memory – sobald das Kind sicher wird.",
+    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr, mit Mustern und unter Wäschekörben wie bei Memory – sobald das Kind sicher wird. Danach kommen Fäustlinge, Gummistiefel und Bärenhausschuhe, je ein linker und ein rechter.",
   },
   {
     path: "/buchstaben/",
@@ -214,7 +219,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Zähneputzen für Kinder – Zahnputzlied mit Timer",
     description:
       "Zähneputzen mit Lied: Schritt für Schritt putzen, die Zuckermonster verschwinden, morgens und abends ein Stern. Zahnputz-Timer für Kleinkinder.",
-    text: "Ein Zahnputz-Begleiter: Zahnputzlied, sieben Schritte nach KAI (Kauflächen, außen, innen), Zuckermonster auf den Zähnen und eine Wochentafel mit Sonne und Mond.",
+    text: "Ein Zahnputz-Begleiter, so lang wie sein Lied, etwa zwei Minuten: Erst zeigt eine kleine Geschichte, wo die Zuckermonster herkommen, dann führen sieben Schritte nach KAI (Kauflächen, außen, innen) durchs Putzen, und die Monster verschwinden. Morgens geht die Sonne auf, abends der Mond, und eine Wochentafel sammelt die Sterne. Das Zahnputzlied singt in der Sprache der App – auf Deutsch, Englisch, Spanisch, Russisch, Chinesisch, Hindi oder Arabisch.",
   },
   {
     path: "/toepfchen/",
@@ -228,21 +233,21 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Belohnungstafel für Kinder – gestalten und drucken",
     description:
       "Belohnungstafel für Kleinkinder gestalten: Tag, Woche, Monat oder Sterne sammeln, mit Bildern und Belohnung. Am Tablet nutzen oder drucken – auch zum Ausmalen.",
-    text: "Eine Belohnungstafel für Kleinkinder, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Gedruckt wird in Farbe oder schwarz-weiß, und schwarz-weiß ist mehr als ein grauer Ausdruck: Jedes Bild der Tafel ist dafür noch einmal als Ausmalbild gezeichnet, mit klaren, dicken Linien. Das spart Tinte, und das Kind malt seine Tafel selbst bunt. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern.",
+    text: "Eine Belohnungstafel für Kleinkinder, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder Sterne sammeln, für jede Aufgabe auf einem eigenen Weg zu ihrer Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Gedruckt wird in Farbe oder schwarz-weiß, und schwarz-weiß ist mehr als ein grauer Ausdruck: Jedes Bild der Tafel ist dafür noch einmal als Ausmalbild gezeichnet, mit klaren, dicken Linien. Das spart Tinte, und das Kind malt seine Tafel selbst bunt. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern und der Countdown „Wie oft noch schlafen?“.",
   },
   {
     path: "/timer/",
-    title: "Visueller Timer für Kinder – Sanduhr, Zug und Kerze",
+    title: "Visueller Timer für Kinder – Zeitscheibe und Sanduhr",
     description:
-      "Ein Timer ohne Zahlen für Kleinkinder: ein Zug fährt zum Bahnhof, eine Sanduhr rinnt, eine Kerze brennt herunter. 1 bis 10 Minuten, am Ende winkt die Familie.",
-    text: "Ein visueller Timer für Kinder, die noch keine Uhr lesen: Ein Erwachsener stellt 1, 2, 3, 5 oder 10 Minuten ein, und das Kind sieht die Zeit vergehen – ein kleiner Zug rollt zum Bahnhof, wo die Bärenfamilie wartet, der Sand rinnt durch eine große Sanduhr, oder eine Kerze brennt herunter, bis das Bärenkind sie auspustet, oder Ameisen tragen Krümel für Krümel einen Keks zu ihrem Hügel. Tippt das Kind aufs Bild, leuchtet kurz auf, was noch bleibt. Zum Abwechseln unter Geschwistern liegt ein Spielzeug beim Fuchskind, bis die Sanduhr leer ist, dann wandert es zum Bärenkind, und die Sanduhr dreht sich von selbst um. Am Ende klingt eine fröhliche Melodie und die Familie winkt. Für „noch fünf Minuten spielen“, das Warten aufs Essen oder fürs Aufräumen; der Bildschirm bleibt dabei an, und der Timer läuft auch, wenn die Spielzeit vorbei ist.",
+      "Ein Timer ohne Zahlen für Kleinkinder: Die rote Scheibe schrumpft, Sand rinnt, Kerzen brennen, ein Zug fährt zum Bahnhof. 10 Sekunden bis 3 Stunden.",
+    text: "Ein visueller Timer für Kinder, die noch keine Uhr lesen – einer unserer Alltagshelfer. Ein Erwachsener stellt 10 oder 30 Sekunden oder 1 bis 10 Minuten ein, jede andere Zeit bis zu drei Stunden oder eine Uhrzeit, bis zu der es dauert, und das Kind sieht die Zeit vergehen: Die rote Scheibe, wie Kinder sie aus der Kita kennen, wird kleiner, Sand rinnt durch eine große Sanduhr, Kerzen brennen herunter, ein Apfelbaum wächst, blüht und trägt Äpfel, eine Pizza wird Stück für Stück gegessen, ein Kinderwecker zählt herunter, ein Zug rollt zum Bahnhof, eine Raupe frisst ihr Blatt, eine Blume wächst und blüht, oder die Sonne geht auf. Tippt das Kind aufs Bild, leuchtet kurz auf, was noch bleibt, und klein in der Ecke steht für uns Große die restliche Zeit. Zum Abwechseln unter Geschwistern steht die Sanduhr zwischen zwei Kissen: Eine Lampe zeigt, wer dran ist, das Spielzeug liegt dort, bis der Sand durch ist, dann hüpft es hinüber, und die Sanduhr dreht sich von selbst um. Am Ende klingen ein Jubel und eine fröhliche Melodie. Für „noch fünf Minuten spielen“, das Warten aufs Essen oder fürs Aufräumen; der Bildschirm bleibt dabei an, und der Timer läuft auch, wenn die Spielzeit vorbei ist.",
   },
   {
     path: "/tagesplan/",
     title: "Tagesplan für Kinder – Tag und Woche in Bildern",
     description:
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Bildkarten zum Drucken und Ausmalen.",
-    text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel – in Farbe oder schwarz-weiß, wo jede Karte als Ausmalbild mit klaren Linien gezeichnet ist, damit das Kind seinen Plan selbst ausmalt. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
+    text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Dazu Karten mit Worten für uns Eltern – Mutmach-Sätze am Morgen, Erzählen nach der Kita, Gute-Nacht-Sätze –, und die Zahnputz-Karte startet gleich das Zähneputzen mit Lied. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel – in Farbe oder schwarz-weiß, wo jede Karte als Ausmalbild mit klaren Linien gezeichnet ist, damit das Kind seinen Plan selbst ausmalt. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln und der Countdown „Wie oft noch schlafen?“.",
   },
   {
     path: "/wie-lange-warten/",

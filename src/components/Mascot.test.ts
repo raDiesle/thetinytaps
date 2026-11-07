@@ -15,10 +15,8 @@ const MASCOT_DRAWINGS = [
   "src/games/together/Helper.tsx",
   "src/games/marbles/scenery.tsx",
   "src/games/marbles/CircusLevel.tsx",
-  "src/games/timer/scenes.tsx",
   "src/games/scenes/hideout.tsx",
   "src/games/elevator/kid.tsx",
-  "src/games/letters/MovePlay.tsx",
   "src/games/scenes/supermarkt/wall.tsx",
   "src/games/scenes/supermarkt/checkout.tsx",
   "src/games/scenes/kita/people.tsx",
@@ -73,10 +71,9 @@ describe("the shared fox and bear", () => {
   // where it does the game's thing: a new place goes on this list with what the figure does there.
   test("a whole fox or bear figure stands only where it does the game's thing", async () => {
     const doing: Record<string, string> = {
-      "src/games/letters/MovePlay.tsx": "Mitmachen: the child hops, claps and stamps the number",
-      "src/games/timer/scenes.tsx": "Timer: the child holds the basket, waters the flower, blows out the candle, takes its turn",
       "src/games/together/pairs.tsx":
         "Was gehört zusammen?: the child the doctor listens to and the hairdresser cuts, and the family the key opens the door to",
+      "src/games/timer/tennis.tsx": "Timer, Tennis (H-71): the two children taking turns, hitting the ball over the net",
     };
     for await (const file of new Bun.Glob("src/**/*.tsx").scan(".")) {
       if (file.endsWith("Mascot.tsx")) continue;

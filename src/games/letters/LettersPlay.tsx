@@ -4,14 +4,19 @@ import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard
 import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
+import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playWhistle, recorded } from "@/lib/sfx";
 import { useAppLanguage, useT } from "@/lib/language";
+import { repeatPause } from "@/lib/spacing";
 import { LetterCard, NumberCard } from "./Cards";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
+import { useSoftTap } from "./softTap";
 
-/** Presses closer together than this only make ripples, so mashing doesn't strobe. */
-const MIN_CHANGE_MS = 600;
+/**
+ * Presses closer together than this only make ripples, so mashing doesn't strobe nor chop line after line. The same key
+ * again waits longer still, `REPEAT_PAUSE_MS` (`repeats`).
+ */
+const MIN_CHANGE_MS = 1000;
 
 /** Enter: a real car horn and train whistle (src/lib/sounds/), synthesized until loaded. */
 const honk = recorded("honk", playHonk);
@@ -97,6 +102,11 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const history = useRef<Shown[]>([]);
   const hornCount = useRef(0);
   const cardBox = useRef<HTMLDivElement>(null);
+  /**
+   * The same key (or the card, or its picture) again is said and sounded only after a pause: a child hammering one key
+   * heard its line and a note at every press (user feedback, November 2026). Pressed during it, it only ripples.
+   */
+  const repeats = useMemo(() => repeatPause(), []);
 
   const say = useLettersSay();
 
@@ -135,13 +145,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     [pack, say, sentenceFor, settings.sounds],
   );
 
-  const softTap = useCallback(
-    (x?: number, y?: number) => {
-      ripple(x, y);
-      if (settings.sounds) playRandomNote();
-    },
-    [ripple, settings.sounds],
-  );
+  const softTap = useSoftTap(ripple, settings.sounds);
 
   // Cycle through the letter's words so repeated presses stay interesting.
   const pickWord = useCallback(
@@ -280,14 +284,16 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       e.stopPropagation();
       if (shown?.kind !== "letter") return;
       const now = performance.now();
-      if (now - lastChange.current >= MIN_ADVANCE_MS) {
-        lastChange.current = now;
-        const next: Shown = { ...shown, id: nextId.current++, word: pickWord(shown.letter) };
-        present(next, lastStage(next));
+      if (now - lastChange.current < MIN_ADVANCE_MS || !repeats.pass("picture")) {
+        softTap(e.clientX, e.clientY, true);
+        return;
       }
+      lastChange.current = now;
+      const next: Shown = { ...shown, id: nextId.current++, word: pickWord(shown.letter) };
+      present(next, lastStage(next));
       softTap(e.clientX, e.clientY);
     },
-    [shown, present, pickWord, softTap],
+    [shown, present, pickWord, softTap, repeats],
   );
 
   /** Make the card move once. */
@@ -302,7 +308,10 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
    */
   const specialKey = useCallback(
     (key: string) => {
-      const sound = (play: () => void) => settings.sounds && play();
+      if (key !== " " && key !== "Enter" && !(key in ARROWS) && (key !== "Backspace" || history.current.length === 0)) return false;
+      // The same key again moves the card but sounds only after its pause; Backspace waits for it, since it speaks.
+      const again = !repeats.pass(key);
+      const sound = (play: () => void) => settings.sounds && !again && play();
       if (key === " ") {
         sound(playBoing);
         animateCard([{ transform: "none" }, { transform: "translateY(-18%) scale(1.06)" }, { transform: "none" }], 600);
@@ -322,6 +331,10 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         return true;
       }
       if (key === "Backspace") {
+        if (again) {
+          softTap(undefined, undefined, true);
+          return true;
+        }
         const previous = history.current.pop();
         if (!previous) return false;
         // Shown again in full, without putting the current one on the history.
@@ -331,7 +344,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       }
       return false;
     },
-    [present, ripple, animateCard, settings.sounds],
+    [present, ripple, softTap, animateCard, settings.sounds, repeats],
   );
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -366,10 +379,14 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         softTap();
         return;
       }
+      if (!repeats.pass(toUpper(key, pack))) {
+        softTap(undefined, undefined, true);
+        return;
+      }
       lastChange.current = now;
       show(target);
     },
-    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, softTap, byTap, specialKey, stepByStep, settings.finishCounting],
+    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, softTap, byTap, specialKey, stepByStep, settings.finishCounting, repeats],
   );
 
   useEffect(() => {
@@ -405,8 +422,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const repeat = (e: PointerEvent) => {
     e.stopPropagation();
     const counting = settings.finishCounting && performance.now() < countingUntil.current;
-    if (shown && !counting) say(sentenceFor(shown));
-    softTap(e.clientX, e.clientY);
+    const again = !shown || counting || !repeats.pass("card");
+    if (!again) say(sentenceFor(shown));
+    softTap(e.clientX, e.clientY, again);
   };
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 

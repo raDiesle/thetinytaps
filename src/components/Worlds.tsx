@@ -195,11 +195,27 @@ function Lamp() {
 export function Sun() {
   return (
     <>
-      <g className="sky-sun-rays">
-        {Array.from({ length: 12 }, (_, i) => (
-          <rect key={i} x="94" y="4" width="12" height="36" rx="6" transform={`rotate(${i * 30} 100 100)`} />
-        ))}
-      </g>
+      <SunRays />
+      <SunFace />
+    </>
+  );
+}
+
+/** The sun's twelve rays round (100, 100), in a 200 × 200 box. */
+export function SunRays() {
+  return (
+    <g className="sky-sun-rays">
+      {Array.from({ length: 12 }, (_, i) => (
+        <rect key={i} x="94" y="4" width="12" height="36" rx="6" transform={`rotate(${i * 30} 100 100)`} />
+      ))}
+    </g>
+  );
+}
+
+/** The sun's round face without its rays, in the same box as `SunRays`. */
+export function SunFace() {
+  return (
+    <>
       <circle cx="100" cy="100" r="52" />
       <circle className="sky-sun-cheek" cx="74" cy="112" r="9" />
       <circle className="sky-sun-cheek" cx="126" cy="112" r="9" />

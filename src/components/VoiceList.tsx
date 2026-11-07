@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { CATEGORIES } from "@/content/games";
 import { stillToRecord, type VoiceGame, voiceLines } from "@/content/voiceLines";
 
-/** What a character costs with the turbo model, as measured in October 2026 (src/games/adventure/CLAUDE.md). */
-const CREDITS_PER_CHARACTER = 0.1;
+/** What a character costs with the turbo model, as measured in October and November 2026 – the same as `bun run voice make` (scripts/elevenlabs-voice.mjs). */
+const CREDITS_PER_CHARACTER = 0.11;
 /** The credits of the plan, each month. */
 const CREDITS_PER_MONTH = 10_000;
 
@@ -23,8 +23,11 @@ const charactersOf = (lines: string[]) => lines.reduce((sum, line) => sum + line
  */
 export function VoiceList() {
   const all = useMemo(voiceLines, []);
-  const games = useMemo(() => stillToRecord(all), [all]);
-  const done = all.filter((game) => !games.some((g) => g.href === game.href));
+  const open = useMemo(() => stillToRecord(all), [all]);
+  // Parked games wait for the user's word: listed, but neither open nor in the credits still needed.
+  const games = open.filter((game) => !game.parked);
+  const parked = open.filter((game) => game.parked);
+  const done = all.filter((game) => !open.some((g) => g.href === game.href));
   const total = games.flatMap(linesOf);
   const characters = charactersOf(total);
   return (
@@ -33,8 +36,9 @@ export function VoiceList() {
         Die Browserstimme spricht nur noch dort, wo die Stimme die Geschichte erzählt (Kleine Abenteuer, Bewegungsabenteuer), und nur, bis die Aufnahme da ist
         (Oktober 2026); sonst kommt, was die Spiele sagen, nur als Aufnahme und spielt dann immer, wie ein Geräusch. Hier steht jeder deutsche Satz, der dafür
         noch keine Aufnahme hat – direkt aus den Spieldaten gelesen, also immer aktuell. Jede weitere Sprache braucht noch einmal so viele. Credits geschätzt
-        mit {String(CREDITS_PER_CHARACTER).replace(".", ",")} je Zeichen (Turbo-Modell, gemessen im Oktober 2026), {number(CREDITS_PER_MONTH)} gibt es im Monat.
-        Sag dann z. B. „nimm die Sätze von Socken-Paare auf“.
+        mit {String(CREDITS_PER_CHARACTER).replace(".", ",")} je Zeichen (Turbo-Modell, gemessen im Oktober und November 2026), {number(CREDITS_PER_MONTH)} gibt
+        es im Monat. Geparkte Spiele (🅿️) zählen nicht mit: sie werden nur aufgenommen, wenn du es ausdrücklich für sie sagst. Sag dann z. B. „nimm die Sätze von
+        Socken-Paare auf“.
       </p>
       <div className="ideas-overview-scroll">
         <table className="ideas-overview voice-overview">
@@ -51,6 +55,14 @@ export function VoiceList() {
               <tr key={name} className="ideas-overview-finished">
                 <th>{name}</th>
                 <td colSpan={3}>✅ schon aufgenommen</td>
+              </tr>
+            ))}
+            {parked.map((game) => (
+              <tr key={game.href} className="ideas-overview-finished">
+                <th>
+                  <a href={`#stimmen-${game.href}`}>{nameOf(game.href)}</a>
+                </th>
+                <td colSpan={3}>🅿️ geparkt, {number(linesOf(game).length)} Sätze – nur auf deinen Befehl</td>
               </tr>
             ))}
             {games.map((game) => {
@@ -79,7 +91,7 @@ export function VoiceList() {
           </tfoot>
         </table>
       </div>
-      {games.map((game) => (
+      {[...games, ...parked].map((game) => (
         <VoiceGameLines key={game.href} game={game} />
       ))}
     </>
@@ -100,9 +112,11 @@ function VoiceGameLines({ game }: { game: VoiceGame }) {
     <details id={`stimmen-${game.href || "alle"}`} className="ideas-panel voice-game">
       <summary>
         <h3>
+          {game.parked && "🅿️ "}
           {nameOf(game.href)} ({number(lines.length)} {lines.length === 1 ? "Satz" : "Sätze"})
         </h3>
       </summary>
+      {game.parked && <p className="ideas-hint">{game.parked}</p>}
       <button type="button" className="ideas-copy" onClick={copy}>
         {copied ? "Kopiert ✓" : "📋 Alle Sätze kopieren"}
       </button>

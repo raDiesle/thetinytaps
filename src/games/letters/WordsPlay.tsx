@@ -6,9 +6,10 @@ import { isRightToLeftPack, keyMatches, keyOf, toLower, toUpper } from "@/conten
 import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling";
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
-import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
+import { playChime, playCountNote } from "@/lib/sfx";
 import { useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
+import { useSoftTap } from "./softTap";
 
 /** Keys closer together than this only make ripples, so mashing doesn't race through the word. */
 const MIN_TYPE_MS = 300;
@@ -98,13 +99,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     [pack, say],
   );
 
-  const softTap = useCallback(
-    (x?: number, y?: number) => {
-      ripple(x, y);
-      if (settings.sounds) playRandomNote();
-    },
-    [ripple, settings.sounds],
-  );
+  const softTap = useSoftTap(ripple, settings.sounds);
 
   // Go through all words in random order before any word comes again.
   const nextWord = useCallback(() => {

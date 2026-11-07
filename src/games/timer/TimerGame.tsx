@@ -3,9 +3,10 @@ import { GameShell } from "@/components/GameShell";
 import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { PICTURES, TIMER_TITLE } from "./content";
+import { TimerCardArt } from "./cardArt";
+import { isTurns, PICTURES, SWAP_NAME, SWAP_NOTE, TIMER_TITLE } from "./content";
 import { OwnTimeSheet } from "./OwnTimeSheet";
-import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
+import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
 import { lengthWords, type OwnTime } from "./time";
 import { TimerPlay } from "./TimerPlay";
 import "./timer.css";
@@ -18,8 +19,20 @@ export function TimerGame() {
   const t = useT();
   const [settings, update] = useGameSettings(TIMER_SETTINGS_KEY, DEFAULT_TIMER_SETTINGS);
   const [sheet, setSheet] = useState(false);
-  const modes = PICTURES.map((p) => ({ id: p.id, emoji: p.emoji, title: t(p.name) }));
-  const minutes = TIMER_MINUTES.includes(settings.minutes as (typeof TIMER_MINUTES)[number]) ? settings.minutes : DEFAULT_TIMER_SETTINGS.minutes;
+  // Each card is its picture as it looks at the end, with no words on it (user request, November 2026); its name, and
+  // for „Abwechseln“ the line saying it goes on and on, are only read out and its tooltip. „Abwechseln“ is a category
+  // of its own, named on its frame after all the pictures, which share a frame with no name (user request, November 2026).
+  const modes = PICTURES.map((p) => ({
+    id: p.id,
+    emoji: p.emoji,
+    title: t(p.name),
+    note: isTurns(p.id) ? t(SWAP_NOTE) : undefined,
+    kind: isTurns(p.id) ? t(SWAP_NAME) : undefined,
+    art: <TimerCardArt picture={p.id} toy={settings.toy} />,
+  }));
+  // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
+  const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
+  const seconds = TIMER_SECONDS.includes(settings.seconds as (typeof TIMER_SECONDS)[number]) ? settings.seconds : DEFAULT_TIMER_SETTINGS.seconds;
   const own = settings.own;
   const useOwn = settings.useOwn && own !== null;
   const ownLabel = (time: OwnTime) =>
@@ -41,37 +54,29 @@ export function TimerGame() {
       // A tool for the day like the Belohnungstafel: it counts no play time and still runs when play time is over.
       tool
       modes={modes}
-      mode={settings.picture}
+      mode={picture}
       onMode={(picture) => update({ picture: picture as TimerPicture })}
+      levelInHead
       level={
         // The grown-up sets the time here; the child sees no numbers, only the picture running down. Behind the
-        // minutes, the time set last behind „Andere …“ stays as a slip of its own until another comes (H-59).
+        // lengths, the time set last behind „Andere …“ stays as a slip of its own until another comes (H-59).
         <>
-          <Choice
-            label={t({ de: "Wie lange?", en: "How long?", zh: "多长时间？", hi: "कितनी देर?", es: "¿Cuánto tiempo?", ar: "كم من الوقت؟", ru: "Как долго?" })}
-            value={useOwn ? OWN : String(minutes)}
-            onChange={(value) => {
-              if (value === OTHER) setSheet(true);
-              else if (value === OWN) update({ useOwn: true });
-              else update({ minutes: Number(value), useOwn: false });
-            }}
-            options={[
-              ...TIMER_MINUTES.map((m) => ({
-                value: String(m),
-                label: t({
-                  de: `${m} Min.`,
-                  en: `${m} min`,
-                  zh: `${m} 分钟`,
-                  hi: `${m} मिनट`,
-                  es: `${m} min`,
-                  ar: `${m} ${m >= 3 && m <= 10 ? "دقائق" : "دقيقة"}`,
-                  ru: `${m} мин`,
-                }),
-              })),
-              ...(own ? [{ value: OWN, label: ownLabel(own) }] : []),
-              { value: OTHER, label: t({ de: "Andere …", en: "Other …", zh: "其他……", hi: "अन्य …", es: "Otro …", ar: "غير ذلك …", ru: "Другое …" }) },
-            ]}
-          />
+          <div className="tm-lengths">
+            <Choice
+              label={t({ de: "Wie lange?", en: "How long?", zh: "多长时间？", hi: "कितनी देर?", es: "¿Cuánto tiempo?", ar: "كم من الوقت؟", ru: "Как долго?" })}
+              value={useOwn ? OWN : String(seconds)}
+              onChange={(value) => {
+                if (value === OTHER) setSheet(true);
+                else if (value === OWN) update({ useOwn: true });
+                else update({ seconds: Number(value), useOwn: false });
+              }}
+              options={[
+                ...TIMER_SECONDS.map((s) => ({ value: String(s), label: t(lengthWords(s)) })),
+                ...(own ? [{ value: OWN, label: ownLabel(own) }] : []),
+                { value: OTHER, label: t({ de: "Andere …", en: "Other …", zh: "其他……", hi: "अन्य …", es: "Otro …", ar: "غير ذلك …", ru: "Другое …" }) },
+              ]}
+            />
+          </div>
           {sheet && (
             <OwnTimeSheet
               start={own}
@@ -85,7 +90,12 @@ export function TimerGame() {
         </>
       }
     >
-      <TimerPlay settings={{ ...settings, minutes, useOwn }} onPicture={(picture) => update({ picture })} onToy={(toy) => update({ toy })} />
+      <TimerPlay
+        settings={{ ...settings, picture, seconds, useOwn }}
+        onPicture={(picture) => update({ picture })}
+        onToy={(toy) => update({ toy })}
+        onShown={(timeNote) => update({ timeNote })}
+      />
     </GameShell>
   );
 }

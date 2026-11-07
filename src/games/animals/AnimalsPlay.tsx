@@ -48,6 +48,8 @@ export interface AnimalsPlayProps {
   round: FeedRound | GiftRound | HomeRound;
   /** What the round is about, for grown-ups: shown under the picture. */
   topic?: ReactNode;
+  /** The kind's question („Was esse ich?“), said before the round's own when the kind of round changes (Z-24). */
+  intro?: string;
   /** The right food, gift or home was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
   /** The munching or moving in has been watched: the next round may come. */
@@ -58,7 +60,7 @@ export interface AnimalsPlayProps {
  * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), what the animal gives us to it (Z-01), or
  * the animal to its home (N-09). Tapping is enough; dragging works too.
  */
-export function AnimalsPlay({ settings, round, topic, onSolved, onNext }: AnimalsPlayProps) {
+export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }: AnimalsPlayProps) {
   const language = useAppLanguage();
   const texts = pick(ANIMAL_TEXTS, language.id);
   const giftTexts = pick(GIFT_TEXTS, language.id);
@@ -100,12 +102,19 @@ export function AnimalsPlay({ settings, round, topic, onSolved, onNext }: Animal
   // Its ElevenLabs recording; a sentence not translated yet is said in German.
   const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
 
-  const prompt = (r: FeedRound | GiftRound | HomeRound) =>
-    r.kind === "feed" ? texts.hungry(r.animal) : r.kind === "gift" ? giftTexts.whatGives(r.animal) : texts.whereLives(r.animal);
+  /** The round's question; a feeding round's comes after the animal's hunger (Z-24). `queue`: after what is being said. */
+  const ask = (queue = false) => {
+    if (round.kind === "feed") {
+      say(texts.hungry(round.animal), queue);
+      say(texts.whatEats(round.animal), true);
+    } else say(round.kind === "gift" ? giftTexts.whatGives(round.animal) : texts.whereLives(round.animal), queue);
+  };
 
-  // The question and the animal's noise come with the round; the round is mounted anew for every animal.
+  // The kind's question when the kind changed, the round's question and the animal's noise come with the round; the
+  // round is mounted anew for every animal.
   useEffect(() => {
-    say(prompt(round));
+    if (intro) say(intro);
+    ask(Boolean(intro));
     if (settings.sounds) later(400, () => round.animal.sound?.());
   }, []);
 
@@ -132,18 +141,19 @@ export function AnimalsPlay({ settings, round, topic, onSolved, onNext }: Animal
       if (round.kind === "feed") {
         if (settings.sounds) playYuck();
         say(texts.yuck(round.animal));
+        say(texts.whatEats(round.animal), true);
       } else if (round.kind === "gift") {
         // The animal it comes from pops up behind the plate and says so.
         const gift = round.gifts[index];
         const giver = giverOf(gift);
         if (settings.sounds) later(300, () => giver.sound?.());
         say(giftTexts.comesFrom(gift, giver));
-        say(prompt(round), true);
+        ask(true);
       } else {
         const resident = ANIMALS.find((a) => a.home === round.homes[index].id)!;
         if (settings.sounds) later(300, () => resident.sound?.());
         say(texts.livesHere(resident));
-        say(prompt(round), true);
+        ask(true);
       }
       later(WRONG_MS, () => {
         busy.current = false;
@@ -205,7 +215,7 @@ export function AnimalsPlay({ settings, round, topic, onSolved, onNext }: Animal
 
   /** Tapping the animal asks again; it makes its noise and hops. */
   const askAgain = () => {
-    say(prompt(round));
+    ask();
     if (settings.sounds) round.animal.sound?.();
     setNudge((prev) => ({ who: "animal", n: (prev?.n ?? 0) + 1 }));
   };
