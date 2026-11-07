@@ -250,6 +250,13 @@ In a fresh worktree run `bun install` first.
   An animal, water or machine sound that has a recording is imported from `@/lib/realSounds` (same names as in
   `@/lib/sfx`, preloaded with `loadRealSounds`), not from `@/lib/sfx` – unless the recording doesn't fit the moment (a
   bicycle bell is no telephone, the farm's goat and donkey bend the synthesized sheep, horse and cow).
+- What a child can set off quickly, one answer after the other, never piles up into a din (user feedback from
+  Socken-Paare, November 2026): the answer's own sound always plays, but extras round it (a boing, a twinkle, a second
+  knock) come at most every `EXTRA_SOUND_GAP_MS`, and a line that only accompanies the play – praise like „Ein Paar!“,
+  „Toll!“, an end's „Alle … !“, never a line needed to follow the game – is said with `say(…, { gap:
+  ASIDE_LINE_GAP_MS })` (`src/lib/spacing.ts`, `voice.ts`): only when nothing else is said and the last such line lies
+  far enough back, never cutting another line off. Where a level's last answer leads straight into its end, it leaves
+  its praise and extras to the end's.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.

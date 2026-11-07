@@ -7,7 +7,7 @@ import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling"
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
-import { useLettersSay } from "./voice";
+import { useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 
 /** Keys closer together than this only make ripples, so mashing doesn't race through the word. */
@@ -84,6 +84,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
 
   const say = useLettersSay();
+  const praise = useLettersPraise();
 
   /** Says the letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
   const sayLetter = useCallback(
@@ -140,9 +141,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     if (settings.sounds) playChime();
     const word = current.word;
     say(`${word.word}!`, true);
-    say(isAction(word) ? pack.joinIn(word) : pick(pack.praise), true);
+    if (isAction(word)) say(pack.joinIn(word), true);
+    else praise(pick(pack.praise));
     if (isColor(word)) setBackground(word.color);
-  }, [current, done, letters, typed, pack, say, sayLetter, settings.sounds]);
+  }, [current, done, letters, typed, pack, say, praise, sayLetter, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
