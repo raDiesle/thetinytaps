@@ -125,7 +125,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als Bild „Sonnenuntergang“: Die Sonne sinkt hinter die Hügel und wird rot, der Himmel wird orange, dann nachtblau, das Land dunkler, die Sterne kommen nacheinander, und im Häuschen gehen die Fenster an. Der Mond schaut von Anfang an über den Hügel und steigt, jede Sekunde dreht sich die Windmühle ein Stück. Am Ende gähnt die Fuchsfamilie und winkt gute Nacht.",
+        "Gebaut als Bild „Sonnenuntergang“, später umgedreht und „Sonnenaufgang“ genannt (Wunsch, November 2026): Ein großer Mond steht genau in der Mitte über einer Wiese voller Blumenpunkte und geht hinter dem Hügel unter, die Sterne gehen nacheinander aus, der Himmel wird morgenrosa und hell, dann geht an derselben Stelle die große Sonne auf, erst rot, dann gelb. Windmühle und Häuschen sind wieder weg. Jede Sekunde leuchtet ein weicher Lichtkranz um Mond oder Sonne auf.",
     },
     {
       id: "H-55",

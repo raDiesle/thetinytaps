@@ -13,9 +13,12 @@ request, November 2026 – the tally marks were the default before). Behind ⚙�
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
 for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
 `MAX_MARKS`) – or „Aus“.
-The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
-there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
-screen), then the pictures that run until the time is up:
+The start screen's cards are the pictures themselves as they look at their end, with no words on them (user request,
+November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
+cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
+the picture (`ART_ASPECT`). Names are only read out and their tooltip. „Abwechseln“ comes first, its two children with
+the toy and the hourglass; that it runs on without end is said in its tooltip (`SWAP_NOTE`). Then the pictures that run
+until the time is up:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
@@ -50,11 +53,13 @@ screen), then the pictures that run until the time is up:
   `--tm-i`/`--tm-of`), each burning all the way down into its puddle and only then going out, its smoke (`Smoke`: a
   wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the last one goes out with a puff
   too (`blow`).
-- „Sonnenuntergang“ 🌅 (`sunset.tsx`, H-54): for the time before bed – one round hill over the whole picture, a big sun
-  sinking behind it and reddening (gone at `SUN_SET_AT`), the evening's and the night's sky fade in, the land darkens,
-  and once the sun is down the moon rises from behind the hill (`MOON_FROM`); the stars come out one by one (`STARS`,
-  each at its share of the time), the windows of the little house light up. Every
-  second the windmill's sails turn a step. At the end the house's windows are lit and the moon stands high.
+- „Sonnenaufgang“ 🌅 (`sunset.tsx`, id `sunset`, H-54; „Sonnenuntergang“ until the moon came first, November 2026): one round hill, its meadow full of flowers drawn as coloured dots
+  (`FLOWERS`), and a big moon exactly in the picture's middle. First the moon goes down behind the hill (gone at
+  `MOON_SET_AT`) while the stars go out one by one (`STARS`, each at its share of the time), the night's sky and then the
+  morning's pink fade away and the land grows light; then the big sun rises at the very same place (from `SUN_FROM`),
+  red at first and yellow as it climbs, and stands high over the meadow at the end (user feedback, November 2026: the
+  windmill and the little house taken out, sun and moon much bigger and in the middle, the moon setting first). Every
+  second a soft glow widens past the edge of the moon or the sun (`.tm-ring`).
 - „Ameisenstraße“ 🐜 (H-68): a big cookie lies on a picnic blanket at the left, an anthill far off at the right; ants march from under the
   cookie to the hill, each with a crumb, the cookie shrinks and the hill grows. At the end the ants sit on the hill, the
   last crumbs lie on the blanket.
@@ -88,7 +93,7 @@ once, and a picture stepped back from afar comes bright again for it.
 Seen from afar (H-48): eight seconds after the last tap the backdrop (`.tm-back`) and small things
 (`.tm-dims`) fade into the dark and only what runs down stays bright; a tap brings it all back (`tm-far`).
 
-Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `OwnTimeSheet.tsx` (the sheet behind
+Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `cardArt.tsx` (a card's picture), `OwnTimeSheet.tsx` (the sheet behind
 „Andere …“), `time.ts` (own times: typing, clock times, labels, digits; tested in `time.test.ts`), `TimerPlay.tsx` (one
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
@@ -112,7 +117,9 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   picture and the calm `celebrate` – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
-  user feedback, November 2026). A new picture is one whole small story a child knows from life.
+  user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing
+  beside it: what runs down stands big where the eye goes first, and things only standing by (a windmill and a little
+  house beside the moon and the sun) come out (user feedback, November 2026).
 - **What runs out runs out wholly before it ends** (user feedback, November 2026): a candle burns down to its puddle
   before its flame goes out (`CANDLE.stub` a thin rim, the going out after its turn, never before), and what follows
   an ending (the smoke) lingers slow and soft for seconds, never a puff gone at once. `timer.test.ts` checks the candle.
@@ -121,13 +128,16 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
   basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
   story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
-- **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
-  „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **Abwechseln stands first, apart**: it runs without end, so its card comes first (its tooltip says so, `SWAP_NOTE`),
+  and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
+- **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
+  `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
+  is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
 
 - **No fox or bear figure in any picture** (user feedback, November 2026): first a family standing by every picture was
   taken out (children wanted to tap it, and a timer to watch needs as few things and movements as can be), then the
-  children that held the basket and the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
-  brown circles for paws on the hose. A picture tells its story by itself (the basket on the grass, the hose in a forked
+  children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
+  brown circles for paws on the hose. A picture tells its story by itself (the cart rolling by itself, the hose in a forked
   stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
   stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one.
 - **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk

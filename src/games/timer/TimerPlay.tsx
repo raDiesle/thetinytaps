@@ -433,56 +433,11 @@ function TimerRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
-  const stepped = picture === "train" && stops > 1;
-  const stage = {
-    "--tm-ms": `${total}ms`,
-    "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
-    ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
-  } as CSSProperties;
-
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stage}>
-          {picture === "train" && (
-            <>
-              <TrainBackdrop />
-              {stepped && <TrainStepKeyframes total={total} stops={stops} />}
-              {stepped && <TrainStops pieces={stops} />}
-              <RailAhead glow={poke} />
-              <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
-                <Train puff={poke} />
-              </Layer>
-            </>
-          )}
-          {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
-          {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={endsAt - total} total={total} done={phase === "done"} />}
-          {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
-          {picture === "pizza" && <PizzaScene glow={poke} />}
-          {picture === "flower" && <FlowerScene glow={poke} total={total} />}
-          {picture === "sunset" && <SunsetScene glow={poke} />}
-          {picture === "sand" && (
-            <>
-              <SandBackdrop />
-              <Sand running={phase === "running"} glow={poke} />
-              <SandFrame />
-            </>
-          )}
-          {picture === "candle" && (
-            <>
-              <CandleBackdrop />
-              <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={endsAt - total} total={total} />
-            </>
-          )}
-          {picture === "ants" && (
-            <>
-              <AntsBackdrop />
-              <AntRoad />
-              <Cookie glow={poke} />
-              <AntHill />
-              <AntsHome />
-            </>
-          )}
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total, stops)}>
+          <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
         <TimeShownNote shown={phase === "running" ? shown : "off"} endsAt={endsAt} total={total} />
@@ -499,6 +454,84 @@ function TimerRun({
         <TimeLeft endsAt={endsAt} until={until} />
         <TimeShownChoice value={shown} onChange={onShown} />
       </PlayOptions>
+    </>
+  );
+}
+
+/** The stage's lengths for the CSS: the run's, its seconds, the train's way, and the train's own keyframes when it halts. */
+export function stageStyle(picture: TimerPicture, total: number, stops: number) {
+  const stepped = picture === "train" && stops > 1;
+  return {
+    "--tm-ms": `${total}ms`,
+    "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
+    ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
+  } as CSSProperties;
+}
+
+/**
+ * One picture's drawing on the stage, for a run of `total` ms cut into the pieces of `set` ms: in a run, and at its end
+ * on the start screen's card (`TimerCardArt`).
+ */
+export function SceneParts({
+  picture,
+  phase,
+  total,
+  set,
+  poke,
+  startedAt,
+}: {
+  picture: TimerPicture;
+  phase: Phase;
+  total: number;
+  set: number;
+  /** Counts the taps, each lighting what is left. */
+  poke: number;
+  startedAt: number;
+}) {
+  const apples = appleCount(set);
+  const stops = pieceCount(set, MAX_STOPS);
+  const stepped = picture === "train" && stops > 1;
+  return (
+    <>
+      {picture === "train" && (
+        <>
+          <TrainBackdrop />
+          {stepped && <TrainStepKeyframes total={total} stops={stops} />}
+          {stepped && <TrainStops pieces={stops} />}
+          <RailAhead glow={poke} />
+          <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
+            <Train puff={poke} />
+          </Layer>
+        </>
+      )}
+      {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
+      {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} />}
+      {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
+      {picture === "pizza" && <PizzaScene glow={poke} />}
+      {picture === "flower" && <FlowerScene glow={poke} total={total} />}
+      {picture === "sunset" && <SunsetScene glow={poke} />}
+      {picture === "sand" && (
+        <>
+          <SandBackdrop />
+          <Sand running={phase === "running"} glow={poke} />
+          <SandFrame />
+        </>
+      )}
+      {picture === "candle" && (
+        <>
+          <CandleBackdrop />
+          <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={startedAt} total={total} />
+        </>
+      )}
+      {picture === "ants" && (
+        <>
+          <AntsBackdrop />
+          <AntRoad />
+          <Cookie glow={poke} />
+          <AntHill />
+          <AntsHome />
+        </>
+      )}
     </>
   );
 }
