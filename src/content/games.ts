@@ -72,10 +72,25 @@ export const CATEGORIES: Category[] = [
       ru: "Зубы, горшок, распорядок дня",
     },
     // Each a book of its own on the shelf, its name on its spine (user decision, October 2026). First on the shelf, top
-    // left: the everyday helpers are what parents need most; the Belohnungstafel's books, the shelf's eye-catcher,
-    // stands right of Aufs Töpfchen (user feedback, November 2026).
+    // left: the everyday helpers are what parents need most, and the Timer is the very first book (user decision,
+    // November 2026); the Belohnungstafel's books, the shelf's eye-catcher, stand right of Aufs Töpfchen (user feedback,
+    // November 2026).
     apart: true,
     games: [
+      {
+        href: "/timer/",
+        emoji: "⏳",
+        title: { de: "Timer", ru: "Таймер", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت" },
+        blurb: {
+          de: "Warten in Bildern: Zug, Sanduhr, Kerze",
+          en: "Wait with a train, hourglass or candle",
+          zh: "用图画等待：火车、沙漏、蜡烛",
+          hi: "इंतज़ार: ट्रेन, रेत घड़ी, मोमबत्ती",
+          es: "Esperar con tren, reloj de arena o vela",
+          ar: "الانتظار بالصور: قطار وساعة رملية وشمعة",
+          ru: "Ожидание: поезд, песочные часы, свеча",
+        },
+      },
       {
         href: "/zaehne/",
         emoji: "🦷",
@@ -148,21 +163,6 @@ export const CATEGORIES: Category[] = [
           es: "Premios y horario en imágenes",
           ar: "لوحة المكافآت والجدول الزمني بالصور",
           ru: "Таблица наград и расписание в картинках",
-        },
-      },
-      {
-        href: "/timer/",
-        unfinished: true,
-        emoji: "⏳",
-        title: { de: "Timer", ru: "Таймер", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت" },
-        blurb: {
-          de: "Warten in Bildern: Zug, Sanduhr, Kerze",
-          en: "Wait with a train, hourglass or candle",
-          zh: "用图画等待：火车、沙漏、蜡烛",
-          hi: "इंतज़ार: ट्रेन, रेत घड़ी, मोमबत्ती",
-          es: "Esperar con tren, reloj de arena o vela",
-          ar: "الانتظار بالصور: قطار وساعة رملية وشمعة",
-          ru: "Ожидание: поезд, песочные часы, свеча",
         },
       },
       {

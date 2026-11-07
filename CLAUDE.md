@@ -362,8 +362,8 @@ In a fresh worktree run `bun install` first.
   user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
-  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
-  Töpfchen, Timer – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
+  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Zähne putzen, Töpfchen, Belohnungstafel &
+  Zeitplan – user decision, October 2026; the Timer the very first book, top left, November 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
   left corners (`--lean`), so the names running down their spines are read without bending the
@@ -623,9 +623,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
   and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
   the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
-  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang as near
-  the shelf's middle as can be: the top board's books move towards the left wall for it as far as their room there lets
-  them (the trail grows, `signOver`; user feedback, November 2026). On an upright screen it
+  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang far right, at the
+  wall with the stickers, so the top board's books come towards the shelf's middle (the trail shrinks, `signOver`; user
+  feedback, November 2026 – hanging them in the shelf's middle pushed the books to the left wall). On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent

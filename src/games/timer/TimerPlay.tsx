@@ -35,7 +35,7 @@ import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
 import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PizzaScene, SLICES } from "./pizza";
-import { CandleBackdrop, Candles, Layer, RAIL_Y, RailAhead, Sand, SandBackdrop, SandFrame, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
+import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
 import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
@@ -502,8 +502,7 @@ export function SceneParts({
       {picture === "sand" && (
         <>
           <SandBackdrop />
-          <Sand running={phase === "running"} glow={poke} />
-          <SandFrame />
+          <Hourglass running={phase === "running"} glow={poke} />
         </>
       )}
       {picture === "candle" && (

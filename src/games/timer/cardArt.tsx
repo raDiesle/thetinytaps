@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { pieceCount, MAX_STOPS } from "./pieces";
 import type { SwapToy, TimerPicture } from "./settings";
-import { SwapBackdrop, SwapHourglass, Toy } from "./swap";
+import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { SceneParts, stageStyle } from "./TimerPlay";
 
 /**
@@ -15,7 +15,7 @@ const CARD_MS = 5 * 60_000;
  * picture is the button, no words on it) – the cart full of apples, the train at the station, the flower in bloom. It
  * is the very drawing of a run in its end state (`.tm-done`), standing still: the CSS stops every animation in it and
  * puts what an animation would leave at its end in place (`.tm-card-art`), so the menu stays still and light.
- * „Abwechseln“, which never ends, shows the two children's cushions with the toy and the hourglass.
+ * „Abwechseln“, which never ends, shows the fox child's lamp on, the toy on its cushion, and the hourglass between.
  */
 export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { picture: TimerPicture; toy: SwapToy }) {
   return (
@@ -23,8 +23,11 @@ export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { pictu
       {picture === "swap" ? (
         <span className="tm-stage tm-done">
           <SwapBackdrop />
-          <SwapHourglass ms={CARD_MS} startedAt={0} flip={false} running={false} glow={0} />
-          <Toy toy={toy} bear={false} />
+          <SwapLight kind="fox" on />
+          <SwapCushions />
+          <SwapShade kind="bear" on />
+          <SwapHourglass ms={CARD_MS} startedAt={0} flip={false} waiting glow={0} />
+          <Toy toy={toy} place="fox" />
         </span>
       ) : (
         <span className="tm-stage tm-done" style={stageStyle(picture, CARD_MS, pieceCount(CARD_MS, MAX_STOPS))}>

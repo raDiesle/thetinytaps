@@ -351,7 +351,7 @@ function bulbPath(top: number, bottom: number, upsideDown: boolean) {
   return BULB.map(([x, y], i) => `${i ? "L" : "M"}${left + x * GLASS.w} ${upsideDown ? bottom - y * (bottom - top) : top + y * (bottom - top)}`).join(" ");
 }
 
-/** A room with a rug; the glass's pale inside is drawn here, behind the sand. Drawn once. */
+/** A room with a rug and a picture on the wall, the Sanduhr's backdrop. Drawn once. */
 export const SandBackdrop = memo(function SandBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
@@ -364,32 +364,60 @@ export const SandBackdrop = memo(function SandBackdrop() {
         <rect x="260" y="200" width="220" height="170" rx="10" fill="#e7f5ff" stroke="#9c6334" strokeWidth="12" />
         <path d="M266 330 Q370 270 474 330 V364 H266 Z" fill="#8ce99a" />
         <circle cx="420" cy="250" r="26" fill="#ffd43b" />
-        <path d={`${bulbPath(GLASS.top, GLASS.neck, false)} Z`} fill="#f1f8ff" />
-        <path d={`${bulbPath(GLASS.neck, GLASS.bottom, true)} Z`} fill="#f1f8ff" />
       </Draw>
     </Layer>
   );
 });
 
-/** The glass's outline and the wooden frame, in front of the sand. Drawn once. */
-export const SandFrame = memo(function SandFrame() {
+/** The hourglass's box on the stage: the glass with the posts and the wooden plates round it. */
+export const HOURGLASS_BOX = {
+  x: GLASS.cx - GLASS.w / 2 - 60,
+  y: GLASS.top - 4 - PLATE,
+  w: GLASS.w + 120,
+  h: GLASS.bottom - GLASS.top + 8 + 2 * PLATE,
+} as const;
+
+/** A box in stage units as a place in percent of the hourglass's box. */
+function inHourglass(x: number, y: number, w: number, h: number): CSSProperties {
+  const B = HOURGLASS_BOX;
+  return {
+    position: "absolute",
+    left: `${((x - B.x) / B.w) * 100}%`,
+    top: `${((y - B.y) / B.h) * 100}%`,
+    width: `${(w / B.w) * 100}%`,
+    height: `${(h / B.h) * 100}%`,
+  };
+}
+
+/** The glass's pale inside, behind the sand. */
+const GlassInside = memo(function GlassInside() {
+  const B = HOURGLASS_BOX;
+  return (
+    <svg viewBox={`${B.x} ${B.y} ${B.w} ${B.h}`} style={inHourglass(B.x, B.y, B.w, B.h)}>
+      <path d={`${bulbPath(GLASS.top, GLASS.neck, false)} Z`} fill="#f1f8ff" />
+      <path d={`${bulbPath(GLASS.neck, GLASS.bottom, true)} Z`} fill="#f1f8ff" />
+    </svg>
+  );
+});
+
+/** The glass's outline and the wooden frame, in front of the sand: no white streaks for its shine (user feedback, November 2026). */
+const GlassFrame = memo(function GlassFrame() {
+  const B = HOURGLASS_BOX;
   const left = GLASS.cx - GLASS.w / 2 - 50;
   const right = GLASS.cx + GLASS.w / 2 + 50;
   const { top, neck, bottom } = GLASS;
   return (
-    <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
-      <Draw w={STAGE_W} h={STAGE_H}>
-        <g fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round">
-          <path d={bulbPath(top, neck, false)} />
-          <path d={bulbPath(neck, bottom, true)} />
-        </g>
-        {[left + 10, right - 30].map((x) => (
-          <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
-        ))}
-        <rect x={left - 10} y={top - 4 - PLATE} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
-        <rect x={left - 10} y={bottom + 4} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
-      </Draw>
-    </Layer>
+    <svg viewBox={`${B.x} ${B.y} ${B.w} ${B.h}`} style={inHourglass(B.x, B.y, B.w, B.h)}>
+      <g fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round">
+        <path d={bulbPath(top, neck, false)} />
+        <path d={bulbPath(neck, bottom, true)} />
+      </g>
+      {[left + 10, right - 30].map((x) => (
+        <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
+      ))}
+      <rect x={left - 10} y={top - 4 - PLATE} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+      <rect x={left - 10} y={bottom + 4} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+    </svg>
   );
 });
 
@@ -425,23 +453,31 @@ export function BulbSand({ bottom = false, glow = 0 }: { bottom?: boolean; glow?
   );
 }
 
-/** The sand: the top heap sinking, the thin stream through the neck and the bottom heap growing, each its own layer. */
-export function Sand({ running, glow }: { running: boolean; glow: number }) {
+/**
+ * The one hourglass of the timer, shared by „Sanduhr“ and „Abwechseln“ (user request, November 2026: one drawing, not
+ * two built side by side): the pale glass, the top heap sinking, the thin stream through the neck while `running`, the
+ * bottom heap growing, and the frame in front – one layer, so Abwechseln can turn it over as a whole. The sand runs over
+ * `--tm-ms` (set on the stage, or in `style`); `glow` lights the sand left (H-51).
+ */
+export function Hourglass({ running, glow = 0, className, style }: { running: boolean; glow?: number; className?: string; style?: CSSProperties }) {
   const left = GLASS.cx - GLASS.w / 2;
+  const B = HOURGLASS_BOX;
   return (
-    <>
-      <Layer x={left} y={GLASS.top} w={GLASS.w} h={GLASS.neck - GLASS.top} className="tm-bulb">
+    <Layer x={B.x} y={B.y} w={B.w} h={B.h} className={`tm-hourglass${className ? ` ${className}` : ""}`} style={style}>
+      <GlassInside />
+      <div style={inHourglass(left, GLASS.top, GLASS.w, GLASS.neck - GLASS.top)}>
         <BulbSand glow={glow} />
-      </Layer>
+      </div>
       {running && (
-        <Layer x={GLASS.cx - 6} y={GLASS.neck - 4} w={12} h={GLASS.bottom - GLASS.neck} className="tm-stream">
+        <div className="tm-stream" style={inHourglass(GLASS.cx - 6, GLASS.neck - 4, 12, GLASS.bottom - GLASS.neck)}>
           <div className="tm-stream-grains tm-move" />
-        </Layer>
+        </div>
       )}
-      <Layer x={left} y={GLASS.neck} w={GLASS.w} h={GLASS.bottom - GLASS.neck} className="tm-bulb">
+      <div style={inHourglass(left, GLASS.neck, GLASS.w, GLASS.bottom - GLASS.neck)}>
         <BulbSand bottom />
-      </Layer>
-    </>
+      </div>
+      <GlassFrame />
+    </Layer>
   );
 }
 
