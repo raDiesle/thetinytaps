@@ -18,6 +18,7 @@ import {
   MIN_APPLES,
   markUnit,
   marksLeft,
+  PERCENT_MARKS,
   pieceCount,
   pieceMoments,
   runSeconds,
@@ -141,6 +142,18 @@ describe("Timer", () => {
     expect(marksLeft(55_000, 10_000)).toBe(6);
     expect(marksLeft(1, 10_000)).toBe(1);
     expect(marksLeft(0, 10_000)).toBe(0);
+  });
+
+  test("Zeit im Bild: by default ten tally marks, each a tenth of the run, in the bottom right corner (user request, November 2026)", async () => {
+    expect(DEFAULT_TIMER_SETTINGS.showTime).toBe("percent");
+    for (const total of [10_000, 30_000, 5 * 60_000, 3 * 60 * 60_000]) {
+      expect(marksLeft(total, total / PERCENT_MARKS)).toBe(10);
+      expect(marksLeft(total * 0.55, total / PERCENT_MARKS)).toBe(6);
+    }
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    const rule = css.slice(css.indexOf(".tm-shown {"), css.indexOf("}", css.indexOf(".tm-shown {")));
+    expect(rule).toContain("right:");
+    expect(rule).toContain("bottom:");
   });
 
   test("the train halts at every stop and reaches the station as the time is up", () => {

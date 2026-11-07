@@ -12,10 +12,11 @@ export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower"
 export type SwapToy = "bobbycar" | "doll" | "ball";
 
 /**
- * Whether the time left shows in the picture too, for grown-ups who want it (user request, November 2026): not at all
- * (the child sees only the picture), as digits, or as tally marks going one by one.
+ * How the time left shows in the picture's bottom right corner (user requests, November 2026): as ten tally marks, one
+ * for each tenth of the run (`percent`, the default), as tally marks for a stretch of time each (`marks`: 10 s up to
+ * 15 min), as digits, or not at all (the child sees only the picture).
  */
-export type TimeShown = "off" | "digits" | "marks";
+export type TimeShown = "percent" | "marks" | "digits" | "off";
 
 /** The lengths a grown-up can set in the row above the cards, in seconds: 10 and 30 seconds, then 1 to 10 minutes. */
 export const TIMER_SECONDS = [10, 30, 60, 120, 180, 300, 600] as const;
@@ -31,8 +32,11 @@ export interface TimerSettings {
   useOwn: boolean;
   /** The toy in „Abwechseln“ (H-52). */
   toy: SwapToy;
-  /** The time left in the picture's corner too, chosen behind ⚙️ while it runs. */
-  shown: TimeShown;
+  /**
+   * The time left in the picture's corner, chosen behind ⚙️ while it runs. Named anew when tenths became the default
+   * (`shown` held „off“ for everyone who had played before), so the default reaches them too.
+   */
+  showTime: TimeShown;
   /** Always off: the timer says nothing (see the root CLAUDE.md on voice). */
   speech: boolean;
   /** The whistle, chimes and the tune at the end. */
@@ -45,7 +49,7 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   own: null,
   useOwn: false,
   toy: "bobbycar",
-  shown: "off",
+  showTime: "percent",
   speech: false,
   sounds: true,
 };

@@ -181,7 +181,7 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
-        timeShown={settings.shown}
+        timeShown={settings.showTime}
         onShown={onShown}
         onAgain={onAgain}
         onPicture={onPicture}
@@ -191,7 +191,16 @@ function TimerStart({
   const ms = total === "past" ? 0 : total;
   const set = typeof minutes === "number" ? minutes : ms;
   return (
-    <TimerRun picture={settings.picture} total={ms} set={set} until={until} shown={settings.shown} onShown={onShown} onAgain={onAgain} onPicture={onPicture} />
+    <TimerRun
+      picture={settings.picture}
+      total={ms}
+      set={set}
+      until={until}
+      shown={settings.showTime}
+      onShown={onShown}
+      onAgain={onAgain}
+      onPicture={onPicture}
+    />
   );
 }
 

@@ -112,7 +112,10 @@ export const MARK_UNITS = [10_000, 30_000, 60_000, 5 * 60_000, 10 * 60_000, 15 *
 /** At most this many tally marks stand at the start, so they fit in a row of six bundles of five. */
 export const MAX_MARKS = 30;
 
-/** How long one tally mark stands for in a run of `total` ms („Zeit im Bild: Striche“). */
+/** How many tally marks stand at the start with „Striche in %“, the default: one for each tenth of the run. */
+export const PERCENT_MARKS = 10;
+
+/** How long one tally mark stands for in a run of `total` ms („Zeit im Bild: Striche in Zeit“). */
 export function markUnit(total: number): number {
   return MARK_UNITS.find((unit) => Math.ceil(total / unit) <= MAX_MARKS) ?? MARK_UNITS[MARK_UNITS.length - 1];
 }

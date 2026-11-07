@@ -1703,11 +1703,11 @@
   }
 }
 
-/* „Zeit im Bild“: the time left as digits or tally marks on a small paper note in the bottom left corner, for grown-ups
-   who chose it behind ⚙️. Taps go through it to the picture. */
+/* „Zeit im Bild“: the time left as tally marks (the default) or digits on a small paper note in the bottom right corner.
+   Taps go through it to the picture. */
 .tm-shown {
   position: absolute;
-  left: calc(14px + env(safe-area-inset-left));
+  right: calc(14px + env(safe-area-inset-right));
   bottom: calc(14px + env(safe-area-inset-bottom));
   z-index: 2;
   padding: 4px 14px;
@@ -1716,7 +1716,7 @@
   background: #fffdf3;
   box-shadow: 0 6px 14px -8px #00000080;
   color: var(--ink, #3b2a20);
-  rotate: -2deg;
+  rotate: 2deg;
   pointer-events: none;
 }
 
@@ -1740,4 +1740,18 @@
   stroke: currentColor;
   stroke-width: 4;
   stroke-linecap: round;
+}
+
+/* The row of lengths holds nine slips or more (10 and 30 Sek. besides the minutes, the own time, „Andere …“): narrower
+   slips, so on a phone on its side it stays one line and every card stays on the screen. */
+.tm-lengths {
+  display: contents;
+}
+
+:root .mode-level .tm-lengths .choice {
+  gap: 6px;
+}
+
+:root .mode-level .tm-lengths .choice button {
+  padding-inline: 10px;
 }
