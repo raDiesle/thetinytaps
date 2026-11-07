@@ -44,12 +44,11 @@ import {
   Cookie,
   CandleBackdrop,
   Candles,
+  Hourglass,
   Layer,
   RAIL_Y,
   RailAhead,
-  Sand,
   SandBackdrop,
-  SandFrame,
   TRAIN,
   Train,
   TrainBackdrop,
@@ -522,8 +521,7 @@ export function SceneParts({
       {picture === "sand" && (
         <>
           <SandBackdrop />
-          <Sand running={phase === "running"} glow={poke} />
-          <SandFrame />
+          <Hourglass running={phase === "running"} glow={poke} />
         </>
       )}
       {picture === "candle" && (

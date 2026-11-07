@@ -1648,11 +1648,17 @@
   opacity: 1;
 }
 
-/* Abwechseln (H-52): the hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over for the
-   next; the toy travels across the floor to the child whose turn it is. */
+/* Abwechseln (H-52): the Sanduhr's hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over
+   for the next; while the lamps draw who begins it stands full and still (`.tm-wait`). The lamp over the child whose
+   turn it is shines on its cushion, the other side lies in soft shade, and the toy hops over onto the lit cushion. */
 .tm-swap-glass .tm-sand,
 .tm-swap-glass .tm-sand-fill {
   animation-delay: var(--tm-delay);
+}
+
+.tm-wait .tm-sand,
+.tm-wait .tm-sand-fill {
+  animation-play-state: paused;
 }
 
 .tm-flip {
@@ -1665,12 +1671,44 @@
   }
 }
 
-.tm-toy {
-  transition: transform 1.4s ease-in-out;
+.tm-swap-light,
+.tm-swap-shade {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
 }
 
-.tm-toy-bear {
-  transform: translateX(var(--tm-toy-way));
+.tm-swap-light.tm-on,
+.tm-swap-shade.tm-on {
+  opacity: 1;
+}
+
+.tm-swap-shade-fox {
+  background: linear-gradient(to right, rgb(34 36 80 / 0.42) 75%, rgb(34 36 80 / 0.12));
+}
+
+.tm-swap-shade-bear {
+  background: linear-gradient(to left, rgb(34 36 80 / 0.42) 75%, rgb(34 36 80 / 0.12));
+}
+
+.tm-toy {
+  transition: transform 1.2s ease-in-out;
+}
+
+.tm-toy > div,
+.tm-toy svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-toy-hop {
+  animation: tm-toy-hop 1.2s ease-in-out;
+}
+
+@keyframes tm-toy-hop {
+  50% {
+    transform: translateY(-70%);
+  }
 }
 
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
