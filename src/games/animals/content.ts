@@ -851,6 +851,8 @@ export interface AnimalTexts {
   food: (f: Food) => string;
   home: (h: Home) => string;
   hungry: (a: Animal) => string;
+  /** The feeding round's question, said right after `hungry` (Z-24): "Was isst der Hase gern?". */
+  whatEats: (a: Animal) => string;
   yummy: (a: Animal, f: Food) => string;
   yuck: (a: Animal) => string;
   whereLives: (a: Animal) => string;
@@ -866,6 +868,7 @@ const GERMAN_TEXTS: AnimalTexts = {
   food: (f) => f.name,
   home: (h) => h.name,
   hungry: (a) => `${capitalize(a.the)} hat Hunger!`,
+  whatEats: (a) => `Was isst ${a.the} gern?`,
   yummy: (a, f) => `Mmh, lecker! ${capitalize(a.the)} mag ${f.plural}. Danke!`,
   yuck: (a) => `Bäh! Das mag ${a.the} nicht.`,
   whereLives: (a) => `Wo wohnt ${a.the}?`,

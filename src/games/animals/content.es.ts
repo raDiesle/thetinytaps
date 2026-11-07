@@ -180,6 +180,8 @@ export function spanishTexts(german: AnimalTexts): AnimalTexts {
     food: (f) => (food(f) ? capital(food(f).name) : german.food(f)),
     home: (h) => (home(h) ? capital(home(h)!.name) : german.home(h)),
     hungry: (a) => (animal(a) ? `¡${capital(animal(a).the)} tiene hambre!` : german.hungry(a)),
+    // German only so far (Z-24, November 2026): silent in this language until it is translated and recorded.
+    whatEats: german.whatEats,
     yummy: (a, f) =>
       animal(a) && food(f)
         ? `¡Ñam, qué rico! ${capital(toThe(animal(a).the))} le ${food(f).many ? "gustan" : "gusta"} ${food(f).likes}. ¡Gracias!`

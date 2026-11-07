@@ -78,6 +78,14 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
   mir?“ –, quiet (small, muted ink), with no emoji, no bubble, no frame and nothing hopping in, letting every tap
   through (user feedback, November 2026: the bubble with its big sign was too loud; `content.test.ts`). The kind's
   sign (`KIND_SIGNS`) stands only before its name under ⚙️ and is never a picture the child picks from.
+- The voice asks what the child is to do, since it can't read the question under the picture (Z-24, November 2026):
+  when the kind of round changes (and with the first round), it says the kind's question from `KIND_QUESTIONS` once
+  (`intro`, from `AnimalsRounds`), then the round's own – a feeding round „Der Hase hat Hunger!“ and right after it
+  „Was isst der Hase gern?“ (`whatEats`), also again after a wrong food. Every such question is built from the animal's
+  data (`a.the`), never written per animal, and only one choice on screen may answer it (the `alsoEats` rules below).
+  Only through `animalsVoice` (recordings, silent until recorded), never the browser's voice; a new question goes on
+  the `/tiere/` list in `src/content/voiceLines.ts` and comes German-only (`whatEats: german.whatEats` in the other
+  languages' files) until translations are asked for.
 - The choices (plates, homes, the animals to pick) are as big as the room below the picture allows – for homes the sky
   above the animal – on a tablet, a computer and a phone on its side alike, in one row of 2 to 5 (two to a row on a
   phone held upright, `choiceRows`), clear of the page's paper margin, with clear room between them. Each has its name
