@@ -18,9 +18,15 @@ screen), then the pictures that run until the time is up:
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
   seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
   halts there briefly and it chimes (H-45), with keyframes made for the run (`TrainStepKeyframes`, `--tm-roll`).
-- „Apfelbaum“ 🍎 (`apples.tsx`, H-45): always many apples, also for a short time (`appleCount`: one every two seconds,
-  at least `MIN_APPLES`, at most `MAX_APPLES`) – they only fall more often – each with a plop into the basket the bear
-  child holds (the plops spaced, `PIECE_SOUND_GAP_MS`); the heap in it rises a step per apple, the next apple sways each second.
+- „Apfelbaum“ 🍎 (`apples.tsx`, H-45): an apple tree's year (`appleTimes`, `APPLE_YEAR`; user feedback, November
+  2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), blossoms open all
+  over it (`bloomRank`, until 30 %) while three bees buzz round it from then on (`BEES`, each a small layer, its wings a
+  smaller one), each blossom drops as a small green apple swells and reddens at its place (until 45 %), then the bear
+  child pushes its little cart from the right under one apple after the other (`CartKeyframes`, written for the run,
+  the wheels turning with it); the apple sways a second at a time while the cart comes, falls straight down into it with
+  a plop (spaced, `PIECE_SOUND_GAP_MS`) and lies there on its own in the heap (`heapSlot`, `HEAP_ROWS`). Always many
+  apples, also for a short time (`appleCount`, `MIN_APPLES` to `MAX_APPLES`, as many as the heap holds); the last lands
+  as the time is up. A tap rustles the leaves, once the blossoms are out the bees buzz.
 - „Sanduhr“ ⏳: the sand runs from the top bulb into the bottom one.
 - „Raupe“ 🐛 (`caterpillar.tsx`, H-46): a caterpillar eats a big leaf from the tip to the stalk, one bite each second
   (`steps(var(--tm-secs))`, `runSeconds`), its head chewing and three leaf crumbs falling as it munches (`CRUMBS`); at the end a cocoon hangs on the branch and a butterfly flies out and settles on the meadow.
@@ -94,10 +100,15 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
   user feedback, November 2026). A new picture is one whole small story a child knows from life.
+- **What happens, happens as in life** (user feedback on the Apfelbaum, November 2026): things fall straight down,
+  never across to where they are wanted – what catches them comes under them first (the cart under the apple). What is
+  collected stays to be seen one by one (each apple on its own in the heap, never a lump that grows: a rising heap in a
+  basket held at the chest looked like something else entirely), and a picture that runs a long while tells a whole
+  story in stages (the tree grows, blossoms, bears apples, is harvested), so there is always something new to see.
 - **Abwechseln stands first, apart**: it runs without end, so its card comes first and says so (`SWAP_NOTE`), and
   „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
 
-- **A fox or bear child only where it does the picture's thing** (`Child`): it holds the apples' basket, waters the
+- **A fox or bear child only where it does the picture's thing** (`Child`): it pushes the apples' cart, waters the
   flower, blows out the candle, takes its turn with the toy. Never a family standing by to watch or cheer: one stood
   beside every picture and was taken out (user feedback, November 2026) – children wanted to tap it, and a timer to
   watch needs as few things and movements as can be.
@@ -130,14 +141,15 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
   passes (`SKY_CUT` under the ridge, `timer.test.ts` checks), so it never shows, and the thing is never stretched.
   Where the edge is slanted, the box also gets a still `clip-path` to its shape – never an
   animated one, which repaints the box every frame.
-- **Pieces wait on their own clock, not on React**: an apple's fall is a CSS animation with its minute as
-  `animation-delay`, a heap rises by `steps(--tm-n)`, the train's halts are keyframes written once for the run. React
+- **Pieces wait on their own clock, not on React**: an apple's blossom, growing and fall are CSS animations with their
+  moments as `animation-delay`, each apple in the cart appears at its landing, the cart's way and the train's halts are
+  keyframes written once for the run. React
   only plays the plop or bell at those moments (`pieceMoments`), never draws a piece per minute.
 - **Seen from afar only what runs down stays bright** (H-48): a new picture puts its backdrop in `.tm-back` and its
   small helpers (posts, decorations) in `.tm-dims`; what runs down gets neither. A clipped edge drawn in the background's
   colour would show once that fades – cut edges with clipping boxes instead (the leaf's bands, the disc's halves).
 - Development: `?sekunden=<n>` in the address makes a run take n seconds instead of the minutes chosen; the
-  pieces still come from the minutes chosen (5 Min. with `?sekunden=20`: five apples, one every four seconds).
+  pieces still come from the minutes chosen (2 Min. with `?sekunden=25`: twenty apples, its whole year in 25 seconds).
 - It says nothing, so there is no voice line to record.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,

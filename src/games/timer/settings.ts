@@ -1,7 +1,7 @@
 import type { OwnTime } from "./time";
 
 /**
- * What runs down while the child watches: a train going to the station, apples falling into a basket, an hourglass, a
+ * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
  * caterpillar eating a leaf, a flower growing (H-53), a candle, the sun going down (H-54), ants carrying a cookie to
  * their hill (H-68), a red disc, a pizza eaten slice by slice (H-47) – or „Abwechseln“ (H-52), two children taking
  * turns with a toy, turn after turn.

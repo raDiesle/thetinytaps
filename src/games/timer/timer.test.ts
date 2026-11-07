@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
-import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
+import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { FLOWER_CHILD, FLOWER_FLOOR, GROWN_AT, SPOUT, SPROUT, STAKE, STALK, TAP } from "./flower";
@@ -9,6 +9,8 @@ import { MOON, MOON_FROM, ridgeAt, SKY_CUT, STARS, SUN, SUN_SET_AT, SUNSET_FLOOR
 import {
   appleCount,
   applePlaces,
+  appleTimes,
+  harvestOrder,
   haltMs,
   ladybugLaps,
   MAX_APPLES,
@@ -96,7 +98,7 @@ describe("Timer", () => {
   test("the new pictures keep what matters where every screen shows it too", () => {
     expect(CROWN.cx - CROWN.rx).toBeGreaterThanOrEqual(200);
     expect(CROWN.cy - CROWN.ry).toBeGreaterThanOrEqual(80);
-    expect(BASKET.cx + BASKET.w / 2).toBeLessThanOrEqual(1400);
+    expect(CART.x + CART.w).toBeLessThanOrEqual(1400);
     expect(APPLE_FLOOR).toBeLessThanOrEqual(820);
     expect(LEAF.x + LEAF.w).toBeLessThanOrEqual(1200);
     // The leaf is eaten up to its stalk, never past it into the branch.
@@ -119,7 +121,7 @@ describe("Timer", () => {
 
   test("Apfelbaum: always many apples, also for a short time – they only fall more often", () => {
     expect(appleCount(10_000)).toBe(MIN_APPLES);
-    expect(appleCount(60_000)).toBeGreaterThanOrEqual(20);
+    expect(appleCount(60_000)).toBeGreaterThanOrEqual(10);
     expect(appleCount(3 * 3600_000)).toBe(MAX_APPLES);
     expect(MIN_APPLES).toBeGreaterThanOrEqual(6);
   });
@@ -156,21 +158,77 @@ describe("Timer", () => {
     expect(steps.filter((s, i) => i > 0 && s.part === steps[i - 1].part)).toHaveLength(4);
   });
 
-  test("every apple hangs inside the crown, apart from the others", () => {
+  test("every apple hangs inside the crown, apart from the others, and falls straight down past no other apple", () => {
     for (const count of [1, 5, 12, 20, MAX_APPLES]) {
       const r = appleRadius(count);
       const places = applePlaces(count, CROWN.rx - r - 24, CROWN.ry - r - 24);
       expect(places).toHaveLength(count);
       for (const p of places) expect((p.x / (CROWN.rx - r)) ** 2 + (p.y / (CROWN.ry - r)) ** 2).toBeLessThanOrEqual(1);
       for (const a of places) for (const b of places) if (a !== b) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThanOrEqual(2 * r);
-      // They fall from left to right.
-      expect(places.map((p) => p.x)).toEqual([...places.map((p) => p.x)].sort((a, b) => a - b));
+      // Harvested from the right, where the cart waits; an apple falls only once none hangs below it in its way.
+      const order = harvestOrder(places, r);
+      expect(order).toHaveLength(count);
+      expect(order[0].x).toBeGreaterThanOrEqual(order.at(-1)?.x ?? 0);
+      order.forEach((p, k) => {
+        for (const q of order.slice(k + 1)) expect(q.y > p.y && Math.abs(q.x - p.x) < 2 * r).toBe(false);
+      });
     }
   });
 
-  test("the CSS shrinks a landing apple as much as the basket expects", async () => {
-    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    expect(css).toContain(`translateY(var(--tm-dy)) scale(${APPLE_LANDED})`);
+  test("Apfelbaum: the tree grows, blossoms, the apples ripen, then the cart comes under each before it falls; the last lands at the end", () => {
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const count = appleCount(total);
+      const t = appleTimes(total, count);
+      expect(t.harvest).toHaveLength(count);
+      for (let i = 0; i < count; i++) {
+        expect(t.bloom[i]).toBeGreaterThanOrEqual(t.grown);
+        expect(t.ripen[i]).toBeGreaterThan(t.bloom[i]);
+        // Every apple is red before the first one is harvested.
+        expect(t.ripen[i] + t.ripenMs).toBeLessThanOrEqual(t.harvest[0].leave + 1e-6);
+      }
+      let before = t.harvest[0].leave;
+      for (const h of t.harvest) {
+        expect(h.leave).toBeGreaterThanOrEqual(before - 1e-6);
+        expect(h.under).toBeGreaterThan(h.leave);
+        expect(h.fall).toBeGreaterThanOrEqual(h.under);
+        expect(h.land).toBeGreaterThan(h.fall);
+        before = h.land;
+      }
+      expect(t.harvest.at(-1)?.land).toBeCloseTo(total);
+      // Blossoms open all over the tree, not one after the other along a row.
+      expect(new Set(t.bloom).size).toBe(count);
+    }
+  });
+
+  test("Apfelbaum: each apple lies on its own in the cart, and the cart and the bees stay on the screen", () => {
+    expect(HEAP_ROWS.reduce((a, b) => a + b, 0)).toBe(MAX_APPLES);
+    const half = (CART.box.right - CART.box.left) / 2;
+    for (let n = 0; n < MAX_APPLES; n++) {
+      const slot = heapSlot(n);
+      expect(Math.abs(slot.x - CART_MIDDLE) + HEAP_R).toBeLessThanOrEqual(half);
+      expect(slot.y - HEAP_R).toBeGreaterThanOrEqual(CART.y);
+      // Each shows: even the bottom row lies with its middle over the box's front (user feedback, November 2026).
+      expect(slot.y).toBeLessThan(CART.box.rim - 8);
+      // Never two apples on the same spot.
+      for (let m = 0; m < n; m++) {
+        const other = heapSlot(m);
+        expect(Math.hypot(slot.x - other.x, slot.y - other.y)).toBeGreaterThanOrEqual(1.5 * HEAP_R);
+      }
+    }
+    expect(CART.x + CART.w).toBeLessThanOrEqual(RIGHT_EDGE);
+    expect(CART.child + 120).toBeLessThanOrEqual(RIGHT_EDGE);
+    for (const count of [MIN_APPLES, 12, MAX_APPLES]) {
+      for (const p of treeApples(count)) expect(p.x - CART_MIDDLE + CART.box.left).toBeGreaterThanOrEqual(190);
+    }
+    // The bees' rounds (`tm-bee-fly`: up to 430 % right, 110 % up, 220 % down) stay over the meadow and under the sky's top.
+    for (const b of BEES) {
+      const reach = 4.3 * BEE.w;
+      const xs = b.flip ? [b.x - reach, b.x + BEE.w] : [b.x, b.x + reach + BEE.w];
+      expect(xs[0]).toBeGreaterThanOrEqual(200);
+      expect(xs[1]).toBeLessThanOrEqual(RIGHT_EDGE);
+      expect(b.y - 1.1 * BEE.h).toBeGreaterThanOrEqual(80);
+      expect(b.y + 3.2 * BEE.h).toBeLessThanOrEqual(APPLE_FLOOR);
+    }
   });
 
   test("the Ameisenstraße stays on every screen, its ants walk from under the cookie into the hill, one step a second (H-68)", async () => {

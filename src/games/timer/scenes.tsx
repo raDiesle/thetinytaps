@@ -59,7 +59,7 @@ export function Draw({ w, h, children }: { w: number; h: number; children: React
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// The fox or bear child, only where it does the picture's thing itself: holds the apples' basket, waters the flower,
+// The fox or bear child, only where it does the picture's thing itself: pushes the apples' cart, waters the flower,
 // blows out the candle, takes its turn with the toy. Nobody stands by only to watch: a family beside every picture was
 // decoration a child wanted to tap, and was taken out (user feedback, November 2026).
 
