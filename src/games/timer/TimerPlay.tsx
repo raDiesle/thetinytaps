@@ -80,11 +80,11 @@ export function devMs() {
   return seconds > 0 ? seconds * 1000 : 0;
 }
 
-/** How long a run takes from now: the row's minutes or the own time – or `"past"`, a clock time already behind us today. */
+/** How long a run takes from now: the row's length or the own time – or `"past"`, a clock time already behind us today. */
 function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
   if (dev) return dev;
   if (settings.useOwn && settings.own) return ownTimeMs(settings.own, new Date());
-  return settings.minutes * 60_000;
+  return settings.seconds * 1000;
 }
 
 /** running: the picture runs down; blow: the time is up, the candle is blown out; done: the picture's end. */
@@ -172,8 +172,8 @@ function TimerStart({
   }
   if (settings.picture === "swap") {
     // Abwechseln (H-52): the time set is one child's turn, and the turns go on until a grown-up stops – or, with a
-    // clock time set, until then, each turn as long as the row's minutes.
-    const turn = devMs() || (settings.useOwn && settings.own?.kind === "for" ? settings.own.seconds * 1000 : settings.minutes * 60_000);
+    // clock time set, until then, each turn as long as the row's length.
+    const turn = devMs() || (settings.useOwn && settings.own?.kind === "for" ? settings.own.seconds * 1000 : settings.seconds * 1000);
     return (
       <SwapRun
         turnMs={turn}
@@ -181,7 +181,7 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
-        timeShown={settings.shown}
+        timeShown={settings.showTime}
         onShown={onShown}
         onAgain={onAgain}
         onPicture={onPicture}
@@ -191,7 +191,16 @@ function TimerStart({
   const ms = total === "past" ? 0 : total;
   const set = typeof minutes === "number" ? minutes : ms;
   return (
-    <TimerRun picture={settings.picture} total={ms} set={set} until={until} shown={settings.shown} onShown={onShown} onAgain={onAgain} onPicture={onPicture} />
+    <TimerRun
+      picture={settings.picture}
+      total={ms}
+      set={set}
+      until={until}
+      shown={settings.showTime}
+      onShown={onShown}
+      onAgain={onAgain}
+      onPicture={onPicture}
+    />
   );
 }
 

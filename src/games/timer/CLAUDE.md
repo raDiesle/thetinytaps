@@ -2,15 +2,16 @@
 
 Route `/timer/` · idea H-04 („Timer zum Zuschauen“). A book of its own among the Alltagshelfer on the shelf once it is finished. While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
 
-A visual timer for the day, not a game: a grown-up picks the minutes in the row above the cards („Wie lange?“: 1, 2, 3,
-5 or 10 Min., `TIMER_MINUTES`) and a picture card starts it. Behind them „Andere …“ opens a sheet for grown-ups
+A visual timer for the day, not a game: a grown-up picks the length in the row above the cards („Wie lange?“: 10 or 30
+Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds asked for by the user, November 2026) and a picture card starts it. Behind them „Andere …“ opens a sheet for grown-ups
 (`OwnTimeSheet`, H-59, H-60): any length from 10 seconds to 3 hours (− and + for hours, minutes and seconds, ready slips
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
 own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
-grown-ups (`TimeLeft`, H-62), and its „Zeit im Bild“ (`shown.tsx`, kept as `shown`) puts the time left into the
-picture's bottom left corner too, on a small paper note: „Aus“ (the default), „Zahlen“ (digits) or „Striche“ (tally
-marks in bundles of five, each standing for 10 s up to 15 min, `markUnit`, at most `MAX_MARKS`; one goes as its time is
-used up). Without it the child sees no numbers, only the picture running down.
+grown-ups (`TimeLeft`, H-62). Every timer shows the time left in the picture's bottom right corner on a small paper
+note, as tally marks in bundles of five that go one by one (`shown.tsx`, kept as `showTime`; user request, November
+2026): by default „Striche in %“, ten marks each a tenth of the run (`PERCENT_MARKS`), so a short and a long timer look
+alike; behind ⚙️ its „Zeit im Bild“ switches to „Striche in Zeit“ (each mark 10 s up to 15 min, `markUnit`, at most
+`MAX_MARKS`), „Zahlen“ (digits) or „Aus“. The child sees no numbers, only the picture and the marks running down.
 The start screen shows „Abwechseln“ first, its card saying „Läuft ohne Ende, jeder ist mal dran“ under its name where
 there is room (`SWAP_NOTE`, `GameMode.note`; groups with a line over each, tried first, no longer fitted a phone's
 screen), then the pictures that run until the time is up:
@@ -84,6 +85,8 @@ and the shared `Layer`, `Draw`, `Child`, `LeftGlow`; the fox and bear child is t
 
 ## Rules
 
+- The row of lengths stays one line on a phone on its side (844×390), with the own time's slip too: when it wraps, the
+  last row of cards falls off the screen. A new length means narrower slips (`.tm-lengths`), never a second line.
 - **Progress is seen every second** (user feedback, November 2026): every picture moves a step a second that a child
   can see from the sofa – a bite, a crumb, an apple, a slice – not only a tiny wobble. Pieces come many, also for a
   short time (they come more often then, never fewer), the way to go is long (the train across the picture, the ants'
