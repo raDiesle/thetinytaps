@@ -203,13 +203,14 @@ In a fresh worktree run `bun install` first.
 - **The app's mascots are the fox and the bear** (Tapsi is a fox, the book's readers are a fox and a bear family; user
   decision, October 2026 – the fox alone was dropped with the address toddlerfox.com): they come back as a motif in
   the games, so a child finds them again – but **only where they belong to the game** (user feedback, November 2026):
-  a figure the game shows and that acts in it (Mitmachen's child hopping the number, the Timer's child watering the
-  flower, a family that a hideout lets out when tapped, a part the child plays like Tapsi in Bewegungsabenteuer), or a
+  a figure the game shows and that acts in it (Mitmachen's child hopping the number, a family that a hideout lets out
+  when tapped, a part the child plays like Tapsi in Bewegungsabenteuer), or a
   role the picture already has, taken by a fox or bear instead of a person (the baker, the doctor, the driver). **Never
   as decoration**: no family standing by, pointing, watching, walking through a picture or cheering beside the end's
   buttons – children want to tap it and think it belongs to the game, and a game wants as few things and movements as
   it can have, so no child is flooded. Families like that (in Zählen, Wörter tippen, „Wer schaut da raus?“, Socken-Paare,
-  Mitmachen's grown-up, seven Lebendige Bilder, every Timer picture and every `GameEnd`) were taken out again;
+  Mitmachen's grown-up, seven Lebendige Bilder, every Timer picture and every `GameEnd`) were taken out again – and the
+  Timer's children that did act (basket, hose, candle) looked odd as drawings in its calm pictures and went too;
   `Mascot.test.ts` lists where a whole figure may stand and what it does there. People may stay, and a bear is as welcome as a fox (never turn a bear
   into a fox). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Games get them
   step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game

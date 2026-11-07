@@ -1,20 +1,19 @@
 import { memo, type CSSProperties } from "react";
-import { MASCOT_COLORS } from "@/components/Mascot";
 import { applePlaces } from "./pieces";
-import { Child, Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Apfelbaum (H-45): as many apples hang on the tree as minutes are set, and every minute one falls with a plop into the
-// basket the bear child holds. Each apple is a small layer of its own whose fall is a CSS animation waiting for its
+// basket on the grass. Each apple is a small layer of its own whose fall is a CSS animation waiting for its
 // minute (`animation-delay`), so nothing is drawn again while it runs; the heap in the basket rises a step per apple
 // (`steps()`), and the apple to fall next sways softly once a second (H-63).
 
 /** The tree's crown: its middle and radii. */
 export const CROWN = { cx: 560, cy: 320, rx: 310, ry: 220 } as const;
 
-/** The ground the tree, the child and the basket stand on. */
+/** The ground the tree and the basket stand on. */
 export const APPLE_FLOOR = 770;
 
-/** The basket in front of the bear child: its middle, width, the rim's height and its bottom. */
+/** The basket on the grass under the tree: its middle, width, the rim's height and its bottom. */
 export const BASKET = { cx: 1000, w: 210, rim: 715, bottom: APPLE_FLOOR } as const;
 
 /** How long an apple takes to fall into the basket, in ms; it lands as its minute is over. */
@@ -147,10 +146,9 @@ export function AppleHeap() {
   );
 }
 
-/** The basket's front, woven, with the bear child's paws on its rim: in front of the heap and the apples landing. */
+/** The basket's front, woven: in front of the heap and the apples landing. */
 export const BasketFront = memo(function BasketFront() {
   const { cx, w, rim, bottom } = BASKET;
-  const paw = MASCOT_COLORS.bear;
   return (
     <Layer x={cx - w / 2 - 10} y={rim - 20} w={w + 20} h={bottom - rim + 30}>
       <Draw w={w + 20} h={bottom - rim + 30}>
@@ -162,21 +160,16 @@ export const BasketFront = memo(function BasketFront() {
           <path key={i} d={`M${40 + i * 25} 24 V${bottom - rim + 12}`} stroke="#a8743f" strokeWidth="4" />
         ))}
         <rect x="4" y="12" width={w + 12} height="16" rx="8" fill="#c48a4f" stroke={INK} strokeWidth="5" />
-        {/* The bear child's paws holding the rim. */}
-        {[w / 2 - 22, w / 2 + 42].map((x) => (
-          <ellipse key={x} cx={x} cy="18" rx="17" ry="13" fill={paw.fur} stroke={INK} strokeWidth="4" />
-        ))}
       </Draw>
     </Layer>
   );
 });
 
-/** The whole picture: the tree with its apples and the bear child with the basket. */
+/** The whole picture: the tree with its apples and the basket on the grass under it. */
 export function AppleScene({ count, total, glow }: { count: number; total: number; glow: number }) {
   return (
     <>
       <AppleBackdrop />
-      <Child kind="bear" x={BASKET.cx - 60} floor={APPLE_FLOOR} />
       <AppleHeap />
       <Apples count={count} total={total} glow={glow} />
       <BasketFront />

@@ -144,8 +144,8 @@ export const SEO_EN: SeoTranslation = {
     "/timer/": {
       title: "Visual Timer for Kids – Hourglass, Train and Candle",
       description:
-        "A timer without numbers for toddlers: a train rolls to the station, an hourglass runs, a candle burns down. 1 to 10 minutes, and the family waves at the end.",
-      text: "A visual timer for children who can’t read a clock yet: a grown-up sets 1, 2, 3, 5 or 10 minutes, and the child watches the time go by – a little train rolls to the station where the bear family waits, sand runs through a big hourglass, or a candle burns down until the bear child blows it out, or ants carry a cookie to their hill crumb by crumb. When the child taps the picture, what is left lights up for a moment. For taking turns between siblings, a toy lies by the fox child until the hourglass is empty, then it travels to the bear child and the hourglass turns itself over. At the end a happy tune plays and the family waves. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
+        "A timer without numbers for toddlers: a train rolls to the station, an hourglass runs, a candle burns down. 1 to 10 minutes, and children cheer at the end.",
+      text: "A visual timer for children who can’t read a clock yet: a grown-up sets 1, 2, 3, 5 or 10 minutes, and the child watches the time go by – a little train rolls to the station, sand runs through a big hourglass, a flower grows up its stake and blooms, candles burn down, or ants carry a cookie to their hill crumb by crumb. When the child taps the picture, what is left lights up for a moment. For taking turns between siblings, a toy lies on one side until the hourglass is empty, then it travels to the other and the hourglass turns itself over. At the end children cheer and a happy tune plays. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
     },
     "/tagesplan/": {
       title: "Visual Schedule for Toddlers – Day and Week",

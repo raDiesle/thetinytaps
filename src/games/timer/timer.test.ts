@@ -3,7 +3,7 @@ import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
-import { FLOWER_CHILD, FLOWER_FLOOR, GROWN_AT, SPOUT, SPROUT, STAKE, STALK, TAP } from "./flower";
+import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
 import { MOON, MOON_FROM, ridgeAt, SKY_CUT, STARS, SUN, SUN_SET_AT, SUNSET_FLOOR } from "./sunset";
 import {
@@ -24,8 +24,8 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { ANTS, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
-import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
+import { ANTS, CANDLE, COOKIE, FLAME_H, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { SWAP_FLOOR, SWAP_SEATS, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
 
 describe("Timer", () => {
@@ -189,16 +189,26 @@ describe("Timer", () => {
     expect(css).toContain(`animation: tm-march ${ANTS.n}s ease-in-out infinite`);
   });
 
-  test("Abwechseln keeps both children, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
-    expect(SWAP_CHILDREN.fox).toBeGreaterThanOrEqual(200);
-    expect(SWAP_CHILDREN.bear + CHILD.w).toBeLessThanOrEqual(1400);
+  // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
+  // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
+  // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
+  test("no timer picture draws a fox or bear figure", async () => {
+    for await (const file of new Bun.Glob("src/games/timer/*.tsx").scan(".")) {
+      const code = await Bun.file(file).text();
+      expect(/<Mascot(Head)?[\s/>]|MASCOT_COLORS\.\w+\.paw/.test(code) ? `${file} draws a fox or bear` : file).toBe(file);
+    }
+  });
+
+  test("Abwechseln keeps both cushions, the hourglass and the toy on every screen, the toy never under the hourglass (H-52)", () => {
+    expect(SWAP_SEATS.fox).toBeGreaterThanOrEqual(200);
+    expect(SWAP_SEATS.bear + SWAP_SEATS.w).toBeLessThanOrEqual(RIGHT);
     const glassLeft = SWAP_GLASS.cx - SWAP_GLASS.w / 2;
     const glassRight = SWAP_GLASS.cx + SWAP_GLASS.w / 2;
     expect(TOY.fox + TOY.w).toBeLessThanOrEqual(glassLeft + 10);
     expect(TOY.bear).toBeGreaterThanOrEqual(glassRight - 10);
-    // The toy lies right beside the child whose turn it is: right of the fox child, left of the bear child.
-    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_CHILDREN.fox + CHILD.w - 10);
-    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_CHILDREN.bear + 10);
+    // The toy lies right beside the cushion of the child whose turn it is: right of the fox child's, left of the bear child's.
+    expect(TOY.fox).toBeGreaterThanOrEqual(SWAP_SEATS.fox + SWAP_SEATS.w - 10);
+    expect(TOY.bear + TOY.w).toBeLessThanOrEqual(SWAP_SEATS.bear + 10);
     expect(SWAP_GLASS.top).toBeGreaterThanOrEqual(80 + 140);
     expect(SWAP_FLOOR + 10).toBeLessThanOrEqual(820);
   });
@@ -227,24 +237,32 @@ describe("Timer", () => {
     expect(SUNSET_FLOOR).toBeLessThanOrEqual(820);
   });
 
-  test("Blume: the stalk grows tall from a sprout to the ribbon, then opens; the water comes from a tap (H-53)", () => {
+  test("Blume: the stalk grows tall from a sprout to the ribbon, then opens; the water comes from a tap (H-53)", async () => {
     expect(STALK.top).toBeGreaterThan(STAKE.top);
     expect(STAKE.top - 20).toBeGreaterThanOrEqual(80 + 10);
     expect(STALK.soil - STALK.top).toBeGreaterThanOrEqual(600);
     // It is grown well before the end, so the petals opening one by one fill the rest of the time.
     expect(GROWN_AT).toBeGreaterThan(0.5);
     expect(GROWN_AT).toBeLessThanOrEqual(0.8);
-    // A tap on a post, not a can that never runs dry: the hose's nozzle lies over the bed, the tap left of the child.
+    // A tap on a post, not a can that never runs dry: the hose, laid in a stick left of the bed, drips onto it.
     expect(TAP.x).toBeGreaterThanOrEqual(200);
-    expect(TAP.x).toBeLessThan(FLOWER_CHILD);
+    expect(TAP.x).toBeLessThan(HOLDER.x);
+    expect(HOLDER.x).toBeLessThan(STALK.cx - 190);
     expect(SPOUT.x).toBeLessThan(STALK.cx);
     expect(STALK.soil).toBeLessThanOrEqual(820);
     expect(SPROUT).toBeGreaterThan(0);
     expect(SPROUT).toBeLessThan(0.2);
-    // The bear child stands left of the bed.
-    expect(FLOWER_CHILD).toBeGreaterThanOrEqual(200);
-    expect(FLOWER_CHILD + CHILD.w).toBeLessThanOrEqual(STALK.cx - 190);
     expect(FLOWER_FLOOR).toBeLessThanOrEqual(820);
+    // The plant grows as a whole while it rises (user feedback, November 2026): drawn smaller at the start, never so
+    // small that less than the sprout would be left above the soil.
+    expect(SPROUT_SIZE).toBeGreaterThan(SPROUT);
+    expect(SPROUT_SIZE).toBeLessThan(0.6);
+    // The flower when open stays on a phone held sideways (y from 80).
+    expect(STALK.top + 24 - BLOOM / 2).toBeGreaterThanOrEqual(80 + 10);
+    // The CSS grows the plant and then the flower at GROWN_AT, the flower as one layer, all petals at once.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    expect(css).toContain(`animation: tm-bloom calc(var(--tm-ms) * ${+(1 - GROWN_AT).toFixed(2)}) linear calc(var(--tm-ms) * ${GROWN_AT}) forwards`);
+    expect(css).toMatch(new RegExp(`@keyframes tm-grow-up \\{[^}]+\\}\\s*${GROWN_AT * 100}%`));
   });
 
   test("Pizza: many slices round the board, one eaten at each of its moments (H-47)", async () => {

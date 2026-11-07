@@ -1,30 +1,82 @@
 import { memo, useState, type CSSProperties } from "react";
+import { MASCOT_COLORS } from "@/components/Mascot";
 import type { Localized } from "@/lib/language";
 import { bulbPolygon, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 import type { SwapToy } from "./settings";
 
-// Abwechseln (H-52): a toy lies by the fox child while an hourglass runs beside it; when it is empty the toy goes over
-// to the bear child and the hourglass turns itself over – back and forth until a grown-up stops it.
+// Abwechseln (H-52): a toy lies by the fox child's cushion while an hourglass runs beside it; when it is empty the toy
+// goes over to the bear child's cushion and the hourglass turns itself over – back and forth until a grown-up stops it.
+// The children themselves are not drawn: the drawn fox and bear standing there looked odd (user feedback, November
+// 2026); the two floor cushions in the fox's and the bear's colours are their places, the children are the real ones.
 
 const INK = "#3b2a20";
 
-/** The floor the children, the toy and the hourglass stand on. */
+/** The floor the cushions, the toy and the hourglass stand on. */
 export const SWAP_FLOOR = 760;
 
 /**
- * The hourglass between the children, in its own units (0 0 w h): the posts and plates round the glass, the glass's
+ * The hourglass between the cushions, in its own units (0 0 w h): the posts and plates round the glass, the glass's
  * left edge and width, its top, neck and bottom. `cx` and `top` place it on the stage.
  */
 export const SWAP_GLASS = { cx: 800, top: SWAP_FLOOR - 440, w: 210, h: 440, glassX: 40, glassW: 130, glassTop: 34, neck: 220, glassBottom: 406 } as const;
 
 /**
- * Where the toy lies: its size, and its left edge by each child – right of the fox child, left of the bear child, with
- * the hourglass between them. The bear's place is `bear - fox` further right (`--tm-toy-way`).
+ * Where the toy lies: its size, and its left edge by each cushion – right of the fox child's, left of the bear child's,
+ * with the hourglass between them. The bear's place is `bear - fox` further right (`--tm-toy-way`).
  */
 export const TOY = { w: 160, h: 130, fox: 530, bear: 910 } as const;
 
-/** Where the two children stand (their left edges): the fox child at the left, the bear child at the right. */
-export const SWAP_CHILDREN = { fox: 400, bear: 1080 } as const;
+/** The two children's floor cushions (their left edges, and width): the fox child's at the left, the bear child's at the right. */
+export const SWAP_SEATS = { fox: 400, bear: 1080, w: 120 } as const;
+
+/**
+ * A child's floor cushion, round and soft, in the fox's or the bear's colours with that animal's ears sewn on (pointed
+ * or round) – no face, so it stays a cushion and never a drawn animal standing by.
+ */
+function Cushion({ kind }: { kind: "fox" | "bear" }) {
+  const c = MASCOT_COLORS[kind];
+  const mid = SWAP_SEATS[kind] + SWAP_SEATS.w / 2;
+  const floor = SWAP_FLOOR + 10;
+  return (
+    <g>
+      <ellipse cx={mid} cy={floor + 4} rx="92" ry="14" fill="#000" opacity="0.12" />
+      {[-1, 1].map((side) =>
+        kind === "fox" ? (
+          <g key={side} strokeLinejoin="round">
+            <path
+              d={`M${mid + side * 26} ${floor - 66} L${mid + side * 50} ${floor - 114} L${mid + side * 66} ${floor - 58} Z`}
+              fill={c.fur}
+              stroke={INK}
+              strokeWidth="5"
+            />
+            <path d={`M${mid + side * 38} ${floor - 70} L${mid + side * 50} ${floor - 98} L${mid + side * 56} ${floor - 66} Z`} fill={c.earIn} />
+          </g>
+        ) : (
+          <g key={side}>
+            <circle cx={mid + side * 48} cy={floor - 78} r="22" fill={c.fur} stroke={INK} strokeWidth="5" />
+            <circle cx={mid + side * 48} cy={floor - 78} r="11" fill={c.earIn} />
+          </g>
+        ),
+      )}
+      <path
+        d={`M${mid - 88} ${floor - 14} C${mid - 96} ${floor - 70} ${mid - 50} ${floor - 84} ${mid} ${floor - 84} C${mid + 50} ${floor - 84} ${mid + 96} ${floor - 70} ${mid + 88} ${floor - 14} C${mid + 60} ${floor + 2} ${mid - 60} ${floor + 2} ${mid - 88} ${floor - 14} Z`}
+        fill={c.fur}
+        stroke={INK}
+        strokeWidth="5"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${mid - 70} ${floor - 30} C${mid - 30} ${floor - 18} ${mid + 30} ${floor - 18} ${mid + 70} ${floor - 30}`}
+        fill="none"
+        stroke={c.shade}
+        strokeWidth="4"
+        strokeDasharray="10 8"
+      />
+      <ellipse cx={mid - 30} cy={floor - 64} rx="26" ry="9" fill={c.light} opacity="0.8" />
+      <circle cx={mid} cy={floor - 44} r="7" fill={c.pale} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
 
 /** A box in the hourglass's own units as a place in percent of it. */
 function inGlass(x: number, y: number, w: number, h: number): CSSProperties {
@@ -77,6 +129,8 @@ export const SwapBackdrop = memo(function SwapBackdrop() {
         <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
         <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
         <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="560" ry="44" fill="#91a7ff" opacity="0.6" />
+        <Cushion kind="fox" />
+        <Cushion kind="bear" />
       </svg>
     </Layer>
   );
@@ -200,8 +254,8 @@ function ToyDrawing({ toy }: { toy: SwapToy }) {
 }
 
 /**
- * The toy, lying by the child whose turn it is: `bear` moves it over to the bear child (a CSS transition, so it
- * travels across the floor), and back to the fox child without it.
+ * The toy, lying by the cushion of the child whose turn it is: `bear` moves it over to the bear child's (a CSS
+ * transition, so it travels across the floor), and back to the fox child's without it.
  */
 export function Toy({ toy, bear }: { toy: SwapToy; bear: boolean }) {
   return (

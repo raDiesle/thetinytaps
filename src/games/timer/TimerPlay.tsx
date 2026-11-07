@@ -37,11 +37,9 @@ import {
   AntRoad,
   AntsBackdrop,
   AntsHome,
-  CANDLE,
   Cookie,
   CandleBackdrop,
   Candles,
-  Child,
   Layer,
   RAIL_Y,
   RailAhead,
@@ -59,9 +57,9 @@ import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
 import { clockOn, digits, ownTimeMs } from "./time";
 
-/** The child blows the candle out this long after the time is up, and the flame goes out. */
+/** The last candle goes out with a puff this long after the time is up. */
 const BLOW_MS = 700;
-/** Then the child (where there is one) cheers, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
+/** Then children cheer, and „Nochmal“ and „Weiter“ come after this long (the butterfly takes longer to fly over). */
 const END_MS = 4200;
 const END_MS_CATERPILLAR = 5600;
 /** The cheer at the end comes this long after the picture's own sound, so both are heard. */
@@ -87,7 +85,7 @@ function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
   return settings.minutes * 60_000;
 }
 
-/** running: the picture runs down; blow: the time is up, the candle is blown out; done: the picture's end. */
+/** running: the picture runs down; blow: the time is up, the last candle goes out with a puff; done: the picture's end. */
 type Phase = "running" | "blow" | "done";
 
 /**
@@ -282,7 +280,7 @@ function TimerRun({
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
   const [far, setFar] = useState(false);
-  // Gleich ist es so weit (H-49): a while before the end the bell rings once and the child (where there is one) waves.
+  // Gleich ist es so weit (H-49): a while before the end the bell rings once, and a picture stepped back from afar comes bright again.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
   const { effects, ripple, glow, celebrate } = useTapFeedback();
@@ -433,7 +431,7 @@ function TimerRun({
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}${soon ? " tm-soon" : ""}`} style={stage}>
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stage}>
           {picture === "train" && (
             <>
               <TrainBackdrop />
@@ -462,7 +460,6 @@ function TimerRun({
             <>
               <CandleBackdrop />
               <Candles out={phase === "done"} flare={phase === "running" ? poke : 0} glow={poke} startedAt={endsAt - total} total={total} />
-              <Child kind="bear" x={CANDLE.xs[CANDLE.xs.length - 1] + CANDLE.w / 2 + 24} floor={CANDLE.base + 22} />
             </>
           )}
           {picture === "ants" && (

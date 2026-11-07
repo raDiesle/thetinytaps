@@ -1,5 +1,4 @@
 import { memo, type CSSProperties, type ReactNode } from "react";
-import { Mascot } from "@/components/Mascot";
 
 // Everything is drawn on a stage of STAGE_W × STAGE_H that covers the screen (`.tm-stage`): what matters stays within
 // x 200–1400 (cut off at 4:3) and y 80–820 (cut off on a phone on its side). What moves is an HTML layer of its own
@@ -55,23 +54,6 @@ export function Draw({ w, h, children }: { w: number; h: number; children: React
     <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
       {children}
     </svg>
-  );
-}
-
-// ---------------------------------------------------------------------------------------------------------------
-// The fox or bear child, only where it does the picture's thing itself: holds the apples' basket, waters the flower,
-// blows out the candle, takes its turn with the toy. Nobody stands by only to watch: a family beside every picture was
-// decoration a child wanted to tap, and was taken out (user feedback, November 2026).
-
-/** The child's width and height on the stage. */
-export const CHILD = { w: 120, h: 180 } as const;
-
-/** A fox or bear child with its left edge at `x`, standing on `floor`; it waves and hops with `.tm-done` on the stage. */
-export function Child({ kind, x, floor }: { kind: "fox" | "bear"; x: number; floor: number }) {
-  return (
-    <Layer x={x} y={floor - CHILD.h} w={CHILD.w} h={CHILD.h} className="tm-mascot">
-      <Mascot kind={kind} child />
-    </Layer>
   );
 }
 
@@ -439,7 +421,7 @@ export function Sand({ running, glow }: { running: boolean; glow: number }) {
 // ---------------------------------------------------------------------------------------------------------------
 // Kerze: three tall candles on the table burn down one after another (user feedback, November 2026: taller, and
 // several, so more of the time shows); when one is down to its stub it goes out with a curl of smoke and the next
-// lights up. At the end the bear child leans over and blows the last one out. Each candle burns in its third of the
+// lights up. At the end the last one goes out with a puff too. Each candle burns in its third of the
 // time: the same animations as one candle, each with a third of the time as duration and its turn as delay.
 
 /** The candles when new: their middles, width, top and the table they stand on; at the end only `stub` of each is left. */

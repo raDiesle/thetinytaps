@@ -7,10 +7,9 @@ import { useT } from "@/lib/language";
 import { loadRecordings, playChime, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
-import { Child } from "./scenes";
 import type { SwapToy, TimeShown, TimerPicture } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
-import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_TOYS, SwapBackdrop, SwapHourglass, Toy } from "./swap";
+import { SWAP_TOYS, SwapBackdrop, SwapHourglass, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
 
 /** Children cheering at the clock time set (a recording, else a flourish). */
@@ -31,9 +30,9 @@ function turnAt(turns: Turns, turnMs: number, now: number) {
 }
 
 /**
- * Abwechseln (H-52): two children take turns with a toy. It lies by the fox child while the hourglass runs; when the
- * sand is through, it goes over to the bear child with a sound, the hourglass turns itself over, and so on until a
- * grown-up leaves with ✕ – or until the clock time set, then the families cheer and „Nochmal“ and „Weiter“ come.
+ * Abwechseln (H-52): two children take turns with a toy. It lies by the fox child's cushion while the hourglass runs;
+ * when the sand is through, it goes over to the bear child's with a sound, the hourglass turns itself over, and so on until a
+ * grown-up leaves with ✕ – or until the clock time set, then children cheer and „Nochmal“ and „Weiter“ come.
  * Real time like every timer: the turn is worked out from the clock, so a phone that slept shows the right child.
  * Behind ⚙️ grown-ups pick the toy, say whose turn it is (which starts that turn anew) and see the time to the change.
  */
@@ -158,8 +157,6 @@ export function SwapRun({
       <div className="tm-play" data-picture="swap" onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
         <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
           <SwapBackdrop />
-          <Child kind="fox" x={SWAP_CHILDREN.fox} floor={SWAP_FLOOR + 10} />
-          <Child kind="bear" x={SWAP_CHILDREN.bear} floor={SWAP_FLOOR + 10} />
           <SwapHourglass key={`${turns.start}-${turn}`} ms={turnMs} startedAt={turnStart} flip={flip} running={!done} glow={poke} />
           <Toy toy={toy} bear={holder === "bear"} />
           {done && <div className="tm-done-light" />}

@@ -323,51 +323,6 @@
   }
 }
 
-/* The child stands still while it waits; at the end it waves and hops. */
-.tm-mascot .mascot-arm {
-  transform-box: view-box;
-  transform-origin: 144px 178px;
-}
-
-.tm-done .mascot-arm {
-  animation: tm-wave 2.4s ease-in-out forwards;
-}
-
-.tm-done .tm-mascot {
-  animation: hop 0.6s ease-out 2;
-}
-
-@keyframes tm-wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  20%,
-  50%,
-  80% {
-    transform: rotate(-160deg);
-  }
-  35%,
-  65% {
-    transform: rotate(-125deg);
-  }
-  100% {
-    transform: rotate(-145deg);
-  }
-}
-
-/* The bear child leans to the last candle and blows it out. */
-.tm-blow .tm-mascot {
-  transform-origin: 50% 100%;
-  animation: tm-lean 0.7s ease-in-out forwards;
-}
-
-/* It stands right of the candles, so it leans to the left. */
-@keyframes tm-lean {
-  to {
-    transform: rotate(-10deg) translateX(-8%);
-  }
-}
-
 /* Every second a small, soft step (H-63), so a long time never looks stuck: the train's wheels turn once and a puff of
    steam rises, a big grain falls through the hourglass's neck, a drop of wax runs a little further. Each is a small
    layer of its own moving by transform and opacity; at the end they stand still. */
@@ -965,19 +920,13 @@
    dark, and only what runs down stays bright – the rail ahead and the train, the sand, the flame, the apples, the leaf,
    the red. A tap brings everything back at once. */
 .tm-back,
-.tm-dims,
-.tm-mascot {
+.tm-dims {
   transition: opacity 0.4s ease-out;
 }
 
 .tm-far .tm-back,
 .tm-far .tm-dims {
   opacity: 0.35;
-  transition-duration: 2.5s;
-}
-
-.tm-far .tm-mascot {
-  opacity: 0.3;
   transition-duration: 2.5s;
 }
 
@@ -1319,22 +1268,6 @@
   transform: translateX(var(--tm-toy-way));
 }
 
-/* Gleich ist es so weit (H-49): a while before the end (a minute, or the last fifth of a short time) a bell rings once
-   and the child (where there is one) waves once – from afar too, since it brings the picture back (`tm-soon`, only while running). */
-.tm-running.tm-soon .mascot-arm {
-  animation: tm-wave-soon 2.4s ease-in-out;
-}
-
-@keyframes tm-wave-soon {
-  25%,
-  65% {
-    transform: rotate(-150deg);
-  }
-  45% {
-    transform: rotate(-120deg);
-  }
-}
-
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
 .tm-sky-box {
   overflow: hidden;
@@ -1521,8 +1454,10 @@
   }
 }
 
-/* Blume (H-53): the stalk slides up out of the soil from a sprout to the ribbon, what is still to grow shrinks above it
-   along the stake, a drop falls from the watering can every second, and at the end the flower opens round the bud. */
+/* Blume (H-53): the plant rises out of the soil from a sprout to the ribbon and grows as a whole as it rises – its foot
+   on the soil, scaled up from there, so stalk and leaves get thicker and bigger (user feedback, November 2026) – while
+   what is still to grow shrinks above it along the stake and a drop falls from the hose every second. The box it is in
+   is cut at the soil, so the part not yet grown waits below it. */
 .tm-stalk,
 .tm-to-grow {
   position: absolute;
@@ -1530,7 +1465,8 @@
 }
 
 .tm-stalk {
-  transform: translateY(var(--tm-sprout));
+  transform-origin: 50% 100%;
+  transform: translateY(var(--tm-sprout)) scale(var(--tm-sprout-size));
   animation: tm-grow-up var(--tm-ms) linear forwards;
 }
 
@@ -1549,10 +1485,12 @@
   transform: translateY(-100%);
 }
 
-/* The stalk grows in the first 70 % of the time (GROWN_AT in flower.tsx); then the flower opens. */
+/* The plant grows in the first 70 % of the time (GROWN_AT in flower.tsx); then the flower opens. Moving down by
+   (size − sprout) of its height while drawn at `size` leaves exactly the sprout above the soil, and both run linearly to
+   none, so its top rises evenly with what is still to grow. */
 @keyframes tm-grow-up {
   from {
-    transform: translateY(var(--tm-sprout));
+    transform: translateY(var(--tm-sprout)) scale(var(--tm-sprout-size));
   }
   70%,
   to {
@@ -1622,20 +1560,29 @@
   }
 }
 
-/* The petals open one after another, slowly, each in its share of the time after the stalk is grown. */
-.tm-petal {
+/* The flower grows from small to big round the bud, all its petals at once (user feedback, November 2026), in the
+   time after the plant is grown (GROWN_AT, 0.7, in flower.tsx) until the end. */
+.tm-bloom {
   opacity: 0;
-  transform: scale(0.15);
-  animation: tm-petal calc(var(--tm-ms) * var(--tm-share)) ease-out calc(var(--tm-ms) * var(--tm-at)) forwards;
+  transform: scale(0.2);
+  will-change: transform;
+  animation: tm-bloom calc(var(--tm-ms) * 0.3) linear calc(var(--tm-ms) * 0.7) forwards;
 }
 
-.tm-done .tm-petal {
+.tm-done .tm-bloom {
   animation: none;
   opacity: 1;
   transform: none;
 }
 
-@keyframes tm-petal {
+@keyframes tm-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  3% {
+    opacity: 1;
+  }
   to {
     opacity: 1;
     transform: none;
