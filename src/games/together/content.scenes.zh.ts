@@ -59,7 +59,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
   "brot-butter": { name: "面包", partner: "黄油", question: "什么和面包是一对？", right: "黄油和面包是一对。真棒！", belongs: "黄油和面包是一对！" },
   "pizza-tomate": { name: "比萨", partner: "番茄", question: "什么和比萨是一对？", right: "番茄和比萨是一对。真棒！", belongs: "番茄和比萨是一对！" },
   "salat-gurke": { name: "沙拉", partner: "黄瓜", question: "什么和沙拉是一对？", right: "黄瓜和沙拉是一对。真棒！", belongs: "黄瓜和沙拉是一对！" },
-  "kekse-kakao": { name: "饼干", partner: "可可", question: "什么和饼干是一对？", right: "可可和饼干是一对。真棒！", belongs: "可可和饼干是一对！" },
   "suppe-loeffel": { name: "汤", partner: "勺子", question: "什么和汤是一对？", right: "勺子和汤是一对。真棒！", belongs: "勺子和汤是一对！" },
   "pausenbrot-brotdose": {
     name: "三明治",
@@ -69,7 +68,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
     belongs: "饭盒和三明治是一对！",
   },
   "pudding-kirschen": { name: "布丁", partner: "樱桃", question: "什么和布丁是一对？", right: "樱桃和布丁是一对。真棒！", belongs: "樱桃和布丁是一对！" },
-  "orange-saft": { name: "橙子", partner: "果汁", question: "什么和橙子是一对？", right: "果汁和橙子是一对。真棒！", belongs: "果汁和橙子是一对！" },
   "burger-ketchup": { name: "汉堡", partner: "番茄酱", question: "什么和汉堡是一对？", right: "番茄酱和汉堡是一对。真棒！", belongs: "番茄酱和汉堡是一对！" },
   "pfanne-pfannenwender": {
     name: "平底锅",
@@ -89,7 +87,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
     right: "鼠标和笔记本电脑是一对。真棒！",
     belongs: "鼠标和笔记本电脑是一对！",
   },
-  "handy-ladekabel": { name: "手机", partner: "充电线", question: "什么和手机是一对？", right: "充电线和手机是一对。真棒！", belongs: "充电线和手机是一对！" },
   "drucker-papier": { name: "打印机", partner: "纸", question: "什么和打印机是一对？", right: "纸和打印机是一对。真棒！", belongs: "纸和打印机是一对！" },
   "schraube-schraubenzieher": {
     name: "螺丝",
@@ -208,7 +205,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
   },
   "laub-rechen": { name: "落叶", partner: "耙子", question: "什么和落叶是一对？", right: "耙子和落叶是一对。真棒！", belongs: "耙子和落叶是一对！" },
   "kartoffeln-spaten": { name: "土豆", partner: "铲子", question: "什么和土豆是一对？", right: "铲子和土豆是一对。真棒！", belongs: "铲子和土豆是一对！" },
-  "lagerfeuer-holz": { name: "篝火", partner: "木柴", question: "什么和篝火是一对？", right: "木柴和篝火是一对。真棒！", belongs: "木柴和篝火是一对！" },
   "feld-traktor": { name: "田地", partner: "拖拉机", question: "什么和田地是一对？", right: "拖拉机和田地是一对。真棒！", belongs: "拖拉机和田地是一对！" },
   "mais-popcorn": { name: "玉米", partner: "爆米花", question: "什么和玉米是一对？", right: "爆米花和玉米是一对。真棒！", belongs: "爆米花和玉米是一对！" },
   "meer-muschel": { name: "大海", partner: "贝壳", question: "什么和大海是一对？", right: "贝壳和大海是一对。真棒！", belongs: "贝壳和大海是一对！" },
@@ -321,14 +317,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
     belongs: "门票和马戏团是一对！",
   },
   "kirche-glocke": { name: "教堂", partner: "钟", question: "什么和教堂是一对？", right: "钟和教堂是一对。真棒！", belongs: "钟和教堂是一对！" },
-  "torte-kerze": { name: "蛋糕", partner: "蜡烛", question: "什么和蛋糕是一对？", right: "蜡烛和蛋糕是一对。真棒！", belongs: "蜡烛和蛋糕是一对！" },
-  "geschenk-schleife": {
-    name: "礼物",
-    partner: "蝴蝶结",
-    question: "什么和礼物是一对？",
-    right: "蝴蝶结和礼物是一对。真棒！",
-    belongs: "蝴蝶结和礼物是一对！",
-  },
   "tannenbaum-weihnachtsstern": {
     name: "圣诞树",
     partner: "星星",
@@ -415,7 +403,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
   },
   matrose: { name: "水手", partner: "锚", question: "水手需要什么？", right: "水手需要锚。真棒！", belongs: "水手需要锚！" },
   seilbahnfuehrerin: { name: "缆车司机", partner: "缆车", question: "缆车司机需要什么？", right: "缆车司机需要缆车。真棒！", belongs: "缆车司机需要缆车！" },
-  zahnaerztin: { name: "牙医", partner: "牙刷", question: "牙医需要什么？", right: "牙医需要牙刷。真棒！", belongs: "牙医需要牙刷！" },
   tieraerztin: { name: "兽医", partner: "创可贴", question: "兽医需要什么？", right: "兽医需要创可贴。真棒！", belongs: "兽医需要创可贴！" },
   krankenpfleger: { name: "护士", partner: "体温计", question: "护士需要什么？", right: "护士需要体温计。真棒！", belongs: "护士需要体温计！" },
   apothekerin: { name: "药剂师", partner: "药片", question: "药剂师需要什么？", right: "药剂师需要药片。真棒！", belongs: "药剂师需要药片！" },
@@ -440,8 +427,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
     belongs: "冰淇淋店员需要冰淇淋！",
   },
   kassierer: { name: "收银员", partner: "钱", question: "收银员需要什么？", right: "收银员需要钱。真棒！", belongs: "收银员需要钱！" },
-  konditorin: { name: "糕点师", partner: "蛋糕", question: "糕点师需要什么？", right: "糕点师需要蛋糕。真棒！", belongs: "糕点师需要蛋糕！" },
-  pizzabaecker: { name: "比萨师傅", partner: "比萨", question: "比萨师傅需要什么？", right: "比萨师傅需要比萨。真棒！", belongs: "比萨师傅需要比萨！" },
   kellnerin: { name: "服务员", partner: "咖啡", question: "服务员需要什么？", right: "服务员需要咖啡。真棒！", belongs: "服务员需要咖啡！" },
   floristin: { name: "花艺师", partner: "花束", question: "花艺师需要什么？", right: "花艺师需要花束。真棒！", belongs: "花艺师需要花束！" },
   baeuerin: { name: "农民", partner: "拖拉机", question: "农民需要什么？", right: "农民需要拖拉机。真棒！", belongs: "农民需要拖拉机！" },
@@ -589,7 +574,6 @@ export const CHINESE_SCENES: TogetherTranslation = {
   hexe: { name: "女巫", partner: "扫帚", question: "女巫需要什么？", right: "女巫需要扫帚。真棒！", belongs: "女巫需要扫帚！" },
   pirat: { name: "海盗", partner: "藏宝图", question: "海盗需要什么？", right: "海盗需要藏宝图。真棒！", belongs: "海盗需要藏宝图！" },
   clown: { name: "小丑", partner: "气球", question: "小丑需要什么？", right: "小丑需要气球。真棒！", belongs: "小丑需要气球！" },
-  weihnachtsmann: { name: "圣诞老人", partner: "礼物", question: "圣诞老人需要什么？", right: "圣诞老人需要礼物。真棒！", belongs: "圣诞老人需要礼物！" },
   detektivin: { name: "侦探", partner: "放大镜", question: "侦探需要什么？", right: "侦探需要放大镜。真棒！", belongs: "侦探需要放大镜！" },
   maerchenerzaehlerin: {
     name: "讲故事的人",

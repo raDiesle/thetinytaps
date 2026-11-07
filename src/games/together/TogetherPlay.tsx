@@ -178,7 +178,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
     <div className={`together-play kind-${round.kind}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
       <div className="tg-top">
         <div ref={topRef} className={`tg-above${nudge && !working ? ` tg-nudge-${nudge % 2}` : ""}`} data-tap onPointerDown={onTopDown}>
-          <PairPicture pair={round.pair} working={working} label={texts.name(round.pair)} />
+          <PairPicture pair={round.pair} working={working} live label={texts.name(round.pair)} />
         </div>
         {topic}
       </div>

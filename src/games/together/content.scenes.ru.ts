@@ -131,13 +131,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     right: "Огурец подходит к салату. Здорово!",
     belongs: "Огурец подходит к салату!",
   },
-  "kekse-kakao": {
-    name: "Печенье",
-    partner: "Какао",
-    question: "Что подходит к печенью?",
-    right: "Какао подходит к печенью. Здорово!",
-    belongs: "Какао подходит к печенью!",
-  },
   "suppe-loeffel": {
     name: "Суп",
     partner: "Ложка",
@@ -158,13 +151,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Что подходит к пудингу?",
     right: "Вишни подходят к пудингу. Здорово!",
     belongs: "Вишни подходят к пудингу!",
-  },
-  "orange-saft": {
-    name: "Апельсин",
-    partner: "Сок",
-    question: "Что подходит к апельсину?",
-    right: "Сок подходит к апельсину. Здорово!",
-    belongs: "Сок подходит к апельсину!",
   },
   "burger-ketchup": {
     name: "Бургер",
@@ -214,13 +200,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Что подходит к ноутбуку?",
     right: "Мышка подходит к ноутбуку. Здорово!",
     belongs: "Мышка подходит к ноутбуку!",
-  },
-  "handy-ladekabel": {
-    name: "Телефон",
-    partner: "Зарядка",
-    question: "Что подходит к телефону?",
-    right: "Зарядка подходит к телефону. Здорово!",
-    belongs: "Зарядка подходит к телефону!",
   },
   "drucker-papier": {
     name: "Принтер",
@@ -502,13 +481,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     right: "Лопата подходит к картошке. Здорово!",
     belongs: "Лопата подходит к картошке!",
   },
-  "lagerfeuer-holz": {
-    name: "Костёр",
-    partner: "Дрова",
-    question: "Что подходит к костру?",
-    right: "Дрова подходят к костру. Здорово!",
-    belongs: "Дрова подходят к костру!",
-  },
   "feld-traktor": {
     name: "Поле",
     partner: "Трактор",
@@ -746,20 +718,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Что подходит к церкви?",
     right: "Колокол подходит к церкви. Здорово!",
     belongs: "Колокол подходит к церкви!",
-  },
-  "torte-kerze": {
-    name: "Торт",
-    partner: "Свечка",
-    question: "Что подходит к торту?",
-    right: "Свечка подходит к торту. Здорово!",
-    belongs: "Свечка подходит к торту!",
-  },
-  "geschenk-schleife": {
-    name: "Подарок",
-    partner: "Бант",
-    question: "Что подходит к подарку?",
-    right: "Бант подходит к подарку. Здорово!",
-    belongs: "Бант подходит к подарку!",
   },
   "tannenbaum-weihnachtsstern": {
     name: "Ёлка",
@@ -1027,13 +985,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     right: "Работнику канатной дороги нужна канатная дорога. Здорово!",
     belongs: "Работнику канатной дороги нужна канатная дорога!",
   },
-  zahnaerztin: {
-    name: "Стоматолог",
-    partner: "Зубная щётка",
-    question: "Что нужно стоматологу?",
-    right: "Стоматологу нужна зубная щётка. Здорово!",
-    belongs: "Стоматологу нужна зубная щётка!",
-  },
   tieraerztin: {
     name: "Ветеринар",
     partner: "Пластырь",
@@ -1117,20 +1068,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Что нужно кассиру?",
     right: "Кассиру нужны деньги. Здорово!",
     belongs: "Кассиру нужны деньги!",
-  },
-  konditorin: {
-    name: "Кондитер",
-    partner: "Торт",
-    question: "Что нужно кондитеру?",
-    right: "Кондитеру нужен торт. Здорово!",
-    belongs: "Кондитеру нужен торт!",
-  },
-  pizzabaecker: {
-    name: "Повар в пиццерии",
-    partner: "Пицца",
-    question: "Что нужно повару в пиццерии?",
-    right: "Повару в пиццерии нужна пицца. Здорово!",
-    belongs: "Повару в пиццерии нужна пицца!",
   },
   kellnerin: {
     name: "Официантка",
@@ -1530,13 +1467,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Что нужно клоуну?",
     right: "Клоуну нужен воздушный шар. Здорово!",
     belongs: "Клоуну нужен воздушный шар!",
-  },
-  weihnachtsmann: {
-    name: "Дед Мороз",
-    partner: "Подарки",
-    question: "Что нужно Деду Морозу?",
-    right: "Деду Морозу нужны подарки. Здорово!",
-    belongs: "Деду Морозу нужны подарки!",
   },
   detektivin: {
     name: "Детектив",

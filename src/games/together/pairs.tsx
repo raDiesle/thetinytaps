@@ -23,7 +23,8 @@ import {
 import { BACKDROPS, type BackdropId } from "./backdrops";
 import { Helper, type Outfit } from "./Helper";
 import type { RoundKind } from "./levels";
-import { type Act, fromScene, type Prop } from "./scene";
+import { PAINTED } from "./painted";
+import { type Act, fromPainted, fromScene, type Prop } from "./scene";
 import { SCENES } from "./scenes";
 import type { TopicId } from "./topics";
 
@@ -72,8 +73,10 @@ export interface Partner {
   plural?: true;
   /** An emoji for it, where one shows it plainly … */
   emoji?: string;
-  /** … else a drawing in a 100 × 100 box. */
+  /** … or a drawing in a 100 × 100 box … */
   draw?: ReactNode;
+  /** … or a painted picture: a painted pair's `part`, by the pair's id in `bilder/teile/` (`partImage`). */
+  image?: string;
 }
 
 /** The one above and what belongs to it. */
@@ -91,6 +94,8 @@ export interface Pair {
   partner: Partner;
   /** Back to front; one of them is the partner (`tool`), which shows only once it is there. */
   layers: Layer[];
+  /** A painted pair's two frames, before and after (`painted/`, `framesOf`), shown instead of layers. */
+  frames?: [string, string];
   /** A scene's shared motion (scene.tsx); a handmade pair has none and moves by its own rules. */
   act?: Act;
   /** A scene's time from the partner's arrival to its motion, in ms (`--t`). */
@@ -639,8 +644,8 @@ const HANDMADE: Pair[] = [
   ),
 ];
 
-/** Every pair: the handmade ones, then the scenes (`scenes/`). Each partner belongs to its own one above only. */
-export const PAIRS: Pair[] = [...HANDMADE, ...SCENES.map(fromScene)];
+/** Every pair: the handmade ones, the scenes (`scenes/`) and the painted pairs whose pictures are made (`painted/`). Each partner belongs to its own one above only. */
+export const PAIRS: Pair[] = [...HANDMADE, ...SCENES.map(fromScene), ...PAINTED.flatMap((p) => fromPainted(p) ?? [])];
 
 /** The pairs of one kind. */
 export const pairsOf = (kind: RoundKind) => PAIRS.filter((p) => p.kind === kind);

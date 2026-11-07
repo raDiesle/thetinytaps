@@ -67,21 +67,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["pop", "twinkle"],
   },
   {
-    id: "schneemann-karotte",
-    topic: "wetter",
-    name: "Schneemann",
-    the: "der Schneemann",
-    toThe: "zum Schneemann",
-    partner: { name: "Karotte", the: "die Karotte", acc: "die Karotte", emoji: "🥕" },
-    thing: "☃️",
-    backdrop: "schnee",
-    props: [["🌲", 40, 130, 28]],
-    // The carrot becomes the snowman's nose.
-    act: "onto",
-    spot: [158, 88, 28],
-    sounds: ["pop"],
-  },
-  {
     id: "schnee-schlitten",
     topic: "wetter",
     name: "Schnee",

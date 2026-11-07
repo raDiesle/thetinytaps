@@ -71,6 +71,7 @@ export const SCENES: SceneSpec[] = [
     act: "onto",
     spot: [170, 92, 32],
     sounds: ["pop"],
+    alsoFits: ["saftpresse-orange"],
   },
   {
     id: "palme-kokosnuss",
@@ -113,22 +114,6 @@ export const SCENES: SceneSpec[] = [
     // The spade digs the potatoes out of the bed.
     act: "tap",
     sounds: ["crunch", "thump"],
-  },
-  {
-    id: "lagerfeuer-holz",
-    topic: "garten",
-    name: "Lagerfeuer",
-    the: "das Lagerfeuer",
-    toThe: "zum Lagerfeuer",
-    partner: { name: "Holz", the: "das Holz", acc: "das Holz", emoji: "🪵" },
-    thing: "🔥",
-    backdrop: "nacht",
-    props: [
-      ["🪨", 58, 168, 22],
-      ["🪨", 242, 168, 22],
-    ],
-    act: "into",
-    sounds: ["thump", "crackle"],
   },
   {
     id: "feld-traktor",
@@ -247,7 +232,7 @@ export const SCENES: SceneSpec[] = [
     act: "onto",
     spot: [170, 106, 42],
     sounds: ["rustle", "pop"],
-    // Cones hang on the Christmas tree and on other trees too, and a fir gives wood for the fire.
-    alsoFits: ["tannenbaum-weihnachtsstern", "baum-apfel", "lagerfeuer-holz"],
+    // Cones hang on the Christmas tree and on other trees too.
+    alsoFits: ["tannenbaum-weihnachtsstern", "baum-apfel"],
   },
 ];

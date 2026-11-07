@@ -21,12 +21,20 @@ Each pair belongs to a **topic** (`topics.ts`: Im Bad, Küche & Essen, Zu Hause,
 Unterwegs, Feste – things of the day; Berufe, Bauen & Reparieren, Fahrzeuge, Arzt & Krankenhaus, Feuerwehr, Polizei &
 Rettung, Laden, Café & Küche, Bauernhof & Wald, Musik & Bühne, Sport, Märchen & Abenteuer – helpers), so grown-ups may
 one day choose topics behind ⚙️. Helpers are split by place on purpose: since the wrong choices come from other topics
-first, helpers of one place (the builder's bricks, the crane driver's crane) are rarely dealt together. There are two sorts:
+first, helpers of one place (the builder's bricks, the crane driver's crane) are rarely dealt together. There are three sorts:
 - **Handmade** (`HANDMADE` in `pairs.tsx`, nine: Zahnbürste, Tür, Topf, Blume, Papier, Feuerwehr, Ärztin, Bäcker,
   Friseurin): drawn layer by layer with motions of their own in `together.css` (`.pair-<id>`), the only ones translated
   so far (`content.<lang>.ts`). Drawn in their old 200 × 200 units and moved into the middle of the wide box
   (`handmade`), on a backdrop.
-- **Scenes** (`scenes/<topic>.ts`, about 230, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
+- **Painted** (`painted/<topic>.ts`, `PaintedPair`, user decision, November 2026 – the way new pairs are made): two
+  pictures of ONE scene painted with Gemini, the first showing what waits for its partner, the second the very same
+  scene with the partner at work, fading in over the first as the partner lands (`PairPicture`'s `live`, `.tg-framed`
+  in `together.css`). A pair is written as plain data with its prompts (`before`, `after`, in English) and plays only
+  once its pictures are made (`fromPainted`, `framesOf` in `frames.ts`); `picturePrompts.ts` puts the rest into the
+  picture queue (`bun run image queue --make`: the first frames with the fox and bear families as reference, then the
+  second frames drawn from the first, then the painted partners cut out of the second). Check each pair before and
+  after side by side, mark it `made`, and redraw what isn't clear (delete the file, sharpen its prompt).
+- **Scenes** (`scenes/<topic>.ts`, about 220, the older emoji scenes, `SceneSpec` and `fromScene` in `scene.tsx`): written as data – a backdrop, the thing
   as a big emoji (or, for a helper, the fox or bear in its outfit, `Helper.tsx`, with what it works on), a few small
   emoji round it for context (`props`), the partner, and one of a few shared motions (`Act`: onto, into, beside, rub,
   pour, tap, turn, light, hold; `.act-<act>` in `together.css`). A helper's tool lands in its paw first and is carried
@@ -45,6 +53,36 @@ of Schatten finden (`nextLevel`). Every visit begins on the first step. Every si
 play-time limit (`gameEnded`, `countGame`). A thing comes again only after all of its kind (`useDeck`).
 
 ## Rules
+
+### Painted pairs (user feedback from the review of the emoji scenes, November 2026)
+
+- **The first picture plainly lacks the partner, and shows nothing else that would do its job.** No cake that already
+  has candles, no letter box with a letter in it, no present that already has its bow, no building site where the
+  bricks already lie ready. Whoever is there shows it waits: a fox or bear empty-pawed, puzzled or searching, looking
+  at what is missing – feelings only in faces and poses, never a „?“ or other sign floating in the air.
+- **The second picture is the very same scene a moment later**: the partner in use (the candles burning on the cake,
+  the brush down in the chimney held by its rope, the reindeer pulling the sleigh) and everyone glad to have it.
+  Nothing else changes. A partner that is merely there, lying beside someone with empty paws, is no answer: the
+  prompt says who holds it and what it does.
+- **The thing lacks the partner, never the other way round**: the juicer waits for its orange, not the orange for its
+  juice; the fire pit with its stacked wood waits for the fire, not the fire for wood.
+- **A helper needs a tool, vehicle, animal or instrument to do its job – never what it hands out or makes** (Father
+  Christmas needs his reindeer, not a present; the pastry cook a piping bag, not a cake), and never a thing every child
+  has at home (the dentist needs her mouth mirror, not a toothbrush).
+- **The place is plain at a glance**: a building site behind its barrier with a half-built wall, a lifeguard tower on
+  the beach, a mine with its cart on rails, a kitten up a tree for the fire engine's ladder. Name the few things that
+  tell the place in `before`, nothing more.
+- **Only partners that look one way**: a thing a child knows by one look (a carrot, a key, a life ring), never one that
+  looks very different from home to home (a charging cable was removed).
+- **The partner on its plate looks like the partner in the second picture**: its emoji only where Apple's emoji
+  matches it (🍊, 🦌, 🥕), else a `part`, painted from the second frame (Apple's 🕯️ stands on a metal dish – birthday
+  candles don't).
+- One plain scene, the main thing big in the middle, a few things that tell the place, and only the characters named,
+  each once (`CAST` in `picturePrompts.ts` says so to Gemini). Fox and bear take turns; a helper is a fox or bear
+  grown-up in its role, children are fox or bear children, and everyone wears clothes. Things and children stay as the
+  rules for all pairs below say (exactly one choice fits, `alsoFits` both ways, partner names unique within a kind).
+
+### All pairs
 
 - Grown-ups change things only behind ⚙️ held while playing (`PlayOptions`): „Was drankommt“ („Gemischt“ or exactly one
   kind, `settings.kinds` – never a mix of some, user feedback, November 2026) and „Schwierigkeit“ (Von selbst, Leicht,

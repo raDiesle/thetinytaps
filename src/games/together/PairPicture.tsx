@@ -1,9 +1,12 @@
 import type { CSSProperties } from "react";
+import { partImage } from "./frames";
 import type { Pair, Partner } from "./pairs";
 import { BOX_H, BOX_W } from "./scene";
 
-/** The partner as it lies on its plate: its emoji or its drawing, filling its box. */
+/** The partner as it lies on its plate: its emoji, its painted picture or its drawing, filling its box. */
 export function PartnerIcon({ partner }: { partner: Partner }) {
+  const image = partner.image && partImage(partner.image);
+  if (image) return <img className="tg-icon tg-part" src={image} alt="" draggable={false} aria-hidden />;
   return partner.emoji ? (
     <span className="tg-icon tg-emoji" aria-hidden>
       {partner.emoji}
@@ -22,8 +25,20 @@ const py = (n: number) => `${(n / BOX_H) * 100}%`;
 /**
  * The one above in its wide box, every layer of it a small HTML layer of its own; `working` shows its partner there and
  * sets the two off doing what they are for (together.css). Without it only the one above shows, as over a wrong plate.
+ * A pair with painted frames shows its first, and the second fades in over it as the partner lands: the same scene,
+ * the partner in use and everyone glad. `live` (the round's own picture) loads the second at once, hidden, so it is
+ * there to fade in; the small picture over a wrong plate needs only the first.
  */
-export function PairPicture({ pair, working = false, label }: { pair: Pair; working?: boolean; label?: string }) {
+export function PairPicture({ pair, working = false, live = false, label }: { pair: Pair; working?: boolean; live?: boolean; label?: string }) {
+  if (pair.frames) {
+    const [before, after] = pair.frames;
+    return (
+      <span className={`tg-box tg-framed${working ? " working" : ""}`} role="img" aria-label={label} aria-hidden={label ? undefined : true}>
+        <img className="tg-frame" src={before} alt="" draggable={false} decoding="async" />
+        {live && <img className="tg-frame tg-frame-after" src={after} alt="" draggable={false} decoding="async" />}
+      </span>
+    );
+  }
   const style = pair.start === undefined ? undefined : ({ "--t": `${pair.start}ms` } as CSSProperties);
   return (
     <span

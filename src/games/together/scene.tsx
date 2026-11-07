@@ -72,6 +72,8 @@ import {
   playYum,
 } from "@/lib/sfx";
 import { BACKDROPS, type BackdropId } from "./backdrops";
+import { framesOf, partImage } from "./frames";
+import type { PaintedPair } from "./painted";
 import { Helper, type Outfit } from "./Helper";
 import type { Layer, Pair, Partner, Rect } from "./pairs";
 import { TOPICS, type TopicId } from "./topics";
@@ -324,6 +326,29 @@ export function fromScene(spec: SceneSpec): Pair {
     act,
     start,
     sounds: names.map((name, i) => [start + 100 + i * 650, SOUNDS[name]] as [number, () => void]),
+    alsoFits: spec.alsoFits,
+  };
+}
+
+/** A painted pair's sounds begin as its second picture fades in, as soon as the partner has landed. */
+const PAINTED_START = 150;
+
+/** A painted pair (`painted/`) as the game plays it, once its pictures are made; until then none. */
+export function fromPainted(spec: PaintedPair): Pair | undefined {
+  const frames = framesOf(spec.id);
+  const image = spec.part ? partImage(spec.id) : undefined;
+  if (!frames || (spec.part && !image)) return undefined;
+  return {
+    id: spec.id,
+    kind: TOPICS[spec.topic].kind,
+    topic: spec.topic,
+    name: spec.name,
+    the: spec.the,
+    toThe: spec.toThe,
+    partner: spec.part ? { ...spec.partner, image: spec.id } : spec.partner,
+    layers: [],
+    frames,
+    sounds: spec.sounds.map((name, i) => [PAINTED_START + 100 + i * 650, SOUNDS[name]] as [number, () => void]),
     alsoFits: spec.alsoFits,
   };
 }

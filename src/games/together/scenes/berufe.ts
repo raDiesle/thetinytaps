@@ -1,5 +1,5 @@
 import type { SceneSpec } from "../scene";
-import { binLorry, sweepBrush, vacuum } from "../tools";
+import { binLorry, vacuum } from "../tools";
 
 // The helpers of the topic „Berufe“ (topics.ts) and what they need, written as data (see scene.tsx): the jobs that
 // have no place of their own among the other helper topics (building, vehicles, the doctor's, rescue, shop and café,
@@ -148,22 +148,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["tick", "ding"],
     // A teacher works at a computer too.
     alsoFits: ["lehrerin"],
-  },
-  {
-    id: "schornsteinfeger",
-    topic: "berufe",
-    name: "Schornsteinfeger",
-    the: "der Schornsteinfeger",
-    toThe: "der Schornsteinfeger",
-    partner: { name: "Kaminbesen", the: "der Kaminbesen", acc: "den Kaminbesen", draw: sweepBrush },
-    helper: { fur: "fox", outfit: { coat: "#343a40", hat: "tophat", detail: "buttons", detailColor: "#ffd43b" } },
-    // Up on the roof, the brush sweeps to and fro in the top of the tall chimney.
-    backdrop: "dach",
-    act: "rub",
-    spot: [225, 44, 44],
-    sounds: ["whoosh", "rustle"],
-    // A witch's broom sweeps too.
-    alsoFits: ["hexe"],
   },
   {
     id: "muellwerker",

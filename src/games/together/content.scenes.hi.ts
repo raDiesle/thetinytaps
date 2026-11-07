@@ -132,13 +132,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     right: "सलाद के लिए खीरा चाहिए। बहुत बढ़िया!",
     belongs: "सलाद के लिए खीरा चाहिए!",
   },
-  "kekse-kakao": {
-    name: "बिस्कुट",
-    partner: "कोको",
-    question: "बिस्कुट के लिए क्या चाहिए?",
-    right: "बिस्कुट के लिए कोको चाहिए। बहुत बढ़िया!",
-    belongs: "बिस्कुट के लिए कोको चाहिए!",
-  },
   "suppe-loeffel": {
     name: "सूप",
     partner: "चम्मच",
@@ -159,13 +152,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     question: "पुडिंग के लिए क्या चाहिए?",
     right: "पुडिंग के लिए चेरी चाहिए। बहुत बढ़िया!",
     belongs: "पुडिंग के लिए चेरी चाहिए!",
-  },
-  "orange-saft": {
-    name: "संतरा",
-    partner: "जूस",
-    question: "संतरे के लिए क्या चाहिए?",
-    right: "संतरे के लिए जूस चाहिए। बहुत बढ़िया!",
-    belongs: "संतरे के लिए जूस चाहिए!",
   },
   "burger-ketchup": {
     name: "बर्गर",
@@ -215,13 +201,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     question: "लैपटॉप के लिए क्या चाहिए?",
     right: "लैपटॉप के लिए माउस चाहिए। बहुत बढ़िया!",
     belongs: "लैपटॉप के लिए माउस चाहिए!",
-  },
-  "handy-ladekabel": {
-    name: "फ़ोन",
-    partner: "चार्जर",
-    question: "फ़ोन के लिए क्या चाहिए?",
-    right: "फ़ोन के लिए चार्जर चाहिए। बहुत बढ़िया!",
-    belongs: "फ़ोन के लिए चार्जर चाहिए!",
   },
   "drucker-papier": {
     name: "प्रिंटर",
@@ -503,13 +482,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     right: "आलुओं के लिए फावड़ा चाहिए। बहुत बढ़िया!",
     belongs: "आलुओं के लिए फावड़ा चाहिए!",
   },
-  "lagerfeuer-holz": {
-    name: "अलाव",
-    partner: "लकड़ी",
-    question: "अलाव के लिए क्या चाहिए?",
-    right: "अलाव के लिए लकड़ी चाहिए। बहुत बढ़िया!",
-    belongs: "अलाव के लिए लकड़ी चाहिए!",
-  },
   "feld-traktor": {
     name: "खेत",
     partner: "ट्रैक्टर",
@@ -747,20 +719,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     question: "चर्च के लिए क्या चाहिए?",
     right: "चर्च के लिए घंटा चाहिए। बहुत बढ़िया!",
     belongs: "चर्च के लिए घंटा चाहिए!",
-  },
-  "torte-kerze": {
-    name: "केक",
-    partner: "मोमबत्ती",
-    question: "केक के लिए क्या चाहिए?",
-    right: "केक के लिए मोमबत्ती चाहिए। बहुत बढ़िया!",
-    belongs: "केक के लिए मोमबत्ती चाहिए!",
-  },
-  "geschenk-schleife": {
-    name: "तोहफ़ा",
-    partner: "रिबन",
-    question: "तोहफ़े के लिए क्या चाहिए?",
-    right: "तोहफ़े के लिए रिबन चाहिए। बहुत बढ़िया!",
-    belongs: "तोहफ़े के लिए रिबन चाहिए!",
   },
   "tannenbaum-weihnachtsstern": {
     name: "क्रिसमस ट्री",
@@ -1028,13 +986,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     right: "केबल कार चालक को केबल कार चाहिए। बहुत बढ़िया!",
     belongs: "केबल कार चालक को केबल कार चाहिए!",
   },
-  zahnaerztin: {
-    name: "दाँतों का डॉक्टर",
-    partner: "टूथब्रश",
-    question: "दाँतों का डॉक्टर को क्या चाहिए?",
-    right: "दाँतों का डॉक्टर को टूथब्रश चाहिए। बहुत बढ़िया!",
-    belongs: "दाँतों का डॉक्टर को टूथब्रश चाहिए!",
-  },
   tieraerztin: {
     name: "पशु डॉक्टर",
     partner: "बैंडेज",
@@ -1118,20 +1069,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     question: "कैशियर को क्या चाहिए?",
     right: "कैशियर को पैसे चाहिए। बहुत बढ़िया!",
     belongs: "कैशियर को पैसे चाहिए!",
-  },
-  konditorin: {
-    name: "केक बनाने वाला",
-    partner: "केक",
-    question: "केक बनाने वाले को क्या चाहिए?",
-    right: "केक बनाने वाले को केक चाहिए। बहुत बढ़िया!",
-    belongs: "केक बनाने वाले को केक चाहिए!",
-  },
-  pizzabaecker: {
-    name: "पिज़्ज़ा बनाने वाला",
-    partner: "पिज़्ज़ा",
-    question: "पिज़्ज़ा बनाने वाले को क्या चाहिए?",
-    right: "पिज़्ज़ा बनाने वाले को पिज़्ज़ा चाहिए। बहुत बढ़िया!",
-    belongs: "पिज़्ज़ा बनाने वाले को पिज़्ज़ा चाहिए!",
   },
   kellnerin: {
     name: "वेटर",
@@ -1531,13 +1468,6 @@ export const HINDI_SCENES: TogetherTranslation = {
     question: "जोकर को क्या चाहिए?",
     right: "जोकर को गुब्बारा चाहिए। बहुत बढ़िया!",
     belongs: "जोकर को गुब्बारा चाहिए!",
-  },
-  weihnachtsmann: {
-    name: "सांता क्लॉज़",
-    partner: "तोहफ़े",
-    question: "सांता क्लॉज़ को क्या चाहिए?",
-    right: "सांता क्लॉज़ को तोहफ़े चाहिए। बहुत बढ़िया!",
-    belongs: "सांता क्लॉज़ को तोहफ़े चाहिए!",
   },
   detektivin: {
     name: "जासूस",

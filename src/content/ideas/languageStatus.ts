@@ -326,7 +326,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🏠 Die vielen neuen Szenen (scenes/)",
         recorded: true,
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu am 7. November 2026, am selben Tag übersetzt (content.scenes.<Sprache>.ts): die 228 Paare und Helfer der Themen (Bad, Küche, Berufe, Bauen, Fahrzeuge, Musik, Sport …) mit Namen und Sätzen. Die Sätze sind in keiner Sprache aufgenommen und bleiben bis dahin stumm (🎙️ Stimmen).",
+        note: "Neu am 7. November 2026, am selben Tag übersetzt (content.scenes.<Sprache>.ts): die Paare und Helfer der Themen (Bad, Küche, Berufe, Bauen, Fahrzeuge, Musik, Sport …) mit Namen und Sätzen. Die Sätze sind in keiner Sprache aufgenommen und bleiben bis dahin stumm (🎙️ Stimmen).",
+      },
+      {
+        label: "🔄 Umgebaute Paare nach der Durchsicht",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Am 7. November 2026 umgedreht oder mit neuem Gegenstück (GERMAN_ONLY in content.test.ts): Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin – Zahnarztspiegel, Weihnachtsmann – Rentier, Pizzabäcker – Pizzaschieber, Konditorin – Spritzbeutel. Ihre alten Übersetzungen wurden gestrichen; bis zur neuen Übersetzung sagen sie alles auf Deutsch.",
       },
       {
         label: "🗂️ Die Namen der Themen",

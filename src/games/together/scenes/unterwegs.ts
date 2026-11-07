@@ -107,18 +107,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["engine", "whoosh"],
   },
   {
-    id: "briefkasten-brief",
-    topic: "unterwegs",
-    name: "Briefkasten",
-    the: "der Briefkasten",
-    toThe: "zum Briefkasten",
-    partner: { name: "Brief", the: "der Brief", acc: "den Brief", emoji: "✉️" },
-    thing: "📮",
-    backdrop: "hausfront",
-    act: "into",
-    sounds: ["whoosh", "plop"],
-  },
-  {
     id: "krankenhaus-krankenwagen",
     topic: "unterwegs",
     name: "Krankenhaus",

@@ -1,6 +1,7 @@
 import { DAY_PICTURE_QUEUE } from "@/games/feelings/dayPictures";
 import { MOOD_PICTURE_QUEUE } from "@/games/feelings/moodPictures";
 import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
+import { TOGETHER_PICTURE_QUEUE } from "@/games/together/picturePrompts";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
 // here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet of
@@ -39,4 +40,4 @@ export interface QueuedPicture {
 }
 
 /** Every picture waiting, oldest first. */
-export const PICTURE_QUEUE: QueuedPicture[] = [...RITUAL_PICTURE_QUEUE, ...DAY_PICTURE_QUEUE, ...MOOD_PICTURE_QUEUE];
+export const PICTURE_QUEUE: QueuedPicture[] = [...RITUAL_PICTURE_QUEUE, ...DAY_PICTURE_QUEUE, ...MOOD_PICTURE_QUEUE, ...TOGETHER_PICTURE_QUEUE];

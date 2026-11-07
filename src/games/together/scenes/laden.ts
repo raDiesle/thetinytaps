@@ -46,36 +46,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["ding", "rustle"],
   },
   {
-    id: "konditorin",
-    topic: "laden",
-    name: "Konditorin",
-    the: "die Konditorin",
-    toThe: "die Konditorin",
-    partner: { name: "Torte", the: "die Torte", acc: "die Torte", emoji: "🎂" },
-    helper: { fur: "bear", outfit: { coat: "#ffdeeb", hat: "chef", detail: "apron" }, lashes: true },
-    backdrop: "baeckerei",
-    act: "hold",
-    sounds: ["twinkle", "yum"],
-    // A baker bakes cakes too.
-    alsoFits: ["baecker"],
-  },
-  {
-    id: "pizzabaecker",
-    topic: "laden",
-    name: "Pizzabäcker",
-    the: "der Pizzabäcker",
-    toThe: "der Pizzabäcker",
-    partner: { name: "Pizza", the: "die Pizza", acc: "die Pizza", emoji: "🍕" },
-    helper: { fur: "fox", outfit: { coat: "#f8f9fa", hat: "chef", detail: "scarf", detailColor: "#2f9e44" } },
-    // The pizza goes into the glowing mouth of the brick oven.
-    backdrop: "pizzeria",
-    act: "into",
-    spot: [238, 140, 46],
-    sounds: ["whoosh", "crackle"],
-    // A cook and a baker bake it too.
-    alsoFits: ["koch", "baecker"],
-  },
-  {
     id: "kellnerin",
     topic: "laden",
     name: "Kellnerin",
@@ -88,8 +58,8 @@ export const SCENES: SceneSpec[] = [
     act: "onto",
     spot: [226, 118, 38],
     sounds: ["clonk", "yum"],
-    // She brings cake, pizza, ice cream and a spoon too, and takes the money.
-    alsoFits: ["konditorin", "pizzabaecker", "eisverkaeuferin", "koch", "kassierer"],
+    // She brings ice cream and a spoon too, and takes the money.
+    alsoFits: ["eisverkaeuferin", "koch", "kassierer"],
   },
   {
     id: "floristin",

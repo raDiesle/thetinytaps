@@ -175,20 +175,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["crunch"],
   },
   {
-    id: "kekse-kakao",
-    topic: "kueche",
-    name: "Kekse",
-    the: "die Kekse",
-    toThe: "zu den Keksen",
-    partner: { name: "Kakao", the: "der Kakao", acc: "den Kakao", emoji: "☕" },
-    thing: "🍪",
-    backdrop: "esstisch",
-    act: "beside",
-    sounds: ["pop", "crunch"],
-    // Milk goes with biscuits too.
-    alsoFits: ["muesli-milch"],
-  },
-  {
     id: "suppe-loeffel",
     topic: "kueche",
     name: "Suppe",
@@ -227,18 +213,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["plop", "yum"],
     // Cherries go on ice cream and on a cake too.
     alsoFits: ["torte-kerze"],
-  },
-  {
-    id: "orange-saft",
-    topic: "kueche",
-    name: "Orange",
-    the: "die Orange",
-    toThe: "zur Orange",
-    partner: { name: "Saft", the: "der Saft", acc: "den Saft", emoji: "🧃" },
-    thing: "🍊",
-    backdrop: "kueche",
-    act: "beside",
-    sounds: ["pop", "glug"],
   },
   {
     id: "burger-ketchup",

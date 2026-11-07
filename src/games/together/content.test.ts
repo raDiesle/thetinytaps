@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dealRound, KIND_ORDER, nextKind, TOGETHER_LEVELS } from "./levels";
 import { DEFAULT_TOGETHER_SETTINGS } from "./settings";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -9,20 +9,32 @@ import { BOX_H, BOX_W } from "./scene";
 import { SCENES } from "./scenes";
 import { TOPICS } from "./topics";
 import { KIND_SIGNS } from "./RoundTopic";
+import { framesOf, partImage } from "./frames";
+import { PAINTED } from "./painted";
+
+/** Every pair written down, also the painted ones whose pictures aren't made yet: its id, kind and partner's name. */
+const ALL = [
+  ...PAIRS.map((p) => ({ id: p.id, kind: p.kind, partner: p.partner.name })),
+  ...PAINTED.filter((p) => !PAIRS.some((q) => q.id === p.id)).map((p) => ({ id: p.id, kind: TOPICS[p.topic].kind, partner: p.partner.name })),
+];
 
 test("ids and partners are unique, and each pair has exactly one partner layer", () => {
-  expect(PAIRS.filter((p, i) => PAIRS.findIndex((q) => q.id === p.id) !== i).map((p) => p.id)).toEqual([]);
+  expect(ALL.filter((p, i) => ALL.findIndex((q) => q.id === p.id) !== i).map((p) => p.id)).toEqual([]);
+  expect(PAINTED.filter((p, i) => PAINTED.findIndex((q) => q.id === p.id) !== i).map((p) => p.id)).toEqual([]);
   for (const kind of KIND_ORDER) {
-    const names = pairsOf(kind).map((p) => p.partner.name);
+    const names = ALL.filter((p) => p.kind === kind).map((p) => p.partner);
     expect(names.filter((n, i) => names.indexOf(n) !== i)).toEqual([]);
   }
   for (const pair of PAIRS) {
     expect(pair.id).toMatch(/^[a-z0-9-]+$/);
-    expect(pair.layers.filter((l) => l.tool).length).toBe(1);
+    // A painted pair shows its two frames instead of layers.
+    expect(pair.layers.filter((l) => l.tool).length).toBe(pair.frames ? 0 : 1);
     // A layer's class is its key and says how it moves, so it comes once in a picture.
     expect(new Set(pair.layers.map((l) => l.cls)).size).toBe(pair.layers.length);
-    // The partner is either an emoji or a drawing.
-    expect(!!pair.partner.emoji !== !!pair.partner.draw).toBe(true);
+    // The partner is an emoji, a drawing or a painted picture, exactly one of them, and a painted one is there.
+    const { emoji, draw, image } = pair.partner;
+    expect([emoji, draw, image].filter(Boolean).length, pair.id).toBe(1);
+    if (image) expect(partImage(image), `${pair.id}: bilder/teile/${image}.webp`).toBeDefined();
   }
 });
 
@@ -87,10 +99,11 @@ test("every choice shows its name below it", async () => {
 
 // `alsoFits` names real pairs of the same kind, and they are never dealt together.
 test("pairs that also fit each other are never in one round", () => {
-  const byId = new Map(PAIRS.map((p) => [p.id, p]));
-  for (const pair of PAIRS) {
+  const byId = new Map(ALL.map((p) => [p.id, p]));
+  for (const pair of [...PAIRS, ...PAINTED.map((p) => ({ ...p, kind: TOPICS[p.topic].kind }))]) {
     for (const id of pair.alsoFits ?? []) {
       expect(byId.get(id)?.kind === pair.kind ? id : `${pair.id}: alsoFits ${id} is no pair of its kind`).toBe(id);
+      if (!("layers" in pair)) continue;
       for (let i = 0; i < 20; i++) expect(dealRound(pair, PAIRS, 4).choices.some((p) => p.id === id) ? `${pair.id} with ${id}` : "").toBe("");
     }
   }
@@ -156,11 +169,17 @@ test("every scene is of its topic's kind: a helper has its fox or bear, a thing 
 /** The languages translated whole (the handmade pairs in `content.<lang>.ts`, the scenes in `content.scenes.<lang>.ts`, November 2026): every pair has its sentences. */
 const COMPLETE: (TargetLanguageId & TextsLanguageId)[] = ["en", "zh", "hi", "es", "ar", "ru"];
 
+/**
+ * The painted pairs (`painted/`, November 2026) came after the translations: a new one is German only until the user
+ * asks for its translations, and one turned from an emoji scene keeps them where its names stayed the same.
+ */
+const GERMAN_ONLY = new Set(PAINTED.map((p) => p.id));
+
 /** The languages in a script of their own: no Latin letter may be left in their sentences. */
 const OWN_SCRIPT: TargetLanguageId[] = ["zh", "hi", "ar", "ru"];
 
 test("the translated languages say every pair in their own words", () => {
-  const ids = new Set(PAIRS.map((p) => p.id));
+  const ids = new Set(ALL.map((p) => p.id));
   for (const [language, sentences] of Object.entries(TOGETHER_TRANSLATIONS)) {
     for (const id of Object.keys(sentences ?? {})) expect(ids.has(id), `${language} ${id}`).toBe(true);
   }
@@ -168,6 +187,7 @@ test("the translated languages say every pair in their own words", () => {
     const texts = TOGETHER_TEXTS[language]!;
     const de = TOGETHER_TEXTS.de!;
     for (const pair of PAIRS) {
+      if (GERMAN_ONLY.has(pair.id) && !TOGETHER_TRANSLATIONS[language]?.[pair.id]) continue;
       expect(TOGETHER_TRANSLATIONS[language]?.[pair.id], `${language} ${pair.id}`).toBeDefined();
       const said = (["name", "partner", "question", "right", "belongs"] as const).map((key) => [key, texts[key](pair), de[key](pair)]);
       for (const [key, sentence, german] of said) {
@@ -188,4 +208,26 @@ test("every layer's class is styled in together.css", () => {
       expect(css.includes(`.${cls}`)).toBe(true);
     }
   }
+});
+
+// The painted pairs (user decision, November 2026): a pair marked made has all its pictures (both frames, and its
+// painted partner where it has one) and one with all of them is marked made, so it left the picture queue; no picture
+// lies there without its pair; and the partner on its plate is an emoji or painted, exactly one of them.
+test("every painted pair has its pictures once made, and every picture its pair", () => {
+  const byId = new Map(PAINTED.map((p) => [p.id, p]));
+  for (const p of PAINTED) {
+    expect(!!p.partner.emoji !== !!p.part, `${p.id}: an emoji or a part, exactly one`).toBe(true);
+    const frames = !!framesOf(p.id);
+    const made = frames && (!p.part || !!partImage(p.id));
+    expect(p.made, `${p.id}: made when all its pictures are there, "frames" when only its frames`).toBe(made ? true : frames && p.part ? "frames" : undefined);
+    expect(PAIRS.some((q) => q.id === p.id)).toBe(made);
+    expect(p.toThe, p.id).toBe(TOPICS[p.topic].kind === "helper" ? p.the : p.toThe);
+    expect(p.sounds.length, p.id).toBeGreaterThan(0);
+  }
+  const files = (folder: string) => {
+    const path = new URL(folder, import.meta.url).pathname;
+    return existsSync(path) ? [...new Bun.Glob("*.webp").scanSync({ cwd: path })] : [];
+  };
+  for (const file of files("./bilder")) expect(byId.has(file.replace(/-[12]\.webp$/, "")) && /-[12]\.webp$/.test(file), `bilder/${file}`).toBe(true);
+  for (const file of files("./bilder/teile")) expect(!!byId.get(file.replace(/\.webp$/, ""))?.part, `bilder/teile/${file}`).toBe(true);
 });

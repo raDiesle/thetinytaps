@@ -131,13 +131,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     right: "The cucumber goes with the salad. Great!",
     belongs: "The cucumber goes with the salad!",
   },
-  "kekse-kakao": {
-    name: "Cookies",
-    partner: "Cocoa",
-    question: "What goes with the cookies?",
-    right: "The cocoa goes with the cookies. Great!",
-    belongs: "The cocoa goes with the cookies!",
-  },
   "suppe-loeffel": {
     name: "Soup",
     partner: "Spoon",
@@ -158,13 +151,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     question: "What goes with the pudding?",
     right: "The cherries go with the pudding. Great!",
     belongs: "The cherries go with the pudding!",
-  },
-  "orange-saft": {
-    name: "Orange",
-    partner: "Juice",
-    question: "What goes with the orange?",
-    right: "The juice goes with the orange. Great!",
-    belongs: "The juice goes with the orange!",
   },
   "burger-ketchup": {
     name: "Burger",
@@ -214,13 +200,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     question: "What goes with the laptop?",
     right: "The mouse goes with the laptop. Great!",
     belongs: "The mouse goes with the laptop!",
-  },
-  "handy-ladekabel": {
-    name: "Phone",
-    partner: "Charging cable",
-    question: "What goes with the phone?",
-    right: "The charging cable goes with the phone. Great!",
-    belongs: "The charging cable goes with the phone!",
   },
   "drucker-papier": {
     name: "Printer",
@@ -502,13 +481,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     right: "The spade goes with the potatoes. Great!",
     belongs: "The spade goes with the potatoes!",
   },
-  "lagerfeuer-holz": {
-    name: "Campfire",
-    partner: "Firewood",
-    question: "What goes with the campfire?",
-    right: "The firewood goes with the campfire. Great!",
-    belongs: "The firewood goes with the campfire!",
-  },
   "feld-traktor": {
     name: "Field",
     partner: "Tractor",
@@ -746,20 +718,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     question: "What goes with the church?",
     right: "The bell goes with the church. Great!",
     belongs: "The bell goes with the church!",
-  },
-  "torte-kerze": {
-    name: "Cake",
-    partner: "Candle",
-    question: "What goes with the cake?",
-    right: "The candle goes with the cake. Great!",
-    belongs: "The candle goes with the cake!",
-  },
-  "geschenk-schleife": {
-    name: "Present",
-    partner: "Bow",
-    question: "What goes with the present?",
-    right: "The bow goes with the present. Great!",
-    belongs: "The bow goes with the present!",
   },
   "tannenbaum-weihnachtsstern": {
     name: "Christmas tree",
@@ -1027,13 +985,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     right: "The cable car operator needs the cable car. Great!",
     belongs: "The cable car operator needs the cable car!",
   },
-  zahnaerztin: {
-    name: "Dentist",
-    partner: "Toothbrush",
-    question: "What does the dentist need?",
-    right: "The dentist needs the toothbrush. Great!",
-    belongs: "The dentist needs the toothbrush!",
-  },
   tieraerztin: {
     name: "Vet",
     partner: "Bandage",
@@ -1117,20 +1068,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     question: "What does the cashier need?",
     right: "The cashier needs the money. Great!",
     belongs: "The cashier needs the money!",
-  },
-  konditorin: {
-    name: "Pastry chef",
-    partner: "Cake",
-    question: "What does the pastry chef need?",
-    right: "The pastry chef needs the cake. Great!",
-    belongs: "The pastry chef needs the cake!",
-  },
-  pizzabaecker: {
-    name: "Pizza maker",
-    partner: "Pizza",
-    question: "What does the pizza maker need?",
-    right: "The pizza maker needs the pizza. Great!",
-    belongs: "The pizza maker needs the pizza!",
   },
   kellnerin: {
     name: "Waitress",
@@ -1530,13 +1467,6 @@ export const ENGLISH_SCENES: TogetherTranslation = {
     question: "What does the clown need?",
     right: "The clown needs the balloon. Great!",
     belongs: "The clown needs the balloon!",
-  },
-  weihnachtsmann: {
-    name: "Santa Claus",
-    partner: "Presents",
-    question: "What does Santa Claus need?",
-    right: "Santa Claus needs the presents. Great!",
-    belongs: "Santa Claus needs the presents!",
   },
   detektivin: {
     name: "Detective",

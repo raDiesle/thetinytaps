@@ -6,20 +6,6 @@ import { digger, paintRoller } from "../tools";
 
 export const SCENES: SceneSpec[] = [
   {
-    id: "bauarbeiterin",
-    topic: "bauen",
-    name: "Bauarbeiterin",
-    the: "die Bauarbeiterin",
-    toThe: "die Bauarbeiterin",
-    partner: { name: "Steine", the: "die Steine", acc: "die Steine", plural: true, emoji: "🧱" },
-    helper: { fur: "fox", outfit: { coat: "#ff922b", hat: "hardhat", detail: "vest", detailColor: "#ffd43b" }, lashes: true },
-    // The bricks are put down on the building site, beside the half-built wall.
-    backdrop: "baustelle",
-    act: "onto",
-    spot: [222, 140, 52],
-    sounds: ["thump", "clonk"],
-  },
-  {
     id: "mechanikerin",
     topic: "bauen",
     name: "Mechanikerin",

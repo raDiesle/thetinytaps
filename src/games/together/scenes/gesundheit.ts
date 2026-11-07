@@ -6,20 +6,6 @@ import type { SceneSpec } from "../scene";
 
 export const SCENES: SceneSpec[] = [
   {
-    id: "zahnaerztin",
-    topic: "gesundheit",
-    name: "Zahnärztin",
-    the: "die Zahnärztin",
-    toThe: "die Zahnärztin",
-    partner: { name: "Zahnbürste", the: "die Zahnbürste", acc: "die Zahnbürste", emoji: "🪥" },
-    helper: { fur: "bear", outfit: { coat: "#e7f5ff", detail: "collar", detailColor: "#74c0fc" }, lashes: true },
-    // The toothbrush scrubs the tooth.
-    thing: "🦷",
-    backdrop: "praxis",
-    act: "rub",
-    sounds: ["scrub", "squeak"],
-  },
-  {
     id: "tieraerztin",
     topic: "gesundheit",
     name: "Tierärztin",

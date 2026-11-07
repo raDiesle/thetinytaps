@@ -33,16 +33,6 @@ export const paintRoller = (
   </g>
 );
 
-/** A red and white life ring with its rope round it. */
-export const lifeRing = (
-  <g>
-    <circle cx="50" cy="50" r="32" fill="none" stroke={OUT} strokeWidth="24" />
-    <circle cx="50" cy="50" r="32" fill="none" stroke="#f8f9fa" strokeWidth="18" />
-    <circle cx="50" cy="50" r="32" fill="none" stroke="#e03131" strokeWidth="18" strokeDasharray="25.13 25.13" strokeDashoffset="12.5" />
-    <path d="M50 4 Q86 6 96 50 Q86 92 50 96 Q14 92 4 50 Q14 8 50 4" fill="none" stroke="#e9c46a" strokeWidth="2.5" strokeDasharray="6 4" />
-  </g>
-);
-
 /** A pair of orange swimming armbands. */
 export const armbands = (
   <g {...line}>
@@ -95,30 +85,6 @@ export const hotAirBalloon = (
     <path d="M30 10 C18 24 18 46 30 62 L36 66 C26 48 24 26 30 10 Z M70 10 C82 24 82 46 70 62 L64 66 C74 48 76 26 70 10 Z" fill="#e03131" />
     <rect x="38" y="78" width="24" height="16" rx="3" fill="#c08552" />
     <path d="M38 86 H62 M46 78 V94 M54 78 V94" stroke={OUT} strokeWidth="1.5" opacity="0.5" />
-  </g>
-);
-
-/** A chimney sweep's brush: a big round brush of black bristles on its rope, the iron ball hanging under it. */
-export const sweepBrush = (
-  <g>
-    <path d="M50 2 V40" stroke={OUT} strokeWidth="6" strokeLinecap="round" />
-    <path d="M50 2 V40" stroke="#e9c46a" strokeWidth="2.5" strokeLinecap="round" />
-    {Array.from({ length: 18 }, (_, i) => {
-      const a = (i * Math.PI) / 9;
-      return (
-        <path
-          key={i}
-          d={`M${50 + Math.cos(a) * 6} ${58 + Math.sin(a) * 6} L${50 + Math.cos(a) * 30} ${58 + Math.sin(a) * 30}`}
-          stroke="#343a40"
-          strokeWidth="5.5"
-          strokeLinecap="round"
-        />
-      );
-    })}
-    <circle cx="50" cy="58" r="30" fill="none" stroke={OUT} strokeWidth="1.5" strokeDasharray="3 5" opacity="0.6" />
-    <circle cx="50" cy="58" r="8" fill="#868e96" stroke={OUT} strokeWidth="2.4" />
-    <path d="M50 66 V88" stroke={OUT} strokeWidth="3" />
-    <circle cx="50" cy="92" r="6" fill="#495057" stroke={OUT} strokeWidth="2.4" />
   </g>
 );
 

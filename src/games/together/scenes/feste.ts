@@ -5,32 +5,6 @@ import type { SceneSpec } from "../scene";
 
 export const SCENES: SceneSpec[] = [
   {
-    id: "torte-kerze",
-    topic: "feste",
-    name: "Torte",
-    the: "die Torte",
-    toThe: "zur Torte",
-    partner: { name: "Kerze", the: "die Kerze", acc: "die Kerze", emoji: "🕯️" },
-    thing: "🎂",
-    backdrop: "party",
-    props: [["🎈", 40, 60, 28]],
-    act: "onto",
-    sounds: ["clonk", "twinkle"],
-  },
-  {
-    id: "geschenk-schleife",
-    topic: "feste",
-    name: "Geschenk",
-    the: "das Geschenk",
-    toThe: "zum Geschenk",
-    partner: { name: "Schleife", the: "die Schleife", acc: "die Schleife", emoji: "🎀" },
-    thing: "🎁",
-    backdrop: "party",
-    props: [["🎉", 258, 60, 26]],
-    act: "onto",
-    sounds: ["rustle", "twinkle"],
-  },
-  {
     id: "tannenbaum-weihnachtsstern",
     topic: "feste",
     name: "Tannenbaum",
@@ -43,6 +17,7 @@ export const SCENES: SceneSpec[] = [
     act: "onto",
     sounds: ["twinkle", "chime"],
     // The moon's star would sit on the tree too, and a pine cone hang in it: „mond-stern“ and „tanne-tannenzapfen“ name it.
+    alsoFits: ["torte-kerze"],
   },
   {
     id: "osterei-pinsel",
@@ -72,8 +47,8 @@ export const SCENES: SceneSpec[] = [
     backdrop: "nacht",
     act: "light",
     sounds: ["click", "chime"],
-    // The birthday candle would light a lantern too.
-    alsoFits: ["torte-kerze"],
+    // The birthday candles would light a lantern too, and the campfire's flame.
+    alsoFits: ["torte-kerze", "feuerstelle-feuer"],
   },
   {
     id: "pinata-bonbons",

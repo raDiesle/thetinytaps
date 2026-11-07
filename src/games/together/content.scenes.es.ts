@@ -131,13 +131,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     right: "El pepino va con la ensalada. ¡Genial!",
     belongs: "¡El pepino va con la ensalada!",
   },
-  "kekse-kakao": {
-    name: "Galletas",
-    partner: "Chocolate caliente",
-    question: "¿Qué va con las galletas?",
-    right: "El chocolate caliente va con las galletas. ¡Genial!",
-    belongs: "¡El chocolate caliente va con las galletas!",
-  },
   "suppe-loeffel": {
     name: "Sopa",
     partner: "Cuchara",
@@ -158,13 +151,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¿Qué va con el pudín?",
     right: "Las cerezas van con el pudín. ¡Genial!",
     belongs: "¡Las cerezas van con el pudín!",
-  },
-  "orange-saft": {
-    name: "Naranja",
-    partner: "Jugo",
-    question: "¿Qué va con la naranja?",
-    right: "El jugo va con la naranja. ¡Genial!",
-    belongs: "¡El jugo va con la naranja!",
   },
   "burger-ketchup": {
     name: "Hamburguesa",
@@ -214,13 +200,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¿Qué va con la computadora portátil?",
     right: "El ratón va con la computadora portátil. ¡Genial!",
     belongs: "¡El ratón va con la computadora portátil!",
-  },
-  "handy-ladekabel": {
-    name: "Celular",
-    partner: "Cable de carga",
-    question: "¿Qué va con el celular?",
-    right: "El cable de carga va con el celular. ¡Genial!",
-    belongs: "¡El cable de carga va con el celular!",
   },
   "drucker-papier": {
     name: "Impresora",
@@ -502,13 +481,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     right: "La pala va con las papas. ¡Genial!",
     belongs: "¡La pala va con las papas!",
   },
-  "lagerfeuer-holz": {
-    name: "Fogata",
-    partner: "Leña",
-    question: "¿Qué va con la fogata?",
-    right: "La leña va con la fogata. ¡Genial!",
-    belongs: "¡La leña va con la fogata!",
-  },
   "feld-traktor": {
     name: "Campo",
     partner: "Tractor",
@@ -746,20 +718,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¿Qué va con la iglesia?",
     right: "La campana va con la iglesia. ¡Genial!",
     belongs: "¡La campana va con la iglesia!",
-  },
-  "torte-kerze": {
-    name: "Pastel",
-    partner: "Vela",
-    question: "¿Qué va con el pastel?",
-    right: "La vela va con el pastel. ¡Genial!",
-    belongs: "¡La vela va con el pastel!",
-  },
-  "geschenk-schleife": {
-    name: "Regalo",
-    partner: "Lazo",
-    question: "¿Qué va con el regalo?",
-    right: "El lazo va con el regalo. ¡Genial!",
-    belongs: "¡El lazo va con el regalo!",
   },
   "tannenbaum-weihnachtsstern": {
     name: "Árbol de Navidad",
@@ -1027,13 +985,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     right: "La operadora de teleférico necesita el teleférico. ¡Genial!",
     belongs: "¡La operadora de teleférico necesita el teleférico!",
   },
-  zahnaerztin: {
-    name: "Dentista",
-    partner: "Cepillo de dientes",
-    question: "¿Qué necesita la dentista?",
-    right: "La dentista necesita el cepillo de dientes. ¡Genial!",
-    belongs: "¡La dentista necesita el cepillo de dientes!",
-  },
   tieraerztin: {
     name: "Veterinaria",
     partner: "Curita",
@@ -1117,20 +1068,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¿Qué necesita el cajero?",
     right: "El cajero necesita el dinero. ¡Genial!",
     belongs: "¡El cajero necesita el dinero!",
-  },
-  konditorin: {
-    name: "Pastelera",
-    partner: "Pastel",
-    question: "¿Qué necesita la pastelera?",
-    right: "La pastelera necesita el pastel. ¡Genial!",
-    belongs: "¡La pastelera necesita el pastel!",
-  },
-  pizzabaecker: {
-    name: "Pizzero",
-    partner: "Pizza",
-    question: "¿Qué necesita el pizzero?",
-    right: "El pizzero necesita la pizza. ¡Genial!",
-    belongs: "¡El pizzero necesita la pizza!",
   },
   kellnerin: {
     name: "Camarera",
@@ -1530,13 +1467,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¿Qué necesita el payaso?",
     right: "El payaso necesita el globo. ¡Genial!",
     belongs: "¡El payaso necesita el globo!",
-  },
-  weihnachtsmann: {
-    name: "Papá Noel",
-    partner: "Regalos",
-    question: "¿Qué necesita Papá Noel?",
-    right: "Papá Noel necesita los regalos. ¡Genial!",
-    belongs: "¡Papá Noel necesita los regalos!",
   },
   detektivin: {
     name: "Detective",

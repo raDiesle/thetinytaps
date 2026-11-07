@@ -132,13 +132,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     right: "الخيار يناسب السلطة. رائع!",
     belongs: "الخيار يناسب السلطة!",
   },
-  "kekse-kakao": {
-    name: "بسكويت",
-    partner: "كاكاو",
-    question: "ماذا يناسب البسكويت؟",
-    right: "الكاكاو يناسب البسكويت. رائع!",
-    belongs: "الكاكاو يناسب البسكويت!",
-  },
   "suppe-loeffel": {
     name: "شوربة",
     partner: "ملعقة",
@@ -159,13 +152,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "ماذا يناسب البودينغ؟",
     right: "الكرز تناسب البودينغ. رائع!",
     belongs: "الكرز تناسب البودينغ!",
-  },
-  "orange-saft": {
-    name: "برتقالة",
-    partner: "عصير",
-    question: "ماذا يناسب البرتقالة؟",
-    right: "العصير يناسب البرتقالة. رائع!",
-    belongs: "العصير يناسب البرتقالة!",
   },
   "burger-ketchup": {
     name: "برغر",
@@ -215,13 +201,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "ماذا يناسب اللابتوب؟",
     right: "الماوس يناسب اللابتوب. رائع!",
     belongs: "الماوس يناسب اللابتوب!",
-  },
-  "handy-ladekabel": {
-    name: "هاتف",
-    partner: "كابل شحن",
-    question: "ماذا يناسب الهاتف؟",
-    right: "كابل الشحن يناسب الهاتف. رائع!",
-    belongs: "كابل الشحن يناسب الهاتف!",
   },
   "drucker-papier": {
     name: "طابعة",
@@ -503,13 +482,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     right: "المجرفة تناسب البطاطا. رائع!",
     belongs: "المجرفة تناسب البطاطا!",
   },
-  "lagerfeuer-holz": {
-    name: "نار مخيم",
-    partner: "حطب",
-    question: "ماذا يناسب نار المخيم؟",
-    right: "الحطب يناسب نار المخيم. رائع!",
-    belongs: "الحطب يناسب نار المخيم!",
-  },
   "feld-traktor": {
     name: "حقل",
     partner: "جرار",
@@ -747,20 +719,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "ماذا يناسب الكنيسة؟",
     right: "الجرس يناسب الكنيسة. رائع!",
     belongs: "الجرس يناسب الكنيسة!",
-  },
-  "torte-kerze": {
-    name: "كعكة",
-    partner: "شمعة",
-    question: "ماذا يناسب الكعكة؟",
-    right: "الشمعة تناسب الكعكة. رائع!",
-    belongs: "الشمعة تناسب الكعكة!",
-  },
-  "geschenk-schleife": {
-    name: "هدية",
-    partner: "فيونكة",
-    question: "ماذا يناسب الهدية؟",
-    right: "الفيونكة تناسب الهدية. رائع!",
-    belongs: "الفيونكة تناسب الهدية!",
   },
   "tannenbaum-weihnachtsstern": {
     name: "شجرة ميلاد",
@@ -1028,13 +986,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     right: "سائقة التلفريك تحتاج إلى التلفريك. رائع!",
     belongs: "سائقة التلفريك تحتاج إلى التلفريك!",
   },
-  zahnaerztin: {
-    name: "طبيبة أسنان",
-    partner: "فرشاة أسنان",
-    question: "إلى ماذا تحتاج طبيبة الأسنان؟",
-    right: "طبيبة الأسنان تحتاج إلى فرشاة الأسنان. رائع!",
-    belongs: "طبيبة الأسنان تحتاج إلى فرشاة الأسنان!",
-  },
   tieraerztin: {
     name: "طبيبة بيطرية",
     partner: "لصقة جروح",
@@ -1118,20 +1069,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "إلى ماذا يحتاج أمين الصندوق؟",
     right: "أمين الصندوق يحتاج إلى النقود. رائع!",
     belongs: "أمين الصندوق يحتاج إلى النقود!",
-  },
-  konditorin: {
-    name: "صانعة حلويات",
-    partner: "كعكة",
-    question: "إلى ماذا تحتاج صانعة الحلويات؟",
-    right: "صانعة الحلويات تحتاج إلى الكعكة. رائع!",
-    belongs: "صانعة الحلويات تحتاج إلى الكعكة!",
-  },
-  pizzabaecker: {
-    name: "صانع بيتزا",
-    partner: "بيتزا",
-    question: "إلى ماذا يحتاج صانع البيتزا؟",
-    right: "صانع البيتزا يحتاج إلى البيتزا. رائع!",
-    belongs: "صانع البيتزا يحتاج إلى البيتزا!",
   },
   kellnerin: {
     name: "نادلة",
@@ -1531,13 +1468,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "إلى ماذا يحتاج المهرج؟",
     right: "المهرج يحتاج إلى البالون. رائع!",
     belongs: "المهرج يحتاج إلى البالون!",
-  },
-  weihnachtsmann: {
-    name: "بابا نويل",
-    partner: "هدايا",
-    question: "إلى ماذا يحتاج بابا نويل؟",
-    right: "بابا نويل يحتاج إلى الهدايا. رائع!",
-    belongs: "بابا نويل يحتاج إلى الهدايا!",
   },
   detektivin: {
     name: "محققة",

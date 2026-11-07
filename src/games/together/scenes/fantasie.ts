@@ -121,21 +121,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["boing", "giggle"],
   },
   {
-    id: "weihnachtsmann",
-    topic: "fantasie",
-    name: "Weihnachtsmann",
-    the: "der Weihnachtsmann",
-    toThe: "der Weihnachtsmann",
-    partner: { name: "Geschenke", the: "die Geschenke", acc: "die Geschenke", plural: true, emoji: "🎁" },
-    helper: { fur: "fox", outfit: { coat: "#e03131", hat: "beanie", hatColor: "#e03131", detail: "belt", detailColor: "#212529" } },
-    // The presents come under the Christmas tree.
-    thing: "🎄",
-    thingAt: [196, 118, 80],
-    backdrop: "schnee",
-    act: "beside",
-    sounds: ["bells"],
-  },
-  {
     id: "detektivin",
     topic: "fantasie",
     name: "Detektivin",
@@ -222,23 +207,6 @@ export const SCENES: SceneSpec[] = [
     sounds: ["rustle", "thump"],
     // An explorer and a hiker sleep in a tent too.
     alsoFits: ["entdecker", "wanderer"],
-  },
-  {
-    id: "zwerg",
-    topic: "fantasie",
-    name: "Zwerg",
-    the: "der Zwerg",
-    toThe: "der Zwerg",
-    partner: { name: "Spitzhacke", the: "die Spitzhacke", acc: "die Spitzhacke", emoji: "⛏️" },
-    helper: { fur: "bear", outfit: { coat: "#2b8a3e", hat: "zipfel", detail: "belt" } },
-    // Deep in the mine, the pick knocks on the gem on its rock.
-    thing: "💎",
-    thingAt: [222, 124, 52],
-    backdrop: "bergwerk",
-    act: "tap",
-    sounds: ["knock", "knock", "twinkle"],
-    // A cave explorer and a builder may dig with a pick too.
-    alsoFits: ["hoehlenforscher", "bauarbeiterin"],
   },
   {
     id: "nikolaus",

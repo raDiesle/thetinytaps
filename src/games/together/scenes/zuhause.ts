@@ -164,21 +164,6 @@ export const SCENES: SceneSpec[] = [
     alsoFits: ["computer-tastatur"],
   },
   {
-    id: "handy-ladekabel",
-    topic: "zuhause",
-    name: "Handy",
-    the: "das Handy",
-    toThe: "zum Handy",
-    partner: { name: "Ladekabel", the: "das Ladekabel", acc: "das Ladekabel", emoji: "🔌" },
-    thing: "📱",
-    backdrop: "wohnzimmer",
-    // Plugged in, the phone lights up.
-    act: "light",
-    sounds: ["click", "chime"],
-    // The computer and the laptop are charged with a cable too.
-    alsoFits: ["computer-tastatur", "laptop-maus"],
-  },
-  {
     id: "drucker-papier",
     topic: "zuhause",
     name: "Drucker",
@@ -301,8 +286,8 @@ export const SCENES: SceneSpec[] = [
     // The board goes to and fro under the saw.
     act: "rub",
     sounds: ["saw"],
-    // The campfire's wood is sawn too, and the saw lies with the hammer and the screwdriver in the toolbox.
-    alsoFits: ["lagerfeuer-holz", "werkzeugkasten-hammer", "schraube-schraubenzieher"],
+    // The saw lies with the hammer and the screwdriver in the toolbox.
+    alsoFits: ["werkzeugkasten-hammer", "schraube-schraubenzieher"],
   },
   {
     id: "fenster-vorhang",

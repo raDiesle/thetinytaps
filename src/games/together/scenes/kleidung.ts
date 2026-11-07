@@ -55,8 +55,8 @@ export const SCENES: SceneSpec[] = [
     backdrop: "kinderzimmer",
     act: "beside",
     sounds: ["swirl", "pop"],
-    // A bow goes on a dress too, and flip-flops with a summer dress.
-    alsoFits: ["geschenk-schleife", "badehose-flipflops"],
+    // Flip-flops go with a summer dress.
+    alsoFits: ["badehose-flipflops"],
   },
   {
     id: "jacke-kappe",

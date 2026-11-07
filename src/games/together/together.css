@@ -141,6 +141,38 @@
   overflow: visible;
 }
 
+/* A painted partner lies on its plate whole, as an emoji would. */
+.tg-part {
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* A pair's painted frames fill its box, the paper's colour behind them while they load. The second lies hidden over
+   the first and fades in as the partner lands: one picture changes, nothing hops. Each is an HTML layer of its own,
+   so the fade is only its opacity. */
+.tg-framed {
+  background: #f4ead8;
+}
+
+.tg-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.tg-frame-after {
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.tg-framed.working .tg-frame-after {
+  opacity: 1;
+}
+
 .tg-emoji {
   font-family: var(--font-emoji);
   font-size: 86cqh;
