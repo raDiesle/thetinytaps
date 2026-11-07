@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import { useAppLanguage } from "@/lib/language";
+import { ASIDE_LINE_GAP_MS } from "@/lib/spacing";
 import { recordedVoice } from "@/lib/voice";
 
 // What Buchstaben & Zahlen says, from its ElevenLabs recordings (`bun run voice make --only buchstaben`,
@@ -15,4 +16,13 @@ export const lettersVoice = recordedVoice(voiceFiles);
 export function useLettersSay() {
   const { id } = useAppLanguage();
   return useCallback((text: string, queue = false) => lettersVoice.say(text, id, { queue }), [id]);
+}
+
+/**
+ * Says a line that only accompanies the play (praise after a letter or word found), after what is being said: at most
+ * every `ASIDE_LINE_GAP_MS`, so quick rounds don't end in the same „Super!“ each time (root CLAUDE.md).
+ */
+export function useLettersPraise() {
+  const { id } = useAppLanguage();
+  return useCallback((text: string) => lettersVoice.say(text, id, { queue: true, gap: ASIDE_LINE_GAP_MS }), [id]);
 }
