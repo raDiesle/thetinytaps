@@ -5,7 +5,7 @@ import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookAlike, lookOf, PEEK_ITEMS, PEEK_LOOKALIKES } from "@/games/shadows/content";
-import { GROW_MS, GROW_TEXTS, GROWTHS } from "./growth";
+import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./growth";
 import { KIND_SIGNS } from "./TopicBubble";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 
@@ -272,13 +272,31 @@ test("what the small one becomes is the one right choice, and the others become 
   expect(new Set(GROWTHS.map((g) => g.emoji)).size).toBe(GROWTHS.length);
   for (const level of ANIMAL_LEVELS) {
     for (const growth of GROWTHS) {
-      const round = dealGrow(growth, level.choices);
-      expect(round.grown.length).toBe(Math.min(level.choices, GROWTHS.length));
-      expect(new Set(round.grown).size).toBe(round.grown.length);
-      expect(round.grown.filter((g) => g === growth).length).toBe(1);
-      expect(round.grown[round.correct]).toBe(growth);
+      // Dealt many times, since the others are picked by chance.
+      for (let i = 0; i < 20; i++) {
+        const round = dealGrow(growth, level.choices);
+        expect(round.grown.length, growth.id).toBe(level.choices);
+        expect(new Set(round.grown).size).toBe(round.grown.length);
+        expect(round.grown.filter((g) => g === growth).length).toBe(1);
+        expect(round.grown[round.correct]).toBe(growth);
+        // Exactly one fits: nothing a child could think comes out of this small one too.
+        for (const g of round.grown) if (g !== growth) expect(growLookAlike(g, growth), `${growth.id} ${g.id}`).toBe(false);
+      }
     }
   }
+  // Every plant is alike to every other (flowers look alike, trees look alike, and no child can tell which seed, nut,
+  // bulb or bud becomes which plant); the lookalike groups name only small ones there are.
+  const animals = ["raupe", "ei", "kaulquappe"];
+  const plants = GROWTHS.filter((g) => !animals.includes(g.id));
+  for (const a of plants) for (const b of plants) if (a !== b) expect(growLookAlike(a, b), `${a.id} ${b.id}`).toBe(true);
+  for (const id of GROW_LOOKALIKES.flat())
+    expect(
+      GROWTHS.some((g) => g.id === id),
+      id,
+    ).toBe(true);
+  // Enough that aren't alike are left for the most choices a step offers.
+  const most = Math.max(...ANIMAL_LEVELS.map((l) => l.choices));
+  for (const growth of GROWTHS) expect(GROWTHS.filter((g) => g !== growth && !growLookAlike(g, growth)).length, growth.id).toBeGreaterThanOrEqual(most - 1);
   // What it becomes stands inside its box, and its sounds come while it grows.
   for (const g of GROWTHS) {
     for (const xy of g.spot) expect(xy, g.id).toBeGreaterThan(0);
@@ -294,6 +312,14 @@ test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „a
   expect(de.becomes(byId.ei)).toBe("Aus dem Ei wird ein Küken. Toll!");
   expect(de.becomes(byId.samen)).toBe("Aus dem Samen wird eine Sonnenblume. Toll!");
   expect(de.comesFrom(byId.kaulquappe)).toBe("Der Frosch kommt aus der Kaulquappe!");
+  expect(de.whatBecomes(byId.eichel)).toBe("Was wird aus der Eichel?");
+  expect(de.becomes(byId.eichel)).toBe("Aus der Eichel wird ein Baum. Toll!");
+  expect(de.comesFrom(byId.eichel)).toBe("Der Baum kommt aus der Eichel!");
+  expect(de.becomes(byId.zwiebel)).toBe("Aus der Zwiebel wird eine Tulpe. Toll!");
+  expect(de.becomes(byId.kuerbiskern)).toBe("Aus dem Kürbiskern wird ein Kürbis. Toll!");
+  expect(de.comesFrom(byId.kokosnuss)).toBe("Die Palme kommt aus der Kokosnuss!");
+  expect(de.whatBecomes(byId.knospe)).toBe("Was wird aus der Knospe?");
+  expect(de.becomes(byId.knospe)).toBe("Aus der Knospe wird eine Rose. Toll!");
 });
 
 // The bubble's sign tells grown-ups what a round is about; were it one of the pictures to pick from, it would give the
