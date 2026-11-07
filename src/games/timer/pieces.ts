@@ -1,8 +1,24 @@
 // Piece by piece instead of flowing (H-45): an apple falls every minute, the train halts at a little stop every minute.
 // A small child sees single things at once, where a flowing picture is hard to judge – and a long time still moves.
 
-/** At most this many apples hang on the tree: beyond 30 minutes each apple stands for a little more than a minute. */
+/** At most this many apples hang on the tree: from a minute on it is always this many, each standing for a share of the time. */
 export const MAX_APPLES = 30;
+
+/** At least this many apples, even for a few seconds: the tree is always full. */
+export const MIN_APPLES = 6;
+
+/**
+ * How many apples hang on the tree for a run of `ms` (user feedback, November 2026): always a lot, also for a short
+ * time – then they fall more often, one every two seconds for a minute, rather than a few apples one a minute.
+ */
+export function appleCount(ms: number): number {
+  return Math.max(MIN_APPLES, Math.min(MAX_APPLES, Math.round(ms / 2000)));
+}
+
+/** The whole seconds of a run, at least one: the pictures' steps a second (`--tm-secs`, the caterpillar's bites). */
+export function runSeconds(ms: number): number {
+  return Math.max(1, Math.round(ms / 1000));
+}
 
 /** At most this many stretches between the train's stops, so the stops stand a finger apart on a phone. */
 export const MAX_STOPS = 12;
@@ -88,4 +104,20 @@ export function ladybugLaps(ms: number): { dots: number; every: number; laps: nu
   const every = Math.ceil(minutes / MAX_DOTS);
   const dots = Math.max(1, Math.round(minutes / every));
   return { dots, every, laps: dots * every };
+}
+
+/** What a tally mark can stand for, from short to long; the shortest is taken that needs no more than `MAX_MARKS`. */
+export const MARK_UNITS = [10_000, 30_000, 60_000, 5 * 60_000, 10 * 60_000, 15 * 60_000] as const;
+
+/** At most this many tally marks stand at the start, so they fit in a row of six bundles of five. */
+export const MAX_MARKS = 30;
+
+/** How long one tally mark stands for in a run of `total` ms („Zeit im Bild: Striche“). */
+export function markUnit(total: number): number {
+  return MARK_UNITS.find((unit) => Math.ceil(total / unit) <= MAX_MARKS) ?? MARK_UNITS[MARK_UNITS.length - 1];
+}
+
+/** How many tally marks stand while `left` ms are left: each mark still begun counts, none once the time is up. */
+export function marksLeft(left: number, unit: number): number {
+  return left > 0 ? Math.ceil(left / unit) : 0;
 }

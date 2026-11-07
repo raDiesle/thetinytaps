@@ -75,6 +75,8 @@ const ENDS = new Set([
   "src/games/scenes/ScenePlay.tsx", // every item of a picture found
   "src/games/socks/SocksPlay.tsx", // the whole wash on the line
   "src/games/teeth/TeethPlay.tsx", // all teeth brushed
+  "src/games/timer/SwapPlay.tsx", // the clock time set for taking turns has come
+  "src/games/timer/TimerPlay.tsx", // the time is up
   "src/games/weaning/WeaningPlay.tsx", // the morning at the story's end
 ]);
 

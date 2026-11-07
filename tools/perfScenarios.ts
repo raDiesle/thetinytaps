@@ -147,9 +147,9 @@ export const SCENARIOS: Scenario[] = [
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the ants marching, the sky growing dark over the sunset,
-  // the pizza's slices lifted off, the water rising in the bucket, the dough rising in the oven, the ladybug crawling
-  // round the red disc and in „Abwechseln“ the hourglass running.
-  ...(["zug", "apfelbaum", "sanduhr", "raupe", "blume", "eimer", "kerze", "sonne", "ameisen", "scheibe", "pizza", "kuchen", "abwechseln"] as const).map((name, i) => ({
+  // the pizza's slices lifted off, the ladybug crawling
+  // round the red disc and in „Abwechseln“ (the first card) the hourglass running.
+  ...(["abwechseln", "zug", "apfelbaum", "sanduhr", "raupe", "blume", "kerze", "sonne", "ameisen", "scheibe", "pizza"] as const).map((name, i) => ({
     name: `timer-${name}`,
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-list > li:nth-child(${i + 1}) .mode-card` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],

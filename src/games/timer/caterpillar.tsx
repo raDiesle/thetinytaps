@@ -1,7 +1,7 @@
 import { memo, type CSSProperties } from "react";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
-// Raupe (H-46): a little caterpillar eats its way through a big leaf from the tip to the stalk, bite by bite; what is
+// Raupe (H-46): a little caterpillar eats its way through a big leaf from the tip to the stalk, a bite every second; what is
 // still green is the time left. At the end it spins itself in on the branch and a butterfly flies out and settles on the meadow.
 // The leaf is cut in bands, each clipped by a box with a round end that slides back over it (`overflow: hidden`, moved
 // by `transform` while the leaf inside moves the other way), so the bitten edge is wavy and nothing is painted again.
@@ -137,8 +137,9 @@ export const Leaf = memo(function Leaf({ glow }: { glow: number }) {
 });
 
 /**
- * The caterpillar on the leaf, its head at the bitten edge, moving back with it. Its head is a small layer of its own
- * that chews once a second (H-63).
+ * The caterpillar on the leaf, its head at the bitten edge, moving back with it bite by bite, one a second (the leaf's
+ * bands and the caterpillar go in `steps(--tm-secs)`). Its head is a small layer of its own that chews once a second
+ * (H-63), and with each bite crumbs of leaf fall from its mouth.
  */
 export function Caterpillar() {
   const { w, h } = CATERPILLAR;
@@ -166,9 +167,24 @@ export function Caterpillar() {
           <circle cx="24" cy="56" r="5" fill="#ff8f8f" opacity="0.7" />
         </svg>
       </div>
+      {/* With every bite a few crumbs of leaf fall from its mouth (user feedback, November 2026), each a small layer. */}
+      {CRUMBS.map((c, i) => (
+        <div
+          key={i}
+          className="tm-crumb tm-beat"
+          style={{ left: `${(c.x / w) * 100}%`, top: `${(c.y / h) * 100}%`, width: `${(c.r / w) * 200}%`, "--tm-dx": `${c.dx}%` } as CSSProperties}
+        />
+      ))}
     </Layer>
   );
 }
+
+/** The crumbs of leaf falling from the caterpillar's mouth at every bite: where they start in its box, their size and drift. */
+const CRUMBS = [
+  { x: 168, y: 58, r: 7, dx: 60 },
+  { x: 176, y: 50, r: 5, dx: 160 },
+  { x: 160, y: 64, r: 6, dx: -40 },
+] as const;
 
 /** The cocoon hanging under the branch, spun at the end (shown only then, by its CSS). */
 function Cocoon() {

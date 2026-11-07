@@ -3,7 +3,7 @@ import { GameShell } from "@/components/GameShell";
 import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { PICTURES, TIMER_TITLE } from "./content";
+import { PICTURES, SWAP_NOTE, TIMER_TITLE } from "./content";
 import { OwnTimeSheet } from "./OwnTimeSheet";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
 import { lengthWords, type OwnTime } from "./time";
@@ -18,7 +18,10 @@ export function TimerGame() {
   const t = useT();
   const [settings, update] = useGameSettings(TIMER_SETTINGS_KEY, DEFAULT_TIMER_SETTINGS);
   const [sheet, setSheet] = useState(false);
-  const modes = PICTURES.map((p) => ({ id: p.id, emoji: p.emoji, title: t(p.name) }));
+  // „Abwechseln“ stands on its own above the others, with a line saying it goes on and on; the others run until the time is up.
+  const modes = PICTURES.map((p) => ({ id: p.id, emoji: p.emoji, title: t(p.name), note: p.id === "swap" ? t(SWAP_NOTE) : undefined }));
+  // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
+  const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
   const minutes = TIMER_MINUTES.includes(settings.minutes as (typeof TIMER_MINUTES)[number]) ? settings.minutes : DEFAULT_TIMER_SETTINGS.minutes;
   const own = settings.own;
   const useOwn = settings.useOwn && own !== null;
@@ -41,7 +44,7 @@ export function TimerGame() {
       // A tool for the day like the Belohnungstafel: it counts no play time and still runs when play time is over.
       tool
       modes={modes}
-      mode={settings.picture}
+      mode={picture}
       onMode={(picture) => update({ picture: picture as TimerPicture })}
       level={
         // The grown-up sets the time here; the child sees no numbers, only the picture running down. Behind the
@@ -85,7 +88,12 @@ export function TimerGame() {
         </>
       }
     >
-      <TimerPlay settings={{ ...settings, minutes, useOwn }} onPicture={(picture) => update({ picture })} onToy={(toy) => update({ toy })} />
+      <TimerPlay
+        settings={{ ...settings, picture, minutes, useOwn }}
+        onPicture={(picture) => update({ picture })}
+        onToy={(toy) => update({ toy })}
+        onShown={(shown) => update({ shown })}
+      />
     </GameShell>
   );
 }

@@ -81,13 +81,23 @@ export function Child({ kind, x, floor }: { kind: "fox" | "bear"; x: number; flo
 /** The track's top; the train's wheels stand on it. */
 export const RAIL_Y = 650;
 /**
- * Where the train starts (its left end) and where its front stops, at the buffers before the station – within x 1400,
- * where a tablet cuts the picture.
+ * Where the train starts (its left end), its size on the stage and where its front stops, at the buffers before the
+ * station: a small train on a long track, so it is plain how far it has come and how far it still goes (user feedback,
+ * November 2026: the way was too short to see it move).
  */
-export const TRAIN = { x: 200, w: 360, h: 200, stop: 1060 } as const;
+export const TRAIN = { x: 200, w: 270, h: 150, stop: 1290 } as const;
+
+/** The train is drawn in these units and shrunk to `TRAIN.w` × `TRAIN.h`. */
+const TRAIN_ART = { w: 360, h: 200 } as const;
+
+/** The track's right end, just behind the buffers. */
+const TRACK_END = TRAIN.stop + 40;
 
 /** The little house where the train sets off (H-64): behind its start, its roof and window above the train. */
-export const HOME = { x: 225, w: 210, top: 430 } as const;
+export const HOME = { x: 210, w: 200, top: 430 } as const;
+
+/** The station at the track's end, behind where the train halts: its left edge, width and the wall's top. */
+const STATION = { x: 1080, w: 250, top: 430 } as const;
 
 /** The countryside with the track and the station; drawn once. */
 export const TrainBackdrop = memo(function TrainBackdrop() {
@@ -128,28 +138,59 @@ export const TrainBackdrop = memo(function TrainBackdrop() {
         <rect x={HOME.x + 130} y={HOME.top + 22} width="50" height="44" rx="6" fill="#fff3bf" stroke={INK} strokeWidth="4" />
         <rect x={HOME.x + 80} y={HOME.top + 90} width="50" height={RAIL_Y - HOME.top - 90} rx="6" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
         {/* Trees along the way, so the child sees how far the train has come. */}
-        {[640, 890].map((x) => (
+        {[600, 800].map((x) => (
           <g key={x}>
             <rect x={x - 10} y="520" width="20" height="90" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
-            <circle cx={x} cy="500" r="56" fill="#40a35a" stroke={INK} strokeWidth="4" />
+            <circle cx={x} cy="500" r="52" fill="#40a35a" stroke={INK} strokeWidth="4" />
           </g>
         ))}
         {/* The station: a house with a red roof behind the platform at the track's end. */}
-        <rect x="1060" y="420" width="290" height="200" fill="#fff3d6" stroke={INK} strokeWidth="5" />
-        <path d="M1040 430 L1205 330 L1370 430 Z" fill="#e8590c" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
-        <rect x="1240" y="500" width="60" height="120" rx="6" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
-        <rect x="1085" y="460" width="70" height="60" rx="6" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
-        <rect x="1315" y="460" width="24" height="60" rx="6" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
-        <rect x="1060" y="610" width="540" height="34" fill="#ced4da" stroke={INK} strokeWidth="4" />
+        <rect x={STATION.x} y={STATION.top} width={STATION.w} height={RAIL_Y - 30 - STATION.top} fill="#fff3d6" stroke={INK} strokeWidth="5" />
+        <path
+          d={`M${STATION.x - 20} ${STATION.top + 10} L${STATION.x + STATION.w / 2} ${STATION.top - 90} L${STATION.x + STATION.w + 20} ${STATION.top + 10} Z`}
+          fill="#e8590c"
+          stroke={INK}
+          strokeWidth="5"
+          strokeLinejoin="round"
+        />
+        <rect x={STATION.x + 30} y={STATION.top + 40} width="70" height="56" rx="6" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
+        <rect x={STATION.x + 150} y={STATION.top + 40} width="70" height="56" rx="6" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
+        {/* The station's clock under its roof's tip. */}
+        <circle cx={STATION.x + STATION.w / 2} cy={STATION.top - 22} r="24" fill="#fff" stroke={INK} strokeWidth="4" />
+        <path
+          d={`M${STATION.x + STATION.w / 2} ${STATION.top - 22} V${STATION.top - 38} M${STATION.x + STATION.w / 2} ${STATION.top - 22} H${STATION.x + STATION.w / 2 + 12}`}
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <rect x={STATION.x - 20} y={RAIL_Y - 40} width={STAGE_W - STATION.x + 20} height="34" fill="#ced4da" stroke={INK} strokeWidth="4" />
         {/* The track: sleepers, the rail and the buffers at its end. */}
-        <rect x="0" y={RAIL_Y + 4} width="1100" height="24" fill="#a68a6d" />
-        {Array.from({ length: 23 }, (_, i) => (
+        <rect x="0" y={RAIL_Y + 4} width={TRACK_END} height="24" fill="#a68a6d" />
+        {Array.from({ length: Math.floor(TRACK_END / 48) }, (_, i) => (
           <rect key={i} x={10 + i * 48} y={RAIL_Y + 2} width="26" height="18" rx="3" fill="#6b4a2b" />
         ))}
         {/* The rail is dark where the train has been; ahead of it a shining rail lies over it (`RailAhead`). */}
-        <rect x="0" y={RAIL_Y - 6} width="1100" height="10" rx="4" fill="#3d434a" />
-        <rect x="1072" y={RAIL_Y - 70} width="22" height="70" fill="#e03131" stroke={INK} strokeWidth="4" />
-        <rect x="1060" y={RAIL_Y - 64} width="16" height="22" rx="5" fill="#ffd43b" stroke={INK} strokeWidth="3" />
+        <rect x="0" y={RAIL_Y - 6} width={TRACK_END} height="10" rx="4" fill="#3d434a" />
+        {/* The end, plain from afar (user feedback, November 2026): big red and white buffers and a chequered flag over them. */}
+        <rect x={TRAIN.stop + 8} y={RAIL_Y - 84} width="28" height="84" fill="#e03131" stroke={INK} strokeWidth="4" />
+        <path d={`M${TRAIN.stop + 8} ${RAIL_Y - 62} h28 M${TRAIN.stop + 8} ${RAIL_Y - 34} h28`} stroke="#fff" strokeWidth="10" />
+        <rect x={TRAIN.stop - 2} y={RAIL_Y - 74} width="18" height="28" rx="6" fill="#ffd43b" stroke={INK} strokeWidth="3" />
+        <rect x={TRAIN.stop + 18} y={RAIL_Y - 404} width="10" height="320" rx="4" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
+        <g stroke={INK} strokeWidth="4" strokeLinejoin="round">
+          <path
+            d={`M${TRAIN.stop + 18} ${RAIL_Y - 400} L${TRAIN.stop - 92} ${RAIL_Y - 390} L${TRAIN.stop - 92} ${RAIL_Y - 320} L${TRAIN.stop + 18} ${RAIL_Y - 330} Z`}
+            fill="#fff"
+          />
+          <path
+            d={[0, 1, 2, 3, 4]
+              .flatMap((c) =>
+                [0, 1, 2].filter((r) => (c + r) % 2 === 0).map((r) => `M${TRAIN.stop + 18 - c * 22} ${RAIL_Y - 400 + c * 2 + r * 23.3} h-22 v23.3 h22 Z`),
+              )
+              .join(" ")}
+            fill={INK}
+            strokeWidth="0"
+          />
+        </g>
       </Draw>
     </Layer>
   );
@@ -167,16 +208,21 @@ const WHEELS = [
 
 /** A box in the train's own units as a place in percent of it, for the layers riding along inside it. */
 function inTrain(x: number, y: number, w: number, h: number): CSSProperties {
-  return { left: `${(x / TRAIN.w) * 100}%`, top: `${(y / TRAIN.h) * 100}%`, width: `${(w / TRAIN.w) * 100}%`, height: `${(h / TRAIN.h) * 100}%` };
+  return {
+    left: `${(x / TRAIN_ART.w) * 100}%`,
+    top: `${(y / TRAIN_ART.h) * 100}%`,
+    width: `${(w / TRAIN_ART.w) * 100}%`,
+    height: `${(h / TRAIN_ART.h) * 100}%`,
+  };
 }
 
 /**
- * The train: a locomotive facing right with two wagons, TRAIN.w × TRAIN.h, its wheels on the rail; `puff` keys a steam
+ * The train: a locomotive facing right with two wagons, drawn in TRAIN_ART units, its wheels on the rail; `puff` keys a steam
  * cloud. Every second its wheels turn once and a small puff of steam rises from the chimney (H-63) – the wheels and the
  * puff are small layers of their own riding in the train's, so the train's drawing is never painted again.
  */
 export function Train({ puff }: { puff: number }) {
-  const { w, h } = TRAIN;
+  const { w, h } = TRAIN_ART;
   return (
     <>
       <Draw w={w} h={h}>
@@ -228,7 +274,7 @@ export const TrainStops = memo(function TrainStops({ pieces }: { pieces: number 
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-dims">
       <Draw w={STAGE_W} h={STAGE_H}>
         {Array.from({ length: pieces - 1 }, (_, i) => {
-          const x = from + ((i + 1) / pieces) * way + 12;
+          const x = from + ((i + 1) / pieces) * way + 10;
           return (
             <g key={i}>
               <rect x={x - 4} y={RAIL_Y - 96} width="8" height="92" rx="3" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
@@ -391,12 +437,23 @@ export function Sand({ running, glow }: { running: boolean; glow: number }) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Kerze: a candle on the table burns down; at the end the bear child blows it out.
+// Kerze: three tall candles on the table burn down one after another (user feedback, November 2026: taller, and
+// several, so more of the time shows); when one is down to its stub it goes out with a curl of smoke and the next
+// lights up. At the end the bear child leans over and blows the last one out. Each candle burns in its third of the
+// time: the same animations as one candle, each with a third of the time as duration and its turn as delay.
 
-/** The candle when lit: its middle, width, top and the table it stands on; at the end only `stub` of it is left. */
-export const CANDLE = { cx: 820, w: 120, top: 250, base: 760, stub: 90 } as const;
+/** The candles when new: their middles, width, top and the table they stand on; at the end only `stub` of each is left. */
+export const CANDLE = { xs: [600, 800, 1000], w: 110, top: 215, base: 785, stub: 70 } as const;
 
-/** A cosy evening room with a window and the table; drawn once. */
+/** How tall the flame stands above a candle's top, so the first candle's flame stays on every screen. */
+export const FLAME_H = 130;
+
+/** The candle burning at `share` (0–1) of the time, counted from 0. */
+export function candleAt(share: number): number {
+  return Math.min(CANDLE.xs.length - 1, Math.max(0, Math.floor(share * CANDLE.xs.length)));
+}
+
+/** A cosy evening room with a window and the table with the candles' holders; drawn once. */
 export const CandleBackdrop = memo(function CandleBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
@@ -408,76 +465,93 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
           </radialGradient>
         </defs>
         <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-room)" />
-        <rect x="1100" y="150" width="240" height="260" rx="12" fill="#1c2a5a" stroke="#c9a46b" strokeWidth="14" />
-        <path d="M1220 150 V410 M1100 280 H1340" stroke="#c9a46b" strokeWidth="10" />
-        <circle cx="1170" cy="220" r="34" fill="#fff3bf" />
-        <circle cx="1186" cy="210" r="30" fill="#1c2a5a" />
+        <rect x="1110" y="150" width="220" height="240" rx="12" fill="#1c2a5a" stroke="#c9a46b" strokeWidth="14" />
+        <path d="M1220 150 V390 M1110 270 H1330" stroke="#c9a46b" strokeWidth="10" />
+        <circle cx="1170" cy="215" r="32" fill="#fff3bf" />
+        <circle cx="1186" cy="205" r="28" fill="#1c2a5a" />
         {[
           [1280, 200],
-          [1300, 340],
-          [1150, 350],
+          [1295, 330],
+          [1150, 340],
         ].map(([cx, cy]) => (
           <circle key={cx} cx={cx} cy={cy} r="5" fill="#fff3bf" />
         ))}
         <rect x="0" y={CANDLE.base + 10} width={STAGE_W} height={STAGE_H} fill="#8a5a2b" />
         <rect x="0" y={CANDLE.base + 10} width={STAGE_W} height="16" fill="#a8743f" />
-        <ellipse cx={CANDLE.cx} cy={CANDLE.base + 8} rx="110" ry="20" fill="#e6b44c" stroke={INK} strokeWidth="5" />
+        {CANDLE.xs.map((cx) => (
+          <ellipse key={cx} cx={cx} cy={CANDLE.base + 8} rx="92" ry="18" fill="#e6b44c" stroke={INK} strokeWidth="5" />
+        ))}
       </Draw>
     </Layer>
   );
 });
 
-/**
- * The wax that has run down, a puddle on the holder that grows as the candle burns (H-64): what has burnt lies
- * below, what is still to burn stands above. Behind the candle, so it shows on both sides of it.
- */
-export function WaxPuddle() {
-  return (
-    <Layer x={CANDLE.cx - 100} y={CANDLE.base - 14} w={200} h={28}>
-      <div className="tm-puddle tm-move" />
-    </Layer>
-  );
-}
-
-/** The candle's wax, shrinking from the bottom up as it burns (its CSS scales it). */
-export function CandleWax({ glow }: { glow: number }) {
-  return (
-    <Layer x={CANDLE.cx - CANDLE.w / 2} y={CANDLE.top} w={CANDLE.w} h={CANDLE.base - CANDLE.top} className="tm-wax-box">
-      <div className="tm-wax tm-move">
-        <LeftGlow n={glow} />
-      </div>
-    </Layer>
-  );
+/** The animation timing of candle `i` for the CSS: its turn (`--tm-i`) among `--tm-of` candles. */
+function turn(i: number): CSSProperties {
+  return { "--tm-i": i, "--tm-of": CANDLE.xs.length } as CSSProperties;
 }
 
 /**
- * The candle's top with its wick and flame, going down with the wax: a layer as tall as the candle, moved down by the
- * part that burns away. `out` puts the flame out with a curl of smoke; `flare` keys the flame flaring up at a tap.
+ * One candle: the wax that has run down, a puddle on the holder that grows as it burns (H-64), behind it; the wax,
+ * shrinking from the bottom up (its CSS scales it); and its top with wick and flame going down with the wax – a layer as
+ * tall as the candle, moved down by the part that burns away. The flame lights up at the candle's turn and, but on the
+ * last, goes out with a curl of smoke at its end. `out` puts the last one's flame out; `flare` keys the flame flaring
+ * up at a tap; `glow` lights the wax still to burn (H-51), given only to the candles not yet burnt.
  */
-export function CandleFlame({ out, flare }: { out: boolean; flare: number }) {
+function Candle({ i, out, flare, glow }: { i: number; out: boolean; flare: number; glow: number }) {
+  const cx = CANDLE.xs[i];
   const w = CANDLE.w;
   const h = CANDLE.base - CANDLE.top;
+  const last = i === CANDLE.xs.length - 1;
   return (
-    <Layer x={CANDLE.cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-flame-box tm-move">
-      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-        <ellipse cx={w / 2} cy="0" rx={w / 2 - 2} ry="14" fill="#ffe3e3" stroke={INK} strokeWidth="4" />
-        <path d={`M${w / 2} 0 V-22`} stroke={INK} strokeWidth="5" strokeLinecap="round" />
-      </svg>
-      {/* A drop of wax running down the candle's side, a little further every second (H-63). */}
-      <div className="tm-drop tm-beat" />
-      {out ? (
-        <div className="tm-smoke" />
-      ) : (
-        <div className="tm-flame">
-          <div key={flare} className={flare ? "tm-flare" : undefined}>
-            <svg viewBox="0 0 80 130">
-              <path d="M40 4 C60 40 76 70 70 96 C64 120 16 120 10 96 C4 70 22 40 40 4 Z" fill="#ffa94d" />
-              <path d="M40 40 C52 62 58 82 54 100 C50 116 30 116 26 100 C22 82 30 62 40 40 Z" fill="#ffe066" />
-            </svg>
-          </div>
+    <>
+      <Layer x={cx - 90} y={CANDLE.base - 14} w={180} h={28} style={turn(i)}>
+        <div className="tm-puddle tm-move" />
+      </Layer>
+      <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-wax-box" style={turn(i)}>
+        <div className="tm-wax tm-move">
+          <LeftGlow n={glow} />
         </div>
-      )}
-    </Layer>
+      </Layer>
+      <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-flame-box tm-move" style={turn(i)}>
+        <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+          <ellipse cx={w / 2} cy="0" rx={w / 2 - 2} ry="13" fill="#ffe3e3" stroke={INK} strokeWidth="4" />
+          <path d={`M${w / 2} 0 V-22`} stroke={INK} strokeWidth="5" strokeLinecap="round" />
+        </svg>
+        <div className={`tm-lit${last ? "" : " tm-goes-out"}`}>
+          {/* A drop of wax running down the candle's side, a little further every second (H-63). */}
+          <div className="tm-drop tm-beat" />
+          {out ? (
+            <div className="tm-smoke" />
+          ) : (
+            <div className="tm-flame">
+              <div key={flare} className={flare ? "tm-flare" : undefined}>
+                <svg viewBox="0 0 80 130">
+                  <path d="M40 4 C60 40 76 70 70 96 C64 120 16 120 10 96 C4 70 22 40 40 4 Z" fill="#ffa94d" />
+                  <path d="M40 40 C52 62 58 82 54 100 C50 116 30 116 26 100 C22 82 30 62 40 40 Z" fill="#ffe066" />
+                </svg>
+              </div>
+            </div>
+          )}
+        </div>
+        {!last && <div className="tm-smoke tm-puff" />}
+      </Layer>
+    </>
+  );
+}
+
+/**
+ * The three candles. The one burning while a tap comes is worked out from the clock, so its wax and those after it
+ * light up, never the stubs already burnt.
+ */
+export function Candles({ out, flare, glow, startedAt, total }: { out: boolean; flare: number; glow: number; startedAt: number; total: number }) {
+  const now = glow ? candleAt((Date.now() - startedAt) / total) : 0;
+  return (
+    <>
+      {CANDLE.xs.map((_, i) => (
+        <Candle key={i} i={i} out={out} flare={i === now ? flare : 0} glow={i >= now ? glow : 0} />
+      ))}
+    </>
   );
 }
 
@@ -489,16 +563,17 @@ export function CandleFlame({ out, flare }: { out: boolean; flare: number }) {
 export const GROUND = 720;
 
 /** The cookie on the blanket: its middle and size; it shrinks to nothing towards its bottom middle. */
-export const COOKIE = { cx: 365, w: 330, h: 176 } as const;
+export const COOKIE = { cx: 420, w: 440, h: 232 } as const;
 
 /** The anthill: its middle and full size; it grows from `start` of it at its foot to its whole size. */
-export const HILL = { cx: 990, w: 340, h: 260, start: 0.75 } as const;
+export const HILL = { cx: 1160, w: 300, h: 240, start: 0.75 } as const;
 
 /**
  * The ants' road from under the cookie to the hill's foot: `n` ants walk it at once, `step` apart, each one step a
- * second, so one ant reaches the hill every second (H-63). The CSS's `tm-march` has one keyframe per step.
+ * second, so one ant reaches the hill every second (H-63). The CSS's `tm-march` has one keyframe per step. A long way
+ * and a big cookie (user feedback, November 2026), so the ants are seen carrying it off.
  */
-export const ANTS = { from: 385, n: 7, step: 66, w: 63, h: 42 } as const;
+export const ANTS = { from: 470, n: 9, step: 66, w: 63, h: 42 } as const;
 
 /** The meadow with the picnic blanket and the crumbs that will be left; drawn once. */
 export const AntsBackdrop = memo(function AntsBackdrop() {
@@ -524,14 +599,14 @@ export const AntsBackdrop = memo(function AntsBackdrop() {
           </g>
         ))}
         {/* A tree far back and the meadow. */}
-        <rect x="640" y="360" width="26" height="150" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
-        <circle cx="653" cy="330" r="80" fill="#40a35a" stroke={INK} strokeWidth="4" />
+        <rect x="790" y="360" width="26" height="150" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
+        <circle cx="803" cy="330" r="80" fill="#40a35a" stroke={INK} strokeWidth="4" />
         <path d="M0 520 Q300 450 640 500 T1200 490 T1600 480 V900 H0 Z" fill="#9bd57a" />
         <path d={`M0 ${GROUND - 70} Q420 ${GROUND - 110} 820 ${GROUND - 80} T1600 ${GROUND - 90} V900 H0 Z`} fill="#7cc35a" />
         {/* The picnic blanket under the cookie, red with white stripes. */}
-        <ellipse cx={COOKIE.cx} cy={GROUND + 6} rx="225" ry="46" fill="#e03131" stroke={INK} strokeWidth="5" />
+        <ellipse cx={COOKIE.cx} cy={GROUND + 6} rx="290" ry="52" fill="#e03131" stroke={INK} strokeWidth="5" />
         <path
-          d={`M${COOKIE.cx - 120} ${GROUND - 30} L${COOKIE.cx - 60} ${GROUND + 46} M${COOKIE.cx - 20} ${GROUND - 38} L${COOKIE.cx + 40} ${GROUND + 48} M${COOKIE.cx + 80} ${GROUND - 34} L${COOKIE.cx + 130} ${GROUND + 40}`}
+          d={`M${COOKIE.cx - 170} ${GROUND - 34} L${COOKIE.cx - 110} ${GROUND + 50} M${COOKIE.cx - 40} ${GROUND - 44} L${COOKIE.cx + 20} ${GROUND + 56} M${COOKIE.cx + 90} ${GROUND - 42} L${COOKIE.cx + 150} ${GROUND + 50}`}
           stroke="#fff"
           strokeWidth="14"
           opacity="0.85"

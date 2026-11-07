@@ -84,6 +84,8 @@ export interface GameMode {
    * frame, with the sort's name once above them.
    */
   kind?: string;
+  /** A short line for grown-ups under the card's name (what is special about it), shown only where the card has room. */
+  note?: string;
 }
 
 /** The modes in runs of one `kind` each, in the order the kinds first come; one run without kinds when none has one. */
@@ -338,7 +340,10 @@ export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, leve
         <span className="game-emoji" aria-hidden>
           {m.emoji}
         </span>
-        <span className="game-title">{m.title}</span>
+        <span className="game-title">
+          {m.title}
+          {m.note && <small className="game-note">{m.note}</small>}
+        </span>
         {m.id === mode && (modes?.length ?? 0) > 1 && (
           <span className="badge">
             {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}

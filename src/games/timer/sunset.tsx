@@ -1,72 +1,65 @@
 import { memo, type CSSProperties } from "react";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
-// Sonnenuntergang (H-54): for „noch zehn Minuten, dann ist Schlafenszeit“ – the sun sinks behind the hills, the sky
-// goes orange, then blue, the first stars come out and the land grows dark with it, so the screen gets calmer as the
-// time runs out. The moon peeks over the hills from the start (where it goes, H-64) and rises as the sun goes down;
-// at the end it stands high, the windows of the little house are lit. Every second the
-// windmill's sails turn a step (H-63). Sky and land darken by big layers fading in (`opacity`), the sun and moon move
-// by `transform` inside boxes cut off below the hills' ridge (`overflow: hidden`), never by drawing again.
+// Sonnenuntergang (H-54): for „noch zehn Minuten, dann ist Schlafenszeit“ – a big sun sinks behind one round hill
+// and reddens, the sky goes orange, then blue, and once the sun is gone the moon rises from behind the hill; the first
+// stars come out and the land grows dark with it, so the screen gets calmer as the time runs out (user feedback,
+// November 2026: one hill to see, the sun much bigger, the moon after it). At the end the moon stands high and the
+// windows of the little house are lit. Every second the windmill's sails turn a step (H-63). Sky and land darken by
+// big layers fading in (`opacity`), the sun and moon move by `transform` inside boxes cut off below the hill's ridge
+// (`overflow: hidden`), never by drawing again.
 
-/** The sun: its middle, radius, its top at the start, and its top at the end – below `SKY_CUT`, so it is gone. */
-export const SUN = { cx: 430, r: 105, top: 150, set: 640 } as const;
+/** The sun: its middle, radius, its top at the start, and its top when it has set – below `SKY_CUT`, so it is gone. */
+export const SUN = { cx: 640, r: 190, top: 110, set: 665 } as const;
 
-/** The moon: its middle, radius, its top at the end, and its top at the start – just peeking over the hills. */
-export const MOON = { cx: 900, r: 66, top: 165, start: 560 } as const;
+/** The share of the time the sun takes to set; the moon rises after it. */
+export const SUN_SET_AT = 0.55;
 
-/** Where the boxes holding the sun and the moon end below: under the hills' ridge everywhere they pass, so no cut shows. */
-export const SKY_CUT = 625;
+/** The moon: its middle, radius, its top at the end, and its top at the start – hidden behind the hill until the sun is gone. */
+export const MOON = { cx: 1180, r: 85, top: 130, start: 665 } as const;
 
-/** The ground of the front hill. */
+/** When the moon starts to rise from behind the hill, a share of the time. */
+export const MOON_FROM = 0.5;
+
+/** Where the boxes holding the sun and the moon end below: under the hill's ridge everywhere they pass, so no cut shows. */
+export const SKY_CUT = 660;
+
+/** The ground at the hill's foot. */
 export const SUNSET_FLOOR = 790;
 
-/** The windmill on the far hill: where its sails turn. */
-const MILL = { cx: 735, cy: 470, sails: 190 } as const;
+/** The windmill on the hill's right shoulder: where its sails turn. */
+const MILL = { cx: 980, cy: 372, sails: 190 } as const;
 
-/** The little house on the front hill and its two windows, lit as night comes. */
-const HOUSE = { x: 250, y: 590, w: 150, h: 120 } as const;
+/** The little house on the hill's left slope and its two windows, lit as night comes. */
+const HOUSE = { x: 230, y: 545, w: 140, h: 120 } as const;
 
-/** The far hills' ridge as curves (each from the end of the one before), in front of the sun and the moon. */
-const RIDGE: { ctrl: [number, number]; to: [number, number] }[] = [
-  { ctrl: [260, 520], to: [520, 590] },
-  { ctrl: [780, 660], to: [1040, 560] },
-  { ctrl: [1320, 460], to: [1600, 545] },
-];
-const RIDGE_START: [number, number] = [0, 600];
+/** The hill's ridge, one curve over the whole picture: its ends and its control point (halfway in x). */
+const RIDGE = { end: 650, ctrl: 380 } as const;
 
-/** The ridge's height at `x`, worked out from its curves (for the checks that the sun and the moon set behind it). */
+/** The ridge's height at `x` (for the checks that the sun and the moon set behind it). */
 export function ridgeAt(x: number): number {
-  let from = RIDGE_START;
-  for (const { ctrl, to } of RIDGE) {
-    if (x <= to[0]) {
-      // The curves' controls lie halfway in x, so x grows evenly with t.
-      const t = (x - from[0]) / (to[0] - from[0]);
-      return (1 - t) ** 2 * from[1] + 2 * t * (1 - t) * ctrl[1] + t ** 2 * to[1];
-    }
-    from = to;
-  }
-  return from[1];
+  const t = x / STAGE_W;
+  return (1 - t) ** 2 * RIDGE.end + 2 * t * (1 - t) * RIDGE.ctrl + t ** 2 * RIDGE.end;
 }
 
-/** The far hills, and the front hill, drawn in front of the sun and the moon. */
-const FAR_HILLS = `M${RIDGE_START.join(" ")} ${RIDGE.map(({ ctrl, to }) => `Q${ctrl.join(" ")} ${to.join(" ")}`).join(" ")} V900 H0 Z`;
-const FRONT_HILL = "M0 700 Q400 640 820 700 T1600 690 V900 H0 Z";
+/** The hill, in front of the sun and the moon. */
+const HILL = `M0 ${RIDGE.end} Q${STAGE_W / 2} ${RIDGE.ctrl} ${STAGE_W} ${RIDGE.end} V900 H0 Z`;
 
 /**
- * The stars, coming out one after another in the second half (`at`: the part of the time when each begins to shine),
- * kept clear of the sun's and the moon's ways.
+ * The stars, coming out one after another once the sun is gone (`at`: the part of the time when each begins to shine),
+ * kept clear of where the moon ends up.
  */
 export const STARS: { x: number; y: number; at: number }[] = [
-  { x: 1180, y: 140, at: 0.5 },
-  { x: 880, y: 110, at: 0.56 },
-  { x: 1330, y: 250, at: 0.62 },
-  { x: 640, y: 170, at: 0.67 },
-  { x: 1420, y: 120, at: 0.72 },
-  { x: 260, y: 100, at: 0.77 },
-  { x: 760, y: 300, at: 0.81 },
-  { x: 1240, y: 380, at: 0.85 },
-  { x: 590, y: 400, at: 0.89 },
-  { x: 1060, y: 430, at: 0.93 },
+  { x: 300, y: 130, at: 0.56 },
+  { x: 860, y: 110, at: 0.6 },
+  { x: 1420, y: 170, at: 0.64 },
+  { x: 560, y: 200, at: 0.68 },
+  { x: 1000, y: 180, at: 0.72 },
+  { x: 720, y: 330, at: 0.76 },
+  { x: 1330, y: 340, at: 0.8 },
+  { x: 430, y: 330, at: 0.84 },
+  { x: 880, y: 270, at: 0.88 },
+  { x: 1070, y: 400, at: 0.92 },
 ];
 
 /** The day's sky behind everything; drawn once. */
@@ -126,7 +119,7 @@ function inBox(r: number, top: number, pad: number): CSSProperties {
   return { left: `${(pad / w) * 100}%`, top: `${((top - SKY_TOP) / h) * 100}%`, width: `${((2 * r) / w) * 100}%`, height: `${((2 * r) / h) * 100}%` };
 }
 
-/** The sun going down behind the hills, getting redder; a tap lights what is still above them (H-51). */
+/** The big sun going down behind the hill, getting redder; a tap lights what is still above it (H-51). */
 function Sun({ glow }: { glow: number }) {
   const size = 2 * SUN.r;
   const pad = 40;
@@ -141,7 +134,7 @@ function Sun({ glow }: { glow: number }) {
   );
 }
 
-/** The moon rising from behind the hills, where it peeked out from the start. */
+/** The moon rising from behind the hill once the sun has gone. */
 function Moon() {
   const size = 2 * MOON.r;
   const style = { ...inBox(MOON.r, MOON.top, 0), "--tm-moon-from": `${((MOON.start - MOON.top) / size) * 100}%` } as CSSProperties;
@@ -159,20 +152,19 @@ function Moon() {
   );
 }
 
-/** The hills with the windmill's tower and the little house, in front of the sun and the moon; drawn once. */
+/** The hill with the windmill's tower and the little house, in front of the sun and the moon; drawn once. */
 const Hills = memo(function Hills() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
       <Draw w={STAGE_W} h={STAGE_H}>
-        <path d={FAR_HILLS} fill="#86c95f" />
+        <path d={HILL} fill="#7cc35a" />
         <path
-          d={`M${MILL.cx - 26} ${MILL.cy + 150} L${MILL.cx - 16} ${MILL.cy} H${MILL.cx + 16} L${MILL.cx + 26} ${MILL.cy + 150} Z`}
+          d={`M${MILL.cx - 26} ${MILL.cy + 160} L${MILL.cx - 16} ${MILL.cy} H${MILL.cx + 16} L${MILL.cx + 26} ${MILL.cy + 160} Z`}
           fill="#f1e3c8"
           stroke={INK}
           strokeWidth="5"
         />
         <path d={`M${MILL.cx - 22} ${MILL.cy + 4} L${MILL.cx} ${MILL.cy - 24} L${MILL.cx + 22} ${MILL.cy + 4} Z`} fill="#c0504d" stroke={INK} strokeWidth="5" />
-        <path d={FRONT_HILL} fill="#6fb24c" />
         {/* The little house, its windows dark until night comes (the lit ones are a layer of their own). */}
         <rect x={HOUSE.x} y={HOUSE.y} width={HOUSE.w} height={HOUSE.h} fill="#ffe3b3" stroke={INK} strokeWidth="5" />
         <path
@@ -182,10 +174,8 @@ const Hills = memo(function Hills() {
           strokeWidth="5"
           strokeLinejoin="round"
         />
-        <rect x={HOUSE.x + 22} y={HOUSE.y + 28} width="40" height="40" fill="#3b4a7a" stroke={INK} strokeWidth="4" />
-        <rect x={HOUSE.x + 88} y={HOUSE.y + 28} width="40" height="40" fill="#3b4a7a" stroke={INK} strokeWidth="4" />
-        <circle cx="520" cy="640" r="46" fill="#4f9a3a" stroke={INK} strokeWidth="4" />
-        <rect x="512" y="676" width="16" height="40" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
+        <rect x={HOUSE.x + 20} y={HOUSE.y + 28} width="40" height="40" fill="#3b4a7a" stroke={INK} strokeWidth="4" />
+        <rect x={HOUSE.x + 80} y={HOUSE.y + 28} width="40" height="40" fill="#3b4a7a" stroke={INK} strokeWidth="4" />
       </Draw>
     </Layer>
   );
@@ -208,12 +198,12 @@ function Sails() {
   );
 }
 
-/** The land growing dark as night comes, a layer of the hills' shape fading in over them. */
+/** The land growing dark as night comes, a layer of the hill's shape fading in over it. */
 const Dusk = memo(function Dusk() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-dusk-land tm-move">
       <Draw w={STAGE_W} h={STAGE_H}>
-        <path d={FAR_HILLS} fill="#141a3c" />
+        <path d={HILL} fill="#141a3c" />
       </Draw>
     </Layer>
   );
@@ -222,10 +212,10 @@ const Dusk = memo(function Dusk() {
 /** The house's windows lighting up as it gets dark. */
 function Windows() {
   return (
-    <Layer x={HOUSE.x + 22} y={HOUSE.y + 28} w={106} h={40} className="tm-windows tm-move">
-      <svg viewBox="0 0 106 40">
+    <Layer x={HOUSE.x + 20} y={HOUSE.y + 28} w={100} h={40} className="tm-windows tm-move">
+      <svg viewBox="0 0 100 40">
         <rect x="0" y="0" width="40" height="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
-        <rect x="66" y="0" width="40" height="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
+        <rect x="60" y="0" width="40" height="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
       </svg>
     </Layer>
   );

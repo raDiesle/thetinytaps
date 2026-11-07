@@ -135,7 +135,15 @@
   }
 }
 
-/* Kerze: the wax shrinks from the bottom up, and its top with wick and flame goes down by as much. */
+/* Kerze: three candles burn one after another, each in its share of the time (--tm-i of --tm-of, set per candle): its
+   wax shrinks from the bottom up and its top with wick and flame goes down by as much. */
+.tm-wax-box,
+.tm-flame-box,
+.tm-puddle {
+  --tm-turn: calc(var(--tm-ms) / var(--tm-of));
+  --tm-from: calc(var(--tm-ms) * var(--tm-i) / var(--tm-of));
+}
+
 .tm-wax {
   position: absolute;
   inset: 0;
@@ -144,19 +152,19 @@
   border-top: none;
   border-radius: 0 0 8% 8% / 0 0 2% 2%;
   transform-origin: 50% 100%;
-  animation: tm-burn var(--tm-ms) linear forwards;
+  animation: tm-burn var(--tm-turn) linear var(--tm-from) both;
 }
 
 .tm-flame-box {
-  /* The part that burns away, as a share of the candle's height (CANDLE: 510 high, 90 left). */
-  --tm-burnt: 82.35%;
-  animation: tm-burn-top var(--tm-ms) linear forwards;
+  /* The part that burns away, as a share of the candle's height (CANDLE: 570 high, 70 left). */
+  --tm-burnt: 87.72%;
+  animation: tm-burn-top var(--tm-turn) linear var(--tm-from) both;
 }
 
 .tm-done .tm-wax,
 .tm-blow .tm-wax {
   animation: none;
-  transform: scaleY(0.1765);
+  transform: scaleY(0.1228);
 }
 
 .tm-done .tm-flame-box,
@@ -166,15 +174,86 @@
 }
 
 @keyframes tm-burn {
+  from {
+    transform: none;
+  }
   to {
-    transform: scaleY(0.1765);
+    transform: scaleY(0.1228);
   }
 }
 
 @keyframes tm-burn-top {
+  from {
+    transform: none;
+  }
   to {
     transform: translateY(var(--tm-burnt));
   }
+}
+
+/* A candle's flame lights up at its turn and – but on the last, which the child blows out – goes out at its end with a
+   curl of smoke (tm-puff), as the next one lights. */
+.tm-lit {
+  position: absolute;
+  inset: 0;
+  animation: tm-light 0.6s ease-out var(--tm-from) both;
+}
+
+.tm-goes-out {
+  animation:
+    tm-light 0.6s ease-out var(--tm-from) both,
+    tm-go-out 0.5s ease-in calc(var(--tm-from) + var(--tm-turn) - 0.5s) forwards;
+}
+
+@keyframes tm-light {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-go-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.tm-puff {
+  animation: tm-puff 1.6s ease-out calc(var(--tm-from) + var(--tm-turn)) both;
+}
+
+@keyframes tm-puff {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+  10% {
+    opacity: 0.8;
+    transform: translateX(-50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-30%, -260%) scale(2.4);
+  }
+}
+
+.tm-done .tm-lit,
+.tm-blow .tm-lit {
+  animation: none;
+  opacity: 1;
+}
+
+.tm-done .tm-goes-out,
+.tm-blow .tm-goes-out,
+.tm-done .tm-puff,
+.tm-blow .tm-puff {
+  animation: none;
+  opacity: 0;
 }
 
 .tm-flame {
@@ -276,15 +355,16 @@
   }
 }
 
-/* The bear child leans to the candle and blows it out. */
+/* The bear child leans to the last candle and blows it out. */
 .tm-blow .tm-mascot {
   transform-origin: 50% 100%;
   animation: tm-lean 0.7s ease-in-out forwards;
 }
 
+/* It stands right of the candles, so it leans to the left. */
 @keyframes tm-lean {
   to {
-    transform: rotate(10deg) translateX(8%);
+    transform: rotate(-10deg) translateX(-8%);
   }
 }
 
@@ -448,7 +528,7 @@
   border-radius: 50%;
   background: #ffb3c1;
   transform: scale(0.62, 0.55);
-  animation: tm-spread var(--tm-ms) linear forwards;
+  animation: tm-spread var(--tm-turn) linear var(--tm-from) both;
 }
 
 .tm-done .tm-puddle,
@@ -458,6 +538,9 @@
 }
 
 @keyframes tm-spread {
+  from {
+    transform: scale(0.62, 0.55);
+  }
   to {
     transform: none;
   }
@@ -571,9 +654,10 @@
   height: 100%;
 }
 
+/* A bite every second (user feedback, November 2026): the edge goes back in as many steps as the run has seconds. */
 .tm-eat {
   will-change: transform;
-  animation: tm-eat var(--tm-ms) linear forwards;
+  animation: tm-eat var(--tm-ms) steps(var(--tm-secs), end) forwards;
 }
 
 .tm-done .tm-eat {
@@ -588,7 +672,34 @@
 }
 
 .tm-caterpillar {
-  animation: tm-eat var(--tm-ms) linear forwards;
+  animation: tm-eat var(--tm-ms) steps(var(--tm-secs), end) forwards;
+}
+
+/* Crumbs of leaf falling from the mouth with each bite, as the head bites down. */
+.tm-crumb {
+  aspect-ratio: 1;
+  border: 0.1cqw solid #3b2a20;
+  border-radius: 40% 60% 50% 45%;
+  background: #58b947;
+  opacity: 0;
+  animation: tm-crumb 1s ease-in infinite;
+}
+
+@keyframes tm-crumb {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  8% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tm-dx), 900%) rotate(200deg);
+  }
 }
 
 .tm-done .tm-caterpillar {
@@ -615,12 +726,17 @@
   overflow: visible;
 }
 
+/* The head bites down as the second begins (when the edge steps back) and opens again for the next bite. */
 @keyframes tm-chew {
-  35% {
+  0%,
+  100% {
     transform: rotate(12deg) translateY(4%);
   }
-  70% {
+  20% {
     transform: none;
+  }
+  60% {
+    transform: rotate(-8deg);
   }
 }
 
@@ -1124,7 +1240,7 @@
    into the hill at the end; every ant starts a second after the one before. */
 .tm-ant {
   opacity: 0;
-  animation: tm-march 7s ease-in-out infinite;
+  animation: tm-march 9s ease-in-out infinite;
 }
 
 @keyframes tm-march {
@@ -1132,33 +1248,41 @@
     opacity: 0;
     transform: translateX(calc(var(--tm-ant-step) * 0));
   }
-  14.286% {
+  11.111% {
     opacity: 1;
     transform: translateX(calc(var(--tm-ant-step) * 1));
   }
-  28.571% {
+  22.222% {
     opacity: 1;
     transform: translateX(calc(var(--tm-ant-step) * 2));
   }
-  42.857% {
+  33.333% {
     opacity: 1;
     transform: translateX(calc(var(--tm-ant-step) * 3));
   }
-  57.143% {
+  44.444% {
     opacity: 1;
     transform: translateX(calc(var(--tm-ant-step) * 4));
   }
-  71.429% {
+  55.556% {
     opacity: 1;
     transform: translateX(calc(var(--tm-ant-step) * 5));
   }
-  85.714% {
+  66.667% {
     opacity: 1;
     transform: translateX(calc(var(--tm-ant-step) * 6));
   }
+  77.778% {
+    opacity: 1;
+    transform: translateX(calc(var(--tm-ant-step) * 7));
+  }
+  88.889% {
+    opacity: 1;
+    transform: translateX(calc(var(--tm-ant-step) * 8));
+  }
   100% {
     opacity: 0;
-    transform: translateX(calc(var(--tm-ant-step) * 7));
+    transform: translateX(calc(var(--tm-ant-step) * 9));
   }
 }
 
@@ -1319,20 +1443,24 @@
   opacity: 0.6;
 }
 
+/* The sun has set at 55 % of the time (SUN_SET_AT); the moon waits behind the hill until 50 % (MOON_FROM) and rises then. */
 @keyframes tm-set {
+  55%,
   to {
     transform: translateY(var(--tm-sun-set));
   }
 }
 
 @keyframes tm-redden {
+  50%,
   to {
     opacity: 1;
   }
 }
 
 @keyframes tm-moonrise {
-  from {
+  from,
+  50% {
     transform: translateY(var(--tm-moon-from));
   }
   to {
@@ -1421,10 +1549,12 @@
   transform: translateY(-100%);
 }
 
+/* The stalk grows in the first 70 % of the time (GROWN_AT in flower.tsx); then the flower opens. */
 @keyframes tm-grow-up {
   from {
     transform: translateY(var(--tm-sprout));
   }
+  70%,
   to {
     transform: none;
   }
@@ -1434,8 +1564,38 @@
   from {
     transform: translateY(var(--tm-sprout));
   }
+  70%,
   to {
     transform: translateY(-100%);
+  }
+}
+
+/* The soil crumbling aside where the stalk pushes out, every second while it grows. */
+.tm-soil {
+  inset: 0;
+  border-radius: 45% 55% 40% 60%;
+  background: #6b3f1d;
+  opacity: 0;
+  animation: tm-soil 1s ease-out infinite;
+}
+
+@keyframes tm-soil {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    transform: translate(calc(var(--tm-dx) * 0.6), var(--tm-dy));
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tm-dx), 0);
   }
 }
 
@@ -1462,157 +1622,23 @@
   }
 }
 
-.tm-bloom {
+/* The petals open one after another, slowly, each in its share of the time after the stalk is grown. */
+.tm-petal {
   opacity: 0;
-  transform: scale(0.25);
+  transform: scale(0.15);
+  animation: tm-petal calc(var(--tm-ms) * var(--tm-share)) ease-out calc(var(--tm-ms) * var(--tm-at)) forwards;
 }
 
-.tm-done .tm-bloom {
-  animation: tm-bloom 1.6s ease-out 0.2s forwards;
-}
-
-@keyframes tm-bloom {
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* Eimer (H-69): the water slides up inside the bucket from a little to the red line, a ring spreads where each drop
-   lands, and at the end the boat at the line floats on it, rocking a little before it lies still. */
-.tm-water-level {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(#a5d8ff 0 3%, #74c0fc 3% 100%);
-  opacity: 0.9;
-  transform: translateY(var(--tm-from));
-  animation: tm-fill var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-water-level {
-  animation: none;
-  transform: translateY(var(--tm-to));
-}
-
-@keyframes tm-fill {
-  from {
-    transform: translateY(var(--tm-from));
-  }
-  to {
-    transform: translateY(var(--tm-to));
-  }
-}
-
-.tm-ring {
-  left: calc(var(--tm-drop) - 9%);
-  top: -2.5%;
-  width: 18%;
-  height: 5%;
-  border: 0.2cqw solid #fff;
-  border-radius: 50%;
-  opacity: 0;
-  animation: tm-ring 1s ease-out infinite;
-}
-
-@keyframes tm-ring {
-  from {
-    opacity: 0.9;
-    transform: scale(0.2);
-  }
-  to {
-    opacity: 0;
-    transform: none;
-  }
-}
-
-.tm-boat {
-  transform-origin: 50% 100%;
-}
-
-.tm-done .tm-boat {
-  animation: tm-float 2.6s ease-in-out forwards;
-}
-
-@keyframes tm-float {
-  25% {
-    transform: translateY(-3%) rotate(-5deg);
-  }
-  50% {
-    transform: translateY(-3%) rotate(4deg);
-  }
-  75% {
-    transform: translateY(-3%) rotate(-2deg);
-  }
-  to {
-    transform: translateY(-3%);
-  }
-}
-
-/* Kuchen (H-53): the dough slides up out of its tin like the flower's stalk (`tm-stalk`, `tm-to-grow`) and browns in
-   the second half; at the end the door opens down and the cake comes out over it onto the table. */
-.tm-cake-part {
-  position: absolute;
-}
-
-.tm-cake-part svg,
-.tm-cake-tin {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.tm-baked {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  will-change: opacity;
-  animation: tm-bake var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-baked {
+.tm-done .tm-petal {
   animation: none;
   opacity: 1;
+  transform: none;
 }
 
-@keyframes tm-bake {
-  35% {
-    opacity: 0;
-  }
+@keyframes tm-petal {
   to {
     opacity: 1;
-  }
-}
-
-.tm-door {
-  transform-origin: 50% 100%;
-}
-
-.tm-done .tm-door {
-  animation: tm-door 0.9s ease-in forwards;
-}
-
-@keyframes tm-door {
-  to {
-    transform: perspective(60cqw) rotateX(-78deg);
-  }
-}
-
-.tm-done .tm-cake {
-  animation: tm-cake-out 1.6s ease-in-out 0.9s both;
-}
-
-@keyframes tm-cake-out {
-  from {
     transform: none;
-  }
-  30% {
-    transform: translate(-8%, -24%);
-  }
-  to {
-    transform: translate(var(--tm-out-x), var(--tm-out-y));
   }
 }
 
@@ -1657,4 +1683,61 @@
   inset: 0;
   border-radius: 0;
   background: rgb(255 240 170 / 0.55);
+}
+
+/* The time is up, plain to see (user feedback, November 2026): a warm light spreads over the picture once and stays,
+   while children cheer and a few hearts, stars and notes rise slowly (`celebrate`). One layer fading in, never a blink. */
+.tm-done-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(closest-side at 50% 45%, rgb(255 240 170 / 0.55), rgb(255 220 120 / 0.25) 60%, transparent);
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-done-light 1.4s ease-out 0.5s forwards;
+}
+
+@keyframes tm-done-light {
+  to {
+    opacity: 1;
+  }
+}
+
+/* „Zeit im Bild“: the time left as digits or tally marks on a small paper note in the bottom left corner, for grown-ups
+   who chose it behind ⚙️. Taps go through it to the picture. */
+.tm-shown {
+  position: absolute;
+  left: calc(14px + env(safe-area-inset-left));
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  z-index: 2;
+  padding: 4px 14px;
+  border: 2px solid var(--ink, #3b2a20);
+  border-radius: 10px;
+  background: #fffdf3;
+  box-shadow: 0 6px 14px -8px #00000080;
+  color: var(--ink, #3b2a20);
+  rotate: -2deg;
+  pointer-events: none;
+}
+
+.tm-shown b {
+  font-size: clamp(1.4rem, 5cqh, 2.6rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.tm-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  max-width: 46cqw;
+}
+
+.tm-tally svg {
+  width: clamp(28px, 6cqh, 48px);
+  height: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+  stroke-linecap: round;
 }

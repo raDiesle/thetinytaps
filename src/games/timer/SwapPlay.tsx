@@ -4,13 +4,17 @@ import { GameEnd } from "@/components/GameEnd";
 import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
-import { playChime, playMelody, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { loadRecordings, playChime, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import { Child } from "./scenes";
-import type { SwapToy, TimerPicture } from "./settings";
+import type { SwapToy, TimeShown, TimerPicture } from "./settings";
+import { TimeShownChoice, TimeShownNote } from "./shown";
 import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_TOYS, SwapBackdrop, SwapHourglass, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
+
+/** Children cheering at the clock time set (a recording, else a flourish). */
+const playCheer = recorded("cheer", playTusch);
 
 /** Who has the toy. */
 type Holder = "fox" | "bear";
@@ -39,6 +43,8 @@ export function SwapRun({
   until,
   toy,
   onToy,
+  timeShown,
+  onShown,
   onAgain,
   onPicture,
 }: {
@@ -49,6 +55,9 @@ export function SwapRun({
   until?: string;
   toy: SwapToy;
   onToy: (toy: SwapToy) => void;
+  /** The time to the change in the picture's corner too, or not (behind ⚙️). */
+  timeShown: TimeShown;
+  onShown: (shown: TimeShown) => void;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
 }) {
@@ -60,8 +69,9 @@ export function SwapRun({
   const [poke, setPoke] = useState(0);
   // The hourglass turns itself over for every turn after the first one seen.
   const shown = useRef(false);
-  const { effects, ripple, glow } = useTapFeedback();
+  const { effects, ripple, glow, celebrate } = useTapFeedback();
   useWakeLock(!done);
+  useEffect(() => loadRecordings(["cheer"]), []);
 
   // The turn, checked at least every second and again when the page comes back (timers sleep in the background).
   useEffect(() => {
@@ -96,12 +106,20 @@ export function SwapRun({
     const timer = setTimeout(playChime, 700);
     return () => clearTimeout(timer);
   }, [turn]);
+  // At the clock time set, the end is plain like every timer's: children cheer and a few things rise slowly.
   useEffect(() => {
     if (!done) return;
     playChime();
-    const timer = setTimeout(playMelody, 900);
-    return () => clearTimeout(timer);
-  }, [done]);
+    const cheer = setTimeout(() => {
+      playCheer();
+      celebrate();
+    }, 700);
+    const tune = setTimeout(playMelody, 2500);
+    return () => {
+      clearTimeout(cheer);
+      clearTimeout(tune);
+    };
+  }, [done, celebrate]);
 
   const holder: Holder = (turn % 2 === 0) === (turns.first === "fox") ? "fox" : "bear";
   const flip = shown.current;
@@ -144,9 +162,11 @@ export function SwapRun({
           <Child kind="bear" x={SWAP_CHILDREN.bear} floor={SWAP_FLOOR + 10} />
           <SwapHourglass key={`${turns.start}-${turn}`} ms={turnMs} startedAt={turnStart} flip={flip} running={!done} glow={poke} />
           <Toy toy={toy} bear={holder === "bear"} />
+          {done && <div className="tm-done-light" />}
         </div>
+        {!done && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
-        {done && <GameEnd delayMs={3200} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
+        {done && <GameEnd delayMs={4200} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>
@@ -212,6 +232,7 @@ export function SwapRun({
           />
         )}
         {endsAt !== undefined && <TimeLeft endsAt={endsAt} until={until} />}
+        <TimeShownChoice value={timeShown} onChange={onShown} />
       </PlayOptions>
     </>
   );

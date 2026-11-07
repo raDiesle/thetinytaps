@@ -31,6 +31,9 @@ export const tomorrowAt = (at: string): Localized => ({
 
 /** The pictures in their order on the start screen; „Weiter“ at the end goes on with the next, after the last the first. */
 export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = [
+  // „Abwechseln“ first, on its own above the others (user feedback, November 2026): it is not a time running out but
+  // turns going on and on, so it stands apart with a line saying so (`TURNS_GROUP`).
+  { id: "swap", emoji: "🔁", name: SWAP_NAME },
   {
     id: "train",
     emoji: "🚂",
@@ -52,7 +55,6 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
   },
   { id: "caterpillar", emoji: "🐛", name: { de: "Raupe", en: "Caterpillar", zh: "毛毛虫", hi: "इल्ली", es: "Oruga", ar: "اليرقة", ru: "Гусеница" } },
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
-  { id: "bucket", emoji: "🪣", name: { de: "Eimer" } },
   { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
   {
     id: "sunset",
@@ -70,12 +72,22 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     name: { de: "Rote Scheibe", en: "Red Disc", zh: "红色圆盘", hi: "लाल चक्र", es: "Disco rojo", ar: "القرص الأحمر", ru: "Красный круг" },
   },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
-  { id: "cake", emoji: "🎂", name: { de: "Kuchen" } },
-  { id: "swap", emoji: "🔁", name: SWAP_NAME },
 ];
 
-/** The picture after `id`, after the last the first, for „Weiter“. */
+/**
+ * The line on „Abwechseln“'s card, first on the start screen, for grown-ups: it runs on without an end, and each child
+ * gets its turn (user feedback, November 2026).
+ */
+export const SWAP_NOTE: Localized = { de: "Läuft ohne Ende, jeder ist mal dran" };
+
+/** The pictures that run until the time is up, in their order: all but „Abwechseln“. */
+export const TIMED_PICTURES = PICTURES.filter((p) => p.id !== "swap");
+
+/**
+ * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
+ * „Abwechseln“, which goes on without an end; from „Abwechseln“ the first.
+ */
 export function nextPicture(id: TimerPicture): TimerPicture {
-  const i = PICTURES.findIndex((p) => p.id === id);
-  return PICTURES[(i + 1) % PICTURES.length].id;
+  const i = TIMED_PICTURES.findIndex((p) => p.id === id);
+  return TIMED_PICTURES[(i + 1) % TIMED_PICTURES.length].id;
 }

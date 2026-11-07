@@ -114,7 +114,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als zwei Bilder. „Blume“: Das Bärenkind gießt, jede Sekunde fällt ein Tropfen aus der Gießkanne, der Stängel wächst an einem Stab hinauf bis zur roten Schleife, die von Anfang an zeigt, wie weit er kommt, und am Ende geht die Blüte auf. „Kuchen“: Durchs Ofenfenster geht der Teig aus seiner Form auf, bis zum gestrichelten Umriss des fertigen Kuchens, und wird in der zweiten Hälfte braun; jede Sekunde steigt ein Wölkchen warme Luft aus dem Ofen. Am Ende klappt die Ofentür auf, der Kuchen kommt auf den Tisch neben der Fuchsfamilie, und alle jubeln (Mama Fuchs holt ihn nicht selbst heraus, sie steht am Tisch).",
+        "Gebaut als zwei Bilder. „Blume“: Das Bärenkind gießt, jede Sekunde fällt ein Tropfen aus der Gießkanne, der Stängel wächst an einem Stab hinauf bis zur roten Schleife, die von Anfang an zeigt, wie weit er kommt, und am Ende geht die Blüte auf. „Kuchen“ (am 7. November 2026 wieder herausgenommen, Feedback): Durchs Ofenfenster geht der Teig aus seiner Form auf, bis zum gestrichelten Umriss des fertigen Kuchens, und wird in der zweiten Hälfte braun; jede Sekunde steigt ein Wölkchen warme Luft aus dem Ofen. Am Ende klappt die Ofentür auf, der Kuchen kommt auf den Tisch neben der Fuchsfamilie, und alle jubeln (Mama Fuchs holt ihn nicht selbst heraus, sie steht am Tisch).",
     },
     {
       id: "H-54",
@@ -256,9 +256,9 @@ export const timerIdeas: IdeaArea = {
       text: "Aus der Gießkanne fällt jede Sekunde ein Tropfen in einen Eimer, und das Wasser steigt bis zu einem Strich, an dem ein kleines Holzschiff schon wartet: Dort ist die Zeit um. Am Ende schwimmt das Schiff, und das Bärenkind gießt mit dem Eimer eine Blume (wie H-53).",
       why: "Jeder Tropfen ist eine sichtbare Sekunde, und der Strich zeigt von Anfang an, wohin es geht. Für das Warten auf etwas Gutes passt ein Bild, das voller wird.",
       effort: "S",
-      done: true,
+      rejected: true,
       partial:
-        "Gebaut als Bild „Eimer“: Die Gießkanne hängt an einem Pfosten über einem durchsichtigen Eimer im Garten, jede Sekunde fällt ein Tropfen, und auf dem Wasser breitet sich ein Ring aus. Das Wasser steigt bis zum roten Strich, wo das Holzschiff an einem Faden von einem Stock über dem Eimer schon wartet. Am Ende schwimmt es und schaukelt kurz, und die Blume im Topf neben dem Eimer geht auf; die Bärenfamilie steht daneben und winkt (das Bärenkind gießt nicht selbst mit dem Eimer).",
+        "Abgelehnt und wieder herausgenommen (Feedback 7. November 2026: „macht für mich keinen Sinn“ – woher das Schiff, warum die Blume blüht, woher das ganze Wasser aus der Kanne kommt). Gebaut war es als Bild „Eimer“: Die Gießkanne hängt an einem Pfosten über einem durchsichtigen Eimer im Garten, jede Sekunde fällt ein Tropfen, und auf dem Wasser breitet sich ein Ring aus. Das Wasser steigt bis zum roten Strich, wo das Holzschiff an einem Faden von einem Stock über dem Eimer schon wartet. Am Ende schwimmt es und schaukelt kurz, und die Blume im Topf neben dem Eimer geht auf; die Bärenfamilie steht daneben und winkt (das Bärenkind gießt nicht selbst mit dem Eimer).",
     },
   ],
 };

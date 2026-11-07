@@ -1,33 +1,59 @@
 import { describe, expect, test } from "bun:test";
-import { nextPicture, PICTURES } from "./content";
+import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, APPLE_LANDED, appleRadius, BASKET, CROWN } from "./apples";
 import { EATEN, LEAF, LEAF_FLOOR } from "./caterpillar";
-import { BOAT, BUCKET, bucketEdges, GOAL_Y, POT, SPOUT, WATER } from "./bucket";
-import { CAKE, CAKE_FLOOR, DOUGH_START, OVEN, OVEN_WINDOW, TABLE } from "./cake";
 import { DISC, DOTS, dotAt } from "./disc";
-import { FLOWER_CHILD, FLOWER_FLOOR, SPROUT, STAKE, STALK } from "./flower";
+import { FLOWER_CHILD, FLOWER_FLOOR, GROWN_AT, SPOUT, SPROUT, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
-import { MOON, ridgeAt, SKY_CUT, STARS, SUN, SUNSET_FLOOR } from "./sunset";
-import { applePlaces, haltMs, ladybugLaps, MAX_APPLES, MAX_DOTS, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
-import { ANTS, CANDLE, CHILD, COOKIE, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
+import { MOON, MOON_FROM, ridgeAt, SKY_CUT, STARS, SUN, SUN_SET_AT, SUNSET_FLOOR } from "./sunset";
+import {
+  appleCount,
+  applePlaces,
+  haltMs,
+  ladybugLaps,
+  MAX_APPLES,
+  MAX_DOTS,
+  MAX_MARKS,
+  MAX_STOPS,
+  MIN_APPLES,
+  markUnit,
+  marksLeft,
+  pieceCount,
+  pieceMoments,
+  runSeconds,
+  soonMs,
+  trainSteps,
+} from "./pieces";
+import { ANTS, CANDLE, CHILD, COOKIE, FLAME_H, GLASS, GROUND, HILL, SAND_FLOOR, STAGE_H, TRAIN } from "./scenes";
 import { SWAP_CHILDREN, SWAP_FLOOR, SWAP_GLASS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_MINUTES } from "./settings";
 
 describe("Timer", () => {
-  test("every picture has its own id, an emoji and a German name, and „Weiter“ goes round them all", () => {
+  test("every picture has its own id, an emoji and a German name, Abwechseln comes first and „Weiter“ goes round the others", () => {
     expect(new Set(PICTURES.map((p) => p.id)).size).toBe(PICTURES.length);
     for (const p of PICTURES) {
       expect(p.emoji).not.toBe("");
       expect(p.name.de.trim()).not.toBe("");
     }
+    // Abwechseln runs without end, so it stands on top under its own line and „Weiter“ never leads into it.
+    expect(PICTURES[0].id).toBe("swap");
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 1);
     const seen = new Set<string>();
-    let id = PICTURES[0].id;
-    for (let i = 0; i < PICTURES.length; i++) {
+    let id = TIMED_PICTURES[0].id;
+    for (let i = 0; i < TIMED_PICTURES.length; i++) {
       seen.add(id);
       id = nextPicture(id);
     }
-    expect(seen.size).toBe(PICTURES.length);
-    expect(id).toBe(PICTURES[0].id);
+    expect(seen.size).toBe(TIMED_PICTURES.length);
+    expect(id).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
+  });
+
+  test("the removed pictures stay removed (user feedback, November 2026: Eimer and Kuchen made no sense)", () => {
+    const ids: string[] = PICTURES.map((p) => p.id);
+    expect(ids).not.toContain("bucket");
+    expect(ids).not.toContain("cake");
   });
 
   test("the minutes are 1 to 10, rising, and the default is one of them", () => {
@@ -37,15 +63,24 @@ describe("Timer", () => {
     expect(TIMER_MINUTES).toContain(DEFAULT_TIMER_SETTINGS.minutes as (typeof TIMER_MINUTES)[number]);
   });
 
+  const RIGHT_EDGE = 1340;
+
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
     expect(TRAIN.x).toBeGreaterThanOrEqual(200);
-    expect(TRAIN.stop).toBeLessThanOrEqual(1400);
+    expect(TRAIN.stop + TRAIN.w).toBeLessThanOrEqual(1400 + 200);
+    // A long way to go, so every second shows a step: the train drives most of the picture's width.
+    expect(TRAIN.stop - TRAIN.x).toBeGreaterThanOrEqual(1000);
+    expect(TRAIN.stop).toBeLessThanOrEqual(RIGHT_EDGE);
     expect(GLASS.cx - GLASS.w / 2).toBeGreaterThanOrEqual(200);
     // With a margin: at 80 and 820 the hourglass's plates touched the screen's edges on a phone on its side.
     expect(GLASS.top - 44).toBeGreaterThanOrEqual(130);
     expect(SAND_FLOOR + 10).toBeLessThanOrEqual(790);
     expect(CANDLE.base).toBeLessThanOrEqual(820);
-    expect(CANDLE.top).toBeGreaterThanOrEqual(80 + 140);
+    // Tall candles, their flames still on the screen; three of them burning one after the other.
+    expect(CANDLE.top - FLAME_H).toBeGreaterThanOrEqual(80);
+    expect(CANDLE.base - CANDLE.top).toBeGreaterThanOrEqual(500);
+    expect(CANDLE.xs.length).toBeGreaterThanOrEqual(3);
+    expect(CANDLE.xs[0] - CANDLE.w / 2).toBeGreaterThanOrEqual(200);
     expect(STAGE_H).toBe(900);
   });
 
@@ -80,6 +115,32 @@ describe("Timer", () => {
     expect(pieceCount(30 * 60_000, MAX_STOPS)).toBe(MAX_STOPS);
     expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
     expect(pieceMoments(300_000, 1)).toEqual([]);
+  });
+
+  test("Apfelbaum: always many apples, also for a short time – they only fall more often", () => {
+    expect(appleCount(10_000)).toBe(MIN_APPLES);
+    expect(appleCount(60_000)).toBeGreaterThanOrEqual(20);
+    expect(appleCount(3 * 3600_000)).toBe(MAX_APPLES);
+    expect(MIN_APPLES).toBeGreaterThanOrEqual(6);
+  });
+
+  test("a step every second: the caterpillar bites once a second, as many bites as the run has seconds", async () => {
+    expect(runSeconds(20_000)).toBe(20);
+    expect(runSeconds(400)).toBe(1);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    expect(css).toContain("tm-eat var(--tm-ms) steps(var(--tm-secs), end)");
+  });
+
+  test("Zeit im Bild: tally marks never more than fit, each one still begun counts, none at the end", () => {
+    for (const minutes of [1 / 6, 1, 2, 5, 10, 30, 60, 180]) {
+      const total = minutes * 60_000;
+      expect(marksLeft(total, markUnit(total))).toBeLessThanOrEqual(MAX_MARKS);
+      expect(marksLeft(total, markUnit(total))).toBeGreaterThan(0);
+    }
+    expect(markUnit(60_000)).toBe(10_000);
+    expect(marksLeft(55_000, 10_000)).toBe(6);
+    expect(marksLeft(1, 10_000)).toBe(1);
+    expect(marksLeft(0, 10_000)).toBe(0);
   });
 
   test("the train halts at every stop and reaches the station as the time is up", () => {
@@ -148,15 +209,17 @@ describe("Timer", () => {
 
   test("Sonnenuntergang: the sun and the moon move behind the ridge, the cut of their boxes always hidden below it (H-54)", () => {
     for (const { cx, r } of [SUN, MOON]) for (let x = cx - r; x <= cx + r; x += 5) expect(ridgeAt(x)).toBeLessThan(SKY_CUT);
-    // The sun is wholly gone at the end, the moon peeks over the hill from the start and stands high at the end.
+    // A big sun, wholly gone at the end; the moon hidden behind the hill until the sun is (nearly) down, high at the end.
+    expect(SUN.r).toBeGreaterThanOrEqual(150);
     expect(SUN.set).toBeGreaterThanOrEqual(SKY_CUT);
     expect(SUN.top).toBeGreaterThanOrEqual(80);
-    expect(MOON.start).toBeLessThan(ridgeAt(MOON.cx) - 20);
+    expect(MOON.start).toBeGreaterThanOrEqual(SKY_CUT);
+    expect(MOON_FROM).toBeGreaterThanOrEqual(SUN_SET_AT - 0.1);
     expect(MOON.top).toBeGreaterThanOrEqual(80);
     // The stars come out in order through the second half, within the sky, never where the moon ends up.
     expect(STARS.map((s) => s.at)).toEqual([...STARS.map((s) => s.at)].sort((a, b) => a - b));
     for (const s of STARS) {
-      expect(s.at).toBeGreaterThanOrEqual(0.4);
+      expect(s.at).toBeGreaterThanOrEqual(SUN_SET_AT);
       expect(s.at).toBeLessThan(1);
       expect(s.y).toBeLessThan(ridgeAt(s.x) - 30);
       expect(Math.hypot(s.x - MOON.cx, s.y - (MOON.top + MOON.r))).toBeGreaterThan(MOON.r + 30);
@@ -164,9 +227,17 @@ describe("Timer", () => {
     expect(SUNSET_FLOOR).toBeLessThanOrEqual(820);
   });
 
-  test("Blume: the stalk grows from a sprout to the ribbon, on every screen (H-53)", () => {
+  test("Blume: the stalk grows tall from a sprout to the ribbon, then opens; the water comes from a tap (H-53)", () => {
     expect(STALK.top).toBeGreaterThan(STAKE.top);
-    expect(STAKE.top - 20).toBeGreaterThanOrEqual(80 + 100);
+    expect(STAKE.top - 20).toBeGreaterThanOrEqual(80 + 10);
+    expect(STALK.soil - STALK.top).toBeGreaterThanOrEqual(600);
+    // It is grown well before the end, so the petals opening one by one fill the rest of the time.
+    expect(GROWN_AT).toBeGreaterThan(0.5);
+    expect(GROWN_AT).toBeLessThanOrEqual(0.8);
+    // A tap on a post, not a can that never runs dry: the hose's nozzle lies over the bed, the tap left of the child.
+    expect(TAP.x).toBeGreaterThanOrEqual(200);
+    expect(TAP.x).toBeLessThan(FLOWER_CHILD);
+    expect(SPOUT.x).toBeLessThan(STALK.cx);
     expect(STALK.soil).toBeLessThanOrEqual(820);
     expect(SPROUT).toBeGreaterThan(0);
     expect(SPROUT).toBeLessThan(0.2);
@@ -176,7 +247,7 @@ describe("Timer", () => {
     expect(FLOWER_FLOOR).toBeLessThanOrEqual(820);
   });
 
-  test("Pizza: eight slices round the board, eaten at their eighths (H-47)", async () => {
+  test("Pizza: many slices round the board, one eaten at each of its moments (H-47)", async () => {
     let area = 0;
     for (let i = 0; i < SLICES; i++) {
       const s = slice(i);
@@ -192,6 +263,7 @@ describe("Timer", () => {
     // A slice is gone at its moment: the CSS lifts it off in as many seconds as its delay takes away.
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     expect(css).toContain(`animation: tm-slice ${SLICE_SECONDS}s ease-in both`);
+    expect(SLICES).toBeGreaterThanOrEqual(16);
     expect(pieceMoments(8 * 60_000, SLICES)).toHaveLength(SLICES - 1);
   });
 
@@ -214,48 +286,6 @@ describe("Timer", () => {
       expect(y - DOTS.r).toBeGreaterThanOrEqual(80);
       expect(y + DOTS.r).toBeLessThanOrEqual(820);
     }
-  });
-
-  test("Eimer: the water rises from a little to the red line, where the boat waits; all on every screen (H-69)", () => {
-    expect(WATER.start).toBeGreaterThan(0);
-    expect(WATER.start).toBeLessThan(WATER.goal);
-    expect(WATER.goal).toBeLessThan(1);
-    expect(BUCKET.cx - BUCKET.wTop / 2).toBeGreaterThanOrEqual(200);
-    expect(BUCKET.bottom).toBeLessThanOrEqual(820);
-    // The boat hangs inside the bucket, its keel a little under the line, so the water reaches it only at the end.
-    const line = bucketEdges(GOAL_Y);
-    expect(BOAT.left).toBeGreaterThan(line.left);
-    expect(BOAT.right).toBeLessThan(line.right);
-    expect(BOAT.keel).toBeGreaterThan(GOAL_Y);
-    expect(BOAT.keel - GOAL_Y).toBeLessThan(20);
-    // The drops fall into the bucket, clear of the boat.
-    const rim = bucketEdges(BUCKET.top);
-    expect(SPOUT.x).toBeGreaterThan(rim.left + 20);
-    expect(SPOUT.x).toBeLessThan(BOAT.left - 30);
-    expect(SPOUT.y + SPOUT.fall).toBeGreaterThan(BUCKET.top);
-    // The pot beside the bucket, within the right edge.
-    expect(POT.cx - 44).toBeGreaterThan(rim.right + 14);
-    expect(POT.cx + 50).toBeLessThanOrEqual(RIGHT);
-    expect(POT.floor).toBeLessThanOrEqual(820);
-  });
-
-  test("Kuchen: the dough rises inside the oven's window, and the cake comes out onto the table (H-53)", () => {
-    expect(DOUGH_START).toBeGreaterThan(0);
-    expect(DOUGH_START).toBeLessThan(0.3);
-    // The cake, risen, is seen whole through the window.
-    expect(CAKE.x).toBeGreaterThanOrEqual(OVEN_WINDOW.x);
-    expect(CAKE.x + CAKE.w).toBeLessThanOrEqual(OVEN_WINDOW.x + OVEN_WINDOW.w);
-    expect(CAKE.y + CAKE.dough.y).toBeGreaterThan(OVEN_WINDOW.y);
-    expect(CAKE.y + CAKE.h).toBeLessThanOrEqual(OVEN_WINDOW.y + OVEN_WINDOW.h);
-    // The dough's box is cut behind the tin's front, never above its rim.
-    expect(CAKE.dough.y + CAKE.dough.h).toBeGreaterThan(CAKE.rim);
-    expect(OVEN.x + OVEN.w).toBeLessThanOrEqual(1340);
-    expect(OVEN.y).toBeGreaterThanOrEqual(80 + 140);
-    // The table stands left of the oven and holds the cake.
-    expect(TABLE.x).toBeGreaterThanOrEqual(200);
-    expect(TABLE.x + TABLE.w).toBeLessThan(OVEN.x);
-    expect(CAKE.w).toBeLessThan(TABLE.w);
-    expect(CAKE_FLOOR).toBeLessThanOrEqual(820);
   });
 
   test("Gleich ist es so weit: a minute before the end, or the last fifth of a short time (H-49)", () => {

@@ -417,6 +417,28 @@ kbd {
   font-size: 1.35rem;
 }
 
+/* A card's line for grown-ups (GameMode.note): small and quiet under its name, left out where the card is small. */
+.game-note {
+  display: block;
+  margin-top: 0.25em;
+  font-size: max(0.75rem, 0.7em);
+  font-weight: 500;
+  line-height: 1.2;
+  opacity: 0.8;
+}
+
+@container (max-height: 129.98px) {
+  .game-note {
+    display: none;
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .game-note {
+    display: none;
+  }
+}
+
 /*
  * Cards of one sort (GameMode.kind) stand together on a pale frame, the sort's name once above them. The group and its
  * list of cards take the menu's columns (subgrid), so all cards keep one size; the frame lies round the cards

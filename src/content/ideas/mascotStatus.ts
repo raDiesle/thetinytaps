@@ -77,7 +77,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/timer/",
     note: "SVG. Ein Fuchs- oder Bärenkind nur, wo es selbst etwas tut: beim Apfelbaum hält das Bärenkind den Korb, bei der Blume gießt es, bei der Kerze pustet es sie aus, beim Abwechseln wandert das Spielzeug zwischen Fuchskind und Bärenkind (`Child`).",
     tasks: [
-      { label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Korb, Gießkanne, Kerze, Abwechseln)", work: "drawing", effort: "S", state: "done" },
+      { label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Korb, Gartenschlauch, Kerze, Abwechseln)", work: "drawing", effort: "S", state: "done" },
       {
         label: "Fuchs- oder Bärenfamilie steht in jedem Bild daneben und winkt am Ende",
         work: "drawing",
