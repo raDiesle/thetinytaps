@@ -235,7 +235,10 @@ test("every painted pair has its pictures once made, and every picture its pair"
     expect(!!p.partner.emoji !== !!p.part, `${p.id}: an emoji or a part, exactly one`).toBe(true);
     const frames = !!framesOf(p.id);
     const made = frames && (!p.part || !!partImage(p.id));
-    expect(p.made, `${p.id}: made when all its pictures are there, "frames" when only its frames`).toBe(made ? true : frames && p.part ? "frames" : undefined);
+    const part = !!p.part && !!partImage(p.id);
+    expect(p.made, `${p.id}: made when all its pictures are there, "frames" or "part" when only those`).toBe(
+      made ? true : frames && p.part ? "frames" : part ? "part" : undefined,
+    );
     expect(PAIRS.some((q) => q.id === p.id)).toBe(made);
     expect(p.toThe, p.id).toBe(TOPICS[p.topic].kind === "helper" ? p.the : p.toThe);
     expect(p.sounds.length, p.id).toBeGreaterThan(0);

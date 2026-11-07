@@ -42,7 +42,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Krone", the: "die Krone", acc: "die Krone", emoji: "👑" },
     cast: "bear",
     before:
-      "A throne room with red banners on the stone walls and a red carpet leading up to a golden throne. Beside the throne stands a little table with an empty red velvet cushion on it. On the throne sits the king, a grown-up bear in a purple robe and a red cape trimmed with white fur, his head bare, one paw feeling the top of his bare head, looking at the empty cushion, brows raised, mouth a small o.",
+      "A throne room with red banners on the stone walls and a red carpet leading up to a golden throne. Beside the throne stands a little table with an empty red velvet cushion on it. On the throne sits the king, a grown-up bear in a purple robe and a red cape trimmed with white fur, his head bare, one paw feeling the top of his bare head, looking at the empty cushion, brows raised, mouth a small o. Nothing floats above his head.",
     after: "A golden crown with red jewels now sits on the king's head; he sits up proudly and smiles. The cushion stays empty.",
     sounds: ["clonk", "twinkle"],
     // A king may carry a shield too.
@@ -64,6 +64,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["clonk", "giggle"],
     // A king may carry the shield, and a knight rides a horse.
     alsoFits: ["koenig", "reiterin"],
+    made: "part",
   },
   {
     id: "fee",
@@ -72,16 +73,16 @@ export const PAINTED: PaintedPair[] = [
     the: "die Fee",
     toThe: "die Fee",
     partner: { name: "Zauberstab", the: "der Zauberstab", acc: "den Zauberstab" },
-    part: "a slim white magic wand with a little golden star at its tip",
+    part: "a slim white magic wand with a little golden star at its tip, nothing round it",
     cast: "fox",
     before:
       "A garden at night under a full moon, a big round orange pumpkin lying on the grass in the middle. Beside the pumpkin stands the fairy, a grown-up fox woman with eyelashes in a pink dress with gauzy lilac wings and a flower wreath in her hair, her paws empty, looking at the pumpkin, brows raised, mouth a small o.",
     after:
       "The fairy now points a slim white magic wand with a little golden star at its tip at the pumpkin, and the pumpkin has turned into a round golden coach with little windows. The fairy smiles happily.",
     sounds: ["twinkle", "chime"],
-    made: "frames",
     // A magician and a witch may have a wand too; the princess's coach stands in the second picture.
     alsoFits: ["zauberkuenstler", "hexe", "prinzessin"],
+    made: "frames",
   },
   {
     id: "zauberkuenstler",
@@ -92,7 +93,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Zylinder", the: "der Zylinder", acc: "den Zylinder", emoji: "🎩" },
     cast: "both",
     before:
-      "A small stage with red curtains and a spotlight; on it a little round table covered with a red cloth down to the floor, nothing on it. On a bench in front of the stage sits a little bear child, waiting. Behind the table stands the magician, a grown-up fox in a black tailcoat with a red bow tie, his head bare, his empty paws spread over the empty table, brows raised, mouth a small o.",
+      "A small stage with red curtains and a spotlight; on it a little round table covered with a red cloth down to the floor, nothing on it. On a bench in front of the stage sits a little bear child in a blue shirt and purple trousers, waiting. Behind the table stands the magician, a grown-up fox in a black tailcoat with a red bow tie, his head bare, his empty paws spread over the empty table, brows raised, mouth a small o.",
     after:
       "The magician now holds a black top hat upside down on the table, and a little white rabbit peeks out of it; the magician beams and the bear child claps, laughing.",
     sounds: ["poof", "drumRoll"],
@@ -111,9 +112,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The witch now sits astride a broom – a wooden stick with a bundle of straw bristles – and flies up past the moon with the black cat sitting behind her; both laugh.",
     sounds: ["whoosh", "giggle"],
-    made: true,
     // A witch may have a wand too, and brooms sweep chimneys and floors.
     alsoFits: ["fee", "schornsteinfeger", "raumpflegerin", "strassenkehrer"],
+    made: true,
   },
   {
     id: "pirat",
@@ -129,9 +130,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The pirate now holds an old treasure map with a palm tree and a red X on it in one paw and points with the other at the big rock; at its foot the lid of a treasure chest peeks out of the sand. He grins happily.",
     sounds: ["rustle", "twinkle"],
-    made: "frames",
     // A pirate sails a ship, drops an anchor and looks through a telescope.
     alsoFits: ["kapitaen", "matrose", "sternguckerin"],
+    made: true,
   },
   {
     id: "detektivin",
@@ -146,9 +147,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The detective now holds a big magnifying glass with a black handle over the paw prints, one eye big behind the glass, and follows the trail, smiling. A little grey kitten peeks out from behind the flowerpot.",
     sounds: ["slide", "tick"],
-    made: true,
     // A microscope or a torch may help a detective look too.
     alsoFits: ["forscherin", "hoehlenforscher"],
+    made: true,
   },
   {
     id: "sternguckerin",
@@ -163,9 +164,9 @@ export const PAINTED: PaintedPair[] = [
       "A hilltop at night, a dark-blue sky full of stars and a big round moon far away. A wooden bench stands on the hill. Beside the bench stands a grown-up fox woman with eyelashes in a blue coat, a yellow bobble hat and a yellow scarf, her paws empty, squinting up at the far moon, brows raised, mouth a small o.",
     after: "She now looks through a telescope – a long blue tube on a three-legged wooden stand – pointed up at the moon, and smiles in wonder.",
     sounds: ["twinkle"],
-    made: true,
     // A pirate and a captain look through one too, and a rocket flies to the moon.
     alsoFits: ["pirat", "kapitaen", "astronautin"],
+    made: true,
   },
   {
     id: "hoehlenforscher",
@@ -176,9 +177,9 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Taschenlampe", the: "die Taschenlampe", acc: "die Taschenlampe", emoji: "🔦" },
     cast: "fox",
     before:
-      "The entrance of a cave in a rocky mountainside; inside the cave it is pitch dark, only a faint glitter deep in the darkness. At the entrance stands the cave explorer, a grown-up fox in a grey overall with brown straps and a plain yellow helmet, his paws empty, peering into the dark, brows raised, mouth a small o.",
+      "The entrance of a cave in a rocky mountainside; inside the cave it is pitch dark, nothing to be seen inside. At the entrance stands the cave explorer, a grown-up fox in a grey overall with brown straps and a plain yellow helmet, his paws empty, peering into the dark, brows raised, mouth a small o.",
     after:
-      "The explorer now holds a black torch and shines its bright beam into the cave: purple and blue crystals sparkle on the cave walls, and the fox smiles in wonder.",
+      "The explorer now holds a black torch and shines its bright beam into the cave: purple and blue crystals show on the cave walls in its light, and the fox smiles in wonder.",
     sounds: ["click", "twinkle"],
     // A detective may search with a torch, and the dwarf's pickaxe fits a cave too.
     alsoFits: ["detektivin", "zwerg"],
@@ -198,6 +199,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["rustle", "thump"],
     // A warm duvet is for sleeping too.
     alsoFits: ["frau-holle"],
+    made: true,
   },
   {
     id: "ballonfahrerin",
@@ -229,9 +231,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A golden coach with round windows and big wheels, pulled by a white horse, now stands on the road; the princess sits in it and waves happily from its window as it sets off towards the castle.",
     sounds: ["neigh", "hop"],
-    made: "frames",
     // A horse could carry her there, and the fairy's pumpkin turns into such a coach.
     alsoFits: ["reiterin", "fee"],
+    made: true,
   },
   {
     id: "sandmann",
@@ -240,13 +242,14 @@ export const PAINTED: PaintedPair[] = [
     the: "der Sandmann",
     toThe: "der Sandmann",
     partner: { name: "Schlafsand", the: "der Schlafsand", acc: "den Schlafsand" },
-    part: "a small open brown cloth sack full of shimmering golden sand",
+    part: "a small open brown cloth sack, the size of a paw, full of fine golden sand, nothing round it",
     cast: "both",
     before:
       "A cosy child's bedroom at night: a wooden bed with a patchwork quilt, a small window with the moon, a little lamp glowing softly. In the bed lies a little bear child in striped pyjamas, wide awake, its eyes wide open. Beside the bed stands a small old grown-up fox with a white pointed beard, a red pointed cap and a blue cloak, his paws empty, looking at the wide-awake child, brows raised, mouth a small o.",
     after:
-      "The old fox now sprinkles shimmering golden sand from a small brown cloth sack over the child, who lies with closed eyes, smiling in its sleep. The fox smiles contently.",
+      "The old fox now sprinkles fine golden sand from a small brown cloth sack over the child, who lies with closed eyes, smiling in its sleep. The fox smiles contently.",
     sounds: ["trickle", "musicbox"],
+    made: "frames",
   },
   {
     id: "frau-holle",
@@ -262,9 +265,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The old bear woman now shakes a big fluffy white feather duvet out of the window, and snowflakes fall from it onto the village below, whose roofs and fields turn white; she smiles happily.",
     sounds: ["rustle", "whoosh"],
-    made: "frames",
     // A tent is for sleeping too.
     alsoFits: ["abenteurerin"],
+    made: true,
   },
   {
     id: "tiefseeforscherin",
@@ -278,7 +281,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "The end of a wooden jetty over a clear blue sea. Deep below the surface, on the sandy sea floor between coral and swaying seaweed, lie an old wooden treasure chest and a few colourful fish. On the jetty kneels the explorer, a grown-up fox woman with eyelashes in a red-and-white striped shirt and a white cap, her paws empty, looking down at the chest deep below, brows raised, mouth a small o.",
     after:
-      "A little yellow submarine with round windows and a small propeller now floats deep down beside the treasure chest; the explorer sits inside it and waves happily through its round front window. The jetty is empty now.",
+      "A little yellow submarine with round windows and a small propeller now floats at the surface beside the jetty, its round hatch open on top; the explorer kneels on the jetty where she was, one paw on the hatch, smiling happily, ready to dive down to the chest.",
     sounds: ["plop", "hum"],
     // Swimming goggles let one look under water too.
     alsoFits: ["schwimmer"],

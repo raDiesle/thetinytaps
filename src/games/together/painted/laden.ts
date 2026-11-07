@@ -46,9 +46,10 @@ export const PAINTED: PaintedPair[] = [
     part: "a silver soup ladle: a deep round bowl on a long handle with a hook at its end",
     cast: "both",
     before:
-      "A restaurant kitchen with a steel counter. On the stove a big pot of steaming orange soup; on the counter a row of three empty white bowls. At the counter waits a fox child in a striped T-shirt, holding out an empty bowl and a spoon, hungry. The cook, a grown-up bear in a white chef's coat, a white chef's hat and a red neckerchief, stands at the pot with empty paws, looking from the soup to the empty bowls, brows raised, mouth a small o.",
+      "A restaurant kitchen with a steel counter. On the stove a big pot of steaming orange soup; on the counter a row of three empty white bowls. At the counter waits a fox child in a striped T-shirt, holding out an empty bowl with both paws, hungry. The cook, a grown-up bear in a white chef's coat, a white chef's hat and a red neckerchief, stands at the pot with empty paws, looking from the soup to the empty bowls, brows raised, mouth a small o.",
     after: "The cook now ladles soup with a big silver ladle into the child's bowl; steam rises, and the child and the cook smile happily.",
     sounds: ["trickle", "yum"],
+    made: "part",
   },
   {
     id: "eisverkaeuferin",
@@ -64,7 +65,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The ice-cream seller now scoops a round ball of pink strawberry ice cream with a silver ice-cream scoop onto the child's cone; the child beams and she smiles happily.",
     sounds: ["ring", "yum"],
-    made: "frames",
+    made: true,
   },
   {
     id: "kassierer",
@@ -80,8 +81,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A grey cash register with big coloured buttons now stands on the counter; the cashier presses its buttons, its drawer opens, and the child drops its coin in. Both smile happily.",
     sounds: ["ding", "ring"],
-    made: "frames",
     alsoFits: ["marktfrau"],
+    made: true,
   },
   {
     id: "kellnerin",
@@ -97,7 +98,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The waitress now carries the three cups and the cake on a round silver tray to the child's table; the counter is empty, and the child and she smile happily.",
     sounds: ["clonk", "yum"],
-    made: "frames",
+    made: true,
   },
   {
     id: "marktfrau",
@@ -114,6 +115,7 @@ export const PAINTED: PaintedPair[] = [
       "A red market scale now stands on the bare corner of the table, the apples on its silver pan and its needle turned; the market seller tips them into the child's basket. Both smile happily.",
     sounds: ["clonk", "ding"],
     alsoFits: ["kassierer"],
+    made: true,
   },
   {
     id: "waffelbaeckerin",
@@ -129,5 +131,6 @@ export const PAINTED: PaintedPair[] = [
     after:
       "An open round waffle iron now stands on the counter, a golden heart-shaped waffle steaming in it; the waffle baker lifts the waffle onto the child's plate. Both smile happily.",
     sounds: ["sizzle", "yum"],
+    made: "part",
   },
 ];

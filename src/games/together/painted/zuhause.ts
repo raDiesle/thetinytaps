@@ -28,7 +28,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Brille", the: "die Brille", acc: "die Brille", emoji: "👓" },
     cast: "fox",
     before:
-      "A living room with an armchair and a little side table with a lamp. In the armchair sits a grown-up grandpa fox in a brown cardigan, holding a newspaper far out at arm's length and squinting at it; nothing sits on his nose. A fox child in a green T-shirt leans on the armrest beside him with empty paws, looking at the grandpa's squinting face, brows raised, mouth a small o.",
+      "A living room drawn whole round them: a wall with a window and a picture, a rug, an armchair and a little side table with a lamp. In the armchair sits a grown-up grandpa fox in a brown cardigan, holding a newspaper out at the full length of both arms, as far from his face as he can, squinting at it; nothing sits on his nose. A fox child in a green T-shirt leans on the armrest beside him with empty paws, looking at the grandpa's squinting face, brows raised, mouth a small o.",
     after:
       "Round black-rimmed reading glasses now sit on the grandpa fox's nose – the fox child has just put them there – and he reads the newspaper close up, the child looking into it with him; both smile happily.",
     sounds: ["rustle", "pop"],
@@ -48,8 +48,8 @@ export const PAINTED: PaintedPair[] = [
       "A children's room with a toy workbench of colourful wood in the middle; one big yellow plastic screw sticks half out of its board. A bear child in blue dungarees stands at the bench with empty paws, pressing on the screw's head with one finger, looking at it, brows raised, mouth a small o.",
     after: "The bear child now turns the screw into the board with a big toy screwdriver with a red handle, and smiles happily.",
     sounds: ["click", "squeak"],
-    made: true,
     alsoFits: ["nagel-hammer"],
+    made: true,
   },
   {
     id: "nagel-hammer",
@@ -60,7 +60,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Hammer", the: "der Hammer", acc: "den Hammer", emoji: "🔨" },
     cast: "fox",
     before:
-      "A workshop corner with a wooden workbench. On it a little wooden birdhouse is being built: its roof board lies on top, and one big nail stands up out of the roof board, not yet in. A grown-up fox in a checked shirt holds the roof board steady with both paws; a fox child in a red T-shirt beside him has empty paws and looks at the nail sticking up, brows raised, mouth a small o.",
+      "A workshop corner with a wooden workbench. On it a little wooden birdhouse is being built: its roof board lies on top, and one big nail stands up out of the roof board, not yet in. No tools anywhere: none on the bench, none on the walls. A grown-up fox in a checked shirt holds the roof board steady with both paws; a fox child in a red T-shirt beside him has empty paws and looks at the nail sticking up, brows raised, mouth a small o.",
     after:
       "The fox child now hits the nail with a hammer with a wooden handle and a grey metal head, the nail going down into the board; both foxes smile happily.",
     sounds: ["knocks"],
@@ -81,6 +81,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["rustle", "clonk"],
     // The rake's leaves go onto the dustpan too.
     alsoFits: ["laub-rechen"],
+    made: true,
   },
   {
     id: "roboter-batterie",
@@ -96,5 +97,6 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A black battery with a copper-coloured top now lies in the robot's slot, the robot's eyes light up and it raises its arms; the bear child claps happily.",
     sounds: ["click", "beeps"],
+    made: true,
   },
 ];

@@ -30,9 +30,9 @@ export const PAINTED: PaintedPair[] = [
       "A breakfast table by a sunny window. On the table in the middle a bowl of dry muesli flakes with a spoon standing in it. A fox child in pyjamas with little stars sits at the table, one paw on the spoon, looking into the dry bowl, brows raised, mouth a small o.",
     after: "The fox child now pours milk from a glass of milk over the flakes, the bowl filling up white, and smiles happily.",
     sounds: ["glug", "trickle"],
-    made: true,
     // Milk goes into the empty teacup too, and a spoon belongs to muesli.
     alsoFits: ["tasse-teekanne", "suppe-loeffel"],
+    made: true,
   },
   {
     id: "tasse-teekanne",
@@ -48,6 +48,7 @@ export const PAINTED: PaintedPair[] = [
     after: "Grandma bear now pours steaming tea from a round white teapot with blue dots into the child's cup; both smile happily.",
     sounds: ["trickle"],
     alsoFits: ["muesli-milch"],
+    made: true,
   },
   {
     id: "suppe-loeffel",
@@ -61,9 +62,9 @@ export const PAINTED: PaintedPair[] = [
       "A kitchen table with a checked tablecloth. In the middle a deep bowl of steaming noodle soup with peas. A fox child in a red T-shirt sits in front of it with empty paws, looking at the hot soup, brows raised, mouth a small o.",
     after: "The fox child now holds a silver spoon, scoops up some soup and blows on it, smiling happily.",
     sounds: ["plop", "yum"],
-    made: true,
     // A spoon is for muesli and the egg too, and the handmade pot is stirred with it.
     alsoFits: ["muesli-milch", "eierbecher-ei", "topf"],
+    made: true,
   },
   {
     id: "pausenbrot-brotdose",
@@ -78,9 +79,9 @@ export const PAINTED: PaintedPair[] = [
       "A kitchen counter in the morning sun. On a wooden board in the middle lies a sandwich cut into two halves. A bear child in a green jacket, ready to go out, stands at the counter with empty paws, looking at the sandwich, brows raised, mouth a small o: how to take it along?",
     after: "The bear child now puts the sandwich halves into a green plastic lunch box and clicks its lid shut, smiling happily.",
     sounds: ["plop", "click"],
-    made: "frames",
     // The lunch box goes into the school bag.
     alsoFits: ["schule-schulranzen", "picknickdecke-picknickkorb"],
+    made: true,
   },
   {
     id: "pfanne-pfannenwender",
@@ -89,12 +90,12 @@ export const PAINTED: PaintedPair[] = [
     the: "die Pfanne",
     toThe: "zur Pfanne",
     partner: { name: "Pfannenwender", the: "der Pfannenwender", acc: "den Pfannenwender" },
-    part: "a kitchen turner: a wide black slotted blade on a wooden handle",
+    part: "a kitchen turner: a wide silver slotted blade on a wooden handle",
     cast: "fox",
     before:
       "A kitchen stove with a frying pan on it; in the pan a pancake, its top side still pale, its edges turning golden. A grown-up fox in an apron stands at the stove, a fox child in a yellow T-shirt on a little step beside him; both have empty paws and look at the pancake, brows raised, mouth a small o.",
     after:
-      "The fox child now flips the pancake with a kitchen turner, the grown-up fox's paw over the child's paw on the handle, the pancake turning golden side up; both laugh happily.",
+      "The fox child now holds a kitchen turner with a silver slotted blade, the blade under the pancake in the pan, lifting it a little so its golden underside shows; the grown-up fox's paw lies over the child's paw on the handle. Both laugh happily.",
     sounds: ["sizzle", "whoosh"],
   },
   {
@@ -126,8 +127,8 @@ export const PAINTED: PaintedPair[] = [
       "A breakfast table by a window. In the middle a yellow egg cup on a little plate – empty, its hollow bare. A fox child in a blue pyjama sits at the table with empty paws, looking into the empty egg cup, brows raised, mouth a small o.",
     after: "A brown egg now stands in the egg cup, and the fox child taps its top with a little spoon, smiling happily.",
     sounds: ["knock", "yum"],
-    made: "frames",
     alsoFits: ["suppe-loeffel"],
+    made: true,
   },
   {
     id: "teig-ausstecher",
@@ -143,7 +144,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now presses a metal star-shaped cookie cutter into the dough; star-shaped holes are in the dough and a few dough stars lie on the baking tray, and the child smiles happily.",
     sounds: ["stamp", "yum"],
-    made: "frames",
+    made: true,
   },
   {
     id: "hochstuhl-laetzchen",

@@ -373,11 +373,21 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
   const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   const gap = [0, 2, 4].map((i) => parseInt(gapHex.slice(i, i + 2), 16));
+  // The gap sometimes comes back far darker than asked (a plum 150, 45, 105 round two pairs' frames, November 2026, left
+  // as bands): where the sheet has a plain border of a magenta-ish colour, that colour is gap too.
+  const border = [];
+  for (let x = 0; x < w; x += 4) border.push((2 * w + x) * 3, ((h - 3) * w + x) * 3);
+  const median = (c) => border.map((p) => data[p + c]).sort((a, b) => a - b)[border.length >> 1];
+  const seen = [median(0), median(1), median(2)];
+  const plain = border.filter((p) => Math.hypot(data[p] - seen[0], data[p + 1] - seen[1], data[p + 2] - seen[2]) < 40).length / border.length;
+  const tinted = (c) => [0, 1, 2].every((i) => (gap[i] > 128 ? c[i] - Math.min(...c) > 40 : c[i] <= Math.min(...c) + 10));
+  const second = plain > 0.8 && tinted(seen) ? seen : null;
   const isGap = (x, y) => {
     const p = (y * w + x) * 3;
     // Wide enough for the darker magenta the book's softened colours bring (198, 24, 147 left a band of gap on two
     // pictures, November 2026); a cut still needs most of a whole row or column in it.
-    return Math.hypot(data[p] - gap[0], data[p + 1] - gap[1], data[p + 2] - gap[2]) < 150;
+    if (Math.hypot(data[p] - gap[0], data[p + 1] - gap[1], data[p + 2] - gap[2]) < 150) return true;
+    return !!second && Math.hypot(data[p] - second[0], data[p + 1] - second[1], data[p + 2] - second[2]) < 50;
   };
   // A pixel tinted by the gap colour: its strongest channels rise above its weakest as the gap's do (magenta: red and
   // blue well above green), even where it is blended with the picture's paper.
@@ -386,6 +396,8 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
   const isTint = (x, y) => {
     const p = (y * w + x) * 3;
     const top = Math.max(...lows.map((i) => data[p + i]));
+    // Blended with the paper the plum gap is a dusty pink, far from magenta's tint but near the plum itself.
+    if (second && Math.hypot(data[p] - second[0], data[p + 1] - second[1], data[p + 2] - second[2]) < 90 && data[p] - data[p + 1] > 30) return true;
     return highs.length > 0 && lows.length > 0 && highs.every((i) => data[p + i] > 110 && data[p + i] - top > 45);
   };
   const columnGap = (x, y0 = 0, y1 = h) => {
@@ -485,6 +497,9 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
         if (c < cols - 1) x1 -= insetX;
         if (r > 0) y0 += insetY;
         if (r < rows - 1) y1 -= insetY;
+        // The outermost line still blends with the border round the sheet: a faint pink row stayed on every frame of
+        // 140 pairs (review, November 2026).
+        [x0, x1, y0, y1] = [x0 + 2, x1 - 2, y0 + 2, y1 - 2];
       }
       pieces.push(
         await sharp(input)

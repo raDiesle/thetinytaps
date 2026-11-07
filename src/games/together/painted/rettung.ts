@@ -50,8 +50,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The police officer now blows a silver whistle on a red cord and points with his white-gloved arm: the cars on one side drive on in a neat row while the others wait. He and the drivers smile.",
     sounds: ["whistle", "engine"],
-    made: true,
     alsoFits: ["rettungsschwimmerin", "schwimmlehrer", "polizistin"],
+    made: true,
   },
   {
     id: "sanitaeter",
@@ -67,6 +67,7 @@ export const PAINTED: PaintedPair[] = [
       "A white ambulance with a red stripe and a blue light on its roof now stands on the road at the playground's edge, its back doors open; the paramedic carries the child to it, and the child smiles a little.",
     sounds: ["siren"],
     alsoFits: ["aerztin", "hubschrauberpilotin", "krankenpfleger"],
+    made: true,
   },
   {
     id: "hubschrauberpilotin",
@@ -77,9 +78,9 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Hubschrauber", the: "der Hubschrauber", acc: "den Hubschrauber", emoji: "🚁" },
     cast: "bear",
     before:
-      "High mountains under a blue sky. Halfway up a steep rocky cliff a little white lamb stands stuck on a narrow ledge, bleating. At the foot of the cliff stands the rescue pilot, a grown-up bear woman with eyelashes in a red flight suit and a white flying helmet, her paws empty, looking up at the lamb, brows raised, mouth a small o: the ledge is far too high.",
+      "A green mountain meadow under a blue sky, snowy peaks behind. On the right lies an empty round landing pad, a flat grey circle with a white ring painted on it. On the left stands the rescue pilot, a grown-up bear woman with eyelashes in a red flight suit and a white flying helmet, her paws empty; beside her a little white lamb with a bandaged front leg sits on a blue blanket. Both look at the empty landing pad, brows raised, mouth a small o.",
     after:
-      "A red rescue helicopter now hovers beside the ledge, the pilot in its cockpit; a rope hangs down from it and the lamb is lifted up safely in a harness. The pilot and the lamb are happy.",
+      "A red rescue helicopter now stands on the landing pad, its rotor still and its side door open. The pilot and the lamb stay exactly where they were, both smiling at it.",
     sounds: ["rotor"],
     alsoFits: ["pilot", "sanitaeter", "feuerwehrfrau"],
   },
@@ -97,6 +98,7 @@ export const PAINTED: PaintedPair[] = [
       "The firefighter now sprays white foam from a red fire extinguisher onto the grill; the flames are out, only a little smoke rises. He smiles happily.",
     sounds: ["hiss", "whoosh"],
     alsoFits: ["feuerwehr", "feuerwehrfrau"],
+    made: true,
   },
   {
     id: "polizistin",
@@ -105,13 +107,14 @@ export const PAINTED: PaintedPair[] = [
     the: "die Polizistin",
     toThe: "die Polizistin",
     partner: { name: "Polizeihund", the: "der Polizeihund", acc: "den Polizeihund" },
-    part: "a brown-and-black shepherd dog in a dark police harness, sitting upright, ears pricked",
+    part: "a brown-and-black shepherd dog in a plain dark-blue harness with no letters, sitting upright, ears pricked",
     cast: "both",
     before:
       "A big park with tall grass and thick bushes. A fox child in a blue T-shirt stands sadly at the bushes, pointing into them: its teddy is lost somewhere in there. Beside it stands the police officer, a grown-up bear woman with eyelashes in a dark-blue police uniform and a police cap, holding an empty leash with nothing on it, looking at the thick bushes, brows raised, mouth a small o.",
     after:
-      "A brown-and-black shepherd dog in a police harness is now on the leash; it sniffs into the bushes and pulls the teddy out. The fox child hugs the teddy, and the officer smiles happily.",
+      "A brown-and-black shepherd dog in a plain dark-blue harness with no letters is now on the leash; it sniffs into the bushes and pulls the teddy out. The fox child hugs the teddy, and the officer smiles happily.",
     sounds: ["rustle", "giggle"],
     alsoFits: ["polizist", "schaefer"],
+    made: "frames",
   },
 ];

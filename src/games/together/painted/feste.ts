@@ -30,7 +30,8 @@ export const PAINTED: PaintedPair[] = [
     cast: "fox",
     before:
       "A cosy living room at Christmas with a window showing falling snow outside. In the middle a big Christmas tree decorated with red and golden baubles and a garland; the very tip of its top is bare. A grown-up fox in a red jumper lifts a fox child in green pyjamas up towards the top of the tree; the child's paws are empty, and both look at the bare tip, brows raised, mouth a small o.",
-    after: "The fox child now puts a big shining golden star onto the tree's tip, and it glows. The child and the grown-up fox smile happily.",
+    after:
+      "The fox child now puts a big golden star onto the tree's tip, a plain golden star with no rays or glow round it. The child and the grown-up fox smile happily.",
     sounds: ["twinkle", "chime"],
     // Candles would go on a Christmas tree too.
     alsoFits: ["torte-kerze"],
@@ -46,10 +47,12 @@ export const PAINTED: PaintedPair[] = [
     cast: "bear",
     before:
       "A kitchen table at Easter, a window with spring sunshine behind. In the middle a plain white egg in an egg cup, beside it three little open pots of paint: red, blue and yellow. A bear child in a striped T-shirt and a little apron sits at the table with empty paws, looking at the white egg and the paint pots, brows raised, mouth a small o.",
-    after: "The bear child now holds a thin paintbrush with a wooden handle and paints colourful stripes and dots on the egg, smiling happily.",
+    after:
+      "The egg stays in its egg cup, the only egg; the bear child now holds a thin paintbrush with a wooden handle and paints colourful stripes on the egg in the cup, smiling happily.",
     sounds: ["swirl"],
     // The handmade paper's crayons would colour an egg too, and the Easter nest's eggs are painted ones.
     alsoFits: ["papier", "osternest-ostereier"],
+    made: "part",
   },
   {
     id: "laterne-licht",
@@ -64,9 +67,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A small yellow light bulb now glows inside the lantern, seen through its thin paper, and the lantern shines warm orange in the dark. The fox child smiles happily, holding it up high.",
     sounds: ["click", "chime"],
-    made: true,
     // The birthday candles, the campfire's flame and the torch would light a lantern too.
     alsoFits: ["torte-kerze", "feuerstelle-feuer", "zelt-taschenlampe"],
+    made: true,
   },
   {
     id: "blumenstrauss-vase",
@@ -81,9 +84,9 @@ export const PAINTED: PaintedPair[] = [
       "A sunny living room, a window behind and a table with a white tablecloth. In the middle of the table a bunch of colourful tulips and daisies tied with a ribbon lies flat, its flower heads beginning to droop. A bear child in a light-blue T-shirt stands at the table with empty paws, looking at the drooping flowers, brows raised, mouth a small o.",
     after: "The flowers now stand upright and fresh in a tall blue glass vase full of water. The bear child smiles happily, both paws on the vase.",
     sounds: ["rustle", "plop"],
-    made: "frames",
     // The handmade flower's watering can would water a bouquet too.
     alsoFits: ["blume"],
+    made: true,
   },
   {
     id: "osternest-ostereier",
@@ -92,14 +95,15 @@ export const PAINTED: PaintedPair[] = [
     the: "das Osternest",
     toThe: "zum Osternest",
     partner: { name: "Ostereier", the: "die Ostereier", acc: "die Ostereier", plural: true },
-    part: "three colourful Easter eggs painted with stripes and dots",
+    part: "exactly three Easter eggs lying together, a red one, a blue one and a yellow one, each painted with white stripes and dots",
     cast: "fox",
     before:
       "A spring garden with green grass, a bush and yellow daffodils. In the middle in the grass a round nest of straw, empty. A fox child in a light-green T-shirt kneels beside it with empty paws, looking into the empty nest, brows raised, mouth a small o.",
-    after: "Three colourful Easter eggs painted with stripes and dots now lie in the nest, and the fox child points at them, smiling happily.",
+    after:
+      "Three Easter eggs now lie in the nest, a red one, a blue one and a yellow one, each painted with white stripes and dots, and the fox child points at them, smiling happily.",
     sounds: ["plop", "twinkle"],
-    made: "frames",
     alsoFits: ["osterei-pinsel"],
+    made: "frames",
   },
   {
     id: "plaetzchenteig-ausstechform",
@@ -115,6 +119,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now presses a star-shaped metal biscuit cutter into the dough; star-shaped biscuits lie on the baking tray, and star-shaped holes are left in the dough. Both bears smile happily.",
     sounds: ["stamp", "yum"],
+    made: true,
   },
   {
     id: "clownskostuem-clownsnase",
@@ -129,8 +134,8 @@ export const PAINTED: PaintedPair[] = [
       "A children's room on carnival day with colourful paper streamers on the wall. In the middle a fox child in a colourful clown costume with big dots, a ruffled collar and a small pointed clown hat stands touching its own plain dark nose with one empty paw, brows raised, mouth a small o.",
     after: "The fox child now wears a round red clown nose over its own nose and laughs happily, arms spread out.",
     sounds: ["boing", "giggle"],
-    made: "frames",
     // A red nose could be a snowman's nose too.
     alsoFits: ["schneemann-karotte"],
+    made: true,
   },
 ];

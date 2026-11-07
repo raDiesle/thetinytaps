@@ -17,6 +17,7 @@ export const PAINTED: PaintedPair[] = [
       "A big white passenger plane now stands at the stairs, its door open at their top; the pilot stands in the doorway and waves happily, his suitcase gone with him.",
     sounds: ["jet"],
     alsoFits: ["hubschrauberpilotin"],
+    made: true,
   },
   {
     id: "busfahrerin",
@@ -59,7 +60,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "In front of a train station building, by the kerb. A bear child stands there with a big suitcase and a teddy under one arm, waving down the road. Beside it stands the driver, a grown-up fox in a white shirt with a black cap with a yellow-and-black chequered band, his paws empty, looking down the empty road, brows raised, mouth a small o.",
     after:
-      "A yellow car with a sign on its roof now stands at the kerb, the fox driver holds its back door open and lifts the suitcase in. The bear child smiles happily.",
+      "A yellow car with a sign on its roof now stands at the kerb, its back door open; the fox driver stands where he was and holds the door. The bear child stands where it was with its one suitcase and teddy, smiling happily.",
     sounds: ["engine", "honk"],
   },
   {
@@ -73,7 +74,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A harbour quay with an iron bollard, a few wooden crates and a gangway that leads out over the water to nothing. The water beside the quay is empty. The captain, a grown-up bear in a dark-blue coat with golden buttons and a white captain's cap, stands at the gangway with empty paws, looking at the empty water, brows raised, mouth a small o.",
     after:
-      "A big ship with a white hull and a funnel now lies at the quay, the gangway leading onto it; the captain stands at its rail and waves happily, smoke rising from the funnel.",
+      "A big ship with a white hull and a funnel now lies at the quay, the gangway leading onto it; the captain stays on the quay where he was, one paw on the gangway's rail, and waves happily, smoke rising from the funnel.",
     sounds: ["splash", "honk"],
     alsoFits: ["pirat", "segler", "matrose", "rettungsschwimmerin", "sternguckerin"],
   },
@@ -90,6 +91,7 @@ export const PAINTED: PaintedPair[] = [
     after: "A big lorry with a long trailer now stands backed up to the ramp, the crates loaded into it; the driver leans out of its cab and waves happily.",
     sounds: ["engine", "honk"],
     alsoFits: ["paketbotin", "muellwerker"],
+    made: true,
   },
   {
     id: "strassenbahnfahrer",
@@ -102,7 +104,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A city street with two rails set into the cobbles and a wire hanging above them, and a low raised platform between the rails and the pavement. The driver, a grown-up fox in a red uniform jacket, a yellow tie and a dark peaked cap, stands on the platform with empty paws, looking along the empty rails, brows raised, mouth a small o.",
     after:
-      "A tram now stands on the rails at the platform, its pole touching the wire above; the fox sits in its front cab and rings its bell, smiling happily.",
+      "A tram now stands on the rails at the platform, its pole touching the wire above and its front door open; the fox stays on the platform where he was, one paw on the open door, smiling happily.",
     sounds: ["bells", "train"],
   },
   {
@@ -118,6 +120,7 @@ export const PAINTED: PaintedPair[] = [
     after: "The rider now sits on a red motorbike on the road, her helmet on, and rides off along it, smiling happily.",
     sounds: ["engine"],
     alsoFits: ["rennfahrerin", "radfahrerin"],
+    made: true,
   },
   {
     id: "matrose",
@@ -132,6 +135,7 @@ export const PAINTED: PaintedPair[] = [
     after: "The sailor now lowers a big black anchor on the chain over the bow into the water, and the ship stays still in the bay. He smiles happily.",
     sounds: ["rattle", "splash"],
     alsoFits: ["kapitaen", "pirat", "segler"],
+    made: true,
   },
   {
     id: "seilbahnfuehrerin",
@@ -161,8 +165,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A yellow tow truck with an orange light on its cab now stands in front of the car and lifts the car's front up on its hook; the bear works its lever and smiles happily.",
     sounds: ["engine", "rattle"],
-    made: "frames",
     alsoFits: ["mechanikerin"],
+    made: true,
   },
   {
     id: "schneepflugfahrer",
@@ -171,7 +175,7 @@ export const PAINTED: PaintedPair[] = [
     the: "der Schneepflugfahrer",
     toThe: "der Schneepflugfahrer",
     partner: { name: "Schneepflug", the: "der Schneepflug", acc: "den Schneepflug" },
-    part: "an orange snowplough lorry seen from the side with a big slanted blade at its front",
+    part: "an orange snowplough lorry seen from the side with a big slanted orange blade at its front",
     cast: "fox",
     before:
       "A village road in winter, buried deep in fresh snow; a small red car is stuck in it up to its wheels, snow piled high. The road worker, a grown-up fox in an orange winter jacket with reflective stripes and a woolly hat, stands at the edge of the road with empty paws, looking at the deep snow, brows raised, mouth a small o.",
@@ -179,5 +183,6 @@ export const PAINTED: PaintedPair[] = [
       "An orange snowplough lorry with a big slanted blade at its front now drives along the road and pushes the snow aside; the fox waves from its cab, and behind it the road is clear. He smiles happily.",
     sounds: ["engine", "whoosh"],
     alsoFits: ["strassenkehrer"],
+    made: "frames",
   },
 ];

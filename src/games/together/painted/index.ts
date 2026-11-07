@@ -73,8 +73,8 @@ export interface PaintedPair {
   sounds: SoundName[];
   /** Other pairs of its kind whose partner fits this one too, or which this one's partner fits (see `SceneSpec`). */
   alsoFits?: string[];
-  /** Its pictures are made and in `bilder/` (no longer queued), or only its two frames, its `part` still to come. */
-  made?: true | "frames";
+  /** Its pictures are made and in `bilder/` (no longer queued), or only its two frames („frames“, its `part` still to come), or only its `part` („part“, its frames drawn again). */
+  made?: true | "frames" | "part";
 }
 
 /** All painted pairs, in the topics' order. */

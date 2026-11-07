@@ -33,8 +33,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The painter now holds a paintbrush with a wooden handle and red paint on its tip in her free paw and paints the tree onto the canvas, half of it already there, smiling happily.",
     sounds: ["swirl", "scrub"],
-    made: true,
     alsoFits: ["anstreicher"],
+    made: true,
   },
   {
     id: "astronautin",
@@ -45,7 +45,7 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Rakete", the: "die Rakete", acc: "die Rakete", emoji: "🚀" },
     cast: "bear",
     before:
-      "A launch site at dusk: a tall steel launch tower beside an empty round concrete launch pad, a big round moon low in the sky above. The astronaut, a grown-up bear woman with eyelashes in a white spacesuit with a blue badge, holds her round helmet under one arm, the other paw empty, and looks from the empty launch pad up to the moon, brows raised, mouth a small o.",
+      "A launch site at dusk: a tall steel launch tower beside an empty round concrete launch pad, a big round moon low in the sky above. The astronaut, a grown-up bear woman with eyelashes in a plain white spacesuit with no badge, logo, flag or letters, holds her round helmet under one arm, the other paw empty, and looks from the empty launch pad up to the moon, brows raised, mouth a small o.",
     after:
       "A white rocket with red fins and a red tip now stands on the launch pad beside the tower and lifts off with a bright flame and clouds of smoke; the astronaut waves happily from its round window, her helmet on.",
     sounds: ["launch"],
@@ -61,7 +61,8 @@ export const PAINTED: PaintedPair[] = [
     cast: "fox",
     before:
       "The front of a house with one big window in the middle, its glass grey with dust, smudges and muddy paw prints, so you can hardly see through it. A bucket of soapy water stands on the pavement below. The window cleaner, a grown-up fox in green overalls with blue straps and a yellow cap, stands in front of the window with empty paws, looking at the dirty glass, brows raised, mouth a small o.",
-    after: "The window cleaner now wipes the glass with a yellow sponge, foam on it; the wiped half of the window sparkles clean. He smiles happily.",
+    after:
+      "The window cleaner now wipes the glass with a yellow sponge, foam on it; the wiped half of the window is clear and you can see through it, the other half still dusty. He smiles happily.",
     sounds: ["squeak", "scrub"],
     alsoFits: ["obstbaeuerin"],
   },
@@ -92,8 +93,8 @@ export const PAINTED: PaintedPair[] = [
       "A street in front of a house with a long garden path up to its front door. On the pavement stands a tall tower of five brown cardboard parcels, piled on each other, much too heavy to lift. The parcel carrier, a grown-up bear woman with eyelashes in a brown uniform and a yellow cap, stands beside the tower with empty paws, looking from the heavy parcels to the far front door, brows raised, mouth a small o.",
     after: "The parcel carrier now pushes the tower of parcels up the garden path on a red hand truck with two black wheels, smiling happily.",
     sounds: ["rattle", "doorbell"],
-    made: "frames",
     alsoFits: ["lkw-fahrerin"],
+    made: true,
   },
   {
     id: "schneiderin",
@@ -107,8 +108,9 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A tailor's shop with a tailor's dummy wearing a half-made dress and a tall mirror behind. On the table in the middle lies a little blue jacket with a big rip in its sleeve. The tailor, a grown-up bear woman with eyelashes in a pink dress with a tape measure round her neck, stands at the table with empty paws, looking at the rip, brows raised, mouth a small o.",
     after:
-      "The tailor now sews the rip shut with a needle and red thread, a wooden spool of red thread in her other paw; half of the rip is already sewn with neat red stitches. She smiles happily.",
+      "The jacket lies on the table where it was; the tailor now pushes a long silver needle with red thread through its sleeve at the rip, a wooden spool of red thread in her other paw, and half of the rip is already sewn shut with big red stitches. She smiles happily.",
     sounds: ["whirr"],
+    made: "part",
   },
   {
     id: "forscherin",
@@ -122,8 +124,8 @@ export const PAINTED: PaintedPair[] = [
       "A bright laboratory with shelves of glass jars and potted plants, and an empty white table in the middle. The scientist, a grown-up fox woman with eyelashes in a white lab coat with blue buttons, holds a small glass slide with a tiny green leaf on it up to her eye, squinting, brows raised, mouth a small o: it is far too small to see.",
     after: "A grey microscope now stands on the table with the glass slide under its lens; the scientist looks into it, amazed and happy.",
     sounds: ["click", "hum"],
-    made: true,
     alsoFits: ["detektivin"],
+    made: true,
   },
   {
     id: "muellwerker",
@@ -139,6 +141,7 @@ export const PAINTED: PaintedPair[] = [
     after: "An orange rubbish lorry now stands at the kerb, and the refuse collector rolls a bin to its back, where it is tipped in. The bear smiles happily.",
     sounds: ["rumble", "beeps"],
     alsoFits: ["lkw-fahrerin", "strassenkehrer"],
+    made: true,
   },
   {
     id: "raumpflegerin",
@@ -153,8 +156,8 @@ export const PAINTED: PaintedPair[] = [
       "A living room with a sofa and a big round rug in the middle, the rug covered in crumbs, fluff and biscuit bits. The cleaner, a grown-up bear woman with eyelashes in a lilac dress, a blue headscarf and an apron, stands on the rug with empty paws, looking down at the crumbs, brows raised, mouth a small o.",
     after: "The cleaner now vacuums the rug with a red vacuum cleaner; the half behind it is clean. She smiles happily.",
     sounds: ["hum", "whirr"],
-    made: "frames",
     alsoFits: ["hexe"],
+    made: true,
   },
   {
     id: "strassenkehrer",
@@ -170,7 +173,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A small orange street-sweeping vehicle with two round spinning brushes at its front now drives along the street, the fox in its cab; behind it the street is clean. He smiles happily.",
     sounds: ["whirr", "scrub"],
-    made: "frames",
     alsoFits: ["muellwerker", "schneepflugfahrer", "hexe"],
+    made: true,
   },
 ];

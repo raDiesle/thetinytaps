@@ -53,8 +53,8 @@ export function framesJob(p: PaintedPair, before: string, after: string): Queued
 /** The pictures of the painted pairs still to make, as the picture queue takes them: one request per pair for its two frames, and the painted partners four to a sheet. */
 export const TOGETHER_PICTURE_QUEUE: QueuedPicture[] = PAINTED.filter((p) => p.made !== true).flatMap((p): QueuedPicture[] => {
   const pictures: QueuedPicture[] = [];
-  if (!p.made) pictures.push(framesJob(p, `${DIR}/${p.id}-1.webp`, `${DIR}/${p.id}-2.webp`));
-  if (p.part)
+  if (p.made !== "frames") pictures.push(framesJob(p, `${DIR}/${p.id}-1.webp`, `${DIR}/${p.id}-2.webp`));
+  if (p.part && p.made !== "part")
     pictures.push({
       id: `zusammen-teil-${p.id}`,
       file: `${DIR}/teile/${p.id}.webp`,

@@ -17,6 +17,7 @@ export const PAINTED: PaintedPair[] = [
       "A tractor with big black back wheels now stands hitched to the plough and pulls it over the field, the farmer at its wheel; new furrows lie behind it. She smiles happily.",
     sounds: ["engine"],
     alsoFits: ["reiterin", "bauer", "maehdrescherfahrer"],
+    made: true,
   },
   {
     id: "gaertner",
@@ -32,7 +33,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The gardener now pushes a red lawn mower over the lawn; behind it lies a wide stripe of short neat grass, and the ball can be seen. He smiles happily.",
     sounds: ["engine", "whirr"],
-    made: "frames",
+    made: true,
   },
   {
     id: "imkerin",
@@ -48,6 +49,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The beekeeper now holds a bell-shaped straw beehive under the branch, and the bees fly into it through its little hole; the branch is nearly empty. She smiles happily under her veil.",
     sounds: ["buzz", "thump"],
+    made: true,
   },
   {
     id: "holzfaeller",
@@ -61,8 +63,8 @@ export const PAINTED: PaintedPair[] = [
       "A forest clearing with tall fir trees round it and an empty woodshed. In the middle a thick tree stump used as a chopping block, a big round log standing on it, whole. The woodcutter, a grown-up bear in a red-and-black checked shirt and a dark woolly hat, stands at the chopping block with empty paws, looking at the log, brows raised, mouth a small o.",
     after: "The woodcutter now swings an axe with a wooden handle down onto the log, and it splits in two halves that fall to the sides. He smiles happily.",
     sounds: ["knock", "knock", "creak"],
-    made: true,
     alsoFits: ["tischlerin"],
+    made: true,
   },
   {
     id: "bauer",
@@ -79,6 +81,7 @@ export const PAINTED: PaintedPair[] = [
       "The farmer now milks the cow into a shiny metal milk pail standing under the udder, white milk splashing into it. The cow and the farmer look happy.",
     sounds: ["trickle", "drops"],
     alsoFits: ["baeuerin", "maehdrescherfahrer", "pferdepflegerin"],
+    made: true,
   },
   {
     id: "schaefer",
@@ -94,8 +97,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A black-and-white sheepdog now runs round the sheep and herds them together towards the open pen, two of them already inside. The shepherd smiles happily.",
     sounds: ["whistle", "hop"],
-    made: "frames",
     alsoFits: ["polizistin"],
+    made: true,
   },
   {
     id: "obstbaeuerin",
@@ -109,8 +112,8 @@ export const PAINTED: PaintedPair[] = [
       "An orchard on a sunny day. In the middle a tall apple tree full of red apples, all hanging high up in its crown; under it an empty wicker basket. The fruit farmer, a grown-up fox woman with eyelashes in a yellow blouse, a green apron and a sun hat, stands under the tree stretching up with empty paws, far too short to reach the apples, brows raised, mouth a small o.",
     after: "A wooden ladder now leans against the tree; the fruit farmer stands on it and picks the red apples, the basket half full. She smiles happily.",
     sounds: ["rustle", "plop"],
-    made: true,
     alsoFits: ["feuerwehrfrau", "elektrikerin", "fensterputzer"],
+    made: true,
   },
   {
     id: "pferdepflegerin",
@@ -126,6 +129,7 @@ export const PAINTED: PaintedPair[] = [
     after: "The stable keeper now forks hay from the heap into the manger with a pitchfork; the horse munches happily and she smiles.",
     sounds: ["rustle", "munch"],
     alsoFits: ["bauer"],
+    made: true,
   },
   {
     id: "maehdrescherfahrer",
@@ -142,5 +146,6 @@ export const PAINTED: PaintedPair[] = [
       "A green combine harvester now drives through the wheat, its wide reel turning at its front, the fox in its high cab; behind it lies a stripe of cut stubble. He smiles happily.",
     sounds: ["engine", "rustle"],
     alsoFits: ["baeuerin", "bauer"],
+    made: true,
   },
 ];

@@ -30,8 +30,8 @@ export const PAINTED: PaintedPair[] = [
       "A street on a grey rainy day: grey clouds, rain pouring down, a house front behind. In the middle a fox child in a light-blue T-shirt and dark blue trousers stands in the rain, getting wet, holding both empty paws over its head and looking up at the rain, unhappy.",
     after: "The fox child now holds an open red umbrella over its head; the raindrops bounce off it, and the fox child underneath is dry and smiles happily.",
     sounds: ["pop", "drops"],
-    made: "frames",
     alsoFits: ["pfuetze-gummistiefel"],
+    made: true,
   },
   {
     id: "pfuetze-gummistiefel",
@@ -47,8 +47,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now wears a pair of yellow rubber boots and jumps into the middle of the puddle, the brown water splashing up high. The bear child laughs happily.",
     sounds: ["splash"],
-    made: "frames",
     alsoFits: ["regen-regenschirm", "schuh-socken"],
+    made: true,
   },
   {
     id: "sonne-sonnenbrille",
@@ -64,6 +64,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["pop", "twinkle"],
     // A cap shades the eyes from the sun too.
     alsoFits: ["zeitung-brille"],
+    made: true,
   },
   {
     id: "schnee-schlitten",
@@ -75,10 +76,12 @@ export const PAINTED: PaintedPair[] = [
     part: "a wooden sledge with red metal runners and a rope at its front",
     cast: "bear",
     before:
-      "A snowy hill on a winter day with a few snow-covered fir trees beside it. At the top of the long white slope in the middle stands a bear child in a blue winter jacket and a red woolly hat, empty-pawed, looking down the slope, brows raised, mouth a small o.",
-    after: "The bear child now sits on a wooden sledge with red runners and slides down the slope, snow spraying up, laughing happily.",
+      "A snowy hilltop on a winter day with a few snow-covered fir trees beside it, a long white slope going down to the right. Big in front, at the top of the slope, stands a bear child in a blue winter jacket and a red woolly hat, empty-pawed, looking down the slope, brows raised, mouth a small o.",
+    after:
+      "The bear child now sits on a wooden sledge with red runners at the top of the slope, where it stood, holding its rope, ready to slide down, laughing happily.",
     sounds: ["slide", "whoosh"],
     alsoFits: ["see-schlittschuhe", "schal-handschuhe"],
+    made: "part",
   },
   {
     id: "drachen-wind",
@@ -93,6 +96,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A strong wind now blows across the meadow, shown as white swirling wind lines coming from the left; the grass and the tree's leaves lean with it, and the kite flies high in the sky on its taut string. The fox child holds the string tight and laughs happily.",
     sounds: ["blow", "whoosh"],
+    made: true,
   },
   {
     id: "see-schlittschuhe",
@@ -106,9 +110,9 @@ export const PAINTED: PaintedPair[] = [
       "A frozen pond on a cold winter day, its ice smooth and light blue, snow on its banks and on a few bare trees. A bear child in a purple winter jacket, a woolly hat and plain brown boots stands at the edge of the ice, empty-pawed, looking out over the smooth ice, brows raised, mouth a small o.",
     after: "The bear child now wears a pair of white ice skates with silver blades and glides across the ice on one leg, arms spread out, laughing happily.",
     sounds: ["slide", "twinkle"],
-    made: true,
     // A sledge slides on the ice too.
     alsoFits: ["schnee-schlitten"],
+    made: true,
   },
   {
     id: "schneeweg-schneeschieber",
@@ -124,5 +128,6 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The fox child now pushes a snow shovel with a wide red blade along the path, the grown-up fox helping with one paw on the handle; a cleared strip of path lies behind them. Both smile happily.",
     sounds: ["crunch", "slide"],
+    made: "part",
   },
 ];

@@ -28,7 +28,8 @@ export const PAINTED: PaintedPair[] = [
     cast: "bear",
     before:
       "A car workshop with tyres stacked against the wall. In the middle a small red car, its front wheel sitting loose and crooked on the car, tilted out at the top, as if it might fall off. The mechanic, a grown-up bear woman with eyelashes in grey overalls with blue straps and a red cap, crouches beside the wheel with empty paws, looking at it, brows raised, mouth a small o.",
-    after: "The mechanic now turns the wheel's nut tight with a big silver spanner; the wheel stands straight on the car again. She smiles happily.",
+    after:
+      "The mechanic now holds a big silver spanner on the nut in the very middle of the wheel and turns it; the wheel stands straight on the car again. She smiles happily.",
     sounds: ["click", "rattle"],
     alsoFits: ["klempner", "handwerker", "abschleppfahrer"],
   },
@@ -45,8 +46,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The carpenter now saws through the plank along the pencil line with a saw with a wooden handle; sawdust falls, the cut is half done. She smiles happily.",
     sounds: ["saw"],
-    made: true,
     alsoFits: ["handwerker", "holzfaeller"],
+    made: true,
   },
   {
     id: "handwerker",
@@ -61,6 +62,7 @@ export const PAINTED: PaintedPair[] = [
     after: "The handyman now knocks the nail into the chair's leg with a hammer with a wooden handle; the chair stands firm. He smiles happily.",
     sounds: ["knock", "knock"],
     alsoFits: ["tischlerin", "bauarbeiterin", "mechanikerin"],
+    made: true,
   },
   {
     id: "elektrikerin",
@@ -74,8 +76,8 @@ export const PAINTED: PaintedPair[] = [
       "A room in the evening, dim and grey, the window dark blue. From the ceiling hangs a lamp with an empty socket: nothing in it, no light. Under it stands a small stepladder, and on it the electrician, a grown-up fox woman with eyelashes in a yellow work jacket, a white hard hat and a tool belt, reaching up with empty paws towards the empty socket, brows raised, mouth a small o.",
     after: "The electrician now screws a light bulb into the socket, and it glows bright yellow: the whole room is warm and light. She smiles happily.",
     sounds: ["click", "ding"],
-    made: true,
     alsoFits: ["obstbaeuerin"],
+    made: true,
   },
   {
     id: "kranfuehrer",
@@ -88,7 +90,7 @@ export const PAINTED: PaintedPair[] = [
     before:
       "A building site behind a red-and-white barrier: a tall house, its walls built up to the third floor, its top still open. On the ground in front lies a heavy pallet of red bricks with chains round it. The driver, a grown-up fox in an orange work jacket, a yellow safety vest and a white hard hat, stands beside the pallet with empty paws, looking up to the top of the house, brows raised, mouth a small o: far too high to carry the bricks up.",
     after:
-      "A tall yellow tower crane now stands beside the house and lifts the pallet of bricks up high on its hook; the fox sits in the crane's cab and smiles happily.",
+      "A tall yellow tower crane now stands beside the house and lifts the pallet of bricks up high on its hook, its cab empty; the fox stands where he was, steering it with a small yellow control box in his paws, and smiles happily.",
     sounds: ["whirr", "thump"],
     alsoFits: ["bauarbeiterin", "baggerfahrer"],
   },
@@ -104,8 +106,8 @@ export const PAINTED: PaintedPair[] = [
       "A bathroom with tiles and a washbasin. In the middle a white toilet, blocked, its water standing up to the rim, a small puddle on the floor beside it. The plumber, a grown-up fox in blue overalls with grey straps and a red cap, stands beside the toilet with empty paws, looking at the high water, brows raised, mouth a small o.",
     after: "The plumber now pumps a red rubber plunger with a wooden handle in the toilet; the water gurgles away and the puddle is gone. He smiles happily.",
     sounds: ["squeak", "glug"],
-    made: true,
     alsoFits: ["mechanikerin"],
+    made: true,
   },
   {
     id: "baggerfahrer",
@@ -122,6 +124,7 @@ export const PAINTED: PaintedPair[] = [
       "A yellow digger now stands at the marked patch and digs a hole with its toothed bucket, a heap of earth beside it; the bear sits in its cab and smiles happily.",
     sounds: ["rumble", "beeps"],
     alsoFits: ["bauarbeiterin", "kranfuehrer"],
+    made: true,
   },
   {
     id: "anstreicher",
@@ -136,8 +139,8 @@ export const PAINTED: PaintedPair[] = [
       "An empty room being redone: a big bare grey wall, the floor covered with a sheet, an open bucket of blue paint with a paint tray beside it. The painter, a grown-up fox in paint-spotted white overalls and a white cap, stands at the wall with empty paws, looking from the paint to the grey wall, brows raised, mouth a small o.",
     after: "The painter now rolls blue paint up the wall with a paint roller; a wide blue stripe already covers the grey. He smiles happily.",
     sounds: ["swirl", "scrub"],
-    made: "frames",
     alsoFits: ["malerin"],
+    made: true,
   },
   {
     id: "strassenbauerin",
@@ -153,6 +156,6 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A yellow road roller with a big smooth steel drum now rolls over the asphalt, the bear in its seat; behind it the road is flat and smooth. She smiles happily.",
     sounds: ["rumble", "hiss"],
-    made: "frames",
+    made: true,
   },
 ];

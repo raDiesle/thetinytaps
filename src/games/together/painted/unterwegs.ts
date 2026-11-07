@@ -30,7 +30,7 @@ export const PAINTED: PaintedPair[] = [
       "A quiet path in a park with a bench at the side. In the middle a small red children's bicycle stands ready on its stand. A bear child in a green T-shirt and blue trousers stands beside it, one paw on the handlebar, the other paw on top of its own bare head, looking unsure.",
     after: "The bear child now wears a light-blue bicycle helmet, its strap closed under the chin, sits on the bicycle and rides off, smiling happily.",
     sounds: ["click", "ring"],
-    made: "frames",
+    made: true,
   },
   {
     id: "haltestelle-bus",
@@ -45,7 +45,7 @@ export const PAINTED: PaintedPair[] = [
       "A bus stop on a town street: a plain round sign without letters on a pole and a small glass shelter with a bench, houses behind. The road beside it is empty. A fox child in a red jacket with a little backpack stands at the kerb beside a grown-up fox in a blue coat; both look down the empty road, waiting, brows raised, mouth a small o.",
     after: "A yellow city bus now stands at the stop with its doors open; the fox child climbs in, waving happily, and the grown-up fox smiles behind it.",
     sounds: ["engine", "hiss"],
-    made: "frames",
+    made: true,
   },
   {
     id: "auto-reifen",
@@ -61,7 +61,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child and the grown-up bear now fit a black tyre on a silver rim onto the hub together, and the car stands on all its wheels again. Both smile happily.",
     sounds: ["clonk", "click"],
-    made: "frames",
+    made: true,
   },
   {
     id: "ruderboot-ruder",
@@ -70,7 +70,7 @@ export const PAINTED: PaintedPair[] = [
     the: "das Ruderboot",
     toThe: "zum Ruderboot",
     partner: { name: "Ruder", the: "die Ruder", acc: "die Ruder", plural: true },
-    part: "two wooden oars with flat red-tipped blades, crossed",
+    part: "two plain wooden oars with flat blades, crossed",
     cast: "both",
     before:
       "A calm lake with reeds and a wooden jetty. In the middle a small wooden rowing boat floats beside the jetty; the two metal holders on its sides are empty. A fox child in a yellow life jacket and a bear child in an orange life jacket sit in the boat, their empty paws in their laps, looking at the still water, brows raised, mouth a small o: the boat doesn't move.",

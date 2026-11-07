@@ -31,8 +31,8 @@ export const PAINTED: PaintedPair[] = [
       "A bathroom washbasin under a mirror, its tap running with a stream of water, an empty white soap dish on the basin's edge. A fox child in a green T-shirt with rolled-up sleeves stands on a little step stool at the basin, holding its muddy brown paws under the water – the mud stays on – and looks at the empty soap dish, brows raised, mouth a small o.",
     after: "The fox child now rubs a pink bar of soap between its paws, white foam all over them, the mud washing away, and smiles happily.",
     sounds: ["trickle", "wash"],
-    made: true,
     alsoFits: ["eimer-schwamm", "badewanne-badeente"],
+    made: true,
   },
   {
     id: "eimer-schwamm",
@@ -47,9 +47,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now dips a big yellow sponge into the foam and scrubs the paw prints off the tub's side; half of them are gone already, and it smiles happily.",
     sounds: ["splash", "scrub"],
-    made: true,
     // Soap scrubs too, the sponge goes into the bath, and a blackboard is wiped with it.
     alsoFits: ["wasserhahn-seife", "badewanne-badeente", "tafel-kreide"],
+    made: true,
   },
   {
     id: "handtuchhalter-handtuch",
@@ -65,6 +65,7 @@ export const PAINTED: PaintedPair[] = [
     after: "A fluffy light-green towel now hangs from the rail, and the fox child dries its paws in it, smiling happily.",
     sounds: ["swirl", "rustle"],
     alsoFits: ["badewanne-badeente"],
+    made: true,
   },
   {
     id: "badewanne-badeente",
@@ -79,8 +80,8 @@ export const PAINTED: PaintedPair[] = [
       "A cosy bathroom with light tiles and a little window. In the middle a white bathtub filled with warm water and a soft heap of white foam; between the foam the water lies calm and bare, nothing floats on it. A bear child in a white bathrobe kneels at the tub, its arms on the rim, looking at the bare water, brows raised, mouth a small o.",
     after: "A yellow rubber duck with an orange beak now floats on the water among the foam; the bear child pushes it along with one paw and laughs happily.",
     sounds: ["splash", "squeak"],
-    made: "frames",
     // Soap, the sponge and the towel belong to the bath too.
     alsoFits: ["wasserhahn-seife", "eimer-schwamm", "handtuchhalter-handtuch"],
+    made: true,
   },
 ];

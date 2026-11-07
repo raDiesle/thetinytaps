@@ -26,7 +26,7 @@ export const PAINTED: PaintedPair[] = [
     the: "das Laub",
     toThe: "zum Laub",
     partner: { name: "Rechen", the: "der Rechen", acc: "den Rechen" },
-    part: "a garden rake: a long wooden handle and a wide metal head with a row of tines",
+    part: "a garden rake lying diagonally, its whole wooden handle and its wide metal head with a row of tines in view",
     cast: "fox",
     before:
       "An autumn garden with a wooden fence and a tree that has lost most of its leaves. In the middle the lawn is covered all over with orange, red and yellow fallen leaves, an empty wheelbarrow at the side. A fox child in a mustard-yellow jumper, brown trousers and sturdy shoes stands among the leaves with empty paws, looking at the leaf-covered lawn, brows raised, mouth a small o.",
@@ -34,6 +34,7 @@ export const PAINTED: PaintedPair[] = [
       "The fox child now holds a garden rake with a long wooden handle and a metal head with tines and rakes the leaves into a big pile; a strip of green lawn shows behind it. The fox child smiles happily.",
     sounds: ["leaves", "rustle"],
     alsoFits: ["besen-kehrschaufel"],
+    made: "frames",
   },
   {
     id: "zelt-taschenlampe",
@@ -42,7 +43,7 @@ export const PAINTED: PaintedPair[] = [
     the: "das Zelt",
     toThe: "zum Zelt",
     partner: { name: "Taschenlampe", the: "die Taschenlampe", acc: "die Taschenlampe" },
-    part: "a grey hand torch, switched on, a short yellow beam at its front",
+    part: "a grey hand torch, switched off, its round glass front pale yellow",
     cast: "bear",
     before:
       "Night in a garden: a dark blue sky without moon, the dark shapes of a hedge and a tree. In the middle a small orange tent with its door open; inside it is pitch dark. A bear child in striped pyjamas kneels at the tent's open door with empty paws, peering into the dark inside, brows raised, mouth a small o. Everything is dark and dim.",
@@ -50,6 +51,7 @@ export const PAINTED: PaintedPair[] = [
       "The bear child now holds a grey torch whose yellow beam shines into the tent and lights up a rolled-out blue sleeping bag inside. The bear child smiles happily.",
     sounds: ["click", "chime"],
     alsoFits: ["feuerstelle-feuer", "laterne-licht"],
+    made: "frames",
   },
   {
     id: "apfelbaum-leiter",
@@ -65,6 +67,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A wooden ladder now leans against the tree's trunk; the fox child stands on it, the grown-up fox holds the ladder steady, and the child picks a red apple. Both smile happily.",
     sounds: ["creak", "pop"],
+    made: true,
   },
   {
     id: "planschbecken-gartenschlauch",
@@ -80,9 +83,9 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now holds a green garden hose and fills the pool with a stream of water from its yellow nozzle; the pool is half full, and the bear child laughs happily.",
     sounds: ["trickle", "splash"],
-    made: "frames",
     // The watering can would fill the pool too, and the hose water the flower.
     alsoFits: ["blume"],
+    made: true,
   },
   {
     id: "rasen-rasenmaeher",
@@ -98,6 +101,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child and the grown-up bear now push a red lawn mower together, their paws on its handle; behind it lies a wide strip of short, neatly cut grass. Both smile happily.",
     sounds: ["engine", "whirr"],
+    made: true,
   },
   {
     id: "waescheleine-waescheklammern",
@@ -113,7 +117,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The fox child now pinches two wooden clothes pegs onto the line, and the red T-shirt hangs from them, swinging in the breeze. The fox child smiles happily.",
     sounds: ["snap", "whoosh"],
-    made: "frames",
+    made: true,
   },
   {
     id: "picknickdecke-picknickkorb",
@@ -129,7 +133,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A wicker picnic basket now stands open on the blanket, sandwiches and red apples coming out of it; the fox child and the bear child each hold a sandwich and smile happily.",
     sounds: ["creak", "munch"],
-    made: "frames",
     alsoFits: ["pausenbrot-brotdose"],
+    made: true,
   },
 ];

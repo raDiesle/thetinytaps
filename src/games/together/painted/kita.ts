@@ -17,9 +17,9 @@ export const PAINTED: PaintedPair[] = [
       "A school building of red brick with a big front door and a round clock above it, a little path with flowers on both sides leading to the door. On the path in front of the door stands a fox child in a light-blue T-shirt and red trousers, its paws empty and nothing on its back, looking back over its shoulder at its own back, brows raised, mouth a small o.",
     after: "The fox child now wears a red school backpack on its back, holding its straps with both paws, and beams happily.",
     sounds: ["thump", "ring"],
-    made: true,
     // The lunch box goes into the school bag.
     alsoFits: ["pausenbrot-brotdose"],
+    made: true,
   },
   {
     id: "schere-buntpapier",
@@ -35,7 +35,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The bear child now cuts into a sheet of red paper with the scissors, a few red paper strips already lying on the table and a yellow and a blue sheet beside them, and smiles happily.",
     sounds: ["snap", "rip"],
-    made: "frames",
+    made: true,
   },
   {
     id: "tafel-kreide",
@@ -50,9 +50,9 @@ export const PAINTED: PaintedPair[] = [
       "A Kita room with a low blackboard on the wall, dark green and completely blank, its little ledge at the bottom bare. A fox child in a purple T-shirt and dungarees stands in front of the board with empty paws, looking at the blank board, brows raised, mouth a small o.",
     after: "The fox child now draws a big sun on the board with a stick of white chalk, white chalk lines shining on the green, and smiles happily.",
     sounds: ["tick", "squeak"],
-    made: "frames",
     // A blackboard is wiped with the sponge, and chalk draws on paper too.
     alsoFits: ["eimer-schwamm", "papier"],
+    made: true,
   },
   {
     id: "xylofon-schlaegel",
@@ -81,7 +81,7 @@ export const PAINTED: PaintedPair[] = [
       "A Kita table by a window. In the middle a shallow bowl full of big colourful wooden beads, each with a hole through it. A bear child in a pink T-shirt sits at the table holding up one bead and looking through its hole, brows raised, mouth a small o; nothing else lies on the table.",
     after: "The bear child now threads the beads onto a long red lace, a row of colourful beads already on it like a necklace, and smiles happily.",
     sounds: ["click", "twinkle"],
-    made: "frames",
+    made: true,
   },
   {
     id: "bastelbild-klebestift",

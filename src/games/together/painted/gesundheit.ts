@@ -32,8 +32,8 @@ export const PAINTED: PaintedPair[] = [
       "A bright hospital room with one bed and an open door to a sunny hospital garden. A bear child in striped pyjamas sits on the edge of the bed, one leg in a white plaster cast, looking longingly at the garden. The nurse, a grown-up bear in light-blue scrubs, stands beside the bed with empty paws, looking at the cast leg, brows raised, mouth a small o.",
     after: "The bear child now sits in a blue wheelchair with its cast leg stretched out, and the nurse pushes it towards the open door; both smile happily.",
     sounds: ["squeak", "giggle"],
-    made: "frames",
     alsoFits: ["sanitaeter"],
+    made: true,
   },
   {
     id: "ohrenaerztin",
@@ -49,8 +49,8 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The ear doctor now looks into the child's ear through a small black ear light with a little lamp and a pointed white tip; the child lowers its paw and smiles.",
     sounds: ["click", "ding"],
-    made: "frames",
     alsoFits: ["aerztin"],
+    made: true,
   },
   {
     id: "augenaerztin",
@@ -59,7 +59,7 @@ export const PAINTED: PaintedPair[] = [
     the: "die Augenärztin",
     toThe: "die Augenärztin",
     partner: { name: "Sehtafel", the: "die Sehtafel", acc: "die Sehtafel" },
-    part: "a children's eye chart: a white board with rows of simple black pictures (a house, an apple, a car, a star), each row smaller, no letters and no numbers",
+    part: "a white board with rows of little black pictures – a house, an apple, a car, a star – each row smaller than the one above; only pictures, nothing written",
     cast: "both",
     before:
       "An eye doctor's room: a fox child in a green T-shirt sits on a chair at one end, ready, one eye covered with its paw; the wall at the other end of the room is bare and white. The eye doctor, a grown-up bear woman with eyelashes in a white coat with a blue collar, stands between them with a long thin pointer stick in her paw, looking at the bare wall, brows raised, mouth a small o.",

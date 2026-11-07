@@ -70,7 +70,10 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 - **The second picture is the very same scene a moment later**: the partner in use (the candles burning on the cake,
   the brush down in the chimney held by its rope, the reindeer pulling the sleigh) and everyone glad to have it.
   Nothing else changes. A partner that is merely there, lying beside someone with empty paws, is no answer: the
-  prompt says who holds it and what it does.
+  prompt says who holds it and what it does. The partner comes to whoever waits, never the other way round: nobody
+  moves to another place between the frames (into a cockpit, up a cliff), since Gemini then draws them twice, at the old
+  place and the new – the rescue pilot climbing into her helicopter came out doubled three times, and stands beside it
+  on its landing pad now (November 2026).
 - **The thing lacks the partner, never the other way round**: the juicer waits for its orange, not the orange for its
   juice; the fire pit with its stacked wood waits for the fire, not the fire for wood.
 - **A helper needs a tool, vehicle, animal or instrument to do its job – never what it hands out or makes** (Father
@@ -91,7 +94,11 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   their frames again (a character or the partner twice in the second, the partner already somewhere in the first, a
   „?“, a drawn frame, a changed framing) and 77 their plate (white frame lines, a coloured panel left behind, cut off at
   its cell's edge – the sheet prompt for cut-outs was wrong then). `TWO_FRAMES` in `picturePrompts.ts` now says each
-  of these per panel; a fault that comes back often goes there, not into each pair's words.
+  of these per panel; a fault that comes back often goes there, not into each pair's words. Delete what fails and let
+  `made` say what is left (`true`, `"frames"`, `"part"`): the queue then draws only the rest. Small motion strokes
+  pass; a „?“, stars, sparkles, glow rays, hearts or letters in the picture, or on a uniform, fail (the second frame is
+  the answer, and nothing floats up after an answer). Of the 92 redrawn on shared sheets, 33 pairs and 12 plates failed
+  again, most because someone moved to a new place (now a rule above) or the framing drifted.
 - One plain scene, the main thing big in the middle, a few things that tell the place, and only the characters named,
   each once (`CAST` in `picturePrompts.ts` says so to Gemini). Fox and bear take turns; a helper is a fox or bear
   grown-up in its role, children are fox or bear children, and everyone wears clothes. Things and children stay as the

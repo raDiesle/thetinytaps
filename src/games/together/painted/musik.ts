@@ -17,9 +17,9 @@ export const PAINTED: PaintedPair[] = [
       "A small wooden open-air stage in a park, colourful bunting strung above it and a wooden stool in its middle. On a bench in front of the stage sits a little bear child in a red T-shirt, waiting, its paws ready to clap. On the stool sits the musician, a grown-up fox in a purple shirt with a yellow scarf, his empty paws resting on his knees, looking down at his empty lap, brows raised, mouth a small o.",
     after: "The musician now holds a red guitar on his lap and strums its strings, singing, his eyes happily half closed. The bear child claps and laughs.",
     sounds: ["plink", "melody"],
-    made: true,
     // A guitarist may sing into a microphone too.
     alsoFits: ["saengerin"],
+    made: true,
   },
   {
     id: "saengerin",
@@ -35,6 +35,7 @@ export const PAINTED: PaintedPair[] = [
       "The singer now holds a black handheld microphone with a round silver head close to her mouth and sings, her eyes happy. The fox child listens, smiling and swaying.",
     sounds: ["trill", "melody"],
     alsoFits: ["gitarrist"],
+    made: true,
   },
   {
     id: "trommler",
@@ -87,12 +88,12 @@ export const PAINTED: PaintedPair[] = [
     the: "die Pianistin",
     toThe: "die Pianistin",
     partner: { name: "Klavier", the: "das Klavier", acc: "das Klavier" },
-    part: "a shiny black grand piano with its lid propped open and its black and white keys",
+    part: "a shiny black grand piano with its lid propped open and its black and white keys, black and white only, no other colour",
     cast: "both",
     before:
-      "A festive hall with garlands and a polished wooden floor. In its middle stands a round black stool all alone, a big empty space in front of it. On a chair at the side sits a little bear child in a party hat, waiting. Beside the stool stands the musician, a grown-up fox woman with eyelashes in a lilac dress with a white collar, her paws empty, looking at the empty space in front of the stool, brows raised, mouth a small o.",
+      "A festive hall with garlands and a polished wooden floor. In its middle stands a round black stool all alone, a big empty space in front of it. On a chair at the side sits a little bear child in a party hat, waiting. On the stool sits the musician, a grown-up fox woman with eyelashes in a lilac dress with a white collar, her empty paws in her lap, looking at the empty space in front of her, brows raised, mouth a small o.",
     after:
-      "A shiny black grand piano now stands in front of the stool, its lid propped open; the musician sits on the stool and plays its black and white keys, smiling. The bear child bobs along happily.",
+      "A shiny black grand piano now stands in front of the stool, its lid propped open; the musician, still on the stool, plays its black and white keys, smiling. The bear child bobs along happily.",
     sounds: ["plink", "melody"],
   },
   {
@@ -120,7 +121,7 @@ export const PAINTED: PaintedPair[] = [
     cast: "both",
     before:
       "A cosy street corner in the evening: cobblestones, a glowing street lamp, the lit window of a café behind. A little bear child in a yellow raincoat stands nearby, waiting, looking up at her. Under the street lamp stands the musician, a grown-up fox woman with eyelashes in a black jacket with a golden scarf, her paws empty, looking at them, brows raised, mouth a small o.",
-    after: "The musician now holds a shining golden saxophone and plays it, cheeks round, eyes happy. The bear child sways along, smiling.",
+    after: "The musician now holds a golden saxophone and plays it, cheeks round, eyes happy. The bear child sways along, smiling.",
     sounds: ["melody"],
   },
   {
@@ -137,7 +138,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "The musician now holds a light-wood recorder to his mouth and plays it, his fingers on its holes, smiling. The three birds sing along with open beaks.",
     sounds: ["trill", "melody"],
-    made: "frames",
+    made: true,
   },
   {
     id: "harfenspielerin",
@@ -149,10 +150,11 @@ export const PAINTED: PaintedPair[] = [
     part: "a tall golden harp with many thin strings",
     cast: "both",
     before:
-      "A castle hall with tall arched windows and a red carpet; a carved golden stool stands in its middle, an empty space beside it. On a cushion in front sits a little fox child, waiting. Beside the stool stands the musician, a grown-up bear woman with eyelashes in a long flowing light-blue dress with a flower wreath in her hair, her paws empty, looking at the empty space beside the stool, brows raised, mouth a small o.",
+      "A castle hall with tall arched windows and a red carpet; a carved golden stool stands in its middle, an empty space beside it. On a cushion in front sits a little fox child, waiting. On the stool sits the musician, a grown-up bear woman with eyelashes in a long flowing light-blue dress with a flower wreath in her hair, her empty paws in her lap, looking at the empty space beside her, brows raised, mouth a small o.",
     after:
-      "A tall golden harp with many strings now stands beside the stool; the musician sits on the stool and plucks its strings with both paws, smiling. The fox child listens dreamily.",
+      "A tall golden harp with many strings now stands beside the stool; the musician, still on the stool, plucks its strings with both paws, smiling. The fox child listens dreamily.",
     sounds: ["plink", "melody"],
+    made: "part",
   },
   {
     id: "xylofonspieler",
@@ -164,10 +166,11 @@ export const PAINTED: PaintedPair[] = [
     part: "a wooden xylophone with rainbow-coloured bars and two mallets lying on it",
     cast: "both",
     before:
-      "A bright kindergarten room: a round rug with colourful floor cushions, a window with a potted plant behind. On the cushions sit a little bear child and a little fox child, waiting. Kneeling on the rug in front of them is the music teacher, a grown-up fox in an orange jumper with a green neckerchief, his paws empty, looking at the empty spot on the rug in front of him, brows raised, mouth a small o.",
+      "A bright kindergarten room: a round rug with two floor cushions, a red one and a blue one, a window with a potted plant behind. On the cushions sit a little bear child and a little fox child, waiting. Kneeling on the rug in front of them is the music teacher, a grown-up fox in an orange jumper with a green neckerchief, his paws empty, looking at the empty spot on the rug in front of him, brows raised, mouth a small o.",
     after:
       "A wooden xylophone with rainbow-coloured bars now lies on the rug in front of him, and he taps its bars with two mallets, smiling. The two children clap happily.",
     sounds: ["plink", "melody"],
+    made: "part",
   },
   {
     id: "tubaspieler",
@@ -200,6 +203,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["boing", "clap"],
     // A child might juggle a football, a basketball or tennis balls too.
     alsoFits: ["fussballerin", "basketballspieler", "tennisspielerin"],
+    made: true,
   },
   {
     id: "puppenspielerin",
