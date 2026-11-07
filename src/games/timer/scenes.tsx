@@ -1,4 +1,4 @@
-import { memo, type CSSProperties, type ReactNode } from "react";
+import { memo, useId, type CSSProperties, type ReactNode } from "react";
 import { Mascot } from "@/components/Mascot";
 
 // Everything is drawn on a stage of STAGE_W × STAGE_H that covers the screen (`.tm-stage`): what matters stays within
@@ -59,7 +59,7 @@ export function Draw({ w, h, children }: { w: number; h: number; children: React
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// The fox or bear child, only where it does the picture's thing itself: holds the apples' basket, waters the flower,
+// The fox or bear child, only where it does the picture's thing itself: pushes the apples' cart, waters the flower,
 // blows out the candle, takes its turn with the toy. Nobody stands by only to watch: a family beside every picture was
 // decoration a child wanted to tap, and was taken out (user feedback, November 2026).
 
@@ -310,13 +310,17 @@ export function RailAhead({ glow }: { glow: number }) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Sanduhr: a big hourglass whose sand runs from the top into the bottom.
+// Sanduhr: a big, tall hourglass whose sand runs from the top into the bottom (user feedback, November 2026: taller,
+// so the heap is seen growing). Only the sand is drawn – no film on the glass it left, no grain over the stream.
 
-/** The hourglass's glass: its middle, the top and bottom bulbs (between the wooden plates) and the neck. */
-export const GLASS = { cx: 800, w: 230, top: 190, neck: 452, bottom: 715 } as const;
+/** The hourglass's glass: its middle, width, the top and bottom bulbs (between the wooden plates) and the neck. */
+export const GLASS = { cx: 800, w: 300, top: 152, neck: 451, bottom: 750 } as const;
+
+/** The wooden plates' height above and below the glass (with a small gap to it). */
+export const PLATE = 34;
 
 /** The room's floor, where the hourglass stands. */
-export const SAND_FLOOR = GLASS.bottom + 48;
+export const SAND_FLOOR = GLASS.bottom + PLATE + 8;
 
 /** The top bulb's outline as fractions of its box (x, y), from top left round to top right; the bottom one is it upside down. */
 export const BULB: [number, number][] = [
@@ -336,9 +340,27 @@ export const BULB: [number, number][] = [
   [1, 0],
 ];
 
+/** How far down its bulb the sand begins: the full top's surface, and the full bottom heap's top at the end. */
+export const SAND_LEVEL = 0.3;
+
 /** The bulb as a CSS polygon, the right way up (top) or upside down (bottom). */
-export function bulbPolygon(upsideDown: boolean) {
+function bulbPolygon(upsideDown: boolean) {
   return `polygon(${BULB.map(([x, y]) => `${x * 100}% ${(upsideDown ? 1 - y : y) * 100}%`).join(", ")})`;
+}
+
+/**
+ * The part of a bulb below `level` (fractions of its box), as an SVG path in a 100 × 100 box: the sand when that bulb
+ * is full. The bulb's outline cut by one line (Sutherland–Hodgman with one edge).
+ */
+export function bulbBelow(level: number, upsideDown: boolean) {
+  const points = BULB.map(([x, y]): [number, number] => [x, upsideDown ? 1 - y : y]);
+  const kept: [number, number][] = [];
+  points.forEach((p, i) => {
+    const q = points[(i + 1) % points.length];
+    if (p[1] >= level) kept.push(p);
+    if (p[1] >= level !== q[1] >= level) kept.push([p[0] + ((q[0] - p[0]) * (level - p[1])) / (q[1] - p[1]), level]);
+  });
+  return `${kept.map(([x, y], i) => `${i ? "L" : "M"}${(x * 100).toFixed(2)} ${(y * 100).toFixed(2)}`).join(" ")} Z`;
 }
 
 /** The same outline in stage units, for the drawn glass. */
@@ -371,15 +393,17 @@ export const SandBackdrop = memo(function SandBackdrop() {
 export const SandFrame = memo(function SandFrame() {
   const left = GLASS.cx - GLASS.w / 2 - 50;
   const right = GLASS.cx + GLASS.w / 2 + 50;
+  const { cx, w, top, neck, bottom } = GLASS;
+  const bulb = neck - top;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
       <Draw w={STAGE_W} h={STAGE_H}>
         <g fill="none" stroke={INK} strokeWidth="6" strokeLinejoin="round">
-          <path d={bulbPath(GLASS.top, GLASS.neck, false)} />
-          <path d={bulbPath(GLASS.neck, GLASS.bottom, true)} />
+          <path d={bulbPath(top, neck, false)} />
+          <path d={bulbPath(neck, bottom, true)} />
         </g>
         <path
-          d={`M${GLASS.cx - 90} ${GLASS.top + 30} Q${GLASS.cx - 96} ${GLASS.top + 120} ${GLASS.cx - 60} ${GLASS.top + 200}`}
+          d={`M${cx - 0.39 * w} ${top + 0.11 * bulb} Q${cx - 0.42 * w} ${top + 0.46 * bulb} ${cx - 0.26 * w} ${top + 0.76 * bulb}`}
           stroke="#fff"
           strokeWidth="12"
           fill="none"
@@ -387,7 +411,7 @@ export const SandFrame = memo(function SandFrame() {
           opacity="0.8"
         />
         <path
-          d={`M${GLASS.cx - 60} ${GLASS.bottom - 200} Q${GLASS.cx - 96} ${GLASS.bottom - 120} ${GLASS.cx - 90} ${GLASS.bottom - 30}`}
+          d={`M${cx - 0.26 * w} ${bottom - 0.76 * bulb} Q${cx - 0.42 * w} ${bottom - 0.46 * bulb} ${cx - 0.39 * w} ${bottom - 0.11 * bulb}`}
           stroke="#fff"
           strokeWidth="12"
           fill="none"
@@ -395,42 +419,62 @@ export const SandFrame = memo(function SandFrame() {
           opacity="0.8"
         />
         {[left + 10, right - 30].map((x) => (
-          <rect key={x} x={x} y={GLASS.top - 10} width="20" height={GLASS.bottom - GLASS.top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
+          <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
         ))}
-        <rect x={left - 10} y={GLASS.top - 44} width={right - left + 20} height="40" rx="14" fill="#c97d3a" stroke={INK} strokeWidth="6" />
-        <rect x={left - 10} y={GLASS.bottom + 4} width={right - left + 20} height="40" rx="14" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+        <rect x={left - 10} y={top - 4 - PLATE} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+        <rect x={left - 10} y={bottom + 4} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
       </Draw>
     </Layer>
   );
 });
 
 /**
- * The sand: the top heap sinking, the thin stream through the neck and the bottom heap growing, each its own layer.
- * Every second one big grain falls through the neck into the heap (H-63), and the glass the sand has left keeps a
- * faint film of it (H-64), so what is over shows above and what is still to come below.
+ * The sand in one bulb, filling the box it is put in (the bulb's box). The sand is drawn still in the bulb's shape, and
+ * a window over it (`overflow: hidden`, no `clip-path`) slides: down in the top bulb, so the sand left sinks, up in
+ * the bottom one, its top rounded to a heap, while the drawing inside slides back the other way and stays put. Both
+ * move by `transform` only. A `clip-path` round a moving layer was left out of the picture of a turning page, and the
+ * top's sand showed as a square for a moment (user feedback, November 2026). `glow` lights the sand left (H-51).
  */
+export function BulbSand({ bottom = false, glow = 0 }: { bottom?: boolean; glow?: number }) {
+  // useId gives characters a url(#…) would need escaped.
+  const id = `tm-sand-${useId().replace(/[^\w-]/g, "")}`;
+  return (
+    <div className={`tm-sand ${bottom ? "tm-sand-bottom" : "tm-sand-top"} tm-move`} style={{ "--tm-level": `${SAND_LEVEL * 100}%` } as CSSProperties}>
+      <div className="tm-sand-fill tm-move">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#ffd8a8" />
+              <stop offset="1" stopColor="#f4a95c" />
+            </linearGradient>
+          </defs>
+          <path d={bulbBelow(SAND_LEVEL, bottom)} fill={`url(#${id})`} />
+        </svg>
+        {glow > 0 && (
+          <div className="tm-sand-light" style={{ clipPath: bulbPolygon(bottom) }}>
+            <LeftGlow n={glow} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** The sand: the top heap sinking, the thin stream through the neck and the bottom heap growing, each its own layer. */
 export function Sand({ running, glow }: { running: boolean; glow: number }) {
   const left = GLASS.cx - GLASS.w / 2;
   return (
     <>
-      <Layer x={left} y={GLASS.top} w={GLASS.w} h={GLASS.neck - GLASS.top} className="tm-bulb" style={{ clipPath: bulbPolygon(false) }}>
-        <div className="tm-sand-dust" />
-        <div className="tm-sand tm-sand-top tm-move">
-          <LeftGlow n={glow} />
-        </div>
+      <Layer x={left} y={GLASS.top} w={GLASS.w} h={GLASS.neck - GLASS.top} className="tm-bulb">
+        <BulbSand glow={glow} />
       </Layer>
       {running && (
-        <Layer x={GLASS.cx - 5} y={GLASS.neck - 4} w={10} h={GLASS.bottom - GLASS.neck} className="tm-stream">
+        <Layer x={GLASS.cx - 6} y={GLASS.neck - 4} w={12} h={GLASS.bottom - GLASS.neck} className="tm-stream">
           <div className="tm-stream-grains tm-move" />
         </Layer>
       )}
-      {running && (
-        <Layer x={GLASS.cx - 11} y={GLASS.neck - 8} w={22} h={22}>
-          <div className="tm-grain tm-beat" />
-        </Layer>
-      )}
-      <Layer x={left} y={GLASS.neck} w={GLASS.w} h={GLASS.bottom - GLASS.neck} className="tm-bulb" style={{ clipPath: bulbPolygon(true) }}>
-        <div className="tm-sand tm-sand-bottom tm-move" />
+      <Layer x={left} y={GLASS.neck} w={GLASS.w} h={GLASS.bottom - GLASS.neck} className="tm-bulb">
+        <BulbSand bottom />
       </Layer>
     </>
   );

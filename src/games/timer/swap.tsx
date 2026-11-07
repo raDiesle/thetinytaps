@@ -1,6 +1,6 @@
 import { memo, useState, type CSSProperties } from "react";
 import type { Localized } from "@/lib/language";
-import { bulbPolygon, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
+import { BulbSand, Layer, STAGE_H, STAGE_W } from "./scenes";
 import type { SwapToy } from "./settings";
 
 // Abwechseln (H-52): a toy lies by the fox child while an hourglass runs beside it; when it is empty the toy goes over
@@ -105,18 +105,16 @@ export function SwapHourglass({ ms, startedAt, flip, running, glow }: { ms: numb
         <path d={`${bulbPath(glassTop, neck, false)} Z`} fill="#f1f8ff" />
         <path d={`${bulbPath(neck, glassBottom, true)} Z`} fill="#f1f8ff" />
       </svg>
-      <div className="tm-bulb" style={{ ...inGlass(glassX, glassTop, glassW, neck - glassTop), clipPath: bulbPolygon(false), overflow: "hidden" }}>
-        <div className="tm-sand tm-sand-top tm-move">
-          <LeftGlow n={glow} />
-        </div>
+      <div className="tm-bulb" style={inGlass(glassX, glassTop, glassW, neck - glassTop)}>
+        <BulbSand glow={glow} />
       </div>
       {running && (
         <div className="tm-stream" style={inGlass(w / 2 - 4, neck - 4, 8, glassBottom - neck)}>
           <div className="tm-stream-grains tm-move" />
         </div>
       )}
-      <div className="tm-bulb" style={{ ...inGlass(glassX, neck, glassW, glassBottom - neck), clipPath: bulbPolygon(true), overflow: "hidden" }}>
-        <div className="tm-sand tm-sand-bottom tm-move" />
+      <div className="tm-bulb" style={inGlass(glassX, neck, glassW, glassBottom - neck)}>
+        <BulbSand bottom />
       </div>
       <svg viewBox={`0 0 ${w} ${h}`} style={inGlass(0, 0, w, h)}>
         <g fill="none" stroke={INK} strokeWidth="5" strokeLinejoin="round">
