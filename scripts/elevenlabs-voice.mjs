@@ -23,6 +23,7 @@
 // deletes recordings no line uses any more, so running it again costs nothing.
 // It says how many characters (≈ credits) it needs first and stops if there are
 // not enough left. The key comes from ELEVENLABS_API_KEY (export it in ~/.zshrc).
+import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -98,8 +99,16 @@ function apiKey() {
   return key;
 }
 
-/** How often a request is tried again when the service is busy (429) or fails on its side (5xx, network). */
+/** How often a request is tried again when the service turns it away (429: too many at once) or fails on its side (5xx). */
 const RETRIES = 5;
+
+/**
+ * How long a request may go without its answer before the run stops. A line takes a second or two; a request the Mac
+ * slept through (lid closed, November 2026) never answered at all, while the service had made – and charged – the line.
+ * So the limit is far above any real answer, and a request that reaches it, or loses its connection, is never sent
+ * again: it may already be paid. The run stops instead; started again, it goes on where it stopped.
+ */
+const ANSWER_LIMIT_MS = 10 * 60_000;
 
 async function call(path, { body, query, soft = false } = {}) {
   const url = `${API}${path}${query ? `?${new URLSearchParams(query)}` : ""}`;
@@ -109,11 +118,9 @@ async function call(path, { body, query, soft = false } = {}) {
       method: body ? "POST" : "GET",
       headers: { "xi-api-key": apiKey(), ...(body ? { "content-type": "application/json" } : {}) },
       body: body ? JSON.stringify(body) : undefined,
-      // A request open while the Mac slept never answered and held the run for good (November 2026): give up on it
-      // after a minute, so it is tried again.
-      signal: AbortSignal.timeout(60_000),
-    }).catch((error) => ({ ok: false, status: 0, text: async () => String(error) }));
-    if (response.ok || attempt >= RETRIES || !(response.status === 0 || response.status === 429 || response.status >= 500)) break;
+      signal: AbortSignal.timeout(ANSWER_LIMIT_MS),
+    }).catch((error) => ({ ok: false, status: 0, text: async () => `no answer (${error}) – the line may have been charged; run again to go on` }));
+    if (response.ok || attempt >= RETRIES || !(response.status === 429 || response.status >= 500)) break;
     await new Promise((done) => setTimeout(done, 2000 * 2 ** attempt));
   }
   if (soft && !response.ok) return null;
@@ -256,6 +263,9 @@ async function tryLine() {
 }
 
 async function make() {
+  // Keeps the Mac from falling asleep by itself while recording (`caffeinate` ends with this process). Closing the lid
+  // still puts it to sleep: let a run finish first.
+  if (process.platform === "darwin") spawn("caffeinate", ["-i", "-w", String(process.pid)], { stdio: "ignore" }).unref();
   const config = flags.has("dry") ? null : readConfig();
   const todo = [];
   for (const story of await stories()) {

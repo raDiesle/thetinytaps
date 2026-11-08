@@ -59,6 +59,11 @@ In a fresh worktree run `bun install` first.
   Before building something bigger in a game, merge local `main` into your branch and read the game's latest
   commits and `CLAUDE.md`: another session may already be building the same thing (two sweets stories once
   had to be folded into one), and its new rules apply to your work too.
+- A paid run (`bun run voice make`, `bun run image`) finishes before the Mac may sleep or go offline: never tell the
+  user a sleeping Mac loses nothing (user feedback, November 2026). A request on its way when the lid closed was made
+  and charged by the service while its answer never came, and the line had to be bought again; so the voice script
+  never sends an unanswered request again (`ANSWER_LIMIT_MS`) and keeps the Mac awake while it runs. When the user wants
+  to stop for the night, say how long the run still takes and let it end first.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
