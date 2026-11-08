@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { SettingsGroup } from "@/components/SettingControls";
 import { SHELF } from "@/content/games";
-import { APP_LANGUAGES, OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
+import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
 import { type OfflineManifest, sizeOf } from "@/lib/offlineParts";
 import { keepsOffline, offlineChoiceOf, setOfflineSettings, usePwa } from "@/lib/pwa";
 
 // For grown-ups, behind „mehr …“ on the shelf: whether the games are kept on the device to play without internet, and
 // which (user request, November 2026: „nur für die ausgewählte Sprache runterladen; ggf. könnte der User auswählen, ob
 // er auch die Sprachen runterladen will und ggf. pro Spiel (Buch) auswählen, Default: alles“). An installed app keeps
-// them by default, a browser tab only when asked. The service worker downloads from the build's list
-// (src/lib/offlineParts.ts) only the chosen books with the chosen languages' voices and songs; the sizes come from that
-// list, which is fetched only once the choice is opened (it is a couple of MB).
+// them by default, a browser tab only when asked. The language is never chosen here: it is the app language, which 🌐
+// decides for everything (user feedback, November 2026) – grown-ups choose only whether the music and the voices come
+// along (both by default) and which books (all by default). The service worker downloads from the build's list
+// (src/lib/offlineParts.ts); the sizes come from that list, which is fetched only once the books are opened (it is a
+// couple of MB).
 
 /** „84 MB“: a size for grown-ups, rounded, its number written as `locale` writes it and with its own `unit`. */
 const megabytes = (bytes: number, locale: string, unit: string) =>
@@ -33,7 +35,7 @@ function useManifest(url: string | null, wanted: boolean) {
   return manifest;
 }
 
-/** „Ohne Internet spielen“: keep the games on the device, and which languages and books (behind „mehr …“, RoomNotes). */
+/** „Ohne Internet spielen“: keep the games on the device, with or without music and voices, and which books (behind „mehr …“, RoomNotes). */
 export function OfflineOptions() {
   const t = useT();
   const language = useAppLanguage();
@@ -44,14 +46,7 @@ export function OfflineOptions() {
   const choice = offlineChoiceOf(offline, language.id);
   const unit = t({ de: "MB", en: "MB", zh: "MB", hi: "एमबी", es: "MB", ar: "ميغابايت", ru: "МБ" });
   const mb = (bytes: number) => megabytes(bytes, language.speechLang, unit);
-  const size = (languages: string[], skip: string[]) => (manifest ? mb(sizeOf(manifest, { ...choice, languages, skip })) : null);
-
-  const toggleLanguage = (id: string) => {
-    const languages = choice.languages.includes(id) ? choice.languages.filter((l) => l !== id) : [...choice.languages, id];
-    // At least one; back to only the app language means „follow the app language“ again.
-    if (languages.length === 0) return;
-    setOfflineSettings({ languages: languages.length === 1 && languages[0] === language.id ? null : languages });
-  };
+  const size = manifest ? mb(sizeOf(manifest, choice)) : null;
   const toggleBook = (id: string) => setOfflineSettings({ skip: offline.skip.includes(id) ? offline.skip.filter((b) => b !== id) : [...offline.skip, id] });
 
   return (
@@ -109,42 +104,36 @@ export function OfflineOptions() {
           </p>
         )}
         {on && (
+          // In the app language only, which is named so grown-ups see whose voices come (🌐 changes it).
+          <fieldset className="choice">
+            <legend>
+              {t({ de: "Dazu speichern", en: "Also save", zh: "同时保存", hi: "साथ में सेव करें", es: "Guardar también", ar: "حفظ أيضًا", ru: "Сохранить также" })}
+            </legend>
+            <button
+              type="button"
+              className={offline.music ? "selected" : undefined}
+              aria-pressed={offline.music}
+              onClick={() => setOfflineSettings({ music: !offline.music })}
+            >
+              🎵 {t({ de: "Musik", en: "Music", zh: "音乐", hi: "संगीत", es: "Música", ar: "الموسيقى", ru: "Музыка" })}
+            </button>
+            <button
+              type="button"
+              className={offline.voices ? "selected" : undefined}
+              aria-pressed={offline.voices}
+              onClick={() => setOfflineSettings({ voices: !offline.voices })}
+            >
+              🗣️ {t({ de: "Stimmen", en: "Voices", zh: "语音", hi: "आवाज़ें", es: "Voces", ar: "الأصوات", ru: "Голоса" })} · {OWN_NAMES[language.id]}
+            </button>
+          </fieldset>
+        )}
+        {on && (
           <details className="offline-pick" onToggle={(event) => setOpen(event.currentTarget.open)}>
             <summary>
-              {t({
-                de: "Welche Sprachen und Bücher?",
-                en: "Which languages and books?",
-                zh: "哪些语言和书？",
-                hi: "कौन-सी भाषाएँ और किताबें?",
-                es: "¿Qué idiomas y libros?",
-                ar: "أي لغات وكتب؟",
-                ru: "Какие языки и книги?",
-              })}
-              {size(choice.languages, choice.skip) && <span className="offline-size"> ({size(choice.languages, choice.skip)})</span>}
+              {t({ de: "Welche Bücher?", en: "Which books?", zh: "哪些书？", hi: "कौन-सी किताबें?", es: "¿Qué libros?", ar: "أي كتب؟", ru: "Какие книги?" })}
+              {size && <span className="offline-size"> ({size})</span>}
             </summary>
-            <fieldset className="choice">
-              <legend>
-                {t({
-                  de: "Sprachen der Stimmen und Lieder",
-                  en: "Languages of the voices and songs",
-                  zh: "语音和歌曲的语言",
-                  hi: "आवाज़ों और गीतों की भाषाएँ",
-                  es: "Idiomas de las voces y canciones",
-                  ar: "لغات الأصوات والأغاني",
-                  ru: "Языки голосов и песен",
-                })}
-              </legend>
-              {APP_LANGUAGES.map((id) => {
-                const chosen = choice.languages.includes(id);
-                return (
-                  <button key={id} type="button" className={chosen ? "selected" : undefined} aria-pressed={chosen} onClick={() => toggleLanguage(id)}>
-                    {OWN_NAMES[id]}
-                  </button>
-                );
-              })}
-            </fieldset>
-            <fieldset className="choice">
-              <legend>{t({ de: "Bücher", en: "Books", zh: "书", hi: "किताबें", es: "Libros", ar: "الكتب", ru: "Книги" })}</legend>
+            <fieldset className="choice" aria-label={t({ de: "Bücher", en: "Books", zh: "书", hi: "किताबें", es: "Libros", ar: "الكتب", ru: "Книги" })}>
               {SHELF.map((entry) => {
                 const chosen = !offline.skip.includes(entry.id);
                 const thing = entry.game ?? entry.category;

@@ -23,7 +23,7 @@ import { SEO_RU } from "../src/content/seo.ru";
 import { SEO_ZH } from "../src/content/seo.zh";
 import { shelfEntryOf } from "../src/content/games";
 import { appPlugin, PRODUCTION } from "./appPlugin";
-import { isBackgroundSong, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
+import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
 import { BOOT_WAIT, chunkClosure, pageModuleFor, pageModules } from "./pageStart";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
@@ -389,6 +389,7 @@ async function writeOfflineManifest() {
     const language = languageOf(file);
     if (language) part.language = language;
     if (isBackgroundSong(file)) part.music = true;
+    if (isVoice(file)) part.voice = true;
     const standsIn = english.get(file);
     if (standsIn) part.standsIn = [...standsIn].sort();
     parts.push(part);

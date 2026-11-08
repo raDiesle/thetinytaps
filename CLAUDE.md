@@ -124,8 +124,9 @@ In a fresh worktree run `bun install` first.
   into the translated menus keeps its card's title and blurb in its own folder (`names.ts`, imported by `games.ts`, like
   `/zusammen/`), so its own row says they are missing, not the home page's.
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
-  (🌐 on the home page, `useAppLanguage()`); no game or menu adds a language choice of its own (a „Spielsprache“ once
-  put Russian letters under German menus). A language joins `APP_LANGUAGES` only once the menus and the letters and
+  (🌐 on the home page, `useAppLanguage()`); no game, menu or option adds a language choice of its own (a „Spielsprache“ once
+  put Russian letters under German menus, and the offline copy's choice of languages was taken out again, user feedback,
+  November 2026: what is kept follows 🌐). A language joins `APP_LANGUAGES` only once the menus and the letters and
   words games speak it (`language.test.ts` checks the pack); until then packs and recordings in other languages wait
   in the code. No second language next to the first either (a „Zweite Sprache“, „Bär – bear“, was removed), and
   grown-ups choose exactly one language, in one place: 🌐. The app language starts on
@@ -572,8 +573,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   index.html, its scripts and styles and the pictures they name), then every file of the site once a page fetched it,
   so a game played once plays offline – and more only for an installed app or when grown-ups ask for it under „Ohne
   Internet spielen“ behind „mehr …“ (`OfflineOptions`, `src/lib/pwa.ts`): then the books chosen there (default: all)
-  with only the chosen languages' voices and songs (default: the app language; English too where it stands in for
-  missing recordings), never every language. The build lists each file with its book and language
+  in the app language only, with its voices and the background song unless switched off there (English recordings too
+  where they stand in for missing ones; a game's own song, like the Zahnputzlied, always comes with its book), never
+  every language and never a language chosen there – switching 🌐 swaps the kept voices. The build lists each file with its book and language
   (`writeOfflineManifest` in `tools/build.ts`, filling `__OFFLINE__` in `sw.js`; the rules in `src/lib/offlineParts.ts`),
   so a new kind of file named by language must be known there, and the worker deletes what is no longer chosen. A new
   build takes over the files named by their content from the old cache instead of downloading them again. Never

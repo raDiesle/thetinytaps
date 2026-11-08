@@ -1,5 +1,7 @@
 // What an offline copy is made of, by book on the shelf and by language (user request, November 2026: „nur für die
-// ausgewählte Sprache runterladen, ggf. pro Spiel (Buch) auswählen, Default: alles“). The build writes it as
+// ausgewählte Sprache runterladen, ggf. pro Spiel (Buch) auswählen, Default: alles“). Its language is always the app
+// language (🌐), never one chosen here; grown-ups choose only whether the music and the voices come along, and which
+// books (user feedback, November 2026: „der User muss/kann nicht die Sprache auswählen“). The build writes it as
 // static/offline.<hash>.json (tools/build.ts); the service worker (src/sw.js) downloads from it only what the
 // grown-ups chose (`OfflineChoice`), and src/components/OfflineOptions.tsx shows how big each choice is. Kept apart from
 // build.ts, which builds when imported, so offlineParts.test.ts can check it and the page can use it.
@@ -13,8 +15,10 @@ export interface OfflinePart {
   books?: string[];
   /** The language it speaks or sings: a recording of a line, a song in one language. */
   language?: string;
-  /** The background song, kept only while music is on. */
+  /** The background song, kept only while music is on and chosen. */
   music?: true;
+  /** A recorded line of a game's voice, kept only when the voices are chosen; a game's own song is no such line. */
+  voice?: true;
   /** An English recording that stands in for these languages' missing ones (`recordingUrl`, src/lib/voice.ts). */
   standsIn?: string[];
 }
@@ -26,12 +30,14 @@ export interface OfflineManifest {
 
 /** What grown-ups chose to keep for playing without internet (`OfflineChoice`, stored on the device). */
 export interface OfflineChoice {
-  /** The languages to keep the voices and songs of. */
+  /** The languages to keep the voices and songs of: the app language (src/lib/pwa.ts). */
   languages: string[];
   /** The books left out (`SHELF` ids); a book added later is in, as „all“ is the default. */
   skip: string[];
   /** Keep the background song (only while music is on). */
   music: boolean;
+  /** Keep the games' recorded voices. */
+  voices: boolean;
 }
 
 /**
@@ -43,6 +49,9 @@ export function languageOf(path: string): string | undefined {
   if (/^[0-9a-f]{8}\.[a-z0-9]+\.mp3$/.test(name)) return "de";
   return /^([a-z]{2})-[0-9a-f]{8}\.[a-z0-9]+\.mp3$/.exec(name)?.[1] ?? /^musik-.*-([a-z]{2})\.[a-z0-9]+\.mp3$/.exec(name)?.[1];
 }
+
+/** A recorded line of a game's voice (a song sung in a language is the game's, not a voice). */
+export const isVoice = (path: string) => languageOf(path) !== undefined && !/(^|\/)musik-[^/]*$/.test(path);
 
 /** A song that plays only while music is on (the background song, which has no language). */
 export const isBackgroundSong = (path: string) => /(^|\/)musik-[^/]*\.mp3$/.test(path) && languageOf(path) === undefined;
@@ -65,6 +74,7 @@ export function needsEnglish(paths: string[]) {
 /** Whether `part` belongs to the offline copy grown-ups chose. */
 export function wanted(part: OfflinePart, choice: OfflineChoice) {
   if (part.music && !choice.music) return false;
+  if (part.voice && choice.voices === false) return false;
   if (part.books?.length && part.books.every((book) => choice.skip.includes(book))) return false;
   if (!part.language) return true;
   return choice.languages.includes(part.language) || (part.standsIn ?? []).some((language) => choice.languages.includes(language));
