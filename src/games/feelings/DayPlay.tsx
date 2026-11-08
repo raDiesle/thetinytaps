@@ -6,7 +6,7 @@ import { type Day, dayStories, NIGHT_IMAGE } from "./days";
 import { dayIn } from "./localized";
 import type { ReadAlongCorner } from "./PassPlay";
 import { RoundPlay } from "./RoundPlay";
-import { roundOf, stepsOf } from "./rounds";
+import { openingLines, roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 
 /** Where a day is: the page of the story before scene `index`, the scene itself, or the night at the end. */
@@ -87,7 +87,13 @@ export function DayPlay({
       />
     );
 
-  const { before } = dayIn(day, language).scenes[at.index];
+  const texts = dayIn(day, language);
+  const { before } = texts.scenes[at.index];
+  // What comes next opens with: loaded while this page or scene plays (the night's text after the last scene).
+  const sceneOpening = openingLines(roundOf(story, at.step, language));
+  const afterScene = last
+    ? [texts.end]
+    : [texts.scenes[at.index + 1].before.text, ...openingLines(roundOf(scenes[at.index + 1], stepOf(at.index + 1), language))];
   if (at.page === "before")
     return (
       <DayPage
@@ -98,6 +104,7 @@ export function DayPlay({
         progress={progress}
         onNext={() => setAt({ ...at, page: "scene" })}
         onPick={replay}
+        nextLines={sceneOpening}
       />
     );
 
@@ -112,6 +119,7 @@ export function DayPlay({
       onEndKey={goOn}
       onPick={replay}
       readAlong={readAlong}
+      nextLines={afterScene}
     />
   );
 }

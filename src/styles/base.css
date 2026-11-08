@@ -144,6 +144,29 @@ html:has(.play-area) body {
   }
 }
 
+/*
+ * A sound the game needs now is still loading (SoundLoading.tsx): the same paw track on a small slip of paper in the
+ * middle of the screen, over the game, after a moment, so a quick load shows nothing. Taps go through it.
+ */
+.sound-wait {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 60;
+  padding: 18px 26px;
+  border-radius: 6px;
+  background: var(--paper-grain, none), var(--paper, #fbf4e3);
+  box-shadow: 0 6px 18px rgb(60 40 20 / 0.25);
+  transform: translate(-50%, -50%) rotate(-1.5deg);
+  pointer-events: none;
+  animation: boot-show 0.4s ease-out 0.6s backwards;
+}
+
+.sound-wait .boot-wait span {
+  width: 30px;
+  height: 30px;
+}
+
 .seo-page ul {
   padding-left: 20px;
   font-size: 0.9rem;

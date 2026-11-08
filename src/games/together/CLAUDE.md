@@ -191,6 +191,10 @@ The topics' names are translated inline in `topics.ts`. A new pair or topic come
 for its translations: it goes on `GERMAN_ONLY` in `content.test.ts` (and `languageStatus.ts` says so) until its
 sentences are added to each `content.scenes.<lang>.ts`. Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in every app
 language but German and Russian for the painted pairs and the wishes (November 2026, the month's credits ran out): a
-sentence without its recording stays silent. New sentences are listed by
+sentence without its recording stays silent. With hundreds of sentences per language the game never loads them all
+(`loadAll`): `TogetherRounds` draws the next round's pair a turn ahead (only the pair – its choices and difficulty are
+dealt on its turn) and fetches its question and praise while this round plays, and a round shows only once the lines it
+may say are loaded (`roundLines`: question, praise, and whom each wrong choice belongs to; `useVoiceReady`) – till then
+the last round's picture stays and the paw track shows. New sentences are listed by
 `src/content/recordedLines.ts` (`zusammen`) and recorded with `bun run voice make --only zusammen`, only when the user
 asks. `languageStatus.ts` says what is missing.

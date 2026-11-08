@@ -4,6 +4,8 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote, playRustle } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
+import { useVoiceReady } from "@/lib/voiceReady";
+import { animalsVoice } from "@/games/animals/voice";
 import { ITEMS, PEEK_ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
 import {
@@ -69,6 +71,20 @@ interface Round {
   level: ShadowLevel;
   /** How each shadow lies. */
   poses: ShadowPose[];
+  /** What comes after it, drawn a turn ahead so its lines load while this round is played. */
+  ahead: Ahead;
+}
+
+/**
+ * The next picture and, where animals peek out, the next animal, drawn from their decks a turn early (the same order
+ * as drawing them when due): only their lines are fetched ahead, never all of the game's (user request, November 2026).
+ * Their step and the others to choose from are dealt when they come, as the child's last round decides.
+ */
+interface Ahead {
+  /** The pictures it was drawn from: a new kind of pictures draws anew. */
+  pool: ShadowItem[];
+  item: ShadowItem;
+  peek: ShadowItem | null;
 }
 
 interface Offset {
@@ -184,11 +200,19 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const drawRef = useRef(drawItem);
   drawRef.current = drawItem;
 
+  /** What was drawn ahead for the round after the one on screen. */
+  const aheadRef = useRef<Ahead | null>(null);
+
+  /** Deals the next picture; it shows and asks once its first line is loaded (`ready` below). */
   const nextRound = useCallback(() => {
-    const item = drawRef.current();
+    const before = aheadRef.current;
+    const item = before?.pool === poolRef.current ? before.item : drawRef.current();
+    const peeks = themeRef.current === "all" || themeRef.current === "animals";
+    const ahead = { pool: poolRef.current, item: drawRef.current(), peek: peeks ? (before?.peek ?? drawPeek()) : null };
+    aheadRef.current = ahead;
     const level = SHADOW_LEVELS[levelRef.current];
     const shadows = dealShadows(item, poolRef.current, level);
-    const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item), level, poses: poseShadows(shadows.length, level) };
+    const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item), level, poses: poseShadows(shadows.length, level), ahead };
     missesRef.current = 0;
     setPeek(null);
     setRound(next);
@@ -200,9 +224,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     setFocus(null);
     focusRef.current = null;
     busy.current = false;
-    say(texts.search(item));
-    if (settings.sounds) later(400, () => item.sound?.());
-  }, [settings.sounds, say, later]);
+  }, [drawPeek]);
 
   /** After a picture found its shadow: an animal peeks out, but only where animals are among the pictures; else the next picture. */
   const advance = useCallback(() => {
@@ -210,7 +232,9 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       nextRound();
       return;
     }
-    const item = drawPeek();
+    const ahead = aheadRef.current;
+    const item = ahead?.peek ?? drawPeek();
+    if (ahead) aheadRef.current = { ...ahead, peek: null };
     const level = PEEK_LEVELS[peekLevelRef.current];
     setPeek({ id: peekId.current++, item, choices: dealPeek(item, PEEK_ITEMS, level), level });
   }, [nextRound, drawPeek]);
@@ -228,6 +252,37 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   // Start with a picture right away; settings can't change while playing.
   useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
   useEffect(() => nextRound(), []);
+
+  // A round shows only once the line it starts with is loaded, so picture and voice come together (the paw track shows
+  // meanwhile); then the rest of its lines and the next round's load. A picture asks „… sucht seinen Schatten“, an
+  // animal peeking out „Wer schaut da raus?“ (from Was gehört zum Tier?'s recordings).
+  const shadowNow = round && !peek ? [texts.search(round.item)] : [];
+  const shadowNext =
+    round && !peek
+      ? [
+          texts.found(round.item),
+          ...round.shadows.filter((s) => s !== round.item).map(texts.thatIs),
+          texts.search(round.ahead.item),
+          texts.found(round.ahead.item),
+        ]
+      : [];
+  const shadowReady = useVoiceReady(shadowsVoice, shadowNow, language.id, { next: shadowNext, enabled: !!round && !peek });
+  const peekNow = peek ? [texts.peek] : [];
+  const peekNext = peek
+    ? [texts.there(peek.item), ...peek.choices.filter((c) => c !== peek.item).map(texts.thatIs)]
+    : round?.ahead.peek
+      ? [texts.peek, texts.there(round.ahead.peek)]
+      : [];
+  const peekReady = useVoiceReady(animalsVoice, peekNow, language.id, { next: peekNext });
+
+  // The picture asks for its shadow and makes its noise once it shows.
+  const asked = useRef(-1);
+  useEffect(() => {
+    if (!round || peek || !shadowReady || asked.current === round.id) return;
+    asked.current = round.id;
+    say(texts.search(round.item));
+    if (settings.sounds) later(400, () => round.item.sound?.());
+  }, [round, peek, shadowReady]);
 
   const softTap = useCallback(
     (x?: number, y?: number) => {
@@ -413,7 +468,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   // Arrow keys (or any key) move the frame, Space or Enter picks, 1–4 pick straight away.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || !round || peek || e.key === "Escape") return;
+      if (e.repeat || !round || peek || !shadowReady || e.key === "Escape") return;
       if (outcome) {
         softTap();
         return;
@@ -443,9 +498,11 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  if (!round) return null;
+  if (!round || (!peek && !shadowReady)) return null;
   if (peek)
-    return <PeekPlay key={peek.id} settings={settings} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />;
+    return !peekReady ? null : (
+      <PeekPlay key={peek.id} settings={settings} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />
+    );
 
   const won = outcome?.ok === true;
   const offset = landed ?? drag;

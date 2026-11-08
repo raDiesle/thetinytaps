@@ -96,6 +96,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const nextId = useRef(0);
   const wordIndex = useRef(new Map<string, number>());
   const lastThing = useRef<Countable | null>(null);
+  /** The things the next number counts, picked ahead so their counting sentences are loaded before a key asks for them. */
+  const nextThing = useRef<Countable | null>(null);
   const countTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   /** What is on screen right now (for the history), and what was before it. */
   const current = useRef<Shown | null>(null);
@@ -113,6 +115,16 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
   const byTap = useCallback((s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0, [settings.numbers]);
 
+  /** What a letter shown with `word` says, as the options ask for it. */
+  const letterLine = useCallback(
+    (letter: LetterEntry, word: WordEntry) => {
+      if (settings.announce === "word") return `${word.word}!`;
+      if (settings.announce === "letter") return `${letter.spoken}!`;
+      return pack.letterSentence(letter, word);
+    },
+    [pack, settings.announce],
+  );
+
   /** The full sentence for a fully revealed letter or number. */
   const sentenceFor = useCallback(
     (s: Shown) => {
@@ -121,11 +133,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         const sentence = s.n === 0 ? `${pack.numberWords[0]}!` : pack.countSentence(s.n, s.thing);
         return lettersVoice.has(sentence, language) ? sentence : `${pack.numberWords[s.n]}!`;
       }
-      if (settings.announce === "word") return `${s.word.word}!`;
-      if (settings.announce === "letter") return `${s.letter.spoken}!`;
-      return pack.letterSentence(s.letter, s.word);
+      return letterLine(s.letter, s.word);
     },
-    [pack, settings.announce, language],
+    [pack, letterLine, language],
   );
 
   /** Speak and play the sound for reaching `stage`. */
@@ -147,22 +157,62 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
 
   const softTap = useSoftTap(ripple, settings.sounds);
 
-  // Cycle through the letter's words so repeated presses stay interesting.
-  const pickWord = useCallback(
+  /** The word the letter comes with next time: its words take turns, so repeated presses stay interesting. */
+  const nextWordOf = useCallback(
     (letter: LetterEntry) => {
       const words = inTheme(letter.words, settings.theme);
-      const index = wordIndex.current.get(letter.upper) ?? 0;
-      wordIndex.current.set(letter.upper, index + 1);
-      return words[index % words.length];
+      return words[(wordIndex.current.get(letter.upper) ?? 0) % words.length];
     },
     [settings.theme],
   );
 
+  const pickWord = useCallback(
+    (letter: LetterEntry) => {
+      const word = nextWordOf(letter);
+      wordIndex.current.set(letter.upper, (wordIndex.current.get(letter.upper) ?? 0) + 1);
+      return word;
+    },
+    [nextWordOf],
+  );
+
+  const things = useMemo(() => inTheme(pack.countables, settings.theme), [pack, settings.theme]);
+  /** Things to count by chance, never the same twice in a row. */
+  const drawThing = useCallback(
+    (not: Countable | null) => {
+      const others = things.filter((c) => c !== not);
+      return others.length > 0 ? others[Math.floor(Math.random() * others.length)] : things[0];
+    },
+    [things],
+  );
+  /** The things the next number counts (drawn again when the pictures' theme changed). */
+  const upcomingThing = useCallback(() => {
+    if (!nextThing.current || !things.includes(nextThing.current)) nextThing.current = drawThing(lastThing.current);
+    return nextThing.current;
+  }, [things, drawThing]);
+
   const pickThing = useCallback(() => {
-    const others = inTheme(pack.countables, settings.theme).filter((c) => c !== lastThing.current);
-    lastThing.current = others[Math.floor(Math.random() * others.length)];
+    lastThing.current = upcomingThing();
+    nextThing.current = drawThing(lastThing.current);
     return lastThing.current;
-  }, [pack, settings.theme]);
+  }, [upcomingThing, drawThing]);
+
+  /**
+   * Loads what the next press can say – every number with the things it counts next, and every letter with its next
+   * word – so a key's line never comes late. Only those, never the game's whole folder (hundreds of lines a language).
+   */
+  const loadAhead = useCallback(() => {
+    const thing = upcomingThing();
+    const numbers = pack.numberWords.flatMap((word, n) => [`${word}!`, ...(n > 0 && thing ? [pack.countSentence(n, thing)] : [])]);
+    const letters = numbersOnly
+      ? []
+      : pack.letters.flatMap((letter) => {
+          const word = nextWordOf(letter);
+          return word ? [letterLine(letter, word)] : [];
+        });
+    lettersVoice.load([...numbers, pack.zero.sentence, ...letters], language);
+  }, [pack, numbersOnly, upcomingThing, nextWordOf, letterLine, language]);
+
+  useEffect(() => loadAhead(), [loadAhead]);
 
   /** Put `next` on screen; the one before goes on the history for Backspace. */
   const replace = useCallback((next: Shown) => {
@@ -181,6 +231,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const present = useCallback(
     (next: Shown, from: number) => {
       replace(next);
+      // A word or things were used up: their successors load now.
+      loadAhead();
 
       if (byTap(next)) {
         // All things are there, waiting to be tapped one by one.
@@ -215,7 +267,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       }
       countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + (last === full ? COUNT_SUMMARY_MS : 0);
     },
-    [announce, replace, byTap, stepByStep, holdDigit, settings.numbers],
+    [announce, replace, loadAhead, byTap, stepByStep, holdDigit, settings.numbers],
   );
 
   const show = useCallback(

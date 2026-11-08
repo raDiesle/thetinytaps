@@ -126,7 +126,7 @@ export function AdventurePlay({
       setFailed(true);
       return;
     }
-    loadVoice(story, language);
+    const voiceReady = loadVoice(story, language);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!PROD) Object.assign(window, { __adventure: player });
@@ -134,15 +134,21 @@ export function AdventurePlay({
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(canvas);
-    // The first picture is drawn at once, but the story and its music start only once the page has turned (pageMotion.ts).
+    // The first picture is drawn at once, but the story and its music start only once the page has turned (pageMotion.ts)
+    // and Tapsi's first lines are loaded (the paw track meanwhile), so the first one comes with the start.
     const paused = player.paused;
     player.paused = true;
     player.start();
-    const go = afterPageMotion(() => {
-      player.paused = paused;
-      if (settings.music) music.start();
-    });
+    let alive = true;
+    const go = afterPageMotion(() =>
+      voiceReady().then(() => {
+        if (!alive) return;
+        player.paused = paused;
+        if (settings.music) music.start();
+      }),
+    );
     return () => {
+      alive = false;
       go();
       observer.disconnect();
       music.stop();

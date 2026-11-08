@@ -357,7 +357,11 @@ day's entry there is deleted (it is then told in German; `feelings.test.ts` chec
 (the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
 Everything said is played from its ElevenLabs recording (`useVoice` in `shared.tsx`, files in `stimme/`), recorded in
 every app language (November 2026); a line still in German (not translated yet) stays silent in another language. A beat with a recording stays long enough to be heard (`beatMs`), and a
-story loads its recordings when it starts (`preload`). A new or changed line is listed by `src/content/recordedLines.ts`
+scene loads only its own lines and the next one's opening, never a whole day or group at once (the game has about
+600 lines per language): a scene or page of the story starts telling once its opening lines are there, with the paw track
+meanwhile (`useLinesReady` in `shared.tsx`, `openingLines`), then the rest of it and what the next page or scene opens
+with load quietly (`nextLines`, given by `DayPlay` and `PassPlay`). With the voice switched off nothing of it is loaded
+(`preload` and `useLinesReady` check `settings.voice`), and the story still waits each line's length. A new or changed line is listed by `src/content/recordedLines.ts`
 (`gefuehle`) and recorded with `bun run voice make --only gefuehle`, only when the user asks. „Wie geht's dir?“ and
 „Was brauche ich?“ are on that list in every language they are translated into (C-73, `MOOD_SAID`, `NEEDS_SAID`): a
 child picking a feeling hears it in its own language; a new line said there goes into those lists with all its languages.

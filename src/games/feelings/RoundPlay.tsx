@@ -5,9 +5,23 @@ import { preloadImages } from "./images";
 import { ReadAlong } from "./ReadAlong";
 import type { ReadAlongCorner } from "./PassPlay";
 import { STORIES } from "./stories";
-import { beatText, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
+import { beatText, openingLines, type ReadPart, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
-import { CHEER_MS, ChoiceCard, GoOn, OOPS_MS, StepDots, StoryPicture, cheer, oops, useTimers, useVoice, type CardState, type PictureLook } from "./shared";
+import {
+  CHEER_MS,
+  ChoiceCard,
+  GoOn,
+  OOPS_MS,
+  StepDots,
+  StoryPicture,
+  cheer,
+  oops,
+  useLinesReady,
+  useTimers,
+  useVoice,
+  type CardState,
+  type PictureLook,
+} from "./shared";
 import { beatMs, type Beat } from "./story";
 
 /**
@@ -32,6 +46,7 @@ export function RoundPlay({
   onEndKey,
   onPick,
   readAlong,
+  nextLines = [],
 }: {
   round: Round;
   settings: FeelingsSettings;
@@ -51,12 +66,16 @@ export function RoundPlay({
    * whether it is open, and the loudspeaker standing beside it (`VoiceSwitch`).
    */
   readAlong?: ReadAlongCorner;
+  /** What the page or scene after this one opens with: loaded while this one plays, so it starts at once. */
+  nextLines?: string[];
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [tried, setTried] = useState(false);
   const [cheering, setCheering] = useState(false);
   const { later } = useTimers();
-  const { say, sound, voiced, preload } = useVoice(settings);
+  const { say, sound, voiced } = useVoice(settings);
+  // The scene starts telling once its opening lines are there; the rest of it and the next one's opening load meanwhile.
+  const ready = useLinesReady(settings, openingLines(round), [...roundLines(round), ...nextLines]);
 
   /** Plays the beats one after another, then calls `then`. */
   const playBeats = useCallback(
@@ -77,11 +96,14 @@ export function RoundPlay({
 
   useEffect(() => {
     preloadImages(roundImages(round));
-    preload(roundLines(round));
-    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while. Only
-    // once the page it opens on lies still (pageMotion.ts).
-    return afterPageMotion(() => playBeats(round.start.beats, () => say(round.question, true)));
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while. Only
+    // once the page it opens on lies still (pageMotion.ts) and its opening lines are loaded (`useLinesReady`).
+    return afterPageMotion(() => playBeats(round.start.beats, () => say(round.question, true)));
+  }, [ready]);
 
   const goOn = () => setPhase((now) => (now === "intro" ? "choose" : now));
 

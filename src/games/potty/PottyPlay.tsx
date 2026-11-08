@@ -197,6 +197,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   /** Says `text` from its ElevenLabs recording (a German one where it is not translated); `queue` waits for what is said. */
   const say = (text: string, queue = false) => pottyVoice.say(text, language.id, { queue });
+  // Its few dozen lines are fetched as it starts, so none comes late (src/lib/voice.ts: `loadAll` only for so few).
+  useEffect(() => pottyVoice.loadAll(language.id), [language.id]);
   /** A thought's line, in German where it is not translated yet, and after it what the ✓ is for. */
   const sayScene = (id: string, withFinish: boolean) => {
     say(texts.scenes[id] ?? POTTY_TEXTS.de.scenes[id]);

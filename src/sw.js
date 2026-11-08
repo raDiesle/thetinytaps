@@ -1,6 +1,6 @@
 // Service worker: keeps what a visitor used in the browser, so it starts again without network (plane, no WLAN) and
 // right away, and the whole site only for those who installed it as an app. Not bundled – the build copies this file
-// to out/sw.js and fills in VERSION, FILES, SHELL and TEXTS (tools/build.ts, writeServiceWorker).
+// to out/sw.js and fills in VERSION, FILES, SHELL, TEXTS and OFFLINE (tools/build.ts, writeServiceWorker).
 //
 // It once downloaded every file of the site (42 MB: every game's pictures and sounds) on the first visit and again
 // after every new build, for everyone, while few ever play offline. Now a visit downloads only what it plays.
@@ -12,6 +12,12 @@ const FILES = __FILES__;
 const SHELL_FILES = __SHELL__;
 /** The texts of each language besides German (static/texts-ru.<hash>.js), by language; left out of FILES. */
 const TEXTS = __TEXTS__;
+/**
+ * The offline copy by book and language (static/offline.<hash>.json, src/lib/offlineParts.ts), or null: what an
+ * installed app keeps is what grown-ups chose there (`OfflineChoice`) – the app language's voices and songs only,
+ * every book unless left out (user request, November 2026: the voices of all languages are over 200 MB).
+ */
+const OFFLINE = __OFFLINE__;
 /**
  * Left out of FILES and kept once fetched: songs (musik-*.mp3), because music can be off and then
  * they are never downloaded, Tapsi's voice in other languages than German (en-<hash>.mp3) and the texts
@@ -43,19 +49,75 @@ async function olderEntries() {
 /** How many files keepAll downloads at once; each batch is kept before the next starts. */
 const BATCH = 24;
 
-/**
- * Downloads every file of FILES the cache lacks yet (an installed app plays offline), then marks it so. In batches,
- * so what came is kept when the network or the worker stops halfway (a phone's signal, a newer build taking over),
- * and the next start goes on from there.
- */
-async function keepAll(cache) {
-  const have = new Set((await cache.keys()).map((request) => request.url));
-  const missing = FILES.filter((file) => !have.has(new URL(file, self.registration.scope).href));
-  for (let i = 0; i < missing.length; i += BATCH) {
-    // "reload" skips the HTTP cache, so no file from an older build sneaks in.
-    await cache.addAll(missing.slice(i, i + BATCH).map((file) => new Request(file, { cache: "reload" })));
+/** Whether a part of the offline copy is in `choice` (the same rule as `wanted` in src/lib/offlineParts.ts). */
+function wanted(part, choice) {
+  if (part.music && !choice.music) return false;
+  if (part.books?.length && part.books.every((book) => choice.skip.includes(book))) return false;
+  if (!part.language) return true;
+  return choice.languages.includes(part.language) || (part.standsIn ?? []).some((language) => choice.languages.includes(language));
+}
+
+/** The offline copy's parts, its list kept in `cache` once fetched; [] when there is none or it can't be fetched (offline). */
+async function offlineParts(cache) {
+  if (!OFFLINE) return [];
+  const address = new URL(OFFLINE, self.registration.scope).href;
+  try {
+    let response = await cache.match(address);
+    if (!response) {
+      response = await fetch(address);
+      if (!response.ok) return [];
+      await cache.put(address, response.clone());
+    }
+    return (await response.json()).parts;
+  } catch {
+    return [];
   }
-  await cache.put(ALL, new Response("1"));
+}
+
+/**
+ * Downloads every file the offline copy lacks yet (an installed app plays offline), then marks it so: with `choice`
+ * (`{ languages, skip, music }`) only the files of the chosen books and languages, and the files of those left out are
+ * dropped; without one (`true`, an app from before the choice) every file of FILES. In batches, so what came is kept
+ * when the network or the worker stops halfway (a phone's signal, a newer build taking over), and the next start goes
+ * on from there. `report(done, total)` hears the bytes as they come.
+ */
+async function keepAll(cache, choice, report = () => {}) {
+  const have = new Set((await cache.keys()).map((request) => request.url));
+  const full = (file) => new URL(file, self.registration.scope).href;
+  let files = FILES.map((file) => ({ path: file, bytes: 0 }));
+  if (typeof choice === "object" && choice) {
+    const parts = await offlineParts(cache);
+    if (parts.length) {
+      files = parts.filter((part) => wanted(part, choice));
+      for (const language of choice.languages) if (TEXTS[language]) files.push({ path: TEXTS[language], bytes: 0 });
+      // What is no longer chosen goes (a language or book left out now), but never what the start needs.
+      const keep = new Set([...files, ...SHELL_FILES.map((path) => ({ path }))].map((file) => full(file.path)));
+      for (const part of parts) if (have.has(full(part.path)) && !keep.has(full(part.path))) await cache.delete(full(part.path));
+    }
+  }
+  const total = files.reduce((sum, file) => sum + file.bytes, 0);
+  let done = files.reduce((sum, file) => sum + (have.has(full(file.path)) ? file.bytes : 0), 0);
+  const missing = files.filter((file) => !have.has(full(file.path)));
+  report(done, total);
+  for (let i = 0; i < missing.length; i += BATCH) {
+    const batch = missing.slice(i, i + BATCH);
+    // "reload" skips the HTTP cache, so no file from an older build sneaks in.
+    await cache.addAll(batch.map((file) => new Request(file.path, { cache: "reload" })));
+    done += batch.reduce((sum, file) => sum + file.bytes, 0);
+    report(done, total);
+  }
+  await cache.put(ALL, new Response(JSON.stringify(choice)));
+}
+
+/** The choice kept with the offline copy (`true` from an app before the choice), or null when there is none. */
+async function keptChoice(response) {
+  if (!response) return null;
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return true;
+  }
 }
 
 self.addEventListener("install", (event) => {
@@ -67,9 +129,9 @@ self.addEventListener("install", (event) => {
       // what changed. The languages kept (the app language, at least) come along in their new build.
       const older = await olderEntries();
       const languages = new Set();
-      let wantsAll = false;
+      let wantsAll = null;
       for (const { cache: from, request } of older) {
-        if (request.url === ALL) wantsAll = true;
+        if (request.url === ALL && wantsAll === null) wantsAll = await keptChoice(await from.match(request));
         const language = /\/static\/texts-([a-z]{2})\./.exec(request.url)?.[1];
         if (language) languages.add(language);
         if (!HASHED.test(new URL(request.url).pathname) || (await cache.match(request))) continue;
@@ -82,7 +144,7 @@ self.addEventListener("install", (event) => {
       const missing = [];
       for (const file of start) if (!HASHED.test(new URL(file, self.registration.scope).pathname) || !(await cache.match(file))) missing.push(file);
       await cache.addAll(missing.map((file) => new Request(file, { cache: "reload" })));
-      if (wantsAll) await keepAll(cache);
+      if (wantsAll) await keepAll(cache, wantsAll);
       await self.skipWaiting();
     })(),
   );
@@ -114,9 +176,14 @@ async function keepLoaded(urls) {
 // - keepTexts: the texts of the language it plays in (on the very first visit it loaded them before this worker was
 //   there, and after a switch they are new);
 // - keep: the files it loaded before this worker was there, so the first visit starts offline too;
-// - keepAll: it runs as an installed app, which plays everything offline; answered with offlineReady once all is there.
+// - keepAll: it runs as an installed app, or grown-ups asked to play without internet: the choice of books and
+//   languages (or `true`, every file); answered with offlineProgress as it downloads and offlineReady once all is there;
+// - forgetAll: grown-ups no longer want the offline copy: what it kept beyond what was played goes with the next choice;
+// - offlineManifest: where the offline copy's list is, so the page can show how big a choice is.
 self.addEventListener("message", (event) => {
-  const { keepTexts, keep, keepAll: all } = event.data ?? {};
+  const { keepTexts, keep, keepAll: all, forgetAll, offlineManifest } = event.data ?? {};
+  const answer = (data) => event.source?.postMessage(data);
+  if (offlineManifest) answer({ offlineManifest: OFFLINE });
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
@@ -124,9 +191,14 @@ self.addEventListener("message", (event) => {
       if (texts && !(await cache.match(texts))) await cache.add(texts);
       if (Array.isArray(keep)) await keepLoaded(keep);
       if (all) {
-        if (!(await cache.match(ALL))) await keepAll(cache);
-        event.source?.postMessage({ offlineReady: true });
+        const kept = await keptChoice(await cache.match(ALL));
+        // The same choice again (an installed app's every start) is there already: ALL is kept only once all came.
+        if (JSON.stringify(kept) !== JSON.stringify(all)) {
+          await keepAll(cache, all, (done, total) => answer({ offlineProgress: { done, total } }));
+        }
+        answer({ offlineReady: true });
       }
+      if (forgetAll) await cache.delete(ALL);
     })(),
   );
 });

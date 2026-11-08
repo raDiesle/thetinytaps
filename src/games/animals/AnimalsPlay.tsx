@@ -8,6 +8,7 @@ import { ANIMAL_TEXTS, ANIMALS, GIFT_TEXTS, giverOf } from "./content";
 import { GiftDrawing } from "./gifts";
 import { HomeDrawing } from "./homes";
 import type { FeedRound, GiftRound, HomeRound } from "./levels";
+import { questionLines } from "./lines";
 import type { AnimalsSettings } from "./settings";
 import { animalsVoice } from "./voice";
 
@@ -103,12 +104,7 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
   const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
 
   /** The round's question; a feeding round's comes after the animal's hunger (Z-24). `queue`: after what is being said. */
-  const ask = (queue = false) => {
-    if (round.kind === "feed") {
-      say(texts.hungry(round.animal), queue);
-      say(texts.whatEats(round.animal), true);
-    } else say(round.kind === "gift" ? giftTexts.whatGives(round.animal) : texts.whereLives(round.animal), queue);
-  };
+  const ask = (queue = false) => questionLines(round, language.id).forEach((line, i) => say(line, queue || i > 0));
 
   // The kind's question when the kind changed, the round's question and the animal's noise come with the round; the
   // round is mounted anew for every animal.

@@ -6,9 +6,11 @@ import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard
 import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
+import { useAppLanguage } from "@/lib/language";
 import { playChime } from "@/lib/sfx";
+import { useVoiceReady } from "@/lib/voiceReady";
 import { LetterWord } from "./Cards";
-import { useLettersPraise, useLettersSay } from "./voice";
+import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
 
@@ -48,9 +50,16 @@ function shuffle<T>(items: T[]): T[] {
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
+/** A letter to look for, with its picture. */
+type Sought = { letter: LetterEntry; word: WordEntry };
+/** One round: the letter on screen, the one after it (its lines load meanwhile), and whether its question waits for the praise. */
+type Round = Sought & { id: number; after: Sought; queue: boolean };
+
 /** "Wo ist das B?": a letter and its picture appear, and the child looks for the key. */
 export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
-  const [current, setCurrent] = useState<{ id: number; letter: LetterEntry; word: WordEntry } | null>(null);
+  const [current, setCurrent] = useState<Round | null>(null);
+  /** The next letter, waiting for its lines (`useVoiceReady`) while the letter found stays on screen. */
+  const [coming, setComing] = useState<Round | null>(null);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [wrong, setWrong] = useState(0);
   const [found, setFound] = useState(false);
@@ -61,6 +70,9 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const nextId = useRef(0);
   const deck = useRef<LetterEntry[]>([]);
   const wordIndex = useRef(new Map<string, number>());
+  /** The letter drawn last from the deck: the one after the letter on screen. */
+  const upcoming = useRef<Sought | null>(null);
+  const { id: language } = useAppLanguage();
 
   const letters = useMemo(() => findableLetters(pack, settings.theme), [pack, settings.theme]);
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
@@ -81,28 +93,50 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
     [settings.theme],
   );
 
-  // Go through all letters in random order before any letter comes again.
+  /** What a round says: its question and, once found, the letter with its word. */
+  const linesOf = useCallback(({ letter, word }: Sought) => [pack.findPrompt(letter), pack.letterSentence(letter, word)], [pack]);
+
+  // A letter comes on screen only once its lines are there, so its question is asked with its picture; the letter
+  // after it loads meanwhile. The praise is a handful of lines, loaded once.
+  const round = coming ?? current;
+  const ready = useVoiceReady(lettersVoice, round ? linesOf(round) : [], language, { next: round ? linesOf(round.after) : [] });
+  useEffect(() => lettersVoice.load(pack.praise, language), [pack, language]);
+
+  // Go through all letters in random order before any letter comes again; each is drawn one round ahead, so its
+  // lines load while the letter before it is looked for.
+  const draw = useCallback((): Sought => {
+    if (deck.current.length === 0) {
+      deck.current = shuffle(letters);
+      // The deck is used from the end; don't start the new round with the letter drawn last.
+      const last = deck.current.length - 1;
+      if (last > 0 && deck.current[last] === upcoming.current?.letter) {
+        [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
+      }
+    }
+    const letter = deck.current.pop()!;
+    upcoming.current = { letter, word: pickWord(letter) };
+    return upcoming.current;
+  }, [letters, pickWord]);
+
+  /** Draws the next letter; after a find (`queue`) its question waits for the praise instead of cutting it off. */
   const nextLetter = useCallback(
     (queue = false) => {
-      if (deck.current.length === 0) {
-        deck.current = shuffle(letters);
-        // The deck is used from the end; don't start the new round with the letter just found.
-        const last = deck.current.length - 1;
-        if (last > 0 && deck.current[last] === current?.letter) {
-          [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
-        }
-      }
-      const letter = deck.current.pop()!;
-      const id = nextId.current++;
-      setCurrent({ id, letter, word: pickWord(letter) });
-      setWrong(0);
-      setFound(false);
-      setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
-      // After a find, the question waits for the praise instead of cutting it off.
-      say(pack.findPrompt(letter), queue);
+      const first = upcoming.current ?? draw();
+      setComing({ ...first, id: nextId.current++, after: draw(), queue });
     },
-    [letters, current, pack, pickWord, say],
+    [draw],
   );
+
+  // The letter waiting comes on screen once its lines are there.
+  useEffect(() => {
+    if (!coming || !ready) return;
+    setComing(null);
+    setCurrent(coming);
+    setWrong(0);
+    setFound(false);
+    setBackground(BACKGROUNDS[coming.id % BACKGROUNDS.length]);
+    say(pack.findPrompt(coming.letter), coming.queue);
+  }, [coming, ready, pack, say]);
 
   // A found key stays lit for a moment, then the next letter comes without another key or tap.
   useEffect(() => {
@@ -117,8 +151,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   /** A key was pressed, on the keyboard or on the screen. */
   const pressKey = useCallback(
     (key: string) => {
-      if (!current) return;
-      if (found) {
+      if (!current || found) {
         softTap();
         return;
       }

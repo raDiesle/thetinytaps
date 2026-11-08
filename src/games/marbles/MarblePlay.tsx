@@ -99,6 +99,8 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   // Every line is said from its ElevenLabs recording in the app language; a line not translated yet in German. Lines wait
   // for each other, but a level's first line cuts off what is still said from before.
   const say = useCallback((text: Localized, queue = true) => marblesVoice.say(pick(text, language.id), language.id, { queue }), [language.id]);
+  // Its few dozen lines are fetched as it starts, so none comes late (src/lib/voice.ts: `loadAll` only for so few).
+  useEffect(() => marblesVoice.loadAll(language.id), [language.id]);
 
   useEffect(() => {
     say(LEVEL_TEXTS[level.id].intro, false);

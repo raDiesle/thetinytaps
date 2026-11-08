@@ -8,6 +8,7 @@ import { PageTime } from "./lib/analytics";
 import { PlaytimeLock } from "./components/PlaytimeLock";
 import { ScreenHint } from "./components/ScreenHint";
 import { SeoHead } from "./components/SeoHead";
+import { SoundLoading } from "./components/SoundLoading";
 import { applySavedFigure } from "./lib/common";
 import { loadAppLanguage } from "./lib/language";
 import { forgetOldLook } from "./lib/look";
@@ -32,6 +33,7 @@ createRoot(document.getElementById("root")!).render(
       <ScreenHint />
       <SeoHead />
       <BackgroundMusic />
+      <SoundLoading />
       <MenuRipples />
       <PageTime />
     </BrowserRouter>

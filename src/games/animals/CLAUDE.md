@@ -49,7 +49,12 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest 
 Each round is mounted anew (`key={turn}`) and reports `onSolved(misses)` when the right thing is picked and `onNext()`
 when the reaction has been watched; the step and the animals still to come live in `AnimalsRounds`, which also hands
 each round its `RoundTopic` (`topic`) to show under its picture. Every five rounds (one of each kind) count as a game for the play-time limit (`gameEnded`,
-`countGame`). Homes are drawn in `homes.tsx`, gifts in `gifts.tsx`, the small ones and their growing in `growth.tsx`; animals, foods, gifts' givers and sentences are in `content.ts`.
+`countGame`). The game says ≈570 lines per language, so it never loads them all (user request, November 2026):
+`AnimalsRounds` draws the next round's animal or small one a turn ahead (`upcoming`; its choices are dealt only when it
+comes, on the step this round leads to), shows a round only once the lines it starts with are loaded (`useVoiceReady`:
+the kind's question and the round's own, `questionLines` in `lines.ts`; the paw track shows meanwhile), and then loads
+the rest of its lines (`answerLines`, `wrongLines`) and the next round's question and answer. A new line a round says
+goes into `lines.ts` too, or it is fetched only when said and comes late on a phone. Homes are drawn in `homes.tsx`, gifts in `gifts.tsx`, the small ones and their growing in `growth.tsx`; animals, foods, gifts' givers and sentences are in `content.ts`.
 
 **Difficulty** (`ANIMAL_LEVELS`, `dealFeed`, `dealGift`, `dealHome`, `dealGrow` in `levels.ts`; the step rule is `nextLevel` from
 Schatten finden): one step for all four kinds. Two rounds in a row without a wrong pick → one up; two wrong picks in

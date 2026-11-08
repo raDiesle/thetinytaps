@@ -3,6 +3,7 @@ import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/languag
 import { loadRecordings } from "@/lib/sfx";
 import { distanceToRect, TAP_SLOP_PX } from "@/lib/tapTargets";
 import { hush, recordedVoice } from "@/lib/voice";
+import { useVoiceReady } from "@/lib/voiceReady";
 import { framesFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
@@ -98,13 +99,15 @@ export function useVoice(settings: FeelingsSettings) {
     [language.id],
   );
   const voiced = useCallback((text: string) => voice.has(text, language.id), [language.id]);
-  /** Starts loading the recordings of a story's lines, so each is said right when its picture comes. */
+  /** Starts loading the recordings of a story's lines, so each is said right when its picture comes; nothing while the voice is off. */
   const preload = useCallback(
-    (texts: (string | undefined)[]) =>
-      voice.load(
-        texts.filter((t): t is string => !!t),
-        language.id,
-      ),
+    (texts: (string | undefined)[]) => {
+      if (speaking.current)
+        voice.load(
+          texts.filter((t): t is string => !!t),
+          language.id,
+        );
+    },
     [language.id],
   );
 
@@ -116,6 +119,21 @@ export function useVoice(settings: FeelingsSettings) {
   );
 
   return { say, sound, voiced, preload };
+}
+
+/**
+ * Whether a scene or page may start telling: true once the recordings of `lines` (what it opens with) are loaded, or
+ * after SOUND_WAIT_MS, with the paw track meanwhile (`useVoiceReady`). Then `next` loads quietly: the rest of the scene
+ * and the opening of the one after it, so a whole day never loads at once. Once true it stays true, so switching the
+ * voice back on never stops a scene that began. With the voice off nothing is loaded and it is true at once – the
+ * story still waits for each line's length (`voiced`).
+ */
+export function useLinesReady(settings: FeelingsSettings, lines: string[], next: string[] = []) {
+  const language = useAppLanguage();
+  const ready = useVoiceReady(voice, lines.filter(Boolean), language.id, { next: next.filter(Boolean), enabled: settings.voice });
+  const [begun, setBegun] = useState(ready);
+  if (ready && !begun) setBegun(true);
+  return begun || ready;
 }
 
 /**

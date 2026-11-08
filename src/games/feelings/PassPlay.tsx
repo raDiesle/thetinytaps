@@ -3,7 +3,7 @@ import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { groupStories, type StoryGroup } from "./groups";
 import { RoundPlay } from "./RoundPlay";
-import { roundOf, stepsOf } from "./rounds";
+import { openingLines, roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 
 /** „Alltagssituationen“'s bottom right corner for grown-ups: the note with the round's text, and the loudspeaker beside it. */
@@ -87,6 +87,8 @@ export function PassPlay({
       onEndKey={last ? (next?.onNext ?? onAgain) : goOn}
       onPick={replay}
       readAlong={readAlong}
+      // The next scene's opening loads while this one plays.
+      nextLines={last ? [] : openingLines(roundOf(scenes[now.index + 1], stepOf(now.index + 1), language))}
     />
   );
 }

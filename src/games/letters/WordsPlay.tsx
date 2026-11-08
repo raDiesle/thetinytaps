@@ -6,8 +6,10 @@ import { isRightToLeftPack, keyMatches, keyOf, toLower, toUpper } from "@/conten
 import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling";
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
+import { useAppLanguage } from "@/lib/language";
 import { playChime, playCountNote } from "@/lib/sfx";
-import { useLettersPraise, useLettersSay } from "./voice";
+import { useVoiceReady } from "@/lib/voiceReady";
+import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 import { useSoftTap } from "./softTap";
 
@@ -58,9 +60,14 @@ function paradeSpots(count: number) {
   }));
 }
 
+/** One word to type, and the word that comes after it (its lines load meanwhile). */
+type Round = { id: number; word: WordEntry; after: WordEntry };
+
 /** „Wörter tippen“ with the whole word: a picture with its word, typed letter by letter. */
 export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
-  const [current, setCurrent] = useState<{ id: number; word: WordEntry } | null>(null);
+  const [current, setCurrent] = useState<Round | null>(null);
+  /** The next word, waiting for its lines (`useVoiceReady`) while the word before stays on screen. */
+  const [coming, setComing] = useState<Round | null>(null);
   const [typed, setTyped] = useState(0);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [nudges, setNudges] = useState(0);
@@ -71,6 +78,9 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const doneAt = useRef(0);
   const nextId = useRef(0);
   const deck = useRef<WordEntry[]>([]);
+  /** The word drawn last from the deck: the one after the word on screen. */
+  const upcoming = useRef<WordEntry | null>(null);
+  const { id: language } = useAppLanguage();
 
   const words = useMemo(
     () => wordsFor(pack, settings.wordKind, Number(settings.wordLength), settings.theme),
@@ -87,39 +97,64 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const say = useLettersSay();
   const praise = useLettersPraise();
 
-  /** Says the letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
-  const sayLetter = useCallback(
+  /** The letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
+  const letterLine = useCallback(
     (unit: string) => {
       const upper = toUpper(unit, pack);
       const letter = /\p{Script=Devanagari}/u.test(unit)
         ? undefined
         : (pack.letters.find((l) => l.upper === upper) ?? pack.letters.find((l) => keyMatches(unitKey(unit), l.upper, pack)));
-      say(`${letter?.spoken ?? unit}!`);
+      return `${letter?.spoken ?? unit}!`;
     },
-    [pack, say],
+    [pack],
   );
+  const sayLetter = useCallback((unit: string) => say(letterLine(unit)), [say, letterLine]);
+
+  /** Everything a word's round says: the word, its letters' names and, for a doing word, the invitation. */
+  const linesOf = useCallback(
+    (word: WordEntry) => [`${word.word}!`, ...textUnits(spellingOf(word)).map(letterLine), ...(isAction(word) ? [pack.joinIn(word)] : [])],
+    [pack, letterLine],
+  );
+
+  // A word comes on screen only once its lines are there, so its name is said with its picture; the word after it
+  // loads meanwhile. The praise is a handful of lines, loaded once.
+  const round = coming ?? current;
+  const ready = useVoiceReady(lettersVoice, round ? linesOf(round.word) : [], language, { next: round ? linesOf(round.after) : [] });
+  useEffect(() => lettersVoice.load(pack.praise, language), [pack, language]);
 
   const softTap = useSoftTap(ripple, settings.sounds);
 
-  // Go through all words in random order before any word comes again.
-  const nextWord = useCallback(() => {
+  // Go through all words in random order before any word comes again; each is drawn one round ahead, so its lines load
+  // while the word before it is typed.
+  const draw = useCallback(() => {
     if (deck.current.length === 0) {
       deck.current = shuffle(words);
-      // The deck is used from the end; don't start the new round with the word just typed.
+      // The deck is used from the end; don't start the new round with the word drawn last.
       const last = deck.current.length - 1;
-      if (last > 0 && deck.current[last] === current?.word) {
+      if (last > 0 && deck.current[last] === upcoming.current) {
         [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
       }
     }
-    const word = deck.current.pop()!;
-    const id = nextId.current++;
+    upcoming.current = deck.current.pop()!;
+    return upcoming.current;
+  }, [words]);
+
+  const nextWord = useCallback(() => {
+    const word = upcoming.current ?? draw();
+    setComing({ id: nextId.current++, word, after: draw() });
+  }, [draw]);
+
+  // The word waiting comes on screen once its lines are there.
+  useEffect(() => {
+    if (!coming || !ready) return;
+    setComing(null);
     doneAt.current = 0;
-    setCurrent({ id, word });
+    setCurrent(coming);
     setTyped(0);
     setNudges(0);
-    setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
-    say(`${word.word}!`);
-  }, [words, current, say]);
+    setBackground(BACKGROUNDS[coming.id % BACKGROUNDS.length]);
+    say(`${coming.word.word}!`);
+  }, [coming, ready, say]);
 
   const typeNext = useCallback(() => {
     if (!current || done) return;
@@ -152,10 +187,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
 
   /** Once a finished word has been celebrated long enough, start the next one. */
   const tryNextWord = useCallback(() => {
-    if (!done || performance.now() - doneAt.current < CELEBRATE_MS) return false;
+    if (!done || coming || performance.now() - doneAt.current < CELEBRATE_MS) return false;
     nextWord();
     return true;
-  }, [done, nextWord]);
+  }, [done, coming, nextWord]);
 
   // Start with a word right away; changed options while playing bring a new game (its key in LettersGame).
   useEffect(() => nextWord(), []);
@@ -163,7 +198,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** A key was pressed, on the keyboard or on the screen. */
   const pressKey = useCallback(
     (key: string) => {
-      if (!current) return;
+      if (!current) {
+        softTap();
+        return;
+      }
       if (done) {
         if (!tryNextWord()) softTap();
         return;

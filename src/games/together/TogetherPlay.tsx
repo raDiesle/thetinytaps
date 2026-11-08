@@ -6,7 +6,7 @@ import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import type { TogetherRound } from "./levels";
 import { PairPicture, PartnerIcon } from "./PairPicture";
-import { TOGETHER_TEXTS, WORK_MS } from "./pairs";
+import { TOGETHER_TEXTS, type TogetherTexts, WORK_MS } from "./pairs";
 import type { TogetherSettings } from "./settings";
 import { togetherVoice } from "./voice";
 
@@ -21,6 +21,14 @@ interface Offset {
 }
 
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+
+/**
+ * Every line `round` may say: its question, the praise of the right pick and, for each wrong choice, whom it belongs
+ * to. A round starts only once they are loaded, so each comes at its moment.
+ */
+export function roundLines(round: TogetherRound, texts: TogetherTexts): string[] {
+  return [texts.question(round.pair), texts.right(round.pair), ...round.choices.filter((p) => p !== round.pair).map((p) => texts.belongs(p))];
+}
 
 /** What a round gets from `TogetherRounds`, which plays the two kinds in turn. */
 export interface TogetherPlayProps {
@@ -77,10 +85,9 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
 
   // Its ElevenLabs recording; a sentence not translated yet is said in German.
   const say = useCallback((text: string, queue = false) => togetherVoice.say(text, language.id, { queue }), [language.id]);
-  // Its few sentences load as the game starts, so even the first is heard right away.
-  useEffect(() => togetherVoice.loadAll(language.id), [language.id]);
 
-  // The question comes with the round; the round is mounted anew for every pair.
+  // The question comes with the round; the round is mounted anew for every pair, and only once its lines are loaded
+  // (`roundLines`, `TogetherRounds`), so the question comes with the picture.
   useEffect(() => say(texts.question(round.pair)), []);
 
   const softTap = useCallback(

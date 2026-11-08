@@ -3,6 +3,7 @@ import { AppLanguageOptions, LeaveOptions, MenuButton, useMusicSwitch } from "@/
 import { ContactLink } from "@/components/ContactLink";
 import { InstallHint } from "@/components/InstallHint";
 import { MascotHead } from "@/components/Mascot";
+import { OfflineOptions } from "@/components/OfflineOptions";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { SeoWords } from "@/components/SeoText";
@@ -278,6 +279,7 @@ export function RoomNotes() {
         <ContactLink />
       </p>
       <InstallHint />
+      <OfflineOptions />
     </MenuButton>
   );
 }

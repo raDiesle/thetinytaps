@@ -96,6 +96,9 @@ export const roundImages = (round: Round): string[] => [round.start.image, round
 /** The text a beat is said as: its narration and its line together, as recorded. */
 export const beatText = (beat: Beat): string => [beat.narration, beat.line].filter(Boolean).join(" ");
 
+/** What a round says first: its scene told, then its question – loaded before it starts telling. */
+export const openingLines = (round: Round): string[] => [...round.start.beats.map(beatText), round.question].filter(Boolean);
+
 /** Every line a round may say, to load their recordings when it starts. */
 export const roundLines = (round: Round): string[] =>
   [...round.start.beats, ...round.good.beats, ...(round.end?.beats ?? [])].map(beatText).concat(round.question, round.instead.answer);

@@ -3,16 +3,19 @@ import { SHADOW_RECORDINGS } from "@/games/shadows/content";
 import { useDeck } from "@/games/shadows/deck";
 import { nextLevel } from "@/games/shadows/levels";
 import { DEV } from "@/lib/buildInfo";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { loadRecordings } from "@/lib/sfx";
+import { useVoiceReady } from "@/lib/voiceReady";
 import { AnimalsPlay } from "./AnimalsPlay";
 import { ANIMAL_RECORDINGS, ANIMALS, GIVERS, type Animal } from "./content";
 import { GrowPlay } from "./GrowPlay";
 import { GROWTHS } from "./growth";
+import { type AnimalRound, answerLines, questionLines, type RoundSubject, wrongLines } from "./lines";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import type { AnimalsSettings } from "./settings";
 import { KIND_QUESTIONS, RoundTopic } from "./RoundTopic";
+import { animalsVoice } from "./voice";
 
 const FED = ANIMALS.filter((a) => a.food);
 const HOUSED = ANIMALS.filter((a) => a.home);
@@ -40,6 +43,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const devGrowth = useRef(DEV ? GROWTHS.find((g) => g.id === new URLSearchParams(window.location.search).get("grow")) : undefined);
   const lastAnimal = useRef<Animal | null>(null);
   const t = useT();
+  const language = useAppLanguage().id;
   /** While developing, `?animal=<id>` feeds, houses or asks only that animal, to look at its rounds and its home. */
   const [devAnimal] = useState(() => (DEV ? ANIMALS.find((a) => a.id === new URLSearchParams(window.location.search).get("animal")) : undefined));
   // The real animal sounds (and the munch), loaded at once so even the first round sounds real.
@@ -54,39 +58,42 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
     return animal;
   };
 
-  // Dealt once per turn: the round must stay the same while it is played, however often this renders.
-  const dealt = useRef<{ turn: number; round: ReturnType<typeof deal>; newKind: boolean } | null>(null);
-  function deal(last: RoundKind | null) {
+  /** The kind of the round after `last` and its animal or small one, drawn from the decks before its choices are dealt. */
+  function drawSubject(last: RoundKind | null): RoundSubject {
+    if (devGrowth.current) return { kind: "grow", growth: devGrowth.current };
+    const kind = nextKind(last, settings.kinds);
+    if (kind === "grow") return { kind, growth: drawGrowth() };
+    if (kind === "gift") return { kind, animal: drawAnimal(drawGiver, (a) => a.gives) };
+    return kind === "feed" ? { kind, animal: drawAnimal(drawFed, (a) => a.food) } : { kind, animal: drawAnimal(drawHoused, (a) => a.home) };
+  }
+  /** The choices of a round, dealt as it comes on, on the step the child is on now. */
+  function deal(subject: RoundSubject): AnimalRound {
     // A fixed difficulty plays its step; switched back to „Von selbst“, the game climbs on from there.
     if (settings.difficulty !== "auto" && levelRef.current !== FIXED_LEVELS[settings.difficulty]) {
       levelRef.current = FIXED_LEVELS[settings.difficulty];
       resultsRef.current = [];
     }
-    const level = ANIMAL_LEVELS[levelRef.current];
-    if (devGrowth.current) return dealGrow(devGrowth.current, level.choices);
-    const kind = nextKind(last, settings.kinds);
-    if (kind === "grow") return dealGrow(drawGrowth(), level.choices);
-    if (kind === "gift")
-      return dealGift(
-        drawAnimal(drawGiver, (a) => a.gives),
-        level.choices,
-      );
-    return kind === "feed"
-      ? dealFeed(
-          drawAnimal(drawFed, (a) => a.food),
-          level.choices,
-        )
-      : dealHome(
-          drawAnimal(drawHoused, (a) => a.home),
-          level.choices,
-        );
+    const { choices } = ANIMAL_LEVELS[levelRef.current];
+    if (subject.kind === "grow") return dealGrow(subject.growth, choices);
+    if (subject.kind === "gift") return dealGift(subject.animal, choices);
+    return subject.kind === "feed" ? dealFeed(subject.animal, choices) : dealHome(subject.animal, choices);
   }
+
+  // Dealt once per turn: the round must stay the same while it is played, however often this renders. The next round's
+  // animal or small one is drawn a turn ahead (`upcoming`), so its lines load while this one is played; its choices are
+  // dealt only when it comes, on the step this round leads to.
+  const dealt = useRef<{ turn: number; round: AnimalRound; newKind: boolean; upcoming: RoundSubject; kinds: AnimalsSettings["kinds"] } | null>(null);
   if (dealt.current?.turn !== turn) {
     const last = dealt.current?.round.kind ?? null;
-    const next = deal(last);
-    dealt.current = { turn, round: next, newKind: next.kind !== last };
+    const round = deal(dealt.current?.upcoming ?? drawSubject(last));
+    dealt.current = { turn, round, newKind: round.kind !== last, upcoming: drawSubject(round.kind), kinds: settings.kinds };
+  } else if (dealt.current.kinds !== settings.kinds) {
+    // Other kinds chosen behind ⚙️ while this round is played: the next round is drawn again.
+    const { round } = dealt.current;
+    lastAnimal.current = "animal" in round ? round.animal : null;
+    dealt.current = { ...dealt.current, upcoming: drawSubject(round.kind), kinds: settings.kinds };
   }
-  const round = dealt.current.round;
+  const { round, upcoming } = dealt.current;
 
   const auto = settings.difficulty === "auto";
   const onSolved = useCallback(
@@ -115,6 +122,20 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const topic = <RoundTopic kind={round.kind} />;
   // When the kind of round changes (also the first round), the voice says its question once before the round's own (Z-24).
   const intro = dealt.current.newKind ? t(KIND_QUESTIONS[round.kind]) : undefined;
+  // The round comes on once the lines it starts with are loaded, so its question comes with its picture (the paw track
+  // shows meanwhile); then the rest of its lines load and the next round's question and answer – never all the game's
+  // lines at once.
+  const upcomingIntro = upcoming.kind !== round.kind ? t(KIND_QUESTIONS[upcoming.kind]) : undefined;
+  const ready = useVoiceReady(animalsVoice, [...(intro ? [intro] : []), ...questionLines(round, language)], language, {
+    next: [
+      ...answerLines(round, language),
+      ...wrongLines(round, language),
+      ...(upcomingIntro ? [upcomingIntro] : []),
+      ...questionLines(upcoming, language),
+      ...answerLines(upcoming, language),
+    ],
+  });
+  if (!ready) return null;
   return round.kind === "grow" ? (
     <GrowPlay key={turn} settings={settings} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
   ) : (

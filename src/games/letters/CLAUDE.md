@@ -73,6 +73,12 @@ the app language (🌐, `useLanguagePack()`), never in another one and never wit
   or its recording is never found. Two lines in a row (a word, then the praise) are said one after the other (`queue`),
   never joined into one sentence, which has no recording. The counting sentences („drei Äpfel!“) are recorded too
   (November 2026); one without its recording (a new thing to count) says the number word alone (`sentenceFor`).
+- The recordings are hundreds of lines a language, so the game never loads them all (`loadAll`): Frei tippen and Zählen
+  load what the next press can say as play starts and after each press (`loadAhead`: every number with the things it
+  counts next – drawn one ahead, `nextThing` – and every letter with its next word); Mitmachen its number words and
+  invitations. Wörter tippen and „Wo ist das B?“ draw each word or letter one round ahead: the next one's lines load
+  while this one is played, and a round comes on screen only once its lines are there (`useVoiceReady`, the paw track
+  meanwhile), so its first line comes with its picture. A new line the game says goes into those lists.
 - Grown-up texts (start screen, options, hints on the play screen) go through `useT()` (`t({ de, ru, en, zh, hi, es, ar })`);
   new or changed lines come German-only until translations are asked for, marked in `languageStatus.ts`.
 - Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` types by key

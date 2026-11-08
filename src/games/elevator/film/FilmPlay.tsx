@@ -10,7 +10,7 @@ import { tapState } from "@/lib/tapTargets";
 import { hush, talking } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
 import { translationOf } from "../phrases";
-import { sayIn } from "../voice";
+import { filmLines, linesReady, loadLines, sayIn } from "../voice";
 import type { ElevatorSettings } from "../settings";
 import { Fitted, type Picture } from "../trail/items";
 import type { Cue } from "../trail/types";
@@ -319,6 +319,12 @@ export function FilmPlay({
 
   const play = async () => {
     let picks: string[] = [];
+    // Only the film's lines up to its first choice load (then those of the way picked); the first scene's first line
+    // holds its beats until it is there, so it comes with the picture.
+    const opening = film.scenes(picks)[0]?.beats.find((beat) => beat.say || beat.ask);
+    const ready = linesReady([opening?.ask, opening?.say], voice);
+    loadLines(filmLines(film, picks), voice);
+    const g = generation.current;
     for (let i = 0; ; i++) {
       const scene = film.scenes(picks)[i];
       if (!scene) break;
@@ -332,6 +338,10 @@ export function FilmPlay({
       await wait(60);
       put({ shut: false });
       await wait(IRIS_MS + LOOK_MS);
+      if (i === 0) {
+        await ready();
+        if (g !== generation.current) return;
+      }
       for (const [j, beat] of scene.beats.entries()) {
         if (beat.say || beat.ask) await quiet();
         if (beat.tap) await waitTap(beat.tap, beat.ask);
@@ -347,6 +357,7 @@ export function FilmPlay({
         await quiet();
         picks = [...picks, await waitChoice(scene.choice)];
         put({ picks });
+        loadLines(filmLines(film, picks), voice);
         await wait(PICKED_MS);
       }
     }

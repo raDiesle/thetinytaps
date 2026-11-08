@@ -21,7 +21,9 @@ import { SEO_ES } from "../src/content/seo.es";
 import { SEO_HI } from "../src/content/seo.hi";
 import { SEO_RU } from "../src/content/seo.ru";
 import { SEO_ZH } from "../src/content/seo.zh";
+import { shelfEntryOf } from "../src/content/games";
 import { appPlugin, PRODUCTION } from "./appPlugin";
+import { isBackgroundSong, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
 import { BOOT_WAIT, chunkClosure, pageModuleFor, pageModules } from "./pageStart";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
@@ -294,6 +296,7 @@ async function pagePreloads(template: string) {
 // and the texts of each language (texts-ru.<hash>.js, src/content/texts): only the chosen one is needed, and
 // the worker keeps the one a page asks for (TEXTS, by language).
 async function writeServiceWorker() {
+  const offline = await writeOfflineManifest();
   const all = await filesIn(OUT);
   const texts = Object.fromEntries(all.flatMap((file) => /^static\/texts-([a-z]{2})\.[^/]*\.js$/.exec(file)?.slice(1, 2).map((id) => [id, `./${file}`]) ?? []));
   // Offline every address opens index.html (src/sw.js), so the other pages, written for search engines, stay out.
@@ -304,7 +307,8 @@ async function writeServiceWorker() {
       `/${file}` !== PREVIEW_IMAGE.path &&
       !/\.(map|LICENSE\.txt)$/.test(file) &&
       !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file) &&
-      !Object.values(texts).includes(`./${file}`),
+      !Object.values(texts).includes(`./${file}`) &&
+      `./${file}` !== offline,
   );
   const shell = await shellFiles();
   const template = await readFile(join(ROOT, "src/sw.js"), "utf8");
@@ -314,8 +318,86 @@ async function writeServiceWorker() {
     .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
     .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
     .replace("__SHELL__", JSON.stringify(shell.map((file) => `./${file}`)))
-    .replace("__TEXTS__", JSON.stringify(texts));
+    .replace("__TEXTS__", JSON.stringify(texts))
+    .replace("__OFFLINE__", JSON.stringify(offline));
   await writeFile(join(OUT, "sw.js"), worker);
+}
+
+/**
+ * The offline copy by book and language (src/lib/offlineParts.ts), as static/offline.<hash>.json; returns its address.
+ * A file belongs to the books whose pages' code names it: each lazy page of App.tsx with every chunk it imports (and
+ * loads later itself, but no other page), less what the start already needs, which every book shares. The other
+ * languages' voices and songs are told apart by their names; an English recording stands in for the languages whose
+ * recordings in the same game's code fall short (`needsEnglish`).
+ */
+async function writeOfflineManifest() {
+  const files = await filesIn(OUT);
+  const read = (file: string) => readFile(join(OUT, file), "utf8");
+  const prefix = `${base}/static/`;
+  const escaped = prefix.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+  const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
+  const chunkOf = (name: string) => files.find((file) => new RegExp(`^static/${name}\\.[a-z0-9]+\\.js$`).test(file));
+  const pageChunks = new Set([...new Set(modules.values())].map(chunkOf).filter((chunk): chunk is string => !!chunk));
+  /** A chunk with the chunks it imports, statically or later, but never another page. */
+  const closure = async (first: string) => {
+    const seen = new Set<string>();
+    const queue = [first];
+    while (queue.length) {
+      const file = queue.shift() as string;
+      if (seen.has(file)) continue;
+      seen.add(file);
+      for (const [, name] of (await read(file)).matchAll(new RegExp(`(?:from|import)\\s*\\(?"${escaped}([\\w.-]+\\.js)"`, "g"))) {
+        const chunk = `static/${name}`;
+        if (!pageChunks.has(chunk) || chunk === first) queue.push(chunk);
+      }
+    }
+    return seen;
+  };
+  /** The files a chunk's code names (pictures, sounds), besides itself. */
+  const named = async (chunk: string) => [chunk, ...[...(await read(chunk)).matchAll(new RegExp(`${escaped}([\\w.-]+\\.(?:mp3|webp|png|jpe?g|svg|woff2?))`, "g"))].map((m) => `static/${m[1]}`)];
+
+  const html = await read("index.html");
+  const start = new Set<string>();
+  for (const [, name] of html.matchAll(new RegExp(`${escaped}([\\w.-]+\\.js)`, "g"))) for (const chunk of await chunkClosure(`static/${name}`, read, prefix)) start.add(chunk);
+  const shared = new Set<string>();
+  for (const chunk of start) for (const file of await named(chunk)) shared.add(file);
+
+  const books = new Map<string, Set<string>>();
+  const english = new Map<string, Set<string>>();
+  for (const [path, module] of modules) {
+    const book = shelfEntryOf(path)?.id;
+    const chunk = chunkOf(module);
+    if (!book || !chunk) continue;
+    const used: string[] = [];
+    for (const each of await closure(chunk)) if (!start.has(each)) used.push(...(await named(each)));
+    const lacking = needsEnglish(used)(SEO_LANGUAGES);
+    for (const file of used) {
+      if (shared.has(file)) continue;
+      books.set(file, (books.get(file) ?? new Set()).add(book));
+      if (languageOf(file) === "en" && lacking.length) english.set(file, new Set([...(english.get(file) ?? []), ...lacking]));
+    }
+  }
+
+  const parts: OfflinePart[] = [];
+  for (const file of files) {
+    // Pages for search engines, the worker, the texts by language (the worker keeps those by TEXTS) stay out.
+    if ((/\.(html|xml|txt|map)$/.test(file) && file !== "index.html") || file === "sw.js" || /^static\/texts-[a-z]{2}\./.test(file)) continue;
+    if (`/${file}` === PREVIEW_IMAGE.path) continue;
+    const part: OfflinePart = { path: `./${file}`, bytes: (await Bun.file(join(OUT, file)).size) as number };
+    const inBooks = books.get(file);
+    if (inBooks) part.books = [...inBooks].sort();
+    const language = languageOf(file);
+    if (language) part.language = language;
+    if (isBackgroundSong(file)) part.music = true;
+    const standsIn = english.get(file);
+    if (standsIn) part.standsIn = [...standsIn].sort();
+    parts.push(part);
+  }
+  const manifest: OfflineManifest = { parts };
+  const json = JSON.stringify(manifest);
+  const name = `static/offline.${createHash("sha256").update(json).digest("hex").slice(0, 8)}.json`;
+  await writeFile(join(OUT, name), json);
+  return `./${name}`;
 }
 
 /**

@@ -8,7 +8,7 @@ import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who 
 import { Backdrop, Buttons, CabinBack, CabinFront, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose, useHero } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
-import { sayIn } from "./voice";
+import { linesReady, loadLines, sayIn, storyLines } from "./voice";
 import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
 
@@ -372,7 +372,13 @@ export function ElevatorPlay({
     const hero = actorAt(story.start, story.startX, -1, "stand");
     const buddy = story.buddy ? actorAt(story.buddy.floor, story.buddy.x, story.buddy.face, story.buddy.pose) : null;
     put({ ...START, picking: false, story, cabin: story.start, actors: { hero, buddy } });
+    // Only this story's lines load; its first one holds the start until it is there, so it comes with the picture.
+    const ready = linesReady([story.need.say], language);
+    loadLines(storyLines(story), language);
+    const g = generation.current;
     await wait(700);
+    await ready();
+    if (g !== generation.current) return;
     actor("hero", { pose: story.need.pose });
     showBubble("hero", story.need.pic);
     cue(story.need.sounds);

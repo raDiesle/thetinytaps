@@ -39,6 +39,7 @@ function fakeCaches(store: Store, network: Network) {
         for (const request of requests) await add(request);
       },
       keys: async () => [...cache.keys()].map((url) => ({ url })),
+      delete: async (request: string | { url: string }) => cache.delete(address(request)),
     };
   };
   return {
@@ -55,7 +56,10 @@ function fakeCaches(store: Store, network: Network) {
 }
 
 /** Loads the worker of a build with these files into the fake browser, `network` as its fetch. */
-function worker(network: Network, { store = new Map() as Store, version = "new", files = [] as string[], shell = [] as string[] } = {}) {
+function worker(
+  network: Network,
+  { store = new Map() as Store, version = "new", files = [] as string[], shell = [] as string[], offline = null as string | null } = {},
+) {
   const handlers: Record<string, Handler> = {};
   const self = {
     registration: { scope: SCOPE },
@@ -70,7 +74,8 @@ function worker(network: Network, { store = new Map() as Store, version = "new",
     .replace('"__VERSION__"', JSON.stringify(version))
     .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
     .replace("__SHELL__", JSON.stringify(shell.map((file) => `./${file}`)))
-    .replace("__TEXTS__", "{}");
+    .replace("__TEXTS__", "{}")
+    .replace("__OFFLINE__", JSON.stringify(offline && `./${offline}`));
   // The tests don't wait the whole time a phone would.
   const quick = source.replace(/NETWORK_WAIT_MS = \d+/, "NETWORK_WAIT_MS = 50");
   expect(quick).not.toBe(source);
@@ -210,4 +215,59 @@ test("an installed app's download that breaks off goes on from where it stopped"
   // The batches that came before the signal broke off are not downloaded again.
   expect(asked.length).toBeLessThan(many.length - 24);
   expect(await sw.file("static/bild59.h59.webp")).toBe("net static/bild59.h59.webp");
+});
+
+// What an installed app keeps is what grown-ups chose (user request, November 2026): the voices of all languages are
+// over 200 MB, so only the chosen languages' recordings and songs come, and only the books not left out.
+const MANIFEST = "static/offline.m1.json";
+const PARTS = [
+  { path: "./index.html", bytes: 1 },
+  { path: "./static/app.a1.js", bytes: 10 },
+  { path: "./static/zaehne.c3.js", bytes: 10, books: ["zaehne"] },
+  { path: "./static/1a2b3c4d.v1.mp3", bytes: 5, books: ["zaehne"], language: "de" },
+  { path: "./static/en-1a2b3c4d.v2.mp3", bytes: 5, books: ["zaehne"], language: "en", standsIn: ["ru"] },
+  { path: "./static/es-1a2b3c4d.v3.mp3", bytes: 5, books: ["zaehne"], language: "es" },
+  { path: "./static/tiere.t1.js", bytes: 10, books: ["zuordnen"] },
+  { path: "./static/musik-hintergrund.s1.mp3", bytes: 50, music: true },
+];
+
+/** A network serving the offline copy's list too. */
+function withManifest() {
+  const net = online();
+  const network: Network = async (request) => (request.url === SCOPE + MANIFEST ? new Response(JSON.stringify({ parts: PARTS })) : net.network(request));
+  return { asked: net.asked, network };
+}
+
+const cached = (sw: { store: Store }, version = "new") => [...(sw.store.get(`tinytaps-${version}`)?.keys() ?? [])].map((url) => url.replace(SCOPE, ""));
+
+test("an installed app keeps only the chosen languages and books", async () => {
+  const { asked, network } = withManifest();
+  const sw = worker(network, { files: FILES, shell: SHELL, offline: MANIFEST });
+  await sw.install();
+  asked.length = 0;
+  await sw.message({ keepAll: { languages: ["es"], skip: ["zuordnen"], music: false } });
+  expect(asked.sort()).toEqual(["static/es-1a2b3c4d.v3.mp3", "static/zaehne.c3.js"]);
+  // Russian has few recordings of its own: the English ones that stand in for it come along.
+  asked.length = 0;
+  await sw.message({ keepAll: { languages: ["ru"], skip: [], music: true } });
+  expect(asked.sort()).toEqual(["static/en-1a2b3c4d.v2.mp3", "static/musik-hintergrund.s1.mp3", "static/tiere.t1.js"]);
+  // Spanish is no longer chosen: its recordings go, what the start needs stays.
+  expect(cached(sw)).not.toContain("static/es-1a2b3c4d.v3.mp3");
+  expect(cached(sw)).toContain("static/app.a1.js");
+});
+
+test("the same choice again downloads nothing, and the next build keeps the choice", async () => {
+  const first = withManifest();
+  const choice = { languages: ["de"], skip: [], music: false };
+  const old = worker(first.network, { version: "1", files: FILES, shell: SHELL, offline: MANIFEST });
+  await old.install();
+  await old.message({ keepAll: choice });
+  first.asked.length = 0;
+  await old.message({ keepAll: choice });
+  expect(first.asked).toEqual([]);
+  const next = withManifest();
+  const sw = worker(next.network, { store: old.store, version: "2", files: FILES, shell: SHELL, offline: MANIFEST });
+  await sw.install();
+  expect(cached(sw, "2")).toContain("static/1a2b3c4d.v1.mp3");
+  expect(cached(sw, "2")).not.toContain("static/en-1a2b3c4d.v2.mp3");
 });

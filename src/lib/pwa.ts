@@ -1,6 +1,9 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { track } from "@/lib/analytics";
 import { BASE_URL, BUILD_TIME, PROD } from "@/lib/buildInfo";
+import { loadCommon } from "@/lib/common";
+import type { OfflineChoice } from "@/lib/offlineParts";
+import { loadStored } from "@/lib/storage";
 
 // Offline and "install as app" (PWA). The service worker itself is src/sw.js.
 
@@ -16,6 +19,23 @@ interface InstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+/** What grown-ups chose for playing without internet, stored on the device. */
+export interface OfflineSettings {
+  /** Keep an offline copy: null until chosen, which means yes for an installed app and no in a browser tab. */
+  on: boolean | null;
+  /** The languages whose voices and songs to keep; null: the app language, whichever it is. */
+  languages: string[] | null;
+  /** The books left out (`SHELF` ids). */
+  skip: string[];
+}
+
+const OFFLINE_KEY = "tinytaps.offline.v1";
+const OFFLINE_DEFAULTS: OfflineSettings = { on: null, languages: null, skip: [] };
+
+function loadOfflineSettings(): OfflineSettings {
+  return typeof localStorage === "undefined" ? OFFLINE_DEFAULTS : loadStored(OFFLINE_KEY, OFFLINE_DEFAULTS);
+}
+
 const state = {
   /** All files are in the browser (only an installed app keeps them all); the games start without network. */
   offlineReady: false,
@@ -23,6 +43,12 @@ const state = {
   installed: false,
   /** A new version took over in the background; this page still runs the old one until it reloads. */
   updateReady: false,
+  /** How far the offline copy has come, in bytes, while it downloads. */
+  offlineProgress: null as { done: number; total: number } | null,
+  /** Where the offline copy's list is (src/lib/offlineParts.ts), once the worker told; null without a worker. */
+  offlineManifest: null as string | null,
+  /** What grown-ups chose to keep for playing without internet. */
+  offline: loadOfflineSettings(),
 };
 let snapshot = { ...state };
 const listeners = new Set<() => void>();
@@ -88,7 +114,7 @@ export function setUpPwa() {
   addEventListener("appinstalled", () => {
     update({ installPrompt: null, installed: true });
     track("installiert");
-    keepAllOffline();
+    keepAllOffline({ again: true });
   });
 
   // The very first worker also takes over the page, but then nothing is old. Nor is it when the page
@@ -97,7 +123,7 @@ export function setUpPwa() {
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (hadWorker) void runsOldBuild().then((old) => old && update({ updateReady: true }));
     // A newer worker took over, maybe while the old one was still downloading everything: it goes on.
-    if (isStandalone()) keepAllOffline();
+    keepAllOffline({ again: true });
   });
 
   const base = `${BASE_URL.replace(/\/$/, "")}/`;
@@ -120,22 +146,60 @@ export function setUpPwa() {
       }),
   );
   navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data?.offlineReady) update({ offlineReady: true });
+    if (event.data?.offlineReady) update({ offlineReady: true, offlineProgress: null });
+    if (event.data?.offlineProgress) update({ offlineProgress: event.data.offlineProgress });
+    if ("offlineManifest" in (event.data ?? {})) update({ offlineManifest: event.data.offlineManifest });
   });
   void navigator.serviceWorker.ready.then((registration) => {
     // What this page loaded before the worker was there (on a first visit: all of it so far) is kept too.
     const loaded = performance.getEntriesByType("resource").map((entry) => entry.name);
-    registration.active?.postMessage({ keep: loaded });
+    registration.active?.postMessage({ keep: loaded, offlineManifest: true });
   });
-  if (isStandalone()) keepAllOffline();
+  // The offline copy is asked for once the app language is known (keepTextsOffline, from language.ts).
+}
+
+/** The app language, as language.ts last told (keepTextsOffline): pwa.ts can't import it, language.ts imports this. */
+let appLanguage = "de";
+
+/** Whether an offline copy is kept: as chosen, else for an installed app only. */
+export const keepsOffline = (settings = state.offline) => settings.on ?? isStandalone();
+
+/** What the worker keeps for `settings`: the languages chosen (or the app language), the books not left out, the song while music is on. */
+export function offlineChoiceOf(settings: OfflineSettings, language = appLanguage): OfflineChoice {
+  return { languages: settings.languages ?? [language], skip: settings.skip, music: loadCommon().music };
 }
 
 /**
- * An installed app plays without network: its worker keeps every file of the site (src/sw.js). A page in a browser
- * tab doesn't ask for that – most visitors never play offline, and it was 42 MB for each of them.
+ * Tells the worker what to keep for playing without network (src/sw.js): an installed app keeps the games of the
+ * chosen books in the chosen languages (by default all books, the app language) – never every language's voices, which
+ * are over 200 MB. A page in a browser tab keeps only what it played, unless grown-ups asked for the offline copy.
  */
-function keepAllOffline() {
-  void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ keepAll: true }));
+function keepAllOffline({ again = false } = {}) {
+  if (!PROD || !("serviceWorker" in navigator) || !keepsOffline()) return;
+  const choice = offlineChoiceOf(state.offline);
+  // The same choice once per worker: the worker goes on with a download that broke off by itself.
+  if (!again && JSON.stringify(choice) === lastSent) return;
+  lastSent = JSON.stringify(choice);
+  void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ keepAll: choice }));
+}
+
+/** The choice last sent to the worker, so the start and a language switch don't ask twice. */
+let lastSent = "";
+
+/** Changes what is kept for playing without internet, remembers it and tells the worker. */
+export function setOfflineSettings(changes: Partial<OfflineSettings>) {
+  const before = keepsOffline();
+  update({ offline: { ...state.offline, ...changes } });
+  try {
+    localStorage.setItem(OFFLINE_KEY, JSON.stringify(state.offline));
+  } catch {
+    // Storage full or disabled: it still applies for this visit.
+  }
+  if (keepsOffline()) keepAllOffline();
+  else if (before && PROD && "serviceWorker" in navigator) {
+    update({ offlineReady: false, offlineProgress: null });
+    void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ forgetAll: true }));
+  }
 }
 
 /**
@@ -143,7 +207,11 @@ function keepAllOffline() {
  * languages pages play in, and on the very first visit the page loads them before the worker is there.
  */
 export function keepTextsOffline(language: string) {
+  appLanguage = language;
   if (!PROD || !("serviceWorker" in navigator)) return;
+  // Told at every start, once the app language is known, and at every switch: the offline copy follows the app
+  // language unless grown-ups chose its languages.
+  keepAllOffline();
   void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ keepTexts: language }));
 }
 

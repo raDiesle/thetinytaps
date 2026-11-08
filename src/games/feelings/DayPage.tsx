@@ -2,7 +2,7 @@ import { type ReactNode, useEffect } from "react";
 import { useT } from "@/lib/language";
 import { preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
-import { Frames, GoOn, StepDots, useVoice } from "./shared";
+import { Frames, GoOn, StepDots, useLinesReady, useVoice } from "./shared";
 
 /**
  * A page of a day's story between two scenes (`days.ts`): only told, never chosen in (user idea, November 2026). So it
@@ -22,6 +22,7 @@ export function DayPage({
   ending,
   onEndKey,
   onPick,
+  nextLines = [],
 }: {
   image: string;
   text: string;
@@ -36,15 +37,21 @@ export function DayPage({
   onEndKey?: () => void;
   /** A tap on a dot at the top: that scene again. */
   onPick?: (index: number) => void;
+  /** What the scene after this page opens with: loaded while the page is read, so the scene starts at once. */
+  nextLines?: string[];
 }) {
   const t = useT();
-  const { say, preload } = useVoice(settings);
+  const { say } = useVoice(settings);
+  // Its text is said once its recording is there (the paw track meanwhile); then the next scene's opening loads.
+  const ready = useLinesReady(settings, [text], nextLines);
 
   useEffect(() => {
     preloadImages([image]);
-    preload([text]);
-    say(text);
   }, []);
+
+  useEffect(() => {
+    if (ready) say(text);
+  }, [ready]);
 
   useEffect(() => {
     const go = onNext ?? onEndKey;

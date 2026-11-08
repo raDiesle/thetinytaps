@@ -3,14 +3,17 @@ import { DevTag, letterCode } from "@/components/DevTag";
 import { useDeck } from "@/games/shadows/deck";
 import { nextLevel } from "@/games/shadows/levels";
 import { DEV } from "@/lib/buildInfo";
+import { pick, useAppLanguage } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { loadRealSounds } from "@/lib/realSounds";
-import { dealRound, FIXED_LEVELS, nextKind, ROUNDS_PER_GAME, TOGETHER_LEVELS, type RoundKind } from "./levels";
-import { PAIRS, pairsOf } from "./pairs";
+import { useVoiceReady } from "@/lib/voiceReady";
+import { dealRound, FIXED_LEVELS, nextKind, ROUNDS_PER_GAME, TOGETHER_LEVELS, type RoundKind, type TogetherRound } from "./levels";
+import { PAIRS, type Pair, pairsOf, TOGETHER_TEXTS } from "./pairs";
 import { TOPICS } from "./topics";
 import type { TogetherSettings } from "./settings";
-import { TogetherPlay } from "./TogetherPlay";
+import { roundLines, TogetherPlay } from "./TogetherPlay";
 import { RoundTopic } from "./RoundTopic";
+import { togetherVoice } from "./voice";
 
 const OF_DAY = pairsOf("pair");
 const HELPERS = pairsOf("helper");
@@ -41,23 +44,42 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
   // The real recordings among the sounds (the giggle, the splash), loaded at once so even the first round sounds real.
   useEffect(() => loadRealSounds(PAIRS.flatMap((p) => p.sounds.map(([, sound]) => sound))), []);
 
-  // Dealt once per turn: the round must stay the same while it is played, however often this renders.
-  const dealt = useRef<{ turn: number; round: ReturnType<typeof deal> } | null>(null);
-  function deal(last: RoundKind | null) {
+  const draw = (kind: RoundKind) => (kind === "pair" ? drawOfDay() : drawHelper());
+
+  /**
+   * Dealt once per turn: the round must stay the same while it is played, however often this renders. The pair of the
+   * round after it (`next`) is drawn a turn ahead, so its lines load while this one plays; that round's choices and
+   * difficulty are dealt only on its turn, since this round's play may still change the difficulty.
+   */
+  const dealt = useRef<{ turn: number; round: TogetherRound; next: Pair } | null>(null);
+  function deal(before: { round: TogetherRound; next: Pair } | null): TogetherRound {
     // A fixed difficulty plays its step; switched back to „Von selbst“, the game climbs on from there.
     if (settings.difficulty !== "auto" && levelRef.current !== FIXED_LEVELS[settings.difficulty]) {
       levelRef.current = FIXED_LEVELS[settings.difficulty];
       resultsRef.current = [];
     }
     // While developing, `?pair=<id>` shows that pair first, to look at it.
-    const shown = DEV && last === null ? PAIRS.find((p) => p.id === new URLSearchParams(window.location.search).get("pair")) : undefined;
-    if (shown) return dealRound(shown, PAIRS, TOGETHER_LEVELS[levelRef.current]);
-    const kind = nextKind(last, settings.kinds);
-    const pair = kind === "pair" ? drawOfDay() : drawHelper();
+    const asked = DEV && before === null ? PAIRS.find((p) => p.id === new URLSearchParams(window.location.search).get("pair")) : undefined;
+    if (asked) return dealRound(asked, PAIRS, TOGETHER_LEVELS[levelRef.current]);
+    const kind = nextKind(before?.round.kind ?? null, settings.kinds);
+    // The pair drawn ahead, unless grown-ups switched its kind off meanwhile.
+    const pair = before?.next.kind === kind ? before.next : draw(kind);
     return dealRound(pair, PAIRS, TOGETHER_LEVELS[levelRef.current]);
   }
-  if (dealt.current?.turn !== turn) dealt.current = { turn, round: deal(dealt.current?.round.kind ?? null) };
-  const round = dealt.current.round;
+  if (dealt.current?.turn !== turn) {
+    const round = deal(dealt.current);
+    dealt.current = { turn, round, next: draw(nextKind(round.kind, settings.kinds)) };
+  }
+  const { round, next } = dealt.current;
+
+  // A round starts only once the lines it may say are loaded (the paw track shows meanwhile); the last round's picture
+  // stays till then. The next pair's question and praise load behind it.
+  const language = useAppLanguage();
+  const texts = pick(TOGETHER_TEXTS, language.id);
+  const ready = useVoiceReady(togetherVoice, roundLines(round, texts), language.id, { next: [texts.question(next), texts.right(next)] });
+  const shownRef = useRef<{ turn: number; round: TogetherRound } | null>(null);
+  if (ready && shownRef.current?.turn !== turn) shownRef.current = { turn, round };
+  const shown = shownRef.current;
 
   const auto = settings.difficulty === "auto";
   const onSolved = useCallback(
@@ -82,10 +104,18 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
     setTurn(turn + 1);
   }, [turn]);
 
+  if (!shown) return null;
   return (
     <>
-      <TogetherPlay key={turn} settings={settings} round={round} onSolved={onSolved} onNext={onNext} topic={<RoundTopic pair={round.pair} />} />
-      <DevTag code={pairCode(round.pair)} id={round.pair.id} />
+      <TogetherPlay
+        key={shown.turn}
+        settings={settings}
+        round={shown.round}
+        onSolved={onSolved}
+        onNext={onNext}
+        topic={<RoundTopic pair={shown.round.pair} />}
+      />
+      <DevTag code={pairCode(shown.round.pair)} id={shown.round.pair.id} />
     </>
   );
 }

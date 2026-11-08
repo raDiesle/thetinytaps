@@ -1,5 +1,8 @@
+import { Glob } from "bun";
 import { describe, expect, test } from "bun:test";
-import { recordingUrl } from "./voice";
+import { readFileSync } from "node:fs";
+import { basename, dirname } from "node:path";
+import { forgetOld, recordingUrl } from "./voice";
 import { recordingName } from "./voiceName";
 
 // What a line with a missing recording does (user decision, November 2026): the English recording plays instead,
@@ -36,4 +39,38 @@ describe("recordingUrl", () => {
     expect(recordingUrl(urls, "Schlaf gut!", "de", "Good night!")).toBeUndefined();
     expect(recordingUrl(urls, "Sleep well!", "en", "Good night!")).toBeUndefined();
   });
+});
+
+describe("what a voice keeps in memory", () => {
+  test("the decoded lines used longest ago go first, until the rest fit", () => {
+    const sounds = new Map([
+      ["a", { duration: 60 }],
+      ["b", { duration: 60 }],
+      ["c", { duration: 60 }],
+    ]);
+    forgetOld(sounds, 130);
+    expect([...sounds.keys()]).toEqual(["b", "c"]);
+    forgetOld(sounds, 200);
+    expect([...sounds.keys()]).toEqual(["b", "c"]);
+  });
+});
+
+// The voices are over 200 MB (November 2026): a game loads this round's lines and the next one's, never its whole
+// folder – `loadAll` only where a language has a few dozen lines, so a game can fetch them all as it starts.
+test("only a voice of a few dozen lines a language loads all of them", () => {
+  const LIMIT = 80;
+  const callers = [...new Glob("src/**/*.{ts,tsx}").scanSync(".")].filter(
+    (file) => !file.includes(".test.") && file !== "src/lib/voice.ts" && readFileSync(file, "utf8").includes(".loadAll("),
+  );
+  expect(callers.length).toBeGreaterThan(0);
+  for (const file of callers) {
+    const game = /^src\/games\/[^/]+/.exec(file)?.[0] ?? dirname(file);
+    const perLanguage = new Map<string, number>();
+    for (const mp3 of new Glob(`${game}/**/stimme/**/*.mp3`).scanSync(".")) {
+      const name = basename(mp3, ".mp3");
+      const language = /^([a-z]{2})-/.exec(name)?.[1] ?? "de";
+      perLanguage.set(language, (perLanguage.get(language) ?? 0) + 1);
+    }
+    expect(Math.max(0, ...perLanguage.values()), `${file} loads all of ${game}'s voice`).toBeLessThanOrEqual(LIMIT);
+  }
 });

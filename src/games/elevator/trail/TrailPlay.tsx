@@ -12,7 +12,7 @@ import { StoryEnd, nextCard } from "../cards";
 import { ActionButton } from "../house";
 import { KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose, useHero } from "../kid";
 import { spokenIn, translationOf } from "../phrases";
-import { sayIn } from "../voice";
+import { linesReady, loadLines, sayIn, trailLines } from "../voice";
 import type { ElevatorSettings } from "../settings";
 import { FRIENDS, type FriendPose } from "./friends";
 import { allStations, facing, groundY, placed, route } from "./ground";
@@ -1013,7 +1013,13 @@ export function TrailPlay({
     const k = viewRef.current.kid;
     drawGoal(heldOf(k, theGoal), onString ? handOf(k) : null);
     kid({ pose: level.away.pose });
+    // Only this level's lines load; its first one holds the start until it is there, so it comes with the goal going away.
+    const ready = linesReady([level.away.say], voice);
+    loadLines(trailLines(level), voice);
+    const g = generation.current;
     await wait(900);
+    await ready();
+    if (g !== generation.current) return;
     cue(level.away.sounds);
     kid({ pose: "shake" });
     put({ away: true });

@@ -538,6 +538,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
   `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.
+- Voice recordings load as they are needed, never a whole game's at once (user request, November 2026: with a voice
+  in seven languages a game's lines were up to 7 MB a language): a game holds each round or scene until its lines are
+  there (`useVoiceReady` in `src/lib/voiceReady.ts`, or `voice.ready(lines)`), and meanwhile fetches the next round's
+  (`next`, `voice.load`) – one round ahead, never more. While a round waits, `SoundLoading` (mounted in `index.tsx`,
+  fed by `waitingFor` in `src/lib/soundWait.ts`) shows the paw track on a slip of paper after a moment, so the line
+  comes with its picture, not late; nothing waits longer than `SOUND_WAIT_MS`, then the game goes on silent. Fetched
+  files stay as bytes and are decoded when said; decoded voice is kept only for `KEEP_SECONDS` (a decoded buffer is
+  about ten times its MP3, which old phones can't hold). `loadAll` is only for a voice of a few dozen lines
+  (`voice.test.ts` checks), and a voice switched off (Gefühle's `VoiceSwitch`) loads nothing.
 - Music: one background song plays behind the menus and every game from the first tap or key of the visit
   (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
@@ -561,7 +570,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menu card was tapped made the next menu take seconds to show.
 - Offline: the service worker keeps what a visit uses – at install only the start (`shellFiles` in `tools/build.ts`:
   index.html, its scripts and styles and the pictures they name), then every file of the site once a page fetched it,
-  so a game played once plays offline – and the whole site only for an installed app (`keepAll`, `isStandalone`). A new
+  so a game played once plays offline – and more only for an installed app or when grown-ups ask for it under „Ohne
+  Internet spielen“ behind „mehr …“ (`OfflineOptions`, `src/lib/pwa.ts`): then the books chosen there (default: all)
+  with only the chosen languages' voices and songs (default: the app language; English too where it stands in for
+  missing recordings), never every language. The build lists each file with its book and language
+  (`writeOfflineManifest` in `tools/build.ts`, filling `__OFFLINE__` in `sw.js`; the rules in `src/lib/offlineParts.ts`),
+  so a new kind of file named by language must be known there, and the worker deletes what is no longer chosen. A new
   build takes over the files named by their content from the old cache instead of downloading them again. Never
   download every file for every visitor again: it was 42 MB on each first visit and after each build, while few play
   offline (November 2026; `sw.test.ts`). What is fetched ahead (other pages' code, the song) waits when the visitor
