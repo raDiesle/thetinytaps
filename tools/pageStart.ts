@@ -49,3 +49,15 @@ export async function chunkClosure(first: string, read: (file: string) => Promis
   }
   return [...seen];
 }
+
+/**
+ * The hosts Umami counts on (`data-domains`): the site's own host and its twin with or without „www.“. Umami drops
+ * every visit on a host not listed, and the site is served on whichever of the two the repository's Pages setting
+ * names while the other only redirects there: in November 2026 `siteUrl` said www.funforboth.com while Pages served
+ * funforboth.com, and Umami counted no visitor at all. Listing both counts them wherever the site is served.
+ */
+export function countedHosts(siteUrl: string): string {
+  const host = new URL(siteUrl).hostname;
+  const twin = host.startsWith("www.") ? host.slice(4) : `www.${host}`;
+  return `${host},${twin}`;
+}

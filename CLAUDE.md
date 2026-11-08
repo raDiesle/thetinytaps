@@ -763,7 +763,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Visits are counted only by Cloudflare Web Analytics (the build adds it with the repository variable
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
   time on each page, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
-  its website id in `tools/build.ts`, counting only on the site's own host), both
+  its website id in `tools/build.ts`, counting only on the site's own hosts – with and without www, `countedHosts`, since
+  Umami drops every visit on a host not listed and counted no one while Pages served funforboth.com and `siteUrl` said
+  www, November 2026), both
   without cookies or a consent banner: never add Google Analytics (not even in its consent mode, which still sends to
   Google and shows almost nothing without consent) or another tracker that sets cookies, needs consent or records
   sessions (user decisions, October and November 2026; `tracking.test.ts` checks). New things to measure go through
