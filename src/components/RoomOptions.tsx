@@ -7,6 +7,7 @@ import { OfflineOptions } from "@/components/OfflineOptions";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { SeoWords } from "@/components/SeoText";
+import { CONTACT_EMAIL } from "@/content/legal";
 import { type Figure, useCommonSettings } from "@/lib/common";
 import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
 
@@ -280,6 +281,102 @@ export function RoomNotes() {
       </p>
       <InstallHint />
       <OfflineOptions />
+    </MenuButton>
+  );
+}
+
+/**
+ * „Feedback“, a small paper slip in the room's bottom left corner, mirroring Impressum and Datenschutz on the right: it
+ * opens a few words from us asking for feedback, ideas and wishes, and only there the button that opens the grown-up's
+ * mail app (user request, November 2026: not the bare address, whose tap went straight to writing a mail). The mail app
+ * sends nothing by itself either.
+ */
+export function RoomFeedback() {
+  const t = useT();
+  const label = t({
+    de: "Feedback & Wünsche",
+    ru: "Отзывы и пожелания",
+    en: "Feedback & wishes",
+    zh: "反馈与心愿",
+    hi: "सुझाव और इच्छाएँ",
+    es: "Comentarios y deseos",
+    ar: "ملاحظات وأمنيات",
+  });
+  return (
+    <MenuButton
+      icon="💬"
+      label={label}
+      className="room-feedback"
+      art={
+        <>
+          <span aria-hidden>💬</span> {t({ de: "Feedback", ru: "Отзыв", en: "Feedback", zh: "反馈", hi: "सुझाव", es: "Opiniones", ar: "ملاحظات" })}
+        </>
+      }
+    >
+      <section className="seo-text feedback-note">
+        <h2>
+          {t({
+            de: "Schreiben Sie uns",
+            ru: "Напишите нам",
+            en: "Write to us",
+            zh: "给我们写信",
+            hi: "हमें लिखिए",
+            es: "Escríbanos",
+            ar: "اكتبوا لنا",
+          })}
+        </h2>
+        <p>
+          {t({
+            de: "Fun for Both wächst mit jeder Rückmeldung. Was gefällt Ihrem Kind, wo hakt es, und welches Spiel würden Sie sich noch wünschen? Erzählen Sie es uns gern – über ein Lob freuen wir uns, über Kritik und neue Ideen genauso.",
+            ru: "Fun for Both растёт с каждым отзывом. Что нравится вашему ребёнку, где что-то не получается и какую игру вам бы ещё хотелось? Расскажите нам – похвале мы рады, а критике и новым идеям ничуть не меньше.",
+            en: "Fun for Both grows with every message we get. What does your child love, where does something get stuck, and which game would you still like to see? Do tell us – we are glad of praise, and just as glad of criticism and new ideas.",
+            zh: "Fun for Both 因每一条反馈而成长。您的孩子喜欢什么，哪里不太顺，您还希望有什么游戏？欢迎告诉我们——我们喜欢听到夸奖，也同样欢迎批评和新点子。",
+            hi: "Fun for Both हर सुझाव के साथ बढ़ता है। आपके बच्चे को क्या अच्छा लगता है, कहाँ अटकता है, और आप कौन-सा खेल और चाहेंगे? हमें ज़रूर बताइए – तारीफ़ से हमें ख़ुशी होती है, और आलोचना व नए विचारों से भी उतनी ही।",
+            es: "Fun for Both crece con cada mensaje que recibimos. ¿Qué le gusta a su peque, dónde se atasca algo y qué juego le gustaría ver todavía? Cuéntenoslo: un elogio nos alegra, y las críticas y las ideas nuevas, igual.",
+            ar: "ينمو Fun for Both مع كل رسالة تصلنا. ما الذي يحبّه طفلكم، وأين يتعثّر شيء ما، وأيّ لعبة تتمنّون أن تروها بعد؟ أخبرونا – يسعدنا المديح، وتسعدنا الملاحظات والأفكار الجديدة بالقدر نفسه.",
+          })}
+        </p>
+        <p>
+          {t({
+            de: "Jede Nachricht lesen wir selbst.",
+            ru: "Каждое письмо мы читаем сами.",
+            en: "We read every message ourselves.",
+            zh: "每一条消息我们都会亲自阅读。",
+            hi: "हर संदेश हम ख़ुद पढ़ते हैं।",
+            es: "Leemos cada mensaje nosotros mismos.",
+            ar: "نقرأ كل رسالة بأنفسنا.",
+          })}
+        </p>
+        <p className="feedback-mail">
+          <a
+            className="install-button"
+            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+              t({
+                de: "Feedback zu Fun for Both",
+                ru: "Отзыв о Fun for Both",
+                en: "Feedback on Fun for Both",
+                zh: "关于 Fun for Both 的反馈",
+                hi: "Fun for Both के बारे में सुझाव",
+                es: "Comentarios sobre Fun for Both",
+                ar: "ملاحظات حول Fun for Both",
+              }),
+            )}`}
+          >
+            <span aria-hidden>✉️</span>{" "}
+            {t({
+              de: "E-Mail schreiben",
+              ru: "Написать письмо",
+              en: "Write an email",
+              zh: "写邮件",
+              hi: "ईमेल लिखिए",
+              es: "Escribir un correo",
+              ar: "اكتبوا رسالة",
+            })}
+          </a>
+          {/* The address to copy, for a device without a mail app. */}
+          <span className="feedback-address">{CONTACT_EMAIL}</span>
+        </p>
+      </section>
     </MenuButton>
   );
 }

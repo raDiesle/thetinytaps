@@ -15,7 +15,7 @@ bun run preview    # serve the built site like GitHub Pages (tools/preview.ts)
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
-(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **www.funforboth.com**, Enforce HTTPS).
+(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **www.funforboth.com** (not funforboth.com: GitHub then sends funforboth.com on to www by itself), Enforce HTTPS).
 The domain is registered at Cloudflare; its DNS records are `tools/funforboth.com.zone` (import it under
 DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate).
 toddlerfox.com (the address until October 2026) and booksforboth.com (until November 2026) only redirect: import

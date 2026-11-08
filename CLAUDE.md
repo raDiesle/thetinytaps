@@ -451,7 +451,9 @@ In a fresh worktree run `bun install` first.
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (the words
   for search engines) waits below the first screen (`data-below-fold`), never fixed over it – except on the bookshelf, the
   home page, which never scrolls (user feedback, October 2026): there it opens from the carving's „mehr …“
-  (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`). On a phone the home
+  (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`), „Feedback“ in its
+  bottom left, which opens a few words from us before the mail button (`RoomFeedback`; never the bare address, whose tap
+  went straight to writing a mail, user request, November 2026). On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
   while there is more to scroll to. Buttons and cards in a menu never touch or overlap, also not with a tilted card's
   corner or a button's shadow: keep clear room between the menu's head (its rows of buttons) and the cards
@@ -719,7 +721,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
   `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
   The custom domain in the repo's Pages settings (`gh api repos/raDiesle/thetinytaps/pages -q .cname`) must be the
-  host of `siteUrl`. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
+  host of `siteUrl` (`www.funforboth.com`, user decision, 8 November 2026: www is the usual form): in November 2026
+  Pages served funforboth.com while `siteUrl` said www, so every canonical link, hreflang and sitemap address went through
+  a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
   from before the change. Check it with `curl -sI` (`age`, `x-cache: HIT`) and against GitHub directly
   (`--resolve <host>:443:185.199.108.153`) before you suspect the build or the DNS. A new deploy clears that cache only
   for the custom domain's host, not for the other name (November 2026: funforboth.com came back after a deploy, www stayed 404).
@@ -763,7 +767,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Visits are counted only by Cloudflare Web Analytics (the build adds it with the repository variable
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
   time on each page, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
-  its website id in `tools/build.ts`, counting only on the site's own host), both
+  its website id in `tools/build.ts`, counting only on the site's own hosts – with and without www, `countedHosts`, since
+  Umami drops every visit on a host not listed and counted no one while Pages served funforboth.com and `siteUrl` said
+  www, November 2026), both
   without cookies or a consent banner: never add Google Analytics (not even in its consent mode, which still sends to
   Google and shows almost nothing without consent) or another tracker that sets cookies, needs consent or records
   sessions (user decisions, October and November 2026; `tracking.test.ts` checks). New things to measure go through

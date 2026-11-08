@@ -2,13 +2,12 @@ import { type CSSProperties, type HTMLAttributes, type MouseEvent, type PointerE
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
-import { RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
+import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
-import { ContactLink } from "@/components/ContactLink";
 import { playKnock } from "@/lib/sfx";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
@@ -167,7 +166,7 @@ const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
  * app's name is a painted sign hanging on chains: in front of a wide shelf standing on legs, down into its top
  * compartment, above an upright one's. Drawn in 3D – each compartment a box going back, the boards seen from
  * the eye's height – but still: nothing moves until it is tapped. The room fills the screen and nothing follows below it:
- * `legal` (Impressum, Datenschutz) stands small in its bottom right corner.
+ * `legal` (Impressum, Datenschutz) stands small in its bottom right corner, „Feedback“ in its bottom left (RoomFeedback).
  */
 export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<HTMLElement>; legal?: ReactNode }) {
   const navigate = useNavigate();
@@ -285,7 +284,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
           )}
         </div>
         {legal && <nav className="room-legal">{legal}</nav>}
-        <ContactLink className="room-contact" />
+        <RoomFeedback />
       </div>
     </main>
   );
