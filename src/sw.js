@@ -52,6 +52,7 @@ const BATCH = 24;
 /** Whether a part of the offline copy is in `choice` (the same rule as `wanted` in src/lib/offlineParts.ts). */
 function wanted(part, choice) {
   if (part.music && !choice.music) return false;
+  if (part.voice && choice.voices === false) return false;
   if (part.books?.length && part.books.every((book) => choice.skip.includes(book))) return false;
   if (!part.language) return true;
   return choice.languages.includes(part.language) || (part.standsIn ?? []).some((language) => choice.languages.includes(language));
@@ -76,7 +77,7 @@ async function offlineParts(cache) {
 
 /**
  * Downloads every file the offline copy lacks yet (an installed app plays offline), then marks it so: with `choice`
- * (`{ languages, skip, music }`) only the files of the chosen books and languages, and the files of those left out are
+ * (`{ languages, skip, music, voices }`) only the files of the chosen books in the app language, and the files of those left out are
  * dropped; without one (`true`, an app from before the choice) every file of FILES. In batches, so what came is kept
  * when the network or the worker stops halfway (a phone's signal, a newer build taking over), and the next start goes
  * on from there. `report(done, total)` hears the bytes as they come.

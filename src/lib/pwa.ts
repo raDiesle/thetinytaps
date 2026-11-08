@@ -23,14 +23,16 @@ interface InstallPromptEvent extends Event {
 export interface OfflineSettings {
   /** Keep an offline copy: null until chosen, which means yes for an installed app and no in a browser tab. */
   on: boolean | null;
-  /** The languages whose voices and songs to keep; null: the app language, whichever it is. */
-  languages: string[] | null;
+  /** Keep the background song (while 🎵 Musik is on); the language is always the app language, never chosen here. */
+  music: boolean;
+  /** Keep the games' recorded voices in the app language. */
+  voices: boolean;
   /** The books left out (`SHELF` ids). */
   skip: string[];
 }
 
 const OFFLINE_KEY = "tinytaps.offline.v1";
-const OFFLINE_DEFAULTS: OfflineSettings = { on: null, languages: null, skip: [] };
+const OFFLINE_DEFAULTS: OfflineSettings = { on: null, music: true, voices: true, skip: [] };
 
 function loadOfflineSettings(): OfflineSettings {
   return typeof localStorage === "undefined" ? OFFLINE_DEFAULTS : loadStored(OFFLINE_KEY, OFFLINE_DEFAULTS);
@@ -164,14 +166,17 @@ let appLanguage = "de";
 /** Whether an offline copy is kept: as chosen, else for an installed app only. */
 export const keepsOffline = (settings = state.offline) => settings.on ?? isStandalone();
 
-/** What the worker keeps for `settings`: the languages chosen (or the app language), the books not left out, the song while music is on. */
+/**
+ * What the worker keeps for `settings`: the books not left out in the app language (🌐 decides it, the offline copy
+ * has no language choice of its own), with its voices and the song as chosen – the song only while 🎵 Musik is on.
+ */
 export function offlineChoiceOf(settings: OfflineSettings, language = appLanguage): OfflineChoice {
-  return { languages: settings.languages ?? [language], skip: settings.skip, music: loadCommon().music };
+  return { languages: [language], skip: settings.skip, music: settings.music && loadCommon().music, voices: settings.voices };
 }
 
 /**
  * Tells the worker what to keep for playing without network (src/sw.js): an installed app keeps the games of the
- * chosen books in the chosen languages (by default all books, the app language) – never every language's voices, which
+ * chosen books in the app language (by default all books, with music and voices) – never every language's voices, which
  * are over 200 MB. A page in a browser tab keeps only what it played, unless grown-ups asked for the offline copy.
  */
 function keepAllOffline({ again = false } = {}) {
@@ -210,7 +215,7 @@ export function keepTextsOffline(language: string) {
   appLanguage = language;
   if (!PROD || !("serviceWorker" in navigator)) return;
   // Told at every start, once the app language is known, and at every switch: the offline copy follows the app
-  // language unless grown-ups chose its languages.
+  // language, and the voices of the language left go.
   keepAllOffline();
   void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ keepTexts: language }));
 }

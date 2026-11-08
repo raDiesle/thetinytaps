@@ -124,8 +124,9 @@ In a fresh worktree run `bun install` first.
   into the translated menus keeps its card's title and blurb in its own folder (`names.ts`, imported by `games.ts`, like
   `/zusammen/`), so its own row says they are missing, not the home page's.
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
-  (🌐 on the home page, `useAppLanguage()`); no game or menu adds a language choice of its own (a „Spielsprache“ once
-  put Russian letters under German menus). A language joins `APP_LANGUAGES` only once the menus and the letters and
+  (🌐 on the home page, `useAppLanguage()`); no game, menu or option adds a language choice of its own (a „Spielsprache“ once
+  put Russian letters under German menus, and the offline copy's choice of languages was taken out again, user feedback,
+  November 2026: what is kept follows 🌐). A language joins `APP_LANGUAGES` only once the menus and the letters and
   words games speak it (`language.test.ts` checks the pack); until then packs and recordings in other languages wait
   in the code. No second language next to the first either (a „Zweite Sprache“, „Bär – bear“, was removed), and
   grown-ups choose exactly one language, in one place: 🌐. The app language starts on
@@ -574,8 +575,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   index.html, its scripts and styles and the pictures they name), then every file of the site once a page fetched it,
   so a game played once plays offline – and more only for an installed app or when grown-ups ask for it under „Ohne
   Internet spielen“ behind „mehr …“ (`OfflineOptions`, `src/lib/pwa.ts`): then the books chosen there (default: all)
-  with only the chosen languages' voices and songs (default: the app language; English too where it stands in for
-  missing recordings), never every language. The build lists each file with its book and language
+  in the app language only, with its voices and the background song unless switched off there (English recordings too
+  where they stand in for missing ones; a game's own song, like the Zahnputzlied, always comes with its book), never
+  every language and never a language chosen there – switching 🌐 swaps the kept voices. The build lists each file with its book and language
   (`writeOfflineManifest` in `tools/build.ts`, filling `__OFFLINE__` in `sw.js`; the rules in `src/lib/offlineParts.ts`),
   so a new kind of file named by language must be known there, and the worker deletes what is no longer chosen. A new
   build takes over the files named by their content from the old cache instead of downloading them again. Never
@@ -714,14 +716,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
-- The app is called „Fun for Both“ and lives at funforboth.com (its main address since November 2026, user decision – without www since 8 November 2026, the
-  host Pages serves; www.funforboth.com only redirects there;
+- The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
   toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
   „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
   `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
   The custom domain in the repo's Pages settings (`gh api repos/raDiesle/thetinytaps/pages -q .cname`) must be the
-  host of `siteUrl`: in November 2026 Pages served funforboth.com while `siteUrl` said www, so every canonical link,
-  hreflang and sitemap address went through a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
+  host of `siteUrl` (`www.funforboth.com`, user decision, 8 November 2026: www is the usual form): in November 2026
+  Pages served funforboth.com while `siteUrl` said www, so every canonical link, hreflang and sitemap address went through
+  a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
   from before the change. Check it with `curl -sI` (`age`, `x-cache: HIT`) and against GitHub directly
   (`--resolve <host>:443:185.199.108.153`) before you suspect the build or the DNS. A new deploy clears that cache only
   for the custom domain's host, not for the other name (November 2026: funforboth.com came back after a deploy, www stayed 404).

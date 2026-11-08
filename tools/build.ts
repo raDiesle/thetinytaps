@@ -23,7 +23,7 @@ import { SEO_RU } from "../src/content/seo.ru";
 import { SEO_ZH } from "../src/content/seo.zh";
 import { shelfEntryOf } from "../src/content/games";
 import { appPlugin, PRODUCTION } from "./appPlugin";
-import { isBackgroundSong, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
+import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
 import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules } from "./pageStart";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
@@ -38,7 +38,7 @@ const base = (process.env.PUBLIC_BASE_PATH || "/").replace(/\/$/, "");
 
 // Where the site is online, for links that search engines keep (canonical, sitemap).
 // GitHub Pages serves it on its own domain (repo settings → Pages, DNS in tools/funforboth.com.zone).
-const siteUrl = `${process.env.SITE_ORIGIN || "https://funforboth.com"}${base}`;
+const siteUrl = `${process.env.SITE_ORIGIN || "https://www.funforboth.com"}${base}`;
 
 // READABLE=1 (`bun run perf --profile`): the same build with its names and lines kept, so a profile shows where time goes.
 const minify = process.env.READABLE === "1" ? { syntax: true, whitespace: false, identifiers: false } : true;
@@ -389,6 +389,7 @@ async function writeOfflineManifest() {
     const language = languageOf(file);
     if (language) part.language = language;
     if (isBackgroundSong(file)) part.music = true;
+    if (isVoice(file)) part.voice = true;
     const standsIn = english.get(file);
     if (standsIn) part.standsIn = [...standsIn].sort();
     parts.push(part);

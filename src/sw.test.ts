@@ -9,7 +9,7 @@ import { join } from "node:path";
 // visit keeps only what it plays, and only an installed app keeps everything. These run the real worker in a fake
 // browser: caches kept in maps, and a network that answers as each test says.
 
-const SCOPE = "https://funforboth.com/";
+const SCOPE = "https://www.funforboth.com/";
 const OLD_PAGE = "old build";
 
 type Event = Record<string, unknown> & { waitUntil(work: Promise<unknown>): void };
@@ -218,15 +218,16 @@ test("an installed app's download that breaks off goes on from where it stopped"
 });
 
 // What an installed app keeps is what grown-ups chose (user request, November 2026): the voices of all languages are
-// over 200 MB, so only the chosen languages' recordings and songs come, and only the books not left out.
+// over 200 MB, so only the app language's recordings and songs come, the voices and the song only when chosen, and only
+// the books not left out.
 const MANIFEST = "static/offline.m1.json";
 const PARTS = [
   { path: "./index.html", bytes: 1 },
   { path: "./static/app.a1.js", bytes: 10 },
   { path: "./static/zaehne.c3.js", bytes: 10, books: ["zaehne"] },
-  { path: "./static/1a2b3c4d.v1.mp3", bytes: 5, books: ["zaehne"], language: "de" },
-  { path: "./static/en-1a2b3c4d.v2.mp3", bytes: 5, books: ["zaehne"], language: "en", standsIn: ["ru"] },
-  { path: "./static/es-1a2b3c4d.v3.mp3", bytes: 5, books: ["zaehne"], language: "es" },
+  { path: "./static/1a2b3c4d.v1.mp3", bytes: 5, books: ["zaehne"], language: "de", voice: true },
+  { path: "./static/en-1a2b3c4d.v2.mp3", bytes: 5, books: ["zaehne"], language: "en", voice: true, standsIn: ["ru"] },
+  { path: "./static/es-1a2b3c4d.v3.mp3", bytes: 5, books: ["zaehne"], language: "es", voice: true },
   { path: "./static/tiere.t1.js", bytes: 10, books: ["zuordnen"] },
   { path: "./static/musik-hintergrund.s1.mp3", bytes: 50, music: true },
 ];
@@ -240,25 +241,32 @@ function withManifest() {
 
 const cached = (sw: { store: Store }, version = "new") => [...(sw.store.get(`tinytaps-${version}`)?.keys() ?? [])].map((url) => url.replace(SCOPE, ""));
 
-test("an installed app keeps only the chosen languages and books", async () => {
+test("an installed app keeps only the app language and the chosen books", async () => {
   const { asked, network } = withManifest();
   const sw = worker(network, { files: FILES, shell: SHELL, offline: MANIFEST });
   await sw.install();
   asked.length = 0;
-  await sw.message({ keepAll: { languages: ["es"], skip: ["zuordnen"], music: false } });
+  await sw.message({ keepAll: { languages: ["es"], skip: ["zuordnen"], music: false, voices: true } });
   expect(asked.sort()).toEqual(["static/es-1a2b3c4d.v3.mp3", "static/zaehne.c3.js"]);
   // Russian has few recordings of its own: the English ones that stand in for it come along.
   asked.length = 0;
-  await sw.message({ keepAll: { languages: ["ru"], skip: [], music: true } });
+  await sw.message({ keepAll: { languages: ["ru"], skip: [], music: true, voices: true } });
   expect(asked.sort()).toEqual(["static/en-1a2b3c4d.v2.mp3", "static/musik-hintergrund.s1.mp3", "static/tiere.t1.js"]);
-  // Spanish is no longer chosen: its recordings go, what the start needs stays.
+  // Spanish is no longer the app language: its recordings go, what the start needs stays.
   expect(cached(sw)).not.toContain("static/es-1a2b3c4d.v3.mp3");
   expect(cached(sw)).toContain("static/app.a1.js");
+  // Without voices and music the games stay, their recordings and the song go.
+  asked.length = 0;
+  await sw.message({ keepAll: { languages: ["ru"], skip: [], music: false, voices: false } });
+  expect(asked).toEqual([]);
+  expect(cached(sw)).not.toContain("static/en-1a2b3c4d.v2.mp3");
+  expect(cached(sw)).not.toContain("static/musik-hintergrund.s1.mp3");
+  expect(cached(sw)).toContain("static/tiere.t1.js");
 });
 
 test("the same choice again downloads nothing, and the next build keeps the choice", async () => {
   const first = withManifest();
-  const choice = { languages: ["de"], skip: [], music: false };
+  const choice = { languages: ["de"], skip: [], music: false, voices: true };
   const old = worker(first.network, { version: "1", files: FILES, shell: SHELL, offline: MANIFEST });
   await old.install();
   await old.message({ keepAll: choice });
