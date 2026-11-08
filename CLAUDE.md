@@ -339,7 +339,8 @@ In a fresh worktree run `bun install` first.
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
 - The fullscreen button is always there to get back into fullscreen, which a phone leaves whenever another app was
-  opened in between: in every menu in the top right (`MenuHead`, the last of the home page's buttons) and while playing in the far top
+  opened in between: in every menu in the top right (`MenuHead`; on the home page a little sign nailed onto the shelf's top right corner,
+  `.shelf-fullscreen`) and while playing in the far top
   right, with ⚙️ right beside it on its left (beside ✕ it hung on its own up there, user feedback, November 2026). A game shows it
   only while out of fullscreen, on every device, to get back in – never to leave it, so a child's tap can't end it and a
   game in fullscreen shows nothing of it (user feedback, October 2026); leaving is the menus' button. Starting or leaving a game in fullscreen must not make the browser
@@ -576,7 +577,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Offline: the service worker keeps what a visit uses – at install only the start (`shellFiles` in `tools/build.ts`:
   index.html, its scripts and styles and the pictures they name), then every file of the site once a page fetched it,
   so a game played once plays offline – and more only for an installed app or when grown-ups ask for it under „Ohne
-  Internet spielen“ behind „mehr …“ (`OfflineOptions`, `src/lib/pwa.ts`): then the books chosen there (default: all)
+  Internet spielen“ behind the sign „Offline spielen“ hanging under the shelf (`RoomOffline`, `OfflineOptions`,
+  `src/lib/pwa.ts`): then the books chosen there (default: all)
   in the app language only, with its voices and the background song unless switched off there (English recordings too
   where they stand in for missing ones; a game's own song, like the Zahnputzlied, always comes with its book), never
   every language and never a language chosen there – switching 🌐 swaps the kept voices. The build lists each file with its book and language
@@ -645,9 +647,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
-  closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Browsers show how to leave fullscreen over the
+  closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Installing the app and the offline copy are not
+  among those texts, where grown-ups didn't find them, but behind a little sign „Offline spielen“ hanging on two short
+  chains from the shelf's underside below the globe, between its right legs and clear of the Impressum on the floor
+  (`RoomOffline`; on an upright screen from the top board into the top left compartment; user request, November 2026). Browsers show how to leave fullscreen over the
   middle of the screen's bottom (or top) edge for a while, again whenever fullscreen starts: so nothing to tap lies
-  there (user feedback, November 2026). On a wide screen the shelf starts right under the fullscreen button's room and
+  there (user feedback, November 2026). On a wide screen the shelf starts right at the screen's top – the fullscreen button is no longer a note above it but a
+  little sign nailed onto its top right corner, so the room above went to the shelf (user request, November 2026), and
+  the plan lets the name's sign hang deeper where the foxes on its o would leave the screen (`Sign.rise`) – and
   stands on four legs at its corners, two in front and two behind them, never one in the middle (`--legs`, user
   feedback, November 2026), leaving the bottom's middle to the floor, and the app's name is a painted sign hanging
   on its two little chains in front of the shelf, down into its top compartment (`SIGN_DIP`; standing on the floor at

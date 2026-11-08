@@ -2,7 +2,7 @@ import { useT } from "@/lib/language";
 import { install, isIos, isStandalone, usePwa } from "@/lib/pwa";
 
 /**
- * Small note for parents under the home page menu: install as an app, and
+ * Small note for parents behind the shelf's sign „Offline spielen“ (RoomOffline): install as an app, and
  * whether the games already work without internet.
  */
 export function InstallHint() {

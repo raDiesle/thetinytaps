@@ -2,7 +2,7 @@ import { type CSSProperties, type HTMLAttributes, type MouseEvent, type PointerE
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
-import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
+import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomOffline, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
@@ -127,9 +127,15 @@ const SPINE_COLOURS = ["#5e4f44", "#475057", "#685e4b", "#515647", "#594c51", "#
 const SIGN_SIZE = 0.09;
 const SIGN_EMS = 7.8;
 const SIGN_BOARD = 1.5;
+/** How far the foxes on its o rise above its board, in its letters' size. */
+const SIGN_FOXES = 0.4;
 
-/** The least height of a wide shelf's legs, for the room's: the bottom's middle where browsers note how to leave fullscreen. */
+/**
+ * The least height of a wide shelf's legs, for the room's: the bottom's middle where browsers note how to leave
+ * fullscreen; and in px, so the sign „Offline spielen“ hanging between them under the globe can be read and tapped.
+ */
 const LEGS = 0.1;
+const MIN_LEGS = 46;
 
 /** The eye's distance from the shelf and its height on it, as share of the shelf's (`perspective` in bookshelf.css). */
 const EYE = 1300;
@@ -164,7 +170,8 @@ const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
  * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
  * app's name is a painted sign hanging on chains: in front of a wide shelf standing on legs, down into its top
- * compartment, above an upright one's. Drawn in 3D – each compartment a box going back, the boards seen from
+ * compartment, above an upright one's. The fullscreen button is a small sign nailed onto the shelf's top right corner,
+ * and „Offline spielen“ hangs below the globe (RoomOffline). Drawn in 3D – each compartment a box going back, the boards seen from
  * the eye's height – but still: nothing moves until it is tapped. The room fills the screen and nothing follows below it:
  * `legal` (Impressum, Datenschutz) stands small in its bottom right corner, „Feedback“ in its bottom left (RoomFeedback).
  */
@@ -183,7 +190,11 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
       // The screen's shape decides, not the room's: the room's height follows the plan (`data-plan` in bookshelf.css).
       const upright = window.innerWidth / window.innerHeight < 0.95;
       const sign = Math.min(64, Math.max(20, height * SIGN_SIZE));
-      const options = { upright, sign: { width: sign * SIGN_EMS, height: sign * SIGN_BOARD }, legs: Math.min(90, Math.max(28, height * LEGS)) };
+      const options = {
+        upright,
+        sign: { width: sign * SIGN_EMS, height: sign * SIGN_BOARD, rise: sign * SIGN_FOXES },
+        legs: Math.min(90, Math.max(MIN_LEGS, height * LEGS)),
+      };
       const planFor = (carving: Carving | undefined) => planShelf(width, height, spansFor(carving), { ...options, carved: carving?.span ?? 0 });
       const plain = planFor(undefined);
       const carved = CARVINGS.map((carving) => ({ carving, layout: planFor(carving) })).find(
@@ -230,9 +241,6 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
       <div className="room-scene" data-plan={layout?.upright ? "upright" : "wide"}>
         <div className="room-wall" aria-hidden />
         <div className="room-floor" aria-hidden />
-        <div className="room-top">
-          <FullscreenButton />
-        </div>
         {READING && margin > 200 && (
           <span
             className="room-picture"
@@ -248,6 +256,14 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
               {/* The app's name, painted on a sign: hanging in front of a wide shelf's top compartment, above an upright one's. */}
               <div className="shelf-sign" style={layout.sign && { left: layout.sign.x + layout.sign.w / 2, top: layout.sign.y + layout.sign.h }}>
                 <Logo secretProps={secretProps} />
+              </div>
+              {/*
+               * The fullscreen button, a little sign nailed onto the shelf's top right corner (user request, November
+               * 2026): above the shelf it took a strip of the screen the books now have.
+               */}
+              <FullscreenButton className="shelf-fullscreen" />
+              <div className="shelf-offline">
+                <RoomOffline />
               </div>
               <div className="shelf-box" onPointerDown={nudge}>
                 <span className="shelf-back" />

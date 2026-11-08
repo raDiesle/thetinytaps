@@ -45,13 +45,14 @@
 }
 
 /*
- * A screen wider than tall: the shelf starts high, with only the fullscreen button's room above it (and the foxes on
- * the sign's o, which hangs down into the shelf), and stands on legs (`--legs`, from its plan, below the room's height
+ * A screen wider than tall: the shelf starts right at the top, with only the room for the foxes on the sign's o (which
+ * hangs down into the shelf) above it – the fullscreen button is nailed onto its corner (user request, November 2026) –
+ * and stands on legs (`--legs`, from its plan, below the room's height
  * it gets; user decision, November 2026). So the bottom of the screen's middle, where browsers show how to leave
  * fullscreen, holds only legs and floor, never a book.
  */
 .room-scene[data-plan="wide"] {
-  --top: clamp(48px, 9vh, 80px);
+  --top: clamp(6px, 1.5vh, 14px);
 }
 
 /* Striped wallpaper with little dots, the lamp's light on it and a moulding under the ceiling. */
@@ -86,19 +87,6 @@
     linear-gradient(#0000 40%, #0000002e),
     var(--wood-grain-h) 0 0 / 1200px 360px,
     #a87447;
-}
-
-/* ----- The top of the wall: only the fullscreen button, in the top right as on every menu ----- */
-
-.room-top {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  height: var(--top);
-  padding: 0 max(12px, env(safe-area-inset-right)) 0 0;
 }
 
 /* The things in the shelf are buttons without a button's look: only the drawing, a little lift under a finger. */
@@ -567,9 +555,155 @@
   -webkit-user-select: all;
 }
 
-/* The install hint behind the carving's „mehr …“ (RoomNotes), below its texts. */
+/*
+ * The fullscreen button: a little painted sign nailed onto the shelf's top right corner, over the top board and the side
+ * post, tipped a little as a sign hung by one nail is – in the top right as on every menu, and part of the shelf.
+ */
+.shelf-fullscreen {
+  position: absolute;
+  top: calc(var(--crown) * 0.25);
+  right: calc(var(--post) * 0.2);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 46px;
+  padding: 8px 0 0;
+  border: 3px solid #9a6a40;
+  border-radius: 6px 6px 4px 4px;
+  background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;
+  color: var(--ink);
+  rotate: 4deg;
+  box-shadow:
+    inset 0 0 0 1px #00000024,
+    3px 3px 6px #3a261452;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The nail it hangs on, driven into the shelf through its top. */
+.shelf-fullscreen::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e4ded5, #7a6f64 55%, #3d3530);
+  box-shadow: 0 1px 1px #0000004d;
+  translate: -50% 0;
+}
+
+.shelf-fullscreen .fullscreen-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.shelf-fullscreen:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+/*
+ * „Offline spielen“ (RoomOffline): a little sign like the name's, hanging on two short chains from the underside of a
+ * wide shelf below the globe (the column of the grown-ups' things), just inside its front leg and clear of the floor's
+ * Impressum; on an upright screen, which has no legs, from the top board into the top left compartment, above the
+ * speaker standing on its board.
+ */
+.shelf-offline {
+  --hang: calc(var(--legs, 46px) * 0.2);
+  position: absolute;
+  top: calc(100% + var(--hang));
+  right: calc(var(--post) * 1.35);
+  z-index: 2;
+}
+
+.room-scene[data-plan="upright"] .shelf-offline {
+  --hang: 10px;
+  top: calc(var(--crown) + var(--hang) + 3px);
+  right: auto;
+  left: calc(var(--post) + 6px);
+}
+
+/* Above an upright shelf there is the wall's room under the name: the fullscreen sign is nailed onto the top board's
+ * corner from above, clear of the stickers on the top compartment's right wall. */
+.room-scene[data-plan="upright"] .shelf-fullscreen {
+  top: auto;
+  bottom: calc(100% - var(--crown) * 0.8);
+}
+
+.room-offline {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.room-offline-board {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.3em 0.65em 0.35em 0.5em;
+  border: 3px solid #9a6a40;
+  border-radius: 6px 6px 4px 4px;
+  background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;
+  color: var(--ink);
+  font-size: clamp(11px, calc(var(--legs, 60px) * 0.22), 16px);
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 0 0 1px #00000024,
+    3px 3px 6px #3a261452;
+}
+
+.room-offline-board svg {
+  flex: none;
+  width: 1.5em;
+  height: 1.5em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Its two chains, going up to the shelf's underside (or out of the picture above an upright shelf). */
+.room-offline-board::before,
+.room-offline-board::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 14%;
+  width: 7px;
+  height: var(--hang);
+  background:
+    center bottom / 100% auto repeat-y
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 16'%3E%3Crect x='3.9' y='6' width='2.2' height='10.5' rx='1.1' fill='%235c4632'/%3E%3Cellipse cx='5' cy='4' rx='3.6' ry='3.4' fill='none' stroke='%23866548' stroke-width='1.7'/%3E%3C/svg%3E");
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.room-offline-board::after {
+  right: 14%;
+  left: auto;
+  translate: 50% 0;
+}
+
+.room-offline:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* In its menu: installing first, then what is kept. */
 .home-menu-panel .install-hint {
-  margin: 12px 0 0;
+  margin: 0 0 12px;
 }
 
 /*
@@ -577,7 +711,6 @@
  * seen at once without scrolling (user feedback, November 2026).
  */
 .home-menu-panel .offline-options {
-  margin-top: 12px;
   padding: 14px 18px;
   gap: 0;
   font-size: 1rem;

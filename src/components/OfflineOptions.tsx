@@ -5,7 +5,7 @@ import { useAppLanguage, useT } from "@/lib/language";
 import { type OfflineManifest, sizeOf } from "@/lib/offlineParts";
 import { keepsOffline, offlineChoiceOf, setOfflineSettings, usePwa } from "@/lib/pwa";
 
-// For grown-ups, behind „mehr …“ on the shelf: whether the games are kept on the device to play without internet, and
+// For grown-ups, behind the sign „Offline spielen“ hanging under the shelf (RoomOffline), below installing the app: whether the games are kept on the device to play without internet, and
 // which (user request, November 2026: „nur für die ausgewählte Sprache runterladen; ggf. könnte der User auswählen, ob
 // er auch die Sprachen runterladen will und ggf. pro Spiel (Buch) auswählen, Default: alles“). An installed app keeps
 // them by default, a browser tab only when asked. The language is never chosen here: it is the app language, which 🌐
@@ -19,7 +19,7 @@ import { keepsOffline, offlineChoiceOf, setOfflineSettings, usePwa } from "@/lib
 const megabytes = (bytes: number, locale: string, unit: string) =>
   `${(bytes / 1e6).toLocaleString(locale, { maximumFractionDigits: bytes < 10e6 ? 1 : 0, minimumFractionDigits: bytes < 10e6 ? 1 : 0 })} ${unit}`;
 
-/** Whether `ref`'s element has been on the screen (it stays in the page unseen while „mehr …“ is closed). */
+/** Whether `ref`'s element has been on the screen (the panel it stands in may open scrolled). */
 function useSeen(ref: RefObject<Element | null>) {
   const [seen, setSeen] = useState(false);
   useEffect(() => {
@@ -58,7 +58,7 @@ function Pick({ on, onClick, children }: { on: boolean; onClick: () => void; chi
   );
 }
 
-/** „Ohne Internet spielen“: keep the games on the device, with or without music and voices, and which books (behind „mehr …“, RoomNotes). */
+/** „Ohne Internet spielen“: keep the games on the device, with or without music and voices, and which books (behind „Offline spielen“, RoomOffline). */
 export function OfflineOptions() {
   const t = useT();
   const language = useAppLanguage();

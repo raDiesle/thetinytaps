@@ -22,7 +22,11 @@ const ROOMS = [
 const SIGN = (height: number) => Math.min(64, Math.max(20, height * 0.09));
 
 /** What the home page asks for besides the room: the sign hanging in front of a wide shelf, the carved words, the legs' least height. */
-const OPTIONS = (height: number) => ({ sign: { width: SIGN(height) * 7.8, height: SIGN(height) * 1.5 }, carved: CARVED, legs: height * 0.1 });
+const OPTIONS = (height: number) => ({
+  sign: { width: SIGN(height) * 7.8, height: SIGN(height) * 1.5, rise: SIGN(height) * 0.4 },
+  carved: CARVED,
+  legs: height * 0.1,
+});
 
 const overlap = (a: ShelfRect, b: ShelfRect) => a.x < b.x + b.w - 0.01 && b.x < a.x + a.w - 0.01 && a.y < b.y + b.h - 0.01 && b.y < a.y + a.h - 0.01;
 
@@ -78,7 +82,12 @@ describe("the bookshelf", () => {
     const top = cells.find((c) => c.books) as (typeof cells)[number];
     expect(sign).toBeDefined();
     if (!sign) return;
-    expect(sign.y + sign.h).toBeCloseTo(top.y + top.h * SIGN_DIP);
+    // Down by `SIGN_DIP`, or deeper where the foxes on it would leave the screen.
+    const dip = top.y + top.h * SIGN_DIP;
+    if (Math.abs(sign.y + sign.h - dip) > 0.01) {
+      expect(sign.y + sign.h).toBeGreaterThan(dip);
+      expect(sign.y).toBeCloseTo(options.sign.rise);
+    }
     // The books stand together in the middle of what the trail leaves (`.shelf-row`): where the helpers' books end.
     const books = top.books ?? [];
     const span = books.reduce((sum, b) => sum + BOOKS[b], 0);
@@ -92,8 +101,9 @@ describe("the bookshelf", () => {
     // The carved words stand centred under it (user feedback, November 2026), moved right where it hangs right of them.
     const wordsMiddle = helpersEnd + (CARVED * BOOK_ASPECT * bh) / 2 + 0.05 * bh + (wordsShift ?? 0);
     expect(wordsMiddle).toBeCloseTo(sign.x + sign.w / 2, 0);
-    // The foxes on its o rise 0.4 of its letters above it, below the room's top (at least 48 px, `--top`).
-    expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-48);
+    // The foxes on its o rise 0.4 of its letters above it, inside the shelf: it starts right at the screen's top (`--top`;
+    // the fullscreen button is nailed onto its corner, user request, November 2026).
+    expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
     // Sign and words hang far right, so the books at their left come towards the shelf's middle (user feedback,
     // November 2026): right at the wall with the stickers, or no room is left at the board's right to move them into.
     const atWall = sign.x + sign.w > top.x + top.w - SIGN_CLEAR.wall * bh - 1;

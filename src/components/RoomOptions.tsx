@@ -15,8 +15,8 @@ import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
  * The grown-ups' options on the home page, as things standing in the bookshelf's own compartments (Bookshelf.tsx)
  * instead of buttons: a wooden loudspeaker (music), an hourglass (play time), a globe (the language), stickers of a fox
  * girl and a bear boy stuck on the shelf's right inner side (the child's figure), and „mehr …“ in the words carved beside
- * the everyday helpers with what grown-ups read about the app (RoomNotes). Each opens its menu (HomeOptions.tsx), or
- * switches with one tap where that has none.
+ * the everyday helpers with what grown-ups read about the app (RoomNotes), and a sign „Offline spielen“ hanging under the
+ * shelf (RoomOffline). Each opens its menu (HomeOptions.tsx), or switches with one tap where that has none.
  */
 
 /** The wooden loudspeaker standing in the shelf: one tap switches the music of all games on or off. */
@@ -251,10 +251,10 @@ export function RoomStickers() {
 
 /**
  * „mehr …“ at the end of the words carved beside the everyday helpers (Bookshelf.tsx), for grown-ups: it opens what the
- * app is (the page's words for search engines, SeoWords), a few words from us as parents (ParentsNote) and how to install
- * the app (InstallHint) – the shelf's page has nothing below its first screen. It took the place of a little „i“ book in
- * the shelf, which grown-ups had to find (user feedback, November 2026). While closed the text stays in the page unseen
- * (`keep`), so search engines still read it.
+ * app is (the page's words for search engines, SeoWords) and a few words from us as parents (ParentsNote) – the shelf's
+ * page has nothing below its first screen; installing and playing offline have a sign of their own (RoomOffline). It
+ * took the place of a little „i“ book in the shelf, which grown-ups had to find (user feedback, November 2026). While
+ * closed the text stays in the page unseen (`keep`), so search engines still read it.
  */
 export function RoomNotes() {
   const t = useT();
@@ -279,6 +279,42 @@ export function RoomNotes() {
       <p className="room-notes-contact">
         <ContactLink />
       </p>
+    </MenuButton>
+  );
+}
+
+/**
+ * „Offline spielen“, a little sign hanging on two short chains from the shelf's underside below the globe (on an upright
+ * screen, which has no legs, from the top board into the top left compartment): it opens installing the app and which
+ * games are kept to play without internet (user request, November 2026: behind „mehr …“ among the texts they were hard
+ * to find).
+ */
+export function RoomOffline() {
+  const t = useT();
+  const label = t({
+    de: "Offline spielen",
+    ru: "Играть офлайн",
+    en: "Play offline",
+    zh: "离线玩",
+    hi: "ऑफ़लाइन खेलें",
+    es: "Jugar sin conexión",
+    ar: "اللعب دون اتصال",
+  });
+  return (
+    <MenuButton
+      icon="📲"
+      label={label}
+      className="room-offline"
+      art={
+        <span className="room-offline-board">
+          {/* An arrow down into a tray: what is fetched stays on the device. */}
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M12 3.5v11M7 10l5 5 5-5M4.5 16.5v3.5h15v-3.5" />
+          </svg>
+          <span>{label}</span>
+        </span>
+      }
+    >
       <InstallHint />
       <OfflineOptions />
     </MenuButton>

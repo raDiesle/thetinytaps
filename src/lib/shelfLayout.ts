@@ -107,8 +107,11 @@ export interface ShelfLayout {
 export interface ShelfOptions {
   /** The screen stands upright (its own shape, not the room's, so the room's size can't flip it back and forth). */
   upright?: boolean;
-  /** The sign hanging in front of a wide shelf, in px: its board's width and height. */
-  sign?: { width: number; height: number };
+  /**
+   * The sign hanging in front of a wide shelf, in px: its board's width and height, and how far the foxes on its o rise
+   * above it (`rise`), which must stay inside the shelf's top: the shelf starts right at the screen's top.
+   */
+  sign?: Sign;
   /**
    * Of the first place (the everyday helpers' books with the words carved beside them), how much at its right takes no
    * tap, in picture books' widths: the carved words, which the hanging sign may cover.
@@ -116,6 +119,13 @@ export interface ShelfOptions {
   carved?: number;
   /** The least height of a wide shelf's legs, in px. */
   legs?: number;
+}
+
+/** The sign with the app's name, in px: its board's width and height, and how far the foxes on its o rise above it. */
+export interface Sign {
+  width: number;
+  height: number;
+  rise?: number;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -210,7 +220,7 @@ function trailFor(sign: { width: number }, bh: number, words: number) {
  * the stickers lets the sign, so the sign and the words under it hang far right and the books at their left come
  * towards the shelf's middle (user feedback, November 2026): `top.trail` shrinks by twice what they move right.
  */
-function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: number; height: number }, carved: number) {
+function signOver(top: ShelfCell, spans: number[], bh: number, sign: Sign, carved: number) {
   // Where the last book to take ends: the books stand together in the middle of what the trail leaves (`.shelf-row` in
   // bookshelf.css: 2 px padding, `BOOK_GAP` between each and the ends), the carved words the end of the helpers' place.
   const books = top.books ?? [];
@@ -233,13 +243,14 @@ function signOver(top: ShelfCell, spans: number[], bh: number, sign: { width: nu
   const lo = end - words + SIGN_CLEAR.books * bh;
   const hi = top.x + top.w - SIGN_CLEAR.wall * bh - sign.width;
   const x = Math.max(lo, Math.min(hi, end - words / 2 - sign.width / 2));
-  const rect: ShelfRect = { x, y: top.y + top.h * SIGN_DIP - sign.height, w: sign.width, h: sign.height };
+  // On a low screen it hangs a little deeper, so the foxes on it stay on the screen (the shelf starts at its top).
+  const rect: ShelfRect = { x, y: Math.max(top.y + top.h * SIGN_DIP - sign.height, sign.rise ?? 0), w: sign.width, h: sign.height };
   // The words' middle lies a little right of their place's, past the padding at their left (`.shelf-carving`).
   const middle = end - words / 2 + 0.05 * bh;
   return { sign: rect, wordsShift: words > 0 ? Math.max(0, x + sign.width / 2 - middle) : 0 };
 }
 
-function planWide(width: number, height: number, spans: number[], legs: number, sign: { width: number; height: number }, carved: number): ShelfLayout {
+function planWide(width: number, height: number, spans: number[], legs: number, sign: Sign, carved: number): ShelfLayout {
   const count = spans.length;
   const frame = frameFor(width, height);
   const { post, wall, crown, board } = frame;
