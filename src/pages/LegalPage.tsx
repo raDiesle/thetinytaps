@@ -116,8 +116,8 @@ export function PrivacyPage() {
         </p>
         <p>
           Die Domain funforboth.com ist bei der Cloudflare, Inc. registriert, deren Namensserver Ihrem Browser sagen, wo die Seite liegt. Die Seite selbst läuft
-          nicht über Cloudflare. Wer eine frühere Adresse (toddlerfox.com oder booksforboth.com) aufruft, wird von Cloudflare zu www.funforboth.com
-          weitergeleitet; dafür verarbeitet Cloudflare kurz Ihre IP-Adresse und die aufgerufene Adresse.
+          nicht über Cloudflare. Wer eine frühere Adresse (toddlerfox.com oder booksforboth.com) aufruft, wird von Cloudflare zu funforboth.com weitergeleitet;
+          dafür verarbeitet Cloudflare kurz Ihre IP-Adresse und die aufgerufene Adresse.
         </p>
       </section>
 
@@ -173,8 +173,8 @@ export function PrivacyPage() {
         </p>
         <p>
           Das alles bleibt auf Ihrem Gerät und wird nicht an uns oder andere übertragen. Sie können es jederzeit löschen, indem Sie in Ihrem Browser die
-          Website-Daten von www.funforboth.com löschen. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG: Das Speichern ist nötig, damit die Spiele so funktionieren,
-          wie Sie es gewählt haben.
+          Website-Daten von funforboth.com löschen. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG: Das Speichern ist nötig, damit die Spiele so funktionieren, wie
+          Sie es gewählt haben.
         </p>
       </section>
 
