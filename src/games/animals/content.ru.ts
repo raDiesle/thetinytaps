@@ -171,8 +171,7 @@ export function russianTexts(german: AnimalTexts): AnimalTexts {
     food: (f) => (food(f) ? capital(food(f)!.name) : german.food(f)),
     home: (h) => (home(h) ? capital(home(h)!.name) : german.home(h)),
     hungry: (a) => (animal(a) ? `${capital(animal(a))} хочет кушать!` : german.hungry(a)),
-    // German only so far (Z-24, November 2026): silent in this language until it is translated and recorded.
-    whatEats: german.whatEats,
+    whatEats: (a) => (animal(a) ? `Что любит кушать ${animal(a)}?` : german.whatEats(a)),
     yummy: (a, f) => (animal(a) && food(f) ? `Ням-ням, вкусно! ${capital(animal(a))} любит ${food(f)!.likes}. Спасибо!` : german.yummy(a, f)),
     yuck: (a) => (animal(a) ? `Фу! ${capital(animal(a))} такое не ест.` : german.yuck(a)),
     whereLives: (a) => (animal(a) ? `Где живёт ${animal(a)}?` : german.whereLives(a)),

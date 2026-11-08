@@ -27,7 +27,7 @@ const DONE_MS = 700;
 const MOVE_MS = 620;
 
 /** The stamp's invitation; hop and clap take theirs from the language pack's doing words („Hüpf mit!“). */
-const STOMP_INVITE: Localized = {
+export const STOMP_INVITE: Localized = {
   de: "Stampf mit!",
   ru: "Топай со мной!",
   en: "Now you stomp!",

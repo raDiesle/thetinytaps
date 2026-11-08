@@ -11,12 +11,13 @@
 //   bun run voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
 //   bun run voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
 //   bun run voice try "<text>" [--kind turn] [--lang en]   one line with the voice, into .voice-raw/probe.mp3
-//   bun run voice make [--dry] [--lang de,en] [--only zaehne,alle-spiele] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
+//   bun run voice make [--dry] [--lang de,en] [--only zaehne,alle-spiele] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags] [--parallel 4]
 //                                            records every line that has no recording yet, in all
 //                                            languages or those of --lang, of every story and game or
 //                                            those of --only (and again: lines with that text part, of
 //                                            that kind, or all); --model eleven_v4_turbo costs half,
-//                                            --no-tags leaves out how a line is said
+//                                            --no-tags leaves out how a line is said; English first, then
+//                                            the order of RECORDING_ORDER, --parallel at once
 //
 // `make` only records what is missing (a line changed → new hash → new file) and
 // deletes recordings no line uses any more, so running it again costs nothing.
@@ -49,6 +50,13 @@ const DESIGN_TEXT =
   "Jetzt du – stampf mit! Stampf, stampf, stampf! Super machst du das! Und jetzt ganz hoch strecken – noch ein bisschen höher! " +
   "Ja, genau so! Geschafft – du bist stark!";
 
+/**
+ * The order `make` records the languages in: English, then by speakers in the world (Mandarin, Hindi, Spanish, Arabic –
+ * Ethnologue 2025, first and second language), then German before Russian (user decision, November 2026: German is the
+ * app's own language), then the rest (Italian).
+ */
+const RECORDING_ORDER = ["en", "zh", "hi", "es", "ar", "de", "ru"];
+
 /** How each kind of line is said: an audio tag in front of it (costs its characters too). */
 const TAGS = {
   opening: "[curious]",
@@ -75,7 +83,7 @@ const values = {};
 const rest = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
-  if (a === "--redo" || a === "--kind" || a === "--model" || a === "--lang" || a === "--only") {
+  if (a === "--redo" || a === "--kind" || a === "--model" || a === "--lang" || a === "--only" || a === "--parallel") {
     if (i + 1 >= argv.length) fail(`${a} needs a value`);
     values[a.slice(2)] = argv[++i];
   } else if (a.startsWith("--")) flags.add(a.slice(2));
@@ -90,13 +98,24 @@ function apiKey() {
   return key;
 }
 
+/** How often a request is tried again when the service is busy (429) or fails on its side (5xx, network). */
+const RETRIES = 5;
+
 async function call(path, { body, query, soft = false } = {}) {
   const url = `${API}${path}${query ? `?${new URLSearchParams(query)}` : ""}`;
-  const response = await fetch(url, {
-    method: body ? "POST" : "GET",
-    headers: { "xi-api-key": apiKey(), ...(body ? { "content-type": "application/json" } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response;
+  for (let attempt = 0; ; attempt++) {
+    response = await fetch(url, {
+      method: body ? "POST" : "GET",
+      headers: { "xi-api-key": apiKey(), ...(body ? { "content-type": "application/json" } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+      // A request open while the Mac slept never answered and held the run for good (November 2026): give up on it
+      // after a minute, so it is tried again.
+      signal: AbortSignal.timeout(60_000),
+    }).catch((error) => ({ ok: false, status: 0, text: async () => String(error) }));
+    if (response.ok || attempt >= RETRIES || !(response.status === 0 || response.status === 429 || response.status >= 500)) break;
+    await new Promise((done) => setTimeout(done, 2000 * 2 ** attempt));
+  }
   if (soft && !response.ok) return null;
   if (!response.ok) fail(`${path}: ${response.status} ${await response.text()}`);
   return response;
@@ -112,11 +131,12 @@ async function credits() {
 
 /**
  * Credits a character really costs with the turbo model, as measured in October 2026: 0.096 (10,399 characters for
- * 995), 0.078 (6,398 for 498), 0.102 (34,408 for 3,506) and, in November 2026, 0.109 (26,425 for 2,881) and 0.085 (15,528 for 1,327). The service's own
- * `character_cost_multiplier` (0.5) is five times too high and once stopped a run that would have fit, so the check before
- * a run goes by this, a little above all of them.
+ * 995), 0.078 (6,398 for 498), 0.102 (34,408 for 3,506) and, in November 2026, 0.109 (26,425 for 2,881), 0.085 (15,528 for 1,327) and 0.189
+ * (103,890 English characters for 19,607, 7 November 2026 – nearly twice the month before, so measure again after a big
+ * run and raise this when a run costs more). The service's own `character_cost_multiplier` (0.5) once stopped a run that
+ * would have fit, so the check before a run goes by this, a little above the latest measurement.
  */
-const CREDITS_PER_CHARACTER = 0.11;
+const CREDITS_PER_CHARACTER = 0.2;
 
 function readConfig() {
   if (!existsSync(CONFIG)) fail(`No voice yet: run "bun run voice design", listen, then "bun run voice save <1|2|3>"`);
@@ -251,6 +271,10 @@ async function make() {
       if (!flags.has("dry")) for (const f of orphans) rmSync(join(story.folder, f));
     }
   }
+  // English first, then the other languages by their speakers in the world, German before Russian (user decisions,
+  // November 2026): a run stopped halfway (credits, network) leaves the languages most players hear done.
+  const rank = (language) => (RECORDING_ORDER.includes(language) ? RECORDING_ORDER.indexOf(language) : RECORDING_ORDER.length);
+  todo.sort((a, b) => rank(a.story.language) - rank(b.story.language));
   const characters = todo.reduce((sum, line) => sum + spoken(line).length, 0);
   const byStory = Object.entries(Object.groupBy(todo, (line) => line.story.name)).map(
     ([name, lines]) => `${name} ${lines.reduce((sum, line) => sum + spoken(line).length, 0)}`,
@@ -267,11 +291,21 @@ async function make() {
   const before = await credits();
   if (!before) console.log('The key may not read the credits ("User: Read" on elevenlabs.io), so they are not checked.');
   else if (before.left < needed) fail(`Only ${before.left} credits left this month, ${needed} needed`);
-  for (const [i, line] of todo.entries()) {
-    mkdirSync(line.story.folder, { recursive: true });
-    writeFileSync(line.file, await record(config, spoken(line), Number.parseInt(voiceId(line.text), 16), line.story.language));
-    console.log(`${i + 1}/${todo.length}  ${line.text}`);
-  }
+  // A few requests at once (`--parallel`, default 4), taken from the list in its order, so a language is done before
+  // the next one is far along; each file is written as it comes, so a run stopped halfway goes on where it stopped.
+  // The subscription allows 5 requests at once for the whole account: run one recording at a time (two runs side by
+  // side, 4 + 3, ran out of retries on „concurrent_limit_exceeded“ in November 2026) and keep --parallel at 5 or less.
+  let next = 0;
+  let made = 0;
+  const worker = async () => {
+    while (next < todo.length) {
+      const line = todo[next++];
+      mkdirSync(line.story.folder, { recursive: true });
+      writeFileSync(line.file, await record(config, spoken(line), Number.parseInt(voiceId(line.text), 16), line.story.language));
+      console.log(`${++made}/${todo.length}  ${line.story.name}  ${line.text}`);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.max(1, Number(values.parallel ?? 4)) }, worker));
   const after = await credits();
   if (before && after) console.log(`Used ${after.used - before.used} credits, ${after.left} left this month.`);
 }

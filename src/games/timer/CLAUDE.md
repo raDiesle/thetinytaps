@@ -274,10 +274,13 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   still – `say` waits for it), „Gleich ist es so weit!“ with the bell (H-49) and one line at the end, what is there
   now; Abwechseln and Tennis „Wer fängt an?“ as the lamps draw, who begins, and „Tauschen! Jetzt ist das … dran.“ at
   every change (and when a grown-up gives the turn behind ⚙️). Nothing speaks before a grown-up starts a run with a
-  card, lines after the first are queued so none cuts another off, and leaving stops the voice (`hush`). Only
-  recordings play (`timerVoice`, ./stimme/, `bun run voice make --only timer`), never the browser's voice: until they
-  are made it stays silent, and in other app languages too until they are translated and recorded. A new picture gets
-  its two lines in `PICTURE_LINES` (the type asks for them) and they come on the 🎙️ list by themselves.
+  card, lines after the first are queued so none cuts another off, and leaving stops the voice (`hush`). Every line is
+  `Localized` in all app languages (November 2026) and said in the app language through `timerSay` (its English
+  recording standing in where the language has none); `timerSaid(language)` lists them for the recordings. Only
+  recordings play (`timerVoice`, ./stimme/, `bun run voice make --only timer`), never the browser's voice: a line without its recording stays
+  silent (every app language but Russian recorded, November 2026). A new picture gets its two lines in `PICTURE_LINES` (the type asks for them), German only
+  until translations are asked for, and they come on the 🎙️ list by themselves; `timer.test.ts` fails on a line missing
+  in a language until it is translated (mark the gap in `languageStatus.ts` and loosen that check only then).
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,
   also over long times (H-45, H-63 to H-69), and new pictures. A new timer idea goes there, not into the Alltagshelfer.

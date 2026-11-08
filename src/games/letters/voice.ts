@@ -5,8 +5,8 @@ import { ASIDE_LINE_GAP_MS } from "@/lib/spacing";
 import { recordedVoice } from "@/lib/voice";
 
 // What Buchstaben & Zahlen says, from its ElevenLabs recordings (`bun run voice make --only buchstaben`,
-// src/content/recordedLines.ts): one file per line in stimme/ (German; the other languages only once the user asks
-// for them). A line not recorded yet stays silent. The language pack follows the app language, so its lines are said
+// src/content/recordedLines.ts): one file per line in stimme/ (German; every other app language in stimme/<language>/, November
+// 2026). A line not recorded yet stays silent. The language pack follows the app language, so its lines are said
 // in that language.
 
 /** The game's voice. */

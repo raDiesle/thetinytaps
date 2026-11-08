@@ -1,5 +1,5 @@
 // What the games with ElevenLabs recordings (besides Bewegungsabenteuer, whose stories list their own lines) say, in
-// every language they are translated into (or in German only so far, `germanOnly`): the list
+// every language they are translated into: the list
 // scripts/elevenlabs-voice.mjs records from, one MP3 per line in the game's stimme/ folder (src/lib/voice.ts plays them). German lines come from voiceLines.ts, the list on
 // /management/; the other languages from each game's translations. A line a language has no translation of is said
 // in German, so only translated lines get a recording in that language.
@@ -9,8 +9,6 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { voiceLines } from "@/content/voiceLines";
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { GOOD_NIGHT } from "@/components/GameShell";
-import { MOOD_SAID } from "@/games/feelings/mood";
-import { NEEDS_SAID } from "@/games/feelings/needs";
 import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
 import { type Step, STEP_TRANSLATIONS, STEPS } from "@/games/teeth/steps";
@@ -80,32 +78,31 @@ function weaning(language: TargetLanguageId): RecordedLine[] {
   return once(STEPS_WEANING.map((step) => step.line[language] !== undefined && { text: step.line[language]!, kind: "calm" as const }));
 }
 
-/**
- * A game recorded in German only so far (Was gehört zum Tier?, Gefühle's stories, Schatten finden, Was gehört zusammen?,
- * Kettenreaktion, Aufs Töpfchen, Socken-Paare, Buchstaben & Zahlen, November 2026): its other languages are
- * recorded only when the user asks (root CLAUDE.md), so until then they say nothing, and a `make` for other games
- * spends no credits on them. Its praise is said proudly, everything else warmly. Groups in `waiting` (by their label on
- * the /management/ list) are left out until the user asks for them: they stay on that list as still to record.
- */
-const germanOnly =
-  (href: string, { waiting = [] }: { waiting?: string[] } = {}) =>
-  (language: TargetLanguageId): RecordedLine[] =>
-    language !== "de"
-      ? []
-      : once(
-          (voiceLines().find((g) => g.href === href)?.groups ?? [])
-            .filter((g) => !waiting.includes(g.label))
-            .flatMap((g) => g.lines.map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) }))),
-        );
+/** The list of `voiceLines.ts` in each language, built once: it reads every game's data. */
+const LISTS = new Map<TargetLanguageId, ReturnType<typeof voiceLines>>();
+const listIn = (language: TargetLanguageId) => {
+  if (!LISTS.has(language)) LISTS.set(language, voiceLines(language));
+  return LISTS.get(language)!;
+};
 
 /**
- * Gefühle: the stories in German only so far; „Wie geht's dir?“ and „Was brauche ich?“ in every language they are
- * translated into (C-73, user wish, November 2026), since a child picking a feeling should hear it in its own language.
+ * A game whose lines `voiceLines.ts` lists in every language (November 2026: the user asked for every language).
+ * Its praise is said proudly, everything else warmly. A line a language has no translation of yet is said in German
+ * there, which has no recording in that language, so a line of another language that is also one of the German lines
+ * is left out – unless the game's texts are whole in each language (`whole`, the letters' language packs, where an
+ * English „A!“ is English).
  */
-function feelings(language: TargetLanguageId): RecordedLine[] {
-  if (language === "de") return germanOnly("/gefuehle/")(language);
-  return once([...MOOD_SAID, ...NEEDS_SAID].map((line) => line[language] !== undefined && { text: line[language]!, kind: "instruction" as const }));
-}
+const spoken =
+  (href: string, { whole = false }: { whole?: boolean } = {}) =>
+  (language: TargetLanguageId): RecordedLine[] => {
+    const groups = (lang: TargetLanguageId) => listIn(lang).find((g) => g.href === href)?.groups ?? [];
+    const german = language === "de" || whole ? new Set<string>() : new Set(groups("de").flatMap((g) => g.lines));
+    return once(
+      groups(language).flatMap((g) =>
+        g.lines.filter((text) => !german.has(text)).map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) })),
+      ),
+    );
+  };
 
 /** What every game says: good night when play time is over, and the question at a level's end (GameEnd). */
 function allGames(language: TargetLanguageId): RecordedLine[] {
@@ -124,17 +121,15 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "kleine-abenteuer", folder: "src/games/elevator/stimme", lines: elevator },
   { name: "alle-spiele", folder: "src/components/stimme", lines: allGames },
   { name: "abstillen", folder: "src/games/weaning/stimme", lines: weaning },
-  { name: "tiere", folder: "src/games/animals/stimme", lines: germanOnly("/tiere/") },
-  { name: "gefuehle", folder: "src/games/feelings/stimme", lines: feelings },
-  { name: "schatten", folder: "src/games/shadows/stimme", lines: germanOnly("/schatten/") },
-  { name: "zusammen", folder: "src/games/together/stimme", lines: germanOnly("/zusammen/") },
-  { name: "kettenreaktion", folder: "src/games/marbles/stimme", lines: germanOnly("/kettenreaktion/") },
-  { name: "toepfchen", folder: "src/games/potty/stimme", lines: germanOnly("/toepfchen/") },
-  { name: "socken", folder: "src/games/socks/stimme", lines: germanOnly("/socken/") },
-  { name: "timer", folder: "src/games/timer/stimme", lines: germanOnly("/timer/") },
-  // Its 361 counting sentences („drei Äpfel!“, ≈ 1,100 credits) didn't fit into November 2026's credits: until they
-  // are recorded the game says the number alone.
-  { name: "buchstaben", folder: "src/games/letters/stimme", lines: germanOnly("/buchstaben/", { waiting: ["Zahl mit Dingen"] }) },
+  { name: "tiere", folder: "src/games/animals/stimme", lines: spoken("/tiere/") },
+  { name: "gefuehle", folder: "src/games/feelings/stimme", lines: spoken("/gefuehle/") },
+  { name: "schatten", folder: "src/games/shadows/stimme", lines: spoken("/schatten/") },
+  { name: "zusammen", folder: "src/games/together/stimme", lines: spoken("/zusammen/") },
+  { name: "kettenreaktion", folder: "src/games/marbles/stimme", lines: spoken("/kettenreaktion/") },
+  { name: "toepfchen", folder: "src/games/potty/stimme", lines: spoken("/toepfchen/") },
+  { name: "socken", folder: "src/games/socks/stimme", lines: spoken("/socken/") },
+  { name: "timer", folder: "src/games/timer/stimme", lines: spoken("/timer/") },
+  { name: "buchstaben", folder: "src/games/letters/stimme", lines: spoken("/buchstaben/", { whole: true }) },
 ];
 
 /** The languages these games are recorded in: the app's. */

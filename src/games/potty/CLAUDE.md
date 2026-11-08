@@ -96,8 +96,7 @@ thought's picture lacks its second frame, or `bilder/` holds a picture of anybod
 German, English, Chinese, Hindi, Spanish, Arabic and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart
 inline `t({ … })`): another language goes next to them when asked for, and a new or changed German line loses its
 translations until then. Everything Tapsi's story says is played from its ElevenLabs recording (`voice.ts`, files in `stimme/`),
-recorded in German only so far (November 2026): the other languages stay silent until the user asks for their
-recordings, a thought not translated yet plays its German one. Two sentences in a row (what the child said, then the
+recorded in every app language (November 2026); a thought not translated yet stays silent in another language. Two sentences in a row (what the child said, then the
 next step; a thought, then what the ✓ is for) go one after the other (`queue`), never as one joined sentence, which
 would have no recording. A new or changed line is listed by `src/content/recordedLines.ts` (`toepfchen`) and recorded
 with `bun run voice make --only toepfchen`, only when the user asks. Tapsi (`TAPSI.name` is `Localized`) is „Tapsi“ in English and Spanish, „塔普西“, „टैप्सी“,

@@ -33,9 +33,9 @@ Keys: arrows (and any other key) move a frame over the socks still on the floor 
 
 ## Languages
 
-The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 / मोज़ा / جورب). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only so far
-(November 2026): a sentence in another language stays silent until the user asks for its recordings, a German fallback
-sentence is silent in that language too (no English recording yet; `recordedVoice` never plays the German one for another language). A new or changed sentence is listed by `src/content/recordedLines.ts` (`socken`) and recorded with
+The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 / मोज़ा / جورب). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in every app language
+(November 2026); a German fallback sentence (a new one not translated yet) is silent in another language
+(`recordedVoice` never plays the German one for another language). A new or changed sentence is listed by `src/content/recordedLines.ts` (`socken`) and recorded with
 `bun run voice make --only socken`, only when the user asks. Arabic talks to the child with "let's" (هيّا نبحث), Hindi with commands, Spanish with tú: nothing that changes for a boy or a girl.
 - Translations come only when the user asks. A new or changed German line comes German-only; add the Russian only on request. Gaps are marked in `src/content/ideas/languageStatus.ts`.
 - When a German line changes its meaning, delete its Russian in the same change (a stale translation is worse than German).

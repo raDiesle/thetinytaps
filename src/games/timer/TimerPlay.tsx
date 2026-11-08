@@ -5,7 +5,7 @@ import { useLeaveGame } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
 import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
-import { useAppLanguage, useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
@@ -42,7 +42,7 @@ import { TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
 import { clockOn, digits, ownTimeMs } from "./time";
-import { PICTURE_LINES, SOON_LINE, type TimedPicture, timerVoice } from "./voice";
+import { PICTURE_LINES, SOON_LINE, type TimedPicture, timerLoad, timerSay } from "./voice";
 
 /** The last candle goes out with a puff this long after the time is up. */
 const BLOW_MS = 700;
@@ -289,9 +289,9 @@ function TimerRun({
   // recorded; a grown-up leaving with ✕ stops it.
   const language = useAppLanguage().id;
   const lines = PICTURE_LINES[picture];
-  const say = useCallback((text: string, queue = false) => timerVoice.say(text, language, { queue }), [language]);
+  const say = useCallback((line: Localized, queue = false) => timerSay(line, language, queue), [language]);
   useEffect(() => {
-    timerVoice.load([lines.start, SOON_LINE, lines.end], language);
+    timerLoad([lines.start, SOON_LINE, lines.end], language);
     say(lines.start);
   }, [lines, language, say]);
   useEffect(() => hush, []);

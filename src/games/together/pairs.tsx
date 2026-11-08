@@ -673,9 +673,8 @@ export interface TogetherTexts {
   /** Its partner, for screen readers: "Zahnpasta". */
   partner: (p: Pair) => string;
   /**
-   * The round's question. In German the pair's wish (Z-25): what the one above wants to do, never naming the partner
-   * („Wir wollen Zähne putzen.“); in the other languages still „What goes with the toothbrush?“ until they are
-   * translated.
+   * The round's question: the pair's wish (Z-25), what the one above wants to do, never naming the partner („Wir wollen
+   * Zähne putzen.“, „Let's brush our teeth.“). Said as the round comes and shown under the picture (`RoundTopic`).
    */
   question: (p: Pair) => string;
   /** The right pick: "Die Zahnpasta gehört zur Zahnbürste. Toll!". */
@@ -697,15 +696,15 @@ const GERMAN_TEXTS: TogetherTexts = {
 };
 
 /**
- * One pair in another language (`content.<lang>.ts`), written out sentence by sentence rather than built from words:
- * there are only a few translated, and each language's grammar (cases, the partner's gender in its verb) is then plain to see.
+ * One pair in another language (`content.<lang>.ts`, `content.scenes.<lang>.ts`), written out sentence by sentence
+ * rather than built from words: each language's grammar (cases, the partner's gender in its verb) is then plain to see.
  */
 export interface PairTranslation {
   /** The one above, for screen readers. */
   name: string;
   /** Its partner, for screen readers. */
   partner: string;
-  /** The question, as `TogetherTexts.question`: still „What goes with …?“, written before the German became a wish (Z-25). */
+  /** The pair's wish, as `TogetherTexts.question` (Z-25): what the one above wants to do, never naming the partner. */
   question: string;
   /** The right pick, with the praise, as `TogetherTexts.right`. */
   right: string;

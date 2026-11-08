@@ -79,7 +79,10 @@ test("the sentences have no German left in them, and none in another script has 
     const german = ANIMAL_TEXTS.de;
     for (const animal of ANIMALS.filter((a) => words.animals[a.id])) {
       // Each sentence next to its German one.
-      const pairs: [string, string][] = (["hungry", "yuck", "whereLives", "livesHere"] as const).map((key) => [texts[key](animal), german[key](animal)]);
+      const pairs: [string, string][] = (["hungry", "whatEats", "yuck", "whereLives", "livesHere"] as const).map((key) => [
+        texts[key](animal),
+        german[key](animal),
+      ]);
       if (animal.food && words.foods[animal.food.id]) pairs.push([texts.yummy(animal, animal.food), german.yummy(animal, animal.food)]);
       if (animal.home && words.homes[animal.home]) pairs.push([texts.movedIn(animal, HOMES[animal.home]), german.movedIn(animal, HOMES[animal.home])]);
       for (const [sentence, de] of pairs) expect(sentence, `${language} ${animal.id}`).not.toBe(de);
@@ -124,6 +127,7 @@ test("an animal without its words gets the whole German sentence, in every langu
   for (const language of Object.keys(ANIMAL_TRANSLATIONS) as TargetLanguageId[]) {
     const texts = ANIMAL_TEXTS[language]!;
     expect(texts.hungry(animal), language).toBe(de.hungry(animal));
+    expect(texts.whatEats(animal), language).toBe(de.whatEats(animal));
     expect(texts.yummy(animal, withFood.food!), language).toBe(de.yummy(animal, withFood.food!));
     expect(texts.movedIn(animal, HOMES[withFood.home!]), language).toBe(de.movedIn(animal, HOMES[withFood.home!]));
     const giver = { ...GIVERS[0], id: "not-translated" };

@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { APP_LANGUAGES } from "@/lib/language";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
 import { BAR, CLOCK, CLOCK_FLOOR, clockText, DIGITS } from "./clock";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
+import { timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
 import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
@@ -583,4 +585,19 @@ describe("Timer", () => {
     expect(soonMs(60_000)).toBe(12_000);
     expect(soonMs(10_000)).toBe(2000);
   });
+});
+
+// What the Timer says comes in every app language (H-72): no line falls back to German in another language, and Russian,
+// Chinese, Hindi and Arabic have no Latin letters in theirs.
+test("every line the Timer says is translated into every app language", () => {
+  const german = new Set(timerSaid("de"));
+  for (const language of APP_LANGUAGES) {
+    const said = timerSaid(language);
+    expect(said.length, language).toBe(german.size);
+    if (language === "de") continue;
+    for (const line of said) {
+      expect(german.has(line), `${language}: ${line}`).toBe(false);
+      if (["ru", "zh", "hi", "ar"].includes(language)) expect(line, language).not.toMatch(/[A-Za-zäöüß]/);
+    }
+  }
 });

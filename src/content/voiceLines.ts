@@ -1,12 +1,13 @@
-// Every German line the games say, gathered from their own data: the list of what still has
-// to be recorded with ElevenLabs, now that the browser's voice no longer speaks (root
+// Every line the games say (in German, or in another language for recordedLines.ts), gathered from their own data:
+// the list of what still has to be recorded with ElevenLabs, now that the browser's voice no longer speaks (root
 // CLAUDE.md). Shown on /management/ (VoiceList, loaded only there, since it pulls in the
 // data of every game). Read from the data itself, so it stays true when lines change; the
 // few lines written inline in a component are copied here, and voiceLines.test.ts checks
 // that they are still in that file.
 
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
-import { de } from "@/content/de";
+import { languageFor } from "@/content/languages";
+import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, giverOf, GIVERS } from "@/games/animals/content";
 import { GIFTS } from "@/games/animals/gifts";
 import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
@@ -19,12 +20,13 @@ import { FILMS } from "@/games/elevator/film/films";
 import type { Film } from "@/games/elevator/film/types";
 import { TRAIL_LEVELS } from "@/games/elevator/trail/levels";
 import type { Station, Way } from "@/games/elevator/trail/types";
-import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
+import { FEELINGS } from "@/games/feelings/bear";
 import { DAYS } from "@/games/feelings/days";
 import { SITUATIONS } from "@/games/feelings/kita";
 import { SELF_SITUATIONS } from "@/games/feelings/selbst";
-import { MOOD_LINES } from "@/games/feelings/mood";
-import { NEEDS_LINES } from "@/games/feelings/needs";
+import { comfortsIn, dayIn, feelingIn, situationIn } from "@/games/feelings/localized";
+import { MOOD_SAID } from "@/games/feelings/mood";
+import { NEEDS_SAID } from "@/games/feelings/needs";
 import { PRAISE as FEELINGS_PRAISE } from "@/games/feelings/shared";
 import type { Beat } from "@/games/feelings/story";
 import { buildBath } from "@/games/marbles/bath";
@@ -51,8 +53,10 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
-import { BEGINS, PICTURE_LINES, SOON_LINE, TURN_TO, WHO_BEGINS } from "@/games/timer/voice";
+import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
+import { STOMP_INVITE } from "@/games/letters/MovePlay";
+import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
@@ -97,6 +101,8 @@ export interface VoiceGame {
 /** A line copied from a component, where it is written inline: voiceLines.test.ts checks it is still there. */
 export interface InlineLine {
   text: string;
+  /** Its translations, written there too, where the component says it in other languages. */
+  translations?: Omit<Localized, "de">;
   /** The file it is written in, from the repository root. */
   file: string;
 }
@@ -110,14 +116,88 @@ const beat = (b: Beat) => [b.narration, b.line].filter(Boolean).join(" ");
 /** Lines written inline in components, by game route. */
 export const INLINE_LINES: Record<string, InlineLine[]> = {
   "/kettenreaktion/": [
-    { text: "Der Korb ist voll!", file: "src/games/marbles/TrackLevel.tsx" },
-    { text: "Bumm! Alles umgefallen!", file: "src/games/marbles/ToppleLevel.tsx" },
-    { text: "Hatschi!", file: "src/games/marbles/SneezeLevel.tsx" },
-    { text: "Achtung, fertig – los!", file: "src/games/marbles/TrackLevel.tsx" },
-    { text: "Der Schneemann ist fertig!", file: "src/games/marbles/snowTrack.tsx" },
-    { text: "Alle sind im Becken!", file: "src/games/marbles/slideTrack.tsx" },
-    { text: "Voll! Der Kran hebt alles hoch!", file: "src/games/marbles/siteTrack.tsx" },
-    { text: "Alle sind auf dem Mond! Sternschnuppen!", file: "src/games/marbles/spaceTrack.tsx" },
+    {
+      text: "Der Korb ist voll!",
+      translations: { en: "The basket is full!", zh: "篮子满啦！", hi: "टोकरी भर गई!", es: "¡La cesta está llena!", ar: "السلة ممتلئة!", ru: "Корзина полна!" },
+      file: "src/games/marbles/TrackLevel.tsx",
+    },
+    {
+      text: "Bumm! Alles umgefallen!",
+      translations: {
+        en: "Boom! Everything fell over!",
+        zh: "砰！全倒啦！",
+        hi: "धड़ाम! सब गिर गया!",
+        es: "¡Bum! ¡Todo se cayó!",
+        ar: "بوم! سقط كل شيء!",
+        ru: "Бум! Всё упало!",
+      },
+      file: "src/games/marbles/ToppleLevel.tsx",
+    },
+    {
+      text: "Hatschi!",
+      translations: { en: "Achoo!", zh: "阿嚏！", hi: "आछू!", es: "¡Achís!", ar: "أتشو!", ru: "Апчхи!" },
+      file: "src/games/marbles/SneezeLevel.tsx",
+    },
+    {
+      text: "Achtung, fertig – los!",
+      translations: {
+        en: "Ready, steady, go!",
+        zh: "预备——出发！",
+        hi: "एक, दो, तीन – चलो!",
+        es: "¡A la una, a las dos y a las tres!",
+        ar: "استعداد، انطلاق!",
+        ru: "На старт, внимание, марш!",
+      },
+      file: "src/games/marbles/TrackLevel.tsx",
+    },
+    {
+      text: "Der Schneemann ist fertig!",
+      translations: {
+        en: "The snowman is ready!",
+        zh: "雪人堆好啦！",
+        hi: "स्नोमैन तैयार है!",
+        es: "¡El muñeco de nieve está listo!",
+        ar: "رجل الثلج جاهز!",
+        ru: "Снеговик готов!",
+      },
+      file: "src/games/marbles/snowTrack.tsx",
+    },
+    {
+      text: "Alle sind im Becken!",
+      translations: {
+        en: "Everyone is in the pool!",
+        zh: "大家都到水池里啦！",
+        hi: "सब पानी में पहुँच गए!",
+        es: "¡Todos están en la piscina!",
+        ar: "الجميع في المسبح!",
+        ru: "Все в бассейне!",
+      },
+      file: "src/games/marbles/slideTrack.tsx",
+    },
+    {
+      text: "Voll! Der Kran hebt alles hoch!",
+      translations: {
+        en: "Full! The crane lifts everything up!",
+        zh: "满啦！吊车把东西全吊起来啦！",
+        hi: "भर गया! क्रेन सब कुछ ऊपर उठाती है!",
+        es: "¡Lleno! ¡La grúa lo levanta todo!",
+        ar: "امتلأ! الرافعة ترفع كل شيء!",
+        ru: "Полный! Кран поднимает всё наверх!",
+      },
+      file: "src/games/marbles/siteTrack.tsx",
+    },
+    {
+      text: "Alle sind auf dem Mond! Sternschnuppen!",
+      translations: {
+        en: "Everyone is on the moon! Shooting stars!",
+        zh: "大家都到月亮上啦！流星来啦！",
+        hi: "सब चाँद पर पहुँच गए! टूटते तारे!",
+        es: "¡Todos están en la luna! ¡Estrellas fugaces!",
+        ar: "الجميع على القمر! شهب!",
+        ru: "Все на луне! Падающие звёзды!",
+      },
+      file: "src/games/marbles/spaceTrack.tsx",
+    },
   ],
   "/belohnungstafel/": [
     { text: "Geschafft! Hurra!", file: "src/games/rewards/BoardScreen.tsx" },
@@ -133,7 +213,9 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
   ],
 };
 
-const inline = (href: string) => INLINE_LINES[href].map((l) => l.text);
+/** The lines written inline in a game's components, in `language` (German where they have no translation). */
+const inline = (href: string, language: TargetLanguageId = "de") =>
+  INLINE_LINES[href].map((l) => (language === "de" ? l.text : (l.translations?.[language] ?? l.text)));
 
 function scenes(): VoiceGroup[] {
   const words = SCENE_PHRASES.de;
@@ -168,7 +250,8 @@ function scenes(): VoiceGroup[] {
   ];
 }
 
-function letters(): VoiceGroup[] {
+function letters(language: TargetLanguageId): VoiceGroup[] {
+  const de = languageFor(language).pack;
   const words = de.letters.flatMap((l) => l.words.map((w) => ({ l, w })));
   return [
     { label: "Buchstabe mit Wort", lines: once(words.map(({ l, w }) => de.letterSentence(l, w))), built: "Buchstabe, „wie“ und ein Wort dazu" },
@@ -179,7 +262,11 @@ function letters(): VoiceGroup[] {
     },
     { label: "Suchen: Frage", lines: once(de.letters.map(de.findPrompt)), built: "„Wo ist das …?“ mit dem Buchstaben" },
     { label: "Mitmachen", lines: once(de.actions.map(de.joinIn)) },
-    { label: "Mitmachen mit Zahlen", lines: ["Stampf mit!"], note: "„Hüpf mit!“ und „Klatsch mit!“ kommen von den Tu-Wörtern; das Stampfen hat keins." },
+    {
+      label: "Mitmachen mit Zahlen",
+      lines: [pick(STOMP_INVITE, language)],
+      note: "„Hüpf mit!“ und „Klatsch mit!“ kommen von den Tu-Wörtern; das Stampfen hat keins.",
+    },
     { label: "Lob", lines: once(de.praise) },
     { label: "Zahlwörter beim Zählen", lines: once(de.numberWords.map((n) => `${n}!`)) },
     {
@@ -190,8 +277,8 @@ function letters(): VoiceGroup[] {
   ];
 }
 
-function shadows(): VoiceGroup[] {
-  const texts = SHADOW_TEXTS.de;
+function shadows(language: TargetLanguageId): VoiceGroup[] {
+  const texts = pick(SHADOW_TEXTS, language);
   return [
     { label: "Wer sucht seinen Schatten", lines: once(SHADOW_ITEMS.map(texts.search)), built: "Satz mit dem Namen jedes Bilds" },
     { label: "Schatten gefunden", lines: once(SHADOW_ITEMS.map(texts.found)), built: "Satz mit dem Namen jedes Bilds" },
@@ -199,29 +286,36 @@ function shadows(): VoiceGroup[] {
   ];
 }
 
-function animals(): VoiceGroup[] {
-  const texts = ANIMAL_TEXTS.de;
+function animals(language: TargetLanguageId): VoiceGroup[] {
+  const texts = pick(ANIMAL_TEXTS, language);
+  const gifts = pick(GIFT_TEXTS, language);
+  const grow = pick(GROW_TEXTS, language);
+  const peek = pick(SHADOW_TEXTS, language);
   const fed = ANIMALS.filter((a) => a.food);
   const housed = ANIMALS.filter((a) => a.home);
   const residents = Object.keys(HOMES).flatMap((id) => ANIMALS.find((a) => a.home === id) ?? []);
   return [
-    { label: "Art der Runde", lines: once(KIND_ORDER.map((kind) => KIND_QUESTIONS[kind].de!)), note: "Einmal, wenn die Art der Runde wechselt (Z-24)." },
+    {
+      label: "Art der Runde",
+      lines: once(KIND_ORDER.map((kind) => pick(KIND_QUESTIONS[kind], language))),
+      note: "Einmal, wenn die Art der Runde wechselt (Z-24).",
+    },
     { label: "Füttern: Hunger", lines: once(fed.map(texts.hungry)), built: "Satz mit dem Tier" },
     { label: "Füttern: Frage", lines: once(fed.map(texts.whatEats)), built: "Satz mit dem Tier", note: "Gleich nach „… hat Hunger!“ (Z-24)." },
     { label: "Füttern: richtig", lines: once(fed.map((a) => texts.yummy(a, a.food!))), built: "Satz mit Tier und Futter" },
     { label: "Füttern: falsch", lines: once(fed.map(texts.yuck)), built: "Satz mit dem Tier" },
-    { label: "Was gibt uns das Tier?: Frage", lines: once(GIVERS.map(GIFT_TEXTS.de.whatGives)), built: "Satz mit dem Tier" },
-    { label: "Was gibt uns das Tier?: richtig", lines: once(GIVERS.map((a) => GIFT_TEXTS.de.gives(a, GIFTS[a.gives!]))), built: "Satz mit Tier und Gabe" },
+    { label: "Was gibt uns das Tier?: Frage", lines: once(GIVERS.map(gifts.whatGives)), built: "Satz mit dem Tier" },
+    { label: "Was gibt uns das Tier?: richtig", lines: once(GIVERS.map((a) => gifts.gives(a, GIFTS[a.gives!]))), built: "Satz mit Tier und Gabe" },
     {
       label: "Was gibt uns das Tier?: falsch, von wem es kommt",
-      lines: once(Object.values(GIFTS).map((g) => GIFT_TEXTS.de.comesFrom(g, giverOf(g)))),
+      lines: once(Object.values(GIFTS).map((g) => gifts.comesFrom(g, giverOf(g)))),
       built: "Satz mit der Gabe und dem Tier, von dem sie kommt",
     },
-    { label: "Was wird aus mir?: Frage", lines: once(GROWTHS.map(GROW_TEXTS.de!.whatBecomes)), built: "Satz mit dem Kleinen" },
-    { label: "Was wird aus mir?: richtig", lines: once(GROWTHS.map(GROW_TEXTS.de!.becomes)), built: "Satz mit dem Kleinen und was daraus wird" },
+    { label: "Was wird aus mir?: Frage", lines: once(GROWTHS.map(grow.whatBecomes)), built: "Satz mit dem Kleinen" },
+    { label: "Was wird aus mir?: richtig", lines: once(GROWTHS.map(grow.becomes)), built: "Satz mit dem Kleinen und was daraus wird" },
     {
       label: "Was wird aus mir?: falsch, woraus es kommt",
-      lines: once(GROWTHS.map(GROW_TEXTS.de!.comesFrom)),
+      lines: once(GROWTHS.map(grow.comesFrom)),
       built: "Satz mit dem Großen und woraus es kommt",
     },
     { label: "Zuhause: Frage", lines: once(housed.map(texts.whereLives)), built: "Satz mit dem Tier" },
@@ -229,27 +323,28 @@ function animals(): VoiceGroup[] {
     { label: "Zuhause: falsch, wer da wohnt", lines: once(residents.map(texts.livesHere)), built: "Satz mit dem Tier, das dort wohnt" },
     {
       label: "Wer schaut da raus?",
-      lines: once([SHADOW_TEXTS.de.peek, ...PEEK_ITEMS.map(SHADOW_TEXTS.de.there), ...PEEK_ITEMS.map(SHADOW_TEXTS.de.thatIs)]),
+      lines: once([peek.peek, ...PEEK_ITEMS.map(peek.there), ...PEEK_ITEMS.map(peek.thatIs)]),
     },
   ];
 }
 
-function timer(): VoiceGroup[] {
+function timer(language: TargetLanguageId): VoiceGroup[] {
+  const said = (line: Localized) => pick(line, language);
   const pictures = Object.values(PICTURE_LINES);
   return [
-    { label: "Am Anfang eines Bildes", lines: once(pictures.map((p) => p.start)) },
-    { label: "Kurz vor dem Ende", lines: [SOON_LINE], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
-    { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => p.end)) },
+    { label: "Am Anfang eines Bildes", lines: once(pictures.map((p) => said(p.start))) },
+    { label: "Kurz vor dem Ende", lines: [said(SOON_LINE)], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
+    { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => said(p.end))) },
     {
       label: "Abwechseln und Tennis",
-      lines: once([WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)]),
+      lines: once(TURN_LINES.map(said)),
       note: "„Wer fängt an?“, während die Lampen auslosen, dann wer anfängt; „Tauschen! …“ bei jedem Wechsel.",
     },
   ];
 }
 
-function together(): VoiceGroup[] {
-  const texts = TOGETHER_TEXTS.de!;
+function together(language: TargetLanguageId): VoiceGroup[] {
+  const texts = pick(TOGETHER_TEXTS, language);
   return [
     // Z-25: the question is the pair's wish, what the one above wants to do, never naming the partner.
     { label: "Was jemand vorhat", lines: once(PAIRS.map(texts.question)), built: "„Die Blume hat Durst.“ – ein Satz je Paar, ohne das Gegenstück zu nennen" },
@@ -258,27 +353,32 @@ function together(): VoiceGroup[] {
   ];
 }
 
-function feelings(): VoiceGroup[] {
+function feelings(language: TargetLanguageId): VoiceGroup[] {
+  const comforts = comfortsIn(language);
+  const feelings = FEELINGS.map((f) => feelingIn(f, language));
+  const situations = SITUATIONS.map((s) => situationIn(s, language));
+  const selfSituations = SELF_SITUATIONS.map((s) => situationIn(s, language));
+  const days = DAYS.map((d) => dayIn(d, language));
   return [
     // „Wie geht's dir?“ and „Was brauche ich?“ are games of their own in the book, but share this game's recordings
     // (stimme/).
-    { label: "Wie geht's dir?", lines: once(MOOD_LINES) },
-    { label: "Was brauche ich?", lines: once(NEEDS_LINES) },
-    { label: "Zu Hause: Fragen", lines: once(FEELINGS.flatMap((f) => f.questions)) },
-    { label: "Zu Hause: liebe Dinge", lines: once(FEELINGS.flatMap((f) => f.comforts.map((c) => COMFORTS[c].narration))) },
-    { label: "Zu Hause: nicht so gute Ideen", lines: once(FEELINGS.flatMap((f) => f.instead.map((i) => i.answer))) },
-    { label: "Zu Hause: Ende", lines: once(FEELINGS.map((f) => `${f.end.narration} ${f.end.line}`)) },
-    { label: "Kindergarten: Geschichte", lines: once(SITUATIONS.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))) },
-    { label: "Kindergarten: Fragen", lines: once(SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
-    { label: "Kindergarten: nicht so gute Ideen", lines: once(SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
+    { label: "Wie geht's dir?", lines: once(MOOD_SAID.map((line) => pick(line, language))) },
+    { label: "Was brauche ich?", lines: once(NEEDS_SAID.map((line) => pick(line, language))) },
+    { label: "Zu Hause: Fragen", lines: once(feelings.flatMap((f) => f.questions)) },
+    { label: "Zu Hause: liebe Dinge", lines: once(feelings.flatMap((f) => f.comforts.map((c) => comforts[c].narration))) },
+    { label: "Zu Hause: nicht so gute Ideen", lines: once(feelings.flatMap((f) => f.instead.map((i) => i.answer))) },
+    { label: "Zu Hause: Ende", lines: once(feelings.map((f) => `${f.end.narration} ${f.end.line}`)) },
+    { label: "Kindergarten: Geschichte", lines: once(situations.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))) },
+    { label: "Kindergarten: Fragen", lines: once(situations.flatMap((s) => s.steps.map((st) => st.question))) },
+    { label: "Kindergarten: nicht so gute Ideen", lines: once(situations.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
     {
       label: "Mehr Gefühle: Geschichte",
-      lines: once(SELF_SITUATIONS.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))),
+      lines: once(selfSituations.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))),
     },
-    { label: "Mehr Gefühle: Fragen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.question))) },
-    { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(SELF_SITUATIONS.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
-    { label: "Lob", lines: once(FEELINGS_PRAISE.de) },
-    { label: "Tagesgeschichten", lines: once(DAYS.flatMap((d) => [...d.scenes.map((s) => s.before.text), d.end])) },
+    { label: "Mehr Gefühle: Fragen", lines: once(selfSituations.flatMap((s) => s.steps.map((st) => st.question))) },
+    { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(selfSituations.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
+    { label: "Lob", lines: once(pick(FEELINGS_PRAISE, language)) },
+    { label: "Tagesgeschichten", lines: once(days.flatMap((d) => [...d.scenes.map((s) => s.before.text), d.end])) },
   ];
 }
 
@@ -332,12 +432,12 @@ function filmLines(film: Film): (string | undefined)[] {
   return lines;
 }
 
-function marbles(): VoiceGroup[] {
+function marbles(language: TargetLanguageId): VoiceGroup[] {
   const machines = [buildMachine, buildKitchen, buildGarden, buildBuilding, buildCircus, buildSpace, buildLight, buildBath, buildFarm, buildNight, buildTidy];
   const events = [...machines.flatMap((build) => build().events), ...buildWater().stretches.flatMap((s) => s.events)];
   return [
-    { label: "Erster Satz jedes Levels", lines: once(Object.values(MARBLE_LEVELS).map((l) => l.intro.de)) },
-    { label: "Sätze der Maschinen", lines: once([...events.map((e) => e.say?.de), ...inline("/kettenreaktion/")]) },
+    { label: "Erster Satz jedes Levels", lines: once(Object.values(MARBLE_LEVELS).map((l) => l.intro[language])) },
+    { label: "Sätze der Maschinen", lines: once([...events.map((e) => e.say?.[language]), ...inline("/kettenreaktion/", language)]) },
   ];
 }
 
@@ -354,9 +454,9 @@ function weaning(): VoiceGroup[] {
   return [{ label: "Seiten der Geschichte", lines: once(WEANING_LINES) }];
 }
 
-function potty(): VoiceGroup[] {
-  const texts = POTTY_TEXTS.de;
-  const name = TAPSI.name.de;
+function potty(language: TargetLanguageId): VoiceGroup[] {
+  const texts = pick(POTTY_TEXTS, language);
+  const name = pick(TAPSI.name, language);
   const which = ["pipi", "kaka", "both", "unsure"] as const;
   return [
     {
@@ -369,8 +469,8 @@ function potty(): VoiceGroup[] {
   ];
 }
 
-function socks(): VoiceGroup[] {
-  const texts = SOCK_TEXTS.de;
+function socks(language: TargetLanguageId): VoiceGroup[] {
+  const texts = pick(SOCK_TEXTS, language);
   return [{ label: "Alle Sätze", lines: once([texts.start, ...texts.pair, texts.done]) }];
 }
 
@@ -423,10 +523,14 @@ export const stillToRecord = (games: VoiceGame[]): VoiceGame[] =>
   });
 
 /**
- * Every game that speaks, with all it says in German, recorded or not (stillToRecord leaves out what is).
- * Bewegungsabenteuer is not here: its stories list Tapsi's lines themselves.
+ * Every game that speaks, with all it says in `language` (German for the list on /management/), recorded or not
+ * (stillToRecord leaves out what is). In another language a game says what it has no translation of in German, so
+ * those lines come out German here too; recordedLines.ts leaves them out. Lebendige Bilder, Zähne putzen, Kleine
+ * Abenteuer, Abstillen, the Belohnungstafel and the lines of all games are listed in German only (the first is
+ * parked, recordedLines.ts reads the others' translations itself). Bewegungsabenteuer is not here: its stories list
+ * Tapsi's lines themselves.
  */
-export function voiceLines(): VoiceGame[] {
+export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
   return [
     {
       href: "/bilder/",
@@ -434,19 +538,19 @@ export function voiceLines(): VoiceGame[] {
       parked:
         "Geparkt (Entscheidung November 2026): Die Bilder antworten mit ihren Geräuschen, die gut passen, und erzählen nichts. Aufgenommen würden höchstens Sätze, die Menschen im Bild selbst sagen („Hallo, hier ist der Kinderarzt!“) – und auch die nur, wenn du es ausdrücklich für Lebendige Bilder sagst.",
     },
-    { href: "/buchstaben/", groups: letters() },
-    { href: "/schatten/", groups: shadows() },
-    { href: "/tiere/", groups: animals() },
-    { href: "/zusammen/", groups: together() },
-    { href: "/gefuehle/", groups: feelings() },
+    { href: "/buchstaben/", groups: letters(language) },
+    { href: "/schatten/", groups: shadows(language) },
+    { href: "/tiere/", groups: animals(language) },
+    { href: "/zusammen/", groups: together(language) },
+    { href: "/gefuehle/", groups: feelings(language) },
     { href: "/kleine-abenteuer/", groups: elevator() },
-    { href: "/kettenreaktion/", groups: marbles() },
+    { href: "/kettenreaktion/", groups: marbles(language) },
     { href: "/zaehne/", groups: teeth() },
-    { href: "/toepfchen/", groups: potty() },
+    { href: "/toepfchen/", groups: potty(language) },
     { href: "/abstillen/", groups: weaning() },
-    { href: "/socken/", groups: socks() },
+    { href: "/socken/", groups: socks(language) },
     { href: "/belohnungstafel/", groups: rewards() },
-    { href: "/timer/", groups: timer() },
+    { href: "/timer/", groups: timer(language) },
     {
       href: "",
       groups: [

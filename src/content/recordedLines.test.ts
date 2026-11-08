@@ -44,3 +44,21 @@ test("every recorded game's folder is played, with its languages below it", () =
 test("every recorded game says something in German", () => {
   for (const game of RECORDED_GAMES) expect(game.lines("de").length, game.name).toBeGreaterThan(0);
 });
+
+// The user asked for every game's voice in every app language (November 2026): a game that says something only in
+// German would stay silent in the others, so each recorded game lists lines in each language.
+test("every recorded game says something in every app language", () => {
+  for (const game of RECORDED_GAMES)
+    for (const language of RECORDED_LANGUAGES) expect(game.lines(language).length, `${game.name} ${language}`).toBeGreaterThan(0);
+});
+
+// A line a language hasn't translated is said in German there, and has no recording in that language: it must never be
+// recorded with that language's voice (only the letters' packs are whole, where an English „A!“ is English).
+test("no game records a German line as another language's", () => {
+  for (const game of RECORDED_GAMES.filter((g) => g.name !== "buchstaben")) {
+    const german = new Set(game.lines("de").map((l) => l.text));
+    for (const language of RECORDED_LANGUAGES.filter((l) => l !== "de"))
+      for (const line of game.lines(language))
+        expect({ game: game.name, language, text: line.text, german: german.has(line.text) }).toMatchObject({ german: false });
+  }
+});

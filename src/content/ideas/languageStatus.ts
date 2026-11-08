@@ -65,9 +65,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "🗣️ Stimme",
-        languages: { de: "text" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
         recorded: true,
-        note: "Was jedes Bild am Anfang und am Ende sagt, „Gleich ist es so weit!“ zur Glocke, und bei Abwechseln und Tennis „Wer fängt an?“, wer anfängt und „Tauschen! …“ (H-72, voice.ts, 7. November 2026): nur Deutsch, noch nicht aufgenommen (bun run voice make --only timer) – bis dahin still, keine Browserstimme.",
+        note: "Was jedes Bild am Anfang und am Ende sagt, „Gleich ist es so weit!“ zur Glocke, und bei Abwechseln und Tennis „Wer fängt an?“, wer anfängt und „Tauschen! …“ (H-72, voice.ts, 7. November 2026): in alle Sprachen übersetzt (timerSaid) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin still, keine Browserstimme.",
       },
     ],
   },
@@ -94,8 +94,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🚽 Bilder und Texte",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm.",
       },
       {
         label: "🎵 Warte-Lied (gesungen)",
@@ -159,8 +159,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/abstillen/",
     recorded: true,
-    note: "Die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ übersetzt am 3. November 2026; noch in keiner Sprache aufgenommen (🎙️ Stimmen, bun run voice make --only abstillen).",
-    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ übersetzt am 3. November 2026, auf Deutsch und den anderen Sprachen außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht).",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
   },
   {
     href: "/bilder/",
@@ -184,8 +184,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "⛓️ Alle Bahnen und Maschinen",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Auch Schneebahn, Weltraumbahn, Wasserrutsche und Baustellen-Bahn (übersetzt am 3. November 2026). Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Auch Schneebahn, Weltraumbahn, Wasserrutsche und Baustellen-Bahn (übersetzt am 3. November 2026). Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm.",
       },
       {
         label: "👆 „Mitmachen“ über den Karten",
@@ -212,14 +212,14 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "✉️ Ein Brief für Oma",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026; in keiner Sprache aufgenommen – bis dahin liest die Stimme des Browsers.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Neu (4. November 2026), übersetzt am 5. November 2026, außer Russisch von ElevenLabs gesprochen (7./8. November 2026); auf Russisch liest bis dahin die Stimme des Browsers.",
       },
       {
         label: "🥨 Beim Bäcker",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026; in keiner Sprache aufgenommen – bis dahin liest die Stimme des Browsers.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Neu (4. November 2026), übersetzt am 5. November 2026, außer Russisch von ElevenLabs gesprochen (7./8. November 2026); auf Russisch liest bis dahin die Stimme des Browsers.",
       },
     ],
   },
@@ -246,20 +246,20 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Wie geht's dir? und Kindergarten",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. „Wie geht's dir?“ und „Was brauche ich?“ stehen seit dem 7. November 2026 (C-73) in allen Sprachen auf der Aufnahmeliste (`bun run voice make --only gefuehle`); neu dazu sagt die Stimme den Namen des getippten Gefühls („Traurig“), noch in keiner Sprache aufgenommen.",
+        languages: { de: "partial", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Auf Deutsch fehlen noch einige Sätze, die seit dem 4. November 2026 dazukamen (die Namen der Gefühle wie „Traurig“, ein paar Schritte der Geschichten), 92 mit denen der anderen Teile – bis dahin still.",
       },
       {
         label: "Zu Hause",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "„Müde am Abend“ (der Bär legt sich selbst schlafen) neu übersetzt am 3. November 2026. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026), die Aufnahmen der anderen Sprachen fehlen noch. „Partyhut wegnehmen“ beim Geburtstag (statt „Geschenk wegnehmen“, 4. November 2026) übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
+        languages: { de: "partial", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "„Müde am Abend“ (der Bär legt sich selbst schlafen) neu übersetzt am 3. November 2026. Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. „Partyhut wegnehmen“ beim Geburtstag (statt „Geschenk wegnehmen“, 4. November 2026) ist auf Deutsch noch nicht aufgenommen.",
       },
       {
         label: "Mehr Gefühle",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch. Am 4. November 2026 geändert und am 5. November 2026 übersetzt, in keiner Sprache aufgenommen: beim lauten Knall der dritte Schritt („Mit dem Fuchs Kuchen essen“) und das Ende, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“) und das Ende, bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“) und das Ende, in „Traurig, Kuschelhase weg“ der „Kuschelhase“ des Bären und der „Kuschelhund“ des Fuchses.",
+        languages: { de: "partial", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Am 4. November 2026 geändert und am 5. November 2026 übersetzt, auf Deutsch noch nicht aufgenommen: beim lauten Knall der dritte Schritt („Mit dem Fuchs Kuchen essen“) und das Ende, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“) und das Ende, bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“) und das Ende, in „Traurig, Kuschelhase weg“ der „Kuschelhase“ des Bären und der „Kuschelhund“ des Fuchses.",
       },
       {
         label: "Buch und Gruppen",
@@ -269,8 +269,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Tagesgeschichten",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), in keiner Sprache aufgenommen: die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026): die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
       },
     ],
   },
@@ -281,7 +281,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Frage „Wie geht's dir heute?“",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Außer Russisch von ElevenLabs gesprochen (Deutsch am 3., die anderen am 7./8. November 2026).",
       },
       {
         label: "Zeile für Erwachsene",
@@ -291,8 +292,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Gefühle und Wie doll ist es?",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Die Namen der acht Gefühle, „Wie doll ist es?“ und die drei Antworten, zugleich die Bildunterschriften (MOODS, STRENGTH_QUESTION, STRENGTH_ANSWERS in mood.ts), übersetzt am 5. November 2026, in keiner Sprache aufgenommen.",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Die Namen der acht Gefühle, „Wie doll ist es?“ und die drei Antworten, zugleich die Bildunterschriften (MOODS, STRENGTH_QUESTION, STRENGTH_ANSWERS in mood.ts), übersetzt am 5. November 2026, außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026).",
       },
       {
         label: "Gruppen „Angenehme / Unangenehme Gefühle“",
@@ -313,16 +314,16 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Frage und was guttut",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ am 7. November 2026; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. In keiner Sprache aufgenommen.",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ am 7. November 2026; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. Außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026).",
       },
     ],
   },
   {
     href: "/tiere/",
     recorded: true,
-    languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm. Auch alles, was am 7. November 2026 dazukam (die neuen Tiere, Zuhause, Futter, Geschenke und Entwicklungen aus GERMAN_ONLY in content.ts), am selben Tag übersetzt; die deutschen Sätze dazu sind noch nicht aufgenommen; „Wer schaut da raus?“ ist zu „Erkennen“ (Schatten finden) umgezogen. Seit 7. November 2026 (Z-24) fragt die Stimme beim Füttern nach „… hat Hunger!“ auch „Was isst der Hase gern?“ – nur Deutsch, in den anderen Sprachen fehlt der Satz (bis dahin still dort) – und sagt beim Wechsel der Art der Runde deren Frage („Was esse ich?“, schon in allen sieben Sprachen); beides ist noch nicht aufgenommen.",
+    languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Auch alles, was am 7. November 2026 dazukam (die neuen Tiere, Zuhause, Futter, Geschenke und Entwicklungen aus GERMAN_ONLY in content.ts), am selben Tag übersetzt; die deutschen Sätze dazu sind noch nicht aufgenommen; „Wer schaut da raus?“ ist zu „Erkennen“ (Schatten finden) umgezogen. Seit 7. November 2026 (Z-24) fragt die Stimme beim Füttern nach „… hat Hunger!“ auch „Was isst der Hase gern?“ (am 7. November 2026 übersetzt) und sagt beim Wechsel der Art der Runde deren Frage („Was esse ich?“). Auf Deutsch fehlen noch 390 Sätze (alles vom 7. November 2026), bis dahin still.",
   },
   {
     href: "/zusammen/",
@@ -330,20 +331,20 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🤝 Die ersten Paare und Helfer, Fragen und Einstellungen",
         recorded: true,
-        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Übersetzt am 5. November 2026: die neun ersten Paare (Zahnbürste bis Friseurin) mit Namen und Sätzen (content.<Sprache>.ts), die Fragen unter dem Bild und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs auf Deutsch (3. November 2026); die Aufnahmen der anderen Sprachen fehlen noch, bis dahin bleiben sie stumm.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Übersetzt am 5. November 2026: die neun ersten Paare (Zahnbürste bis Friseurin) mit Namen und Sätzen (content.<Sprache>.ts) und die Einstellungen beim Spielen. Die Sätze spricht Tapsis Stimme von ElevenLabs auf Deutsch (3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm.",
       },
       {
         label: "🗣️ Was jemand vorhat (Z-25): ein Satz je Paar statt der Frage",
         recorded: true,
-        languages: { de: "text" },
-        note: "Seit 7. November 2026 sagt die Stimme auf Deutsch, was jemand vorhat, ohne das Gegenstück zu nennen („Die Blume hat Durst.“, „Die Feuerwehr will das Feuer löschen.“), und er steht klein unter dem Bild – 190 Sätze, für jedes Paar einer, in pairs.tsx und painted/. Nur auf Deutsch und noch nicht aufgenommen (🎙️ Stimmen), bis dahin bleibt die Frage stumm. Die anderen Sprachen sagen weiter ihre übersetzte Frage („What goes with the toothbrush?“) und zeigen „Was gehört zu mir?“ / „Was brauche ich?“, bis die Sätze übersetzt werden.",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Seit 7. November 2026 sagt die Stimme, was jemand vorhat, ohne das Gegenstück zu nennen („Die Blume hat Durst.“, „Die Feuerwehr will das Feuer löschen.“), und er steht klein unter dem Bild – 190 Sätze, für jedes Paar einer, in pairs.tsx und painted/. Am selben Tag in alle sechs Sprachen übersetzt (die `question` in content.<Sprache>.ts und content.scenes.<Sprache>.ts), in jeder Sprache klein unter dem Bild. Außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026); bis dahin bleibt die Frage dort stumm.",
       },
       {
         label: "🎨 Die gemalten Paare und Helfer (painted/)",
         recorded: true,
-        languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "Am 7. November 2026 wurden die Emoji-Szenen durch gemalte Paare ersetzt (181, je zwei Bilder von Gemini; sie spielen, sobald ihre Bilder da sind). 108 davon behielten Namen und Gegenstück und damit ihre Übersetzung (content.scenes.<Sprache>.ts). Neu und nur auf Deutsch sind die übrigen 73 – darunter Tor – Ball, Haltestelle – Bus, Toaster – Toast, Straßenkehrer, Schäfer, Prinzessin, Sandmann – sowie die mit neuem Gegenstück: Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin, Weihnachtsmann, Pizzabäcker, Konditorin, Paketbotin, Krankenpfleger, Polizist, Koch, Eisverkäuferin, Kassierer, Kellnerin, Gärtner. Bis zur Übersetzung sagen sie alles auf Deutsch. Aufgenommen ist keiner der Sätze (🎙️ Stimmen).",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Am 7. November 2026 wurden die Emoji-Szenen durch gemalte Paare ersetzt (181, je zwei Bilder von Gemini; sie spielen, sobald ihre Bilder da sind). 108 davon behielten Namen und Gegenstück und damit ihre Übersetzung (content.scenes.<Sprache>.ts). Die übrigen 73, am selben Tag in alle sechs Sprachen übersetzt, sind – darunter Tor – Ball, Haltestelle – Bus, Toaster – Toast, Straßenkehrer, Schäfer, Prinzessin, Sandmann – sowie die mit neuem Gegenstück: Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin, Weihnachtsmann, Pizzabäcker, Konditorin, Paketbotin, Krankenpfleger, Polizist, Koch, Eisverkäuferin, Kassierer, Kellnerin, Gärtner. Außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026).",
       },
       {
         label: "🗂️ Die Namen der Themen",
@@ -363,8 +364,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Bilder, Sätze und Stimme",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm. Die 114 neuen Bilder vom 7. November 2026 (20 Tiere, T-Rex, Spinne, Wurm, Grashüpfer, Hummer, 13 Fahrzeuge, 14 Bilder zum Essen, 62 Dinge) am selben Tag übersetzt; ihre deutschen Sätze sind noch nicht aufgenommen.",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Die 114 neuen Bilder vom 7. November 2026 (20 Tiere, T-Rex, Spinne, Wurm, Grashüpfer, Hummer, 13 Fahrzeuge, 14 Bilder zum Essen, 62 Dinge) am selben Tag übersetzt; ihre deutschen Sätze sind noch nicht aufgenommen.",
       },
     ],
   },
@@ -372,36 +373,36 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/socken/",
     recorded: true,
-    languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026); die anderen Sprachen sind übersetzt, ihre Aufnahmen fehlen noch und bleiben bis dahin stumm.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm.",
   },
   {
     href: "/buchstaben/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026) bis auf die 361 Zählsätze („drei Äpfel!“, ≈ 1.100 Credits), für die die Credits nicht mehr reichten: bis dahin sagt das Spiel nur die Zahl. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm. Die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart („Hier lässt sich viel einstellen …“) übersetzt am 5. November 2026. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+    note: "Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026) bis auf die 361 Zählsätze („drei Äpfel!“, ≈ 1.100 Credits), für die die Credits nicht mehr reichten: bis dahin sagt das Spiel nur die Zahl. Die anderen Sprachen außer Russisch sind ganz von ElevenLabs gesprochen, auch die Zählsätze (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart („Hier lässt sich viel einstellen …“) übersetzt am 5. November 2026. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
   },
   {
     href: "/zaehlen/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Ein Spiel für sich seit November 2026 (vorher „Nur Zahlen“ in „Frei tippen“), mit dessen Zahlen und Texten. Deutsch von ElevenLabs gesprochen bis auf die Zählsätze („drei Äpfel!“): bis dahin sagt es nur die Zahl. Name, Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm.",
+    note: "Ein Spiel für sich seit November 2026 (vorher „Nur Zahlen“ in „Frei tippen“), mit dessen Zahlen und Texten. Deutsch von ElevenLabs gesprochen bis auf die Zählsätze („drei Äpfel!“): bis dahin sagt es nur die Zahl. Name, Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026. Die anderen Sprachen außer Russisch sind ganz von ElevenLabs gesprochen, auch die Zählsätze (7./8. November 2026); Russisch fehlt noch.",
   },
   {
     href: "/mitmachen/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Neu (November 2026, L-15), mit den Zahlwörtern und Tu-Wörtern der Sprachpakete: „Hüpf mit!“, „Klatsch mit!“ und die Zahlwörter sind auf Deutsch von ElevenLabs gesprochen, „Stampf mit!“ fehlt noch (bis dahin still). Name, Zeile im Inhaltsverzeichnis und „Stampf mit!“ übersetzt am 5. November 2026. Die anderen Sprachen sind noch nicht aufgenommen und bleiben bis dahin stumm; Hindi hat kein „Klatsch mit!“ (zwei Wörter).",
+    note: "Neu (November 2026, L-15), mit den Zahlwörtern und Tu-Wörtern der Sprachpakete: „Hüpf mit!“, „Klatsch mit!“ und die Zahlwörter sind auf Deutsch von ElevenLabs gesprochen, „Stampf mit!“ fehlt noch (bis dahin still). Name, Zeile im Inhaltsverzeichnis und „Stampf mit!“ übersetzt am 5. November 2026. Die anderen Sprachen außer Russisch sind ganz von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch. Hindi hat kein „Klatsch mit!“ (zwei Wörter).",
   },
   {
     href: "/woerter/",
     recorded: true,
     languages: { de: "partial", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Ein Spiel für sich seit November 2026 (vorher eine Spielart von „Buchstaben & Zahlen“), mit „Wo ist das B?“; Wörter aus den Sprachpaketen wie bei „Frei tippen“. Deutsch von ElevenLabs gesprochen, die anderen Sprachen noch nicht aufgenommen. Die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026.",
+    note: "Ein Spiel für sich seit November 2026 (vorher eine Spielart von „Buchstaben & Zahlen“), mit „Wo ist das B?“; Wörter aus den Sprachpaketen wie bei „Frei tippen“. Deutsch von ElevenLabs gesprochen, die anderen Sprachen außer Russisch am 7./8. November 2026; Russisch fehlt noch. Die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026.",
   },
   {
     href: "/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es in allen sieben Sprachen (/en/, /zh/, /hi/, /es/, /ar/, /ru/, A-22; die fünf weiteren seit 7. November 2026). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). „Nochmal oder weiter?“ und „Nochmal?“ am Ende eines Levels (alle Spiele, A-24) in allen sieben Sprachen geschrieben (7. November 2026), noch nicht aufgenommen: bis dahin still. Der Name „Fun for Both“ bleibt in allen Sprachen gleich. „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx) übersetzt am 5. November 2026; auf Hindi „किसकी बारी?“, da „wer spielt“ dort nach Junge oder Mädchen ginge.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es in allen sieben Sprachen (/en/, /zh/, /hi/, /es/, /ar/, /ru/, A-22; die fünf weiteren seit 7. November 2026). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). „Nochmal oder weiter?“ und „Nochmal?“ am Ende eines Levels (alle Spiele, A-24) in allen sieben Sprachen geschrieben (7. November 2026) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026). Der Name „Fun for Both“ bleibt in allen Sprachen gleich. „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx) übersetzt am 5. November 2026; auf Hindi „किसकी बारी?“, da „wer spielt“ dort nach Junge oder Mädchen ginge.",
   },
 ];

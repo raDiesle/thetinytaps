@@ -178,8 +178,7 @@ export function arabicTexts(german: AnimalTexts): AnimalTexts {
     food: (f) => food(f)?.name ?? german.food(f),
     home: (h) => home(h)?.name ?? german.home(h),
     hungry: (a) => (animal(a) ? `${the(a)} ${by(a, "جائع", "جائعة")}!` : german.hungry(a)),
-    // German only so far (Z-24, November 2026): silent in this language until it is translated and recorded.
-    whatEats: german.whatEats,
+    whatEats: (a) => (animal(a) ? `ماذا ${by(a, "يحب", "تحب")} ${the(a)} أن ${by(a, "يأكل", "تأكل")}؟` : german.whatEats(a)),
     yummy: (a, f) => (animal(a) && food(f) ? `ممم، لذيذ! ${the(a)} ${by(a, "يحب", "تحب")} ${food(f).likes}. شكرا!` : german.yummy(a, f)),
     yuck: (a) => (animal(a) ? `يع! ${the(a)} لا ${by(a, "يحب", "تحب")} هذا.` : german.yuck(a)),
     whereLives: (a) => (animal(a) ? `أين ${by(a, "يعيش", "تعيش")} ${the(a)}؟` : german.whereLives(a)),

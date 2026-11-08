@@ -36,8 +36,7 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
   without their stop and the Wasserbahn's gates open by themselves after the first. A level that gets something else that waits for a tap follows it too.
 - `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, en, zh, hi, es, ar, ru }`, written next to its moment;
   `MarblePlay` plays its ElevenLabs recording (`voice.ts`, files in `stimme/`) in the app language, or the German line's where a translation is missing. Never pass a bare German string.
-  Recorded in German only so far (November 2026): the other languages stay silent until the user asks for their
-  recordings. A new or changed line is listed on `/management/` (`voiceLines.ts`: machine events and level intros are
+  Recorded in every app language (November 2026). A new or changed line is listed on `/management/` (`voiceLines.ts`: machine events and level intros are
   read from the data, a line written inline in a level goes into `INLINE_LINES`, or it is never recorded) and recorded
   with `bun run voice make --only kettenreaktion`, only when the user asks.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,

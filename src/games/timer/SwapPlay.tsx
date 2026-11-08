@@ -3,7 +3,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
-import { useAppLanguage, useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { loadRecordings, playChime, playClick, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
@@ -14,7 +14,7 @@ import { TimeShownChoice, TimeShownNote } from "./shown";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { Ball, COURT, FLIGHT_MS, Racket, TennisBackdrop, TennisBoard, TennisPlayers, tennisStyle } from "./tennis";
 import { TimeLeft } from "./TimerPlay";
-import { BEGINS, timerVoice, TURN_TO, WHO_BEGINS } from "./voice";
+import { BEGINS, TURN_LINES, TURN_TO, timerLoad, timerSay, WHO_BEGINS } from "./voice";
 
 /** Children cheering at the clock time set (a recording, else a flourish). */
 const playCheer = recorded("cheer", playTusch);
@@ -118,8 +118,8 @@ export function SwapRun({
   // The voice (H-72): „Wer fängt an?“ as the lamps draw, who begins as they have, and „Tauschen! …“ at every change.
   // Silent until recorded; a grown-up leaving with ✕ stops it.
   const language = useAppLanguage().id;
-  const say = useCallback((text: string, queue = false) => timerVoice.say(text, language, { queue }), [language]);
-  useEffect(() => timerVoice.load([WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)], language), [language]);
+  const say = useCallback((line: Localized, queue = false) => timerSay(line, language, queue), [language]);
+  useEffect(() => timerLoad(TURN_LINES, language), [language]);
   useEffect(() => hush, []);
 
   /** A child's turn begins now (or after the toy's hop): the toy hops over to its cushion with a whoosh and a chime. */

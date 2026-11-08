@@ -69,7 +69,7 @@ export function useTimers() {
 }
 
 // What the game says, from its ElevenLabs recordings (`bun run voice make --only gefuehle`, src/content/recordedLines.ts):
-// one file per line in stimme/ (German; the other languages only once the user asks for them). A line not recorded yet
+// one file per line in stimme/ (German; every other app language in stimme/<language>/, November 2026). A line not recorded yet
 // stays silent.
 const voice = recordedVoice(voiceFiles);
 

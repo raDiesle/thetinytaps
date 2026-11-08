@@ -117,7 +117,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const sentenceFor = useCallback(
     (s: Shown) => {
       if (s.kind === "number") {
-        // A counting sentence not recorded yet („drei Äpfel!“) says the number alone.
+        // A counting sentence without its recording (a new thing to count) says the number alone.
         const sentence = s.n === 0 ? `${pack.numberWords[0]}!` : pack.countSentence(s.n, s.thing);
         return lettersVoice.has(sentence, language) ? sentence : `${pack.numberWords[s.n]}!`;
       }

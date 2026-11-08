@@ -12,10 +12,9 @@ One flowing game, like Was gehört zum Tier?: its card plays at once (`startMode
 
 Each round begins with its **wish** (Z-25, `wish` on every pair): the voice says what the one above wants to do or what
 is the matter, never the thing it needs – „Die Feuerwehr will das Feuer löschen.“, „Die Blume hat Durst.“, „Die Tür ist
-zu. Wir wollen rein.“ – so the child thinks what it is for. In German it is the question (`TogetherTexts.question`), said
-when the round comes, after a wrong pick and on a tap on the picture, and it stands as the quiet line under the picture
-for grown-ups (`RoundTopic.tsx`); the other languages still say their translated „What goes with …?“ and show the kind's
-„What goes with me?“ / „What do I need?“ until the wishes are translated. Each choice has its name small below it. The right one flies up into the picture and the two set to
+zu. Wir wollen rein.“ – so the child thinks what it is for. In every language it is the question
+(`TogetherTexts.question`), said when the round comes, after a wrong pick and on a tap on the picture, and it stands as
+the quiet line under the picture for grown-ups (`RoundTopic.tsx`). Each choice has its name small below it. The right one flies up into the picture and the two set to
 work (`.working`, `WORK_MS`). A wrong pick stays still on its plate, and the one it belongs to peeks up over its plate
 for a moment (`.tg-owner`) – never shown as wrong.
 
@@ -27,8 +26,8 @@ Rettung, Laden, Café & Küche, Bauernhof & Wald, Musik & Bühne, Sport, Märche
 one day choose topics behind ⚙️. Helpers are split by place on purpose: since the wrong choices come from other topics
 first, helpers of one place (the builder's bricks, the crane driver's crane) are rarely dealt together. There are three sorts:
 - **Handmade** (`HANDMADE` in `pairs.tsx`, nine: Zahnbürste, Tür, Topf, Blume, Papier, Feuerwehr, Ärztin, Bäcker,
-  Friseurin): drawn layer by layer with motions of their own in `together.css` (`.pair-<id>`), the only ones translated
-  so far (`content.<lang>.ts`). Drawn in their old 200 × 200 units and moved into the middle of the wide box
+  Friseurin): drawn layer by layer with motions of their own in `together.css` (`.pair-<id>`), translated in
+  `content.<lang>.ts`. Drawn in their old 200 × 200 units and moved into the middle of the wide box
   (`handmade`), on a backdrop.
 - **Painted** (`painted/<topic>.ts`, `PaintedPair`, user decision, November 2026 – the way new pairs are made): two
   pictures of ONE scene painted with Gemini, the first showing what waits for its partner, the second the very same
@@ -176,17 +175,22 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; November 2026). Grown-ups'
 texts (name, blurb, ⚙️, the topic line) are inline `t({ de, … })`; the sentences are `TOGETHER_TEXTS` (`pick(…, language.id)`),
 German built from the pairs' articles (`GERMAN_SAYS`: „gehört“, „gehören“ for a `plural` partner, „braucht“), every
-other language written out per pair in `content.<lang>.ts` (a `TogetherTranslation`: name, partner, question, right,
-belongs – its question is still the old „What goes with …?“, since the German one became the wish) and listed in `src/content/texts/texts-<lang>.ts`, never imported from game code. A pair without its sentences
+other language written out per pair in `content.<lang>.ts` (a `TogetherTranslation`: name, partner, question – the
+pair's wish in that language –, right, belongs) and listed in `src/content/texts/texts-<lang>.ts`, never imported from game code. A pair without its sentences
 in a language is said wholly in German, and its name under the choice shows in German. Things "go with" each other,
 helpers "need" their tools; where a verb would follow someone's gender, the sentence is built so it follows the tool or
 no one (Hindi „… के लिए … चाहिए“, Russian „нужен / нужна / нужны“), and the helpers keep the German ones' gender
-(Spanish la doctora, Arabic تحتاج). Every pair is translated in all six languages (the nine handmade ones in `content.<lang>.ts`, the scenes in
-`content.scenes.<lang>.ts`; both are merged in `src/content/texts/texts-<lang>.ts`, and `content.test.ts` checks that every
-pair has its sentences in each language, which differ from the German, the names of things excepted in languages with
-Latin letters: Pizza, Computer). The topics' names are translated inline in `topics.ts`. A new scene or topic comes in German
-only until the user asks for its translations; then the pairs are added to each `content.scenes.<lang>.ts` and the test
-is relaxed for them like `GERMAN_ONLY` in the other games (the test wants all pairs again once they are translated). Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in German only for
-the handmade pairs so far: a sentence without its recording stays silent. New sentences are listed by
+(Spanish la doctora, Arabic تحتاج). Every pair is translated in all six languages, wish included (November 2026; the nine handmade ones in
+`content.<lang>.ts`, all others, painted ones not made yet too, in `content.scenes.<lang>.ts`; both are merged in
+`src/content/texts/texts-<lang>.ts`, and `content.test.ts` checks that every pair has its sentences in each language,
+which differ from the German, the names of things excepted in languages with Latin letters: Pizza, Computer; that the
+game says exactly them; and that no wish holds its partner's name in that language). A translated wish keeps the rules
+of the German one: it never names its partner, nor in the helper's name where that holds it in that language (English
+„guitarist“, Chinese 水管工 – say „the fox“, „the bear“ then), nor another pair's partner where the German doesn't.
+The topics' names are translated inline in `topics.ts`. A new pair or topic comes in German only until the user asks
+for its translations: it goes on `GERMAN_ONLY` in `content.test.ts` (and `languageStatus.ts` says so) until its
+sentences are added to each `content.scenes.<lang>.ts`. Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in every app
+language but German and Russian for the painted pairs and the wishes (November 2026, the month's credits ran out): a
+sentence without its recording stays silent. New sentences are listed by
 `src/content/recordedLines.ts` (`zusammen`) and recorded with `bun run voice make --only zusammen`, only when the user
 asks. `languageStatus.ts` says what is missing.

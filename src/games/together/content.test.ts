@@ -204,34 +204,63 @@ test("every scene is of its topic's kind: a helper has its fox or bear, a thing 
   }
 });
 
-/** The languages translated whole (the handmade pairs in `content.<lang>.ts`, the scenes in `content.scenes.<lang>.ts`, November 2026): every pair has its sentences. */
+/**
+ * Every language speaks every pair, also the painted ones whose pictures aren't made yet (the handmade pairs in
+ * `content.<lang>.ts`, all others in `content.scenes.<lang>.ts`): its names, its wish and its answers, never German.
+ */
 const COMPLETE: (TargetLanguageId & TextsLanguageId)[] = ["en", "zh", "hi", "es", "ar", "ru"];
 
 /**
- * The painted pairs (`painted/`, November 2026) came after the translations: a new one is German only until the user
- * asks for its translations, and one turned from an emoji scene keeps them where its names stayed the same.
+ * Pairs said in German only for now: a new pair comes in German until the user asks for its translations (root
+ * CLAUDE.md), and waits here until then, named in `languageStatus.ts`. Empty since every pair was translated (November 2026).
  */
-const GERMAN_ONLY = new Set(PAINTED.map((p) => p.id));
+const GERMAN_ONLY = new Set<string>([]);
 
 /** The languages in a script of their own: no Latin letter may be left in their sentences. */
 const OWN_SCRIPT: TargetLanguageId[] = ["zh", "hi", "ar", "ru"];
 
-test("the translated languages say every pair in their own words", () => {
+/** Whether a sentence holds a name as a word of its own (Chinese, written without spaces, anywhere in it). */
+const holds = (sentence: string, name: string, language: TargetLanguageId) => {
+  const text = sentence.toLowerCase();
+  const word = name.toLowerCase();
+  if (language === "zh") return text.includes(word);
+  const at = text.indexOf(word);
+  if (at < 0) return false;
+  const letter = /[\p{L}\p{M}]/u;
+  return [...text.matchAll(new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))].some(
+    (m) => !letter.test(text[m.index - 1] ?? "") && !letter.test(text[m.index + word.length] ?? ""),
+  );
+};
+
+test("every language says every pair in its own words, the wish too", () => {
   const ids = new Set(ALL.map((p) => p.id));
+  const german = new Map(ALL.map((p) => [p.id, p]));
   for (const [language, sentences] of Object.entries(TOGETHER_TRANSLATIONS)) {
     for (const id of Object.keys(sentences ?? {})) expect(ids.has(id), `${language} ${id}`).toBe(true);
   }
   for (const language of COMPLETE) {
+    const sentences = TOGETHER_TRANSLATIONS[language] ?? {};
+    for (const { id } of ALL) {
+      if (GERMAN_ONLY.has(id)) continue;
+      const said = sentences[id];
+      expect(said ? id : `${language} ${id} is not translated`).toBe(id);
+      if (!said) continue;
+      for (const key of ["name", "partner", "question", "right", "belongs"] as const) {
+        expect(said[key].trim().length > 0 ? id : `${language} ${id}: no ${key}`).toBe(id);
+        if (OWN_SCRIPT.includes(language)) expect(said[key], `${language} ${id} ${key}`).not.toMatch(/[A-Za-zäöüß]/);
+      }
+      // A name may be the German word in a language with Latin letters (Pizza, Computer, Piñata); a sentence never is.
+      expect(said.question, `${language} ${id}`).not.toBe(german.get(id)?.wish);
+      // Z-25 in every language: the wish leaves the partner to the child.
+      expect(holds(said.question, said.partner, language) ? `${language} ${id}: „${said.question}“ names ${said.partner}` : "").toBe("");
+    }
+    // What the game says is exactly the translation, never German filling a gap.
     const texts = TOGETHER_TEXTS[language]!;
     const de = TOGETHER_TEXTS.de!;
-    for (const pair of PAIRS) {
-      if (GERMAN_ONLY.has(pair.id) && !TOGETHER_TRANSLATIONS[language]?.[pair.id]) continue;
-      expect(TOGETHER_TRANSLATIONS[language]?.[pair.id], `${language} ${pair.id}`).toBeDefined();
-      const said = (["name", "partner", "question", "right", "belongs"] as const).map((key) => [key, texts[key](pair), de[key](pair)]);
-      for (const [key, sentence, german] of said) {
-        // A name may be the German word in a language with Latin letters (Pizza, Computer, Piñata); a sentence never is.
-        if (!(OWN_SCRIPT.includes(language) === false && (key === "name" || key === "partner"))) expect(sentence, `${language} ${pair.id}`).not.toBe(german);
-        if (OWN_SCRIPT.includes(language)) expect(sentence, `${language} ${pair.id}`).not.toMatch(/[A-Za-zäöüß]/);
+    for (const pair of PAIRS.filter((p) => !GERMAN_ONLY.has(p.id))) {
+      for (const key of ["name", "partner", "question", "right", "belongs"] as const) {
+        expect(texts[key](pair), `${language} ${pair.id} ${key}`).toBe(sentences[pair.id]![key]);
+        if (key !== "name" && key !== "partner") expect(texts[key](pair), `${language} ${pair.id} ${key}`).not.toBe(de[key](pair));
       }
     }
   }
