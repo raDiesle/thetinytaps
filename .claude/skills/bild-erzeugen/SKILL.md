@@ -178,6 +178,12 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   lines between them is cut at those lines (November 2026). Look at the cut-outs on grey (#6a6a6a), not only the raw
   sheet. A border warning of 75–90 % on such a sheet is the backdrop's darker vignette, not a fault, as long as the
   piece looks clean.
+- **A cut-out's figure never touches the picture's edge** where it isn't meant to end: Gemini sometimes draws it cut
+  off by its frame, and the trim then leaves a straight line (Opa Bär's cap ended flat at the top, and every menu
+  showed his head sliced, user feedback, November 2026). Before keeping a cut-out, check that its top and side rows
+  are transparent (only a figure sitting on the page's foot may touch the bottom); if not, draw it again with „whole
+  figure, room on every side“, or for a small missing tip redraw it with its own line and colours on a taller canvas.
+  `BookFamily.test.ts` checks the menu's readers.
 - **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
   character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are
   drawn from the picture where it already does so, not from the place's first picture: from the empty room the
