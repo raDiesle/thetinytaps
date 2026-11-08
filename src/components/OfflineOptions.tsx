@@ -10,10 +10,11 @@ import { keepsOffline, offlineChoiceOf, setOfflineSettings, usePwa } from "@/lib
 // er auch die Sprachen runterladen will und ggf. pro Spiel (Buch) auswählen, Default: alles“). An installed app keeps
 // them by default, a browser tab only when asked. The service worker downloads from the build's list
 // (src/lib/offlineParts.ts) only the chosen books with the chosen languages' voices and songs; the sizes come from that
-// list, which is fetched only once the choice is opened (it is a couple of MB). German only so far (languageStatus.ts).
+// list, which is fetched only once the choice is opened (it is a couple of MB).
 
-/** „84 MB“: a size for grown-ups, rounded. */
-const megabytes = (bytes: number) => `${bytes < 10e6 ? (bytes / 1e6).toFixed(1).replace(".", ",") : Math.round(bytes / 1e6)} MB`;
+/** „84 MB“: a size for grown-ups, rounded, its number written as `locale` writes it and with its own `unit`. */
+const megabytes = (bytes: number, locale: string, unit: string) =>
+  `${(bytes / 1e6).toLocaleString(locale, { maximumFractionDigits: bytes < 10e6 ? 1 : 0, minimumFractionDigits: bytes < 10e6 ? 1 : 0 })} ${unit}`;
 
 /** The list of the offline copy, fetched once `wanted`; null until it is there (or without a service worker). */
 function useManifest(url: string | null, wanted: boolean) {
@@ -41,7 +42,9 @@ export function OfflineOptions() {
   const on = keepsOffline(offline);
   const manifest = useManifest(offlineManifest, open);
   const choice = offlineChoiceOf(offline, language.id);
-  const size = (languages: string[], skip: string[]) => (manifest ? megabytes(sizeOf(manifest, { ...choice, languages, skip })) : null);
+  const unit = t({ de: "MB", en: "MB", zh: "MB", hi: "एमबी", es: "MB", ar: "ميغابايت", ru: "МБ" });
+  const mb = (bytes: number) => megabytes(bytes, language.speechLang, unit);
+  const size = (languages: string[], skip: string[]) => (manifest ? mb(sizeOf(manifest, { ...choice, languages, skip })) : null);
 
   const toggleLanguage = (id: string) => {
     const languages = choice.languages.includes(id) ? choice.languages.filter((l) => l !== id) : [...choice.languages, id];
@@ -53,30 +56,84 @@ export function OfflineOptions() {
 
   return (
     <section className="settings offline-options">
-      <SettingsGroup title={t({ de: "Ohne Internet spielen" })}>
+      <SettingsGroup
+        title={t({
+          de: "Ohne Internet spielen",
+          en: "Play without internet",
+          zh: "不联网也能玩",
+          hi: "बिना इंटरनेट के खेलें",
+          es: "Jugar sin internet",
+          ar: "اللعب بدون إنترنت",
+          ru: "Играть без интернета",
+        })}
+      >
         <fieldset className="choice">
-          <legend>{t({ de: "Spiele auf diesem Gerät speichern" })}</legend>
+          <legend>
+            {t({
+              de: "Spiele auf diesem Gerät speichern",
+              en: "Save the games on this device",
+              zh: "把游戏保存在这台设备上",
+              hi: "खेलों को इस डिवाइस पर सेव करें",
+              es: "Guardar los juegos en este dispositivo",
+              ar: "حفظ الألعاب على هذا الجهاز",
+              ru: "Сохранить игры на этом устройстве",
+            })}
+          </legend>
           <button type="button" className={on ? "selected" : undefined} aria-pressed={on} onClick={() => setOfflineSettings({ on: true })}>
-            {t({ de: "Ja" })}
+            {t({ de: "Ja", en: "Yes", zh: "是", hi: "हाँ", es: "Sí", ar: "نعم", ru: "Да" })}
           </button>
           <button type="button" className={on ? undefined : "selected"} aria-pressed={!on} onClick={() => setOfflineSettings({ on: false })}>
-            {t({ de: "Nein, nur was gespielt wurde" })}
+            {t({
+              de: "Nein, nur was gespielt wurde",
+              en: "No, only what was played",
+              zh: "不，只保存玩过的",
+              hi: "नहीं, सिर्फ़ जो खेला गया",
+              es: "No, solo lo que se ha jugado",
+              ar: "لا، فقط ما تم لعبه",
+              ru: "Нет, только то, во что уже играли",
+            })}
           </button>
         </fieldset>
         {/* Once all is there, InstallHint says so („Funktioniert auch ohne Internet.“). */}
         {on && offlineProgress && offlineProgress.total > 0 && offlineProgress.done < offlineProgress.total && (
           <p className="offline-state" aria-live="polite">
-            {t({ de: `Wird gespeichert: ${megabytes(offlineProgress.done)} von ${megabytes(offlineProgress.total)}` })}
+            {t({
+              de: `Wird gespeichert: ${mb(offlineProgress.done)} von ${mb(offlineProgress.total)}`,
+              en: `Saving: ${mb(offlineProgress.done)} of ${mb(offlineProgress.total)}`,
+              zh: `正在保存：${mb(offlineProgress.done)} / ${mb(offlineProgress.total)}`,
+              hi: `सेव हो रहा है: ${mb(offlineProgress.total)} में से ${mb(offlineProgress.done)}`,
+              es: `Guardando: ${mb(offlineProgress.done)} de ${mb(offlineProgress.total)}`,
+              ar: `جارٍ الحفظ: ${mb(offlineProgress.done)} من ${mb(offlineProgress.total)}`,
+              ru: `Сохраняется: ${mb(offlineProgress.done)} из ${mb(offlineProgress.total)}`,
+            })}
           </p>
         )}
         {on && (
           <details className="offline-pick" onToggle={(event) => setOpen(event.currentTarget.open)}>
             <summary>
-              {t({ de: "Welche Sprachen und Bücher?" })}
+              {t({
+                de: "Welche Sprachen und Bücher?",
+                en: "Which languages and books?",
+                zh: "哪些语言和书？",
+                hi: "कौन-सी भाषाएँ और किताबें?",
+                es: "¿Qué idiomas y libros?",
+                ar: "أي لغات وكتب؟",
+                ru: "Какие языки и книги?",
+              })}
               {size(choice.languages, choice.skip) && <span className="offline-size"> ({size(choice.languages, choice.skip)})</span>}
             </summary>
             <fieldset className="choice">
-              <legend>{t({ de: "Sprachen der Stimmen und Lieder" })}</legend>
+              <legend>
+                {t({
+                  de: "Sprachen der Stimmen und Lieder",
+                  en: "Languages of the voices and songs",
+                  zh: "语音和歌曲的语言",
+                  hi: "आवाज़ों और गीतों की भाषाएँ",
+                  es: "Idiomas de las voces y canciones",
+                  ar: "لغات الأصوات والأغاني",
+                  ru: "Языки голосов и песен",
+                })}
+              </legend>
               {APP_LANGUAGES.map((id) => {
                 const chosen = choice.languages.includes(id);
                 return (
@@ -87,7 +144,7 @@ export function OfflineOptions() {
               })}
             </fieldset>
             <fieldset className="choice">
-              <legend>{t({ de: "Bücher" })}</legend>
+              <legend>{t({ de: "Bücher", en: "Books", zh: "书", hi: "किताबें", es: "Libros", ar: "الكتب", ru: "Книги" })}</legend>
               {SHELF.map((entry) => {
                 const chosen = !offline.skip.includes(entry.id);
                 const thing = entry.game ?? entry.category;
