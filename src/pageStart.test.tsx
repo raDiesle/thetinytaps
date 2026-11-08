@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
-import { BOOT_WAIT, chunkClosure, pageModuleFor, pageModules } from "../tools/pageStart";
+import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules } from "../tools/pageStart";
 import { PageLoading } from "./components/PageLoading";
 import { SEO_PAGES } from "./content/seo";
 
@@ -41,4 +41,9 @@ test("a chunk's closure follows its static imports, never a page loaded later", 
   };
   const files = await chunkClosure("static/Page.a1.js", async (file) => code[file] ?? "", "/static/");
   expect(files.sort()).toEqual(["static/Page.a1.js", "static/deep.e5.js", "static/shared.b2.js", "static/side.c3.js"]);
+});
+
+test("Umami counts on the site's host with and without www, wherever Pages serves it", () => {
+  expect(countedHosts("https://www.funforboth.com/")).toBe("www.funforboth.com,funforboth.com");
+  expect(countedHosts("https://funforboth.com/")).toBe("funforboth.com,www.funforboth.com");
 });
