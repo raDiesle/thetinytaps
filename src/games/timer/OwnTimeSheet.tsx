@@ -178,7 +178,7 @@ export function OwnTimeSheet({ start, onDone, onClose }: { start: OwnTime | null
                     setTyped("");
                   }}
                 >
-                  {t(lengthWords(minutes * 60))}
+                  <span className="choice-label">{t(lengthWords(minutes * 60))}</span>
                 </button>
               ))}
             </div>

@@ -532,7 +532,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   game, user decision, October 2026): never bring a description back to a start screen. `settings` („⚙️ Einstellungen“)
   is optional and its button shows only when a game passes it; Kettenreaktion has none. Never add it to a game that has
   none, and when touching a game that still has it, prefer removing it (keep the default behaviour, delete the code for
-  the other). Where it is still kept, it holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
+  the other). Where it is still kept, it holds only options and the notes that explain them, compact enough to be seen
+  whole without scrolling: one short row per option, and a long list of single things (books, games) shows only once a
+  grown-up picks „Auswählen“ instead of „Alle“ (user feedback on „Ohne Internet spielen“, November 2026). A game adds no own switch for what the home page already sets for all games
   (Musik, Sprache), nor a switch for sounds or voice, nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
@@ -691,7 +693,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`PlayOptions.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
   grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
-  `look.test.ts`); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
+  `look.test.ts`); a choice's stroke lies on its words' own span (`.choice-label`, `Choice` puts it there, a choice row
+  of its own must too) and covers all of them, on every line they wrap onto – a stroke across the button's middle left
+  words unmarked (user feedback, November 2026); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
   over its top edge; and the emoji of cards and the table of contents look printed into the paper (softer colours, the
   paper's grain over them, `book.css`). While playing, the ✕ is the page's corner, lying flush in the screen's very corner with no gap to either edge, also
   on a phone with a camera cut-out or rounded corners: it never steps in by the safe area (that left a strip of the

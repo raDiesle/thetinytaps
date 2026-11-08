@@ -59,8 +59,31 @@ const rule = (selector: string) => css.match(new RegExp(`${selector.replace(/[.*
 test("what is on in the options is marked with a highlighter, not yellow paper", () => {
   expect(rule(".play-options-button.holding)::after")).toContain("animation: book-highlight");
   expect(css).toMatch(/\.menu-head \.panel-icon\[aria-expanded="true"\][^{]*::after\s*\{[^}]*animation: book-highlight/);
-  expect(rule(".settings .choice button.selected::after")).toContain("animation: book-highlight");
   expect(rule(".settings .choice button.selected")).toContain("background-color: var(--paper)");
+});
+
+// The stroke covers all of a choice's words, on every line they wrap onto (user feedback, November 2026: a stroke
+// across the button's middle left words unmarked): it lies on the words' own span, cloned onto each line, and every
+// choice in the grown-ups' options puts its words into that span.
+test("the highlighter covers all the words of a chosen choice", () => {
+  const words = rule(".settings .choice button.selected .choice-label");
+  expect(words).toContain("animation: book-highlight-words");
+  expect(words).toContain("box-decoration-break: clone");
+  expect(css).not.toMatch(/\.choice button\.selected::after/);
+  const sources = readdirSync("src", { recursive: true, encoding: "utf8" })
+    .filter((file) => /\.tsx$/.test(file) && !file.includes(".test."))
+    .map((file) => [file, readFileSync(join("src", file), "utf8")] as const)
+    .filter(([, code]) => /className="choice\b/.test(code));
+  expect(sources.length).toBeGreaterThan(2);
+  for (const [file, code] of sources) {
+    // The buttons inside each choice row: from its opening tag to its closing one (rows hold no nested rows).
+    const rows = code
+      .split(/className="choice\b/)
+      .slice(1)
+      .map((rest) => rest.split(/<\/(?:fieldset|div)>/)[0]);
+    const buttons = rows.flatMap((row) => row.match(/<button[\s\S]*?<\/button>/g) ?? []);
+    expect({ file, unmarked: buttons.filter((button) => !button.includes("choice-label")) }).toEqual({ file, unmarked: [] });
+  }
 });
 
 // The small grey gear on ⚙️'s note wasn't seen while playing, nor known for the options without words (user feedback,

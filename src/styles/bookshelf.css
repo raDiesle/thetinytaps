@@ -572,6 +572,38 @@
   margin: 12px 0 0;
 }
 
+/*
+ * „Ohne Internet spielen“ below it (OfflineOptions): one short row each, their names in one column, so all of it is
+ * seen at once without scrolling (user feedback, November 2026).
+ */
+.home-menu-panel .offline-options {
+  margin-top: 12px;
+  padding: 14px 18px;
+  gap: 0;
+  font-size: 1rem;
+}
+
+.home-menu-panel .offline-options .settings-group,
+.home-menu-panel .offline-options .choice {
+  gap: 8px;
+}
+
+.home-menu-panel .offline-options .choice legend {
+  min-width: 5.5em;
+}
+
+.home-menu-panel .offline-options .choice button {
+  min-height: 40px;
+  padding: 4px 12px;
+}
+
+.home-menu-panel .offline-size,
+.home-menu-panel .offline-state {
+  margin: 0;
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+
 /* Its chains go up out of the picture; each ends in the frame's top edge. */
 .shelf-sign::before,
 .shelf-sign::after {

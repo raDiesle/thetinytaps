@@ -32,7 +32,7 @@ export function Choice<T extends string>({
           aria-pressed={o.value === value}
           onClick={() => onChange(o.value)}
         >
-          {o.label}
+          <span className="choice-label">{o.label}</span>
         </button>
       ))}
     </fieldset>

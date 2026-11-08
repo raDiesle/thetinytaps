@@ -1551,27 +1551,31 @@
 /*
  * In the grown-ups' options (a game's ⚙️, the shelf's things), the chosen choice is marked the same way: a highlighter
  * stroke drawn across its words as it is chosen or the options open – not yellow paper like the level row's slips.
+ * The stroke lies on the words themselves (`.choice-label`), over all of them and on every line they wrap onto, emoji
+ * included – a stroke across the button's middle left a wrapped line's words unmarked (user feedback, November 2026;
+ * `look.test.ts`). Each line's stroke grows from left to right as it comes on.
  */
 :root .settings .choice button.selected {
-  position: relative;
-  isolation: isolate;
   background-color: var(--paper);
 }
 
-:root .settings .choice button.selected::after {
-  content: "";
-  position: absolute;
-  top: calc(50% - 0.5em);
-  left: 7px;
-  right: 7px;
-  height: 1.05em;
+:root .settings .choice button.selected .choice-label {
+  margin: 0 -0.2em;
+  padding: 0.04em 0.2em;
   border-radius: 3px 8px 4px 7px / 6px 8px 5px 8px;
-  background: linear-gradient(90deg, #f5c800 0 3px, #0000 7px calc(100% - 7px), #f5c800 calc(100% - 3px)), var(--highlighter);
-  mix-blend-mode: multiply;
-  opacity: 0.85;
-  rotate: -1.5deg;
-  pointer-events: none;
-  animation: book-highlight 0.4s ease-out both;
+  /* More ink where the stroke starts and ends, as a real highlighter leaves. */
+  background:
+    left / 100% 100% no-repeat linear-gradient(90deg, #f5c800 0 3px, #0000 7px calc(100% - 7px), #f5c800 calc(100% - 3px)),
+    left / 100% 100% no-repeat linear-gradient(var(--highlighter), var(--highlighter));
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: book-highlight-words 0.4s ease-out both;
+}
+
+@keyframes book-highlight-words {
+  from {
+    background-size: 0 100%;
+  }
 }
 
 @keyframes book-highlight {
