@@ -289,7 +289,8 @@ export function RoomNotes() {
  * „Feedback“, a small paper slip in the room's bottom left corner, mirroring Impressum and Datenschutz on the right: it
  * opens a few words from us asking for feedback, ideas and wishes, and only there the button that opens the grown-up's
  * mail app (user request, November 2026: not the bare address, whose tap went straight to writing a mail). The mail app
- * sends nothing by itself either.
+ * sends nothing by itself either. Its sign is an envelope, never a speech bubble, which looked like a chat (user feedback,
+ * November 2026).
  */
 export function RoomFeedback() {
   const t = useT();
@@ -304,12 +305,12 @@ export function RoomFeedback() {
   });
   return (
     <MenuButton
-      icon="💬"
+      icon="✉️"
       label={label}
       className="room-feedback"
       art={
         <>
-          <span aria-hidden>💬</span> {t({ de: "Feedback", ru: "Отзыв", en: "Feedback", zh: "反馈", hi: "सुझाव", es: "Opiniones", ar: "ملاحظات" })}
+          <span aria-hidden>✉️</span> {t({ de: "Feedback", ru: "Отзыв", en: "Feedback", zh: "反馈", hi: "सुझाव", es: "Opiniones", ar: "ملاحظات" })}
         </>
       }
     >
