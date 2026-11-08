@@ -714,14 +714,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
-- The app is called „Fun for Both“ and lives at funforboth.com (its main address since November 2026, user decision – without www since 8 November 2026, the
-  host Pages serves; www.funforboth.com only redirects there;
+- The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
   toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
   „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
   `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
   The custom domain in the repo's Pages settings (`gh api repos/raDiesle/thetinytaps/pages -q .cname`) must be the
-  host of `siteUrl`: in November 2026 Pages served funforboth.com while `siteUrl` said www, so every canonical link,
-  hreflang and sitemap address went through a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
+  host of `siteUrl` (`www.funforboth.com`, user decision, 8 November 2026: www is the usual form): in November 2026
+  Pages served funforboth.com while `siteUrl` said www, so every canonical link, hreflang and sitemap address went through
+  a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
   from before the change. Check it with `curl -sI` (`age`, `x-cache: HIT`) and against GitHub directly
   (`--resolve <host>:443:185.199.108.153`) before you suspect the build or the DNS. A new deploy clears that cache only
   for the custom domain's host, not for the other name (November 2026: funforboth.com came back after a deploy, www stayed 404).
