@@ -450,7 +450,9 @@ In a fresh worktree run `bun install` first.
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (the words
   for search engines) waits below the first screen (`data-below-fold`), never fixed over it – except on the bookshelf, the
   home page, which never scrolls (user feedback, October 2026): there it opens from the carving's „mehr …“
-  (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`). On a phone the home
+  (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`), „Feedback“ in its
+  bottom left, which opens a few words from us before the mail button (`RoomFeedback`; never the bare address, whose tap
+  went straight to writing a mail, user request, November 2026). On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
   while there is more to scroll to. Buttons and cards in a menu never touch or overlap, also not with a tilted card's
   corner or a button's shadow: keep clear room between the menu's head (its rows of buttons) and the cards

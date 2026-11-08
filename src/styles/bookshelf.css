@@ -524,17 +524,47 @@
   color: inherit;
 }
 
-/* The makers' mail address, small in the room's bottom left corner, mirroring the legal links. */
-.room-contact {
+/*
+ * „Feedback“ (RoomFeedback), a small paper slip in the room's bottom left corner, mirroring the legal links: plain paper
+ * on the dark floor, so grown-ups find it, still and small, so it doesn't call a child.
+ */
+.room-feedback {
   position: absolute;
   left: max(10px, env(safe-area-inset-left));
-  bottom: max(1px, env(safe-area-inset-bottom));
+  bottom: max(6px, env(safe-area-inset-bottom));
   z-index: 3;
-  font-size: 0.68rem;
-  font-weight: 600;
+  padding: 3px 10px 4px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--paper-grain, none), #fbf3df;
+  color: #4a3424;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
   line-height: 1.25;
-  color: #fbf3dfd9;
-  text-shadow: 0 1px 2px #2a1a0e99;
+  rotate: -2deg;
+  box-shadow: 2px 3px 6px #2a1a0e80;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.room-feedback:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+/* Inside its menu: the mail button, and below it the address to copy. */
+.feedback-mail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.feedback-address {
+  font-size: 0.85rem;
+  user-select: all;
+  -webkit-user-select: all;
 }
 
 /* The install hint behind the carving's „mehr …“ (RoomNotes), below its texts. */

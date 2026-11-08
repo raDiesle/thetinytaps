@@ -7,6 +7,7 @@ import { OfflineOptions } from "@/components/OfflineOptions";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { SeoWords } from "@/components/SeoText";
+import { CONTACT_EMAIL } from "@/content/legal";
 import { type Figure, useCommonSettings } from "@/lib/common";
 import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
 
@@ -280,6 +281,46 @@ export function RoomNotes() {
       </p>
       <InstallHint />
       <OfflineOptions />
+    </MenuButton>
+  );
+}
+
+/**
+ * „Feedback“, a small paper slip in the room's bottom left corner, mirroring Impressum and Datenschutz on the right: it
+ * opens a few words from us asking for feedback, ideas and wishes, and only there the button that opens the grown-up's
+ * mail app (user request, November 2026: not the bare address, whose tap went straight to writing a mail). The mail app
+ * sends nothing by itself either.
+ */
+export function RoomFeedback() {
+  const t = useT();
+  const label = t({ de: "Feedback & Wünsche" });
+  return (
+    <MenuButton
+      icon="💬"
+      label={label}
+      className="room-feedback"
+      art={
+        <>
+          <span aria-hidden>💬</span> {t({ de: "Feedback" })}
+        </>
+      }
+    >
+      <section className="seo-text feedback-note">
+        <h2>{t({ de: "Schreiben Sie uns" })}</h2>
+        <p>
+          {t({
+            de: "Fun for Both wächst mit jeder Rückmeldung. Was gefällt Ihrem Kind, wo hakt es, und welches Spiel würden Sie sich noch wünschen? Erzählen Sie es uns gern – über ein Lob freuen wir uns, über Kritik und neue Ideen genauso.",
+          })}
+        </p>
+        <p>{t({ de: "Jede Nachricht lesen wir selbst." })}</p>
+        <p className="feedback-mail">
+          <a className="install-button" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t({ de: "Feedback zu Fun for Both" }))}`}>
+            <span aria-hidden>✉️</span> {t({ de: "E-Mail schreiben" })}
+          </a>
+          {/* The address to copy, for a device without a mail app. */}
+          <span className="feedback-address">{CONTACT_EMAIL}</span>
+        </p>
+      </section>
     </MenuButton>
   );
 }
