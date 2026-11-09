@@ -270,6 +270,13 @@ export const SEO_TEXTS: PageSeo[] = [
       "Eine Bildgeschichte zum Abstillen für Kleinkinder: Tapsi der Fuchs sagt Tschüss zur Mama-Milch, ist traurig, kuschelt mit Mama und schläft ohne Stillen ein.",
     text: "Eine Bildgeschichte zum Vorlesen, wenn das Stillen zu Ende geht: Tapsi der Fuchs war ein Baby und hat bei Mama getrunken, jetzt ist Tapsi groß, isst einen Apfel und trinkt aus dem Becher. Mama erzählt, dass die Mama-Milch bald alle ist, und Tapsi winkt ihr zum Abschied. Am Abend möchte Tapsi doch trinken und ist traurig – Mama ist ganz nah, nimmt Tapsi in den Arm, liest ein Buch vor und singt ein Schlaflied, bis Tapsi einschläft. Am Morgen sind Mama und Papa stolz. Jedes Tippen blättert eine Seite weiter, und der Satz jeder Seite steht klein darunter zum Vorlesen. Für sanftes Abstillen von Kleinkindern, ohne Druck und ohne Schimpfen.",
   },
+  {
+    path: "/milchkette/",
+    title: "Tapsis Milchkette – Abstillen in Kapiteln",
+    description:
+      "Eine Vorlesegeschichte in Kapiteln zum sanften Abstillen: erst die Milch am Tag, dann am Abend, in der Nacht und zuletzt am Morgen – mit Tapsi dem Fuchs.",
+    text: "Eine längere Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Stillen langsam zu Ende gehen soll. Tapsi der Fuchs hat als Baby an Mamas Brust getrunken und ist jetzt groß. Mama erzählt, warum die Milch nun gehen darf: Ihre Brust hat so lange Milch gemacht und möchte ausruhen. Über Tapsis Bett hängt eine Kette mit einem Milchtropfen für jede Stillzeit, und Kapitel für Kapitel geht einer: zuerst die Milch am Tag, wenn Spielen, Essen und der Becher helfen, dann die am Abend, wenn Tapsi mit Buch und Lied einschläft, dann die in der Nacht, wenn Papa tröstet, und zuletzt die am Morgen, mit einem Abschied. Tapsi darf wütend und traurig sein, Mama und Papa bleiben ganz nah. Unter jedem Bild steht der Satz zum Vorlesen.",
+  },
   scene(
     "baustelle",
     "Baustelle",

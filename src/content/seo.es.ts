@@ -180,6 +180,12 @@ export const SEO_ES: SeoTranslation = {
         "Un cuento ilustrado para el destete de niños pequeños: el zorro Tapsi dice adiós a la leche de mamá, se pone triste, se abraza a mamá y se duerme sin mamar.",
       text: "Un cuento ilustrado para leer en voz alta cuando la lactancia llega a su fin: el zorro Tapsi era un bebé y tomaba el pecho de mamá; ahora Tapsi es mayor, come una manzana y bebe de un vaso. Mamá le cuenta que su leche pronto se acabará, y Tapsi le dice adiós con la mano. Por la noche Tapsi quiere mamar de todos modos y se pone triste: mamá está muy cerca, abraza a Tapsi, le lee un libro y le canta una nana hasta que Tapsi se duerme. Por la mañana, mamá y papá están orgullosos. Cada toque pasa una página, y la frase de cada página aparece en pequeño debajo de la imagen para leerla en voz alta. Para un destete suave de niños pequeños, sin presión ni regaños.",
     },
+    "/milchkette/": {
+      title: "La cadena de leche de Tapsi – destete en capítulos",
+      description:
+        "Un cuento por capítulos del zorro Tapsi para un destete suave: primero se va la leche del día, luego la de la tarde, la de la noche y al final la de la mañana.",
+      text: "Un cuento largo para leer en voz alta, capítulo a capítulo, cuando la lactancia va a terminar poco a poco. El zorro Tapsi tomaba el pecho de mamá de bebé y ahora es mayor. Mamá explica por qué la leche puede irse: su pecho ha hecho leche durante mucho tiempo y quiere descansar. Sobre la cama de Tapsi cuelga una cadena con una gota de leche por cada toma, y en cada capítulo se va una: primero la del día, cuando ayudan el juego, la comida y el vaso; luego la de la tarde, cuando Tapsi se duerme con un libro y una canción; luego la de la noche, cuando papá consuela; y al final la de la mañana, con una despedida. Tapsi puede enfadarse y estar triste, y mamá y papá están cerca. Bajo cada imagen está la frase para leer.",
+    },
     "/bilder/baustelle/": scene(
       "Obra",
       "excavadora, grúa y hormigonera",

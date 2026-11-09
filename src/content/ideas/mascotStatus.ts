@@ -106,6 +106,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "drawing", effort: "M", state: "done" }],
   },
   {
+    href: "/milchkette/",
+    note: "Gemini-Bilder: Tapsi, Mama und Papa Fuchs durch die ganze Geschichte, gezeichnet nach der Fuchsfamilie (buch-fuechse.webp).",
+    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "picture", pictures: 51, effort: "M", state: "done" }],
+  },
+  {
     href: "/bilder/",
     note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es als Tiere im Wald und im Winter, als Fahrer und Erwachsene in Rollen und als Überraschung im Versteck.",
     tasks: [

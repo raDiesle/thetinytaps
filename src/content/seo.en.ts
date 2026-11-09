@@ -174,6 +174,12 @@ export const SEO_EN: SeoTranslation = {
         "A picture story for weaning toddlers: Tapsi the fox says goodbye to mommy's milk, feels sad, cuddles with mom and falls asleep without nursing.",
       text: "A picture story to read aloud when breastfeeding comes to an end: Tapsi the fox was a baby and drank at mom's, now Tapsi is big, eats an apple and drinks from a cup. Mom tells Tapsi that her milk will soon be all gone, and Tapsi waves it goodbye. In the evening Tapsi still wants to nurse and is sad – mom stays close, holds Tapsi tight, reads a book and sings a lullaby until Tapsi falls asleep. In the morning mom and dad are proud. Every tap turns a page, and each page's sentence stands small below the picture for reading aloud. For gentle weaning of toddlers, without pressure or scolding.",
     },
+    "/milchkette/": {
+      title: "Tapsi's Milk Chain – Weaning in Chapters",
+      description:
+        "A read-aloud story in chapters for gentle weaning: first the daytime milk goes, then the evening's, the night's and last the morning's – with Tapsi the fox.",
+      text: "A longer story to read aloud, chapter by chapter, when breastfeeding is to end slowly. Tapsi the fox drank at mom's breast as a baby and is big now. Mom explains why the milk may go: her breast has made milk for so long and would like to rest. Above Tapsi's bed hangs a chain with a milk drop for every nursing time, and chapter by chapter one goes: first the daytime milk, when play, food and a cup help, then the evening's, when Tapsi falls asleep with a book and a song, then the night's, when dad comforts, and last the morning's, with a goodbye. Tapsi may be angry and sad, and mom and dad stay close. Below every picture stands the sentence to read aloud.",
+    },
     "/bilder/baustelle/": scene(
       "Construction Site",
       "excavator, crane and cement mixer",

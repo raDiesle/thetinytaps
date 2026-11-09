@@ -1,5 +1,6 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
+import { MILK_CHAIN_BLURB, MILK_CHAIN_TITLE } from "@/games/milkchain/names";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
@@ -202,6 +203,14 @@ export const CATEGORIES: Category[] = [
           ar: "وداعًا يا حليب ماما – قصة",
           ru: "Пока, мамино молоко – история",
         },
+      },
+      {
+        // The second weaning story, in chapters along the steps of gentle weaning (src/games/milkchain); German only so far.
+        href: "/milchkette/",
+        unfinished: true,
+        emoji: "🍼",
+        title: MILK_CHAIN_TITLE,
+        blurb: MILK_CHAIN_BLURB,
       },
     ],
   },
