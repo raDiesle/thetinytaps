@@ -37,6 +37,19 @@ const PLACES: Record<Place, string> = {
   weg: "A sunny path through a park, trees and a meadow on both sides.",
 };
 
+/**
+ * Where the foxes are in each place's first picture. A page drawn from it keeps them there too unless told otherwise:
+ * of 20 pages first drawn, six had a second Tapsi or Mama, or Tapsi's tail left lying on the rug, where the first
+ * picture had them (November 2026) – so every page says those places are empty now.
+ */
+const WAS_THERE: Record<Place, string> = {
+  wohnzimmer: "Tapsi plays on the rug and Mama sits on the green sofa",
+  kinderzimmer: "Tapsi stands on the bed and Mama stands beside it",
+  kueche: "Papa sits at the table and Tapsi in the child's chair",
+  garten: "Tapsi kicks a ball on the lawn and Mama runs behind",
+  weg: "Papa pushes a pram along the path with Tapsi asleep in it",
+};
+
 /** The light of a page, said in every prompt: the place's first picture is drawn in daylight. */
 const LIGHT: Record<Light, string> = {
   tag: "It is daytime, friendly daylight.",
@@ -94,6 +107,7 @@ function promptOf(page: ChainPage): string {
     ? [PLACES[page.place], "Draw the foxes like the fox family in the reference picture: the same fur, faces and clothes."]
     : [
         "Redraw this exact place from the reference picture: keep it exactly as it is – the same walls, window, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses and the light change, and who is there.",
+        `In the reference picture ${WAS_THERE[page.place]}: that was another moment. Draw each fox only where this page says, and leave every other place empty – no fox, no second fox, no fox tail left lying on the rug or the furniture.`,
       ];
   parts.push(LIGHT[page.light]);
   if (page.place === "kinderzimmer") parts.push(chainOn(page));
@@ -122,7 +136,23 @@ export function chainPicture(page: ChainPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/kette-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["fragen-nicht", "tag-raus", "tag-mittag"]);
+const MADE = new Set<string>([
+  "satt",
+  "wachsen",
+  "kette",
+  "essen",
+  "fragen-nicht",
+  "fragen-spielen",
+  "gleich",
+  "gleich-sessel",
+  "tag-will",
+  "tag-raus",
+  "tag-mittag",
+  "tag-halten",
+  "tag-leichter",
+  "vermissen-traurig",
+  "vermissen-mama",
+]);
 
 /** Every picture of the story still to make. */
 export const MILK_CHAIN_PICTURE_QUEUE: QueuedPicture[] = MILK_CHAIN_PAGES.filter((p) => !MADE.has(p.id)).map(chainPicture);

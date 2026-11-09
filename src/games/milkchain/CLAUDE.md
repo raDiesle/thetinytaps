@@ -32,5 +32,7 @@ Still being built (`unfinished`, user decision): reached only from „🚧 In Ar
   a grown-up reads it.
 - Pictures (`/bild-erzeugen`): each place's first picture (`FIRST`) is drawn from the fox family
   (`buch-fuechse.webp`), every other page there from that first picture as its only ref, so the room stays; full bleed,
-  never a white margin or rounded corners (two first pictures came back so and were drawn again). Count the foxes on
-  every picture before keeping it: only the cast the page names, each once.
+  never a white margin or rounded corners (two first pictures came back so and were drawn again). Every page drawn from a first
+  picture says where the foxes stood there and that those places are empty now (`WAS_THERE`): without it six of
+  twenty pages kept a second Tapsi or Mama, or a tail lying on the rug. Count the foxes on every picture before keeping
+  it: only the cast the page names, each once, and look for stray tails.
