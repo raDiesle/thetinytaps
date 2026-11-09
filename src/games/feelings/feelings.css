@@ -5,10 +5,12 @@
    that comes (a relieved, happy bear) is the answer. Only one thing moves at a time, its two frames fading slowly into
    each other: the big picture while the scene is shown, the two cards while the child chooses.
 
-   The picture and the cards keep one size for the whole round: things that grow and shrink confuse small children.
-   So their room is worked out from the screen alone (cq units of .story-play), never from what is in it.
-   Wide screens: the picture in the middle, the not-so-good card at the bottom left and the good one at the top right,
-   each lying over a corner of the picture (user's choice). Upright screens: picture on top, the cards below.
+   The room of the picture and the cards is worked out from the screen alone (cq units of .story-play), never from
+   what is in it, and nothing grows or shrinks in an animation.
+   Wide screens: the picture in the middle, the not-so-good card at the bottom left and the good one at the top right.
+   While the child chooses the cards lie big on top, covering the picture; a tap on the picture brings it to the front
+   and the cards wait small and grey on its corners until one is tapped (user wish, November 2026).
+   Upright screens: picture on top, the cards below.
    The ✕ and the dots lie on top of the pictures and take no room. */
 
 .story-play {
@@ -728,6 +730,44 @@
   filter: grayscale(0.7) brightness(1.1);
 }
 
+/* ---------- Cards or picture on top (user wish, November 2026) ---------- */
+
+/* The picture lets taps through to the way on (`GoOn`) under it – except while the cards lie over it: then a tap on
+   what is seen of it brings it to the front. */
+.story-middle {
+  pointer-events: none;
+}
+
+.fg-frame-tap {
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+/* The picture in front: over the cards, which wait small behind it – below the dots and the grown-ups' notes. */
+.story-play[data-front="picture"] .story-middle {
+  z-index: 4;
+}
+
+.story-play[data-front="picture"] .story-choices {
+  z-index: 3;
+}
+
+/* Tapped to the front while the child chooses, the cards behind it go grey until one is tapped. */
+.fg-choice-behind .fg-card-image,
+.fg-choice-behind .fg-placeholder {
+  filter: grayscale(0.85) brightness(1.08);
+}
+
+.fg-choice-behind .fg-card {
+  box-shadow: 0 6px 0 var(--ink);
+}
+
+/* The sheet with the text open: the texts leave the pictures and stand on it, in the bottom right corner. */
+.story-play[data-sheet] .fg-caption {
+  display: none;
+}
+
 /* ---------- Tick and cross ---------- */
 
 .fg-mark circle {
@@ -792,8 +832,37 @@
     --card-w: calc((100cqw - 2 * var(--pad) - var(--pic-w)) / (2 * (1 - var(--over))));
     /* Up or down to the picture's edge, then a third of the card further, so it lies on the corner. */
     --card-edge: max(var(--pad), var(--pic-top) - var(--card-w) * 0.75 * 0.3);
+    /* While the child chooses the cards lie on top, about twice as big, over the picture (user wish, November 2026) –
+       side by side without touching, and low enough to leave the picture's text room between them. */
+    --card-big: min(2 * var(--card-w), (100cqw - 2 * var(--pad) - var(--gap)) / 2, (100cqh - 2 * var(--pad)) * 0.7 * 4 / 3);
 
     display: block;
+  }
+
+  /* Big while they lie on top, right in the screen's corners; small again, on the picture's corners, once the picture is
+     tapped to the front or plays a choice. The change is at once, never a growing card. */
+  .story-play[data-front="cards"] .story-choices .fg-choice,
+  .story-play[data-front="cards"] .story-choices .fg-card {
+    --card-w: var(--card-big);
+  }
+
+  .story-play[data-front="cards"] .story-choices .fg-choice:first-child {
+    bottom: var(--pad);
+  }
+
+  .story-play[data-front="cards"] .story-choices .fg-choice:last-child {
+    top: var(--pad);
+  }
+
+  /* The picture's whole text stands in its bottom right corner, right of the big not-so-good card, so the cards never
+     cover it; not wider than a readable line. */
+  .story-play .fg-picture-caption {
+    right: 8px;
+    left: auto;
+    max-width: max(30%, 50cqw + var(--pic-w) / 2 - 2 * var(--pad) - var(--card-big) - var(--gap));
+    font-size: clamp(0.8rem, 2.4cqh, 1.05rem);
+    text-align: start;
+    translate: none;
   }
 
   /* Tablets (about 4:3) have room above and below the picture: bigger cards, a smaller picture. */
@@ -812,11 +881,6 @@
   .fg-frame {
     width: var(--pic-w);
     margin: 0;
-  }
-
-  /* The question stays clear of the cards on the picture's corners. */
-  .fg-picture-caption {
-    max-width: 56%;
   }
 
   /* The cards lie over the picture, but the room between them is the picture's: taps there reach nothing. */
@@ -1028,7 +1092,8 @@
 }
 
 /* The sheet: a page of paper right above the two notes, in the bottom right corner – on wide screens below the good
-   card, over the room right of the picture and only as far over the picture as a readable line needs. Only as tall as
+   card as it lies big on top, beside the big not-so-good one, never narrower than a readable line. While it is open
+   the pictures carry no text: it stands here instead (user wish, November 2026). Only as tall as
    its text, scrolled by itself when it is long. While the voice tells the scene (`.told`) the part told now is marked
    by the highlighter and the others are paler; with the voice off everything shows alike, to be read through. */
 .story-text-sheet {
@@ -1082,13 +1147,13 @@
   vertical-align: -0.2em;
 }
 
-/* Wide: the sheet starts below the good card on the top right and is as wide as the room right of the picture, but
-   never narrower than a readable line; its bottom stays above the notes and ▶. */
+/* Wide: the sheet starts below the big good card on the top right and is as wide as the room beside the big
+   not-so-good one, but never narrower than a readable line; its bottom stays above the notes and ▶. */
 @media (min-aspect-ratio: 6 / 5) {
   .story-text-sheet {
-    --sheet-top: calc(var(--card-edge) + var(--card-w) * 0.75 + 10px);
+    --sheet-top: calc(var(--pad) + var(--card-big) * 0.75 + 10px);
 
-    width: max(50cqw - var(--pic-w) / 2 - var(--pad), min(44cqw, 22rem));
+    width: max(100cqw - 2 * var(--pad) - var(--card-big) - var(--gap), min(44cqw, 22rem));
   }
 }
 

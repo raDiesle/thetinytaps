@@ -185,10 +185,27 @@ test("the game answers calmly", () => {
 test("a scene goes on with a tap, and one thing moves at a time", () => {
   const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
   expect(round).toContain('const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;');
-  expect(round).toContain('still={phase === "choose"}');
+  expect(round).toContain("still={!pictureFront}");
   expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain('<Frames name={image} moving={active} className="fg-card-image" />');
   expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
+});
+
+// While the child chooses, the cards lie big over the picture; a tap on the picture brings it to the front with the
+// cards grey behind it, and a tap on a grey card only brings them back, it chooses nothing (user wish, November 2026).
+// The pictures carry their whole text, never a short caption – and none at all while the sheet with the text is open,
+// which then holds it in the bottom right corner.
+test("cards or picture on top, and the whole text on the picture or the sheet", () => {
+  const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
+  expect(round).toContain('if (front === "picture") return setFront("cards");');
+  expect(round).toContain('onTap={pictureFront ? undefined : () => setFront("picture")}');
+  expect(round).toContain("onWake={behind ? wake : undefined}");
+  expect(round, "the picture's text is its whole part of the sheet").toContain("wholeText(round).find((p) => p.id === part)?.text");
+  const shared = readFileSync("src/games/feelings/shared.tsx", "utf8");
+  expect(shared, "a grey card wakes the cards, never chooses").toMatch(/if \(onWake\) onWake\(\);\s*else if \(active\) onChoose\?\.\(\);/);
+  const css = readFileSync("src/games/feelings/feelings.css", "utf8");
+  expect(css).toMatch(/\.story-play\[data-sheet\] \.fg-caption\s*\{\s*display: none/);
+  expect(css).toMatch(/\.fg-choice-behind [^{]*\{[^}]*grayscale/);
 });
 
 // „Alltagssituationen“ alone has a switch for its voice, for grown-ups who tell the story themselves (user decision,
@@ -285,6 +302,37 @@ test("every story is in exactly one day, and every page of a day has its picture
     }
   });
   if (!imageFor(NIGHT_IMAGE)) expect(DAY_PICTURE_QUEUE.map((p) => p.id)).toContain(NIGHT_IMAGE);
+});
+
+// Nothing is said twice in a row (user feedback, November 2026: the page „Oma Bär ist zu Besuch. Heute fährt sie wieder
+// nach Hause.“ was followed by the scene's „Oma Bär war zu Besuch. Jetzt fährt sie wieder nach Hause.“): where the
+// scene's first beat names a thing its page names (a noun inside a sentence, the cast left aside), the page marks that
+// beat as `told`, and the day plays the scene without saying it (`afterPage`).
+test("a scene after a page of the day doesn't say again what the page told", () => {
+  const CAST = new Set(["bär", "bären", "fuchs", "igel", "hase", "füchsin"]);
+  const nouns = (text: string) =>
+    new Set(
+      text
+        .split(/(?<=[.!?:])\s+/)
+        .flatMap((sentence) => sentence.split(/[\s,]+/).slice(1))
+        .filter((word) => /^\p{Lu}/u.test(word))
+        .map((word) => word.toLowerCase().replace(/[^\p{L}]/gu, ""))
+        .filter((word) => !CAST.has(word))
+        .map((word) => word.slice(0, 6)),
+    );
+  for (const day of DAYS)
+    for (const scene of day.scenes) {
+      const story = STORIES.find((s) => s.id === scene.story);
+      if (!story) continue;
+      const first = roundOf(story, 0, "de").start.beats[0];
+      if (!first) continue;
+      const page = nouns(scene.before.text);
+      const shared = [...nouns([first.narration, first.line].filter(Boolean).join(" "))].filter((noun) => page.has(noun));
+      if (shared.length) expect(scene.told ?? 0, `${day.id} ${scene.story}: the page already names ${shared.join(", ")}`).toBeGreaterThan(0);
+    }
+  const play = readFileSync("src/games/feelings/DayPlay.tsx", "utf8");
+  expect(play).toContain("afterPage(roundOf(");
+  expect(play).not.toMatch(/round=\{roundOf\(/);
 });
 
 // A day's translation tells the same day: one page per scene, every one a sentence, and the day ends at night.
