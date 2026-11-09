@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   fullTitle,
   languagePrefix,
+  MOVED_PATHS,
   NO_INDEX_PATHS,
   type PageSeo,
   type PageText,
@@ -251,6 +252,19 @@ async function writePages(template: string) {
       await mkdir(dir, { recursive: true });
       const html = replaceOnce(template, '<html lang="de">', `<html lang="${language}">`);
       await writeFile(join(dir, "index.html"), replaceOnce(html, "</head>", '<meta name="robots" content="noindex" /></head>'));
+    }
+  }
+  // A moved page sends on to its new address in the same language: GitHub Pages can't answer 301, and Google takes a
+  // meta refresh at once with a canonical link as one (MOVED_PATHS).
+  for (const language of SEO_LANGUAGES) {
+    for (const [from, to] of Object.entries(MOVED_PATHS)) {
+      const target = urlOf(to, language);
+      const dir = join(OUT, languagePrefix(language), from);
+      await mkdir(dir, { recursive: true });
+      await writeFile(
+        join(dir, "index.html"),
+        `<!doctype html>\n<html lang="${language}">\n<head>\n<meta charset="utf-8" />\n<title>${SITE_NAME}</title>\n<link rel="canonical" href="${target}" />\n<meta http-equiv="refresh" content="0; url=${target}" />\n</head>\n<body><a href="${target}">${target}</a></body>\n</html>\n`,
+      );
     }
   }
   const urls = built.map(({ language, page }) => `  <url><loc>${urlOf(page.path, language)}</loc></url>`);

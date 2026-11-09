@@ -17,7 +17,7 @@ bun run preview    # serve the built site like GitHub Pages (tools/preview.ts)
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (repo settings → Pages → Source: **GitHub Actions**, Custom domain: **www.funforboth.com** (not funforboth.com: GitHub then sends funforboth.com on to www by itself), Enforce HTTPS).
 The domain is registered at Cloudflare; its DNS records are `tools/funforboth.com.zone` (import it under
-DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate).
+DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate: with the records proxied (orange cloud) Pages shows „Enforce HTTPS – Unavailable … not properly configured to support HTTPS“, as in November 2026; switch them to „DNS only“, wait for the certificate, then tick Enforce HTTPS).
 toddlerfox.com (the address until October 2026) and booksforboth.com (until November 2026) only redirect: import
 `tools/redirect-<domain>.zone` *with* „Proxy imported DNS records“ (delete the old GitHub records first), then
 Rules → Redirect Rules → a rule for all incoming requests, dynamic target

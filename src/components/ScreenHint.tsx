@@ -3,6 +3,7 @@ import { useLocation } from "react-router";
 import { useDevice } from "@/lib/device";
 import { canFullscreen, enterFullscreen, useFullscreen } from "@/lib/fullscreen";
 import { useT } from "@/lib/language";
+import { isCrawler } from "@/lib/locale";
 import { isStandalone } from "@/lib/pwa";
 
 const PORTRAIT = "(orientation: portrait)";
@@ -61,8 +62,10 @@ export function ScreenHint() {
   }, [fullscreen]);
 
   // The management page, Impressum and Datenschutz are for grown-ups reading, not a menu or a game.
+  // Nor search engines: Google reads every page as an upright phone, and the note would be all it saw of it.
   if (
     !device.touchOnly ||
+    isCrawler() ||
     pathname.startsWith("/management") ||
     pathname.startsWith("/ideen") ||
     pathname.startsWith("/impressum") ||
