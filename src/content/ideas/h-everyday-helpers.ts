@@ -394,7 +394,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut als „Abstillen“ (/abstillen/): dreizehn SVG-Seiten mit Tapsi, Mama und Papa Fuchs, jedes Tippen blättert weiter, der Satz jeder Seite steht klein zum Vorlesen darunter. Offen: Aufnahmen der Sätze (ElevenLabs), Übersetzungen, eine Fassung nur fürs nächtliche Abstillen („Die Milch schläft nachts“). In Arbeit (9. November 2026, unter „🚧 In Arbeit“ auf /management/): eine zweite, tiefere Geschichte in elf Kapiteln nach den Schritten des sanften Abstillens, „Tapsis Milchkette“ (/milchkette/) – die Brust beim Namen, warum die Milch weniger wird, nicht anbieten, hinauszögern, dann geht eine Stillzeit nach der anderen: Tag, Abend, Nacht und zuletzt der Morgen mit Abschied, danach das Vermissen. Bilder von Gemini, die Sätze zum Vorlesen darunter, in allen sieben Sprachen der App.",
+        "Gebaut als Buch „Abstillen“ bei den Alltagshelfern (/abstillen/, 9. November 2026): „Tapsis Milchkette“, eine Geschichte in elf Kapiteln nach den Schritten des sanften Abstillens – die Brust beim Namen, warum die Milch weniger wird, nicht anbieten, hinauszögern, dann geht eine Stillzeit nach der anderen: Tag, Abend, Nacht und zuletzt der Morgen mit Abschied, danach das Vermissen. Bilder von Gemini, die Sätze zum Vorlesen darunter, in allen sieben Sprachen der App; am Anfang ein Inhaltsverzeichnis, aus dem man jedes Kapitel direkt aufschlägt. Die erste, kürzere SVG-Geschichte „Tschüss, Mama-Milch“ wurde dafür gelöscht. Offen: eine Fassung nur fürs nächtliche Abstillen („Die Milch schläft nachts“).",
     },
     {
       id: "H-58",

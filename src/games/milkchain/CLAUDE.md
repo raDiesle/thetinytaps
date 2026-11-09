@@ -1,23 +1,28 @@
 # Tapsis Milchkette
 
-Route `/milchkette/` · idea H-44 (with „Abstillen“, `src/games/weaning/`) · research „abstillen-kapitel“.
+Route `/abstillen/` · idea H-44 · research „abstillen-kapitel“.
 
-The second, deeper weaning story (user request, 9 November 2026), read by a grown-up with the child chapter by chapter:
+The book „Abstillen“ among the Alltagshelfer (`MILK_CHAIN_BOOK`, a spine book of its own, playing at once): a weaning
+story in chapters (user request, 9 November 2026), read by a grown-up with the child chapter by chapter. It replaced a
+first, shorter SVG story „Tschüss, Mama-Milch“ that stood at this address (deleted on the user's request the same day).
+
 Tapsi the fox drank at Mama's breast as a baby and is big now; Mama tells why the milk may go, and over Tapsi's bed hangs
 a chain with one milk drop per milk time. Chapter by chapter one drop goes – the day's, the evening's, the night's and
 last the morning's – into a little box to remember it, and what comes instead hangs there (ball, book, star, cup). Then
 Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama and Papa love Tapsi as before.
-Still being built (`unfinished`, user decision): reached only from „🚧 In Arbeit“ on `/management/`, ✕ goes back there.
 - `milkChain.ts`: the chapters and pages (`MILK_CHAIN`), the steps of gentle weaning (`GENTLE_STEPS`), the order the
   milk times go (`MILK_ORDER`), what comes instead (`INSTEAD`) and which drops are gone on a page (`goneOn`).
 - `milkChainPictures.ts`: the Gemini prompt of every page (place, light, chain, cast and clothes, nursing), as the
   picture queue takes them; a made picture goes on `MADE`.
-- `MilkChainPlay.tsx`: one page per tap or key (← and Backspace back, ◀ for the grown-up), the picture as big as the
-  room allows, under it the chapter's title on its first page and the sentence to read aloud; a paper placeholder where
-  a picture isn't made yet; `GameEnd` small in the corners on the last page; `DevTag` `K<chapter>-<page>`.
+- `MilkChainPlay.tsx`: the book opens on its table of contents (`CONTENTS`, `DevTag` `K0`): the story's name, then one
+  line per chapter in two columns – a round cut of its first picture, „Kapitel n“ and its title, dots, its page number;
+  a tap (or its number key) opens it. Then one page per tap or key (← and Backspace back, ◀ for the grown-up, from the
+  first page back to the contents), the picture as big as the room allows, under it the chapter's title on its first
+  page and the sentence to read aloud; a paper placeholder where a picture isn't made yet; `GameEnd` small in the
+  corners on the last page, „Nochmal“ opening the contents; `DevTag` `K<chapter>-<page>`.
 - `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
   (user request, 9 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with `byLanguage`.
-- `names.ts`: title and blurb in every language. `milkchain.css`: classes `mk-`.
+- `names.ts`: the book's name on the shelf („Abstillen“), the story's title and its blurb in every language. `milkchain.css`: classes `mk-`.
 
 ## Rules
 
@@ -27,9 +32,20 @@ Still being built (`unfinished`, user decision): reached only from „🚧 In Ar
   drinking, the night, the farewell, then missing it. `milkchain.test.ts` checks the order. The milk times go day,
   evening, night, morning (`MILK_ORDER`, checked): the evening only after Tapsi has learnt to fall asleep with book and
   song, the night with Papa comforting, the morning last with a thank-you and a farewell.
-- Everything in `src/games/weaning/CLAUDE.md`'s rules holds here too: plainly about Mama's breast (the word „Brust“ is
-  said, the drinking pictures show Tapsi at the breast as a breastfeeding picture book does, `NURSING`), gentle and
-  true, nobody scolds, being sad and angry is shown and held, a grown-up is always close, lines ≤ 110 characters.
+- **A story read over many days opens on its chapters** (user request, 9 November 2026: „von Kapitel zu Kapitel am
+  Anfang springen“): the book starts on its table of contents, never on page one, and while a page is open the corner
+  goes back to it (`useInnerBack`), so a grown-up goes on where they stopped yesterday. A new chapter gets its line there
+  by itself.
+- The story is gentle and true: the milk is gone and stays gone (no „just once more“), Tapsi may be sad and angry, and a
+  grown-up is always close and holds it until it is done – never skipped. Nobody scolds, nothing is bad or naughty
+  (`milkchain.test.ts` checks the words). Lines ≤ 110 characters, in the present tense.
+- **It is plainly about Mama's breast** (user feedback, November 2026, replacing „a milk drop, never a breast“: a child
+  doesn't understand the story otherwise): the word „Brust“ is said (checked), and the pictures of drinking show Tapsi
+  at the breast as a picture book about breastfeeding does – Mama's top lifted at one side, the breast a soft round
+  shape of her fur, Tapsi's face hiding the nipple, nothing more bare (`NURSING` in `milkChainPictures.ts`). Where nobody
+  drinks, Mama lays her paw on her breast through her clothes.
+- Tapsi is an animal, not the child's figure, so it does not follow „Junge / Mädchen“. A new story about weaning (night
+  only) keeps the order of `MILK_ORDER`.
 - Every language has every chapter and page (`milkchain.test.ts`): a new page or chapter comes in German only and its
   languages' rows in `languageStatus.ts` say what is missing until the user asks for translations; a German line whose
   meaning changes loses its translations (they fall back to German). The rules for the child's languages hold here

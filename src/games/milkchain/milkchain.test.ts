@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { MILK_CHAIN_AR } from "./ar";
 import { MILK_CHAIN_EN } from "./en";
@@ -52,6 +53,13 @@ describe("Tapsis Milchkette", () => {
     expect(MILK_CHAIN_PAGES.some((p) => /traurig sein/.test(p.text))).toBe(true);
     expect(MILK_CHAIN_PAGES.at(-1)?.text).toMatch(/lieb/);
   });
+});
+
+// User request, 9 November 2026: a story read over many days opens on its chapters, and the corner goes back to them.
+test("the book opens on its table of contents, and the corner leads back to it", () => {
+  const play = readFileSync("src/games/milkchain/MilkChainPlay.tsx", "utf8");
+  expect(play).toContain("useState(CONTENTS)");
+  expect(play).toMatch(/useInnerBack\(index === CONTENTS \? undefined/);
 });
 
 describe("Tapsis Milchkette in every language", () => {

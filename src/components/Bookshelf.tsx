@@ -53,10 +53,16 @@ const VOLUME_COLOURS: Record<string, string> = { "/belohnungstafel/": GOLD, "/ta
 const volumeColour = (href: string, i: number) => VOLUME_COLOURS[href] ?? DAILY_COLOURS[i % DAILY_COLOURS.length];
 
 /**
- * How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to
- * read, and each thick enough for a child's finger (user feedback, November 2026).
+ * How wide each book spine out stands, in picture books' widths: wide enough for its name in one line, big enough to
+ * read, and thick enough for a child's finger (user feedback, November 2026; six books once had 1.6 together).
  */
-const DAILY_SPAN = 1.6;
+const DAILY_SPINE = 0.27;
+
+/**
+ * The room a book leaning left needs at its foot where it rests against the tied books upright left of it, in picture
+ * books' widths: without it the book leant into them and hid half its name (the book „Abstillen“, November 2026).
+ */
+const LEAN_ROOM = 0.13;
 
 /** The words carved beside the everyday helpers: all of them, or only the first line where the room is small. */
 interface Carving {
@@ -112,6 +118,17 @@ for (const entry of SHELF) {
   else if (last?.[0].colour && last[0].world === book.world) last.push(daily(last.filter((b) => !b.volumes).length));
   else PLACES.push([daily(0)]);
 }
+
+/**
+ * How wide the books spine out stand together, in picture books' widths: each book's and each tied volume's width, and
+ * the room at the foot of a book leaning against the tied books. A new everyday helper widens it, never squeezes the rest.
+ */
+const DAILY_SPAN = (() => {
+  const books = PLACES.find((place) => place[0].colour) ?? [];
+  const spines = books.reduce((n, book) => n + (book.volumes?.length ?? 1), 0);
+  const leaning = books.filter((book, i) => !book.volumes && books[i - 1]?.volumes).length;
+  return spines * DAILY_SPINE + leaning * LEAN_ROOM;
+})();
 
 /**
  * The colours of the books standing with their spines out beside the picture books, only to fill the shelf: dusty and
@@ -328,7 +345,7 @@ function DailyGroup({
   const name = t(CATEGORIES.find((c) => c.id === books[0].world)?.title ?? books[0].title);
   const span = dailySpan(carving);
   return (
-    <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN } as CSSProperties}>
+    <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN, "--lean-room": LEAN_ROOM } as CSSProperties}>
       <span className="shelf-daily-books">
         {books.map((book) =>
           book.volumes ? <BookBundle key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,

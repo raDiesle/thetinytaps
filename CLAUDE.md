@@ -378,7 +378,7 @@ In a fresh worktree run `bun install` first.
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
   category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Zähne putzen, Töpfchen, Belohnungstafel &
-  Zeitplan – user decision, October 2026; the Timer the very first book, top left, November 2026): each of its games is a book of its own, standing spine out side by side, its
+  Zeitplan, Abstillen – user decision, October 2026; the Timer the very first book, top left, November 2026): each of its games is a book of its own, standing spine out side by side, its
   emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
   left corners (`--lean`), so the names running down their spines are read without bending the

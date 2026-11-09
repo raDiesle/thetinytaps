@@ -1506,6 +1506,12 @@
   --lean: -10.5deg;
 }
 
+/* A book right of the tied books, which stand upright, leans on them less and stands off at its foot so as not to lean into them (`LEAN_ROOM`). */
+.shelf-daily-books > .shelf-bundle + .shelf-daily {
+  --lean: -6deg;
+  margin-left: calc(var(--bh) * 0.82 * var(--lean-room));
+}
+
 .shelf-daily:nth-child(4n + 2) {
   height: calc(var(--bh) * 0.92);
 }

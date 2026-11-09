@@ -158,13 +158,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abstillen/",
-    recorded: true,
-    note: "Die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ übersetzt am 3. November 2026, auf Deutsch und den anderen Sprachen außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht).",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
-  },
-  {
-    href: "/milchkette/",
-    note: "„Tapsis Milchkette“, die zweite Abstillgeschichte in Kapiteln (milkChain.ts): Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine.",
+    note: "Das Buch „Abstillen“ mit „Tapsis Milchkette“, der Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine.",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {

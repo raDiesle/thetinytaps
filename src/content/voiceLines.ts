@@ -54,7 +54,6 @@ import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
-import { GERMAN_LINES as WEANING_LINES } from "@/games/weaning/content";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
@@ -69,7 +68,6 @@ import shadowsFiles from "../games/shadows/stimme/*.mp3?glob";
 import socksFiles from "../games/socks/stimme/*.mp3?glob";
 import teethFiles from "../games/teeth/stimme/*.mp3?glob";
 import togetherFiles from "../games/together/stimme/*.mp3?glob";
-import weaningFiles from "../games/weaning/stimme/*.mp3?glob";
 
 /** Lines of one kind in a game, each once. */
 export interface VoiceGroup {
@@ -450,10 +448,6 @@ function teeth(): VoiceGroup[] {
   ];
 }
 
-function weaning(): VoiceGroup[] {
-  return [{ label: "Seiten der Geschichte", lines: once(WEANING_LINES) }];
-}
-
 function potty(language: TargetLanguageId): VoiceGroup[] {
   const texts = pick(POTTY_TEXTS, language);
   const name = pick(TAPSI.name, language);
@@ -500,7 +494,6 @@ const RECORDED = new Set(
     goodNightFiles,
     elevatorFiles,
     teethFiles,
-    weaningFiles,
     animalsFiles,
     feelingsFiles,
     shadowsFiles,
@@ -526,7 +519,7 @@ export const stillToRecord = (games: VoiceGame[]): VoiceGame[] =>
  * Every game that speaks, with all it says in `language` (German for the list on /management/), recorded or not
  * (stillToRecord leaves out what is). In another language a game says what it has no translation of in German, so
  * those lines come out German here too; recordedLines.ts leaves them out. Lebendige Bilder, Zähne putzen, Kleine
- * Abenteuer, Abstillen, the Belohnungstafel and the lines of all games are listed in German only (the first is
+ * Abenteuer, the Belohnungstafel and the lines of all games are listed in German only (the first is
  * parked, recordedLines.ts reads the others' translations itself). Bewegungsabenteuer is not here: its stories list
  * Tapsi's lines themselves.
  */
@@ -547,7 +540,6 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/kettenreaktion/", groups: marbles(language) },
     { href: "/zaehne/", groups: teeth() },
     { href: "/toepfchen/", groups: potty(language) },
-    { href: "/abstillen/", groups: weaning() },
     { href: "/socken/", groups: socks(language) },
     { href: "/belohnungstafel/", groups: rewards() },
     { href: "/timer/", groups: timer(language) },

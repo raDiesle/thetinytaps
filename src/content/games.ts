@@ -1,6 +1,6 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
-import { MILK_CHAIN_BLURB, MILK_CHAIN_TITLE } from "@/games/milkchain/names";
+import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
@@ -190,26 +190,11 @@ export const CATEGORIES: Category[] = [
         },
       },
       {
+        // The book „Abstillen“ holds „Tapsis Milchkette“, the weaning story in chapters along the steps of gentle
+        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026).
         href: "/abstillen/",
-        unfinished: true,
         emoji: "🤱",
-        title: { de: "Abstillen", ru: "Отлучение от груди", en: "Weaning", zh: "断奶", hi: "दूध छुड़ाना", es: "El destete", ar: "الفطام" },
-        blurb: {
-          de: "Tschüss, Mama-Milch – eine Geschichte",
-          en: "Bye-bye, Mommy’s milk – a story",
-          zh: "再见，妈妈的奶——一个故事",
-          hi: "टाटा, मम्मी का दूध – एक कहानी",
-          es: "Adiós, leche de mamá: un cuento",
-          ar: "وداعًا يا حليب ماما – قصة",
-          ru: "Пока, мамино молоко – история",
-        },
-      },
-      {
-        // The second weaning story, in chapters along the steps of gentle weaning (src/games/milkchain); German only so far.
-        href: "/milchkette/",
-        unfinished: true,
-        emoji: "🍼",
-        title: MILK_CHAIN_TITLE,
+        title: MILK_CHAIN_BOOK,
         blurb: MILK_CHAIN_BLURB,
       },
     ],

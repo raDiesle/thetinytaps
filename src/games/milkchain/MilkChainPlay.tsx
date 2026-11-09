@@ -1,12 +1,14 @@
-import { type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
 import { DevTag } from "@/components/DevTag";
 import { GameEnd } from "@/components/GameEnd";
+import { useInnerBack } from "@/components/GameShell";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { byLanguage } from "@/content/texts";
 import { useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
 import pictureFiles from "./bilder/*.webp?glob";
 import { MILK_CHAIN, MILK_CHAIN_PAGES } from "./milkChain";
+import { MILK_CHAIN_TITLE } from "./names";
 
 /** Each page's picture by its file name without extension (`kette-<page id>`). */
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
@@ -33,21 +35,30 @@ const LAST = MILK_CHAIN_PAGES.length - 1;
 /** Each page's chapter (its number from 1) and its place in it, for the heading and the dev tag. */
 const WHERE = MILK_CHAIN.flatMap((chapter, c) => chapter.pages.map((_, p) => ({ chapter, number: c + 1, first: p === 0, code: `K${c + 1}-${p + 1}` })));
 
+/** Where each chapter begins in the story: its first page's place, from 0. */
+const CHAPTER_STARTS = MILK_CHAIN.map((chapter) => MILK_CHAIN_PAGES.indexOf(chapter.pages[0]));
+
+/** The table of contents at the book's start, where no page of the story is open. */
+const CONTENTS = -1;
+
 const NEXT = { de: "Weiter", en: "Next", zh: "下一页", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" };
 const BACK = { de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "पिछला पन्ना", es: "Página anterior", ar: "الصفحة السابقة", ru: "Назад" };
 
 /**
- * „Tapsis Milchkette“: the chaptered weaning story read with a grown-up, one page per tap. The picture fills the room
- * above, and under it what the grown-up reads, with the chapter's title over its first page. Any tap or key turns on (←
- * and Backspace back, ◀ bottom left); the last page ends with „Nochmal“. A page whose picture isn't made yet shows a
- * paper placeholder in its place.
+ * „Tapsis Milchkette“: the chaptered weaning story read with a grown-up, one page per tap. The book opens on its table
+ * of contents (user request, 9 November 2026: a story read over many days goes on where it stopped), one line per
+ * chapter; a tap on one, or its number on the keyboard, opens it, and any other key starts at the beginning. On a page
+ * the picture fills the room above, and under it what the grown-up reads, with the chapter's title over its first page.
+ * Any tap or key turns on (← and Backspace back, ◀ bottom left, from the first page back to the contents); the corner
+ * goes back to the contents (`useInnerBack`), and the last page ends with „Nochmal“, which opens the contents again. A
+ * page whose picture isn't made yet shows a paper placeholder in its place.
  */
 export function MilkChainPlay() {
   const t = useT();
   const { id: language } = useAppLanguage();
   const translation = language === "de" ? undefined : TRANSLATIONS[language];
-  const [index, setIndex] = useState(0);
-  const indexRef = useRef(0);
+  const [index, setIndex] = useState(CONTENTS);
+  const indexRef = useRef(CONTENTS);
   const startedAt = useRef(0);
   const { effects, ripple } = useTapFeedback();
 
@@ -56,11 +67,20 @@ export function MilkChainPlay() {
     startedAt.current = performance.now();
     setIndex(next);
     // The page after this one loads while this one is read.
-    const after = MILK_CHAIN_PAGES[next + 1] && pictureOf(MILK_CHAIN_PAGES[next + 1].id);
+    const after = next >= 0 && MILK_CHAIN_PAGES[next + 1] && pictureOf(MILK_CHAIN_PAGES[next + 1].id);
     if (after) new Image().src = after;
   }, []);
 
-  useEffect(() => show(0), [show]);
+  useEffect(() => show(CONTENTS), [show]);
+
+  /** Opens a chapter from the table of contents. */
+  const open = (chapter: number) => {
+    playPageTurn(0.6);
+    show(CHAPTER_STARTS[chapter]);
+  };
+
+  // While a page is open, the corner goes back to the table of contents; there it leaves the book as always.
+  useInnerBack(index === CONTENTS ? undefined : () => show(CONTENTS));
 
   /** The next page, or ripples and a soft note where it comes too soon, and on the last page. */
   const forward = (x?: number, y?: number) => {
@@ -75,7 +95,7 @@ export function MilkChainPlay() {
   };
 
   const back = () => {
-    if (indexRef.current === 0) return;
+    if (indexRef.current === CONTENTS) return;
     playPageTurn(0.6);
     show(indexRef.current - 1);
   };
@@ -83,12 +103,70 @@ export function MilkChainPlay() {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
+      if (indexRef.current === CONTENTS) {
+        // 1–9 open their chapter, 0 the tenth; ← and Backspace have nothing before them; any other key starts at the beginning.
+        const digit = /^[0-9]$/.test(e.key) ? (Number(e.key) || 10) - 1 : undefined;
+        if (digit !== undefined && digit < MILK_CHAIN.length) open(digit);
+        else if (digit !== undefined || e.key === "ArrowLeft" || e.key === "Backspace") {
+          ripple();
+          playRandomNote();
+        } else open(0);
+        return;
+      }
       if (e.key === "ArrowLeft" || e.key === "Backspace") back();
       else forward();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   });
+
+  if (index === CONTENTS) {
+    return (
+      <div
+        className="mk-play mk-contents"
+        onPointerDown={(e: PointerEvent) => {
+          ripple(e.clientX, e.clientY);
+          playRandomNote();
+        }}
+      >
+        <h2 className="mk-contents-title">{t(MILK_CHAIN_TITLE)}</h2>
+        <ol className="mk-toc" style={{ "--mk-rows": Math.ceil(MILK_CHAIN.length / 2) } as CSSProperties}>
+          {MILK_CHAIN.map((chapter, c) => {
+            const title = translation?.chapters[chapter.id] ?? chapter.title;
+            const picture = pictureOf(chapter.pages[0].id);
+            return (
+              <li key={chapter.id}>
+                <button
+                  type="button"
+                  className="mk-toc-line"
+                  data-tap
+                  aria-label={`${t(CHAPTER).replace("{n}", String(c + 1))}: ${title}`}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    open(c);
+                  }}
+                >
+                  <span className="mk-toc-picture" aria-hidden>
+                    {picture && <img src={picture} alt="" draggable={false} decoding="async" />}
+                  </span>
+                  <span className="mk-toc-name">
+                    <span className="mk-toc-chapter">{t(CHAPTER).replace("{n}", String(c + 1))}</span>
+                    <span className="mk-toc-title">{title}</span>
+                  </span>
+                  <span className="mk-toc-dots" aria-hidden />
+                  <span className="mk-toc-page" aria-hidden>
+                    {CHAPTER_STARTS[c] + 1}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        <DevTag code="K0" id="inhalt" />
+        <FeedbackLayer effects={effects} />
+      </div>
+    );
+  }
 
   const page = MILK_CHAIN_PAGES[index];
   const where = WHERE[index];
@@ -116,7 +194,7 @@ export function MilkChainPlay() {
         <p className="mk-text">{translation?.pages[page.id] ?? page.text}</p>
       </div>
 
-      {index > 0 && !last && (
+      {!last && (
         <button
           type="button"
           className="mk-turn mk-back"
@@ -145,7 +223,7 @@ export function MilkChainPlay() {
         </button>
       )}
       {/* One story, so only „Nochmal“; small in the corners, so the last picture stays free. */}
-      {last && <GameEnd delayMs={600} onAgain={() => show(0)} corners />}
+      {last && <GameEnd delayMs={600} onAgain={() => show(CONTENTS)} corners />}
       <DevTag code={where.code} id={page.id} />
       <FeedbackLayer effects={effects} />
     </div>

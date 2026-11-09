@@ -20,8 +20,8 @@ export const SEO_ES: SeoTranslation = {
     "/": {
       title: "Juegos para niños pequeños y ayudas diarias – gratis",
       description:
-        "Juegos educativos y ayudantes del día a día para niños pequeños: láminas, emociones, letras, temporizador, dientes, orinal, premios. Sin anuncios.",
-      text: "Fun for Both es una estantería llena de libros ilustrados para jugar, para grandes y pequeños juntos: cada toque y cada tecla hace algo enseguida, nada está mal y no hay nada que leer. En los libros esperan láminas para buscar y encontrar, aventuras en movimiento, reacciones en cadena y pequeñas aventuras, emociones, letras y números, emparejar y reconocer. Y como el día con un niño pequeño tiene sus propios pequeños obstáculos, justo al lado están nuestros ayudantes del día a día: un temporizador que muestra el tiempo con imágenes, lavarse los dientes con canción, el juego del orinal, una tabla de recompensas, una rutina diaria con pictogramas y una cuenta atrás «¿Cuántas noches faltan?», en la tablet o para imprimir.",
+        "Juegos educativos y ayudantes del día a día para niños pequeños: láminas, emociones, letras, temporizador, dientes, orinal, premios, destete. Sin anuncios.",
+      text: "Fun for Both es una estantería llena de libros ilustrados para jugar, para grandes y pequeños juntos: cada toque y cada tecla hace algo enseguida, nada está mal y no hay nada que leer. En los libros esperan láminas para buscar y encontrar, aventuras en movimiento, reacciones en cadena y pequeñas aventuras, emociones, letras y números, emparejar y reconocer. Y como el día con un niño pequeño tiene sus propios pequeños obstáculos, justo al lado están nuestros ayudantes del día a día: un temporizador que muestra el tiempo con imágenes, lavarse los dientes con canción, el juego del orinal, una tabla de recompensas, una rutina diaria con pictogramas y una cuenta atrás «¿Cuántas noches faltan?», en la tablet o para imprimir, y un cuento por capítulos para el destete.",
     },
     "/spiele/lebendige-welten/": {
       title: "Láminas vivas e historias para niños pequeños",
@@ -175,16 +175,10 @@ export const SEO_ES: SeoTranslation = {
       text: "Un cuento para dejar el chupete, para jugar la noche anterior: el zorro Tapsi junta sus chupetes y los pone en una cajita en el alféizar de la ventana, o los ata a un globo que sale volando por la ventana. Luego se apaga la luz, mamá da un beso de buenas noches, y por la noche llega el hada del chupete por la ventana, brilla y cambia los chupetes por un regalo. Por la mañana, el niño despierta a Tapsi, y el regalo espera en el alféizar. Los padres eligen qué regalo es y si es la cajita o el globo, para que el cuento encaje con la despedida de verdad.",
     },
     "/abstillen/": {
-      title: "Cuento para el destete – adiós, leche de mamá",
-      description:
-        "Un cuento ilustrado para el destete de niños pequeños: el zorro Tapsi dice adiós a la leche de mamá, se pone triste, se abraza a mamá y se duerme sin mamar.",
-      text: "Un cuento ilustrado para leer en voz alta cuando la lactancia llega a su fin: el zorro Tapsi era un bebé y tomaba el pecho de mamá; ahora Tapsi es mayor, come una manzana y bebe de un vaso. Mamá le cuenta que su leche pronto se acabará, y Tapsi le dice adiós con la mano. Por la noche Tapsi quiere mamar de todos modos y se pone triste: mamá está muy cerca, abraza a Tapsi, le lee un libro y le canta una nana hasta que Tapsi se duerme. Por la mañana, mamá y papá están orgullosos. Cada toque pasa una página, y la frase de cada página aparece en pequeño debajo de la imagen para leerla en voz alta. Para un destete suave de niños pequeños, sin presión ni regaños.",
-    },
-    "/milchkette/": {
-      title: "La cadena de leche de Tapsi – destete en capítulos",
+      title: "Cuento para el destete – la cadena de leche de Tapsi",
       description:
         "Un cuento por capítulos del zorro Tapsi para un destete suave: primero se va la leche del día, luego la de la tarde, la de la noche y al final la de la mañana.",
-      text: "Un cuento largo para leer en voz alta, capítulo a capítulo, cuando la lactancia va a terminar poco a poco. El zorro Tapsi tomaba el pecho de mamá de bebé y ahora es mayor. Mamá explica por qué la leche puede irse: su pecho ha hecho leche durante mucho tiempo y quiere descansar. Sobre la cama de Tapsi cuelga una cadena con una gota de leche por cada toma, y en cada capítulo se va una: primero la del día, cuando ayudan el juego, la comida y el vaso; luego la de la tarde, cuando Tapsi se duerme con un libro y una canción; luego la de la noche, cuando papá consuela; y al final la de la mañana, con una despedida. Tapsi puede enfadarse y estar triste, y mamá y papá están cerca. Bajo cada imagen está la frase para leer.",
+      text: "Un cuento largo para leer en voz alta, capítulo a capítulo, cuando la lactancia va a terminar poco a poco. El zorro Tapsi tomaba el pecho de mamá de bebé y ahora es mayor. Mamá explica por qué la leche puede irse: su pecho ha hecho leche durante mucho tiempo y quiere descansar. Sobre la cama de Tapsi cuelga una cadena con una gota de leche por cada toma, y en cada capítulo se va una: primero la del día, cuando ayudan el juego, la comida y el vaso; luego la de la tarde, cuando Tapsi se duerme con un libro y una canción; luego la de la noche, cuando papá consuela; y al final la de la mañana, con una despedida. Tapsi puede enfadarse y estar triste, y mamá y papá están cerca. Bajo cada imagen está la frase para leer. El libro se abre por su índice: desde ahí se abre directamente cada uno de los once capítulos, y a la noche siguiente se sigue donde se dejó. Cada toque pasa una página. Para un destete suave de niños pequeños, sin presión ni regaños.",
     },
     "/bilder/baustelle/": scene(
       "Obra",

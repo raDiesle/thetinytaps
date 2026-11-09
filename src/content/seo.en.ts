@@ -19,8 +19,8 @@ export const SEO_EN: SeoTranslation = {
     "/": {
       title: "Toddler Games & Everyday Helpers – Free, No Ads",
       description:
-        "Learning games and everyday helpers for toddlers: look-and-find pictures, feelings, letters, a visual timer, tooth brushing, potty, reward chart.",
-      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognising. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print.",
+        "Learning games and everyday helpers for toddlers: look-and-find pictures, feelings, letters, a visual timer, tooth brushing, potty, reward chart, weaning.",
+      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognising. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print – and a read-aloud story in chapters for weaning.",
     },
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
@@ -169,16 +169,10 @@ export const SEO_EN: SeoTranslation = {
       text: "A story for weaning off the pacifier, to play on the evening before: Tapsi the fox gathers his pacifiers and puts them into a little box on the windowsill – or ties them to a balloon that flies out of the window. Then the light goes out, mom gives a good-night kiss, and at night the pacifier fairy comes through the window, sparkles and swaps the pacifiers for a present. In the morning the child wakes Tapsi up, and the present waits on the windowsill. Parents choose which present it is and whether it is the box or the balloon, so the story matches the real goodbye.",
     },
     "/abstillen/": {
-      title: "Weaning Story for Toddlers – Bye-bye, Mommy's Milk",
-      description:
-        "A picture story for weaning toddlers: Tapsi the fox says goodbye to mommy's milk, feels sad, cuddles with mom and falls asleep without nursing.",
-      text: "A picture story to read aloud when breastfeeding comes to an end: Tapsi the fox was a baby and drank at mom's, now Tapsi is big, eats an apple and drinks from a cup. Mom tells Tapsi that her milk will soon be all gone, and Tapsi waves it goodbye. In the evening Tapsi still wants to nurse and is sad – mom stays close, holds Tapsi tight, reads a book and sings a lullaby until Tapsi falls asleep. In the morning mom and dad are proud. Every tap turns a page, and each page's sentence stands small below the picture for reading aloud. For gentle weaning of toddlers, without pressure or scolding.",
-    },
-    "/milchkette/": {
-      title: "Tapsi's Milk Chain – Weaning in Chapters",
+      title: "Weaning Story for Toddlers – Tapsi's Milk Chain",
       description:
         "A read-aloud story in chapters for gentle weaning: first the daytime milk goes, then the evening's, the night's and last the morning's – with Tapsi the fox.",
-      text: "A longer story to read aloud, chapter by chapter, when breastfeeding is to end slowly. Tapsi the fox drank at mom's breast as a baby and is big now. Mom explains why the milk may go: her breast has made milk for so long and would like to rest. Above Tapsi's bed hangs a chain with a milk drop for every nursing time, and chapter by chapter one goes: first the daytime milk, when play, food and a cup help, then the evening's, when Tapsi falls asleep with a book and a song, then the night's, when dad comforts, and last the morning's, with a goodbye. Tapsi may be angry and sad, and mom and dad stay close. Below every picture stands the sentence to read aloud.",
+      text: "A longer story to read aloud, chapter by chapter, when breastfeeding is to end slowly. Tapsi the fox drank at mom's breast as a baby and is big now. Mom explains why the milk may go: her breast has made milk for so long and would like to rest. Above Tapsi's bed hangs a chain with a milk drop for every nursing time, and chapter by chapter one goes: first the daytime milk, when play, food and a cup help, then the evening's, when Tapsi falls asleep with a book and a song, then the night's, when dad comforts, and last the morning's, with a goodbye. Tapsi may be angry and sad, and mom and dad stay close. Below every picture stands the sentence to read aloud. The book opens on its table of contents, where each of the eleven chapters can be opened directly, so the next evening you go on where you stopped. Every tap turns a page. For gentle weaning of toddlers, without pressure or scolding.",
     },
     "/bilder/baustelle/": scene(
       "Construction Site",

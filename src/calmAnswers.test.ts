@@ -77,7 +77,6 @@ const ENDS = new Set([
   "src/games/teeth/TeethPlay.tsx", // all teeth brushed
   "src/games/timer/SwapPlay.tsx", // the clock time set for taking turns has come
   "src/games/timer/TimerPlay.tsx", // the time is up
-  "src/games/weaning/WeaningPlay.tsx", // the morning at the story's end
 ]);
 
 test("things rise only at a level's or story's end", () => {

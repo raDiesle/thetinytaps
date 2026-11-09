@@ -1,7 +1,7 @@
 /*
  * Tapsis Milchkette: the page's picture as big as the room above allows (.mk-picture-room, a size container), under it
  * what the grown-up reads (.mk-words), the chapter's title over its first page; ◀ bottom left, ▶ bottom right.
- * Nothing moves but the page changing.
+ * Nothing moves but the page changing. Before the first page, the table of contents (.mk-contents, below).
  */
 
 .mk-play {
@@ -101,4 +101,144 @@
 
 .mk-next {
   right: clamp(10px, 2vw, 26px);
+}
+
+/*
+ * The table of contents the book opens on: the story's name, then one line per chapter in two columns (the first
+ * half down the left, the rest down the right), each a round picture of its first page, its number and title, dots
+ * leading to its page number – like a picture book's contents. The lines share the room below the name, each a size
+ * container its type grows with, and the whole line is the tap.
+ */
+.mk-contents {
+  gap: clamp(4px, 1.5vh, 14px);
+  padding-inline: clamp(16px, 4vw, 64px);
+}
+
+.mk-contents-title {
+  flex: none;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 3.6vw, 40px);
+  font-weight: 700;
+  color: #5a3d52;
+}
+
+.mk-toc {
+  flex: 1 1 0;
+  min-height: 0;
+  width: min(100%, 1200px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(var(--mk-rows), minmax(0, 1fr));
+  grid-auto-flow: column;
+  gap: clamp(4px, 1.4vh, 14px) clamp(14px, 3vw, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mk-toc > li {
+  min-height: 0;
+  container-type: size;
+}
+
+.mk-toc-line {
+  display: flex;
+  align-items: center;
+  gap: min(3cqw, 14cqh);
+  width: 100%;
+  height: 100%;
+  padding: 0 min(3cqw, 18cqh) 0 min(1.2cqw, 6cqh);
+  border: none;
+  border-radius: 999px 22px 22px 999px;
+  background: linear-gradient(90deg, #f2c9a8b0, #f6dcc066 75%, #f6dcc033);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mk-toc > li:nth-child(3n + 2) .mk-toc-line {
+  background: linear-gradient(90deg, #e9c3d6b0, #f1d8e466 75%, #f1d8e433);
+}
+
+.mk-toc > li:nth-child(3n + 3) .mk-toc-line {
+  background: linear-gradient(90deg, #c9d9b8b0, #dde8d166 75%, #dde8d133);
+}
+
+.mk-toc-line:active {
+  translate: 2px 2px;
+}
+
+.mk-toc-line:focus-visible {
+  outline: 4px solid #3d3045;
+  outline-offset: 2px;
+}
+
+/* The chapter's first picture, cut round like a print pasted in. */
+.mk-toc-picture {
+  flex: none;
+  width: min(88cqh, 18cqw);
+  height: min(88cqh, 18cqw);
+  overflow: hidden;
+  border: 2px solid #3d3045;
+  border-radius: 50%;
+  background: #fffaf0;
+}
+
+.mk-toc-picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mk-toc-name {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* „Kapitel 4“, small over the title, only where the line is tall enough for both. */
+.mk-toc-chapter {
+  display: none;
+  font-size: min(17cqh, 3.2cqw);
+  line-height: 1.2;
+  color: #8a6a7a;
+}
+
+@container (min-height: 64px) {
+  .mk-toc-chapter {
+    display: block;
+  }
+}
+
+/* Up to two lines, so a long title is read whole, never cut off. */
+.mk-toc-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: min(36cqh, 4.4cqw);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.mk-toc-dots {
+  flex: 1 1 1em;
+  min-width: 1em;
+  height: 6px;
+  background: radial-gradient(circle, #3d3045a6 0 1.4px, #0000 2px) 0 50% / 11px 6px repeat-x;
+}
+
+.mk-toc-page {
+  flex: none;
+  min-width: 1.3em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: min(36cqh, 4.6cqw);
+  font-style: italic;
+  font-weight: 700;
+  text-align: end;
 }

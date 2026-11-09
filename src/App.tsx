@@ -42,8 +42,7 @@ const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
 const TogetherPage = page(() => import("@/pages/TogetherPage"), "TogetherPage", "/zusammen/");
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
-const WeaningPage = page(() => import("@/pages/WeaningPage"), "WeaningPage", "/abstillen/");
-const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/milchkette/");
+const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/");
 
 export function App() {
   // Where each way back can step back in the history (goBack.ts).
@@ -65,8 +64,7 @@ export function App() {
         <Route path="zaehne" element={<TeethPage />} />
         <Route path="toepfchen" element={<PottyPage />} />
         <Route path="schnullerfee" element={<PacifierPage />} />
-        <Route path="abstillen" element={<WeaningPage />} />
-        <Route path="milchkette" element={<MilkChainPage />} />
+        <Route path="abstillen" element={<MilkChainPage />} />
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />

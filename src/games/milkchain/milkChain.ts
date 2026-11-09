@@ -7,8 +7,8 @@
 // comes instead (a ball, a book, a star, a cup). It is plainly about Mama's breast: the word is said, and the pictures
 // show Tapsi drinking there.
 //
-// German only. Played at `/milchkette/` (`MilkChainPlay.tsx`), still being built; its pictures come from Gemini
-// (`milkChainPictures.ts`).
+// German here, the other languages in `<lang>.ts`. Played at `/abstillen/`, the book „Abstillen“ among the Alltagshelfer
+// (`MilkChainPlay.tsx`); its pictures come from Gemini (`milkChainPictures.ts`).
 
 /** A step of gentle weaning as the guides give it, in their order; each has a chapter of its own. */
 export type WeaningStep = "vorbereiten" | "nicht-anbieten" | "hinauszoegern" | "ersetzen" | "einschlafen" | "nacht" | "abschied" | "begleiten";
@@ -28,7 +28,7 @@ export const GENTLE_STEPS: { id: WeaningStep; title: string; what: string }[] = 
 /** A milk time on the chain, in the order they go. */
 export type MilkTime = "tag" | "abend" | "nacht" | "morgen";
 
-/** The order the milk times go in: the day first, then falling asleep, the night, and the morning's milk last (checked in `weaning.test.ts`). */
+/** The order the milk times go in: the day first, then falling asleep, the night, and the morning's milk last (checked in `milkchain.test.ts`). */
 export const MILK_ORDER: MilkTime[] = ["tag", "abend", "nacht", "morgen"];
 
 /** Where a page plays: every place keeps its look from its first picture on (`milkChainPictures.ts`). */
@@ -44,7 +44,7 @@ export type Light = "tag" | "abend" | "nacht" | "morgen";
 export interface ChainPage {
   /** Unique in the story, also the picture's file name (`bilder/kette-<id>.webp`). */
   id: string;
-  /** What is read aloud, German, present tense, short (checked in `weaning.test.ts`). */
+  /** What is read aloud, German, present tense, short (checked in `milkchain.test.ts`). */
   text: string;
   place: Place;
   light: Light;
