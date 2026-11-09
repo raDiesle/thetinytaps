@@ -1,7 +1,5 @@
 import { type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
 import { useInnerBack } from "@/components/GameShell";
-import { pagesBetween } from "@/content/games";
 import { useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { finishRoutineStep } from "@/lib/routine";
@@ -23,7 +21,7 @@ import {
   withMood,
 } from "./mood";
 import { MoodGroups, usePickKeys } from "./moodGroups";
-import { NEEDS_HREF, NEEDS_TITLE, type NeedsVisit } from "./needs";
+import { NEEDS_TITLE } from "./needs";
 import type { FeelingsSettings } from "./settings";
 import { ChoiceCard, useVoice } from "./shared";
 
@@ -37,7 +35,7 @@ const cardImage = (mood: Mood) => moodImages.feeling(mood.id);
  * The corner in the top left goes back to all feelings (`useInnerBack`). In the evening the card picked this morning
  * says so under it (C-33). Copying the faces and what helps are games of their own (user feedback, November 2026).
  */
-export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
+export function MoodPlay({ settings, onNeeds }: { settings: FeelingsSettings; onNeeds: () => void }) {
   const [mood, setMood] = useState<Mood>();
   const { say, preload } = useVoice(settings);
   const t = useT();
@@ -85,7 +83,7 @@ export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
     />
   );
 
-  return <main className="mood-play">{mood ? <Strengths key={mood.id} mood={mood} say={say} /> : <MoodGroups card={card} />}</main>;
+  return <main className="mood-play">{mood ? <Strengths key={mood.id} mood={mood} say={say} onNeeds={onNeeds} /> : <MoodGroups card={card} />}</main>;
 }
 
 /**
@@ -93,7 +91,7 @@ export function MoodPlay({ settings }: { settings: FeelingsSettings }) {
  * (C-36; user wish, November 2026: pictures, no slider), side by side over a band from thin to thick. A tap on one
  * says how strong it is with a note, higher the stronger; the others go pale, and a tap on another changes it.
  */
-function Strengths({ mood, say }: { mood: Mood; say: (text: string) => void }) {
+function Strengths({ mood, say, onNeeds }: { mood: Mood; say: (text: string) => void; onNeeds: () => void }) {
   const t = useT();
   const [picked, setPicked] = useState<Strength>();
 
@@ -150,7 +148,7 @@ function Strengths({ mood, say }: { mood: Mood; say: (text: string) => void }) {
       <svg className="mood-band" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden>
         <path d="M6 22 L394 4 Q398 20 394 36 L6 26 Z" />
       </svg>
-      <NeedsLink />
+      <NeedsLink onNeeds={onNeeds} />
     </div>
   );
 }
@@ -158,17 +156,15 @@ function Strengths({ mood, say }: { mood: Mood; say: (text: string) => void }) {
 /**
  * On to „Was brauche ich?“ once a feeling is picked (user wish, November 2026): what helps with it is the next thing to
  * ask. A paper slip with the hug's picture and the game's name, in the bottom right corner – never the middle of the
- * bottom edge, where browsers show how to leave fullscreen. A page turns forward to it, and its way back comes here.
+ * bottom edge, where browsers show how to leave fullscreen. A page turns forward to it (the same game, its other card,
+ * `MoodGame`); ✕ there goes back to the sub-menu.
  */
-function NeedsLink() {
+function NeedsLink({ onNeeds }: { onNeeds: () => void }) {
   const t = useT();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
   const picture = imageFor(moodImages.need("kuscheln"));
   const go = (e: PointerEvent) => {
     e.stopPropagation();
-    const visit: NeedsVisit = { from: pathname };
-    turnPageWith("forward", () => navigate(NEEDS_HREF, { state: visit }), pagesBetween(pathname, NEEDS_HREF));
+    turnPageWith("forward", onNeeds);
   };
   return (
     <button type="button" className="mood-needs-link" data-tap onPointerDown={go}>

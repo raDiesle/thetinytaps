@@ -276,7 +276,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/wie-gehts-dir/",
-    note: "Eigenes Spiel im Buch „Gefühle“ (4. November 2026), seit dem 6. November 2026 nur noch die Gefühlskarten und „Wie doll ist es?“ mit drei Bildern; teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
+    note: "Im Buch „Gefühle“ (4. November 2026); seit dem 6. November 2026 die Gefühlskarten und „Wie doll ist es?“ mit drei Bildern. Seit 9. November 2026 ist „Was brauche ich?“ die zweite Karte seiner Startseite (ein Untermenü, früher ein eigenes Spiel); dessen Zeilen stehen unten. Teilt die Aufnahmen (stimme/) mit „Alltagssituationen“.",
     parts: [
       {
         label: "Frage „Wie geht's dir heute?“",
@@ -300,12 +300,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Neu (6. November 2026): die kleinen Namen über den beiden Gruppen für Erwachsene (PLEASANT, UNPLEASANT in mood.ts), übersetzt am 7. November 2026.",
       },
-    ],
-  },
-  {
-    href: "/was-brauche-ich/",
-    note: "Eigenes Spiel im Buch „Gefühle“ seit dem 6. November 2026 (vorher „Was hilft dir jetzt?“ in „Wie geht's dir?“, C-31).",
-    parts: [
       {
         label: "Name und Zeile für Erwachsene",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },

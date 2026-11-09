@@ -263,12 +263,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         state: "done",
         note: "Wunsch vom 6. November 2026, gemacht am selben Tag (gefuehl-…-wenig, gefuehl-…-doll).",
       },
-    ],
-  },
-  {
-    href: "/was-brauche-ich/",
-    note: "Der kleine Bär tut, was er gerade braucht; ein Erwachsener nur dort, wo es dazugehört (in den Arm nehmen), angezogen.",
-    tasks: [
       {
         label: "Der kleine Bär in T-Shirt und Hose tut, was er braucht (kuscheln, allein sein, toben, trinken, essen, ausruhen, Lied)",
         work: "picture",

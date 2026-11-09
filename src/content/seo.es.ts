@@ -69,12 +69,6 @@ export const SEO_ES: SeoTranslation = {
       description: "Alegría, orgullo, cansancio o enojo: el niño toca la imagen que va con su emoción y muestra con qué fuerza la siente ahora. Sin anuncios.",
       text: "Ocho emociones en dos grupos, las agradables y las desagradables, cada una con el osito en un momento que los niños conocen. El niño toca su emoción, luego tres imágenes muestran la misma emoción un poco, bastante y muchísimo, y el niño elige con qué fuerza la siente ahora. Desde ahí se sigue a «¿Qué necesito?». Un comienzo para hablar de emociones.",
     },
-    "/was-brauche-ich/": {
-      title: "¿Qué necesito? Necesidades para niños pequeños",
-      description:
-        "Un abrazo, estar a solas, correr, soplar, beber algo o descansar: el niño muestra con una imagen lo que le sienta bien ahora. Sin anuncios.",
-      text: "Cuando una emoción es grande, ayuda saber qué se necesita. El niño toca una imagen –un abrazo, estar a solas, correr y saltar, zapatear y soplar, beber, comer algo, descansar o una canción– y los padres ven qué le sienta bien ahora.",
-    },
     "/kettenreaktion/": {
       title: "Reacción en cadena y circuito de canicas",
       description:

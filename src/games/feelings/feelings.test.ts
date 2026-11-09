@@ -10,7 +10,7 @@ import { SITUATIONS, type SituationId } from "./kita";
 import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { asCaption, MOODS, morningMood, STRENGTH_ANSWERS, STRENGTHS, withMood } from "./mood";
 import { MOOD_PICTURE_QUEUE } from "./moodPictures";
-import { NEEDS, needsCameFrom } from "./needs";
+import { NEEDS } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
@@ -506,10 +506,13 @@ test("the morning's feeling is marked beside its caption, never in it", () => {
   expect(play).not.toMatch(/caption=\{[^}]*THIS_MORNING/);
 });
 
-// „Wie geht's dir?“ leads on to „Was brauche ich?“, whose way back comes to it again (user wish, November 2026).
-test("a feeling's screen links to „Was brauche ich?“, and only it is gone back to from there", () => {
-  expect(readFileSync("src/games/feelings/MoodPlay.tsx", "utf8")).toContain("<NeedsLink />");
-  expect(needsCameFrom({ from: "/wie-gehts-dir/" })).toBe("/wie-gehts-dir/");
-  expect(needsCameFrom({ from: "//elsewhere.example/" })).toBeUndefined();
-  expect(needsCameFrom(null)).toBeUndefined();
+// „Wie geht's dir?“ and „Was brauche ich?“ are one game (user wish, November 2026): its start screen offers both as cards,
+// and the feeling's screen turns a page on to the needs, which stay in the same game.
+test("„Wie geht's dir?“ starts with a sub-menu of both games, and the feeling's screen links to the needs", () => {
+  const game = readFileSync("src/games/feelings/MoodGame.tsx", "utf8");
+  expect(game).toContain("modes={modes}");
+  expect(game).toContain("<NeedsPlay settings={settings} />");
+  expect(game).toContain("<MoodPlay settings={settings} onNeeds=");
+  expect(readFileSync("src/games/feelings/MoodPlay.tsx", "utf8")).toContain("<NeedsLink onNeeds={onNeeds} />");
+  expect(readFileSync("src/games/feelings/MoodPlay.tsx", "utf8")).toContain('turnPageWith("forward", onNeeds)');
 });

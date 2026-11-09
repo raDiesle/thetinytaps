@@ -1,13 +1,16 @@
 # Gefühle
 
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
-`cover-gefuehle.webp`; user decision, November 2026) with three games; the names of the translated ones are in
-`names.ts`, „Was brauche ich?“ in its own file (`needs.ts`), so each language row reads its own.
-In its table of contents „Alltagssituationen“ stands first, then „Wie geht's dir?“ and „Was brauche ich?“ (user wish,
-November 2026; the order of `games` in `games.ts`). Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
+`cover-gefuehle.webp`; user decision, November 2026) with two games (9 November 2026: „Wie geht's dir?“ holds „Was brauche ich?“ as its second card); the names of the translated
+ones are in `names.ts`, „Was brauche ich?“ in its own file (`needs.ts`), so each language row reads its own.
+In its table of contents „Alltagssituationen“ stands first, then „Wie geht's dir?“ (user wish, November 2026; the order of
+`games` in `games.ts`). „Was brauche ich?“ is no game of its own in the book any more (9 November 2026, below). Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
 area C. The first two are small games of their own, each doing one thing (user feedback, November 2026: copying faces and
 what helps were steps of „Wie geht's dir?“ and became games of their own; „Gefühle nachmachen“ was then removed, see below):
-- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`) plays at once:
+- **„Wie geht's dir?“** (`/wie-gehts-dir/`, `MoodGame.tsx`, `MoodPlay.tsx`, `mood.ts`, `moodArt.tsx`). Its start screen is a
+  small sub-menu of two cards, „Wie geht's dir?“ and „Was brauche ich?“ (`GameShell` `modes`, `MoodGame.tsx`); the card picked
+  plays, and ✕ goes back to the sub-menu. A routine's card (the Tagesplan, `{ returnTo }`) plays the feeling at once. The
+  feeling part:
   1. Eight cards of feelings (`MOODS`: fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich – C-29) in
      two groups (`MoodGroups`, `moodGroups.tsx`): the pleasant ones on a warm yellow panel, the unpleasant ones on a cool
      blue-grey one, each named small for grown-ups („Angenehme / Unangenehme Gefühle“), side by side on wide screens and
@@ -20,8 +23,8 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
      draw them in `bilder/README.md`, „Wie doll ist es?“). A tap on one (digits, arrows, any other key steps on and back) plays a note, higher the
      stronger, and the voice says „Ein bisschen.“, „Schon ziemlich.“ or „Ganz doll!“; the other two go pale (by filter)
      and stay tappable to change it. In the bottom right corner a paper slip with the hug's round picture leads on to
-     „Was brauche ich?“ (`NeedsLink`, user wish, November 2026), turning a page forward; it passes `{ from }` in the
-     router state, so that game's ✕ comes back here (`needsCameFrom`, its `leaveTo`) – the screen seen before. Under the row a still band from thin to thick in the group's colour tells grown-ups
+     „Was brauche ich?“ (`NeedsLink`, user wish, November 2026): a page turns forward and the same game shows its
+     other card (`onNeeds`); ✕ there goes back to the sub-menu. Under the row a still band from thin to thick in the group's colour tells grown-ups
      the direction; upright the three stand one above the other without it. Captions are the answers without their
      marks (`asCaption`). It was a slider with a drawn bear (`FeelingBear`, removed 6 November 2026): the user wanted
      pictures, and three steps a child tells apart at a glance rather than five that differ little.
@@ -47,7 +50,8 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
 - **„Gefühle nachmachen“ was removed** (C-35, user decision, 6 November 2026): the little bear's faces to copy in a
   mirror. Its drawings stay to be used again for something else: each feeling's face (`Mood.face`) drawn big by
   `BigFace` (`moodArt.tsx`, the shared `MascotHead`). Don't delete them as unused.
-- **„Was brauche ich?“** (`/was-brauche-ich/`, `NeedsGame.tsx`, `NeedsPlay.tsx`, `needs.ts`, C-31): cards of what the
+- **„Was brauche ich?“** (`NeedsPlay.tsx`, `needs.ts`, C-31; the second card of „Wie geht's dir?“ since 9 November 2026, its
+  old address `/was-brauche-ich/` leads there): cards of what the
   child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
   ausruhen, ein Lied) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
   ist es?“, and stay tappable to change it) and its line says it does good, so the grown-up sees what the child needs.

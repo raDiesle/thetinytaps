@@ -1,5 +1,4 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
-import { NEEDS_BLURB, NEEDS_TITLE } from "@/games/feelings/needs";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
@@ -311,8 +310,8 @@ export const CATEGORIES: Category[] = [
     blurb: BOOK_BLURB,
     games: [
       { href: "/gefuehle/", emoji: "🐻", title: ALLTAG_TITLE, blurb: ALLTAG_BLURB },
+      // „Wie geht's dir?“ holds both: its start screen offers „Was brauche ich?“ as its second card.
       { href: "/wie-gehts-dir/", emoji: "😊", title: MOOD_TITLE, blurb: MOOD_BLURB },
-      { href: "/was-brauche-ich/", emoji: "🤗", title: NEEDS_TITLE, blurb: NEEDS_BLURB },
     ],
   },
   {

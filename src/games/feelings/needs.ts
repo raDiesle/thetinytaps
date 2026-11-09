@@ -43,20 +43,6 @@ export const CALM_DONE: Localized = {
 /** What a child may need now; each has its card. */
 export type NeedId = "kuscheln" | "allein" | "toben" | "pusten" | "trinken" | "essen" | "ausruhen" | "lied";
 
-/** Its address. */
-export const NEEDS_HREF = "/was-brauche-ich/";
-
-/** The address of „Wie geht's dir?“, whose feeling screen links here and whose way back comes from here. */
-export const MOOD_HREF = "/wie-gehts-dir/";
-
-/** The router state „Wie geht's dir?“ passes when it opens this game: the page its way back leads to. */
-export interface NeedsVisit {
-  from: string;
-}
-
-/** Where this game's way back leads when „Wie geht's dir?“ opened it; none when opened from the book. */
-export const needsCameFrom = (state: unknown): string | undefined => ((state as Partial<NeedsVisit> | null)?.from === MOOD_HREF ? MOOD_HREF : undefined);
-
 /** The game's name (C-31, a game of its own since November 2026). */
 export const NEEDS_TITLE: Localized = {
   de: "Was brauche ich?",

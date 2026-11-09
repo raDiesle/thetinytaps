@@ -197,7 +197,8 @@ export const SCENARIOS: Scenario[] = [
     name: "wie-gehts-dir",
     path: "/wie-gehts-dir/",
     parts: [
-      { label: "Gefühl wählen", before: [{ wait: 1500 }], ms: 4000, tap: TAPS },
+      // The start screen's first card „Wie geht's dir?“ (the second is „Was brauche ich?“).
+      { label: "Gefühl wählen", before: [{ wait: 1500 }, { tap: ".mode-picker li:nth-child(1) button" }, { wait: 1500 }], ms: 4000, tap: TAPS },
       {
         label: "Wie doll",
         // The taps before left a feeling open, or went on to „Was brauche ich?“ by its link: the page starts again at
@@ -208,6 +209,7 @@ export const SCENARIOS: Scenario[] = [
           { wait: 4000 },
           { tap: ".screen-hint-button", optional: true },
           { wait: 500 },
+          { waitFor: ".mode-picker li:nth-child(1) button" }, { tap: ".mode-picker li:nth-child(1) button" }, { wait: 1500 },
           { waitFor: '.fg-card[aria-label="Wütend"]' }, { wait: 1500 }, { tap: '.fg-card[aria-label="Wütend"]' }, { waitFor: ".mood-strengths" }, { wait: 1500 }],
         ms: 8000,
         // The arrows pick a weaker or stronger picture, the other two going pale.
@@ -219,11 +221,22 @@ export const SCENARIOS: Scenario[] = [
   // the two slow breaths are said (the breath's circle round a big face is gone, November 2026).
   {
     name: "was-brauche-ich-pusten",
-    path: "/was-brauche-ich/",
+    path: "/wie-gehts-dir/",
     parts: [
       {
         label: "Stampfen und pusten",
-        before: [{ wait: 1500 }, { waitFor: '.fg-card[aria-label="Stampfen und pusten"]' }, { tap: '.fg-card[aria-label="Stampfen und pusten"]' }],
+        // The start screen's second card „Was brauche ich?“ first, then its card.
+        before: [
+          { eval: "location.assign('/wie-gehts-dir/')" },
+          { wait: 4000 },
+          { tap: ".screen-hint-button", optional: true },
+          { wait: 500 },
+          { waitFor: ".mode-picker li:nth-child(2) button" },
+          { tap: ".mode-picker li:nth-child(2) button" },
+          { wait: 1500 },
+          { waitFor: '.fg-card[aria-label="Stampfen und pusten"]' },
+          { tap: '.fg-card[aria-label="Stampfen und pusten"]' },
+        ],
         ms: 6000,
       },
     ],
