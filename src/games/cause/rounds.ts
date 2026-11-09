@@ -4,7 +4,10 @@
 import type { MascotKind, MascotMouth } from "@/components/Mascot";
 import type { Localized } from "@/lib/language";
 
-/** One picture of what happened: an emoji, and what it is for grown-ups (read out with it, never shown). */
+/**
+ * One picture of what happened: an emoji (a placeholder until its Gemini picture is made), and its question for
+ * grown-ups, shown small under it and read out, which they can ask the child for that picture.
+ */
 export interface CauseOption {
   id: string;
   emoji: string;
@@ -32,8 +35,8 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "fox",
     before: "frown",
     options: [
-      { id: "ballon", emoji: "🎈", label: { de: "Der Luftballon ist weggeflogen" }, fits: true },
-      { id: "eis", emoji: "🍦", label: { de: "Es gibt ein Eis" }, fits: false },
+      { id: "ballon", emoji: "🎈", label: { de: "Fliegt der Luftballon weg?" }, fits: true },
+      { id: "eis", emoji: "🍦", label: { de: "Gibt es ein Eis?" }, fits: false },
     ],
   },
   {
@@ -41,8 +44,8 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "bear",
     before: "grin",
     options: [
-      { id: "oma", emoji: "👵", label: { de: "Oma kommt zu Besuch" }, fits: true },
-      { id: "regen", emoji: "🌧️", label: { de: "Es regnet" }, fits: false },
+      { id: "oma", emoji: "👵", label: { de: "Kommt Oma zu Besuch?" }, fits: true },
+      { id: "regen", emoji: "🌧️", label: { de: "Regnet es?" }, fits: false },
     ],
   },
   {
@@ -50,8 +53,8 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "bear",
     before: "frown",
     options: [
-      { id: "schaufel", emoji: "✋🪏", label: { de: "Jemand nimmt ihm die Schaufel weg" }, fits: true },
-      { id: "rutschen", emoji: "🛝", label: { de: "Es darf rutschen" }, fits: false },
+      { id: "schaufel", emoji: "✋🪏", label: { de: "Nimmt jemand die Schaufel weg?" }, fits: true },
+      { id: "rutschen", emoji: "🛝", label: { de: "Darf es rutschen?" }, fits: false },
     ],
   },
   {
@@ -59,8 +62,8 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "fox",
     before: "o",
     options: [
-      { id: "hund", emoji: "🐕", label: { de: "Ein Hund bellt laut" }, fits: true },
-      { id: "schmetterling", emoji: "🦋", label: { de: "Ein Schmetterling landet" }, fits: false },
+      { id: "hund", emoji: "🐕", label: { de: "Bellt ein Hund laut?" }, fits: true },
+      { id: "schmetterling", emoji: "🦋", label: { de: "Landet ein Schmetterling?" }, fits: false },
     ],
   },
 ];

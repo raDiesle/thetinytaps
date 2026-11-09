@@ -5,15 +5,14 @@ game of the book „Gefühle“ (after „Alltagssituationen“, „Wie geht's d
 with its grown-up beside it) shows a feeling in its face; two pictures show what happened. The right one lets the face
 change (crying → smiling, the grown-up claps), then the next round comes. A wrong one only makes the child shake its head
 gently. **Still being built** (`unfinished` in `games.ts`, user feedback, November 2026: trying it, the user didn't
-understand it): it stands neither in the book nor in search results, only under „🚧 In Arbeit“ on `/management/`, with
-its help text (`CAUSE_HELP` in `names.ts`, shown there as `Game.help`). Before publishing it, it must explain itself by
+understand it): it stands neither in the book nor in search results, only under „🚧 In Arbeit“ on `/management/`. Before publishing it, it must explain itself by
 playing: a feeling plain beyond the mouth (sad and angry are both `frown` now), causes shown as pictures made with
-Gemini (`/bild-erzeugen`) from each round's text instead of emojis, many more rounds than four, and the cause played out – then drop the mark, delete the help, and name the game again in the book's
+Gemini (`/bild-erzeugen`) from each round's text instead of emojis, many more rounds than four, and the cause played out – then drop the mark and name the game again in the book's
 search texts (`/spiele/gefuehle/`, all seven languages). Four rounds, then the shared end (`GameEnd`, „Nochmal“). Plays at once, no start screen, no settings, silent:
 no voice, only the sounds of a tap (`playTwinkle`, `playPlop`).
 - `CauseGame.tsx` – the start screen (`GameShell startMode="play"`).
 - `CausePlay.tsx` – the rounds, taps, keys (digits pick, any other key one at random), the timer to the next round.
-- `rounds.ts` – the rounds and their pictures (still emojis, to be replaced; the `label` is for grown-ups and read out only).
+- `rounds.ts` – the rounds and their pictures (still emojis, to be replaced), each with its question (`label`).
 - `names.ts` – the name and line, German only (the language row in `languageStatus.ts` says so).
 - `cause.css` – classes prefixed `cause-`.
 
@@ -24,5 +23,9 @@ Rules of this game:
   picture queue), showing the scene – the balloon flying off from the child's paw, the dog barking at it – never an
   emoji or two side by side (`✋🪏`). The emojis there now are placeholders until those pictures are made; a new round
   comes with its picture's prompt, never with an emoji. No text in the pictures.
+- **Under each picture stands its question for grown-ups** (`label`, user feedback, November 2026: „nur
+  Beschreibungstext unter die Bilder, die der Erwachsene für jedes Bild lesen kann als Frage“): small and quiet, present
+  tense, ending in „?“ („Fliegt der Luftballon weg?“, `cause.test.ts`), so a grown-up asks it the child picture by
+  picture. That is the game's only help: no help text on the management page or elsewhere.
 - Many rounds, not four (user plan, November 2026): the game gets many more scenes, written first as text, then drawn.
 - The head shake is on the HTML layer round the child's svg (`.cause-no`), never inside the svg.

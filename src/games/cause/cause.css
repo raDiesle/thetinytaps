@@ -69,9 +69,22 @@
   justify-content: center;
 }
 
+/* A picture with its question under it. */
+.cause-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  transition: opacity 0.4s linear;
+}
+
+.cause-choice.pale {
+  opacity: 0.4;
+}
+
 .cause-option {
-  width: min(38vh, 34vw);
-  height: min(38vh, 34vw);
+  width: min(34vh, 34vw);
+  height: min(34vh, 34vw);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,19 +93,24 @@
   box-shadow: 0 2px 0 rgba(74, 44, 51, 0.15);
   cursor: pointer;
   touch-action: manipulation;
-  transition: opacity 0.4s linear;
-}
-
-.cause-option.pale {
-  opacity: 0.4;
 }
 
 .cause-option.chosen {
   box-shadow: 0 0 0 4px #ffd43b;
 }
 
+/* Its question for grown-ups, small and quiet, as wide as the picture: they ask it the child for that picture. */
+.cause-name {
+  max-width: min(34vh, 34vw);
+  color: #4a2c33;
+  font-size: max(13px, 2.2vh);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+}
+
 .cause-emoji {
-  font-size: min(24vh, 20vw);
+  font-size: min(22vh, 20vw);
   line-height: 1;
 }
 

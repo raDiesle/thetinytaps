@@ -95,17 +95,21 @@ export function CausePlay() {
       </div>
       <div className="cause-options">
         {current.options.map((option) => (
-          <div
-            key={option.id}
-            className={`cause-option${solved && picked !== option.id ? " pale" : ""}${picked === option.id ? " chosen" : ""}`}
-            role="button"
-            tabIndex={0}
-            aria-label={t(option.label)}
-            data-tap={tapState({ goal: option.fits })}
-            onPointerDown={(e) => pick(option, e.clientX, e.clientY)}
-          >
-            <span className="cause-emoji" aria-hidden="true">
-              {option.emoji}
+          <div key={option.id} className={`cause-choice${solved && picked !== option.id ? " pale" : ""}`}>
+            <div
+              className={`cause-option${picked === option.id ? " chosen" : ""}`}
+              role="button"
+              tabIndex={0}
+              aria-label={t(option.label)}
+              data-tap={tapState({ goal: option.fits })}
+              onPointerDown={(e) => pick(option, e.clientX, e.clientY)}
+            >
+              <span className="cause-emoji" aria-hidden="true">
+                {option.emoji}
+              </span>
+            </div>
+            <span className="cause-name" aria-hidden="true">
+              {t(option.label)}
             </span>
           </div>
         ))}

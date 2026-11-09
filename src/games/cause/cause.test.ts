@@ -9,14 +9,15 @@ describe("Was ist passiert?", () => {
     }
   });
 
-  test("round and picture ids are unique, and every picture has an emoji and a German line for grown-ups", () => {
+  test("round and picture ids are unique, and every picture has an emoji and a German question for grown-ups", () => {
     const roundIds = CAUSE_ROUNDS.map((r) => r.id);
     expect(new Set(roundIds).size).toBe(roundIds.length);
     const optionIds = CAUSE_ROUNDS.flatMap((r) => r.options.map((o) => o.id));
     expect(new Set(optionIds).size).toBe(optionIds.length);
     for (const option of CAUSE_ROUNDS.flatMap((r) => r.options)) {
       expect(option.emoji.trim().length).toBeGreaterThan(0);
-      expect(option.label.de.trim().length).toBeGreaterThan(0);
+      // Shown under its picture as the question a grown-up asks the child for it (user feedback, November 2026).
+      expect(option.label.de, option.id).toMatch(/\S\?$/);
     }
   });
 });
