@@ -14,6 +14,9 @@
   --ocean: #4cc9f0;
   --outline: 4px solid var(--ink);
   --lift: 0 8px 0 var(--ink);
+  /* The words for grown-ups under a picture (a story's sentence, Gefühle's caption): small, since only grown-ups
+     read them, and the same size in every game – set in the rounded face, weight 600, in ink. */
+  --caption-size: clamp(0.85rem, 2.1vh, 1.1rem);
 }
 
 /* The girl's family of colours (👧 on the home page, `data-figure` from src/lib/common.ts): a warm lilac sky

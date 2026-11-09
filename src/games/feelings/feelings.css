@@ -317,7 +317,7 @@
   right: 0;
   height: var(--caption-h);
   padding-top: 0.8rem;
-  font-size: clamp(0.85rem, 2.1vh, 1.1rem);
+  font-size: var(--caption-size);
 }
 
 /* Low or wide screens: on the lower edge of the picture or card, small, on a pale band. */

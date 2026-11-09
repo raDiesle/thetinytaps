@@ -18,7 +18,7 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   line per chapter in two columns – a round cut of its first picture, „Kapitel n“ and its title, dots, its page number;
   a tap (or its number key) opens it. Then one page per tap or key (← and Backspace back, ◀ for the grown-up, from the
   first page back to the contents), the picture as big as the room allows, under it the chapter's title on its first
-  page and the sentence to read aloud; a paper placeholder where a picture isn't made yet; `GameEnd` small in the
+  page and the sentence to read aloud, small and decorated; a paper placeholder where a picture isn't made yet; `GameEnd` small in the
   corners on the last page, „Nochmal“ opening the contents; `DevTag` `K<chapter>-<page>`.
 - `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
   (user request, 9 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with `byLanguage`.
@@ -53,6 +53,12 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   Arabic with „let's“ instead of an imperative, Spanish without adjectives about Tapsi that change with gender.
 - The sentence under the picture is for the grown-up; the child follows the pictures. No voice and no browser voice:
   a grown-up reads it.
+- **The picture as big as the screen allows, the words small under it** (user feedback, November 2026: the picture was
+  small and the sentence big): the sentence is set like Gefühle's day pages (the book's serif, its first letter big and
+  red) at `--caption-size`, between two curled flourishes, always in the room of the chapter's line and two lines so the
+  picture keeps its size from page to page. No room is kept under the ✕'s corner: the picture stands in the middle, and
+  the sides kept free for ◀ and ▶ keep it clear of the corner (keeping `--corner-clear` above it cost a sixth of the
+  height on a phone). Look at 844×390, 1024×768 and 1280×720.
 - Pictures (`/bild-erzeugen`): each place's first picture (`FIRST`) is drawn from the fox family
   (`buch-fuechse.webp`), every other page there from that first picture as its only ref, so the room stays; full bleed,
   never a white margin or rounded corners (two first pictures came back so and were drawn again). Every page drawn from a first

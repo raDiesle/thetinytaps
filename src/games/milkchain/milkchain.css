@@ -10,8 +10,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(6px, 1.5vh, 14px);
-  padding: calc(clamp(8px, 2vh, 18px) + var(--corner-clear, 0px)) clamp(64px, 9vw, 120px) clamp(10px, 2.5vh, 22px);
+  gap: clamp(4px, 1.2vh, 12px);
+  /* No room kept under the ✕'s corner: the picture stands in the middle, and the sides (kept free for ◀ and ▶) keep it
+     clear of the corner and the fullscreen note, so the picture gets the whole height. */
+  padding: clamp(6px, 1.6vh, 16px) max(clamp(64px, 9vw, 120px), var(--corner-clear, 0px)) clamp(6px, 1.6vh, 16px);
   background: #fbf3e2;
   color: #3d3045;
   user-select: none;
@@ -61,23 +63,78 @@
   font-family: ui-monospace, monospace;
 }
 
+/*
+ * What the grown-up reads, small, since the child follows the pictures: set like Gefühle's pages of a day's story
+ * (`.fg-day-text`) – the book's serif, its first letter big and red – at the size of every caption for grown-ups
+ * (`--caption-size`), between two curled flourishes like a picture book's. Always the room of the chapter's line and two
+ * lines of text, so the picture keeps its size from page to page.
+ */
 .mk-words {
   flex: none;
-  max-width: 62ch;
+  display: grid;
+  grid-template-columns: auto fit-content(44em) auto;
+  align-items: center;
+  column-gap: 0.7em;
+  max-width: 100%;
+  font-size: var(--caption-size);
+}
+
+.mk-words::before,
+.mk-words::after {
+  content: "";
+  width: 4em;
+  height: 1.3em;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 22'%3E%3Cg fill='none' stroke='%23b0879c' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M66 11H24c-7 0-11 5-16 3.5S2 8 6.5 5.5 13 8 11 11.5'/%3E%3Cpath d='M40 11c-3-4-8-6-12-5 2 4 7 5.5 12 5z' fill='%23b0879c' fill-opacity='.3'/%3E%3Cpath d='M50 11c3 3.5 7.5 5 11 4-1.5-3.5-6-5-11-4z' fill='%23b0879c' fill-opacity='.3'/%3E%3C/g%3E%3Ccircle cx='31' cy='15.5' r='1.6' fill='%23e0907f'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* The right one mirrored, its curl outwards too. */
+.mk-words::after {
+  scale: -1 1;
+}
+
+/* Laid out left to right in every language, so each curl stays outside; Arabic text inside still runs right to left. */
+.mk-words {
+  direction: ltr;
+}
+
+:root[lang="ar"] .mk-words-inner {
+  direction: rtl;
+}
+
+.mk-words-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 4.1em;
   text-align: center;
 }
 
 .mk-chapter {
-  margin: 0 0 0.2em;
-  font-size: clamp(13px, 1.8vw, 18px);
-  font-weight: 600;
+  margin: 0 0 0.15em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.85em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
   color: #8a6a7a;
 }
 
 .mk-text {
   margin: 0;
-  font-size: clamp(16px, 2.4vw, 26px);
-  line-height: 1.3;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1em;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.mk-text::first-letter {
+  color: var(--tomato, #e8553f);
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .mk-turn {

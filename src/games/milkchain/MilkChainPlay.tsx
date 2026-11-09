@@ -186,12 +186,14 @@ export function MilkChainPlay() {
         )}
       </div>
       <div className="mk-words">
-        {where.first && (
-          <h2 className="mk-chapter">
-            {t(CHAPTER).replace("{n}", String(where.number))}: {translation?.chapters[where.chapter.id] ?? where.chapter.title}
-          </h2>
-        )}
-        <p className="mk-text">{translation?.pages[page.id] ?? page.text}</p>
+        <div className="mk-words-inner">
+          {where.first && (
+            <h2 className="mk-chapter">
+              {t(CHAPTER).replace("{n}", String(where.number))}: {translation?.chapters[where.chapter.id] ?? where.chapter.title}
+            </h2>
+          )}
+          <p className="mk-text">{translation?.pages[page.id] ?? page.text}</p>
+        </div>
       </div>
 
       {!last && (
