@@ -178,6 +178,11 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 - The main picture is as big as the room allows: the picture's share of the height is `flex: 1.75` on a computer and
   `1.6` on a phone on its side (`together.css`); a smaller box is a fault to report, not a setting to add.
 - The ⚙️ of this game is the gear alone (`PlayOptions iconOnly`), its name read out only. Other games keep the label.
+- The caption under the picture is a full sentence (user request, November 2026): the pair's wish, then a question about
+  what is needed („… Was werfen wir in den gelben Postkasten?“). It is the `caption` field of each pair in every
+  language (`captions.ts` for German), shown but never spoken, so the recordings of the wish stay valid. It never names
+  the partner nor a word holding it, ends with „?“, and stays within 120 characters so it fits two lines. Every pair
+  has one in all six other languages too (`content.test.ts` checks).
 
 ## Languages
 

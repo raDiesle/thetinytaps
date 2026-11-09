@@ -12,6 +12,7 @@ export const ARABIC: TogetherTranslation = {
     question: "هيّا نغسل أسناننا.",
     right: "معجون الأسنان يناسب فرشاة الأسنان. رائع!",
     belongs: "معجون الأسنان يناسب فرشاة الأسنان!",
+    caption: "هيّا نغسل أسناننا. ماذا نضع على الفرشاة لذلك؟",
   },
   tuer: {
     name: "باب",
@@ -19,6 +20,7 @@ export const ARABIC: TogetherTranslation = {
     question: "الباب مغلق. نريد أن ندخل.",
     right: "المفتاح يناسب الباب. رائع!",
     belongs: "المفتاح يناسب الباب!",
+    caption: "الباب مغلق. نريد أن ندخل. بماذا يُفتح؟",
   },
   topf: {
     name: "قدر",
@@ -26,6 +28,7 @@ export const ARABIC: TogetherTranslation = {
     question: "القدر مفتوح. نريد أن نغلقه.",
     right: "الغطاء يناسب القدر. رائع!",
     belongs: "الغطاء يناسب القدر!",
+    caption: "القدر مفتوح. نريد أن نغلقه. ماذا يناسب فوقه؟",
   },
   blume: {
     name: "زهرة",
@@ -33,6 +36,7 @@ export const ARABIC: TogetherTranslation = {
     question: "الزهرة عطشانة.",
     right: "المرشة تناسب الزهرة. رائع!",
     belongs: "المرشة تناسب الزهرة!",
+    caption: "الزهرة عطشانة. بماذا تحصل على الماء؟",
   },
   papier: {
     name: "ورقة",
@@ -40,6 +44,7 @@ export const ARABIC: TogetherTranslation = {
     question: "نريد أن نرسم صورة.",
     right: "قلم التلوين يناسب الورقة. رائع!",
     belongs: "قلم التلوين يناسب الورقة!",
+    caption: "نريد أن نرسم صورة. بماذا تتلون الورقة؟",
   },
   feuerwehr: {
     name: "رجل إطفاء",
@@ -47,6 +52,7 @@ export const ARABIC: TogetherTranslation = {
     question: "رجل الإطفاء يريد أن يطفئ النيران.",
     right: "رجل الإطفاء يحتاج إلى الخرطوم. رائع!",
     belongs: "رجل الإطفاء يحتاج إلى الخرطوم!",
+    caption: "رجل الإطفاء يريد أن يطفئ النيران. بماذا يرش الماء؟",
   },
   aerztin: {
     name: "طبيبة",
@@ -54,6 +60,7 @@ export const ARABIC: TogetherTranslation = {
     question: "الطبيبة تريد أن تسمع قلبك.",
     right: "الطبيبة تحتاج إلى السماعة الطبية. رائع!",
     belongs: "الطبيبة تحتاج إلى السماعة الطبية!",
+    caption: "الطبيبة تريد أن تسمع قلبك. بماذا تصغي إليه؟",
   },
   baecker: {
     name: "خباز",
@@ -61,6 +68,7 @@ export const ARABIC: TogetherTranslation = {
     question: "الخباز يريد أن يخبز شيئًا لذيذًا للفطور.",
     right: "الخباز يحتاج إلى الرغيف. رائع!",
     belongs: "الخباز يحتاج إلى الرغيف!",
+    caption: "الخباز يريد أن يخبز شيئًا لذيذًا للفطور. ماذا يضع بعد ذلك على الطاولة؟",
   },
   friseurin: {
     name: "مصففة شعر",
@@ -68,5 +76,6 @@ export const ARABIC: TogetherTranslation = {
     question: "مصففة الشعر تريد أن تقص الشعر.",
     right: "مصففة الشعر تحتاج إلى المقص. رائع!",
     belongs: "مصففة الشعر تحتاج إلى المقص!",
+    caption: "مصففة الشعر تريد أن تقص الشعر. بماذا يتم ذلك؟",
   },
 };

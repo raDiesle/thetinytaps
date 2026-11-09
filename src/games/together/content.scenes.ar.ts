@@ -12,6 +12,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "انتهينا في المرحاض! الآن نريد أن ننظف أنفسنا.",
     right: "ورق التواليت يناسب المرحاض. رائع!",
     belongs: "ورق التواليت يناسب المرحاض!",
+    caption: "انتهينا في المرحاض! الآن نريد أن ننظف أنفسنا. بماذا يتم ذلك جيدًا؟",
   },
   "wasserhahn-seife": {
     name: "صنبور",
@@ -19,6 +20,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الكفوف مليئة بالطين. نريد أن نغسلها جيدًا.",
     right: "الصابون يناسب الصنبور. رائع!",
     belongs: "الصابون يناسب الصنبور!",
+    caption: "الكفوف مليئة بالطين. نريد أن نغسلها جيدًا. ما الذي يزيل الوسخ؟",
   },
   "eimer-schwamm": {
     name: "دلو",
@@ -26,6 +28,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "آثار كفوف متسخة في كل مكان! نريد أن نفركها.",
     right: "الإسفنجة تناسب الدلو. رائع!",
     belongs: "الإسفنجة تناسب الدلو!",
+    caption: "آثار كفوف متسخة في كل مكان! نريد أن نفركها. بماذا يتم ذلك بأفضل شكل؟",
   },
   "muesli-milch": {
     name: "حبوب إفطار",
@@ -33,6 +36,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نأكل حبوب الإفطار، لكنها ما زالت جافة تمامًا.",
     right: "الحليب يناسب حبوب الإفطار. رائع!",
     belongs: "الحليب يناسب حبوب الإفطار!",
+    caption: "نريد أن نأكل حبوب الإفطار، لكنها ما زالت جافة تمامًا. ماذا نصب فوقها؟",
   },
   "tasse-teekanne": {
     name: "فنجان",
@@ -40,6 +44,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الفنجان فارغ. الجدة تريد أن تصب شيئًا دافئًا.",
     right: "إبريق الشاي يناسب الفنجان. رائع!",
     belongs: "إبريق الشاي يناسب الفنجان!",
+    caption: "الفنجان فارغ. الجدة تريد أن تصب شيئًا دافئًا. من أي شيء تصبه؟",
   },
   "suppe-loeffel": {
     name: "شوربة",
@@ -47,6 +52,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الشوربة جاهزة. نريد أن نأكلها.",
     right: "الملعقة تناسب الشوربة. رائع!",
     belongs: "الملعقة تناسب الشوربة!",
+    caption: "الشوربة جاهزة. نريد أن نأكلها. بماذا يتم ذلك؟",
   },
   "pausenbrot-brotdose": {
     name: "شطيرة",
@@ -54,6 +60,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نغلف الشطيرة حتى لا تنضغط.",
     right: "علبة الغداء تناسب الشطيرة. رائع!",
     belongs: "علبة الغداء تناسب الشطيرة!",
+    caption: "نريد أن نغلف الشطيرة حتى لا تنضغط. في أي شيء تكون محفوظة جيدًا؟",
   },
   "pfanne-pfannenwender": {
     name: "مقلاة",
@@ -61,6 +68,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نقلب الفطيرة.",
     right: "السباتولا تناسب المقلاة. رائع!",
     belongs: "السباتولا تناسب المقلاة!",
+    caption: "نريد أن نقلب الفطيرة. بماذا يتم ذلك؟",
   },
   "bett-teddy": {
     name: "سرير",
@@ -68,6 +76,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن ننام، مع شيء نحضنه.",
     right: "الدبدوب يناسب السرير. رائع!",
     belongs: "الدبدوب يناسب السرير!",
+    caption: "نريد أن ننام، مع شيء نحضنه. ماذا نأخذ معنا إلى السرير؟",
   },
   "zeitung-brille": {
     name: "جريدة",
@@ -75,6 +84,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الجد يريد أن يقرأ الجريدة، لكن الحروف صغيرة جدًا.",
     right: "النظارة تناسب الجريدة. رائع!",
     belongs: "النظارة تناسب الجريدة!",
+    caption: "الجد يريد أن يقرأ الجريدة، لكن الحروف صغيرة جدًا. ماذا يضع على أنفه؟",
   },
   "schraube-schraubenzieher": {
     name: "برغي",
@@ -82,6 +92,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن ندير هذا في الخشب حتى يثبت جيدًا.",
     right: "المفك يناسب البرغي. رائع!",
     belongs: "المفك يناسب البرغي!",
+    caption: "نريد أن ندير هذا في الخشب حتى يثبت جيدًا. بماذا يتم ذلك؟",
   },
   "besen-kehrschaufel": {
     name: "مكنسة",
@@ -89,6 +100,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نجمع كومة الفتات.",
     right: "مجرفة الغبار تناسب المكنسة. رائع!",
     belongs: "مجرفة الغبار تناسب المكنسة!",
+    caption: "نريد أن نجمع كومة الفتات. ما الذي يساعد المكنسة في ذلك؟",
   },
   "schuh-socken": {
     name: "حذاء",
@@ -96,6 +108,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "القدمان ما زالتا عاريتين. أولًا شيء ناعم، ثم الحذاء.",
     right: "الجوارب تناسب الحذاء. رائع!",
     belongs: "الجوارب تناسب الحذاء!",
+    caption: "القدمان ما زالتا عاريتين. أولًا شيء ناعم، ثم الحذاء. ماذا نلبس أولًا؟",
   },
   "schal-handschuhe": {
     name: "وشاح",
@@ -103,6 +116,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الجو بارد. نريد كفوفًا دافئة.",
     right: "القفازات تناسب الوشاح. رائع!",
     belongs: "القفازات تناسب الوشاح!",
+    caption: "الجو بارد. نريد كفوفًا دافئة. ماذا نلبس في اليدين؟",
   },
   "schule-schulranzen": {
     name: "مدرسة",
@@ -110,6 +124,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نحمل الدفاتر والكتب على ظهورنا.",
     right: "الحقيبة المدرسية تناسب المدرسة. رائع!",
     belongs: "الحقيبة المدرسية تناسب المدرسة!",
+    caption: "نريد أن نحمل الدفاتر والكتب على ظهورنا. ماذا نأخذ معنا لذلك؟",
   },
   "schere-buntpapier": {
     name: "مقص",
@@ -117,6 +132,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نقص ونصنع أشغالًا يدوية.",
     right: "الورق الملون يناسب المقص. رائع!",
     belongs: "الورق الملون يناسب المقص!",
+    caption: "نريد أن نقص ونصنع أشغالًا يدوية. ماذا نحتاج للقص؟",
   },
   "zauberhut-zauberstab": {
     name: "قبعة ساحر",
@@ -124,6 +140,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "شبيك لبيك! نريد أن نخرج شيئًا من القبعة.",
     right: "العصا السحرية تناسب قبعة الساحر. رائع!",
     belongs: "العصا السحرية تناسب قبعة الساحر!",
+    caption: "شبيك لبيك! نريد أن نخرج شيئًا من القبعة. ماذا نحتاج لذلك؟",
   },
   "burg-fahne": {
     name: "قلعة",
@@ -131,6 +148,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن يرفرف شيء فوق البرج.",
     right: "العلم يناسب القلعة. رائع!",
     belongs: "العلم يناسب القلعة!",
+    caption: "نريد أن يرفرف شيء فوق البرج. ما الذي يرفرف في الهواء؟",
   },
   "laub-rechen": {
     name: "أوراق شجر",
@@ -138,6 +156,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نجمع الأوراق الملونة في كومة.",
     right: "مشط الحديقة يناسب أوراق الشجر. رائع!",
     belongs: "مشط الحديقة يناسب أوراق الشجر!",
+    caption: "نريد أن نجمع الأوراق الملونة في كومة. بماذا يتم ذلك بأفضل شكل؟",
   },
   "zelt-taschenlampe": {
     name: "خيمة",
@@ -145,6 +164,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الخيمة مظلمة من الداخل. نريد أن ننير داخلها.",
     right: "المصباح اليدوي يناسب الخيمة. رائع!",
     belongs: "المصباح اليدوي يناسب الخيمة!",
+    caption: "الخيمة مظلمة من الداخل. نريد أن ننير داخلها. ماذا نأخذ معنا؟",
   },
   "regen-regenschirm": {
     name: "مطر",
@@ -152,6 +172,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المطر ينزل. نريد ألا نبتل.",
     right: "المظلة تناسب المطر. رائع!",
     belongs: "المظلة تناسب المطر!",
+    caption: "المطر ينزل. نريد ألا نبتل. ماذا نرفع فوقنا؟",
   },
   "pfuetze-gummistiefel": {
     name: "بركة ماء",
@@ -159,6 +180,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نقفز في البركة، وتبقى أقدامنا جافة.",
     right: "حذاء المطر يناسب بركة الماء. رائع!",
     belongs: "حذاء المطر يناسب بركة الماء!",
+    caption: "نريد أن نقفز في البركة، وتبقى أقدامنا جافة. ماذا نلبس في القدمين؟",
   },
   "sonne-sonnenbrille": {
     name: "شمس",
@@ -166,6 +188,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الجو ساطع جدًا في الخارج. العيون تكاد تنغلق.",
     right: "النظارة الشمسية تناسب الشمس. رائع!",
     belongs: "النظارة الشمسية تناسب الشمس!",
+    caption: "الجو ساطع جدًا في الخارج. العيون تكاد تنغلق. ما الذي يحمي العينين؟",
   },
   "schneemann-karotte": {
     name: "رجل ثلج",
@@ -173,6 +196,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "رجل الثلج يريد أن يكون له أنف.",
     right: "الجزرة تناسب رجل الثلج. رائع!",
     belongs: "الجزرة تناسب رجل الثلج!",
+    caption: "رجل الثلج يريد أن يكون له أنف. ماذا نغرس في وجهه؟",
   },
   "schnee-schlitten": {
     name: "ثلج",
@@ -180,6 +204,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن ننزلق إلى أسفل التلة.",
     right: "المزلجة تناسب الثلج. رائع!",
     belongs: "المزلجة تناسب الثلج!",
+    caption: "نريد أن ننزلق إلى أسفل التلة. على ماذا نجلس؟",
   },
   "drachen-wind": {
     name: "طائرة ورقية",
@@ -187,6 +212,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الطائرة الورقية تريد أن تطير عاليًا في السماء.",
     right: "الريح تناسب الطائرة الورقية. رائع!",
     belongs: "الريح تناسب الطائرة الورقية!",
+    caption: "الطائرة الورقية تريد أن تطير عاليًا في السماء. ما الذي ينفخه إلى أعلى؟",
   },
   "fahrrad-helm": {
     name: "دراجة",
@@ -194,6 +220,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن ننطلق، ونريد أن يبقى الرأس محميًا.",
     right: "الخوذة تناسب الدراجة. رائع!",
     belongs: "الخوذة تناسب الدراجة!",
+    caption: "نريد أن ننطلق، ونريد أن يبقى الرأس محميًا. ماذا نضع على الرأس؟",
   },
   "briefkasten-brief": {
     name: "صندوق بريد",
@@ -201,6 +228,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نرسل بريدًا إلى الجدة.",
     right: "الرسالة تناسب صندوق البريد. رائع!",
     belongs: "الرسالة تناسب صندوق البريد!",
+    caption: "نريد أن نرسل بريدًا إلى الجدة. ماذا نرمي في صندوق البريد الأصفر؟",
   },
   "tannenbaum-weihnachtsstern": {
     name: "شجرة ميلاد",
@@ -208,6 +236,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "شجرة الميلاد جاهزة تقريبًا. ما زال ينقص شيء في قمتها.",
     right: "النجمة تناسب شجرة الميلاد. رائع!",
     belongs: "النجمة تناسب شجرة الميلاد!",
+    caption: "شجرة الميلاد جاهزة تقريبًا. ما زال ينقص شيء في قمتها. ما الذي يلمع هناك؟",
   },
   "osterei-pinsel": {
     name: "بيضة فصح",
@@ -215,6 +244,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نلون بيضة الفصح بألوان كثيرة.",
     right: "فرشاة الرسم تناسب بيضة الفصح. رائع!",
     belongs: "فرشاة الرسم تناسب بيضة الفصح!",
+    caption: "نريد أن نلون بيضة الفصح بألوان كثيرة. بماذا تتلون؟",
   },
   "laterne-licht": {
     name: "فانوس",
@@ -222,6 +252,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الجو مظلم. نريد أن يضيء الفانوس.",
     right: "الضوء يناسب الفانوس. رائع!",
     belongs: "الضوء يناسب الفانوس!",
+    caption: "الجو مظلم. نريد أن يضيء الفانوس. ماذا يجب أن يوضع داخله؟",
   },
   "blumenstrauss-vase": {
     name: "باقة زهور",
@@ -229,6 +260,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن تقف الزهور مستقيمة في الماء.",
     right: "المزهرية تناسب باقة الزهور. رائع!",
     belongs: "المزهرية تناسب باقة الزهور!",
+    caption: "نريد أن تقف الزهور مستقيمة في الماء. في أي شيء تقف؟",
   },
   malerin: {
     name: "رسامة",
@@ -236,6 +268,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الرسامة تريد أن ترسم شجرة.",
     right: "الرسامة تحتاج إلى فرشاة الرسم. رائع!",
     belongs: "الرسامة تحتاج إلى فرشاة الرسم!",
+    caption: "الرسامة تريد أن ترسم شجرة. بماذا تلون؟",
   },
   astronautin: {
     name: "رائدة فضاء",
@@ -243,6 +276,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "رائدة الفضاء تريد أن تطير إلى الفضاء.",
     right: "رائدة الفضاء تحتاج إلى الصاروخ. رائع!",
     belongs: "رائدة الفضاء تحتاج إلى الصاروخ!",
+    caption: "رائدة الفضاء تريد أن تطير إلى الفضاء. بماذا تصعد إلى هناك؟",
   },
   fensterputzer: {
     name: "منظف نوافذ",
@@ -250,6 +284,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "منظف النوافذ يريد أن يمسح النافذة المغبرة حتى تصير نظيفة.",
     right: "منظف النوافذ يحتاج إلى الإسفنجة. رائع!",
     belongs: "منظف النوافذ يحتاج إلى الإسفنجة!",
+    caption: "منظف النوافذ يريد أن يمسح النافذة المغبرة حتى تصير نظيفة. بماذا يمسح؟",
   },
   fotograf: {
     name: "مصور",
@@ -257,6 +292,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المصور يريد أن يلتقط صورة.",
     right: "المصور يحتاج إلى الكاميرا. رائع!",
     belongs: "المصور يحتاج إلى الكاميرا!",
+    caption: "المصور يريد أن يلتقط صورة. بماذا يلتقط الصورة؟",
   },
   schneiderin: {
     name: "خياطة",
@@ -264,6 +300,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الخياطة تريد أن تصلح الثقب في السترة.",
     right: "الخياطة تحتاج إلى الخيط. رائع!",
     belongs: "الخياطة تحتاج إلى الخيط!",
+    caption: "الخياطة تريد أن تصلح الثقب في السترة. ماذا تحتاج لذلك؟",
   },
   forscherin: {
     name: "عالمة",
@@ -271,6 +308,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "العالمة تريد أن ترى الأشياء الصغيرة جدًا كبيرة.",
     right: "العالمة تحتاج إلى المجهر. رائع!",
     belongs: "العالمة تحتاج إلى المجهر!",
+    caption: "العالمة تريد أن ترى الأشياء الصغيرة جدًا كبيرة. ما الذي يساعدها في ذلك؟",
   },
   schornsteinfeger: {
     name: "منظف مداخن",
@@ -278,6 +316,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "منظف المداخن يريد أن ينظف المدخنة.",
     right: "منظف المداخن يحتاج إلى فرشاة المدخنة. رائع!",
     belongs: "منظف المداخن يحتاج إلى فرشاة المدخنة!",
+    caption: "منظف المداخن يريد أن ينظف المدخنة. بماذا ينظفها؟",
   },
   muellwerker: {
     name: "عامل نظافة",
@@ -285,6 +324,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "عامل النظافة يريد أن يفرغ الحاويات الممتلئة.",
     right: "عامل النظافة يحتاج إلى شاحنة القمامة. رائع!",
     belongs: "عامل النظافة يحتاج إلى شاحنة القمامة!",
+    caption: "عامل النظافة يريد أن يفرغ الحاويات الممتلئة. بماذا يأتي؟",
   },
   raumpflegerin: {
     name: "عاملة نظافة",
@@ -292,6 +332,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "عاملة النظافة تريد أن تنظف السجادة.",
     right: "عاملة النظافة تحتاج إلى المكنسة الكهربائية. رائع!",
     belongs: "عاملة النظافة تحتاج إلى المكنسة الكهربائية!",
+    caption: "عاملة النظافة تريد أن تنظف السجادة. ما الذي يمر على الأرض لذلك؟",
   },
   bauarbeiterin: {
     name: "عاملة بناء",
@@ -299,6 +340,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "عاملة البناء تريد أن تكمل بناء الجدار.",
     right: "عاملة البناء تحتاج إلى الطوب. رائع!",
     belongs: "عاملة البناء تحتاج إلى الطوب!",
+    caption: "عاملة البناء تريد أن تكمل بناء الجدار. بماذا يرتفع الجدار؟",
   },
   mechanikerin: {
     name: "ميكانيكية",
@@ -306,6 +348,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الميكانيكية تريد أن تثبت العجلة في السيارة جيدًا.",
     right: "الميكانيكية تحتاج إلى مفتاح الربط. رائع!",
     belongs: "الميكانيكية تحتاج إلى مفتاح الربط!",
+    caption: "الميكانيكية تريد أن تثبت العجلة في السيارة جيدًا. بماذا تدير؟",
   },
   tischlerin: {
     name: "نجارة",
@@ -313,6 +356,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "النجارة تريد أن تقسم اللوح إلى قطعتين.",
     right: "النجارة تحتاج إلى المنشار. رائع!",
     belongs: "النجارة تحتاج إلى المنشار!",
+    caption: "النجارة تريد أن تقسم اللوح إلى قطعتين. بماذا يتم ذلك؟",
   },
   handwerker: {
     name: "حرفي",
@@ -320,6 +364,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الحرفي يريد أن يدق المسمار في رجل الكرسي.",
     right: "الحرفي يحتاج إلى المطرقة. رائع!",
     belongs: "الحرفي يحتاج إلى المطرقة!",
+    caption: "الحرفي يريد أن يدق المسمار في رجل الكرسي. بماذا يدق؟",
   },
   elektrikerin: {
     name: "كهربائية",
@@ -327,6 +372,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الكهربائية تريد أن يعود النور إلى السقف.",
     right: "الكهربائية تحتاج إلى اللمبة. رائع!",
     belongs: "الكهربائية تحتاج إلى اللمبة!",
+    caption: "الكهربائية تريد أن يعود النور إلى السقف. ماذا تركّب؟",
   },
   kranfuehrer: {
     name: "سائق رافعة",
@@ -334,6 +380,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يرفع الحجارة الثقيلة إلى أعلى البيت.",
     right: "سائق الرافعة يحتاج إلى الرافعة. رائع!",
     belongs: "سائق الرافعة يحتاج إلى الرافعة!",
+    caption: "الثعلب يريد أن يرفع الحجارة الثقيلة إلى أعلى البيت. بماذا يتم ذلك؟",
   },
   klempner: {
     name: "سباك",
@@ -341,6 +388,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "السباك يريد أن يفتح المرحاض المسدود.",
     right: "السباك يحتاج إلى مكبس التسليك. رائع!",
     belongs: "السباك يحتاج إلى مكبس التسليك!",
+    caption: "السباك يريد أن يفتح المرحاض المسدود. بماذا يتم ذلك؟",
   },
   baggerfahrer: {
     name: "سائق حفارة",
@@ -348,6 +396,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يحفر حفرة كبيرة جدًا، ويرفع الكثير من التراب.",
     right: "سائق الحفارة يحتاج إلى الحفارة. رائع!",
     belongs: "سائق الحفارة يحتاج إلى الحفارة!",
+    caption: "الدب يريد أن يحفر حفرة كبيرة جدًا، ويرفع الكثير من التراب. بماذا يرفعه بعيدًا؟",
   },
   anstreicher: {
     name: "دهان",
@@ -355,6 +404,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدهان يريد أن يلون الحائط الرمادي بالأزرق.",
     right: "الدهان يحتاج إلى أسطوانة الدهان. رائع!",
     belongs: "الدهان يحتاج إلى أسطوانة الدهان!",
+    caption: "الدهان يريد أن يلون الحائط الرمادي بالأزرق. بماذا يتم ذلك؟",
   },
   pilot: {
     name: "طيار",
@@ -362,6 +412,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الطيار يريد أن يطير مع ناس كثيرين إلى مكان بعيد.",
     right: "الطيار يحتاج إلى الطائرة. رائع!",
     belongs: "الطيار يحتاج إلى الطائرة!",
+    caption: "الطيار يريد أن يطير مع ناس كثيرين إلى مكان بعيد. بماذا يطير؟",
   },
   busfahrerin: {
     name: "سائقة حافلة",
@@ -369,6 +420,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "السائقة تريد أن توصل ناسًا كثيرين عبر المدينة.",
     right: "سائقة الحافلة تحتاج إلى الحافلة. رائع!",
     belongs: "سائقة الحافلة تحتاج إلى الحافلة!",
+    caption: "السائقة تريد أن توصل ناسًا كثيرين عبر المدينة. بماذا يتم ذلك؟",
   },
   lokfuehrer: {
     name: "سائق قاطرة",
@@ -376,6 +428,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن ينطلق بالعربات على السكة.",
     right: "سائق القاطرة يحتاج إلى القاطرة. رائع!",
     belongs: "سائق القاطرة يحتاج إلى القاطرة!",
+    caption: "الدب يريد أن ينطلق بالعربات على السكة. بماذا يجرها؟",
   },
   taxifahrer: {
     name: "سائق تاكسي",
@@ -383,6 +436,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يوصل الطفل وحقيبة السفر إلى محطة القطار.",
     right: "سائق التاكسي يحتاج إلى التاكسي. رائع!",
     belongs: "سائق التاكسي يحتاج إلى التاكسي!",
+    caption: "الثعلب يريد أن يوصل الطفل وحقيبة السفر إلى محطة القطار. بماذا يتم ذلك؟",
   },
   kapitaen: {
     name: "قبطان",
@@ -390,6 +444,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "القبطان يريد أن يعبر البحر مع ناس كثيرين.",
     right: "القبطان يحتاج إلى السفينة. رائع!",
     belongs: "القبطان يحتاج إلى السفينة!",
+    caption: "القبطان يريد أن يعبر البحر مع ناس كثيرين. ما الذي يحمله؟",
   },
   "lkw-fahrerin": {
     name: "سائقة شاحنة",
@@ -397,6 +452,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "السائقة تريد أن تنقل الصناديق الكثيرة إلى مكان بعيد.",
     right: "سائقة الشاحنة تحتاج إلى الشاحنة. رائع!",
     belongs: "سائقة الشاحنة تحتاج إلى الشاحنة!",
+    caption: "السائقة تريد أن تنقل الصناديق الكثيرة إلى مكان بعيد. بماذا يتم ذلك؟",
   },
   strassenbahnfahrer: {
     name: "سائق ترام",
@@ -404,6 +460,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يسير على السكة عبر المدينة.",
     right: "سائق الترام يحتاج إلى الترام. رائع!",
     belongs: "سائق الترام يحتاج إلى الترام!",
+    caption: "الثعلب يريد أن يسير على السكة عبر المدينة. ما الذي يسير على السكة؟",
   },
   motorradfahrerin: {
     name: "راكبة دراجة نارية",
@@ -411,6 +468,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "السائقة جاهزة، وتريد أن تنطلق بسرعة على الطريق.",
     right: "راكبة الدراجة النارية تحتاج إلى الدراجة النارية. رائع!",
     belongs: "راكبة الدراجة النارية تحتاج إلى الدراجة النارية!",
+    caption: "السائقة جاهزة، وتريد أن تنطلق بسرعة على الطريق. بماذا تنطلق؟",
   },
   matrose: {
     name: "بحار",
@@ -418,6 +476,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "البحار يريد أن يبقى المركب هنا ولا يتحرك.",
     right: "البحار يحتاج إلى المرساة. رائع!",
     belongs: "البحار يحتاج إلى المرساة!",
+    caption: "البحار يريد أن يبقى المركب هنا ولا يتحرك. ماذا يرمي في الماء؟",
   },
   seilbahnfuehrerin: {
     name: "سائقة تلفريك",
@@ -425,6 +484,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدبة تريد أن تأخذ الناس في كابينة إلى أعلى الجبل.",
     right: "سائقة التلفريك تحتاج إلى التلفريك. رائع!",
     belongs: "سائقة التلفريك تحتاج إلى التلفريك!",
+    caption: "الدبة تريد أن تأخذ الناس في كابينة إلى أعلى الجبل. بماذا تسير؟",
   },
   sanitaeter: {
     name: "مسعف",
@@ -432,6 +492,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المسعف يريد أن ينقل الطفل بسرعة إلى المستشفى.",
     right: "المسعف يحتاج إلى سيارة الإسعاف. رائع!",
     belongs: "المسعف يحتاج إلى سيارة الإسعاف!",
+    caption: "المسعف يريد أن ينقل الطفل بسرعة إلى المستشفى. بماذا يتم ذلك؟",
   },
   hubschrauberpilotin: {
     name: "قائدة مروحية",
@@ -439,6 +500,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الخروف الصغير تأذى. القائدة تريد أن تطير به بسرعة إلى الوادي.",
     right: "قائدة المروحية تحتاج إلى المروحية. رائع!",
     belongs: "قائدة المروحية تحتاج إلى المروحية!",
+    caption: "الخروف الصغير تأذى. القائدة تريد أن تطير به بسرعة إلى الوادي. بماذا تطير؟",
   },
   feuerwehrfrau: {
     name: "إطفائية",
@@ -446,6 +508,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "القطة الصغيرة عالقة فوق الشجرة. الإطفائية تريد أن تنزلها.",
     right: "الإطفائية تحتاج إلى سيارة الإطفاء. رائع!",
     belongs: "الإطفائية تحتاج إلى سيارة الإطفاء!",
+    caption: "القطة الصغيرة عالقة فوق الشجرة. الإطفائية تريد أن تنزلها. بماذا تصل إلى هناك؟",
   },
   rettungsschwimmerin: {
     name: "منقذة",
@@ -453,6 +516,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المنقذة تريد أن ترمي شيئًا للطفل في الماء.",
     right: "المنقذة تحتاج إلى طوق النجاة. رائع!",
     belongs: "المنقذة تحتاج إلى طوق النجاة!",
+    caption: "المنقذة تريد أن ترمي شيئًا للطفل في الماء. ما الذي يبقيه على السطح؟",
   },
   baeuerin: {
     name: "مزارعة",
@@ -460,6 +524,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المزارعة تريد أن تحرث الحقل.",
     right: "المزارعة تحتاج إلى الجرار. رائع!",
     belongs: "المزارعة تحتاج إلى الجرار!",
+    caption: "المزارعة تريد أن تحرث الحقل. بماذا يتم ذلك؟",
   },
   imkerin: {
     name: "نحالة",
@@ -467,6 +532,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "السرب على الغصن. النحالة تريد أن تعطيه بيتًا.",
     right: "النحالة تحتاج إلى خلية النحل. رائع!",
     belongs: "النحالة تحتاج إلى خلية النحل!",
+    caption: "السرب على الغصن. النحالة تريد أن تعطيه بيتًا. ماذا تقدم لها؟",
   },
   holzfaeller: {
     name: "حطاب",
@@ -474,6 +540,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الحطاب يريد أن يشق الجذع السميك.",
     right: "الحطاب يحتاج إلى الفأس. رائع!",
     belongs: "الحطاب يحتاج إلى الفأس!",
+    caption: "الحطاب يريد أن يشق الجذع السميك. بماذا يتم ذلك؟",
   },
   gitarrist: {
     name: "عازف غيتار",
@@ -481,6 +548,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يغني أغنية، ويعزف معها بأصابعه.",
     right: "عازف الغيتار يحتاج إلى الغيتار. رائع!",
     belongs: "عازف الغيتار يحتاج إلى الغيتار!",
+    caption: "الثعلب يريد أن يغني أغنية، ويعزف معها بأصابعه. ماذا يضع على حضنه لذلك؟",
   },
   saengerin: {
     name: "مغنية",
@@ -488,6 +556,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المغنية تريد أن تغني بصوت عال للجميع.",
     right: "المغنية تحتاج إلى الميكروفون. رائع!",
     belongs: "المغنية تحتاج إلى الميكروفون!",
+    caption: "المغنية تريد أن تغني بصوت عال للجميع. ما الذي يجعل الجميع يسمعها؟",
   },
   trommler: {
     name: "عازف طبل",
@@ -495,6 +564,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يمشي في المقدمة، ويعزف الموسيقى.",
     right: "عازف الطبل يحتاج إلى الطبل. رائع!",
     belongs: "عازف الطبل يحتاج إلى الطبل!",
+    caption: "الدب يريد أن يمشي في المقدمة، ويعزف الموسيقى. بماذا يضرب الإيقاع؟",
   },
   trompeterin: {
     name: "عازفة بوق",
@@ -502,6 +572,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلبة تريد أن تنفخ لحنًا عاليًا فوق التلال.",
     right: "عازفة البوق تحتاج إلى البوق. رائع!",
     belongs: "عازفة البوق تحتاج إلى البوق!",
+    caption: "الثعلبة تريد أن تنفخ لحنًا عاليًا فوق التلال. بماذا تنفخ؟",
   },
   geiger: {
     name: "عازف كمان",
@@ -509,6 +580,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يعزف بالقوس بلطف شديد.",
     right: "عازف الكمان يحتاج إلى الكمان. رائع!",
     belongs: "عازف الكمان يحتاج إلى الكمان!",
+    caption: "الدب يريد أن يعزف بالقوس بلطف شديد. ماذا يمرر عليه القوس؟",
   },
   pianistin: {
     name: "عازفة بيانو",
@@ -516,6 +588,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلبة تجلس على الكرسي، وتريد أن تعزف.",
     right: "عازفة البيانو تحتاج إلى البيانو. رائع!",
     belongs: "عازفة البيانو تحتاج إلى البيانو!",
+    caption: "الثعلبة تجلس على الكرسي، وتريد أن تعزف. على ماذا تضغط؟",
   },
   akkordeonspieler: {
     name: "عازف أكورديون",
@@ -523,6 +596,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يشد ويضغط، ويعزف معًا.",
     right: "عازف الأكورديون يحتاج إلى الأكورديون. رائع!",
     belongs: "عازف الأكورديون يحتاج إلى الأكورديون!",
+    caption: "الدب يريد أن يشد ويضغط، ويعزف معًا. ماذا يحمل أمام صدره؟",
   },
   saxofonistin: {
     name: "عازفة ساكسفون",
@@ -530,6 +604,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلبة تريد أن تنفخ لحنًا مرحًا.",
     right: "عازفة الساكسفون تحتاج إلى الساكسفون. رائع!",
     belongs: "عازفة الساكسفون تحتاج إلى الساكسفون!",
+    caption: "الثعلبة تريد أن تنفخ لحنًا مرحًا. بماذا يتم ذلك؟",
   },
   floetenspieler: {
     name: "عازف ناي",
@@ -537,6 +612,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يعزف مع العصافير، ويسابقها.",
     right: "عازف الناي يحتاج إلى الناي. رائع!",
     belongs: "عازف الناي يحتاج إلى الناي!",
+    caption: "الدب يريد أن يعزف مع العصافير، ويسابقها. بماذا يتم ذلك؟",
   },
   fussballerin: {
     name: "لاعبة كرة قدم",
@@ -544,6 +620,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلبة تريد أن تسجل هدفًا.",
     right: "لاعبة كرة القدم تحتاج إلى كرة القدم. رائع!",
     belongs: "لاعبة كرة القدم تحتاج إلى كرة القدم!",
+    caption: "الثعلبة تريد أن تسجل هدفًا. ماذا تحتاج لذلك في الملعب؟",
   },
   basketballspieler: {
     name: "لاعب كرة سلة",
@@ -551,6 +628,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يرمي ويصيب الحلقة العالية.",
     right: "لاعب كرة السلة يحتاج إلى كرة السلة. رائع!",
     belongs: "لاعب كرة السلة يحتاج إلى كرة السلة!",
+    caption: "الدب يريد أن يرمي ويصيب الحلقة العالية. بماذا يتم ذلك؟",
   },
   tennisspielerin: {
     name: "لاعبة تنس",
@@ -558,6 +636,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "لاعبة التنس تريد أن تبدأ اللعب بالإرسال.",
     right: "لاعبة التنس تحتاج إلى كرة التنس. رائع!",
     belongs: "لاعبة التنس تحتاج إلى كرة التنس!",
+    caption: "لاعبة التنس تريد أن تبدأ اللعب بالإرسال. ما الذي يطير بعد ذلك فوق الشبكة؟",
   },
   schwimmer: {
     name: "سباح",
@@ -565,6 +644,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يفتح عينيه تحت الماء.",
     right: "السباح يحتاج إلى نظارة السباحة. رائع!",
     belongs: "السباح يحتاج إلى نظارة السباحة!",
+    caption: "الثعلب يريد أن يفتح عينيه تحت الماء. ماذا يضع أمام عينيه؟",
   },
   skifahrerin: {
     name: "متزلجة",
@@ -572,6 +652,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلبة تريد أن تنزل بسرعة من الجبل المغطى بالثلج.",
     right: "المتزلجة تحتاج إلى الزلاجات. رائع!",
     belongs: "المتزلجة تحتاج إلى الزلاجات!",
+    caption: "الثعلبة تريد أن تنزل بسرعة من الجبل المغطى بالثلج. بماذا يتم ذلك؟",
   },
   eislaeufer: {
     name: "متزلج على الجليد",
@@ -579,6 +660,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن ينزلق فوق الجليد.",
     right: "المتزلج على الجليد يحتاج إلى أحذية التزلج. رائع!",
     belongs: "المتزلج على الجليد يحتاج إلى أحذية التزلج!",
+    caption: "الدب يريد أن ينزلق فوق الجليد. ماذا يربط في قدميه؟",
   },
   rodlerin: {
     name: "راكبة مزلجة",
@@ -586,6 +668,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدبة تريد أن تنزلق مع الطفل إلى أسفل التلة.",
     right: "راكبة المزلجة تحتاج إلى المزلجة. رائع!",
     belongs: "راكبة المزلجة تحتاج إلى المزلجة!",
+    caption: "الدبة تريد أن تنزلق مع الطفل إلى أسفل التلة. على ماذا تجلس؟",
   },
   segler: {
     name: "ملاح",
@@ -593,6 +676,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يعبر الماء، والهواء يدفعه.",
     right: "الملاح يحتاج إلى القارب الشراعي. رائع!",
     belongs: "الملاح يحتاج إلى القارب الشراعي!",
+    caption: "الثعلب يريد أن يعبر الماء، والهواء يدفعه. بماذا يتم ذلك؟",
   },
   rennfahrerin: {
     name: "سائقة سباق",
@@ -600,6 +684,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "سائقة السباق تريد أن تقود بسرعة كبيرة في دوائر.",
     right: "سائقة السباق تحتاج إلى سيارة السباق. رائع!",
     belongs: "سائقة السباق تحتاج إلى سيارة السباق!",
+    caption: "سائقة السباق تريد أن تقود بسرعة كبيرة في دوائر. بماذا يتم ذلك؟",
   },
   skater: {
     name: "متزلج على اللوح",
@@ -607,6 +692,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يتدحرج إلى أسفل المنحدر.",
     right: "المتزلج على اللوح يحتاج إلى لوح التزلج. رائع!",
     belongs: "المتزلج على اللوح يحتاج إلى لوح التزلج!",
+    caption: "الدب يريد أن يتدحرج إلى أسفل المنحدر. على ماذا يتدحرج؟",
   },
   ballerina: {
     name: "راقصة باليه",
@@ -614,6 +700,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الراقصة تريد أن ترقص على أطراف أصابعها.",
     right: "راقصة الباليه تحتاج إلى حذاء الباليه. رائع!",
     belongs: "راقصة الباليه تحتاج إلى حذاء الباليه!",
+    caption: "الراقصة تريد أن ترقص على أطراف أصابعها. ماذا تلبس؟",
   },
   angler: {
     name: "صياد سمك",
@@ -621,6 +708,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يصطاد سمكة.",
     right: "صياد السمك يحتاج إلى الصنارة. رائع!",
     belongs: "صياد السمك يحتاج إلى الصنارة!",
+    caption: "الدب يريد أن يصطاد سمكة. بماذا يتم ذلك؟",
   },
   radfahrerin: {
     name: "راكبة دراجة",
@@ -628,6 +716,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدبة تريد أن تنطلق على عجلتين.",
     right: "راكبة الدراجة تحتاج إلى الدراجة. رائع!",
     belongs: "راكبة الدراجة تحتاج إلى الدراجة!",
+    caption: "الدبة تريد أن تنطلق على عجلتين. ما الذي ينتظرها؟",
   },
   kletterin: {
     name: "متسلقة",
@@ -635,6 +724,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المتسلقة تريد أن تتسلق الجدار بأمان.",
     right: "المتسلقة تحتاج إلى الحبل. رائع!",
     belongs: "المتسلقة تحتاج إلى الحبل!",
+    caption: "المتسلقة تريد أن تتسلق الجدار بأمان. ما الذي يؤمّنها؟",
   },
   badmintonspieler: {
     name: "لاعب ريشة طائرة",
@@ -642,6 +732,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يلعب فوق الشبكة العالية.",
     right: "لاعب الريشة الطائرة يحتاج إلى الريشة الطائرة. رائع!",
     belongs: "لاعب الريشة الطائرة يحتاج إلى الريشة الطائرة!",
+    caption: "الثعلب يريد أن يلعب فوق الشبكة العالية. بماذا يتم ذلك؟",
   },
   eishockeyspieler: {
     name: "لاعب هوكي جليد",
@@ -649,6 +740,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "اللاعب يريد أن يدخل القرص في المرمى.",
     right: "لاعب هوكي الجليد يحتاج إلى عصا هوكي الجليد. رائع!",
     belongs: "لاعب هوكي الجليد يحتاج إلى عصا هوكي الجليد!",
+    caption: "اللاعب يريد أن يدخل القرص في المرمى. ماذا يحتاج لذلك؟",
   },
   reiterin: {
     name: "فارسة",
@@ -656,6 +748,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الفارسة تريد أن تقفز فوق الحاجز.",
     right: "الفارسة تحتاج إلى الحصان. رائع!",
     belongs: "الفارسة تحتاج إلى الحصان!",
+    caption: "الفارسة تريد أن تقفز فوق الحاجز. على ماذا تجلس؟",
   },
   schwimmlehrer: {
     name: "مدرب سباحة",
@@ -663,6 +756,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "طفل الثعلب يريد أن ينزل إلى الماء العميق، ويبقى على سطحه.",
     right: "مدرب السباحة يحتاج إلى العوامات. رائع!",
     belongs: "مدرب السباحة يحتاج إلى العوامات!",
+    caption: "طفل الثعلب يريد أن ينزل إلى الماء العميق، ويبقى على سطحه. ما الذي يساعده في ذلك؟",
   },
   gewichtheberin: {
     name: "رافعة أثقال",
@@ -670,6 +764,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "اللاعبة تريد أن ترفع شيئًا ثقيلًا جدًا.",
     right: "رافعة الأثقال تحتاج إلى الدمبل. رائع!",
     belongs: "رافعة الأثقال تحتاج إلى الدمبل!",
+    caption: "اللاعبة تريد أن ترفع شيئًا ثقيلًا جدًا. بماذا يتم ذلك؟",
   },
   surfer: {
     name: "راكب أمواج",
@@ -677,6 +772,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يركب الموجة الكبيرة.",
     right: "راكب الأمواج يحتاج إلى لوح ركوب الأمواج. رائع!",
     belongs: "راكب الأمواج يحتاج إلى لوح ركوب الأمواج!",
+    caption: "الدب يريد أن يركب الموجة الكبيرة. على ماذا يقف؟",
   },
   koenig: {
     name: "ملك",
@@ -684,6 +780,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الملك ينقصه شيء على رأسه.",
     right: "الملك يحتاج إلى التاج. رائع!",
     belongs: "الملك يحتاج إلى التاج!",
+    caption: "الملك ينقصه شيء على رأسه. ماذا نضع عليه؟",
   },
   ritter: {
     name: "فارس",
@@ -691,6 +788,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الفارس يريد أن يحمي نفسه من التنين الصغير.",
     right: "الفارس يحتاج إلى الدرع. رائع!",
     belongs: "الفارس يحتاج إلى الدرع!",
+    caption: "الفارس يريد أن يحمي نفسه من التنين الصغير. ماذا يمسك أمامه؟",
   },
   fee: {
     name: "جنية",
@@ -698,6 +796,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الجنية تريد أن تحول اليقطينة إلى شيء جميل.",
     right: "الجنية تحتاج إلى العصا السحرية. رائع!",
     belongs: "الجنية تحتاج إلى العصا السحرية!",
+    caption: "الجنية تريد أن تحول اليقطينة إلى شيء جميل. بماذا تسحر؟",
   },
   zauberkuenstler: {
     name: "حاوي",
@@ -705,6 +804,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الحاوي يريد أن يخرج أرنبًا.",
     right: "الحاوي يحتاج إلى القبعة العالية. رائع!",
     belongs: "الحاوي يحتاج إلى القبعة العالية!",
+    caption: "الحاوي يريد أن يخرج أرنبًا. ماذا يملك لذلك؟",
   },
   hexe: {
     name: "ساحرة",
@@ -712,6 +812,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الساحرة تريد أن تطير في الليل، وقطتها خلفها.",
     right: "الساحرة تحتاج إلى المكنسة. رائع!",
     belongs: "الساحرة تحتاج إلى المكنسة!",
+    caption: "الساحرة تريد أن تطير في الليل، وقطتها خلفها. بماذا تطير؟",
   },
   pirat: {
     name: "قرصان",
@@ -719,6 +820,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "القرصان يريد أن يعرف أين دفن الصندوق.",
     right: "القرصان يحتاج إلى خريطة الكنز. رائع!",
     belongs: "القرصان يحتاج إلى خريطة الكنز!",
+    caption: "القرصان يريد أن يعرف أين دفن الصندوق. ما الذي يدل على الطريق؟",
   },
   detektivin: {
     name: "محققة",
@@ -726,6 +828,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المحققة تريد أن ترى الآثار الصغيرة كبيرة جدًا.",
     right: "المحققة تحتاج إلى العدسة المكبرة. رائع!",
     belongs: "المحققة تحتاج إلى العدسة المكبرة!",
+    caption: "المحققة تريد أن ترى الآثار الصغيرة كبيرة جدًا. ماذا تحتاج لذلك؟",
   },
   sternguckerin: {
     name: "راصدة نجوم",
@@ -733,6 +836,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "راصدة النجوم تريد أن ترى القمر قريبًا جدًا.",
     right: "راصدة النجوم تحتاج إلى التلسكوب. رائع!",
     belongs: "راصدة النجوم تحتاج إلى التلسكوب!",
+    caption: "راصدة النجوم تريد أن ترى القمر قريبًا جدًا. بماذا يتم ذلك؟",
   },
   hoehlenforscher: {
     name: "مستكشف كهوف",
@@ -740,6 +844,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "مستكشف الكهوف يريد أن يضيء الكهف المظلم.",
     right: "مستكشف الكهوف يحتاج إلى المصباح اليدوي. رائع!",
     belongs: "مستكشف الكهوف يحتاج إلى المصباح اليدوي!",
+    caption: "مستكشف الكهوف يريد أن يضيء الكهف المظلم. ماذا يأخذ معه؟",
   },
   abenteurerin: {
     name: "مغامرة",
@@ -747,6 +852,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المغامرة تريد أن تنام في الخارج.",
     right: "المغامرة تحتاج إلى الخيمة. رائع!",
     belongs: "المغامرة تحتاج إلى الخيمة!",
+    caption: "المغامرة تريد أن تنام في الخارج. ماذا تنصب؟",
   },
   zwerg: {
     name: "قزم",
@@ -754,6 +860,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "القزم يريد أن يستخرج الجواهر من الصخر.",
     right: "القزم يحتاج إلى المعول. رائع!",
     belongs: "القزم يحتاج إلى المعول!",
+    caption: "القزم يريد أن يستخرج الجواهر من الصخر. بماذا يتم ذلك؟",
   },
   ballonfahrerin: {
     name: "راكبة منطاد",
@@ -761,6 +868,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدبة تريد أن تطير في السلة عاليًا في السماء.",
     right: "راكبة المنطاد تحتاج إلى المنطاد. رائع!",
     belongs: "راكبة المنطاد تحتاج إلى المنطاد!",
+    caption: "الدبة تريد أن تطير في السلة عاليًا في السماء. ما الذي يحملها إلى أعلى؟",
   },
   "handtuchhalter-handtuch": {
     name: "علاقة مناشف",
@@ -768,6 +876,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الكفوف مبللة. نريد أن نجففها.",
     right: "المنشفة تناسب علاقة المناشف. رائع!",
     belongs: "المنشفة تناسب علاقة المناشف!",
+    caption: "الكفوف مبللة. نريد أن نجففها. بماذا يتم ذلك؟",
   },
   "badewanne-badeente": {
     name: "حوض استحمام",
@@ -775,6 +884,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الحوض ممتلئ. نريد أن نجعل شيئًا يسبح فيه.",
     right: "البطة المطاطية تناسب حوض الاستحمام. رائع!",
     belongs: "البطة المطاطية تناسب حوض الاستحمام!",
+    caption: "الحوض ممتلئ. نريد أن نجعل شيئًا يسبح فيه. ماذا يناسب الماء؟",
   },
   "saftpresse-orange": {
     name: "عصارة",
@@ -782,6 +892,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نصنع عصيرًا طازجًا.",
     right: "البرتقالة تناسب العصارة. رائع!",
     belongs: "البرتقالة تناسب العصارة!",
+    caption: "نريد أن نصنع عصيرًا طازجًا. ماذا نضع في العصارة؟",
   },
   "toaster-toast": {
     name: "محمصة خبز",
@@ -789,6 +900,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نحمص شيئًا حتى يصبح مقرمشًا.",
     right: "التوست يناسب محمصة الخبز. رائع!",
     belongs: "التوست يناسب محمصة الخبز!",
+    caption: "نريد أن نحمص شيئًا حتى يصبح مقرمشًا. ماذا نضع في الفتحة؟",
   },
   "eierbecher-ei": {
     name: "كأس بيض",
@@ -796,6 +908,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نفطر، وأن نطرق على شيء من أعلاه.",
     right: "البيضة تناسب كأس البيض. رائع!",
     belongs: "البيضة تناسب كأس البيض!",
+    caption: "نريد أن نفطر، وأن نطرق على شيء من أعلاه. ماذا يثبت فيه جيدًا؟",
   },
   "teig-ausstecher": {
     name: "عجين",
@@ -803,6 +916,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نصنع نجومًا من العجين.",
     right: "قطاعة العجين تناسب العجين. رائع!",
     belongs: "قطاعة العجين تناسب العجين!",
+    caption: "نريد أن نصنع نجومًا من العجين. بماذا نشكّل النجوم؟",
   },
   "hochstuhl-laetzchen": {
     name: "كرسي أطفال",
@@ -810,6 +924,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الطعام يتساقط. نريد أن يبقى القميص نظيفًا.",
     right: "المريلة تناسب كرسي الأطفال. رائع!",
     belongs: "المريلة تناسب كرسي الأطفال!",
+    caption: "الطعام يتساقط. نريد أن يبقى القميص نظيفًا. ماذا نضع حول الرقبة؟",
   },
   "nagel-hammer": {
     name: "مسمار",
@@ -817,6 +932,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن ندق المسمار في اللوح.",
     right: "المطرقة تناسب المسمار. رائع!",
     belongs: "المطرقة تناسب المسمار!",
+    caption: "نريد أن ندق المسمار في اللوح. بماذا يتم ذلك؟",
   },
   "roboter-batterie": {
     name: "روبوت",
@@ -824,6 +940,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الروبوت يريد أن يمشي من جديد، لكن لم تبق له قوة.",
     right: "البطارية تناسب الروبوت. رائع!",
     belongs: "البطارية تناسب الروبوت!",
+    caption: "الروبوت يريد أن يمشي من جديد، لكن لم تبق له قوة. ما الذي يعطيه طاقة جديدة؟",
   },
   "turnschuh-schnuersenkel": {
     name: "حذاء رياضي",
@@ -831,6 +948,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نربط الحذاء.",
     right: "أربطة الحذاء تناسب الحذاء الرياضي. رائع!",
     belongs: "أربطة الحذاء تناسب الحذاء الرياضي!",
+    caption: "نريد أن نربط الحذاء. ماذا نحتاج لذلك؟",
   },
   "hose-guertel": {
     name: "بنطال",
@@ -838,6 +956,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "البنطال ينزلق! نريد أن يبقى في مكانه.",
     right: "الحزام يناسب البنطال. رائع!",
     belongs: "الحزام يناسب البنطال!",
+    caption: "البنطال ينزلق! نريد أن يبقى في مكانه. ما الذي يمسكه عند الخصر؟",
   },
   "buegelbrett-buegeleisen": {
     name: "طاولة كي",
@@ -845,6 +964,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "القميص مجعد. نريد أن نجعله أملس.",
     right: "المكواة تناسب طاولة الكي. رائع!",
     belongs: "المكواة تناسب طاولة الكي!",
+    caption: "القميص مجعد. نريد أن نجعله أملس. بماذا يصبح أملس؟",
   },
   "tafel-kreide": {
     name: "سبورة",
@@ -852,6 +972,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نرسم شيئًا على السبورة.",
     right: "الطباشير يناسب السبورة. رائع!",
     belongs: "الطباشير يناسب السبورة!",
+    caption: "نريد أن نرسم شيئًا على السبورة. بماذا نكتب عليها؟",
   },
   "xylofon-schlaegel": {
     name: "إكسيليفون",
@@ -859,22 +980,39 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن ننقر على الألواح الملونة.",
     right: "المضارب تناسب الإكسيليفون. رائع!",
     belongs: "المضارب تناسب الإكسيليفون!",
+    caption: "نريد أن ننقر على الألواح الملونة. بماذا ننقر عليها؟",
   },
-  "perlen-schnur": { name: "خرز", partner: "خيط", question: "نريد أن نصنع قلادة.", right: "الخيط يناسب الخرز. رائع!", belongs: "الخيط يناسب الخرز!" },
+  "perlen-schnur": {
+    name: "خرز",
+    partner: "خيط",
+    question: "نريد أن نصنع قلادة.",
+    right: "الخيط يناسب الخرز. رائع!",
+    belongs: "الخيط يناسب الخرز!",
+    caption: "نريد أن نصنع قلادة. على ماذا تُنظم الخرزات؟",
+  },
   "bastelbild-klebestift": {
     name: "لوحة أشغال",
     partner: "قلم صمغ",
     question: "نريد أن تبقى الأوراق ملتصقة باللوحة.",
     right: "قلم الصمغ يناسب لوحة الأشغال. رائع!",
     belongs: "قلم الصمغ يناسب لوحة الأشغال!",
+    caption: "نريد أن تبقى الأوراق ملتصقة باللوحة. بماذا تُلصق؟",
   },
-  "tor-ball": { name: "مرمى", partner: "كرة قدم", question: "نريد أن نسجل هدفًا.", right: "كرة القدم تناسب المرمى. رائع!", belongs: "كرة القدم تناسب المرمى!" },
+  "tor-ball": {
+    name: "مرمى",
+    partner: "كرة قدم",
+    question: "نريد أن نسجل هدفًا.",
+    right: "كرة القدم تناسب المرمى. رائع!",
+    belongs: "كرة القدم تناسب المرمى!",
+    caption: "نريد أن نسجل هدفًا. بماذا يتم ذلك؟",
+  },
   "puzzle-puzzleteil": {
     name: "أحجية",
     partner: "قطعة أحجية",
     question: "ما زال جزء ناقصًا. نريد أن نكمل الصورة.",
     right: "قطعة الأحجية تناسب الأحجية. رائع!",
     belongs: "قطعة الأحجية تناسب الأحجية!",
+    caption: "ما زال جزء ناقصًا. نريد أن نكمل الصورة. ما الذي يناسب الفراغ؟",
   },
   "trommel-trommelstoecke": {
     name: "طبل",
@@ -882,6 +1020,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نصنع صوتًا عاليًا: بوم، بوم!",
     right: "عصي الطبل تناسب الطبل. رائع!",
     belongs: "عصي الطبل تناسب الطبل!",
+    caption: "نريد أن نصنع صوتًا عاليًا: بوم، بوم! بماذا نضرب عليها؟",
   },
   "feuerstelle-feuer": {
     name: "موقد",
@@ -889,6 +1028,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الحطب جاهز. نريد أن نتدفأ.",
     right: "النار تناسب الموقد. رائع!",
     belongs: "النار تناسب الموقد!",
+    caption: "الحطب جاهز. نريد أن نتدفأ. ماذا نحتاج للإشعال؟",
   },
   "apfelbaum-leiter": {
     name: "شجرة تفاح",
@@ -896,6 +1036,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "التفاح معلق عاليًا جدًا. نريد أن نقطفه.",
     right: "السلم يناسب شجرة التفاح. رائع!",
     belongs: "السلم يناسب شجرة التفاح!",
+    caption: "التفاح معلق عاليًا جدًا. نريد أن نقطفه. ما الذي يساعدنا على الصعود؟",
   },
   "planschbecken-gartenschlauch": {
     name: "مسبح أطفال",
@@ -903,6 +1044,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المسبح فارغ. نريد أن نملأه بالماء.",
     right: "خرطوم الحديقة يناسب مسبح الأطفال. رائع!",
     belongs: "خرطوم الحديقة يناسب مسبح الأطفال!",
+    caption: "المسبح فارغ. نريد أن نملأه بالماء. بماذا يتم ذلك؟",
   },
   "rasen-rasenmaeher": {
     name: "عشب",
@@ -910,6 +1052,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "العشب طويل جدًا. نريد أن نجعله قصيرًا.",
     right: "جزازة العشب تناسب العشب. رائع!",
     belongs: "جزازة العشب تناسب العشب!",
+    caption: "العشب طويل جدًا. نريد أن نجعله قصيرًا. بماذا يتم ذلك؟",
   },
   "waescheleine-waescheklammern": {
     name: "حبل غسيل",
@@ -917,6 +1060,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن يبقى القميص معلقًا ولا يسقط.",
     right: "مشابك الغسيل تناسب حبل الغسيل. رائع!",
     belongs: "مشابك الغسيل تناسب حبل الغسيل!",
+    caption: "نريد أن يبقى القميص معلقًا ولا يسقط. ما الذي يثبته؟",
   },
   "picknickdecke-picknickkorb": {
     name: "بطانية نزهة",
@@ -924,6 +1068,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "البطانية جاهزة. نريد أن نأكل.",
     right: "سلة النزهة تناسب بطانية النزهة. رائع!",
     belongs: "سلة النزهة تناسب بطانية النزهة!",
+    caption: "البطانية جاهزة. نريد أن نأكل. ماذا نحزم معنا؟",
   },
   "see-schlittschuhe": {
     name: "بحيرة متجمدة",
@@ -931,6 +1076,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "البحيرة متجمدة. نريد أن ننزلق فوق الجليد.",
     right: "أحذية التزلج تناسب البحيرة المتجمدة. رائع!",
     belongs: "أحذية التزلج تناسب البحيرة المتجمدة!",
+    caption: "البحيرة متجمدة. نريد أن ننزلق فوق الجليد. ماذا نلبس في القدمين؟",
   },
   "schneeweg-schneeschieber": {
     name: "طريق مغطى بالثلج",
@@ -938,6 +1084,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الطريق مغطى بالثلج. نريد أن نزيح الثلج عنه.",
     right: "مجرفة الثلج تناسب الطريق المغطى بالثلج. رائع!",
     belongs: "مجرفة الثلج تناسب الطريق المغطى بالثلج!",
+    caption: "الطريق مغطى بالثلج. نريد أن نزيح الثلج عنه. بماذا يتم ذلك؟",
   },
   "haltestelle-bus": {
     name: "موقف حافلات",
@@ -945,6 +1092,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "ننتظر هنا، ونريد أن نركب.",
     right: "الحافلة تناسب موقف الحافلات. رائع!",
     belongs: "الحافلة تناسب موقف الحافلات!",
+    caption: "ننتظر هنا، ونريد أن نركب. بماذا نكمل الرحلة بعد قليل؟",
   },
   "auto-reifen": {
     name: "سيارة",
@@ -952,6 +1100,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "عجلة واحدة ناقصة. السيارة تريد أن تسير من جديد.",
     right: "الإطار يناسب السيارة. رائع!",
     belongs: "الإطار يناسب السيارة!",
+    caption: "عجلة واحدة ناقصة. السيارة تريد أن تسير من جديد. ماذا يجب أن نركّب؟",
   },
   "ruderboot-ruder": {
     name: "قارب تجديف",
@@ -959,6 +1108,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نعبر البحيرة بالقارب.",
     right: "المجاديف تناسب قارب التجديف. رائع!",
     belongs: "المجاديف تناسب قارب التجديف!",
+    caption: "نريد أن نعبر البحيرة بالقارب. بماذا يتحرك؟",
   },
   "torte-kerze": {
     name: "كعكة",
@@ -966,6 +1116,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نحتفل بعيد الميلاد! نريد أن ننفخ.",
     right: "الشموع تناسب الكعكة. رائع!",
     belongs: "الشموع تناسب الكعكة!",
+    caption: "نحتفل بعيد الميلاد! نريد أن ننفخ. ماذا نضع فوقها؟",
   },
   "osternest-ostereier": {
     name: "عش فصح",
@@ -973,6 +1124,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "العش ما زال فارغًا. الأرنب خبأ شيئًا ملونًا.",
     right: "بيض الفصح يناسب عش الفصح. رائع!",
     belongs: "بيض الفصح يناسب عش الفصح!",
+    caption: "العش ما زال فارغًا. الأرنب خبأ شيئًا ملونًا. ماذا يوجد في العش؟",
   },
   "plaetzchenteig-ausstechform": {
     name: "عجين بسكويت",
@@ -980,6 +1132,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن نخبز نجومًا لعيد الميلاد.",
     right: "قالب البسكويت يناسب عجين البسكويت. رائع!",
     belongs: "قالب البسكويت يناسب عجين البسكويت!",
+    caption: "نريد أن نخبز نجومًا لعيد الميلاد. بماذا نقصها؟",
   },
   "clownskostuem-clownsnase": {
     name: "زي مهرج",
@@ -987,6 +1140,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "نريد أن يكون شكلنا مضحكًا. ما زال ينقص شيء أحمر على الوجه.",
     right: "أنف المهرج يناسب زي المهرج. رائع!",
     belongs: "أنف المهرج يناسب زي المهرج!",
+    caption: "نريد أن يكون شكلنا مضحكًا. ما زال ينقص شيء أحمر على الوجه. ماذا نضع في وسط الوجه؟",
   },
   paketbotin: {
     name: "ساعية بريد",
@@ -994,6 +1148,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "ساعية البريد تريد أن تدفع برج الطرود العالي إلى البيت.",
     right: "ساعية البريد تحتاج إلى عربة اليد. رائع!",
     belongs: "ساعية البريد تحتاج إلى عربة اليد!",
+    caption: "ساعية البريد تريد أن تدفع برج الطرود العالي إلى البيت. ما الذي يساعدها في ذلك؟",
   },
   strassenkehrer: {
     name: "كناس شوارع",
@@ -1001,6 +1156,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "كناس الشوارع يريد أن ينظف الشارع كله.",
     right: "كناس الشوارع يحتاج إلى آلة الكنس. رائع!",
     belongs: "كناس الشوارع يحتاج إلى آلة الكنس!",
+    caption: "كناس الشوارع يريد أن ينظف الشارع كله. بماذا يسير؟",
   },
   strassenbauerin: {
     name: "عاملة طرق",
@@ -1008,6 +1164,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "عاملة الطرق تريد أن تجعل الإسفلت الجديد أملس تمامًا.",
     right: "عاملة الطرق تحتاج إلى المدحلة. رائع!",
     belongs: "عاملة الطرق تحتاج إلى المدحلة!",
+    caption: "عاملة الطرق تريد أن تجعل الإسفلت الجديد أملس تمامًا. ما الذي يدور فوقه؟",
   },
   abschleppfahrer: {
     name: "سائق شاحنة سحب",
@@ -1015,6 +1172,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يسحب السيارة المعطلة بعيدًا.",
     right: "سائق شاحنة السحب يحتاج إلى شاحنة السحب. رائع!",
     belongs: "سائق شاحنة السحب يحتاج إلى شاحنة السحب!",
+    caption: "الدب يريد أن يسحب السيارة المعطلة بعيدًا. بماذا يتم ذلك؟",
   },
   schneepflugfahrer: {
     name: "سائق كاسحة ثلج",
@@ -1022,6 +1180,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الطريق مغطى بالثلج كله. الثعلب يريد أن يفتحه.",
     right: "سائق كاسحة الثلج يحتاج إلى كاسحة الثلج. رائع!",
     belongs: "سائق كاسحة الثلج يحتاج إلى كاسحة الثلج!",
+    caption: "الطريق مغطى بالثلج كله. الثعلب يريد أن يفتحه. بماذا يسير؟",
   },
   zahnaerztin: {
     name: "طبيبة أسنان",
@@ -1029,6 +1188,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "طبيبة الأسنان تريد أن تنظر في عمق فمك.",
     right: "طبيبة الأسنان تحتاج إلى مرآة الأسنان. رائع!",
     belongs: "طبيبة الأسنان تحتاج إلى مرآة الأسنان!",
+    caption: "طبيبة الأسنان تريد أن تنظر في عمق فمك. بماذا يتم ذلك؟",
   },
   krankenpfleger: {
     name: "ممرض",
@@ -1036,6 +1196,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "ساق طفل الدب في الجبس. الممرض يريد أن يأخذه إلى الخارج.",
     right: "الممرض يحتاج إلى الكرسي المتحرك. رائع!",
     belongs: "الممرض يحتاج إلى الكرسي المتحرك!",
+    caption: "ساق طفل الدب في الجبس. الممرض يريد أن يأخذه إلى الخارج. بماذا يتم ذلك؟",
   },
   ohrenaerztin: {
     name: "طبيبة أذن",
@@ -1043,6 +1204,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "طبيبة الأذن تريد أن تنظر في أذنك.",
     right: "طبيبة الأذن تحتاج إلى منظار الأذن. رائع!",
     belongs: "طبيبة الأذن تحتاج إلى منظار الأذن!",
+    caption: "طبيبة الأذن تريد أن تنظر في أذنك. بماذا يتم ذلك؟",
   },
   augenaerztin: {
     name: "طبيبة عيون",
@@ -1050,6 +1212,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "طبيبة العيون تريد أن تريك صورًا على الحائط.",
     right: "طبيبة العيون تحتاج إلى لوحة النظر. رائع!",
     belongs: "طبيبة العيون تحتاج إلى لوحة النظر!",
+    caption: "طبيبة العيون تريد أن تريك صورًا على الحائط. ما الذي يساعد على التعرف عليها؟",
   },
   polizist: {
     name: "شرطي",
@@ -1057,6 +1220,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الشرطي يريد أن يقول للسيارات متى تسير.",
     right: "الشرطي يحتاج إلى الصفارة. رائع!",
     belongs: "الشرطي يحتاج إلى الصفارة!",
+    caption: "الشرطي يريد أن يقول للسيارات متى تسير. بماذا يعطي الإشارة؟",
   },
   feuerwehrmann: {
     name: "إطفائي",
@@ -1064,6 +1228,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الشواية تحترق! الإطفائي يريد أن يطفئ اللهب.",
     right: "الإطفائي يحتاج إلى طفاية الحريق. رائع!",
     belongs: "الإطفائي يحتاج إلى طفاية الحريق!",
+    caption: "الشواية تحترق! الإطفائي يريد أن يطفئ اللهب. ما الذي يساعد في ذلك؟",
   },
   polizistin: {
     name: "شرطية",
@@ -1071,6 +1236,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الشرطية تبحث عن الدب المحشو. أنف قوي يساعدها.",
     right: "الشرطية تحتاج إلى كلب الشرطة. رائع!",
     belongs: "الشرطية تحتاج إلى كلب الشرطة!",
+    caption: "الشرطية تبحث عن الدب المحشو. أنف قوي يساعدها. من الذي يساعدها في البحث؟",
   },
   pizzabaecker: {
     name: "خباز بيتزا",
@@ -1078,6 +1244,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يضع الطعام في عمق الفرن الساخن.",
     right: "خباز البيتزا يحتاج إلى مجرفة البيتزا. رائع!",
     belongs: "خباز البيتزا يحتاج إلى مجرفة البيتزا!",
+    caption: "الثعلب يريد أن يضع الطعام في عمق الفرن الساخن. بماذا يتم ذلك؟",
   },
   konditorin: {
     name: "صانعة حلويات",
@@ -1085,6 +1252,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "صانعة الحلويات تريد أن تضع الكريمة على الكعكة لتصبح جميلة.",
     right: "صانعة الحلويات تحتاج إلى كيس التزيين. رائع!",
     belongs: "صانعة الحلويات تحتاج إلى كيس التزيين!",
+    caption: "صانعة الحلويات تريد أن تضع الكريمة على الكعكة لتصبح جميلة. بماذا يتم ذلك؟",
   },
   koch: {
     name: "طباخ",
@@ -1092,6 +1260,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الطباخ يريد أن يصب الشوربة في الوعاء.",
     right: "الطباخ يحتاج إلى المغرفة. رائع!",
     belongs: "الطباخ يحتاج إلى المغرفة!",
+    caption: "الطباخ يريد أن يصب الشوربة في الوعاء. بماذا يتم ذلك؟",
   },
   eisverkaeuferin: {
     name: "بائعة مثلجات",
@@ -1099,6 +1268,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "بائعة المثلجات تريد أن تصنع كرة مثلجات مستديرة.",
     right: "بائعة المثلجات تحتاج إلى مغرفة المثلجات. رائع!",
     belongs: "بائعة المثلجات تحتاج إلى مغرفة المثلجات!",
+    caption: "بائعة المثلجات تريد أن تصنع كرة مثلجات مستديرة. ما الذي يساعدها في ذلك؟",
   },
   kassierer: {
     name: "محاسب",
@@ -1106,6 +1276,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "حان وقت الدفع. البائع يريد أن يأخذ المال.",
     right: "المحاسب يحتاج إلى آلة النقود. رائع!",
     belongs: "المحاسب يحتاج إلى آلة النقود!",
+    caption: "حان وقت الدفع. البائع يريد أن يأخذ المال. أين يوضع المال؟",
   },
   kellnerin: {
     name: "نادلة",
@@ -1113,6 +1284,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "النادلة تريد أن تحمل ثلاثة فناجين والكعكة معًا.",
     right: "النادلة تحتاج إلى الصينية. رائع!",
     belongs: "النادلة تحتاج إلى الصينية!",
+    caption: "النادلة تريد أن تحمل ثلاثة فناجين والكعكة معًا. على ماذا تضع كل شيء؟",
   },
   marktfrau: {
     name: "بائعة سوق",
@@ -1120,6 +1292,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "بائعة السوق تريد أن تعرف كم وزن التفاح.",
     right: "بائعة السوق تحتاج إلى الميزان. رائع!",
     belongs: "بائعة السوق تحتاج إلى الميزان!",
+    caption: "بائعة السوق تريد أن تعرف كم وزن التفاح. ما الذي يُظهر ذلك؟",
   },
   waffelbaeckerin: {
     name: "صانعة وافل",
@@ -1127,6 +1300,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "صانعة الوافل تريد أن تخبز قلوبًا حلوة.",
     right: "صانعة الوافل تحتاج إلى آلة الوافل. رائع!",
     belongs: "صانعة الوافل تحتاج إلى آلة الوافل!",
+    caption: "صانعة الوافل تريد أن تخبز قلوبًا حلوة. ما الذي يسخن في ذلك؟",
   },
   gaertner: {
     name: "بستاني",
@@ -1134,6 +1308,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "البستاني يريد أن يجعل العشب الطويل قصيرًا.",
     right: "البستاني يحتاج إلى جزازة العشب. رائع!",
     belongs: "البستاني يحتاج إلى جزازة العشب!",
+    caption: "البستاني يريد أن يجعل العشب الطويل قصيرًا. بماذا يتم ذلك؟",
   },
   bauer: {
     name: "مزارع",
@@ -1141,6 +1316,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المزارع يريد أن يحلب البقرة.",
     right: "المزارع يحتاج إلى دلو الحليب. رائع!",
     belongs: "المزارع يحتاج إلى دلو الحليب!",
+    caption: "المزارع يريد أن يحلب البقرة. ماذا يضع تحتها؟",
   },
   schaefer: {
     name: "راعي غنم",
@@ -1148,6 +1324,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الخراف تركض في كل مكان. الراعي يريد أن يجمعها.",
     right: "راعي الغنم يحتاج إلى كلب الرعي. رائع!",
     belongs: "راعي الغنم يحتاج إلى كلب الرعي!",
+    caption: "الخراف تركض في كل مكان. الراعي يريد أن يجمعها. من الذي يساعده في ذلك؟",
   },
   obstbaeuerin: {
     name: "مزارعة فاكهة",
@@ -1155,6 +1332,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "مزارعة الفاكهة تريد أن تقطف التفاح من أعلى الشجرة.",
     right: "مزارعة الفاكهة تحتاج إلى السلم. رائع!",
     belongs: "مزارعة الفاكهة تحتاج إلى السلم!",
+    caption: "مزارعة الفاكهة تريد أن تقطف التفاح من أعلى الشجرة. ما الذي يساعدها على الصعود؟",
   },
   pferdepflegerin: {
     name: "سائسة خيول",
@@ -1162,6 +1340,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الفرس جائع. السائسة تريد أن تحضر له الطعام.",
     right: "سائسة الخيول تحتاج إلى المذراة. رائع!",
     belongs: "سائسة الخيول تحتاج إلى المذراة!",
+    caption: "الفرس جائع. السائسة تريد أن تحضر له الطعام. بماذا يتم ذلك؟",
   },
   maehdrescherfahrer: {
     name: "سائق حصادة",
@@ -1169,6 +1348,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يحصد حقل القمح كله.",
     right: "سائق الحصادة يحتاج إلى الحصادة. رائع!",
     belongs: "سائق الحصادة يحتاج إلى الحصادة!",
+    caption: "الثعلب يريد أن يحصد حقل القمح كله. بماذا يتم ذلك؟",
   },
   harfenspielerin: {
     name: "عازفة قيثارة",
@@ -1176,6 +1356,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدبة تريد أن تعزف على الأوتار بلطف شديد.",
     right: "عازفة القيثارة تحتاج إلى القيثارة. رائع!",
     belongs: "عازفة القيثارة تحتاج إلى القيثارة!",
+    caption: "الدبة تريد أن تعزف على الأوتار بلطف شديد. ماذا يوجد أمامها؟",
   },
   xylofonspieler: {
     name: "عازف إكسيليفون",
@@ -1183,6 +1364,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أن يعزف نغمات للأطفال.",
     right: "عازف الإكسيليفون يحتاج إلى الإكسيليفون. رائع!",
     belongs: "عازف الإكسيليفون يحتاج إلى الإكسيليفون!",
+    caption: "الثعلب يريد أن يعزف نغمات للأطفال. على ماذا ينقر؟",
   },
   tubaspieler: {
     name: "عازف توبا",
@@ -1190,6 +1372,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يصدر صوتًا عميقًا وعاليًا جدًا.",
     right: "عازف التوبا يحتاج إلى التوبا. رائع!",
     belongs: "عازف التوبا يحتاج إلى التوبا!",
+    caption: "الدب يريد أن يصدر صوتًا عميقًا وعاليًا جدًا. بماذا يصدر الصوت؟",
   },
   jongleur: {
     name: "لاعب سيرك",
@@ -1197,6 +1380,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "لاعب السيرك يريد أن يرمي ثلاثة أشياء في الهواء معًا.",
     right: "لاعب السيرك يحتاج إلى الكرات الملونة. رائع!",
     belongs: "لاعب السيرك يحتاج إلى الكرات الملونة!",
+    caption: "لاعب السيرك يريد أن يرمي ثلاثة أشياء في الهواء معًا. ماذا يرمي؟",
   },
   puppenspielerin: {
     name: "محركة دمى",
@@ -1204,6 +1388,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "محركة الدمى تريد أن تعرض مسرحية للأطفال.",
     right: "محركة الدمى تحتاج إلى دمية اليد. رائع!",
     belongs: "محركة الدمى تحتاج إلى دمية اليد!",
+    caption: "محركة الدمى تريد أن تعرض مسرحية للأطفال. بماذا تقدمها؟",
   },
   einradfahrer: {
     name: "راكب دراجة أحادية",
@@ -1211,6 +1396,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدب يريد أن يحافظ على توازنه، ويدور في الساحة.",
     right: "راكب الدراجة الأحادية يحتاج إلى الدراجة الأحادية. رائع!",
     belongs: "راكب الدراجة الأحادية يحتاج إلى الدراجة الأحادية!",
+    caption: "الدب يريد أن يحافظ على توازنه، ويدور في الساحة. ماذا يوجد تحته؟",
   },
   akrobatin: {
     name: "لاعبة أكروبات",
@@ -1218,6 +1404,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "لاعبة الأكروبات تريد أن تطير عاليًا تحت سقف السيرك.",
     right: "لاعبة الأكروبات تحتاج إلى الأرجوحة. رائع!",
     belongs: "لاعبة الأكروبات تحتاج إلى الأرجوحة!",
+    caption: "لاعبة الأكروبات تريد أن تطير عاليًا تحت سقف السيرك. بماذا تتعلق؟",
   },
   ruderin: {
     name: "مجدفة",
@@ -1225,6 +1412,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الدبة تريد أن تعبر البحيرة إلى الجزيرة.",
     right: "المجدفة تحتاج إلى المجاديف. رائع!",
     belongs: "المجدفة تحتاج إلى المجاديف!",
+    caption: "الدبة تريد أن تعبر البحيرة إلى الجزيرة. بماذا يتم ذلك؟",
   },
   weihnachtsmann: {
     name: "بابا نويل",
@@ -1232,6 +1420,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "بابا نويل يريد أن يوصل الهدايا. لكن ينقصه في الأمام من يجره.",
     right: "بابا نويل يحتاج إلى غزال الرنة. رائع!",
     belongs: "بابا نويل يحتاج إلى غزال الرنة!",
+    caption: "بابا نويل يريد أن يوصل الهدايا. لكن ينقصه في الأمام من يجره. من يجر المزلجة؟",
   },
   prinzessin: {
     name: "أميرة",
@@ -1239,6 +1428,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الأميرة تريد أن تذهب إلى القصر كما في الحكايات.",
     right: "الأميرة تحتاج إلى العربة الملكية. رائع!",
     belongs: "الأميرة تحتاج إلى العربة الملكية!",
+    caption: "الأميرة تريد أن تذهب إلى القصر كما في الحكايات. بماذا يتم ذلك؟",
   },
   sandmann: {
     name: "رجل الرمل",
@@ -1246,6 +1436,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الثعلب يريد أحلامًا حلوة للطفل.",
     right: "رجل الرمل يحتاج إلى رمل النوم. رائع!",
     belongs: "رجل الرمل يحتاج إلى رمل النوم!",
+    caption: "الثعلب يريد أحلامًا حلوة للطفل. ماذا ينثر في عينيه؟",
   },
   "frau-holle": {
     name: "الأم هولي",
@@ -1253,6 +1444,7 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "الأم هولي تريد أن تجعل الثلج يتساقط.",
     right: "الأم هولي تحتاج إلى لحاف الريش. رائع!",
     belongs: "الأم هولي تحتاج إلى لحاف الريش!",
+    caption: "الأم هولي تريد أن تجعل الثلج يتساقط. بماذا تغطي الأرض؟",
   },
   tiefseeforscherin: {
     name: "مستكشفة أعماق",
@@ -1260,5 +1452,6 @@ export const ARABIC_SCENES: TogetherTranslation = {
     question: "المستكشفة تريد أن تنزل عميقًا جدًا إلى الأسماك.",
     right: "مستكشفة الأعماق تحتاج إلى الغواصة. رائع!",
     belongs: "مستكشفة الأعماق تحتاج إلى الغواصة!",
+    caption: "المستكشفة تريد أن تنزل عميقًا جدًا إلى الأسماك. بماذا يتم ذلك؟",
   },
 };

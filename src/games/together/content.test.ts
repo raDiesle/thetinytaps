@@ -10,6 +10,7 @@ import { SCENES } from "./scenes";
 import { TOPICS } from "./topics";
 import { KIND_SIGNS } from "./RoundTopic";
 import { framesOf, partImage } from "./frames";
+import { CAPTIONS } from "./captions";
 import { PAINTED } from "./painted";
 import { TOGETHER_PICTURE_QUEUE } from "./picturePrompts";
 import { planQueue } from "@/content/pictureQueuePlan";
@@ -168,6 +169,28 @@ test("each pair has a wish that never names its partner", () => {
   }
 });
 
+// The caption under the picture (user request, November 2026): the wish, then a question about what is needed – a full
+// sentence grown-ups and child read together. It names the one above, never its partner nor a word holding it, and is
+// said nowhere (so it has no recording); every language has its own (`content.<lang>.ts`, the test below).
+test("each pair has a caption: its wish and a question, never naming the partner", () => {
+  const ids = new Set(ALL.map((p) => p.id));
+  for (const id of Object.keys(CAPTIONS)) expect(ids.has(id) ? id : `caption of ${id}, no pair`).toBe(id);
+  const problems: string[] = [];
+  for (const { id, partner, wish } of ALL) {
+    const caption = CAPTIONS[id];
+    if (!caption) {
+      problems.push(`${id} has no caption`);
+      continue;
+    }
+    if (!caption.startsWith(wish)) problems.push(`${id}: „${caption}“ does not begin with its wish („${wish}“)`);
+    if (!caption.endsWith("?")) problems.push(`${id}: „${caption}“ asks no question`);
+    if (caption.length > 120) problems.push(`${id}: „${caption}“ is ${caption.length} characters, a line too long under the picture`);
+    const named = namesPartner(caption, partner);
+    if (named) problems.push(`${id}: „${caption}“ names ${partner} („${named}“)`);
+  }
+  expect(problems).toEqual([]);
+});
+
 // Within a kind each emoji stands for one thing only: a partner's emoji is no other pair's partner nor any thing above,
 // and nothing placed round a thing for context is a partner a child could be offered as the answer.
 test("an emoji means one thing in its kind, and no context emoji is a partner", () => {
@@ -245,7 +268,7 @@ test("every language says every pair in its own words, the wish too", () => {
       const said = sentences[id];
       expect(said ? id : `${language} ${id} is not translated`).toBe(id);
       if (!said) continue;
-      for (const key of ["name", "partner", "question", "right", "belongs"] as const) {
+      for (const key of ["name", "partner", "question", "caption", "right", "belongs"] as const) {
         expect(said[key].trim().length > 0 ? id : `${language} ${id}: no ${key}`).toBe(id);
         if (OWN_SCRIPT.includes(language)) expect(said[key], `${language} ${id} ${key}`).not.toMatch(/[A-Za-zäöüß]/);
       }
@@ -253,12 +276,18 @@ test("every language says every pair in its own words, the wish too", () => {
       expect(said.question, `${language} ${id}`).not.toBe(german.get(id)?.wish);
       // Z-25 in every language: the wish leaves the partner to the child.
       expect(holds(said.question, said.partner, language) ? `${language} ${id}: „${said.question}“ names ${said.partner}` : "").toBe("");
+      // The caption names no partner either, and asks its question in the language's own words (never German).
+      expect(holds(said.caption, said.partner, language) ? `${language} ${id}: „${said.caption}“ names ${said.partner}` : "").toBe("");
+      expect(said.caption, `${language} ${id} caption`).not.toBe(CAPTIONS[id]);
+      expect(
+        said.caption.endsWith("?") || said.caption.endsWith("？") || said.caption.endsWith("؟") ? id : `${language} ${id}: „${said.caption}“ asks no question`,
+      ).toBe(id);
     }
     // What the game says is exactly the translation, never German filling a gap.
     const texts = TOGETHER_TEXTS[language]!;
     const de = TOGETHER_TEXTS.de!;
     for (const pair of PAIRS.filter((p) => !GERMAN_ONLY.has(p.id))) {
-      for (const key of ["name", "partner", "question", "right", "belongs"] as const) {
+      for (const key of ["name", "partner", "question", "caption", "right", "belongs"] as const) {
         expect(texts[key](pair), `${language} ${pair.id} ${key}`).toBe(sentences[pair.id]![key]);
         if (key !== "name" && key !== "partner") expect(texts[key](pair), `${language} ${pair.id} ${key}`).not.toBe(de[key](pair));
       }

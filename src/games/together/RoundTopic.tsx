@@ -9,12 +9,12 @@ import { type Pair, TOGETHER_TEXTS } from "./pairs";
 export const KIND_SIGNS: Record<RoundKind, string> = { pair: "🤝", helper: "🦺" };
 
 /**
- * What this round is about, for grown-ups: its question as plain small text under the picture – no sign, no bubble, no
- * frame (user feedback, November 2026). The child needs none of it – it plays from the pictures and hears the wish –
- * so it stays quiet and lets every tap through. It is the pair's wish in the app language, the very sentence the voice
- * says (Z-25: „Die Blume hat Durst.“, „The flower is thirsty.“).
+ * What this round is about, under the picture: its caption as plain small text – no sign, no bubble, no frame (user
+ * feedback, November 2026). It is the wish and a question about what is needed, in the app language (`caption`, e.g.
+ * „Die Blume hat Durst. Womit bekommt sie Wasser?“). The child plays from the pictures and hears the wish, so this
+ * stays quiet and lets every tap through.
  */
 export function RoundTopic({ pair }: { pair: Pair }) {
   const { id } = useAppLanguage();
-  return <p className="tg-topic">{pick(TOGETHER_TEXTS, id).question(pair)}</p>;
+  return <p className="tg-topic">{pick(TOGETHER_TEXTS, id).caption(pair)}</p>;
 }

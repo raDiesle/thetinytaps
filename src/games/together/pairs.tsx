@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Mascot, type MascotKind } from "@/components/Mascot";
 import { byLanguage } from "@/content/texts";
+import { CAPTIONS } from "./captions";
 import type { Localized } from "@/lib/language";
 import { playGiggle, playSplash } from "@/lib/realSounds";
 import {
@@ -677,6 +678,12 @@ export interface TogetherTexts {
    * Zähne putzen.“, „Let's brush our teeth.“). Said as the round comes and shown under the picture (`RoundTopic`).
    */
   question: (p: Pair) => string;
+  /**
+   * The caption under the picture (`RoundTopic`): the wish and a question about what is needed, a full sentence for
+   * grown-ups and child to read together („Wir wollen Oma Post schicken. Was werfen wir in den gelben Postkasten?“).
+   * Shown, never said, so it has no recording.
+   */
+  caption: (p: Pair) => string;
   /** The right pick: "Die Zahnpasta gehört zur Zahnbürste. Toll!". */
   right: (p: Pair) => string;
   /** A wrong pick, while the one it belongs to pops up: "Der Schlüssel gehört zur Tür!". */
@@ -691,6 +698,7 @@ const GERMAN_TEXTS: TogetherTexts = {
   name: (p) => p.name,
   partner: (p) => p.partner.name,
   question: (p) => p.wish,
+  caption: (p) => CAPTIONS[p.id] ?? p.wish,
   right: (p) => `${GERMAN_SAYS(p)}. Toll!`,
   belongs: (p) => `${GERMAN_SAYS(p)}!`,
 };
@@ -706,6 +714,8 @@ export interface PairTranslation {
   partner: string;
   /** The pair's wish, as `TogetherTexts.question` (Z-25): what the one above wants to do, never naming the partner. */
   question: string;
+  /** The caption under the picture, as `TogetherTexts.caption`: the wish and a question, never naming the partner. */
+  caption: string;
   /** The right pick, with the praise, as `TogetherTexts.right`. */
   right: string;
   /** The partner belongs to the one above, said when it was picked wrongly, as `TogetherTexts.belongs`. */
@@ -720,6 +730,7 @@ const textsOf = (sentences: TogetherTranslation): TogetherTexts => ({
   name: (p) => sentences[p.id]?.name ?? GERMAN_TEXTS.name(p),
   partner: (p) => sentences[p.id]?.partner ?? GERMAN_TEXTS.partner(p),
   question: (p) => sentences[p.id]?.question ?? GERMAN_TEXTS.question(p),
+  caption: (p) => sentences[p.id]?.caption ?? GERMAN_TEXTS.caption(p),
   right: (p) => sentences[p.id]?.right ?? GERMAN_TEXTS.right(p),
   belongs: (p) => sentences[p.id]?.belongs ?? GERMAN_TEXTS.belongs(p),
 });

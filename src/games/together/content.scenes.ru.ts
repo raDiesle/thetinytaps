@@ -11,6 +11,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "В туалете всё сделано! Теперь мы хотим вытереться.",
     right: "Туалетная бумага подходит к туалету. Здорово!",
     belongs: "Туалетная бумага подходит к туалету!",
+    caption: "В туалете всё сделано! Теперь мы хотим вытереться. Что нам для этого нужно?",
   },
   "wasserhahn-seife": {
     name: "Кран",
@@ -18,6 +19,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лапки все в грязи. Мы хотим их хорошо помыть.",
     right: "Мыло подходит к крану. Здорово!",
     belongs: "Мыло подходит к крану!",
+    caption: "Лапки все в грязи. Мы хотим их хорошо помыть. Что убирает грязь?",
   },
   "eimer-schwamm": {
     name: "Ведро",
@@ -25,6 +27,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Сколько грязных следов от лапок! Мы хотим их оттереть.",
     right: "Губка подходит к ведру. Здорово!",
     belongs: "Губка подходит к ведру!",
+    caption: "Сколько грязных следов от лапок! Мы хотим их оттереть. Чем это лучше всего сделать?",
   },
   "muesli-milch": {
     name: "Мюсли",
@@ -32,6 +35,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим есть мюсли, но они совсем сухие.",
     right: "Молоко подходит к мюсли. Здорово!",
     belongs: "Молоко подходит к мюсли!",
+    caption: "Мы хотим есть мюсли, но они совсем сухие. Что нам налить сверху?",
   },
   "tasse-teekanne": {
     name: "Чашка",
@@ -39,6 +43,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Чашка пустая. Бабушка хочет налить что-то тёплое.",
     right: "Чайник подходит к чашке. Здорово!",
     belongs: "Чайник подходит к чашке!",
+    caption: "Чашка пустая. Бабушка хочет налить что-то тёплое. Из чего она наливает?",
   },
   "suppe-loeffel": {
     name: "Суп",
@@ -46,6 +51,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Суп готов. Мы хотим его съесть.",
     right: "Ложка подходит к супу. Здорово!",
     belongs: "Ложка подходит к супу!",
+    caption: "Суп готов. Мы хотим его съесть. Чем нам есть?",
   },
   "pausenbrot-brotdose": {
     name: "Бутерброд",
@@ -53,6 +59,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим упаковать бутерброд, чтобы он не помялся.",
     right: "Ланчбокс подходит к бутерброду. Здорово!",
     belongs: "Ланчбокс подходит к бутерброду!",
+    caption: "Мы хотим упаковать бутерброд, чтобы он не помялся. Во что его убрать?",
   },
   "pfanne-pfannenwender": {
     name: "Сковорода",
@@ -60,6 +67,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим перевернуть блинчик.",
     right: "Лопатка подходит к сковороде. Здорово!",
     belongs: "Лопатка подходит к сковороде!",
+    caption: "Мы хотим перевернуть блинчик. Чем нам перевернуть?",
   },
   "bett-teddy": {
     name: "Кровать",
@@ -67,6 +75,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим заснуть в обнимку с чем-то мягким.",
     right: "Мишка подходит к кровати. Здорово!",
     belongs: "Мишка подходит к кровати!",
+    caption: "Мы хотим заснуть в обнимку с чем-то мягким. Что нам взять с собой в кроватку?",
   },
   "zeitung-brille": {
     name: "Газета",
@@ -74,6 +83,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Дедушка хочет почитать газету, но буквы такие маленькие.",
     right: "Очки подходят к газете. Здорово!",
     belongs: "Очки подходят к газете!",
+    caption: "Дедушка хочет почитать газету, но буквы такие маленькие. Что он надевает на нос?",
   },
   "schraube-schraubenzieher": {
     name: "Шуруп",
@@ -81,6 +91,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим крепко-крепко вкрутить это в дерево.",
     right: "Отвёртка подходит к шурупу. Здорово!",
     belongs: "Отвёртка подходит к шурупу!",
+    caption: "Мы хотим крепко-крепко вкрутить это в дерево. Что нам для этого нужно?",
   },
   "besen-kehrschaufel": {
     name: "Веник",
@@ -88,6 +99,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим собрать кучку крошек.",
     right: "Совок подходит к венику. Здорово!",
     belongs: "Совок подходит к венику!",
+    caption: "Мы хотим собрать кучку крошек. Что ему в этом поможет?",
   },
   "schuh-socken": {
     name: "Кроссовок",
@@ -95,6 +107,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ножки ещё голые. Сначала надеваем что-то мягкое, потом кроссовок.",
     right: "Носки подходят к кроссовку. Здорово!",
     belongs: "Носки подходят к кроссовку!",
+    caption: "Ножки ещё голые. Сначала надеваем что-то мягкое, потом кроссовок. Что надевают сначала?",
   },
   "schal-handschuhe": {
     name: "Шарф",
@@ -102,6 +115,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Холодно. Мы хотим, чтобы лапкам было тепло.",
     right: "Перчатки подходят к шарфу. Здорово!",
     belongs: "Перчатки подходят к шарфу!",
+    caption: "Холодно. Мы хотим, чтобы лапкам было тепло. Что надевают на руки?",
   },
   "schule-schulranzen": {
     name: "Школа",
@@ -109,6 +123,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим нести тетради и книжки на спине.",
     right: "Портфель подходит к школе. Здорово!",
     belongs: "Портфель подходит к школе!",
+    caption: "Мы хотим нести тетради и книжки на спине. Что берут с собой для этого?",
   },
   "schere-buntpapier": {
     name: "Ножницы",
@@ -116,6 +131,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим резать и мастерить.",
     right: "Цветная бумага подходит к ножницам. Здорово!",
     belongs: "Цветная бумага подходит к ножницам!",
+    caption: "Мы хотим резать и мастерить. Что нужно для вырезания?",
   },
   "zauberhut-zauberstab": {
     name: "Волшебная шляпа",
@@ -123,6 +139,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фокус-покус! Мы хотим достать что-то из шляпы.",
     right: "Волшебная палочка подходит к волшебной шляпе. Здорово!",
     belongs: "Волшебная палочка подходит к волшебной шляпе!",
+    caption: "Фокус-покус! Мы хотим достать что-то из шляпы. Что для этого нужно?",
   },
   "burg-fahne": {
     name: "Замок",
@@ -130,6 +147,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Наверху на башне должно что-то развеваться.",
     right: "Флаг подходит к замку. Здорово!",
     belongs: "Флаг подходит к замку!",
+    caption: "Наверху на башне должно что-то развеваться. Что развевается на ветру?",
   },
   "laub-rechen": {
     name: "Листья",
@@ -137,6 +155,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Разноцветные листья надо собрать в кучу.",
     right: "Грабли подходят к листьям. Здорово!",
     belongs: "Грабли подходят к листьям!",
+    caption: "Разноцветные листья надо собрать в кучу. Чем это лучше всего делать?",
   },
   "zelt-taschenlampe": {
     name: "Палатка",
@@ -144,6 +163,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "В палатке темно. Мы хотим посветить внутрь.",
     right: "Фонарик подходит к палатке. Здорово!",
     belongs: "Фонарик подходит к палатке!",
+    caption: "В палатке темно. Мы хотим посветить внутрь. Что нам взять с собой?",
   },
   "regen-regenschirm": {
     name: "Дождь",
@@ -151,6 +171,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Идёт дождь. Мы не хотим промокнуть.",
     right: "Зонт подходит к дождю. Здорово!",
     belongs: "Зонт подходит к дождю!",
+    caption: "Идёт дождь. Мы не хотим промокнуть. Что мы поднимаем над головой?",
   },
   "pfuetze-gummistiefel": {
     name: "Лужа",
@@ -158,6 +179,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим прыгать по лужам, и чтобы ножки не промокли.",
     right: "Резиновые сапоги подходят к луже. Здорово!",
     belongs: "Резиновые сапоги подходят к луже!",
+    caption: "Мы хотим прыгать по лужам, и чтобы ножки не промокли. Что надевают на ноги?",
   },
   "sonne-sonnenbrille": {
     name: "Солнце",
@@ -165,6 +187,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "На улице так светло. Глазки сами жмурятся.",
     right: "Солнечные очки подходят к солнцу. Здорово!",
     belongs: "Солнечные очки подходят к солнцу!",
+    caption: "На улице так светло. Глазки сами жмурятся. Что защищает глаза?",
   },
   "schneemann-karotte": {
     name: "Снеговик",
@@ -172,6 +195,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Снеговик хочет, чтобы у него был нос.",
     right: "Морковка подходит к снеговику. Здорово!",
     belongs: "Морковка подходит к снеговику!",
+    caption: "Снеговик хочет, чтобы у него был нос. Что воткнуть ему вместо носа?",
   },
   "schnee-schlitten": {
     name: "Снег",
@@ -179,6 +203,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим скатиться с горки.",
     right: "Санки подходят к снегу. Здорово!",
     belongs: "Санки подходят к снегу!",
+    caption: "Мы хотим скатиться с горки. На чём при этом сидят?",
   },
   "drachen-wind": {
     name: "Воздушный змей",
@@ -186,6 +211,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Воздушный змей хочет взлететь высоко в небо.",
     right: "Ветер подходит к воздушному змею. Здорово!",
     belongs: "Ветер подходит к воздушному змею!",
+    caption: "Воздушный змей хочет взлететь высоко в небо. Что поднимает его вверх?",
   },
   "fahrrad-helm": {
     name: "Велосипед",
@@ -193,6 +219,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим поехать. Голова должна быть защищена.",
     right: "Шлем подходит к велосипеду. Здорово!",
     belongs: "Шлем подходит к велосипеду!",
+    caption: "Мы хотим поехать. Голова должна быть защищена. Что надевают на голову?",
   },
   "briefkasten-brief": {
     name: "Почтовый ящик",
@@ -200,6 +227,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим отправить бабушке почту.",
     right: "Письмо подходит к почтовому ящику. Здорово!",
     belongs: "Письмо подходит к почтовому ящику!",
+    caption: "Мы хотим отправить бабушке почту. Что мы бросим в жёлтый почтовый ящик?",
   },
   "tannenbaum-weihnachtsstern": {
     name: "Ёлка",
@@ -207,6 +235,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ёлка почти готова. На самую верхушку нужно ещё кое-что.",
     right: "Звезда подходит к ёлке. Здорово!",
     belongs: "Звезда подходит к ёлке!",
+    caption: "Ёлка почти готова. На самую верхушку нужно ещё кое-что. Что там блестит?",
   },
   "osterei-pinsel": {
     name: "Пасхальное яйцо",
@@ -214,6 +243,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим раскрасить яйцо.",
     right: "Кисточка подходит к пасхальному яйцу. Здорово!",
     belongs: "Кисточка подходит к пасхальному яйцу!",
+    caption: "Мы хотим раскрасить яйцо. Чем его раскрасить?",
   },
   "laterne-licht": {
     name: "Фонарь",
@@ -221,6 +251,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Темно. Фонарь должен гореть.",
     right: "Свет подходит к фонарю. Здорово!",
     belongs: "Свет подходит к фонарю!",
+    caption: "Темно. Фонарь должен гореть. Что должно быть внутри?",
   },
   "blumenstrauss-vase": {
     name: "Букет",
@@ -228,6 +259,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Цветы должны красиво стоять в воде.",
     right: "Ваза подходит к букету. Здорово!",
     belongs: "Ваза подходит к букету!",
+    caption: "Цветы должны красиво стоять в воде. Во что их поставить?",
   },
   malerin: {
     name: "Художница",
@@ -235,6 +267,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Художница хочет нарисовать дерево.",
     right: "Художнице нужна кисточка. Здорово!",
     belongs: "Художнице нужна кисточка!",
+    caption: "Художница хочет нарисовать дерево. Чем она рисует?",
   },
   astronautin: {
     name: "Космонавт",
@@ -242,6 +275,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Космонавт хочет полететь в космос.",
     right: "Космонавту нужна ракета. Здорово!",
     belongs: "Космонавту нужна ракета!",
+    caption: "Космонавт хочет полететь в космос. На чём она летит наверх?",
   },
   fensterputzer: {
     name: "Мойщик окон",
@@ -249,6 +283,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мойщик окон хочет начисто вымыть пыльное окно.",
     right: "Мойщику окон нужна губка. Здорово!",
     belongs: "Мойщику окон нужна губка!",
+    caption: "Мойщик окон хочет начисто вымыть пыльное окно. Чем он вытирает?",
   },
   fotograf: {
     name: "Фотограф",
@@ -256,6 +291,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет сделать снимок.",
     right: "Фотографу нужен фотоаппарат. Здорово!",
     belongs: "Фотографу нужен фотоаппарат!",
+    caption: "Медведь хочет сделать снимок. Чем он делает снимок?",
   },
   schneiderin: {
     name: "Швея",
@@ -263,6 +299,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Швея хочет зашить дырку на куртке.",
     right: "Швее нужна нитка. Здорово!",
     belongs: "Швее нужна нитка!",
+    caption: "Швея хочет зашить дырку на куртке. Что ей для этого нужно?",
   },
   forscherin: {
     name: "Учёный",
@@ -270,6 +307,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Учёный хочет увидеть совсем крошечные вещи большими.",
     right: "Учёному нужен микроскоп. Здорово!",
     belongs: "Учёному нужен микроскоп!",
+    caption: "Учёный хочет увидеть совсем крошечные вещи большими. Что ей в этом поможет?",
   },
   schornsteinfeger: {
     name: "Трубочист",
@@ -277,6 +315,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Трубочист хочет почистить трубу.",
     right: "Трубочисту нужна щётка. Здорово!",
     belongs: "Трубочисту нужна щётка!",
+    caption: "Трубочист хочет почистить трубу. Чем он чистит?",
   },
   muellwerker: {
     name: "Мусорщик",
@@ -284,6 +323,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет опустошить полные баки.",
     right: "Мусорщику нужен мусоровоз. Здорово!",
     belongs: "Мусорщику нужен мусоровоз!",
+    caption: "Медведь хочет опустошить полные баки. На чём он приезжает?",
   },
   raumpflegerin: {
     name: "Уборщица",
@@ -291,6 +331,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Уборщица хочет почистить ковёр.",
     right: "Уборщице нужен пылесос. Здорово!",
     belongs: "Уборщице нужен пылесос!",
+    caption: "Уборщица хочет почистить ковёр. Что едет по полу?",
   },
   bauarbeiterin: {
     name: "Строитель",
@@ -298,6 +339,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Строитель хочет достроить стену.",
     right: "Строителю нужны кирпичи. Здорово!",
     belongs: "Строителю нужны кирпичи!",
+    caption: "Строитель хочет достроить стену. Из чего стена становится выше?",
   },
   mechanikerin: {
     name: "Механик",
@@ -305,6 +347,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Механик хочет крепко прикрутить колесо к машине.",
     right: "Механику нужен гаечный ключ. Здорово!",
     belongs: "Механику нужен гаечный ключ!",
+    caption: "Механик хочет крепко прикрутить колесо к машине. Чем она закручивает?",
   },
   tischlerin: {
     name: "Столяр",
@@ -312,6 +355,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Столяр хочет разделить доску на две части.",
     right: "Столяру нужна пила. Здорово!",
     belongs: "Столяру нужна пила!",
+    caption: "Столяр хочет разделить доску на две части. Чем это сделать?",
   },
   handwerker: {
     name: "Мастер",
@@ -319,6 +363,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мастер хочет забить гвоздь в ножку стула.",
     right: "Мастеру нужен молоток. Здорово!",
     belongs: "Мастеру нужен молоток!",
+    caption: "Мастер хочет забить гвоздь в ножку стула. Чем он стучит?",
   },
   elektrikerin: {
     name: "Электрик",
@@ -326,6 +371,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Электрик хочет, чтобы под потолком снова был свет.",
     right: "Электрику нужна лампочка. Здорово!",
     belongs: "Электрику нужна лампочка!",
+    caption: "Электрик хочет, чтобы под потолком снова был свет. Что она вставит?",
   },
   kranfuehrer: {
     name: "Крановщик",
@@ -333,6 +379,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет поднять тяжёлые камни высоко на дом.",
     right: "Крановщику нужен подъёмный кран. Здорово!",
     belongs: "Крановщику нужен подъёмный кран!",
+    caption: "Лис хочет поднять тяжёлые камни высоко на дом. Чем он это сделает?",
   },
   klempner: {
     name: "Сантехник",
@@ -340,6 +387,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Сантехник хочет прочистить забитый унитаз.",
     right: "Сантехнику нужен вантуз. Здорово!",
     belongs: "Сантехнику нужен вантуз!",
+    caption: "Сантехник хочет прочистить забитый унитаз. Чем это сделать?",
   },
   baggerfahrer: {
     name: "Экскаваторщик",
@@ -347,6 +395,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет выкопать огромную яму и убрать много-много земли.",
     right: "Экскаваторщику нужен экскаватор. Здорово!",
     belongs: "Экскаваторщику нужен экскаватор!",
+    caption: "Медведь хочет выкопать огромную яму и убрать много-много земли. Чем он всё это убирает?",
   },
   anstreicher: {
     name: "Маляр",
@@ -354,6 +403,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Маляр хочет покрасить серую стену в синий цвет.",
     right: "Маляру нужен валик. Здорово!",
     belongs: "Маляру нужен валик!",
+    caption: "Маляр хочет покрасить серую стену в синий цвет. Чем это сделать?",
   },
   pilot: {
     name: "Пилот",
@@ -361,6 +411,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Пилот хочет взять много людей и улететь далеко-далеко.",
     right: "Пилоту нужен самолёт. Здорово!",
     belongs: "Пилоту нужен самолёт!",
+    caption: "Пилот хочет взять много людей и улететь далеко-далеко. На чём он летит?",
   },
   busfahrerin: {
     name: "Водитель автобуса",
@@ -368,6 +419,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Водитель хочет провезти много людей по городу.",
     right: "Водителю автобуса нужен автобус. Здорово!",
     belongs: "Водителю автобуса нужен автобус!",
+    caption: "Водитель хочет провезти много людей по городу. Что для этого нужно?",
   },
   lokfuehrer: {
     name: "Машинист",
@@ -375,6 +427,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет поехать с вагонами по рельсам.",
     right: "Машинисту нужен паровоз. Здорово!",
     belongs: "Машинисту нужен паровоз!",
+    caption: "Медведь хочет поехать с вагонами по рельсам. Чем он их тянет?",
   },
   taxifahrer: {
     name: "Таксист",
@@ -382,6 +435,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет отвезти ребёнка с чемоданом на вокзал.",
     right: "Таксисту нужно такси. Здорово!",
     belongs: "Таксисту нужно такси!",
+    caption: "Лис хочет отвезти ребёнка с чемоданом на вокзал. На чём они поедут?",
   },
   kapitaen: {
     name: "Капитан",
@@ -389,6 +443,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Капитан хочет отвезти много людей за море.",
     right: "Капитану нужен корабль. Здорово!",
     belongs: "Капитану нужен корабль!",
+    caption: "Капитан хочет отвезти много людей за море. Что несёт его по воде?",
   },
   "lkw-fahrerin": {
     name: "Водитель грузовика",
@@ -396,6 +451,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Водитель хочет отвезти много ящиков далеко-далеко.",
     right: "Водителю грузовика нужен грузовик. Здорово!",
     belongs: "Водителю грузовика нужен грузовик!",
+    caption: "Водитель хочет отвезти много ящиков далеко-далеко. На чём она поедет?",
   },
   strassenbahnfahrer: {
     name: "Водитель трамвая",
@@ -403,6 +459,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет поехать по рельсам через город.",
     right: "Водителю трамвая нужен трамвай. Здорово!",
     belongs: "Водителю трамвая нужен трамвай!",
+    caption: "Лис хочет поехать по рельсам через город. Что катится по рельсам?",
   },
   motorradfahrerin: {
     name: "Мотоциклист",
@@ -410,6 +467,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет с рёвом умчаться по дороге.",
     right: "Мотоциклисту нужен мотоцикл. Здорово!",
     belongs: "Мотоциклисту нужен мотоцикл!",
+    caption: "Лиса хочет с рёвом умчаться по дороге. На чём она умчится?",
   },
   matrose: {
     name: "Матрос",
@@ -417,6 +475,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Матрос хочет, чтобы судно здесь остановилось.",
     right: "Матросу нужен якорь. Здорово!",
     belongs: "Матросу нужен якорь!",
+    caption: "Матрос хочет, чтобы судно здесь остановилось. Что он бросает в воду?",
   },
   seilbahnfuehrerin: {
     name: "Работник канатной дороги",
@@ -424,6 +483,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет поднять людей в кабинке высоко на гору.",
     right: "Работнику канатной дороги нужна канатная дорога. Здорово!",
     belongs: "Работнику канатной дороги нужна канатная дорога!",
+    caption: "Медведица хочет поднять людей в кабинке высоко на гору. На чём она едет?",
   },
   sanitaeter: {
     name: "Фельдшер",
@@ -431,6 +491,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фельдшер хочет быстро отвезти ребёнка в больницу.",
     right: "Фельдшеру нужна скорая помощь. Здорово!",
     belongs: "Фельдшеру нужна скорая помощь!",
+    caption: "Фельдшер хочет быстро отвезти ребёнка в больницу. На чём они поедут?",
   },
   hubschrauberpilotin: {
     name: "Пилот вертолёта",
@@ -438,6 +499,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ягнёнку больно. Лётчица хочет быстро отвезти его вниз, в долину.",
     right: "Пилоту вертолёта нужен вертолёт. Здорово!",
     belongs: "Пилоту вертолёта нужен вертолёт!",
+    caption: "Ягнёнку больно. Лётчица хочет быстро отвезти его вниз, в долину. На чём она летит?",
   },
   feuerwehrfrau: {
     name: "Пожарная",
@@ -445,6 +507,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Котёнок сидит высоко на дереве и не может слезть. Медведица хочет его снять.",
     right: "Пожарной нужна пожарная машина. Здорово!",
     belongs: "Пожарной нужна пожарная машина!",
+    caption: "Котёнок сидит высоко на дереве и не может слезть. Медведица хочет его снять. На чём она приедет?",
   },
   rettungsschwimmerin: {
     name: "Спасатель",
@@ -452,6 +515,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет бросить что-то ребёнку в воде.",
     right: "Спасателю нужен спасательный круг. Здорово!",
     belongs: "Спасателю нужен спасательный круг!",
+    caption: "Лиса хочет бросить что-то ребёнку в воде. Что держит на воде?",
   },
   baeuerin: {
     name: "Фермер",
@@ -459,6 +523,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фермер хочет вспахать поле.",
     right: "Фермеру нужен трактор. Здорово!",
     belongs: "Фермеру нужен трактор!",
+    caption: "Фермер хочет вспахать поле. Что для этого нужно?",
   },
   imkerin: {
     name: "Пчеловод",
@@ -466,6 +531,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Рой сидит на ветке. Пчеловод хочет дать пчёлам домик.",
     right: "Пчеловоду нужен улей. Здорово!",
     belongs: "Пчеловоду нужен улей!",
+    caption: "Рой сидит на ветке. Пчеловод хочет дать пчёлам домик. Что она им предложит?",
   },
   holzfaeller: {
     name: "Лесоруб",
@@ -473,6 +539,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лесоруб хочет расколоть толстое полено.",
     right: "Лесорубу нужен топор. Здорово!",
     belongs: "Лесорубу нужен топор!",
+    caption: "Лесоруб хочет расколоть толстое полено. Чем он это сделает?",
   },
   gitarrist: {
     name: "Гитарист",
@@ -480,6 +547,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет спеть песенку и подыгрывать себе.",
     right: "Гитаристу нужна гитара. Здорово!",
     belongs: "Гитаристу нужна гитара!",
+    caption: "Лис хочет спеть песенку и подыгрывать себе. Что у него на коленях?",
   },
   saengerin: {
     name: "Певица",
@@ -487,6 +555,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Певица хочет громко петь для всех.",
     right: "Певице нужен микрофон. Здорово!",
     belongs: "Певице нужен микрофон!",
+    caption: "Певица хочет громко петь для всех. Что поможет, чтобы все её слышали?",
   },
   trommler: {
     name: "Барабанщик",
@@ -494,6 +563,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет шагать впереди и играть музыку.",
     right: "Барабанщику нужен барабан. Здорово!",
     belongs: "Барабанщику нужен барабан!",
+    caption: "Медведь хочет шагать впереди и играть музыку. Чем он отбивает ритм?",
   },
   trompeterin: {
     name: "Трубач",
@@ -501,6 +571,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет громко сыграть, чтобы звук летел над холмами.",
     right: "Трубачу нужна труба. Здорово!",
     belongs: "Трубачу нужна труба!",
+    caption: "Лиса хочет громко сыграть, чтобы звук летел над холмами. Во что она дует?",
   },
   geiger: {
     name: "Скрипач",
@@ -508,6 +579,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет нежно играть смычком.",
     right: "Скрипачу нужна скрипка. Здорово!",
     belongs: "Скрипачу нужна скрипка!",
+    caption: "Медведь хочет нежно играть смычком. По чему он водит смычком?",
   },
   pianistin: {
     name: "Пианист",
@@ -515,6 +587,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса сидит на табуретке и хочет поиграть.",
     right: "Пианисту нужно пианино. Здорово!",
     belongs: "Пианисту нужно пианино!",
+    caption: "Лиса сидит на табуретке и хочет поиграть. На что она нажимает?",
   },
   akkordeonspieler: {
     name: "Аккордеонист",
@@ -522,6 +595,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет растягивать, сжимать и играть.",
     right: "Аккордеонисту нужен аккордеон. Здорово!",
     belongs: "Аккордеонисту нужен аккордеон!",
+    caption: "Медведь хочет растягивать, сжимать и играть. Что у него перед грудью?",
   },
   saxofonistin: {
     name: "Саксофонист",
@@ -529,6 +603,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет подуть и сыграть весёлую мелодию.",
     right: "Саксофонисту нужен саксофон. Здорово!",
     belongs: "Саксофонисту нужен саксофон!",
+    caption: "Лиса хочет подуть и сыграть весёлую мелодию. Что для этого нужно?",
   },
   floetenspieler: {
     name: "Флейтист",
@@ -536,6 +611,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет играть наперегонки с птичками.",
     right: "Флейтисту нужна флейта. Здорово!",
     belongs: "Флейтисту нужна флейта!",
+    caption: "Медведь хочет играть наперегонки с птичками. Что для этого нужно?",
   },
   fussballerin: {
     name: "Футболист",
@@ -543,6 +619,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет забить гол.",
     right: "Футболисту нужен футбольный мяч. Здорово!",
     belongs: "Футболисту нужен футбольный мяч!",
+    caption: "Лиса хочет забить гол. Что ей нужно на поле?",
   },
   basketballspieler: {
     name: "Баскетболист",
@@ -550,6 +627,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет попасть в корзину.",
     right: "Баскетболисту нужен баскетбольный мяч. Здорово!",
     belongs: "Баскетболисту нужен баскетбольный мяч!",
+    caption: "Медведь хочет попасть в корзину. Что ему для этого нужно?",
   },
   tennisspielerin: {
     name: "Теннисист",
@@ -557,6 +635,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет сделать подачу.",
     right: "Теннисисту нужен теннисный мяч. Здорово!",
     belongs: "Теннисисту нужен теннисный мяч!",
+    caption: "Медведица хочет сделать подачу. Что потом летит через сетку?",
   },
   schwimmer: {
     name: "Пловец",
@@ -564,6 +643,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет открыть глаза под водой.",
     right: "Пловцу нужны очки для плавания. Здорово!",
     belongs: "Пловцу нужны очки для плавания!",
+    caption: "Лис хочет открыть глаза под водой. Что он надевает на глаза?",
   },
   skifahrerin: {
     name: "Лыжник",
@@ -571,6 +651,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет промчаться вниз по заснеженной горе.",
     right: "Лыжнику нужны лыжи. Здорово!",
     belongs: "Лыжнику нужны лыжи!",
+    caption: "Лиса хочет промчаться вниз по заснеженной горе. Что для этого нужно?",
   },
   eislaeufer: {
     name: "Фигурист",
@@ -578,6 +659,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фигурист хочет скользить по льду.",
     right: "Фигуристу нужны коньки. Здорово!",
     belongs: "Фигуристу нужны коньки!",
+    caption: "Фигурист хочет скользить по льду. Что он надевает на ноги?",
   },
   rodlerin: {
     name: "Саночник",
@@ -585,6 +667,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет скатиться с ребёнком с холма.",
     right: "Саночнику нужны санки. Здорово!",
     belongs: "Саночнику нужны санки!",
+    caption: "Медведица хочет скатиться с ребёнком с холма. На чём она сидит?",
   },
   segler: {
     name: "Яхтсмен",
@@ -592,6 +675,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет плыть по воде вместе с ветром.",
     right: "Яхтсмену нужна парусная лодка. Здорово!",
     belongs: "Яхтсмену нужна парусная лодка!",
+    caption: "Лис хочет плыть по воде вместе с ветром. Что для этого нужно?",
   },
   rennfahrerin: {
     name: "Гонщик",
@@ -599,6 +683,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет очень быстро ездить по кругу.",
     right: "Гонщику нужна гоночная машина. Здорово!",
     belongs: "Гонщику нужна гоночная машина!",
+    caption: "Лиса хочет очень быстро ездить по кругу. Что для этого нужно?",
   },
   skater: {
     name: "Скейтер",
@@ -606,6 +691,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет скатиться по рампе.",
     right: "Скейтеру нужен скейтборд. Здорово!",
     belongs: "Скейтеру нужен скейтборд!",
+    caption: "Медведь хочет скатиться по рампе. На чём он катится?",
   },
   ballerina: {
     name: "Балерина",
@@ -613,6 +699,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Балерина хочет танцевать на кончиках пальцев.",
     right: "Балерине нужны пуанты. Здорово!",
     belongs: "Балерине нужны пуанты!",
+    caption: "Балерина хочет танцевать на кончиках пальцев. Что она надевает?",
   },
   angler: {
     name: "Рыбак",
@@ -620,6 +707,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет поймать рыбу.",
     right: "Рыбаку нужна удочка. Здорово!",
     belongs: "Рыбаку нужна удочка!",
+    caption: "Медведь хочет поймать рыбу. Что для этого нужно?",
   },
   radfahrerin: {
     name: "Велосипедист",
@@ -627,6 +715,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет уехать на двух колёсах.",
     right: "Велосипедисту нужен велосипед. Здорово!",
     belongs: "Велосипедисту нужен велосипед!",
+    caption: "Медведица хочет уехать на двух колёсах. Что стоит наготове?",
   },
   kletterin: {
     name: "Скалолаз",
@@ -634,6 +723,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Скалолаз хочет надёжно забраться вверх по стене.",
     right: "Скалолазу нужна верёвка. Здорово!",
     belongs: "Скалолазу нужна верёвка!",
+    caption: "Скалолаз хочет надёжно забраться вверх по стене. Что её страхует?",
   },
   badmintonspieler: {
     name: "Игрок в бадминтон",
@@ -641,6 +731,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет играть через высокую сетку.",
     right: "Игроку в бадминтон нужен волан. Здорово!",
     belongs: "Игроку в бадминтон нужен волан!",
+    caption: "Лис хочет играть через высокую сетку. Что для этого нужно?",
   },
   eishockeyspieler: {
     name: "Хоккеист",
@@ -648,6 +739,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет забросить шайбу в ворота.",
     right: "Хоккеисту нужна хоккейная клюшка. Здорово!",
     belongs: "Хоккеисту нужна хоккейная клюшка!",
+    caption: "Медведь хочет забросить шайбу в ворота. Что ему для этого нужно?",
   },
   reiterin: {
     name: "Наездница",
@@ -655,6 +747,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Наездница хочет перепрыгнуть через препятствие.",
     right: "Наезднице нужна лошадь. Здорово!",
     belongs: "Наезднице нужна лошадь!",
+    caption: "Наездница хочет перепрыгнуть через препятствие. На ком она сидит?",
   },
   schwimmlehrer: {
     name: "Тренер по плаванию",
@@ -662,6 +755,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лисёнок хочет в глубокую воду и держаться на плаву.",
     right: "Тренеру по плаванию нужны нарукавники. Здорово!",
     belongs: "Тренеру по плаванию нужны нарукавники!",
+    caption: "Лисёнок хочет в глубокую воду и держаться на плаву. Что ему поможет?",
   },
   gewichtheberin: {
     name: "Тяжелоатлет",
@@ -669,6 +763,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Тяжелоатлет хочет поднять что-то очень тяжёлое.",
     right: "Тяжелоатлету нужна гантеля. Здорово!",
     belongs: "Тяжелоатлету нужна гантеля!",
+    caption: "Тяжелоатлет хочет поднять что-то очень тяжёлое. Что для этого нужно?",
   },
   surfer: {
     name: "Сёрфер",
@@ -676,6 +771,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет прокатиться на большой волне.",
     right: "Сёрферу нужна доска для сёрфинга. Здорово!",
     belongs: "Сёрферу нужна доска для сёрфинга!",
+    caption: "Медведь хочет прокатиться на большой волне. На чём он стоит?",
   },
   koenig: {
     name: "Король",
@@ -683,6 +779,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Королю чего-то не хватает на голове.",
     right: "Королю нужна корона. Здорово!",
     belongs: "Королю нужна корона!",
+    caption: "Королю чего-то не хватает на голове. Что ему надевают на голову?",
   },
   ritter: {
     name: "Рыцарь",
@@ -690,6 +787,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Рыцарь хочет укрыться от маленького дракона.",
     right: "Рыцарю нужен щит. Здорово!",
     belongs: "Рыцарю нужен щит!",
+    caption: "Рыцарь хочет укрыться от маленького дракона. Что он держит перед собой?",
   },
   fee: {
     name: "Фея",
@@ -697,6 +795,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фея хочет превратить тыкву во что-то красивое.",
     right: "Фее нужна волшебная палочка. Здорово!",
     belongs: "Фее нужна волшебная палочка!",
+    caption: "Фея хочет превратить тыкву во что-то красивое. Чем она колдует?",
   },
   zauberkuenstler: {
     name: "Фокусник",
@@ -704,6 +803,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фокусник хочет достать кролика.",
     right: "Фокуснику нужен цилиндр. Здорово!",
     belongs: "Фокуснику нужен цилиндр!",
+    caption: "Фокусник хочет достать кролика. Что у него для этого есть?",
   },
   hexe: {
     name: "Ведьма",
@@ -711,6 +811,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ведьма хочет полететь в ночь, а сзади сядет её кошка.",
     right: "Ведьме нужна метла. Здорово!",
     belongs: "Ведьме нужна метла!",
+    caption: "Ведьма хочет полететь в ночь, а сзади сядет её кошка. На чём она летит?",
   },
   pirat: {
     name: "Пират",
@@ -718,6 +819,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Пират хочет узнать, где зарыт сундук.",
     right: "Пирату нужна карта сокровищ. Здорово!",
     belongs: "Пирату нужна карта сокровищ!",
+    caption: "Пират хочет узнать, где зарыт сундук. Что показывает путь?",
   },
   detektivin: {
     name: "Детектив",
@@ -725,6 +827,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Детектив хочет увидеть маленькие следы совсем большими.",
     right: "Детективу нужна лупа. Здорово!",
     belongs: "Детективу нужна лупа!",
+    caption: "Детектив хочет увидеть маленькие следы совсем большими. Что ей для этого нужно?",
   },
   sternguckerin: {
     name: "Звездочёт",
@@ -732,6 +835,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Звездочёт хочет увидеть луну совсем близко.",
     right: "Звездочёту нужен телескоп. Здорово!",
     belongs: "Звездочёту нужен телескоп!",
+    caption: "Звездочёт хочет увидеть луну совсем близко. Что для этого нужно?",
   },
   hoehlenforscher: {
     name: "Спелеолог",
@@ -739,6 +843,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Спелеолог хочет посветить в тёмную пещеру.",
     right: "Спелеологу нужен фонарик. Здорово!",
     belongs: "Спелеологу нужен фонарик!",
+    caption: "Спелеолог хочет посветить в тёмную пещеру. Что он берёт с собой?",
   },
   abenteurerin: {
     name: "Искатель приключений",
@@ -746,6 +851,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Искатель приключений хочет ночевать на природе.",
     right: "Искателю приключений нужна палатка. Здорово!",
     belongs: "Искателю приключений нужна палатка!",
+    caption: "Искатель приключений хочет ночевать на природе. Что она ставит?",
   },
   zwerg: {
     name: "Гном",
@@ -753,6 +859,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Гном хочет выбить драгоценные камни из скалы.",
     right: "Гному нужна кирка. Здорово!",
     belongs: "Гному нужна кирка!",
+    caption: "Гном хочет выбить драгоценные камни из скалы. Что для этого нужно?",
   },
   ballonfahrerin: {
     name: "Пилот воздушного шара",
@@ -760,6 +867,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет подняться в корзине высоко в небо.",
     right: "Пилоту воздушного шара нужен воздушный шар. Здорово!",
     belongs: "Пилоту воздушного шара нужен воздушный шар!",
+    caption: "Медведица хочет подняться в корзине высоко в небо. Что поднимает её вверх?",
   },
   "handtuchhalter-handtuch": {
     name: "Вешалка для полотенец",
@@ -767,6 +875,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лапки мокрые. Мы хотим их вытереть.",
     right: "Полотенце подходит к вешалке для полотенец. Здорово!",
     belongs: "Полотенце подходит к вешалке для полотенец!",
+    caption: "Лапки мокрые. Мы хотим их вытереть. Чем это сделать?",
   },
   "badewanne-badeente": {
     name: "Ванна",
@@ -774,6 +883,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ванна полная. Мы хотим пустить что-нибудь поплавать.",
     right: "Резиновая уточка подходит к ванне. Здорово!",
     belongs: "Резиновая уточка подходит к ванне!",
+    caption: "Ванна полная. Мы хотим пустить что-нибудь поплавать. Что подходит в воду?",
   },
   "saftpresse-orange": {
     name: "Соковыжималка",
@@ -781,6 +891,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим сделать свежий сок.",
     right: "Апельсин подходит к соковыжималке. Здорово!",
     belongs: "Апельсин подходит к соковыжималке!",
+    caption: "Мы хотим сделать свежий сок. Что нужно положить в соковыжималку?",
   },
   "toaster-toast": {
     name: "Тостер",
@@ -788,6 +899,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим поджарить что-нибудь до хрустящей корочки.",
     right: "Тост подходит к тостеру. Здорово!",
     belongs: "Тост подходит к тостеру!",
+    caption: "Мы хотим поджарить что-нибудь до хрустящей корочки. Что нужно положить в щель?",
   },
   "eierbecher-ei": {
     name: "Подставка для яиц",
@@ -795,6 +907,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим позавтракать: постучать ложечкой и снять верхушку.",
     right: "Яйцо подходит к подставке для яиц. Здорово!",
     belongs: "Яйцо подходит к подставке для яиц!",
+    caption: "Мы хотим позавтракать: постучать ложечкой и снять верхушку. Что нам поставить в подставку?",
   },
   "teig-ausstecher": {
     name: "Тесто",
@@ -802,6 +915,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим сделать из теста звёздочки.",
     right: "Формочка подходит к тесту. Здорово!",
     belongs: "Формочка подходит к тесту!",
+    caption: "Мы хотим сделать из теста звёздочки. Чем нам вырезать звёздочки?",
   },
   "hochstuhl-laetzchen": {
     name: "Стульчик для кормления",
@@ -809,6 +923,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Еда капает! А футболка должна остаться чистой.",
     right: "Слюнявчик подходит к стульчику для кормления. Здорово!",
     belongs: "Слюнявчик подходит к стульчику для кормления!",
+    caption: "Еда капает! А футболка должна остаться чистой. Что надевают на шею?",
   },
   "nagel-hammer": {
     name: "Гвоздь",
@@ -816,6 +931,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим забить гвоздь в доску.",
     right: "Молоток подходит к гвоздю. Здорово!",
     belongs: "Молоток подходит к гвоздю!",
+    caption: "Мы хотим забить гвоздь в доску. Чем нам это сделать?",
   },
   "roboter-batterie": {
     name: "Робот",
@@ -823,6 +939,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Робот хочет снова ходить, но у него нет сил.",
     right: "Батарейка подходит к роботу. Здорово!",
     belongs: "Батарейка подходит к роботу!",
+    caption: "Робот хочет снова ходить, но у него нет сил. Что даст ему новые силы?",
   },
   "turnschuh-schnuersenkel": {
     name: "Кед",
@@ -830,6 +947,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим завязать кед на бантик.",
     right: "Шнурки подходят к кеду. Здорово!",
     belongs: "Шнурки подходят к кеду!",
+    caption: "Мы хотим завязать кед на бантик. Что для этого нужно?",
   },
   "hose-guertel": {
     name: "Штаны",
@@ -837,6 +955,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Штаны сползают! Они должны держаться наверху.",
     right: "Ремень подходит к штанам. Здорово!",
     belongs: "Ремень подходит к штанам!",
+    caption: "Штаны сползают! Они должны держаться наверху. Что удержит их на талии?",
   },
   "buegelbrett-buegeleisen": {
     name: "Гладильная доска",
@@ -844,6 +963,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Рубашка вся мятая. Мы хотим её разгладить.",
     right: "Утюг подходит к гладильной доске. Здорово!",
     belongs: "Утюг подходит к гладильной доске!",
+    caption: "Рубашка вся мятая. Мы хотим её разгладить. Чем её разгладить?",
   },
   "tafel-kreide": {
     name: "Школьная доска",
@@ -851,6 +971,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим нарисовать что-то на доске.",
     right: "Мел подходит к школьной доске. Здорово!",
     belongs: "Мел подходит к школьной доске!",
+    caption: "Мы хотим нарисовать что-то на доске. Чем на ней пишут?",
   },
   "xylofon-schlaegel": {
     name: "Ксилофон",
@@ -858,6 +979,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим позвенеть по разноцветным пластинкам.",
     right: "Молоточки подходят к ксилофону. Здорово!",
     belongs: "Молоточки подходят к ксилофону!",
+    caption: "Мы хотим позвенеть по разноцветным пластинкам. Чем мы по ним ударяем?",
   },
   "perlen-schnur": {
     name: "Бусины",
@@ -865,6 +987,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим сделать бусы.",
     right: "Нитка подходит к бусинам. Здорово!",
     belongs: "Нитка подходит к бусинам!",
+    caption: "Мы хотим сделать бусы. На что нанизывают бусины?",
   },
   "bastelbild-klebestift": {
     name: "Аппликация",
@@ -872,6 +995,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Листочки должны держаться на картинке.",
     right: "Клей-карандаш подходит к аппликации. Здорово!",
     belongs: "Клей-карандаш подходит к аппликации!",
+    caption: "Листочки должны держаться на картинке. Чем их приклеить?",
   },
   "tor-ball": {
     name: "Ворота",
@@ -879,6 +1003,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим забить гол.",
     right: "Мяч подходит к воротам. Здорово!",
     belongs: "Мяч подходит к воротам!",
+    caption: "Мы хотим забить гол. Что нам для этого нужно?",
   },
   "puzzle-puzzleteil": {
     name: "Пазл",
@@ -886,6 +1011,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Не хватает одного кусочка. Мы хотим собрать картинку до конца.",
     right: "Деталь пазла подходит к пазлу. Здорово!",
     belongs: "Деталь пазла подходит к пазлу!",
+    caption: "Не хватает одного кусочка. Мы хотим собрать картинку до конца. Что подходит в пустое место?",
   },
   "trommel-trommelstoecke": {
     name: "Барабан",
@@ -893,6 +1019,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим громко стучать: бум, бум!",
     right: "Барабанные палочки подходят к барабану. Здорово!",
     belongs: "Барабанные палочки подходят к барабану!",
+    caption: "Мы хотим громко стучать: бум, бум! Чем по ней стучат?",
   },
   "feuerstelle-feuer": {
     name: "Кострище",
@@ -900,6 +1027,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Дрова уже лежат. Мы хотим погреться.",
     right: "Огонь подходит к кострищу. Здорово!",
     belongs: "Огонь подходит к кострищу!",
+    caption: "Дрова уже лежат. Мы хотим погреться. Что нужно, чтобы разжечь дрова?",
   },
   "apfelbaum-leiter": {
     name: "Яблоня",
@@ -907,6 +1035,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Яблоки висят так высоко. Мы хотим их сорвать.",
     right: "Лестница подходит к яблоне. Здорово!",
     belongs: "Лестница подходит к яблоне!",
+    caption: "Яблоки висят так высоко. Мы хотим их сорвать. Что поможет нам забраться?",
   },
   "planschbecken-gartenschlauch": {
     name: "Детский бассейн",
@@ -914,6 +1043,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Бассейн пустой. Мы хотим наполнить его водой.",
     right: "Садовый шланг подходит к детскому бассейну. Здорово!",
     belongs: "Садовый шланг подходит к детскому бассейну!",
+    caption: "Бассейн пустой. Мы хотим наполнить его водой. Чем нам наполнить его?",
   },
   "rasen-rasenmaeher": {
     name: "Газон",
@@ -921,6 +1051,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Трава такая высокая. Мы хотим сделать её короткой.",
     right: "Газонокосилка подходит к газону. Здорово!",
     belongs: "Газонокосилка подходит к газону!",
+    caption: "Трава такая высокая. Мы хотим сделать её короткой. Чем это сделать?",
   },
   "waescheleine-waescheklammern": {
     name: "Бельевая верёвка",
@@ -928,6 +1059,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Футболка должна висеть на верёвке и не падать.",
     right: "Прищепки подходят к бельевой верёвке. Здорово!",
     belongs: "Прищепки подходят к бельевой верёвке!",
+    caption: "Футболка должна висеть на верёвке и не падать. Что её удержит?",
   },
   "picknickdecke-picknickkorb": {
     name: "Плед для пикника",
@@ -935,6 +1067,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Плед уже расстелен. Мы хотим есть.",
     right: "Корзинка для пикника подходит к пледу для пикника. Здорово!",
     belongs: "Корзинка для пикника подходит к пледу для пикника!",
+    caption: "Плед уже расстелен. Мы хотим есть. Что нам взять с собой?",
   },
   "see-schlittschuhe": {
     name: "Замёрзшее озеро",
@@ -942,6 +1075,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Озеро всё подо льдом. Мы хотим скользить по льду.",
     right: "Коньки подходят к замёрзшему озеру. Здорово!",
     belongs: "Коньки подходят к замёрзшему озеру!",
+    caption: "Озеро всё подо льдом. Мы хотим скользить по льду. Что надевают на ноги?",
   },
   "schneeweg-schneeschieber": {
     name: "Заснеженная дорожка",
@@ -949,6 +1083,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Дорожка вся в снегу. Мы хотим её расчистить.",
     right: "Лопата для снега подходит к заснеженной дорожке. Здорово!",
     belongs: "Лопата для снега подходит к заснеженной дорожке!",
+    caption: "Дорожка вся в снегу. Мы хотим её расчистить. Чем нам это сделать?",
   },
   "haltestelle-bus": {
     name: "Остановка",
@@ -956,6 +1091,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы ждём здесь и хотим поехать.",
     right: "Автобус подходит к остановке. Здорово!",
     belongs: "Автобус подходит к остановке!",
+    caption: "Мы ждём здесь и хотим поехать. На чём мы скоро поедем дальше?",
   },
   "auto-reifen": {
     name: "Машина",
@@ -963,6 +1099,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Не хватает колеса. Автомобиль хочет снова ехать.",
     right: "Шина подходит к машине. Здорово!",
     belongs: "Шина подходит к машине!",
+    caption: "Не хватает колеса. Автомобиль хочет снова ехать. Что нужно прикрепить?",
   },
   "ruderboot-ruder": {
     name: "Гребная лодка",
@@ -970,6 +1107,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим переплыть на лодке через озеро.",
     right: "Вёсла подходят к гребной лодке. Здорово!",
     belongs: "Вёсла подходят к гребной лодке!",
+    caption: "Мы хотим переплыть на лодке через озеро. Чем она движется?",
   },
   "torte-kerze": {
     name: "Торт",
@@ -977,6 +1115,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "У нас день рождения! Давай подуем!",
     right: "Свечки подходят к торту. Здорово!",
     belongs: "Свечки подходят к торту!",
+    caption: "У нас день рождения! Давай подуем! Что втыкают сверху?",
   },
   "osternest-ostereier": {
     name: "Пасхальное гнездо",
@@ -984,6 +1123,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Гнездо ещё пустое. Зайчик спрятал что-то разноцветное.",
     right: "Пасхальные яйца подходят к пасхальному гнезду. Здорово!",
     belongs: "Пасхальные яйца подходят к пасхальному гнезду!",
+    caption: "Гнездо ещё пустое. Зайчик спрятал что-то разноцветное. Что лежит в гнезде?",
   },
   "plaetzchenteig-ausstechform": {
     name: "Песочное тесто",
@@ -991,6 +1131,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим испечь звёздочки к Рождеству.",
     right: "Вырубка для печенья подходит к песочному тесту. Здорово!",
     belongs: "Вырубка для печенья подходит к песочному тесту!",
+    caption: "Мы хотим испечь звёздочки к Рождеству. Чем мы их вырежем?",
   },
   "clownskostuem-clownsnase": {
     name: "Костюм клоуна",
@@ -998,6 +1139,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Мы хотим выглядеть смешно. На лице не хватает чего-то красного.",
     right: "Нос клоуна подходит к костюму клоуна. Здорово!",
     belongs: "Нос клоуна подходит к костюму клоуна!",
+    caption: "Мы хотим выглядеть смешно. На лице не хватает чего-то красного. Что мы поставим посреди лица?",
   },
   paketbotin: {
     name: "Курьер",
@@ -1005,6 +1147,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Курьер хочет докатить высокую башню из посылок до дома.",
     right: "Курьеру нужна тележка. Здорово!",
     belongs: "Курьеру нужна тележка!",
+    caption: "Курьер хочет докатить высокую башню из посылок до дома. Что ей в этом поможет?",
   },
   strassenkehrer: {
     name: "Дворник",
@@ -1012,6 +1155,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Дворник хочет сделать всю улицу чистой.",
     right: "Дворнику нужна подметальная машина. Здорово!",
     belongs: "Дворнику нужна подметальная машина!",
+    caption: "Дворник хочет сделать всю улицу чистой. На чём он ездит?",
   },
   strassenbauerin: {
     name: "Дорожный рабочий",
@@ -1019,6 +1163,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет сделать свежий асфальт совсем гладким.",
     right: "Дорожному рабочему нужен каток. Здорово!",
     belongs: "Дорожному рабочему нужен каток!",
+    caption: "Медведица хочет сделать свежий асфальт совсем гладким. Что проедет по асфальту?",
   },
   abschleppfahrer: {
     name: "Водитель эвакуатора",
@@ -1026,6 +1171,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет увезти сломанную машину.",
     right: "Водителю эвакуатора нужен эвакуатор. Здорово!",
     belongs: "Водителю эвакуатора нужен эвакуатор!",
+    caption: "Медведь хочет увезти сломанную машину. Чем он это увозит?",
   },
   schneepflugfahrer: {
     name: "Водитель снегоочистителя",
@@ -1033,6 +1179,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Дорога вся в снегу. Лис хочет её расчистить.",
     right: "Водителю снегоочистителя нужен снегоочиститель. Здорово!",
     belongs: "Водителю снегоочистителя нужен снегоочиститель!",
+    caption: "Дорога вся в снегу. Лис хочет её расчистить. На чём он едет?",
   },
   zahnaerztin: {
     name: "Зубной врач",
@@ -1040,6 +1187,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Зубной врач хочет заглянуть глубоко тебе в рот.",
     right: "Зубному врачу нужно зеркальце. Здорово!",
     belongs: "Зубному врачу нужно зеркальце!",
+    caption: "Зубной врач хочет заглянуть глубоко тебе в рот. Что ей для этого нужно?",
   },
   krankenpfleger: {
     name: "Медбрат",
@@ -1047,6 +1195,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "У медвежонка нога в гипсе. Медбрат хочет вывезти его на улицу.",
     right: "Медбрату нужна инвалидная коляска. Здорово!",
     belongs: "Медбрату нужна инвалидная коляска!",
+    caption: "У медвежонка нога в гипсе. Медбрат хочет вывезти его на улицу. На чём его вывезти?",
   },
   ohrenaerztin: {
     name: "Ушной врач",
@@ -1054,6 +1203,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ушной врач хочет заглянуть тебе в ушко.",
     right: "Ушному врачу нужен отоскоп. Здорово!",
     belongs: "Ушному врачу нужен отоскоп!",
+    caption: "Ушной врач хочет заглянуть тебе в ушко. Что ей для этого нужно?",
   },
   augenaerztin: {
     name: "Глазной врач",
@@ -1061,6 +1211,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Глазной врач хочет показать тебе картинки на стене.",
     right: "Глазному врачу нужна таблица. Здорово!",
     belongs: "Глазному врачу нужна таблица!",
+    caption: "Глазной врач хочет показать тебе картинки на стене. Что помогает узнавать картинки?",
   },
   polizist: {
     name: "Полицейский",
@@ -1068,6 +1219,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Полицейский хочет показать автомобилям, когда им можно ехать.",
     right: "Полицейскому нужен свисток. Здорово!",
     belongs: "Полицейскому нужен свисток!",
+    caption: "Полицейский хочет показать автомобилям, когда им можно ехать. Чем он подаёт знак?",
   },
   feuerwehrmann: {
     name: "Пожарный",
@@ -1075,6 +1227,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Гриль горит! Пожарный хочет погасить пламя.",
     right: "Пожарному нужен огнетушитель. Здорово!",
     belongs: "Пожарному нужен огнетушитель!",
+    caption: "Гриль горит! Пожарный хочет погасить пламя. Что ему в этом поможет?",
   },
   polizistin: {
     name: "Полицейская",
@@ -1082,6 +1235,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Полицейская ищет плюшевого медвежонка. Ей поможет хороший нюх.",
     right: "Полицейской нужна служебная собака. Здорово!",
     belongs: "Полицейской нужна служебная собака!",
+    caption: "Полицейская ищет плюшевого медвежонка. Ей поможет хороший нюх. Кто ей поможет искать?",
   },
   pizzabaecker: {
     name: "Пиццайоло",
@@ -1089,6 +1243,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет отправить еду глубоко в горячую печь.",
     right: "Пиццайоло нужна лопата для пиццы. Здорово!",
     belongs: "Пиццайоло нужна лопата для пиццы!",
+    caption: "Лис хочет отправить еду глубоко в горячую печь. Чем это сделать?",
   },
   konditorin: {
     name: "Кондитер",
@@ -1096,6 +1251,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет украсить торт сливками.",
     right: "Кондитеру нужен кондитерский мешок. Здорово!",
     belongs: "Кондитеру нужен кондитерский мешок!",
+    caption: "Медведица хочет украсить торт сливками. Что ей для этого нужно?",
   },
   koch: {
     name: "Повар",
@@ -1103,6 +1259,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Повар хочет налить суп в миску.",
     right: "Повару нужен половник. Здорово!",
     belongs: "Повару нужен половник!",
+    caption: "Повар хочет налить суп в миску. Чем он это сделает?",
   },
   eisverkaeuferin: {
     name: "Продавщица мороженого",
@@ -1110,6 +1267,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Продавщица хочет сделать круглый шарик мороженого.",
     right: "Продавщице мороженого нужна ложка для мороженого. Здорово!",
     belongs: "Продавщице мороженого нужна ложка для мороженого!",
+    caption: "Продавщица хочет сделать круглый шарик мороженого. Что ей в этом поможет?",
   },
   kassierer: {
     name: "Кассир",
@@ -1117,6 +1275,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Ребёнок хочет заплатить. Продавец хочет взять деньги.",
     right: "Кассиру нужна касса. Здорово!",
     belongs: "Кассиру нужна касса!",
+    caption: "Ребёнок хочет заплатить. Продавец хочет взять деньги. Куда нужно положить деньги?",
   },
   kellnerin: {
     name: "Официантка",
@@ -1124,6 +1283,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Официантка хочет отнести три чашки и пирожное за один раз.",
     right: "Официантке нужен поднос. Здорово!",
     belongs: "Официантке нужен поднос!",
+    caption: "Официантка хочет отнести три чашки и пирожное за один раз. На что она всё ставит?",
   },
   marktfrau: {
     name: "Продавщица на рынке",
@@ -1131,6 +1291,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Продавщица хочет узнать, насколько тяжёлые яблоки.",
     right: "Продавщице на рынке нужны весы. Здорово!",
     belongs: "Продавщице на рынке нужны весы!",
+    caption: "Продавщица хочет узнать, насколько тяжёлые яблоки. Что это показывает?",
   },
   waffelbaeckerin: {
     name: "Пекарь вафель",
@@ -1138,6 +1299,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лиса хочет испечь сладкие сердечки.",
     right: "Пекарю вафель нужна вафельница. Здорово!",
     belongs: "Пекарю вафель нужна вафельница!",
+    caption: "Лиса хочет испечь сладкие сердечки. Что при этом нагревается?",
   },
   gaertner: {
     name: "Садовник",
@@ -1145,6 +1307,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Садовник хочет подстричь высокую траву.",
     right: "Садовнику нужна газонокосилка. Здорово!",
     belongs: "Садовнику нужна газонокосилка!",
+    caption: "Садовник хочет подстричь высокую траву. Что для этого нужно?",
   },
   bauer: {
     name: "Фермер",
@@ -1152,6 +1315,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Фермер хочет подоить корову.",
     right: "Фермеру нужно ведро для молока. Здорово!",
     belongs: "Фермеру нужно ведро для молока!",
+    caption: "Фермер хочет подоить корову. Что он подставит снизу?",
   },
   schaefer: {
     name: "Пастух",
@@ -1159,6 +1323,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Овцы бегают кто куда. Лис хочет собрать их вместе.",
     right: "Пастуху нужна пастушья собака. Здорово!",
     belongs: "Пастуху нужна пастушья собака!",
+    caption: "Овцы бегают кто куда. Лис хочет собрать их вместе. Кто ему в этом поможет?",
   },
   obstbaeuerin: {
     name: "Садовод",
@@ -1166,6 +1331,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Садовод хочет сорвать яблоки высоко на дереве.",
     right: "Садоводу нужна лестница. Здорово!",
     belongs: "Садоводу нужна лестница!",
+    caption: "Садовод хочет сорвать яблоки высоко на дереве. Что поможет ей забраться?",
   },
   pferdepflegerin: {
     name: "Конюх",
@@ -1173,6 +1339,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лошадка голодная. Конюх хочет принести ей корм.",
     right: "Конюху нужны вилы. Здорово!",
     belongs: "Конюху нужны вилы!",
+    caption: "Лошадка голодная. Конюх хочет принести ей корм. Чем это сделать?",
   },
   maehdrescherfahrer: {
     name: "Комбайнёр",
@@ -1180,6 +1347,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет убрать урожай со всего поля.",
     right: "Комбайнёру нужен комбайн. Здорово!",
     belongs: "Комбайнёру нужен комбайн!",
+    caption: "Лис хочет убрать урожай со всего поля. Что для этого нужно?",
   },
   harfenspielerin: {
     name: "Арфистка",
@@ -1187,6 +1355,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет очень нежно перебирать струны.",
     right: "Арфистке нужна арфа. Здорово!",
     belongs: "Арфистке нужна арфа!",
+    caption: "Медведица хочет очень нежно перебирать струны. Что стоит перед ней?",
   },
   xylofonspieler: {
     name: "Ксилофонист",
@@ -1194,6 +1363,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет позвенеть для детей.",
     right: "Ксилофонисту нужен ксилофон. Здорово!",
     belongs: "Ксилофонисту нужен ксилофон!",
+    caption: "Лис хочет позвенеть для детей. На чём он звенит?",
   },
   tubaspieler: {
     name: "Тубист",
@@ -1201,6 +1371,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет гудеть очень низко и громко.",
     right: "Тубисту нужна туба. Здорово!",
     belongs: "Тубисту нужна туба!",
+    caption: "Медведь хочет гудеть очень низко и громко. Чем он гудит?",
   },
   jongleur: {
     name: "Жонглёр",
@@ -1208,6 +1379,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Жонглёр хочет подбрасывать в воздух три штуки сразу.",
     right: "Жонглёру нужны мячики. Здорово!",
     belongs: "Жонглёру нужны мячики!",
+    caption: "Жонглёр хочет подбрасывать в воздух три штуки сразу. Что он подбрасывает?",
   },
   puppenspielerin: {
     name: "Кукловод",
@@ -1215,6 +1387,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет показать детям спектакль.",
     right: "Кукловоду нужна перчаточная кукла. Здорово!",
     belongs: "Кукловоду нужна перчаточная кукла!",
+    caption: "Медведица хочет показать детям спектакль. Что ей нужно для спектакля?",
   },
   einradfahrer: {
     name: "Моноциклист",
@@ -1222,6 +1395,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведь хочет держать равновесие и кататься по площади.",
     right: "Моноциклисту нужен моноцикл. Здорово!",
     belongs: "Моноциклисту нужен моноцикл!",
+    caption: "Медведь хочет держать равновесие и кататься по площади. Что у него под ногами?",
   },
   akrobatin: {
     name: "Акробатка",
@@ -1229,6 +1403,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Акробатка хочет раскачиваться высоко под куполом цирка.",
     right: "Акробатке нужна трапеция. Здорово!",
     belongs: "Акробатке нужна трапеция!",
+    caption: "Акробатка хочет раскачиваться высоко под куполом цирка. На чём она висит?",
   },
   ruderin: {
     name: "Гребец",
@@ -1236,6 +1411,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Медведица хочет переплыть озеро до острова.",
     right: "Гребцу нужны вёсла. Здорово!",
     belongs: "Гребцу нужны вёсла!",
+    caption: "Медведица хочет переплыть озеро до острова. Что для этого нужно?",
   },
   weihnachtsmann: {
     name: "Дед Мороз",
@@ -1243,6 +1419,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Дед Мороз хочет привезти подарки. Впереди не хватает того, кто будет тянуть.",
     right: "Деду Морозу нужен олень. Здорово!",
     belongs: "Деду Морозу нужен олень!",
+    caption: "Дед Мороз хочет привезти подарки. Впереди не хватает того, кто будет тянуть. Кто повезёт сани?",
   },
   prinzessin: {
     name: "Принцесса",
@@ -1250,6 +1427,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Принцесса хочет поехать в замок, как в сказке.",
     right: "Принцессе нужна карета. Здорово!",
     belongs: "Принцессе нужна карета!",
+    caption: "Принцесса хочет поехать в замок, как в сказке. Что для этого нужно?",
   },
   sandmann: {
     name: "Песочный человечек",
@@ -1257,6 +1435,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Лис хочет, чтобы малышу снились сладкие сны.",
     right: "Песочному человечку нужен сонный песок. Здорово!",
     belongs: "Песочному человечку нужен сонный песок!",
+    caption: "Лис хочет, чтобы малышу снились сладкие сны. Что он сыплет ему в глаза?",
   },
   "frau-holle": {
     name: "Госпожа Метелица",
@@ -1264,6 +1443,7 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Госпожа Метелица хочет, чтобы пошёл снег.",
     right: "Госпоже Метелице нужна перина. Здорово!",
     belongs: "Госпоже Метелице нужна перина!",
+    caption: "Госпожа Метелица хочет, чтобы пошёл снег. Чем она накрывает землю?",
   },
   tiefseeforscherin: {
     name: "Исследователь глубин",
@@ -1271,5 +1451,6 @@ export const RUSSIAN_SCENES: TogetherTranslation = {
     question: "Исследовательница хочет спуститься глубоко-глубоко к рыбкам.",
     right: "Исследователю глубин нужна подводная лодка. Здорово!",
     belongs: "Исследователю глубин нужна подводная лодка!",
+    caption: "Исследовательница хочет спуститься глубоко-глубоко к рыбкам. На чём она спустится?",
   },
 };

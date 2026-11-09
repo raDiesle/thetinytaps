@@ -7,7 +7,7 @@
   --name-gap: 8px;
   --name-room: calc(var(--name-gap) + var(--name-size) * 1.25);
   /* The quiet line under the picture saying what the round is about. */
-  --topic-room: calc(clamp(0.75rem, 2.3vh, 1rem) * 1.25 + 0.5em);
+  --topic-room: calc(clamp(0.75rem, 2.3vh, 1rem) * 2.5 + 0.5em);
   position: absolute;
   inset: 0;
   display: flex;

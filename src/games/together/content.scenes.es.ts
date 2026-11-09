@@ -11,6 +11,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¡Ya terminamos en el inodoro! Ahora queremos limpiarnos.",
     right: "El papel higiénico va con el inodoro. ¡Genial!",
     belongs: "¡El papel higiénico va con el inodoro!",
+    caption: "¡Ya terminamos en el inodoro! Ahora queremos limpiarnos. ¿Con qué se hace bien?",
   },
   "wasserhahn-seife": {
     name: "Grifo",
@@ -18,6 +19,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las patitas están llenas de barro. Queremos lavarlas bien.",
     right: "El jabón va con el grifo. ¡Genial!",
     belongs: "¡El jabón va con el grifo!",
+    caption: "Las patitas están llenas de barro. Queremos lavarlas bien. ¿Qué quita la suciedad?",
   },
   "eimer-schwamm": {
     name: "Cubo",
@@ -25,6 +27,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¡Cuántas huellas sucias de patitas! Queremos frotar hasta quitarlas.",
     right: "La esponja va con el cubo. ¡Genial!",
     belongs: "¡La esponja va con el cubo!",
+    caption: "¡Cuántas huellas sucias de patitas! Queremos frotar hasta quitarlas. ¿Con qué se consigue mejor?",
   },
   "muesli-milch": {
     name: "Muesli",
@@ -32,6 +35,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos comer muesli, pero todavía está muy seco.",
     right: "La leche va con el muesli. ¡Genial!",
     belongs: "¡La leche va con el muesli!",
+    caption: "Queremos comer muesli, pero todavía está muy seco. ¿Qué le echamos por encima?",
   },
   "tasse-teekanne": {
     name: "Taza",
@@ -39,6 +43,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La taza está vacía. La abuela quiere servir algo calentito.",
     right: "La tetera va con la taza. ¡Genial!",
     belongs: "¡La tetera va con la taza!",
+    caption: "La taza está vacía. La abuela quiere servir algo calentito. ¿De dónde lo sirve?",
   },
   "suppe-loeffel": {
     name: "Sopa",
@@ -46,6 +51,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La sopa ya está hecha. Queremos comerla.",
     right: "La cuchara va con la sopa. ¡Genial!",
     belongs: "¡La cuchara va con la sopa!",
+    caption: "La sopa ya está hecha. Queremos comerla. ¿Con qué se hace?",
   },
   "pausenbrot-brotdose": {
     name: "Sándwich",
@@ -53,6 +59,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos guardar el sándwich para que no se aplaste.",
     right: "La fiambrera va con el sándwich. ¡Genial!",
     belongs: "¡La fiambrera va con el sándwich!",
+    caption: "Queremos guardar el sándwich para que no se aplaste. ¿Dónde queda bien guardado?",
   },
   "pfanne-pfannenwender": {
     name: "Sartén",
@@ -60,6 +67,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos darle la vuelta al panqueque.",
     right: "La espátula va con la sartén. ¡Genial!",
     belongs: "¡La espátula va con la sartén!",
+    caption: "Queremos darle la vuelta al panqueque. ¿Con qué se hace?",
   },
   "bett-teddy": {
     name: "Cama",
@@ -67,6 +75,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos dormirnos con algo para abrazar.",
     right: "El osito de peluche va con la cama. ¡Genial!",
     belongs: "¡El osito de peluche va con la cama!",
+    caption: "Queremos dormirnos con algo para abrazar. ¿Qué llevamos a la cama?",
   },
   "zeitung-brille": {
     name: "Periódico",
@@ -74,6 +83,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El abuelo quiere leer el periódico, pero las letras son muy pequeñas.",
     right: "Las gafas van con el periódico. ¡Genial!",
     belongs: "¡Las gafas van con el periódico!",
+    caption: "El abuelo quiere leer el periódico, pero las letras son muy pequeñas. ¿Qué se pone en la nariz?",
   },
   "schraube-schraubenzieher": {
     name: "Tornillo",
@@ -81,6 +91,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos enroscar esto bien fuerte en la madera.",
     right: "El destornillador va con el tornillo. ¡Genial!",
     belongs: "¡El destornillador va con el tornillo!",
+    caption: "Queremos enroscar esto bien fuerte en la madera. ¿Con qué se hace?",
   },
   "besen-kehrschaufel": {
     name: "Escoba",
@@ -88,6 +99,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos levantar del suelo el montón de migas.",
     right: "El recogedor va con la escoba. ¡Genial!",
     belongs: "¡El recogedor va con la escoba!",
+    caption: "Queremos levantar del suelo el montón de migas. ¿Qué ayuda a la escoba?",
   },
   "schuh-socken": {
     name: "Zapato",
@@ -95,6 +107,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Los pies todavía están desnudos. Primero va algo suave y después el zapato.",
     right: "Los calcetines van con el zapato. ¡Genial!",
     belongs: "¡Los calcetines van con el zapato!",
+    caption: "Los pies todavía están desnudos. Primero va algo suave y después el zapato. ¿Qué se pone primero?",
   },
   "schal-handschuhe": {
     name: "Bufanda",
@@ -102,6 +115,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Hace frío. Queremos tener las patitas calentitas.",
     right: "Los guantes van con la bufanda. ¡Genial!",
     belongs: "¡Los guantes van con la bufanda!",
+    caption: "Hace frío. Queremos tener las patitas calentitas. ¿Qué se pone en las manos?",
   },
   "schule-schulranzen": {
     name: "Escuela",
@@ -109,6 +123,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos llevar los cuadernos y los libros en la espalda.",
     right: "La mochila va con la escuela. ¡Genial!",
     belongs: "¡La mochila va con la escuela!",
+    caption: "Queremos llevar los cuadernos y los libros en la espalda. ¿Qué llevamos para eso?",
   },
   "schere-buntpapier": {
     name: "Tijeras",
@@ -116,6 +131,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos recortar y hacer manualidades.",
     right: "El papel de colores va con las tijeras. ¡Genial!",
     belongs: "¡El papel de colores va con las tijeras!",
+    caption: "Queremos recortar y hacer manualidades. ¿Qué hace falta para cortar?",
   },
   "zauberhut-zauberstab": {
     name: "Sombrero de mago",
@@ -123,6 +139,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¡Abracadabra! Queremos sacar algo del sombrero.",
     right: "La varita mágica va con el sombrero de mago. ¡Genial!",
     belongs: "¡La varita mágica va con el sombrero de mago!",
+    caption: "¡Abracadabra! Queremos sacar algo del sombrero. ¿Qué hace falta para eso?",
   },
   "burg-fahne": {
     name: "Castillo",
@@ -130,6 +147,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Arriba en la torre tiene que ondear algo.",
     right: "La bandera va con el castillo. ¡Genial!",
     belongs: "¡La bandera va con el castillo!",
+    caption: "Arriba en la torre tiene que ondear algo. ¿Qué ondea con el viento?",
   },
   "laub-rechen": {
     name: "Hojas secas",
@@ -137,6 +155,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las hojas de colores tienen que ir a un montón.",
     right: "El rastrillo va con las hojas secas. ¡Genial!",
     belongs: "¡El rastrillo va con las hojas secas!",
+    caption: "Las hojas de colores tienen que ir a un montón. ¿Con qué se hace mejor?",
   },
   "zelt-taschenlampe": {
     name: "Tienda de campaña",
@@ -144,6 +163,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "En la tienda está oscuro. Queremos iluminar dentro.",
     right: "La linterna va con la tienda de campaña. ¡Genial!",
     belongs: "¡La linterna va con la tienda de campaña!",
+    caption: "En la tienda está oscuro. Queremos iluminar dentro. ¿Qué llevamos?",
   },
   "regen-regenschirm": {
     name: "Lluvia",
@@ -151,6 +171,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Está lloviendo. No queremos mojarnos.",
     right: "El paraguas va con la lluvia. ¡Genial!",
     belongs: "¡El paraguas va con la lluvia!",
+    caption: "Está lloviendo. No queremos mojarnos. ¿Qué levantamos?",
   },
   "pfuetze-gummistiefel": {
     name: "Charco",
@@ -158,6 +179,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos saltar en el charco y que los pies no se mojen.",
     right: "Las botas de lluvia van con el charco. ¡Genial!",
     belongs: "¡Las botas de lluvia van con el charco!",
+    caption: "Queremos saltar en el charco y que los pies no se mojen. ¿Qué se pone en los pies?",
   },
   "sonne-sonnenbrille": {
     name: "Sol",
@@ -165,6 +187,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Afuera brilla muchísimo. Los ojos casi se cierran.",
     right: "Las gafas de sol van con el sol. ¡Genial!",
     belongs: "¡Las gafas de sol van con el sol!",
+    caption: "Afuera brilla muchísimo. Los ojos casi se cierran. ¿Qué protege los ojos?",
   },
   "schneemann-karotte": {
     name: "Muñeco de nieve",
@@ -172,6 +195,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El muñeco de nieve quiere tener nariz.",
     right: "La zanahoria va con el muñeco de nieve. ¡Genial!",
     belongs: "¡La zanahoria va con el muñeco de nieve!",
+    caption: "El muñeco de nieve quiere tener nariz. ¿Qué le clavamos en la cara?",
   },
   "schnee-schlitten": {
     name: "Nieve",
@@ -179,6 +203,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos bajar la montaña deslizándonos.",
     right: "El trineo va con la nieve. ¡Genial!",
     belongs: "¡El trineo va con la nieve!",
+    caption: "Queremos bajar la montaña deslizándonos. ¿Sobre qué nos sentamos?",
   },
   "drachen-wind": {
     name: "Cometa",
@@ -186,6 +211,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La cometa quiere volar alto en el cielo.",
     right: "El viento va con la cometa. ¡Genial!",
     belongs: "¡El viento va con la cometa!",
+    caption: "La cometa quiere volar alto en el cielo. ¿Qué lo sopla hacia arriba?",
   },
   "fahrrad-helm": {
     name: "Bicicleta",
@@ -193,6 +219,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos salir ya. La cabeza tiene que estar protegida.",
     right: "El casco va con la bicicleta. ¡Genial!",
     belongs: "¡El casco va con la bicicleta!",
+    caption: "Queremos salir ya. La cabeza tiene que estar protegida. ¿Qué se pone en la cabeza?",
   },
   "briefkasten-brief": {
     name: "Buzón",
@@ -200,6 +227,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos mandarle algo por correo a la abuela.",
     right: "La carta va con el buzón. ¡Genial!",
     belongs: "¡La carta va con el buzón!",
+    caption: "Queremos mandarle algo por correo a la abuela. ¿Qué echamos en el buzón amarillo?",
   },
   "tannenbaum-weihnachtsstern": {
     name: "Árbol de Navidad",
@@ -207,6 +235,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El abeto está casi terminado. Arriba, en la punta, falta algo.",
     right: "La estrella de Navidad va con el árbol de Navidad. ¡Genial!",
     belongs: "¡La estrella de Navidad va con el árbol de Navidad!",
+    caption: "El abeto está casi terminado. Arriba, en la punta, falta algo. ¿Qué brilla ahí?",
   },
   "osterei-pinsel": {
     name: "Huevo de Pascua",
@@ -214,6 +243,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos pintar el huevo de colores.",
     right: "El pincel va con el huevo de Pascua. ¡Genial!",
     belongs: "¡El pincel va con el huevo de Pascua!",
+    caption: "Queremos pintar el huevo de colores. ¿Con qué se pone de colores?",
   },
   "laterne-licht": {
     name: "Farol",
@@ -221,6 +251,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Está oscuro. El farol tiene que brillar.",
     right: "La luz va con el farol. ¡Genial!",
     belongs: "¡La luz va con el farol!",
+    caption: "Está oscuro. El farol tiene que brillar. ¿Qué hay que ponerle dentro?",
   },
   "blumenstrauss-vase": {
     name: "Ramo de flores",
@@ -228,6 +259,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las flores tienen que estar bien derechas en el agua.",
     right: "El jarrón va con el ramo de flores. ¡Genial!",
     belongs: "¡El jarrón va con el ramo de flores!",
+    caption: "Las flores tienen que estar bien derechas en el agua. ¿Dónde se quedan?",
   },
   malerin: {
     name: "Pintora",
@@ -235,6 +267,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La pintora quiere pintar un árbol.",
     right: "La pintora necesita el pincel. ¡Genial!",
     belongs: "¡La pintora necesita el pincel!",
+    caption: "La pintora quiere pintar un árbol. ¿Con qué pinta?",
   },
   astronautin: {
     name: "Astronauta",
@@ -242,6 +275,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La astronauta quiere volar al espacio.",
     right: "La astronauta necesita el cohete. ¡Genial!",
     belongs: "¡La astronauta necesita el cohete!",
+    caption: "La astronauta quiere volar al espacio. ¿Con qué sube hasta allí?",
   },
   fensterputzer: {
     name: "Limpiador de ventanas",
@@ -249,6 +283,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El limpiador de ventanas quiere dejar limpia la ventana llena de polvo.",
     right: "El limpiador de ventanas necesita la esponja. ¡Genial!",
     belongs: "¡El limpiador de ventanas necesita la esponja!",
+    caption: "El limpiador de ventanas quiere dejar limpia la ventana llena de polvo. ¿Con qué lo limpia?",
   },
   fotograf: {
     name: "Fotógrafo",
@@ -256,6 +291,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El fotógrafo quiere hacer una foto.",
     right: "El fotógrafo necesita la cámara. ¡Genial!",
     belongs: "¡El fotógrafo necesita la cámara!",
+    caption: "El fotógrafo quiere hacer una foto. ¿Con qué hace la imagen?",
   },
   schneiderin: {
     name: "Costurera",
@@ -263,6 +299,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La costurera quiere coser el agujero de la chaqueta.",
     right: "La costurera necesita el hilo. ¡Genial!",
     belongs: "¡La costurera necesita el hilo!",
+    caption: "La costurera quiere coser el agujero de la chaqueta. ¿Qué necesita para eso?",
   },
   forscherin: {
     name: "Investigadora",
@@ -270,6 +307,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La investigadora quiere ver muy grandes las cosas diminutas.",
     right: "La investigadora necesita el microscopio. ¡Genial!",
     belongs: "¡La investigadora necesita el microscopio!",
+    caption: "La investigadora quiere ver muy grandes las cosas diminutas. ¿Qué la ayuda a hacerlo?",
   },
   schornsteinfeger: {
     name: "Deshollinador",
@@ -277,6 +315,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El deshollinador quiere quitar el hollín de arriba del tejado.",
     right: "El deshollinador necesita el cepillo de chimenea. ¡Genial!",
     belongs: "¡El deshollinador necesita el cepillo de chimenea!",
+    caption: "El deshollinador quiere quitar el hollín de arriba del tejado. ¿Con qué lo limpia?",
   },
   muellwerker: {
     name: "Basurero",
@@ -284,6 +323,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere vaciar los contenedores llenos.",
     right: "El basurero necesita el camión de basura. ¡Genial!",
     belongs: "¡El basurero necesita el camión de basura!",
+    caption: "El oso quiere vaciar los contenedores llenos. ¿En qué llega?",
   },
   raumpflegerin: {
     name: "Limpiadora",
@@ -291,6 +331,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La limpiadora quiere dejar limpia la alfombra.",
     right: "La limpiadora necesita la aspiradora. ¡Genial!",
     belongs: "¡La limpiadora necesita la aspiradora!",
+    caption: "La limpiadora quiere dejar limpia la alfombra. ¿Qué pasa por el suelo?",
   },
   bauarbeiterin: {
     name: "Obrera de la construcción",
@@ -298,6 +339,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La obrera quiere seguir construyendo el muro.",
     right: "La obrera de la construcción necesita los ladrillos. ¡Genial!",
     belongs: "¡La obrera de la construcción necesita los ladrillos!",
+    caption: "La obrera quiere seguir construyendo el muro. ¿Con qué sube más el muro?",
   },
   mechanikerin: {
     name: "Mecánica",
@@ -305,6 +347,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La mecánica quiere apretar bien la rueda del auto.",
     right: "La mecánica necesita la llave inglesa. ¡Genial!",
     belongs: "¡La mecánica necesita la llave inglesa!",
+    caption: "La mecánica quiere apretar bien la rueda del auto. ¿Con qué la aprieta?",
   },
   tischlerin: {
     name: "Carpintera",
@@ -312,6 +355,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La carpintera quiere partir la tabla en dos trozos.",
     right: "La carpintera necesita la sierra. ¡Genial!",
     belongs: "¡La carpintera necesita la sierra!",
+    caption: "La carpintera quiere partir la tabla en dos trozos. ¿Con qué se hace?",
   },
   handwerker: {
     name: "Reparador",
@@ -319,6 +363,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El reparador quiere clavar el clavo en la pata de la silla.",
     right: "El reparador necesita el martillo. ¡Genial!",
     belongs: "¡El reparador necesita el martillo!",
+    caption: "El reparador quiere clavar el clavo en la pata de la silla. ¿Con qué golpea?",
   },
   elektrikerin: {
     name: "Electricista",
@@ -326,6 +371,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La electricista quiere que vuelva a haber luz arriba, en el techo.",
     right: "La electricista necesita la bombilla. ¡Genial!",
     belongs: "¡La electricista necesita la bombilla!",
+    caption: "La electricista quiere que vuelva a haber luz arriba, en el techo. ¿Qué pone ahí?",
   },
   kranfuehrer: {
     name: "Gruista",
@@ -333,6 +379,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere subir las piedras pesadas a lo alto de la casa.",
     right: "El gruista necesita la grúa. ¡Genial!",
     belongs: "¡El gruista necesita la grúa!",
+    caption: "El zorro quiere subir las piedras pesadas a lo alto de la casa. ¿Con qué se hace?",
   },
   klempner: {
     name: "Plomero",
@@ -340,6 +387,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El plomero quiere destapar el inodoro para que el agua vuelva a bajar.",
     right: "El plomero necesita el desatascador. ¡Genial!",
     belongs: "¡El plomero necesita el desatascador!",
+    caption: "El plomero quiere destapar el inodoro para que el agua vuelva a bajar. ¿Con qué se consigue?",
   },
   baggerfahrer: {
     name: "Operador de excavadora",
@@ -347,6 +395,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere hacer un agujero enorme y sacar mucha tierra.",
     right: "El operador de excavadora necesita la excavadora. ¡Genial!",
     belongs: "¡El operador de excavadora necesita la excavadora!",
+    caption: "El oso quiere hacer un agujero enorme y sacar mucha tierra. ¿Con qué la saca?",
   },
   anstreicher: {
     name: "Pintor de paredes",
@@ -354,6 +403,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere dejar azul la pared gris.",
     right: "El pintor de paredes necesita el rodillo de pintura. ¡Genial!",
     belongs: "¡El pintor de paredes necesita el rodillo de pintura!",
+    caption: "El zorro quiere dejar azul la pared gris. ¿Con qué se hace?",
   },
   pilot: {
     name: "Piloto",
@@ -361,6 +411,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El piloto quiere volar muy lejos con mucha gente.",
     right: "El piloto necesita el avión. ¡Genial!",
     belongs: "¡El piloto necesita el avión!",
+    caption: "El piloto quiere volar muy lejos con mucha gente. ¿En qué vuela?",
   },
   busfahrerin: {
     name: "Conductora de autobús",
@@ -368,6 +419,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La conductora quiere llevar a mucha gente por la ciudad.",
     right: "La conductora de autobús necesita el autobús. ¡Genial!",
     belongs: "¡La conductora de autobús necesita el autobús!",
+    caption: "La conductora quiere llevar a mucha gente por la ciudad. ¿En qué se hace?",
   },
   lokfuehrer: {
     name: "Maquinista",
@@ -375,6 +427,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere arrancar con los vagones sobre las vías.",
     right: "El maquinista necesita la locomotora. ¡Genial!",
     belongs: "¡El maquinista necesita la locomotora!",
+    caption: "El oso quiere arrancar con los vagones sobre las vías. ¿Qué tira de ellos?",
   },
   taxifahrer: {
     name: "Taxista",
@@ -382,6 +435,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere llevar al pequeño oso con su maleta a la estación.",
     right: "El taxista necesita el taxi. ¡Genial!",
     belongs: "¡El taxista necesita el taxi!",
+    caption: "El zorro quiere llevar al pequeño oso con su maleta a la estación. ¿En qué se hace?",
   },
   kapitaen: {
     name: "Capitán",
@@ -389,6 +443,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El capitán quiere cruzar el mar con mucha gente.",
     right: "El capitán necesita el barco. ¡Genial!",
     belongs: "¡El capitán necesita el barco!",
+    caption: "El capitán quiere cruzar el mar con mucha gente. ¿Qué lo lleva?",
   },
   "lkw-fahrerin": {
     name: "Camionera",
@@ -396,6 +451,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La conductora quiere llevar las muchas cajas muy lejos.",
     right: "La camionera necesita el camión. ¡Genial!",
     belongs: "¡La camionera necesita el camión!",
+    caption: "La conductora quiere llevar las muchas cajas muy lejos. ¿En qué se hace?",
   },
   strassenbahnfahrer: {
     name: "Conductor de tranvía",
@@ -403,6 +459,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere ir por las vías a través de la ciudad.",
     right: "El conductor de tranvía necesita el tranvía. ¡Genial!",
     belongs: "¡El conductor de tranvía necesita el tranvía!",
+    caption: "El zorro quiere ir por las vías a través de la ciudad. ¿Qué rueda por las vías?",
   },
   motorradfahrerin: {
     name: "Motociclista",
@@ -410,6 +467,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La conductora ya lleva el casco puesto y quiere salir zumbando por la carretera.",
     right: "La motociclista necesita la moto. ¡Genial!",
     belongs: "¡La motociclista necesita la moto!",
+    caption: "La conductora ya lleva el casco puesto y quiere salir zumbando por la carretera. ¿En qué sale?",
   },
   matrose: {
     name: "Marinero",
@@ -417,6 +475,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El marinero quiere que el barco se quede quieto aquí.",
     right: "El marinero necesita el ancla. ¡Genial!",
     belongs: "¡El marinero necesita el ancla!",
+    caption: "El marinero quiere que el barco se quede quieto aquí. ¿Qué echa al agua?",
   },
   seilbahnfuehrerin: {
     name: "Operadora de teleférico",
@@ -424,6 +483,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere subir a la gente en una cabina hasta lo alto de la montaña.",
     right: "La operadora de teleférico necesita el teleférico. ¡Genial!",
     belongs: "¡La operadora de teleférico necesita el teleférico!",
+    caption: "La osa quiere subir a la gente en una cabina hasta lo alto de la montaña. ¿En qué viaja?",
   },
   sanitaeter: {
     name: "Paramédico",
@@ -431,6 +491,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El paramédico quiere llevar rápido al pequeño zorro al hospital.",
     right: "El paramédico necesita la ambulancia. ¡Genial!",
     belongs: "¡El paramédico necesita la ambulancia!",
+    caption: "El paramédico quiere llevar rápido al pequeño zorro al hospital. ¿En qué se hace?",
   },
   hubschrauberpilotin: {
     name: "Piloto de helicóptero",
@@ -438,6 +499,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El corderito se ha hecho daño. La piloto quiere llevarlo volando rápido al valle.",
     right: "La piloto de helicóptero necesita el helicóptero. ¡Genial!",
     belongs: "¡La piloto de helicóptero necesita el helicóptero!",
+    caption: "El corderito se ha hecho daño. La piloto quiere llevarlo volando rápido al valle. ¿En qué vuela?",
   },
   feuerwehrfrau: {
     name: "Bombera",
@@ -445,6 +507,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El gatito está atrapado arriba en el árbol. La osa quiere bajarlo.",
     right: "La bombera necesita el camión de bomberos. ¡Genial!",
     belongs: "¡La bombera necesita el camión de bomberos!",
+    caption: "El gatito está atrapado arriba en el árbol. La osa quiere bajarlo. ¿En qué llega hasta allí?",
   },
   rettungsschwimmerin: {
     name: "Socorrista",
@@ -452,6 +515,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La socorrista quiere lanzarle algo al pequeño oso que está en el agua.",
     right: "La socorrista necesita el salvavidas. ¡Genial!",
     belongs: "¡La socorrista necesita el salvavidas!",
+    caption: "La socorrista quiere lanzarle algo al pequeño oso que está en el agua. ¿Qué lo mantiene a flote?",
   },
   baeuerin: {
     name: "Granjera",
@@ -459,6 +523,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La granjera quiere arar el campo.",
     right: "La granjera necesita el tractor. ¡Genial!",
     belongs: "¡La granjera necesita el tractor!",
+    caption: "La granjera quiere arar el campo. ¿Con qué se hace?",
   },
   imkerin: {
     name: "Apicultora",
@@ -466,6 +531,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El enjambre está en la rama. La apicultora quiere darle un hogar.",
     right: "La apicultora necesita la colmena. ¡Genial!",
     belongs: "¡La apicultora necesita la colmena!",
+    caption: "El enjambre está en la rama. La apicultora quiere darle un hogar. ¿Qué le ofrece?",
   },
   holzfaeller: {
     name: "Leñador",
@@ -473,6 +539,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El leñador quiere partir el tronco grueso.",
     right: "El leñador necesita el hacha. ¡Genial!",
     belongs: "¡El leñador necesita el hacha!",
+    caption: "El leñador quiere partir el tronco grueso. ¿Con qué se hace?",
   },
   gitarrist: {
     name: "Guitarrista",
@@ -480,6 +547,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere cantar una canción y tocar con los dedos a la vez.",
     right: "El guitarrista necesita la guitarra. ¡Genial!",
     belongs: "¡El guitarrista necesita la guitarra!",
+    caption: "El zorro quiere cantar una canción y tocar con los dedos a la vez. ¿Qué tiene sobre las rodillas?",
   },
   saengerin: {
     name: "Cantante",
@@ -487,6 +555,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La cantante quiere cantar fuerte para todos.",
     right: "La cantante necesita el micrófono. ¡Genial!",
     belongs: "¡La cantante necesita el micrófono!",
+    caption: "La cantante quiere cantar fuerte para todos. ¿Qué ayuda a que todos la oigan?",
   },
   trommler: {
     name: "Tamborilero",
@@ -494,6 +563,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere marchar delante y hacer música.",
     right: "El tamborilero necesita el tambor. ¡Genial!",
     belongs: "¡El tamborilero necesita el tambor!",
+    caption: "El oso quiere marchar delante y hacer música. ¿Con qué marca el compás?",
   },
   trompeterin: {
     name: "Trompetista",
@@ -501,6 +571,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro quiere soplar muy fuerte por encima de las colinas.",
     right: "La trompetista necesita la trompeta. ¡Genial!",
     belongs: "¡La trompetista necesita la trompeta!",
+    caption: "La señora Zorro quiere soplar muy fuerte por encima de las colinas. ¿Con qué sopla?",
   },
   geiger: {
     name: "Violinista",
@@ -508,6 +579,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere tocar muy suave con el arco.",
     right: "El violinista necesita el violín. ¡Genial!",
     belongs: "¡El violinista necesita el violín!",
+    caption: "El oso quiere tocar muy suave con el arco. ¿Qué roza con él?",
   },
   pianistin: {
     name: "Pianista",
@@ -515,6 +587,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro está sentada en el taburete y quiere tocar.",
     right: "La pianista necesita el piano. ¡Genial!",
     belongs: "¡La pianista necesita el piano!",
+    caption: "La señora Zorro está sentada en el taburete y quiere tocar. ¿Sobre qué presiona?",
   },
   akkordeonspieler: {
     name: "Acordeonista",
@@ -522,6 +595,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere estirar, apretar y tocar a la vez.",
     right: "El acordeonista necesita el acordeón. ¡Genial!",
     belongs: "¡El acordeonista necesita el acordeón!",
+    caption: "El oso quiere estirar, apretar y tocar a la vez. ¿Qué lleva delante del pecho?",
   },
   saxofonistin: {
     name: "Saxofonista",
@@ -529,6 +603,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro quiere soplar una melodía alegre.",
     right: "La saxofonista necesita el saxofón. ¡Genial!",
     belongs: "¡La saxofonista necesita el saxofón!",
+    caption: "La señora Zorro quiere soplar una melodía alegre. ¿Con qué se hace?",
   },
   floetenspieler: {
     name: "Flautista",
@@ -536,6 +611,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere hacer música con los pájaros, a ver quién suena más bonito.",
     right: "El flautista necesita la flauta. ¡Genial!",
     belongs: "¡El flautista necesita la flauta!",
+    caption: "El oso quiere hacer música con los pájaros, a ver quién suena más bonito. ¿Con qué se hace?",
   },
   fussballerin: {
     name: "Futbolista",
@@ -543,6 +619,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro quiere meter un gol.",
     right: "La futbolista necesita el balón de fútbol. ¡Genial!",
     belongs: "¡La futbolista necesita el balón de fútbol!",
+    caption: "La señora Zorro quiere meter un gol. ¿Qué necesita en el campo?",
   },
   basketballspieler: {
     name: "Jugador de baloncesto",
@@ -550,6 +627,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere encestar.",
     right: "El jugador de baloncesto necesita el balón de baloncesto. ¡Genial!",
     belongs: "¡El jugador de baloncesto necesita el balón de baloncesto!",
+    caption: "El oso quiere encestar. ¿Con qué se hace?",
   },
   tennisspielerin: {
     name: "Tenista",
@@ -557,6 +635,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere hacer el saque.",
     right: "La tenista necesita la pelota de tenis. ¡Genial!",
     belongs: "¡La tenista necesita la pelota de tenis!",
+    caption: "La osa quiere hacer el saque. ¿Qué vuela entonces sobre la red?",
   },
   schwimmer: {
     name: "Nadador",
@@ -564,6 +643,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere abrir los ojos debajo del agua.",
     right: "El nadador necesita las gafas de natación. ¡Genial!",
     belongs: "¡El nadador necesita las gafas de natación!",
+    caption: "El zorro quiere abrir los ojos debajo del agua. ¿Qué se pone delante de los ojos?",
   },
   skifahrerin: {
     name: "Esquiadora",
@@ -571,6 +651,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro quiere bajar zumbando por la montaña nevada.",
     right: "La esquiadora necesita los esquís. ¡Genial!",
     belongs: "¡La esquiadora necesita los esquís!",
+    caption: "La señora Zorro quiere bajar zumbando por la montaña nevada. ¿Con qué se hace?",
   },
   eislaeufer: {
     name: "Patinador sobre hielo",
@@ -578,6 +659,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere deslizarse por el estanque helado.",
     right: "El patinador sobre hielo necesita los patines de hielo. ¡Genial!",
     belongs: "¡El patinador sobre hielo necesita los patines de hielo!",
+    caption: "El oso quiere deslizarse por el estanque helado. ¿Qué se ata a los pies?",
   },
   rodlerin: {
     name: "Trineísta",
@@ -585,6 +667,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere bajar la colina deslizándose con el pequeño oso.",
     right: "La trineísta necesita el trineo. ¡Genial!",
     belongs: "¡La trineísta necesita el trineo!",
+    caption: "La osa quiere bajar la colina deslizándose con el pequeño oso. ¿Sobre qué se sienta?",
   },
   segler: {
     name: "Velerista",
@@ -592,6 +675,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere navegar por el agua con el viento.",
     right: "El velerista necesita el velero. ¡Genial!",
     belongs: "¡El velerista necesita el velero!",
+    caption: "El zorro quiere navegar por el agua con el viento. ¿Con qué se hace?",
   },
   rennfahrerin: {
     name: "Piloto de carreras",
@@ -599,6 +683,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La piloto quiere dar vueltas y vueltas muy rápido.",
     right: "La piloto de carreras necesita el auto de carreras. ¡Genial!",
     belongs: "¡La piloto de carreras necesita el auto de carreras!",
+    caption: "La piloto quiere dar vueltas y vueltas muy rápido. ¿Con qué se hace?",
   },
   skater: {
     name: "Patinador de skate",
@@ -606,6 +691,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere bajar rodando por la rampa.",
     right: "El patinador de skate necesita la patineta. ¡Genial!",
     belongs: "¡El patinador de skate necesita la patineta!",
+    caption: "El oso quiere bajar rodando por la rampa. ¿Sobre qué rueda?",
   },
   ballerina: {
     name: "Bailarina",
@@ -613,6 +699,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La bailarina quiere bailar de puntillas.",
     right: "La bailarina necesita las zapatillas de ballet. ¡Genial!",
     belongs: "¡La bailarina necesita las zapatillas de ballet!",
+    caption: "La bailarina quiere bailar de puntillas. ¿Qué se pone?",
   },
   angler: {
     name: "Pescador",
@@ -620,6 +707,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere atrapar un pez.",
     right: "El pescador necesita la caña de pescar. ¡Genial!",
     belongs: "¡El pescador necesita la caña de pescar!",
+    caption: "El oso quiere atrapar un pez. ¿Con qué se hace?",
   },
   radfahrerin: {
     name: "Ciclista",
@@ -627,6 +715,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere irse sobre dos ruedas.",
     right: "La ciclista necesita la bicicleta. ¡Genial!",
     belongs: "¡La ciclista necesita la bicicleta!",
+    caption: "La osa quiere irse sobre dos ruedas. ¿Qué está listo?",
   },
   kletterin: {
     name: "Escaladora",
@@ -634,6 +723,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La escaladora quiere subir la pared sin peligro.",
     right: "La escaladora necesita la cuerda. ¡Genial!",
     belongs: "¡La escaladora necesita la cuerda!",
+    caption: "La escaladora quiere subir la pared sin peligro. ¿Qué la asegura?",
   },
   badmintonspieler: {
     name: "Jugador de bádminton",
@@ -641,6 +731,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere jugar por encima de la red alta.",
     right: "El jugador de bádminton necesita el volante. ¡Genial!",
     belongs: "¡El jugador de bádminton necesita el volante!",
+    caption: "El zorro quiere jugar por encima de la red alta. ¿Con qué se hace?",
   },
   eishockeyspieler: {
     name: "Jugador de hockey sobre hielo",
@@ -648,6 +739,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El jugador quiere meter el disco en la portería.",
     right: "El jugador de hockey sobre hielo necesita el palo de hockey sobre hielo. ¡Genial!",
     belongs: "¡El jugador de hockey sobre hielo necesita el palo de hockey sobre hielo!",
+    caption: "El jugador quiere meter el disco en la portería. ¿Qué necesita para eso?",
   },
   reiterin: {
     name: "Jinete",
@@ -655,6 +747,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La jinete quiere saltar el obstáculo.",
     right: "La jinete necesita el caballo. ¡Genial!",
     belongs: "¡La jinete necesita el caballo!",
+    caption: "La jinete quiere saltar el obstáculo. ¿Sobre qué va sentada?",
   },
   schwimmlehrer: {
     name: "Profesor de natación",
@@ -662,6 +755,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorrito quiere ir al agua honda y no hundirse.",
     right: "El profesor de natación necesita los flotadores de brazo. ¡Genial!",
     belongs: "¡El profesor de natación necesita los flotadores de brazo!",
+    caption: "El zorrito quiere ir al agua honda y no hundirse. ¿Qué lo ayuda a hacerlo?",
   },
   gewichtheberin: {
     name: "Levantadora de pesas",
@@ -669,6 +763,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La atleta quiere levantar algo enorme por encima de la cabeza.",
     right: "La levantadora de pesas necesita la pesa. ¡Genial!",
     belongs: "¡La levantadora de pesas necesita la pesa!",
+    caption: "La atleta quiere levantar algo enorme por encima de la cabeza. ¿Con qué se hace?",
   },
   surfer: {
     name: "Surfista",
@@ -676,6 +771,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere montar la ola grande.",
     right: "El surfista necesita la tabla de surf. ¡Genial!",
     belongs: "¡El surfista necesita la tabla de surf!",
+    caption: "El oso quiere montar la ola grande. ¿Sobre qué se pone de pie?",
   },
   koenig: {
     name: "Rey",
@@ -683,6 +779,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Al rey le falta algo en la cabeza.",
     right: "El rey necesita la corona. ¡Genial!",
     belongs: "¡El rey necesita la corona!",
+    caption: "Al rey le falta algo en la cabeza. ¿Qué se le pone?",
   },
   ritter: {
     name: "Caballero",
@@ -690,6 +787,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El caballero quiere protegerse del pequeño dragón.",
     right: "El caballero necesita el escudo. ¡Genial!",
     belongs: "¡El caballero necesita el escudo!",
+    caption: "El caballero quiere protegerse del pequeño dragón. ¿Qué sostiene delante de sí?",
   },
   fee: {
     name: "Hada",
@@ -697,6 +795,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El hada quiere convertir la calabaza en algo bonito.",
     right: "El hada necesita la varita mágica. ¡Genial!",
     belongs: "¡El hada necesita la varita mágica!",
+    caption: "El hada quiere convertir la calabaza en algo bonito. ¿Con qué lo transforma?",
   },
   zauberkuenstler: {
     name: "Ilusionista",
@@ -704,6 +803,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El ilusionista quiere sacar un conejo.",
     right: "El ilusionista necesita el sombrero de copa. ¡Genial!",
     belongs: "¡El ilusionista necesita el sombrero de copa!",
+    caption: "El ilusionista quiere sacar un conejo. ¿Qué usa para eso?",
   },
   hexe: {
     name: "Bruja",
@@ -711,6 +811,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La bruja quiere volar por la noche con su gato detrás.",
     right: "La bruja necesita la escoba. ¡Genial!",
     belongs: "¡La bruja necesita la escoba!",
+    caption: "La bruja quiere volar por la noche con su gato detrás. ¿En qué vuela?",
   },
   pirat: {
     name: "Pirata",
@@ -718,6 +819,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El pirata quiere saber dónde está enterrado el cofre.",
     right: "El pirata necesita el mapa del tesoro. ¡Genial!",
     belongs: "¡El pirata necesita el mapa del tesoro!",
+    caption: "El pirata quiere saber dónde está enterrado el cofre. ¿Qué muestra el camino?",
   },
   detektivin: {
     name: "Detective",
@@ -725,6 +827,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La detective quiere ver muy grandes las huellas pequeñitas.",
     right: "La detective necesita la lupa. ¡Genial!",
     belongs: "¡La detective necesita la lupa!",
+    caption: "La detective quiere ver muy grandes las huellas pequeñitas. ¿Qué necesita para eso?",
   },
   sternguckerin: {
     name: "Observadora de estrellas",
@@ -732,6 +835,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La observadora de estrellas quiere ver la luna muy de cerca.",
     right: "La observadora de estrellas necesita el telescopio. ¡Genial!",
     belongs: "¡La observadora de estrellas necesita el telescopio!",
+    caption: "La observadora de estrellas quiere ver la luna muy de cerca. ¿Con qué se hace?",
   },
   hoehlenforscher: {
     name: "Explorador de cuevas",
@@ -739,6 +843,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El explorador quiere iluminar la cueva oscura.",
     right: "El explorador de cuevas necesita la linterna. ¡Genial!",
     belongs: "¡El explorador de cuevas necesita la linterna!",
+    caption: "El explorador quiere iluminar la cueva oscura. ¿Qué lleva consigo?",
   },
   abenteurerin: {
     name: "Aventurera",
@@ -746,6 +851,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La aventurera quiere dormir al aire libre.",
     right: "La aventurera necesita la tienda de campaña. ¡Genial!",
     belongs: "¡La aventurera necesita la tienda de campaña!",
+    caption: "La aventurera quiere dormir al aire libre. ¿Qué monta?",
   },
   zwerg: {
     name: "Enano",
@@ -753,6 +859,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El enano quiere sacar piedras preciosas de la roca.",
     right: "El enano necesita el pico. ¡Genial!",
     belongs: "¡El enano necesita el pico!",
+    caption: "El enano quiere sacar piedras preciosas de la roca. ¿Con qué se hace?",
   },
   ballonfahrerin: {
     name: "Piloto de globo",
@@ -760,6 +867,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere flotar en la cesta, alto en el cielo.",
     right: "La piloto de globo necesita el globo aerostático. ¡Genial!",
     belongs: "¡La piloto de globo necesita el globo aerostático!",
+    caption: "La osa quiere flotar en la cesta, alto en el cielo. ¿Qué la lleva hacia arriba?",
   },
   "handtuchhalter-handtuch": {
     name: "Toallero",
@@ -767,6 +875,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las patitas están mojadas. Queremos secarlas.",
     right: "La toalla va con el toallero. ¡Genial!",
     belongs: "¡La toalla va con el toallero!",
+    caption: "Las patitas están mojadas. Queremos secarlas. ¿Con qué se hace?",
   },
   "badewanne-badeente": {
     name: "Bañera",
@@ -774,6 +883,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La bañera está llena. Queremos poner algo a flotar.",
     right: "El patito de goma va con la bañera. ¡Genial!",
     belongs: "¡El patito de goma va con la bañera!",
+    caption: "La bañera está llena. Queremos poner algo a flotar. ¿Qué cabe en el agua?",
   },
   "saftpresse-orange": {
     name: "Exprimidor",
@@ -781,6 +891,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hacer zumo fresco.",
     right: "La naranja va con el exprimidor. ¡Genial!",
     belongs: "¡La naranja va con el exprimidor!",
+    caption: "Queremos hacer zumo fresco. ¿Qué va en el exprimidor?",
   },
   "toaster-toast": {
     name: "Tostadora",
@@ -788,6 +899,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos dorar algo hasta que esté bien crujiente.",
     right: "La tostada va con la tostadora. ¡Genial!",
     belongs: "¡La tostada va con la tostadora!",
+    caption: "Queremos dorar algo hasta que esté bien crujiente. ¿Qué entra por la ranura?",
   },
   "eierbecher-ei": {
     name: "Huevera",
@@ -795,6 +907,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos desayunar y abrir algo por arriba con unos golpecitos.",
     right: "El huevo va con la huevera. ¡Genial!",
     belongs: "¡El huevo va con la huevera!",
+    caption: "Queremos desayunar y abrir algo por arriba con unos golpecitos. ¿Dónde se queda firme?",
   },
   "teig-ausstecher": {
     name: "Masa",
@@ -802,6 +915,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hacer estrellas con la masa.",
     right: "El cortapastas va con la masa. ¡Genial!",
     belongs: "¡El cortapastas va con la masa!",
+    caption: "Queremos hacer estrellas con la masa. ¿Con qué damos forma a las estrellas?",
   },
   "hochstuhl-laetzchen": {
     name: "Trona",
@@ -809,6 +923,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La comida mancha. La camiseta tiene que quedar limpia.",
     right: "El babero va con la trona. ¡Genial!",
     belongs: "¡El babero va con la trona!",
+    caption: "La comida mancha. La camiseta tiene que quedar limpia. ¿Qué se pone alrededor del cuello?",
   },
   "nagel-hammer": {
     name: "Clavo",
@@ -816,6 +931,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos clavar el clavo en la tabla.",
     right: "El martillo va con el clavo. ¡Genial!",
     belongs: "¡El martillo va con el clavo!",
+    caption: "Queremos clavar el clavo en la tabla. ¿Con qué se hace?",
   },
   "roboter-batterie": {
     name: "Robot",
@@ -823,6 +939,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El robot quiere volver a andar, pero ya no tiene fuerza.",
     right: "La pila va con el robot. ¡Genial!",
     belongs: "¡La pila va con el robot!",
+    caption: "El robot quiere volver a andar, pero ya no tiene fuerza. ¿Qué le da energía nueva?",
   },
   "turnschuh-schnuersenkel": {
     name: "Zapatilla deportiva",
@@ -830,6 +947,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos atar el zapato.",
     right: "Los cordones van con la zapatilla deportiva. ¡Genial!",
     belongs: "¡Los cordones van con la zapatilla deportiva!",
+    caption: "Queremos atar el zapato. ¿Qué hace falta para eso?",
   },
   "hose-guertel": {
     name: "Pantalón",
@@ -837,6 +955,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¡El pantalón se baja! Tiene que quedarse arriba.",
     right: "El cinturón va con el pantalón. ¡Genial!",
     belongs: "¡El cinturón va con el pantalón!",
+    caption: "¡El pantalón se baja! Tiene que quedarse arriba. ¿Qué la sujeta arriba?",
   },
   "buegelbrett-buegeleisen": {
     name: "Tabla de planchar",
@@ -844,6 +963,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La camisa está arrugada. Queremos dejarla lisa.",
     right: "La plancha va con la tabla de planchar. ¡Genial!",
     belongs: "¡La plancha va con la tabla de planchar!",
+    caption: "La camisa está arrugada. Queremos dejarla lisa. ¿Con qué se queda lisa?",
   },
   "tafel-kreide": {
     name: "Pizarra",
@@ -851,6 +971,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos dibujar algo en la pizarra.",
     right: "La tiza va con la pizarra. ¡Genial!",
     belongs: "¡La tiza va con la pizarra!",
+    caption: "Queremos dibujar algo en la pizarra. ¿Con qué se escribe en ella?",
   },
   "xylofon-schlaegel": {
     name: "Xilófono",
@@ -858,6 +979,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hacer tilín, tilín en las placas de colores.",
     right: "Las mazas van con el xilófono. ¡Genial!",
     belongs: "¡Las mazas van con el xilófono!",
+    caption: "Queremos hacer tilín, tilín en las placas de colores. ¿Con qué las golpeamos?",
   },
   "perlen-schnur": {
     name: "Perlas",
@@ -865,6 +987,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hacer un collar.",
     right: "El hilo va con las perlas. ¡Genial!",
     belongs: "¡El hilo va con las perlas!",
+    caption: "Queremos hacer un collar. ¿Dónde se enhebran las cuentas?",
   },
   "bastelbild-klebestift": {
     name: "Manualidad",
@@ -872,6 +995,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las hojas tienen que quedarse fijas en el dibujo.",
     right: "La barra de pegamento va con la manualidad. ¡Genial!",
     belongs: "¡La barra de pegamento va con la manualidad!",
+    caption: "Las hojas tienen que quedarse fijas en el dibujo. ¿Con qué se pegan?",
   },
   "tor-ball": {
     name: "Portería",
@@ -879,6 +1003,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos meter un gol.",
     right: "El balón de fútbol va con la portería. ¡Genial!",
     belongs: "¡El balón de fútbol va con la portería!",
+    caption: "Queremos meter un gol. ¿Con qué se hace?",
   },
   "puzzle-puzzleteil": {
     name: "Rompecabezas",
@@ -886,6 +1011,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Falta un trozo. Queremos terminar el dibujo.",
     right: "La pieza va con el rompecabezas. ¡Genial!",
     belongs: "¡La pieza va con el rompecabezas!",
+    caption: "Falta un trozo. Queremos terminar el dibujo. ¿Qué encaja en el hueco?",
   },
   "trommel-trommelstoecke": {
     name: "Tambor",
@@ -893,6 +1019,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hacer bum, bum, bien fuerte.",
     right: "Las baquetas van con el tambor. ¡Genial!",
     belongs: "¡Las baquetas van con el tambor!",
+    caption: "Queremos hacer bum, bum, bien fuerte. ¿Con qué se toca?",
   },
   "feuerstelle-feuer": {
     name: "Círculo de piedras",
@@ -900,6 +1027,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La leña ya está preparada. Queremos calentarnos.",
     right: "El fuego va con el círculo de piedras. ¡Genial!",
     belongs: "¡El fuego va con el círculo de piedras!",
+    caption: "La leña ya está preparada. Queremos calentarnos. ¿Qué hace falta para encenderlo?",
   },
   "apfelbaum-leiter": {
     name: "Manzano",
@@ -907,6 +1035,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las manzanas están muy altas. Queremos recogerlas.",
     right: "La escalera va con el manzano. ¡Genial!",
     belongs: "¡La escalera va con el manzano!",
+    caption: "Las manzanas están muy altas. Queremos recogerlas. ¿Qué nos ayuda a subir?",
   },
   "planschbecken-gartenschlauch": {
     name: "Piscina hinchable",
@@ -914,6 +1043,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La piscina está vacía. Queremos llenarla de agua.",
     right: "La manguera va con la piscina hinchable. ¡Genial!",
     belongs: "¡La manguera va con la piscina hinchable!",
+    caption: "La piscina está vacía. Queremos llenarla de agua. ¿Con qué se hace?",
   },
   "rasen-rasenmaeher": {
     name: "Césped",
@@ -921,6 +1051,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La hierba está muy larga. Queremos dejarla cortita.",
     right: "El cortacésped va con el césped. ¡Genial!",
     belongs: "¡El cortacésped va con el césped!",
+    caption: "La hierba está muy larga. Queremos dejarla cortita. ¿Con qué se hace?",
   },
   "waescheleine-waescheklammern": {
     name: "Tendedero",
@@ -928,6 +1059,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La camiseta tiene que quedarse colgada en el tendedero.",
     right: "Las pinzas de la ropa van con el tendedero. ¡Genial!",
     belongs: "¡Las pinzas de la ropa van con el tendedero!",
+    caption: "La camiseta tiene que quedarse colgada en el tendedero. ¿Qué la sujeta?",
   },
   "picknickdecke-picknickkorb": {
     name: "Manta de pícnic",
@@ -935,6 +1067,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La manta ya está puesta. ¡Tenemos hambre!",
     right: "La cesta de pícnic va con la manta de pícnic. ¡Genial!",
     belongs: "¡La cesta de pícnic va con la manta de pícnic!",
+    caption: "La manta ya está puesta. ¡Tenemos hambre! ¿Qué guardamos?",
   },
   "see-schlittschuhe": {
     name: "Lago helado",
@@ -942,6 +1075,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El lago está helado. Queremos deslizarnos por encima.",
     right: "Los patines de hielo van con el lago helado. ¡Genial!",
     belongs: "¡Los patines de hielo van con el lago helado!",
+    caption: "El lago está helado. Queremos deslizarnos por encima. ¿Qué se pone en los pies?",
   },
   "schneeweg-schneeschieber": {
     name: "Camino nevado",
@@ -949,6 +1083,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El camino está todo nevado. Queremos despejarlo.",
     right: "La pala de nieve va con el camino nevado. ¡Genial!",
     belongs: "¡La pala de nieve va con el camino nevado!",
+    caption: "El camino está todo nevado. Queremos despejarlo. ¿Con qué se hace?",
   },
   "haltestelle-bus": {
     name: "Parada",
@@ -956,6 +1091,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Esperamos aquí y queremos subir.",
     right: "El autobús va con la parada. ¡Genial!",
     belongs: "¡El autobús va con la parada!",
+    caption: "Esperamos aquí y queremos subir. ¿En qué seguimos el viaje?",
   },
   "auto-reifen": {
     name: "Auto",
@@ -963,6 +1099,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Falta una rueda. El auto quiere volver a andar.",
     right: "El neumático va con el auto. ¡Genial!",
     belongs: "¡El neumático va con el auto!",
+    caption: "Falta una rueda. El auto quiere volver a andar. ¿Qué hay que ponerle?",
   },
   "ruderboot-ruder": {
     name: "Bote",
@@ -970,6 +1107,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Vamos a cruzar el lago con el bote.",
     right: "Los remos van con el bote. ¡Genial!",
     belongs: "¡Los remos van con el bote!",
+    caption: "Vamos a cruzar el lago con el bote. ¿Con qué avanza?",
   },
   "torte-kerze": {
     name: "Pastel",
@@ -977,6 +1115,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¡Celebramos un cumpleaños! Queremos soplar.",
     right: "Las velas van con el pastel. ¡Genial!",
     belongs: "¡Las velas van con el pastel!",
+    caption: "¡Celebramos un cumpleaños! Queremos soplar. ¿Qué se pone encima?",
   },
   "osternest-ostereier": {
     name: "Nido de Pascua",
@@ -984,6 +1123,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El nido todavía está vacío. El conejito ha escondido algo de colores.",
     right: "Los huevos de Pascua van con el nido de Pascua. ¡Genial!",
     belongs: "¡Los huevos de Pascua van con el nido de Pascua!",
+    caption: "El nido todavía está vacío. El conejito ha escondido algo de colores. ¿Qué hay en el nido?",
   },
   "plaetzchenteig-ausstechform": {
     name: "Masa de galletas",
@@ -991,6 +1131,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hornear estrellas para Navidad.",
     right: "El molde para galletas va con la masa de galletas. ¡Genial!",
     belongs: "¡El molde para galletas va con la masa de galletas!",
+    caption: "Queremos hornear estrellas para Navidad. ¿Con qué cortamos la masa?",
   },
   "clownskostuem-clownsnase": {
     name: "Disfraz de payaso",
@@ -998,6 +1139,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Queremos hacer reír. En la cara todavía falta algo rojo.",
     right: "La nariz de payaso va con el disfraz de payaso. ¡Genial!",
     belongs: "¡La nariz de payaso va con el disfraz de payaso!",
+    caption: "Queremos hacer reír. En la cara todavía falta algo rojo. ¿Qué ponemos en medio de la cara?",
   },
   paketbotin: {
     name: "Repartidora",
@@ -1005,6 +1147,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La repartidora quiere empujar la torre alta de paquetes hasta la casa.",
     right: "La repartidora necesita la carretilla. ¡Genial!",
     belongs: "¡La repartidora necesita la carretilla!",
+    caption: "La repartidora quiere empujar la torre alta de paquetes hasta la casa. ¿Qué la ayuda a hacerlo?",
   },
   strassenkehrer: {
     name: "Barrendero",
@@ -1012,6 +1155,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere limpiar toda la calle.",
     right: "El barrendero necesita la barredora. ¡Genial!",
     belongs: "¡El barrendero necesita la barredora!",
+    caption: "El zorro quiere limpiar toda la calle. ¿En qué va?",
   },
   strassenbauerin: {
     name: "Obrera de carreteras",
@@ -1019,6 +1163,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La obrera quiere aplastar el asfalto nuevo hasta dejarlo bien liso.",
     right: "La obrera de carreteras necesita la apisonadora. ¡Genial!",
     belongs: "¡La obrera de carreteras necesita la apisonadora!",
+    caption: "La obrera quiere aplastar el asfalto nuevo hasta dejarlo bien liso. ¿Qué rueda por encima?",
   },
   abschleppfahrer: {
     name: "Conductor de remolque",
@@ -1026,6 +1171,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere llevarse el auto roto tirando de él.",
     right: "El conductor de remolque necesita el camión de remolque. ¡Genial!",
     belongs: "¡El conductor de remolque necesita el camión de remolque!",
+    caption: "El oso quiere llevarse el auto roto tirando de él. ¿Con qué tira de él?",
   },
   schneepflugfahrer: {
     name: "Conductor de quitanieves",
@@ -1033,6 +1179,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La calle está toda nevada. El zorro quiere despejarla.",
     right: "El conductor de quitanieves necesita el quitanieves. ¡Genial!",
     belongs: "¡El conductor de quitanieves necesita el quitanieves!",
+    caption: "La calle está toda nevada. El zorro quiere despejarla. ¿En qué va?",
   },
   zahnaerztin: {
     name: "Dentista",
@@ -1040,6 +1187,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La dentista quiere mirar al fondo de tu boca.",
     right: "La dentista necesita el espejito. ¡Genial!",
     belongs: "¡La dentista necesita el espejito!",
+    caption: "La dentista quiere mirar al fondo de tu boca. ¿Con qué se hace?",
   },
   krankenpfleger: {
     name: "Enfermero",
@@ -1047,6 +1195,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El pequeño oso tiene una pierna con yeso. El enfermero quiere sacarlo afuera.",
     right: "El enfermero necesita la silla de ruedas. ¡Genial!",
     belongs: "¡El enfermero necesita la silla de ruedas!",
+    caption: "El pequeño oso tiene una pierna con yeso. El enfermero quiere sacarlo afuera. ¿Con qué se hace?",
   },
   ohrenaerztin: {
     name: "Doctora de oídos",
@@ -1054,6 +1203,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La doctora de oídos quiere mirar dentro de tu oreja.",
     right: "La doctora de oídos necesita el otoscopio. ¡Genial!",
     belongs: "¡La doctora de oídos necesita el otoscopio!",
+    caption: "La doctora de oídos quiere mirar dentro de tu oreja. ¿Con qué se hace?",
   },
   augenaerztin: {
     name: "Oculista",
@@ -1061,6 +1211,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La oculista quiere enseñarte dibujos en la pared.",
     right: "La oculista necesita el cartel de la vista. ¡Genial!",
     belongs: "¡La oculista necesita el cartel de la vista!",
+    caption: "La oculista quiere enseñarte dibujos en la pared. ¿Qué ayuda a reconocerlos?",
   },
   polizist: {
     name: "Policía de tráfico",
@@ -1068,6 +1219,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El policía quiere indicar a los autos cuándo pueden pasar.",
     right: "El policía de tráfico necesita el silbato. ¡Genial!",
     belongs: "¡El policía de tráfico necesita el silbato!",
+    caption: "El policía quiere indicar a los autos cuándo pueden pasar. ¿Con qué da la señal?",
   },
   feuerwehrmann: {
     name: "Bombero",
@@ -1075,6 +1227,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "¡La parrilla se está quemando! El bombero quiere apagar las llamas.",
     right: "El bombero necesita el extintor. ¡Genial!",
     belongs: "¡El bombero necesita el extintor!",
+    caption: "¡La parrilla se está quemando! El bombero quiere apagar las llamas. ¿Qué ayuda a hacerlo?",
   },
   polizistin: {
     name: "Policía",
@@ -1082,6 +1235,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa busca el peluche perdido. Una buena nariz tiene que ayudarla.",
     right: "La policía necesita el perro policía. ¡Genial!",
     belongs: "¡La policía necesita el perro policía!",
+    caption: "La osa busca el peluche perdido. Una buena nariz tiene que ayudarla. ¿Quién la ayuda a buscar?",
   },
   pizzabaecker: {
     name: "Pizzero",
@@ -1089,6 +1243,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere meter la comida al fondo del horno caliente.",
     right: "El pizzero necesita la pala de pizza. ¡Genial!",
     belongs: "¡El pizzero necesita la pala de pizza!",
+    caption: "El zorro quiere meter la comida al fondo del horno caliente. ¿Con qué se hace?",
   },
   konditorin: {
     name: "Repostera",
@@ -1096,6 +1251,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La repostera quiere decorar la tarta con nata.",
     right: "La repostera necesita la manga pastelera. ¡Genial!",
     belongs: "¡La repostera necesita la manga pastelera!",
+    caption: "La repostera quiere decorar la tarta con nata. ¿Con qué se hace?",
   },
   koch: {
     name: "Cocinero",
@@ -1103,6 +1259,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El cocinero quiere servir sopa en el tazón.",
     right: "El cocinero necesita el cucharón. ¡Genial!",
     belongs: "¡El cocinero necesita el cucharón!",
+    caption: "El cocinero quiere servir sopa en el tazón. ¿Con qué se hace?",
   },
   eisverkaeuferin: {
     name: "Vendedora de helados",
@@ -1110,6 +1267,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro quiere hacer una bola de helado bien redonda.",
     right: "La vendedora de helados necesita la cuchara de helado. ¡Genial!",
     belongs: "¡La vendedora de helados necesita la cuchara de helado!",
+    caption: "La señora Zorro quiere hacer una bola de helado bien redonda. ¿Qué la ayuda a hacerlo?",
   },
   kassierer: {
     name: "Cajero",
@@ -1117,6 +1275,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Es hora de pagar. El vendedor quiere recibir el dinero.",
     right: "El cajero necesita la caja registradora. ¡Genial!",
     belongs: "¡El cajero necesita la caja registradora!",
+    caption: "Es hora de pagar. El vendedor quiere recibir el dinero. ¿Dónde se guarda el dinero?",
   },
   kellnerin: {
     name: "Camarera",
@@ -1124,6 +1283,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La camarera quiere llevar tres tazas y el pastel a la vez.",
     right: "La camarera necesita la bandeja. ¡Genial!",
     belongs: "¡La camarera necesita la bandeja!",
+    caption: "La camarera quiere llevar tres tazas y el pastel a la vez. ¿Sobre qué lo pone todo?",
   },
   marktfrau: {
     name: "Vendedora del mercado",
@@ -1131,6 +1291,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La vendedora del mercado quiere saber cuánto pesan las manzanas.",
     right: "La vendedora del mercado necesita la balanza. ¡Genial!",
     belongs: "¡La vendedora del mercado necesita la balanza!",
+    caption: "La vendedora del mercado quiere saber cuánto pesan las manzanas. ¿Qué lo muestra?",
   },
   waffelbaeckerin: {
     name: "Vendedora de gofres",
@@ -1138,6 +1299,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La señora Zorro quiere hacer corazones dulces.",
     right: "La vendedora de gofres necesita la gofrera. ¡Genial!",
     belongs: "¡La vendedora de gofres necesita la gofrera!",
+    caption: "La señora Zorro quiere hacer corazones dulces. ¿Qué se calienta para eso?",
   },
   gaertner: {
     name: "Jardinero",
@@ -1145,6 +1307,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El jardinero quiere dejar cortita la hierba alta.",
     right: "El jardinero necesita el cortacésped. ¡Genial!",
     belongs: "¡El jardinero necesita el cortacésped!",
+    caption: "El jardinero quiere dejar cortita la hierba alta. ¿Con qué se hace?",
   },
   bauer: {
     name: "Granjero",
@@ -1152,6 +1315,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El granjero quiere ordeñar la vaca.",
     right: "El granjero necesita el cubo de leche. ¡Genial!",
     belongs: "¡El granjero necesita el cubo de leche!",
+    caption: "El granjero quiere ordeñar la vaca. ¿Qué pone debajo?",
   },
   schaefer: {
     name: "Pastor",
@@ -1159,6 +1323,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Las ovejas andan sueltas por todas partes. El zorro quiere juntarlas.",
     right: "El pastor necesita el perro pastor. ¡Genial!",
     belongs: "¡El pastor necesita el perro pastor!",
+    caption: "Las ovejas andan sueltas por todas partes. El zorro quiere juntarlas. ¿Quién lo ayuda a hacerlo?",
   },
   obstbaeuerin: {
     name: "Fruticultora",
@@ -1166,6 +1331,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La fruticultora quiere recoger las manzanas de lo alto del árbol.",
     right: "La fruticultora necesita la escalera. ¡Genial!",
     belongs: "¡La fruticultora necesita la escalera!",
+    caption: "La fruticultora quiere recoger las manzanas de lo alto del árbol. ¿Qué la ayuda a subir?",
   },
   pferdepflegerin: {
     name: "Cuidadora de caballos",
@@ -1173,6 +1339,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El caballo tiene hambre. La cuidadora quiere llevarle comida.",
     right: "La cuidadora de caballos necesita la horquilla. ¡Genial!",
     belongs: "¡La cuidadora de caballos necesita la horquilla!",
+    caption: "El caballo tiene hambre. La cuidadora quiere llevarle comida. ¿Con qué se hace?",
   },
   maehdrescherfahrer: {
     name: "Conductor de cosechadora",
@@ -1180,6 +1347,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere recoger todo el trigo del campo.",
     right: "El conductor de cosechadora necesita la cosechadora. ¡Genial!",
     belongs: "¡El conductor de cosechadora necesita la cosechadora!",
+    caption: "El zorro quiere recoger todo el trigo del campo. ¿Con qué se hace?",
   },
   harfenspielerin: {
     name: "Arpista",
@@ -1187,6 +1355,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere tocar muy suavecito con los dedos.",
     right: "La arpista necesita el arpa. ¡Genial!",
     belongs: "¡La arpista necesita el arpa!",
+    caption: "La osa quiere tocar muy suavecito con los dedos. ¿Qué hay delante de ella?",
   },
   xylofonspieler: {
     name: "Xilofonista",
@@ -1194,6 +1363,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere hacer tilín, tilín para los niños.",
     right: "El xilofonista necesita el xilófono. ¡Genial!",
     belongs: "¡El xilofonista necesita el xilófono!",
+    caption: "El zorro quiere hacer tilín, tilín para los niños. ¿Sobre qué lo toca?",
   },
   tubaspieler: {
     name: "Tubista",
@@ -1201,6 +1371,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere hacer un ¡bruum! muy grave y fuerte.",
     right: "El tubista necesita la tuba. ¡Genial!",
     belongs: "¡El tubista necesita la tuba!",
+    caption: "El oso quiere hacer un ¡bruum! muy grave y fuerte. ¿Con qué lo hace?",
   },
   jongleur: {
     name: "Malabarista",
@@ -1208,6 +1379,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El zorro quiere lanzar tres cosas a la vez por el aire.",
     right: "El malabarista necesita las pelotas de malabares. ¡Genial!",
     belongs: "¡El malabarista necesita las pelotas de malabares!",
+    caption: "El zorro quiere lanzar tres cosas a la vez por el aire. ¿Qué lanza?",
   },
   puppenspielerin: {
     name: "Titiritera",
@@ -1215,6 +1387,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La titiritera quiere mostrarles una función de teatro a los niños.",
     right: "La titiritera necesita el títere. ¡Genial!",
     belongs: "¡La titiritera necesita el títere!",
+    caption: "La titiritera quiere mostrarles una función de teatro a los niños. ¿Con qué lo representa?",
   },
   einradfahrer: {
     name: "Monociclista",
@@ -1222,6 +1395,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El oso quiere mantener el equilibrio y dar vueltas por la plaza.",
     right: "El monociclista necesita el monociclo. ¡Genial!",
     belongs: "¡El monociclista necesita el monociclo!",
+    caption: "El oso quiere mantener el equilibrio y dar vueltas por la plaza. ¿Qué tiene debajo?",
   },
   akrobatin: {
     name: "Acróbata",
@@ -1229,6 +1403,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La acróbata quiere columpiarse muy alto en la carpa.",
     right: "La acróbata necesita el trapecio. ¡Genial!",
     belongs: "¡La acróbata necesita el trapecio!",
+    caption: "La acróbata quiere columpiarse muy alto en la carpa. ¿De qué cuelga?",
   },
   ruderin: {
     name: "Remadora",
@@ -1236,6 +1411,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La osa quiere cruzar el lago hasta la isla.",
     right: "La remadora necesita los remos. ¡Genial!",
     belongs: "¡La remadora necesita los remos!",
+    caption: "La osa quiere cruzar el lago hasta la isla. ¿Con qué se hace?",
   },
   weihnachtsmann: {
     name: "Papá Noel",
@@ -1243,6 +1419,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Papá Noel quiere llevar los regalos. Delante falta alguien que tire.",
     right: "Papá Noel necesita el reno. ¡Genial!",
     belongs: "¡Papá Noel necesita el reno!",
+    caption: "Papá Noel quiere llevar los regalos. Delante falta alguien que tire. ¿Quién tira del trineo?",
   },
   prinzessin: {
     name: "Princesa",
@@ -1250,6 +1427,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La princesa quiere ir al castillo como en un cuento.",
     right: "La princesa necesita la carroza. ¡Genial!",
     belongs: "¡La princesa necesita la carroza!",
+    caption: "La princesa quiere ir al castillo como en un cuento. ¿En qué se hace?",
   },
   sandmann: {
     name: "Hombre de Arena",
@@ -1257,6 +1435,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "El Hombre de Arena quiere que el pequeño oso sueñe bonito.",
     right: "El Hombre de Arena necesita el polvo mágico. ¡Genial!",
     belongs: "¡El Hombre de Arena necesita el polvo mágico!",
+    caption: "El Hombre de Arena quiere que el pequeño oso sueñe bonito. ¿Qué le echa en los ojos?",
   },
   "frau-holle": {
     name: "Madre Nieve",
@@ -1264,6 +1443,7 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "Madre Nieve quiere que nieve.",
     right: "Madre Nieve necesita el edredón de plumas. ¡Genial!",
     belongs: "¡Madre Nieve necesita el edredón de plumas!",
+    caption: "Madre Nieve quiere que nieve. ¿Con qué cubre la tierra?",
   },
   tiefseeforscherin: {
     name: "Exploradora del mar",
@@ -1271,5 +1451,6 @@ export const SPANISH_SCENES: TogetherTranslation = {
     question: "La exploradora quiere bajar muy hondo, hasta los peces.",
     right: "La exploradora del mar necesita el submarino. ¡Genial!",
     belongs: "¡La exploradora del mar necesita el submarino!",
+    caption: "La exploradora quiere bajar muy hondo, hasta los peces. ¿En qué baja?",
   },
 };
