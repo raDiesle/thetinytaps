@@ -1,0 +1,103 @@
+/* „Was ist passiert?“: classes and keyframes carry the game's prefix (`cause-`), the CSS is global. */
+
+.cause-play {
+  position: relative;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  padding: 3vh 3vw;
+  box-sizing: border-box;
+}
+
+/* The child and its grown-up stand side by side in the room above the pictures; only the HTML layer round them moves. */
+.cause-scene {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2vw;
+  height: 34vh;
+  max-height: 34vh;
+}
+
+.cause-scene svg {
+  height: 100%;
+  width: auto;
+  display: block;
+}
+
+.cause-kid,
+.cause-grown {
+  height: 100%;
+}
+
+.cause-kid > div {
+  height: 100%;
+}
+
+/* A wrong picture: the child shakes its head gently, twice, and is still again. */
+.cause-no {
+  animation: cause-shake 0.9s linear 1;
+}
+
+@keyframes cause-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6%);
+  }
+  40% {
+    transform: translateX(6%);
+  }
+  60% {
+    transform: translateX(-4%);
+  }
+  80% {
+    transform: translateX(4%);
+  }
+}
+
+/* The two pictures of what happened, side by side as paper tiles. */
+.cause-options {
+  display: flex;
+  gap: 4vw;
+  justify-content: center;
+}
+
+.cause-option {
+  width: min(38vh, 34vw);
+  height: min(38vh, 34vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: #fffaf0;
+  box-shadow: 0 2px 0 rgba(74, 44, 51, 0.15);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: opacity 0.4s linear;
+}
+
+.cause-option.pale {
+  opacity: 0.4;
+}
+
+.cause-option.chosen {
+  box-shadow: 0 0 0 4px #ffd43b;
+}
+
+.cause-emoji {
+  font-size: min(24vh, 20vw);
+  line-height: 1;
+}
+
+.cause-question {
+  margin: 0;
+  font-size: 2.6vh;
+  color: #4a2c33;
+}

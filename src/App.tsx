@@ -28,6 +28,7 @@ const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-dir/");
+const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
 const PacifierPage = page(() => import("@/pages/PacifierPage"), "PacifierPage", "/schnullerfee/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
@@ -73,6 +74,7 @@ export function App() {
         <Route path="wie-gehts-dir" element={<MoodPage />} />
         {/* „Was brauche ich?“ is one of the two games of „Wie geht's dir?“ now (its card on the start screen). */}
         <Route path="was-brauche-ich" element={<Navigate to="/wie-gehts-dir/" replace />} />
+        <Route path="was-ist-passiert" element={<CausePage />} />
         {/* Zu Hause and Kindergarten had pages of their own; all stories are on one start screen now. */}
         <Route path="gefuehle/:place" element={<Navigate to="/gefuehle/" replace />} />
         <Route path="schatten" element={<ShadowsPage />} />

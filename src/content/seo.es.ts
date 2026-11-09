@@ -32,7 +32,7 @@ export const SEO_ES: SeoTranslation = {
     "/spiele/gefuehle/": {
       title: "Juegos de emociones para niños pequeños",
       description: "Situaciones cotidianas con el osito, ¿Cómo estás? y ¿Qué necesito?: el niño muestra su emoción, con qué fuerza la siente y qué le ayuda.",
-      text: "Un libro ilustrado sobre las emociones con tres juegos: en «Situaciones cotidianas» el osito vive día a día lo que los niños conocen –enojo, tristeza, miedo y alegría– y el niño elige qué le ayuda. En «¿Cómo estás?» el niño muestra su propia emoción y con qué fuerza la siente, y en «¿Qué necesito?», lo que le sienta bien ahora.",
+      text: "Un libro ilustrado sobre las emociones con cuatro juegos: en «Situaciones cotidianas» el osito vive día a día lo que los niños conocen –enojo, tristeza, miedo y alegría– y el niño elige qué le ayuda. En «¿Cómo estás?» el niño muestra su propia emoción y con qué fuerza la siente, y en «¿Qué necesito?», lo que le sienta bien ahora. En «¿Qué pasó?» el niño ve por qué tiene una emoción.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Aprender letras y números – juegos de teclado",
@@ -68,6 +68,11 @@ export const SEO_ES: SeoTranslation = {
       title: "¿Cómo estás? Mostrar emociones para niños pequeños",
       description: "Alegría, orgullo, cansancio o enojo: el niño toca la imagen que va con su emoción y muestra con qué fuerza la siente ahora. Sin anuncios.",
       text: "Ocho emociones en dos grupos, las agradables y las desagradables, cada una con el osito en un momento que los niños conocen. El niño toca su emoción, luego tres imágenes muestran la misma emoción un poco, bastante y muchísimo, y el niño elige con qué fuerza la siente ahora. Desde ahí se sigue a «¿Qué necesito?». Un comienzo para hablar de emociones.",
+    },
+    "/was-ist-passiert/": {
+      title: "¿Qué pasó? Entender las emociones para niños pequeños",
+      description: "El niño ve una emoción y toca lo que pasó: el globo se fue volando, llega la abuela, un perro ladra. Sin anuncios.",
+      text: "Un niño llora, ríe, se enfada o se asusta, y dos imágenes muestran qué pudo pasar. El niño toca la que encaja y ve que las emociones tienen un motivo. Un comienzo para hablar con los pequeños sobre el porqué.",
     },
     "/kettenreaktion/": {
       title: "Reacción en cadena y circuito de canicas",

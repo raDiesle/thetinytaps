@@ -1,9 +1,9 @@
 # Gefühle
 
 A book of its own on the shelf (category `gefuehle` in `games.ts`, world „gefuehle“ in `Worlds.tsx`, cover
-`cover-gefuehle.webp`; user decision, November 2026) with two games (9 November 2026: „Wie geht's dir?“ holds „Was brauche ich?“ as its second card); the names of the translated
+`cover-gefuehle.webp`; user decision, November 2026) with three games (the third, „Was ist passiert?“ (J-03), lives in `src/games/cause/` with its own CLAUDE.md; 9 November 2026: „Wie geht's dir?“ holds „Was brauche ich?“ as its second card); the names of the translated
 ones are in `names.ts`, „Was brauche ich?“ in its own file (`needs.ts`), so each language row reads its own.
-In its table of contents „Alltagssituationen“ stands first, then „Wie geht's dir?“ (user wish, November 2026; the order of
+In its table of contents „Alltagssituationen“ stands first, then „Wie geht's dir?“ and „Was ist passiert?“ (user wish, November 2026; the order of
 `games` in `games.ts`). „Was brauche ich?“ is no game of its own in the book any more (9 November 2026, below). Ideas for more games in the book are area J on `/management/` (`src/content/ideas/j-feelings-games.ts`), new scenes
 area C. The first two are small games of their own, each doing one thing (user feedback, November 2026: copying faces and
 what helps were steps of „Wie geht's dir?“ and became games of their own; „Gefühle nachmachen“ was then removed, see below):

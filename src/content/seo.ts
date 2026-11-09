@@ -101,7 +101,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/spiele/gefuehle/",
     title: "Gefühle-Spiele für Kleinkinder",
     description: "Alltagssituationen mit dem kleinen Bären, Wie geht's dir? und Was brauche ich? – das Kind zeigt sein Gefühl, wie doll es ist und was hilft.",
-    text: "Ein Bilderbuch über Gefühle mit drei Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut.",
+    text: "Ein Bilderbuch über Gefühle mit vier Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut. Bei „Was ist passiert?“ sieht das Kind, warum ein Gefühl da ist.",
   },
   {
     path: "/spiele/buchstaben-zahlen/",
@@ -142,6 +142,12 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Wie geht's dir? Gefühle zeigen für Kleinkinder",
     description: "Fröhlich, stolz, müde oder wütend: Das Kind tippt auf das Bild, das zu seinem Gefühl passt, und zeigt, wie doll es gerade ist. Ohne Werbung.",
     text: "Acht Gefühle in zwei Gruppen, die angenehmen und die unangenehmen, jedes mit dem kleinen Bären in einem Moment, den Kinder kennen. Das Kind tippt auf sein Gefühl, dann zeigen drei Bilder dasselbe Gefühl ein bisschen, schon ziemlich und ganz doll, und das Kind wählt, wie doll es gerade ist. Auf der Startseite steht auch „Was brauche ich?“: Dort zeigt das Kind mit einem Bild, was ihm jetzt guttut – in den Arm nehmen, allein sein, toben, trinken, essen oder ausruhen. Ein Anfang für Gespräche über Gefühle.",
+  },
+  {
+    path: "/was-ist-passiert/",
+    title: "Was ist passiert? Gefühle verstehen für Kleinkinder",
+    description: "Das Kind sieht ein Gefühl und tippt, was passiert ist: der Luftballon fliegt weg, Oma kommt, ein Hund bellt. Ohne Werbung.",
+    text: "Ein Kind weint, lacht, ist wütend oder erschrickt, und zwei Bilder zeigen, was passiert sein könnte. Das Kind tippt das Bild, das passt, und sieht, dass Gefühle einen Grund haben. Ein Anfang, um mit Kleinkindern über das Warum zu sprechen.",
   },
   {
     path: "/kettenreaktion/",

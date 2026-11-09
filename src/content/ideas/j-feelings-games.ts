@@ -28,6 +28,7 @@ export const feelingsGamesIdeas: IdeaArea = {
       id: "J-03",
       emoji: "❓",
       title: "Was ist passiert?",
+      done: true,
       text: "Das Fuchskind weint, und daneben liegen zwei Bilder: Sein Luftballon fliegt weg, oder es bekommt ein Eis. Das Kind tippt, was passiert ist; die Szene spielt dann kurz nach, wie es dazu kam, und Papa Fuchs tröstet. Beim anderen Bild schüttelt das Fuchskind sanft den Kopf. Andere Runden: das Bärenkind lacht (Oma ist da, oder der Turm fällt um), es ist wütend (jemand nimmt ihm die Schaufel, oder es darf rutschen), es erschrickt (ein Hund bellt, oder ein Schmetterling landet). Jede Runde hat genau ein passendes Bild, ein Test prüft die Liste.",
       why: "Gefühle haben einen Grund – das zu verstehen ist der nächste Schritt nach dem Benennen. Eltern können danach fragen: „Und warum warst du heute traurig?“",
       effort: "M",
