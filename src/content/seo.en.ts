@@ -30,7 +30,7 @@ export const SEO_EN: SeoTranslation = {
     "/spiele/gefuehle/": {
       title: "Feelings Games for Toddlers",
       description: "Everyday situations with the little bear, How are you? and What do I need? – the child shows its feeling, how strong it is and what helps.",
-      text: "A picture book about feelings with four games: in Everyday Situations the little bear lives through what children know, day by day – anger, sadness, fear and joy – and the child picks what helps. In “How are you?” the child shows its own feeling and how strong it is, and in “What do I need?” what does it good now. In “What Happened?” the child sees why a feeling is there.",
+      text: "A picture book about feelings with three games: in Everyday Situations the little bear lives through what children know, day by day – anger, sadness, fear and joy – and the child picks what helps. In “How are you?” the child shows its own feeling and how strong it is, and in “What do I need?” what does it good now.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Letters and Numbers – Keyboard Games",

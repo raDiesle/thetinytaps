@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, SHELF, UNFINISHED, bookIdOf, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
+import { CATEGORIES, SHELF, UNFINISHED, bookIdOf, bookPage, categoryHref, categoryOf, hasPage, listedGames, pagesBetween } from "./games";
 import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -99,12 +99,12 @@ describe("pages of a book", () => {
   test("the first game is on page 1, the table of contents before it", () => {
     for (const c of books) {
       expect(bookPage(categoryHref(c))).toEqual({ book: c.id, page: 0 });
-      c.games.forEach((g, i) => expect(bookPage(g.href), g.href).toEqual({ book: c.id, page: i + 1 }));
+      listedGames(c).forEach((g, i) => expect(bookPage(g.href), g.href).toEqual({ book: c.id, page: i + 1 }));
     }
   });
 
   test("back from a game to the table of contents turns as many pages as its number", () => {
-    for (const c of books) c.games.forEach((g, i) => expect(pagesBetween(g.href, categoryHref(c))).toBe(i + 1));
+    for (const c of books) listedGames(c).forEach((g, i) => expect(pagesBetween(g.href, categoryHref(c))).toBe(i + 1));
     // Out of a book, or between two books, one page turns.
     expect(pagesBetween(books[0].games.at(-1)!.href, categoryHref(books[1]))).toBe(1);
     expect(pagesBetween("/", categoryHref(books[0]))).toBe(1);
@@ -599,7 +599,7 @@ test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or
 // search engine finds it until it is done.
 test("games still being built stand nowhere on the shelf or in a book", () => {
-  expect(UNFINISHED.map((g) => g.href)).toEqual(["/schnullerfee/"]);
+  expect(UNFINISHED.map((g) => g.href)).toEqual(["/schnullerfee/", "/was-ist-passiert/"]);
   for (const game of UNFINISHED) {
     expect(
       SHELF.map((e) => e.href),
