@@ -34,5 +34,7 @@ Still being built (`unfinished`, user decision): reached only from „🚧 In Ar
   (`buch-fuechse.webp`), every other page there from that first picture as its only ref, so the room stays; full bleed,
   never a white margin or rounded corners (two first pictures came back so and were drawn again). Every page drawn from a first
   picture says where the foxes stood there and that those places are empty now (`WAS_THERE`): without it six of
-  twenty pages kept a second Tapsi or Mama, or a tail lying on the rug. Count the foxes on every picture before keeping
+  twenty pages kept a second Tapsi or Mama, or a tail lying on the rug. A page whose foxes stay where
+  the first picture can't show them (Tapsi drinking on Mama's lap in the living room) is drawn from a page where they
+  already are (`FROM`). Count the foxes on every picture before keeping
   it: only the cast the page names, each once, and look for stray tails.

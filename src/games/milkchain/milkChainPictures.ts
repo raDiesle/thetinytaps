@@ -50,6 +50,19 @@ const WAS_THERE: Record<Place, string> = {
   weg: "Papa pushes a pram along the path with Tapsi asleep in it",
 };
 
+/**
+ * Pages drawn from another page of their place where the foxes already are as they should be, with where they are
+ * there. Drawn from the place's first picture, Tapsi stayed on the rug while drinking on Mama's lap too, twice in a row
+ * (`/bild-erzeugen`: what stays put comes from a picture where it already is).
+ */
+const FROM: Record<string, { page: string; was: string }> = {
+  "fragen-tapsi": { page: "noch", was: "Tapsi sits on Mama's lap on the green sofa and drinks at her breast, and the rug is empty" },
+  "gleich-lied": { page: "noch", was: "Tapsi sits on Mama's lap on the green sofa and drinks at her breast, and the rug is empty" },
+  "abend-frueher": { page: "noch", was: "Tapsi sits on Mama's lap on the green sofa and drinks at her breast, and the rug is empty" },
+  langsam: { page: "babys", was: "Tapsi sits on Mama's lap on the edge of the bed" },
+  "nacht-schlaeft": { page: "tag-ab", was: "Mama stands by the bed and holds Tapsi up in her arms" },
+};
+
 /** The light of a page, said in every prompt: the place's first picture is drawn in daylight. */
 const LIGHT: Record<Light, string> = {
   tag: "It is daytime, friendly daylight.",
@@ -107,7 +120,7 @@ function promptOf(page: ChainPage): string {
     ? [PLACES[page.place], "Draw the foxes like the fox family in the reference picture: the same fur, faces and clothes."]
     : [
         "Redraw this exact place from the reference picture: keep it exactly as it is – the same walls, window, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses and the light change, and who is there.",
-        `In the reference picture ${WAS_THERE[page.place]}: that was another moment. Draw each fox only where this page says, and leave every other place empty – no fox, no second fox, no fox tail left lying on the rug or the furniture.`,
+        `In the reference picture ${FROM[page.id]?.was ?? WAS_THERE[page.place]}: that was another moment. Draw each fox only where this page says, and leave every other place empty – no fox, no second fox, no fox tail left lying on the rug or the furniture.`,
       ];
   parts.push(LIGHT[page.light]);
   if (page.place === "kinderzimmer") parts.push(chainOn(page));
@@ -129,7 +142,7 @@ export function chainPicture(page: ChainPage): QueuedPicture {
     aspect: "4:3",
     size: "1200x900",
     quality: 70,
-    ref: [first ? FAMILY : pictureFile(FIRST[page.place])],
+    ref: [first ? FAMILY : pictureFile(FROM[page.id]?.page ?? FIRST[page.place])],
     alone: "story picture",
     date: "2026-11-09",
   };
@@ -152,6 +165,36 @@ const MADE = new Set<string>([
   "tag-leichter",
   "vermissen-traurig",
   "vermissen-mama",
+  "baby",
+  "noch",
+  "schoss",
+  "babys",
+  "muede",
+  "schwer",
+  "auch",
+  "tag-ab",
+  "tag-dose",
+  "tag-nicht",
+  "abend-buch",
+  "abend-schlaf",
+  "abend-ab",
+  "nacht-ab",
+  "nacht-wach",
+  "nacht-papa",
+  "nacht-lied",
+  "nacht-sonne",
+  "nacht-stolz",
+  "abschied-letzter",
+  "abschied-sagen",
+  "abschied-trinken",
+  "abschied-danke",
+  "abschied-traenen",
+  "abschied-dose",
+  "abschied-fest",
+  "vermissen-herz",
+  "vermissen-immer",
+  "bleibt-kette",
+  "bleibt-lieb",
 ]);
 
 /** Every picture of the story still to make. */
