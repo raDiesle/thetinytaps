@@ -164,8 +164,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/milchkette/",
-    note: "„Tapsis Milchkette“, die zweite Abstillgeschichte in Kapiteln (milkChain.ts): nur auf Deutsch, die Sätze werden vorgelesen und sind nicht aufgenommen. Übersetzt sind nur „Weiter“ und „Zurückblättern“ und die Suchtexte.",
-    languages: { de: "done" },
+    note: "„Tapsis Milchkette“, die zweite Abstillgeschichte in Kapiteln (milkChain.ts): Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/bilder/",

@@ -34,6 +34,7 @@ import { DAYTIME_ES as teethDaytime } from "@/games/teeth/daytime.es";
 import { COMFORTS_ES as comforts, FEELINGS_ES as feelings } from "@/games/feelings/bear.es";
 import { SITUATIONS_ES as situations } from "@/games/feelings/kita.es";
 import { DAYS_ES as days } from "@/games/feelings/days.es";
+import { MILK_CHAIN_ES as milkChain } from "@/games/milkchain/es";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.es";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.es";
 import type { LanguageTexts } from ".";
@@ -80,6 +81,7 @@ export const TEXTS: LanguageTexts = {
   feelings,
   situations,
   days,
+  milkChain,
   seo,
   stories: { cloudTrip, treasureIsland },
 };

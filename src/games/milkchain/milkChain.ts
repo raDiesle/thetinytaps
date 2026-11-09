@@ -56,6 +56,17 @@ export interface ChainPage {
   nursing?: true;
 }
 
+/**
+ * The story in another language, kept in `<lang>.ts` beside this file and loaded with that language's texts
+ * (`src/content/texts/texts-<lang>.ts`), never imported by the game. A page or title it lacks shows in German.
+ */
+export interface MilkChainTranslation {
+  /** Each chapter's title by chapter id. */
+  chapters: Record<string, string>;
+  /** Each page's sentence by page id. */
+  pages: Record<string, string>;
+}
+
 /** One chapter: read on its own on the evening it fits, or the whole story at once. */
 export interface Chapter {
   id: string;

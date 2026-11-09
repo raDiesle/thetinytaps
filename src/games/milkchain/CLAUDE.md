@@ -15,7 +15,9 @@ Still being built (`unfinished`, user decision): reached only from „🚧 In Ar
 - `MilkChainPlay.tsx`: one page per tap or key (← and Backspace back, ◀ for the grown-up), the picture as big as the
   room allows, under it the chapter's title on its first page and the sentence to read aloud; a paper placeholder where
   a picture isn't made yet; `GameEnd` small in the corners on the last page; `DevTag` `K<chapter>-<page>`.
-- `names.ts`: title and blurb, German only. `milkchain.css`: classes `mk-`.
+- `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
+  (user request, 9 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with `byLanguage`.
+- `names.ts`: title and blurb in every language. `milkchain.css`: classes `mk-`.
 
 ## Rules
 
@@ -28,6 +30,11 @@ Still being built (`unfinished`, user decision): reached only from „🚧 In Ar
 - Everything in `src/games/weaning/CLAUDE.md`'s rules holds here too: plainly about Mama's breast (the word „Brust“ is
   said, the drinking pictures show Tapsi at the breast as a breastfeeding picture book does, `NURSING`), gentle and
   true, nobody scolds, being sad and angry is shown and held, a grown-up is always close, lines ≤ 110 characters.
+- Every language has every chapter and page (`milkchain.test.ts`): a new page or chapter comes in German only and its
+  languages' rows in `languageStatus.ts` say what is missing until the user asks for translations; a German line whose
+  meaning changes loses its translations (they fall back to German). The rules for the child's languages hold here
+  too: Tapsi in each script (Тапси, 塔普西, टैप्सी, تابسي), the breast named (Brust, breast, 乳房, छाती, pecho, صدر, грудь),
+  Arabic with „let's“ instead of an imperative, Spanish without adjectives about Tapsi that change with gender.
 - The sentence under the picture is for the grown-up; the child follows the pictures. No voice and no browser voice:
   a grown-up reads it.
 - Pictures (`/bild-erzeugen`): each place's first picture (`FIRST`) is drawn from the fox family

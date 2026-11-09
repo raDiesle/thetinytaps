@@ -8,6 +8,7 @@ import type { ComfortId, FeelingId } from "@/games/feelings/bear";
 import type { DayText } from "@/games/feelings/days";
 import type { SituationId } from "@/games/feelings/kita";
 import type { ComfortText, FeelingText, SituationText } from "@/games/feelings/localized";
+import type { MilkChainTranslation } from "@/games/milkchain/milkChain";
 import type { SceneTranslation } from "@/games/scenes/types";
 import type { ShadowTranslation } from "@/games/shadows/content";
 import type { SockTexts } from "@/games/socks/content";
@@ -55,6 +56,8 @@ export interface LanguageTexts {
   situations?: Partial<Record<SituationId, SituationText>>;
   /** Gefühle, the days' pages of the story by day id (`feelings/days.<id>.ts`). */
   days?: Partial<Record<string, DayText>>;
+  /** Tapsis Milchkette: chapter titles and pages (`milkchain/<id>.ts`). */
+  milkChain?: MilkChainTranslation;
   /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
   seo?: SeoTranslation;
   /** Bewegungsabenteuer: Tapsi's lines by story folder (`adventure/stories/<story>/lines.<id>.ts`). */

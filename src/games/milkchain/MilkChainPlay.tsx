@@ -2,7 +2,8 @@ import { type PointerEvent, useCallback, useEffect, useRef, useState } from "rea
 import { DevTag } from "@/components/DevTag";
 import { GameEnd } from "@/components/GameEnd";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { useT } from "@/lib/language";
+import { byLanguage } from "@/content/texts";
+import { useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
 import pictureFiles from "./bilder/*.webp?glob";
 import { MILK_CHAIN, MILK_CHAIN_PAGES } from "./milkChain";
@@ -10,6 +11,20 @@ import { MILK_CHAIN, MILK_CHAIN_PAGES } from "./milkChain";
 /** Each page's picture by its file name without extension (`kette-<page id>`). */
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
 const pictureOf = (id: string) => PICTURES.get(`kette-${id}`);
+
+/** The story in the other languages, filled as their texts load; German is in `milkChain.ts`. */
+const TRANSLATIONS = byLanguage((texts) => texts.milkChain);
+
+/** „Kapitel 4“ in each language, before the chapter's title. */
+const CHAPTER = {
+  de: "Kapitel {n}",
+  en: "Chapter {n}",
+  zh: "第{n}章",
+  hi: "अध्याय {n}",
+  es: "Capítulo {n}",
+  ar: "الفصل {n}",
+  ru: "Глава {n}",
+};
 
 /** Taps this soon after a page began only ripple, so a double tap doesn't skip a page. */
 const TAP_GUARD_MS = 450;
@@ -29,6 +44,8 @@ const BACK = { de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "�
  */
 export function MilkChainPlay() {
   const t = useT();
+  const { id: language } = useAppLanguage();
+  const translation = language === "de" ? undefined : TRANSLATIONS[language];
   const [index, setIndex] = useState(0);
   const indexRef = useRef(0);
   const startedAt = useRef(0);
@@ -93,10 +110,10 @@ export function MilkChainPlay() {
       <div className="mk-words">
         {where.first && (
           <h2 className="mk-chapter">
-            Kapitel {where.number}: {where.chapter.title}
+            {t(CHAPTER).replace("{n}", String(where.number))}: {translation?.chapters[where.chapter.id] ?? where.chapter.title}
           </h2>
         )}
-        <p className="mk-text">{page.text}</p>
+        <p className="mk-text">{translation?.pages[page.id] ?? page.text}</p>
       </div>
 
       {index > 0 && !last && (

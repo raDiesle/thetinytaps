@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { MILK_CHAIN_AR } from "./ar";
+import { MILK_CHAIN_EN } from "./en";
+import { MILK_CHAIN_ES } from "./es";
+import { MILK_CHAIN_HI } from "./hi";
 import { GENTLE_STEPS, goneOn, MILK_CHAIN, MILK_CHAIN_PAGES, MILK_ORDER } from "./milkChain";
+import { MILK_CHAIN_RU } from "./ru";
+import { MILK_CHAIN_ZH } from "./zh";
 
 describe("Tapsis Milchkette", () => {
   test("every page has its own id, a short German text and a picture", () => {
@@ -46,4 +52,34 @@ describe("Tapsis Milchkette", () => {
     expect(MILK_CHAIN_PAGES.some((p) => /traurig sein/.test(p.text))).toBe(true);
     expect(MILK_CHAIN_PAGES.at(-1)?.text).toMatch(/lieb/);
   });
+});
+
+describe("Tapsis Milchkette in every language", () => {
+  const chapterIds = MILK_CHAIN.map((c) => c.id).sort();
+  const pageIds = MILK_CHAIN_PAGES.map((p) => p.id).sort();
+  const LANGUAGES = { en: MILK_CHAIN_EN, zh: MILK_CHAIN_ZH, hi: MILK_CHAIN_HI, es: MILK_CHAIN_ES, ar: MILK_CHAIN_AR, ru: MILK_CHAIN_RU };
+  /** Tapsi's name and the breast, as each language writes them: the story is plainly about Mama's breast. */
+  const SAYS = {
+    en: ["Tapsi", "breast"],
+    zh: ["塔普西", "乳房"],
+    hi: ["टैप्सी", "छाती"],
+    es: ["Tapsi", "pecho"],
+    ar: ["تابسي", "صدر"],
+    ru: ["Тапси", "груд"],
+  };
+
+  for (const [language, translation] of Object.entries(LANGUAGES)) {
+    test(`${language}: every chapter and page, nothing else`, () => {
+      expect(Object.keys(translation.chapters).sort()).toEqual(chapterIds);
+      expect(Object.keys(translation.pages).sort()).toEqual(pageIds);
+      for (const text of [...Object.values(translation.chapters), ...Object.values(translation.pages)]) expect(text.trim()).not.toBe("");
+    });
+
+    test(`${language}: Tapsi in its own script, and the breast named`, () => {
+      const all = Object.values(translation.pages).join(" ");
+      for (const word of SAYS[language as keyof typeof SAYS]) expect(all).toContain(word);
+      // Russian, Chinese, Hindi and Arabic are written without Latin letters.
+      if (language !== "en" && language !== "es") expect(all + Object.values(translation.chapters).join(" ")).not.toMatch(/[A-Za-z]/);
+    });
+  }
 });
