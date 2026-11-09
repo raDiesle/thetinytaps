@@ -185,27 +185,43 @@ test("the game answers calmly", () => {
 test("a scene goes on with a tap, and one thing moves at a time", () => {
   const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
   expect(round).toContain('const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;');
-  expect(round).toContain("still={!pictureFront}");
+  expect(round).toContain("still={choosing}");
   expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain('<Frames name={image} moving={active} className="fg-card-image" />');
   expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
 });
 
-// While the child chooses, the cards lie big over the picture; a tap on the picture brings it to the front with the
-// cards grey behind it, and a tap on a grey card only brings them back, it chooses nothing (user wish, November 2026).
-// The pictures carry their whole text, never a short caption – and none at all while the sheet with the text is open,
-// which then holds it in the bottom right corner.
-test("cards or picture on top, and the whole text on the picture or the sheet", () => {
+// Choosing (user wish, November 2026): the scene is minimised top left with its text under it, the two choices A (not
+// so good, left) and B (good, right) stand side by side with two arrows from the scene to them, and a tap on the small
+// scene steps back to the scene alone. After a choice only the picture stays, with its tick or cross, and no choice is
+// shown any more. The caption is always under the picture, never on it, and the sheet holds it when open.
+test("choosing: minimised scene, A and B with arrows, and only the chosen picture after", () => {
   const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
-  expect(round).toContain('if (front === "picture") return setFront("cards");');
-  expect(round).toContain('onTap={pictureFront ? undefined : () => setFront("picture")}');
-  expect(round).toContain("onWake={behind ? wake : undefined}");
+  expect(round, "the choices are A and B, side by side").toContain('letter="A"');
+  expect(round).toContain('letter="B"');
+  expect(round, "two arrows from the scene to the choices").toContain('className="story-arrow"');
+  expect(round, "a tap on the minimised scene steps back to the scene alone").toContain("onTap={choosing ? minimised : undefined}");
+  expect(round, "the choices stand only while choosing").toContain("choosing && (");
+  expect(round, "the picture's tick stays after a choice").toContain('const look: PictureLook = phase === "trying" ? "bad" : doneHere ? "good" : "story";');
+  expect(round, "no grey cards to wake any more").not.toMatch(/front|Front|cheering|onWake/);
   expect(round, "the picture's text is its whole part of the sheet").toContain("wholeText(round).find((p) => p.id === part)?.text");
-  const shared = readFileSync("src/games/feelings/shared.tsx", "utf8");
-  expect(shared, "a grey card wakes the cards, never chooses").toMatch(/if \(onWake\) onWake\(\);\s*else if \(active\) onChoose\?\.\(\);/);
+  expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a card picks, nothing else").toMatch(/if \(active\) onChoose\?\.\(\);/);
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
   expect(css).toMatch(/\.story-play\[data-sheet\] \.fg-caption\s*\{\s*display: none/);
-  expect(css).toMatch(/\.fg-choice-behind [^{]*\{[^}]*grayscale/);
+  expect(css, "the caption stands under the picture, full width").toMatch(/\.fg-picture-caption \{[^}]*top: 100%/);
+  expect(css, "no caption in a corner of the picture").not.toMatch(/\.story-play \.fg-picture-caption \{/);
+  expect(css, "the minimised scene's caption is under it, across the screen").toMatch(
+    /\[data-stage="choose"\] \.fg-picture-caption \{[^}]*width: calc\(100cqw/,
+  );
+});
+
+// The way back to the scene before: a corner bottom left in a pass of short scenes, the first scene without one.
+test("a way back to the scene before, bottom left", () => {
+  const pass = readFileSync("src/games/feelings/PassPlay.tsx", "utf8");
+  expect(pass).toContain("onBack={now.index > 0 ? () => replay(now.index - 1) : undefined}");
+  expect(readFileSync("src/games/feelings/RoundPlay.tsx", "utf8")).toMatch(/<StepBack\s/);
+  const css = readFileSync("src/games/feelings/feelings.css", "utf8");
+  expect(css).toMatch(/\.fg-back \{[^}]*left: var\(--pad\)/);
 });
 
 // „Alltagssituationen“ alone has a switch for its voice, for grown-ups who tell the story themselves (user decision,

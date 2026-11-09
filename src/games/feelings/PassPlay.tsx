@@ -86,6 +86,7 @@ export function PassPlay({
       onDone={last ? undefined : goOn}
       onEndKey={last ? (next?.onNext ?? onAgain) : goOn}
       onPick={replay}
+      onBack={now.index > 0 ? () => replay(now.index - 1) : undefined}
       readAlong={readAlong}
       // The next scene's opening loads while this one plays.
       nextLines={last ? [] : openingLines(roundOf(scenes[now.index + 1], stepOf(now.index + 1), language))}

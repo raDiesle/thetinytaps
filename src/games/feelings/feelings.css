@@ -37,12 +37,11 @@
   container-type: size;
 }
 
-/* Low or wide screens: every pixel of height counts, and the cards lie on the picture, so the captions sit on the
-   pictures' lower edge. */
+/* Low or wide screens: every pixel of height counts, so the caption under the picture is a single line. */
 @media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
   .story-play {
     --label: 14px;
-    --caption-h: 0px;
+    --caption-h: 2.4rem;
   }
 }
 
@@ -323,7 +322,6 @@
 
 /* Low or wide screens: on the lower edge of the picture or card, small, on a pale band. */
 @media (max-height: 560px), (min-aspect-ratio: 6 / 5) {
-  .fg-picture-caption,
   .fg-choice .fg-caption {
     position: absolute;
     top: auto;
@@ -339,11 +337,6 @@
     opacity: 1;
     translate: -50% 0;
     pointer-events: none;
-  }
-
-  .fg-picture-caption {
-    bottom: 8px;
-    border-radius: 12px;
   }
 
   .fg-choice .fg-caption {
@@ -744,25 +737,6 @@
   touch-action: manipulation;
 }
 
-/* The picture in front: over the cards, which wait small behind it – below the dots and the grown-ups' notes. */
-.story-play[data-front="picture"] .story-middle {
-  z-index: 4;
-}
-
-.story-play[data-front="picture"] .story-choices {
-  z-index: 3;
-}
-
-/* Tapped to the front while the child chooses, the cards behind it go grey until one is tapped. */
-.fg-choice-behind .fg-card-image,
-.fg-choice-behind .fg-placeholder {
-  filter: grayscale(0.85) brightness(1.08);
-}
-
-.fg-choice-behind .fg-card {
-  box-shadow: 0 6px 0 var(--ink);
-}
-
 /* The sheet with the text open: the texts leave the pictures and stand on it, in the bottom right corner. */
 .story-play[data-sheet] .fg-caption {
   display: none;
@@ -826,43 +800,12 @@
     --card-min: 24cqw;
     --over: 0.2;
     /* The picture as high as the screen, unless that leaves the cards too little room beside it. */
-    --pic-w: min((100cqh - 2 * var(--pad)) * 4 / 3, 100cqw - 2 * var(--pad) - 2 * (1 - var(--over)) * var(--card-min));
+    --pic-w: min((100cqh - 2 * var(--pad) - var(--caption-h)) * 4 / 3, 100cqw - 2 * var(--pad) - 2 * (1 - var(--over)) * var(--card-min));
     --pic-top: calc((100cqh - var(--pic-w) * 3 / 4) / 2);
     /* Each card fills its side and reaches a fifth of its width over the picture. */
     --card-w: calc((100cqw - 2 * var(--pad) - var(--pic-w)) / (2 * (1 - var(--over))));
-    /* Up or down to the picture's edge, then a third of the card further, so it lies on the corner. */
-    --card-edge: max(var(--pad), var(--pic-top) - var(--card-w) * 0.75 * 0.3);
-    /* While the child chooses the cards lie on top, about twice as big, over the picture (user wish, November 2026) –
-       side by side without touching, and low enough to leave the picture's text room between them. */
-    --card-big: min(2 * var(--card-w), (100cqw - 2 * var(--pad) - var(--gap)) / 2, (100cqh - 2 * var(--pad)) * 0.7 * 4 / 3);
 
     display: block;
-  }
-
-  /* Big while they lie on top, right in the screen's corners; small again, on the picture's corners, once the picture is
-     tapped to the front or plays a choice. The change is at once, never a growing card. */
-  .story-play[data-front="cards"] .story-choices .fg-choice,
-  .story-play[data-front="cards"] .story-choices .fg-card {
-    --card-w: var(--card-big);
-  }
-
-  .story-play[data-front="cards"] .story-choices .fg-choice:first-child {
-    bottom: var(--pad);
-  }
-
-  .story-play[data-front="cards"] .story-choices .fg-choice:last-child {
-    top: var(--pad);
-  }
-
-  /* The picture's whole text stands in its bottom right corner, right of the big not-so-good card, so the cards never
-     cover it; not wider than a readable line. */
-  .story-play .fg-picture-caption {
-    right: 8px;
-    left: auto;
-    max-width: max(30%, 50cqw + var(--pic-w) / 2 - 2 * var(--pad) - var(--card-big) - var(--gap));
-    font-size: clamp(0.8rem, 2.4cqh, 1.05rem);
-    text-align: start;
-    translate: none;
   }
 
   /* Tablets (about 4:3) have room above and below the picture: bigger cards, a smaller picture. */
@@ -878,9 +821,10 @@
     padding: 0;
   }
 
+  /* The picture with its caption under it, the pair centred. */
   .fg-frame {
     width: var(--pic-w);
-    margin: 0;
+    margin: 0 0 var(--caption-h);
   }
 
   /* The cards lie over the picture, but the room between them is the picture's: taps there reach nothing. */
@@ -898,21 +842,7 @@
   }
 
   .story-choices .fg-choice {
-    position: absolute;
     gap: 0;
-  }
-
-  /* The not-so-good idea at the bottom left, the good one at the top right (user's choice, November 2026). Right at
-     the screen's edges, as their width is reckoned: a phone's safe-area inset (the notch's side, 47 px and more) left
-     an empty strip beside the card and pushed it further over the picture (user feedback, November 2026). */
-  .story-choices .fg-choice:first-child {
-    bottom: var(--card-edge);
-    left: var(--pad);
-  }
-
-  .story-choices .fg-choice:last-child {
-    top: var(--card-edge);
-    right: var(--pad);
   }
 
   /* The tick or cross of the big picture moves to its top left corner: the good card lies on the top right one. */
@@ -952,6 +882,161 @@
   .story-play .game-end-button.next {
     font-size: min(clamp(2.1rem, 13vh, 4.6rem), (100cqw - var(--pic-w)) / 10);
   }
+}
+
+/* ---------- Choosing (user wish, November 2026): the scene minimised top left, its text under it, and the two choices
+   A and B side by side below it, with arrows from the scene to each. A tap on the small scene steps back to the scene
+   alone, big in the middle. Only the choosing stage has this layout; the scene and the good one stand as above. ---------- */
+
+.story-play[data-stage="choose"] {
+  --mini-w: min(20cqw, 36cqh * 4 / 3);
+  --mini-h: calc(var(--mini-w) * 0.75);
+  /* The choices start under the minimised scene, with room for the arrows. Wide screens: the two choices stand between
+     the bottom corners, so they reach down to the edge; upright they reach the corners, which are kept free. */
+  --corner: var(--pad);
+  --choose-top: calc(3 * var(--pad) + var(--mini-h) + 1.6rem);
+  --card-w: min((100cqw - 2 * var(--pad) - var(--gap)) / 2, (100cqh - var(--choose-top) - var(--corner) - var(--label)) / 0.75);
+}
+
+@media (max-aspect-ratio: 6 / 5) {
+  .story-play[data-stage="choose"] {
+    --mini-w: min(30cqw, 36cqh * 4 / 3);
+    --corner: calc(var(--next-w) + 2 * var(--pad));
+  }
+}
+
+.story-play[data-stage="choose"] .story-middle {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+}
+
+.story-play[data-stage="choose"] .fg-frame {
+  position: absolute;
+  top: var(--pad);
+  left: var(--pad);
+  width: var(--mini-w);
+  margin: 0;
+  border-radius: 14px;
+}
+
+/* The scene's text beside the minimised picture, on its top right, the rest of the screen's width; never on the picture,
+   and the arrows run down from the picture's bottom, past it. */
+.story-play[data-stage="choose"] .fg-picture-caption {
+  top: 2.4rem;
+  left: calc(100% + var(--gap));
+  width: calc(100cqw - var(--mini-w) - 3 * var(--pad) - var(--gap));
+  max-width: none;
+  height: auto;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font-size: clamp(0.85rem, 2.4vh, 1.05rem);
+  text-align: start;
+  translate: none;
+}
+
+.story-play[data-stage="choose"] .story-choices {
+  position: absolute;
+  top: var(--choose-top);
+  right: 0;
+  bottom: var(--corner);
+  left: 0;
+  z-index: 3;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap);
+  padding: 0 var(--pad);
+  pointer-events: none;
+}
+
+.story-play[data-stage="choose"] .story-choices > * {
+  pointer-events: auto;
+}
+
+.story-play[data-stage="choose"] .story-choices .fg-choice {
+  position: relative;
+  width: var(--card-w);
+  gap: 0;
+}
+
+/* Two arrows from the minimised scene to A and B: drawn where they stand, behind the choices. */
+.story-arrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.story-arrow {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.story-arrow-head {
+  fill: var(--ink);
+}
+
+/* The letter of a choice (A or B) on its top right corner, half outside it. */
+.fg-card-letter {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: clamp(34px, 24%, 52px);
+  aspect-ratio: 1;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--sunshine);
+  box-shadow: 0 3px 0 var(--ink);
+  color: var(--ink);
+  font-size: clamp(1rem, 2.6cqw, 1.5rem);
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* The way back to the scene before: bottom left, as ▶ is bottom right, and only where there is one. */
+.fg-back {
+  position: absolute;
+  left: var(--pad);
+  bottom: var(--pad);
+  z-index: 7;
+  width: var(--next-w);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fg-back-sign {
+  display: block;
+  width: 100%;
+  filter: drop-shadow(0 3px 0 var(--ink));
+}
+
+.fg-back-sign circle {
+  fill: var(--paper, #fbf6ea);
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.fg-back-sign path {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linejoin: round;
 }
 
 /* ---------- „Alltagssituationen“'s corner for grown-ups: the text to read out and the voice switch ---------- */
@@ -1147,13 +1232,12 @@
   vertical-align: -0.2em;
 }
 
-/* Wide: the sheet starts below the big good card on the top right and is as wide as the room beside the big
-   not-so-good one, but never narrower than a readable line; its bottom stays above the notes and ▶. */
+/* Wide: the sheet starts under the dots on the top right, a readable line wide; its bottom stays above the notes and ▶. */
 @media (min-aspect-ratio: 6 / 5) {
   .story-text-sheet {
-    --sheet-top: calc(var(--pad) + var(--card-big) * 0.75 + 10px);
+    --sheet-top: calc(var(--pad) + 40px);
 
-    width: max(100cqw - 2 * var(--pad) - var(--card-big) - var(--gap), min(44cqw, 22rem));
+    width: min(44cqw, 22rem);
   }
 }
 

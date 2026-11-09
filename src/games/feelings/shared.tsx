@@ -229,7 +229,7 @@ export function ChoiceCard({
   caption,
   state,
   onChoose,
-  onWake,
+  letter,
   marker,
 }: {
   /** Name of the picture, see images.ts. */
@@ -238,31 +238,27 @@ export function ChoiceCard({
   caption: string;
   state: CardState;
   onChoose?: () => void;
-  /**
-   * The card lies grey and small behind the big picture (tapped to the front, `RoundPlay`): a tap only brings the cards
-   * back to the front, big again, and chooses nothing yet (user wish, November 2026).
-   */
-  onWake?: () => void;
+  /** The letter on the card's corner („A“, „B“): the two choices are told apart by it, never by which is right. */
+  letter?: string;
   /**
    * A note for grown-ups on a page marker over the card's top edge („Heute früh“), kept out of the caption so the
    * caption stays the card's few words and never covers the picture.
    */
   marker?: string;
 }) {
-  const active = state === "choose" && !onWake;
+  const active = state === "choose";
   return (
-    <div className={`fg-choice${onWake ? " fg-choice-behind" : ""}`}>
+    <div className="fg-choice">
       <button
         type="button"
         className={`fg-card fg-card-${state}`}
         // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
         data-tap
-        disabled={!active && !onWake}
+        disabled={!active}
         aria-label={marker ? `${marker}: ${caption}` : caption}
         onPointerDown={(e: PointerEvent) => {
           e.stopPropagation();
-          if (onWake) onWake();
-          else if (active) onChoose?.();
+          if (active) onChoose?.();
         }}
       >
         {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
@@ -270,6 +266,11 @@ export function ChoiceCard({
         {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
+      {letter && (
+        <span className="fg-card-letter" aria-hidden>
+          {letter}
+        </span>
+      )}
       {marker && (
         <span className="fg-card-marker" aria-hidden>
           {marker}
@@ -347,6 +348,30 @@ export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
         </svg>
       </button>
     </>
+  );
+}
+
+/**
+ * The way back to the scene before (`RoundPlay`, `onBack`): bottom left, as ▶ is bottom right. Only a tap on it goes
+ * back, never on; the screen's other taps stay as they are (user feedback, November 2026: short scenes need a way back).
+ */
+export function StepBack({ onBack, label }: { onBack: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      className="fg-back"
+      data-tap=""
+      aria-label={label}
+      onPointerDown={(e: PointerEvent) => {
+        e.stopPropagation();
+        onBack();
+      }}
+    >
+      <svg className="fg-back-sign" viewBox="0 0 100 100" aria-hidden>
+        <circle cx="50" cy="50" r="44" />
+        <path d="M60 30 L28 50 L60 70 Z" />
+      </svg>
+    </button>
   );
 }
 

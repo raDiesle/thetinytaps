@@ -166,10 +166,10 @@ the next one to come.
 
 **A scene goes on with a tap, never by a timer (user feedback, November 2026):** the starting picture is told and
 then waits, with ▶; one tap anywhere (or any key) brings the two cards. The
-narration goes on meanwhile. **The cards come big, on top (user wish, November 2026):** about twice the size they had,
-covering the picture in the middle. A tap on the picture brings it to the front, and the cards wait small and grey on
-its corners; a tap on a grey card (or any key) only brings them back to the front, big again – it chooses nothing yet
-(`Front` in `RoundPlay.tsx`, `onWake` in `ChoiceCard`). After a not-so-good idea the cards come back on top. After the good choice the
+narration goes on meanwhile. **The choice (user wish, November 2026):** the scene shrinks to a small picture top left,
+its text under it, and the two cards A and B stand side by side below it, joined to the scene by two arrows (`choose`
+in `RoundPlay.tsx`). A tap on the small scene steps back to the scene alone, big in the middle (`minimised`); a tap on
+a card picks it. After the not-so-good idea (A) its picture comes back crossed out and the choices stand again. After the good choice the
 story goes on by itself only within the scene (the good idea's picture, the happy end); then that picture waits with ▶
 again, and only a tap (or any key) brings the next scene (`onDone`; user feedback, November 2026: it went on by
 itself before one could look). The last scene of a pass waits with its end buttons instead.
@@ -191,22 +191,20 @@ until the user asks.
 **The whole text, never cut short, and it says whose view the scene takes (user feedback, November 2026):** the big
 picture carries everything the voice says with it – the scene's sentences and its question, the not-so-good idea's
 answer, what the good one tells – the same text as its part of the sheet (`readAlong`), never a short form of it; it
-stands in the picture's bottom right corner, beside the big not-so-good card. The question says what is the matter
+stands under the picture, the full width of the screen's room beside the small scene (never on the picture, user feedback, November 2026). The question says what is the matter
 and who chooses – „Der Bär hat Angst. Was machst du?“ when the child helps him, „Der kleine Bär
 ist ganz oben. Was kann er tun?“ when the bear acts himself. A separate role sentence before it („Stell dir vor: Du
 bist der kleine Bär.“, `ROLE_LINES`) was tried and taken out again: two sentences in turn said less than one question.
 A caption, big or on a card, always shows whole: it takes a second line, never „…“ (`feelings.test.ts` checks).
 
-**Layout (user's choice, November 2026):** wide screens (from 6:5) put the picture in the middle, as big as the
-height allows unless the cards would get less than a quarter of the width (`--card-min`, 30 % on tablets), the
-not-so-good card at the bottom left and the good one at the top right: while the child chooses big in the screen's
-corners over the picture (`--card-big`), otherwise (the picture tapped to the front, a choice playing) a fifth of their
-width over its corners; the picture's tick or cross sits on its top left corner. No margins beyond 8 px – not even a phone's safe-area
-inset, which left an empty strip beside the card. Cards are never see-through, waiting or crossed out (pale by filter,
-not opacity): the big picture showed through and seemed to lie on top of them. At the end „Nochmal“
-stands left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
-below. Captions lie on the pictures' lower edge on wide or low screens. Look at 844×390, 1024×768 and 1280×720 after
-a change.
+**Layout (user's choice, November 2026):** the scene is big in the middle while it is told and shown. While the child
+chooses (`data-stage="choose"`) it is minimised top left (`--mini-w`), its caption beside it and under the dots; the
+two cards A (not-so-good, left) and B (good, right) stand in a row below it, with an SVG arrow from the small scene to
+each (measured in `RoundPlay.tsx`, redrawn on resize). A caption is always under its picture, never on it (user
+feedback, November 2026). Cards are never see-through or pale by opacity: a crossed-out or waiting card goes pale by
+filter. Wide screens put the back step (`StepBack`, „Vorige Szene“) bottom left, with ▶ bottom right; the grown-ups'
+notes sit left of ▶. At the end „Nochmal“ and „Weiter“ stand in the choices' row. Look at 844×390, 390×844, 1024×768
+and 1280×720 after a change.
 
 **Who hurts is a raccoon, never fox or bear (user decision, November 2026):** in a new story the other child who
 pushes, kicks, takes something away or knocks it over is the raccoon (`bilder/README.md`, „Figuren“); fox and bear,
@@ -316,9 +314,8 @@ breaks, otherwise crying – never an error sound. Crying, the crash, the laugh 
 recordings (`SOUNDS`, `RECORDED_SOUNDS` in `story.ts`, loaded when a round starts; `feelings.test.ts` fails when a file
 is missing); „Aua!“ is synthesized (`playAua`) until an `aua.mp3` is found.
 
-The big picture of the story is a framed photo – white mat, soft shadow – and is
-pale while the cards lie on it, so it never looks like one of the
-cards (which have the yellow ring and stand out like buttons); tapped to the front it is bright again and the cards go grey.
+The picture of the story is a framed photo – white mat, soft shadow – so it never looks like one of the cards
+(which have the yellow ring and stand out like buttons). While the cards stand, the scene is the small one top left.
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear's faces kept from
 „Gefühle nachmachen“ are drawn, see above).
@@ -343,7 +340,7 @@ Nothing grows or shrinks in an animation: the cards change between big on top an
 and a new picture only fades in where the last one was (`feelings.css` works the room out from the screen alone, cq
 units of `.story-play`).
 
-Under every picture, big or card (on wide and low screens on it), a short caption says what it shows – for
+Under every picture, big, small or card, a short caption says what it shows – for
 grown-ups, to tell the story and give feedback on the pictures; the child chooses
 by the picture. Every picture has one (`caption`, `endCaption`, `instead.caption`,
 `Feeling.title`). Choices say what to do, as short as a button: „Hand halten“,

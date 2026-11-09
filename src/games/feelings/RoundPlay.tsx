@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DevTag, letterCode } from "@/components/DevTag";
+import { useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { preloadImages } from "./images";
 import { ReadAlong } from "./ReadAlong";
@@ -12,6 +13,7 @@ import {
   ChoiceCard,
   GoOn,
   OOPS_MS,
+  StepBack,
   StepDots,
   StoryPicture,
   cheer,
@@ -19,28 +21,24 @@ import {
   useLinesReady,
   useTimers,
   useVoice,
-  type CardState,
   type PictureLook,
 } from "./shared";
 import { beatMs, type Beat } from "./story";
 
 /**
- * "intro": the scene is shown and told until the child taps the screen (▶). "choose": the two cards wait. "trying": the not-so-good idea is shown with what it leads
- * to. "good": the good idea is done. "end": the story's happy end. "done": the round is over and `ending` shows.
+ * "intro": the scene is shown and told until the child taps the screen (▶). "choose": the scene is minimised top left,
+ * its text under it, and the two choices A and B side by side with arrows from the scene to them. "trying": the
+ * not-so-good idea is shown big with what it leads to. "good": the good idea is done. "end": the story's happy end.
+ * "done": the round is over and `ending` shows.
  */
 type Phase = "intro" | "choose" | "trying" | "good" | "end" | "done";
 
 /**
- * What lies on top while the child chooses (user wish, November 2026): the two cards, big, over the picture in the
- * middle – or, after a tap on the picture, the picture, with the cards small and grey behind it until one is tapped.
- */
-type Front = "cards" | "picture";
-
-/**
- * One round: the scene, one question, two cards – the not-so-good idea and the good one; a tap on a card chooses it.
- * The not-so-good one shows what it leads to and is crossed out, then the good one is left to choose. After the good
- * one (and the story's happy end, on its last step) `onFinish` is called, and the round stays on its last picture:
- * with ▶ in the screen's corner (`onDone`, the next scene; `GoOn`), or with `ending` beside it (the end buttons of a pass).
+ * One round: the scene, one question, two choices – the not-so-good idea (A, left) and the good one (B, right). A tap on
+ * a choice picks it. The not-so-good one shows what it leads to and is crossed out, then the choices come back. After
+ * the good one only its picture stays, with its green tick (and the story's happy end, on its last step), and `onFinish`
+ * is called: the round stays on its last picture, with ▶ in the screen's corner (`onDone`, the next scene; `GoOn`), or
+ * with `ending` in its place (the end buttons of a pass).
  */
 export function RoundPlay({
   round,
@@ -51,6 +49,7 @@ export function RoundPlay({
   onDone,
   onEndKey,
   onPick,
+  onBack,
   readAlong,
   nextLines = [],
 }: {
@@ -59,7 +58,7 @@ export function RoundPlay({
   /** The dots at the top: how many scenes the pass has and how many are done before this one. */
   progress: { total: number; done: number };
   onFinish: () => void;
-  /** Shown in the cards' room once the round is over, if it is the last of its pass. */
+  /** Shown in the choices' room once the round is over, if it is the last of its pass. */
   ending?: ReactNode;
   /** Once the round is over, a tap on the screen (▶) goes on with it: the next scene of the pass. */
   onDone?: () => void;
@@ -67,6 +66,8 @@ export function RoundPlay({
   onEndKey?: () => void;
   /** A tap on a dot at the top: that scene again, one before this or this one from its start. */
   onPick?: (index: number) => void;
+  /** The scene before this one: a corner bottom left goes back to it (`StepBack`); left out for the first scene. */
+  onBack?: () => void;
   /**
    * „Alltagssituationen“: the note in the bottom right corner that shows grown-ups the round's whole text to read out,
    * whether it is open, and the loudspeaker standing beside it (`VoiceSwitch`).
@@ -77,8 +78,9 @@ export function RoundPlay({
 }) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [tried, setTried] = useState(false);
-  const [cheering, setCheering] = useState(false);
-  const [front, setFront] = useState<Front>("cards");
+  const [arrows, setArrows] = useState<string[]>([]);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const t = useT();
   const { later } = useTimers();
   const { say, sound, voiced } = useVoice(settings);
   // The scene starts telling once its opening lines are there; the rest of it and the next one's opening load meanwhile.
@@ -107,25 +109,25 @@ export function RoundPlay({
 
   useEffect(() => {
     if (!ready) return;
-    // The scene is told, then its question; the cards come only with a tap on the picture, never after a while. Only
+    // The scene is told, then its question; the choices come only with a tap on the picture, never after a while. Only
     // once the page it opens on lies still (pageMotion.ts) and its opening lines are loaded (`useLinesReady`).
     return afterPageMotion(() => playBeats(round.start.beats, () => say(round.question, true)));
   }, [ready]);
 
   const goOn = () => setPhase((now) => (now === "intro" ? "choose" : now));
+  // A tap on the minimised scene steps back: the scene alone, big in the middle, as before the choices.
+  const minimised = () => setPhase("intro");
 
   const finish = useCallback(() => {
     onFinish();
     setPhase("done");
   }, [onFinish]);
 
-  // The good idea: a laugh and „Juhu!“ with a still green frame, then it is done; on the story's last step its happy end follows.
+  // The good idea: a laugh and „Juhu!“, then its picture stays with the green tick; on the story's last step its happy end follows.
   const chooseGood = useCallback(() => {
     setPhase("good");
-    setCheering(true);
     cheer(say, sound);
     later(() => {
-      setCheering(false);
       playBeats(round.good.beats, () => {
         const { end } = round;
         if (!end) return finish();
@@ -135,26 +137,18 @@ export function RoundPlay({
     }, CHEER_MS);
   }, [round, say, sound, later, playBeats, finish]);
 
-  // The not-so-good idea: its picture with a still red frame and what it leads to, heard, while the answer says why.
+  // The not-so-good idea: its picture with a still red cross and what it leads to, heard, while the answer says why.
   const chooseInstead = useCallback(() => {
     const { answer, sound: heard } = round.instead;
     setPhase("trying");
     setTried(true);
     say(answer);
     oops(heard, sound);
-    later(
-      () => {
-        setFront("cards");
-        setPhase("choose");
-      },
-      Math.max(OOPS_MS, beatMs({ narration: answer }, voiced(answer))),
-    );
+    later(() => setPhase("choose"), Math.max(OOPS_MS, beatMs({ narration: answer }, voiced(answer))));
   }, [round, say, sound, later, voiced]);
 
   const choose = (card: "good" | "instead") => {
     if (phase !== "choose") return;
-    // The cards behind the picture: the first tap only brings them back to the front, big again.
-    if (front === "picture") return setFront("cards");
     if (card === "good") chooseGood();
     else if (!tried) chooseInstead();
   };
@@ -163,7 +157,6 @@ export function RoundPlay({
   const pressKey = (key: string) => {
     if (phase === "done") return onEndKey?.();
     if (phase === "intro") return goOn();
-    if (phase === "choose" && front === "picture") return setFront("cards");
     choose(!tried && key === "ArrowLeft" ? "instead" : "good");
   };
 
@@ -176,7 +169,35 @@ export function RoundPlay({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey]);
 
+  // While the choices stand, two arrows run from the minimised scene to A and to B (drawn where they stand, so they
+  // follow the room the screen gives them).
+  const choosing = phase === "choose";
+  useLayoutEffect(() => {
+    if (!choosing) return setArrows([]);
+    const measure = () => {
+      const root = rootRef.current;
+      const pic = root?.querySelector(".fg-frame")?.getBoundingClientRect();
+      const cards = root ? [...root.querySelectorAll(".fg-choice")].map((el) => el.getBoundingClientRect()) : [];
+      if (!root || !pic || cards.length < 2) return setArrows([]);
+      const at = root.getBoundingClientRect();
+      const x0 = pic.left - at.left + pic.width / 2;
+      const y0 = pic.bottom - at.top + 4;
+      setArrows(
+        cards.map((card) => {
+          const x1 = card.left - at.left + card.width / 2;
+          const y1 = card.top - at.top - 8;
+          const mid = (y0 + y1) / 2;
+          return `M${x0} ${y0} C${x0} ${mid}, ${x1} ${mid}, ${x1} ${y1}`;
+        }),
+      );
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [choosing, tried, round.storyId, round.step]);
+
   // The part of the text being told now, marked on the sheet for grown-ups who read it out.
+  const doneHere = phase === "good" || phase === "end" || phase === "done";
   const part: ReadPart =
     phase === "trying"
       ? "instead"
@@ -185,30 +206,22 @@ export function RoundPlay({
         : phase === "end" || phase === "done"
           ? "end"
           : "start";
-  // The big picture: the scene while it is told and chosen, a card's picture once chosen, at last the happy end.
+  // The big picture: the scene while it is told and chosen, the not-so-good idea while it is tried, the good one once
+  // chosen, at last the happy end.
   const shown = { start: round.start, instead: round.instead, good: round.good, end: round.end ?? round.good }[part];
   // Its whole text, never cut short (user feedback, November 2026): everything the voice says with it, as on the sheet.
+  // It stands under the picture, never on it.
   const caption = wholeText(round).find((p) => p.id === part)?.text || shown.caption;
-  // While the child chooses the picture lies behind the cards, pale – unless it was tapped to the front.
-  const picked = phase === "choose";
-  const pictureFront = !picked || front === "picture";
-  let look: PictureLook = pictureFront ? "story" : "quiet";
-  if (phase === "trying") look = "bad";
-  if (cheering) look = "good";
+  // The tick stays on the good picture and the cross on the not-so-good one: nothing comes and goes after a choice.
+  const look: PictureLook = phase === "trying" ? "bad" : doneHere ? "good" : "story";
   // The sheet with the text is open: the texts leave the pictures and stand on it, in the bottom right corner.
   const sheet = !!readAlong?.open && !(phase === "done" && ending !== undefined);
-
-  // What a tap on the screen does now: the cards after the scene is told, the next scene after the last picture.
+  // What a tap on the screen does now: the choices after the scene is told, the next scene after the last picture.
   const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;
-  const doneHere = phase === "good" || phase === "end" || phase === "done";
-  const insteadState: CardState = tried ? "wrong" : phase === "choose" ? "choose" : "rest";
-  const goodState: CardState = doneHere ? "playing" : phase === "choose" ? "choose" : "rest";
-  // The picture tapped while the child chooses: it comes to the front, the cards go grey; a tap on a card brings them back.
-  const behind = picked && front === "picture";
-  const wake = () => setFront("cards");
+  const insteadState = tried ? "wrong" : "choose";
 
   return (
-    <div className="story-play" data-front={pictureFront ? "picture" : "cards"} data-sheet={sheet ? "" : undefined}>
+    <div ref={rootRef} className="story-play" data-stage={choosing ? "choose" : "show"} data-back={onBack ? "" : undefined} data-sheet={sheet ? "" : undefined}>
       <DevTag
         code={`${letterCode(
           Math.max(
@@ -222,40 +235,52 @@ export function RoundPlay({
         <StepDots total={progress.total} done={progress.done + (doneHere ? 1 : 0)} current={!doneHere} upTo={progress.done} onPick={onPick} />
       </header>
       <main className="story-middle">
-        {/* Only one thing moves at a time: the scene while it is shown, then the cards while the child chooses. */}
-        <StoryPicture
-          key={shown.image}
-          name={shown.image}
-          caption={caption}
-          look={look}
-          still={!pictureFront}
-          onTap={pictureFront ? undefined : () => setFront("picture")}
-        />
+        {/* Only one thing moves at a time: the scene while it is shown, the choices while the child chooses. */}
+        <StoryPicture key={shown.image} name={shown.image} caption={caption} look={look} still={choosing} onTap={choosing ? minimised : undefined} />
       </main>
+      {arrows.length === 2 && (
+        <svg className="story-arrows" aria-hidden>
+          <defs>
+            <marker id="fg-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path className="story-arrow-head" d="M0 0 L10 5 L0 10 z" />
+            </marker>
+          </defs>
+          {arrows.map((d) => (
+            <path key={d} className="story-arrow" d={d} markerEnd="url(#fg-arrow)" />
+          ))}
+        </svg>
+      )}
       {/* The scene told, or the chosen idea's last picture: a tap anywhere goes on. */}
       {next && <GoOn onNext={next} label={caption} />}
-      {/* The not-so-good idea always first (bottom left), the good one second (top right). */}
+      {onBack && (
+        <StepBack
+          onBack={onBack}
+          label={t({
+            de: "Vorige Szene",
+            en: "Previous scene",
+            zh: "上一个场景",
+            hi: "पिछला दृश्य",
+            es: "Escena anterior",
+            ar: "المشهد السابق",
+            ru: "Предыдущая сцена",
+          })}
+        />
+      )}
+      {/* A: the not-so-good idea (left), B: the good one (right). After a choice only the picture stays. */}
       <footer className={`story-choices${phase === "done" ? " ending" : ""}`}>
         {phase === "done"
           ? ending
-          : phase !== "intro" && (
+          : choosing && (
               <>
                 <ChoiceCard
                   key="instead"
+                  letter="A"
                   image={round.instead.image}
                   caption={round.instead.caption}
                   state={insteadState}
                   onChoose={() => choose("instead")}
-                  onWake={behind ? wake : undefined}
                 />
-                <ChoiceCard
-                  key="good"
-                  image={round.good.image}
-                  caption={round.good.caption}
-                  state={goodState}
-                  onChoose={() => choose("good")}
-                  onWake={behind ? wake : undefined}
-                />
+                <ChoiceCard key="good" letter="B" image={round.good.image} caption={round.good.caption} state="choose" onChoose={() => choose("good")} />
               </>
             )}
       </footer>
