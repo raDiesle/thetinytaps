@@ -92,6 +92,14 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
   what comes next, and nothing in it may contradict the next scene's first picture (who is there, the place, the
   weather): a day keeps its weather (the snow day stays indoors after the snow, the rainy day ends in the storm) and a
   scene that needs something (the jacket) is not put where the scene before already did it.
+- **The scene after a page never says again what the page told** (user feedback, November 2026: „Oma ist
+  weggefahren“ stood on the page and was said again at once by the scene). Where the scene's first sentence tells the
+  same thing, the page's entry in `days.ts` carries `told` (how many of the scene's first beats it told) and the scene
+  starts after them (`afterPage` in `rounds.ts`; their sounds still play). It counts beats, never words, so it holds in
+  every language; the page's text stays as it is, keeping its translations and recordings. A new page checks this, and
+  `feelings.test.ts` fails where a scene's first sentence shares a noun with its page without `told`.
+- The pages' text is said by the voice like the scenes (`DayPage` says it); a page without its recording stays silent
+  until the user asks for the recordings (`bun run voice make --only gefuehle`).
 - A page's picture is the next scene's place a moment _earlier_, nothing has happened yet: drawn from that scene's first
   picture (`firstImage`) as its only `--ref`, made with `dayPage` of `dayPictures.ts`, and queued there
   (`DAY_PICTURE_QUEUE`, `bilder/README.md` „Tagesgeschichten“; `feelings.test.ts` checks both).
@@ -117,8 +125,9 @@ have no such switch; no other game gets one (`feelings.test.ts`).
 paper note with an open book stands in the screen's bottom right corner, left of the loudspeaker (`ReadAlong.tsx`,
 `.story-corner`; upright, where the cards fill the bottom, on the picture's top right corner below the dots). One tap
 opens it and one tap closes it – never held (held, it was too slow for grown-ups). It opens a paper sheet right above
-the two notes, in the corner where it covers least of the pictures: on wide screens below the good card, as wide as the
-room right of the picture and only as far over the picture as a readable line needs. It holds everything the voice says
+the two notes, in the corner where it covers least of the pictures: on wide screens below the big good card, beside the
+big not-so-good one. **While it is open the pictures carry no text** – no caption on the big picture or the cards: the
+text stands on the sheet instead (user wish, November 2026; `data-sheet`, `feelings.test.ts`). It holds everything the voice says
 in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea (red cross, its caption,
 its answer), the good one (tick, caption, what is told), the happy end. While the voice tells the scene, the part told
 now is marked with the highlighter and scrolled into view; **with the voice off everything shows alike, nothing marked,
@@ -157,7 +166,10 @@ the next one to come.
 
 **A scene goes on with a tap, never by a timer (user feedback, November 2026):** the starting picture is told and
 then waits, with ▶; one tap anywhere (or any key) brings the two cards. The
-narration goes on meanwhile. Once the cards are there, tapping the big picture does nothing. After the good choice the
+narration goes on meanwhile. **The cards come big, on top (user wish, November 2026):** about twice the size they had,
+covering the picture in the middle. A tap on the picture brings it to the front, and the cards wait small and grey on
+its corners; a tap on a grey card (or any key) only brings them back to the front, big again – it chooses nothing yet
+(`Front` in `RoundPlay.tsx`, `onWake` in `ChoiceCard`). After a not-so-good idea the cards come back on top. After the good choice the
 story goes on by itself only within the scene (the good idea's picture, the happy end); then that picture waits with ▶
 again, and only a tap (or any key) brings the next scene (`onDone`; user feedback, November 2026: it went on by
 itself before one could look). The last scene of a pass waits with its end buttons instead.
@@ -176,17 +188,20 @@ happened. The questions written before (November 2026: „Der Bär ist noch trau
 in `bear.ts`, `kita.ts`, `selbst.ts`) still do; rewriting them means new recordings and translations, so it waits
 until the user asks.
 
-**The whole text at once, and it says whose view the scene takes (user feedback, November 2026):** the big picture's
-caption is the round's question from the moment the scene shows, never one sentence after another: what is the matter
-and who chooses, in one compact line – „Der Bär hat Angst. Was machst du?“ when the child helps him, „Der kleine Bär
+**The whole text, never cut short, and it says whose view the scene takes (user feedback, November 2026):** the big
+picture carries everything the voice says with it – the scene's sentences and its question, the not-so-good idea's
+answer, what the good one tells – the same text as its part of the sheet (`readAlong`), never a short form of it; it
+stands in the picture's bottom right corner, beside the big not-so-good card. The question says what is the matter
+and who chooses – „Der Bär hat Angst. Was machst du?“ when the child helps him, „Der kleine Bär
 ist ganz oben. Was kann er tun?“ when the bear acts himself. A separate role sentence before it („Stell dir vor: Du
 bist der kleine Bär.“, `ROLE_LINES`) was tried and taken out again: two sentences in turn said less than one question.
 A caption, big or on a card, always shows whole: it takes a second line, never „…“ (`feelings.test.ts` checks).
 
 **Layout (user's choice, November 2026):** wide screens (from 6:5) put the picture in the middle, as big as the
 height allows unless the cards would get less than a quarter of the width (`--card-min`, 30 % on tablets), the
-not-so-good card at the bottom left and the good one at the top right, each lying a fifth of its width over a corner
-of the picture; the picture's tick or cross sits on its top left corner. No margins beyond 8 px – not even a phone's safe-area
+not-so-good card at the bottom left and the good one at the top right: while the child chooses big in the screen's
+corners over the picture (`--card-big`), otherwise (the picture tapped to the front, a choice playing) a fifth of their
+width over its corners; the picture's tick or cross sits on its top left corner. No margins beyond 8 px – not even a phone's safe-area
 inset, which left an empty strip beside the card. Cards are never see-through, waiting or crossed out (pale by filter,
 not opacity): the big picture showed through and seemed to lie on top of them. At the end „Nochmal“
 stands left of the picture, „Weiter“ right of it. Upright screens keep the picture on top and the two cards
@@ -301,9 +316,9 @@ breaks, otherwise crying – never an error sound. Crying, the crash, the laugh 
 recordings (`SOUNDS`, `RECORDED_SOUNDS` in `story.ts`, loaded when a round starts; `feelings.test.ts` fails when a file
 is missing); „Aua!“ is synthesized (`playAua`) until an `aua.mp3` is found.
 
-The big picture of the story is a framed photo – white mat, soft shadow – and turns
-pale a moment after the child has to choose, so it never looks like one of the
-cards (which have the yellow ring and stand out like buttons).
+The big picture of the story is a framed photo – white mat, soft shadow – and is
+pale while the cards lie on it, so it never looks like one of the
+cards (which have the yellow ring and stand out like buttons); tapped to the front it is bright again and the cards go grey.
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear's faces kept from
 „Gefühle nachmachen“ are drawn, see above).
@@ -324,8 +339,9 @@ with a green tick or red cross, so children can choose without reading; „Nochm
 end are the shared `GameEnd` (`inline`), words only like in every game. Timing of a story's beats and its sounds in
 `story.ts`.
 
-The big picture and the cards keep one size for the whole round – nothing grows or shrinks, and a new picture only
-fades in where the last one was (`feelings.css` works the room out from the screen alone, cq units of `.story-play`).
+Nothing grows or shrinks in an animation: the cards change between big on top and small behind the picture at once,
+and a new picture only fades in where the last one was (`feelings.css` works the room out from the screen alone, cq
+units of `.story-play`).
 
 Under every picture, big or card (on wide and low screens on it), a short caption says what it shows – for
 grown-ups, to tell the story and give feedback on the pictures; the child chooses

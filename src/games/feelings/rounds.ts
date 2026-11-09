@@ -90,6 +90,18 @@ export function roundOf(story: Story, step: number, language: TargetLanguageId):
   };
 }
 
+/**
+ * The round as it comes after a page of a day's story that already told its first `told` beats (`DayScene.told`): those
+ * are not said again – only their sounds stay – so the scene goes on from where the page left off (user feedback,
+ * November 2026: „Oma Bär ist zu Besuch. Heute fährt sie wieder nach Hause.“ was followed by „Oma Bär war zu Besuch.
+ * Jetzt fährt sie wieder nach Hause.“). The beats match in every language, so it holds for all of them.
+ */
+export function afterPage(round: Round, told = 0): Round {
+  if (told === 0) return round;
+  const beats = round.start.beats.flatMap((beat, i) => (i >= told ? [beat] : beat.sound ? [{ sound: beat.sound }] : []));
+  return { ...round, start: { ...round.start, beats } };
+}
+
 /** Every picture a round may show. */
 export const roundImages = (round: Round): string[] => [round.start.image, round.good.image, round.instead.image, ...(round.end ? [round.end.image] : [])];
 

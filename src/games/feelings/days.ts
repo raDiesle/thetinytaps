@@ -26,6 +26,12 @@ export interface DayScene {
   story: string;
   /** Told before the scene: how the day goes on to it (before the first scene, the morning). */
   before: StoryPage;
+  /**
+   * How many of the scene's first beats the page already tells (where the place or what happens comes in both): the
+   * scene leaves them unsaid after the page, so nothing is said twice in a row (`afterPage` in `rounds.ts`; user
+   * feedback, November 2026). Checked in `feelings.test.ts`.
+   */
+  told?: number;
 }
 
 /** One day of the little bear: its scenes in the order of the day, and how it ends. */
@@ -55,7 +61,11 @@ export const NIGHT_IMAGE = "tag-nacht";
 /** The picture of the page before the `scene`-th scene of day `day` (both counted from 1): "tag1-1", "tag1-2" … */
 export const dayImage = (day: number, scene: number) => `tag${day}-${scene}`;
 
-const page = (day: number, scene: number, story: string, text: string): DayScene => ({ story, before: { image: dayImage(day, scene), text } });
+const page = (day: number, scene: number, story: string, text: string, told?: number): DayScene => ({
+  story,
+  before: { image: dayImage(day, scene), text },
+  ...(told ? { told } : {}),
+});
 
 export const DAYS: Day[] = [
   {
@@ -63,10 +73,10 @@ export const DAYS: Day[] = [
     id: "tag-1",
     emoji: "👵",
     scenes: [
-      page(1, 1, "selbst-miss", "Guten Morgen! Oma Bär ist zu Besuch. Heute fährt sie wieder nach Hause."),
+      page(1, 1, "selbst-miss", "Guten Morgen! Oma Bär ist zu Besuch. Heute fährt sie wieder nach Hause.", 1),
       page(1, 2, "kita-grab", "Dann bringt der große Bär den kleinen Bären in den Kindergarten. Er freut sich auf den Fuchs."),
       page(1, 3, "kita-fall", "Danach rennen alle auf die Wiese und spielen Fangen."),
-      page(1, 4, "selbst-broccoli", "Am Abend holt der große Bär den kleinen Bären ab. Der Fuchs darf mit zum Abendessen."),
+      page(1, 4, "selbst-broccoli", "Am Abend holt der große Bär den kleinen Bären ab. Der Fuchs darf mit zum Abendessen.", 1),
       page(1, 5, "zuhause-tired", "Nach dem Essen wird der Fuchs abgeholt. Für den kleinen Bären ist es Zeit fürs Bett."),
     ],
     end: "Der kleine Bär schläft tief und fest. Gute Nacht! Der Tag ist vorbei.",
@@ -76,11 +86,11 @@ export const DAYS: Day[] = [
     emoji: "🦔",
     scenes: [
       page(2, 1, "zuhause-angry", "Guten Morgen! Heute ist Kindergarten. Der kleine Bär will sich ganz allein anziehen."),
-      page(2, 2, "kita-bye", "Dann gehen der große Bär und der kleine Bär zusammen zum Kindergarten."),
+      page(2, 2, "kita-bye", "Dann gehen der große Bär und der kleine Bär zusammen zum Kindergarten.", 1),
       page(2, 3, "kita-new", "Im Spielzimmer wartet der Fuchs schon auf ihn."),
       page(2, 4, "selbst-join", "Später gehen alle nach draußen in den Sandkasten."),
       page(2, 5, "selbst-leave", "Am Nachmittag spielt der kleine Bär auf dem Spielplatz. Da kommt der große Bär zum Abholen."),
-      page(2, 6, "selbst-hairwash", "Zu Hause ist der kleine Bär voller Sand. Ab in die Badewanne!"),
+      page(2, 6, "selbst-hairwash", "Zu Hause ist der kleine Bär voller Sand. Ab in die Badewanne!", 1),
     ],
     end: "Sauber und müde kuschelt sich der kleine Bär ins Bett. Gute Nacht! Der Tag ist vorbei.",
   },
@@ -89,8 +99,8 @@ export const DAYS: Day[] = [
     emoji: "❄️",
     scenes: [
       page(3, 1, "selbst-snow", "Guten Morgen! Der kleine Bär ist gerade aufgewacht. Er tapst ins Wohnzimmer."),
-      page(3, 2, "selbst-cookie", "Nach dem Schnee kommt der Fuchs zum Aufwärmen. Es gibt Kekse."),
-      page(3, 3, "selbst-screen", "Danach dürfen die beiden eine Sendung schauen."),
+      page(3, 2, "selbst-cookie", "Nach dem Schnee kommt der Fuchs zum Aufwärmen. Es gibt Kekse.", 1),
+      page(3, 3, "selbst-screen", "Danach dürfen die beiden eine Sendung schauen.", 1),
       page(3, 4, "selbst-night", "Am Abend geht der Fuchs nach Hause. Der kleine Bär schläft ganz schnell ein."),
     ],
     end: "Bis zum Morgen schläft der kleine Bär tief und fest. Gute Nacht! Der Tag ist vorbei.",
@@ -99,10 +109,10 @@ export const DAYS: Day[] = [
     id: "tag-4",
     emoji: "🌧️",
     scenes: [
-      page(4, 1, "selbst-bored", "Heute regnet es den ganzen Tag. Der Fuchs ist zu Besuch."),
+      page(4, 1, "selbst-bored", "Heute regnet es den ganzen Tag. Der Fuchs ist zu Besuch.", 1),
       page(4, 2, "selbst-shy", "Am Nachmittag geht der Fuchs nach Hause. Der kleine Bär spielt allein im Flur."),
-      page(4, 3, "selbst-baby", "Der Besuch ist wieder weg. Da wacht das Bärenbaby auf."),
-      page(4, 4, "selbst-pancake", "Jetzt haben alle Hunger. Der große Bär macht Pfannkuchen."),
+      page(4, 3, "selbst-baby", "Der Besuch ist wieder weg. Da wacht das Bärenbaby auf.", 1),
+      page(4, 4, "selbst-pancake", "Jetzt haben alle Hunger. Der große Bär macht Pfannkuchen.", 1),
       page(4, 5, "zuhause-scared", "Nach dem Essen wird es draußen dunkel. Der Regen wird immer stärker."),
     ],
     end: "Das Gewitter ist vorbei. Der kleine Bär schläft ein. Gute Nacht! Der Tag ist vorbei.",
@@ -112,10 +122,10 @@ export const DAYS: Day[] = [
     emoji: "🩺",
     scenes: [
       page(5, 1, "selbst-vacuum", "Guten Morgen! Heute räumt der große Bär die Wohnung auf."),
-      page(5, 2, "selbst-jacket", "Danach geht es zum Kinderarzt. Der kleine Bär will die Jacke allein anziehen."),
-      page(5, 3, "selbst-doctor", "Beim Kinderarzt sind sie jetzt dran."),
+      page(5, 2, "selbst-jacket", "Danach geht es zum Kinderarzt. Der kleine Bär will die Jacke allein anziehen.", 1),
+      page(5, 3, "selbst-doctor", "Beim Kinderarzt sind sie jetzt dran.", 1),
       page(5, 4, "selbst-checkout", "Nach dem Arzt gehen sie einkaufen."),
-      page(5, 5, "selbst-dog", "Auf dem Heimweg gehen sie durch den Park."),
+      page(5, 5, "selbst-dog", "Auf dem Heimweg gehen sie durch den Park.", 1),
       page(5, 6, "zuhause-sad", "Zu Hause ist der kleine Bär müde von dem langen Tag."),
     ],
     end: "Am Abend kuschelt sich der kleine Bär ins Bett. Gute Nacht! Der Tag ist vorbei.",
@@ -125,9 +135,9 @@ export const DAYS: Day[] = [
     emoji: "🎂",
     scenes: [
       page(6, 1, "zuhause-happy", "Guten Morgen! Heute hat der kleine Bär Geburtstag."),
-      page(6, 2, "selbst-empathy", "Dann bringt der kleine Bär Luftballons in den Kindergarten. Einen für sich und einen für den Fuchs."),
-      page(6, 3, "selbst-loud", "Am Mittag feiert der ganze Kindergarten ein Fest."),
-      page(6, 4, "selbst-startle", "Am Nachmittag kommt der Fuchs zu ihm nach Hause. Es gibt Geburtstagskuchen."),
+      page(6, 2, "selbst-empathy", "Dann bringt der kleine Bär Luftballons in den Kindergarten. Einen für sich und einen für den Fuchs.", 1),
+      page(6, 3, "selbst-loud", "Am Mittag feiert der ganze Kindergarten ein Fest.", 1),
+      page(6, 4, "selbst-startle", "Am Nachmittag kommt der Fuchs zu ihm nach Hause. Es gibt Geburtstagskuchen.", 1),
       page(6, 5, "selbst-lost", "Der Fuchs darf heute bei ihm schlafen. Beide ziehen ihre Schlafanzüge an."),
     ],
     end: "Was für ein schöner Geburtstag! Gute Nacht! Der Tag ist vorbei.",
@@ -137,9 +147,9 @@ export const DAYS: Day[] = [
     emoji: "🧱",
     scenes: [
       page(7, 1, "kita-angry", "Guten Morgen! Im Kindergarten holt der kleine Bär die Bauklötze."),
-      page(7, 2, "selbst-oops", "Danach spielt der kleine Bär weiter im Spielzimmer."),
+      page(7, 2, "selbst-oops", "Danach spielt der kleine Bär weiter im Spielzimmer.", 1),
       page(7, 3, "kita-slide", "Nach dem Mittagessen gehen alle auf den Spielplatz."),
-      page(7, 4, "kita-kick", "Danach spielen der kleine Bär und der Fuchs auf der Wiese."),
+      page(7, 4, "kita-kick", "Danach spielen der kleine Bär und der Fuchs auf der Wiese.", 1),
     ],
     end: "Am Abend holt der große Bär ihn ab. Zu Hause schläft der kleine Bär schnell ein. Gute Nacht! Der Tag ist vorbei.",
   },
@@ -148,9 +158,9 @@ export const DAYS: Day[] = [
     emoji: "🧗",
     scenes: [
       page(8, 1, "kita-want", "Guten Morgen! Im Kindergarten spielen heute alle draußen."),
-      page(8, 2, "kita-push", "Dann rennt der kleine Bär zur großen Wiese mit dem Baum."),
+      page(8, 2, "kita-push", "Dann rennt der kleine Bär zur großen Wiese mit dem Baum.", 1),
       page(8, 3, "kita-stop", "Unter dem Baum ruhen sich der kleine Bär und der Fuchs aus."),
-      page(8, 4, "selbst-proud", "Am Nachmittag kommt der große Bär. Zum Schluss klettern alle noch aufs Klettergerüst."),
+      page(8, 4, "selbst-proud", "Am Nachmittag kommt der große Bär. Zum Schluss klettern alle noch aufs Klettergerüst.", 1),
     ],
     end: "Zu Hause erzählt der kleine Bär, wie hoch er geklettert ist. Dann schläft er ein. Gute Nacht! Der Tag ist vorbei.",
   },

@@ -6,7 +6,7 @@ import { type Day, dayStories, NIGHT_IMAGE } from "./days";
 import { dayIn } from "./localized";
 import type { ReadAlongCorner } from "./PassPlay";
 import { RoundPlay } from "./RoundPlay";
-import { openingLines, roundOf, stepsOf } from "./rounds";
+import { afterPage, openingLines, roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 
 /** Where a day is: the page of the story before scene `index`, the scene itself, or the night at the end. */
@@ -57,6 +57,9 @@ export function DayPlay({
     update({ day: day.id });
   }, []);
 
+  // A scene as it comes after its page of the story: what the page told already is not said again (`DayScene.told`).
+  const sceneRound = (index: number, step: number) =>
+    afterPage(roundOf(scenes[index], step, language), day.scenes.find((s) => s.story === scenes[index].id)?.told);
   const story = scenes[at.index];
   const last = at.index === scenes.length - 1;
   const progress = { total: scenes.length, done: at.page === "night" ? scenes.length : at.index };
@@ -90,10 +93,8 @@ export function DayPlay({
   const texts = dayIn(day, language);
   const { before } = texts.scenes[at.index];
   // What comes next opens with: loaded while this page or scene plays (the night's text after the last scene).
-  const sceneOpening = openingLines(roundOf(story, at.step, language));
-  const afterScene = last
-    ? [texts.end]
-    : [texts.scenes[at.index + 1].before.text, ...openingLines(roundOf(scenes[at.index + 1], stepOf(at.index + 1), language))];
+  const sceneOpening = openingLines(sceneRound(at.index, at.step));
+  const afterScene = last ? [texts.end] : [texts.scenes[at.index + 1].before.text, ...openingLines(sceneRound(at.index + 1, stepOf(at.index + 1)))];
   if (at.page === "before")
     return (
       <DayPage
@@ -111,7 +112,7 @@ export function DayPlay({
   return (
     <RoundPlay
       key={`${at.index}-${at.step}-${at.run}`}
-      round={roundOf(story, at.step, language)}
+      round={sceneRound(at.index, at.step)}
       settings={settings}
       progress={progress}
       onFinish={finish}

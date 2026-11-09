@@ -183,6 +183,7 @@ export function StoryPicture({
   caption,
   look = "story",
   still = false,
+  onTap,
 }: {
   name: string;
   /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
@@ -192,9 +193,21 @@ export function StoryPicture({
   look?: PictureLook;
   /** Shows only the first frame: while the child chooses, the cards move instead. */
   still?: boolean;
+  /** While the cards lie over it: a tap brings the picture to the front (`RoundPlay`). */
+  onTap?: () => void;
 }) {
   return (
-    <div className={`fg-frame fg-look-${look}`}>
+    <div
+      className={`fg-frame fg-look-${look}${onTap ? " fg-frame-tap" : ""}`}
+      data-tap={onTap ? "" : undefined}
+      onPointerDown={
+        onTap &&
+        ((e: PointerEvent) => {
+          e.stopPropagation();
+          onTap();
+        })
+      }
+    >
       <div className="fg-picture">{art ?? <Frames name={name} moving={!still} />}</div>
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
@@ -216,6 +229,7 @@ export function ChoiceCard({
   caption,
   state,
   onChoose,
+  onWake,
   marker,
 }: {
   /** Name of the picture, see images.ts. */
@@ -225,24 +239,30 @@ export function ChoiceCard({
   state: CardState;
   onChoose?: () => void;
   /**
+   * The card lies grey and small behind the big picture (tapped to the front, `RoundPlay`): a tap only brings the cards
+   * back to the front, big again, and chooses nothing yet (user wish, November 2026).
+   */
+  onWake?: () => void;
+  /**
    * A note for grown-ups on a page marker over the card's top edge („Heute früh“), kept out of the caption so the
    * caption stays the card's few words and never covers the picture.
    */
   marker?: string;
 }) {
-  const active = state === "choose";
+  const active = state === "choose" && !onWake;
   return (
-    <div className="fg-choice">
+    <div className={`fg-choice${onWake ? " fg-choice-behind" : ""}`}>
       <button
         type="button"
         className={`fg-card fg-card-${state}`}
         // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
         data-tap
-        disabled={!active}
+        disabled={!active && !onWake}
         aria-label={marker ? `${marker}: ${caption}` : caption}
         onPointerDown={(e: PointerEvent) => {
           e.stopPropagation();
-          if (active) onChoose?.();
+          if (onWake) onWake();
+          else if (active) onChoose?.();
         }}
       >
         {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
