@@ -195,6 +195,12 @@ const MADE = new Set<string>([
   "vermissen-immer",
   "bleibt-kette",
   "bleibt-lieb",
+  "becher",
+  "langsam",
+  "fragen-tapsi",
+  "gleich-lied",
+  "abend-frueher",
+  "nacht-schlaeft",
 ]);
 
 /** Every picture of the story still to make. */
