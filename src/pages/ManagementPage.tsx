@@ -444,6 +444,7 @@ function Unfinished() {
               {game.emoji} {game.title.de}
             </Link>
             <span className="ideas-hint">{game.blurb.de}</span>
+            {game.help && <p className="ideas-hint">{game.help}</p>}
           </li>
         ))}
       </ul>

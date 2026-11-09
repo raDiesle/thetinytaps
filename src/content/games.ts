@@ -1,5 +1,5 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
-import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
+import { CAUSE_BLURB, CAUSE_HELP, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
@@ -26,6 +26,11 @@ export interface Game {
    * management page links to it, and its way back leads there (user decision, November 2026). Drop the mark to publish it.
    */
   unfinished?: true;
+  /**
+   * For a game still being built: a few German sentences on the management page telling the grown-up testing it what
+   * the game is meant to be, how one round goes and what is missing, so it can be judged without reading the code.
+   */
+  help?: string;
 }
 
 /** One of a game's books tied together on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
@@ -307,7 +312,9 @@ export const CATEGORIES: Category[] = [
       { href: "/gefuehle/", emoji: "🐻", title: ALLTAG_TITLE, blurb: ALLTAG_BLURB },
       // „Wie geht's dir?“ holds both: its start screen offers „Was brauche ich?“ as its second card.
       { href: "/wie-gehts-dir/", emoji: "😊", title: MOOD_TITLE, blurb: MOOD_BLURB },
-      { href: "/was-ist-passiert/", emoji: "❓", title: CAUSE_TITLE, blurb: CAUSE_BLURB },
+      // Still being built: the user didn't understand it when trying it (November 2026), so it waits on the management
+      // page with its help text until it explains itself by playing.
+      { href: "/was-ist-passiert/", unfinished: true, emoji: "❓", title: CAUSE_TITLE, blurb: CAUSE_BLURB, help: CAUSE_HELP },
     ],
   },
   {
@@ -485,11 +492,16 @@ export function pagesBetween(from: string, to: string) {
   return a && b && a.book === b.book ? Math.max(1, Math.abs(a.page - b.page)) : 1;
 }
 
-/** The book on the shelf a page is in: its category's (its page and its games), or a game's own. */
+/**
+ * The book on the shelf a page is in: its category's (its page and its games), or a game's own. A game still being
+ * built is in none, also inside a book's category: it is reached from the management page and goes back there.
+ */
 export function shelfEntryOf(pathname: string): ShelfEntry | undefined {
   const path = withSlash(pathname);
   return SHELF.find((entry) =>
-    entry.game ? isGamePage(entry.game, path) : path.startsWith(`/spiele/${entry.category.id}/`) || entry.category.games.some((g) => isGamePage(g, path)),
+    entry.game
+      ? isGamePage(entry.game, path)
+      : path.startsWith(`/spiele/${entry.category.id}/`) || listedGames(entry.category).some((g) => isGamePage(g, path)),
   );
 }
 

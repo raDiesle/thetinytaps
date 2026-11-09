@@ -32,7 +32,7 @@ export const SEO_ES: SeoTranslation = {
     "/spiele/gefuehle/": {
       title: "Juegos de emociones para niños pequeños",
       description: "Situaciones cotidianas con el osito, ¿Cómo estás? y ¿Qué necesito?: el niño muestra su emoción, con qué fuerza la siente y qué le ayuda.",
-      text: "Un libro ilustrado sobre las emociones con cuatro juegos: en «Situaciones cotidianas» el osito vive día a día lo que los niños conocen –enojo, tristeza, miedo y alegría– y el niño elige qué le ayuda. En «¿Cómo estás?» el niño muestra su propia emoción y con qué fuerza la siente, y en «¿Qué necesito?», lo que le sienta bien ahora. En «¿Qué pasó?» el niño ve por qué tiene una emoción.",
+      text: "Un libro ilustrado sobre las emociones con tres juegos: en «Situaciones cotidianas» el osito vive día a día lo que los niños conocen –enojo, tristeza, miedo y alegría– y el niño elige qué le ayuda. En «¿Cómo estás?» el niño muestra su propia emoción y con qué fuerza la siente, y en «¿Qué necesito?», lo que le sienta bien ahora.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Aprender letras y números – juegos de teclado",

@@ -101,7 +101,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/spiele/gefuehle/",
     title: "Gefühle-Spiele für Kleinkinder",
     description: "Alltagssituationen mit dem kleinen Bären, Wie geht's dir? und Was brauche ich? – das Kind zeigt sein Gefühl, wie doll es ist und was hilft.",
-    text: "Ein Bilderbuch über Gefühle mit vier Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut. Bei „Was ist passiert?“ sieht das Kind, warum ein Gefühl da ist.",
+    text: "Ein Bilderbuch über Gefühle mit drei Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut.",
   },
   {
     path: "/spiele/buchstaben-zahlen/",
