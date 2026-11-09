@@ -46,3 +46,14 @@ test("no start screen moves the mode played last to the front", async () => {
   }
   expect(moved).toEqual([]);
 });
+
+// Google reads a page after the app ran: a game that plays at once had replaced the built page's words with its
+// picture, and Google saw a page without text (pages „gecrawlt – zurzeit nicht indexiert“, November 2026). While
+// playing the words stay in the page unseen; and the „Bitte quer halten“ note never covers a page for a search engine,
+// which reads every page as an upright phone.
+test("a playing game keeps its page's words for search engines, and no turn-sideways note hides them", async () => {
+  const shell = await Bun.file("src/components/GameShell.tsx").text();
+  const playing = shell.slice(shell.indexOf("if (playing) {"), shell.indexOf("if (menu) return null;"));
+  expect(playing).toMatch(/<div hidden>\s*<SeoWords \/>\s*<\/div>/);
+  expect(await Bun.file("src/components/ScreenHint.tsx").text()).toContain("isCrawler()");
+});

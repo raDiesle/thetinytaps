@@ -774,7 +774,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
   it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
-  panel of its own (the home page behind the carving's „mehr …“ instead); a new menu page does the same. Pages that must stay out of results get a
+  panel of its own (the home page behind the carving's „mehr …“ instead); a new menu page does the same. A game that
+  plays at once keeps them unseen while playing (`<div hidden><SeoWords /></div>` in `GameShell`), and nothing covers a
+  page for a crawler (`ScreenHint` steps aside for `isCrawler`): Google reads every page as an upright phone after the
+  app ran, and such pages had left it a picture and „Bitte quer halten“ with no words (Search Console, November 2026:
+  34 pages „gecrawlt – zurzeit nicht indexiert“; `GameShell.test.ts`). A page with an entry that moves to another
+  address keeps its old one as a line in `MOVED_PATHS` (`seo.ts`) next to its `<Navigate>` in `App.tsx`: the build writes
+  a page there in every language that sends on at once with a canonical link, which Google takes as a redirect – without
+  it GitHub Pages answers 404 and the page's place in Google is lost (`content.test.ts`). Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
   `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).

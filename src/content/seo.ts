@@ -299,6 +299,16 @@ export const SEO_TEXTS: PageSeo[] = [
 export const SEO_PAGES: PageSeo[] = SEO_TEXTS.filter((page) => !isUnfinished(page.path));
 
 /**
+ * Pages that had an entry here, and so stood in the sitemap, and moved: their old address and where it leads now. The
+ * build writes a page there in every language that sends on at once with a canonical link to the new address, which
+ * Google takes as a permanent redirect; without it GitHub Pages answers 404 and the page's place in Google is lost.
+ * App.tsx leads the old address there too (`<Navigate>`), for a visit that starts in the app; `content.test.ts` checks both.
+ */
+export const MOVED_PATHS: Record<string, string> = {
+  "/was-brauche-ich/": "/wie-gehts-dir/",
+};
+
+/**
  * Addresses that must never be in a search result: the pages for grown-ups only (the Impressum names a private
  * address) and the games still being built.
  */

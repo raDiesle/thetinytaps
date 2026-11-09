@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
-import { SeoText } from "@/components/SeoText";
+import { SeoText, SeoWords } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf, isUnfinished, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -340,6 +340,11 @@ export function GameShell({
         {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         {/* The edge of the book's page round the picture (`book.css`). */}
         <div className="book-frame" aria-hidden />
+        {/* What the page is, unseen: Google reads the page after the app ran, and a game that plays at once replaced the
+            built page's text with a picture and left Google a page without words (pages „gecrawlt – zurzeit nicht indexiert“, November 2026). */}
+        <div hidden>
+          <SeoWords />
+        </div>
         {inner && !ended && !playtime.goodNight ? (
           // Back to the game's screen before (`useInnerBack`): one tap, held or not, since nothing is left.
           <TapExit onExit={goInner} sign="back" label={t({ de: "Zurück", ru: "Назад", en: "Back", zh: "返回", hi: "वापस", es: "Atrás", ar: "رجوع" })} />

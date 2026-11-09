@@ -5,6 +5,7 @@ import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import {
+  MOVED_PATHS,
   NO_INDEX_PATHS,
   PREVIEW_IMAGE,
   SEO_LANGUAGES,
@@ -237,6 +238,16 @@ describe("search engine texts (seo.ts)", () => {
     const found = SEO_PAGES.map((page) => page.path);
     for (const path of NO_INDEX_PATHS) expect(found).not.toContain(path);
     for (const game of UNFINISHED) expect(NO_INDEX_PATHS, game.href).toContain(game.href);
+  });
+
+  test("a moved page leads to a page for search engines, and the app leads its old address there too", () => {
+    const found = SEO_PAGES.map((page) => page.path);
+    const app = readFileSync(new URL("../App.tsx", import.meta.url), "utf8");
+    for (const [from, to] of Object.entries(MOVED_PATHS)) {
+      expect(found, from).not.toContain(from);
+      expect(found, from).toContain(to);
+      expect(app, from).toContain(`<Route path="${from.slice(1, -1)}" element={<Navigate to="${to}" replace />} />`);
+    }
   });
 });
 
