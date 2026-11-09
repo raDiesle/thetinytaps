@@ -4,10 +4,10 @@ import type { PageText, SeoTranslation } from "./seo";
 // Spanish understood in Spain and Latin America, for what parents search: "juegos para niños pequeños", "gratis",
 // "sin anuncios", "sin conexión". Imported only by texts-es.ts and tools/build.ts. No `@/` imports: the build reads it.
 
-const scene = (title: string, things: string): PageText => ({
+const scene = (title: string, things: string, more: string): PageText => ({
   title: `${title}: lámina viva para niños pequeños`,
   description: `${title}, una lámina para tocar: ${things} se mueven y suenan. Para niños pequeños, gratis y sin anuncios.`,
-  text: `Una lámina para buscar y encontrar que cobra vida: ${things}. Cada toque despierta algo, con sonido y movimiento. Además: buscar, colorear y explorar libremente.`,
+  text: `Una lámina para buscar y encontrar que cobra vida: ${things}. Cada toque despierta algo, con sonido y movimiento. ${more} Además de explorar libremente, la lámina se puede colorear, recorrer buscando cosas, explorar con preguntas o descubrir a oscuras con la linterna, o se dibujan caminos por los que pasan un coche, un tractor o un tren de vapor.`,
 });
 
 /** The Spanish texts of every page. */
@@ -180,28 +180,120 @@ export const SEO_ES: SeoTranslation = {
         "Un cuento ilustrado para el destete de niños pequeños: el zorro Tapsi dice adiós a la leche de mamá, se pone triste, se abraza a mamá y se duerme sin mamar.",
       text: "Un cuento ilustrado para leer en voz alta cuando la lactancia llega a su fin: el zorro Tapsi era un bebé y tomaba el pecho de mamá; ahora Tapsi es mayor, come una manzana y bebe de un vaso. Mamá le cuenta que su leche pronto se acabará, y Tapsi le dice adiós con la mano. Por la noche Tapsi quiere mamar de todos modos y se pone triste: mamá está muy cerca, abraza a Tapsi, le lee un libro y le canta una nana hasta que Tapsi se duerme. Por la mañana, mamá y papá están orgullosos. Cada toque pasa una página, y la frase de cada página aparece en pequeño debajo de la imagen para leerla en voz alta. Para un destete suave de niños pequeños, sin presión ni regaños.",
     },
-    "/bilder/baustelle/": scene("Obra", "excavadora, grúa y hormigonera"),
-    "/bilder/stadt/": scene("Ciudad", "autobús, semáforo y coche de policía"),
-    "/bilder/bauernhof/": scene("Granja", "vaca, cerdo y tractor"),
-    "/bilder/hof/": scene("Granja del estanque", "pato, gallina y molino de viento"),
-    "/bilder/zoo/": scene("Zoo", "león, jirafa, elefante y mono"),
-    "/bilder/unterwasser/": scene("Fondo del mar", "ballena, delfín, pulpo y tortuga"),
-    "/bilder/badezimmer/": scene("Baño", "bañera, ducha y cepillo de dientes"),
-    "/bilder/wald/": scene("Bosque", "zorro, corzo, erizo y búho"),
-    "/bilder/feuerwache/": scene("Estación de bomberos", "camión de bomberos, sirena y cascos"),
-    "/bilder/weltall/": scene("Espacio", "cohete, astronauta y vehículo lunar"),
-    "/bilder/spielplatz/": scene("Parque infantil", "tobogán, columpio y camión de helados"),
-    "/bilder/kueche/": scene("Cocina", "tostadora, hervidor y nevera"),
-    "/bilder/supermarkt/": scene("Supermercado", "carrito, caja y panadera"),
-    "/bilder/flughafen/": scene("Aeropuerto y estación", "avión, tren y cinta de equipaje"),
-    "/bilder/winterbaustelle/": scene("Obra en invierno", "quitanieves, excavadora y caseta de obra"),
-    "/bilder/kita/": scene("Guardería", "perchero, cochecito de muñecas y tren de cumpleaños"),
-    "/bilder/kinderarzt/": scene("Pediatra", "estetoscopio, báscula y tirita"),
-    "/bilder/strand/": scene("Playa", "castillo de arena, faro, gaviota y velero"),
-    "/bilder/dinotal/": scene("Valle de dinosaurios", "T. rex, braquiosaurio y volcán"),
-    "/bilder/gutenacht/": scene("Buenas noches", "luna, estrellas, osito de peluche y caja de música"),
-    "/bilder/winter/": scene("Invierno", "muñeco de nieve, trineo y ardilla"),
-    "/bilder/herbst/": scene("Otoño", "erizo, castañas, cometa y tractor"),
-    "/bilder/ostern/": scene("Pascua", "conejo de Pascua, corderito y cerezo"),
+    "/bilder/baustelle/": scene(
+      "Obra",
+      "excavadora, grúa y hormigonera",
+      "La excavadora cava, la grúa sube los ladrillos, la apisonadora alisa la calle y en la caseta de obra hay cacao. Entre las máquinas asoman un erizo, un topo y un caracol, y el camión volquete puede irse a la lámina de la ciudad.",
+    ),
+    "/bilder/stadt/": scene(
+      "Ciudad",
+      "autobús, semáforo y coche de policía",
+      "El semáforo pasa de rojo a verde, el autobús, el coche de policía y el camión de la basura recorren las calles, y entre la panadería, la iglesia y la fuente pasean la abuela, los patos y las palomas. El camión de bomberos puede irse al parque de bomberos y el autobús al zoo.",
+    ),
+    "/bilder/bauernhof/": scene(
+      "Granja",
+      "vaca, cerdo y tractor",
+      "La vaca, el cerdo, el caballo, la oveja y la cabra hacen sus sonidos, el gallo canta y el tractor y la cosechadora están en el campo. Alrededor del granjero corren una oca, una gallina, pollitos y un cerdito, y el tractor puede irse a la lámina del bosque.",
+    ),
+    "/bilder/hof/": scene(
+      "Granja del estanque",
+      "pato, gallina y molino de viento",
+      "Junto al estanque croa la rana y nada el pato, en el gallinero canta el gallo y el molino gira. Un corderito, cerditos, pollitos y las abejas de la colmena esperan a que los encuentren, y junto al espantapájaros hay una calabaza.",
+    ),
+    "/bilder/zoo/": scene(
+      "Zoo",
+      "león, jirafa, elefante y mono",
+      "El león con su cachorro, el elefante con su cría, la jirafa, la cebra y los pingüinos con su polluelo esperan a que los toquen. Además, un panda, un koala, un canguro, un rinoceronte, un hipopótamo, un flamenco, una foca y un trenecito, y a veces viene de visita el autobús de la ciudad.",
+    ),
+    "/bilder/unterwasser/": scene(
+      "Fondo del mar",
+      "ballena, delfín, pulpo y tortuga",
+      "Bajo el mar nadan una ballena, un delfín, un tiburón, una raya, un pulpo, un caballito de mar y un pez payaso, y por ahí andan una sirena, un buzo y un submarino. En el fondo hay un cofre del tesoro, un mensaje en una botella y un ancla, y arriba brilla el faro.",
+    ),
+    "/bilder/badezimmer/": scene(
+      "Baño",
+      "bañera, ducha y cepillo de dientes",
+      "En la bañera crece una montaña de espuma, el patito de goma nada, el váter tira de la cadena y el cepillo y la pasta de dientes están listos. Además, una lavadora, un secador, un orinal, unas zapatillas y juguetes de baño como un cocodrilo, una ballena y una rana: una lámina que va bien con el baño de la noche.",
+    ),
+    "/bilder/wald/": scene(
+      "Bosque",
+      "zorro, corzo, erizo y búho",
+      "En el claro junto al arroyo viven un zorro, una corza con su cervatillo, un ciervo, un tejón, un castor y un jabalí con sus rayones; el pájaro carpintero golpea y el búho ulula. Un puente lleva al poste indicador, en el bosque crecen setas y helechos, y a veces pasa el tractor de la granja.",
+    ),
+    "/bilder/feuerwache/": scene(
+      "Estación de bomberos",
+      "camión de bomberos, sirena y cascos",
+      "Suena la sirena y el camión de bomberos sale, con la bombera, el bombero y el perro bombero. Alrededor del parque hay una barra para bajar, una torre de mangueras, una boca de incendios, una ambulancia y un muñeco de prácticas por descubrir, y el camión de bomberos de la ciudad puede venir de visita.",
+    ),
+    "/bilder/weltall/": scene(
+      "Espacio",
+      "cohete, astronauta y vehículo lunar",
+      "En la Luna esperan un vehículo lunar, una excavadora lunar, un módulo de aterrizaje y un perro robot, y por encima pasan la Tierra, Marte y Saturno, una estrella fugaz y un cometa. Un astronauta, la estación espacial y un pequeño extraterrestre con su bebé esperan a que los descubran, y en el invernadero crece una flor espacial.",
+    ),
+    "/bilder/spielplatz/": scene(
+      "Parque infantil",
+      "tobogán, columpio y camión de helados",
+      "El columpio, el tobogán, el balancín y la torre de escalada se ponen en marcha; en el arenero hay un castillo de arena, un cubo, moldes y una excavadora de juguete, y ha llegado el camión de los helados. El abuelo, mamá con el cochecito, una cometa y un globo también están: una lámina como el parque de la esquina.",
+    ),
+    "/bilder/kueche/": scene(
+      "Cocina",
+      "tostadora, hervidor y nevera",
+      "La olla burbujea, la tostadora salta, el hervidor hierve y en el horno sube el bizcocho. Mamá, papá y el bebé están en la cocina, y también el gato y el perro, y el temporizador, el rodillo, la báscula y la batidora esperan a que los prueben.",
+    ),
+    "/bilder/supermarkt/": scene(
+      "Supermercado",
+      "carrito, caja y panadera",
+      "La caja pita, el carrito rueda y la fruta se pesa en la báscula. En el mostrador del pan está la panadera, en la nevera hay leche y queso, y la máquina de chicles, la máquina de botellas y la torre de latas esperan a que las toquen: casi como ir a la compra juntos.",
+    ),
+    "/bilder/flughafen/": scene(
+      "Aeropuerto y estación",
+      "avión, tren y cinta de equipaje",
+      "En la pista, el señalero guía al avión, las maletas viajan por la cinta y el camión cisterna, el coche guía, el autobús y el taxi van y vienen. En la estación de al lado está el tren con su vagón restaurante, el reloj de la estación hace tictac y el revisor, los viajeros y la piloto esperan su viaje.",
+    ),
+    "/bilder/winterbaustelle/": scene(
+      "Obra en invierno",
+      "quitanieves, excavadora y caseta de obra",
+      "La obra en la nieve: la excavadora, la grúa, el volquete y la carretilla elevadora siguen trabajando mientras unos niños hacen un muñeco de nieve y van en trineo. Junto al bidón de fuego hace calor, en el comedero hay un herrerillo y un petirrojo, y también hay un iglú y huellas en la nieve por descubrir.",
+    ),
+    "/bilder/kita/": scene(
+      "Guardería",
+      "perchero, cochecito de muñecas y tren de cumpleaños",
+      "Un día en la guardería: las chaquetas en los ganchos, jugar en el rincón de construcciones, leer un libro de imágenes, comer fideos y pudin y después la siesta. El tren de cumpleaños, el hámster, el tambor, el xilófono y la caja de música esperan a que los toquen: ideal para contarlo antes del primer día de guardería.",
+    ),
+    "/bilder/kinderarzt/": scene(
+      "Pediatra",
+      "estetoscopio, báscula y tirita",
+      "En el pediatra se mide y se pesa, se escucha con el estetoscopio y se mira el oído con la linterna, y al final hay una pegatina. En la sala de espera están papá, un cochecito, un circuito de canicas, un caballito balancín y un acuario: así la próxima visita de verdad resulta un poco más familiar.",
+    ),
+    "/bilder/strand/": scene(
+      "Playa",
+      "castillo de arena, faro, gaviota y velero",
+      "Las olas llegan, la gaviota llama y el castillo de arena crece con el cubo y la pala. En el mar navegan una barca y un barco y salta un delfín, en la playa hay un cangrejo, una estrella de mar y una almeja, y también patatas fritas, crema solar, una tienda de playa y la torre del socorrista.",
+    ),
+    "/bilder/dinotal/": scene(
+      "Valle de dinosaurios",
+      "T. rex, braquiosaurio y volcán",
+      "El tiranosaurio tiene que estornudar, el braquiosaurio estira su largo cuello y en el nido hay huevos de dinosaurio. Además, una cría de triceratops, un anquilosaurio, una cría de pterosaurio, un plesiosaurio en el agua, una cueva, un trozo de ámbar y helechos gigantes: la prehistoria para tocar.",
+    ),
+    "/bilder/gutenacht/": scene(
+      "Buenas noches",
+      "luna, estrellas, osito de peluche y caja de música",
+      "La lámina para la noche: todo lo que se toca se duerme –el osito, el caballito balancín, el pez de colores, el robot y los juguetes– y cuando todos duermen, la habitación se queda a oscuras. La luna, las estrellas, las luciérnagas, la caja de música y el cuento de buenas noches lo hacen todo tranquilo y acogedor.",
+    ),
+    "/bilder/winter/": scene(
+      "Invierno",
+      "muñeco de nieve, trineo y ardilla",
+      "En la nieve, unos niños hacen un muñeco de nieve y un ángel de nieve, un patinador da vueltas sobre el hielo y pasa el trineo tirado por un caballo. Junto a la cabaña están el abuelo, mamá con chocolate caliente, un corzo, un conejo y una ardilla, y en la casita de pájaros hay un herrerillo y un petirrojo.",
+    ),
+    "/bilder/herbst/": scene(
+      "Otoño",
+      "erizo, castañas, cometa y tractor",
+      "El viento arremolina las hojas de colores, la cometa sube y los gansos salvajes cruzan la lámina. La abuela, el abuelo, un niño y el granjero están fuera, y entre castañas, setas, un charco y una cesta de manzanas viven un erizo, una ardilla, un mirlo y una lombriz; incluso hay un muñequito de castañas.",
+    ),
+    "/bilder/ostern/": scene(
+      "Pascua",
+      "conejo de Pascua, corderito y cerezo",
+      "El conejo de Pascua ha escondido huevos de colores en el jardín: uno rojo, uno amarillo, uno verde y uno azul esperan a que los encuentren. En la mesa de pintar se pintan huevos, hay un corderito, un pollito y una gallina, y entre tulipanes, narcisos y dientes de león zumba el abejorro.",
+    ),
   },
 };

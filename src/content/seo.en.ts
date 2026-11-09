@@ -4,10 +4,10 @@ import type { PageText, SeoTranslation } from "./seo";
 // English-speaking parents search: "toddler games", "free", "no ads", "offline" (see the
 // domain research on /management/). Imported only by texts-en.ts and tools/build.ts. No `@/` imports: the build reads it.
 
-const scene = (title: string, things: string): PageText => ({
+const scene = (title: string, things: string, more: string): PageText => ({
   title: `${title} Look-and-Find for Toddlers`,
   description: `A living ${title.toLowerCase()} picture to tap: ${things} move and make sounds. For toddlers, free and without ads.`,
-  text: `A look-and-find picture that comes alive: ${things} – every tap brings something to life, with a sound and a movement. Plus finding, coloring and free exploring.`,
+  text: `A look-and-find picture that comes alive: ${things} – every tap brings something to life, with a sound and a movement. ${more} Besides free exploring, the picture can be colored in, searched, explored with questions or discovered in the dark with a flashlight – or you draw roads for a car, a tractor or a steam train to drive along.`,
 });
 
 /** The English texts of every page. */
@@ -174,28 +174,120 @@ export const SEO_EN: SeoTranslation = {
         "A picture story for weaning toddlers: Tapsi the fox says goodbye to mommy's milk, feels sad, cuddles with mom and falls asleep without nursing.",
       text: "A picture story to read aloud when breastfeeding comes to an end: Tapsi the fox was a baby and drank at mom's, now Tapsi is big, eats an apple and drinks from a cup. Mom tells Tapsi that her milk will soon be all gone, and Tapsi waves it goodbye. In the evening Tapsi still wants to nurse and is sad – mom stays close, holds Tapsi tight, reads a book and sings a lullaby until Tapsi falls asleep. In the morning mom and dad are proud. Every tap turns a page, and each page's sentence stands small below the picture for reading aloud. For gentle weaning of toddlers, without pressure or scolding.",
     },
-    "/bilder/baustelle/": scene("Construction Site", "excavator, crane and cement mixer"),
-    "/bilder/stadt/": scene("City", "bus, traffic light and police car"),
-    "/bilder/bauernhof/": scene("Farm", "cow, pig and tractor"),
-    "/bilder/hof/": scene("Pond Farmyard", "duck, hen and windmill"),
-    "/bilder/zoo/": scene("Zoo", "lion, giraffe, elephant and monkey"),
-    "/bilder/unterwasser/": scene("Underwater", "whale, dolphin, octopus and turtle"),
-    "/bilder/badezimmer/": scene("Bathroom", "bathtub, shower and toothbrush"),
-    "/bilder/wald/": scene("Forest", "fox, deer, hedgehog and owl"),
-    "/bilder/feuerwache/": scene("Fire Station", "fire engine, siren and helmets"),
-    "/bilder/weltall/": scene("Space", "rocket, astronaut and moon buggy"),
-    "/bilder/spielplatz/": scene("Playground", "slide, swing and ice cream van"),
-    "/bilder/kueche/": scene("Kitchen", "toaster, kettle and fridge"),
-    "/bilder/supermarkt/": scene("Supermarket", "shopping cart, checkout and baker"),
-    "/bilder/flughafen/": scene("Airport and Train Station", "plane, train and baggage belt"),
-    "/bilder/winterbaustelle/": scene("Winter Construction", "snowplow, excavator and site trailer"),
-    "/bilder/kita/": scene("Daycare", "coat hooks, doll stroller and birthday train"),
-    "/bilder/kinderarzt/": scene("Pediatrician", "stethoscope, scales and bandage"),
-    "/bilder/strand/": scene("Beach", "sandcastle, lighthouse, seagull and sailboat"),
-    "/bilder/dinotal/": scene("Dino Valley", "T. rex, brachiosaurus and volcano"),
-    "/bilder/gutenacht/": scene("Good Night", "moon, stars, teddy and music box"),
-    "/bilder/winter/": scene("Winter", "snowman, sled and squirrel"),
-    "/bilder/herbst/": scene("Autumn", "hedgehog, chestnuts, kite and tractor"),
-    "/bilder/ostern/": scene("Easter", "Easter bunny, lamb and cherry tree"),
+    "/bilder/baustelle/": scene(
+      "Construction Site",
+      "excavator, crane and cement mixer",
+      "The excavator digs, the crane lifts the bricks up, the road roller makes the road smooth, and there is cocoa in the site trailer. Between the machines a hedgehog, a mole and a snail drop by, and the dump truck can drive over into the city.",
+    ),
+    "/bilder/stadt/": scene(
+      "City",
+      "bus, traffic light and police car",
+      "The traffic light switches from red to green, the bus, the police car and the garbage truck drive through the streets, and Grandma, ducks and pigeons are out and about between the bakery, the church and the fountain. The fire engine can drive over to the fire station, and the bus to the zoo.",
+    ),
+    "/bilder/bauernhof/": scene(
+      "Farm",
+      "cow, pig and tractor",
+      "The cow, the pig, the horse, the sheep and the goat make their sounds, the rooster crows, and the tractor and the combine harvester are out in the field. Around the farmer run a goose, a hen, chicks and a piglet, and the tractor can drive over into the forest.",
+    ),
+    "/bilder/hof/": scene(
+      "Pond Farmyard",
+      "duck, hen and windmill",
+      "By the pond the frog croaks and the duck swims, the rooster crows at the henhouse, and the windmill turns. A lamb, piglets, chicks and the bees at the beehive are waiting to be found, and a pumpkin lies next to the scarecrow.",
+    ),
+    "/bilder/zoo/": scene(
+      "Zoo",
+      "lion, giraffe, elephant and monkey",
+      "The lion with its cub, the elephant with its baby, the giraffe, the zebra and the penguins with their chick are waiting to be tapped. Plus a panda, a koala, a kangaroo, a rhino, a hippo, a flamingo, a seal and a little train – and sometimes the bus from the city comes to visit.",
+    ),
+    "/bilder/unterwasser/": scene(
+      "Underwater",
+      "whale, dolphin, octopus and turtle",
+      "Under the sea swim a whale, a dolphin, a shark, a ray, an octopus, a seahorse and a clownfish, and a mermaid, a diver and a submarine are on their way. On the sea floor lie a treasure chest, a message in a bottle and an anchor, and up above shines the lighthouse.",
+    ),
+    "/bilder/badezimmer/": scene(
+      "Bathroom",
+      "bathtub, shower and toothbrush",
+      "A mountain of bubbles grows in the bathtub, the rubber duck swims, the toilet flushes, and the toothbrush and toothpaste are ready. Plus a washing machine, a hair dryer, a potty, slippers and bath toys like a crocodile, a whale and a frog – a picture that goes well with the child's own bath in the evening.",
+    ),
+    "/bilder/wald/": scene(
+      "Forest",
+      "fox, deer, hedgehog and owl",
+      "In the clearing by the stream live a fox, a deer with its fawn, a stag, a badger, a beaver and a wild boar with its piglets, the woodpecker knocks and the owl hoots. A bridge leads to the signpost, toadstools and ferns grow in the forest, and sometimes the tractor from the farm drives by.",
+    ),
+    "/bilder/feuerwache/": scene(
+      "Fire Station",
+      "fire engine, siren and helmets",
+      "The siren wails, and the fire engine heads out – with the firewoman, the fireman and the fire dog. Around the station there is a fire pole, a hose tower, a hydrant, an ambulance and a practice dummy to discover, and the fire engine from the city can come to visit.",
+    ),
+    "/bilder/weltall/": scene(
+      "Space",
+      "rocket, astronaut and moon buggy",
+      "On the moon wait a moon buggy, a moon digger, a lunar lander and a robot dog, while Earth, Mars and Saturn, a shooting star and a comet go by above them. An astronaut, the space station and a little alien with its baby are waiting to be found – and a space flower grows in the greenhouse.",
+    ),
+    "/bilder/spielplatz/": scene(
+      "Playground",
+      "slide, swing and ice cream van",
+      "The swing, the slide, the seesaw and the climbing tower start to move, in the sandbox there are a sandcastle, a bucket, sand molds and a little toy digger, and the ice cream truck is here. Grandpa, Mom with the stroller, a kite and a balloon are there too – a picture like the playground around the corner.",
+    ),
+    "/bilder/kueche/": scene(
+      "Kitchen",
+      "toaster, kettle and fridge",
+      "The pot bubbles, the toaster pops, the kettle boils, and the cake rises in the oven. Mom, Dad and the baby are in the kitchen, the cat and the dog too, and the kitchen timer, the rolling pin, the scale and the mixer are waiting to be tried out.",
+    ),
+    "/bilder/supermarkt/": scene(
+      "Supermarket",
+      "shopping cart, checkout and baker",
+      "The register beeps, the shopping cart rolls, and the fruit gets weighed on the scale. The baker stands at the bread counter, there is milk and cheese in the fridge, and the gumball machine, the bottle machine and the tower of cans are waiting to be tapped – almost like shopping together.",
+    ),
+    "/bilder/flughafen/": scene(
+      "Airport and Train Station",
+      "plane, train and baggage belt",
+      "On the apron the marshaller waves the plane in, the luggage rides along the baggage belt, and the fuel truck, the follow-me car, the bus and the taxi are on the move. At the train station next door stands the train with its dining car, the station clock ticks, and the conductor, the travelers and the pilot are waiting for their journey.",
+    ),
+    "/bilder/winterbaustelle/": scene(
+      "Winter Construction",
+      "snowplow, excavator and site trailer",
+      "The construction site in the snow: the excavator, the crane, the dump truck and the forklift keep working while children build a snowman and go sledding. It is warm by the fire barrel, a blue tit and a robin sit at the bird feeder, and an igloo and the footprints in the snow are waiting to be found too.",
+    ),
+    "/bilder/kita/": scene(
+      "Daycare",
+      "coat hooks, doll stroller and birthday train",
+      "A day at daycare: jackets on the hooks, playing in the block corner, reading a picture book, lunch with noodles and pudding and then nap time. The birthday train, the hamster, the drum, the xylophone and the music box are waiting to be tapped – lovely for talking about before the first day at daycare.",
+    ),
+    "/bilder/kinderarzt/": scene(
+      "Pediatrician",
+      "stethoscope, scales and bandage",
+      "At the pediatrician's the child is measured and weighed, listened to with the stethoscope and checked with the ear light, and at the end there is a sticker. In the waiting room are Dad, a stroller, a marble run, a rocking horse and an aquarium – so the next real visit feels a little more familiar.",
+    ),
+    "/bilder/strand/": scene(
+      "Beach",
+      "sandcastle, lighthouse, seagull and sailboat",
+      "The waves roll in, the seagull calls, and the sandcastle grows with a bucket and a shovel. Out at sea a boat and a ship sail by and a dolphin jumps, on the beach lie a crab, a starfish and a clam, and there are fries, sunscreen, a beach tent and the lifeguard tower.",
+    ),
+    "/bilder/dinotal/": scene(
+      "Dino Valley",
+      "T. rex, brachiosaurus and volcano",
+      "The T. rex has to sneeze, the brachiosaurus stretches its long neck, and dino eggs lie in the nest. Plus a baby triceratops, an ankylosaurus, a baby pterosaur, a plesiosaur in the water, a cave, a piece of amber and giant ferns – prehistoric times to tap.",
+    ),
+    "/bilder/gutenacht/": scene(
+      "Good Night",
+      "moon, stars, teddy and music box",
+      "The picture for the evening: everything that is tapped falls asleep – the teddy bear, the rocking horse, the goldfish, the robot and the toys – and when everyone is asleep, the room goes dark. The moon, the stars, fireflies, the music box and the bedtime book make it quiet and cozy.",
+    ),
+    "/bilder/winter/": scene(
+      "Winter",
+      "snowman, sled and squirrel",
+      "In the snow children build a snowman and make a snow angel, an ice skater glides around the ice, and the horse-drawn sleigh goes by. By the log cabin are Grandpa, Mom with hot cocoa, a deer, a rabbit and a squirrel, and a blue tit and a robin sit at the birdhouse.",
+    ),
+    "/bilder/herbst/": scene(
+      "Autumn",
+      "hedgehog, chestnuts, kite and tractor",
+      "The wind whirls the colorful leaves, the kite rises, and the wild geese fly across the picture. Grandma, Grandpa, a boy and the farmer are outside, and between chestnuts, mushrooms, a puddle and an apple basket live a hedgehog, a squirrel, a blackbird and a worm – there is even a little chestnut man.",
+    ),
+    "/bilder/ostern/": scene(
+      "Easter",
+      "Easter bunny, lamb and cherry tree",
+      "The Easter Bunny has hidden colorful eggs in the garden – a red, a yellow, a green and a blue one are waiting to be found. Eggs are painted at the painting table, a lamb, a chick and a hen are there, and the bumblebee buzzes among tulips, daffodils and dandelions.",
+    ),
   },
 };

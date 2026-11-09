@@ -74,11 +74,11 @@ export function splitLanguage(pathname: string): { language: SeoLanguage; path: 
 export const SITE_PROMISE =
   "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline, in sieben Sprachen. Mit Touch oder Tastatur, am besten zusammen mit einem Erwachsenen.";
 
-const scene = (id: string, title: string, things: string): PageSeo => ({
+const scene = (id: string, title: string, things: string, more: string): PageSeo => ({
   path: `/bilder/${id}/`,
   title: `Wimmelbild ${title} für Kleinkinder`,
   description: `Wimmelbild ${title} zum Antippen: ${things} bewegen sich und machen Geräusche. Für Kleinkinder, kostenlos und ohne Werbung.`,
-  text: `Ein lebendiges Wimmelbild: ${things} – jedes Antippen bringt etwas zum Leben, mit Geräusch und Bewegung. Dazu Suchen, Ausmalen und freies Entdecken.`,
+  text: `Ein lebendiges Wimmelbild: ${things} – jedes Antippen bringt etwas zum Leben, mit Geräusch und Bewegung. ${more} Neben dem freien Entdecken lässt sich das Bild ausmalen, absuchen, mit Fragen erkunden und mit der Taschenlampe im Dunkeln entdecken – oder man malt Straßen, auf denen Auto, Traktor oder Dampflok durchs Bild fahren.`,
 });
 
 /** The texts of every page: home, categories, games, scenes – also of games still being built, ready for when they are out. */
@@ -270,29 +270,144 @@ export const SEO_TEXTS: PageSeo[] = [
       "Eine Bildgeschichte zum Abstillen für Kleinkinder: Tapsi der Fuchs sagt Tschüss zur Mama-Milch, ist traurig, kuschelt mit Mama und schläft ohne Stillen ein.",
     text: "Eine Bildgeschichte zum Vorlesen, wenn das Stillen zu Ende geht: Tapsi der Fuchs war ein Baby und hat bei Mama getrunken, jetzt ist Tapsi groß, isst einen Apfel und trinkt aus dem Becher. Mama erzählt, dass die Mama-Milch bald alle ist, und Tapsi winkt ihr zum Abschied. Am Abend möchte Tapsi doch trinken und ist traurig – Mama ist ganz nah, nimmt Tapsi in den Arm, liest ein Buch vor und singt ein Schlaflied, bis Tapsi einschläft. Am Morgen sind Mama und Papa stolz. Jedes Tippen blättert eine Seite weiter, und der Satz jeder Seite steht klein darunter zum Vorlesen. Für sanftes Abstillen von Kleinkindern, ohne Druck und ohne Schimpfen.",
   },
-  scene("baustelle", "Baustelle", "Bagger, Kran und Betonmischer"),
-  scene("stadt", "Stadt", "Bus, Ampel und Polizeiauto"),
-  scene("bauernhof", "Bauernhof", "Kuh, Schwein und Traktor"),
-  scene("hof", "Hof am Teich", "Ente, Huhn und Windmühle"),
-  scene("zoo", "Zoo", "Löwe, Giraffe, Elefant und Affe"),
-  scene("unterwasser", "Unterwasser", "Wal, Delfin, Krake und Schildkröte"),
-  scene("badezimmer", "Badezimmer", "Badewanne, Dusche und Zahnbürste"),
-  scene("wald", "Wald", "Fuchs, Reh, Igel und Eule"),
-  scene("feuerwache", "Feuerwache", "Feuerwehrauto, Sirene und Helme"),
-  scene("weltall", "Weltall", "Rakete, Astronaut und Mondauto"),
-  scene("spielplatz", "Spielplatz", "Rutsche, Schaukel und Eiswagen"),
-  scene("kueche", "Küche", "Toaster, Wasserkocher und Kühlschrank"),
-  scene("supermarkt", "Supermarkt", "Einkaufswagen, Kasse und Bäckerin"),
-  scene("flughafen", "Flughafen und Bahnhof", "Flugzeug, Zug und Gepäckband"),
-  scene("winterbaustelle", "Winter-Baustelle", "Schneepflug, Bagger, Bauwagen"),
-  scene("kita", "Kita", "Garderobe, Puppenwagen und Geburtstagszug"),
-  scene("kinderarzt", "Kinderarzt", "Stethoskop, Waage und Pflaster"),
-  scene("strand", "Strand", "Sandburg, Leuchtturm, Möwe und Segelboot"),
-  scene("dinotal", "Dinotal", "T-Rex, Brachiosaurus und Vulkan"),
-  scene("gutenacht", "Gute Nacht", "Mond, Sterne, Teddy und Spieluhr"),
-  scene("winter", "Winter", "Schneemann, Schlitten und Eichhörnchen"),
-  scene("herbst", "Herbst", "Igel, Kastanien, Drachen und Traktor"),
-  scene("ostern", "Ostern", "Osterhase, Lämmchen und Kirschbaum"),
+  scene(
+    "baustelle",
+    "Baustelle",
+    "Bagger, Kran und Betonmischer",
+    "Der Bagger gräbt, der Kran hebt die Steine hoch, die Walze macht die Straße glatt, und im Bauwagen gibt es Kakao. Zwischen den Maschinen schauen Igel, Maulwurf und Schnecke vorbei, und der Kipper fährt auf Wunsch hinüber in die Stadt.",
+  ),
+  scene(
+    "stadt",
+    "Stadt",
+    "Bus, Ampel und Polizeiauto",
+    "Die Ampel springt von Rot auf Grün, Bus, Polizeiauto und Müllauto fahren durch die Straßen, und zwischen Bäckerei, Kirche und Brunnen sind Oma, Enten und Tauben unterwegs. Auf Wunsch fährt das Feuerwehrauto hinüber zur Feuerwache und der Bus in den Zoo.",
+  ),
+  scene(
+    "bauernhof",
+    "Bauernhof",
+    "Kuh, Schwein und Traktor",
+    "Kuh, Schwein, Pferd, Schaf und Ziege machen ihre Geräusche, der Hahn kräht, und Traktor und Mähdrescher sind auf dem Feld. Rund um den Bauern laufen Gans, Huhn, Küken und Ferkel, und der Traktor fährt auf Wunsch hinüber in den Wald.",
+  ),
+  scene(
+    "hof",
+    "Hof am Teich",
+    "Ente, Huhn und Windmühle",
+    "Am Teich quakt der Frosch und schwimmt die Ente, am Hühnerstall kräht der Hahn, und die Windmühle dreht sich. Lamm, Ferkel, Küken und die Bienen am Bienenstock wollen entdeckt werden, und neben der Vogelscheuche liegt ein Kürbis.",
+  ),
+  scene(
+    "zoo",
+    "Zoo",
+    "Löwe, Giraffe, Elefant und Affe",
+    "Der Löwe mit seinem Jungen, der Elefant mit seinem Kleinen, Giraffe, Zebra und die Pinguine mit ihrem Küken warten darauf, angetippt zu werden. Dazu Panda, Koala, Känguru, Nashorn, Flusspferd, Flamingo, Robbe und eine kleine Bahn – und manchmal kommt der Bus aus der Stadt zu Besuch.",
+  ),
+  scene(
+    "unterwasser",
+    "Unterwasser",
+    "Wal, Delfin, Krake und Schildkröte",
+    "Unter dem Meer schwimmen Wal, Delfin, Hai, Rochen, Krake, Seepferdchen und Clownfisch, und eine Meerjungfrau, ein Taucher und ein U-Boot sind unterwegs. Auf dem Grund liegen eine Schatztruhe, eine Flaschenpost und ein Anker, oben leuchtet der Leuchtturm.",
+  ),
+  scene(
+    "badezimmer",
+    "Badezimmer",
+    "Badewanne, Dusche und Zahnbürste",
+    "In der Badewanne wächst ein Berg aus Schaum, die Quietscheente schwimmt, die Toilette spült, und Zahnbürste und Zahnpasta stehen bereit. Dazu Waschmaschine, Föhn, Töpfchen, Hausschuhe und Badetiere wie Krokodil, Wal und Frosch – ein Bild, das zum eigenen Bad am Abend passt.",
+  ),
+  scene(
+    "wald",
+    "Wald",
+    "Fuchs, Reh, Igel und Eule",
+    "Auf der Lichtung am Bach leben Fuchs, Reh mit Kitz, Hirsch, Dachs, Biber und Wildschwein mit Frischlingen, der Specht klopft, und die Eule ruft. Über die Brücke geht es zum Wegweiser, im Wald wachsen Fliegenpilz und Farn, und manchmal kommt der Traktor vom Bauernhof vorbei.",
+  ),
+  scene(
+    "feuerwache",
+    "Feuerwache",
+    "Feuerwehrauto, Sirene und Helme",
+    "Die Sirene heult, und das Feuerwehrauto rückt aus – mit Feuerwehrfrau, Feuerwehrmann und Feuerwehrhund. Rund um die Wache gibt es Rutschstange, Schlauchturm, Hydrant, Krankenwagen und eine Übungspuppe zu entdecken, und das Feuerwehrauto aus der Stadt kommt auf Wunsch zu Besuch.",
+  ),
+  scene(
+    "weltall",
+    "Weltall",
+    "Rakete, Astronaut und Mondauto",
+    "Auf dem Mond warten Mondauto, Mondbagger, Landefähre und ein Roboterhund, darüber ziehen Erde, Mars und Saturn, eine Sternschnuppe und ein Komet. Ein Astronaut, die Raumstation und ein kleines Alien mit seinem Baby wollen entdeckt werden – und im Gewächshaus wächst eine Weltraumblume.",
+  ),
+  scene(
+    "spielplatz",
+    "Spielplatz",
+    "Rutsche, Schaukel und Eiswagen",
+    "Schaukel, Rutsche, Wippe und Kletterturm kommen in Bewegung, im Sandkasten stehen Sandburg, Eimer, Förmchen und ein kleiner Bagger, und der Eiswagen ist da. Opa, Mama mit dem Kinderwagen, ein Drachen und ein Luftballon sind auch dabei – ein Bild wie der Spielplatz um die Ecke.",
+  ),
+  scene(
+    "kueche",
+    "Küche",
+    "Toaster, Wasserkocher und Kühlschrank",
+    "Der Topf blubbert, der Toaster springt, der Wasserkocher kocht, und im Ofen geht der Kuchen auf. Mama, Papa und das Baby sind in der Küche, Katze und Hund auch, und Küchenwecker, Nudelholz, Waage und Mixer warten darauf, ausprobiert zu werden.",
+  ),
+  scene(
+    "supermarkt",
+    "Supermarkt",
+    "Einkaufswagen, Kasse und Bäckerin",
+    "Die Kasse piept, der Einkaufswagen rollt, und das Obst wird auf der Waage gewogen. An der Brottheke steht die Bäckerin, im Kühlregal gibt es Milch und Käse, und Kaugummiautomat, Pfandautomat und der Turm aus Dosen warten aufs Antippen – fast wie beim Einkaufen zusammen.",
+  ),
+  scene(
+    "flughafen",
+    "Flughafen und Bahnhof",
+    "Flugzeug, Zug und Gepäckband",
+    "Auf dem Vorfeld winkt der Einweiser das Flugzeug heran, das Gepäck fährt übers Band, und Tankwagen, Follow-me-Auto, Bus und Taxi sind unterwegs. Am Bahnhof daneben steht der Zug mit Speisewagen, die Bahnhofsuhr tickt, und der Schaffner, die Reisenden und die Pilotin warten auf ihre Reise.",
+  ),
+  scene(
+    "winterbaustelle",
+    "Winter-Baustelle",
+    "Schneepflug, Bagger, Bauwagen",
+    "Die Baustelle im Schnee: Bagger, Kran, Kipper und Gabelstapler arbeiten weiter, während Kinder einen Schneemann bauen und Schlitten fahren. Am Feuerfass ist es warm, am Futterhaus sitzen Blaumeise und Rotkehlchen, und auch ein Iglu und die Fußspuren im Schnee wollen entdeckt werden.",
+  ),
+  scene(
+    "kita",
+    "Kita",
+    "Garderobe, Puppenwagen und Geburtstagszug",
+    "Ein Tag in der Kita: Jacken an die Haken, spielen in der Bauecke, ein Bilderbuch lesen, Mittagessen mit Nudeln und Pudding und danach Mittagsschlaf. Der Geburtstagszug, der Hamster, Trommel, Xylophon und Spieluhr wollen angetippt werden – schön zum Erzählen vor dem ersten Kita-Tag.",
+  ),
+  scene(
+    "kinderarzt",
+    "Kinderarzt",
+    "Stethoskop, Waage und Pflaster",
+    "Beim Kinderarzt wird gemessen und gewogen, mit dem Stethoskop abgehört und mit der Ohrenlampe ins Ohr geschaut, und am Ende gibt es einen Sticker. Im Wartezimmer warten Papa, Kinderwagen, Kugelbahn, Schaukelpferd und ein Aquarium – so wird der nächste echte Besuch ein bisschen vertrauter.",
+  ),
+  scene(
+    "strand",
+    "Strand",
+    "Sandburg, Leuchtturm, Möwe und Segelboot",
+    "Die Wellen rollen, die Möwe ruft, und die Sandburg wächst mit Eimer und Schaufel. Draußen fahren Boot und Schiff, ein Delfin springt, am Strand liegen Krebs, Seestern und Muschel, und es gibt Pommes, Sonnencreme, eine Strandmuschel und den Turm der Rettungsschwimmer.",
+  ),
+  scene(
+    "dinotal",
+    "Dinotal",
+    "T-Rex, Brachiosaurus und Vulkan",
+    "Der T-Rex muss niesen, der Brachiosaurus reckt seinen langen Hals, und im Nest liegen Dino-Eier. Dazu ein Triceratops-Kind, ein Ankylosaurus, ein Flugsaurier-Baby, ein Plesiosaurus im Wasser, eine Höhle, ein Stück Bernstein und riesige Farne – eine Urzeit zum Antippen.",
+  ),
+  scene(
+    "gutenacht",
+    "Gute Nacht",
+    "Mond, Sterne, Teddy und Spieluhr",
+    "Das Bild für den Abend: Alles, was angetippt wird, schläft ein – der Teddy, das Schaukelpferd, der Goldfisch, der Roboter und die Spielsachen –, und wenn alle schlafen, wird das Zimmer dunkel. Mond, Sterne, Glühwürmchen, Spieluhr und Gutenachtbuch machen es leise und gemütlich.",
+  ),
+  scene(
+    "winter",
+    "Winter",
+    "Schneemann, Schlitten und Eichhörnchen",
+    "Im Schnee bauen Kinder einen Schneemann und machen einen Schneeengel, ein Schlittschuhläufer dreht Runden auf dem Eis, und der Pferdeschlitten fährt vorbei. Bei der Blockhütte warten Opa, Mama mit heißem Kakao, Reh, Hase und Eichhörnchen, und am Vogelhaus sitzen Blaumeise und Rotkehlchen.",
+  ),
+  scene(
+    "herbst",
+    "Herbst",
+    "Igel, Kastanien, Drachen und Traktor",
+    "Der Wind wirbelt die bunten Blätter, der Drachen steigt, und die Wildgänse ziehen über das Bild. Oma, Opa, ein Junge und der Bauer sind draußen, und zwischen Kastanien, Pilzen, Pfütze und Apfelkorb wohnen Igel, Eichhörnchen, Amsel und Regenwurm – sogar ein Kastanienmännchen ist dabei.",
+  ),
+  scene(
+    "ostern",
+    "Ostern",
+    "Osterhase, Lämmchen und Kirschbaum",
+    "Im Garten hat der Osterhase bunte Eier versteckt – ein rotes, ein gelbes, ein grünes und ein blaues wollen gefunden werden. Am Maltisch werden Eier bemalt, Lamm, Küken und Henne sind da, und zwischen Tulpen, Narzissen und Löwenzahn summt die Hummel.",
+  ),
 ];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */

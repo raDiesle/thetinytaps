@@ -762,7 +762,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
   and head in step (`useTitle`, `SeoHead`). Under `/en/`, `/ru/` … the router runs below the prefix (`routerBase()`,
   `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
-  browser's language. Texts say only what the page really does, and keep saying it: a change that adds, removes or
+  browser's language. Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
   renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
   text in every language in the same commit, and its book's and the home page's where they name it – they had fallen
   behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user

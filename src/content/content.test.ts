@@ -240,6 +240,19 @@ describe("search engine texts (seo.ts)", () => {
     for (const game of UNFINISHED) expect(NO_INDEX_PATHS, game.href).toContain(game.href);
   });
 
+  // The scene pages had one template's 45 words each and stood among the pages „gecrawlt – zurzeit nicht indexiert“
+  // (November 2026): each tells in sentences of its own what is in its picture and what happens there.
+  test("every scene page tells what is its own, in every language", () => {
+    const scenes = SEO_TEXTS.filter((page) => /^\/bilder\/[^/]+\/$/.test(page.path));
+    expect(scenes.length).toBeGreaterThan(10);
+    for (const page of scenes) {
+      expect(page.text.length, page.path).toBeGreaterThan(400);
+      for (const [language, seo] of Object.entries(TRANSLATIONS)) {
+        expect(seo.pages[page.path].text.length, `${language} ${page.path}`).toBeGreaterThan(language === "zh" ? 150 : 400);
+      }
+    }
+  });
+
   test("a moved page leads to a page for search engines, and the app leads its old address there too", () => {
     const found = SEO_PAGES.map((page) => page.path);
     const app = readFileSync(new URL("../App.tsx", import.meta.url), "utf8");
