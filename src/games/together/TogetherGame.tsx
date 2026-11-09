@@ -48,7 +48,7 @@ export function TogetherGame() {
       startMode="play"
     >
       <TogetherRounds settings={settings} />
-      <PlayOptions>
+      <PlayOptions iconOnly>
         <Choice<"all" | RoundKind>
           label={t({
             de: "Was drankommt",

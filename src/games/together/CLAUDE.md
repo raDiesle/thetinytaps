@@ -170,6 +170,15 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 - A new pair comes with its wish in the same commit (`content.test.ts` wants one on every pair, also painted pairs not
   made yet), German only and unrecorded until the user asks.
 
+### Picture and caption come together (user feedback, November 2026)
+
+- A round's caption (the quiet line under the picture) shows only once the round's picture files are decoded
+  (`useImagesReady` in `TogetherRounds.tsx`): the text never stands alone waiting for its picture. Any new picture
+  file a round shows goes into `imagesOf` there.
+- The main picture is as big as the room allows: the picture's share of the height is `flex: 1.75` on a computer and
+  `1.6` on a phone on its side (`together.css`); a smaller box is a fault to report, not a setting to add.
+- The ⚙️ of this game is the gear alone (`PlayOptions iconOnly`), its name read out only. Other games keep the label.
+
 ## Languages
 
 The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; November 2026). Grown-ups'
