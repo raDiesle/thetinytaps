@@ -159,7 +159,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/abstillen/",
     recorded: true,
-    note: "Die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ übersetzt am 3. November 2026, auf Deutsch und den anderen Sprachen außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht).",
+    note: "Die dreizehn Sätze der Geschichte (content.ts), „Weiter“ und „Zurückblättern“ übersetzt am 3. November 2026, auf Deutsch und den anderen Sprachen außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht). Die zweite Geschichte „Tapsis Milchkette“ (milkChain.ts) gibt es bisher nur als deutschen Text, noch nicht im Spiel.",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
   },
   {

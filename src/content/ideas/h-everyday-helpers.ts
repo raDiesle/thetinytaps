@@ -394,7 +394,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut als „Abstillen“ (/abstillen/): dreizehn SVG-Seiten mit Tapsi, Mama und Papa Fuchs, jedes Tippen blättert weiter, der Satz jeder Seite steht klein zum Vorlesen darunter. Offen: Aufnahmen der Sätze (ElevenLabs), Übersetzungen, eine Fassung nur fürs nächtliche Abstillen („Die Milch schläft nachts“).",
+        "Gebaut als „Abstillen“ (/abstillen/): dreizehn SVG-Seiten mit Tapsi, Mama und Papa Fuchs, jedes Tippen blättert weiter, der Satz jeder Seite steht klein zum Vorlesen darunter. Offen: Aufnahmen der Sätze (ElevenLabs), Übersetzungen, eine Fassung nur fürs nächtliche Abstillen („Die Milch schläft nachts“). Geschrieben (9. November 2026), noch ohne Bilder und nicht im Spiel: eine zweite, tiefere Geschichte in neun Kapiteln, „Tapsis Milchkette“ (milkChain.ts) – die Brust beim Namen, warum die Milch weniger wird, Tag, Nacht, Morgen und zuletzt der Abend, ein Abschiedsfest und das Vermissen.",
     },
     {
       id: "H-58",
