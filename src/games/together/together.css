@@ -29,7 +29,7 @@
 }
 
 .tg-top {
-  flex: 1.25;
+  flex: 1.75;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
@@ -91,7 +91,7 @@
     }
 
     .tg-top {
-      flex: 1.35;
+      flex: 1.6;
       justify-content: center;
       /* Below the page's corner (the ✕), which would lie over the picture's corner. */
       padding: calc(var(--corner-clear, 0px) + 2px) 8px max(calc(var(--frame, 0px) + 4px), env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));

@@ -15,7 +15,7 @@ const INTRO_MS = 9000;
  * `intro` (a game with many ways to play) is a note under it as play starts, telling grown-ups what they can choose
  * there; it fades by itself and goes when the options are opened.
  */
-export function PlayOptions({ children, intro }: { children: ReactNode; intro?: ReactNode }) {
+export function PlayOptions({ children, intro, iconOnly = false }: { children: ReactNode; intro?: ReactNode; iconOnly?: boolean }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [introShown, setIntroShown] = useState(intro !== undefined);
@@ -47,10 +47,13 @@ export function PlayOptions({ children, intro }: { children: ReactNode; intro?: 
           <span className="play-options-gear" aria-hidden>
             ⚙️
           </span>
-          <span className="play-options-label" aria-hidden>
-            <b>{label}</b>
-            <small>{hold}</small>
-          </span>
+          {/* `iconOnly`: just the gear, its name only read out (a game whose corner has room for nothing more). */}
+          {!iconOnly && (
+            <span className="play-options-label" aria-hidden>
+              <b>{label}</b>
+              <small>{hold}</small>
+            </span>
+          )}
         </button>
         {introShown && (
           <div

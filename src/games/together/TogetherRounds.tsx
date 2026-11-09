@@ -8,6 +8,7 @@ import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { loadRealSounds } from "@/lib/realSounds";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { dealRound, FIXED_LEVELS, nextKind, ROUNDS_PER_GAME, TOGETHER_LEVELS, type RoundKind, type TogetherRound } from "./levels";
+import { partImage } from "./frames";
 import { PAIRS, type Pair, pairsOf, TOGETHER_TEXTS } from "./pairs";
 import { TOPICS } from "./topics";
 import type { TogetherSettings } from "./settings";
@@ -17,6 +18,45 @@ import { togetherVoice } from "./voice";
 
 const OF_DAY = pairsOf("pair");
 const HELPERS = pairsOf("helper");
+
+/** The picture files a round shows: its own frames, and the first frame and partner picture of every choice. */
+function imagesOf(round: TogetherRound): string[] {
+  const urls: string[] = [];
+  for (const frame of round.pair.frames ?? []) urls.push(frame);
+  for (const choice of round.choices) {
+    const first = choice.frames?.[0];
+    if (first) urls.push(first);
+    const part = choice.partner.image && partImage(choice.partner.image);
+    if (part) urls.push(part);
+  }
+  return urls;
+}
+
+/**
+ * True once the round's pictures are decoded. The round's caption stands under its picture, so both come together:
+ * without this the text showed long before the picture file had loaded (user feedback, November 2026).
+ */
+function useImagesReady(round: TogetherRound): boolean {
+  const key = imagesOf(round).join("|");
+  const [loaded, setLoaded] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const urls = key ? key.split("|") : [];
+    Promise.all(
+      urls.map((src) => {
+        const img = new Image();
+        img.src = src;
+        return img.decode().catch(() => undefined);
+      }),
+    ).then(() => {
+      if (!cancelled) setLoaded(key);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [key]);
+  return loaded === key;
+}
 
 /** Developer code of a pair ("C07": its topic's letter, its place among that topic's pairs), to name a scene in feedback. */
 function pairCode(pair: (typeof PAIRS)[number]): string {
@@ -77,8 +117,9 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
   const language = useAppLanguage();
   const texts = pick(TOGETHER_TEXTS, language.id);
   const ready = useVoiceReady(togetherVoice, roundLines(round, texts), language.id, { next: [texts.question(next), texts.right(next)] });
+  const imagesReady = useImagesReady(round);
   const shownRef = useRef<{ turn: number; round: TogetherRound } | null>(null);
-  if (ready && shownRef.current?.turn !== turn) shownRef.current = { turn, round };
+  if (ready && imagesReady && shownRef.current?.turn !== turn) shownRef.current = { turn, round };
   const shown = shownRef.current;
 
   const auto = settings.difficulty === "auto";
