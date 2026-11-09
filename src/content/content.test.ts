@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, SHELF, UNFINISHED, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
+import { CATEGORIES, SHELF, UNFINISHED, bookIdOf, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
 import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -53,6 +53,16 @@ describe("home menu", () => {
   // The books on the shelf show a picture painted for them, not emojis (user decision, October 2026).
   test("every picture book on the shelf has a cover picture", () => {
     for (const category of CATEGORIES.filter((c) => !c.apart)) expect(existsSync(`src/components/bilder/cover-${category.id}.webp`), category.id).toBe(true);
+  });
+
+  // A book spine out carries a small picture from its own game on its label, never an emoji: the pictures look better
+  // (user feedback, November 2026).
+  test("every book spine out on the shelf has a picture from its game", () => {
+    for (const entry of SHELF.filter((e) => e.game)) {
+      for (const href of entry.game?.volumes?.map((v) => v.href) ?? [entry.href]) {
+        expect(existsSync(`src/components/bilder/spine-${bookIdOf(href)}.webp`), href).toBe(true);
+      }
+    }
   });
 
   test("every category has its world (backdrop, card colours, the picture on its card)", () => {
@@ -572,17 +582,18 @@ describe("Russian", () => {
 // User feedback, November 2026: the everyday helpers are what parents need most, so they stand first on the shelf
 // (top left); the Zeitplan, „Wie lange warten?“ and the Belohnungstafel, the shelf's eye-catcher, stand tied together
 // right of Aufs Töpfchen in that order, „Wie lange warten?“ left of the Belohnungstafel, and the newer helpers after them
-// once they are finished. The Timer is the very first book, top left (user decision, November 2026).
-test("the Alltagshelfer stand first on the shelf, the Timer top left, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
+// once they are finished. The Timer is the very first book, top left (user decision, November 2026), and „Abstillen“
+// stands right of it, left of Zähne putzen (user request, November 2026).
+test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen beside it, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
     "/timer/",
+    "/abstillen/",
     "/zaehne/",
     "/toepfchen/",
     "/belohnungstafel/",
-    "/abstillen/",
   ]);
-  expect(SHELF[3].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
+  expect(SHELF[4].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or

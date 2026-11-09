@@ -72,6 +72,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
+    href: "/abstillen/",
+    note: "Das Buch „Abstillen“ mit „Tapsis Milchkette“, der Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+  },
+  {
     href: "/zaehne/",
     parts: [
       {
@@ -154,11 +159,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/schnullerfee/",
     note: "Name, Satz auf dem Buchrücken, die Namen der Dinge (nur vorgelesen) und hinter ⚙️ „Abschied der Schnuller“ und „Geschenk der Fee“ mit den acht Geschenken, übersetzt am 3. November 2026. Die Geschichte selbst kommt ohne Worte aus.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-  },
-  {
-    href: "/abstillen/",
-    note: "Das Buch „Abstillen“ mit „Tapsis Milchkette“, der Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine.",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {

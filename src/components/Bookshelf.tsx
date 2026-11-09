@@ -33,6 +33,8 @@ interface ShelfBook {
   games?: string[];
   /** The cloth of a book standing spine out. */
   colour?: string;
+  /** The small picture from its game on the label of a book standing spine out (`bilder/spine-<id>.webp`). */
+  spine?: string;
   /** A game standing as several books tied together with a ribbon (`Game.volumes`): those books, spine out. */
   volumes?: ShelfBook[];
 }
@@ -54,9 +56,10 @@ const volumeColour = (href: string, i: number) => VOLUME_COLOURS[href] ?? DAILY_
 
 /**
  * How wide each book spine out stands, in picture books' widths: wide enough for its name in one line, big enough to
- * read, and thick enough for a child's finger (user feedback, November 2026; six books once had 1.6 together).
+ * read, and thick enough for a child's finger (user feedback, November 2026; six books once had 1.6 together, then
+ * 0.27 each was still too thin to hit on a phone).
  */
-const DAILY_SPINE = 0.27;
+const DAILY_SPINE = 0.38;
 
 /**
  * The room a book leaning left needs at its foot where it rests against the tied books upright left of it, in picture
@@ -111,9 +114,17 @@ for (const entry of SHELF) {
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
   };
   const volumes = entry.game?.volumes?.map(
-    (v, i): ShelfBook => ({ ...book, id: bookIdOf(v.href), href: v.href, title: v.title, emoji: v.emoji, colour: volumeColour(v.href, i) }),
+    (v, i): ShelfBook => ({
+      ...book,
+      id: bookIdOf(v.href),
+      href: v.href,
+      title: v.title,
+      emoji: v.emoji,
+      colour: volumeColour(v.href, i),
+      spine: pictures[`spine-${bookIdOf(v.href)}.webp`],
+    }),
   );
-  const daily = (n: number): ShelfBook => ({ ...book, colour: DAILY_COLOURS[n % DAILY_COLOURS.length], volumes });
+  const daily = (n: number): ShelfBook => ({ ...book, colour: DAILY_COLOURS[n % DAILY_COLOURS.length], spine: pictures[`spine-${book.id}.webp`], volumes });
   if (!entry.game) PLACES.push([book]);
   else if (last?.[0].colour && last[0].world === book.world) last.push(daily(last.filter((b) => !b.volumes).length));
   else PLACES.push([daily(0)]);
@@ -665,7 +676,7 @@ function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent
       onClick={onClick}
     >
       <span className="box-front">
-        <SpineLabel title={t(book.title)} emoji={book.emoji} />
+        <SpineLabel title={t(book.title)} picture={book.spine} />
       </span>
       <span className="box-left" />
       <span className="box-right" />
@@ -678,15 +689,14 @@ function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent
 }
 
 /**
- * The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running
- * down below in one line, never broken (user feedback, November 2026) – the longer the name, the smaller (`--len`).
+ * The paper label on the spine of a game's own book: a small picture from its game on top, so a child finds it at a
+ * glance – never an emoji, the pictures look better (user feedback, November 2026) – its name running down below in one
+ * line, never broken (user feedback, November 2026) – the longer the name, the smaller (`--len`).
  */
-function SpineLabel({ title, emoji }: { title: string; emoji: string }) {
+function SpineLabel({ title, picture }: { title: string; picture?: string }) {
   return (
     <span className="shelf-daily-label" style={{ "--len": [...title].length } as CSSProperties}>
-      <span className="shelf-daily-emoji" aria-hidden>
-        {emoji}
-      </span>
+      <img className="shelf-daily-picture" src={picture} alt="" decoding="async" draggable={false} />
       <span className="shelf-daily-title">{title}</span>
     </span>
   );
@@ -700,7 +710,7 @@ function BookFaces({ book, spine }: { book: ShelfBook; spine?: boolean }) {
   const t = useT();
   return (
     <>
-      <span className="box-left">{spine && <SpineLabel title={t(book.title)} emoji={book.emoji} />}</span>
+      <span className="box-left">{spine && <SpineLabel title={t(book.title)} picture={book.spine} />}</span>
       <span className="box-right" />
       <span className="box-top" />
       <span className="shelf-book-cover">

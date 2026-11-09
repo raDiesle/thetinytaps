@@ -377,10 +377,12 @@ In a fresh worktree run `bun install` first.
   user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
-  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Zähne putzen, Töpfchen, Belohnungstafel &
-  Zeitplan, Abstillen – user decision, October 2026; the Timer the very first book, top left, November 2026): each of its games is a book of its own, standing spine out side by side, its
-  emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
-  user feedback, October 2026), opening its game directly; they lean a little to the left together, on their bottom
+  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Abstillen, Zähne putzen, Töpfchen,
+  Belohnungstafel & Zeitplan – user decision, October 2026; the Timer the very first book, top left, Abstillen beside it,
+  November 2026): each of its games is a book of its own, standing spine out side by side, a small picture from its game
+  at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
+  user feedback, October 2026) – a picture or a cut of one, never an emoji, which looked poorer (`bilder/spine-<id>.webp`,
+  user feedback, November 2026; `content.test.ts` checks) – opening its game directly; they lean a little to the left together, on their bottom
   left corners (`--lean`), so the names running down their spines are read without bending the
   head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
@@ -389,8 +391,8 @@ In a fresh worktree run `bun install` first.
   „Wie lange warten?“ (the Zeitplan's Countdown), Zeitplan and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026).
   Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
-  three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger
-  (`DAILY_SPAN`), and lean a little differently, as books do. The Alltagshelfer are what parents
+  three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger on a
+  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do. The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked

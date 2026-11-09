@@ -74,8 +74,8 @@ export const CATEGORIES: Category[] = [
     },
     // Each a book of its own on the shelf, its name on its spine (user decision, October 2026). First on the shelf, top
     // left: the everyday helpers are what parents need most, and the Timer is the very first book (user decision,
-    // November 2026); the Belohnungstafel's books, the shelf's eye-catcher, stand right of Aufs Töpfchen (user feedback,
-    // November 2026).
+    // November 2026), „Abstillen“ right beside it, left of Zähne putzen (user request, November 2026); the
+    // Belohnungstafel's books, the shelf's eye-catcher, stand right of Aufs Töpfchen (user feedback, November 2026).
     apart: true,
     games: [
       {
@@ -91,6 +91,14 @@ export const CATEGORIES: Category[] = [
           ar: "الانتظار بالصور: قطار وساعة رملية وشمعة",
           ru: "Ожидание: поезд, песочные часы, свеча",
         },
+      },
+      {
+        // The book „Abstillen“ holds „Tapsis Milchkette“, the weaning story in chapters along the steps of gentle
+        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026).
+        href: "/abstillen/",
+        emoji: "🤱",
+        title: MILK_CHAIN_BOOK,
+        blurb: MILK_CHAIN_BLURB,
       },
       {
         href: "/zaehne/",
@@ -188,14 +196,6 @@ export const CATEGORIES: Category[] = [
           ar: "وداع اللهّاية في قصة",
           ru: "Прощаемся с пустышкой: история",
         },
-      },
-      {
-        // The book „Abstillen“ holds „Tapsis Milchkette“, the weaning story in chapters along the steps of gentle
-        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026).
-        href: "/abstillen/",
-        emoji: "🤱",
-        title: MILK_CHAIN_BOOK,
-        blurb: MILK_CHAIN_BLURB,
       },
     ],
   },
