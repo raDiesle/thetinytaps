@@ -20,5 +20,6 @@ export const CAUSE_HELP =
   "Beim anderen Bild schüttelt das Kind nur sanft den Kopf. Die vier Runden: Fuchskind traurig → 🎈 der Luftballon ist weggeflogen (nicht 🍦 Eis); " +
   "Bärenkind lacht → 👵 Oma kommt (nicht 🌧️ Regen); Bärenkind wütend → ✋🪏 jemand nimmt ihm die Schaufel (nicht 🛝 Rutsche); " +
   "Fuchskind erschrickt → 🐕 ein Hund bellt (nicht 🦋 Schmetterling). Danach „Nochmal“. " +
-  "Warum es noch nicht verständlich ist: Das Gefühl zeigt sich nur am kleinen Mund (traurig und wütend sehen gleich aus), die Gründe sind nur Emojis ohne Szene, " +
+  "Warum es noch nicht verständlich ist: Das Gefühl zeigt sich nur am kleinen Mund (traurig und wütend sehen gleich aus), die Gründe sind nur Emojis ohne Szene " +
+  "(sie werden durch Bilder ersetzt, die Gemini aus dem Text jeder Runde malt, und es kommen viel mehr Runden dazu), " +
   "nichts sagt die Frage, und es wird nicht gezeigt, wie es dazu kam. Das sind die Punkte, die vor dem Freischalten besser werden müssen.";

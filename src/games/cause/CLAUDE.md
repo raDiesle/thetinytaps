@@ -7,17 +7,22 @@ change (crying → smiling, the grown-up claps), then the next round comes. A wr
 gently. **Still being built** (`unfinished` in `games.ts`, user feedback, November 2026: trying it, the user didn't
 understand it): it stands neither in the book nor in search results, only under „🚧 In Arbeit“ on `/management/`, with
 its help text (`CAUSE_HELP` in `names.ts`, shown there as `Game.help`). Before publishing it, it must explain itself by
-playing: a feeling plain beyond the mouth (sad and angry are both `frown` now), causes shown as scenes rather than
-lone emojis, and the cause played out – then drop the mark, delete the help, and name the game again in the book's
+playing: a feeling plain beyond the mouth (sad and angry are both `frown` now), causes shown as pictures made with
+Gemini (`/bild-erzeugen`) from each round's text instead of emojis, many more rounds than four, and the cause played out – then drop the mark, delete the help, and name the game again in the book's
 search texts (`/spiele/gefuehle/`, all seven languages). Four rounds, then the shared end (`GameEnd`, „Nochmal“). Plays at once, no start screen, no settings, silent:
 no voice, only the sounds of a tap (`playTwinkle`, `playPlop`).
 - `CauseGame.tsx` – the start screen (`GameShell startMode="play"`).
 - `CausePlay.tsx` – the rounds, taps, keys (digits pick, any other key one at random), the timer to the next round.
-- `rounds.ts` – the rounds and their pictures (emojis; the `label` is for grown-ups and read out only).
+- `rounds.ts` – the rounds and their pictures (still emojis, to be replaced; the `label` is for grown-ups and read out only).
 - `names.ts` – the name and line, German only (the language row in `languageStatus.ts` says so).
 - `cause.css` – classes prefixed `cause-`.
 
 Rules of this game:
 - Exactly one picture per round fits the feeling (`cause.test.ts`).
-- The pictures are emojis, not drawings: no text in them.
+- **No emojis as the pictures of what happened** (user feedback, November 2026: „die Verwendung von Emoticons ist einfach
+  schlecht“). Each cause is a picture made with Gemini from the round's text (`label`, `/bild-erzeugen`, through the
+  picture queue), showing the scene – the balloon flying off from the child's paw, the dog barking at it – never an
+  emoji or two side by side (`✋🪏`). The emojis there now are placeholders until those pictures are made; a new round
+  comes with its picture's prompt, never with an emoji. No text in the pictures.
+- Many rounds, not four (user plan, November 2026): the game gets many more scenes, written first as text, then drawn.
 - The head shake is on the HTML layer round the child's svg (`.cause-no`), never inside the svg.
