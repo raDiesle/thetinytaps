@@ -282,6 +282,19 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/was-ist-passiert/",
+    note: "Ein Fuchs- oder Bärenkind zeigt sein Gefühl, der große Fuchs oder Bär daneben klatscht, wenn die richtige Antwort gefunden ist; die Bilder sind Emoji.",
+    tasks: [
+      {
+        label: "Fuchs- oder Bärenkind mit Papa oder Mama zeigt das Gefühl und reagiert auf das richtige Bild",
+        work: "drawing",
+        effort: "S",
+        idea: "J-03",
+        state: "done",
+      },
+    ],
+  },
+  {
     href: "/tiere/",
     note: "Emoji; der Fuchs mit seinem Bau ist schon dabei.",
     tasks: [{ label: "Fuchs und Fuchsbau", work: "drawing", effort: "S", state: "done" }],

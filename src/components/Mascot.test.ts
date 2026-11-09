@@ -74,6 +74,8 @@ describe("the shared fox and bear", () => {
       "src/games/together/pairs.tsx":
         "Was gehört zusammen?: the child the doctor listens to and the hairdresser cuts, and the family the key opens the door to",
       "src/games/timer/tennis.tsx": "Timer, Tennis (H-71): the two children taking turns, hitting the ball over the net",
+      "src/games/cause/CausePlay.tsx":
+        "Was ist passiert? (J-03): the child shows its feeling, and the grown-up beside it claps once the right picture is found",
     };
     for await (const file of new Bun.Glob("src/**/*.tsx").scan(".")) {
       if (file.endsWith("Mascot.tsx")) continue;

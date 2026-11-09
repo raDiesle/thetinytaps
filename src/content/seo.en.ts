@@ -30,7 +30,7 @@ export const SEO_EN: SeoTranslation = {
     "/spiele/gefuehle/": {
       title: "Feelings Games for Toddlers",
       description: "Everyday situations with the little bear, How are you? and What do I need? – the child shows its feeling, how strong it is and what helps.",
-      text: "A picture book about feelings with three games: in Everyday Situations the little bear lives through what children know, day by day – anger, sadness, fear and joy – and the child picks what helps. In “How are you?” the child shows its own feeling and how strong it is, and in “What do I need?” what does it good now.",
+      text: "A picture book about feelings with four games: in Everyday Situations the little bear lives through what children know, day by day – anger, sadness, fear and joy – and the child picks what helps. In “How are you?” the child shows its own feeling and how strong it is, and in “What do I need?” what does it good now. In “What Happened?” the child sees why a feeling is there.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Letters and Numbers – Keyboard Games",
@@ -65,6 +65,11 @@ export const SEO_EN: SeoTranslation = {
       title: "How Are You? Showing Feelings for Toddlers",
       description: "Happy, proud, tired or angry: the child taps the picture that fits its feeling and shows how strong it is right now. No ads.",
       text: "Eight feelings in two groups, the pleasant and the unpleasant ones, each with the little bear in a moment children know. The child taps its feeling, then three pictures show the same feeling a little, quite a lot and a whole lot, and the child picks how strong it is right now. From there it goes on to “What do I need?”. A start for talking about feelings.",
+    },
+    "/was-ist-passiert/": {
+      title: "What Happened? Understanding Feelings for Toddlers",
+      description: "The child sees a feeling and taps what happened: the balloon flew away, Grandma comes, a dog barks. No ads.",
+      text: "A child cries, laughs, is angry or startled, and two pictures show what might have happened. The child taps the one that fits and sees that feelings have a reason. A start for talking with toddlers about why.",
     },
     "/was-brauche-ich/": {
       title: "What Do I Need? Showing Needs for Toddlers",
