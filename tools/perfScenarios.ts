@@ -200,10 +200,11 @@ export const SCENARIOS: Scenario[] = [
       { label: "Gefühl wählen", before: [{ wait: 1500 }], ms: 4000, tap: TAPS },
       {
         label: "Wie doll",
-        // The taps before left a feeling open: the page starts again on the cards (waiting first, or the old page is
-        // found), its fullscreen question answered as at the start.
+        // The taps before left a feeling open, or went on to „Was brauche ich?“ by its link: the page starts again at
+        // its own address (a reload stayed on the other page), waiting first or the old page is found, its fullscreen
+        // question answered as at the start.
         before: [
-          { eval: "location.reload()" },
+          { eval: "location.assign('/wie-gehts-dir/')" },
           { wait: 4000 },
           { tap: ".screen-hint-button", optional: true },
           { wait: 500 },
@@ -214,15 +215,16 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
   },
-  // „Was brauche ich?“, „Tief pusten“: the breath's circle grows and shrinks round the big face.
+  // „Was brauche ich?“, „Stampfen und pusten“: the picked card stays where it stands, the others going pale, while
+  // the two slow breaths are said (the breath's circle round a big face is gone, November 2026).
   {
     name: "was-brauche-ich-pusten",
     path: "/was-brauche-ich/",
     parts: [
       {
-        label: "Zusammen pusten",
-        before: [{ wait: 1500 }, { tap: '.fg-card[aria-label="Tief pusten"]' }, { waitFor: ".mood-breath" }],
-        ms: 8000,
+        label: "Stampfen und pusten",
+        before: [{ wait: 1500 }, { waitFor: '.fg-card[aria-label="Stampfen und pusten"]' }, { tap: '.fg-card[aria-label="Stampfen und pusten"]' }],
+        ms: 6000,
       },
     ],
   },
