@@ -311,6 +311,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
         note: "NEEDS in needs.ts: Kuscheln, allein sein, toben, trinken und das Lied mit ihren Sätzen übersetzt (5. November 2026), „Was brauchst du jetzt?“, „Stampfen und pusten“, „Etwas essen“ und „Ausruhen“ am 7. November 2026; das gemeinsame Pusten (CALM_LINE, CALM_DONE) übersetzt. Außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026).",
       },
+      {
+        label: "Grundbedürfnisse: Aufs Töpfchen, Warm anziehen, Ein Pflaster, Frische Luft",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, nur Deutsch, Bilder gemacht. Übersetzungen und Aufnahmen kommen erst, wenn die Eltern sie wollen.",
+      },
     ],
   },
   {

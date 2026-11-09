@@ -53,10 +53,12 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
 - **„Was brauche ich?“** (`NeedsPlay.tsx`, `needs.ts`, C-31; the second card of „Wie geht's dir?“ since 9 November 2026, its
   old address `/was-brauche-ich/` leads there): cards of what the
   child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
-  ausruhen, ein Lied) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
+  ausruhen, ein Lied, and the „Grundbedürfnisse“ of 9 November 2026 – aufs Töpfchen, warm anziehen, ein Pflaster, frische
+  Luft, German only for now, their pictures `brauche-toilette` … `brauche-luft` drawn the same day with the bear's first
+  picture as the only reference, prompts in `bilder/README.md`) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
   ist es?“, and stay tappable to change it) and its line says it does good, so the grown-up sees what the child needs.
   **A need never shows big** (user feedback, November 2026: the picture was not to be tapped open): no big picture,
-  no screen of its own, so the corner always leaves the game (`feelings.test.ts`). Every card is a picture of the little bear doing it (`brauche-…`, made 6 November 2026), never
+  no screen of its own, so the corner always leaves the game (`feelings.test.ts`). Every card is a picture of the little bear doing it (`brauche-…`, made 6 and 9 November 2026), never
   a drawn head among them: „Tief pusten“ was the bear's drawn face with a breathing circle and didn't fit the pictures
   beside it (user feedback, November 2026), so it became a scene too – the bear stamping on the floor and blowing out,
   the breath seen as a swirl rising upwards. Picked, it is done together (`Need.together`): „Komm, wir pusten

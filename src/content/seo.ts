@@ -141,7 +141,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/wie-gehts-dir/",
     title: "Wie geht's dir? Gefühle zeigen für Kleinkinder",
     description: "Fröhlich, stolz, müde oder wütend: Das Kind tippt auf das Bild, das zu seinem Gefühl passt, und zeigt, wie doll es gerade ist. Ohne Werbung.",
-    text: "Acht Gefühle in zwei Gruppen, die angenehmen und die unangenehmen, jedes mit dem kleinen Bären in einem Moment, den Kinder kennen. Das Kind tippt auf sein Gefühl, dann zeigen drei Bilder dasselbe Gefühl ein bisschen, schon ziemlich und ganz doll, und das Kind wählt, wie doll es gerade ist. Auf der Startseite steht auch „Was brauche ich?“: Dort zeigt das Kind mit einem Bild, was ihm jetzt guttut – in den Arm nehmen, allein sein, toben, trinken, essen oder ausruhen. Ein Anfang für Gespräche über Gefühle.",
+    text: "Acht Gefühle in zwei Gruppen, die angenehmen und die unangenehmen, jedes mit dem kleinen Bären in einem Moment, den Kinder kennen. Das Kind tippt auf sein Gefühl, dann zeigen drei Bilder dasselbe Gefühl ein bisschen, schon ziemlich und ganz doll, und das Kind wählt, wie doll es gerade ist. Auf der Startseite steht auch „Was brauche ich?“: Dort zeigt das Kind mit einem Bild, was ihm jetzt guttut – in den Arm nehmen, allein sein, toben, trinken, essen, ausruhen, aufs Töpfchen, warm anziehen, ein Pflaster oder frische Luft. Ein Anfang für Gespräche über Gefühle.",
   },
   {
     path: "/was-ist-passiert/",

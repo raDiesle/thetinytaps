@@ -510,19 +510,20 @@
 /* „Was brauche ich?“: its cards four by two, on upright screens two by four. */
 .mood-needs {
   /* The cards' paper rings stay on the screen too: 9px round them, 15px below. */
-  --card-w: min((100cqw - 2 * var(--pad) - 18px - 3 * var(--gap)) / 4, (100cqh - var(--top) - var(--pad) - 24px - var(--gap) - 2 * var(--label)) / 1.5);
+  --card-w: min((100cqw - 2 * var(--pad) - 18px - 5 * var(--gap)) / 6, (100cqh - var(--top) - var(--pad) - 24px - var(--gap) - 2 * var(--label)) / 1.5);
 
   display: grid;
-  grid-template-columns: repeat(4, auto);
+  /* Twelve cards: six in a row, two rows, so all of them fit on a phone lying on its side without scrolling. */
+  grid-template-columns: repeat(6, auto);
   gap: var(--gap);
   margin-top: var(--corner-clear, 0px);
 }
 
 @media (max-aspect-ratio: 1 / 1) {
   .mood-needs {
-    --card-w: min((100cqw - 2 * var(--pad) - 18px - var(--gap)) / 2, (100cqh - var(--top) - var(--pad) - 24px - 3 * var(--gap) - 4 * var(--label)) / 3);
+    --card-w: min((100cqw - 2 * var(--pad) - 18px - 2 * var(--gap)) / 3, (100cqh - var(--top) - var(--pad) - 24px - 3 * var(--gap) - 4 * var(--label)) / 3);
 
-    grid-template-columns: repeat(2, auto);
+    grid-template-columns: repeat(3, auto);
   }
 }
 

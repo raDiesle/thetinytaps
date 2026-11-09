@@ -129,9 +129,9 @@ function inlineTexts(code: string): InlineText[] {
   return found;
 }
 
-/** Whether `row` says the texts of `language` are there: every part without recordings at least translated. */
+/** Whether `row` says the texts of `language` are there: every part at least translated, recorded parts too (a German-only spoken line must show as missing, not hide behind its recording). */
 function textsDone(row: LanguageStatusRow, language: string) {
-  const parts = row.parts ? row.parts.filter((p) => !p.recorded) : [row];
+  const parts = row.parts ?? [row];
   return parts.every((p) => {
     const state = p.languages?.[language as keyof typeof p.languages];
     return state === "done" || state === "text";

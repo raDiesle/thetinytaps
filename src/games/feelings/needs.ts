@@ -41,7 +41,7 @@ export const CALM_DONE: Localized = {
 };
 
 /** What a child may need now; each has its card. */
-export type NeedId = "kuscheln" | "allein" | "toben" | "pusten" | "trinken" | "essen" | "ausruhen" | "lied";
+export type NeedId = "kuscheln" | "allein" | "toben" | "pusten" | "trinken" | "essen" | "ausruhen" | "lied" | "toilette" | "waerme" | "pflaster" | "luft";
 
 /** The game's name (C-31, a game of its own since November 2026). */
 export const NEEDS_TITLE: Localized = {
@@ -75,6 +75,31 @@ export interface Need {
   /** Done together rather than only said: `CALM_LINE`, two slow breaths, then `CALM_DONE` (stamping and blowing). */
   together?: boolean;
 }
+
+// The „Grundbedürfnisse“ (user wish, 9 November 2026): what a child needs in the day besides eating and drinking. German
+// only for now: translations and recordings come when the user asks (`languageStatus.ts` lists what is missing).
+const BASIC_NEEDS: Need[] = [
+  {
+    id: "toilette",
+    caption: { de: "Aufs Töpfchen" },
+    answer: { de: "Aufs Töpfchen gehen tut gut." },
+  },
+  {
+    id: "waerme",
+    caption: { de: "Warm anziehen" },
+    answer: { de: "Warme Sachen tun gut." },
+  },
+  {
+    id: "pflaster",
+    caption: { de: "Ein Pflaster" },
+    answer: { de: "Ein Pflaster hilft." },
+  },
+  {
+    id: "luft",
+    caption: { de: "Frische Luft" },
+    answer: { de: "Frische Luft tut gut." },
+  },
+];
 
 /** The needs in the order of their cards: comfort and quiet first, then moving, eating and drinking, resting, a song. */
 export const NEEDS: Need[] = [
@@ -200,6 +225,7 @@ export const NEEDS: Need[] = [
       ru: "Песенка — это хорошо.",
     },
   },
+  ...BASIC_NEEDS,
 ];
 
 /** Read aloud when the cards come. */
