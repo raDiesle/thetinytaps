@@ -8,8 +8,10 @@
    „Alltagssituationen“ (`RoundPlay`, user wish, November 2026) is a column on every screen: the picture as big as the
    room allows, and under it everything the voice says with it, whole (`StoryWords`), in Abstillen's letters. While the
    child chooses, the two cards A and B take the picture's room, as big as it allows, the scene small above them (left
-   out on a phone) and its text under them. ◀ bottom left, ▶ bottom right and the loudspeaker left of ▶ stand beside the
-   text, in the room it keeps free for them. The dots and the ✕ lie above the pictures. */
+   out on a phone) and its text under them. No room is wasted (user feedback, November 2026, asked twice): on a wide
+   screen ◀ stands in a narrow column of its own on the left, ▶ with the loudspeaker above it on the right, and the
+   pictures and the text take everything between them from top to bottom, the dots lying on the picture's top edge;
+   upright the buttons stand under the text and the dots above the picture. */
 
 .story-play {
   /* Edges and the room between the cards. */
@@ -19,8 +21,12 @@
   --top: calc(max(4px, env(safe-area-inset-top)) + 34px);
   /* Round a picture: a chosen one's ring (10px), its tick or cross half outside it. */
   --ring: 14px;
-  /* Beside the text: ◀ on the left; ▶ and the loudspeaker on the right – the same on both sides, so the text stays in the middle. */
-  --beside: calc(var(--next-w) + var(--note-w) + var(--pad) + 10px);
+  /* The caption under a card: the ring and shadow below it, a gap and two lines. */
+  --cap-font: 0.85rem;
+  --cap: calc(18px + 2.6 * var(--cap-font));
+  /* The letter's circle and the ring stand out of a card; between the two cards the rings keep clear room. */
+  --out: 14px;
+  --between: calc(var(--gap) + 18px);
 
   position: absolute;
   inset: 0;
@@ -30,6 +36,17 @@
   padding: var(--top) var(--pad) max(var(--pad), env(safe-area-inset-bottom));
   background: linear-gradient(var(--sky-bottom), var(--cream));
   container-type: size;
+}
+
+/* A wide screen: the pictures are as tall as the screen allows, so ◀ and ▶ get columns of their own beside them,
+   where a 4:3 picture leaves room anyway, and the dots lie on the picture's top edge instead of a row of their own. */
+@media (min-aspect-ratio: 6 / 5) {
+  .story-play {
+    --top: max(4px, env(safe-area-inset-top));
+    --side: calc(var(--pad) + var(--next-w) + 8px);
+
+    padding-inline: max(var(--side), env(safe-area-inset-left)) max(var(--side), env(safe-area-inset-right));
+  }
 }
 
 /* ---------- How far along a story is: one dot per step, on top of the picture ---------- */
@@ -342,8 +359,6 @@
   align-items: center;
   justify-content: center;
   column-gap: 0.7em;
-  min-height: var(--next-w);
-  padding-inline: var(--beside);
   /* Laid out left to right in every language, so each curl stays outside; Arabic text inside still runs right to left. */
   direction: ltr;
   font-size: var(--caption-size);
@@ -386,12 +401,23 @@
   line-height: 1;
 }
 
-/* Upright the screen is too narrow for the text between the buttons: they stand under it, and the curls go. */
+/* Upright the screen is too narrow for the text between the buttons: they stand under it. On a phone, and upright,
+   the curls go too, so the text takes fewer lines and the pictures more room. */
 @media (max-aspect-ratio: 6 / 5) {
   .fg-words {
     grid-template-columns: minmax(0, 1fr);
-    min-height: 0;
     padding: 0 0 calc(var(--next-w) + 6px);
+  }
+
+  .fg-words::before,
+  .fg-words::after {
+    display: none;
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .fg-words {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .fg-words::before,
@@ -414,6 +440,22 @@
   border-radius: 14px;
 }
 
+@media (min-aspect-ratio: 6 / 5) {
+  /* While choosing, the cards' row is only as tall as the cards, which the width sets on most screens; the small scene
+     above them takes all the rest, never less than 22 % (the page fills the screen, so 100svw is its width). */
+  .story-play[data-stage="choose"] {
+    grid-template:
+      "scene" minmax(22%, 1fr)
+      "choices" minmax(0, calc((100svw - 2 * var(--side) - var(--between) - 4 * var(--out)) / 2 * 3 / 4 + var(--cap) + 2 * var(--out)))
+      "words" auto / minmax(0, 1fr);
+  }
+
+  /* The small scene above the cards keeps clear of the dots. */
+  .story-play[data-stage="choose"] .story-scene {
+    padding-top: 32px;
+  }
+}
+
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .story-play[data-stage="choose"] {
     grid-template: "choices" minmax(0, 1fr) "words" auto / minmax(0, 1fr);
@@ -426,13 +468,6 @@
 
 /* The two cards side by side, each with its caption under it; only the cards take taps. */
 .story-choices {
-  /* The caption under a card: the ring and shadow below it, a gap and two lines. */
-  --cap-font: 0.85rem;
-  --cap: calc(18px + 2.6 * var(--cap-font));
-  /* The letter's circle and the ring stand out of a card; between the two cards the rings keep clear room. */
-  --out: 14px;
-  --between: calc(var(--gap) + 18px);
-
   position: relative;
   z-index: 3;
   grid-area: choices;
@@ -880,7 +915,6 @@
   position: relative;
   z-index: 4;
   grid-area: ending;
-  padding-inline: var(--beside);
 }
 
 .story-play .game-end {
@@ -989,6 +1023,14 @@
   display: flex;
   align-items: stretch;
   padding: 8px;
+}
+
+/* On a wide screen the loudspeaker stands right above ▶, in its column, so the text and pictures keep the room between. */
+@media (min-aspect-ratio: 6 / 5) {
+  .story-play .story-corner {
+    right: calc(var(--pad) - 8px + (var(--next-w) - var(--note-w)) / 2);
+    bottom: calc(var(--pad) + var(--next-w) - 4px);
+  }
 }
 
 /* A paper note like the ones clipped to the page, switched by one tap. */

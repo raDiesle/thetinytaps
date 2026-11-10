@@ -215,6 +215,10 @@ test("choosing: small scene, A and B in two colours, and only the chosen picture
   expect(css).toMatch(/\.fg-choice\[data-letter="B"\] \{\s*--letter: [^;]+;/);
   expect(css, "no caption on a picture any more").not.toContain("fg-picture-caption");
   expect(css, "the text in the book's serif with a big first letter").toMatch(/\.fg-words-text::first-letter \{[^}]*font-size: 1\.5em/);
+  // No room wasted (user feedback, November 2026, asked twice): on a wide screen ◀ and ▶ stand in columns of their own
+  // beside the pictures, and while choosing the small scene takes what the cards (as wide as they can be) leave.
+  expect(css, "◀ and ▶ in columns beside the pictures").toContain("--side: calc(var(--pad) + var(--next-w) + 8px);");
+  expect(css, "the small scene takes the cards' leftover room").toContain('"scene" minmax(22%, 1fr)');
   expect(css, "a phone hides the scene while choosing").toMatch(/\.story-play\[data-stage="choose"\] \.story-scene \{\s*display: none;/);
 });
 

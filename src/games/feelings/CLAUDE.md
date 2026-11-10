@@ -210,8 +210,15 @@ A caption, big or on a card, always shows whole: it takes a second line, never �
 **Layout (user's choice, November 2026):** one grid (`.story-play`): the scene, then the text, then (at a pass's end)
 „Nochmal“ and „Weiter“. The scene is as big as the room above the text allows while it is told and shown. While the
 child chooses (`data-stage="choose"`) it is small on top (left out on a phone), the cards A (not-so-good, left) and B
-(good, right) below it, upright one above the other, each with its caption small under it. The text keeps clear of ◀
-bottom left and of ▶ and the loudspeaker bottom right (`--beside`); upright, where it is narrow, they stand below it.
+(good, right) below it, upright one above the other, each with its caption small under it.
+**No room is wasted** (user feedback, November 2026, asked a second time): on a wide screen a 4:3 picture leaves room
+at its sides anyway, so ◀ stands in a narrow column of its own on the left and ▶ with the loudspeaker right above it on
+the right (`--side`), the dots lie on the picture's top edge instead of a row of their own, and the pictures and the text
+take everything between from top to bottom; the curls beside the text go on a phone, where they cost a line. While
+choosing, the cards' row is only as tall as the cards as wide as they can be, and the small scene above takes all the
+rest (`minmax(22%, 1fr)`). Upright, where the pictures take the whole width, the buttons stand under the text. After a
+change measure the pictures' boxes against their room (`getBoundingClientRect`) at each size, not only by eye: a gap of
+a fifth of the screen round the cards was there before.
 Cards are never see-through or pale by opacity: a crossed-out or waiting card goes pale by filter. Look at 844×390,
 390×844, 1024×768 and 1280×720 after a change.
 
