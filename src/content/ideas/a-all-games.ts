@@ -212,6 +212,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 9. November 2026 (altes Android nachgebildet, zweimal gemessen): beim Putzen 49–56 Bilder pro Sekunde, das langsamste Zwanzigstel 33 ms, 43–54 % beschäftigt, und das Handy malt 32–47 ganze Bildschirme pro Sekunde neu (Grenze 30) – am meisten, wenn der Kopf sich dreht (47) und der Mund zugeht (44–47); auch die Geschichte „Süßes“ (34–36). Die Zeit geht ins Neuzeichnen des ganzen Gesichts in jedem Bild: roundedPath, fmt2, toward und turn in mouth.tsx rechnen jede Fläche jedes Zahns neu. Lösung: die Pfade je Blickwinkel und Mundöffnung einmal bauen und aufheben (wie mouthAt die Modelle), und Kopfdrehen und Mundschließen als wenige vorgezeichnete Bilder überblenden statt jedes Bild neu zu zeichnen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
+      done: true,
     },
     {
       id: "A-26",
@@ -237,6 +238,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 9. November 2026 (Flughafen, zweimal): 57–59 Bilder pro Sekunde, aber der Hauptfaden ist zu 77–90 % beschäftigt (Grenze 60 %), fast alles Malen (rund 700–780 Malvorgänge pro Sekunde); React selbst kostet wenig. Der Flughafen hat rund 150 CSS-Animationen, und was sich *im* großen SVG bewegt, lässt das Handy das ganze Bild in jedem Bild neu malen. Lösung: Was gerade angetippt spielt, als kleine eigene HTML-Ebene über dem Bild bewegen (wie die Fahrzeuge in LaneLayer und Sprite in Zähne putzen), nichts innerhalb des großen SVG animieren; danach auch die anderen Bilder messen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "L",
+      done: true,
     },
     {
       id: "A-29",

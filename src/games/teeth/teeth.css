@@ -403,9 +403,8 @@
   animation: none;
 }
 
-.tooth-sparkle {
-  transform-box: fill-box;
-  transform-origin: center;
+/* A sparkle is a small layer of its own (Sprite): its svg pops in and twinkles as a whole, never something inside it. */
+.tooth-sparkle > svg {
   animation:
     pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay) backwards,
     twinkle 1.6s ease-in-out calc(var(--delay) + 0.4s) infinite;
@@ -625,7 +624,7 @@
 
   .monster-body,
   .zone-glow,
-  .tooth-sparkle,
+  .tooth-sparkle > svg,
   .monster-glow {
     animation: none;
   }
@@ -711,6 +710,34 @@
   pointer-events: none;
 }
 
+/* The story's moving pieces (Piece in origin.tsx): picture units on the screen, each piece a small layer of its own
+   that its keyframes move as a whole, over the still pictures (the sky, the child). */
+.origin-space {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.origin-piece {
+  position: absolute;
+  will-change: transform;
+}
+
+.origin-piece > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.origin-piece .monster-body {
+  pointer-events: auto;
+}
+
 /* The camera: from the head to the mouth while the monsters grow (origin.tsx sets where), 4 beats from beat 4.
    It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again in every frame. */
 .origin-camera {
@@ -757,11 +784,6 @@
 }
 
 /* The mouth closes, chews twice and opens again (its animations are set in origin.tsx, one per sweet). */
-.origin-mouth {
-  transform-box: view-box;
-  transform-origin: 220px 268px;
-}
-
 @keyframes teeth-origin-chew {
   25%,
   42% {
@@ -776,7 +798,6 @@
 }
 
 .origin-crumb {
-  transform-box: fill-box;
   transform-origin: center;
 }
 
@@ -803,7 +824,6 @@
 }
 
 .origin-monster {
-  transform-box: fill-box;
   transform-origin: 50% 100%;
   animation: teeth-origin-grow 1.2s ease-out var(--grow) backwards;
 }
@@ -817,7 +837,6 @@
 
 /* The child gets worried as the monsters grow: brows up in the middle, eyes on the teeth. */
 .origin-brow {
-  transform-box: fill-box;
   transform-origin: center;
 }
 
@@ -852,9 +871,8 @@
 }
 
 /* Time goes by: the sun (or the moon) crosses the sky over the head while the monsters grow. */
+/* It turns round a point far below it (set in origin.tsx). */
 .origin-sky-body {
-  transform-box: view-box;
-  transform-origin: 220px 560px;
   transform: rotate(-35deg);
 }
 
@@ -950,7 +968,6 @@
 }
 
 .origin-heart {
-  transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
   animation: teeth-origin-heart 1.608s ease-out var(--at) backwards;
@@ -984,8 +1001,8 @@
 }
 
 .origin-cheek {
-  transform-box: fill-box;
   transform-origin: center;
+  opacity: 0.65;
 }
 
 @keyframes teeth-origin-glow {

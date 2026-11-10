@@ -36,6 +36,17 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
   management page – never import it in the game (`scenes.test.ts` checks, and that both lists agree). Whatever
   another picture is needed for loads it ahead: a vehicle driving off loads the picture it drives to, the party the
   next picture for „Weiter“, and a visiting vehicle's own picture loads with the one it visits (`ScenesGame`).
+- **A picture is a stack of svgs, one per item** (A-28, November 2026: with all items in one svg an old phone painted
+  the whole airport again in every frame while a tapped item moved – busy 84–96 %, now 43–53 %): the background's svg
+  (`scene-svg`) holds only the still background and its colouring copy; each item, what background taps bring out,
+  the overlay and the marks have a `SceneLayer` of their own, all full-size with the picture's viewBox, so the stack
+  looks exactly like one svg. An item's layer is a layer of the graphics card while it plays or drives (`moving`), not
+  at the party, where dozens at once would fill an old phone's memory. Never put something that moves back into the
+  background's svg (`layers.test.ts`), and since an item now lies in an svg of its own, its drawing must not rely on
+  the background's ids or structure: a gradient, filter or clip path it uses is defined in its own drawing (the grey
+  filter of colouring in is the one shared reference). Cropping an item's svg to its own box measured worse – don't.
+  The background's own movements (`<Poke>`, the gust of wind) still repaint it whole; they are short and only on a tap.
+  `bun run perf bilder` measures the airport after changing what moves.
 - New picture or many new items: run `/neue-szene` (`.claude/skills/neue-szene/SKILL.md`); it has the full
   guide to depth, keys, drawing style, animations and the browser checks.
 - Two of the hidden surprises are the app's mascots as a family (`MascotFamily` in `hideout.tsx`): the fox or bear

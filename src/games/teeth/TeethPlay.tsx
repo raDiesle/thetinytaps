@@ -221,8 +221,8 @@ const formatTime = (ms: number) => {
 
 const ease = (k: number) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
 
-/** Glides from one view to the next, so the child sees the head turn and the mouth open. */
-function useGlidingView(target: View, ms: number): View {
+/** Glides from one view to the next, so the child sees the head turn and the mouth open; `gliding` while it does. */
+function useGlidingView(target: View, ms: number): { view: View; gliding: boolean } {
   const [view, setView] = useState(target);
   const current = useRef(target);
   useEffect(() => {
@@ -231,7 +231,7 @@ function useGlidingView(target: View, ms: number): View {
     let frame = 0;
     const step = (t: number) => {
       const k = ms <= 0 ? 1 : Math.min(1, (t - start) / ms);
-      current.current = lerpView(from, target, ease(k));
+      current.current = k >= 1 ? target : lerpView(from, target, ease(k));
       setView(current.current);
       if (k < 1) frame = requestAnimationFrame(step);
     };
@@ -243,7 +243,7 @@ function useGlidingView(target: View, ms: number): View {
       clearTimeout(arrive);
     };
   }, [target, ms]);
-  return view;
+  return { view, gliding: view !== target };
 }
 
 /** Elapsed time that can be paused and jumped around in. */
@@ -580,7 +580,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const scene: SceneKind =
     before === "sweets" || before === "grow" ? "story" : before === "brush" || before === "paste" || ending === "tidy" ? "sink" : "mirror";
   const target = step?.view ?? GRIN_VIEW;
-  const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
+  const { view, gliding } = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
   // The brush glides along the step's teeth and reaches each monster just as it goes.
   const inStep = monsters.filter((m) => m.step === phase);
@@ -635,6 +635,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
               happy={done}
               daytime={daytime}
               action={action}
+              gliding={gliding}
               free={room}
               onTickle={tickle}
             />
