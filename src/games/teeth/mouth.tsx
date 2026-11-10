@@ -192,6 +192,11 @@ interface MouthProps {
   daytime: Daytime;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
+  /**
+   * The head turns or the mouth opens or closes: the picture is drawn anew in every frame, so the glow on the teeth
+   * to brush waits until it holds still (the yellow of those teeth shows the way meanwhile).
+   */
+  gliding: boolean;
   /** The free part of the screen between heading and controls, where the mouth has to fit. */
   free: RefObject<HTMLElement | null>;
   onTickle: (id: number) => void;
@@ -256,7 +261,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, daytime, action, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gliding, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -296,8 +301,13 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
   const lipsPath = useMemo(() => smoothPath(lipPoints), [lipPoints]);
 
   const svg = useRef<SVGSVGElement>(null);
-  const { box, unit } = fitBox(useRoom(svg, free), mouthFocus(lipPoints, project.zoom, view.open));
+  const room = useRoom(svg, free);
+  const { box, unit } = fitBox(room, mouthFocus(lipPoints, project.zoom, view.open));
   const frame = screenFrame(box, unit);
+  // The mirror's glass and frame stay where they are on the screen however the picture zooms, so they are drawn in
+  // screen px: an svg whose viewBox changed with every frame of a turning head was painted anew each time.
+  const screen = { width: Math.round(room?.width ?? box.width), height: Math.round(room?.height ?? box.height) };
+  const screenEdge = screenFrame({ x: 0, y: 0, ...screen }, 1);
   const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
   /** A point of the picture in screen px from the screen's middle (where the box's middle lies), and `scale` in px. */
   const onScreen = (at: { x: number; y: number }, scale: number): SpriteSpot => ({
@@ -415,6 +425,18 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
     );
   };
 
+  // The lips over the glow's edge, in a layer of their own above it, so the glow stays inside them; with them the
+  // monsters waiting for a later step, which stand still. While the head turns or the mouth opens there is no glow and
+  // every layer with the picture's viewBox is drawn anew in every frame, so they join the still picture instead:
+  // one screen painted per frame rather than two.
+  const lipsAndWaiting = (
+    <>
+      <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
+      <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
+      {monsters.filter((m) => m.waiting).map(placed)}
+    </>
+  );
+
   // Pictures on top of each other, all with the same viewBox and size, so they line up exactly: the still one below
   // (face, teeth), then each in a layer of its own the glow on the teeth to brush (the whole svg pulses, which a phone
   // does without painting), the lips and the waiting monsters, what moves (the monsters being brushed, the arrows on
@@ -434,10 +456,13 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
           </clipPath>
         </defs>
         <rect {...frame} fill="#dff6ff" />
-        <g clipPath="url(#mirror)">{still}</g>
+        <g clipPath="url(#mirror)">
+          {still}
+          {gliding && lipsAndWaiting}
+        </g>
       </svg>
 
-      {zone && (
+      {zone && !gliding && (
         <svg className="mouth mouth-moving zone-glow" viewBox={viewBox} aria-hidden>
           <defs>
             <clipPath id="mirror-glow">
@@ -460,65 +485,49 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
         </svg>
       )}
 
-      <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
-        <defs>
-          <clipPath id="mirror-moving">
-            <rect {...frame} />
-          </clipPath>
-        </defs>
-        <g clipPath="url(#mirror-moving)">
-          {/* The lips over the glow's edge, here rather than with the still picture, so the glow stays inside them. */}
-          <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
-          <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
-          {monsters.filter((m) => m.waiting).map(placed)}
-        </g>
-      </svg>
+      {!gliding && (
+        <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
+          <defs>
+            <clipPath id="mirror-moving">
+              <rect {...frame} />
+            </clipPath>
+          </defs>
+          <g clipPath="url(#mirror-moving)">{lipsAndWaiting}</g>
+        </svg>
+      )}
 
       <div className="mouth-sprites">
         {/* The ones being brushed now on top. */}
         {monsters.filter((m) => !m.waiting).map(placed)}
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
+        {/* All clean: the front teeth sparkle, each star a small layer of its own that twinkles as a whole. */}
+        {happy &&
+          model.teeth.map((t, i) => {
+            const face = surfaceFace(t.faces, "outer");
+            if (all[t.id.jaw].facing(face.normal) < 0.4 || t.id.n > 2) return null;
+            const at = onScreen(all[t.id.jaw].point(face.center), 0.2);
+            return (
+              <Sprite key={t.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={SPARKLE_REACH} className="tooth-sparkle">
+                <svg viewBox={spriteBox(SPARKLE_REACH)} style={{ "--delay": `${i * 90}ms` } as CSSProperties}>
+                  <path d={STAR_PATH} transform="translate(-50 -50)" fill="#ffd23f" stroke={INK} strokeWidth={8} />
+                </svg>
+              </Sprite>
+            );
+          })}
       </div>
 
-      <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
+      <svg className="mouth mouth-moving" viewBox={`0 0 ${screen.width} ${screen.height}`} aria-hidden>
         <defs>
           <clipPath id="mirror-active">
-            <rect {...frame} />
+            <rect {...screenEdge} />
           </clipPath>
-          <radialGradient id="monster-glow">
-            <stop offset="0.5" stopColor="#fffbd1" />
-            <stop offset="0.72" stopColor="#ffd23f" stopOpacity={0.95} />
-            <stop offset="1" stopColor="#ffb703" stopOpacity={0} />
-          </radialGradient>
         </defs>
-        <g clipPath="url(#mirror-active)">
-          {happy &&
-            model.teeth.map((t, i) => {
-              const face = surfaceFace(t.faces, "outer");
-              if (all[t.id.jaw].facing(face.normal) < 0.4 || t.id.n > 2) return null;
-              const at = all[t.id.jaw].point(face.center);
-              return (
-                <g key={t.key} transform={`translate(${(at.x - 10).toFixed(1)} ${(at.y - 10).toFixed(1)}) scale(0.2)`}>
-                  {/* The animation's transform would replace a transform attribute, so that sits on the group. */}
-                  <path
-                    className="tooth-sparkle"
-                    d={STAR_PATH}
-                    fill="#ffd23f"
-                    stroke={INK}
-                    strokeWidth={8}
-                    style={{ "--delay": `${i * 90}ms` } as CSSProperties}
-                  />
-                </g>
-              );
-            })}
-
-          {/* The mirror glass catches the light. */}
-          <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)}) scale(${(1.6 * unit).toFixed(3)})`}>
-            <path d="M80 10 L135 10 L10 135 L10 80 Z" />
-            <path d="M160 10 L178 10 L10 178 L10 160 Z" />
-          </g>
+        {/* The mirror glass catches the light. */}
+        <g clipPath="url(#mirror-active)" fill="#fff" opacity={0.35} pointerEvents="none" transform="scale(1.6)">
+          <path d="M80 10 L135 10 L10 135 L10 80 Z" />
+          <path d="M160 10 L178 10 L10 178 L10 160 Z" />
         </g>
-        <FrameStroke frame={frame} unit={unit} />
+        <FrameStroke frame={screenEdge} unit={1} />
       </svg>
       {brush &&
         brush.stops.length > 0 &&
@@ -628,6 +637,9 @@ function Sprite({ spot, reach, className, children }: { spot: SpriteSpot; reach:
     </div>
   );
 }
+
+/** How far a sparkle's star reaches from its middle, in its own units (STAR_PATH is about 100 wide round 50, 50). */
+const SPARKLE_REACH = 60;
 
 /** The viewBox of an svg filling a Sprite: `reach` units each way round (0, 0). */
 const spriteBox = (reach: number) => `${-reach} ${-reach} ${2 * reach} ${2 * reach}`;
