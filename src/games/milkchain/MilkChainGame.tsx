@@ -1,8 +1,17 @@
+import { ChapterBook } from "@/components/ChapterBook";
 import { GameShell } from "@/components/GameShell";
+import { byLanguage } from "@/content/texts";
 import { useT } from "@/lib/language";
-import { MilkChainPlay } from "./MilkChainPlay";
+import pictureFiles from "./bilder/*.webp?glob";
+import { MILK_CHAIN } from "./milkChain";
 import { MILK_CHAIN_TITLE } from "./names";
-import "./milkchain.css";
+
+/** Each page's picture by its file name without extension (`kette-<page id>`). */
+const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
+const pictureOf = (id: string) => PICTURES.get(`kette-${id}`);
+
+/** The story in the other languages, filled as their texts load; German is in `milkChain.ts`. */
+const TRANSLATIONS = byLanguage((texts) => texts.milkChain);
 
 export function MilkChainGame() {
   const t = useT();
@@ -12,7 +21,7 @@ export function MilkChainGame() {
       // One story with nothing to choose before it: it starts at once, and ✕ goes back to the page before it.
       startMode="story"
     >
-      <MilkChainPlay />
+      <ChapterBook chapters={MILK_CHAIN} title={MILK_CHAIN_TITLE} pictureOf={pictureOf} translations={TRANSLATIONS} />
     </GameShell>
   );
 }

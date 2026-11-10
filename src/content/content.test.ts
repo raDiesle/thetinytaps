@@ -584,22 +584,23 @@ describe("Russian", () => {
 // right of Aufs Töpfchen in that order, „Wie lange warten?“ left of the Belohnungstafel, and the newer helpers after them
 // once they are finished. The Timer is the very first book, top left (user decision, November 2026), and „Abstillen“
 // stands right of it, left of Zähne putzen (user request, November 2026).
-test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen beside it, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
+test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen beside it and the Schnullerfee beside that, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
     "/timer/",
     "/abstillen/",
+    "/schnullerfee/",
     "/zaehne/",
     "/toepfchen/",
     "/belohnungstafel/",
   ]);
-  expect(SHELF[4].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
+  expect(SHELF[5].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or
 // search engine finds it until it is done.
 test("games still being built stand nowhere on the shelf or in a book", () => {
-  expect(UNFINISHED.map((g) => g.href)).toEqual(["/schnullerfee/", "/was-ist-passiert/"]);
+  expect(UNFINISHED.map((g) => g.href)).toEqual(["/was-ist-passiert/"]);
   for (const game of UNFINISHED) {
     expect(
       SHELF.map((e) => e.href),

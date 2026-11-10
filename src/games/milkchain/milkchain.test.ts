@@ -57,7 +57,7 @@ describe("Tapsis Milchkette", () => {
 
 // User request, 9 November 2026: a story read over many days opens on its chapters, and the corner goes back to them.
 test("the book opens on its table of contents, and the corner leads back to it", () => {
-  const play = readFileSync("src/games/milkchain/MilkChainPlay.tsx", "utf8");
+  const play = readFileSync("src/components/ChapterBook.tsx", "utf8");
   expect(play).toContain("useState(CONTENTS)");
   expect(play).toMatch(/useInnerBack\(index === CONTENTS \? undefined/);
 });

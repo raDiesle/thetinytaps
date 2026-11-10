@@ -1,6 +1,7 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
+import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
@@ -101,6 +102,14 @@ export const CATEGORIES: Category[] = [
         blurb: MILK_CHAIN_BLURB,
       },
       {
+        // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a
+        // story in chapters along the steps of a gentle goodbye to the pacifier (src/games/pacifierstory).
+        href: "/schnullerfee/",
+        emoji: "🧚",
+        title: PACIFIER_STORY_BOOK,
+        blurb: PACIFIER_STORY_BLURB,
+      },
+      {
         href: "/zaehne/",
         emoji: "🦷",
         title: { de: "Zähne putzen", ru: "Чистим зубы", en: "Brushing Teeth", zh: "刷牙", hi: "दाँत साफ़ करना", es: "Lavarse los dientes", ar: "تنظيف الأسنان" },
@@ -172,29 +181,6 @@ export const CATEGORIES: Category[] = [
           es: "Premios y horario en imágenes",
           ar: "لوحة المكافآت والجدول الزمني بالصور",
           ru: "Таблица наград и расписание в картинках",
-        },
-      },
-      {
-        href: "/schnullerfee/",
-        unfinished: true,
-        emoji: "🧚",
-        title: {
-          de: "Die Schnullerfee",
-          ru: "Фея пустышек",
-          en: "The Pacifier Fairy",
-          zh: "奶嘴仙子",
-          hi: "चुसनी परी",
-          es: "El hada del chupete",
-          ar: "جنّية اللهّاية",
-        },
-        blurb: {
-          de: "Abschied vom Schnuller als Geschichte",
-          en: "Saying goodbye to the pacifier, as a story",
-          zh: "在故事里和奶嘴说再见",
-          hi: "कहानी के साथ चुसनी को अलविदा",
-          es: "Despedirse del chupete con un cuento",
-          ar: "وداع اللهّاية في قصة",
-          ru: "Прощаемся с пустышкой: история",
         },
       },
     ],

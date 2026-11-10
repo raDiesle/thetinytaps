@@ -101,7 +101,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "Eltern suchen „schnullerfee brief pdf“, „schnullerfee video für kinder“, „schnuller abschied luftballon“ und „kind 2 jahre schnuller abgewöhnen“.",
       effort: "M",
       partial:
-        "Gebaut als eigenes Buch der Alltagshelfer (/schnullerfee/, November 2026): Tapsi sammelt die Schnuller ins Kästchen oder an den Luftballon, Licht aus, die Schnullerfee (eine kleine Bärin mit Flügeln) glitzert und tauscht sie gegen ein Geschenk, am Morgen wird es ausgepackt. Kästchen oder Luftballon und das Geschenk (acht Bilder) wählen Eltern hinter ⚙️. Offen: der Name des Kindes und der Feenbrief zum Ausdrucken (H-02).",
+        "Gebaut als eigenes Buch der Alltagshelfer neben „Abstillen“ (/schnullerfee/, 10. November 2026): „Tapsi und die Schnullerfee“, eine Vorlesegeschichte in Kapiteln mit Gemini-Bildern wie „Abstillen“, entlang der Schritte eines sanften Abschieds (Recherche „schnullerfee-kapitel“): erzählen, nur noch im Bett, den Tag mit drei Sternen am Fenster aussuchen, einsammeln und Tschüss sagen, die erste Nacht, die Fee tauscht die Schachtel gegen einen Kuschelhasen, vermissen dürfen. Eine erste, gespielte Fassung (SVG, ein Zimmer, Kästchen oder Luftballon und das Geschenk hinter ⚙️) wurde dafür auf Wunsch gelöscht (10. November 2026). Offen: der Name des Kindes und der Feenbrief zum Ausdrucken (H-02).",
     },
     {
       id: "H-12",

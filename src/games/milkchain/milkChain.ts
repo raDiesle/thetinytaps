@@ -1,3 +1,5 @@
+import type { StoryChapter, StoryTranslation } from "@/components/ChapterBook";
+
 // „Tapsis Milchkette“, the second Abstillen story (user request, 9 November 2026): told in chapters that follow the
 // steps weaning guides advise for gentle weaning (`GENTLE_STEPS`, research „abstillen-kapitel“) – tell the child first,
 // stop offering but don't refuse, put off and shorten, replace one milk time after the other (the day first), part
@@ -8,7 +10,7 @@
 // show Tapsi drinking there.
 //
 // German here, the other languages in `<lang>.ts`. Played at `/abstillen/`, the book „Abstillen“ among the Alltagshelfer
-// (`MilkChainPlay.tsx`); its pictures come from Gemini (`milkChainPictures.ts`).
+// (`ChapterBook`); its pictures come from Gemini (`milkChainPictures.ts`).
 
 /** A step of gentle weaning as the guides give it, in their order; each has a chapter of its own. */
 export type WeaningStep = "vorbereiten" | "nicht-anbieten" | "hinauszoegern" | "ersetzen" | "einschlafen" | "nacht" | "abschied" | "begleiten";
@@ -56,22 +58,11 @@ export interface ChainPage {
   nursing?: true;
 }
 
-/**
- * The story in another language, kept in `<lang>.ts` beside this file and loaded with that language's texts
- * (`src/content/texts/texts-<lang>.ts`), never imported by the game. A page or title it lacks shows in German.
- */
-export interface MilkChainTranslation {
-  /** Each chapter's title by chapter id. */
-  chapters: Record<string, string>;
-  /** Each page's sentence by page id. */
-  pages: Record<string, string>;
-}
+/** The story in another language (`<lang>.ts` beside this file), as every chapter book keeps it. */
+export type MilkChainTranslation = StoryTranslation;
 
 /** One chapter: read on its own on the evening it fits, or the whole story at once. */
-export interface Chapter {
-  id: string;
-  /** Its heading, German, plain words. */
-  title: string;
+export interface Chapter extends StoryChapter {
   /** The step of gentle weaning it tells, if any (the first two chapters only set the scene). */
   step?: WeaningStep;
   /** The milk time this chapter says goodbye to: its drop leaves the chain on this chapter's pages. */

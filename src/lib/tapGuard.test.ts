@@ -19,12 +19,7 @@ test("a screen that changed by itself guards the next tap too", () => {
 // picked a card on the screen the first tap had just brought).
 test("screen-by-screen games guard their taps", () => {
   const read = (f: string) => readFileSync(f, "utf8");
-  for (const f of [
-    "src/games/feelings/shared.tsx",
-    "src/games/feelings/RoundPlay.tsx",
-    "src/games/milkchain/MilkChainPlay.tsx",
-    "src/games/potty/PottyPlay.tsx",
-  ])
+  for (const f of ["src/games/feelings/shared.tsx", "src/games/feelings/RoundPlay.tsx", "src/components/ChapterBook.tsx", "src/games/potty/PottyPlay.tsx"])
     expect(read(f), f).toContain("@/lib/tapGuard");
-  for (const f of ["src/games/milkchain/MilkChainPlay.tsx", "src/games/potty/PottyPlay.tsx"]) expect(read(f), f).not.toMatch(/const TAP_GUARD_MS = /);
+  for (const f of ["src/components/ChapterBook.tsx", "src/games/potty/PottyPlay.tsx"]) expect(read(f), f).not.toMatch(/const TAP_GUARD_MS = /);
 });
