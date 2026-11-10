@@ -320,8 +320,18 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/was-ist-passiert/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Neues Spiel im Buch „Gefühle“ (J-03, 9. November 2026): Name und Zeile in names.ts, die Frage und die Fragen unter den Bildern in rounds.ts, übersetzt auf Wunsch am 10. November 2026. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen (seo.<Sprache>.ts).",
+    parts: [
+      {
+        label: "Name, Zeile und „Was ist passiert?“",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Name und Zeile in names.ts, die Frage in scenes.ts (CAUSE_QUESTION), übersetzt auf Wunsch am 10. November 2026. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen (seo.<Sprache>.ts).",
+      },
+      {
+        label: "Die 30 Szenen",
+        languages: { de: "done" },
+        note: "Neu geschrieben am 10. November 2026 (scenes.ts): was der Bär zeigt, die beiden Fragen unter den Bildern und warum. Nur Deutsch; Übersetzungen kämen als scenes.<Sprache>.ts, nach Id. Keine Stimme.",
+      },
+    ],
   },
   {
     href: "/tiere/",

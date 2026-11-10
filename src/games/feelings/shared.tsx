@@ -163,8 +163,8 @@ function useFrame(count: number): number {
  * stays. Only one thing moves at a time (user feedback, November 2026): the big picture while the scene is shown, the
  * two cards while the child chooses.
  */
-export function Frames({ name, moving, className }: { name: string; moving: boolean; className?: string }) {
-  const frames = framesFor(name);
+export function Frames({ name, moving, className, sources }: { name: string; moving: boolean; className?: string; sources?: string[] }) {
+  const frames = sources ?? framesFor(name);
   const shown = useFrame(moving ? frames.length : 1);
   if (frames.length === 0) return <Placeholder name={name} />;
   return frames.map((src, i) => (
@@ -180,12 +180,15 @@ export function Frames({ name, moving, className }: { name: string; moving: bool
  */
 export function StoryPicture({
   name,
+  sources,
   art,
   look = "story",
   still = false,
   onTap,
 }: {
   name: string;
+  /** The picture's frames, where another game shows its own pictures here (Was ist passiert?); otherwise found by `name`. */
+  sources?: string[];
   /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
   art?: ReactNode;
   look?: PictureLook;
@@ -206,7 +209,7 @@ export function StoryPicture({
         })
       }
     >
-      <div className="fg-picture">{art ?? <Frames name={name} moving={!still} />}</div>
+      <div className="fg-picture">{art ?? <Frames name={name} sources={sources} moving={!still} />}</div>
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
@@ -237,6 +240,7 @@ export type CardState = "choose" | "playing" | "wrong" | "rest";
 /** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
   image,
+  sources,
   caption,
   state,
   onChoose,
@@ -245,6 +249,8 @@ export function ChoiceCard({
 }: {
   /** Name of the picture, see images.ts. */
   image: string;
+  /** The picture's frames, where another game shows its own pictures here (Was ist passiert?); otherwise found by `image`. */
+  sources?: string[];
   /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
   caption: string;
   state: CardState;
@@ -277,7 +283,7 @@ export function ChoiceCard({
         }}
       >
         {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
-        <Frames name={image} moving={active} className="fg-card-image" />
+        <Frames name={image} sources={sources} moving={active} className="fg-card-image" />
         {state === "playing" && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
