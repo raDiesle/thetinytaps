@@ -183,30 +183,6 @@ export const CATEGORIES: Category[] = [
           ru: "Таблица наград и расписание в картинках",
         },
       },
-      {
-        // The first Schnullerfee, a story played in one room (SVG), still being built; only on the management page.
-        href: "/schnullerfee-spiel/",
-        unfinished: true,
-        emoji: "🧚",
-        title: {
-          de: "Die Schnullerfee",
-          ru: "Фея пустышек",
-          en: "The Pacifier Fairy",
-          zh: "奶嘴仙子",
-          hi: "चुसनी परी",
-          es: "El hada del chupete",
-          ar: "جنّية اللهّاية",
-        },
-        blurb: {
-          de: "Abschied vom Schnuller als Geschichte",
-          en: "Saying goodbye to the pacifier, as a story",
-          zh: "在故事里和奶嘴说再见",
-          hi: "कहानी के साथ चुसनी को अलविदा",
-          es: "Despedirse del chupete con un cuento",
-          ar: "وداع اللهّاية في قصة",
-          ru: "Прощаемся с пустышкой: история",
-        },
-      },
     ],
   },
   {

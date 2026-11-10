@@ -174,12 +174,6 @@ export const SEO_ES: SeoTranslation = {
         "Un cuento por capítulos para leer en voz alta: Tapsi el zorro reúne sus tres chupetes y de noche el hada del chupete los cambia por un regalo.",
       text: "Un cuento para leer en voz alta, capítulo a capítulo, cuando el chupete tiene que irse. Tapsi el zorro tiene tres chupetes, uno rojo, uno azul y uno amarillo, y con el chupete en la boca mamá solo oye «mmm-mmm». Mamá y papá le hablan del hada del chupete, que lleva los chupetes a los bebés. Primero el chupete se queda en la cama y solo sirve para dormirse. Después Tapsi dice que el hada puede venir, papá pega tres estrellas en la ventana y cada mañana Tapsi quita una. El gran día Tapsi busca todos los chupetes, los mete en una caja, da a cada uno un beso de despedida y los deja en el alféizar con un dibujo. La primera noche cuesta, Tapsi llora, y mamá y papá se quedan cerca, consuelan y cantan. De noche entra el hada volando, se lleva la caja y deja un regalo: un conejito de peluche que ahora ayuda a dormirse. Tapsi puede echar de menos el chupete y estar triste, y mamá y papá quieren a Tapsi, con chupete y sin él. El libro empieza por su índice, bajo cada imagen está la frase para leer y cada toque pasa la página.",
     },
-    "/schnullerfee-spiel/": {
-      title: "El hada del chupete – despedirse del chupete",
-      description:
-        "El hada del chupete viene: juntar los chupetes en una cajita o atarlos a un globo, apagar la luz y por la mañana hay un regalo. Para dejar el chupete.",
-      text: "Un cuento para dejar el chupete, para jugar la noche anterior: el zorro Tapsi junta sus chupetes y los pone en una cajita en el alféizar de la ventana, o los ata a un globo que sale volando por la ventana. Luego se apaga la luz, mamá da un beso de buenas noches, y por la noche llega el hada del chupete por la ventana, brilla y cambia los chupetes por un regalo. Por la mañana, el niño despierta a Tapsi, y el regalo espera en el alféizar. Los padres eligen qué regalo es y si es la cajita o el globo, para que el cuento encaje con la despedida de verdad.",
-    },
     "/abstillen/": {
       title: "Cuento para el destete – la cadena de leche de Tapsi",
       description:

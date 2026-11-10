@@ -167,12 +167,6 @@ export const SEO_EN: SeoTranslation = {
       description: "A read-aloud story in chapters: Tapsi the fox gathers three pacifiers, and at night the pacifier fairy swaps them for a present.",
       text: "A story to read aloud, chapter by chapter, when the pacifier is to go. Tapsi the fox has three pacifiers, a red, a blue and a yellow one, and with a pacifier in the mouth mom only hears “mmm-mmm”. Mom and dad tell of the pacifier fairy, who takes pacifiers to the little babies. First the pacifier stays in bed and is only for falling asleep. Then Tapsi says the fairy may come, dad sticks three stars on the window, and every morning Tapsi takes one down. On the big day Tapsi gathers all the pacifiers into a box, kisses each goodbye and puts them on the windowsill with a drawing. The first night is hard, Tapsi cries, and mom and dad stay close, comfort and sing. At night the fairy flies in, takes the box and leaves a present: a cuddly bunny that now helps with falling asleep. Tapsi may miss the pacifier and be sad, and mom and dad love Tapsi, with a pacifier or without. The book opens on its table of contents, the sentence to read aloud stands below every picture, and every tap turns the page.",
     },
-    "/schnullerfee-spiel/": {
-      title: "Pacifier Fairy – Saying Goodbye to the Pacifier",
-      description:
-        "The pacifier fairy comes: gather the pacifiers into a box or tie them to a balloon, lights out – and in the morning a present waits. For weaning off the binky.",
-      text: "A story for weaning off the pacifier, to play on the evening before: Tapsi the fox gathers his pacifiers and puts them into a little box on the windowsill – or ties them to a balloon that flies out of the window. Then the light goes out, mom gives a good-night kiss, and at night the pacifier fairy comes through the window, sparkles and swaps the pacifiers for a present. In the morning the child wakes Tapsi up, and the present waits on the windowsill. Parents choose which present it is and whether it is the box or the balloon, so the story matches the real goodbye.",
-    },
     "/abstillen/": {
       title: "Weaning Story for Toddlers – Tapsi's Milk Chain",
       description:

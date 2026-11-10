@@ -264,13 +264,6 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn der Schnuller gehen soll. Tapsi der Fuchs hat drei Schnuller, einen roten, einen blauen und einen gelben, und mit Schnuller im Mund versteht Mama nur „Mmm-mmm“. Mama und Papa erzählen von der Schnullerfee, die die Schnuller zu den kleinen Babys bringt. Erst wohnt der Schnuller nur noch im Bett und darf nur zum Einschlafen in den Mund. Dann sagt Tapsi selbst, dass die Fee kommen darf, Papa klebt drei Sterne ans Fenster, und jeden Morgen nimmt Tapsi einen ab. Am großen Tag sucht Tapsi alle Schnuller zusammen, legt sie in eine Schachtel, gibt jedem einen Abschiedskuss und stellt sie mit einem gemalten Bild aufs Fensterbrett. Die erste Nacht ist schwer, Tapsi weint, und Mama und Papa bleiben da, trösten und singen. Nachts fliegt die Schnullerfee herein, nimmt die Schachtel und legt ein Geschenk hin: einen Kuschelhasen, der jetzt beim Einschlafen hilft. Tapsi darf den Schnuller vermissen und traurig sein, und Mama und Papa haben Tapsi lieb, mit Schnuller und ohne. Das Buch beginnt mit seinem Inhaltsverzeichnis, unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter.",
   },
   {
-    path: "/schnullerfee-spiel/",
-    title: "Schnullerfee – Abschied vom Schnuller als Geschichte",
-    description:
-      "Die Schnullerfee holt die Schnuller: einsammeln, ins Kästchen oder an den Luftballon, Licht aus – am Morgen liegt ein Geschenk da. Zum Schnuller abgewöhnen.",
-    text: "Eine Geschichte zum Schnuller abgewöhnen, zum Spielen am Abend davor: Tapsi der Fuchs sammelt seine Schnuller ein und legt sie ins Schnullerkästchen auf die Fensterbank – oder bindet sie an einen Luftballon, der aus dem Fenster fliegt. Dann geht das Licht aus, Mama gibt einen Gute-Nacht-Kuss, und in der Nacht kommt die Schnullerfee durchs Fenster, glitzert und tauscht die Schnuller gegen ein Geschenk. Am Morgen weckt das Kind Tapsi, und das Geschenk wartet auf der Fensterbank. Welches Geschenk es ist und ob Kästchen oder Luftballon, stellen die Eltern ein, damit die Geschichte zum echten Abschied passt.",
-  },
-  {
     path: "/abstillen/",
     title: "Abstillen mit Geschichte – Tapsis Milchkette",
     description:

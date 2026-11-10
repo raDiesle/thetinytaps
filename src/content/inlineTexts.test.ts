@@ -40,7 +40,6 @@ const FOLDERS: Record<string, string[]> = {
   "/timer/": ["src/games/timer"],
   "/belohnungstafel/": ["src/games/rewards"],
   "/schnullerfee/": ["src/games/pacifierstory"],
-  "/schnullerfee-spiel/": ["src/games/pacifier"],
   "/abstillen/": ["src/games/milkchain"],
   "/": ["src/components", "src/pages", "src/lib", "src/content/games.ts"],
 };

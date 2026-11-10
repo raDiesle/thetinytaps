@@ -10,7 +10,6 @@ import { Mascot, MascotHead } from "./Mascot";
 const MASCOT_DRAWINGS = [
   "src/components/RoomOptions.tsx",
   "src/games/scenes/shared.tsx",
-  "src/games/pacifier/drawings.tsx",
   "src/games/together/pairs.tsx",
   "src/games/together/Helper.tsx",
   "src/games/marbles/scenery.tsx",

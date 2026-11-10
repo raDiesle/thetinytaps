@@ -68,7 +68,6 @@ const ENDS = new Set([
   "src/games/elevator/film/FilmPlay.tsx", // the film's party at its end
   "src/games/elevator/trail/TrailPlay.tsx", // the finale when the goal is back
   "src/games/marbles/MarblePlay.tsx", // the machine's party when it has run
-  "src/games/pacifier/PacifierPlay.tsx", // the present unwrapped in the story
   "src/games/potty/PottyPlay.tsx", // it came, and the party at the end (Aufs Töpfchen's point)
   "src/games/rewards/BoardScreen.tsx", // a full star chart, a full day
   "src/games/rewards/PlanScreen.tsx", // the day's plan done

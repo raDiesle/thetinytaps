@@ -30,7 +30,6 @@ const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementP
 const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-dir/");
 const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
-const PacifierPage = page(() => import("@/pages/PacifierPage"), "PacifierPage", "/schnullerfee-spiel/");
 const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
@@ -66,8 +65,6 @@ export function App() {
         <Route path="toepfchen" element={<PottyPage />} />
         <Route path="abstillen" element={<MilkChainPage />} />
         <Route path="schnullerfee" element={<PacifierStoryPage />} />
-        {/* The first, played Schnullerfee story (SVG), still being built; the book „Schnullerfee“ is the story in chapters. */}
-        <Route path="schnullerfee-spiel" element={<PacifierPage />} />
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />

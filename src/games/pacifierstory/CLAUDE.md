@@ -4,8 +4,8 @@ Route `/schnullerfee/` · idea H-11 · research „schnullerfee-kapitel“.
 
 The book „Schnullerfee“ among the Alltagshelfer, right of „Abstillen“ (`PACIFIER_STORY_BOOK`, a spine book of its own,
 playing at once): a story about saying goodbye to the pacifier, in chapters like „Abstillen“ (user request, 10 November
-2026: „ähnlich wie wir es im Stil gemacht haben zu Abstillen“), read by a grown-up with the child. The first, played
-Schnullerfee (SVG, `src/games/pacifier`) moved to `/schnullerfee-spiel/` and stays unfinished.
+2026: „ähnlich wie wir es im Stil gemacht haben zu Abstillen“), read by a grown-up with the child. A first, played
+Schnullerfee (SVG, one room, box or balloon) was deleted for it on the user's request the same day.
 
 Tapsi the fox (the same family and home as in „Abstillen“) has three pacifiers, a red, a blue and a yellow one. Mama and
 Papa tell of the pacifier fairy, the pacifier first stays in bed, Tapsi says the fairy may come and Papa sticks three
