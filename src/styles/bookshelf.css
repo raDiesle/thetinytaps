@@ -606,10 +606,9 @@
 }
 
 /*
- * „Offline spielen“ (RoomOffline): a little sign like the name's, hanging on two short chains from the underside of a
- * wide shelf below the globe (the column of the grown-ups' things), just inside its front leg and clear of the floor's
- * Impressum; on an upright screen, which has no legs, from the top board into the top left compartment, above the
- * speaker standing on its board.
+ * „Offline spielen“ (RoomOffline): a little sign like the name's, hanging on two short chains from the shelf's underside
+ * at its right (below the globe on a wide shelf), just inside its front leg and clear of the floor's Impressum – at the
+ * screen's bottom right on an upright screen too, never in its top compartment (user feedback, November 2026).
  */
 .shelf-offline {
   --hang: calc(var(--legs, 46px) * 0.2);
@@ -617,13 +616,6 @@
   top: calc(100% + var(--hang));
   right: calc(var(--post) * 1.35);
   z-index: 2;
-}
-
-.room-scene[data-plan="upright"] .shelf-offline {
-  --hang: 10px;
-  top: calc(var(--crown) + var(--hang) + 3px);
-  right: auto;
-  left: calc(var(--post) + 6px);
 }
 
 /* Above an upright shelf there is the wall's room under the name: the fullscreen sign is nailed onto the top board's
@@ -673,7 +665,7 @@
   stroke-linejoin: round;
 }
 
-/* Its two chains, going up to the shelf's underside (or out of the picture above an upright shelf). */
+/* Its two chains, going up to the shelf's underside. */
 .room-offline-board::before,
 .room-offline-board::after {
   content: "";
@@ -771,7 +763,7 @@
 }
 
 /*
- * The wide shelf's four legs: turned wood, narrower at the foot, a soft shadow on the floor under each. Only at its
+ * The shelf's four legs: turned wood, narrower at the foot, a soft shadow on the floor under each. Only at its
  * corners, never one in the middle (user feedback, November 2026): the front two at its sides, and the back two behind
  * them, a little further in, darker in the shelf's shadow and standing a little higher on the floor going back.
  */

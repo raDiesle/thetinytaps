@@ -160,6 +160,29 @@ describe("the bookshelf", () => {
       expect(planShelf(width, height, BOOKS, OPTIONS(height)).cells.flatMap((c) => (c.books ? [c.books] : []))).toEqual([[0], [1, 2, 3]]);
   });
 
+  // On an upright phone one picture book on each board made a tall column of single books, and „Offline spielen“ hung in
+  // the top compartment (user feedback, November 2026): the picture books stand two side by side, the everyday helpers
+  // alone on their board, and the shelf stands on legs, with the sign hanging under it at the screen's bottom right.
+  test.each([
+    [370, 700],
+    [740, 1000],
+  ])("on an upright screen the picture books stand two on a board and the shelf on legs, in a %i × %i room", (width, height) => {
+    for (const [books, boards] of [
+      [BOOKS, [[0], [1, 2], [3]]],
+      [
+        [3, 1, 1, 1, 1],
+        [[0], [1, 2], [3, 4]],
+      ],
+    ] as const) {
+      const plan = planShelf(width, height, [...books], OPTIONS(height));
+      expect(plan.upright).toBe(true);
+      expect(plan.cells.flatMap((c) => (c.books ? [c.books] : []))).toEqual(boards.map((b) => [...b]));
+      expect(plan.legs).toBeGreaterThanOrEqual(OPTIONS(height).legs - 0.01);
+    }
+    const css = readFileSync(new URL("../styles/bookshelf.css", import.meta.url), "utf8");
+    expect(css).not.toMatch(/upright"\] \.shelf-offline/);
+  });
+
   // Spread over a wide board, the books stood with big empty room between them and looked lost on a big monitor (user
   // feedback, November 2026): they stand together in the middle, BOOK_GAP apart, and books spine out fill the ends.
   test("the books of a board stand together in the middle, not spread over it", () => {

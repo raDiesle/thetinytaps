@@ -99,7 +99,7 @@ export interface ShelfLayout {
    * November 2026): the sign keeps clear of the books at their left, so it may hang right of their place's middle.
    */
   wordsShift?: number;
-  /** How high the legs it stands on are, below its `height` (a wide shelf's; 0 for an upright one). */
+  /** How high the legs it stands on are, below its `height`. */
   legs: number;
 }
 
@@ -117,7 +117,7 @@ export interface ShelfOptions {
    * tap, in picture books' widths: the carved words, which the hanging sign may cover.
    */
   carved?: number;
-  /** The least height of a wide shelf's legs, in px. */
+  /** The least height of the shelf's legs, in px. */
   legs?: number;
 }
 
@@ -174,6 +174,18 @@ function boardsOf(spans: number[], rows: number): number[][] {
   return [wide, rest];
 }
 
+/**
+ * The places on an upright shelf's boards: the everyday helpers' books (wider than a picture book) alone on theirs, the
+ * picture books two side by side on each board below – never one picture book on each board, which left the shelf a tall
+ * column of single books (user feedback, November 2026).
+ */
+export function uprightBoards(spans: number[]): number[][] {
+  const wide = spans.flatMap((s, i) => (s > 1 ? [[i]] : []));
+  const rest = spans.flatMap((s, i) => (s > 1 ? [] : [i]));
+  const pairs = Array.from({ length: Math.ceil(rest.length / 2) }, (_, r) => rest.slice(2 * r, 2 * r + 2));
+  return [...wide, ...pairs];
+}
+
 /** Of two ways, the one with more boards unless the other's books are much bigger: two books up top, not an empty board. */
 function prefer<T extends { bh: number }>(more: T, fewer: T) {
   return more.bh * 1.25 >= fewer.bh ? more : fewer;
@@ -184,12 +196,13 @@ function prefer<T extends { bh: number }>(more: T, fewer: T) {
  * picture book; the everyday helpers' books with the words carved beside them take more). A screen wider than tall gets
  * a narrow column at the right for the grown-ups' things (`SIDE_COLUMN`) and the books left of it, two boards of them
  * where that keeps them nearly as big (every board holds books, none only fills the shelf). An upright screen gets the
- * things in compartments on top and the books below.
+ * things in compartments on top and the books below (`uprightBoards`). Both stand on legs, with „Offline spielen“
+ * hanging under the shelf at its right, at the screen's bottom right (RoomOffline).
  */
 export function planShelf(width: number, height: number, spans: number[], options: ShelfOptions = {}): ShelfLayout {
   const upright = options.upright ?? width / height < 0.95;
-  if (upright) return planUpright(width, height, spans);
   const legs = options.legs ?? 0;
+  if (upright) return planUpright(width, height - legs, spans, legs);
   return planWide(width, height - legs, spans, legs, options.sign ?? { width: 0, height: 0 }, options.carved ?? 0);
 }
 
@@ -197,8 +210,8 @@ export function planShelf(width: number, height: number, spans: number[], option
  * The places on `rows` boards and the biggest book they leave room for: the widest board decides. A wide shelf's
  * boards hold the books by kind (`boardsOf`), and its first keeps `trail` free at its right.
  */
-function rowsOf(spans: number[], rows: number, width: number, tier: number, wide = false, trail = 0) {
-  const boards = wide ? boardsOf(spans, rows) : split(spans.length, rows);
+function rowsOf(spans: number[], rows: number, width: number, tier: number, wide = false, trail = 0, given?: number[][]) {
+  const boards = given ?? (wide ? boardsOf(spans, rows) : split(spans.length, rows));
   const trailOf = (r: number) => (r === 0 ? trail : 0);
   const bh = Math.min(...boards.map((books, r) => bookFor(width - trailOf(r), tier, spanOf(spans, books), books.length)));
   return { boards, bh, trailOf, middle: Math.max(...boards.map((books, r) => trailOf(r) + rowWidth(spanOf(spans, books), books.length, bh))) };
@@ -306,22 +319,19 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
   };
 }
 
-function planUpright(width: number, height: number, spans: number[]): ShelfLayout {
-  const count = spans.length;
+function planUpright(width: number, height: number, spans: number[], legs: number): ShelfLayout {
   const frame = frameFor(width, height);
   const { post, wall, crown, board } = frame;
   const inner = height - crown - frame.plinth;
   const room = width - 2 * post;
   const things = clamp(inner * 0.16, 64, 150);
   const rest = inner - things - board;
-  const option = (rows: number) => {
-    const tier = (rest - (rows - 1) * board) / rows;
-    return { rows, tier, ...rowsOf(spans, rows, room, tier) };
-  };
-  const plan = count > 2 ? prefer(option(count), option(2)) : option(1);
+  const boards = uprightBoards(spans);
+  const rows = boards.length;
+  const plan = rowsOf(spans, rows, room, (rest - (rows - 1) * board) / rows, false, 0, boards);
   // The books' boards only as high as they need; what is left goes to the things on top.
-  const tier = Math.min(plan.tier, plan.bh / 0.75);
-  const top = inner - plan.rows * (tier + board);
+  const tier = Math.min((rest - (rows - 1) * board) / rows, plan.bh / 0.75);
+  const top = inner - rows * (tier + board);
   const n = SHELF_THINGS.length;
   const middle = Math.min(room, Math.max(plan.middle, n * 64 + (n - 1) * wall));
   const cells: ShelfCell[] = [];
@@ -353,5 +363,5 @@ function planUpright(width: number, height: number, spans: number[]): ShelfLayou
     cells.push({ x: post, y, w: middle, h: tier, books });
     planks.push({ x: post, y: y - board, w: middle, h: board });
   });
-  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: plan.bh, upright: true, legs: 0 };
+  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: plan.bh, upright: true, legs };
 }

@@ -660,7 +660,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Installing the app and the offline copy are not
   among those texts, where grown-ups didn't find them, but behind a little sign „Offline spielen“ hanging on two short
   chains from the shelf's underside below the globe, between its right legs and clear of the Impressum on the floor
-  (`RoomOffline`; on an upright screen from the top board into the top left compartment; user request, November 2026). Browsers show how to leave fullscreen over the
+  (`RoomOffline`, user request, November 2026) – on an upright screen too, where the shelf stands on legs as well, never
+  in its top compartment (user feedback, November 2026). On an upright screen the picture books stand two side by side on
+  each board below the helpers' board, never one book on each board (user feedback, November 2026; `uprightBoards`). Browsers show how to leave fullscreen over the
   middle of the screen's bottom (or top) edge for a while, again whenever fullscreen starts: so nothing to tap lies
   there (user feedback, November 2026). On a wide screen the shelf starts right at the screen's top – the fullscreen button is no longer a note above it but a
   little sign nailed onto its top right corner, so the room above went to the shelf (user request, November 2026), and

@@ -159,7 +159,7 @@ const SIGN_BOARD = 1.5;
 const SIGN_FOXES = 0.4;
 
 /**
- * The least height of a wide shelf's legs, for the room's: the bottom's middle where browsers note how to leave
+ * The least height of the shelf's legs, for the room's: the bottom's middle where browsers note how to leave
  * fullscreen; and in px, so the sign „Offline spielen“ hanging between them under the globe can be read and tapped.
  */
 const LEGS = 0.1;
@@ -199,7 +199,7 @@ const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
  * app's name is a painted sign hanging on chains: in front of a wide shelf standing on legs, down into its top
  * compartment, above an upright one's. The fullscreen button is a small sign nailed onto the shelf's top right corner,
- * and „Offline spielen“ hangs below the globe (RoomOffline). Drawn in 3D – each compartment a box going back, the boards seen from
+ * and „Offline spielen“ hangs under the shelf at its right, at the screen's bottom right on every screen (RoomOffline). Drawn in 3D – each compartment a box going back, the boards seen from
  * the eye's height – but still: nothing moves until it is tapped. The room fills the screen and nothing follows below it:
  * `legal` (Impressum, Datenschutz) stands small in its bottom right corner, „Feedback“ in its bottom left (RoomFeedback).
  */
@@ -258,7 +258,8 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
         "--plinth": `${layout.frame.plinth}px`,
-        ...(!layout.upright && { "--sign": `${plan?.sign}px`, "--legs": `${layout.legs}px` }),
+        ...(!layout.upright && { "--sign": `${plan?.sign}px` }),
+        "--legs": `${layout.legs}px`,
         width: `${layout.width}px`,
         height: `${layout.height}px`,
       } as CSSProperties)
@@ -314,16 +315,17 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
                 <span className="shelf-crown" />
                 <span className="shelf-plinth" />
               </div>
-              {!layout.upright && (
-                // Standing on four legs at its corners, none in the middle, so the bottom of the screen's middle, where the
-                // browser shows how to leave fullscreen, holds nothing to tap. The back legs stand behind the front ones.
-                <span className="shelf-legs" aria-hidden>
-                  <span className="back" />
-                  <span className="back" />
-                  <span />
-                  <span />
-                </span>
-              )}
+              {/*
+               * Standing on four legs at its corners, none in the middle, so the bottom of the screen's middle, where the
+               * browser shows how to leave fullscreen, holds nothing to tap, and „Offline spielen“ hangs between the right
+               * ones. The back legs stand behind the front ones.
+               */}
+              <span className="shelf-legs" aria-hidden>
+                <span className="back" />
+                <span className="back" />
+                <span />
+                <span />
+              </span>
             </div>
           )}
         </div>
