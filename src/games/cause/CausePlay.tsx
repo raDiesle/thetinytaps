@@ -1,122 +1,215 @@
-import { useCallback, useEffect, useState } from "react";
-import { Mascot } from "@/components/Mascot";
+import { type ReactNode, useEffect, useState } from "react";
+import { DevTag } from "@/components/DevTag";
 import { GameEnd } from "@/components/GameEnd";
-import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { playPlop, playTwinkle } from "@/lib/sfx";
+import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { tapState } from "@/lib/tapTargets";
-import { CAUSE_QUESTION, CAUSE_ROUNDS, type CauseOption } from "./rounds";
+import { playPlop, playTwinkle } from "@/lib/sfx";
+import { screenChanged, screenTap } from "@/lib/tapGuard";
+import { ChoiceCard, GoOn, StepBack, StepDots, StoryPicture, StoryWords } from "../feelings/shared";
+import { framesOf, preloadImages } from "./images";
+import { CAUSE_PASSES, CAUSE_QUESTION, type CauseScene, causeOnLeft, sceneCode, sceneImages } from "./scenes";
 
-/** How long the right picture stays before the next round comes; the child's face has changed by then. */
-const NEXT_MS = 2600;
+/** Where the child stopped: kept between visits, so the game goes on with the next scenes. */
+interface CauseProgress {
+  /** The pass played last, counted from 0 (`CAUSE_PASSES`). */
+  pass: number;
+  /** The scene of `pass` it goes on with, counted from 0. */
+  scene: number;
+}
+
+const PROGRESS_KEY = "tinytaps.cause.v1";
+const START: CauseProgress = { pass: 0, scene: 0 };
 
 /**
- * „Was ist passiert?“: the child shows a feeling, and the child taps the picture of what happened. The right one lets
- * the child's face change (crying → smiling, a grown-up claps); the other one only makes the child shake its head
- * gently and goes on waiting. Digits pick that option, any other key one at random. After the last round the end
- * shows „Nochmal“, the rounds start again.
+ * „Was ist passiert?“: one pass of six scenes after the other, laid out like Gefühle's „Alltagssituationen“ (its
+ * `.story-play` and picture components). The dots at the top are the pass's scenes; after the last come „Nochmal“ and
+ * „Weiter“ (the next pass, after the last the first). The pass and scene reached are kept, so the next visit goes on.
  */
 export function CausePlay() {
-  const t = useT();
-  const { effects, ripple, glow } = useTapFeedback();
-  const [round, setRound] = useState(0);
-  const [picked, setPicked] = useState<string | null>(null);
-  /** Counts the wrong pictures of this round; a new count replays the head shake. */
-  const [wrongs, setWrongs] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const [progress, update] = useGameSettings<CauseProgress>(PROGRESS_KEY, START);
+  // `run` restarts a scene played again from its dot or with „Nochmal“.
+  const [now, setNow] = useState(() => {
+    const pass = progress.pass % CAUSE_PASSES.length;
+    return { pass, index: progress.scene < CAUSE_PASSES[pass].length ? progress.scene : 0, run: 0 };
+  });
+  const scenes = CAUSE_PASSES[now.pass];
+  const scene = scenes[now.index];
+  const last = now.index === scenes.length - 1;
+  const following = (now.pass + 1) % CAUSE_PASSES.length;
 
-  const current = CAUSE_ROUNDS[round];
-  const solved = picked !== null;
+  const go = (pass: number, index: number) => setNow({ pass, index, run: now.run + 1 });
+  // The cause found: the scene to go on with is kept at once, even if no one taps ▶ – after the last, the next pass.
+  const found = () => update(last ? { pass: following, scene: 0 } : { pass: now.pass, scene: now.index + 1 });
+  const again = () => {
+    update({ pass: now.pass, scene: 0 });
+    go(now.pass, 0);
+  };
+  const onward = () => {
+    update({ pass: following, scene: 0 });
+    go(following, 0);
+  };
 
-  const pick = useCallback(
-    (option: CauseOption, x?: number, y?: number) => {
-      if (solved || finished) return;
-      if (option.fits) {
-        setPicked(option.id);
-        playTwinkle();
-        glow(x, y);
-      } else {
-        setWrongs((n) => n + 1);
-        playPlop();
-        ripple(x, y);
-      }
-    },
-    [solved, finished, glow, ripple],
+  return (
+    <CauseScenePlay
+      key={`${now.pass}-${now.index}-${now.run}`}
+      scene={scene}
+      pass={now.pass}
+      progress={{ total: scenes.length, done: now.index }}
+      onFound={found}
+      onDone={last ? undefined : () => go(now.pass, now.index + 1)}
+      ending={last ? <GameEnd inline onAgain={again} next={{ onNext: onward }} /> : undefined}
+      onEndKey={last ? onward : () => go(now.pass, now.index + 1)}
+      onPick={(index) => go(now.pass, index)}
+      onBack={now.index > 0 ? () => go(now.pass, now.index - 1) : undefined}
+      nextImage={last ? undefined : sceneImages(scenes[now.index + 1].id).feeling}
+    />
   );
+}
 
-  // Once the right picture is chosen, the next round comes after a moment; after the last one the end is shown.
-  useEffect(() => {
-    if (!solved) return;
-    const timer = setTimeout(() => {
-      if (round + 1 < CAUSE_ROUNDS.length) {
-        setRound((r) => r + 1);
-        setPicked(null);
-        setWrongs(0);
-      } else setFinished(true);
-    }, NEXT_MS);
-    return () => clearTimeout(timer);
-  }, [solved, round]);
+/**
+ * "show": the little bear's feeling, big, and „Was ist passiert?“ under it, until a tap anywhere (▶). "choose": the two
+ * pictures of what may have happened, A and B, the feeling small above them. "found": the picture of what happened,
+ * big with its green tick, and why it led to the feeling under it.
+ */
+type Phase = "show" | "choose" | "found";
 
-  // Digits pick that picture, any other key one at random.
+/** One scene: the feeling, the choice of two causes, and the cause found. */
+function CauseScenePlay({
+  scene,
+  pass,
+  progress,
+  onFound,
+  onDone,
+  ending,
+  onEndKey,
+  onPick,
+  onBack,
+  nextImage,
+}: {
+  scene: CauseScene;
+  /** The pass it belongs to, for the dev server's tag. */
+  pass: number;
+  /** The dots at the top: how many scenes the pass has and how many are done before this one. */
+  progress: { total: number; done: number };
+  /** Called once the cause is found. */
+  onFound: () => void;
+  /** Once the cause is found, a tap on the screen (▶) goes on: the next scene. */
+  onDone?: () => void;
+  /** Shown in the room under the words once the cause is found, on the pass's last scene: „Nochmal“ and „Weiter“. */
+  ending?: ReactNode;
+  /** A key pressed once the cause is found: every key does something. */
+  onEndKey: () => void;
+  /** A tap on a dot at the top: that scene again, one before this or this one from its start. */
+  onPick: (index: number) => void;
+  /** The scene before: ◀ bottom left goes back to it; left out on a pass's first scene. */
+  onBack?: () => void;
+  /** The next scene's first picture, loaded while this one plays. */
+  nextImage?: string;
+}) {
+  const t = useT();
+  const [phase, setPhase] = useState<Phase>("show");
+  /** The other picture was tapped: it stays crossed out. */
+  const [crossed, setCrossed] = useState(false);
+  const images = sceneImages(scene.id);
+
   useEffect(() => {
-    if (finished) return;
+    preloadImages([images.feeling, images.cause, images.other, ...(nextImage ? [nextImage] : [])]);
+  }, []);
+
+  // Every new picture, or the cards coming: a tap right after it (the second of a double tap) does nothing (`screenTap`).
+  useEffect(() => screenChanged(), [phase]);
+
+  const pick = (card: "cause" | "other") => {
+    if (phase !== "choose") return;
+    if (card === "cause") {
+      setPhase("found");
+      playTwinkle();
+      onFound();
+    } else if (!crossed) {
+      setCrossed(true);
+      playPlop();
+    }
+  };
+
+  const left: "cause" | "other" = causeOnLeft(scene) ? "cause" : "other";
+  const right = left === "cause" ? "other" : "cause";
+
+  // ←/1 the left card, →/2 the right one, every other key the cause, so mashing keys still plays the scene through –
+  // one step at a time, like taps (`screenTap`).
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (e.repeat) return;
-      const digit = Number(e.key) - 1;
-      const options = current.options;
-      pick(options[digit >= 0 && digit < options.length ? digit : Math.floor(Math.random() * options.length)]);
+      if (e.repeat || !screenTap()) return;
+      if (phase === "show") return setPhase("choose");
+      if (phase === "found") return (onDone ?? onEndKey)();
+      pick(e.key === "ArrowLeft" || e.key === "1" ? left : e.key === "ArrowRight" || e.key === "2" ? right : "cause");
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [finished, current, pick]);
+  });
 
-  const again = () => {
-    setRound(0);
-    setPicked(null);
-    setWrongs(0);
-    setFinished(false);
-  };
-
-  // The child's face: as it is at first, a smile once the right picture is found (a grin stays a grin).
-  const mouth = solved && current.before !== "grin" ? "smile" : current.before;
+  const choosing = phase === "choose";
+  const shown = phase === "found" ? images.cause : images.feeling;
+  // The whole text stands under the picture, never on it: what the bear shows and the question, then why once found.
+  const caption = phase === "found" ? scene.told : `${scene.shows} ${t(CAUSE_QUESTION)}`;
+  const next = phase === "show" ? () => setPhase("choose") : phase === "found" ? onDone : undefined;
+  // ◀ bottom left: from the choice back to the feeling alone, otherwise to the scene before.
+  const back = choosing ? () => setPhase("show") : onBack;
+  const card = (which: "cause" | "other", letter: string) => (
+    <ChoiceCard
+      key={which}
+      letter={letter}
+      image={images[which]}
+      sources={framesOf(images[which])}
+      caption={which === "cause" ? scene.cause : scene.other}
+      state={which === "other" && crossed ? "wrong" : "choose"}
+      onChoose={() => pick(which)}
+    />
+  );
 
   return (
-    <main className="cause-play">
-      <div className="cause-scene" key={current.id}>
-        <div className="cause-kid" key={wrongs}>
-          <div className={wrongs > 0 && !solved ? "cause-no" : undefined}>
-            <Mascot kind={current.kind} child mouth={mouth} pose="stand" />
-          </div>
-        </div>
-        <div className="cause-grown">
-          <Mascot kind={current.kind} mouth="smile" pose={solved ? "clap" : "stand"} />
-        </div>
+    <div className="story-play" data-stage={choosing ? "choose" : "show"} data-end={phase === "found" && ending ? "" : undefined}>
+      <DevTag code={sceneCode(scene)} id={`${scene.id} · Durchgang ${pass + 1}`} />
+      <header className="story-top">
+        <StepDots total={progress.total} done={progress.done + (phase === "found" ? 1 : 0)} current={phase !== "found"} upTo={progress.done} onPick={onPick} />
+      </header>
+      <div className="story-scene">
+        <StoryPicture
+          key={shown}
+          name={shown}
+          sources={framesOf(shown)}
+          look={phase === "found" ? "good" : "story"}
+          still={choosing}
+          onTap={choosing ? () => setPhase("show") : undefined}
+        />
       </div>
-      <div className="cause-options">
-        {current.options.map((option) => (
-          <div key={option.id} className={`cause-choice${solved && picked !== option.id ? " pale" : ""}`}>
-            <div
-              className={`cause-option${picked === option.id ? " chosen" : ""}`}
-              role="button"
-              tabIndex={0}
-              aria-label={t(option.label)}
-              data-tap={tapState({ goal: option.fits })}
-              onPointerDown={(e) => pick(option, e.clientX, e.clientY)}
-            >
-              <span className="cause-emoji" aria-hidden="true">
-                {option.emoji}
-              </span>
-            </div>
-            <span className="cause-name" aria-hidden="true">
-              {t(option.label)}
-            </span>
-          </div>
-        ))}
-      </div>
-      <p className="cause-question">{t(CAUSE_QUESTION)}</p>
-      {finished && <GameEnd onAgain={again} />}
-      <FeedbackLayer effects={effects} />
-    </main>
+      {choosing && (
+        <div className="story-choices">
+          {card(left, "A")}
+          {card(right, "B")}
+        </div>
+      )}
+      <StoryWords text={caption} />
+      {phase === "found" && ending && <div className="story-ending">{ending}</div>}
+      {next && <GoOn onNext={next} label={caption} />}
+      {back && (
+        <StepBack
+          onBack={back}
+          label={
+            choosing
+              ? t({ de: "Zurück", ru: "Назад", en: "Back", zh: "返回", hi: "वापस", es: "Atrás", ar: "رجوع" })
+              : t({
+                  de: "Vorige Szene",
+                  en: "Previous scene",
+                  zh: "上一个场景",
+                  hi: "पिछला दृश्य",
+                  es: "Escena anterior",
+                  ar: "المشهد السابق",
+                  ru: "Предыдущая сцена",
+                })
+          }
+        />
+      )}
+    </div>
   );
 }
