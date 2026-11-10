@@ -61,3 +61,18 @@ export function countedHosts(siteUrl: string): string {
   const twin = host.startsWith("www.") ? host.slice(4) : `www.${host}`;
   return `${host},${twin}`;
 }
+
+/**
+ * A little script for the very top of a built page's head that starts fetching the texts of the language the app will
+ * play in together with the start's code. The app loads them before its first screen (loadAppLanguage), but only finds
+ * out which once its own code has run: a visitor whose browser speaks English, on the German start page, waited a
+ * second longer for the shelf on a slow phone, the texts coming only after the start's code (November 2026). It picks
+ * the language as `load()` in src/lib/language.ts does – the one saved (`key`), else for a search engine (`crawler`)
+ * the address's (`address`), else the first of the browser's languages the app speaks, else English – and German
+ * needs nothing. `chunks` names, for each other language the app speaks, its texts chunk and the chunks it imports.
+ * It stands before the stylesheet: a script after one waits until the stylesheet has loaded.
+ */
+export function textsPreload(chunks: Record<string, string[]>, address: string, { key, crawler }: { key: string; crawler: RegExp }) {
+  const code = `(function(c,a,k,r){var l,w,i,x,n=navigator;try{l=localStorage.getItem(k)}catch(e){}if(l!=="de"&&!c[l]){l="de";w=r.test(n.userAgent)?[a]:[].concat(n.languages&&n.languages.length?n.languages:n.language?[n.language]:[],"en");for(i=0;i<w.length;i++){x=String(w[i]).toLowerCase().split("-")[0];if(x==="de"||c[x]){l=x;break}}}(c[l]||[]).forEach(function(f){var t=document.createElement("link");t.rel="modulepreload";t.crossOrigin="anonymous";t.href=f;document.head.appendChild(t)})})(${JSON.stringify(chunks)},${JSON.stringify(address)},${JSON.stringify(key)},${crawler.toString()})`;
+  return `<script>${code}</script>`;
+}

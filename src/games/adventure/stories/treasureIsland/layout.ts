@@ -72,10 +72,15 @@ export const ROD_LENGTH = 1.25;
 export const ROD_GRIP_R = 0.27;
 export const ROD_GRIP_L = 0.08;
 export const CAST_REACH = 3.6;
+/** How many short pieces the fishing line is drawn of, so it can sag in a curve. */
+export const LINE_PIECES = 12;
 /** Where the rod lies on Ole's back after the fishing (Ole's own space, x to Ole's left): along its left side, behind Tapsi. */
 export const ROD_REST = v3(0.5, 0, -0.05);
-/** Where the paddle stands in the water beside Ole while Tapsi fishes (Ole's own space): on Tapsi's right and a little behind, low, so it does not hide the island. */
-export const PADDLE_STAND = v3(-1.05, 0.7, -0.3);
+/**
+ * Where the paddle lies while Tapsi waves, fishes and sits (Ole's own space): along the right side of the
+ * shell, low, so it hides neither the island nor the rod and the float from a camera on Tapsi's right.
+ */
+export const PADDLE_REST = v3(-0.55, 0.47, -0.1);
 export const BOAT_END = 35;
 /** Where Ole has crawled up the beach after the paddling, with Tapsi still on its back. */
 export const BEACH_Z = 32.2;
@@ -106,20 +111,56 @@ export const DRUMS_Z = 15.5;
 /** Where the beating paw comes down (measured on the drum clip), from Tapsi: x to Tapsi's left; and how wide the drums are. */
 export const DRUM_HAND = v3(0.42, 0.75, 0.32).multiplyScalar(GUIDE_SIZE);
 export const DRUM_RADIUS = 0.15;
-/** The wooden gate across the path; half its opening, and how high it rises. */
+/** How many birds every drum beat scares off the path together. */
+export const BIRDS_PER_BEAT = 2;
+/** How much bigger than `makeBird` draws them the birds at the drums are, to be seen beside Tapsi from behind. */
+export const BIRD_SCALE = 3;
+/** About how far behind Tapsi the drums' camera stands (m), on a wide screen: the birds sit clear of Tapsi and the drums from there. */
+export const DRUMS_CAMERA_BACK = 2;
+
+/**
+ * Where bird n at the drums sits on the path, relative to Tapsi at the drums: a little flock for every beat, on
+ * the side of its drum (even beats on Tapsi's left, -x), the nearest first. They sit well ahead and out to the
+ * side as the camera close behind Tapsi's shoulders sees them, beside the drums and the body and never behind
+ * them (right behind Tapsi, seen from high up, they were hidden by its legs and the drums). `r` gives the jitter.
+ */
+export function drumBirdSpot(n: number, r: () => number) {
+  const beat = Math.floor(n / BIRDS_PER_BEAT);
+  const inFlock = n % BIRDS_PER_BEAT;
+  const side = beat % 2 === 0 ? -1 : 1;
+  const ahead = 2.3 + Math.floor(beat / 2) * 0.35 + inFlock * 0.2 + r() * 0.15;
+  const x = side * (DRUMS_CAMERA_BACK + ahead) * (0.3 + inFlock * 0.09 + r() * 0.04);
+  return { beat, side, x, ahead };
+}
+/**
+ * The wooden gate across the path; half its opening, and how high it rises: its stakes' feet end well above
+ * the tips of Tapsi's ears on Ole's back (2.2 m over the ground), so Tapsi rides through without touching it.
+ */
 export const GATE_Z = 10.5;
 export const GATE_HALF = 1.3;
-export const GATE_LIFT = 1.9;
-/** The winch beside the gate on the left; its crank turns in front of Tapsi's paws. */
-export const WINCH_X = -2.55;
+export const GATE_LIFT = 2.7;
+/** How high the beam over the gate is: above the stakes' tips when the gate is up, so they never go into it. */
+export const GATE_BEAM = GATE_LIFT + 2.5;
+/**
+ * How far in front of Tapsi, how far to its left and how high the crank turns (measured on the clip): Tapsi
+ * stands beside it, so the camera straight behind sees its whole big circle beside the body. The body goes
+ * along (down at the bottom, up on the toes at the top), so the paws stay on its handle.
+ */
+export const CRANK_REACH = 0.34 * GUIDE_SIZE;
+export const CRANK_SIDE = 0.4;
+const CRANK_HEIGHT = 0.82 * GUIDE_SIZE;
+export const CRANK_ARM = 0.3 * GUIDE_SIZE;
+/** The winch beside the gate on the left, its crank beside Tapsi on Ole's back, where Ole stands clear of the gate's post. */
+export const WINCH_X = -2.55 - CRANK_SIDE;
 export const WINCH_Z = GATE_Z + 0.35;
-/** How far in front of Tapsi and how high the paws turn the crank (measured on the clip). */
-export const CRANK_REACH = 0.39 * GUIDE_SIZE;
-const CRANK_HEIGHT = 0.86 * GUIDE_SIZE;
-export const CRANK_ARM = 0.24 * GUIDE_SIZE;
-/** The knob sticking out of the crank towards Tapsi, and the level bar on it that both paws hold. */
+/**
+ * The knob sticking out of the crank towards Tapsi, and the long level bar on it that both paws hold: it
+ * reaches from the knob over to Tapsi's right, in front of Tapsi's chest, and the paws hold it this far
+ * from the knob (m).
+ */
 export const CRANK_KNOB = 0.12;
-export const CRANK_BAR = 0.26;
+export const CRANK_BAR = 0.6;
+export const CRANK_GRIPS = { L: 0.28, R: 0.48 };
 /** The crank's axle above the ground: Tapsi turns it standing on Ole's back. */
 export const CRANK_Y = TURTLE_BACK + CRANK_HEIGHT;
 /** How far behind the crank the winch's post stands: beyond Ole's head. */
@@ -156,10 +197,15 @@ export const BAY = v3(0.3, 0, -23);
 /** Where the lock hangs on the chest (the chest's own space), and where the turning paw is, from Tapsi. */
 export const LOCK = v3(0, 0.62, 0.45);
 const KEY_HAND = v3(-0.1, 0.95, 0.42).multiplyScalar(GUIDE_SIZE);
-/** The camera for the key turn, from the lock: over Tapsi's right shoulder, so the paw and the key's ring show. */
-export const KEY_VIEW = v3(1.35, 1.0, 2.4);
-/** Where the key's ring is when it is in the lock, from the lock. */
-export const KEY_RING = v3(0, 0.05, 0.4);
+/**
+ * The camera for the key turn, from the lock: level with the key on Tapsi's right, side on, so the ring is
+ * seen standing up and lying down as it turns, the paw on it and the chest beside it.
+ */
+export const KEY_VIEW = v3(1.9, 0.25, 0.2);
+/** Where the key's ring is when it is in the lock, from the lock (it sticks out of it towards Tapsi). */
+export const KEY_RING = v3(0, 0.05, 0.36);
+/** Where the lock is from Tapsi: a key's length beyond the turning paw, so the key never reaches into Tapsi's body. */
+const KEY_LOCK = v3(KEY_HAND.x, KEY_HAND.y - KEY_RING.y, KEY_HAND.z + KEY_RING.z);
 export const RAFT_FROM = -35;
 /** Where the rope is tied to the chest, from the chest. */
 export const ROPE_TIE = v3(0, 0.4, 0.45);
@@ -172,19 +218,22 @@ export const ROPE_REACH = 0.26;
 export const ROPE_TAIL = [v3(-0.22, 0.22, 0.17), v3(-0.3, -0.05, 0.08), v3(-0.36, 0.03, 0.02), v3(-0.42, 0.03, -0.4)];
 /** Pulled in to Ole's side, the chest right in front of Tapsi: x so the lock is at the turning paw, z just clear of the shell. */
 export const RAFT_TO = BAY.z - TURTLE_HALF_WIDTH - 1.12;
-export const RAFT_X = BAY.x - KEY_HAND.x - LOCK.x;
+export const RAFT_X = BAY.x - KEY_LOCK.x - LOCK.x;
 /**
  * The chest on its crate at the near end of the raft (the raft's own space): high enough that the
  * lock is where Tapsi's paw turns the key, standing on Ole's back, and close enough to reach.
  */
-export const CHEST_Y = TURTLE_BACK - TURTLE_FLOAT + KEY_HAND.y - LOCK.y;
-export const CHEST_Z = BAY.z - KEY_HAND.z - LOCK.z - RAFT_TO;
+export const CHEST_Y = TURTLE_BACK - TURTLE_FLOAT + KEY_LOCK.y - LOCK.y;
+export const CHEST_Z = BAY.z - KEY_LOCK.z - LOCK.z - RAFT_TO;
 /** Where Tapsi celebrates, facing us: Ole has turned round and crawled up the beach. */
 export const PARTY = v3(BAY.x, 0, BAY.z + 1.9);
-/** At the end Tapsi stands in the sand here, beside Ole on the right as we see it, facing the bay … */
-export const COIN_STAND = v3(PARTY.x + 1.4, 0, PARTY.z);
-/** … before the open chest the crabs have set down, its front to Tapsi and the lid open away, so the paws reach down into it. */
-export const CHEST_SAND = v3(COIN_STAND.x, 0, COIN_STAND.z - 0.62);
+/**
+ * At the end Tapsi stays on Ole's back (it never jumps off its friend): it steps here, to the edge of the shell
+ * towards the bay (Ole lies side on, so world z runs across its back), and turns round to the bay …
+ */
+export const COIN_STAND = v3(PARTY.x, 0, PARTY.z - 0.45);
+/** … before the open chest the crabs set down in the sand right behind Ole, its front to Tapsi and the lid open away, so the paws reach down into it. */
+export const CHEST_SAND = v3(COIN_STAND.x, 0, COIN_STAND.z - 0.8);
 /** The way the crabs carry the chest from the raft (x, z): out past Ole on the right and up the beach. */
 export const CARRY_PATH: [number, number][] = [
   [RAFT_X + 1.3, CHEST_Z + RAFT_TO + 0.3],

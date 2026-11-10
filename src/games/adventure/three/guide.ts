@@ -222,6 +222,12 @@ export class Guide {
   /** The happy face: eyes squeezed into arcs, a wide open laugh and red cheeks. */
   private readonly happyEyes: THREE.Object3D[] = [];
   private readonly laugh: THREE.Group;
+  /** The open mouth while talking: a small dark half-moon with a tongue, like the laugh but smaller. */
+  private readonly speech: THREE.Group;
+  /** How far the talking mouth is open now (0..1), following the syllables smoothly. */
+  private speechOpen = 0;
+  /** How much the face talks (0..1): it eases in and out, so the mouth never snaps shut. */
+  private speechWeight = 0;
   private readonly blush: THREE.Mesh[] = [];
   private readonly ears: THREE.Group[] = [];
   private readonly armL: Arm;
@@ -309,19 +315,31 @@ export class Guide {
     this.mouth.rotation.z = Math.PI;
     this.mouth.position.set(0, 0.04, 0.33);
     face.add(this.mouth);
-    // The laugh: a wide open half-moon with a pink tongue.
-    this.laugh = new THREE.Group();
-    this.laugh.position.set(0, 0.045, 0.325);
-    this.laugh.rotation.x = -0.35;
-    const laughGeo = new THREE.CircleGeometry(0.06, 24, Math.PI, Math.PI);
-    laughGeo.scale(1.15, 1, 1);
-    this.laugh.add(new THREE.Mesh(laughGeo, new THREE.MeshStandardMaterial({ color: "#5a1a1f", roughness: 0.6, side: THREE.DoubleSide })));
-    const tongue = new THREE.Mesh(new THREE.CircleGeometry(0.03, 16), new THREE.MeshStandardMaterial({ color: "#ff7c8f", roughness: 0.5 }));
-    tongue.scale.set(1.2, 0.6, 1);
-    tongue.position.set(0, -0.042, 0.002);
-    this.laugh.add(tongue);
-    this.laugh.visible = false;
-    face.add(this.laugh);
+    // The laugh: a wide open half-moon with a pink tongue; talking opens a smaller one of the same kind.
+    // Drawn a little in front of what lies at the same depth, so a mouth tucked into the round muzzle (and
+    // not sticking out of it, seen from the side) still shows whole from the front.
+    const onMuzzle = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 };
+    const insideMat = new THREE.MeshStandardMaterial({ color: "#5a1a1f", roughness: 0.6, side: THREE.DoubleSide, ...onMuzzle });
+    const tongueMat = new THREE.MeshStandardMaterial({ color: "#ff7c8f", roughness: 0.5, ...onMuzzle });
+    const openMouth = (radius: number, y: number, z: number, tilt: number) => {
+      const group = new THREE.Group();
+      group.position.set(0, y, z);
+      group.rotation.x = -tilt;
+      const inside = new THREE.CircleGeometry(radius, 24, Math.PI, Math.PI);
+      inside.scale(1.15, 1, 1);
+      group.add(new THREE.Mesh(inside, insideMat));
+      const tongue = new THREE.Mesh(new THREE.CircleGeometry(radius / 2, 16), tongueMat);
+      tongue.scale.set(1.2, 0.6, 1);
+      tongue.position.set(0, -radius * 0.7, 0.002);
+      group.add(tongue);
+      group.visible = false;
+      face.add(group);
+      return group;
+    };
+    this.laugh = openMouth(0.06, 0.045, 0.325, 0.35);
+    // Its straight top edge where the closed smile's corners are, so the mouth opens downwards from them; a
+    // little further out than the smile and tipped forward, following the round muzzle.
+    this.speech = openMouth(0.045, 0.045, 0.345, 0.5);
 
     const eyeMat = new THREE.MeshPhysicalMaterial({ color: "#1d1411", roughness: 0.1, clearcoat: 1 });
     const shine = new THREE.MeshBasicMaterial({ color: "#ffffff" });
@@ -757,11 +775,19 @@ export class Guide {
       ear.rotation.x = -0.15 - this.earsBack * 1.35 + earBounce;
     });
 
-    const open = this.talking ? 0.6 + Math.abs(Math.sin(time * 14)) * 0.9 : 0.6;
-    this.mouth.scale.set(1, open, 1);
-    this.mouth.visible = !happy;
+    // Talking: the mouth opens and closes smoothly about four syllables a second, some wider than others,
+    // and eases shut when the voice stops – never a smile line stretched up and down, which looked odd.
+    const syllable = 0.5 - 0.5 * Math.cos(time * 24);
+    const stress = 0.65 + 0.35 * Math.sin(time * 2.3) * Math.sin(time * 1.3 + 1);
+    this.speechWeight = live ? THREE.MathUtils.damp(this.speechWeight, this.talking ? 1 : 0, 12, dt) : this.talking ? 1 : 0;
+    this.speechOpen = live ? THREE.MathUtils.damp(this.speechOpen, syllable * stress, 25, dt) : syllable * stress;
+    const open = this.speechOpen * this.speechWeight;
+    const talkingNow = this.speechWeight > 0.02;
+    this.mouth.visible = !happy && !talkingNow;
+    this.speech.visible = !happy && talkingNow;
+    this.speech.scale.set(0.85 + open * 0.15, 0.3 + open * 0.7, 1);
     this.laugh.visible = happy;
-    const laughOpen = 0.85 + (this.talking ? Math.abs(Math.sin(time * 14)) * 0.35 : Math.sin(time * 6) * 0.08);
+    const laughOpen = 0.85 + (talkingNow ? open * 0.3 : Math.sin(time * 6) * 0.08);
     this.laugh.scale.set(1, laughOpen, 1);
 
     // Only the limbs the movement is about show through the body.

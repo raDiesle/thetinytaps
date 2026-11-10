@@ -28,8 +28,11 @@ function browserLanguages(): readonly string[] {
  * Search engines that run the page, and Google's own page tests, by their user agent. Named one by one:
  * a pattern like /bot/ would also catch phones (Cubot) and send their players German.
  */
-const CRAWLER =
+export const CRAWLER =
   /googlebot|google-inspectiontool|storebot-google|chrome-lighthouse|bingbot|yandexbot|duckduckbot|baiduspider|applebot|petalbot|seznambot|slurp/i;
+
+/** Where the app language a grown-up picked is saved (language.ts); a built page's head reads it too (tools/pageStart.ts). */
+export const LANGUAGE_KEY = "tinytaps.applanguage.v1";
 
 /** Whether the page is being read by a search engine or a preview service rather than played. */
 export function isCrawler(userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent) {

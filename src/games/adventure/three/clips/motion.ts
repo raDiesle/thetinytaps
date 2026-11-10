@@ -171,10 +171,14 @@ export const keyTurn = (t: number) => (t < KEY_PICKUP ? 0 : hold(phase(t - KEY_P
 
 /** Seconds of one cast of the fishing rod: swinging back over the shoulder, then out. */
 export const CAST_PERIOD = 3.2;
-/** How far a cast is swung back over the right shoulder and out ahead (0..1 each), `t` seconds into the cast clip. */
+/**
+ * How far a cast is swung back over the right shoulder, out ahead and followed through (0..1 each), `t`
+ * seconds into the cast clip. Like a real overhead cast: lifted back slowly, a moment's pause, then snapped
+ * forwards quickly and stopped high – the float lets go there – and the rod follows it down towards the water.
+ */
 export function castSwing(t: number) {
   const k = phase(t, CAST_PERIOD);
-  return { back: hold(k, 0.05, 0.35, 0.42, 0.5), out: hold(k, 0.42, 0.55, 0.85, 1) };
+  return { back: hold(k, 0.05, 0.32, 0.42, 0.49), out: hold(k, 0.42, 0.5, 0.85, 1), follow: hold(k, 0.5, 0.64, 0.85, 1) };
 }
 /** Sitting down or getting up takes this long, from this many seconds into the sit clip; stories sit the guide down with it. */
 export const SIT_FROM = 0.2;

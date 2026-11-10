@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
 import { hasTexts, loadTexts } from "@/content/texts";
-import { playLanguage } from "@/lib/locale";
+import { LANGUAGE_KEY, playLanguage } from "@/lib/locale";
 import { addressLanguage } from "@/lib/pageAddress";
 import { keepTextsOffline } from "@/lib/pwa";
 
@@ -20,7 +20,7 @@ export const APP_LANGUAGES: TargetLanguageId[] = ["de", "en", "zh", "hi", "es", 
 /** The thing in `language`, or the German one when there is none. */
 export const pick = <T>(texts: Localized<T>, language: TargetLanguageId): T => texts[language] ?? texts.de;
 
-const KEY = "tinytaps.applanguage.v1";
+const KEY = LANGUAGE_KEY;
 const listeners = new Set<() => void>();
 
 /** The saved app language; until a grown-up picks one, the browser's language if the app speaks it (playLanguage). */

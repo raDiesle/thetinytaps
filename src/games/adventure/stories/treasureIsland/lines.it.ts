@@ -150,7 +150,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 💰
     {
-      situation: "Oh! Oro! I granchi ci portano il forziere. Salto giù!",
+      situation: "Oh! Oro! I granchi ci portano il forziere.",
       instruction: "Mani dentro, fino in fondo, e lancia le monete in alto! Così!",
       turn: "Ora tu: mani dentro e lancia in alto!",
       again: "Mani dentro, lancia in alto!",

@@ -25,7 +25,8 @@ import { SEO_ZH } from "../src/content/seo.zh";
 import { shelfEntryOf } from "../src/content/games";
 import { appPlugin, PRODUCTION } from "./appPlugin";
 import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
-import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules } from "./pageStart";
+import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, textsPreload } from "./pageStart";
+import { CRAWLER, LANGUAGE_KEY } from "../src/lib/locale";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
 // After bundling it adds what GitHub Pages and an offline app need: public/, the manifest and icon links,
@@ -233,11 +234,11 @@ function headTags({ language, page, text }: BuiltPage) {
 // every page would be wrong, and Google ignores lastmod on a site where it is often wrong.
 // 404.html stays the plain start page, so deep links like /bilder/baustelle/ still boot the app.
 async function writePages(template: string) {
-  await writeFile(join(OUT, "404.html"), template);
+  const { preloadsOf, textsOf } = await pagePreloads(template);
+  await writeFile(join(OUT, "404.html"), textsOf(template, "de"));
   const built = SEO_LANGUAGES.flatMap((language) => SEO_PAGES.map((page): BuiltPage => ({ language, page, text: textIn(page, language) })));
-  const preloadsOf = await pagePreloads(template);
   for (const one of built) {
-    let html = replaceOnce(template, '<html lang="de">', `<html lang="${one.language}">`);
+    let html = replaceOnce(textsOf(template, one.language), '<html lang="de">', `<html lang="${one.language}">`);
     html = replaceOnce(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(one.text))}</title>`);
     html = replaceOnce(html, /<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${escapeHtml(one.text.description)}" />`);
     html = replaceOnce(html, "</head>", `  ${[headTags(one), ...(await preloadsOf(one))].join("\n    ")}\n  </head>`);
@@ -250,7 +251,7 @@ async function writePages(template: string) {
     for (const path of NO_INDEX_PATHS) {
       const dir = join(OUT, languagePrefix(language), path);
       await mkdir(dir, { recursive: true });
-      const html = replaceOnce(template, '<html lang="de">', `<html lang="${language}">`);
+      const html = replaceOnce(textsOf(template, language), '<html lang="de">', `<html lang="${language}">`);
       await writeFile(join(dir, "index.html"), replaceOnce(html, "</head>", '<meta name="robots" content="noindex" /></head>'));
     }
   }
@@ -276,10 +277,12 @@ async function writePages(template: string) {
 }
 
 /**
- * The chunks a page needs beyond the start's, as `<link rel="modulepreload">` tags: its own page's code (App.tsx loads
- * it lazily, so without them it was fetched only after the start's code had run, one round trip after another) and, on
- * a page in another language than German, that language's texts, which the app loads before its first screen. They
- * come down together with the start's code, while the page's title waits on paper (`.boot`).
+ * The chunks a page needs beyond the start's, as `<link rel="modulepreload">` tags (`preloadsOf`): its own page's code
+ * (App.tsx loads it lazily, so without them it was fetched only after the start's code had run, one round trip after
+ * another). And `textsOf`, which puts the script into a page's head that fetches the texts of the language the visitor
+ * will play in (textsPreload) – the browser's, not the address's: a German page played in English needs the English
+ * texts, an English page played in German none. They come down together with the start's code, while the page's title
+ * waits on paper (`.boot`).
  */
 async function pagePreloads(template: string) {
   const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
@@ -291,13 +294,18 @@ async function pagePreloads(template: string) {
     if (found.length !== 1) throw new Error(`build: ${found.length} chunks for ${name}`);
     return found[0];
   };
-  return async ({ language, page }: BuiltPage) => {
-    const module = pageModuleFor(page.path, modules);
-    if (module === undefined) throw new Error(`build: no page of App.tsx opens ${page.path}`);
-    const firsts = [...(module ? [chunkOf(module)] : []), ...(language === "de" ? [] : [chunkOf(`texts-${language}`)])];
-    const needed = new Set<string>();
-    for (const first of firsts) for (const file of await chunkClosure(first, read, `${base}/static/`)) needed.add(file);
-    return [...needed].filter((file) => !linked.has(href(`/${file}`))).map((file) => `<link rel="modulepreload" crossorigin href="${href(`/${file}`)}">`);
+  const unlinked = async (first: string) => (await chunkClosure(first, read, `${base}/static/`)).map((file) => href(`/${file}`)).filter((url) => !linked.has(url));
+  const texts: Record<string, string[]> = {};
+  for (const language of SEO_LANGUAGES) if (language !== "de") texts[language] = await unlinked(chunkOf(`texts-${language}`));
+  const stylesheet = '<link rel="stylesheet"';
+  return {
+    preloadsOf: async ({ page }: BuiltPage) => {
+      const module = pageModuleFor(page.path, modules);
+      if (module === undefined) throw new Error(`build: no page of App.tsx opens ${page.path}`);
+      return (module ? await unlinked(chunkOf(module)) : []).map((url) => `<link rel="modulepreload" crossorigin href="${url}">`);
+    },
+    textsOf: (html: string, address: SeoLanguage) =>
+      replaceOnce(html, stylesheet, `${textsPreload(texts, address, { key: LANGUAGE_KEY, crawler: CRAWLER })}${stylesheet}`),
   };
 }
 

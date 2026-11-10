@@ -6,7 +6,7 @@ import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomOffline, RoomSpe
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
-import { type Localized, useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
@@ -67,11 +67,16 @@ const DAILY_SPINE = 0.38;
  */
 const LEAN_ROOM = 0.13;
 
-/** The words carved beside the everyday helpers: all of them, or only the first line where the room is small. */
+/**
+ * The place of the words carved beside the everyday helpers. Their sentence below the first line comes wherever it fits
+ * (measured in the page, `DailyGroup`): a phone on its side has room for it under the sign too, and showed only „Für
+ * Groß & Klein“ with empty room below it (user feedback, November 2026).
+ */
 interface Carving {
   /** How wide, in picture books' widths. */
   span: number;
-  short: boolean;
+  /** A narrow place, where the words stand a little smaller and closer to its sides. */
+  narrow: boolean;
   /** The least height of a picture book for them: below it they would be too small to read. */
   minBook: number;
 }
@@ -81,9 +86,9 @@ interface Carving {
  * none does, since its „mehr …“ is the way to the texts for grown-ups.
  */
 const CARVINGS: Carving[] = [
-  { span: 1.4, short: false, minBook: 170 },
-  { span: 1.3, short: false, minBook: 170 },
-  { span: 1.25, short: true, minBook: 100 },
+  { span: 1.4, narrow: false, minBook: 170 },
+  { span: 1.3, narrow: false, minBook: 170 },
+  { span: 1.25, narrow: true, minBook: 100 },
 ];
 
 /** How much smaller the picture books may get for the carved words. */
@@ -355,8 +360,32 @@ function DailyGroup({
   take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const t = useT();
+  const { id: language } = useAppLanguage();
   const name = t(CATEGORIES.find((c) => c.id === books[0].world)?.title ?? books[0].title);
   const span = dailySpan(carving);
+  const sentence = useRef<HTMLSpanElement>(null);
+
+  // The sentence under „Für Groß & Klein“ comes wherever it fits whole – in height and in its longest word's width –
+  // and is left out where it doesn't, never cut off or spilling over the board: what fits shows on the page, so it is
+  // measured there (offsetHeight leaves the carving's 3D push out). Hiding it changes nothing of the carving's own size.
+  // Measured again when the words change with the language, and the room with the carving.
+  useLayoutEffect(() => {
+    const words = sentence.current;
+    const box = words?.parentElement;
+    if (!words || !box) return;
+    const fit = () => {
+      words.hidden = false;
+      const style = getComputedStyle(box);
+      const room = box.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      const parts = [...box.children].filter((part): part is HTMLElement => part instanceof HTMLElement && part.offsetHeight > 0);
+      const need = parts.reduce((sum, part) => sum + part.offsetHeight, 0) + (parseFloat(style.rowGap) || 0) * (parts.length - 1);
+      words.hidden = need > room + 1 || words.scrollWidth > words.clientWidth + 1;
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [carving, language]);
   return (
     <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN, "--lean-room": LEAN_ROOM } as CSSProperties}>
       <span className="shelf-daily-books">
@@ -366,7 +395,7 @@ function DailyGroup({
         <span className="shelf-group-label">{name}</span>
       </span>
       {carving && (
-        <span className="shelf-carving" data-short={carving.short || undefined}>
+        <span className="shelf-carving" data-narrow={carving.narrow || undefined}>
           {/* Kept whole, so a narrow carving never breaks it. */}
           <span className="shelf-carving-big">
             {t({
@@ -379,21 +408,17 @@ function DailyGroup({
               ar: "للكبار\u00a0والصغار",
             })}
           </span>
-          {!carving.short && (
-            <>
-              <span>
-                {t({
-                  de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag.",
-                  ru: "Первый шаг в цифровой мир вместе – развивающие игры и помощники на каждый день.",
-                  en: "The first step into the digital world, taken together – with learning games and little helpers for the day.",
-                  zh: "一起迈向数字世界的第一步——有益智游戏，也有日常小帮手。",
-                  hi: "डिजिटल दुनिया में साथ मिलकर पहला क़दम – सीखने वाले खेलों और दिन भर के छोटे मददगारों के साथ।",
-                  es: "El primer paso juntos al mundo digital, con juegos para aprender y pequeños ayudantes para el día.",
-                  ar: "الخطوة الأولى معًا إلى العالم الرقمي – مع ألعاب تعليمية ومساعدين صغار لكل يوم.",
-                })}
-              </span>
-            </>
-          )}
+          <span className="shelf-carving-words" ref={sentence}>
+            {t({
+              de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag.",
+              ru: "Первый шаг в цифровой мир вместе – развивающие игры и помощники на каждый день.",
+              en: "The first step into the digital world, taken together – with learning games and little helpers for the day.",
+              zh: "一起迈向数字世界的第一步——有益智游戏，也有日常小帮手。",
+              hi: "डिजिटल दुनिया में साथ मिलकर पहला क़दम – सीखने वाले खेलों और दिन भर के छोटे मददगारों के साथ।",
+              es: "El primer paso juntos al mundo digital, con juegos para aprender y pequeños ayudantes para el día.",
+              ar: "الخطوة الأولى معًا إلى العالم الرقمي – مع ألعاب تعليمية ومساعدين صغار لكل يوم.",
+            })}
+          </span>
           <RoomNotes />
         </span>
       )}
