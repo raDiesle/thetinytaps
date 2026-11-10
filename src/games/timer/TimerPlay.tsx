@@ -474,8 +474,8 @@ export function stageStyle(picture: TimerPicture, total: number, stops: number) 
 }
 
 /**
- * One picture's drawing on the stage, for a run of `total` ms cut into the pieces of `set` ms: in a run, and at its end
- * on the start screen's card (`TimerCardArt`).
+ * One picture's drawing on the stage, for a run of `total` ms cut into the pieces of `set` ms: in a run, and halfway
+ * through one on the start screen's card (`TimerCardArt`, `still`: no clock of its own ticks on).
  */
 export function SceneParts({
   picture,
@@ -484,6 +484,7 @@ export function SceneParts({
   set,
   poke,
   startedAt,
+  still,
 }: {
   picture: TimerPicture;
   phase: Phase;
@@ -492,6 +493,8 @@ export function SceneParts({
   /** Counts the taps, each lighting what is left. */
   poke: number;
   startedAt: number;
+  /** A menu's card: the picture at this moment, with nothing that counts on by itself. */
+  still?: boolean;
 }) {
   const apples = appleCount(set);
   const stops = pieceCount(set, MAX_STOPS);
@@ -510,10 +513,10 @@ export function SceneParts({
         </>
       )}
       {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
-      {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} />}
+      {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} still={still} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
-      {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} />}
+      {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}
       {picture === "sand" && (

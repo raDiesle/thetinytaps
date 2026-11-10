@@ -2,9 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { bookIdOf, CATEGORIES, hasPage, listedGames } from "@/content/games";
+import sharp from "sharp";
+import { PREVIEW_SIZE } from "@/components/GameCard";
 import { SCENE_ENTRIES } from "@/games/scenes/catalog";
 
-// The menus show a round cut of each game instead of its emoji (user request, November 2026), made by
+// The menus show a 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
 // `bun run previews` (tools/previews.ts) as small still pictures: these checks keep every menu's pictures there and
 // light, so a phone shows a menu without drawing a single game.
 
@@ -44,6 +46,18 @@ describe("menu pictures", () => {
   test("bun run previews knows every folder the menus show", () => {
     expect(folders.length).toBeGreaterThan(5);
     for (const folder of new Set(folders)) expect(TOOL.includes(`"${folder}"`), folder).toBe(true);
+  });
+
+  test("every picture is 3 : 2 at the size the menus show, so it fills a card without stretching", async () => {
+    // A round cut in a square showed too little of the game (user feedback, November 2026); old squares left in a
+    // folder would be cropped by the card.
+    expect(TOOL).toContain(`const SIZE = { width: ${PREVIEW_SIZE.width}, height: ${PREVIEW_SIZE.height} }`);
+    for (const folder of new Set(folders)) {
+      for (const name of readdirSync(join(ROOT, folder))) {
+        const { width, height } = await sharp(join(ROOT, folder, name)).metadata();
+        expect({ width, height }, `${folder}/${name}`).toEqual({ ...PREVIEW_SIZE });
+      }
+    }
   });
 
   test("the pictures are small: a menu of twenty cards stays light on a phone", () => {

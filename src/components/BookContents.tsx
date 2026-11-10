@@ -9,7 +9,7 @@ import previews from "./vorschau/*.webp?glob";
 
 /**
  * A book's first page, laid out as a picture book's table of contents (user feedback, October 2026):
- * one line per game, its picture (a round cut of the game, `vorschau/<book id>.webp`), its name, the dots leading to the page it is on. Each line is as tall as the page
+ * one line per game, its picture (a cut of the game in a rounded rectangle, `vorschau/<book id>.webp`), its name, the dots leading to the page it is on. Each line is as tall as the page
  * allows (the lines share the room under the title), and the whole line is the tap: it turns the page to the game.
  */
 export function BookContents({ games, world }: { games: Game[]; world: string }) {

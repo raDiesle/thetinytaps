@@ -454,13 +454,19 @@ In a fresh worktree run `bun install` first.
   front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
   last first; `GameShell.test.ts` checks).
 - **Menus show pictures from the games, not emojis** (user request, November 2026): every card of a start screen, every
-  line of a book's table of contents and every picture's card of Lebendige Bilder shows a round cut of its game as it
-  plays (`CardPicture`), a small still webp in the game's `vorschau/` folder (`GameShell previews`; the books' lines in
-  `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the game's own svg drawn
-  into the menu, which would have a phone draw every game at once. A new game, level, scene or card runs it
+  line of a book's table of contents and every picture's card of Lebendige Bilder shows a 3 : 2 cut of its game as it
+  plays (`CardPicture`, `PREVIEW_SIZE`), a small still webp in the game's `vorschau/` folder (`GameShell previews`; the
+  books' lines in `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the
+  game's own svg drawn into the menu, which would have a phone draw every game at once. On a card the picture fills
+  nearly the whole card with the name on a small paper label over its foot, and on a table of contents' line it is a big
+  rounded rectangle as tall as the line – never a small round cut in the middle, which showed too little (user feedback,
+  November 2026). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
+  it is about (an animal with the right food and at least one wrong one), the letter, picture and word together, the
+  number with all its things, several sock pairs on the line, a dancer mid-move (`WHOLE`, `ALONE`, `PLAYS` – a moment
+  played into the game first, never only its empty start). A new game, level, scene or card runs it
   (`bun run previews <folder or address>`) and its picture is looked at before committing (`--shots` keeps the whole
   window beside it): where the start shows only sky, a dark room or an empty page waiting for a key, give it a cut, a
-  later moment or a key there (`CUTS`, `WAITS`, `KEYS`), as Kettenreaktion's big worlds and the keyboard games needed;
+  later moment or a key there (`CUTS`, `WAITS`, `PLAYS`), as Kettenreaktion's big worlds and the keyboard games needed;
   what a game lays over its picture (key letters, a count, a backpack, sentences, its buttons) goes into
   `HIDE_OVERLAYS`, or the cut finds it as the busiest part; a new menu adds its folder to `MENUS` (`previews.test.ts`).
   The emoji stays only where no picture is yet (a card „bald“).

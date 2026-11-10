@@ -3,10 +3,11 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
 
-// `bun run previews`: the round pictures on the menus' cards and lines (user request, November 2026: pictures from the
+// `bun run previews`: the pictures on the menus' cards and lines (user request, November 2026: pictures from the
 // games instead of emojis). It opens each card in headless Chrome as a child would, waits until the game stands, and
-// keeps a square cut of the picture as a small webp in the game's `vorschau/` folder – a still image the menus show at
-// no cost, where the game's own svg in every card would make a phone draw them all.
+// keeps a 3 : 2 cut of the picture as a small webp in the game's `vorschau/` folder – a still image the menus show at
+// no cost, where the game's own svg in every card would make a phone draw them all. A card shows it over nearly its
+// whole face, a table of contents' line as a rounded rectangle (`CardPicture`, user feedback, November 2026).
 //
 //   bun run previews                   build, then picture every card of every menu below
 //   bun run previews marbles           only the menus whose folder or address contains "marbles"
@@ -29,8 +30,10 @@ const shots = option("shots");
 
 /** The window the games are pictured in: a tablet, where every game shows its whole picture. */
 const SCREEN = { width: 1024, height: 768, scale: 2 };
-/** The pictures' side in pixels: about twice the biggest round print (124–150 CSS pixels), sharp on most screens. */
-const SIZE = 256;
+/** The pictures' size in pixels, `PREVIEW_SIZE` in GameCard.tsx: 3 : 2, like a card, sharp enough on most screens. */
+const SIZE = { width: 480, height: 320 };
+/** Width over height of every cut. */
+const ASPECT = SIZE.width / SIZE.height;
 
 /** A menu whose cards get pictures: its address and the folder they go to, `<card's data-mode>.webp`. */
 interface Menu {
@@ -40,7 +43,7 @@ interface Menu {
   levels?: number;
   /**
    * Run in the page before each picture, where a game's start shows too little of it: brings more into sight and
-   * returns the part of the window to look in (CSS pixels), whose busiest square becomes the picture.
+   * returns the part of the window to look in (CSS pixels), whose busiest part becomes the picture.
    */
   prepare?: string;
 }
@@ -48,7 +51,7 @@ interface Menu {
 /**
  * Kettenreaktion's worlds are much bigger than the screen, and the camera starts in a corner of sky: this shows the
  * whole world (`.marble-camera`, moved only by its transform) in the window and returns where it lies, so the picture
- * is the busiest square of it – where the machines stand.
+ * is the busiest part of it – where the machines stand.
  */
 const WHOLE_WORLD = `(() => {
   // Its size before the camera's transform, as cameraLayer sets it (an svg has no offsetWidth).
@@ -81,28 +84,105 @@ const MENUS: Menu[] = [
 const BOOKS = ["lebendige-welten", "gefuehle", "zuordnen", "buchstaben-zahlen"];
 const BOOK_DIR = "src/components/vorschau";
 
+/** Where the tables of contents' pictures go: smaller in the line than on a card, so they are cut closer (`ZOOMED`). */
+const isBook = (file: string) => file.startsWith(BOOK_DIR);
+
 /** What CUTS and WAITS know a picture by: its game's folder and its id, „marbles/topple“ (a book's line: „components/…“). */
 const keyOf = (file: string) => file.split("/").filter((part) => part !== "vorschau").slice(-2).join("/").replace(/\.webp$/, "");
 
 /**
- * Where the cut lies, by `keyOf`: its middle as a share of the window's width and height, and its side as a share of
- * the height. By default it is the busiest square of the window (or of what the menu's `prepare` returns); one given
- * here also skips `prepare`.
+ * Where the cut lies, by `keyOf`: its middle as a share of the window's width and height, and its height as a share of
+ * the window's height (its width is `ASPECT` times that). By default it is the busiest part of the window (or of what
+ * the menu's `prepare` returns); one given here also skips `prepare`.
  */
 const CUTS: Record<string, { x: number; y: number; size: number }> = {
-  // The number and the bear hopping it stand far apart.
-  "components/mitmachen": { x: 0.5, y: 0.55, size: 0.85 },
+  // The clothesline with the pairs hung on it (`PLAYS`), not the floor.
+  "components/socken": { x: 0.39, y: 0.2, size: 0.58 },
 };
 
 /**
- * Keys pressed before the picture, by `keyOf`: the keyboard games wait for a key on an empty page („Drück eine
- * Taste!“), and only then show what they are about.
+ * Cut round everything the window shows (each clear edge in it), however big that is, by `keyOf`: where the parts of
+ * a game's picture stand far apart and the busiest part would cut one off (user feedback, November 2026: Frei tippen's
+ * „A“, its monkey and „Affe“ whole and in the middle; Zählen's number and all its things; Mitmachen's number and the
+ * fox hopping it; the animal with the right thing and a wrong one beside it).
  */
-const KEYS: Record<string, string> = {
-  "components/buchstaben": "a",
-  "components/zaehlen": "4",
-  "components/mitmachen": "3",
+const WHOLE = new Set(["components/buchstaben", "components/zaehlen", "components/mitmachen", "components/tiere"]);
+
+/**
+ * A part of the window shown alone, by `keyOf`, in CSS pixels: cut out and set into a blurred copy of itself widened
+ * to 3 : 2, its sides fading into it, so it fills the picture. Bewegungsabenteuer's dark dancer, in its box at the bottom right, shows the
+ * movement better than the fox seen from behind (user feedback, November 2026).
+ */
+const ALONE: Record<string, Area> = {
+  // Inside the box's rounded corners (it stands at 745–1000 × 443–717 in the tablet's window), its feet whole.
+  "components/abenteuer": { x: 758, y: 446, width: 228, height: 270 },
 };
+
+/**
+ * What a child does before the picture, by `keyOf`: the keyboard games wait for a key on an empty page („Drück eine
+ * Taste!“), and only then show what they are about; others show their best only after playing a while.
+ */
+const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
+  "components/buchstaben": async (cdp) => {
+    await press(cdp, "a");
+    await sleep(2000);
+  },
+  // Three things, counted in one by one, then the digit: small enough to stand whole beside it.
+  "components/zaehlen": async (cdp) => {
+    await press(cdp, "3");
+    await sleep(4500);
+  },
+  "components/mitmachen": async (cdp) => {
+    await press(cdp, "3");
+    await sleep(2000);
+  },
+  // The stomping (the sixth step, a knee and an arm up), a few seconds in, when the dancer is in the middle of it.
+  "components/abenteuer": async (cdp) => {
+    for (let i = 0; i < 6; i++) {
+      await press(cdp, "ArrowRight");
+      await sleep(300);
+    }
+    await sleep(6000);
+  },
+  // Many pairs on the line (user feedback, November 2026): three washes hung whole, so the game takes the child to
+  // four pairs with patterns, and of those all but one.
+  "components/socken": (cdp) => hangSocks(cdp, 3),
+};
+
+/** Hangs every pair of `washes` washes and then all but one pair of the next, as a quick child would. */
+async function hangSocks(cdp: Cdp, washes: number) {
+  for (let wash = 0; wash <= washes; wash++) {
+    await until(cdp, `!!document.querySelector(".socks-play.sorting")`);
+    // The socks tumble out, the baskets come down.
+    await sleep(3000);
+    for (;;) {
+      const left = await evaluate<number>(cdp, `document.querySelectorAll(".sock:not(.gone)").length`);
+      if (left <= (wash === washes ? 2 : 0)) break;
+      await tap(cdp, ".sock:not(.gone)");
+      await sleep(300);
+      await tap(cdp, '.sock[data-tap="goal"]');
+      await sleep(1200);
+    }
+    if (wash < washes) await until(cdp, `!document.querySelector(".socks-play.sorting")`);
+  }
+  await sleep(800);
+}
+
+/** Waits until `condition` (run in the page) holds, at most `ms`. */
+async function until(cdp: Cdp, condition: string, ms = 20_000) {
+  for (const end = Date.now() + ms; Date.now() < end; await sleep(200)) if (await evaluate<boolean>(cdp, condition)) return;
+  throw new Error(`Waited in vain for ${condition}`);
+}
+
+/** Taps the middle of the first element `selector` finds, as a mouse would. */
+async function tap(cdp: Cdp, selector: string) {
+  const at = await evaluate<{ x: number; y: number } | null>(
+    cdp,
+    `(() => { const r = document.querySelector(${JSON.stringify(selector)})?.getBoundingClientRect(); return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null; })()`,
+  );
+  if (!at) throw new Error(`Nothing to tap: ${selector}`);
+  for (const type of ["mousePressed", "mouseReleased"]) await cdp.send("Input.dispatchMouseEvent", { type, ...at, button: "left", clickCount: 1 });
+}
 
 /** How long a game takes to stand after its card was tapped, in ms (the page's turn and the game's first moves). */
 const WAIT = 4500;
@@ -114,12 +194,13 @@ const WAITS: Record<string, number> = {
 /**
  * Hides what lies over every game and is no part of its picture: the corner, the notes, a scene's key letters, count
  * and „Drück eine Taste!“, the story's ⏮ ⏸ ⏭, the marble run's space key, the trail's backpack, Gefühle's
- * sentences under the picture, and the pointing hand (any element whose text is only a 👆, 👇, 👈 or 👉), which would
+ * sentences under the picture, its dots, ◀, ▶ and loudspeaker (seen as content, they made the cut take the whole page
+ * round a small picture), and the pointing hand (any element whose text is only a 👆, 👇, 👈 or 👉), which would
  * stand in every picture.
  */
 const HIDE_OVERLAYS = `(() => {
   const style = document.createElement("style");
-  style.textContent = ".exit-corner, .play-options-corner, .play-fullscreen, .play-fullscreen-corner, .dev-tag, .sound-wait, .scene-prompt, .scene-keys, .scene-goal, .scene-keys-toggle, .adventure-controls, .run-space, .fg-words-text, .fg-day-text, .fg-caption { visibility: hidden !important; }";
+  style.textContent = ".exit-corner, .play-options-corner, .play-fullscreen, .play-fullscreen-corner, .dev-tag, .sound-wait, .scene-prompt, .scene-keys, .scene-goal, .scene-keys-toggle, .adventure-controls, .run-space, .fg-words-text, .fg-day-text, .fg-caption, .fg-dots, .fg-go-on, .fg-next, .fg-back, .story-voice { visibility: hidden !important; }";
   document.head.append(style);
   // Kleine Abenteuer's backpack and its button lie in an svg of their own over the trail.
   const hud = document.querySelector(".tl-bag")?.closest("svg");
@@ -138,23 +219,28 @@ interface Area {
   height: number;
 }
 
-/** A picture's square cut: its left, top and side in pixels. */
-interface Square {
+/** A picture's cut: its left, top, width and height in pixels. */
+interface Cut {
   left: number;
   top: number;
-  side: number;
+  width: number;
+  height: number;
 }
 
-/** How big a cut may be, as a share of the shorter side: smaller, a game's thing is cut off; bigger, its details vanish. */
-const SMALLEST = 0.4;
-const BIGGEST = 0.7;
+/**
+ * How tall a cut may be, as a share of the picture's height: smaller, a game's thing is cut off; bigger, its details
+ * vanish. A card shows much of its game; a table of contents' line, smaller, is cut closer so it can be made out
+ * (user feedback, November 2026: „etwas mehr Zoom“).
+ */
+const WIDE = { smallest: 0.5, biggest: 0.88 };
+const ZOOMED = { smallest: 0.38, biggest: 0.6 };
 
 /**
- * Where to cut `png`: around what it shows where that fits a square (a letter and its animal on an empty page), else
- * the square with the most detail (the sum of its brightness steps from pixel to pixel) – plain sky, wall and paper
- * have none, machines, animals and things a lot.
+ * Where to cut `png` in `ASPECT`: around what it shows where that fits (a letter and its animal on an empty page),
+ * else the part with the most detail (the sum of its brightness steps from pixel to pixel) – plain sky, wall and
+ * paper have none, machines, animals and things a lot.
  */
-async function bestSquare(png: Buffer): Promise<Square> {
+async function bestCut(png: Buffer, { smallest, biggest }: typeof WIDE): Promise<Cut> {
   const { width = 1, height = 1 } = await sharp(png).metadata();
   const f = Math.min(1, 200 / Math.max(width, height));
   // Small and a little blurred, the paper's grain counts as no detail.
@@ -165,7 +251,7 @@ async function bestSquare(png: Buffer): Promise<Square> {
     .raw()
     .toBuffer({ resolveWithObject: true });
   const [w, h] = [info.width, info.height];
-  // A summed table of the steps, so each square's detail is four lookups; and the box round every clear step.
+  // A summed table of the steps, so each cut's detail is four lookups; and the box round every clear step.
   const sum = new Float64Array((w + 1) * (h + 1));
   const box = { x0: w, y0: h, x1: 0, y1: 0 };
   for (let y = 0; y < h; y++) {
@@ -173,63 +259,98 @@ async function bestSquare(png: Buffer): Promise<Square> {
       const p = data[y * w + x];
       const step = (x + 1 < w ? Math.abs(data[y * w + x + 1] - p) : 0) + (y + 1 < h ? Math.abs(data[(y + 1) * w + x] - p) : 0);
       sum[(y + 1) * (w + 1) + x + 1] = step + sum[y * (w + 1) + x + 1] + sum[(y + 1) * (w + 1) + x] - sum[y * (w + 1) + x];
-      if (step > 20) Object.assign(box, { x0: Math.min(box.x0, x), y0: Math.min(box.y0, y), x1: Math.max(box.x1, x), y1: Math.max(box.y1, y) });
+      // The page's paper edge round the picture is no content.
+      const inside = x > w * 0.04 && x < w * 0.96 && y > h * 0.04 && y < h * 0.96;
+      if (step > 20 && inside) Object.assign(box, { x0: Math.min(box.x0, x), y0: Math.min(box.y0, y), x1: Math.max(box.x1, x), y1: Math.max(box.y1, y) });
     }
   }
-  const shorter = Math.min(w, h);
-  const content = Math.max(box.x1 - box.x0, box.y1 - box.y0) * 1.12;
-  const s = Math.round(Math.min(BIGGEST * shorter, Math.max(SMALLEST * shorter, content)));
+  // The cut's height: what the content needs, within the bounds and never wider than the picture.
+  const content = Math.max(box.y1 - box.y0, (box.x1 - box.x0) / ASPECT) * 1.12;
+  const ch = Math.round(Math.min(biggest * h, w / ASPECT, Math.max(smallest * h, content)));
+  const cw = Math.min(w, Math.round(ch * ASPECT));
   let best = { x: 0, y: 0 };
-  if (content <= s) {
-    best = { x: Math.round((box.x0 + box.x1 - s) / 2), y: Math.round((box.y0 + box.y1 - s) / 2) };
+  // Compared with the bound, not with the rounded height: 112.000…1 > 112 once cut Frei tippen's „A“ off.
+  if (content <= Math.min(biggest * h, w / ASPECT)) {
+    best = { x: Math.round((box.x0 + box.x1 - cw) / 2), y: Math.round((box.y0 + box.y1 - ch) / 2) };
   } else {
     let most = -1;
-    for (let y = 0; y + s <= h; y++) {
-      for (let x = 0; x + s <= w; x++) {
-        const detail = sum[(y + s) * (w + 1) + x + s] - sum[y * (w + 1) + x + s] - sum[(y + s) * (w + 1) + x] + sum[y * (w + 1) + x];
+    // Clear of the page's paper edge where there is room: its line is detail too, and stood as a strip at the side.
+    const [mx, my] = [Math.min(Math.round(w * 0.03), Math.floor((w - cw) / 2)), Math.min(Math.round(h * 0.03), Math.floor((h - ch) / 2))];
+    for (let y = my; y + ch <= h - my; y++) {
+      for (let x = mx; x + cw <= w - mx; x++) {
+        const detail = sum[(y + ch) * (w + 1) + x + cw] - sum[y * (w + 1) + x + cw] - sum[(y + ch) * (w + 1) + x] + sum[y * (w + 1) + x];
         if (detail > most) [best, most] = [{ x, y }, detail];
       }
     }
   }
   // Back at full size, kept inside the picture (a rounded pixel, or content near an edge).
-  const side = Math.round(s / f);
+  const cutWidth = Math.min(width, Math.round(cw / f));
+  const cutHeight = Math.min(height, Math.round(cutWidth / ASPECT));
   return {
-    side,
-    left: Math.max(0, Math.min(Math.round(best.x / f), width - side)),
-    top: Math.max(0, Math.min(Math.round(best.y / f), height - side)),
+    width: cutWidth,
+    height: cutHeight,
+    left: Math.max(0, Math.min(Math.round(best.x / f), width - cutWidth)),
+    top: Math.max(0, Math.min(Math.round(best.y / f), height - cutHeight)),
   };
 }
 
-/** Presses `key` (a letter or digit) as a child on a keyboard would. */
+/** Presses `key` (a letter, a digit or a named key like „ArrowRight“) as a child on a keyboard would. */
 async function press(cdp: Cdp, key: string) {
-  const code = /\d/.test(key) ? `Digit${key}` : `Key${key.toUpperCase()}`;
-  await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key, code, text: key });
+  const named = key.length > 1;
+  const code = named ? key : /\d/.test(key) ? `Digit${key}` : `Key${key.toUpperCase()}`;
+  await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key, code, ...(named ? {} : { text: key }) });
   await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key, code });
 }
 
-/** Pictures what the window shows now into `file`: the cut CUTS says, or the busiest square of `area` (by default the window). */
+/** The webp's quality: low enough to stay under the size `previews.test.ts` allows a picture. */
+const QUALITY = 70;
+
+/** Pictures what the window shows now into `file`: the cut CUTS says, or the busiest part of `area` (by default the window). */
 async function picture(cdp: Cdp, file: string, area?: Area | null) {
   const key = keyOf(file);
-  if (KEYS[key]) {
-    await press(cdp, KEYS[key]);
-    await sleep(2000);
-  }
+  await PLAYS[key]?.(cdp);
   await evaluate(cdp, HIDE_OVERLAYS);
   await sleep(150);
   mkdirSync(file.slice(0, file.lastIndexOf("/")), { recursive: true });
   const cut = CUTS[key];
-  if (!cut) {
+  const alone = ALONE[key];
+  if (alone) {
+    const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...alone, scale: 1 } });
+    const png = Buffer.from(shot.data, "base64");
+    if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), png);
+    const { width = 1, height = 1 } = await sharp(png).metadata();
+    const wide = Math.round(height * ASPECT);
+    const backdrop = await sharp(png).resize(wide, height, { fit: "fill" }).blur(24).png().toBuffer();
+    // Its left and right sides fade out, so no edge shows where it meets the blur.
+    const fade = Math.round(width * 0.12);
+    const mask = Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs><linearGradient id="f"><stop offset="0" stop-opacity="0"/><stop offset="${fade / width}" stop-opacity="1"/><stop offset="${1 - fade / width}" stop-opacity="1"/><stop offset="1" stop-opacity="0"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#f)"/></svg>`,
+    );
+    const alpha = await sharp(mask).resize(width, height, { fit: "fill" }).png().toBuffer();
+    const faded = await sharp(png).ensureAlpha().composite([{ input: alpha, blend: "dest-in" }]).png().toBuffer();
+    // Two steps: sharp resizes before it composites (or extends), whatever order they are asked in.
+    const whole = await sharp(backdrop)
+      .composite([{ input: faded, left: Math.round((wide - width) / 2), top: 0 }])
+      .png()
+      .toBuffer();
+    await sharp(whole).resize(SIZE.width, SIZE.height).webp({ quality: QUALITY }).toFile(file);
+  } else if (!cut) {
     area ??= { x: 0, y: 0, width: SCREEN.width, height: SCREEN.height };
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...area, scale: 1 } });
     const png = Buffer.from(shot.data, "base64");
     if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), png);
-    const { left, top, side } = await bestSquare(png);
-    await sharp(png).extract({ left, top, width: side, height: side }).resize(SIZE, SIZE).webp({ quality: 74 }).toFile(file);
+    const rect = await bestCut(png, WHOLE.has(key) ? { smallest: ZOOMED.smallest, biggest: 1 } : isBook(file) ? ZOOMED : WIDE);
+    await sharp(png).extract(rect).resize(SIZE.width, SIZE.height).webp({ quality: QUALITY }).toFile(file);
   } else {
-    const side = cut.size * SCREEN.height;
-    const clip = { x: cut.x * SCREEN.width - side / 2, y: cut.y * SCREEN.height - side / 2, width: side, height: side, scale: 1 };
+    const height = cut.size * SCREEN.height;
+    const width = height * ASPECT;
+    // Kept inside the window.
+    const x = Math.max(0, Math.min(cut.x * SCREEN.width - width / 2, SCREEN.width - width));
+    const y = Math.max(0, Math.min(cut.y * SCREEN.height - height / 2, SCREEN.height - height));
+    const clip = { x, y, width, height, scale: 1 };
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip });
-    await sharp(Buffer.from(shot.data, "base64")).resize(SIZE, SIZE).webp({ quality: 74 }).toFile(file);
+    if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), Buffer.from(shot.data, "base64"));
+    await sharp(Buffer.from(shot.data, "base64")).resize(SIZE.width, SIZE.height).webp({ quality: QUALITY }).toFile(file);
   }
   console.log(`  ${file}`);
 }
