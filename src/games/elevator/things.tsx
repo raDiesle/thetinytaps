@@ -815,3 +815,65 @@ export function Block({ colour }: { colour: string }) {
     </>
   );
 }
+
+/** A carrot from the garden, its leaves sprouting up from (0, 0) and its root reaching down `len`; `bitten` leaves
+ * the top of the root with a bite out of its end. */
+export function Carrot({ len = 120, bitten = false }: { len?: number; bitten?: boolean }) {
+  const l = bitten ? len * 0.45 : len;
+  return (
+    <g>
+      <g stroke="#2f9e44" strokeWidth="8" strokeLinecap="round" fill="none">
+        <path d="M-4 -2 Q-20 -30 -30 -62" />
+        <path d="M0 -2 Q2 -40 0 -78" />
+        <path d="M4 -2 Q20 -30 30 -62" />
+      </g>
+      <g fill="#51cf66" stroke={INK} strokeWidth="2.5">
+        <ellipse cx="-30" cy="-66" rx="12" ry="18" transform="rotate(-20 -30 -66)" />
+        <ellipse cx="0" cy="-82" rx="12" ry="18" />
+        <ellipse cx="30" cy="-66" rx="12" ry="18" transform="rotate(20 30 -66)" />
+      </g>
+      {bitten ? (
+        <g>
+          <path
+            d={`M-22 0 Q-22 ${l * 0.6} -16 ${l} Q0 ${l + 10} 16 ${l} Q22 ${l * 0.6} 22 0 Q0 -8 -22 0 Z`}
+            fill="#fd7e14"
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <ellipse cx="0" cy={l + 1} rx="14" ry="6" fill="#ffc078" stroke={INK} strokeWidth="2" />
+        </g>
+      ) : (
+        <path d={`M-22 0 Q-24 ${l * 0.5} 0 ${l} Q24 ${l * 0.5} 22 0 Q0 -8 -22 0 Z`} fill="#fd7e14" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      )}
+      <path d={`M-12 ${l * 0.25} H-2 M4 ${l * 0.45} H14 M-10 ${l * 0.65} H-2`} stroke="#d9480f" strokeWidth="3" strokeLinecap="round" />
+      <path d={`M-12 6 Q-14 ${l * 0.3} -8 ${l * 0.5}`} stroke="#ffc078" strokeWidth="5" strokeLinecap="round" fill="none" />
+    </g>
+  );
+}
+
+/** A ripe strawberry hanging from its green cap at (0, 0). */
+export function Strawberry() {
+  return (
+    <g>
+      <path d="M0 4 C-28 0 -34 32 0 58 C34 32 28 0 0 4 Z" fill="#e03131" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-14 14 Q-20 26 -14 38" stroke="#ff8787" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <g fill="#ffe066">
+        {(
+          [
+            [-6, 18],
+            [8, 16],
+            [14, 30],
+            [0, 32],
+            [-10, 42],
+            [6, 46],
+          ] as const
+        ).map(([x, y]) => (
+          <ellipse key={`${x}${y}`} cx={x} cy={y} rx="2" ry="3" />
+        ))}
+      </g>
+      <path d="M0 6 L-18 0 L-6 -2 L-10 -12 L0 -4 L10 -12 L6 -2 L18 0 Z" fill="#40c057" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M0 -4 V-14" stroke="#2f9e44" strokeWidth="4" strokeLinecap="round" />
+    </g>
+  );
+}

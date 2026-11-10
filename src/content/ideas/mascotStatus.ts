@@ -186,6 +186,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Der Bäcker ist ein Bär mit weißer Jacke und Bäckermütze. Mama oder Papa und der Bruder sind die Familie des Kindes und warten auf D-19.",
       },
       {
+        label: "Papa im Garten-Film wird ein Fuchs oder Bär",
+        work: "drawing",
+        effort: "S",
+        idea: "D-19",
+        note: "Im Garten sind nur das Kind und Papa, seine Familie: der Film hat keine Rolle für einen Fuchs oder Bären, Papa wartet auf D-19.",
+      },
+      {
         label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen",
         work: "drawing",
         effort: "M",

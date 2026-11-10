@@ -43,13 +43,21 @@ A story told like television, from place to place with a cut in between, instead
   `lashes` for a woman): the crew is a fox and a she-bear, the neighbour a vixen, the resident a bear, the postwoman of
   „Ein Brief für Oma“ a she-bear, the baker of „Beim Bäcker“ a bear (`wear={["baker"]}`: white jacket and baker's hat). The child and its own family (Mama or Papa, Oma) stay people until D-19 is decided –
   a human child with a fox mother doesn't fit; grown-ups in a role or next door may be foxes and bears; `places.tsx` – houses, trees, the road, the ditch; `truck.tsx` – the fire engine (ladder, blue light, wheels). The child is `Kid` from `kid.tsx` with the `fire` outfit (helmet, jacket, boots).
-- `film.css` – classes and keyframes `fm-` (`fm-br-` for „Ein Brief für Oma“, `fm-bk-` for „Beim Bäcker“); a duration that goes with the story is written `calc(… * var(--fm-pace))`.
+- `film.css` – classes and keyframes `fm-` (`fm-br-` for „Ein Brief für Oma“, `fm-bk-` for „Beim Bäcker“, `fm-gt-` for „Unser Garten wächst“); a duration that goes with the story is written `calc(… * var(--fm-pace))`.
 - `films.test.ts` checks every way through every film: it ends, a pick only adds scenes after those seen, no scene twice, two or three different options, every tap spot and option lies wholly in its scene's `focus`, every tap beat asks, every line is a German sentence, and the pace is calm (at most three sounds in a beat, at least 0.9 s apart as played, a beat that speaks at least 2.7 s).
 
 Films so far:
 - „Die Feuerwehr“ (G-15–G-17, G-21, `feuerwehr.tsx`): the town with three troubles – the child picks one (the cat up the tree, the house on fire, the car in the ditch) → someone calls (`anruf-…`) → in the station the bell rings, the crew slides down the pole, dresses and the gate rolls up → the engine drives out with siren and blue light → the job (cat: the ladder goes up, the cat jumps into the arms; fire: hose out, three flames, one tap each; car: the warning triangle is put up, the winch pulls the car out, the driver gets a blanket) → the radio crackles and shows the two other jobs on signs, the child picks the second one → drive → that job → back at the station the engine is washed and everybody, with the people helped, has cake. The same crew of two in every scene (G-22, partly).
-- „Ein Brief für Oma“ (G-20, G-24, `brief.tsx`, classes `fm-br-`): at home the child picks what to paint for Oma (sun, flower, rainbow) → at the table, seen from above, the picture draws itself line by line, is folded into the envelope and gets its stamp (one tap each) → in the street the child posts it, the yellow post van comes, the postbox is opened and the letters go into the van → the van drives over the land past the cows, a tap honks and a cow moos → at Oma's house the child rings, Oma comes out, gets the letter and opens it, hearts rise → at home the phone rings: Oma says thank you, the picked picture beside her in a speech bubble. A calm film: no siren, soft sounds.
-- „Beim Bäcker“ (G-20, G-25, `baecker.tsx`, classes `fm-bk-`): in front of the bakery the child opens the door, the bell rings and the baker (a bear) asks it in; it picks what to bake by tapping it in the shop window (rolls, a pretzel, a cake) → in the bakehouse, with a baker's hat, it pours the flour into the bowl, kneads the dough, which rests and grows under a cloth, lifts the cloth, and the dough gets its shape → it opens the oven, the tray goes in, behind the door's glass the goods turn brown, the timer rings, it takes them out and warm steam rises → at home the table is laid, the goods go on the board and everybody eats. A calm film: soft sounds, the oven's warmth shown by its glow.
+- „Ein Brief für Oma“ (G-20, G-24, `brief.tsx`, classes `fm-br-`): at home the child picks what to paint for Oma (sun, flower, rainbow) → at the table, seen from above, the picture draws itself line by line, is folded into the envelope (seen from its back, the flap closing over it), the envelope turns over by itself, and the stamp goes on its front beside the address (one tap each) → in the street the child posts it, the yellow post van comes, the postbox is opened and the letters go into the van → the van drives over the land past the cows, a tap honks and a cow moos → at Oma's house the child rings, Oma comes out, gets the letter and opens it, hearts rise → at home the phone rings: Oma says thank you, the picked picture beside her in a speech bubble. A calm film: no siren, soft sounds.
+- „Beim Bäcker“ (G-20, G-25, `baecker.tsx`, classes `fm-bk-`): in front of the bakery the child opens the door, the bell rings and the baker (a bear) asks it in; it picks what to bake by tapping it in the shop window (rolls, a pretzel, a cake) → in the bakehouse, with a baker's hat, it pours the flour into the bowl, steps up to the dough on the board and kneads it with both hands (`KneadArms`, the child's pose `knead`: three times it leans in, presses the dough flat and away and folds it back), then the dough, still small, rests and grows under a cloth, lifts the cloth, and the dough gets its shape → it opens the oven, the tray goes in, behind the door's glass the goods turn brown, the timer rings, it takes them out and warm steam rises → at home the table is laid, the goods go on the board and everybody eats. A calm film: soft sounds, the oven's warmth shown by its glow.
+- „Unser Garten wächst“ (G-30, `garten.tsx`, classes `fm-gt-`): in the garden the child and Papa walk to the empty bed;
+  on the table lie three seed packets and the child picks what shall grow (sunflower, carrots, strawberries) → at the
+  bed it digs a hole with the spade, the seeds fall in from the packet, earth goes over them and the empty packet goes
+  on a stick beside them, then it waters them (one tap each) → it fetches the rain cloud (rain on the bed), a sprout
+  comes up, it pushes the cloud away and the sun shines, the plant grows from picture to picture → the end goes with the
+  pick: the sunflower's bud opens and a bee visits it; or the child pulls out a carrot, holds it up and bites it while a
+  bee flies to the tulips; or the strawberry flowers, a bee visits them, they turn into red berries, the child picks them
+  into a bowl and eats one. A calm film: patience and growing, soft sounds (`playBuzz` and `playMunch` are recordings).
 
 Rules for films (from building the first one; follow them in the next):
 - **A film is calm, never a flood of stimuli** (user feedback, November 2026: a child of two is overwhelmed by sounds, voice and clicks close together). The engine does most of it, so keep it: `PACE` (`types.ts`) stretches every beat, sound cue, `Go` move, the ladder and the story's CSS (`--fm-pace`) – write times at a natural pace and never work round it with shorter ones. A line is never cut off by the next: the engine waits until the voice is done and then a quiet moment (`REST_MS`) before the next line, cut or question; a question is asked again only after `NUDGE_MS` and then less and less often; the sound of a tapped beat comes a little after the tap's click (`TAP_GAP_MS`), and taps on nothing play a note at most every `FREE_NOTE_MS`. In a film's data: few sounds per beat (one ring or siren where three were, at most three, 0.9 s apart as played), enough time for every line (`films.test.ts`), slow walks and drives, loops that pulse gently (a blue light or a ringing phone sways, never flickers), and choice cards that come out one by one, the next only once the line of the last one has been said. When something feels busy, take a sound or a move out rather than make it quicker.
@@ -60,7 +68,11 @@ Rules for films (from building the first one; follow them in the next):
 - **The child stays seen while things happen round it** (found in „Beim Bäcker“): nothing that moves – a tipping sack,
   an opening door, a carried bag – passes over its face, so leave it room beside what it works on. Behind a counter or
   table it stands so that its chest shows above the top (its feet hidden below it), never with its feet on the top, or it
-  seems to stand on the table. A window in a door, an oven or a box is a hole in that thing's drawing (`fillRule="evenodd"`)
+  seems to stand on the table. What waits to be tapped (a spade, a seed packet) lies beside the child, never in front
+  of its legs; where a plant grows tall or wide, the child stands clear of it (the garden's harvest moves it to the
+  bed's corner, `HARVEST_KID_X`: the carrot tops hid its face). Something the child eats or drinks lies in front of its
+  face with its tip at the mouth (`kid.tsx` draws it after the head): held in the hand at the mouth it was behind the
+  head and could not be seen. A window in a door, an oven or a box is a hole in that thing's drawing (`fillRule="evenodd"`)
   with see-through glass over it, so what is inside (the browning bread, the glow) shows through.
 - **Places look finished, like a picture book, never like boxes** (feedback on „Die Feuerwehr“): a house has a door
   with a step, framed windows with sills and a chimney; a tree a crown of several leaf balls with light on it; a
@@ -74,7 +86,19 @@ Rules for films (from building the first one; follow them in the next):
   line, and only then the question – never only a ring or glow round things in the picture. A new option gets its
   `card` (a close-up, not the strip's small icon) and its `sounds`; both choices of a film use the same close-ups, so
   the cat on the radio's card is the cat from the town.
+- **Things are handled as they really are, and a film of something being made shows the hands doing each step**
+  (user feedback on „Ein Brief für Oma“ and „Beim Bäcker“, November 2026): a stamp goes on the envelope's front with
+  the address, never on the back with its flap – so the envelope turns over first; the dough is kneaded by the child's
+  hands pressing and folding it, never a ball that only wobbles by itself. Before drawing a step, think how it is
+  really done and which side or part of the thing it is done to; where the thing is bigger than the child's reach,
+  make it smaller there (the fresh dough is, and grows under the cloth) rather than stretch the child's arms.
 - **Every choice is right, and each option is what it shows**: picking is never a test. At most a choice at the start and one in the middle, so a film stays a few minutes.
+- **A scene's `focus` is as low as its story allows**: on a phone on its side the room is wide and low, so a tall focus
+  makes everyone tiny. A scene with the sky in it (the garden's rain and sun, the sun fixed in `Outdoors` at 1420, 110)
+  takes the sky only as far as its story needs.
+- To play a film through in the preview, send keys instead of clicking: a digit picks that card (only once the cards
+  are out – sent earlier, nothing happens) and any other key taps the spot shown; a click on the picture while the
+  cards come out picks the next card in turn, not the one under it.
 - New films and their lines come in German only (the title through `titleIn`, the voice German until the title is translated: `voice` in `FilmPlay.tsx`, like the trail levels). „Die Feuerwehr“, „Ein Brief für Oma“ and „Beim Bäcker“ are translated into every app language (the last two on request, 5 November 2026, not yet recorded in the other languages); `phrases.test.ts` checks a film's lines along every way through it, like a level's.
 
 ## Languages (German, English, Chinese, Hindi, Spanish, Arabic, Russian)

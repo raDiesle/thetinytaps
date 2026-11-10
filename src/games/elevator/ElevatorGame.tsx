@@ -51,6 +51,7 @@ export function ElevatorGame() {
         { id: "feuerwehr", emoji: "🚒", title: title("Die Feuerwehr"), kind: t(FILM) },
         { id: "brief", emoji: "✉️", title: title("Ein Brief für Oma"), kind: t(FILM) },
         { id: "baecker", emoji: "🥨", title: title("Beim Bäcker"), kind: t(FILM) },
+        { id: "garten", emoji: "🌻", title: title("Unser Garten wächst"), kind: t(FILM) },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
