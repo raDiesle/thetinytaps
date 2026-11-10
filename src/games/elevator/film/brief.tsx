@@ -129,12 +129,20 @@ function Sheet({ art, w = 360, h = 300 }: { art: Art; w?: number; h?: number }) 
   );
 }
 
-/** A small closed letter, centred on (0, 0): blue with a red heart stamp in its corner. */
+/** A small closed letter seen from its front, centred on (0, 0): blue, the address written on it and a red heart
+ * stamp in its corner – the front, where the stamp goes, never the back with its flap. */
 function Letter({ s = 1 }: { s?: number }) {
   return (
     <g transform={`scale(${s})`}>
       <rect x="-40" y="-26" width="80" height="52" rx="5" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
-      <path d="M-40 -26 L0 4 L40 -26" stroke={INK} strokeWidth="3" fill="none" strokeLinejoin="round" />
+      <path
+        d="M-14 4 q6 -4 12 0 t12 0 t12 0 M-14 14 q6 -4 12 0 t12 0 t12 0"
+        stroke={INK}
+        strokeOpacity="0.55"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+      />
       <rect x="18" y="-20" width="16" height="18" rx="2" fill="#fff" stroke="#e03131" strokeWidth="2" />
       <path d="M26 -8 l-5 -5 a3 3 0 0 1 5 -3 a3 3 0 0 1 5 3 Z" fill="#e03131" />
     </g>
@@ -507,6 +515,37 @@ const STAMP_AT: Point = [1380, 300];
 const STAMP_ON: Point = [ENVELOPE[0] + 120, ENVELOPE[1] - 64];
 const CRAYON_REST: Point = [330, 680];
 
+/** The envelope's front, centred on (0, 0) like its back: the address written in wavy lines below the middle, room
+ * for the stamp in the top right corner. */
+function EnvelopeFront() {
+  return (
+    <g>
+      <rect x="-170" y="-110" width="340" height="220" rx="8" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
+      <path
+        d="M-70 10 q12 -10 24 0 t24 0 t24 0 t24 0 t24 0 M-70 44 q12 -10 24 0 t24 0 t24 0 t24 0 M-70 78 q12 -10 24 0 t24 0 t24 0 t24 0 t24 0"
+        stroke={INK}
+        strokeOpacity="0.55"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect x="86" y="-96" width="68" height="76" rx="4" fill="none" stroke={INK} strokeOpacity="0.25" strokeWidth="3" strokeDasharray="8 8" />
+    </g>
+  );
+}
+
+/** The envelope's back with the flap closed over the picture, centred on (0, 0). */
+function EnvelopeBack() {
+  return (
+    <g>
+      <rect x="-170" y="-110" width="340" height="220" rx="8" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
+      <path d="M-170 110 L-20 0 M170 110 L20 0" stroke={INK} strokeOpacity="0.35" strokeWidth="3" />
+      <path d="M-170 -110 L0 10 L170 -110 Z" fill="#74c0fc" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+    </g>
+  );
+}
+
 function PaintDraw({ step, busy, picks }: SceneProps) {
   const art = picks[0] as Art;
   const crayon = route<Point[]>(step, [
@@ -519,10 +558,13 @@ function PaintDraw({ step, busy, picks }: SceneProps) {
   ]);
   const stamp = route<Point[]>(step, [
     [0, [STAMP_AT]],
-    [3, [STAMP_AT, [STAMP_ON[0] + 60, STAMP_ON[1] - 140], STAMP_ON]],
+    [4, [STAMP_AT, [STAMP_ON[0] + 60, STAMP_ON[1] - 140], STAMP_ON]],
   ]);
   const folding = step >= 2;
   const inside = step >= 3 || (step === 2 && !busy);
+  // Once the picture is in and the flap closed, the envelope turns over, so the stamp goes on its front.
+  const turning = step === 3 && busy;
+  const turned = step >= 3;
   const [ex, ey] = ENVELOPE;
   return (
     <g>
@@ -544,18 +586,20 @@ function PaintDraw({ step, busy, picks }: SceneProps) {
         </g>
       ))}
       {/* The envelope seen from its back: the flap open while the picture goes in, then closed */}
-      <path
-        className="fm-br-flap"
-        d={
-          inside
-            ? `M${ex - 170} ${ey - 110} L${ex} ${ey + 10} L${ex + 170} ${ey - 110} Z`
-            : `M${ex - 170} ${ey - 110} L${ex} ${ey - 210} L${ex + 170} ${ey - 110} Z`
-        }
-        fill="#74c0fc"
-        stroke={INK}
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
+      {!turned && (
+        <path
+          className="fm-br-flap"
+          d={
+            inside
+              ? `M${ex - 170} ${ey - 110} L${ex} ${ey + 10} L${ex + 170} ${ey - 110} Z`
+              : `M${ex - 170} ${ey - 110} L${ex} ${ey - 210} L${ex + 170} ${ey - 110} Z`
+          }
+          fill="#74c0fc"
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+      )}
       {!inside && (
         <Go path={paper} ms={1800} delay={900}>
           <g className="fm-br-fold" style={{ transform: folding ? "scale(0.42, 0.3)" : "none" }}>
@@ -565,13 +609,30 @@ function PaintDraw({ step, busy, picks }: SceneProps) {
           </g>
         </Go>
       )}
-      <rect x={ex - 170} y={ey - 110} width="340" height="220" rx="8" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
-      <path d={`M${ex - 170} ${ey + 110} L${ex - 20} ${ey} M${ex + 170} ${ey + 110} L${ex + 20} ${ey}`} stroke={INK} strokeOpacity="0.35" strokeWidth="3" />
-      {inside && (
-        <path d={`M${ex - 170} ${ey - 110} L${ex} ${ey + 10} L${ex + 170} ${ey - 110}`} stroke={INK} strokeWidth="4" fill="none" strokeLinejoin="round" />
+      {!turned && (
+        <>
+          <rect x={ex - 170} y={ey - 110} width="340" height="220" rx="8" fill="#a5d8ff" stroke={INK} strokeWidth="4" />
+          <path d={`M${ex - 170} ${ey + 110} L${ex - 20} ${ey} M${ex + 170} ${ey + 110} L${ex + 20} ${ey}`} stroke={INK} strokeOpacity="0.35" strokeWidth="3" />
+          {inside && (
+            <path d={`M${ex - 170} ${ey - 110} L${ex} ${ey + 10} L${ex + 170} ${ey - 110}`} stroke={INK} strokeWidth="4" fill="none" strokeLinejoin="round" />
+          )}
+        </>
       )}
+      {/* Turning over: the back narrows away, then the front widens in where it lay */}
+      <g transform={`translate(${ex} ${ey})`}>
+        {turning && (
+          <g className="fm-br-turn-away">
+            <EnvelopeBack />
+          </g>
+        )}
+        {turned && (
+          <g className={turning ? "fm-br-turn-to" : undefined}>
+            <EnvelopeFront />
+          </g>
+        )}
+      </g>
       <Go path={stamp} ms={1500}>
-        <g transform={step >= 3 ? "scale(0.62)" : undefined} className="fm-br-stamp">
+        <g transform={step >= 4 ? "scale(0.62)" : undefined} className="fm-br-stamp">
           <Stamp />
         </g>
       </Go>
@@ -613,6 +674,8 @@ const paint: Scene = {
       say: "Falten und hinein.",
       ms: 3000,
     },
+    // The envelope turns over by itself: the stamp belongs on its front, not on the back with the flap.
+    { ms: 1800, sounds: [[300, playRustle]] },
     {
       tap: { at: STAMP_AT, r: 85 },
       ask: "Und die Briefmarke drauf!",

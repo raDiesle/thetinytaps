@@ -94,7 +94,10 @@ export type Pose =
   | "lift"
   | "pack"
   // On a raft: both hands on the paddle, which strokes through the water.
-  | "paddle";
+  | "paddle"
+  // Kneading dough at a table: the child draws no arms, the scene draws them over the dough (`KneadArms` in
+  // film/baecker.tsx), since the hands lie on something drawn in front of the child.
+  | "knead";
 
 /** What the child wears; "barefoot" and "flipflops" are for the beach (feet instead of shoes), "fire" is the fire
  * brigade's jacket, trousers and helmet. */
@@ -440,7 +443,7 @@ export function Kid({
         {front && <g transform={`translate(0 -54) scale(${front.scale})`}>{front.draw()}</g>}
         {pose === "paddle" && <Paddle sleeve={sleeve} />}
         {/* Arms */}
-        {pose !== "paddle" && (
+        {pose !== "paddle" && pose !== "knead" && (
           <g className="el-arm el-arm-l" style={{ transformOrigin: "-22px -100px" }}>
             {/* Drawn as a right arm and mirrored */}
             <g transform="scale(-1 1)">
@@ -459,7 +462,7 @@ export function Kid({
             </g>
           </g>
         )}
-        {!sitting && pose !== "paddle" && rightArmEl}
+        {!sitting && pose !== "paddle" && pose !== "knead" && rightArmEl}
         {/* Head */}
         <rect x="-7" y="-116" width="14" height="12" fill={SKIN} />
         <g className="el-head" style={{ transformOrigin: "0px -108px" }}>

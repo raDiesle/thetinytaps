@@ -187,7 +187,9 @@ test("a scene goes on with a tap, and one thing moves at a time", () => {
   expect(round).toContain('const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;');
   expect(round).toContain("still={choosing}");
   expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
-  expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain('<Frames name={image} moving={active} className="fg-card-image" />');
+  expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain(
+    '<Frames name={image} sources={sources} moving={active} className="fg-card-image" />',
+  );
   expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
 });
 

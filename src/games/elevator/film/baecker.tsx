@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK, SKIN } from "@/games/scenes/shared";
 import { playMunch } from "@/lib/realSounds";
 import { playChime, playClonk, playCrackle, playDing, playPlop, playPop, playRustle, playThump, playWhoosh, playYum } from "@/lib/sfx";
 import { BROTHER, Kid, type Look, type Pose, useHero } from "../kid";
@@ -516,6 +516,16 @@ const BOARD: Point = [1170, BENCH_TOP - 6];
 /** The child stands behind the table (on a stool), between the bowl and the board, clear of the tipping sack; the
  * baker beside the table on the right. */
 const KID_BENCH = 945;
+/** Where the dough is kneaded: at the board's near end, so the child, stepping up to it, reaches it with both hands
+ * while its face stays clear of the dough. */
+const KNEAD: Point = [1100, BENCH_TOP - 6];
+const KID_KNEAD = 1012;
+/** The fresh dough is small enough for the child's hands to lie on its top (a ball as big as the child came up to its
+ * chin); under the cloth it grows to `RISEN`. */
+const FRESH = 0.72;
+const RISEN = 1.35;
+/** The child's feet behind the table: its chest shows above the top. */
+const KID_Y = GROUND - 140;
 const BAKER_BENCH = 1440;
 
 /** The bakehouse: tiled walls, a window with the morning outside, a shelf of flour sacks and jars, a lamp, and the
@@ -640,6 +650,22 @@ function Dough() {
   );
 }
 
+/** The child's arms while it kneads, drawn over the dough (its own `Kid` draws none in the pose "knead"): from its
+ * shoulders, its feet on (0, 0), both hands on the dough's near top. They press down and forward, then lift to fold
+ * the far end back (`fm-bk-press`), while the child leans into it (`fm-bk-lean`). */
+function KneadArms({ pressing }: { pressing: boolean }) {
+  const hero = useHero();
+  return (
+    <g className={pressing ? "fm-bk-press" : undefined} style={{ transformOrigin: "0px -100px" }}>
+      {/* One hand on top of the dough, the other below it on its near side, so both are seen */}
+      <path d="M22 -100 Q50 -114 74 -112" stroke={hero.shirt} strokeWidth="14" strokeLinecap="round" fill="none" />
+      <circle cx="78" cy="-112" r="9" fill={SKIN} />
+      <path d="M-22 -100 Q12 -80 52 -94" stroke={hero.shirt} strokeWidth="14" strokeLinecap="round" fill="none" />
+      <circle cx="56" cy="-94" r="9" fill={SKIN} />
+    </g>
+  );
+}
+
 /** The checked cloth the dough rests under, standing on (0, 0). */
 function Cloth() {
   return (
@@ -662,10 +688,33 @@ function DoughDraw({ step, busy, picks }: SceneProps) {
   const bake = picks[0] as Bake;
   const pouring = step === 2 && busy;
   const kneaded = step >= 3;
+  const kneading = step === 3;
+  // The dough flies over the child's head onto the board's near end, comes straight down there, is kneaded, and then
+  // slides to the board's middle to rest under the cloth.
   const dough = route<Point[]>(step, [
     [0, [[BOWL[0], BOWL[1] + 10]]],
-    [3, [[BOWL[0], BOWL[1] + 10], [930, 360], BOARD]],
+    [3, [[BOWL[0], BOWL[1] + 10], [900, 300], [KNEAD[0], 320], KNEAD]],
+    [4, [KNEAD, BOARD]],
   ]);
+  // The child steps up to the dough to knead it, and back before the cloth comes down.
+  const kid = route<Point[]>(step, [
+    [0, [[KID_BENCH, KID_Y]]],
+    [
+      3,
+      [
+        [KID_BENCH, KID_Y],
+        [KID_KNEAD, KID_Y],
+      ],
+    ],
+    [
+      4,
+      [
+        [KID_KNEAD, KID_Y],
+        [KID_BENCH, KID_Y],
+      ],
+    ],
+  ]);
+  const lean = kneading && busy ? "fm-bk-lean" : undefined;
   const cloth = route<Point[]>(step, [
     [0, [[BOARD[0], -200]]],
     [4, [[BOARD[0], -200], BOARD]],
@@ -675,9 +724,11 @@ function DoughDraw({ step, busy, picks }: SceneProps) {
   const shaped = step >= 6;
   return (
     <Bakehouse>
-      <g transform={`translate(${KID_BENCH} ${GROUND - 140})`}>
-        <Child pose={step >= 6 && busy ? "cheer" : "stand"} chef />
-      </g>
+      <Go path={kid} ms={1400}>
+        <g className={lean}>
+          <Child pose={kneading ? "knead" : step >= 6 && busy ? "cheer" : "stand"} chef />
+        </g>
+      </Go>
       <g transform={`translate(${BAKER_BENCH} ${GROUND})`}>
         <Grownup look={BAKER} pose={step >= 6 && busy ? "cheer" : "stand"} wear={["baker"]} face={-1} />
       </g>
@@ -713,15 +764,26 @@ function DoughDraw({ step, busy, picks }: SceneProps) {
           the cloth it grows, and the cloth with it, once the cloth has come down over it. */}
       <Go path={dough} ms={1400} className={shaped ? "fm-bk-gone" : undefined}>
         <g style={{ opacity: kneaded ? 1 : 0 }}>
-          <g className="fm-bk-rise" style={{ transform: risen ? "scale(1.35)" : "none" }}>
-            <g className={step === 3 && busy ? "fm-bk-knead" : undefined}>
+          <g className="fm-bk-rise" style={{ transform: `scale(${risen ? RISEN : FRESH})` }}>
+            <g className={kneading && busy ? "fm-bk-knead" : undefined} style={{ transformOrigin: "-86px 0px" }}>
               <Dough />
+              {kneading && busy && (
+                <path className="fm-bk-crease" d="M-24 -76 Q14 -58 54 -66" stroke={RAW.line} strokeWidth="5" strokeLinecap="round" fill="none" />
+              )}
             </g>
           </g>
         </g>
       </Go>
+      {/* The child's hands on the dough, over it; always there (empty but while kneading) so they move with the child */}
+      <Go path={kid} ms={1400}>
+        {kneading && (
+          <g className={lean}>
+            <KneadArms pressing={busy} />
+          </g>
+        )}
+      </Go>
       <Go path={cloth} ms={1400} className={step >= 5 ? "fm-bk-gone" : undefined}>
-        <g className="fm-bk-rise" style={{ transform: risen ? "scale(1.35)" : "none" }}>
+        <g className="fm-bk-rise" style={{ transform: risen ? `scale(${RISEN})` : "none" }}>
           <Cloth />
         </g>
       </Go>
@@ -754,12 +816,14 @@ const dough: Scene = {
     {
       tap: { at: [BOWL[0], BOWL[1] + 20], r: 110 },
       ask: "Jetzt kneten wir den Teig!",
+      // A soft thump each time the hands press the dough away (`fm-bk-press`: three times, from 1.4 s, a second each)
       sounds: [
-        [1500, playThump],
-        [2400, playThump],
+        [1800, playThump],
+        [2800, playThump],
+        [3800, playThump],
       ],
       say: "Kneten, kneten. Der Teig wird schön weich.",
-      ms: 3600,
+      ms: 4800,
     },
     { ms: 3800, sounds: [[0, playRustle]], say: "Unter dem Tuch ruht der Teig und wird groß." },
     {

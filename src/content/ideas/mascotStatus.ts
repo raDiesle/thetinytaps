@@ -284,10 +284,10 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/was-ist-passiert/",
-    note: "Ein Fuchs- oder Bärenkind zeigt sein Gefühl, der große Fuchs oder Bär daneben klatscht, wenn die richtige Antwort gefunden ist; die Bilder sind Emoji.",
+    note: "Der kleine Bär aus „Alltagssituationen“ zeigt in jeder Szene sein Gefühl, auf Bildern von Gemini (10. November 2026); Papa, Mama und Oma Bär kommen nur, wo sie etwas tun (kitzeln, Kuchen bringen, zu Besuch kommen).",
     tasks: [
       {
-        label: "Fuchs- oder Bärenkind mit Papa oder Mama zeigt das Gefühl und reagiert auf das richtige Bild",
+        label: "Der kleine Bär zeigt das Gefühl, Papa, Mama oder Oma Bär tun im Bild, was passiert ist",
         work: "drawing",
         effort: "S",
         idea: "J-03",
