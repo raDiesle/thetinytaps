@@ -168,7 +168,7 @@ export const TRANSLATION: StoryTranslation = {
     // 💰
     {
       name: "Toss the gold",
-      situation: "Oh! Gold! The crabs bring us the chest. I hop down!",
+      situation: "Oh! Gold! The crabs bring us the chest.",
       instruction: "Reach in deep – and throw the coins up high! Like this!",
       turn: "Your turn – reach in and throw them up!",
       again: "Reach in – throw them up!",

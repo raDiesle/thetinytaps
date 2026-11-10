@@ -36,6 +36,12 @@ A story fetches its own lines as it starts (`loadVoice`, files only) and starts 
 the paw track meanwhile, so Tapsi's first line comes with the start. `voice.test.ts` checks the translations against the German steps and that a
 language with recordings has one for every line and no extra ones. Recordings in other languages than German
 are not kept offline by every phone, only once the story has started in that language (`tools/build.ts`, `src/sw.js`).
+- A line that only loses its last sentence keeps its recordings, cut, never recorded again (November 2026, „Ich hüpfe
+  runter!“ in eight languages): find the pause before that sentence (`ffmpeg -af silencedetect`, word times from
+  `whisper-cli -ml 1` with `~/.cache/whisper/ggml-base.bin`), cut 0.15 s into it with a short fade and 0.25 s of
+  quiet after, encode like the others (22,050 Hz mono, 32 kbit/s MP3), save it under the shortened line's name
+  (`recordingName`), delete the old file and let Whisper hear the cut file once. Shorten the line in every
+  `lines.<language>.ts` alike; `voice.test.ts` checks that names and lines match.
 - A new story or changed lines come in German only: translate (`lines.<language>.ts`) and record (`bun run voice make`)
   only when the user asks for it, and keep the story's row in `src/content/ideas/languageStatus.ts` true
   (`content.test.ts` checks it against the files).

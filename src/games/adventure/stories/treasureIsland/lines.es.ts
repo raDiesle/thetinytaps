@@ -168,7 +168,7 @@ export const TRANSLATION: StoryTranslation = {
     // 💰
     {
       name: "Lanzar el oro",
-      situation: "¡Oh! ¡Oro! Los cangrejos nos traen el cofre. ¡Me bajo de un salto!",
+      situation: "¡Oh! ¡Oro! Los cangrejos nos traen el cofre.",
       instruction: "Metemos las manos hasta el fondo, y ¡lanzamos las monedas arriba! ¡Así!",
       turn: "Ahora tú: ¡mete las manos y lanza!",
       again: "Mete las manos, ¡lanza arriba!",
