@@ -1,10 +1,10 @@
 /*
- * Tapsis Milchkette: the page's picture as big as the room above allows (.mk-picture-room, a size container), under it
- * what the grown-up reads (.mk-words), the chapter's title over its first page; ◀ bottom left, ▶ bottom right.
- * Nothing moves but the page changing. Before the first page, the table of contents (.mk-contents, below).
+ * A story book in chapters (`ChapterBook`: Tapsis Milchkette, Tapsi und die Schnullerfee): the page's picture as big
+ * as the room above allows (.cb-picture-room, a size container), under it what the grown-up reads (.cb-words), the chapter's title over its first page; ◀ bottom left, ▶ bottom right.
+ * Nothing moves but the page changing. Before the first page, the table of contents (.cb-contents, below).
  */
 
-.mk-play {
+.cb-play {
   position: absolute;
   inset: 0;
   display: flex;
@@ -19,7 +19,7 @@
   user-select: none;
 }
 
-.mk-picture-room {
+.cb-picture-room {
   flex: 1 1 0;
   min-height: 0;
   width: 100%;
@@ -29,7 +29,7 @@
   container-type: size;
 }
 
-.mk-picture {
+.cb-picture {
   display: block;
   /* 4:3, as big as the room allows. */
   width: min(100cqw, 133.33cqh);
@@ -37,16 +37,16 @@
   object-fit: cover;
   border-radius: 6px;
   box-shadow: 0 2px 10px #3d304533;
-  animation: mk-page-in 0.35s ease-out;
+  animation: cb-page-in 0.35s ease-out;
 }
 
-@keyframes mk-page-in {
+@keyframes cb-page-in {
   from {
     opacity: 0;
   }
 }
 
-.mk-placeholder {
+.cb-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -58,7 +58,7 @@
   font-size: clamp(18px, 4cqh, 34px);
 }
 
-.mk-placeholder small {
+.cb-placeholder small {
   font-size: 0.55em;
   font-family: ui-monospace, monospace;
 }
@@ -69,7 +69,7 @@
  * (`--caption-size`), between two curled flourishes like a picture book's. Always the room of the chapter's line and two
  * lines of text, so the picture keeps its size from page to page.
  */
-.mk-words {
+.cb-words {
   flex: none;
   display: grid;
   grid-template-columns: auto fit-content(44em) auto;
@@ -79,8 +79,8 @@
   font-size: var(--caption-size);
 }
 
-.mk-words::before,
-.mk-words::after {
+.cb-words::before,
+.cb-words::after {
   content: "";
   width: 4em;
   height: 1.3em;
@@ -90,20 +90,20 @@
 }
 
 /* The right one mirrored, its curl outwards too. */
-.mk-words::after {
+.cb-words::after {
   scale: -1 1;
 }
 
 /* Laid out left to right in every language, so each curl stays outside; Arabic text inside still runs right to left. */
-.mk-words {
+.cb-words {
   direction: ltr;
 }
 
-:root[lang="ar"] .mk-words-inner {
+:root[lang="ar"] .cb-words-inner {
   direction: rtl;
 }
 
-.mk-words-inner {
+.cb-words-inner {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -111,7 +111,7 @@
   text-align: center;
 }
 
-.mk-chapter {
+.cb-chapter {
   margin: 0 0 0.15em;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.85em;
@@ -122,7 +122,7 @@
   color: #8a6a7a;
 }
 
-.mk-text {
+.cb-text {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1em;
@@ -130,14 +130,14 @@
   text-wrap: balance;
 }
 
-.mk-text::first-letter {
+.cb-text::first-letter {
   color: var(--tomato, #e8553f);
   font-size: 1.5em;
   font-weight: 700;
   line-height: 1;
 }
 
-.mk-turn {
+.cb-turn {
   position: absolute;
   bottom: clamp(10px, 3vh, 26px);
   width: clamp(48px, 7vw, 72px);
@@ -151,12 +151,12 @@
   cursor: pointer;
 }
 
-.mk-back {
+.cb-back {
   left: clamp(10px, 2vw, 26px);
   background: #fffaf0;
 }
 
-.mk-next {
+.cb-next {
   right: clamp(10px, 2vw, 26px);
 }
 
@@ -166,12 +166,12 @@
  * leading to its page number – like a picture book's contents. The lines share the room below the name, each a size
  * container its type grows with, and the whole line is the tap.
  */
-.mk-contents {
+.cb-contents {
   gap: clamp(4px, 1.5vh, 14px);
   padding-inline: clamp(16px, 4vw, 64px);
 }
 
-.mk-contents-title {
+.cb-contents-title {
   flex: none;
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
@@ -180,13 +180,13 @@
   color: #5a3d52;
 }
 
-.mk-toc {
+.cb-toc {
   flex: 1 1 0;
   min-height: 0;
   width: min(100%, 1200px);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(var(--mk-rows), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--cb-rows), minmax(0, 1fr));
   grid-auto-flow: column;
   gap: clamp(4px, 1.4vh, 14px) clamp(14px, 3vw, 40px);
   margin: 0;
@@ -194,12 +194,12 @@
   list-style: none;
 }
 
-.mk-toc > li {
+.cb-toc > li {
   min-height: 0;
   container-type: size;
 }
 
-.mk-toc-line {
+.cb-toc-line {
   display: flex;
   align-items: center;
   gap: min(3cqw, 14cqh);
@@ -216,25 +216,25 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mk-toc > li:nth-child(3n + 2) .mk-toc-line {
+.cb-toc > li:nth-child(3n + 2) .cb-toc-line {
   background: linear-gradient(90deg, #e9c3d6b0, #f1d8e466 75%, #f1d8e433);
 }
 
-.mk-toc > li:nth-child(3n + 3) .mk-toc-line {
+.cb-toc > li:nth-child(3n + 3) .cb-toc-line {
   background: linear-gradient(90deg, #c9d9b8b0, #dde8d166 75%, #dde8d133);
 }
 
-.mk-toc-line:active {
+.cb-toc-line:active {
   translate: 2px 2px;
 }
 
-.mk-toc-line:focus-visible {
+.cb-toc-line:focus-visible {
   outline: 4px solid #3d3045;
   outline-offset: 2px;
 }
 
 /* The chapter's first picture, cut round like a print pasted in. */
-.mk-toc-picture {
+.cb-toc-picture {
   flex: none;
   width: min(88cqh, 18cqw);
   height: min(88cqh, 18cqw);
@@ -244,14 +244,14 @@
   background: #fffaf0;
 }
 
-.mk-toc-picture img {
+.cb-toc-picture img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.mk-toc-name {
+.cb-toc-name {
   display: flex;
   flex: 0 1 auto;
   flex-direction: column;
@@ -259,7 +259,7 @@
 }
 
 /* „Kapitel 4“, small over the title, only where the line is tall enough for both. */
-.mk-toc-chapter {
+.cb-toc-chapter {
   display: none;
   font-size: min(17cqh, 3.2cqw);
   line-height: 1.2;
@@ -267,13 +267,13 @@
 }
 
 @container (min-height: 64px) {
-  .mk-toc-chapter {
+  .cb-toc-chapter {
     display: block;
   }
 }
 
 /* Up to two lines, so a long title is read whole, never cut off. */
-.mk-toc-title {
+.cb-toc-title {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
@@ -283,14 +283,14 @@
   line-height: 1.15;
 }
 
-.mk-toc-dots {
+.cb-toc-dots {
   flex: 1 1 1em;
   min-width: 1em;
   height: 6px;
   background: radial-gradient(circle, #3d3045a6 0 1.4px, #0000 2px) 0 50% / 11px 6px repeat-x;
 }
 
-.mk-toc-page {
+.cb-toc-page {
   flex: none;
   min-width: 1.3em;
   font-family: Georgia, "Times New Roman", serif;

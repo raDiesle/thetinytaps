@@ -1,6 +1,7 @@
 # Die Schnullerfee
 
-Route `/schnullerfee/` · idea H-11 (Alltagshelfer, a book of its own on the shelf once it is finished). While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
+Route `/schnullerfee-spiel/` · idea H-11 (Alltagshelfer). Since 10 November 2026 the shelf's book „Schnullerfee“ at
+`/schnullerfee/` is the story in chapters (`src/games/pacifierstory`); this played story moved here and stays unfinished. While it is being built (`unfinished` in `games.ts`, user decision, November 2026) it is not on the shelf, only linked from `/management/`, and its way back leads there.
 
 A story without words for the evening before the pacifiers go, played by the child with a grown-up beside it. It
 plays at once (`startMode`), with no start screen; ✕ goes back to the page before it. One room, Tapsi's bedroom, from

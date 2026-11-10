@@ -377,8 +377,8 @@ In a fresh worktree run `bun install` first.
   user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
-  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Abstillen, Zähne putzen, Töpfchen,
-  Belohnungstafel & Zeitplan – user decision, October 2026; the Timer the very first book, top left, Abstillen beside it,
+  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Timer, Abstillen, Schnullerfee, Zähne putzen, Töpfchen,
+  Belohnungstafel & Zeitplan – user decision, October 2026; the Timer the very first book, top left, Abstillen beside it and the Schnullerfee beside that,
   November 2026): each of its games is a book of its own, standing spine out side by side, a small picture from its game
   at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026) – a picture or a cut of one, never an emoji, which looked poorer (`bilder/spine-<id>.webp`,

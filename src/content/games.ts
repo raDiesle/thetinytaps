@@ -1,6 +1,7 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
+import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
@@ -101,6 +102,14 @@ export const CATEGORIES: Category[] = [
         blurb: MILK_CHAIN_BLURB,
       },
       {
+        // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a
+        // story in chapters along the steps of a gentle goodbye to the pacifier (src/games/pacifierstory).
+        href: "/schnullerfee/",
+        emoji: "🧚",
+        title: PACIFIER_STORY_BOOK,
+        blurb: PACIFIER_STORY_BLURB,
+      },
+      {
         href: "/zaehne/",
         emoji: "🦷",
         title: { de: "Zähne putzen", ru: "Чистим зубы", en: "Brushing Teeth", zh: "刷牙", hi: "दाँत साफ़ करना", es: "Lavarse los dientes", ar: "تنظيف الأسنان" },
@@ -175,7 +184,8 @@ export const CATEGORIES: Category[] = [
         },
       },
       {
-        href: "/schnullerfee/",
+        // The first Schnullerfee, a story played in one room (SVG), still being built; only on the management page.
+        href: "/schnullerfee-spiel/",
         unfinished: true,
         emoji: "🧚",
         title: {

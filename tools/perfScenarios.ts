@@ -141,7 +141,7 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Was gehört zusammen?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
-  { name: "schnullerfee", path: "/schnullerfee/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 10000, tap: TAPS }] },
+  { name: "schnullerfee", path: "/schnullerfee-spiel/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },

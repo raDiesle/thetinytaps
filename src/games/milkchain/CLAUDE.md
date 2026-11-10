@@ -14,7 +14,8 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   milk times go (`MILK_ORDER`), what comes instead (`INSTEAD`) and which drops are gone on a page (`goneOn`).
 - `milkChainPictures.ts`: the Gemini prompt of every page (place, light, chain, cast and clothes, nursing), as the
   picture queue takes them; a made picture goes on `MADE`.
-- `MilkChainPlay.tsx`: the book opens on its table of contents (`CONTENTS`, `DevTag` `K0`): the story's name, then one
+- `MilkChainGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, classes `cb-` in
+  `chapterBook.css`, also the book „Schnullerfee“ – a change there reaches both): the book opens on its table of contents (`CONTENTS`, `DevTag` `K0`): the story's name, then one
   line per chapter in two columns – a round cut of its first picture, „Kapitel n“ and its title, dots, its page number;
   a tap (or its number key) opens it. Then one page per tap or key (← and Backspace back, ◀ for the grown-up, from the
   first page back to the contents), the picture as big as the room allows, under it the chapter's title on its first
@@ -22,7 +23,7 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   corners on the last page, „Nochmal“ opening the contents; `DevTag` `K<chapter>-<page>`.
 - `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
   (user request, 9 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with `byLanguage`.
-- `names.ts`: the book's name on the shelf („Abstillen“), the story's title and its blurb in every language. `milkchain.css`: classes `mk-`.
+- `names.ts`: the book's name on the shelf („Abstillen“), the story's title and its blurb in every language.
 
 ## Rules
 
