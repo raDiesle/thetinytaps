@@ -13,7 +13,7 @@ import { MOOD_PICTURE_QUEUE } from "./moodPictures";
 import { NEEDS } from "./needs";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
-import { readAlong, roundLines, roundOf, stepsOf } from "./rounds";
+import { roundLines, roundOf, roundText, stepsOf } from "./rounds";
 import { STORIES } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
@@ -191,28 +191,31 @@ test("a scene goes on with a tap, and one thing moves at a time", () => {
   expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
 });
 
-// Choosing (user wish, November 2026): the scene is minimised top left with its text under it, the two choices A (not
-// so good, left) and B (good, right) stand side by side with two arrows from the scene to them, and a tap on the small
-// scene steps back to the scene alone. After a choice only the picture stays, with its tick or cross, and no choice is
-// shown any more. The caption is always under the picture, never on it, and the sheet holds it when open.
-test("choosing: minimised scene, A and B with arrows, and only the chosen picture after", () => {
+// Choosing (user wish, November 2026): the scene is small on top (hidden on a phone, so the cards are as big as the
+// room allows), the two choices A (not so good, left) and B (good, right) side by side below it, in two colours and
+// with no arrows, and a tap on the small scene steps back to the scene alone. After a choice only the picture stays,
+// with its tick or cross. Every text stands whole under the pictures in Abstillen's letters, never on them.
+test("choosing: small scene, A and B in two colours, and only the chosen picture after", () => {
   const round = readFileSync("src/games/feelings/RoundPlay.tsx", "utf8");
   expect(round, "the choices are A and B, side by side").toContain('letter="A"');
   expect(round).toContain('letter="B"');
-  expect(round, "two arrows from the scene to the choices").toContain('className="story-arrow"');
+  expect(round, "no arrows from the scene to the choices").not.toMatch(/story-arrow|useLayoutEffect/);
   expect(round, "a tap on the minimised scene steps back to the scene alone").toContain("onTap={choosing ? minimised : undefined}");
+  expect(round, "◀ while choosing goes back to the scene").toContain("const back = choosing ? minimised : onBack;");
   expect(round, "the choices stand only while choosing").toContain("choosing && (");
   expect(round, "the picture's tick stays after a choice").toContain('const look: PictureLook = phase === "trying" ? "bad" : doneHere ? "good" : "story";');
   expect(round, "no grey cards to wake any more").not.toMatch(/front|Front|cheering|onWake/);
-  expect(round, "the picture's text is its whole part of the sheet").toContain("wholeText(round).find((p) => p.id === part)?.text");
-  expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a card picks, nothing else").toMatch(/if \(active\) onChoose\?\.\(\);/);
+  expect(round, "the text under the pictures is the whole part said").toContain("roundText(round).find((p) => p.id === part)?.text");
+  expect(round, "under the pictures").toContain("<StoryWords text={caption} />");
+  const shared = readFileSync("src/games/feelings/shared.tsx", "utf8");
+  expect(shared, "a card picks, once").toMatch(/if \(active && screenTap\(\)\) onChoose\?\.\(\);/);
+  expect(shared, "a card knows its letter").toContain("data-letter={letter}");
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
-  expect(css).toMatch(/\.story-play\[data-sheet\] \.fg-caption\s*\{\s*display: none/);
-  expect(css, "the caption stands under the picture, full width").toMatch(/\.fg-picture-caption \{[^}]*top: 100%/);
-  expect(css, "no caption in a corner of the picture").not.toMatch(/\.story-play \.fg-picture-caption \{/);
-  expect(css, "the minimised scene's caption is under it, across the screen").toMatch(
-    /\[data-stage="choose"\] \.fg-picture-caption \{[^}]*width: calc\(100cqw/,
-  );
+  expect(css, "A and B differ in colour").toMatch(/\.fg-choice\[data-letter="A"\] \{\s*--letter: [^;]+;/);
+  expect(css).toMatch(/\.fg-choice\[data-letter="B"\] \{\s*--letter: [^;]+;/);
+  expect(css, "no caption on a picture any more").not.toContain("fg-picture-caption");
+  expect(css, "the text in the book's serif with a big first letter").toMatch(/\.fg-words-text::first-letter \{[^}]*font-size: 1\.5em/);
+  expect(css, "a phone hides the scene while choosing").toMatch(/\.story-play\[data-stage="choose"\] \.story-scene \{\s*display: none;/);
 });
 
 // The way back to the scene before: a corner bottom left in a pass of short scenes, the first scene without one.
@@ -220,6 +223,11 @@ test("a way back to the scene before, bottom left", () => {
   const pass = readFileSync("src/games/feelings/PassPlay.tsx", "utf8");
   expect(pass).toContain("onBack={now.index > 0 ? () => replay(now.index - 1) : undefined}");
   expect(readFileSync("src/games/feelings/RoundPlay.tsx", "utf8")).toMatch(/<StepBack\s/);
+  // A day's pages and scenes step back too: a page to the scene before it, a scene to its page (user wish, November 2026).
+  expect(readFileSync("src/games/feelings/DayPage.tsx", "utf8")).toMatch(/<StepBack\s/);
+  const day = readFileSync("src/games/feelings/DayPlay.tsx", "utf8");
+  expect(day).toContain("onBack={backToScene(at.index - 1)}");
+  expect(day).toContain('onBack={() => setAt({ ...at, page: "before" })}');
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
   expect(css).toMatch(/\.fg-back \{[^}]*left: var\(--pad\)/);
 });
@@ -238,30 +246,19 @@ test("the voice switch is Alltagssituationen's alone, and tapped", () => {
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");
 });
 
-// Grown-ups who read the scenes out themselves (the voice switched off) open the round's whole text from the screen's
-// bottom right corner, beside the loudspeaker (user feedback, November 2026): it holds every line the voice would say,
-// in Alltagssituationen only; it opens with one tap, never held; switching the voice off opens it, and then nothing on
-// it is marked, since the grown-up reads it all.
-test("the text to read out holds every line a round says", () => {
+// Everything the voice says in a round stands whole under its pictures, part by part (user wish, November 2026), so
+// grown-ups who switched the voice off read it out from there; the paper note that opened it as a sheet was removed.
+test("the text under the pictures holds every line a round says", () => {
   for (const story of STORIES)
     for (let step = 0; step < stepsOf(story); step++) {
       const round = roundOf(story, step, "de");
-      const sheet = readAlong(round)
+      const text = roundText(round)
         .map((part) => part.text)
         .join(" ");
-      for (const line of roundLines(round).filter(Boolean)) expect(sheet, `${story.id} ${step}`).toContain(line);
+      for (const line of roundLines(round).filter(Boolean)) expect(text, `${story.id} ${step}`).toContain(line);
     }
-  // The corner is made once, for the passes by feeling and the days alike.
-  const users = ["FeelingsPlay.tsx", "MoodGame.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx"].filter((f) =>
-    readFileSync(`src/games/feelings/${f}`, "utf8").includes("ReadAlongCorner = {"),
-  );
-  expect(users).toEqual(["FeelingsPlay.tsx"]);
-  const note = readFileSync("src/games/feelings/ReadAlong.tsx", "utf8");
-  expect(note).not.toContain("useHold");
-  expect(note).toContain("{...tapProps(onToggle)}");
-  expect(note, "the loudspeaker stands in the same corner").toContain('className="story-corner"');
-  expect(note, "with the voice off nothing is marked").toContain("part={voice ? part : undefined}");
-  expect(readFileSync("src/games/feelings/FeelingsPlay.tsx", "utf8"), "switching the voice off opens the text").toContain("{ voice: false, text: true }");
+  expect(existsSync("src/games/feelings/ReadAlong.tsx"), "no button to show the text").toBe(false);
+  expect(readFileSync("src/games/feelings/settings.ts", "utf8")).not.toMatch(/\btext:/);
 });
 
 // After the good choice its picture waits for ▶ too, never on to the next scene by a timer, and the „Weiter“ at a
@@ -286,7 +283,7 @@ test("▶ keeps one place, the notes stay off the pages, and the dots go back", 
   for (const f of ["RoundPlay.tsx", "DayPage.tsx"]) expect(read(f), f).toContain("<GoOn ");
   for (const f of ["RoundPlay.tsx", "DayPage.tsx", "MoodPlay.tsx", "PassPlay.tsx", "DayPlay.tsx"]) expect(read(f), f).not.toContain("fg-next-sign");
   const page = read("DayPage.tsx");
-  expect(page).not.toMatch(/story-corner|voiceSwitch|VoiceSwitch|ReadAlong/);
+  expect(page).not.toMatch(/story-corner|voiceSwitch|VoiceSwitch/);
   expect(read("DayPlay.tsx")).not.toContain("corner={");
   const css = read("feelings.css");
   const next = css.slice(css.indexOf(".fg-next {"), css.indexOf("}", css.indexOf(".fg-next {")));

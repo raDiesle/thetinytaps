@@ -1,8 +1,9 @@
 import { type ReactNode, useEffect } from "react";
 import { useT } from "@/lib/language";
+import { screenChanged, screenTap } from "@/lib/tapGuard";
 import { preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
-import { Frames, GoOn, StepDots, useLinesReady, useVoice } from "./shared";
+import { Frames, GoOn, StepBack, StepDots, useLinesReady, useVoice } from "./shared";
 
 /**
  * A page of a day's story between two scenes (`days.ts`): only told, never chosen in (user idea, November 2026). So it
@@ -22,6 +23,7 @@ export function DayPage({
   ending,
   onEndKey,
   onPick,
+  onBack,
   nextLines = [],
 }: {
   image: string;
@@ -37,6 +39,8 @@ export function DayPage({
   onEndKey?: () => void;
   /** A tap on a dot at the top: that scene again. */
   onPick?: (index: number) => void;
+  /** ◀ bottom left: the scene before this page; left out on a day's first page. */
+  onBack?: () => void;
   /** What the scene after this page opens with: loaded while the page is read, so the scene starts at once. */
   nextLines?: string[];
 }) {
@@ -47,6 +51,8 @@ export function DayPage({
 
   useEffect(() => {
     preloadImages([image]);
+    // The page just came: a tap right after it (the second of a double tap) does nothing (`screenTap`).
+    screenChanged();
   }, []);
 
   useEffect(() => {
@@ -57,7 +63,7 @@ export function DayPage({
     const go = onNext ?? onEndKey;
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (!e.repeat) go?.();
+      if (!e.repeat && screenTap()) go?.();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -75,6 +81,20 @@ export function DayPage({
           <Frames name={image} moving={false} />
         </div>
       </div>
+      {onBack && (
+        <StepBack
+          onBack={onBack}
+          label={t({
+            de: "Vorige Szene",
+            en: "Previous scene",
+            zh: "上一个场景",
+            hi: "पिछला दृश्य",
+            es: "Escena anterior",
+            ar: "المشهد السابق",
+            ru: "Предыдущая сцена",
+          })}
+        />
+      )}
       <div className="fg-day-words">
         <p className="fg-day-text">{text}</p>
         {ending}

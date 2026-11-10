@@ -123,7 +123,7 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   first steps felt broken to the user). A tap anywhere on the picture that is not on a button is „Weiter“, on every
   step and at once – also while the step's sounds still run and while the buttons for what the child said show
   (the user asked for it after both a sparkle-only tap and a tap that only shook those buttons); only a double tap
-  (`TAP_GUARD_MS`) and the last step sparkle. Where a grown-up's choice goes on (what the child said), there is no
+  (`TAP_GUARD_MS`, the shared value of `src/lib/tapGuard.ts`) and the last step sparkle. Where a grown-up's choice goes on (what the child said), there is no
   „Weiter“ beside it: the choice's buttons look like „Weiter“ (yellow, ▶) and call for attention instead. Only
   going into and out of the waiting goes on by itself (`Step.auto`); where the child does something itself it waits
   for a tap or „Weiter“. Every step without its own buttons for going on has „Weiter“ (`potty.test.ts` checks which

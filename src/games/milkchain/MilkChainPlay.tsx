@@ -6,6 +6,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { byLanguage } from "@/content/texts";
 import { useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
+import { screenChanged, screenTap } from "@/lib/tapGuard";
 import pictureFiles from "./bilder/*.webp?glob";
 import { MILK_CHAIN, MILK_CHAIN_PAGES } from "./milkChain";
 import { MILK_CHAIN_TITLE } from "./names";
@@ -28,8 +29,6 @@ const CHAPTER = {
   ru: "Глава {n}",
 };
 
-/** Taps this soon after a page began only ripple, so a double tap doesn't skip a page. */
-const TAP_GUARD_MS = 450;
 const LAST = MILK_CHAIN_PAGES.length - 1;
 
 /** Each page's chapter (its number from 1) and its place in it, for the heading and the dev tag. */
@@ -59,12 +58,12 @@ export function MilkChainPlay() {
   const translation = language === "de" ? undefined : TRANSLATIONS[language];
   const [index, setIndex] = useState(CONTENTS);
   const indexRef = useRef(CONTENTS);
-  const startedAt = useRef(0);
   const { effects, ripple } = useTapFeedback();
 
   const show = useCallback((next: number) => {
     indexRef.current = next;
-    startedAt.current = performance.now();
+    // Taps right after a page came only ripple, so a double tap doesn't skip a page (`screenTap`).
+    screenChanged();
     setIndex(next);
     // The page after this one loads while this one is read.
     const after = next >= 0 && MILK_CHAIN_PAGES[next + 1] && pictureOf(MILK_CHAIN_PAGES[next + 1].id);
@@ -75,6 +74,7 @@ export function MilkChainPlay() {
 
   /** Opens a chapter from the table of contents. */
   const open = (chapter: number) => {
+    if (!screenTap()) return;
     playPageTurn(0.6);
     show(CHAPTER_STARTS[chapter]);
   };
@@ -85,7 +85,7 @@ export function MilkChainPlay() {
   /** The next page, or ripples and a soft note where it comes too soon, and on the last page. */
   const forward = (x?: number, y?: number) => {
     const now = indexRef.current;
-    if (now >= LAST || performance.now() - startedAt.current < TAP_GUARD_MS) {
+    if (now >= LAST || !screenTap()) {
       ripple(x, y);
       playRandomNote();
       return;
@@ -96,6 +96,7 @@ export function MilkChainPlay() {
 
   const back = () => {
     if (indexRef.current === CONTENTS) return;
+    if (!screenTap()) return ripple();
     playPageTurn(0.6);
     show(indexRef.current - 1);
   };

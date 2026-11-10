@@ -4,6 +4,8 @@ import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion, usePageStill } from "@/lib/pageMotion";
+// Taps this soon after a step began only ripple, so a double tap doesn't skip a step: the app's one value for it.
+import { TAP_GUARD_MS } from "@/lib/tapGuard";
 import {
   playBoing,
   playChime,
@@ -75,8 +77,6 @@ const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
-/** Taps this soon after a step began only ripple, so a double tap doesn't skip a step. */
-const TAP_GUARD_MS = 350;
 const DONE = STEPS.findIndex((s) => s.id === "done");
 const SIT = STEPS.findIndex((s) => s.id === "sit");
 

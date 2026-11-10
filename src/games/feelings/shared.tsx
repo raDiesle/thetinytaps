@@ -2,6 +2,7 @@ import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useS
 import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { distanceToRect, TAP_SLOP_PX } from "@/lib/tapTargets";
+import { screenTap } from "@/lib/tapGuard";
 import { hush, recordedVoice } from "@/lib/voice";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { framesFor } from "./images";
@@ -173,14 +174,13 @@ export function Frames({ name, moving, className }: { name: string; moving: bool
 
 /**
  * The big picture in the middle: what happens right now. Unless `still`, its frames fade into each other in a loop,
- * like a tiny GIF, so the animals seem to move a little. A short caption for grown-ups says what it shows.
+ * like a tiny GIF, so the animals seem to move a little. Its text stands under it, outside it (`StoryWords`).
  * Where it waits for a tap to go on, `GoOn` lies beside it: ▶ in the screen's corner, the whole screen tapped.
  * Give it a new `key` with every new picture, so it starts at the first frame.
  */
 export function StoryPicture({
   name,
   art,
-  caption,
   look = "story",
   still = false,
   onTap,
@@ -188,12 +188,10 @@ export function StoryPicture({
   name: string;
   /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
   art?: ReactNode;
-  /** What the picture shows, in a few words: for grown-ups, children don't read it. */
-  caption: string;
   look?: PictureLook;
   /** Shows only the first frame: while the child chooses, the cards move instead. */
   still?: boolean;
-  /** While the cards lie over it: a tap brings the picture to the front (`RoundPlay`). */
+  /** While the child chooses, the small scene above the cards: a tap brings it back big (`RoundPlay`). */
   onTap?: () => void;
 }) {
   return (
@@ -204,7 +202,7 @@ export function StoryPicture({
         onTap &&
         ((e: PointerEvent) => {
           e.stopPropagation();
-          onTap();
+          if (screenTap()) onTap();
         })
       }
     >
@@ -212,7 +210,20 @@ export function StoryPicture({
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
-      <p className="fg-caption fg-picture-caption">{caption}</p>
+    </div>
+  );
+}
+
+/**
+ * Everything the voice says with the big picture, whole, under it (user feedback, November 2026: the text to read out
+ * stands under the pictures, never on them or on a sheet of its own). Set like Abstillen's sentence under its picture
+ * (`.mk-words`): the book's serif, its first letter big and red, at the size of every caption (`--caption-size`),
+ * between two curled flourishes.
+ */
+export function StoryWords({ text }: { text: string }) {
+  return (
+    <div className="fg-words">
+      <p className="fg-words-text">{text}</p>
     </div>
   );
 }
@@ -238,7 +249,10 @@ export function ChoiceCard({
   caption: string;
   state: CardState;
   onChoose?: () => void;
-  /** The letter on the card's corner („A“, „B“): the two choices are told apart by it, never by which is right. */
+  /**
+   * The letter on the card's corner („A“, „B“): the two choices are told apart by it and by the colour of its ring and
+   * circle (user wish, November 2026), never by which is right.
+   */
   letter?: string;
   /**
    * A note for grown-ups on a page marker over the card's top edge („Heute früh“), kept out of the caption so the
@@ -248,7 +262,7 @@ export function ChoiceCard({
 }) {
   const active = state === "choose";
   return (
-    <div className="fg-choice">
+    <div className="fg-choice" data-letter={letter}>
       <button
         type="button"
         className={`fg-card fg-card-${state}`}
@@ -258,7 +272,8 @@ export function ChoiceCard({
         aria-label={marker ? `${marker}: ${caption}` : caption}
         onPointerDown={(e: PointerEvent) => {
           e.stopPropagation();
-          if (active) onChoose?.();
+          // A tap right after the cards came (a double tap that brought them) picks nothing (`screenTap`).
+          if (active && screenTap()) onChoose?.();
         }}
       >
         {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
@@ -329,7 +344,8 @@ export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
             const box = el.getBoundingClientRect();
             return box.width > 0 && distanceToRect(e.clientX, e.clientY, box) <= TAP_SLOP_PX;
           });
-          if (!near) onNext();
+          // A second tap right after the first goes on only once (`screenTap`).
+          if (!near && screenTap()) onNext();
         }}
       />
       <button
@@ -339,7 +355,7 @@ export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
         aria-label={label}
         onPointerDown={(e: PointerEvent) => {
           e.stopPropagation();
-          onNext();
+          if (screenTap()) onNext();
         }}
       >
         <svg className="fg-next-sign" viewBox="0 0 100 100" aria-hidden>
@@ -352,8 +368,9 @@ export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
 }
 
 /**
- * The way back to the scene before (`RoundPlay`, `onBack`): bottom left, as ▶ is bottom right. Only a tap on it goes
- * back, never on; the screen's other taps stay as they are (user feedback, November 2026: short scenes need a way back).
+ * The way back (`RoundPlay`, `DayPage`, `onBack`): bottom left, as ▶ is bottom right – from the choices to the scene
+ * told, from a scene to the page or scene before. Only a tap on it goes back, never on; the screen's other taps stay as
+ * they are (user feedback, November 2026: short scenes need a way back).
  */
 export function StepBack({ onBack, label }: { onBack: () => void; label: string }) {
   return (
@@ -364,7 +381,7 @@ export function StepBack({ onBack, label }: { onBack: () => void; label: string 
       aria-label={label}
       onPointerDown={(e: PointerEvent) => {
         e.stopPropagation();
-        onBack();
+        if (screenTap()) onBack();
       }}
     >
       <svg className="fg-back-sign" viewBox="0 0 100 100" aria-hidden>
@@ -415,7 +432,7 @@ export function StepDots({
             aria-label={String(i + 1)}
             onPointerDown={(e: PointerEvent) => {
               e.stopPropagation();
-              onPick(i);
+              if (screenTap()) onPick(i);
             }}
           >
             {mark}

@@ -91,8 +91,9 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
   printed on the paper with its edge fading into it, no white mat, no cards, no question, no ✓ or ✗; the text beside it
   (below it on an upright screen) in the book's serif letters with a big first letter. The whole page is one tap (or any
   key) to the scene, with ▶ in the screen's bottom right corner as in the scenes (see „▶ has one place“); never a timer.
-  The dots on top are the day's scenes. The grown-ups' notes (the text to read out, the loudspeaker) are not on a page:
-  there they change nothing and only lay over ▶ (user feedback, November 2026).
+  The dots on top are the day's scenes. The loudspeaker is not on a page: there it changes nothing and only lay over ▶
+  (user feedback, November 2026). ◀ bottom left goes back to the scene before the page (`onBack`; none on a day's first
+  page), and ◀ in a scene back to its page.
 - A page never says how the scene before it ended: a scene asks another of its steps each time it is played
   (`settings.steps`, shared with the groups), so „Der Turm steht wieder“ would be wrong two times out of three. It says
   what comes next, and nothing in it may contradict the next scene's first picture (who is there, the place, the
@@ -118,7 +119,7 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
 
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
 tell the scenes to the child in their own words. So while a scene plays (never on a page of a day's story), a wooden
-loudspeaker with a speech bubble stands at the screen's bottom, left of ▶, beside the book of the text to read out (`VoiceSwitch.tsx`, drawn like the shelf's
+loudspeaker with a speech bubble stands at the screen's bottom, left of ▶ (`VoiceSwitch.tsx`, drawn like the shelf's
 loudspeaker for the music). One tap on it (never held: held, it was too slow for grown-ups, user feedback, November
 2026) switches off everything said – the scene,
 the question, the answers, „Juhu!“ – and the bubble gives way to a red cross; tapped again, it speaks again. The sounds
@@ -127,20 +128,13 @@ already waiting stay silent too, and the beats keep the length of their recordin
 to tell them. „Wie geht's dir?“ and „Was brauche ich?“ always speak (their `…Game` sets `voice: true`) and
 have no such switch; no other game gets one (`feelings.test.ts`).
 
-**The text to read out (user wish and feedback, November 2026):** for grown-ups who tell the scenes themselves, a
-paper note with an open book stands in the screen's bottom right corner, left of the loudspeaker (`ReadAlong.tsx`,
-`.story-corner`; upright, where the cards fill the bottom, on the picture's top right corner below the dots). One tap
-opens it and one tap closes it – never held (held, it was too slow for grown-ups). It opens a paper sheet right above
-the two notes, in the corner where it covers least of the pictures: on wide screens below the big good card, beside the
-big not-so-good one. **While it is open the pictures carry no text** – no caption on the big picture or the cards: the
-text stands on the sheet instead (user wish, November 2026; `data-sheet`, `feelings.test.ts`). It holds everything the voice says
-in this round (`readAlong` in `rounds.ts`): the scene and its question, the not-so-good idea (red cross, its caption,
-its answer), the good one (tick, caption, what is told), the happy end. While the voice tells the scene, the part told
-now is marked with the highlighter and scrolled into view; **with the voice off everything shows alike, nothing marked,
-since the grown-up reads it all** – and switching the voice off opens the sheet by itself. It stays open from scene to
-scene and visit to visit (`settings.text`), but steps aside at a pass's end, where „Weiter“ stands. Only in
-„Alltagssituationen“, never in the book's other games; `feelings.test.ts` checks that the sheet holds every line a round says
-– a new kind of line said in a round goes into `readAlong` too – and that both notes are tapped, never held (`tapProps`).
+**The whole text stands under the pictures (user wish, November 2026):** everything the voice says in a round – the
+scene and its question, the not-so-good idea's answer, what the good one tells, the happy end – stands whole under the
+pictures, the part said now (`roundText` in `rounds.ts`, `StoryWords` in `shared.tsx`), so grown-ups who switched the
+voice off read it out from there. It is set like Abstillen's sentence (`.fg-words` copies `.mk-words`): the book's
+serif, small at `--caption-size`, its first letter big and red, curled flourishes beside it on wide screens. There is
+no button to show the text: a paper note with a book that opened it on a sheet (`ReadAlong`) was removed with it. A new
+kind of line said in a round goes into `roundText` too (`feelings.test.ts` checks every line is there).
 
 **One scene, one choice (user feedback, November 2026).** A round (`rounds.ts`, `RoundPlay.tsx`) is one scene and one
 step of its story: the starting picture, one question, exactly two cards – the not-so-good idea and the good one. After
@@ -161,8 +155,8 @@ Keys: the left arrow picks the not-so-good idea, every other key the good one.
 **▶ has one place, and the whole screen goes on (user feedback, November 2026):** wherever the game waits for a tap
 to go on – a scene told, a chosen idea's last picture, a page of a day's story – ▶
 stands at the same spot, the screen's bottom right corner, and a tap anywhere on the screen goes on (`GoOn` in
-`shared.tsx`), except within reach of anything else that can be tapped (the dots, the grown-ups' notes, ✕), whose taps
-stay theirs. Nothing else ever stands in that corner: the grown-ups' notes stand left of it (`feelings.test.ts`). ▶ on
+`shared.tsx`), except within reach of anything else that can be tapped (the dots, ◀, the loudspeaker, ✕), whose taps
+stay theirs. Nothing else ever stands in that corner: the loudspeaker stands left of it (`feelings.test.ts`). ▶ on
 the picture's corner and ▶ under a page's text moved from screen to screen and lay under the notes.
 
 **The dots go back (user wish, November 2026):** the dots at the top are tapped – a ✓ plays that scene again with the
@@ -172,13 +166,23 @@ the next one to come.
 
 **A scene goes on with a tap, never by a timer (user feedback, November 2026):** the starting picture is told and
 then waits, with ▶; one tap anywhere (or any key) brings the two cards. The
-narration goes on meanwhile. **The choice (user wish, November 2026):** the scene shrinks to a small picture top left,
-its text under it, and the two cards A and B stand side by side below it, joined to the scene by two arrows (`choose`
-in `RoundPlay.tsx`). A tap on the small scene steps back to the scene alone, big in the middle (`minimised`); a tap on
-a card picks it. After the not-so-good idea (A) its picture comes back crossed out and the choices stand again. After the good choice the
+narration goes on meanwhile. **The choice (user wish, November 2026):** the scene shrinks to a small picture on top
+and the two cards A and B stand side by side below it, as big as the room left allows, with no arrows between them
+(`choose` in `RoundPlay.tsx`); on a phone (shorter side < 600 px) the small scene is left out, so the cards get all the
+room (user wish, November 2026). A and B differ in colour, ring and letter's circle alike – A blue, B yellow, never the
+green or red of a right or wrong answer (`data-letter`). A tap on the small scene, or ◀ bottom left, steps back to the
+scene alone, big (`minimised`); a tap on a card picks it. After the not-so-good idea (A) its picture comes back crossed
+out and the choices stand again. After the good choice the
 story goes on by itself only within the scene (the good idea's picture, the happy end); then that picture waits with ▶
 again, and only a tap (or any key) brings the next scene (`onDone`; user feedback, November 2026: it went on by
 itself before one could look). The last scene of a pass waits with its end buttons instead.
+
+**One tap, one step (user feedback, November 2026):** a child's hand often lands twice in quick succession, and the
+second tap must not pick a card on the screen the first one just brought, nor skip a page unseen. Every tap or key that
+changes the screen – ▶ and the whole screen's tap, ◀, a card, a dot, the small scene, a page – asks the shared guard
+first (`screenTap` in `src/lib/tapGuard.ts`), and a new picture or the cards coming mark the screen changed
+(`screenChanged`), so for `TAP_GUARD_MS` after it nothing changes it again. A new control that changes the screen does
+the same.
 
 **Calm (user feedback, November 2026):** nothing floats up (no hearts, stars, 💢, 💥, 💧, 💤, 🎉), nothing hops,
 shakes, pulses, glows, stamps or grows – not after a choice, not while waiting. Only one thing moves at a time, its
@@ -196,21 +200,20 @@ until the user asks.
 
 **The whole text, never cut short, and it says whose view the scene takes (user feedback, November 2026):** the big
 picture carries everything the voice says with it – the scene's sentences and its question, the not-so-good idea's
-answer, what the good one tells – the same text as its part of the sheet (`readAlong`), never a short form of it; it
-stands under the picture, the full width of the screen's room beside the small scene (never on the picture, user feedback, November 2026). The question says what is the matter
+answer, what the good one tells – the same text as its part of `roundText`, never a short form of it; it
+stands under the pictures (`StoryWords`), never on them (user feedback, November 2026). The question says what is the matter
 and who chooses – „Der Bär hat Angst. Was machst du?“ when the child helps him, „Der kleine Bär
 ist ganz oben. Was kann er tun?“ when the bear acts himself. A separate role sentence before it („Stell dir vor: Du
 bist der kleine Bär.“, `ROLE_LINES`) was tried and taken out again: two sentences in turn said less than one question.
 A caption, big or on a card, always shows whole: it takes a second line, never „…“ (`feelings.test.ts` checks).
 
-**Layout (user's choice, November 2026):** the scene is big in the middle while it is told and shown. While the child
-chooses (`data-stage="choose"`) it is minimised top left (`--mini-w`), its caption beside it and under the dots; the
-two cards A (not-so-good, left) and B (good, right) stand in a row below it, with an SVG arrow from the small scene to
-each (measured in `RoundPlay.tsx`, redrawn on resize). A caption is always under its picture, never on it (user
-feedback, November 2026). Cards are never see-through or pale by opacity: a crossed-out or waiting card goes pale by
-filter. Wide screens put the back step (`StepBack`, „Vorige Szene“) bottom left, with ▶ bottom right; the grown-ups'
-notes sit left of ▶. At the end „Nochmal“ and „Weiter“ stand in the choices' row. Look at 844×390, 390×844, 1024×768
-and 1280×720 after a change.
+**Layout (user's choice, November 2026):** one grid (`.story-play`): the scene, then the text, then (at a pass's end)
+„Nochmal“ and „Weiter“. The scene is as big as the room above the text allows while it is told and shown. While the
+child chooses (`data-stage="choose"`) it is small on top (left out on a phone), the cards A (not-so-good, left) and B
+(good, right) below it, upright one above the other, each with its caption small under it. The text keeps clear of ◀
+bottom left and of ▶ and the loudspeaker bottom right (`--beside`); upright, where it is narrow, they stand below it.
+Cards are never see-through or pale by opacity: a crossed-out or waiting card goes pale by filter. Look at 844×390,
+390×844, 1024×768 and 1280×720 after a change.
 
 **Who hurts is a raccoon, never fox or bear (user decision, November 2026):** in a new story the other child who
 pushes, kicks, takes something away or knocks it over is the raccoon (`bilder/README.md`, „Figuren“); fox and bear,
@@ -321,7 +324,7 @@ recordings (`SOUNDS`, `RECORDED_SOUNDS` in `story.ts`, loaded when a round start
 is missing); „Aua!“ is synthesized (`playAua`) until an `aua.mp3` is found.
 
 The picture of the story is a framed photo – white mat, soft shadow – so it never looks like one of the cards
-(which have the yellow ring and stand out like buttons). While the cards stand, the scene is the small one top left.
+(which have the yellow ring and stand out like buttons). While the cards stand, the scene is the small one on top.
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle (only the little bear's faces kept from
 „Gefühle nachmachen“ are drawn, see above).
