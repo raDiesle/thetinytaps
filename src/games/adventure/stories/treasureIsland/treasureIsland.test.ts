@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
+import * as THREE from "three";
+import { Guide, restPose } from "../../three/guide";
+import { TURTLE_BACK, TURTLE_HALF_WIDTH } from "../../three/props";
 import { TREASURE_ISLAND } from ".";
+import { CHEST_SAND, COIN_STAND, GATE_BEAM, GATE_LIFT, PARTY } from "./layout";
 import { CYCLES, clipLength } from "./script";
 
 test("every movement of the Schatzinsel ends after whole goes, so each go has its target", () => {
@@ -17,4 +21,26 @@ test("the Schatzinsel has a cycle and lines for every step", () => {
   expect(TREASURE_ISLAND.lines.length).toBe(steps);
   expect(TREASURE_ISLAND.lead.length).toBe(steps);
   expect(TREASURE_ISLAND.demo.length).toBe(steps);
+});
+
+test("the gate rises high enough for Tapsi on Ole's back to ride through without touching it", () => {
+  const guide = new Guide();
+  guide.apply(restPose(), 0);
+  guide.root.updateMatrixWorld(true);
+  // From Tapsi's feet to the tips of the ears, standing on Ole's back.
+  const top = new THREE.Box3().setFromObject(guide.root).max.y;
+  expect(top).toBeGreaterThan(1.4);
+  expect(GATE_LIFT, `ears at ${(TURTLE_BACK + top).toFixed(2)} m`).toBeGreaterThan(TURTLE_BACK + top + 0.3);
+  // And the stakes' tips stay below the beam.
+  expect(GATE_LIFT + 2.3).toBeLessThan(GATE_BEAM - 0.13);
+});
+
+test("at the end Tapsi stays on Ole's back, and the chest comes to Tapsi instead", () => {
+  // Ole lies side on at the party, so world z runs across its shell (the shell's half width).
+  const onShell = Math.hypot(COIN_STAND.x - PARTY.x, COIN_STAND.z - PARTY.z);
+  expect(onShell).toBeLessThan(TURTLE_HALF_WIDTH * 0.7);
+  // The chest stands in the sand just past the shell's edge, within reach of the paws.
+  const chest = Math.hypot(CHEST_SAND.x - PARTY.x, CHEST_SAND.z - PARTY.z);
+  expect(chest).toBeGreaterThan(TURTLE_HALF_WIDTH + 0.3);
+  expect(Math.hypot(CHEST_SAND.x - COIN_STAND.x, CHEST_SAND.z - COIN_STAND.z)).toBeLessThan(0.9);
 });

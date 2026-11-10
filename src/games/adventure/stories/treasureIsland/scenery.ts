@@ -17,6 +17,7 @@ import {
   DOOR_Z,
   DRUM_HAND,
   DRUM_RADIUS,
+  GATE_BEAM,
   GATE_HALF,
   GATE_Z,
   groundHeight,
@@ -860,17 +861,17 @@ export function makeGate() {
   const wood = mat("#9a6a3e", 0.9);
   const dark = mat("#6e4a2a", 0.9);
   for (const side of [1, -1]) {
-    const post = solid(new THREE.CylinderGeometry(0.17, 0.2, 3.6, 10), dark);
-    post.position.set((GATE_HALF + 0.25) * side, 1.7, 0);
+    const post = solid(new THREE.CylinderGeometry(0.17, 0.2, GATE_BEAM + 0.25, 10), dark);
+    post.position.set((GATE_HALF + 0.25) * side, (GATE_BEAM + 0.25) / 2 - 0.1, 0);
     group.add(post);
   }
   // Long enough on the left to carry the pulley over the winch.
   const beam = solid(new THREE.BoxGeometry(4.9, 0.26, 0.32), dark);
-  beam.position.set(-0.45, 3.35, 0);
+  beam.position.set(-0.45, GATE_BEAM, 0);
   group.add(beam);
   const pulley = solid(new THREE.CylinderGeometry(0.13, 0.13, 0.08, 16), mat("#5a5048", 0.6, { metalness: 0.4 }));
   pulley.rotation.x = Math.PI / 2;
-  pulley.position.set(WINCH_X + 0.45, 3.12, 0.2);
+  pulley.position.set(WINCH_X + 0.45, GATE_BEAM - 0.23, 0.2);
   group.add(pulley);
 
   const gate = new THREE.Group();
@@ -909,10 +910,15 @@ export function makeGate() {
   const crank = new THREE.Group();
   crank.position.set(0, CRANK_Y, 0);
   winch.add(crank);
-  const arm = solid(new THREE.BoxGeometry(0.05, CRANK_ARM + 0.05, 0.04), dark);
+  // Painted red, so its turn shows against the dark post behind it.
+  const paint = mat("#c4442e", 0.6);
+  const arm = solid(new THREE.BoxGeometry(0.09, CRANK_ARM + 0.09, 0.06), paint);
   arm.position.y = CRANK_ARM / 2;
   crank.add(arm);
-  const knob = solid(new THREE.CylinderGeometry(0.025, 0.025, CRANK_KNOB, 8), dark);
+  const hub = solid(new THREE.CylinderGeometry(0.08, 0.08, 0.08, 14), paint);
+  hub.rotation.x = Math.PI / 2;
+  crank.add(hub);
+  const knob = solid(new THREE.CylinderGeometry(0.035, 0.035, CRANK_KNOB, 8), paint);
   knob.rotation.x = Math.PI / 2;
   knob.position.set(0, CRANK_ARM, CRANK_KNOB / 2);
   crank.add(knob);
@@ -922,6 +928,8 @@ export function makeGate() {
   crank.add(bar);
   const grip = solid(new THREE.CylinderGeometry(0.032, 0.032, CRANK_BAR, 10), mat("#c98d52", 0.6));
   grip.rotation.z = Math.PI / 2;
+  // From just left of the knob over to Tapsi's right (+x).
+  grip.position.x = CRANK_BAR / 2 - 0.05;
   bar.add(grip);
 
   // The rope from the drum up over the pulley and down to the gate.
@@ -941,7 +949,7 @@ export function makeGate() {
   mergeParts(winch, [crank]);
   mergeParts(group, [gate, winch, ...ropes]);
   const drumTop = v3(WINCH_X, CRANK_Y + 0.13, WINCH_Z - GATE_Z - WINCH_POST + 0.3);
-  const overPulley = v3(WINCH_X + 0.45, 3.25, 0.2);
+  const overPulley = v3(WINCH_X + 0.45, GATE_BEAM - 0.1, 0.2);
   return {
     group,
     /** lift: how high the gate is (m); angle: the crank's turn (rad, 0 = up, as seen from Tapsi, positive anticlockwise). */
@@ -951,7 +959,7 @@ export function makeGate() {
       crank.rotation.z = angle;
       bar.rotation.z = -angle;
       stretch(ropes[0], drumTop, overPulley);
-      stretch(ropes[1], v3(WINCH_X + 0.58, 3.12, 0.2), v3(-GATE_HALF + 0.3, lift + 2.0, 0.05));
+      stretch(ropes[1], v3(WINCH_X + 0.58, GATE_BEAM - 0.23, 0.2), v3(-GATE_HALF + 0.3, lift + 2.0, 0.05));
     },
   };
 }
