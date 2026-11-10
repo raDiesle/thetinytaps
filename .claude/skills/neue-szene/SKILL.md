@@ -25,8 +25,10 @@ src/games/scenes/
     <id>.css       // all animations of this scene
 ```
 
-Register the scene in `src/games/scenes/index.ts` (`SCENES`) and remove it from
-`UPCOMING_SCENES`. The route `/bilder/<id>` (`src/pages/ScenePage.tsx`) finds it with `findScene`.
+Register the scene twice, in the same place of the menu order: in `src/games/scenes/catalog.ts` (`SCENE_ENTRIES`: id,
+emoji, German title and its `load`, a dynamic import of its own file – every picture is a chunk of its own) and in
+`src/games/scenes/index.ts` (`SCENES`, only for tests and the management page); remove it from `UPCOMING_SCENES`.
+The route `/bilder/<id>` (`src/pages/ScenePage.tsx`) loads it with `loadScene`; `scenes.test.ts` checks both lists agree.
 Add its search engine entry to `src/content/seo.ts` (`scene("<id>", "<Titel>", "<three things to tap>")`,
 things that really are in the picture), and its English in `src/content/seo.en.ts` (`scene("<Title>", "<things>")`);
 `content.test.ts` fails without either.

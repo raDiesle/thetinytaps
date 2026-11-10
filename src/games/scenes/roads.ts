@@ -1,5 +1,5 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { SCENES } from ".";
+import { loadedScene } from "./catalog";
 import { depthScale, float } from "./layout";
 import { localizeItem } from "./localize";
 import { placeBox, type Placement, type SceneItem } from "./types";
@@ -54,9 +54,9 @@ export interface Guest {
 /** The id of a guest in the picture it visits; can't clash with the picture's own items. */
 const GUEST_ID = "gast";
 
-/** The vehicle of `road` as a guest in the picture it visits, named in `languageId`. */
+/** The vehicle of `road` as a guest in the picture it visits, named in `languageId`; its own picture must be loaded (`loadScene`). */
 export function guestFor(road: Road, languageId: TargetLanguageId = "de"): Guest | undefined {
-  const home = SCENES.find((s) => s.id === road.from)?.items.find((i) => i.id === road.item);
+  const home = loadedScene(road.from)?.items.find((i) => i.id === road.item);
   if (!home) return undefined;
   const item = localizeItem(road.from, home, languageId);
   return { item: { ...item, id: GUEST_ID, place: parkAt(item, road.park) }, look: item.id, road };

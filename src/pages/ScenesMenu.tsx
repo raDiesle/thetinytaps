@@ -3,11 +3,11 @@ import { MenuHead } from "@/components/MenuTop";
 import { Choice } from "@/components/SettingControls";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
-import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
-import { localizeScene } from "@/games/scenes/localize";
+import { SCENE_ENTRIES, scenePath, sceneTitle, UPCOMING_SCENES } from "@/games/scenes/catalog";
 import { carryOverScenesSettings, DEFAULT_SCENES_SETTINGS, SCENE_MODES, SCENES_SETTINGS_KEY, type SceneMode } from "@/games/scenes/settings";
 import { useGameSettings } from "@/lib/common";
 import { useFitGrid } from "@/lib/fitGrid";
+import { usePreloadPages } from "@/lib/preloadPages";
 import { useAppLanguage, useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
@@ -32,7 +32,9 @@ export function ScenesMenu() {
   useTitle(title);
   useUpdateBetweenGames();
   const [settings, update] = useGameSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
-  const grid = useFitGrid(SCENES.length + UPCOMING_SCENES.length);
+  const grid = useFitGrid(SCENE_ENTRIES.length + UPCOMING_SCENES.length);
+  // Each picture is a chunk of its own (catalog.ts): they load one by one while the menu waits for a tap.
+  usePreloadPages(SCENE_ENTRIES.map((s) => scenePath(s.id)));
   return (
     <main className="home">
       <Sky />
@@ -65,9 +67,9 @@ export function ScenesMenu() {
         </div>
       </MenuHead>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
-        {SCENES.map((scene) => localizeScene(scene, language.id)).map((s) => (
+        {SCENE_ENTRIES.map((s) => (
           <li key={s.id}>
-            <GameCard href={`/bilder/${s.id}/`} emoji={s.emoji} title={s.title} />
+            <GameCard href={scenePath(s.id)} emoji={s.emoji} title={sceneTitle(s.id, language.id)} />
           </li>
         ))}
         {UPCOMING_SCENES.map((s) => (

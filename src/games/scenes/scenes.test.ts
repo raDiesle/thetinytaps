@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -7,6 +9,7 @@ import { RUSSIAN_KEYBOARD_ROWS } from "@/lib/cyrillicKeys";
 import { HINDI_KEYBOARD_ROWS } from "@/lib/devanagariKeys";
 import { pick } from "@/lib/language";
 import { SCENES } from ".";
+import { loadedScene, loadScene, SCENE_ENTRIES } from "./catalog";
 import { ARABIC_SCENE_KEYS, assignKeys, HINDI_SCENE_KEYS, pressedKey, RUSSIAN_SCENE_KEYS, SCENE_KEYS, sceneKeysFor } from "./keys";
 import { localizeScene, sceneLanguage } from "./localize";
 import { SCENE_PHRASES } from "./phrases";
@@ -24,6 +27,27 @@ const MIN_TAP = 40;
 
 /** Things in a background that move when tapped (`<Poke>`, clouds), at least. */
 const MIN_POKES = 5;
+
+// The engine finds a picture's German names and its items among the pictures loaded (`loadedScene`).
+await Promise.all(SCENE_ENTRIES.map((entry) => loadScene(entry.id)));
+
+describe("the catalog of pictures (catalog.ts)", () => {
+  test("names every picture in menu order with its own id, emoji and title, and loads that very picture", () => {
+    expect(SCENE_ENTRIES.map(({ id, emoji, title }) => ({ id, emoji, title }))).toEqual(SCENES.map(({ id, emoji, title }) => ({ id, emoji, title })));
+    for (const scene of SCENES) expect(loadedScene(scene.id)).toBe(scene);
+  });
+
+  test("the game imports pictures only through loadScene, never all of them from index.ts", () => {
+    // index.ts imports all 23 pictures at once (1.6 MB of code): only the tests and the management page may use it.
+    const dir = import.meta.dir;
+    const files = [
+      ...readdirSync(dir, { recursive: true, encoding: "utf8" }).map((f) => join(dir, f)),
+      ...readdirSync(join(dir, "../../pages")).map((f) => join(dir, "../../pages", f)),
+    ].filter((f) => /\.tsx?$/.test(f) && !f.endsWith(".test.ts") && !f.endsWith(".test.tsx") && !f.endsWith("ManagementPage.tsx"));
+    const offenders = files.filter((f) => /from "(\.|@\/games\/scenes|@\/games\/scenes\/index|\.\/index)"/.test(readFileSync(f, "utf8")));
+    expect(offenders.map((f) => f.slice(dir.length))).toEqual([]);
+  });
+});
 
 /** Every language the engine speaks (phrases.ts), German first. */
 const LANGUAGES = Object.keys(SCENE_PHRASES) as TargetLanguageId[];

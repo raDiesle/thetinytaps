@@ -23,7 +23,10 @@ import { winter } from "./winter/Winter";
 import { winterbaustelle } from "./winterbaustelle/WinterBaustelle";
 import { zoo } from "./zoo/Zoo";
 
-/** All playable scenes, in menu order. */
+/**
+ * All playable scenes, in menu order, loaded at once: only for the tests and the management page. The game loads each
+ * picture on its own (`loadScene` in catalog.ts), so a picture never downloads the other 22.
+ */
 export const SCENES: Scene[] = [
   baustelle,
   stadt,
@@ -49,9 +52,6 @@ export const SCENES: Scene[] = [
   herbst,
   ostern,
 ];
-
-/** Shown greyed out in the menu so children (and parents) know more is coming. */
-export const UPCOMING_SCENES: { emoji: string; title: string }[] = [];
 
 export function findScene(id: string): Scene | undefined {
   return SCENES.find((s) => s.id === id);

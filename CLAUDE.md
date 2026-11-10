@@ -601,7 +601,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
-  whose cards open lazy pages does the same.
+  whose cards open lazy pages does the same. A game made of many big parts (pictures, levels drawn in code) loads each
+  part's code only when it is played, through an `import()` per part, and keeps what its menu needs before that (id,
+  emoji, title) in a small catalog: Lebendige Bilder's 23 pictures in one chunk were 1.6 MB that its menu and every
+  picture downloaded and ran first (perf analysis, November 2026; `src/games/scenes/catalog.ts`).
   Nothing ever loads in the dark (user feedback, November 2026: Zähne putzen opened straight from its address stood dark
   for seconds on a phone, showing only the small words for search engines on the table): a built page shows its title
   on a sheet of paper with a paw track coming and going (`.boot` in `base.css`, `BOOT_WAIT` in `tools/pageStart.ts`),

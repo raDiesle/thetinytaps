@@ -1,5 +1,5 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { SCENES } from ".";
+import { loadedScene } from "./catalog";
 import { SCENE_TRANSLATIONS } from "./translations";
 import type { Scene, SceneItem, SceneTranslation } from "./types";
 
@@ -14,10 +14,10 @@ import type { Scene, SceneItem, SceneTranslation } from "./types";
 const covers = (scene: Pick<Scene, "items" | "chains">, translation: SceneTranslation) =>
   scene.items.every((item) => translation.items[item.id]) && (scene.chains ?? []).every((chain, c) => translation.chains?.[c]?.length === chain.steps.length);
 
-/** The language picture `sceneId` plays in: `languageId` when it is translated completely, otherwise German. */
+/** The language picture `sceneId` (loaded, `loadScene`) plays in: `languageId` when it is translated completely, otherwise German. */
 export function sceneLanguage(sceneId: string, languageId: TargetLanguageId): TargetLanguageId {
   const translation = languageId === "de" ? undefined : SCENE_TRANSLATIONS[sceneId]?.[languageId];
-  const scene = SCENES.find((s) => s.id === sceneId);
+  const scene = loadedScene(sceneId);
   return translation && scene && covers(scene, translation) ? languageId : "de";
 }
 

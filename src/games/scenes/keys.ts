@@ -2,7 +2,7 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { arabicLetterOf } from "@/lib/arabicKeys";
 import { cyrillicLetterOf } from "@/lib/cyrillicKeys";
 import { devanagariLetterOf } from "@/lib/devanagariKeys";
-import { SCENES } from ".";
+import { loadedScene } from "./catalog";
 import type { SceneItem } from "./types";
 
 // Keys mode in every language: each item gets a key, where it can the first letter of its name in the
@@ -70,7 +70,7 @@ const latinInitial = (word: string) => word.normalize("NFD").charAt(0).toLocaleU
 
 /** The German name of an item of picture `sceneId`, for Chinese, which plays on the German keys. */
 const germanName = (sceneId: string | undefined, item: SceneItem) =>
-  SCENES.find((s) => s.id === sceneId)?.items.find((i) => i.id === item.id)?.name ?? item.name;
+  (sceneId ? loadedScene(sceneId) : undefined)?.items.find((i) => i.id === item.id)?.name ?? item.name;
 
 /**
  * The key an item would like by its name, so where possible the key is the word's first letter:

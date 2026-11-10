@@ -29,6 +29,13 @@ wakes up like in the torch's light (moves, sounds, speaks, is counted), so the p
 
 ## Working on scenes
 
+- **Every picture is a chunk of its own** (perf analysis, November 2026: all pictures in one chunk were 1.6 MB of code,
+  downloaded and run before the menu or any single picture showed). The menu, the end's „Weiter“ and exit signs know a
+  picture by its entry in `catalog.ts` (`SCENE_ENTRIES`: id, emoji, German title, `load`); the game gets the picture
+  itself only from `loadScene` / `loadedScene`. `index.ts`'s `SCENES` imports them all and is only for the tests and the
+  management page – never import it in the game (`scenes.test.ts` checks, and that both lists agree). Whatever
+  another picture is needed for loads it ahead: a vehicle driving off loads the picture it drives to, the party the
+  next picture for „Weiter“, and a visiting vehicle's own picture loads with the one it visits (`ScenesGame`).
 - New picture or many new items: run `/neue-szene` (`.claude/skills/neue-szene/SKILL.md`); it has the full
   guide to depth, keys, drawing style, animations and the browser checks.
 - Two of the hidden surprises are the app's mascots as a family (`MascotFamily` in `hideout.tsx`): the fox or bear

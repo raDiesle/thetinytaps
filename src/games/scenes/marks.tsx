@@ -1,6 +1,6 @@
 import { useMemo, type PointerEvent } from "react";
 import { pick, useAppLanguage } from "@/lib/language";
-import { findScene } from ".";
+import { sceneEntry } from "./catalog";
 import { SCENE_PHRASES } from "./phrases";
 import { sceneLanguage } from "./localize";
 import { ROADS, roadId, type Trip } from "./roads";
@@ -49,7 +49,7 @@ export function ExitSign({ exit, right, width, onFollow }: { exit: Exit; right: 
           <exit.item.Art />
         </svg>
         <text className="scene-exit-emoji" x={0} y={46}>
-          {findScene(exit.to)?.emoji}
+          {sceneEntry(exit.to)?.emoji}
         </text>
       </g>
     </g>

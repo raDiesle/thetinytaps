@@ -9,12 +9,12 @@ import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
-import { SCENES } from ".";
+import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
 import { LaneLayer, type LaneControl } from "./LaneLayer";
-import { localizeScene, sceneLanguage } from "./localize";
+import { sceneLanguage } from "./localize";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
 import { capitalize, SCENE_PHRASES } from "./phrases";
 import { coloursIn, type ColourTrait } from "./colourParts";
@@ -341,11 +341,15 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   };
 
   /** The next picture in menu order (after the last one the first). The game stays open, like following a vehicle. */
-  const nextScene = localizeScene(SCENES[(SCENES.findIndex((s) => s.id === scene.id) + 1) % SCENES.length], appLanguage.id);
+  const nextId = SCENE_ENTRIES[(SCENE_ENTRIES.findIndex((s) => s.id === scene.id) + 1) % SCENE_ENTRIES.length].id;
   const goToNextScene = () => {
     const { trip: _, ...state } = (location.state ?? {}) as { trip?: Trip };
-    navigate(`/bilder/${nextScene.id}/`, { replace: true, state });
+    navigate(scenePath(nextId), { replace: true, state });
   };
+  // Once all is found, the next picture loads while the party plays, so „Weiter“ shows it at once.
+  useEffect(() => {
+    if (allDiscovered) preloadScene(nextId);
+  }, [allDiscovered, nextId]);
 
   /** Explore and colour mode: count the item (and colour it in), and celebrate when it was the last one. */
   const discover = (item: SceneItem, x: number, y: number) => {
@@ -445,6 +449,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const driveOff = (item: SceneItem, road: Road) => {
     const goingHome = item === guest?.item;
     const to = goingHome ? road.from : road.to;
+    // The other picture loads while the vehicle drives off, so following its sign shows it at once.
+    preloadScene(to);
     const dx = driveDistance(item, road.faces, scene.width, true);
     const ms = driveMs(dx);
     busyUntil.current.set(item.id, Infinity);
@@ -896,7 +902,9 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </div>
       )}
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
-      {!questMode && allDiscovered && <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ name: nextScene.title, onNext: goToNextScene }} />}
+      {!questMode && allDiscovered && (
+        <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }} />
+      )}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
       {colouring && keysOn && !allDiscovered && (
         <button
