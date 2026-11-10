@@ -10,6 +10,7 @@ import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTIN
 import { CLOUD_TRIP } from "./stories/cloudTrip";
 import { type Story, storyIn, storyTitle } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
+import previews from "./vorschau/*.webp?glob";
 
 /** The stories on the start screen, each a card; one `unfinished` says „in Bearbeitung“ and starts only on localhost. */
 const STORIES: { id: AdventureStoryId; emoji: string; story: Story; unfinished?: true }[] = [
@@ -43,6 +44,7 @@ export function AdventureGame() {
 
   return (
     <GameShell
+      previews={previews}
       title={t({
         de: "Bewegungsabenteuer",
         en: "Movement Adventures",

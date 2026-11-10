@@ -19,6 +19,7 @@
     "archive-check": "bun scripts/archive-check.mjs",
     "frames": "bun scripts/frame-check.mjs",
     "perf": "bun tools/perf.ts",
+    "previews": "bun tools/previews.ts",
     "voice": "bun scripts/elevenlabs-voice.mjs"
   },
   "dependencies": {

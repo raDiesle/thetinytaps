@@ -5,6 +5,7 @@ import { useT } from "@/lib/language";
 import { GAME_TITLE, LEVEL_TEXTS } from "./content";
 import { MarblePlay } from "./MarblePlay";
 import { DEFAULT_MARBLE_SETTINGS, MARBLE_SETTINGS_KEY, type MarbleLevel, type MarbleSettings } from "./settings";
+import previews from "./vorschau/*.webp?glob";
 
 /** The mode cards in menu order, one per level; „Weiter“ at a level's end goes on with the next. */
 const MODES: { id: MarbleLevel; emoji: string }[] = [
@@ -39,6 +40,7 @@ export function MarbleGame() {
 
   return (
     <GameShell
+      previews={previews}
       title={t(GAME_TITLE)}
       modes={modes}
       mode={mode}

@@ -10,6 +10,7 @@ import { NeedsPlay } from "./NeedsPlay";
 import { NEEDS_BLURB, NEEDS_TITLE } from "./needs";
 import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY } from "./settings";
 import "./feelings.css";
+import previews from "./vorschau/*.webp?glob";
 
 /** The two games under „Wie geht's dir?“: the feeling (the first card) and what the child needs (the second). */
 const FEELING = "gefuehl";
@@ -35,7 +36,7 @@ export function MoodGame() {
   ];
 
   return (
-    <GameShell title={t(MOOD_TITLE)} modes={modes} mode={choice} onMode={setChoice} startMode={routed ? FEELING : undefined}>
+    <GameShell previews={previews} title={t(MOOD_TITLE)} modes={modes} mode={choice} onMode={setChoice} startMode={routed ? FEELING : undefined}>
       {choice === NEED ? <NeedsPlay settings={settings} /> : <MoodPlay settings={settings} onNeeds={() => setChoice(NEED)} />}
     </GameShell>
   );

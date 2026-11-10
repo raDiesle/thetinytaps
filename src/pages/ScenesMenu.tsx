@@ -12,6 +12,7 @@ import { useAppLanguage, useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 import { SeoText } from "@/components/SeoText";
+import previews from "../games/scenes/vorschau/*.webp?glob";
 
 const CATEGORY = categoryOf("/bilder/");
 
@@ -69,7 +70,7 @@ export function ScenesMenu() {
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {SCENE_ENTRIES.map((s) => (
           <li key={s.id}>
-            <GameCard href={scenePath(s.id)} emoji={s.emoji} title={sceneTitle(s.id, language.id)} />
+            <GameCard href={scenePath(s.id)} id={s.id} emoji={s.emoji} picture={previews[`${s.id}.webp`]} title={sceneTitle(s.id, language.id)} />
           </li>
         ))}
         {UPCOMING_SCENES.map((s) => (

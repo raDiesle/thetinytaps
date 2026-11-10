@@ -10,6 +10,7 @@ import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY, type ElevatorSettings
 import { TRAIL_LEVELS } from "./trail/levels";
 import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
+import previews from "./vorschau/*.webp?glob";
 
 /** The names of the card groups: which levels ride the lift in the house, which walk through the world, which are films. */
 const LIFT = { de: "🛗 Aufzug", ru: "🛗 Лифт", en: "🛗 Elevator", zh: "🛗 电梯", hi: "🛗 लिफ़्ट", es: "🛗 Ascensor", ar: "🛗 المصعد" };
@@ -26,6 +27,7 @@ export function ElevatorGame() {
 
   return (
     <GameShell
+      previews={previews}
       title={t({
         de: "Kleine Abenteuer",
         ru: "Маленькие приключения",

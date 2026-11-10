@@ -24,7 +24,7 @@ the fly. Never loosen these; add a package with `bun add --exact <name>` (`-d` f
 or `bun x`, which fetch past the lockfile. Tests import from `bun:test`.
 What a bundler adds to the code comes from one Bun plugin (`tools/appPlugin.ts`), used alike by build, dev server
 (`bunfig.toml`, `[serve.static]`) and tests (`src/testPreload.ts`): a folder of files is `import files from
-"./bilder/*.webp?glob"` (one extension per pattern – Bun can't load `{a,b}` – `**` for subfolders), facts about the
+"./bilder/*.webp?glob"` (relative to the importing file – an `@/` path finds no files and no error says so –, one extension per pattern – Bun can't load `{a,b}` – `**` for subfolders), facts about the
 build come from `src/lib/buildInfo.ts` (never `import.meta.env`), and in the build a stylesheet a module imports travels in
 that module's chunk (Bun alone would load every game's CSS with the start page; the dev server still does, for hot
 reload, so a game borrowing another's CSS shows only in `preview-pages` – `css.test.ts` checks the keyframes). Keep it that way when adding such code.
@@ -194,7 +194,7 @@ In a fresh worktree run `bun install` first.
   nor `*` after it (`.row:has(…) > *`): while such a rule is loaded Chrome restyles the whole page at every change of the
   DOM, and the shelf preloads every game's CSS, so two games' rules made the book's take-out stutter (November 2026;
   `css.test.ts`) – mark the element with a class, put the attribute on the element that carries `:has()`, and name what
-  the rule styles. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts,
+  the rule styles. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts, its pictures decoded (`picturesReady` in `bookTravel.ts`: the menus' pictures arriving mid-flight cost a stutter),,
   never in its middle, and loading other pages' code waits (`holdPreloads` in `src/lib/preloadPages.ts`).
   `bun run perf` measures it: it plays each game in headless
   Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
@@ -451,6 +451,17 @@ In a fresh worktree run `bun install` first.
 - A menu's cards, lines and books always stand in the same order (user feedback, November 2026): nothing moves to the
   front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
   last first; `GameShell.test.ts` checks).
+- **Menus show pictures from the games, not emojis** (user request, November 2026): every card of a start screen, every
+  line of a book's table of contents and every picture's card of Lebendige Bilder shows a round cut of its game as it
+  plays (`CardPicture`), a small still webp in the game's `vorschau/` folder (`GameShell previews`; the books' lines in
+  `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the game's own svg drawn
+  into the menu, which would have a phone draw every game at once. A new game, level, scene or card runs it
+  (`bun run previews <folder or address>`) and its picture is looked at before committing (`--shots` keeps the whole
+  window beside it): where the start shows only sky, a dark room or an empty page waiting for a key, give it a cut, a
+  later moment or a key there (`CUTS`, `WAITS`, `KEYS`), as Kettenreaktion's big worlds and the keyboard games needed;
+  what a game lays over its picture (key letters, a count, a backpack, sentences, its buttons) goes into
+  `HIDE_OVERLAYS`, or the cut finds it as the busiest part; a new menu adds its folder to `MENUS` (`previews.test.ts`).
+  The emoji stays only where no picture is yet (a card „bald“).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
   choices may sit there.

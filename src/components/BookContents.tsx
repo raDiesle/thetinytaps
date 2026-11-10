@@ -1,13 +1,15 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router";
-import { type Game, gamePage } from "@/content/games";
+import { CardPicture } from "@/components/GameCard";
+import { bookIdOf, type Game, gamePage } from "@/content/games";
 import { useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
 import { preloadPage } from "@/lib/preloadPages";
+import previews from "./vorschau/*.webp?glob";
 
 /**
  * A book's first page, laid out as a picture book's table of contents (user feedback, October 2026):
- * one line per game, its picture, its name, the dots leading to the page it is on. Each line is as tall as the page
+ * one line per game, its picture (a round cut of the game, `vorschau/<book id>.webp`), its name, the dots leading to the page it is on. Each line is as tall as the page
  * allows (the lines share the room under the title), and the whole line is the tap: it turns the page to the game.
  */
 export function BookContents({ games, world }: { games: Game[]; world: string }) {
@@ -37,9 +39,7 @@ function ContentsLine({ game, page }: { game: Game; page: number }) {
       onPointerDown={() => preloadPage(game.href)}
       onClick={turnPage}
     >
-      <span className="toc-picture" aria-hidden>
-        {game.emoji}
-      </span>
+      <CardPicture className="toc-picture" emoji={game.emoji} picture={previews[`${bookIdOf(game.href)}.webp`]} />
       <span className="toc-name">
         <span className="toc-title">{title}</span>
         <span className="toc-blurb">{t(game.blurb)}</span>

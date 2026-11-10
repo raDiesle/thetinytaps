@@ -78,6 +78,8 @@ and which file holds what. Add notes that save the next session time: dev helper
 
 ## Checks before you finish
 
+Its menu card needs its picture: `bun run previews <its menu's folder or address>` writes it into the `vorschau/` folder (a new menu: add it to `MENUS` in `tools/previews.ts` and pass `previews` to `GameShell`); look at it before committing.
+
 1. `bun run verify`; add a `<game>.test.ts` for content rules (unique ids, every
    sentence non-empty, references between lists exist).
 2. Preview (`preview_start` with `dev`): start screen, every mode, touch and keys,

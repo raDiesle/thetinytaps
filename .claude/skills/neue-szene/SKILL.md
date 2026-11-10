@@ -201,6 +201,8 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 
 ## Checks before you finish
 
+Its menu card needs its picture: `bun run previews <its menu's folder or address>` writes it into the `vorschau/` folder (a new menu: add it to `MENUS` in `tools/previews.ts` and pass `previews` to `GameShell`); look at it before committing.
+
 1. `bun run verify` (typecheck + `scenes.test.ts`: ids, articles, tap sizes, chains,
    keys, question grammar, roads) and `bun run build` (always Bun, never npm or yarn).
 2. Preview (`.claude/launch.json`, `preview_start`) at `/bilder/<id>`, then:

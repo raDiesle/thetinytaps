@@ -211,6 +211,8 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 
 ## Checks before you finish
 
+Its menu card needs its picture: `bun run previews <its menu's folder or address>` writes it into the `vorschau/` folder (a new menu: add it to `MENUS` in `tools/previews.ts` and pass `previews` to `GameShell`); look at it before committing.
+
 1. `bun run verify` – `levels.test.ts` runs for every level in `TRAIL_LEVELS`: unique
    station ids, ground and stations left to right, the bag never over three and
    always holding what the next obstacle needs, only the last station frees the

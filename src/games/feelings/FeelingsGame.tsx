@@ -8,6 +8,7 @@ import { groupById, playableGroups } from "./groups";
 import { ALLTAG_TITLE } from "./names";
 import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY, type FeelingsOrder } from "./settings";
 import "./feelings.css";
+import previews from "./vorschau/*.webp?glob";
 
 /**
  * „Alltagssituationen“: by default one card per day of the little bear („Tag 1“, „Tag 2“ …, `DAYS`), its scenes of
@@ -27,6 +28,7 @@ export function FeelingsGame() {
 
   return (
     <GameShell
+      previews={previews}
       title={t(ALLTAG_TITLE)}
       modes={modes}
       mode={byDay ? dayById(settings.day).id : groupById(settings.group).id}
