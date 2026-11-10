@@ -22,8 +22,6 @@ export interface FeelingsSettings {
    * the child themselves switch it off (`VoiceSwitch`); the sounds go on. „Wie geht's dir?“ always speaks.
    */
   voice: boolean;
-  /** Whether „Alltagssituationen“ shows the whole text of each scene on its picture, for grown-ups to read out (`ReadAlong`). */
-  text: boolean;
   /** Read aloud by the browser's voice: always off (`FIXED` in src/lib/common.ts), kept for the shared options. */
   speech: boolean;
   /** Little sounds for hugs, stomping, lullabies. */
@@ -38,7 +36,6 @@ export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
   scene: 0,
   steps: {},
   voice: true,
-  text: false,
   speech: false,
   sounds: true,
 };

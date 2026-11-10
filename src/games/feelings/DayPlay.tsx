@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { DayPage } from "./DayPage";
 import { type Day, dayStories, NIGHT_IMAGE } from "./days";
 import { dayIn } from "./localized";
-import type { ReadAlongCorner } from "./PassPlay";
 import { RoundPlay } from "./RoundPlay";
 import { afterPage, openingLines, roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
@@ -26,7 +25,7 @@ export function DayPlay({
   update,
   onAgain,
   next,
-  readAlong,
+  voiceSwitch,
 }: {
   day: Day;
   /** The scene to begin with: where the child stopped last time; its page of the story comes first. */
@@ -36,10 +35,10 @@ export function DayPlay({
   onAgain: () => void;
   next?: { name?: string; onNext: () => void };
   /**
-   * The corner for grown-ups: the scene's whole text and the loudspeaker – in the scenes only: on the pages of the story
-   * they would change nothing (user feedback, November 2026: there they only lay over ▶).
+   * The loudspeaker for grown-ups – in the scenes only: on the pages of the story it would change nothing (user
+   * feedback, November 2026: there it only lay over ▶).
    */
-  readAlong?: ReadAlongCorner;
+  voiceSwitch?: ReactNode;
 }) {
   const { id: language } = useAppLanguage();
   const scenes = dayStories(day);
@@ -75,6 +74,8 @@ export function DayPlay({
   const goOn = () => setAt(last ? { ...at, page: "night" } : { index: at.index + 1, page: "before", step: stepOf(at.index + 1), run: at.run });
   // A dot tapped (user wish, November 2026): that scene itself again, with the choice it played – the one now from its start.
   const replay = (index: number) => setAt({ index, page: "scene", step: played.current[index] ?? stepOf(index), run: at.run + 1 });
+  // ◀ bottom left: from a scene to its page of the story, from a page to the scene before it (user wish, November 2026).
+  const backToScene = (index: number) => (index >= 0 ? () => replay(index) : undefined);
 
   if (at.page === "night")
     return (
@@ -87,6 +88,7 @@ export function DayPlay({
         ending={<GameEnd inline showNext onAgain={onAgain} next={next} />}
         onEndKey={next?.onNext ?? onAgain}
         onPick={replay}
+        onBack={backToScene(scenes.length - 1)}
       />
     );
 
@@ -105,6 +107,7 @@ export function DayPlay({
         progress={progress}
         onNext={() => setAt({ ...at, page: "scene" })}
         onPick={replay}
+        onBack={backToScene(at.index - 1)}
         nextLines={sceneOpening}
       />
     );
@@ -119,7 +122,8 @@ export function DayPlay({
       onDone={goOn}
       onEndKey={goOn}
       onPick={replay}
-      readAlong={readAlong}
+      onBack={() => setAt({ ...at, page: "before" })}
+      voiceSwitch={voiceSwitch}
       nextLines={afterScene}
     />
   );

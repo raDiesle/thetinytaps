@@ -243,7 +243,10 @@ In a fresh worktree run `bun install` first.
 
 - A game of short scenes (a picture, a question, a choice, then the next) has a way back bottom left to the scene
   before, as `StepBack` in Gefühle's „Alltagssituationen“ does (`onBack`; „Vorige Szene“ in every language, so its
-  aria label is translated with the rest). Captions of a picture always stand under it, never on it, in every phase – small, since only grown-ups read them, at the one size of every caption (`--caption-size` in `base.css`), and the picture takes all the room they leave. A story's sentence a grown-up reads aloud under its picture is set alike in every story (user feedback from Abstillen, November 2026): the book's serif with its first letter big and red, as Gefühle's day pages and Abstillen do – never a face or size of its own.
+  aria label is translated with the rest). One tap is one step there: a quick second tap (a child's
+  hand often lands twice) changes nothing on the screen the first one just brought – every tap or key that turns to the
+  next picture, page or choice asks `screenTap()` of `src/lib/tapGuard.ts`, and a screen that changes by itself calls
+  `screenChanged()` (user feedback, November 2026; Gefühle, Abstillen, Aufs Töpfchen; `tapGuard.test.ts`). Captions of a picture always stand under it, never on it, in every phase – small, since only grown-ups read them, at the one size of every caption (`--caption-size` in `base.css`), and the picture takes all the room they leave. A story's sentence a grown-up reads aloud under its picture is set alike in every story (user feedback from Abstillen, November 2026): the book's serif with its first letter big and red, as Gefühle's day pages and scenes and Abstillen do – never a face or size of its own.
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
   The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
   a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world

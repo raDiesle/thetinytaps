@@ -423,7 +423,7 @@ export const feelingsIdeas: IdeaArea = {
       id: "C-53",
       emoji: "💬",
       title: "Eine Frage zum Weiterreden",
-      text: "Unten im Text zum Vorlesen (`ReadAlong`), nach dem guten Ende, steht pro Szene eine Frage für den Erwachsenen: „Hast du schon mal eine Biene gesehen? Was hast du gemacht?“, „Wann hast du dich zuletzt so gefreut?“. Nicht vorgelesen, nur für den Großen, der die Szene mit dem Kind anschaut.",
+      text: "Unter dem Bild des guten Endes (der Text unter den Bildern, `StoryWords`) steht pro Szene eine Frage für den Erwachsenen: „Hast du schon mal eine Biene gesehen? Was hast du gemacht?“, „Wann hast du dich zuletzt so gefreut?“. Nicht vorgelesen, nur für den Großen, der die Szene mit dem Kind anschaut.",
       why: "Eine Szene hilft am meisten, wenn sie zum eigenen Leben des Kindes führt. Die Frage ist da, wo der Erwachsene ohnehin liest, und braucht keine Aufnahme.",
       effort: "S",
     },

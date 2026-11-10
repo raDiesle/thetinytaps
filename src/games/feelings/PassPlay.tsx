@@ -6,15 +6,6 @@ import { RoundPlay } from "./RoundPlay";
 import { openingLines, roundOf, stepsOf } from "./rounds";
 import type { FeelingsSettings } from "./settings";
 
-/** „Alltagssituationen“'s bottom right corner for grown-ups: the note with the round's text, and the loudspeaker beside it. */
-export interface ReadAlongCorner {
-  /** Whether the sheet with the text is open. */
-  open: boolean;
-  onToggle: () => void;
-  /** The loudspeaker that switches the voice (`VoiceSwitch`), standing in the corner beside the book. */
-  voiceSwitch: ReactNode;
-}
-
 /**
  * One pass through a group: each of its scenes once, one choice each. After a scene's good idea its picture waits with
  * ▶ until a tap brings the next scene (user feedback, November 2026). Every scene asks its next step
@@ -29,7 +20,7 @@ export function PassPlay({
   remember = true,
   onAgain,
   next,
-  readAlong,
+  voiceSwitch,
 }: {
   group: StoryGroup;
   /** The scene to begin with: where the child stopped last time. */
@@ -41,8 +32,8 @@ export function PassPlay({
   onAgain: () => void;
   /** The next group; left out where there is none to go on to. */
   next?: { name?: string; onNext: () => void };
-  /** The corner for grown-ups: the round's whole text and the loudspeaker („Alltagssituationen“ only, `ReadAlong`). */
-  readAlong?: ReadAlongCorner;
+  /** The loudspeaker for grown-ups in the bottom right corner („Alltagssituationen“ only, `VoiceSwitch`). */
+  voiceSwitch?: ReactNode;
 }) {
   const { id: language } = useAppLanguage();
   const scenes = groupStories(group);
@@ -87,7 +78,7 @@ export function PassPlay({
       onEndKey={last ? (next?.onNext ?? onAgain) : goOn}
       onPick={replay}
       onBack={now.index > 0 ? () => replay(now.index - 1) : undefined}
-      readAlong={readAlong}
+      voiceSwitch={voiceSwitch}
       // The next scene's opening loads while this one plays.
       nextLines={last ? [] : openingLines(roundOf(scenes[now.index + 1], stepOf(now.index + 1), language))}
     />

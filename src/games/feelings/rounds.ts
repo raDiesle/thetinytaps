@@ -118,8 +118,8 @@ export const roundLines = (round: Round): string[] =>
 /** The parts of a round in the order they are told: the scene with its question, the not-so-good idea, the good one, the happy end. */
 export type ReadPart = "start" | "instead" | "good" | "end";
 
-/** One part of a round's whole text, for grown-ups to read out (`ReadAlong`). */
-export interface ReadAlongPart {
+/** One part of a round's whole text, standing under its picture (`StoryWords`). */
+export interface RoundTextPart {
   id: ReadPart;
   /** The card's caption, for the two ideas: which one the text belongs to. */
   caption?: string;
@@ -129,8 +129,11 @@ export interface ReadAlongPart {
 
 const told = (beats: Beat[]): string => beats.map(beatText).filter(Boolean).join(" ");
 
-/** Everything a round says, part by part, for grown-ups who read it out themselves (the voice switched off, `VoiceSwitch`). */
-export const readAlong = (round: Round): ReadAlongPart[] => [
+/**
+ * Everything a round says, part by part: each part stands whole under its picture, for grown-ups who read it out
+ * themselves (the voice switched off, `VoiceSwitch`) or follow along.
+ */
+export const roundText = (round: Round): RoundTextPart[] => [
   { id: "start", text: [told(round.start.beats), round.question].filter(Boolean).join(" ") },
   { id: "instead", caption: round.instead.caption, text: round.instead.answer },
   { id: "good", caption: round.good.caption, text: told(round.good.beats) },

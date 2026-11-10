@@ -268,7 +268,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Buch und Gruppen",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts), die acht Gruppen (groups.ts), „Stimme ausschalten“ / „Stimme einschalten“ des Lautsprechers (VoiceSwitch.tsx) und „Text zum Vorlesen zeigen“ / „Text ausblenden“ (ReadAlong.tsx); der Text selbst kommt aus den Szenen in ihrer Sprache.",
+        note: "Neu (4. November 2026), übersetzt am 5. November 2026: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts), die acht Gruppen (groups.ts), „Stimme ausschalten“ / „Stimme einschalten“ des Lautsprechers (VoiceSwitch.tsx) (der Knopf „Text zum Vorlesen“, ReadAlong.tsx, wurde im November 2026 entfernt: der Text steht jetzt unter den Bildern); der Text selbst kommt aus den Szenen in ihrer Sprache.",
       },
       {
         label: "Tagesgeschichten",

@@ -6,6 +6,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import type { TextsLanguageId } from "@/content/texts";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
+import { screenChanged, screenTap } from "@/lib/tapGuard";
 import "./chapterBook.css";
 
 /** One page of a story book: its picture (found by `pictureOf(id)`) and the sentence a grown-up reads under it. */
@@ -45,9 +46,6 @@ const CHAPTER = {
   ar: "الفصل {n}",
   ru: "Глава {n}",
 };
-
-/** Taps this soon after a page began only ripple, so a double tap doesn't skip a page. */
-const TAP_GUARD_MS = 450;
 
 /** The table of contents at the book's start, where no page of the story is open. */
 const CONTENTS = -1;
@@ -98,13 +96,13 @@ export function ChapterBook({
   const LAST = pages.length - 1;
   const [index, setIndex] = useState(CONTENTS);
   const indexRef = useRef(CONTENTS);
-  const startedAt = useRef(0);
   const { effects, ripple } = useTapFeedback();
 
   const show = useCallback(
     (next: number) => {
       indexRef.current = next;
-      startedAt.current = performance.now();
+      // Taps right after a page came only ripple, so a double tap doesn't skip a page (`screenTap`).
+      screenChanged();
       setIndex(next);
       // The page after this one loads while this one is read.
       const after = next >= 0 && pages[next + 1] && pictureOf(pages[next + 1].id);
@@ -117,6 +115,7 @@ export function ChapterBook({
 
   /** Opens a chapter from the table of contents. */
   const open = (chapter: number) => {
+    if (!screenTap()) return;
     playPageTurn(0.6);
     show(starts[chapter]);
   };
@@ -127,7 +126,7 @@ export function ChapterBook({
   /** The next page, or ripples and a soft note where it comes too soon, and on the last page. */
   const forward = (x?: number, y?: number) => {
     const now = indexRef.current;
-    if (now >= LAST || performance.now() - startedAt.current < TAP_GUARD_MS) {
+    if (now >= LAST || !screenTap()) {
       ripple(x, y);
       playRandomNote();
       return;
@@ -138,6 +137,7 @@ export function ChapterBook({
 
   const back = () => {
     if (indexRef.current === CONTENTS) return;
+    if (!screenTap()) return ripple();
     playPageTurn(0.6);
     show(indexRef.current - 1);
   };
