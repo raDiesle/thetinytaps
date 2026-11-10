@@ -1705,6 +1705,11 @@
   pointer-events: auto;
 }
 
+/* The sentence under the first line never smaller than can still be read; where it doesn't fit so, it is left out (`DailyGroup`). */
+.shelf-carving-words {
+  font-size: max(1em, 8px);
+}
+
 .shelf-carving-big {
   font-size: 1.45em;
   font-weight: 700;
@@ -1719,8 +1724,8 @@
   padding-top: max(0px, calc(var(--bh) * 1.04 - var(--ch) * 0.7));
 }
 
-/* Only the first line, where the room is small (a phone): as big as the books' names, so it can still be read. */
-.shelf-carving[data-short] {
+/* A narrow place (a phone): as big as the books' names, so it can still be read, and closer to its sides. */
+.shelf-carving[data-narrow] {
   padding-inline: calc(var(--bh) * 0.08);
   font-size: calc(var(--bh) * 0.075);
 }

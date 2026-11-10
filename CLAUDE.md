@@ -418,9 +418,11 @@ In a fresh worktree run `bun install` first.
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
   Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). It ends with a carved, underlined „mehr …“
   that opens the texts for grown-ups (`RoomNotes`, see below). The carving takes room of its own on the board
-  (`planShelf` takes each place's width), all of it where the picture books stay nearly as big (`CARVING_SHRINK`) and the
-  words big enough to read, else only its first line and „mehr …“ – never none, since „mehr …“ is the way to those
-  texts (`CARVINGS`). Its place is only as wide as its words need: a wider one left a gap beside them, and the picture
+  (`planShelf` takes each place's width), a wide place where the picture books stay nearly as big (`CARVING_SHRINK`) and the
+  words big enough to read, else a narrow one – never none, since „mehr …“ is the way to those texts (`CARVINGS`). Its
+  sentence under the first line stands wherever it fits whole, measured in the page, and is left out only where it
+  doesn't (a phone on its side has the room: only „Für Groß & Klein“ there left the board empty, user feedback, November
+  2026). Its place is only as wide as its words need: a wider one left a gap beside them, and the picture
   book beside it stands close to its words, not a finger's gap away (only „mehr …“ in their middle takes a tap, user
   feedback, November 2026);
   words added to it widen its place (`CARVINGS`), never spill past the board – measure its first and last line against
@@ -577,8 +579,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
-  "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“, a small plain button beside the big ones so a
-  child's hand goes elsewhere, lets a grown-up play upright for the rest of the visit), and asks once per visit for fullscreen, which on Android
+  "Bitte quer halten" while the device stands upright – under it one short sentence on what the site offers and why
+  sideways (user request, November 2026: a grown-up coming from a search sees this first) – (its „Trotzdem hochkant“, a small plain slip above the turning phone, never beside the big
+  buttons, so a child's hand goes elsewhere – user feedback, November 2026 – lets a grown-up play upright for the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - Updates: a page opened online always comes from the network, so it runs the newest build; the service worker answers
   it from its cache only offline, on an error status or after 3 s without an answer (`src/sw.js`, `sw.test.ts`). Never
