@@ -13,7 +13,7 @@ no voice, only the sounds of a tap (`playTwinkle`, `playPlop`).
 - `CauseGame.tsx` – the start screen (`GameShell startMode="play"`).
 - `CausePlay.tsx` – the rounds, taps, keys (digits pick, any other key one at random), the timer to the next round.
 - `rounds.ts` – the rounds and their pictures (still emojis, to be replaced), each with its question (`label`).
-- `names.ts` – the name and line, German only (the language row in `languageStatus.ts` says so).
+- `names.ts` – the name and line in every app language (translated 10 November 2026), and `rounds.ts` the question and each picture's question for grown-ups the same.
 - `cause.css` – classes prefixed `cause-`.
 
 Rules of this game:

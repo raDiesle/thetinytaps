@@ -48,7 +48,7 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
   { id: "apple", emoji: "🍎", name: { de: "Apfelbaum", en: "Apple Tree", zh: "苹果树", hi: "सेब का पेड़", es: "Manzano", ar: "شجرة التفاح", ru: "Яблоня" } },
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
-  { id: "clock", emoji: "⏰", name: { de: "Wecker" } },
+  { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   {
     id: "train",
     emoji: "🚂",
@@ -67,19 +67,27 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     id: "sunset",
     emoji: "🌅",
     // Renamed from „Sonnenuntergang“ when the picture turned into a sunrise (November 2026); its id stays, so a kept choice
-    // still finds it. The old translations meant a sunset and were dropped until translations are asked for.
-    name: { de: "Sonnenaufgang" },
+    // still finds it. The old translations meant a sunset and were dropped; translated anew on 10 November 2026.
+    name: { de: "Sonnenaufgang", en: "Sunrise", zh: "日出", hi: "सूर्योदय", es: "Amanecer", ar: "شروق الشمس", ru: "Восход" },
   },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
   // Taking turns at tennis (H-71, user request, November 2026), beside „Abwechseln“ in its group.
-  { id: "tennis", emoji: "🎾", name: { de: "Tennis" } },
+  { id: "tennis", emoji: "🎾", name: { de: "Tennis", en: "Tennis", zh: "网球", hi: "टेनिस", es: "Tenis", ar: "التنس", ru: "Теннис" } },
 ];
 
 /**
  * The line on the cards of „Abwechseln“ and Tennis, last on the start screen, for grown-ups: they run on without an
  * end, and each child gets its turn (user feedback, November 2026).
  */
-export const SWAP_NOTE: Localized = { de: "Läuft ohne Ende, jeder ist mal dran" };
+export const SWAP_NOTE: Localized = {
+  de: "Läuft ohne Ende, jeder ist mal dran",
+  en: "Runs without end, everyone gets a turn",
+  zh: "不停地转，每人轮流",
+  hi: "बिना रुके चलता है, सबकी बारी आती है",
+  es: "Sigue sin parar, todos tienen su turno",
+  ar: "يستمر بلا نهاية، ولكلٍّ دوره",
+  ru: "Идёт без конца, каждый по очереди",
+};
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
 export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "tennis";

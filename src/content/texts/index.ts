@@ -58,6 +58,8 @@ export interface LanguageTexts {
   days?: Partial<Record<string, DayText>>;
   /** Tapsis Milchkette: chapter titles and pages (`milkchain/<id>.ts`). */
   milkChain?: MilkChainTranslation;
+  /** Tapsi und die Schnullerfee: chapter titles and pages (`pacifierstory/<id>.ts`). */
+  pacifierStory?: MilkChainTranslation;
   /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
   seo?: SeoTranslation;
   /** Bewegungsabenteuer: Tapsi's lines by story folder (`adventure/stories/<story>/lines.<id>.ts`). */

@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { PACIFIER_STORY_AR } from "./ar";
+import { PACIFIER_STORY_EN } from "./en";
+import { PACIFIER_STORY_ES } from "./es";
+import { PACIFIER_STORY_HI } from "./hi";
 import { PACIFIER_PAGES, PACIFIER_STEPS, PACIFIER_STORY } from "./pacifierStory";
+import { PACIFIER_STORY_RU } from "./ru";
+import { PACIFIER_STORY_ZH } from "./zh";
 import { PACIFIER_PICTURE_QUEUE } from "./pacifierStoryPictures";
 
 describe("Tapsi und die Schnullerfee", () => {
@@ -47,4 +53,41 @@ describe("Tapsi und die Schnullerfee", () => {
   test("every picture is drawn from a reference, so the places stay", () => {
     for (const picture of PACIFIER_PICTURE_QUEUE) expect(picture.ref?.length, picture.id).toBe(1);
   });
+});
+
+describe("Tapsi und die Schnullerfee in every language", () => {
+  const chapterIds = PACIFIER_STORY.map((c) => c.id).sort();
+  const pageIds = PACIFIER_PAGES.map((p) => p.id).sort();
+  const LANGUAGES = {
+    en: PACIFIER_STORY_EN,
+    zh: PACIFIER_STORY_ZH,
+    hi: PACIFIER_STORY_HI,
+    es: PACIFIER_STORY_ES,
+    ar: PACIFIER_STORY_AR,
+    ru: PACIFIER_STORY_RU,
+  };
+  /** Tapsi's name and the pacifier, as each language writes them. */
+  const SAYS = {
+    en: ["Tapsi", "pacifier"],
+    zh: ["塔普西", "奶嘴"],
+    hi: ["टैप्सी", "चुसनी"],
+    es: ["Tapsi", "chupete"],
+    ar: ["تابسي", "لهاية"],
+    ru: ["Тапси", "пустышк"],
+  };
+
+  for (const [language, translation] of Object.entries(LANGUAGES)) {
+    test(`${language}: every chapter and page, nothing else`, () => {
+      expect(Object.keys(translation.chapters).sort()).toEqual(chapterIds);
+      expect(Object.keys(translation.pages).sort()).toEqual(pageIds);
+      for (const text of [...Object.values(translation.chapters), ...Object.values(translation.pages)]) expect(text.trim()).not.toBe("");
+    });
+
+    test(`${language}: Tapsi in its own script, and the pacifier named`, () => {
+      const all = Object.values(translation.pages).join(" ");
+      for (const word of SAYS[language as keyof typeof SAYS]) expect(all).toContain(word);
+      // Russian, Chinese, Hindi and Arabic are written without Latin letters.
+      if (language !== "en" && language !== "es") expect(all + Object.values(translation.chapters).join(" ")).not.toMatch(/[A-Za-z]/);
+    });
+  }
 });

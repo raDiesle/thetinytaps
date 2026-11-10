@@ -19,7 +19,10 @@ Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and w
 - `PacifierStoryGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as
   „Abstillen“: table of contents first, one page per tap, the picture big and the sentence small under it; dev tags
   `S0`, `S<chapter>-<page>`). A change to how the book reads goes there, so both books get it.
-- `names.ts`: the book's name on the shelf („Schnullerfee“), the story's title and its blurb – German only so far.
+- `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
+  (translated on request, 10 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with
+  `byLanguage` (`pacifierStory`), passed to `ChapterBook` as `translations`.
+- `names.ts`: the book's name on the shelf („Schnullerfee“), the story's title and its blurb in every language.
 
 ## Rules
 
@@ -34,8 +37,12 @@ Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and w
   ever gives. The foxes are the family: Tapsi, Mama and Papa Fuchs, never a fox or bear only standing by.
 - Tapsi is an animal, not the child's figure, so it does not follow „Junge / Mädchen“, and the German text names Tapsi
   instead of „er“ or „sie“, as „Abstillen“ does.
-- German only until the user asks for translations; then `<lang>.ts` beside the data as in `src/games/milkchain`, read
-  with `byLanguage` and passed to `ChapterBook` as `translations`, and the row in `languageStatus.ts` says what is there.
+- Every language has every chapter and page (`pacifierstory.test.ts`): a new page or chapter comes in German only and
+  the row in `languageStatus.ts` says what is missing until the user asks for translations; a German line whose meaning
+  changes loses its translations (they fall back to German). The child's languages' rules hold: Tapsi in each script
+  (Тапси, 塔普西, टैप्सी, تابسي), the pacifier named the same way throughout (pacifier, 奶嘴, चुसनी, chupete, لهاية,
+  пустышка), Arabic with „let's“ instead of an imperative, Spanish without adjectives about Tapsi that change with
+  gender; Tapsi's grammar follows „Abstillen“'s (masculine in Russian, Hindi and Arabic).
 - Pictures (`/bild-erzeugen`): the living room and the garden are drawn from the first pictures of „Abstillen“'s
   (`kette-fragen-nicht`, `kette-tag-raus`), so both books show one home; Tapsi's room is drawn once from the fox family
   (`fee-drei`, with a wide windowsill for the stars, the box and the fairy) and every other page there from it; the

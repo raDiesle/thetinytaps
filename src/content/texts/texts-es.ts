@@ -35,6 +35,7 @@ import { COMFORTS_ES as comforts, FEELINGS_ES as feelings } from "@/games/feelin
 import { SITUATIONS_ES as situations } from "@/games/feelings/kita.es";
 import { DAYS_ES as days } from "@/games/feelings/days.es";
 import { MILK_CHAIN_ES as milkChain } from "@/games/milkchain/es";
+import { PACIFIER_STORY_ES as pacifierStory } from "@/games/pacifierstory/es";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.es";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.es";
 import type { LanguageTexts } from ".";
@@ -82,6 +83,7 @@ export const TEXTS: LanguageTexts = {
   situations,
   days,
   milkChain,
+  pacifierStory,
   seo,
   stories: { cloudTrip, treasureIsland },
 };

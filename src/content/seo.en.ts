@@ -20,7 +20,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Toddler Games & Everyday Helpers – Free, No Ads",
       description:
         "Learning games and everyday helpers for toddlers: look-and-find pictures, feelings, letters, a visual timer, tooth brushing, potty, reward chart, weaning.",
-      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognising. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print – and read-aloud stories in chapters for weaning and for saying goodbye to the pacifier with the pacifier fairy.",
+      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognizing. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print – and read-aloud stories in chapters for weaning and for saying goodbye to the pacifier with the pacifier fairy.",
     },
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
@@ -42,7 +42,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Matching Games for Toddlers",
       description:
         "What does the animal need, what goes together, which shadow fits, which socks match? First matching games for toddlers, free and without ads.",
-      text: "Four first matching games: in “What Does the Animal Need?” the animal gets its food and its home, in “What goes together?” toothbrush and toothpaste or the fire fighter and the hose find each other, in Recognise the child spots shadows and animals in the bush, and in “Sock Pairs” matching socks go on the line. Tap or drag, nothing is ever wrong – and every game gets easier or harder by itself.",
+      text: "Four first matching games: in “What Does the Animal Need?” the animal gets its food and its home, in “What goes together?” toothbrush and toothpaste or the fire fighter and the hose find each other, in “Recognize” the child spots shadows and animals in the bush, and in “Sock Pairs” matching socks go on the line. Tap or drag, nothing is ever wrong – and every game gets easier or harder by itself.",
     },
     "/bilder/": {
       title: "Interactive Look-and-Find Pictures for Toddlers",
@@ -95,8 +95,8 @@ export const SEO_EN: SeoTranslation = {
       text: "The toothbrush lies above, toothpaste, a key and a lid below: the child taps what belongs to it, and the two get going – the toothpaste squeezes a blob onto the brush, the key turns and the door opens. In between, helpers drawn as fox and bear need their tools: the fire fighter puts out the fire with the hose, the doctor listens with the stethoscope, the hairdresser snips with the scissors. Nearly 200 pairs in more than twenty topics, from the bathroom and daycare to the farm. The game gets easier or harder by itself.",
     },
     "/schatten/": {
-      title: "Recognise – Shadows and Animals for Toddlers",
-      description: "Which shadow belongs to the giraffe? Who is peeking out of the bush? First recognising for toddlers, without ads.",
+      title: "Recognize – Shadows and Animals for Toddlers",
+      description: "Which shadow belongs to the giraffe? Who is peeking out of the bush? First recognizing for toddlers, without ads.",
       text: "A picture looks for its shadow among two to six – animals, vehicles, food and things; then an animal peeks out of a bush or the pond and the child taps who it is. Tap or drag; a wrong shadow briefly shows who it is. First a few very different pictures, then more and more alike as the child gets sure, later turned and mirrored shadows and some under paper flaps to remember.",
     },
     "/socken/": {

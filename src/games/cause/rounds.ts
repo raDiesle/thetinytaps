@@ -27,7 +27,15 @@ export interface CauseRound {
 }
 
 /** The question under the pictures, the same in every round. */
-export const CAUSE_QUESTION: Localized = { de: "Was ist passiert?" };
+export const CAUSE_QUESTION: Localized = {
+  de: "Was ist passiert?",
+  en: "What happened?",
+  zh: "发生了什么？",
+  hi: "क्या हुआ?",
+  es: "¿Qué pasó?",
+  ar: "ماذا حدث؟",
+  ru: "Что случилось?",
+};
 
 export const CAUSE_ROUNDS: readonly CauseRound[] = [
   {
@@ -35,8 +43,34 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "fox",
     before: "frown",
     options: [
-      { id: "ballon", emoji: "🎈", label: { de: "Fliegt der Luftballon weg?" }, fits: true },
-      { id: "eis", emoji: "🍦", label: { de: "Gibt es ein Eis?" }, fits: false },
+      {
+        id: "ballon",
+        emoji: "🎈",
+        label: {
+          de: "Fliegt der Luftballon weg?",
+          en: "Is the balloon flying away?",
+          zh: "气球飞走了吗？",
+          hi: "क्या गुब्बारा उड़ रहा है?",
+          es: "¿Se va volando el globo?",
+          ar: "هل يطير البالون بعيدًا؟",
+          ru: "Улетает воздушный шарик?",
+        },
+        fits: true,
+      },
+      {
+        id: "eis",
+        emoji: "🍦",
+        label: {
+          de: "Gibt es ein Eis?",
+          en: "Is there ice cream?",
+          zh: "有冰淇淋吗？",
+          hi: "क्या आइसक्रीम मिलती है?",
+          es: "¿Hay helado?",
+          ar: "هل هناك مثلّجات؟",
+          ru: "Будет мороженое?",
+        },
+        fits: false,
+      },
     ],
   },
   {
@@ -44,8 +78,34 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "bear",
     before: "grin",
     options: [
-      { id: "oma", emoji: "👵", label: { de: "Kommt Oma zu Besuch?" }, fits: true },
-      { id: "regen", emoji: "🌧️", label: { de: "Regnet es?" }, fits: false },
+      {
+        id: "oma",
+        emoji: "👵",
+        label: {
+          de: "Kommt Oma zu Besuch?",
+          en: "Is Grandma coming to visit?",
+          zh: "奶奶来看我们了吗？",
+          hi: "क्या दादी मिलने आ रही हैं?",
+          es: "¿Viene la abuela de visita?",
+          ar: "هل تأتي الجدة لزيارتنا؟",
+          ru: "Бабушка приходит в гости?",
+        },
+        fits: true,
+      },
+      {
+        id: "regen",
+        emoji: "🌧️",
+        label: {
+          de: "Regnet es?",
+          en: "Is it raining?",
+          zh: "下雨了吗？",
+          hi: "क्या बारिश हो रही है?",
+          es: "¿Está lloviendo?",
+          ar: "هل تمطر؟",
+          ru: "Идёт дождь?",
+        },
+        fits: false,
+      },
     ],
   },
   {
@@ -53,8 +113,34 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "bear",
     before: "frown",
     options: [
-      { id: "schaufel", emoji: "✋🪏", label: { de: "Nimmt jemand die Schaufel weg?" }, fits: true },
-      { id: "rutschen", emoji: "🛝", label: { de: "Darf es rutschen?" }, fits: false },
+      {
+        id: "schaufel",
+        emoji: "✋🪏",
+        label: {
+          de: "Nimmt jemand die Schaufel weg?",
+          en: "Is someone taking the shovel away?",
+          zh: "有人把铲子拿走了吗？",
+          hi: "क्या कोई फावड़ा छीन रहा है?",
+          es: "¿Alguien le quita la pala?",
+          ar: "هل يأخذ أحدٌ المجرفة؟",
+          ru: "Кто-то забирает лопатку?",
+        },
+        fits: true,
+      },
+      {
+        id: "rutschen",
+        emoji: "🛝",
+        label: {
+          de: "Darf es rutschen?",
+          en: "Can the little one go down the slide?",
+          zh: "可以滑滑梯吗？",
+          hi: "क्या फिसलपट्टी पर फिसलने को मिलता है?",
+          es: "¿Puede tirarse por el tobogán?",
+          ar: "هل يُسمح بالتزحلق؟",
+          ru: "Можно покататься с горки?",
+        },
+        fits: false,
+      },
     ],
   },
   {
@@ -62,8 +148,34 @@ export const CAUSE_ROUNDS: readonly CauseRound[] = [
     kind: "fox",
     before: "o",
     options: [
-      { id: "hund", emoji: "🐕", label: { de: "Bellt ein Hund laut?" }, fits: true },
-      { id: "schmetterling", emoji: "🦋", label: { de: "Landet ein Schmetterling?" }, fits: false },
+      {
+        id: "hund",
+        emoji: "🐕",
+        label: {
+          de: "Bellt ein Hund laut?",
+          en: "Is a dog barking loudly?",
+          zh: "有狗在大声叫吗？",
+          hi: "क्या कोई कुत्ता ज़ोर से भौंक रहा है?",
+          es: "¿Ladra fuerte un perro?",
+          ar: "هل ينبح كلب بصوت عالٍ؟",
+          ru: "Громко лает собака?",
+        },
+        fits: true,
+      },
+      {
+        id: "schmetterling",
+        emoji: "🦋",
+        label: {
+          de: "Landet ein Schmetterling?",
+          en: "Is a butterfly landing?",
+          zh: "有蝴蝶落下来了吗？",
+          hi: "क्या कोई तितली आकर बैठ रही है?",
+          es: "¿Se posa una mariposa?",
+          ar: "هل تحطّ فراشة؟",
+          ru: "Садится бабочка?",
+        },
+        fits: false,
+      },
     ],
   },
 ];

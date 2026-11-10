@@ -76,28 +76,60 @@ export interface Need {
   together?: boolean;
 }
 
-// The „Grundbedürfnisse“ (user wish, 9 November 2026): what a child needs in the day besides eating and drinking. German
-// only for now: translations and recordings come when the user asks (`languageStatus.ts` lists what is missing).
+// The „Grundbedürfnisse“ (user wish, 9 November 2026): what a child needs in the day besides eating and drinking.
+// Translated on request on 10 November 2026; their recordings come when the user asks (`languageStatus.ts`).
 const BASIC_NEEDS: Need[] = [
   {
     id: "toilette",
-    caption: { de: "Aufs Töpfchen" },
-    answer: { de: "Aufs Töpfchen gehen tut gut." },
+    caption: { de: "Aufs Töpfchen", en: "Go potty", zh: "坐便盆", hi: "पॉटी जाना", es: "Ir al orinal", ar: "الذهاب إلى النونية", ru: "На горшок" },
+    answer: {
+      de: "Aufs Töpfchen gehen tut gut.",
+      en: "Going potty feels good.",
+      zh: "坐便盆真舒服。",
+      hi: "पॉटी जाना अच्छा लगता है।",
+      es: "Ir al orinal hace bien.",
+      ar: "الذهاب إلى النونية يريحنا.",
+      ru: "Сходить на горшок — это хорошо.",
+    },
   },
   {
     id: "waerme",
-    caption: { de: "Warm anziehen" },
-    answer: { de: "Warme Sachen tun gut." },
+    caption: { de: "Warm anziehen", en: "Bundle up", zh: "穿暖和", hi: "गरम कपड़े पहनना", es: "Abrigarse", ar: "ارتداء ملابس دافئة", ru: "Одеться потеплее" },
+    answer: {
+      de: "Warme Sachen tun gut.",
+      en: "Warm clothes feel good.",
+      zh: "穿暖和真舒服。",
+      hi: "गरम कपड़े अच्छे लगते हैं।",
+      es: "La ropa calentita hace bien.",
+      ar: "الملابس الدافئة تريحنا.",
+      ru: "Тёплая одежда — это хорошо.",
+    },
   },
   {
     id: "pflaster",
-    caption: { de: "Ein Pflaster" },
-    answer: { de: "Ein Pflaster hilft." },
+    caption: { de: "Ein Pflaster", en: "A bandage", zh: "创可贴", hi: "एक पट्टी", es: "Una curita", ar: "لاصقة جروح", ru: "Пластырь" },
+    answer: {
+      de: "Ein Pflaster hilft.",
+      en: "A bandage helps.",
+      zh: "贴上创可贴就好多了。",
+      hi: "पट्टी से आराम मिलता है।",
+      es: "Una curita ayuda.",
+      ar: "اللاصقة تساعدنا.",
+      ru: "Пластырь помогает.",
+    },
   },
   {
     id: "luft",
-    caption: { de: "Frische Luft" },
-    answer: { de: "Frische Luft tut gut." },
+    caption: { de: "Frische Luft", en: "Fresh air", zh: "出去透透气", hi: "ताज़ी हवा", es: "Aire fresco", ar: "هواء نقي", ru: "Свежий воздух" },
+    answer: {
+      de: "Frische Luft tut gut.",
+      en: "Fresh air feels good.",
+      zh: "透透气真舒服。",
+      hi: "ताज़ी हवा अच्छी लगती है।",
+      es: "El aire fresco hace bien.",
+      ar: "الهواء النقي يريحنا.",
+      ru: "Свежий воздух — это хорошо.",
+    },
   },
 ];
 

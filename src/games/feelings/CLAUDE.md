@@ -54,7 +54,7 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
   old address `/was-brauche-ich/` leads there): cards of what the
   child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
   ausruhen, ein Lied, and the „Grundbedürfnisse“ of 9 November 2026 – aufs Töpfchen, warm anziehen, ein Pflaster, frische
-  Luft, German only for now, their pictures `brauche-toilette` … `brauche-luft` drawn the same day with the bear's first
+  Luft, translated 10 November 2026 (not yet recorded), their pictures `brauche-toilette` … `brauche-luft` drawn on 9 November with the bear's first
   picture as the only reference, prompts in `bilder/README.md`) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
   ist es?“, and stay tappable to change it) and its line says it does good, so the grown-up sees what the child needs.
   **A need never shows big** (user feedback, November 2026: the picture was not to be tapped open): no big picture,

@@ -15,14 +15,44 @@ export function TimeShownChoice({ value, onChange }: { value: TimeShown; onChang
   const t = useT();
   return (
     <Choice
-      label={t({ de: "Zeit im Bild" })}
+      label={t({
+        de: "Zeit im Bild",
+        en: "Time in the picture",
+        zh: "画面中的时间",
+        hi: "तस्वीर में समय",
+        es: "Tiempo en la imagen",
+        ar: "الوقت في الصورة",
+        ru: "Время на картинке",
+      })}
       value={value}
       onChange={(v) => onChange(v as TimeShown)}
       options={[
-        { value: "digits", label: t({ de: "Zahlen" }) },
-        { value: "percent", label: t({ de: "Striche in %" }) },
-        { value: "marks", label: t({ de: "Striche in Zeit" }) },
-        { value: "off", label: t({ de: "Aus" }) },
+        { value: "digits", label: t({ de: "Zahlen", en: "Numbers", zh: "数字", hi: "अंक", es: "Números", ar: "أرقام", ru: "Цифры" }) },
+        {
+          value: "percent",
+          label: t({
+            de: "Striche in %",
+            en: "Marks in %",
+            zh: "刻线（百分比）",
+            hi: "निशान, प्रतिशत में",
+            es: "Rayas en %",
+            ar: "خطوط بالنسبة المئوية",
+            ru: "Чёрточки в %",
+          }),
+        },
+        {
+          value: "marks",
+          label: t({
+            de: "Striche in Zeit",
+            en: "Marks in time",
+            zh: "刻线（时间）",
+            hi: "निशान, समय में",
+            es: "Rayas por tiempo",
+            ar: "خطوط بالوقت",
+            ru: "Чёрточки по времени",
+          }),
+        },
+        { value: "off", label: t({ de: "Aus", en: "Off", zh: "关", hi: "बंद", es: "Apagado", ar: "إيقاف", ru: "Выкл." }) },
       ]}
     />
   );

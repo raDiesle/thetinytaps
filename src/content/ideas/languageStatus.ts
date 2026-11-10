@@ -60,8 +60,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "Bilder und Menü",
-        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Es fehlen die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“) und hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) – 7. November 2026, nur Deutsch –, und der Name des Bildes „Sonnenaufgang“ (vorher „Sonnenuntergang“, die alten Übersetzungen hießen Sonnenuntergang und sind gelöscht), und die Namen der Bilder „Wecker“ und „Tennis“ (7. November 2026, nur Deutsch).",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Am 10. November 2026 übersetzt, was noch fehlte: die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“), hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) und die Namen der Bilder „Sonnenaufgang“, „Wecker“ und „Tennis“.",
       },
       {
         label: "🗣️ Stimme",
@@ -78,8 +78,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/schnullerfee/",
-    note: "Das Buch „Schnullerfee“ mit „Tapsi und die Schnullerfee“, einer Geschichte in Kapiteln (pacifierStory.ts, November 2026): bisher nur Deutsch – Name, Satz fürs Regal, Kapitel und Sätze fehlen in den anderen Sprachen (dann als <Sprache>.ts im Ordner, wie bei „Abstillen“). Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook und sind übersetzt.",
-    languages: { de: "done" },
+    note: "Das Buch „Schnullerfee“ mit „Tapsi und die Schnullerfee“, einer Geschichte in Kapiteln (pacifierStory.ts, November 2026): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 10. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/zaehne/",
@@ -313,15 +313,15 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Grundbedürfnisse: Aufs Töpfchen, Warm anziehen, Ein Pflaster, Frische Luft",
         recorded: true,
-        languages: { de: "text" },
-        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, nur Deutsch, Bilder gemacht. Übersetzungen und Aufnahmen kommen erst, wenn die Eltern sie wollen.",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, Bilder gemacht, übersetzt auf Wunsch am 10. November 2026. Aufnahmen fehlen noch in allen Sprachen (bis dahin still).",
       },
     ],
   },
   {
     href: "/was-ist-passiert/",
-    languages: { de: "done" },
-    note: "Neues Spiel im Buch „Gefühle“ (J-03, 9. November 2026): Name und Zeile in names.ts, nur Deutsch. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen (seo.<Sprache>.ts).",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Neues Spiel im Buch „Gefühle“ (J-03, 9. November 2026): Name und Zeile in names.ts, die Frage und die Fragen unter den Bildern in rounds.ts, übersetzt auf Wunsch am 10. November 2026. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen (seo.<Sprache>.ts).",
   },
   {
     href: "/tiere/",
@@ -362,8 +362,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "Name und Zeile des Spiels",
-        languages: { de: "done" },
-        note: "Seit dem Umzug von „Wer schaut da raus?“ heißt das Spiel „Erkennen“ (7. November 2026); Name und Zeile im Inhaltsverzeichnis sind noch nur Deutsch, die alten Übersetzungen von „Schatten finden“ wurden gestrichen.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Seit dem Umzug von „Wer schaut da raus?“ heißt das Spiel „Erkennen“ (7. November 2026); Name und Zeile im Inhaltsverzeichnis übersetzt auf Wunsch am 10. November 2026.",
       },
       {
         label: "Bilder, Sätze und Stimme",

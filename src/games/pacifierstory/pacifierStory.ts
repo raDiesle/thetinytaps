@@ -8,8 +8,9 @@ import type { StoryChapter } from "@/components/ChapterBook";
 // blue, yellow), three paper stars in the window counting the nights to the fairy, and a box with the pacifiers on the
 // windowsill that the fairy swaps for a cuddly bunny.
 //
-// German here; other languages only once the user asks for them. Played at `/schnullerfee/`, the book „Schnullerfee“
-// among the Alltagshelfer (`ChapterBook`); its pictures come from Gemini (`pacifierStoryPictures.ts`).
+// German here, the other languages in `<lang>.ts` beside it (translated on request, 10 November 2026). Played at
+// `/schnullerfee/`, the book „Schnullerfee“ among the Alltagshelfer (`ChapterBook`); its pictures come from Gemini
+// (`pacifierStoryPictures.ts`).
 
 /** A step of saying goodbye to the pacifier gently, as the guides give it; each has a chapter of its own. */
 export type PacifierStep = "vorbereiten" | "weniger" | "festlegen" | "abgeben" | "erste-nacht" | "tausch" | "dabeibleiben";
