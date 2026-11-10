@@ -236,6 +236,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 9. November 2026 (Flughafen, zweimal): 57–59 Bilder pro Sekunde, aber der Hauptfaden ist zu 77–90 % beschäftigt (Grenze 60 %), fast alles Malen (rund 700–780 Malvorgänge pro Sekunde); React selbst kostet wenig. Der Flughafen hat rund 150 CSS-Animationen, und was sich *im* großen SVG bewegt, lässt das Handy das ganze Bild in jedem Bild neu malen. Lösung: Was gerade angetippt spielt, als kleine eigene HTML-Ebene über dem Bild bewegen (wie die Fahrzeuge in LaneLayer und Sprite in Zähne putzen), nichts innerhalb des großen SVG animieren; danach auch die anderen Bilder messen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "L",
+      done: true,
     },
     {
       id: "A-29",

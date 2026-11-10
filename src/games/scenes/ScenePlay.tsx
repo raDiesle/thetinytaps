@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
@@ -87,6 +87,24 @@ function paleGrey(hex: string) {
   return `rgb(${v} ${v} ${v})`;
 }
 
+/**
+ * One svg of the picture's stack, all lying exactly over each other with the picture's viewBox: the still background
+ * at the bottom, each item in its own, then what taps bring out, the overlay and the marks. What moves in one layer
+ * (a tapped item, a beetle crawling out) has the phone paint only that layer again, never the whole picture – with
+ * everything in one svg an old phone painted the whole airport in every frame (idea A-28). `moving` makes it a layer
+ * of its own on the graphics card while it moves (its empty rest costs no memory: the card skips transparent tiles);
+ * `taps` lets its drawings be tapped (the svg itself never is). Cropping an item's svg to its own box was tried and
+ * measured worse (busy 54–62 % instead of 43–53 %, November 2026).
+ */
+function SceneLayer({ scene, className, moving, taps, children }: { scene: Scene; className?: string; moving?: boolean; taps?: boolean; children: ReactNode }) {
+  const classes = ["scene-layer", taps && "scene-taps", moving && "moving", className].filter(Boolean).join(" ");
+  return (
+    <svg className={classes} viewBox={`0 0 ${scene.width} ${scene.height}`} preserveAspectRatio="xMidYMid meet">
+      {children}
+    </svg>
+  );
+}
+
 /** Plays `scene` (already in the app language, see localize.ts); the engine's own sentences come from phrases.ts. */
 export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings: ScenesSettings; onKeys: (keys: boolean) => void }) {
   // A picture that is not translated completely plays in German, voice and keys included (localize.ts).
@@ -161,6 +179,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   /** Taps per background spot, so its kinds take turns. */
   const spotTaps = useRef(new Map<number, number>());
   const svgRef = useRef<SVGSVGElement>(null);
+  /** The whole picture, all its layers (SceneLayer). */
+  const sceneRef = useRef<HTMLDivElement>(null);
   /** Torch mode: the night over the picture, where the light is (picture units) and the items it shines on. */
   const nightRef = useRef<HTMLDivElement>(null);
   const lightAt = useRef<[number, number]>([scene.width / 2, scene.height / 2]);
@@ -259,7 +279,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const hasColour = (item: SceneItem, colour: ColourTrait) => {
     let colours = itemColours.current.get(item.id);
     if (!colours) {
-      const drawn = svgRef.current?.querySelector(`[data-item="${item.id}"]`);
+      const drawn = sceneRef.current?.querySelector(`[data-item="${item.id}"]`);
       if (!drawn) return false;
       colours = coloursIn(drawn);
       itemColours.current.set(item.id, colours);
@@ -756,6 +776,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
 
   return (
     <div
+      ref={sceneRef}
       className={sceneClass}
       style={{ "--sky": grey ? paleGrey(scene.sky) : scene.sky, "--ground": grey ? paleGrey(scene.ground) : scene.ground } as CSSProperties}
       onPointerDown={onBackgroundPointer}
@@ -792,16 +813,17 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </g>
         {/* Taps go through the grey copy to the background, whose things move (`<Poke>`). */}
         {grey && <use href={`#${svgId}-bg`} {...greyCopy} pointerEvents="none" />}
-        {items.map((item, i) => {
-          const play = plays[item.id];
-          const place = item.place;
-          const drive = drives[item.id];
-          // A guest keeps the class of its own picture, which its animations use.
-          const look = item === guest?.item ? guest.look : item.id;
-          const peek = play?.playing && play.surprise !== undefined ? { surprise: SURPRISES[play.surprise], ...peekTimes(item) } : null;
-          return (
+      </svg>
+      {items.map((item, i) => {
+        const play = plays[item.id];
+        const place = item.place;
+        const drive = drives[item.id];
+        // A guest keeps the class of its own picture, which its animations use.
+        const look = item === guest?.item ? guest.look : item.id;
+        const peek = play?.playing && play.surprise !== undefined ? { surprise: SURPRISES[play.surprise], ...peekTimes(item) } : null;
+        return (
+          <SceneLayer key={item.id} scene={scene} taps moving={!!play?.playing || !!drive}>
             <g
-              key={item.id}
               className={drive && `scene-drive ${drive.phase}`}
               style={drive && ({ "--drive-dx": `${drive.dx}px`, "--drive-ms": `${drive.ms}ms` } as CSSProperties)}
             >
@@ -829,21 +851,23 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
                 </g>
               </g>
             </g>
-          );
-        })}
-        <g className="spot-layer">
-          {effects.map((effect) => (
-            <SpotEffectArt key={effect.id} effect={effect} />
-          ))}
-        </g>
-        {scene.Overlay && (
-          <g className="scene-overlay">
-            <g id={`${svgId}-overlay`}>
-              <scene.Overlay />
-            </g>
-            {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
+          </SceneLayer>
+        );
+      })}
+      <SceneLayer scene={scene} className="spot-layer">
+        {effects.map((effect) => (
+          <SpotEffectArt key={effect.id} effect={effect} />
+        ))}
+      </SceneLayer>
+      {scene.Overlay && (
+        <SceneLayer scene={scene} className="scene-overlay">
+          <g id={`${svgId}-overlay`}>
+            <scene.Overlay />
           </g>
-        )}
+          {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
+        </SceneLayer>
+      )}
+      <SceneLayer scene={scene} className="scene-marks" taps>
         {exits.map((exit) => (
           <ExitSign
             key={exit.item.id}
@@ -860,7 +884,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         {keysOn && <KeyBadges scene={scene} keyOf={keys.keyOf} lit={lit} />}
         {keysOn && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
-      </svg>
+      </SceneLayer>
       {/* Torch mode: the night over everything but the light; it goes when all were found (a bedtime picture stays dark). */}
       {lanes && <LaneLayer ref={laneRef} width={scene.width} height={scene.height} items={items} sounds={soundsOn} onPass={wake} />}
       {torch && <TorchNight nightRef={nightRef} off={allDiscovered && !bedtime} />}
