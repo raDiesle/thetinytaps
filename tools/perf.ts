@@ -14,6 +14,8 @@ import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type S
 //   bun run perf --device phone2016    another device from DEVICES
 //   bun run perf --json report.json    also write the numbers as JSON (the weekly run keeps them)
 //   bun run perf --shots               a screenshot at the end of each measurement, next to the JSON or in the system's temp folder
+//   bun run perf --trace               also write Chrome's trace of each stretch to a file, to open in DevTools'
+//                                      Performance panel (what painted, laid out or ran in each long frame)
 //   bun run perf --profile             also list the functions that took the most time in each stretch (on a build that
 //                                      keeps its names)
 //
@@ -378,11 +380,11 @@ interface TraceEvent {
  * Records Chrome's trace while `during` runs: where painting (main thread) and rastering (its helper threads) take time,
  * and how many pixels were rastered anew (each raster task's tile, its size from the compositor's tile snapshots).
  */
-async function traced(cdp: Cdp, during: () => Promise<void>) {
+async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   const events: TraceEvent[] = [];
   const off = cdp.on("Tracing.dataCollected", (params) => events.push(...(params.value as TraceEvent[])));
   await cdp.send("Tracing.start", {
-    traceConfig: { includedCategories: ["devtools.timeline", "disabled-by-default-devtools.timeline", "disabled-by-default-devtools.timeline.frame", "disabled-by-default-cc.debug"] },
+    traceConfig: { includedCategories: ["devtools.timeline", "disabled-by-default-devtools.timeline", "disabled-by-default-devtools.timeline.frame", "disabled-by-default-cc.debug", ...(flag("trace") ? ["disabled-by-default-devtools.timeline.invalidationTracking"] : [])] },
     transferMode: "ReportEvents",
   });
   await during();
@@ -390,6 +392,7 @@ async function traced(cdp: Cdp, during: () => Promise<void>) {
   await cdp.send("Tracing.end");
   await complete;
   off();
+  if (keep) writeFileSync(keep, JSON.stringify({ traceEvents: events }));
   const total = (names: string[]) => events.filter((e) => e.ph === "X" && names.includes(e.name)).reduce((sum, e) => sum + (e.dur ?? 0), 0) / 1000;
   const tileArea = new Map<string, number>();
   for (const e of events) {
@@ -408,7 +411,7 @@ async function traced(cdp: Cdp, during: () => Promise<void>) {
 type Frames = { deltas: number[]; long: { ms: number; scripts: { source: string; ms: number }[] }[] };
 
 /** Measures `ms` of whatever runs now. */
-async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget): Promise<Measurement> {
+async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget, traceFile?: string): Promise<Measurement> {
   const { label, ms, tap, type } = part;
   await evaluate(cdp, FRAME_COUNTER);
   const before = await metrics(cdp);
@@ -432,7 +435,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget)
     wall = (performance.now() - start) / 1000;
     after = await metrics(cdp);
     frames = await evaluate(cdp, "window.__perfStop ? window.__perfStop() : null");
-  });
+  }, traceFile);
   // (Set inside the callback, which TypeScript can't see.)
   const counted = frames as Frames | null;
   if (!counted) throw new Error(`${label}: the page was left while measuring (a tap opened another page?)`);
@@ -530,12 +533,13 @@ async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir:
   const results: Measurement[] = [];
   for (const part of scenario.parts) {
     for (const step of part.before ?? []) await runStep(cdp, step);
-    const m = await measure(cdp, scenario, part, BUDGET);
+    const file = (ext: string) => join(shotsDir ?? "", `${scenario.name}-${part.label}.${ext}`.replace(/[^\w.-]+/g, "_"));
+    const m = await measure(cdp, scenario, part, BUDGET, shotsDir && flag("trace") ? file("json") : undefined);
     results.push(m);
     printRow(m);
     if (shotsDir) {
       const { data } = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png" });
-      writeFileSync(join(shotsDir, `${scenario.name}-${part.label}.png`.replace(/[^\w.-]+/g, "_")), Buffer.from(data, "base64"));
+      writeFileSync(file("png"), Buffer.from(data, "base64"));
     }
   }
   return results;
@@ -546,7 +550,7 @@ async function main() {
   if (!scenarios.length) throw new Error(`No scenario matches ${filters.join(", ")}.`);
   const site = await siteUrl();
   const { cdp, stop } = await launchChrome();
-  const shotsDir = flag("shots") ? mkdtempSync(join(tmpdir(), "tinytaps-perf-shots-")) : null;
+  const shotsDir = flag("shots") || flag("trace") ? mkdtempSync(join(tmpdir(), "tinytaps-perf-shots-")) : null;
   const all: Measurement[] = [];
   try {
     await cdp.send("Page.enable");
@@ -573,7 +577,7 @@ async function main() {
   }
   const over = all.filter((m) => m.over.length);
   console.log(`\n${all.length - over.length} of ${all.length} stretches within budget.`);
-  if (shotsDir) console.log(`Screenshots: ${shotsDir}`);
+  if (shotsDir) console.log(`${flag("trace") ? "Traces" : "Screenshots"}: ${shotsDir}`);
   const json = option("json");
   if (json) writeFileSync(json, `${JSON.stringify({ date: new Date().toISOString(), device, measurements: all }, null, 2)}\n`);
   process.exit(over.length ? 1 : 0);

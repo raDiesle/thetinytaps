@@ -751,9 +751,9 @@
   line-height: 1;
 }
 
-/* A week's row under the mouse on its 🗑️: red, its rings and picture faded. */
-.pl-wrow:has(.pl-whead > .rw-act-delete:hover) > *,
-.pl-wrow:has(.pl-wtools > .rw-act-delete:hover) > * {
+/* A week's row under the mouse on its 🗑️: red, its rings and picture faded. Its parts by name, never `> *` after `:has()`. */
+.pl-wrow:has(.pl-whead > .rw-act-delete:hover) > :is(.pl-whead, .pl-wcell, .pl-wtools),
+.pl-wrow:has(.pl-wtools > .rw-act-delete:hover) > :is(.pl-whead, .pl-wcell, .pl-wtools) {
   background: color-mix(in srgb, #e53935 14%, transparent);
   outline: max(2px, 0.5cqmin) dashed #c62828;
   outline-offset: -1px;
@@ -1250,7 +1250,7 @@
   filter: none;
 }
 
-.pl-wrow:has(.pl-ring-step[data-edit="row-stars"].less:hover) .pl-wcell .pl-star-end {
+.pl-wrow:has(.pl-ring-row.less:hover) .pl-wcell .pl-star-end {
   opacity: 0.25;
 }
 

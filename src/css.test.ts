@@ -106,3 +106,32 @@ test("no note shows beside ✕", () => {
   const files = ["src/components/GameShell.tsx", "src/styles/playing.css", "src/styles/book.css"];
   expect(files.filter((file) => readFileSync(file, "utf8").includes("exit-hint"))).toEqual([]);
 });
+
+// Chrome restyles the whole document on every change of the DOM while a rule has an attribute selector inside `:has()`
+// (`:has([aria-label="…"])`, `:has(.a[data-edit="…"]:hover)`) or picks every element after it (`.row:has(…) > *`):
+// it can't tell which elements such a rule touches, so any element added anywhere invalidates them all. Measured in
+// November 2026 in a test page: each insertion cost 56–73 ms instead of under 1 ms, and since the shelf preloads every
+// game's code, every game's CSS is active there – the book's take-out stuttered from Kettenreaktion's and the
+// Tagesplan's rules. Mark the element with a class, put the attribute on the element that carries `:has()`, and name
+// what the rule styles (`> :is(.a, .b)`).
+test("no attribute selector inside :has() and no * after it", () => {
+  const wrong: string[] = [];
+  for (const file of cssFiles) {
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const match of css.matchAll(/:has\(/g)) {
+      let depth = 1;
+      let end = (match.index ?? 0) + match[0].length;
+      while (depth > 0 && end < css.length) {
+        if (css[end] === "(") depth++;
+        else if (css[end] === ")") depth--;
+        end++;
+      }
+      const inside = css.slice((match.index ?? 0) + match[0].length, end - 1);
+      if (inside.includes("[")) wrong.push(`${file}: :has(${inside})`);
+      // The rest of this selector, up to the next one in its list or its block.
+      const after = css.slice(end).match(/^[^,{]*/)?.[0] ?? "";
+      if (/(^|[\s>+~(])\*/.test(after)) wrong.push(`${file}: :has(${inside})${after.trim()}`);
+    }
+  }
+  expect(wrong).toEqual([]);
+});

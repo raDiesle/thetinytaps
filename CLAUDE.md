@@ -190,7 +190,11 @@ In a fresh worktree run `bun install` first.
   svg or element) and animate that layer's `transform` or `opacity`: a small figure that sways or glows is a small
   HTML layer round its own little svg, and the HTML moves, not a group inside (even small svgs animating inside kept an
   old phone's main thread busy; Zähne putzen's monsters, `Sprite`). A layer is only as big as what it shows: a phone
-  rasters a changed layer in bands as wide as the screen. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts,
+  rasters a changed layer in bands as wide as the screen. Never an attribute selector inside `:has()` (`:has([aria-label=…])`)
+  nor `*` after it (`.row:has(…) > *`): while such a rule is loaded Chrome restyles the whole page at every change of the
+  DOM, and the shelf preloads every game's CSS, so two games' rules made the book's take-out stutter (November 2026;
+  `css.test.ts`) – mark the element with a class, put the attribute on the element that carries `:has()`, and name what
+  the rule styles. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts,
   never in its middle, and loading other pages' code waits (`holdPreloads` in `src/lib/preloadPages.ts`).
   `bun run perf` measures it: it plays each game in headless
   Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget

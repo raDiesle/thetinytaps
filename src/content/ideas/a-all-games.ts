@@ -220,6 +220,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 9. November 2026: Beim Herausnehmen eines Buchs aus dem Regal gibt es in zwei Durchgängen je 2 Hänger von 100–270 ms, gleich am Anfang (0,3 s nach dem Tippen); sonst 54 Bilder pro Sekunde, 19–21 % beschäftigt. Die Zeit steckt im Tipp selbst (dispatchDiscreteEvent 25 ms): takeOutBook baut die nächste Seite und das Bild des Buchs (copyScreen) erst, wenn der Finger tippt. Lösung: die Seite schon beim Aufsetzen des Fingers (oder wenn die Maus darüber ist) vorbereiten und das Abheben des Buchs erst starten, wenn sie fertig ist.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
+      done: true,
     },
     {
       id: "A-27",

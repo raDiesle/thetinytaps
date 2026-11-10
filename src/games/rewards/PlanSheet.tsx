@@ -909,11 +909,27 @@ function DayHead({ d, today, look }: { d: Date; today: Date; look: PlanLook }) {
 /** The part of the day a card stands in, as a row's tint: morning, the day (midday or none), evening. */
 const partClass = (part: Slot | undefined) => (part === "morning" ? "morning" : part === "evening" ? "evening" : "day");
 
-/** − or ＋ drawn as a ring with its sign in it, so it plainly adds or takes a circle (user feedback, November 2026). */
-function RingStep({ by, data, off = false, label }: { by: 1 | -1; data: Record<`data-${string}`, string | undefined>; off?: boolean; label: string }) {
+/**
+ * − or ＋ drawn as a ring with its sign in it, so it plainly adds or takes a circle (user feedback, November 2026). `row`
+ * marks the steps that change a week's whole row, which planner.css finds by that class (never by `data-edit` inside
+ * `:has()`, which makes Chrome restyle the whole page on every change of the DOM).
+ */
+function RingStep({
+  by,
+  data,
+  off = false,
+  row = false,
+  label,
+}: {
+  by: 1 | -1;
+  data: Record<`data-${string}`, string | undefined>;
+  off?: boolean;
+  row?: boolean;
+  label: string;
+}) {
   return (
     <span
-      className={`pl-ring-step ${by > 0 ? "more" : "less"}${off ? " off" : ""}`}
+      className={`pl-ring-step ${by > 0 ? "more" : "less"}${row ? " pl-ring-row" : ""}${off ? " off" : ""}`}
       {...(off ? {} : data)}
       data-by={by}
       role="button"
@@ -1032,12 +1048,14 @@ function RowTools({ plan, row, key0, withDelete, last }: { plan: Plan; row: Plan
         <RingStep
           by={-1}
           off={least <= 1}
+          row
           data={{ "data-edit": "row-stars", "data-row": row.id }}
           label={`${label}: ${t(FEWER_STARS)} (${t({ de: "jeden Tag" })})`}
         />
         <RingStep
           by={1}
           off={most >= MAX_STARS}
+          row
           data={{ "data-edit": "row-stars", "data-row": row.id }}
           label={`${label}: ${t(MORE_STARS)} (${t({ de: "jeden Tag" })})`}
         />

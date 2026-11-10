@@ -1,6 +1,6 @@
 /* ---------- Kettenreaktion: Nagelbrett ---------- */
 
-.marble-play:has([aria-label="Nagelbrett"]) {
+.marble-play[data-level="pegs"] {
   background: #bfe3f5;
 }
 

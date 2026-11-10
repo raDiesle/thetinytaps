@@ -10,52 +10,52 @@
   background: #f3d5a4;
 }
 
-.marble-play:has([aria-label="Alles fällt um"]) {
+.marble-play[data-level="topple"] {
   background: #ffe9c7;
 }
 
-.marble-play:has([aria-label="Große Maschine"]) {
+.marble-play[data-level="machine"] {
   background: #fff1d0;
 }
 
-.marble-play:has([aria-label="Verrückte Küche"]) {
+.marble-play[data-level="kitchen"] {
   background: #dff3ea;
 }
 
-.marble-play:has([aria-label="Im Garten"]) {
+.marble-play[data-level="garden"] {
   background: #8fd5ff;
 }
 
-.marble-play:has([aria-label="Baustelle"]) {
+.marble-play[data-level="building"] {
   background: #bfe9ff;
 }
 
-.marble-play:has([aria-label="Zirkus"]) {
+.marble-play[data-level="circus"] {
   background: #c8323f;
 }
 
-.marble-play:has([aria-label="Raketenstart"]) {
+.marble-play[data-level="space"] {
   background: #0d1446;
 }
 
-.marble-play:has([aria-label="Licht-Kette"]) {
+.marble-play[data-level="light"] {
   background: #384067;
 }
 
-.marble-play:has([aria-label="Badezimmer"]) {
+.marble-play[data-level="bath"] {
   background: #e3f4ff;
 }
 
-.marble-play:has([aria-label="Bauernhof"]) {
+.marble-play[data-level="farm"] {
   /* Sky above and grass below, like the picture, where the screen is taller than it. */
   background: linear-gradient(#9ad8ff 66.7%, #7cc94e 66.7%);
 }
 
-.marble-play:has([aria-label="Gute-Nacht-Maschine"]) {
+.marble-play[data-level="night"] {
   background: #6b5a86;
 }
 
-.marble-play:has([aria-label="Aufräum-Maschine"]) {
+.marble-play[data-level="tidy"] {
   background: #ffe8b0;
 }
 

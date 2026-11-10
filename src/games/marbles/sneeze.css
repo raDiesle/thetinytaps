@@ -1,6 +1,6 @@
 /* ---------- Kettenreaktion: Hatschi-Kette ---------- */
 
-.marble-play:has([aria-label="Hatschi-Kette"]) {
+.marble-play[data-level="sneeze"] {
   background: #8fd5ff;
 }
 

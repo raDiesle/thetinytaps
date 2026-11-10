@@ -1,7 +1,7 @@
 /* ---------- Kettenreaktion: Wasserbahn ---------- */
 
 /* Sky above and beside the hillside, when the screen is taller or wider than the picture. */
-.marble-play:has([aria-label="Wasserbahn"]) {
+.marble-play[data-level="water"] {
   background: #7fd0ff;
 }
 

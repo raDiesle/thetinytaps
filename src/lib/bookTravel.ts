@@ -56,18 +56,23 @@ function pageMargins() {
   return { left: Number.parseFloat(style.getPropertyValue("--page-left")) || 30, right: Number.parseFloat(style.getPropertyValue("--page-right")) || 18 };
 }
 
+/**
+ * A copy of `original` without what is never seen in it: the words kept unseen for search engines (`hidden`), and what
+ * lies below the first screen – a page turned in 3D is painted whole, all the way down. Each element left out is one a
+ * phone needn't style and paint while it gets the book ready (the shelf's unseen texts were 40 % of the room).
+ */
+function seenCopy(original: HTMLElement) {
+  const copy = original.cloneNode(true) as HTMLElement;
+  copy.removeAttribute("id");
+  for (const unseen of copy.querySelectorAll("[hidden], [data-below-fold], .seo-text")) unseen.remove();
+  return copy;
+}
+
 /** A still copy of everything the app shows, as big as the screen, to be printed on the book's left page. */
 function copyScreen() {
   const print = element("bt-print");
   const root = document.getElementById("root");
-  if (root) {
-    const copy = root.cloneNode(true) as HTMLElement;
-    copy.removeAttribute("id");
-    // What lies below the first screen is never seen on the page, but a page turned in 3D is painted whole, all the way
-    // down: without it the copy costs a phone a long frame less while the book flies.
-    for (const hidden of copy.querySelectorAll("[data-below-fold], .seo-text")) hidden.remove();
-    print.append(copy);
-  }
+  if (root) print.append(seenCopy(root));
   return print;
 }
 
@@ -181,21 +186,32 @@ function moves({ w, h, x, y, turned, lean, px, py }: Built) {
   return { book, lid, left, right, print, fills: page * h >= vh };
 }
 
-/** Plays the moves forwards (out of the shelf) or backwards (back into it); resolves when they are done. */
+/**
+ * The moves forwards (out of the shelf) or backwards (back into it): each part stands still as it is in their first
+ * frame until the returned function starts them all at once, which resolves when they are done. Not paused animations
+ * standing ready: started only then, the phone knows from the start how big the book will grow and draws it once at
+ * that size.
+ */
 function travel(built: Built, m: ReturnType<typeof moves>, direction: "normal" | "reverse") {
   const timing: KeyframeAnimationOptions = { duration: TOTAL, fill: "both", direction, easing: "linear" };
-  const front = built.lid.querySelector(".shelf-book-cover");
   const dim = [
     { offset: 0, filter: "brightness(1)" },
     { offset: AT_MIDDLE, filter: "brightness(1)", easing: "cubic-bezier(.5,0,.35,1)" },
     { offset: AT_OPEN, filter: "brightness(0.45)" },
     { offset: 1, filter: "brightness(0.45)" },
   ];
-  front?.animate(dim, timing);
-  built.left.animate(m.left, timing);
-  built.right.animate(m.right, timing);
-  built.lid.animate(m.lid, timing);
-  return built.book.animate(m.book, timing).finished;
+  const parts: [Element | null, Keyframe[]][] = [
+    [built.lid.querySelector(".shelf-book-cover"), dim],
+    [built.left, m.left],
+    [built.right, m.right],
+    [built.lid, m.lid],
+    [built.book, m.book],
+  ];
+  for (const [part, frames] of parts) {
+    const { offset, easing, ...first } = frames[direction === "normal" ? 0 : frames.length - 1];
+    if (part instanceof HTMLElement) Object.assign(part.style, first);
+  }
+  return () => Promise.all(parts.map(([part, frames]) => part?.animate(frames, timing).finished));
 }
 
 /** A layer over the app for the book to travel on; it takes the taps meanwhile, so nothing under it starts. */
@@ -215,11 +231,38 @@ function leave(root: HTMLElement, ms: number) {
 /** Waits for the next frames, `count` of them. */
 const frames = (count: number) => new Promise<void>((resolve) => (count <= 0 ? resolve() : requestAnimationFrame(() => frames(count - 1).then(resolve))));
 
+/** The longest the book waits on the shelf for the page it opens on (its code still loading): then it goes anyway. */
+const READY_WAIT = 3000;
+
+/**
+ * Resolves once `gone` has left the page (the router has put the new page in its place), or after `READY_WAIT`. It
+ * resolves in the same task as that change, before the browser draws it, so what is done then is drawn with it.
+ */
+function whenGone(gone: Element | null) {
+  const root = document.getElementById("root");
+  if (!gone || !root) return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    const done = () => {
+      observer.disconnect();
+      clearTimeout(cap);
+      resolve();
+    };
+    const observer = new MutationObserver(() => !gone.isConnected && done());
+    observer.observe(root, { childList: true, subtree: true });
+    const cap = setTimeout(done, READY_WAIT);
+  });
+}
+
 /**
  * Takes the shelf book `book` out, opens it and goes on to where it leads with `go`. The room stays on the layer as a
- * copy while the app changes under it, right as the book lifts off its board, so the left page can show it printed.
- * Drawing the new page and copying it are the heavy part, so they come while the book still lifts slowly, never while
- * it flies (a long frame there stuttered on phones), and no other page's code is loaded until the book is open.
+ * copy while the app changes under it, so the left page can show the new page printed.
+ *
+ * Everything heavy comes before the book moves, while it still stands in its gap and the screen looks as before:
+ * the room's copy is drawn in the very frame the new page replaces the room (one long frame on an old phone, which no
+ * one sees, since nothing changes), then the new page is copied onto the left page, and only then the book lifts – and
+ * with it the sound. While it moves the main thread has nothing left to do: drawing and copying during the motion
+ * stuttered on phones (4 frames over 50 ms in its first 0.4 s, November 2026), and no other page's code is loaded until
+ * the book is open.
  */
 export function takeOutBook(book: HTMLElement, go: () => void) {
   if (travelling || still()) {
@@ -227,40 +270,55 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
     return;
   }
   travelling = true;
-  holdPreloads(TOTAL + 300);
+  holdPreloads(READY_WAIT);
   // The game or menu the book opens on waits with its voice, songs and animations until the book lies open and the
   // layer is gone (pageMotion.ts): the child sees it start, never while the book still flies.
   const lies = pageMoves();
-  // The cover lands on the left with the sound's last thud.
-  playPageTurn((LIFT + FLY + OPEN) / 1000 / 0.85);
+  // The layer is there at once, empty, to take the taps while the book gets ready.
   const root = layer();
   const built = buildBook(book);
   const m = moves(built);
-  book.dataset.away = "";
   const room = book.closest("main");
+  const scene: HTMLElement[] = [];
   if (room) {
-    const backdrop = room.cloneNode(true) as HTMLElement;
+    // The copy has the book's gap; the shelf itself shows it whole until the copy covers it.
+    book.dataset.away = "";
+    const backdrop = seenCopy(room);
+    delete book.dataset.away;
     const box = room.getBoundingClientRect();
     backdrop.classList.add("bt-backdrop");
     Object.assign(backdrop.style, { top: `${box.top}px`, left: `${box.left}px`, width: `${box.width}px` });
-    root.append(backdrop);
+    scene.push(backdrop);
   }
-  root.append(built.book);
-  const done = travel(built, m, "normal");
+  scene.push(built.book);
+  const moving = travel(built, m, "normal");
   void (async () => {
-    // First the moves reach the compositor, which plays them on while the page changes under the room's copy.
-    await frames(2);
-    go();
-    // The new page shows after React's next render (a game's menu fits its cards a frame later).
-    await frames(3);
-    const print = copyScreen();
-    print.style.transform = m.print;
-    built.left.append(print);
+    try {
+      const ready = whenGone(room);
+      go();
+      await ready;
+      book.dataset.away = "";
+      root.append(...scene);
+      // The new page fits its cards a frame or two after it first shows (useFitGrid); then it is printed on the left page.
+      await frames(3);
+      const print = copyScreen();
+      print.style.transform = m.print;
+      built.left.append(print);
+      // The print is drawn before the book lifts.
+      await frames(2);
+      // The cover lands on the left with the sound's last thud.
+      playPageTurn((LIFT + FLY + OPEN) / 1000 / 0.85);
+      holdPreloads(TOTAL + 300);
+      await moving();
+    } catch {
+      // A move cut short (the page hidden meanwhile): the layer goes all the same.
+    } finally {
+      travelling = false;
+      void leave(root, m.fills ? 140 : 320)
+        .catch(() => root.remove())
+        .finally(lies);
+    }
   })();
-  done.finally(() => {
-    travelling = false;
-    void leave(root, m.fills ? 140 : 320).finally(lies);
-  });
 }
 
 /**
@@ -305,7 +363,7 @@ export function putBookBack(from: string, go: () => void) {
     built.left.append(print);
     root.append(built.book);
     setTimeout(() => playPageTurn(OPEN / 1000), ZOOM);
-    travel(built, m, "reverse").finally(() => {
+    travel(built, m, "reverse")().finally(() => {
       delete book.dataset.away;
       travelling = false;
       root.remove();
