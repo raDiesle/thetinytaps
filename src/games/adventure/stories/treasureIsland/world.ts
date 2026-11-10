@@ -49,6 +49,7 @@ import {
   WEB_GAP,
   WEB_Z,
   COINS_PER_TOSS,
+  LINE_PIECES,
 } from "./layout";
 import {
   cobwebTexture,
@@ -188,7 +189,11 @@ export function makeWorld(scene: THREE.Scene) {
   rod.add(rodTip);
   const bobber = makeBobber();
   scene.add(bobber);
-  const line = solid(new THREE.CylinderGeometry(0.004, 0.004, 1, 4), mat("#ffffff", 0.5), false);
+  // The line in short pieces, so it can hang down in a curve between the rod's tip and the float.
+  const line = new THREE.Group();
+  const linePiece = new THREE.CylinderGeometry(0.004, 0.004, 1, 4);
+  const lineColor = mat("#ffffff", 0.5);
+  for (let i = 0; i < LINE_PIECES; i++) line.add(solid(linePiece, lineColor, false));
   scene.add(line);
   const fishColors = ["#ff9f43", "#7bd3ff", "#ffd23f", "#ff7eb6", "#7bd389"];
   const fishes = Array.from({ length: goes(S.fish) }, (_, i) => {

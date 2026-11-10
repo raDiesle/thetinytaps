@@ -325,18 +325,20 @@ export const ARM_CLIPS = clips({
     // Both paws on the rod: swung back sideways over the right shoulder, the right paw up beside the
     // head and the left one in front of the chest, then out ahead. The paws stay outside the body and
     // head all the way.
-    const { back, out } = castSwing(t);
+    // After the snap the paws follow the float down, out in front at chest height, and the body leans after them.
+    const { back, out, follow } = castSwing(t);
     const rest = Math.max(0, 1 - back - out);
-    p.armR.raise = 1.0 * rest + 2.1 * back + 1.35 * out;
-    p.armR.spread = 0.15 * rest + 0.85 * back + 0.2 * out;
-    p.armR.elbow = 0.7 * rest + 1.75 * back + 0.35 * out;
-    p.armL.raise = 1.0 * rest + 1.45 * back + 1.25 * out;
+    p.armR.raise = 1.0 * rest + 2.1 * back + 1.35 * out - 0.45 * follow;
+    p.armR.spread = 0.15 * rest + 0.85 * back + 0.2 * out - 0.05 * follow;
+    p.armR.elbow = 0.7 * rest + 1.75 * back + 0.35 * out - 0.1 * follow;
+    p.armL.raise = 1.0 * rest + 1.45 * back + 1.25 * out - 0.4 * follow;
     p.armL.spread = -0.1 * rest - 0.45 * back - 0.05 * out;
     p.armL.elbow = 0.7 * rest + 1.0 * back + 0.4 * out;
     p.twist = -back * 0.35 + out * 0.1;
     p.lean = -back * 0.06;
-    p.bend = -back * 0.1 + out * 0.15;
+    p.bend = -back * 0.1 + out * 0.15 + follow * 0.12;
     p.headYaw = back * 0.25;
+    p.headPitch = follow * 0.15;
   },
 
   scatter: (t, p) => {
@@ -555,19 +557,25 @@ export const ARM_CLIPS = clips({
   },
 
   crank: (t, p) => {
-    // Both hands on the handle of a crank in front, turning big circles: up, over to one side, down, over to the other.
+    // Both hands on the long handle of a big crank beside the body on the left, turning big circles in front:
+    // from the left up, over to the right, down and back. The whole body goes along: the chest follows the
+    // handle from side to side, the knees bend at the bottom and the toes lift at the top.
     const a = phase(t, CRANK_PERIOD) * TAU;
     const side = Math.cos(a);
     const up = Math.sin(a);
     for (const arm of [p.armL, p.armR]) {
-      arm.raise = 1.2 + up * 0.62;
-      arm.elbow = 0.7 - up * 0.42;
+      arm.raise = 1.2 + up * 0.8;
+      arm.elbow = 0.7 - up * 0.5;
     }
-    p.armL.spread = TOGETHER + 0.3 + side * 0.56;
-    p.armR.spread = TOGETHER + 0.3 - side * 0.56;
-    p.twist = side * 0.24;
-    p.lean = side * 0.08;
-    p.bend = 0.1 - up * 0.08;
+    p.armL.spread = TOGETHER + 0.35 + side * 0.7;
+    p.armR.spread = TOGETHER + 0.25 - side * 0.7;
+    p.turn = 0.1;
+    p.twist = side * 0.3;
+    p.shift = side * 0.06;
+    p.lean = side * 0.12;
+    p.bend = 0.12 - up * 0.1;
+    crouch(p, Math.max(0, -up) * 0.3);
+    p.toes = Math.max(0, up) * 0.5;
   },
 
   turn_key: (t, p) => {

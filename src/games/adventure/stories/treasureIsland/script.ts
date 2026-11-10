@@ -60,8 +60,8 @@ export const SWING_PERIOD = 6;
 /**
  * Seconds of travel before each step: walking or paddling there, or the camera coming in. Kiki flies in
  * for the hello while the camera comes round to Tapsi's front; before the paddling Tapsi takes the paddle;
- * before the coins the lid opens, Ole turns round, the crabs carry the chest up the beach and Tapsi hops
- * down into the sand behind it (`CARRY`, `HOP_FROM`); before the hooray Tapsi turns round to us.
+ * before the coins the lid opens, Ole turns round, the crabs carry the chest up the beach behind Ole and Tapsi
+ * turns round to it on Ole's back (`CARRY`, `HOP_FROM`); before the hooray Tapsi turns round to us.
  */
 export const TRAVEL = [4, 3, 1.2, 3, 1, 2, 2.5, 3, 3, 3, 4, 2, 2, 3, 3, 3.5, 2, 6, 2.5, 7.5, 1.5, 1.5];
 /**
@@ -161,7 +161,7 @@ export const LEAP_TO = 0.92;
 export const tossAt = (n: number) => n * TOSS_PERIOD + TOSS_AT;
 /** In the coins step (seconds into it): the lid opens, the crabs come up out of the water at the raft, lift the open chest off it, carry it up the beach, set it down and go. */
 export const CARRY = { up: 1.6, lift: 2.1, off: 2.6, down: 5.4, set: 5.8, gone: 6.8 };
-/** In the coins step (seconds into it): Tapsi hops down from Ole into the sand behind the chest, and lands. */
+/** In the coins step (seconds into it): Tapsi steps to the edge of Ole's back and turns round to the chest behind Ole, and stands. */
 export const HOP_FROM = 5.9;
 export const HOP_LAND = 6.7;
 
@@ -169,10 +169,8 @@ export const HOP_LAND = 6.7;
 export const PADDLE_TILT = 1.3;
 /** How far from its middle each paw holds the paddle while it lies on the lap (m). */
 export const PADDLE_GRIP = 0.22;
-/** The paddle lying across Tapsi's lap: its shaft (y) along x, the blades flat (z up); and on the sand, along z. */
+/** The paddle lying across Tapsi's lap: its shaft (y) along x, the blades flat (z up); and along z, on Ole's back or on the sand. */
 export const ACROSS = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(0, 0, 1), v3(1, 0, 0), v3(0, 1, 0)));
 export const ON_SAND = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(-1, 0, 0), v3(0, 0, 1), v3(0, 1, 0)));
-/** The paddle standing beside Ole (Ole's space): its own y, the shaft, down into the water, the top leaning in. */
-export const STANDING = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, Math.PI - 0.12));
 /** Where Tapsi lets the paddle fall onto the beach, beside Ole on the right. */
 export const PADDLE_DROP = v3(1.35, 0, BEACH_Z + 0.3);

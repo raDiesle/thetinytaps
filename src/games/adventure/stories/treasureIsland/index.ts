@@ -43,8 +43,9 @@ import {
   COIN_STAND,
   COINS_PER_TOSS,
   clamp01,
-  CRANK_BAR,
+  CRANK_GRIPS,
   CRANK_REACH,
+  CRANK_SIDE,
   DOOR_Z,
   DRUMS_Z,
   GATE_LIFT,
@@ -58,7 +59,7 @@ import {
   LAGOON_LEVEL,
   LOCK,
   MONKEY_Z,
-  PADDLE_STAND,
+  PADDLE_REST,
   PARTY,
   RAFT_FROM,
   RAFT_TO,
@@ -123,7 +124,6 @@ import {
   REEL_TIME,
   S,
   sequence,
-  STANDING,
   SWING_PERIOD,
   TRAIL_FROM,
   tossAt,
@@ -144,8 +144,8 @@ import { makeWorld } from "./world";
 // dodges the monkeys' nuts in slow motion, picks apples, solves the riddle of
 // the stone door, brushes the cobwebs out of the passage behind it, pulls the
 // treasure chest ashore and unlocks it with the key Kiki brings – then two crabs
-// carry the open chest up the beach, Tapsi hops down behind it, reaches deep into
-// it and throws the coins up, so they rain down all round, turns round to us and
+// carry the open chest up the beach behind Ole, Tapsi turns round to it on Ole's back,
+// reaches deep into it and throws the coins up, so they rain down all round, turns round to us and
 // jumps for joy, and waves goodbye. Every world reaction is timed to the
 // guide's clip, so it happens together with the child's movement. Every
 // movement stays on the spot: the child in front of the screen never has to
@@ -322,7 +322,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.drums:
         return [0, DRUMS_Z];
       case S.gate:
-        return [WINCH_X, WINCH_Z + CRANK_REACH];
+        return [WINCH_X + CRANK_SIDE, WINCH_Z + CRANK_REACH];
       case S.roll:
       case S.rollLeft:
       case S.rollMiddle:
@@ -387,11 +387,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   /** Where Tapsi's feet are while showing and doing a step's movement, for the cameras: on Ole's back. */
   function actSpot(step: number, act: number, out: THREE.Vector3) {
     if (step <= S.paddle) return out.set(0, TURTLE_BACK - TURTLE_FLOAT - (step >= S.sit ? SIT_DROP : 0), boatZ(step, act));
-    // At the end Tapsi stands in the sand beside Ole: the camera looks at both, from the middle of the
-    // gorge Ole came down, whose rock walls come close on either side.
+    // At the end Tapsi stands on Ole's back: at its edge by the chest behind Ole, then in its middle again.
     if (step >= S.coins) {
-      const x = (PARTY.x + COIN_STAND.x) / 2;
-      return out.set(x, groundHeight(x, COIN_STAND.z), COIN_STAND.z);
+      const [x, z] = step === S.coins ? [COIN_STAND.x, COIN_STAND.z] : [PARTY.x, PARTY.z];
+      return out.set(x, Math.max(groundHeight(PARTY.x, PARTY.z), -TURTLE_FLOAT) + TURTLE_BACK, z);
     }
     const [x, z] = step === S.jump ? [0, jumpZ(act + DEMO[S.jump])] : standAt(step);
     return out.set(x, Math.max(groundHeight(x, z), bridgeTop(x, z), (step >= S.rope && step <= S.key ? LAGOON_LEVEL : 0) - TURTLE_FLOAT) + TURTLE_BACK, z);
@@ -414,12 +413,13 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     switch (step) {
       case S.fish:
         // Behind Tapsi, a little raised and to the side: the rod swings back over us and the float flies out ahead.
-        rear(at, pos, look, 0.35, 1.45, 1.25);
+        rear(at, pos, look, 0.75, 1.45, 1.3);
         look.set(at.x, at.y + 0.9, at.z - 1.6);
         return;
       case S.hello:
-        // From the front, a little to Tapsi's right, where Kiki flutters and Tapsi waves: hello to us too.
-        rear(at, pos, look, Math.PI - 0.3, 1.3, 1.3);
+        // Straight in front of Tapsi, Tapsi in the middle of the picture: the waving paw on one side, Kiki
+        // fluttering on the other, and the hello is to us too.
+        rear(at, pos, look, Math.PI, 1.3, 1.3);
         look.y += 0.05;
         return;
       case S.sit:
@@ -450,21 +450,24 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         return;
       }
       case S.duck:
-        // Right behind Tapsi's head and a little over it, looking ahead the way Tapsi looks: the head stays low in
-        // the picture and the log swings straight at us, then over Tapsi's ducked head and ours.
-        overHead(at, pos, look, 1.5, 1.4, 1.5);
+        // Far back behind Tapsi and low, below Tapsi's head, looking up: the whole swing stays in the picture, the
+        // log coming down out of the sky in front, over Tapsi's ducked head and up again towards us.
+        overHead(at, pos, look, 0.45, 4.2, 1.6);
         return;
       case S.drums:
-        // Straight behind Tapsi and high up: both paws and both drums beside the body show, and the birds on
-        // the path beyond, over Tapsi's head.
-        rear(at, pos, look, 0, 2.3, 1.2);
-        look.y = at.y + 0.55;
+        // Straight behind Tapsi in the middle, a little over the head: both paws and both drums beside the body
+        // show, and the birds on the path beyond. Looking down a little keeps the far island out of the picture,
+        // which a phone couldn't draw in time along with the glow (a level look cost a third more draws).
+        rear(at, pos, look, 0, 2.0, 1.25);
+        look.set(at.x, at.y + 0.45, at.z - 0.6);
         return;
       case S.gate: {
-        // From behind on the left: the paws on the crank in front, the gate beyond; then through the open gate.
+        // Straight behind Tapsi in the middle: the crank turns beside the body on the left, its whole circle in
+        // the picture, the gate beyond; then through the open gate.
         const open = smooth(f.praise / 1.6);
-        rear(at, pos, look, -0.85, 1.6, 1.45);
-        look.x += 0.3 + open * 0.8;
+        rear(at, pos, look, 0, 1.55, 1.3);
+        look.x -= CRANK_SIDE * 0.4 * (1 - open);
+        look.x += open * 1.1;
         look.y += 0.3 + open * 0.4;
         return;
       }
@@ -481,8 +484,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         look.set(at.x, at.y + 1.1, at.z - 1.2);
         return;
       case S.apples:
-        // Behind Tapsi like at the log but lower, looking up into the tree, where the apples hang over Tapsi's head.
-        overHead(at, pos, look, 0.65, 1.7, 2.6);
+        // Centred behind Tapsi and well back, looking up a little into the tree: so the apples hang clear above
+        // Tapsi's head and paws, not behind them.
+        overHead(at, pos, look, 1.6, 3.3, 1.2);
         return;
       case S.riddle:
         // Further back, so the three pictures over the door show above Tapsi.
@@ -505,22 +509,22 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         look.z -= 0.9;
         return;
       case S.key: {
-        // From behind on the right while Kiki brings the key and Tapsi picks it up; for the turning
-        // close over Tapsi's shoulder, where the key's ring turns in the picture.
+        // From behind on the right while Kiki brings the key and Tapsi picks it up; for the turning round to
+        // Tapsi's right side, level with the key: the ring stands up and lies down as it turns.
         rear(at, pos, look, 0.7, 1.4, 0.9);
-        const lock = v3(RAFT_X, LAGOON_LEVEL + 0.2 + LOCK.y, RAFT_TO + LOCK.z);
-        look.copy(lock);
+        const keyhole = lock.group.getWorldPosition(new THREE.Vector3());
+        look.copy(keyhole);
         const k = smooth((f.act + f.demo - KEY_PICKUP + 0.9) / 1.1) * (1 - smooth((f.praise - 0.4) / 1.5));
-        look.lerp(lock.clone().add(KEY_RING), k);
-        pos.lerp(lock.add(KEY_VIEW), k);
+        look.lerp(keyhole.clone().addScaledVector(KEY_RING, 0.5), k);
+        pos.lerp(keyhole.add(KEY_VIEW), k);
         return;
       }
       case S.coins: {
-        // Behind Tapsi on the left and above: down into the chest and up with the coins over it. From further
-        // left than straight behind, so the cliff right beside Tapsi stays out of the picture.
-        pos.set(COIN_STAND.x - 2.6 + Math.sin(f.local * 0.3) * 0.1, at.y + 1.95, COIN_STAND.z + 1.2);
-        look.set(COIN_STAND.x - 0.1, at.y + 0.85, COIN_STAND.z - 0.8);
-        // Before that, while the chest opens and the crabs carry it up the beach to where Tapsi hops down.
+        // Behind Tapsi on the left and high over Ole's shell, so the shell doesn't hide the chest behind
+        // it: down into the chest and up with the coins over it.
+        pos.set(COIN_STAND.x - 1.9 + Math.sin(f.local * 0.3) * 0.1, at.y + 2.3, COIN_STAND.z + 1.9);
+        look.set(COIN_STAND.x - 0.1, at.y + 0.5, COIN_STAND.z - 0.9);
+        // Before that, while the chest opens and the crabs carry it up the beach behind Ole.
         const toss = smooth((f.local - HOP_FROM + 0.4) / 1.8);
         if (toss < 1) {
           carryShot(f.local, carryPos, carryLook);
@@ -750,15 +754,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   /** How far the paddle has gone from Tapsi's lap onto the sand, in the praise after the paddling. */
   const putDown = (step: number, praise: number) => (step > S.paddle ? 1 : step === S.paddle ? clamp01((praise - 1.2) / 0.9) : 0);
 
-  /** The paddle standing in the water beside Ole while Tapsi fishes, its top leaning against the shell towards Tapsi. */
-  function paddleStanding(pos: THREE.Vector3, q: THREE.Quaternion) {
-    turtle.group.localToWorld(pos.copy(PADDLE_STAND));
-    // The paddle's own y (the shaft) points down into the water.
-    return q.copy(turtle.group.quaternion).multiply(STANDING);
+  /** The paddle lying along the right side of Ole's shell while Tapsi fishes, the blades flat. */
+  function paddleResting(pos: THREE.Vector3, q: THREE.Quaternion) {
+    turtle.group.localToWorld(pos.copy(PADDLE_REST));
+    return q.copy(turtle.group.quaternion).multiply(ON_SAND);
   }
 
   /**
-   * The paddle stands in the water beside Ole while Tapsi waves, fishes and
+   * The paddle lies along Ole's shell while Tapsi waves, fishes and
    * sits down; before paddling, Tapsi takes it onto the lap with the right paw
    * first. Then it is always in Tapsi's paws: lying across the lap,
    * then taken up to paddle – its shaft through both paws, tipped a little
@@ -772,7 +775,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // Across the lap, the blades flat; the paddle's own y (the shaft) to Tapsi's left.
     const lapPos = guide.lap.getWorldPosition(tmpA);
     lapQ.copy(guide.lap.getWorldQuaternion(tmpQ)).multiply(ACROSS);
-    // How far the paddle has come from standing in the water onto the lap, and how firmly each paw holds it then.
+    // How far the paddle has come from Ole's back onto the lap, and how firmly each paw holds it then.
     const before = (from: number, soft: number) => (step < S.paddle ? 0 : step === S.paddle ? smooth((f.local - from) / soft) : 1);
     const pick = before(0.6, 1.3);
     const grabR = before(0.1, 0.5);
@@ -821,10 +824,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       paddle.position.lerpVectors(lapPos, mid, hold).y += Math.sin(hold * Math.PI) * 0.1;
       paddle.quaternion.slerpQuaternions(lapQ, heldQ, hold);
     } else if (pick < 1) {
-      // Lifted out of the water over Ole's side and laid across the lap.
-      const standQ = paddleStanding(tmpC, new THREE.Quaternion());
+      // Lifted off Ole's back and laid across the lap.
+      const restQ = paddleResting(tmpC, new THREE.Quaternion());
       paddle.position.lerpVectors(tmpC, lapPos, pick).y += Math.sin(pick * Math.PI) * 0.2;
-      paddle.quaternion.slerpQuaternions(standQ, lapQ, pick);
+      paddle.quaternion.slerpQuaternions(restQ, lapQ, pick);
     } else {
       paddle.position.copy(lapPos);
       paddle.quaternion.copy(lapQ);
@@ -861,19 +864,32 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
   }
 
-  /** Where the float is now: in the paws, flying out, on the water by `landing`, or reeled in. */
+  /**
+   * Where the float is now: hanging from the rod's tip, swung out behind it as the rod goes back and snaps
+   * forwards, flying out in a high arc from where it let go, on the water by `landing`, or reeled in.
+   */
   function floatAt(clip: number, tip: THREE.Vector3, out: THREE.Vector3, time: number) {
-    const hang = out.copy(tip).add(tmpC.set(0, -0.22, 0));
     const u = clip / CAST_PERIOD;
     const n = Math.floor(u);
     const k = u - n;
     const casting = clip >= 0 && n < fishes.length;
+    // How far the float trails behind the tip: swung back with the rod, and still behind it while the rod
+    // snaps forwards, until it lets go.
+    const { back } = clip > 0 ? castSwing(clip) : { back: 0 };
+    const snap = casting && k >= 0.42 && k < CAST_OUT ? 0.8 : 0;
+    const hang = (trail: number) => {
+      const yaw = guide.root.rotation.y;
+      return out.copy(tip).add(tmpC.set(-Math.sin(yaw) * 0.3 * trail, -0.22 * (1 - 0.5 * trail), -Math.cos(yaw) * 0.3 * trail));
+    };
     if (casting && k >= CAST_OUT && k < CAST_LANDS) {
-      // Out in a high arc.
+      // Out in a high arc, fast at first and slower as the line holds it back.
       const t = (k - CAST_OUT) / (CAST_LANDS - CAST_OUT);
+      const e = 1 - (1 - t) ** 1.6;
       const land = landing(n, tmpB);
       land.y = wave(land.x, land.z, time);
-      return hang.lerp(land, t).add(tmpC.set(0, Math.sin(t * Math.PI) * 1.2, 0));
+      return hang(0.8 * (1 - t))
+        .lerp(land, e)
+        .add(tmpC.set(0, 4 * e * (1 - e) * 0.9, 0));
     }
     if (casting && k >= CAST_LANDS && k < REEL) {
       const land = landing(n, out);
@@ -888,9 +904,33 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     if (reeling >= 0) {
       const land = landing(reeling, tmpB);
       land.y = wave(land.x, land.z, time);
-      return hang.lerp(land, 1 - smooth(r)).add(tmpC.set(0, Math.sin(r * Math.PI) * 0.15, 0));
+      return hang(0)
+        .lerp(land, 1 - smooth(r))
+        .add(tmpC.set(0, Math.sin(r * Math.PI) * 0.15, 0));
     }
-    return hang;
+    return hang(Math.max(back, snap));
+  }
+
+  /**
+   * The line from the rod's tip to the float: nearly straight while the float flies and pulls it, hanging
+   * down in a curve once the float lies on the water – never below the water.
+   */
+  function drawLine(tip: THREE.Vector3, float: THREE.Vector3, sag: number) {
+    const pieces = line.children;
+    const from = new THREE.Vector3();
+    const to = new THREE.Vector3();
+    const at = (s: number, v: THREE.Vector3) => {
+      v.lerpVectors(tip, float, s);
+      v.y = Math.max(v.y - sag * 4 * s * (1 - s), Math.min(float.y, tip.y) - 0.01);
+      return v;
+    };
+    pieces.forEach((piece, i) => {
+      at(i / pieces.length, from);
+      at((i + 1) / pieces.length, to);
+      piece.position.lerpVectors(from, to, 0.5);
+      piece.scale.y = Math.max(0.001, from.distanceTo(to));
+      piece.quaternion.setFromUnitVectors(UP, to.sub(from).normalize());
+    });
   }
 
   /** Where the float of cast n lands, ahead of Tapsi on the sea. */
@@ -922,20 +962,24 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       updateMoved(guide.root);
       // The right paw holds the rod in front of the chest; swung back it is up beside the head, over the
       // right shoulder and outside the head, cast out it is up ahead. The left paw holds lower down.
-      const { back, out } = clip > 0 ? castSwing(clip) : { back: 0, out: 0 };
+      const { back, out, follow } = clip > 0 ? castSwing(clip) : { back: 0, out: 0, follow: 0 };
       const rest = Math.max(0, 1 - back - out);
       const paw = guide.bodyPoint(
-        tmpB.set(-0.06 * rest - 0.3 * back - 0.08 * out, 0.2 * rest + 0.6 * back + 0.56 * out, 0.3 * rest - 0.02 * back + 0.34 * out),
+        tmpB.set(
+          -0.06 * rest - 0.3 * back - 0.08 * out,
+          0.2 * rest + 0.6 * back + 0.56 * out - 0.24 * follow,
+          0.3 * rest - 0.02 * back + 0.34 * out + 0.08 * follow,
+        ),
         tmpB,
       );
-      // Tipped up and a little forwards; swung back, it points up and back over the right shoulder, cast
-      // out it points ahead to where the float flies.
+      // Tipped up and a little forwards; swung back, it points up and back over the right shoulder, snapped
+      // out it stops high ahead, and then follows the float down until it points nearly level at it.
       const yaw = guide.root.rotation.y;
       const ahead = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
       const right = new THREE.Vector3(-Math.cos(yaw), 0, Math.sin(yaw));
-      const dir = new THREE.Vector3(0, 1, 0)
-        .addScaledVector(ahead, 0.3 - back * 1.15 + out * 0.55)
-        .addScaledVector(right, 0.12 + back * 0.4)
+      const dir = new THREE.Vector3(0, 1 - 0.8 * follow, 0)
+        .addScaledVector(ahead, 0.3 - back * 1.15 + out * 0.55 + follow * 0.7)
+        .addScaledVector(right, 0.12 + back * 0.4 - follow * 0.08)
         .normalize();
       heldQ.setFromUnitVectors(UP, dir);
       const butt = paw.addScaledVector(dir, -ROD_GRIP_R);
@@ -958,9 +1002,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const tip = rodTip.getWorldPosition(new THREE.Vector3());
     if (casting) {
       floatAt(clip, tip, bobber.position, f.time);
-      line.position.lerpVectors(tip, bobber.position, 0.5);
-      line.scale.y = Math.max(0.01, tip.distanceTo(bobber.position));
-      line.quaternion.setFromUnitVectors(UP, tmpC.copy(bobber.position).sub(tip).normalize());
+      // Slack once the float lies on the water, taut while it flies or is reeled in.
+      const k = clip / CAST_PERIOD - Math.floor(clip / CAST_PERIOD);
+      const slack = clip > 0 ? smooth((k - CAST_LANDS) / 0.08) * (1 - smooth((k - REEL) / 0.04)) : 0;
+      drawLine(tip, bobber.position, 0.05 + slack * 0.35);
     }
 
     // A fish leaps over the float after every cast: out on one side, in on the other.
@@ -1010,9 +1055,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     gate.group.updateMatrixWorld(true);
     const bar = gate.bar.getWorldPosition(new THREE.Vector3());
     const across = new THREE.Vector3(1, 0, 0);
-    // Tapsi's left is -x here, facing the island.
-    guide.hold("L", bar.clone().addScaledVector(across, -CRANK_BAR * 0.3), across, weight);
-    guide.hold("R", bar.clone().addScaledVector(across, CRANK_BAR * 0.3), across, weight);
+    // Tapsi's right is +x here, facing the island: the bar reaches from the knob over to it.
+    guide.hold("L", bar.clone().addScaledVector(across, CRANK_GRIPS.L), across, weight);
+    guide.hold("R", bar.clone().addScaledVector(across, CRANK_GRIPS.R), across, weight);
   }
 
   /**
@@ -1067,7 +1112,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     tube([far.clone().addScaledVector(along, 0.1), ...held, ...tail], 32);
   }
 
-  /** How far Tapsi leans forward: picking up and laying down the rod, lifting the paddle out of the water, swinging it out over Ole's side. */
+  /** How far Tapsi leans forward: picking up and laying down the rod, lifting the paddle off Ole's back, swinging it out over Ole's side. */
   function bendAt(f: StoryFrame) {
     if (f.opening !== null) return 0;
     const bump = (t: number, from: number, to: number, soft: number) => smooth((t - from) / soft) * (1 - smooth((t - to) / soft));
@@ -1090,13 +1135,15 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // In the bay Ole lies side on, Tapsi across its back facing the water; turning round, Ole turns Tapsi with it.
     turtle.group.localToWorld(guide.root.position.set(0, TURTLE_BACK - SIT_DROP * sitting, 0));
     guide.root.rotation.y = ride.yaw + (Math.PI / 2) * ride.side;
-    // At the end Tapsi hops down off Ole's back into the sand before the chest, turning round to it in
-    // the air, and stays there; for the hooray it turns back to us.
-    const off = step === S.coins ? clamp01((f.local - HOP_FROM) / (HOP_LAND - HOP_FROM)) : step > S.coins ? 1 : 0;
+    // At the end Tapsi stays on Ole's back (never jumps off its friend): it steps to the shell's edge by the
+    // chest, turning round to it with small steps; for the hooray it turns back to us and steps back into
+    // the middle, so seen from the front it stands on Ole, not in the chest behind.
+    const off = step === S.coins ? clamp01((f.local - HOP_FROM) / (HOP_LAND - HOP_FROM)) : step === S.hooray ? 1 - clamp01(f.local / 1.2) : 0;
     if (off > 0) {
-      guide.root.position.lerp(tmpA.set(COIN_STAND.x, groundHeight(COIN_STAND.x, COIN_STAND.z), COIN_STAND.z), smooth(off));
-      guide.root.position.y += Math.sin(off * Math.PI) * 0.35;
-      guide.root.rotation.y += Math.PI * (step === S.coins ? smooth(off) : step === S.hooray ? 1 - smooth(f.local / 1.2) : 0);
+      guide.root.position.x += (COIN_STAND.x - guide.root.position.x) * smooth(off);
+      guide.root.position.z += (COIN_STAND.z - guide.root.position.z) * smooth(off);
+      guide.root.position.y += Math.abs(Math.sin(off * Math.PI * 2)) * 0.06;
+      guide.root.rotation.y += Math.PI * smooth(off);
     }
     guide.joy = step === S.coins ? smooth((f.local - 0.8) / 0.6) : step > S.coins ? 1 : 0;
     return { sitting };
@@ -1160,6 +1207,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     });
   }
 
+  /** Where the star boxes float over the jumps, before they fly off. */
+  const boxHome = boxes.map((box) => box.group.position.y);
+
   function updateWorld(f: StoryFrame) {
     const { step, act, time } = f;
     const len = actLength(step);
@@ -1206,9 +1256,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
     // Over the brook: the bridge gives a little under every landing, and a star comes out of every box the head bumps.
     bridge.position.y = step === S.jump ? -bridgeDip(clip) : 0;
+    // Their stars given, the boxes float up into the sky while Tapsi rides on, so they never hang between the
+    // camera and the swinging log behind them.
+    const flown = step < S.duck ? 0 : step === S.duck ? smooth(f.local / 3) : 1;
     boxes.forEach((box, n) => {
       const since = step === S.jump ? clip - bumpTime(n) : step > S.jump ? 99 : -99;
       box.set(since, time);
+      box.group.position.y = boxHome[n] + flown * flown * 9;
+      box.group.visible = flown < 1;
       if (step === S.jump && atClip(bumpTime(n))) {
         gold.burst(box.group.getWorldPosition(tmpA).add(v3(0, 0.6, 0)), 22, 3);
         cue("knock");
@@ -1508,7 +1563,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         key.rotation.set(0, Math.PI, 0);
       } else {
         lock.group.getWorldPosition(key.position);
-        key.position.z += 0.17;
+        // Its ring stands KEY_RING out of the lock towards Tapsi, at the turning paw.
+        key.position.z += KEY_RING.z - 0.19;
         key.rotation.set(0, Math.PI, keyTurn(clip) * (Math.PI / 2));
       }
     }
@@ -1551,14 +1607,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         }
       }
     }
-    if (step === S.coins && crossed(f, HOP_LAND)) {
-      sand.burst(tmpA.set(COIN_STAND.x, groundHeight(COIN_STAND.x, COIN_STAND.z), COIN_STAND.z), 16, 2);
-      cue("pop");
-    }
-
-    // The coins of every throw fly up out of Tapsi's paws, spread all round but away from Ole on the
-    // left, spin, and stay lying in the sand close by where they land (or fall back into the chest).
-    const sandY = groundHeight(COIN_STAND.x, COIN_STAND.z) + 0.006;
+    // The coins of every throw fly up out of Tapsi's paws over the chest, spread all round but away from Ole
+    // behind Tapsi, spin, and stay lying in the sand close by where they land (or fall back into the chest).
+    const sandY = groundHeight(CHEST_SAND.x, CHEST_SAND.z) + 0.006;
+    const pawsY = Math.max(groundHeight(PARTY.x, PARTY.z), -TURTLE_FLOAT) + TURTLE_BACK + 1.45;
     let landed = Infinity;
     coins.forEach((coin, i) => {
       const n = Math.floor(i / COINS_PER_TOSS);
@@ -1566,10 +1618,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       coin.visible = t > 0;
       if (!coin.visible) return;
       const j = i % COINS_PER_TOSS;
-      const a = -1.4 + (2.6 * (j + 0.5)) / COINS_PER_TOSS + Math.sin(i * 12.9898) * 0.15;
+      const a = -Math.PI + 0.45 + ((Math.PI - 0.9) * (j + 0.5)) / COINS_PER_TOSS + Math.sin(i * 12.9898) * 0.15;
       const speed = 0.3 + ((i * 7) % 5) * 0.07;
       const rise = 3 + ((i * 3) % 4) * 0.2;
-      const from = tmpA.set(COIN_STAND.x, sandY + 1.45, COIN_STAND.z - 0.1);
+      const from = tmpA.set(COIN_STAND.x, pawsY, COIN_STAND.z - 0.3);
       const flight = (rise + Math.sqrt(rise * rise + 2 * COIN_FALL * (from.y - sandY))) / COIN_FALL;
       const u = Math.min(t, flight);
       coin.position.set(from.x + Math.cos(a) * speed * u, from.y + rise * u - 0.5 * COIN_FALL * u * u, from.z + Math.sin(a) * speed * u);
@@ -1600,13 +1652,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // treasure on, and at the end flies off over the bay to be waved goodbye.
     const g = guide.root.position;
     const p = parrot.group.position;
-    const around = v3(g.x + Math.cos(time * 1.1) * 1.1, g.y + 2.3 + Math.sin(time * 2.3) * 0.2, g.z + Math.sin(time * 1.1) * 0.8);
-    // Close beside Tapsi's waving paw, so we see both from the front.
-    const beside = v3(g.x + 0.82 + Math.sin(time * 1.3) * 0.06, g.y + 1.12 + Math.sin(time * 2.3) * 0.06, g.z + 0.35 + Math.cos(time * 1.3) * 0.08);
+    // Circling ahead of Tapsi, never back towards the camera behind it, where it would fill the picture.
+    const around = v3(g.x + Math.cos(time * 1.1) * 1.1, g.y + 2.3 + Math.sin(time * 2.3) * 0.2, g.z - 0.8 + Math.sin(time * 1.1) * 0.6);
+    // Beside Tapsi on its left, the other side from the waving right paw, so the two never overlap seen
+    // from the front; on this side Kiki stays for the fishing and the paddling too.
+    const beside = v3(g.x - 0.8 + Math.sin(time * 1.3) * 0.05, g.y + 1.2 + Math.sin(time * 2.3) * 0.06, g.z + 0.2 + Math.cos(time * 1.3) * 0.08);
     // A little ahead and behind the brook as the camera sees it, below the boxes, showing the way.
     const ahead = v3(g.x - 0.6, g.y + 1.3 + Math.sin(time * 2.3) * 0.12, g.z - 1.2 + Math.sin(time * 1.3) * 0.2);
-    // Ahead on the left and high, out of the way of the rod, watching the float.
-    const watch = v3(g.x - 1.4 + Math.sin(time * 1.3) * 0.2, g.y + 2.0 + Math.sin(time * 2.3) * 0.1, g.z - 1.8);
+    // Ahead and high, a little left of the float's way, watching it: the camera on Tapsi's right sees Kiki
+    // between Tapsi's head and the float, never over the head.
+    const watch = v3(g.x - 0.5 + Math.sin(time * 1.3) * 0.15, g.y + 2.2 + Math.sin(time * 2.3) * 0.1, g.z - 2.2);
     // High above the bow, leading the way to the island out of the paddle's reach.
     const leading = v3(g.x + 0.3 + Math.sin(time * 1.3) * 0.3, g.y + 2.6 + Math.sin(time * 2.3) * 0.15, g.z - 4.5);
     // Beyond the webs on the left, beside the spider hanging in the middle.
@@ -1617,7 +1672,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     if (f.opening !== null || step === S.hello) {
       // Far over the sea in the opening; comes in for the hello.
       const come = step === S.hello && f.opening === null ? smooth((f.local - 0.3) / 2.2) : 0;
-      p.set(5, 7, BOAT_START - 22).lerp(beside, come);
+      p.set(-5, 7, BOAT_START - 22).lerp(beside, come);
       // A little hop in the air whenever Tapsi waves.
       if (step === S.hello && act + f.demo > 0) p.y += Math.abs(Math.sin(time * 4.5)) * 0.15;
     } else if (step === S.fish || step === S.sit) {

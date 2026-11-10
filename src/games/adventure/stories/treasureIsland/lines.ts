@@ -166,7 +166,7 @@ export const LINES: StepLines[] = [
   },
   {
     icon: "💰",
-    situation: "Oh! Gold! Die Krebse bringen uns die Truhe. Ich hüpfe runter!",
+    situation: "Oh! Gold! Die Krebse bringen uns die Truhe.",
     instruction: "Tief rein greifen – und die Münzen hoch werfen! So!",
     turn: "Jetzt du – rein greifen und hoch werfen!",
     again: "Rein greifen – hoch werfen!",
