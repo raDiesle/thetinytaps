@@ -111,6 +111,27 @@ export const DRUMS_Z = 15.5;
 /** Where the beating paw comes down (measured on the drum clip), from Tapsi: x to Tapsi's left; and how wide the drums are. */
 export const DRUM_HAND = v3(0.42, 0.75, 0.32).multiplyScalar(GUIDE_SIZE);
 export const DRUM_RADIUS = 0.15;
+/** How many birds every drum beat scares off the path together. */
+export const BIRDS_PER_BEAT = 2;
+/** How much bigger than `makeBird` draws them the birds at the drums are, to be seen beside Tapsi from behind. */
+export const BIRD_SCALE = 3;
+/** About how far behind Tapsi the drums' camera stands (m), on a wide screen: the birds sit clear of Tapsi and the drums from there. */
+export const DRUMS_CAMERA_BACK = 2;
+
+/**
+ * Where bird n at the drums sits on the path, relative to Tapsi at the drums: a little flock for every beat, on
+ * the side of its drum (even beats on Tapsi's left, -x), the nearest first. They sit well ahead and out to the
+ * side as the camera close behind Tapsi's shoulders sees them, beside the drums and the body and never behind
+ * them (right behind Tapsi, seen from high up, they were hidden by its legs and the drums). `r` gives the jitter.
+ */
+export function drumBirdSpot(n: number, r: () => number) {
+  const beat = Math.floor(n / BIRDS_PER_BEAT);
+  const inFlock = n % BIRDS_PER_BEAT;
+  const side = beat % 2 === 0 ? -1 : 1;
+  const ahead = 2.3 + Math.floor(beat / 2) * 0.35 + inFlock * 0.2 + r() * 0.15;
+  const x = side * (DRUMS_CAMERA_BACK + ahead) * (0.3 + inFlock * 0.09 + r() * 0.04);
+  return { beat, side, x, ahead };
+}
 /**
  * The wooden gate across the path; half its opening, and how high it rises: its stakes' feet end well above
  * the tips of Tapsi's ears on Ole's back (2.2 m over the ground), so Tapsi rides through without touching it.

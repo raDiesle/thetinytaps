@@ -94,14 +94,19 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Am Anfang sieht man den Fuchs von vorn**: Beim Vorstellen schwenkt die Kamera erst vor ihn, so
   dass man sein Gesicht sieht, und geht erst danach hinter ihn. Während er winkt, steht er mittig im
   Bild, und wem er winkt (Kiki), ist neben ihm, nicht über oder hinter ihm.
-- **Wo beide Arme vor dem Körper arbeiten** (Trommeln), steht die Kamera genau mittig hinter dem
-  Fuchs und so hoch, dass man über die Schultern auf die Pfoten sieht.
+- **Wo beide Arme vor dem Körper arbeiten** (Trommeln), steht die Kamera genau mittig und nah hinter
+  den Schultern, nur wenig über dem Kopf, und schaut den Weg entlang: Pfoten und Trommeln neben dem
+  Körper, und dahinter, worum es geht. Nie hoch und weit hinten mit dem Blick hinab auf die Trommeln –
+  da sah man nicht, wofür getrommelt wird.
 - **Ausholen geht seitlich über die Schulter** (Angel): Die Pfoten gehen neben dem Kopf hoch, nicht
   vor dem Gesicht vorbei oder in den Kopf. Wo ein Arm hinter dem Körper ist, scheint er durch; er
   geht aber nie in den Körper hinein. Das Ding in der Hand legt fest, wo die Pfoten sind, nicht
   umgekehrt.
-- **Wer weggescheucht wird, ist im Bild**: Kamera so hoch, dass man über den Fuchs hinweg sieht,
-  was auf dem Weg sitzt, und groß genug, um es zu erkennen.
+- **Wer weggescheucht wird, ist im Bild**: Viele und groß (die Vögel dreimal so groß wie gebaut, zwei
+  je Trommelschlag), so dass man auf einen Blick sieht, wozu die Bewegung da ist. Sie sitzen, von der
+  Kamera aus gesehen, neben dem Fuchs und neben dem, was er bewegt, nie dahinter: Kleine Vögel direkt
+  vor dem Fuchs versteckten sich hinter Beinen und Trommeln (`drumBirdSpot`, der Test prüft es). Auf
+  dem Handy und dem Tablet anschauen, auch das Bewegungsfenster unten rechts.
 - **Was die Hände tun, ist im Bild.** Verdeckt der Körper die Hände, geht die Kamera über die
   Schulter. Was in der Hand gedreht wird (Schlüssel im Schloss), sieht man von der Seite auf seiner
   Höhe: Die Kamera schwenkt dafür seitlich heran, solange gedreht wird. Was gedreht wird, muss so

@@ -31,7 +31,10 @@ import {
   CHEST_Y,
   CHEST_Z,
   DOOR_Z,
+  BIRD_SCALE,
+  BIRDS_PER_BEAT,
   DRUMS_Z,
+  drumBirdSpot,
   freeSpot,
   GATE_Z,
   groundHeight,
@@ -243,7 +246,7 @@ export function makeWorld(scene: THREE.Scene) {
   const keyTurns = goes(S.key);
   /** Seconds into the key clip when the last turn opens the lock. */
   const lastTurn = KEY_PICKUP + (keyTurns - 1) * KEY_TURN + KEY_TURN * 0.45;
-  // A bird for every beat, on the side of its drum (even ones on Tapsi's left, -x), the nearest first.
+  // A little flock for every beat, big and beside the drums as the camera behind Tapsi sees them (`drumBirdSpot`).
   const birdColors: [string, string][] = [
     ["#ffd23f", "#ff8a1f"],
     ["#4fb8ff", "#2f6fe8"],
@@ -252,20 +255,18 @@ export function makeWorld(scene: THREE.Scene) {
     ["#ffffff", "#9fb0c0"],
     ["#b388ff", "#7a52d9"],
   ];
-  const birds = Array.from({ length: beats }, (_, n) => {
+  const birds = Array.from({ length: beats * BIRDS_PER_BEAT }, (_, n) => {
     const bird = makeBird(...birdColors[(n * 5) % birdColors.length]);
     const r = seeded(40 + n);
-    const side = n % 2 === 0 ? -1 : 1;
-    const z = DRUMS_Z - 1.2 - Math.floor(n / 2) * 0.22 - r() * 0.1;
-    const x = side * (0.35 + r() * 0.7);
+    const { beat, side, x, ahead } = drumBirdSpot(n, r);
+    const z = DRUMS_Z - ahead;
     const home = v3(x, groundHeight(x, z), z);
     bird.group.position.copy(home);
-    // Big enough to see over Tapsi's shoulders.
-    bird.group.scale.setScalar(1.6);
+    bird.group.scale.setScalar(BIRD_SCALE);
     // Mostly looking towards us, each a little differently.
     const look = (r() - 0.5) * 1.6;
     bird.group.rotation.y = look;
-    return { ...bird, home, look, side };
+    return { ...bird, home, look, side, beat };
   });
   const flock = makeFlock(birds);
   scene.add(flock.group);

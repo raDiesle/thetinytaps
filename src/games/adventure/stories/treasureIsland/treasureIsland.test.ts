@@ -1,10 +1,22 @@
 import { expect, test } from "bun:test";
 import * as THREE from "three";
 import { Guide, restPose } from "../../three/guide";
-import { TURTLE_BACK, TURTLE_HALF_WIDTH } from "../../three/props";
+import { seeded, TURTLE_BACK, TURTLE_HALF_WIDTH } from "../../three/props";
 import { TREASURE_ISLAND } from ".";
-import { CHEST_SAND, COIN_STAND, GATE_BEAM, GATE_LIFT, PARTY } from "./layout";
-import { CYCLES, clipLength } from "./script";
+import {
+  BIRD_SCALE,
+  BIRDS_PER_BEAT,
+  CHEST_SAND,
+  COIN_STAND,
+  DRUM_HAND,
+  DRUM_RADIUS,
+  DRUMS_CAMERA_BACK,
+  drumBirdSpot,
+  GATE_BEAM,
+  GATE_LIFT,
+  PARTY,
+} from "./layout";
+import { CYCLES, clipLength, goes, S } from "./script";
 
 test("every movement of the Schatzinsel ends after whole goes, so each go has its target", () => {
   CYCLES.forEach((cycle, step) => {
@@ -43,4 +55,19 @@ test("at the end Tapsi stays on Ole's back, and the chest comes to Tapsi instead
   const chest = Math.hypot(CHEST_SAND.x - PARTY.x, CHEST_SAND.z - PARTY.z);
   expect(chest).toBeGreaterThan(TURTLE_HALF_WIDTH + 0.3);
   expect(Math.hypot(CHEST_SAND.x - COIN_STAND.x, CHEST_SAND.z - COIN_STAND.z)).toBeLessThan(0.9);
+});
+
+test("the birds at the drums sit big beside the drums as the camera behind Tapsi sees them, never behind a drum or Tapsi", () => {
+  // From high up and far back they sat small behind Tapsi's legs and the drums, and nobody saw what the drumming was for.
+  expect(BIRDS_PER_BEAT).toBeGreaterThanOrEqual(2);
+  expect(BIRD_SCALE).toBeGreaterThanOrEqual(2.5);
+  // How far out to the side a drum's outer edge reaches, seen from the camera (tangent of the angle).
+  const drumEdge = (DRUM_HAND.x + DRUM_RADIUS) / (DRUMS_CAMERA_BACK + DRUM_HAND.z);
+  const beats = goes(S.drums) * 2;
+  for (let n = 0; n < beats * BIRDS_PER_BEAT; n++) {
+    const { x, ahead, side } = drumBirdSpot(n, seeded(40 + n));
+    expect(Math.sign(x), `bird ${n}`).toBe(side);
+    expect(Math.abs(x) / (DRUMS_CAMERA_BACK + ahead), `bird ${n}`).toBeGreaterThan(drumEdge);
+    expect(ahead, `bird ${n}`).toBeGreaterThan(DRUM_HAND.z + 1);
+  }
 });

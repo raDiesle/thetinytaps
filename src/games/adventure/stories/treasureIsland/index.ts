@@ -455,11 +455,13 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         overHead(at, pos, look, 0.45, 4.2, 1.6);
         return;
       case S.drums:
-        // Straight behind Tapsi in the middle, a little over the head: both paws and both drums beside the body
-        // show, and the birds on the path beyond. Looking down a little keeps the far island out of the picture,
-        // which a phone couldn't draw in time along with the glow (a level look cost a third more draws).
-        rear(at, pos, look, 0, 2.0, 1.25);
-        look.set(at.x, at.y + 0.45, at.z - 0.6);
+        // Close behind Tapsi's shoulders in the middle and only a little over the head, looking along the path:
+        // both paws and both drums beside the body, and the birds sitting on the path beyond, big. From high up
+        // and far back, looking down on the drums, the birds were small behind Tapsi's legs and nobody saw them.
+        // Still looking down a little keeps the far island out of the picture, which a phone couldn't draw in
+        // time along with the glow (a level look cost a third more draws).
+        rear(at, pos, look, 0, 1.45, 1.0);
+        look.set(at.x, at.y + 0.8, at.z - 2.4);
         return;
       case S.gate: {
         // Straight behind Tapsi in the middle: the crank turns beside the body on the left, its whole circle in
@@ -1285,7 +1287,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     swing.pivot.rotation.x = -swingAngle;
 
     // Drums: beat n comes down on the left drum when even, the right one when odd. The drum bounces
-    // and swings, and the nearest bird on the path on that side startles, hops and flies off the path
+    // and swings, and the nearest little flock on the path on that side startles, hops and flies off the path
     // to that side, over the bushes and away; with the last beat the way is free.
     const beatAt = (n: number) => DRUM_HIT + n * (DRUM_PERIOD / 2);
     for (const side of [0, 1]) {
@@ -1293,12 +1295,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       for (let n = side; n < beats; n += 2) if (step === S.drums && clip >= beatAt(n)) since = clip - beatAt(n);
       drums.set(side, since);
     }
-    birds.forEach((b, n) => {
-      const t = step === S.drums ? clip - beatAt(n) : step > S.drums ? 99 : -1;
+    for (let n = 0; n < beats; n++) {
       if (step === S.drums && atClip(beatAt(n))) {
         cue("drum");
         if (n % 2 === 0) cue("tweet");
       }
+    }
+    birds.forEach((b, n) => {
+      const t = step === S.drums ? clip - beatAt(b.beat) : step > S.drums ? 99 : -1;
       b.group.visible = t < 2.5;
       if (!b.group.visible) return;
       if (t < 0) {
