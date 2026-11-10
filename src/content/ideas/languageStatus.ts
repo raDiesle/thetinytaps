@@ -220,6 +220,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
         note: "Neu (4. November 2026), übersetzt am 5. November 2026, außer Russisch von ElevenLabs gesprochen (7./8. November 2026); auf Russisch liest bis dahin die Stimme des Browsers.",
       },
+      {
+        label: "🌻 Unser Garten wächst",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu (10. November 2026), nur Deutsch und noch nicht aufgenommen: bis dahin liest die Stimme des Browsers. Titel und Sätze fehlen in den anderen Sprachen.",
+      },
     ],
   },
   {

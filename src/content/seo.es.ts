@@ -27,7 +27,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Láminas vivas e historias para niños pequeños",
       description:
         "Láminas vivas para buscar, juegos de movimiento, reacciones en cadena y pequeñas aventuras que responden a cada toque. Para niños pequeños, sin anuncios.",
-      text: "Imágenes e historias que responden a cada toque: más de veinte «Imágenes vivas», «Aventuras en movimiento» para moverse junto al zorro Tapsi, la «Reacción en cadena» con veinte máquinas y circuitos de canicas, y «Pequeñas aventuras» en el ascensor, por caminos y en pequeñas películas: con los bomberos, en la panadería o con una carta para la abuela.",
+      text: "Imágenes e historias que responden a cada toque: más de veinte «Imágenes vivas», «Aventuras en movimiento» para moverse junto al zorro Tapsi, la «Reacción en cadena» con veinte máquinas y circuitos de canicas, y «Pequeñas aventuras» en el ascensor, por caminos y en pequeñas películas: con los bomberos, en la panadería, con una carta para la abuela o en nuestro huerto.",
     },
     "/spiele/gefuehle/": {
       title: "Juegos de emociones para niños pequeños",
@@ -84,7 +84,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Pequeñas aventuras: historias para niños pequeños",
       description:
         "Aventuras cortas con imágenes: subir en ascensor, recorrer caminos y ver pequeñas películas como en la panadería. Cada toque hace avanzar la historia.",
-      text: "Aventuras de pocos minutos: subir en ascensor y descubrir algo en cada piso, recorrer un camino –detrás de la pelota, la cometa o el trenecito– y celebrar al final, o vivir una pequeña película: salir con los bomberos, llevar una carta a la abuela u hornear panecillos, un pretzel o un pastel en la panadería. Por el camino, el niño también decide.",
+      text: "Aventuras de pocos minutos: subir en ascensor y descubrir algo en cada piso, recorrer un camino –detrás de la pelota, la cometa o el trenecito– y celebrar al final, o vivir una pequeña película: salir con los bomberos, llevar una carta a la abuela, hornear panecillos, un pretzel o un pastel en la panadería, o sembrar en el huerto un girasol, zanahorias o fresas, regarlos y verlos crecer. Por el camino, el niño también decide.",
     },
     "/tiere/": {
       title: "Alimentar a los animales – juego para niños pequeños",

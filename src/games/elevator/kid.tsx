@@ -9,6 +9,7 @@ import {
   Boots,
   Bowl,
   Breakfast,
+  Carrot,
   ChefHat,
   EggBasket,
   EmptyPlate,
@@ -23,6 +24,7 @@ import {
   Raincoat,
   SleepyMoon,
   Stove,
+  Strawberry,
   Table,
   Teddy,
   Toilet,
@@ -121,7 +123,9 @@ export function FireHelmet() {
     </g>
   );
 }
-export type Holding = "eggs" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
+/** What the child holds; "carrot" (fresh or `"carrotBitten"`, its leaves up, while it eats in front of the face with
+ * its root at the mouth) and "berry" are held in the right hand, from the garden. */
+export type Holding = "eggs" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat" | "carrot" | "carrotBitten" | "berry";
 
 /** Held in front with both hands. */
 const IN_FRONT: Partial<Record<Holding, { draw: () => ReactNode; scale: number }>> = {
@@ -332,6 +336,16 @@ export function Kid({
           <Boat />
         </g>
       )}
+      {(holding === "carrot" || holding === "carrotBitten") && pose !== "drink" && (
+        <g transform={`translate(${rx} ${ry + 4}) scale(0.62)`}>
+          <Carrot bitten={holding === "carrotBitten"} />
+        </g>
+      )}
+      {holding === "berry" && pose !== "drink" && (
+        <g transform={`translate(${rx + 2} ${ry - 4}) scale(0.5)`}>
+          <Strawberry />
+        </g>
+      )}
       <path d={right.d} stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
       {pose === "eat" && !holding && (
         <g transform={`translate(${rx} ${ry})`}>
@@ -465,6 +479,18 @@ export function Kid({
           )}
           {fire && <FireHelmet />}
         </g>
+        {/* Eating a carrot or a strawberry, it lies in front of the face with its tip at the mouth (in the hand, which is
+            behind the head there, it was hidden); a carrot's leaves hang down over the chest. */}
+        {pose === "drink" && (holding === "carrot" || holding === "carrotBitten") && (
+          <g transform="translate(32 -52) rotate(156) scale(0.62)">
+            <Carrot bitten={holding === "carrotBitten"} />
+          </g>
+        )}
+        {pose === "drink" && holding === "berry" && (
+          <g transform="translate(24 -112) rotate(105) scale(0.5)">
+            <Strawberry />
+          </g>
+        )}
         {sitting && rightArmEl}
         {/* Swish lines beside the head while it shakes, one per side as it swings there. */}
         <g stroke={INK} strokeWidth="4" strokeLinecap="round" fill="none">

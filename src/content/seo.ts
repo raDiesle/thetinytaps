@@ -95,7 +95,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Wimmelbilder und Geschichten für Kleinkinder",
     description:
       "Lebendige Wimmelbilder, Bewegungsspiele, Kettenreaktionen und kleine Abenteuer, die auf jedes Antippen antworten. Für Kleinkinder, ohne Werbung.",
-    text: "Bilder und Geschichten, die auf jedes Antippen antworten: über zwanzig Lebendige Bilder, Bewegungsabenteuer zum Mitmachen mit dem Fuchs Tapsi, zwanzig Kettenreaktionen und Kugelbahnen, und Kleine Abenteuer mit dem Aufzug, auf Wegen und in kleinen Filmen – mit der Feuerwehr, beim Bäcker oder mit einem Brief für Oma.",
+    text: "Bilder und Geschichten, die auf jedes Antippen antworten: über zwanzig Lebendige Bilder, Bewegungsabenteuer zum Mitmachen mit dem Fuchs Tapsi, zwanzig Kettenreaktionen und Kugelbahnen, und Kleine Abenteuer mit dem Aufzug, auf Wegen und in kleinen Filmen – mit der Feuerwehr, beim Bäcker, mit einem Brief für Oma oder im eigenen Garten.",
   },
   {
     path: "/spiele/gefuehle/",
@@ -160,7 +160,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Kleine Abenteuer – Bildergeschichten für Kleinkinder",
     description:
       "Kurze Bilder-Abenteuer für Kleinkinder: Aufzug fahren, Wege entlanglaufen und kleine Filme wie beim Bäcker. Jedes Tippen bringt die Geschichte weiter.",
-    text: "Abenteuer von wenigen Minuten: mit dem Aufzug fahren und auf jedem Stockwerk etwas entdecken, einen Weg entlanglaufen – dem Ball, dem Drachen oder der kleinen Lok hinterher – und am Ende feiern, oder einen kleinen Film erleben: mit der Feuerwehr ausrücken, einen Brief zu Oma bringen oder beim Bäcker Brötchen, eine Brezel oder einen Kuchen backen. Unterwegs entscheidet das Kind mit.",
+    text: "Abenteuer von wenigen Minuten: mit dem Aufzug fahren und auf jedem Stockwerk etwas entdecken, einen Weg entlanglaufen – dem Ball, dem Drachen oder der kleinen Lok hinterher – und am Ende feiern, oder einen kleinen Film erleben: mit der Feuerwehr ausrücken, einen Brief zu Oma bringen, beim Bäcker Brötchen, eine Brezel oder einen Kuchen backen oder im Garten eine Sonnenblume, Karotten oder Erdbeeren säen, gießen und wachsen sehen. Unterwegs entscheidet das Kind mit.",
   },
   {
     path: "/tiere/",

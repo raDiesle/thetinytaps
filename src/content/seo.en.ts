@@ -25,7 +25,7 @@ export const SEO_EN: SeoTranslation = {
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
       description: "Living look-and-find pictures, movement games, chain reactions and little adventures that answer every tap. For toddlers, without ads.",
-      text: "Pictures and stories that answer every tap: more than twenty Living Pictures, Move-Along Adventures with Tapsi the fox, twenty Chain Reactions and marble runs, and Little Adventures in the elevator, along paths and in little films – with the fire brigade, at the bakery or with a letter for Grandma.",
+      text: "Pictures and stories that answer every tap: more than twenty Living Pictures, Move-Along Adventures with Tapsi the fox, twenty Chain Reactions and marble runs, and Little Adventures in the elevator, along paths and in little films – with the fire brigade, at the bakery, with a letter for Grandma or in our own garden.",
     },
     "/spiele/gefuehle/": {
       title: "Feelings Games for Toddlers",
@@ -80,7 +80,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Little Adventures – Picture Stories for Toddlers",
       description:
         "Short picture adventures for toddlers: ride the elevator, walk along paths and watch little films like the bakery. Every tap moves the story on.",
-      text: "Adventures of a few minutes: ride the elevator and discover something on every floor, walk along a path – after the ball, the kite or the little train – and celebrate at the end, or live a little film: drive out with the fire brigade, take a letter to Grandma or bake rolls, a pretzel or a cake at the bakery. On the way the child decides too.",
+      text: "Adventures of a few minutes: ride the elevator and discover something on every floor, walk along a path – after the ball, the kite or the little train – and celebrate at the end, or live a little film: drive out with the fire brigade, take a letter to Grandma, bake rolls, a pretzel or a cake at the bakery, or sow a sunflower, carrots or strawberries in the garden, water them and watch them grow. On the way the child decides too.",
     },
     "/tiere/": {
       title: "Feed the Animals – Animal Game for Toddlers",

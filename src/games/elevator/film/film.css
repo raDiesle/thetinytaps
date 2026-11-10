@@ -725,6 +725,159 @@
   }
 }
 
+/* „Unser Garten wächst“: the spade digs, the seed packet tips, the seeds drop into the hole. */
+.fm-gt-dig {
+  animation: fm-gt-dig calc(0.5s * var(--fm-pace)) ease-in-out calc(1.4s * var(--fm-pace)) 4 alternate;
+}
+
+@keyframes fm-gt-dig {
+  to {
+    transform: rotate(-24deg) translateY(10px);
+  }
+}
+
+.fm-gt-tip {
+  animation: fm-gt-tip calc(2.2s * var(--fm-pace)) ease-in-out calc(1.4s * var(--fm-pace));
+}
+
+@keyframes fm-gt-tip {
+  25%,
+  75% {
+    transform: rotate(-140deg);
+  }
+}
+
+.fm-gt-seed {
+  opacity: 0;
+  animation: fm-gt-seed calc(0.8s * var(--fm-pace)) ease-in both;
+}
+
+@keyframes fm-gt-seed {
+  from {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(54px);
+    opacity: 0;
+  }
+}
+
+/* The watering can tips over the bed and water drops fall from its spout, a few times; the earth darkens. */
+.fm-gt-tilt {
+  animation: fm-gt-tilt calc(2.6s * var(--fm-pace)) ease-in-out calc(1.4s * var(--fm-pace));
+}
+
+@keyframes fm-gt-tilt {
+  20%,
+  80% {
+    transform: rotate(-28deg);
+  }
+}
+
+.fm-gt-water {
+  opacity: 0;
+  animation: fm-gt-fall calc(0.7s * var(--fm-pace)) ease-in 3 both;
+}
+
+@keyframes fm-gt-fall {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(120px);
+    opacity: 0;
+  }
+}
+
+.fm-gt-wet {
+  transition: opacity calc(1.6s * var(--fm-pace)) ease-in-out calc(1.8s * var(--fm-pace));
+}
+
+/* Rain falls from the cloud over the bed, calmly, as long as the cloud rains. */
+.fm-gt-rain {
+  opacity: 0;
+  animation: fm-gt-rain calc(1.1s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-gt-rain {
+  from {
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(380px);
+    opacity: 0;
+  }
+}
+
+/* The sun shines out once the cloud has gone: a warm ring round it, once. */
+.fm-gt-shine {
+  opacity: 0;
+  animation: fm-gt-shine calc(2.4s * var(--fm-pace)) ease-out calc(1s * var(--fm-pace)) forwards;
+}
+
+@keyframes fm-gt-shine {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.15);
+    opacity: 0.5;
+  }
+}
+
+/* The plant grows out of the earth, slowly, while the stage before it fades; the sunflower's bud opens, and the
+   strawberry's flowers turn into berries. */
+.fm-gt-grow {
+  transition:
+    transform calc(2.4s * var(--fm-pace)) ease-out calc(0.6s * var(--fm-pace)),
+    opacity calc(1.4s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-gt-open {
+  transition:
+    transform calc(2s * var(--fm-pace)) ease-out calc(0.6s * var(--fm-pace)),
+    opacity calc(1s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-gt-turn {
+  transition: opacity calc(2s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+/* The bee's wings beat softly while it flies. */
+.fm-gt-wings {
+  animation: fm-gt-wings 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes fm-gt-wings {
+  to {
+    transform: scaleY(0.6);
+  }
+}
+
+/* The strawberries in the bowl are gone once eaten. */
+.fm-gt-gone {
+  animation: fm-gt-gone calc(0.8s * var(--fm-pace)) ease-in calc(0.6s * var(--fm-pace)) forwards;
+}
+
+@keyframes fm-gt-gone {
+  to {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-spot,
   .fm-wheel.spin,
@@ -733,6 +886,8 @@
   .fm-candle,
   .fm-ring,
   .fm-br-ring,
+  .fm-gt-rain,
+  .fm-gt-wings,
   .fm-strip.run .fm-frame,
   .fm-card-move::before {
     animation: none;

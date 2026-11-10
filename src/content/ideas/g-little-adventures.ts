@@ -269,6 +269,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Das Kind wählt Sonnenblume, Karotte oder Erdbeere, legt den Samen in die Erde, gießt (ein Tippen), Regen und Sonne wechseln sich ab, der Keim kommt heraus, die Pflanze wächst langsam von Bild zu Bild. Am Ende wird geerntet oder die Blume blüht, und eine Biene kommt vorbei.",
       why: "Zeigt Geduld und Wachsen in langsamen, ruhigen Bildern.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-31",
