@@ -28,8 +28,9 @@ export const feelingsGamesIdeas: IdeaArea = {
       id: "J-03",
       emoji: "❓",
       title: "Was ist passiert?",
+      done: true,
       partial:
-        "Neu gebaut am 10. November 2026: 30 Szenen in fünf Durchgängen zu sechs, angeordnet wie „Alltagssituationen“ – der kleine Bär zeigt sein Gefühl auf einem Bild von Gemini, darunter „Was ist passiert?“; dann zwei Bilder (A und B) desselben Orts, einen Moment früher, mit ihrer Frage darunter; das passende kommt groß mit grünem Haken und dem Satz, warum. Steht noch unter „🚧 In Arbeit“, bis es ausprobiert ist; die Szenen sind nur auf Deutsch.",
+        "Neu gebaut am 10. November 2026: 30 Szenen in fünf Durchgängen zu sechs, angeordnet wie „Alltagssituationen“ – der kleine Bär zeigt sein Gefühl auf einem Bild von Gemini, darunter „Was ist passiert?“; dann zwei Bilder (A und B) desselben Orts, einen Moment früher, mit ihrer Frage darunter; das passende kommt groß mit grünem Haken und dem Satz, warum. Veröffentlicht am 10. November 2026; die Szenen sind nur auf Deutsch.",
       text: "Das Fuchskind weint, und daneben liegen zwei Bilder: Sein Luftballon fliegt weg, oder es bekommt ein Eis. Das Kind tippt, was passiert ist; die Szene spielt dann kurz nach, wie es dazu kam, und Papa Fuchs tröstet. Beim anderen Bild schüttelt das Fuchskind sanft den Kopf. Andere Runden: das Bärenkind lacht (Oma ist da, oder der Turm fällt um), es ist wütend (jemand nimmt ihm die Schaufel, oder es darf rutschen), es erschrickt (ein Hund bellt, oder ein Schmetterling landet). Jede Runde hat genau ein passendes Bild, ein Test prüft die Liste.",
       why: "Gefühle haben einen Grund – das zu verstehen ist der nächste Schritt nach dem Benennen. Eltern können danach fragen: „Und warum warst du heute traurig?“",
       effort: "M",

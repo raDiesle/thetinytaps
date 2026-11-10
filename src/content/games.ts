@@ -295,7 +295,7 @@ export const CATEGORIES: Category[] = [
       { href: "/wie-gehts-dir/", emoji: "😊", title: MOOD_TITLE, blurb: MOOD_BLURB },
       // Still being built: the user didn't understand it when trying it (November 2026), so it waits on the management
       // page until it explains itself by playing.
-      { href: "/was-ist-passiert/", unfinished: true, emoji: "❓", title: CAUSE_TITLE, blurb: CAUSE_BLURB },
+      { href: "/was-ist-passiert/", emoji: "❓", title: CAUSE_TITLE, blurb: CAUSE_BLURB },
     ],
   },
   {

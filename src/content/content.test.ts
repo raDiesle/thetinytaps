@@ -600,7 +600,6 @@ test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or
 // search engine finds it until it is done.
 test("games still being built stand nowhere on the shelf or in a book", () => {
-  expect(UNFINISHED.map((g) => g.href)).toEqual(["/was-ist-passiert/"]);
   for (const game of UNFINISHED) {
     expect(
       SHELF.map((e) => e.href),

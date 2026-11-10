@@ -189,6 +189,20 @@ export const SCENARIOS: Scenario[] = [
     path: "/timer/?sekunden=16",
     parts: [{ label: "Ernte", before: [{ tap: `.mode-card[title^="Apfelbaum"]` }, { wait: 6000 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   },
+  // „Was ist passiert?“: scene after scene by keys – the feeling, the two cards, the cause big – each key one step,
+  // so the pictures' slow fading and the cards coming are measured (taps could hit ◀ and step back).
+  {
+    name: "was-ist-passiert",
+    path: "/was-ist-passiert/",
+    parts: [
+      {
+        label: "Szenen spielen",
+        before: [{ wait: 1500 }, { tap: ".screen-hint-button", optional: true }, { wait: 1500 }],
+        ms: 10000,
+        type: { keys: ["x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x"], every: 800 },
+      },
+    ],
+  },
   // „Alltagssituationen“: the first group's scenes, one tap on a card each; the book's other games play at once.
   { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Szenen wählen", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
   // „Wie geht's dir?“: a feeling's card, then its three pictures, a little to a whole lot, picked in turn (C-36).

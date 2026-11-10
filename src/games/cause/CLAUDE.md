@@ -2,10 +2,9 @@
 
 Route `/was-ist-passiert/`, idea **J-03** (area J on `/management/`, `src/content/ideas/j-feelings-games.ts`), a game of
 the book „Gefühle“. The little bear of „Alltagssituationen“ shows a feeling; two pictures show what may have happened a
-moment before, and the child taps the one that led to it. **Still being built** (`unfinished` in `games.ts`): it stands
-neither in the book nor in search results, only under „🚧 In Arbeit“ on `/management/`, until the user has tried the
-new version. Publishing it means dropping the mark and naming the game again in the book's search texts
-(`/spiele/gefuehle/`, all seven languages).
+moment before, and the child taps the one that led to it. Published on 10 November 2026, once the user had tried the
+rebuilt game: it stands third in the book's table of contents, and its search texts (`seo.ts` and `seo.<lang>.ts`) and
+the book's tell of the little bear's 30 scenes – a change to what the game offers changes them in all seven languages.
 
 Rebuilt on 10 November 2026 (user request: „erweitere um sehr viel deutlich mehr Szenen, dann erstelle die Gemini
 Bilder und schreibe den Text darunter (mit Zurück-Button), UI angeordnet wie bei Alltagssituationen“):

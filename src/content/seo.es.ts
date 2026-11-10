@@ -31,8 +31,9 @@ export const SEO_ES: SeoTranslation = {
     },
     "/spiele/gefuehle/": {
       title: "Juegos de emociones para niños pequeños",
-      description: "Situaciones cotidianas con el osito, ¿Cómo estás? y ¿Qué necesito?: el niño muestra su emoción, con qué fuerza la siente y qué le ayuda.",
-      text: "Un libro ilustrado sobre las emociones con tres juegos: en «Situaciones cotidianas» el osito vive día a día lo que los niños conocen –enojo, tristeza, miedo y alegría– y el niño elige qué le ayuda. En «¿Cómo estás?» el niño muestra su propia emoción y con qué fuerza la siente, y en «¿Qué necesito?», lo que le sienta bien ahora.",
+      description:
+        "Situaciones cotidianas con el osito, ¿Cómo estás? y ¿Qué pasó?: el niño muestra su emoción, con qué fuerza la siente, qué le ayuda y por qué.",
+      text: "Un libro ilustrado sobre las emociones con tres juegos: en «Situaciones cotidianas» el osito vive día a día lo que los niños conocen –enojo, tristeza, miedo y alegría– y el niño elige qué le ayuda. En «¿Cómo estás?» el niño muestra su propia emoción y con qué fuerza la siente, y en «¿Qué necesito?», lo que le sienta bien ahora. En «¿Qué pasó?» el osito llora, ríe o se asusta, y el niño toca, entre dos imágenes, lo que pasó.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Aprender letras y números – juegos de teclado",
@@ -71,8 +72,8 @@ export const SEO_ES: SeoTranslation = {
     },
     "/was-ist-passiert/": {
       title: "¿Qué pasó? Entender las emociones para niños pequeños",
-      description: "El niño ve una emoción y toca lo que pasó: el globo se fue volando, llega la abuela, un perro ladra. Sin anuncios.",
-      text: "Un niño llora, ríe, se enfada o se asusta, y dos imágenes muestran qué pudo pasar. El niño toca la que encaja y ve que las emociones tienen un motivo. Un comienzo para hablar con los pequeños sobre el porqué.",
+      description: "El osito llora, ríe o se asusta, y el niño toca lo que pasó: el globo se va volando, llega la abuela. Sin anuncios.",
+      text: "Treinta pequeñas escenas con el osito: está triste, enojado, tiene miedo, está feliz, orgulloso o algo le da asco. Dos imágenes muestran lo que pudo pasar justo antes –se le cae el helado, el mapache le quita la pala, papá le hace cosquillas– y el niño toca la que encaja. Debajo, los adultos leen qué preguntarle y por qué el osito se siente así. Así se ve que las emociones tienen un motivo: un comienzo para hablar con los pequeños sobre el porqué.",
     },
     "/kettenreaktion/": {
       title: "Reacción en cadena y circuito de canicas",

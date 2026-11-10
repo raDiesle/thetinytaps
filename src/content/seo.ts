@@ -100,8 +100,9 @@ export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/spiele/gefuehle/",
     title: "Gefühle-Spiele für Kleinkinder",
-    description: "Alltagssituationen mit dem kleinen Bären, Wie geht's dir? und Was brauche ich? – das Kind zeigt sein Gefühl, wie doll es ist und was hilft.",
-    text: "Ein Bilderbuch über Gefühle mit drei Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut.",
+    description:
+      "Alltagssituationen mit dem kleinen Bären, Wie geht's dir? und Was ist passiert? – das Kind zeigt sein Gefühl, wie doll es ist, was hilft und warum.",
+    text: "Ein Bilderbuch über Gefühle mit drei Spielen: In den Alltagssituationen erlebt der kleine Bär Tag für Tag, was Kinder kennen – Wut, Traurigkeit, Angst und Freude –, und das Kind wählt, was ihm hilft. Bei „Wie geht's dir?“ zeigt das Kind sein eigenes Gefühl und wie doll es ist, und bei „Was brauche ich?“, was ihm jetzt guttut. Bei „Was ist passiert?“ weint, lacht oder erschrickt der kleine Bär, und das Kind tippt unter zwei Bildern an, was passiert ist.",
   },
   {
     path: "/spiele/buchstaben-zahlen/",
@@ -146,8 +147,8 @@ export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/was-ist-passiert/",
     title: "Was ist passiert? Gefühle verstehen für Kleinkinder",
-    description: "Das Kind sieht ein Gefühl und tippt, was passiert ist: der Luftballon fliegt weg, Oma kommt, ein Hund bellt. Ohne Werbung.",
-    text: "Ein Kind weint, lacht, ist wütend oder erschrickt, und zwei Bilder zeigen, was passiert sein könnte. Das Kind tippt das Bild, das passt, und sieht, dass Gefühle einen Grund haben. Ein Anfang, um mit Kleinkindern über das Warum zu sprechen.",
+    description: "Der kleine Bär weint, lacht oder erschrickt, und das Kind tippt, was passiert ist: Der Luftballon fliegt weg, Oma kommt. Ohne Werbung.",
+    text: "Dreißig kleine Szenen mit dem kleinen Bären: Er ist traurig, wütend, hat Angst, freut sich, ist stolz oder findet etwas eklig. Zwei Bilder zeigen, was kurz davor passiert sein könnte – sein Eis fällt herunter, der Waschbär nimmt ihm die Schaufel weg, Papa kitzelt ihn –, und das Kind tippt das Bild, das passt. Darunter lesen Erwachsene, was sie das Kind fragen können und warum der Bär sich so fühlt. So sieht das Kind, dass Gefühle einen Grund haben – ein Anfang, um mit Kleinkindern über das Warum zu sprechen.",
   },
   {
     path: "/kettenreaktion/",

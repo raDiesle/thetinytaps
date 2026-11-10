@@ -29,8 +29,9 @@ export const SEO_EN: SeoTranslation = {
     },
     "/spiele/gefuehle/": {
       title: "Feelings Games for Toddlers",
-      description: "Everyday situations with the little bear, How are you? and What do I need? – the child shows its feeling, how strong it is and what helps.",
-      text: "A picture book about feelings with three games: in Everyday Situations the little bear lives through what children know, day by day – anger, sadness, fear and joy – and the child picks what helps. In “How are you?” the child shows its own feeling and how strong it is, and in “What do I need?” what does it good now.",
+      description:
+        "Everyday situations with the little bear, How are you? and What Happened? – the child shows its feeling, how strong it is, what helps and why.",
+      text: "A picture book about feelings with three games: in Everyday Situations the little bear lives through what children know, day by day – anger, sadness, fear and joy – and the child picks what helps. In “How are you?” the child shows its own feeling and how strong it is, and in “What do I need?” what does it good now. In “What Happened?” the little bear cries, laughs or gets a fright, and the child taps the one of two pictures that shows what happened.",
     },
     "/spiele/buchstaben-zahlen/": {
       title: "Letters and Numbers – Keyboard Games",
@@ -68,8 +69,8 @@ export const SEO_EN: SeoTranslation = {
     },
     "/was-ist-passiert/": {
       title: "What Happened? Understanding Feelings for Toddlers",
-      description: "The child sees a feeling and taps what happened: the balloon flew away, Grandma comes, a dog barks. No ads.",
-      text: "A child cries, laughs, is angry or startled, and two pictures show what might have happened. The child taps the one that fits and sees that feelings have a reason. A start for talking with toddlers about why.",
+      description: "The little bear cries, laughs or gets a fright, and the child taps what happened: the balloon flies away, Grandma comes. No ads.",
+      text: "Thirty small scenes with the little bear: he is sad, angry, scared, happy, proud or finds something yucky. Two pictures show what might have happened just before – his ice cream falls down, the raccoon takes his spade, Papa tickles him – and the child taps the one that fits. Below them, grown-ups read what to ask the child and why the bear feels this way. So the child sees that feelings have a reason – a start for talking with toddlers about why.",
     },
     "/kettenreaktion/": {
       title: "Chain Reaction and Marble Run for Kids",
