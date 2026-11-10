@@ -548,6 +548,34 @@
   transition: d calc(0.6s * var(--fm-pace)) ease-in-out;
 }
 
+/* Then the closed envelope turns over to its front, where the stamp goes: the back narrows to a line, the front
+   widens out of it. */
+.fm-br-turn-away,
+.fm-br-turn-to {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.fm-br-turn-away {
+  animation: fm-br-turn-away calc(0.5s * var(--fm-pace)) ease-in calc(0.3s * var(--fm-pace)) forwards;
+}
+
+@keyframes fm-br-turn-away {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.fm-br-turn-to {
+  animation: fm-br-turn-to calc(0.5s * var(--fm-pace)) ease-out calc(0.8s * var(--fm-pace)) backwards;
+}
+
+@keyframes fm-br-turn-to {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 /* The postbox's door swings open on its left hinge. */
 .fm-br-door {
   transform-box: fill-box;
@@ -644,14 +672,68 @@
   }
 }
 
-/* The dough is pressed and stretched on the board a few times, once it has got there. */
+/* Kneading, once the dough has landed on the board: three times the child leans in and its hands press the dough
+   down and away, so it stretches flat from its near end; then the hands lift and fold the far end back over, the
+   dough is round again with a fold on top. All four run the same second (and delay), so they stay in step; the
+   film's thumps fall on the presses. */
+.fm-bk-knead,
+.fm-bk-press,
+.fm-bk-lean,
+.fm-bk-crease {
+  animation-duration: calc(1s * var(--fm-pace));
+  animation-delay: calc(1.4s * var(--fm-pace));
+  animation-iteration-count: 3;
+  animation-timing-function: ease-in-out;
+}
+
 .fm-bk-knead {
-  animation: fm-bk-knead calc(0.5s * var(--fm-pace)) ease-in-out calc(1.4s * var(--fm-pace)) 4 alternate;
+  animation-name: fm-bk-knead;
 }
 
 @keyframes fm-bk-knead {
-  to {
-    transform: scale(1.18, 0.8);
+  40%,
+  55% {
+    transform: scale(1.3, 0.74);
+  }
+  85% {
+    transform: scale(0.96, 1.05);
+  }
+}
+
+.fm-bk-press {
+  animation-name: fm-bk-press;
+}
+
+@keyframes fm-bk-press {
+  40%,
+  55% {
+    transform: rotate(7deg) translateX(10px);
+  }
+  75% {
+    transform: rotate(-9deg);
+  }
+}
+
+.fm-bk-lean {
+  animation-name: fm-bk-lean;
+}
+
+@keyframes fm-bk-lean {
+  40%,
+  55% {
+    transform: rotate(4deg);
+  }
+}
+
+.fm-bk-crease {
+  opacity: 0;
+  animation-name: fm-bk-crease;
+}
+
+@keyframes fm-bk-crease {
+  70%,
+  90% {
+    opacity: 1;
   }
 }
 
