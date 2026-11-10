@@ -68,6 +68,16 @@
   font-weight: 700;
 }
 
+/* Under „Bitte quer halten“: what the site offers and why sideways, short and quiet beside the big title. */
+.screen-hint-why {
+  max-width: 22em;
+  margin: -12px 0 0;
+  font-size: 1rem;
+  line-height: 1.35;
+  opacity: 0.8;
+  text-wrap: balance;
+}
+
 .screen-hint-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -97,16 +107,21 @@
 }
 
 /*
- * „Trotzdem hochkant“ is for a grown-up only: small and plain beside the big buttons, so a child's hand goes elsewhere,
- * yet still a fair tap for a finger.
+ * „Trotzdem hochkant“ is for a grown-up only: a small plain slip above the turning phone, away from the big buttons
+ * below it where a child's hand goes (user feedback, November 2026: beside them it was too big and too easy to hit).
+ * Its tap area is still a fair one for a grown-up's finger.
  */
-.screen-hint-button.screen-hint-upright {
-  align-self: center;
-  min-height: 40px;
-  padding: 4px 16px;
-  font-size: 0.95rem;
+.screen-hint-upright {
+  min-height: 34px;
+  padding: 4px 14px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 999px;
+  background: #ffffffa8;
+  color: color-mix(in srgb, var(--ink) 75%, transparent);
+  font: inherit;
+  font-size: 0.85rem;
   font-weight: 600;
-  box-shadow: 0 3px 0 var(--ink);
+  cursor: pointer;
 }
 
 .screen-hint-button:active {

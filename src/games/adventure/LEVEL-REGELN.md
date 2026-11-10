@@ -79,6 +79,10 @@ Fehler in späteren Leveln nicht wieder passiert.
   nachschwingen. Der Schwimmer hängt beim Ausholen hinter der Spitze, fliegt dann im Bogen hinaus, und
   die Schnur hängt durch, solange er draußen liegt.
 - Kein Satz behauptet, das Kind gesehen zu haben (es gibt keine Kamera).
+- **Was Tapsi sagt, stimmt mit dem überein, was passiert.** Ändert sich eine Handlung, ändert sich ihr
+  Satz im selben Commit, in jeder Sprache. Kündigt ein Satz etwas an, das es nicht mehr gibt („Ich hüpfe
+  runter!“, als Tapsi auf Ole blieb), fällt er weg, statt durch einen neuen ersetzt zu werden: Tapsi
+  sagt dann einfach nichts dazu.
 
 ## Fuchs und Darstellung
 

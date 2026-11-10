@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { downloadMusic } from "@/lib/musicFile";
 import { afterPageMotion } from "@/lib/pageMotion";
+import { afterLoad, savesData } from "@/lib/pwa";
 import { decodeSound, type Loop, playLoop, unlockAudio } from "@/lib/sfx";
 import { talking } from "@/lib/voice";
 
@@ -106,16 +107,28 @@ export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
   const [visible, setVisible] = useState(() => !hidden());
   const on = enabled && !hushed;
 
+  // Downloaded and decoded only once the page has loaded and nothing moves, as downloadMusicIfOn does: fetching it right
+  // at the start came down with the shelf's code and first pictures on a slow phone (November 2026). A visitor saving
+  // data gets it only with the first tap. Not decoded at that tap either: on the shelf the first tap takes a book out, and
+  // the decoded song (tens of MB) made the page turn after it stutter on an old phone (`bun run perf menues`).
   useEffect(() => {
-    if (!on) return;
+    if (!on || (savesData() && !going)) return;
     let alive = true;
-    void loadSong().then((loaded) => {
-      if (alive) setBuffer(loaded);
+    let cancel = () => {};
+    afterLoad(() => {
+      if (!alive) return;
+      cancel = afterPageMotion(
+        () =>
+          void loadSong().then((loaded) => {
+            if (alive) setBuffer(loaded);
+          }),
+      );
     });
     return () => {
       alive = false;
+      cancel();
     };
-  }, [on]);
+  }, [on, going]);
 
   useEffect(() => {
     const onChange = () => setVisible(!hidden());

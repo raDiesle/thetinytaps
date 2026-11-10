@@ -86,6 +86,18 @@ export function ScreenHint() {
   if (portrait && !upright) {
     return (
       <div className="screen-hint" role="dialog" aria-modal aria-label={t(TURN)}>
+        {/* For the grown-up only: small and plain above the turning phone, far from the big buttons a child's hand goes to. */}
+        <button type="button" className="screen-hint-upright" onClick={playUpright}>
+          {t({
+            de: "Trotzdem hochkant",
+            ru: "Всё равно вертикально",
+            en: "Upright anyway",
+            zh: "仍然竖着玩",
+            hi: "फिर भी खड़ा रखें",
+            es: "Vertical de todos modos",
+            ar: "عموديًا على أي حال",
+          })}
+        </button>
         <svg className="screen-hint-phone" viewBox="0 0 120 120" aria-hidden>
           <path className="screen-hint-arrow" d="M28 30 A44 44 0 0 1 92 28 M84 18 L93 28 L80 34" />
           <g className="screen-hint-turn">
@@ -94,25 +106,18 @@ export function ScreenHint() {
           </g>
         </svg>
         <p className="screen-hint-title">{t(TURN)}</p>
-        <div className="screen-hint-buttons">
-          {fullscreenPossible && (
+        {/* What the site is and why sideways, in one sentence for a grown-up who came from a search or a link. */}
+        <p className="screen-hint-why">
+          {t({ de: "Bilderbuch-Spiele und Alltagshelfer für Groß und Klein – quer werden die Bilder groß genug für kleine Finger." })}
+        </p>
+        {fullscreenPossible && (
+          <div className="screen-hint-buttons">
             <button type="button" className="screen-hint-button" onClick={goFullscreen}>
               <FullscreenIcon />{" "}
               {t({ de: "Vollbild", ru: "Полный экран", en: "Full screen", zh: "全屏", hi: "फ़ुल स्क्रीन", es: "Pantalla completa", ar: "ملء الشاشة" })}
             </button>
-          )}
-          <button type="button" className="screen-hint-button secondary screen-hint-upright" onClick={playUpright}>
-            {t({
-              de: "Trotzdem hochkant",
-              ru: "Всё равно вертикально",
-              en: "Upright anyway",
-              zh: "仍然竖着玩",
-              hi: "फिर भी खड़ा रखें",
-              es: "Vertical de todos modos",
-              ar: "عموديًا على أي حال",
-            })}
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     );
   }

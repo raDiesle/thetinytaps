@@ -169,7 +169,7 @@ export const TRANSLATION: StoryTranslation = {
     // 💰
     {
       name: "抛金币",
-      situation: "哦！金子！螃蟹把宝箱搬过来啦。我跳下来！",
+      situation: "哦！金子！螃蟹把宝箱搬过来啦。",
       instruction: "手深深伸进去——把金币抛得高高的！像这样！",
       turn: "轮到你——伸进去，抛高高！",
       again: "伸进去——抛高高！",
