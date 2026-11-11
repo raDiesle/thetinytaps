@@ -8,7 +8,7 @@ its second frame (`-b`) fading in and out so the foxes move a little; a new pict
 picture (`Step.moves`: trousers going down, sitting down; `StoryPicture`'s `moves`); with `Step.again` it plays again
 after that pause, over and over until the story goes on (trousers down, so the child sees what to do while doing it). Drawn on top (emoji and CSS):
 what Tapsi feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubble, while sitting the clock on
-the wall and the thought bubble, hearts, stars and notes rising slowly, and at the bottom the row of step icons (each one jumps there) with the
+the wall and the thought bubble, and at the bottom the row of step icons (each one jumps there) with the
 grown-ups' buttons on the right next to it.
 
 The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both needs, since a child often can't tell beforehand.

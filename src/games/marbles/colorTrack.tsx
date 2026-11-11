@@ -2,13 +2,13 @@
 // a yellow and a blue marble, and the child picks the colour of each one. At
 // the end of the run every marble hops into the tube of its colour, a note
 // higher for each, while the voice counts „Drei rote!“. The first full tube
-// has a small party in its colour, and the run is done.
+// glows in its colour, and the run is done.
 
 import { memo, useId } from "react";
 import { playMusicbox, playPing, playPop } from "@/lib/sfx";
 import { countLine, SORT_COLORS, TUBE_FULL, TUBE_FULL_LINE, TUBE_TOP, TUBES, tubeSlot } from "./colors";
 import { VIEW_W, wobble } from "./level";
-import { Ball, STAR_POINTS } from "./parts";
+import { Ball } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { TRACK_H } from "./track";
 import { type EndProps, INK, type ThingProps, type TrackTheme } from "./trackTheme";
@@ -69,38 +69,10 @@ function ColorThing({ color, spin }: ThingProps) {
   return <Ball color={color} x={0} y={0} spin={spin} />;
 }
 
-/** A small heart around 0, 0. */
-const HEART = "M0 10 C-14 0 -16 -10 -8 -13 C-3 -15 0 -11 0 -8 C0 -11 3 -15 8 -13 C16 -10 14 0 0 10 Z";
-
-/** The small party of a full tube: hearts and stars in its colour rise slowly from it, `age` seconds after it got full. */
-function TubeParty({ x, color, age }: { x: number; color: string; age: number }) {
-  return (
-    <g pointerEvents="none">
-      {Array.from({ length: 6 }, (_, i) => {
-        const k = (age - i * 0.35) / 3;
-        if (k < 0 || k >= 1) return null;
-        const side = i % 2 ? 1 : -1;
-        const px = x + side * (24 + (i % 3) * 14) + 10 * Math.sin(k * 6 + i);
-        const py = TUBE_TOP - 20 - 320 * k;
-        const fade = k < 0.15 ? k / 0.15 : k > 0.7 ? (1 - k) / 0.3 : 1;
-        return (
-          <g key={i} transform={`translate(${px} ${py}) scale(${i % 2 ? 1.6 : 1.1})`} opacity={fade}>
-            {i % 2 ? (
-              <path d={HEART} fill={color} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-            ) : (
-              <polygon points={STAR_POINTS} fill={color} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-            )}
-          </g>
-        );
-      })}
-    </g>
-  );
-}
-
 /**
  * The end of the colour run: three glass tubes on a stand, red, yellow and
  * blue, each with a coloured rim and foot so the child sees which is which.
- * Behind the marbles their tinted inside and the full tube's glow and party,
+ * Behind the marbles their tinted inside and the full tube's glow,
  * in front of them the glass.
  */
 function TubesEnd({ layer, fullAge, fullTube, tapAge }: EndProps) {
@@ -126,7 +98,6 @@ function TubesEnd({ layer, fullAge, fullTube, tapAge }: EndProps) {
                 />
               )}
               <rect x={x - half} y={TUBE_TOP + dip} width={2 * half} height={bottom - TUBE_TOP} rx={half} fill={c.tint} />
-              {full && <TubeParty x={x} color={c.fill} age={fullAge} />}
             </g>
           );
         })}

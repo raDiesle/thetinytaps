@@ -139,7 +139,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   /** The keyboard frame; appears with the first key. */
   const [focus, setFocus] = useState<number | null>(null);
   const [fit, setFit] = useState({ columns: 2, size: 100 });
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
 
   const gridRef = useRef<HTMLDivElement>(null);
   const sockRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -247,7 +247,6 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     setPhase("cheer");
     if (settings.sounds) playMelody();
     aside(texts.done);
-    celebrate();
     later(CHEER_MS, () => {
       // Every wash is a game for a game limit: with the last one played, the game says good night (GameShell).
       gameEnded();

@@ -86,7 +86,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
   const level = levelAt(index);
   const next = levelAt(index + 1);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -113,14 +113,13 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     setParty(true);
     // The good-night machine ends as calmly as it ran.
     sound(level.id === "night" ? playLullaby : playMelody);
-    celebrate();
     timers.current.push(
       setTimeout(() => {
         setParty(false);
         setEnded(true);
       }, PARTY_MS),
     );
-  }, [sound, celebrate, level.id]);
+  }, [sound, level.id]);
 
   const startLevel = (nextIndex: number) => {
     setEnded(false);

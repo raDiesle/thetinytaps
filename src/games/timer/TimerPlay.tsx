@@ -280,7 +280,7 @@ function TimerRun({
   // Gleich ist es so weit (H-49): a while before the end the bell rings once, and a picture stepped back from afar comes bright again.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
 
@@ -383,19 +383,16 @@ function TimerRun({
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
       say(lines.end, true);
-      // The time is up, plain to see and hear (user feedback, November 2026): children cheer, a few hearts, stars and
-      // notes rise slowly over the picture, which lights up warmly, and then the friendly tune.
-      const cheer = setTimeout(() => {
-        playCheer();
-        celebrate();
-      }, CHEER_MS);
+      // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
+      // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
+      const cheer = setTimeout(playCheer, CHEER_MS);
       const tune = setTimeout(playMelody, CHEER_MS + 1800);
       return () => {
         clearTimeout(cheer);
         clearTimeout(tune);
       };
     }
-  }, [phase, picture, celebrate, say, lines]);
+  }, [phase, picture, say, lines]);
 
   /**
    * A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and what is still left lights up softly

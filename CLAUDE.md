@@ -261,10 +261,12 @@ In a fresh worktree run `bun install` first.
   opening. Nothing floats up then (no hearts, stars, sparkles, 💢 💥 💧, no `celebrate`), and no card, button or frame
   hops, shakes, pulses, blinks or grows – not the one picked, not the others, not „Weiter“ at the end (user feedback
   from Gefühle, November 2026: too much fast blinking and movement for small children, for every game). What lives in
-  the picture may still act (an animal shaking its head at the wrong food, a hidden one coming out happy). Only a
-  level's or a story's end is celebrated (`celebrate`), calmly: a few hearts, stars and notes rise slowly while
-  everyone in the picture cheers – never a storm of confetti, shapes or fast movement. `tapFeedback.test.ts` keeps it
-  calm, `calmAnswers.test.ts` keeps answers still and `celebrate` at the ends.
+  the picture may still act (an animal shaking its head at the wrong food, a hidden one coming out happy). A level's or
+  a story's end is celebrated by its picture and its sound (everyone in it cheering, the tune) and by its trophy beside
+  the end's buttons (see trophies below) – nothing rises there any more: the hearts, stars and notes of `celebrate`
+  were replaced by the trophy (user decision, November 2026), and never a storm of confetti, shapes or fast movement.
+  `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). `tapFeedback.test.ts` keeps it
+  calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
   feedback, November 2026): the sound says it, and what floats up from a thing tapped in the picture is a music note

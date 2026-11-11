@@ -115,7 +115,7 @@ taken out (user request, November 2026). The pictures:
   the turn's start so a reload keeps them right. The players stand still: only rackets and ball move, each a layer of
   its own (`Racket`, `Ball`).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
-  picture (`.tm-done-light`) and a few hearts, stars and notes rise slowly (`celebrate`), a friendly tune after it, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
+  picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
   noch?“: the rail to the station, the sand on top, the wax, the slices – `LeftGlow`, inside the shrinking part so it is
@@ -151,7 +151,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
-  picture and the calm `celebrate` – for every picture, Abwechseln's clock time too. Never a storm of confetti.
+  picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
   user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing

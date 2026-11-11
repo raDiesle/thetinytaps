@@ -255,12 +255,14 @@ export const allGamesIdeas: IdeaArea = {
       text: "Heute steigen am Ende eines Levels in elf Spielen sieben Herzen, Sterne und Noten über vier Sekunden auf (`celebrate`); in Bewegungsabenteuer fliegen 220 bis 400 Konfettistücke, im Zirkus der Kugelbahn regnen 90. Stattdessen endet jedes Spiel so, wie sein Bild zu Ende kommt (die Ideen dazu stehen bei den Spielen, mit „Gehört zu A-30“). Für Spiele ohne eigenes Ende eine von fünf allgemeinen Varianten, jede einmal und dann still: A – warmes Licht, das Bild wird langsam golden wie Abendsonne und bleibt so (Favorit, zusammen mit dem Satz aus A-24); B – ein einziger Stern steigt langsam auf und bleibt oben stehen; C – ein Pfoten-Stempel drückt sich einmal ins Papier, mit leisem Plopp; D – kleine Pfoten tapsen einmal über den unteren Rand; E – „Ende“ in Schreibschrift blendet ein wie im Bilderbuch (ohne die klatschende Familie aus D-12). Wörter tippen hat seine Idee schon: W-10, das Wort zum Spielen.",
       why: "Weniger Sinnesreize: kein Blinken, nichts Wildes, die Freude liegt im Bild und im Satz der Stimme. Ein Kind sieht, was es geschafft hat, statt Formen, die mit dem Spiel nichts zu tun haben.",
       effort: "M",
+      partial:
+        "Die aufsteigenden Herzen, Sterne und Noten (`celebrate`) sind an allen Enden weg, der Pokal des Levels steht dort (A-31, 11. November 2026); das Konfetti in Bewegungsabenteuer und im Zirkus und die eigenen Enden der Spiele sind noch offen.",
     },
     {
       id: "A-31",
       emoji: "🏆",
       title: "Pokale sammeln: jedes Level gibt seinen eigenen Pokal, im Regal auf der Startseite",
-      text: "Am Ende jedes Levels oder jeder Geschichte (GameEnd) steht neben „Nochmal“ und „Weiter“ der Pokal dieses Levels, einmal gewonnen und dann gesammelt. Jeder sieht anders aus: Metall nach dem Spiel, Form, Henkel, Deckel und Fuß nach dem Level, im Medaillon das Bild des Levels. Die neuesten stehen rechts neben den Bilderbüchern auf dem unteren Brett; ein Tipp darauf zeigt alle, nach Spielen geordnet. Spiele ohne Ende (Socken-Paare, Zuordnen) und Belohnungstafel und Zeitplan haben noch keine.",
+      text: "Am Ende jedes Levels oder jeder Geschichte (GameEnd) steht neben „Nochmal“ und „Weiter“ der Pokal dieses Levels, einmal gewonnen und dann gesammelt. Jeder sieht anders aus: Metall nach dem Spiel, Form, Henkel, Deckel und Fuß nach dem Level, im Medaillon das Bild des Levels. Die neuesten stehen rechts neben den Bilderbüchern auf dem unteren Brett; ein Tipp darauf zeigt alle, nach Spielen geordnet. Spiele ohne Ende (Socken-Paare, Zuordnen) und Belohnungstafel und Zeitplan haben noch keine. Der Pokal ersetzt die aufsteigenden Herzen, Sterne und Noten (`celebrate`) an allen Enden (Entscheidung 11. November 2026, A-30 teilweise); das Konfetti in Bewegungsabenteuer und im Zirkus der Kugelbahn ist noch da (M- und K-Ideen zu A-30).",
       why: "Ein Kind sieht wieder, was es geschafft hat, und findet es im Regal wieder – ruhig, ohne Zählen während des Spiels.",
       effort: "M",
       done: true,

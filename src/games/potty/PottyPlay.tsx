@@ -114,7 +114,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [asking, setAsking] = useState(false);
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
 
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
@@ -264,7 +264,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         if (came !== "kaka") sound(0, playTrickle);
         if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
         sound(900, cheer);
-        later(600, () => celebrate());
         break;
       case "wipe":
         sound(300, playRip);
@@ -284,7 +283,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       case "party":
         sound(0, cheer);
         sound(300, partyHorn);
-        celebrate();
         break;
       case "stars":
         if (star) {

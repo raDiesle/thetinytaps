@@ -124,7 +124,7 @@ export function FilmPlay({
 }) {
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(view);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   const t = useT();
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
@@ -365,7 +365,6 @@ export function FilmPlay({
     put({ party: true });
     say(film.end);
     sound(() => playRecorded("cheer", playTusch));
-    celebrate();
     await wait(END_MS);
     put({ picking: true });
   };

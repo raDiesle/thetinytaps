@@ -201,7 +201,7 @@ tubes stand on a stand, each with its colour as a ring at the rim and a dot on t
 in an arc to above the tube of its colour and drops straight in (`hop`), a note one step higher for each marble already
 there (`playCountNote`), and the voice counts „Eine rote!“ … „Fünf rote!“ (`countLine`; said with `say(line, false)`, so
 a newer count cuts off the one before and the voice never lags behind the tubes). The first tube with `TUBE_FULL` marbles
-is the end: it glows in its colour, a few hearts and stars in its colour rise slowly from it (`TubeParty`), „Die Röhre ist
+is the end: it glows in its colour (nothing rises: the level's trophy at the end replaced that, user decision, November 2026), „Die Röhre ist
 voll!“, and the level is done. Marbles still on the way pile up out of their tube's top. No tunnel magic here (it would
 change a marble's colour).
 - Nothing can be wrong: every colour has its tube, and any tube full ends the run.
