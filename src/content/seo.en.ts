@@ -87,7 +87,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Feed the Animals – Animal Game for Toddlers",
       description:
         "What goes with the animal? What does it eat, what does it give us, where does it live, what does the caterpillar become? With animal sounds, no ads.",
-      text: "The rabbit wants a carrot, the elephant peanuts, the cow gives us milk, the beaver looks for its lodge, the caterpillar becomes a butterfly and the seed a sunflower: tap the food, the milk, the egg or the home, and the animal is happy and makes its sound. Many animals from the farm, the forest, the zoo and the sea. The game gets easier or harder by itself.",
+      text: "The rabbit wants a carrot, the elephant peanuts, the cow gives us milk, the beaver looks for its lodge, the caterpillar becomes a butterfly and the seed a sunflower: tap the food, the milk, the egg or the home, and the animal is happy and makes its sound. Many animals from the farm, the forest, the zoo and the sea. And behind a little curtain something moos, barks or roars: who was it? The game gets easier or harder by itself.",
     },
     "/zusammen/": {
       title: "What Goes Together? – Matching Game for Toddlers",

@@ -451,7 +451,9 @@ In a fresh worktree run `bun install` first.
   Wer schaut da raus?), they become one flowing game instead: the kinds take turns in a fixed order, easiest first, and
   the game finds the difficulty itself by how the child plays (`nextLevel`, like Socken-Paare and Schatten finden), so
   its card plays at once with no start screen. Grown-ups may still pick the kinds or fix the difficulty, behind ⚙️
-  while playing (`PlayOptions`), never on cards or a start screen (user feedback, November 2026). Picking kinds or
+  while playing (`PlayOptions`), never on cards or a start screen (user feedback, November 2026) – or, where that is
+  the only option, as a small note of words right in the top right corner, no ⚙️ to hold and no panel (Was gehört zum
+  Tier?'s „Was drankommt“, user decision, November 2026). Picking kinds or
   categories (what comes up) is always „Gemischt“ – all of them – or exactly one, one `Choice`, never a mix of some
   switched on and off one by one (user feedback, November 2026: Was gehört zum Tier? and Was gehört zusammen? had a
   toggle per kind; Schatten finden's picture choice already worked so).

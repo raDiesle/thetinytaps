@@ -91,7 +91,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Alimentar a los animales – juego para niños pequeños",
       description:
         "¿Qué va con cada animal? ¿Qué come, qué nos da, dónde vive y en qué se convierte la oruga? Con sonidos de animales, para niños pequeños, sin anuncios.",
-      text: "El conejo quiere una zanahoria, el elefante cacahuetes, la vaca nos da leche, el castor busca su madriguera, la oruga se convierte en mariposa y la semilla en girasol: basta tocar la comida, la leche, el huevo o la casa, y el animal se alegra y hace su sonido. Muchos animales de la granja, del bosque, del zoo y del mar. El juego se vuelve solo más fácil o más difícil.",
+      text: "El conejo quiere una zanahoria, el elefante cacahuetes, la vaca nos da leche, el castor busca su madriguera, la oruga se convierte en mariposa y la semilla en girasol: basta tocar la comida, la leche, el huevo o la casa, y el animal se alegra y hace su sonido. Muchos animales de la granja, del bosque, del zoo y del mar. Y detrás de una pequeña cortina algo muge, ladra o ruge: ¿quién fue? El juego se vuelve solo más fácil o más difícil.",
     },
     "/zusammen/": {
       title: "¿Qué va junto? – emparejar para niños pequeños",

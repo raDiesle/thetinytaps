@@ -168,7 +168,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Tiere füttern – Tierspiel für Kleinkinder",
     description:
       "Was gehört zum Tier? Was frisst es, was gibt es uns, wo wohnt es, und was wird aus der Raupe? Mit Tiergeräuschen, für Kleinkinder, ohne Werbung.",
-    text: "Der Hase will eine Möhre, der Elefant Erdnüsse, die Kuh gibt uns Milch, der Biber sucht seine Burg, aus der Raupe wird ein Schmetterling und aus dem Samen eine Sonnenblume: Futter, Milch, Ei oder Zuhause antippen, und das Tier freut sich und macht sein Geräusch. Viele Tiere vom Bauernhof, aus Wald, Zoo und Meer. Das Spiel wird von selbst leichter oder schwerer.",
+    text: "Der Hase will eine Möhre, der Elefant Erdnüsse, die Kuh gibt uns Milch, der Biber sucht seine Burg, aus der Raupe wird ein Schmetterling und aus dem Samen eine Sonnenblume: Futter, Milch, Ei oder Zuhause antippen, und das Tier freut sich und macht sein Geräusch. Viele Tiere vom Bauernhof, aus Wald, Zoo und Meer. Und hinter einem kleinen Vorhang muht, bellt oder brüllt es: Wer war das? Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/zusammen/",

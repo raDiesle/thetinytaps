@@ -141,6 +141,13 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Was wird aus mir?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
   {
+    // „Wer macht das Geräusch?“ alone: the curtain tapped (it sways) and the right animal picked, so it opens again and again.
+    name: "tiere-geraeusche",
+    path: "/tiere/",
+    storage: `localStorage.setItem("tinytaps.animals.v3", JSON.stringify({ kinds: "sound" }))`,
+    parts: [{ label: "Wer macht das Geräusch?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '.as-stage, [data-tap="goal"]', every: 700 } }],
+  },
+  {
     // „Was gehört zusammen?“: the right one tapped each time, so every pair and helper sets to work in turn.
     name: "zusammen",
     path: "/zusammen/",

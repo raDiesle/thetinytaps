@@ -1,13 +1,10 @@
 import { GameShell } from "@/components/GameShell";
-import { PlayOptions } from "@/components/PlayOptions";
-import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
 import "@/games/shadows/shadows.css";
 import { AnimalsRounds } from "./AnimalsRounds";
 import { KIND_ORDER, type RoundKind } from "./levels";
-import { KIND_SIGNS } from "./RoundTopic";
-import { ANIMALS_SETTINGS_KEY, DEFAULT_ANIMALS_SETTINGS, type Difficulty } from "./settings";
+import { ANIMALS_SETTINGS_KEY, DEFAULT_ANIMALS_SETTINGS } from "./settings";
 import "./animals.css";
 
 /** The game's name, on its start screen and in the browser tab. */
@@ -24,7 +21,18 @@ export const ANIMALS_TITLE: Localized = {
 /** All kinds taking turns, the first choice of „Was drankommt“ (worded as Schatten finden's „Gemischt“). */
 const MIXED: Localized = { de: "Gemischt", ru: "Вперемешку", en: "Mixed", zh: "混合", hi: "मिले-जुले", es: "Mezclado", ar: "منوعة" };
 
-/** The names of the four kinds of rounds, to choose one of them (after their sign, `KIND_SIGNS`). */
+/** What the choices in the corner are about. */
+const WHAT_COMES_UP: Localized = {
+  de: "Was drankommt",
+  ru: "Что будет в игре",
+  en: "What comes up",
+  zh: "出现哪些内容",
+  hi: "क्या-क्या आएगा",
+  es: "Qué aparece",
+  ar: "ما الذي يظهر",
+};
+
+/** The names of the five kinds of rounds, to choose one of them in the corner. */
 const KIND_NAMES: Record<RoundKind, Localized> = {
   feed: {
     de: "Tiere füttern",
@@ -62,6 +70,8 @@ const KIND_NAMES: Record<RoundKind, Localized> = {
     es: "¿En qué me convierto?",
     ar: "إلى ماذا أتحول؟",
   },
+  // German only until translations are asked for (languageStatus.ts).
+  sound: { de: "Wer macht das Geräusch?" },
 };
 
 export function AnimalsGame() {
@@ -71,40 +81,46 @@ export function AnimalsGame() {
   return (
     <GameShell
       title={t(ANIMALS_TITLE)}
-      // Nothing to choose first: its four kinds of rounds take turns and the game finds the difficulty itself, so its
+      // Nothing to choose first: its five kinds of rounds take turns and the game finds the difficulty itself, so its
       // card plays at once; ✕ and „Menü“ go back to the table of contents (GameShell), there is no start screen.
-      // Grown-ups change both while playing (⚙️ held in the corner).
+      // Grown-ups pick one kind in the top right corner while playing.
       startMode="play"
     >
       <AnimalsRounds settings={settings} />
-      <PlayOptions>
-        <Choice<"all" | RoundKind>
-          label={t({
-            de: "Was drankommt",
-            ru: "Что будет в игре",
-            en: "What comes up",
-            zh: "出现哪些内容",
-            hi: "क्या-क्या आएगा",
-            es: "Qué aparece",
-            ar: "ما الذي يظهر",
-          })}
-          value={settings.kinds}
-          onChange={(kinds) => update({ kinds })}
-          // All kinds taking turns, or just one – never a mix of some (user feedback, November 2026).
-          options={[{ value: "all", label: t(MIXED) }, ...KIND_ORDER.map((kind) => ({ value: kind, label: `${KIND_SIGNS[kind]} ${t(KIND_NAMES[kind])}` }))]}
-        />
-        <Choice<Difficulty>
-          label={t({ de: "Schwierigkeit", ru: "Сложность", en: "Difficulty", zh: "难度", hi: "कठिनाई", es: "Dificultad", ar: "الصعوبة" })}
-          value={settings.difficulty}
-          onChange={(difficulty) => update({ difficulty })}
-          options={[
-            { value: "auto", label: t({ de: "Von selbst", ru: "Автоматически", en: "Automatic", zh: "自动", hi: "अपने-आप", es: "Automática", ar: "تلقائي" }) },
-            { value: "easy", label: t({ de: "Leicht", ru: "Легко", en: "Easy", zh: "简单", hi: "आसान", es: "Fácil", ar: "سهل" }) },
-            { value: "medium", label: t({ de: "Mittel", ru: "Средне", en: "Medium", zh: "中等", hi: "मध्यम", es: "Media", ar: "متوسط" }) },
-            { value: "hard", label: t({ de: "Schwer", ru: "Сложно", en: "Hard", zh: "困难", hi: "कठिन", es: "Difícil", ar: "صعب" }) },
-          ]}
-        />
-      </PlayOptions>
+      <KindCorner value={settings.kinds} onChange={(kinds) => update({ kinds })} />
     </GameShell>
+  );
+}
+
+/**
+ * „Was drankommt“ while playing, right in the top right corner as a small paper note listing the choices – no ⚙️ to hold
+ * and no panel popping up over the game (user decision, November 2026): „Gemischt“ or exactly one kind, the chosen one
+ * marked by the highlighter's stroke. Words only, no signs. A change counts from the next round.
+ */
+function KindCorner({ value, onChange }: { value: "all" | RoundKind; onChange: (kinds: "all" | RoundKind) => void }) {
+  const t = useT();
+  const choices: { value: "all" | RoundKind; label: string }[] = [
+    { value: "all", label: t(MIXED) },
+    ...KIND_ORDER.map((kind) => ({ value: kind, label: t(KIND_NAMES[kind]) })),
+  ];
+  return (
+    <nav className="ap-kinds" aria-label={t(WHAT_COMES_UP)} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
+      <span className="ap-kinds-title" aria-hidden>
+        {t(WHAT_COMES_UP)}
+      </span>
+      {choices.map((choice) => (
+        <button
+          key={choice.value}
+          type="button"
+          className="ap-kind"
+          aria-pressed={choice.value === value}
+          // No focus left on it, so Space and Enter keep playing the game.
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={() => onChange(choice.value)}
+        >
+          <span className="ap-kind-label">{choice.label}</span>
+        </button>
+      ))}
+    </nav>
   );
 }

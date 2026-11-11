@@ -14,6 +14,7 @@ import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
 import { HOMES } from "@/games/animals/homes";
 import { KIND_ORDER } from "@/games/animals/levels";
 import { KIND_QUESTIONS } from "@/games/animals/RoundTopic";
+import { SOUND_ANIMALS, SOUND_TEXTS } from "@/games/animals/sounds";
 import { PAIRS, TOGETHER_TEXTS } from "@/games/together/pairs";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
 import { FILMS } from "@/games/elevator/film/films";
@@ -302,6 +303,7 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
   const gifts = pick(GIFT_TEXTS, language);
   const grow = pick(GROW_TEXTS, language);
   const peek = pick(SHADOW_TEXTS, language);
+  const sound = pick(SOUND_TEXTS, language);
   const fed = ANIMALS.filter((a) => a.food);
   const housed = ANIMALS.filter((a) => a.home);
   const residents = Object.keys(HOMES).flatMap((id) => ANIMALS.find((a) => a.home === id) ?? []);
@@ -332,6 +334,12 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
     { label: "Zuhause: Frage", lines: once(housed.map(texts.whereLives)), built: "Satz mit dem Tier" },
     { label: "Zuhause: richtig", lines: once(housed.map((a) => texts.movedIn(a, HOMES[a.home!]))), built: "Satz mit Tier und Zuhause" },
     { label: "Zuhause: falsch, wer da wohnt", lines: once(residents.map(texts.livesHere)), built: "Satz mit dem Tier, das dort wohnt" },
+    {
+      label: "Wer macht das Geräusch?",
+      lines: once([sound.listen, ...SOUND_ANIMALS.map(sound.there), ...SOUND_ANIMALS.map(sound.thatIs)]),
+      built: "Satz mit dem Tier",
+      note: "Z-15: ein Tier ruft hinter dem Vorhang; „Da ist ja …“ und „Das ist …“ wie bei „Wer schaut da raus?“.",
+    },
     {
       label: "Wer schaut da raus?",
       lines: once([peek.peek, ...PEEK_ITEMS.map(peek.there), ...PEEK_ITEMS.map(peek.thatIs)]),
