@@ -191,6 +191,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Hieß „Schranke und Weiche“ und gilt seit R-03 (3. November 2026) auch für die Stationen der Maschinen; der neue Name übersetzt am 5. November 2026.",
       },
+      {
+        label: "🎨 Farbenbahn",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu seit K-10 (11. November 2026): Name, erster Satz, „Eine rote!“ bis „Fünf blaue!“ und „Die Röhre ist voll!“ nur auf Deutsch und noch nicht gesprochen; bis dahin zählen nur die Töne.",
+      },
     ],
   },
   {

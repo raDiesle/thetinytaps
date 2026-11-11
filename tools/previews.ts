@@ -98,6 +98,8 @@ const keyOf = (file: string) => file.split("/").filter((part) => part !== "vorsc
 const CUTS: Record<string, { x: number; y: number; size: number }> = {
   // The clothesline with the pairs hung on it (`PLAYS`), not the floor.
   "components/socken": { x: 0.39, y: 0.2, size: 0.58 },
+  // The shelf with its red, yellow and blue marble, what the child picks from, rather than the run's empty middle.
+  "marbles/colortrack": { x: 0.28, y: 0.25, size: 0.5 },
 };
 
 /**

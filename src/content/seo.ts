@@ -154,7 +154,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/kettenreaktion/",
     title: "Kettenreaktion und Kugelbahn für Kinder",
     description: "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kleinkinder, ohne Werbung.",
-    text: "Zwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine und Alltagsdinge fallen um, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt – zum Staunen und Nochmal-Machen.",
+    text: "Einundzwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine und Alltagsdinge fallen um, eins stößt das nächste an. Auf der Farbenbahn sucht das Kind für jede Kugel Rot, Gelb oder Blau aus, und unten fällt sie in die Röhre ihrer Farbe und wird mitgezählt. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt – zum Staunen und Nochmal-Machen.",
   },
   {
     path: "/kleine-abenteuer/",

@@ -32,6 +32,7 @@ import type { Beat } from "@/games/feelings/story";
 import { buildBath } from "@/games/marbles/bath";
 import { buildBuilding } from "@/games/marbles/building";
 import { buildCircus } from "@/games/marbles/circus";
+import { COUNT_LINES as MARBLE_COUNTS } from "@/games/marbles/colors";
 import { LEVEL_TEXTS as MARBLE_LEVELS } from "@/games/marbles/content";
 import { buildFarm } from "@/games/marbles/farm";
 import { buildGarden } from "@/games/marbles/garden";
@@ -196,6 +197,7 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
       },
       file: "src/games/marbles/spaceTrack.tsx",
     },
+    { text: "Die Röhre ist voll!", file: "src/games/marbles/colors.ts" },
   ],
   "/belohnungstafel/": [
     { text: "Geschafft! Hurra!", file: "src/games/rewards/BoardScreen.tsx" },
@@ -436,6 +438,7 @@ function marbles(language: TargetLanguageId): VoiceGroup[] {
   return [
     { label: "Erster Satz jedes Levels", lines: once(Object.values(MARBLE_LEVELS).map((l) => l.intro[language])) },
     { label: "Sätze der Maschinen", lines: once([...events.map((e) => e.say?.[language]), ...inline("/kettenreaktion/", language)]) },
+    { label: "Farbenbahn zählt", lines: once(MARBLE_COUNTS.map((l) => l[language])) },
   ];
 }
 
