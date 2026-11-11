@@ -4,7 +4,8 @@ import { LANGUAGES, type LanguageId } from "@/content/languages";
 import { ARABIC_KEYBOARD_ROWS, arabicLetterOf } from "./arabicKeys";
 import { cyrillicLetterOf, RUSSIAN_KEYBOARD_ROWS } from "./cyrillicKeys";
 import { devanagariLetterOf, HINDI_KEYBOARD_ROWS } from "./devanagariKeys";
-import { APP_LANGUAGES, OWN_NAMES } from "./language";
+import { targetLanguageFor } from "@/content/targetLanguages";
+import { APP_LANGUAGES, OWN_NAMES, pick, spokenIn } from "./language";
 
 describe("app languages", () => {
   // Translations are made only on request, so a name may be missing (it shows in German); one that is there is in
@@ -23,6 +24,22 @@ describe("app languages", () => {
 
   test("each app language has its own name for the language choice", () => {
     for (const id of APP_LANGUAGES) expect(OWN_NAMES[id]).toBeTruthy();
+  });
+});
+
+// What is new is written English first (user decision, November 2026), what came before German first: a language a
+// text lacks shows the text's first language, spoken with that language's voice, never another language's voice.
+describe("a text's first language", () => {
+  test("an English-first text stands in with English, a German-first one with German", () => {
+    expect(pick({ en: "Music", ru: "Музыка" }, "de")).toBe("Music");
+    expect(pick({ en: "Music", ru: "Музыка" }, "ru")).toBe("Музыка");
+    expect(pick({ de: "Musik", en: "Music" }, "hi")).toBe("Musik");
+  });
+
+  test("a line missing in the app language is spoken in its first language with that language's voice", () => {
+    expect(spokenIn({ en: "Hello" }, targetLanguageFor("de"))).toEqual({ text: "Hello", lang: targetLanguageFor("en").speechLang, english: undefined });
+    expect(spokenIn({ en: "Hello" }, targetLanguageFor("ru"))).toEqual({ text: "Hello", lang: targetLanguageFor("en").speechLang, english: "Hello" });
+    expect(spokenIn({ de: "Hallo" }, targetLanguageFor("ru")).lang).toBe(targetLanguageFor("de").speechLang);
   });
 });
 

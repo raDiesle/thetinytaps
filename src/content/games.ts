@@ -18,7 +18,7 @@ import {
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
-import type { Localized } from "@/lib/language";
+import type { Texts } from "@/lib/language";
 
 export interface Game {
   href: string;
@@ -26,9 +26,9 @@ export interface Game {
   also?: string[];
   emoji: string;
   /** The game's name in every language of the app (see lib/language.ts). */
-  title: Localized;
+  title: Texts;
   /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
-  blurb: Localized;
+  blurb: Texts;
   /**
    * On the shelf the game stands as these books side by side, tied with a ribbon, one for each part it opens on
    * (`also`), each with its own name on its spine.
@@ -48,15 +48,15 @@ export interface Game {
 export interface Volume {
   href: string;
   emoji: string;
-  title: Localized;
+  title: Texts;
 }
 
 export interface Category {
   id: string;
   emoji: string;
-  title: Localized;
+  title: Texts;
   /** One short line for grown-ups under the name on its book, like `Game.blurb`. */
-  blurb: Localized;
+  blurb: Texts;
   games: Game[];
   /**
    * Its games stand apart, each a book of its own: on the shelf they stand side by side with their spines out, each

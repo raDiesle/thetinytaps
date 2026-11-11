@@ -8,17 +8,39 @@ import { keepTextsOffline } from "@/lib/pwa";
 // The language of the whole app, chosen once on the home page: the grown-ups'
 // screens (home page, start screens, settings) and what the child hears and sees
 // in every game, the letters and words games and Tapsi included: one language,
-// never mixed. A text gives the German and the translations next to each other,
-// t({ de: "Musik", ru: "Музыка" }); a language a text lacks falls back to German.
+// never mixed. A text gives its first language and the translations next to each other,
+// t({ en: "Music", ru: "Музыка" }). What is new is written in English first (user decision, November 2026), what
+// came before in German; a language a text lacks falls back to German where the text has it, else to English.
 
-/** The same thing in several languages; German is always there and is used for the others missing. */
+/** The same thing in several languages, written German first (before November 2026): German stands in for the others missing. */
 export type Localized<T = string> = { de: T } & Partial<Record<TargetLanguageId, T>>;
+
+/** The same thing in several languages, written English first, as everything new is: English stands in for the others missing. */
+export type EnglishFirst<T = string> = { en: T } & Partial<Record<TargetLanguageId, T>>;
+
+/** A text written in either first language; what `t`, `pick` and `spokenIn` take. */
+export type Texts<T = string> = Localized<T> | EnglishFirst<T>;
 
 /** Languages the whole app (grown-up screens included) can be switched to, in menu order. */
 export const APP_LANGUAGES: TargetLanguageId[] = ["de", "en", "zh", "hi", "es", "ar", "ru"];
 
-/** The thing in `language`, or the German one when there is none. */
-export const pick = <T>(texts: Localized<T>, language: TargetLanguageId): T => texts[language] ?? texts.de;
+/** The language a text stands in with where it lacks one: German where it has it (the older texts), else English. */
+export const firstLanguage = (texts: Texts<unknown>): "de" | "en" => (texts.de === undefined ? "en" : "de");
+
+/** The thing in `language`, or in its first language when there is none (`firstLanguage`). */
+export function pick<T>(texts: Localized<T>, language: TargetLanguageId): T;
+export function pick<T>(texts: EnglishFirst<T>, language: TargetLanguageId): T;
+export function pick<T>(texts: Texts<T>, language: TargetLanguageId): T;
+export function pick<T>(texts: Texts<T>, language: TargetLanguageId): T {
+  return (texts[language] ?? texts[firstLanguage(texts)]) as T;
+}
+
+/** `t`: a text in the app language; one signature per first language, so `T` is read from the text as it is. */
+export interface Translate {
+  <T>(texts: Localized<T>): T;
+  <T>(texts: EnglishFirst<T>): T;
+  <T>(texts: Texts<T>): T;
+}
 
 const KEY = LANGUAGE_KEY;
 const listeners = new Set<() => void>();
@@ -100,13 +122,18 @@ export interface Spoken<T = string> {
 }
 
 /**
- * A line in `language` and its voice; where the translation is missing, the German line with the German voice
- * (translations come only on request, and a Russian voice reading German words would be neither).
+ * A line in `language` and its voice; where the translation is missing, the line in its first language with that
+ * language's voice (translations come only on request, and a Russian voice reading German words would be neither).
  */
-export function spokenIn<T>(texts: Localized<T>, language: TargetLanguage): Spoken<T> {
+export function spokenIn<T>(texts: Localized<T>, language: TargetLanguage): Spoken<T>;
+export function spokenIn<T>(texts: EnglishFirst<T>, language: TargetLanguage): Spoken<T>;
+export function spokenIn<T>(texts: Texts<T>, language: TargetLanguage): Spoken<T>;
+export function spokenIn<T>(texts: Texts<T>, language: TargetLanguage): Spoken<T> {
   const own = texts[language.id];
   const english = language.id !== "en" && language.id !== "de" && typeof texts.en === "string" ? texts.en : undefined;
-  return own === undefined ? { text: texts.de, lang: targetLanguageFor("de").speechLang, english } : { text: own, lang: language.speechLang, english };
+  if (own !== undefined) return { text: own, lang: language.speechLang, english };
+  const first = firstLanguage(texts);
+  return { text: texts[first] as T, lang: targetLanguageFor(first).speechLang, english };
 }
 
 /** The script of each language not written in Latin letters: a sentence without it was not translated. */
@@ -127,10 +154,10 @@ export function voiceFor(text: string, language: TargetLanguage) {
   return script && !script.test(text) ? targetLanguageFor("de").speechLang : language.speechLang;
 }
 
-/** `t` for the app language: t({ de: "Musik", ru: "Музыка" }) → the text in the chosen language. */
-export function useT() {
+/** `t` for the app language: t({ en: "Music", ru: "Музыка" }) → the text in the chosen language. */
+export function useT(): Translate {
   const { id } = useAppLanguage();
-  return <T>(texts: Localized<T>) => pick(texts, id);
+  return <T>(texts: Texts<T>) => pick(texts, id);
 }
 
 /** Each wanted language by its own name, for the app's language choice (people look for their language in their language). */
