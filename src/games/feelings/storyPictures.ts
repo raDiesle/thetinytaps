@@ -13,7 +13,11 @@ import type { SituationId } from "./kita";
 
 const DIR = "src/games/feelings/bilder";
 
-/** The characters these stories draw, described as in `bilder/README.md` („Figuren“), so every picture names them alike. */
+/**
+ * The characters these stories draw, described as in `bilder/README.md` („Figuren“), so every picture names them alike.
+ * Say what an animal is where the model may take it for another: Grandma bear's „grey tips“ in a dark room came out a
+ * grey mouse (November 2026).
+ */
 export const FIGURES = {
   bear: "the little bear: a small bear child, warm brown fur, light beige muzzle, round ears with beige inside, light-blue t-shirt, dark blue-purple trousers",
   fox: "the fox: a small fox child, orange fur, white muzzle, pointed ears, mint-green t-shirt, coral-red trousers",
@@ -25,7 +29,8 @@ export const FIGURES = {
     "the teacher: a grown-up grey mouse, taller than the children, big round ears pink inside, round glasses, purple shirt with a white apron, kind face",
   bigBear: "the big bear: the little bear's grown-up, much taller, same warm brown fur and beige muzzle, green knitted sweater, kind face",
   baby: "the bear baby: a tiny bear baby, same warm brown fur, beige muzzle, in a pale-yellow romper, round and sleepy",
-  grandma: "Grandma bear: an old bear, same warm brown fur with grey tips, round glasses, a lilac cardigan",
+  grandma:
+    "Grandma bear: an old BEAR, the same warm brown fur, round bear ears and beige muzzle as the little bear, only a little grey at the tips of her head fur, round glasses, a lilac cardigan – never a mouse, never grey all over",
 } as const;
 
 /** A character of `FIGURES`, or one only this story has, described in English like them („the hairdresser: a grown-up fox …“). */
@@ -55,6 +60,8 @@ export interface StoryDrawing {
   instead: [Shot, Shot, Shot];
   /** Everyone happy at the end (`…-ende`). */
   end: Shot;
+  /** Which of its pictures are made and in `bilder/`, so the queue leaves them out: only the first („first“), or all. */
+  made?: "first" | true;
 }
 
 const figure = (f: Figure) => (f in FIGURES ? FIGURES[f as keyof typeof FIGURES] : f);
@@ -66,7 +73,7 @@ const LOOK_REF = file("bye-ende");
 
 /** The first picture of a story: a new place, its own cast only (with every character described, Gemini drew others in). */
 export const firstPrompt = (d: StoryDrawing) =>
-  `Use the reference picture only for how the characters look and for the style: draw a completely new place, and nobody else from the reference. In the picture, each exactly once: ${castOf(d.cast)}. ${d.first} Each exactly once; nobody else. Gentle, no injuries, no blood. No speech bubbles, no sound words, no text, no letters.`;
+  `Use the reference picture only for how the characters look and for the style: draw a completely new place, and nobody else from the reference. In the picture, each exactly once: ${castOf(d.cast)}. ${d.first} Each exactly once; nobody else. The place fills the whole picture edge to edge, never an empty white background. Feelings show only in faces and poses: no question marks, exclamation marks, hearts or other signs floating in the air. Gentle, no injuries, no blood. No speech bubbles, no sound words, no text, no letters.`;
 
 /** A later picture of a story, redrawn from its first one. */
 export function laterPrompt(d: StoryDrawing, shot: Shot, notSoGood: boolean) {
@@ -93,10 +100,12 @@ export function storyShots(d: StoryDrawing): { name: string; prompt: string; fir
   ];
 }
 
-/** The story's pictures as the queue takes them: the first one alone, the others drawn from it once it is made. */
+/** The story's pictures still to make, as the queue takes them: the first one alone, the others drawn from it once it is made. */
 export function storyPictures(d: StoryDrawing): QueuedPicture[] {
+  if (d.made === true) return [];
   const title = ALLTAG_SITUATIONS.find((s) => s.id === d.id)?.title ?? d.id;
-  return storyShots(d).map(({ name, prompt, first }) => ({
+  const shots = storyShots(d).filter(({ first }) => !(first && d.made === "first"));
+  return shots.map(({ name, prompt, first }) => ({
     id: name,
     file: file(name),
     use: `Gefühle, „Alltagssituationen“, „${title}“: ${first ? "das erste Bild" : "ein Bild der Geschichte"}`,

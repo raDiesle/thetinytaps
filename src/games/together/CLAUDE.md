@@ -108,6 +108,9 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   each once (`CAST` in `picturePrompts.ts` says so to Gemini). Fox and bear take turns; a helper is a fox or bear
   grown-up in its role, children are fox or bear children, and everyone wears clothes. Things and children stay as the
   rules for all pairs below say (exactly one choice fits, `alsoFits` both ways, partner names unique within a kind).
+  A character meant to be seen whole is told how small it is and where its edges lie („helmet well below the top
+  edge, both feet well above the bottom edge“): „seen whole from her helmet to her feet“ alone came back cut off at the
+  hips (the cyclist, November 2026).
 
 ### All pairs
 

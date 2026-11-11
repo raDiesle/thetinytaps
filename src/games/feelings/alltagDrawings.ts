@@ -9,6 +9,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-37
   {
     id: "puzzle",
+    made: "first",
     place: "Wohnzimmer: niedriger Tisch mit einem Holzpuzzle mit Bauernhoftieren (die Kuh passt nicht), der große Bär liest auf dem Sofa.",
     cast: ["bear", "bigBear"],
     first:
@@ -29,6 +30,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-38
   {
     id: "race",
+    made: "first",
     place: "Garten: Wiese, ein niedriger Holzzaun, ein Apfelbaum; der Fuchs ist zuerst am Baum, der kleine Bär bleibt mitten auf der Wiese stehen.",
     cast: ["bear", "fox"],
     first:
@@ -49,6 +51,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-39
   {
     id: "farewell",
+    made: "first",
     place:
       "Flur an der offenen Haustür, daneben ein großes Fenster zum Weg: der Fuchs setzt seine Mütze auf, draußen wartet sein Papa, der große Bär steht im Flur.",
     cast: ["bear", "fox", "the fox's dad: a grown-up fox, taller than the bears, orange fur, white muzzle, a brown jacket", "bigBear"],
@@ -70,6 +73,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-40
   {
     id: "myself",
+    made: "first",
     place: "Küche am Frühstückstisch: zwei Becher (der des kleinen Bären voll Saft, der des großen Bären leer), eine kleine Saftkanne.",
     cast: ["bear", "bigBear"],
     first:
@@ -94,7 +98,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "Omas Gästezimmer bei Nacht: Gästebett mit Flickendecke, ein Mond-Nachtlicht auf dem Nachttisch, ein gerahmtes Bild an der Wand, eine geschlossene Tür; Oma Bär auf der Bettkante. Der große Bär ist schon nach Hause gefahren.",
     cast: ["bear", "grandma"],
     first:
-      "Grandma bear's small guest room at night, soft dark blue, lit warmly by exactly one small moon-shaped night light glowing on a bedside table. The little bear, in light-blue pyjamas with little white stars, lies in a guest bed under a patchwork quilt, his head on the pillow; his small white plush bunny lies beside him on the quilt. He looks sadly towards the closed door, ears down, eyes wet, homesick. Grandma bear sits on the edge of the bed, kind face. On the wall above the bed hangs exactly one framed picture of a flower meadow.",
+      "Grandma bear's small guest room at night, soft dark blue, lit warmly by exactly one small moon-shaped night light glowing on a bedside table. The little bear, in light-blue pyjamas with little white stars, lies in a guest bed under a patchwork quilt, his head on the pillow; his small white plush bunny lies beside him on the quilt. He looks sadly towards the closed door, ears down, eyes wet, homesick. Grandma bear sits on the edge of the bed, kind face. She is a BEAR like the little bear: the same warm brown fur, round bear ears and beige bear muzzle, only a little grey at the tips of her head fur, in her lilac cardigan – never a mouse, never grey all over, and the night light lets her brown fur show. On the wall above the bed hangs exactly one framed picture of a flower meadow.",
     keep: "Night. The little bear wears his light-blue pyjamas with little white stars. Exactly one moon-shaped night light glowing on the bedside table, exactly one framed picture of a flower meadow on the wall above the bed, exactly one small white plush bunny, the closed door.",
     steps: [
       "„Kuschelhase drücken“ – The little bear himself, lying in bed, hugs the small white plush bunny tight against his cheek with both arms, eyes closed, calmer, a small smile, no tears now; Grandma bear smiles.",
@@ -115,7 +119,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "Friseursalon: hoher Friseurstuhl mit Armlehnen vor einem großen Spiegel, eine Ablage mit einer Sprühflasche, die Friseurin (Füchsin) mit Kamm und Schere, der große Bär auf dem Wartestuhl.",
     cast: ["bear", "the hairdresser: a grown-up fox lady, taller than the bears, orange fur, white muzzle, a teal apron over a white blouse", "bigBear"],
     first:
-      "A bright, friendly hairdresser's salon. The little bear sits on a tall hairdresser's chair with two armrests, a big blue-and-white striped cape round his neck that covers him down to his knees, in front of a big wall mirror that shows his reflection; he looks scared, ears flat, eyes wide, shoulders up. Behind him stands the hairdresser holding exactly one comb in one paw and exactly one small pair of scissors in the other, smiling kindly. On a shelf under the mirror stands exactly one spray bottle of water. A little to the side the big bear sits on a waiting chair, smiling at him. Nothing on the floor yet.",
+      "A bright, friendly hairdresser's salon that fills the whole picture edge to edge: a warm yellow wall, a wooden floor, a window with a plant – no empty white background. The little bear sits on a tall hairdresser's chair with two armrests, a big blue-and-white striped cape round his neck that covers him down to his knees, in front of a big wall mirror that shows his reflection; he looks scared, ears flat, eyes wide, shoulders up. Behind him stands the hairdresser holding exactly one comb in one paw and exactly one small pair of scissors in the other, smiling kindly. On a shelf under the mirror stands exactly one spray bottle of water. A little to the side the big bear sits on a waiting chair, smiling at him. Nothing on the floor yet.",
     keep: "The little bear wears the big blue-and-white striped cape round his neck. Exactly one tall hairdresser's chair with two armrests in front of the big wall mirror, which shows the little bear's reflection (only a reflection, not a second bear). Exactly one spray bottle on the shelf under the mirror. The hairdresser holds the comb and the small scissors.",
     steps: [
       "„Armlehnen fest drücken“ – The little bear himself grips both armrests tight with his paws and sits very still and straight, braver, a small brave smile, plain brown face, NO red or pink patches at all; the hairdresser combs his head gently, smiling.",
@@ -135,7 +139,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     place: "Spielzimmer im Kindergarten: Teppich, ein umgestoßener Turm aus bunten Bauklötzen (zwei stehen noch), der Fuchs sitzt daneben. Keine Erwachsenen.",
     cast: ["bear", "fox"],
     first:
-      "A kindergarten playroom with a soft round rug. On the rug the fox sits beside what is left of his tower of big colourful wooden blocks: only two blocks still stand stacked, about ten blocks lie scattered across the rug, just fallen. The fox looks at them, sad, ears down. Right beside them the little bear has just stopped running, one foot still lifted, and holds both paws over his mouth, startled, eyes wide, guilty. No grown-ups.",
+      "A kindergarten playroom with a soft round rug. On the rug the fox – a fox child with pointed, upright fox ears, never floppy ones – sits beside what is left of his tower of big colourful wooden blocks: only two blocks still stand stacked, about ten blocks lie scattered across the rug, just fallen. The fox looks at them, sad, ears down. Right beside them the little bear has just stopped running, one foot still lifted, and holds both paws over his mouth, startled, eyes wide, guilty. No grown-ups.",
     keep: "The colourful wooden blocks of the fallen tower lie scattered on the rug, two of them still stacked.",
     steps: [
       "„„Entschuldigung!“ sagen“ – The little bear himself bends towards the fox, both paws on his chest, saying sorry with an honest, sorry face; the fox looks up at him and smiles a little.",
@@ -152,6 +156,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-44
   {
     id: "laughed",
+    made: "first",
     place:
       "Malecke im Kindergarten: niedriger Tisch mit einem Becher Stifte, das Bild des kleinen Bären (bunte Kringel), das Bild des Waschbären (ein Haus), der Hase malt daneben, eine leere Pinnwand an der Wand. Keine Erwachsenen.",
     cast: ["bear", "raccoon", "bunny"],
@@ -172,6 +177,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "excited",
+    made: "first",
     place:
       "Kinderzimmer bei Nacht: der kleine Bär im Schlafanzug im Bett, Kuschelhase, Nachttisch mit Lampe, gepackter Kinderkoffer, Eimer mit Schaufel, die Tür zum Nebenzimmer angelehnt",
     cast: ["bear"],
@@ -192,6 +198,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "envy",
+    made: "first",
     place: "Gehweg vor einer Hecke und Häusern: der Fuchs mit seinem neuen roten Laufrad mit Klingel, der kleine Bär mit seinem alten blauen Roller",
     cast: ["bear", "fox"],
     first:
@@ -211,6 +218,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "supermarket",
+    made: "first",
     place:
       "Gang im Supermarkt zwischen hohen Regalen: der kleine Bär allein mit seinem Kuschelhasen, vor ihm eine Kiste Äpfel und ein Dosenturm, hinten eine Ecke",
     cast: ["bear"],
@@ -238,7 +246,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     place: "Küche: offener Kühlschrank mit einem Joghurt, einer Milchflasche und Gemüse, Tisch mit zwei Löffeln, der große Bär mit einem Apfel",
     cast: ["bear", "bigBear"],
     first:
-      "A bright kitchen. The fridge door stands wide open: inside, on the middle shelf, exactly one small pink pot of strawberry yogurt, beside it one milk bottle and a few vegetables. The big bear stands in the middle of the kitchen holding up exactly one red apple in his paw, a puzzled, questioning face, eyebrows raised. The little bear stands in front of him, angry, frowning, red cheeks drawn flat, mouth wide open calling out, one arm flung out vaguely, not pointing at anything clearly. On the kitchen table lie two small spoons.",
+      "A bright kitchen. The fridge door stands wide open: inside, on the middle shelf, exactly one small pink pot of strawberry yogurt, beside it one milk bottle and a few vegetables. The big bear stands in the middle of the kitchen holding up exactly one red apple in his paw, a puzzled face, eyebrows raised – the puzzlement only in his face, no question mark or any other sign above him. The little bear stands in front of him, angry, frowning, red cheeks drawn flat, mouth wide open calling out, one arm flung out vaguely, not pointing at anything clearly. On the kitchen table lie two small spoons.",
     keep: "The fridge door stays wide open with exactly one small pink yogurt pot, one milk bottle and a few vegetables inside; exactly one red apple in the whole picture; two small spoons on the table.",
     steps: [
       "„Genau zeigen“ – The little bear himself stretches his arm out straight and points with one paw exactly at the pink yogurt pot in the open fridge, his whole arm one clear line towards it; plain brown face, NO red or pink patches at all, a hopeful look. The big bear follows the paw with his eyes and smiles, understanding, the apple lowered.",
@@ -254,6 +262,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "bee",
+    made: "first",
     place: "Wiese mit Picknickdecke: der rote Saftbecher des kleinen Bären, der grüne Teebecher des großen Bären, Brote, ein Ball, am Rand Blumen; eine Biene",
     cast: ["bear", "bigBear", "the bee: one small round cartoon honeybee, yellow and black stripes, little clear wings, a friendly face"],
     first:
@@ -273,6 +282,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "phone",
+    made: "first",
     place: "Küche: der große Bär telefoniert an der Arbeitsplatte, der kleine Bär mit seinem Bild, Tisch mit Stiften, Stuhl mit dem Kuschelhasen",
     cast: ["bear", "bigBear"],
     first:
@@ -292,6 +302,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "hit",
+    made: "first",
     place: "Sandkasten im Kindergarten: der Fuchs hält sich den Arm, zwischen ihnen eine rote Schaufel und ein gelber Eimer",
     cast: ["bear", "fox"],
     first:
@@ -319,6 +330,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   },
   {
     id: "pickup",
+    made: "first",
     place:
       "Spielzimmer im Kindergarten am Nachmittag: der große Bär in der offenen Tür mit dem grünen Rucksack des kleinen Bären, Garderobe, der Fuchs mit einem Bausteinturm",
     cast: ["bear", "fox", "bigBear"],
@@ -340,6 +352,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-56
   {
     id: "bath",
+    made: "first",
     place:
       "Badezimmer: Wanne voller Schaum mit dem kleinen Bären und dem Fuchs in Badeshirts, am Wannenrand eine Shampooflasche und ein Becher, der große Bär auf einem Hocker mit einem großen Handtuch, eine Badematte",
     cast: ["bear", "fox", "bigBear"],
@@ -361,6 +374,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-57
   {
     id: "butterfly",
+    made: "first",
     place: "Garten: eine einzelne große gelbe Blume mit einem Schmetterling darauf, dahinter ein Tulpenbeet, der Fuchs mit einer grünen Gießkanne, viel Rasen",
     cast: ["bear", "fox", "the butterfly: one small butterfly with bright-blue wings edged in orange"],
     first:
@@ -381,6 +395,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-58
   {
     id: "morning",
+    made: "first",
     place:
       "Kinderzimmer am Morgen: Bett mit blauer Decke, Nachttisch mit einem roten Wecker, Hausschuhe vor dem Bett, ein zugezogener Vorhang, das Bärenbaby in der offenen Tür",
     cast: ["bear", "baby"],
@@ -402,6 +417,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-59
   {
     id: "worn",
+    made: "first",
     place:
       "Flur daheim nach dem Kindergarten: der kleine Bär liegt in Jacke auf dem Boden, neben ihm eine grüne Brotdose, das Bärenbaby baut einen kleinen Turm, der große Bär hängt seine Tasche auf, durch die offene Tür die Kuschelecke mit Kissen und dem Kuschelhasen",
     cast: ["bear", "baby", "bigBear"],
@@ -423,6 +439,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-60
   {
     id: "sick",
+    made: "first",
     place:
       "Wohnzimmer: Sofa mit blauer Decke, darauf der kranke kleine Bär mit Schal, ein Tischchen mit Teetasse und Bilderbuch, ein großes Fenster hinter dem Sofa, draußen der Fuchs mit einem roten Ball",
     cast: ["bear", "fox"],
@@ -444,6 +461,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-61
   {
     id: "car",
+    made: "first",
     place:
       "Im Auto auf der langen Fahrt zu Oma Bär, von der Seite aufgeschnitten: vorn fährt der große Bär, hinten der kleine Bär im Kindersitz mit Kuschelhase und Trinkflasche, daneben schläft das Bärenbaby in seinem Sitz, draußen eine Landstraße mit drei Autos",
     cast: ["bear", "baby", "bigBear"],
@@ -465,6 +483,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-62
   {
     id: "sticky",
+    made: "first",
     place:
       "Kindergarten, Maltisch: der kleine Bär mit blauen Farbpfoten vor seinem Blatt, der Fuchs mit seinem Sonnenbild, ein Farbbecher und ein Pinsel auf dem Tisch, hinten ein Waschbecken",
     cast: ["bear", "fox"],
@@ -486,6 +505,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-63
   {
     id: "nappy",
+    made: "first",
     place:
       "Spielzimmer: der kleine Bär mit einem roten Spielzeugauto auf dem Teppich, daneben das Bärenbaby mit stinkender Windel, ein Regal mit einer frischen Windel, ein geschlossenes Fenster, der große Bär in der Tür mit einer Wickelunterlage",
     cast: ["bear", "baby", "bigBear"],
@@ -507,6 +527,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-64
   {
     id: "socks",
+    made: "first",
     place:
       "Draußen nach dem Regen: ein Weg mit einer tiefen Pfütze, nasses Gras, eine leere Holzbank am Rand; der kleine Bär in gelben Gummistiefeln, der Fuchs daneben",
     cast: ["bear", "fox"],
@@ -528,6 +549,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-65
   {
     id: "lick",
+    made: "first",
     place: "Ein Weg im Park mit Gras und Bäumen: ein kleiner, freundlicher Hund an der Leine einer Füchsin, ein Stock auf dem Weg, der kleine Bär",
     cast: [
       "bear",
@@ -552,6 +574,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-67
   {
     id: "paintbrush",
+    made: "first",
     place:
       "Zu Hause am Esstisch: der kleine Bär vor seinem Bild, das Bärenbaby im Hochstuhl mit seinem eigenen Blatt und dem Pinsel des Bären, ein Malkasten, ein Becher mit Farbwasser, ein paar Buntstifte; dahinter ein Sofa mit einem Kissen",
     cast: ["bear", "baby"],
@@ -573,6 +596,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-69
   {
     id: "bluecup",
+    made: "first",
     place:
       "Küche am Morgen: Frühstückstisch mit einem roten Becher voll Milch, einer Schüssel Haferbrei und einem Löffel; ein leerer blauer Becher an der Spüle; der große Bär mit dem Milchkrug",
     cast: ["bear", "bigBear"],
@@ -594,6 +618,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-70
   {
     id: "nap",
+    made: "first",
     place:
       "Schlafraum im Kindergarten am Mittag: drei Matten mit Decken, Vorhänge zu, gedämpftes Licht; der Fuchs und der Igel schlafen, der kleine Bär liegt wach mit seinem Kuschelhasen, die Erzieherin sitzt leise auf einem Stuhl an der Tür",
     cast: ["bear", "fox", "hedgehog", "teacher"],
@@ -615,6 +640,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-71
   {
     id: "teeth",
+    made: "first",
     place:
       "Badezimmer am Abend: Waschbecken mit Spiegel und einem kleinen Tritthocker davor, auf dem Beckenrand ein Zahnputzbecher und eine kleine Sanduhr; der große Bär hält die Zahnbürste mit Zahnpasta, der kleine Bär im Schlafanzug",
     cast: ["bear", "bigBear"],
@@ -636,6 +662,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-72
   {
     id: "bedtime",
+    made: "first",
     place:
       "Wohnzimmer am Abend: eine Holzeisenbahn mit Schienen und einem Tunnel auf dem Teppich, ein niedriges Regal mit ein paar Bilderbüchern, ein Sofa; der große Bär mit einem grünen Bilderbuch, der kleine Bär im Schlafanzug",
     cast: ["bear", "bigBear"],
