@@ -318,6 +318,9 @@ In a fresh worktree run `bun install` first.
   own picture in its medallion, `trophyPictures.ts`), drawn still, coming in once slowly – never shining, sparkling or
   bouncing. The newest stand at the right of the lowest board of picture books, books and trophies together in the
   middle (`TrophyShelf`), and one tap there opens all of them by game; before the first one nothing stands there.
+  A game may give it before its end where reaching the goal once is enough (Kettenreaktion: one ball in the goal,
+  `onGoal`). „🏆 Alle Pokale im Regal ansehen“ at the top of `/management/` opens the shelf on `/?pokale=alle` with every
+  trophy there is, for a look without playing – nothing stored (`everyTrophy`).
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
   some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
   Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.

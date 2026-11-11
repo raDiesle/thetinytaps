@@ -32,13 +32,24 @@ const HANDLES = ["loops", "rings", "none"] as const;
 const LIDS = ["open", "ball", "star"] as const;
 const FEET = ["block", "steps", "round"] as const;
 
+/**
+ * Games whose trophy holds what reached the goal: Kettenreaktion's has the ball lying in its open cup (user decision,
+ * November 2026: one ball in the goal wins it), so it is always a cup, never the star.
+ */
+const BALL_GAMES = new Set(["/kettenreaktion/"]);
+
+/** The colours of the ball lying in a trophy, the marble run's. */
+const BALL_COLORS = ["#e2483d", "#f2c230", "#3f86d8", "#3fae5a", "#9a5bc7"];
+
 /** What makes a trophy look like no other: its metal, the cup's form (or a star), its handles, its lid and its foot. */
 export interface TrophyLook {
   metal: number;
   form: (typeof FORMS)[number];
   handles: (typeof HANDLES)[number];
-  lid: (typeof LIDS)[number];
+  lid: (typeof LIDS)[number] | "ball-in";
   foot: (typeof FEET)[number];
+  /** The colour of the ball lying in the cup, for a game whose trophy holds one (`BALL_GAMES`). */
+  ball?: string;
 }
 
 /** A small, stable hash of a text (FNV-1a), so a level's trophy looks the same on every visit. */
@@ -52,12 +63,15 @@ function hash(text: string) {
 export function trophyLook(game: string, level: string): TrophyLook {
   const h = hash(trophyKey(game, level));
   const order = gameOrder(game);
+  const ball = BALL_GAMES.has(game);
+  const form = FORMS[h % FORMS.length];
   return {
     metal: (order >= 0 ? order : hash(game)) % METALS.length,
-    form: FORMS[h % FORMS.length],
+    form: ball && form === "star" ? "round" : form,
     handles: HANDLES[Math.floor(h / 4) % HANDLES.length],
-    lid: LIDS[Math.floor(h / 12) % LIDS.length],
+    lid: ball ? "ball-in" : LIDS[Math.floor(h / 12) % LIDS.length],
     foot: FEET[Math.floor(h / 36) % FEET.length],
+    ...(ball && { ball: BALL_COLORS[Math.floor(h / 108) % BALL_COLORS.length] }),
   };
 }
 
@@ -142,7 +156,9 @@ export function Trophy({ game, level, className, label }: { game: string; level:
             strokeLinecap="round"
           />
           <ellipse cx="50" cy={cup.rim} rx={cup.rx} ry={cup.rx / 6} fill={metal.light} stroke={INK} strokeWidth="1.6" />
-          {look.lid === "open" ? (
+          {look.lid === "ball-in" ? (
+            <BallIn rim={cup.rim} rx={cup.rx} color={look.ball ?? BALL_COLORS[0]} metal={metal} uid={uid} />
+          ) : look.lid === "open" ? (
             <ellipse cx="50" cy={cup.rim + 0.6} rx={cup.rx - 3.5} ry={cup.rx / 6 - 1.6} fill={metal.dark} />
           ) : (
             <>
@@ -173,6 +189,37 @@ export function Trophy({ game, level, className, label }: { game: string; level:
       )}
       <circle cx={mx} cy={my} r={mr} fill="none" stroke={metal.light} strokeWidth="1" />
     </svg>
+  );
+}
+
+/**
+ * The ball that reached the goal, lying in the cup's opening: the opening dark behind it, the ball sunk a little into
+ * it, and the rim's front edge drawn again over its bottom, so it lies in the cup rather than on it.
+ */
+function BallIn({ rim, rx, color, metal, uid }: { rim: number; rx: number; color: string; metal: Metal; uid: string }) {
+  const ry = rx / 6;
+  const r = 11;
+  const cy = rim - 3;
+  return (
+    <>
+      <defs>
+        <radialGradient id={`${uid}b`} cx="0.36" cy="0.32" r="0.75">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.9" />
+          <stop offset="0.22" stopColor={color} />
+          <stop offset="1" stopColor={color} stopOpacity="0.75" />
+        </radialGradient>
+        <clipPath id={`${uid}o`}>
+          {/* Everything above the rim's front edge: the ball's part below it lies inside the cup. */}
+          <path d={`M0 0 H100 V${rim} H${50 + rx} A${rx} ${ry} 0 0 1 ${50 - rx} ${rim} H0 Z`} />
+        </clipPath>
+      </defs>
+      <ellipse cx="50" cy={rim + 0.6} rx={rx - 3.5} ry={ry - 1.6} fill={metal.dark} />
+      <g clipPath={`url(#${uid}o)`}>
+        <circle cx="50" cy={cy} r={r} fill={color} />
+        <circle cx="50" cy={cy} r={r} fill={`url(#${uid}b)`} stroke={INK} strokeWidth="1.4" />
+      </g>
+      <path d={`M${50 - rx} ${rim} A${rx} ${ry} 0 0 0 ${50 + rx} ${rim}`} fill="none" stroke={INK} strokeWidth="1.6" />
+    </>
   );
 }
 

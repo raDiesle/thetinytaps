@@ -3,14 +3,13 @@ import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
 import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomOffline, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
-import { TrophyShelf, trophyRow } from "@/components/TrophyShelf";
+import { TrophyShelf, trophyRow, useShelfTrophies } from "@/components/TrophyShelf";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
-import { useTrophies } from "@/lib/trophies";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
@@ -525,7 +524,7 @@ function Compartment({
   children?: ReactNode;
 }) {
   const t = useT();
-  const won = useTrophies().length;
+  const won = useShelfTrophies().length;
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
   const back = (layout.bookHeight * DEPTH) / EYE / 2;

@@ -269,7 +269,7 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * The same run comes in other worlds too (K-18, `look`): snow, space, a water
  * slide and a building site, each with its own wall, things and end.
  */
-function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: TrackTheme }) {
+function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & { look: TrackTheme }) {
   const label = useLevelName(look.level);
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
@@ -453,6 +453,8 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   };
 
   const land = (m: Marble, t: number) => {
+    // The first thing in the basket or a tube wins the level's trophy.
+    if (landed.current.length === 0) onGoal?.();
     if (look.sort) {
       landInTube(m, t, look.sort);
       return;

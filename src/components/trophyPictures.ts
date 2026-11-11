@@ -1,4 +1,5 @@
-import { bookIdOf } from "@/content/games";
+import { bookIdOf, CATEGORIES } from "@/content/games";
+import type { TrophyWon } from "@/lib/trophies";
 import adventure from "../games/adventure/vorschau/*.webp?glob";
 import elevator from "../games/elevator/vorschau/*.webp?glob";
 import feelings from "../games/feelings/vorschau/*.webp?glob";
@@ -27,4 +28,18 @@ const LEVELS: Record<string, Record<string, string>> = {
 export function trophyPicture(game: string, level: string): string | undefined {
   const id = bookIdOf(game);
   return (level ? LEVELS[game]?.[`${level}.webp`] : undefined) ?? books[`${id}.webp`] ?? shelfPictures[`spine-${id}.webp`];
+}
+
+/**
+ * A trophy for every level that has a picture, and one for every other finished game: what the shelf shows on
+ * `/?pokale=alle`, so grown-ups can look at all of them without playing (the link on /management/). Never stored.
+ * „Wie geht's dir?“ borrows Gefühle's pictures, so it gets its one trophy only.
+ */
+export function everyTrophy(): TrophyWon[] {
+  return CATEGORIES.flatMap((category) => category.games)
+    .filter((game) => !game.unfinished)
+    .flatMap((game) => {
+      const levels = game.href === "/wie-gehts-dir/" ? [] : Object.keys(LEVELS[game.href] ?? {}).map((file) => file.replace(/\.webp$/, ""));
+      return (levels.length ? levels : [""]).map((level, i) => ({ game: game.href, level, at: i }));
+    });
 }

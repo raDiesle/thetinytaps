@@ -27,6 +27,8 @@ import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
 import { DEV } from "@/lib/buildInfo";
+import { useLocation } from "react-router";
+import { awardTrophy, gameOfPath } from "@/lib/trophies";
 
 /** The levels in turn (names and first lines in `content.ts`). */
 const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
@@ -121,6 +123,12 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     );
   }, [sound, level.id]);
 
+  // One ball in the goal is enough for the level's trophy (user decision, November 2026); the end shows it beside its buttons.
+  const game = gameOfPath(useLocation().pathname)?.href;
+  const onGoal = useCallback(() => {
+    if (game) awardTrophy(game, level.id);
+  }, [game, level.id]);
+
   const startLevel = (nextIndex: number) => {
     setEnded(false);
     setIndex(nextIndex);
@@ -141,7 +149,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
-      <level.Level key={round} sound={sound} say={say} onDone={onDone} watch={settings.play === "watch"} />
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
       {ended && <GameEnd level={level.id} onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <FeedbackLayer effects={effects} />
     </div>

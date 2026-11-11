@@ -1,6 +1,8 @@
-import type { CSSProperties } from "react";
+import { type CSSProperties, useMemo } from "react";
+import { useLocation } from "react-router";
 import { MenuButton } from "@/components/HomeOptions";
 import { Trophy } from "@/components/Trophy";
+import { everyTrophy } from "@/components/trophyPictures";
 import { useT } from "@/lib/language";
 import { gameOf, gameOrder, type TrophyWon, useTrophies } from "@/lib/trophies";
 
@@ -10,6 +12,16 @@ import { gameOf, gameOrder, type TrophyWon, useTrophies } from "@/lib/trophies";
  * only filling the shelf there. As many as fit stand there, the newest; one tap opens them all, by game (TrophyCabinet).
  * Before the first trophy nothing stands there: the books spine out fill the end as before.
  */
+
+/** The address's question that shows every trophy there is instead of those won (the test link on /management/). */
+export const ALL_TROPHIES = "pokale=alle";
+
+/** The trophies the shelf shows: those won, or on `/?pokale=alle` every one there is, for a look at all of them. */
+export function useShelfTrophies(): TrophyWon[] {
+  const won = useTrophies();
+  const all = new URLSearchParams(useLocation().search).has("pokale", "alle");
+  return useMemo(() => (all ? everyTrophy() : won), [all, won]);
+}
 
 /** A trophy's height on the shelf, in picture books' heights. */
 export const SHELF_TROPHY = 0.5;
@@ -29,7 +41,7 @@ export function trophyRow(room: number, bh: number, won: number) {
 /** The newest trophies standing on the board, `count` of them; a tap opens all of them. */
 export function TrophyShelf({ count, bh }: { count: number; bh: number }) {
   const t = useT();
-  const won = useTrophies();
+  const won = useShelfTrophies();
   if (count <= 0 || won.length === 0) return null;
   const label = t({ de: "Pokale" });
   const style = { "--trophy-h": `${SHELF_TROPHY * bh}px`, "--trophy-gap": `${TROPHY_GAP * bh}px` } as CSSProperties;
