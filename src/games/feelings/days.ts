@@ -164,6 +164,87 @@ export const DAYS: Day[] = [
     ],
     end: "Zu Hause erzählt der kleine Bär, wie hoch er geklettert ist. Dann schläft er ein. Gute Nacht! Der Tag ist vorbei.",
   },
+  {
+    // Tag 9 to Tag 15 tell the everyday scenes of alltag.ts (ideas C-37 to C-72); German only until translated.
+    id: "tag-9",
+    emoji: "🌅",
+    scenes: [
+      page(9, 1, "alltag-morning", "Guten Morgen! Draußen wird es hell. Der kleine Bär wacht auf. Heute ist Kindergarten.", 1),
+      page(9, 2, "alltag-bluecup", "Danach tapst der kleine Bär in die Küche. Der große Bär deckt den Tisch."),
+      page(9, 3, "alltag-sticky", "Dann bringt der große Bär den kleinen Bären in den Kindergarten. Dort malt der Fuchs schon am Tisch."),
+      page(9, 4, "alltag-accident", "Nach dem Malen baut der Fuchs im Spielzimmer einen hohen Turm."),
+      page(9, 5, "alltag-nap", "Nach dem Mittagessen legen sich alle zum Mittagsschlaf hin. Der Fuchs und der Igel schlafen schnell ein.", 1),
+      page(9, 6, "alltag-pickup", "Nach dem Schlafen spielen alle im Spielzimmer. Bald kommen die Großen zum Abholen."),
+    ],
+    end: "Zu Hause erzählt der kleine Bär vom Kindergarten. Dann schläft er ein. Gute Nacht! Der Tag ist vorbei.",
+  },
+  {
+    id: "tag-10",
+    emoji: "🎨",
+    scenes: [
+      page(10, 1, "alltag-myself", "Guten Morgen! Der kleine Bär und der große Bär frühstücken zusammen.", 1),
+      page(10, 2, "alltag-laughed", "Nach dem Frühstück geht es los. Am Maltisch sitzen schon der Hase und der Waschbär."),
+      page(10, 3, "alltag-hit", "Später spielen alle draußen im Sandkasten."),
+      page(10, 4, "alltag-worn", "Am Nachmittag holt der große Bär ihn ab. Der Tag war lang."),
+      page(10, 5, "alltag-teeth", "Nach dem Abendessen ist Zeit fürs Zähneputzen. Ab ins Badezimmer!"),
+    ],
+    end: "Mit sauberen Zähnen kuschelt sich der kleine Bär ins Bett. Gute Nacht! Der Tag ist vorbei.",
+  },
+  {
+    id: "tag-11",
+    emoji: "✂️",
+    scenes: [
+      page(11, 1, "alltag-barber", "Guten Morgen! Die Haare vom kleinen Bären sind ganz lang. Darum geht es heute zum Friseur.", 1),
+      page(11, 2, "alltag-supermarket", "Danach gehen sie einkaufen. Der kleine Bär trägt seinen Kuschelhasen."),
+      page(11, 3, "alltag-envy", "Am Nachmittag fährt der kleine Bär draußen Roller. Da kommt der Fuchs."),
+      page(11, 4, "alltag-pointing", "Danach hat der kleine Bär großen Hunger. Der große Bär macht den Kühlschrank auf."),
+      page(11, 5, "alltag-bedtime", "Am Abend spielt der kleine Bär im Schlafanzug mit seiner Eisenbahn.", 1),
+    ],
+    end: "Nach der Geschichte schläft der kleine Bär ein. Gute Nacht! Der Tag ist vorbei.",
+  },
+  {
+    id: "tag-12",
+    emoji: "🦋",
+    scenes: [
+      page(12, 1, "alltag-race", "Guten Morgen! Heute kommt der Fuchs zum Spielen in den Garten."),
+      page(12, 2, "alltag-butterfly", "Danach gießen der kleine Bär und der Fuchs die Blumen."),
+      page(12, 3, "alltag-farewell", "Am Abend klingelt es an der Tür. Das ist der Papa vom Fuchs.", 1),
+      page(12, 4, "alltag-excited", "Danach packt der kleine Bär seinen Koffer. Morgen geht es ans Meer!", 1),
+    ],
+    end: "Endlich schläft der kleine Bär. Morgen geht es ans Meer. Gute Nacht! Der Tag ist vorbei.",
+  },
+  {
+    id: "tag-13",
+    emoji: "🌊",
+    scenes: [
+      page(13, 1, "alltag-car", "Guten Morgen! Heute fahren alle zu Oma Bär. Sie wohnt am Meer.", 1),
+      page(13, 2, "alltag-bee", "Bei Oma Bär scheint die Sonne. Der kleine Bär und der große Bär machen Picknick auf der Wiese.", 1),
+      page(13, 3, "alltag-homesick", "Am Abend fährt der große Bär mit dem Baby nach Hause. Der kleine Bär schläft heute zum ersten Mal bei Oma.", 1),
+    ],
+    end: "Oma Bär deckt ihn gut zu. Morgen bauen sie Sandburgen am Meer. Gute Nacht! Der Tag ist vorbei.",
+  },
+  {
+    id: "tag-14",
+    emoji: "🤧",
+    scenes: [
+      page(14, 1, "alltag-sick", "Guten Morgen! Der kleine Bär hat Schnupfen. Heute bleibt er zu Hause."),
+      page(14, 2, "alltag-phone", "Am Vormittag geht es ihm schon besser. Er malt ein Bild für den großen Bären."),
+      page(14, 3, "alltag-puzzle", "Nach dem Mittagessen holt der kleine Bär sein Puzzle mit den Bauernhoftieren.", 1),
+      page(14, 4, "alltag-nappy", "Danach spielt der kleine Bär mit seinem roten Auto. Das Baby krabbelt zu ihm.", 1),
+      page(14, 5, "alltag-paintbrush", "Am Abend malt der kleine Bär am Tisch. Das Baby will auch malen.", 1),
+    ],
+    end: "Der Schnupfen ist fast weg. Der kleine Bär schläft tief und fest. Gute Nacht! Der Tag ist vorbei.",
+  },
+  {
+    id: "tag-15",
+    emoji: "☔",
+    scenes: [
+      page(15, 1, "alltag-socks", "Guten Morgen! Es hat die ganze Nacht geregnet. Der kleine Bär und der Fuchs gehen draußen spazieren.", 1),
+      page(15, 2, "alltag-lick", "Auf dem Heimweg geht der kleine Bär durch den Park. Da kommt eine Füchsin mit einem kleinen Hund.", 1),
+      page(15, 3, "alltag-bath", "Am Abend kommt der Fuchs zu Besuch. Beide sind ganz schmutzig vom Regen. Ab in die Badewanne!", 1),
+    ],
+    end: "Danach wird der Fuchs abgeholt. Frisch gebadet schläft der kleine Bär ein. Gute Nacht! Der Tag ist vorbei.",
+  },
 ];
 
 /** The day's name on its card and under „Weiter“: „Tag 1“, „Tag 2“ … */

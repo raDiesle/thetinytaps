@@ -23,6 +23,7 @@ import type { Station, Way } from "@/games/elevator/trail/types";
 import { FEELINGS } from "@/games/feelings/bear";
 import { DAYS } from "@/games/feelings/days";
 import { SITUATIONS } from "@/games/feelings/kita";
+import { ALLTAG_SITUATIONS } from "@/games/feelings/alltag";
 import { SELF_SITUATIONS } from "@/games/feelings/selbst";
 import { comfortsIn, dayIn, feelingIn, situationIn } from "@/games/feelings/localized";
 import { MOOD_SAID } from "@/games/feelings/mood";
@@ -368,6 +369,7 @@ function feelings(language: TargetLanguageId): VoiceGroup[] {
   const feelings = FEELINGS.map((f) => feelingIn(f, language));
   const situations = SITUATIONS.map((s) => situationIn(s, language));
   const selfSituations = SELF_SITUATIONS.map((s) => situationIn(s, language));
+  const everyday = ALLTAG_SITUATIONS.map((s) => situationIn(s, language));
   const days = DAYS.map((d) => dayIn(d, language));
   return [
     // „Wie geht's dir?“ and „Was brauche ich?“ are games of their own in the book, but share this game's recordings
@@ -387,6 +389,9 @@ function feelings(language: TargetLanguageId): VoiceGroup[] {
     },
     { label: "Mehr Gefühle: Fragen", lines: once(selfSituations.flatMap((s) => s.steps.map((st) => st.question))) },
     { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(selfSituations.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
+    { label: "Neue Szenen: Geschichte", lines: once(everyday.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))) },
+    { label: "Neue Szenen: Fragen", lines: once(everyday.flatMap((s) => s.steps.map((st) => st.question))) },
+    { label: "Neue Szenen: nicht so gute Ideen", lines: once(everyday.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
     { label: "Lob", lines: once(pick(FEELINGS_PRAISE, language)) },
     { label: "Tagesgeschichten", lines: once(days.flatMap((d) => [...d.scenes.map((s) => s.before.text), d.end])) },
   ];
