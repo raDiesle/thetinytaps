@@ -223,8 +223,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🌻 Unser Garten wächst",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (10. November 2026), Titel und Sätze übersetzt auf Wunsch am 11. November 2026, in keiner Sprache aufgenommen: bis dahin liest die Stimme des Browsers.",
+        languages: { de: "text", en: "done", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Neu (10. November 2026), Titel und Sätze übersetzt auf Wunsch am 11. November 2026. Englisch von ElevenLabs gesprochen am 11. November 2026 mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“, die Credits des ersten waren aufgebraucht); die anderen Sprachen noch nicht aufgenommen: bis dahin liest die Stimme des Browsers.",
       },
     ],
   },
@@ -319,8 +319,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Grundbedürfnisse: Aufs Töpfchen, Warm anziehen, Ein Pflaster, Frische Luft",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, Bilder gemacht, übersetzt auf Wunsch am 10. November 2026. Aufnahmen fehlen noch in allen Sprachen (bis dahin still).",
+        languages: { de: "text", en: "done", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, Bilder gemacht, übersetzt auf Wunsch am 10. November 2026. Englisch von ElevenLabs gesprochen am 11. November 2026 mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“); die anderen Sprachen fehlen noch (bis dahin still).",
       },
     ],
   },

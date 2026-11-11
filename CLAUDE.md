@@ -64,6 +64,13 @@ In a fresh worktree run `bun install` first.
   and charged by the service while its answer never came, and the line had to be bought again; so the voice script
   never sends an unanswered request again (`ANSWER_LIMIT_MS`) and keeps the Mac awake while it runs. When the user wants
   to stop for the night, say how long the run still takes and let it end first.
+  Tapsi's voice (`stimme.json`) was made with Voice Design and lives only in the first ElevenLabs account and its
+  workspace: no other account's key can use it, and it can't be shared there (November 2026: hours went into looking for
+  it under a second key). While the first account's credits are spent, the second account (`ELEVENLABS_API_KEY_2` in
+  `~/.zshrc`, used as `ELEVENLABS_API_KEY="$ELEVENLABS_API_KEY_2" bun run voice …`) records with its clone „Tapsi Coach
+  (Klon)“ (`--voice iGb9o2uzfokG3rIleRfg`, made by `bun run voice clone`); check a key's account first
+  (`bun run voice credits`: Creator is the first, Starter the second). The clone sounds close, not the same: use it for
+  whole parts or languages, never a few lines among the original's, and say so in `languageStatus.ts`.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
