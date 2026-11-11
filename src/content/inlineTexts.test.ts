@@ -3,9 +3,10 @@ import { describe, expect, test } from "bun:test";
 import { APP_LANGUAGES } from "@/lib/language";
 import { LANGUAGE_STATUS, type LanguageStatusRow } from "./ideas";
 
-// The inline texts (`t({ de: "…", en: "…" })`) against the language status on the management page: where a game's
-// row says a language is there, every inline text of the game has it. So the table can't claim more than the code
-// has, and a text written German-only into a translated game shows up as a gap to mark there. Recorded parts (sung
+// The inline texts (`t({ en: "…", de: "…" })`, the older ones German first) against the language status on the
+// management page: where a game's row says a language is there, German included, every inline text of the game has
+// it. So the table can't claim more than the code has, and a text written English-only (or, before November 2026,
+// German-only) into a translated game shows up as a gap to mark there. Recorded parts (sung
 // songs, Tapsi's voice) are left out: their state is about recordings, not inline texts.
 
 /** The source folders of each row of the language status; the home page row has the shared screens and menus. */
@@ -35,11 +36,13 @@ const FOLDERS: Record<string, string[]> = {
   "/zaehlen/": [],
   "/mitmachen/": ["src/games/letters/MovePlay.tsx", "src/games/letters/names.ts"],
   "/woerter/": ["src/games/letters/WordsPlay.tsx", "src/games/letters/FindPlay.tsx"],
+  "/gross-klein/": ["src/games/letters/CasePlay.tsx"],
   "/zaehne/": ["src/games/teeth"],
   "/toepfchen/": ["src/games/potty"],
   "/timer/": ["src/games/timer"],
   "/belohnungstafel/": ["src/games/rewards"],
   "/schnullerfee/": ["src/games/pacifierstory"],
+  "/kita/": ["src/games/kitastory"],
   "/abstillen/": ["src/games/milkchain"],
   "/": ["src/components", "src/pages", "src/lib", "src/content/games.ts"],
 };
@@ -59,20 +62,21 @@ function sources(path: string): string[] {
     .filter((f) => !GERMAN_ONLY.test(f) && !OWN_FILES.has(f));
 }
 
-/** A literal text (or a function building one, `de: (n) => …`) with a `de` key in a source file: where it starts and the keys next to it. */
+/** A literal text (or a function building one, `en: (n) => …`) with an `en` or `de` key in a source file: where it starts and the keys next to it. */
 interface InlineText {
   line: number;
-  german: string;
+  /** The start of its first text, to find it by. */
+  text: string;
   keys: string[];
 }
 
 /**
- * The object literals of `code` whose `de` is a string, a template literal or an arrow function, with their own keys. A small scanner
+ * The object literals of `code` whose `en` or `de` is a string, a template literal or an arrow function, with their own keys. A small scanner
  * rather than a parser: it skips strings, templates and comments, and counts `key:` at the top level of each `{}`.
  */
 function inlineTexts(code: string): InlineText[] {
   const found: InlineText[] = [];
-  const stack: { open: string; start: number; keys: string[]; german?: string }[] = [];
+  const stack: { open: string; start: number; keys: string[]; text?: string }[] = [];
   let word = "";
   let i = 0;
   /** The end of the string or template starting at `from`, nested `${…}` included. */
@@ -107,7 +111,7 @@ function inlineTexts(code: string): InlineText[] {
       i++;
     } else if ("}])".includes(c)) {
       const frame = stack.pop();
-      if (c === "}" && frame?.german !== undefined) found.push({ line: code.slice(0, frame.start).split("\n").length, german: frame.german, keys: frame.keys });
+      if (c === "}" && frame?.text !== undefined) found.push({ line: code.slice(0, frame.start).split("\n").length, text: frame.text, keys: frame.keys });
       word = "";
       i++;
     } else if (/[\w$]/.test(c)) {
@@ -118,7 +122,7 @@ function inlineTexts(code: string): InlineText[] {
       const frame = stack[stack.length - 1];
       frame.keys.push(word);
       const value = code.slice(i + 1).trimStart();
-      if (word === "de" && /^(["'`]|\([^()]*\)\s*=>|[\w$]+\s*=>)/.test(value)) frame.german = value.slice(0, 60);
+      if ((word === "de" || word === "en") && /^(["'`]|\([^()]*\)\s*=>|[\w$]+\s*=>)/.test(value)) frame.text ??= value.slice(0, 60);
       word = "";
       i++;
     } else {
@@ -148,23 +152,24 @@ describe("inline texts against the language status", () => {
   test("the scanner finds texts and their languages", () => {
     const found = inlineTexts(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: the sample is source code with a template literal in it
-      't({ de: `A ${b.c}`, en: "B" }); x = { de: "Hallo", ru: \'Привет\' }; y = { de: (n) => `${n}-mal`, en: (n) => n }; z = { de: n => n }; type L = { de: T };',
+      't({ de: `A ${b.c}`, en: "B" }); x = { de: "Hallo", ru: \'Привет\' }; y = { de: (n) => `${n}-mal`, en: (n) => n }; z = { de: n => n }; e = { en: "Hi", ru: "Привет" }; type L = { de: T };',
     );
-    expect(found.map((f) => [f.german.slice(0, 3), f.keys])).toEqual([
+    expect(found.map((f) => [f.text.slice(0, 3), f.keys])).toEqual([
       ["`A ", ["de", "en"]],
       ['"Ha', ["de", "ru"]],
       ["(n)", ["de", "en"]],
       ["n =", ["de"]],
+      ['"Hi', ["en", "ru"]],
     ]);
   });
 
   for (const row of LANGUAGE_STATUS)
     test(`${row.href}: a language marked as there is in every inline text`, () => {
-      const languages = APP_LANGUAGES.filter((language) => language !== "de" && textsDone(row, language));
+      const languages = APP_LANGUAGES.filter((language) => textsDone(row, language));
       const missing = FOLDERS[row.href].flatMap(sources).flatMap((file) =>
-        inlineTexts(readFileSync(file, "utf8")).flatMap(({ line, german, keys }) => {
+        inlineTexts(readFileSync(file, "utf8")).flatMap(({ line, text, keys }) => {
           const lacking = languages.filter((language) => !keys.includes(language));
-          return lacking.length ? [`${file}:${line} ${german} – ${lacking.join(", ")}`] : [];
+          return lacking.length ? [`${file}:${line} ${text} – ${lacking.join(", ")}`] : [];
         }),
       );
       expect(missing).toEqual([]);

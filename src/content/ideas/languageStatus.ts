@@ -82,6 +82,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
+    href: "/kita/",
+    note: "Das Buch „Kita-Start“ mit „Tapsi geht in die Kita“, einer Geschichte in Kapiteln (kitaStory.ts, 11. November 2026): nur Deutsch. Es fehlen Name, Satz fürs Regal (names.ts) und Kapitel und Sätze, als <Sprache>.ts im Ordner wie bei „Schnullerfee“. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.",
+    languages: { de: "done" },
+  },
+  {
     href: "/zaehne/",
     parts: [
       {
@@ -191,6 +196,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Hieß „Schranke und Weiche“ und gilt seit R-03 (3. November 2026) auch für die Stationen der Maschinen; der neue Name übersetzt am 5. November 2026.",
       },
+      {
+        label: "🎨 Farbenbahn",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu seit K-10 (11. November 2026): Name, erster Satz, „Eine rote!“ bis „Fünf blaue!“ und „Die Röhre ist voll!“ nur auf Deutsch und noch nicht gesprochen; bis dahin zählen nur die Töne.",
+      },
     ],
   },
   {
@@ -267,15 +278,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "24 Geschichten in selbst.ts – enttäuscht, eifersüchtig, Ekel, peinlich, aufgeregt und 19 weitere vom Spielplatz bis zum lauten Knall –, alle auf Deutsch von ElevenLabs gesprochen und übersetzt in kita.<Sprache>.ts (3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Am 4. November 2026 geändert und am 5. November 2026 übersetzt, auf Deutsch noch nicht aufgenommen: beim lauten Knall der dritte Schritt („Mit dem Fuchs Kuchen essen“) und das Ende, bei „Stolz, ganz oben“ der erste Schritt („„Komm doch auch hoch!“ rufen“) und das Ende, bei der Langeweile am Regentag der erste Schritt („Mit dem Fuchs Kochen spielen“) und das Ende, in „Traurig, Kuschelhase weg“ der „Kuschelhase“ des Bären und der „Kuschelhund“ des Fuchses.",
       },
       {
+        label: "Neue Szenen",
+        recorded: true,
+        languages: { de: "text" },
+        note: "31 Szenen aus den Ideen C-37 bis C-72 (alltag.ts, 11. November 2026), vom Puzzle, das nicht passt, bis „Noch nicht ins Bett!“, und die Seiten der Geschichte von Tag 9 bis Tag 15 (days.ts): nur Deutsch, noch nicht gesprochen und noch nicht übersetzt (kita.<Sprache>.ts, days.<Sprache>.ts). Ihre Bilder warten in der Bilder-Queue; bis sie gemacht sind, zeigt die gebaute Seite die Szenen nicht.",
+      },
+      {
         label: "Buch und Gruppen",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts), die acht Gruppen (groups.ts), „Stimme ausschalten“ / „Stimme einschalten“ des Lautsprechers (VoiceSwitch.tsx) (der Knopf „Text zum Vorlesen“, ReadAlong.tsx, wurde im November 2026 entfernt: der Text steht jetzt unter den Bildern); der Text selbst kommt aus den Szenen in ihrer Sprache.",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Die neunte Gruppe „Frust & Warten“ (groups.ts, 11. November 2026) gibt es nur auf Deutsch; sie zeigt erst neue Szenen, deren Bilder noch fehlen. Neu (4. November 2026), übersetzt am 5. November 2026: die Namen „Alltagssituationen“ und die Zeile von „Wie geht's dir?“ (names.ts), die acht Gruppen (groups.ts), „Stimme ausschalten“ / „Stimme einschalten“ des Lautsprechers (VoiceSwitch.tsx) (der Knopf „Text zum Vorlesen“, ReadAlong.tsx, wurde im November 2026 entfernt: der Text steht jetzt unter den Bildern); der Text selbst kommt aus den Szenen in ihrer Sprache.",
       },
       {
         label: "Tagesgeschichten",
         recorded: true,
-        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
-        note: "Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026): die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
+        languages: { de: "text", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Tag 9 bis Tag 15 (11. November 2026, mit den neuen Szenen) gibt es nur auf Deutsch, noch nicht gesprochen. Neu (4. November 2026), übersetzt am 5. November 2026 (days.<Sprache>.ts), außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026): die acht Tage mit ihren Seiten der Geschichte zwischen den Szenen und ihrem Ende (days.ts), die Namen „Tag 1“ … und die Zeile „Geschichten“ mit „📅 Tage“ / „😊 Nach Gefühlen“ (FeelingsGame.tsx).",
       },
     ],
   },
@@ -341,9 +358,20 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/tiere/",
-    recorded: true,
-    languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
-    note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Auch alles, was am 7. November 2026 dazukam (die neuen Tiere, Zuhause, Futter, Geschenke und Entwicklungen aus GERMAN_ONLY in content.ts), am selben Tag übersetzt; die deutschen Sätze dazu sind noch nicht aufgenommen; „Wer schaut da raus?“ ist zu „Erkennen“ (Schatten finden) umgezogen. Seit 7. November 2026 (Z-24) fragt die Stimme beim Füttern nach „… hat Hunger!“ auch „Was isst der Hase gern?“ (am 7. November 2026 übersetzt) und sagt beim Wechsel der Art der Runde deren Frage („Was esse ich?“). Auf Deutsch fehlen noch 390 Sätze (alles vom 7. November 2026), bis dahin still.",
+    parts: [
+      {
+        label: "Füttern, Was gibt uns das Tier?, Wer wohnt wo?, Was wird aus mir?",
+        recorded: true,
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Alle Spielarten, auch „Was gibt uns das Tier?“ und „Was wird aus mir?“ (Wörter und Sätze in content.<Sprache>.ts), die Fragen in der Sprechblase und die Einstellungen hinter ⚙️ (übersetzt am 3. November 2026). Was gesagt wird, ist auf Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Auch alles, was am 7. November 2026 dazukam (die neuen Tiere, Zuhause, Futter, Geschenke und Entwicklungen aus GERMAN_ONLY in content.ts), am selben Tag übersetzt; die deutschen Sätze dazu sind noch nicht aufgenommen; „Wer schaut da raus?“ ist zu „Erkennen“ (Schatten finden) umgezogen. Seit 7. November 2026 (Z-24) fragt die Stimme beim Füttern nach „… hat Hunger!“ auch „Was isst der Hase gern?“ (am 7. November 2026 übersetzt) und sagt beim Wechsel der Art der Runde deren Frage („Was esse ich?“). Auf Deutsch fehlen noch 390 Sätze (alles vom 7. November 2026), bis dahin still.",
+      },
+      {
+        label: "🔊 Wer macht das Geräusch? (Z-15) und „Was drankommt“ oben rechts",
+        recorded: true,
+        languages: { de: "text" },
+        note: "Neu am 11. November 2026, nur Deutsch: der Name der Art, ihre Frage, „Hör mal! Wer ist hinter dem Vorhang?“ und die neuen Tiere Hahn, Taube, Truthahn, Pfau, Mücke und Schlange (GERMAN_ONLY in content.ts). „Da ist ja …“ und „Das ist …“ sind die Sätze von „Wer schaut da raus?“. Die Wahl „Was drankommt“ ist übersetzt; ihre Liste stand vorher hinter ⚙️, die „Schwierigkeit“ ist weg.",
+      },
+    ],
   },
   {
     href: "/zusammen/",
@@ -421,6 +449,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Ein Spiel für sich seit November 2026 (vorher eine Spielart von „Buchstaben & Zahlen“), mit „Wo ist das B?“; Wörter aus den Sprachpaketen wie bei „Frei tippen“. Deutsch von ElevenLabs gesprochen, die anderen Sprachen außer Russisch am 7./8. November 2026; Russisch fehlt noch. Die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026.",
   },
   {
+    href: "/gross-klein/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", es: "partial", ru: "partial" },
+    note: "Neu (November 2026, L-23), noch „in Bearbeitung“. Nur Deutsch: der Name „Wo ist das kleine b?“, die Zeile im Inhaltsverzeichnis und die Frage „Wo ist das kleine …?“ (noch nicht aufgenommen, bis dahin still). Der Name des gefundenen Buchstabens und das Lob kommen aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache. Hindi und Arabisch haben keine Groß- und Kleinbuchstaben: dort spielt es auf Englisch (Deutsch, solange das englische Paket nicht geladen ist).",
+  },
+  {
     href: "/",
     parts: [
       {
@@ -432,6 +466,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "📱 Hinweis „Bitte quer halten“",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Der Satz unter „Bitte quer halten“ (was die Seite bietet und warum quer, 10. November 2026) übersetzt auf Wunsch am 11. November 2026, wie Titel, „Vollbild“ und „Trotzdem hochkant“.",
+      },
+      {
+        label: "🏆 Pokale",
+        languages: { de: "done" },
+        note: "Die Pokale im Regal (TrophyShelf.tsx, 11. November 2026): nur das Wort „Pokale“ (vorgelesen und über dem Schrank mit allen Pokalen) wartet auf seine Übersetzung; die Namen der Spiele darin sind schon übersetzt.",
       },
     ],
   },

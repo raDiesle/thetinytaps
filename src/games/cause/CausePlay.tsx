@@ -61,7 +61,7 @@ export function CausePlay() {
       progress={{ total: scenes.length, done: now.index }}
       onFound={found}
       onDone={last ? undefined : () => go(now.pass, now.index + 1)}
-      ending={last ? <GameEnd inline onAgain={again} next={{ onNext: onward }} /> : undefined}
+      ending={last ? <GameEnd inline level={`runde-${now.pass + 1}`} onAgain={again} next={{ onNext: onward }} /> : undefined}
       onEndKey={last ? onward : () => go(now.pass, now.index + 1)}
       onPick={(index) => go(now.pass, index)}
       onBack={now.index > 0 ? () => go(now.pass, now.index - 1) : undefined}

@@ -246,5 +246,13 @@ export const rewardChartIdeas: IdeaArea = {
       effort: "S",
       rejected: true,
     },
+    {
+      id: "T-29",
+      emoji: "🎁",
+      title: "Sticker mit Patsch, volle Tafel öffnet die Geschenkbox",
+      text: "Ein Sticker wird mit einem leisen Patsch angedrückt, sonst nichts. Ist die Tafel voll, öffnet sich langsam die Geschenkbox mit der Belohnung – statt Herzen, Sterne und Noten aufsteigen zu lassen. Gehört zu A-30.",
+      why: "Die Freude gehört zur Belohnung selbst, nicht zu Formen drumherum.",
+      effort: "S",
+    },
   ],
 };

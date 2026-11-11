@@ -2,12 +2,6 @@ import { type Localized, useT } from "@/lib/language";
 import type { RoundKind } from "./levels";
 
 /**
- * The sign of each kind of round, before its name under ⚙️ (never while playing). Never something the child picks from
- * (no 🥕, no 🦋), or it would give the answer away or look like one more choice.
- */
-export const KIND_SIGNS: Record<RoundKind, string> = { feed: "🍽️", gift: "🎁", home: "🏠", grow: "🌱" };
-
-/**
  * The round's question, as the animal (or the small one) would ask it: shown under the picture, and said once by the
  * voice when the kind of round changes (Z-24, `AnimalsRounds`).
  */
@@ -32,6 +26,8 @@ export const KIND_QUESTIONS: Record<RoundKind, Localized> = {
     es: "¿En qué me convierto?",
     ar: "إلى ماذا أتحول؟",
   },
+  // German only until translations are asked for (languageStatus.ts).
+  sound: { de: "Wer macht das Geräusch?" },
 };
 
 /**

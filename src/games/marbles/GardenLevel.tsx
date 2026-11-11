@@ -44,7 +44,7 @@ import {
   type Garden,
 } from "./garden";
 import { beside, deg, lerp, seg, svgLine } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
 import { BAR_COLORS, Ball } from "./parts";
@@ -73,7 +73,7 @@ export function GardenLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={garden} level="garden" {...props}>
+    <MachineStage machine={garden} level="garden" start={{ x: BIRDHOUSE.x, y: BIRDHOUSE.doorY - 8, r: 84 }} {...props}>
       {(t) => (
         <>
           <Sky gradient={`${ids}-sky`} />
@@ -115,8 +115,6 @@ export function GardenLevel(props: LevelProps) {
           <Birds garden={garden} t={t} />
           <Butterfly garden={garden} t={t} />
           <Sparkles x={SUN.x} y={SUN.headY} age={t - garden.tBloom} n={12} spread={240} />
-
-          <TapHint t={t} x={BIRDHOUSE.x + 92} y={BIRDHOUSE.doorY + 96} />
         </>
       )}
     </MachineStage>

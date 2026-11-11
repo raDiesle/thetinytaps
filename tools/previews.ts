@@ -98,6 +98,8 @@ const keyOf = (file: string) => file.split("/").filter((part) => part !== "vorsc
 const CUTS: Record<string, { x: number; y: number; size: number }> = {
   // The clothesline with the pairs hung on it (`PLAYS`), not the floor.
   "components/socken": { x: 0.39, y: 0.2, size: 0.58 },
+  // The shelf with its red, yellow and blue marble, what the child picks from, rather than the run's empty middle.
+  "marbles/colortrack": { x: 0.28, y: 0.25, size: 0.5 },
 };
 
 /**
@@ -106,7 +108,7 @@ const CUTS: Record<string, { x: number; y: number; size: number }> = {
  * „A“, its monkey and „Affe“ whole and in the middle; Zählen's number and all its things; Mitmachen's number and the
  * fox hopping it; the animal with the right thing and a wrong one beside it).
  */
-const WHOLE = new Set(["components/buchstaben", "components/zaehlen", "components/mitmachen", "components/tiere"]);
+const WHOLE = new Set(["components/buchstaben", "components/zaehlen", "components/mitmachen", "components/gross-klein", "components/tiere"]);
 
 /**
  * A part of the window shown alone, by `keyOf`, in CSS pixels: cut out and set into a blurred copy of itself widened
@@ -200,7 +202,7 @@ const WAITS: Record<string, number> = {
  */
 const HIDE_OVERLAYS = `(() => {
   const style = document.createElement("style");
-  style.textContent = ".exit-corner, .play-options-corner, .play-fullscreen, .play-fullscreen-corner, .dev-tag, .sound-wait, .scene-prompt, .scene-keys, .scene-goal, .scene-keys-toggle, .adventure-controls, .run-space, .fg-words-text, .fg-day-text, .fg-caption, .fg-dots, .fg-go-on, .fg-next, .fg-back, .story-voice { visibility: hidden !important; }";
+  style.textContent = ".exit-corner, .play-options-corner, .play-fullscreen, .play-fullscreen-corner, .corner-choices, .dev-tag, .sound-wait, .scene-prompt, .scene-keys, .scene-goal, .scene-keys-toggle, .adventure-controls, .run-space, .fg-words-text, .fg-day-text, .fg-caption, .fg-dots, .fg-go-on, .fg-next, .fg-back, .story-voice { visibility: hidden !important; }";
   document.head.append(style);
   // Kleine Abenteuer's backpack and its button lie in an svg of their own over the trail.
   const hud = document.querySelector(".tl-bag")?.closest("svg");

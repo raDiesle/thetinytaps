@@ -33,7 +33,7 @@ import {
   type Machine,
 } from "./machine";
 import { beside, deg, seg } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { DARK_WOOD, Hopper, INK, MARBLE_COLOR, Picture, WallClock, Window, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
 import { BAR_COLORS, Ball, Rail } from "./parts";
@@ -53,7 +53,7 @@ export function MachineLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={machine} level="machine" {...props}>
+    <MachineStage machine={machine} level="machine" start={{ x: HOPPER.x, y: HOPPER.y - 22, r: 66 }} {...props}>
       {(t) => (
         <>
           <Room stripes={`${ids}-stripes`} />
@@ -81,8 +81,6 @@ export function MachineLevel(props: LevelProps) {
           <FunnelFront />
           <BucketFront drop={machine.bucketDrop(t)} />
           <Gate lift={machine.bucketDrop(t)} />
-
-          <TapHint t={t} x={HOPPER.x + 92} y={HOPPER.y + 96} />
         </>
       )}
     </MachineStage>

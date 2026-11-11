@@ -287,5 +287,13 @@ export const littleAdventuresIdeas: IdeaArea = {
       why: "Kinder wollen das Spannendste wiedersehen; das stärkt das Nacherzählen mit den Eltern.",
       effort: "M",
     },
+    {
+      id: "G-33",
+      emoji: "🏠",
+      title: "Ende eines Abenteuers: das Ziel antwortet",
+      text: "Am Ziel gehen die Fenster an und die Tür öffnet sich; beim Aufzug gehen die Türen auf, und die Leute auf dem Stockwerk winken einmal; ein Film endet mit „Ende“ wie auf der letzten Buchseite – statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
+      why: "Das Kind sieht, dass es angekommen ist, und das Ende erzählt die Geschichte weiter.",
+      effort: "S",
+    },
   ],
 };
