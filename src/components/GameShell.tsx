@@ -38,9 +38,16 @@ const LeaveGame = createContext<() => void>(() => {});
 /** The way back to the menu before the game, for a game that has a way out of its own (the Timer). */
 export const useLeaveGame = () => useContext(LeaveGame);
 
+/** Whether leaving the game closes its book and puts it back on the shelf (not back to a menu or a routine). */
+const LeavesToShelf = createContext(false);
+
+/** For `GameEnd`'s „Menü“ button: it shows the shelf only where that is where it leads. */
+export const useLeavesToShelf = () => useContext(LeavesToShelf);
+
 /**
  * Tells GameShell whether the end of a level (`GameEnd`) is on screen: then the corner in the top left is the way back,
- * with one tap – the ribbon onto the shelf where the game goes back there – and the end shows no „Menü“ button of its own.
+ * with one tap – the ribbon onto the shelf where the game goes back there. The end shows no „Menü“ button of its own,
+ * except in Zähne putzen and Aufs Töpfchen (`GameEnd`'s `menu`).
  */
 const EndShown = createContext<(shown: boolean) => void>(() => {});
 
@@ -338,11 +345,13 @@ export function GameShell({
           <GoodNight />
         ) : (
           <LeaveGame value={stop}>
-            <EndShown value={setEnded}>
-              <InnerBack value={setInnerBack}>
-                <CountsPlaytime value={!free}>{children}</CountsPlaytime>
-              </InnerBack>
-            </EndShown>
+            <LeavesToShelf value={toShelf}>
+              <EndShown value={setEnded}>
+                <InnerBack value={setInnerBack}>
+                  <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+                </InnerBack>
+              </EndShown>
+            </LeavesToShelf>
           </LeaveGame>
         )}
         {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}

@@ -173,5 +173,13 @@ export const marblesIdeas: IdeaArea = {
       effort: "M",
       done: true,
     },
+    {
+      id: "K-20",
+      emoji: "🎪",
+      title: "Kettenreaktion: der Vorhang geht zu statt Konfettiregen",
+      text: "Im Zirkus geht am Ende der Vorhang langsam zu, nur der Scheinwerfer bleibt auf der Kugel stehen, ein Tusch – statt 90 Konfettistücken und der Konfettikanone. Die anderen Bahnen enden mit einem Glockenschlag, und der Korb mit den Kugeln schließt seinen Deckel, statt dass Herzen und Sterne aufsteigen. Gehört zu A-30.",
+      why: "Ein Ende wie im Theater: ruhig, und es gehört zur Bahn.",
+      effort: "S",
+    },
   ],
 };

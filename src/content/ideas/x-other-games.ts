@@ -128,5 +128,21 @@ export const otherGamesIdeas: IdeaArea = {
       effort: "S",
       done: true,
     },
+    {
+      id: "X-15",
+      emoji: "🧺",
+      title: "Socken-Paare: die Paare wandern in den Korb",
+      text: "Ist eine Wäsche fertig, werden die Paare nacheinander gefaltet und wandern in den Wäschekorb, der Deckel geht zu – dann kommt die nächste Wäsche. Statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
+      why: "Ein Ende, das zum Aufräumen gehört, wie zu Hause.",
+      effort: "S",
+    },
+    {
+      id: "X-16",
+      emoji: "✨",
+      title: "Zähne putzen: ein Zahn blitzt, dann klebt der Stern",
+      text: "Am Ende blitzt ein sauberer Zahn einmal kurz auf, dann wird der Stern auf den Wochenplan geklebt, mit einem leisen Patsch. Sonst fliegt nichts. Gehört zu A-30.",
+      why: "Die Belohnung ist das, was geputzt wurde, und der Stern, der bleibt.",
+      effort: "S",
+    },
   ],
 };

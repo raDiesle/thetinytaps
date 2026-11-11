@@ -520,7 +520,10 @@ In a fresh worktree run `bun install` first.
   (the next level in the game's order, after the last the first, so there is always one). It has no „Menü“ button
   (user feedback, November 2026): the way back is the page's corner in the top left, as in every menu – the ✕, which
   leads to the game's own start screen or the page before it, and where that is the shelf the book's ribbon instead of
-  the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing. They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+  the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing.
+  The one exception are Zähne putzen and Aufs Töpfchen, done once played: they show „Menü“ instead of „Nochmal“
+  (`GameEnd menu`), a paper slip with the ribbon's round shelf label beside the word, so it looks like the way back in
+  the corner (user request, November 2026; `GameEnd.test.ts` keeps it to those two). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
   and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
   a big painted label taped onto the page, „Nochmal“ a smaller paper slip beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
