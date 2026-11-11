@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
+import { ALL_TROPHIES } from "@/components/TrophyShelf";
 import { CATEGORIES, UNFINISHED } from "@/content/games";
 import { pick } from "@/lib/language";
 import {
@@ -187,6 +188,10 @@ export function ManagementPage() {
         <span aria-hidden>🧭</span> Management
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
+      {/* To look at every trophy on the shelf without playing: shown only for this visit of the page, nothing is stored. */}
+      <p className="ideas-test-links">
+        <Link to={`/?${ALL_TROPHIES}`}>🏆 Alle Pokale im Regal ansehen (zum Testen)</Link>
+      </p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
         abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
