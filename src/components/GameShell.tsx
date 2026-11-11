@@ -20,7 +20,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
-import { canTestUnfinished } from "@/lib/localTest";
+import { UNLOCK_HOLD_MS, canPlayUnfinished, unlockUnfinished } from "@/lib/localTest";
 import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
@@ -103,7 +103,8 @@ export interface GameMode {
   art?: ReactNode;
   /**
    * Still being built: the card says „in Bearbeitung“ and starts only where it may be tested (`canTestUnfinished`: the
-   * dev server or this computer); on the real site it stands greyed out and does nothing.
+   * dev server or this computer); on the real site it stands greyed out and does nothing – unless held for
+   * `UNLOCK_HOLD_MS`, a way only the grown-up who makes the app knows, which starts it with no sign (`unlockUnfinished`).
    */
   unfinished?: true;
 }
@@ -279,6 +280,17 @@ export function GameShell({
   const stopRef = useRef(stop);
   stopRef.current = stop;
 
+  // A greyed-out card „in Bearbeitung“ held for three seconds starts anyway, for this visit (unlockUnfinished): with no
+  // ring, glow or sound while it is held, since only the grown-up who makes the app is to know it.
+  const heldMode = useRef<string | undefined>(undefined);
+  const unlockHold = useHold(() => {
+    const id = heldMode.current;
+    if (!id) return;
+    unlockUnfinished();
+    onMode?.(id);
+    void start(true);
+  }, UNLOCK_HOLD_MS);
+
   useEffect(() => {
     if (!playing) return;
     let escDownAt: number | null = null;
@@ -404,9 +416,21 @@ export function GameShell({
 
   /** One mode's card; one still being built stands greyed out where it can't be tested. */
   const card = (m: GameMode) =>
-    m.unfinished && !canTestUnfinished() ? (
+    m.unfinished && !canPlayUnfinished() ? (
       <li key={m.id}>
-        <div className={`game-card mode-card disabled${pictureCard(previews?.[`${m.id}.webp`])}`} aria-disabled data-mode={m.id}>
+        <div
+          className={`game-card mode-card disabled${pictureCard(previews?.[`${m.id}.webp`])}`}
+          role="button"
+          aria-disabled
+          data-mode={m.id}
+          onPointerDown={(e) => {
+            heldMode.current = m.id;
+            unlockHold.props.onPointerDown(e);
+          }}
+          onPointerUp={unlockHold.props.onPointerUp}
+          onPointerCancel={unlockHold.props.onPointerCancel}
+          onContextMenu={unlockHold.props.onContextMenu}
+        >
           <CardPicture emoji={m.emoji} picture={previews?.[`${m.id}.webp`]} />
           <span className="game-title">{m.title}</span>
           {unfinishedBadge}
