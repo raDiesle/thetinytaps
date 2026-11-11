@@ -23,7 +23,7 @@ import { SEO_ES } from "./seo.es";
 import { SEO_HI } from "./seo.hi";
 import { SEO_RU } from "./seo.ru";
 import { SEO_ZH } from "./seo.zh";
-import { APP_LANGUAGES } from "../lib/language";
+import { APP_LANGUAGES, pick } from "../lib/language";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
@@ -72,7 +72,7 @@ describe("home menu", () => {
   test("every card has a short line for grown-ups that fits in two lines", () => {
     const lines = [...games.map((g) => [g.href, g.blurb] as const), ...CATEGORIES.map((c) => [c.id, c.blurb] as const)];
     for (const [where, blurb] of lines) {
-      expect(blurb?.de, where).toBeDefined();
+      expect(blurb && pick(blurb, "de"), where).toBeDefined();
       for (const text of Object.values(blurb ?? {})) expect(text.length, where).toBeLessThanOrEqual(42);
     }
   });

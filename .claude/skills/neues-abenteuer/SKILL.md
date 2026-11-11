@@ -169,11 +169,14 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
      levels still play.
 4. **Add the data** to `levels.ts`: the `TrailLevel` with stations, sounds from
    `@/lib/sfx` (add a new sound to the fitting topic file there, built on `note()`),
-   short German sentences in the present tense. Append it to `TRAIL_LEVELS`.
-   The level comes in German only: its lines in the phrasebooks (`src/games/elevator/en.ts`, `ru.ts`, …) are
-   written only when the user asks for them, and until then the whole level is said in German (its title has no
-   translation). Add a German-only row part for it in `src/content/ideas/languageStatus.ts`. When you change a
-   German sentence that already has translations, delete or update them (`phrases.test.ts` fails on a left-over one).
+   short sentences in the present tense, **English first** (root `CLAUDE.md`: everything new since November 2026).
+   Append it to `TRAIL_LEVELS`. The levels so far are German first, their phrasebooks (`src/games/elevator/en.ts`,
+   `ru.ts`, …) keyed by the German sentence: the first English-first level teaches `levels.ts` and the phrasebooks a
+   level's first language (its own sentences English, German a translation like the others, the level said in English
+   where one is missing), with a test – never by writing it German first after all. Other languages, German included,
+   only when the user asks for them; add an English-only row part for it in `src/content/ideas/languageStatus.ts`.
+   When you change a sentence in its first language that already has translations, delete or update them
+   (`phrases.test.ts` fails on a left-over one).
 5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title: title("…"), kind: t(TRAIL) }` after the
    other trail levels. If the start-screen note mentions the levels or keys, keep it true.
 6. **The cards pick it up**: `cards.tsx` builds the end cards from `TRAIL_LEVELS` and
@@ -186,7 +189,7 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 
 - **No text for the child.** Nothing written in the picture, on things, signs or
   buttons. `title` is for the parents' start screen only.
-- **German speech only**, and only with „Vorlesen“ on: `ask`, `done`, `away.say`,
+- **Speech in the level's first language** (English for new levels) or the app language's translation, and only with „Vorlesen“ on: `ask`, `done`, `away.say`,
   `finale.say`. Short words, present tense.
 - **Nothing is pointed at** beyond what `TrailPlay` shows by itself: before each tap
   yellow footprints lead to the child's pale ghost, standing where the tap takes it and

@@ -7,7 +7,7 @@ import { TrophyShelf, trophyRow } from "@/components/TrophyShelf";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
-import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
 import { useTrophies } from "@/lib/trophies";
@@ -26,8 +26,8 @@ interface ShelfBook {
   id: string;
   href: string;
   world: WorldId;
-  title: Localized;
-  blurb: Localized;
+  title: Texts;
+  blurb: Texts;
   emoji: string;
   /** The picture pasted on its cover (`bilder/cover-<category>.webp`); without one a piece of its world and its emoji. */
   cover?: string;

@@ -110,17 +110,27 @@ In a fresh worktree run `bun install` first.
 
 ## Language and style
 
-- Everything the child or parent sees or hears is **German** (short, simple, present
-  tense). Other languages come game by game: the app aims at German, the five most spoken
-  languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
+- **Everything new the child or parent sees or hears is written in English first** (short, simple, present tense;
+  user decision, 11 November 2026: new games, features, stories, modes, lines, menus' texts – German is no longer the
+  first language). What came before was written German first and stays so: a line changed in such a text is changed
+  in its German (see below), never rewritten English first. Other languages come game by game: the app aims at
+  German, the five most spoken languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian
+  (`src/content/targetLanguages.ts`).
   Translations and recordings (ElevenLabs voice, Suno songs) are made **only when the user asks** for
-  them, since they cost tokens and credits: new features, stories, modes and changed lines come in German
-  only, never translated or recorded on your own, also in a game that already speaks other languages.
+  them, since they cost tokens and credits – German now is such a translation too: new features, stories, modes and
+  lines come in English only, never translated (also not into German) or recorded on your own, also in a game that
+  already speaks other languages. Until German is asked for, a German player sees and hears those in English.
+  This rule wins over the games' own `CLAUDE.md` files written before it: where one says a new line, story or mode
+  „comes in German only“, it now comes in English only, German being one of the translations made on request; where
+  that game's data is built on German sentences, its first English-first part teaches it a part's first language (see
+  below). Rewrite such a sentence in a game's file when you work there anyway.
   Instead keep `src/content/ideas/languageStatus.ts` (shown on `/management/`) true in the same commit: what is
   there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
-  `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell, and
-  `inlineTexts.test.ts` checks that every inline `t({ de: … })` of a game has each language its row marks as there
-  (so a German-only line in a translated game fails until its row says what is missing). A new game that comes German-only
+  `"text"` where it is translated but not yet recorded – a new part marks `en` and leaves `de` out until it is
+  translated. `content.test.ts` checks it where files tell, and
+  `inlineTexts.test.ts` checks that every inline `t({ en: … })` (or older `t({ de: … })`) of a game has each language
+  its row marks as there, German included (so an English-only line in a translated game fails until its row says what
+  is missing). A new game that comes English-only
   into the translated menus keeps its card's title and blurb in its own folder (`names.ts`, imported by `games.ts`, like
   `/zusammen/`), so its own row says they are missing, not the home page's.
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
@@ -130,29 +140,37 @@ In a fresh worktree run `bun install` first.
   words games speak it (`language.test.ts` checks the pack); until then packs and recordings in other languages wait
   in the code. No second language next to the first either (a „Zweite Sprache“, „Bär – bear“, was removed), and
   grown-ups choose exactly one language, in one place: 🌐. The app language starts on
-  `playLanguage(…)` (`src/lib/locale.ts`): German while developing, for players the browser's language if offered,
+  `playLanguage(…)` (`src/lib/locale.ts`): German while developing (new English-first texts show in English there
+  until translated), for players the browser's language if offered,
   else the first one – never a hard-coded `"de"`. Where a game lacks the language, it plays in English, then German.
   Code, comments, docs and commit messages are English, except
-  German names of games, modes and content.
+  the German names of the older games, modes and content.
 - **The whole app speaks German, English, Chinese, Hindi, Spanish, Arabic and Russian** (🌐 on the home page,
   `APP_LANGUAGES` in `src/lib/language.ts`): grown-ups' screens and what the child hears and sees, translated once on
   request (Russian, then the other five, October 2026). Write every user-facing text so it can be translated: short
-  texts inline as `t({ de: "…" })` (`useT()`), adding the other languages only when translations are asked for; larger
-  content gets a `<lang>.ts` / `*.<lang>.ts` file next to the German data, keyed by id, and a table by language.
+  texts inline as `t({ en: "…" })` (`useT()`; typed `EnglishFirst`, the older German-first ones `Localized`, and a
+  field taking either is `Texts`, all in `src/lib/language.ts`), adding the other languages only when translations
+  are asked for; larger content gets a `<lang>.ts` / `*.<lang>.ts` file next to its first language's data (English
+  for what is new), keyed by id, and a table by language. The language chunks were built for German in the code
+  (`TextsLanguageId` leaves `de` out): when German is first asked for English-first content of that kind, add `de`
+  to them like any other language. Games whose data is built on German sentences (Lebendige Bilder's items and
+  `sceneLanguage`, the elevator's phrasebook keyed by German sentence) are taught to take a part's first language with
+  their first English-first part, checked by a test – never by writing that part German first after all.
   A visit downloads only its own language: such a file is imported only by `src/content/texts/texts-<lang>.ts` (one chunk
   per language, loaded before the first screen; the service worker keeps only the languages played), and the game's
   table fills from there with `byLanguage(…)` – never import it from game code, or every visitor downloads it
   (`texts.test.ts` checks this). Inline texts stay in the code with all their languages: moving them into the language
   chunks at build time was tried (October 2026) and saved too little for what it cost (the app waiting for its
   language, a reload on every switch, a build step), so don't do it again.
-  A text without a translation shows in German; a browser voice speaks it with the German voice – never German words
-  with another language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`),
+  A text without a translation shows in its first language – German for the older texts, English for what is new
+  (`pick`, `firstLanguage`, `language.test.ts`) –; a browser voice speaks it with that language's voice – never German
+  or English words with another language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`),
   never a fixed `de-DE`. **A recording missing in the app language is replaced by the English one, else nothing plays,
   never the German one** (user decision, November 2026: a child hearing Russian or Spanish can't follow German;
   `recordingUrl` in `src/lib/voice.ts`, `voice.test.ts`): a line with several languages passes its English text as
   `say(…, { english })` (`spokenIn` and the elevator's phrasebook do), and only the games told by their voice fall
-  back to the browser's voice after that. When the meaning of a German line changes, delete its translations (they fall back to German) rather
-  than leaving wrong ones. For the child: present tense, informal (ты, tú, तुम, 你), and nothing that changes for boy or
+  back to the browser's voice after that. When the meaning of a line changes in its first language, delete its translations (they fall back to
+  it) rather than leaving wrong ones. For the child: present tense, informal (ты, tú, तुम, 你), and nothing that changes for boy or
   girl – Spanish without adjectives about the child, Hindi with requests or „let's“ instead of gendered verbs, Arabic
   with „let's“ (هيّا ن…) instead of an imperative. Grown-ups: вы, usted, आप, Arabic plural. Names the voice says
   (Tapsi → „Тапси“, „塔普西“, „टैप्सी“, „تابسي“) are written in the language's own script, never in Latin letters inside a
@@ -557,7 +575,7 @@ src/games/<game>/        one folder per game, see its CLAUDE.md
   <X>Game.tsx            start screen: <GameShell> with modes, level, settings
   <X>Play.tsx            the game itself, mounted only while playing
   settings.ts            settings type, defaults, storage key "tinytaps.<game>.v1"
-  content.ts             German texts and pictures
+  content.ts             texts (English first since November 2026, German in the older games) and pictures
   <game>.css             styles and animations, classes prefixed by the game
 src/components/          shared UI: GameShell, GameEnd (Nochmal/Weiter), SettingControls, …
 src/content/             home menu (games.ts), language packs (de/en/tr/pl), ideas
