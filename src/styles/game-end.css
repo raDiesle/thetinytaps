@@ -76,6 +76,25 @@
   -webkit-text-stroke: 0.08em var(--ink);
 }
 
+/* „Menü“ (`menu`): the ribbon's round label with the shelf and the yellow arrow beside the word, so it looks like the
+   way back in the corner (user request, November 2026). */
+.game-end-button.menu {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.game-end-button.menu.to-shelf {
+  padding-left: 0.3em;
+}
+
+.game-end-button.menu .shelf-label-art {
+  flex: none;
+  width: auto;
+  height: 2.4em;
+  overflow: visible;
+}
+
 .game-end-button:active {
   translate: 0 4px;
 }
@@ -129,4 +148,9 @@
 
 .game-end.corners .game-end-trophy {
   height: clamp(64px, 18vh, 130px);
+}
+
+/* „Menü“ alone in the corner is the only way on: a little bigger than „Nochmal“ there, its shelf still clear. */
+.game-end.corners .game-end-button.menu {
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
 }

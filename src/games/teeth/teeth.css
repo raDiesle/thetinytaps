@@ -1482,9 +1482,11 @@
   filter: none;
 }
 
+/* The day's name about as big as its sun and moon, so a grown-up reads it at a glance across the room (0.55em was
+   too small, user feedback, November 2026). */
 .teeth-day-name {
-  font-size: 0.55em;
-  font-weight: 700;
+  font-size: 0.9em;
+  font-weight: 800;
   color: var(--ink);
 }
 

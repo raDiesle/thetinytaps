@@ -528,7 +528,10 @@ In a fresh worktree run `bun install` first.
   (the next level in the game's order, after the last the first, so there is always one). It has no „Menü“ button
   (user feedback, November 2026): the way back is the page's corner in the top left, as in every menu – the ✕, which
   leads to the game's own start screen or the page before it, and where that is the shelf the book's ribbon instead of
-  the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing. They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+  the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing.
+  The one exception are Zähne putzen and Aufs Töpfchen, done once played: they show „Menü“ instead of „Nochmal“
+  (`GameEnd menu`), a paper slip with the ribbon's round shelf label beside the word, so it looks like the way back in
+  the corner (user request, November 2026; `GameEnd.test.ts` keeps it to those two). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
   and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
   a big painted label taped onto the page, „Nochmal“ a smaller paper slip beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
@@ -769,7 +772,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   November 2026).
 - A game still being built is marked `unfinished: true` in `CATEGORIES` (user decision, November 2026): it stands
   neither on the shelf nor in its book, its page carries `noindex` and stays out of the sitemap (its texts wait in
-  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ and „Menü“ lead back. Its
+  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ and „Menü“ lead back.
+  Where the user wants it seen already, it is `unfinished: "labelled"` instead (user request, November 2026, L-23):
+  it stands in its book's table of contents with the page marker „in Bearbeitung“ (`BookContents`, the label of the
+  start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
+  takes no tap –, keeps `noindex`, and its ✕ leads back to its book. Its
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`

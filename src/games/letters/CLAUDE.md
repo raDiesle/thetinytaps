@@ -1,6 +1,6 @@
 # Buchstaben & Zahlen
 
-The book „Buchstaben & Zahlen“ holds four games, each a page of its table of contents (`games.ts`), sharing this folder
+The book „Buchstaben & Zahlen“ holds five games, each a page of its table of contents (`games.ts`), sharing this folder
 and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys stay as chosen in each):
 - Frei tippen, `/buchstaben/` (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its
   things and digit at once, or optionally counts them aloud, step by step or by tapping each thing.
@@ -16,14 +16,22 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
 - Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
   mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
   for a shown letter).
+- Wo ist das kleine b?, `/gross-klein/` (`CasePlay.tsx`, `case.css`; L-23, still „in Bearbeitung“: `unfinished:
+  "labelled"` in `games.ts`, so its line carries that label and opens only on this computer): a big letter with eyes
+  looks for its child among three small letters with eyes; the right one (tapped, or its key pressed) walks over in
+  little hops and they hold hands, a wrong one shakes its head. Three rounds in a row found at the first tap bring
+  look-alikes (b next to d, `ALIKE`), a wrong tap among them plainly different ones again (`choicesFor`). Only letters
+  with a big and a small form and no marks over them (`caseLetters`: no umlauts, no Й); Hindi and Arabic, which have
+  one form, play it in English. It asks „Wo ist das kleine …?“ (`SMALL_PROMPT`, German, not yet recorded, so silent
+  until then) and says the letter's name when found, from the recordings of the other games. No ⚙️.
 
-`LettersGame way={…}` is all four (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
+`LettersGame way={…}` is all five (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
 `names.ts`. Each plays at once (`startMode`) with no start screen: ✕ goes back to the book's table of contents,
 the page before it.
 
 ## Rules
 
-- The four are games of their own in the table of contents, never „Spielart“ or „Nur Zahlen“ choices behind one
+- The five are games of their own in the table of contents, never „Spielart“ or „Nur Zahlen“ choices behind one
   game's ⚙️: they were folded into one game once and split again (user feedback, November 2026). A new thing to do with
   letters or numbers is a new game in the book; a variant of one (which words, how numbers come) is an option of it.
 - Every option is changed while playing, never in the menu: ⚙️ in the top right corner (the way back, the page's corner, takes the left), always held (`PlayOptions`),

@@ -216,6 +216,12 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Ein Bild und sein Wort: Das Kind tippt es Buchstabe für Buchstabe auf der Tastatur oder dem Bildschirm. Bildwörter, Farben, Tu-Wörter oder alles gemischt, in drei Längen. Oder nur der erste Buchstabe: „Wo ist das B?“ – die Taste dazu finden.",
   },
   {
+    path: "/gross-klein/",
+    title: "Wo ist das kleine b? – große und kleine Buchstaben",
+    description: "Ein großer Buchstabe mit Augen sucht sein Kind: Von drei kleinen Buchstaben gehört einer dazu, läuft zu ihm und nimmt seine Hand.",
+    text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe mit Augen sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber, und beide halten sich an der Hand; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p.",
+  },
+  {
     path: "/zaehne/",
     title: "Zähneputzen für Kinder – Zahnputzlied mit Timer",
     description:

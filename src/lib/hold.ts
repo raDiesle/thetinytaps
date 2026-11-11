@@ -38,7 +38,7 @@ export function useHold(onDone: () => void, ms: number) {
 
   const props = {
     style: { "--hold-ms": `${ms}ms` } as CSSProperties,
-    onPointerDown: (e: PointerEvent<HTMLButtonElement>) => {
+    onPointerDown: (e: PointerEvent<HTMLElement>) => {
       // Keep the game from reacting to the tap on the button.
       e.stopPropagation();
       // A finger that slides a little still counts as holding.

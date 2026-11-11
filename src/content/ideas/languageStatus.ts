@@ -421,6 +421,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Ein Spiel für sich seit November 2026 (vorher eine Spielart von „Buchstaben & Zahlen“), mit „Wo ist das B?“; Wörter aus den Sprachpaketen wie bei „Frei tippen“. Deutsch von ElevenLabs gesprochen, die anderen Sprachen außer Russisch am 7./8. November 2026; Russisch fehlt noch. Die Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026.",
   },
   {
+    href: "/gross-klein/",
+    recorded: true,
+    languages: { de: "partial", en: "partial", zh: "partial", es: "partial", ru: "partial" },
+    note: "Neu (November 2026, L-23), noch „in Bearbeitung“. Nur Deutsch: der Name „Wo ist das kleine b?“, die Zeile im Inhaltsverzeichnis und die Frage „Wo ist das kleine …?“ (noch nicht aufgenommen, bis dahin still). Der Name des gefundenen Buchstabens und das Lob kommen aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache. Hindi und Arabisch haben keine Groß- und Kleinbuchstaben: dort spielt es auf Englisch (Deutsch, solange das englische Paket nicht geladen ist).",
+  },
+  {
     href: "/",
     parts: [
       {

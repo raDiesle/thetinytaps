@@ -2,7 +2,18 @@ import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TI
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
-import { COUNT_BLURB, COUNT_TITLE, FREE_BLURB, FREE_TITLE, MOVE_BLURB, MOVE_TITLE, WORDS_BLURB, WORDS_TITLE } from "@/games/letters/names";
+import {
+  CASE_BLURB,
+  CASE_TITLE,
+  COUNT_BLURB,
+  COUNT_TITLE,
+  FREE_BLURB,
+  FREE_TITLE,
+  MOVE_BLURB,
+  MOVE_TITLE,
+  WORDS_BLURB,
+  WORDS_TITLE,
+} from "@/games/letters/names";
 import { WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
@@ -25,8 +36,11 @@ export interface Game {
   /**
    * Still being built: it stands neither on the shelf nor in its book and is in no search result or sitemap; only the
    * management page links to it, and its way back leads there (user decision, November 2026). Drop the mark to publish it.
+   * `"labelled"`: still being built, but already standing in its book, its line marked „in Bearbeitung“ (user request,
+   * November 2026, L-23); it opens only where parts being built may be tested (`canTestUnfinished`), stays out of search
+   * results and the sitemap, and its way back is its book's like any other game's.
    */
-  unfinished?: true;
+  unfinished?: true | "labelled";
 }
 
 /** One of a game's books tied together on the shelf (`Game.volumes`): an address of the game, its emoji and name. */
@@ -398,6 +412,7 @@ export const CATEGORIES: Category[] = [
       { href: "/zaehlen/", emoji: "🔢", title: COUNT_TITLE, blurb: COUNT_BLURB },
       { href: "/mitmachen/", emoji: "🐸", title: MOVE_TITLE, blurb: MOVE_BLURB },
       { href: "/woerter/", emoji: "✍️", title: WORDS_TITLE, blurb: WORDS_BLURB },
+      { href: "/gross-klein/", emoji: "👪", title: CASE_TITLE, blurb: CASE_BLURB, unfinished: "labelled" },
     ],
   },
 ];
@@ -408,10 +423,13 @@ export const CATEGORIES: Category[] = [
  */
 export const hasPage = (category: Category) => !category.apart && listedGames(category).length > 1;
 
-/** A category's games a child finds on the shelf or in its book: all but those still being built (`Game.unfinished`). */
-export const listedGames = (category: Category) => category.games.filter((game) => !game.unfinished);
+/**
+ * A category's games a child finds on the shelf or in its book: all but those still being built (`Game.unfinished`),
+ * except the ones already standing there with their label („in Bearbeitung“).
+ */
+export const listedGames = (category: Category) => category.games.filter((game) => game.unfinished !== true);
 
-/** The games still being built (`Game.unfinished`), linked only from the management page. */
+/** The games still being built (`Game.unfinished`), listed on the management page and in no search result. */
 export const UNFINISHED: Game[] = CATEGORIES.flatMap((category) => category.games.filter((game) => game.unfinished));
 
 /** Where the category's book on the shelf leads: its page, or its only game; the shelf for one whose games stand apart. */
@@ -442,8 +460,11 @@ const isGamePage = (game: Game, path: string) => [game.href, ...(game.also ?? []
 
 const withSlash = (pathname: string) => (pathname.endsWith("/") ? pathname : `${pathname}/`);
 
-/** Whether a page belongs to a game still being built (`Game.unfinished`). */
+/** Whether a page belongs to a game still being built (`Game.unfinished`), labelled in its book or not. */
 export const isUnfinished = (pathname: string) => UNFINISHED.some((game) => isGamePage(game, withSlash(pathname)));
+
+/** Whether a page belongs to a game still being built and found only from the management page (`unfinished: true`). */
+export const isHidden = (pathname: string) => UNFINISHED.some((game) => game.unfinished === true && isGamePage(game, withSlash(pathname)));
 
 /** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {

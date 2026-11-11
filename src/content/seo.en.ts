@@ -129,6 +129,11 @@ export const SEO_EN: SeoTranslation = {
         "Type first words letter by letter: bear, ball, colors and action words. Or “Where is the B?” – find the key for a letter. For toddlers, without ads.",
       text: "A picture and its word: the child types it letter by letter on the keyboard or the screen. Picture words, colors, action words or all mixed, in three lengths. Or just the first letter: “Where is the B?” – find its key.",
     },
+    "/gross-klein/": {
+      title: "Where Is Little b? – Capital and Small Letters",
+      description: "A big letter with eyes looks for its little one: three small letters to choose from, and the right one walks over and holds its hand.",
+      text: "A letter game about capital and small letters: a big letter with eyes looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and they hold hands; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p.",
+    },
     "/zaehne/": {
       title: "Tooth Brushing for Kids – Song and Timer",
       description:
