@@ -11,6 +11,11 @@ export interface LevelProps {
   say: (text: Localized, queue?: boolean) => void;
   /** The level is finished: the machine has run, everything has fallen over, or the marble run's basket is full. */
   onDone: () => void;
+  /**
+   * The first ball has reached the goal (the marble run's basket or tubes, the pegboard's bins): enough for the level's
+   * trophy, given here already (user decision, November 2026). Levels without such a goal leave it to their end.
+   */
+  onGoal?: () => void;
   /** Nothing waits for the child: what would wait for a tap goes on by itself (the start screen's choice: the marble run's barrier and switch, the machines' stops). */
   watch?: boolean;
 }

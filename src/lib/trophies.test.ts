@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { trophyRow } from "@/components/TrophyShelf";
 import { METALS, trophyLook } from "@/components/Trophy";
-import { trophyPicture } from "@/components/trophyPictures";
+import { everyTrophy, trophyPicture } from "@/components/trophyPictures";
 import { CATEGORIES } from "@/content/games";
 import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest } from "./trophies";
 
@@ -54,6 +54,35 @@ describe("trophies", () => {
     expect(trophyRow(10_000, 100, 3).count).toBe(3);
     const row = trophyRow(150, 100, 9);
     expect(row.width).toBeLessThanOrEqual(150);
+  });
+
+  test("Kettenreaktion's trophies hold a ball in their cup, and one ball in the goal wins one", () => {
+    for (const level of ["track", "colortrack", "pegs", "garden", "circus"]) {
+      const look = trophyLook("/kettenreaktion/", level);
+      expect(look.lid).toBe("ball-in");
+      expect(look.form).not.toBe("star");
+      expect(look.ball).toBeTruthy();
+    }
+    expect(trophyLook("/bilder/", "zoo").ball).toBeUndefined();
+    expect(readFileSync("src/games/marbles/MarblePlay.tsx", "utf8")).toContain("onGoal={onGoal}");
+    for (const file of ["src/games/marbles/TrackLevel.tsx", "src/games/marbles/PegsLevel.tsx"]) {
+      expect(readFileSync(file, "utf8"), file).toContain("onGoal?.()");
+    }
+  });
+
+  test("the test view on /?pokale=alle has every finished game's trophies, each once", () => {
+    const all = everyTrophy();
+    const keys = all.map((trophy) => `${trophy.game}#${trophy.level}`);
+    expect(new Set(keys).size).toBe(keys.length);
+    for (const game of CATEGORIES.flatMap((category) => category.games)) {
+      if (!game.unfinished)
+        expect(
+          all.some((trophy) => trophy.game === game.href),
+          game.href,
+        ).toBe(true);
+    }
+    expect(all.filter((trophy) => trophy.game === "/kettenreaktion/").length).toBeGreaterThan(10);
+    expect(readFileSync("src/pages/ManagementPage.tsx", "utf8")).toContain("ALL_TROPHIES");
   });
 
   test("the end of a level awards it, and the games with levels pass theirs", () => {

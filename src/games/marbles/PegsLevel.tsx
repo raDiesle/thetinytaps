@@ -83,7 +83,7 @@ interface Animal {
  * five bins, where an animal waits and hops with joy. After ten marbles the
  * level ends.
  */
-export function PegsLevel({ sound, onDone }: LevelProps) {
+export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   const label = useLevelName("pegs");
   const animals = useMemo(() => pickAnimals(BINS), []);
   const svg = useRef<SVGSVGElement>(null);
@@ -125,6 +125,8 @@ export function PegsLevel({ sound, onDone }: LevelProps) {
       sound(animals[d.bin].sound);
     }
     landed.current++;
+    // The first marble in a bin wins the level's trophy.
+    if (landed.current === 1) onGoal?.();
     if (landed.current === DONE_AFTER) doneTimer.current = setTimeout(onDone, DONE_DELAY_MS);
   };
 
