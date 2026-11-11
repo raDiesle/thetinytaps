@@ -4,7 +4,7 @@ Route `/tiere/`.
 
 One flowing game, like Socken-Paare: its card plays at once (`startMode`), with no start screen, no cards and no `level`
 row; ✕ goes back to the table of contents. Its only option, „Was drankommt“, stands as a small paper note in the top
-right corner while playing (`KindCorner` in `AnimalsGame.tsx`), no ⚙️. `AnimalsRounds.tsx` lets five kinds of rounds take
+right corner while playing (`KindCorner` in `AnimalsGame.tsx`, the shared `CornerChoices`), no ⚙️. `AnimalsRounds.tsx` lets five kinds of rounds take
 turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest („Wer schaut da raus?“ moved to „Erkennen“, `src/games/shadows/`, in November 2026 – user decision, Z-14):
 1. Füttern (N-08): tap (or drag) the food to the hungry animal – the farm's and the wood's animals, and since November
    2026 zoo and sea animals too (elephant and peanuts, parrot and grapes, crocodile, tiger and wolf with meat, …), and

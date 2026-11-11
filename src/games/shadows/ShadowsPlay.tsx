@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { DEV } from "@/lib/buildInfo";
+import { CornerChoices } from "@/components/CornerChoices";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote, playRustle } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
@@ -34,33 +35,25 @@ const WRONG_MS = 1500;
 /** Dropped this close to a shadow (as a share of its size) still counts: small fingers don't aim well. */
 const SNAP = 0.3;
 
-/** The kinds of pictures to pick from while playing, each shown by its emoji; "all" by one of each kind. */
-const THEMES: { id: ShadowTheme; emoji: string[]; label: Localized }[] = [
-  {
-    id: "all",
-    emoji: ["🐘", "🚗", "🍌", "☂️"],
-    label: { de: "Gemischt", ru: "Вперемешку", en: "Mixed", zh: "混合", hi: "मिले-जुले", es: "Mezclado", ar: "منوعة" },
-  },
-  { id: "animals", emoji: ["🐘"], label: { de: "Tiere", ru: "Животные", en: "Animals", zh: "动物", hi: "जानवर", es: "Animales", ar: "حيوانات" } },
-  {
-    id: "vehicles",
-    emoji: ["🚗"],
-    label: { de: "Fahrzeuge", ru: "Транспорт", en: "Vehicles", zh: "交通工具", hi: "गाड़ियाँ", es: "Vehículos", ar: "مركبات" },
-  },
-  { id: "food", emoji: ["🍌"], label: { de: "Essen", ru: "Еда", en: "Food", zh: "食物", hi: "खाना", es: "Comida", ar: "طعام" } },
-  { id: "things", emoji: ["☂️"], label: { de: "Dinge", ru: "Вещи", en: "Things", zh: "东西", hi: "चीज़ें", es: "Cosas", ar: "أشياء" } },
-];
+/** What the choices in the top right corner are about (worded as Was gehört zum Tier?'s). */
+const WHAT_COMES_UP: Localized = {
+  de: "Was drankommt",
+  ru: "Что будет в игре",
+  en: "What comes up",
+  zh: "出现哪些内容",
+  hi: "क्या-क्या आएगा",
+  es: "Qué aparece",
+  ar: "ما الذي يظهر",
+};
 
-/** A theme's picture: one emoji, or a small square of four for "all". */
-function ThemeIcon({ emoji }: { emoji: string[] }) {
-  return (
-    <span className={`sh-theme-icon${emoji.length > 1 ? " mixed" : ""}`}>
-      {emoji.map((e) => (
-        <span key={e}>{e}</span>
-      ))}
-    </span>
-  );
-}
+/** The kinds of pictures to pick from while playing, by name in the top right corner; "all" mixes them. */
+const THEMES: { id: ShadowTheme; label: Localized }[] = [
+  { id: "all", label: { de: "Gemischt", ru: "Вперемешку", en: "Mixed", zh: "混合", hi: "मिले-जुले", es: "Mezclado", ar: "منوعة" } },
+  { id: "animals", label: { de: "Tiere", ru: "Животные", en: "Animals", zh: "动物", hi: "जानवर", es: "Animales", ar: "حيوانات" } },
+  { id: "vehicles", label: { de: "Fahrzeuge", ru: "Транспорт", en: "Vehicles", zh: "交通工具", hi: "गाड़ियाँ", es: "Vehículos", ar: "مركبات" } },
+  { id: "food", label: { de: "Essen", ru: "Еда", en: "Food", zh: "食物", hi: "खाना", es: "Comida", ar: "طعام" } },
+  { id: "things", label: { de: "Dinge", ru: "Вещи", en: "Things", zh: "东西", hi: "चीज़ें", es: "Cosas", ar: "أشياء" } },
+];
 
 interface Round {
   id: number;
@@ -135,8 +128,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const [theme, setTheme] = useState<ShadowTheme>("all");
   /** The round of „Wer schaut da raus?“ being played; null while a picture looks for its shadow. */
   const [peek, setPeek] = useState<PeekRound | null>(null);
-  /** The theme menu is open. */
-  const [themesOpen, setThemesOpen] = useState(false);
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   /** The shadow the picture is dragged over, so it can grow a little. */
   const [hover, setHover] = useState<number | null>(null);
@@ -430,20 +421,11 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
 
   const onShadowDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
-    setThemesOpen(false);
     touch(index);
   };
 
-  const onThemesDown = (e: PointerEvent) => {
-    e.stopPropagation();
-    if (settings.sounds) playPop();
-    setThemesOpen((open) => !open);
-  };
-
   /** Only pictures of `next` from now on ("all" mixes them): a new picture comes at once, at the same step. */
-  const pickTheme = (next: ShadowTheme) => (e: PointerEvent) => {
-    e.stopPropagation();
-    setThemesOpen(false);
+  const pickTheme = (next: ShadowTheme) => {
     if (next === themeRef.current) {
       if (settings.sounds) playPop();
       return;
@@ -481,7 +463,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
         setFocus(to);
       };
       const current = focusRef.current;
-      if (themesOpen) setThemesOpen(false);
       if (Number.isInteger(digit) && digit >= 1 && digit <= count) {
         move(digit - 1);
         touch(digit - 1);
@@ -498,127 +479,94 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  if (!round || (!peek && !shadowReady)) return null;
+  // The kind of pictures, chosen in the top right corner in every round (also while an animal peeks out or a round waits for its voice).
+  const corner = (
+    <CornerChoices title={t(WHAT_COMES_UP)} value={theme} onChange={pickTheme} choices={THEMES.map((th) => ({ value: th.id, label: t(th.label) }))} />
+  );
+
+  if (!round || (!peek && !shadowReady)) return corner;
   if (peek)
-    return !peekReady ? null : (
-      <PeekPlay key={peek.id} settings={settings} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />
+    return (
+      <>
+        {peekReady && (
+          <PeekPlay key={peek.id} settings={settings} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />
+        )}
+        {corner}
+      </>
     );
 
   const won = outcome?.ok === true;
   const offset = landed ?? drag;
 
   return (
-    <div
-      className="shadows-play"
-      onPointerDown={(e) => {
-        setThemesOpen(false);
-        softTap(e.clientX, e.clientY);
-      }}
-    >
-      <div className="sh-top">
-        <div key={`picture-${round.id}`} className="sh-picture-box">
-          <span
-            ref={pictureRef}
-            className={`sh-picture sh-emoji${drag ? " dragging" : ""}${landed ? " landed" : ""}${
-              outcome?.ok === false ? " wrong" : ""
-            }${!drag && !outcome && nudge ? ` nudge-${nudge % 2}` : ""}`}
-            style={offset ? landedStyle(offset, landed) : undefined}
-            role="img"
-            aria-label={texts.name(round.item)}
-            data-tap
-            onPointerDown={onPictureDown}
-            onPointerMove={onPictureMove}
-            onPointerUp={onPictureUp}
-            onPointerCancel={onPictureCancel}
-          >
-            {round.item.emoji}
-          </span>
+    <>
+      <div className="shadows-play" onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
+        <div className="sh-top">
+          <div key={`picture-${round.id}`} className="sh-picture-box">
+            <span
+              ref={pictureRef}
+              className={`sh-picture sh-emoji${drag ? " dragging" : ""}${landed ? " landed" : ""}${
+                outcome?.ok === false ? " wrong" : ""
+              }${!drag && !outcome && nudge ? ` nudge-${nudge % 2}` : ""}`}
+              style={offset ? landedStyle(offset, landed) : undefined}
+              role="img"
+              aria-label={texts.name(round.item)}
+              data-tap
+              onPointerDown={onPictureDown}
+              onPointerMove={onPictureMove}
+              onPointerUp={onPictureUp}
+              onPointerCancel={onPictureCancel}
+            >
+              {round.item.emoji}
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="sh-ground">
-        <div className="sh-options" style={choiceRows(round.shadows.length)}>
-          {round.shadows.map((s, i) => {
-            const peek = outcome?.pick === i && !outcome.ok;
-            const pose = round.poses[i];
-            const covered = round.level.covered;
-            return (
-              <div
-                key={`${round.id}-${s.id}`}
-                ref={(el) => {
-                  optionRefs.current[i] = el;
-                }}
-                className={`sh-option${focus === i ? " focused" : ""}${hover === i ? " near" : ""}${
-                  won && outcome.pick === i ? " matched" : ""
-                }${peek ? " peek" : ""}${covered ? " covered" : ""}${covered && opened === i ? " open" : ""}`}
-                role="button"
-                aria-label={peek ? texts.name(s) : texts.shadow(i + 1)}
-                data-tap={tapState({ goal: i === round.correct })}
-                onPointerDown={onShadowDown(i)}
-              >
-                <span
+        <div className="sh-ground">
+          <div className="sh-options" style={choiceRows(round.shadows.length)}>
+            {round.shadows.map((s, i) => {
+              const peek = outcome?.pick === i && !outcome.ok;
+              const pose = round.poses[i];
+              const covered = round.level.covered;
+              return (
+                <div
+                  key={`${round.id}-${s.id}`}
                   ref={(el) => {
-                    shadowRefs.current[i] = el;
+                    optionRefs.current[i] = el;
                   }}
-                  className="sh-shadow sh-emoji"
-                  style={pose.angle || pose.flip ? { rotate: `${pose.angle}deg`, scale: pose.flip ? "-1 1" : undefined } : undefined}
-                  aria-hidden
+                  className={`sh-option${focus === i ? " focused" : ""}${hover === i ? " near" : ""}${
+                    won && outcome.pick === i ? " matched" : ""
+                  }${peek ? " peek" : ""}${covered ? " covered" : ""}${covered && opened === i ? " open" : ""}`}
+                  role="button"
+                  aria-label={peek ? texts.name(s) : texts.shadow(i + 1)}
+                  data-tap={tapState({ goal: i === round.correct })}
+                  onPointerDown={onShadowDown(i)}
                 >
-                  {s.emoji}
-                </span>
-                {covered && (
-                  <span className="sh-flap" aria-hidden>
-                    {flapsNew && i === 0 && <span className="sh-flap-hand">👆</span>}
+                  <span
+                    ref={(el) => {
+                      shadowRefs.current[i] = el;
+                    }}
+                    className="sh-shadow sh-emoji"
+                    style={pose.angle || pose.flip ? { rotate: `${pose.angle}deg`, scale: pose.flip ? "-1 1" : undefined } : undefined}
+                    aria-hidden
+                  >
+                    {s.emoji}
                   </span>
-                )}
-                <span className="sh-name" aria-hidden>
-                  {texts.name(s)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="sh-bar">
-        <div className="sh-themes" data-tap-root>
-          <button
-            type="button"
-            className={`sh-theme-button${themesOpen ? " open" : ""}`}
-            aria-label={t({
-              de: "Bilder wählen",
-              en: "Choose pictures",
-              zh: "选择图片",
-              hi: "तस्वीरें चुनें",
-              es: "Elegir dibujos",
-              ar: "اختيار الصور",
-              ru: "Выбрать картинки",
+                  {covered && (
+                    <span className="sh-flap" aria-hidden>
+                      {flapsNew && i === 0 && <span className="sh-flap-hand">👆</span>}
+                    </span>
+                  )}
+                  <span className="sh-name" aria-hidden>
+                    {texts.name(s)}
+                  </span>
+                </div>
+              );
             })}
-            aria-expanded={themesOpen}
-            data-tap
-            onPointerDown={onThemesDown}
-          >
-            <ThemeIcon emoji={THEMES.find((th) => th.id === theme)!.emoji} />
-          </button>
-          {themesOpen && (
-            <div className="sh-theme-menu" role="menu">
-              {THEMES.map((th) => (
-                <button
-                  key={th.id}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={th.id === theme}
-                  className={`sh-theme-choice${th.id === theme ? " current" : ""}`}
-                  aria-label={t(th.label)}
-                  data-tap
-                  onPointerDown={pickTheme(th.id)}
-                >
-                  <ThemeIcon emoji={th.emoji} />
-                </button>
-              ))}
-            </div>
-          )}
+          </div>
         </div>
+        <FeedbackLayer effects={effects} />
       </div>
-      <FeedbackLayer effects={effects} />
-    </div>
+      {corner}
+    </>
   );
 }

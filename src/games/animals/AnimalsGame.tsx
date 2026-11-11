@@ -1,3 +1,4 @@
+import { CornerChoices } from "@/components/CornerChoices";
 import { GameShell } from "@/components/GameShell";
 import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
@@ -92,35 +93,15 @@ export function AnimalsGame() {
   );
 }
 
-/**
- * „Was drankommt“ while playing, right in the top right corner as a small paper note listing the choices – no ⚙️ to hold
- * and no panel popping up over the game (user decision, November 2026): „Gemischt“ or exactly one kind, the chosen one
- * marked by the highlighter's stroke. Words only, no signs. A change counts from the next round.
- */
+/** „Was drankommt“ while playing, in the top right corner: „Gemischt“ or exactly one kind, which comes at once (`AnimalsRounds`). */
 function KindCorner({ value, onChange }: { value: "all" | RoundKind; onChange: (kinds: "all" | RoundKind) => void }) {
   const t = useT();
-  const choices: { value: "all" | RoundKind; label: string }[] = [
-    { value: "all", label: t(MIXED) },
-    ...KIND_ORDER.map((kind) => ({ value: kind, label: t(KIND_NAMES[kind]) })),
-  ];
   return (
-    <nav className="ap-kinds" aria-label={t(WHAT_COMES_UP)} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
-      <span className="ap-kinds-title" aria-hidden>
-        {t(WHAT_COMES_UP)}
-      </span>
-      {choices.map((choice) => (
-        <button
-          key={choice.value}
-          type="button"
-          className="ap-kind"
-          aria-pressed={choice.value === value}
-          // No focus left on it, so Space and Enter keep playing the game.
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={() => onChange(choice.value)}
-        >
-          <span className="ap-kind-label">{choice.label}</span>
-        </button>
-      ))}
-    </nav>
+    <CornerChoices
+      title={t(WHAT_COMES_UP)}
+      value={value}
+      onChange={onChange}
+      choices={[{ value: "all", label: t(MIXED) }, ...KIND_ORDER.map((kind) => ({ value: kind, label: t(KIND_NAMES[kind]) }))]}
+    />
   );
 }

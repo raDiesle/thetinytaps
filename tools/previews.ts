@@ -202,7 +202,7 @@ const WAITS: Record<string, number> = {
  */
 const HIDE_OVERLAYS = `(() => {
   const style = document.createElement("style");
-  style.textContent = ".exit-corner, .play-options-corner, .play-fullscreen, .play-fullscreen-corner, .dev-tag, .sound-wait, .scene-prompt, .scene-keys, .scene-goal, .scene-keys-toggle, .adventure-controls, .run-space, .fg-words-text, .fg-day-text, .fg-caption, .fg-dots, .fg-go-on, .fg-next, .fg-back, .story-voice { visibility: hidden !important; }";
+  style.textContent = ".exit-corner, .play-options-corner, .play-fullscreen, .play-fullscreen-corner, .corner-choices, .dev-tag, .sound-wait, .scene-prompt, .scene-keys, .scene-goal, .scene-keys-toggle, .adventure-controls, .run-space, .fg-words-text, .fg-day-text, .fg-caption, .fg-dots, .fg-go-on, .fg-next, .fg-back, .story-voice { visibility: hidden !important; }";
   document.head.append(style);
   // Kleine Abenteuer's backpack and its button lie in an svg of their own over the trail.
   const hud = document.querySelector(".tl-bag")?.closest("svg");
