@@ -275,5 +275,13 @@ export const allGamesIdeas: IdeaArea = {
       why: "Gemalte Pokale sehen schöner aus und passen zu den Buchdeckeln im Regal.",
       effort: "M",
     },
+    {
+      id: "A-33",
+      emoji: "🍌",
+      title: "Bilder günstiger: Nano Banana 2.1 auf 2K-Bögen mit vier Bildern",
+      text: "Recherche „gemini-bildpreise“ (11. November 2026): Das neue Modell gemini-nano-banana-2.1 kostet je 1K-Bild im Batch dasselbe wie unser Nano Banana 2 Lite (0,0168 $), soll besser aussehen und Figuren treuer halten – und kann 2K für 0,0252 $. Ein 2K-Bogen fasst vier Bilder in der Größe, die heute je eine Anfrage allein kostet (Karten 1200×900, Geschichtsbilder), also etwa 0,007 $ statt 0,017 $ je Bild; kleine Freisteller passen zu neunt oder sechzehnt auf einen Bogen. Dafür sind seine Eingabe (Text, Vorlagen) sechsmal so teuer wie bei Lite und es denkt standardmäßig („medium“, als Text-Ausgabe bezahlt). Zuerst ein Versuch für etwa 0,03 $: ein 2K-Bogen mit vier wartenden Bildern, Denken auf „minimal“, die Token-Zahlen der Antwort (usageMetadata) gelesen und das Bild neben Lite gelegt. Hält es, bekommen `bun run image` und der Plan der Warteschlange 2K-Bögen (Größen der Felder, 3x3 und 4x4) und das Skript schreibt die echten Kosten jedes Batches mit.",
+      why: "Bisher rund 1 900 Anfragen für 32 $, drei Viertel davon ein Bild allein; mit vier Bildern je Anfrage wäre es etwa die Hälfte, ohne schlechtere Bilder.",
+      effort: "M",
+    },
   ],
 };
