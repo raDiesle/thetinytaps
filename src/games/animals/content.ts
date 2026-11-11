@@ -381,6 +381,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["apfel", "banane", "trauben", "melone", "blume", "honig", "wurm"],
     home: "hoehle",
     alsoLives: ["baum", "stall", "wald", "dschungel", "bambuswald"],
+    ...calls("bat", playSqueak),
   },
   {
     id: "affe",
@@ -722,6 +723,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["heu", "salat", "apfel", "moehre", "banane", "trauben", "melone", "mais", "blume", "bambus", "holz", "erdnuss"],
     home: "savanne",
     alsoLives: ["wueste"],
+    ...calls("rhino", quiet),
   },
   {
     id: "kaenguru",
@@ -839,10 +841,18 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["dschungel", "bambuswald", "baum", "wiese", "stall"],
     ...calls("boar", playOink),
   },
-  { id: "waschbaer", emoji: "🦝", name: "Waschbär", the: "der Waschbär", home: "wald", alsoLives: ["dschungel", "bambuswald", "baum", "hoehle", "garten"] },
+  {
+    id: "waschbaer",
+    emoji: "🦝",
+    name: "Waschbär",
+    the: "der Waschbär",
+    home: "wald",
+    alsoLives: ["dschungel", "bambuswald", "baum", "hoehle", "garten"],
+    ...calls("raccoon", playSqueak),
+  },
   { id: "dachs", emoji: "🦡", name: "Dachs", the: "der Dachs", home: "bau", alsoLives: ["wald", "dschungel", "bambuswald", "hoehle"] },
   { id: "qualle", emoji: "🪼", name: "Qualle", the: "die Qualle", home: "meer", alsoLives: ["teich", "fluss", "riff", "aquarium"] },
-  { id: "schwan", emoji: "🦢", name: "Schwan", the: "der Schwan", home: "teich", alsoLives: ["meer", "fluss", "riff", "nest"] },
+  { id: "schwan", emoji: "🦢", name: "Schwan", the: "der Schwan", home: "teich", alsoLives: ["meer", "fluss", "riff", "nest"], ...calls("swan", playQuack) },
   // Animals known by their sound, for „Wer macht das Geräusch?“ only (Z-15, November 2026): the rooster crows like
   // no hen, so the two look alike and sound different.
   { id: "hahn", emoji: "🐓", name: "Hahn", the: "der Hahn", ...calls("crow", playCrow) },

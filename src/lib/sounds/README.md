@@ -16,13 +16,15 @@ ffmpeg -ss 0.15 -t 0.9 -i source.mp3 -af "highpass=f=45,afade=t=in:d=0.008,afade
 ```
 
 To try another recording: search Freesound with the licence filter
-"Creative Commons 0", put the new file here under the same name, done.
+"Creative Commons 0", put the new file here under the same name, done. Freesound shows only one result per pack
+unless the search address ends in `&g=0`: add it, or whole packs of fitting recordings stay hidden.
 
 | File             | Source                                                                                                                                   | By                        | Cut                |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ------------------ |
 | `alarm.mp3`      | [fire alarm bell](https://freesound.org/people/msx2plus/sounds/678345/)                                                                  | msx2plus                  | 0.0–1.60 s         |
 | `baa.mp3`        | [Sheep baa](https://freesound.org/people/Chipsplease/sounds/669765/)                                                                     | Chipsplease               | 0.98–1.83 s        |
 | `bark.mp3`       | [Puppy Bark](https://freesound.org/people/AntumDeluge/sounds/583142/)                                                                    | AntumDeluge               | 0.08–1.28 s        |
+| `bat.mp3`        | [Bat chirp (close-up)](https://freesound.org/people/coelhoigor/sounds/455593/)                                                           | coelhoigor                | 3.40–5.00 s        |
 | `bells.mp3`      | [Old Church Bell.wav](https://freesound.org/people/dsp9000/sounds/76405/)                                                                | dsp9000                   | 0.0–3.20 s         |
 | `blow.mp3`       | [Hairdryer](https://freesound.org/people/mpue76/sounds/541563/)                                                                          | mpue76                    | 0.4–2.00 s         |
 | `boar.mp3`       | [Swine - Pig; Dinosaur-like Grunt](https://freesound.org/people/TheKingOfGeeks360/sounds/842313/)                                        | TheKingOfGeeks360         | 0.00–1.50 s        |
@@ -80,6 +82,8 @@ To try another recording: search Freesound with the licence filter
 | `peck.mp3`       | [woodpecker taps 20240915](https://freesound.org/people/todorrobot/sounds/754590/)                                                       | todorrobot                | 0.12–1.22 s        |
 | `penguin.mp3`    | [Pinguin Colony at Gourdin Island](https://freesound.org/people/al.barbosa/sounds/150873/)                                               | al.barbosa                | 5.0–6.70 s         |
 | `quack.mp3`      | [Duck quacking.mp3](https://freesound.org/people/DigPro120/sounds/558858/)                                                               | DigPro120                 | 0.18–1.28 s        |
+| `raccoon.mp3`    | [120827 Raccoon, bark, screech, yelp, squeal, backyard, Toronto.wav](https://freesound.org/people/TRP/sounds/616622/)                    | TRP                       | 0.45–2.00 s        |
+| `rhino.mp3`      | [Indian rhinoceros (Rhinoceros unicornis)](https://freesound.org/people/Breviceps/sounds/535810/)                                        | Breviceps                 | 0.00–0.85 s        |
 | `ring.mp3`       | [Bike Bell.wav](https://freesound.org/people/bsumusictech/sounds/81875/)                                                                 | bsumusictech              | 0.03–1.73 s        |
 | `roar.mp3`       | [Lion Growl.wav](https://freesound.org/people/LilMati/sounds/516829/)                                                                    | LilMati                   | 1.08–2.38 s        |
 | `saw.mp3`        | [Sawing Wood](https://freesound.org/people/Mateusz_Chenc/sounds/519661/)                                                                 | Mateusz_Chenc             | 0.0–1.50 s         |
@@ -92,6 +96,7 @@ To try another recording: search Freesound with the licence filter
 | `squirrel.mp3`   | [squirrel upset.wav](https://freesound.org/people/cognito%20perceptu/sounds/18515/)                                                      | cognito perceptu          | 18.55–19.75 s      |
 | `stag.mp3`       | [250910_22h43 Gergueil D104 - Brame](https://freesound.org/people/Sadiquecat/sounds/826421/)                                             | Sadiquecat                | 5.60–8.60 s        |
 | `stomp.mp3`      | [Stomp.wav](https://freesound.org/people/000600/sounds/180015/)                                                                          | 000600                    | 0.0–1.60 s         |
+| `swan.mp3`       | [sangsvan-short.aiff](https://freesound.org/people/PerMagnusLindborg/sounds/223697/)                                                     | PerMagnusLindborg         | 0.20–2.20 s        |
 | `switch.mp3`     | [Switch Flip #1](https://freesound.org/people/IanStarGem/sounds/278205/)                                                                 | IanStarGem                | 0.0–0.30 s         |
 | `tick.mp3`       | [Ticking Clock](https://freesound.org/people/AntumDeluge/sounds/188033/)                                                                 | AntumDeluge               | 0.1–2.40 s         |
 | `tiger.mp3`      | [Tiger Roar](https://freesound.org/people/lauramellis/sounds/263115/)                                                                    | lauramellis               | 0.90–3.30 s        |
@@ -108,7 +113,8 @@ To try another recording: search Freesound with the licence filter
 
 The animal calls added for „Wer macht das Geräusch?“ in Was gehört zum Tier? (November 2026) were picked by their
 pages and levels, not yet by ear: `llama.mp3` is an alpaca, `boar.mp3` a domestic pig's rough grunt,
-`crocodile.mp3` an alligator, and `hippo.mp3`, `mosquito.mp3` and `crocodile.mp3` are the least certain – listen to
+`crocodile.mp3` an alligator, `swan.mp3` a whooper swan, `raccoon.mp3` a screech, `rhino.mp3` an Indian rhino's honk, and
+`hippo.mp3`, `mosquito.mp3`, `crocodile.mp3` and `rhino.mp3` are the least certain – listen to
 them before swapping anything else.
 
 `bubbles`, `growl`, `helicopter`, `mouse`, `penguin` and `washer` have names of their own (not `blub`,

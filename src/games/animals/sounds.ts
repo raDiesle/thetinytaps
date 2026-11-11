@@ -15,7 +15,7 @@ export const SOUND_LOOKALIKES: string[][] = [
   // Growls and roars.
   ["baer", "loewe", "tiger", "gorilla", "krokodil"],
   // Grunts and snorts.
-  ["schwein", "wildschwein", "igel", "nilpferd", "kamel"],
+  ["schwein", "wildschwein", "igel", "nilpferd", "nashorn", "kamel"],
   // Bleats.
   ["schaf", "ziege", "lama"],
   // Neighs and brays.
@@ -29,13 +29,13 @@ export const SOUND_LOOKALIKES: string[][] = [
   // Soft hoots and coos.
   ["eule", "taube"],
   // Quacks, honks and gabbles.
-  ["ente", "gans", "flamingo"],
+  ["ente", "gans", "schwan", "flamingo"],
   // Screeches.
   ["papagei", "pfau", "adler"],
   // Buzzing and whining.
   ["biene", "muecke"],
   // Squeaks and chatters of small animals.
-  ["maus", "eichhoernchen"],
+  ["maus", "eichhoernchen", "fledermaus", "waschbaer"],
   // Chirps.
   ["vogel", "grashuepfer"],
 ];
