@@ -75,7 +75,7 @@ export const SEO_EN: SeoTranslation = {
     "/kettenreaktion/": {
       title: "Chain Reaction and Marble Run for Kids",
       description: "A marble rolls off and sets a machine going: marble runs and chain reactions to tap and marvel at, for toddlers, without ads.",
-      text: "Twenty runs and machines: marbles roll over wood, snow, water slides and conveyor belts, dominoes and everyday things topple, one thing pushes the next. One tap starts the chain reaction, and at one point the machine waits until the child lets it run on with a tap – to marvel at and play again.",
+      text: "Twenty-one runs and machines: marbles roll over wood, snow, water slides and conveyor belts, dominoes and everyday things topple, one thing pushes the next. On the colour run the child picks red, yellow or blue for each marble, and at the bottom it drops into the tube of its colour and is counted. One tap starts the chain reaction, and at one point the machine waits until the child lets it run on with a tap – to marvel at and play again.",
     },
     "/kleine-abenteuer/": {
       title: "Little Adventures – Picture Stories for Toddlers",

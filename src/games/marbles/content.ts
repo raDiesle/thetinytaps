@@ -38,6 +38,10 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
       ru: "Нажми — и шарики покатятся!",
     },
   },
+  colortrack: {
+    name: { de: "Farbenbahn" },
+    intro: { de: "Welche Farbe? Tipp eine Kugel an!" },
+  },
   snowtrack: {
     name: { de: "Schneebahn", en: "Snow Run", zh: "雪球轨道", hi: "बर्फ़ का रास्ता", es: "La pista de nieve", ar: "مسار الثلج", ru: "Снежная горка" },
     intro: {

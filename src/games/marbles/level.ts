@@ -7,8 +7,8 @@ import type { MarbleLevel } from "./settings";
 export interface LevelProps {
   /** Plays a sound effect, unless sounds are off. */
   sound: (play: () => void) => void;
-  /** Says a line in the app language, if speech is on; every line comes in German and Russian. */
-  say: (text: Localized) => void;
+  /** Says a line in the app language, after what is being said; with `queue` false it cuts that off instead (a count that must keep up with the picture). */
+  say: (text: Localized, queue?: boolean) => void;
   /** The level is finished: the machine has run, everything has fallen over, or the marble run's basket is full. */
   onDone: () => void;
   /** Nothing waits for the child: what would wait for a tap goes on by itself (the start screen's choice: the marble run's barrier and switch, the machines' stops). */

@@ -3,7 +3,7 @@
 Route `/kettenreaktion/` (`/kugelbahn/`, its old address and then the marble run's, leads here). The „Klingende Kugelbahn“
 was a game of its own for a while and is the first level here again, so marble run and machines are one game on the home menu.
 
-Twenty levels in turn, beginning with the one picked on the start screen; after each one „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
+Twenty-one levels in turn, beginning with the one picked on the start screen; after each one „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
 machines: the points-along-a-way helpers in `path.ts`, the marble and rail drawings in `parts.tsx`, `useFrames`/`useAnyKey` in `level.ts`.
 
 "Alles fällt um" (`ToppleLevel.tsx`): everyday things (`things.tsx`) stand in seven runs, each small to tall, and topple onto each other like dominoes; each round picks other things, and the last one is always the broom, which falls onto the drum, bang, and sparkles burst out of it.
@@ -191,3 +191,21 @@ when full, the animals in the tunnel, and its `End` (drawn behind and in front o
   everything shared with the wooden run. The tunnel's colour-changing magic is the wooden run's only
   (`magic`); the other worlds keep each thing's own look.
 - `trackTheme.test.ts` checks each world's level, its texts, the tunnel animals and that its landing spots stay on the wall.
+
+## Farbenbahn (K-10)
+
+„Farbenbahn“ (`colorTrack.tsx`, numbers and lines in `colors.ts`, `colortrack`, second card after the wooden run): a world
+of the same run (`TrackTheme.sort`) where the shelf always holds a red, a yellow and a blue marble – the one taken pops up
+again – so the child picks each marble's colour instead of a thing. At the end, where the basket would be, three glass
+tubes stand on a stand, each with its colour as a ring at the rim and a dot on the stand. A marble hops off the last row
+in an arc to above the tube of its colour and drops straight in (`hop`), a note one step higher for each marble already
+there (`playCountNote`), and the voice counts „Eine rote!“ … „Fünf rote!“ (`countLine`; said with `say(line, false)`, so
+a newer count cuts off the one before and the voice never lags behind the tubes). The first tube with `TUBE_FULL` marbles
+is the end: it glows in its colour, a few hearts and stars in its colour rise slowly from it (`TubeParty`), „Die Röhre ist
+voll!“, and the level is done. Marbles still on the way pile up out of their tube's top. No tunnel magic here (it would
+change a marble's colour).
+- Nothing can be wrong: every colour has its tube, and any tube full ends the run.
+- The tubes stand `TUBES.bottom` well above the wall's lower edge: at its very edge the bottom marbles were cut off by
+  the frame on a tablet, and the stand in front must not cover the lowest marble either.
+- Its texts are German only, and the counting lines aren't recorded yet (`languageStatus.ts`, „🎨 Farbenbahn“); until
+  then only the notes count. `trackTheme.test.ts` checks the tubes, the counting and the hop.

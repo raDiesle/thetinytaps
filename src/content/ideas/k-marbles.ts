@@ -95,6 +95,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Statt eines Startknopfs drei große Farbknöpfe (rot, gelb, blau). Jede Kugel bekommt die Farbe, die das Kind antippt. Unten fällt sie in die passende Röhre, und die Stimme zählt mit: „Drei rote!“. Volle Röhre: kleines Fest in ihrer Farbe.",
       why: "Farben und erste Mengen ganz nebenbei, ohne dass etwas falsch sein kann.",
       effort: "S",
+      done: true,
     },
     {
       id: "K-11",

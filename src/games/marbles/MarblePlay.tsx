@@ -21,7 +21,7 @@ import { SneezeLevel } from "./SneezeLevel";
 import { SpaceLevel } from "./SpaceLevel";
 import { TidyLevel } from "./TidyLevel";
 import { ToppleLevel } from "./ToppleLevel";
-import { SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
+import { ColorTrackLevel, SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
 import { marblesVoice } from "./voice";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
@@ -31,6 +31,7 @@ import { DEV } from "@/lib/buildInfo";
 /** The levels in turn (names and first lines in `content.ts`). */
 const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
   { id: "track", Level: TrackLevel },
+  { id: "colortrack", Level: ColorTrackLevel },
   { id: "snowtrack", Level: SnowTrackLevel },
   { id: "spacetrack", Level: SpaceTrackLevel },
   { id: "slidetrack", Level: SlideTrackLevel },
@@ -53,7 +54,7 @@ const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
 ];
 
 /** The marble runs, the wooden one and its other worlds (K-18). */
-const RUNS: MarbleLevel[] = ["track", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
+const RUNS: MarbleLevel[] = ["track", "colortrack", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
 
 /** The levels in turn, beginning with the chosen one (in development `?level=garden` in the address), so „Weiter“ always has a next. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {

@@ -79,7 +79,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Reacción en cadena y circuito de canicas",
       description:
         "Una canica echa a rodar y pone en marcha una máquina: circuitos de canicas y reacciones en cadena para tocar y asombrarse. Para niños pequeños.",
-      text: "Veinte circuitos y máquinas: las canicas ruedan sobre madera, nieve, toboganes de agua y cintas transportadoras, las fichas de dominó y las cosas de casa caen, una empuja a la siguiente. Un toque pone en marcha la reacción en cadena, y en un punto la máquina espera hasta que el niño la deja seguir con otro toque: para asombrarse y volver a empezar.",
+      text: "Veintiún circuitos y máquinas: las canicas ruedan sobre madera, nieve, toboganes de agua y cintas transportadoras, las fichas de dominó y las cosas de casa caen, una empuja a la siguiente. En el circuito de colores el niño elige rojo, amarillo o azul para cada canica, y abajo cae en el tubo de su color y se cuenta. Un toque pone en marcha la reacción en cadena, y en un punto la máquina espera hasta que el niño la deja seguir con otro toque: para asombrarse y volver a empezar.",
     },
     "/kleine-abenteuer/": {
       title: "Pequeñas aventuras: historias para niños pequeños",
