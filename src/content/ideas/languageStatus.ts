@@ -82,6 +82,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
+    href: "/kita/",
+    note: "Das Buch „Kita-Start“ mit „Tapsi geht in die Kita“, einer Geschichte in Kapiteln (kitaStory.ts, 11. November 2026): nur Deutsch. Es fehlen Name, Satz fürs Regal (names.ts) und Kapitel und Sätze, als <Sprache>.ts im Ordner wie bei „Schnullerfee“. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.",
+    languages: { de: "done" },
+  },
+  {
     href: "/zaehne/",
     parts: [
       {

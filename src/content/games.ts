@@ -2,6 +2,7 @@ import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TI
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
+import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
 import {
   CASE_BLURB,
   CASE_TITLE,
@@ -122,6 +123,15 @@ export const CATEGORIES: Category[] = [
         emoji: "🧚",
         title: PACIFIER_STORY_BOOK,
         blurb: PACIFIER_STORY_BLURB,
+      },
+      {
+        // The book „Kita-Start“ beside „Schnullerfee“ (idea H-10, user request, 11 November 2026: „im gleichen Stil wie
+        // Abstillen“): „Tapsi geht in die Kita“, a story in chapters along the steps of settling in and the morning's
+        // goodbye ritual (src/games/kitastory).
+        href: "/kita/",
+        emoji: "🎒",
+        title: KITA_STORY_BOOK,
+        blurb: KITA_STORY_BLURB,
       },
       {
         href: "/zaehne/",
