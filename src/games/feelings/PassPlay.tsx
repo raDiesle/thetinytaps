@@ -73,7 +73,7 @@ export function PassPlay({
       settings={settings}
       progress={{ total: scenes.length, done: now.index }}
       onFinish={finish}
-      ending={last ? <GameEnd inline showNext onAgain={onAgain} next={next} /> : undefined}
+      ending={last ? <GameEnd inline showNext level={group.id} onAgain={onAgain} next={next} /> : undefined}
       onDone={last ? undefined : goOn}
       onEndKey={last ? (next?.onNext ?? onAgain) : goOn}
       onPick={replay}

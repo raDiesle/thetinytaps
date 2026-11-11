@@ -142,7 +142,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   return (
     <div className={`marble-play${party ? " party" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
       <level.Level key={round} sound={sound} say={say} onDone={onDone} watch={settings.play === "watch"} />
-      {ended && <GameEnd onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
+      {ended && <GameEnd level={level.id} onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <FeedbackLayer effects={effects} />
     </div>
   );

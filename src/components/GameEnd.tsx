@@ -5,7 +5,9 @@ import { track } from "@/lib/analytics";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
+import { awardTrophy, gameOfPath } from "@/lib/trophies";
 import { recordedVoice } from "@/lib/voice";
+import { Trophy } from "@/components/Trophy";
 import endFiles from "./stimme/**/*.mp3?glob";
 
 /**
@@ -54,17 +56,23 @@ interface GameEndProps {
    * feeling, user feedback, November 2026). Elsewhere the name is only read out.
    */
   showNext?: boolean;
+  /**
+   * The level played, for its trophy (`src/lib/trophies.ts`): every level of a game gives a trophy of its own. Left out
+   * where the game has one level or story only, which gives the game's one trophy.
+   */
+  level?: string;
 }
 
 /**
- * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another). Nothing
- * stands beside them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken
- * out again (user feedback, November 2026). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
+ * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another), and the
+ * level's trophy beside them, won now or before (Trophy.tsx, user decision, November 2026). Nothing else stands beside
+ * them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken out again
+ * (user feedback, November 2026). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
  * no button here but the page's corner in the top left, as in every menu – the ✕, or the book's ribbon where the game
  * goes back onto the shelf (GameShell, told by `useEndShown`; a „Menü“ button was one way back too many, user feedback,
  * November 2026).
  */
-export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = false, showNext = false }: GameEndProps) {
+export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = false, showNext = false, level = "" }: GameEndProps) {
   const t = useT();
   const language = useAppLanguage();
   const endShown = useEndShown();
@@ -82,6 +90,13 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
   useEffect(() => {
     if (shown) track("ende", { spiel: pathname });
   }, [shown, pathname]);
+
+  // The level's trophy (user decision, November 2026): given once the end shows, standing beside the buttons and from
+  // then on in the bookshelf on the home page (TrophyShelf).
+  const game = gameOfPath(pathname)?.href;
+  useEffect(() => {
+    if (shown && game) awardTrophy(game, level);
+  }, [shown, game, level]);
 
   // With the last game of a game limit, the game says good night instead (GameShell).
   useEffect(() => {
@@ -122,6 +137,8 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false, inline = 
 
   return (
     <div className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
+      {/* The trophy won, still once it has come: the level's reward, not a button. */}
+      {game && <Trophy game={game} level={level} className="game-end-trophy" />}
       <div className="game-end-small">
         <button type="button" className="game-end-button again" onPointerDown={press("nochmal", onAgain)}>
           {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}

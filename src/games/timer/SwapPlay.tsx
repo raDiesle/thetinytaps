@@ -308,7 +308,7 @@ export function SwapRun({
         )}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
-        {done && <GameEnd delayMs={4200} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
+        {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>

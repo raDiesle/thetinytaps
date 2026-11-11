@@ -290,6 +290,14 @@ In a fresh worktree run `bun install` first.
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
+  What a child does collect are **trophies** (user decision, November 2026): every level's or story's end gives the
+  trophy of that level, once, and it waits in the shelf on the home page – never a count while playing. One system for
+  every game: `GameEnd` awards it (`awardTrophy`, `src/lib/trophies.ts`, finding the game by its address) and shows it
+  beside its buttons; a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
+  Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
+  own picture in its medallion, `trophyPictures.ts`), drawn still, coming in once slowly – never shining, sparkling or
+  bouncing. The newest stand at the right of the lowest board of picture books, books and trophies together in the
+  middle (`TrophyShelf`), and one tap there opens all of them by game; before the first one nothing stands there.
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
   some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
   Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.
@@ -528,8 +536,8 @@ In a fresh worktree run `bun install` first.
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's
   cards' room, Zähne putzen's week chart) passes `inline` (user feedback, November 2026; `GameEnd.test.ts`). Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom right corner instead, and only where that game's rules say so.
-    Nothing stands beside the buttons: a fox or bear family cheering there (D-12) was decoration and was taken out (user
-  feedback, November 2026). `Mascot` is the app's one drawn fox and bear standing (grown-up or child, standing, waving,
+    Nothing stands beside the buttons but the level's trophy (see trophies above): a fox or bear family cheering there
+  (D-12) was decoration and was taken out (user feedback, November 2026). `Mascot` is the app's one drawn fox and bear standing (grown-up or child, standing, waving,
   cheering, clapping or pointing): a game whose fox or bear does its thing takes it rather than drawing its own.
 
 ## Architecture

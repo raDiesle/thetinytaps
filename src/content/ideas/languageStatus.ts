@@ -433,6 +433,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Der Satz unter „Bitte quer halten“ (was die Seite bietet und warum quer, 10. November 2026) übersetzt auf Wunsch am 11. November 2026, wie Titel, „Vollbild“ und „Trotzdem hochkant“.",
       },
+      {
+        label: "🏆 Pokale",
+        languages: { de: "done" },
+        note: "Die Pokale im Regal (TrophyShelf.tsx, 11. November 2026): nur das Wort „Pokale“ (vorgelesen und über dem Schrank mit allen Pokalen) wartet auf seine Übersetzung; die Namen der Spiele darin sind schon übersetzt.",
+      },
     ],
   },
 ];

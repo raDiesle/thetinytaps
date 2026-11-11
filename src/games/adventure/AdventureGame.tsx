@@ -62,6 +62,7 @@ export function AdventureGame() {
       <AdventurePlay
         key={story.sequence.title}
         story={story}
+        storyId={PLAYABLE[at].id}
         language={language}
         settings={common}
         next={next && { name: storyTitle(next.story, app.id), onNext: () => update({ story: next.id }) }}

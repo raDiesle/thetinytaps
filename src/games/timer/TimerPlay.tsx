@@ -450,6 +450,7 @@ function TimerRun({
         {phase === "done" && (
           <GameEnd
             delayMs={picture === "caterpillar" ? END_MS_CATERPILLAR : END_MS}
+            level={picture}
             onAgain={onAgain}
             next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }}
           />

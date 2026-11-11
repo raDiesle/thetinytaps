@@ -256,5 +256,22 @@ export const allGamesIdeas: IdeaArea = {
       why: "Weniger Sinnesreize: kein Blinken, nichts Wildes, die Freude liegt im Bild und im Satz der Stimme. Ein Kind sieht, was es geschafft hat, statt Formen, die mit dem Spiel nichts zu tun haben.",
       effort: "M",
     },
+    {
+      id: "A-31",
+      emoji: "🏆",
+      title: "Pokale sammeln: jedes Level gibt seinen eigenen Pokal, im Regal auf der Startseite",
+      text: "Am Ende jedes Levels oder jeder Geschichte (GameEnd) steht neben „Nochmal“ und „Weiter“ der Pokal dieses Levels, einmal gewonnen und dann gesammelt. Jeder sieht anders aus: Metall nach dem Spiel, Form, Henkel, Deckel und Fuß nach dem Level, im Medaillon das Bild des Levels. Die neuesten stehen rechts neben den Bilderbüchern auf dem unteren Brett; ein Tipp darauf zeigt alle, nach Spielen geordnet. Spiele ohne Ende (Socken-Paare, Zuordnen) und Belohnungstafel und Zeitplan haben noch keine.",
+      why: "Ein Kind sieht wieder, was es geschafft hat, und findet es im Regal wieder – ruhig, ohne Zählen während des Spiels.",
+      effort: "M",
+      done: true,
+    },
+    {
+      id: "A-32",
+      emoji: "🎨",
+      title: "Pokale als Bilder: für jeden Pokal ein gemaltes Bild statt der Zeichnung",
+      text: "Gehört zu A-31. Heute sind die Pokale SVG-Zeichnungen (Trophy.tsx). Mit /bild-erzeugen bekäme jedes Spiel oder jedes Level einen gemalten Pokal im Stil der Bilderbücher, passend zum Level (ein Pokal mit Kuh für den Bauernhof, einer mit Rakete für die Weltraumbahn), als kleine Bilder auf einem gemeinsamen Bogen, damit es günstig bleibt; die Zeichnung bleibt, wo noch kein Bild ist.",
+      why: "Gemalte Pokale sehen schöner aus und passen zu den Buchdeckeln im Regal.",
+      effort: "M",
+    },
   ],
 };

@@ -99,3 +99,34 @@
   font-size: clamp(0.95rem, 2.2vw, 1.25rem);
   pointer-events: auto;
 }
+
+/*
+ * The level's trophy beside the buttons (Trophy.tsx): it comes once, slowly, and then stands still – no shine running
+ * over it, no bounce, no sparkle. It is the reward, not a button: taps go past it.
+ */
+.game-end-trophy {
+  flex: none;
+  align-self: flex-end;
+  height: clamp(96px, 30vh, 230px);
+  width: auto;
+  aspect-ratio: 2 / 3;
+  pointer-events: none;
+  /* Lifted off the picture, so it is seen on a busy one too. */
+  filter: drop-shadow(0 3px 6px #2a180c66);
+  animation: game-end-trophy-in 1.4s ease-out both;
+}
+
+@keyframes game-end-trophy-in {
+  from {
+    opacity: 0;
+    transform: translateY(6%);
+  }
+}
+
+.game-end.inline .game-end-trophy {
+  height: clamp(80px, 22vh, 170px);
+}
+
+.game-end.corners .game-end-trophy {
+  height: clamp(64px, 18vh, 130px);
+}
