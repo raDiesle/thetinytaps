@@ -1,3 +1,4 @@
+import { ALLTAG_PICTURE_QUEUE } from "@/games/feelings/alltagDrawings";
 import { DAY_PICTURE_QUEUE } from "@/games/feelings/dayPictures";
 import { MOOD_PICTURE_QUEUE } from "@/games/feelings/moodPictures";
 import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
@@ -68,6 +69,7 @@ export interface QueuedPicture {
 /** Every picture waiting, oldest first. */
 export const PICTURE_QUEUE: QueuedPicture[] = [
   ...RITUAL_PICTURE_QUEUE,
+  ...ALLTAG_PICTURE_QUEUE,
   ...DAY_PICTURE_QUEUE,
   ...MOOD_PICTURE_QUEUE,
   ...TOGETHER_PICTURE_QUEUE,
