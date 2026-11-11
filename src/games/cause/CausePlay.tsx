@@ -2,7 +2,8 @@ import { type ReactNode, useEffect, useState } from "react";
 import { DevTag } from "@/components/DevTag";
 import { GameEnd } from "@/components/GameEnd";
 import { useGameSettings } from "@/lib/common";
-import { useT } from "@/lib/language";
+import { byLanguage } from "@/content/texts";
+import { useAppLanguage, useT } from "@/lib/language";
 import { playPlop, playTwinkle } from "@/lib/sfx";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
 import { ChoiceCard, GoOn, StepBack, StepDots, StoryPicture, StoryWords } from "../feelings/shared";
@@ -18,6 +19,9 @@ interface CauseProgress {
 }
 
 const PROGRESS_KEY = "tinytaps.cause.v1";
+
+/** The scenes' words in the other languages, filled as their texts load; German is in `scenes.ts`. */
+const TRANSLATIONS = byLanguage((texts) => texts.cause);
 const START: CauseProgress = { pass: 0, scene: 0 };
 
 /**
@@ -107,6 +111,9 @@ function CauseScenePlay({
   nextImage?: string;
 }) {
   const t = useT();
+  const { id: language } = useAppLanguage();
+  // The words under the pictures in the app language; a scene not translated keeps its German words.
+  const words = { ...scene, ...(language === "de" ? undefined : TRANSLATIONS[language]?.[scene.id]) };
   const [phase, setPhase] = useState<Phase>("show");
   /** The other picture was tapped: it stays crossed out. */
   const [crossed, setCrossed] = useState(false);
@@ -151,7 +158,7 @@ function CauseScenePlay({
   const choosing = phase === "choose";
   const shown = phase === "found" ? images.cause : images.feeling;
   // The whole text stands under the picture, never on it: what the bear shows and the question, then why once found.
-  const caption = phase === "found" ? scene.told : `${scene.shows} ${t(CAUSE_QUESTION)}`;
+  const caption = phase === "found" ? words.told : `${words.shows} ${t(CAUSE_QUESTION)}`;
   const next = phase === "show" ? () => setPhase("choose") : phase === "found" ? onDone : undefined;
   // ◀ bottom left: from the choice back to the feeling alone, otherwise to the scene before.
   const back = choosing ? () => setPhase("show") : onBack;
@@ -161,7 +168,7 @@ function CauseScenePlay({
       letter={letter}
       image={images[which]}
       sources={framesOf(images[which])}
-      caption={which === "cause" ? scene.cause : scene.other}
+      caption={which === "cause" ? words.cause : words.other}
       state={which === "other" && crossed ? "wrong" : "choose"}
       onChoose={() => pick(which)}
     />

@@ -223,8 +223,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🌻 Unser Garten wächst",
         recorded: true,
-        languages: { de: "text" },
-        note: "Neu (10. November 2026), nur Deutsch und noch nicht aufgenommen: bis dahin liest die Stimme des Browsers. Titel und Sätze fehlen in den anderen Sprachen.",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Neu (10. November 2026), Titel und Sätze übersetzt auf Wunsch am 11. November 2026, in keiner Sprache aufgenommen: bis dahin liest die Stimme des Browsers.",
       },
     ],
   },
@@ -334,8 +334,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "Die 30 Szenen",
-        languages: { de: "done" },
-        note: "Neu geschrieben am 10. November 2026 (scenes.ts): was der Bär zeigt, die beiden Fragen unter den Bildern und warum. Nur Deutsch; Übersetzungen kämen als scenes.<Sprache>.ts, nach Id. Keine Stimme.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Neu geschrieben am 10. November 2026 (scenes.ts): was der Bär zeigt, die beiden Fragen unter den Bildern und warum. Übersetzt auf Wunsch am 11. November 2026 (scenes.<Sprache>.ts, nach Id). Keine Stimme.",
       },
     ],
   },
@@ -430,8 +430,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "📱 Hinweis „Bitte quer halten“",
-        languages: { de: "done" },
-        note: "Der Satz unter „Bitte quer halten“ (was die Seite bietet und warum quer, 10. November 2026) nur auf Deutsch; Titel, „Vollbild“ und „Trotzdem hochkant“ sind übersetzt.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Der Satz unter „Bitte quer halten“ (was die Seite bietet und warum quer, 10. November 2026) übersetzt auf Wunsch am 11. November 2026, wie Titel, „Vollbild“ und „Trotzdem hochkant“.",
       },
     ],
   },

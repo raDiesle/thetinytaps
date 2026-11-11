@@ -1,6 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
+import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import { PICTURE_QUEUE } from "@/content/pictureQueue";
+import { CAUSE_SCENES_AR } from "./scenes.ar";
+import { CAUSE_SCENES_EN } from "./scenes.en";
+import { CAUSE_SCENES_ES } from "./scenes.es";
+import { CAUSE_SCENES_HI } from "./scenes.hi";
+import { CAUSE_SCENES_RU } from "./scenes.ru";
+import { CAUSE_SCENES_ZH } from "./scenes.zh";
 import { CAUSE_PASSES, CAUSE_SCENES, FEELING_LETTER, PASS_SIZE, sceneCode, sceneImages } from "./scenes";
 
 describe("Was ist passiert?", () => {
@@ -42,5 +49,32 @@ describe("Was ist passiert?", () => {
   // The raccoon is the one who takes or knocks over, never a fox or a bear (Gefühle's pictures, user decision, November 2026).
   test("whoever takes, knocks over or scribbles is the raccoon", () => {
     for (const s of CAUSE_SCENES.filter((s) => /nimmt|stößt|kritzelt|will .* nicht von/i.test(s.cause))) expect(s.cause, s.id).toContain("Waschbär");
+  });
+
+  // Translated on request (November 2026): no line for a scene that is gone, every scene where the language table says the
+  // scenes are there, questions still questions, and no Latin letters inside a Russian, Chinese, Hindi or Arabic sentence.
+  test("the scenes' words in the other languages", () => {
+    const translations = { en: CAUSE_SCENES_EN, zh: CAUSE_SCENES_ZH, hi: CAUSE_SCENES_HI, es: CAUSE_SCENES_ES, ar: CAUSE_SCENES_AR, ru: CAUSE_SCENES_RU };
+    const ids = CAUSE_SCENES.map((s) => s.id);
+    const status = LANGUAGE_STATUS.find((row) => row.href === "/was-ist-passiert/")?.parts?.find((part) => part.label.includes("Szenen"));
+    expect(status).toBeDefined();
+    for (const [language, table] of Object.entries(translations)) {
+      expect(
+        Object.keys(table).filter((id) => !ids.includes(id)),
+        language,
+      ).toEqual([]);
+      if (status?.languages[language as keyof typeof status.languages] === "done")
+        expect(
+          ids.filter((id) => !table[id]),
+          `${language}: scenes missing though marked done in languageStatus.ts`,
+        ).toEqual([]);
+      for (const s of CAUSE_SCENES) {
+        const words = table[s.id];
+        if (!words) continue;
+        for (const question of [words.cause, words.other]) expect(question, `${language} ${s.id}`).toMatch(/[?？؟]$/);
+        expect(words.cause, `${language} ${s.id}`).not.toBe(words.other);
+        if (["ru", "zh", "hi", "ar"].includes(language)) for (const text of Object.values(words)) expect(text, `${language} ${s.id}`).not.toMatch(/[A-Za-z]/);
+      }
+    }
   });
 });

@@ -38,6 +38,7 @@ import { MILK_CHAIN_HI as milkChain } from "@/games/milkchain/hi";
 import { PACIFIER_STORY_HI as pacifierStory } from "@/games/pacifierstory/hi";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.hi";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.hi";
+import { CAUSE_SCENES_HI as cause } from "@/games/cause/scenes.hi";
 import type { LanguageTexts } from ".";
 
 // Everything in Hindi that lives in files of its own, one chunk loaded only when the app plays in Hindi
@@ -84,6 +85,7 @@ export const TEXTS: LanguageTexts = {
   days,
   milkChain,
   pacifierStory,
+  cause,
   seo,
   stories: { cloudTrip, treasureIsland },
 };

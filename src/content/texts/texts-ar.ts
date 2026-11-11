@@ -38,6 +38,7 @@ import { MILK_CHAIN_AR as milkChain } from "@/games/milkchain/ar";
 import { PACIFIER_STORY_AR as pacifierStory } from "@/games/pacifierstory/ar";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.ar";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.ar";
+import { CAUSE_SCENES_AR as cause } from "@/games/cause/scenes.ar";
 import type { LanguageTexts } from ".";
 
 // Everything in Arabic that lives in files of its own, one chunk loaded only when the app plays in Arabic
@@ -84,6 +85,7 @@ export const TEXTS: LanguageTexts = {
   days,
   milkChain,
   pacifierStory,
+  cause,
   seo,
   stories: { cloudTrip, treasureIsland },
 };

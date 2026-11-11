@@ -1,8 +1,8 @@
 // The scenes of „Was ist passiert?“ (J-03): the little bear shows a feeling, and two pictures show what may have
 // happened – exactly one of them leads to that feeling. Each scene is three pictures in one place (`bilder/<id>.webp`,
 // `<id>-grund.webp`, `<id>-anders.webp`, made with Gemini from the `draw` texts below, `causePictures.ts`) and the
-// German words for grown-ups under them. Translations come only when the user asks (then as `scenes.<lang>.ts`, keyed
-// by id). Plain data with no picture imports, so the picture queue can read it.
+// German words for grown-ups under them. The other languages are in `scenes.<lang>.ts`, keyed by id, loaded with their
+// language's texts (`src/content/texts/texts-<lang>.ts`). Plain data with no picture imports, so the picture queue can read it.
 
 import type { Localized } from "@/lib/language";
 
@@ -42,6 +42,12 @@ export interface CauseScene {
     other: string;
   };
 }
+
+/** A scene's words for grown-ups in another language (`scenes.<lang>.ts`). */
+export type CauseSceneText = Pick<CauseScene, "shows" | "cause" | "other" | "told">;
+
+/** Every scene's words in one language, by scene id; a scene left out shows its German words. */
+export type CauseTranslation = Partial<Record<string, CauseSceneText>>;
 
 /** The question after what the first picture shows, the same in every scene. */
 export const CAUSE_QUESTION: Localized = {

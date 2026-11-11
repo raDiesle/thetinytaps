@@ -10,7 +10,11 @@ Rebuilt on 10 November 2026 (user request: „erweitere um sehr viel deutlich me
 Bilder und schreibe den Text darunter (mit Zurück-Button), UI angeordnet wie bei Alltagssituationen“):
 - `scenes.ts` – the 30 scenes, in five passes of six (`CAUSE_PASSES`), each mixing the feelings (traurig, wütend, Angst,
   froh, stolz, igitt): what the picture shows (`shows`), the two questions under the cards (`cause`, `other`), why
-  (`told`), and what Gemini draws (`draw`). German only; translations would come as `scenes.<lang>.ts` keyed by id.
+  (`told`), and what Gemini draws (`draw`).
+- `scenes.<lang>.ts` – the words under the pictures in the other app languages, keyed by id (translated 11 November
+  2026), loaded with their language's texts (`texts.cause`, `byLanguage` in `CausePlay.tsx`); a new or changed scene
+  comes German only, and the row „Die 30 Szenen“ in `languageStatus.ts` then says what is missing (`cause.test.ts`
+  wants every scene where that row says „done“); a changed meaning drops that scene's lines there rather than keep wrong ones.
 - `causePictures.ts` – the scenes' pictures as the picture queue takes them; `FEELING_WAITING` and `CAUSE_WAITING` list the scenes whose feeling or earlier moments are still to make (all made 10 November 2026).
 - `images.ts` – the pictures in `bilder/`: `<id>` (the feeling), `<id>-grund` (what happened), `<id>-anders` (what didn't).
 - `CausePlay.tsx` – the passes (kept in `tinytaps.cause.v1`, so the next visit goes on) and one scene's three phases.
