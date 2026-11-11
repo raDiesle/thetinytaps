@@ -108,7 +108,7 @@ const CUTS: Record<string, { x: number; y: number; size: number }> = {
  * „A“, its monkey and „Affe“ whole and in the middle; Zählen's number and all its things; Mitmachen's number and the
  * fox hopping it; the animal with the right thing and a wrong one beside it).
  */
-const WHOLE = new Set(["components/buchstaben", "components/zaehlen", "components/mitmachen", "components/tiere"]);
+const WHOLE = new Set(["components/buchstaben", "components/zaehlen", "components/mitmachen", "components/gross-klein", "components/tiere"]);
 
 /**
  * A part of the window shown alone, by `keyOf`, in CSS pixels: cut out and set into a blurred copy of itself widened

@@ -399,6 +399,19 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/gross-klein/",
+    note: "L-23: keine Fuchs- oder Bärenfigur – der große und der kleine Buchstabe sind selbst Groß und Kind, mit Augen, und halten sich an der Hand.",
+    tasks: [
+      {
+        label: "Fuchs- oder Bärenfamilie neben den Buchstaben",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Nicht bauen: nur Deko (Feedback November 2026) – die Buchstaben selbst sind Groß und Kind.",
+      },
+    ],
+  },
+  {
     href: "/",
     note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Fun for Both“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
     tasks: [

@@ -35,6 +35,7 @@ const FOLDERS: Record<string, string[]> = {
   "/zaehlen/": [],
   "/mitmachen/": ["src/games/letters/MovePlay.tsx", "src/games/letters/names.ts"],
   "/woerter/": ["src/games/letters/WordsPlay.tsx", "src/games/letters/FindPlay.tsx"],
+  "/gross-klein/": ["src/games/letters/CasePlay.tsx"],
   "/zaehne/": ["src/games/teeth"],
   "/toepfchen/": ["src/games/potty"],
   "/timer/": ["src/games/timer"],

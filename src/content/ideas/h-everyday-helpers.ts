@@ -405,5 +405,21 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       done: true,
     },
+    {
+      id: "H-73",
+      emoji: "🏮",
+      title: "Aufs Töpfchen: Lampions statt fliegender Formen",
+      text: "Bei der Party hängen Lampions still im Bad und gehen nacheinander an, einer nach dem anderen, bis alle leuchten – statt Herzen und Sterne steigen zu lassen. Die Party bleibt das Ende, nur leiser. Gehört zu A-30.",
+      why: "Ein Fest ohne Gewimmel: das Kind sieht, dass es etwas Besonderes ist, ohne aufgedreht zu werden.",
+      effort: "S",
+    },
+    {
+      id: "H-74",
+      emoji: "🌙",
+      title: "Zeitplan: die Karte dreht sich, am Ende geht der Mond auf",
+      text: "Eine erledigte Karte dreht sich um und zeigt eine Pfote. Ist der ganze Tag erledigt, geht oben auf der Seite langsam der Mond auf (morgens die Sonne) – statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
+      why: "Das Kind sieht, wie der Tag voll wird, und das Ende passt zur Tageszeit.",
+      effort: "S",
+    },
   ],
 };
