@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
 import { CATEGORIES, UNFINISHED } from "@/content/games";
+import { pick } from "@/lib/language";
 import {
   EFFORT_LABELS,
   MASCOT_STATUS,
@@ -445,10 +446,10 @@ function Unfinished() {
         {UNFINISHED.map((game) => (
           <li key={game.href}>
             <Link to={game.href}>
-              {game.emoji} {game.title.de}
+              {game.emoji} {pick(game.title, "de")}
             </Link>
             <span className="ideas-hint">
-              {game.blurb.de}
+              {pick(game.blurb, "de")}
               {game.unfinished === "labelled" && " · steht im Buch mit „in Bearbeitung“"}
             </span>
           </li>
@@ -599,7 +600,7 @@ function Languages() {
               return [
                 <tr key={row.href}>
                   <th>
-                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite & Eltern"}
+                    {game ? `${game.emoji} ${pick(game.title, "de")}` : "🏠 Startseite & Eltern"}
                     {row.recorded && " 🎙️"}
                     {row.note && <small>{row.note}</small>}
                   </th>
@@ -674,7 +675,7 @@ function Mascots({ onShow }: { onShow: (id: string) => void }) {
               return [
                 <tr key={row.href}>
                   <th colSpan={5}>
-                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite, Cover & Menüs"}
+                    {game ? `${game.emoji} ${pick(game.title, "de")}` : "🏠 Startseite, Cover & Menüs"}
                     {row.note && <small>{row.note}</small>}
                   </th>
                 </tr>,
@@ -803,7 +804,7 @@ function ResearchPanel({ research, open, onShow }: { research: Research; open: b
                   return (
                     <tr key={match.href}>
                       <th>
-                        <Link to={match.href}>{game ? `${game.emoji} ${game.title.de}` : match.href}</Link>
+                        <Link to={match.href}>{game ? `${game.emoji} ${pick(game.title, "de")}` : match.href}</Link>
                       </th>
                       <td>{match.searches.map((q) => `„${q}“`).join(", ")}</td>
                       <td>{match.title}</td>
