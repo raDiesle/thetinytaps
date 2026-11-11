@@ -34,7 +34,7 @@ import {
   wireY,
 } from "./light";
 import { easeOut, seg } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { BAR_COLORS, STAR_POINTS } from "./parts";
 import type { Pt } from "./path";
 import { INK, Picture, Sparkles } from "./scenery";
@@ -76,7 +76,7 @@ export function LightLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={light} level="light" {...props}>
+    <MachineStage machine={light} level="light" start={{ x: TORCH.x0 + 85, y: TORCH.lens.y, r: 100 }} {...props}>
       {(t) => (
         <>
           <Room paper={`${ids}-paper`} />
@@ -114,7 +114,6 @@ export function LightLevel(props: LevelProps) {
           <Fireflies light={light} t={t} glow={`${ids}-glow`} />
           <Sparkles x={LAMP.x} y={DOME_Y - 140} age={t - light.tLamp - 0.6} n={12} spread={300} />
           <Sparkles x={OWL.x} y={OWL.y - 40} age={t - light.tOwl} n={8} spread={140} />
-          <TapHint t={t} x={TORCH.x0 + 80} y={NIGHTSTAND.top + 140} />
         </>
       )}
     </MachineStage>

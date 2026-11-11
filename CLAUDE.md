@@ -321,9 +321,15 @@ In a fresh worktree run `bun install` first.
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
   some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
   Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.
-- What the child taps to set things off is plainly marked (a glow, and a still hand pointing at it before the first tap)
-  and lies wholly in the picture, clear of the edges and the ✕. Where the picture moves away from it, a big button
-  brings it back.
+- What the child taps to set things off is plainly marked by the shared `TapHint` (`src/components/TapHint.tsx`): a
+  golden ring round it and a drawn hand pointing at it, still at first, and the longer the child doesn't find it the
+  clearer (user feedback, November 2026, from Kettenreaktion and Kleine Abenteuer: the 👆 and the yellow ring were too
+  plain and looked poor) – after a few seconds the hand taps and rings go out at each press, later the picture round it
+  darkens and both grow (`TAP_HINT_STAGES_MS`); that waiting is the one animation allowed before a tap. Never an emoji
+  finger nor a hint of a game's own, and never drawn inside a big svg: it is an HTML layer over the picture (a machine's
+  world point goes there by `cameraPoint`/`worldHint`). Its hand lies on the side where it covers nothing to tap and
+  stays whole on the screen (look at it at 844×390). What is marked lies wholly in the picture, clear of the edges and
+  the ✕. Where the picture moves away from it, a big button brings it back.
 - Where the child picks one of several (Zuordnen, Schatten, a quiz), exactly one choice fits: never offer a wrong
   choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
   The choices are as big as the room below (or beside) the picture allows – sized from that room as a size container,
@@ -332,7 +338,8 @@ In a fresh worktree run `bun install` first.
   text under the picture: no emoji, no bubble, no frame (user feedback from the Zuordnen games, November 2026: small
   buttons with room to spare, a loud topic bubble; `choiceRows` in `src/games/shadows/levels.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
-  animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
+  animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
+  waiting starts to move after its first stage). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
