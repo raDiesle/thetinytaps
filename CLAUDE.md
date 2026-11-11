@@ -764,7 +764,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   November 2026).
 - A game still being built is marked `unfinished: true` in `CATEGORIES` (user decision, November 2026): it stands
   neither on the shelf nor in its book, its page carries `noindex` and stays out of the sitemap (its texts wait in
-  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ and „Menü“ lead back. Its
+  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ and „Menü“ lead back.
+  Where the user wants it seen already, it is `unfinished: "labelled"` instead (user request, November 2026, L-23):
+  it stands in its book's table of contents with the page marker „in Bearbeitung“ (`BookContents`, the label of the
+  start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
+  takes no tap –, keeps `noindex`, and its ✕ leads back to its book. Its
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
   entry or route. `content.test.ts` checks it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`

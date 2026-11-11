@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
-import { CardPicture, pictureCard } from "@/components/GameCard";
+import { CardPicture, pictureCard, UNFINISHED_LABEL } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
 import { SeoText, SeoWords } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
-import { categoryHref, categoryOf, isUnfinished, pagesBetween } from "@/content/games";
+import { categoryHref, categoryOf, isHidden, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
@@ -198,8 +198,8 @@ export function GameShell({
   const returnTo = routineReturn(location.state);
   // Neither a routine's step nor a tool counts as play, nor stops when play time is over.
   const free = !!returnTo || !!tool;
-  // A game still being built is opened from the management page only, so its way back leads there.
-  const unfinished = isUnfinished(location.pathname);
+  // A game still being built and on no shelf is opened from the management page only, so its way back leads there.
+  const unfinished = isHidden(location.pathname);
   const category = unfinished ? undefined : categoryOf(location.pathname);
   const back = backHref ?? (unfinished ? "/management/" : category ? categoryHref(category) : "/");
   const backText =
@@ -408,11 +408,7 @@ export function GameShell({
   if (menu) return null;
 
   /** „in Bearbeitung“ on a card still being built (`GameMode.unfinished`). */
-  const unfinishedBadge = (
-    <span className="badge">
-      {t({ de: "in Bearbeitung", ru: "в работе", en: "in progress", zh: "制作中", hi: "तैयार हो रहा है", es: "en preparación", ar: "قيد الإعداد" })}
-    </span>
-  );
+  const unfinishedBadge = <span className="badge">{t(UNFINISHED_LABEL)}</span>;
 
   /** One mode's card; one still being built stands greyed out where it can't be tested. */
   const card = (m: GameMode) =>
