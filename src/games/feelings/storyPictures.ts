@@ -62,6 +62,12 @@ export interface StoryDrawing {
   end: Shot;
   /** Which of its pictures are made and in `bilder/`, so the queue leaves them out: only the first („first“), or all. */
   made?: "first" | true;
+  /**
+   * Pictures of a story already made that are drawn again (`envy-3`), until they are right: only they go back to the
+   * queue. A picture that failed the look at the story's sheet (a second bear, a throw towards someone) is deleted and
+   * named here, its prompt sharpened.
+   */
+  redo?: string[];
 }
 
 const figure = (f: Figure) => (f in FIGURES ? FIGURES[f as keyof typeof FIGURES] : f);
@@ -102,9 +108,8 @@ export function storyShots(d: StoryDrawing): { name: string; prompt: string; fir
 
 /** The story's pictures still to make, as the queue takes them: the first one alone, the others drawn from it once it is made. */
 export function storyPictures(d: StoryDrawing): QueuedPicture[] {
-  if (d.made === true) return [];
   const title = ALLTAG_SITUATIONS.find((s) => s.id === d.id)?.title ?? d.id;
-  const shots = storyShots(d).filter(({ first }) => !(first && d.made === "first"));
+  const shots = storyShots(d).filter(({ name, first }) => (d.made === true ? d.redo?.includes(name) : !(first && d.made === "first")));
   return shots.map(({ name, prompt, first }) => ({
     id: name,
     file: file(name),

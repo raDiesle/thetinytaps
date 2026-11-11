@@ -256,6 +256,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["ring", "whoosh"],
     // A motorbike and a unicycle go down a road too.
     alsoFits: ["motorradfahrerin", "einradfahrer"],
+    made: true,
   },
   {
     id: "kletterin",
