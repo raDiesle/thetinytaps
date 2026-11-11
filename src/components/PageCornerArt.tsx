@@ -79,6 +79,32 @@ function RibbonArt() {
       <rect x="17" y="0" width="26" height="10" fill={`url(#${id}f)`} />
       {/* Its woven edges, a little lighter. */}
       <path className="page-ribbon-edge" d="M18.6 1.5C18.8 30 18.8 55 18.3 77M41.4 1.5C41.2 30 41.2 55 41.7 77" />
+      <ShelfLabel />
+    </svg>
+  );
+}
+
+/**
+ * The ribbon's round label alone, with its shadow: the way back onto the shelf as a picture, on the „Menü“ button at
+ * the end of Zähne putzen and Aufs Töpfchen (`GameEnd`'s `menu`), so it looks like the ribbon in the corner (user
+ * request, November 2026). Drawn in the ribbon's box, cut to the label and its arrow.
+ */
+export function ShelfLabelArt() {
+  return (
+    <svg className="page-ribbon-art shelf-label-art" viewBox="3 8 58 68" aria-hidden>
+      <g className="page-ribbon-shadow">
+        <circle cx="30" cy="35" r="26" />
+        <circle cx="47.5" cy="62.5" r="12.5" />
+      </g>
+      <ShelfLabel />
+    </svg>
+  );
+}
+
+/** The label sewn onto the ribbon: a tall, slim bookshelf in colour, and the way back's round yellow arrow over its edge. */
+function ShelfLabel() {
+  return (
+    <>
       {/* The label, a patch of paper-coloured cloth sewn on round its edge. */}
       <circle className="page-ribbon-label" cx="30" cy="35" r="26" />
       <circle className="page-ribbon-stitch" cx="30" cy="35" r="23.4" />
@@ -108,7 +134,7 @@ function RibbonArt() {
       {/* The way back's round yellow arrow, drawn as MenuTop's round arrow (its back-arrow). */}
       <circle className="page-ribbon-badge" cx="47.5" cy="62.5" r="12.5" />
       <path className="page-ribbon-arrow" d="M53.9 62.5H41.5M46.7 56.9L41.1 62.5L46.7 68.1" />
-    </svg>
+    </>
   );
 }
 

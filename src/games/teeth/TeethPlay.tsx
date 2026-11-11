@@ -489,7 +489,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   const again = useCallback(() => {
     const t = performance.now();
-    // „Nochmal“ turns the page: the new brushing waits for it to lie still, like the first one.
+    // „Von vorn“ or Space at the end: should a page still turn, the new brushing waits for it to lie still, like the first one.
     const moving = pageMoving();
     setHeld(moving);
     setClock({ banked: 0, since: moving ? null : t, until: song.ready ? undefined : waitAt(preludeOf(settings)) });
@@ -648,7 +648,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         ending === "rest" && (
           <div className="teeth-end">
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-            <GameEnd inline onAgain={again} />
+            <GameEnd inline menu />
           </div>
         )
       ) : (

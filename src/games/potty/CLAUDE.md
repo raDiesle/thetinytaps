@@ -34,9 +34,10 @@ The steps: eating and drinking, the bladder presses or the tummy rumbles (`need`
 unsure – before calling, nobody has said anything yet – Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows ❓),
 calling „Mama! Papa!“ – they come in together and stay in every picture from then on – into the bathroom together,
 trousers down, sit down, then the waiting, done (whatever the grown-up's ✓ chose is in the potty, the parents cheer),
-wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see below), then `GameEnd` with „Nochmal“ only (one story, so „Weiter“
-would be „Nochmal“ again), small in the bottom corner (`GameEnd`'s `corners`: „Nochmal“ bottom right, the party
-picture free beside it; the way back is the ribbon in the top left), which starts a new round, unsure again. Only a tap within `TAP_GUARD_MS` of a step's start
+wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see below), then `GameEnd` with „Menü“ only (`menu`: one story, so no „Weiter“, and once on the potty the child is done, so no
+„Nochmal“ – user request, November 2026), small in the bottom corner (`GameEnd`'s `corners`: „Menü“ bottom right with
+the ribbon's shelf label beside the word, the party picture free beside it; the ribbon in the top left leads there too),
+which closes the book and puts it back on the shelf. Only a tap within `TAP_GUARD_MS` of a step's start
 sparkles (a double tap), and while sitting one while a thought still runs.
 
 When nothing comes, the „nichts“ next to the ✓ takes the other story (`NOTHING_STEPS`, `storyFor`, `At.nothing`):
@@ -142,8 +143,8 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   for what the child said); everything else there stays still, the child looks at the story.
 - A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way. The row
   is small and right at the bottom (the user's choice): it is for the grown-up, the picture is the story.
-- The end of the story keeps its picture free: „Nochmal“ small in the bottom corner (`corners`), never big
-  in the middle over the party.
+- The end of the story keeps its picture free: „Menü“ with its shelf label small in the bottom corner (`corners`,
+  `menu`), never big in the middle over the party, and no „Nochmal“ (user request, November 2026).
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
   above the cards): „Muss mal!“ starts at once, what the child said is picked while Tapsi calls (💧, 💩, 💧💩)
   and once more on the way when calling was jumped past – the next step, never a jump further; what came on the
