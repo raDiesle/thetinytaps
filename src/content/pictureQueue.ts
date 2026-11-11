@@ -4,6 +4,7 @@ import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
 import { TOGETHER_PICTURE_QUEUE } from "@/games/together/picturePrompts";
 import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
 import { PACIFIER_PICTURE_QUEUE } from "@/games/pacifierstory/pacifierStoryPictures";
+import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
@@ -72,5 +73,6 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...TOGETHER_PICTURE_QUEUE,
   ...MILK_CHAIN_PICTURE_QUEUE,
   ...PACIFIER_PICTURE_QUEUE,
+  ...KITA_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,
 ];

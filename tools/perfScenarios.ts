@@ -149,6 +149,7 @@ export const SCENARIOS: Scenario[] = [
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "kita", path: "/kita/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
