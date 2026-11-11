@@ -1412,7 +1412,9 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 4px clamp(3px, 0.8vmin, 8px);
+  /* Broad columns, so each day reads as a day of its own (narrow ones looked like a row of slots). */
+  min-width: 2.7em;
+  padding: 4px clamp(6px, 1.6vmin, 14px);
   border: 3px solid var(--ink);
   border-radius: 14px;
   background: #fff;
@@ -1440,35 +1442,44 @@
   animation-delay: 0.3s;
 }
 
-/* Today stands out: bigger, tagged „Heute“, warm yellow in the morning and night blue in the evening. */
+/* Today stands out at a glance (user feedback, November 2026: not enough before): much bigger, lifted above the other
+   days, a broad yellow frame with a shadow, a strong colour – yellow in the morning, violet in the evening – and a big
+   „Heute“ tag. Still: nothing pulses or blinks. */
 .teeth-day.today {
   position: relative;
-  padding: 6px clamp(6px, 1.4vmin, 12px);
+  margin: 0 clamp(4px, 1vmin, 10px);
+  padding: 6px clamp(10px, 2.2vmin, 20px);
   border-width: 4px;
-  font-size: clamp(1.4rem, 4.8vmin, 2.4rem);
-  outline: 5px solid var(--sunshine);
+  font-size: clamp(1.7rem, 6.2vmin, 3.1rem);
+  outline: 6px solid #ffc21a;
+  box-shadow: 0 6px 0 6px rgb(0 0 0 / 0.18);
+  translate: 0 -0.25em;
 }
 
 .teeth-day.today.morning {
-  background: #fff1b8;
+  background: #ffe066;
 }
 
 .teeth-day.today.evening {
-  background: #c9c2ff;
+  background: #b3a8ff;
+}
+
+.teeth-day.today .teeth-day-name {
+  font-weight: 900;
 }
 
 .teeth-today-tag {
   position: absolute;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + 10px);
   left: 50%;
   translate: -50% 0;
-  padding: 1px 8px;
+  padding: 2px 12px;
   border: 3px solid var(--ink);
   border-radius: 999px;
-  background: var(--sunshine);
+  background: #ffc21a;
   color: var(--ink);
-  font-size: clamp(0.75rem, 2.4vmin, 1rem);
-  font-weight: 700;
+  font-size: clamp(0.95rem, 3.4vmin, 1.5rem);
+  font-weight: 800;
   white-space: nowrap;
 }
 
@@ -1482,10 +1493,10 @@
   filter: none;
 }
 
-/* The day's name about as big as its sun and moon, so a grown-up reads it at a glance across the room (0.55em was
-   too small, user feedback, November 2026). */
+/* The day's name a little bigger than its sun and moon, so a grown-up reads it at a glance across the room (0.55em,
+   then 0.9em, were too small, user feedback, November 2026). */
 .teeth-day-name {
-  font-size: 0.9em;
+  font-size: 1.05em;
   font-weight: 800;
   color: var(--ink);
 }
