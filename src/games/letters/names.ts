@@ -1,10 +1,10 @@
 import type { Localized } from "@/lib/language";
 
-// The names of the book's four games and their lines in its table of contents, kept here rather than in `games.ts`:
+// The names of the book's games and their lines in its table of contents, kept here rather than in `games.ts`:
 // what is new comes German only, so the games' own rows in the language table say it is missing (`inlineTexts.test.ts`).
 
-/** The four games of the book „Buchstaben & Zahlen“, each on a page of its own (user feedback, November 2026). */
-export type LettersWay = "free" | "count" | "move" | "words";
+/** The games of the book „Buchstaben & Zahlen“, each on a page of its own (user feedback, November 2026). */
+export type LettersWay = "free" | "count" | "move" | "words" | "case";
 
 /** Frei tippen: every key shows its letter or number. */
 export const FREE_TITLE: Localized = {
@@ -94,5 +94,11 @@ export const WORDS_BLURB: Localized = {
   ar: "كلمات أولى والبحث عن الحروف",
 };
 
+/** Wo ist das kleine b?: a big letter looks for its small one among three (L-23). German only until translations are asked for. */
+export const CASE_TITLE: Localized = { de: "Wo ist das kleine b?" };
+
+/** Its line in the book's table of contents. */
+export const CASE_BLURB: Localized = { de: "Großer Buchstabe sucht sein kleines Kind" };
+
 /** Each game's name, by the way it plays. */
-export const WAY_TITLES: Record<LettersWay, Localized> = { free: FREE_TITLE, count: COUNT_TITLE, move: MOVE_TITLE, words: WORDS_TITLE };
+export const WAY_TITLES: Record<LettersWay, Localized> = { free: FREE_TITLE, count: COUNT_TITLE, move: MOVE_TITLE, words: WORDS_TITLE, case: CASE_TITLE };

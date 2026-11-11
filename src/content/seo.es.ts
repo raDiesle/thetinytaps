@@ -133,6 +133,11 @@ export const SEO_ES: SeoTranslation = {
         "Escribir primeras palabras letra a letra: oso, pelota, colores y verbos. O «¿Dónde está la B?»: encontrar la tecla de una letra. Sin anuncios.",
       text: "Una imagen y su palabra: el niño la escribe letra a letra en el teclado o en la pantalla. Palabras con imagen, colores, verbos de acción o todo mezclado, en tres longitudes. O solo la primera letra: «¿Dónde está la B?», y a buscar su tecla.",
     },
+    "/gross-klein/": {
+      title: "¿Dónde está la b pequeña? – Mayúsculas y minúsculas",
+      description: "Una letra grande con ojos busca a su pequeña: de tres minúsculas solo una es la suya, que camina hasta ella y le da la mano.",
+      text: "Un juego de letras sobre mayúsculas y minúsculas: una letra grande con ojos busca a su pequeña. Abajo hay tres minúsculas y solo una es la suya. Al tocarla, camina hasta la grande y se dan la mano; una equivocada niega con la cabeza. Primero las tres son muy distintas, después parecidas, como b, d y p.",
+    },
     "/zaehne/": {
       title: "Cepillarse los dientes: canción y temporizador",
       description:

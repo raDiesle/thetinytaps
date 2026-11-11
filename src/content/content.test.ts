@@ -77,10 +77,10 @@ describe("home menu", () => {
     }
   });
 
-  test("Frei tippen, Zählen, Mitmachen and Wörter tippen are four games in their book's table of contents, not ways to play of one", () => {
+  test("Frei tippen, Zählen, Mitmachen, Wörter tippen and Wo ist das kleine b? are games in their book's table of contents, not ways to play of one", () => {
     const book = CATEGORIES.find((category) => category.id === "buchstaben-zahlen");
     expect(book && hasPage(book)).toBe(true);
-    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/mitmachen/", "/woerter/"]);
+    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/mitmachen/", "/woerter/", "/gross-klein/"]);
   });
 
   test("category ids and game addresses are unique", () => {
@@ -600,11 +600,21 @@ test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or
 // search engine finds it until it is done.
 test("games still being built stand nowhere on the shelf or in a book", () => {
-  for (const game of UNFINISHED) {
+  for (const game of UNFINISHED.filter((game) => game.unfinished === true)) {
     expect(
       SHELF.map((e) => e.href),
       game.href,
     ).not.toContain(game.href);
     expect(bookPage(game.href), game.href).toBeUndefined();
+  }
+});
+
+// User request, November 2026 (L-23): a game still being built may already stand in its book, its line labelled
+// „in Bearbeitung“ – but it stays out of search results, and its book is a picture book with a table of contents.
+test("games labelled „in Bearbeitung“ stand in their book's table of contents and in no search result", () => {
+  for (const game of UNFINISHED.filter((game) => game.unfinished === "labelled")) {
+    const book = CATEGORIES.find((category) => category.games.includes(game));
+    expect(book && hasPage(book) && listedGames(book).includes(game), game.href).toBe(true);
+    expect(NO_INDEX_PATHS, game.href).toContain(game.href);
   }
 });

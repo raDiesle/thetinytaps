@@ -122,6 +122,12 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Hüpfen, klatschen, stampfen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [..."3a2b"], every: 2200 } }],
   },
   {
+    // Wo ist das kleine b?: letter keys choose among the three small letters; the right one walks over on its own layer.
+    name: "gross-klein",
+    path: "/gross-klein/",
+    parts: [{ label: "Kleine Buchstaben finden", before: [{ wait: 1500 }], ms: 9000, type: { keys: [..."abcdefghiklmnoprstu"], every: 450 } }],
+  },
+  {
     name: "woerter",
     path: "/woerter/",
     parts: [{ label: "Wörter tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcdefghijklmnoprstu"], every: 400 } }],

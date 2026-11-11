@@ -54,6 +54,7 @@ import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
+import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
@@ -265,6 +266,15 @@ function letters(language: TargetLanguageId): VoiceGroup[] {
       lines: [pick(STOMP_INVITE, language)],
       note: "„Hüpf mit!“ und „Klatsch mit!“ kommen von den Tu-Wörtern; das Stampfen hat keins.",
     },
+    ...(SMALL_PROMPT[language]
+      ? [
+          {
+            label: "Wo ist das kleine …?",
+            lines: once(caseLetters(de).map((l) => SMALL_PROMPT[language]!(l.spoken))),
+            built: "„Wo ist das kleine …?“ mit dem Buchstaben",
+          },
+        ]
+      : []),
     { label: "Lob", lines: once(de.praise) },
     { label: "Zahlwörter beim Zählen", lines: once(de.numberWords.map((n) => `${n}!`)) },
     {
