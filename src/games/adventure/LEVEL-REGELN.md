@@ -89,6 +89,18 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Der Fuchs soll natürlich aussehen: schlanke Gliedmaßen, die sich verjüngen, sichtbare Gelenke,
   Finger und Zehen mit runden Spitzen; Hände und Füße bewegen sich mit (Handgelenk, Fußgelenk),
   nichts wirkt wie steife Stäbe.
+- **Hände wie echte Hände** (Rückmeldung November 2026): Der Daumen sitzt auf der Seite, auf der er
+  bei dieser Handfläche wirklich sitzt (Handfläche vorn → Daumen außen), nie spiegelverkehrt. Die
+  Handfläche zeigt, wohin eine echte zeigt: beim hängenden Arm zum Körper, beim vorgestreckten oder
+  seitlich ausgestreckten Arm nach unten, beim hochgereckten nach vorn – nie immer nach oben
+  (`forearmTurn` in `three/guide.ts`). Nur wo die Pfote fängt, wirft, antippt, hochdrückt oder etwas
+  hält, öffnet sie sich (`palm` in der Pose des Clips; Halten macht `guide.hold`). Ein neuer Clip,
+  der fängt oder wirft, setzt `palm`.
+- **Arme wie bei einem Kind** (Rückmeldung November 2026: hochgereckt endeten sie unter den Ohren):
+  hochgestreckt reicht die Pfote deutlich über die Ohrenspitzen, hängend endet sie über dem Knie.
+  `three/guide.test.ts` prüft beides. Wer die Arme ändert, misst danach alles neu, was am Clip
+  gemessen ist (`DRUM_HAND`, `CRANK_*`, `KEY_HAND` in `layout.ts`, `REACH_TOP` in `world.ts`), und
+  schaut, dass sitzende Pfoten nicht im Boden stecken (`sitDown` in `three/player.ts`).
 - Körper und Kopf verdecken keine Arme oder Beine, die gerade die Bewegung machen (halb
   durchsichtig dort), aber nur diese.
 - Das Leuchten am Fuchs ist ein sauberer Rand um die Umrisse, ohne Spalten oder Nähte zwischen den

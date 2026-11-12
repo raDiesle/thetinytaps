@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { movement } from "../library/movements";
 import { type Cue, DEFAULT_TURN, type Story, type StoryFrame, type StoryWorld } from "../stories/story";
 import { clipFocus, clipPose } from "./clips";
-import { Guide, type LegPose, lerpLeg, lerpPose, restPose, type Pose } from "./guide";
+import { type ArmPose, Guide, type LegPose, lerpLeg, lerpPose, restPose, type Pose } from "./guide";
 import { Stage } from "./stage";
 import { talking } from "../voice";
 
@@ -44,7 +44,8 @@ const SEATED: LegPose = { lift: 1.55, spread: 0.1, knee: 0.08 };
  * squat with the feet under the hips (the knee bends twice as far as the thigh lifts, so the feet stay put),
  * onto the bottom with the knees pulled up, then the legs stretched out. Getting up goes the same way back:
  * knees in, lean forwards over the feet, push up. The upper body leans forwards in the squat; the rest of the
- * pose (the arms) stays.
+ * pose (the arms) stays, except that a hanging arm comes a little forwards once seated, so the paw rests on the
+ * floor beside the thigh instead of reaching into it.
  */
 export function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
@@ -56,12 +57,16 @@ export function sitDown(p: Pose, k: number): Pose {
         : lerpLeg(TUCKED, SEATED, smoothstep((k - 0.7) / 0.3));
   const lean = Math.sin(Math.PI * Math.min(1, k / 0.85)) * 0.45;
   const down = Math.min(1, k / 0.3);
+  const seated = smoothstep(THREE.MathUtils.clamp((k - 0.45) / 0.55, 0, 1));
+  const rest = (arm: ArmPose): ArmPose => ({ ...arm, raise: arm.raise + seated * 0.4 * (1 - THREE.MathUtils.smoothstep(arm.raise, 0.3, 1)) });
   return {
     ...p,
     toes: p.toes * (1 - down),
     lift: p.lift * (1 - down),
     bend: p.bend + lean,
     headPitch: p.headPitch - lean * 0.5,
+    armL: rest(p.armL),
+    armR: rest(p.armR),
     legL: leg(p.legL),
     legR: leg(p.legR),
   };

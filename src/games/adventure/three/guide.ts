@@ -20,6 +20,13 @@ export interface ArmPose {
   elbow: number;
   /** Turn of the upper arm around itself: which way the elbow folds. */
   twist: number;
+  /**
+   * How open the paw is (0..1), for catching, throwing, tapping or pushing something up: 0 (or left out) turns
+   * the forearm the natural way – the palm towards the body while the arm hangs, down while it reaches out,
+   * forwards while it is up – and 1 turns the palm to the inside of the elbow's bend (up while the forearm
+   * points ahead), the way a paw holds something out.
+   */
+  palm?: number;
 }
 
 export interface LegPose {
@@ -78,6 +85,7 @@ const lerpArm = (a: ArmPose, b: ArmPose, k: number): ArmPose => ({
   spread: lerp(a.spread, b.spread, k),
   elbow: lerp(a.elbow, b.elbow, k),
   twist: lerp(a.twist, b.twist, k),
+  palm: lerp(a.palm ?? 0, b.palm ?? 0, k),
 });
 /** Blends two leg poses. */
 export const lerpLeg = (a: LegPose, b: LegPose, k: number): LegPose => ({
@@ -105,6 +113,49 @@ export function lerpPose(a: Pose, b: Pose, k: number): Pose {
   };
 }
 
+const turnQ = new THREE.Quaternion();
+const partQ = new THREE.Quaternion();
+const turnEuler = new THREE.Euler();
+const along = new THREE.Vector3();
+const aim = new THREE.Vector3();
+const X_AXIS = new THREE.Vector3(1, 0, 0);
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const DOWN = new THREE.Vector3(0, -1, 0);
+const AHEAD = new THREE.Vector3(0, 0, 1);
+
+/**
+ * How far the forearm turns the paw round its own length (rad, the paw's turn about its y), so the palm faces
+ * where a real one would: towards the body while the arm hangs (the thumb ahead), down while the forearm
+ * reaches out ahead or to the side, and forwards while it is raised – never up all the time, which looked
+ * unnatural (user feedback, November 2026). `arm.palm` opens it the other way, for catching or throwing.
+ * The paw is built with its palm ahead and the thumb outside (turn 0); a real forearm turns it from there
+ * through the palm facing the body (π/2) to the palm facing back (π), and never further.
+ */
+export function forearmTurn(p: Pose, arm: ArmPose, side: 1 | -1) {
+  // The forearm in the space of the hips, set up as apply() poses it.
+  turnQ
+    .setFromEuler(turnEuler.set(p.bend, p.twist, -p.lean))
+    .multiply(partQ.setFromEuler(turnEuler.set(-arm.raise, 0, arm.spread * side)))
+    .multiply(partQ.setFromAxisAngle(Y_AXIS, arm.twist * side))
+    .multiply(partQ.setFromAxisAngle(X_AXIS, -arm.elbow));
+  along.set(0, -1, 0).applyQuaternion(turnQ);
+  // Down while the forearm points down or ahead, forwards as it rises above the shoulder.
+  aim
+    .copy(DOWN)
+    .lerp(AHEAD, THREE.MathUtils.smoothstep(along.y, 0.1, 0.7))
+    .normalize()
+    .applyQuaternion(turnQ.invert());
+  // How far that lies across the forearm: along it (a hanging arm), the palm stays towards the body.
+  const across = THREE.MathUtils.smoothstep(Math.hypot(aim.x, aim.z), 0.25, 0.75);
+  const wanted = -side * Math.atan2(aim.x, aim.z);
+  // From the palm facing the body, at most a quarter turn each way; a palm that would have to turn further
+  // turns back to it as smoothly, so the paw never snaps round.
+  let off = THREE.MathUtils.euclideanModulo(wanted - Math.PI / 2 + Math.PI, Math.PI * 2) - Math.PI;
+  if (Math.abs(off) > Math.PI / 2) off = Math.sign(off) * (Math.PI - Math.abs(off));
+  const turn = (Math.PI / 2 + off * across) * (1 - (arm.palm ?? 0));
+  return -side * turn;
+}
+
 /** The fox is built in the units below and shown this much bigger; the story scales what it measured on the fox with it. */
 export const GUIDE_SIZE = 1.15;
 /** How solid the body and head stay where they hide an arm or a leg. */
@@ -113,8 +164,12 @@ const SEE_THROUGH = 0.4;
 const THIGH = 0.24;
 const SHIN = 0.24;
 const FOOT = 0.07;
-const UPPER_ARM = 0.21;
-const FOREARM = 0.19;
+// Arms long enough to reach well over the head when raised, as a child's do, and no further than the lower thigh
+// when they hang (user feedback, November 2026: raised, they ended below the ears). The shoulders sit high on the
+// chest for it, so the arms need not be longer than the short legs allow.
+const UPPER_ARM = 0.26;
+const FOREARM = 0.24;
+const SHOULDER_Y = 0.43;
 /** Where a paw holds a bar (hand space): in front of the palm, resting on the curled fingers. */
 const GRIP = new THREE.Vector3(0, -0.045, 0.04);
 /** How far the fingers curl round a bar they hold (rad). */
@@ -447,7 +502,7 @@ export class Guide {
     const padMat = fur("#e7a3a0");
     const makeArm = (side: 1 | -1, hand: THREE.Group): Arm => {
       const shoulder = new THREE.Group();
-      shoulder.position.set(0.2 * side, 0.36, 0);
+      shoulder.position.set(0.2 * side, SHOULDER_Y, 0);
       const upper = new THREE.Group();
       shoulder.add(upper);
       const joint = mesh(new THREE.SphereGeometry(0.054, 20, 16), furMat);
@@ -460,6 +515,8 @@ export class Guide {
       // The forearm narrows to a slim wrist; the wrist is round, so the paw can bend at it.
       elbow.add(limb(FOREARM, 0.042, 0.028, darkMat, 0.1));
       hand.position.y = -FOREARM;
+      // The forearm's turn first, then the wrist bending in the palm's own directions.
+      hand.rotation.order = "YXZ";
       elbow.add(hand);
       hand.add(mesh(new THREE.SphereGeometry(0.029, 14, 10), darkMat));
       const palm = mesh(new THREE.SphereGeometry(0.048, 20, 16), pawMat);
@@ -499,9 +556,11 @@ export class Guide {
         hand.add(knuckle);
         fingers.push(knuckle);
       }
+      // The thumb on the outer side of the palm, as on a real hand with the palm ahead: on the inner side
+      // the paw was a mirrored one. Which way the palm faces is the forearm's turn (`forearmTurn`).
       const thumb = new THREE.Group();
-      thumb.position.set(-0.04 * side, -0.033, 0.01);
-      thumb.rotation.set(-0.35, 0, -0.95 * side);
+      thumb.position.set(0.04 * side, -0.033, 0.01);
+      thumb.rotation.set(-0.35, 0, 0.95 * side);
       finger(thumb, 0.016, 0.012, 0.0135).rotation.x = -0.35;
       hand.add(thumb);
       this.spine.add(shoulder);
@@ -724,7 +783,7 @@ export class Guide {
       // The paw hangs a little bent at the wrist and trails behind when the arm swings fast.
       const flop = wrist[0].step(rate(pose.raise, before?.raise, 6) * 0.06 + rate(pose.elbow, before?.elbow, 6) * 0.04, step);
       const sway = wrist[1].step(-rate(pose.spread, before?.spread, 6) * 0.06 * side, step);
-      a.hand.rotation.set(-0.14 + THREE.MathUtils.clamp(flop, -0.5, 0.5), 0, THREE.MathUtils.clamp(sway, -0.4, 0.4));
+      a.hand.rotation.set(-0.14 + THREE.MathUtils.clamp(flop, -0.5, 0.5), forearmTurn(p, pose, side), THREE.MathUtils.clamp(sway, -0.4, 0.4));
       // Fingers close together and curl softly while the arm hangs, and stretch and spread once it
       // reaches out or up; the little finger curls most.
       const open = THREE.MathUtils.smoothstep(pose.raise + pose.spread, 0.5, 1.8);
@@ -857,6 +916,7 @@ export class Guide {
     a.upper.quaternion.identity();
     a.elbow.rotation.x += (-bend - a.elbow.rotation.x) * weight;
     a.hand.rotation.x *= 1 - weight;
+    a.hand.rotation.y *= 1 - weight;
     a.hand.rotation.z *= 1 - weight;
     a.fingers.forEach((finger, i) => {
       finger.rotation.x += (-GRIP_CURL * 0.6 - finger.rotation.x) * weight;

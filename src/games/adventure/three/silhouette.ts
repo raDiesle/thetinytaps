@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { Pose } from "./guide";
+import { forearmTurn, type Pose } from "./guide";
 
 // A glowing outline of a child doing the guide's movement, like the dancers
 // in "Just Dance": a slim dark body with a bright rim, and inside it a stick
@@ -55,7 +55,7 @@ export class Silhouette {
   private readonly spine = joint(this.hips, 0, 0);
   private readonly neck = joint(this.spine, 0, NECK_Y);
   private readonly head = joint(this.neck, 0, HEAD + 0.03);
-  private readonly arms: { shoulder: THREE.Object3D; upper: THREE.Object3D; elbow: THREE.Object3D }[] = [];
+  private readonly arms: { shoulder: THREE.Object3D; upper: THREE.Object3D; elbow: THREE.Object3D; wrist: THREE.Object3D }[] = [];
   private readonly legs: { hip: THREE.Object3D; knee: THREE.Object3D }[] = [];
   private readonly bones: Bone[] = [];
   /** Joints drawn as dots on the skeleton. */
@@ -77,7 +77,7 @@ export class Silhouette {
       const elbow = joint(upper, 0, -UPPER_ARM);
       const wrist = joint(elbow, 0, -FOREARM);
       const palm = joint(wrist, 0, -PALM);
-      this.arms.push({ shoulder, upper, elbow });
+      this.arms.push({ shoulder, upper, elbow, wrist });
       const hip = joint(this.hips, HIP * side, 0);
       const knee = joint(hip, 0, -THIGH);
       const foot = joint(knee, 0, -SHIN);
@@ -89,10 +89,11 @@ export class Silhouette {
       this.bone(shoulder, elbow, 0.068);
       this.bone(elbow, wrist, 0.055);
       this.bone(wrist, palm, 0.06);
-      // Four fingers fanned out from the palm and a thumb to the inside.
+      // Four fingers fanned out from the palm and the thumb on its outer side, like the fox's paw (palm ahead
+      // before the forearm turns it, `forearmTurn`).
       const hand: THREE.Object3D[] = [];
       for (const a of [-0.45, -0.15, 0.15, 0.45]) hand.push(joint(palm, Math.sin(a) * FINGER, -Math.cos(a) * FINGER));
-      hand.push(joint(wrist, -0.05 * side, -0.035, 0.01));
+      hand.push(joint(wrist, 0.05 * side, -0.035, 0.01));
       fingers.push(hand);
       for (const tip of hand.slice(0, 4)) this.bone(palm, tip, 0);
       this.bone(wrist, hand[4], 0);
@@ -191,6 +192,7 @@ export class Silhouette {
       arm.shoulder.rotation.set(-pose.raise, 0, pose.spread * side);
       arm.upper.rotation.y = pose.twist * side;
       arm.elbow.rotation.x = -pose.elbow;
+      arm.wrist.rotation.y = forearmTurn(p, pose, side);
     });
     [p.legL, p.legR].forEach((pose, i) => {
       const side = i === 0 ? 1 : -1;
