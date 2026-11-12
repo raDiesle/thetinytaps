@@ -44,8 +44,11 @@ export const SETTLING_STEPS: { id: SettlingStep; title: string; what: string }[]
 /** Where a page plays: every place keeps its look from its reference picture on (`kitaStoryPictures.ts`). */
 export type Place = "wohnzimmer" | "kinderzimmer" | "weg" | "kita" | "garderobe" | "gruppenraum" | "garten";
 
-/** Who is in a page's picture: Tapsi, Mama and Papa Fuchs, Mia the Kita teacher, Bruno and two more children of the group. */
-export type Cast = "tapsi" | "mama" | "papa" | "mia" | "bruno" | "kinder";
+/**
+ * Who is in a page's picture: Tapsi, Mama and Papa Fuchs, Mia the Kita teacher, Bruno, two more children of the group
+ * („kinder“) and, where the whole group plays, four more („gruppe“).
+ */
+export type Cast = "tapsi" | "mama" | "papa" | "mia" | "bruno" | "kinder" | "gruppe";
 
 /** The light of a page. */
 export type Light = "morgen" | "tag" | "mittag" | "abend";
@@ -58,7 +61,7 @@ export interface KitaPage {
   text: string;
   place: Place;
   light: Light;
-  /** Everyone in the picture, each once („kinder“ are two). */
+  /** Everyone in the picture, each once („kinder“ are two, „gruppe“ four). */
   cast: Cast[];
   /** What happens in the picture, in English, for its Gemini prompt (`kitaStoryPictures.ts` adds place, cast and light). */
   picture: string;
@@ -101,7 +104,7 @@ export const KITA_STORY: KitaChapter[] = [
         light: "abend",
         cast: ["tapsi", "mama"],
         picture:
-          "Tapsi and Mama kneel on the round rug in front of the bed and pack Tapsi's backpack: Mama holds up small red slippers, and Tapsi pushes the plush bunny into the backpack so its ears stick out.",
+          "Tapsi and Mama kneel on the round rug in front of the bed and pack Tapsi's backpack: Mama holds up small red slippers, and Tapsi pushes the plush bunny into the backpack so its ears stick out. Tapsi looks happy and eager, smiling with relaxed, raised brows – not frowning.",
       },
     ],
   },
@@ -231,12 +234,30 @@ export const KITA_STORY: KitaChapter[] = [
           "Mia sits cross-legged on the play rug with Tapsi on her lap, Tapsi leans against her with a sad face and holds the plush bunny; Mia holds Tapsi gently. The small wooden chair at the back wall is empty.",
       },
       {
+        id: "zuhause",
+        text: "Und Mama? Mama ist zu Hause und saugt Staub. Sie denkt an Tapsi.",
+        place: "wohnzimmer",
+        light: "morgen",
+        cast: ["mama"],
+        picture:
+          "Mama vacuums the rug in front of the green sofa with an upright vacuum cleaner and smiles softly to herself, thinking of Tapsi. Tapsi is not at home: the rug is empty, no blocks on it, no fox child anywhere.",
+      },
+      {
         id: "laenger",
         text: "Jeden Tag bleibt Mama ein bisschen länger weg. Tapsi spielt jetzt mit Bruno.",
         place: "garten",
         light: "tag",
         cast: ["tapsi", "bruno"],
         picture: "Tapsi and Bruno sit in the sandpit and fill a red bucket together with small shovels, both laughing.",
+      },
+      {
+        id: "toben",
+        text: "Im Garten spielen viele Kinder. Sie rutschen, rennen und buddeln. Tapsi lacht mit.",
+        place: "garten",
+        light: "tag",
+        cast: ["tapsi", "bruno", "kinder", "gruppe", "mia"],
+        picture:
+          "The whole group plays in the garden and has fun, all laughing: Tapsi comes down the small slide with both arms up, Bruno waits at the slide's foot and cheers; the bear girl in the green dress and the bear boy in the orange T-shirt chase each other across the lawn; two of the other bear children dig in the sandpit and two kick a big red ball on the lawn; Mia stands on the lawn by the sandpit and laughs.",
       },
     ],
   },

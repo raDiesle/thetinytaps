@@ -38,6 +38,13 @@ describe("Tapsi geht in die Kita", () => {
     for (const text of texts) expect(text, text).not.toMatch(/\b\d{1,2}(:\d\d)? Uhr\b/);
   });
 
+  // User decision, 12 November 2026: Mama at home while Tapsi is in the Kita belongs where she stays away longer, never
+  // to the first short goodbye, when the guides keep her in the building.
+  test("Mama is shown away from Tapsi only once she stays away longer", () => {
+    for (const chapter of KITA_STORY)
+      for (const page of chapter.pages) if (page.cast.includes("mama") && !page.cast.includes("tapsi")) expect(chapter.step, page.id).toBe("bezugsperson");
+  });
+
   test("nothing scolds or shames, crying is allowed, and it ends in love", () => {
     const words = /\b(böse|unartig|schäm|stell dich nicht an|hör auf zu weinen|darf nicht weinen|baby\b|heimlich|schnell weg)/i;
     for (const page of KITA_PAGES) expect(page.text, page.id).not.toMatch(words);
@@ -50,7 +57,7 @@ describe("Tapsi geht in die Kita", () => {
   test("Mia, Bruno and the group are only in the Kita, Papa only at home and on the way", () => {
     const kita = new Set(["kita", "garderobe", "gruppenraum", "garten"]);
     for (const page of KITA_PAGES) {
-      if (page.cast.some((c) => c === "mia" || c === "bruno" || c === "kinder")) expect(kita.has(page.place), page.id).toBe(true);
+      if (page.cast.some((c) => c === "mia" || c === "bruno" || c === "kinder" || c === "gruppe")) expect(kita.has(page.place), page.id).toBe(true);
       if (page.cast.includes("papa")) expect(["wohnzimmer", "kita"]).toContain(page.place);
     }
   });

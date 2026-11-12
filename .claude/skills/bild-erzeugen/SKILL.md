@@ -241,10 +241,16 @@ Children's picture-book illustration for 2–4 year olds, like a page of a print
 picture book. Soft, flat, rounded shapes with thick dark plum ink outlines
 (#3d3045), warm friendly colours softened like gouache printed on matte paper –
 still clear and easy to tell apart, never dull or grey – gentle shading. Simple,
-uncluttered background. Every fox and bear wears clothes. No text, no letters,
-no numbers, no speech bubbles, no frames, no book, page or paper edge drawn
-around the picture.
+uncluttered background. Every fox and bear wears clothes. Faces are friendly
+and relaxed, never frowning or with angry brows unless the picture asks for
+that feeling. No text, no letters, no numbers, no speech bubbles, no frames, no
+book, page or paper edge drawn around the picture.
 ```
+
+**Faces look as the moment feels, friendly by default** (user feedback, 12 November 2026: „diesen Fehler machst du
+öfter“ – Tapsi packing the backpack looked angry, with brows drawn down): the block says so, a prompt names the face of
+anyone whose mood matters („smiling with relaxed, raised brows“), and every face is looked at before keeping a picture
+– frowning brows on a calm or happy page are a fault to fix by an edit of that picture (see Workflow 4).
 
 The app draws the book, its page and margin round every picture itself: never ask Gemini for them, and keep the
 last line of the block, so „a page of a picture book“ doesn't come back as a drawn open book. Never call the picture a

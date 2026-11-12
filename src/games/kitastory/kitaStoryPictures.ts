@@ -44,7 +44,7 @@ const PLACES: Record<Place, { ref: string; was: string; first?: string; looks?: 
     was: "Papa and Tapsi stand on the pavement and look at the house",
     first: "anschauen",
     looks:
-      "A quiet little street in front of the daycare centre (a German Kita for toddlers), seen from across the pavement: a friendly low one-storey house with a red roof and warm yellow walls, a green front door on the right, and on the left a big low window with a white frame, its lower edge at a toddler's chest height from the floor inside, children's paintings of suns and flowers stuck inside the glass at its edges so the middle of the window stays clear; a low wooden fence with an open gate, a path to the door, a tree beside the house, a pavement in front.",
+      "A quiet little street in front of a daycare centre (a German Kita for toddlers), seen from across the pavement, so plainly a Kita and not a family's house: a wide, friendly one-storey building with a red roof and warm yellow walls, a colourful rainbow painted along its wall under the roof, a big green front door on the right standing wide open, showing a bright hall with small coats on hooks inside, and on the left a big low window with a white frame, children's paintings of suns and flowers stuck inside the glass at its edges so the middle of the window stays clear; in front of the house a low wooden fence with a big wide entrance gate, both its wings swung wide open, and a path from it to the open door. Beside the house, behind the fence, a garden with a playground full of toys: a sandpit with a wooden edge and buckets and shovels in it, a small slide, a swing on a wooden frame, a little climbing frame, a tricycle and a big red ball on the lawn; a big tree beside the house, a pavement in front.",
   },
   garderobe: {
     ref: pictureFile("ankommen"),
@@ -69,6 +69,9 @@ const PLACES: Record<Place, { ref: string; was: string; first?: string; looks?: 
   },
 };
 
+/** Whether a character is one of the Kita's bears. */
+const isBear = (c: Cast) => c !== "tapsi" && c !== "mama" && c !== "papa";
+
 /** Where Mia and Bruno are first drawn, so a later page with them in another place keeps their look. */
 const PEOPLE: Partial<Record<Cast, string>> = { mia: "ankommen", bruno: "stuhl" };
 
@@ -79,6 +82,9 @@ const LIGHT: Record<Light, string> = {
   mittag: "It is the midday nap: the curtains are drawn and the room lies in soft dim light, everything still clearly seen.",
   abend: "It is evening: dusk outside the window, a lamp gives warm soft light.",
 };
+
+/** How many characters a cast name stands for, where it is more than one. */
+const GROUP_SIZE: Partial<Record<Cast, number>> = { kinder: 2, gruppe: 4 };
 
 /** Everyone in a page's picture, each described with what they wear there. */
 function castOf(page: KitaPage): string {
@@ -91,8 +97,10 @@ function castOf(page: KitaPage): string {
       "Bruno, Tapsi's friend, a small bear toddler as tall as Tapsi with dark-brown fur, in a red T-shirt and blue dungarees, with only a tiny round bear tail",
     kinder:
       "two more small toddlers of the daycare group, as tall as Tapsi: a little bear girl with light-brown fur in a green dress, and a little bear boy with grey-brown fur in an orange T-shirt",
+    gruppe:
+      "four more small toddlers of the daycare group, as tall as Tapsi, each with only a tiny round bear tail: a little bear girl with dark-brown fur in a pink dress, a little bear boy with honey-blond fur in a yellow T-shirt and green trousers, a little bear girl with reddish-brown fur in a purple dress, and a little bear boy with cream-coloured fur in a blue striped sweater",
   };
-  const n = page.cast.reduce((sum, c) => sum + (c === "kinder" ? 2 : 1), 0);
+  const n = page.cast.reduce((sum, c) => sum + (GROUP_SIZE[c] ?? 1), 0);
   return `Exactly ${n === 1 ? "one character" : `${n} characters, each once`}: ${page.cast.map((c) => who[c]).join("; ")}. Nobody else: only ONE of each in the whole picture, nobody more in a doorway, on the furniture, behind the window or peeking in from an edge.`;
 }
 
@@ -101,7 +109,12 @@ function thingsOf(page: KitaPage): string[] {
   const things: string[] = [];
   if (/plush bunny/.test(page.picture))
     things.push("The plush bunny is Tapsi's light-grey soft toy with long floppy ears, not a living rabbit; there is only one.");
-  if (/backpack/.test(page.picture)) things.push("Tapsi's backpack is a small green toddler backpack with a fox face on its front pocket; there is only one.");
+  // On the first day's arrival Tapsi wore one backpack on the back and a second on the front (user feedback, 12
+  // November 2026): say where a worn backpack sits.
+  if (/backpack/.test(page.picture))
+    things.push(
+      "Tapsi's backpack is a small green toddler backpack with a fox face on its front pocket; there is only one. When Tapsi wears it, it sits on Tapsi's back with only its two straps over the shoulders – nothing on Tapsi's chest or tummy.",
+    );
   if (/star sign/.test(page.picture)) things.push("Tapsi's hook is marked with a small round sign showing a yellow star.");
   return things;
 }
@@ -128,6 +141,7 @@ const NAMED: Record<Cast, string> = {
   mia: "Mia (the grown-up bear)",
   bruno: "Bruno",
   kinder: "the other bear children",
+  gruppe: "the rest of the bear group",
 };
 
 /**
@@ -142,13 +156,13 @@ function absent(page: KitaPage): string {
   if (!gone.length) return "";
   const names = gone.map((who) => NAMED[who]);
   const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
-  return `${list} ${names.length === 1 && gone[0] !== "kinder" ? "is" : "are"} not in this picture at all: leave their places in the reference empty, and give nobody else their place or clothes.`;
+  return `${list} ${names.length === 1 && !GROUP_SIZE[gone[0]] ? "is" : "are"} not in this picture at all: leave their places in the reference empty, and give nobody else their place or clothes.`;
 }
 
 /** The prompt of a page's picture, without the style block. */
 function promptOf(page: KitaPage): string {
   const place = PLACES[page.place];
-  const bears = page.cast.some((c) => c === "mia" || c === "bruno" || c === "kinder");
+  const bears = page.cast.some(isBear);
   const parts =
     place.first === page.id
       ? [
@@ -175,7 +189,7 @@ function promptOf(page: KitaPage): string {
 function ownRefs(page: KitaPage): string[] {
   const place = PLACES[page.place];
   if (place.first !== page.id) return [place.ref];
-  return page.cast.some((c) => c === "mia" || c === "bruno" || c === "kinder") ? [FAMILY, BEARS] : [FAMILY];
+  return page.cast.some(isBear) ? [FAMILY, BEARS] : [FAMILY];
 }
 
 /** The pictures a page is drawn from: its place's own, then the pictures Mia and Bruno first came in (`PEOPLE`). */
@@ -213,8 +227,10 @@ const MADE = new Set<string>([
   "wieder",
   "essen",
   "traurig",
+  "zuhause",
   "pusten",
   "laenger",
+  "toben",
   "weg",
   "schuhe",
   "kuss",

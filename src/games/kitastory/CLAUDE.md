@@ -9,9 +9,9 @@ request, 11 November 2026: „setze Idee H-10 im gleichen Stil wie Abstillen um�
 Tapsi the fox (the same family and home as in „Abstillen“ and „Schnullerfee“) is told about the Kita, looks at it from
 the street with Papa and packs the backpack with slippers and the plush bunny. In the first days Mama stays on a little
 chair while Tapsi meets Mia, the teacher, and Bruno; then Mama goes out for a moment for the first time, saying she
-comes back, Tapsi cries and Mia comforts, and Mama comes back. Mia takes over breakfast and comforting, and Mama stays
-away longer each day. Every morning the same goodbye: the same way, the jacket on the hook with the yellow star, a big
-squeeze, a kiss on the nose, „Ich hole dich nach dem Mittagsschlaf ab“, Mia's hand, waving at the window. Then Tapsi's
+comes back, Tapsi cries and Mia comforts, and Mama comes back. Mia takes over breakfast and comforting, Mama is at
+home meanwhile (vacuuming), and she stays away longer each day, while Tapsi plays with the whole group in the garden.
+Every morning the same goodbye: the same way, the jacket on the hook with the yellow star, a big squeeze, a kiss on the nose, „Ich hole dich nach dem Mittagsschlaf ab“, Mia's hand, waving at the window. Then Tapsi's
 day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there, as she said.
 - `kitaStory.ts`: the chapters and pages (`KITA_STORY`) and the steps of settling in (`SETTLING_STEPS`).
 - `kitaStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, bunny, backpack, star), as the
@@ -33,14 +33,17 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
   Tapsi“ – and a grown-up is always close. Nobody scolds or hurries; no days or ages are named. Lines ≤ 110 characters,
   in the present tense.
 - The foxes are the family; the Kita's people are bears in roles – Mia the teacher, Bruno the friend, two children of the
-  group – and stay in the Kita (checked). Papa is at home and on the walk to look at the Kita.
+  group („kinder“) and four more where the whole group plays („gruppe“) – and stay in the Kita (checked). Papa is at home and on the walk to look at the Kita.
+- Where Mama is while Tapsi is in the Kita (at home, vacuuming) is shown only once she stays away longer, in Mia's
+  chapter, never in the first short goodbye: there the guides keep her in the building for a few minutes (user decision,
+  12 November 2026).
 - Tapsi is an animal, not the child's figure, so it does not follow „Junge / Mädchen“, and the German text names Tapsi
   instead of „er“ or „sie“.
 - Pictures (`/bild-erzeugen`): the living room, Tapsi's room and the path are drawn from „Abstillen“'s and the
   Schnullerfee's pictures (one home for all three books); each Kita place is drawn once (`PLACES.first`, from the fox and
   the bear family) and every other page there from it. Mia and Bruno keep their look from the page they first came in
   (`PEOPLE`), added as a further reference where the place's picture doesn't show them. Count the characters on every
-  picture before keeping it, each once („kinder“ are two), and look for stray tails.
+  picture before keeping it, each once („kinder“ are two, „gruppe“ four), and look for stray tails.
   Gemini keeps what the reference shows where a page doesn't plainly move it: the pram of „Abstillen“'s path stood
   beside Tapsi on the way to the Kita, and Tapsi stayed on the living room's rug (with a second bunny on the sofa) when
   the page only said „on the sofa between them“. So `PLACES.was` names every thing of the reference that is gone now
@@ -57,3 +60,7 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
   hook beside the backpack). Bears get „only a tiny round bear tail“: Mia once came with a fox's bushy tail. People behind a
   window seen from outside came out in front of the house twice, also with „inside, seen through the glass“: draw such
   a page from inside, with the one outside seen small through the window (the waving window is the play room's).
+  The Kita from the street is plainly a Kita, not a family's house (user feedback, 12 November 2026): a playground with
+  toys in its garden, the front door and a big entrance gate standing wide open. A worn backpack sits on the back with
+  only its straps in front (`thingsOf`): the arrival once had a second one on Tapsi's chest. Look at every face before
+  keeping a picture: calm Tapsi packing came back frowning as if angry (the style block now asks for friendly faces).

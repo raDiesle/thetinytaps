@@ -116,6 +116,11 @@ test("both style blocks dress the fox and the bear", () => {
   for (const style of [BOOK_STYLE, CUTOUT_STYLE]) expect(style).toContain("Every fox and bear wears clothes.");
 });
 
+// Calm pages came back with an angry-looking fox (user feedback, 12 November 2026: „diesen Fehler machst du öfter“).
+test("both style blocks ask for friendly faces", () => {
+  for (const style of [BOOK_STYLE, CUTOUT_STYLE]) expect(style).toContain("never frowning or with angry brows unless the picture asks for that feeling");
+});
+
 // The user only wants to know how many pictures wait, never to read and approve prompts there (November 2026).
 test("the management page shows how many pictures wait, and no prompts to review", () => {
   const page = readFileSync("src/pages/ManagementPage.tsx", "utf8");
