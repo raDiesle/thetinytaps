@@ -10,6 +10,7 @@ import { dealPairs, lookKey, nextLevel, oneOf, type Side, SOCK_LEVELS, SOCK_TEXT
 import { Basket, Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
 import { socksVoice } from "./voice";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** The full machine stands still for a moment before it starts on its own. */
 const INTRO_MS = 600;
@@ -121,6 +122,8 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     newRound(0, Math.min(SOCK_LEVELS.length - 1, Number(DEV && new URLSearchParams(window.location.search).get("level")) || 0)),
   );
   const [phase, setPhase] = useState<Phase>("intro");
+  // The wash on screen in the address (`?seite=3`), so the time-on-page event tells how many were played.
+  useStepAddress(round.id + 1);
   const [selected, setSelected] = useState<number | null>(null);
   /** Bumped to make the selected sock wiggle again when it is tapped once more. */
   const [nudge, setNudge] = useState(0);

@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { DevTag } from "@/components/DevTag";
 import { GameEnd } from "@/components/GameEnd";
+import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { useGameSettings } from "@/lib/common";
 import { byLanguage } from "@/content/texts";
 import { useAppLanguage, useT } from "@/lib/language";
@@ -32,7 +33,10 @@ const START: CauseProgress = { pass: 0, scene: 0 };
 export function CausePlay() {
   const [progress, update] = useGameSettings<CauseProgress>(PROGRESS_KEY, START);
   // `run` restarts a scene played again from its dot or with „Nochmal“.
+  // A link to a scene (`?seite=2-3`: the second pass's third scene) starts there, else where the last visit stopped.
   const [now, setNow] = useState(() => {
+    const [linkedPass, linkedScene] = (stepInAddress() ?? "").split("-").map((n) => Number(n) - 1);
+    if (CAUSE_PASSES[linkedPass]?.[linkedScene]) return { pass: linkedPass, index: linkedScene, run: 0 };
     const pass = progress.pass % CAUSE_PASSES.length;
     return { pass, index: progress.scene < CAUSE_PASSES[pass].length ? progress.scene : 0, run: 0 };
   });
@@ -40,6 +44,8 @@ export function CausePlay() {
   const scene = scenes[now.index];
   const last = now.index === scenes.length - 1;
   const following = (now.pass + 1) % CAUSE_PASSES.length;
+  // The scene on screen is in the address: its pass and its place there, each from 1 (stepAddress.ts).
+  useStepAddress(`${now.pass + 1}-${now.index + 1}`);
 
   const go = (pass: number, index: number) => setNow({ pass, index, run: now.run + 1 });
   // The cause found: the scene to go on with is kept at once, even if no one taps ▶ – after the last, the next pass.

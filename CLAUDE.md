@@ -570,6 +570,19 @@ In a fresh worktree run `bun install` first.
   its cards), the corner becomes a round arrow back to them (`useInnerBack` from `GameShell`, one tap, Esc held too) – the
   child's way back to all of them, never a button of the game's own (user feedback from Gefühle, November 2026). A way back is never dropped while something
   moves (a book still coming out, a page turning): it goes at once, without the animation if need be.
+- **Every level has its own address, and every page, scene or round its `?seite=`** (user request, November 2026: a
+  link names the very level and page, and Umami shows how far children get before leaving). A game with cards takes
+  the level as the last part of its route (`abenteuer/:level?` in `App.tsx`, `content.test.ts` checks), and `GameShell`
+  keeps address and level in step: a card tapped adds the level to the history (the phone's back button goes back to
+  the cards), ✕ steps back, an address with an unknown level goes to the cards, and a game that goes on to the next
+  level itself („Weiter“ without a new card) names it with `useLevelOnScreen(id)` (`src/lib/levelAddress.ts`). A game
+  that goes through pages, scenes or rounds calls `useStepAddress(step)` (`src/lib/stepAddress.ts`) with the one on
+  screen – a page's number from 1, a scene's id –, and starts on a link's step where it can (`stepInAddress`,
+  `stepIndexInAddress`; `ChapterBook` does both for every story told in chapters). The step only replaces the address in
+  place, so it adds nothing to the history, draws nothing again and costs no page view (Umami leaves out what follows
+  „?“); the time-on-page event „seite“ sends the last step and how many were shown. Never one event per step: that
+  would use up Umami's monthly allowance. `stepAddress.test.ts` checks that every game with scenes, rounds or an end
+  shows them, apart from the few listed there with their reason.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
@@ -893,7 +906,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
 - Visits are counted only by Cloudflare Web Analytics (the build adds it with the repository variable
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
-  time on each page, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
+  time on each page with the last step of a story or game shown there, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
   its website id in `tools/build.ts`, counting only on the site's own hosts – with and without www, `countedHosts`, since
   Umami drops every visit on a host not listed and counted no one while Pages served funforboth.com and `siteUrl` said
   www, November 2026), both
@@ -931,4 +944,4 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    see how the real site behaves (the user declines it, November 2026): what depends on the host (`canTestUnfinished`)
    gets a unit test instead.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
-   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/` (the card tapped starts that level), `?level=<n>` on `/socken/`.
+   (Bewegungsabenteuer), `/kettenreaktion/<id>/` (every level of a game with cards has its own address), `?level=<n>` on `/socken/`.

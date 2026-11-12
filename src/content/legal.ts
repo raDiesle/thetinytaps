@@ -14,7 +14,7 @@ export const OPERATOR = {
 };
 
 /** When the Datenschutzerklärung last changed: update it with the text. */
-export const PRIVACY_UPDATED = "7. November 2026";
+export const PRIVACY_UPDATED = "12. November 2026";
 
 /** Where grown-ups write to us with feedback or ideas (home page, bottom left and behind „mehr …“). Not the Impressum's address. */
 export const CONTACT_EMAIL = "david.amend.de@gmail.com";

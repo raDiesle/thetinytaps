@@ -71,8 +71,9 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
   (`groups.ts`: Traurig, Wütend, Frust & Warten, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
   Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`), played without the days' pages. The cards
   always stand in their fixed order; the day or group played last keeps its place, marked „zuletzt“, and goes on with
-  the scene where the child stopped (`settings.day`/`dayScene`, `settings.group`/`scene`). The old addresses
-  `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
+  the scene where the child stopped (`settings.day`/`dayScene`, `settings.group`/`scene`). Each card has its own
+  address below `/gefuehle/` (see „Every level has its own address“ in the root `CLAUDE.md`), and one that names no
+  card, like the old `/gefuehle/zuhause/` and `/gefuehle/kindergarten/`, leads back to `/gefuehle/` (`GameShell`).
 
 **Pictures of the feelings (user feedback, November 2026):** always the same figure, the little bear, never the fox or
 a changing child; alone – no grown-up beside him – unless the thing shown needs one (a hug); close and big, the

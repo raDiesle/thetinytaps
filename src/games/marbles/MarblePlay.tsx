@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
+import { useLevelOnScreen } from "@/components/GameShell";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage } from "@/lib/language";
@@ -26,7 +27,6 @@ import { marblesVoice } from "./voice";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
-import { DEV } from "@/lib/buildInfo";
 import { useLocation } from "react-router";
 import { awardTrophy, gameOfPath } from "@/lib/trophies";
 
@@ -58,12 +58,11 @@ const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
 /** The marble runs, the wooden one and its other worlds (K-18). */
 const RUNS: MarbleLevel[] = ["track", "colortrack", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
 
-/** The levels in turn, beginning with the chosen one (in development `?level=garden` in the address), so „Weiter“ always has a next. */
+/** The levels in turn, beginning with the chosen one (`/kettenreaktion/garden/` opens that one), so „Weiter“ always has a next. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
-  const fromUrl = DEV ? new URLSearchParams(window.location.search).get("level") : null;
   const first = Math.max(
     0,
-    LEVELS.findIndex((l) => l.id === (fromUrl ?? choice)),
+    LEVELS.findIndex((l) => l.id === choice),
   );
   return [...LEVELS.slice(first), ...LEVELS.slice(0, first)].map((l) => l.id);
 }
@@ -88,6 +87,8 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
   const level = levelAt(index);
   const next = levelAt(index + 1);
+  // „Weiter“ plays the next level without changing the card picked: the address names the one on screen.
+  useLevelOnScreen(level.id);
   const { effects, ripple } = useTapFeedback();
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");

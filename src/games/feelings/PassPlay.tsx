@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
+import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { groupStories, type StoryGroup } from "./groups";
 import { RoundPlay } from "./RoundPlay";
 import { openingLines, roundOf, stepsOf } from "./rounds";
@@ -44,9 +45,13 @@ export function PassPlay({
   const played = useRef<Record<number, number>>({});
   // `run` restarts a scene played again from its dot.
   const [now, setNow] = useState(() => {
-    const index = startAt < scenes.length ? startAt : 0;
+    // A link to a scene of the pass (`?seite=3`) starts there.
+    const linked = Number(stepInAddress()) - 1;
+    const index = scenes[linked] ? linked : startAt < scenes.length ? startAt : 0;
     return { index, step: stepOf(index), run: 0 };
   });
+  // The scene on screen, from 1, in the address (stepAddress.ts).
+  useStepAddress(now.index + 1);
 
   useEffect(() => {
     if (remember) update({ group: group.id });

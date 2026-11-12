@@ -16,6 +16,7 @@ import { Silhouette } from "./three/silhouette";
 import { hush, loadVoice, say } from "./voice";
 import "./adventure.css";
 import { PROD } from "@/lib/buildInfo";
+import { useStepAddress } from "@/lib/stepAddress";
 
 const CUES: Record<Cue, () => void> = {
   splash: playSplash,
@@ -70,6 +71,8 @@ export function AdventurePlay({
   const flashRef = useRef<HTMLDivElement>(null);
   const outlineRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
+  // The story's step on screen, from 1, in the address (stepAddress.ts).
+  useStepAddress(step + 1);
   const [pointing, setPointing] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
   const [ended, setEnded] = useState(false);

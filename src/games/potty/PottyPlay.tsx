@@ -54,6 +54,7 @@ import { pottyVoice } from "./voice";
 import { WaitClock } from "./WaitClock";
 import { WeekStars } from "./WeekStars";
 import { useWaitingMusic } from "./waitMusic";
+import { useStepAddress } from "@/lib/stepAddress";
 
 const flush = recorded("flush", playFlush);
 const splash = recorded("splash", playSplash);
@@ -106,6 +107,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [went, setWent] = useState<Went | null>(null);
   const scenes = useMemo(() => scenesFor(said), [said]);
   const [at, setAt] = useState<At>(START);
+  // The step on screen in the address by its name (stepAddress.ts); the bubble's scenes while sitting are no steps.
+  useStepAddress(STEPS[at.step].id);
   const [busy, setBusy] = useState(false);
   /**
    * The buttons for what the child said show in this step: while calling, and on the way while nothing was picked.

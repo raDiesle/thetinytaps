@@ -17,6 +17,7 @@ import { Fitted, type Picture } from "../trail/items";
 import type { Cue } from "../trail/types";
 import { type Choice, type Film, type Option, PACE, type Spot } from "./types";
 import "./film.css";
+import { useStepAddress } from "@/lib/stepAddress";
 
 // The film keeps a calm pace (user feedback, November 2026): a line is never cut off by the next one, a quiet moment
 // lies between two lines, a question is asked again only after a long while and then less and less often, and the
@@ -124,6 +125,8 @@ export function FilmPlay({
   onPick: (id: string) => void;
 }) {
   const [view, setView] = useState<View>(START);
+  // The scene on screen, from 1, in the address (stepAddress.ts).
+  useStepAddress(view.scene + 1);
   const viewRef = useRef<View>(view);
   const { effects, ripple, glow } = useTapFeedback();
   const t = useT();

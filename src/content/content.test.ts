@@ -30,11 +30,35 @@ import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
   const app = readFileSync("src/App.tsx", "utf8");
-  const routes = new Set([...app.matchAll(/path="([^"]+)"/g)].map((match) => `/${match[1]}/`));
+  // A game with cards takes its level as an optional last part (`abenteuer/:level?`): its own address is the part before.
+  const routes = new Set([...app.matchAll(/path="([^"]+)"/g)].map((match) => `/${match[1].replace(/\/:level\?$/, "")}/`));
   const games = CATEGORIES.flatMap((category) => category.games);
 
   test.each(games.flatMap((game) => [game.href, ...(game.also ?? [])]).map((href) => [href] as const))("%s has a route in App.tsx", (href) => {
     expect(routes).toContain(href);
+  });
+
+  test("every game with cards has an address for each level (`/:level?`), which GameShell keeps in step", () => {
+    // Which page shows which game: the pages import the games' start screens, App.tsx loads the pages.
+    const pageFiles = new Map([...app.matchAll(/const (\w+) = page\(\(\) => import\("@\/pages\/(\w+)"\)/g)].map((m) => [m[1], m[2]]));
+    const routeOf = new Map([...app.matchAll(/<Route path="([^"]+)" element=\{<(\w+) \/>\}/g)].map((m) => [m[2], m[1]]));
+    const withCards: string[] = [];
+    for (const dir of readdirSync("src/games")) {
+      for (const file of readdirSync(`src/games/${dir}`).filter((f) => f.endsWith("Game.tsx"))) {
+        const code = readFileSync(`src/games/${dir}/${file}`, "utf8");
+        if (!/<GameShell[^>]*\smodes=/s.test(code)) continue;
+        for (const [, name] of code.matchAll(/export function (\w+)/g)) {
+          for (const [variable, pageFile] of pageFiles) {
+            const page = readFileSync(`src/pages/${pageFile}.tsx`, "utf8");
+            if (!new RegExp(`import \\{[^}]*\\b${name}\\b`).test(page)) continue;
+            const route = routeOf.get(variable);
+            if (route) withCards.push(route);
+          }
+        }
+      }
+    }
+    expect(withCards.length).toBeGreaterThan(5);
+    for (const route of withCards) expect(route).toEndWith("/:level?");
   });
 
   test("a book of one game opens it directly, without a menu of one card", () => {
