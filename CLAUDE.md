@@ -294,8 +294,8 @@ In a fresh worktree run `bun install` first.
   hops, shakes, pulses, blinks or grows – not the one picked, not the others, not „Weiter“ at the end (user feedback
   from Gefühle, November 2026: too much fast blinking and movement for small children, for every game). What lives in
   the picture may still act (an animal shaking its head at the wrong food, a hidden one coming out happy). A level's or
-  a story's end is celebrated by its picture and its sound (everyone in it cheering, the tune) and by its trophy beside
-  the end's buttons (see trophies below) – nothing rises there any more: the hearts, stars and notes of `celebrate`
+  a story's end is celebrated by its picture and its sound (everyone in it cheering, the tune) and by its trophy handed
+  over (see trophies below) – nothing rises there any more: the hearts, stars and notes of `celebrate`
   were replaced by the trophy (user decision, November 2026), and never a storm of confetti, shapes or fast movement.
   `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
@@ -326,10 +326,13 @@ In a fresh worktree run `bun install` first.
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
   What a child does collect are **trophies** (user decision, November 2026): every level's or story's end gives the
   trophy of that level, once, and it waits in the shelf on the home page – never a count while playing. One system for
-  every game: `GameEnd` awards it (`awardTrophy`, `src/lib/trophies.ts`, finding the game by its address) and shows it
-  beside its buttons; a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
+  every game: `GameEnd` awards it (`awardTrophy`, `src/lib/trophies.ts`, finding the game by its address) and hands it
+  over so it is plainly won (user feedback, November 2026: small beside the buttons, bottom right in Aufs Töpfchen, it
+  was hardly seen): big in the middle of the screen with „Geschafft!“ under it, then shrinking onto its little wooden
+  board beside the buttons – into the collection – and only then the buttons come (`AWARD_MS`, a tap on it lands it at
+  once; one transform, measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
-  own picture in its medallion, `trophyPictures.ts`), drawn still, coming in once slowly – never shining, sparkling or
+  own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. The newest stand at the right of the lowest board of picture books, books and trophies together in the
   middle (`TrophyShelf`), and one tap there opens all of them by game; before the first one nothing stands there.
   A game may give it before its end where reaching the goal once is enough (Kettenreaktion: one ball in the goal,

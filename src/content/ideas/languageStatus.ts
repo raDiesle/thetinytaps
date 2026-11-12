@@ -470,7 +470,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏆 Pokale",
         languages: { de: "done" },
-        note: "Die Pokale im Regal (TrophyShelf.tsx, 11. November 2026): nur das Wort „Pokale“ (vorgelesen und über dem Schrank mit allen Pokalen) wartet auf seine Übersetzung; die Namen der Spiele darin sind schon übersetzt.",
+        note: "Die Pokale im Regal (TrophyShelf.tsx, 11. November 2026): nur das Wort „Pokale“ (vorgelesen und über dem Schrank mit allen Pokalen) und „Geschafft!“ unter dem großen Pokal am Ende eines Levels (GameEnd.tsx, 12. November 2026) warten auf ihre Übersetzung; die Namen der Spiele darin sind schon übersetzt.",
       },
     ],
   },
