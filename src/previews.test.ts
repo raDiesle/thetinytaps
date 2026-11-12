@@ -19,9 +19,9 @@ const sources = (dir: string): string[] =>
     entry.isDirectory() ? sources(join(dir, entry.name)) : /\.tsx?$/.test(entry.name) && !entry.name.endsWith(".test.ts") ? [join(dir, entry.name)] : [],
   );
 
-/** The `vorschau/` folders the app imports, relative to the repo. */
+/** The `vorschau/` folders the app imports, relative to the repo (not the wildcard folders of the page of all pictures). */
 const folders = sources(join(ROOT, "src")).flatMap((file) =>
-  [...readFileSync(file, "utf8").matchAll(/from "([^"]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) =>
+  [...readFileSync(file, "utf8").matchAll(/from "([^"*]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) =>
     join(file.slice(ROOT.length + 1, file.lastIndexOf("/")), path),
   ),
 );

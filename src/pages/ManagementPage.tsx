@@ -204,6 +204,10 @@ export function ManagementPage() {
             {label}
           </a>
         ))}
+        {/* A page of its own: every picture of the app at once, to check them without playing (PicturesPage). */}
+        <Link to="/management/bilder/" className="ideas-contents-page">
+          🖼️ Alle Bilder ansehen ↗
+        </Link>
       </nav>
 
       <NextPanel ideas={nextIdeas} noIdeas={noIdeas} onShow={showIdea} onMark={setMark} />

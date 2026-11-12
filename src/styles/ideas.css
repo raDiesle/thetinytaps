@@ -588,6 +588,11 @@ button.idea-id {
   text-decoration: none;
 }
 
+/* The link to the page of all pictures, a page of its own rather than a place on this one. */
+.ideas-contents a.ideas-contents-page {
+  background: #fff3c4;
+}
+
 /* Research: one folding panel per piece of research. */
 .ideas-research > h2 {
   margin: 0 0 4px;

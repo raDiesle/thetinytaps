@@ -430,6 +430,7 @@ export const MOVED_PATHS: Record<string, string> = {
  */
 export const NO_INDEX_PATHS = [
   "/management/",
+  "/management/bilder/",
   "/ideen/",
   "/impressum/",
   "/datenschutz/",
