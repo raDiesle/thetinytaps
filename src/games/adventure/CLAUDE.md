@@ -16,7 +16,8 @@ The start screen picks the story (`settings.story`, the modes are the sequences'
 dark rain cloud that hides the sun, then flies back over the land to Tapsi standing on the little cloud Wolle
 on a meadow by a village (the camera far enough back that Wolle's underside shows). Tapsi waves Kiki over,
 flaps its arms so Wolle rises (only on the downstrokes), ducks under small planes (camera further back, low
-and looking a little up, so the whole body shows), taps balloons that float in from ahead on both sides at
+and looking a little up, so the whole body shows; each plane dives in from the top edge, passes over the head and
+flies on at us, out of the picture – never pulling up), taps balloons that float in from ahead on both sides at
 paw height until they pop (seen from behind), sits down for the fast part, leans left and right through the
 curves for the stars beside the cloud towers (Wolle darts quickly aside, `CURVE_SWING`, and the low camera
 follows only part of the way, so each star is seen coming), stands up under the rain cloud, pushes its grey

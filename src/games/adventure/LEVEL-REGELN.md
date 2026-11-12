@@ -140,7 +140,10 @@ Fehler in späteren Leveln nicht wieder passiert.
   Seite, dass das, was kommt, frei neben ihm vorbeizieht und man es sieht (Wolkenreise: Wolle springt
   zur Seite, die Kamera geht nur halb mit, der Stern fliegt durch die Mitte des Bildes).
 - **Duckt sich der Fuchs unter etwas** (Flugzeuge), steht die Kamera weiter weg, tiefer und schaut
-  etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt.
+  etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt. Was
+  heranfliegt, kommt schräg von oben herab, vom oberen Bildrand, nah genug und groß genug, dass man
+  es sieht – nie frontal auf Kopfhöhe von vorn, da steckte es hinter dem Kopf und war winzig. Nach
+  dem Kopf fliegt es weiter auf uns zu und aus dem Bild, nie nach oben weg (Wolkenreise, November 2026).
 - **Kommt etwas zu den Händen** (Luftballons zum Antippen), kommt es von vorn schräg seitlich auf
   Höhe der Hände angeschwebt, nie von oben, und die Kamera schaut von hinten: So sieht man es kommen
   und die Pfote treffen.

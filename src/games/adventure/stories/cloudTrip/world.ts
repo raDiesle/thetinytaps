@@ -55,6 +55,8 @@ export function makeWorld(scene: THREE.Scene) {
 
   const planes = Array.from({ length: goes(S.duck) }, (_, n) => {
     const plane = makePlane(PLANE_COLORS[n % PLANE_COLORS.length]);
+    // A quarter bigger than built: diving in from high up ahead, a smaller one was hard to see.
+    plane.group.scale.setScalar(1.25);
     plane.group.visible = false;
     scene.add(plane.group);
     return plane;
