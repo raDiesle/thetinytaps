@@ -1,6 +1,7 @@
 import songFiles from "./musik/*.mp3?glob";
 import timingFiles from "./musik/*.json?glob";
 import { useEffect, useRef, useSyncExternalStore } from "react";
+import { DUCK, songGain } from "@/lib/loudness";
 import { audioContext, decodeSound, type Loop, playLoop, playTuneNote } from "@/lib/sfx";
 import { talking } from "@/lib/voice";
 import { type SungTimes, sungLanguageOf } from "./sung";
@@ -46,10 +47,10 @@ export function sungSteps(lang: string): number[] {
   return song.verses.map((t) => Math.round((t - song.start) * 1000));
 }
 
-/** Loudness of the song; mastered music is much louder than the synthesized notes. */
-const VOLUME = 0.35;
+/** Loudness of the song: as loud as the voice (every language's song measured −15.9 to −16.4 LUFS, see src/lib/loudness.ts). */
+const VOLUME = songGain(-16.1);
 /** Loudness while the voice says what to do, so it can be understood. */
-const DUCKED = 0.08;
+const DUCKED = VOLUME * DUCK;
 /** How often to look whether the voice is speaking. */
 const DUCK_CHECK_MS = 150;
 const BEAT_MS = 280;

@@ -9,7 +9,8 @@ All recordings are from [Freesound](https://freesound.org) under
 are still listed, so a sound can be swapped or traced back.
 
 Each one is cut to the part used (column "Cut"), faded in and out, brought to
-a similar loudness and saved as mono MP3 (96 kbit/s), e.g.:
+a similar loudness – about −18 LUFS, a little under the voice's −17 (`src/lib/loudness.ts`; measure with
+`ffmpeg -i <file> -af ebur128 -f null -`) – and saved as mono MP3 (96 kbit/s), e.g.:
 
 ```bash
 ffmpeg -ss 0.15 -t 0.9 -i source.mp3 -af "highpass=f=45,afade=t=in:d=0.008,afade=t=out:st=0.75:d=0.15,volume=-6dB" -ac 1 -ar 44100 -c:a libmp3lame -b:a 96k meow.mp3

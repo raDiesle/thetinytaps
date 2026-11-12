@@ -1,4 +1,5 @@
 import soundFiles from "../sounds/*.mp3?glob";
+import { EFFECTS_GAIN } from "../loudness";
 import { silent } from "../silent";
 
 // The audio context, recorded sounds and the note helpers every synthesized sound is made of.
@@ -8,6 +9,7 @@ export const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.6
 
 let ctx: AudioContext | null = null;
 let masterVolume = 1;
+let limiter: DynamicsCompressorNode | null = null;
 
 function audio(): AudioContext | null {
   if (typeof window === "undefined" || !("AudioContext" in window)) return null;
@@ -22,7 +24,27 @@ export function audioContext(): AudioContext | null {
   return audio();
 }
 
-/** Scales all effects, e.g. while play time fades out. */
+/**
+ * Where every sound, song and voice line goes instead of straight to the speaker: a limiter, so music as loud as the
+ * voice (src/lib/loudness.ts) with a sound on top never goes past full scale and crackles on a phone's speaker.
+ */
+export function speaker(ac: AudioContext): AudioNode {
+  if (!limiter || limiter.context !== ac) {
+    limiter = ac.createDynamicsCompressor();
+    limiter.threshold.value = -3;
+    limiter.knee.value = 0;
+    limiter.ratio.value = 20;
+    limiter.attack.value = 0.002;
+    limiter.release.value = 0.2;
+    limiter.connect(ac.destination);
+  }
+  return limiter;
+}
+
+/** The volume of an effect at `volume`: a little under voice and music, and faded with play time. */
+const effect = (volume: number) => volume * masterVolume * EFFECTS_GAIN;
+
+/** Scales all effects and songs, e.g. while play time fades out. */
 export function setSfxVolume(volume: number) {
   masterVolume = volume;
 }
@@ -112,7 +134,7 @@ export function playLoop(
   source.loopEnd = loopEnd;
   const gain = ac.createGain();
   gain.gain.setValueAtTime(0, ac.currentTime);
-  source.connect(gain).connect(ac.destination);
+  source.connect(gain).connect(speaker(ac));
   source.start(0, Math.min(offset, buffer.duration));
   const fade = (to: number, seconds: number) => {
     const t = ac.currentTime;
@@ -143,8 +165,8 @@ export function playRecorded(name: string, synth: () => void) {
   source.buffer = buffer;
   source.playbackRate.value = 0.96 + Math.random() * 0.08;
   const gain = ac.createGain();
-  gain.gain.value = masterVolume;
-  source.connect(gain).connect(ac.destination);
+  gain.gain.value = effect(1);
+  source.connect(gain).connect(speaker(ac));
   source.start();
 }
 
@@ -174,7 +196,7 @@ export function note({ from, to = from, duration, type, volume, delay = 0, lowpa
   osc.frequency.setValueAtTime(from, start);
   osc.frequency.exponentialRampToValueAtTime(to, start + duration);
   gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume * masterVolume, start + 0.01);
+  gain.gain.linearRampToValueAtTime(effect(volume), start + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
   let out: AudioNode = osc.connect(gain);
   if (lowpass) {
@@ -183,7 +205,7 @@ export function note({ from, to = from, duration, type, volume, delay = 0, lowpa
     filter.frequency.value = lowpass;
     out = out.connect(filter);
   }
-  out.connect(ac.destination);
+  out.connect(speaker(ac));
   osc.start(start);
   osc.stop(start + duration);
 }
@@ -215,10 +237,10 @@ export function voice({
   pitch.forEach((hz, i) => (i ? osc.frequency.linearRampToValueAtTime(hz, at(i, pitch.length)) : osc.frequency.setValueAtTime(hz, start)));
   const gain = ac.createGain();
   gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume * masterVolume, start + 0.04);
-  gain.gain.setValueAtTime(volume * masterVolume, start + duration * 0.8);
+  gain.gain.linearRampToValueAtTime(effect(volume), start + 0.04);
+  gain.gain.setValueAtTime(effect(volume), start + duration * 0.8);
   gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-  gain.connect(ac.destination);
+  gain.connect(speaker(ac));
   for (const formant of [0, 1]) {
     const filter = ac.createBiquadFilter();
     filter.type = "bandpass";
@@ -267,10 +289,10 @@ export function hiss({
   filter.frequency.exponentialRampToValueAtTime(to, start + duration);
   const gain = ac.createGain();
   gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(volume * masterVolume, start + Math.min(0.08, duration / 4));
-  gain.gain.setValueAtTime(volume * masterVolume, start + duration * 0.6);
+  gain.gain.linearRampToValueAtTime(effect(volume), start + Math.min(0.08, duration / 4));
+  gain.gain.setValueAtTime(effect(volume), start + duration * 0.6);
   gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-  source.connect(filter).connect(gain).connect(ac.destination);
+  source.connect(filter).connect(gain).connect(speaker(ac));
   source.start(start);
   source.stop(start + duration);
 }
