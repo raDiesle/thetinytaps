@@ -396,7 +396,8 @@ In a fresh worktree run `bun install` first.
   the child a „braver Junge“ or the like. With „Mädchen“ the menus get the girl's colours (`:root[data-figure="girl"]` in
   `base.css`: a lilac sky going pink): a new shared colour of the menus gets its girl's value there too.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
-  as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
+  as well as a computer (what a game puts at the picture's edge adds `var(--frame, 0px)`: the book's paper margin lies
+  over the picture's edges and hid half of Bewegungsabenteuer's route): let it fill the screen behind headings and controls and zoom what matters into
   the room left between them, instead of a fixed box with empty space round it. Buttons go where the picture's shape
   leaves room anyway (beside a 4:3 picture on a wide screen, never a row of their own under it), and what a picture's row
   doesn't need goes to the next picture (Gefühle's small scene over the cards; user feedback, November 2026, asked twice). Look at both sizes in the preview.
