@@ -7,14 +7,21 @@ A 3D movement story (three.js, loaded only on this page). The fox Tapsi shows ea
 The start screen picks the story (`settings.story`, the modes are the sequences' titles). At the end of a story the shared `GameEnd` offers „Nochmal“ and „Weiter“ (the next playable story in `STORIES` order, after the last the first; none while only one can be played). A story still being built is `unfinished` in `STORIES` (user decision, November 2026, the Wolkenreise): its card says „in Bearbeitung“ and starts only on localhost (`canTestUnfinished`, `src/lib/localTest.ts`), on the real site it stands greyed out and „Weiter“ skips it – unless the user holds its card for three seconds, which starts it and lets it play for the rest of the visit (`unlockUnfinished`, user request, November 2026: a way only the user knows, so nothing on the screen hints at it – no ring, glow, sound or text); remove the mark to publish it. The second story is
 `stories/cloudTrip/`, „Die Wolkenreise“ (about 3 minutes, same files as the treasure island): it opens at a
 dark rain cloud that hides the sun, then flies back over the land to Tapsi standing on the little cloud Wolle
-on a meadow by a village. Tapsi waves Kiki over, flaps its arms so Wolle rises (only on the downstrokes),
-ducks under small planes (camera right behind and just over the head), taps balloons that float to the paws
-until they pop, sits down for the fast part, leans left and right through the curves for the stars beside the
-cloud towers (Wolle slaloms and banks, the camera leans with it), stands up under the rain cloud, pushes its
-grey puffs up and away until the sun comes out, paints a rainbow band by band with big arm arcs, turns round
-to us and cheers on Wolle (it bounces under every landing), and waves goodbye while Kiki flies off into the
-sun. Kiki changes to Tapsi's left once, ahead of it, at the balloons (`KIKI` in `index.ts`), because the
-camera often looks from the right from then on. The timing helpers (`passTime`, `tapTime`, `starTime`,
+on a meadow by a village (the camera far enough back that Wolle's underside shows). Tapsi waves Kiki over,
+flaps its arms so Wolle rises (only on the downstrokes), ducks under small planes (camera further back, low
+and looking a little up, so the whole body shows), taps balloons that float in from ahead on both sides at
+paw height until they pop (seen from behind), sits down for the fast part, leans left and right through the
+curves for the stars beside the cloud towers (Wolle darts quickly aside, `CURVE_SWING`, and the low camera
+follows only part of the way, so each star is seen coming), stands up under the rain cloud, pushes its grey
+puffs up and away until the sun comes out (camera far back), paints a rainbow band by band with big arm arcs
+– a paint bucket rises out of Wolle with a brush for each paw, and before each band Tapsi bends down and dips
+the brush (`ARC_DIP` in `three/clips/motion.ts`; the bucket is placed where the measured brush tips are at the
+deepest dip, `holdBrushes`) –, turns round to us and cheers on Wolle (it bounces under every landing), and
+waves goodbye while Kiki flies off into the sun. Kiki keeps its distance, looping slowly further and nearer
+round its place (`kikiLoop`), and changes to Tapsi's left once, ahead of it, at the balloons (`KIKI` in
+`index.ts`), because the camera often looks from the right from then on; while Wolle turns round in the
+hooray its places stay put in the world instead of turning with Tapsi into the camera. A tap or click on
+the picture pauses any adventure (`AdventurePlay`), ▶ goes on. The timing helpers (`passTime`, `tapTime`, `starTime`,
 `pushTime`, `curveZ`) are in `script.ts`; `cloudTrip.test.ts` checks whole goes and lengths.
 
 ## Tapsi's voice
@@ -122,5 +129,5 @@ October 2026: 2,186 objects, 79 % busy, budget 60 %). So:
   on a level goes into it as a general rule (German), in the same commit as the fix.
 - The movement library has its own notes in `library/README.md`; `library/library.test.ts` checks that
   scenarios and sequences only use movements that exist.
-- `__adventure.seek(seconds)` in the console jumps to a moment; arrow keys skip, Space pauses.
+- `__adventure.seek(seconds)` in the console jumps to a moment; arrow keys skip, Space or a tap on the picture pauses.
 - three.js is only imported below this folder, so the rest of the app stays small.

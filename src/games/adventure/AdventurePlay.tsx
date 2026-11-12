@@ -7,6 +7,7 @@ import { useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { playChime, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { loadRealSounds, playSplash, playTweet } from "@/lib/realSounds";
+import { screenTap } from "@/lib/tapGuard";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
 import { type Cue, type Story, type StoryFrame, storyTitle } from "./stories/story";
@@ -46,9 +47,10 @@ function stepName(story: Story, i: number, language: TargetLanguageId) {
 /**
  * A 3D movement story: the fox Tapsi shows each movement and the child does
  * it along in front of the screen; the world answers on its own time. Nobody
- * has to tap, and nothing has to be read – Tapsi says everything. Grown-ups
- * can pause and jump between steps with the buttons in the corner, by tapping
- * a picture on the route, or with the keys (arrows jump, Space pauses).
+ * has to tap, and nothing has to be read – Tapsi says everything. A tap anywhere
+ * on the picture pauses (and a tap on the big ▶ goes on); grown-ups also pause and
+ * jump between steps with the buttons in the corner, by tapping a picture on the
+ * route, or with the keys (arrows jump, Space pauses).
  */
 export function AdventurePlay({
   story,
@@ -167,6 +169,8 @@ export function AdventurePlay({
   const togglePause = () => {
     const player = playerRef.current;
     if (!player) return;
+    // A child's hand often lands twice: the second tap must not undo the first one's pause.
+    if (!screenTap()) return;
     player.paused = !player.paused;
     setPaused(player.paused);
     if (player.paused) {
@@ -234,7 +238,14 @@ export function AdventurePlay({
 
   return (
     <div className="adventure">
-      <canvas ref={canvasRef} className="adventure-canvas" />
+      {/* A tap on the picture pauses (user request, November 2026); the ▶ over it goes on. */}
+      <canvas
+        ref={canvasRef}
+        className="adventure-canvas"
+        onPointerDown={(e) => {
+          if (e.button === 0 && !ended && !paused) togglePause();
+        }}
+      />
       <div ref={flashRef} className="adventure-flash" aria-hidden />
       <div ref={outlineRef} className="adventure-outline" aria-hidden />
       <ol className="adventure-route" aria-label={storyTitle(story, app.id)}>

@@ -97,7 +97,11 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Kamera von hinten, damit links links ist; wo die Arme vor dem Körper arbeiten, höher und seitlich.
 - **Am Anfang sieht man den Fuchs von vorn**: Beim Vorstellen schwenkt die Kamera erst vor ihn, so
   dass man sein Gesicht sieht, und geht erst danach hinter ihn. Während er winkt, steht er mittig im
-  Bild, und wem er winkt (Kiki), ist neben ihm, nicht über oder hinter ihm.
+  Bild, und wem er winkt (Kiki), ist neben ihm, nicht über oder hinter ihm – und ganz im Bild, auch
+  am Anfang des Winkens (in der Wolkenreise flog Kiki erst außerhalb des Bildes).
+- **Worauf der Fuchs steht, ist mit im Bild** (Wolle, Ole): Die Kamera steht so weit hinten, dass man
+  den Träger ganz sieht, bei einer Wolke auch ihre Unterseite – nicht nur einen weißen Rand unter den
+  Füßen.
 - **Wo beide Arme vor dem Körper arbeiten** (Trommeln), steht die Kamera genau mittig und nah hinter
   den Schultern, nur wenig über dem Kopf, und schaut den Weg entlang: Pfoten und Trommeln neben dem
   Körper, und dahinter, worum es geht. Nie hoch und weit hinten mit dem Blick hinab auf die Trommeln –
@@ -111,13 +115,25 @@ Fehler in späteren Leveln nicht wieder passiert.
   Kamera aus gesehen, neben dem Fuchs und neben dem, was er bewegt, nie dahinter: Kleine Vögel direkt
   vor dem Fuchs versteckten sich hinter Beinen und Trommeln (`drumBirdSpot`, der Test prüft es). Auf
   dem Handy und dem Tablet anschauen, auch das Bewegungsfenster unten rechts.
+- **Malt der Fuchs, dann mit einem Werkzeug** (Regenbogen): ein Farbeimer und ein Pinsel in jeder
+  Pfote; vor jedem Bogen bückt er sich und taucht den Pinsel ein, und Farbe im Eimer und am Pinsel
+  ist die des Bandes, das er gleich malt. Mit leeren Pfoten in die Luft zu malen sah nach nichts aus.
 - **Was die Hände tun, ist im Bild.** Verdeckt der Körper die Hände, geht die Kamera über die
   Schulter. Was in der Hand gedreht wird (Schlüssel im Schloss), sieht man von der Seite auf seiner
   Höhe: Die Kamera schwenkt dafür seitlich heran, solange gedreht wird. Was gedreht wird, muss so
   gebaut sein, dass man die Drehung sieht: Ein Schlüsselring steht längs zum Schaft; ein flacher
   Ring, der sich um sich selbst dreht, sieht aus, als stünde er still.
-- **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse), steht die Kamera genau mittig hinter ihm
-  und etwas tiefer, damit man sieht, wie es heranrollt.
+- **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse, Sterne), steht die Kamera genau mittig hinter ihm
+  und etwas tiefer, damit man sieht, wie es heranrollt. Weicht er aus, dann schnell und weit genug zur
+  Seite, dass das, was kommt, frei neben ihm vorbeizieht und man es sieht (Wolkenreise: Wolle springt
+  zur Seite, die Kamera geht nur halb mit, der Stern fliegt durch die Mitte des Bildes).
+- **Duckt sich der Fuchs unter etwas** (Flugzeuge), steht die Kamera weiter weg, tiefer und schaut
+  etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt.
+- **Kommt etwas zu den Händen** (Luftballons zum Antippen), kommt es von vorn schräg seitlich auf
+  Höhe der Hände angeschwebt, nie von oben, und die Kamera schaut von hinten: So sieht man es kommen
+  und die Pfote treffen.
+- **Schiebt der Fuchs etwas weg** (graue Wolken), steht die Kamera weit hinter ihm: Man sieht, wie es
+  kommt und wie es weggeschoben wird, nicht nur die Pfoten davor.
 - **Schwingt etwas über den Fuchs hinweg** (Baumstamm), steht die Kamera weit hinter ihm und tief
   und schaut schräg nach oben: So sieht man den ganzen Schwung, von vorn über den Kopf hinweg, und
   nicht nur das Stück direkt über dem Kopf. Was dabei zwischen Kamera und Schwung hängen würde
@@ -151,12 +167,17 @@ Fehler in späteren Leveln nicht wieder passiert.
   deutlich mit, nicht nur der Körper.
 - **Hinter durchsichtigen Dingen sieht man durch** (Spinnweben): keine weiße oder helle Fläche
   dahinter, die wie eine Wand wirkt.
+- **Begleiter halten Abstand und fliegen hin und her** (Kiki): nicht immer dicht neben dem Fuchs,
+  sondern ein Stück weg, in einer langsamen, weiten Schleife mal näher, mal ferner, mal höher (am
+  Anfang beim Winken nah genug, dass man sieht, wem er winkt).
 - **Begleiter fliegen nie durchs Bild** (Kiki): Sie bleiben weit genug vor der Kamera und wechseln
   höchstens einmal die Seite, vor dem Fuchs und in einem Schritt, in dem die Kamera von hinten schaut.
   Von der Kamera aus gesehen sitzen sie nie auf dem Kopf des Fuchses und nie vor dem, worauf er
   schaut (Schwimmer): Jede Kamera einer Station prüfen, nicht nur die von hinten.
   Jeden Übergang zwischen zwei Stationen anschauen, nicht nur die Stationen selbst: Ein Papagei, der
-  beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz.
+  beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz. Dreht sich der
+  Träger mit dem Fuchs um, drehen sich die Plätze des Begleiters nicht mit: Sie bleiben in der Welt
+  stehen, sonst schwenkt er mit herum in die Kamera.
 - **Die Kamera steht frei, auch am Anfang**: Nicht in oder knapp vor Wolken oder Bergen starten. Das,
   was gezeigt werden soll (die Regenwolke), sieht man aus Abstand ganz. Ein grauer Himmel hat keinen
   hellen Sonnenschein.
@@ -171,6 +192,8 @@ Fehler in späteren Leveln nicht wieder passiert.
   schwarz. Vor dem Abschluss die ganze Geschichte Bild für Bild durchlaufen und auf schwarze Bilder
   und `NaN` prüfen (Konsole: `__adventure.seek(t)`).
 - Neue Stationen im Browser anschauen, nicht nur typprüfen.
+- **Ein Tipp oder Klick aufs Bild hält an**, in jedem Abenteuer, und ▶ in der Mitte geht weiter
+  (`AdventurePlay`); ein schneller zweiter Tipp ändert nichts (`screenTap`).
 - **Keine Schnitte und kein Weiß zwischen den Stationen.** Ole trägt Tapsi den ganzen Weg, und die
   Kamera fährt mit (in engen Schluchten dicht hinter Tapsi, nie durch Felsen). Nichts Großes, Helles
   steht im Weg von Kamera oder Figur: Ein Lichtschein in einer Türöffnung wird ausgeblendet, bevor

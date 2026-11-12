@@ -387,18 +387,20 @@ export const ARM_CLIPS = clips({
   },
 
   arc: (t, p) => {
-    // A big half circle: the arm goes out to the side and up over the head, stays a moment and drops
-    // back; the left arm first, then the right one. The body and head go along with the paw.
-    const { left, up, down } = arcDraw(t);
+    // Bent forwards, the arm dips its brush into the paint bucket in front of the feet; then it goes out to the side
+    // and up over the head in a big half circle, stays a moment and drops back; the left arm first, then the right
+    // one. The body and head go along with the paw.
+    const { left, dip, up, down } = arcDraw(t);
     const draw = up * (1 - down);
     const arm = left ? p.armL : p.armR;
-    arm.spread = 0.3 + draw * 2.6;
-    arm.raise = draw * 0.35;
-    arm.elbow = 0.1;
+    arm.spread = 0.3 + draw * 2.6 - dip * 0.5;
+    arm.raise = draw * 0.35 + dip * 0.5;
+    arm.elbow = 0.1 - dip * 0.1;
     const side = left ? 1 : -1;
+    p.bend = dip * 0.8;
     p.lean = -side * Math.sin(draw * Math.PI) * 0.12;
     p.headTilt = -side * draw * 0.15;
-    p.headPitch = -draw * 0.35;
+    p.headPitch = -draw * 0.35 + dip * 0.25;
   },
 
   kite: (t, p) => {

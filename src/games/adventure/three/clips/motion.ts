@@ -148,15 +148,28 @@ export const TAP_HIT = 0.43;
 export const LEAN_PERIOD = 3.4;
 /** Seconds of one jump for joy in the cheer clip. */
 export const CHEER_PERIOD = 0.8;
-/** Seconds of one go of the arc clip: the left arm draws a half circle up over the head, then the right one. */
-export const ARC_PERIOD = 4;
-/** Which arm draws in the arc clip `t` s in (true: the left one) and how far up it has come, 0..1. */
+/**
+ * Seconds of one go of the arc clip: the left arm dips its brush into the paint bucket in front of the feet and
+ * draws a half circle up over the head, then the right one.
+ */
+export const ARC_PERIOD = 5;
+/** Where in each half of the arc clip the brush is deepest in the bucket. */
+export const ARC_DIP = 0.16;
+/**
+ * Which arm draws in the arc clip `t` s in (true: the left one), how deep it dips into the bucket first (0..1), how
+ * far up it has come (0..1) and how far down again.
+ */
 export function arcDraw(t: number) {
   const k = phase(t, ARC_PERIOD);
   const left = k < 0.5;
   const half = left ? k * 2 : k * 2 - 1;
-  // Up for most of the half, a moment at the top, and back down quickly.
-  return { left, up: smooth(clamp01((half - 0.04) / 0.56)), down: smooth(clamp01((half - 0.72) / 0.24)) };
+  // Down into the bucket and a moment there, then up for most of the half, a moment at the top, and back down.
+  return {
+    left,
+    dip: hold(half, 0, ARC_DIP - 0.02, ARC_DIP + 0.06, 0.34),
+    up: smooth(clamp01((half - 0.28) / 0.42)),
+    down: smooth(clamp01((half - 0.8) / 0.17)),
+  };
 }
 
 /** Seconds of one turn of the crank clip; stories turn their crank with it. */

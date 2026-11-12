@@ -121,6 +121,59 @@ export function makeBalloon(color: string) {
   return group;
 }
 
+/**
+ * The paint bucket Tapsi dips its brushes into, standing on Wolle in front of the feet: a blue tin with a rim and a
+ * handle, `height` tall and `radius` wide, open at the top, with the paint just under the rim. Its paint shows the
+ * colour being painted (`paint.material.color`).
+ */
+export function makeBucket(height: number, radius: number) {
+  const group = new THREE.Group();
+  const tin = mat("#4f7fd6", 0.45, { metalness: 0.2, side: THREE.DoubleSide });
+  const side = solid(new THREE.CylinderGeometry(radius, radius * 0.85, height, 28, 1, true), tin);
+  side.position.y = height / 2;
+  group.add(side);
+  const bottom = solid(new THREE.CircleGeometry(radius * 0.85, 28), tin, false);
+  bottom.rotation.x = -Math.PI / 2;
+  bottom.position.y = 0.005;
+  group.add(bottom);
+  const metal = mat("#d5dde8", 0.35, { metalness: 0.5 });
+  const rim = solid(new THREE.TorusGeometry(radius, radius * 0.07, 8, 32), metal, false);
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = height;
+  group.add(rim);
+  const handle = solid(new THREE.TorusGeometry(radius * 0.95, radius * 0.04, 6, 24, Math.PI), metal, false);
+  handle.position.y = height;
+  handle.rotation.y = 0.5;
+  group.add(handle);
+  const paint = solid(new THREE.CircleGeometry(radius * 0.97, 28), mat("#ff4d4d", 0.3), false);
+  paint.rotation.x = -Math.PI / 2;
+  paint.position.y = height - radius * 0.25;
+  group.add(paint);
+  return { group: mergeParts(group, [paint]), paint: paint as THREE.Mesh<THREE.CircleGeometry, THREE.MeshStandardMaterial> };
+}
+
+/** How far a brush reaches from where the paw holds it to the tip of its bristles (in the fox's own units). */
+export const BRUSH_REACH = 0.25;
+
+/**
+ * A big paint brush: a wooden handle, a metal ferrule and soft bristles, laid along -y from where the paw holds it
+ * (the origin), the bristles' tip `BRUSH_REACH` away. The bristles take the colour last dipped (`tip.material.color`).
+ */
+export function makeBrush() {
+  const group = new THREE.Group();
+  const handle = solid(new THREE.CylinderGeometry(0.013, 0.016, 0.2, 10), mat("#c98b4f", 0.6), false);
+  handle.position.y = -0.03;
+  group.add(handle);
+  const ferrule = solid(new THREE.CylinderGeometry(0.021, 0.017, 0.05, 12), mat("#d5dde8", 0.3, { metalness: 0.6 }), false);
+  ferrule.position.y = -0.15;
+  group.add(ferrule);
+  const bristles = new THREE.CylinderGeometry(0.023, 0.016, 0.07, 12);
+  bristles.translate(0, -0.21, 0);
+  const tip = solid(bristles, mat("#ff4d4d", 0.6), false);
+  group.add(tip);
+  return { group: mergeParts(group, [tip]), tip: tip as THREE.Mesh<THREE.CylinderGeometry, THREE.MeshStandardMaterial> };
+}
+
 /** A golden star that glows a little. */
 export function makeStar() {
   const shape = new THREE.Shape();

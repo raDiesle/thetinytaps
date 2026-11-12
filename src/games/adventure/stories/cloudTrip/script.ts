@@ -74,7 +74,7 @@ export const PUSH_TOP = 0.4;
 /** Seconds into the push clip when the paws reach grey puff n. */
 export const pushTime = (n: number) => (n + PUSH_TOP) * PUSH_PERIOD;
 /** Where in each half of the arc clip the arm is at the top, so that half of the band is painted. */
-export const ARC_TOP = 0.6;
+export const ARC_TOP = 0.7;
 /** Seconds into the cheer clip when the feet land on Wolle, in every jump. */
 export const LANDING = 0.72;
 

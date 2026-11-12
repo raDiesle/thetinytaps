@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { arcDraw, ARC_PERIOD, CHEER_PERIOD, clipPose, duckDepth, FLAP_PERIOD, LEAN_PERIOD, PUSH_PERIOD, sitProgress } from "../../three/clips";
-import { type Guide, lerpPose, type Pose } from "../../three/guide";
+import { ARC_DIP, arcDraw, ARC_PERIOD, CHEER_PERIOD, clipPose, duckDepth, FLAP_PERIOD, LEAN_PERIOD, PUSH_PERIOD, sitProgress } from "../../three/clips";
+import { type Guide, GUIDE_SIZE, lerpPose, type Pose } from "../../three/guide";
 import { updateMoved } from "../../three/matrices";
 import { sitDown } from "../../three/player";
 import { DAY, type SkyColors, type Stage } from "../../three/stage";
@@ -17,6 +17,7 @@ import {
   MEADOW_Z,
   PUFF_GAP,
   PUFF_RADIUS,
+  RAINBOW_COLORS,
   SIT_DROP,
   SIT_Z,
   smooth,
@@ -28,7 +29,7 @@ import {
   WOLLE_TOP,
 } from "./layout";
 import { LINES, OPENING_LINES } from "./lines";
-import { BALLOON_RADIUS } from "./scenery";
+import { BALLOON_RADIUS, BRUSH_REACH, makeBrush, makeBucket } from "./scenery";
 import {
   ARC_TOP,
   actLength,
@@ -114,6 +115,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const n = Math.floor(clip / FLAP_PERIOD);
     return Math.min(goes(S.flap), n + smooth((clip / FLAP_PERIOD - n - 0.5) / 0.5));
   };
+  /** How far Wolle is out to the side at angle `a` of a curve: quick across the middle, a long while out at the side. */
+  const swing = (a: number) => {
+    const k = Math.sin(a);
+    return CURVE_SWING * Math.sign(k) * Math.abs(k) ** 0.45;
+  };
   /** From one place (z) to the next while travelling to a step. */
   const travelTo = (local: number, step: number, from: number, to: number) => from + (to - from) * smooth(local / TRAVEL[step]);
 
@@ -149,10 +155,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.stars: {
         // Round the cloud towers: swinging out to the right while leaning left into the curve, and the other way.
         out.z = curveZ(local);
+        // Wolle darts over to each side quickly and stays out there while the star comes, so it is seen coming.
         const curving = clip > 0 && clip < clipLength(step);
         const a = (Math.max(0, clip) / LEAN_PERIOD) * TAU;
-        out.x = curving ? CURVE_SWING * Math.sin(a) : 0;
-        const dx = curving ? CURVE_SWING * (TAU / LEAN_PERIOD) * Math.cos(a) : 0;
+        out.x = curving ? swing(a) : 0;
+        const dx = curving ? ((swing(a + 0.01) - swing(a - 0.01)) / 0.02) * (TAU / LEAN_PERIOD) : 0;
         out.yaw = AHEAD - 0.35 * Math.atan2(dx, 2);
         out.roll = curving ? -0.12 * Math.sin(a) : 0;
         break;
@@ -250,6 +257,91 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   rain.mesh.position.copy(stationRoot);
   const cloudHome = rainCloud.puffs.map((p) => p.position.clone());
 
+  // --- The paint bucket and the brushes ------------------------------------
+  // Out of Wolle comes a paint bucket with a brush for each paw (user idea, November 2026): before every half of
+  // the rainbow Tapsi bends down and dips the brush into it, then paints the band with it; the paint in the bucket
+  // is the colour of the band being painted.
+  /** Seconds into each go of the arc clip when the left (or right) brush is deepest in the bucket. */
+  const dipAt = (left: boolean) => (left ? 0 : ARC_PERIOD / 2) + (ARC_DIP * ARC_PERIOD) / 2;
+  /** Which way a held brush points in the paw's own space: ahead out of the fist and a little down, like a pencil. */
+  const BRUSH_TURN = new THREE.Quaternion().setFromUnitVectors(v3(0, -1, 0), v3(0, -0.85, 0.5).normalize());
+  const brushLength = BRUSH_REACH * GUIDE_SIZE;
+  /** Where a brush in Tapsi's paw is held (`pos`) and which way it is turned (`q`), in world space. */
+  const brushInPaw = (hand: "L" | "R", pos: THREE.Vector3, q: THREE.Quaternion) => {
+    guide.gripPoint(hand, pos);
+    (hand === "L" ? guide.handL : guide.handR).getWorldQuaternion(q).multiply(BRUSH_TURN);
+  };
+  /** The tip of the brush in a paw at the deepest dip, measured in Tapsi's space: the bucket stands under both. */
+  const tipAtDip = (hand: "L" | "R") => {
+    measure("arc", ARC_PERIOD + dipAt(hand === "L"), 0);
+    const pos = new THREE.Vector3();
+    const q = new THREE.Quaternion();
+    brushInPaw(hand, pos, q);
+    return pos.add(v3(0, -brushLength, 0).applyQuaternion(q));
+  };
+  const dipL = tipAtDip("L");
+  const dipR = tipAtDip("R");
+  const BUCKET_RADIUS = Math.max(0.16, Math.abs(dipL.x - dipR.x) / 2 + 0.07);
+  /** Where the bucket stands on Wolle, in Tapsi's space: under both tips, which reach a little into the paint. */
+  const BUCKET = v3((dipL.x + dipR.x) / 2, 0, (dipL.z + dipR.z) / 2);
+  const BUCKET_HEIGHT = Math.max(0.14, Math.min(dipL.y, dipR.y) + 0.03 + BUCKET_RADIUS * 0.25);
+  const bucket = makeBucket(BUCKET_HEIGHT, BUCKET_RADIUS);
+  scene.add(bucket.group);
+  const brushes = (["L", "R"] as const).map((hand) => {
+    const brush = makeBrush();
+    scene.add(brush.group);
+    const side = hand === "L" ? 1 : -1;
+    // Standing in the bucket, the handle leaning out to its paw's side and back towards Tapsi.
+    const lean = v3(-side * 0.35, -1, 0.3).normalize();
+    const restTip = v3(BUCKET.x + side * BUCKET_RADIUS * 0.35, BUCKET_HEIGHT - BUCKET_RADIUS * 0.25 - 0.02, BUCKET.z);
+    return { hand, left: hand === "L", ...brush, lean, restTip, shown: -1 };
+  });
+  let bucketShown = -1;
+  /** How far the bucket has come up out of Wolle in this frame (0 hidden inside, 1 standing on top). */
+  let bucketUp = 0;
+
+  const pawPos = new THREE.Vector3();
+  const pawQ = new THREE.Quaternion();
+  const restQ = new THREE.Quaternion();
+  const DOWN = new THREE.Vector3(0, -1, 0);
+  /**
+   * The brushes stand in the bucket until their paw dips into it the first time, are in the paw while it paints, and
+   * go back into the bucket in the praise. Called after the pose, so they are where the paws are in this frame.
+   */
+  function holdBrushes(f: StoryFrame) {
+    const clip = f.act + f.demo;
+    const painting = f.opening === null && f.step === S.rainbow;
+    updateMoved(guide.root);
+    for (const brush of brushes) {
+      brush.group.visible = bucket.group.visible;
+      if (!brush.group.visible) continue;
+      const first = dipAt(brush.left);
+      const held = painting ? smooth((clip - first + 0.25) / 0.25) * (1 - smooth((clip - clipLength(S.rainbow) - 0.1) / 0.5)) : 0;
+      // In the bucket: the tip in the paint, the handle leaning out.
+      const g = guide.root.position;
+      fromTapsi(tmpA.copy(brush.restTip).setY(brush.restTip.y - (BUCKET_HEIGHT + 0.12) * (1 - bucketUp)), g, place.yaw, tmpA);
+      tmpB.copy(brush.lean).applyAxisAngle(UP, place.yaw);
+      restQ.setFromUnitVectors(DOWN, tmpB);
+      tmpA.addScaledVector(tmpB, -brushLength);
+      if (held > 0) {
+        brushInPaw(brush.hand, pawPos, pawQ);
+        tmpA.lerp(pawPos, held);
+        restQ.slerp(pawQ, held);
+      }
+      brush.group.position.copy(tmpA);
+      brush.group.quaternion.copy(restQ);
+      brush.group.scale.setScalar(GUIDE_SIZE);
+      updateMoved(brush.group);
+      // The bristles take the colour of the band they were last dipped for.
+      const dips = painting && clip >= first ? Math.floor((clip - first) / ARC_PERIOD) : f.step > S.rainbow ? RAINBOW_COLORS.length - 1 : 0;
+      const colour = THREE.MathUtils.clamp(dips, 0, RAINBOW_COLORS.length - 1);
+      if (colour !== brush.shown) {
+        brush.shown = colour;
+        brush.tip.material.color.set(RAINBOW_COLORS[colour]);
+      }
+    }
+  }
+
   // --- Camera --------------------------------------------------------------
   /** How far the camera stands from Tapsi, so the whole body with the arms up fills most of the picture. */
   const frameDistance = () => {
@@ -270,41 +362,50 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const praise = local - LEAD[step] - actLength(step);
     switch (step) {
       case S.hello:
-        // From the front: the first look at Tapsi's face.
-        around(g, Math.PI + 0.15, 1.05, 1.1, pos, look);
+        // From the front: the first look at Tapsi's face, far enough back for Wolle's underside and Kiki beside it.
+        around(g, Math.PI + 0.15, 1.4, 0.9, pos, look, 0.45);
         return;
       case S.flap:
-        around(g, 0, 1.15, 1.3, pos, look, 0.9);
+        // Behind and far enough back that Wolle's underside shows: what the wings lift.
+        around(g, 0, 1.5, 1.1, pos, look, 0.5);
         return;
       case S.duck:
-        // Right behind the head and just over it, looking the way Tapsi looks: the planes come at us.
-        pos.set(g.x, g.y + standTop + 0.3, g.z + 1.5);
-        look.set(g.x, g.y + standTop * 0.75, g.z - 6);
+        // Behind, at the height of the shoulders and looking a little up the way Tapsi looks: the whole ducking
+        // body shows, and the planes come at us over the head.
+        pos.set(g.x, g.y + standTop * 0.7, g.z + 3);
+        look.set(g.x, g.y + standTop * 1.05, g.z - 6);
         return;
       case S.balloons:
-        // A little from the right and higher, so the paws in front of the body show.
-        around(g, 0.55, 1.05, 1.5, pos, look);
-        look.z -= 0.4;
+        // Right behind and a little over the head, so both paws in front of the body and the balloons floating in
+        // from the sides show.
+        around(g, 0, 1.15, 1.7, pos, look, 0.75);
+        look.z -= 1.2;
         return;
       case S.sit:
       case S.stand:
         around(g, 0.5, 1, 1.2, pos, look, 0.6);
         return;
       case S.stars:
-        // Behind, swinging out only half as far as Wolle, so the curves show.
-        around(g, 0, 1.1, 1.4, pos, look, 0.6);
-        pos.x -= place.x * 0.5;
-        look.z -= 1;
+        // Low behind, a little under the reaching paws and looking up along the way: the stars hang against the
+        // sky ahead and come nearer. The camera swings out only a third as far as Wolle, so Tapsi slides over to
+        // each star.
+        around(g, 0, 1.2, 0.35, pos, look, 0.75);
+        pos.x -= place.x * 0.65;
+        look.x -= place.x * 0.5;
+        look.z -= 3;
         return;
       case S.push:
-        // Low behind Tapsi, looking up past it at the puffs and the sun.
-        pos.set(g.x + 0.5, g.y + 0.85, g.z + 2.7);
-        look.set(g.x, g.y + 2.4, g.z - 1.2);
+        // Far behind and low, looking up past Tapsi: the whole stack of puffs coming down onto the paws and each
+        // pushed puff flying off, with Wolle under Tapsi.
+        pos.set(g.x + 0.6, g.y + 0.2, g.z + 4.6);
+        look.set(g.x, g.y + 2.1, g.z - 1.2);
         return;
       case S.rainbow:
-        // Behind and a bit higher, looking out at the sky where the rainbow is painted.
-        pos.set(g.x + 0.3, g.y + 1.5, g.z + 3.2);
-        look.set(g.x, g.y + 3.2, g.z - 12);
+        // Behind, a little to the right and over the head, looking out at the sky: Tapsi stands under the middle of
+        // the rainbow (never in front of a half being painted), the bucket shows beside the legs and over the back
+        // bent down to it.
+        pos.set(g.x + 0.75, g.y + 1.15, g.z + 3.1);
+        look.set(g.x, g.y + 1.1, g.z - 6);
         return;
       default: {
         // Turned round to us: from the front, the sun and the rainbow behind Tapsi; at the very end up and away.
@@ -358,35 +459,47 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
   // --- Kiki ----------------------------------------------------------------
   /**
-   * Where Kiki flies in each step, in Tapsi's space (x to its left, z ahead): clear of the paws and of what
-   * comes, and away from the camera. From the balloons on the camera often looks from Tapsi's right, so Kiki
-   * changes to the left once, ahead of Tapsi, and stays there (crossing later would fly through the shot).
+   * Where Kiki flies in each step, in Tapsi's space (x to its left, z ahead): a good way off to the side and ahead,
+   * clear of the paws and of what comes, never right beside Tapsi (user feedback, November 2026). From the balloons
+   * on the camera often looks from Tapsi's right, so Kiki changes to the left once, ahead of Tapsi, and stays there
+   * (crossing later would fly through the shot).
    */
   const KIKI = [
-    v3(-1.0, 1.55, 0.8),
-    v3(-1.3, 1.9, -0.6),
-    v3(-1.3, 1.9, -0.6),
-    v3(1.5, 1.8, -1.2),
-    v3(1.5, 1.8, -1.2),
-    v3(1.3, 1.6, -1.6),
-    v3(1.3, 1.6, -1.6),
-    v3(1.4, 0.5, 0.4),
-    v3(1.5, 1.2, -0.3),
-    v3(1.3, 1.5, -0.5),
-    v3(1.3, 1.5, -0.5),
+    v3(-1.8, 1.25, -0.5),
+    v3(-2.4, 1.4, 2.6),
+    v3(-2.6, 1.5, 3),
+    v3(2.6, 1.5, 3.6),
+    v3(2.6, 1.6, 3.4),
+    v3(2.8, 1.9, 4),
+    v3(2.8, 1.9, 4),
+    v3(2.4, 0.9, 2.4),
+    v3(2.6, 1.4, 2.2),
+    v3(2.4, 1.9, -2.2),
+    v3(2.4, 1.9, -2.2),
   ];
+  /**
+   * Kiki doesn't hang still: it flies a slow, wide loop round its place, now further off, now nearer, a little up and
+   * down; on its own side of Tapsi always (the loop is narrower than its place is far to the side).
+   */
+  const kikiLoop = (time: number, size: number, out: THREE.Vector3) =>
+    out.set(0.7 * Math.sin(time * 0.43), 0.3 * Math.sin(time * 0.71 + 1), 1.3 * Math.sin(time * 0.29 + 2)).multiplyScalar(size);
   const kikiFar = v3(-10, 6, MEADOW_Z - 22);
   function placeKiki(f: StoryFrame, g: THREE.Vector3) {
     const { step, time } = f;
     const p = parrot.group.position;
-    const here = fromTapsi(KIKI[step], g, place.yaw, tmpA);
+    // At the hello Kiki comes close enough to be waved to, and loops wider from then on.
+    const loop = kikiLoop(time, step === S.hello ? 0.35 : 1, new THREE.Vector3());
+    // While Wolle turns round in the hooray, Kiki's places are taken as Tapsi faces before and after the turn: turning
+    // with Tapsi, Kiki swung round into the camera.
+    const yawOf = (s: number) => (s >= S.hooray ? AHEAD - Math.PI : step >= S.hooray ? AHEAD : place.yaw);
+    const here = fromTapsi(loop.add(KIKI[step]), g, yawOf(step), tmpA);
     if (f.opening !== null) {
       p.copy(kikiFar);
     } else if (step === S.hello) {
       p.copy(kikiFar).lerp(here, smooth((f.local - 0.3) / 2.4));
       if (f.act + f.demo > 0) p.y += Math.abs(Math.sin(time * 4.5)) * 0.12;
     } else {
-      const before = fromTapsi(KIKI[step - 1], g, place.yaw, tmpB);
+      const before = fromTapsi(kikiLoop(time, step - 1 === S.hello ? 0.35 : 1, tmpB).add(KIKI[step - 1]), g, yawOf(step - 1), tmpB);
       p.copy(before).lerp(here, smooth(f.local / 1.5));
     }
     p.y += Math.sin(time * 2.3) * 0.08;
@@ -433,7 +546,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // Tapsi's face shows the planes passing: a little shy while they go over.
     guide.earsBack = step === S.duck && clip > 0 ? duckDepth(clip) * 0.8 : 0;
 
-    // The balloons float up to the paws from ahead, the left one first, and pop – confetti.
+    // The balloons float in from ahead and out to the side, at the height of the paws, towards the hand that taps
+    // them – never from above or below, where they were hard to see – the left one first, and pop: confetti.
     balloons.forEach((balloon, n) => {
       const u = step === S.balloons && !inOpening ? (clip - tapTime(n) + FLOAT) / FLOAT : -1;
       balloon.visible = u >= 0 && u < 1;
@@ -441,8 +555,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         const side = n % 2 === 0 ? 1 : -1;
         const target = balloonAt[n];
         const e = u * 0.6 + smooth(u) * 0.4;
-        tmpA.set(target.x + side * 1.6, target.y - 2.6, target.z + 4.5).lerp(target, e);
-        tmpA.x += Math.sin(time * 1.7 + n) * 0.12 * (1 - u);
+        tmpA.set(target.x + side * 3.2, target.y + 0.25, target.z + 3).lerp(target, e);
+        tmpA.y += Math.sin(time * 1.7 + n) * 0.1 * (1 - u);
         fromTapsi(tmpA, g, place.yaw, balloon.position);
         balloon.rotation.set(0, 0, Math.sin(time * 1.3 + n) * 0.15 * (1 - u));
       }
@@ -555,6 +669,20 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     }
 
+    // The bucket comes up out of Wolle as it flies to the rainbow and sinks back into it as Wolle turns round to us.
+    bucketUp = inOpening ? 0 : step === S.rainbow ? smooth((f.local - 0.2) / 1.2) : step === S.hooray ? 1 - smooth(f.local / (TRAVEL[S.hooray] * 0.8)) : 0;
+    bucket.group.visible = bucketUp > 0;
+    if (bucket.group.visible) {
+      fromTapsi(tmpA.copy(BUCKET).setY(-(BUCKET_HEIGHT + 0.12) * (1 - bucketUp)), g, place.yaw, bucket.group.position);
+      bucket.group.rotation.set(0, place.yaw, 0);
+      updateMoved(bucket.group);
+      const colour = THREE.MathUtils.clamp(Math.floor(Math.max(0, arcClip) / ARC_PERIOD), 0, RAINBOW_COLORS.length - 1);
+      if (colour !== bucketShown) {
+        bucketShown = colour;
+        bucket.paint.material.color.set(RAINBOW_COLORS[colour]);
+      }
+    }
+
     // Hooray: confetti when Tapsi has turned round, and again with every other landing.
     if (step === S.hooray) {
       if (atClip(0)) {
@@ -611,6 +739,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       placeKiki(f, g);
       updateWorld(f, g);
       return { walking: false, flash: 0, sitting, bend: 0 };
+    },
+    afterPose(f) {
+      holdBrushes(f);
     },
   };
 }
