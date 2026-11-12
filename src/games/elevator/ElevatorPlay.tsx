@@ -11,6 +11,7 @@ import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW
 import { linesReady, loadLines, sayIn, storyLines } from "./voice";
 import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** Time the lift takes per floor. */
 const FLOOR_MS = 1200;
@@ -124,6 +125,8 @@ export function ElevatorPlay({
 }) {
   const hero = useHero();
   const [view, setView] = useState<View>(START);
+  // How far the story got, in the address (stepAddress.ts): how many of its tasks began, or the end.
+  useStepAddress(view.picking ? "ende" : Object.keys(view.taps).length + 1);
   const viewRef = useRef<View>(START);
   const { effects, ripple } = useTapFeedback();
 

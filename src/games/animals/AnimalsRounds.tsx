@@ -18,6 +18,7 @@ import { KIND_QUESTIONS, RoundTopic } from "./RoundTopic";
 import { SOUND_ANIMALS } from "./sounds";
 import { SoundPlay } from "./SoundPlay";
 import { animalsVoice } from "./voice";
+import { useStepAddress } from "@/lib/stepAddress";
 
 const FED = ANIMALS.filter((a) => a.food);
 const HOUSED = ANIMALS.filter((a) => a.home);
@@ -30,6 +31,8 @@ const HOUSED = ANIMALS.filter((a) => a.home);
  */
 export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const [turn, setTurn] = useState(0);
+  // The round on screen in the address (`?seite=3`), so the time-on-page event tells how many rounds were played.
+  useStepAddress(turn + 1);
   /**
    * The difficulty step (an index into `ANIMAL_LEVELS`); every visit begins on the first. While developing, `?level=N`
    * starts on step N, to look at the harder rounds.

@@ -25,6 +25,7 @@ import {
 import { PeekPlay } from "./PeekPlay";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
 import { shadowsVoice } from "./voice";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
@@ -165,6 +166,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const peekLevelRef = useRef(Math.min(PEEK_LEVELS.length - 1, Number(DEV && new URLSearchParams(window.location.search).get("level")) || 0));
   const peekResultsRef = useRef<number[]>([]);
   const peekId = useRef(0);
+  // The picture on screen in the address (`?seite=3`, `3-tier` while an animal peeks out after it), so the time-on-page event tells how far the child got.
+  useStepAddress(round ? (peek ? `${round.id + 1}-tier` : round.id + 1) : undefined);
   const drawPeek = useDeck(PEEK_ITEMS);
 
   const later = useCallback((ms: number, run: () => void) => {

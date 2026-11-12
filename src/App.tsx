@@ -53,6 +53,9 @@ export function App() {
   return (
     // While a page's code still loads, a sheet of paper with a paw track, never an empty screen (PageLoading).
     <Suspense fallback={<PageLoading />}>
+      {/* A game with cards takes its level as the last part of its address (`abenteuer/:level?`, levelAddress.ts): one
+          route for the cards and their levels, so the page stays while the address follows the level. An address
+          naming no level of the game (Gefühle's old `/gefuehle/zuhause/`) leads to its cards (GameShell). */}
       <Routes>
         <Route index element={<Home />} />
         <Route path="spiele/:category" element={<CategoryPage />} />
@@ -74,23 +77,21 @@ export function App() {
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />
         <Route path="wie-lange-warten" element={<WaitPage />} />
-        <Route path="timer" element={<TimerPage />} />
-        <Route path="gefuehle" element={<FeelingsPage />} />
-        <Route path="wie-gehts-dir" element={<MoodPage />} />
+        <Route path="timer/:level?" element={<TimerPage />} />
+        <Route path="gefuehle/:level?" element={<FeelingsPage />} />
+        <Route path="wie-gehts-dir/:level?" element={<MoodPage />} />
         {/* „Was brauche ich?“ is one of the two games of „Wie geht's dir?“ now (its card on the start screen). */}
         <Route path="was-brauche-ich" element={<Navigate to="/wie-gehts-dir/" replace />} />
         <Route path="was-ist-passiert" element={<CausePage />} />
-        {/* Zu Hause and Kindergarten had pages of their own; all stories are on one start screen now. */}
-        <Route path="gefuehle/:place" element={<Navigate to="/gefuehle/" replace />} />
         <Route path="schatten" element={<ShadowsPage />} />
         <Route path="socken" element={<SocksPage />} />
-        <Route path="kettenreaktion" element={<MarblePage />} />
+        <Route path="kettenreaktion/:level?" element={<MarblePage />} />
         {/* Kettenreaktion's old address, then the Klingende Kugelbahn's; the marble run is a level of Kettenreaktion now. */}
         <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
-        <Route path="kleine-abenteuer" element={<ElevatorPage />} />
+        <Route path="kleine-abenteuer/:level?" element={<ElevatorPage />} />
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
-        <Route path="abenteuer" element={<AdventurePage />} />
+        <Route path="abenteuer/:level?" element={<AdventurePage />} />
         <Route path="impressum" element={<ImprintPage />} />
         <Route path="datenschutz" element={<PrivacyPage />} />
         <Route path="management" element={<ManagementPage />} />

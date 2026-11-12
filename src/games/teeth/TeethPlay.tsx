@@ -24,6 +24,7 @@ import { sungLanguageFor } from "./sung";
 import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** The recorded voice of the prelude and the end (`bun run voice make`, src/content/recordedLines.ts). */
 const voice = recordedVoice(voiceFiles);
@@ -353,6 +354,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const cue = before ? preludeCue(before) : step && stepText(step, "cue", language);
   /** In the last seconds before the brushing: 3, 2, 1. */
   const count = brushed < 0 && -brushed <= COUNTDOWN * 1000 ? Math.ceil(-brushed / 1000) : null;
+  // The part on screen in the address (`?seite=sweets`, `lower-top`, `ende`), so the time-on-page event tells where brushing was left.
+  useStepAddress(before ?? step?.id ?? (done ? "ende" : undefined));
 
   /** Says a line from its recording: in the app language, or the German line where it has no translation. */
   const say = useCallback(({ text, english }: Spoken, queue = false) => voice.say(text, language.id, { queue, english }), [language.id]);

@@ -25,7 +25,7 @@ Eleven Rube Goldberg machines: one tap, and for about 40 seconds one thing sets 
 - „Gute-Nacht-Maschine" (`night.ts`, `NightLevel.tsx`, R-07, about 45 s): the calm one – a children's room at dusk; the music box's crank nudges a golden star ball down a zigzag gutter into a basket, the basket sinks and its cord over two ceiling pulleys draws the curtain, and the curtain tips the rocking chair until its backrest taps the cuckoo clock's pendulum. The sleepy cuckoo calls a soft „kuckuck“ and yawns, and its beak pushes the arc lamp's pull chain: click, the light goes out, the moon rises in the round window, and teddy, moon, cuckoo, star and the carousel sheep fall asleep („z z z“) while the camera glides back to the music box. The room gets dark as a plain veil, and what is outside or glows is drawn over it. Slow pace and soft sounds only: no background song while it plays and its end plays `playLullaby` instead of the cheerful tune.
 - „Aufräum-Maschine" (`tidy.ts`, `TidyLevel.tsx`, R-08, about 33 s): an untidy children's room – the rocking horse kicks the football, which rolls the blocks into the toy chest and itself after them, the lid slams and sets off the wind-up truck, which pushes the books to the shelf, where they hop in. Then the truck bounces on the bellows: each puff runs along the hose and blows a sock into the laundry basket, and the last throws the rolled-up sock ball onto the full basket. It bounces off and rolls along the floor: the crayons it reaches hop into the pencil pot, each with its own note, and the jigsaw pieces hop into the puzzle board until the picture is whole. Last it knocks the plug out of the air cushion – pfffft, the cushion jumps like a balloon let go and throws the cuddly bunny into bed (a bunny, not a teddy, because the circus has the teddy); the blanket spreads over it and everything glitters.
 
-Everything in a machine is a function of the seconds since the tap; in development `__machine.seek(seconds)` in the console jumps to a moment, and `?level=garden` in the address makes the first card tapped start that level.
+Everything in a machine is a function of the seconds since the tap; in development `__machine.seek(seconds)` in the console jumps to a moment, and each level has its own address, `/kettenreaktion/garden/` opening that one (`?level=` is gone).
 
 ## Languages (German, English, Chinese, Hindi, Spanish, Arabic, Russian)
 
@@ -67,8 +67,8 @@ are the shared `TapHint`, still until the child has waited a few seconds.
 ## Working on machines
 
 - Everything in a machine level is a pure function of the seconds since the tap, so any moment can be
-  looked at with `__machine.seek(seconds)` in the console; with `?level=<id>` in the address, whichever card is tapped
-  starts that level (the start screen still comes first).
+  looked at with `__machine.seek(seconds)` in the console; `/kettenreaktion/<id>/` opens that level at once, and
+  the address follows „Weiter“ (`useLevelOnScreen`).
   The clock runs on after a seek, so a screenshot shows a later moment: to hold one, freeze the frames first
   (`const raf = requestAnimationFrame.bind(window); requestAnimationFrame = (cb) => raf((ts) => cb(window.__frozen ?? ts)); window.__frozen = performance.now()`),
   then seek; set `window.__frozen = undefined` to let it run again.

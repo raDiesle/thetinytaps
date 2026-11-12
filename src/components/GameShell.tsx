@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { CardPicture, pictureCard, UNFINISHED_LABEL } from "@/components/GameCard";
@@ -14,6 +14,7 @@ import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { useCommonSettings } from "@/lib/common";
 import { goBack } from "@/lib/goBack";
+import { levelHome, levelHref } from "@/lib/levelAddress";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { track } from "@/lib/analytics";
 import { routineReturn } from "@/lib/routine";
@@ -53,6 +54,19 @@ const EndShown = createContext<(shown: boolean) => void>(() => {});
 
 /** For `GameEnd`: says it is on screen (true) or gone again (false). */
 export const useEndShown = () => useContext(EndShown);
+
+/** Tells GameShell which level is on screen, for its address (`useLevelOnScreen`). */
+const LevelOnScreen = createContext<(id: string | undefined) => void>(() => {});
+
+/**
+ * For a game that goes on from level to level by itself, without changing the card picked (`mode`): Kettenreaktion's
+ * „Weiter“ plays the next machine, Kleine Abenteuer's the next story. The address then names the level on screen
+ * (levelAddress.ts), not the card picked first.
+ */
+export function useLevelOnScreen(id: string) {
+  const set = useContext(LevelOnScreen);
+  useEffect(() => set(id), [id, set]);
+}
 
 /**
  * A screen inside the game to go back from (a feeling picked in „Wie geht's dir?“, back to all feelings): while a game
@@ -217,6 +231,17 @@ export function GameShell({
         ? t(category.title)
         : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const menu = menuAfterPlay({ startMode, leaveTo }, back);
+  // Each card's level has an address of its own below the game's (`abenteuer/:level?`, levelAddress.ts) – not in a game
+  // that plays at once or as a routine's step, which have no cards to come back to.
+  const addressed = useParams().level;
+  const levels = !!modes?.length && !startMode && !returnTo;
+  const home = levelHome(location.pathname, levels ? addressed : undefined);
+  /** Whether a level can be played here: one of the cards, and one still being built only where it may be tested. */
+  const playable = (id: string) => !!modes?.some((m) => m.id === id && (!m.unfinished || canPlayUnfinished()));
+  /** The level the address was last set to or played from, so a change of address the game made itself isn't handled again. */
+  const shownLevel = useRef<string | undefined>(undefined);
+  // The level a game says is on screen (`useLevelOnScreen`), where it went on by itself; else the card picked.
+  const [onScreen, setOnScreen] = useState<string | undefined>(undefined);
   const [playing, setPlaying] = useState(false);
   // The end of a level is on screen (GameEnd): the corner is then the way back, not a „Menü“ button.
   const [ended, setEnded] = useState(false);
@@ -253,8 +278,11 @@ export function GameShell({
   const playArea = useRef<HTMLDivElement>(null);
   useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
-  /** Starts playing; `turn` turns the page into the game (not when the page opens playing). */
-  const start = async (turn = false) => {
+  /**
+   * Starts playing; `turn` turns the page into the game (not when the page opens playing). A card's level `id` gets its
+   * own address, a new step in the history, so the phone's back button comes back to the cards.
+   */
+  const start = async (turn = false, id?: string) => {
     // The menus are locked then (PlaytimeLock); this also stops a key that slips past it. A routine's step is no game.
     if (!free) {
       if (isPlaytimeOver()) return;
@@ -263,8 +291,14 @@ export function GameShell({
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
     unlockSpeech();
-    if (turn) turnPageWith("forward", () => setPlaying(true));
-    else setPlaying(true);
+    const play = () => {
+      setPlaying(true);
+      if (!id || !levels) return;
+      shownLevel.current = id;
+      navigate(levelHref(home, id));
+    };
+    if (turn) turnPageWith("forward", play);
+    else play();
     await enterKidMode();
   };
 
@@ -278,6 +312,10 @@ export function GameShell({
       // Back in the history too, so the phone's back button doesn't open the game again (goBack.ts).
       if (returnTo) goBack(navigate, returnTo);
       else if (menu) goBack(navigate, menu);
+      else if (levels && addressed) {
+        shownLevel.current = undefined;
+        goBack(navigate, home);
+      }
     };
     // The page turns back from the game to its menu: as many pages as lie between them, or the book
     // closes and goes back on the shelf.
@@ -295,7 +333,7 @@ export function GameShell({
     if (!id) return;
     unlockUnfinished();
     onMode?.(id);
-    void start(true);
+    void start(true, id);
   }, UNLOCK_HOLD_MS);
 
   useEffect(() => {
@@ -345,6 +383,41 @@ export function GameShell({
     else void start();
   }, []);
 
+  // The address names another level than the one shown: a link, a reload or the browser's forward button opened it, so
+  // it plays at once (an unknown one, or any while play time is over, leads to the cards). No level while playing: the
+  // phone's back button went back to the cards, which show again.
+  useEffect(() => {
+    if (!levels || addressed === shownLevel.current) return;
+    shownLevel.current = addressed;
+    if (addressed && !playable(addressed)) {
+      shownLevel.current = undefined;
+      navigate(home, { replace: true });
+    } else if (addressed && playing) onMode?.(addressed);
+    else if (addressed) {
+      if (!free && isPlaytimeOver()) {
+        shownLevel.current = undefined;
+        navigate(home, { replace: true });
+        return;
+      }
+      onMode?.(addressed);
+      void start();
+    } else if (playing) {
+      stopSpeaking();
+      hushVoice();
+      exitKidMode();
+      turnPageWith("back", () => setPlaying(false));
+    }
+  }, [addressed]);
+
+  // „Weiter“, or the game itself, went on to another level: the address follows, in place of the one before.
+  const current = onScreen ?? mode;
+  useEffect(() => {
+    if (!playing) setOnScreen(undefined);
+    if (!levels || !playing || !current || current === addressed || !playable(current)) return;
+    shownLevel.current = current;
+    navigate(levelHref(home, current), { replace: true });
+  }, [current, playing]);
+
   if (playing) {
     const backToMenu = t({
       de: "Zurück zum Menü",
@@ -367,7 +440,9 @@ export function GameShell({
             <LeavesToShelf value={toShelf}>
               <EndShown value={setEnded}>
                 <InnerBack value={setInnerBack}>
-                  <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+                  <LevelOnScreen value={setOnScreen}>
+                    <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+                  </LevelOnScreen>
                 </InnerBack>
               </EndShown>
             </LeavesToShelf>
@@ -474,7 +549,7 @@ export function GameShell({
 
   const pick = (id: string) => {
     onMode?.(id);
-    void start(true);
+    void start(true, id);
   };
 
   return (

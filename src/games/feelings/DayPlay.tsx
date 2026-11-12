@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
+import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { DayPage } from "./DayPage";
 import { type Day, dayStories, NIGHT_IMAGE } from "./days";
 import { dayIn } from "./localized";
@@ -48,9 +49,16 @@ export function DayPlay({
   // The step each scene played today, so a tap on its dot plays it again as it was.
   const played = useRef<Record<number, number>>({});
   const [at, setAt] = useState<At>(() => {
+    // A link to a place in the day (`?seite=text-3`, `3`, `nacht`) starts there.
+    const linked = stepInAddress()?.match(/^(text-)?(\d+)$/);
+    const linkedIndex = linked ? Number(linked[2]) - 1 : -1;
+    if (scenes[linkedIndex]) return { index: linkedIndex, page: linked?.[1] ? "before" : "scene", step: stepOf(linkedIndex), run: 0 };
+    if (stepInAddress() === "nacht") return { index: scenes.length - 1, page: "night", step: stepOf(scenes.length - 1), run: 0 };
     const index = startAt < scenes.length ? startAt : 0;
     return { index, page: "before", step: stepOf(index), run: 0 };
   });
+  // Where the day is, in the address: the page of the story before a scene (`text-3`), the scene (`3`) or the night.
+  useStepAddress(at.page === "night" ? "nacht" : at.page === "before" ? `text-${at.index + 1}` : at.index + 1);
 
   useEffect(() => {
     update({ day: day.id });

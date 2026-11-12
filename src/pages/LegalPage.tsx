@@ -145,10 +145,11 @@ export function PrivacyPage() {
           Um zu sehen, welche Spiele gern gespielt werden und wie lange welche Seite angesehen wird, nutzen wir außerdem Umami Cloud der Umami Software, Inc.,
           San Francisco, USA. Ein kleines Skript meldet dabei, welche Seite aufgerufen wurde, von welcher Seite Sie kamen, Browser, Betriebssystem, Gerätetyp,
           Bildschirmgröße und Sprache und das Land, das Umami aus Ihrer IP-Adresse ableitet. Dazu meldet die App: wie lange eine Seite zu sehen war, in welcher
-          Sprache und ob als installierte App; wenn ein Spiel bis zum Ende gespielt wurde und ob danach „Nochmal“ oder „Weiter“ gewählt wurde; wenn die
-          Spielzeit des Tages abgelaufen ist oder verlängert wurde; welche Einstellung für alle Spiele gewählt wurde (Sprache, Musik, Junge oder Mädchen, wie
-          ein Spiel verlassen wird, Art der Spielzeit-Grenze); und wenn die App installiert wurde. Was Ihr Kind im Spiel tippt oder wählt und was Sie in
-          Belohnungstafel oder Tagesplan eintragen, wird nicht gemeldet.
+          Sprache und ob als installierte App, und bei Geschichten und Runden, bis zu welcher Seite oder Runde gespielt wurde und wie viele es waren; wenn ein
+          Spiel bis zum Ende gespielt wurde und ob danach „Nochmal“ oder „Weiter“ gewählt wurde; wenn die Spielzeit des Tages abgelaufen ist oder verlängert
+          wurde; welche Einstellung für alle Spiele gewählt wurde (Sprache, Musik, Junge oder Mädchen, wie ein Spiel verlassen wird, Art der Spielzeit-Grenze);
+          und wenn die App installiert wurde. Was Ihr Kind im Spiel tippt oder wählt und was Sie in Belohnungstafel oder Tagesplan eintragen, wird nicht
+          gemeldet.
         </p>
         <p>
           Umami setzt keine Cookies und verfolgt Sie nicht über andere Seiten hinweg. Um einen Besuch zusammenzuhalten, bildet Umami aus Ihrer IP-Adresse, Ihrem
