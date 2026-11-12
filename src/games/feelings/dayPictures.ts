@@ -1,6 +1,4 @@
 import type { QueuedPicture } from "@/content/pictureQueue";
-import { ALLTAG_DRAWINGS } from "./alltagDrawings";
-import { type Figure, FIGURES } from "./storyPictures";
 
 // The pictures of the days' pages of the story (`days.ts`, user idea, November 2026), as the picture queue takes them
 // until they are made (`/bild-erzeugen`, never made on your own); a made one leaves the list, its prompt kept in
@@ -10,7 +8,7 @@ import { type Figure, FIGURES } from "./storyPictures";
 // are calm. The night that ends every day is the little bear's room at night. Plain data, with no picture imports, so
 // the management page that lists the queue doesn't load the game's pictures; `feelings.test.ts` checks that every page
 // still to make has its entry here, drawn from its scene's first picture. Tag 9 to Tag 15 (the everyday scenes of
-// alltag.ts, 11 November 2026) wait here until their scenes' first pictures are made.
+// alltag.ts, 11 November 2026) were made on 12 November 2026.
 
 const DIR = "src/games/feelings/bilder";
 
@@ -41,23 +39,5 @@ export function dayPage(day: number, scene: number, ref: string, use: string, ca
   };
 }
 
-/** Everyone in a page of an everyday scene: characters of `FIGURES`, or the n-th of that scene's own cast (the hairdresser …). */
-const who = (...cast: (Figure | [string, number])[]) =>
-  cast.map((f) => (Array.isArray(f) ? (ALLTAG_DRAWINGS.find((d) => d.id === f[0])?.cast[f[1]] ?? "") : (FIGURES[f as keyof typeof FIGURES] ?? f))).join("; ");
-
-/** A page before an everyday scene of alltag.ts, drawn from that scene's first picture. */
-const everyday = (day: number, scene: number, story: string, use: string, cast: string, action: string) =>
-  dayPage(day, scene, `${story}-passiert`, use, cast, action, "2026-11-11");
-
 /** Every page of the days' stories and the night still to make. */
-export const DAY_PICTURE_QUEUE: QueuedPicture[] = [
-  // Tag 9: morning, breakfast, kindergarten, nap, pick-up.
-  everyday(
-    9,
-    4,
-    "accident",
-    "der Fuchs baut einen Turm",
-    who("bear", "fox"),
-    "The fox kneels on the rug and puts one more block on top of his tall tower of colourful blocks, which stands whole and straight. The little bear stands a few steps away and watches, smiling. No block lies on the floor.",
-  ),
-];
+export const DAY_PICTURE_QUEUE: QueuedPicture[] = [];

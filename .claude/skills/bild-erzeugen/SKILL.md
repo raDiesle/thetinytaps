@@ -317,7 +317,12 @@ names – use those.
    moment is meant to be (relieved after a deep breath, not still red with anger)? No hands from the edge unless
    someone off-picture really acts – say so in the prompt, or Gemini adds a pointing hand.
 4. If it's wrong, change the prompt (be specific about what was wrong) and run again;
-   stop after about three tries and show the user the best one with what's off.
+   stop after about three tries and show the user the best one with what's off. Count a picture's tries across
+   batches: a story picture back in `redo` that fails a second time with a sharper prompt, in the same way (a
+   character drawn twice – once where it was in the first picture and once where it moves to –, the same prop twice, a
+   breath blown towards the table again), won't come right by a third blind round. Of 18 such redraws on 12 November
+   2026, 7 passed and 11 failed exactly as before. Leave it out of the next batch and show the user what keeps going
+   wrong instead: the step's idea may need changing (a pose the first picture makes hard), or a test on 2.1 alone.
 5. Keep files small: cards ~1200×900 at quality 80 (< 200 KB), sprites 512–768 px.
    Commit only the final file in the game folder, never `.image-raw/`, right after
    the pictures arrive, and merge into main.

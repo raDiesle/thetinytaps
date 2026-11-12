@@ -82,12 +82,12 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     keep: "Exactly two cups on the table – the little bear's and the big bear's – and exactly one small glass jug of orange juice.",
     steps: [
       "„„Ich will selber!“ sagen“ – The little bear himself says it loudly to the big bear, one paw on his chest, a firm but calmer face; the big bear listens, nodding kindly. The little bear's cup is full, the big bear's empty.",
-      "„Tief pusten“ – The little bear himself has turned on his chair away from the table, his back to the cups and the jug, facing the left edge, sitting sideways with his back to the table; he blows out a long breath, cheeks round, and a soft little cloud of breath rises straight upwards into the empty air high above him, far from the table, the juice and the big bear – in front of his mouth only empty air, nothing on the table in front of him. Eyes softly closed, a calm relieved face, plain brown face, NO red or pink patches at all. The big bear watches, calm.",
+      "„Tief pusten“ – The little bear himself has turned on his chair away from the table, his back to the cups and the jug, facing the left edge, sitting sideways with his back to the table; he blows out a long breath, cheeks round, and a soft little cloud of breath rises straight upwards into the empty air high above him, far from the table, the juice and the big bear – in front of his mouth only empty air, nothing on the table in front of him. Eyes softly closed, a calm relieved face, plain brown face, NO red or pink patches at all. The big bear watches, calm. Seen from the side, his back is plainly to the table: his face points to the left edge, away from his cup, and his cheeks are plain brown fur like the rest of his face.",
       "„Selbst einschenken“ – The little bear himself holds the small jug with both paws and pours orange juice into the big bear's cup, tongue out in concentration, proud, plain brown face, NO red or pink patches at all; the big bear only steadies the bottom of the jug with one finger, smiling.",
     ],
     instead: [
       "„Saftbecher umkippen“ – The little bear knocks his full cup over with the back of his paw: the cup lies on its side and orange juice spreads across the table and drips over the edge; the big bear leans back, surprised.",
-      "„Den großen Bären hauen“ – The little bear leans over and his open paw lands on the big bear's forearm with a slap, touching it plainly; the big bear pulls his arm back, hurt and surprised.",
+      "„Den großen Bären hauen“ – The little bear leans over and his open paw lands on the big bear's forearm with a slap, touching it plainly; the big bear pulls his arm back, hurt and surprised. The jug stands on the table, untouched: the big bear's paws are empty and the little bear's paw is on the big bear's forearm, never on the jug. The little bear's juice cup stands in plain sight.",
       "„Kanne runterwerfen“ – The little bear has just thrown the small glass jug down: it lies broken on the kitchen floor in a puddle of orange juice; the table has no jug on it now. The big bear looks shocked.",
     ],
     end: "The little bear and the big bear each drink orange juice from their own cup at the table, the little bear beaming with pride, plain brown face, NO red or pink patches at all; the jug stands between them.",
@@ -118,7 +118,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "barber",
     made: true,
-    redo: ["barber-ende"],
     place:
       "Friseursalon: hoher Friseurstuhl mit Armlehnen vor einem großen Spiegel, eine Ablage mit einer Sprühflasche, die Friseurin (Füchsin) mit Kamm und Schere, der große Bär auf dem Wartestuhl.",
     cast: ["bear", "the hairdresser: a grown-up fox lady, taller than the bears, orange fur, white muzzle, a teal apron over a white blouse", "bigBear"],
@@ -135,7 +134,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "„Sprühflasche runterwerfen“ – The little bear sweeps the spray bottle off the shelf with his paw from under the cape: it lies broken on the floor in a splash of water; the hairdresser startles. The shelf is empty now: only ONE spray bottle in the whole picture.",
       "„Die Friseurin anbrüllen“ – The little bear himself turns and shouts at the hairdresser, mouth wide open, fists down, short shout lines, no speech bubble; she leans back startled, ears flat. Nothing flies.",
     ],
-    end: "The haircut is done: the cape is off, the little bear in his light-blue t-shirt and dark blue-purple trousers sits on the chair and laughs at his reflection in the mirror, touching a neat little tuft on top of his head; a few small tufts of brown fur lie on the floor. The hairdresser smiles; the big bear stands beside the chair, laughing too. The waiting chair is empty: only ONE big bear in the whole picture.",
+    end: "The haircut is done: the cape is off, the little bear in his light-blue t-shirt and dark blue-purple trousers sits on the chair and laughs at his reflection in the mirror, touching a neat little tuft on top of his head; a few small tufts of brown fur lie on the floor. The hairdresser smiles; the big bear stands beside the chair, laughing too. The waiting chair is empty: only ONE big bear in the whole picture. The big bear wears his green sweater as in the picture, and he stands; he does not sit.",
   },
   // C-43
   {
@@ -149,7 +148,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     keep: "The colourful wooden blocks of the fallen tower lie scattered on the rug, two of them still stacked.",
     steps: [
       "„„Entschuldigung!“ sagen“ – The little bear himself bends towards the fox, both paws on his chest, saying sorry with an honest, sorry face; the fox looks up at him and smiles a little.",
-      "„Tief pusten“ – The little bear himself kneels beside the fox, turned away from him and from the blocks, facing the left edge; he blows out a long breath, cheeks round, and a soft little cloud of breath rises straight upwards into the empty air high above him, far from the fox and the blocks. Eyes softly closed, a calm relieved face; the fox watches, calm.",
+      "„Tief pusten“ – The little bear himself kneels beside the fox, turned away from him and from the blocks, facing the left edge; he blows out a long breath, cheeks round, and a soft little cloud of breath rises straight upwards into the empty air high above him, far from the fox and the blocks. Eyes softly closed, a calm relieved face; the fox watches, calm. His face points to the left edge, his back to the fox and the blocks, and the cloud rises above his head, never towards them. The fox sits calmly with a small smile.",
       "„Zusammen neu bauen“ – The little bear himself kneels by the fox and hands him one red block; the fox takes it, smiling happily; a new small tower of three blocks stands between them, the other blocks lie around.",
     ],
     instead: [
@@ -205,7 +204,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "envy",
     made: true,
-    redo: ["envy-3", "envy-nein-3"],
     place: "Gehweg vor einer Hecke und Häusern: der Fuchs mit seinem neuen roten Laufrad mit Klingel, der kleine Bär mit seinem alten blauen Roller",
     cast: ["bear", "fox"],
     first:
@@ -214,12 +212,12 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     steps: [
       "„Fäuste drücken“ – The little bear himself, standing beside his blue scooter, squeezes both fists tight in front of his chest, eyes shut, mouth open saying something, no speech bubble; he looks calmer, plain brown face, NO red or pink patches at all. The fox sits on his red balance bike and smiles.",
       "„„Darf ich mal?“ fragen“ – The little bear himself asks the fox politely, one open paw held out towards the red balance bike, head tilted, a hopeful, friendly face; he does NOT touch the bike. The fox smiles and nods.",
-      "„Tauschen“ – The little bear himself sits on the red balance bike, both feet on the ground, and the fox stands on the blue scooter right beside him, holding its handlebar, both laughing. Exactly ONE red balance bike (the little bear's now) and ONE blue scooter (the fox's now) in the whole picture, nothing else on the sidewalk.",
+      "„Tauschen“ – The little bear himself sits on the red balance bike, both feet on the ground, and the fox stands on the blue scooter right beside him, holding its handlebar, both laughing. Exactly ONE red balance bike (the little bear's now) and ONE blue scooter (the fox's now) in the whole picture, nothing else on the sidewalk. Exactly ONE red balance bike, the one under the little bear; the fox stands on the scooter's deck, his paws only on the scooter's handlebar.",
     ],
     instead: [
       "„Laufrad umschubsen“ – The little bear pushes the red balance bike over with both paws; it falls on its side onto the sidewalk and the silver bell breaks off; the fox has jumped off in time and gasps.",
       "„Den Fuchs vom Laufrad ziehen“ – The little bear pulls the fox off the red balance bike by his t-shirt; the fox tumbles onto the sidewalk and cries, the bike tips over.",
-      "„Roller wegtreten“ – The little bear kicks his own blue scooter hard; it flies off towards the LEFT edge, behind the little bear, far from the fox who stands on the right, and lands on its side, a wheel broken off. The fox looks startled.",
+      "„Roller wegtreten“ – The little bear kicks his own blue scooter hard; it flies off towards the LEFT edge, behind the little bear, far from the fox who stands on the right, and lands on its side, a wheel broken off. The fox looks startled. The whole scooter, handlebar and all, flies away: the little bear's paws are empty. No bursts or marks round the broken wheel.",
     ],
     end: "The little bear rides the red balance bike and rings its silver bell, laughing; the fox rides the blue scooter right beside him, both happy, side by side along the sidewalk.",
   },
@@ -251,7 +249,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "pointing",
     made: true,
-    redo: ["pointing-2", "pointing-ende"],
+    redo: ["pointing-2"],
     place: "Küche: offener Kühlschrank mit einem Joghurt, einer Milchflasche und Gemüse, Tisch mit zwei Löffeln, der große Bär mit einem Apfel",
     cast: ["bear", "bigBear"],
     first:
@@ -259,7 +257,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     keep: "The fridge door stays wide open with exactly one small pink yogurt pot, one milk bottle and a few vegetables inside; exactly one red apple in the whole picture; two small spoons on the table.",
     steps: [
       "„Genau zeigen“ – The little bear himself stretches his arm out straight and points with one paw exactly at the pink yogurt pot in the open fridge, his whole arm one clear line towards it; plain brown face, NO red or pink patches at all, a hopeful look. The big bear follows the paw with his eyes and smiles, understanding, the apple lowered.",
-      "„Stampfen und pusten“ – The little bear himself, seen whole down to both feet and dressed exactly as in the picture (light-blue t-shirt, dark blue-purple trousers), stamps both feet on the floor at once, small impact lines under both soles, and blows out a long breath; he has turned away from the fridge and from the big bear, and the soft breath cloud rises straight upwards into the empty air. He looks relieved, plain brown face, NO red or pink patches at all. The big bear waits calmly.",
+      "„Stampfen und pusten“ – The little bear himself, seen whole down to both feet and dressed exactly as in the picture (light-blue t-shirt, dark blue-purple trousers), stamps both feet on the floor at once, small impact lines under both soles, and blows out a long breath; he has turned away from the fridge and from the big bear, and the soft breath cloud rises straight upwards into the empty air. He looks relieved, plain brown face, NO red or pink patches at all. The big bear waits calmly. The fridge and the big bear are behind his back: he faces the left edge, and the breath rises over his head towards the ceiling, never into the fridge.",
       "„Zum Kühlschrank ziehen“ – The little bear himself takes the big bear by the paw and leads him towards the open fridge, walking ahead and looking back, a hopeful smile, plain brown face, NO red or pink patches at all; the big bear follows, smiling.",
     ],
     instead: [
@@ -267,7 +265,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "„Gegen den Kühlschrank treten“ – The little bear kicks the bottom of the open fridge with his foot; inside, the milk bottle and the vegetables tip over and tumble off the shelf onto the floor; the yogurt pot stays.",
       "„Ganz laut schreien“ – The little bear screams with his mouth wide open, fists down, eyes squeezed shut; the big bear covers both ears with his paws, wincing. No speech bubble, no sound word.",
     ],
-    end: "The little bear and the big bear sit together at the kitchen table, each spooning yogurt from the pink pot with one of the two spoons, both smiling happily. The yogurt pot stands on the table between them, so the fridge shelf no longer has it: exactly one yogurt pot in the whole picture.",
+    end: "The little bear and the big bear sit together at the kitchen table, each spooning yogurt from the pink pot with one of the two spoons, both smiling happily. The yogurt pot stands on the table between them, so the fridge shelf no longer has it: exactly one yogurt pot in the whole picture. The kitchen table is exactly the table of the picture at its place, nothing added; both bears sit on chairs there. Exactly TWO spoons in the whole picture, one in each bear's paw, none on the table.",
   },
   {
     id: "bee",
@@ -286,21 +284,20 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     instead: [
       "„Nach der Biene schlagen“ – The little bear swats wildly at the bee with his paw; the bee has stung the paw, he pulls it back, wincing, a small swelling on it.",
       "„Saft umkippen“ – The little bear jerks back and knocks over his red cup; orange juice splashes across the picnic blanket.",
-      "„Ball nach der Biene werfen“ – The little bear has just thrown the blue-and-white ball at the bee on the LEFT: arm stretched out to the left, the ball just left his paw and flies to the left, away from the big bear on the right; the bee dodges, and the ball knocks over the juice cup at the left of the blanket.",
+      "„Ball nach der Biene werfen“ – The little bear has just thrown the blue-and-white ball at the bee on the LEFT: arm stretched out to the left, the ball just left his paw and flies to the left, away from the big bear on the right; the bee dodges, and the ball knocks over the juice cup at the left of the blanket. Exactly ONE ball in the whole picture, the one in the air: nothing lies on the blanket where the ball lay.",
     ],
     end: "The little bear and the big bear sit happily on the picnic blanket and eat their sandwiches, smiling; far away at the meadow's edge the bee buzzes among the flowers, nowhere near the blanket.",
   },
   {
     id: "phone",
     made: true,
-    redo: ["phone-1"],
     place: "Küche: der große Bär telefoniert an der Arbeitsplatte, der kleine Bär mit seinem Bild, Tisch mit Stiften, Stuhl mit dem Kuschelhasen",
     cast: ["bear", "bigBear"],
     first:
       "A kitchen. The big bear stands by the kitchen counter talking on a mobile phone held to his ear, busy, looking away. The little bear stands right beside him, holding up his new drawing (a sheet of paper with a colourful house and a tree on it) with one paw and tugging at the big bear's trouser leg with the other, an impatient, pleading frown. On the kitchen table lie a few crayons; on a kitchen chair beside the table sits the little bear's small white plush bunny.",
     keep: "Exactly one mobile phone, one drawing of a house and a tree, a few crayons on the table, one kitchen chair beside the table and one small white plush bunny in the whole picture.",
     steps: [
-      "„Leise antippen“ – The little bear himself stands close beside the big bear and gently taps the big bear's trouser leg with one fingertip, the finger plainly touching it, a quiet, patient face, the drawing in his other paw; the big bear, still holding the phone to his ear, looks down at him kindly and holds up one paw for „one moment“. The little bear looks calm, a small smile.",
+      "„Leise antippen“ – The little bear himself stands close beside the big bear and gently taps the big bear's trouser leg with one fingertip, the finger plainly touching it, a quiet, patient face, the drawing in his other paw; the big bear, still holding the phone to his ear, looks down at him kindly and holds up one paw for „one moment“. The little bear looks calm, a small smile. The little bear has the same warm brown fur as in the picture, never paler. Only one fingertip touches the trouser leg; his paw does not grip it.",
       "„Mit dem Kuschelhasen zählen“ – The little bear himself sits on the kitchen chair hugging the white plush bunny with one arm and counts on the fingers of his other paw, fingers spread, calm and patient; the chair has only him and the bunny on it, exactly one bunny. The drawing lies on the table. The big bear talks on the phone.",
       "„Bild auf den Tisch legen“ – The little bear himself has laid his drawing neatly on the kitchen table and draws a yellow sun on it with a crayon, happy and concentrated; the big bear talks on the phone.",
     ],
@@ -314,7 +311,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "hit",
     made: true,
-    redo: ["hit-3"],
     place: "Sandkasten im Kindergarten: der Fuchs hält sich den Arm, zwischen ihnen eine rote Schaufel und ein gelber Eimer",
     cast: ["bear", "fox"],
     first:
@@ -325,7 +321,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "„„Entschuldigung!“ sagen“ – The little bear himself kneels in the sand in front of the fox, one paw on his own chest, a sorry, kind face, saying sorry, no speech bubble; the fox looks up at him, his tears drying, a small smile.",
       {
         shows:
-          "„Zur Erzieherin gehen“ – The little bear himself leads the fox by his good paw to the sandpit's edge, where the teacher kneels and holds a small blue cold pack gently on the fox's arm; the fox smiles a little, the little bear looks relieved and caring. The shovel and the bucket lie in the sand. Exactly three characters in the picture, each whole with a head: the teacher, the little bear and the fox – no empty clothes, nobody else.",
+          "„Zur Erzieherin gehen“ – The little bear himself leads the fox by his good paw to the sandpit's edge, where the teacher kneels and holds a small blue cold pack gently on the fox's arm; the fox smiles a little, the little bear looks relieved and caring. The shovel and the bucket lie in the sand. Exactly three characters in the picture, each whole with a head: the teacher, the little bear and the fox – no empty clothes, nobody else. The little bear is a bear from head to toe – round bear ears, a tiny round bear tail, never a fox tail; only the fox has a bushy tail. He smiles, relieved and caring.",
         cast: ["bear", "fox", "teacher"],
       },
     ],
@@ -445,9 +441,9 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     instead: [
       "„Brotdose an die Wand werfen“ – The little bear, sitting on the floor, has just thrown the green lunchbox at the wall: his arm stretched out, the lunchbox hitting the bare wall and springing open, its lid flying off. The bear baby and the big bear look shocked.",
       "„Turm vom Baby umwerfen“ – The little bear sweeps the bear baby's block tower over with his paw; the four blocks tumble across the floor and the bear baby starts to cry.",
-      "„Den großen Bären hauen“ – The big bear kneels and reaches for the zip of the little bear's jacket; the little bear, sitting up on the rug, slaps the big bear's arm with his own paw, whiny – the little bear is the one hitting, the big bear does NOT touch his head or face – and the big bear pulls his arm back, surprised.",
+      "„Den großen Bären hauen“ – The big bear kneels and reaches for the zip of the little bear's jacket; the little bear, sitting up on the rug, slaps the big bear's arm with his own paw, whiny – the little bear is the one hitting, the big bear does NOT touch his head or face – and the big bear pulls his arm back, surprised. Exactly ONE bear baby, sitting at her blocks where she sits in the picture; nobody is behind the little bear.",
     ],
-    end: "In the cuddle corner the little bear, his orange jacket off and hanging on the hook by the front door, lies on the big cushions hugging the small white plush bunny, a tired, happy smile; the big bear sits beside him and the bear baby leans against the big bear. Only ONE little bear in the whole picture, in the cuddle corner. The hallway floor is empty but for the lunchbox.",
+    end: "In the cuddle corner the little bear, his orange jacket off and hanging on the hook by the front door, lies on the big cushions hugging the small white plush bunny, a tired, happy smile; the big bear sits beside him and the bear baby leans against the big bear. Only ONE little bear in the whole picture, in the cuddle corner. The hallway floor is empty but for the lunchbox. The hallway rug is empty: nobody lies there any more. The orange jacket hangs on a hook; the little bear in the cuddle corner wears only his light-blue t-shirt.",
   },
   // C-60
   {
@@ -619,7 +615,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
     keep: "Exactly ONE red cup and ONE blue cup in the whole picture, ONE bowl of porridge, ONE spoon, ONE milk jug. Morning light.",
     steps: [
       "„„Ich will den blauen!“ sagen“ – The little bear himself, sitting at the table, says it out loud and points at the blue cup by the sink, calm now, plain brown face, NO red or pink patches at all; the big bear nods kindly and smiles.",
-      "„Ganz fest stampfen“ – The little bear himself has climbed down and stands on the kitchen floor beside his chair (not on it), seen whole down to both feet, dressed exactly as in the picture: light-blue t-shirt and dark blue-purple trousers. Both his feet stamp on the floor together, little impact lines under both soles, arms down, fists loose; nothing lies in front of his feet. The anger is going out of him, relieved, plain brown face, NO red or pink patches at all. His chair is empty now: only ONE little bear. The big bear watches calmly.",
+      "„Ganz fest stampfen“ – The little bear himself has climbed down and stands on the kitchen floor beside his chair (not on it), seen whole down to both feet, dressed exactly as in the picture: light-blue t-shirt and dark blue-purple trousers. Both his feet stamp on the floor together, little impact lines under both soles, arms down, fists loose; nothing lies in front of his feet. The anger is going out of him, relieved, plain brown face, NO red or pink patches at all. His chair is empty now: only ONE little bear. The big bear watches calmly. Both his feet are on the floor below the table, never on the table; the red cup of milk still stands on the table.",
       "„Selbst umgießen“ – The little bear himself, sitting at the table, pours the milk from the red cup into the blue cup with both paws, careful and proud, plain brown face, NO red or pink patches at all; the big bear stands beside him and holds the blue cup steady with one paw, smiling. The counter by the sink is empty now: only ONE blue cup, on the table.",
     ],
     instead: [
@@ -646,11 +642,11 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "„An etwas Schönes denken“ – The little bear himself lies perfectly still on his back, paws folded on his tummy, the blanket smooth over him, eyes half open gazing upwards, a dreamy happy little smile, as if thinking of something lovely. The plush bunny lies tucked beside him. The others sleep on.",
     ],
     instead: [
-      "„Den Fuchs anstupsen“ – The little bear sits up, leans over from his mat to the fox's mat and pokes the fox in the side, his finger plainly touching the fox; the fox has woken up with a start and begins to cry, rubbing his eyes.",
+      "„Den Fuchs anstupsen“ – The little bear sits up, leans over from his mat to the fox's mat and pokes the fox in the side, his finger plainly touching the fox; the fox has woken up with a start and begins to cry, rubbing his eyes. His own mat is empty now, his yellow blanket thrown back with nobody under it: only ONE little bear in the whole picture, the one sitting up.",
       "„Laut singen“ – The little bear sits up on his mat and sings loudly, mouth wide open, arms flung wide; the fox and the little hedgehog have woken up and sit up, the hedgehog crying, paws over its ears; the teacher looks up from her chair. No music notes.",
       "„Durch den Raum rennen“ – The little bear has jumped up, run across the room and tripped over the little hedgehog's mat: he stumbles forwards, arms out; the hedgehog wakes up crying. His own mat is empty now: only ONE little bear in the whole picture.",
     ],
-    end: "The little bear lies fast asleep on his mat under his yellow blanket, the same as in the picture, eyes closed, a peaceful smile, the white plush bunny in his arms – the only plush bunny in the picture, the mat beside him is empty of it; the fox and the little hedgehog sleep too; at the door the teacher smiles.",
+    end: "The little bear lies fast asleep on his mat under his yellow blanket, the same as in the picture, eyes closed, a peaceful smile, the white plush bunny in his arms – the only plush bunny in the picture, the mat beside him is empty of it; the fox and the little hedgehog sleep too; at the door the teacher smiles. Exactly ONE white plush bunny in the whole picture, held in his arms; nothing lies on the mats beside the sleepers.",
   },
   // C-71
   {
@@ -695,7 +691,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
       "„Schienen kaputt treten“ – The little bear kicks the wooden track with one foot: the ring breaks apart, track pieces and the two wagons scattering across the rug, the tunnel knocked over; the big bear lifts his paws in surprise.",
       "„Buch zerreißen“ – The little bear tugs at the green picture book in the big bear's paws: one page tears in two; the big bear looks sad.",
     ],
-    end: "The big bear sits on the sofa and reads the picture book with the big yellow moon aloud; the little bear, in his pyjamas, snuggles sleepily against him, smiling, plain brown face, NO red or pink patches at all. Only ONE little bear in the whole picture, against the big bear: the rug by the train is empty of him. The green book lies on the sofa beside them, and the train rests in its tunnel on the rug.",
+    end: "The big bear sits on the sofa and reads the picture book with the big yellow moon aloud; the little bear, in his pyjamas, snuggles sleepily against him, smiling, plain brown face, NO red or pink patches at all. Only ONE little bear in the whole picture, against the big bear: the rug by the train is empty of him. The green book lies on the sofa beside them, and the train rests in its tunnel on the rug. Only the two of them on the sofa, each whole; no other bear or part of one anywhere in the room. The moon book lies open in the big bear's paws; the green book lies closed on the sofa beside them.",
   },
 ];
 
