@@ -895,8 +895,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`
   – always as cheap as it can be (user decision, November 2026): every picture asked for goes into the queue
   (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“) and `bun run image queue` makes only
-  what is already as cheap as it gets; a small picture whose shared sheet isn't full waits for later sessions, unless
-  the user, asked in the session, says to make it now. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
+  what is already as cheap as it gets; a picture whose shared sheet isn't full waits for later sessions, unless
+  the user, asked in the session with the number of pictures short of their sheet, says to make it now. Never a
+  picture generated alone where a sheet can hold it – unless the user says to make it faster (user decision, 12
+  November 2026): small ones go four to a 1K sheet of Lite, big ones four to a 2K sheet of Nano Banana 2.1, which the
+  queue picks itself (idea A-33). Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work
 
