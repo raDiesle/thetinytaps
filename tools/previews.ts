@@ -3,9 +3,9 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
 
-// `bun run previews`: the round pictures on the menus' cards and lines (user request, November 2026: pictures from the
+// `bun run previews`: the framed pictures on the menus' cards and lines (user request, November 2026: pictures from the
 // games instead of emojis). It opens each card in headless Chrome as a child would, waits until the game stands, and
-// keeps a square cut of the picture as a small webp in the game's `vorschau/` folder – a still image the menus show at
+// keeps a landscape cut of the picture (4:3) as a small webp in the game's `vorschau/` folder – a still image the menus show at
 // no cost, where the game's own svg in every card would make a phone draw them all.
 //
 //   bun run previews                   build, then picture every card of every menu below
@@ -29,8 +29,13 @@ const shots = option("shots");
 
 /** The window the games are pictured in: a tablet, where every game shows its whole picture. */
 const SCREEN = { width: 1024, height: 768, scale: 2 };
-/** The pictures' side in pixels: about twice the biggest round print (124–150 CSS pixels), sharp on most screens. */
-const SIZE = 256;
+/**
+ * The pictures' shape and size in pixels: landscape like the games themselves, so a frame shows more of a game than a
+ * circle did; about twice the biggest frame on a card (about 180 CSS pixels wide), sharp on most screens.
+ */
+const ASPECT = 4 / 3;
+const WIDTH = 360;
+const HEIGHT = Math.round(WIDTH / ASPECT);
 
 /** A menu whose cards get pictures: its address and the folder they go to, `<card's data-mode>.webp`. */
 interface Menu {
@@ -40,7 +45,7 @@ interface Menu {
   levels?: number;
   /**
    * Run in the page before each picture, where a game's start shows too little of it: brings more into sight and
-   * returns the part of the window to look in (CSS pixels), whose busiest square becomes the picture.
+   * returns the part of the window to look in (CSS pixels), whose busiest cut becomes the picture.
    */
   prepare?: string;
 }
@@ -48,7 +53,7 @@ interface Menu {
 /**
  * Kettenreaktion's worlds are much bigger than the screen, and the camera starts in a corner of sky: this shows the
  * whole world (`.marble-camera`, moved only by its transform) in the window and returns where it lies, so the picture
- * is the busiest square of it – where the machines stand.
+ * is the busiest cut of it – where the machines stand.
  */
 const WHOLE_WORLD = `(() => {
   // Its size before the camera's transform, as cameraLayer sets it (an svg has no offsetWidth).
@@ -85,8 +90,8 @@ const BOOK_DIR = "src/components/vorschau";
 const keyOf = (file: string) => file.split("/").filter((part) => part !== "vorschau").slice(-2).join("/").replace(/\.webp$/, "");
 
 /**
- * Where the cut lies, by `keyOf`: its middle as a share of the window's width and height, and its side as a share of
- * the height. By default it is the busiest square of the window (or of what the menu's `prepare` returns); one given
+ * Where the cut lies, by `keyOf`: its middle as a share of the window's width and height, and its height as a share of
+ * the window's height. By default it is the busiest cut of the window (or of what the menu's `prepare` returns); one given
  * here also skips `prepare`.
  */
 const CUTS: Record<string, { x: number; y: number; size: number }> = {
@@ -138,23 +143,24 @@ interface Area {
   height: number;
 }
 
-/** A picture's square cut: its left, top and side in pixels. */
-interface Square {
+/** A picture's cut, `ASPECT` wide: its left, top, width and height in pixels. */
+interface Cut {
   left: number;
   top: number;
-  side: number;
+  width: number;
+  height: number;
 }
 
-/** How big a cut may be, as a share of the shorter side: smaller, a game's thing is cut off; bigger, its details vanish. */
+/** How tall a cut may be, as a share of the window's height: smaller, a game's thing is cut off; bigger, its details vanish. */
 const SMALLEST = 0.4;
-const BIGGEST = 0.7;
+const BIGGEST = 0.75;
 
 /**
- * Where to cut `png`: around what it shows where that fits a square (a letter and its animal on an empty page), else
- * the square with the most detail (the sum of its brightness steps from pixel to pixel) – plain sky, wall and paper
+ * Where to cut `png`: around what it shows where that fits a cut (a letter and its animal on an empty page), else
+ * the cut with the most detail (the sum of its brightness steps from pixel to pixel) – plain sky, wall and paper
  * have none, machines, animals and things a lot.
  */
-async function bestSquare(png: Buffer): Promise<Square> {
+async function bestCut(png: Buffer): Promise<Cut> {
   const { width = 1, height = 1 } = await sharp(png).metadata();
   const f = Math.min(1, 200 / Math.max(width, height));
   // Small and a little blurred, the paper's grain counts as no detail.
@@ -165,7 +171,7 @@ async function bestSquare(png: Buffer): Promise<Square> {
     .raw()
     .toBuffer({ resolveWithObject: true });
   const [w, h] = [info.width, info.height];
-  // A summed table of the steps, so each square's detail is four lookups; and the box round every clear step.
+  // A summed table of the steps, so each cut's detail is four lookups; and the box round every clear step.
   const sum = new Float64Array((w + 1) * (h + 1));
   const box = { x0: w, y0: h, x1: 0, y1: 0 };
   for (let y = 0; y < h; y++) {
@@ -176,27 +182,31 @@ async function bestSquare(png: Buffer): Promise<Square> {
       if (step > 20) Object.assign(box, { x0: Math.min(box.x0, x), y0: Math.min(box.y0, y), x1: Math.max(box.x1, x), y1: Math.max(box.y1, y) });
     }
   }
-  const shorter = Math.min(w, h);
-  const content = Math.max(box.x1 - box.x0, box.y1 - box.y0) * 1.12;
-  const s = Math.round(Math.min(BIGGEST * shorter, Math.max(SMALLEST * shorter, content)));
+  // The cut's height in the small picture (its width ASPECT times it), never wider or taller than the picture.
+  const tallest = Math.min(h, w / ASPECT);
+  const content = Math.max(box.y1 - box.y0, (box.x1 - box.x0) / ASPECT) * 1.12;
+  const ch = Math.round(Math.min(BIGGEST * h, tallest, Math.max(SMALLEST * h, content)));
+  const cw = Math.min(w, Math.round(ch * ASPECT));
   let best = { x: 0, y: 0 };
-  if (content <= s) {
-    best = { x: Math.round((box.x0 + box.x1 - s) / 2), y: Math.round((box.y0 + box.y1 - s) / 2) };
+  if (content <= ch) {
+    best = { x: Math.round((box.x0 + box.x1 - cw) / 2), y: Math.round((box.y0 + box.y1 - ch) / 2) };
   } else {
     let most = -1;
-    for (let y = 0; y + s <= h; y++) {
-      for (let x = 0; x + s <= w; x++) {
-        const detail = sum[(y + s) * (w + 1) + x + s] - sum[y * (w + 1) + x + s] - sum[(y + s) * (w + 1) + x] + sum[y * (w + 1) + x];
+    for (let y = 0; y + ch <= h; y++) {
+      for (let x = 0; x + cw <= w; x++) {
+        const detail = sum[(y + ch) * (w + 1) + x + cw] - sum[y * (w + 1) + x + cw] - sum[(y + ch) * (w + 1) + x] + sum[y * (w + 1) + x];
         if (detail > most) [best, most] = [{ x, y }, detail];
       }
     }
   }
   // Back at full size, kept inside the picture (a rounded pixel, or content near an edge).
-  const side = Math.round(s / f);
+  const cutHeight = Math.min(height, Math.round(ch / f));
+  const cutWidth = Math.min(width, Math.round(cutHeight * ASPECT));
   return {
-    side,
-    left: Math.max(0, Math.min(Math.round(best.x / f), width - side)),
-    top: Math.max(0, Math.min(Math.round(best.y / f), height - side)),
+    width: cutWidth,
+    height: cutHeight,
+    left: Math.max(0, Math.min(Math.round(best.x / f), width - cutWidth)),
+    top: Math.max(0, Math.min(Math.round(best.y / f), height - cutHeight)),
   };
 }
 
@@ -207,7 +217,7 @@ async function press(cdp: Cdp, key: string) {
   await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key, code });
 }
 
-/** Pictures what the window shows now into `file`: the cut CUTS says, or the busiest square of `area` (by default the window). */
+/** Pictures what the window shows now into `file`: the cut CUTS says, or the busiest cut of `area` (by default the window). */
 async function picture(cdp: Cdp, file: string, area?: Area | null) {
   const key = keyOf(file);
   if (KEYS[key]) {
@@ -223,13 +233,13 @@ async function picture(cdp: Cdp, file: string, area?: Area | null) {
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...area, scale: 1 } });
     const png = Buffer.from(shot.data, "base64");
     if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), png);
-    const { left, top, side } = await bestSquare(png);
-    await sharp(png).extract({ left, top, width: side, height: side }).resize(SIZE, SIZE).webp({ quality: 74 }).toFile(file);
+    await sharp(png).extract(await bestCut(png)).resize(WIDTH, HEIGHT).webp({ quality: 72 }).toFile(file);
   } else {
-    const side = cut.size * SCREEN.height;
-    const clip = { x: cut.x * SCREEN.width - side / 2, y: cut.y * SCREEN.height - side / 2, width: side, height: side, scale: 1 };
+    const height = cut.size * SCREEN.height;
+    const width = Math.min(SCREEN.width, height * ASPECT);
+    const clip = { x: Math.max(0, cut.x * SCREEN.width - width / 2), y: cut.y * SCREEN.height - height / 2, width, height, scale: 1 };
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip });
-    await sharp(Buffer.from(shot.data, "base64")).resize(SIZE, SIZE).webp({ quality: 74 }).toFile(file);
+    await sharp(Buffer.from(shot.data, "base64")).resize(WIDTH, HEIGHT).webp({ quality: 72 }).toFile(file);
   }
   console.log(`  ${file}`);
 }

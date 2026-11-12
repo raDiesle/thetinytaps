@@ -41,6 +41,7 @@ export function MarbleGame() {
   return (
     <GameShell
       previews={previews}
+      labelOnPicture
       title={t(GAME_TITLE)}
       modes={modes}
       mode={mode}

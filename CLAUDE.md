@@ -194,7 +194,7 @@ In a fresh worktree run `bun install` first.
   nor `*` after it (`.row:has(…) > *`): while such a rule is loaded Chrome restyles the whole page at every change of the
   DOM, and the shelf preloads every game's CSS, so two games' rules made the book's take-out stutter (November 2026;
   `css.test.ts`) – mark the element with a class, put the attribute on the element that carries `:has()`, and name what
-  the rule styles. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts, its pictures decoded (`picturesReady` in `bookTravel.ts`: the menus' pictures arriving mid-flight cost a stutter),,
+  the rule styles. Nothing heavy runs while a book flies or a page turns: a new page is drawn before the motion starts, its pictures decoded (`picturesReady`: the menus' pictures arriving mid-flight cost a stutter),
   never in its middle, and loading other pages' code waits (`holdPreloads` in `src/lib/preloadPages.ts`).
   `bun run perf` measures it: it plays each game in headless
   Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
@@ -454,8 +454,11 @@ In a fresh worktree run `bun install` first.
   front because it was played last – „zuletzt“ only marks the card where it stands (Gefühle once put the group played
   last first; `GameShell.test.ts` checks).
 - **Menus show pictures from the games, not emojis** (user request, November 2026): every card of a start screen, every
-  line of a book's table of contents and every picture's card of Lebendige Bilder shows a round cut of its game as it
-  plays (`CardPicture`), a small still webp in the game's `vorschau/` folder (`GameShell previews`; the books' lines in
+  line of a book's table of contents and every picture's card of Lebendige Bilder shows a cut of its game as it
+  plays (`CardPicture`) – landscape (4:3) like the games, framed like a photo pasted in, and as big as the card or
+  line allows beside or above its name, never over it (user feedback, November 2026: small round prints showed too
+  little, and pictures lay over the words); only where many cards' pictures are the point the picture fills the card
+  and the name lies on it in a small paper box (`GameShell labelOnPicture`, Kettenreaktion) – a small still webp in the game's `vorschau/` folder (`GameShell previews`; the books' lines in
   `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the game's own svg drawn
   into the menu, which would have a phone draw every game at once. A new game, level, scene or card runs it
   (`bun run previews <folder or address>`) and its picture is looked at before committing (`--shots` keeps the whole
@@ -639,7 +642,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   no `data-look` or other branch (`look.test.ts`). Like this: the home page is a room with a bookshelf (`Bookshelf`, D-20, user
   decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
-  game sharing the page's height – a round picture, its name, dots leading to its page number (the first game on page 1,
+  game sharing the page's height – its framed picture, its name, dots leading to its page number (the first game on page 1,
   `gamePage`, user feedback, October 2026) – each line a soft wash of
   its world's colour and all of it the tap, never cards; every
   menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is

@@ -1,6 +1,7 @@
 import { bookIdOf, shelfEntryOf } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
 import { pageMoves } from "@/lib/pageMotion";
+import { picturesReady } from "@/lib/picturesReady";
 import { holdPreloads } from "@/lib/preloadPages";
 import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
@@ -251,18 +252,6 @@ function whenGone(gone: Element | null) {
     observer.observe(root, { childList: true, subtree: true });
     const cap = setTimeout(done, READY_WAIT);
   });
-}
-
-/** The longest the book waits for the new page's pictures to be decoded. */
-const PICTURES_WAIT = 800;
-
-/**
- * Resolves once every picture on the page is loaded and decoded, or after `PICTURES_WAIT`: a menu's pictures
- * (`CardPicture`) that came only while the book flew had the phone draw the page again in its first frames.
- */
-function picturesReady() {
-  const pictures = [...document.querySelectorAll<HTMLImageElement>("#root img")].map((img) => img.decode().catch(() => undefined));
-  return Promise.race([Promise.all(pictures), new Promise((resolve) => setTimeout(resolve, PICTURES_WAIT))]);
 }
 
 /**

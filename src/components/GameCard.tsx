@@ -4,7 +4,7 @@ import { useTurnPage } from "@/lib/look";
 import { preloadPage } from "@/lib/preloadPages";
 
 /**
- * The round print on a menu's card or line: a cut of the game as it looks (`picture`, from a `vorschau/` folder, made
+ * The picture on a menu's card or line: a framed landscape cut of the game as it looks (`picture`, from a `vorschau/` folder, made
  * by `bun run previews`), else its emoji (user request, November 2026: pictures instead of emojis in every menu). The
  * picture is a small still image, decoded off the main thread, never the game's drawing: an svg scene in every card
  * would cost a phone as much as playing them all at once.
@@ -21,7 +21,7 @@ export interface GameCardProps {
   /** Without a link the card is shown greyed out as "coming soon". */
   href?: string;
   emoji: string;
-  /** A round cut of what the card opens, in place of the emoji (`CardPicture`). */
+  /** A framed cut of what the card opens, in place of the emoji (`CardPicture`). */
   picture?: string;
   title: string;
   /** What `bun run previews` names its picture by: the scene's id. */

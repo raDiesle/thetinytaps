@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 import { bookIdOf, CATEGORIES, hasPage, listedGames } from "@/content/games";
 import { SCENE_ENTRIES } from "@/games/scenes/catalog";
 
-// The menus show a round cut of each game instead of its emoji (user request, November 2026), made by
+// The menus show a framed landscape cut of each game instead of its emoji (user request, November 2026), made by
 // `bun run previews` (tools/previews.ts) as small still pictures: these checks keep every menu's pictures there and
 // light, so a phone shows a menu without drawing a single game.
 
@@ -44,6 +45,16 @@ describe("menu pictures", () => {
   test("bun run previews knows every folder the menus show", () => {
     expect(folders.length).toBeGreaterThan(5);
     for (const folder of new Set(folders)) expect(TOOL.includes(`"${folder}"`), folder).toBe(true);
+  });
+
+  test("the pictures are landscape cuts, as the frames on the cards are", async () => {
+    // Square prints in round frames showed too little of a game (user feedback, November 2026): tools/previews.ts cuts 4:3.
+    for (const folder of new Set(folders)) {
+      for (const name of readdirSync(join(ROOT, folder))) {
+        const { width = 0, height = 0 } = await sharp(join(ROOT, folder, name)).metadata();
+        expect(width / height, `${folder}/${name}`).toBeCloseTo(4 / 3, 1);
+      }
+    }
   });
 
   test("the pictures are small: a menu of twenty cards stays light on a phone", () => {
