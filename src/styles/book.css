@@ -1681,66 +1681,21 @@
 }
 
 /*
- * A preview picture in the emoji's place (`CardPicture`), printed more lightly so its colours stay. On a card, which is
- * a rectangle already, it fills nearly the whole card and the name lies over its foot on a small paper label (user
- * feedback, November 2026: a round cut in the card's middle showed too little of the game) – laid over the card like
- * `.mode-art`, so the card's flat or upright layout for emoji and title doesn't matter.
+ * A preview picture in the emoji's place (`CardPicture`): a landscape cut of the game (3 : 2), framed
+ * like a photo cut out and pasted in, and as big as the card allows above or beside its name – never over it (user
+ * feedback, November 2026: small round prints showed too little, and pictures must never cover the words).
  */
 :root .with-picture {
   overflow: hidden;
+  border-radius: 12px 17px 14px 19px / 17px 12px 19px 14px;
   filter: saturate(0.95) sepia(0.05);
 }
 
-:root .game-list .game-card.picture-card {
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0;
-  padding: 10px;
-}
-
-/* A scrolling list's card has no height of its own any more: it takes the pictures' shape. */
-:root .game-list:not(.fit) .game-card.picture-card {
+:root .game-emoji.with-picture {
+  width: 100%;
+  max-width: 300px;
   height: auto;
   aspect-ratio: 3 / 2;
-}
-
-:root .game-list .picture-card .game-emoji.with-picture {
-  position: absolute;
-  inset: 5px;
-  width: auto;
-  height: auto;
-  border-width: 2px;
-  /* Cut by hand like the card round it. */
-  border-radius: 12px 17px 13px 19px / 17px 12px 19px 13px;
-}
-
-:root .game-list .picture-card .game-title {
-  position: relative;
-  z-index: 1;
-  max-width: 100%;
-  padding: 0.1em 0.6em 0.15em;
-  border-radius: 6px 9px 7px 10px;
-  background: color-mix(in srgb, var(--paper) 90%, #0000);
-  box-shadow: 0 1px 3px #3d304540;
-  line-height: 1.1;
-}
-
-/* The picture's name small and in one line on the label, so it hides little of the picture. */
-:root .game-list.fit .picture-card .game-title {
-  overflow: hidden;
-  font-size: clamp(0.85rem, min(14cqh, 8cqw), 1.5rem);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  hyphens: none;
-}
-
-:root .picture-card .game-note {
-  white-space: normal;
-}
-
-:root .game-list:not(.fit) .picture-card .game-title {
-  font-size: 0.95rem;
 }
 
 /*
@@ -1761,12 +1716,102 @@
   object-fit: cover;
 }
 
+/* A card sized by its grid row: the picture takes every bit of height its name leaves. */
+@container (min-height: 130px) {
+  :root .game-list.fit .game-card:has(> .with-picture) {
+    gap: 2cqh;
+    padding: 10px 10px 3cqh;
+  }
+
+  :root .game-list.fit .game-emoji.with-picture {
+    flex: 1 1 0;
+    width: auto;
+    max-width: 100%;
+    min-height: 0;
+  }
+}
+
+/* A flat fitted card: the picture beside the name, as tall as the card. */
+@container (max-height: 129.98px) {
+  :root .game-list.fit .game-emoji.with-picture {
+    width: auto;
+    max-width: 50cqw;
+    height: calc(100cqh - 12px);
+  }
+}
+
+/* Too narrow for picture and name side by side: the picture above a small name, as big as the rest leaves. */
+@container (max-height: 129.98px) and (max-width: 179.98px) {
+  :root .game-list.fit .game-emoji.with-picture {
+    flex: 1 1 0;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+/* A phone's scrolling list of flat cards: the picture beside the name. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root .game-list:not(.fit) .game-emoji.with-picture {
+    width: 96px;
+    height: 64px;
+  }
+}
+
+/*
+ * `GameShell labelOnPicture` (Kettenreaktion): the picture fills the whole card and the name lies on it in a small
+ * paper box, readable over any picture (user request, November 2026).
+ */
+/* Above every flat or upright card layout of the menus, whatever their sizes. */
+:root .mode-list .game-card.mode-card.picture-card {
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0;
+  min-height: 0;
+  padding: 7px;
+  text-align: center;
+}
+
+:root .mode-list:not(.fit) .game-card.mode-card.picture-card {
+  height: auto;
+  aspect-ratio: 3 / 2;
+}
+
+:root .mode-list .game-card.mode-card.picture-card > .game-emoji.with-picture {
+  position: absolute;
+  inset: 7px;
+  width: auto;
+  max-width: none;
+  height: auto;
+  aspect-ratio: auto;
+}
+
+:root .mode-list .game-card.mode-card.picture-card > .game-title {
+  position: relative;
+  max-width: calc(100% - 16px);
+  margin: 0 auto 2px;
+  padding: 1px 8px 2px;
+  border: 1.5px solid #3d304566;
+  border-radius: 6px 9px 7px 10px / 9px 6px 10px 7px;
+  background: color-mix(in srgb, var(--paper) 92%, #0000);
+  box-shadow: 0 2px 5px -2px #3d304566;
+  font-size: clamp(0.7rem, min(9cqh, 6.5cqw), 1.15rem);
+  line-height: 1.1;
+}
+
+@media (hover: hover) {
+  :root .picture-card:hover .game-emoji {
+    animation: none;
+  }
+}
+
 :root :is(.game-emoji, .toc-picture)::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: var(--paper-grain), radial-gradient(circle, #0000 58%, #5a3c1f1a);
+  background: var(--paper-grain), radial-gradient(closest-side, #0000 58%, #5a3c1f1a);
   mix-blend-mode: multiply;
   opacity: 0.6;
   pointer-events: none;

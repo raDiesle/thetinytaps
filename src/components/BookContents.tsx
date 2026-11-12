@@ -10,7 +10,7 @@ import previews from "./vorschau/*.webp?glob";
 
 /**
  * A book's first page, laid out as a picture book's table of contents (user feedback, October 2026):
- * one line per game, its picture (a cut of the game in a rounded rectangle, `vorschau/<book id>.webp`), its name, the dots leading to the page it is on. Each line is as tall as the page
+ * one line per game, its picture (a framed cut of the game, `vorschau/<book id>.webp`), its name, the dots leading to the page it is on. Each line is as tall as the page
  * allows (the lines share the room under the title), and the whole line is the tap: it turns the page to the game.
  * A game still being built but already in its book (`unfinished: "labelled"`) carries the page marker „in Bearbeitung“
  * and opens only where parts being built may be tested; elsewhere its line stands pale and does nothing.

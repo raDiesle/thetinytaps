@@ -124,11 +124,17 @@ interface GameShellProps {
   /** Ways to play, as big cards: tapping one picks it and starts the game. Without them there is one start button. */
   modes?: GameMode[];
   /**
-   * The game's `vorschau/` folder (`import previews from "./vorschau/*.webp?glob"`): `<mode id>.webp` is a cut of
-   * the game as that card plays it, filling the card in place of its emoji (user request, November 2026). `bun run
+   * The game's `vorschau/` folder (`import previews from "./vorschau/*.webp?glob"`): `<mode id>.webp` is a framed cut of
+   * the game as that card plays it, shown on the card in place of its emoji (user request, November 2026). `bun run
    * previews` makes them; a still picture costs a phone nothing, where the game's own svg in every card would.
    */
   previews?: Record<string, string>;
+  /**
+   * The picture fills the whole card and the name lies on it in a small paper box, readable over any picture – for
+   * many cards whose pictures are the point (Kettenreaktion's machines, user request, November 2026). Without it the
+   * framed picture stands above the name.
+   */
+  labelOnPicture?: boolean;
   /** The mode played last, marked on its card. */
   mode?: string;
   onMode?: (id: string) => void;
@@ -179,6 +185,7 @@ export function GameShell({
   title,
   modes,
   previews,
+  labelOnPicture,
   mode,
   onMode,
   startMode,
@@ -415,7 +422,7 @@ export function GameShell({
     m.unfinished && !canPlayUnfinished() ? (
       <li key={m.id}>
         <div
-          className={`game-card mode-card disabled${pictureCard(previews?.[`${m.id}.webp`])}`}
+          className={`game-card mode-card disabled${labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
           role="button"
           aria-disabled
           data-mode={m.id}
@@ -436,7 +443,7 @@ export function GameShell({
       <li key={m.id}>
         <button
           type="button"
-          className={`game-card mode-card${m.art ? " mode-art-card" : pictureCard(previews?.[`${m.id}.webp`])}`}
+          className={`game-card mode-card${m.art ? " mode-art-card" : labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
           onClick={() => pick(m.id)}
           data-mode={m.id}
           aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
