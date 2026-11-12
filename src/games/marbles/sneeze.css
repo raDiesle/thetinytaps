@@ -3,8 +3,3 @@
 .marble-play[data-level="sneeze"] {
   background: #8fd5ff;
 }
-
-/* The finger before the tap stands still: nothing moves until the child does something. */
-.sneeze-hint {
-  pointer-events: none;
-}

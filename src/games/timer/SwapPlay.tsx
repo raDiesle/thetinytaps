@@ -111,7 +111,7 @@ export function SwapRun({
   const moveMs = tennis ? FLIGHT_MS : HOP_MS;
   const holderNow = useRef<Holder | null>(null);
   const drawTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(!done);
   useEffect(() => loadRecordings(["cheer"]), []);
 
@@ -220,20 +220,17 @@ export function SwapRun({
     const timer = setTimeout(tennis ? playLand : playChime, tennis ? FLIGHT_MS : 700);
     return () => clearTimeout(timer);
   }, [turn, tennis, say]);
-  // At the clock time set, the end is plain like every timer's: children cheer and a few things rise slowly.
+  // At the clock time set, the end is plain like every timer's: children cheer, then the trophy with the end's buttons.
   useEffect(() => {
     if (!done) return;
     playChime();
-    const cheer = setTimeout(() => {
-      playCheer();
-      celebrate();
-    }, 700);
+    const cheer = setTimeout(playCheer, 700);
     const tune = setTimeout(playMelody, 2500);
     return () => {
       clearTimeout(cheer);
       clearTimeout(tune);
     };
-  }, [done, celebrate]);
+  }, [done]);
 
   const holder: Holder | null = turns ? ((turn % 2 === 0) === (turns.first === "fox") ? "fox" : "bear") : null;
   holderNow.current = holder;
@@ -308,7 +305,7 @@ export function SwapRun({
         )}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
-        {done && <GameEnd delayMs={4200} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
+        {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>

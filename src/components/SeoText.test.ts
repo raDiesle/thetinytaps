@@ -7,7 +7,7 @@ import { join } from "node:path";
 // the bookshelf, has its text behind the carving's „mehr …“ (RoomNotes).
 
 const SRC = join(import.meta.dir, "..");
-const NO_TEXT = ["pages/ManagementPage.tsx", "pages/LegalPage.tsx"];
+const NO_TEXT = ["pages/ManagementPage.tsx", "pages/PicturesPage.tsx", "pages/LegalPage.tsx"];
 
 test("every menu shows the text for search engines below its first screen", async () => {
   const menus: string[] = [];

@@ -10,6 +10,7 @@ import previews from "./vorschau/*.webp?glob";
 /** The mode cards in menu order, one per level; „Weiter“ at a level's end goes on with the next. */
 const MODES: { id: MarbleLevel; emoji: string }[] = [
   { id: "track", emoji: "🎢" },
+  { id: "colortrack", emoji: "🎨" },
   { id: "snowtrack", emoji: "☃️" },
   { id: "spacetrack", emoji: "🪐" },
   { id: "slidetrack", emoji: "🛟" },
@@ -41,6 +42,7 @@ export function MarbleGame() {
   return (
     <GameShell
       previews={previews}
+      labelOnPicture
       title={t(GAME_TITLE)}
       modes={modes}
       mode={mode}

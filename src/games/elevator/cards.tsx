@@ -29,5 +29,5 @@ export function nextCard(id: string) {
 export function StoryEnd({ id, onPick }: { id: string; onPick: (id: string) => void }) {
   const language = useAppLanguage();
   const next = nextCard(id);
-  return <GameEnd onAgain={() => onPick(id)} next={{ name: titleIn(next.title, language.id), onNext: () => onPick(next.id) }} />;
+  return <GameEnd level={id} onAgain={() => onPick(id)} next={{ name: titleIn(next.title, language.id), onNext: () => onPick(next.id) }} />;
 }

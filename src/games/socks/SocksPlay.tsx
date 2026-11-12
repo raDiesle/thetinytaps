@@ -1,19 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { DEV } from "@/lib/buildInfo";
-import {
-  loadRecordings,
-  playBoing,
-  playCountNote,
-  playKnock,
-  playMelody,
-  playPlop,
-  playRandomNote,
-  playRecorded,
-  playTwinkle,
-  playWash,
-  playWhoosh,
-} from "@/lib/sfx";
+import { loadRecordings, playBoing, playCountNote, playKnock, playPlop, playRandomNote, playRecorded, playTwinkle, playWash, playWhoosh } from "@/lib/sfx";
 import { useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { ASIDE_LINE_GAP_MS, EXTRA_SOUND_GAP_MS, spaced } from "@/lib/spacing";
@@ -22,6 +10,7 @@ import { dealPairs, lookKey, nextLevel, oneOf, type Side, SOCK_LEVELS, SOCK_TEXT
 import { Basket, Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
 import { socksVoice } from "./voice";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** The full machine stands still for a moment before it starts on its own. */
 const INTRO_MS = 600;
@@ -36,10 +25,16 @@ const FLY_MS = 800;
 /** The baskets come down over their socks once all lie: this long after, and for this long; matches `.sock-basket`. */
 const BASKET_WAIT_MS = 500;
 const BASKET_DROP_MS = 500;
-/** After the last pair hangs: they jump for joy before the line is pulled away. */
-const CHEER_MS = 1500;
+/** After the last pair landed, a breath before the cheer. */
+const LAST_LANDED_MS = 150;
+/**
+ * The pairs jump for joy once, one after the other, before the line is pulled away; matches `sock-cheer` in socks.css
+ * (0.6 s plus 0.08 s per slot). Kept short: with all socks sorted the child wants the next wash (user feedback,
+ * November 2026).
+ */
+const CHEER_MS = 1000;
 /** The line with all socks is pulled out of the picture; matches `sock-line-pull` in socks.css. */
-const PULL_MS = 1000;
+const PULL_MS = 800;
 /** Width of the sock drawing as a share of its height (its viewBox is 64 × 96). */
 const SOCK_ASPECT = 64 / 96;
 /** The biggest a sock on the floor gets, on a large screen with few socks. */
@@ -127,6 +122,8 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     newRound(0, Math.min(SOCK_LEVELS.length - 1, Number(DEV && new URLSearchParams(window.location.search).get("level")) || 0)),
   );
   const [phase, setPhase] = useState<Phase>("intro");
+  // The wash on screen in the address (`?seite=3`), so the time-on-page event tells how many were played.
+  useStepAddress(round.id + 1);
   const [selected, setSelected] = useState<number | null>(null);
   /** Bumped to make the selected sock wiggle again when it is tapped once more. */
   const [nudge, setNudge] = useState(0);
@@ -139,7 +136,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   /** The keyboard frame; appears with the first key. */
   const [focus, setFocus] = useState<number | null>(null);
   const [fit, setFit] = useState({ columns: 2, size: 100 });
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
 
   const gridRef = useRef<HTMLDivElement>(null);
   const sockRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -244,10 +241,9 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   /** All pairs hang: they jump for joy, then the line is pulled out of the picture and the next wash comes. */
   const finish = () => {
     const level = nextLevel(round.level, { pairs: round.socks.length / 2, misses: missesRef.current, ms: performance.now() - sortStartRef.current });
+    // No melody: the pairs' own notes and the line are enough, a tune on top was too much (user feedback, November 2026).
     setPhase("cheer");
-    if (settings.sounds) playMelody();
     aside(texts.done);
-    celebrate();
     later(CHEER_MS, () => {
       // Every wash is a game for a game limit: with the last one played, the game says good night (GameShell).
       gameEnded();
@@ -280,7 +276,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       next[index] = { x: to.x - from.x, y: to.y - from.y, scale: target.offsetHeight / sock.offsetHeight };
     });
     setFlights((f) => ({ ...f, ...next }));
-    // The last pair leaves its praise and extras to the end's melody and line, which follow right after it.
+    // The last pair leaves its praise and extras to the end's line, which follows right after it.
     const last = matchedRef.current.size === round.socks.length;
     // The rising note and one knock always answer a pair; the rest only when the last extras lie far enough back.
     const flourish = !last && extras.pass();
@@ -301,7 +297,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       }
     });
 
-    if (last) later(FLY_MS + 300, finish);
+    if (last) later(FLY_MS + LAST_LANDED_MS, finish);
   };
 
   /** The child tapped (or chose by key) the sock at `index` on the floor. */

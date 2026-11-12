@@ -20,6 +20,16 @@
   font-weight: 600;
 }
 
+/* Links for trying things out (every trophy on the shelf), under the build date. */
+.ideas-test-links {
+  width: fit-content;
+  margin: 0 auto 12px;
+  padding: 4px 16px;
+  border-radius: 999px;
+  background: #ffffffd9;
+  font-weight: 700;
+}
+
 .ideas-panel {
   margin-bottom: 24px;
   padding: 20px 24px;
@@ -586,6 +596,11 @@ button.idea-id {
   color: inherit;
   font-weight: 700;
   text-decoration: none;
+}
+
+/* The link to the page of all pictures, a page of its own rather than a place on this one. */
+.ideas-contents a.ideas-contents-page {
+  background: #fff3c4;
 }
 
 /* Research: one folding panel per piece of research. */

@@ -2,7 +2,9 @@ import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
+import { ALL_TROPHIES } from "@/components/TrophyShelf";
 import { CATEGORIES, UNFINISHED } from "@/content/games";
+import { pick } from "@/lib/language";
 import {
   EFFORT_LABELS,
   MASCOT_STATUS,
@@ -186,6 +188,10 @@ export function ManagementPage() {
         <span aria-hidden>🧭</span> Management
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
+      {/* To look at every trophy on the shelf without playing: shown only for this visit of the page, nothing is stored. */}
+      <p className="ideas-test-links">
+        <Link to={`/?${ALL_TROPHIES}`}>🏆 Alle Pokale im Regal ansehen (zum Testen)</Link>
+      </p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
         abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
@@ -204,6 +210,10 @@ export function ManagementPage() {
             {label}
           </a>
         ))}
+        {/* A page of its own: every picture of the app at once, to check them without playing (PicturesPage). */}
+        <Link to="/management/bilder/" className="ideas-contents-page">
+          🖼️ Alle Bilder ansehen ↗
+        </Link>
       </nav>
 
       <NextPanel ideas={nextIdeas} noIdeas={noIdeas} onShow={showIdea} onMark={setMark} />
@@ -428,22 +438,29 @@ function NextPanel({
 }
 
 /** A command for Claude and a button that copies it. */
-/** The games still being built (`Game.unfinished`): on no shelf and in no search result, so linked only here. */
+/**
+ * The games still being built (`Game.unfinished`): in no search result, and most on no shelf either, so linked here;
+ * those already in their book with the label „in Bearbeitung“ (`"labelled"`) are said to be.
+ */
 function Unfinished() {
   if (UNFINISHED.length === 0) return null;
   return (
     <section id="in-arbeit" className="ideas-panel">
-      <h2>🚧 In Arbeit: Spiele, die noch nicht im Regal stehen</h2>
+      <h2>🚧 In Arbeit: Spiele, die noch nicht fertig sind</h2>
       <p className="ideas-hint">
-        Nur von hier erreichbar, bis sie fertig sind; ✕ führt hierher zurück. Fertig: <code>unfinished</code> in games.ts entfernen.
+        Nur von hier erreichbar, bis sie fertig sind; ✕ führt hierher zurück – außer bei denen, die schon mit dem Schild „in Bearbeitung“ im Buch stehen (dort
+        nur auf diesem Rechner spielbar). Fertig: <code>unfinished</code> in games.ts entfernen.
       </p>
       <ul className="ideas-next-list">
         {UNFINISHED.map((game) => (
           <li key={game.href}>
             <Link to={game.href}>
-              {game.emoji} {game.title.de}
+              {game.emoji} {pick(game.title, "de")}
             </Link>
-            <span className="ideas-hint">{game.blurb.de}</span>
+            <span className="ideas-hint">
+              {pick(game.blurb, "de")}
+              {game.unfinished === "labelled" && " · steht im Buch mit „in Bearbeitung“"}
+            </span>
           </li>
         ))}
       </ul>
@@ -592,7 +609,7 @@ function Languages() {
               return [
                 <tr key={row.href}>
                   <th>
-                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite & Eltern"}
+                    {game ? `${game.emoji} ${pick(game.title, "de")}` : "🏠 Startseite & Eltern"}
                     {row.recorded && " 🎙️"}
                     {row.note && <small>{row.note}</small>}
                   </th>
@@ -667,7 +684,7 @@ function Mascots({ onShow }: { onShow: (id: string) => void }) {
               return [
                 <tr key={row.href}>
                   <th colSpan={5}>
-                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite, Cover & Menüs"}
+                    {game ? `${game.emoji} ${pick(game.title, "de")}` : "🏠 Startseite, Cover & Menüs"}
                     {row.note && <small>{row.note}</small>}
                   </th>
                 </tr>,
@@ -796,7 +813,7 @@ function ResearchPanel({ research, open, onShow }: { research: Research; open: b
                   return (
                     <tr key={match.href}>
                       <th>
-                        <Link to={match.href}>{game ? `${game.emoji} ${game.title.de}` : match.href}</Link>
+                        <Link to={match.href}>{game ? `${game.emoji} ${pick(game.title, "de")}` : match.href}</Link>
                       </th>
                       <td>{match.searches.map((q) => `„${q}“`).join(", ")}</td>
                       <td>{match.title}</td>

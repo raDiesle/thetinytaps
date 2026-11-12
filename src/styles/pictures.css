@@ -1,0 +1,254 @@
+/* ---------- All pictures (/management/bilder/, hidden, for grown-ups) ---------- */
+
+.pics {
+  --pics-h: 130px;
+}
+
+/* Wider than the management page: on a big screen more pictures fit side by side. */
+:root .home.pics {
+  max-width: min(1700px, 100%);
+}
+
+.pics[data-size="s"] {
+  --pics-h: 80px;
+}
+
+.pics[data-size="l"] {
+  --pics-h: 220px;
+}
+
+.pics-chip {
+  padding: 4px 12px;
+  border: 2px solid transparent;
+  border-radius: 99px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pics-chip small {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.pics-chip[aria-pressed="true"] {
+  border-color: #b9770e;
+  background: #fff3c4;
+}
+
+.pics-tools {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0 0 16px;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: #fffffff2;
+  box-shadow: 0 2px 8px #0002;
+}
+
+.pics-tools input[type="search"] {
+  flex: 1 1 220px;
+  padding: 6px 12px;
+  border: 1px solid #bbb;
+  border-radius: 99px;
+  font: inherit;
+}
+
+.pics-tools label {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pics-sizes {
+  display: flex;
+  gap: 4px;
+}
+
+.pics-count {
+  margin-left: auto;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.pics-shelf h2 small {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.pics-play {
+  margin-left: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pics-shelf h3 {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+}
+
+.pics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* A set: the pictures that belong together in one frame, its shared name below. */
+.pics-set {
+  margin: 0;
+  padding: 6px;
+  border-radius: 12px;
+  background: #f6f2ea;
+}
+
+.pics-set[data-many] {
+  background: #eaf1fb;
+  outline: 2px solid #c8d8f0;
+}
+
+.pics-set figcaption {
+  max-width: 100%;
+  padding-top: 4px;
+  overflow: hidden;
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+.pics-row {
+  display: flex;
+  gap: 6px;
+}
+
+.pics-tile {
+  position: relative;
+  display: block;
+  height: var(--pics-h);
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+  cursor: zoom-in;
+}
+
+.pics-tile img {
+  display: block;
+  height: 100%;
+  width: auto;
+  min-width: 40px;
+  max-width: calc(var(--pics-h) * 2.2);
+  object-fit: contain;
+}
+
+.pics-role {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  left: 3px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: #000a;
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* „Bewegung zeigen“: the second frame fades in and out over the first, as the games do. */
+.pics-moving .pics-fade {
+  position: absolute;
+  inset: 0;
+  animation: pics-fade 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes pics-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* One picture big over the page. */
+.pics-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template: 1fr auto / auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #111e;
+  color: #fff;
+}
+
+.pics-big {
+  grid-column: 2;
+  justify-self: center;
+  max-width: 100%;
+  max-height: calc(100vh - 220px);
+  border-radius: 10px;
+  background: repeating-conic-gradient(#444 0 25%, #555 0 50%) 0 0 / 20px 20px;
+  object-fit: contain;
+}
+
+.pics-step,
+.pics-close {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff3;
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pics-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 1.3rem;
+}
+
+.pics-info {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.pics-info p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0;
+}
+
+.pics-info .pics-chip {
+  color: #222;
+}
+
+.pics-siblings {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  --pics-h: 70px;
+}
+
+.pics-siblings .pics-tile[aria-pressed="true"] {
+  outline: 3px solid #ffd54a;
+}

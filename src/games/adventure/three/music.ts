@@ -1,4 +1,4 @@
-import { audioContext } from "@/lib/sfx";
+import { audioContext, speaker } from "@/lib/sfx";
 import type { Energy } from "../library/types";
 
 // Soft, endless adventure music made on the fly: a bass line and a marimba
@@ -26,7 +26,7 @@ export class Music {
     if (!ac || this.timer) return;
     this.gain = ac.createGain();
     this.gain.gain.value = this.quiet ? 0 : 0.5;
-    this.gain.connect(ac.destination);
+    this.gain.connect(speaker(ac));
     this.nextAt = ac.currentTime + 0.1;
     this.timer = setInterval(() => this.schedule(), 50);
   }

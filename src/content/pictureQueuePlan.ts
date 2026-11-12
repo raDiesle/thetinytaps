@@ -1,24 +1,23 @@
 // Which waiting pictures are cheap to make now, and which are better kept for later (/bild-erzeugen).
 // A request to Gemini costs the same whether it brings one picture or a sheet of two or four (`--grid`), which
-// `bun run image` cuts apart. So small pictures that look alike (same style, aspect, size, cut-out and references)
-// share a sheet: a full sheet is as cheap as it gets and is made at once, a sheet still short of pictures waits for
-// partners. A picture too big for any sheet gains nothing by waiting and is made at once. Used by the management
-// page and by `bun run image queue`, so this file imports nothing from the app.
+// `bun run image` cuts apart. So pictures that look alike (same style, aspect, size, cut-out and references) share a
+// sheet, and each sheet goes to the engine that makes its pictures for the least money: small ones four to a 1K sheet of
+// the Lite model, big ones four to a 2K sheet of Nano Banana 2.1 (idea A-33, measured November 2026). A full sheet is
+// as cheap as it gets and is made at once, a sheet still short of pictures waits for partners, and only a picture that
+// can never share one (drawn from its own story's first picture, `alone`) is a request of its own. Used by
+// the management page and by `bun run image queue`, so this file imports nothing from the app.
 
 import type { QueuedPicture } from "./pictureQueue";
 
 /** The book's style block, put before every picture's prompt (see the skill /bild-erzeugen). */
 export const BOOK_STYLE =
-  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache printed on matte paper – still clear and easy to tell apart, never dull or grey – gentle shading. Simple, uncluttered background. Every fox and bear wears clothes. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
+  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache printed on matte paper – still clear and easy to tell apart, never dull or grey – gentle shading. Simple, uncluttered background. Every fox and bear wears clothes. Faces are friendly and relaxed, never frowning or with angry brows unless the picture asks for that feeling. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
 
 /** The style block for cut-outs: no background and no paper texture, which would spoil the cut. */
 export const CUTOUT_STYLE =
-  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache – still clear and easy to tell apart, never dull or grey – gentle shading. Every fox and bear wears clothes. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
+  "Children's picture-book illustration for 2–4 year olds, like a page of a printed picture book. Soft, flat, rounded shapes with thick dark plum ink outlines (#3d3045), warm friendly colours softened like gouache – still clear and easy to tell apart, never dull or grey – gentle shading. Every fox and bear wears clothes. Faces are friendly and relaxed, never frowning or with angry brows unless the picture asks for that feeling. No text, no letters, no numbers, no speech bubbles, no frames, no book, page or paper edge drawn around the picture.";
 
-/** US dollars per request with the default model (gemini-3.1-flash-lite-image, October 2026): batch, and at once with `--now`. */
-export const REQUEST_PRICE = { batch: 0.017, now: 0.034 };
-
-/** The pixels of a 1K picture per aspect Gemini can make (the default model's only size). */
+/** The pixels of a 1K picture per aspect Gemini can make (the Lite model's only size). */
 export const PICTURE_1K: Record<string, [number, number]> = {
   "1:1": [1024, 1024],
   "2:3": [832, 1248],
@@ -31,6 +30,47 @@ export const PICTURE_1K: Record<string, [number, number]> = {
   "16:9": [1344, 768],
   "21:9": [1536, 672],
 };
+
+/** The pixels of a 2K picture per aspect (Nano Banana 2.1 with `imageSize: "2K"`; 4:3 measured as 2400 × 1792). */
+export const PICTURE_2K: Record<string, [number, number]> = {
+  "1:1": [2048, 2048],
+  "2:3": [1696, 2528],
+  "3:2": [2528, 1696],
+  "3:4": [1792, 2400],
+  "4:3": [2400, 1792],
+  "4:5": [1856, 2304],
+  "5:4": [2304, 1856],
+  "9:16": [1536, 2752],
+  "16:9": [2752, 1536],
+  "21:9": [3168, 1344],
+};
+
+/** A way to ask Gemini: its model, the resolution it is asked for and what a request costs. */
+export interface Engine {
+  /** Gemini's model id. */
+  model: string;
+  /** The resolution asked for; none for a model that knows only 1K. */
+  imageSize?: "2K";
+  /** How long the model thinks first: the least, since it only costs and the sheets came out as well without. */
+  thinking?: "minimal";
+  /** Its pixels per aspect. */
+  pixels: Record<string, [number, number]>;
+  /** US dollars per request in a batch, as measured from Gemini's own token counts (November 2026); at once it is twice that. */
+  price: number;
+}
+
+/**
+ * The engines the queue picks from, the cheapest request first. Nano Banana 2.1 asks the same for a 1K picture as Lite
+ * but can make 2K, where four big pictures fit on one sheet: 0.029 $ a sheet, 0.0073 $ a 1200 × 900 picture against
+ * 0.017 $ alone from Lite (A-33, research „gemini-bildpreise“).
+ */
+export const ENGINES = {
+  lite: { model: "gemini-3.1-flash-lite-image", pixels: PICTURE_1K, price: 0.017 },
+  sheet2k: { model: "gemini-nano-banana-2.1", imageSize: "2K", thinking: "minimal", pixels: PICTURE_2K, price: 0.029 },
+} satisfies Record<string, Engine>;
+
+/** One of `ENGINES`. */
+export type EngineId = keyof typeof ENGINES;
 
 /** A sheet of several pictures in one request: columns x rows. */
 export type Grid = "2x2" | "1x2" | "2x1";
@@ -54,26 +94,44 @@ export function gridAspect(aspect: string, cols: number, rows: number): string |
   });
 }
 
-/** Roughly the longest side of one panel of this sheet, in pixels; undefined when Gemini can't make the sheet. */
-export function panelSide(aspect: string, grid: Grid): number | undefined {
-  const [cols, rows] = gridSize(grid);
+/** Roughly the longest side of one panel of this sheet (or of the whole picture), in pixels; undefined when Gemini can't make it. */
+export function panelSide(aspect: string, grid: Grid | undefined, engine: EngineId = "lite"): number | undefined {
+  const [cols, rows] = grid ? gridSize(grid) : [1, 1];
   const whole = gridAspect(aspect, cols, rows);
   if (!whole) return undefined;
-  const [w, h] = PICTURE_1K[whole];
-  return Math.floor(Math.max(w / cols, h / rows) * GAP_SHARE);
+  const [w, h] = ENGINES[engine].pixels[whole];
+  return Math.floor(Math.max(w / cols, h / rows) * (grid ? GAP_SHARE : 1));
 }
 
-/** The longest side a picture needs, or undefined for the whole picture. */
-const neededSide = (size?: string) => (size ? Math.max(...size.split("x").map(Number)) : undefined);
+/** The longest side a picture needs: its size, or without one a whole 1K picture (which a 2K sheet's panel has too). */
+const neededSide = ({ size, aspect = "1:1" }: QueuedPicture) => (size ? Math.max(...size.split("x").map(Number)) : Math.max(...(PICTURE_1K[aspect] ?? [1024])));
 
-/** The sheets a picture fits in, the most pictures per request first. */
-function gridsFor(picture: QueuedPicture): Grid[] {
-  const side = neededSide(picture.size);
-  if (picture.alone || !side) return [];
-  return GRIDS.map((grid) => ({ grid, panel: panelSide(picture.aspect ?? "1:1", grid) ?? 0 }))
-    .filter(({ panel }) => panel >= side * SMALLER_OK)
-    .sort((a, b) => panelsOf(b.grid) - panelsOf(a.grid) || b.panel - a.panel)
-    .map(({ grid }) => grid);
+/** Whether a picture of this size comes out well enough from that panel. */
+const fits = (picture: QueuedPicture, grid: Grid | undefined, engine: EngineId) =>
+  (panelSide(picture.aspect ?? "1:1", grid, engine) ?? 0) >= neededSide(picture) * SMALLER_OK;
+
+/** A sheet a picture could be drawn on. */
+interface Option {
+  engine: EngineId;
+  grid: Grid;
+}
+
+/** The sheets a picture fits in, the cheapest picture first, then the biggest panels; none for a picture drawn alone. */
+function optionsFor(picture: QueuedPicture): Option[] {
+  if (picture.alone) return [];
+  const each = ({ engine, grid }: Option) => ENGINES[engine].price / panelsOf(grid);
+  return (Object.keys(ENGINES) as EngineId[])
+    .flatMap((engine) => GRIDS.map((grid) => ({ engine, grid })))
+    .filter(({ engine, grid }) => fits(picture, grid, engine))
+    .sort(
+      (a, b) => each(a) - each(b) || (panelSide(picture.aspect ?? "1:1", b.grid, b.engine) ?? 0) - (panelSide(picture.aspect ?? "1:1", a.grid, a.engine) ?? 0),
+    );
+}
+
+/** The cheapest engine whose sheet (or whole picture) is big enough, else the one with the most pixels. */
+function engineFor(picture: QueuedPicture, grid: Grid | undefined): EngineId {
+  const engines = Object.keys(ENGINES) as EngineId[];
+  return engines.find((engine) => fits(picture, grid, engine)) ?? engines[engines.length - 1];
 }
 
 /** The shared start of a picture's prompt. */
@@ -89,6 +147,8 @@ function sheetKey(picture: QueuedPicture) {
 export interface Sheet {
   /** The sheet, or undefined for one picture alone. */
   grid?: Grid;
+  /** Who makes it. */
+  engine: EngineId;
   pictures: QueuedPicture[];
   /** Panels left over, filled with another version of a picture to choose from (`.image-raw/variants/`). */
   variants: number;
@@ -99,6 +159,8 @@ export interface Sheet {
 /** Pictures that wait for partners to fill their sheet. */
 export interface WaitingSheet {
   grid: Grid;
+  /** Who will make it. */
+  engine: EngineId;
   pictures: QueuedPicture[];
   /** How many more pictures of the same kind would fill it. */
   missing: number;
@@ -114,6 +176,9 @@ export interface QueuePlan {
   blocked: { picture: QueuedPicture; ref: string }[];
 }
 
+/** US dollars these requests cost in a batch. */
+export const costOf = (sheets: { engine: EngineId }[]) => sheets.reduce((sum, s) => sum + ENGINES[s.engine].price, 0);
+
 /**
  * Splits the queue into what is cheap to make now and what waits for more pictures of its kind. `force` names
  * pictures (or "all") the grown-up wants now anyway: their whole sheet comes now, with spare panels as variants.
@@ -125,24 +190,27 @@ export function planQueue(queue: QueuedPicture[], force: string[] | "all" = []):
   for (const picture of queue) {
     const ref = picture.ref?.find((r) => queued.has(r) && r !== picture.file);
     if (ref) plan.blocked.push({ picture, ref });
-    else if (picture.panels) plan.now.push({ grid: picture.panels.length > 2 ? "2x2" : "1x2", pictures: [picture], variants: 0 });
-    else if (!gridsFor(picture).length) plan.now.push({ pictures: [picture], variants: 0 });
+    else if (picture.panels) {
+      const grid = picture.panels.length > 2 ? "2x2" : "1x2";
+      plan.now.push({ grid, engine: engineFor(picture, grid), pictures: [picture], variants: 0 });
+    } else if (!optionsFor(picture).length) plan.now.push({ engine: engineFor(picture, undefined), pictures: [picture], variants: 0 });
     else groups.set(sheetKey(picture), [...(groups.get(sheetKey(picture)) ?? []), picture]);
   }
   for (const pictures of groups.values()) {
-    const fits = gridsFor(pictures[0]);
-    const grid = fits[0];
+    const options = optionsFor(pictures[0]);
+    const { engine, grid } = options[0];
     const full = panelsOf(grid);
     let i = 0;
-    for (; i + full <= pictures.length; i += full) plan.now.push({ grid, pictures: pictures.slice(i, i + full), variants: 0 });
+    for (; i + full <= pictures.length; i += full) plan.now.push({ grid, engine, pictures: pictures.slice(i, i + full), variants: 0 });
     const rest = pictures.slice(i);
     if (!rest.length) continue;
     if (force === "all" || rest.some((p) => force.includes(p.id))) {
-      // The same price whatever the sheet: the smallest that holds them has the biggest panels.
-      const smallest = fits.filter((g) => panelsOf(g) >= rest.length).sort((a, b) => panelsOf(a) - panelsOf(b))[0];
-      const sheet = rest.length === 1 ? undefined : smallest;
-      plan.now.push({ grid: sheet, pictures: rest, variants: sheet ? panelsOf(sheet) - rest.length : 0, forced: true });
-    } else plan.waiting.push({ grid, pictures: rest, missing: full - rest.length });
+      // One request either way: the cheapest that holds them, and of those the biggest panels (options' order).
+      const holds = options.filter((o) => panelsOf(o.grid) >= rest.length);
+      const cheapest = holds.sort((a, b) => ENGINES[a.engine].price - ENGINES[b.engine].price || panelsOf(a.grid) - panelsOf(b.grid))[0];
+      if (rest.length === 1) plan.now.push({ engine: engineFor(rest[0], undefined), pictures: rest, variants: 0, forced: true });
+      else plan.now.push({ grid: cheapest.grid, engine: cheapest.engine, pictures: rest, variants: panelsOf(cheapest.grid) - rest.length, forced: true });
+    } else plan.waiting.push({ grid, engine, pictures: rest, missing: full - rest.length });
   }
   return plan;
 }
@@ -161,6 +229,10 @@ export interface ImageJob {
   ref?: string[];
   /** Cut-out frames of one animation: each keeps its whole cell, so they line up (`--frames`). */
   frames?: boolean;
+  /** Gemini's model, its resolution and thinking (`ENGINES`). */
+  model?: string;
+  imageSize?: string;
+  thinking?: string;
 }
 
 /** Where a spare panel's other version of a picture goes: kept out of the game, to choose from. */
@@ -174,7 +246,12 @@ export function variantFile(picture: QueuedPicture, n: number) {
 export function jobOf(sheet: Sheet): ImageJob {
   const [first] = sheet.pictures;
   const { aspect, size, quality, transparent, key, ref } = first;
-  const shared = Object.fromEntries(Object.entries({ aspect, size, quality, transparent, key, ref }).filter(([, v]) => v !== undefined));
+  const { model, ...engine } = ENGINES[sheet.engine] as Engine;
+  const shared = Object.fromEntries(
+    Object.entries({ aspect, size, quality, transparent, key, ref, model, imageSize: engine.imageSize, thinking: engine.thinking }).filter(
+      ([, v]) => v !== undefined,
+    ),
+  );
   if (!sheet.grid) return { ...shared, out: [first.file], prompt: `${styleOf(first)} ${first.prompt}` };
   if (first.panels)
     return {

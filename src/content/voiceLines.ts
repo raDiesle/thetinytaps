@@ -14,6 +14,7 @@ import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
 import { HOMES } from "@/games/animals/homes";
 import { KIND_ORDER } from "@/games/animals/levels";
 import { KIND_QUESTIONS } from "@/games/animals/RoundTopic";
+import { SOUND_ANIMALS, SOUND_TEXTS } from "@/games/animals/sounds";
 import { PAIRS, TOGETHER_TEXTS } from "@/games/together/pairs";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
 import { FILMS } from "@/games/elevator/film/films";
@@ -23,6 +24,7 @@ import type { Station, Way } from "@/games/elevator/trail/types";
 import { FEELINGS } from "@/games/feelings/bear";
 import { DAYS } from "@/games/feelings/days";
 import { SITUATIONS } from "@/games/feelings/kita";
+import { ALLTAG_SITUATIONS } from "@/games/feelings/alltag";
 import { SELF_SITUATIONS } from "@/games/feelings/selbst";
 import { comfortsIn, dayIn, feelingIn, situationIn } from "@/games/feelings/localized";
 import { MOOD_SAID } from "@/games/feelings/mood";
@@ -32,6 +34,7 @@ import type { Beat } from "@/games/feelings/story";
 import { buildBath } from "@/games/marbles/bath";
 import { buildBuilding } from "@/games/marbles/building";
 import { buildCircus } from "@/games/marbles/circus";
+import { COUNT_LINES as MARBLE_COUNTS } from "@/games/marbles/colors";
 import { LEVEL_TEXTS as MARBLE_LEVELS } from "@/games/marbles/content";
 import { buildFarm } from "@/games/marbles/farm";
 import { buildGarden } from "@/games/marbles/garden";
@@ -54,6 +57,7 @@ import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
+import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
@@ -196,6 +200,7 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
       },
       file: "src/games/marbles/spaceTrack.tsx",
     },
+    { text: "Die Röhre ist voll!", file: "src/games/marbles/colors.ts" },
   ],
   "/belohnungstafel/": [
     { text: "Geschafft! Hurra!", file: "src/games/rewards/BoardScreen.tsx" },
@@ -265,6 +270,15 @@ function letters(language: TargetLanguageId): VoiceGroup[] {
       lines: [pick(STOMP_INVITE, language)],
       note: "„Hüpf mit!“ und „Klatsch mit!“ kommen von den Tu-Wörtern; das Stampfen hat keins.",
     },
+    ...(SMALL_PROMPT[language]
+      ? [
+          {
+            label: "Wo ist das kleine …?",
+            lines: once(caseLetters(de).map((l) => SMALL_PROMPT[language]!(l.spoken))),
+            built: "„Wo ist das kleine …?“ mit dem Buchstaben",
+          },
+        ]
+      : []),
     { label: "Lob", lines: once(de.praise) },
     { label: "Zahlwörter beim Zählen", lines: once(de.numberWords.map((n) => `${n}!`)) },
     {
@@ -289,6 +303,7 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
   const gifts = pick(GIFT_TEXTS, language);
   const grow = pick(GROW_TEXTS, language);
   const peek = pick(SHADOW_TEXTS, language);
+  const sound = pick(SOUND_TEXTS, language);
   const fed = ANIMALS.filter((a) => a.food);
   const housed = ANIMALS.filter((a) => a.home);
   const residents = Object.keys(HOMES).flatMap((id) => ANIMALS.find((a) => a.home === id) ?? []);
@@ -319,6 +334,12 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
     { label: "Zuhause: Frage", lines: once(housed.map(texts.whereLives)), built: "Satz mit dem Tier" },
     { label: "Zuhause: richtig", lines: once(housed.map((a) => texts.movedIn(a, HOMES[a.home!]))), built: "Satz mit Tier und Zuhause" },
     { label: "Zuhause: falsch, wer da wohnt", lines: once(residents.map(texts.livesHere)), built: "Satz mit dem Tier, das dort wohnt" },
+    {
+      label: "Wer macht das Geräusch?",
+      lines: once([sound.listen, ...SOUND_ANIMALS.map(sound.there), ...SOUND_ANIMALS.map(sound.thatIs)]),
+      built: "Satz mit dem Tier",
+      note: "Z-15: ein Tier ruft hinter dem Vorhang; „Da ist ja …“ und „Das ist …“ wie bei „Wer schaut da raus?“.",
+    },
     {
       label: "Wer schaut da raus?",
       lines: once([peek.peek, ...PEEK_ITEMS.map(peek.there), ...PEEK_ITEMS.map(peek.thatIs)]),
@@ -356,6 +377,7 @@ function feelings(language: TargetLanguageId): VoiceGroup[] {
   const feelings = FEELINGS.map((f) => feelingIn(f, language));
   const situations = SITUATIONS.map((s) => situationIn(s, language));
   const selfSituations = SELF_SITUATIONS.map((s) => situationIn(s, language));
+  const everyday = ALLTAG_SITUATIONS.map((s) => situationIn(s, language));
   const days = DAYS.map((d) => dayIn(d, language));
   return [
     // „Wie geht's dir?“ and „Was brauche ich?“ are games of their own in the book, but share this game's recordings
@@ -375,6 +397,9 @@ function feelings(language: TargetLanguageId): VoiceGroup[] {
     },
     { label: "Mehr Gefühle: Fragen", lines: once(selfSituations.flatMap((s) => s.steps.map((st) => st.question))) },
     { label: "Mehr Gefühle: nicht so gute Ideen", lines: once(selfSituations.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
+    { label: "Neue Szenen: Geschichte", lines: once(everyday.flatMap((s) => [...s.intro, ...s.steps.flatMap((st) => st.beats), ...s.outro].map(beat))) },
+    { label: "Neue Szenen: Fragen", lines: once(everyday.flatMap((s) => s.steps.map((st) => st.question))) },
+    { label: "Neue Szenen: nicht so gute Ideen", lines: once(everyday.flatMap((s) => s.steps.map((st) => st.instead.answer))) },
     { label: "Lob", lines: once(pick(FEELINGS_PRAISE, language)) },
     { label: "Tagesgeschichten", lines: once(days.flatMap((d) => [...d.scenes.map((s) => s.before.text), d.end])) },
   ];
@@ -436,6 +461,7 @@ function marbles(language: TargetLanguageId): VoiceGroup[] {
   return [
     { label: "Erster Satz jedes Levels", lines: once(Object.values(MARBLE_LEVELS).map((l) => l.intro[language])) },
     { label: "Sätze der Maschinen", lines: once([...events.map((e) => e.say?.[language]), ...inline("/kettenreaktion/", language)]) },
+    { label: "Farbenbahn zählt", lines: once(MARBLE_COUNTS.map((l) => l[language])) },
   ];
 }
 

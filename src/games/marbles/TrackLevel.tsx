@@ -1,12 +1,14 @@
 import { memo, useContext, useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/TapFeedback";
-import { cameraLayer, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
+import { cameraLayer, cameraPoint, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint } from "./level";
+import { TapHint } from "@/components/TapHint";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
 import { SITE_TRACK } from "./siteTrack";
 import { SLIDE_TRACK } from "./slideTrack";
 import { SNOW_TRACK } from "./snowTrack";
 import { SPACE_TRACK } from "./spaceTrack";
-import { type EndProps, INK, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
+import { COLOR_TRACK } from "./colorTrack";
+import { type ColorSort, type EndProps, INK, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
@@ -267,7 +269,7 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * The same run comes in other worlds too (K-18, `look`): snow, space, a water
  * slide and a building site, each with its own wall, things and end.
  */
-function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: TrackTheme }) {
+function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & { look: TrackTheme }) {
   const label = useLevelName(look.level);
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
@@ -294,6 +296,10 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   const landed = useRef<Landed[]>([]);
   const nextId = useRef(0);
   const fullAt = useRef(Infinity);
+  /** The tube that got full first, in a run that sorts by colour. */
+  const fullTube = useRef(-1);
+  /** How long a thing takes from the run's end to where it comes to rest. */
+  const landMs = look.sort?.hopMs ?? LAND_MS;
   const bars = useRef(never(BARS.length));
   const bumps = useRef(never(TURNS.length));
   const drums = useRef(never(DRUMS.length));
@@ -318,7 +324,10 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   const followFrom = useRef(0);
   const box = useRef<HTMLDivElement>(null);
   /** The three things on the shelf, when each was put there, and which a key or a tap on the wall lets out next. */
-  const [firstShelf] = useState(() => [...ROLLERS].sort(() => Math.random() - 0.5).slice(0, SHELF.things.length));
+  // A run that sorts by colour (K-10) always has one marble of each colour there.
+  const [firstShelf] = useState<Roller[]>(() =>
+    look.sort ? look.sort.colors.map(() => "marble") : [...ROLLERS].sort(() => Math.random() - 0.5).slice(0, SHELF.things.length),
+  );
   const shelf = useRef(firstShelf);
   const filled = useRef(SHELF.things.map(() => -Infinity));
   const turn = useRef(0);
@@ -444,6 +453,12 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   };
 
   const land = (m: Marble, t: number) => {
+    // The first thing in the basket or a tube wins the level's trophy.
+    if (landed.current.length === 0) onGoal?.();
+    if (look.sort) {
+      landInTube(m, t, look.sort);
+      return;
+    }
     const slot = Math.min(landed.current.length, BASKET_SLOTS.length - 1);
     const to = look.landAt?.(landed.current.length) ?? BASKET_SLOTS[slot];
     landed.current.push({ id: m.id, kind: m.kind, color: m.color, look: m.look, from: { x: m.x, y: m.y }, to, at: t });
@@ -455,6 +470,38 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
       sound(look.fullSound);
       say(look.full);
       setTimeout(onDone, DONE_AFTER_FULL_MS);
+    }
+  };
+
+  /**
+   * A run that sorts by colour (K-10): the marble hops into the tube of its
+   * colour, a note one step higher for each marble already in it, and the
+   * voice counts „Drei rote!“ – the newest count cutting off the one before,
+   * so it never lags behind the tube. The first full tube ends the run.
+   */
+  const landInTube = (m: Marble, t: number, sort: ColorSort) => {
+    const tube = Math.max(0, sort.colors.indexOf(m.color));
+    const n = landed.current.filter((l) => l.color === m.color).length;
+    const to = sort.landAt(tube, n);
+    landed.current.push({ id: m.id, kind: m.kind, color: m.color, look: m.look, from: { x: m.x, y: m.y }, to, at: t });
+    sound(playWhoosh);
+    setTimeout(() => {
+      sound(() => {
+        look.landSound(m.kind);
+        playCountNote(n);
+      });
+      const line = sort.count(tube, n + 1);
+      if (line) say(line, false);
+    }, sort.hopMs);
+    if (!done.current && n + 1 >= sort.full) {
+      done.current = true;
+      fullTube.current = tube;
+      fullAt.current = t + sort.hopMs;
+      setTimeout(() => {
+        sound(look.fullSound);
+        say(look.full);
+      }, sort.hopMs);
+      setTimeout(onDone, sort.hopMs + DONE_AFTER_FULL_MS);
     }
   };
 
@@ -724,14 +771,14 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   };
 
   /** Lets a thing into the run at the hopper, or first flies it there from the shelf. */
-  const release = (kind: Roller, from?: Pt) => {
+  const release = (kind: Roller, from?: Pt, color?: string) => {
     const id = nextId.current++;
     const start = from ?? HOPPER;
     lookingUp.current = false;
     marbles.current.push({
       id,
       kind,
-      color: BRIGHT_COLORS[id % BRIGHT_COLORS.length],
+      color: color ?? BRIGHT_COLORS[id % BRIGHT_COLORS.length],
       look: "plain",
       nudged: -Infinity,
       fly: from ? { from, at: performance.now() } : null,
@@ -751,9 +798,14 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
     sound(look.release[kind]);
   };
 
-  /** The i-th thing on the shelf goes into the hopper, and something else pops up in its place. */
+  /** The i-th thing on the shelf goes into the hopper, and something else pops up in its place (sorting by colour, the same again). */
   const take = (i: number) => {
     if (done.current) return;
+    if (look.sort) {
+      release("marble", shelfSpot(i, "marble"), look.sort.colors[i]);
+      filled.current[i] = performance.now();
+      return;
+    }
     release(shelf.current[i], shelfSpot(i, shelf.current[i]));
     const others = shelf.current.filter((_, j) => j !== i);
     const choices = ROLLERS.filter((r) => r !== shelf.current[i] && !others.includes(r));
@@ -809,10 +861,11 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   const started = nextId.current > 0;
   /** What the end needs to draw itself: when each thing arrived, when it got full and when it was tapped. */
   const end = {
-    parts: landed.current.map((l) => l.at + LAND_MS).filter((at) => at <= t),
+    parts: landed.current.map((l) => l.at + landMs).filter((at) => at <= t),
     t,
     fullAge: (t - fullAt.current) / 1000,
     tapAge: (t - basketTapped.current) / 1000,
+    fullTube: fullTube.current,
   };
   const spot = (i: number, layer: "back" | "front") => <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />;
   const cam = camera.current;
@@ -823,6 +876,7 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
     playBar(i, performance.now());
   };
 
+  const at = cameraPoint(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
       <TrackLook.Provider value={look}>
@@ -951,12 +1005,14 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
 
           <g data-tap onPointerDown={tapBasket}>
             {landed.current.map((l, i) => {
-              const k = Math.min(1, (t - l.at) / LAND_MS);
+              const k = Math.min(1, (t - l.at) / landMs);
               // A thing that becomes part of the end (a snowman's ball) is gone once it is there.
               if (look.absorb && k >= 1) return null;
-              const bounce = (k < 1 ? 0 : wobble((t - l.at - LAND_MS) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
-              const x = l.from.x + (l.to.x - l.from.x) * k;
-              const y = l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R) - (look.pileLift?.(end.fullAge) ?? 0);
+              const bounce = (k < 1 ? 0 : wobble((t - l.at - landMs) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
+              const hop = look.sort?.hop(l.from, l.to, k);
+              const x = hop?.x ?? l.from.x + (l.to.x - l.from.x) * k;
+              const y =
+                (hop?.y ?? l.from.y + (l.to.y - l.from.y) * k * k) - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R) - (look.pileLift?.(end.fullAge) ?? 0);
               return <RollerBody key={l.id} kind={l.kind} color={l.color} look={l.look} x={x} y={y} spin={0} grow={1} />;
             })}
           </g>
@@ -1028,14 +1084,21 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
             );
           })}
 
-          <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />
-
-          {/* Before the first tap and after ⬆: a big hand on the middle thing on the shelf says „tap me“ */}
-          {(!started || lookingUp.current) && <ShelfHint />}
-          {/* Until the barrier has first been lifted, a big hand points at it while things wait there */}
-          {!watch && queue.current.length > 0 && gate.current.openedAt === -Infinity && <GateHint />}
+          <Shelf
+            things={shelf.current}
+            filled={filled.current}
+            colors={look.sort?.colors ?? shelf.current.map(() => BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length])}
+            t={t}
+            onTake={take}
+          />
         </svg>
       </TrackLook.Provider>
+      {/* Before the first tap and after ⬆: the shared hint on the middle thing on the shelf says „tap me“ */}
+      {(!started || lookingUp.current) && <TapHint key={`shelf${nextId.current}`} {...worldHint(at, SHELF_SPOT)} side="right" />}
+      {/* Until the barrier has first been lifted, the hint points at it from the left while things wait there */}
+      {!watch && queue.current.length > 0 && gate.current.openedAt === -Infinity && (
+        <TapHint key="gate" {...worldHint(at, { ...gatePivot(), r: 62 })} side="left" />
+      )}
       {/* Down the run, the ⬆ button in the bottom left corner takes the camera back up to the shelf */}
       {!done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
         <button
@@ -1248,9 +1311,9 @@ function Peek({ animal, age }: { animal: string; age: number }) {
 /**
  * The shelf over row 1a with three things to pick from (K-07). Tapping one
  * lets it out; the new one in its place pops up from small. A marble on it
- * has `color`, the colour it keeps on the run.
+ * has its place's colour in `colors`, which it keeps on the run.
  */
-function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled: number[]; color: string; t: number; onTake: (i: number) => void }) {
+function Shelf({ things, filled, colors, t, onTake }: { things: Roller[]; filled: number[]; colors: string[]; t: number; onTake: (i: number) => void }) {
   const { shelf } = useLook();
   return (
     <g>
@@ -1275,7 +1338,7 @@ function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled:
           >
             <rect x={at.x - 58} y="-10" width="116" height={SHELF.y + 26} fill="transparent" />
             <g transform={`translate(${at.x} ${SHELF.y}) scale(${k}) translate(${-at.x} ${-SHELF.y})`}>
-              <RollerBody kind={kind} color={color} x={at.x} y={at.y} spin={0} scale={SHELF.scale} />
+              <RollerBody kind={kind} color={colors[i]} x={at.x} y={at.y} spin={0} scale={SHELF.scale} />
             </g>
           </g>
         );
@@ -1284,18 +1347,9 @@ function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled:
   );
 }
 
-/**
- * Says „tap a thing on the shelf, and it rolls“: a big hand points down at the
- * middle thing from the room above the wall, so it covers nothing. It stands
- * still, like every hint here.
- */
-function ShelfHint() {
-  return (
-    <text className="run-hint" x={SHELF.things[1] + 18} y="-26" fontSize="100" textAnchor="middle">
-      👇
-    </text>
-  );
-}
+/** Where the hint says „tap a thing on the shelf, and it rolls“: round the last thing, with the hand on the free wall to
+ * its right (above, it left the screen on a phone on its side; below, it covered the first row's xylophone). */
+const SHELF_SPOT = { x: SHELF.things[2], y: SHELF.y - 40, r: 64 };
 
 /** Under each place on the shelf its number key, which lets out the thing there; it goes down while `held`. */
 function ShelfKeys({ held, onTake }: { held: string | null; onTake: (i: number) => void }) {
@@ -1431,16 +1485,6 @@ function Gate({ lift, open, rang, glow }: { lift: number; open: boolean; rang: n
         )}
       </g>
     </g>
-  );
-}
-
-/** A big still hand pointing at the barrier from the left while things wait behind it, until it is first lifted. */
-function GateHint() {
-  const p = gatePivot();
-  return (
-    <text className="run-hint" x={p.x - 88} y={p.y + 28} fontSize="76" textAnchor="middle">
-      👉
-    </text>
   );
 }
 
@@ -1832,5 +1876,7 @@ export const SnowTrackLevel = (props: LevelProps) => <Run {...props} look={SNOW_
 export const SpaceTrackLevel = (props: LevelProps) => <Run {...props} look={SPACE_TRACK} />;
 /** „Wasserrutsche“: beach ball, swim ring and rubber duck slide down blue chutes into a pool (K-18). */
 export const SlideTrackLevel = (props: LevelProps) => <Run {...props} look={SLIDE_TRACK} />;
+/** „Farbenbahn“: the child picks each marble's colour, and the tubes at the end count them (K-10). */
+export const ColorTrackLevel = (props: LevelProps) => <Run {...props} look={COLOR_TRACK} />;
 /** „Baustellen-Bahn“: tyre, stone and log ride conveyor belts into a skip that the crane lifts (K-18). */
 export const SiteTrackLevel = (props: LevelProps) => <Run {...props} look={SITE_TRACK} />;

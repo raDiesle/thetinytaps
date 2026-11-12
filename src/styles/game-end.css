@@ -76,6 +76,25 @@
   -webkit-text-stroke: 0.08em var(--ink);
 }
 
+/* „Menü“ (`menu`): the ribbon's round label with the shelf and the yellow arrow beside the word, so it looks like the
+   way back in the corner (user request, November 2026). */
+.game-end-button.menu {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.game-end-button.menu.to-shelf {
+  padding-left: 0.3em;
+}
+
+.game-end-button.menu .shelf-label-art {
+  flex: none;
+  width: auto;
+  height: 2.4em;
+  overflow: visible;
+}
+
 .game-end-button:active {
   translate: 0 4px;
 }
@@ -98,4 +117,191 @@
 .game-end.corners .game-end-button {
   font-size: clamp(0.95rem, 2.2vw, 1.25rem);
   pointer-events: auto;
+}
+
+/*
+ * The level's trophy (Trophy.tsx), handed over so it is plainly won (user feedback, November 2026: small beside the
+ * buttons in the bottom corner it was hardly seen): it grows in big in the middle of the screen with „Geschafft!“ under
+ * it, stays a moment, then shrinks back onto its little wooden board beside the buttons – into the collection – and
+ * stands still there. Once, slowly: no shine running over it, no bounce, no sparkle. GameEnd measures where its board
+ * is and sets `--award-x`, `--award-y` (from there to the middle) and `--award-s` (how much bigger it is there).
+ */
+.game-end-prize {
+  flex: none;
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.game-end-trophy {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: clamp(96px, 30vh, 230px);
+  aspect-ratio: 2 / 3;
+  /* Its foot stands on the board, a little sunk into its top. */
+  margin-bottom: -0.4%;
+  transform-origin: 50% 50%;
+}
+
+.game-end-trophy-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Lifted off the picture, so it is seen on a busy one too. */
+  filter: drop-shadow(0 3px 6px #2a180c66);
+}
+
+/* While it is handed over a tap on it puts it on its board at once (GameEnd). */
+.game-end-trophy.awarding {
+  pointer-events: auto;
+  will-change: transform;
+  animation: game-end-trophy-award var(--award-ms, 3.4s) both;
+}
+
+/* Grows in big in the middle (0.6 s), stays there (to 60 %), then shrinks onto its board. Each step eases on its own. */
+@keyframes game-end-trophy-award {
+  0% {
+    opacity: 0;
+    transform: translate(var(--award-x), var(--award-y)) scale(calc(var(--award-s) * 0.7));
+    animation-timing-function: ease-out;
+  }
+  18% {
+    opacity: 1;
+    transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
+    animation-timing-function: linear;
+  }
+  60% {
+    transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A soft, still light behind the big trophy, so it stands out on a busy picture too; it goes with „Geschafft!“. */
+.game-end-trophy.awarding::before {
+  content: "";
+  position: absolute;
+  inset: -18% -45%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff8dccc, #fff3c466 55%, #fff3c400);
+  animation: game-end-done var(--award-ms, 3.4s) both;
+}
+
+/* „Geschafft!“ under the big trophy, for the grown-up beside the child; it shrinks away with it and is gone on the board. */
+.game-end-done {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
+  margin-top: calc(0.6rem / var(--award-s, 1));
+  color: #fff;
+  font-size: calc(clamp(2.2rem, 11vh, 5rem) / var(--award-s, 1));
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-text-stroke: 0.1em var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 0 0.06em 0.12em #2a180c55;
+  animation: game-end-done var(--award-ms, 3.4s) both;
+}
+
+@keyframes game-end-done {
+  0%,
+  10% {
+    opacity: 0;
+  }
+  24%,
+  62% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The little board it lands on, wood like the bookshelf's where all trophies stand: there from the start, so the
+   trophy's way down has a place to go. */
+.game-end-board {
+  display: block;
+  width: calc(clamp(96px, 30vh, 230px) * 0.95);
+  height: calc(clamp(96px, 30vh, 230px) * 0.07);
+  min-height: 7px;
+  border: 1.5px solid #4a2e22;
+  border-radius: 3px;
+  background: linear-gradient(#c88f58, #a7693a 45%, #7b4622);
+  box-shadow:
+    inset 0 2px 0 #e8b98066,
+    0 4px 6px #2a180c55;
+}
+
+/* The buttons come once the trophy is on its board, calmly. */
+.game-end:not(.landed) > :not(.game-end-prize) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.game-end.landed > :not(.game-end-prize) {
+  animation: game-end-in 0.5s ease-out;
+}
+
+.game-end.inline .game-end-trophy {
+  height: clamp(80px, 22vh, 170px);
+}
+
+.game-end.inline .game-end-board {
+  width: calc(clamp(80px, 22vh, 170px) * 0.95);
+  height: calc(clamp(80px, 22vh, 170px) * 0.07);
+}
+
+.game-end.corners .game-end-trophy {
+  height: clamp(64px, 18vh, 130px);
+}
+
+.game-end.corners .game-end-board {
+  width: calc(clamp(64px, 18vh, 130px) * 0.95);
+  height: calc(clamp(64px, 18vh, 130px) * 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-end-trophy.awarding {
+    animation-name: game-end-trophy-calm;
+  }
+}
+
+/* With less motion asked for: big in the middle and back again without the way between, fading. */
+@keyframes game-end-trophy-calm {
+  0% {
+    opacity: 0;
+    transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
+  }
+  15%,
+  70% {
+    opacity: 1;
+    transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
+  }
+  85% {
+    opacity: 0;
+    transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
+  }
+  86% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* „Menü“ alone in the corner is the only way on: a little bigger than „Nochmal“ there, its shelf still clear. */
+.game-end.corners .game-end-button.menu {
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
 }

@@ -49,7 +49,7 @@ import {
   type Building,
 } from "./building";
 import { deg, rad } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { CabDriver, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
 import { BAR_COLORS, Ball } from "./parts";
@@ -81,7 +81,7 @@ export function BuildingLevel(props: LevelProps) {
   const inMixer = (t: number) => machine.marbleAt(t).pt.x < SPIRIT.from.x;
 
   return (
-    <MachineStage machine={machine} level="building" {...props}>
+    <MachineStage machine={machine} level="building" start={{ x: MIXER.x + 6, y: MIXER.y, r: 96 }} {...props}>
       {(t) => (
         <>
           <Site ids={ids} />
@@ -117,8 +117,6 @@ export function BuildingLevel(props: LevelProps) {
           <Chute />
           <WreckingBall machine={machine} t={t} />
           <Sparkles x={(HOUSE.x0 + HOUSE.x1) / 2} y={HOUSE.top - ROOF.h} age={t - machine.tTree} n={12} spread={260} />
-
-          <TapHint t={t} x={MIXER.x - 30} y={MIXER.y + 230} />
         </>
       )}
     </MachineStage>

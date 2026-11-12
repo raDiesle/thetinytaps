@@ -5,11 +5,13 @@
 // nothing. Umami counts every page shown by itself (where visits begin and end, how many leave after one page, how
 // long a visit lasts); the events here add what it can't see. Everything goes through `track`, so another tool could
 // take Umami's place here alone. Only coarse facts are sent – which page or game, how long, which option – never
-// anything a child typed or chose that could tell who it is. This file imports nothing of the app, so the language,
-// options and install code can all report through it without a circle of imports.
+// anything a child typed or chose that could tell who it is. This file imports nothing of the app but the step on
+// screen (stepAddress.ts, which imports nothing of the app either), so the language, options and install code can all
+// report through it without a circle of imports.
 
 import { useEffect } from "react";
 import { useLocation } from "react-router";
+import { stepOf } from "./stepAddress";
 
 /** Umami's tracker, there once its script has loaded. */
 interface Umami {
@@ -82,7 +84,10 @@ export function PageTime() {
       const ms = performance.now() - since;
       since = undefined;
       if (ms < MIN_PAGE_MS) return;
+      // How far a game got: the page, scene or round shown last (`?seite=`) and how many were shown.
+      const step = stepOf(pathname);
       track("seite", {
+        ...(step && { schritt: step.step, schritte: step.count }),
         // Below the router's base (/en/…), so the same game is one page in every language; `sprache` tells them apart.
         seite: pathname,
         dauer: durationStep(ms),

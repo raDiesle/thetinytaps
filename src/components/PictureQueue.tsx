@@ -1,9 +1,9 @@
 import { Fragment } from "react";
 import { waitingMascotPictures } from "@/content/ideas/mascotStatus";
 import { PICTURE_QUEUE, type QueuedPicture } from "@/content/pictureQueue";
-import { type Grid, planQueue, REQUEST_PRICE } from "@/content/pictureQueuePlan";
+import { costOf, type EngineId, type Grid, planQueue } from "@/content/pictureQueuePlan";
 
-const dollars = (requests: number) => `≈ ${(requests * REQUEST_PRICE.batch).toFixed(3).replace(".", ",")} $`;
+const dollars = (sheets: { engine: EngineId }[]) => `≈ ${costOf(sheets).toFixed(3).replace(".", ",")} $`;
 const gridName = (grid: Grid) => grid.replace("x", "×");
 
 /** What a sheet's pictures have in common, in words: „1:1, 512 px, freigestellt“. */
@@ -40,10 +40,12 @@ export function PictureQueue() {
         🖼️ Offene Bilder: {PICTURE_QUEUE.length} {PICTURE_QUEUE.length === 1 ? "wartet" : "warten"} auf Gemini
       </h2>
       <p className="ideas-hint">
-        Jedes Bild, um das gebeten wird, kommt erst hierher. Eine Anfrage an Gemini kostet gleich viel, ob sie ein Bild bringt oder einen Bogen aus zwei oder
-        vier kleinen, die danach zerschnitten werden. Darum warten kleine Bilder derselben Art, bis ihr Bogen voll ist; was schon so günstig geht wie möglich
-        (ein voller Bogen, ein großes Bild, das nie einen Bogen teilt), macht Claude gleich mit. Ein Bogen, der noch wartet, kostet jetzt gemacht eine Anfrage
-        mehr ({dollars(1)}) – Claude fragt dann, ob der Bogen noch warten soll. Sag z. B. „mach die günstigen Bilder“ oder „mach die wartenden Sticker jetzt“.
+        Jedes Bild, um das gebeten wird, kommt erst hierher, und keins wird einzeln gemacht, wo es einen Bogen teilen kann. Eine Anfrage an Gemini kostet gleich
+        viel, ob sie ein Bild bringt oder einen Bogen aus zwei oder vier, die danach zerschnitten werden: kleine Bilder kommen auf 1K-Bögen von Lite (≈ 0,004 $
+        das Bild), große auf 2K-Bögen von Nano Banana 2.1 (≈ 0,007 $ statt 0,017 $ allein). Darum warten Bilder derselben Art, bis ihr Bogen voll ist; was schon
+        so günstig geht wie möglich (ein voller Bogen, ein Geschichtenbild, das nach seinem eigenen ersten Bild gezeichnet wird), macht Claude gleich mit. Ein
+        Bogen, der noch wartet, kostet jetzt gemacht eine Anfrage mehr – Claude fragt dann, ob er noch warten soll. Sag z. B. „mach die günstigen Bilder“ oder
+        „mach die wartenden Sticker jetzt“.
       </p>
       {PICTURE_QUEUE.length === 0 ? (
         <p>Gerade wartet kein Bild.</p>
@@ -60,7 +62,7 @@ export function PictureQueue() {
               {plan.now.length > 0 && (
                 <tr>
                   <th colSpan={2}>
-                    ✅ Jetzt günstig: {plan.now.length} {plan.now.length === 1 ? "Anfrage" : "Anfragen"} {dollars(plan.now.length)}
+                    ✅ Jetzt günstig: {plan.now.length} {plan.now.length === 1 ? "Anfrage" : "Anfragen"} {dollars(plan.now)}
                     <small>Volle Bögen und Bilder, die nie einen Bogen teilen – Warten spart hier nichts.</small>
                   </th>
                 </tr>
@@ -74,7 +76,7 @@ export function PictureQueue() {
                     <th colSpan={2}>
                       ⏳ Bogen {gridName(w.grid)} ({kindOf(w.pictures[0])}): {w.pictures.length} von {w.pictures.length + w.missing} da, es{" "}
                       {w.missing === 1 ? "fehlt eins" : `fehlen ${w.missing}`}
-                      <small>Jetzt gemacht: eine Anfrage mehr, {dollars(1)}; die freien Felder werden dann zu Varianten zum Aussuchen.</small>
+                      <small>Jetzt gemacht: eine Anfrage mehr, {dollars([w])}; die freien Felder werden dann zu Varianten zum Aussuchen.</small>
                     </th>
                   </tr>
                   {rows(w.pictures)}

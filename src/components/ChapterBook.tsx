@@ -6,6 +6,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import type { TextsLanguageId } from "@/content/texts";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
+import { stepIndexInAddress, useStepAddress } from "@/lib/stepAddress";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
 import "./chapterBook.css";
 
@@ -94,8 +95,12 @@ export function ChapterBook({
     };
   }, [chapters, code]);
   const LAST = pages.length - 1;
-  const [index, setIndex] = useState(CONTENTS);
-  const indexRef = useRef(CONTENTS);
+  // A link to one of its pages (`?seite=7`) opens the book there, else at its table of contents.
+  const [first] = useState(() => stepIndexInAddress(pages.length) ?? CONTENTS);
+  const [index, setIndex] = useState(first);
+  const indexRef = useRef(first);
+  // The page on screen is in the address: its number in the whole story, from 1 (stepAddress.ts).
+  useStepAddress(index === CONTENTS ? "inhalt" : index + 1);
   const { effects, ripple } = useTapFeedback();
 
   const show = useCallback(
@@ -111,7 +116,7 @@ export function ChapterBook({
     [pages, pictureOf],
   );
 
-  useEffect(() => show(CONTENTS), [show]);
+  useEffect(() => show(first), [show]);
 
   /** Opens a chapter from the table of contents. */
   const open = (chapter: number) => {

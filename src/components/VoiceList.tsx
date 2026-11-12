@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { CATEGORIES } from "@/content/games";
+import { pick } from "@/lib/language";
 import { stillToRecord, type VoiceGame, voiceLines } from "@/content/voiceLines";
 
 /** What a character costs with the turbo model, as measured in October and November 2026 – the same as `bun run voice make` (scripts/elevenlabs-voice.mjs). */
@@ -10,7 +11,7 @@ const CREDITS_PER_MONTH = 10_000;
 const GAME_BY_HREF = new Map(CATEGORIES.flatMap((c) => c.games.map((g) => [g.href, g])));
 const nameOf = (href: string) => {
   const game = GAME_BY_HREF.get(href);
-  return game ? `${game.emoji} ${game.title.de}` : "🏠 Alle Spiele";
+  return game ? `${game.emoji} ${pick(game.title, "de")}` : "🏠 Alle Spiele";
 };
 const number = (n: number) => Math.round(n).toLocaleString("de-DE");
 const linesOf = (game: VoiceGame) => game.groups.flatMap((g) => g.lines);

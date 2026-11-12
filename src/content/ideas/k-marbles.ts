@@ -95,6 +95,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Statt eines Startknopfs drei große Farbknöpfe (rot, gelb, blau). Jede Kugel bekommt die Farbe, die das Kind antippt. Unten fällt sie in die passende Röhre, und die Stimme zählt mit: „Drei rote!“. Volle Röhre: kleines Fest in ihrer Farbe.",
       why: "Farben und erste Mengen ganz nebenbei, ohne dass etwas falsch sein kann.",
       effort: "S",
+      done: true,
     },
     {
       id: "K-11",
@@ -172,6 +173,14 @@ export const marblesIdeas: IdeaArea = {
       why: "Ein Durchgang dauert etwa doppelt so lang, und unterwegs passiert immer wieder etwas Neues.",
       effort: "M",
       done: true,
+    },
+    {
+      id: "K-20",
+      emoji: "🎪",
+      title: "Kettenreaktion: der Vorhang geht zu statt Konfettiregen",
+      text: "Im Zirkus geht am Ende der Vorhang langsam zu, nur der Scheinwerfer bleibt auf der Kugel stehen, ein Tusch – statt 90 Konfettistücken und der Konfettikanone. Die anderen Bahnen enden mit einem Glockenschlag, und der Korb mit den Kugeln schließt seinen Deckel, statt dass Herzen und Sterne aufsteigen. Gehört zu A-30.",
+      why: "Ein Ende wie im Theater: ruhig, und es gehört zur Bahn.",
+      effort: "S",
     },
   ],
 };

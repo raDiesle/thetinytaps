@@ -1,6 +1,6 @@
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pageStill } from "@/lib/pageMotion";
-import { audioContext, decodeSound } from "@/lib/sfx";
+import { audioContext, decodeSound, speaker } from "@/lib/sfx";
 import { atMost, waitingFor } from "./soundWait";
 import { speak, stopSpeaking } from "./speech";
 import { recordingName } from "./voiceName";
@@ -147,7 +147,7 @@ function play(buffer: AudioBuffer) {
   return new Promise<void>((done) => {
     const source = ac.createBufferSource();
     source.buffer = buffer;
-    source.connect(ac.destination);
+    source.connect(speaker(ac));
     source.onended = () => {
       if (playing === source) playing = null;
       done();

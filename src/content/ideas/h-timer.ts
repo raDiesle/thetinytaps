@@ -293,5 +293,13 @@ export const timerIdeas: IdeaArea = {
       partial:
         "Eingebaut (7. November 2026, src/games/timer/voice.ts): jedes Bild sagt seinen Satz am Anfang, sobald die Seite stillliegt, „Gleich ist es so weit!“ zur Glocke und seinen Satz am Ende; Abwechseln und Tennis sagen „Wer fängt an?“, „Das Fuchskind fängt an!“ / „Das Bärenkind fängt an!“ und bei jedem Wechsel „Tauschen! Jetzt ist das … dran.“. 26 Sätze, nur Deutsch, noch nicht aufgenommen (bun run voice make --only timer), bis dahin still.",
     },
+    {
+      id: "H-75",
+      emoji: "🎂",
+      title: "Timer: das fertige Ding ist das Ende",
+      text: "Ist die Zeit um, zeigt das Bild selbst, dass es fertig ist – der Kuchen dampft einmal, die Glocke klingt –, und sonst kommt nichts dazu: keine Herzen und Sterne mehr. Gehört zu A-30.",
+      why: "Ein Timer soll beruhigen; das Ende bleibt so ruhig wie das Warten davor.",
+      effort: "S",
+    },
   ],
 };

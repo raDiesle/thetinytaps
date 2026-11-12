@@ -167,6 +167,11 @@ export class StoryPlayer {
     return this.story.sequence.steps.length;
   }
 
+  /** The whole story's length in seconds, opening included. */
+  get duration() {
+    return this.total;
+  }
+
   /** A step's length: the sequence's seconds plus showing the movement first. */
   private stepSeconds(step: number) {
     return this.story.sequence.steps[step].seconds + this.story.demo[step];
