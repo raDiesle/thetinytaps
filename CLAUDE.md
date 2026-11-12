@@ -646,7 +646,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
-  song files are named `musik-*.mp3`, see `/musik-erzeugen`. A game that runs along its own song (its steps follow it)
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. Music and voice play equally loud, sounds only a little
+  quieter (user feedback, November 2026: the song played 12 dB under the voice and was too quiet on a phone at full
+  volume): a song's volume is `songGain(<its measured LUFS>)`, effects are scaled by `EFFECTS_GAIN`, and everything
+  goes through the one limiter `speaker()` (`src/lib/loudness.ts`, `src/lib/sfx/core.ts`; `loudness.test.ts`). A game that runs along its own song (its steps follow it)
   starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
   when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
@@ -899,8 +902,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`
   – always as cheap as it can be (user decision, November 2026): every picture asked for goes into the queue
   (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“) and `bun run image queue` makes only
-  what is already as cheap as it gets; a small picture whose shared sheet isn't full waits for later sessions, unless
-  the user, asked in the session, says to make it now. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
+  what is already as cheap as it gets; a picture whose shared sheet isn't full waits for later sessions, unless
+  the user, asked in the session with the number of pictures short of their sheet, says to make it now. Never a
+  picture generated alone where a sheet can hold it – unless the user says to make it faster (user decision, 12
+  November 2026): small ones go four to a 1K sheet of Lite, big ones four to a 2K sheet of Nano Banana 2.1, which the
+  queue picks itself (idea A-33). Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work
 

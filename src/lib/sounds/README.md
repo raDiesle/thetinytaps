@@ -4,12 +4,14 @@ Real recordings for the sounds that should sound like the real thing (animals,
 bells, water …). `src/lib/sfx/` plays a file here when one has the sound's
 name, otherwise – and until the file is loaded – its synthesized sound.
 
-All recordings are from [Freesound](https://freesound.org) under
+Most recordings are from [Freesound](https://freesound.org) under
 **CC0 1.0** (public domain): free to use, no attribution required. The sources
-are still listed, so a sound can be swapped or traced back.
+are still listed, so a sound can be swapped or traced back. A few animal calls Freesound
+had no fitting recording for are made with ElevenLabs' sound effects (see „Made with ElevenLabs“ below).
 
 Each one is cut to the part used (column "Cut"), faded in and out, brought to
-a similar loudness and saved as mono MP3 (96 kbit/s), e.g.:
+a similar loudness – about −18 LUFS, a little under the voice's −17 (`src/lib/loudness.ts`; measure with
+`ffmpeg -i <file> -af ebur128 -f null -`) – and saved as mono MP3 (96 kbit/s), e.g.:
 
 ```bash
 ffmpeg -ss 0.15 -t 0.9 -i source.mp3 -af "highpass=f=45,afade=t=in:d=0.008,afade=t=out:st=0.75:d=0.15,volume=-6dB" -ac 1 -ar 44100 -c:a libmp3lame -b:a 96k meow.mp3
@@ -110,6 +112,36 @@ unless the search address ends in `&g=0`: add it, or whole packs of fitting reco
 | `yay.mp3`        | [Voice_Child_WowCelebration.wav](https://freesound.org/people/MrFossy/sounds/521900/)                                                    | MrFossy                   | 4.05–4.70 s        |
 | `yum.mp3`        | [Mmm girl 1.wav](https://freesound.org/people/esperar/sounds/170788/)                                                                    | esperar                   | 0.0–1.88 s         |
 | `zebra.mp3`      | [Zebras - Grant's Zebra Braying](https://freesound.org/people/TheKingOfGeeks360/sounds/850661/)                                          | TheKingOfGeeks360         | 0.20–1.40 s        |
+
+## Made with ElevenLabs
+
+Animal calls Freesound has none of are made with ElevenLabs' sound effects (`POST /v1/sound-generation`, model
+`eleven_text_to_sound_v2`) on the first account (`ELEVENLABS_API_KEY`; paid plans may use them commercially). They
+are **not free**: about 11 credits a second asked for (a 1.5 s call cost 17, a 2 s one 22, November 2026), counted
+like the voice's characters, so check what the account has left first. Ask for the animal's own voice and nothing
+else – „A single … , close up, clean recording, no background noise“, 1.5–2 s, `prompt_influence` 0.7 –, look at the
+loudness every 50 ms to cut it to the call itself (≈1–1.5 s), and save it small: these calls need no quality, so
+mono, 22.05 kHz, 32 kbit/s, which makes 4–7 KB a call instead of the 15–30 KB of the Freesound ones at 96 kbit/s
+(`soundFiles.test.ts` checks the files below stay so):
+
+```bash
+curl -s -o raw.mp3 -X POST "https://api.elevenlabs.io/v1/sound-generation?output_format=mp3_44100_128" \
+  -H "xi-api-key: $ELEVENLABS_API_KEY" -H "content-type: application/json" \
+  -d '{"text":"A pet hamster squeaking, a few tiny high-pitched squeaks, close up, clean recording, no background noise","duration_seconds":1.5,"prompt_influence":0.7}'
+ffmpeg -ss 0.3 -t 1.05 -i raw.mp3 -af "highpass=f=60,afade=t=in:d=0.01,afade=t=out:st=0.93:d=0.12,loudnorm=I=-16:TP=-1.5:LRA=11" -ac 1 -ar 22050 -c:a libmp3lame -b:a 32k hamster.mp3
+```
+
+A fly's buzz asked for quietly („a housefly buzzing“) came back as faint noise; asked for loud and close it worked.
+Not yet heard by ear (Claude checked only spectrum and loudness): listen to them before building more on them.
+
+| File            | Prompt (ElevenLabs sound effects, November 2026)                                                          | Cut         |
+| --------------- | --------------------------------------------------------------------------------------------------------- | ----------- |
+| `fly.mp3`       | Loud close-up buzzing of a big fly flying around the microphone, clear bzzz, nothing else (1.5 s, 0.8)    | 0.50–1.45 s |
+| `hamster.mp3`   | A pet hamster squeaking, a few tiny high-pitched squeaks, close up, clean recording, no background noise  | 0.30–1.35 s |
+| `moose.mp3`     | A moose calling, one long deep nasal bellow, close up, clean recording, no background noise (2 s)         | 0.25–1.65 s |
+| `otter.mp3`     | A river otter chirping and squeaking, close up, clean recording, no water, no background noise            | 0.05–1.35 s |
+| `peep.mp3`      | A single baby chick peeping, close up, clean recording, no background noise (1.5 s, 0.6)                  | 0.00–1.25 s |
+| `polarbear.mp3` | A single polar bear growling once, a deep grumbling growl, close up, clean recording, no background noise | 0.00–1.70 s |
 
 The animal calls added for „Wer macht das Geräusch?“ in Was gehört zum Tier? (November 2026) were picked by their
 pages and levels, not yet by ear: `llama.mp3` is an alpaca, `boar.mp3` a domestic pig's rough grunt,

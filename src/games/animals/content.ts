@@ -571,7 +571,7 @@ export const ANIMALS: Animal[] = [
     home: "eis",
     // It swims in the sea, and its cubs are born in a den of snow.
     alsoLives: ["meer", "teich", "fluss", "riff", "hoehle"],
-    sound: real("growl", playRoar),
+    ...calls("polarbear", playRoar),
   },
   {
     id: "krokodil",
@@ -701,7 +701,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["erdnuss", "mais", "heu", "moehre", "apfel", "salat", "banane", "trauben", "melone", "blaetter", "blume", "kaese", "wurm", "holz", "honig"],
     home: "kaefig",
     alsoLives: ["bau", "mauseloch"],
-    sound: real("mouse", playSqueak),
+    ...calls("hamster", playSqueak),
   },
   {
     id: "nilpferd",
@@ -745,6 +745,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["holz", "heu", "salat", "apfel", "moehre", "bambus", "blume", "nuss", "erdnuss", "banane", "trauben", "melone", "mais"],
     home: "wald",
     alsoLives: ["dschungel", "bambuswald", "baum"],
+    ...calls("moose", quiet),
   },
   {
     id: "faultier",
@@ -766,6 +767,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["garnele", "fleisch", "knochen", "wurm", "fliege"],
     home: "fluss",
     alsoLives: ["teich", "meer", "riff", "bau", "biberburg"],
+    ...calls("otter", playSqueak),
   },
   {
     id: "hai",
@@ -861,6 +863,9 @@ export const ANIMALS: Animal[] = [
   { id: "pfau", emoji: "🦚", name: "Pfau", the: "der Pfau", ...calls("peacock", playSquawk) },
   { id: "muecke", emoji: "🦟", name: "Mücke", the: "die Mücke", ...calls("mosquito", playBuzz) },
   { id: "schlange", emoji: "🐍", name: "Schlange", the: "die Schlange", ...calls("hiss", playHiss) },
+  // Their calls made with ElevenLabs' sound effects (November 2026), like the polar bear's, hamster's, elk's and otter's.
+  { id: "kueken", emoji: "🐤", name: "Küken", the: "das Küken", ...calls("peep", playTweet) },
+  { id: "fliege", emoji: "🪰", name: "Fliege", the: "die Fliege", ...calls("fly", playBuzz) },
 ];
 
 /**
@@ -869,7 +874,7 @@ export const ANIMALS: Animal[] = [
  * its words in each translated language, and that these have none yet – once translated, take them off this list.
  */
 export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
-  animals: ["hahn", "taube", "truthahn", "pfau", "muecke", "schlange"],
+  animals: ["hahn", "taube", "truthahn", "pfau", "muecke", "schlange", "kueken", "fliege"],
   foods: [],
   homes: [],
   gifts: [],

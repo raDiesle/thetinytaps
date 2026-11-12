@@ -51,7 +51,9 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest 
    recording, `Animal.call`); the child taps below which animal it was. A wrong one calls with its own voice and says
    „Das ist …“, so the two can be compared; the right one opens the curtain, there it stands („Da ist ja …“) and calls
    once more. Every animal with a recording of its own takes part (`SOUND_ANIMALS`: every `call` in `content.ts`), the
-   farm's, the wood's, the zoo's and some only here (Hahn, Taube, Truthahn, Pfau, …).
+   farm's, the wood's, the zoo's and some only here (Hahn, Taube, Truthahn, Pfau, Küken, Fliege, …). Since November
+   2026 calls Freesound had none of are made with ElevenLabs' sound effects (Eisbär, Hamster, Elch, Otter, Küken,
+   Fliege; how and at what size in `src/lib/sounds/README.md`, „Made with ElevenLabs“).
 
 Each round is mounted anew (`key={turn}`) and reports `onSolved(misses)` when the right thing is picked and `onNext()`
 when the reaction has been watched; the step and the animals still to come live in `AnimalsRounds`, which also hands
@@ -125,7 +127,8 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
     brays, barks, quacks and honks, screeches, buzzing, squeaks, chirps, hisses, the hens' clucks and gobbles) are a
     group in `SOUND_LOOKALIKES` (`sounds.ts`) and never dealt together (`dealSound`). Every calling animal has a
     recording of its own (`Animal.call`, a file in `src/lib/sounds/`, used by no other animal of this game – no bubbles
-    for the fish, no growl shared by the bears), keeps at least three others it isn't alike to, and a new one joins a
+    for the fish, no growl shared by the bears; where Freesound has none, one made with ElevenLabs – the animal's voice
+    alone, ≈1–1.5 s, mono 22.05 kHz 32 kbit/s, `soundFiles.test.ts`), keeps at least three others it isn't alike to, and a new one joins a
     group where it sounds like one (`content.test.ts`). What is heard is still until the child taps the curtain, and
     hammering it plays the call again only after `REPEAT_PAUSE_MS` (it only sways meanwhile).
   - Two animals never share an emoji (no alpaca beside the llama), and only animals with an emoji of their own take part – no woodpecker or mole drawn as another bird or animal (`content.test.ts`).

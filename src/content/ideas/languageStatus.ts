@@ -369,7 +369,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🔊 Wer macht das Geräusch? (Z-15) und „Was drankommt“ oben rechts",
         recorded: true,
         languages: { de: "done" },
-        note: "Neu am 11. November 2026, nur Deutsch: der Name der Art, ihre Frage, „Hör mal! Wer ist hinter dem Vorhang?“ und die neuen Tiere Hahn, Taube, Truthahn, Pfau, Mücke und Schlange (GERMAN_ONLY in content.ts). „Da ist ja …“ und „Das ist …“ sind die Sätze von „Wer schaut da raus?“. Die Wahl „Was drankommt“ ist übersetzt; ihre Liste stand vorher hinter ⚙️, die „Schwierigkeit“ ist weg. Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto).",
+        note: "Neu am 11. November 2026, nur Deutsch: der Name der Art, ihre Frage, „Hör mal! Wer ist hinter dem Vorhang?“ und die neuen Tiere Hahn, Taube, Truthahn, Pfau, Mücke und Schlange, am 12. November 2026 Küken und Fliege (GERMAN_ONLY in content.ts). „Da ist ja …“ und „Das ist …“ sind die Sätze von „Wer schaut da raus?“. Die Wahl „Was drankommt“ ist übersetzt; ihre Liste stand vorher hinter ⚙️, die „Schwierigkeit“ ist weg. Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto).",
       },
     ],
   },

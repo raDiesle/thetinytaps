@@ -2,7 +2,8 @@ import type { Localized } from "@/lib/language";
 import { type Animal, ANIMALS } from "./content";
 
 // „Wer macht das Geräusch?“ (Z-15): an animal calls behind a curtain and the child taps who it was. Every animal with
-// a call of its own (`Animal.call`, a real CC0 recording from src/lib/sounds/) takes part, each once.
+// a call of its own (`Animal.call`, a recording from src/lib/sounds/: CC0 from Freesound or made with ElevenLabs) takes
+// part, each once.
 
 /** The animals that call behind the curtain, each with a recording no other animal has. */
 export const SOUND_ANIMALS: Animal[] = ANIMALS.filter((a) => a.call);
@@ -13,15 +14,15 @@ export const SOUND_ANIMALS: Animal[] = ANIMALS.filter((a) => a.call);
  */
 export const SOUND_LOOKALIKES: string[][] = [
   // Growls and roars.
-  ["baer", "loewe", "tiger", "gorilla", "krokodil"],
+  ["baer", "eisbaer", "loewe", "tiger", "gorilla", "krokodil"],
   // Grunts and snorts.
   ["schwein", "wildschwein", "igel", "nilpferd", "nashorn", "kamel"],
   // Bleats.
   ["schaf", "ziege", "lama"],
   // Neighs and brays.
   ["pferd", "esel", "zebra"],
-  // The bellows of the deer.
-  ["hirsch", "kuh"],
+  // The bellows of the deer and the elk.
+  ["hirsch", "elch", "kuh"],
   // Barks.
   ["hund", "seehund", "fuchs"],
   // Clucks, crows and gobbles: a child knows them all from the farm's hens.
@@ -33,11 +34,11 @@ export const SOUND_LOOKALIKES: string[][] = [
   // Screeches.
   ["papagei", "pfau", "adler"],
   // Buzzing and whining.
-  ["biene", "muecke"],
+  ["biene", "muecke", "fliege"],
   // Squeaks and chatters of small animals.
-  ["maus", "eichhoernchen", "fledermaus", "waschbaer"],
-  // Chirps.
-  ["vogel", "grashuepfer"],
+  ["maus", "hamster", "eichhoernchen", "fledermaus", "waschbaer", "otter"],
+  // Chirps and peeps.
+  ["vogel", "kueken", "grashuepfer"],
 ];
 
 /** Whether `a` and `b` sound alike to a child (`SOUND_LOOKALIKES`). */
