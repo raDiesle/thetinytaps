@@ -64,6 +64,13 @@ In a fresh worktree run `bun install` first.
   and charged by the service while its answer never came, and the line had to be bought again; so the voice script
   never sends an unanswered request again (`ANSWER_LIMIT_MS`) and keeps the Mac awake while it runs. When the user wants
   to stop for the night, say how long the run still takes and let it end first.
+  Tapsi's voice (`stimme.json`) was made with Voice Design and lives only in the first ElevenLabs account and its
+  workspace: no other account's key can use it, and it can't be shared there (November 2026: hours went into looking for
+  it under a second key). While the first account's credits are spent, the second account (`ELEVENLABS_API_KEY_2` in
+  `~/.zshrc`, used as `ELEVENLABS_API_KEY="$ELEVENLABS_API_KEY_2" bun run voice …`) records with its clone „Tapsi Coach
+  (Klon)“ (`--voice iGb9o2uzfokG3rIleRfg`, made by `bun run voice clone`); check a key's account first
+  (`bun run voice credits`: Creator is the first, Starter the second). The clone sounds close, not the same: use it for
+  whole parts or languages, never a few lines among the original's, and say so in `languageStatus.ts`.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
@@ -324,9 +331,15 @@ In a fresh worktree run `bun install` first.
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
   some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
   Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.
-- What the child taps to set things off is plainly marked (a glow, and a still hand pointing at it before the first tap)
-  and lies wholly in the picture, clear of the edges and the ✕. Where the picture moves away from it, a big button
-  brings it back.
+- What the child taps to set things off is plainly marked by the shared `TapHint` (`src/components/TapHint.tsx`): a
+  golden ring round it and a drawn hand pointing at it, still at first, and the longer the child doesn't find it the
+  clearer (user feedback, November 2026, from Kettenreaktion and Kleine Abenteuer: the 👆 and the yellow ring were too
+  plain and looked poor) – after a few seconds the hand taps and rings go out at each press, later the picture round it
+  darkens and both grow (`TAP_HINT_STAGES_MS`); that waiting is the one animation allowed before a tap. Never an emoji
+  finger nor a hint of a game's own, and never drawn inside a big svg: it is an HTML layer over the picture (a machine's
+  world point goes there by `cameraPoint`/`worldHint`). Its hand lies on the side where it covers nothing to tap and
+  stays whole on the screen (look at it at 844×390). What is marked lies wholly in the picture, clear of the edges and
+  the ✕. Where the picture moves away from it, a big button brings it back.
 - Where the child picks one of several (Zuordnen, Schatten, a quiz), exactly one choice fits: never offer a wrong
   choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
   The choices are as big as the room below (or beside) the picture allows – sized from that room as a size container,
@@ -335,7 +348,8 @@ In a fresh worktree run `bun install` first.
   text under the picture: no emoji, no bubble, no frame (user feedback from the Zuordnen games, November 2026: small
   buttons with room to spare, a loud topic bubble; `choiceRows` in `src/games/shadows/levels.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
-  animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
+  animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
+  waiting starts to move after its first stage). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie

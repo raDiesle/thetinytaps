@@ -1,6 +1,7 @@
 import { memo, useContext, useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/TapFeedback";
-import { cameraLayer, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
+import { cameraLayer, cameraPoint, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint } from "./level";
+import { TapHint } from "@/components/TapHint";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
 import { SITE_TRACK } from "./siteTrack";
 import { SLIDE_TRACK } from "./slideTrack";
@@ -875,6 +876,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     playBar(i, performance.now());
   };
 
+  const at = cameraPoint(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
       <TrackLook.Provider value={look}>
@@ -1089,13 +1091,14 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             t={t}
             onTake={take}
           />
-
-          {/* Before the first tap and after ⬆: a big hand on the middle thing on the shelf says „tap me“ */}
-          {(!started || lookingUp.current) && <ShelfHint />}
-          {/* Until the barrier has first been lifted, a big hand points at it while things wait there */}
-          {!watch && queue.current.length > 0 && gate.current.openedAt === -Infinity && <GateHint />}
         </svg>
       </TrackLook.Provider>
+      {/* Before the first tap and after ⬆: the shared hint on the middle thing on the shelf says „tap me“ */}
+      {(!started || lookingUp.current) && <TapHint key={`shelf${nextId.current}`} {...worldHint(at, SHELF_SPOT)} side="right" />}
+      {/* Until the barrier has first been lifted, the hint points at it from the left while things wait there */}
+      {!watch && queue.current.length > 0 && gate.current.openedAt === -Infinity && (
+        <TapHint key="gate" {...worldHint(at, { ...gatePivot(), r: 62 })} side="left" />
+      )}
       {/* Down the run, the ⬆ button in the bottom left corner takes the camera back up to the shelf */}
       {!done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
         <button
@@ -1344,18 +1347,9 @@ function Shelf({ things, filled, colors, t, onTake }: { things: Roller[]; filled
   );
 }
 
-/**
- * Says „tap a thing on the shelf, and it rolls“: a big hand points down at the
- * middle thing from the room above the wall, so it covers nothing. It stands
- * still, like every hint here.
- */
-function ShelfHint() {
-  return (
-    <text className="run-hint" x={SHELF.things[1] + 18} y="-26" fontSize="100" textAnchor="middle">
-      👇
-    </text>
-  );
-}
+/** Where the hint says „tap a thing on the shelf, and it rolls“: round the last thing, with the hand on the free wall to
+ * its right (above, it left the screen on a phone on its side; below, it covered the first row's xylophone). */
+const SHELF_SPOT = { x: SHELF.things[2], y: SHELF.y - 40, r: 64 };
 
 /** Under each place on the shelf its number key, which lets out the thing there; it goes down while `held`. */
 function ShelfKeys({ held, onTake }: { held: string | null; onTake: (i: number) => void }) {
@@ -1491,16 +1485,6 @@ function Gate({ lift, open, rang, glow }: { lift: number; open: boolean; rang: n
         )}
       </g>
     </g>
-  );
-}
-
-/** A big still hand pointing at the barrier from the left while things wait behind it, until it is first lifted. */
-function GateHint() {
-  const p = gatePivot();
-  return (
-    <text className="run-hint" x={p.x - 88} y={p.y + 28} fontSize="76" textAnchor="middle">
-      👉
-    </text>
   );
 }
 
