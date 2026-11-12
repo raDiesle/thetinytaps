@@ -234,8 +234,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🌻 Unser Garten wächst",
         recorded: true,
-        languages: { de: "text", en: "done", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (10. November 2026), Titel und Sätze übersetzt auf Wunsch am 11. November 2026. Englisch von ElevenLabs gesprochen am 11. November 2026 mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“, die Credits des ersten waren aufgebraucht); die anderen Sprachen noch nicht aufgenommen: bis dahin liest die Stimme des Browsers.",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Neu (10. November 2026), Titel und Sätze übersetzt auf Wunsch am 11. November 2026. Von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“, die Credits des ersten waren aufgebraucht): Englisch am 11., Chinesisch, Hindi, Spanisch und Arabisch am 12. November 2026; Deutsch und Russisch noch nicht aufgenommen: bis dahin liest die Stimme des Browsers.",
       },
     ],
   },
@@ -336,8 +336,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Grundbedürfnisse: Aufs Töpfchen, Warm anziehen, Ein Pflaster, Frische Luft",
         recorded: true,
-        languages: { de: "text", en: "done", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, Bilder gemacht, übersetzt auf Wunsch am 10. November 2026. Englisch von ElevenLabs gesprochen am 11. November 2026 mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“); die anderen Sprachen fehlen noch (bis dahin still).",
+        languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
+        note: "Neu (9. November 2026): vier Karten in NEEDS (needs.ts) mit ihren Sätzen, Bilder gemacht, übersetzt auf Wunsch am 10. November 2026. Von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“): Englisch am 11., Chinesisch, Hindi, Spanisch und Arabisch am 12. November 2026; Deutsch und Russisch fehlen noch (bis dahin still).",
       },
     ],
   },
@@ -392,7 +392,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🎨 Die gemalten Paare und Helfer (painted/)",
         recorded: true,
         languages: { de: "text", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "text" },
-        note: "Am 7. November 2026 wurden die Emoji-Szenen durch gemalte Paare ersetzt (181, je zwei Bilder von Gemini; sie spielen, sobald ihre Bilder da sind). 108 davon behielten Namen und Gegenstück und damit ihre Übersetzung (content.scenes.<Sprache>.ts). Die übrigen 73, am selben Tag in alle sechs Sprachen übersetzt, sind – darunter Tor – Ball, Haltestelle – Bus, Toaster – Toast, Straßenkehrer, Schäfer, Prinzessin, Sandmann – sowie die mit neuem Gegenstück: Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin, Weihnachtsmann, Pizzabäcker, Konditorin, Paketbotin, Krankenpfleger, Polizist, Koch, Eisverkäuferin, Kassierer, Kellnerin, Gärtner. Außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026).",
+        note: "Am 7. November 2026 wurden die Emoji-Szenen durch gemalte Paare ersetzt (181, je zwei Bilder von Gemini; sie spielen, sobald ihre Bilder da sind). 108 davon behielten Namen und Gegenstück und damit ihre Übersetzung (content.scenes.<Sprache>.ts). Die übrigen 73, am selben Tag in alle sechs Sprachen übersetzt, sind – darunter Tor – Ball, Haltestelle – Bus, Toaster – Toast, Straßenkehrer, Schäfer, Prinzessin, Sandmann – sowie die mit neuem Gegenstück: Saftpresse – Orange, Feuerstelle – Feuer, Torte – Kerzen, Zahnärztin, Weihnachtsmann, Pizzabäcker, Konditorin, Paketbotin, Krankenpfleger, Polizist, Koch, Eisverkäuferin, Kassierer, Kellnerin, Gärtner. Außer Deutsch und Russisch von ElevenLabs gesprochen (7./8. November 2026). Die sieben Paare, die am 11. November 2026 dazukamen (Astronautin, Hubschrauberpilotin, Koch, Pianistin, Radfahrerin, Fee, Tiefseeforscherin), am 12. November 2026 mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“), ganze Paare je Stimme.",
       },
       {
         label: "🗂️ Die Namen der Themen",
