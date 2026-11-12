@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { makeCloud, makeConfetti, makeParrot, mergeStatic, seeded } from "../../three/props";
-import { ALT, RAINBOW_BAND, RAINBOW_CENTER, RAINBOW_RADIUS, SUN, SUN_Z } from "./layout";
+import { ALT, SUN, SUN_Z } from "./layout";
 import { curveZ, goes, S, starTime, TRAVEL } from "./script";
-import { makeBalloon, makeMeadow, makePlane, makePuff, makeRain, makeRainbow, makeRainCloud, makeStar, makeSun, makeWolle } from "./scenery";
+import { makeBalloon, makeBrush, makeMeadow, makePlane, makePuff, makeRain, makeRainbow, makeRainCloud, makeStar, makeSun, makeWolle } from "./scenery";
 
 // Puts „Die Wolkenreise“ together: the meadow, the clouds along the way, the rain cloud with the
 // sun, and one thing for every go of every movement (planes, balloons, stars, puffs). build() in
@@ -13,7 +13,7 @@ const PLANE_COLORS = ["#e8473c", "#3f8ae8", "#4cb050", "#f08a24", "#9b6bff"];
 const BALLOON_COLORS = ["#ff4d6d", "#ffd23f", "#3ec1d3", "#7bd389", "#b388ff", "#ff9f43"];
 
 /** A white cloud scaled down, with its long side along `yaw`. */
-function cloudAt(seed: number, x: number, y: number, z: number, size: number, yaw = 0) {
+export function cloudAt(seed: number, x: number, y: number, z: number, size: number, yaw = 0) {
   const cloud = makeCloud(seed);
   cloud.position.set(x, y, z);
   cloud.scale.setScalar(size);
@@ -26,7 +26,7 @@ export function makeWorld(scene: THREE.Scene) {
   scene.add(ground, mergeStatic(things));
 
   // White clouds: far away all round, towers along the curves (one beside every star, on its side),
-  // a bank under each end of the rainbow, and a few under the way so the sky has depth.
+  // and a few under the way so the sky has depth (the banks under the rainbow's ends come with the rainbow, in index.ts).
   const sky = new THREE.Group();
   const rnd = seeded(77);
   for (let i = 0; i < 26; i++) {
@@ -40,10 +40,6 @@ export function makeWorld(scene: THREE.Scene) {
     const side = n % 2 === 0 ? -1 : 1;
     const z = curveZ(TRAVEL[S.stars] + starTime(n));
     for (let k = 0; k < 4; k++) sky.add(cloudAt(300 + n * 4 + k, side * (7 + rnd() * 1.5), ALT - 10 + k * 5, z, 0.45, Math.PI / 2 + (rnd() - 0.5) * 0.4));
-  }
-  for (const side of [1, -1]) {
-    const x = side * (RAINBOW_RADIUS - RAINBOW_BAND * 3);
-    sky.add(cloudAt(400 + side, x, RAINBOW_CENTER.y - 1, RAINBOW_CENTER.z, 0.9));
   }
   for (let i = 0; i < 8; i++) sky.add(cloudAt(500 + i, (rnd() - 0.5) * 50, ALT - 9 - rnd() * 3, 20 - i * 12, 0.6 + rnd() * 0.4, rnd() * 3));
   scene.add(mergeStatic(sky));
@@ -94,14 +90,21 @@ export function makeWorld(scene: THREE.Scene) {
   const rain = makeRain(700);
   scene.add(rain.mesh);
   const rainbow = makeRainbow();
-  rainbow.group.position.copy(RAINBOW_CENTER);
   scene.add(rainbow.group);
-  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.7, 16, 12), new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.9 }));
+  // A brush for each paw while the rainbow is painted.
+  const brushes = [makeBrush(), makeBrush()];
+  for (const brush of brushes) {
+    brush.group.visible = false;
+    brush.group.matrixAutoUpdate = false;
+    scene.add(brush.group);
+  }
+  // The sparkling tip, as big as a band's width in the fox's units of the arc clip; scaled with the rainbow.
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.9 }));
   tip.visible = false;
   scene.add(tip);
 
   const confetti = makeConfetti(220);
   const sparkle = makeConfetti(120, ["#ffd23f", "#fff3a0", "#ffffff"], 0.8);
   scene.add(confetti.mesh, sparkle.mesh);
-  return { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, tip, confetti, sparkle };
+  return { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, brushes, tip, confetti, sparkle };
 }

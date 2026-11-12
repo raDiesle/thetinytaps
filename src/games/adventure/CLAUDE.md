@@ -11,7 +11,10 @@ on a meadow by a village. Tapsi waves Kiki over, flaps its arms so Wolle rises (
 ducks under small planes (camera right behind and just over the head), taps balloons that float to the paws
 until they pop, sits down for the fast part, leans left and right through the curves for the stars beside the
 cloud towers (Wolle slaloms and banks, the camera leans with it), stands up under the rain cloud, pushes its
-grey puffs up and away until the sun comes out, paints a rainbow band by band with big arm arcs, turns round
+grey puffs up and away until the sun comes out, paints a rainbow band by band with a long brush in each paw (the left half, then the right), standing in its
+middle: the bristles go round circles in front of it (`ARC`, `brushArm` in `three/clips/motion.ts`), the rainbow far
+off is those circles as the held-still camera sees them, and each band is painted up to where the tip is seen
+(`paintedTo` in `index.ts`, `three/clips/arc.test.ts`), turns round
 to us and cheers on Wolle (it bounces under every landing), and waves goodbye while Kiki flies off into the
 sun. Kiki changes to Tapsi's left once, ahead of it, at the balloons (`KIKI` in `index.ts`), because the
 camera often looks from the right from then on. The timing helpers (`passTime`, `tapTime`, `starTime`,

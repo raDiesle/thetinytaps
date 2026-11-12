@@ -13,8 +13,12 @@ import { WHOLE_CLIPS } from "./whole";
 // One file per body part the clip is about; motion.ts has their building blocks.
 
 export {
+  ARC,
   ARC_PERIOD,
+  ARC_TOP,
+  arcAngle,
   arcDraw,
+  arcRadius,
   BRUSH_HIT,
   BRUSH_PERIOD,
   CAST_PERIOD,

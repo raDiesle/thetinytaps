@@ -1,6 +1,11 @@
-import type { Pose } from "../guide";
+import { type ArmPose, lerpArm, type Pose } from "../guide";
 import {
+  ARC,
+  arcAngle,
   arcDraw,
+  arcLean,
+  arcRadius,
+  brushArm,
   BRUSH_PERIOD,
   castSwing,
   CHEER_PERIOD,
@@ -387,18 +392,28 @@ export const ARM_CLIPS = clips({
   },
 
   arc: (t, p) => {
-    // A big half circle: the arm goes out to the side and up over the head, stays a moment and drops
-    // back; the left arm first, then the right one. The body and head go along with the paw.
-    const { left, up, down } = arcDraw(t);
-    const draw = up * (1 - down);
-    const arm = left ? p.armL : p.armR;
-    arm.spread = 0.3 + draw * 2.6;
-    arm.raise = draw * 0.35;
-    arm.elbow = 0.1;
+    // A rainbow painted with a long brush: the arm goes out to the band's end, then the brush's tip goes
+    // round the band up over the head, stays a moment and the arm drops back; the left arm first, then the
+    // right one. The body leans out with the arm and over to the other side at the top; the other arm
+    // holds its brush ready in front.
+    const { left, band, reach, along, down } = arcDraw(t);
     const side = left ? 1 : -1;
-    p.lean = -side * Math.sin(draw * Math.PI) * 0.12;
-    p.headTilt = -side * draw * 0.15;
-    p.headPitch = -draw * 0.35;
+    const angle = arcAngle(along);
+    const r = arcRadius(band);
+    const lean = arcLean(side, angle);
+    const ready: ArmPose = { raise: 0.5, spread: 0.2, elbow: 1.1, twist: 0 };
+    const stroke = brushArm(side, side * r * Math.cos(angle), ARC.y + r * Math.sin(angle), ARC.z, lean);
+    const draw = reach * (1 - down);
+    if (left) {
+      p.armL = lerpArm(ready, stroke, draw);
+      p.armR = ready;
+    } else {
+      p.armR = lerpArm(ready, stroke, draw);
+      p.armL = ready;
+    }
+    p.lean = lean * draw;
+    p.headTilt = -side * along * draw * 0.15;
+    p.headPitch = -along * draw * 0.35;
   },
 
   kite: (t, p) => {

@@ -73,7 +73,8 @@ export const restPose = (): Pose => ({
 });
 
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
-const lerpArm = (a: ArmPose, b: ArmPose, k: number): ArmPose => ({
+/** Blends two arm poses. */
+export const lerpArm = (a: ArmPose, b: ArmPose, k: number): ArmPose => ({
   raise: lerp(a.raise, b.raise, k),
   spread: lerp(a.spread, b.spread, k),
   elbow: lerp(a.elbow, b.elbow, k),
@@ -113,8 +114,11 @@ const SEE_THROUGH = 0.4;
 const THIGH = 0.24;
 const SHIN = 0.24;
 const FOOT = 0.07;
-const UPPER_ARM = 0.21;
-const FOREARM = 0.19;
+/** Length of the upper arm and of the forearm down to the wrist, in the fox's own units. */
+export const UPPER_ARM = 0.21;
+export const FOREARM = 0.19;
+/** Where the left shoulder sits on the spine (x to the fox's left); the right one is mirrored. */
+export const SHOULDER = { x: 0.2, y: 0.36 };
 /** Where a paw holds a bar (hand space): in front of the palm, resting on the curled fingers. */
 const GRIP = new THREE.Vector3(0, -0.045, 0.04);
 /** How far the fingers curl round a bar they hold (rad). */
@@ -209,6 +213,14 @@ interface Leg {
   foot: THREE.Group;
   /** The toes, bending at the ball of the foot. */
   toes: THREE.Group;
+}
+
+/** How high a leg reaches from the hip down to the ankle. */
+const legHeight = (l: LegPose) => THIGH * Math.cos(l.lift) * Math.cos(l.spread) + SHIN * Math.cos(l.lift - l.knee);
+
+/** How high the hips stand above the root in `p` (the fox's own units), without breathing. */
+export function hipsHeight(p: Pose) {
+  return Math.max(legHeight(p.legL), legHeight(p.legR)) + FOOT + p.toes * 0.05 + p.lift;
 }
 
 export class Guide {
@@ -447,7 +459,7 @@ export class Guide {
     const padMat = fur("#e7a3a0");
     const makeArm = (side: 1 | -1, hand: THREE.Group): Arm => {
       const shoulder = new THREE.Group();
-      shoulder.position.set(0.2 * side, 0.36, 0);
+      shoulder.position.set(SHOULDER.x * side, SHOULDER.y, 0);
       const upper = new THREE.Group();
       shoulder.add(upper);
       const joint = mesh(new THREE.SphereGeometry(0.054, 20, 16), furMat);
@@ -692,10 +704,8 @@ export class Guide {
 
   /** Puts the fox into `pose`; `time` (s) drives blinking, breathing and the tail. */
   apply(p: Pose, time: number) {
-    const legHeight = (l: LegPose) => THIGH * Math.cos(l.lift) * Math.cos(l.spread) + SHIN * Math.cos(l.lift - l.knee);
-    const stand = Math.max(legHeight(p.legL), legHeight(p.legR));
     const breathe = Math.sin(time * 2.2) * 0.006;
-    const height = stand + FOOT + p.toes * 0.05 + p.lift + breathe;
+    const height = hipsHeight(p) + breathe;
     this.hips.position.set(p.shift, height, 0);
     // The turn of a pose is on top of where the story points the fox (root).
     this.hips.rotation.y = p.turn;
@@ -712,6 +722,7 @@ export class Guide {
     const step = live ? dt : 0;
 
     // Standing on one leg, the upper body leans a little over the other; the head stays more upright than the body.
+    const stand = Math.max(legHeight(p.legL), legHeight(p.legR));
     const lifted = (l: LegPose) => stand - legHeight(l);
     this.spine.rotation.set(p.bend, p.twist, -p.lean + THREE.MathUtils.clamp((lifted(p.legL) - lifted(p.legR)) * 0.4, -0.1, 0.1));
     this.head.rotation.set(p.headPitch, p.headYaw - p.twist * 0.2, -p.headTilt + p.lean * 0.3);
@@ -812,6 +823,13 @@ export class Guide {
   hipsPoint(local: THREE.Vector3, out: THREE.Vector3) {
     this.hips.updateWorldMatrix(true, false);
     return this.hips.localToWorld(out.copy(local));
+  }
+
+  /** The forearm's place in the world (elbow at the origin, the wrist at -FOREARM on y), e.g. for a brush held along it. */
+  forearm(hand: "L" | "R", out: THREE.Matrix4) {
+    const elbow = (hand === "L" ? this.armL : this.armR).elbow;
+    elbow.updateWorldMatrix(true, false);
+    return out.copy(elbow.matrixWorld);
   }
 
   /** Where a paw would hold a bar right now, in world space. */

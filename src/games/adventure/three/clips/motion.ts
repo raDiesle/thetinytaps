@@ -1,5 +1,5 @@
 import type { MotionClipId } from "../../library/types";
-import { restPose, type Pose } from "../guide";
+import { type ArmPose, FOREARM, type Pose, restPose, SHOULDER, UPPER_ARM } from "../guide";
 
 // Building blocks the clips are made of (phases, crouching, steps, jumps) and the
 // timings stories match their world to (jump, brush, crank, key, stop dance).
@@ -148,15 +148,92 @@ export const TAP_HIT = 0.43;
 export const LEAN_PERIOD = 3.4;
 /** Seconds of one jump for joy in the cheer clip. */
 export const CHEER_PERIOD = 0.8;
-/** Seconds of one go of the arc clip: the left arm draws a half circle up over the head, then the right one. */
+/** Seconds of one go of the arc clip: the left arm paints a band's left half up over the head, then the right one its right half. */
 export const ARC_PERIOD = 4;
-/** Which arm draws in the arc clip `t` s in (true: the left one) and how far up it has come, 0..1. */
+/**
+ * The arc clip paints a rainbow with a long brush, one band each go, outer band first. The bristles go round one
+ * circle standing upright in front of the fox, its middle on the fox's middle (hips space, the fox's units), so
+ * the fox stands in the middle of the rainbow; a story puts its rainbow where that circle is seen from its camera.
+ * Each band's circle is a little smaller than the one before.
+ */
+export const ARC = {
+  /** The middle of the circles: a little above the hips, in front of the body. */
+  y: 0.2,
+  z: 0.3,
+  /** The outer edge of the outer band, and how wide each band is. */
+  radius: 0.96,
+  band: 0.02,
+  bands: 6,
+  /** How far (rad) the ends of the bands reach below the middle's height. */
+  below: 0.2,
+  /** The brush, from the wrist along the forearm to the tip of its bristles. */
+  brush: 0.43,
+};
+/** How far round its half band the brush is, 0 at the band's end and 1 at its top, `along` 0..1. */
+export const arcAngle = (along: number) => -ARC.below + along * (Math.PI / 2 + ARC.below);
+/** The middle of band `band`'s circle. */
+export const arcRadius = (band: number) => ARC.radius - (band + 0.5) * ARC.band;
+/** Where in each half of the arc clip the brush is at the top: there that half of the band is finished. */
+export const ARC_TOP = 0.66;
+/**
+ * The arc clip `t` s in: which arm paints (true: the left one) the band `band`, how far the arm has come out to
+ * the band's end (`reach`), how far round the brush has painted (`along`), and how far it has dropped back after.
+ */
 export function arcDraw(t: number) {
   const k = phase(t, ARC_PERIOD);
   const left = k < 0.5;
   const half = left ? k * 2 : k * 2 - 1;
-  // Up for most of the half, a moment at the top, and back down quickly.
-  return { left, up: smooth(clamp01((half - 0.04) / 0.56)), down: smooth(clamp01((half - 0.72) / 0.24)) };
+  const band = Math.min(ARC.bands - 1, Math.max(0, Math.floor(t / ARC_PERIOD)));
+  // Out to the band's end, slowly round and up, a moment at the top, and back down quickly.
+  return {
+    left,
+    band,
+    reach: smooth(clamp01((half - 0.02) / 0.1)),
+    along: smooth(clamp01((half - 0.12) / (ARC_TOP - 0.12))),
+    down: smooth(clamp01((half - 0.74) / 0.22)),
+  };
+}
+/** How far the body leans (to the fox's left) while the arm on `side` (1 left, -1 right) paints at `angle`: out with the arm, then over to the other side. */
+export const arcLean = (side: number, angle: number) => side * (0.1 * Math.cos(angle) - 0.2 * Math.sin(angle));
+
+/** How far ahead of the need (fox units²) and how softly the upper arm starts rolling in `brushArm`. */
+const ROLL_MARGIN = 0;
+const ROLL_SOFT = 0.05;
+
+/**
+ * The arm on `side` (1 left, -1 right) reaching the brush's tip to (x, y, z) in hips space (x to the fox's left),
+ * the upper body leaning by `lean`: the elbow bends forwards as far as the distance needs, then the shoulder
+ * turns the arm out and forwards onto the point. Where turning out alone can't bring the tip that far to the side
+ * (the arm out level, the forearm bent forwards), the upper arm also rolls round itself, so the bend points out.
+ */
+export function brushArm(side: number, x: number, y: number, z: number, lean: number): ArmPose {
+  // Into the space of the spine, which leans round the hips (Guide.apply: spine.rotation.z = -lean), and
+  // mirrored onto the left arm: the right one is its mirror image (spread and twist count outwards on both).
+  const c = Math.cos(lean);
+  const s = Math.sin(lean);
+  const dx = (x * c - y * s) * side - SHOULDER.x;
+  const dy = x * s + y * c - SHOULDER.y;
+  const dz = z;
+  const reach = FOREARM + ARC.brush;
+  const d = Math.hypot(dx, dy, dz);
+  const elbow = Math.acos(Math.max(-1, Math.min(1, (d * d - UPPER_ARM ** 2 - reach ** 2) / (2 * UPPER_ARM * reach))));
+  // The tip in the upper arm's space: down the upper arm and on along the bent forearm.
+  const down = UPPER_ARM + reach * Math.cos(elbow);
+  const ahead = reach * Math.sin(elbow);
+  // The shoulder turns the arm as Rx(-raise) · Rz(spread) · Ry(twist) (Guide.apply). Rolling (twist) swings the
+  // forearm's bend outwards, turning out (spread) brings x to dx, turning forwards (raise) then y and z.
+  // Roll about as far as x needs, eased in and out (a soft maximum of 0 and the need), so the arm never snaps.
+  const need = dx * dx - down * down + ROLL_MARGIN;
+  const sideways = Math.sqrt((need + Math.sqrt(need * need + ROLL_SOFT ** 2)) / 2);
+  const twist = Math.asin(Math.min(1, sideways / Math.max(ahead, 1e-6)));
+  const px = ahead * Math.sin(twist);
+  const pz = ahead * Math.cos(twist);
+  // px·cos(spread) + down·sin(spread) = dx, always on the way that lifts the arm out and up beside the head
+  // (the other way would swing it up in front), so one stroke never jumps between the two.
+  const spread = Math.atan2(down, px) + Math.acos(Math.max(-1, Math.min(1, dx / Math.hypot(px, down))));
+  const y0 = px * Math.sin(spread) - down * Math.cos(spread);
+  const forwards = Math.atan2(dz, dy) - Math.atan2(pz, y0);
+  return { raise: -Math.atan2(Math.sin(forwards), Math.cos(forwards)), spread, elbow, twist };
 }
 
 /** Seconds of one turn of the crank clip; stories turn their crank with it. */

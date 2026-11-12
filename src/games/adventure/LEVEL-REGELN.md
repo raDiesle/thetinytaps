@@ -116,6 +116,13 @@ Fehler in späteren Leveln nicht wieder passiert.
   Höhe: Die Kamera schwenkt dafür seitlich heran, solange gedreht wird. Was gedreht wird, muss so
   gebaut sein, dass man die Drehung sieht: Ein Schlüsselring steht längs zum Schaft; ein flacher
   Ring, der sich um sich selbst dreht, sieht aus, als stünde er still.
+- **Was der Fuchs malt oder zeichnet, entsteht genau an der Pinselspitze**, so wie die Kamera sie
+  sieht, nie daneben (Regenbogen der Wolkenreise): Die Spitze fährt die Form selbst ab (im selben
+  Radius, Band für Band), und wie weit gemalt ist, wird jedes Bild aus der wirklichen Spitze nach dem
+  Posieren gerechnet, nicht aus dem Zeitplan. Steht das Gemalte weit weg (am Himmel), ist es die
+  vergrößerte Form, von der Kamera aus gesehen; die Kamera und der Boden des Fuchses stehen dann
+  still, sonst rutschen nah und fern gegeneinander. Der Fuchs steht genau in der Mitte dessen, was
+  er rundherum malt. `arc.test.ts` misst die Spitze am Gerüst.
 - **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse), steht die Kamera genau mittig hinter ihm
   und etwas tiefer, damit man sieht, wie es heranrollt.
 - **Schwingt etwas über den Fuchs hinweg** (Baumstamm), steht die Kamera weit hinter ihm und tief

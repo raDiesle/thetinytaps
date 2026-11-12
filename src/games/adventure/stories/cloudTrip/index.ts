@@ -1,6 +1,7 @@
 import * as THREE from "three";
-import { arcDraw, ARC_PERIOD, CHEER_PERIOD, clipPose, duckDepth, FLAP_PERIOD, LEAN_PERIOD, PUSH_PERIOD, sitProgress } from "../../three/clips";
-import { type Guide, lerpPose, type Pose } from "../../three/guide";
+import { ARC, ARC_PERIOD, ARC_TOP, arcDraw, CHEER_PERIOD, clipPose, duckDepth, FLAP_PERIOD, LEAN_PERIOD, PUSH_PERIOD, sitProgress } from "../../three/clips";
+import { FOREARM, GUIDE_SIZE, type Guide, hipsHeight, lerpPose, type Pose } from "../../three/guide";
+import { mergeStatic } from "../../three/props";
 import { updateMoved } from "../../three/matrices";
 import { sitDown } from "../../three/player";
 import { DAY, type SkyColors, type Stage } from "../../three/stage";
@@ -17,6 +18,8 @@ import {
   MEADOW_Z,
   PUFF_GAP,
   PUFF_RADIUS,
+  RAINBOW_COLORS,
+  RAINBOW_Z,
   SIT_DROP,
   SIT_Z,
   smooth,
@@ -30,7 +33,6 @@ import {
 import { LINES, OPENING_LINES } from "./lines";
 import { BALLOON_RADIUS } from "./scenery";
 import {
-  ARC_TOP,
   actLength,
   clipLength,
   curveZ,
@@ -50,7 +52,7 @@ import {
   TRAVEL,
 } from "./script";
 import { TRANSLATIONS } from "./translations";
-import { makeWorld } from "./world";
+import { cloudAt, makeWorld } from "./world";
 
 // „Die Wolkenreise“: the sun is stuck behind a rain cloud and everything is grey. Tapsi rides on
 // Wolle, a little cloud with a face, from the meadow up into the sky to fetch it: flapping lifts Wolle
@@ -87,7 +89,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const scene = stage.scene;
   stage.setSky(GREY, DAY, 0);
   stage.updateReflections();
-  const { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, tip, confetti, sparkle } = makeWorld(scene);
+  const { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, brushes, tip, confetti, sparkle } = makeWorld(scene);
 
   const focus = v3(0, 0, MEADOW_Z);
   const camPos = new THREE.Vector3();
@@ -96,18 +98,21 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const fromLook = new THREE.Vector3();
   const tmpA = new THREE.Vector3();
   const tmpB = new THREE.Vector3();
+  const tmpM = new THREE.Matrix4();
   const GREY_PUFF = new THREE.Color("#8a929c");
   const DARK_CLOUD = new THREE.Color("#6f7884");
   const WHITE = new THREE.Color("#ffffff");
   const DIM_FILL = new THREE.Color("#aab4c0");
   const DAY_FILL = new THREE.Color("#cfe8ff");
   let skyBand = -1;
+  /** The go of the arc clip while the brush paints, for afterPose; null while it doesn't. */
+  let paintNow: ReturnType<typeof arcDraw> | null = null;
   let lastTime = 0;
 
   // --- Wolle's way ---------------------------------------------------------
   const REST_Y = groundHeight(0, MEADOW_Z) + WOLLE_REST;
-  /** Wolle floats up and down a little where nothing has to meet a paw exactly. */
-  const bob = (step: number, time: number) => (step === S.stars || step === S.push ? 0 : Math.sin(time * 1.3) * 0.05);
+  /** Wolle floats up and down a little where nothing has to meet a paw exactly (the brush meets the rainbow far away). */
+  const bob = (step: number, time: number) => (step === S.stars || step === S.push || step === S.rainbow ? 0 : Math.sin(time * 1.3) * 0.05);
   /** How many wing beats have lifted Wolle `clip` s into the flapping: only the downstrokes lift. */
   const beats = (clip: number) => {
     if (clip <= 0) return 0;
@@ -167,8 +172,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         out.z = SUN_Z;
         break;
       case S.hooray: {
-        // Wolle turns round with Tapsi, to us; then bounces under every landing.
+        // Wolle turns round with Tapsi, to us, floating again; then bounces under every landing.
         out.z = SUN_Z;
+        out.y = ALT + bob(step, time) * smooth(local / TRAVEL[step]);
         out.yaw = AHEAD - Math.PI * smooth(local / TRAVEL[step]);
         if (clip > 0 && clip < clipLength(step)) {
           const k = (clip / CHEER_PERIOD) % 1;
@@ -302,8 +308,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         look.set(g.x, g.y + 2.4, g.z - 1.2);
         return;
       case S.rainbow:
-        // Behind and a bit higher, looking out at the sky where the rainbow is painted.
-        pos.set(g.x + 0.3, g.y + 1.5, g.z + 3.2);
+        // Right behind and a bit higher, looking out at the sky where the rainbow is painted: Tapsi in its middle.
+        pos.set(g.x, g.y + 1.5, g.z + 3.2);
         look.set(g.x, g.y + 3.2, g.z - 12);
         return;
       default: {
@@ -354,6 +360,44 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const k = smooth((t - 4) / (OPENING - 4));
     flight.getPoint(k * 0.98 + 0.02 * smooth(t / 4) * (1 - k), pos);
     look.copy(SUN).lerp(tmpB, smooth((t - 4.5) / (OPENING - 4.8)));
+  }
+
+  // --- The rainbow -----------------------------------------------------------
+  // The brush's tip goes round circles in front of Tapsi (`ARC`); far behind them the rainbow stands exactly
+  // where the camera of the rainbow step sees those circles, so the paint comes off the bristles, round
+  // Tapsi standing in its middle. The bands' circles stand upright across the way, like the rainbow, so the
+  // one is the other made bigger from the camera.
+  const arcHips = hipsHeight(clipPose("arc", 0));
+  const arcMiddle = fromTapsi(v3(0, (arcHips + ARC.y) * GUIDE_SIZE, ARC.z * GUIDE_SIZE), stationRoot, AHEAD, new THREE.Vector3());
+  const rainbowEye = new THREE.Vector3();
+  actShot(S.rainbow, 0, stationRoot, rainbowEye, tmpB);
+  /** How much bigger the rainbow is than the brush's circles (the fox's units). */
+  const rainbowScale = ((RAINBOW_Z - rainbowEye.z) / (arcMiddle.z - rainbowEye.z)) * GUIDE_SIZE;
+  rainbow.group.position
+    .copy(arcMiddle)
+    .sub(rainbowEye)
+    .multiplyScalar(rainbowScale / GUIDE_SIZE)
+    .add(rainbowEye);
+  rainbow.group.scale.setScalar(rainbowScale);
+  updateMoved(rainbow.group);
+  tip.scale.setScalar(ARC.band * 1.2 * rainbowScale);
+  // A bank of clouds under each end of the rainbow.
+  const ends = new THREE.Group();
+  for (const side of [1, -1]) {
+    const r = (ARC.radius - ARC.band * 3) * rainbowScale;
+    const end = rainbow.group.position.clone().add(v3(side * r * Math.cos(ARC.below), -r * Math.sin(ARC.below) - 0.8, 0));
+    ends.add(cloudAt(400 + side, end.x, end.y, end.z, 0.9));
+  }
+  scene.add(mergeStatic(ends));
+  /** Where on its band the brush's tip is seen right now, 0 at the band's end and 1 at the top, from the camera at `eye`. */
+  function paintedTo(left: boolean, eye: THREE.Vector3) {
+    guide.forearm(left ? "L" : "R", tmpM);
+    tmpA.set(0, -(FOREARM + ARC.brush), 0).applyMatrix4(tmpM);
+    // Through the bristles' tip onto the rainbow, into its own space.
+    const out = (RAINBOW_Z - eye.z) / (tmpA.z - eye.z);
+    tmpA.sub(eye).multiplyScalar(out).add(eye).sub(rainbow.group.position);
+    const angle = Math.atan2(tmpA.y, (left ? -1 : 1) * tmpA.x);
+    return clamp01((angle + ARC.below) / (Math.PI / 2 + ARC.below));
   }
 
   // --- Kiki ----------------------------------------------------------------
@@ -532,21 +576,24 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
 
     // The rainbow: every go of the arms paints one band, the left arm the left half from its end up to the
-    // top, then the right arm the right half; a bright spot shows where the paint is.
+    // top, then the right arm the right half; the band is painted up to where the brush's tip is seen.
     const arcClip = step === S.rainbow ? clip : step > S.rainbow ? 99 : -99;
-    const painting = Math.floor(arcClip / ARC_PERIOD);
     const draw = arcDraw(Math.max(0, arcClip));
-    for (let b = 0; b < 6; b++) {
+    const painting = Math.floor(arcClip / ARC_PERIOD);
+    const stroking = step === S.rainbow && arcClip >= 0 && painting < RAINBOW_COLORS.length && draw.down === 0;
+    paintNow = stroking ? draw : null;
+    for (let b = 0; b < RAINBOW_COLORS.length; b++) {
       if (b < painting) rainbow.paint(b, 1, 1);
       else if (b > painting || arcClip < 0) rainbow.paint(b, 0, 0);
-      else rainbow.paint(b, draw.left ? draw.up : 1, draw.left ? 0 : draw.up);
+      else if (!stroking) rainbow.paint(b, 1, draw.left ? 0 : 1);
     }
-    tip.visible = step === S.rainbow && arcClip >= 0 && painting < 6 && draw.up > 0.02 && draw.down === 0;
-    if (tip.visible) {
-      rainbow.edge(painting, draw.left, draw.up, tip.position);
-      rainbow.group.localToWorld(tip.position);
+    tip.visible = false;
+    for (const brush of brushes) {
+      brush.group.visible = step === S.rainbow && clip >= -0.6;
+      brush.dip(RAINBOW_COLORS[Math.min(RAINBOW_COLORS.length - 1, Math.max(0, painting))]);
     }
     if (step === S.rainbow) {
+      if (atClip(-0.6)) for (const hand of ["L", "R"] as const) sparkle.burst(guide.gripPoint(hand, tmpA), 14, 1.5);
       for (let h = 0; h < 12; h++) {
         if (atClip((h + ARC_TOP) * (ARC_PERIOD / 2))) {
           cue("chime");
@@ -598,9 +645,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         const travel = f.lead - f.demo;
         orbitBlend(g, fromPos, fromLook, camPos, camLook, smooth(f.local / Math.max(1.2, travel)), camPos, camLook);
       }
-      // A gentle breathing of the camera, like it is held by hand.
-      camPos.x += Math.sin(f.time * 0.6) * 0.03;
-      camPos.y += Math.sin(f.time * 0.8) * 0.02;
+      // A gentle breathing of the camera, like it is held by hand; held still while the rainbow is painted, so
+      // the brush near by and the rainbow far off stay one on the other.
+      const held = step === S.rainbow ? 1 - smooth(f.local / TRAVEL[step]) : step === S.hooray ? smooth(f.local / TRAVEL[step]) : 1;
+      camPos.x += Math.sin(f.time * 0.6) * 0.03 * held;
+      camPos.y += Math.sin(f.time * 0.8) * 0.02 * held;
       camPos.y = Math.max(camPos.y, groundHeight(camPos.x, camPos.z) + 0.3);
       stage.camera.position.copy(camPos);
       stage.camera.lookAt(camLook);
@@ -611,6 +660,22 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       placeKiki(f, g);
       updateWorld(f, g);
       return { walking: false, flash: 0, sitting, bend: 0 };
+    },
+    afterPose() {
+      // The brushes lie along the forearms, and the band is painted up to where the painting brush's tip is seen.
+      if (!brushes[0].group.visible) return;
+      for (const [n, brush] of brushes.entries()) {
+        guide.forearm(n === 0 ? "L" : "R", brush.group.matrix);
+        brush.group.updateMatrixWorld(true);
+      }
+      if (!paintNow) return;
+      const { left, band, reach } = paintNow;
+      const eye = stage.camera.position;
+      const along = reach < 1 ? 0 : paintedTo(left, eye);
+      rainbow.paint(band, left ? along : 1, left ? 0 : along);
+      tip.visible = along > 0.02;
+      if (tip.visible) rainbow.group.localToWorld(rainbow.edge(band, left, along, tip.position));
+      updateMoved(tip);
     },
   };
 }

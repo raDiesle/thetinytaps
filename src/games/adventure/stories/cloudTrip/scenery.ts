@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { makeBush, mat, mergeParts, seeded, solid } from "../../three/props";
-import { groundHeight, PUFF_RADIUS, RAINBOW_BAND, RAINBOW_COLORS, RAINBOW_RADIUS, SUN_RADIUS, TAU, WOLLE_REST, WOLLE_TOP } from "./layout";
+import { ARC, arcAngle, arcRadius } from "../../three/clips";
+import { FOREARM } from "../../three/guide";
+import { groundHeight, PUFF_RADIUS, RAINBOW_COLORS, SUN_RADIUS, TAU, WOLLE_REST, WOLLE_TOP } from "./layout";
 
 // The props of „Die Wolkenreise“, modelled from simple shapes like the rest:
 // Wolle the little cloud, toy planes, balloons, stars, the sun with a face,
@@ -266,25 +268,28 @@ export function makeRain(count: number) {
 const RAINBOW_SEGMENTS = 40;
 
 /**
- * The rainbow, standing up in its own xy plane round its middle: six bands, each in two halves that
- * are painted from their end up to the top (`paint(band, left, right)`, 0..1 each). `edge` tells where
- * the painting is, for the sparkling tip.
+ * The rainbow, standing up in its own xy plane round its middle, in the fox's units of the arc clip (`ARC`): six
+ * bands, each in two halves that are painted from their end, a little below the middle's height, up to the top
+ * (`paint(band, left, right)`, 0..1 each, along the angle like the brush). The story scales and places it where
+ * the brush's circle is seen from the camera. `edge` tells where the painting is, for the sparkling tip.
  */
 export function makeRainbow() {
   const group = new THREE.Group();
   const halves = RAINBOW_COLORS.map((color, n) => {
-    const outer = RAINBOW_RADIUS - n * RAINBOW_BAND;
-    const inner = outer - RAINBOW_BAND;
+    const outer = ARC.radius - n * ARC.band;
+    const inner = outer - ARC.band;
     const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.88, side: THREE.DoubleSide, depthWrite: false });
-    // Left half: from the left end (angle π) up to the top; right half: from the right end (0) up to the top.
-    return [Math.PI, 0].map((from) => {
-      const to = Math.PI / 2;
+    // Left half: from the left end (below angle π) up to the top; right half: from the right end (below 0) up to the top.
+    return [-1, 1].map((x) => {
       const points: number[] = [];
+      const p = (r: number, along: number) => {
+        const a = arcAngle(along);
+        return [x * Math.cos(a) * r, Math.sin(a) * r, 0];
+      };
       for (let s = 0; s < RAINBOW_SEGMENTS; s++) {
-        const a0 = from + ((to - from) * s) / RAINBOW_SEGMENTS;
-        const a1 = from + ((to - from) * (s + 1)) / RAINBOW_SEGMENTS;
-        const p = (r: number, a: number) => [Math.cos(a) * r, Math.sin(a) * r, 0];
-        points.push(...p(inner, a0), ...p(outer, a0), ...p(outer, a1), ...p(inner, a0), ...p(outer, a1), ...p(inner, a1));
+        const k0 = s / RAINBOW_SEGMENTS;
+        const k1 = (s + 1) / RAINBOW_SEGMENTS;
+        points.push(...p(inner, k0), ...p(outer, k0), ...p(outer, k1), ...p(inner, k0), ...p(outer, k1), ...p(inner, k1));
       }
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
@@ -302,11 +307,40 @@ export function makeRainbow() {
       l.geometry.setDrawRange(0, 6 * Math.round(THREE.MathUtils.clamp(left, 0, 1) * RAINBOW_SEGMENTS));
       r.geometry.setDrawRange(0, 6 * Math.round(THREE.MathUtils.clamp(right, 0, 1) * RAINBOW_SEGMENTS));
     },
-    /** Where the middle of a half band is painted up to (`left` half or not, k of the way), in the rainbow's own space. */
-    edge(band: number, left: boolean, k: number, out: THREE.Vector3) {
-      const r = RAINBOW_RADIUS - (band + 0.5) * RAINBOW_BAND;
-      const a = left ? Math.PI - (k * Math.PI) / 2 : (k * Math.PI) / 2;
-      return out.set(Math.cos(a) * r, Math.sin(a) * r, 0);
+    /** Where the middle of a half band is painted up to (`left` half or not, `along` of the way), in the rainbow's own space. */
+    edge(band: number, left: boolean, along: number, out: THREE.Vector3) {
+      const r = arcRadius(band);
+      const a = arcAngle(along);
+      return out.set((left ? -1 : 1) * Math.cos(a) * r, Math.sin(a) * r, 0);
+    },
+  };
+}
+
+/**
+ * The long paintbrush of the arc clip, built along a forearm (the elbow at the origin, the wrist at -FOREARM on
+ * y): the handle runs through the paw on along the arm, and the tip of the bristles is `ARC.brush` past the wrist,
+ * where the clip puts it on the band. The bristles take the colour of the band being painted (`dip`).
+ */
+export function makeBrush() {
+  const group = new THREE.Group();
+  const tip = FOREARM + ARC.brush;
+  const bristleLength = 0.09;
+  const handleFrom = FOREARM - 0.03;
+  const handleTo = tip - bristleLength + 0.01;
+  const handle = solid(new THREE.CylinderGeometry(0.011, 0.013, handleTo - handleFrom, 10), mat("#c98b4f", 0.6));
+  handle.position.y = -(handleFrom + handleTo) / 2;
+  const ferrule = solid(new THREE.CylinderGeometry(0.019, 0.015, 0.035, 12), mat("#c8ccd4", 0.35, { metalness: 0.6 }));
+  ferrule.position.y = -(tip - bristleLength + 0.012);
+  const paint = mat(RAINBOW_COLORS[0], 0.5);
+  const bristles = solid(new THREE.SphereGeometry(0.022, 14, 10), paint);
+  bristles.scale.set(1, bristleLength / 0.044, 1);
+  bristles.position.y = -(tip - bristleLength / 2);
+  group.add(handle, ferrule, bristles);
+  mergeParts(group, [bristles]);
+  return {
+    group,
+    dip(color: string) {
+      paint.color.set(color);
     },
   };
 }

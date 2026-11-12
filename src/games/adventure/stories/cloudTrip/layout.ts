@@ -61,10 +61,10 @@ export const PUFF_GAP = 1.15;
 /** The size of the grey puffs Tapsi pushes away. */
 export const PUFF_RADIUS = 0.85;
 
-/** The middle of the rainbow's circle, far ahead below Wolle, and the outer band's radius. */
-export const RAINBOW_CENTER = v3(0, ALT - 9, SUN_Z - 34);
-export const RAINBOW_RADIUS = 21;
-/** How wide each band is. */
-export const RAINBOW_BAND = 1.5;
-/** The rainbow's colours from the outside in: one band for every half circle the arms paint. */
+/**
+ * How far ahead the rainbow stands, behind the sun: the story sizes and places it there so that, seen from the
+ * camera, it lies exactly on the circle Tapsi's brush goes round (`ARC` of the arc clip).
+ */
+export const RAINBOW_Z = SUN_Z - 34;
+/** The rainbow's colours from the outside in: one band for every half circle the brush paints. */
 export const RAINBOW_COLORS = ["#ff4d4d", "#ff9a2e", "#ffd93b", "#5ccf5c", "#3fa3ff", "#9b6bff"];
