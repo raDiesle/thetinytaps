@@ -298,6 +298,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär sitzt am Tisch vor seinem Holzpuzzle mit Bauernhoftieren, die Kuh passt nicht in ihr Loch; der große Bär liest auf dem Sofa. 1) „Das Puzzle vom Tisch fegen“ (Krach) oder die Fäuste ganz fest drücken und wieder loslassen. 2) „Das Teil reinhauen“ (Krach) oder das Teil umdrehen und nochmal probieren. 3) „Den großen Bären anbrüllen“ oder „Hilf mir bitte!“ sagen – der große Bär zeigt auf die Ecke, und die Kuh passt. Zum Schluss ist das Puzzle fertig, und die Kuh muht.",
       why: "„Frust, die Jacke klemmt“ zeigt Frust beim Anziehen; beim Spielen kommt er noch öfter. Die Szene zeigt die drei Wege, die Kleinkinder selbst gehen können: kurz Dampf ablassen, anders probieren, um Hilfe bitten.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Frust, das Puzzle passt nicht“ in Gefühle (alltag.ts, Tag 14), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-38",
@@ -306,6 +309,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Garten rennen der kleine Bär und der Fuchs um die Wette zum Apfelbaum; der Fuchs ist zuerst da und reißt die Arme hoch, der Bär bleibt stehen, die Unterlippe vorgeschoben. 1) „Den Fuchs schubsen“ (Aua) oder ganz fest auf den Boden stampfen. 2) „„Gilt nicht!“ schreien und weglaufen“ (der Fuchs ist traurig) oder rufen: „Nochmal!“ 3) „Den Fuchs am Ohr ziehen“ (Aua) oder dem Fuchs die Pfote zum Abklatschen hinhalten. Zum Schluss rennen beide nochmal, diesmal Hand in Hand.",
       why: "Verlieren tut weh, und Wer-ist-zuerst-da spielen Kinder schon ganz früh. Die Szene zeigt, dass der Ärger sein darf und das Spiel trotzdem weitergeht.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Verloren beim Wettrennen“ in Gefühle (alltag.ts, Tag 12), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-39",
@@ -314,6 +320,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: An der Haustür zieht der Fuchs seine Mütze auf, sein Papa wartet draußen; der kleine Bär hält noch das Auto, mit dem sie gespielt haben, und weint. 1) „Dem Fuchs die Mütze wegnehmen, damit er bleibt“ (der Fuchs weint) oder den Fuchs zum Abschied fest umarmen. 2) „Das Auto hinterherwerfen“ (Krach) oder das Auto ganz fest an den Bauch drücken. 3) „Gegen die Tür treten“ (Krach) oder ans Fenster laufen und winken, bis der Fuchs um die Ecke ist. Zum Schluss winkt der Fuchs von draußen zurück, und der große Bär sagt: „Morgen wieder.“",
       why: "„Abschied an der Tür“ zeigt den Bären, der gebracht wird; hier geht der Freund. Solche kleinen Abschiede gibt es fast jeden Tag, und sie enden oft in Tränen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Traurig, der Freund geht heim“ in Gefühle (alltag.ts, Tag 12), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-40",
@@ -322,6 +331,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Am Frühstückstisch hat der große Bär dem kleinen Bären den Saft schon eingeschenkt – der wollte es selbst machen und ballt die Fäuste; auf dem Tisch stehen zwei Becher und die kleine Kanne. 1) „Den Becher umkippen“ (Platsch) oder laut sagen: „Ich will selber!“ 2) „Den großen Bären hauen“ (Aua) oder tief pusten, nach oben, vom Tisch weg. 3) „Die Kanne auf den Boden werfen“ (Krach) oder dem großen Bären selbst einschenken – der hält die Kanne nur ein bisschen mit. Zum Schluss trinken beide, und der kleine Bär strahlt.",
       why: "„Selber!“ ist der Satz der Trotzphase: Wut, weil ein Großer etwas abgenommen hat, gehört zum Alltäglichsten. Die Szene zeigt Worte statt Wut und einen Weg, es doch noch selbst zu tun.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wütend, ich will selber“ in Gefühle (alltag.ts, Tag 10), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-41",
@@ -330,6 +342,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär liegt in Oma Bärs Gästebett, ein Nachtlicht leuchtet, sein Kuscheltier liegt neben ihm, an der Wand hängt ein Bild; Oma sitzt auf der Bettkante, und der Bär schaut traurig zur Tür. 1) „Das Nachtlicht runterwerfen“ (Krach) oder das Kuscheltier ganz fest drücken. 2) „Oma wegschubsen“ (Aua) oder sagen: „Ich vermisse Mama.“ – Oma nickt und streichelt ihm über den Kopf. 3) „Das Bild von der Wand reißen“ (Krach) oder die Augen zumachen und ganz langsam atmen, mit der Pfote auf dem Bauch. Zum Schluss schläft er, mit einem Lächeln.",
       why: "„Vermissen, Oma fährt weg“ ist das Vermissen zu Hause; Heimweh an einem fremden Ort ist die andere Seite und kommt mit jeder ersten Übernachtung. Sagen, was man fühlt, hilft hier besonders.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Heimweh, die erste Nacht bei Oma“ in Gefühle (alltag.ts, Tag 13), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-42",
@@ -338,6 +353,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär sitzt auf dem hohen Friseurstuhl, einen Umhang um den Hals, und schaut ängstlich in den Spiegel; hinter ihm die Friseurin, eine Füchsin, mit Kamm, auf der Ablage eine Sprühflasche, der große Bär sitzt auf dem Wartestuhl. 1) „Zappeln und die Füchsin treten“ (Aua) oder die Pfoten ganz fest um die Armlehnen drücken. 2) „Die Sprühflasche runterwerfen“ (Krach) oder im Spiegel zuschauen, wie ein Büschel fällt. 3) „Die Füchsin anbrüllen“ oder sagen: „Kurz Pause, bitte!“ – die Füchsin wartet, und der große Bär winkt ihm zu. Zum Schluss schaut er in den Spiegel und lacht über seinen neuen Schopf.",
       why: "Der Friseur macht vielen Kleinkindern Angst: fremde Hände am Kopf, Geräusche hinter dem Ohr, stillsitzen. Pause sagen dürfen gibt ihnen ein Stück Kontrolle zurück.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Angst beim Friseur“ in Gefühle (alltag.ts, Tag 11), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Die Friseurin ist eine Füchsin.",
     },
     {
       id: "C-43",
@@ -346,6 +364,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: In der Kita ist der kleine Bär beim Rennen gegen den Bauklotzturm des Fuchses gestoßen; die Klötze liegen herum, der Fuchs schaut traurig, der Bär hält erschrocken die Pfoten vor den Mund. 1) „Die restlichen Klötze auch umtreten“ (Krach) oder sagen: „Entschuldigung!“ 2) „Lachen und weiterrennen“ (der Fuchs weint) oder sich neben den Fuchs knien und tief pusten. 3) „Mit Klötzen werfen“ (Aua) oder dem Fuchs einen Klotz reichen und zusammen neu bauen. Zum Schluss steht ein neuer Turm, höher als der alte, und beide lachen.",
       why: "Erschrecken über sich selbst und ein schlechtes Gewissen kennen schon Zweijährige. Bisher passiert dem Bären in den Kita-Geschichten immer etwas; hier macht er etwas kaputt und lernt, es wiedergutzumachen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Ups, aus Versehen“ in Gefühle (alltag.ts, Tag 9), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-44",
@@ -354,6 +375,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Am Maltisch der Kita zeigt der kleine Bär stolz sein Bild (ein bunter Kringel, das ist Mama Bär), der Fuchs zeigt darauf und lacht; auf dem Tisch Stifte und das Bild des Fuchses, daneben malt der Hase. 1) „Das Bild des Fuchses zerreißen“ (Ritsch, der Fuchs weint) oder laut sagen: „Das mag ich nicht!“ 2) „Mit Stiften werfen“ (Aua) oder die Fäuste drücken und tief pusten. 3) „Das eigene Bild zerknüllen“ (Knautsch) oder sich neben den Hasen setzen und weitermalen. Zum Schluss hängt sein Bild an der Wand, und der Fuchs schaut es sich an.",
       why: "Ausgelacht werden tut weh, und Kinder zerstören dann oft gerade das, worauf sie eben noch stolz waren. Die Szene zeigt, dass man sich wehren darf und das eigene Bild trotzdem gut ist.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Gekränkt, ausgelacht beim Malen“ in Gefühle (alltag.ts, Tag 10), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Es lacht der Waschbär.",
     },
     {
       id: "C-45",
@@ -362,6 +386,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär liegt im Bett, die Augen weit offen; neben dem Bett stehen der gepackte Kinderkoffer und ein Eimer mit Schaufel – morgen geht es ans Meer. 1) „Den Koffer wieder ausräumen“ (Rumms, alles fällt raus) oder die Pfote auf den Bauch legen und langsam atmen. 2) „Mit der Schaufel auf den Eimer trommeln“ (laut, nebenan wacht das Baby auf) oder dem Kuscheltier flüstern, was er morgen am Meer baut. 3) „Das Licht anmachen und spielen“ oder die Augen zumachen und den Wellen lauschen (leises Meeresrauschen). Zum Schluss schläft er, die Schaufel im Arm.",
       why: "Bisher sind die frohen Gefühle der Geschichten einfach schön. Vorfreude kann aber auch zu viel sein – auch ein schönes Gefühl lässt sich beruhigen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Zu aufgeregt zum Schlafen“ in Gefühle (alltag.ts, Tag 12), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-46",
@@ -370,6 +397,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Auf dem Gehweg zeigt der Fuchs stolz sein neues rotes Laufrad mit Klingel, der kleine Bär steht mit seinem alten Roller daneben und schaut finster. 1) „Das Laufrad umschubsen“ (Krach) oder die Fäuste drücken und sagen: „Das will ich auch!“ 2) „Den Fuchs vom Laufrad ziehen“ (Aua) oder fragen: „Darf ich mal?“ 3) „Den eigenen Roller wegtreten“ (Krach) oder tauschen: Der Fuchs probiert den Roller, der Bär das Laufrad. Zum Schluss fahren beide nebeneinander, und der Bär klingelt.",
       why: "Eifersucht aufs Baby ist schon da; Neid auf das Spielzeug eines anderen kommt im Kita-Alter täglich vor. Sagen, was man will, und fragen statt nehmen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Neidisch auf das Laufrad“ in Gefühle (alltag.ts, Tag 11), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-47",
@@ -378,6 +408,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Zwischen hohen Regalen steht der kleine Bär allein, sein Kuscheltier im Arm; den großen Bären sieht er nicht mehr, vor ihm eine Kiste Äpfel und ein Turm aus Dosen. 1) „Das Regal hochklettern, um zu gucken“ (gefährlich, Krach) oder stehen bleiben wie ein Baum, die Füße fest auf dem Boden, und tief atmen. 2) „Den Dosenturm umwerfen“ (Krach) oder ganz laut rufen: „Papa!“ 3) „Die Äpfel aus der Kiste rollen lassen“ (Rumpeln) oder das Kuscheltier fest drücken und weiter da warten, wo er ist. Zum Schluss kommt der große Bär um die Ecke, und sie umarmen sich.",
       why: "Verlorengehen ist eine der größten Ängste von Kindern und Eltern, und was man dann tut – stehen bleiben, laut rufen, warten –, sollen Kinder kennen, bevor es passiert. Für Größere passt eine Variante, in der der Bär an der Kasse fragt.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Angst, allein im Supermarkt“ in Gefühle (alltag.ts, Tag 11), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-48",
@@ -386,6 +419,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: In der Küche ruft der kleine Bär „Da! Da!“, der große Bär hält fragend einen Apfel hoch; der Bär will aber den Joghurt im offenen Kühlschrank. 1) „Den Apfel aus der Pfote schlagen“ (Rumms) oder mit dem Finger genau auf den Joghurt zeigen. 2) „Gegen den Kühlschrank treten“ (Krach) oder stampfen, ganz fest, und dann tief pusten. 3) „Schreien, bis sich alle die Ohren zuhalten“ oder den großen Bären an der Pfote zum Kühlschrank ziehen. Zum Schluss löffeln beide Joghurt.",
       why: "Kleinkinder wissen oft genau, was sie wollen, haben aber noch nicht die Worte – eine der häufigsten Ursachen für Wut. Zeigen und hinführen sind Wege, die jedes Kind schon kann.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wütend, keiner versteht mich“ in Gefühle (alltag.ts, Tag 11), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-49",
@@ -394,6 +430,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Beim Picknick auf der Wiese summt eine Biene um den Saftbecher des kleinen Bären, er zieht die Schultern hoch; auf der Decke Becher, Brote und ein Ball, am Rand Blumen, der große Bär sitzt daneben. 1) „Nach der Biene schlagen“ (Aua, sie sticht) oder ganz still sitzen bleiben. 2) „Den Saft umkippen“ (Platsch) oder langsam aufstehen und ein paar Schritte weggehen. 3) „Mit dem Ball nach der Biene werfen“ oder zuschauen, wie sie zu den Blumen fliegt, und tief ausatmen. Zum Schluss sitzen alle wieder auf der Decke, die Biene summt in den Blumen.",
       why: "Bienen und Wespen machen im Sommer fast allen Kleinkindern Angst, und Schlagen ist das, was sie dann tun – und genau das macht es schlimmer. Stillhalten und weggehen sind Mittel mit dem Körper.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Angst vor der Biene“ in Gefühle (alltag.ts, Tag 13), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-50",
@@ -402,6 +441,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der große Bär telefoniert in der Küche, der kleine Bär hält ihm sein neues Bild hin und zieht ihn am Hosenbein; auf dem Tisch Stifte, auf dem Stuhl sein Kuscheltier. 1) „Das Telefon wegreißen“ (Krach) oder den großen Bären leise am Arm antippen – der hebt die Pfote: „Gleich.“ 2) „Laut dazwischenschreien“ oder sich mit dem Kuscheltier auf den Stuhl setzen und an den Fingern zählen. 3) „Das Bild zerknüllen“ (Knautsch) oder das Bild schon mal schön auf den Tisch legen. Zum Schluss legt der große Bär auf und schaut sich das Bild ganz lange an.",
       why: "Warten, wenn ein Großer beschäftigt ist, fällt Kleinkindern besonders schwer. Leise Bescheid sagen und sich selbst beschäftigen sind Wege, die Eltern sich jeden Tag wünschen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Warten, großer Bär telefoniert“ in Gefühle (alltag.ts, Tag 14), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-51",
@@ -410,6 +452,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Sandkasten der Kita hält sich der Fuchs den Arm und weint, zwischen ihnen liegt die Schaufel; der kleine Bär steht davor, die Pfote noch erhoben – er hat ihn im Streit um die Schaufel gehauen, und erschrickt. 1) „Nochmal hauen“ (Aua) oder die Pfoten runternehmen und tief pusten. 2) „Die Schaufel nehmen und weiterbuddeln“ (der Fuchs weint) oder sagen: „Entschuldigung!“ 3) „Lachen“ oder mit dem Fuchs zur Erzieherin gehen, die einen Kühlakku bringt. Zum Schluss buddeln beide zusammen, einer mit der Schaufel, einer mit dem Eimer.",
       why: "Kinder hauen manchmal – wichtig ist, was danach kommt. In „Selbst wütend“ geht es um das Davor; hier um das Wiedergutmachen, das Kinder selten gezeigt bekommen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Selbst gehauen, und jetzt?“ in Gefühle (alltag.ts, Tag 10), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-52",
@@ -434,6 +479,8 @@ export const feelingsIdeas: IdeaArea = {
       text: "Die Karten von „Alltagssituationen“ nach der Recherche „gefuehle-gruppen“, mit den gebauten Szenen und allen offenen Ideen, je etwa sieben Szenen (21 Runden): Freude & Stolz (Geburtstag, Schnee, Stolz oben, C-45, C-55, C-56, C-57), Traurig (6 gebaut, C-39, C-41), Wütend (Schuh, Kita, Spielplatz, Kasse, C-38, C-67), Frust & Warten – neu, Wut ohne Gegner, die Zones of Regulation nennen Frust eigens (Jacke, Pfannkuchen, C-37, C-40, C-48, C-50), Angst (7 gebaut, mit Erschrecken, das Papilio zur Furcht zählt; C-42, C-47 und C-49 nur im Tausch), Müde & zu viel (Abend, laut, Langeweile, C-58 bis C-61), Igitt & Hoppla (Brokkoli, Hose, C-43, C-62 bis C-65), Streit im Kindergarten (6 gebaut, C-44, C-51), Freunde & Familie (6 gebaut, C-46). Die Reihenfolge: zuerst die vier Gefühle, mit denen Papilio, RULER und das Farbenmonster beginnen (Freude, Traurig, Wütend, Angst), Frust gleich nach Wut, dann Müde & zu viel und Igitt & Hoppla, zum Schluss die zwei Gruppen mit anderen. Jede Gruppe kann die Farbe ihres Gefühls bekommen wie im Farbenmonster (Freude gelb, Traurig blau, Wut rot, Angst dunkel, Ruhe grün). C-66 ist Ersatz.",
       why: "Gebaut reichen die Gruppen von 6 Runden (Igitt & Hoppla) bis 21 (Angst), mit den offenen Ideen wüchse Wütend auf elf Szenen: Ein Durchgang wäre mal nach zwei Szenen vorbei, mal nach elf. Gleich lange Gruppen fühlen sich gleich wichtig an, und Freude als erste Karte macht den Einstieg leicht.",
       effort: "S",
+      partial:
+        "Die Gruppe „Frust & Warten“ gibt es (groups.ts), vorerst nur mit den neuen Szenen C-37, C-40, C-48 und C-50 und nur Deutsch; die neuen Szenen stehen in ihren Gruppen. Offen: Jacke und Pfannkuchen hinüber, die neue Reihenfolge und die Farben der Gruppen.",
     },
     {
       id: "C-55",
@@ -442,6 +489,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Kindergarten am Nachmittag, der große Bär steht in der Tür und winkt, der kleine Bär sieht ihn und strahlt; vor ihm der Fuchs mit einem Bausteinturm, an der Garderobe seine Tasche. 1) „Losrennen und den Fuchs umrennen“ (Aua) oder an Ort und Stelle hüpfen, winken und rufen: „Papa!“ 2) „Im Rennen den Turm vom Fuchs umwerfen“ (Krach) oder erst zum Fuchs: „Tschüss, bis morgen!“ 3) „Dem großen Bären die Tasche aus der Hand reißen“ oder in die Arme laufen und ganz fest drücken. Zum Schluss gehen beide Hand in Hand, der Fuchs winkt.",
       why: "Wiedersehen ist die größte Freude im Kita-Alltag, und gerade da rennen Kinder alles über den Haufen. Die Szene zeigt, dass große Freude laut sein darf und trotzdem Platz für die anderen lässt. Eltern suchen auch das Gegenteil („kleinkind freut sich nicht beim abholen“) – das Spiel zeigt, wie Freude aussehen kann.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Freude beim Abholen“ in Gefühle (alltag.ts, Tag 9), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-56",
@@ -450,6 +500,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär und der Fuchs sitzen zusammen in der Wanne voller Schaum, beide kichern laut; am Rand eine Quietscheente, eine Shampooflasche und ein Becher, der große Bär sitzt daneben. 1) „Dem Fuchs Wasser ins Gesicht spritzen“ (Weinen) oder sich einen Schaumbart machen und lachen. 2) „Die Shampooflasche ins Wasser ausleeren“ oder mit der Ente schwimmen und laut „Quak!“ machen. 3) „Aus der Wanne springen“ (Aua, ausgerutscht) oder sich vom großen Bären ins Handtuch wickeln lassen und darin kuscheln. Zum Schluss sitzen beide eingewickelt da und kichern leise.",
       why: "Albern und übermütig sein ist eine Freude mit viel Energie (die gelbe Zone der Zones of Regulation) – schön, aber schnell zu wild. Die Szene zeigt, wie man weiter lachen kann, ohne dass jemand Wasser in die Augen kriegt oder ausrutscht.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Albern in der Badewanne“ in Gefühle (alltag.ts, Tag 15), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt mit der Ente schwimmen: Schaum hochpusten; beide in Badesachen.",
     },
     {
       id: "C-57",
@@ -458,6 +511,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Garten sitzt ein Schmetterling auf einer Blume direkt vor dem kleinen Bären, der mit großen Augen und offenem Mund staunt; neben ihm der Fuchs mit einer Gießkanne, dahinter ein Blumenbeet. 1) „Nach dem Schmetterling greifen“ (er fliegt weg, der Fuchs ist traurig) oder ganz still stehen und staunen. 2) „Den Fuchs wegschubsen, damit nur er gucken kann“ (Aua) oder dem Fuchs leise zuflüstern und zeigen: „Guck mal!“ 3) „Hinterherrennen, mitten durchs Blumenbeet“ (Krach, Blumen geknickt) oder mit den Armen flattern wie ein Schmetterling. Zum Schluss landet der Schmetterling auf der Gießkanne, und beide lachen leise.",
       why: "Interesse ist eines der fünf Vorläufergefühle, die Papilio-U3 schon bei Säuglingen beschreibt; Staunen ist die leise Seite der Freude, neben den lauten (Wiedersehen, albern, aufgeregt). Die Szene zeigt, dass man Freude auch ganz still haben und teilen kann.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Staunen, ein Schmetterling“ in Gefühle (alltag.ts, Tag 12), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-58",
@@ -466,6 +522,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Morgens im Kinderzimmer, der Vorhang ist noch zu, der kleine Bär sitzt verschlafen und grummelig im Bett, auf dem Nachttisch ein Wecker, vor dem Bett die Hausschuhe, in der Tür das Bärenbaby. 1) „Den Wecker vom Nachttisch werfen“ (Krach) oder sich ganz lang strecken wie eine Katze und gähnen. 2) „Einen Hausschuh nach dem Bärenbaby werfen“ (Aua) oder sagen: „Ich bin noch so müde.“ 3) „Den Vorhang herunterreißen“ (Krach) oder den Vorhang aufziehen und die Sonne anblinzeln. Zum Schluss sitzt er in Hausschuhen am Frühstückstisch und lächelt.",
       why: "„kind will morgens nicht aufstehen“ suchen Eltern für Zwei- bis Vierjährige. Müde und schlecht gelaunt sein darf sein; Strecken, es sagen und Licht hereinlassen sind Wege, die ein Kind selbst kann. Bisher ist Müde nur der Abend.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Morgenmuffel, Aufstehen ist schwer“ in Gefühle (alltag.ts, Tag 9), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt „Ich bin noch so müde“ sagen: Hausschuhe anziehen; das Ende bleibt im Kinderzimmer.",
     },
     {
       id: "C-59",
@@ -474,6 +533,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Daheim im Flur nach dem Kindergarten, der kleine Bär liegt noch in Jacke auf dem Boden, Gesicht ganz schlapp und quengelig; neben ihm seine Brotdose, das Bärenbaby baut einen kleinen Turm, im Wohnzimmer dahinter die Kuschelecke mit Kissen, der große Bär hängt gerade seine Tasche auf. 1) „Die Brotdose an die Wand werfen“ (Krach) oder einfach liegen bleiben und tief ein- und ausatmen. 2) „Den Turm vom Bärenbaby umwerfen“ (Krach, Weinen) oder dem großen Bären sagen: „Ich bin so geschafft.“ 3) „Den großen Bären hauen, der die Jacke ausziehen will“ (Aua) oder selbst in die Kuschelecke krabbeln und sich ins Kissen kuscheln. Zum Schluss liegt er dort mit Kuscheltier und lächelt müde.",
       why: "„Kind will nach Kita nicht nach Hause“, „Reizüberflutung Kindergarten“ und „überfordert mit Kindergarten“ werden viel gesucht: Nach einem langen Tag mit vielen Kindern ist ein Kleinkind leer, und der Frust bricht oft erst daheim heraus. Die Szene zeigt Ruhe als Mittel, das es sich selbst holt.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Geschafft nach dem Kindergarten“ in Gefühle (alltag.ts, Tag 10), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-60",
@@ -482,6 +544,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär liegt mit Schnupfennase und Schal auf dem Sofa, neben ihm auf dem Tischchen eine Teetasse und ein Bilderbuch; durchs Fenster sieht man den Fuchs draußen mit einem Ball spielen. 1) „Die Teetasse vom Tisch schubsen“ (Krach) oder sich in die Decke kuscheln und die Augen zumachen. 2) „Gegen das Fenster hauen, weil er auch rauswill“ (Krach) oder dem Fuchs durchs Fenster winken. 3) „Das Bilderbuch zerreißen“ oder das Bilderbuch aufschlagen und die Bilder anschauen. Zum Schluss, am nächsten Tag, spielt er wieder draußen mit dem Fuchs.",
       why: "Krank sein gehört zur blauen Zone (müde, schlapp, traurig) und kommt im Kita-Alter dauernd vor. Kinder müssen dann drinnen bleiben, während andere spielen – die Szene zeigt, dass Ausruhen hilft und man trotzdem dabei sein kann, ohne Tablet als Ausweg.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Krank und schlapp“ in Gefühle (alltag.ts, Tag 14), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Das Ende bleibt auf dem Sofa, der Fuchs winkt durchs Fenster.",
     },
     {
       id: "C-61",
@@ -490,6 +555,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Lange Heimfahrt, der kleine Bär sitzt quengelig im Kindersitz, neben ihm das Bärenbaby schläft, auf seinem Schoß Kuscheltier und Trinkflasche, vorne fährt der große Bär. 1) „Mit den Füßen gegen den Sitz vorne treten“ (Aua) oder die Arme ganz fest um das Kuscheltier legen. 2) „Die Trinkflasche nach vorne werfen“ (Krach) oder aus dem Fenster schauen und Autos zählen. 3) „Das Baby wecken“ (Weinen) oder die Augen zumachen und einschlafen.",
       why: "Autofahrten sind der Ort, an dem Müdigkeit und Langeweile zusammenkommen und Kinder nicht weg können.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Quengelig im Auto“ in Gefühle (alltag.ts, Tag 13), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-62",
@@ -498,6 +566,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Kindergarten am Maltisch, der kleine Bär hat die Pfoten voller Fingerfarbe und schaut sie angeekelt an; neben ihm der Fuchs mit seinem Bild, auf dem Tisch ein Farbbecher und Pinsel, hinten ein Waschbecken. 1) „Die Pfoten am Fuchs abwischen“ (Weinen) oder die Pfoten hochhalten und sagen: „Igitt, das klebt!“ 2) „Den Farbbecher umwerfen“ (Krach) oder zum Waschbecken gehen und die Pfoten waschen. 3) „Das Bild vom Fuchs zerknüllen“ oder mit dem Pinsel weitermalen statt mit den Fingern. Zum Schluss halten beide ihre Bilder hoch.",
       why: "„kleinkind mag keine schmutzigen hände“ ist eine häufige Suche; manche Kinder ekeln sich vor Matsch, Farbe und Klebrigem. Die Szene nimmt den Ekel ernst – man muss nicht weiter mit den Fingern malen – und zeigt einen Weg, trotzdem mitzumachen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Igitt, klebrige Pfoten“ in Gefühle (alltag.ts, Tag 9), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt nur „Igitt, das klebt!“ sagen: Pfoten hoch und pusten.",
     },
     {
       id: "C-63",
@@ -506,6 +577,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Der kleine Bär spielt mit Autos auf dem Teppich, neben ihm sitzt das Bärenbaby, ein grüner Geruchskringel steigt aus seiner Windel, der kleine Bär rümpft die Nase; der große Bär kommt mit einer frischen Windel, das Fenster ist zu. 1) „Das Baby wegschubsen“ (Weinen) oder sich die Nase zuhalten und lachen: „Puuuh!“ 2) „Mit dem Auto nach dem Baby werfen“ (Aua) oder ans Fenster gehen und es aufmachen. 3) „Wegrennen und die Tür zuknallen“ (Krach) oder dem großen Bären die frische Windel reichen. Zum Schluss lacht das Baby frisch gewickelt mit dem kleinen Bären.",
       why: "Ekel ist eines der Grundgefühle, und bei Geschwistern kommt dieser Ekel jeden Tag. Nase zuhalten ist ein Körpermittel, Helfen macht aus dem Ekel etwas Gutes – und das Baby ist danach kein Ärgernis, sondern lacht mit.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Puh, die Windel stinkt“ in Gefühle (alltag.ts, Tag 14), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-64",
@@ -514,6 +588,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Draußen nach dem Regen, der kleine Bär ist in eine tiefe Pfütze getreten, Wasser im Gummistiefel, er verzieht das Gesicht; neben ihm der Fuchs, am Rand eine Bank. 1) „Den Fuchs in die Pfütze schubsen“ (Weinen) oder mit dem Fuß wackeln und rufen: „Igitt, alles nass!“ 2) „Den Stiefel nach dem Fuchs werfen“ (Aua) oder sich auf die Bank setzen und den Stiefel ausleeren. 3) „Mit Absicht den Fuchs nass spritzen“ oder den Stiefel wieder anziehen und lachen.",
       why: "Ein Ekel, den jedes Kind kennt, ohne Essen und ohne Ausscheidungen – und nass und matschig mögen viele Kleinkinder nicht („kleinkind mag keine dreckigen hände“).",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Igitt, nasse Socken“ in Gefühle (alltag.ts, Tag 15), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt Stiefel wieder anziehen: Socke auswringen.",
     },
     {
       id: "C-65",
@@ -522,6 +599,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Park schleckt ein kleiner, freundlicher Hund dem kleinen Bären quer übers Gesicht, der Bär kneift die Augen zu und verzieht den Mund; die Füchsin hält den Hund an der Leine, auf dem Weg liegt ein Stock. 1) „Den Hund hauen“ (der Hund jault) oder das Gesicht wegdrehen und sagen: „Nicht schlecken!“ 2) „Den Hund an den Ohren ziehen“ (der Hund jault) oder das Gesicht mit dem Ärmel abwischen: „Igitt!“ – und lachen. 3) „Den Stock nach dem Hund werfen“ (Aua) oder den Hund vorsichtig am Rücken streicheln, wo die Füchsin zeigt. Zum Schluss wedelt der Hund, und der Bär winkt ihm nach.",
       why: "Ekel ohne Essen und ohne Windel, und ein Hund, vor dem man keine Angst haben muss – anders als „Angst vorm großen Hund“. „Nicht schlecken!“ sagen ist ein Wort-Mittel, das schon Zweijährige können.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Igitt, der Hund schleckt“ in Gefühle (alltag.ts, Tag 15), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Er wischt mit der Pfote statt mit dem Ärmel.",
     },
     {
       id: "C-66",
@@ -538,6 +618,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Zu Hause am Tisch, der kleine Bär malt, das Bärenbaby greift sich seinen Pinsel und schmiert damit auf seinem Blatt; der kleine Bär ist wütend; auf dem Tisch Farbe, ein zweiter Pinsel und Buntstifte, auf dem Sofa ein Kissen. 1) „Dem Baby den Pinsel aus der Hand reißen“ (Weinen) oder laut sagen: „Das ist meiner!“ 2) „Mit dem Farbbecher nach dem Baby werfen“ (Krach) oder ins Sofakissen boxen, bis die Wut raus ist. 3) „Das Blatt vom Baby zerreißen“ oder dem Baby einen Buntstift geben und zusammen weitermalen. Gehört zu Wütend (C-54).",
       why: "Das Beispiel stammt von Zero to Three („When your brother took your paintbrush, you felt really angry“): Streit mit Geschwistern zu Hause fehlt im Spiel, Streit gibt es nur im Kindergarten. Ins Kissen boxen nennen Graf und Seide als Wutmittel neben Stampfen, Pusten und Singen.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wütend, Baby nimmt den Pinsel“ in Gefühle (alltag.ts, Tag 14), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Ohne zweiten Pinsel.",
     },
     {
       id: "C-68",
@@ -548,7 +631,7 @@ export const feelingsIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Acht Tage mit allen 39 Szenen (days.ts), nur Deutsch und noch nicht aufgenommen. Die 39 Bilder der Seiten sind gemacht (4. November 2026). Lücken im Tagesablauf füllen Szenen wie C-55 (Papa holt mich ab), C-56 (Badewanne), C-58 (Morgenmuffel), C-59 (Geschafft nach dem Kindergarten), C-61 (Auto), C-45 (Zu aufgeregt zum Schlafen) und C-39 (Freund geht heim) sowie C-69 bis C-72.",
+        "Acht Tage mit allen 39 Szenen (days.ts), nur Deutsch und noch nicht aufgenommen; die 39 Bilder der Seiten sind gemacht (4. November 2026). Dazu Tag 9 bis Tag 15 mit den 31 neuen Szenen C-37 bis C-72 (11. November 2026), deren Seiten-Bilder in der Bilder-Queue warten.",
     },
     {
       id: "C-69",
@@ -557,6 +640,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Am Frühstückstisch, der große Bär hat dem kleinen Bären Milch in den roten Becher gegossen, der kleine Bär will aber den blauen, der neben der Spüle steht, und ist wütend; auf dem Tisch eine Schüssel Haferbrei und ein Löffel. 1) „Den roten Becher umkippen“ (Krach) oder laut sagen: „Ich will den blauen!“ 2) „Mit dem Löffel auf den Tisch hauen“ (Krach) oder ganz fest mit den Füßen unterm Tisch stampfen. 3) „Den Haferbrei wegschieben, bis er runterfällt“ (Krach) oder selbst die Milch in den blauen Becher umgießen, mit dem großen Bären zusammen. Gehört zu Wütend; füllt den Morgen eines Tages.",
       why: "Für die Tagesgeschichten (C-68) fehlen Szenen am Frühstückstisch: Die meisten Tage fangen mit einer Seite der Geschichte an statt mit einem Gefühl am Morgen. Der falsche Becher ist ein Klassiker der Wut mit zwei – klein im Anlass, groß im Gefühl.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wütend, der blaue Becher“ in Gefühle (alltag.ts, Tag 9), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-70",
@@ -565,6 +651,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Schlafraum des Kindergartens, die anderen Kinder liegen schon auf ihren Matten und schlafen, der kleine Bär liegt mit offenen Augen da und zappelt; neben ihm sein Kuschelhase, die Erzieherin sitzt leise an der Tür. 1) „Den schlafenden Fuchs anstupsen“ (der Fuchs wacht auf und weint) oder den Kuschelhasen ganz fest drücken. 2) „Laut singen“ (die anderen wachen auf) oder ganz langsam pusten, wie bei einer Kerze. 3) „Aufstehen und durch den Raum rennen“ oder einfach still liegen und an etwas Schönes denken. Zum Schluss ist er doch eingeschlafen. Gehört zu Müde & zu viel; füllt den Mittag eines Kita-Tages.",
       why: "Die Tagesgeschichten (C-68) springen im Kindergarten vom Vormittag zum Nachmittag; der Mittagsschlaf ist für viele Kita-Kinder der schwerste Moment des Tages, und still werden ist ein Mittel, das sie selbst in der Hand haben.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wach beim Mittagsschlaf“ in Gefühle (alltag.ts, Tag 9), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue.",
     },
     {
       id: "C-71",
@@ -573,6 +662,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Im Badezimmer am Abend, der große Bär hält die Zahnbürste mit Zahnpasta hin, der kleine Bär im Schlafanzug presst den Mund zu und dreht den Kopf weg; am Waschbecken ein Becher und eine kleine Sanduhr. 1) „Die Zahnbürste wegschlagen“ (Krach) oder sagen: „Ich mag nicht!“ 2) „Wegrennen“ oder die Sanduhr selbst umdrehen. 3) „Zahnpasta ins Waschbecken spucken, bevor er putzt“ oder selbst putzen und zum Schluss die Zähne im Spiegel zeigen. Gehört zu Wütend; füllt den Abend eines Tages und passt zu Zähne putzen.",
       why: "Die Tage (C-68) gehen vom Abendessen gleich ins Bett; dazwischen liegt in jeder Familie das Zähneputzen, einer der häufigsten Streitpunkte am Abend („kind will nicht zähne putzen“). Selbst die Sanduhr umdrehen gibt dem Kind etwas in die Hand.",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wütend beim Zähneputzen“ in Gefühle (alltag.ts, Tag 10), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt „Ich mag nicht!“ nur sagen: dabei ganz fest stampfen; statt Zahnpasta ins Becken spucken: den Becher runterwerfen.",
     },
     {
       id: "C-72",
@@ -581,6 +673,9 @@ export const feelingsIdeas: IdeaArea = {
       text: "Erstes Bild: Am Abend im Wohnzimmer, der kleine Bär spielt im Schlafanzug mit seiner Holzeisenbahn, der große Bär hält ein Bilderbuch; der kleine Bär schüttelt wütend den Kopf. 1) „Die Eisenbahn durchs Zimmer werfen“ (Krach) oder sagen: „Ich will noch spielen!“ 2) „Sich unterm Tisch verstecken und nicht rauskommen“ oder die Eisenbahn selbst in den Tunnel fahren: „Gute Nacht, Zug!“ 3) „Das Bilderbuch zuklappen und wegschieben“ oder sich selbst ein Buch zum Vorlesen aussuchen. Zum Schluss liest der große Bär vor. Gehört zu Müde & zu viel; der letzte Moment eines Tages vor der Nacht.",
       why: "Ein Tag endet in den Tagesgeschichten (C-68) mit der Nacht; der Übergang vom Spielen ins Bett ist der Moment, an dem Eltern am häufigsten Wut erleben. Dem Spielzeug „Gute Nacht“ sagen ist ein Abschiedsritual wie beim Spielplatz (C-01).",
       effort: "S",
+      done: true,
+      partial:
+        "Als Geschichte „Wütend, noch nicht ins Bett“ in Gefühle (alltag.ts, Tag 11), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt nur sagen: Fäuste drücken; statt verstecken und Buch wegschieben: Schienen kaputt treten und Buch zerreißen.",
     },
   ],
 };

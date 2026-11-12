@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
-import { CardPicture, pictureCard } from "@/components/GameCard";
+import { CardPicture, pictureCard, UNFINISHED_LABEL } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
 import { SeoText, SeoWords } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
-import { categoryHref, categoryOf, isUnfinished, pagesBetween } from "@/content/games";
+import { categoryHref, categoryOf, isHidden, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
@@ -20,7 +20,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
-import { canTestUnfinished } from "@/lib/localTest";
+import { UNLOCK_HOLD_MS, canPlayUnfinished, unlockUnfinished } from "@/lib/localTest";
 import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
@@ -38,9 +38,16 @@ const LeaveGame = createContext<() => void>(() => {});
 /** The way back to the menu before the game, for a game that has a way out of its own (the Timer). */
 export const useLeaveGame = () => useContext(LeaveGame);
 
+/** Whether leaving the game closes its book and puts it back on the shelf (not back to a menu or a routine). */
+const LeavesToShelf = createContext(false);
+
+/** For `GameEnd`'s „Menü“ button: it shows the shelf only where that is where it leads. */
+export const useLeavesToShelf = () => useContext(LeavesToShelf);
+
 /**
  * Tells GameShell whether the end of a level (`GameEnd`) is on screen: then the corner in the top left is the way back,
- * with one tap – the ribbon onto the shelf where the game goes back there – and the end shows no „Menü“ button of its own.
+ * with one tap – the ribbon onto the shelf where the game goes back there. The end shows no „Menü“ button of its own,
+ * except in Zähne putzen and Aufs Töpfchen (`GameEnd`'s `menu`).
  */
 const EndShown = createContext<(shown: boolean) => void>(() => {});
 
@@ -96,7 +103,8 @@ export interface GameMode {
   art?: ReactNode;
   /**
    * Still being built: the card says „in Bearbeitung“ and starts only where it may be tested (`canTestUnfinished`: the
-   * dev server or this computer); on the real site it stands greyed out and does nothing.
+   * dev server or this computer); on the real site it stands greyed out and does nothing – unless held for
+   * `UNLOCK_HOLD_MS`, a way only the grown-up who makes the app knows, which starts it with no sign (`unlockUnfinished`).
    */
   unfinished?: true;
 }
@@ -116,11 +124,17 @@ interface GameShellProps {
   /** Ways to play, as big cards: tapping one picks it and starts the game. Without them there is one start button. */
   modes?: GameMode[];
   /**
-   * The game's `vorschau/` folder (`import previews from "./vorschau/*.webp?glob"`): `<mode id>.webp` is a cut of
-   * the game as that card plays it, filling the card in place of its emoji (user request, November 2026). `bun run
+   * The game's `vorschau/` folder (`import previews from "./vorschau/*.webp?glob"`): `<mode id>.webp` is a framed cut of
+   * the game as that card plays it, shown on the card in place of its emoji (user request, November 2026). `bun run
    * previews` makes them; a still picture costs a phone nothing, where the game's own svg in every card would.
    */
   previews?: Record<string, string>;
+  /**
+   * The picture fills the whole card and the name lies on it in a small paper box, readable over any picture – for
+   * many cards whose pictures are the point (Kettenreaktion's machines, user request, November 2026). Without it the
+   * framed picture stands above the name.
+   */
+  labelOnPicture?: boolean;
   /** The mode played last, marked on its card. */
   mode?: string;
   onMode?: (id: string) => void;
@@ -171,6 +185,7 @@ export function GameShell({
   title,
   modes,
   previews,
+  labelOnPicture,
   mode,
   onMode,
   startMode,
@@ -190,8 +205,8 @@ export function GameShell({
   const returnTo = routineReturn(location.state);
   // Neither a routine's step nor a tool counts as play, nor stops when play time is over.
   const free = !!returnTo || !!tool;
-  // A game still being built is opened from the management page only, so its way back leads there.
-  const unfinished = isUnfinished(location.pathname);
+  // A game still being built and on no shelf is opened from the management page only, so its way back leads there.
+  const unfinished = isHidden(location.pathname);
   const category = unfinished ? undefined : categoryOf(location.pathname);
   const back = backHref ?? (unfinished ? "/management/" : category ? categoryHref(category) : "/");
   const backText =
@@ -272,6 +287,17 @@ export function GameShell({
   const stopRef = useRef(stop);
   stopRef.current = stop;
 
+  // A greyed-out card „in Bearbeitung“ held for three seconds starts anyway, for this visit (unlockUnfinished): with no
+  // ring, glow or sound while it is held, since only the grown-up who makes the app is to know it.
+  const heldMode = useRef<string | undefined>(undefined);
+  const unlockHold = useHold(() => {
+    const id = heldMode.current;
+    if (!id) return;
+    unlockUnfinished();
+    onMode?.(id);
+    void start(true);
+  }, UNLOCK_HOLD_MS);
+
   useEffect(() => {
     if (!playing) return;
     let escDownAt: number | null = null;
@@ -338,11 +364,13 @@ export function GameShell({
           <GoodNight />
         ) : (
           <LeaveGame value={stop}>
-            <EndShown value={setEnded}>
-              <InnerBack value={setInnerBack}>
-                <CountsPlaytime value={!free}>{children}</CountsPlaytime>
-              </InnerBack>
-            </EndShown>
+            <LeavesToShelf value={toShelf}>
+              <EndShown value={setEnded}>
+                <InnerBack value={setInnerBack}>
+                  <CountsPlaytime value={!free}>{children}</CountsPlaytime>
+                </InnerBack>
+              </EndShown>
+            </LeavesToShelf>
           </LeaveGame>
         )}
         {!free && !playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
@@ -387,17 +415,25 @@ export function GameShell({
   if (menu) return null;
 
   /** „in Bearbeitung“ on a card still being built (`GameMode.unfinished`). */
-  const unfinishedBadge = (
-    <span className="badge">
-      {t({ de: "in Bearbeitung", ru: "в работе", en: "in progress", zh: "制作中", hi: "तैयार हो रहा है", es: "en preparación", ar: "قيد الإعداد" })}
-    </span>
-  );
+  const unfinishedBadge = <span className="badge">{t(UNFINISHED_LABEL)}</span>;
 
   /** One mode's card; one still being built stands greyed out where it can't be tested. */
   const card = (m: GameMode) =>
-    m.unfinished && !canTestUnfinished() ? (
+    m.unfinished && !canPlayUnfinished() ? (
       <li key={m.id}>
-        <div className={`game-card mode-card disabled${pictureCard(previews?.[`${m.id}.webp`])}`} aria-disabled data-mode={m.id}>
+        <div
+          className={`game-card mode-card disabled${labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
+          role="button"
+          aria-disabled
+          data-mode={m.id}
+          onPointerDown={(e) => {
+            heldMode.current = m.id;
+            unlockHold.props.onPointerDown(e);
+          }}
+          onPointerUp={unlockHold.props.onPointerUp}
+          onPointerCancel={unlockHold.props.onPointerCancel}
+          onContextMenu={unlockHold.props.onContextMenu}
+        >
           <CardPicture emoji={m.emoji} picture={previews?.[`${m.id}.webp`]} />
           <span className="game-title">{m.title}</span>
           {unfinishedBadge}
@@ -407,7 +443,7 @@ export function GameShell({
       <li key={m.id}>
         <button
           type="button"
-          className={`game-card mode-card${m.art ? " mode-art-card" : pictureCard(previews?.[`${m.id}.webp`])}`}
+          className={`game-card mode-card${m.art ? " mode-art-card" : labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
           onClick={() => pick(m.id)}
           data-mode={m.id}
           aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}

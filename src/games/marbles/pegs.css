@@ -9,7 +9,7 @@
   touch-action: none;
 }
 
-/* The hint stands still (nothing moves before the first tap) and lets taps through. */
+/* The marble waiting at the top before the first tap lets taps through. */
 .pegs-hint {
   pointer-events: none;
 }

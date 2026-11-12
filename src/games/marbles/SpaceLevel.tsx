@@ -2,7 +2,7 @@ import { memo, useId, useMemo, type ReactNode } from "react";
 import { useT } from "@/lib/language";
 import { VIEW_H, wobble, type LevelProps } from "./level";
 import { beside, deg, hop, lerp, svgLine } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { INK, MARBLE_COLOR, Sparkles } from "./scenery";
 import {
   ARM,
@@ -71,7 +71,7 @@ export function SpaceLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={space} level="space" {...props}>
+    <MachineStage machine={space} level="space" start={{ x: DISH.x, y: DISH.y - 6, r: 96 }} {...props}>
       {(t) => (
         <>
           <Sky sky={`${ids}-sky`} t={t} space={space} />
@@ -103,8 +103,6 @@ export function SpaceLevel(props: LevelProps) {
           <PipeFront space={space} />
           <Smoke space={space} t={t} />
           <Sparkles x={ROCKET.x} y={330} age={t - space.tLift - 0.9} n={12} spread={320} />
-
-          <TapHint t={t} x={DISH.x + 110} y={DISH.y + 100} />
         </>
       )}
     </MachineStage>

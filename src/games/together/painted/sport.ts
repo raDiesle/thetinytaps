@@ -251,11 +251,12 @@ export const PAINTED: PaintedPair[] = [
     partner: { name: "Fahrrad", the: "das Fahrrad", acc: "das Fahrrad", emoji: "🚲" },
     cast: "bear",
     before:
-      "A country road winding through green hills to a little village far away. At the roadside, seen whole from her helmet to her feet with room round her, stands a grown-up bear woman with eyelashes in a yellow sports shirt with green stripes and a green helmet, her paws empty, looking down the long road to the far village, brows raised, mouth a small o.",
+      "A country road winding through green hills to a little village far away. At the roadside on the right, small enough that the whole of her fits with room round her – her helmet well below the top edge, both feet on the grass well above the bottom edge, never cut off at the hips – stands a grown-up bear woman with eyelashes in a yellow sports shirt with green stripes and a green helmet, her paws empty, looking down the long road to the far village, brows raised, mouth a small o.",
     after: "She now stands where she was, astride a green bicycle, both paws on its handlebars and one foot on a pedal, ready to ride off, smiling happily.",
     sounds: ["ring", "whoosh"],
     // A motorbike and a unicycle go down a road too.
     alsoFits: ["motorradfahrerin", "einradfahrer"],
+    made: true,
   },
   {
     id: "kletterin",

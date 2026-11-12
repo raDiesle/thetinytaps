@@ -52,11 +52,14 @@ function stepName(story: Story, i: number, language: TargetLanguageId) {
  */
 export function AdventurePlay({
   story,
+  storyId,
   language,
   settings,
   next,
 }: {
   story: Story;
+  /** The story's id in `STORIES`, for its trophy at the end. */
+  storyId: string;
   language: TargetLanguage;
   settings: CommonSettings;
   /** The story „Weiter“ starts at the end; none where only one story can be played. */
@@ -259,7 +262,7 @@ export function AdventurePlay({
           ▶
         </button>
       )}
-      {ended && <GameEnd onAgain={again} next={next} />}
+      {ended && <GameEnd level={storyId} onAgain={again} next={next} />}
       <p className="adventure-sr-only">{scene}</p>
     </div>
   );

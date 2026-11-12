@@ -21,16 +21,19 @@ import { SneezeLevel } from "./SneezeLevel";
 import { SpaceLevel } from "./SpaceLevel";
 import { TidyLevel } from "./TidyLevel";
 import { ToppleLevel } from "./ToppleLevel";
-import { SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
+import { ColorTrackLevel, SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
 import { marblesVoice } from "./voice";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
 import { DEV } from "@/lib/buildInfo";
+import { useLocation } from "react-router";
+import { awardTrophy, gameOfPath } from "@/lib/trophies";
 
 /** The levels in turn (names and first lines in `content.ts`). */
 const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
   { id: "track", Level: TrackLevel },
+  { id: "colortrack", Level: ColorTrackLevel },
   { id: "snowtrack", Level: SnowTrackLevel },
   { id: "spacetrack", Level: SpaceTrackLevel },
   { id: "slidetrack", Level: SlideTrackLevel },
@@ -53,7 +56,7 @@ const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
 ];
 
 /** The marble runs, the wooden one and its other worlds (K-18). */
-const RUNS: MarbleLevel[] = ["track", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
+const RUNS: MarbleLevel[] = ["track", "colortrack", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
 
 /** The levels in turn, beginning with the chosen one (in development `?level=garden` in the address), so „Weiter“ always has a next. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
@@ -85,7 +88,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
   const level = levelAt(index);
   const next = levelAt(index + 1);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -112,14 +115,19 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     setParty(true);
     // The good-night machine ends as calmly as it ran.
     sound(level.id === "night" ? playLullaby : playMelody);
-    celebrate();
     timers.current.push(
       setTimeout(() => {
         setParty(false);
         setEnded(true);
       }, PARTY_MS),
     );
-  }, [sound, celebrate, level.id]);
+  }, [sound, level.id]);
+
+  // One ball in the goal is enough for the level's trophy (user decision, November 2026); the end shows it beside its buttons.
+  const game = gameOfPath(useLocation().pathname)?.href;
+  const onGoal = useCallback(() => {
+    if (game) awardTrophy(game, level.id);
+  }, [game, level.id]);
 
   const startLevel = (nextIndex: number) => {
     setEnded(false);
@@ -141,8 +149,8 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
-      <level.Level key={round} sound={sound} say={say} onDone={onDone} watch={settings.play === "watch"} />
-      {ended && <GameEnd onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
+      {ended && <GameEnd level={level.id} onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <FeedbackLayer effects={effects} />
     </div>
   );

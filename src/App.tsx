@@ -24,6 +24,7 @@ const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/b
 const CountingPage = page(() => import("@/pages/LettersPage"), "CountingPage", "/zaehlen/");
 const MovePage = page(() => import("@/pages/LettersPage"), "MovePage", "/mitmachen/");
 const WordsPage = page(() => import("@/pages/LettersPage"), "WordsPage", "/woerter/");
+const CasePage = page(() => import("@/pages/LettersPage"), "CasePage", "/gross-klein/");
 const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
@@ -32,6 +33,7 @@ const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-
 const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
 const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/");
+const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
 const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
@@ -58,6 +60,7 @@ export function App() {
         <Route path="zaehlen" element={<CountingPage />} />
         <Route path="mitmachen" element={<MovePage />} />
         <Route path="woerter" element={<WordsPage />} />
+        <Route path="gross-klein" element={<CasePage />} />
         <Route path="tiere" element={<AnimalsPage />} />
         <Route path="zusammen" element={<TogetherPage />} />
         <Route path="bilder" element={<ScenesMenu />} />
@@ -66,6 +69,7 @@ export function App() {
         <Route path="toepfchen" element={<PottyPage />} />
         <Route path="abstillen" element={<MilkChainPage />} />
         <Route path="schnullerfee" element={<PacifierStoryPage />} />
+        <Route path="kita" element={<KitaStoryPage />} />
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />

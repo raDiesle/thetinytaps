@@ -88,7 +88,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Spiele & Alltagshelfer für Kleinkinder – kostenlos",
     description:
       "Lernspiele und Alltagshelfer für Kleinkinder: Wimmelbilder, Gefühle, Buchstaben, Timer, Zähneputzen, Töpfchen, Belohnungstafel, Abstillen. Ohne Werbung.",
-    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. In den Büchern warten Wimmelbilder, Bewegungsabenteuer, Kettenreaktionen und kleine Abenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und Erkennen. Und weil der Tag mit einem kleinen Kind seine eigenen kleinen Hürden hat, stehen gleich daneben unsere Alltagshelfer: ein Timer, der die Zeit in Bildern zeigt, Zähneputzen mit Lied, das Töpfchen-Spiel, eine Belohnungstafel, ein Tagesplan in Bildern und ein Countdown „Wie oft noch schlafen?“ – am Tablet oder zum Ausdrucken – und Vorlesegeschichten in Kapiteln fürs Abstillen und für den Abschied vom Schnuller mit der Schnullerfee.",
+    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. In den Büchern warten Wimmelbilder, Bewegungsabenteuer, Kettenreaktionen und kleine Abenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und Erkennen. Und weil der Tag mit einem kleinen Kind seine eigenen kleinen Hürden hat, stehen gleich daneben unsere Alltagshelfer: ein Timer, der die Zeit in Bildern zeigt, Zähneputzen mit Lied, das Töpfchen-Spiel, eine Belohnungstafel, ein Tagesplan in Bildern und ein Countdown „Wie oft noch schlafen?“ – am Tablet oder zum Ausdrucken – und Vorlesegeschichten in Kapiteln fürs Abstillen, für den Abschied vom Schnuller mit der Schnullerfee und für den Start in der Kita.",
   },
   {
     path: "/spiele/lebendige-welten/",
@@ -154,7 +154,7 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/kettenreaktion/",
     title: "Kettenreaktion und Kugelbahn für Kinder",
     description: "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kleinkinder, ohne Werbung.",
-    text: "Zwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine und Alltagsdinge fallen um, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt – zum Staunen und Nochmal-Machen.",
+    text: "Einundzwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine und Alltagsdinge fallen um, eins stößt das nächste an. Auf der Farbenbahn sucht das Kind für jede Kugel Rot, Gelb oder Blau aus, und unten fällt sie in die Röhre ihrer Farbe und wird mitgezählt. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt – zum Staunen und Nochmal-Machen.",
   },
   {
     path: "/kleine-abenteuer/",
@@ -168,7 +168,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Tiere füttern – Tierspiel für Kleinkinder",
     description:
       "Was gehört zum Tier? Was frisst es, was gibt es uns, wo wohnt es, und was wird aus der Raupe? Mit Tiergeräuschen, für Kleinkinder, ohne Werbung.",
-    text: "Der Hase will eine Möhre, der Elefant Erdnüsse, die Kuh gibt uns Milch, der Biber sucht seine Burg, aus der Raupe wird ein Schmetterling und aus dem Samen eine Sonnenblume: Futter, Milch, Ei oder Zuhause antippen, und das Tier freut sich und macht sein Geräusch. Viele Tiere vom Bauernhof, aus Wald, Zoo und Meer. Das Spiel wird von selbst leichter oder schwerer.",
+    text: "Der Hase will eine Möhre, der Elefant Erdnüsse, die Kuh gibt uns Milch, der Biber sucht seine Burg, aus der Raupe wird ein Schmetterling und aus dem Samen eine Sonnenblume: Futter, Milch, Ei oder Zuhause antippen, und das Tier freut sich und macht sein Geräusch. Viele Tiere vom Bauernhof, aus Wald, Zoo und Meer. Und hinter einem kleinen Vorhang muht, bellt oder brüllt es: Wer war das? Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/zusammen/",
@@ -214,6 +214,12 @@ export const SEO_TEXTS: PageSeo[] = [
     description:
       "Erste Wörter Buchstabe für Buchstabe tippen: Bär, Ball, Farben und Tu-Wörter. Oder „Wo ist das B?“ – die Taste zum Buchstaben finden. Ohne Werbung.",
     text: "Ein Bild und sein Wort: Das Kind tippt es Buchstabe für Buchstabe auf der Tastatur oder dem Bildschirm. Bildwörter, Farben, Tu-Wörter oder alles gemischt, in drei Längen. Oder nur der erste Buchstabe: „Wo ist das B?“ – die Taste dazu finden.",
+  },
+  {
+    path: "/gross-klein/",
+    title: "Wo ist das kleine b? – große und kleine Buchstaben",
+    description: "Ein großer Buchstabe mit Augen sucht sein Kind: Von drei kleinen Buchstaben gehört einer dazu, läuft zu ihm und nimmt seine Hand.",
+    text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe mit Augen sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber, und beide halten sich an der Hand; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p.",
   },
   {
     path: "/zaehne/",
@@ -263,6 +269,13 @@ export const SEO_TEXTS: PageSeo[] = [
     description:
       "Eine Vorlesegeschichte in Kapiteln: Tapsi der Fuchs sammelt seine drei Schnuller ein, und nachts tauscht die Schnullerfee sie gegen ein Geschenk.",
     text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn der Schnuller gehen soll. Tapsi der Fuchs hat drei Schnuller, einen roten, einen blauen und einen gelben, und mit Schnuller im Mund versteht Mama nur „Mmm-mmm“. Mama und Papa erzählen von der Schnullerfee, die die Schnuller zu den kleinen Babys bringt. Erst wohnt der Schnuller nur noch im Bett und darf nur zum Einschlafen in den Mund. Dann sagt Tapsi selbst, dass die Fee kommen darf, Papa klebt drei Sterne ans Fenster, und jeden Morgen nimmt Tapsi einen ab. Am großen Tag sucht Tapsi alle Schnuller zusammen, legt sie in eine Schachtel, gibt jedem einen Abschiedskuss und stellt sie mit einem gemalten Bild aufs Fensterbrett. Die erste Nacht ist schwer, Tapsi weint, und Mama und Papa bleiben da, trösten und singen. Nachts fliegt die Schnullerfee herein, nimmt die Schachtel und legt ein Geschenk hin: einen Kuschelhasen, der jetzt beim Einschlafen hilft. Tapsi darf den Schnuller vermissen und traurig sein, und Mama und Papa haben Tapsi lieb, mit Schnuller und ohne. Das Buch beginnt mit seinem Inhaltsverzeichnis, unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter.",
+  },
+  {
+    path: "/kita/",
+    title: "Kita-Eingewöhnung und Abschied – eine Geschichte",
+    description:
+      "Eine Vorlesegeschichte in Kapiteln für die Kita-Eingewöhnung und den Abschied am Morgen: Tapsi der Fuchs kommt in die Kita, und Mama kommt immer wieder.",
+    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn die Kita beginnt oder der Abschied am Morgen schwerfällt. Mama und Papa erzählen Tapsi dem Fuchs von der Kita, Papa und Tapsi schauen sie sich von außen an, und zusammen packen sie den Rucksack mit Hausschuhen und dem Kuschelhasen. In den ersten Tagen bleibt Mama mit in der Kita, auf einem kleinen Stuhl, während Tapsi Mia kennenlernt, die Erzieherin, und mit Bruno spielt. Dann geht Mama zum ersten Mal kurz hinaus und sagt vorher, dass sie wiederkommt; Tapsi weint, Mia tröstet, und Mama ist bald wieder da. Mia hilft beim Frühstück und pustet aufs Knie, und jeden Tag bleibt Mama etwas länger weg. Ein Kapitel ist das Abschiedsritual, das man jeden Morgen lesen kann: Jacke an den Haken mit dem Stern, einmal fest drücken, ein Kuss auf die Nase, „Ich hole dich nach dem Mittagsschlaf ab“ und Winken am Fenster – Mama schleicht sich nie weg. Dann Tapsis Tag mit Morgenkreis, Turmbauen, Sandkasten, Mittagessen und Mittagsschlaf, und genau danach steht Mama in der Tür. Das Buch beginnt mit seinem Inhaltsverzeichnis, unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter. Nach dem Berliner Eingewöhnungsmodell.",
   },
   {
     path: "/abstillen/",

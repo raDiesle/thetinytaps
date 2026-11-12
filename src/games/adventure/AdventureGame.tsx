@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
 import { type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
-import { canTestUnfinished } from "@/lib/localTest";
+import { canPlayUnfinished } from "@/lib/localTest";
 import { useAppLanguage, useT } from "@/lib/language";
 import { useStoredSettings } from "@/lib/storage";
 import { AdventurePlay } from "./AdventurePlay";
@@ -19,22 +19,22 @@ const STORIES: { id: AdventureStoryId; emoji: string; story: Story; unfinished?:
   { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP, unfinished: true },
 ];
 
-/** The stories that can be played here: those still being built only where they may be tested. */
-const PLAYABLE = STORIES.filter((s) => !s.unfinished || canTestUnfinished());
-
 /** The start screen: no options of its own, music and Tapsi's language come from the home page. */
 export function AdventureGame() {
   const [settings, update] = useStoredSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
   const t = useT();
   const app = useAppLanguage();
+  // The stories that can be played here: those still being built only where they may be tested, or once a held card
+  // unlocked them for the visit (`unlockUnfinished`) – so asked at every render, not once.
+  const playable = STORIES.filter((s) => !s.unfinished || canPlayUnfinished());
   const at = Math.max(
     0,
-    PLAYABLE.findIndex((s) => s.id === settings.story),
+    playable.findIndex((s) => s.id === settings.story),
   );
-  const chosen = PLAYABLE[at].story;
+  const chosen = playable[at].story;
   // „Weiter“ at the end: the next story that can be played, after the last the first – none where there is only one.
-  const next = PLAYABLE.length > 1 ? PLAYABLE[(at + 1) % PLAYABLE.length] : undefined;
+  const next = playable.length > 1 ? playable[(at + 1) % playable.length] : undefined;
   // The app language, like every game. A story not told in it yet is said in English,
   // or else German – never German words with a Russian voice.
   const told = (id: string) => id === "de" || Boolean(chosen.translations?.[id as TargetLanguageId]);
@@ -62,6 +62,7 @@ export function AdventureGame() {
       <AdventurePlay
         key={story.sequence.title}
         story={story}
+        storyId={playable[at].id}
         language={language}
         settings={common}
         next={next && { name: storyTitle(next.story, app.id), onNext: () => update({ story: next.id }) }}

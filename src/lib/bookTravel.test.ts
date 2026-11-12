@@ -8,7 +8,7 @@ import { shelfBookOf } from "./bookTravel";
 test("every category's page and every game finds its book on the shelf", () => {
   for (const category of CATEGORIES) {
     if (!category.apart) expect(shelfBookOf(categoryHref(category))).toBe(category.id);
-    for (const game of category.games.filter((g) => g.unfinished)) expect(shelfBookOf(game.href), game.href).toBeUndefined();
+    for (const game of category.games.filter((g) => g.unfinished === true)) expect(shelfBookOf(game.href), game.href).toBeUndefined();
     for (const game of listedGames(category)) {
       // A bundle of volumes: the game's own address is the volume of that address, wherever it stands in the bundle.
       const own = game.volumes?.find((v) => v.href === game.href)?.href ?? game.volumes?.[0].href ?? game.href;

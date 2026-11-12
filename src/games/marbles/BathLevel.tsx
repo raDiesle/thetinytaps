@@ -66,7 +66,7 @@ export function BathLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={bath} level="bath" {...props}>
+    <MachineStage machine={bath} level="bath" start={{ x: BUTTON.x, y: BUTTON.y, r: 62, side: "left" }} {...props}>
       {(t) => (
         <>
           <Room tiles={`${ids}-tiles`} />
@@ -93,7 +93,6 @@ export function BathLevel(props: LevelProps) {
           <Bubbles bath={bath} t={t} sheen={`${ids}-sheen`} />
           <Sparkles x={LAMP.x} y={LAMP.y + 20} age={t - bath.tLast - 0.15} n={12} spread={260} />
           <Sparkles x={WHALE.stop} y={FLOOR - 170} age={t - bath.tLast - 0.5} n={8} spread={200} />
-          {t < 0 && <Hint />}
         </>
       )}
     </MachineStage>
@@ -845,19 +844,6 @@ function Bubbles({ bath, t, sheen }: { bath: Bath; t: number; sheen: string }) {
           </g>
         );
       })}
-    </g>
-  );
-}
-
-/** Before the tap: a soft glow round the red button and a still finger pointing at it. */
-function Hint() {
-  return (
-    <g className="marble-hint">
-      <circle cx={BUTTON.x} cy={BUTTON.y} r="62" fill="#ffd23f" opacity="0.35" />
-      <circle cx={BUTTON.x} cy={BUTTON.y} r="62" fill="none" stroke="#ffb703" strokeWidth="6" />
-      <text x={BUTTON.x - 120} y={BUTTON.y + 32} fontSize="90" textAnchor="middle">
-        👉
-      </text>
     </g>
   );
 }

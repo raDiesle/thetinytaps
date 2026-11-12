@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { PREVIEW_SIZE } from "@/components/GameCard";
 import { SCENE_ENTRIES } from "@/games/scenes/catalog";
 
-// The menus show a 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
+// The menus show a framed 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
 // `bun run previews` (tools/previews.ts) as small still pictures: these checks keep every menu's pictures there and
 // light, so a phone shows a menu without drawing a single game.
 

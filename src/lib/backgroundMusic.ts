@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { downloadMusic } from "@/lib/musicFile";
+import { DUCK, songGain } from "@/lib/loudness";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { afterLoad, savesData } from "@/lib/pwa";
 import { decodeSound, type Loop, playLoop, unlockAudio } from "@/lib/sfx";
@@ -21,10 +22,10 @@ const SONG = {
   loopEnd: 158.81,
 };
 
-/** Loudness of the song: below the tap sounds, which are what the games are about. */
-const VOLUME = 0.25;
+/** Loudness of the song: as loud as the voice (measured −17.3 LUFS, see src/lib/loudness.ts; measure a new song again). */
+const VOLUME = songGain(-17.3);
 /** Loudness while the voice speaks, so it can be understood. */
-const DUCKED = 0.06;
+const DUCKED = VOLUME * DUCK;
 /** How often to look whether the voice is speaking. */
 const DUCK_CHECK_MS = 150;
 

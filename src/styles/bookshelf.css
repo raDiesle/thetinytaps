@@ -1935,3 +1935,58 @@
 .bt-left .bt-print .sky {
   box-shadow: none;
 }
+
+/*
+ * The trophies won (TrophyShelf), standing in a row at the right end of the lowest board of books, beside the books
+ * spine out; one button, which opens all of them. Still: they never shine or move by themselves.
+ */
+.shelf-end > .home-menu {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.shelf-trophies {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.shelf-trophies-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--trophy-gap);
+  padding: 0 2px;
+}
+
+.room-thing .shelf-trophy {
+  height: var(--trophy-h);
+  width: auto;
+  aspect-ratio: 2 / 3;
+}
+
+/* All trophies won, by game side by side, in the menu that opens from the shelf. */
+.trophy-cabinet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+}
+
+.trophy-cabinet-game h3 {
+  margin: 0.4em 0 0.2em;
+  font-size: 1.05rem;
+}
+
+.trophy-cabinet-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 14px;
+}
+
+.trophy-cabinet-trophy {
+  height: clamp(80px, 16vh, 120px);
+  width: auto;
+  aspect-ratio: 2 / 3;
+}

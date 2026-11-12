@@ -4,11 +4,11 @@ import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GERMAN_ONLY, GIFT_TE
 import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOME_LOOKALIKES, HOMES, type HomeId } from "./homes";
-import { PEEK_ITEMS } from "@/games/shadows/content";
 import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./growth";
-import { KIND_SIGNS } from "./RoundTopic";
 import { DEFAULT_ANIMALS_SETTINGS } from "./settings";
-import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
+import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealSound, KIND_ORDER, nextKind, type RoundKind } from "./levels";
+import { SOUND_ANIMALS, SOUND_LOOKALIKES, soundLookAlike } from "./sounds";
+import { readdirSync } from "node:fs";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -144,21 +144,19 @@ test("all kinds take turns in their order, or only the one chosen; no kind is sw
     for (let i = 0; i < 6; i++) played.push(nextKind(played[played.length - 1], kinds));
     return played;
   };
-  expect(turns("all")).toEqual(["feed", "gift", "home", "grow", "feed", "gift", "home"]);
+  expect(turns("all")).toEqual(["feed", "gift", "home", "grow", "sound", "feed", "gift"]);
   expect(turns("home")).toEqual(["home", "home", "home", "home", "home", "home", "home"]);
   // One kind chosen while another plays: the next round is the chosen one.
   expect(nextKind("feed", "grow")).toBe("grow");
   expect(DEFAULT_ANIMALS_SETTINGS.kinds).toBe("all");
   for (const kind of KIND_ORDER) expect(kind in DEFAULT_ANIMALS_SETTINGS, kind).toBe(false);
-  // The fixed difficulties are steps there are, easy to hard.
-  expect(FIXED_LEVELS.easy).toBe(0);
-  expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
-  expect(FIXED_LEVELS.hard).toBe(ANIMAL_LEVELS.length - 1);
+  // No „Schwierigkeit“ any more: the game always finds it itself (user decision, November 2026).
+  expect("difficulty" in DEFAULT_ANIMALS_SETTINGS).toBe(false);
 });
 
 test("the rounds take turns starting with feeding, and the steps only get harder", () => {
   expect(KIND_ORDER[0]).toBe("feed");
-  expect(new Set(KIND_ORDER).size).toBe(4);
+  expect(new Set(KIND_ORDER).size).toBe(5);
   ANIMAL_LEVELS.forEach((level, i) => {
     const before = ANIMAL_LEVELS[i - 1];
     expect(level.choices).toBeGreaterThanOrEqual(2);
@@ -389,12 +387,12 @@ test("the German sentences of „Was wird aus mir?“ say „aus dem“ and „a
   expect(de.comesFrom(byId.schirmchen)).toBe("Der Löwenzahn kommt aus dem Schirmchen!");
 });
 
-// A round's sign stands before its name under ⚙️; were it one of the pictures to pick from, it would give the answer away
-// or look like one more choice.
-test("no round's sign is a picture the child picks from", () => {
-  const pictures = new Set([...ANIMALS, ...FOODS, ...PEEK_ITEMS, ...GROWTHS].map((thing) => thing.emoji));
-  expect(Object.values(KIND_SIGNS).filter((sign) => pictures.has(sign))).toEqual([]);
-  expect(Object.keys(KIND_SIGNS).sort()).toEqual([...KIND_ORDER].sort());
+// „Was drankommt“ lists the kinds by name only, no signs (user decision, November 2026).
+test("the kinds are chosen by their names, with no sign before them", async () => {
+  const source = await Bun.file(new URL("./AnimalsGame.tsx", import.meta.url)).text();
+  expect(source).not.toContain("KIND_SIGNS");
+  expect(source).not.toContain("PlayOptions");
+  expect(source).not.toMatch(/label: `\$\{/);
 });
 
 // While playing, the round's kind is plain small text under the picture, never its sign in a bubble (user feedback,
@@ -402,7 +400,7 @@ test("no round's sign is a picture the child picks from", () => {
 test("the round's topic while playing is plain text, without its sign", async () => {
   const source = await Bun.file(new URL("./RoundTopic.tsx", import.meta.url)).text();
   const component = source.slice(source.indexOf("export function RoundTopic"));
-  expect(component).not.toContain("KIND_SIGNS");
+  expect(component).not.toContain("SIGN");
   expect(component).not.toContain("bubble");
 });
 
@@ -412,5 +410,39 @@ test("a food shared by several animals looks and is named the same for each", ()
   for (const animal of ANIMALS.filter((a) => a.food)) {
     const shared = FOODS.find((f) => f.id === animal.food!.id)!;
     expect(animal.food, animal.id).toEqual(shared);
+  }
+});
+
+// „Wer macht das Geräusch?“ (Z-15): every animal that calls has a recording of its own, so the sound says who it is.
+test("every calling animal has a recording of its own, and no two share one", () => {
+  const files = new Set(readdirSync(new URL("../../lib/sounds/", import.meta.url)).map((f) => f.replace(/\.mp3$/, "")));
+  const calls = SOUND_ANIMALS.map((a) => a.call!);
+  for (const a of SOUND_ANIMALS) expect(files.has(a.call!), `${a.id} ${a.call}`).toBe(true);
+  expect(new Set(calls).size).toBe(calls.length);
+  // An animal calls with its own recording wherever it calls.
+  for (const a of SOUND_ANIMALS) expect(a.sound, a.id).toBeDefined();
+});
+
+test("the sound look-alikes name animals that call, each in one group only", () => {
+  const ids = SOUND_LOOKALIKES.flat();
+  const callers = new Set(SOUND_ANIMALS.map((a) => a.id));
+  const animals = new Set(ANIMALS.map((a) => a.id));
+  // A group may name an animal still waiting for its recording, but never one that isn't there at all.
+  for (const id of ids) expect(animals.has(id), id).toBe(true);
+  expect(new Set(ids).size).toBe(ids.length);
+  // Enough left to choose from: every caller has at least three that don't sound like it.
+  for (const a of SOUND_ANIMALS) expect(SOUND_ANIMALS.filter((b) => b !== a && !soundLookAlike(a, b)).length, a.id).toBeGreaterThanOrEqual(3);
+  expect(callers.size).toBeGreaterThanOrEqual(20);
+});
+
+test("a sound round offers exactly one animal that sounds like what is heard", () => {
+  for (const level of ANIMAL_LEVELS) {
+    for (const animal of SOUND_ANIMALS) {
+      const r = dealSound(animal, level.choices);
+      expect(r.animals.length).toBe(level.choices);
+      expect(new Set(r.animals).size).toBe(level.choices);
+      expect(r.animals[r.correct]).toBe(animal);
+      for (const other of r.animals) if (other !== animal) expect(soundLookAlike(other, animal), `${animal.id} ${other.id}`).toBe(false);
+    }
   }
 });

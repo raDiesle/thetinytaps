@@ -9,7 +9,7 @@
 import type { Localized } from "@/lib/language";
 import type { Beat, OopsSound } from "./story";
 
-/** The kindergarten stories, and the stories of more feelings in selbst.ts that play the same way. */
+/** The kindergarten stories, and the stories of more feelings in selbst.ts and alltag.ts that play the same way. */
 export type SituationId =
   | "push"
   | "kick"
@@ -44,7 +44,38 @@ export type SituationId =
   | "shy"
   | "bored"
   | "empathy"
-  | "startle";
+  | "startle"
+  | "puzzle"
+  | "race"
+  | "farewell"
+  | "myself"
+  | "homesick"
+  | "barber"
+  | "accident"
+  | "laughed"
+  | "excited"
+  | "envy"
+  | "supermarket"
+  | "pointing"
+  | "bee"
+  | "phone"
+  | "hit"
+  | "pickup"
+  | "bath"
+  | "butterfly"
+  | "morning"
+  | "worn"
+  | "sick"
+  | "car"
+  | "sticky"
+  | "nappy"
+  | "socks"
+  | "lick"
+  | "paintbrush"
+  | "bluecup"
+  | "nap"
+  | "teeth"
+  | "bedtime";
 
 /** The not-so-good idea next to a good step. */
 export interface KitaInstead {

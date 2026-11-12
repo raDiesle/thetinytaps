@@ -204,6 +204,8 @@ export const lettersIdeas: IdeaArea = {
       text: "Option bei „A a“: Der große Buchstabe sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört dazu; wird er angetippt, läuft er zur Mama (L-09) und beide wackeln. Die anderen winken nur. Erst sehr verschiedene Buchstaben (B, o, x), später ähnliche (b, d, p).",
       why: "Groß und klein zusammenbringen – die Brücke zum Lesen echter Texte, in denen fast alles klein ist.",
       effort: "S",
+      partial:
+        "Als eigenes Spiel im Buch „Buchstaben & Zahlen“ (/gross-klein/, November 2026), mit Schild „in Bearbeitung“ und nur auf diesem Rechner spielbar. Die Frage „Wo ist das kleine …?“ ist noch nicht aufgenommen, Name und Zeile nur auf Deutsch.",
     },
   ],
 };

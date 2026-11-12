@@ -53,7 +53,7 @@ export const PAINTED: PaintedPair[] = [
     after: "The cook now ladles soup with a big silver ladle into the child's bowl; steam rises, and the child and the cook smile happily.",
     sounds: ["trickle", "yum"],
     fromFirst: true,
-    made: "part",
+    made: true,
   },
   {
     id: "eisverkaeuferin",

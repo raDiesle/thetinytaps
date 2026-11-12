@@ -35,6 +35,28 @@ export interface EndProps {
   fullAge: number;
   /** Seconds since the end was tapped. */
   tapAge: number;
+  /** In a run that sorts by colour (K-10), the tube that got full first; -1 before. */
+  fullTube: number;
+}
+
+/**
+ * A run that sorts by colour (K-10): the shelf always holds one marble of each
+ * colour, the one taken pops up again, and each marble hops into the tube of
+ * its colour at the end, where the voice counts it. The first full tube ends the run.
+ */
+export interface ColorSort {
+  /** The shelf's marbles, one colour per place, left to right; the tubes in the same order. */
+  colors: string[];
+  /** Where the n-th marble (0 first) of the i-th colour comes to rest. */
+  landAt: (tube: number, n: number) => Pt;
+  /** How a marble hops from the run's end into its tube, `k` from 0 to 1. */
+  hop: (from: Pt, to: Pt, k: number) => Pt;
+  /** How long that hop takes (ms). */
+  hopMs: number;
+  /** Marbles of one colour that fill its tube. */
+  full: number;
+  /** Said as the n-th marble (from 1) of the i-th colour lands, „Drei rote!“; null for none. */
+  count: (tube: number, n: number) => Localized | null;
 }
 
 /** One marble run's world. Everything not named here is the same on every run. */
@@ -70,6 +92,8 @@ export interface TrackTheme {
   landAt?: (i: number) => Pt;
   /** Things that arrive become part of the end (the snowman) instead of lying there. */
   absorb?: boolean;
+  /** Sorts the marbles into tubes by colour (K-10) instead of letting the five things fill one end. */
+  sort?: ColorSort;
   /** How far the things lying at the end are lifted, `fullAge` seconds after it was full (the crane). */
   pileLift?: (fullAge: number) => number;
 }

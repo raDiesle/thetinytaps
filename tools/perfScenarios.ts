@@ -122,6 +122,12 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Hüpfen, klatschen, stampfen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [..."3a2b"], every: 2200 } }],
   },
   {
+    // Wo ist das kleine b?: letter keys choose among the three small letters; the right one walks over on its own layer.
+    name: "gross-klein",
+    path: "/gross-klein/",
+    parts: [{ label: "Kleine Buchstaben finden", before: [{ wait: 1500 }], ms: 9000, type: { keys: [..."abcdefghiklmnoprstu"], every: 450 } }],
+  },
+  {
     name: "woerter",
     path: "/woerter/",
     parts: [{ label: "Wörter tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcdefghijklmnoprstu"], every: 400 } }],
@@ -135,6 +141,13 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Was wird aus mir?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
   {
+    // „Wer macht das Geräusch?“ alone: the curtain tapped (it sways) and the right animal picked, so it opens again and again.
+    name: "tiere-geraeusche",
+    path: "/tiere/",
+    storage: `localStorage.setItem("tinytaps.animals.v3", JSON.stringify({ kinds: "sound" }))`,
+    parts: [{ label: "Wer macht das Geräusch?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '.as-stage, [data-tap="goal"]', every: 700 } }],
+  },
+  {
     // „Was gehört zusammen?“: the right one tapped each time, so every pair and helper sets to work in turn.
     name: "zusammen",
     path: "/zusammen/",
@@ -143,6 +156,7 @@ export const SCENARIOS: Scenario[] = [
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "kita", path: "/kita/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices

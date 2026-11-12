@@ -1,26 +1,34 @@
+import { ALLTAG_PICTURE_QUEUE } from "@/games/feelings/alltagDrawings";
 import { DAY_PICTURE_QUEUE } from "@/games/feelings/dayPictures";
 import { MOOD_PICTURE_QUEUE } from "@/games/feelings/moodPictures";
 import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
 import { TOGETHER_PICTURE_QUEUE } from "@/games/together/picturePrompts";
 import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
 import { PACIFIER_PICTURE_QUEUE } from "@/games/pacifierstory/pacifierStoryPictures";
+import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
-// here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet of
-// small pictures, or a picture that never shares one) and leaves the rest until later sessions bring partners for
-// its sheet – unless the grown-up says to make it now. The management page shows what waits and what for.
+// here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet, or a
+// picture that never shares one) and leaves the rest until later sessions bring partners for its sheet – unless the
+// grown-up says to make it now (user decision, November 2026: never a picture alone, always the cheapest way, unless
+// the user says to make it faster). The management page shows what waits and what for.
 // A made picture leaves the queue in the same commit (pictureQueue.test.ts fails while its file exists).
 
 /**
  * The only reasons a picture may take a request of its own where a sheet could hold it (user feedback, November 2026:
- * frames and cut-outs sent one by one cost twice what sheets would have). Small things share 2x2 sheets, the moments of
+ * frames and cut-outs sent one by one cost twice what sheets would have; November 2026 again: never alone where a sheet
+ * works). Small things share 1K sheets of Lite, big ones and whole pictures 2K sheets of Nano Banana 2.1, the moments of
  * one scene go in one request as `panels`; a new reason comes here only once a check proved a sheet fails for it.
  */
 export const ALONE_REASONS = {
   /** A second frame drawn from a first that is already made, so the two stay one scene (Lebendige Bilder). */
   "second frame": "drawn from its first frame, which is already made",
-  /** A page of a story drawn from its scene's first picture, keeping the place (Gefühle's days). */
+  /**
+   * A later picture of a story drawn from its first one, keeping the place (Gefühle's stories and days). Proved on
+   * 11 November 2026: on 2K sheets of Nano Banana 2.1 the pictures lost what they had to keep (the bunny gone in six of
+   * eight panels, though every panel said so), while Lite alone kept it (research „gemini-bildpreise“, A-33).
+   */
   "story picture": "drawn from its scene's first picture, so the place stays the same",
 } as const;
 
@@ -67,10 +75,12 @@ export interface QueuedPicture {
 /** Every picture waiting, oldest first. */
 export const PICTURE_QUEUE: QueuedPicture[] = [
   ...RITUAL_PICTURE_QUEUE,
+  ...ALLTAG_PICTURE_QUEUE,
   ...DAY_PICTURE_QUEUE,
   ...MOOD_PICTURE_QUEUE,
   ...TOGETHER_PICTURE_QUEUE,
   ...MILK_CHAIN_PICTURE_QUEUE,
   ...PACIFIER_PICTURE_QUEUE,
+  ...KITA_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,
 ];
