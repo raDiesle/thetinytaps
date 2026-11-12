@@ -39,7 +39,7 @@ import { appPlugin } from "../tools/appPlugin.ts";
 // (`bun run image queue` failed on „Cannot find module './bilder/*.webp?glob'“, November 2026).
 plugin(appPlugin());
 const { PICTURE_QUEUE } = await import("../src/content/pictureQueue.ts");
-const { jobOf, planQueue, REQUEST_PRICE } = await import("../src/content/pictureQueuePlan.ts");
+const { costOf, ENGINES, jobOf, planQueue } = await import("../src/content/pictureQueuePlan.ts");
 
 const RAW_DIR = ".image-raw";
 const DEFAULT_MODEL = "gemini-3.1-flash-lite-image";
@@ -112,6 +112,7 @@ const JOB_FIELDS = new Set([
   "transparent",
   "key",
   "frames",
+  "model",
   "imageSize",
   "thinking",
 ]);
@@ -145,6 +146,8 @@ function toJob(o) {
     frames: Boolean(o.frames),
     // The picture's resolution ("1K", "2K", "4K"; Lite knows only 1K) and how much the model thinks first ("minimal",
     // "medium", "high"): the model's default when not given. A --jobs file takes them from the command line too.
+    // The queue picks a model per request (src/content/pictureQueuePlan.ts); a job without one takes --model's.
+    model: o.model,
     imageSize: o.imageSize ?? opts.imageSize,
     thinking: o.thinking ?? opts.thinking,
   };
@@ -369,21 +372,22 @@ async function status() {
 
 // ---------- The queue ----------
 
-const dollars = (requests) => `$${(requests * REQUEST_PRICE.batch).toFixed(3)}`;
+const dollars = (sheets) => `$${costOf(sheets).toFixed(3)}`;
+const engineName = ({ engine }) => `${ENGINES[engine].model}${ENGINES[engine].imageSize ? ` ${ENGINES[engine].imageSize}` : ""}`;
 
 /** Prints what of the queue is cheap now, what waits for partners and what waits for its reference. */
 function printPlan(plan) {
   if (!PICTURE_QUEUE.length) return console.log("the queue is empty (src/content/pictureQueue.ts)");
   const ids = (pictures) => pictures.map((p) => p.id).join(", ");
-  console.log(`cheap now – ${plan.now.length} request${plan.now.length === 1 ? "" : "s"}, ${dollars(plan.now.length)}:`);
+  console.log(`cheap now – ${plan.now.length} request${plan.now.length === 1 ? "" : "s"}, ${dollars(plan.now)}:`);
   if (!plan.now.length) console.log("  nothing");
   for (const sheet of plan.now) {
     const how = sheet.grid ? `sheet ${sheet.grid}${sheet.variants ? ` (+${sheet.variants} variant${sheet.variants > 1 ? "s" : ""})` : ""}` : "alone";
-    console.log(`  ${how}${sheet.forced ? ", forced" : ""}: ${ids(sheet.pictures)}`);
+    console.log(`  ${how}${sheet.forced ? ", forced" : ""}, ${engineName(sheet)}: ${ids(sheet.pictures)}`);
   }
   if (plan.waiting.length) {
     console.log("waiting for partners – making them now anyway costs one request more each:");
-    for (const w of plan.waiting) console.log(`  sheet ${w.grid}, ${w.missing} missing (+${dollars(1)} now): ${ids(w.pictures)}`);
+    for (const w of plan.waiting) console.log(`  sheet ${w.grid}, ${engineName(w)}, ${w.missing} missing (+${dollars([w])} now): ${ids(w.pictures)}`);
   }
   if (plan.blocked.length) {
     console.log("waiting for their reference to be made first:");
@@ -391,18 +395,27 @@ function printPlan(plan) {
   }
 }
 
-/** Sends the jobs as one batch (or at once with --now) and saves the pictures. */
+/** Sends the jobs as one batch per model (or at once with --now) and saves the pictures. */
 async function make(jobs) {
+  const modelOfJob = (job) => job.model ?? modelOf(opts);
   if (opts.now) {
     for (const job of jobs) {
-      const answer = await call(`models/${modelOf(opts)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
+      const answer = await call(`models/${modelOfJob(job)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
       const { picture, error } = pictureIn(answer);
       if (error) fail(error);
       await finish(job, picture, ROOT);
     }
   } else {
-    const record = await submit(jobs, modelOf(opts));
-    if (opts.wait !== false) await waitFor([record]);
+    // A batch holds requests to one model, so the queue's sheets for Lite and for Nano Banana 2.1 go as two.
+    const records = [];
+    for (const model of new Set(jobs.map(modelOfJob)))
+      records.push(
+        await submit(
+          jobs.filter((job) => modelOfJob(job) === model),
+          model,
+        ),
+      );
+    if (opts.wait !== false) await waitFor(records);
     else console.log("not waiting – `bun run image fetch` saves the pictures once they are ready");
   }
 }

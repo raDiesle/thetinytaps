@@ -1,5 +1,6 @@
 import songFiles from "./musik/*.mp3?glob";
 import { useEffect, useState } from "react";
+import { DUCK, songGain } from "@/lib/loudness";
 import { type Loop, loadSound, playLoop, playWaitNote } from "@/lib/sfx";
 import { BEAT_MS } from "./content";
 
@@ -22,10 +23,10 @@ const SONGS: Record<string, string> = Object.fromEntries(
   }),
 );
 
-/** Loudness of the song; mastered music is much louder than the synthesized notes. */
-const VOLUME = 0.35;
+/** Loudness of the song: as loud as the voice (every language's song measured −15.8 to −16.3 LUFS, see src/lib/loudness.ts). */
+const VOLUME = songGain(-16.1);
 /** Loudness while the voice speaks, so it can be understood. */
-const DUCKED = 0.08;
+const DUCKED = VOLUME * DUCK;
 const DUCK_CHECK_MS = 150;
 
 /**

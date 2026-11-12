@@ -175,7 +175,10 @@ and returns `{ fade, stop }`. Build a small hook like `useBrushingMusic` in
 - play at the game's own time (offset = first beat + game time), restart when the
   game's clock changes (pause, jumps), stop when paused;
 - duck while the voice speaks: poll `speechSynthesis.speaking` every ~150 ms and
-  `fade` to a low volume; `VOLUME` ≈ 0.35, ducked ≈ 0.08 for a song at −16 LUFS;
+  `fade` to a low volume; `VOLUME = songGain(<measured LUFS>)` and ducked `VOLUME * DUCK` (`src/lib/loudness.ts`):
+  measure the converted MP3 with `ffmpeg -i <file> -af ebur128 -f null -` (the „I:“ line), so the song plays as loud
+  as the voice – never a volume picked by ear (a background song at 0.25 played 12 dB under the voice and was too
+  quiet on a phone at full volume, user feedback, November 2026; `loudness.test.ts` checks);
 - `useNoBackgroundMusic()` in the game's Play component, so the shared background
   song (`src/lib/backgroundMusic.ts`) stops while the game's own one plays;
 - background music plays only while `music` in the common settings is on (switch

@@ -4,6 +4,7 @@
 
 export {
   audioContext,
+  speaker,
   decodeSound,
   type Loop,
   type LoopOptions,
