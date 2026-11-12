@@ -74,7 +74,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "myself",
     made: true,
-    redo: ["myself-2", "myself-nein-2"],
     place: "Küche am Frühstückstisch: zwei Becher (der des kleinen Bären voll Saft, der des großen Bären leer), eine kleine Saftkanne.",
     cast: ["bear", "bigBear"],
     first:
@@ -140,7 +139,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "accident",
     made: true,
-    redo: ["accident-2"],
     place: "Spielzimmer im Kindergarten: Teppich, ein umgestoßener Turm aus bunten Bauklötzen (zwei stehen noch), der Fuchs sitzt daneben. Keine Erwachsenen.",
     cast: ["bear", "fox"],
     first:
@@ -249,7 +247,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "pointing",
     made: true,
-    redo: ["pointing-2"],
     place: "Küche: offener Kühlschrank mit einem Joghurt, einer Milchflasche und Gemüse, Tisch mit zwei Löffeln, der große Bär mit einem Apfel",
     cast: ["bear", "bigBear"],
     first:
@@ -270,7 +267,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "bee",
     made: true,
-    redo: ["bee-nein-3"],
     place: "Wiese mit Picknickdecke: der rote Saftbecher des kleinen Bären, der grüne Teebecher des großen Bären, Brote, ein Ball, am Rand Blumen; eine Biene",
     cast: ["bear", "bigBear", "the bee: one small round cartoon honeybee, yellow and black stripes, little clear wings, a friendly face"],
     first:
@@ -426,7 +422,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "worn",
     made: true,
-    redo: ["worn-nein-3", "worn-ende"],
     place:
       "Flur daheim nach dem Kindergarten: der kleine Bär liegt in Jacke auf dem Boden, neben ihm eine grüne Brotdose, das Bärenbaby baut einen kleinen Turm, der große Bär hängt seine Tasche auf, durch die offene Tür die Kuschelecke mit Kissen und dem Kuschelhasen",
     cast: ["bear", "baby", "bigBear"],
@@ -606,7 +601,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "bluecup",
     made: true,
-    redo: ["bluecup-2"],
     place:
       "Küche am Morgen: Frühstückstisch mit einem roten Becher voll Milch, einer Schüssel Haferbrei und einem Löffel; ein leerer blauer Becher an der Spüle; der große Bär mit dem Milchkrug",
     cast: ["bear", "bigBear"],
@@ -629,7 +623,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "nap",
     made: true,
-    redo: ["nap-nein", "nap-ende"],
     place:
       "Schlafraum im Kindergarten am Mittag: drei Matten mit Decken, Vorhänge zu, gedämpftes Licht; der Fuchs und der Igel schlafen, der kleine Bär liegt wach mit seinem Kuschelhasen, die Erzieherin sitzt leise auf einem Stuhl an der Tür",
     cast: ["bear", "fox", "hedgehog", "teacher"],
@@ -674,7 +667,6 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   {
     id: "bedtime",
     made: true,
-    redo: ["bedtime-ende"],
     place:
       "Wohnzimmer am Abend: eine Holzeisenbahn mit Schienen und einem Tunnel auf dem Teppich, ein niedriges Regal mit ein paar Bilderbüchern, ein Sofa; der große Bär mit einem grünen Bilderbuch, der kleine Bär im Schlafanzug",
     cast: ["bear", "bigBear"],

@@ -317,12 +317,16 @@ names – use those.
    moment is meant to be (relieved after a deep breath, not still red with anger)? No hands from the edge unless
    someone off-picture really acts – say so in the prompt, or Gemini adds a pointing hand.
 4. If it's wrong, change the prompt (be specific about what was wrong) and run again;
-   stop after about three tries and show the user the best one with what's off. Count a picture's tries across
-   batches: a story picture back in `redo` that fails a second time with a sharper prompt, in the same way (a
-   character drawn twice – once where it was in the first picture and once where it moves to –, the same prop twice, a
-   breath blown towards the table again), won't come right by a third blind round. Of 18 such redraws on 12 November
-   2026, 7 passed and 11 failed exactly as before. Leave it out of the next batch and show the user what keeps going
-   wrong instead: the step's idea may need changing (a pose the first picture makes hard), or a test on 2.1 alone.
+   stop after about three tries and show the user the best one with what's off. **The fix is a better prompt, never
+   a changed idea** (user decision, 12 November 2026): when a picture keeps going wrong, name in its prompt exactly
+   what went wrong and draw it again – don't propose changing the story's step or end so the picture gets easier.
+   **Judge as the user does, not stricter** (user feedback, 12 November 2026): of 11 story pictures failed twice for a
+   breath blown towards the table, a ball or bunny drawn twice, a cup gone, the little bear drawn twice (still lying
+   where the first picture had him, and in the corner he moves to), the user took all of them and turned down only a
+   bear's head floating on its own. A picture fails only where it is plainly broken – a head or limb without its
+   body, text or letters. Everything less goes into the game; where two tries of the
+   same picture exist, keep the one with the fewest faults, and show the borderline ones to the user on a sheet
+   (first picture, each try, what is off) instead of paying for another round.
 5. Keep files small: cards ~1200×900 at quality 80 (< 200 KB), sprites 512–768 px.
    Commit only the final file in the game folder, never `.image-raw/`, right after
    the pictures arrive, and merge into main.
