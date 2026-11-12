@@ -3,6 +3,7 @@
 //
 //   bun run image <out.webp> "<prompt>" [--ref a.png ...] [--aspect 4:3] [--size 1200x900]
 //              [--transparent] [--key ff00ff] [--quality 80] [--model <id>]
+//              [--image-size 2K] [--thinking minimal]
 //   bun run image a.webp,b.webp "<prompt>" --grid 1x2 --panel "<a>" --panel "<b>" [options]
 //   … --grid 2x2 --transparent --frames      frames of one animation: each keeps its whole cell, so they line up
 //   bun run image --jobs jobs.json            many pictures in one batch
@@ -38,7 +39,7 @@ import { appPlugin } from "../tools/appPlugin.ts";
 // (`bun run image queue` failed on „Cannot find module './bilder/*.webp?glob'“, November 2026).
 plugin(appPlugin());
 const { PICTURE_QUEUE } = await import("../src/content/pictureQueue.ts");
-const { jobOf, planQueue, REQUEST_PRICE } = await import("../src/content/pictureQueuePlan.ts");
+const { costOf, ENGINES, jobOf, planQueue } = await import("../src/content/pictureQueuePlan.ts");
 
 const RAW_DIR = ".image-raw";
 const DEFAULT_MODEL = "gemini-3.1-flash-lite-image";
@@ -82,6 +83,8 @@ function parseArgs(argv) {
     else if (a === "--key") opts.key = next().replace(/^#/, "");
     else if (a === "--quality") opts.quality = Number(next());
     else if (a === "--model") opts.model = next();
+    else if (a === "--image-size") opts.imageSize = next();
+    else if (a === "--thinking") opts.thinking = next();
     else if (a === "--now") opts.now = true;
     else if (a === "--no-wait") opts.wait = false;
     else if (a === "--wait") opts.wait = true;
@@ -96,7 +99,23 @@ function parseArgs(argv) {
 
 /** One request: one picture, or one grid cut into several. Paths relative to the checkout. */
 /** The fields a job in --jobs may have; anything else is a typo that would be ignored silently. */
-const JOB_FIELDS = new Set(["out", "prompt", "ref", "refs", "panels", "aspect", "grid", "size", "quality", "transparent", "key", "frames"]);
+const JOB_FIELDS = new Set([
+  "out",
+  "prompt",
+  "ref",
+  "refs",
+  "panels",
+  "aspect",
+  "grid",
+  "size",
+  "quality",
+  "transparent",
+  "key",
+  "frames",
+  "model",
+  "imageSize",
+  "thinking",
+]);
 
 /** A job read from a --jobs file, checked for fields this script doesn't know. */
 function checkedJob(o) {
@@ -125,6 +144,12 @@ function toJob(o) {
     transparent: Boolean(o.transparent),
     key: (o.key ?? "ff00ff").replace(/^#/, ""),
     frames: Boolean(o.frames),
+    // The picture's resolution ("1K", "2K", "4K"; Lite knows only 1K) and how much the model thinks first ("minimal",
+    // "medium", "high"): the model's default when not given. A --jobs file takes them from the command line too.
+    // The queue picks a model per request (src/content/pictureQueuePlan.ts); a job without one takes --model's.
+    model: o.model,
+    imageSize: o.imageSize ?? opts.imageSize,
+    thinking: o.thinking ?? opts.thinking,
   };
   if (job.frames && !(job.grid && job.transparent)) fail("--frames is for the cut-out frames of one sheet: it needs --grid and --transparent");
   if (!/^[0-9a-f]{6}$/i.test(job.key)) fail("--key must be a colour like ff00ff");
@@ -190,7 +215,8 @@ function buildRequest(job) {
     parts.push({ inlineData: { mimeType, data: readFileSync(resolve(ROOT, file)).toString("base64") } });
   }
   const generationConfig = { responseModalities: ["IMAGE"] };
-  if (aspect) generationConfig.imageConfig = { aspectRatio: aspect };
+  if (aspect || job.imageSize) generationConfig.imageConfig = { ...(aspect && { aspectRatio: aspect }), ...(job.imageSize && { imageSize: job.imageSize }) };
+  if (job.thinking) generationConfig.thinkingConfig = { thinkingLevel: job.thinking };
   return { contents: [{ parts }], generationConfig };
 }
 
@@ -261,6 +287,31 @@ function closeRecord(record, how) {
   renameSync(recordPath(record), join(done, basename(recordPath(record))));
 }
 
+/**
+ * US dollars per million tokens in a batch (half the price of asking at once): input (text and pictures), text and
+ * thinking output, picture output. From ai.google.dev/gemini-api/docs/pricing, November 2026.
+ */
+const BATCH_PRICES = {
+  "gemini-3.1-flash-lite-image": { input: 0.125, text: 0.75, image: 15 },
+  "gemini-nano-banana-2.1": { input: 0.75, text: 3.75, image: 15 },
+};
+
+/** Prints what a batch really cost, from the token counts Gemini sent back, so a price is measured, not assumed. */
+function reportCost(record) {
+  const sum = (key) => record.usage.reduce((n, u) => n + (u[key] ?? 0), 0);
+  const imageOut = record.usage.reduce(
+    (n, u) => n + (u.candidatesTokensDetails ?? []).filter((d) => d.modality === "IMAGE").reduce((m, d) => m + d.tokenCount, 0),
+    0,
+  );
+  const [input, output, thoughts] = [sum("promptTokenCount"), sum("candidatesTokenCount"), sum("thoughtsTokenCount")];
+  const tokens = `${input} in, ${imageOut} picture out, ${output - imageOut} text out, ${thoughts} thinking`;
+  const price = BATCH_PRICES[record.model];
+  if (!price) return console.log(`${record.name}: ${tokens} (no price known for ${record.model})`);
+  const dollars = (input * price.input + imageOut * price.image + (output - imageOut + thoughts) * price.text) / 1e6;
+  const requests = record.usage.length;
+  console.log(`${record.name}: ${tokens} – $${dollars.toFixed(4)} for ${requests} request${requests === 1 ? "" : "s"}`);
+}
+
 const stateOf = (batch) => String(batch.metadata?.state ?? batch.state ?? "unknown");
 
 /** Looks at one batch; saves its pictures once it is done. Returns true when nothing is left to wait for. */
@@ -278,6 +329,9 @@ async function check(record) {
   const root = existsSync(record.checkout) ? record.checkout : ROOT;
   if (root !== record.checkout) console.warn(`${record.checkout} is gone – saving into ${root} instead`);
   let failed = 0;
+  record.usage = answers.map((answer) => answer.response?.usageMetadata).filter(Boolean);
+  writeFileSync(recordPath(record), JSON.stringify(record, null, 2));
+  reportCost(record);
   for (const [i, answer] of answers.entries()) {
     const job = record.jobs[Number(answer.metadata?.key ?? i)];
     const { picture, error } = answer.error ? { error: answer.error.message } : pictureIn(answer.response);
@@ -318,21 +372,22 @@ async function status() {
 
 // ---------- The queue ----------
 
-const dollars = (requests) => `$${(requests * REQUEST_PRICE.batch).toFixed(3)}`;
+const dollars = (sheets) => `$${costOf(sheets).toFixed(3)}`;
+const engineName = ({ engine }) => `${ENGINES[engine].model}${ENGINES[engine].imageSize ? ` ${ENGINES[engine].imageSize}` : ""}`;
 
 /** Prints what of the queue is cheap now, what waits for partners and what waits for its reference. */
 function printPlan(plan) {
   if (!PICTURE_QUEUE.length) return console.log("the queue is empty (src/content/pictureQueue.ts)");
   const ids = (pictures) => pictures.map((p) => p.id).join(", ");
-  console.log(`cheap now – ${plan.now.length} request${plan.now.length === 1 ? "" : "s"}, ${dollars(plan.now.length)}:`);
+  console.log(`cheap now – ${plan.now.length} request${plan.now.length === 1 ? "" : "s"}, ${dollars(plan.now)}:`);
   if (!plan.now.length) console.log("  nothing");
   for (const sheet of plan.now) {
     const how = sheet.grid ? `sheet ${sheet.grid}${sheet.variants ? ` (+${sheet.variants} variant${sheet.variants > 1 ? "s" : ""})` : ""}` : "alone";
-    console.log(`  ${how}${sheet.forced ? ", forced" : ""}: ${ids(sheet.pictures)}`);
+    console.log(`  ${how}${sheet.forced ? ", forced" : ""}, ${engineName(sheet)}: ${ids(sheet.pictures)}`);
   }
   if (plan.waiting.length) {
     console.log("waiting for partners – making them now anyway costs one request more each:");
-    for (const w of plan.waiting) console.log(`  sheet ${w.grid}, ${w.missing} missing (+${dollars(1)} now): ${ids(w.pictures)}`);
+    for (const w of plan.waiting) console.log(`  sheet ${w.grid}, ${engineName(w)}, ${w.missing} missing (+${dollars([w])} now): ${ids(w.pictures)}`);
   }
   if (plan.blocked.length) {
     console.log("waiting for their reference to be made first:");
@@ -340,18 +395,27 @@ function printPlan(plan) {
   }
 }
 
-/** Sends the jobs as one batch (or at once with --now) and saves the pictures. */
+/** Sends the jobs as one batch per model (or at once with --now) and saves the pictures. */
 async function make(jobs) {
+  const modelOfJob = (job) => job.model ?? modelOf(opts);
   if (opts.now) {
     for (const job of jobs) {
-      const answer = await call(`models/${modelOf(opts)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
+      const answer = await call(`models/${modelOfJob(job)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
       const { picture, error } = pictureIn(answer);
       if (error) fail(error);
       await finish(job, picture, ROOT);
     }
   } else {
-    const record = await submit(jobs, modelOf(opts));
-    if (opts.wait !== false) await waitFor([record]);
+    // A batch holds requests to one model, so the queue's sheets for Lite and for Nano Banana 2.1 go as two.
+    const records = [];
+    for (const model of new Set(jobs.map(modelOfJob)))
+      records.push(
+        await submit(
+          jobs.filter((job) => modelOfJob(job) === model),
+          model,
+        ),
+      );
+    if (opts.wait !== false) await waitFor(records);
     else console.log("not waiting – `bun run image fetch` saves the pictures once they are ready");
   }
 }

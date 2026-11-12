@@ -7,6 +7,8 @@ import {
   playChatter,
   playCluck,
   playCroak,
+  playCoo,
+  playCrow,
   playDolphin,
   playHoot,
   playMeow,
@@ -18,9 +20,12 @@ import {
   playSnap,
   playSquawk,
   playSqueak,
+  playSniff,
+  playHiss,
   playTrumpet,
   playTweet,
   playWhale,
+  playRecorded,
   recorded,
 } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -60,7 +65,13 @@ export interface Animal {
   gives?: GiftId;
   /** The other gifts it gives us too (the sheep's milk): never a wrong choice, like `alsoEats`. */
   alsoGives?: GiftId[];
+  /** Its sound, wherever it calls: the real recording, the synthesized one until that is loaded. */
   sound?: () => void;
+  /**
+   * The name of its own recording in src/lib/sounds/ for „Wer macht das Geräusch?“ (Z-15): no other animal has the same
+   * (`content.test.ts`), so the sound says which animal it is. Only animals with one take part there.
+   */
+  call?: string;
 }
 
 const food = (id: string, emoji: string, name: string, plural = name): Food => ({ id, emoji, name, plural });
@@ -74,6 +85,18 @@ const real = (name: string, synth: () => void) => {
   ANIMAL_RECORDINGS.push(name);
   return recorded(name, synth);
 };
+
+/** For a call without a synthesized stand-in: nothing until its recording is loaded (a round ahead). */
+const quiet = () => {};
+
+/**
+ * An animal's own call (`Animal.call`) and its sound playing it. `preload`: loaded when the game starts, like the
+ * recordings the animals had before „Wer macht das Geräusch?“; the others are loaded a round ahead (`AnimalsRounds`).
+ */
+const calls = (name: string, synth: () => void, preload = false) => ({
+  call: name,
+  sound: preload ? real(name, synth) : () => playRecorded(name, synth),
+});
 
 /**
  * The first animal of a home is the one that peeks out when someone else
@@ -101,7 +124,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fleisch", "fisch", "kaese", "apfel", "moehre", "banane", "mais", "salat", "nuss", "honig", "fliege", "erdnuss", "melone", "garnele", "holz"],
     home: "huette",
     alsoLives: ["koerbchen", "garten"],
-    sound: real("bark", playBark),
+    ...calls("bark", playBark, true),
   },
   {
     id: "katze",
@@ -112,7 +135,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fleisch", "knochen", "kaese", "fliege", "garnele"],
     home: "koerbchen",
     alsoLives: ["huette", "stall", "garten"],
-    sound: real("meow", playMeow),
+    ...calls("meow", playMeow, true),
   },
   {
     id: "maus",
@@ -123,7 +146,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["nuss", "mais", "apfel", "moehre", "salat", "banane", "heu", "blaetter", "erdnuss", "trauben", "melone", "holz"],
     home: "mauseloch",
     alsoLives: ["bau", "stall", "hoehle", "nest", "kaefig", "wiese", "garten", "laubhaufen", "wald", "dschungel", "bambuswald"],
-    sound: real("mouse", playSqueak),
+    ...calls("mouse", playSqueak, true),
   },
   {
     id: "vogel",
@@ -134,7 +157,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch", "erdnuss", "trauben", "heu", "melone", "garnele"],
     home: "nest",
     alsoLives: ["baum", "stall", "huette", "koerbchen", "dschungel", "savanne", "bambuswald", "wueste", "wald", "kaefig", "wiese", "garten", "berg"],
-    sound: real("tweet", playTweet),
+    ...calls("tweet", playTweet, true),
   },
   {
     id: "baer",
@@ -162,7 +185,7 @@ export const ANIMALS: Animal[] = [
     home: "hoehle",
     // It catches fish in the river.
     alsoLives: ["bau", "eis", "dschungel", "bambuswald", "wald", "berg", "fluss", "teich", "meer", "riff"],
-    sound: real("growl", playRoar),
+    ...calls("growl", playRoar, true),
   },
   {
     id: "biene",
@@ -175,7 +198,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["baum", "nest", "wiese", "garten"],
     gives: "honig",
     alsoGives: [],
-    sound: real("buzz", playBuzz),
+    ...calls("buzz", playBuzz, true),
   },
   {
     id: "frosch",
@@ -186,7 +209,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["wurm"],
     home: "teich",
     alsoLives: ["aquarium", "dschungel", "bambuswald", "wald", "meer", "fluss", "riff", "wiese", "garten"],
-    sound: real("croak", playCroak),
+    ...calls("croak", playCroak, true),
   },
   {
     id: "kuh",
@@ -200,7 +223,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["wiese", "berg"],
     gives: "milch",
     alsoGives: ["kaese"],
-    sound: real("moo", playMoo),
+    ...calls("moo", playMoo, true),
   },
   {
     id: "pferd",
@@ -211,7 +234,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["moehre", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus", "erdnuss", "trauben", "melone"],
     home: "stall",
     alsoLives: ["wiese"],
-    sound: real("neigh", playNeigh),
+    ...calls("neigh", playNeigh, true),
   },
   {
     id: "eichhoernchen",
@@ -222,6 +245,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["mais", "apfel", "banane", "moehre", "blaetter", "erdnuss", "trauben", "melone", "holz"],
     home: "baum",
     alsoLives: ["nest", "hoehle", "wald", "dschungel", "bambuswald", "garten"],
+    ...calls("squirrel", playSqueak),
   },
   {
     id: "pinguin",
@@ -233,7 +257,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["garnele"],
     home: "eis",
     alsoLives: ["teich", "aquarium", "meer", "fluss", "riff"],
-    sound: real("penguin", playSquawk),
+    ...calls("penguin", playSquawk, true),
   },
   {
     id: "fisch",
@@ -270,7 +294,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["stall", "nest", "meer", "fluss", "riff"],
     gives: "ei",
     alsoGives: [],
-    sound: real("quack", playQuack),
+    ...calls("quack", playQuack, true),
   },
   {
     id: "fuchs",
@@ -279,8 +303,9 @@ export const ANIMALS: Animal[] = [
     the: "der Fuchs",
     home: "bau",
     alsoLives: ["hoehle", "wueste", "savanne", "wald", "dschungel", "bambuswald", "berg"],
+    ...calls("fox", playBark),
   },
-  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [], sound: real("oink", playOink) },
+  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [], ...calls("oink", playOink, true) },
   // More animals with a home (November 2026).
   {
     id: "biber",
@@ -312,7 +337,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fisch"],
     home: "meer",
     alsoLives: ["teich", "fluss", "riff"],
-    sound: real("whale", playWhale),
+    ...calls("whale", playWhale, true),
   },
   { id: "krebs", emoji: "🦀", name: "Krebs", the: "der Krebs", home: "meer", alsoLives: ["aquarium", "teich", "fluss", "riff"] },
   {
@@ -335,6 +360,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["blaetter", "salat", "moehre", "apfel", "mais", "blume", "bambus", "banane", "trauben", "melone", "erdnuss"],
     home: "wueste",
     alsoLives: ["savanne", "stall"],
+    ...calls("camel", quiet),
   },
   {
     id: "eule",
@@ -343,7 +369,7 @@ export const ANIMALS: Animal[] = [
     the: "die Eule",
     home: "baum",
     alsoLives: ["nest", "stall", "wald", "dschungel", "bambuswald"],
-    sound: real("hoot", playHoot),
+    ...calls("hoot", playHoot, true),
   },
   {
     id: "fledermaus",
@@ -355,6 +381,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["apfel", "banane", "trauben", "melone", "blume", "honig", "wurm"],
     home: "hoehle",
     alsoLives: ["baum", "stall", "wald", "dschungel", "bambuswald"],
+    ...calls("bat", playSqueak),
   },
   {
     id: "affe",
@@ -365,7 +392,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["apfel", "nuss", "blaetter", "mais", "moehre", "salat", "bambus", "wurm", "fliege", "erdnuss", "trauben", "melone"],
     home: "dschungel",
     alsoLives: ["baum", "bambuswald", "savanne", "wueste", "wald"],
-    sound: real("chatter", playChatter),
+    ...calls("chatter", playChatter, true),
   },
   {
     id: "huhn",
@@ -378,7 +405,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["nest", "wiese", "garten"],
     gives: "ei",
     alsoGives: [],
-    sound: real("cluck", playCluck),
+    ...calls("cluck", playCluck, true),
   },
   {
     id: "panda",
@@ -413,7 +440,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["wiese", "berg"],
     gives: "wolle",
     alsoGives: ["milch", "kaese"],
-    sound: real("baa", playBaa),
+    ...calls("baa", playBaa, true),
   },
   // More animals that give us something (November 2026).
   // The goat bleats with the sheep's recording, as on the farm; the goose quacks like the farm's goose.
@@ -427,7 +454,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["stall", "hoehle", "wiese"],
     gives: "kaese",
     alsoGives: ["milch", "wolle"],
-    sound: real("baa", playBaa),
+    ...calls("goat", playBaa),
   },
   {
     id: "gans",
@@ -438,7 +465,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["teich", "meer", "fluss", "riff", "wiese", "nest"],
     gives: "ei",
     alsoGives: [],
-    sound: real("quack", playQuack),
+    ...calls("goose", playQuack),
   },
   {
     id: "lama",
@@ -451,6 +478,7 @@ export const ANIMALS: Animal[] = [
     alsoLives: ["stall", "hoehle", "wiese"],
     gives: "wolle",
     alsoGives: [],
+    ...calls("llama", quiet),
   },
   {
     id: "loewe",
@@ -461,7 +489,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["knochen", "fisch"],
     home: "savanne",
     alsoLives: ["dschungel", "wueste", "hoehle", "bambuswald", "wald"],
-    sound: real("roar", playRoar),
+    ...calls("roar", playRoar, true),
   },
   {
     id: "giraffe",
@@ -485,7 +513,7 @@ export const ANIMALS: Animal[] = [
     home: "savanne",
     // Asia's elephants live in the jungle, and every elephant bathes in the river.
     alsoLives: ["wueste", "dschungel", "bambuswald", "wald", "fluss", "teich", "meer", "riff"],
-    sound: real("trumpet", playTrumpet),
+    ...calls("trumpet", playTrumpet, true),
   },
   {
     id: "gorilla",
@@ -497,6 +525,7 @@ export const ANIMALS: Animal[] = [
     home: "dschungel",
     // The mountain gorillas.
     alsoLives: ["baum", "bambuswald", "wald", "berg"],
+    ...calls("gorilla", quiet),
   },
   {
     id: "koala",
@@ -518,6 +547,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["garnele"],
     home: "eis",
     alsoLives: ["meer", "teich", "fluss", "riff"],
+    ...calls("seal", playBark),
   },
   {
     id: "delfin",
@@ -528,7 +558,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["garnele"],
     home: "meer",
     alsoLives: ["teich", "fluss", "riff", "aquarium"],
-    sound: real("dolphin", playDolphin),
+    ...calls("dolphin", playDolphin, true),
   },
   {
     id: "eisbaer",
@@ -553,7 +583,7 @@ export const ANIMALS: Animal[] = [
     // The crocodile first: it peeks out of the river.
     home: "fluss",
     alsoLives: ["teich", "meer", "riff", "dschungel", "bambuswald", "wald"],
-    sound: playSnap,
+    ...calls("crocodile", playSnap),
   },
   {
     id: "tiger",
@@ -565,7 +595,7 @@ export const ANIMALS: Animal[] = [
     home: "dschungel",
     // Children mix it up with the lion of the savanna.
     alsoLives: ["bambuswald", "wald", "hoehle", "savanne", "wueste"],
-    sound: real("roar", playRoar),
+    ...calls("tiger", playRoar),
   },
   // The deer before the wolf: it peeks out of the forest.
   {
@@ -578,6 +608,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["heu", "blaetter", "apfel", "moehre", "mais", "salat", "blume", "holz", "erdnuss", "trauben", "melone", "banane", "bambus"],
     home: "wald",
     alsoLives: ["dschungel", "bambuswald", "baum", "wiese", "berg"],
+    ...calls("stag", quiet),
   },
   {
     id: "wolf",
@@ -588,6 +619,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["knochen", "fisch", "apfel", "trauben", "melone"],
     home: "wald",
     alsoLives: ["dschungel", "bambuswald", "hoehle", "bau", "berg"],
+    ...calls("howl", quiet),
   },
   {
     id: "igel",
@@ -599,6 +631,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["fliege", "apfel", "trauben", "banane", "fleisch", "nuss", "erdnuss", "melone"],
     home: "laubhaufen",
     alsoLives: ["garten", "wiese", "wald", "dschungel", "bambuswald", "bau"],
+    ...calls("hedgehog", playSniff),
   },
   {
     id: "schmetterling",
@@ -633,7 +666,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["nuss", "erdnuss", "apfel", "banane", "mais", "moehre", "salat", "blume", "blaetter", "wurm", "fliege", "honig", "heu", "melone", "holz"],
     home: "dschungel",
     alsoLives: ["baum", "bambuswald", "wald", "kaefig", "nest"],
-    sound: real("squawk", playSquawk),
+    ...calls("squawk", playSquawk, true),
   },
   {
     id: "zebra",
@@ -644,6 +677,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["blaetter", "salat", "moehre", "apfel", "mais", "blume", "bambus", "banane", "trauben", "erdnuss", "melone"],
     home: "savanne",
     alsoLives: ["wueste"],
+    ...calls("zebra", playNeigh),
   },
   {
     id: "esel",
@@ -654,6 +688,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["apfel", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus", "trauben", "erdnuss", "melone", "holz"],
     home: "stall",
     alsoLives: ["wiese", "berg"],
+    ...calls("heehaw", playNeigh),
   },
   // More animals to feed and to house, with melons, shrimps and wood (November 2026).
   {
@@ -677,6 +712,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["heu", "salat", "blaetter", "apfel", "moehre", "banane", "trauben", "mais", "blume", "bambus", "erdnuss", "nuss"],
     home: "fluss",
     alsoLives: ["teich", "meer", "riff", "savanne", "wueste"],
+    ...calls("hippo", quiet),
   },
   {
     id: "nashorn",
@@ -687,6 +723,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["heu", "salat", "apfel", "moehre", "banane", "trauben", "melone", "mais", "blume", "bambus", "holz", "erdnuss"],
     home: "savanne",
     alsoLives: ["wueste"],
+    ...calls("rhino", quiet),
   },
   {
     id: "kaenguru",
@@ -771,6 +808,7 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["wurm", "fliege", "fisch"],
     home: "teich",
     alsoLives: ["meer", "fluss", "riff"],
+    ...calls("flamingo", playQuack),
   },
   {
     id: "adler",
@@ -782,6 +820,7 @@ export const ANIMALS: Animal[] = [
     home: "berg",
     // Its eyrie on a cliff or a tall tree.
     alsoLives: ["nest", "baum", "hoehle", "wald", "dschungel", "bambuswald"],
+    ...calls("eagle", playSquawk),
   },
   {
     id: "marienkaefer",
@@ -791,7 +830,7 @@ export const ANIMALS: Animal[] = [
     home: "wiese",
     alsoLives: ["garten", "baum", "wald", "dschungel", "bambuswald"],
   },
-  { id: "grashuepfer", emoji: "🦗", name: "Grashüpfer", the: "der Grashüpfer", home: "wiese", alsoLives: ["garten"] },
+  { id: "grashuepfer", emoji: "🦗", name: "Grashüpfer", the: "der Grashüpfer", home: "wiese", alsoLives: ["garten"], ...calls("cricket", playTweet) },
   // A pig too, so the sty is never wrong for it.
   {
     id: "wildschwein",
@@ -800,12 +839,28 @@ export const ANIMALS: Animal[] = [
     the: "das Wildschwein",
     home: "wald",
     alsoLives: ["dschungel", "bambuswald", "baum", "wiese", "stall"],
-    sound: real("oink", playOink),
+    ...calls("boar", playOink),
   },
-  { id: "waschbaer", emoji: "🦝", name: "Waschbär", the: "der Waschbär", home: "wald", alsoLives: ["dschungel", "bambuswald", "baum", "hoehle", "garten"] },
+  {
+    id: "waschbaer",
+    emoji: "🦝",
+    name: "Waschbär",
+    the: "der Waschbär",
+    home: "wald",
+    alsoLives: ["dschungel", "bambuswald", "baum", "hoehle", "garten"],
+    ...calls("raccoon", playSqueak),
+  },
   { id: "dachs", emoji: "🦡", name: "Dachs", the: "der Dachs", home: "bau", alsoLives: ["wald", "dschungel", "bambuswald", "hoehle"] },
   { id: "qualle", emoji: "🪼", name: "Qualle", the: "die Qualle", home: "meer", alsoLives: ["teich", "fluss", "riff", "aquarium"] },
-  { id: "schwan", emoji: "🦢", name: "Schwan", the: "der Schwan", home: "teich", alsoLives: ["meer", "fluss", "riff", "nest"] },
+  { id: "schwan", emoji: "🦢", name: "Schwan", the: "der Schwan", home: "teich", alsoLives: ["meer", "fluss", "riff", "nest"], ...calls("swan", playQuack) },
+  // Animals known by their sound, for „Wer macht das Geräusch?“ only (Z-15, November 2026): the rooster crows like
+  // no hen, so the two look alike and sound different.
+  { id: "hahn", emoji: "🐓", name: "Hahn", the: "der Hahn", ...calls("crow", playCrow) },
+  { id: "taube", emoji: "🕊️", name: "Taube", the: "die Taube", ...calls("coo", playCoo) },
+  { id: "truthahn", emoji: "🦃", name: "Truthahn", the: "der Truthahn", ...calls("gobble", playCluck) },
+  { id: "pfau", emoji: "🦚", name: "Pfau", the: "der Pfau", ...calls("peacock", playSquawk) },
+  { id: "muecke", emoji: "🦟", name: "Mücke", the: "die Mücke", ...calls("mosquito", playBuzz) },
+  { id: "schlange", emoji: "🐍", name: "Schlange", the: "die Schlange", ...calls("hiss", playHiss) },
 ];
 
 /**
@@ -814,7 +869,7 @@ export const ANIMALS: Animal[] = [
  * its words in each translated language, and that these have none yet – once translated, take them off this list.
  */
 export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
-  animals: [],
+  animals: ["hahn", "taube", "truthahn", "pfau", "muecke", "schlange"],
   foods: [],
   homes: [],
   gifts: [],

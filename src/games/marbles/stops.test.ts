@@ -17,7 +17,7 @@ import { BASINS, gateWaits, TAP_GATE } from "./water";
 
 // Every machine has three or four stations on its way where it could hold still until the child taps (R-03), and holds
 // at exactly one of them: letting a run go on never takes more than one tap (user feedback, November 2026). What glows
-// there must be on the screen while it waits – the camera stands still with the machine – and the 👇 beside it too,
+// there must be on the screen while it waits – the camera stands still with the machine – and the hint's hand beside it too,
 // clear of the picture's edges and the ✕ in the top left corner; that holds for the inactive ones too, so any of them
 // can be switched on.
 

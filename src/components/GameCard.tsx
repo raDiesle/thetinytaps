@@ -1,7 +1,18 @@
 import { Link } from "react-router";
-import { useT } from "@/lib/language";
+import { type Localized, useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
 import { preloadPage } from "@/lib/preloadPages";
+
+/** The page marker on a card or a table of contents' line still being built (`GameMode.unfinished`, `Game.unfinished`). */
+export const UNFINISHED_LABEL: Localized = {
+  de: "in Bearbeitung",
+  ru: "в работе",
+  en: "in progress",
+  zh: "制作中",
+  hi: "तैयार हो रहा है",
+  es: "en preparación",
+  ar: "قيد الإعداد",
+};
 
 /** The previews' size in pixels (`tools/previews.ts` makes them so): 3 : 2, like the cards and lines that show them. */
 export const PREVIEW_SIZE = { width: 480, height: 320 } as const;

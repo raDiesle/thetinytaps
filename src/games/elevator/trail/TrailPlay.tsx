@@ -406,7 +406,7 @@ export function TrailPlay({
   const onString = theGoal.carry === "string";
   const [view, setView] = useState<View>(() => startView(level));
   const viewRef = useRef<View>(view);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   const { touchOnly } = useDevice();
   /** The key held down right now, so its cap on the screen goes down too. */
   const [held, setHeld] = useState<string | null>(null);
@@ -1035,7 +1035,6 @@ export function TrailPlay({
     put({ party: true });
     sound(playMelody);
     say(level.finale.say);
-    celebrate();
     const finaleMs = level.finale.ms + (level.finale.via ?? []).reduce((sum, [, ms]) => sum + ms, 0);
     await flyGoal(level.finale, onString ? handOf(viewRef.current.kid) : null);
     const { into } = level.finale;

@@ -61,24 +61,15 @@ test("the end buttons come calmly and never call", () => {
   expect(calling).toEqual([]);
 });
 
-// `celebrate()` lets hearts, stars and notes rise: only for a level's or a story's end, never after a choice or an
-// answer. A celebration somewhere new must be such an end and be added here on purpose.
+// `celebrate()` lets hearts, stars and notes rise. A level's or story's end has its trophy instead (user decision,
+// November 2026: `GameEnd`, src/lib/trophies.ts), so nothing rises in a game; only a chart grown-ups keep with the
+// child, filled, still gets them. A celebration somewhere new must be such a chart and be added here on purpose.
 const ENDS = new Set([
-  "src/games/elevator/ElevatorPlay.tsx", // the story's party at its end
-  "src/games/elevator/film/FilmPlay.tsx", // the film's party at its end
-  "src/games/elevator/trail/TrailPlay.tsx", // the finale when the goal is back
-  "src/games/marbles/MarblePlay.tsx", // the machine's party when it has run
-  "src/games/potty/PottyPlay.tsx", // it came, and the party at the end (Aufs Töpfchen's point)
   "src/games/rewards/BoardScreen.tsx", // a full star chart, a full day
   "src/games/rewards/PlanScreen.tsx", // the day's plan done
-  "src/games/scenes/ScenePlay.tsx", // every item of a picture found
-  "src/games/socks/SocksPlay.tsx", // the whole wash on the line
-  "src/games/teeth/TeethPlay.tsx", // all teeth brushed
-  "src/games/timer/SwapPlay.tsx", // the clock time set for taking turns has come
-  "src/games/timer/TimerPlay.tsx", // the time is up
 ]);
 
-test("things rise only at a level's or story's end", () => {
+test("things rise only when a grown-ups' chart is full, never at a game's end", () => {
   const celebrating = files
     .filter((file) => file.endsWith(".tsx"))
     .map((file) => join("src", file))

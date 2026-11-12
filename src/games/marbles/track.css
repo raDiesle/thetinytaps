@@ -29,11 +29,6 @@
   }
 }
 
-/* Still, like the machines' finger: nothing moves before the first tap. */
-.run-hint {
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .run-wrench.busy {
     animation: none;

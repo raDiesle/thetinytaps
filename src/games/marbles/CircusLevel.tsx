@@ -43,7 +43,7 @@ import {
   type LionPose,
 } from "./circus";
 import { beside, deg, lerp, rad, seg, svgLine } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { Bunting, INK, MARBLE_COLOR, Sparkles } from "./scenery";
 import { BALL_R, type Pt } from "./path";
 import { BAR_COLORS, Ball } from "./parts";
@@ -70,7 +70,7 @@ export function CircusLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={circus} level="circus" {...props}>
+    <MachineStage machine={circus} level="circus" start={{ x: HAT.x, y: HAT.y - 46, r: 88 }} {...props}>
       {(t) => {
         const uni = circus.unicycleAt(t);
         const clown = circus.clownAt(t);
@@ -110,8 +110,6 @@ export function CircusLevel(props: LevelProps) {
             <ConfettiBurst age={t - circus.tFire} />
             <ConfettiRain age={t - circus.tShow} />
             <Sparkles x={clown.pt.x} y={clown.pt.y - 40} age={t - circus.tShow} n={12} spread={200} />
-
-            <TapHint t={t} x={HAT.x + 120} y={HAT.y + 110} />
           </>
         );
       }}

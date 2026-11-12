@@ -41,7 +41,7 @@ import {
   WORLD_W,
 } from "./kitchen";
 import { deg, hop, seg } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { Bunting, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WallClock, Window, WOOD } from "./scenery";
 import type { Pt } from "./path";
 import { BAR_COLORS, Ball } from "./parts";
@@ -68,7 +68,7 @@ export function KitchenLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={kitchen} level="kitchen" {...props}>
+    <MachineStage machine={kitchen} level="kitchen" start={{ x: HOPPER.x, y: HOPPER.y - 70, r: 82 }} {...props}>
       {(t) => (
         <>
           <Room tiles={`${ids}-tiles`} />
@@ -94,7 +94,6 @@ export function KitchenLevel(props: LevelProps) {
 
           <SpiceJar t={t} />
           <Sparkles x={BREAKFAST.cx} y={BREAKFAST.top - 60} age={t - kitchen.tToast} />
-          <TapHint t={t} x={HOPPER.x + 118} y={HOPPER.y + 60} />
         </>
       )}
     </MachineStage>

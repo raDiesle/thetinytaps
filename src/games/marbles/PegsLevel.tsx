@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playPlink, playPop } from "@/lib/sfx";
 import { loadRealSounds, playBark, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
-import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
+import { cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
+import { TapHint } from "@/components/TapHint";
 import { BAR_COLORS, Ball } from "./parts";
 import { BALL_R } from "./path";
 import {
@@ -83,10 +84,11 @@ interface Animal {
  * five bins, where an animal waits and hops with joy. After ten marbles the
  * level ends.
  */
-export function PegsLevel({ sound, onDone }: LevelProps) {
+export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   const label = useLevelName("pegs");
   const animals = useMemo(() => pickAnimals(BINS), []);
   const svg = useRef<SVGSVGElement>(null);
+  const box = useRef<HTMLDivElement>(null);
   const now = useRef(performance.now());
   const started = useRef(false);
   const nextId = useRef(0);
@@ -125,6 +127,8 @@ export function PegsLevel({ sound, onDone }: LevelProps) {
       sound(animals[d.bin].sound);
     }
     landed.current++;
+    // The first marble in a bin wins the level's trophy.
+    if (landed.current === 1) onGoal?.();
     if (landed.current === DONE_AFTER) doneTimer.current = setTimeout(onDone, DONE_DELAY_MS);
   };
 
@@ -189,7 +193,7 @@ export function PegsLevel({ sound, onDone }: LevelProps) {
 
   const t = now.current;
   return (
-    <div className="marble-level pegs-level" onPointerDown={onPointerDown}>
+    <div className="marble-level pegs-level" ref={box} onPointerDown={onPointerDown}>
       <svg ref={svg} className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         <Board />
         {PEGS.map((p, i) => (
@@ -234,18 +238,19 @@ export function PegsLevel({ sound, onDone }: LevelProps) {
         })}
         <Frame />
         {!started.current && (
-          // A still hint: a marble waiting at the top, and a finger under it. Nothing moves before the first tap.
+          // A marble waiting at the top, and the shared hint round it until the first tap.
           <g className="pegs-hint" opacity="0.8">
             <Ball color={BAR_COLORS[0]} x={VIEW_W / 2} y={SPAWN_Y} spin={0} />
-            <text x={VIEW_W / 2} y={SPAWN_Y + 118} fontSize="80" textAnchor="middle">
-              👆
-            </text>
           </g>
         )}
       </svg>
+      {!started.current && <TapHint key="start" {...worldHint(cameraPoint(box.current, PICTURE, PICTURE), { x: VIEW_W / 2, y: SPAWN_Y, r: 52 })} />}
     </div>
   );
 }
+
+/** The whole board, as the svg shows it (`preserveAspectRatio` meet). */
+const PICTURE = { x: 0, y: 0, w: VIEW_W, h: VIEW_H };
 
 /** A nail: a brass head that glows in its row's colour for a moment after a marble hit it. */
 function Nail({ x, y, color, age }: { x: number; y: number; color: string; age: number }) {

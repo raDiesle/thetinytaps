@@ -3,9 +3,9 @@ import { GameShell } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting, useTouchKeys } from "@/components/TouchKeyboard";
-import { hasCase, sampleLetter, useLanguagePack } from "@/content/languages";
+import { hasCase, languageFor, sampleLetter, useLanguagePack } from "@/content/languages";
 import { useGameSettings } from "@/lib/common";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
 import {
   DEFAULT_LETTERS_SETTINGS,
   LETTERS_SETTINGS_KEY,
@@ -17,6 +17,7 @@ import {
   type WordLength,
   type WordTyping,
 } from "./settings";
+import { CasePlay } from "./CasePlay";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
 import { MovePlay } from "./MovePlay";
@@ -24,12 +25,13 @@ import { type LettersWay, WAY_TITLES } from "./names";
 import { WordsPlay } from "./WordsPlay";
 
 /**
- * One of the book's four games – Frei tippen, Zählen, Mitmachen or Wörter tippen –, each on its own page of the table of contents
+ * One of the book's games – Frei tippen, Zählen, Mitmachen, Wörter tippen or Wo ist das kleine b? –, each on its own page of the table of contents
  * (user feedback, November 2026). They share their settings, so letters, pictures and keys stay as chosen.
  */
 export function LettersGame({ way }: { way: LettersWay }) {
   const [settings, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
   const pack = useLanguagePack();
+  const { id: appLanguage } = useAppLanguage();
   // Hindi and Arabic letters have one form only: no choice of big and small letters, the games show that one.
   const cased = hasCase(pack);
   const play: LettersSettings = cased ? settings : { ...settings, letterCase: "upper" };
@@ -65,6 +67,18 @@ export function LettersGame({ way }: { way: LettersWay }) {
   );
 
   const title = t(WAY_TITLES[way]);
+  if (way === "case") {
+    // Big and small letters need a script that has both: Hindi and Arabic play it in English (German until the
+    // English pack is loaded). Nothing to choose: no ⚙️.
+    const english = languageFor("en").pack;
+    const casePack = cased ? pack : english;
+    const caseLanguage = cased ? appLanguage : english === languageFor("de").pack ? "de" : "en";
+    return (
+      <GameShell title={title} startMode={way}>
+        <CasePlay pack={casePack} language={caseLanguage} settings={play} />
+      </GameShell>
+    );
+  }
   if (way === "move") {
     // Mitmachen has nothing to choose: no ⚙️, it plays at once with the shared on-screen keys.
     return (
@@ -75,7 +89,7 @@ export function LettersGame({ way }: { way: LettersWay }) {
   }
   // Each game plays at once, so grown-ups would not guess what waits behind ⚙️: a note names it as play starts (user
   // feedback, November 2026).
-  const intro: Record<Exclude<LettersWay, "move">, ReactNode> = {
+  const intro: Record<Exclude<LettersWay, "move" | "case">, ReactNode> = {
     free: t({
       de: "Zahlen vorzählen, Nachspuren, große und kleine Buchstaben, Bilder – halten Sie ⚙️ gedrückt und wählen Sie aus.",
       ru: "Счёт вслух, обводка, большие и маленькие буквы, картинки – удерживайте ⚙️ и выбирайте.",

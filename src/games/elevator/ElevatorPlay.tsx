@@ -125,7 +125,7 @@ export function ElevatorPlay({
   const hero = useHero();
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(START);
-  const { effects, ripple, celebrate } = useTapFeedback();
+  const { effects, ripple } = useTapFeedback();
 
   // A story is a script of waits; starting another one (or leaving) bumps the generation and drops its timers.
   const generation = useRef(0);
@@ -357,7 +357,6 @@ export function ElevatorPlay({
       put({ party: true, cleared: true });
       sound(playMelody);
       say(texts.party);
-      celebrate();
       later(1200, () => {
         put((v) => ({ playing: null, used: [...v.used, last.prop] }));
         (["hero", "buddy"] as Who[]).forEach((who) => actor(who, { pose: "cheer", hidden: false }));

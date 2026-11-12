@@ -104,10 +104,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [said, setSaid] = useState<Said>("unsure");
   /** What really came, chosen at the ✓; null before. */
   const [went, setWent] = useState<Went | null>(null);
-  /** Bumped by „Nochmal“, so a new round shuffles the thoughts after the first ones anew. */
-  const [round, setRound] = useState(0);
-  // round only asks for a new shuffle.
-  const scenes = useMemo(() => scenesFor(said), [said, round]);
+  const scenes = useMemo(() => scenesFor(said), [said]);
   const [at, setAt] = useState<At>(START);
   const [busy, setBusy] = useState(false);
   /**
@@ -117,7 +114,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [asking, setAsking] = useState(false);
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
 
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
@@ -267,7 +264,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         if (came !== "kaka") sound(0, playTrickle);
         if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
         sound(900, cheer);
-        later(600, () => celebrate());
         break;
       case "wipe":
         sound(300, playRip);
@@ -287,7 +283,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       case "party":
         sound(0, cheer);
         sound(300, partyHorn);
-        celebrate();
         break;
       case "stars":
         if (star) {
@@ -411,18 +406,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     e.stopPropagation();
     if (settings.sounds) playPop();
     jump(atRef.current.step + 1);
-  };
-
-  const restart = () => {
-    stopTimers();
-    setSaid("unsure");
-    setWent(null);
-    toldFinish.current = false;
-    checked.current = false;
-    starred.current = false;
-    setFresh(false);
-    setRound((r) => r + 1);
-    begin(0, { came: null, said: "unsure", nothing: false });
   };
 
   useEffect(() => {
@@ -594,9 +577,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </div>
       </div>
 
-      {/* There is one story only, so „Weiter“ would be „Nochmal“ again: only „Menü“ and „Nochmal“, small in the corners
-          so the party picture stays free. */}
-      {last && <GameEnd delayMs={step.ms} onAgain={restart} corners />}
+      {/* There is one story only, so „Weiter“ would be „Nochmal“ again, and once on the potty a child is done: only
+          „Menü“ with the shelf, small in the corner so the party picture stays free. */}
+      {last && <GameEnd delayMs={step.ms} menu corners />}
       <FeedbackLayer effects={effects} />
     </div>
   );

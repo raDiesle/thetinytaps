@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
-import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
+import { TapHint } from "@/components/TapHint";
 import { cameraOn } from "./machineKit";
 import { Sparkles } from "./scenery";
 import { pickThings, type Thing } from "./things";
@@ -221,15 +222,18 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const drumAge = (t - drumAt.current) / 1000;
   const drumSquash = drumAge >= 0 && drumAge < 2 ? 0.12 * Math.exp(-drumAge * 5) * Math.cos(drumAge * 30) : 0;
   const first = things[0];
+  const world = { x: 0, y: 0, w: worldW, h: VIEW_H };
+  const view = { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H };
+  // Round the first thing, the one the tap pushes over; the hand comes from the left, where the push comes from.
+  const firstSpot = {
+    x: MARGIN + (lefts[0] + first.w / 2) * SCALE,
+    y: FLOOR - first.h * 0.55 * SCALE,
+    r: Math.min(110, Math.max(60, Math.max(first.w, first.h) * 0.6 * SCALE)),
+  };
 
   return (
     <div className="marble-level" ref={box} onPointerDown={push}>
-      <svg
-        className="marble-camera"
-        viewBox={`0 0 ${worldW} ${VIEW_H}`}
-        style={cameraLayer(box.current, { x: 0, y: 0, w: worldW, h: VIEW_H }, { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H })}
-        aria-label={label}
-      >
+      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraLayer(box.current, world, view)} aria-label={label}>
         <g>
           <Room width={worldW} />
           <g transform={`translate(${MARGIN} ${FLOOR}) scale(${SCALE})`}>
@@ -248,15 +252,11 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
               <Drum />
             </g>
             <Sparkles x={drumLeft + DRUM.w / 2} y={-DRUM.h - 70} age={drumAge - 0.25} n={14} spread={200} />
-            {/* Only once everything has dropped in, so the finger doesn't stand in the air before the first thing. */}
-            {phase.current === "ready" && (
-              <text className="topple-hint" x={-24} y={-first.h * 0.62} fontSize={86 / SCALE} textAnchor="end" dominantBaseline="middle">
-                👉
-              </text>
-            )}
           </g>
         </g>
       </svg>
+      {/* Only once everything has dropped in, so the hint doesn't stand in the air before the first thing. */}
+      {phase.current === "ready" && <TapHint key="push" {...worldHint(cameraPoint(box.current, world, view), firstSpot)} side="left" />}
     </div>
   );
 }

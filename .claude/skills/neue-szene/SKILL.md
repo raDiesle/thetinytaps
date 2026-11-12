@@ -186,18 +186,21 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 
 ## Texts
 
-- German, 2–3 short sentences per item, present tense, simple words, sounds
+- **English first** (root `CLAUDE.md`: everything new since November 2026), 2–3 short sentences per item, present tense, simple words, sounds
   ("Brumm, brumm!", "Quak!") – spoken only, never drawn into the picture. Speech is off by default, but the texts are also
   used in find mode ("Wo ist der Traktor?").
 - `name` with the correct article; the find question is built from it.
-- German only, unless the user asks for languages: a scene without (or with an incomplete) `ru.ts` plays
-  entirely in German, also on a Russian app (`sceneLanguage` in `localize.ts`). Mark the gap in the
+- English only, unless the user asks for languages – German included. The scenes so far are German first: their
+  items' sentences are German and a scene without (or with an incomplete) `ru.ts` plays entirely in German, also on
+  a Russian app (`sceneLanguage` in `localize.ts`). The first English-first scene teaches the scene data and
+  `sceneLanguage` a scene's first language (its own sentences English, German as a translation like `ru.ts`, the
+  whole scene in English where a translation is missing), with a test – never by writing it German first after all. Mark the gap in the
   `/bilder/` row of `src/content/ideas/languageStatus.ts`. When asked for Russian: `src/games/scenes/<id>/ru.ts`
   (`export const RU: SceneTranslation`, see an existing scene) with the title, description, every item (`name` in
   the nominative without article, starting with a Cyrillic letter – it is the item's key; `gender` m/f/n or
   `plural: true` as Russian has it) and the chain sentences in order, imported in `src/content/texts/texts-ru.ts` (`scenes`);
-  present tense, "ты", nothing that changes for boy or girl. Changing a German item of a translated scene: delete
-  its Russian when the meaning changes.
+  present tense, "ты", nothing that changes for boy or girl. Changing an item of a translated scene in its first
+  language: delete its translations when the meaning changes.
 
 ## Checks before you finish
 
