@@ -67,8 +67,12 @@ In a fresh worktree run `bun install` first.
   Tapsi's voice (`stimme.json`) was made with Voice Design and lives only in the first ElevenLabs account and its
   workspace: no other account's key can use it, and it can't be shared there (November 2026: hours went into looking for
   it under a second key). While the first account's credits are spent, the second account (`ELEVENLABS_API_KEY_2` in
-  `~/.zshrc`, used as `ELEVENLABS_API_KEY="$ELEVENLABS_API_KEY_2" bun run voice …`) records with its clone „Tapsi Coach
-  (Klon)“ (`--voice iGb9o2uzfokG3rIleRfg`, made by `bun run voice clone`); check a key's account first
+  `~/.zshrc`, used as `ELEVENLABS_API_KEY="$ELEVENLABS_API_KEY_2" bun run voice …`) records with clones of Tapsi made
+  by `bun run voice clone` from about 2.5 minutes of the original's takes in one language: „Tapsi Coach (Klon)“ from
+  English for en, zh, hi, es and ar (`--voice iGb9o2uzfokG3rIleRfg`), „Tapsi Coach (Klon de)“ for German
+  (`P8WiXqMIbsXF2nUgvRI0`) and „Tapsi Coach (Klon ru)“ for Russian (`wlDm46LsfSYnFAMs48Uv`) – the user chose the clone
+  of the language's own takes over the English one by ear (November 2026), always with `--parallel 2` (Starter allows 3
+  requests at once, the default 4 stopped a run); check a key's account first
   (`bun run voice credits`: Creator is the first, Starter the second). The clone sounds close, not the same: use it for
   whole parts or languages or whole rounds (a pair, a scene: what is heard together comes from one voice), never a few lines among the original's, and say so in `languageStatus.ts`. It speaks Chinese, Hindi, Spanish and Arabic well though made from English takes (checked with `whisper-cli`, which writes Hindi in Urdu letters).
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a

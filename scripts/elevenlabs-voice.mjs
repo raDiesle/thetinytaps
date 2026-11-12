@@ -329,6 +329,7 @@ async function make() {
   // the next one is far along; each file is written as it comes, so a run stopped halfway goes on where it stopped.
   // The subscription allows 5 requests at once for the whole account: run one recording at a time (two runs side by
   // side, 4 + 3, ran out of retries on „concurrent_limit_exceeded“ in November 2026) and keep --parallel at 5 or less.
+  // The second account's Starter plan allows only 3: with its key run --parallel 2 (the default 4 stopped a run there).
   let next = 0;
   let made = 0;
   const worker = async () => {
