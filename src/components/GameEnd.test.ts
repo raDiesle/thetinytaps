@@ -39,3 +39,18 @@ test("the end of a level has no way back of its own: the corner is it, but in Z�
   }
   expect(withMenu.sort()).toEqual(["src/games/potty/PottyPlay.tsx", "src/games/teeth/TeethPlay.tsx"]);
 });
+
+// Small beside the buttons (bottom right in Aufs Töpfchen) the trophy was hardly seen (user feedback, November 2026): it
+// is handed over big in the middle with „Geschafft!“ under it, then shrinks onto its board beside the buttons, and the
+// buttons come only once it has landed – as one transform from where it stands, which a phone moves cheaply.
+test("the trophy is handed over big in the middle, then lands on its board before the buttons come", async () => {
+  const end = await Bun.file("src/components/GameEnd.tsx").text();
+  expect(end).toMatch(/de: "Geschafft!"/);
+  expect(end).toMatch(/className="game-end-board"/);
+  expect(end).toMatch(/if \(!landed \|\| !asks\) return;/);
+  const css = await Bun.file("src/styles/game-end.css").text();
+  const award = css.match(/@keyframes game-end-trophy-award \{([\s\S]*?)\n\}/)?.[1] ?? "";
+  expect(award).toMatch(/translate\(var\(--award-x\), var\(--award-y\)\) scale\(var\(--award-s\)\)/);
+  expect(award).not.toMatch(/\b(width|height|top|left|filter):/);
+  expect(css).toMatch(/\.game-end:not\(\.landed\) > :not\(\.game-end-prize\) \{\s*visibility: hidden;/);
+});

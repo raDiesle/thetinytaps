@@ -1,4 +1,4 @@
-import { useEffect, useState, type PointerEvent } from "react";
+import { type CSSProperties, type PointerEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { useCountsPlaytime, useEndShown, useLeaveGame, useLeavesToShelf } from "@/components/GameShell";
 import { ShelfLabelArt } from "@/components/PageCornerArt";
@@ -29,6 +29,15 @@ export const AGAIN_OR_NEXT: Localized = {
 export const AGAIN_ONLY: Localized = { de: "Nochmal?", ru: "Ещё раз?", en: "Again?", zh: "再来一次？", hi: "फिर से?", es: "¿Otra vez?", ar: "مرة أخرى؟" };
 /** How long the question waits after the buttons came, so the game's own end line comes first. */
 const ASK_AFTER_MS = 1500;
+/**
+ * How long the trophy is handed over before the buttons come (user feedback, November 2026: beside the buttons in the
+ * bottom corner it was hardly seen): it grows in big in the middle of the screen with „Geschafft!“ under it, stays a
+ * moment, then shrinks onto its little board beside the buttons – into the collection. `game-end-trophy-award` in
+ * game-end.css runs exactly this long.
+ */
+export const AWARD_MS = 3400;
+/** The trophy's height in the middle of the screen, as a share of the screen's height (and at most of its width). */
+const AWARD_HEIGHT = 0.58;
 
 const endVoice = recordedVoice(endFiles);
 
@@ -72,7 +81,8 @@ interface GameEndProps {
 
 /**
  * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another), and the
- * level's trophy beside them, won now or before (Trophy.tsx, user decision, November 2026). Nothing else stands beside
+ * level's trophy, won now or before (Trophy.tsx, user decision, November 2026): handed over big in the middle with
+ * „Geschafft!“, then on its board beside them (`AWARD_MS`). Nothing else stands beside
  * them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken out again
  * (user feedback, November 2026). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
  * no button here but the page's corner in the top left, as in every menu – the ✕, or the book's ribbon where the game
@@ -88,6 +98,10 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   const leave = useLeaveGame();
   const toShelf = useLeavesToShelf();
   const [shown, setShown] = useState(delayMs <= 0);
+  // The trophy first in the middle, big, then on its board: the buttons come once it has landed.
+  const [landed, setLanded] = useState(false);
+  const [award, setAward] = useState<CSSProperties>();
+  const trophyRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (shown) return;
@@ -108,6 +122,30 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
     if (shown && game) awardTrophy(game, level);
   }, [shown, game, level]);
 
+  // Where the trophy is handed over: measured at its place beside the buttons, before it is painted, so it starts big
+  // in the middle of the screen and shrinks back exactly onto its board (a transform only, which a phone moves cheaply).
+  const hasTrophy = Boolean(game);
+  useLayoutEffect(() => {
+    const trophy = trophyRef.current;
+    if (!shown || landed || award || !trophy) return;
+    const box = trophy.getBoundingClientRect();
+    if (box.height <= 0) return setLanded(true);
+    const height = Math.min(window.innerHeight * AWARD_HEIGHT, window.innerWidth * 0.6);
+    // Its middle a little above the screen's, so „Geschafft!“ fits under it.
+    setAward({
+      "--award-x": `${(window.innerWidth / 2 - (box.left + box.width / 2)).toFixed(1)}px`,
+      "--award-y": `${(window.innerHeight * 0.42 - (box.top + box.height / 2)).toFixed(1)}px`,
+      "--award-s": Math.max(1, height / box.height).toFixed(3),
+      "--award-ms": `${AWARD_MS}ms`,
+    } as CSSProperties);
+  }, [shown, landed, award]);
+  useEffect(() => {
+    if (!shown || landed) return;
+    if (!hasTrophy) return setLanded(true);
+    const timer = setTimeout(() => setLanded(true), AWARD_MS);
+    return () => clearTimeout(timer);
+  }, [shown, landed, hasTrophy]);
+
   // With the last game of a game limit, the game says good night instead (GameShell).
   useEffect(() => {
     if (shown && counts) gameEnded();
@@ -118,14 +156,14 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   const hasNext = next !== undefined;
   const asks = hasNext || !menu;
   useEffect(() => {
-    if (!shown || !asks) return;
+    if (!landed || !asks) return;
     const timer = setTimeout(() => {
       if (isPlaytimeOver()) return;
       const line = hasNext ? AGAIN_OR_NEXT : AGAIN_ONLY;
       endVoice.say(line[language.id] ?? line.de, language.id, { queue: true, english: line.en });
     }, ASK_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [shown, asks, hasNext, language.id]);
+  }, [landed, asks, hasNext, language.id]);
 
   // While the end is on screen, the corner in the top left is the way back.
   useEffect(() => {
@@ -147,9 +185,30 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   };
 
   return (
-    <div className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
-      {/* The trophy won, still once it has come: the level's reward, not a button. */}
-      {game && <Trophy game={game} level={level} className="game-end-trophy" />}
+    <div
+      className={`game-end${corners ? " corners" : ""}${inline ? " inline" : ""}${landed ? " landed" : ""}`}
+      data-tap-root
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      {/*
+       * The trophy won: handed over big in the middle with „Geschafft!“ under it, then on its board beside the buttons,
+       * still. A tap on it while it is big puts it on its board at once.
+       */}
+      {game && (
+        <span className="game-end-prize">
+          <span
+            ref={trophyRef}
+            className={`game-end-trophy${award && !landed ? " awarding" : ""}`}
+            style={award}
+            data-tap={landed ? undefined : ""}
+            onPointerDown={() => setLanded(true)}
+          >
+            <Trophy game={game} level={level} className="game-end-trophy-art" />
+            {!landed && <span className="game-end-done">{t({ de: "Geschafft!" })}</span>}
+          </span>
+          <span className="game-end-board" />
+        </span>
+      )}
       <div className="game-end-small">
         {menu ? (
           <button
