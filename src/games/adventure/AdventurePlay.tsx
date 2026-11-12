@@ -8,6 +8,7 @@ import { afterPageMotion } from "@/lib/pageMotion";
 import { playChime, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { loadRealSounds, playSplash, playTweet } from "@/lib/realSounds";
 import { useWakeLock } from "@/lib/wakeLock";
+import { clock } from "./clock";
 import { movement } from "./library/movements";
 import { type Cue, type Story, type StoryFrame, storyTitle } from "./stories/story";
 import { Music } from "./three/music";
@@ -69,6 +70,8 @@ export function AdventurePlay({
   const playerRef = useRef<StoryPlayer | null>(null);
   const flashRef = useRef<HTMLDivElement>(null);
   const outlineRef = useRef<HTMLDivElement>(null);
+  const playedRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLSpanElement>(null);
   const [step, setStep] = useState(0);
   const [pointing, setPointing] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
@@ -92,6 +95,23 @@ export function AdventurePlay({
     const silhouette = new Silhouette();
     outlineRef.current?.append(silhouette.svg);
     let player: StoryPlayer;
+    // How far the story is, for grown-ups: written straight into the bar and the number, never through React, since it
+    // changes in every frame – the bar by a transform (no repaint), the number only when its second changes.
+    let shownPart = -1;
+    let shownClock = "";
+    const showTime = (time: number) => {
+      const total = player.duration;
+      const part = Math.round(Math.min(1, Math.max(0, time / total)) * 1000) / 1000;
+      if (part !== shownPart && playedRef.current) {
+        shownPart = part;
+        playedRef.current.style.transform = `scaleX(${part})`;
+      }
+      const left = `−${clock(total - time)}`;
+      if (left !== shownClock && leftRef.current) {
+        shownClock = left;
+        leftRef.current.textContent = left;
+      }
+    };
     try {
       player = new StoryPlayer(canvas, story, {
         onLine(text, kind, at) {
@@ -117,6 +137,7 @@ export function AdventurePlay({
           setEnded(true);
         },
         onPose(pose, frame, view) {
+          showTime(frame.time);
           const box = outlineRef.current;
           if (!box) return;
           const shown = outlineShown(frame);
@@ -246,6 +267,13 @@ export function AdventurePlay({
           </li>
         ))}
       </ol>
+      {/* How far the story is: the bar filled as far as it has played, the time still to come beside it. For grown-ups, small. */}
+      <div className="adventure-time" hidden={ended} aria-hidden>
+        <div className="adventure-time-bar">
+          <div ref={playedRef} className="adventure-time-played" />
+        </div>
+        <span ref={leftRef} className="adventure-time-left" />
+      </div>
       <div className="adventure-controls">
         <button type="button" onClick={() => jump((p) => p.skip(-1))} aria-label={back} title={`${back} (←)`}>
           ⏮
