@@ -26,8 +26,13 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
   in the picture. `gemini-2.5-flash-image` is deprecated (off on 15 March 2027) and dearer
   ($0.0195 batch). `gemini-nano-banana-2.1` (Nano Banana 2.1, since October 2026) costs the
   same per 1K picture as Lite but more for input and its thinking, and can make 2K ($0.0252
-  batch) – four card-sized panels per sheet; untested here, see idea A-33 and the research
-  „gemini-bildpreise“ on `/management/` before switching. Prices change: check
+  batch) – four card-sized panels per sheet (`--model gemini-nano-banana-2.1 --image-size 2K
+  --thinking minimal`, 58 % cheaper per picture, measured November 2026). **Never for story
+  pictures drawn from a reference**: on its sheets they lost things every picture must keep (the
+  bunny was missing in six of eight panels, even with „EVERY panel contains …“), Lite alone kept
+  them; untested for cards and cut-outs without a reference (idea A-33, research
+  „gemini-bildpreise“ on `/management/`). Every batch prints its real cost from the tokens
+  Gemini sends back (`BATCH_PRICES` in the script, a new model needs its line). Prices change: check
   ai.google.dev/gemini-api/docs/pricing (Nov 2026) before trusting these. List the models the key can use:
   `curl -s -H "x-goog-api-key: $GEMINI_API_KEY" https://generativelanguage.googleapis.com/v1beta/models`
 - The key must be **exported** (`export GEMINI_API_KEY=…` in `~/.zshrc`); if the shell

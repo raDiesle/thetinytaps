@@ -97,7 +97,7 @@ export const ALLTAG_DRAWINGS: StoryDrawing[] = [
   // C-41
   {
     id: "homesick",
-    made: "first",
+    made: true,
     place:
       "Omas Gästezimmer bei Nacht: Gästebett mit Flickendecke, ein Mond-Nachtlicht auf dem Nachttisch, ein gerahmtes Bild an der Wand, eine geschlossene Tür; Oma Bär auf der Bettkante. Der große Bär ist schon nach Hause gefahren.",
     cast: ["bear", "grandma"],

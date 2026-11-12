@@ -3,6 +3,7 @@
 //
 //   bun run image <out.webp> "<prompt>" [--ref a.png ...] [--aspect 4:3] [--size 1200x900]
 //              [--transparent] [--key ff00ff] [--quality 80] [--model <id>]
+//              [--image-size 2K] [--thinking minimal]
 //   bun run image a.webp,b.webp "<prompt>" --grid 1x2 --panel "<a>" --panel "<b>" [options]
 //   … --grid 2x2 --transparent --frames      frames of one animation: each keeps its whole cell, so they line up
 //   bun run image --jobs jobs.json            many pictures in one batch
@@ -82,6 +83,8 @@ function parseArgs(argv) {
     else if (a === "--key") opts.key = next().replace(/^#/, "");
     else if (a === "--quality") opts.quality = Number(next());
     else if (a === "--model") opts.model = next();
+    else if (a === "--image-size") opts.imageSize = next();
+    else if (a === "--thinking") opts.thinking = next();
     else if (a === "--now") opts.now = true;
     else if (a === "--no-wait") opts.wait = false;
     else if (a === "--wait") opts.wait = true;
@@ -96,7 +99,22 @@ function parseArgs(argv) {
 
 /** One request: one picture, or one grid cut into several. Paths relative to the checkout. */
 /** The fields a job in --jobs may have; anything else is a typo that would be ignored silently. */
-const JOB_FIELDS = new Set(["out", "prompt", "ref", "refs", "panels", "aspect", "grid", "size", "quality", "transparent", "key", "frames"]);
+const JOB_FIELDS = new Set([
+  "out",
+  "prompt",
+  "ref",
+  "refs",
+  "panels",
+  "aspect",
+  "grid",
+  "size",
+  "quality",
+  "transparent",
+  "key",
+  "frames",
+  "imageSize",
+  "thinking",
+]);
 
 /** A job read from a --jobs file, checked for fields this script doesn't know. */
 function checkedJob(o) {
@@ -125,6 +143,10 @@ function toJob(o) {
     transparent: Boolean(o.transparent),
     key: (o.key ?? "ff00ff").replace(/^#/, ""),
     frames: Boolean(o.frames),
+    // The picture's resolution ("1K", "2K", "4K"; Lite knows only 1K) and how much the model thinks first ("minimal",
+    // "medium", "high"): the model's default when not given. A --jobs file takes them from the command line too.
+    imageSize: o.imageSize ?? opts.imageSize,
+    thinking: o.thinking ?? opts.thinking,
   };
   if (job.frames && !(job.grid && job.transparent)) fail("--frames is for the cut-out frames of one sheet: it needs --grid and --transparent");
   if (!/^[0-9a-f]{6}$/i.test(job.key)) fail("--key must be a colour like ff00ff");
@@ -190,7 +212,8 @@ function buildRequest(job) {
     parts.push({ inlineData: { mimeType, data: readFileSync(resolve(ROOT, file)).toString("base64") } });
   }
   const generationConfig = { responseModalities: ["IMAGE"] };
-  if (aspect) generationConfig.imageConfig = { aspectRatio: aspect };
+  if (aspect || job.imageSize) generationConfig.imageConfig = { ...(aspect && { aspectRatio: aspect }), ...(job.imageSize && { imageSize: job.imageSize }) };
+  if (job.thinking) generationConfig.thinkingConfig = { thinkingLevel: job.thinking };
   return { contents: [{ parts }], generationConfig };
 }
 
@@ -261,6 +284,31 @@ function closeRecord(record, how) {
   renameSync(recordPath(record), join(done, basename(recordPath(record))));
 }
 
+/**
+ * US dollars per million tokens in a batch (half the price of asking at once): input (text and pictures), text and
+ * thinking output, picture output. From ai.google.dev/gemini-api/docs/pricing, November 2026.
+ */
+const BATCH_PRICES = {
+  "gemini-3.1-flash-lite-image": { input: 0.125, text: 0.75, image: 15 },
+  "gemini-nano-banana-2.1": { input: 0.75, text: 3.75, image: 15 },
+};
+
+/** Prints what a batch really cost, from the token counts Gemini sent back, so a price is measured, not assumed. */
+function reportCost(record) {
+  const sum = (key) => record.usage.reduce((n, u) => n + (u[key] ?? 0), 0);
+  const imageOut = record.usage.reduce(
+    (n, u) => n + (u.candidatesTokensDetails ?? []).filter((d) => d.modality === "IMAGE").reduce((m, d) => m + d.tokenCount, 0),
+    0,
+  );
+  const [input, output, thoughts] = [sum("promptTokenCount"), sum("candidatesTokenCount"), sum("thoughtsTokenCount")];
+  const tokens = `${input} in, ${imageOut} picture out, ${output - imageOut} text out, ${thoughts} thinking`;
+  const price = BATCH_PRICES[record.model];
+  if (!price) return console.log(`${record.name}: ${tokens} (no price known for ${record.model})`);
+  const dollars = (input * price.input + imageOut * price.image + (output - imageOut + thoughts) * price.text) / 1e6;
+  const requests = record.usage.length;
+  console.log(`${record.name}: ${tokens} – $${dollars.toFixed(4)} for ${requests} request${requests === 1 ? "" : "s"}`);
+}
+
 const stateOf = (batch) => String(batch.metadata?.state ?? batch.state ?? "unknown");
 
 /** Looks at one batch; saves its pictures once it is done. Returns true when nothing is left to wait for. */
@@ -278,6 +326,9 @@ async function check(record) {
   const root = existsSync(record.checkout) ? record.checkout : ROOT;
   if (root !== record.checkout) console.warn(`${record.checkout} is gone – saving into ${root} instead`);
   let failed = 0;
+  record.usage = answers.map((answer) => answer.response?.usageMetadata).filter(Boolean);
+  writeFileSync(recordPath(record), JSON.stringify(record, null, 2));
+  reportCost(record);
   for (const [i, answer] of answers.entries()) {
     const job = record.jobs[Number(answer.metadata?.key ?? i)];
     const { picture, error } = answer.error ? { error: answer.error.message } : pictureIn(answer.response);
