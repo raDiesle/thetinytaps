@@ -63,6 +63,8 @@ export const ARM_CLIPS = clips({
       a.raise = 1.2 + k * 1.3;
       a.spread = 0.15;
       a.elbow = 2.0 - k * 1.9;
+      // Palms up against what is pushed.
+      a.palm = 1;
     }
     p.toes = k * 0.6;
     p.headPitch = -0.35 * k;
@@ -99,6 +101,8 @@ export const ARM_CLIPS = clips({
       a.raise = 0.25 + down * 0.6 + up * 2.6;
       a.spread = 0.15 + up * 0.45;
       a.elbow = 0.3 + down * 0.3 - up * 0.2;
+      // The paws scoop palm up and keep it so as they fling the coins.
+      a.palm = Math.max(down, up);
     }
     p.headPitch = down * 0.4 - up * 0.35;
   },
@@ -266,6 +270,8 @@ export const ARM_CLIPS = clips({
     hand.raise = 0.9 + tap * 0.65;
     hand.spread = 0.1;
     hand.elbow = 1.5 - tap * 1.45;
+    // The paw opens towards the balloon it taps.
+    hand.palm = tap;
     p.bend = tap * 0.1;
   },
 
@@ -293,6 +299,8 @@ export const ARM_CLIPS = clips({
       a.raise = 1.3;
       a.spread = TOGETHER + 0.05 + k * 1.0;
       a.elbow = 0.5;
+      // Palm to palm.
+      a.palm = 0.5;
     }
     p.lift = (1 - k) * 0.01;
   },
@@ -316,6 +324,7 @@ export const ARM_CLIPS = clips({
     p.armR.raise = -0.6 * back + up * 1.9;
     p.armR.spread = 0.15;
     p.armR.elbow = 0.15;
+    p.armR.palm = 1;
     crouch(p, back * 0.25);
     p.bend += back * 0.15;
     p.toes = up * 0.4;
@@ -347,6 +356,7 @@ export const ARM_CLIPS = clips({
     p.armR.raise = 0.3 + out * 0.8;
     p.armR.spread = 0.1 + out * 1.1;
     p.armR.elbow = 1.7 - out * 1.6;
+    p.armR.palm = 1;
     p.armL.raise = 0.4;
     p.armL.elbow = 1.6;
     p.twist = -0.15 + out * 0.3;
@@ -358,6 +368,8 @@ export const ARM_CLIPS = clips({
       a.raise = 1.1;
       a.spread = 1.15 - k * 1.55;
       a.elbow = 0.3 + k * 1.5;
+      // Open paws to catch with.
+      a.palm = 1;
     }
     p.bend = k * 0.1 - (1 - k) * 0.05;
     p.lift = 0;

@@ -109,7 +109,7 @@ export const SWING_HELD = 0.77;
 export const SWING_PARKED = 1.1;
 export const DRUMS_Z = 15.5;
 /** Where the beating paw comes down (measured on the drum clip), from Tapsi: x to Tapsi's left; and how wide the drums are. */
-export const DRUM_HAND = v3(0.42, 0.75, 0.32).multiplyScalar(GUIDE_SIZE);
+export const DRUM_HAND = v3(0.49, 0.73, 0.44).multiplyScalar(GUIDE_SIZE);
 export const DRUM_RADIUS = 0.15;
 /** How many birds every drum beat scares off the path together. */
 export const BIRDS_PER_BEAT = 2;
@@ -146,9 +146,9 @@ export const GATE_BEAM = GATE_LIFT + 2.5;
  * stands beside it, so the camera straight behind sees its whole big circle beside the body. The body goes
  * along (down at the bottom, up on the toes at the top), so the paws stay on its handle.
  */
-export const CRANK_REACH = 0.34 * GUIDE_SIZE;
+export const CRANK_REACH = 0.38 * GUIDE_SIZE;
 export const CRANK_SIDE = 0.4;
-const CRANK_HEIGHT = 0.82 * GUIDE_SIZE;
+const CRANK_HEIGHT = 0.88 * GUIDE_SIZE;
 export const CRANK_ARM = 0.3 * GUIDE_SIZE;
 /** The winch beside the gate on the left, its crank beside Tapsi on Ole's back, where Ole stands clear of the gate's post. */
 export const WINCH_X = -2.55 - CRANK_SIDE;
@@ -196,7 +196,7 @@ export const SIT_DROP = 0.015;
 export const BAY = v3(0.3, 0, -23);
 /** Where the lock hangs on the chest (the chest's own space), and where the turning paw is, from Tapsi. */
 export const LOCK = v3(0, 0.62, 0.45);
-const KEY_HAND = v3(-0.1, 0.95, 0.42).multiplyScalar(GUIDE_SIZE);
+const KEY_HAND = v3(-0.08, 0.91, 0.53).multiplyScalar(GUIDE_SIZE);
 /**
  * The camera for the key turn, from the lock: level with the key on Tapsi's right, side on, so the ring is
  * seen standing up and lying down as it turns, the paw on it and the chest beside it.
