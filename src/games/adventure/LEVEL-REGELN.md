@@ -94,6 +94,15 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Der Fuchs soll natürlich aussehen: schlanke Gliedmaßen, die sich verjüngen, sichtbare Gelenke,
   Finger und Zehen mit runden Spitzen; Hände und Füße bewegen sich mit (Handgelenk, Fußgelenk),
   nichts wirkt wie steife Stäbe.
+- **Ein Körper wie der eines Kindes** (Rückmeldung November 2026: zwei Kugeln für Brust und Becken,
+  kein Hals und Kugelgelenke an den Schultern sahen nach Schneemann-Puppe aus): ein durchgehender Rumpf
+  mit Schultern, die die Arme tragen, weicher Taille, Hüften, aus denen die Oberschenkel wachsen, rundem
+  Bauch vorn und Po hinten; ein kurzer Hals, auf dem der Kopf sitzt (Kinn über den Schultergelenken),
+  der Kopf etwa ein Viertel der Größe, nie ein Drittel. Schulterkappen statt Kugeln, Oberschenkel oben
+  voll, Waden hinten am Schienbein. Das Fell bekommt seine Zeichnung über den Körper (das Creme läuft
+  weich von der Kehle bis zum Bauch, `torsoGeometry` in `three/guide.ts`), nie als aufgesetzter Fleck.
+  `three/guide.test.ts` prüft Hals und Kopfgröße. Die Gelenkpunkte (Schultern, Hüften, Armlängen)
+  bleiben dabei, wo sie sind, sonst stimmt nichts mehr, was am Clip gemessen ist.
 - **Hände wie echte Hände** (Rückmeldung November 2026): Der Daumen sitzt auf der Seite, auf der er
   bei dieser Handfläche wirklich sitzt (Handfläche vorn → Daumen außen), nie spiegelverkehrt. Die
   Handfläche zeigt, wohin eine echte zeigt: beim hängenden Arm zum Körper, beim vorgestreckten oder
@@ -145,7 +154,10 @@ Fehler in späteren Leveln nicht wieder passiert.
   Seite, dass das, was kommt, frei neben ihm vorbeizieht und man es sieht (Wolkenreise: Wolle springt
   zur Seite, die Kamera geht nur halb mit, der Stern fliegt durch die Mitte des Bildes).
 - **Duckt sich der Fuchs unter etwas** (Flugzeuge), steht die Kamera weiter weg, tiefer und schaut
-  etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt.
+  etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt. Was
+  heranfliegt, kommt schräg von oben herab, vom oberen Bildrand, nah genug und groß genug, dass man
+  es sieht – nie frontal auf Kopfhöhe von vorn, da steckte es hinter dem Kopf und war winzig. Nach
+  dem Kopf fliegt es weiter auf uns zu und aus dem Bild, nie nach oben weg (Wolkenreise, November 2026).
 - **Kommt etwas zu den Händen** (Luftballons zum Antippen), kommt es von vorn schräg seitlich auf
   Höhe der Hände angeschwebt, nie von oben, und die Kamera schaut von hinten: So sieht man es kommen
   und die Pfote treffen. Die Pfote greift nach vorn **und zur Seite** hinaus, nie nur gerade nach vorn:

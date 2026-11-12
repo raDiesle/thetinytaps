@@ -77,6 +77,12 @@ const ARRIVE = 0.35;
 const PAW_RADIUS = 0.07;
 /** How fast the planes fly (m/s). */
 const PLANE_SPEED = 7;
+/** How far behind Tapsi the camera stands while it ducks: a plane flying at us is gone there. */
+const DUCK_CAMERA_BACK = 3;
+/** How high the camera stands while Tapsi ducks, as a share of Tapsi's standing height. */
+const DUCK_CAMERA_HEIGHT = 0.7;
+/** Where a plane is gone: at the camera, out of the picture. */
+const PLANE_GONE = DUCK_CAMERA_BACK;
 
 /** Wolle's place and turn for a frame. */
 interface Place {
@@ -230,6 +236,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const standTop = measure("idle", 1, 0).top;
   const duckTop = measure("duck", passTime(0), 0).top;
   const PASS_Y = Math.max(duckTop + 0.24, (duckTop + standTop) / 2 + 0.05);
+  // How much higher than over the head a plane is, `d` metres along its way (over the head at 0, coming from ahead at
+  // -d): it dives in from the picture's top edge, close enough to be seen, getting flatter as it nears, so it shows
+  // against the sky above Tapsi all the way in; past the head it keeps sinking gently towards us until it is just over the camera, never rising.
+  const PAST_DROP = Math.min(0, standTop * DUCK_CAMERA_HEIGHT + 0.25 - PASS_Y);
+  const rise = (d: number) => (d < 0 ? -d * 0.15 + d * d * 0.036 : PAST_DROP * (1 - (1 - Math.min(1, d / PLANE_GONE)) ** 2));
 
   // A balloon for every tapping paw, the left one first, just beyond where the paw reaches out to (forwards and
   // out to its side), floating in from ahead and out on that side at the height of the paws – never from above or
@@ -399,7 +410,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.duck:
         // Behind, at the height of the shoulders and looking a little up the way Tapsi looks: the whole ducking
         // body shows, and the planes come at us over the head.
-        pos.set(g.x, g.y + standTop * 0.7, g.z + 3);
+        pos.set(g.x, g.y + standTop * DUCK_CAMERA_HEIGHT, g.z + DUCK_CAMERA_BACK);
         look.set(g.x, g.y + standTop * 1.05, g.z - 6);
         return;
       case S.balloons:
@@ -557,15 +568,15 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     }
 
-    // The planes: one comes at Tapsi's head in every duck, passes right over it at the deepest point and
-    // pulls up steeply over the camera behind.
+    // The planes: one comes at Tapsi's head in every duck, gliding down from high up ahead – coming straight at
+    // the head at its height, a plane hid behind it and was hard to see –, passes right over it at the deepest
+    // point and flies on at us, down to just over the camera, out of the picture's top edge: never pulling up.
     planes.forEach((plane, n) => {
       const d = step === S.duck && !inOpening ? (clip - passTime(n)) * PLANE_SPEED : -99;
-      const on = d > -22 && d < 5;
+      const on = d > -12 && d < PLANE_GONE;
       plane.group.visible = on;
       if (!on) return;
-      const rise = (x: number) => (x < 0 ? -x * 0.06 : x * x * 1.4);
-      plane.group.position.set(g.x + Math.sin(time * 2 + n) * 0.05 * Math.min(1, -d / 4), g.y + PASS_Y + rise(d), g.z + d);
+      plane.group.position.set(g.x + Math.sin(time * 2 + n) * 0.05 * Math.min(1, Math.max(0, -d / 4)), g.y + PASS_Y + rise(d), g.z + d);
       plane.group.rotation.set(-Math.atan((rise(d + 0.1) - rise(d - 0.1)) / 0.2), 0, Math.sin(time * 2.5 + n) * 0.12, "YXZ");
       plane.spin(time);
       if (atClip(passTime(n) - 0.35)) cue("whoosh");
