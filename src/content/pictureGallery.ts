@@ -75,6 +75,7 @@ export const PICTURE_SOURCES: Record<string, PictureSource> = {
   timer: { title: "Timer", hrefs: ["/timer/"] },
   milkchain: { title: "Abstillen", hrefs: ["/abstillen/"] },
   pacifierstory: { title: "Schnullerfee", hrefs: ["/schnullerfee/"] },
+  kitastory: { title: "Kita-Start", hrefs: ["/kita/"] },
   teeth: { title: "Zähne putzen", hrefs: ["/zaehne/"] },
   potty: { title: "Aufs Töpfchen", hrefs: ["/toepfchen/"] },
   rewards: { title: "Belohnungstafel, Zeitplan und Wie lange warten?", hrefs: ["/belohnungstafel/", "/tagesplan/", "/wie-lange-warten/"] },
