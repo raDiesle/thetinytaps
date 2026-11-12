@@ -19,9 +19,14 @@ Fehler in späteren Leveln nicht wieder passiert.
   (stattdessen Spinnweben wegwedeln), kein Balancieren auf Schienen, kein schnelles Drehen.
 - **Nur zeigen, was zur Bewegung gehört.** Teile, die nicht Teil der Bewegung sind, sollen nicht
   auffallen: Beim Paddeln scheinen die Füße nicht durch den Körper, nur Arme. Leuchten und
-  Durchscheinen folgen `clipFocus`.
+  Durchscheinen folgen `clipFocus`. Was die Hauptbewegung macht, leuchtet aber mit, auch wenn der Clip
+  zu einem anderen Teil gehört: Neigt sich der Fuchs zur Seite, leuchtet die Pfote, die auf dieser Seite
+  hinausgreift (`MORE_FOCUS` in `three/clips/index.ts`).
 - Erst zeigt der Fuchs die Bewegung allein, dann „Jetzt du!“. Bewegungen sind groß und halten kurz
   an ihren Enden, damit man sie gut erkennt.
+- **Bewegungen gehen fließend ineinander über**, nie ruckartig: Wechseln sich die Pfoten ab (Ballons
+  antippen), wartet die eine halb oben, während die andere hinausgreift, und keine springt beim Wechsel
+  an einen anderen Platz (`clips.test.ts` misst es beim Antippen).
 - **Jede Bewegung oft genug.** Zeigen und Mitmachen zusammen dauern etwa 12–25 s, also viele
   Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr.
 - **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: erst Kiki winken, dann
@@ -143,7 +148,10 @@ Fehler in späteren Leveln nicht wieder passiert.
   etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt.
 - **Kommt etwas zu den Händen** (Luftballons zum Antippen), kommt es von vorn schräg seitlich auf
   Höhe der Hände angeschwebt, nie von oben, und die Kamera schaut von hinten: So sieht man es kommen
-  und die Pfote treffen.
+  und die Pfote treffen. Die Pfote greift nach vorn **und zur Seite** hinaus, nie nur gerade nach vorn:
+  Von hinten verdeckten Kopf und Arm sonst Ballon und Pfote. Der Ballon schwebt langsamer werdend an
+  seinen Platz und wartet dort kurz, und er platzt in dem Moment, in dem die Pfote ihn berührt – nie
+  erst, wenn die Pfote schon in ihm steckt (`popAt` misst die Berührung).
 - **Schiebt der Fuchs etwas weg** (graue Wolken), steht die Kamera weit hinter ihm: Man sieht, wie es
   kommt und wie es weggeschoben wird, nicht nur die Pfoten davor.
 - **Schwingt etwas über den Fuchs hinweg** (Baumstamm), steht die Kamera weit hinter ihm und tief

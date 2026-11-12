@@ -13,6 +13,7 @@ import {
   FLAP_PERIOD,
   hold,
   TAP_PERIOD,
+  tapReach,
   jump,
   KEY_PICKUP,
   keyTurn,
@@ -264,15 +265,25 @@ export const ARM_CLIPS = clips({
   },
 
   tap_forward: (t, p) => {
-    const k = phase(t, TAP_PERIOD);
-    const tap = hold(k, 0.1, 0.25, 0.32, 0.5);
-    const hand = Math.floor(t / TAP_PERIOD) % 2 === 0 ? p.armL : p.armR;
-    hand.raise = 0.9 + tap * 0.65;
-    hand.spread = 0.1;
-    hand.elbow = 1.5 - tap * 1.45;
-    // The paw opens towards the balloon it taps.
-    hand.palm = tap;
-    p.bend = tap * 0.1;
+    // Both paws wait half up in front of the body; in turn each reaches forwards and out to its own side, to the
+    // balloon floating in there, and comes back – flowing, never jumping from one paw to the other (user
+    // feedback, November 2026: the arms jerked up, and reaching straight ahead they hid the balloons).
+    const l = tapReach(t);
+    const r = tapReach(t - TAP_PERIOD);
+    for (const [arm, k] of [
+      [p.armL, l],
+      [p.armR, r],
+    ] as const) {
+      arm.raise = 0.75 + k * 0.85;
+      arm.spread = 0.25 + k * 0.5;
+      arm.elbow = 1.3 - k * 1.2;
+      // The paw opens towards the balloon it taps.
+      arm.palm = k;
+    }
+    // The body and the eyes go a little with the reaching paw (to the fox's left is positive).
+    p.lean = (l - r) * 0.06;
+    p.headYaw = (l - r) * 0.25;
+    p.bend = Math.max(l, r) * 0.08;
   },
 
   point: (t, p) => {

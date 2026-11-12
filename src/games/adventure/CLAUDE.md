@@ -17,7 +17,8 @@ dark rain cloud that hides the sun, then flies back over the land to Tapsi stand
 on a meadow by a village (the camera far enough back that Wolle's underside shows). Tapsi waves Kiki over,
 flaps its arms so Wolle rises (only on the downstrokes), ducks under small planes (camera further back, low
 and looking a little up, so the whole body shows), taps balloons that float in from ahead on both sides at
-paw height until they pop (seen from behind), sits down for the fast part, leans left and right through the
+paw height and wait there (seen from behind; the paws take turns reaching forwards and out to their side,
+flowing, `tapReach`, and a balloon pops the moment the paw touches it, `popAt`), sits down for the fast part, leans left and right (the reaching paw glowing too) through the
 curves for the stars beside the cloud towers (Wolle darts quickly aside, `CURVE_SWING`, and the low camera
 follows only part of the way, so each star is seen coming), stands up under the rain cloud, pushes its grey
 puffs up and away until the sun comes out (camera far back), paints a rainbow band by band with big arm arcs

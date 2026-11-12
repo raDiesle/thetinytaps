@@ -142,8 +142,24 @@ export const duckDepth = (t: number) => hold(phase(t, DUCK_PERIOD), 0.05, 0.28, 
 export const FLAP_PERIOD = 1.1;
 /** Seconds of one tap of tap_forward: the left paw taps in the first one, the right in the next. */
 export const TAP_PERIOD = 1.5;
-/** Seconds into each tap when the paw is furthest forward. */
-export const TAP_HIT = 0.43;
+/** Seconds into each tap when the paw is furthest out. */
+export const TAP_HIT = 0.6;
+/** Seconds a tapping paw takes to reach out, and to come back after holding at the balloon for a moment. */
+const TAP_OUT = 0.6;
+const TAP_HOLD = 0.1;
+const TAP_BACK = 0.8;
+/**
+ * How far the left paw of tap_forward reaches out `t` s into the clip (0..1; the right one is a tap later): it
+ * goes out smoothly, holds at the hit and comes back, while the other paw is already on its way.
+ */
+export function tapReach(t: number) {
+  const cycle = 2 * TAP_PERIOD;
+  let d = (((t - TAP_HIT) % cycle) + cycle) % cycle;
+  if (d > cycle - TAP_OUT) d -= cycle;
+  if (d < 0) return smooth(1 + d / TAP_OUT);
+  if (d < TAP_HOLD) return 1;
+  return 1 - smooth(clamp01((d - TAP_HOLD) / TAP_BACK));
+}
 /** Seconds of one go of lean_side: over to the left, back, over to the right, back. */
 export const LEAN_PERIOD = 3.4;
 /** Seconds of one jump for joy in the cheer clip. */

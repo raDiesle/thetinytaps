@@ -71,6 +71,10 @@ const GREY: SkyColors = { top: "#7d8796", horizon: "#c3c9d1", sun: "#000000" };
 const SINK = 0.03;
 /** Seconds a balloon floats towards the paw. */
 const FLOAT = 3.2;
+/** Seconds before the paw is furthest out that a balloon has floated to its place and waits there. */
+const ARRIVE = 0.35;
+/** How far from a paw's grip point its fur reaches (m): a balloon closer than this to it is touched. */
+const PAW_RADIUS = 0.07;
 /** How fast the planes fly (m/s). */
 const PLANE_SPEED = 7;
 
@@ -227,10 +231,33 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const duckTop = measure("duck", passTime(0), 0).top;
   const PASS_Y = Math.max(duckTop + 0.24, (duckTop + standTop) / 2 + 0.05);
 
-  // A balloon at the front of every tapping paw: the left one first.
+  // A balloon for every tapping paw, the left one first, just beyond where the paw reaches out to (forwards and
+  // out to its side), floating in from ahead and out on that side at the height of the paws – never from above or
+  // below, where they were hard to see.
+  const handOf = (n: number) => (n % 2 === 0 ? "L" : "R");
   const balloonAt = balloons.map((_, n) => {
-    const m = measure("tap_forward", tapTime(n), 0);
-    return (n % 2 === 0 ? m.L : m.R).clone().add(v3(0, 0, BALLOON_RADIUS + 0.02));
+    const hit = measure("tap_forward", tapTime(n), 0)[handOf(n)];
+    const before = measure("tap_forward", tapTime(n) - 0.2, 0)[handOf(n)];
+    return hit.clone().addScaledVector(hit.clone().sub(before).normalize(), BALLOON_RADIUS + 0.03);
+  });
+  /** How far balloon n has floated in (0..1) `clip` s into the tapping: it slows down and waits at its place just before the paw comes. */
+  const floated = (n: number, clip: number) => (clip - tapTime(n) + ARRIVE + FLOAT) / FLOAT;
+  /** Where balloon n is when it has floated `u` (0..1) of its way in, in Tapsi's space. */
+  const balloonPath = (n: number, u: number, out: THREE.Vector3) => {
+    const target = balloonAt[n];
+    const side = n % 2 === 0 ? 1 : -1;
+    const k = Math.min(1, u);
+    return out.set(target.x + side * 3.2, target.y + 0.25, target.z + 3).lerp(target, 1 - (1 - k) ** 2);
+  };
+  // Each balloon pops the moment the paw touches it, on the paw's way out – never once the paw is already in it
+  // (user feedback, November 2026).
+  const popAt = balloons.map((_, n) => {
+    const at = new THREE.Vector3();
+    for (let c = tapTime(n) - 0.6; c < tapTime(n); c += 0.01) {
+      const paw = measure("tap_forward", c, 0)[handOf(n)];
+      if (balloonPath(n, floated(n, c), at).distanceTo(paw) < BALLOON_RADIUS + PAW_RADIUS) return c;
+    }
+    return tapTime(n);
   });
 
   // A star at the reaching paw at the furthest lean of every curve, where Wolle carries Tapsi then.
@@ -546,22 +573,18 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // Tapsi's face shows the planes passing: a little shy while they go over.
     guide.earsBack = step === S.duck && clip > 0 ? duckDepth(clip) * 0.8 : 0;
 
-    // The balloons float in from ahead and out to the side, at the height of the paws, towards the hand that taps
-    // them – never from above or below, where they were hard to see – the left one first, and pop: confetti.
+    // The balloons float in towards the paw that taps them, and pop as it touches them: confetti.
     balloons.forEach((balloon, n) => {
-      const u = step === S.balloons && !inOpening ? (clip - tapTime(n) + FLOAT) / FLOAT : -1;
-      balloon.visible = u >= 0 && u < 1;
+      const u = step === S.balloons && !inOpening ? floated(n, clip) : -1;
+      balloon.visible = u >= 0 && clip < popAt[n];
       if (balloon.visible) {
-        const side = n % 2 === 0 ? 1 : -1;
-        const target = balloonAt[n];
-        const e = u * 0.6 + smooth(u) * 0.4;
-        tmpA.set(target.x + side * 3.2, target.y + 0.25, target.z + 3).lerp(target, e);
-        tmpA.y += Math.sin(time * 1.7 + n) * 0.1 * (1 - u);
+        balloonPath(n, u, tmpA);
+        tmpA.y += Math.sin(time * 1.7 + n) * 0.1 * Math.max(0, 1 - u);
         fromTapsi(tmpA, g, place.yaw, balloon.position);
-        balloon.rotation.set(0, 0, Math.sin(time * 1.3 + n) * 0.15 * (1 - u));
+        balloon.rotation.set(0, 0, Math.sin(time * 1.3 + n) * 0.15 * Math.max(0, 1 - u));
       }
-      if (step === S.balloons && atClip(tapTime(n))) {
-        confetti.burst(fromTapsi(balloonAt[n], g, place.yaw, tmpB), 26, 2.6, true);
+      if (step === S.balloons && atClip(popAt[n])) {
+        confetti.burst(fromTapsi(balloonPath(n, floated(n, popAt[n]), tmpA), g, place.yaw, tmpB), 26, 2.6, true);
         cue("pop");
       }
     });

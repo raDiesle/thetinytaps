@@ -130,7 +130,7 @@ noch ein ruhiger Abschied dazukommen.
   müssen die Bewegungen des Fuchses deutlich sein.
 - **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet
   nur der Körperteil, um den es geht (`clipFocus` in `../three/clips/`, nach der Datei des Clips: an der Kurbel die Arme,
-  beim Stampfen die Beine), als schmaler neongrüner Rand ohne Muster, und nur solange er sich
+  beim Stampfen die Beine; beim Neigen zur Seite auch die hinausgreifende Pfote, `MORE_FOCUS`), als schmaler neongrüner Rand ohne Muster, und nur solange er sich
   bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
   gewollt, aber noch nicht mit Kindern ausprobiert.
 - **Umriss-Hilfe** (dunkle Kinderfigur mit leuchtendem Rand wie bei „Just Dance“,
