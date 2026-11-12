@@ -867,7 +867,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
   browser's language. Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
   renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
-  text in every language in the same commit, and its book's and the home page's where they name it – they had fallen
+  text in every language in the same commit, and its book's and the home page's where they name it, also for something new in every game (the trophies) or a new picture in a game (the Timer's Tennis), which both stayed missing from the texts for days (November 2026) – they had fallen
   behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
   feedback, November 2026; `content.test.ts` checks that a book's text names each of its games). No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
