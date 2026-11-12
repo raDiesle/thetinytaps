@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import { Contour, CONTOUR_PARTS, GLOW_LAYER, type ContourPart } from "./contour";
 import { skinRigid } from "./skin";
 import { mergeParts } from "./props";
@@ -222,6 +223,72 @@ function limb(length: number, top: number, bottom: number, material: THREE.Mater
   return mesh(new THREE.LatheGeometry(points, 18), material);
 }
 
+/** How deep the torso is from front to back, against its width: a child's is flatter than round. */
+const TORSO_DEPTH = 0.84;
+/** How big the head is drawn (the face's own units were made for a bigger one). */
+const HEAD_SCALE = 0.74;
+
+/** A soft bump round `at`, `width` wide, 1 at its top. */
+const bump = (y: number, at: number, width: number) => Math.exp(-(((y - at) / width) ** 2));
+
+/**
+ * The torso from the crotch up through the neck into the head, its half width at each height (in the spine's
+ * space): round under the hips, the hips the thighs grow out of, a soft waist, a chest widening into shoulders
+ * that reach over the shoulder joints (SHOULDER_Y), sloping down into the neck. Turned round its middle, flatter
+ * front to back (`TORSO_DEPTH`), with a child's round tummy in front and its bottom behind. Coloured by its
+ * vertices: the fox's cream runs from the throat down the chest to the tummy and fades softly into the fur,
+ * instead of a patch laid on it.
+ */
+function torsoGeometry() {
+  const outline = new THREE.SplineCurve(
+    [
+      [0, -0.078],
+      [0.06, -0.07],
+      [0.108, -0.047],
+      [0.138, -0.008],
+      [0.147, 0.045],
+      [0.139, 0.11],
+      [0.128, 0.17],
+      [0.134, 0.235],
+      [0.149, 0.305],
+      [0.16, 0.375],
+      [0.162, 0.425],
+      [0.146, 0.463],
+      [0.1, 0.488],
+      [0.064, 0.51],
+      [0.058, 0.55],
+      [0.056, 0.6],
+      [0, 0.62],
+    ].map(([x, y]) => new THREE.Vector2(x, y)),
+  );
+  // Its seam at the back, and welded there, so no crease shows down the middle.
+  const lathe = new THREE.LatheGeometry(outline.getPoints(56), 36, Math.PI);
+  lathe.deleteAttribute("uv");
+  lathe.deleteAttribute("normal");
+  const geometry = mergeVertices(lathe, 1e-5);
+  lathe.dispose();
+  const pos = geometry.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
+  const furColor = new THREE.Color(FUR);
+  const creamColor = new THREE.Color(CREAM);
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
+    const out = z > 0 ? 1 + 0.2 * bump(y, 0.12, 0.1) : 1 + 0.3 * bump(y, 0.01, 0.07) + 0.06 * bump(y, 0.36, 0.08);
+    pos.setZ(i, z * TORSO_DEPTH * out);
+    // How far round from the front, and how far round the cream reaches at this height.
+    const round = Math.abs(Math.atan2(x, z));
+    const reach = 0.55 + 0.25 * bump(y, 0.18, 0.14) - 0.08 * bump(y, 0.42, 0.05);
+    const cream = (1 - THREE.MathUtils.smoothstep(round, reach - 0.12, reach + 0.12)) * THREE.MathUtils.smoothstep(y, -0.02, 0.05);
+    c.copy(furColor)
+      .lerp(creamColor, cream)
+      .toArray(colors, i * 3);
+  }
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 /** A value that follows its target as if on a spring: it lags behind, overshoots a little and settles. */
 class Spring {
   value = 0;
@@ -330,25 +397,20 @@ export class Guide {
     this.root.add(this.hips);
     this.hips.add(this.spine);
 
-    // Body: slim, a chest and a smaller belly, so the arms and legs stand clear of it.
-    const chest = mesh(new THREE.SphereGeometry(0.16, 32, 24), furMat);
-    chest.scale.set(1.1, 1.15, 0.78);
-    chest.position.y = 0.31;
-    this.spine.add(chest);
-    const pelvis = mesh(new THREE.SphereGeometry(0.15, 28, 20), furMat);
-    pelvis.scale.set(0.95, 1.1, 0.8);
-    pelvis.position.y = 0.08;
-    this.spine.add(pelvis);
-    const belly = mesh(new THREE.SphereGeometry(0.11, 24, 18), creamMat, false);
-    belly.scale.set(0.95, 1.6, 0.5);
-    belly.position.set(0, 0.2, 0.075);
-    this.spine.add(belly);
+    // Body: one torso shaped like a child's, slim enough that the arms and legs stand clear of it – shoulders
+    // that carry the arms, a soft waist, hips the thighs grow out of – and a short neck under the head. Two
+    // balls for chest and pelvis looked like a snowman with a doll's ball joints (user feedback, November 2026).
+    const torsoMat = fur("#ffffff");
+    torsoMat.vertexColors = true;
+    torsoMat.sheenColor.copy(furMat.sheenColor);
+    this.spine.add(mesh(torsoGeometry(), torsoMat));
 
-    // Head: round, with muzzle, nose, eyes, ears and bandana; kept small, so it hides little of the arms.
-    this.head.position.y = 0.5;
+    // Head: round, with muzzle, nose, eyes, ears and bandana; small for the body and on a neck, as a child's
+    // (about a quarter of its height, not a third), so it hides little of the arms.
+    this.head.position.y = 0.55;
     this.spine.add(this.head);
     const face = new THREE.Group();
-    face.scale.setScalar(0.8);
+    face.scale.setScalar(HEAD_SCALE);
     this.head.add(face);
     const skull = mesh(new THREE.SphereGeometry(0.27, 40, 30), furMat);
     skull.scale.set(1.08, 0.95, 0.95);
@@ -505,8 +567,12 @@ export class Guide {
       shoulder.position.set(0.2 * side, SHOULDER_Y, 0);
       const upper = new THREE.Group();
       shoulder.add(upper);
-      const joint = mesh(new THREE.SphereGeometry(0.054, 20, 16), furMat);
-      upper.add(joint);
+      // The shoulder's cap of muscle, running from the torso's shoulder down into the upper arm: a ball
+      // standing out round the joint looked like a doll's.
+      const deltoid = mesh(new THREE.SphereGeometry(0.056, 20, 16), furMat);
+      deltoid.scale.set(1, 1.3, 0.95);
+      deltoid.position.y = -0.03;
+      upper.add(deltoid);
       upper.add(limb(UPPER_ARM, 0.05, 0.039, furMat));
       const elbow = new THREE.Group();
       elbow.position.y = -UPPER_ARM;
@@ -569,17 +635,22 @@ export class Guide {
     this.armL = makeArm(1, this.handL);
     this.armR = makeArm(-1, this.handR);
 
-    // Legs: slim, with a round knee, dark socks and light paws with four toes in front.
+    // Legs like a child's: thighs full at the hip, where they grow out of the torso, narrowing to a small
+    // knee; the calf round at the back of the shin, which narrows to a slim ankle; dark socks and light paws
+    // with four toes in front.
     const makeLeg = (side: 1 | -1): Leg => {
       const hip = new THREE.Group();
       hip.position.set(0.11 * side, 0.02, 0);
-      hip.add(limb(THIGH, 0.062, 0.045, furMat));
+      hip.add(limb(THIGH, 0.074, 0.046, furMat, 0.08));
       const knee = new THREE.Group();
       knee.position.y = -THIGH;
       hip.add(knee);
-      knee.add(mesh(new THREE.SphereGeometry(0.05, 16, 12), furMat));
-      // The calf is fullest high up and the shin narrows to a slim ankle.
-      knee.add(limb(SHIN, 0.048, 0.03, darkMat, 0.16));
+      knee.add(mesh(new THREE.SphereGeometry(0.047, 16, 12), furMat));
+      knee.add(limb(SHIN, 0.046, 0.03, darkMat, 0.08));
+      const calf = mesh(new THREE.SphereGeometry(0.042, 16, 12), darkMat);
+      calf.scale.set(0.95, 1.75, 0.9);
+      calf.position.set(0, -0.075, -0.016);
+      knee.add(calf);
       const foot = new THREE.Group();
       foot.position.y = -SHIN;
       knee.add(foot);

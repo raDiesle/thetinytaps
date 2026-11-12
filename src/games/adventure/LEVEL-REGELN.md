@@ -89,6 +89,15 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Der Fuchs soll natürlich aussehen: schlanke Gliedmaßen, die sich verjüngen, sichtbare Gelenke,
   Finger und Zehen mit runden Spitzen; Hände und Füße bewegen sich mit (Handgelenk, Fußgelenk),
   nichts wirkt wie steife Stäbe.
+- **Ein Körper wie der eines Kindes** (Rückmeldung November 2026: zwei Kugeln für Brust und Becken,
+  kein Hals und Kugelgelenke an den Schultern sahen nach Schneemann-Puppe aus): ein durchgehender Rumpf
+  mit Schultern, die die Arme tragen, weicher Taille, Hüften, aus denen die Oberschenkel wachsen, rundem
+  Bauch vorn und Po hinten; ein kurzer Hals, auf dem der Kopf sitzt (Kinn über den Schultergelenken),
+  der Kopf etwa ein Viertel der Größe, nie ein Drittel. Schulterkappen statt Kugeln, Oberschenkel oben
+  voll, Waden hinten am Schienbein. Das Fell bekommt seine Zeichnung über den Körper (das Creme läuft
+  weich von der Kehle bis zum Bauch, `torsoGeometry` in `three/guide.ts`), nie als aufgesetzter Fleck.
+  `three/guide.test.ts` prüft Hals und Kopfgröße. Die Gelenkpunkte (Schultern, Hüften, Armlängen)
+  bleiben dabei, wo sie sind, sonst stimmt nichts mehr, was am Clip gemessen ist.
 - **Hände wie echte Hände** (Rückmeldung November 2026): Der Daumen sitzt auf der Seite, auf der er
   bei dieser Handfläche wirklich sitzt (Handfläche vorn → Daumen außen), nie spiegelverkehrt. Die
   Handfläche zeigt, wohin eine echte zeigt: beim hängenden Arm zum Körper, beim vorgestreckten oder

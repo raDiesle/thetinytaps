@@ -44,3 +44,16 @@ test("the palm faces the body while the arm hangs, down while it reaches out and
   posed(guide, { raise: Math.PI / 2, spread: 0, elbow: 0, palm: 1 });
   expect(palmOf(guide).y, "ahead and open, to catch: up").toBeGreaterThan(0.7);
 });
+
+// A body like a child's (user feedback, November 2026: two balls for chest and pelvis, no neck and the head sunk
+// between ball-jointed shoulders looked like a snowman doll): the head sits on a neck above the shoulders and is
+// about a quarter of the height, not a third.
+test("the head sits on a neck above the shoulders and is no bigger than a child's", () => {
+  const guide = new Guide();
+  posed(guide, {});
+  const head = new THREE.Box3().setFromObject((guide as unknown as { head: THREE.Object3D }).head);
+  const whole = new THREE.Box3().setFromObject(guide.root);
+  const shoulderY = (guide as unknown as { armL: { shoulder: THREE.Object3D } }).armL.shoulder.getWorldPosition(new THREE.Vector3()).y;
+  expect(head.min.y - shoulderY, "the chin above the shoulder joints").toBeGreaterThan(0.04 * guide.root.scale.y);
+  expect((head.max.y - head.min.y) / (whole.max.y - whole.min.y), "the head's share of the height, ears included").toBeLessThan(0.34);
+});
