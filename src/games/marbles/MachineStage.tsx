@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
 import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
 import { PROD } from "@/lib/buildInfo";
 import { loadRealSounds } from "@/lib/realSounds";
 import { playPop } from "@/lib/sfx";
+import { type HintSide, TapHint } from "@/components/TapHint";
 
 /** How fast the camera catches up with the action, per second. */
 const CAMERA_FOLLOW = 2.6;
 
 /**
  * A station where the machine may hold still until the child taps (R-03): at `at` seconds everything stops, the thing at
- * (`x`, `y`) – the one that sets off the next part – glows with a still 👇 beside it, and a tap or key lets it run on.
+ * (`x`, `y`) – the one that sets off the next part – is marked by the shared `TapHint`, and a tap or key lets it run on.
  * Only the one stop marked `active` waits; the others stay in the data, ready to be switched on, and the machine runs
  * through them (at most one tap on the way, user feedback, November 2026). With „Von selbst“ (`LevelProps.watch`) the
  * machine runs straight through.
@@ -39,6 +40,14 @@ export interface MachineBase {
   stops: MachineStop[];
 }
 
+/** What the child taps to start a machine, in world units: the hint's ring goes round it, and the hand points from `side`. */
+export interface StartSpot {
+  x: number;
+  y: number;
+  r: number;
+  side?: HintSide;
+}
+
 /**
  * The stage every Rube Goldberg machine runs on: waits for the tap (or a key),
  * then counts the seconds, plays the machine's sounds and lines at their
@@ -53,8 +62,9 @@ export function MachineStage({
   say,
   onDone,
   watch,
+  start: startSpot,
   children,
-}: LevelProps & { machine: MachineBase; level: MarbleLevel; children: (t: number) => ReactNode }) {
+}: LevelProps & { machine: MachineBase; level: MarbleLevel; start: StartSpot; children: (t: number) => ReactNode }) {
   const label = useLevelName(level);
   /** Seconds since the tap; below 0 until then. */
   const clock = useRef(-1);
@@ -120,64 +130,29 @@ export function MachineStage({
   };
   const stop = waiting.current ? stops[nextStop.current] : undefined;
   useAnyKey(start);
+  const world = { x: 0, y: 0, w: machine.width, h: VIEW_H };
+  const view = { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H };
+  const at = cameraPoint(box.current, world, view);
 
   return (
     <div className="marble-level" ref={box} onPointerDown={start}>
-      <svg
-        className="marble-camera"
-        viewBox={`0 0 ${machine.width} ${VIEW_H}`}
-        style={cameraLayer(box.current, { x: 0, y: 0, w: machine.width, h: VIEW_H }, { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H })}
-        aria-label={label}
-      >
+      <svg className="marble-camera" viewBox={`0 0 ${machine.width} ${VIEW_H}`} style={cameraLayer(box.current, world, view)} aria-label={label}>
         {children(clock.current)}
-        {stop && <StopHint {...stop} />}
       </svg>
+      {clock.current < 0 && <TapHint key="start" {...worldHint(at, startSpot)} side={startSpot.side} />}
+      {stop && <TapHint key={`stop${nextStop.current}`} {...worldHint(at, { x: stop.x, y: stop.y, r: STOP_HINT.ring })} side={stopFinger(stop).side} />}
     </div>
   );
 }
 
-/** How far the 👇 of a stop stands above its spot (its baseline), and how big the glow round the spot is. */
-export const STOP_HINT = { above: 110, glow: 100 };
+/** How far the hand of a stop reaches above its spot (its far end), how big the glow round the spot is, and the ring in it. */
+export const STOP_HINT = { above: 110, glow: 100, ring: 72 };
 
 /**
- * Where the finger of a stop stands: 👇 above the spot, or 👈 right of its glow where the spot is high up – never below
- * it, where it covered the thing itself (the circus seal's body).
+ * Where the hand of a stop is: above the spot pointing down, or right of its glow pointing left where the spot is high
+ * up – never below it, where it covered the thing itself (the circus seal's body). `x`, `y` is about the hand's far end.
  */
-export function stopFinger({ x, y }: { x: number; y: number }) {
-  if (y - STOP_HINT.above >= 200) return { emoji: "👇", x, y: y - STOP_HINT.above };
-  return { emoji: "👈", x: x + STOP_HINT.glow + 60, y: y + 30 };
-}
-
-/**
- * The glow round what sets off the next part (a halo, clear in the middle so the thing itself shows), and a still
- * finger pointing at it, while the machine waits at a stop. Drawn once when it stops, nothing in it moves.
- */
-function StopHint({ x, y }: MachineStop) {
-  const finger = stopFinger({ x, y });
-  return (
-    <g className="marble-hint">
-      <defs>
-        <radialGradient id="marble-stop-glow">
-          <stop offset="0.5" stopColor="#ffe066" stopOpacity="0" />
-          <stop offset="0.72" stopColor="#ffe066" stopOpacity="0.7" />
-          <stop offset="1" stopColor="#ffe066" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <circle cx={x} cy={y} r={STOP_HINT.glow} fill="url(#marble-stop-glow)" />
-      <circle cx={x} cy={y} r={STOP_HINT.glow * 0.72} fill="none" stroke="#ffd23f" strokeWidth="8" />
-      <text x={finger.x} y={finger.y} fontSize="90" textAnchor="middle">
-        {finger.emoji}
-      </text>
-    </g>
-  );
-}
-
-/** The still finger that says „tap here“, until the machine starts. */
-export function TapHint({ t, x, y }: { t: number; x: number; y: number }) {
-  if (t >= 0) return null;
-  return (
-    <text className="marble-hint" x={x} y={y} fontSize="90" textAnchor="middle">
-      👆
-    </text>
-  );
+export function stopFinger({ x, y }: { x: number; y: number }): { side: HintSide; x: number; y: number } {
+  if (y - STOP_HINT.above >= 200) return { side: "above", x, y: y - STOP_HINT.above };
+  return { side: "right", x: x + STOP_HINT.glow + 60, y: y + 30 };
 }

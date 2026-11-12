@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playHa, playHatschi, playLeaves, playSniff, playSqueak, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { loadRealSounds, playBaa, playBark, playGiggle, playMeow, playMoo, playOink, playQuack, playTrumpet, playTweet } from "@/lib/realSounds";
-import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
+import { TapHint } from "@/components/TapHint";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
 import type { Pt } from "./path";
 import { INK } from "./scenery";
@@ -293,6 +294,19 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
           <FallingLeaves leaves={leaves} age={t - leavesT.current} />
         </g>
       </svg>
+      {t < 0 && (
+        <TapHint
+          key="feather"
+          {...worldHint(
+            cameraPoint(box.current, { x: 0, y: 0, w: row.worldW, h: VIEW_H }, { x: camX, y: VIEW_H - VIEW_H / camZ, w: VIEW_W, h: VIEW_H }, camZ),
+            {
+              ...featherStart(row.seats[0]),
+              y: featherStart(row.seats[0]).y - 30,
+              r: 70,
+            },
+          )}
+        />
+      )}
     </div>
   );
 }
@@ -493,9 +507,12 @@ function FallingLeaves({ leaves, age }: { leaves: Leaf[]; age: number }) {
 
 /* ---------- The feather and the sneezes ---------- */
 
+/** Where the feather hangs in the air before the tap: right above the first animal. */
+const featherStart = (seat: Seat) => ({ x: seat.x + 110, y: FLOOR - 330 });
+
 /** The feather: still in the air before the tap, then floating down onto the mouse's nose, tickling it, and dropping to the grass. */
 function Feather({ seat, b, t, color }: { seat: Seat; b: Beast; t: number; color: string }) {
-  const start = { x: seat.x + 110, y: FLOOR - 330 };
+  const start = featherStart(seat);
   const nose = noseOf(seat);
   const onNose = { x: nose.x + 14, y: nose.y - 8 };
   let at: Pt;
@@ -521,12 +538,6 @@ function Feather({ seat, b, t, color }: { seat: Seat; b: Beast; t: number; color
         <path d="M0 0 Q4 -34 6 -66" fill="none" stroke={INK} strokeWidth="2.5" />
         <path d="M2 -20 l-8 -6 M4 -36 l-9 -8 M4 -30 l8 -8 M3 -48 l7 -9" stroke={INK} strokeWidth="2" opacity="0.5" />
       </g>
-      {/* A still finger: tap here. It stays put, so nothing moves before the child does something. */}
-      {t < 0 && (
-        <text className="sneeze-hint" x={start.x + 90} y={start.y + 120} fontSize="90" textAnchor="middle">
-          👆
-        </text>
-      )}
     </g>
   );
 }

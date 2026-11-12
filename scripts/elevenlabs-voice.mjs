@@ -11,6 +11,8 @@
 //   bun run voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
 //   bun run voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
 //   bun run voice try "<text>" [--kind turn] [--lang en]   one line with the voice, into .voice-raw/probe.mp3
+//   --voice <id> (try, make)                    another voice for this run only, e.g. the clone; stimme.json stays
+//   bun run voice clone "<name>" <file.mp3>...  an Instant Voice Clone from samples, prints its id for --voice
 //   bun run voice make [--dry] [--lang de,en] [--only zaehne,alle-spiele] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags] [--parallel 4]
 //                                            records every line that has no recording yet, in all
 //                                            languages or those of --lang, of every story and game or
@@ -84,7 +86,7 @@ const values = {};
 const rest = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
-  if (a === "--redo" || a === "--kind" || a === "--model" || a === "--lang" || a === "--only" || a === "--parallel") {
+  if (a === "--redo" || a === "--kind" || a === "--model" || a === "--lang" || a === "--only" || a === "--parallel" || a === "--voice") {
     if (i + 1 >= argv.length) fail(`${a} needs a value`);
     values[a.slice(2)] = argv[++i];
   } else if (a.startsWith("--")) flags.add(a.slice(2));
@@ -147,7 +149,10 @@ const CREDITS_PER_CHARACTER = 0.2;
 
 function readConfig() {
   if (!existsSync(CONFIG)) fail(`No voice yet: run "bun run voice design", listen, then "bun run voice save <1|2|3>"`);
-  return JSON.parse(readFileSync(CONFIG, "utf8"));
+  const config = JSON.parse(readFileSync(CONFIG, "utf8"));
+  // --voice records with another voice for this run only, e.g. a clone of Tapsi in a second account whose credits
+  // are used while the first account's are spent (a designed voice can't be shared outside its own workspace).
+  return values.voice ? { ...config, voice: values.voice } : config;
 }
 
 /** The spoken text: the line with the tag of its kind in front. */
@@ -251,6 +256,25 @@ async function save() {
   console.log(`Saved "${name}" (${voice_id}) in ${CONFIG}. Next: bun run voice try "Jetzt du – stampf mit!" or bun run voice make --dry`);
 }
 
+/**
+ * Makes an Instant Voice Clone of Tapsi from recordings (`clone "<name>" <file.mp3>...`) in the key's account and prints
+ * its id for `--voice`. A voice made with Voice Design stays in its own workspace, so a second account whose credits are
+ * used meanwhile needs a clone of it (November 2026). It sounds close, not the same: use it for whole languages only.
+ */
+async function clone() {
+  const [name, ...files] = rest;
+  if (!name || files.length === 0) fail('bun run voice clone "Tapsi Coach (Klon)" <file.mp3>...');
+  const form = new FormData();
+  form.append("name", name);
+  form.append("remove_background_noise", "false");
+  form.append("description", "Clone of Tapsi Coach (Voice Design, first account), made from its own recordings.");
+  for (const file of files) form.append("files", new Blob([readFileSync(file)], { type: "audio/mpeg" }), file.split("/").pop());
+  const response = await fetch(`${API}/voices/add`, { method: "POST", headers: { "xi-api-key": apiKey() }, body: form });
+  if (!response.ok) fail(`/voices/add: ${response.status} ${await response.text()}`);
+  const { voice_id } = await response.json();
+  console.log(`Cloned "${name}" (${voice_id}). Next: bun run voice try "Look, a tower!" --lang en --voice ${voice_id}`);
+}
+
 async function tryLine() {
   const text = rest[0];
   if (!text) fail('What should it say? bun run voice try "Jetzt du – stampf mit!"');
@@ -305,6 +329,7 @@ async function make() {
   // the next one is far along; each file is written as it comes, so a run stopped halfway goes on where it stopped.
   // The subscription allows 5 requests at once for the whole account: run one recording at a time (two runs side by
   // side, 4 + 3, ran out of retries on „concurrent_limit_exceeded“ in November 2026) and keep --parallel at 5 or less.
+  // The second account's Starter plan allows only 3: with its key run --parallel 2 (the default 4 stopped a run there).
   let next = 0;
   let made = 0;
   const worker = async () => {
@@ -328,6 +353,7 @@ const COMMANDS = {
   },
   design,
   save,
+  clone,
   try: tryLine,
   make,
 };

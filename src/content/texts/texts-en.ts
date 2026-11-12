@@ -38,6 +38,7 @@ import { MILK_CHAIN_EN as milkChain } from "@/games/milkchain/en";
 import { PACIFIER_STORY_EN as pacifierStory } from "@/games/pacifierstory/en";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.en";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.en";
+import { CAUSE_SCENES_EN as cause } from "@/games/cause/scenes.en";
 import type { LanguageTexts } from ".";
 
 // Everything in English that lives in files of its own, one chunk loaded only when the app plays in English
@@ -84,6 +85,7 @@ export const TEXTS: LanguageTexts = {
   days,
   milkChain,
   pacifierStory,
+  cause,
   stories: { cloudTrip, treasureIsland },
   seo,
 };

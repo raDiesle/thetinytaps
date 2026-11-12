@@ -183,5 +183,13 @@ export const scenesIdeas: IdeaArea = {
       effort: "M",
       done: true,
     },
+    {
+      id: "B-21",
+      emoji: "🌇",
+      title: "Ende eines Bildes: Abendlicht und eine Verbeugung",
+      text: "Ist alles gefunden, wird das Licht im Bild langsam abendlich warm, und alles Gefundene nickt nacheinander einmal kurz, wie Schauspieler am Schluss – ohne Geräusch für jedes, nur ein leiser Klang am Ende. Statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
+      why: "Das Kind sieht noch einmal alles, was es gefunden hat, ruhig und in seinem eigenen Bild.",
+      effort: "M",
+    },
   ],
 };

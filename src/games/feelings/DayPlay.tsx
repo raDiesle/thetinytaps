@@ -85,7 +85,7 @@ export function DayPlay({
         text={dayIn(day, language).end}
         settings={settings}
         progress={progress}
-        ending={<GameEnd inline showNext onAgain={onAgain} next={next} />}
+        ending={<GameEnd inline showNext level={day.id} onAgain={onAgain} next={next} />}
         onEndKey={next?.onNext ?? onAgain}
         onPick={replay}
         onBack={backToScene(scenes.length - 1)}

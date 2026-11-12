@@ -4,6 +4,7 @@ import type { SeoTranslation } from "@/content/seo";
 import type { LanguagePack } from "@/content/types";
 import type { StoryTranslation } from "@/games/adventure/stories/story";
 import type { AnimalTranslation } from "@/games/animals/content";
+import type { CauseTranslation } from "@/games/cause/scenes";
 import type { ComfortId, FeelingId } from "@/games/feelings/bear";
 import type { DayText } from "@/games/feelings/days";
 import type { SituationId } from "@/games/feelings/kita";
@@ -60,6 +61,8 @@ export interface LanguageTexts {
   milkChain?: MilkChainTranslation;
   /** Tapsi und die Schnullerfee: chapter titles and pages (`pacifierstory/<id>.ts`). */
   pacifierStory?: MilkChainTranslation;
+  /** Was ist passiert?: each scene's words for grown-ups by scene id (`cause/scenes.<id>.ts`). */
+  cause?: CauseTranslation;
   /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
   seo?: SeoTranslation;
   /** Bewegungsabenteuer: Tapsi's lines by story folder (`adventure/stories/<story>/lines.<id>.ts`). */

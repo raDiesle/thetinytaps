@@ -11,6 +11,7 @@ import { COMFORT_TEXTS, DAY_TEXTS, dayIn, FEELING_TEXTS, SITUATION_TEXTS, storyI
 import { asCaption, MOODS, morningMood, STRENGTH_ANSWERS, STRENGTHS, withMood } from "./mood";
 import { MOOD_PICTURE_QUEUE } from "./moodPictures";
 import { NEEDS } from "./needs";
+import { ALLTAG_SITUATIONS } from "./alltag";
 import { SELF_SITUATIONS } from "./selbst";
 import { GROUPS } from "./groups";
 import { roundLines, roundOf, roundText, stepsOf } from "./rounds";
@@ -42,7 +43,7 @@ function expectPicture(name: string) {
 }
 
 // The kindergarten stories and the stories of more feelings (selbst.ts) play alike and find their pictures by id.
-const ALL_SITUATIONS = [...SITUATIONS, ...SELF_SITUATIONS];
+const ALL_SITUATIONS = [...SITUATIONS, ...SELF_SITUATIONS, ...ALLTAG_SITUATIONS];
 
 test("every kindergarten story has its pictures", () => {
   const ids = ALL_SITUATIONS.map((s) => s.id);

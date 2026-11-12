@@ -13,9 +13,10 @@ request, November 2026 – the tally marks were the default before). Behind ⚙�
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
 for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
 `MAX_MARKS`) – or „Aus“.
-The start screen's cards are the pictures themselves as they look at their end, with no words on them (user request,
-November 2026; `TimerCardArt` in `cardArt.tsx`, `GameMode.art`): the very drawing of a run (`SceneParts`) in `.tm-done`,
-cut as for 5 minutes, every animation in it stopped (`.tm-card-art`), so the menu stands still. The cards come as wide as
+The start screen's cards are the pictures themselves as they look halfway through a run, with no words on them (user
+request, November 2026; the middle rather than the end, user feedback, November 2026; `TimerCardArt` in `cardArt.tsx`,
+`GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
+animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
 2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
@@ -114,7 +115,7 @@ taken out (user request, November 2026). The pictures:
   the turn's start so a reload keeps them right. The players stand still: only rackets and ball move, each a layer of
   its own (`Racket`, `Ball`).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
-  picture (`.tm-done-light`) and a few hearts, stars and notes rise slowly (`celebrate`), a friendly tune after it, then `GameEnd` with „Nochmal“ and „Weiter“ (the next picture,
+  picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
   noch?“: the rail to the station, the sand on top, the wax, the slices – `LeftGlow`, inside the shrinking part so it is
@@ -150,7 +151,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
-  picture and the calm `celebrate` – for every picture, Abwechseln's clock time too. Never a storm of confetti.
+  picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
   user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing
@@ -183,9 +184,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
   November 2026), its tooltip says so (`SWAP_NOTE`) and „Weiter“ never leads into it (`TIMED_PICTURES`, `nextPicture`).
-- **A card is its picture at the end, no words** (user request, November 2026): a new picture gets its card from
-  `SceneParts` by itself; what its end needs from an animation that runs on at `.tm-done` (the butterfly flying over)
-  is set still under `.tm-card-art` – look at the card, since every animation there is stopped (`timer.test.ts`).
+- **A card is its picture halfway through, no words** (user request and feedback, November 2026: the end showed too
+  little of how a picture runs): a new picture gets its card from `SceneParts` by itself, its animations seeked to the
+  middle (`holdAt`), and what its own clock counts in React (the caterpillar's bites, the Wecker's digits) counts once
+  for that moment and no more (`still`). Where the middle shows little (the Sonnenaufgang between moon and sun), the
+  card takes a later moment (`LATER`) – look at every card (`timer.test.ts`).
 
 - **No fox or bear figure in any picture** (user feedback, November 2026): first a family standing by every picture was
   taken out (children wanted to tap it, and a timer to watch needs as few things and movements as can be), then the

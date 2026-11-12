@@ -233,8 +233,8 @@
   align-items: center;
   gap: min(3cqw, 16cqh);
   height: 100%;
-  padding: 0 min(2.5cqw, 20cqh) 0 min(1.2cqw, 8cqh);
-  border-radius: 20px 28px 28px 20px;
+  padding: 0 min(2.5cqw, 20cqh) 0 2cqh;
+  border-radius: 16px 28px 28px 16px;
   color: inherit;
   text-decoration: none;
   /* A watercolour wash, strongest under the picture, fading towards the page number, on the page's paper. */
@@ -1639,6 +1639,37 @@
 }
 
 /*
+ * „in Bearbeitung“ on a table of contents' line (`Game.unfinished: "labelled"`): the same strip of film, stuck on the
+ * line between its dots and its page number – inside the line, so it never reaches the line above.
+ */
+:root .toc-badge {
+  flex: none;
+  padding: 0.15em 0.6em 0.2em 0.9em;
+  border-radius: 2px 3px 3px 2px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 85%, #0000) 0 0.45em, #0000 0.45em), linear-gradient(#ffffff40, #0000 60%),
+    color-mix(in srgb, var(--accent) 38%, #fff8e0d9);
+  box-shadow:
+    0 1px 1px #0000002e,
+    1px 4px 6px -3px #5a3c1f80;
+  font-size: max(13px, min(28cqh, 3cqw));
+  font-weight: 700;
+  white-space: nowrap;
+  rotate: -4deg;
+}
+
+/* Where it can't be played yet, its line stands pale and takes no tap. */
+:root .toc-unfinished {
+  border: 2px dashed color-mix(in srgb, var(--ink) 30%, #0000);
+  opacity: 0.7;
+  translate: none;
+}
+
+:root .toc-unfinished .toc-picture {
+  filter: grayscale(0.7);
+}
+
+/*
  * ----- The pictures (emoji) printed into the paper -----
  * A little softer and warmer than on a screen, with the paper's grain and a faint ink edge over them, so they look
  * printed on the page like everything else rather than lying on top of it (user feedback, October 2026).
@@ -1650,7 +1681,7 @@
 }
 
 /*
- * A preview picture in the emoji's place (`CardPicture`): a landscape cut of the game (4:3, like the games), framed
+ * A preview picture in the emoji's place (`CardPicture`): a landscape cut of the game (3 : 2), framed
  * like a photo cut out and pasted in, and as big as the card allows above or beside its name – never over it (user
  * feedback, November 2026: small round prints showed too little, and pictures must never cover the words).
  */
@@ -1664,13 +1695,18 @@
   width: 100%;
   max-width: 300px;
   height: auto;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
 }
 
-/* A book's line: the picture nearly as tall as the line, and wider by its shape – never so wide that the name is cut. */
+/*
+ * A table of contents' line: a rounded rectangle in the pictures' shape, standing out a little over the line into the
+ * gap between the lines, so it is as big as the page allows (user feedback, November 2026: a small round cut was hard
+ * to make out).
+ */
 :root .toc-picture.with-picture {
-  width: min(123cqh, 32cqw);
-  height: min(92cqh, 24cqw);
+  width: min(calc(150cqh + 1.5vh), 26cqw);
+  height: calc(100cqh + 1vh);
+  border-radius: 10px 14px 11px 15px / 14px 10px 15px 11px;
 }
 
 :root .menu-picture {
@@ -1718,7 +1754,7 @@
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .game-list:not(.fit) .game-emoji.with-picture {
     width: 96px;
-    height: 72px;
+    height: 64px;
   }
 }
 
@@ -1739,7 +1775,7 @@
 
 :root .mode-list:not(.fit) .game-card.mode-card.picture-card {
   height: auto;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
 }
 
 :root .mode-list .game-card.mode-card.picture-card > .game-emoji.with-picture {

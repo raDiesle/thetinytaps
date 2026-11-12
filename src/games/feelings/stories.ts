@@ -1,11 +1,12 @@
 // All stories of the feelings game: first the bear's feelings at home, then the kindergarten stories, then the
-// stories of more feelings where the bear helps himself (selbst.ts). „Alltagssituationen“ plays them by feeling
+// stories of more feelings where the bear helps himself (selbst.ts, and the everyday scenes of alltag.ts). „Alltagssituationen“ plays them by feeling
 // (groups.ts), one choice per scene (rounds.ts).
 
 import { PROD } from "@/lib/buildInfo";
 import { FEELINGS, type Feeling } from "./bear";
 import { imageFor, situationImages } from "./images";
 import { SITUATIONS, type Situation } from "./kita";
+import { ALLTAG_SITUATIONS } from "./alltag";
 import { SELF_SITUATIONS } from "./selbst";
 
 /** One story: a feeling of the bear at home, or a kindergarten story. */
@@ -19,5 +20,9 @@ export const STORIES: Story[] = [
   // its pictures are made; the dev server shows it, so it can be looked at.
   ...SELF_SITUATIONS.filter((situation) => !PROD || situationImages(situation).every(imageFor)).map(
     (situation): Story => ({ id: `selbst-${situation.id}`, emoji: situation.emoji, title: situation.title, kind: "kita", situation }),
+  ),
+  // The everyday scenes of ideas C-37 to C-72 (alltag.ts), German only so far, the same way.
+  ...ALLTAG_SITUATIONS.filter((situation) => !PROD || situationImages(situation).every(imageFor)).map(
+    (situation): Story => ({ id: `alltag-${situation.id}`, emoji: situation.emoji, title: situation.title, kind: "kita", situation }),
   ),
 ];

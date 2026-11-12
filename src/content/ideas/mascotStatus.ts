@@ -76,6 +76,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi, Mama, Papa Fuchs und die Bärenfee in den Bildern", work: "picture", pictures: 40, effort: "M", state: "done" }],
   },
   {
+    href: "/kita/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung; in der Kita sind Bären in Rollen – Mia die Erzieherin, Bruno Tapsis Freund und zwei Kinder der Gruppe.",
+    tasks: [{ label: "Tapsi, Mama, Papa Fuchs und die Kita-Bären in den Bildern", work: "picture", pictures: 31, effort: "M", state: "done" }],
+  },
+  {
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
@@ -395,6 +400,19 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "S",
         state: "removed",
         note: "Großer und Kind standen unten links, der Große zeigte auf das Bild. Rausgenommen (Feedback November 2026): nur Deko – Kinder wollten draufdrücken und dachten, sie gehöre zum Spiel.",
+      },
+    ],
+  },
+  {
+    href: "/gross-klein/",
+    note: "L-23: keine Fuchs- oder Bärenfigur – der große und der kleine Buchstabe sind selbst Groß und Kind, mit Augen, und halten sich an der Hand.",
+    tasks: [
+      {
+        label: "Fuchs- oder Bärenfamilie neben den Buchstaben",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Nicht bauen: nur Deko (Feedback November 2026) – die Buchstaben selbst sind Groß und Kind.",
       },
     ],
   },

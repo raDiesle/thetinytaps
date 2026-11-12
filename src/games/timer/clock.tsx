@@ -132,16 +132,19 @@ function Digits({ text }: { text: string }) {
   );
 }
 
-/** The time left on the screen, ticking while it runs (only this small layer is drawn again); 0:00 once it is up. */
-function ClockDigits({ endsAt, total, running }: { endsAt: number; total: number; running: boolean }) {
+/**
+ * The time left on the screen, ticking while it runs (only this small layer is drawn again); 0:00 once it is up. `still`
+ * (a menu's card) shows the time left now and ticks no more.
+ */
+function ClockDigits({ endsAt, total, running, still }: { endsAt: number; total: number; running: boolean; still?: boolean }) {
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
-    if (!running) return;
+    if (!running || still) return;
     const tick = () => setNow(Date.now());
     tick();
     const timer = setInterval(tick, 250);
     return () => clearInterval(timer);
-  }, [running]);
+  }, [running, still]);
   const text = clockText(running ? endsAt - now : 0, total);
   return (
     <Part {...DIGITS} className="tm-clock-digits">
@@ -334,8 +337,8 @@ const Blocks = memo(function Blocks({ glow }: { glow: number }) {
   );
 });
 
-/** The whole picture: the room, and the clock with its ticking digits, its blocks and its snooze bar. */
-export function ClockScene({ glow, endsAt, total, running }: { glow: number; endsAt: number; total: number; running: boolean }) {
+/** The whole picture: the room, and the clock with its ticking digits, its blocks and its snooze bar (`still`: not ticking). */
+export function ClockScene({ glow, endsAt, total, running, still }: { glow: number; endsAt: number; total: number; running: boolean; still?: boolean }) {
   return (
     <>
       <ClockBackdrop />
@@ -345,7 +348,7 @@ export function ClockScene({ glow, endsAt, total, running }: { glow: number; end
         <ClockBody />
         <Stickers />
         <Blocks glow={glow} />
-        <ClockDigits endsAt={endsAt} total={total} running={running} />
+        <ClockDigits endsAt={endsAt} total={total} running={running} still={still} />
       </Layer>
     </>
   );

@@ -108,7 +108,15 @@ export function ScreenHint() {
         <p className="screen-hint-title">{t(TURN)}</p>
         {/* What the site is and why sideways, in one sentence for a grown-up who came from a search or a link. */}
         <p className="screen-hint-why">
-          {t({ de: "Bilderbuch-Spiele und Alltagshelfer für Groß und Klein – quer werden die Bilder groß genug für kleine Finger." })}
+          {t({
+            de: "Bilderbuch-Spiele und Alltagshelfer für Groß und Klein – quer werden die Bilder groß genug für kleine Finger.",
+            en: "Picture-book games and everyday helpers for grown-ups and little ones – held sideways, the pictures get big enough for small fingers.",
+            zh: "给大人和孩子的绘本游戏和日常小帮手——横过来，图片就大到小手指也能点。",
+            hi: "बड़ों और छोटों के लिए चित्र-पुस्तक वाले खेल और रोज़ के छोटे सहायक – आड़ा पकड़ने पर तस्वीरें छोटी उँगलियों के लिए काफ़ी बड़ी हो जाती हैं।",
+            es: "Juegos de libro ilustrado y ayudas para el día a día, para grandes y pequeños: en horizontal, las imágenes son lo bastante grandes para dedos pequeños.",
+            ar: "ألعاب كتب مصوّرة ومساعدات يومية للكبار والصغار – عند إمساك الجهاز بالعرض تكبر الصور بما يكفي للأصابع الصغيرة.",
+            ru: "Игры-книжки с картинками и помощники на каждый день для больших и маленьких – если держать устройство горизонтально, картинки становятся достаточно большими для маленьких пальчиков.",
+          })}
         </p>
         {fullscreenPossible && (
           <div className="screen-hint-buttons">

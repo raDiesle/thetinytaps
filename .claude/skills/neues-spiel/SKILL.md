@@ -19,7 +19,7 @@ src/games/<game>/          folder name: short English word (marbles, elevator)
   <X>Game.tsx              start screen: <GameShell title emoji modes mode onMode level settings>
   <X>Play.tsx              the game, mounted only while playing; props: settings (+ mode)
   settings.ts              <X>Settings, DEFAULT_<X>_SETTINGS, <X>_SETTINGS_KEY = "tinytaps.<game>.v1"
-  content.ts               German texts, pictures, sentences
+  content.ts               English texts (the first language of everything new), pictures, sentences
   <game>.css               all styles; every class prefixed (`elev-`, `shadow-` …), CSS is global
   CLAUDE.md                what the game does and where its parts are (see below)
 src/pages/<X>Page.tsx      useTitle("<Titel>"); return <XGame />
@@ -34,11 +34,13 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
    And its entry in `src/content/seo.ts`: a title with what parents search for (see the research
    on `/management/`), a description of 80–160 characters and a short text; true to what the game does.
    The same three in English in `src/content/seo.en.ts` (what English-speaking parents search for), for the
-   page under `/en/`.
+   page under `/en/`, and in the other five app languages in `seo.<lang>.ts` (search texts always come in all seven).
 4. One line in the README structure table and the roadmap.
-5. German only, unless the user asks for other languages (see the root `CLAUDE.md`): the title in `games.ts`
-   as `{ de: "…" }`, start-screen texts as `t({ de: "…" })`, so a translation can be added later without
-   rewriting; the game's row in `src/content/ideas/languageStatus.ts` with only `de`.
+5. English only, unless the user asks for other languages – German included (see the root `CLAUDE.md`: everything
+   new is written English first since November 2026): the title and blurb in the game's `names.ts` as `{ en: "…" }`
+   (`EnglishFirst`), start-screen and in-game texts as `t({ en: "…" })`, so a translation can be added later without
+   rewriting; the game's row in `src/content/ideas/languageStatus.ts` with only `en`. Its search texts still come
+   in all seven languages (step 3).
 
 ## Settings and shared parts
 

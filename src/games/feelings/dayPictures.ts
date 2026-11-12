@@ -7,7 +7,8 @@ import type { QueuedPicture } from "@/content/pictureQueue";
 // keeping the place and the look of everyone, and only what the characters do changes – nothing has happened yet, all
 // are calm. The night that ends every day is the little bear's room at night. Plain data, with no picture imports, so
 // the management page that lists the queue doesn't load the game's pictures; `feelings.test.ts` checks that every page
-// still to make has its entry here, drawn from its scene's first picture.
+// still to make has its entry here, drawn from its scene's first picture. Tag 9 to Tag 15 (the everyday scenes of
+// alltag.ts, 11 November 2026) were made on 12 November 2026.
 
 const DIR = "src/games/feelings/bilder";
 
@@ -22,7 +23,7 @@ const CALM = "Everyone is calm and content: nobody cries, nobody is angry or sca
  * A page before scene `scene` of day `day`, drawn from `ref` (the scene's first picture, without folder and .webp):
  * `cast` names everyone in it, `action` what they do. Ten of the first 39 got a double of someone („only ONE of each“).
  */
-export function dayPage(day: number, scene: number, ref: string, use: string, cast: string, action: string): QueuedPicture {
+export function dayPage(day: number, scene: number, ref: string, use: string, cast: string, action: string, date = "2026-11-04"): QueuedPicture {
   const id = `tag${day}-${scene}`;
   return {
     id,
@@ -34,9 +35,9 @@ export function dayPage(day: number, scene: number, ref: string, use: string, ca
     quality: 65,
     ref: [`${DIR}/${ref}.webp`],
     alone: "story picture",
-    date: "2026-11-04",
+    date,
   };
 }
 
-/** Every page of the days' stories and the night still to make (none now). */
+/** Every page of the days' stories and the night still to make. */
 export const DAY_PICTURE_QUEUE: QueuedPicture[] = [];

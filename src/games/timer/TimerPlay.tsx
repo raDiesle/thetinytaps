@@ -280,7 +280,7 @@ function TimerRun({
   // Gleich ist es so weit (H-49): a while before the end the bell rings once, and a picture stepped back from afar comes bright again.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
 
@@ -383,19 +383,16 @@ function TimerRun({
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
       say(lines.end, true);
-      // The time is up, plain to see and hear (user feedback, November 2026): children cheer, a few hearts, stars and
-      // notes rise slowly over the picture, which lights up warmly, and then the friendly tune.
-      const cheer = setTimeout(() => {
-        playCheer();
-        celebrate();
-      }, CHEER_MS);
+      // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
+      // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
+      const cheer = setTimeout(playCheer, CHEER_MS);
       const tune = setTimeout(playMelody, CHEER_MS + 1800);
       return () => {
         clearTimeout(cheer);
         clearTimeout(tune);
       };
     }
-  }, [phase, picture, celebrate, say, lines]);
+  }, [phase, picture, say, lines]);
 
   /**
    * A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and what is still left lights up softly
@@ -450,6 +447,7 @@ function TimerRun({
         {phase === "done" && (
           <GameEnd
             delayMs={picture === "caterpillar" ? END_MS_CATERPILLAR : END_MS}
+            level={picture}
             onAgain={onAgain}
             next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }}
           />
@@ -474,8 +472,8 @@ export function stageStyle(picture: TimerPicture, total: number, stops: number) 
 }
 
 /**
- * One picture's drawing on the stage, for a run of `total` ms cut into the pieces of `set` ms: in a run, and at its end
- * on the start screen's card (`TimerCardArt`).
+ * One picture's drawing on the stage, for a run of `total` ms cut into the pieces of `set` ms: in a run, and halfway
+ * through one on the start screen's card (`TimerCardArt`, `still`: no clock of its own ticks on).
  */
 export function SceneParts({
   picture,
@@ -484,6 +482,7 @@ export function SceneParts({
   set,
   poke,
   startedAt,
+  still,
 }: {
   picture: TimerPicture;
   phase: Phase;
@@ -492,6 +491,8 @@ export function SceneParts({
   /** Counts the taps, each lighting what is left. */
   poke: number;
   startedAt: number;
+  /** A menu's card: the picture at this moment, with nothing that counts on by itself. */
+  still?: boolean;
 }) {
   const apples = appleCount(set);
   const stops = pieceCount(set, MAX_STOPS);
@@ -510,10 +511,10 @@ export function SceneParts({
         </>
       )}
       {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
-      {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} />}
+      {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} still={still} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
-      {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} />}
+      {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}
       {picture === "sand" && (

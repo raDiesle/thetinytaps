@@ -17,35 +17,9 @@
   height: 100%;
 }
 
-/* What the child taps: a glowing yellow ring that breathes. */
+/* What the child taps: an unseen ring that takes the tap; the shared `TapHint` over the picture marks it. */
 .fm-spot {
-  fill: #ffd43b;
-  fill-opacity: 0.18;
-  stroke: #ffd43b;
-  stroke-width: 12;
-  animation: fm-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes fm-glow {
-  from {
-    stroke-opacity: 0.45;
-    fill-opacity: 0.08;
-  }
-  to {
-    stroke-opacity: 1;
-    fill-opacity: 0.28;
-  }
-}
-
-/* The hand stands still before the first tap; after a reminder it pops up once. */
-.fm-hand {
-  pointer-events: none;
-}
-
-.fm-hand.again {
-  animation: pop-in 0.7s ease-out backwards;
-  transform-box: fill-box;
-  transform-origin: 50% 0;
+  fill: transparent;
 }
 
 .fm-option {
@@ -161,12 +135,13 @@
 }
 
 /* The still hand on the first card before the first tap; after a reminder it pops up once. */
+/* The shared hint's drawn hand (`HintHand`), standing still under the first card. */
 .fm-card-hand {
   position: absolute;
   right: 4%;
   bottom: -18%;
-  line-height: 1;
   pointer-events: none;
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 4px 5px rgb(0 0 0 / 0.3));
 }
 
 .fm-card-hand.again {
@@ -961,7 +936,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fm-spot,
   .fm-wheel.spin,
   .fm-flame,
   .fm-smoke circle,

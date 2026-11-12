@@ -23,7 +23,7 @@ import { SEO_ES } from "./seo.es";
 import { SEO_HI } from "./seo.hi";
 import { SEO_RU } from "./seo.ru";
 import { SEO_ZH } from "./seo.zh";
-import { APP_LANGUAGES } from "../lib/language";
+import { APP_LANGUAGES, pick } from "../lib/language";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
@@ -72,15 +72,15 @@ describe("home menu", () => {
   test("every card has a short line for grown-ups that fits in two lines", () => {
     const lines = [...games.map((g) => [g.href, g.blurb] as const), ...CATEGORIES.map((c) => [c.id, c.blurb] as const)];
     for (const [where, blurb] of lines) {
-      expect(blurb?.de, where).toBeDefined();
+      expect(blurb && pick(blurb, "de"), where).toBeDefined();
       for (const text of Object.values(blurb ?? {})) expect(text.length, where).toBeLessThanOrEqual(42);
     }
   });
 
-  test("Frei tippen, Zählen, Mitmachen and Wörter tippen are four games in their book's table of contents, not ways to play of one", () => {
+  test("Frei tippen, Zählen, Mitmachen, Wörter tippen and Wo ist das kleine b? are games in their book's table of contents, not ways to play of one", () => {
     const book = CATEGORIES.find((category) => category.id === "buchstaben-zahlen");
     expect(book && hasPage(book)).toBe(true);
-    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/mitmachen/", "/woerter/"]);
+    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/mitmachen/", "/woerter/", "/gross-klein/"]);
   });
 
   test("category ids and game addresses are unique", () => {
@@ -584,27 +584,38 @@ describe("Russian", () => {
 // right of Aufs Töpfchen in that order, „Wie lange warten?“ left of the Belohnungstafel, and the newer helpers after them
 // once they are finished. The Timer is the very first book, top left (user decision, November 2026), and „Abstillen“
 // stands right of it, left of Zähne putzen (user request, November 2026).
-test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen beside it and the Schnullerfee beside that, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
+test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen beside it, the Schnullerfee and Kita-Start beside that, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
     "/timer/",
     "/abstillen/",
     "/schnullerfee/",
+    "/kita/",
     "/zaehne/",
     "/toepfchen/",
     "/belohnungstafel/",
   ]);
-  expect(SHELF[5].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
+  expect(SHELF[6].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or
 // search engine finds it until it is done.
 test("games still being built stand nowhere on the shelf or in a book", () => {
-  for (const game of UNFINISHED) {
+  for (const game of UNFINISHED.filter((game) => game.unfinished === true)) {
     expect(
       SHELF.map((e) => e.href),
       game.href,
     ).not.toContain(game.href);
     expect(bookPage(game.href), game.href).toBeUndefined();
+  }
+});
+
+// User request, November 2026 (L-23): a game still being built may already stand in its book, its line labelled
+// „in Bearbeitung“ – but it stays out of search results, and its book is a picture book with a table of contents.
+test("games labelled „in Bearbeitung“ stand in their book's table of contents and in no search result", () => {
+  for (const game of UNFINISHED.filter((game) => game.unfinished === "labelled")) {
+    const book = CATEGORIES.find((category) => category.games.includes(game));
+    expect(book && hasPage(book) && listedGames(book).includes(game), game.href).toBe(true);
+    expect(NO_INDEX_PATHS, game.href).toContain(game.href);
   }
 });

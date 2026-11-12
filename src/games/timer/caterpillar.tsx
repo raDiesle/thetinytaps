@@ -344,8 +344,12 @@ function leafPolygon(front: readonly number[]): string {
   return `polygon(0% 0%, ${front.map((f, k) => `${pc(f, LEAF.w)} ${pc(ROW_Y[k], LEAF.h)}`).join(", ")}, 0% 100%)`;
 }
 
-/** The bites done so far, counted by the clock once a second (and again when the page comes back), all at the end. */
-function useBites(startedAt: number, count: number, running: boolean): number {
+/**
+ * The bites done so far, counted by the clock once a second (and again when the page comes back), all at the end;
+ * `still` counts them once and no more (a menu's card).
+ */
+function useBites(startedAt: number, count: number, done: boolean, still?: boolean): number {
+  const running = !done && !still;
   const due = () => Math.min(count, Math.max(0, Math.floor((Date.now() - startedAt) / 1000 + 0.5)));
   const [bites, setBites] = useState(due);
   useEffect(() => {
@@ -367,7 +371,7 @@ function useBites(startedAt: number, count: number, running: boolean): number {
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [startedAt, count, running]);
-  return running ? bites : count;
+  return done ? count : bites;
 }
 
 /** A transform moving a layer of `w` × `h` placed at the leaf's corner so its top left lies at (x, y) in the leaf's units. */
@@ -642,10 +646,13 @@ function Butterfly() {
   );
 }
 
-/** The whole picture: the leaf with the caterpillar on its branch over the meadow; the cocoon and butterfly at the end. */
-export function CaterpillarScene({ glow, startedAt, total, done }: { glow: number; startedAt: number; total: number; done: boolean }) {
+/**
+ * The whole picture: the leaf with the caterpillar on its branch over the meadow; the cocoon and butterfly at the end.
+ * `still` (a menu's card) shows the bites due now and counts no more.
+ */
+export function CaterpillarScene({ glow, startedAt, total, done, still }: { glow: number; startedAt: number; total: number; done: boolean; still?: boolean }) {
   const count = runSeconds(total);
-  const bites = useBites(startedAt, count, !done);
+  const bites = useBites(startedAt, count, done, still);
   const plan = useMemo(() => planBites(count, startedAt), [count, startedAt]);
   const front = useMemo(() => (done ? ROW_Y.map(() => 0) : frontAfter(plan, bites)), [plan, bites, done]);
   return (

@@ -4,8 +4,3 @@
 .marble-play[data-level="water"] {
   background: #7fd0ff;
 }
-
-/* The finger over the gate stays still: nothing moves before the child taps. */
-.water-hint {
-  pointer-events: none;
-}

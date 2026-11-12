@@ -17,13 +17,21 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 - Image models need billing enabled in AI Studio (the free tier allows 0 pictures;
   a `429 … free_tier … limit: 0` means billing is off). Don't generate dozens of
   variants without asking.
-- Default model `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite, $0.034 per 1K
-  picture, $0.017 as batch, Oct 2026 – the cheapest; 1K is its only size, enough for
-  these simple pictures, also for second frames with `--ref`). `--model` or
-  `GEMINI_IMAGE_MODEL` switches, e.g. `gemini-3.1-flash-image` (Nano Banana 2, $0.067)
-  or `gemini-3-pro-image` (Nano Banana Pro, $0.134) only for hard scenes with many
-  characters – ask the user first. Keep costs low, but only where the saving doesn't show
-  in the picture. `gemini-2.5-flash-image` is switched off. List the models the key can use:
+- **Two engines, and the queue picks them** (`ENGINES` in `src/content/pictureQueuePlan.ts`, idea A-33, research
+  „gemini-bildpreise“ on `/management/`, decided November 2026): every sheet goes to whichever makes its pictures for
+  the least, as long as its panels are big enough.
+  - `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite, $0.017 a request in a batch; 1K is its only size): small
+    pictures and cut-outs four to a 1K sheet (≈ $0.004 each), and every picture that must be drawn alone.
+  - `gemini-nano-banana-2.1` at 2K with minimal thinking (≈ $0.029 a sheet, measured from its tokens): big pictures
+    and whole ones four to a sheet, each panel as big as a whole 1K picture (≈ $0.0073 each, 58 % less than alone).
+    By hand: `--model gemini-nano-banana-2.1 --image-size 2K --thinking minimal`. **Never for a story's later
+    pictures drawn from its first** (`alone: "story picture"`): on its sheets they lost things every picture must keep
+    (the bunny gone in six of eight panels, even with „EVERY panel contains …“), Lite alone kept them.
+  `gemini-3.1-flash-image` (Nano Banana 2, $0.067) or `gemini-3-pro-image` (Nano Banana Pro, $0.134) only for hard
+  scenes with many characters – ask the user first. `gemini-2.5-flash-image` is deprecated (off on 15 March 2027) and
+  dearer. Every batch prints its real cost from the tokens Gemini sends back (`BATCH_PRICES` in the script, a new
+  model needs its line; a measured price that moves goes into `ENGINES`). Prices change: check
+  ai.google.dev/gemini-api/docs/pricing (Nov 2026) before trusting these. List the models the key can use:
   `curl -s -H "x-goog-api-key: $GEMINI_API_KEY" https://generativelanguage.googleapis.com/v1beta/models`
 - The key must be **exported** (`export GEMINI_API_KEY=…` in `~/.zshrc`); if the shell
   of this session started before, run `zsh -ic 'export GEMINI_API_KEY; bun run image …'`.
@@ -31,24 +39,29 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 ## Cheap first: the queue (always)
 
 Pictures are always made as cheap as they can be (user decision, November 2026). A request costs the same whether
-it brings one picture or a sheet of two or four small ones (`--grid`), so small pictures of one kind wait until their
-sheet is full, and later sessions bring the partners.
+it brings one picture or a sheet of two or four (`--grid`), so pictures of one kind wait until their sheet is full,
+and later sessions bring the partners.
 
-**Never one picture per request where a sheet can hold it** (user feedback, November 2026, „das darf nicht nochmal
-passieren“: 14 scenes of „Was gehört zusammen?“ went out as two requests each, every frame alone, and their cut-out
-partners each alone with a reference – about twice what sheets would have cost). Before writing a queue entry or a
-`--jobs` file, go through these, cheapest first, and take the first that works:
-- small things, cut-outs and cards share 2x2 sheets: no `ref` and no `alone`, the prompt says what to draw by itself
-  (a partner's look comes from its own words, not „from this picture“);
+**Never a picture generated alone, always the cheapest way – unless the user says in so many words to make it faster**
+(user decision, 12 November 2026; before: user feedback, November 2026, „das darf nicht nochmal passieren“: 14 scenes
+of „Was gehört zusammen?“ went out as two requests each, every frame alone, and their cut-out partners each alone with
+a reference – about twice what sheets would have cost). No `bun run image <file> "<prompt>"` for a new picture, no
+`--now`, no `--force` of a sheet not yet full without the user's word. Before writing a queue entry or a `--jobs` file,
+go through these, cheapest first, and take the first that works:
+- cards, cut-outs, backdrops and whole pictures share 2x2 sheets – small ones Lite's 1K, big ones and those without a
+  size 2.1's 2K (the queue picks): no `ref` and no `alone`, the prompt says what to draw by itself (a partner's look
+  comes from its own words, not „from this picture“);
 - pictures that belong together (the two moments of one scene, a story's steps) go in one request as `panels`
   (`QueuedPicture.panels`, `--grid 1x2` / `2x2`), cut apart after – a before and after drawn so changed 8–12 % of the
   picture and 1 % of its edge, as steady as a second frame drawn from its first (measured with `bun run frames`,
   November 2026, „Was gehört zusammen?“);
-- only what a check proved can't share – a second frame that must keep a first already made, a redrawn picture –
-  is `alone` or drawn from a `ref`, and its `alone` names that reason (`pictureQueue.test.ts` takes only the reasons in
-  `ALONE_REASONS`).
-Then everything that is cheap goes out in **one** batch (`queue --make`), never pair by pair, and the plan's line
-„cheap now – N requests“ is read before sending: more requests than pictures ÷ 2 means something above was missed.
+- only what a check proved can't share – a second frame that must keep a first already made, a story's later picture
+  drawn from its first (proved on 2.1's sheets, November 2026), a redrawn picture – is `alone` or drawn from a `ref`,
+  and its `alone` names that reason (`pictureQueue.test.ts` takes only the reasons in `ALONE_REASONS`, and fails when
+  the plan sends a picture alone that has none). Those still go out together in one batch, never one by one.
+Then everything that is cheap goes out in **one** run (`queue --make`; one batch per engine), never pair by pair, and
+the plan's line „cheap now – N requests, $…“ is read before sending: more requests than pictures ÷ 2, outside the
+`alone` ones, means something above was missed.
 
 1. **Every picture asked for goes into `src/content/pictureQueue.ts` first** (id, file, German `use`, the prompt
    *without* the style block, aspect, size, `transparent`, `ref`, date; `alone` with the reason for a second frame or a
@@ -58,14 +71,15 @@ Then everything that is cheap goes out in **one** batch (`queue --make`), never 
    data registers `appPlugin()` and then imports dynamically (`scripts/gemini-image.mjs`), never statically, or
    `bun run image queue` fails on „Cannot find module './bilder/*.webp?glob'“.
 2. **`bun run image queue`** shows the plan (`src/content/pictureQueuePlan.ts`): *cheap now* are full sheets and
-   pictures that never share one (no `size`, bigger than a panel, `alone`) – waiting saves nothing there; *waiting for
+   pictures that never share one (`alone`) – waiting saves nothing there – each with its engine; *waiting for
    partners* are sheets not yet full, together with older pictures already waiting there; *after their reference* are
    pictures drawn from another one still in the queue.
 3. **Make the cheap part at once without asking**: `bun run image queue --make` (in the background, like every batch) –
    except pictures a game's rules keep for the user (Gefühle's „Geplant“, `src/games/feelings/CLAUDE.md`): those only
    wait in the queue for a batch the user asks for.
-4. **For what waits, ask the user in the session** (AskUserQuestion, „warten“ first): wait for partners, or make it now
-   for one request more (≈ $0.017). Now: `bun run image queue --make --force <id,…>` (or `all`) – the sheet's spare
+4. **For what waits, ask the user in the session** (AskUserQuestion, „warten“ first), naming how many pictures don't
+   fill their sheet and what making them now would cost (the plan prints it per sheet: $0.017 Lite, $0.029 2.1):
+   wait for partners, or make it now. Now: `bun run image queue --make --force <id,…>` (or `all`) – the sheet's spare
    panels become variants of its pictures in `.image-raw/variants/`, to pick the best. Waiting: commit the queue entry
    with the feature, which shows a placeholder until then (see Workflow 0), and merge it, so the next session finds it.
 5. **A made picture leaves the queue** in the commit that adds it (the script reminds you; `pictureQueue.test.ts`
@@ -105,10 +119,12 @@ pictures when they are ready.
   the checkout that sent them, or into this one if that worktree is gone. `fetch` is for a batch nobody waits for:
   beside the run still waiting for it, both save and one stops with ENOENT. Never pipe a run into `head` either – it
   cuts off the list of saved pictures (send its output to a file).
-- `--now` asks right away at the full price: only for a quick single try while
-  getting a prompt right. `--no-wait` only sends.
+- `--now` asks right away at the full price: only when the user says to make it faster. `--no-wait` only sends.
 
 ## Commands
+
+A new picture goes through the queue (above); these single runs are for redrawing a picture already in a game, for
+`--from` (no request at all) and for what the user asks to have faster.
 
 ```bash
 # card / illustration, cropped to an exact size
@@ -301,7 +317,12 @@ names – use those.
    moment is meant to be (relieved after a deep breath, not still red with anger)? No hands from the edge unless
    someone off-picture really acts – say so in the prompt, or Gemini adds a pointing hand.
 4. If it's wrong, change the prompt (be specific about what was wrong) and run again;
-   stop after about three tries and show the user the best one with what's off.
+   stop after about three tries and show the user the best one with what's off. Count a picture's tries across
+   batches: a story picture back in `redo` that fails a second time with a sharper prompt, in the same way (a
+   character drawn twice – once where it was in the first picture and once where it moves to –, the same prop twice, a
+   breath blown towards the table again), won't come right by a third blind round. Of 18 such redraws on 12 November
+   2026, 7 passed and 11 failed exactly as before. Leave it out of the next batch and show the user what keeps going
+   wrong instead: the step's idea may need changing (a pose the first picture makes hard), or a test on 2.1 alone.
 5. Keep files small: cards ~1200×900 at quality 80 (< 200 KB), sprites 512–768 px.
    Commit only the final file in the game folder, never `.image-raw/`, right after
    the pictures arrive, and merge into main.

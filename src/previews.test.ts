@@ -1,11 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import sharp from "sharp";
 import { bookIdOf, CATEGORIES, hasPage, listedGames } from "@/content/games";
+import sharp from "sharp";
+import { PREVIEW_SIZE } from "@/components/GameCard";
 import { SCENE_ENTRIES } from "@/games/scenes/catalog";
 
-// The menus show a framed landscape cut of each game instead of its emoji (user request, November 2026), made by
+// The menus show a framed 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
 // `bun run previews` (tools/previews.ts) as small still pictures: these checks keep every menu's pictures there and
 // light, so a phone shows a menu without drawing a single game.
 
@@ -47,12 +48,14 @@ describe("menu pictures", () => {
     for (const folder of new Set(folders)) expect(TOOL.includes(`"${folder}"`), folder).toBe(true);
   });
 
-  test("the pictures are landscape cuts, as the frames on the cards are", async () => {
-    // Square prints in round frames showed too little of a game (user feedback, November 2026): tools/previews.ts cuts 4:3.
+  test("every picture is 3 : 2 at the size the menus show, so it fills a card without stretching", async () => {
+    // A round cut in a square showed too little of the game (user feedback, November 2026); old squares left in a
+    // folder would be cropped by the card.
+    expect(TOOL).toContain(`const SIZE = { width: ${PREVIEW_SIZE.width}, height: ${PREVIEW_SIZE.height} }`);
     for (const folder of new Set(folders)) {
       for (const name of readdirSync(join(ROOT, folder))) {
-        const { width = 0, height = 0 } = await sharp(join(ROOT, folder, name)).metadata();
-        expect(width / height, `${folder}/${name}`).toBeCloseTo(4 / 3, 1);
+        const { width, height } = await sharp(join(ROOT, folder, name)).metadata();
+        expect({ width, height }, `${folder}/${name}`).toEqual({ ...PREVIEW_SIZE });
       }
     }
   });

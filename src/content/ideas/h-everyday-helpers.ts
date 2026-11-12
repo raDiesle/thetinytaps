@@ -92,6 +92,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Morgens vor der Kita: Tapsi bringt den kleinen Bären hin, gibt ihm einen Kuss, winkt am Fenster. Dann zeigt eine Reihe Bilder den Tag des Bären (Spielen, Essen, Schlafen) – und danach kommt Mama. Immer gleich, kurz, und endet fröhlich.",
       why: "Eltern suchen „kita eingewöhnung 2 jährige“, „kind weint beim abschied kita“ und „kind will nicht in den kindergarten“. Ergänzt die Kita-Geschichten (X-10) um ein Ritual, das man jeden Morgen spielt.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als eigenes Buch der Alltagshelfer neben „Schnullerfee“ (/kita/, 11. November 2026): „Tapsi geht in die Kita“, eine Vorlesegeschichte in Kapiteln mit Gemini-Bildern wie „Abstillen“, entlang der Schritte der Eingewöhnung (Recherche „kita-eingewoehnung“, Berliner Modell): erzählen und packen, Mama bleibt dabei, der erste kurze Abschied, Mia die Erzieherin tröstet, das Ritual jeden Morgen (Jacke an den Sternhaken, drücken, Kuss, „Ich hole dich nach dem Mittagsschlaf ab“, Winkefenster), Tapsis Tag in der Kita, und Mama kommt wie gesagt. Statt Tapsi, der den Bären bringt, geht Tapsi selbst, von Mama gebracht; der Bär ist Bruno, Tapsis Freund, und Mia, die Erzieherin.",
     },
     {
       id: "H-11",
@@ -404,6 +407,22 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "Eltern wollen solche Rituale oft einführen, wissen im Moment aber die Worte nicht; die Karte erinnert, wann, und sagt, was. Ein fester Ablauf jeden Tag gibt Halt, und konkrete Fragen bringen Kinder eher zum Erzählen als „Wie war's?“ (Recherche „rituale“).",
       effort: "M",
       done: true,
+    },
+    {
+      id: "H-73",
+      emoji: "🏮",
+      title: "Aufs Töpfchen: Lampions statt fliegender Formen",
+      text: "Bei der Party hängen Lampions still im Bad und gehen nacheinander an, einer nach dem anderen, bis alle leuchten – statt Herzen und Sterne steigen zu lassen. Die Party bleibt das Ende, nur leiser. Gehört zu A-30.",
+      why: "Ein Fest ohne Gewimmel: das Kind sieht, dass es etwas Besonderes ist, ohne aufgedreht zu werden.",
+      effort: "S",
+    },
+    {
+      id: "H-74",
+      emoji: "🌙",
+      title: "Zeitplan: die Karte dreht sich, am Ende geht der Mond auf",
+      text: "Eine erledigte Karte dreht sich um und zeigt eine Pfote. Ist der ganze Tag erledigt, geht oben auf der Seite langsam der Mond auf (morgens die Sonne) – statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
+      why: "Das Kind sieht, wie der Tag voll wird, und das Ende passt zur Tageszeit.",
+      effort: "S",
     },
   ],
 };

@@ -76,6 +76,25 @@
   -webkit-text-stroke: 0.08em var(--ink);
 }
 
+/* „Menü“ (`menu`): the ribbon's round label with the shelf and the yellow arrow beside the word, so it looks like the
+   way back in the corner (user request, November 2026). */
+.game-end-button.menu {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.game-end-button.menu.to-shelf {
+  padding-left: 0.3em;
+}
+
+.game-end-button.menu .shelf-label-art {
+  flex: none;
+  width: auto;
+  height: 2.4em;
+  overflow: visible;
+}
+
 .game-end-button:active {
   translate: 0 4px;
 }
@@ -98,4 +117,40 @@
 .game-end.corners .game-end-button {
   font-size: clamp(0.95rem, 2.2vw, 1.25rem);
   pointer-events: auto;
+}
+
+/*
+ * The level's trophy beside the buttons (Trophy.tsx): it comes once, slowly, and then stands still – no shine running
+ * over it, no bounce, no sparkle. It is the reward, not a button: taps go past it.
+ */
+.game-end-trophy {
+  flex: none;
+  align-self: flex-end;
+  height: clamp(96px, 30vh, 230px);
+  width: auto;
+  aspect-ratio: 2 / 3;
+  pointer-events: none;
+  /* Lifted off the picture, so it is seen on a busy one too. */
+  filter: drop-shadow(0 3px 6px #2a180c66);
+  animation: game-end-trophy-in 1.4s ease-out both;
+}
+
+@keyframes game-end-trophy-in {
+  from {
+    opacity: 0;
+    transform: translateY(6%);
+  }
+}
+
+.game-end.inline .game-end-trophy {
+  height: clamp(80px, 22vh, 170px);
+}
+
+.game-end.corners .game-end-trophy {
+  height: clamp(64px, 18vh, 130px);
+}
+
+/* „Menü“ alone in the corner is the only way on: a little bigger than „Nochmal“ there, its shelf still clear. */
+.game-end.corners .game-end-button.menu {
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
 }

@@ -96,13 +96,16 @@ describe("Timer", () => {
     expect(ids).not.toContain("cake");
   });
 
-  test("each card is its picture at the end, with no words on it, and stands still in the menu (user request, November 2026)", async () => {
+  test("each card is its picture halfway through its run, with no words on it, and stands still in the menu (user request and feedback, November 2026)", async () => {
     const game = await Bun.file(new URL("./TimerGame.tsx", import.meta.url)).text();
     expect(game).toContain("art: <TimerCardArt picture={p.id}");
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    const still = css.match(/\.tm-card-art \* \{([^}]*)\}/)?.[1] ?? "";
-    expect(still).toContain("animation: none !important");
-    expect(still).toContain("will-change: auto !important");
+    expect(css.match(/\.tm-card-art\.tm-still \* \{([^}]*)\}/)?.[1]).toContain("animation: none !important");
+    expect(css.match(/\.tm-card-art \* \{([^}]*)\}/)?.[1]).toContain("will-change: auto !important");
+    const art = await Bun.file(new URL("./cardArt.tsx", import.meta.url)).text();
+    expect(art).toContain("const MIDDLE = 0.5;");
+    expect(art).toContain('phase="running"');
+    expect(art).not.toContain("tm-done");
   });
 
   test("the lengths are 10 seconds to 10 minutes, with 10 and 30 seconds (user request, November 2026), rising, and the default is one of them", () => {

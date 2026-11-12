@@ -83,5 +83,13 @@ export const adventureIdeas: IdeaArea = {
       effort: "S",
       done: true,
     },
+    {
+      id: "M-10",
+      emoji: "🌈",
+      title: "Bewegungsabenteuer: Regenbogen und Truhe statt Konfetti",
+      text: "Auf der Wolkenreise erscheint am Ende langsam ein Regenbogen, statt 220 Konfettistücke zu werfen; auf der Schatzinsel geht die Truhe auf und das Gold leuchtet von innen, ohne dass Konfetti, Gischt und Sand fliegen (heute 400 + 240 + 160 + 160 Stück). Tapsi jubelt weiter, das genügt. Gehört zu A-30.",
+      why: "Nach dem Bewegen kommt das Kind zur Ruhe, statt noch mehr aufgedreht zu werden; und das Handy hat weniger zu tun.",
+      effort: "S",
+    },
   ],
 };
