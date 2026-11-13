@@ -68,11 +68,12 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
 - **„Alltagssituationen“** (`/gefuehle/`, `FeelingsGame.tsx`, `FeelingsPlay.tsx`): by default one card per **day** of
   the little bear, „Tag 1“, „Tag 2“ … (`days.ts`, `DayPlay.tsx`, idea C-68, see „Tagesgeschichten“ below); the level row
   „Geschichten: 📅 Tage / 😊 Nach Gefühlen“ (`settings.order`) switches to one card per group of feelings
-  (`groups.ts`: Traurig, Wütend, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
+  (`groups.ts`: Traurig, Wütend, Frust & Warten, Angst, Freude & Stolz, Müde & zu viel, Streit im Kindergarten, Freunde & Familie,
   Igitt & Hoppla – every story in exactly one, checked in `feelings.test.ts`), played without the days' pages. The cards
   always stand in their fixed order; the day or group played last keeps its place, marked „zuletzt“, and goes on with
-  the scene where the child stopped (`settings.day`/`dayScene`, `settings.group`/`scene`). The old addresses
-  `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
+  the scene where the child stopped (`settings.day`/`dayScene`, `settings.group`/`scene`). Each card has its own
+  address below `/gefuehle/` (see „Every level has its own address“ in the root `CLAUDE.md`), and one that names no
+  card, like the old `/gefuehle/zuhause/` and `/gefuehle/kindergarten/`, leads back to `/gefuehle/` (`GameShell`).
 
 **Pictures of the feelings (user feedback, November 2026):** always the same figure, the little bear, never the fox or
 a changing child; alone – no grown-up beside him – unless the thing shown needs one (a hug); close and big, the
@@ -83,7 +84,7 @@ of the app. The pictures made before (`gesicht-…`, `hilft-…`, `wetter-…`) 
 `feelings.test.ts` checks the bear, his clothes and the groups. Good and unpleasant feelings always stand apart, as two
 groups, wherever the feelings are listed.
 
-**Tagesgeschichten (user idea, November 2026):** every scene stands in exactly one of eight days (`DAYS`, checked in
+**Tagesgeschichten (user idea, November 2026):** every scene stands in exactly one of fifteen days (`DAYS`, checked in
 `feelings.test.ts`), in the order of a day from getting up to going to sleep, and before each scene a **page of the
 story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it; after the last scene the night
 (`tag-nacht`) ends the day with „Nochmal“ and „Weiter“ (the next day, named under it). Rules:
@@ -240,7 +241,17 @@ the kindergarten), excited (the first snow) – ideas C-05, C-12, C-16, C-17, C-
 (pictures made November 2026): leaving the playground, a show that ends, no lolly at the checkout, a
 jacket that won't go on, waiting for pancakes, the vacuum cleaner, a big dog, the doctor, washing hair, waking at night,
 the lost cuddly toy, not allowed to join in, a party too loud, proud on the climbing frame, missing grandma, shy with a
-visitor, bored on a rainy day, caring when the fox cries, startled by a bang (C-01 to C-15, C-23 to C-28). The little
+visitor, bored on a rainy day, caring when the fox cries, startled by a bang (C-01 to C-15, C-23 to C-28). Then 31
+everyday scenes (`alltag.ts`, ids `alltag-…`, ideas C-37 to C-72 but C-52 to C-54, C-66 and C-68, November 2026): the
+puzzle, a lost race, a friend going home, „Ich will selber!“, the first night at Grandma's, the hairdresser, an accident,
+laughed at, too excited to sleep, envy, lost in the supermarket, not understood, a bee, waiting while the phone goes on,
+having hit, picked up, silly in the bath, a butterfly, a grumpy morning, worn out, ill, a long drive, sticky paint, a
+smelly nappy, wet socks, a licking dog, the baby's paintbrush, the blue cup, the nap, brushing teeth and bedtime. They
+are German only, apart from `SELF_SITUATIONS`, so they wait for their translations without failing its check, and are
+told in Tag 9 to Tag 15; their pictures are described per story in `alltagDrawings.ts` (`StoryDrawing`), whose prompts
+`storyPictures.ts` wraps in the frames of „So bleibt die Szene gleich“ for the picture queue. A new story of this kind
+goes there the same way. Where an idea's family plot needs a bear baby to take something (the paintbrush), the baby may
+do it – it doesn't mean to; the raccoon is for the other child who hurts. The little
 bear has the feeling and
 helps himself (a body trick, saying how he feels, doing something else); the feeling itself is never the not-so-good
 idea, only what hurts someone or breaks something is (hiding when embarrassed is the feeling, so its not-so-good idea is

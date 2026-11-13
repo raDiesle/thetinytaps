@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { PREVIEW_SIZE } from "@/components/GameCard";
 import { SCENE_ENTRIES } from "@/games/scenes/catalog";
 
-// The menus show a 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
+// The menus show a framed 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
 // `bun run previews` (tools/previews.ts) as small still pictures: these checks keep every menu's pictures there and
 // light, so a phone shows a menu without drawing a single game.
 
@@ -19,9 +19,9 @@ const sources = (dir: string): string[] =>
     entry.isDirectory() ? sources(join(dir, entry.name)) : /\.tsx?$/.test(entry.name) && !entry.name.endsWith(".test.ts") ? [join(dir, entry.name)] : [],
   );
 
-/** The `vorschau/` folders the app imports, relative to the repo. */
+/** The `vorschau/` folders the app imports, relative to the repo (not the wildcard folders of the page of all pictures). */
 const folders = sources(join(ROOT, "src")).flatMap((file) =>
-  [...readFileSync(file, "utf8").matchAll(/from "([^"]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) =>
+  [...readFileSync(file, "utf8").matchAll(/from "([^"*]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) =>
     join(file.slice(ROOT.length + 1, file.lastIndexOf("/")), path),
   ),
 );

@@ -142,14 +142,33 @@ export const duckDepth = (t: number) => hold(phase(t, DUCK_PERIOD), 0.05, 0.28, 
 export const FLAP_PERIOD = 1.1;
 /** Seconds of one tap of tap_forward: the left paw taps in the first one, the right in the next. */
 export const TAP_PERIOD = 1.5;
-/** Seconds into each tap when the paw is furthest forward. */
-export const TAP_HIT = 0.43;
+/** Seconds into each tap when the paw is furthest out. */
+export const TAP_HIT = 0.6;
+/** Seconds a tapping paw takes to reach out, and to come back after holding at the balloon for a moment. */
+const TAP_OUT = 0.6;
+const TAP_HOLD = 0.1;
+const TAP_BACK = 0.8;
+/**
+ * How far the left paw of tap_forward reaches out `t` s into the clip (0..1; the right one is a tap later): it
+ * goes out smoothly, holds at the hit and comes back, while the other paw is already on its way.
+ */
+export function tapReach(t: number) {
+  const cycle = 2 * TAP_PERIOD;
+  let d = (((t - TAP_HIT) % cycle) + cycle) % cycle;
+  if (d > cycle - TAP_OUT) d -= cycle;
+  if (d < 0) return smooth(1 + d / TAP_OUT);
+  if (d < TAP_HOLD) return 1;
+  return 1 - smooth(clamp01((d - TAP_HOLD) / TAP_BACK));
+}
 /** Seconds of one go of lean_side: over to the left, back, over to the right, back. */
 export const LEAN_PERIOD = 3.4;
 /** Seconds of one jump for joy in the cheer clip. */
 export const CHEER_PERIOD = 0.8;
-/** Seconds of one go of the arc clip: the left arm paints a band's left half up over the head, then the right one its right half. */
-export const ARC_PERIOD = 4;
+/**
+ * Seconds of one go of the arc clip: the left arm dips its brush into the paint bucket in front of the feet and
+ * paints a band's left half up over the head, then the right one its right half.
+ */
+export const ARC_PERIOD = 5;
 /**
  * The arc clip paints a rainbow with a long brush, one band each go, outer band first. The bristles go round one
  * circle standing upright in front of the fox, its middle on the fox's middle (hips space, the fox's units), so
@@ -157,8 +176,8 @@ export const ARC_PERIOD = 4;
  * Each band's circle is a little smaller than the one before.
  */
 export const ARC = {
-  /** The middle of the circles: a little above the hips, in front of the body. */
-  y: 0.2,
+  /** The middle of the circles: above the hips, in front of the body, high enough that the camera behind sees the bands' top above the ears. */
+  y: 0.3,
   z: 0.3,
   /** The outer edge of the outer band, and how wide each band is. */
   radius: 0.96,
@@ -173,24 +192,29 @@ export const ARC = {
 export const arcAngle = (along: number) => -ARC.below + along * (Math.PI / 2 + ARC.below);
 /** The middle of band `band`'s circle. */
 export const arcRadius = (band: number) => ARC.radius - (band + 0.5) * ARC.band;
+/** Where in each half of the arc clip the brush is deepest in the bucket. */
+export const ARC_DIP = 0.16;
 /** Where in each half of the arc clip the brush is at the top: there that half of the band is finished. */
-export const ARC_TOP = 0.66;
+export const ARC_TOP = 0.76;
 /**
- * The arc clip `t` s in: which arm paints (true: the left one) the band `band`, how far the arm has come out to
- * the band's end (`reach`), how far round the brush has painted (`along`), and how far it has dropped back after.
+ * The arc clip `t` s in: which arm paints (true: the left one) the band `band`, how deep it dips into the bucket first
+ * (`dip`), how far it has come out to the band's end (`reach`), how far round the brush has painted (`along`), and how
+ * far it has dropped back after (`down`).
  */
 export function arcDraw(t: number) {
   const k = phase(t, ARC_PERIOD);
   const left = k < 0.5;
   const half = left ? k * 2 : k * 2 - 1;
   const band = Math.min(ARC.bands - 1, Math.max(0, Math.floor(t / ARC_PERIOD)));
-  // Out to the band's end, slowly round and up, a moment at the top, and back down quickly.
+  // Down into the bucket and a moment there, out to the band's end, slowly round and up, a moment at the top, and
+  // back down.
   return {
     left,
     band,
-    reach: smooth(clamp01((half - 0.02) / 0.1)),
-    along: smooth(clamp01((half - 0.12) / (ARC_TOP - 0.12))),
-    down: smooth(clamp01((half - 0.74) / 0.22)),
+    dip: hold(half, 0, ARC_DIP - 0.02, ARC_DIP + 0.06, 0.34),
+    reach: smooth(clamp01((half - 0.28) / 0.1)),
+    along: smooth(clamp01((half - 0.38) / (ARC_TOP - 0.38))),
+    down: smooth(clamp01((half - 0.82) / 0.15)),
   };
 }
 /** How far the body leans (to the fox's left) while the arm on `side` (1 left, -1 right) paints at `angle`: out with the arm, then over to the other side. */

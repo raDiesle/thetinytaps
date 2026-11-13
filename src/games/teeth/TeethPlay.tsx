@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
@@ -25,6 +24,7 @@ import { sungLanguageFor } from "./sung";
 import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** The recorded voice of the prelude and the end (`bun run voice make`, src/content/recordedLines.ts). */
 const voice = recordedVoice(voiceFiles);
@@ -310,7 +310,6 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const [tickled, setTickled] = useState<number | null>(null);
   const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
-  const { effects, celebrate } = useTapFeedback();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
@@ -355,6 +354,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const cue = before ? preludeCue(before) : step && stepText(step, "cue", language);
   /** In the last seconds before the brushing: 3, 2, 1. */
   const count = brushed < 0 && -brushed <= COUNTDOWN * 1000 ? Math.ceil(-brushed / 1000) : null;
+  // The part on screen in the address (`?seite=sweets`, `lower-top`, `ende`), so the time-on-page event tells where brushing was left.
+  useStepAddress(before ?? step?.id ?? (done ? "ende" : undefined));
 
   /** Says a line from its recording: in the app language, or the German line where it has no translation. */
   const say = useCallback(({ text, english }: Spoken, queue = false) => voice.say(text, language.id, { queue, english }), [language.id]);
@@ -431,7 +432,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       if (settings.sounds) (phase === 0 ? playTusch : playChime)();
       if (!sung) say(stepText(STEPS[phase], "cue", language));
     } else {
-      // Done: a fanfare of notes and children cheering, and hearts, stars and notes rising slowly.
+      // Done: a fanfare of notes and children cheering; the medal and the grin say the rest, nothing rises.
       if (settings.sounds) {
         [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
         setTimeout(() => playRecorded("cheer", playTusch), 700);
@@ -444,7 +445,6 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       setWeek(next);
       // Opened by the Tagesplan's teeth card: that card is done, morning or evening.
       finishRoutineStep();
-      celebrate();
     }
     // Only when the part changes, not when a setting does.
   }, [part, round]);
@@ -489,7 +489,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   const again = useCallback(() => {
     const t = performance.now();
-    // „Nochmal“ turns the page: the new brushing waits for it to lie still, like the first one.
+    // „Von vorn“ or Space at the end: should a page still turn, the new brushing waits for it to lie still, like the first one.
     const moving = pageMoving();
     setHeld(moving);
     setClock({ banked: 0, since: moving ? null : t, until: song.ready ? undefined : waitAt(preludeOf(settings)) });
@@ -648,7 +648,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         ending === "rest" && (
           <div className="teeth-end">
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-            <GameEnd inline onAgain={again} />
+            <GameEnd inline menu />
           </div>
         )
       ) : (
@@ -798,8 +798,6 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
           </small>
         </button>
       )}
-
-      <FeedbackLayer effects={effects} />
     </div>
   );
 }

@@ -23,7 +23,7 @@
 .adventure-outline {
   position: absolute;
   right: max(2vw, env(safe-area-inset-right));
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(30px, 3.6vw, 44px));
+  bottom: calc(max(10px, env(safe-area-inset-bottom)) + var(--frame, 0px) + clamp(30px, 3.6vw, 44px));
   width: min(30vw, 34vh);
   aspect-ratio: 2 / 2.15;
   border-radius: 28px;
@@ -51,7 +51,8 @@
 /* The way through the story, one picture per movement: small, it is for grown-ups to jump. */
 .adventure-route {
   position: absolute;
-  bottom: max(6px, env(safe-area-inset-bottom));
+  /* Above the book's paper margin (`--frame`), which lies over the picture's edges. */
+  bottom: calc(max(6px, env(safe-area-inset-bottom)) + var(--frame, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
@@ -107,8 +108,55 @@
   }
 
   .adventure-outline {
-    bottom: max(10px, env(safe-area-inset-bottom));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + var(--frame, 0px));
   }
+}
+
+/* How far the story is, for grown-ups: a small bar (played filled, still to come empty) and the time left,
+   bottom left, clear of the route in the middle and the dancer on the right. No backdrop blur: over the 3D picture it
+   would be drawn again in every frame. Played left to right like a clock in every language. */
+.adventure-time {
+  position: absolute;
+  bottom: calc(max(8px, env(safe-area-inset-bottom)) + var(--frame, 0px));
+  left: calc(max(12px, env(safe-area-inset-left)) + var(--frame, 0px));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 70%);
+  color: #23395d;
+  font-size: clamp(11px, 1.15vw, 14px);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  direction: ltr;
+  pointer-events: none;
+}
+
+.adventure-time[hidden] {
+  display: none;
+}
+
+.adventure-time-bar {
+  width: clamp(64px, 11vw, 150px);
+  height: clamp(5px, 0.6vw, 7px);
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(35 57 93 / 18%);
+}
+
+.adventure-time-played {
+  height: 100%;
+  border-radius: inherit;
+  background: #e8742c;
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+.adventure-time-left {
+  min-width: 3.4em;
 }
 
 /* For grown-ups: back, pause and forward, small and out of the way. */

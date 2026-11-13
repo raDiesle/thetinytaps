@@ -29,7 +29,7 @@ import {
 } from "./farm";
 import { VIEW_H, type LevelProps, wobble } from "./level";
 import { along, easeOut, seg } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { BAR_COLORS } from "./parts";
 import { INK, Sparkles } from "./scenery";
 
@@ -58,7 +58,7 @@ export function FarmLevel(props: LevelProps) {
   const still = (t: number) => Math.min(t, farm.tDone);
 
   return (
-    <MachineStage machine={farm} level="farm" {...props}>
+    <MachineStage machine={farm} level="farm" start={{ x: POST.x + 10, y: POST.top - 80, r: 92 }} {...props}>
       {(t) => (
         <>
           <Yard />
@@ -87,7 +87,6 @@ export function FarmLevel(props: LevelProps) {
           <MooRings farm={farm} t={t} />
           <ChoirNotes farm={farm} t={t} />
           <Sparkles x={BARN_MID} y={BARN.peak - 40} age={t - farm.tChoir - 0.8} n={12} spread={340} />
-          <TapHint t={t} x={POST.x + 120} y={POST.top + 150} />
         </>
       )}
     </MachineStage>

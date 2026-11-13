@@ -1,7 +1,7 @@
 import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import { clamp01, lerp, svgLine } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import { BAR_COLORS, STAR_POINTS } from "./parts";
 import { INK, Picture, Sparkles, WallClock, Window } from "./scenery";
 import type { Pt } from "./path";
@@ -63,7 +63,7 @@ export function TidyLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={tidy} level="tidy" {...props}>
+    <MachineStage machine={tidy} level="tidy" start={{ x: HORSE.x + 10, y: FLOOR - 170, r: 150, side: "left" }} {...props}>
       {(t) => (
         <>
           <Room paper={`${ids}-paper`} />
@@ -116,7 +116,6 @@ export function TidyLevel(props: LevelProps) {
           <Sparkles x={PILLOW.x - 120} y={BED.top - 70} age={t - tidy.tGlitter - 0.25} n={10} spread={240} />
           <Sparkles x={(CUSHION.x0 + CUSHION.x1) / 2} y={FLOOR - 140} age={t - tidy.tGlitter - 0.5} n={8} spread={180} />
           {/* Under the horse's belly, between its legs: the bottom edge of the picture is cut off on a phone on its side. */}
-          <TapHint t={t} x={HORSE.x} y={FLOOR - 34} />
         </>
       )}
     </MachineStage>

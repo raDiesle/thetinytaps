@@ -20,7 +20,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Toddler Games & Everyday Helpers – Free, No Ads",
       description:
         "Learning games and everyday helpers for toddlers: look-and-find pictures, feelings, letters, a visual timer, tooth brushing, potty, reward chart, weaning.",
-      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognizing. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print – and read-aloud stories in chapters for weaning and for saying goodbye to the pacifier with the pacifier fairy.",
+      text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognizing. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print – and read-aloud stories in chapters for weaning, for saying goodbye to the pacifier with the pacifier fairy and for starting daycare. Whoever plays a game or a story to its end gets a little trophy of its own for it, and all the trophies gather at the bottom of the shelf beside the books.",
     },
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
@@ -60,7 +60,7 @@ export const SEO_EN: SeoTranslation = {
     "/gefuehle/": {
       title: "Feelings for Toddlers – Everyday Situations",
       description: "Angry, sad, scared, happy: the little bear meets everyday situations at home and at daycare, and the child picks what helps. No ads.",
-      text: "Little stories of the bear, told as days from morning to night: he is angry, sad, scared or happy, and the child picks between two ideas what helps. The scenes also come sorted by feeling. If you would rather tell the story yourself, one tap turns the voice off and opens the whole text to read aloud. For talking about feelings with toddlers.",
+      text: "Little stories of the bear, told as days from morning to night: he is angry, sad, scared or happy, and the child picks between two ideas what helps. The scenes also come sorted by feeling. The whole text stands under the pictures: if you would rather tell the story yourself or read it aloud, one tap turns the voice off. For talking about feelings with toddlers.",
     },
     "/wie-gehts-dir/": {
       title: "How Are You? Showing Feelings for Toddlers",
@@ -75,7 +75,7 @@ export const SEO_EN: SeoTranslation = {
     "/kettenreaktion/": {
       title: "Chain Reaction and Marble Run for Kids",
       description: "A marble rolls off and sets a machine going: marble runs and chain reactions to tap and marvel at, for toddlers, without ads.",
-      text: "Twenty runs and machines: marbles roll over wood, snow, water slides and conveyor belts, dominoes and everyday things topple, one thing pushes the next. One tap starts the chain reaction, and at one point the machine waits until the child lets it run on with a tap – to marvel at and play again.",
+      text: "Twenty-one runs and machines: marbles roll over wood, snow, water slides and conveyor belts, dominoes and everyday things topple, one thing pushes the next. On the colour run the child picks red, yellow or blue for each marble, and at the bottom it drops into the tube of its colour and is counted. One tap starts the chain reaction, and at one point the machine waits until the child lets it run on with a tap – to marvel at and play again.",
     },
     "/kleine-abenteuer/": {
       title: "Little Adventures – Picture Stories for Toddlers",
@@ -87,7 +87,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Feed the Animals – Animal Game for Toddlers",
       description:
         "What goes with the animal? What does it eat, what does it give us, where does it live, what does the caterpillar become? With animal sounds, no ads.",
-      text: "The rabbit wants a carrot, the elephant peanuts, the cow gives us milk, the beaver looks for its lodge, the caterpillar becomes a butterfly and the seed a sunflower: tap the food, the milk, the egg or the home, and the animal is happy and makes its sound. Many animals from the farm, the forest, the zoo and the sea. The game gets easier or harder by itself.",
+      text: "The rabbit wants a carrot, the elephant peanuts, the cow gives us milk, the beaver looks for its lodge, the caterpillar becomes a butterfly and the seed a sunflower: tap the food, the milk, the egg or the home, and the animal is happy and makes its sound. Many animals from the farm, the forest, the zoo and the sea. And behind a little curtain something moos, barks or roars: who was it? The game gets easier or harder by itself.",
     },
     "/zusammen/": {
       title: "What Goes Together? – Matching Game for Toddlers",
@@ -129,6 +129,11 @@ export const SEO_EN: SeoTranslation = {
         "Type first words letter by letter: bear, ball, colors and action words. Or “Where is the B?” – find the key for a letter. For toddlers, without ads.",
       text: "A picture and its word: the child types it letter by letter on the keyboard or the screen. Picture words, colors, action words or all mixed, in three lengths. Or just the first letter: “Where is the B?” – find its key.",
     },
+    "/gross-klein/": {
+      title: "Where Is Little b? – Capital and Small Letters",
+      description: "A big letter with eyes looks for its little one: three small letters to choose from, and the right one walks over and holds its hand.",
+      text: "A letter game about capital and small letters: a big letter with eyes looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and they hold hands; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p.",
+    },
     "/zaehne/": {
       title: "Tooth Brushing for Kids – Song and Timer",
       description:
@@ -149,7 +154,7 @@ export const SEO_EN: SeoTranslation = {
     "/timer/": {
       title: "Visual Timer for Kids – Red Disc and Hourglass",
       description: "A timer without numbers for toddlers: the red disc shrinks, sand runs, candles burn, a train rolls to the station. 10 seconds to 3 hours.",
-      text: "A visual timer for children who can’t read a clock yet – one of our everyday helpers. A grown-up sets 10 or 30 seconds or 1 to 10 minutes, any other time up to three hours or a clock time to end at, and the child watches the time go by: the red disc children know from daycare gets smaller, sand runs through a big hourglass, candles burn down, an apple tree grows, blossoms and bears apples, a pizza is eaten slice by slice, a children’s alarm clock counts down, a train rolls to the station, a caterpillar eats its leaf, a flower grows and blooms, or the sun rises. When the child taps the picture, what is left lights up for a moment, and small in the corner the time left stands for us grown-ups. For taking turns between siblings, the hourglass stands between two cushions: a lamp shows whose turn it is, the toy lies there until the sand is through, then it hops over and the hourglass turns itself over. At the end a cheer and a happy tune sound. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
+      text: "A visual timer for children who can’t read a clock yet – one of our everyday helpers. A grown-up sets 10 or 30 seconds or 1 to 10 minutes, any other time up to three hours or a clock time to end at, and the child watches the time go by: the red disc children know from daycare gets smaller, sand runs through a big hourglass, candles burn down, an apple tree grows, blossoms and bears apples, a pizza is eaten slice by slice, a children’s alarm clock counts down, a train rolls to the station, a caterpillar eats its leaf, a flower grows and blooms, or the sun rises. When the child taps the picture, what is left lights up for a moment, and small in the corner the time left stands for us grown-ups. For taking turns between siblings, the hourglass stands between two cushions: a lamp shows whose turn it is, the toy lies there until the sand is through, then it hops over and the hourglass turns itself over. Or two children play tennis: the ball lies on the racket of whoever’s turn it is, that half of the court is in the light, and at the change the ball flies slowly over the net. At the end a cheer and a happy tune sound. For “five more minutes of play”, waiting for dinner or tidying up; the screen stays on meanwhile, and the timer still runs when play time is over.",
     },
     "/tagesplan/": {
       title: "Visual Schedule for Toddlers – Day and Week",
@@ -167,6 +172,11 @@ export const SEO_EN: SeoTranslation = {
       title: "Pacifier Fairy – A Story for Giving Up the Pacifier",
       description: "A read-aloud story in chapters: Tapsi the fox gathers three pacifiers, and at night the pacifier fairy swaps them for a present.",
       text: "A story to read aloud, chapter by chapter, when the pacifier is to go. Tapsi the fox has three pacifiers, a red, a blue and a yellow one, and with a pacifier in the mouth mom only hears “mmm-mmm”. Mom and dad tell of the pacifier fairy, who takes pacifiers to the little babies. First the pacifier stays in bed and is only for falling asleep. Then Tapsi says the fairy may come, dad sticks three stars on the window, and every morning Tapsi takes one down. On the big day Tapsi gathers all the pacifiers into a box, kisses each goodbye and puts them on the windowsill with a drawing. The first night is hard, Tapsi cries, and mom and dad stay close, comfort and sing. At night the fairy flies in, takes the box and leaves a present: a cuddly bunny that now helps with falling asleep. Tapsi may miss the pacifier and be sad, and mom and dad love Tapsi, with a pacifier or without. The book opens on its table of contents, the sentence to read aloud stands below every picture, and every tap turns the page.",
+    },
+    "/kita/": {
+      title: "Starting Daycare – A Story for Settling In and Goodbyes",
+      description: "A read-aloud story in chapters for settling into daycare and the morning goodbye: Tapsi the fox starts daycare, and mom always comes back.",
+      text: "A story to read aloud, chapter by chapter, when daycare begins or the morning goodbye is hard. Mom and dad tell Tapsi the fox about daycare, dad and Tapsi look at it from outside, and together they pack the backpack with slippers and the cuddly bunny. In the first days mom stays at daycare, on a little chair, while Tapsi gets to know Mia, the teacher, and plays with Bruno. Then mom goes out for a short while for the first time and says beforehand that she will come back; Tapsi cries, Mia comforts, and mom is soon back. Mia helps at breakfast and blows on a sore knee, and every day mom stays away a little longer. One chapter is the goodbye ritual you can read every morning: the jacket on the hook with the star, one big squeeze, a kiss on the nose, “I’ll pick you up after nap time” and waving at the window – mom never sneaks away. Then Tapsi’s day with circle time, a block tower, the sandpit, lunch and nap time, and right after it mom stands in the door. The book opens on its table of contents, the sentence to read aloud stands below every picture, and every tap turns the page. Following the Berlin settling-in model.",
     },
     "/abstillen/": {
       title: "Weaning Story for Toddlers – Tapsi's Milk Chain",

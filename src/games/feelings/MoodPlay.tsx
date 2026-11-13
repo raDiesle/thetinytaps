@@ -24,6 +24,7 @@ import { MoodGroups, usePickKeys } from "./moodGroups";
 import { NEEDS_TITLE } from "./needs";
 import type { FeelingsSettings } from "./settings";
 import { ChoiceCard, useVoice } from "./shared";
+import { useStepAddress } from "@/lib/stepAddress";
 
 /** A feeling's card: the little bear alone with it, in a moment that brings it (user feedback, November 2026). */
 const cardImage = (mood: Mood) => moodImages.feeling(mood.id);
@@ -37,6 +38,8 @@ const cardImage = (mood: Mood) => moodImages.feeling(mood.id);
  */
 export function MoodPlay({ settings, onNeeds }: { settings: FeelingsSettings; onNeeds: () => void }) {
   const [mood, setMood] = useState<Mood>();
+  // The feeling picked in the address (`?seite=happy`), none while the cards are shown.
+  useStepAddress(mood?.id);
   const { say, preload } = useVoice(settings);
   const t = useT();
   // In the evening, the feeling picked this morning (C-33), read once.

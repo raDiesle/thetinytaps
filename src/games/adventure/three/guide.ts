@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import { Contour, CONTOUR_PARTS, GLOW_LAYER, type ContourPart } from "./contour";
 import { skinRigid } from "./skin";
 import { mergeParts } from "./props";
@@ -20,6 +21,13 @@ export interface ArmPose {
   elbow: number;
   /** Turn of the upper arm around itself: which way the elbow folds. */
   twist: number;
+  /**
+   * How open the paw is (0..1), for catching, throwing, tapping or pushing something up: 0 (or left out) turns
+   * the forearm the natural way – the palm towards the body while the arm hangs, down while it reaches out,
+   * forwards while it is up – and 1 turns the palm to the inside of the elbow's bend (up while the forearm
+   * points ahead), the way a paw holds something out.
+   */
+  palm?: number;
 }
 
 export interface LegPose {
@@ -79,6 +87,7 @@ export const lerpArm = (a: ArmPose, b: ArmPose, k: number): ArmPose => ({
   spread: lerp(a.spread, b.spread, k),
   elbow: lerp(a.elbow, b.elbow, k),
   twist: lerp(a.twist, b.twist, k),
+  palm: lerp(a.palm ?? 0, b.palm ?? 0, k),
 });
 /** Blends two leg poses. */
 export const lerpLeg = (a: LegPose, b: LegPose, k: number): LegPose => ({
@@ -106,6 +115,56 @@ export function lerpPose(a: Pose, b: Pose, k: number): Pose {
   };
 }
 
+const turnQ = new THREE.Quaternion();
+const partQ = new THREE.Quaternion();
+const turnEuler = new THREE.Euler();
+const along = new THREE.Vector3();
+const aim = new THREE.Vector3();
+const X_AXIS = new THREE.Vector3(1, 0, 0);
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const DOWN = new THREE.Vector3(0, -1, 0);
+const AHEAD = new THREE.Vector3(0, 0, 1);
+
+/**
+ * How far the forearm turns the paw round its own length (rad, the paw's turn about its y), so the palm faces
+ * where a real one would: towards the body while the arm hangs (the thumb ahead), down while the forearm
+ * reaches out ahead or to the side, and forwards while it is raised – never up all the time, which looked
+ * unnatural (user feedback, November 2026). `arm.palm` opens it the other way, for catching or throwing.
+ * The paw is built with its palm ahead and the thumb outside (turn 0); a real forearm turns it from there
+ * through the palm facing the body (π/2) to the palm facing back (π), and never further.
+ */
+export function forearmTurn(p: Pose, arm: ArmPose, side: 1 | -1) {
+  // The forearm in the space of the hips, set up as apply() poses it.
+  turnQ
+    .setFromEuler(turnEuler.set(p.bend, p.twist, -p.lean))
+    .multiply(partQ.setFromEuler(turnEuler.set(-arm.raise, 0, arm.spread * side)))
+    .multiply(partQ.setFromAxisAngle(Y_AXIS, arm.twist * side))
+    .multiply(partQ.setFromAxisAngle(X_AXIS, -arm.elbow));
+  along.set(0, -1, 0).applyQuaternion(turnQ);
+  // Down while the forearm points down or ahead, forwards as it rises above the shoulder.
+  aim
+    .copy(DOWN)
+    .lerp(AHEAD, THREE.MathUtils.smoothstep(along.y, 0.1, 0.7))
+    .normalize()
+    .applyQuaternion(turnQ.invert());
+  // How far that lies across the forearm: along it (a hanging arm), the palm stays towards the body.
+  const across = THREE.MathUtils.smoothstep(Math.hypot(aim.x, aim.z), 0.25, 0.75);
+  const wanted = -side * Math.atan2(aim.x, aim.z);
+  // From the palm facing the body, at most a quarter turn each way; a palm that would have to turn further
+  // turns back to it as smoothly, so the paw never snaps round.
+  let off = THREE.MathUtils.euclideanModulo(wanted - Math.PI / 2 + Math.PI, Math.PI * 2) - Math.PI;
+  if (Math.abs(off) > Math.PI / 2) off = Math.sign(off) * (Math.PI - Math.abs(off));
+  const turn = (Math.PI / 2 + off * across) * (1 - (arm.palm ?? 0));
+  return -side * turn;
+}
+
+/** How high a leg posed `l` reaches from the foot's sole to the hip. */
+const legHeight = (l: LegPose) => THIGH * Math.cos(l.lift) * Math.cos(l.spread) + SHIN * Math.cos(l.lift - l.knee);
+/** How high the hips stand above the root in `p` (the fox's own units), without breathing. */
+export function hipsHeight(p: Pose) {
+  return Math.max(legHeight(p.legL), legHeight(p.legR)) + FOOT + p.toes * 0.05 + p.lift;
+}
+
 /** The fox is built in the units below and shown this much bigger; the story scales what it measured on the fox with it. */
 export const GUIDE_SIZE = 1.15;
 /** How solid the body and head stay where they hide an arm or a leg. */
@@ -114,11 +173,14 @@ const SEE_THROUGH = 0.4;
 const THIGH = 0.24;
 const SHIN = 0.24;
 const FOOT = 0.07;
-/** Length of the upper arm and of the forearm down to the wrist, in the fox's own units. */
-export const UPPER_ARM = 0.21;
-export const FOREARM = 0.19;
-/** Where the left shoulder sits on the spine (x to the fox's left); the right one is mirrored. */
-export const SHOULDER = { x: 0.2, y: 0.36 };
+// Arms long enough to reach well over the head when raised, as a child's do, and no further than the lower thigh
+// when they hang (user feedback, November 2026: raised, they ended below the ears). The shoulders sit high on the
+// chest for it, so the arms need not be longer than the short legs allow.
+export const UPPER_ARM = 0.26;
+export const FOREARM = 0.24;
+const SHOULDER_Y = 0.43;
+/** Where the shoulder joints sit in the spine's space (x to each side). */
+export const SHOULDER = { x: 0.2, y: SHOULDER_Y };
 /** Where a paw holds a bar (hand space): in front of the palm, resting on the curled fingers. */
 const GRIP = new THREE.Vector3(0, -0.045, 0.04);
 /** How far the fingers curl round a bar they hold (rad). */
@@ -171,6 +233,72 @@ function limb(length: number, top: number, bottom: number, material: THREE.Mater
   return mesh(new THREE.LatheGeometry(points, 18), material);
 }
 
+/** How deep the torso is from front to back, against its width: a child's is flatter than round. */
+const TORSO_DEPTH = 0.84;
+/** How big the head is drawn (the face's own units were made for a bigger one). */
+const HEAD_SCALE = 0.74;
+
+/** A soft bump round `at`, `width` wide, 1 at its top. */
+const bump = (y: number, at: number, width: number) => Math.exp(-(((y - at) / width) ** 2));
+
+/**
+ * The torso from the crotch up through the neck into the head, its half width at each height (in the spine's
+ * space): round under the hips, the hips the thighs grow out of, a soft waist, a chest widening into shoulders
+ * that reach over the shoulder joints (SHOULDER_Y), sloping down into the neck. Turned round its middle, flatter
+ * front to back (`TORSO_DEPTH`), with a child's round tummy in front and its bottom behind. Coloured by its
+ * vertices: the fox's cream runs from the throat down the chest to the tummy and fades softly into the fur,
+ * instead of a patch laid on it.
+ */
+function torsoGeometry() {
+  const outline = new THREE.SplineCurve(
+    [
+      [0, -0.078],
+      [0.06, -0.07],
+      [0.108, -0.047],
+      [0.138, -0.008],
+      [0.147, 0.045],
+      [0.139, 0.11],
+      [0.128, 0.17],
+      [0.134, 0.235],
+      [0.149, 0.305],
+      [0.16, 0.375],
+      [0.162, 0.425],
+      [0.146, 0.463],
+      [0.1, 0.488],
+      [0.064, 0.51],
+      [0.058, 0.55],
+      [0.056, 0.6],
+      [0, 0.62],
+    ].map(([x, y]) => new THREE.Vector2(x, y)),
+  );
+  // Its seam at the back, and welded there, so no crease shows down the middle.
+  const lathe = new THREE.LatheGeometry(outline.getPoints(56), 36, Math.PI);
+  lathe.deleteAttribute("uv");
+  lathe.deleteAttribute("normal");
+  const geometry = mergeVertices(lathe, 1e-5);
+  lathe.dispose();
+  const pos = geometry.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
+  const furColor = new THREE.Color(FUR);
+  const creamColor = new THREE.Color(CREAM);
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
+    const out = z > 0 ? 1 + 0.2 * bump(y, 0.12, 0.1) : 1 + 0.3 * bump(y, 0.01, 0.07) + 0.06 * bump(y, 0.36, 0.08);
+    pos.setZ(i, z * TORSO_DEPTH * out);
+    // How far round from the front, and how far round the cream reaches at this height.
+    const round = Math.abs(Math.atan2(x, z));
+    const reach = 0.55 + 0.25 * bump(y, 0.18, 0.14) - 0.08 * bump(y, 0.42, 0.05);
+    const cream = (1 - THREE.MathUtils.smoothstep(round, reach - 0.12, reach + 0.12)) * THREE.MathUtils.smoothstep(y, -0.02, 0.05);
+    c.copy(furColor)
+      .lerp(creamColor, cream)
+      .toArray(colors, i * 3);
+  }
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 /** A value that follows its target as if on a spring: it lags behind, overshoots a little and settles. */
 class Spring {
   value = 0;
@@ -213,14 +341,6 @@ interface Leg {
   foot: THREE.Group;
   /** The toes, bending at the ball of the foot. */
   toes: THREE.Group;
-}
-
-/** How high a leg reaches from the hip down to the ankle. */
-const legHeight = (l: LegPose) => THIGH * Math.cos(l.lift) * Math.cos(l.spread) + SHIN * Math.cos(l.lift - l.knee);
-
-/** How high the hips stand above the root in `p` (the fox's own units), without breathing. */
-export function hipsHeight(p: Pose) {
-  return Math.max(legHeight(p.legL), legHeight(p.legR)) + FOOT + p.toes * 0.05 + p.lift;
 }
 
 export class Guide {
@@ -287,25 +407,20 @@ export class Guide {
     this.root.add(this.hips);
     this.hips.add(this.spine);
 
-    // Body: slim, a chest and a smaller belly, so the arms and legs stand clear of it.
-    const chest = mesh(new THREE.SphereGeometry(0.16, 32, 24), furMat);
-    chest.scale.set(1.1, 1.15, 0.78);
-    chest.position.y = 0.31;
-    this.spine.add(chest);
-    const pelvis = mesh(new THREE.SphereGeometry(0.15, 28, 20), furMat);
-    pelvis.scale.set(0.95, 1.1, 0.8);
-    pelvis.position.y = 0.08;
-    this.spine.add(pelvis);
-    const belly = mesh(new THREE.SphereGeometry(0.11, 24, 18), creamMat, false);
-    belly.scale.set(0.95, 1.6, 0.5);
-    belly.position.set(0, 0.2, 0.075);
-    this.spine.add(belly);
+    // Body: one torso shaped like a child's, slim enough that the arms and legs stand clear of it – shoulders
+    // that carry the arms, a soft waist, hips the thighs grow out of – and a short neck under the head. Two
+    // balls for chest and pelvis looked like a snowman with a doll's ball joints (user feedback, November 2026).
+    const torsoMat = fur("#ffffff");
+    torsoMat.vertexColors = true;
+    torsoMat.sheenColor.copy(furMat.sheenColor);
+    this.spine.add(mesh(torsoGeometry(), torsoMat));
 
-    // Head: round, with muzzle, nose, eyes, ears and bandana; kept small, so it hides little of the arms.
-    this.head.position.y = 0.5;
+    // Head: round, with muzzle, nose, eyes, ears and bandana; small for the body and on a neck, as a child's
+    // (about a quarter of its height, not a third), so it hides little of the arms.
+    this.head.position.y = 0.55;
     this.spine.add(this.head);
     const face = new THREE.Group();
-    face.scale.setScalar(0.8);
+    face.scale.setScalar(HEAD_SCALE);
     this.head.add(face);
     const skull = mesh(new THREE.SphereGeometry(0.27, 40, 30), furMat);
     skull.scale.set(1.08, 0.95, 0.95);
@@ -462,8 +577,12 @@ export class Guide {
       shoulder.position.set(SHOULDER.x * side, SHOULDER.y, 0);
       const upper = new THREE.Group();
       shoulder.add(upper);
-      const joint = mesh(new THREE.SphereGeometry(0.054, 20, 16), furMat);
-      upper.add(joint);
+      // The shoulder's cap of muscle, running from the torso's shoulder down into the upper arm: a ball
+      // standing out round the joint looked like a doll's.
+      const deltoid = mesh(new THREE.SphereGeometry(0.056, 20, 16), furMat);
+      deltoid.scale.set(1, 1.3, 0.95);
+      deltoid.position.y = -0.03;
+      upper.add(deltoid);
       upper.add(limb(UPPER_ARM, 0.05, 0.039, furMat));
       const elbow = new THREE.Group();
       elbow.position.y = -UPPER_ARM;
@@ -472,6 +591,8 @@ export class Guide {
       // The forearm narrows to a slim wrist; the wrist is round, so the paw can bend at it.
       elbow.add(limb(FOREARM, 0.042, 0.028, darkMat, 0.1));
       hand.position.y = -FOREARM;
+      // The forearm's turn first, then the wrist bending in the palm's own directions.
+      hand.rotation.order = "YXZ";
       elbow.add(hand);
       hand.add(mesh(new THREE.SphereGeometry(0.029, 14, 10), darkMat));
       const palm = mesh(new THREE.SphereGeometry(0.048, 20, 16), pawMat);
@@ -511,9 +632,11 @@ export class Guide {
         hand.add(knuckle);
         fingers.push(knuckle);
       }
+      // The thumb on the outer side of the palm, as on a real hand with the palm ahead: on the inner side
+      // the paw was a mirrored one. Which way the palm faces is the forearm's turn (`forearmTurn`).
       const thumb = new THREE.Group();
-      thumb.position.set(-0.04 * side, -0.033, 0.01);
-      thumb.rotation.set(-0.35, 0, -0.95 * side);
+      thumb.position.set(0.04 * side, -0.033, 0.01);
+      thumb.rotation.set(-0.35, 0, 0.95 * side);
       finger(thumb, 0.016, 0.012, 0.0135).rotation.x = -0.35;
       hand.add(thumb);
       this.spine.add(shoulder);
@@ -522,17 +645,22 @@ export class Guide {
     this.armL = makeArm(1, this.handL);
     this.armR = makeArm(-1, this.handR);
 
-    // Legs: slim, with a round knee, dark socks and light paws with four toes in front.
+    // Legs like a child's: thighs full at the hip, where they grow out of the torso, narrowing to a small
+    // knee; the calf round at the back of the shin, which narrows to a slim ankle; dark socks and light paws
+    // with four toes in front.
     const makeLeg = (side: 1 | -1): Leg => {
       const hip = new THREE.Group();
       hip.position.set(0.11 * side, 0.02, 0);
-      hip.add(limb(THIGH, 0.062, 0.045, furMat));
+      hip.add(limb(THIGH, 0.074, 0.046, furMat, 0.08));
       const knee = new THREE.Group();
       knee.position.y = -THIGH;
       hip.add(knee);
-      knee.add(mesh(new THREE.SphereGeometry(0.05, 16, 12), furMat));
-      // The calf is fullest high up and the shin narrows to a slim ankle.
-      knee.add(limb(SHIN, 0.048, 0.03, darkMat, 0.16));
+      knee.add(mesh(new THREE.SphereGeometry(0.047, 16, 12), furMat));
+      knee.add(limb(SHIN, 0.046, 0.03, darkMat, 0.08));
+      const calf = mesh(new THREE.SphereGeometry(0.042, 16, 12), darkMat);
+      calf.scale.set(0.95, 1.75, 0.9);
+      calf.position.set(0, -0.075, -0.016);
+      knee.add(calf);
       const foot = new THREE.Group();
       foot.position.y = -SHIN;
       knee.add(foot);
@@ -704,6 +832,7 @@ export class Guide {
 
   /** Puts the fox into `pose`; `time` (s) drives blinking, breathing and the tail. */
   apply(p: Pose, time: number) {
+    const stand = Math.max(legHeight(p.legL), legHeight(p.legR));
     const breathe = Math.sin(time * 2.2) * 0.006;
     const height = hipsHeight(p) + breathe;
     this.hips.position.set(p.shift, height, 0);
@@ -722,7 +851,6 @@ export class Guide {
     const step = live ? dt : 0;
 
     // Standing on one leg, the upper body leans a little over the other; the head stays more upright than the body.
-    const stand = Math.max(legHeight(p.legL), legHeight(p.legR));
     const lifted = (l: LegPose) => stand - legHeight(l);
     this.spine.rotation.set(p.bend, p.twist, -p.lean + THREE.MathUtils.clamp((lifted(p.legL) - lifted(p.legR)) * 0.4, -0.1, 0.1));
     this.head.rotation.set(p.headPitch, p.headYaw - p.twist * 0.2, -p.headTilt + p.lean * 0.3);
@@ -735,7 +863,7 @@ export class Guide {
       // The paw hangs a little bent at the wrist and trails behind when the arm swings fast.
       const flop = wrist[0].step(rate(pose.raise, before?.raise, 6) * 0.06 + rate(pose.elbow, before?.elbow, 6) * 0.04, step);
       const sway = wrist[1].step(-rate(pose.spread, before?.spread, 6) * 0.06 * side, step);
-      a.hand.rotation.set(-0.14 + THREE.MathUtils.clamp(flop, -0.5, 0.5), 0, THREE.MathUtils.clamp(sway, -0.4, 0.4));
+      a.hand.rotation.set(-0.14 + THREE.MathUtils.clamp(flop, -0.5, 0.5), forearmTurn(p, pose, side), THREE.MathUtils.clamp(sway, -0.4, 0.4));
       // Fingers close together and curl softly while the arm hangs, and stretch and spread once it
       // reaches out or up; the little finger curls most.
       const open = THREE.MathUtils.smoothstep(pose.raise + pose.spread, 0.5, 1.8);
@@ -875,6 +1003,7 @@ export class Guide {
     a.upper.quaternion.identity();
     a.elbow.rotation.x += (-bend - a.elbow.rotation.x) * weight;
     a.hand.rotation.x *= 1 - weight;
+    a.hand.rotation.y *= 1 - weight;
     a.hand.rotation.z *= 1 - weight;
     a.fingers.forEach((finger, i) => {
       finger.rotation.x += (-GRIP_CURL * 0.6 - finger.rotation.x) * weight;

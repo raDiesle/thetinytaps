@@ -101,7 +101,7 @@ export const PAINTED: PaintedPair[] = [
     after:
       "A shiny black grand piano now stands in front of the stool, its lid propped open; the musician, still on the stool, plays its black and white keys, smiling. The bear child bobs along happily.",
     sounds: ["plink", "melody"],
-    made: "part",
+    made: true,
   },
   {
     id: "akkordeonspieler",

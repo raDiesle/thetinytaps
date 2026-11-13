@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GameShell } from "@/components/GameShell";
+import { GameShell, useLevelOnScreen } from "@/components/GameShell";
 import { useGameSettings } from "@/lib/common";
 import { useAppLanguage, useT } from "@/lib/language";
 import { ElevatorPlay } from "./ElevatorPlay";
@@ -67,6 +67,8 @@ export function ElevatorGame() {
 function Stories({ settings }: { settings: ElevatorSettings }) {
   const language = useAppLanguage();
   const [run, setRun] = useState({ story: settings.story, n: 0 });
+  // „Weiter“ plays the next story without changing the card picked: the address names the one on screen.
+  useLevelOnScreen(run.story);
   const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));
   const level = TRAIL_LEVELS.find((l) => l.id === run.story);
   const film = FILMS.find((f) => f.id === run.story);

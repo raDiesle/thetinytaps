@@ -90,7 +90,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["twinkle", "chime"],
     // A magician and a witch may have a wand too; the princess's coach stands in the second picture.
     alsoFits: ["zauberkuenstler", "hexe", "prinzessin"],
-    made: "frames",
+    made: true,
   },
   {
     id: "zauberkuenstler",
@@ -308,6 +308,6 @@ export const PAINTED: PaintedPair[] = [
     // Swimming goggles let one look under water too.
     alsoFits: ["schwimmer"],
     fromFirst: true,
-    made: "frames",
+    made: true,
   },
 ];

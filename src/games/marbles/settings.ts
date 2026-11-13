@@ -1,6 +1,7 @@
 /** One level of the game. */
 export type MarbleLevel =
   | "track"
+  | "colortrack"
   | "snowtrack"
   | "spacetrack"
   | "slidetrack"

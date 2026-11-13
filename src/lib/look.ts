@@ -5,6 +5,7 @@ import { pagesBetween } from "@/content/games";
 import { putBookBack } from "@/lib/bookTravel";
 import { goBack } from "@/lib/goBack";
 import { pageMoves } from "@/lib/pageMotion";
+import { picturesReady } from "@/lib/picturesReady";
 import { holdPreloads } from "@/lib/preloadPages";
 import { playPageTurn } from "@/lib/sfx";
 
@@ -73,9 +74,11 @@ export function turnPageWith(direction: TurnDirection, update: () => void, pages
     for (const sheet of sheets) on ? document.body.append(sheet) : sheet.remove();
   };
   show(direction === "back");
-  const transition = document.startViewTransition(() => {
+  const transition = document.startViewTransition(async () => {
     flushSync(update);
     show(direction === "forward");
+    // The new page is taken for the turn with its pictures decoded, so none comes in while it turns.
+    await picturesReady();
   });
   // A skipped turn (a hidden page, a second tap mid-turn) still makes the change; it only needs no error report.
   transition.ready.catch(() => {});

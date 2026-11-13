@@ -338,7 +338,7 @@ export function makeWorld(scene: THREE.Scene) {
   });
 
   /** Where the paws are at the top of a reach (measured on the clip), from Tapsi: x to Tapsi's left. */
-  const REACH_TOP = v3(0.25, 1.6, 0.05).multiplyScalar(GUIDE_SIZE);
+  const REACH_TOP = v3(0.25, 1.77, 0.12).multiplyScalar(GUIDE_SIZE);
   /** The apples hang from a bough this high over Tapsi's feet, a little above the highest the paws reach. */
   const APPLE_BOUGH = REACH_TOP.y + 0.45;
   const appleTree = makeAppleTree(APPLE_BOUGH);

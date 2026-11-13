@@ -133,7 +133,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const [effects, setEffects] = useState<SpotEffect[]>([]);
   /** Colour mode: the space bar is held, so its cap on the screen goes down too. */
   const [spaceDown, setSpaceDown] = useState(false);
-  const { effects: feedback, ripple, glow, celebrate } = useTapFeedback();
+  const { effects: feedback, ripple, glow } = useTapFeedback();
   const location = useLocation();
   const navigate = useNavigate();
   const roadsOn = settings.mode === "explore";
@@ -335,13 +335,12 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setFocus(item);
   }, []);
 
-  /** Everything was discovered: all items dance at once, with hearts, stars and notes rising slowly. */
+  /** Everything was discovered: all items dance at once; then the end's buttons come with the picture's trophy. */
   const party = () => {
     setPartying(true);
     if (soundsOn) playMelody();
     say(colouring ? words.allColoured : words.allFound);
     items.forEach((item, i) => later(() => animate(item, true), i * 40));
-    celebrate();
     later(() => setPartying(false), PARTY_MS);
   };
 
@@ -927,7 +926,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       )}
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
       {!questMode && allDiscovered && (
-        <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }} />
+        <GameEnd delayMs={END_BUTTONS_MS} level={scene.id} onAgain={startOver} next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }} />
       )}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
       {colouring && keysOn && !allDiscovered && (

@@ -54,6 +54,7 @@ export const PAINTED: PaintedPair[] = [
     sounds: ["launch"],
     alsoFits: ["sternguckerin"],
     fromFirst: true,
+    made: true,
   },
   {
     id: "fensterputzer",

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { PICTURE_QUEUE, type QueuedPicture } from "./pictureQueue";
-import { BOOK_STYLE, CUTOUT_STYLE, jobOf, PICTURE_1K, planQueue } from "./pictureQueuePlan";
+import { BOOK_STYLE, CUTOUT_STYLE, ENGINES, jobOf, PICTURE_1K, planQueue } from "./pictureQueuePlan";
 
 const picture = (id: string, more: Partial<QueuedPicture> = {}): QueuedPicture => ({
   id,
@@ -52,14 +52,28 @@ describe("queue plan", () => {
     expect(plan.waiting).toEqual([expect.objectContaining({ grid: "2x2", missing: 3 })]);
   });
 
-  test("a picture too big for a sheet, or one drawn alone, goes now", () => {
-    const big = picture("card", { aspect: "4:3", size: "1200x900", transparent: false });
+  test("only a picture drawn alone goes now on its own, with Lite", () => {
     const frame = picture("frame", { alone: "second frame" });
-    const plan = planQueue([big, frame]);
-    expect(plan.now.map((s) => [s.grid, s.pictures[0].id])).toEqual([
-      [undefined, "card"],
-      [undefined, "frame"],
-    ]);
+    const plan = planQueue([picture("card", { aspect: "4:3", size: "1200x900", transparent: false }), frame]);
+    expect(plan.now.map((s) => [s.grid, s.engine, s.pictures[0].id])).toEqual([[undefined, "lite", "frame"]]);
+    expect(jobOf(plan.now[0])).toEqual(expect.objectContaining({ model: ENGINES.lite.model }));
+    expect(jobOf(plan.now[0]).imageSize).toBeUndefined();
+  });
+
+  // A request costs the same with two or four pictures: small ones four to Lite's 1K sheet, big ones four to a 2K
+  // sheet of Nano Banana 2.1 (A-33: 0.0073 $ a picture instead of 0.017 $ alone).
+  test("big pictures and whole ones share a 2K sheet of Nano Banana 2.1", () => {
+    for (const more of [{ size: "1200x900" }, { size: undefined }]) {
+      const plan = planQueue(["a", "b", "c", "d"].map((id) => picture(id, { aspect: "4:3", transparent: false, ...more })));
+      expect(plan.now.map((s) => [s.grid, s.engine])).toEqual([["2x2", "sheet2k"]]);
+      expect(jobOf(plan.now[0])).toEqual(expect.objectContaining({ model: ENGINES.sheet2k.model, imageSize: "2K", thinking: "minimal" }));
+    }
+    expect(planQueue(["a", "b", "c", "d"].map((id) => picture(id))).now[0].engine).toBe("lite");
+  });
+
+  // User decision, November 2026: never a picture alone where a sheet works, always the cheapest way.
+  test("in the real queue only pictures that must be drawn alone take a request of their own", () => {
+    for (const sheet of planQueue(PICTURE_QUEUE).now) if (!sheet.grid) expect(sheet.pictures[0].alone, sheet.pictures[0].id).toBeDefined();
   });
 
   test("pictures that differ in style, size or references never share a sheet", () => {
@@ -83,7 +97,7 @@ describe("queue plan", () => {
   });
 
   test("a picture waits for its reference still in the queue", () => {
-    const first = picture("first", { transparent: false, size: undefined });
+    const first = picture("first", { transparent: false, size: undefined, alone: "story picture" });
     const plan = planQueue([first, picture("second", { ref: [first.file] })]);
     expect(plan.blocked.map((b) => b.picture.id)).toEqual(["second"]);
     expect(jobOf(plan.now[0]).prompt.startsWith(BOOK_STYLE)).toBe(true);
@@ -100,6 +114,11 @@ test("the skill's style block is the queue's", () => {
 // Every fox and bear wears clothes (user feedback, November 2026): both style blocks say so, so no picture forgets it.
 test("both style blocks dress the fox and the bear", () => {
   for (const style of [BOOK_STYLE, CUTOUT_STYLE]) expect(style).toContain("Every fox and bear wears clothes.");
+});
+
+// Calm pages came back with an angry-looking fox (user feedback, 12 November 2026: „diesen Fehler machst du öfter“).
+test("both style blocks ask for friendly faces", () => {
+  for (const style of [BOOK_STYLE, CUTOUT_STYLE]) expect(style).toContain("never frowning or with angry brows unless the picture asks for that feeling");
 });
 
 // The user only wants to know how many pictures wait, never to read and approve prompts there (November 2026).

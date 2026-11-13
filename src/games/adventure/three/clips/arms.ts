@@ -18,6 +18,7 @@ import {
   FLAP_PERIOD,
   hold,
   TAP_PERIOD,
+  tapReach,
   jump,
   KEY_PICKUP,
   keyTurn,
@@ -68,6 +69,8 @@ export const ARM_CLIPS = clips({
       a.raise = 1.2 + k * 1.3;
       a.spread = 0.15;
       a.elbow = 2.0 - k * 1.9;
+      // Palms up against what is pushed.
+      a.palm = 1;
     }
     p.toes = k * 0.6;
     p.headPitch = -0.35 * k;
@@ -104,6 +107,8 @@ export const ARM_CLIPS = clips({
       a.raise = 0.25 + down * 0.6 + up * 2.6;
       a.spread = 0.15 + up * 0.45;
       a.elbow = 0.3 + down * 0.3 - up * 0.2;
+      // The paws scoop palm up and keep it so as they fling the coins.
+      a.palm = Math.max(down, up);
     }
     p.headPitch = down * 0.4 - up * 0.35;
   },
@@ -265,13 +270,25 @@ export const ARM_CLIPS = clips({
   },
 
   tap_forward: (t, p) => {
-    const k = phase(t, TAP_PERIOD);
-    const tap = hold(k, 0.1, 0.25, 0.32, 0.5);
-    const hand = Math.floor(t / TAP_PERIOD) % 2 === 0 ? p.armL : p.armR;
-    hand.raise = 0.9 + tap * 0.65;
-    hand.spread = 0.1;
-    hand.elbow = 1.5 - tap * 1.45;
-    p.bend = tap * 0.1;
+    // Both paws wait half up in front of the body; in turn each reaches forwards and out to its own side, to the
+    // balloon floating in there, and comes back – flowing, never jumping from one paw to the other (user
+    // feedback, November 2026: the arms jerked up, and reaching straight ahead they hid the balloons).
+    const l = tapReach(t);
+    const r = tapReach(t - TAP_PERIOD);
+    for (const [arm, k] of [
+      [p.armL, l],
+      [p.armR, r],
+    ] as const) {
+      arm.raise = 0.75 + k * 0.85;
+      arm.spread = 0.25 + k * 0.5;
+      arm.elbow = 1.3 - k * 1.2;
+      // The paw opens towards the balloon it taps.
+      arm.palm = k;
+    }
+    // The body and the eyes go a little with the reaching paw (to the fox's left is positive).
+    p.lean = (l - r) * 0.06;
+    p.headYaw = (l - r) * 0.25;
+    p.bend = Math.max(l, r) * 0.08;
   },
 
   point: (t, p) => {
@@ -298,6 +315,8 @@ export const ARM_CLIPS = clips({
       a.raise = 1.3;
       a.spread = TOGETHER + 0.05 + k * 1.0;
       a.elbow = 0.5;
+      // Palm to palm.
+      a.palm = 0.5;
     }
     p.lift = (1 - k) * 0.01;
   },
@@ -321,6 +340,7 @@ export const ARM_CLIPS = clips({
     p.armR.raise = -0.6 * back + up * 1.9;
     p.armR.spread = 0.15;
     p.armR.elbow = 0.15;
+    p.armR.palm = 1;
     crouch(p, back * 0.25);
     p.bend += back * 0.15;
     p.toes = up * 0.4;
@@ -352,6 +372,7 @@ export const ARM_CLIPS = clips({
     p.armR.raise = 0.3 + out * 0.8;
     p.armR.spread = 0.1 + out * 1.1;
     p.armR.elbow = 1.7 - out * 1.6;
+    p.armR.palm = 1;
     p.armL.raise = 0.4;
     p.armL.elbow = 1.6;
     p.twist = -0.15 + out * 0.3;
@@ -363,6 +384,8 @@ export const ARM_CLIPS = clips({
       a.raise = 1.1;
       a.spread = 1.15 - k * 1.55;
       a.elbow = 0.3 + k * 1.5;
+      // Open paws to catch with.
+      a.palm = 1;
     }
     p.bend = k * 0.1 - (1 - k) * 0.05;
     p.lift = 0;
@@ -392,28 +415,24 @@ export const ARM_CLIPS = clips({
   },
 
   arc: (t, p) => {
-    // A rainbow painted with a long brush: the arm goes out to the band's end, then the brush's tip goes
-    // round the band up over the head, stays a moment and the arm drops back; the left arm first, then the
-    // right one. The body leans out with the arm and over to the other side at the top; the other arm
-    // holds its brush ready in front.
-    const { left, band, reach, along, down } = arcDraw(t);
+    // Bent forwards, the arm dips its long brush into the paint bucket in front of the feet; then it goes out to
+    // the band's end, the brush's tip goes round the band up over the head, stays a moment and the arm drops
+    // back; the left arm first, then the right one. The body leans out with the arm and over to the other side
+    // at the top.
+    const { left, band, dip, reach, along, down } = arcDraw(t);
     const side = left ? 1 : -1;
     const angle = arcAngle(along);
     const r = arcRadius(band);
     const lean = arcLean(side, angle);
-    const ready: ArmPose = { raise: 0.5, spread: 0.2, elbow: 1.1, twist: 0 };
+    const dipping: ArmPose = { raise: dip * 0.5, spread: 0.3 - dip * 0.5, elbow: 0.1 - dip * 0.1, twist: 0 };
     const stroke = brushArm(side, side * r * Math.cos(angle), ARC.y + r * Math.sin(angle), ARC.z, lean);
     const draw = reach * (1 - down);
-    if (left) {
-      p.armL = lerpArm(ready, stroke, draw);
-      p.armR = ready;
-    } else {
-      p.armR = lerpArm(ready, stroke, draw);
-      p.armL = ready;
-    }
+    if (left) p.armL = lerpArm(dipping, stroke, draw);
+    else p.armR = lerpArm(dipping, stroke, draw);
+    p.bend = dip * 0.8;
     p.lean = lean * draw;
     p.headTilt = -side * along * draw * 0.15;
-    p.headPitch = -along * draw * 0.35;
+    p.headPitch = -along * draw * 0.35 + dip * 0.25;
   },
 
   kite: (t, p) => {

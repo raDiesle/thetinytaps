@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { makeBush, mat, mergeParts, seeded, solid } from "../../three/props";
 import { ARC, arcAngle, arcRadius } from "../../three/clips";
-import { FOREARM } from "../../three/guide";
 import { groundHeight, PUFF_RADIUS, RAINBOW_COLORS, SUN_RADIUS, TAU, WOLLE_REST, WOLLE_TOP } from "./layout";
 
 // The props of „Die Wolkenreise“, modelled from simple shapes like the rest:
@@ -121,6 +120,66 @@ export function makeBalloon(color: string) {
   string.position.y = -BALLOON_RADIUS * 1.15 - 0.29;
   group.add(string);
   return group;
+}
+
+/**
+ * The paint bucket Tapsi dips its brushes into, standing on Wolle in front of the feet: a blue tin with a rim and a
+ * handle, `height` tall and `radius` wide, open at the top, with the paint just under the rim. Its paint shows the
+ * colour being painted (`paint.material.color`).
+ */
+export function makeBucket(height: number, radius: number) {
+  const group = new THREE.Group();
+  const tin = mat("#4f7fd6", 0.45, { metalness: 0.2, side: THREE.DoubleSide });
+  const side = solid(new THREE.CylinderGeometry(radius, radius * 0.85, height, 28, 1, true), tin);
+  side.position.y = height / 2;
+  group.add(side);
+  const bottom = solid(new THREE.CircleGeometry(radius * 0.85, 28), tin, false);
+  bottom.rotation.x = -Math.PI / 2;
+  bottom.position.y = 0.005;
+  group.add(bottom);
+  const metal = mat("#d5dde8", 0.35, { metalness: 0.5 });
+  const rim = solid(new THREE.TorusGeometry(radius, radius * 0.07, 8, 32), metal, false);
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = height;
+  group.add(rim);
+  const handle = solid(new THREE.TorusGeometry(radius * 0.95, radius * 0.04, 6, 24, Math.PI), metal, false);
+  handle.position.y = height;
+  handle.rotation.y = 0.5;
+  group.add(handle);
+  const paint = solid(new THREE.CircleGeometry(radius * 0.97, 28), mat("#ff4d4d", 0.3), false);
+  paint.rotation.x = -Math.PI / 2;
+  paint.position.y = height - radius * 0.25;
+  group.add(paint);
+  return { group: mergeParts(group, [paint]), paint: paint as THREE.Mesh<THREE.CircleGeometry, THREE.MeshStandardMaterial> };
+}
+
+/**
+ * How far a brush reaches from where the paw holds it (the wrist) to the tip of its bristles (in the fox's own units):
+ * as far past the wrist as the arc clip paints (`ARC.brush`).
+ */
+export const BRUSH_REACH = ARC.brush;
+
+/**
+ * A long paint brush: a wooden handle, a metal ferrule and soft bristles, laid along -y from where the paw holds it
+ * (the origin, the wrist; the handle runs a little on along the forearm through the fist), the bristles' tip
+ * `BRUSH_REACH` away. The bristles take the colour last dipped (`tip.material.color`).
+ */
+export function makeBrush() {
+  const group = new THREE.Group();
+  const bristleLength = 0.09;
+  const handleFrom = 0.05;
+  const handleTo = -(BRUSH_REACH - bristleLength + 0.01);
+  const handle = solid(new THREE.CylinderGeometry(0.013, 0.016, handleFrom - handleTo, 10), mat("#c98b4f", 0.6), false);
+  handle.position.y = (handleFrom + handleTo) / 2;
+  group.add(handle);
+  const ferrule = solid(new THREE.CylinderGeometry(0.021, 0.017, 0.05, 12), mat("#d5dde8", 0.3, { metalness: 0.6 }), false);
+  ferrule.position.y = -(BRUSH_REACH - bristleLength);
+  group.add(ferrule);
+  const bristles = new THREE.CylinderGeometry(0.023, 0.016, bristleLength, 12);
+  bristles.translate(0, -(BRUSH_REACH - bristleLength / 2), 0);
+  const tip = solid(bristles, mat("#ff4d4d", 0.6), false);
+  group.add(tip);
+  return { group: mergeParts(group, [tip]), tip: tip as THREE.Mesh<THREE.CylinderGeometry, THREE.MeshStandardMaterial> };
 }
 
 /** A golden star that glows a little. */
@@ -312,35 +371,6 @@ export function makeRainbow() {
       const r = arcRadius(band);
       const a = arcAngle(along);
       return out.set((left ? -1 : 1) * Math.cos(a) * r, Math.sin(a) * r, 0);
-    },
-  };
-}
-
-/**
- * The long paintbrush of the arc clip, built along a forearm (the elbow at the origin, the wrist at -FOREARM on
- * y): the handle runs through the paw on along the arm, and the tip of the bristles is `ARC.brush` past the wrist,
- * where the clip puts it on the band. The bristles take the colour of the band being painted (`dip`).
- */
-export function makeBrush() {
-  const group = new THREE.Group();
-  const tip = FOREARM + ARC.brush;
-  const bristleLength = 0.09;
-  const handleFrom = FOREARM - 0.03;
-  const handleTo = tip - bristleLength + 0.01;
-  const handle = solid(new THREE.CylinderGeometry(0.011, 0.013, handleTo - handleFrom, 10), mat("#c98b4f", 0.6));
-  handle.position.y = -(handleFrom + handleTo) / 2;
-  const ferrule = solid(new THREE.CylinderGeometry(0.019, 0.015, 0.035, 12), mat("#c8ccd4", 0.35, { metalness: 0.6 }));
-  ferrule.position.y = -(tip - bristleLength + 0.012);
-  const paint = mat(RAINBOW_COLORS[0], 0.5);
-  const bristles = solid(new THREE.SphereGeometry(0.022, 14, 10), paint);
-  bristles.scale.set(1, bristleLength / 0.044, 1);
-  bristles.position.y = -(tip - bristleLength / 2);
-  group.add(handle, ferrule, bristles);
-  mergeParts(group, [bristles]);
-  return {
-    group,
-    dip(color: string) {
-      paint.color.set(color);
     },
   };
 }

@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
 import { playPlop } from "@/lib/sfx";
 import { loadRealSounds, playCroak, playFlush, playQuack, playSplash } from "@/lib/realSounds";
-import { cameraLayer, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
+import { TapHint } from "@/components/TapHint";
 import { deg, svgLine } from "./machineKit";
 import type { Pt } from "./path";
 import { INK, Sparkles } from "./scenery";
@@ -248,7 +249,7 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
           <PoolFront />
           <Pipe duck={duck} t={t4} flow={flowAt(stretches[3], t4)} bulge={duck.hidden && hopping ? Math.sin(hopK * Math.PI) : 0} />
           {BASINS.map((b, i) => (
-            <Gate key={i} basin={b} lift={gateAt(stretches[i], timeOf(i))} waiting={i === step.current && t < 0} />
+            <Gate key={i} basin={b} lift={gateAt(stretches[i], timeOf(i))} />
           ))}
           <Fish at={water.fishAt(t2)} />
 
@@ -263,9 +264,19 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
             <Splash key={i} x={r.pt.x} y={r.pt.y} age={life.current - r.at} size={0.5} />
           ))}
           <Sparkles x={(POOL.x0 + POOL.x1) / 2 + 120} y={POOL.y - 140} age={t4 - water.pool.sparkle} n={14} spread={320} />
-          {t < 0 && <TapHint basin={s.basin} />}
         </g>
       </svg>
+      {t < 0 && (
+        <TapHint
+          key={`gate${step.current}`}
+          {...worldHint(cameraPoint(box.current, WATER_WORLD, { x: cam.x, y: cam.y, w: VIEW_W, h: VIEW_H }), {
+            x: gateX(s.basin),
+            y: s.basin.y + GATE.wheelY,
+            r: GATE.wheelR + 22,
+          })}
+          side="right"
+        />
+      )}
     </div>
   );
 }
@@ -423,8 +434,8 @@ function BasinFront({ basin: b }: { basin: Basin }) {
   );
 }
 
-/** A lock gate: a wooden board between two posts, lifted by the big red handwheel on the beam. `waiting` marks the gate the child can open. */
-function Gate({ basin: b, lift, waiting }: { basin: Basin; lift: number; waiting: boolean }) {
+/** A lock gate: a wooden board between two posts, lifted by the big red handwheel on the beam. */
+function Gate({ basin: b, lift }: { basin: Basin; lift: number }) {
   const x = gateX(b);
   const up = lift * GATE.lift;
   const wy = b.y + GATE.wheelY;
@@ -449,7 +460,6 @@ function Gate({ basin: b, lift, waiting }: { basin: Basin; lift: number; waiting
       </g>
       <rect x={x - GATE.w / 2 - 14} y={b.y + GATE.beam - 16} width={GATE.w + 28} height="22" rx="6" fill={WOOD_DARK} stroke={INK} strokeWidth="3" />
       <rect x={x - 5} y={wy} width="10" height={GATE.wheelY * -1 + GATE.beam - 16} fill="#777" stroke={INK} strokeWidth="2" />
-      {waiting && <circle cx={x} cy={wy} r={GATE.wheelR + 22} fill="#fff59d" fillOpacity="0.7" stroke="#ffd23f" strokeWidth="8" />}
       <g transform={`translate(${x} ${wy}) rotate(${lift * 400})`}>
         <circle r={GATE.wheelR} fill="none" stroke={INK} strokeWidth="18" />
         <circle r={GATE.wheelR} fill="none" stroke="#ff5d73" strokeWidth="12" />
@@ -460,15 +470,6 @@ function Gate({ basin: b, lift, waiting }: { basin: Basin; lift: number; waiting
         <circle cx={GATE.wheelR} cy="0" r="9" fill="#ffd23f" stroke={INK} strokeWidth="3" />
       </g>
     </g>
-  );
-}
-
-/** The finger over the gate the duck waits at; still, so nothing moves before the child does. */
-function TapHint({ basin }: { basin: Basin }) {
-  return (
-    <text className="water-hint" x={gateX(basin)} y={basin.y + GATE.wheelY - GATE.wheelR - 34} fontSize="90" textAnchor="middle">
-      👇
-    </text>
   );
 }
 

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { makeCloud, makeConfetti, makeParrot, mergeStatic, seeded } from "../../three/props";
 import { ALT, SUN, SUN_Z } from "./layout";
 import { curveZ, goes, S, starTime, TRAVEL } from "./script";
-import { makeBalloon, makeBrush, makeMeadow, makePlane, makePuff, makeRain, makeRainbow, makeRainCloud, makeStar, makeSun, makeWolle } from "./scenery";
+import { makeBalloon, makeMeadow, makePlane, makePuff, makeRain, makeRainbow, makeRainCloud, makeStar, makeSun, makeWolle } from "./scenery";
 
 // Puts „Die Wolkenreise“ together: the meadow, the clouds along the way, the rain cloud with the
 // sun, and one thing for every go of every movement (planes, balloons, stars, puffs). build() in
@@ -51,6 +51,8 @@ export function makeWorld(scene: THREE.Scene) {
 
   const planes = Array.from({ length: goes(S.duck) }, (_, n) => {
     const plane = makePlane(PLANE_COLORS[n % PLANE_COLORS.length]);
+    // A quarter bigger than built: diving in from high up ahead, a smaller one was hard to see.
+    plane.group.scale.setScalar(1.25);
     plane.group.visible = false;
     scene.add(plane.group);
     return plane;
@@ -91,13 +93,6 @@ export function makeWorld(scene: THREE.Scene) {
   scene.add(rain.mesh);
   const rainbow = makeRainbow();
   scene.add(rainbow.group);
-  // A brush for each paw while the rainbow is painted.
-  const brushes = [makeBrush(), makeBrush()];
-  for (const brush of brushes) {
-    brush.group.visible = false;
-    brush.group.matrixAutoUpdate = false;
-    scene.add(brush.group);
-  }
   // The sparkling tip, as big as a band's width in the fox's units of the arc clip; scaled with the rainbow.
   const tip = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.9 }));
   tip.visible = false;
@@ -106,5 +101,5 @@ export function makeWorld(scene: THREE.Scene) {
   const confetti = makeConfetti(220);
   const sparkle = makeConfetti(120, ["#ffd23f", "#fff3a0", "#ffffff"], 0.8);
   scene.add(confetti.mesh, sparkle.mesh);
-  return { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, brushes, tip, confetti, sparkle };
+  return { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, tip, confetti, sparkle };
 }

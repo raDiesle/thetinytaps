@@ -14,6 +14,7 @@ import { WHOLE_CLIPS } from "./whole";
 
 export {
   ARC,
+  ARC_DIP,
   ARC_PERIOD,
   ARC_TOP,
   arcAngle,
@@ -76,8 +77,15 @@ const FOCUS_PARTS: Record<Focus, ContourPart[]> = {
   all: ["armL", "armR", "legL", "legR", "body", "head"],
 };
 
+/**
+ * Clips whose movement reaches past their file's part: leaning to the side, the paw on that side reaching out is the
+ * main movement, so it glows with the body (user feedback, November 2026). Only parts that move glow, so the other
+ * paw, hanging still, stays dark.
+ */
+const MORE_FOCUS: Partial<Record<MotionClipId, ContourPart[]>> = { lean_side: ["body", "head", "armL", "armR"] };
+
 /** The parts of the guide that may glow during clip `id`. */
-export const clipFocus = (id: MotionClipId) => FOCUS_PARTS[FOCUS[id]];
+export const clipFocus = (id: MotionClipId) => MORE_FOCUS[id] ?? FOCUS_PARTS[FOCUS[id]];
 
 /** The pose of clip `id`, `t` seconds after it started. */
 export const clipPose = (id: MotionClipId, t: number): Pose => posed(CLIPS[id], t);

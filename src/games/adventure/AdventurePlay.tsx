@@ -7,7 +7,9 @@ import { useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { playChime, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { loadRealSounds, playSplash, playTweet } from "@/lib/realSounds";
+import { screenTap } from "@/lib/tapGuard";
 import { useWakeLock } from "@/lib/wakeLock";
+import { clock } from "./clock";
 import { movement } from "./library/movements";
 import { type Cue, type Story, type StoryFrame, storyTitle } from "./stories/story";
 import { Music } from "./three/music";
@@ -16,6 +18,7 @@ import { Silhouette } from "./three/silhouette";
 import { hush, loadVoice, say } from "./voice";
 import "./adventure.css";
 import { PROD } from "@/lib/buildInfo";
+import { useStepAddress } from "@/lib/stepAddress";
 
 const CUES: Record<Cue, () => void> = {
   splash: playSplash,
@@ -46,17 +49,21 @@ function stepName(story: Story, i: number, language: TargetLanguageId) {
 /**
  * A 3D movement story: the fox Tapsi shows each movement and the child does
  * it along in front of the screen; the world answers on its own time. Nobody
- * has to tap, and nothing has to be read – Tapsi says everything. Grown-ups
- * can pause and jump between steps with the buttons in the corner, by tapping
- * a picture on the route, or with the keys (arrows jump, Space pauses).
+ * has to tap, and nothing has to be read – Tapsi says everything. A tap anywhere
+ * on the picture pauses (and a tap on the big ▶ goes on); grown-ups also pause and
+ * jump between steps with the buttons in the corner, by tapping a picture on the
+ * route, or with the keys (arrows jump, Space pauses).
  */
 export function AdventurePlay({
   story,
+  storyId,
   language,
   settings,
   next,
 }: {
   story: Story;
+  /** The story's id in `STORIES`, for its trophy at the end. */
+  storyId: string;
   language: TargetLanguage;
   settings: CommonSettings;
   /** The story „Weiter“ starts at the end; none where only one story can be played. */
@@ -66,7 +73,11 @@ export function AdventurePlay({
   const playerRef = useRef<StoryPlayer | null>(null);
   const flashRef = useRef<HTMLDivElement>(null);
   const outlineRef = useRef<HTMLDivElement>(null);
+  const playedRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLSpanElement>(null);
   const [step, setStep] = useState(0);
+  // The story's step on screen, from 1, in the address (stepAddress.ts).
+  useStepAddress(step + 1);
   const [pointing, setPointing] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
   const [ended, setEnded] = useState(false);
@@ -89,6 +100,23 @@ export function AdventurePlay({
     const silhouette = new Silhouette();
     outlineRef.current?.append(silhouette.svg);
     let player: StoryPlayer;
+    // How far the story is, for grown-ups: written straight into the bar and the number, never through React, since it
+    // changes in every frame – the bar by a transform (no repaint), the number only when its second changes.
+    let shownPart = -1;
+    let shownClock = "";
+    const showTime = (time: number) => {
+      const total = player.duration;
+      const part = Math.round(Math.min(1, Math.max(0, time / total)) * 1000) / 1000;
+      if (part !== shownPart && playedRef.current) {
+        shownPart = part;
+        playedRef.current.style.transform = `scaleX(${part})`;
+      }
+      const left = `−${clock(total - time)}`;
+      if (left !== shownClock && leftRef.current) {
+        shownClock = left;
+        leftRef.current.textContent = left;
+      }
+    };
     try {
       player = new StoryPlayer(canvas, story, {
         onLine(text, kind, at) {
@@ -114,6 +142,7 @@ export function AdventurePlay({
           setEnded(true);
         },
         onPose(pose, frame, view) {
+          showTime(frame.time);
           const box = outlineRef.current;
           if (!box) return;
           const shown = outlineShown(frame);
@@ -164,6 +193,8 @@ export function AdventurePlay({
   const togglePause = () => {
     const player = playerRef.current;
     if (!player) return;
+    // A child's hand often lands twice: the second tap must not undo the first one's pause.
+    if (!screenTap()) return;
     player.paused = !player.paused;
     setPaused(player.paused);
     if (player.paused) {
@@ -231,7 +262,14 @@ export function AdventurePlay({
 
   return (
     <div className="adventure">
-      <canvas ref={canvasRef} className="adventure-canvas" />
+      {/* A tap on the picture pauses (user request, November 2026); the ▶ over it goes on. */}
+      <canvas
+        ref={canvasRef}
+        className="adventure-canvas"
+        onPointerDown={(e) => {
+          if (e.button === 0 && !ended && !paused) togglePause();
+        }}
+      />
       <div ref={flashRef} className="adventure-flash" aria-hidden />
       <div ref={outlineRef} className="adventure-outline" aria-hidden />
       <ol className="adventure-route" aria-label={storyTitle(story, app.id)}>
@@ -243,6 +281,13 @@ export function AdventurePlay({
           </li>
         ))}
       </ol>
+      {/* How far the story is: the bar filled as far as it has played, the time still to come beside it. For grown-ups, small. */}
+      <div className="adventure-time" hidden={ended} aria-hidden>
+        <div className="adventure-time-bar">
+          <div ref={playedRef} className="adventure-time-played" />
+        </div>
+        <span ref={leftRef} className="adventure-time-left" />
+      </div>
       <div className="adventure-controls">
         <button type="button" onClick={() => jump((p) => p.skip(-1))} aria-label={back} title={`${back} (←)`}>
           ⏮
@@ -259,7 +304,7 @@ export function AdventurePlay({
           ▶
         </button>
       )}
-      {ended && <GameEnd onAgain={again} next={next} />}
+      {ended && <GameEnd level={storyId} onAgain={again} next={next} />}
       <p className="adventure-sr-only">{scene}</p>
     </div>
   );

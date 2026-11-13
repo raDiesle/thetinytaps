@@ -324,9 +324,15 @@ export const STRETCH_CURL: Movement[] = [
     bodyZone: "upper_body",
     bodyParts: ["arms", "hands", "shoulders", "torso"],
     bodyMovement:
-      "Das Kind führt einen gestreckten Arm in einem großen Bogen von der einen Seite über den Kopf zur anderen Seite, als male es einen Regenbogen.",
+      "Das Kind führt einen gestreckten Arm in einem großen Bogen von der einen Seite über den Kopf zur anderen Seite, als male es einen Regenbogen; vor jedem Bogen beugt es sich vor und taucht den Pinsel in den Farbeimer.",
     startingPose: "Stehen, ein Arm unten zur Seite.",
-    movementSteps: ["Arm unten zur Seite", "Großer Bogen über den Kopf", "Zur anderen Seite hinunter", "Mit dem anderen Arm zurück"],
+    movementSteps: [
+      "Vorbeugen, den Pinsel eintauchen",
+      "Arm unten zur Seite",
+      "Großer Bogen über den Kopf",
+      "Zur anderen Seite hinunter",
+      "Mit dem anderen Arm zurück",
+    ],
     durationSeconds: 14,
     repetitions: 2,
     instruction: "Mal einen Regenbogen!",

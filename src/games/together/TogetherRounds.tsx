@@ -15,6 +15,7 @@ import type { TogetherSettings } from "./settings";
 import { roundLines, TogetherPlay } from "./TogetherPlay";
 import { RoundTopic } from "./RoundTopic";
 import { togetherVoice } from "./voice";
+import { useStepAddress } from "@/lib/stepAddress";
 
 const OF_DAY = pairsOf("pair");
 const HELPERS = pairsOf("helper");
@@ -72,6 +73,8 @@ function pairCode(pair: (typeof PAIRS)[number]): string {
  */
 export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
   const [turn, setTurn] = useState(0);
+  // The round on screen in the address (`?seite=3`), so the time-on-page event tells how many rounds were played.
+  useStepAddress(turn + 1);
   /**
    * The difficulty step (an index into `TOGETHER_LEVELS`); every visit begins on the first. While developing,
    * `?level=N` starts on step N, to look at the harder rounds.

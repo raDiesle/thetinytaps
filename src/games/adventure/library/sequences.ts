@@ -239,9 +239,10 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "rainbow_arc",
-        seconds: 24.5,
+        seconds: 29.5,
         energy: "calm",
-        situation: "Mit einem Arm nach dem anderen einen großen Bogen über den Kopf malen; jeder Bogen malt eine Farbe in den Himmel.",
+        situation:
+          "Aus Wolle kommt ein Farbeimer mit zwei Pinseln. Tapsi beugt sich vor, taucht einen Pinsel in die Farbe und malt mit einem Arm nach dem anderen einen großen Bogen über den Kopf; jeder Bogen malt eine Farbe in den Himmel, und die Farbe im Eimer wechselt.",
         transition: "Der Regenbogen ist fertig.",
       },
       {

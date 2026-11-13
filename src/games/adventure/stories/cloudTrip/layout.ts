@@ -49,7 +49,7 @@ export const SIT_Z = 15;
 /** Where the curves end. */
 export const CURVES_TO = -21;
 /** How far Wolle swings out to either side in the curves. */
-export const CURVE_SWING = 0.9;
+export const CURVE_SWING = 1.5;
 /** Under the rain cloud: pushing it up, painting the rainbow, cheering and waving goodbye. */
 export const SUN_Z = -30;
 

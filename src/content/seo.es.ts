@@ -21,7 +21,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Juegos para niños pequeños y ayudas diarias – gratis",
       description:
         "Juegos educativos y ayudantes del día a día para niños pequeños: láminas, emociones, letras, temporizador, dientes, orinal, premios, destete. Sin anuncios.",
-      text: "Fun for Both es una estantería llena de libros ilustrados para jugar, para grandes y pequeños juntos: cada toque y cada tecla hace algo enseguida, nada está mal y no hay nada que leer. En los libros esperan láminas para buscar y encontrar, aventuras en movimiento, reacciones en cadena y pequeñas aventuras, emociones, letras y números, emparejar y reconocer. Y como el día con un niño pequeño tiene sus propios pequeños obstáculos, justo al lado están nuestros ayudantes del día a día: un temporizador que muestra el tiempo con imágenes, lavarse los dientes con canción, el juego del orinal, una tabla de recompensas, una rutina diaria con pictogramas y una cuenta atrás «¿Cuántas noches faltan?», en la tablet o para imprimir, y cuentos por capítulos para el destete y para despedirse del chupete con el hada del chupete.",
+      text: "Fun for Both es una estantería llena de libros ilustrados para jugar, para grandes y pequeños juntos: cada toque y cada tecla hace algo enseguida, nada está mal y no hay nada que leer. En los libros esperan láminas para buscar y encontrar, aventuras en movimiento, reacciones en cadena y pequeñas aventuras, emociones, letras y números, emparejar y reconocer. Y como el día con un niño pequeño tiene sus propios pequeños obstáculos, justo al lado están nuestros ayudantes del día a día: un temporizador que muestra el tiempo con imágenes, lavarse los dientes con canción, el juego del orinal, una tabla de recompensas, una rutina diaria con pictogramas y una cuenta atrás «¿Cuántas noches faltan?», en la tablet o para imprimir, y cuentos por capítulos para el destete, para despedirse del chupete con el hada del chupete y para empezar la guardería. Quien juega un juego o un cuento hasta el final recibe su propio trofeo pequeño, y todos los trofeos se juntan abajo en la estantería, junto a los libros.",
     },
     "/spiele/lebendige-welten/": {
       title: "Láminas vivas e historias para niños pequeños",
@@ -63,7 +63,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Emociones para niños pequeños: situaciones cotidianas",
       description:
         "Enojo, tristeza, miedo, alegría: el osito vive situaciones cotidianas en casa y en la guardería, y el niño elige qué le ayuda. Sin anuncios.",
-      text: "Pequeñas historias del oso, contadas como días de la mañana a la noche: siente enojo, tristeza, miedo o alegría, y el niño elige entre dos ideas qué le ayuda. Las escenas también vienen ordenadas por emociones. Quien prefiera contar la historia con sus propias palabras apaga la voz con un toque y abre el texto completo para leerlo en voz alta. Para hablar de emociones con niños pequeños.",
+      text: "Pequeñas historias del oso, contadas como días de la mañana a la noche: siente enojo, tristeza, miedo o alegría, y el niño elige entre dos ideas qué le ayuda. Las escenas también vienen ordenadas por emociones. Bajo las imágenes está el texto completo: quien prefiera contar la historia con sus propias palabras o leerla en voz alta apaga la voz con un toque. Para hablar de emociones con niños pequeños.",
     },
     "/wie-gehts-dir/": {
       title: "¿Cómo estás? Mostrar emociones para niños pequeños",
@@ -79,7 +79,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Reacción en cadena y circuito de canicas",
       description:
         "Una canica echa a rodar y pone en marcha una máquina: circuitos de canicas y reacciones en cadena para tocar y asombrarse. Para niños pequeños.",
-      text: "Veinte circuitos y máquinas: las canicas ruedan sobre madera, nieve, toboganes de agua y cintas transportadoras, las fichas de dominó y las cosas de casa caen, una empuja a la siguiente. Un toque pone en marcha la reacción en cadena, y en un punto la máquina espera hasta que el niño la deja seguir con otro toque: para asombrarse y volver a empezar.",
+      text: "Veintiún circuitos y máquinas: las canicas ruedan sobre madera, nieve, toboganes de agua y cintas transportadoras, las fichas de dominó y las cosas de casa caen, una empuja a la siguiente. En el circuito de colores el niño elige rojo, amarillo o azul para cada canica, y abajo cae en el tubo de su color y se cuenta. Un toque pone en marcha la reacción en cadena, y en un punto la máquina espera hasta que el niño la deja seguir con otro toque: para asombrarse y volver a empezar.",
     },
     "/kleine-abenteuer/": {
       title: "Pequeñas aventuras: historias para niños pequeños",
@@ -91,7 +91,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Alimentar a los animales – juego para niños pequeños",
       description:
         "¿Qué va con cada animal? ¿Qué come, qué nos da, dónde vive y en qué se convierte la oruga? Con sonidos de animales, para niños pequeños, sin anuncios.",
-      text: "El conejo quiere una zanahoria, el elefante cacahuetes, la vaca nos da leche, el castor busca su madriguera, la oruga se convierte en mariposa y la semilla en girasol: basta tocar la comida, la leche, el huevo o la casa, y el animal se alegra y hace su sonido. Muchos animales de la granja, del bosque, del zoo y del mar. El juego se vuelve solo más fácil o más difícil.",
+      text: "El conejo quiere una zanahoria, el elefante cacahuetes, la vaca nos da leche, el castor busca su madriguera, la oruga se convierte en mariposa y la semilla en girasol: basta tocar la comida, la leche, el huevo o la casa, y el animal se alegra y hace su sonido. Muchos animales de la granja, del bosque, del zoo y del mar. Y detrás de una pequeña cortina algo muge, ladra o ruge: ¿quién fue? El juego se vuelve solo más fácil o más difícil.",
     },
     "/zusammen/": {
       title: "¿Qué va junto? – emparejar para niños pequeños",
@@ -133,6 +133,11 @@ export const SEO_ES: SeoTranslation = {
         "Escribir primeras palabras letra a letra: oso, pelota, colores y verbos. O «¿Dónde está la B?»: encontrar la tecla de una letra. Sin anuncios.",
       text: "Una imagen y su palabra: el niño la escribe letra a letra en el teclado o en la pantalla. Palabras con imagen, colores, verbos de acción o todo mezclado, en tres longitudes. O solo la primera letra: «¿Dónde está la B?», y a buscar su tecla.",
     },
+    "/gross-klein/": {
+      title: "¿Dónde está la b pequeña? – Mayúsculas y minúsculas",
+      description: "Una letra grande con ojos busca a su pequeña: de tres minúsculas solo una es la suya, que camina hasta ella y le da la mano.",
+      text: "Un juego de letras sobre mayúsculas y minúsculas: una letra grande con ojos busca a su pequeña. Abajo hay tres minúsculas y solo una es la suya. Al tocarla, camina hasta la grande y se dan la mano; una equivocada niega con la cabeza. Primero las tres son muy distintas, después parecidas, como b, d y p.",
+    },
     "/zaehne/": {
       title: "Cepillarse los dientes: canción y temporizador",
       description:
@@ -155,7 +160,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Temporizador visual para niños – disco y reloj de arena",
       description:
         "Un temporizador sin números para niños pequeños: el disco rojo se encoge, cae la arena, arden velas, un tren llega a la estación. De 10 segundos a 3 horas.",
-      text: "Un temporizador visual para niños que aún no saben leer el reloj, uno de nuestros ayudantes del día a día. Una persona adulta elige 10 o 30 segundos o de 1 a 10 minutos, cualquier otro tiempo de hasta tres horas o una hora del reloj hasta la que dura, y el niño ve pasar el tiempo: el disco rojo que los niños conocen de la guardería se hace más pequeño, la arena cae por un gran reloj de arena, las velas se consumen, un manzano crece, florece y da manzanas, una pizza se come porción a porción, un despertador infantil cuenta hacia atrás, un tren rueda hacia la estación, una oruga se come su hoja, una flor crece y florece, o sale el sol. Cuando el niño toca la imagen, se ilumina un momento lo que queda, y en pequeño, en la esquina, aparece el tiempo restante para nosotros, los mayores. Para turnarse entre hermanos, el reloj de arena está entre dos cojines: una lámpara muestra a quién le toca, el juguete se queda ahí hasta que pasa la arena, luego salta al otro lado y el reloj de arena se da la vuelta solo. Al final suenan una ovación y una melodía alegre. Para «cinco minutos más de juego», esperar la comida o recoger; mientras tanto la pantalla sigue encendida, y el temporizador funciona aunque haya terminado el tiempo de juego.",
+      text: "Un temporizador visual para niños que aún no saben leer el reloj, uno de nuestros ayudantes del día a día. Una persona adulta elige 10 o 30 segundos o de 1 a 10 minutos, cualquier otro tiempo de hasta tres horas o una hora del reloj hasta la que dura, y el niño ve pasar el tiempo: el disco rojo que los niños conocen de la guardería se hace más pequeño, la arena cae por un gran reloj de arena, las velas se consumen, un manzano crece, florece y da manzanas, una pizza se come porción a porción, un despertador infantil cuenta hacia atrás, un tren rueda hacia la estación, una oruga se come su hoja, una flor crece y florece, o sale el sol. Cuando el niño toca la imagen, se ilumina un momento lo que queda, y en pequeño, en la esquina, aparece el tiempo restante para nosotros, los mayores. Para turnarse entre hermanos, el reloj de arena está entre dos cojines: una lámpara muestra a quién le toca, el juguete se queda ahí hasta que pasa la arena, luego salta al otro lado y el reloj de arena se da la vuelta solo. O dos niños juegan al tenis: la pelota está en la raqueta de quien tiene el turno, su mitad de la pista está iluminada, y al cambiar la pelota vuela despacio por encima de la red. Al final suenan una ovación y una melodía alegre. Para «cinco minutos más de juego», esperar la comida o recoger; mientras tanto la pantalla sigue encendida, y el temporizador funciona aunque haya terminado el tiempo de juego.",
     },
     "/tagesplan/": {
       title: "Rutina diaria con pictogramas – día y semana",
@@ -174,6 +179,12 @@ export const SEO_ES: SeoTranslation = {
       description:
         "Un cuento por capítulos para leer en voz alta: Tapsi el zorro reúne sus tres chupetes y de noche el hada del chupete los cambia por un regalo.",
       text: "Un cuento para leer en voz alta, capítulo a capítulo, cuando el chupete tiene que irse. Tapsi el zorro tiene tres chupetes, uno rojo, uno azul y uno amarillo, y con el chupete en la boca mamá solo oye «mmm-mmm». Mamá y papá le hablan del hada del chupete, que lleva los chupetes a los bebés. Primero el chupete se queda en la cama y solo sirve para dormirse. Después Tapsi dice que el hada puede venir, papá pega tres estrellas en la ventana y cada mañana Tapsi quita una. El gran día Tapsi busca todos los chupetes, los mete en una caja, da a cada uno un beso de despedida y los deja en el alféizar con un dibujo. La primera noche cuesta, Tapsi llora, y mamá y papá se quedan cerca, consuelan y cantan. De noche entra el hada volando, se lleva la caja y deja un regalo: un conejito de peluche que ahora ayuda a dormirse. Tapsi puede echar de menos el chupete y estar triste, y mamá y papá quieren a Tapsi, con chupete y sin él. El libro empieza por su índice, bajo cada imagen está la frase para leer y cada toque pasa la página.",
+    },
+    "/kita/": {
+      title: "Empezar la guardería – un cuento para la adaptación",
+      description:
+        "Un cuento por capítulos para leer en voz alta sobre la adaptación a la guardería y la despedida por la mañana: Tapsi empieza, y mamá siempre vuelve.",
+      text: "Un cuento para leer en voz alta, capítulo a capítulo, cuando empieza la guardería o la despedida de la mañana cuesta. Mamá y papá le cuentan al zorrito Tapsi qué es la guardería, papá y Tapsi la miran desde fuera y juntos preparan la mochila con las zapatillas y el conejito de peluche. Los primeros días mamá se queda en la guardería, en una sillita, mientras Tapsi conoce a Mia, la educadora, y juega con Bruno. Luego mamá sale un ratito por primera vez y antes dice que volverá; Tapsi llora, Mia consuela y mamá vuelve enseguida. Mia ayuda en el desayuno y sopla en la rodilla, y cada día mamá se queda fuera un poco más. Un capítulo es el ritual de despedida que se puede leer cada mañana: la chaqueta en el gancho de la estrella, un abrazo fuerte, un beso en la nariz, «Te recojo después de la siesta» y decir adiós con la mano en la ventana; mamá nunca se va a escondidas. Después, el día de Tapsi: la asamblea, una torre de bloques, el arenero, la comida y la siesta, y justo después mamá está en la puerta. El libro empieza con su índice, bajo cada dibujo está la frase para leer en voz alta y cada toque pasa la página. Según el modelo de adaptación de Berlín.",
     },
     "/abstillen/": {
       title: "Cuento para el destete – la cadena de leche de Tapsi",

@@ -1,7 +1,7 @@
 import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import { deg, easeOut, seg } from "./machineKit";
-import { MachineStage, TapHint } from "./MachineStage";
+import { MachineStage } from "./MachineStage";
 import {
   BASKET,
   BIRD,
@@ -64,7 +64,7 @@ export function NightLevel(props: LevelProps) {
   const finalTurn = night.crankTurn(1000);
 
   return (
-    <MachineStage machine={night} level="night" {...props}>
+    <MachineStage machine={night} level="night" start={{ x: CRANK.x - 10, y: CRANK.y + 5, r: 70 }} {...props}>
       {(t) => {
         const end = Math.min(t, night.duration);
         return (
@@ -95,7 +95,6 @@ export function NightLevel(props: LevelProps) {
             <Zzz x={DOOR.x + 34} y={DOOR.y - 30} from={night.tCuckoo} t={end} />
             <Zzz x={BASKET.x + 34} y={BASKET.rim1 - 50} from={night.tStar} t={end} />
             <Zzz x={CAROUSEL.x + 80} y={CAROUSEL.y - 30} from={night.tSheep} t={end} />
-            <TapHint t={t} x={CRANK.x + 6} y={SHELF.top + 150} />
           </>
         );
       }}

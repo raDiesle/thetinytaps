@@ -3,16 +3,17 @@ import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./co
 import { GIFTS, type Gift } from "./gifts";
 import { GROWTHS, growLookAlike, type Growth } from "./growth";
 import { HOMES, type Home } from "./homes";
-import type { Difficulty } from "./settings";
+import { soundLookAlike, SOUND_ANIMALS } from "./sounds";
 
 /**
- * The four kinds of rounds: feeding (N-08), what the animal gives us (Z-01), who lives where (N-09), what the small
- * one becomes (Z-12). „Wer schaut da raus?“ moved to „Erkennen“ (Schatten finden) in November 2026.
+ * The five kinds of rounds: feeding (N-08), what the animal gives us (Z-01), who lives where (N-09), what the small
+ * one becomes (Z-12) and who makes the sound behind the curtain (Z-15). „Wer schaut da raus?“ moved to „Erkennen“
+ * (Schatten finden) in November 2026.
  */
-export type RoundKind = "feed" | "gift" | "home" | "grow";
+export type RoundKind = "feed" | "gift" | "home" | "grow" | "sound";
 
 /** The kinds take turns in this order, starting with feeding. */
-export const KIND_ORDER: RoundKind[] = ["feed", "gift", "home", "grow"];
+export const KIND_ORDER: RoundKind[] = ["feed", "gift", "home", "grow", "sound"];
 
 /** One step of difficulty. */
 export interface AnimalLevel {
@@ -26,9 +27,6 @@ export interface AnimalLevel {
  * Harder means more to choose from, never quicker.
  */
 export const ANIMAL_LEVELS: AnimalLevel[] = [{ choices: 2 }, { choices: 3 }, { choices: 4 }];
-
-/** The step a fixed difficulty plays on (chosen behind ⚙️); „Von selbst“ climbs and falls instead. */
-export const FIXED_LEVELS: Record<Exclude<Difficulty, "auto">, number> = { easy: 0, medium: 1, hard: ANIMAL_LEVELS.length - 1 };
 
 /** The kind after `last` in `KIND_ORDER` when all take turns (the first to begin with), or the one kind chosen. */
 export function nextKind(last: RoundKind | null, kinds: "all" | RoundKind): RoundKind {
@@ -69,6 +67,14 @@ export interface GrowRound {
   correct: number;
 }
 
+/** A sound round (Z-15): `animal` calls behind the curtain, one of `animals` (at `correct`) is it. */
+export interface SoundRound {
+  kind: "sound";
+  animal: Animal;
+  animals: Animal[];
+  correct: number;
+}
+
 /** The foods of a feeding round, `animal`'s own among `count` it doesn't eat (`wrongFoods`), in random order. */
 export function dealFeed(animal: Animal, count: number): FeedRound {
   const right = animal.food!;
@@ -101,4 +107,14 @@ export function dealGrow(growth: Growth, count: number): GrowRound {
   const others = GROWTHS.filter((g) => g !== growth && !growLookAlike(g, growth));
   const grown = shuffle([growth, ...shuffle(others).slice(0, count - 1)]);
   return { kind: "grow", growth, grown, correct: grown.indexOf(growth) };
+}
+
+/**
+ * The animals of a sound round, `animal` among `count - 1` others that make a sound of their own, in random order;
+ * never one that sounds like it (`SOUND_LOOKALIKES`: no tiger next to the lion), so only one choice fits what is heard.
+ */
+export function dealSound(animal: Animal, count: number): SoundRound {
+  const others = SOUND_ANIMALS.filter((a) => a !== animal && !soundLookAlike(a, animal));
+  const animals = shuffle([animal, ...shuffle(others).slice(0, count - 1)]);
+  return { kind: "sound", animal, animals, correct: animals.indexOf(animal) };
 }

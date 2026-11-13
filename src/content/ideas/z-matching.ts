@@ -137,6 +137,15 @@ export const matchingIdeas: IdeaArea = {
       partial:
         "Gebaut am 7. November 2026: alle 190 Sätze (auch die sieben Paare, deren Bilder noch fehlen) stehen als `wish` bei den Paaren, ersetzen auf Deutsch die gesprochene Frage und stehen klein unter dem Bild; ein Test prüft, dass keiner sein Gegenstück nennt. Noch nicht aufgenommen, darum vorerst stumm; die anderen Sprachen behalten ihre Frage, bis die Sätze übersetzt werden.",
     },
+    {
+      id: "Z-15",
+      emoji: "🔊",
+      done: true,
+      title: "Was gehört zum Tier?: Wer macht das Geräusch?",
+      text: "Oben hängt ein Vorhang an einer kleinen Bühne. Tippt das Kind ihn an, wackelt er und dahinter muht, bellt oder quakt es. Unten stehen zwei bis fünf Tiere; das Kind tippt, wer das war, der Vorhang geht auf, und das Tier steht da und macht sein Geräusch noch einmal. Ein falsches Tier ruft mit seiner eigenen Stimme, so kann das Kind vergleichen. Tiere, die ähnlich klingen (Brüllen, Grunzen, Meckern, Wiehern, Bellen …), kommen nie zusammen dran. Umgesetzt am 11. November 2026 als fünfte Art von Was gehört zum Tier? (auf Wunsch dort statt in Schatten finden): 51 Tiere, jedes mit einer eigenen echten CC0-Aufnahme, darunter neu Hahn, Taube, Truthahn, Pfau, Mücke und Schlange. „Was drankommt“ steht seitdem direkt oben rechts statt hinter ⚙️, die Schwierigkeit findet das Spiel immer selbst. Nur Deutsch, noch nicht gesprochen.",
+      why: "Hinhören statt hinschauen – Tiergeräusche sind das Erste, was Kleine nachmachen. Die Tiere sind schon da, das Spiel braucht keine neuen Bilder.",
+      effort: "S",
+    },
   ],
 };
 
@@ -151,7 +160,7 @@ export const recognisingIdeas: IdeaArea = {
   emoji: "👂",
   title: "Schatten finden – erkennen",
   intro:
-    "Vorschlag vom November 2026: Schatten finden wird das Spiel fürs einfache Zuordnen nach einem Hinweis. Von einem Ding ist nur etwas zu sehen oder zu hören – sein Schatten, ein Stück hinter dem Busch, sein Geräusch –, und das Kind tippt unten das Ganze. Die Arten wechseln sich ab wie bei Was gehört zum Tier?, die Schwierigkeit findet das Spiel selbst (nextLevel); Große wählen hinter ⚙️ „Gemischt“ oder genau eine Art. Was hörbar ist, ist erst still: Ein Vorhang, eine Tür oder ein Sack wartet mit der zeigenden Hand, erst ein Tippen darauf spielt das Geräusch, und jedes weitere Tippen spielt es noch einmal. Genau eine Antwort passt (X-14): Was ähnlich klingt, kommt nie zusammen dran, wie die ähnlichen Umrisse. Aus dem Buch passen auch Wessen Fell? (Z-06) und Die andere Hälfte (Z-07) hierher. Das Geräusch-Rätsel in Lebendige Bilder (B-02, ein Ding in einem vollen Bild suchen) ist die Schwester-Idee dazu; hier ist es eine Wahl aus zwei bis fünf, wie bei den Schatten. Das Geräusche-Buch (N-31) bleibt abgelehnt.",
+    "Vorschlag vom November 2026: Schatten finden wird das Spiel fürs einfache Zuordnen nach einem Hinweis. Von einem Ding ist nur etwas zu sehen oder zu hören – sein Schatten, ein Stück hinter dem Busch, sein Geräusch –, und das Kind tippt unten das Ganze. Die Arten wechseln sich ab wie bei Was gehört zum Tier?, die Schwierigkeit findet das Spiel selbst (nextLevel); Große wählen hinter ⚙️ „Gemischt“ oder genau eine Art. Was hörbar ist, ist erst still: Ein Vorhang, eine Tür oder ein Sack wartet mit der zeigenden Hand, erst ein Tippen darauf spielt das Geräusch, und jedes weitere Tippen spielt es noch einmal. Genau eine Antwort passt (X-14): Was ähnlich klingt, kommt nie zusammen dran, wie die ähnlichen Umrisse. Aus dem Buch passen auch Wessen Fell? (Z-06) und Die andere Hälfte (Z-07) hierher. Das Geräusch-Rätsel in Lebendige Bilder (B-02, ein Ding in einem vollen Bild suchen) ist die Schwester-Idee dazu; hier ist es eine Wahl aus zwei bis fünf, wie bei den Schatten. Das Geräusche-Buch (N-31) bleibt abgelehnt. Wer macht das Geräusch? (Z-15) wurde stattdessen eine Art von Was gehört zum Tier? (November 2026) und steht dort.",
   ideas: [
     {
       id: "Z-14",
@@ -161,14 +170,6 @@ export const recognisingIdeas: IdeaArea = {
       text: "Wer schaut da raus? (X-04) verlässt Was gehört zum Tier? und wird eine zweite Art Runde in Schatten finden, im Wechsel mit den Schatten und auf einer gemeinsamen Treppe der Schwierigkeit: erst wenige, klar verschiedene Bilder, dann ähnliche, gedrehte, Stücke hinter Lücken im Busch. Hinter ⚙️ „Was drankommt“: Gemischt, Schatten oder Wer schaut da raus?. Was gehört zum Tier? behält Füttern, Was gibt uns das Tier?, Wer wohnt wo? und Was wird aus mir? – alles, was zum Tier gehört. Der Name der Karte kann dann über beides sprechen (etwa „Wer ist das?“); das entscheidet sich beim Umsetzen.",
       why: "Beides ist dasselbe Zuordnen: aus einem Teil das Ganze erkennen. PeekPlay, die Bühne und glyph.ts liegen schon in src/games/shadows/, und die Treppe von Schatten finden kennt schon ähnliche Umrisse. Was gehört zum Tier? wird dadurch klarer.",
       effort: "M",
-    },
-    {
-      id: "Z-15",
-      emoji: "🔊",
-      title: "Wer macht das Geräusch?",
-      text: "Oben hängt ein Vorhang an einer kleinen Bühne. Tippt das Kind ihn an, wackelt er und dahinter muht, bellt oder quakt es. Unten stehen zwei bis fünf Tiere; das Kind tippt, wer das war, der Vorhang geht auf, und das Tier steht da und macht sein Geräusch noch einmal. Echte Aufnahmen gibt es schon für Kuh, Schaf, Schwein, Pferd, Hund, Katze, Ente, Hahn, Huhn, Frosch, Eule, Löwe, Elefant, Wal, Delfin, Pinguin, Maus, Taube, Kuckuck, Biene und Papagei. Schwerer: mehr Tiere, dann Tiere, die gleich aussehen, aber verschieden klingen (Hahn und Huhn).",
-      why: "Hinhören statt hinschauen – Tiergeräusche sind das Erste, was Kleine nachmachen. Die Aufnahmen sind da, das Spiel braucht keine neuen Bilder.",
-      effort: "S",
     },
     {
       id: "Z-16",

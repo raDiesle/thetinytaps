@@ -19,9 +19,14 @@ Fehler in späteren Leveln nicht wieder passiert.
   (stattdessen Spinnweben wegwedeln), kein Balancieren auf Schienen, kein schnelles Drehen.
 - **Nur zeigen, was zur Bewegung gehört.** Teile, die nicht Teil der Bewegung sind, sollen nicht
   auffallen: Beim Paddeln scheinen die Füße nicht durch den Körper, nur Arme. Leuchten und
-  Durchscheinen folgen `clipFocus`.
+  Durchscheinen folgen `clipFocus`. Was die Hauptbewegung macht, leuchtet aber mit, auch wenn der Clip
+  zu einem anderen Teil gehört: Neigt sich der Fuchs zur Seite, leuchtet die Pfote, die auf dieser Seite
+  hinausgreift (`MORE_FOCUS` in `three/clips/index.ts`).
 - Erst zeigt der Fuchs die Bewegung allein, dann „Jetzt du!“. Bewegungen sind groß und halten kurz
   an ihren Enden, damit man sie gut erkennt.
+- **Bewegungen gehen fließend ineinander über**, nie ruckartig: Wechseln sich die Pfoten ab (Ballons
+  antippen), wartet die eine halb oben, während die andere hinausgreift, und keine springt beim Wechsel
+  an einen anderen Platz (`clips.test.ts` misst es beim Antippen).
 - **Jede Bewegung oft genug.** Zeigen und Mitmachen zusammen dauern etwa 12–25 s, also viele
   Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr.
 - **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: erst Kiki winken, dann
@@ -89,6 +94,27 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Der Fuchs soll natürlich aussehen: schlanke Gliedmaßen, die sich verjüngen, sichtbare Gelenke,
   Finger und Zehen mit runden Spitzen; Hände und Füße bewegen sich mit (Handgelenk, Fußgelenk),
   nichts wirkt wie steife Stäbe.
+- **Ein Körper wie der eines Kindes** (Rückmeldung November 2026: zwei Kugeln für Brust und Becken,
+  kein Hals und Kugelgelenke an den Schultern sahen nach Schneemann-Puppe aus): ein durchgehender Rumpf
+  mit Schultern, die die Arme tragen, weicher Taille, Hüften, aus denen die Oberschenkel wachsen, rundem
+  Bauch vorn und Po hinten; ein kurzer Hals, auf dem der Kopf sitzt (Kinn über den Schultergelenken),
+  der Kopf etwa ein Viertel der Größe, nie ein Drittel. Schulterkappen statt Kugeln, Oberschenkel oben
+  voll, Waden hinten am Schienbein. Das Fell bekommt seine Zeichnung über den Körper (das Creme läuft
+  weich von der Kehle bis zum Bauch, `torsoGeometry` in `three/guide.ts`), nie als aufgesetzter Fleck.
+  `three/guide.test.ts` prüft Hals und Kopfgröße. Die Gelenkpunkte (Schultern, Hüften, Armlängen)
+  bleiben dabei, wo sie sind, sonst stimmt nichts mehr, was am Clip gemessen ist.
+- **Hände wie echte Hände** (Rückmeldung November 2026): Der Daumen sitzt auf der Seite, auf der er
+  bei dieser Handfläche wirklich sitzt (Handfläche vorn → Daumen außen), nie spiegelverkehrt. Die
+  Handfläche zeigt, wohin eine echte zeigt: beim hängenden Arm zum Körper, beim vorgestreckten oder
+  seitlich ausgestreckten Arm nach unten, beim hochgereckten nach vorn – nie immer nach oben
+  (`forearmTurn` in `three/guide.ts`). Nur wo die Pfote fängt, wirft, antippt, hochdrückt oder etwas
+  hält, öffnet sie sich (`palm` in der Pose des Clips; Halten macht `guide.hold`). Ein neuer Clip,
+  der fängt oder wirft, setzt `palm`.
+- **Arme wie bei einem Kind** (Rückmeldung November 2026: hochgereckt endeten sie unter den Ohren):
+  hochgestreckt reicht die Pfote deutlich über die Ohrenspitzen, hängend endet sie über dem Knie.
+  `three/guide.test.ts` prüft beides. Wer die Arme ändert, misst danach alles neu, was am Clip
+  gemessen ist (`DRUM_HAND`, `CRANK_*`, `KEY_HAND` in `layout.ts`, `REACH_TOP` in `world.ts`), und
+  schaut, dass sitzende Pfoten nicht im Boden stecken (`sitDown` in `three/player.ts`).
 - Körper und Kopf verdecken keine Arme oder Beine, die gerade die Bewegung machen (halb
   durchsichtig dort), aber nur diese.
 - Das Leuchten am Fuchs ist ein sauberer Rand um die Umrisse, ohne Spalten oder Nähte zwischen den
@@ -97,7 +123,11 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Kamera von hinten, damit links links ist; wo die Arme vor dem Körper arbeiten, höher und seitlich.
 - **Am Anfang sieht man den Fuchs von vorn**: Beim Vorstellen schwenkt die Kamera erst vor ihn, so
   dass man sein Gesicht sieht, und geht erst danach hinter ihn. Während er winkt, steht er mittig im
-  Bild, und wem er winkt (Kiki), ist neben ihm, nicht über oder hinter ihm.
+  Bild, und wem er winkt (Kiki), ist neben ihm, nicht über oder hinter ihm – und ganz im Bild, auch
+  am Anfang des Winkens (in der Wolkenreise flog Kiki erst außerhalb des Bildes).
+- **Worauf der Fuchs steht, ist mit im Bild** (Wolle, Ole): Die Kamera steht so weit hinten, dass man
+  den Träger ganz sieht, bei einer Wolke auch ihre Unterseite – nicht nur einen weißen Rand unter den
+  Füßen.
 - **Wo beide Arme vor dem Körper arbeiten** (Trommeln), steht die Kamera genau mittig und nah hinter
   den Schultern, nur wenig über dem Kopf, und schaut den Weg entlang: Pfoten und Trommeln neben dem
   Körper, und dahinter, worum es geht. Nie hoch und weit hinten mit dem Blick hinab auf die Trommeln –
@@ -111,6 +141,9 @@ Fehler in späteren Leveln nicht wieder passiert.
   Kamera aus gesehen, neben dem Fuchs und neben dem, was er bewegt, nie dahinter: Kleine Vögel direkt
   vor dem Fuchs versteckten sich hinter Beinen und Trommeln (`drumBirdSpot`, der Test prüft es). Auf
   dem Handy und dem Tablet anschauen, auch das Bewegungsfenster unten rechts.
+- **Malt der Fuchs, dann mit einem Werkzeug** (Regenbogen): ein Farbeimer und ein Pinsel in jeder
+  Pfote; vor jedem Bogen bückt er sich und taucht den Pinsel ein, und Farbe im Eimer und am Pinsel
+  ist die des Bandes, das er gleich malt. Mit leeren Pfoten in die Luft zu malen sah nach nichts aus.
 - **Was die Hände tun, ist im Bild.** Verdeckt der Körper die Hände, geht die Kamera über die
   Schulter. Was in der Hand gedreht wird (Schlüssel im Schloss), sieht man von der Seite auf seiner
   Höhe: Die Kamera schwenkt dafür seitlich heran, solange gedreht wird. Was gedreht wird, muss so
@@ -122,9 +155,26 @@ Fehler in späteren Leveln nicht wieder passiert.
   Posieren gerechnet, nicht aus dem Zeitplan. Steht das Gemalte weit weg (am Himmel), ist es die
   vergrößerte Form, von der Kamera aus gesehen; die Kamera und der Boden des Fuchses stehen dann
   still, sonst rutschen nah und fern gegeneinander. Der Fuchs steht genau in der Mitte dessen, was
-  er rundherum malt. `arc.test.ts` misst die Spitze am Gerüst.
-- **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse), steht die Kamera genau mittig hinter ihm
-  und etwas tiefer, damit man sieht, wie es heranrollt.
+  er rundherum malt, und der Bogen liegt von der Kamera hinter ihm aus gesehen über Kopf und Ohren
+  (auch auf dem Handy, 844×390): Was vor dem Fuchs gemalt wird, sieht sie von hinten und oben tiefer
+  liegen, als es ist. `arc.test.ts` misst die Spitze am Gerüst.
+- **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse, Sterne), steht die Kamera genau mittig hinter ihm
+  und etwas tiefer, damit man sieht, wie es heranrollt. Weicht er aus, dann schnell und weit genug zur
+  Seite, dass das, was kommt, frei neben ihm vorbeizieht und man es sieht (Wolkenreise: Wolle springt
+  zur Seite, die Kamera geht nur halb mit, der Stern fliegt durch die Mitte des Bildes).
+- **Duckt sich der Fuchs unter etwas** (Flugzeuge), steht die Kamera weiter weg, tiefer und schaut
+  etwas nach oben: Man sieht den ganzen Körper beim Ducken und das, was über ihn hinwegfliegt. Was
+  heranfliegt, kommt schräg von oben herab, vom oberen Bildrand, nah genug und groß genug, dass man
+  es sieht – nie frontal auf Kopfhöhe von vorn, da steckte es hinter dem Kopf und war winzig. Nach
+  dem Kopf fliegt es weiter auf uns zu und aus dem Bild, nie nach oben weg (Wolkenreise, November 2026).
+- **Kommt etwas zu den Händen** (Luftballons zum Antippen), kommt es von vorn schräg seitlich auf
+  Höhe der Hände angeschwebt, nie von oben, und die Kamera schaut von hinten: So sieht man es kommen
+  und die Pfote treffen. Die Pfote greift nach vorn **und zur Seite** hinaus, nie nur gerade nach vorn:
+  Von hinten verdeckten Kopf und Arm sonst Ballon und Pfote. Der Ballon schwebt langsamer werdend an
+  seinen Platz und wartet dort kurz, und er platzt in dem Moment, in dem die Pfote ihn berührt – nie
+  erst, wenn die Pfote schon in ihm steckt (`popAt` misst die Berührung).
+- **Schiebt der Fuchs etwas weg** (graue Wolken), steht die Kamera weit hinter ihm: Man sieht, wie es
+  kommt und wie es weggeschoben wird, nicht nur die Pfoten davor.
 - **Schwingt etwas über den Fuchs hinweg** (Baumstamm), steht die Kamera weit hinter ihm und tief
   und schaut schräg nach oben: So sieht man den ganzen Schwung, von vorn über den Kopf hinweg, und
   nicht nur das Stück direkt über dem Kopf. Was dabei zwischen Kamera und Schwung hängen würde
@@ -158,12 +208,17 @@ Fehler in späteren Leveln nicht wieder passiert.
   deutlich mit, nicht nur der Körper.
 - **Hinter durchsichtigen Dingen sieht man durch** (Spinnweben): keine weiße oder helle Fläche
   dahinter, die wie eine Wand wirkt.
+- **Begleiter halten Abstand und fliegen hin und her** (Kiki): nicht immer dicht neben dem Fuchs,
+  sondern ein Stück weg, in einer langsamen, weiten Schleife mal näher, mal ferner, mal höher (am
+  Anfang beim Winken nah genug, dass man sieht, wem er winkt).
 - **Begleiter fliegen nie durchs Bild** (Kiki): Sie bleiben weit genug vor der Kamera und wechseln
   höchstens einmal die Seite, vor dem Fuchs und in einem Schritt, in dem die Kamera von hinten schaut.
   Von der Kamera aus gesehen sitzen sie nie auf dem Kopf des Fuchses und nie vor dem, worauf er
   schaut (Schwimmer): Jede Kamera einer Station prüfen, nicht nur die von hinten.
   Jeden Übergang zwischen zwei Stationen anschauen, nicht nur die Stationen selbst: Ein Papagei, der
-  beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz.
+  beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz. Dreht sich der
+  Träger mit dem Fuchs um, drehen sich die Plätze des Begleiters nicht mit: Sie bleiben in der Welt
+  stehen, sonst schwenkt er mit herum in die Kamera.
 - **Die Kamera steht frei, auch am Anfang**: Nicht in oder knapp vor Wolken oder Bergen starten. Das,
   was gezeigt werden soll (die Regenwolke), sieht man aus Abstand ganz. Ein grauer Himmel hat keinen
   hellen Sonnenschein.
@@ -178,6 +233,8 @@ Fehler in späteren Leveln nicht wieder passiert.
   schwarz. Vor dem Abschluss die ganze Geschichte Bild für Bild durchlaufen und auf schwarze Bilder
   und `NaN` prüfen (Konsole: `__adventure.seek(t)`).
 - Neue Stationen im Browser anschauen, nicht nur typprüfen.
+- **Ein Tipp oder Klick aufs Bild hält an**, in jedem Abenteuer, und ▶ in der Mitte geht weiter
+  (`AdventurePlay`); ein schneller zweiter Tipp ändert nichts (`screenTap`).
 - **Keine Schnitte und kein Weiß zwischen den Stationen.** Ole trägt Tapsi den ganzen Weg, und die
   Kamera fährt mit (in engen Schluchten dicht hinter Tapsi, nie durch Felsen). Nichts Großes, Helles
   steht im Weg von Kamera oder Figur: Ein Lichtschein in einer Türöffnung wird ausgeblendet, bevor

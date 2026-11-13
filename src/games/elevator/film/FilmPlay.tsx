@@ -1,5 +1,6 @@
 import { type CSSProperties, type PointerEvent, memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
+import { HintHand, TapHint } from "@/components/TapHint";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { INK } from "@/games/scenes/shared";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -16,6 +17,7 @@ import { Fitted, type Picture } from "../trail/items";
 import type { Cue } from "../trail/types";
 import { type Choice, type Film, type Option, PACE, type Spot } from "./types";
 import "./film.css";
+import { useStepAddress } from "@/lib/stepAddress";
 
 // The film keeps a calm pace (user feedback, November 2026): a line is never cut off by the next one, a quiet moment
 // lies between two lines, a question is asked again only after a long while and then less and less often, and the
@@ -123,8 +125,10 @@ export function FilmPlay({
   onPick: (id: string) => void;
 }) {
   const [view, setView] = useState<View>(START);
+  // The scene on screen, from 1, in the address (stepAddress.ts).
+  useStepAddress(view.scene + 1);
   const viewRef = useRef<View>(view);
-  const { effects, ripple, glow, celebrate } = useTapFeedback();
+  const { effects, ripple, glow } = useTapFeedback();
   const t = useT();
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
@@ -365,7 +369,6 @@ export function FilmPlay({
     put({ party: true });
     say(film.end);
     sound(() => playRecorded("cheer", playTusch));
-    celebrate();
     await wait(END_MS);
     put({ picking: true });
   };
@@ -460,12 +463,7 @@ export function FilmPlay({
     <div ref={playEl} className="fm-play" style={{ "--fm-pace": PACE } as CSSProperties} onPointerDown={(e) => tap(e.clientX, e.clientY)}>
       <svg className="fm-svg" viewBox={viewBox} preserveAspectRatio="xMidYMid meet" aria-hidden>
         <Draw step={view.step} busy={view.busy} picks={view.picks} />
-        {spot && (
-          <g>
-            <circle className="fm-spot" cx={spot.at[0]} cy={spot.at[1]} r={spot.r} data-tap={tapState({ goal: true })} />
-            {view.hand && <Hand key={view.nudge} spot={spot} again={view.nudge > 0} />}
-          </g>
-        )}
+        {spot && <circle className="fm-spot" cx={spot.at[0]} cy={spot.at[1]} r={spot.r} data-tap={tapState({ goal: true })} />}
         {choice?.options.map((o, i) => (
           <g
             key={o.id}
@@ -486,6 +484,16 @@ export function FilmPlay({
           </g>
         ))}
       </svg>
+      {spot && (
+        <TapHint
+          key={`${view.scene}:${spot.at.join(",")}`}
+          x={(spot.at[0] - vx) * s}
+          y={(spot.at[1] - top) * s}
+          r={spot.r * s}
+          size={Math.max(64, Math.min(150, 130 * s))}
+          hand={view.hand}
+        />
+      )}
       {choice && (
         <>
           <div className={`fm-dim${view.shown > 0 ? " on" : ""}`} />
@@ -545,16 +553,6 @@ export function FilmPlay({
       {view.picking && <StoryEnd id={film.id} onPick={onPick} />}
       <FeedbackLayer effects={effects} />
     </div>
-  );
-}
-
-/** The pointing hand, its fingertip in the lower right of the spot (below it the strip may cover it); still, or popping
- * up again after a reminder. */
-function Hand({ spot: { at, r }, again }: { spot: Spot; again: boolean }) {
-  return (
-    <text className={`fm-hand${again ? " again" : ""}`} x={at[0] + r * 0.45} y={at[1] + r * 0.3 + 110} fontSize="120" textAnchor="middle">
-      👆
-    </text>
   );
 }
 
@@ -632,8 +630,8 @@ function ChoiceCard({
           <FilmFrame picture={option.card} n={n} />
         </div>
         {hand && (
-          <span key={`hand${nudge}`} className={`fm-card-hand${nudge > 0 ? " again" : ""}`} style={{ fontSize: box.w * 0.32 }}>
-            👆
+          <span key={`hand${nudge}`} className={`fm-card-hand${nudge > 0 ? " again" : ""}`} style={{ width: box.w * 0.22, height: box.w * 0.33 }}>
+            <HintHand />
           </span>
         )}
       </div>
