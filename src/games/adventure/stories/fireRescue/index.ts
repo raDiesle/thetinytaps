@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { CHEER_PERIOD, clipPose, duckDepth, PULL_DOWN_AT, PULL_DOWN_PERIOD } from "../../three/clips";
+import { CHEER_PERIOD, clipPose, duckDepth, PULL_DOWN_AT, PULL_DOWN_PERIOD, PUMP_DOWN_AT, PUMP_PERIOD } from "../../three/clips";
 import { type Guide, lerpPose } from "../../three/guide";
 import { updateMoved } from "../../three/matrices";
 import { mergeStatic } from "../../three/props";
@@ -10,6 +10,8 @@ import {
   CATCH_GAP,
   clamp01,
   FLOOR,
+  FOUNTAIN_RIM,
+  FOUNTAIN_X,
   HOUSE_HALF,
   HOUSE_Z,
   HOVER,
@@ -24,7 +26,7 @@ import {
   YARD_Z,
 } from "./layout";
 import { LANGUAGE, LINES, OPENING_LINES } from "./lines";
-import { HOSE_OUT, makeGallows, makeSmokyHouse, makeWashingLine, NOZZLE_MOUTH } from "./scenery";
+import { HOSE_OUT, makeGallows, makeSmokyHouse, makeWashingLine, NOZZLE_MOUTH, PUMP_BARREL, SUCTION_OUT } from "./scenery";
 import {
   actLength,
   catchTime,
@@ -41,6 +43,7 @@ import {
   PRAISE,
   passTime,
   pullTime,
+  pumpTime,
   releaseTime,
   S,
   sequence,
@@ -52,7 +55,8 @@ import { makeWorld } from "./world";
 // „Fire Rescue“: smoke comes out of a house in town and kittens sit up on its roof. Tapsi never walks: it stands on
 // Robo, a round hover robot, and Robo carries it everywhere (user idea, November 2026) – so the child moves along on
 // the spot. Tapsi waves Kiki over, rings the fire bell so the gate rolls up, ducks under the washing lines across
-// the street, sprays the smoke away with the hose, left and right, while Robo rises floor by floor, catches the
+// the street, pumps water from the fountain on the square into Robo's tanks, sprays the smoke away with the hose, left
+// and right, while Robo rises floor by floor and its tanks empty, catches the
 // kittens jumping off the roof, turns round to us and cheers, and waves goodbye. Tapsi always faces the way and the
 // camera looks from behind, so left is left; only at the start and the end does it look from the front.
 //
@@ -60,8 +64,8 @@ import { makeWorld } from "./world";
 // script.ts; here they move.
 
 const UP = new THREE.Vector3(0, 1, 0);
-/** How far behind Tapsi the camera stands while it ducks. */
-const DUCK_CAMERA_BACK = 3;
+/** How far behind Tapsi the camera stands while it ducks: far enough to see Robo under its feet too. */
+const DUCK_CAMERA_BACK = 4.2;
 /** How high the camera stands while Tapsi ducks, as a share of Tapsi's standing height: under the washing. */
 const DUCK_CAMERA_HEIGHT = 0.6;
 /** How much higher than the nozzle's mouth the water lands on the house's front. */
@@ -74,8 +78,15 @@ const HOP = 0.4;
 const KITTEN_OUT = 0.47;
 /** How far a kitten swings out to the side as it hops from the paws onto Robo, round Tapsi's body. */
 const HOP_ASIDE = 0.4;
-/** Where the kittens sit on Robo once caught, in Robo's space (+z its front): round Tapsi's feet. */
-const RIDE = [v3(0.5, ROBO_TOP, 0.3), v3(-0.5, ROBO_TOP, 0.3), v3(0.47, ROBO_TOP, -0.38), v3(-0.47, ROBO_TOP, -0.38)];
+/** Where the kittens sit on Robo once caught, in Robo's space (+z its front): round Tapsi's feet, one for each kitten. */
+const RIDE = [
+  v3(0.42, ROBO_TOP, 0.36),
+  v3(-0.42, ROBO_TOP, 0.36),
+  v3(0.44, ROBO_TOP, -0.38),
+  v3(-0.44, ROBO_TOP, -0.38),
+  v3(0.55, ROBO_TOP, -0.01),
+  v3(-0.55, ROBO_TOP, -0.01),
+];
 
 /** Robo's place and turn for a frame. */
 interface Place {
@@ -89,7 +100,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const scene = stage.scene;
   stage.setSky(DAY, DAY, 0);
   stage.updateReflections();
-  const { robo, parrot, door, bell, rope, handle, puffs, roofSmoke, kittens, nozzle, hose, water, confetti, spray } = makeWorld(scene);
+  const { robo, parrot, door, bell, rope, handle, pump, pumpHandle, suction, puffs, roofSmoke, kittens, nozzle, hose, water, confetti, spray } =
+    makeWorld(scene);
 
   const focus = v3(0, 0, YARD_Z);
   const camPos = new THREE.Vector3();
@@ -166,6 +178,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   scene.add(mergeStatic(makeGallows(ROPE_TOP, ROPE_TOP.x + 1.55)));
   bell.position.copy(BELL_AT);
 
+  // The pump's handle stands where the paws are up at the top of a push, so they take it there.
+  const pumpTop = measure("pump", PUMP_PERIOD).mid;
+
   // A window with smoke for each place the water lands at the left and the right end of every go of the hose, where
   // Robo has risen to by then: one floor higher for every go.
   const windows = puffs.map((_, n) => {
@@ -213,6 +228,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         break;
       case S.duck:
         out.z = duckZ(local);
+        break;
+      case S.pump:
+        // Still beside the fountain, where the street ended.
+        out.z = DUCK_END;
         break;
       case S.spray:
         out.z = DUCK_END + (SPRAY_Z - DUCK_END) * smooth(local / TRAVEL[step]);
@@ -282,26 +301,36 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.bell:
         // From Tapsi's left side, a little behind and raised: the paws up at the handle in front of the body, the bell
         // beyond them and the gate rolling up ahead (on the left of the picture). From behind, the head hid the paws.
-        around(g, -1.2, 1.35, 1.1, pos, look, 1.3);
+        around(g, -1.2, 1.6, 1.0, pos, look, 1.2);
         look.z -= 0.4;
         return;
       case S.duck:
         // Behind, under the washing and looking a little up the street: the whole ducking body shows, and every line
         // passes over the head.
         pos.set(g.x, g.y + standTop * DUCK_CAMERA_HEIGHT, g.z + DUCK_CAMERA_BACK);
-        look.set(g.x, g.y + standTop, g.z - 6);
+        look.set(g.x, g.y + standTop * 0.7, g.z - 6);
+        return;
+      case S.pump:
+        // From Tapsi's left, a little behind and raised, looking across to the fountain on its right: the paws on the
+        // handle in front of the body, the pump in Robo's hatch, the tanks filling and the hose down into the water.
+        // From the right the camera stood over the fountain and showed none of it.
+        around(g, -1.0, 1.45, 1.15, pos, look, 0.8);
+        look.x += 0.7;
         return;
       case S.spray:
         // Behind and high over the head, rising with Robo: the nozzle in the paws and the water's arc to either side
-        // and the house's front. From behind on one side, the body hid the water going to the other.
-        pos.set(g.x - 0.4, g.y + 2.5, g.z + 3.3);
-        look.set(g.x, g.y + 1.3, g.z - 5);
+        // and the house's front. From behind on one side, the body hid the water going to the other. Far enough back and
+        // looking low enough that Robo shows under Tapsi's feet as it rises (user feedback, November 2026: from higher
+        // up Tapsi seemed to float up the house on nothing).
+        pos.set(g.x - 0.4, g.y + 1.8, g.z + 4.8);
+        look.set(g.x, g.y + 0.6, g.z - 5);
         return;
       case S.catch:
         // From Tapsi's left side, a little behind: the kittens on the gutter, the open arms they jump into and the
-        // kitten held in them. Over the shoulder, the body hid the kitten in the arms.
-        pos.set(g.x - 2.6, g.y + 1.4, g.z + 2.3);
-        look.set(g.x, g.y + 1.15, g.z - 1.1);
+        // kitten held in them. Over the shoulder, the body hid the kitten in the arms. Back and low enough that Robo
+        // shows under Tapsi's feet, with the kittens riding on it.
+        pos.set(g.x - 3.1, g.y + 1.2, g.z + 2.8);
+        look.set(g.x, g.y + 0.8, g.z - 1.1);
         return;
       default: {
         // Turned round to us: from the front, the house behind Tapsi; at the very end up and away.
@@ -360,28 +389,50 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
   // --- Kiki ----------------------------------------------------------------
   /**
-   * Where Kiki flies in each step, in Tapsi's space (x to its left, z ahead): always on Tapsi's right, a good way off
-   * and clear of the paws and of what comes – over the washing lines in the street, beside the water's arc.
+   * Where Kiki flies in each step, in Tapsi's space (x to its left, z ahead), and how wide its loop round that place
+   * is: always on Tapsi's right, a good way off and clear of the paws and of what comes, and where the step's camera
+   * sees it – never behind the bell's post, a wall or Tapsi, inside the house, or under the dancer's box in the bottom
+   * right corner (user feedback, November 2026; `companions.test.ts` follows it through the whole story).
    */
-  const KIKI = [v3(-1.8, 1.25, -0.5), v3(-2.4, 1.5, 2.4), v3(-2.2, 2.5, 2.4), v3(-2.6, 1.8, 0.8), v3(-2.4, 0.9, 1.4), v3(-2.2, 1.9, -1.8), v3(-2.2, 1.9, -1.8)];
-  /** Kiki doesn't hang still: a slow, wide loop round its place, on its own side of Tapsi always. */
+  const KIKI = [
+    // Hello: between Tapsi and the bell's post, below the waving paw (behind the post it was hidden, in front of it
+    // too close to the camera).
+    { at: v3(-0.95, 1.0, 0.05), loop: 0.3 },
+    // Bell: ahead on the right and high, past the post, seen beside Tapsi from its left.
+    { at: v3(-1.7, 2.3, 3.0), loop: 0.6 },
+    // Street: low beside Robo and a little ahead, ducking under the washing with Tapsi (further right it sat under the
+    // dancer's box).
+    { at: v3(-0.9, 0.75, 1.4), loop: 0.4 },
+    // Pump: over the fountain.
+    { at: v3(-2.7, 1.7, 0.4), loop: 1 },
+    // Spray: on the right beside the water's arc, rising with Robo, well below the roof's edge (seen against it, Kiki
+    // looked like one of the kittens).
+    { at: v3(-2.2, 1.6, 1.0), loop: 0.5 },
+    // Catch: on the right behind Tapsi and low, clear of the house and the kittens' jumps, and of the roof's edge.
+    { at: v3(-1.3, 1.4, -0.8), loop: 0.4 },
+    { at: v3(-2.2, 1.9, -1.8), loop: 1 },
+    { at: v3(-2.2, 1.9, -1.8), loop: 1 },
+  ];
+  /** Kiki doesn't hang still: a slow loop round its place, on its own side of Tapsi always. */
   const kikiLoop = (time: number, size: number, out: THREE.Vector3) =>
     out.set(0.6 * Math.sin(time * 0.43), 0.25 * Math.sin(time * 0.71 + 1), 1.1 * Math.sin(time * 0.29 + 2)).multiplyScalar(size);
-  const kikiFar = v3(6, 7, 8);
+  /** Where Kiki waits through the opening: high over the yard's front, so it flies down to Tapsi through open air, under
+   * the bell's beam. */
+  const kikiFar = v3(1, 6, YARD_Z - 5);
   function placeKiki(f: StoryFrame, g: THREE.Vector3) {
     const { step, time } = f;
     const p = parrot.group.position;
-    const loop = kikiLoop(time, step === S.hello ? 0.35 : 1, new THREE.Vector3());
+    const loop = kikiLoop(time, KIKI[step].loop, new THREE.Vector3());
     // While Robo turns round in the hooray, Kiki's places are taken as Tapsi faces before and after the turn.
     const yawOf = (s: number) => (s >= S.hooray ? AHEAD - Math.PI : step >= S.hooray ? AHEAD : place.yaw);
-    const here = fromTapsi(loop.add(KIKI[step]), g, yawOf(step), tmpA);
+    const here = fromTapsi(loop.add(KIKI[step].at), g, yawOf(step), tmpA);
     if (f.opening !== null) {
       p.copy(kikiFar);
     } else if (step === S.hello) {
       p.copy(kikiFar).lerp(here, smooth((f.local - 0.3) / 2.4));
       if (f.act + f.demo > 0) p.y += Math.abs(Math.sin(time * 4.5)) * 0.12;
     } else {
-      const before = fromTapsi(kikiLoop(time, step - 1 === S.hello ? 0.35 : 1, tmpB).add(KIKI[step - 1]), g, yawOf(step - 1), tmpB);
+      const before = fromTapsi(kikiLoop(time, KIKI[step - 1].loop, tmpB).add(KIKI[step - 1].at), g, yawOf(step - 1), tmpB);
       p.copy(before).lerp(here, smooth(f.local / 1.5));
     }
     p.y += Math.sin(time * 2.3) * 0.08;
@@ -401,6 +452,15 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     for (let n = 0; n < goes(S.bell); n++) sum += smooth((clip - (n + 0.02) * PULL_DOWN_PERIOD) / ((PULL_DOWN_AT - 0.02) * PULL_DOWN_PERIOD));
     return sum / goes(S.bell);
   };
+
+  /** How full Robo's tanks are `clip` s into the pump clip: a share more at each push, while the handle goes down. */
+  const pumped = (clip: number) => {
+    let sum = 0;
+    for (let n = 0; n < goes(S.pump); n++) sum += smooth((clip - (n + 0.12) * PUMP_PERIOD) / ((PUMP_DOWN_AT - 0.1) * PUMP_PERIOD));
+    return sum / goes(S.pump);
+  };
+  /** Where the water gushes in at the top of the tanks, in Robo's space. */
+  const TANK_TOPS = [v3(0.9, 0.38, -0.08), v3(-0.9, 0.38, -0.08)];
 
   function updateWorld(f: StoryFrame, g: THREE.Vector3) {
     const { step, time } = f;
@@ -423,6 +483,19 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // A line of washing passes right over the ducked head in every duck.
     if (step === S.duck) for (let n = 0; n < goes(S.duck); n++) if (atClip(passTime(n) - 0.35)) cue("whoosh");
     guide.earsBack = step === S.duck && clip > 0 ? duckDepth(clip) * 0.8 : 0;
+
+    // Every push of the pump gushes water into both of Robo's tanks; they fill a share at each, and the hose empties
+    // them while it sprays.
+    if (step === S.pump) {
+      for (let n = 0; n < goes(S.pump); n++) {
+        if (!atClip(pumpTime(n))) continue;
+        cue("splash");
+        for (const top of TANK_TOPS) spray.burst(robo.group.localToWorld(tmpA.copy(top)), 8, 1.1, true);
+      }
+    }
+    const pumpClip = inOpening || step < S.pump ? -99 : step > S.pump ? 99 : clip;
+    const emptied = inOpening || step < S.spray ? 0 : step > S.spray ? 1 : clamp01((clip - 0.5) / (clipLength(S.spray) - 0.5));
+    robo.fill(pumped(pumpClip) * (1 - emptied));
 
     // The smoke: grey puffs at the windows, breathing a little, until the water reaches one: it turns white like steam,
     // rises and is gone. The smoke over the roof thins with every puff put out.
@@ -510,6 +583,63 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     }
     bell.rotation.set(down * 0.55 + ring, 0, 0);
+  }
+
+  /**
+   * The pump grows up out of Robo's hatch as Robo stops beside the fountain, its handle up where the paws take it; the
+   * paws push it down and pull it up, the barrel leaning after the handle, and it sinks back into the hatch in the
+   * praise. Meanwhile the suction hose comes down out of the tank on Tapsi's right, over the basin's rim into the water.
+   */
+  const pumpTopAt = new THREE.Vector3();
+  const suctionEnd = new THREE.Vector3();
+  function holdPump(f: StoryFrame) {
+    const pumping = f.opening === null && f.step === S.pump;
+    const clip = f.act + f.demo;
+    const out = pumping ? smooth((f.local - TRAVEL[S.pump] + 1.6) / 1.3) * (1 - smooth((f.praise - 0.6) / 1.2)) : 0;
+    const shown = out > 0.005;
+    pump.barrel.visible = pump.rod.visible = pumpHandle.visible = suction.mesh.visible = shown;
+    if (!shown) return;
+    const hatch = robo.group.localToWorld(tmpC.copy(HOSE_OUT));
+    // The handle: up out of the hatch to the top of a push, in the paws while they pump; let go at the top of the last.
+    fromTapsi(pumpTop, guide.root.position, place.yaw, pumpTopAt);
+    const at = pumpHandle.position.copy(hatch).addScaledVector(UP, 0.06).lerp(pumpTopAt, out);
+    const held = pumping ? smooth((clip - 0.25) / 0.5) * (1 - smooth((clip - clipLength(S.pump) + 0.3) / 0.3)) : 0;
+    if (held > 0) {
+      guide.gripPoint("L", tmpA);
+      guide.gripPoint("R", tmpB);
+      at.lerp(tmpA.add(tmpB).multiplyScalar(0.5), held);
+      left.set(1, 0, 0).applyAxisAngle(UP, place.yaw);
+      guide.hold("L", tmpD.copy(at).addScaledVector(left, 0.09), left, held);
+      guide.hold("R", tmpD.copy(at).addScaledVector(left, -0.09), left, held);
+    }
+    pumpHandle.rotation.set(0, place.yaw, 0);
+    // The barrel stands in the hatch leaning towards the handle; the rod runs from its top up to the handle.
+    across.subVectors(at, hatch).normalize();
+    pump.barrel.position.copy(hatch);
+    pump.barrel.quaternion.setFromUnitVectors(UP, across);
+    pump.barrel.scale.set(1, out, 1);
+    pump.rod.visible = at.distanceTo(hatch) > PUMP_BARREL * out + 0.01;
+    pump.rodBetween(tmpA.copy(hatch).addScaledVector(across, PUMP_BARREL * out), at);
+    // The suction hose: from the foot of the tank, up over the basin's rim and down into the water.
+    const start = robo.group.localToWorld(tmpA.copy(SUCTION_OUT));
+    suctionEnd.set(FOUNTAIN_X - 0.35, FOUNTAIN_RIM - 0.2, place.z);
+    const end = tmpB.copy(start).lerp(suctionEnd, out);
+    bend.set(start.x + (suctionEnd.x - start.x) * 0.45, Math.max(start.y, FOUNTAIN_RIM) + 0.35, place.z);
+    bend.lerpVectors(start, bend, out);
+    const piece = (u: number, o: THREE.Vector3) =>
+      o
+        .copy(start)
+        .multiplyScalar((1 - u) ** 2)
+        .addScaledVector(bend, 2 * u * (1 - u))
+        .addScaledVector(end, u * u);
+    for (let i = 0; i < suction.count; i++) {
+      piece(i / suction.count, tmpC);
+      piece((i + 1) / suction.count, tmpD);
+      const length = tmpD.distanceTo(tmpC);
+      middle.copy(tmpC).add(tmpD).multiplyScalar(0.5);
+      suction.set(i, middle, tmpD.sub(tmpC).normalize(), Math.max(0.001, length * 1.15));
+    }
+    suction.done();
   }
 
   /** The nozzle in the paws while they spray, with the hose up to it from Robo's hatch and the water's arc out of it. */
@@ -658,10 +788,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     afterPose(f) {
       updateMoved(guide.root);
       holdRope(f);
+      holdPump(f);
       holdHose(f);
       holdKittens(f);
     },
-    held: () => [handle, nozzle, ...kittens],
+    held: () => [handle, pumpHandle, nozzle, ...kittens],
   };
 }
 

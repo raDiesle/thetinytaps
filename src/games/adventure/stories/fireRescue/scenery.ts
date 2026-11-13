@@ -25,8 +25,19 @@ const v2 = (x: number, y: number) => new THREE.Vector2(x, y);
 const UP = new THREE.Vector3(0, 1, 0);
 const FORWARD = new THREE.Vector3(0, 0, 1);
 
-/** Where on Robo's deck the hose comes out, in Robo's own space (+z is its front, where Tapsi looks). */
+/** Where on Robo's deck the hose comes out, in Robo's own space (+z is its front, where Tapsi looks); the pump comes out there too. */
 export const HOSE_OUT = new THREE.Vector3(0, ROBO_TOP, 0.5);
+/** Robo's water tanks on either side of its rim, in Robo's space: how far out, how far back, their bottom, height and radius. */
+const TANK_X = 0.9;
+const TANK_Z = -0.08;
+const TANK_BOTTOM = -0.14;
+const TANK_HEIGHT = 0.5;
+const TANK_RADIUS = 0.12;
+/** Where the suction hose goes into the tank on Tapsi's right (Robo's -x): through its top cap, in Robo's space, so the hose
+ * arches up over Robo's rim where it is seen (from the tank's foot Robo's body hid it). */
+export const SUCTION_OUT = new THREE.Vector3(-TANK_X, TANK_BOTTOM + TANK_HEIGHT + 0.02, TANK_Z);
+/** How long the pump's barrel is, from the hatch up to where its rod comes out. */
+export const PUMP_BARREL = 0.42;
 
 /**
  * Robo, the round hover robot Tapsi stands on: a red saucer with a white band and a flat grey deck on top,
@@ -96,7 +107,30 @@ export function makeRobo() {
   ring.rotation.x = Math.PI / 2;
   ring.position.y = -0.3;
   body.add(ring);
-  mergeParts(body);
+  // A glass water tank on either side of the rim, filled by the pump and emptied by the hose: the water in each is a
+  // blue column of its own, stretched to the level.
+  const glass = new THREE.MeshStandardMaterial({ color: "#e8f6ff", roughness: 0.1, transparent: true, opacity: 0.32, depthWrite: false });
+  const waterMat = new THREE.MeshStandardMaterial({ color: "#5fc3ff", emissive: "#2b8fff", emissiveIntensity: 0.25, roughness: 0.2 });
+  const levels: THREE.Mesh[] = [];
+  for (const side of [1, -1]) {
+    const x = side * TANK_X;
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(TANK_RADIUS, TANK_RADIUS, TANK_HEIGHT, 24, 1, true), glass);
+    tank.position.set(x, TANK_BOTTOM + TANK_HEIGHT / 2, TANK_Z);
+    body.add(tank);
+    for (const y of [TANK_BOTTOM, TANK_BOTTOM + TANK_HEIGHT]) {
+      const cap = solid(new THREE.CylinderGeometry(TANK_RADIUS + 0.015, TANK_RADIUS + 0.015, 0.04, 24), white);
+      cap.position.set(x, y, TANK_Z);
+      body.add(cap);
+    }
+    const waterGeo = new THREE.CylinderGeometry(TANK_RADIUS - 0.012, TANK_RADIUS - 0.012, 1, 20);
+    waterGeo.translate(0, 0.5, 0);
+    const water = new THREE.Mesh(waterGeo, waterMat);
+    water.position.set(x, TANK_BOTTOM + 0.02, TANK_Z);
+    water.visible = false;
+    body.add(water);
+    levels.push(water);
+  }
+  mergeParts(body, levels);
   const beamGeo = new THREE.CylinderGeometry(0.42, 0.62, 1, 32, 1, true);
   beamGeo.translate(0, -0.5, 0);
   const beam = new THREE.Mesh(
@@ -110,6 +144,13 @@ export function makeRobo() {
     /** Presses Robo flat a little (0..1). */
     squash(k: number) {
       body.scale.set(1 + k * 0.07, 1 - k * 0.14, 1 + k * 0.07);
+    },
+    /** Fills both water tanks up to `k` (0 empty … 1 full). */
+    fill(k: number) {
+      for (const water of levels) {
+        water.visible = k > 0.01;
+        water.scale.y = Math.max(0.001, k * (TANK_HEIGHT - 0.04));
+      }
     },
     /** Lets the light under Robo reach down `height` metres, to the ground. */
     beamTo(height: number) {
@@ -693,4 +734,77 @@ export function makeWater() {
     opacity: 0.85,
   });
   return makeChain(geometry, material, 36);
+}
+
+/**
+ * The pump that comes up out of Robo's hatch: a red barrel standing on the hatch (its foot at the group's origin, along
+ * +y, stretched by its scale while it comes out), a shiny rod from its top up to the handle, placed by `rodBetween(a, b)`.
+ */
+export function makePump() {
+  const barrel = new THREE.Group();
+  const red = mat("#d93a2b", 0.45);
+  const white = mat("#f6f4ef", 0.45);
+  const body = solid(new THREE.CylinderGeometry(0.065, 0.075, PUMP_BARREL, 18), red, false);
+  body.position.y = PUMP_BARREL / 2;
+  barrel.add(body);
+  for (const y of [0.06, PUMP_BARREL - 0.03]) {
+    const band = solid(new THREE.CylinderGeometry(0.08, 0.08, 0.035, 18), white, false);
+    band.position.y = y;
+    barrel.add(band);
+  }
+  mergeParts(barrel);
+  const rod = solid(new THREE.CylinderGeometry(0.018, 0.018, 1, 10), mat("#c9d1da", 0.25, { metalness: 0.7 }), false);
+  const q = new THREE.Quaternion();
+  const d = new THREE.Vector3();
+  return {
+    barrel,
+    rod,
+    rodBetween(a: THREE.Vector3, b: THREE.Vector3) {
+      d.subVectors(b, a);
+      rod.position.copy(a).addScaledVector(d, 0.5);
+      rod.scale.set(1, Math.max(0.001, d.length()), 1);
+      rod.quaternion.copy(q.setFromUnitVectors(UP, d.normalize()));
+    },
+  };
+}
+
+/** The suction hose Robo lets down from its tank into the fountain: short grey-blue pieces along a curve. */
+export function makeSuctionHose() {
+  const geometry = new THREE.CylinderGeometry(0.045, 0.045, 1, 8, 1, true);
+  return makeChain(geometry, mat("#2f86b8", 0.55), 14);
+}
+
+/**
+ * The fountain on the square: a round stone basin with water in it and a column in its middle with a little bowl on
+ * top, its middle at `x`, `z` on the ground. Static.
+ */
+export function makeFountain(x: number, z: number, radius: number, rim: number) {
+  const group = new THREE.Group();
+  const stone = mat("#cbbfae", 0.9);
+  const wall = solid(new THREE.CylinderGeometry(radius, radius + 0.05, rim, 36, 1, true), stone);
+  wall.material.side = THREE.DoubleSide;
+  wall.position.y = rim / 2;
+  group.add(wall);
+  const top = solid(new THREE.TorusGeometry(radius, 0.07, 8, 36), stone);
+  top.rotation.x = Math.PI / 2;
+  top.position.y = rim;
+  group.add(top);
+  const water = solid(new THREE.CircleGeometry(radius - 0.02, 36), mat("#5fb8ef", 0.15, { emissive: "#2b7dff", emissiveIntensity: 0.15 }), false);
+  water.rotation.x = -Math.PI / 2;
+  water.position.y = rim - 0.1;
+  group.add(water);
+  const column = solid(new THREE.CylinderGeometry(0.12, 0.16, rim + 0.5, 16), stone);
+  column.position.y = (rim + 0.5) / 2;
+  group.add(column);
+  const bowlGeo = new THREE.SphereGeometry(0.3, 20, 10, 0, TAU, Math.PI / 2, Math.PI / 2);
+  const bowl = solid(bowlGeo, stone);
+  bowl.material.side = THREE.DoubleSide;
+  bowl.position.y = rim + 0.75;
+  group.add(bowl);
+  const pool = solid(new THREE.CircleGeometry(0.26, 20), mat("#5fb8ef", 0.15, { emissive: "#2b7dff", emissiveIntensity: 0.15 }), false);
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.y = rim + 0.72;
+  group.add(pool);
+  group.position.set(x, 0, z);
+  return group;
 }

@@ -30,6 +30,8 @@ import {
   PULL_DOWN_AT,
   PULL_DOWN_PERIOD,
   pullReach,
+  PUMP_DOWN_AT,
+  PUMP_PERIOD,
   PUSH_PERIOD,
   smooth,
   sprayAim,
@@ -120,14 +122,17 @@ export const ARM_CLIPS = clips({
   },
 
   pull_down: (t, p) => {
+    // Up high first, stretched as far as the paws go, on the toes, looking up at the handle (user feedback,
+    // November 2026: the child should stretch), then pulled down into the knees.
     const k = hold(phase(t, PULL_DOWN_PERIOD), 0.0, PULL_DOWN_AT, 0.55, 0.9);
     for (const a of [p.armL, p.armR]) {
-      a.raise = 2.9 - k * 2.3;
-      a.spread = 0.2;
-      a.elbow = 0.2 + k * 1.8;
+      a.raise = 3.08 - k * 2.48;
+      a.spread = 0.12 + k * 0.08;
+      a.elbow = 0.02 + k * 1.98;
     }
     crouch(p, k * 0.25);
-    p.headPitch = -0.35 + k * 0.4;
+    p.toes = (1 - k) * 0.9;
+    p.headPitch = -0.45 + k * 0.5;
   },
 
   robot: (t, p) => {
@@ -557,13 +562,17 @@ export const ARM_CLIPS = clips({
   },
 
   pump: (t, p) => {
-    const down = hold(phase(t, 1.3), 0.05, 0.4, 0.5, 0.9);
+    // Both paws on a pump's handle in front of the chest: pushed down slowly and far into the knees, held a moment
+    // at the bottom (the water gushes), and pulled up again to the chin, on the toes.
+    const down = hold(phase(t, PUMP_PERIOD), 0.08, PUMP_DOWN_AT, 0.55, 0.95);
     for (const a of [p.armL, p.armR]) {
-      a.raise = 1.0 - down * 0.55;
+      a.raise = 1.9 - down * 1.15;
       a.spread = TOGETHER + 0.25;
-      a.elbow = 1.4 - down * 1.0;
+      a.elbow = 1.25 - down * 0.95;
     }
-    crouch(p, down * 0.3);
+    crouch(p, down * 0.32);
+    p.toes = (1 - down) * 0.4;
+    p.headPitch = 0.1 + down * 0.15;
   },
 
   drum: (t, p) => {

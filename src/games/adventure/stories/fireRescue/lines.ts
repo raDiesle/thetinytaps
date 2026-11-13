@@ -41,6 +41,14 @@ export const LINES: StepLines[] = [
     praise: "We made it through!",
   },
   {
+    icon: "💧",
+    situation: "Robo needs water for the hose. Look, a fountain!",
+    instruction: "Hold the handle and push it down – like this!",
+    turn: "Your turn – pump!",
+    again: "Glug, glug! The water comes in!",
+    praise: "Robo's tanks are full!",
+  },
+  {
     icon: "💦",
     situation: "There's the house with the smoke!",
     instruction: "Hold the hose and spray – left, and right! Like this!",

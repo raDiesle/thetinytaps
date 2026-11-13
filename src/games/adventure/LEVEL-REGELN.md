@@ -28,7 +28,8 @@ Fehler in späteren Leveln nicht wieder passiert.
   antippen), wartet die eine halb oben, während die andere hinausgreift, und keine springt beim Wechsel
   an einen anderen Platz (`clips.test.ts` misst es beim Antippen).
 - **Jede Bewegung oft genug.** Zeigen und Mitmachen zusammen dauern etwa 12–25 s, also viele
-  Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr.
+  Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr (Feuerwehr, Rückmeldung
+  November 2026: sechs Kätzchen statt vier, damit das Fangen länger dauert).
 - **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: erst Kiki winken, dann
   die Angel auswerfen), nicht mit Sitzen und Zuschauen.
 - **Hinsetzen und Aufstehen sind eigene Schritte, aber nur die Bewegung selbst**: Der Fuchs setzt
@@ -70,7 +71,10 @@ Fehler in späteren Leveln nicht wieder passiert.
   über Tapsi hängt.
 - **Was getroffen wird, hängt dort, wo die Pfote im Clip wirklich ankommt**: am Clip messen, nicht
   schätzen, und seitlich vom Körper, damit man den Treffer von hinten sieht. Lieber an der
-  höchsten Stelle, die die Pfote erreicht (Äpfel), damit sich das Kind richtig streckt.
+  höchsten Stelle, die die Pfote erreicht (Äpfel), damit sich das Kind richtig streckt. Das gilt auch
+  für alles, was der Fuchs von oben herunterzieht (der Griff der Feuerglocke, Rückmeldung November
+  2026: „er soll sich mehr strecken“): Der Clip reckt die Arme ganz hoch, auf den Zehenspitzen und mit
+  Blick nach oben, und der Griff hängt genau dort, wo die Pfoten dann sind.
 - **Die Pfoten sind an dem, was sie drehen oder halten** (Kurbel, Paddel, Angel, Schlüssel): Hand
   und Ding bewegen sich zusammen, sonst dreht sich etwas wie von Geisterhand. **Und nichts davon reicht
   in den Körper**: Ein Schlüssel ragt von der Pfote nach vorn, also sitzt das Schloss eine
@@ -128,9 +132,11 @@ Fehler in späteren Leveln nicht wieder passiert.
   dass man sein Gesicht sieht, und geht erst danach hinter ihn. Während er winkt, steht er mittig im
   Bild, und wem er winkt (Kiki), ist neben ihm, nicht über oder hinter ihm – und ganz im Bild, auch
   am Anfang des Winkens (in der Wolkenreise flog Kiki erst außerhalb des Bildes).
-- **Worauf der Fuchs steht, ist mit im Bild** (Wolle, Ole): Die Kamera steht so weit hinten, dass man
+- **Worauf der Fuchs steht, ist mit im Bild** (Wolle, Ole, Robo): Die Kamera steht so weit hinten, dass man
   den Träger ganz sieht, bei einer Wolke auch ihre Unterseite – nicht nur einen weißen Rand unter den
-  Füßen.
+  Füßen. In jeder Station, auch beim Ducken, Hochgreifen und Fangen, und gerade wenn der Träger mit dem
+  Fuchs aufsteigt (Robo am Haus hoch): Von oben schauend schwebte Tapsi auf nichts die Hauswand hinauf
+  (Rückmeldung November 2026). Dann steht die Kamera weiter hinten und schaut tiefer.
 - **Vor dem Festlegen der Kamera prüfen, was Kopf und Körper verdecken** (Feuerwehr, November 2026):
   Ziehen die Pfoten über dem Kopf (Glockenseil), verdeckte der Kopf sie von hinten – dort von der
   Seite. Schwenkt etwas nach links und rechts (Wasserstrahl), verdeckte der Körper von schräg hinten
@@ -243,12 +249,26 @@ Fehler in späteren Leveln nicht wieder passiert.
   beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz. Dreht sich der
   Träger mit dem Fuchs um, drehen sich die Plätze des Begleiters nicht mit: Sie bleiben in der Welt
   stehen, sonst schwenkt er mit herum in die Kamera.
+- **Begleiter fliegen um Dinge herum, nie hindurch, und verstecken sich nicht** (Feuerwehr, Rückmeldung
+  November 2026: Kiki flog durch die Hauswand und schwebte beim Winken die ganze Zeit hinter dem Pfosten
+  der Glocke). Sein Platz in jeder Station liegt frei von Häusern, Pfosten, Wäsche und dem Fuchs, auch
+  mit seiner Schleife, und von der Kamera der Station aus gesehen vor allem, nicht dahinter; gegen eine
+  Dachkante gesehen wirkt er wie eins der Dinge darauf (Kiki neben den Kätzchen), und unten rechts liegt
+  er unter dem Kasten mit der Tänzerfigur. Auch woher er am Anfang kommt, ist freie Luft.
+  `three/companions.test.ts` spielt die Geschichte Bild für Bild durch und prüft, dass sein Weg durch
+  nichts geht und er nie länger als einen Moment verdeckt, außerhalb des Bildes oder unter dem Kasten
+  ist; eine neue Geschichte mit Begleiter kommt dort dazu (sein Objekt bekommt einen Namen).
 - **Die Kamera steht frei, auch am Anfang**: Nicht in oder knapp vor Wolken oder Bergen starten. Das,
   was gezeigt werden soll (die Regenwolke), sieht man aus Abstand ganz. Ein grauer Himmel hat keinen
   hellen Sonnenschein.
 - **Keine Felswand füllt das Bild.** In engen Buchten erst von oben nachsehen, wo die Wände sind,
   und Figur, Truhe und Kamera so stellen, dass die Kamera frei steht und die Wand höchstens am Rand
   zu sehen ist.
+- **Karte und Pokal zeigen eine Szene des Levels**, nie den Kasten mit der Tänzerfigur (Rückmeldung
+  November 2026: die Pokale zeigten „das Skelett“): Das Bild in `vorschau/<level>.webp` kommt aus
+  `bun run previews /abenteuer/`, das für die Geschichten den Kasten und die Reihe der Stationen
+  ausblendet (`HIDE_ALSO` in `tools/previews.ts`), und zeigt eine Station mitten im Tun mit Fuchs und
+  Träger (`PLAYS`: Feuerwehr beim Spritzen). Kommt eine Station dazu, die Tastendrücke dort anpassen.
 
 ## Technik
 

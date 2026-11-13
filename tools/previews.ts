@@ -146,18 +146,26 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
     }
     await sleep(6000);
   },
-  // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening.
-  "adventure/feuerwehr": async (cdp) => {
-    for (let i = 0; i < 4; i++) {
-      await press(cdp, "ArrowRight");
-      await sleep(300);
-    }
-    await sleep(7000);
-  },
+  // The other stories likewise show a station in the middle of play, not their empty opening: Tapsi paddling on Ole
+  // (Die Schatzinsel's fourth step), Tapsi on Wolle tapping the balloons (Die Wolkenreise's fourth).
+  "adventure/schatzinsel": (cdp) => stepInto(cdp, 3),
+  "adventure/wolkenreise": (cdp) => stepInto(cdp, 3),
+  // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening (the fifth
+  // step, after the pump).
+  "adventure/feuerwehr": (cdp) => stepInto(cdp, 5),
   // Many pairs on the line (user feedback, November 2026): three washes hung whole, so the game takes the child to
   // four pairs with patterns, and of those all but one.
   "components/socken": (cdp) => hangSocks(cdp, 3),
 };
+
+/** Skips a Bewegungsabenteuer story `steps` steps on (⏭) and waits until Tapsi is in the middle of the movement. */
+async function stepInto(cdp: Cdp, steps: number) {
+  for (let i = 0; i < steps; i++) {
+    await press(cdp, "ArrowRight");
+    await sleep(300);
+  }
+  await sleep(7000);
+}
 
 /** Hangs every pair of `washes` washes and then all but one pair of the next, as a quick child would. */
 async function hangSocks(cdp: Cdp, washes: number) {
@@ -220,6 +228,19 @@ const HIDE_OVERLAYS = `(() => {
     if (/^[👆👇👈👉]$/u.test(node.textContent.trim())) node.parentElement.style.visibility = "hidden";
   }
 })()`;
+
+/**
+ * What else to hide in the cuts of one game's levels, by the folder of `keyOf`: a Bewegungsabenteuer story's card and
+ * trophy show a scene of the story, never the dark dancer in its box nor the row of steps under it (user feedback,
+ * November 2026: the trophies showed the skeleton). The game's own card keeps the dancer, its `ALONE` cut.
+ */
+const HIDE_ALSO: Record<string, string> = {
+  adventure: ".adventure-outline, .adventure-route",
+};
+
+/** A script that hides what `selectors` name. */
+const hideAlso = (selectors: string) =>
+  `(() => { const style = document.createElement("style"); style.textContent = ${JSON.stringify(`${selectors} { visibility: hidden !important; }`)}; document.head.append(style); })()`;
 
 /** A part of the window, in CSS pixels. */
 interface Area {
@@ -320,6 +341,7 @@ async function picture(cdp: Cdp, file: string, area?: Area | null) {
   const key = keyOf(file);
   await PLAYS[key]?.(cdp);
   await evaluate(cdp, HIDE_OVERLAYS);
+  if (HIDE_ALSO[key.split("/")[0]]) await evaluate(cdp, hideAlso(HIDE_ALSO[key.split("/")[0]]));
   await sleep(150);
   mkdirSync(file.slice(0, file.lastIndexOf("/")), { recursive: true });
   const cut = CUTS[key];

@@ -2,8 +2,9 @@ import * as THREE from "three";
 
 // The way of „Fire Rescue“, from the fire station's yard at +z down the street towards -z:
 // the station building 35 · Robo in the yard 31 · the yard's wall with the roller gate 25 ·
-// the street with houses on both sides and washing lines across it 24.6 … -4 · the square, where
-// Robo stops before the house with the smoke -8 · the house's front -13, the kittens on its roof.
+// the street with houses on both sides and washing lines across it 24.6 … -4 · the square with a fountain on
+// the right, where Robo pumps water -5.5, and stops before the house with the smoke -8 · the house's front -13, the
+// kittens on its roof.
 // Robo hovers straight along x = 0; it only rises (floor by floor at the house) and turns round at the end.
 //
 // Shared by the scenery and the story: heights, positions along the way, small maths helpers.
@@ -46,6 +47,11 @@ export const STREET_END = -4;
 /** How fast Robo hovers down the street while the washing lines come (m/s). */
 export const DUCK_SPEED = 2;
 
+/** The fountain on the square, on Tapsi's right where Robo stops at the end of the street: its middle (x) and radius. */
+export const FOUNTAIN_X = 2.25;
+export const FOUNTAIN_RADIUS = 1;
+/** How high the fountain's basin is, and its water a little below the rim. */
+export const FOUNTAIN_RIM = 0.5;
 /** Where Robo stops before the house with the smoke, and sprays. */
 export const SPRAY_Z = -8;
 /** The front of the house with the smoke. */
@@ -64,4 +70,4 @@ export const PARTY_GAP = 3.6;
 /** Colours of the street's houses, in turn. */
 export const HOUSE_COLORS = ["#f4d28a", "#9fd3c7", "#f2a7a0", "#c7b8ea", "#a8d58a", "#f7c59f"];
 /** The kittens' fur, one each. */
-export const KITTEN_COLORS = ["#f39c4a", "#9aa0a8", "#f4ead8", "#4a4a52"];
+export const KITTEN_COLORS = ["#f39c4a", "#9aa0a8", "#f4ead8", "#4a4a52", "#b86f3c", "#8fa3bd"];

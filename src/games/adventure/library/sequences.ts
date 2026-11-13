@@ -293,7 +293,16 @@ export const SEQUENCES: Sequence[] = [
         seconds: 18.5,
         energy: "lively",
         situation: "Robo schwebt die Straße entlang, quer über ihr hängen Wäscheleinen auf Kopfhöhe; ducken, und die Wäsche streicht über Tapsi hinweg.",
-        transition: "Vorn steht das Haus mit dem Rauch.",
+        transition: "Am Ende der Straße liegt ein Platz mit einem Brunnen.",
+      },
+      {
+        movement: "pump_up",
+        name: "Pump the water",
+        seconds: 19.4,
+        energy: "medium",
+        situation:
+          "Robo hält neben dem Brunnen und lässt einen Saugschlauch ins Wasser; aus seiner Luke wächst eine Pumpe. Den Griff hinunterdrücken und hochziehen: Bei jedem Pumpen gluckert Wasser in Robos Tanks.",
+        transition: "Die Tanks sind voll, vorn steht das Haus mit dem Rauch.",
       },
       {
         movement: "hose_spray",
@@ -301,15 +310,15 @@ export const SEQUENCES: Sequence[] = [
         seconds: 16.3,
         energy: "medium",
         situation:
-          "Aus Robo kommt das Strahlrohr; nach links und rechts spritzen, jedes Rauchwölkchen am Fenster wird zu weißem Dampf, und Robo steigt mit jedem Mal ein Stockwerk höher.",
+          "Aus Robo kommt das Strahlrohr; nach links und rechts spritzen, jedes Rauchwölkchen am Fenster wird zu weißem Dampf, die Tanks leeren sich, und Robo steigt mit jedem Mal ein Stockwerk höher.",
         transition: "Robo ist oben am Dach, da sitzen die Kätzchen.",
       },
       {
         movement: "big_ball_catch",
         name: "Catch the kittens",
-        seconds: 16.2,
+        seconds: 23,
         energy: "medium",
-        situation: "Die Kätzchen springen eins nach dem anderen vom Dachrand in Tapsis Arme und hüpfen dann auf Robo.",
+        situation: "Sechs Kätzchen springen eins nach dem anderen vom Dachrand in Tapsis Arme und hüpfen dann auf Robo.",
         transition: "Alle Kätzchen sind sicher auf Robo.",
       },
       {

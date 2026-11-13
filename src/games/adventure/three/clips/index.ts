@@ -47,6 +47,8 @@ export {
   PULL_PERIOD,
   pulledIn,
   pullReach,
+  PUMP_DOWN_AT,
+  PUMP_PERIOD,
   PUSH_PERIOD,
   SHAPE_SECONDS,
   SIT_TIME,

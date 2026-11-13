@@ -645,6 +645,7 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Auf dem Hof steht eine alte Schwengelpumpe.", reaction: "Wasser spritzt in den Eimer.", worlds: ["farm"] },
     { situation: "Der Ballon des Clowns ist schlaff.", reaction: "Er hebt mit dem Clown ab.", worlds: ["circus"] },
     { situation: "Der Schlauch der Feuerwehr ist flach.", reaction: "Er wird dick und spritzt.", worlds: ["fire_station"] },
+    { situation: "Robo hat kein Wasser für den Schlauch.", reaction: "Mit jedem Pumpen gluckert es in seine Tanks.", worlds: ["fire_station"] },
   ],
   stir: [
     { situation: "Der Kakao ist noch weiß.", reaction: "Er wird schön braun.", everyday: true },

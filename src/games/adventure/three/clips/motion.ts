@@ -166,6 +166,10 @@ export const LEAN_PERIOD = 3.4;
 export const PULL_DOWN_PERIOD = 2.6;
 /** Where in a pull the paws are down (pull_down holds them there until 0.55): the bell rings. */
 export const PULL_DOWN_AT = 0.35;
+/** Seconds of one push of a pump's handle (pump): down into the knees, held, up again. */
+export const PUMP_PERIOD = 2.4;
+/** Where in a push the handle is down (pump holds it there until 0.55): the water gushes. */
+export const PUMP_DOWN_AT = 0.45;
 /** Seconds of one catch: the arms open wide, close round what comes, hold it and open again. */
 export const CATCH_PERIOD = 3.4;
 /** Where in a catch the arms have closed round what comes (they hold it until `CATCH_OPEN`). */

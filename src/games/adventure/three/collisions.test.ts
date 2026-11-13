@@ -5,8 +5,8 @@ import { FIRE_RESCUE } from "../stories/fireRescue";
 import type { Story } from "../stories/story";
 import { TREASURE_ISLAND } from "../stories/treasureIsland";
 import { Guide } from "./guide";
+import { quietStage, shown, withoutScreen } from "./headless";
 import { storyFrame, storyPose, storyTimes, worldPose } from "./player";
-import type { Stage } from "./stage";
 
 // No solid thing goes into another (user feedback, November 2026: picking up the rod in Die Schatzinsel, paw and rod
 // were inside Tapsi's body). Every story is played here frame by frame without a screen, as the player plays it, and
@@ -17,39 +17,6 @@ import type { Stage } from "./stage";
 const FUR = 0.03;
 /** Seconds between the frames checked. */
 const EVERY = 0.1;
-
-/** A stage that draws nothing: what the worlds use of it, without a renderer. */
-function quietStage() {
-  return {
-    scene: new THREE.Scene(),
-    camera: new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 900),
-    sun: new THREE.DirectionalLight(),
-    fill: new THREE.HemisphereLight(),
-    setSky() {},
-    setSunDirection() {},
-    updateReflections() {},
-  } as unknown as Stage;
-}
-
-/** Builds a story's world with a canvas that draws nothing (cobwebs and the riddle draw on one). */
-function withoutScreen<T>(make: () => T): T {
-  const g = globalThis as { document?: unknown };
-  const had = "document" in g;
-  const before = g.document;
-  const pen = new Proxy({}, { get: () => () => {} });
-  g.document = { createElement: () => ({ getContext: () => pen }) };
-  try {
-    return make();
-  } finally {
-    if (had) g.document = before;
-    else delete g.document;
-  }
-}
-
-const shown = (o: THREE.Object3D) => {
-  for (let at: THREE.Object3D | null = o; at; at = at.parent) if (!at.visible) return false;
-  return true;
-};
 
 /** Where things reach into the guide's body: the deepest moment of each, as "what at time: depth". */
 function overlaps(story: Story) {

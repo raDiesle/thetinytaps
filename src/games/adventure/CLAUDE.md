@@ -35,22 +35,32 @@ hooray its places stay put in the world instead of turning with Tapsi into the c
 the picture pauses any adventure (`AdventurePlay`), ▶ goes on. The timing helpers (`passTime`, `tapTime`, `starTime`,
 `pushTime`, `curveZ`) are in `script.ts`; `cloudTrip.test.ts` checks whole goes and lengths.
 
-The third story is `stories/fireRescue/`, „Fire Rescue“ (about 2¼ minutes, same files, still `unfinished`), the first
+The third story is `stories/fireRescue/`, „Fire Rescue“ (about 2¾ minutes, same files, still `unfinished`), the first
 written English first (`Story.language`, `LANGUAGE` in its `lines.ts`). **Tapsi never walks** (user request, November
 2026): it stands on Robo, a red hover robot with a glowing ring and a beam, which carries it everywhere (`roboAt`),
 bobs only while nothing is done on it and squashes at landings. It opens at a house with smoke at its windows and
 kittens on its gutter, then flies back over the street and the washing lines into the yard of the fire station. Tapsi
-waves Kiki over, pulls the bell's rope down hand over hand (the handle lies in the paws, `holdRope`; each pull rings the
+waves Kiki over, reaches high up and pulls the bell's rope down hand over hand (the handle hangs so high that Tapsi
+stretches onto its toes and looks up, `pull_down`; it lies in the paws, `holdRope`; each pull rings the
 bell and lifts the roller door of the yard's gate a bit, high enough for Tapsi's ears on Robo, `GATE_OPEN`, checked by
 a test), ducks under washing lines across the street (their bottom between the measured heights of the ears standing
-and ducking, `LAUNDRY_BOTTOM`), sprays left and right with a hose coming out of Robo's hatch (one window's smoke at
+and ducking, `LAUNDRY_BOTTOM`), pumps water at a fountain (a pump's handle comes out of Robo's hatch, held in both
+paws and pushed down at every go, `pump` clip, `PUMP_PERIOD`; a blue suction hose runs from the top of a tank into the
+fountain, and Robo's two see-through tanks fill a little with every stroke, `pumped`, emptied again by the hose),
+sprays left and right with a hose coming out of Robo's hatch (one window's smoke at
 every swing, the windows placed where the measured water arc lands, Robo rising a floor after each go), catches a
-kitten jumping off the gutter at every go (it hops on and rides on Robo), cheers while Robo turns round to us, and
+kitten jumping off the gutter at every go – six of them, so the catching lasts (it hops on and rides on Robo, `RIDE`), cheers while Robo turns round to us, and
 waves goodbye. Every place a paw has to reach is measured from the clip (`measure`, `aimNow` in `index.ts`), not set by
-hand. Cameras: from Tapsi's left at the bell, so the head doesn't hide the paws; behind and low under the washing; high
-behind for the hose, which swings to both sides; behind on the left, well back, for the catch; in front for the hello,
-the hooray and the goodbye. `fireRescue.test.ts` checks whole goes, lengths, one kitten per go, where the lines hang and
-the gate's height.
+hand. Cameras – each keeps Robo in the picture under Tapsi, also while it rises up the house: from Tapsi's left at the
+bell, so the head doesn't hide the paws; behind, low and far enough back under the washing; from the left at the pump,
+so fountain, hose and tanks show; high behind for the hose, which swings to both sides; behind on the left, well back,
+for the catch; in front for the hello, the hooray and the goodbye. Kiki has a place of its own in every step (`KIKI` in
+`index.ts`, with how far it loops), clear of every thing, in the picture and away from the dancer's box:
+`three/companions.test.ts` plays the story without a screen and fails when Kiki flies through a thing or stays hidden,
+out of the picture or under the box for longer than a moment (user feedback, November 2026: Kiki flew through the house
+and hovered behind the bell's post). `fireRescue.test.ts` checks whole goes, lengths, one kitten per go, where the lines
+hang and the gate's height. The card's and the trophy's picture show Tapsi spraying on Robo (`PLAYS` in
+`tools/previews.ts`; every story's picture is a station in play, without the dancer's box or the route, `HIDE_ALSO`).
 
 ## Nothing goes into Tapsi
 
