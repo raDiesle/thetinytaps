@@ -200,7 +200,7 @@ export const HAIR_STORY: HairChapter[] = [
         light: "abend",
         cast: ["tapsi", "mama"],
         picture:
-          "Tapsi in the bath leans the head back and looks straight up at the yellow sun sticker on the ceiling, which is seen at the top of the picture; Mama kneels beside the tub, one hand behind Tapsi's head, and pours from the small red cup at the back of the head.",
+          "Tapsi in the bath sits upright in the middle of the tub, its whole head inside the tub above the bubbles, tips the head back and looks straight up at the yellow sun sticker on the ceiling, which is seen at the top of the picture; Mama kneels beside the tub, reaches in with one hand behind Tapsi's head, and pours from the small red cup at the back of the head, far from the face.",
       },
       {
         id: "schaum",

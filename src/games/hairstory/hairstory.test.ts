@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { HAIR_PAGES, HAIR_STORY, WASH_STEPS } from "./hairStory";
-import { HAIR_PICTURE_QUEUE, hairPicture } from "./hairStoryPictures";
+import { HAIR_PICTURE_QUEUE, hairPicture, IN_THE_BATH } from "./hairStoryPictures";
 
 describe("Tapsi and the Foam Crown", () => {
   test("every page has its own id, a short English text and a picture", () => {
@@ -69,6 +69,11 @@ describe("Tapsi and the Foam Crown", () => {
       const gone = (first?.cast ?? []).filter((who) => !page.cast.includes(who));
       expect(hairPicture(page).prompt.includes("not in this picture at all"), page.id).toBe(gone.length > 0);
     }
+  });
+
+  // The first bath pictures: a see-through tub, water over the face, a second cup or bottle in Mama's other paw.
+  test("every picture in the bath keeps the tub solid, the face dry and one cup", () => {
+    for (const page of HAIR_PAGES) if (/Tapsi in the bath/.test(page.picture)) expect(hairPicture(page).prompt, page.id).toContain(IN_THE_BATH);
   });
 
   // A thing shown twice comes back doubled (Schnullerfee: a lid held over a box came back as a second lid): every thing

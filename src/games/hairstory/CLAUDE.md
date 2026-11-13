@@ -49,4 +49,9 @@ all alone, and in bed Tapsi promises the bunny a foam crown next time.
   …“) before the other bath pages were drawn. Tapsi washing the bunny „very seriously“ came back frowning as if angry:
   never „seriously“ or „concentrating“ for a child doing something gently – name the face (a calm, caring little
   smile), and look at every face before keeping a picture. Put each character where the reference has it (Tapsi on the rug, Mama on the sofa; Tapsi on the bed), and
-  count the characters, each once, and look for stray tails.
+  count the characters, each once, and look for stray tails. The first bath pictures came back with a
+  see-through tub showing Tapsi's body like a glass bowl, Tapsi lying with the head over the tub's edge while Mama
+  poured onto the face, and a second red cup or shampoo bottle in Mama's other paw – each though „only one“ was said:
+  every bath prompt ends with `IN_THE_BATH` (checked). A thing too many, a see-through tub or a face is fixed by
+  editing the picture; a wrong pose is not – Tapsi's head over the tub's edge came back unchanged from an edit – so draw
+  that page anew with a page text that places the pose plainly („its whole head inside the tub“).

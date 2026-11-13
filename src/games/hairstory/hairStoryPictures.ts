@@ -82,6 +82,14 @@ function thingsOf(page: HairPage): string[] {
   return things;
 }
 
+/**
+ * What every picture of Tapsi in the bath keeps, as its first takes went wrong (13 November 2026): the tub came out
+ * see-through like a glass bowl with Tapsi's body in it, Tapsi lay with the head hanging over the tub's edge while Mama
+ * poured onto the face, and Mama held a second red cup or a second shampoo bottle in her other paw.
+ */
+export const IN_THE_BATH =
+  "Tapsi sits upright inside the tub, head, shoulders and paws above the bubbles; the bathtub's front is solid white porcelain, nothing of Tapsi's body or the water is seen through it. Water from the cup falls only on the back of Tapsi's head and runs down the back, never over Tapsi's face. Mama's other paw is empty or rests on Tapsi or the tub: she never holds a second cup or a second bottle.";
+
 /** Every page is full bleed (two first pictures of Tapsis Milchkette came back with a white rounded margin). */
 const END =
   "Everyone's face shows plainly what they feel. The illustration fills the whole picture edge to edge (full bleed): no border, no frame, no white margin, no rounded corners, no vignette. No speech bubbles. No text, no letters, no numbers, also not on bottles or signs.";
@@ -118,7 +126,9 @@ function promptOf(page: HairPage): string {
           `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – no second fox, no fox tail left lying on the floor or the furniture.`,
           absent(page),
         ];
-  parts.push(LIGHT[page.light], castOf(page), ...thingsOf(page), `Now this happens: ${page.picture}`, END);
+  parts.push(LIGHT[page.light], castOf(page), ...thingsOf(page), `Now this happens: ${page.picture}`);
+  if (/Tapsi in the bath/.test(page.picture)) parts.push(IN_THE_BATH);
+  parts.push(END);
   return parts.filter(Boolean).join(" ");
 }
 
@@ -140,7 +150,33 @@ export function hairPicture(page: HairPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/haare-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["klebrig", "sagen", "reihenfolge", "augen", "hase", "hase-augen", "becher", "trocknen", "stolz", "hase-krone", "lieb"]);
+const MADE = new Set<string>([
+  "aufhoeren",
+  "augen",
+  "becher",
+  "einwickeln",
+  "entscheiden",
+  "fuehlen",
+  "hase-augen",
+  "hase-krone",
+  "hase",
+  "jetzt",
+  "klebrig",
+  "lappen",
+  "lieb",
+  "mama-waschen",
+  "nass",
+  "reihenfolge",
+  "sagen",
+  "schaum",
+  "sonne",
+  "spiegel",
+  "spuelen",
+  "stolz",
+  "trocknen",
+  "tropfen",
+  "warten",
+]);
 
 /** Every picture of the story still to make. */
 export const HAIR_PICTURE_QUEUE: QueuedPicture[] = HAIR_PAGES.filter((p) => !MADE.has(p.id)).map(hairPicture);
