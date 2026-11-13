@@ -25,7 +25,7 @@ export interface StepLines {
   praise: string;
 }
 
-/** One step's lines in another language: the same lines as its German StepLines, `more` without the times. */
+/** One step's lines in another language: the same lines as its first language's StepLines, `more` without the times. */
 export interface StepTranslation {
   /** What the step is called on the route (shown to grown-ups); the German name where left out. */
   name?: string;
@@ -98,12 +98,17 @@ export interface StoryWorld {
 }
 
 /** Sounds a world can ask for. */
-export type Cue = "splash" | "whoosh" | "rumble" | "chime" | "sparkle" | "pop" | "knock" | "tweet" | "drum";
+export type Cue = "splash" | "whoosh" | "rumble" | "chime" | "sparkle" | "pop" | "knock" | "tweet" | "drum" | "bell" | "meow";
 
 export interface Story {
   sequence: Sequence;
+  /**
+   * The language `lines`, the sequence's title and its steps' names are written in: German where left out (the older
+   * stories), English for what is new (user decision, November 2026). Translations follow these lines.
+   */
+  language?: TargetLanguageId;
   lines: StepLines[];
-  /** The lines in other languages; a language left out is said in German. */
+  /** The lines in other languages; a language left out is said in the story's first language. */
   translations?: Partial<Record<TargetLanguageId, StoryTranslation>>;
   /** Before the first step: what the story is about, e.g. the way on a map. */
   opening?: { seconds: number; lines: { at: number; text: string }[] };
@@ -119,7 +124,7 @@ export interface Story {
 /** True if `at` was passed between the last frame and this one. */
 export const crossed = (f: StoryFrame, at: number) => f.prevLocal < at && f.local >= at;
 
-/** What the guide says when the child joins in, where a step has no `turn` of its own. */
+/** What the guide says when the child joins in, where a step of a German story has no `turn` of its own. */
 export const DEFAULT_TURN = "Jetzt du!";
 
 /** The German lines put into another language: same steps, icons and times; a step without `turn` gets the language's `defaultTurn`. */
@@ -141,11 +146,18 @@ export function translateLines(opening: { at: number; text: string }[], lines: S
   };
 }
 
-/** The story's title in `language` (for grown-ups' screens), the German one where it has none. */
+/** The language a story's own lines are written in (`Story.language`). */
+export const firstLanguage = (story: Story): TargetLanguageId => story.language ?? "de";
+
+/** True if the story can be said in `language`: its own lines' language, or one it has a translation into. */
+export const toldIn = (story: Story, language: TargetLanguageId) => language === firstLanguage(story) || Boolean(story.translations?.[language]);
+
+/** The story's title in `language` (for grown-ups' screens), the one of its first language where it has none. */
 export const storyTitle = (story: Story, language: TargetLanguageId) => story.translations?.[language]?.title ?? story.sequence.title;
 
-/** The story as it is said in `language`: the German one where it has no translation. */
+/** The story as it is said in `language`: as it was written where it has no translation into it. */
 export function storyIn(story: Story, language: TargetLanguageId): Story {
+  if (language === firstLanguage(story)) return story;
   const t = story.translations?.[language];
   if (!t) return story;
   const { opening, lines } = translateLines(story.opening?.lines ?? [], story.lines, t);

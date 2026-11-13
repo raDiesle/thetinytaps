@@ -5,13 +5,13 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import type { CommonSettings } from "@/lib/common";
 import { useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
-import { playChime, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
-import { loadRealSounds, playSplash, playTweet } from "@/lib/realSounds";
+import { playChime, playDing, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
+import { loadRealSounds, playMeow, playSplash, playTweet } from "@/lib/realSounds";
 import { screenTap } from "@/lib/tapGuard";
 import { useWakeLock } from "@/lib/wakeLock";
 import { clock } from "./clock";
 import { movement } from "./library/movements";
-import { type Cue, type Story, type StoryFrame, storyTitle } from "./stories/story";
+import { type Cue, firstLanguage, type Story, type StoryFrame, storyTitle } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
 import { Silhouette } from "./three/silhouette";
@@ -30,6 +30,8 @@ const CUES: Record<Cue, () => void> = {
   knock: () => playKnock(),
   tweet: playTweet,
   drum: playDrum,
+  bell: playDing,
+  meow: playMeow,
 };
 
 const smooth = (k: number) => {
@@ -40,10 +42,21 @@ const smooth = (k: number) => {
 /** How much the outline shows: it comes in when Tapsi starts to show the movement and goes with the praise. */
 const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (1 - smooth(f.praise / 0.8));
 
-/** What step `i` is called on the route, for grown-ups in the app language: the story's translation, else the German name. */
+/** What step `i` is called on the route, for grown-ups in the app language: the story's translation, else its own name. */
 function stepName(story: Story, i: number, language: TargetLanguageId) {
   const step = story.sequence.steps[i];
   return story.translations?.[language]?.steps[i]?.name ?? step.name ?? movement(step.movement).name;
+}
+
+/**
+ * What happens in step `i`, for screen readers: in the app language Tapsi's first line there; for a German player of a
+ * German story the library's description of the step (`story` is already the one said in the language played).
+ */
+function stepScene(story: Story, i: number, language: TargetLanguageId) {
+  const own = language === firstLanguage(story) ? undefined : story.translations?.[language]?.steps[i];
+  if (own) return own.situation ?? own.instruction;
+  if (firstLanguage(story) === "de" && language === "de") return story.sequence.steps[i].situation;
+  return story.lines[i].situation ?? story.lines[i].instruction;
 }
 
 /**
@@ -91,7 +104,7 @@ export function AdventurePlay({
   useWakeLock(!ended && !paused);
   // The story has its own music, which the stop dance needs to control.
   useNoBackgroundMusic();
-  useEffect(() => loadRealSounds([playSplash, playTweet]), []);
+  useEffect(() => loadRealSounds([playSplash, playTweet, playMeow]), []);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -251,9 +264,7 @@ export function AdventurePlay({
     );
   }
 
-  // For screen readers: what happens in this step (the library's description), in other app languages Tapsi's first line there.
-  const own = app.id === "de" ? undefined : story.translations?.[app.id]?.steps[step];
-  const scene = own ? (own.situation ?? own.instruction) : story.sequence.steps[step].situation;
+  const scene = stepScene(story, step, app.id);
   const back = t({ de: "Zurück", en: "Back", zh: "后退", hi: "पीछे", es: "Atrás", ar: "رجوع", ru: "Назад" });
   const forward = t({ de: "Vor", en: "Forward", zh: "前进", hi: "आगे", es: "Adelante", ar: "تقدّم", ru: "Вперёд" });
   const resume = t({ de: "Weiter", en: "Go on", zh: "继续", hi: "जारी रखें", es: "Seguir", ar: "متابعة", ru: "Дальше" });

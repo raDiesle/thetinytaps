@@ -1,5 +1,5 @@
 /** The 3D stories to choose from on the start screen. */
-export type AdventureStoryId = "schatzinsel" | "wolkenreise";
+export type AdventureStoryId = "schatzinsel" | "wolkenreise" | "feuerwehr";
 
 /**
  * Only the story played last is kept: read aloud, sounds, music and Tapsi's language

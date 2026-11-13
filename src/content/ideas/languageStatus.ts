@@ -244,7 +244,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch.",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Englisch, dann Deutsch.",
     parts: [
       {
         label: "🏝️ Die Schatzinsel",
@@ -255,6 +255,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "☁️ Die Wolkenreise",
         recorded: true,
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+      },
+      {
+        label: "🚒 Fire Rescue",
+        recorded: true,
+        languages: { en: "text" },
+        note: "Neu (13. November 2026), zuerst auf Englisch geschrieben: noch nicht übersetzt und nicht aufgenommen, bis dahin liest die Stimme des Browsers die englischen Sätze. Noch „in Bearbeitung“.",
       },
     ],
   },

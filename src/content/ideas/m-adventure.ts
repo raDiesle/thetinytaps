@@ -6,7 +6,7 @@ export const adventureIdeas: IdeaArea = {
   emoji: "🏝️",
   title: "Bewegungsabenteuer",
   intro:
-    "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 105 Bewegungen, gespielt wird bisher nur die Schatzinsel.",
+    "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 106 Bewegungen, gespielt werden die Schatzinsel, die Wolkenreise und (noch in Bearbeitung) die Feuerwehr.",
   ideas: [
     {
       id: "M-01",
@@ -16,7 +16,7 @@ export const adventureIdeas: IdeaArea = {
       why: "Die Bewegungen und Abläufe gibt es schon; es fehlen nur Welt und Sätze.",
       effort: "L",
       partial:
-        "Das Wolkenland ist gebaut: „Die Wolkenreise“, auf dem Startbild neben der Schatzinsel wählbar. Winterwald, Feuerwehr, Dinotal und die Karte fehlen.",
+        "Das Wolkenland ist gebaut: „Die Wolkenreise“, auf dem Startbild neben der Schatzinsel wählbar. Die Feuerwehr auch (13. November 2026, noch in Bearbeitung): „Fire Rescue“, Tapsi steht auf dem Schwebe-Roboter Robo und muss nie laufen. Winterwald, Dinotal und die Karte fehlen.",
     },
     {
       id: "M-02",

@@ -9,7 +9,7 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Jede Bewegung des Fuchses wird nachgemacht**, auch die zwischen den Stationen. Das Kind steht
   vor dem Bildschirm im Zimmer und kann sich nicht frei durch den Raum bewegen. Darum geht, hüpft
   oder steigt die Figur nie von der Stelle: Sie wird getragen (Schatzinsel: auf dem Panzer einer
-  Schildkröte) und macht alles auf der Stelle. Erlaubt sind nur kleine Schritte zur Seite und zurück.
+  Schildkröte, Wolkenreise: auf der Wolke Wolle, Feuerwehr: auf dem Schwebe-Roboter Robo) und macht alles auf der Stelle. Erlaubt sind nur kleine Schritte zur Seite und zurück.
   **Auch am Ende bleibt sie auf ihrem Träger** und springt nie von ihm herunter (Tapsi blieb nicht auf
   Ole): Was sie erreichen soll, kommt zu ihr (die Truhe wird direkt neben Ole abgestellt), und sie
   dreht sich höchstens mit kleinen Schritten auf ihm um.
@@ -128,6 +128,12 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Worauf der Fuchs steht, ist mit im Bild** (Wolle, Ole): Die Kamera steht so weit hinten, dass man
   den Träger ganz sieht, bei einer Wolke auch ihre Unterseite – nicht nur einen weißen Rand unter den
   Füßen.
+- **Vor dem Festlegen der Kamera prüfen, was Kopf und Körper verdecken** (Feuerwehr, November 2026):
+  Ziehen die Pfoten über dem Kopf (Glockenseil), verdeckte der Kopf sie von hinten – dort von der
+  Seite. Schwenkt etwas nach links und rechts (Wasserstrahl), verdeckte der Körper von schräg hinten
+  die eine Seite – dort hoch und mittig hinter dem Fuchs. Wird vor dem Bauch gefangen (Kätzchen),
+  verdeckte der Rücken den Fang über die Schulter – dort schräg von hinten und weit genug weg, dass der
+  ganze Fuchs im Bild bleibt.
 - **Wo beide Arme vor dem Körper arbeiten** (Trommeln), steht die Kamera genau mittig und nah hinter
   den Schultern, nur wenig über dem Kopf, und schaut den Weg entlang: Pfoten und Trommeln neben dem
   Körper, und dahinter, worum es geht. Nie hoch und weit hinten mit dem Blick hinab auf die Trommeln –

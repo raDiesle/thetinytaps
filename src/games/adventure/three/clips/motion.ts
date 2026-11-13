@@ -162,6 +162,24 @@ export function tapReach(t: number) {
 }
 /** Seconds of one go of lean_side: over to the left, back, over to the right, back. */
 export const LEAN_PERIOD = 3.4;
+/** Seconds of one pull of the bell rope (pull_down): the arms high up, pulled down into the knees, up again. */
+export const PULL_DOWN_PERIOD = 2.6;
+/** Where in a pull the paws are down (pull_down holds them there until 0.55): the bell rings. */
+export const PULL_DOWN_AT = 0.35;
+/** Seconds of one catch: the arms open wide, close round what comes, hold it and open again. */
+export const CATCH_PERIOD = 3.4;
+/** Where in a catch the arms have closed round what comes (they hold it until `CATCH_OPEN`). */
+export const CATCH_CLOSED = 0.65;
+/** Where in a catch the arms begin to open again. */
+export const CATCH_OPEN = 0.85;
+/** Seconds of one go of the hose (spray): aiming to the left, then over to the right and back. */
+export const SPRAY_PERIOD = 3.6;
+/**
+ * Where the hose aims, -1..1, `t` seconds into the spray clip: furthest to Tapsi's left (1) at a quarter of each go,
+ * furthest right (-1) at three quarters, lingering there so the water reaches its target.
+ */
+export const sprayAim = (t: number) => linger(Math.sin(phase(t, SPRAY_PERIOD) * TAU));
+
 /** Seconds of one jump for joy in the cheer clip. */
 export const CHEER_PERIOD = 0.8;
 /**

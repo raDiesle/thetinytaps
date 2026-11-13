@@ -8,6 +8,9 @@ import {
   brushArm,
   BRUSH_PERIOD,
   castSwing,
+  CATCH_CLOSED,
+  CATCH_OPEN,
+  CATCH_PERIOD,
   CHEER_PERIOD,
   clamp01,
   clips,
@@ -24,9 +27,12 @@ import {
   keyTurn,
   linger,
   phase,
+  PULL_DOWN_AT,
+  PULL_DOWN_PERIOD,
   pullReach,
   PUSH_PERIOD,
   smooth,
+  sprayAim,
   steps,
   swing,
   TAU,
@@ -114,7 +120,7 @@ export const ARM_CLIPS = clips({
   },
 
   pull_down: (t, p) => {
-    const k = hold(phase(t, 2.6), 0.0, 0.35, 0.55, 0.9);
+    const k = hold(phase(t, PULL_DOWN_PERIOD), 0.0, PULL_DOWN_AT, 0.55, 0.9);
     for (const a of [p.armL, p.armR]) {
       a.raise = 2.9 - k * 2.3;
       a.spread = 0.2;
@@ -379,7 +385,7 @@ export const ARM_CLIPS = clips({
   },
 
   catch: (t, p) => {
-    const k = hold(phase(t, 3.4), 0.45, 0.65, 0.85, 1);
+    const k = hold(phase(t, CATCH_PERIOD), 0.45, CATCH_CLOSED, CATCH_OPEN, 1);
     for (const a of [p.armL, p.armR]) {
       a.raise = 1.1;
       a.spread = 1.15 - k * 1.55;
@@ -390,6 +396,22 @@ export const ARM_CLIPS = clips({
     p.bend = k * 0.1 - (1 - k) * 0.05;
     p.lift = 0;
     p.headPitch = -0.1 * (1 - k);
+  },
+
+  spray: (t, p) => {
+    // Both paws hold the hose's nozzle together in front of the chest; the body turns it over to the left, holds,
+    // and over to the right, the head looking where the water goes. Knees a little soft, feet stay put.
+    const aim = sprayAim(t);
+    for (const a of [p.armL, p.armR]) {
+      a.raise = 1.3;
+      a.elbow = 0.6;
+    }
+    p.armL.spread = p.armR.spread = TOGETHER + 0.14;
+    crouch(p, 0.1);
+    p.twist = aim * 0.42;
+    p.headYaw = aim * 0.3;
+    p.headPitch = -0.12;
+    p.lean = -aim * 0.03;
   },
 
   stretch_up: (t, p) => {
