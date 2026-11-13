@@ -4,6 +4,7 @@ import {
   BRUSH_PERIOD,
   CAST_PERIOD,
   castSwing,
+  castWindup,
   CRANK_PERIOD,
   DODGE_PASS,
   DODGE_PERIOD,
@@ -69,7 +70,10 @@ import {
   ROD_GRIP_L,
   ROD_GRIP_R,
   ROD_LENGTH,
+  ROD_DIR,
+  ROD_PAW,
   ROD_REST,
+  rodElbowL,
   ROLL_LEAD,
   ROLL_BANK_END,
   ROLL_RADIUS,
@@ -972,35 +976,37 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const gripR = grip * smooth((0.45 - down) / 0.3);
     if (down < 1) {
       updateMoved(guide.root);
-      // The right paw holds the rod in front of the chest; swung back it is high behind the right shoulder,
-      // outside the head, as far back as a child can reach, cast out it is up ahead. The left paw holds lower down.
+      // The left paw holds the rod above the right one. Swung back, both paws go over to the right side: the left one
+      // first across in front of the chest, low, under the chin, and only once it is beside the head up behind the
+      // right shoulder, the arm past the head, never through it; the right paw holds the rod's end lower down in front
+      // of the right shoulder. Cast out the left paw is up ahead, then follows the float down.
       const { back, out, follow } = clip > 0 ? castSwing(clip) : { back: 0, out: 0, follow: 0 };
       const rest = Math.max(0, 1 - back - out);
-      // On the way back and forth it bows out to the right, round the head instead of past the face.
-      const bow = 4 * back * (1 - back);
-      const paw = guide.bodyPoint(
-        tmpB.set(
-          -0.06 * rest - 0.32 * back - 0.08 * out - 0.2 * bow,
-          0.2 * rest + 0.8 * back + 0.6 * out - 0.26 * follow,
-          0.3 * rest - 0.2 * back + 0.38 * out + 0.12 * follow,
-        ),
-        tmpB,
-      );
-      // Tipped up and a little forwards; swung back, it points back over the right shoulder, nearly level, snapped
-      // out it stops high ahead, and then follows the float down until it points nearly level at it.
-      const yaw = guide.root.rotation.y;
-      const ahead = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
-      const right = new THREE.Vector3(-Math.cos(yaw), 0, Math.sin(yaw));
-      const dir = new THREE.Vector3(0, 1 - 0.65 * back - 0.8 * follow, 0)
-        .addScaledVector(ahead, 0.3 - back * 1.3 + out * 0.6 + follow * 0.75)
-        .addScaledVector(right, 0.12 + back * 0.3 + bow * 0.35 - follow * 0.08)
+      const { across, up } = castWindup(back);
+      const local =
+        out > 0
+          ? new THREE.Vector3().addScaledVector(ROD_PAW.rest, rest).addScaledVector(ROD_PAW.back, back).addScaledVector(ROD_PAW.out, out)
+          : new THREE.Vector3(
+              THREE.MathUtils.lerp(ROD_PAW.rest.x, ROD_PAW.back.x, across),
+              THREE.MathUtils.lerp(ROD_PAW.rest.y, ROD_PAW.back.y, up),
+              THREE.MathUtils.lerp(ROD_PAW.rest.z, ROD_PAW.back.z, back) + 0.06 * Math.sin(Math.PI * back),
+            );
+      const paw = guide.bodyPoint(local.add(tmpC.set(0, -0.26 * follow, 0.04 * follow)), tmpB);
+      // Tipped up and a little forwards; swung back, it points back and out over the right shoulder, nearly level,
+      // snapped out it stops high ahead, and then follows the float down until it points nearly level at it. In the
+      // body's own space, so it turns with the body.
+      const dir = guide
+        .bodyPoint(tmpC.set(-ROD_DIR.right(back, follow), ROD_DIR.up(back, follow), ROD_DIR.ahead(back, out, follow)), tmpC)
+        .sub(guide.bodyPoint(tmpD.set(0, 0, 0), tmpD))
         .normalize();
       heldQ.setFromUnitVectors(UP, dir);
-      const held = paw.addScaledVector(dir, -ROD_GRIP_R);
+      const held = paw.addScaledVector(dir, -ROD_GRIP_L);
       if (down > 0) {
         // Taken up round Tapsi's left side, tipped up, outside the body, and only then brought round in front of the
         // chest (laid down the same way back): never straight across through the body.
-        const left = right.clone().negate();
+        const yaw = guide.root.rotation.y;
+        const ahead = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+        const left = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
         const beside = guide.bodyPoint(new THREE.Vector3(0.5, 0.05, 0.12), new THREE.Vector3());
         sideQ.setFromUnitVectors(UP, new THREE.Vector3(0, 1, 0).addScaledVector(ahead, 0.25).addScaledVector(left, 0.2).normalize());
         const u = 1 - down;
@@ -1023,7 +1029,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     if (grip > 0) {
       const along = new THREE.Vector3(0, 1, 0).applyQuaternion(rod.quaternion);
       guide.hold("R", rod.position.clone().addScaledVector(along, ROD_GRIP_R), along, gripR);
-      guide.hold("L", rod.position.clone().addScaledVector(along, ROD_GRIP_L), along, grip);
+      // The left arm reaches across in front of the body: its elbow forwards and down, under the chin.
+      guide.hold("L", rod.position.clone().addScaledVector(along, ROD_GRIP_L), along, grip, rodElbowL(clip > 0 ? castSwing(clip).back : 0, tmpD));
     }
 
     // The float and its line, while fishing.

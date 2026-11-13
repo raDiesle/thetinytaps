@@ -96,7 +96,8 @@ export function setAppLanguage(id: TargetLanguageId) {
     for (const listener of listeners) listener();
   };
   if (hasTexts(id)) switchTo();
-  else loadTexts(id).then(switchTo, () => {});
+  // German plays without its texts (only the English-first stories' translations are missing, and show in English).
+  else loadTexts(id).then(switchTo, id === "de" ? switchTo : () => {});
 }
 
 /** The app language outside React, e.g. in a sound helper; components use useAppLanguage. */

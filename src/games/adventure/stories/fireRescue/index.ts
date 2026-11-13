@@ -555,6 +555,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const FORWARD = new THREE.Vector3(0, 0, 1);
 
   /** The bell's handle in the paws while they pull, hanging from its rope otherwise; the bell tips with the rope. */
+  const ELBOW_OUT_L = v3(1, -0.4, 0.2);
+  const ELBOW_OUT_R = v3(-1, -0.4, 0.2);
   function holdRope(f: StoryFrame) {
     const clip = f.act + f.demo;
     const pulling = f.opening === null && f.step === S.bell;
@@ -566,10 +568,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       guide.gripPoint("L", tmpA);
       guide.gripPoint("R", tmpB);
       at.lerp(tmpA.add(tmpB).multiplyScalar(0.5), held);
-      // The paws close round the bar on either side of the rope.
+      // The paws close round the bar on either side of the rope, the elbows out to the sides: reaching up, bent
+      // forwards or back, they lay against the cheeks (`collisions.test.ts` measures the arms too).
       left.set(1, 0, 0).applyAxisAngle(UP, place.yaw);
-      guide.hold("L", tmpC.copy(at).addScaledVector(left, 0.09), left, held);
-      guide.hold("R", tmpC.copy(at).addScaledVector(left, -0.09), left, held);
+      guide.hold("L", tmpC.copy(at).addScaledVector(left, 0.09), left, held, ELBOW_OUT_L);
+      guide.hold("R", tmpC.copy(at).addScaledVector(left, -0.09), left, held, ELBOW_OUT_R);
     }
     handle.rotation.set(0, place.yaw, 0);
     rope.between(ROPE_TOP, tmpA.copy(at).add(v3(0, 0.03, 0)));

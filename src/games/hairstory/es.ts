@@ -1,0 +1,41 @@
+import type { StoryTranslation } from "@/components/ChapterBook";
+
+/** „Tapsi and the Foam Crown“ in Spanish, loaded with the Spanish texts (`texts-es.ts`). */
+export const HAIR_STORY_ES: StoryTranslation = {
+  chapters: {
+    heute: "Día de lavar el pelo",
+    zuerst: "Primero, Conejito",
+    selbst: "Tapsi elige",
+    krone: "La corona de espuma",
+    zuviel: "Cuando es demasiado",
+    handtuch: "La toalla calentita",
+    naechstes: "La próxima vez",
+  },
+  pages: {
+    klebrig: "Tapsi tiene papilla en el pelo. Y arena del arenero.",
+    sagen: "Mamá dice: «Esta noche te lavamos el pelo. No todas las noches, solo hoy».",
+    reihenfolge: "Primero agua, luego espuma, luego agua otra vez. Y después, la toalla calentita.",
+    augen: "«No me gusta el agua en los ojos», dice Tapsi. Mamá escucha: «Tus ojos no se van a mojar».",
+    hase: "Tapsi le lava el pelo a Conejito. El vaso está vacío, así que Conejito no se moja.",
+    "hase-augen": "«¡Cabeza atrás, Conejito, y mira arriba!» Tapsi le tapa los ojos a Conejito con una toallita.",
+    "mama-waschen": "Luego Tapsi le lava el pelo a mamá, con agua de verdad. «Qué gusto», dice mamá.",
+    becher: "Tapsi elige el vaso: el rojo. Y el champú que huele a manzana.",
+    fuehlen: "Tapsi toca el agua con la patita. Tibia, no caliente. Justo bien.",
+    lappen: "Tapsi trae la toallita. Tapsi se la pone sobre los ojos, sin ayuda.",
+    nass: "Tapsi está en la bañera. Mamá echa agua tibia con el vaso, despacito, por detrás.",
+    sonne: "Cabeza atrás, ojos arriba, al sol del techo. El agua baja por la espalda.",
+    schaum: "Tapsi se frota la espuma sin ayuda. ¡Frota, frota, frota!",
+    spiegel: "Mamá hace una corona de espuma. Tapsi la ve en el espejo y se ríe.",
+    jetzt: "Tapsi se tapa los ojos con la toallita y dice: «¡Ya!» Mamá cuenta: «Uno, dos, tres».",
+    spuelen: "¡Chof! La espuma se va espalda abajo. Los ojos de Tapsi siguen secos.",
+    tropfen: "Otra noche, una gota entra en el ojo de Tapsi. Pica, y Tapsi llora.",
+    aufhoeren: "Mamá para enseguida y seca la cara de Tapsi. «Puedes llorar. Aquí estoy».",
+    warten: "Esperan hasta que está mejor. Mamá pregunta: «¿Más agua, o lo dejamos por hoy?»",
+    entscheiden: "Tapsi dice: «Un chof más». Tapsi sujeta fuerte la toallita, y ya está.",
+    einwickeln: "Fuera de la bañera y a la toalla calentita. Mamá envuelve a Tapsi, bien a gustito.",
+    trocknen: "Papá le seca el pelo a Tapsi frotando. Suave y esponjoso, y huele a manzana.",
+    stolz: "«Sujetaste la toallita sin ayuda», dice papá. Tapsi siente mucho orgullo.",
+    "hase-krone": "En la cama, Tapsi le cuenta a Conejito: «La próxima vez, tú también tienes corona de espuma».",
+    lieb: "Mamá y papá quieren a Tapsi, con el pelo pegajoso y con el pelo limpio.",
+  },
+};

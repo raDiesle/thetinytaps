@@ -8,6 +8,7 @@ import {
   brushArm,
   BRUSH_PERIOD,
   castSwing,
+  castWindup,
   CATCH_CLOSED,
   CATCH_OPEN,
   CATCH_PERIOD,
@@ -358,22 +359,28 @@ export const ARM_CLIPS = clips({
   },
 
   cast: (t, p) => {
-    // Both paws on the rod: swung back sideways over the right shoulder as far as it goes, the right paw high
-    // behind the head and the left one up in front of the chest, the body turned with it, then out ahead. The
-    // paws stay outside the body and head all the way.
-    // After the snap the paws follow the float down, out in front at chest height, and the body leans after them.
+    // Both paws on the rod, the left one above: swung back, both go over to the right side – the left arm first
+    // across in front of the chest, low under the chin, then up until the paw is behind the right shoulder, past the
+    // head, never through it; the right paw holds the rod's end in front of the right shoulder, its elbow out. The
+    // body turns with it, then the rod snaps out ahead and the paws follow the float down. The angles are those the
+    // story's grip on the rod brings the arms to (`holdRod`), so the child figure moves as the fox does.
     const { back, out, follow } = castSwing(t);
-    const rest = Math.max(0, 1 - back - out);
-    p.armR.raise = 1.0 * rest + 2.55 * back + 1.35 * out - 0.45 * follow;
-    p.armR.spread = 0.15 * rest + 0.9 * back + 0.2 * out - 0.05 * follow;
-    p.armR.elbow = 0.7 * rest + 1.9 * back + 0.35 * out - 0.1 * follow;
-    p.armL.raise = 1.0 * rest + 1.85 * back + 1.25 * out - 0.4 * follow;
-    p.armL.spread = -0.1 * rest - 0.4 * back - 0.05 * out;
-    p.armL.elbow = 0.7 * rest + 1.1 * back + 0.4 * out;
-    p.twist = -back * 0.5 + out * 0.12;
+    const { across, up } = castWindup(back);
+    // Swung back the weights follow the paw's path; snapped out they go straight over from back to ahead.
+    const [side, high] = out > 0 ? [back, back] : [across, up];
+    const mix = (r: number, b: number, o: number, by: number) => r * (1 - by - out) + b * by + o * out;
+    p.armL.raise = mix(0.5, 2.1, 1.45, high) - 0.15 * follow;
+    p.armL.spread = mix(-0.15, -0.95, -0.45, side);
+    p.armL.twist = mix(-0.8, -1.0, -0.35, side);
+    p.armL.elbow = mix(1.1, 0.85, 0.7, high) + 0.2 * follow;
+    p.armR.raise = mix(0.75, 1.07, 1.2, high) - 0.45 * follow;
+    p.armR.spread = mix(0.15, 0.98, 0.3, side);
+    p.armR.twist = mix(-1.7, -0.47, -0.9, side);
+    p.armR.elbow = mix(0.9, 2.4, 1.75, high) - 0.25 * follow;
+    p.twist = -back * 0.8 + out * 0.12;
     p.lean = -back * 0.1;
-    p.bend = -back * 0.18 + out * 0.18 + follow * 0.15;
-    p.headYaw = back * 0.3;
+    p.bend = -back * 0.12 + out * 0.18 + follow * 0.15;
+    p.headYaw = back * 0.35;
     p.headPitch = follow * 0.15;
   },
 

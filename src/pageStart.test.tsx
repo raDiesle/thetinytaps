@@ -64,7 +64,7 @@ function preloadedBy(script: string, visitor: { languages: string[]; saved?: str
 test("a built page fetches the texts of the language the app will play in at once, chosen as the app chooses it", () => {
   // The pages for search engines come in exactly the app's languages, so every language the app plays in has a chunk.
   expect([...SEO_LANGUAGES] as string[]).toEqual(APP_LANGUAGES);
-  const chunks = Object.fromEntries(APP_LANGUAGES.filter((id) => id !== "de").map((id) => [id, [`/static/texts-${id}.x.js`, `/static/shared-${id}.y.js`]]));
+  const chunks = Object.fromEntries(APP_LANGUAGES.map((id) => [id, [`/static/texts-${id}.x.js`, `/static/shared-${id}.y.js`]]));
   const crawler = "Mozilla/5.0 (Linux; Android 6.0.1) Chrome/130 Mobile Safari/537.36 (compatible; Googlebot/2.1)";
   const visitors = [
     { languages: ["de-DE", "en"] },
@@ -86,7 +86,7 @@ test("a built page fetches the texts of the language the app will play in at onc
       Object.defineProperty(globalThis.navigator, "languages", { value: visitor.languages, configurable: true });
       const app = saved ?? playLanguage(APP_LANGUAGES, false, CRAWLER.test(visitor.userAgent ?? ""), address);
       Object.defineProperty(globalThis.navigator, "languages", { value: original.languages, configurable: true });
-      const expected = app === "de" ? [] : chunks[app].map((file) => `modulepreload ${file}`);
+      const expected = chunks[app].map((file) => `modulepreload ${file}`);
       expect({ address, visitor, fetched: preloadedBy(script, visitor) }).toEqual({ address, visitor, fetched: expected });
     }
   }

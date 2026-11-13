@@ -37,7 +37,7 @@ const GERMAN_ONLY: Record<string, string> = { kita: "/kita/" };
  * Recorded games written English first (root CLAUDE.md, November 2026) and not translated yet, German included: they say
  * everything in English, so only the English voice records them, and their row in languageStatus.ts says so.
  */
-const ENGLISH_ONLY: Record<string, string> = { "haare-waschen": "/haare-waschen/" };
+const ENGLISH_ONLY: Record<string, string> = {};
 
 test("no two lines of a game share a recording", () => {
   for (const game of RECORDED_GAMES) {

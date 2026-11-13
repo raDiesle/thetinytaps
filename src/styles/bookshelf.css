@@ -1851,12 +1851,22 @@
   min-height: 0;
   margin-bottom: 6cqw;
   overflow: hidden;
-  font-size: min(48cqw, calc((100cqh - 90cqw) / var(--len) * 1.65));
+  font-size: min(48cqw, calc((100cqh - 90cqw) / var(--len) * var(--per-letter, 1.65)));
   font-weight: 700;
   line-height: 1.3;
   text-align: center;
   white-space: nowrap;
   writing-mode: vertical-rl;
+}
+
+/* Cyrillic letters are wider than Latin ones, and Chinese ones stand upright a whole em tall: with the Latin share the
+   longer Russian names and „还要等多久？“ ran past their labels (November 2026). */
+:root[lang="ru"] .shelf-daily-title {
+  --per-letter: 1.45;
+}
+
+:root[lang="zh"] .shelf-daily-title {
+  --per-letter: 0.95;
 }
 
 /* ----- The book taken out (bookTravel.ts): a layer of its own over the app ----- */

@@ -24,6 +24,7 @@ export {
   BRUSH_PERIOD,
   CAST_PERIOD,
   castSwing,
+  castWindup,
   CATCH_CLOSED,
   CATCH_OPEN,
   CATCH_PERIOD,
