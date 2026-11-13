@@ -67,11 +67,15 @@ export function surface(x: number, z: number) {
 
 /** Where things happen; z along the path. */
 export const BOAT_START = 62;
-/** How long the fishing rod is, where along it the right paw (above) and the left paw (at the end) hold it, and how far ahead the float lands. */
+/**
+ * How long the fishing rod is, where along it the right paw (above) and the left paw (at the end) hold it, how far
+ * ahead the float lands and how high its arc goes on the way: far out, so the big swing has a big throw.
+ */
 export const ROD_LENGTH = 1.25;
 export const ROD_GRIP_R = 0.27;
 export const ROD_GRIP_L = 0.08;
-export const CAST_REACH = 3.6;
+export const CAST_REACH = 5.6;
+export const CAST_ARC = 1.7;
 /** How many short pieces the fishing line is drawn of, so it can sag in a curve. */
 export const LINE_PIECES = 12;
 /** Where the rod lies on Ole's back after the fishing (Ole's own space, x to Ole's left): along its left side, behind Tapsi. */
