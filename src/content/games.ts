@@ -3,6 +3,7 @@ import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
+import { HAIR_STORY_BLURB, HAIR_STORY_BOOK } from "@/games/hairstory/names";
 import {
   CASE_BLURB,
   CASE_TITLE,
@@ -132,6 +133,15 @@ export const CATEGORIES: Category[] = [
         emoji: "🎒",
         title: KITA_STORY_BOOK,
         blurb: KITA_STORY_BLURB,
+      },
+      {
+        // The book „Hair Washing“ beside „Kita-Start“ (idea H-14, user request, 13 November 2026: „im gleichen Stil wie
+        // Stillen oder Kita oder Schnullerfee“): „Tapsi and the Foam Crown“, a story in chapters along the steps the guides
+        // give for washing a small child's hair calmly (src/games/hairstory), English first.
+        href: "/haare-waschen/",
+        emoji: "🛁",
+        title: HAIR_STORY_BOOK,
+        blurb: HAIR_STORY_BLURB,
       },
       {
         href: "/zaehne/",

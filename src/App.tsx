@@ -34,6 +34,7 @@ const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
 const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/");
 const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/");
+const HairStoryPage = page(() => import("@/pages/HairStoryPage"), "HairStoryPage", "/haare-waschen/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
 const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
@@ -73,6 +74,7 @@ export function App() {
         <Route path="abstillen" element={<MilkChainPage />} />
         <Route path="schnullerfee" element={<PacifierStoryPage />} />
         <Route path="kita" element={<KitaStoryPage />} />
+        <Route path="haare-waschen" element={<HairStoryPage />} />
         <Route path="belohnungstafel" element={<RewardsPage />} />
         {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
         <Route path="tagesplan" element={<PlannerPage />} />

@@ -58,6 +58,7 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { KITA_STORY } from "@/games/kitastory/kitaStory";
+import { HAIR_STORY } from "@/games/hairstory/hairStory";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
 import { PACIFIER_STORY } from "@/games/pacifierstory/pacifierStory";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
@@ -68,6 +69,7 @@ import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import kitaFiles from "../games/kitastory/stimme/*.mp3?glob";
+import hairFiles from "../games/hairstory/stimme/en/*.mp3?glob";
 import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
 import pacifierFiles from "../games/pacifierstory/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
@@ -361,14 +363,15 @@ const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
 
 /**
  * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
- * German (which recordedLines.ts leaves out there).
+ * in the book's first language, German or English (which recordedLines.ts leaves out there).
  */
 function chapterBook(
   chapters: StoryChapter[],
   language: TargetLanguageId,
   translations: Partial<Record<TextsLanguageId, StoryTranslation>> = {},
+  first: "de" | "en" = "de",
 ): VoiceGroup[] {
-  const translation = language === "de" ? undefined : translations[language];
+  const translation = language === first ? undefined : translations[language as TextsLanguageId];
   return chapters.map((chapter) => ({
     label: `Kapitel „${chapter.title}“`,
     lines: once(chapter.pages.map((page) => translation?.pages[page.id] ?? page.text)),
@@ -559,7 +562,9 @@ const RECORDED = new Set(
     milkChainFiles,
     pacifierFiles,
     kitaFiles,
-  ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
+    // An English-first book is recorded in English first (`en-<hash>`): its hash is the line's, as German files' are.
+    hairFiles,
+  ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4).replace(/^en-/, ""))),
 );
 
 /** The games and groups of `games` with only the lines that have no German recording yet. */
@@ -603,6 +608,7 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/abstillen/", groups: chapterBook(MILK_CHAIN, language, MILK_CHAIN_TEXTS) },
     { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
     { href: "/kita/", groups: chapterBook(KITA_STORY, language) },
+    { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, {}, "en") },
     {
       href: "",
       groups: [
