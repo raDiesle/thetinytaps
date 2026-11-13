@@ -146,6 +146,14 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
     }
     await sleep(6000);
   },
+  // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening.
+  "adventure/feuerwehr": async (cdp) => {
+    for (let i = 0; i < 4; i++) {
+      await press(cdp, "ArrowRight");
+      await sleep(300);
+    }
+    await sleep(7000);
+  },
   // Many pairs on the line (user feedback, November 2026): three washes hung whole, so the game takes the child to
   // four pairs with patterns, and of those all but one.
   "components/socken": (cdp) => hangSocks(cdp, 3),
