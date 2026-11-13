@@ -68,8 +68,9 @@ export function countedHosts(siteUrl: string): string {
  * out which once its own code has run: a visitor whose browser speaks English, on the German start page, waited a
  * second longer for the shelf on a slow phone, the texts coming only after the start's code (November 2026). It picks
  * the language as `load()` in src/lib/language.ts does – the one saved (`key`), else for a search engine (`crawler`)
- * the address's (`address`), else the first of the browser's languages the app speaks, else English – and German
- * needs nothing. `chunks` names, for each other language the app speaks, its texts chunk and the chunks it imports.
+ * the address's (`address`), else the first of the browser's languages the app speaks, else English. `chunks` names,
+ * for each language the app speaks, its texts chunk and the chunks it imports (German's holds only the translations of
+ * what is written English first).
  * It stands before the stylesheet: a script after one waits until the stylesheet has loaded.
  */
 export function textsPreload(chunks: Record<string, string[]>, address: string, { key, crawler }: { key: string; crawler: RegExp }) {

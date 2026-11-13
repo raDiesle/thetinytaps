@@ -360,6 +360,7 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
 /** The chapter books' translations, filled as the languages' texts load. */
 const MILK_CHAIN_TEXTS = byLanguage((texts) => texts.milkChain);
 const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
+const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
 
 /**
  * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
@@ -608,7 +609,7 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/abstillen/", groups: chapterBook(MILK_CHAIN, language, MILK_CHAIN_TEXTS) },
     { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
     { href: "/kita/", groups: chapterBook(KITA_STORY, language) },
-    { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, {}, "en") },
+    { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, HAIR_TEXTS, "en") },
     {
       href: "",
       groups: [

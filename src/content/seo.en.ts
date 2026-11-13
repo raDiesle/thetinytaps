@@ -19,7 +19,7 @@ export const SEO_EN: SeoTranslation = {
     "/": {
       title: "Toddler Games & Everyday Helpers – Free, No Ads",
       description:
-        "Learning games and everyday helpers for toddlers: look-and-find pictures, feelings, letters, a visual timer, tooth brushing, potty, reward chart, weaning.",
+        "Learning games & everyday helpers for toddlers: look-and-find pictures, feelings, letters, timer, toothbrushing, potty, reward chart, weaning, hair washing.",
       text: "Fun for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. In the books wait look-and-find pictures, movement adventures, chain reactions and little adventures, feelings, letters and numbers, matching and recognizing. And because a day with a little child has its own small hurdles, our everyday helpers stand right beside them: a timer that shows time in pictures, tooth brushing with a song, the potty game, a reward chart, a daily plan in pictures and a “how many more sleeps?” countdown – on a tablet or to print – and read-aloud stories in chapters for weaning, for saying goodbye to the pacifier with the pacifier fairy, for starting daycare and for hair washing. Whoever plays a game or a story to its end gets a little trophy of its own for it, and all the trophies gather at the bottom of the shelf beside the books.",
     },
     "/spiele/lebendige-welten/": {

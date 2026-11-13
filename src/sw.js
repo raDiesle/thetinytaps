@@ -10,7 +10,7 @@ const VERSION = "__VERSION__";
 const FILES = __FILES__;
 /** What the app needs to start on the home page (index.html, its scripts, styles and pictures): kept at install. */
 const SHELL_FILES = __SHELL__;
-/** The texts of each language besides German (static/texts-ru.<hash>.js), by language; left out of FILES. */
+/** The texts of each language (static/texts-ru.<hash>.js), by language; left out of FILES. */
 const TEXTS = __TEXTS__;
 /**
  * The offline copy by book and language (static/offline.<hash>.json, src/lib/offlineParts.ts), or null: what an

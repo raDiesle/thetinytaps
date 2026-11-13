@@ -36,6 +36,7 @@ import { SITUATIONS_ES as situations } from "@/games/feelings/kita.es";
 import { DAYS_ES as days } from "@/games/feelings/days.es";
 import { MILK_CHAIN_ES as milkChain } from "@/games/milkchain/es";
 import { PACIFIER_STORY_ES as pacifierStory } from "@/games/pacifierstory/es";
+import { HAIR_STORY_ES as hairStory } from "@/games/hairstory/es";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.es";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.es";
 import { CAUSE_SCENES_ES as cause } from "@/games/cause/scenes.es";
@@ -85,6 +86,7 @@ export const TEXTS: LanguageTexts = {
   days,
   milkChain,
   pacifierStory,
+  hairStory,
   cause,
   seo,
   stories: { cloudTrip, treasureIsland },

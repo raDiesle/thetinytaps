@@ -165,9 +165,9 @@ In a fresh worktree run `bun install` first.
   texts inline as `t({ en: "…" })` (`useT()`; typed `EnglishFirst`, the older German-first ones `Localized`, and a
   field taking either is `Texts`, all in `src/lib/language.ts`), adding the other languages only when translations
   are asked for; larger content gets a `<lang>.ts` / `*.<lang>.ts` file next to its first language's data (English
-  for what is new), keyed by id, and a table by language. The language chunks were built for German in the code
-  (`TextsLanguageId` leaves `de` out): when German is first asked for English-first content of that kind, add `de`
-  to them like any other language. Games whose data is built on German sentences (Lebendige Bilder's items and
+  for what is new), keyed by id, and a table by language. German has a chunk of its own
+  for that (`texts-de.ts`, since „Haare waschen“, November 2026): the older German-first games need nothing there, and
+  German English-first content is listed in it like any other language's. Games whose data is built on German sentences (Lebendige Bilder's items and
   `sceneLanguage`, the elevator's phrasebook keyed by German sentence) are taught to take a part's first language with
   their first English-first part, checked by a test – never by writing that part German first after all.
   A visit downloads only its own language: such a file is imported only by `src/content/texts/texts-<lang>.ts` (one chunk
@@ -460,7 +460,7 @@ In a fresh worktree run `bun install` first.
   user feedback, November 2026; `content.test.ts` checks) – opening its game directly; they lean a little to the left together, on their bottom
   left corners (`--lean`), so the names running down their spines are read without bending the
   head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
-  shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`), checked in every
+  shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`, by its script's letter width, `--per-letter`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
   that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
   „Wie lange warten?“ (the Zeitplan's Countdown), Zeitplan and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026).
