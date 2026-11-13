@@ -129,7 +129,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Bewegungsspiele für Kleinkinder drinnen",
     description:
       "Bewegungsabenteuer zum Mitmachen: Der Fuchs Tapsi zeigt Hüpfen, Strecken und Schleichen, das Kind macht vor dem Bildschirm mit. Ohne Werbung.",
-    text: "Eine Bewegungsgeschichte für drinnen: Tapsi springt, duckt sich und streckt sich, das Kind macht mit, und die Welt antwortet. Ohne Lesen, Tapsi sagt alles.",
+    text: "Bewegungsgeschichten für drinnen, auf der Schatzinsel oder auf einer Reise mit der kleinen Wolke: Tapsi springt, duckt sich und streckt sich, das Kind macht mit, und die Welt antwortet. Ohne Lesen, Tapsi sagt alles.",
   },
   {
     path: "/gefuehle/",

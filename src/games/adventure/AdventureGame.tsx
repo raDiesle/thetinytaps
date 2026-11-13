@@ -17,7 +17,7 @@ import previews from "./vorschau/*.webp?glob";
 const STORIES: { id: AdventureStoryId; emoji: string; story: Story; unfinished?: true }[] = [
   { id: "schatzinsel", emoji: "🏝️", story: TREASURE_ISLAND },
   // Still being built (user decision, November 2026): tested on localhost only.
-  { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP, unfinished: true },
+  { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP },
   // Tapsi rides Robo, a hover robot, so it never has to walk (user idea, November 2026); being built, English first.
   { id: "feuerwehr", emoji: "🚒", story: FIRE_RESCUE, unfinished: true },
 ];
