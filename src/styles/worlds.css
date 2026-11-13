@@ -78,31 +78,6 @@
   paint-order: stroke;
 }
 
-/* Lebendige Welten: a farm on the meadow. */
-.world-barn {
-  bottom: 3vh;
-  left: 3%;
-  width: clamp(80px, 14vh, 160px);
-}
-
-.world-fence {
-  bottom: 2vh;
-  left: calc(4% + clamp(80px, 14vh, 160px));
-  width: clamp(90px, 15vh, 180px);
-}
-
-.world-tree {
-  right: 4%;
-  bottom: 3vh;
-  width: clamp(56px, 11vh, 120px);
-}
-
-.world-tree2 {
-  right: calc(5% + clamp(56px, 11vh, 120px));
-  bottom: 6vh;
-  width: clamp(40px, 8vh, 86px);
-}
-
 /* Buchstaben & Zahlen: building blocks on the meadow. */
 .world-pile {
   bottom: 2vh;

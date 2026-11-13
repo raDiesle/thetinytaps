@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 /*
  * Each home category has a world of its own (idea V-08), so a child finds „its“ area again by the picture: a meadow
- * with a farm for Lebendige Welten, a table with toys for Zuordnen, building blocks for Buchstaben & Zahlen and a
+ * for Lebendige Welten, a table with toys for Zuordnen, building blocks for Buchstaben & Zahlen and a
  * children's room for the Alltagshelfer, a cosy living room with a sofa for Gefühle. Its menus show it behind the cards (Sky), its book on the home page's shelf a
  * small piece of it (WorldCardScene). The things are drawn once here, each in its own box, and placed by the two.
  */
@@ -38,19 +38,6 @@ function Tree() {
       <circle cx="26" cy="38" r="5" fill="#ff6b6b" stroke="none" />
       <circle cx="52" cy="30" r="5" fill="#ff6b6b" stroke="none" />
       <circle cx="48" cy="56" r="5" fill="#ff6b6b" stroke="none" />
-    </g>
-  );
-}
-
-/** A short wooden fence; box 160 × 50. */
-function Fence() {
-  return (
-    <g className="world-line" fill="#f7e2b5">
-      <rect x="4" y="14" width="152" height="9" rx="3" />
-      <rect x="4" y="30" width="152" height="9" rx="3" />
-      {[8, 48, 88, 128].map((x) => (
-        <path key={x} d="M0 8 L12 0 L24 8 V48 H0 Z" transform={`translate(${x} 0)`} />
-      ))}
     </g>
   );
 }
@@ -254,23 +241,10 @@ export function WorldWindow() {
 /** What stands in front of the backdrop of a world, along the bottom of the screen. */
 export function WorldGround({ world }: { world: WorldId }) {
   switch (world) {
+    // Only the meadow's hills: the farm's barn, fence and trees stood behind the cards as clutter and were taken out of
+    // the menus (user feedback, November 2026). Barn and tree stay in the cover's fallback scene (WorldCardScene).
     case "lebendige-welten":
-      return (
-        <>
-          <Thing name="barn" box="0 0 120 110">
-            <Barn />
-          </Thing>
-          <Thing name="fence" box="0 0 160 50">
-            <Fence />
-          </Thing>
-          <Thing name="tree" box="0 0 80 120">
-            <Tree />
-          </Thing>
-          <Thing name="tree2" box="0 0 80 120">
-            <Tree />
-          </Thing>
-        </>
-      );
+      return null;
     case "buchstaben-zahlen":
       return (
         <>

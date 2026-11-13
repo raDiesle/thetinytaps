@@ -196,9 +196,11 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   piece looks clean.
 - **A cut-out's figure never touches the picture's edge** where it isn't meant to end: Gemini sometimes draws it cut
   off by its frame, and the trim then leaves a straight line (Opa Bär's cap ended flat at the top, and every menu
-  showed his head sliced, user feedback, November 2026). Before keeping a cut-out, check that its top and side rows
-  are transparent (only a figure sitting on the page's foot may touch the bottom); if not, draw it again with „whole
-  figure, room on every side“, or for a small missing tip redraw it with its own line and colours on a taller canvas.
+  showed his head sliced; Oma Bär's legs ended flat at the bottom and her cardigan on the right, user feedback,
+  November 2026). Before keeping a cut-out, check that all four outer rows are transparent – the bottom too, also for a
+  figure sitting on the page's foot – and that no side ends in a long straight line (a cut the trim moved off the
+  edge); if not, draw it again with „the whole of both figures fits in the picture with empty room on every side, legs
+  and feet included“, or for a small missing tip redraw it with its own line and colours on a taller canvas.
   `BookFamily.test.ts` checks the menu's readers.
 - **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
   character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are

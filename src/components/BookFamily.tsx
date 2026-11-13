@@ -1,22 +1,10 @@
 import pictures from "./bilder/*.webp?glob";
-
-/** The two animal families reading one book together: Tapsi's (the foxes) and the little bear's. */
-export type Family = "fox" | "bear";
+import { type Family, READER_FILES } from "./readerPictures";
 
 /** Their cut-out pictures (Gemini, `bilder/`). */
-export const FAMILY_PICTURES: Record<Family, string | undefined> = {
+const FAMILY_PICTURES: Record<Family, string | undefined> = {
   fox: pictures["buch-fuechse.webp"],
   bear: pictures["buch-baeren.webp"],
-};
-
-/**
- * Who reads with the child at the bottom of the menus, in turn from visit to visit (D-21): the parents, then Oma, then
- * Opa – on the bears' side Opa before Oma, so the two sides never show the same grown-ups (Oma Fuchs beside Opa Bär).
- * A picture not made yet falls back to the parents.
- */
-export const READERS: Record<Family, (string | undefined)[]> = {
-  fox: [FAMILY_PICTURES.fox, pictures["buch-oma-fuchs.webp"], pictures["buch-opa-fuchs.webp"]],
-  bear: [FAMILY_PICTURES.bear, pictures["buch-opa-baer.webp"], pictures["buch-oma-baer.webp"]],
 };
 
 /** Counts the visits, so the next one brings the next readers. */
@@ -37,10 +25,15 @@ function visitNumber(): number {
   return visit;
 }
 
-/** The picture of who reads on this side in this visit. */
+/** The file of who reads on this side in the visit `n` (D-21, `READER_FILES`). */
+export function readerFileOf(family: Family, n: number): string {
+  const readers = READER_FILES[family];
+  return readers[n % readers.length];
+}
+
+/** The picture of who reads on this side in this visit; one not made yet (still in the picture queue) falls back to the parents. */
 export function readerOf(family: Family, n = visitNumber()): string | undefined {
-  const readers = READERS[family];
-  return readers[n % readers.length] ?? FAMILY_PICTURES[family];
+  return pictures[readerFileOf(family, n)] ?? FAMILY_PICTURES[family];
 }
 
 /**
