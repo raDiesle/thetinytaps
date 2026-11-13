@@ -93,6 +93,11 @@ export interface StoryWorld {
   update(frame: StoryFrame): FrameResult;
   /** After the guide took its pose: what it holds follows its paws, and the paws hold on to it. */
   afterPose?(frame: StoryFrame): void;
+  /**
+   * What the guide holds, takes up or puts down (rod, paddle, key, brushes …), solid things that must never reach
+   * into its body: `three/collisions.test.ts` checks them, and the paws, in every frame of the story.
+   */
+  held?(): THREE.Object3D[];
   /** Where the camera's attention is, so shadows stay sharp there. */
   focus: THREE.Vector3;
 }

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { movement } from "../library/movements";
-import { type Cue, DEFAULT_TURN, type Story, type StoryFrame, type StoryWorld } from "../stories/story";
+import { type Cue, DEFAULT_TURN, type FrameResult, type Story, type StoryFrame, type StoryWorld } from "../stories/story";
 import { clipFocus, clipPose } from "./clips";
 import { type ArmPose, Guide, type LegPose, lerpLeg, lerpPose, restPose, type Pose } from "./guide";
 import { Stage } from "./stage";
@@ -74,6 +74,73 @@ export function sitDown(p: Pose, k: number): Pose {
 const smoothstep = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
 const PRAISE_BLEND = 0.9;
 
+/** A step's length: the sequence's seconds plus showing the movement first. */
+const stepLength = (story: Story, step: number) => story.sequence.steps[step].seconds + story.demo[step];
+
+/** When each step of a story starts (story seconds, after the opening) and how long the whole story is. */
+export function storyTimes(story: Story) {
+  let t = story.opening?.seconds ?? 0;
+  const starts = story.sequence.steps.map((_, i) => {
+    const start = t;
+    t += stepLength(story, i);
+    return start;
+  });
+  return { starts, total: t };
+}
+
+/** The step playing at `t` seconds of the story and how far into it. */
+function stepAt(story: Story, starts: number[], t: number) {
+  let step = starts.length - 1;
+  while (step > 0 && t < starts[step]) step--;
+  const local = Math.max(0, Math.min(t - starts[step], stepLength(story, step)));
+  return { step, local };
+}
+
+/** The story's frame at `t` seconds (`before`: the moment of the frame before, to find what happened in between). */
+export function storyFrame(story: Story, starts: number[], t: number, before: number, dt: number): StoryFrame {
+  const { step, local } = stepAt(story, starts, t);
+  const opening = t < (story.opening?.seconds ?? 0) ? t : null;
+  const lead = story.lead[step];
+  const actLength = stepLength(story, step) - lead - story.praise[step];
+  return {
+    step,
+    local,
+    // The opening holds the first step at its very start, so nothing in it happens yet.
+    prevLocal: opening === null ? before - starts[step] : 0,
+    lead,
+    demo: story.demo[step],
+    act: local - lead,
+    actLength,
+    praise: local - lead - actLength,
+    opening,
+    time: t,
+    dt,
+  };
+}
+
+/**
+ * The guide's pose in a frame, before the world sits or bends it: standing (or walking, `walkWeight`) while
+ * travelling, the step's clip from when the guide shows it, and back to standing in the praise.
+ */
+export function storyPose(story: Story, f: StoryFrame, walkWeight: number): Pose {
+  const lead = lerpPose(clipPose("idle", f.time), clipPose("march", f.time * 1.25), walkWeight);
+  // The clip runs on from showing it into doing it together.
+  const clipTime = f.act + f.demo;
+  if (clipTime < 0) return lead;
+  const motion = movement(story.sequence.steps[f.step].movement).motion;
+  const acting = clipPose(motion, clipTime);
+  let pose = lerpPose(lead, acting, Math.min(1, clipTime / ACT_BLEND));
+  if (f.praise > 0) pose = lerpPose(pose, restPose(), Math.min(1, f.praise / PRAISE_BLEND));
+  return pose;
+}
+
+/** The pose a world's answer turns that into: sitting and bending on top. */
+export const worldPose = (pose: Pose, result: FrameResult) => {
+  const p = sitDown(pose, result.sitting ?? 0);
+  p.bend += result.bend ?? 0;
+  return p;
+};
+
 export class StoryPlayer {
   readonly stage: Stage;
   private readonly guide = new Guide();
@@ -102,13 +169,7 @@ export class StoryPlayer {
     this.stage.scene.add(this.guide.root);
     this.world = story.build(this.stage, this.guide, (c) => events.onCue(c));
     this.opening = story.opening?.seconds ?? 0;
-    let t = this.opening;
-    this.starts = story.sequence.steps.map((_, i) => {
-      const start = t;
-      t += this.stepSeconds(i);
-      return start;
-    });
-    this.total = t;
+    ({ starts: this.starts, total: this.total } = storyTimes(story));
   }
 
   start() {
@@ -172,41 +233,18 @@ export class StoryPlayer {
     return this.total;
   }
 
-  /** A step's length: the sequence's seconds plus showing the movement first. */
-  private stepSeconds(step: number) {
-    return this.story.sequence.steps[step].seconds + this.story.demo[step];
-  }
-
   private stepAt(t: number) {
-    let step = this.starts.length - 1;
-    while (step > 0 && t < this.starts[step]) step--;
-    const local = Math.max(0, Math.min(t - this.starts[step], this.stepSeconds(step)));
-    return { step, local };
+    return stepAt(this.story, this.starts, t);
   }
 
   private tick(dt: number) {
     const t = Math.min(this.elapsed, this.total);
-    const { step, local } = this.stepAt(t);
-    const opening = t < this.opening ? t : null;
-    // The opening holds the first step at its very start, so nothing in it happens yet.
-    const prevLocal = opening === null ? this.prevElapsed - this.starts[step] : 0;
-    if (opening !== null) this.speakOpening(t);
+    const frame = storyFrame(this.story, this.starts, t, this.prevElapsed, dt);
+    // The clock runs on past the end; the frame stays at it.
+    frame.time = this.elapsed;
+    const { step } = frame;
+    if (frame.opening !== null) this.speakOpening(t);
     this.prevElapsed = t;
-    const lead = this.story.lead[step];
-    const actLength = this.stepSeconds(step) - lead - this.story.praise[step];
-    const frame: StoryFrame = {
-      step,
-      local,
-      prevLocal,
-      lead,
-      demo: this.story.demo[step],
-      act: local - lead,
-      actLength,
-      praise: local - lead - actLength,
-      opening,
-      time: this.elapsed,
-      dt,
-    };
 
     if (step !== this.currentStep) {
       this.currentStep = step;
@@ -225,8 +263,8 @@ export class StoryPlayer {
       this.quiet = quiet;
       this.events.onQuiet?.(quiet);
     }
-    const pose = sitDown(this.pose(frame, result.walking, dt), result.sitting ?? 0);
-    pose.bend += result.bend ?? 0;
+    this.walkWeight += ((result.walking ? 1 : 0) - this.walkWeight) * Math.min(1, dt * 6);
+    const pose = worldPose(storyPose(this.story, frame, this.walkWeight), result);
     // From just before the guide shows the movement until the praise.
     const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
     this.guide.highlight = smooth((frame.act + frame.demo + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8));
@@ -246,19 +284,6 @@ export class StoryPlayer {
       this.ended = true;
       this.events.onEnd();
     }
-  }
-
-  private pose(f: StoryFrame, walking: boolean, dt: number): Pose {
-    this.walkWeight += ((walking ? 1 : 0) - this.walkWeight) * Math.min(1, dt * 6);
-    const lead = lerpPose(clipPose("idle", f.time), clipPose("march", f.time * 1.25), this.walkWeight);
-    // The clip runs on from showing it into doing it together.
-    const clipTime = f.act + f.demo;
-    if (clipTime < 0) return lead;
-    const motion = movement(this.story.sequence.steps[f.step].movement).motion;
-    const acting = clipPose(motion, clipTime);
-    let pose = lerpPose(lead, acting, Math.min(1, clipTime / ACT_BLEND));
-    if (f.praise > 0) pose = lerpPose(pose, restPose(), Math.min(1, f.praise / PRAISE_BLEND));
-    return pose;
   }
 
   private speak(f: StoryFrame) {

@@ -35,6 +35,7 @@ import {
   bridgeTop,
   BROOK_FROM,
   CARRY_PATH,
+  CAST_ARC,
   CAST_REACH,
   CHEST_SAND,
   CHEST_Y,
@@ -243,8 +244,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const carryPos = new THREE.Vector3();
   const carryLook = new THREE.Vector3();
   const lapQ = new THREE.Quaternion();
+  /** The paddle lying on the sand along Ole, its two ends swapped: the same picture, reached by turning the near end forwards. */
+  const ON_SAND_TURNED = ON_SAND.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI));
   const restQ = new THREE.Quaternion();
   const heldQ = new THREE.Quaternion();
+  const sideQ = new THREE.Quaternion();
   const tmpQ = new THREE.Quaternion();
   const basis = new THREE.Matrix4();
   const bladeY = [1, 1];
@@ -800,7 +804,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         .addScaledVector(lapPos, u * u)
         .addScaledVector(tmpC, 2 * u * put)
         .addScaledVector(sandPos, put * put);
-      paddle.quaternion.slerpQuaternions(lapQ, ON_SAND, smooth(put));
+      // Turned along Ole only once it is out over the side, its left end swinging forwards, away from Tapsi: turned
+      // the other way round (the paddle looks the same either way) that end swept back through the tummy.
+      paddle.quaternion.slerpQuaternions(lapQ, ON_SAND_TURNED, smooth((put - 0.35) / 0.65));
     } else if (hold > 0) {
       // The shaft runs from paw to paw; tipped a little more than the paws, so the low blade reaches the water.
       const shaftAlong = left.clone().sub(right);
@@ -881,7 +887,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const snap = casting && k >= 0.42 && k < CAST_OUT ? 0.8 : 0;
     const hang = (trail: number) => {
       const yaw = guide.root.rotation.y;
-      return out.copy(tip).add(tmpC.set(-Math.sin(yaw) * 0.3 * trail, -0.22 * (1 - 0.5 * trail), -Math.cos(yaw) * 0.3 * trail));
+      return out.copy(tip).add(tmpC.set(-Math.sin(yaw) * 0.4 * trail, -0.22 * (1 - 0.5 * trail), -Math.cos(yaw) * 0.4 * trail));
     };
     if (casting && k >= CAST_OUT && k < CAST_LANDS) {
       // Out in a high arc, fast at first and slower as the line holds it back.
@@ -891,7 +897,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       land.y = wave(land.x, land.z, time);
       return hang(0.8 * (1 - t))
         .lerp(land, e)
-        .add(tmpC.set(0, 4 * e * (1 - e) * 0.9, 0));
+        .add(tmpC.set(0, 4 * e * (1 - e) * CAST_ARC, 0));
     }
     if (casting && k >= CAST_LANDS && k < REEL) {
       const land = landing(n, out);
@@ -946,7 +952,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
    */
   function holdRod(f: StoryFrame) {
     const { step, praise } = f;
-    const clip = f.act + f.demo;
+    // Held at the clip's end in the praise, where the rod is in front of the chest: laying it down never starts another swing.
+    const clip = Math.min(f.act + f.demo, clipLength(S.fish));
     // Lying on the round shell, it touches it once, halfway along, and is clear of it everywhere else:
     // along the shell's slope there, never through it.
     const shell = (z: number) => turtleTop(ROD_REST.x, z);
@@ -960,33 +967,54 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // Picked up in the travel before the fishing, laid down again in the praise after it.
     const down = fishing ? Math.max(1 - smooth((f.local - 0.7) / 1.0), smooth((praise - 0.2) / 0.8)) : 1;
     const grip = fishing ? smooth((f.local - 0.2) / 0.5) * (1 - smooth((praise - 0.4) / 0.5)) : 0;
+    // The left paw takes it up on its own side; the right one takes hold only once it is in front of the chest,
+    // and lets go first when it is laid down, so it never reaches across through the body.
+    const gripR = grip * smooth((0.45 - down) / 0.3);
     if (down < 1) {
       updateMoved(guide.root);
-      // The right paw holds the rod in front of the chest; swung back it is up beside the head, over the
-      // right shoulder and outside the head, cast out it is up ahead. The left paw holds lower down.
+      // The right paw holds the rod in front of the chest; swung back it is high behind the right shoulder,
+      // outside the head, as far back as a child can reach, cast out it is up ahead. The left paw holds lower down.
       const { back, out, follow } = clip > 0 ? castSwing(clip) : { back: 0, out: 0, follow: 0 };
       const rest = Math.max(0, 1 - back - out);
+      // On the way back and forth it bows out to the right, round the head instead of past the face.
+      const bow = 4 * back * (1 - back);
       const paw = guide.bodyPoint(
         tmpB.set(
-          -0.06 * rest - 0.3 * back - 0.08 * out,
-          0.2 * rest + 0.6 * back + 0.56 * out - 0.24 * follow,
-          0.3 * rest - 0.02 * back + 0.34 * out + 0.08 * follow,
+          -0.06 * rest - 0.32 * back - 0.08 * out - 0.2 * bow,
+          0.2 * rest + 0.8 * back + 0.6 * out - 0.26 * follow,
+          0.3 * rest - 0.2 * back + 0.38 * out + 0.12 * follow,
         ),
         tmpB,
       );
-      // Tipped up and a little forwards; swung back, it points up and back over the right shoulder, snapped
+      // Tipped up and a little forwards; swung back, it points back over the right shoulder, nearly level, snapped
       // out it stops high ahead, and then follows the float down until it points nearly level at it.
       const yaw = guide.root.rotation.y;
       const ahead = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
       const right = new THREE.Vector3(-Math.cos(yaw), 0, Math.sin(yaw));
-      const dir = new THREE.Vector3(0, 1 - 0.8 * follow, 0)
-        .addScaledVector(ahead, 0.3 - back * 1.15 + out * 0.55 + follow * 0.7)
-        .addScaledVector(right, 0.12 + back * 0.4 - follow * 0.08)
+      const dir = new THREE.Vector3(0, 1 - 0.65 * back - 0.8 * follow, 0)
+        .addScaledVector(ahead, 0.3 - back * 1.3 + out * 0.6 + follow * 0.75)
+        .addScaledVector(right, 0.12 + back * 0.3 + bow * 0.35 - follow * 0.08)
         .normalize();
       heldQ.setFromUnitVectors(UP, dir);
-      const butt = paw.addScaledVector(dir, -ROD_GRIP_R);
-      rod.position.lerpVectors(butt, resting, down);
-      rod.quaternion.slerpQuaternions(heldQ, restQ, down);
+      const held = paw.addScaledVector(dir, -ROD_GRIP_R);
+      if (down > 0) {
+        // Taken up round Tapsi's left side, tipped up, outside the body, and only then brought round in front of the
+        // chest (laid down the same way back): never straight across through the body.
+        const left = right.clone().negate();
+        const beside = guide.bodyPoint(new THREE.Vector3(0.5, 0.05, 0.12), new THREE.Vector3());
+        sideQ.setFromUnitVectors(UP, new THREE.Vector3(0, 1, 0).addScaledVector(ahead, 0.25).addScaledVector(left, 0.2).normalize());
+        const u = 1 - down;
+        rod.position
+          .copy(resting)
+          .multiplyScalar(down * down)
+          .addScaledVector(beside, 2 * u * down)
+          .addScaledVector(held, u * u);
+        if (u < 0.5) rod.quaternion.slerpQuaternions(restQ, sideQ, smooth(u * 2));
+        else rod.quaternion.slerpQuaternions(sideQ, heldQ, smooth(u * 2 - 1));
+      } else {
+        rod.position.copy(held);
+        rod.quaternion.copy(heldQ);
+      }
     } else {
       rod.position.copy(resting);
       rod.quaternion.copy(restQ);
@@ -994,7 +1022,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     updateMoved(rod);
     if (grip > 0) {
       const along = new THREE.Vector3(0, 1, 0).applyQuaternion(rod.quaternion);
-      guide.hold("R", rod.position.clone().addScaledVector(along, ROD_GRIP_R), along, grip);
+      guide.hold("R", rod.position.clone().addScaledVector(along, ROD_GRIP_R), along, gripR);
       guide.hold("L", rod.position.clone().addScaledVector(along, ROD_GRIP_L), along, grip);
     }
 
@@ -1663,9 +1691,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const beside = v3(g.x - 0.8 + Math.sin(time * 1.3) * 0.05, g.y + 1.2 + Math.sin(time * 2.3) * 0.06, g.z + 0.2 + Math.cos(time * 1.3) * 0.08);
     // A little ahead and behind the brook as the camera sees it, below the boxes, showing the way.
     const ahead = v3(g.x - 0.6, g.y + 1.3 + Math.sin(time * 2.3) * 0.12, g.z - 1.2 + Math.sin(time * 1.3) * 0.2);
-    // Ahead and high, a little left of the float's way, watching it: the camera on Tapsi's right sees Kiki
-    // between Tapsi's head and the float, never over the head.
-    const watch = v3(g.x - 0.5 + Math.sin(time * 1.3) * 0.15, g.y + 2.2 + Math.sin(time * 2.3) * 0.1, g.z - 2.2);
+    // Far out on Tapsi's right and ahead, watching the float: right in the picture of the camera behind Tapsi's right
+    // shoulder, clear of the rod's whole swing and the float's arc – in the middle, Kiki looked in front of the rod
+    // cast out, though it was further away (user feedback, November 2026).
+    const watch = v3(g.x + 1.0 + Math.sin(time * 1.3) * 0.12, g.y + 2.0 + Math.sin(time * 2.3) * 0.1, g.z - 3.4);
+    // On the way there it crosses over far ahead of Tapsi, once the camera has come round behind.
+    const crossing = v3(g.x + 0.6, g.y + 2.4, g.z - 3.2);
     // High above the bow, leading the way to the island out of the paddle's reach.
     const leading = v3(g.x + 0.3 + Math.sin(time * 1.3) * 0.3, g.y + 2.6 + Math.sin(time * 2.3) * 0.15, g.z - 4.5);
     // Beyond the webs on the left, beside the spider hanging in the middle.
@@ -1680,12 +1711,17 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       // A little hop in the air whenever Tapsi waves.
       if (step === S.hello && act + f.demo > 0) p.y += Math.abs(Math.sin(time * 4.5)) * 0.15;
     } else if (step === S.fish || step === S.sit) {
-      p.copy(beside).lerp(watch, step === S.fish ? smooth(f.local / 2) : 1);
+      const k = step === S.fish ? smooth((f.local - 0.8) / 2.2) : 1;
+      p.copy(beside)
+        .multiplyScalar((1 - k) ** 2)
+        .addScaledVector(crossing, 2 * k * (1 - k))
+        .addScaledVector(watch, k * k);
     } else if (step === S.paddle) {
       p.copy(watch).lerp(leading, smooth(f.local / 2));
     } else if (step === S.key) {
       // Over Tapsi with the key, lets it fall, then circles again.
-      const over = v3(keyX + 0.15, g.y + 1.45 + Math.sin(time * 4) * 0.08, keyZ - 0.35);
+      // Further ahead than where it lands, so it falls in front of Tapsi's face, never through the muzzle.
+      const over = v3(keyX + 0.15, g.y + 1.45 + Math.sin(time * 4) * 0.08, keyZ - 0.8);
       p.copy(around).lerp(over, smooth(f.local / 0.8) * (1 - smooth((f.local - 1.4) / 1.2)));
       circling = f.local > 2.6;
     } else if (step === S.jump) {
@@ -1840,6 +1876,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       holdKey(f);
       holdRope(f);
     },
+    held: () => [rod, paddle, key, gate.bar, ...ropeParts],
   };
 }
 

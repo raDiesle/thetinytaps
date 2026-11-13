@@ -83,18 +83,19 @@ const listIn = (language: TargetLanguageId) => {
 /**
  * A game whose lines `voiceLines.ts` lists in every language (November 2026: the user asked for every language).
  * Its praise is said proudly, everything else warmly. A line a language has no translation of yet is said in German
- * there, which has no recording in that language, so a line of another language that is also one of the German lines
- * is left out – unless the game's texts are whole in each language (`whole`, the letters' language packs, where an
+ * there (in English for a game written English first, `first`), which has no recording in that language, so a line of
+ * another language that is also one of the first language's lines is left out – unless the game's texts are whole in each language (`whole`, the letters' language packs, where an
  * English „A!“ is English).
  */
 const spoken =
-  (href: string, { whole = false }: { whole?: boolean } = {}) =>
+  (href: string, { whole = false, first = "de" }: { whole?: boolean; first?: "de" | "en" } = {}) =>
   (language: TargetLanguageId): RecordedLine[] => {
     const groups = (lang: TargetLanguageId) => listIn(lang).find((g) => g.href === href)?.groups ?? [];
-    const german = language === "de" || whole ? new Set<string>() : new Set(groups("de").flatMap((g) => g.lines));
+    // An English-first game (`first`) says its untranslated lines in English everywhere: only the English voice records them.
+    const untranslated = language === first || whole ? new Set<string>() : new Set(groups(first).flatMap((g) => g.lines));
     return once(
       groups(language).flatMap((g) =>
-        g.lines.filter((text) => !german.has(text)).map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) })),
+        g.lines.filter((text) => !untranslated.has(text)).map((text) => ({ text, kind: g.label === "Lob" ? ("praise" as const) : ("instruction" as const) })),
       ),
     );
   };
@@ -127,6 +128,7 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "abstillen", folder: "src/games/milkchain/stimme", lines: spoken("/abstillen/") },
   { name: "schnullerfee", folder: "src/games/pacifierstory/stimme", lines: spoken("/schnullerfee/") },
   { name: "kita", folder: "src/games/kitastory/stimme", lines: spoken("/kita/") },
+  { name: "haare-waschen", folder: "src/games/hairstory/stimme", lines: spoken("/haare-waschen/", { first: "en" }) },
 ];
 
 /** The languages these games are recorded in: the app's. */

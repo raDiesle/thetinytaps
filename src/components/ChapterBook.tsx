@@ -5,33 +5,34 @@ import { useInnerBack } from "@/components/GameShell";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { VoiceSwitch } from "@/components/VoiceSwitch";
 import type { TextsLanguageId } from "@/content/texts";
-import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { type Texts, useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
 import { stepIndexInAddress, useStepAddress } from "@/lib/stepAddress";
 import { useStoredSettings } from "@/lib/storage";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
-import { hush, type RecordedVoice } from "@/lib/voice";
+import { hush, type RecordedVoice, type VoiceLine } from "@/lib/voice";
 import "./chapterBook.css";
 
 /** One page of a story book: its picture (found by `pictureOf(id)`) and the sentence a grown-up reads under it. */
 export interface StoryPage {
   /** Unique in the story; the picture is found by it. */
   id: string;
-  /** What is read aloud, German. */
+  /** What is read aloud, in the book's first language (`first`: German, or English for what is new). */
   text: string;
 }
 
 /** One chapter of a story book: its own line in the table of contents. */
 export interface StoryChapter {
   id: string;
-  /** Its heading, German, plain words. */
+  /** Its heading, in the book's first language, plain words. */
   title: string;
   pages: StoryPage[];
 }
 
 /**
- * A story book in another language, kept in `<lang>.ts` beside its German data and loaded with that language's texts
- * (`src/content/texts/texts-<lang>.ts`), never imported by the game. A page or title it lacks shows in German.
+ * A story book in another language, kept in `<lang>.ts` beside its first language's data and loaded with that language's
+ * texts (`src/content/texts/texts-<lang>.ts`), never imported by the game. A page or title it lacks shows in the book's
+ * first language.
  */
 export interface StoryTranslation {
   /** Each chapter's title by chapter id. */
@@ -84,11 +85,12 @@ export function ChapterBook({
   translations,
   code = "K",
   voice,
+  first = "de",
 }: {
   /** The story, in reading order. */
   chapters: StoryChapter[];
   /** The story's name over its table of contents. */
-  title: Localized;
+  title: Texts;
   /** A page's picture by its id, or nothing while it isn't made yet (a paper placeholder stands there). */
   pictureOf: (id: string) => string | undefined;
   /** The story in the other languages (`byLanguage`), filled as their texts load. */
@@ -97,10 +99,16 @@ export function ChapterBook({
   code?: string;
   /** The book's recorded voice (its `stimme/` folder), reading each page aloud; without it the book is silent. */
   voice?: RecordedVoice;
+  /**
+   * The language its chapters are written in: German for the books written before November 2026, English for what is
+   * new (root CLAUDE.md). A page shown in it is read with its recording in that language, so an English page in a German
+   * app plays the English one (`recordingUrl`), never a German voice reading English.
+   */
+  first?: "de" | "en";
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
-  const translation = language === "de" ? undefined : translations?.[language];
+  const translation = language === first ? undefined : translations?.[language as TextsLanguageId];
   const { pages, where, starts } = useMemo(() => {
     const pages = chapters.flatMap((c) => c.pages);
     return {
@@ -113,9 +121,9 @@ export function ChapterBook({
   }, [chapters, code]);
   const LAST = pages.length - 1;
   // A link to one of its pages (`?seite=7`) opens the book there, else at its table of contents.
-  const [first] = useState(() => stepIndexInAddress(pages.length) ?? CONTENTS);
-  const [index, setIndex] = useState(first);
-  const indexRef = useRef(first);
+  const [opened] = useState(() => stepIndexInAddress(pages.length) ?? CONTENTS);
+  const [index, setIndex] = useState(opened);
+  const indexRef = useRef(opened);
   // The page on screen is in the address: its number in the whole story, from 1 (stepAddress.ts).
   useStepAddress(index === CONTENTS ? "inhalt" : index + 1);
   const { effects, ripple } = useTapFeedback();
@@ -123,17 +131,29 @@ export function ChapterBook({
   const [stored, store] = useStoredSettings(VOICE_KEY, { voice: true });
   const reading = voice !== undefined && stored.voice;
   const sentenceOf = useCallback((page: StoryPage) => translation?.pages[page.id] ?? page.text, [translation]);
+  /** The language a page's sentence is shown in: the app's where it is translated, else the book's first. */
+  const languageOf = useCallback((page: StoryPage) => (translation?.pages[page.id] !== undefined ? language : first), [translation, language, first]);
   const said = index === CONTENTS ? undefined : sentenceOf(pages[index]);
+  // German books keep their old way: a German page in another language has no recording there and stays silent.
+  const saidIn = index === CONTENTS || first === "de" ? language : languageOf(pages[index]);
+  /** A page's line for the voice: an English-first book's translated page carries its English, whose recording stands in. */
+  const lineOf = useCallback(
+    (page: StoryPage): VoiceLine =>
+      first === "en" && translation?.pages[page.id] !== undefined ? { text: sentenceOf(page), english: page.text } : sentenceOf(page),
+    [first, translation, sentenceOf],
+  );
   // What comes next: the next page, or from the contents each chapter's first page.
-  const ahead = index === CONTENTS ? starts.map((s) => sentenceOf(pages[s])) : index < LAST ? [sentenceOf(pages[index + 1])] : [];
+  const ahead = index === CONTENTS ? starts.map((s) => lineOf(pages[s])) : index < LAST ? [lineOf(pages[index + 1])] : [];
   const aheadKey = JSON.stringify(ahead);
+  const line = said === undefined ? undefined : lineOf(pages[index]);
+  const english = typeof line === "object" ? line.english : undefined;
   useEffect(() => {
     if (!voice || !reading) return;
-    if (said !== undefined) voice.say(said, language);
-    voice.load(JSON.parse(aheadKey), language);
+    if (said !== undefined) voice.say(said, saidIn, { english });
+    voice.load(JSON.parse(aheadKey), saidIn);
     // A page turned, the book closed or the voice switched off: what was being read stops.
     return hush;
-  }, [voice, reading, said, aheadKey, language]);
+  }, [voice, reading, said, saidIn, english, aheadKey]);
 
   const show = useCallback(
     (next: number) => {
@@ -148,7 +168,7 @@ export function ChapterBook({
     [pages, pictureOf],
   );
 
-  useEffect(() => show(first), [show]);
+  useEffect(() => show(opened), [show]);
 
   /** Opens a chapter from the table of contents. */
   const open = (chapter: number) => {
@@ -271,7 +291,9 @@ export function ChapterBook({
               {t(CHAPTER).replace("{n}", String(here.number))}: {translation?.chapters[here.chapter.id] ?? here.chapter.title}
             </h2>
           )}
-          <p className="cb-text">{translation?.pages[page.id] ?? page.text}</p>
+          <p className="cb-text" lang={languageOf(page) === language ? undefined : languageOf(page)}>
+            {sentenceOf(page)}
+          </p>
         </div>
       </div>
 
