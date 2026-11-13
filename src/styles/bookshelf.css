@@ -1937,56 +1937,198 @@
 }
 
 /*
- * The trophies won (TrophyShelf), standing in a row at the right end of the lowest board of books, beside the books
- * spine out; one button, which opens all of them. Still: they never shine or move by themselves.
+ * The way into the trophy room (TrophySign): a little paper sign like the fullscreen button's, nailed onto the shelf's
+ * right side over the loudspeaker, tipped a little the other way. Still: it never shines or moves by itself.
  */
-.shelf-end > .home-menu {
-  display: flex;
-  align-items: flex-end;
+.shelf-trophy-sign {
+  position: absolute;
+  right: calc(var(--post) * -0.35);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 62px;
+  padding: 9px 4px 3px;
+  border: 3px solid #9a6a40;
+  border-radius: 6px 6px 4px 4px;
+  background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;
+  rotate: -4deg;
+  translate: 0 -50%;
+  box-shadow:
+    inset 0 0 0 1px #00000024,
+    3px 3px 6px #3a261452;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The nail it hangs on. */
+.shelf-trophy-sign::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e4ded5, #7a6f64 55%, #3d3530);
+  box-shadow: 0 1px 1px #0000004d;
+  translate: -50% 0;
+}
+
+.shelf-trophy-sign-art {
+  width: 100%;
   height: 100%;
-  transform-style: preserve-3d;
 }
 
-.shelf-trophies {
+.shelf-trophy-sign:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+/*
+ * The walk into the trophy room (MuseumDoorway in TrophySign.tsx), DOORWAY_MS long: the eye turns right – the shelf's
+ * room swings away to the left about its right edge while the room's right wall comes round about its left edge, as two
+ * walls meeting in a corner do –, the door in that wall swings open on warm light, and the eye walks through it. Only
+ * transforms and opacity, which a phone moves cheaply.
+ */
+:root[data-to-museum] .room {
+  overflow: hidden;
+  perspective: 1100px;
+}
+
+:root[data-to-museum] .room-scene {
+  transform-origin: 100% 50%;
+  animation: museum-turn-away 0.8s ease-in-out both;
+}
+
+@keyframes museum-turn-away {
+  to {
+    transform: translateX(-100vw) rotateY(80deg);
+  }
+}
+
+.museum-doorway {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  perspective: 1100px;
+  cursor: pointer;
+  /* Walking in goes towards the doorway's middle. */
+  transform-origin: 50% 58%;
+  animation: museum-walk-in 0.55s 1.35s ease-in both;
+}
+
+.museum-doorway-wall {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  animation: museum-turn-in 0.8s ease-in-out both;
+}
+
+@keyframes museum-turn-in {
+  from {
+    transform: translateX(100vw) rotateY(-80deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Through the door: the eye comes close to the doorway until its light fills the screen. */
+@keyframes museum-walk-in {
+  from {
+    transform: none;
+  }
+  to {
+    transform: scale(6);
+  }
+}
+
+.museum-doorway-wall > .room-wall,
+.museum-doorway-wall > .room-floor {
+  position: absolute;
+}
+
+/* The door's frame, in the wall's middle, standing on the floor. */
+.museum-doorway-frame {
+  position: absolute;
+  bottom: clamp(14px, 5vh, 44px);
+  left: 50%;
+  width: min(36vw, 46vh);
+  height: min(78vh, 96vw);
+  padding: 2.2% 2.2% 0;
+  border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+  background: linear-gradient(90deg, #6e3d1d, #a8693a 30%, #8a5228 70%, #5c3216);
+  box-shadow: 4px 6px 14px #3a261466;
+  translate: -50% 0;
+  transform-origin: 50% 60%;
+}
+
+/* The trophy room's warm light beyond the door, then filling the screen as one walks in. */
+.museum-doorway-light {
+  position: absolute;
+  inset: 2.2% 2.2% 0;
+  border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+  background: radial-gradient(ellipse at 50% 55%, #fffbe8, #ffd98a 55%, #d99a45);
+}
+
+/* The door leaf, opening away into the room on its left hinge. */
+.museum-doorway-door {
+  position: absolute;
+  inset: 2.2% 2.2% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5%;
+  padding: 16% 12% 10%;
+  border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+  background: var(--wood-grain-v), linear-gradient(90deg, #8a5228, #b67a45 45%, #9a5e30);
+  box-shadow: inset 0 0 0 3px #5c3216;
+  transform-origin: 0 50%;
+  animation: museum-door-open 0.6s 0.8s ease-in-out both;
+}
+
+@keyframes museum-door-open {
+  to {
+    transform: rotateY(-105deg);
+  }
+}
+
+.museum-doorway-panel {
+  flex: 1;
+  width: 100%;
+  border-radius: 6px;
+  box-shadow:
+    inset 2px 2px 0 #5c321680,
+    inset -2px -2px 0 #e0a8704d;
+}
+
+.museum-doorway-knob {
+  position: absolute;
+  top: 58%;
+  right: 9%;
+  width: 7%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3b8, #e8b737 45%, #8a5a10);
+}
+
+/* The little sign on the door, the same as on the shelf. */
+.museum-doorway-plate {
+  position: absolute;
+  top: 9%;
+  left: 50%;
+  width: 26%;
+  aspect-ratio: 40 / 46;
+  padding: 2%;
+  border-radius: 6px;
+  background: #fbf3df;
+  box-shadow: 2px 2px 4px #3a261466;
+  translate: -50% 0;
+}
+
+.museum-doorway-plate svg {
+  width: 100%;
   height: 100%;
-  display: flex;
-  align-items: flex-end;
-}
-
-.shelf-trophies-row {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--trophy-gap);
-  padding: 0 2px;
-}
-
-.room-thing .shelf-trophy {
-  height: var(--trophy-h);
-  width: auto;
-  aspect-ratio: 2 / 3;
-}
-
-/* All trophies won, by game side by side, in the menu that opens from the shelf. */
-.trophy-cabinet {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 28px;
-}
-
-.trophy-cabinet-game h3 {
-  margin: 0.4em 0 0.2em;
-  font-size: 1.05rem;
-}
-
-.trophy-cabinet-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 10px 14px;
-}
-
-.trophy-cabinet-trophy {
-  height: clamp(80px, 16vh, 120px);
-  width: auto;
-  aspect-ratio: 2 / 3;
 }

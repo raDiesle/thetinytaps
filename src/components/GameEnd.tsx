@@ -1,12 +1,13 @@
 import { type CSSProperties, type PointerEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useCountsPlaytime, useEndShown, useLeaveGame, useLeavesToShelf } from "@/components/GameShell";
 import { ShelfLabelArt } from "@/components/PageCornerArt";
 import { track } from "@/lib/analytics";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
-import { awardTrophy, gameOfPath } from "@/lib/trophies";
+import { awardTrophy, gameOfPath, trophyKey, useTrophies } from "@/lib/trophies";
+import { museumHref, TROPHY_ROOM } from "@/lib/museum";
 import { recordedVoice } from "@/lib/voice";
 import { Trophy } from "@/components/Trophy";
 import endFiles from "./stimme/**/*.mp3?glob";
@@ -116,11 +117,18 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   }, [shown, pathname]);
 
   // The level's trophy (user decision, November 2026): given once the end shows, standing beside the buttons and from
-  // then on in the bookshelf on the home page (TrophyShelf).
+  // then on in the trophy room next to the shelf (TrophyMuseum, /pokale/).
+  // Once per end: React's strict mode runs an effect twice while developing, and each award counts a win.
   const game = gameOfPath(pathname)?.href;
+  const awarded = useRef(false);
   useEffect(() => {
-    if (shown && game) awardTrophy(game, level);
+    if (!shown || !game || awarded.current) return;
+    awarded.current = true;
+    awardTrophy(game, level);
   }, [shown, game, level]);
+  const wins = useTrophies().find((trophy) => trophy.game === game && trophy.level === level)?.wins ?? 0;
+  // Landed on its board, a tap on the trophy opens the trophy room at it (user request, November 2026).
+  const navigate = useNavigate();
 
   // Where the trophy is handed over: measured at its place beside the buttons, before it is painted, so it starts big
   // in the middle of the screen and shrinks back exactly onto its board (a transform only, which a phone moves cheaply).
@@ -192,7 +200,8 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
     >
       {/*
        * The trophy won: handed over big in the middle with „Geschafft!“ under it, then on its board beside the buttons,
-       * still. A tap on it while it is big puts it on its board at once.
+       * still, with how often it was won on its foot. A tap on it while it is big puts it on its board at once; on its
+       * board a tap opens the trophy room at it.
        */}
       {game && (
         <span className="game-end-prize">
@@ -200,10 +209,12 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
             ref={trophyRef}
             className={`game-end-trophy${award && !landed ? " awarding" : ""}`}
             style={award}
-            data-tap={landed ? undefined : ""}
-            onPointerDown={() => setLanded(true)}
+            data-tap=""
+            role={landed ? "link" : undefined}
+            aria-label={landed ? t(TROPHY_ROOM) : undefined}
+            onPointerDown={() => (landed ? navigate(museumHref(trophyKey(game, level))) : setLanded(true))}
           >
-            <Trophy game={game} level={level} className="game-end-trophy-art" />
+            <Trophy game={game} level={level} wins={wins} className="game-end-trophy-art" />
             {!landed && <span className="game-end-done">{t({ de: "Geschafft!" })}</span>}
           </span>
           <span className="game-end-board" />

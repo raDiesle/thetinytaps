@@ -86,23 +86,27 @@ function starPath(cx: number, cy: number, outer: number, inner: number, points =
 
 /** The cups: their body, the rim's middle height and half width, where the medallion sits and how big, the cup's bottom. */
 const CUPS = {
-  round: { body: "M22 40 H78 C78 70 68 90 50 94 C32 90 22 70 22 40 Z", rim: 40, rx: 28, medal: [50, 63, 17], bottom: 93 },
-  tall: { body: "M28 28 H72 C72 66 64 92 50 97 C36 92 28 66 28 28 Z", rim: 28, rx: 22, medal: [50, 58, 16], bottom: 96 },
-  wide: { body: "M14 52 H86 C84 76 70 92 50 94 C30 92 16 76 14 52 Z", rim: 52, rx: 36, medal: [50, 71, 15], bottom: 93 },
+  round: { body: "M22 40 H78 C78 70 68 90 50 94 C32 90 22 70 22 40 Z", rim: 40, rx: 28, medal: [50, 64, 21], bottom: 93 },
+  tall: { body: "M28 28 H72 C72 66 64 92 50 97 C36 92 28 66 28 28 Z", rim: 28, rx: 22, medal: [50, 60, 18], bottom: 96 },
+  wide: { body: "M14 52 H86 C84 76 70 92 50 94 C30 92 16 76 14 52 Z", rim: 52, rx: 36, medal: [50, 73, 17], bottom: 93 },
 } as const;
 
 /** The ink line of the book's drawings round each part. */
 const INK = "#4a2e22";
 
-/** The trophy of `level` in the game at `game`, as a still drawing 2 : 3. */
-export function Trophy({ game, level, className, label }: { game: string; level: string; className?: string; label?: string }) {
+/**
+ * The trophy of `level` in the game at `game`, as a still drawing 2 : 3. Won more than once, the number of times stands
+ * on the plate of its foot (`wins`, user request, November 2026).
+ */
+export function Trophy({ game, level, className, label, wins = 0 }: { game: string; level: string; className?: string; label?: string; wins?: number }) {
   const uid = useId().replaceAll(":", "");
   const look = trophyLook(game, level);
   const metal = METALS[look.metal];
   const picture = trophyPicture(game, level);
   const fill = `url(#${uid}m)`;
   const cup = look.form === "star" ? undefined : CUPS[look.form];
-  const [mx, my, mr] = cup ? cup.medal : [50, 62, 15];
+  // The medallion as big as the cup allows, so its picture is recognised (user feedback, November 2026).
+  const [mx, my, mr] = cup ? cup.medal : [50, 62, 19];
   const bottom = cup ? cup.bottom : 98;
   return (
     <svg viewBox="0 0 100 150" className={className} role={label ? "img" : undefined} aria-label={label} aria-hidden={label ? undefined : true}>
@@ -123,7 +127,7 @@ export function Trophy({ game, level, className, label }: { game: string; level:
         </clipPath>
       </defs>
       <ellipse cx="50" cy="147" rx="36" ry="3" fill="#3a26143d" />
-      <Foot kind={look.foot} metal={metal} fill={fill} wood={`url(#${uid}w)`} />
+      <Foot kind={look.foot} metal={metal} fill={fill} wood={`url(#${uid}w)`} wins={wins} />
       {/* The stem with a knot, from the cup down to the foot. */}
       <path d={`M45 ${bottom} H55 L58 119 H42 Z`} fill={fill} stroke={INK} strokeWidth="1.4" />
       <ellipse cx="50" cy={(bottom + 119) / 2} rx="7" ry="3.2" fill={fill} stroke={INK} strokeWidth="1.4" />
@@ -230,14 +234,31 @@ function handle(rim: number, rx: number) {
   return `M${x} ${y} C${x - 17} ${y - 3} ${x - 15} ${y + 30} ${x + 10} ${y + 34}`;
 }
 
+/**
+ * The plate on the foot's front, and on it how often the trophy was won, from the second time on: engraved, in the
+ * book's serif.
+ */
+function Plate({ y, metal, wins }: { y: number; metal: Metal; wins: number }) {
+  if (wins < 2) return <rect x="38" y={y} width="24" height="8" rx="1.5" fill={metal.base} strokeWidth="1" />;
+  return (
+    <g className="trophy-wins">
+      <rect x="33" y={y - 3} width="34" height="14" rx="2" fill={metal.light} strokeWidth="1" />
+      <text x="50" y={y + 8.2} textAnchor="middle" fontSize="11.5" fontWeight="700" fontFamily="Georgia, 'Times New Roman', serif" fill={INK} stroke="none">
+        {wins}×
+      </text>
+    </g>
+  );
+}
+
 /** The foot the trophy stands on: a wooden block, two wooden steps or a round metal foot, with a plate. */
-function Foot({ kind, metal, fill, wood }: { kind: TrophyLook["foot"]; metal: Metal; fill: string; wood: string }) {
+function Foot({ kind, metal, fill, wood, wins }: { kind: TrophyLook["foot"]; metal: Metal; fill: string; wood: string; wins: number }) {
   if (kind === "round")
     return (
       <g stroke={INK} strokeWidth="1.4">
         <path d="M22 146 L32 121 H68 L78 146 Z" fill={fill} />
         <ellipse cx="50" cy="121" rx="18" ry="3.5" fill={metal.light} />
         <path d="M22 146 H78" />
+        {wins >= 2 && <Plate y={131} metal={metal} wins={wins} />}
       </g>
     );
   return (
@@ -253,7 +274,7 @@ function Foot({ kind, metal, fill, wood }: { kind: TrophyLook["foot"]; metal: Me
           <rect x="30" y="118" width="40" height="11" rx="2" fill={wood} />
         </>
       )}
-      <rect x="38" y={kind === "block" ? 130 : 133} width="24" height="8" rx="1.5" fill={metal.base} strokeWidth="1" />
+      <Plate y={kind === "block" ? 130 : 133} metal={metal} wins={wins} />
     </g>
   );
 }
