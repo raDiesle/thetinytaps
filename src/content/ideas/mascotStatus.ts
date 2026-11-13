@@ -81,6 +81,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi, Mama, Papa Fuchs und die Kita-Bären in den Bildern", work: "picture", pictures: 31, effort: "M", state: "done" }],
   },
   {
+    href: "/haare-waschen/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, dazu ihr Badezimmer; keine Bären, die Familie wäscht selbst.",
+    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in den Bildern", work: "picture", pictures: 25, effort: "M", state: "done" }],
+  },
+  {
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
