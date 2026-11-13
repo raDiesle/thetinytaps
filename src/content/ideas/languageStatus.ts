@@ -96,9 +96,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/haare-waschen/",
-    note: 'Das Buch „Hair Washing“ mit „Tapsi and the Foam Crown“, einer Geschichte in Kapiteln (hairStory.ts, 13. November 2026): das erste Kapitelbuch, das Englisch zuerst geschrieben ist (ChapterBook first="en"), nur Englisch. Es fehlen alle anderen Sprachen, auch Deutsch: Name, Satz fürs Regal (names.ts) und Kapitel und Sätze, als <Sprache>.ts im Ordner wie bei „Schnullerfee“; bis dahin liest man es überall auf Englisch. Tapsis Stimme liest jede Seite vor, Aufnahmen gibt es noch keine (bun run voice make --only haare-waschen), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+    note: 'Das Buch „Haare waschen“ mit „Tapsi und die Schaumkrone“, einer Geschichte in Kapiteln (hairStory.ts, 13. November 2026): das erste Kapitelbuch, das Englisch zuerst geschrieben ist (ChapterBook first="en"), am selben Tag in alle Sprachen übersetzt, Deutsch als eine davon (de.ts, geladen mit texts-de.ts): Name, Satz fürs Regal (names.ts), Kapitel und Sätze. Tapsis Stimme liest jede Seite vor, Aufnahmen gibt es noch keine (bun run voice make --only haare-waschen), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
     recorded: true,
-    languages: { en: "text" },
+    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
     href: "/zaehne/",

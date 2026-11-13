@@ -17,18 +17,20 @@ import type { TogetherTranslation } from "@/games/together/pairs";
 import type { Daytime, DaytimeTexts } from "@/games/teeth/daytime";
 import type { StepId, StepTexts } from "@/games/teeth/steps";
 
-// The texts of each language besides German that live in files of their own (the letters and words pack,
-// scene translations, phrasebooks, stories), gathered into one module per language (texts-<id>.ts), so a
-// visit downloads only the language it plays in: the app language is loaded before the first screen
-// (loadAppLanguage in src/lib/language.ts), another one only when a grown-up switches to it. German is
-// written into the code itself and always there. The service worker keeps only the languages a page has
-// loaded (tools/build.ts leaves texts-*.js out of the files it keeps for every visitor).
+// The texts of each language that live in files of their own (the letters and words pack, scene translations,
+// phrasebooks, stories), gathered into one module per language (texts-<id>.ts), so a visit downloads only the
+// language it plays in: the app language is loaded before the first screen (loadAppLanguage in
+// src/lib/language.ts), another one only when a grown-up switches to it. The older games are written German first
+// into the code itself, so German plays without its module; texts-de.ts holds only the German translations of
+// what is written English first (since November 2026, root CLAUDE.md), and where it can't be loaded those show
+// in English. The service worker keeps only the languages a page has loaded (tools/build.ts leaves texts-*.js out
+// of the files it keeps for every visitor).
 //
 // The games keep their tables by language (`PHRASEBOOKS`, `SHADOW_TRANSLATIONS`, …); `byLanguage` makes such
 // a table and fills it as languages load, so a game reads it as before.
 
-/** Every language with texts of its own besides German. */
-export type TextsLanguageId = Exclude<TargetLanguageId | LanguageId, "de">;
+/** Every language with texts of its own (German only for translations of English-first content). */
+export type TextsLanguageId = TargetLanguageId | LanguageId;
 
 /** All texts of one language that live in files of their own; a part the language has no translation of yet is left out. */
 export interface LanguageTexts {
@@ -61,6 +63,8 @@ export interface LanguageTexts {
   milkChain?: MilkChainTranslation;
   /** Tapsi und die Schnullerfee: chapter titles and pages (`pacifierstory/<id>.ts`). */
   pacifierStory?: MilkChainTranslation;
+  /** Tapsi and the Foam Crown, written English first: chapter titles and pages (`hairstory/<id>.ts`, German too). */
+  hairStory?: MilkChainTranslation;
   /** Was ist passiert?: each scene's words for grown-ups by scene id (`cause/scenes.<id>.ts`). */
   cause?: CauseTranslation;
   /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
@@ -71,6 +75,7 @@ export interface LanguageTexts {
 
 /** Each language's module; a dynamic import each, so each becomes a chunk of its own (texts-<id>.<hash>.js). */
 const MODULES: Record<TextsLanguageId, () => Promise<{ TEXTS: LanguageTexts }>> = {
+  de: () => import("./texts-de"),
   en: () => import("./texts-en"),
   zh: () => import("./texts-zh"),
   hi: () => import("./texts-hi"),
@@ -89,12 +94,12 @@ const loaded = new Map<TextsLanguageId, LanguageTexts>();
 const loading = new Map<TextsLanguageId, Promise<void>>();
 const fillers = new Set<(id: TextsLanguageId, texts: LanguageTexts) => void>();
 
-/** Whether the texts of `id` are there (German always is). */
-export const hasTexts = (id: TargetLanguageId | LanguageId) => id === "de" || loaded.has(id);
+/** Whether the texts of `id` are there. */
+export const hasTexts = (id: TargetLanguageId | LanguageId) => loaded.has(id);
 
 /** Downloads the texts of `id` once and fills every table made with `byLanguage`; fails when offline and not kept. */
 export function loadTexts(id: TargetLanguageId | LanguageId): Promise<void> {
-  if (id === "de" || loaded.has(id)) return Promise.resolve();
+  if (loaded.has(id)) return Promise.resolve();
   const running =
     loading.get(id) ??
     MODULES[id]().then(

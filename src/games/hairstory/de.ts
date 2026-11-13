@@ -1,0 +1,41 @@
+import type { StoryTranslation } from "@/components/ChapterBook";
+
+/** „Tapsi and the Foam Crown“ in German, loaded with the German texts (`texts-de.ts`): the story is written English first. */
+export const HAIR_STORY_DE: StoryTranslation = {
+  chapters: {
+    heute: "Haarwaschtag",
+    zuerst: "Erst ist Hase dran",
+    selbst: "Tapsi sucht aus",
+    krone: "Die Schaumkrone",
+    zuviel: "Wenn es zu viel ist",
+    handtuch: "Das warme Handtuch",
+    naechstes: "Nächstes Mal",
+  },
+  pages: {
+    klebrig: "Tapsi hat Brei in den Haaren. Und Sand aus dem Sandkasten.",
+    sagen: "Mama sagt: „Heute Abend waschen wir deine Haare. Nicht jeden Abend – nur heute.“",
+    reihenfolge: "Erst Wasser, dann Schaum, dann wieder Wasser. Und dann das warme Handtuch.",
+    augen: "„Ich mag kein Wasser in den Augen“, sagt Tapsi. Mama hört zu: „Wir halten deine Augen trocken.“",
+    hase: "Tapsi wäscht Hase die Haare. Der Becher ist leer, so bleibt Hase trocken.",
+    "hase-augen": "„Kopf nach hinten, Hase, und guck nach oben!“ Tapsi hält Hase einen Lappen über die Augen.",
+    "mama-waschen": "Dann wäscht Tapsi Mama die Haare, mit echtem Wasser. „Das ist schön“, sagt Mama.",
+    becher: "Tapsi sucht den Becher aus: den roten. Und das Shampoo, das nach Apfel riecht.",
+    fuehlen: "Tapsi fühlt das Wasser mit der Pfote. Warm, nicht heiß. Genau richtig.",
+    lappen: "Tapsi holt den Waschlappen und hält ihn sich über die Augen, ganz allein.",
+    nass: "Tapsi sitzt in der Wanne. Mama gießt warmes Wasser aus dem Becher, langsam, hinten auf den Kopf.",
+    sonne: "Kopf nach hinten, Augen hoch zur Sonne an der Decke. Das Wasser läuft den Rücken hinunter.",
+    schaum: "Tapsi reibt den Schaum ganz allein ein. Rubbel, rubbel, rubbel!",
+    spiegel: "Mama formt eine Schaumkrone. Tapsi sieht sie im Spiegel und lacht.",
+    jetzt: "Tapsi hält den Lappen über die Augen und sagt: „Jetzt!“ Mama zählt: „Eins, zwei, drei.“",
+    spuelen: "Platsch! Der Schaum läuft den Rücken hinunter. Tapsis Augen bleiben trocken.",
+    tropfen: "An einem anderen Abend läuft ein Tropfen in Tapsis Auge. Es brennt, und Tapsi weint.",
+    aufhoeren: "Mama hört sofort auf und trocknet Tapsis Gesicht. „Du darfst weinen. Ich bin da.“",
+    warten: "Sie warten, bis es besser ist. Mama fragt: „Noch mehr Wasser, oder für heute aufhören?“",
+    entscheiden: "Tapsi sagt: „Noch einmal Platsch.“ Tapsi hält den Lappen fest, und es ist geschafft.",
+    einwickeln: "Raus aus der Wanne und rein ins warme Handtuch. Mama wickelt Tapsi ein, ganz kuschelig.",
+    trocknen: "Papa rubbelt Tapsis Haare trocken. Weich und flauschig – und sie duften nach Apfel.",
+    stolz: "„Du hast den Lappen ganz allein gehalten“, sagt Papa. Tapsi ist stolz.",
+    "hase-krone": "Im Bett erzählt Tapsi Hase: „Nächstes Mal bekommst du auch eine Schaumkrone.“",
+    lieb: "Mama und Papa haben Tapsi lieb – mit klebrigen Haaren und mit sauberen Haaren.",
+  },
+};

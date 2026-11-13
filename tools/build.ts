@@ -296,7 +296,7 @@ async function pagePreloads(template: string) {
   };
   const unlinked = async (first: string) => (await chunkClosure(first, read, `${base}/static/`)).map((file) => href(`/${file}`)).filter((url) => !linked.has(url));
   const texts: Record<string, string[]> = {};
-  for (const language of SEO_LANGUAGES) if (language !== "de") texts[language] = await unlinked(chunkOf(`texts-${language}`));
+  for (const language of SEO_LANGUAGES) texts[language] = await unlinked(chunkOf(`texts-${language}`));
   const stylesheet = '<link rel="stylesheet"';
   return {
     preloadsOf: async ({ page }: BuiltPage) => {

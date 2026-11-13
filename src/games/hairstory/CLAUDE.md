@@ -26,10 +26,12 @@ all alone, and in bed Tapsi promises the bunny a foam crown next time.
 
 ## Rules
 
-- **The first English-first chapter book** (root CLAUDE.md, Language): pages, title, book name and blurb are English,
-  and every other language, German too, waits until the user asks for translations. `ChapterBook first="en"` makes a
-  page without a translation show and be said in English, and its English recording plays in every language
-  (`recordedLines.ts` records it only with the English voice; `recordedLines.test.ts` checks).
+- **The first English-first chapter book** (root CLAUDE.md, Language): pages, title, book name and blurb were written in
+  English and translated on request the same day (13 November 2026) into every app language, German as one of them:
+  `<language>.ts` here, loaded with `texts-<language>.ts` (German's chunk `texts-de.ts` began with this book). A changed
+  page is changed in English first, and its translations deleted until made again (they fall back to English, never
+  German). `ChapterBook first="en"`: a page without a translation shows and is said in English; `recordedLines.ts`
+  records a translated page with that language's voice.
 - **The chapters follow the guides' steps in their order** (`WASH_STEPS`, checked): tell what comes and in which order,
   practise on a soft toy and on a grown-up, let the child choose and join in, keep the eyes dry, stop when it is too
   much, the warm towel and praise afterwards. The last chapter only tells the story.

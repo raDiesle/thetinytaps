@@ -10,7 +10,8 @@ const SRC = join(import.meta.dir, "../..");
 const LANGUAGE_FILE = new RegExp(`(^|[/.])(${TEXTS_LANGUAGES.join("|")})\\.ts$`);
 
 const sources = [...new Bun.Glob("**/*.{ts,tsx}").scanSync({ cwd: SRC })].filter((file) => !/\.test\.tsx?$/.test(file) && file !== "testPreload.ts");
-const languageFiles = sources.filter((file) => LANGUAGE_FILE.test(file) && !file.startsWith("content/texts/"));
+// German's words pack (content/de.ts) is the code's own first language, played without the German module.
+const languageFiles = sources.filter((file) => LANGUAGE_FILE.test(file) && !file.startsWith("content/texts/") && file !== "content/de.ts");
 
 /** The source files `file` imports (aliases and relative paths; packages left out). */
 async function importsOf(file: string) {
