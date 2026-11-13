@@ -1,6 +1,5 @@
 import { shuffle } from "@/games/shadows/deck";
 import type { Pair } from "./pairs";
-import type { Difficulty } from "./settings";
 
 /** The two kinds of rounds: things of the day that belong together (Z-03), helpers and what they need (Z-13). */
 export type RoundKind = "pair" | "helper";
@@ -13,9 +12,6 @@ export const KIND_ORDER: RoundKind[] = ["pair", "helper"];
  * from Schatten finden); every visit begins on the first. Harder means more to choose from, never quicker.
  */
 export const TOGETHER_LEVELS: number[] = [2, 3, 3, 4, 4];
-
-/** The step a fixed difficulty plays on (chosen behind ⚙️); „Von selbst“ climbs and falls instead. */
-export const FIXED_LEVELS: Record<Exclude<Difficulty, "auto">, number> = { easy: 0, medium: 2, hard: TOGETHER_LEVELS.length - 1 };
 
 /** Rounds that count as one game for the play-time limit: three of each kind. */
 export const ROUNDS_PER_GAME = 6;

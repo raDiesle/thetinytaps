@@ -6,8 +6,8 @@
   --name-size: clamp(0.78rem, 2.3vh, 1rem);
   --name-gap: 8px;
   --name-room: calc(var(--name-gap) + var(--name-size) * 1.25);
-  /* The quiet line under the picture saying what the round is about. */
-  --topic-room: calc(clamp(0.75rem, 2.3vh, 1rem) * 2.5 + 0.5em);
+  /* The caption under the picture saying what the round is about: two lines, its big first letter and the gap above. */
+  --topic-room: calc(var(--caption-size) * 1.35 * 2 + var(--caption-size) * 0.3 + 6px);
   position: absolute;
   inset: 0;
   display: flex;
@@ -37,6 +37,7 @@
 }
 
 .tg-ground {
+  position: relative;
   flex: 1;
   align-items: center;
   justify-content: center;
@@ -104,22 +105,82 @@
   }
 }
 
-/* What the round is about, for grown-ups (RoundTopic): plain small text centred under the picture, quiet – no sign, no
-   bubble, no frame (user feedback, November 2026). Taps go through it to the game. In German it is the pair's wish, a
-   sentence or two, so it may break into balanced lines within the picture's width. */
-.tg-topic {
+/* What the round is about, for grown-ups to read out (RoundTopic): centred under the picture and set like Abstillen's
+   sentence (`.cb-words` in chapterBook.css, user feedback, November 2026) – the book's serif at the size of every
+   caption, its first letter big and red, a curl on either side on wide screens. No sign, no bubble, no frame; taps go
+   through it to the game. It is the pair's wish and a question, so it may break into two balanced lines. */
+.tg-words {
   flex: none;
+  display: grid;
+  grid-template-columns: auto fit-content(44em) auto;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.7em;
   max-width: 100%;
+  padding-top: 6px;
+  /* Laid out left to right in every language, so each curl stays outside; Arabic text inside still runs right to left. */
+  direction: ltr;
+  font-size: var(--caption-size);
+  pointer-events: none;
+}
+
+.tg-words::before,
+.tg-words::after {
+  content: "";
+  width: 4em;
+  height: 1.3em;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 22'%3E%3Cg fill='none' stroke='%23b0879c' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M66 11H24c-7 0-11 5-16 3.5S2 8 6.5 5.5 13 8 11 11.5'/%3E%3Cpath d='M40 11c-3-4-8-6-12-5 2 4 7 5.5 12 5z' fill='%23b0879c' fill-opacity='.3'/%3E%3Cpath d='M50 11c3 3.5 7.5 5 11 4-1.5-3.5-6-5-11-4z' fill='%23b0879c' fill-opacity='.3'/%3E%3C/g%3E%3Ccircle cx='31' cy='15.5' r='1.6' fill='%23e0907f'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* The right one mirrored, its curl outwards too. */
+.tg-words::after {
+  scale: -1 1;
+}
+
+.tg-topic {
   margin: 0;
-  padding-top: 0.5em;
   color: var(--ink);
-  font-size: clamp(0.75rem, 2.3vh, 1rem);
-  font-weight: 700;
-  line-height: 1.25;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.35;
   text-align: center;
   text-wrap: balance;
-  opacity: 0.7;
-  pointer-events: none;
+  user-select: none;
+}
+
+:root[lang="ar"] .tg-topic {
+  direction: rtl;
+}
+
+.tg-topic::first-letter {
+  color: var(--tomato, #e8553f);
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* On a phone the curls go, so the text takes fewer lines and the picture more room. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .tg-words {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tg-words::before,
+  .tg-words::after {
+    display: none;
+  }
+}
+
+/* ◀, back to the round before (`StepBack`): in the bottom left corner of the choices' ground – the screen's on a computer,
+   beside the picture on a phone on its side –, never over the picture, clear of the page's paper margin, as big as a
+   finger needs. */
+.tg-back {
+  position: absolute;
+  left: max(calc(var(--frame, 0px) + 10px), env(safe-area-inset-left));
+  bottom: max(calc(var(--frame, 0px) + 10px), env(safe-area-inset-bottom));
+  z-index: 7;
+  width: clamp(48px, 7vw, 72px);
 }
 
 /* Every layer is a small HTML layer of its own: what moves moves as a whole, by transform or opacity. */
@@ -339,6 +400,20 @@
   width: calc(var(--size) * 0.72);
   height: calc(var(--size) * 0.72);
   container-type: size;
+  cursor: grab;
+  /* Let go away from the picture, it slides back onto its plate. */
+  transition: translate 0.25s ease-out;
+}
+
+/* Dragged up towards the picture (`drag` in TogetherPlay): it follows the finger at once, over the other plates and the
+   picture. */
+.tg-option.dragged {
+  z-index: 6;
+}
+
+.tg-partner.dragging {
+  cursor: grabbing;
+  transition: none;
 }
 
 /* Its name, small and quiet, centred below the plate, in one line. It stays when the partner flies off. */

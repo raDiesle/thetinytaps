@@ -2,6 +2,7 @@ import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useS
 import { appLanguage, pick, useAppLanguage, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { distanceToRect, TAP_SLOP_PX } from "@/lib/tapTargets";
+import { StepBack as SharedStepBack } from "@/components/StepBack";
 import { screenTap } from "@/lib/tapGuard";
 import { hush, recordedVoice } from "@/lib/voice";
 import { useVoiceReady } from "@/lib/voiceReady";
@@ -376,26 +377,10 @@ export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
 /**
  * The way back (`RoundPlay`, `DayPage`, `onBack`): bottom left, as ▶ is bottom right – from the choices to the scene
  * told, from a scene to the page or scene before. Only a tap on it goes back, never on; the screen's other taps stay as
- * they are (user feedback, November 2026: short scenes need a way back).
+ * they are (user feedback, November 2026: short scenes need a way back). The shared `StepBack`, placed as `.fg-back`.
  */
 export function StepBack({ onBack, label }: { onBack: () => void; label: string }) {
-  return (
-    <button
-      type="button"
-      className="fg-back"
-      data-tap=""
-      aria-label={label}
-      onPointerDown={(e: PointerEvent) => {
-        e.stopPropagation();
-        if (screenTap()) onBack();
-      }}
-    >
-      <svg className="fg-back-sign" viewBox="0 0 100 100" aria-hidden>
-        <circle cx="50" cy="50" r="44" />
-        <path d="M60 30 L28 50 L60 70 Z" />
-      </svg>
-    </button>
-  );
+  return <SharedStepBack className="fg-back" onBack={onBack} label={label} />;
 }
 
 /**
