@@ -1876,18 +1876,6 @@
   pointer-events: none;
 }
 
-/* A still hand points at the curtain until it is first tapped. */
-.as-hand {
-  position: absolute;
-  right: 14%;
-  bottom: 4%;
-  font-family: var(--font-emoji);
-  font-size: 13cqw;
-  line-height: 1;
-  rotate: -18deg;
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .as-curtain.sway-0,
   .as-curtain.sway-1 {

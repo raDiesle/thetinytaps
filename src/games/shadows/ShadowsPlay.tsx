@@ -4,7 +4,7 @@ import { CornerChoices } from "@/components/CornerChoices";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playChime, playPop, playRandomNote, playRustle } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
-import { tapState } from "@/lib/tapTargets";
+import { mayDrag, tapState } from "@/lib/tapTargets";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { animalsVoice } from "@/games/animals/voice";
 import { ITEMS, PEEK_ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
@@ -385,6 +385,11 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const onPictureDown = (e: PointerEvent<HTMLSpanElement>) => {
     e.stopPropagation();
     if (!round || busy.current || pointer.current) return;
+    // A finger taps the picture to hear it again at once; only a mouse may drag it (`mayDrag`).
+    if (!mayDrag(e)) {
+      askAgain();
+      return;
+    }
     e.currentTarget.setPointerCapture(e.pointerId);
     pointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
   };

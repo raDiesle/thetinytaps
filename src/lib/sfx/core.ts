@@ -75,6 +75,15 @@ export function loadRecordings(names: Iterable<string>) {
   }
 }
 
+/** Loads the recording `name` if it isn't yet; resolves once it is there (or failed, or has no file). */
+export function recordingReady(name: string): Promise<unknown> {
+  loadRecordings([name]);
+  return recordings.get(name) ?? Promise.resolve();
+}
+
+/** How many seconds the recording `name` lasts, once it is loaded. */
+export const recordingSeconds = (name: string): number | undefined => loaded.get(name)?.duration;
+
 /** Fetches and decodes the sound file at `url`; null without audio or if it fails. */
 export async function loadSound(url: string): Promise<AudioBuffer | null> {
   if (!audio()) return null;

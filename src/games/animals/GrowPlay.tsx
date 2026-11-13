@@ -6,8 +6,9 @@ import { tapState } from "@/lib/tapTargets";
 import { choiceRows } from "@/games/shadows/levels";
 import { GROW_MS, GROW_TEXTS, GrowthPicture } from "./growth";
 import type { GrowRound } from "./levels";
+import { voiceQuiet } from "@/lib/voice";
+import { useRoundTime, useSay } from "./roundTime";
 import type { AnimalsSettings } from "./settings";
-import { animalsVoice } from "./voice";
 
 /** The picked one's flight up into the small one, before it starts to become it. */
 const FLIGHT_MS = 500;
@@ -61,29 +62,14 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
   const misses = useRef(0);
   const youngRef = useRef<HTMLDivElement>(null);
   const optionRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const { later, whenQuiet } = useRoundTime();
+  const say = useSay();
 
-  const later = useCallback((ms: number, run: () => void) => {
-    const timer = setTimeout(() => {
-      timers.current.delete(timer);
-      run();
-    }, ms);
-    timers.current.add(timer);
-  }, []);
-
-  useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
-  }, []);
-
-  // Its ElevenLabs recording; a sentence not translated yet is said in German.
-  const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
-
-  // The kind's question when the kind changed and the round's question come with the round; the round is mounted anew
-  // for every small one.
+  // The kind's question when the kind changed and the round's question come with the round, each after what is being
+  // said; the round is mounted anew for every small one.
   useEffect(() => {
     if (intro) say(intro);
-    say(texts.whatBecomes(round.growth), Boolean(intro));
+    say(texts.whatBecomes(round.growth));
   }, []);
 
   const softTap = useCallback(
@@ -105,8 +91,9 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
       misses.current++;
       if (settings.sounds) later(250, playPop);
       say(texts.comesFrom(round.grown[index]));
-      say(texts.whatBecomes(round.growth), true);
-      later(WRONG_MS, () => {
+      say(texts.whatBecomes(round.growth));
+      // The next pick only once its lines are said, so they never pile up.
+      whenQuiet(WRONG_MS, () => {
         busy.current = false;
         setOutcome(null);
       });
@@ -128,14 +115,15 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
     }
     say(texts.becomes(round.growth));
     onSolved(misses.current);
-    later(FLIGHT_MS + GROW_MS, onNext);
+    // The next round only once the answer is said in full.
+    whenQuiet(FLIGHT_MS + GROW_MS, onNext);
   };
 
-  /** Tapping the small one asks again; it hops. */
+  /** Tapping the small one asks again (unless a line is still being said); it hops. */
   const onYoungDown = (e: PointerEvent) => {
     e.stopPropagation();
     if (busy.current) return;
-    say(texts.whatBecomes(round.growth));
+    if (voiceQuiet()) say(texts.whatBecomes(round.growth));
     if (settings.sounds) playPop();
     setNudge((n) => n + 1);
   };

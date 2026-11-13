@@ -2,19 +2,33 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, t
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { choiceRows } from "@/games/shadows/levels";
 import { pick, useAppLanguage } from "@/lib/language";
-import { playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { pageMoving } from "@/lib/pageMotion";
+import { playChime, playPop, playRandomNote, recordingReady, recordingSeconds } from "@/lib/sfx";
+import { atMost } from "@/lib/soundWait";
 import { repeatPause } from "@/lib/spacing";
 import { tapState } from "@/lib/tapTargets";
+import { voiceQuiet } from "@/lib/voice";
 import { ANIMAL_TEXTS, type Animal } from "./content";
 import type { SoundRound } from "./levels";
+import { useRoundTime, useSay } from "./roundTime";
 import type { AnimalsSettings } from "./settings";
 import { SOUND_TEXTS } from "./sounds";
-import { animalsVoice } from "./voice";
 
-/** Time to watch the curtain open and the animal call once more before the next round. */
-const CELEBRATE_MS = 3400;
-/** Time a wrong pick's own call takes before the child can pick again. */
-const WRONG_MS = 1600;
+/** Time to look at the animal found after its line, before the next round. */
+const LOOK_MS = 800;
+/** How long a call lasts where its recording isn't loaded (a soft pop then): the question comes after a call, and the loop counts from its end. */
+const CALL_MS = 1600;
+/** A call's length, its recording's own (a little longer, as it may play a little slower), else `CALL_MS`. */
+const callMs = (animal: Animal) => {
+  const seconds = animal.call && recordingSeconds(animal.call);
+  return seconds ? seconds * 1050 : CALL_MS;
+};
+/** The quiet between two calls of the loop, after the call and after every line said. */
+const LOOP_PAUSE_MS = 2000;
+/** How often the loop looks whether it is time to call again. */
+const LOOP_TICK_MS = 200;
+/** The longest the first call waits for its recording (loaded a round ahead, so it is mostly there). */
+const CALL_WAIT_MS = 3000;
 
 /** What a round of „Wer macht das Geräusch?“ gets from `AnimalsRounds`, which plays it in turn with the other kinds. */
 export interface SoundPlayProps {
@@ -34,9 +48,11 @@ export interface SoundPlayProps {
 const call = (animal: Animal) => (animal.sound ?? playPop)();
 
 /**
- * „Wer macht das Geräusch?“ (Z-15), one round of "Was gehört zum Tier?": a little stage with its curtain closed. A tap
- * on the curtain sways it, and behind it an animal calls; the child taps below who it was. A wrong one calls with its
- * own voice, so the two can be compared; the right one opens the curtain, and the animal stands there and calls again.
+ * „Wer macht das Geräusch?“ (Z-15), one round of "Was gehört zum Tier?": a little stage with its curtain closed. Behind
+ * it an animal calls once, then the voice asks who it was, and then the animal calls again and again, with a pause
+ * between, until the child has found it below – no tap needed to hear it (user request, November 2026). A tap on the
+ * curtain sways it and lets the animal call at once. A wrong one calls with its own voice, so the two can be compared;
+ * the right one opens the curtain, and the animal stands there and calls again.
  */
 export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: SoundPlayProps) {
   const language = useAppLanguage();
@@ -55,29 +71,49 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
   const misses = useRef(0);
   /** The curtain hammered: its call again only after a pause (`REPEAT_PAUSE_MS`), meanwhile it only sways. */
   const again = useMemo(() => repeatPause(), []);
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const { later, whenQuiet } = useRoundTime();
+  const say = useSay();
+  /**
+   * When the last sound on the stage ends (a call, or a line said): the loop calls again `LOOP_PAUSE_MS` after it. Never
+   * before the first call and the question are under way.
+   */
+  const soundUntil = useRef(Number.POSITIVE_INFINITY);
+  /** Set once the right animal is found: the loop stops. */
+  const found = useRef(false);
 
-  const later = useCallback((ms: number, run: () => void) => {
-    const timer = setTimeout(() => {
-      timers.current.delete(timer);
-      run();
-    }, ms);
-    timers.current.add(timer);
+  /** The animal calls; returns how long the call lasts. */
+  const callNow = useCallback((animal: Animal) => {
+    call(animal);
+    const ms = callMs(animal);
+    soundUntil.current = Math.max(soundUntil.current === Number.POSITIVE_INFINITY ? 0 : soundUntil.current, performance.now() + ms);
+    return ms;
   }, []);
 
+  // Once the line before is over and the page lies still: the animal calls once, then the kind's question (when the
+  // kind changed) and the round's own, and then the animal calls on and on, with a pause after every call and line.
   useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
-  }, []);
-
-  // Its ElevenLabs recording; a sentence not recorded in the app language stays silent.
-  const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
-
-  // The kind's question when the kind changed, then the round's own; the animal waits behind the curtain for a tap
-  // (Z-15: what is heard is still until the child asks for it).
-  useEffect(() => {
-    if (intro) say(intro);
-    say(texts.listen, Boolean(intro));
+    let alive = true;
+    const loop = () => {
+      if (found.current) return;
+      const now = performance.now();
+      if (!voiceQuiet() || pageMoving()) soundUntil.current = Math.max(soundUntil.current, now);
+      else if (!busy.current && settings.sounds && now - soundUntil.current >= LOOP_PAUSE_MS) callNow(round.animal);
+      later(LOOP_TICK_MS, loop);
+    };
+    whenQuiet(0, () => {
+      void atMost(recordingReady(round.animal.call ?? ""), CALL_WAIT_MS).then(() => {
+        if (!alive) return;
+        const first = settings.sounds ? callNow(round.animal) : 0;
+        later(first, () => {
+          if (intro) say(intro);
+          say(texts.listen);
+          loop();
+        });
+      });
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const softTap = useCallback(
@@ -88,12 +124,12 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
     [ripple, settings.sounds],
   );
 
-  /** A tap on the curtain: it sways and the animal behind it calls. */
+  /** A tap on the curtain: it sways, and the animal behind it calls – unless it calls already or a line is being said. */
   const listen = (x?: number, y?: number) => {
     if (busy.current) return;
     setSway((n) => n + 1);
     glow(x, y);
-    if (settings.sounds && again.pass("curtain")) call(round.animal);
+    if (settings.sounds && voiceQuiet() && performance.now() >= soundUntil.current && again.pass("curtain")) callNow(round.animal);
   };
 
   const choose = (index: number) => {
@@ -106,23 +142,32 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
       // Never a "wrong" for the child; only the difficulty takes note. The animal picked calls with its own voice.
       misses.current++;
       const picked = round.animals[index];
-      if (settings.sounds) later(150, () => call(picked));
-      say(texts.thatIs(picked));
-      later(WRONG_MS, () => {
-        busy.current = false;
-        setOutcome(null);
+      // Its call once the call or line still sounding is over, then „Das ist …“ after it: nothing sounds together
+      // (user feedback, November 2026). The next pick (and the loop's next call) only once that line is said.
+      whenQuiet(Math.max(150, soundUntil.current - performance.now()), () => {
+        later(settings.sounds ? callNow(picked) : 0, () => {
+          say(texts.thatIs(picked));
+          whenQuiet(0, () => {
+            busy.current = false;
+            setOutcome(null);
+          });
+        });
       });
       return;
     }
 
-    // The curtain opens: there it stands, and calls once more.
-    if (settings.sounds) {
-      later(150, playChime);
-      later(700, () => call(round.animal));
-    }
-    say(texts.there(round.animal));
+    // The curtain opens: there it stands and calls once more – once the call or line still sounding is over –, then
+    // „Da ist ja …“ after its call; the loop ends, and the next round comes only once that line is said in full.
+    found.current = true;
     onSolved(misses.current);
-    later(CELEBRATE_MS, onNext);
+    if (settings.sounds) later(150, playChime);
+    whenQuiet(Math.max(700, soundUntil.current - performance.now()), () => {
+      if (settings.sounds) call(round.animal);
+      later(settings.sounds ? callMs(round.animal) : 0, () => {
+        say(texts.there(round.animal));
+        whenQuiet(0, () => whenQuiet(LOOK_MS, onNext));
+      });
+    });
   };
 
   const onStageDown = (e: PointerEvent) => {
@@ -192,12 +237,6 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
           <div className={`as-curtain as-left${sway && !open ? ` sway-${sway % 2}` : ""}`} />
           <div className={`as-curtain as-right${sway && !open ? ` sway-${sway % 2}` : ""}`} />
           <div className="as-valance" />
-          {/* A still hand points at the curtain until it is first tapped. */}
-          {sway === 0 && !open && (
-            <span className="as-hand" aria-hidden>
-              👆
-            </span>
-          )}
         </div>
       </div>
       {topic}

@@ -316,6 +316,10 @@ In a fresh worktree run `bun install` first.
   ASIDE_LINE_GAP_MS })` (`src/lib/spacing.ts`, `voice.ts`): only when nothing else is said and the last such line lies
   far enough back, never cutting another line off. Where a level's last answer leads straight into its end, it leaves
   its praise and extras to the end's.
+  A line is never cut off nor said over another, and a voice line never sounds together with the call or noise it
+  speaks about (user feedback from Was gehört zum Tier?, November 2026): lines of a game of rounds wait for each other
+  (`queue`), the next round, page or pick comes only once the voice is quiet (`voiceQuiet` in `voice.ts`, as the
+  game's `whenQuiet` does), and a line about a call follows that call.
   The same key (or the same thing tapped) pressed again and again is said and sounded again only after a pause
   (`repeatPause`, `REPEAT_PAUSE_MS` in `src/lib/spacing.ts`), and meanwhile only ripples, silently; the soft note of a
   press that sets nothing off is such an extra too (user feedback from Buchstaben & Zahlen, November 2026: hammering B
@@ -364,7 +368,10 @@ In a fresh worktree run `bun install` first.
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
   still (`src/lib/pageMotion.ts`): the voice (`recordedVoice`) and the background song do so by themselves, a game's
-  CSS animations stand on their first frame (`data-page-moving` in `book.css`), and a game's own story, clock or timers
+  CSS animations stand on their first frame (`data-page-moving` in `book.css`) – but a picture's short entrance from
+  invisible (`pop-in`) is shown over at once, so the page moves in whole: held invisible, the pictures were missing
+  while the question under them and the corner's note already stood there (user feedback, November 2026; `isEntrance`
+  in `pageMotion.ts`) –, and a game's own story, clock or timers
   start in `afterPageMotion` / `usePageStill` – a new game that starts by itself does the same (`pageMotion.test.ts`).
 - Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice speaks
   nothing of its own (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
@@ -404,7 +411,7 @@ In a fresh worktree run `bun install` first.
 - Tap areas are bigger than they look: everything a child can tap carries `data-tap`, and a tap up to
   30 px next to it still counts (`src/lib/tapTargets.ts`, installed by `GameShell`). Where grown areas
   overlap, the right answer wins (`data-tap="goal"`), then one not tapped yet (not `"done"`), then the
-  nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
+  nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on), and a finger never drags what it can pick: a press on it picks it at once, only a mouse may drag it there (`mayDrag`; user feedback, November 2026 – a child's finger moves a little while tapping, and the tap became a drag that picked nothing; `touchPicks.test.ts`);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
 - The fullscreen button is always there to get back into fullscreen, which a phone leaves whenever another app was
   opened in between: in every menu in the top right (`MenuHead`; on the home page a little sign nailed onto the shelf's top right corner,

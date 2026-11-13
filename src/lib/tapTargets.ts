@@ -16,6 +16,13 @@
 /** How far, in CSS pixels, a tap may land next to a thing and still count for it. */
 export const TAP_SLOP_PX = 30;
 
+/**
+ * Whether a press on something that can be picked may start dragging it: only with a mouse. On a touch screen the press
+ * picks it at once (user feedback, November 2026, Was gehört zum Tier?: a child's finger moves a little as it taps,
+ * and the tap became a drag that picked nothing). `touchPicks.test.ts` checks the games that drag.
+ */
+export const mayDrag = (e: { pointerType: string }) => e.pointerType === "mouse";
+
 /** What a target is right now: the right answer, already tapped, or neither (""). */
 export type TapState = "" | "goal" | "done";
 

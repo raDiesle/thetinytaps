@@ -247,3 +247,9 @@ export function hush() {
 
 /** True while a line is being said, from its recording or by the browser's voice (Tapsi's mouth moves). */
 export const talking = () => playing !== null || (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking);
+
+/**
+ * True when no line is said nor waiting to be said, in any game: a round goes on to the next only then, so the line
+ * of the round before is never cut off (user feedback, November 2026, Was gehört zum Tier?).
+ */
+export const voiceQuiet = () => pending === 0 && !talking();

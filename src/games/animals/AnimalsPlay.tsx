@@ -2,15 +2,16 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
-import { tapState } from "@/lib/tapTargets";
+import { mayDrag, tapState } from "@/lib/tapTargets";
 import { choiceRows } from "@/games/shadows/levels";
 import { ANIMAL_TEXTS, ANIMALS, GIFT_TEXTS, giverOf } from "./content";
 import { GiftDrawing } from "./gifts";
 import { HomeDrawing } from "./homes";
 import type { FeedRound, GiftRound, HomeRound } from "./levels";
+import { voiceQuiet } from "@/lib/voice";
 import { questionLines } from "./lines";
+import { useRoundTime, useSay } from "./roundTime";
 import type { AnimalsSettings } from "./settings";
-import { animalsVoice } from "./voice";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
@@ -59,7 +60,7 @@ export interface AnimalsPlayProps {
 
 /**
  * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), what the animal gives us to it (Z-01), or
- * the animal to its home (N-09). Tapping is enough; dragging works too.
+ * the animal to its home (N-09). A tap picks; a mouse may drag too, a finger never (`mayDrag`).
  */
 export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }: AnimalsPlayProps) {
   const language = useAppLanguage();
@@ -85,33 +86,20 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
   const emojiRef = useRef<HTMLSpanElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pointer = useRef<{ who: Mover; id: number; x: number; y: number; moved: boolean } | null>(null);
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const { later, whenQuiet } = useRoundTime();
+  const say = useSay();
 
-  const later = useCallback((ms: number, run: () => void) => {
-    const timer = setTimeout(() => {
-      timers.current.delete(timer);
-      run();
-    }, ms);
-    timers.current.add(timer);
-  }, []);
+  /** The round's question; a feeding round's comes after the animal's hunger (Z-24), each after what is being said. */
+  const ask = () => questionLines(round, language.id).forEach((line) => say(line));
 
+  // The kind's question when the kind changed, the round's question and the animal's noise come with the round – once
+  // the line before is over and the page lies still; the round is mounted anew for every animal.
   useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
-  }, []);
-
-  // Its ElevenLabs recording; a sentence not translated yet is said in German.
-  const say = useCallback((text: string, queue = false) => animalsVoice.say(text, language.id, { queue }), [language.id]);
-
-  /** The round's question; a feeding round's comes after the animal's hunger (Z-24). `queue`: after what is being said. */
-  const ask = (queue = false) => questionLines(round, language.id).forEach((line, i) => say(line, queue || i > 0));
-
-  // The kind's question when the kind changed, the round's question and the animal's noise come with the round; the
-  // round is mounted anew for every animal.
-  useEffect(() => {
-    if (intro) say(intro);
-    ask(Boolean(intro));
-    if (settings.sounds) later(400, () => round.animal.sound?.());
+    whenQuiet(0, () => {
+      if (intro) say(intro);
+      ask();
+      if (settings.sounds) later(400, () => round.animal.sound?.());
+    });
   }, []);
 
   const softTap = useCallback(
@@ -137,21 +125,22 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
       if (round.kind === "feed") {
         if (settings.sounds) playYuck();
         say(texts.yuck(round.animal));
-        say(texts.whatEats(round.animal), true);
+        say(texts.whatEats(round.animal));
       } else if (round.kind === "gift") {
         // The animal it comes from pops up behind the plate and says so.
         const gift = round.gifts[index];
         const giver = giverOf(gift);
         if (settings.sounds) later(300, () => giver.sound?.());
         say(giftTexts.comesFrom(gift, giver));
-        ask(true);
+        ask();
       } else {
         const resident = ANIMALS.find((a) => a.home === round.homes[index].id)!;
         if (settings.sounds) later(300, () => resident.sound?.());
         say(texts.livesHere(resident));
-        ask(true);
+        ask();
       }
-      later(WRONG_MS, () => {
+      // The next pick only once its lines are said, so they never pile up.
+      whenQuiet(WRONG_MS, () => {
         busy.current = false;
         setOutcome(null);
       });
@@ -206,12 +195,13 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
     }
     if (settings.sounds) later(200, playChime);
     onSolved(misses.current);
-    later(round.kind === "gift" ? GIFT_CELEBRATE_MS : CELEBRATE_MS, onNext);
+    // The next animal only once the answer is said in full.
+    whenQuiet(round.kind === "gift" ? GIFT_CELEBRATE_MS : CELEBRATE_MS, onNext);
   };
 
-  /** Tapping the animal asks again; it makes its noise and hops. */
+  /** Tapping the animal asks again (unless a line is still being said); it makes its noise and hops. */
   const askAgain = () => {
-    ask();
+    if (voiceQuiet()) ask();
     if (settings.sounds) round.animal.sound?.();
     setNudge((prev) => ({ who: "animal", n: (prev?.n ?? 0) + 1 }));
   };
@@ -245,6 +235,12 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
   const onMoverDown = (who: Mover) => (e: PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (outcome || pointer.current) return;
+    // A finger picks at once; only a mouse may drag (a child's tap that moved a little became a drag, `mayDrag`).
+    if (!mayDrag(e)) {
+      if (who === "animal") askAgain();
+      else choose(who);
+      return;
+    }
     e.currentTarget.setPointerCapture(e.pointerId);
     pointer.current = { who, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
   };

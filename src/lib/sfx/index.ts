@@ -13,6 +13,8 @@ export {
   playLoop,
   playRecorded,
   recorded,
+  recordingReady,
+  recordingSeconds,
   setSfxVolume,
   unlockAudio,
 } from "./core";

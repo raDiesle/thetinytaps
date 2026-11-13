@@ -8,7 +8,7 @@ import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./
 import { DEFAULT_ANIMALS_SETTINGS } from "./settings";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealSound, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import { SOUND_ANIMALS, SOUND_LOOKALIKES, soundLookAlike } from "./sounds";
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -445,4 +445,23 @@ test("a sound round offers exactly one animal that sounds like what is heard", (
       for (const other of r.animals) if (other !== animal) expect(soundLookAlike(other, animal), `${animal.id} ${other.id}`).toBe(false);
     }
   }
+});
+
+// User feedback, November 2026: the voice was cut off when the next round came. Every round says its lines through
+// `useSay` (each waits for the one before) and goes on with `whenQuiet` (only once nothing is said any more).
+test("no round cuts a line off: lines wait for each other, and the next round for the last line", () => {
+  for (const file of ["AnimalsPlay.tsx", "GrowPlay.tsx", "SoundPlay.tsx"]) {
+    const code = readFileSync(new URL(file, import.meta.url), "utf8");
+    expect(code, file).not.toContain("animalsVoice.say");
+    expect(code, file).toContain("useSay()");
+    expect(code, file).toMatch(/whenQuiet\([^)]*, onNext\)/);
+    expect(code, file).not.toMatch(/later\([^)]*, onNext\)/);
+  }
+});
+
+// User request, November 2026: the animal calls once, the voice asks, then it calls on and on – no curtain to tap first.
+test("„Wer macht das Geräusch?“ calls by itself, with no hand pointing at the curtain", () => {
+  const code = readFileSync(new URL("SoundPlay.tsx", import.meta.url), "utf8");
+  expect(code).toContain("LOOP_PAUSE_MS");
+  expect(code).not.toContain("as-hand");
 });

@@ -6,16 +6,16 @@ One flowing game, like Socken-Paare: its card plays at once (`startMode`), with 
 row; ✕ goes back to the table of contents. Its only option, „Was drankommt“, stands as a small paper note in the top
 right corner while playing (`KindCorner` in `AnimalsGame.tsx`, the shared `CornerChoices`), no ⚙️. `AnimalsRounds.tsx` lets five kinds of rounds take
 turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest („Wer schaut da raus?“ moved to „Erkennen“, `src/games/shadows/`, in November 2026 – user decision, Z-14):
-1. Füttern (N-08): tap (or drag) the food to the hungry animal – the farm's and the wood's animals, and since November
+1. Füttern (N-08): tap (or, with a mouse, drag) the food to the hungry animal – the farm's and the wood's animals, and since November
    2026 zoo and sea animals too (elephant and peanuts, parrot and grapes, crocodile, tiger and wolf with meat, …), and
    more since (hamster and nuts, hippo and melon, rhino, elk and sloth with leaves, kangaroo and hay, deer and nuts,
    otter, shark and eagle with fish, octopus, flamingo and whale with shrimps, beaver and wood, …).
-2. Was gibt uns das Tier? (Z-01): tap (or drag) what the animal gives us to it – cow and milk, hen, duck and goose and egg, bee
+2. Was gibt uns das Tier? (Z-01): tap (or, with a mouse, drag) what the animal gives us to it – cow and milk, hen, duck and goose and egg, bee
    and honey, sheep and llama and wool, goat and cheese (`gives`, drawn in `gifts.tsx`). It flies to the animal's side
    and the animal makes it anew there (`.ap-made`): the glass fills with milk, the jar with honey, the egg drops into
    the nest, the ball of wool rolls out, the cheese drops onto its board. A wrong gift: the animal shakes its head and
    the one it comes from pops up behind the plate (`giverOf`: the gift's best-known giver, `Gift.giver`).
-3. Wer wohnt wo? (N-09): tap the animal's home (or drag the animal into it). Besides the farm's and the wood's homes
+3. Wer wohnt wo? (N-09): tap the animal's home (or, with a mouse, drag the animal into it). Besides the farm's and the wood's homes
    there are the beaver lodge, the anthill, the sea, the desert, the jungle, the savanna and the bamboo forest, and since
    November 2026 the cage (hamster), the leaf pile (hedgehog), the meadow (butterfly, ladybird, grasshopper), the garden
    (snail, caterpillar), the river (crocodile, hippo, otter), the mountain (goat, llama, eagle), the forest (deer, wolf,
@@ -47,8 +47,11 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest 
    the larva or the tadpole. `?grow=<id>` plays only „Was wird aus mir?“ with that small one while developing, to
    watch it grow again and again.
 5. Wer macht das Geräusch? (Z-15, November 2026, `SoundPlay.tsx`, `sounds.ts`): a little stage with its curtain
-   closed and a still hand pointing at it. A tap on the curtain sways it and behind it an animal calls (its own CC0
-   recording, `Animal.call`); the child taps below which animal it was. A wrong one calls with its own voice and says
+   closed. Behind it an animal calls once (its own CC0 recording, `Animal.call`, waited for at most `CALL_WAIT_MS`),
+   then the voice asks who it was, and then the animal calls on and on by itself, `LOOP_PAUSE_MS` after its call and
+   after every line said, until the child has found it below – no tap on the curtain needed and no hand pointing at it
+   (user request, November 2026). A tap on the curtain sways it and lets the animal call at once (when nothing sounds
+   yet). A wrong one calls with its own voice (after the call still sounding) and says
    „Das ist …“, so the two can be compared; the right one opens the curtain, there it stands („Da ist ja …“) and calls
    once more. Every animal with a recording of its own takes part (`SOUND_ANIMALS`: every `call` in `content.ts`), the
    farm's, the wood's, the zoo's and some only here (Hahn, Taube, Truthahn, Pfau, Küken, Fliege, …). Since November
@@ -85,6 +88,13 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
   „Gemischt“ lets the round on screen play on and counts from the next one. There is no „Schwierigkeit“ any more (taken out, same decision): the game always finds it itself
   (`content.test.ts` checks the settings have neither a switch per kind nor a difficulty). No other options (names,
   dragging instead of tapping were left out on purpose).
+- No line is ever cut off (user feedback, November 2026: the voice stopped when the round changed): every line is
+  said through `useSay` (`roundTime.ts`), which waits for the one being said, and a round goes on – to the next round,
+  or to the next pick after a wrong one – with `whenQuiet`, only once nothing is said any more and the page lies still;
+  a tap asking again says its question only while the voice is quiet. Its sounds play on when the round goes, too
+  (`content.test.ts`).
+- A finger picks at once: a press on a food, gift or home picks it, never starting a drag a child's moving finger
+  turned into nothing picked (user feedback, November 2026); only a mouse may drag (`mayDrag`, `touchPicks.test.ts`).
 - Harder means more to choose from and less to see, never quicker: no clock, and time doesn't count for the difficulty.
 - A wrong pick is never shown as wrong (the animal says „Bäh!“, the real resident peeks out, the animal shown says who
   it is); it only feeds `nextLevel`.
@@ -129,8 +139,9 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
     recording of its own (`Animal.call`, a file in `src/lib/sounds/`, used by no other animal of this game – no bubbles
     for the fish, no growl shared by the bears; where Freesound has none, one made with ElevenLabs – the animal's voice
     alone, ≈1–1.5 s, mono 22.05 kHz 32 kbit/s, `soundFiles.test.ts`), keeps at least three others it isn't alike to, and a new one joins a
-    group where it sounds like one (`content.test.ts`). What is heard is still until the child taps the curtain, and
-    hammering it plays the call again only after `REPEAT_PAUSE_MS` (it only sways meanwhile).
+    group where it sounds like one (`content.test.ts`). The call comes by itself (see above): first once, then the
+    question, then in a loop; two sounds never play together (a call waits for the one still sounding, `soundUntil`),
+    and hammering the curtain plays the call again only after `REPEAT_PAUSE_MS` (it only sways meanwhile).
   - Two animals never share an emoji (no alpaca beside the llama), and only animals with an emoji of their own take part – no woodpecker or mole drawn as another bird or animal (`content.test.ts`).
   - What the small one becomes the same way: small ones whose grown ones a child could mix up are in one group of `GROW_LOOKALIKES` (`growth.tsx`) and never dealt together (`dealGrow`). Every plant is alike to every other (no child can tell which seed, nut, bulb or bud becomes which plant; `plant` marks one), and every egg to every other egg (no child can tell which egg the chick, the turtle or the dinosaur comes out of); the bee's larva is alike to the caterpillar, and the fish's and the crocodile's eggs to the tadpole (all from the water). A plant and an animal are never in one group. A new small one joins a group or starts one and keeps at least three others it isn't alike to (`content.test.ts`).
   - A grown one's emoji is drawn differently on each platform, so its motion never depends on which way it faces or on a whole body showing: Apple's 🐢 and 🐟 look left, its 🐊 is seen from above and its 🐧 is only a head. Let it rise, stretch, rock or move a little sideways rather than walk a long way in one direction, and seat a head-only emoji in its shell or nest. Look at each new one in the preview at its end and mid-way (`?grow=<id>`, seeking the animations) before calling it done.
