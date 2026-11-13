@@ -353,22 +353,22 @@ export const ARM_CLIPS = clips({
   },
 
   cast: (t, p) => {
-    // Both paws on the rod: swung back sideways over the right shoulder, the right paw up beside the
-    // head and the left one in front of the chest, then out ahead. The paws stay outside the body and
-    // head all the way.
+    // Both paws on the rod: swung back sideways over the right shoulder as far as it goes, the right paw high
+    // behind the head and the left one up in front of the chest, the body turned with it, then out ahead. The
+    // paws stay outside the body and head all the way.
     // After the snap the paws follow the float down, out in front at chest height, and the body leans after them.
     const { back, out, follow } = castSwing(t);
     const rest = Math.max(0, 1 - back - out);
-    p.armR.raise = 1.0 * rest + 2.1 * back + 1.35 * out - 0.45 * follow;
-    p.armR.spread = 0.15 * rest + 0.85 * back + 0.2 * out - 0.05 * follow;
-    p.armR.elbow = 0.7 * rest + 1.75 * back + 0.35 * out - 0.1 * follow;
-    p.armL.raise = 1.0 * rest + 1.45 * back + 1.25 * out - 0.4 * follow;
-    p.armL.spread = -0.1 * rest - 0.45 * back - 0.05 * out;
-    p.armL.elbow = 0.7 * rest + 1.0 * back + 0.4 * out;
-    p.twist = -back * 0.35 + out * 0.1;
-    p.lean = -back * 0.06;
-    p.bend = -back * 0.1 + out * 0.15 + follow * 0.12;
-    p.headYaw = back * 0.25;
+    p.armR.raise = 1.0 * rest + 2.55 * back + 1.35 * out - 0.45 * follow;
+    p.armR.spread = 0.15 * rest + 0.9 * back + 0.2 * out - 0.05 * follow;
+    p.armR.elbow = 0.7 * rest + 1.9 * back + 0.35 * out - 0.1 * follow;
+    p.armL.raise = 1.0 * rest + 1.85 * back + 1.25 * out - 0.4 * follow;
+    p.armL.spread = -0.1 * rest - 0.4 * back - 0.05 * out;
+    p.armL.elbow = 0.7 * rest + 1.1 * back + 0.4 * out;
+    p.twist = -back * 0.5 + out * 0.12;
+    p.lean = -back * 0.1;
+    p.bend = -back * 0.18 + out * 0.18 + follow * 0.15;
+    p.headYaw = back * 0.3;
     p.headPitch = follow * 0.15;
   },
 

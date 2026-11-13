@@ -5,7 +5,7 @@ import { voiceLines } from "@/content/voiceLines";
 
 // The loudspeaker that switches a story's voice off stands only where a grown-up may want to tell the story in their
 // own words (user decisions, November 2026): Gefühle's „Alltagssituationen“ and the chapter books read aloud by
-// Tapsi's voice – Abstillen, Schnullerfee and Kita-Start. Never a pattern for other games (root CLAUDE.md).
+// Tapsi's voice – Abstillen, Schnullerfee, Kita-Start and Hair Washing. Never a pattern for other games (root CLAUDE.md).
 
 /** Every .ts and .tsx file under src, tests left out. */
 const SOURCES = [...new Bun.Glob("src/**/*.{ts,tsx}").scanSync()].filter((file) => !/\.test\.tsx?$/.test(file));
@@ -15,6 +15,7 @@ const BOOKS = [
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/", name: "abstillen", folder: "src/games/milkchain/stimme" },
   { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/", name: "schnullerfee", folder: "src/games/pacifierstory/stimme" },
   { file: "src/games/kitastory/KitaStoryGame.tsx", href: "/kita/", name: "kita", folder: "src/games/kitastory/stimme" },
+  { file: "src/games/hairstory/HairStoryGame.tsx", href: "/haare-waschen/", name: "haare-waschen", folder: "src/games/hairstory/stimme" },
 ];
 
 describe("the voice switch", () => {

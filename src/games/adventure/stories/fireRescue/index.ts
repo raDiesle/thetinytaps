@@ -70,6 +70,10 @@ const RISE = 0.55;
 const JUMP = 0.7;
 /** Seconds a kitten hops from the paws down onto Robo. */
 const HOP = 0.4;
+/** How far before Tapsi's middle a caught kitten lies at least, so it never sinks into the chest. */
+const KITTEN_OUT = 0.47;
+/** How far a kitten swings out to the side as it hops from the paws onto Robo, round Tapsi's body. */
+const HOP_ASIDE = 0.4;
 /** Where the kittens sit on Robo once caught, in Robo's space (+z its front): round Tapsi's feet. */
 const RIDE = [v3(0.5, ROBO_TOP, 0.3), v3(-0.5, ROBO_TOP, 0.3), v3(0.47, ROBO_TOP, -0.38), v3(-0.47, ROBO_TOP, -0.38)];
 
@@ -95,6 +99,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const tmpA = new THREE.Vector3();
   const tmpB = new THREE.Vector3();
   const tmpC = new THREE.Vector3();
+  const tmpD = new THREE.Vector3();
   const GREY = new THREE.Color("#7d838c");
   const WHITE = new THREE.Color("#ffffff");
   let lastTime = 0;
@@ -480,7 +485,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   function holdRope(f: StoryFrame) {
     const clip = f.act + f.demo;
     const pulling = f.opening === null && f.step === S.bell;
-    const held = pulling ? smooth((clip - 0.25) / 0.5) * (1 - smooth(clip - clipLength(S.bell))) : 0;
+    // Let go at the end of the last pull, while the paws are up at the handle: dropping with them, the handle
+    // went through Tapsi's head and chest (`collisions.test.ts`).
+    const held = pulling ? smooth((clip - 0.25) / 0.5) * (1 - smooth((clip - clipLength(S.bell) + 0.3) / 0.3)) : 0;
     const at = handle.position.copy(HANDLE_REST);
     if (held > 0) {
       guide.gripPoint("L", tmpA);
@@ -574,10 +581,15 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const clip = f.opening === null && f.step === S.catch ? f.act + f.demo : f.opening === null && f.step > S.catch ? 99 : -99;
     guide.gripPoint("L", tmpA);
     guide.gripPoint("R", tmpB);
+    // Lying on the forearms in front of the chest, never pressed into it (`collisions.test.ts`): where the arms
+    // close in, it stays KITTEN_OUT before Tapsi's middle.
     const paws = tmpA
       .add(tmpB)
       .multiplyScalar(0.5)
       .add(v3(0, -0.17, 0));
+    const ahead = tmpB.set(0, 0, 1).applyAxisAngle(UP, place.yaw);
+    const out = tmpC.copy(paws).sub(guide.root.position).dot(ahead);
+    if (out < KITTEN_OUT) paws.addScaledVector(ahead, KITTEN_OUT - out);
     kittens.forEach((kitten, n) => {
       const p = kitten.position;
       const ride = robo.group.localToWorld(tmpC.copy(RIDE[n]));
@@ -591,8 +603,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       } else if (hopped <= 0) {
         p.copy(paws);
       } else if (hopped < 1) {
+        // Round Tapsi's side, never through it: two of the spots lie behind it.
+        const side = tmpB.set(1, 0, 0).applyAxisAngle(UP, place.yaw);
+        const away = Math.sign(tmpD.copy(ride).sub(guide.root.position).dot(side)) || 1;
         p.copy(paws).lerp(ride, smooth(hopped));
         p.y += Math.sin(hopped * Math.PI) * 0.25;
+        p.addScaledVector(side, away * Math.sin(hopped * Math.PI) * HOP_ASIDE);
       } else {
         p.copy(ride);
       }
@@ -645,6 +661,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       holdHose(f);
       holdKittens(f);
     },
+    held: () => [handle, nozzle, ...kittens],
   };
 }
 

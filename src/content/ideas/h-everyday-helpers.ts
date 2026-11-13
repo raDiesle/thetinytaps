@@ -129,6 +129,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi in der Badewanne: Schaumkrone formen, Waschlappen vor die Augen, Becher Wasser über den Kopf, die Ente lacht. Das Kind tippt jeden Schritt. Passt zum Badezimmer-Bild (S-05).",
       why: "Eltern suchen „kind haare waschen drama“ und „kind haare waschen tipp“. Vorher spielen, was gleich passiert.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als eigenes Buch der Alltagshelfer neben „Kita-Start“ (/haare-waschen/, 13. November 2026): „Tapsi and the Foam Crown“, eine Vorlesegeschichte in Kapiteln mit Gemini-Bildern wie „Kita-Start“, entlang der Schritte, die Fachstellen raten (Recherche „haare-waschen“): vorher erzählen, am Kuschelhasen und an Mama üben, selbst wählen und mitmachen, die Augen bleiben trocken (Waschlappen selbst halten, Kopf in den Nacken zur Sonne an der Decke, Becher, „Jetzt!“ und Mamas „eins, zwei, drei“, Schaumkrone im Spiegel), sofort aufhören, wenn es zu viel wird, warmes Handtuch und Lob. Nur Englisch bisher. Statt Tippen der Schritte ein Buch zum Vorlesen; das Badezimmer-Bild (S-05) bleibt offen.",
     },
     {
       id: "H-15",
