@@ -2,7 +2,9 @@ import { existsSync, readdirSync } from "node:fs";
 import { expect, test } from "bun:test";
 import { TARGET_LANGUAGES } from "@/content/targetLanguages";
 import { CLOUD_TRIP } from "./stories/cloudTrip";
-import { DEFAULT_TURN, type Story, storyIn } from "./stories/story";
+import { FIRE_RESCUE } from "./stories/fireRescue";
+import { LANGUAGE as FIRE_RESCUE_LANGUAGE } from "./stories/fireRescue/lines";
+import { DEFAULT_TURN, firstLanguage, type Story, storyIn, toldIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 import { recordingName } from "@/lib/voiceName";
 import { spokenLines } from "./voiceId";
@@ -11,12 +13,13 @@ import { spokenLines } from "./voiceId";
 const STORIES = [
   { dir: "src/games/adventure/stories/treasureIsland", story: TREASURE_ISLAND },
   { dir: "src/games/adventure/stories/cloudTrip", story: CLOUD_TRIP },
+  { dir: "src/games/adventure/stories/fireRescue", story: FIRE_RESCUE },
 ];
 
 /** The story in every language it has, with the folder of its recordings. */
 const voices = () =>
   STORIES.flatMap(({ dir, story }) =>
-    TARGET_LANGUAGES.filter((l) => l.id === "de" || story.translations?.[l.id]).map((l) => ({
+    TARGET_LANGUAGES.filter((l) => toldIn(story, l.id)).map((l) => ({
       language: l.id,
       folder: l.id === "de" ? `${dir}/stimme` : `${dir}/stimme/${l.id}`,
       story: storyIn(story, l.id),
@@ -33,7 +36,13 @@ test("every lines.<language>.ts is a language of the app and listed in the story
   }
 });
 
-test("a translation has the same steps and lines as the German story", () => {
+// The voice script reads a story's first language from its lines.ts, the app from the story.
+test("the voice script and the app agree on the language a story is written in", () => {
+  expect(firstLanguage(FIRE_RESCUE)).toBe(FIRE_RESCUE_LANGUAGE);
+  expect(firstLanguage(CLOUD_TRIP)).toBe("de");
+});
+
+test("a translation has the same steps and lines as the story's own", () => {
   for (const { story } of STORIES) {
     for (const [language, t] of Object.entries(story.translations ?? {})) {
       expect(t.opening.length, `${language}: opening`).toBe(story.opening?.lines.length ?? 0);
@@ -41,7 +50,7 @@ test("a translation has the same steps and lines as the German story", () => {
       story.lines.forEach((step, i) => {
         const own = t.steps[i];
         const has = (s: { situation?: string; turn?: string; again?: string }) => [!!s.situation, !!s.turn, !!s.again];
-        expect(has(own), `${language}: step ${i + 1} (${step.icon}) has situation, turn, again like the German`).toEqual(has(step));
+        expect(has(own), `${language}: step ${i + 1} (${step.icon}) has situation, turn, again like the story's own`).toEqual(has(step));
         expect(own.more?.length ?? 0, `${language}: step ${i + 1} (${step.icon}) more`).toBe(step.more?.length ?? 0);
       });
     }

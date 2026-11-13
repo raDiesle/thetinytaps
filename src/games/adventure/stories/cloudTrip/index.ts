@@ -837,6 +837,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       updateWorld(f, g);
       return { walking: false, flash: 0, sitting, bend: 0 };
     },
+    held: () => brushes.map((brush) => brush.group),
     afterPose(f) {
       holdBrushes(f);
       // The band is painted up to where the painting brush's tip is seen.

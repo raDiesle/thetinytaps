@@ -237,9 +237,49 @@ function limb(length: number, top: number, bottom: number, material: THREE.Mater
 const TORSO_DEPTH = 0.84;
 /** How big the head is drawn (the face's own units were made for a bigger one). */
 const HEAD_SCALE = 0.74;
+/** The skull in the face's own units: its radius, how it is stretched (x, y, z) and how high it sits. */
+const SKULL = { radius: 0.27, scale: [1.08, 0.95, 0.95] as [number, number, number], y: 0.16 };
 
 /** A soft bump round `at`, `width` wide, 1 at its top. */
 const bump = (y: number, at: number, width: number) => Math.exp(-(((y - at) / width) ** 2));
+
+/** The torso's outline (half width at each height, in the spine's space), from the crotch up through the neck. */
+const TORSO_OUTLINE = new THREE.SplineCurve(
+  [
+    [0, -0.078],
+    [0.06, -0.07],
+    [0.108, -0.047],
+    [0.138, -0.008],
+    [0.147, 0.045],
+    [0.139, 0.11],
+    [0.128, 0.17],
+    [0.134, 0.235],
+    [0.149, 0.305],
+    [0.16, 0.375],
+    [0.162, 0.425],
+    [0.146, 0.463],
+    [0.1, 0.488],
+    [0.064, 0.51],
+    [0.058, 0.55],
+    [0.056, 0.6],
+    [0, 0.62],
+  ].map(([x, y]) => new THREE.Vector2(x, y)),
+);
+/** The torso's outline as many points, from the bottom up: turned round to make the torso, and read to tell what is inside it. */
+const TORSO_POINTS = TORSO_OUTLINE.getPoints(56);
+
+/** How far the torso reaches out front (z > 0) or behind at height `y`, against its half width: flatter than round, with tummy and bottom. */
+const torsoDepth = (y: number, front: boolean) =>
+  TORSO_DEPTH * (front ? 1 + 0.2 * bump(y, 0.12, 0.1) : 1 + 0.3 * bump(y, 0.01, 0.07) + 0.06 * bump(y, 0.36, 0.08));
+
+/** The torso's half width at height `y` of the spine's space, 0 above and below it. */
+function torsoHalfWidth(y: number) {
+  for (let i = 1; i < TORSO_POINTS.length; i++) {
+    const [a, b] = [TORSO_POINTS[i - 1], TORSO_POINTS[i]];
+    if ((y - a.y) * (y - b.y) <= 0 && a.y !== b.y) return a.x + ((b.x - a.x) * (y - a.y)) / (b.y - a.y);
+  }
+  return 0;
+}
 
 /**
  * The torso from the crotch up through the neck into the head, its half width at each height (in the spine's
@@ -250,29 +290,8 @@ const bump = (y: number, at: number, width: number) => Math.exp(-(((y - at) / wi
  * instead of a patch laid on it.
  */
 function torsoGeometry() {
-  const outline = new THREE.SplineCurve(
-    [
-      [0, -0.078],
-      [0.06, -0.07],
-      [0.108, -0.047],
-      [0.138, -0.008],
-      [0.147, 0.045],
-      [0.139, 0.11],
-      [0.128, 0.17],
-      [0.134, 0.235],
-      [0.149, 0.305],
-      [0.16, 0.375],
-      [0.162, 0.425],
-      [0.146, 0.463],
-      [0.1, 0.488],
-      [0.064, 0.51],
-      [0.058, 0.55],
-      [0.056, 0.6],
-      [0, 0.62],
-    ].map(([x, y]) => new THREE.Vector2(x, y)),
-  );
   // Its seam at the back, and welded there, so no crease shows down the middle.
-  const lathe = new THREE.LatheGeometry(outline.getPoints(56), 36, Math.PI);
+  const lathe = new THREE.LatheGeometry(TORSO_POINTS, 36, Math.PI);
   lathe.deleteAttribute("uv");
   lathe.deleteAttribute("normal");
   const geometry = mergeVertices(lathe, 1e-5);
@@ -284,8 +303,7 @@ function torsoGeometry() {
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
-    const out = z > 0 ? 1 + 0.2 * bump(y, 0.12, 0.1) : 1 + 0.3 * bump(y, 0.01, 0.07) + 0.06 * bump(y, 0.36, 0.08);
-    pos.setZ(i, z * TORSO_DEPTH * out);
+    pos.setZ(i, z * torsoDepth(y, z > 0));
     // How far round from the front, and how far round the cream reaches at this height.
     const round = Math.abs(Math.atan2(x, z));
     const reach = 0.55 + 0.25 * bump(y, 0.18, 0.14) - 0.08 * bump(y, 0.42, 0.05);
@@ -422,9 +440,9 @@ export class Guide {
     const face = new THREE.Group();
     face.scale.setScalar(HEAD_SCALE);
     this.head.add(face);
-    const skull = mesh(new THREE.SphereGeometry(0.27, 40, 30), furMat);
-    skull.scale.set(1.08, 0.95, 0.95);
-    skull.position.y = 0.16;
+    const skull = mesh(new THREE.SphereGeometry(SKULL.radius, 40, 30), furMat);
+    skull.scale.set(...SKULL.scale);
+    skull.position.y = SKULL.y;
     face.add(skull);
     const cheeks = mesh(new THREE.SphereGeometry(0.2, 32, 24), creamMat);
     cheeks.scale.set(1.15, 0.6, 0.75);
@@ -951,6 +969,33 @@ export class Guide {
   hipsPoint(local: THREE.Vector3, out: THREE.Vector3) {
     this.hips.updateWorldMatrix(true, false);
     return this.hips.localToWorld(out.copy(local));
+  }
+
+  /**
+   * Tells how deep a point (world space) lies inside the torso or the skull, in fox units, 0 or less outside – for the
+   * body as it stands now. So a test can tell that nothing the fox holds, and none of its own paws, reaches into its
+   * body (`collisions.test.ts`).
+   */
+  insideNow() {
+    this.spine.updateWorldMatrix(true, false);
+    this.head.updateWorldMatrix(false, false);
+    const toSpine = this.spine.matrixWorld.clone().invert();
+    const toFace = this.head.matrixWorld
+      .clone()
+      .invert()
+      .premultiply(new THREE.Matrix4().makeScale(1 / HEAD_SCALE, 1 / HEAD_SCALE, 1 / HEAD_SCALE));
+    const p = new THREE.Vector3();
+    const [sx, sy, sz] = SKULL.scale;
+    return (world: THREE.Vector3) => {
+      p.copy(world).applyMatrix4(toSpine);
+      let deep = -Infinity;
+      const r = torsoHalfWidth(p.y);
+      if (r > 0) deep = (1 - Math.hypot(p.x / r, p.z / (r * torsoDepth(p.y, p.z > 0)))) * r;
+      // The skull, as the face draws it.
+      p.copy(world).applyMatrix4(toFace);
+      const s = Math.hypot(p.x / sx, (p.y - SKULL.y) / sy, p.z / sz) / SKULL.radius;
+      return Math.max(deep, (1 - s) * SKULL.radius * HEAD_SCALE * sy);
+    };
   }
 
   /** The forearm's place in the world (elbow at the origin, the wrist at -FOREARM on y), e.g. for a brush held along it. */

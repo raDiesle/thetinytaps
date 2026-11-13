@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
 import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomOffline, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
-import { TrophyShelf, trophyRow, useShelfTrophies } from "@/components/TrophyShelf";
+import { TrophySign } from "@/components/TrophySign";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
@@ -256,8 +256,6 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   };
 
   const layout = plan?.layout;
-  // The trophies stand on the lowest board of books, at the child's eye height (TrophyShelf).
-  const trophyCell = layout ? lowestBooks(layout) : -1;
   const margin = layout && plan ? (plan.roomWidth - layout.width) / 2 : 0;
   const style = layout
     ? ({
@@ -299,13 +297,18 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
                * 2026): above the shelf it took a strip of the screen the books now have.
                */}
               <FullscreenButton className="shelf-fullscreen" />
+              {/*
+               * The way to the trophy room: a little sign nailed onto the shelf's right side, above the loudspeaker (user
+               * request, November 2026: the trophies standing on a board took the books' room and sank into the wall).
+               */}
+              <TrophySign top={trophySignTop(layout)} />
               <div className="shelf-offline">
                 <RoomOffline />
               </div>
               <div className="shelf-box" onPointerDown={nudge}>
                 <span className="shelf-back" />
                 {layout.cells.map((cell, i) => (
-                  <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5} label={labelOf(cell, layout)} trophies={i === trophyCell}>
+                  <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5} label={labelOf(cell, layout)}>
                     {cell.books?.map((b) =>
                       PLACES[b][0].colour ? (
                         <DailyGroup key={PLACES[b][0].id} books={PLACES[b]} carving={plan.carving} take={take} />
@@ -489,13 +492,18 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
   return own > 0 && own === cell.books?.length && own === all ? LEARNING : undefined;
 }
 
-/** The compartment of books lowest in the shelf, by its place in the plan's cells. */
-function lowestBooks(layout: ShelfLayout) {
-  let at = -1;
-  layout.cells.forEach((cell, i) => {
-    if (cell.books && (at < 0 || cell.y > layout.cells[at].y)) at = i;
-  });
-  return at;
+/**
+ * Where the trophy room's sign is nailed onto the shelf's right side, from its top: on the board over the loudspeaker on
+ * a wide shelf, on the board under the things on an upright one.
+ */
+function trophySignTop(layout: ShelfLayout) {
+  const board = layout.frame.board;
+  if (!layout.upright) {
+    const music = layout.cells.find((cell) => cell.things?.includes("music"));
+    if (music) return music.y - board / 2;
+  }
+  const books = layout.cells.filter((cell) => cell.books).sort((a, b) => a.y - b.y)[0];
+  return books ? books.y - board / 2 : layout.frame.crown;
 }
 
 /** A rectangle of the shelf's plan as a style. */
@@ -511,7 +519,6 @@ function Compartment({
   spans,
   seed,
   label,
-  trophies = false,
   children,
 }: {
   cell: ShelfCell;
@@ -519,12 +526,9 @@ function Compartment({
   spans: number[];
   seed: number;
   label?: Localized;
-  /** The trophies won stand at its right end, in place of books spine out (TrophyShelf). */
-  trophies?: boolean;
   children?: ReactNode;
 }) {
   const t = useT();
-  const won = useShelfTrophies().length;
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
   const back = (layout.bookHeight * DEPTH) / EYE / 2;
@@ -544,14 +548,6 @@ function Compartment({
   // The stack of books lying flat goes to one end, the left in one compartment, the right in the next – never to the
   // wall with the stickers, which it would hide.
   const stackLeft = seed % 2 === 0 || things.includes("figure");
-  // The trophies stand right of the picture books, and books and trophies stand together in the middle: half their row
-  // is taken from each end's books spine out.
-  const bh = layout.bookHeight;
-  const row = trophies && ends ? trophyRow(2 * Math.min(ends.leftRoom, ends.rightRoom), bh, won) : { count: 0, width: 0 };
-  const leftRoom = ends ? ends.leftRoom - row.width / 2 : 0;
-  const leftSpines = ends ? (row.count > 0 ? spinesIn(leftRoom, bh) : ends.left) : 0;
-  const stack = ends && leftSpines >= ends.stack ? ends.stack : 0;
-  const right = ends ? (row.count > 0 ? spinesIn(ends.rightRoom - row.width / 2, bh) : ends.right) : 0;
   return (
     <div className={`shelf-cell${cell.books ? "" : ` thing ${things.join(" ")}`}`} style={style}>
       <span className="shelf-cell-shade" />
@@ -567,15 +563,14 @@ function Compartment({
             cell.trail ? ({ "--trail": `${cell.trail}px`, "--words-shift": `${shift}px`, "--spines-shift": `${spinesShift}px` } as CSSProperties) : undefined
           }
         >
-          <span className="shelf-end" style={row.count > 0 ? { flex: `0 0 ${Math.max(0, leftRoom)}px` } : undefined}>
-            {stack > 0 && stackLeft && <Stack seed={seed} />}
-            <Spines count={stackLeft ? leftSpines - stack : leftSpines} seed={seed} />
+          <span className="shelf-end">
+            {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
+            <Spines count={stackLeft ? ends.left - ends.stack : ends.left} seed={seed} />
           </span>
           {children}
           <span className="shelf-end">
-            {row.count > 0 && <TrophyShelf count={row.count} bh={layout.bookHeight} />}
-            <Spines count={stackLeft ? right : right - (right >= ends.stack ? ends.stack : 0)} seed={seed + 3} />
-            {ends.stack > 0 && !stackLeft && right >= ends.stack && <Stack seed={seed + 1} />}
+            <Spines count={stackLeft ? ends.right : ends.right - ends.stack} seed={seed + 3} />
+            {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
           </span>
         </div>
       )}
@@ -624,20 +619,15 @@ function endsFor(cell: ShelfCell, bh: number, spans: number[], shift: number) {
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
   const trail = cell.trail ?? 0;
   const end = (cell.w - trail - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh) / 2 - 2;
-  const count = (room: number) => spinesIn(room, bh);
+  // The widest spine's room, so that they never reach past the wall.
   const spine = bh * 0.17 + 1;
+  const count = (room: number) => Math.max(0, Math.min(12, Math.floor(room / spine)));
   // A stack takes the room of this many spines, where there is room for it.
   const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
   // The room kept for the sign hanging in front is the right end's, filled with books spine out as well, less what the
   // carved words moved into (`ShelfLayout.wordsShift`).
   const wall = cell.things?.includes("figure") ? STICKERS_ROOM * bh : 0;
-  const rightRoom = end + trail - wall - shift;
-  return { left: count(end), right: count(rightRoom), leftRoom: end, rightRoom, stack };
-}
-
-/** How many books spine out stand in `room` px beside books `bh` high: by the widest spine's room, so that they never reach past the wall. */
-function spinesIn(room: number, bh: number) {
-  return Math.max(0, Math.min(12, Math.floor(room / (bh * 0.17 + 1))));
+  return { left: count(end), right: count(end + trail - wall - shift), stack };
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */

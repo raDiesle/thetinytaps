@@ -14,7 +14,7 @@ und wie die Welt antwortet.
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `types.ts`                  | Datenmodell (Bewegung, Welt, Szenario, Ablauf)                                                                                                  |
 | `categories.ts`             | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was _nicht_ dazugehört                                                                          |
-| `movements/*.ts`            | **Ergebnis B**: 105 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
+| `movements/*.ts`            | **Ergebnis B**: 106 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor                                              |
 | `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–22 Bewegungen und Sekunden, 153–359 s lang                                                                      |
 | `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 76 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
@@ -57,7 +57,7 @@ gegen echte Möbel, und auf Schienen balanciert niemand.
 
 ## Ergebnis E: Qualitätskontrolle
 
-Stand: 105 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
+Stand: 106 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
 verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
 (`adaptations.seated`). 84 Bewegungen sind „leicht“, 21 „mittel“, keine ist „schwer“.
 

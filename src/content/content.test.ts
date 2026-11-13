@@ -474,20 +474,21 @@ describe("language status on the management page", () => {
     expect(languageStateOf(row(undefined, undefined), "en")).toBeUndefined();
   });
 
-  // What a story speaks follows from its files: lines.<language>.ts is the translation, stimme/ (German)
-  // or stimme/<language>/ the recordings (src/games/adventure/CLAUDE.md).
+  // What a story speaks follows from its files: lines.ts in the story's first language (German, or English for the
+  // new ones), lines.<language>.ts the translations, stimme/ (German) or stimme/<language>/ the recordings
+  // (src/games/adventure/CLAUDE.md).
   test.each([
-    ["🏝️ Die Schatzinsel", "treasureIsland"],
-    ["☁️ Die Wolkenreise", "cloudTrip"],
-  ])("Bewegungsabenteuer: %s shows the translations and recordings it has", (label, folder) => {
+    ["🏝️ Die Schatzinsel", "treasureIsland", "de"],
+    ["☁️ Die Wolkenreise", "cloudTrip", "de"],
+    ["🚒 Fire Rescue", "fireRescue", "en"],
+  ])("Bewegungsabenteuer: %s shows the translations and recordings it has", (label, folder, first) => {
     const dir = `src/games/adventure/stories/${folder}`;
     const recorded = (path: string) => existsSync(path) && readdirSync(path).some((f) => f.endsWith(".mp3"));
-    const translated = new Set(readdirSync(dir).flatMap((f) => /^lines\.([a-z]+)\.ts$/.exec(f)?.[1] ?? []));
+    const translated = new Set([first, ...readdirSync(dir).flatMap((f) => /^lines\.([a-z]+)\.ts$/.exec(f)?.[1] ?? [])]);
     const expected = Object.fromEntries(
       TARGET_LANGUAGES.flatMap((l): [string, LanguageState][] => {
-        if (l.id === "de") return [["de", recorded(`${dir}/stimme`) ? "done" : "text"]];
         if (!translated.has(l.id)) return [];
-        return [[l.id, recorded(`${dir}/stimme/${l.id}`) ? "done" : "text"]];
+        return [[l.id, recorded(l.id === "de" ? `${dir}/stimme` : `${dir}/stimme/${l.id}`) ? "done" : "text"]];
       }),
     );
     const part = LANGUAGE_STATUS.find((r) => r.href === "/abenteuer/")?.parts?.find((p) => p.label === label);

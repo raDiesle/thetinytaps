@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import * as THREE from "three";
 import { makeWorld as cloudTrip } from "../stories/cloudTrip/world";
+import { makeWorld as fireRescue } from "../stories/fireRescue/world";
 import { makeWorld as treasureIsland } from "../stories/treasureIsland/world";
 import { Guide } from "./guide";
 
@@ -8,7 +9,7 @@ import { Guide } from "./guide";
 // main thread 79 % busy (October 2026). Props are baked (`mergeParts`), the fox's arms and legs skinned (`skinRigid`)
 // and the birds one flock (`makeFlock`), so the counts stay well below that; a new prop that is not baked shows here
 // first. Raise a limit only for something new that really needs the parts.
-const LIMITS = { fox: 160, treasureIsland: 900, cloudTrip: 230 };
+const LIMITS = { fox: 160, treasureIsland: 900, cloudTrip: 230, fireRescue: 170 };
 
 const count = (root: THREE.Object3D) => {
   let n = 0;
@@ -40,4 +41,5 @@ test("the fox stays a few hundred objects", () => {
 test("the worlds keep their props baked", () => {
   expect(count(built(treasureIsland))).toBeLessThanOrEqual(LIMITS.treasureIsland);
   expect(count(built(cloudTrip))).toBeLessThanOrEqual(LIMITS.cloudTrip);
+  expect(count(built(fireRescue))).toBeLessThanOrEqual(LIMITS.fireRescue);
 });

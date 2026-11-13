@@ -8,6 +8,9 @@ import {
   brushArm,
   BRUSH_PERIOD,
   castSwing,
+  CATCH_CLOSED,
+  CATCH_OPEN,
+  CATCH_PERIOD,
   CHEER_PERIOD,
   clamp01,
   clips,
@@ -24,9 +27,12 @@ import {
   keyTurn,
   linger,
   phase,
+  PULL_DOWN_AT,
+  PULL_DOWN_PERIOD,
   pullReach,
   PUSH_PERIOD,
   smooth,
+  sprayAim,
   steps,
   swing,
   TAU,
@@ -114,7 +120,7 @@ export const ARM_CLIPS = clips({
   },
 
   pull_down: (t, p) => {
-    const k = hold(phase(t, 2.6), 0.0, 0.35, 0.55, 0.9);
+    const k = hold(phase(t, PULL_DOWN_PERIOD), 0.0, PULL_DOWN_AT, 0.55, 0.9);
     for (const a of [p.armL, p.armR]) {
       a.raise = 2.9 - k * 2.3;
       a.spread = 0.2;
@@ -347,22 +353,22 @@ export const ARM_CLIPS = clips({
   },
 
   cast: (t, p) => {
-    // Both paws on the rod: swung back sideways over the right shoulder, the right paw up beside the
-    // head and the left one in front of the chest, then out ahead. The paws stay outside the body and
-    // head all the way.
+    // Both paws on the rod: swung back sideways over the right shoulder as far as it goes, the right paw high
+    // behind the head and the left one up in front of the chest, the body turned with it, then out ahead. The
+    // paws stay outside the body and head all the way.
     // After the snap the paws follow the float down, out in front at chest height, and the body leans after them.
     const { back, out, follow } = castSwing(t);
     const rest = Math.max(0, 1 - back - out);
-    p.armR.raise = 1.0 * rest + 2.1 * back + 1.35 * out - 0.45 * follow;
-    p.armR.spread = 0.15 * rest + 0.85 * back + 0.2 * out - 0.05 * follow;
-    p.armR.elbow = 0.7 * rest + 1.75 * back + 0.35 * out - 0.1 * follow;
-    p.armL.raise = 1.0 * rest + 1.45 * back + 1.25 * out - 0.4 * follow;
-    p.armL.spread = -0.1 * rest - 0.45 * back - 0.05 * out;
-    p.armL.elbow = 0.7 * rest + 1.0 * back + 0.4 * out;
-    p.twist = -back * 0.35 + out * 0.1;
-    p.lean = -back * 0.06;
-    p.bend = -back * 0.1 + out * 0.15 + follow * 0.12;
-    p.headYaw = back * 0.25;
+    p.armR.raise = 1.0 * rest + 2.55 * back + 1.35 * out - 0.45 * follow;
+    p.armR.spread = 0.15 * rest + 0.9 * back + 0.2 * out - 0.05 * follow;
+    p.armR.elbow = 0.7 * rest + 1.9 * back + 0.35 * out - 0.1 * follow;
+    p.armL.raise = 1.0 * rest + 1.85 * back + 1.25 * out - 0.4 * follow;
+    p.armL.spread = -0.1 * rest - 0.4 * back - 0.05 * out;
+    p.armL.elbow = 0.7 * rest + 1.1 * back + 0.4 * out;
+    p.twist = -back * 0.5 + out * 0.12;
+    p.lean = -back * 0.1;
+    p.bend = -back * 0.18 + out * 0.18 + follow * 0.15;
+    p.headYaw = back * 0.3;
     p.headPitch = follow * 0.15;
   },
 
@@ -379,7 +385,7 @@ export const ARM_CLIPS = clips({
   },
 
   catch: (t, p) => {
-    const k = hold(phase(t, 3.4), 0.45, 0.65, 0.85, 1);
+    const k = hold(phase(t, CATCH_PERIOD), 0.45, CATCH_CLOSED, CATCH_OPEN, 1);
     for (const a of [p.armL, p.armR]) {
       a.raise = 1.1;
       a.spread = 1.15 - k * 1.55;
@@ -390,6 +396,22 @@ export const ARM_CLIPS = clips({
     p.bend = k * 0.1 - (1 - k) * 0.05;
     p.lift = 0;
     p.headPitch = -0.1 * (1 - k);
+  },
+
+  spray: (t, p) => {
+    // Both paws hold the hose's nozzle together in front of the chest; the body turns it over to the left, holds,
+    // and over to the right, the head looking where the water goes. Knees a little soft, feet stay put.
+    const aim = sprayAim(t);
+    for (const a of [p.armL, p.armR]) {
+      a.raise = 1.3;
+      a.elbow = 0.6;
+    }
+    p.armL.spread = p.armR.spread = TOGETHER + 0.14;
+    crouch(p, 0.1);
+    p.twist = aim * 0.42;
+    p.headYaw = aim * 0.3;
+    p.headPitch = -0.12;
+    p.lean = -aim * 0.03;
   },
 
   stretch_up: (t, p) => {

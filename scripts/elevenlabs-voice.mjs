@@ -196,8 +196,14 @@ async function stories() {
   for (const entry of readdirSync(STORIES, { withFileTypes: true })) {
     const dir = join(STORIES, entry.name);
     if (!entry.isDirectory() || !existsSync(join(dir, "lines.ts"))) continue;
-    const { OPENING_LINES, LINES } = await load(join(dir, "lines.ts"));
-    found.push({ name: entry.name, language: "de", folder: join(dir, "stimme"), lines: spokenLines(OPENING_LINES, LINES, DEFAULT_TURN) });
+    // A story's own lines are German unless lines.ts names their language (`LANGUAGE`, English for the new ones).
+    const { OPENING_LINES, LINES, LANGUAGE = "de" } = await load(join(dir, "lines.ts"));
+    found.push({
+      name: LANGUAGE === "de" ? entry.name : `${entry.name}/${LANGUAGE}`,
+      language: LANGUAGE,
+      folder: LANGUAGE === "de" ? join(dir, "stimme") : join(dir, "stimme", LANGUAGE),
+      lines: spokenLines(OPENING_LINES, LINES, DEFAULT_TURN),
+    });
     for (const file of readdirSync(dir).sort()) {
       const language = /^lines\.([a-z]{2})\.ts$/.exec(file)?.[1];
       if (!language) continue;

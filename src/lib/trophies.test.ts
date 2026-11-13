@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { trophyRow } from "@/components/TrophyShelf";
 import { METALS, trophyLook } from "@/components/Trophy";
+import { museumLayout, museumRooms } from "@/components/TrophyMuseum";
 import { everyTrophy, trophyPicture } from "@/components/trophyPictures";
 import { CATEGORIES } from "@/content/games";
-import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest } from "./trophies";
+import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest, trophyWins } from "./trophies";
 
 // The trophies a child collects (CLAUDE.md, „What a child does collect are trophies“): one per level, each looking like
 // no other, awarded by the shared GameEnd of every game.
@@ -12,12 +12,27 @@ import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest } from "./trop
 afterEach(() => resetTrophiesForTest());
 
 describe("trophies", () => {
-  test("a level's trophy is won once, winning it again changes nothing", () => {
+  test("a level's trophy is given once and then counts how often it was won (user request, November 2026)", () => {
     resetTrophiesForTest();
     expect(awardTrophy("/bilder/", "bauernhof", 1)).toBe(true);
     expect(awardTrophy("/bilder/", "bauernhof", 2)).toBe(false);
     expect(hasTrophy("/bilder/", "bauernhof")).toBe(true);
+    expect(trophyWins("/bilder/", "bauernhof")).toBe(2);
     expect(hasTrophy("/bilder/", "zoo")).toBe(false);
+    expect(trophyWins("/bilder/", "zoo")).toBe(0);
+  });
+
+  test("a trophy given before the level's end (one ball in the goal) is counted once with its end", () => {
+    resetTrophiesForTest();
+    awardTrophy("/kettenreaktion/", "track", 1, { early: true });
+    awardTrophy("/kettenreaktion/", "track", 2);
+    expect(trophyWins("/kettenreaktion/", "track")).toBe(1);
+    awardTrophy("/kettenreaktion/", "track", 3, { early: true });
+    awardTrophy("/kettenreaktion/", "track", 4);
+    expect(trophyWins("/kettenreaktion/", "track")).toBe(2);
+    // An end without a goal before it counts on its own.
+    awardTrophy("/kettenreaktion/", "track", 5);
+    expect(trophyWins("/kettenreaktion/", "track")).toBe(3);
   });
 
   test("an address belongs to the game whose address it starts with, the longest", () => {
@@ -48,12 +63,46 @@ describe("trophies", () => {
     }
   });
 
-  test("the shelf always shows at least one trophy once any is won, and none before", () => {
-    expect(trophyRow(200, 100, 0)).toEqual({ count: 0, width: 0 });
-    expect(trophyRow(5, 100, 3).count).toBe(1);
-    expect(trophyRow(10_000, 100, 3).count).toBe(3);
-    const row = trophyRow(150, 100, 9);
-    expect(row.width).toBeLessThanOrEqual(150);
+  test("the trophy room puts every trophy on one plinth, at most a room's plinths in each room, a game's together", () => {
+    const all = everyTrophy();
+    for (const perRoom of [2, 3, 4, 6]) {
+      const rooms = museumRooms(all, perRoom);
+      const placed = rooms.flatMap((room) => room.trophies);
+      expect(placed.length).toBe(all.length);
+      expect(new Set(placed).size).toBe(all.length);
+      for (const room of rooms) {
+        expect(room.trophies.length).toBeGreaterThan(0);
+        expect(room.trophies.length).toBeLessThanOrEqual(perRoom);
+      }
+      // A game with few trophies is never split over two rooms.
+      for (const game of new Set(all.map((trophy) => trophy.game))) {
+        const count = all.filter((trophy) => trophy.game === game).length;
+        if (count > perRoom) continue;
+        expect(rooms.filter((room) => room.trophies.some((trophy) => trophy.game === game)).length, game).toBe(1);
+      }
+    }
+    expect(museumRooms([], 4)).toEqual([{ trophies: [], games: [] }]);
+  });
+
+  test("the trophy room's trophies are big on every screen, and fit its row", () => {
+    for (const [w, h] of [
+      [844, 390],
+      [390, 844],
+      [1024, 768],
+      [1280, 720],
+      [1920, 1080],
+    ]) {
+      const layout = museumLayout(w, h);
+      expect(layout.perRoom).toBeGreaterThanOrEqual(2);
+      // At least a fifth of the screen's height: the medallion's picture must be recognised.
+      expect(layout.trophy, `${w}×${h}`).toBeGreaterThanOrEqual(Math.min(w, h) * 0.2);
+      expect(layout.trophy * 0.74 * layout.perRoom, `${w}×${h}`).toBeLessThan(w);
+    }
+  });
+
+  test("a trophy won again shows its count on its foot, and a tap on it at a level's end opens the trophy room", () => {
+    expect(readFileSync("src/components/Trophy.tsx", "utf8")).toContain("trophy-wins");
+    expect(readFileSync("src/components/GameEnd.tsx", "utf8")).toContain("museumHref(");
   });
 
   test("Kettenreaktion's trophies hold a ball in their cup, and one ball in the goal wins one", () => {
@@ -70,7 +119,7 @@ describe("trophies", () => {
     }
   });
 
-  test("the test view on /?pokale=alle has every finished game's trophies, each once", () => {
+  test("the test view on /pokale/?alle has every finished game's trophies, each once", () => {
     const all = everyTrophy();
     const keys = all.map((trophy) => `${trophy.game}#${trophy.level}`);
     expect(new Set(keys).size).toBe(keys.length);

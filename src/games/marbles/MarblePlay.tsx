@@ -127,7 +127,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   // One ball in the goal is enough for the level's trophy (user decision, November 2026); the end shows it beside its buttons.
   const game = gameOfPath(useLocation().pathname)?.href;
   const onGoal = useCallback(() => {
-    if (game) awardTrophy(game, level.id);
+    if (game) awardTrophy(game, level.id, Date.now(), { early: true });
   }, [game, level.id]);
 
   const startLevel = (nextIndex: number) => {

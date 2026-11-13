@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
-import { type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
+import { targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
 import { canPlayUnfinished } from "@/lib/localTest";
 import { useAppLanguage, useT } from "@/lib/language";
@@ -8,7 +8,8 @@ import { useStoredSettings } from "@/lib/storage";
 import { AdventurePlay } from "./AdventurePlay";
 import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { CLOUD_TRIP } from "./stories/cloudTrip";
-import { type Story, storyIn, storyTitle } from "./stories/story";
+import { FIRE_RESCUE } from "./stories/fireRescue";
+import { firstLanguage, type Story, storyIn, storyTitle, toldIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 import previews from "./vorschau/*.webp?glob";
 
@@ -17,6 +18,8 @@ const STORIES: { id: AdventureStoryId; emoji: string; story: Story; unfinished?:
   { id: "schatzinsel", emoji: "🏝️", story: TREASURE_ISLAND },
   // Still being built (user decision, November 2026): tested on localhost only.
   { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP, unfinished: true },
+  // Tapsi rides Robo, a hover robot, so it never has to walk (user idea, November 2026); being built, English first.
+  { id: "feuerwehr", emoji: "🚒", story: FIRE_RESCUE, unfinished: true },
 ];
 
 /** The start screen: no options of its own, music and Tapsi's language come from the home page. */
@@ -35,10 +38,9 @@ export function AdventureGame() {
   const chosen = playable[at].story;
   // „Weiter“ at the end: the next story that can be played, after the last the first – none where there is only one.
   const next = playable.length > 1 ? playable[(at + 1) % playable.length] : undefined;
-  // The app language, like every game. A story not told in it yet is said in English,
-  // or else German – never German words with a Russian voice.
-  const told = (id: string) => id === "de" || Boolean(chosen.translations?.[id as TargetLanguageId]);
-  const language = targetLanguageFor(told(app.id) ? app.id : told("en") ? "en" : "de");
+  // The app language, like every game. A story not told in it yet is said in English, or else in the language it was
+  // written in – never German words with a Russian voice.
+  const language = targetLanguageFor(toldIn(chosen, app.id) ? app.id : toldIn(chosen, "en") ? "en" : firstLanguage(chosen));
   // Built once per story and language: the game starts anew when the story changes.
   const story = useMemo(() => storyIn(chosen, language.id), [chosen, language.id]);
 

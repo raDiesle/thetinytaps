@@ -321,4 +321,14 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
   },
+  // The fire brigade story: its opening flies over the town, and the hose is its busiest place (hose, water, smoke).
+  {
+    name: "feuerwehr",
+    path: "/abenteuer/feuerwehr/",
+    parts: [
+      { label: "Flug über die Stadt", before: [{ tap: ".screen-hint-button", optional: true }, { wait: 3000 }], ms: 10000 },
+      // The arms glow there like at the drums, so the same decision holds: 60 fps (p95 17 ms) at about 65 % busy (November 2026).
+      { label: "Schlauch", before: [...key("ArrowRight", 4), { wait: 4000 }], ms: 10000, budget: { busy: 0.95 } },
+    ],
+  },
 ];

@@ -9,7 +9,7 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Jede Bewegung des Fuchses wird nachgemacht**, auch die zwischen den Stationen. Das Kind steht
   vor dem Bildschirm im Zimmer und kann sich nicht frei durch den Raum bewegen. Darum geht, hüpft
   oder steigt die Figur nie von der Stelle: Sie wird getragen (Schatzinsel: auf dem Panzer einer
-  Schildkröte) und macht alles auf der Stelle. Erlaubt sind nur kleine Schritte zur Seite und zurück.
+  Schildkröte, Wolkenreise: auf der Wolke Wolle, Feuerwehr: auf dem Schwebe-Roboter Robo) und macht alles auf der Stelle. Erlaubt sind nur kleine Schritte zur Seite und zurück.
   **Auch am Ende bleibt sie auf ihrem Träger** und springt nie von ihm herunter (Tapsi blieb nicht auf
   Ole): Was sie erreichen soll, kommt zu ihr (die Truhe wird direkt neben Ole abgestellt), und sie
   dreht sich höchstens mit kleinen Schritten auf ihm um.
@@ -82,7 +82,10 @@ Fehler in späteren Leveln nicht wieder passiert.
   Fuchs auf seinem Träger, mit Abstand; ein Test misst es (`treasureIsland.test.ts`).
 - **Auswerfen wie echt** (Angel): ausholen über die Schulter, kurz halten, nach vorn schnellen und
   nachschwingen. Der Schwimmer hängt beim Ausholen hinter der Spitze, fliegt dann im Bogen hinaus, und
-  die Schnur hängt durch, solange er draußen liegt.
+  die Schnur hängt durch, solange er draußen liegt. **Ausholen so groß wie möglich**: Pfoten hoch
+  hinter den Kopf, die Angel zeigt fast waagerecht nach hinten, der Oberkörper dreht mit – dann fliegt
+  der Schwimmer weit und in hohem Bogen hinaus (`CAST_REACH`, `CAST_ARC`), aber noch im Bild. Eine
+  kleine Ausholbewegung mit kurzem Wurf sah nicht nach Werfen aus (Rückmeldung, November 2026).
 - Kein Satz behauptet, das Kind gesehen zu haben (es gibt keine Kamera).
 - **Was Tapsi sagt, stimmt mit dem überein, was passiert.** Ändert sich eine Handlung, ändert sich ihr
   Satz im selben Commit, in jeder Sprache. Kündigt ein Satz etwas an, das es nicht mehr gibt („Ich hüpfe
@@ -128,6 +131,12 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Worauf der Fuchs steht, ist mit im Bild** (Wolle, Ole): Die Kamera steht so weit hinten, dass man
   den Träger ganz sieht, bei einer Wolke auch ihre Unterseite – nicht nur einen weißen Rand unter den
   Füßen.
+- **Vor dem Festlegen der Kamera prüfen, was Kopf und Körper verdecken** (Feuerwehr, November 2026):
+  Ziehen die Pfoten über dem Kopf (Glockenseil), verdeckte der Kopf sie von hinten – dort von der
+  Seite. Schwenkt etwas nach links und rechts (Wasserstrahl), verdeckte der Körper von schräg hinten
+  die eine Seite – dort hoch und mittig hinter dem Fuchs. Wird vor dem Bauch gefangen (Kätzchen),
+  verdeckte der Rücken den Fang über die Schulter – dort schräg von hinten und weit genug weg, dass der
+  ganze Fuchs im Bild bleibt.
 - **Wo beide Arme vor dem Körper arbeiten** (Trommeln), steht die Kamera genau mittig und nah hinter
   den Schultern, nur wenig über dem Kopf, und schaut den Weg entlang: Pfoten und Trommeln neben dem
   Körper, und dahinter, worum es geht. Nie hoch und weit hinten mit dem Blick hinab auf die Trommeln –
@@ -135,7 +144,8 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Ausholen geht seitlich über die Schulter** (Angel): Die Pfoten gehen neben dem Kopf hoch, nicht
   vor dem Gesicht vorbei oder in den Kopf. Wo ein Arm hinter dem Körper ist, scheint er durch; er
   geht aber nie in den Körper hinein. Das Ding in der Hand legt fest, wo die Pfoten sind, nicht
-  umgekehrt.
+  umgekehrt. Wo der Arm weit hinter den Kopf geht, schwingt die Pfote auf dem Weg dorthin seitlich nach
+  außen, damit die Angel nicht durch den Kopf streicht.
 - **Wer weggescheucht wird, ist im Bild**: Viele und groß (die Vögel dreimal so groß wie gebaut, zwei
   je Trommelschlag), so dass man auf einen Blick sieht, wozu die Bewegung da ist. Sie sitzen, von der
   Kamera aus gesehen, neben dem Fuchs und neben dem, was er bewegt, nie dahinter: Kleine Vögel direkt
@@ -187,10 +197,20 @@ Fehler in späteren Leveln nicht wieder passiert.
   es hindurchschaut: Es fliegt davon.
 - **Was rollt, bleibt im Bild.** Steht etwas Hohes vor dem Fuchs (Schildkrötenkopf), wird der Boden
   davor angehoben, damit eine rollende Nuss nicht dahinter verschwindet, und sie hüpft darüber.
-- **Keine Grafik geht in eine andere.** Füße, Beine und Körper bleiben über dem Panzer (im Sitzen:
-  Beine gerade nach vorn, auf den Fersen), Stangen, Seile und Taschen gehen nicht durch den Körper.
-  Im Zweifel weglassen (ein Taschenriemen lief als brauner Ring durch den Fuchs). Von der Seite
-  anschauen und nachmessen. Was auf dem Panzer abgelegt ist (die Angel beim Paddeln, das Paddel davor),
+- **Keine Grafik geht in eine andere**, in jedem Abenteuer: Feste Dinge überschneiden sich nicht;
+  nur was keine feste Form hat (Wasser, Luft, Wolken, die dünne Angelschnur), darf man durchdringen.
+  Füße, Beine und Körper bleiben über dem Panzer (im Sitzen: Beine gerade nach vorn, auf den Fersen),
+  Stangen, Seile und Taschen gehen nicht durch den Körper. Im Zweifel weglassen (ein Taschenriemen lief
+  als brauner Ring durch den Fuchs). Von der Seite anschauen und nachmessen. **Ein Test prüft es**
+  (`three/collisions.test.ts`): Er spielt jede Geschichte Bild für Bild ohne Bildschirm ab und meldet
+  jeden Moment, in dem eine Pfote oder etwas, das Tapsi hält, aufhebt oder ablegt, in Rumpf oder Kopf
+  steckt (beim Aufheben der Angel steckten Pfote und Angel im Bauch, Rückmeldung November 2026). Jedes
+  neue Ding in Tapsis Pfoten kommt in `held()` der Geschichte. **Aufheben und Ablegen gehen um den
+  Körper herum**: erst zur Seite neben den Körper, dann nach vorn in die Pfoten; die zweite Pfote greift
+  erst zu, wenn das Ding vor der Brust ist, und lässt beim Ablegen zuerst los. Dreht sich etwas Langes
+  dabei (das Paddel aufs Ufer), dreht es sich erst weit draußen und so herum, dass das nahe Ende vom
+  Körper weg schwingt. Und ein Clip spielt nicht ins Lob weiter, während schon abgelegt wird: Ein
+  zweites Ausholen beim Ablegen schlug die Angel in den Körper. Was auf dem Panzer abgelegt ist (die Angel beim Paddeln, das Paddel davor),
   liegt oben auf und folgt seiner Wölbung, statt hineinzustecken, und liegt dort, wo es keiner Kamera
   im Weg steht: Ein aufrecht im Wasser stehendes Paddel versperrte die Sicht auf den Schwimmer.
 - Der Schwanz ist klein und verdeckt keine Beine.
@@ -214,7 +234,11 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Begleiter fliegen nie durchs Bild** (Kiki): Sie bleiben weit genug vor der Kamera und wechseln
   höchstens einmal die Seite, vor dem Fuchs und in einem Schritt, in dem die Kamera von hinten schaut.
   Von der Kamera aus gesehen sitzen sie nie auf dem Kopf des Fuchses und nie vor dem, worauf er
-  schaut (Schwimmer): Jede Kamera einer Station prüfen, nicht nur die von hinten.
+  schaut (Schwimmer): Jede Kamera einer Station prüfen, nicht nur die von hinten. Wird etwas geworfen
+  (die Angel), fliegt der Begleiter weit rechts oben davon und weiter weg als das Geworfene, aber ganz
+  im Bild: In der Mitte zwischen Kopf und Schwimmer schien Kiki vor der ausgeworfenen Angel zu sein,
+  obwohl er weiter weg war (Rückmeldung, November 2026); am Bildrand halb abgeschnitten ist er auch
+  falsch.
   Jeden Übergang zwischen zwei Stationen anschauen, nicht nur die Stationen selbst: Ein Papagei, der
   beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz. Dreht sich der
   Träger mit dem Fuchs um, drehen sich die Plätze des Begleiters nicht mit: Sie bleiben in der Welt

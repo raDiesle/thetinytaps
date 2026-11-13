@@ -121,6 +121,7 @@ export type MotionClipId =
   | "cast"
   | "scatter"
   | "catch"
+  | "spray"
   | "stretch_up"
   | "curl_small"
   | "grow"

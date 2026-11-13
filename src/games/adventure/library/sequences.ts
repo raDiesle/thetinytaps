@@ -1,5 +1,5 @@
-// Result D: playable sequences of about three minutes each. Two have a 3D story:
-// treasure_island (../stories/treasureIsland/) and cloud_trip (../stories/cloudTrip/).
+// Result D: playable sequences of about three minutes each. Three have a 3D story: treasure_island
+// (../stories/treasureIsland/), cloud_trip (../stories/cloudTrip/) and fire_rescue (../stories/fireRescue/).
 import type { Sequence } from "./types";
 
 export const SEQUENCES: Sequence[] = [
@@ -261,6 +261,75 @@ export const SEQUENCES: Sequence[] = [
       },
     ],
     finale: "Die Sonne lacht über dem Regenbogen, Wolle trägt Tapsi und Kiki nach Hause.",
+  },
+  {
+    id: "fire_rescue",
+    // A story told English first (user decision, November 2026): its title and step names are seen by grown-ups.
+    title: "Fire Rescue",
+    world: "fire_station",
+    opening:
+      "Über einem Haus in der Stadt steigt Rauch auf, auf dem Dach sitzen kleine Kätzchen. Tapsi steht auf Robo, dem Schwebe-Roboter, im Hof der Feuerwache.",
+    steps: [
+      {
+        movement: "wave_hello",
+        name: "Wave to Kiki",
+        seconds: 13,
+        energy: "calm",
+        situation: "Tapsi steht auf Robo, von vorn zu sehen, und winkt Kiki, die herangeflogen kommt.",
+        transition: "Die Kamera geht hinter Tapsi: Das Hoftor ist zu.",
+      },
+      {
+        movement: "bell_rope",
+        name: "Ring the fire bell",
+        seconds: 15.4,
+        energy: "medium",
+        situation:
+          "Über Robo hängt die Feuerglocke am Galgen; hochgreifen, das Seil herunterziehen: Bei jedem Zug läutet sie, und das Rolltor fährt ein Stück hoch.",
+        transition: "Das Tor ist offen, Robo schwebt los.",
+      },
+      {
+        movement: "branch_duck",
+        name: "Duck under the washing lines",
+        seconds: 18.5,
+        energy: "lively",
+        situation: "Robo schwebt die Straße entlang, quer über ihr hängen Wäscheleinen auf Kopfhöhe; ducken, und die Wäsche streicht über Tapsi hinweg.",
+        transition: "Vorn steht das Haus mit dem Rauch.",
+      },
+      {
+        movement: "hose_spray",
+        name: "Spray the smoke away",
+        seconds: 16.3,
+        energy: "medium",
+        situation:
+          "Aus Robo kommt das Strahlrohr; nach links und rechts spritzen, jedes Rauchwölkchen am Fenster wird zu weißem Dampf, und Robo steigt mit jedem Mal ein Stockwerk höher.",
+        transition: "Robo ist oben am Dach, da sitzen die Kätzchen.",
+      },
+      {
+        movement: "big_ball_catch",
+        name: "Catch the kittens",
+        seconds: 16.2,
+        energy: "medium",
+        situation: "Die Kätzchen springen eins nach dem anderen vom Dachrand in Tapsis Arme und hüpfen dann auf Robo.",
+        transition: "Alle Kätzchen sind sicher auf Robo.",
+      },
+      {
+        movement: "hooray_arms",
+        name: "Hooray!",
+        seconds: 11.4,
+        energy: "lively",
+        situation: "Robo dreht sich mit Tapsi und den Kätzchen zu uns um. Arme hoch und hüpfen, Robo federt bei jedem Sprung.",
+        transition: "Zeit, die Kätzchen nach Hause zu bringen.",
+      },
+      {
+        movement: "wave_hello",
+        name: "Wave goodbye",
+        seconds: 11,
+        energy: "calm",
+        situation: "Von vorn: Tapsi winkt zum Abschied, die Kätzchen sitzen auf Robo.",
+        transition: "Die Kamera fliegt hoch, über dem Haus ist der Himmel klar.",
+      },
+    ],
+    finale: "Der Rauch ist weg, die Kätzchen sind gerettet, und Robo trägt alle nach Hause.",
   },
   {
     id: "space_trip",

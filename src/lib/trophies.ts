@@ -3,15 +3,21 @@ import { CATEGORIES, type Game } from "@/content/games";
 
 /*
  * The trophies a child collects (user decision, November 2026): every level or story played to its end (`GameEnd`)
- * gives a trophy of its own, made for that game and level (Trophy.tsx), and the trophies won stand in the bookshelf on
- * the home page (TrophyShelf). Kept in this browser only, like the settings; nothing is sent anywhere.
+ * gives a trophy of its own, made for that game and level (Trophy.tsx), and the trophies won stand in the trophy room
+ * next to the bookshelf (TrophyMuseum). Played to its end again, the same trophy counts how often (user request,
+ * November 2026): the number stands on its foot's plate. Kept in this browser only, like the settings; nothing is sent
+ * anywhere.
  */
 
-/** A trophy won: the game's address, the level's id within it ("" where the game has one level only), when it was first won. */
+/**
+ * A trophy won: the game's address, the level's id within it ("" where the game has one level only), when it was first
+ * won, and how often it was won.
+ */
 export interface TrophyWon {
   game: string;
   level: string;
   at: number;
+  wins: number;
 }
 
 const KEY = "tinytaps.trophies.v1";
@@ -20,7 +26,11 @@ function read(): TrophyWon[] {
   try {
     const raw = localStorage.getItem(KEY);
     const list = raw ? (JSON.parse(raw) as { won?: TrophyWon[] }).won : undefined;
-    return Array.isArray(list) ? list.filter((t) => typeof t?.game === "string" && typeof t.level === "string") : [];
+    if (!Array.isArray(list)) return [];
+    // Trophies kept before they were counted were won once.
+    return list
+      .filter((t) => typeof t?.game === "string" && typeof t.level === "string")
+      .map((t) => ({ ...t, wins: typeof t.wins === "number" && t.wins > 0 ? t.wins : 1 }));
   } catch {
     return [];
   }
@@ -40,20 +50,35 @@ export const trophyKey = (game: string, level: string) => `${game}#${level}`;
 /** Whether the trophy of `game` and `level` was won before. */
 export const hasTrophy = (game: string, level: string) => current().some((t) => t.game === game && t.level === level);
 
+/** How often the trophy of `game` and `level` was won: 0 before the first time. */
+export const trophyWins = (game: string, level: string) => current().find((t) => t.game === game && t.level === level)?.wins ?? 0;
+
 /**
- * Gives the trophy of `game` and `level`, once: winning it again changes nothing (no count – the child collects
- * different ones, never the same over and over). Returns whether it is new.
+ * A trophy given before its level's end (Kettenreaktion: one ball in the goal, `early`), which the end then shows
+ * without counting it a second time.
  */
-export function awardTrophy(game: string, level: string, now = Date.now()): boolean {
-  if (hasTrophy(game, level)) return false;
-  won = [...current(), { game, level, at: now }];
+let claimed: string | undefined;
+
+/**
+ * Gives the trophy of `game` and `level`, or counts one more win of it: each time a level is played to its end, once
+ * (`early` where a game gives it before the end, which then doesn't count again). Returns whether it is new.
+ */
+export function awardTrophy(game: string, level: string, now = Date.now(), { early = false } = {}): boolean {
+  const key = trophyKey(game, level);
+  if (!early && claimed === key) {
+    claimed = undefined;
+    return false;
+  }
+  claimed = early ? key : undefined;
+  const before = current().find((t) => t.game === game && t.level === level);
+  won = before ? current().map((t) => (t === before ? { ...t, wins: t.wins + 1 } : t)) : [...current(), { game, level, at: now, wins: 1 }];
   try {
     localStorage.setItem(KEY, JSON.stringify({ won }));
   } catch {
     // Storage full or disabled: the trophy still stands on the shelf for this visit.
   }
   for (const listener of listeners) listener();
-  return true;
+  return !before;
 }
 
 const subscribe = (listener: () => void) => {
@@ -83,5 +108,6 @@ export const gameOrder = (href: string) => GAMES.findIndex((game) => game.href =
 /** Forgets every trophy: only for tests. */
 export function resetTrophiesForTest(list: TrophyWon[] = []) {
   won = list;
+  claimed = undefined;
   for (const listener of listeners) listener();
 }

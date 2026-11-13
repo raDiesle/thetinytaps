@@ -339,6 +339,11 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Eine Sternschnuppe saust herab.", reaction: "Sie leuchtet in den Armen.", worlds: ["space"] },
     { situation: "Der Jongleur wirft einen Ball herüber.", reaction: "Er jongliert weiter mit drei Bällen.", worlds: ["circus"] },
   ],
+  spray: [
+    { situation: "Die Blumen im Garten haben Durst.", reaction: "Sie trinken und richten sich auf.", everyday: true },
+    { situation: "Das Auto ist voller Schlamm.", reaction: "Es glänzt wieder sauber.", everyday: true },
+    { situation: "Aus dem Fenster kommt grauer Rauch.", reaction: "Er wird zu weißem Dampf und ist weg.", worlds: ["fire_station"] },
+  ],
   throw_underhand: [
     { situation: "Beim Aufräumen liegen Kuscheltiere vor der Kiste.", reaction: "Alles ist drin, die Kiste lacht.", everyday: true },
     { situation: "Die Socke soll in den Wäschekorb.", reaction: "Treffer! Der Korb wackelt.", everyday: true },
