@@ -16,7 +16,7 @@ is the matter, never the thing it needs – „Die Feuerwehr will das Feuer lös
 zu. Wir wollen rein.“ – so the child thinks what it is for. In every language it is the question
 (`TogetherTexts.question`), said when the round comes, after a wrong pick and on a tap on the picture, and it stands as
 the line under the picture for grown-ups (`RoundTopic.tsx`). Each choice has its name small below it. The child taps a
-choice or drags its partner up onto the picture (user request, November 2026). The right one flies up into the picture and the two set to
+choice (with a mouse it may also drag its partner up onto the picture, user request, November 2026). The right one flies up into the picture and the two set to
 work (`.working`, `WORK_MS`). A wrong pick stays still on its plate, and the one it belongs to peeks up over its plate
 for a moment (`.tg-owner`) – never shown as wrong.
 
@@ -121,10 +121,11 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   Tier?) – no ⚙️ to hold, no panel popping up, no signs before the kinds' names (user request, November 2026). One kind
   chosen comes at once, a round of the other kind on screen giving way to it; „Gemischt“ lets the round play on. There
   is no „Schwierigkeit“ any more: the game always finds it itself (`content.test.ts`). No other options.
-- A choice is picked by a tap or by dragging its partner onto the picture (user feedback, November 2026: dragging did
-  nothing, since a choice was picked the moment a finger touched it). So a plate picks on release, not on
-  `pointerdown`: let go on its own plate without having left it, or anywhere near the picture, it picks; let go
-  elsewhere, the partner slides back onto its plate and nothing is picked. The finger is followed on the window,
+- A finger picks a choice the moment it touches it, never dragging it (user feedback, November 2026, for every game: a
+  child's finger moves a little while it taps, and its tap became a drag that picked nothing; `mayDrag`,
+  `touchPicks.test.ts`). Only a mouse may drag the partner onto the picture, and so a mouse's press picks on release:
+  let go on its own plate without having left it, or anywhere near the picture, it picks; let go elsewhere, the partner
+  slides back onto its plate and nothing is picked. The finger is followed on the window,
   since a tap just beside a plate is handed to it by `tapTargets` while the finger's later events stay where it came
   down. A pick right after a new round came is ignored (`screenTap`), and every round calls `screenChanged`.
 - ◀ (`StepBack`, shared in `src/components/`) lies in the choices' bottom left corner (`back` of `TogetherPlay`, inside

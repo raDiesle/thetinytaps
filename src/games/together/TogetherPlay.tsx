@@ -4,7 +4,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
-import { distanceToRect, TAP_SLOP_PX, tapState } from "@/lib/tapTargets";
+import { distanceToRect, mayDrag, TAP_SLOP_PX, tapState } from "@/lib/tapTargets";
 import type { TogetherRound } from "./levels";
 import { PairPicture, PartnerIcon } from "./PairPicture";
 import { TOGETHER_TEXTS, type TogetherTexts, WORK_MS } from "./pairs";
@@ -52,7 +52,7 @@ const near = (r: DOMRect, x: number, y: number) => distanceToRect(x, y, r) <= TA
 
 /**
  * One round of "Was gehört zusammen?": a thing of the day or a helper stands above, and the child taps what belongs
- * to it below, or drags it up onto the picture (user request, November 2026). That one flies up into the picture, and the two do what they are for: the toothpaste squeezes a blob
+ * to it below, or with a mouse drags it up onto the picture (user request, November 2026; a finger picks at once, `mayDrag`). That one flies up into the picture, and the two do what they are for: the toothpaste squeezes a blob
  * onto the brush, the key turns and the door opens, the hose puts out the fire, the scissors snip. A wrong pick shows
  * the one it belongs to over its plate; it is never shown as wrong.
  */
@@ -172,6 +172,11 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }:
   const onChoiceDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
     if (busy.current || pointer.current) return;
+    // A finger picks at once; only a mouse may drag it up (a child's tap that moved a little became a drag, `mayDrag`).
+    if (!mayDrag(e)) {
+      choose(index);
+      return;
+    }
     pointer.current = { id: e.pointerId, index, x: e.clientX, y: e.clientY, moved: false, left: false };
   };
 
