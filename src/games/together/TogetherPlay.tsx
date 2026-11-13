@@ -3,7 +3,8 @@ import { choiceRows } from "@/games/shadows/levels";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
-import { tapState } from "@/lib/tapTargets";
+import { screenChanged, screenTap } from "@/lib/tapGuard";
+import { distanceToRect, TAP_SLOP_PX, tapState } from "@/lib/tapTargets";
 import type { TogetherRound } from "./levels";
 import { PairPicture, PartnerIcon } from "./PairPicture";
 import { TOGETHER_TEXTS, type TogetherTexts, WORK_MS } from "./pairs";
@@ -14,6 +15,8 @@ import { togetherVoice } from "./voice";
 const FLIGHT_MS = 500;
 /** Time the one a wrong pick belongs to shows before the child can try again. */
 const WRONG_MS = 1400;
+/** A finger that moves less than this is a tap on its plate, not a drag. */
+const TAP_PX = 12;
 
 interface Offset {
   x: number;
@@ -40,15 +43,20 @@ export interface TogetherPlayProps {
   onNext: () => void;
   /** What the round is about, for grown-ups: shown small under the picture (`RoundTopic`). */
   topic: ReactNode;
+  /** The way back to the round before (`StepBack`), in the choices' bottom left corner, never over the picture. */
+  back?: ReactNode;
 }
+
+/** Whether (x, y) lies on `r` or within a finger's slop of it (`TAP_SLOP_PX`): small fingers don't aim well. */
+const near = (r: DOMRect, x: number, y: number) => distanceToRect(x, y, r) <= TAP_SLOP_PX;
 
 /**
  * One round of "Was gehört zusammen?": a thing of the day or a helper stands above, and the child taps what belongs
- * to it below. That one flies up into the picture, and the two do what they are for: the toothpaste squeezes a blob
+ * to it below, or drags it up onto the picture (user request, November 2026). That one flies up into the picture, and the two do what they are for: the toothpaste squeezes a blob
  * onto the brush, the key turns and the door opens, the hose puts out the fire, the scissors snip. A wrong pick shows
  * the one it belongs to over its plate; it is never shown as wrong.
  */
-export function TogetherPlay({ settings, round, onSolved, onNext, topic }: TogetherPlayProps) {
+export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }: TogetherPlayProps) {
   const language = useAppLanguage();
   const texts = pick(TOGETHER_TEXTS, language.id);
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -56,6 +64,10 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
   const [flight, setFlight] = useState<Offset | null>(null);
   /** The two doing what they are for. */
   const [working, setWorking] = useState(false);
+  /** The partner being dragged and how far it is from its plate. */
+  const [drag, setDrag] = useState<{ index: number; x: number; y: number } | null>(null);
+  /** The finger on a plate: where it came down, and whether it has moved far enough to be a drag. */
+  const pointer = useRef<{ id: number; index: number; x: number; y: number; moved: boolean; left: boolean } | null>(null);
   /** The keyboard frame; appears with the first key. */
   const [focus, setFocus] = useState<number | null>(null);
   const focusRef = useRef<number | null>(null);
@@ -67,7 +79,8 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
   /** Wrong ones picked in this round, for the difficulty. */
   const misses = useRef(0);
   const topRef = useRef<HTMLDivElement>(null);
-  const optionRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  /** The plates, which stay where they are while their partner is dragged. */
+  const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -80,6 +93,8 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
 
   useEffect(() => {
     const pending = timers.current;
+    // A new round is a new screen: a second tap of the hand that brought it (or ◀) picks nothing on it (`tapGuard`).
+    screenChanged();
     return () => pending.forEach(clearTimeout);
   }, []);
 
@@ -99,7 +114,13 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
   );
 
   const choose = (index: number) => {
+    setDrag(null);
     if (busy.current) return;
+    // A tap right after the round came (a double tap) picks nothing; it only ripples.
+    if (!screenTap()) {
+      softTap();
+      return;
+    }
     busy.current = true;
     const ok = index === round.correct;
     setOutcome({ pick: index, ok });
@@ -117,7 +138,8 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
       return;
     }
 
-    // It flies up into the picture and is gone; then the two set to work.
+    // It flies up into the picture from where it is (its plate, or where it was dropped) and is gone; then the two set
+    // to work. Measured from its plate, which a drag leaves where it is.
     const from = optionRefs.current[index]?.getBoundingClientRect();
     const to = topRef.current?.getBoundingClientRect();
     if (from && to) {
@@ -144,10 +166,54 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
     setNudge((n) => n + 1);
   };
 
+  // A finger on a plate: let go there it picks it, dragged up onto the picture it picks it too; let go anywhere else
+  // the partner goes back to its plate. Followed on the window, since a tap near a plate is handed to it (`tapTargets`)
+  // while the finger's later events stay where it came down.
   const onChoiceDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
-    choose(index);
+    if (busy.current || pointer.current) return;
+    pointer.current = { id: e.pointerId, index, x: e.clientX, y: e.clientY, moved: false, left: false };
   };
+
+  useEffect(() => {
+    const onMove = (e: globalThis.PointerEvent) => {
+      const p = pointer.current;
+      if (!p || p.id !== e.pointerId || busy.current) return;
+      const x = e.clientX - p.x;
+      const y = e.clientY - p.y;
+      if (!p.moved && Math.hypot(x, y) < TAP_PX) return;
+      p.moved = true;
+      const plate = optionRefs.current[p.index]?.getBoundingClientRect();
+      if (plate && !near(plate, e.clientX, e.clientY)) p.left = true;
+      setDrag({ index: p.index, x, y });
+    };
+    const onUp = (e: globalThis.PointerEvent) => {
+      const p = pointer.current;
+      if (!p || p.id !== e.pointerId) return;
+      pointer.current = null;
+      const picture = topRef.current?.getBoundingClientRect();
+      const plate = optionRefs.current[p.index]?.getBoundingClientRect();
+      const onPicture = picture && near(picture, e.clientX, e.clientY);
+      // A tap that slid a little is still a tap: let go on its own plate, never having left it, it picks it. One taken
+      // away and brought back was put back.
+      const onPlate = !p.left && plate && near(plate, e.clientX, e.clientY);
+      if (!p.moved || onPicture || onPlate) choose(p.index);
+      else setDrag(null);
+    };
+    const onCancel = (e: globalThis.PointerEvent) => {
+      if (pointer.current?.id !== e.pointerId) return;
+      pointer.current = null;
+      setDrag(null);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onCancel);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
+    };
+  });
 
   // Arrow keys (or any key) move the frame, Space or Enter picks, 1–4 pick straight away.
   useEffect(() => {
@@ -193,10 +259,15 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
         <div className="tg-options" style={choiceRows(round.choices.length)}>
           {round.choices.map((p, i) => {
             const shown = outcome?.pick === i;
+            const dragged = drag?.index === i;
+            const landed = shown && outcome.ok && flight;
             return (
               <div
                 key={p.id}
-                className={`tg-option${focus === i ? " focused" : ""}`}
+                ref={(el) => {
+                  optionRefs.current[i] = el;
+                }}
+                className={`tg-option${focus === i ? " focused" : ""}${dragged ? " dragged" : ""}`}
                 data-tap={tapState({ goal: i === round.correct })}
                 onPointerDown={onChoiceDown(i)}
               >
@@ -206,11 +277,8 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
                   </span>
                 )}
                 <span
-                  ref={(el) => {
-                    optionRefs.current[i] = el;
-                  }}
-                  className={`tg-partner${shown && outcome.ok ? " landed" : ""}`}
-                  style={shown && outcome.ok && flight ? { translate: `${flight.x}px ${flight.y}px`, scale: "0.4" } : undefined}
+                  className={`tg-partner${shown && outcome.ok ? " landed" : ""}${dragged ? " dragging" : ""}`}
+                  style={landed ? { translate: `${flight.x}px ${flight.y}px`, scale: "0.4" } : dragged ? { translate: `${drag.x}px ${drag.y}px` } : undefined}
                   role="img"
                   aria-label={texts.partner(p)}
                 >
@@ -224,6 +292,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic }: Toget
             );
           })}
         </div>
+        {back}
       </div>
       <FeedbackLayer effects={effects} />
     </div>

@@ -4,7 +4,8 @@ Route `/zusammen/`, in the Zuordnen book. Ideas Z-03 („Was gehört zusammen?�
 das?“, helpers and their tools), built as one game (user decision, November 2026).
 
 One flowing game, like Was gehört zum Tier?: its card plays at once (`startMode`), with no start screen, no cards and no
-`level` row; ✕ goes back to the table of contents. Two kinds of rounds take turns (`KIND_ORDER` in `levels.ts`):
+`level` row; ✕ goes back to the table of contents. ◀ bottom left shows the round before again, as it was dealt
+(`StepBack`, the rounds kept by turn in `TogetherRounds`; going on after it plays the rounds already dealt). Two kinds of rounds take turns (`KIND_ORDER` in `levels.ts`):
 1. Dinge aus dem Alltag (Z-03): a thing stands in its place – the toothbrush in the bathroom, the door in a house
    front – and the child taps what belongs to it (toothpaste, key …).
 2. Helfer und ihr Werkzeug (Z-13): a fox or bear grown-up stands in its role and place – the fire fox by the burning
@@ -14,7 +15,8 @@ Each round begins with its **wish** (Z-25, `wish` on every pair): the voice says
 is the matter, never the thing it needs – „Die Feuerwehr will das Feuer löschen.“, „Die Blume hat Durst.“, „Die Tür ist
 zu. Wir wollen rein.“ – so the child thinks what it is for. In every language it is the question
 (`TogetherTexts.question`), said when the round comes, after a wrong pick and on a tap on the picture, and it stands as
-the quiet line under the picture for grown-ups (`RoundTopic.tsx`). Each choice has its name small below it. The right one flies up into the picture and the two set to
+the line under the picture for grown-ups (`RoundTopic.tsx`). Each choice has its name small below it. The child taps a
+choice or drags its partner up onto the picture (user request, November 2026). The right one flies up into the picture and the two set to
 work (`.working`, `WORK_MS`). A wrong pick stays still on its plate, and the one it belongs to peeks up over its plate
 for a moment (`.tg-owner`) – never shown as wrong.
 
@@ -58,7 +60,7 @@ top of `backdrops/index.ts`). A new scene picks a backdrop that tells its place;
 While developing, a `DevTag` at the bottom right names the pair on screen (`C07`: its topic's letter and its place in the topic, plus the id), and `?pair=<id>` shows that pair first and `?level=N` starts on difficulty step N.
 
 **Difficulty** (`TOGETHER_LEVELS`, `dealRound` in `levels.ts`): 2, 3, 3, 4, 4 things to choose from, with the step rule
-of Schatten finden (`nextLevel`). Every visit begins on the first step. Every six rounds count as a game for the
+of Schatten finden (`nextLevel`), always found by the game itself. Every visit begins on the first step. Every six rounds count as a game for the
 play-time limit (`gameEnded`, `countGame`). A thing comes again only after all of its kind (`useDeck`).
 
 ## Rules
@@ -114,9 +116,19 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 
 ### All pairs
 
-- Grown-ups change things only behind ⚙️ held while playing (`PlayOptions`): „Was drankommt“ („Gemischt“ or exactly one
-  kind, `settings.kinds` – never a mix of some, user feedback, November 2026) and „Schwierigkeit“ (Von selbst, Leicht,
-  Mittel, Schwer). No other options.
+- The one option is „Was drankommt“ („Gemischt“ or exactly one kind, `settings.kinds` – never a mix of some), shown
+  right in the top right corner while playing as the shared paper note of words (`CornerChoices`, as in Was gehört zum
+  Tier?) – no ⚙️ to hold, no panel popping up, no signs before the kinds' names (user request, November 2026). One kind
+  chosen comes at once, a round of the other kind on screen giving way to it; „Gemischt“ lets the round play on. There
+  is no „Schwierigkeit“ any more: the game always finds it itself (`content.test.ts`). No other options.
+- A choice is picked by a tap or by dragging its partner onto the picture (user feedback, November 2026: dragging did
+  nothing, since a choice was picked the moment a finger touched it). So a plate picks on release, not on
+  `pointerdown`: let go on its own plate without having left it, or anywhere near the picture, it picks; let go
+  elsewhere, the partner slides back onto its plate and nothing is picked. The finger is followed on the window,
+  since a tap just beside a plate is handed to it by `tapTargets` while the finger's later events stay where it came
+  down. A pick right after a new round came is ignored (`screenTap`), and every round calls `screenChanged`.
+- ◀ (`StepBack`, shared in `src/components/`) lies in the choices' bottom left corner (`back` of `TogetherPlay`, inside
+  `.tg-ground`): beside the picture on a phone on its side, never over the picture's corner, where it first lay.
 - Exactly one choice fits. Kinds never mix in one round, and the wrong choices come from other topics first, each from
   a topic of its own (`dealRound`), so things of one topic may belong loosely together (soap and sponge in the
   bathroom) – requiring every partner of a topic to fit nothing else in it left a bathroom of two pairs. A partner is
@@ -175,12 +187,15 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
 
 ### Picture and caption come together (user feedback, November 2026)
 
-- A round's caption (the quiet line under the picture) shows only once the round's picture files are decoded
+- A round's caption (the line under the picture) shows only once the round's picture files are decoded
   (`useImagesReady` in `TogetherRounds.tsx`): the text never stands alone waiting for its picture. Any new picture
   file a round shows goes into `imagesOf` there.
 - The main picture is as big as the room allows: the picture's share of the height is `flex: 1.75` on a computer and
   `1.6` on a phone on its side (`together.css`); a smaller box is a fault to report, not a setting to add.
-- The ⚙️ of this game is the gear alone (`PlayOptions iconOnly`), its name read out only. Other games keep the label.
+- The caption is set like Abstillen's sentence under its picture (user feedback, November 2026: the bold, greyed line
+  looked poor): the book's serif at `--caption-size`, its first letter big and red, a curl on either side on wide
+  screens (`.tg-words`, `.tg-topic`, copied from `.cb-words` in `chapterBook.css`) – never a face, weight or size of
+  its own.
 - The caption under the picture is a full sentence (user request, November 2026): the pair's wish, then a question about
   what is needed („… Was werfen wir in den gelben Postkasten?“). It is the `caption` field of each pair in every
   language (`captions.ts` for German), shown but never spoken, so the recordings of the wish stay valid. It never names

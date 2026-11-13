@@ -1,11 +1,9 @@
 import type { RoundKind } from "./levels";
 
-/** How hard the rounds are: found by how the child plays („Von selbst“), or fixed by a grown-up. */
-export type Difficulty = "auto" | "easy" | "medium" | "hard";
-
 /**
- * The game starts at once and takes turns between its two kinds of rounds, finding the difficulty itself
- * (`levels.ts`). Grown-ups may change both while playing, behind ⚙️ held in the corner (`PlayOptions`).
+ * The game starts at once and takes turns between its two kinds of rounds, always finding the difficulty itself
+ * (`levels.ts`; no „Schwierigkeit“ to fix, user decision, November 2026). Grown-ups pick what comes up right in the top
+ * right corner while playing (`CornerChoices`).
  */
 export interface TogetherSettings {
   /**
@@ -13,8 +11,6 @@ export interface TogetherSettings {
    * grown-ups pick everything or one thing, so the options stay plain).
    */
   kinds: "all" | RoundKind;
-  /** Fixed or found by how the child plays. */
-  difficulty: Difficulty;
   /** Speak the question and what belongs to what (off for good until its lines are recorded). */
   speech: boolean;
   /** The pairs' and helpers' sounds and chimes. */
@@ -23,7 +19,6 @@ export interface TogetherSettings {
 
 export const DEFAULT_TOGETHER_SETTINGS: TogetherSettings = {
   kinds: "all",
-  difficulty: "auto",
   speech: false,
   sounds: true,
 };

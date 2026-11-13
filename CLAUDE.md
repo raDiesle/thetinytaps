@@ -277,12 +277,13 @@ In a fresh worktree run `bun install` first.
 
 ## Rules for every game (toddlers play alone)
 
-- A game of short scenes (a picture, a question, a choice, then the next) has a way back bottom left to the scene
-  before, as `StepBack` in Gefühle's „Alltagssituationen“ does (`onBack`; „Vorige Szene“ in every language, so its
-  aria label is translated with the rest). One tap is one step there: a quick second tap (a child's
+- A game of short scenes (a picture, a question, a choice, then the next – also a flowing game of rounds like Was gehört
+  zusammen?) has a way back bottom left to the scene before, the shared `StepBack` (`src/components/StepBack.tsx`, first
+  in Gefühle's „Alltagssituationen“; `onBack`; „Vorige Szene“ in every language, so its aria label is translated with
+  the rest), never over the picture. One tap is one step there: a quick second tap (a child's
   hand often lands twice) changes nothing on the screen the first one just brought – every tap or key that turns to the
   next picture, page or choice asks `screenTap()` of `src/lib/tapGuard.ts`, and a screen that changes by itself calls
-  `screenChanged()` (user feedback, November 2026; Gefühle, Abstillen, Aufs Töpfchen; `tapGuard.test.ts`). Captions of a picture always stand under it, never on it, in every phase – small, since only grown-ups read them, at the one size of every caption (`--caption-size` in `base.css`), and the picture takes all the room they leave. A story's sentence a grown-up reads aloud under its picture is set alike in every story (user feedback from Abstillen, November 2026): the book's serif with its first letter big and red, as Gefühle's day pages and scenes and Abstillen do – never a face or size of its own.
+  `screenChanged()` (user feedback, November 2026; Gefühle, Abstillen, Aufs Töpfchen; `tapGuard.test.ts`). Captions of a picture always stand under it, never on it, in every phase – small, since only grown-ups read them, at the one size of every caption (`--caption-size` in `base.css`), and the picture takes all the room they leave. A story's sentence a grown-up reads aloud under its picture is set alike in every story and game (user feedback from Abstillen, November 2026, and from Was gehört zusammen?'s round captions): the book's serif with its first letter big and red, as Gefühle's day pages and scenes, Abstillen and Was gehört zusammen? do – never a face, weight or size of its own.
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
   The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
   a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world
@@ -805,7 +806,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   The fox and the bear family stand at the bottom of every menu's page (`BookFamilies`, in `Sky`), the foxes in the left
   corner and the bears in the right, seen whole on every screen: below 1400 × 640 the page keeps that room free under
   its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`), and the world's things that
-  stood there (barn, trees, blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
+  stood there (blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
   the top row beside the title, where they were too small and in the way (user feedback, October 2026); the cards move
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
@@ -838,6 +839,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
   book's cover on the shelf shows a piece of it. A new category draws its world (`content.test.ts` checks).
+  Behind the cards a world stays plain: Lebendige Welten's meadow shows only its hills – the barn, fence and trees that
+  stood on it were clutter behind the menu and were taken out (user feedback, November 2026; `Worlds.test.ts`); never
+  bring back a drawn farm or trees there.
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it; on a
   picture book's cover it lies low, as far from the picture as the title (it once touched the picture, user feedback,
   November 2026).
