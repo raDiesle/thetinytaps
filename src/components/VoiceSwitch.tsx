@@ -1,5 +1,6 @@
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useT } from "@/lib/language";
+import "./voiceSwitch.css";
 
 /**
  * One tap on a grown-ups' note in the corner acts at once, as the finger lands (or Enter / Space): the loudspeaker and
@@ -19,11 +20,11 @@ export const tapProps = (onTap: () => void) => ({
 });
 
 /**
- * „Alltagssituationen“ only (user decision, November 2026): a wooden loudspeaker with a speech bubble in the bottom
- * right corner, beside the book of the text to read out, drawn like the shelf's loudspeaker for the music. One tap
- * switches the voice that tells the scene, asks the question and names the choices off or on, for grown-ups who would
- * rather tell the story to the child in their own words; the sounds (crying, laughing, a crash) stay. Off, the bubble
- * gives way to a red cross.
+ * A wooden loudspeaker with a speech bubble in the bottom right corner, drawn like the shelf's loudspeaker for the
+ * music, for grown-ups who would rather tell the story to the child in their own words. Only in Gefühle's
+ * „Alltagssituationen“ and the chapter books read aloud (`ChapterBook`: Abstillen, Schnullerfee, Kita-Start; user
+ * decisions, November 2026) – no other game gets one. One tap switches the voice that tells the story off or on; the
+ * sounds stay. Off, the bubble gives way to a red cross.
  */
 export function VoiceSwitch({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   const t = useT();

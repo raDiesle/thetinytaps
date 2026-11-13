@@ -7,6 +7,7 @@ import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
 import { PACIFIER_PICTURE_QUEUE } from "@/games/pacifierstory/pacifierStoryPictures";
 import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
+import { READER_PICTURE_QUEUE } from "@/components/readerPictures";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
 // here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet, or a
@@ -83,4 +84,5 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...PACIFIER_PICTURE_QUEUE,
   ...KITA_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,
+  ...READER_PICTURE_QUEUE,
 ];

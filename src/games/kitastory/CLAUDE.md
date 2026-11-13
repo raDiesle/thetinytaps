@@ -17,7 +17,9 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
 - `kitaStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, bunny, backpack, star), as the
   picture queue takes them; a made picture goes on `MADE`.
 - `KitaStoryGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as „Abstillen“
-  and „Schnullerfee“; dev tags `E0`, `E<chapter>-<page>`). A change to how the book reads goes there, so all get it.
+  and „Schnullerfee“; dev tags `E0`, `E<chapter>-<page>`). A change to how the book reads goes there, so all get it. Tapsi's voice reads each page's sentence (`voice`, from
+  `stimme/`, listed in `recordedLines.ts` as `kita`, recorded only when the user asks), and the loudspeaker above ▶
+  switches it off (`VoiceSwitch`, user decision, 13 November 2026); a page without its recording stays silent.
 - `names.ts`: the book's name on the shelf („Kita-Start“), the story's title and its blurb – German only until the user
   asks for translations; then `<lang>.ts` files like the Schnullerfee's, imported only by `src/content/texts/texts-<lang>.ts`.
 

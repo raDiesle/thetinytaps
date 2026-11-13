@@ -73,18 +73,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abstillen/",
-    note: "Das Buch „Abstillen“ mit „Tapsis Milchkette“, der Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Das Buch „Abstillen“ mit „Tapsis Milchkette“, der Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only abstillen), bis dahin bleibt es still.",
+    recorded: true,
+    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
     href: "/schnullerfee/",
-    note: "Das Buch „Schnullerfee“ mit „Tapsi und die Schnullerfee“, einer Geschichte in Kapiteln (pacifierStory.ts, November 2026): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 10. November 2026. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Das Buch „Schnullerfee“ mit „Tapsi und die Schnullerfee“, einer Geschichte in Kapiteln (pacifierStory.ts, November 2026): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 10. November 2026. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only schnullerfee), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
+    recorded: true,
+    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
     href: "/kita/",
-    note: "Das Buch „Kita-Start“ mit „Tapsi geht in die Kita“, einer Geschichte in Kapiteln (kitaStory.ts, 11. November 2026): nur Deutsch. Es fehlen Name, Satz fürs Regal (names.ts) und Kapitel und Sätze, als <Sprache>.ts im Ordner wie bei „Schnullerfee“. Die Sätze liest ein Erwachsener vor, Aufnahmen gibt es keine. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.",
-    languages: { de: "done" },
+    note: "Das Buch „Kita-Start“ mit „Tapsi geht in die Kita“, einer Geschichte in Kapiteln (kitaStory.ts, 11. November 2026): nur Deutsch. Es fehlen Name, Satz fürs Regal (names.ts) und Kapitel und Sätze, als <Sprache>.ts im Ordner wie bei „Schnullerfee“. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only kita), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.",
+    recorded: true,
+    languages: { de: "text" },
   },
   {
     href: "/zaehne/",

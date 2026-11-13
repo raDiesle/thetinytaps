@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { expect, test } from "bun:test";
 import { recordingName } from "@/lib/voiceName";
+import { LANGUAGE_STATUS } from "./ideas/languageStatus";
 import { RECORDED_GAMES, RECORDED_LANGUAGES } from "./recordedLines";
 
 // The games recorded with `bun run voice make` from src/content/recordedLines.ts and played by src/lib/voice.ts.
@@ -20,7 +21,16 @@ const PLAYERS: Record<string, string> = {
   "src/games/socks/stimme": "src/games/socks/voice.ts",
   "src/games/letters/stimme": "src/games/letters/voice.ts",
   "src/games/timer/stimme": "src/games/timer/voice.ts",
+  "src/games/milkchain/stimme": "src/games/milkchain/MilkChainGame.tsx",
+  "src/games/pacifierstory/stimme": "src/games/pacifierstory/PacifierStoryGame.tsx",
+  "src/games/kitastory/stimme": "src/games/kitastory/KitaStoryGame.tsx",
 };
+
+/**
+ * Recorded games whose texts are not translated yet (translations come only when the user asks), by name: the address
+ * of their row in languageStatus.ts, which must say so by leaving the other languages out.
+ */
+const GERMAN_ONLY: Record<string, string> = { kita: "/kita/" };
 
 test("no two lines of a game share a recording", () => {
   for (const game of RECORDED_GAMES) {
@@ -48,7 +58,11 @@ test("every recorded game says something in German", () => {
 // German would stay silent in the others, so each recorded game lists lines in each language.
 test("every recorded game says something in every app language", () => {
   for (const game of RECORDED_GAMES)
-    for (const language of RECORDED_LANGUAGES) expect(game.lines(language).length, `${game.name} ${language}`).toBeGreaterThan(0);
+    for (const language of RECORDED_LANGUAGES) {
+      if (game.name in GERMAN_ONLY && language !== "de") continue;
+      expect(game.lines(language).length, `${game.name} ${language}`).toBeGreaterThan(0);
+    }
+  for (const href of Object.values(GERMAN_ONLY)) expect(Object.keys(LANGUAGE_STATUS.find((row) => row.href === href)?.languages ?? {}), href).toEqual(["de"]);
 });
 
 // A line a language hasn't translated is said in German there, and has no recording in that language: it must never be

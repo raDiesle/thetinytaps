@@ -247,7 +247,7 @@ test("the voice switch is Alltagssituationen's alone, and tapped", () => {
   );
   expect(users).toEqual(["FeelingsPlay.tsx"]);
   expect(readFileSync("src/games/feelings/MoodGame.tsx", "utf8")).toContain("voice: true");
-  const button = readFileSync("src/games/feelings/VoiceSwitch.tsx", "utf8");
+  const button = readFileSync("src/components/VoiceSwitch.tsx", "utf8");
   expect(button).toContain("{...tapProps(onToggle)}");
   expect(button).not.toContain("useHold");
   expect(readFileSync("src/games/feelings/shared.tsx", "utf8"), "a line due while switched off stays silent").toContain("if (speaking.current) voice.say(");

@@ -8,7 +8,6 @@ import { PAIRS, pairsOf, TOGETHER_TEXTS, TOGETHER_TRANSLATIONS, WORK_MS } from "
 import { BOX_H, BOX_W } from "./scene";
 import { SCENES } from "./scenes";
 import { TOPICS } from "./topics";
-import { KIND_SIGNS } from "./RoundTopic";
 import { framesOf, partImage } from "./frames";
 import { CAPTIONS } from "./captions";
 import { PAINTED } from "./painted";
@@ -79,10 +78,35 @@ test("the kinds take turns, or only the one chosen; no kind is switched on or of
   for (const kind of KIND_ORDER) expect(kind in DEFAULT_TOGETHER_SETTINGS, kind).toBe(false);
 });
 
-// A kind's sign stands before its name under ⚙️; were it one of the pictures to pick from, it would look like an answer.
-test("a kind's sign is never a partner to pick", () => {
-  const partners = new Set(PAIRS.flatMap((p) => p.partner.emoji ?? []));
-  for (const sign of Object.values(KIND_SIGNS)) expect(partners.has(sign)).toBe(false);
+// „Was drankommt“ stands right in the top right corner while playing, the kinds by their names only – no ⚙️ to hold, no
+// panel and no „Schwierigkeit“: the game always finds that itself (user request, November 2026).
+test("what comes up is chosen in the corner, and there is no difficulty to fix", async () => {
+  const source = await Bun.file(new URL("./TogetherGame.tsx", import.meta.url)).text();
+  expect(source).toContain("<CornerChoices");
+  expect(source).not.toContain("PlayOptions");
+  expect(source).not.toMatch(/label: `\$\{/);
+  expect("difficulty" in DEFAULT_TOGETHER_SETTINGS).toBe(false);
+});
+
+// A choice is tapped or dragged onto the picture: it picks on release, followed on the window (user feedback, November
+// 2026: dragging did nothing while a choice was picked on pointerdown), and ◀ goes back to the round before.
+test("a choice can be dragged onto the picture, and ◀ shows the round before", async () => {
+  const play = await Bun.file(new URL("./TogetherPlay.tsx", import.meta.url)).text();
+  expect(play).toContain('window.addEventListener("pointerup"');
+  expect(play).toContain("screenChanged()");
+  const rounds = await Bun.file(new URL("./TogetherRounds.tsx", import.meta.url)).text();
+  expect(rounds).toMatch(/<StepBack\s/);
+});
+
+// The caption is set like Abstillen's sentence (user feedback, November 2026): serif, its first letter big and red.
+test("the caption under the picture is set like Abstillen's sentence", async () => {
+  const css = await Bun.file(new URL("./together.css", import.meta.url)).text();
+  const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.:]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+  expect(rule(".tg-words")).toContain("font-size: var(--caption-size)");
+  expect(rule(".tg-topic")).toContain("Georgia");
+  expect(rule(".tg-topic")).not.toContain("font-weight");
+  expect(rule(".tg-topic")).not.toContain("opacity");
+  expect(rule(".tg-topic::first-letter")).toContain("--tomato");
 });
 
 // While playing, the round's kind is plain small text under the picture, never its sign in a bubble (user feedback,

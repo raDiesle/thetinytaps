@@ -1,0 +1,28 @@
+/* The way back to the scene before (`StepBack`): a round paper button with ◀. Where it stands and how big it is, the
+   game says on its own class. */
+.step-back {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.step-back-sign {
+  display: block;
+  width: 100%;
+  filter: drop-shadow(0 3px 0 var(--ink));
+}
+
+.step-back-sign circle {
+  fill: var(--paper, #fbf6ea);
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.step-back-sign path {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
