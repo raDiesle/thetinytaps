@@ -68,14 +68,32 @@ export function surface(x: number, z: number) {
 /** Where things happen; z along the path. */
 export const BOAT_START = 62;
 /**
- * How long the fishing rod is, where along it the right paw (above) and the left paw (at the end) hold it, how far
+ * How long the fishing rod is, where along it the left paw (above) and the right paw (at the end) hold it, how far
  * ahead the float lands and how high its arc goes on the way: far out, so the big swing has a big throw.
  */
 export const ROD_LENGTH = 1.25;
-export const ROD_GRIP_R = 0.27;
-export const ROD_GRIP_L = 0.08;
+export const ROD_GRIP_L = 0.27;
+export const ROD_GRIP_R = 0.08;
 export const CAST_REACH = 5.6;
 export const CAST_ARC = 1.7;
+/**
+ * Where the left paw, the upper one on the rod, is in Tapsi's body space (x to its left, y up from the waist, z ahead)
+ * while it holds the rod in front of the chest, swung back behind the right shoulder (beside the neck, clear of the
+ * head) and cast out high ahead. Both paws go over to the right for the wind-up, the left one on top.
+ */
+export const ROD_PAW = { rest: v3(-0.04, 0.24, 0.32), back: v3(-0.26, 0.6, 0), out: v3(-0.06, 0.62, 0.34) };
+/** Which way the rod points (body space, to Tapsi's right, up and ahead) as it is swung back, cast out and followed through. */
+export const ROD_DIR = {
+  right: (back: number, follow: number) => 0.12 + back * 0.95 - follow * 0.08,
+  up: (back: number, follow: number) => 1 - 0.6 * back - 0.8 * follow,
+  ahead: (back: number, out: number, follow: number) => 0.3 - back * 1.2 + out * 0.6 + follow * 0.75,
+};
+/**
+ * Where the left elbow points (body space) while that arm holds the rod: down while the rod is in front of the chest
+ * or cast out, forwards as the paw goes behind the right shoulder, so the arm crosses in front, under the chin, and
+ * never through chest or head (`collisions.test.ts` measures the arms too).
+ */
+export const rodElbowL = (back: number, out: THREE.Vector3) => out.set(0.25, -1 + back, 0.1 + 0.9 * back);
 /** How many short pieces the fishing line is drawn of, so it can sag in a curve. */
 export const LINE_PIECES = 12;
 /** Where the rod lies on Ole's back after the fishing (Ole's own space, x to Ole's left): along its left side, behind Tapsi. */

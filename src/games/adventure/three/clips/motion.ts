@@ -299,6 +299,12 @@ export function castSwing(t: number) {
   const k = phase(t, CAST_PERIOD);
   return { back: hold(k, 0.05, 0.32, 0.42, 0.49), out: hold(k, 0.42, 0.5, 0.85, 1), follow: hold(k, 0.5, 0.64, 0.85, 1) };
 }
+/**
+ * How far the upper paw on the rod (the left) has come over to the right (`across`) and up behind the right shoulder
+ * (`up`) while the cast swings back by `back` (0..1): across in front of the chest first, low under the chin, and up
+ * only once it is beside the head, so the arm passes the head instead of going through it.
+ */
+export const castWindup = (back: number) => ({ across: smooth(clamp01(back / 0.6)), up: smooth(clamp01((back - 0.4) / 0.6)) });
 /** Sitting down or getting up takes this long, from this many seconds into the sit clip; stories sit the guide down with it. */
 export const SIT_FROM = 0.2;
 export const SIT_TIME = 2.2;
