@@ -975,30 +975,6 @@
   bottom: var(--pad);
   z-index: 7;
   width: var(--next-w);
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.fg-back-sign {
-  display: block;
-  width: 100%;
-  filter: drop-shadow(0 3px 0 var(--ink));
-}
-
-.fg-back-sign circle {
-  fill: var(--paper, #fbf6ea);
-  stroke: var(--ink);
-  stroke-width: 6;
-}
-
-.fg-back-sign path {
-  fill: var(--ink);
-  stroke: var(--ink);
-  stroke-width: 6;
-  stroke-linejoin: round;
 }
 
 /* ---------- „Alltagssituationen“'s loudspeaker for grown-ups (`VoiceSwitch`) ---------- */
