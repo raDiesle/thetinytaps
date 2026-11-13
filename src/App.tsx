@@ -46,6 +46,7 @@ const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/
 const TogetherPage = page(() => import("@/pages/TogetherPage"), "TogetherPage", "/zusammen/");
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
 const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/");
+const TrophyRoomPage = page(() => import("@/pages/TrophyRoomPage"), "TrophyRoomPage", "/pokale/");
 
 export function App() {
   // Where each way back can step back in the history (goBack.ts).
@@ -92,6 +93,7 @@ export function App() {
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
         <Route path="abenteuer/:level?" element={<AdventurePage />} />
+        <Route path="pokale" element={<TrophyRoomPage />} />
         <Route path="impressum" element={<ImprintPage />} />
         <Route path="datenschutz" element={<PrivacyPage />} />
         <Route path="management" element={<ManagementPage />} />

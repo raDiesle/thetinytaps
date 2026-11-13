@@ -330,7 +330,7 @@ In a fresh worktree run `bun install` first.
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
   What a child does collect are **trophies** (user decision, November 2026): every level's or story's end gives the
-  trophy of that level, once, and it waits in the shelf on the home page – never a count while playing. One system for
+  trophy of that level, and it waits in the trophy room next to the shelf – never a count while playing; won again, its foot shows how often („3×“, `wins`, counted once per end: a trophy given early by `onGoal` is not counted again by its `GameEnd`). One system for
   every game: `GameEnd` awards it (`awardTrophy`, `src/lib/trophies.ts`, finding the game by its address) and hands it
   over so it is plainly won (user feedback, November 2026: small beside the buttons, bottom right in Aufs Töpfchen, it
   was hardly seen): big in the middle of the screen with „Geschafft!“ under it, then shrinking onto its little wooden
@@ -338,10 +338,18 @@ In a fresh worktree run `bun install` first.
   once; one transform, measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
-  bouncing. The newest stand at the right of the lowest board of picture books, books and trophies together in the
-  middle (`TrophyShelf`), and one tap there opens all of them by game; before the first one nothing stands there.
+  bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
+  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a small
+  paper sign nailed onto the shelf's right side above the loudspeaker (`TrophySign`, only once a trophy is won) – a tap
+  turns the eye to the right, a wall comes round with a door, it opens and one walks in – and by a tap on the trophy
+  landed beside a level's end buttons, which opens the room at that trophy shown big. Inside it is a little museum in
+  simple pseudo-3D using the whole screen: rooms of a few big trophies each on plinths, a brass plate on each plinth's
+  front with the level's name (`trophyNames.ts`, loaded per game, never a whole game's code) and the game's in the book's
+  serif, doorways to walk from room to room, and a tap on a trophy shows it whole and big; the medallion's picture is
+  big enough to be recognised (`museumLayout`, `trophies.test.ts`). The way back to the shelf is always there, in the top
+  left (the ribbon's shelf label), and the first room's left doorway leads there too.
   A game may give it before its end where reaching the goal once is enough (Kettenreaktion: one ball in the goal,
-  `onGoal`). „🏆 Alle Pokale im Regal ansehen“ at the top of `/management/` opens the shelf on `/?pokale=alle` with every
+  `onGoal`). „🏆 Alle Pokale im Pokalzimmer ansehen“ at the top of `/management/` opens `/pokale/?alle` with every
   trophy there is, for a look without playing – nothing stored (`everyTrophy`).
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
   some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.

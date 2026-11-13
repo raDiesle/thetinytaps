@@ -88,7 +88,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Spiele & Alltagshelfer für Kleinkinder – kostenlos",
     description:
       "Lernspiele und Alltagshelfer für Kleinkinder: Wimmelbilder, Gefühle, Buchstaben, Timer, Zähneputzen, Töpfchen, Belohnungstafel, Abstillen. Ohne Werbung.",
-    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. In den Büchern warten Wimmelbilder, Bewegungsabenteuer, Kettenreaktionen und kleine Abenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und Erkennen. Und weil der Tag mit einem kleinen Kind seine eigenen kleinen Hürden hat, stehen gleich daneben unsere Alltagshelfer: ein Timer, der die Zeit in Bildern zeigt, Zähneputzen mit Lied, das Töpfchen-Spiel, eine Belohnungstafel, ein Tagesplan in Bildern und ein Countdown „Wie oft noch schlafen?“ – am Tablet oder zum Ausdrucken – und Vorlesegeschichten in Kapiteln fürs Abstillen, für den Abschied vom Schnuller mit der Schnullerfee und für den Start in der Kita. Wer ein Spiel oder eine Geschichte zu Ende spielt, bekommt dafür einen eigenen kleinen Pokal, und alle Pokale sammeln sich unten im Regal bei den Büchern.",
+    text: "Fun for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. In den Büchern warten Wimmelbilder, Bewegungsabenteuer, Kettenreaktionen und kleine Abenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und Erkennen. Und weil der Tag mit einem kleinen Kind seine eigenen kleinen Hürden hat, stehen gleich daneben unsere Alltagshelfer: ein Timer, der die Zeit in Bildern zeigt, Zähneputzen mit Lied, das Töpfchen-Spiel, eine Belohnungstafel, ein Tagesplan in Bildern und ein Countdown „Wie oft noch schlafen?“ – am Tablet oder zum Ausdrucken – und Vorlesegeschichten in Kapiteln fürs Abstillen, für den Abschied vom Schnuller mit der Schnullerfee und für den Start in der Kita. Wer ein Spiel oder eine Geschichte zu Ende spielt, bekommt dafür einen eigenen kleinen Pokal, und alle Pokale stehen auf Sockeln in einem kleinen Pokalzimmer gleich neben dem Regal.",
   },
   {
     path: "/spiele/lebendige-welten/",
@@ -443,6 +443,8 @@ export const MOVED_PATHS: Record<string, string> = {
  */
 export const NO_INDEX_PATHS = [
   "/management/",
+  // The trophy room shows what this one child has won, nothing for a search.
+  "/pokale/",
   "/management/bilder/",
   "/ideen/",
   "/impressum/",

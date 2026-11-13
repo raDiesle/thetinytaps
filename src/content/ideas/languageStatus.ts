@@ -26,6 +26,11 @@ export interface LanguageStatusPart {
   recorded?: boolean;
   /** What is special, e.g. what is missing or what makes the next language hard. */
   note?: string;
+  /**
+   * Source files that are this part's alone (a page of the shared screens written English first): their inline texts are
+   * checked against this part's languages, and the row's other files against its other parts (`inlineTexts.test.ts`).
+   */
+  files?: string[];
 }
 
 /** One game (or the home page) and the languages it speaks, as a whole or part by part. */
@@ -471,9 +476,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Der Satz unter „Bitte quer halten“ (was die Seite bietet und warum quer, 10. November 2026) übersetzt auf Wunsch am 11. November 2026, wie Titel, „Vollbild“ und „Trotzdem hochkant“.",
       },
       {
-        label: "🏆 Pokale",
+        label: "🏆 Pokal am Ende eines Levels",
         languages: { de: "done" },
-        note: "Die Pokale im Regal (TrophyShelf.tsx, 11. November 2026): nur das Wort „Pokale“ (vorgelesen und über dem Schrank mit allen Pokalen) und „Geschafft!“ unter dem großen Pokal am Ende eines Levels (GameEnd.tsx, 12. November 2026) warten auf ihre Übersetzung; die Namen der Spiele darin sind schon übersetzt.",
+        note: "„Geschafft!“ unter dem großen Pokal am Ende eines Levels (GameEnd.tsx, 12. November 2026) wartet auf seine Übersetzung. Die Zahl der Siege auf dem Fuß des Pokals („3×“, 13. November 2026) braucht keine.",
+      },
+      {
+        label: "🏆 Pokalzimmer",
+        languages: { en: "done" },
+        files: [
+          "src/lib/museum.ts",
+          "src/components/TrophyMuseum.tsx",
+          "src/components/TrophySign.tsx",
+          "src/components/trophyNames.ts",
+          "src/pages/TrophyRoomPage.tsx",
+        ],
+        note: "Das Pokalzimmer neben dem Regal (/pokale/, 13. November 2026), englisch zuerst: „Trophy room“ (Schild am Regal, Raumname, Seitentitel, auch am Pokal am Ende eines Levels), „Next room“, „Room before“, „Put it back“ und „First won“ warten auf ihre Übersetzung, Deutsch eingeschlossen. „Zurück zum Bücherregal“ ist schon in allen Sprachen da, ebenso die Namen der Spiele und Level auf den Schildern der Sockel; „Tag“ und „Runde“ mit ihrer Zahl (trophyNames.ts) stehen in allen sieben Sprachen.",
       },
     ],
   },

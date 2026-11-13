@@ -32,7 +32,7 @@ export function trophyPicture(game: string, level: string): string | undefined {
 
 /**
  * A trophy for every level that has a picture, and one for every other finished game: what the shelf shows on
- * `/?pokale=alle`, so grown-ups can look at all of them without playing (the link on /management/). Never stored.
+ * `/pokale/?alle`, so grown-ups can look at all of them without playing (the link on /management/). Never stored.
  * „Wie geht's dir?“ borrows Gefühle's pictures, so it gets its one trophy only.
  */
 export function everyTrophy(): TrophyWon[] {
@@ -40,6 +40,7 @@ export function everyTrophy(): TrophyWon[] {
     .filter((game) => !game.unfinished)
     .flatMap((game) => {
       const levels = game.href === "/wie-gehts-dir/" ? [] : Object.keys(LEVELS[game.href] ?? {}).map((file) => file.replace(/\.webp$/, ""));
-      return (levels.length ? levels : [""]).map((level, i) => ({ game: game.href, level, at: i }));
+      // Some won more than once, so the test view shows the count on their foot too.
+      return (levels.length ? levels : [""]).map((level, i) => ({ game: game.href, level, at: i, wins: (i % 3) + 1 }));
     });
 }

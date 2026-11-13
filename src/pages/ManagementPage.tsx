@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
-import { ALL_TROPHIES } from "@/components/TrophyShelf";
+import { ALL_TROPHIES, MUSEUM_PATH } from "@/lib/museum";
 import { CATEGORIES, UNFINISHED } from "@/content/games";
 import { pick } from "@/lib/language";
 import {
@@ -188,9 +188,9 @@ export function ManagementPage() {
         <span aria-hidden>🧭</span> Management
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
-      {/* To look at every trophy on the shelf without playing: shown only for this visit of the page, nothing is stored. */}
+      {/* To look at every trophy in the trophy room without playing: shown only for this visit of the page, nothing is stored. */}
       <p className="ideas-test-links">
-        <Link to={`/?${ALL_TROPHIES}`}>🏆 Alle Pokale im Regal ansehen (zum Testen)</Link>
+        <Link to={`${MUSEUM_PATH}?${ALL_TROPHIES}`}>🏆 Alle Pokale im Pokalzimmer ansehen (zum Testen)</Link>
       </p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}

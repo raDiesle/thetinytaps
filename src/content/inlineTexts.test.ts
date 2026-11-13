@@ -165,13 +165,23 @@ describe("inline texts against the language status", () => {
 
   for (const row of LANGUAGE_STATUS)
     test(`${row.href}: a language marked as there is in every inline text`, () => {
-      const languages = APP_LANGUAGES.filter((language) => textsDone(row, language));
-      const missing = FOLDERS[row.href].flatMap(sources).flatMap((file) =>
-        inlineTexts(readFileSync(file, "utf8")).flatMap(({ line, text, keys }) => {
-          const lacking = languages.filter((language) => !keys.includes(language));
-          return lacking.length ? [`${file}:${line} ${text} – ${lacking.join(", ")}`] : [];
-        }),
-      );
+      // A part naming its own files is checked on them alone, the row's other files against its other parts.
+      const own = (row.parts ?? []).filter((part) => part.files?.length);
+      const ownFiles = new Set(own.flatMap((part) => part.files ?? []));
+      const rest = { ...row, parts: row.parts?.filter((part) => !part.files?.length) };
+      const checks: [LanguageStatusRow, string[]][] = [
+        [rest, FOLDERS[row.href].flatMap(sources).filter((file) => !ownFiles.has(file))],
+        ...own.map((part): [LanguageStatusRow, string[]] => [{ href: row.href, languages: part.languages }, part.files ?? []]),
+      ];
+      const missing = checks.flatMap(([checked, files]) => {
+        const languages = APP_LANGUAGES.filter((language) => textsDone(checked, language));
+        return files.flatMap((file) =>
+          inlineTexts(readFileSync(file, "utf8")).flatMap(({ line, text, keys }) => {
+            const lacking = languages.filter((language) => !keys.includes(language));
+            return lacking.length ? [`${file}:${line} ${text} – ${lacking.join(", ")}`] : [];
+          }),
+        );
+      });
       expect(missing).toEqual([]);
     });
 });
