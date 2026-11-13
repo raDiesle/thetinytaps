@@ -5,7 +5,7 @@ import { dayAfter, dayById, dayTitle } from "./days";
 import { groupAfter, groupById } from "./groups";
 import { PassPlay } from "./PassPlay";
 import type { FeelingsSettings } from "./settings";
-import { VoiceSwitch } from "./VoiceSwitch";
+import { VoiceSwitch } from "@/components/VoiceSwitch";
 
 /**
  * „Alltagssituationen“: the picked day (`byDay`) or feeling, going on where the child stopped last time; „Nochmal“

@@ -1033,99 +1033,10 @@
   }
 }
 
-/* A paper note like the ones clipped to the page, switched by one tap. */
-.story-voice {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  width: var(--note-w);
-  padding: 6px 4px 4px;
-  border: 1px solid #3d304566;
-  border-radius: 14px;
-  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf6ea) 70%, #fff);
-  box-shadow:
-    1px 2px 0 #5a3c1f26,
-    2px 4px 6px -2px #00000040;
-  color: var(--ink);
-  font: inherit;
-  cursor: pointer;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-}
-
-.story-voice svg {
-  display: block;
-  width: calc(var(--note-w) - 14px);
-  height: auto;
-}
-
-.story-voice-box {
-  fill: #b98552;
-  stroke: var(--ink);
-  stroke-width: 2.5;
-}
-
-.story-voice-side {
-  fill: #8a5a33;
-  stroke: var(--ink);
-  stroke-width: 2;
-}
-
-.story-voice-foot {
-  fill: #3a2f2a;
-}
-
-.story-voice-ring {
-  fill: #3e3236;
-  stroke: var(--ink);
-  stroke-width: 2;
-}
-
-.story-voice-cone {
-  fill: #5d4c51;
-}
-
-.story-voice-cap {
-  fill: #7a676c;
-  stroke: #2b2230;
-  stroke-width: 1.2;
-}
-
-.story-voice-bubble path {
-  fill: #fff;
-  stroke: var(--ink);
-  stroke-width: 2.4;
-  stroke-linejoin: round;
-}
-
-.story-voice-bubble circle {
-  fill: var(--ink);
-}
-
-.story-voice-off {
-  fill: none;
-  stroke: #b0473d;
-  stroke-width: 4;
-  stroke-linecap: round;
-}
-
-/* Switched off, the speaker pales a little, like the shelf's when the music is off. */
-.story-voice[aria-pressed="false"] .story-voice-box {
-  fill: #c9ab8a;
-}
-
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .story-play,
   .fg-day {
     --note-w: 50px;
-  }
-
-  .story-voice {
-    padding: 4px 3px 3px;
   }
 }
 

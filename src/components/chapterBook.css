@@ -1,6 +1,7 @@
 /*
  * A story book in chapters (`ChapterBook`: Tapsis Milchkette, Tapsi und die Schnullerfee): the page's picture as big
- * as the room above allows (.cb-picture-room, a size container), under it what the grown-up reads (.cb-words), the chapter's title over its first page; ◀ bottom left, ▶ bottom right.
+ * as the room above allows (.cb-picture-room, a size container), under it what the grown-up reads (.cb-words), the chapter's title over its first page; ◀ bottom left, ▶ bottom right
+ * with the loudspeaker above it where the book is read aloud.
  * Nothing moves but the page changing. Before the first page, the table of contents (.cb-contents, below).
  */
 
@@ -17,6 +18,10 @@
   background: #fbf3e2;
   color: #3d3045;
   user-select: none;
+  /* ◀ and ▶: their size, their distance from the side and from the bottom. */
+  --turn: clamp(48px, 7vw, 72px);
+  --turn-side: clamp(10px, 2vw, 26px);
+  --turn-bottom: clamp(10px, 3vh, 26px);
 }
 
 .cb-picture-room {
@@ -139,9 +144,9 @@
 
 .cb-turn {
   position: absolute;
-  bottom: clamp(10px, 3vh, 26px);
-  width: clamp(48px, 7vw, 72px);
-  height: clamp(48px, 7vw, 72px);
+  bottom: var(--turn-bottom);
+  width: var(--turn);
+  height: var(--turn);
   border-radius: 50%;
   border: 3px solid #3d3045;
   background: #ffd966;
@@ -152,12 +157,27 @@
 }
 
 .cb-back {
-  left: clamp(10px, 2vw, 26px);
+  left: var(--turn-side);
   background: #fffaf0;
 }
 
 .cb-next {
-  right: clamp(10px, 2vw, 26px);
+  right: var(--turn-side);
+}
+
+/*
+ * The loudspeaker that switches the voice reading the pages (`VoiceSwitch`, voiceSwitch.css): right above ▶, as wide
+ * as it, in the column kept free beside the picture, so it covers nothing. The padding round it keeps a tap that just
+ * missed it from turning the page.
+ */
+.cb-voice {
+  --note-w: var(--turn);
+  position: absolute;
+  right: calc(var(--turn-side) - 8px);
+  bottom: calc(var(--turn-bottom) + var(--turn) + 4px);
+  z-index: 2;
+  display: flex;
+  padding: 8px;
 }
 
 /*

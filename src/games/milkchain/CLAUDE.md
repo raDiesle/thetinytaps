@@ -53,8 +53,11 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   meaning changes loses its translations (they fall back to German). The rules for the child's languages hold here
   too: Tapsi in each script (Тапси, 塔普西, टैप्सी, تابسي), the breast named (Brust, breast, 乳房, छाती, pecho, صدر, грудь),
   Arabic with „let's“ instead of an imperative, Spanish without adjectives about Tapsi that change with gender.
-- The sentence under the picture is for the grown-up; the child follows the pictures. No voice and no browser voice:
-  a grown-up reads it.
+- **Tapsi's voice reads each page's sentence** as it comes (user decision, 13 November 2026, replacing „a grown-up
+  reads it, no voice“), from the recordings in `stimme/` (German) and `stimme/<language>/`, listed in `recordedLines.ts`
+  (`abstillen`) and made only when the user asks (`bun run voice make --only abstillen`); a page without its recording
+  stays silent, never the browser's voice. A loudspeaker above ▶ switches it off for grown-ups who read themselves
+  (`VoiceSwitch`, one switch for all chapter books, `ChapterBook`). A changed sentence needs its recording again.
 - **The picture as big as the screen allows, the words small under it** (user feedback, November 2026: the picture was
   small and the sentence big): the sentence is set like Gefühle's day pages (the book's serif, its first letter big and
   red) at `--caption-size`, between two curled flourishes, always in the room of the chapter's line and two lines so the

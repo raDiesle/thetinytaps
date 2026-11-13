@@ -372,9 +372,11 @@ In a fresh worktree run `bun install` first.
   one stays silent – except in a game whose story is told by the voice and can't be followed without it (Kleine
   Abenteuer, Bewegungsabenteuer): there the browser's voice (Google's) says a line until its recording is made
   (`recordedVoice(files, { browser: true })`, user decision, October 2026). Give a game that fallback only where it
-  really helps, never for a game that plays fine silent. Never add a switch for either again, with one exception: Gefühle's „Alltagssituationen“, where a grown-up
-  may want to tell the scenes to the child in their own words, has a loudspeaker in its bottom right corner, switched by one tap, that
-  switches its voice off (`VoiceSwitch`, user decision, November 2026) – only there, never as a pattern for other games. Recordings are made only when the user asks (see Language).
+  really helps, never for a game that plays fine silent. Never add a switch for either again, with one exception: where a grown-up may want to tell a story to the
+  child in their own words, a loudspeaker in its bottom right corner, switched by one tap, switches its voice off
+  (`VoiceSwitch` in `src/components/`, user decisions, November 2026) – Gefühle's „Alltagssituationen“ and the chapter
+  books read aloud by Tapsi's voice (`ChapterBook`'s `voice`: Abstillen, Schnullerfee, Kita-Start, one switch for all
+  three) – only there, never as a pattern for other games (`VoiceSwitch.test.ts`). Recordings are made only when the user asks (see Language).
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard, and on
@@ -662,7 +664,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   comes with its picture, not late; nothing waits longer than `SOUND_WAIT_MS`, then the game goes on silent. Fetched
   files stay as bytes and are decoded when said; decoded voice is kept only for `KEEP_SECONDS` (a decoded buffer is
   about ten times its MP3, which old phones can't hold). `loadAll` is only for a voice of a few dozen lines
-  (`voice.test.ts` checks), and a voice switched off (Gefühle's `VoiceSwitch`) loads nothing.
+  (`voice.test.ts` checks), and a voice switched off (`VoiceSwitch`) loads nothing.
 - Music: one background song plays behind the menus and every game from the first tap or key of the visit
   (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off

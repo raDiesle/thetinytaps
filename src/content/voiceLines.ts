@@ -5,9 +5,11 @@
 // few lines written inline in a component are copied here, and voiceLines.test.ts checks
 // that they are still in that file.
 
+import type { StoryChapter, StoryTranslation } from "@/components/ChapterBook";
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { languageFor } from "@/content/languages";
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { byLanguage, type TextsLanguageId } from "@/content/texts";
 import { ANIMALS, ANIMAL_TEXTS, GIFT_TEXTS, giverOf, GIVERS } from "@/games/animals/content";
 import { GIFTS } from "@/games/animals/gifts";
 import { GROW_TEXTS, GROWTHS } from "@/games/animals/growth";
@@ -55,6 +57,9 @@ import { ITEMS as SHADOW_ITEMS, PEEK_ITEMS, SHADOW_TEXTS } from "@/games/shadows
 import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
+import { KITA_STORY } from "@/games/kitastory/kitaStory";
+import { MILK_CHAIN } from "@/games/milkchain/milkChain";
+import { PACIFIER_STORY } from "@/games/pacifierstory/pacifierStory";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
@@ -62,6 +67,9 @@ import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
+import kitaFiles from "../games/kitastory/stimme/*.mp3?glob";
+import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
+import pacifierFiles from "../games/pacifierstory/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
 import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
 import feelingsFiles from "../games/feelings/stimme/*.mp3?glob";
@@ -347,6 +355,26 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
   ];
 }
 
+/** The chapter books' translations, filled as the languages' texts load. */
+const MILK_CHAIN_TEXTS = byLanguage((texts) => texts.milkChain);
+const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
+
+/**
+ * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
+ * German (which recordedLines.ts leaves out there).
+ */
+function chapterBook(
+  chapters: StoryChapter[],
+  language: TargetLanguageId,
+  translations: Partial<Record<TextsLanguageId, StoryTranslation>> = {},
+): VoiceGroup[] {
+  const translation = language === "de" ? undefined : translations[language];
+  return chapters.map((chapter) => ({
+    label: `Kapitel „${chapter.title}“`,
+    lines: once(chapter.pages.map((page) => translation?.pages[page.id] ?? page.text)),
+  }));
+}
+
 function timer(language: TargetLanguageId): VoiceGroup[] {
   const said = (line: Localized) => pick(line, language);
   const pictures = Object.values(PICTURE_LINES);
@@ -528,6 +556,9 @@ const RECORDED = new Set(
     pottyFiles,
     socksFiles,
     lettersFiles,
+    milkChainFiles,
+    pacifierFiles,
+    kitaFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
 );
 
@@ -569,6 +600,9 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/socken/", groups: socks(language) },
     { href: "/belohnungstafel/", groups: rewards() },
     { href: "/timer/", groups: timer(language) },
+    { href: "/abstillen/", groups: chapterBook(MILK_CHAIN, language, MILK_CHAIN_TEXTS) },
+    { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
+    { href: "/kita/", groups: chapterBook(KITA_STORY, language) },
     {
       href: "",
       groups: [

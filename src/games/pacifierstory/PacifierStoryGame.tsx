@@ -2,9 +2,14 @@ import { ChapterBook } from "@/components/ChapterBook";
 import { GameShell } from "@/components/GameShell";
 import { byLanguage } from "@/content/texts";
 import { useT } from "@/lib/language";
+import { recordedVoice } from "@/lib/voice";
 import pictureFiles from "./bilder/*.webp?glob";
+import voiceFiles from "./stimme/**/*.mp3?glob";
 import { PACIFIER_STORY } from "./pacifierStory";
 import { PACIFIER_STORY_TITLE } from "./names";
+
+/** Tapsi's voice reading the pages, from `stimme/` (German) and `stimme/<language>/`; a page not recorded yet stays silent. */
+const VOICE = recordedVoice(voiceFiles);
 
 /** Each page's picture by its file name without extension (`fee-<page id>`). */
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
@@ -22,7 +27,7 @@ export function PacifierStoryGame() {
       // One story with nothing to choose before it: it starts at once, and ✕ goes back to the page before it.
       startMode="story"
     >
-      <ChapterBook chapters={PACIFIER_STORY} title={PACIFIER_STORY_TITLE} pictureOf={pictureOf} translations={TRANSLATIONS} code="S" />
+      <ChapterBook chapters={PACIFIER_STORY} voice={VOICE} title={PACIFIER_STORY_TITLE} pictureOf={pictureOf} translations={TRANSLATIONS} code="S" />
     </GameShell>
   );
 }

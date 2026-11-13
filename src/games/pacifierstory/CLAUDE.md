@@ -18,7 +18,9 @@ Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and w
   toys), as the picture queue takes them; a made picture goes on `MADE`.
 - `PacifierStoryGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as
   „Abstillen“: table of contents first, one page per tap, the picture big and the sentence small under it; dev tags
-  `S0`, `S<chapter>-<page>`). A change to how the book reads goes there, so both books get it.
+  `S0`, `S<chapter>-<page>`). A change to how the book reads goes there, so both books get it. Tapsi's voice reads each page's sentence (`voice`, from
+  `stimme/`, listed in `recordedLines.ts` as `schnullerfee`, recorded only when the user asks), and the loudspeaker above ▶
+  switches it off (`VoiceSwitch`, user decision, 13 November 2026); a page without its recording stays silent.
 - `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
   (translated on request, 10 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with
   `byLanguage` (`pacifierStory`), passed to `ChapterBook` as `translations`.

@@ -3,11 +3,14 @@ import { DevTag } from "@/components/DevTag";
 import { GameEnd } from "@/components/GameEnd";
 import { useInnerBack } from "@/components/GameShell";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
+import { VoiceSwitch } from "@/components/VoiceSwitch";
 import type { TextsLanguageId } from "@/content/texts";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
 import { stepIndexInAddress, useStepAddress } from "@/lib/stepAddress";
+import { useStoredSettings } from "@/lib/storage";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
+import { hush, type RecordedVoice } from "@/lib/voice";
 import "./chapterBook.css";
 
 /** One page of a story book: its picture (found by `pictureOf(id)`) and the sentence a grown-up reads under it. */
@@ -51,6 +54,12 @@ const CHAPTER = {
 /** The table of contents at the book's start, where no page of the story is open. */
 const CONTENTS = -1;
 
+/**
+ * Whether the chapter books read their pages aloud, one switch for all of them (`VoiceSwitch`): a grown-up who tells
+ * the stories in their own words wants every book silent, not only the one where they found the loudspeaker.
+ */
+const VOICE_KEY = "tinytaps.chapterBook.v1";
+
 const NEXT = { de: "Weiter", en: "Next", zh: "下一页", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" };
 const BACK = { de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "पिछला पन्ना", es: "Página anterior", ar: "الصفحة السابقة", ru: "Назад" };
 
@@ -62,6 +71,11 @@ const BACK = { de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "�
  * Any tap or key turns on (← and Backspace back, ◀ bottom left, from the first page back to the contents); the corner
  * goes back to the contents (`useInnerBack`), and the last page ends with „Nochmal“, which opens the contents again. A
  * page whose picture isn't made yet shows a paper placeholder in its place.
+ *
+ * With `voice`, Tapsi's voice reads each page's sentence as it comes (user decision, November 2026), from the book's
+ * recordings in the app language – a page without one stays silent, never German in another language. The loudspeaker
+ * in the bottom right corner, above ▶, switches it off for grown-ups who read themselves (`VoiceSwitch`). Only the
+ * page on screen and the next one are loaded (on the contents, each chapter's first page), nothing while it is off.
  */
 export function ChapterBook({
   chapters,
@@ -69,6 +83,7 @@ export function ChapterBook({
   pictureOf,
   translations,
   code = "K",
+  voice,
 }: {
   /** The story, in reading order. */
   chapters: StoryChapter[];
@@ -80,6 +95,8 @@ export function ChapterBook({
   translations?: Partial<Record<TextsLanguageId, StoryTranslation>>;
   /** The letter of its dev tags (`K0` for the contents, `K<chapter>-<page>`). */
   code?: string;
+  /** The book's recorded voice (its `stimme/` folder), reading each page aloud; without it the book is silent. */
+  voice?: RecordedVoice;
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
@@ -102,6 +119,21 @@ export function ChapterBook({
   // The page on screen is in the address: its number in the whole story, from 1 (stepAddress.ts).
   useStepAddress(index === CONTENTS ? "inhalt" : index + 1);
   const { effects, ripple } = useTapFeedback();
+
+  const [stored, store] = useStoredSettings(VOICE_KEY, { voice: true });
+  const reading = voice !== undefined && stored.voice;
+  const sentenceOf = useCallback((page: StoryPage) => translation?.pages[page.id] ?? page.text, [translation]);
+  const said = index === CONTENTS ? undefined : sentenceOf(pages[index]);
+  // What comes next: the next page, or from the contents each chapter's first page.
+  const ahead = index === CONTENTS ? starts.map((s) => sentenceOf(pages[s])) : index < LAST ? [sentenceOf(pages[index + 1])] : [];
+  const aheadKey = JSON.stringify(ahead);
+  useEffect(() => {
+    if (!voice || !reading) return;
+    if (said !== undefined) voice.say(said, language);
+    voice.load(JSON.parse(aheadKey), language);
+    // A page turned, the book closed or the voice switched off: what was being read stops.
+    return hush;
+  }, [voice, reading, said, aheadKey, language]);
 
   const show = useCallback(
     (next: number) => {
@@ -270,6 +302,11 @@ export function ChapterBook({
         >
           ▶
         </button>
+      )}
+      {voice && (
+        <div className="cb-voice" onPointerDown={(e) => e.stopPropagation()}>
+          <VoiceSwitch on={stored.voice} onToggle={() => store({ voice: !stored.voice })} />
+        </div>
       )}
       {/* One story, so only „Nochmal“; small in the corners, so the last picture stays free. */}
       {last && <GameEnd delayMs={600} onAgain={() => show(CONTENTS)} corners />}

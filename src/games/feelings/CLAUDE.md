@@ -127,7 +127,9 @@ the question, the answers, „Juhu!“ – and the bubble gives way to a red cro
 (crying, laughing, a crash) stay. It is kept in `settings.voice` and checked when a line is due (`useVoice`), so lines
 already waiting stay silent too, and the beats keep the length of their recordings, giving the grown-up the same time
 to tell them. „Wie geht's dir?“ and „Was brauche ich?“ always speak (their `…Game` sets `voice: true`) and
-have no such switch; no other game gets one (`feelings.test.ts`).
+have no such switch; besides the chapter books read aloud (`ChapterBook`), no other game gets one
+(`feelings.test.ts`, `VoiceSwitch.test.ts`). The switch itself is shared (`src/components/VoiceSwitch.tsx` and its
+`voiceSwitch.css`); where it stands is this game's (`.story-corner` in `feelings.css`).
 
 **The whole text stands under the pictures (user wish, November 2026):** everything the voice says in a round – the
 scene and its question, the not-so-good idea's answer, what the good one tells, the happy end – stands whole under the
