@@ -55,7 +55,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Indoor Movement Games for Toddlers",
       description:
         "Movement adventures to join in: Tapsi the fox shows jumping, stretching and sneaking, and the child moves along in front of the screen. No ads.",
-      text: "A movement story for indoors: Tapsi jumps, ducks and stretches, the child joins in, and the world answers. No reading needed, Tapsi says it all.",
+      text: "Movement stories for indoors, on a treasure island or on a trip with a little cloud: Tapsi jumps, ducks and stretches, the child joins in, and the world answers. No reading needed, Tapsi says it all.",
     },
     "/gefuehle/": {
       title: "Feelings for Toddlers – Everyday Situations",

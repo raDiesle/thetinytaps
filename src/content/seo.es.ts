@@ -57,7 +57,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Juegos de movimiento en casa para niños pequeños",
       description:
         "Aventuras en movimiento para hacer juntos: el zorro Tapsi enseña a saltar, estirarse y andar de puntillas, y el niño lo imita frente a la pantalla.",
-      text: "Una historia de movimiento para casa: Tapsi salta, se agacha y se estira, el niño se mueve con él y el mundo responde. Sin leer: Tapsi lo dice todo.",
+      text: "Historias de movimiento para casa, en la isla del tesoro o de viaje en una nubecita: Tapsi salta, se agacha y se estira, el niño se mueve con él y el mundo responde. Sin leer: Tapsi lo dice todo.",
     },
     "/gefuehle/": {
       title: "Emociones para niños pequeños: situaciones cotidianas",
