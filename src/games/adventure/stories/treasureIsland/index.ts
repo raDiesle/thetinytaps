@@ -771,6 +771,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   }
 
   /**
+   * Which way the elbows point as the paddle is put down (body space, the left arm's; the right one's mirrored): out
+   * to their own side, forwards and down, so the left arm following the shaft over to the right as it swings out
+   * bends round the body, never into it. Taken only once the paddle lies on the lap again; paddling bends as before.
+   */
+  const PADDLE_ELBOW_L = v3(1, -0.6, 0.4);
+  const PADDLE_ELBOW_R = v3(-1, -0.6, 0.4);
+
+  /**
    * The paddle lies along Ole's shell while Tapsi waves, fishes and
    * sits down; before paddling, Tapsi takes it onto the lap with the right paw
    * first. Then it is always in Tapsi's paws: lying across the lap,
@@ -852,12 +860,13 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       const along = tmpC.set(0, 1, 0).applyQuaternion(paddle.quaternion);
       const center = paddle.position;
       const letGo = smooth((praise - 1.35) / 0.3);
-      for (const [hand, at, lap, weight] of [
-        ["L", left, PADDLE_GRIP, (1 - letGo) * grabL],
-        ["R", right, -PADDLE_GRIP, (1 - letGo) * grabR],
+      const steer = smooth((praise - 0.9) / 0.4);
+      for (const [hand, at, lap, weight, elbow] of [
+        ["L", left, PADDLE_GRIP, (1 - letGo) * grabL, PADDLE_ELBOW_L],
+        ["R", right, -PADDLE_GRIP, (1 - letGo) * grabR, PADDLE_ELBOW_R],
       ] as const) {
         const s = lap + (at.clone().sub(center).dot(along) - lap) * hold;
-        guide.hold(hand, center.clone().addScaledVector(along, s), along, weight);
+        guide.hold(hand, center.clone().addScaledVector(along, s), along, weight, elbow, steer);
       }
     }
     if (step === S.paddle && crossed(f, LEAD[S.paddle] + actLength(S.paddle) + 2.1)) {
@@ -949,6 +958,13 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const landing = (n: number, out: THREE.Vector3) => out.set([0.3, -0.5, 0.6, -0.2, 0.1][n % 5], 0, BOAT_START - CAST_REACH - (n % 2) * 0.5);
 
   /**
+   * Which way the right elbow points as the rod is laid down (body space): out to the right and down, so the arm
+   * following the rod's end to and from the left side bends round the body instead of flipping into the chest. Taken
+   * only while the rod is taken up or laid down; the cast bends as before.
+   */
+  const ROD_ELBOW_R = v3(-1, -1, 0.2);
+
+  /**
    * The fishing rod lies on Ole's back while Tapsi waves; Tapsi picks it up and holds it in both paws,
    * tipped up, the float on its line. Each cast swings it back sideways over the right shoulder and out
    * ahead, and a fish leaps over the float. After the fishing Tapsi lays the rod down on Ole's back
@@ -1028,7 +1044,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     updateMoved(rod);
     if (grip > 0) {
       const along = new THREE.Vector3(0, 1, 0).applyQuaternion(rod.quaternion);
-      guide.hold("R", rod.position.clone().addScaledVector(along, ROD_GRIP_R), along, gripR);
+      guide.hold(
+        "R",
+        rod.position.clone().addScaledVector(along, ROD_GRIP_R),
+        along,
+        gripR,
+        ROD_ELBOW_R,
+        fishing ? Math.max(smooth(praise / 0.25), smooth((down - 0.05) / 0.3)) : 0,
+      );
       // The left arm reaches across in front of the body: its elbow forwards and down, under the chin.
       guide.hold("L", rod.position.clone().addScaledVector(along, ROD_GRIP_L), along, grip, rodElbowL(clip > 0 ? castSwing(clip).back : 0, tmpD));
     }
@@ -1071,6 +1094,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     });
   }
 
+  /**
+   * Which way the right elbow points while the paw holds the key (body space): out to the right and down. Left to
+   * itself the bend flips from one side of the arm to the other as the ring turns, and one of them goes into the chest.
+   */
+  const KEY_ELBOW = v3(-1, -1, 0);
+
   /** While the key turns in the lock, the right paw holds its ring and turns with it. */
   function holdKey(f: StoryFrame) {
     const clip = f.act + f.demo;
@@ -1080,8 +1109,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     key.updateMatrixWorld(true);
     const ring = key.localToWorld(new THREE.Vector3(0, 0, -0.19));
     const across = new THREE.Vector3(0, 1, 0).applyQuaternion(key.quaternion);
-    guide.hold("R", ring, across, weight);
+    guide.hold("R", ring, across, weight, KEY_ELBOW);
   }
+
+  /**
+   * Which way the elbows point at the crank (body space): out to their own side and forwards, so an arm reaching
+   * across in front of the chest (the left one with the bar on the right, the right one low on the left) bends round
+   * the body instead of down and back into it.
+   */
+  const CRANK_ELBOW_L = v3(1, -0.5, 0.5);
+  const CRANK_ELBOW_R = v3(-1, -0.5, 0.5);
 
   /** Both paws on the level bar of the crank, all the way round, from just before Tapsi starts to turn it. */
   function holdCrank(f: StoryFrame) {
@@ -1093,8 +1130,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const bar = gate.bar.getWorldPosition(new THREE.Vector3());
     const across = new THREE.Vector3(1, 0, 0);
     // Tapsi's right is +x here, facing the island: the bar reaches from the knob over to it.
-    guide.hold("L", bar.clone().addScaledVector(across, CRANK_GRIPS.L), across, weight);
-    guide.hold("R", bar.clone().addScaledVector(across, CRANK_GRIPS.R), across, weight);
+    guide.hold("L", bar.clone().addScaledVector(across, CRANK_GRIPS.L), across, weight, CRANK_ELBOW_L);
+    guide.hold("R", bar.clone().addScaledVector(across, CRANK_GRIPS.R), across, weight, CRANK_ELBOW_R);
   }
 
   /**

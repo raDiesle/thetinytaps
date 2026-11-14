@@ -21,7 +21,7 @@ const ARM_FROM = 0.3;
 /** Seconds between the frames checked. */
 const EVERY = 0.1;
 
-/** Where things reach into the guide's body: the deepest moment of each, as "what at time: depth". */
+/** Where things reach into the guide's body: the deepest moment of each in each step, as "what in step n at time: depth". */
 function overlaps(story: Story) {
   const stage = quietStage();
   const guide = new Guide();
@@ -29,10 +29,12 @@ function overlaps(story: Story) {
   const world = withoutScreen(() => story.build(stage, guide, () => {}));
   const { starts, total } = storyTimes(story);
   const worst = new Map<string, { time: number; depth: number; step: number }>();
+  // The deepest moment of each thing in each step: kept by thing alone, one step's hit hid every other step's.
   const note = (what: string, depth: number, time: number, step: number) => {
     if (depth <= FUR) return;
-    const was = worst.get(what);
-    if (!was || depth > was.depth) worst.set(what, { time, depth, step });
+    const key = `${what} in step ${step}`;
+    const was = worst.get(key);
+    if (!was || depth > was.depth) worst.set(key, { time, depth, step });
   };
   const [point, a, b] = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
   const names = new Map((world.held?.() ?? []).map((thing, i) => [thing, thing.name || `held thing ${i + 1}`]));
@@ -45,18 +47,18 @@ function overlaps(story: Story) {
     guide.apply(worldPose(storyPose(story, f, result.walking ? 1 : 0), result), t);
     world.afterPose?.(f);
     const inside = guide.insideNow();
-    const inHead = guide.insideNow(true);
     for (const hand of ["L", "R"] as const) {
       note(`paw ${hand}`, inside(guide.gripPoint(hand, point)), t, f.step);
-      // The arm along its middle line, from below the shoulder through the elbow to the wrist, against the head (an arm
-      // pressed on the torso while reaching across is not yet checked: the crank, paddle and key still do that).
+      // The arm along its middle line, from below the shoulder through the elbow to the wrist, against the whole body:
+      // an arm reaching across in front of the chest (the crank, the key, picking up or laying down the rod and the
+      // paddle) went into the torso with the usual bend of its elbow, though its paw stayed clear.
       const shoulder = guide.bodyPoint(a.set(SHOULDER.x * (hand === "L" ? 1 : -1), SHOULDER.y, 0), a);
       const forearm = guide.forearm(hand, new THREE.Matrix4());
       const elbow = new THREE.Vector3().setFromMatrixPosition(forearm);
       const wrist = b.set(0, -FOREARM, 0).applyMatrix4(forearm);
       for (let k = 0; k <= 10; k++) {
-        note(`arm ${hand}`, inHead(point.lerpVectors(shoulder, elbow, ARM_FROM + ((1 - ARM_FROM) * k) / 10)), t, f.step);
-        note(`arm ${hand}`, inHead(point.lerpVectors(elbow, wrist, k / 10)), t, f.step);
+        note(`arm ${hand}`, inside(point.lerpVectors(shoulder, elbow, ARM_FROM + ((1 - ARM_FROM) * k) / 10)), t, f.step);
+        note(`arm ${hand}`, inside(point.lerpVectors(elbow, wrist, k / 10)), t, f.step);
       }
     }
     const body = guide.root.getWorldPosition(new THREE.Vector3());
@@ -86,7 +88,7 @@ function overlaps(story: Story) {
       });
     }
   }
-  return [...worst].map(([what, w]) => `${what} in step ${w.step} at ${w.time.toFixed(1)} s: ${w.depth.toFixed(3)} deep`);
+  return [...worst].map(([what, w]) => `${what} at ${w.time.toFixed(1)} s: ${w.depth.toFixed(3)} deep`);
 }
 
 test("in Die Schatzinsel nothing reaches into Tapsi's body", () => {

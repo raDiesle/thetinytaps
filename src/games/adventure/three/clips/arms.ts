@@ -631,16 +631,20 @@ export const ARM_CLIPS = clips({
   crank: (t, p) => {
     // Both hands on the long handle of a big crank beside the body on the left, turning big circles in front:
     // from the left up, over to the right, down and back. The whole body goes along: the chest follows the
-    // handle from side to side, the knees bend at the bottom and the toes lift at the top.
+    // handle from side to side, the knees bend at the bottom and the toes lift at the top. The elbows stay out to
+    // their own side, so the arm reaching across in front of the chest bends round it, never into it; the angles
+    // are those the story's grip on the handle brings the arms to (`holdCrank`), so the child figure moves alike.
     const a = phase(t, CRANK_PERIOD) * TAU;
     const side = Math.cos(a);
     const up = Math.sin(a);
-    for (const arm of [p.armL, p.armR]) {
-      arm.raise = 1.2 + up * 0.8;
-      arm.elbow = 0.7 - up * 0.5;
-    }
-    p.armL.spread = TOGETHER + 0.35 + side * 0.7;
-    p.armR.spread = TOGETHER + 0.25 - side * 0.7;
+    p.armL.raise = 1.11 + up * 0.43;
+    p.armL.spread = 0.46 + side * 0.33;
+    p.armL.twist = -1.23 + side * 0.15 + up * 0.34;
+    p.armL.elbow = 1.54 + up * 0.14;
+    p.armR.raise = 1.05 + side * 0.12 + up * 0.41;
+    p.armR.spread = 0.58 - side * 0.39;
+    p.armR.twist = -1.19 - side * 0.2 + up * 0.4;
+    p.armR.elbow = 1.64 - side * 0.15 + up * 0.16;
     p.turn = 0.1;
     p.twist = side * 0.3;
     p.shift = side * 0.06;
@@ -666,12 +670,14 @@ export const ARM_CLIPS = clips({
       p.armL.elbow = 0.25 + rise * 0.95;
       return;
     }
-    // The key in the lock in front: the paw turns it a quarter round and back.
+    // The key in the lock in front: the paw turns it a quarter round and back, the elbow out to the right and down
+    // (the angles the story's grip on the ring brings the arm to, `holdKey`); the forearm turns the paw with the key.
     const k = keyTurn(t);
-    p.armR.raise = 1.25;
-    p.armR.spread = -0.12;
-    p.armR.elbow = 0.55;
-    p.armR.twist = k * 1.4;
+    p.armR.raise = 0.55 + k * 0.09;
+    p.armR.spread = 0.35 - k * 0.21;
+    p.armR.twist = -0.89 - k * 0.08;
+    p.armR.elbow = 1.39 - k * 0.18;
+    p.armR.palm = k;
     p.armL.raise = 0.6;
     p.armL.spread = 0.3;
     p.armL.elbow = 1.2;

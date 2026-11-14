@@ -240,9 +240,6 @@ const HEAD_SCALE = 0.74;
 /** The skull in the face's own units: its radius, how it is stretched (x, y, z) and how high it sits. */
 const SKULL = { radius: 0.27, scale: [1.08, 0.95, 0.95] as [number, number, number], y: 0.16 };
 
-/** Where the neck begins, in the spine's space: above the shoulders' round tops. */
-const NECK_FROM = 0.47;
-
 /** A soft bump round `at`, `width` wide, 1 at its top. */
 const bump = (y: number, at: number, width: number) => Math.exp(-(((y - at) / width) ** 2));
 
@@ -977,10 +974,9 @@ export class Guide {
   /**
    * Tells how deep a point (world space) lies inside the torso or the skull, in fox units, 0 or less outside – for the
    * body as it stands now. So a test can tell that nothing the fox holds, and none of its own paws, reaches into its
-   * body (`collisions.test.ts`). With `headOnly` it measures only against the head and neck: the skull and the torso
-   * above the shoulders (`NECK_FROM`), where an arm passing by may never go.
+   * body, nor any of its arms (`collisions.test.ts`).
    */
-  insideNow(headOnly = false) {
+  insideNow() {
     this.spine.updateWorldMatrix(true, false);
     this.head.updateWorldMatrix(false, false);
     const toSpine = this.spine.matrixWorld.clone().invert();
@@ -994,7 +990,7 @@ export class Guide {
       p.copy(world).applyMatrix4(toSpine);
       let deep = -Infinity;
       const r = torsoHalfWidth(p.y);
-      if (r > 0 && (!headOnly || p.y > NECK_FROM)) deep = (1 - Math.hypot(p.x / r, p.z / (r * torsoDepth(p.y, p.z > 0)))) * r;
+      if (r > 0) deep = (1 - Math.hypot(p.x / r, p.z / (r * torsoDepth(p.y, p.z > 0)))) * r;
       // The skull, as the face draws it.
       p.copy(world).applyMatrix4(toFace);
       const s = Math.hypot(p.x / sx, (p.y - SKULL.y) / sy, p.z / sz) / SKULL.radius;
@@ -1019,10 +1015,12 @@ export class Guide {
    * and the fingers close round it. The arm bends in the plane across the bar, the elbow down and
    * back – or, given `elbow` (a direction in the body's own space, like bodyPoint's), towards that, the forearm
    * turning so the bar still lies across the paw: an arm reaching across in front of the body bends its elbow
-   * forwards, under the chin, never back through the chest or the head. `weight` blends from the pose (0) to
-   * holding on (1). Called after apply(), every frame.
+   * forwards, under the chin, never back through the chest or the head. `elbowWeight` blends from the usual bend (0)
+   * to that direction (1), so a hold can take it only for the moment it needs it (laying something down across the
+   * body) and bend as before everywhere else. `weight` blends from the pose (0) to holding on (1). Called after
+   * apply(), every frame.
    */
-  hold(hand: "L" | "R", target: THREE.Vector3, along: THREE.Vector3, weight: number, elbow?: THREE.Vector3) {
+  hold(hand: "L" | "R", target: THREE.Vector3, along: THREE.Vector3, weight: number, elbow?: THREE.Vector3, elbowWeight = 1) {
     if (weight <= 0) return;
     const a = hand === "L" ? this.armL : this.armR;
     const side = hand === "L" ? 1 : -1;
@@ -1040,10 +1038,16 @@ export class Guide {
     if (across.lengthSq() < 1e-6) across.set(1, 0, 0);
     across.normalize();
     const toElbow = new THREE.Vector3().crossVectors(across, dir);
-    if (elbow) {
+    if (toElbow.dot(new THREE.Vector3(side * 0.3, -1, -0.6)) < 0) toElbow.negate();
+    const steered = elbow !== undefined && elbowWeight > 0;
+    if (steered) {
       const wanted = elbow.clone().addScaledVector(dir, -elbow.dot(dir));
-      if (wanted.lengthSq() > 1e-6) toElbow.copy(wanted.normalize());
-    } else if (toElbow.dot(new THREE.Vector3(side * 0.3, -1, -0.6)) < 0) toElbow.negate();
+      if (wanted.lengthSq() > 1e-6) {
+        // Round the arm's axis from the usual bend towards the wanted one: both lie across it.
+        const angle = Math.atan2(new THREE.Vector3().crossVectors(toElbow, wanted.normalize()).dot(dir), toElbow.dot(wanted));
+        toElbow.applyAxisAngle(dir, angle * Math.min(1, elbowWeight)).normalize();
+      }
+    }
     const cosShoulder = (UPPER_ARM ** 2 + dist ** 2 - forearm ** 2) / (2 * UPPER_ARM * dist);
     const cosElbow = (UPPER_ARM ** 2 + forearm ** 2 - dist ** 2) / (2 * UPPER_ARM * forearm);
     const shoulderAngle = Math.acos(THREE.MathUtils.clamp(cosShoulder, -1, 1));
@@ -1062,7 +1066,7 @@ export class Guide {
     // Bent the usual way the bar already lies across the paw (along its x); bent another way, the forearm turns
     // round itself until it does again, the shorter way round.
     let turn = 0;
-    if (elbow) {
+    if (steered) {
       a.shoulder.updateMatrixWorld(true);
       const inElbow = along.clone().transformDirection(a.elbow.matrixWorld.clone().invert());
       turn = Math.atan2(-inElbow.z, inElbow.x);

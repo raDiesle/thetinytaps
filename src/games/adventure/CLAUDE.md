@@ -68,11 +68,15 @@ No solid thing reaches into another (user feedback, November 2026: picking up th
 body); only water, air, clouds and the thin fishing line may be passed through. `three/collisions.test.ts` plays every
 story frame by frame without a screen – the same clock and poses as the player (`storyTimes`, `storyFrame`,
 `storyPose`, `worldPose` exported from `three/player.ts`) – and fails on any moment where a paw or something Tapsi
-holds reaches more than `FUR` into its torso or head, or an arm (upper arm below the shoulder, forearm) into its head or
-neck (`guide.insideNow()`, measured against the same torso outline and skull the meshes are built from; an arm crossing
-in front of the body with the default bend went through chin and neck while its paw stayed clear). An arm reaching
-across or up beside the head gets an elbow direction in `guide.hold` (the rod's left elbow forwards, the bell rope's
-elbows out). Arms pressing into the torso are not checked yet: the crank, paddle and key still do it. A story lists what Tapsi holds, picks up or puts down in `StoryWorld.held()`: a new
+holds reaches more than `FUR` into its torso or head, or an arm (upper arm below the shoulder, forearm) into its torso,
+neck or head (`guide.insideNow()`, measured against the same torso outline and skull the meshes are built from; an arm
+crossing in front of the body with the default bend went through chin and neck while its paw stayed clear, and the
+crank, paddle and key pressed the arms into the chest). An arm reaching across in front of the body or up beside the
+head gets an elbow direction in `guide.hold` (body space): the rod's left elbow forwards and its right elbow out, the
+bell rope's, the crank's and the paddle's elbows out, the key's elbow out to the right. Where a hint would change a
+movement that is already clear (paddling, the cast), `elbowWeight` steers only while the thing is picked up or laid
+down. The clip angles follow the grip (crank, `turn_key`), so the child figure moves alike. The test reports each
+step's deepest hit on its own, keyed by thing and step: keyed by thing alone, one step's hit hid all others. A story lists what Tapsi holds, picks up or puts down in `StoryWorld.held()`: a new
 prop in Tapsi's paws goes there, and a new story gets its own test there. Clips that pass a held thing near the body
 (picking up, laying down, a wind-up) are checked by it; when it fails, it names the thing, the step and the second, so
 `__adventure.seek` shows the moment.

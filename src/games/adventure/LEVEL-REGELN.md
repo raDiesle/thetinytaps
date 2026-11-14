@@ -152,9 +152,11 @@ Fehler in späteren Leveln nicht wieder passiert.
   Körper quer hinüber, tief unter dem Kinn, und erst neben dem Kopf hoch hinter die rechte Schulter; der
   Rumpf dreht weit mit, so liegt sie von hinten gesehen wirklich hinter der Schulter. **Kein Arm geht
   durch Kopf, Kinn oder Hals**, nur daran vorbei (Rückmeldung November 2026: der linke Arm lief beim
-  Ausholen durch den Kopf, obwohl die Pfoten frei waren) – ein Arm, der vor dem Körper hinübergreift,
-  bekommt seinen Ellbogen nach vorn (`guide.hold(…, elbow)`), sonst knickt er nach hinten durch Brust
-  und Hals. Wo ein Arm hinter dem Körper ist, scheint er durch; er geht aber nie in den Körper hinein.
+  Ausholen durch den Kopf, obwohl die Pfoten frei waren), und **auch nicht in Brust oder Bauch** (an
+  der Kurbel, am Paddel und am Schlüssel drückten die Arme in die Brust) – ein Arm, der vor dem Körper
+  hinübergreift, bekommt eine Ellbogenrichtung (`guide.hold(…, elbow)`: nach vorn oder nach außen),
+  sonst knickt er nach hinten durch Brust und Hals. Ändert die Richtung eine Bewegung, die schon frei
+  ist (Paddeln, Auswerfen), lenkt sie nur beim Aufheben und Ablegen (`elbowWeight`). Wo ein Arm hinter dem Körper ist, scheint er durch; er geht aber nie in den Körper hinein.
   Das Ding in der Hand legt fest, wo die Pfoten sind, nicht umgekehrt, und der Clip nimmt die Winkel an,
   in die der Griff die Arme bringt, damit die Kinderfigur dasselbe zeigt.
 - **Wer weggescheucht wird, ist im Bild**: Viele und groß (die Vögel dreimal so groß wie gebaut, zwei
@@ -215,7 +217,8 @@ Fehler in späteren Leveln nicht wieder passiert.
   als brauner Ring durch den Fuchs). Von der Seite anschauen und nachmessen. **Ein Test prüft es**
   (`three/collisions.test.ts`): Er spielt jede Geschichte Bild für Bild ohne Bildschirm ab und meldet
   jeden Moment, in dem eine Pfote oder etwas, das Tapsi hält, aufhebt oder ablegt, in Rumpf oder Kopf
-  steckt oder ein Arm in Kopf oder Hals (beim Aufheben der Angel steckten Pfote und Angel im Bauch, Rückmeldung November 2026). Jedes
+  steckt oder ein Arm im Körper, in Hals oder Kopf (beim Aufheben der Angel steckten Pfote und Angel im Bauch, Rückmeldung November 2026). Er
+  meldet für jeden Schritt den tiefsten Treffer einzeln, sonst verdeckt einer alle anderen. Jedes
   neue Ding in Tapsis Pfoten kommt in `held()` der Geschichte. **Aufheben und Ablegen gehen um den
   Körper herum**: erst zur Seite neben den Körper, dann nach vorn in die Pfoten; die zweite Pfote greift
   erst zu, wenn das Ding vor der Brust ist, und lässt beim Ablegen zuerst los. Dreht sich etwas Langes
