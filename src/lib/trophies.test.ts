@@ -108,6 +108,13 @@ describe("trophies", () => {
     expect(readFileSync("src/styles/museum.css", "utf8")).toContain("@keyframes museum-lens-clip");
   });
 
+  test("every door says where it leads, and a plan of all rooms shows where one is and walks to any of them", () => {
+    const code = readFileSync("src/components/TrophyMuseum.tsx", "utf8");
+    expect(code).toContain("museum-door-sign");
+    expect(code).toContain("museum-plan-room");
+    expect(code).toContain('aria-current={key === now ? "location"');
+  });
+
   test("a trophy won again shows its count on its foot, and a tap on it at a level's end opens the trophy room", () => {
     expect(readFileSync("src/components/Trophy.tsx", "utf8")).toContain("trophy-wins");
     expect(readFileSync("src/components/GameEnd.tsx", "utf8")).toContain("museumHref(");

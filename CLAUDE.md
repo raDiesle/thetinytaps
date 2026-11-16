@@ -352,6 +352,9 @@ In a fresh worktree run `bun install` first.
   repeated on every trophy (the game's name only where a room holds several games). A tap on a trophy shows it whole
   and big (`trophyNames.ts`, loaded per game, never a whole game's code; `trophies.test.ts`). The way back to the shelf
   is always there, in the top left (the ribbon's shelf label); the left doorway leads one room back, the hall's to the shelf.
+  Every door says where it leads (a sign over the left doorway: „← Hall“, the wing, the shelf; the hall's doors carry the
+  category's name), and a plan of all rooms behind the map note beside the fullscreen one shows where one is and walks to
+  any room with one tap (`Plan`; user request, November 2026) – a new kind of room or door gets its place there.
 A game may give it before its end where reaching the goal once is enough (Kettenreaktion: one ball in the goal,
   `onGoal`). „🏆 Alle Pokale im Pokalzimmer ansehen“ at the top of `/management/` opens `/pokale/?alle` with every
   trophy there is, for a look without playing – nothing stored (`everyTrophy`).

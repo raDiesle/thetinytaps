@@ -171,6 +171,7 @@ export function TrophyMuseum() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setPath(to);
     setWalk({ to, phase: "out", origin });
   };
+  const [planOpen, setPlanOpen] = useState(false);
   const walkBack = () => (here.length ? walkTo(here.slice(0, -1), "8% 62%") : toShelf());
   useEffect(() => {
     if (!walk) return;
@@ -186,8 +187,9 @@ export function TrophyMuseum() {
   // Left walks back, Esc puts a trophy shown big back.
   const keys = useRef<(e: KeyboardEvent) => void>(() => {});
   keys.current = (e) => {
-    if (e.key === "Escape" && big) putBack();
-    else if (big) return;
+    if (e.key === "Escape" && planOpen) setPlanOpen(false);
+    else if (e.key === "Escape" && big) putBack();
+    else if (big || planOpen) return;
     else if (e.key === "ArrowLeft") walkBack();
   };
   useEffect(() => {
@@ -205,7 +207,10 @@ export function TrophyMuseum() {
     es: "Volver a la estantería",
     ar: "العودة إلى رف الكتب",
   });
-  const backLabel = here.length === 0 ? shelfLabel : t({ en: "Back" });
+  // Where the left door leads: the shelf from the hall, else the room one step up (the hall, or the wing's hall).
+  const parent = here.length > 1 ? nodeAt(tree, here.slice(0, -1)) : undefined;
+  const backName = here.length === 0 ? t({ en: "Bookshelf" }) : parent ? t(parent.title) : t({ en: "Hall" });
+  const backLabel = here.length === 0 ? shelfLabel : backName;
   const doors = node ? node.kids : tree;
   const style = { "--ox": walk?.origin.split(" ")[0], "--oy": walk?.origin.split(" ")[1] } as CSSProperties;
   const plan = node && !node.kids ? tierPlan(node.trophies.length, layout) : undefined;
@@ -237,12 +242,33 @@ export function TrophyMuseum() {
             onPick={(trophy, from) => setBig({ trophy, from })}
           />
         )}
-        <Door layout={layout} label={backLabel} onWalk={walkBack} />
+        <Door layout={layout} label={backLabel} name={backName} onWalk={walkBack} />
       </div>
       <button type="button" className="museum-exit" aria-label={shelfLabel} title={shelfLabel} onClick={toShelf}>
         <ShelfLabelArt />
       </button>
+      <button
+        type="button"
+        className="museum-map-button"
+        aria-label={t({ en: "Plan of the trophy rooms" })}
+        title={t({ en: "Plan of the trophy rooms" })}
+        onClick={() => setPlanOpen(true)}
+      >
+        <PlanIcon />
+      </button>
       <FullscreenButton className="museum-fullscreen" />
+      {planOpen && (
+        <Plan
+          tree={tree}
+          here={here}
+          onClose={() => setPlanOpen(false)}
+          onShelf={toShelf}
+          onGo={(to) => {
+            setPlanOpen(false);
+            if (to.join("/") !== here.join("/")) walkTo(to);
+          }}
+        />
+      )}
       {big && <BigTrophy trophy={big.trophy} from={big.from} name={names(big.trophy.game, big.trophy.level)} onClose={putBack} />}
     </main>
   );
@@ -423,13 +449,16 @@ function PawTrack({ layout: l, side }: { layout: Layout; side: "left" | "right" 
 }
 
 /** The left doorway's tap: one room back, the shelf from the hall. Laid over the drawn doorway, with a soft arrow on its floor. */
-function Door({ layout: l, label, onWalk }: { layout: Layout; label: string; onWalk: () => void }) {
+function Door({ layout: l, label, name, onWalk }: { layout: Layout; label: string; name: string; onWalk: () => void }) {
   const door = doorway(l, "left", 0.985, 0.78);
   const xs = door.map(([x]) => x);
   const ys = door.map(([, y]) => y);
   const box = { left: Math.min(...xs), top: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
   return (
     <button type="button" className="museum-door left" style={box} aria-label={label} title={label} data-tap="" onClick={onWalk}>
+      <span className="museum-door-sign" aria-hidden>
+        ← {name}
+      </span>
       <svg className="museum-door-arrow" viewBox="0 0 40 40" aria-hidden>
         <path d="M28 8 L12 20 L28 32" fill="none" stroke="#fff8e6" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -546,6 +575,98 @@ function Tiers({
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/** A small floor plan for the map button: three rooms joined by a corridor. */
+function PlanIcon() {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden>
+      <g fill="none" stroke="#3a2410" strokeWidth="2.2" strokeLinejoin="round">
+        <rect x="3" y="12" width="9" height="8" />
+        <rect x="20" y="3" width="9" height="8" />
+        <rect x="20" y="21" width="9" height="8" />
+        <path d="M12 16 H16 M16 7 V25 M16 7 H20 M16 25 H20" />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * The plan of the whole museum (the map button, top right): the shelf, the hall, every category's room and the game
+ * rooms of the wings, joined as the doors join them, the room one is in marked. A tap on a room walks there at once, so a
+ * grown-up finds a trophy's room without opening doors one after the other.
+ */
+function Plan({
+  tree,
+  here,
+  onGo,
+  onShelf,
+  onClose,
+}: {
+  tree: MuseumNode[];
+  here: string[];
+  onGo: (path: string[]) => void;
+  onShelf: () => void;
+  onClose: () => void;
+}) {
+  const t = useT();
+  const now = here.join("/");
+  const room = (path: string[], label: string, emoji: string, count?: number) => {
+    const key = path.join("/");
+    return (
+      <button
+        type="button"
+        key={key}
+        className={`museum-plan-room${key === now ? " here" : ""}`}
+        aria-current={key === now ? "location" : undefined}
+        onClick={() => onGo(path)}
+      >
+        {key === now && <span className="museum-plan-here">{t({ en: "You are here" })}</span>}
+        <span>
+          <span aria-hidden>{emoji}</span> {label}
+        </span>
+        {count !== undefined && (
+          <span className="museum-plan-count" aria-hidden>
+            🏆 {count}
+          </span>
+        )}
+      </button>
+    );
+  };
+  return (
+    <div className="museum-plan" role="dialog" aria-label={t({ en: "Plan of the trophy rooms" })}>
+      <button type="button" className="museum-big-close" aria-label={t({ en: "Close" })} onClick={onClose} />
+      <div className="museum-plan-card">
+        <div className="museum-plan-map">
+          <button type="button" className="museum-plan-room shelf" onClick={onShelf}>
+            <span>
+              <span aria-hidden>📚</span> {t({ en: "Bookshelf" })}
+            </span>
+          </button>
+          <span className="museum-plan-link" aria-hidden />
+          {room([], t({ en: "Hall" }), "🏛️")}
+          <span className="museum-plan-link" aria-hidden />
+          <ul className="museum-plan-rooms">
+            {tree.map((node) => (
+              <li key={node.id}>
+                {room([node.id], t(node.title), node.emoji, node.trophies.length)}
+                {node.kids && (
+                  <>
+                    <span className="museum-plan-link" aria-hidden />
+                    <ul className="museum-plan-kids">
+                      {node.kids.map((kid) => (
+                        <li key={kid.id}>{room([node.id, kid.id], t(kid.title), kid.emoji, kid.trophies.length)}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

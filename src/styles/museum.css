@@ -490,10 +490,165 @@
   .museum-scene.walk-out,
   .museum-scene.walk-in,
   .museum-big,
+  .museum-plan,
   .museum-big-trophy.grow,
   .museum-big-trophy.grow .museum-lens,
   .museum-big-trophy.grow .museum-lens-rim,
   .museum-big-plate {
     animation: none;
   }
+}
+
+/* The sign above the left doorway: where it leads. */
+.museum-door-sign {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 2px;
+  max-width: 120px;
+  padding: 0.1em 0.5em;
+  border: 2px solid #c9a060;
+  border-radius: 4px;
+  background: linear-gradient(#fff8e8, #f1e2bf);
+  box-shadow: 0 2px 4px #1a0a0466;
+  color: #3a2410;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.6rem, 1.7vh, 0.95rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.15;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.museum-door {
+  overflow: visible;
+}
+
+/* The map button: a paper note beside the fullscreen one. */
+.museum-map-button {
+  position: absolute;
+  top: max(6px, env(safe-area-inset-top));
+  right: calc(max(6px, env(safe-area-inset-right)) + 58px);
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 44px;
+  padding: 0;
+  border: 3px solid #9a6a40;
+  border-radius: 6px;
+  background: linear-gradient(#ffffff80, #0000 30%), var(--paper-grain, none), #fbf3df;
+  rotate: -3deg;
+  box-shadow: 3px 3px 6px #1a0a0466;
+  cursor: pointer;
+}
+
+.museum-map-button svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* The plan: a paper card over the dimmed room, the rooms as they are joined; a tap on one walks there. */
+.museum-plan {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: #1a0a04d0;
+  animation: museum-dim 0.25s ease-out both;
+}
+
+.museum-plan-card {
+  position: relative;
+  max-width: 94vw;
+  max-height: 88vh;
+  padding: 2vh 2.5vw;
+  overflow: auto;
+  border: 3px solid #9a6a40;
+  border-radius: 8px;
+  background: var(--paper-grain, none), #fbf3df;
+  box-shadow: 0 8px 24px #000a;
+}
+
+.museum-plan-map {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.museum-plan-rooms,
+.museum-plan-kids {
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.museum-plan-rooms > li {
+  display: flex;
+  align-items: center;
+}
+
+.museum-plan-kids {
+  flex-direction: row;
+  flex-wrap: wrap;
+  max-width: 46vw;
+}
+
+.museum-plan-link {
+  flex: none;
+  width: 2.2vw;
+  min-width: 14px;
+  height: 0;
+  border-top: 3px dotted #9a6a3a;
+}
+
+.museum-plan-room {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.4em 0.8em;
+  border: 2px solid #c9a060;
+  border-radius: 6px;
+  background: linear-gradient(#fff8e8, #f1e2bf);
+  color: #3a2410;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.7rem, 2.4vh, 1.1rem);
+  font-weight: 700;
+  font-style: italic;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.museum-plan-room.here {
+  border-color: #c8421c;
+  background: linear-gradient(#ffe9a8, #f6c85a);
+}
+
+.museum-plan-here {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  padding: 0 0.5em;
+  border-radius: 99px;
+  background: #c8421c;
+  color: #fff;
+  font-size: 0.7em;
+  font-style: normal;
+}
+
+.museum-plan-count {
+  font-size: 0.75em;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.museum-plan-room:focus-visible {
+  outline: 3px solid #ffe08a;
 }
