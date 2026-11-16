@@ -37,7 +37,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Letters and Numbers – Keyboard Games",
       description:
         "Free typing, counting, joining in and typing words: every key shows its letter with a picture and a voice, numbers come to count and to hop.",
-      text: "Four games on the keyboard or the screen: free typing with a letter, a picture and a word, counting with numbers and things, Join In, where a fox or bear child hops, claps or stamps every number, and typing words with first words, colors, action words and “Where is the B?”.",
+      text: "Five games on the keyboard or the screen: free typing with a letter, a picture and a word, counting with numbers and things, Join In, where a fox or bear child hops, claps or stamps every number, and typing words with first words, colors, action words and “Where is the B?”, and “Where Is Little b?”, where a big letter looks for its child among three small ones.",
     },
     "/spiele/zuordnen/": {
       title: "Matching Games for Toddlers",
@@ -131,8 +131,8 @@ export const SEO_EN: SeoTranslation = {
     },
     "/gross-klein/": {
       title: "Where Is Little b? – Capital and Small Letters",
-      description: "A big letter with eyes looks for its little one: three small letters to choose from, and the right one walks over and holds its hand.",
-      text: "A letter game about capital and small letters: a big letter with eyes looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and they hold hands; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p.",
+      description: "A big letter looks for its little one: three small letters to choose from, and the right one walks over to it.",
+      text: "A letter game about capital and small letters: a big letter looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and stands beside it; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p.",
     },
     "/zaehne/": {
       title: "Tooth Brushing for Kids – Song and Timer",

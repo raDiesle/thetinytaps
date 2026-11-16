@@ -39,7 +39,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Aprender letras y números – juegos de teclado",
       description:
         "Teclear libre, contar, todos juntos y escribir palabras: cada tecla muestra su letra con imagen y voz, y los números llegan para contar y saltar.",
-      text: "Cuatro juegos en el teclado o en la pantalla: «Teclear libre» con letra, imagen y palabra; «Contar» con números y cosas; «Todos juntos», donde un zorrito o un osito salta, aplaude o zapatea cada número; y «Escribir palabras» con primeras palabras, colores, verbos de acción y «¿Dónde está la B?».",
+      text: "Cinco juegos en el teclado o en la pantalla: «Teclear libre» con letra, imagen y palabra; «Contar» con números y cosas; «Todos juntos», donde un zorrito o un osito salta, aplaude o zapatea cada número; y «Escribir palabras» con primeras palabras, colores, verbos de acción y «¿Dónde está la B?»; y «¿Dónde está la b pequeña?», donde una letra grande busca a su pequeña entre tres minúsculas.",
     },
     "/spiele/zuordnen/": {
       title: "Juegos de emparejar para niños pequeños",
@@ -135,8 +135,8 @@ export const SEO_ES: SeoTranslation = {
     },
     "/gross-klein/": {
       title: "¿Dónde está la b pequeña? – Mayúsculas y minúsculas",
-      description: "Una letra grande con ojos busca a su pequeña: de tres minúsculas solo una es la suya, que camina hasta ella y le da la mano.",
-      text: "Un juego de letras sobre mayúsculas y minúsculas: una letra grande con ojos busca a su pequeña. Abajo hay tres minúsculas y solo una es la suya. Al tocarla, camina hasta la grande y se dan la mano; una equivocada niega con la cabeza. Primero las tres son muy distintas, después parecidas, como b, d y p.",
+      description: "Una letra grande busca a su pequeña: de tres minúsculas solo una es la suya, que camina hasta ella.",
+      text: "Un juego de letras sobre mayúsculas y minúsculas: una letra grande busca a su pequeña. Abajo hay tres minúsculas y solo una es la suya. Al tocarla, camina hasta la grande y se pone a su lado; una equivocada niega con la cabeza. Primero las tres son muy distintas, después parecidas, como b, d y p.",
     },
     "/zaehne/": {
       title: "Cepillarse los dientes: canción y temporizador",

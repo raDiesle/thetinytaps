@@ -432,7 +432,7 @@ export const CATEGORIES: Category[] = [
       { href: "/zaehlen/", emoji: "🔢", title: COUNT_TITLE, blurb: COUNT_BLURB },
       { href: "/mitmachen/", emoji: "🐸", title: MOVE_TITLE, blurb: MOVE_BLURB },
       { href: "/woerter/", emoji: "✍️", title: WORDS_TITLE, blurb: WORDS_BLURB },
-      { href: "/gross-klein/", emoji: "👪", title: CASE_TITLE, blurb: CASE_BLURB, unfinished: "labelled" },
+      { href: "/gross-klein/", emoji: "👪", title: CASE_TITLE, blurb: CASE_BLURB },
     ],
   },
 ];

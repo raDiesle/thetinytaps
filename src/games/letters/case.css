@@ -1,4 +1,4 @@
-/* Wo ist das kleine b? (CasePlay.tsx): a big letter with eyes above, three small letters below; the right one walks over. */
+/* Wo ist das kleine b? (CasePlay.tsx): a big letter above, three small letters below; the right one walks over. */
 
 .cs-play {
   position: absolute;
@@ -50,33 +50,6 @@
   font-size: min(30cqh, 15cqw);
 }
 
-/* Holding hands, once the child has come. */
-.cs-hands {
-  align-self: flex-end;
-  width: min(10cqh, 6cqw);
-  margin: 0 -1cqw min(9cqh, 4.5cqw);
-  overflow: visible;
-  opacity: 0;
-  transition: opacity 0.3s 1.2s;
-}
-
-.cs-hands.held {
-  opacity: 1;
-}
-
-.cs-hands path {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 5;
-  stroke-linecap: round;
-}
-
-.cs-hands circle {
-  fill: #ff7bd0;
-  stroke: var(--ink);
-  stroke-width: 2;
-}
-
 /* The child's place beside the big letter: as wide as a small letter, empty until it has walked there. */
 .cs-spot {
   display: inline-flex;
@@ -114,27 +87,4 @@
 /* After a few wrong taps the right one glows warmer – still, never pulsing. */
 .cs-choice.hint {
   background: radial-gradient(closest-side, #ffe27a 0 50%, #ffe27a00 100%);
-}
-
-/* Two still eyes: at cap height on the big letter, at x-height on a small one. */
-.cs-eyes {
-  position: absolute;
-  top: 0.14em;
-  left: 50%;
-  display: flex;
-  gap: 0.03em;
-  translate: -50% 0;
-  pointer-events: none;
-}
-
-.cs-eyes.small {
-  top: 0.42em;
-}
-
-.cs-eyes span {
-  width: 0.15em;
-  height: 0.18em;
-  border: 0.022em solid var(--ink);
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 62%, var(--ink) 0 32%, #fff 34%);
 }
