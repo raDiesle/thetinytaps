@@ -576,7 +576,11 @@ function BigTrophy({ trophy, from, name, onClose }: { trophy: TrophyWon; from?: 
       {/* The whole screen puts it back: one tap anywhere. */}
       <button type="button" className="museum-big-close" aria-label={t({ en: "Put it back" })} onClick={onClose} />
       <div ref={art} className={`museum-big-trophy${from ? (start ? " grow" : " waiting") : ""}`} style={start}>
-        <Trophy game={trophy.game} level={trophy.level} wins={trophy.wins} />
+        {/* A magnifying glass over the trophy tapped: its lens opens out and the trophy grows to fill the room. */}
+        <div className="museum-lens">
+          <Trophy game={trophy.game} level={trophy.level} wins={trophy.wins} />
+        </div>
+        {from && <span className="museum-lens-rim" aria-hidden />}
       </div>
       <div className="museum-big-plate">
         {name && <span className="museum-plate-name">{name}</span>}

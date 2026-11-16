@@ -103,6 +103,11 @@ describe("trophies", () => {
     }
   });
 
+  test("a trophy tapped in the trophy room comes close through a magnifying glass", () => {
+    expect(readFileSync("src/components/TrophyMuseum.tsx", "utf8")).toContain("museum-lens-rim");
+    expect(readFileSync("src/styles/museum.css", "utf8")).toContain("@keyframes museum-lens-clip");
+  });
+
   test("a trophy won again shows its count on its foot, and a tap on it at a level's end opens the trophy room", () => {
     expect(readFileSync("src/components/Trophy.tsx", "utf8")).toContain("trophy-wins");
     expect(readFileSync("src/components/GameEnd.tsx", "utf8")).toContain("museumHref(");
