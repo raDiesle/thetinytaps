@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { METALS, trophyLook } from "@/components/Trophy";
-import { museumLayout, museumRooms } from "@/components/TrophyMuseum";
+import { museumLayout, museumTree, type MuseumNode, tierPlan } from "@/components/TrophyMuseum";
 import { everyTrophy, trophyPicture } from "@/components/trophyPictures";
 import { CATEGORIES } from "@/content/games";
 import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest, trophyWins } from "./trophies";
@@ -63,40 +63,43 @@ describe("trophies", () => {
     }
   });
 
-  test("the trophy room puts every trophy on one plinth, at most a room's plinths in each room, a game's together", () => {
+  const SCREENS = [
+    [844, 390],
+    [390, 844],
+    [1024, 768],
+    [1280, 720],
+    [1920, 1080],
+  ];
+
+  test("the trophy room's hall has a door for each category with trophies, every trophy behind exactly one room", () => {
     const all = everyTrophy();
-    for (const perRoom of [2, 3, 4, 6]) {
-      const rooms = museumRooms(all, perRoom);
+    for (const [w, h] of SCREENS) {
+      const tree = museumTree(all, museumLayout(w, h));
+      const rooms: MuseumNode[] = tree.flatMap((node) => node.kids ?? [node]);
       const placed = rooms.flatMap((room) => room.trophies);
-      expect(placed.length).toBe(all.length);
+      expect(placed.length, `${w}×${h}`).toBe(all.length);
       expect(new Set(placed).size).toBe(all.length);
-      for (const room of rooms) {
-        expect(room.trophies.length).toBeGreaterThan(0);
-        expect(room.trophies.length).toBeLessThanOrEqual(perRoom);
-      }
-      // A game with few trophies is never split over two rooms.
-      for (const game of new Set(all.map((trophy) => trophy.game))) {
-        const count = all.filter((trophy) => trophy.game === game).length;
-        if (count > perRoom) continue;
-        expect(rooms.filter((room) => room.trophies.some((trophy) => trophy.game === game)).length, game).toBe(1);
-      }
+      // Only categories with trophies have a door, and only a category with several games is ever a wing.
+      expect(new Set(tree.map((node) => node.id)).size).toBe(tree.length);
+      for (const node of tree) if (node.kids) expect(node.kids.length).toBeGreaterThan(1);
     }
-    expect(museumRooms([], 4)).toEqual([{ trophies: [], games: [] }]);
+    expect(museumTree([], museumLayout(844, 390))).toEqual([]);
   });
 
-  test("the trophy room's trophies are big on every screen, and fit its row", () => {
-    for (const [w, h] of [
-      [844, 390],
-      [390, 844],
-      [1024, 768],
-      [1280, 720],
-      [1920, 1080],
-    ]) {
+  test("the trophy room's trophies stand big on every screen: a room has as many tiers as its trophies need", () => {
+    for (const [w, h] of SCREENS) {
       const layout = museumLayout(w, h);
-      expect(layout.perRoom).toBeGreaterThanOrEqual(2);
-      // At least a fifth of the screen's height: the medallion's picture must be recognised.
-      expect(layout.trophy, `${w}×${h}`).toBeGreaterThanOrEqual(Math.min(w, h) * 0.2);
-      expect(layout.trophy * 0.74 * layout.perRoom, `${w}×${h}`).toBeLessThan(w);
+      const rooms = museumTree(everyTrophy(), layout).flatMap((node) => node.kids ?? [node]);
+      for (const room of rooms) {
+        const plan = tierPlan(room.trophies.length, layout);
+        // The medallion's picture must be recognised: a wing's game room may still be small, a category's room never.
+        expect(plan.trophy, `${w}×${h} ${room.id}`).toBeGreaterThanOrEqual(Math.min(w, h) * 0.1);
+        expect(plan.per * plan.rows).toBeGreaterThanOrEqual(room.trophies.length);
+        expect(plan.cellW * plan.per).toBeLessThanOrEqual(layout.area.w + 1);
+        expect(plan.cellH * plan.rows).toBeLessThanOrEqual(layout.area.h + 1);
+      }
+      // More trophies never make fewer tiers.
+      expect(tierPlan(30, layout).rows).toBeGreaterThanOrEqual(tierPlan(3, layout).rows);
     }
   });
 

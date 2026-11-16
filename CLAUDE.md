@@ -343,12 +343,16 @@ In a fresh worktree run `bun install` first.
   paper sign nailed onto the shelf's right side above the loudspeaker (`TrophySign`, only once a trophy is won) – a tap
   turns the eye to the right, a wall comes round with a door, it opens and one walks in – and by a tap on the trophy
   landed beside a level's end buttons, which opens the room at that trophy shown big. Inside it is a little museum in
-  simple pseudo-3D using the whole screen: rooms of a few big trophies each on plinths, a brass plate on each plinth's
-  front with the level's name (`trophyNames.ts`, loaded per game, never a whole game's code) and the game's in the book's
-  serif, doorways to walk from room to room, and a tap on a trophy shows it whole and big; the medallion's picture is
-  big enough to be recognised (`museumLayout`, `trophies.test.ts`). The way back to the shelf is always there, in the top
-  left (the ribbon's shelf label), and the first room's left doorway leads there too.
-  A game may give it before its end where reaching the goal once is enough (Kettenreaktion: one ball in the goal,
+  simple pseudo-3D using the whole screen (user request, November 2026): one walks into a hall with a door and a sign
+  for each category that has trophies, a tap on a door walks into that category's room – trophies grouped by category,
+  never rooms in a row to walk left and right through. The number of trophies shapes the room: they stand on as many
+  tiers (boards along the back wall) as are needed to keep each big enough to be recognised (`tierPlan`, `MIN_TROPHY`),
+  and a category too big for one room is a wing, a hall of its own with a door for each game (`museumTree`). A small
+  brass plate under each trophy names its level in small letters; the category stands once, on the room's sign, never
+  repeated on every trophy (the game's name only where a room holds several games). A tap on a trophy shows it whole
+  and big (`trophyNames.ts`, loaded per game, never a whole game's code; `trophies.test.ts`). The way back to the shelf
+  is always there, in the top left (the ribbon's shelf label); the left doorway leads one room back, the hall's to the shelf.
+A game may give it before its end where reaching the goal once is enough (Kettenreaktion: one ball in the goal,
   `onGoal`). „🏆 Alle Pokale im Pokalzimmer ansehen“ at the top of `/management/` opens `/pokale/?alle` with every
   trophy there is, for a look without playing – nothing stored (`everyTrophy`).
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,

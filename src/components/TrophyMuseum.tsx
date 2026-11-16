@@ -4,90 +4,130 @@ import { FullscreenButton } from "@/components/FullscreenButton";
 import { ShelfLabelArt } from "@/components/PageCornerArt";
 import { Trophy } from "@/components/Trophy";
 import { useLevelNames } from "@/components/trophyNames";
-import { useAppLanguage, useT } from "@/lib/language";
+import { bookIdOf, CATEGORIES } from "@/content/games";
 import { goBack } from "@/lib/goBack";
+import { type Texts, useAppLanguage, useT } from "@/lib/language";
 import { TROPHY_PARAM, TROPHY_ROOM, useMuseumTrophies } from "@/lib/museum";
 import { useStepAddress } from "@/lib/stepAddress";
-import { gameOf, gameOrder, type TrophyWon, trophyKey } from "@/lib/trophies";
+import { gameOf, type TrophyWon, trophyKey } from "@/lib/trophies";
 import "@/styles/museum.css";
 
 /*
- * The trophy room (user request, November 2026): no menu over the shelf but a room of its own next to it, a little
- * museum. Its rooms are drawn in simple perspective – back wall, side walls, ceiling and a floor of boards running to one
- * vanishing point – and in each the trophies stand in a row on plinths, each with a brass plate naming its level and
- * game. Doorways in the side walls lead on to the next room and back; the first room's left door leads back to the
- * shelf, as does the round shelf label in the top left at any time. A tap on a trophy shows it big. Everything is drawn
- * once and stands still; only walking through a door and a trophy coming close move, by transforms and opacity.
+ * The trophy room (user request, November 2026): no menu over the shelf but a little museum next to it. One walks in
+ * into a hall with a door and a sign for each category that has trophies; a tap on a door walks into that category's
+ * room (user request, November 2026: grouped by category, no walking left and right). In a room the trophies stand on
+ * tiers – as many as the number of trophies needs, each tier a board along the back wall with a small brass plate for
+ * each level. A category with more trophies than a room shows big becomes a wing: its own hall with a door for each game.
+ * The rooms are drawn in simple perspective – back wall, side walls, ceiling and a floor of boards running to one vanishing
+ * point; the left doorway always leads one room back (the first one to the shelf), as does the round shelf label in the
+ * top left. A tap on a trophy shows it big. Everything is drawn once and stands still; only walking through a door and a
+ * trophy coming close move, by transforms and opacity.
  */
 
 /** The vanishing point's height on the screen, and how big the back wall is against the screen round that point. */
 const EYE = 0.42;
-const BACK = 0.6;
-
-/** Where the plinths stand: their front's bottom edge, and their height at most, as shares of the screen's height. */
-const PLINTH_FOOT = 0.95;
-const PLINTH_HIGH = 0.24;
-
-/** A plinth's width for its trophy's height, the room between two, and how far its top reaches back (towards the eye's point). */
-const PLINTH_WIDE = 0.74;
-const PLINTH_GAP = 0.2;
-const PLINTH_DEEP = 0.92;
-
-/** The row of plinths' width, as a share of the screen's width. */
-const ROW_WIDTH = 0.86;
+const BACK = 0.8;
 
 /** How long a walk through a door takes, out of one room and into the next (`museum-walk-*` in museum.css). */
 const WALK_MS = 420;
 
-/** One room: the trophies standing in it and the games they were won in. */
-interface MuseumRoom {
-  trophies: TrophyWon[];
-  games: string[];
-}
+/** A trophy is at least this share of the screen's shorter side, or the medallion's picture is not recognised. */
+const MIN_TROPHY = 0.13;
 
-/** How the rooms are drawn on a screen `w` × `h`: their walls and how many trophies stand in each, how big. */
+/** A trophy with its board and its plate is this many trophy heights tall; and this many wide per trophy width. */
+const CELL_HIGH = 1.34;
+const CELL_WIDE = 0.8;
+
+/** How the rooms are drawn on a screen `w` × `h`: their walls, and the area of the back wall the tiers and doors stand in. */
 export function museumLayout(w: number, h: number) {
   const vx = w / 2;
   const vy = h * EYE;
   const back = { x0: vx - vx * BACK, x1: vx + vx * BACK, y0: vy - vy * BACK, y1: vy + (h - vy) * BACK };
-  const row = w * ROW_WIDTH;
-  // As many as stand big on the screen, at least two, at most six; then each as big as the row and the height allow.
-  const perRoom = Math.max(2, Math.min(6, Math.floor(row / ((PLINTH_WIDE + PLINTH_GAP) * h * 0.4))));
-  const trophy = Math.min(h * 0.42, row / (perRoom * (PLINTH_WIDE + PLINTH_GAP)));
-  const plinth = Math.min(h * PLINTH_HIGH, trophy * 0.72);
-  return { w, h, vx, vy, back, perRoom, trophy, plinth, foot: h * PLINTH_FOOT };
+  // Under the room's sign, between the back wall's sides, down to its foot.
+  const area = { x: back.x0 + w * 0.02, y: back.y0 + h * 0.2, w: back.x1 - back.x0 - w * 0.04, h: back.y1 - back.y0 - h * 0.2 };
+  return { w, h, vx, vy, back, area };
 }
 
 /** The museum's measures on this screen. */
 type Layout = ReturnType<typeof museumLayout>;
 
-/**
- * The trophies in rooms of at most `perRoom`, in the shelf's order of the games, each game's in the order they were won:
- * games with few trophies share a room, a game with more than a room holds fills rooms of its own, evenly.
- */
-export function museumRooms(trophies: TrophyWon[], perRoom: number): MuseumRoom[] {
-  const games = [...new Set(trophies.map((trophy) => trophy.game))].sort((a, b) => gameOrder(a) - gameOrder(b));
-  const rooms: MuseumRoom[] = [];
-  let open: MuseumRoom | undefined;
-  for (const game of games) {
-    const own = trophies.filter((trophy) => trophy.game === game).sort((a, b) => a.at - b.at);
-    if (own.length > perRoom) {
-      const count = Math.ceil(own.length / perRoom);
-      const each = Math.ceil(own.length / count);
-      for (let i = 0; i < own.length; i += each) rooms.push({ trophies: own.slice(i, i + each), games: [game] });
-      open = undefined;
-    } else if (open && open.trophies.length + own.length <= perRoom) {
-      open.trophies.push(...own);
-      open.games.push(game);
-    } else {
-      open = { trophies: [...own], games: [game] };
-      rooms.push(open);
-    }
+/** The smallest a trophy may be on this screen. */
+const minTrophy = (l: Layout) => Math.min(l.w, l.h) * MIN_TROPHY;
+
+/** How `count` trophies stand on tiers in a room: how many tiers, how many on each, how big each, and the cell it stands in. */
+export function tierPlan(count: number, l: Layout) {
+  let best = { rows: 1, per: Math.max(count, 1), trophy: 0, cellW: 0, cellH: 0 };
+  for (let rows = 1; rows <= Math.max(count, 1); rows++) {
+    const per = Math.ceil(count / rows);
+    const cellW = l.area.w / per;
+    const cellH = l.area.h / rows;
+    const trophy = Math.min(cellH / CELL_HIGH, cellW / CELL_WIDE, l.h * 0.42);
+    if (trophy > best.trophy) best = { rows, per, trophy, cellW, cellH };
   }
-  return rooms.length ? rooms : [{ trophies: [], games: [] }];
+  return best;
 }
 
-/** The trophy room: its rooms one after the other, the way back to the shelf always in the top left. */
+/** One place in the museum with trophies in it: a category's room, a wing's game room or a wing's hall of `kids`. */
+export interface MuseumNode {
+  id: string;
+  title: Texts;
+  emoji: string;
+  /** Every trophy behind this door, in the shelf's order of the games, each game's in the order they were won. */
+  trophies: TrophyWon[];
+  /** Where the trophies are too many for one room: a door for each game. */
+  kids?: MuseumNode[];
+}
+
+/**
+ * The hall's doors, one for each category with trophies, in the shelf's order. A category whose trophies would stand
+ * smaller than `MIN_TROPHY` on `layout` is a wing with a door for each of its games.
+ */
+export function museumTree(trophies: TrophyWon[], layout: Layout): MuseumNode[] {
+  const sorted = (list: TrophyWon[]) => [...list].sort((a, b) => a.at - b.at);
+  return CATEGORIES.flatMap((category): MuseumNode[] => {
+    const own = category.games.flatMap((game) => sorted(trophies.filter((trophy) => trophy.game === game.href)));
+    if (!own.length) return [];
+    const node: MuseumNode = { id: category.id, title: category.title, emoji: category.emoji, trophies: own };
+    const games = category.games.filter((game) => own.some((trophy) => trophy.game === game.href));
+    if (games.length > 1 && tierPlan(own.length, layout).trophy < minTrophy(layout)) {
+      node.kids = games.map((game) => ({
+        id: bookIdOf(game.href),
+        title: game.title,
+        emoji: game.emoji,
+        trophies: own.filter((trophy) => trophy.game === game.href),
+      }));
+    }
+    return [node];
+  });
+}
+
+/** The node `path` (ids from the hall's doors on) leads to: undefined for the hall itself or a path that leads nowhere. */
+function nodeAt(tree: MuseumNode[], path: string[]): MuseumNode | undefined {
+  let list = tree;
+  let found: MuseumNode | undefined;
+  for (const id of path) {
+    found = list.find((node) => node.id === id);
+    if (!found) return undefined;
+    list = found.kids ?? [];
+  }
+  return found;
+}
+
+/** The path to the room that holds the trophy `key`: its category's, or its game's where the category is a wing. */
+function pathOfTrophy(tree: MuseumNode[], key: string): string[] {
+  const walk = (list: MuseumNode[], path: string[]): string[] | undefined => {
+    for (const node of list) {
+      const here = [...path, node.id];
+      if (node.kids) {
+        const inKid = walk(node.kids, here);
+        if (inKid) return inKid;
+      } else if (node.trophies.some((trophy) => trophyKey(trophy.game, trophy.level) === key)) return here;
+    }
+  };
+  return walk(tree, []) ?? [];
+}
+
+/** The trophy room: the hall and the rooms behind its doors, the way back to the shelf always in the top left. */
 export function TrophyMuseum() {
   const t = useT();
   const language = useAppLanguage();
@@ -96,9 +136,9 @@ export function TrophyMuseum() {
   const trophies = useMuseumTrophies();
   const size = useScreen();
   const layout = useMemo(() => museumLayout(size.w, size.h), [size]);
-  const rooms = useMemo(() => museumRooms(trophies, layout.perRoom), [trophies, layout.perRoom]);
+  const tree = useMemo(() => museumTree(trophies, layout), [trophies, layout]);
   const names = useLevelNames(
-    rooms.flatMap((room) => room.games),
+    trophies.map((trophy) => trophy.game),
     language.id,
   );
 
@@ -108,15 +148,14 @@ export function TrophyMuseum() {
     const trophy = named ? trophies.find((one) => trophyKey(one.game, one.level) === named) : undefined;
     return trophy && { trophy };
   });
-  const [room, setRoom] = useState(() => {
-    const at = named ? rooms.findIndex((one) => one.trophies.some((trophy) => trophyKey(trophy.game, trophy.level) === named)) : -1;
-    return Math.max(0, at);
-  });
-  const shown = Math.min(room, rooms.length - 1);
-  useStepAddress(shown + 1);
+  // Where one stands: the ids of the doors walked through, none in the hall.
+  const [path, setPath] = useState<string[]>(() => (named ? pathOfTrophy(tree, named) : []));
+  const node = nodeAt(tree, path);
+  const here = node ? path : [];
+  useStepAddress(here.length ? here.join("-") : "hall");
 
   // Walking through a door: out of this room towards it, then into the next one.
-  const [walk, setWalk] = useState<{ to: number; phase: "out" | "in"; side: "left" | "right" }>();
+  const [walk, setWalk] = useState<{ to: string[]; phase: "out" | "in"; origin: string }>();
   const toShelf = () => goBack(navigate, "/");
   // Put back, the trophy is no longer named in the address, so a reload opens the room as it is now. In place like the
   // room's step (stepAddress.ts), past the router, keeping its place in the history.
@@ -127,32 +166,29 @@ export function TrophyMuseum() {
     url.searchParams.delete(TROPHY_PARAM);
     window.history.replaceState(window.history.state, "", url);
   };
-  const walkTo = (side: "left" | "right") => {
+  const walkTo = (to: string[], origin = "50% 62%") => {
     if (walk) return;
-    const to = shown + (side === "right" ? 1 : -1);
-    if (to < 0) return toShelf();
-    if (to >= rooms.length) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setRoom(to);
-    setWalk({ to, phase: "out", side });
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setPath(to);
+    setWalk({ to, phase: "out", origin });
   };
+  const walkBack = () => (here.length ? walkTo(here.slice(0, -1), "8% 62%") : toShelf());
   useEffect(() => {
     if (!walk) return;
     const timer = setTimeout(() => {
       if (walk.phase === "out") {
-        setRoom(walk.to);
+        setPath(walk.to);
         setWalk({ ...walk, phase: "in" });
       } else setWalk(undefined);
     }, WALK_MS);
     return () => clearTimeout(timer);
   }, [walk]);
 
-  // The arrow keys walk, Esc puts a trophy shown big back.
+  // Left walks back, Esc puts a trophy shown big back.
   const keys = useRef<(e: KeyboardEvent) => void>(() => {});
   keys.current = (e) => {
     if (e.key === "Escape" && big) putBack();
     else if (big) return;
-    else if (e.key === "ArrowRight") walkTo("right");
-    else if (e.key === "ArrowLeft") walkTo("left");
+    else if (e.key === "ArrowLeft") walkBack();
   };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => keys.current(e);
@@ -160,11 +196,6 @@ export function TrophyMuseum() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const current = rooms[shown];
-  const title = current.games.map((href) => {
-    const game = gameOf(href);
-    return game ? t(game.title) : href;
-  });
   const shelfLabel = t({
     de: "Zurück zum Bücherregal",
     ru: "Назад к книжной полке",
@@ -174,37 +205,39 @@ export function TrophyMuseum() {
     es: "Volver a la estantería",
     ar: "العودة إلى رف الكتب",
   });
-  const style = {
-    "--trophy": `${layout.trophy}px`,
-    "--plinth": `${layout.plinth}px`,
-  } as CSSProperties;
+  const backLabel = here.length === 0 ? shelfLabel : t({ en: "Back" });
+  const doors = node ? node.kids : tree;
+  const style = { "--ox": walk?.origin.split(" ")[0], "--oy": walk?.origin.split(" ")[1] } as CSSProperties;
+  const plan = node && !node.kids ? tierPlan(node.trophies.length, layout) : undefined;
 
   return (
     <main className="museum" style={style}>
-      <div className={`museum-scene${walk ? ` walk-${walk.phase} to-${walk.side}` : ""}`}>
-        <RoomShell layout={layout} left={shown === 0 ? "shelf" : "room"} right={shown < rooms.length - 1} />
+      <div className={`museum-scene${walk ? ` walk-${walk.phase}` : ""}`}>
+        <RoomShell layout={layout} left={here.length === 0 ? "shelf" : "room"} />
+        {/* The room's name once, on a sign on the back wall: the hall's, or the category's or game's. */}
         <span className="museum-room-sign" style={{ top: layout.back.y0 + layout.h * 0.02 }}>
-          <span className="museum-room-name">{title.length ? title.join(" · ") : t(TROPHY_ROOM)}</span>
-          {rooms.length > 1 && (
-            <span className="museum-room-dots" aria-hidden>
-              {rooms.map((_, i) => (
-                <span key={i} className={i === shown ? "here" : undefined} />
-              ))}
-            </span>
-          )}
+          <span className="museum-room-name">
+            {node ? (
+              <>
+                <span aria-hidden>{node.emoji}</span> {t(node.title)}
+              </>
+            ) : (
+              t(TROPHY_ROOM)
+            )}
+          </span>
         </span>
-        <Plinths
-          layout={layout}
-          trophies={current.trophies}
-          nameOf={(trophy) => names(trophy.game, trophy.level)}
-          onPick={(trophy, from) => setBig({ trophy, from })}
-        />
-        <Doors
-          layout={layout}
-          left={shown === 0 ? shelfLabel : t({ en: "Room before" })}
-          right={shown < rooms.length - 1 ? t({ en: "Next room" }) : undefined}
-          onWalk={walkTo}
-        />
+        {doors && <HallDoors layout={layout} nodes={doors} onOpen={(next, from) => walkTo([...here, next], `${from.x.toFixed(0)}px ${from.y.toFixed(0)}px`)} />}
+        {node && plan && (
+          <Tiers
+            layout={layout}
+            plan={plan}
+            trophies={node.trophies}
+            nameOf={(trophy) => names(trophy.game, trophy.level)}
+            showGame={new Set(node.trophies.map((trophy) => trophy.game)).size > 1}
+            onPick={(trophy, from) => setBig({ trophy, from })}
+          />
+        )}
+        <Door layout={layout} label={backLabel} onWalk={walkBack} />
       </div>
       <button type="button" className="museum-exit" aria-label={shelfLabel} title={shelfLabel} onClick={toShelf}>
         <ShelfLabelArt />
@@ -233,7 +266,7 @@ const toward = (l: Layout, x: number, y: number, k: number) => [l.vx + (x - l.vx
 const points = (list: readonly (readonly [number, number])[]) => list.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
 
 /** A doorway in a side wall, between depths `near` and `far` (1 at the screen, `BACK` at the back wall). */
-function doorway(l: Layout, side: "left" | "right", near = 0.86, far = 0.7) {
+function doorway(l: Layout, side: "left" | "right", near = 0.96, far = 0.82) {
   const x = side === "left" ? 0 : l.w;
   const high = 0.66;
   const at = (k: number, up: number) => toward(l, x, l.h - up * l.h, k);
@@ -245,7 +278,7 @@ function doorway(l: Layout, side: "left" | "right", near = 0.86, far = 0.7) {
  * wallpaper and wainscot, the side walls in shade, the floor's boards running to the vanishing point, light from the
  * ceiling, and the doorways – light from the next room in them, the shelf's room in the first room's left one.
  */
-const RoomShell = memo(function RoomShell({ layout: l, left, right }: { layout: Layout; left: "shelf" | "room"; right: boolean }) {
+const RoomShell = memo(function RoomShell({ layout: l, left }: { layout: Layout; left: "shelf" | "room" }) {
   const { w, h, back } = l;
   const corners = { tl: [0, 0], tr: [w, 0], br: [w, h], bl: [0, h] } as const;
   const b = { tl: [back.x0, back.y0], tr: [back.x1, back.y0], br: [back.x1, back.y1], bl: [back.x0, back.y1] } as const;
@@ -331,7 +364,6 @@ const RoomShell = memo(function RoomShell({ layout: l, left, right }: { layout: 
       <ellipse cx={l.vx} cy={(back.y1 + h) / 2} rx={w * 0.42} ry={(h - back.y1) * 0.42} fill="#ffe6a8" opacity="0.18" />
       {/* The doorways: on the left the way back (the shelf's room in the first room), on the right the next room. */}
       <Doorway layout={l} side="left" kind={left} />
-      {right && <Doorway layout={l} side="right" kind="room" />}
     </svg>
   );
 });
@@ -339,7 +371,7 @@ const RoomShell = memo(function RoomShell({ layout: l, left, right }: { layout: 
 /** One doorway in a side wall: its frame, the light (or the shelf's room) beyond, and paw tracks walking into it. */
 function Doorway({ layout: l, side, kind }: { layout: Layout; side: "left" | "right"; kind: "shelf" | "room" }) {
   const door = doorway(l, side);
-  const frame = doorway(l, side, 0.885, 0.68);
+  const frame = doorway(l, side, 0.975, 0.8);
   return (
     <g>
       <polygon points={points(frame)} fill="#5c3216" />
@@ -390,29 +422,67 @@ function PawTrack({ layout: l, side }: { layout: Layout; side: "left" | "right" 
   );
 }
 
-/** What can be tapped of the doorways, laid over the drawn ones: on the left the way back, on the right the next room. */
-function Doors({ layout: l, left, right, onWalk }: { layout: Layout; left: string; right?: string; onWalk: (side: "left" | "right") => void }) {
+/** The left doorway's tap: one room back, the shelf from the hall. Laid over the drawn doorway, with a soft arrow on its floor. */
+function Door({ layout: l, label, onWalk }: { layout: Layout; label: string; onWalk: () => void }) {
+  const door = doorway(l, "left", 0.985, 0.78);
+  const xs = door.map(([x]) => x);
+  const ys = door.map(([, y]) => y);
+  const box = { left: Math.min(...xs), top: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
+  return (
+    <button type="button" className="museum-door left" style={box} aria-label={label} title={label} data-tap="" onClick={onWalk}>
+      <svg className="museum-door-arrow" viewBox="0 0 40 40" aria-hidden>
+        <path d="M28 8 L12 20 L28 32" fill="none" stroke="#fff8e6" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+}
+
+/**
+ * The doors of a hall (the museum's, or a wing's), side by side in one or two rows along the back wall, each under a
+ * sign with its name and how many trophies are behind it. A tap walks through it.
+ */
+function HallDoors({ layout: l, nodes, onOpen }: { layout: Layout; nodes: MuseumNode[]; onOpen: (id: string, from: { x: number; y: number }) => void }) {
+  const t = useT();
+  const rows = nodes.length > 6 ? 2 : 1;
+  const per = Math.ceil(nodes.length / rows);
+  const cellW = l.area.w / Math.max(per, 1);
+  const cellH = l.area.h / rows;
+  // The sign above takes a fifth of the cell, the door the rest, as wide as it is tall allows.
+  const door = Math.min(cellH * 0.72, (cellW * 0.8) / 0.62);
   return (
     <>
-      {(["left", "right"] as const).map((side) => {
-        const label = side === "left" ? left : right;
-        if (!label) return null;
-        const door = doorway(l, side, 0.92, 0.66);
-        const xs = door.map(([x]) => x);
-        const ys = door.map(([, y]) => y);
-        const box = { left: Math.min(...xs), top: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
+      {nodes.map((node, i) => {
+        const row = Math.floor(i / per);
+        const inRow = row === rows - 1 ? nodes.length - per * (rows - 1) : per;
+        const x = l.vx - (inRow * cellW) / 2 + (i - row * per) * cellW;
+        const y = l.area.y + row * cellH;
+        const name = t(node.title);
         return (
           <button
-            key={side}
+            key={node.id}
             type="button"
-            className={`museum-door ${side}`}
-            style={box}
-            aria-label={label}
-            title={label}
+            className="museum-hall-door"
+            style={{ left: x, top: y, width: cellW, height: cellH, "--door": `${door}px` } as CSSProperties}
+            aria-label={name}
             data-tap=""
-            onClick={() => onWalk(side)}
+            onClick={(e) => {
+              const box = e.currentTarget.getBoundingClientRect();
+              onOpen(node.id, { x: box.left + box.width / 2, y: box.top + box.height / 2 });
+            }}
           >
-            <ArrowArt side={side} />
+            <span className="museum-hall-sign">
+              <span aria-hidden>{node.emoji}</span> {name}
+            </span>
+            <svg className="museum-hall-door-art" viewBox="0 0 62 100" aria-hidden>
+              <path d="M2 100 V34 A29 29 0 0 1 60 34 V100 Z" fill="#5c3216" />
+              <path d="M7 100 V34 A24 24 0 0 1 55 34 V100 Z" fill="url(#museum-door-light)" />
+              <path d="M7 100 V34 A24 24 0 0 1 31 10 V100 Z" fill="#8a5a2c" />
+              <circle cx="25" cy="64" r="2.4" fill="#f2d27a" />
+              <path d="M31 10 V100" stroke="#4a2810" strokeWidth="1.5" />
+            </svg>
+            <span className="museum-hall-count" aria-hidden>
+              🏆 {node.trophies.length}
+            </span>
           </button>
         );
       })}
@@ -420,110 +490,63 @@ function Doors({ layout: l, left, right, onWalk }: { layout: Layout; left: strin
   );
 }
 
-/** A big soft arrow on the floor of a doorway, pointing through it. */
-function ArrowArt({ side }: { side: "left" | "right" }) {
-  return (
-    <svg className={`museum-door-arrow ${side}`} viewBox="0 0 40 40" aria-hidden>
-      <path
-        d={side === "right" ? "M12 8 L28 20 L12 32" : "M28 8 L12 20 L28 32"}
-        fill="none"
-        stroke="#fff8e6"
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/** The row of plinths in a room, each with its trophy and its plate, centred in front of the back wall. */
-function Plinths({
+/**
+ * The trophies of a room on `plan.rows` tiers: each tier a wooden board along the back wall, the trophies standing on it,
+ * a small brass plate under each with its level's name (the game's too where the room holds several games' – the category
+ * stands on the room's sign once and is not said again here).
+ */
+function Tiers({
   layout: l,
+  plan,
   trophies,
   nameOf,
+  showGame,
   onPick,
 }: {
   layout: Layout;
+  plan: ReturnType<typeof tierPlan>;
   trophies: TrophyWon[];
   nameOf: (trophy: TrophyWon) => string | undefined;
+  showGame: boolean;
   onPick: (trophy: TrophyWon, from: DOMRect) => void;
 }) {
   const t = useT();
-  const width = l.trophy * PLINTH_WIDE;
-  const gap = l.trophy * PLINTH_GAP;
-  const count = Math.max(trophies.length, 1);
-  const start = l.vx - (count * width + (count - 1) * gap) / 2;
-  const top = l.foot - l.plinth;
+  const { rows, per, trophy: size, cellW, cellH } = plan;
   return (
-    <>
-      {Array.from({ length: count }, (_, i) => {
-        const trophy = trophies[i];
-        const x = start + i * (width + gap);
-        const game = trophy && gameOf(trophy.game);
-        const gameName = game ? t(game.title) : "";
-        const name = trophy ? nameOf(trophy) : undefined;
+    <div className="museum-tiers" style={{ "--trophy": `${size}px`, "--cell": `${cellW}px` } as CSSProperties}>
+      {Array.from({ length: rows }, (_, row) => {
+        const inRow = trophies.slice(row * per, (row + 1) * per);
+        const top = l.area.y + row * cellH + (cellH - size * CELL_HIGH) / 2;
         return (
-          <div
-            key={trophy ? trophyKey(trophy.game, trophy.level) : "empty"}
-            className="museum-stand"
-            style={{ left: x, top, width, height: l.plinth, "--deep": `${(top - l.vy) * (1 - PLINTH_DEEP)}px` } as CSSProperties}
-          >
-            <PlinthArt layout={l} x={x} y={top} width={width} height={l.plinth} />
-            {/* A warm light falling on it from above, painted still. */}
-            <span className="museum-spot" />
-            {trophy && (
-              <>
-                <button
-                  type="button"
-                  className="museum-trophy"
-                  aria-label={[name, gameName].filter(Boolean).join(" – ")}
-                  data-tap=""
-                  onClick={(e) => onPick(trophy, e.currentTarget.getBoundingClientRect())}
-                >
-                  <Trophy game={trophy.game} level={trophy.level} wins={trophy.wins} />
-                </button>
-                <span className="museum-plate" aria-hidden>
-                  {name && <span className="museum-plate-name">{name}</span>}
-                  <span className={name ? "museum-plate-game" : "museum-plate-name"}>{gameName}</span>
-                </span>
-              </>
-            )}
+          <div key={row} className="museum-tier" style={{ top, height: size * CELL_HIGH }}>
+            <span className="museum-board" style={{ top: size }} />
+            {inRow.map((trophy, i) => {
+              const game = gameOf(trophy.game);
+              const gameName = game ? t(game.title) : "";
+              const name = nameOf(trophy);
+              const x = l.vx - (inRow.length * cellW) / 2 + i * cellW;
+              return (
+                <div key={trophyKey(trophy.game, trophy.level)} className="museum-stand" style={{ left: x, width: cellW }}>
+                  <button
+                    type="button"
+                    className="museum-trophy"
+                    aria-label={[name, gameName].filter(Boolean).join(" – ")}
+                    data-tap=""
+                    onClick={(e) => onPick(trophy, e.currentTarget.getBoundingClientRect())}
+                  >
+                    <Trophy game={trophy.game} level={trophy.level} wins={trophy.wins} />
+                  </button>
+                  <span className="museum-plate" aria-hidden>
+                    <span className="museum-plate-name">{name ?? gameName}</span>
+                    {name && showGame && <span className="museum-plate-game">{gameName}</span>}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         );
       })}
-    </>
-  );
-}
-
-/**
- * A plinth drawn in the room's perspective: its front, its top going back towards the vanishing point, and the side
- * that faces the room's middle. Its svg is as big as the box it stands in plus the room the top and side take.
- */
-function PlinthArt({ layout: l, x, y, width, height }: { layout: Layout; x: number; y: number; width: number; height: number }) {
-  const back = (px: number, py: number) => [l.vx + (px - l.vx) * PLINTH_DEEP, l.vy + (py - l.vy) * PLINTH_DEEP] as const;
-  // In the plinth's own px, from the front's top left corner; the svg reaches a little beyond the front all round.
-  const pad = width * 0.2;
-  const local = ([px, py]: readonly [number, number]) => [px - x + pad, py - y + pad] as const;
-  const fl = [x, y] as const;
-  const fr = [x + width, y] as const;
-  const bl = [x, y + height] as const;
-  const br = [x + width, y + height] as const;
-  const top = [fl, fr, back(...fr), back(...fl)].map(local);
-  const side = x + width / 2 < l.vx ? [fr, back(...fr), back(...br), br].map(local) : [fl, back(...fl), back(...bl), bl].map(local);
-  return (
-    <svg
-      className="museum-plinth"
-      style={{ left: -pad, top: -pad, width: width + 2 * pad, height: height + 2 * pad }}
-      viewBox={`0 0 ${width + 2 * pad} ${height + 2 * pad}`}
-      aria-hidden
-    >
-      <ellipse cx={pad + width / 2} cy={pad + height} rx={width * 0.62} ry={width * 0.08} fill="#2a140866" />
-      <polygon points={points(side)} fill="#cbbfa8" />
-      <polygon points={points(top)} fill="#fbf6ec" stroke="#b8a888" strokeWidth="1" />
-      <rect x={pad} y={pad} width={width} height={height} fill="url(#museum-plinth-front)" stroke="#b8a888" strokeWidth="1" />
-      <rect x={pad} y={pad + height * 0.9} width={width} height={height * 0.1} fill="#d9cdb4" />
-      <rect x={pad} y={pad} width={width} height={height * 0.06} fill="#fffaf0" />
-    </svg>
+    </div>
   );
 }
 

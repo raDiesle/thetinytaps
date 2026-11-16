@@ -38,17 +38,10 @@
   height: 100%;
 }
 
-/* Walking through a door: out of this room towards the doorway, then into the next from the other side. */
+/* Walking through a door: into it from where it was tapped, then into the next room from its middle. */
 .museum-scene.walk-out {
+  transform-origin: var(--ox, 50%) var(--oy, 62%);
   animation: museum-walk-out 0.42s ease-in both;
-}
-
-.museum-scene.walk-out.to-right {
-  transform-origin: 92% 62%;
-}
-
-.museum-scene.walk-out.to-left {
-  transform-origin: 8% 62%;
 }
 
 @keyframes museum-walk-out {
@@ -59,15 +52,8 @@
 }
 
 .museum-scene.walk-in {
+  transform-origin: 50% 62%;
   animation: museum-walk-in-room 0.42s ease-out both;
-}
-
-.museum-scene.walk-in.to-right {
-  transform-origin: 8% 62%;
-}
-
-.museum-scene.walk-in.to-left {
-  transform-origin: 92% 62%;
 }
 
 @keyframes museum-walk-in-room {
@@ -107,51 +93,38 @@
   text-wrap: balance;
 }
 
-/* Which room of all: a dot for each, the one here filled. For grown-ups, small and still. */
-.museum-room-dots {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 5px;
+/* The tiers: each a board along the back wall with its trophies standing on it, placed in px by the layout. */
+.museum-tiers,
+.museum-tier {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
 }
 
-.museum-room-dots > span {
-  width: 7px;
-  height: 7px;
-  border: 1.5px solid #9a6a3a;
-  border-radius: 50%;
+.museum-tiers {
+  inset: 0;
 }
 
-.museum-room-dots > .here {
-  background: #9a6a3a;
+.museum-board {
+  position: absolute;
+  left: 7%;
+  width: 86%;
+  height: calc(var(--trophy) * 0.08);
+  border-radius: 3px;
+  background: linear-gradient(#d9a566, #9a6a3a 70%, #5c3216);
+  box-shadow: 0 3px 5px #1a0a0466;
 }
 
-/* A plinth with its trophy and plate: placed in px by the layout, the trophy standing on its top. */
 .museum-stand {
   position: absolute;
-}
-
-.museum-plinth {
-  position: absolute;
-  overflow: visible;
-}
-
-/* A warm light falling on the trophy from above, still. */
-.museum-spot {
-  position: absolute;
-  bottom: 70%;
-  left: 50%;
-  width: calc(var(--trophy) * 1.1);
-  height: calc(var(--trophy) * 1.25);
-  border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 60%, #ffe9b066, #ffe9b022 45%, #0000 70%);
-  translate: -50% 0;
-  pointer-events: none;
+  top: 0;
+  height: 100%;
 }
 
 .museum-trophy {
   position: absolute;
-  bottom: calc(100% + var(--deep) / 2 - var(--trophy) * 0.025);
+  top: 0;
   left: 50%;
   height: var(--trophy);
   aspect-ratio: 2 / 3;
@@ -159,6 +132,7 @@
   border: 0;
   background: none;
   cursor: pointer;
+  pointer-events: auto;
   translate: -50% 0;
   -webkit-tap-highlight-color: transparent;
 }
@@ -176,25 +150,24 @@
   border-radius: 8px;
 }
 
-/* The brass plate screwed onto the plinth's front: the level's name and the game's, engraved in the book's serif. */
+/* A small brass plate under the board, below its trophy: the level's name in the book's serif, one or two short lines. */
 .museum-plate {
   position: absolute;
-  top: 18%;
+  top: calc(var(--trophy) * 1.1);
   left: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 86%;
-  min-height: 46%;
-  max-height: 66%;
-  padding: 0.3em 0.5em;
+  width: calc(var(--cell) * 0.94);
+  box-sizing: border-box;
+  min-height: calc(var(--trophy) * 0.2);
+  padding: 0.15em 0.3em;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 3px;
   background: linear-gradient(170deg, #fff3b8, #e8b737 40%, #c8921c 70%, #f2d27a);
   box-shadow:
     inset 0 0 0 1px #8a5a10,
-    inset 0 0 0 3px #fff3b866,
     0 2px 3px #5a3a1066;
   font-family: Georgia, "Times New Roman", serif;
   color: #4a2e08;
@@ -204,31 +177,10 @@
   pointer-events: none;
 }
 
-/* Its two screws. */
-.museum-plate::before,
-.museum-plate::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff3b8, #8a5a10);
-  translate: 0 -50%;
-}
-
-.museum-plate::before {
-  left: 4px;
-}
-
-.museum-plate::after {
-  right: 4px;
-}
-
 .museum-plate-name {
   display: -webkit-box;
   overflow: hidden;
-  font-size: calc(var(--trophy) * 0.072);
+  font-size: max(7px, calc(var(--trophy) * 0.075));
   font-weight: 700;
   font-style: italic;
   line-height: 1.12;
@@ -238,11 +190,66 @@
 }
 
 .museum-plate-game {
-  margin-top: 0.15em;
-  font-size: calc(var(--trophy) * 0.048);
+  font-size: max(6px, calc(var(--trophy) * 0.055));
   font-variant: small-caps;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   line-height: 1.1;
+}
+
+/* A hall's door: the door itself under a sign with its name, and how many trophies are behind it. All of it is the tap. */
+.museum-hall-door {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.museum-hall-sign {
+  max-width: 96%;
+  padding: 0.2em 0.7em;
+  border: 2px solid #c9a060;
+  border-radius: 5px;
+  background: linear-gradient(#fff8e8, #f1e2bf);
+  box-shadow: 0 3px 6px #1a0a0466;
+  color: #3a2410;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.65rem, min(calc(var(--door) * 0.13), 1.7vw), 1.2rem);
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.museum-hall-door-art {
+  height: var(--door);
+  margin-top: auto;
+  margin-bottom: 4%;
+  width: auto;
+  filter: drop-shadow(0 3px 5px #1a0a0480);
+}
+
+.museum-hall-count {
+  position: absolute;
+  bottom: 1%;
+  padding: 0 0.5em;
+  border-radius: 99px;
+  background: #fff8e8e0;
+  color: #3a2410;
+  font-size: clamp(0.65rem, min(calc(var(--door) * 0.11), 1.6vw), 1rem);
+  font-weight: 700;
+}
+
+.museum-hall-door:focus-visible {
+  outline: 3px solid #ffe08a;
+  border-radius: 8px;
 }
 
 /* What can be tapped of a doorway: a big soft arrow on its floor, pointing through it. */
@@ -260,8 +267,8 @@
 }
 
 .museum-door-arrow {
-  width: clamp(28px, 7vh, 56px);
-  height: clamp(28px, 7vh, 56px);
+  width: clamp(26px, 6vh, 44px);
+  height: clamp(26px, 6vh, 44px);
   filter: drop-shadow(0 2px 3px #3a1e1099);
 }
 
