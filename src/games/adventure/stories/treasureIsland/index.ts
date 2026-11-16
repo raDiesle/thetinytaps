@@ -222,7 +222,6 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     key,
     ropeMat,
     crabs,
-    confetti,
     spray,
     gold,
     sand,
@@ -1673,14 +1672,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       sand.burst(tmpA.set(CHEST_SAND.x, groundHeight(CHEST_SAND.x, CHEST_SAND.z), CHEST_SAND.z), 20, 2);
       cue("knock");
     }
-    // At every second jump for joy, at its top, gold glitters out of the chest behind Tapsi and confetti flies.
+    // At every second jump for joy, at its top, a soft sound; the open chest's gold glows from inside, nothing flies.
     if (step === S.hooray) {
       for (let n = 0; TRAVEL[S.hooray] + n * 1.6 < LEAD[S.hooray] + len; n++) {
-        if (crossed(f, TRAVEL[S.hooray] + 0.4 + n * 1.6)) {
-          gold.burst(chest.group.getWorldPosition(tmpA).add(v3(0, 0.9, 0)), 18, 4.5);
-          confetti.burst(tmpA.copy(guide.root.position).add(v3(0, 1.8, 0)), 30, 5);
-          cue(n % 2 ? "pop" : "sparkle");
-        }
+        if (crossed(f, TRAVEL[S.hooray] + 0.4 + n * 1.6)) cue(n % 2 ? "pop" : "sparkle");
       }
     }
     // The coins of every throw fly up out of Tapsi's paws over the chest, spread all round but away from Ole
@@ -1832,7 +1827,6 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     sea.time.value = time;
     const dt = Math.max(0, Math.min(0.1, time - lastTime));
     lastTime = time;
-    confetti.update(dt);
     spray.update(dt);
     gold.update(dt);
     sand.update(dt);
