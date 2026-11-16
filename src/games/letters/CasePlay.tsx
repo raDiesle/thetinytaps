@@ -15,7 +15,7 @@ import "./case.css";
 
 /** How long the child letter takes to walk over to its big letter. */
 const WALK_MS = 1200;
-/** How long the two stand together, holding hands, before the next big letter comes by itself. */
+/** How long the two stand together, before the next big letter comes by itself. */
 const TOGETHER_MS = 1800;
 /** Rounds found with the first tap in a row before the small letters to choose from look alike (b d p). */
 const ALIKE_AFTER = 3;
@@ -49,7 +49,7 @@ const ALIKE: string[][] = [
   ["у", "ч", "г", "т"],
 ];
 
-/** The letters the game asks for: those with a big and a small form, none with marks over them (Ö, Й), whose dots would crowd the eyes. */
+/** The letters the game asks for: those with a big and a small form, none with marks over them (Ö, Й), which a child could mistake for another letter. */
 export const caseLetters = (pack: LanguagePack) =>
   pack.letters.filter((l) => l.upper !== l.lower && toLower(l.upper, pack) === l.lower && l.upper.normalize("NFD").length === 1);
 
@@ -94,8 +94,8 @@ export function choicesFor(letter: LetterEntry, letters: LetterEntry[], alike: b
 type Round = { id: number; letter: LetterEntry; choices: LetterEntry[]; next: LetterEntry };
 
 /**
- * „Wo ist das kleine b?“ (L-23): a big letter with eyes looks for its child. Three small letters stand below, only one
- * belongs to it; tapped (or its key pressed), it walks over to the big one and they hold hands. A wrong one shakes its
+ * „Wo ist das kleine b?“ (L-23): a big letter looks for its child. Three small letters stand below, only one
+ * belongs to it; tapped (or its key pressed), it walks over to the big one and they stand together. A wrong one shakes its
  * head. First the three look plainly different, then – once the child finds them at the first tap – alike (b, d, p).
  */
 export function CasePlay({ pack, language, settings }: { pack: LanguagePack; language: string; settings: LettersSettings }) {
@@ -180,7 +180,7 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
       frames.push({ transform: `translate(${dx * left}px, calc(${dy * left}px + ${up}em))` });
     }
     element.animate(frames, { duration: WALK_MS, easing: "linear" });
-    // Arrived, they hold hands and sway together once.
+    // Arrived, they sway together once.
     pair.current?.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(-4deg)" }, { transform: "rotate(4deg)" }, { transform: "rotate(0deg)" }], {
       duration: 900,
       delay: WALK_MS,
@@ -254,18 +254,12 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
             <div ref={pair} className="cs-pair">
               <span className="cs-big" data-tap onPointerDown={onBig} aria-label={prompt?.(round.letter.spoken) ?? round.letter.upper}>
                 {round.letter.upper}
-                <Eyes />
               </span>
-              <svg className={`cs-hands${found ? " held" : ""}`} viewBox="0 0 40 24" aria-hidden>
-                <path d="M0 4 Q10 20 20 16 Q30 20 40 8" />
-                <circle cx="20" cy="16" r="6" />
-              </svg>
               {/* The place the child letter walks to: kept free until it is found, so nothing moves when it comes. */}
               <span className="cs-spot">
                 {found && (
                   <span ref={child} className="cs-small cs-child">
                     {round.letter.lower}
-                    <Eyes small />
                   </span>
                 )}
               </span>
@@ -290,7 +284,6 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
                   }}
                 >
                   {c.lower}
-                  <Eyes small />
                 </span>
               );
             })}
@@ -299,15 +292,5 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
       )}
       <FeedbackLayer effects={effects} />
     </div>
-  );
-}
-
-/** Two still eyes on a letter: at cap height on the big one, at x-height on a small one. */
-function Eyes({ small = false }: { small?: boolean }) {
-  return (
-    <span className={`cs-eyes${small ? " small" : ""}`} aria-hidden>
-      <span />
-      <span />
-    </span>
   );
 }

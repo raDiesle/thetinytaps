@@ -16,10 +16,9 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
 - Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
   mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
   for a shown letter).
-- Wo ist das kleine b?, `/gross-klein/` (`CasePlay.tsx`, `case.css`; L-23, still „in Bearbeitung“: `unfinished:
-  "labelled"` in `games.ts`, so its line carries that label and opens only on this computer): a big letter with eyes
-  looks for its child among three small letters with eyes; the right one (tapped, or its key pressed) walks over in
-  little hops and they hold hands, a wrong one shakes its head. Three rounds in a row found at the first tap bring
+- Wo ist das kleine b?, `/gross-klein/` (`CasePlay.tsx`, `case.css`; L-23, published, playable from the menu): a big letter
+  looks for its child among three small letters; the right one (tapped, or its key pressed) walks over in
+  little hops and stands beside it, a wrong one shakes its head. Three rounds in a row found at the first tap bring
   look-alikes (b next to d, `ALIKE`), a wrong tap among them plainly different ones again (`choicesFor`). Only letters
   with a big and a small form and no marks over them (`caseLetters`: no umlauts, no Й); Hindi and Arabic, which have
   one form, play it in English. It asks „Wo ist das kleine …?“ (`SMALL_PROMPT`, German, not yet recorded, so silent
@@ -31,6 +30,8 @@ the page before it.
 
 ## Rules
 
+- Letters in „Wo ist das kleine b?“ carry nothing drawn on them – no eyes, no chain or hands joining big and small
+  (user feedback, November 2026: they distract from recognising the letter's shape). Keep the letters bare.
 - The five are games of their own in the table of contents, never „Spielart“ or „Nur Zahlen“ choices behind one
   game's ⚙️: they were folded into one game once and split again (user feedback, November 2026). A new thing to do with
   letters or numbers is a new game in the book; a variant of one (which words, how numbers come) is an option of it.

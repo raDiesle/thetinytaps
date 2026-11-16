@@ -109,7 +109,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Buchstaben und Zahlen lernen – Tastatur-Spiele",
     description:
       "Frei tippen, Zählen, Mitmachen und Wörter tippen: Jede Taste zeigt ihren Buchstaben mit Bild und Stimme, Zahlen kommen zum Zählen und Hüpfen.",
-    text: "Vier Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, Mitmachen, bei dem ein Fuchs- oder Bärenkind jede Zahl hüpft, klatscht oder stampft, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“.",
+    text: "Fünf Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, Mitmachen, bei dem ein Fuchs- oder Bärenkind jede Zahl hüpft, klatscht oder stampft, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“, und „Wo ist das kleine b?“, bei dem ein großer Buchstabe unter drei kleinen sein Kind sucht.",
   },
   {
     path: "/spiele/zuordnen/",
@@ -218,8 +218,8 @@ export const SEO_TEXTS: PageSeo[] = [
   {
     path: "/gross-klein/",
     title: "Wo ist das kleine b? – große und kleine Buchstaben",
-    description: "Ein großer Buchstabe mit Augen sucht sein Kind: Von drei kleinen Buchstaben gehört einer dazu, läuft zu ihm und nimmt seine Hand.",
-    text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe mit Augen sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber, und beide halten sich an der Hand; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p.",
+    description: "Ein großer Buchstabe sucht sein Kind: Von drei kleinen Buchstaben gehört einer dazu und läuft zu ihm hinüber.",
+    text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber und stellt sich neben ihn; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p.",
   },
   {
     path: "/zaehne/",
