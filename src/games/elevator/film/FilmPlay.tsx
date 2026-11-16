@@ -6,7 +6,7 @@ import { INK } from "@/games/scenes/shared";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { touchOnly } from "@/lib/device";
 import { useT } from "@/lib/language";
-import { playPop, playRandomNote, playRecorded, playTusch } from "@/lib/sfx";
+import { playPop, playRandomNote, playGlockenspielEnd } from "@/lib/sfx";
 import { tapState } from "@/lib/tapTargets";
 import { hush, talking } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
@@ -368,7 +368,7 @@ export function FilmPlay({
     await quiet();
     put({ party: true });
     say(film.end);
-    sound(() => playRecorded("cheer", playTusch));
+    sound(playGlockenspielEnd);
     await wait(END_MS);
     put({ picking: true });
   };
