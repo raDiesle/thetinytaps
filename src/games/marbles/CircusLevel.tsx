@@ -25,7 +25,6 @@ import {
   LION_TO,
   MANE,
   MAST,
-  MUZZLE,
   NECK,
   NET,
   PEDESTAL_W,
@@ -44,7 +43,7 @@ import {
 } from "./circus";
 import { beside, deg, lerp, rad, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
-import { Bunting, INK, MARBLE_COLOR, Sparkles } from "./scenery";
+import { Bunting, INK, MARBLE_COLOR } from "./scenery";
 import { BALL_R, type Pt } from "./path";
 import { BAR_COLORS, Ball } from "./parts";
 
@@ -107,9 +106,6 @@ export function CircusLevel(props: LevelProps) {
             <Ribbon tassel={circus.tasselAt(t)} pulled={circus.pulledAt(t)} fired={t >= circus.tFire} />
             <Hoop t={t} tPass={circus.tHoop} part="front" />
             <TopHat />
-            <ConfettiBurst age={t - circus.tFire} />
-            <ConfettiRain age={t - circus.tShow} />
-            <Sparkles x={clown.pt.x} y={clown.pt.y - 40} age={t - circus.tShow} n={12} spread={200} />
           </>
         );
       }}
@@ -1148,74 +1144,6 @@ function Spotlights({ on }: { on: number }) {
             </g>
             <circle cx={lamp.x} cy={lamp.y - 30} r="6" fill={INK} />
           </g>
-        );
-      })}
-    </g>
-  );
-}
-
-const CONFETTI = Array.from({ length: 90 }, (_, i) => ({
-  x: 5280 + ((i * 397) % 1560),
-  y0: -40 - ((i * 53) % 360),
-  speed: 190 + ((i * 37) % 130),
-  rest: FLOOR + 6 + ((i * 29) % 46),
-  sway: 10 + (i % 4) * 6,
-  color: BAR_COLORS[i % BAR_COLORS.length],
-}));
-
-/** Confetti raining down from the top of the tent and coming to rest on the sawdust. */
-function ConfettiRain({ age }: { age: number }) {
-  if (age < 0) return null;
-  return (
-    <g>
-      {CONFETTI.map((c, i) => {
-        const y = Math.min(c.rest, c.y0 + c.speed * age);
-        const falling = y < c.rest;
-        const x = c.x + (falling ? c.sway * Math.sin(age * 4 + i) : c.sway * Math.sin(((c.rest - c.y0) / c.speed) * 4 + i));
-        const spin = falling ? age * 300 + i * 40 : i * 40;
-        return (
-          <rect
-            key={i}
-            transform={`translate(${x} ${y}) rotate(${spin})`}
-            x="-6"
-            y="-9"
-            width="12"
-            height="18"
-            rx="2"
-            fill={c.color}
-            stroke={INK}
-            strokeWidth="1.5"
-          />
-        );
-      })}
-    </g>
-  );
-}
-
-/** A puff of confetti out of the cannon's mouth, `age` seconds after it fires. */
-function ConfettiBurst({ age }: { age: number }) {
-  if (age < 0 || age > 1.6) return null;
-  const aim = rad(CANNON.angle);
-  return (
-    <g opacity={Math.min(1, (1.6 - age) * 2)}>
-      {Array.from({ length: 26 }, (_, i) => {
-        const a = aim + ((i % 9) - 4) * 0.12;
-        const v = 320 + ((i * 47) % 260);
-        const x = MUZZLE.x + v * Math.cos(a) * age;
-        const y = MUZZLE.y - v * Math.sin(a) * age + 500 * age * age;
-        return (
-          <rect
-            key={i}
-            transform={`translate(${x} ${y}) rotate(${age * 600 + i * 30})`}
-            x="-5"
-            y="-8"
-            width="10"
-            height="16"
-            rx="2"
-            fill={BAR_COLORS[i % BAR_COLORS.length]}
-            stroke={INK}
-            strokeWidth="1.5"
-          />
         );
       })}
     </g>
