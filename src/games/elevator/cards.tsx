@@ -8,15 +8,17 @@ import { TRAIL_LEVELS } from "./trail/levels";
 /** A story or level, named on its „Weiter“ button for screen readers. */
 export interface StoryCard {
   id: string;
-  /** German; shown through `titleIn` in the app language. */
+  /** In its first language; shown through `titleIn` in the app language. */
   title: string;
+  /** The title's first language: German when absent. */
+  first?: "en";
 }
 
 /** Every story of the game in play order: the lift stories first, then the trail levels, then the films. */
 export const CARDS: StoryCard[] = [
   ...STORIES.map((s) => ({ id: s.id, title: s.title })),
   ...TRAIL_LEVELS.map((l) => ({ id: l.id, title: l.title })),
-  ...FILMS.map((f) => ({ id: f.id, title: f.title })),
+  ...FILMS.map((f) => ({ id: f.id, title: f.title, first: f.first })),
 ];
 
 /** The story after this one; after the last comes the first again. */
@@ -29,5 +31,5 @@ export function nextCard(id: string) {
 export function StoryEnd({ id, onPick }: { id: string; onPick: (id: string) => void }) {
   const language = useAppLanguage();
   const next = nextCard(id);
-  return <GameEnd level={id} onAgain={() => onPick(id)} next={{ name: titleIn(next.title, language.id), onNext: () => onPick(next.id) }} />;
+  return <GameEnd level={id} onAgain={() => onPick(id)} next={{ name: titleIn(next.title, language.id, next.first), onNext: () => onPick(next.id) }} />;
 }

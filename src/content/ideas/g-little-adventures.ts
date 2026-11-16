@@ -175,6 +175,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Weitere Filme nach demselben Muster – etwas passiert, jemand ruft, die Helfer machen sich bereit, fahren hin, helfen, alle freuen sich, zurück nach Hause: der Krankenwagen (ein Kind fällt vom Fahrrad, Pflaster aufs Knie, alle winken), die Polizei (ein Hund ist weggelaufen und wird gefunden), der Abschleppwagen (ein Auto hat eine Panne), die Bergwacht mit dem Hubschrauber (ein Wanderer sitzt fest, bekommt eine Decke), das Rettungsboot (ein Schlauchboot treibt ab), der Tierarzt (ein Hund hat eine Pfote verletzt). Immer harmlos: niemand ist schlimm verletzt, nichts Gruseliges.",
       why: "Ein bekanntes Muster in vielen Kleidern; Kinder lernen die Helfer und ihre Fahrzeuge kennen.",
       effort: "L",
+      partial: "„The ambulance“ (Krankenwagen) ist gebaut, zuerst auf Englisch; Polizei, Abschleppwagen, Bergrettung, Rettungsboot und Tierarzt fehlen noch.",
     },
     {
       id: "G-20",

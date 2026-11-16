@@ -437,6 +437,9 @@ function feelings(language: TargetLanguageId): VoiceGroup[] {
   ];
 }
 
+/** The group of the films written English first: recorded in English, translated only on request. */
+export const ENGLISH_FILMS = "Filme (zuerst Englisch)";
+
 function elevator(): VoiceGroup[] {
   const house = STORIES.flatMap((story) => [
     story.need.say,
@@ -463,7 +466,8 @@ function elevator(): VoiceGroup[] {
   return [
     { label: "Aufzug-Geschichten", lines: once(house) },
     { label: "Weg-Abenteuer", lines: once(trail) },
-    { label: "Filme", lines: once(FILMS.flatMap(filmLines)) },
+    { label: "Filme", lines: once(FILMS.filter((f) => !f.first).flatMap(filmLines)) },
+    { label: ENGLISH_FILMS, lines: once(FILMS.filter((f) => f.first === "en").flatMap(filmLines)) },
     { label: "In allen Geschichten", lines: once(Object.values(elevatorTexts)) },
   ];
 }

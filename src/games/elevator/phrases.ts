@@ -10,18 +10,24 @@ import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@
 export const PHRASEBOOKS: Partial<Record<TargetLanguageId, Record<string, string>>> = byLanguage((texts) => texts.elevator);
 
 const GERMAN = targetLanguageFor("de");
+const ENGLISH = targetLanguageFor("en");
 
-/** `german` in the language `id`; undefined when that language has no translation of it. */
-export function translationOf(german: string, id: TargetLanguageId): string | undefined {
-  return id === "de" ? german : PHRASEBOOKS[id]?.[german];
+/** The language a story, level or film is written in: German for the older ones, English for what is new (`Film.first`). */
+export type FirstLanguage = "de" | "en";
+
+/** `text`, written in the first language `first`, in the language `id`; undefined when that language has no translation of it. */
+export function translationOf(text: string, id: TargetLanguageId, first: FirstLanguage = "de"): string | undefined {
+  return id === first ? text : PHRASEBOOKS[id]?.[text];
 }
 
-/** A title or label for grown-ups in the language `id`, German when it has no translation. */
-export const titleIn = (german: string, id: TargetLanguageId) => translationOf(german, id) ?? german;
+/** A title or label for grown-ups in the language `id`, in its first language when it has no translation. */
+export const titleIn = (text: string, id: TargetLanguageId, first: FirstLanguage = "de") => translationOf(text, id, first) ?? text;
 
-/** What to speak for `german` in `language`: the text and the speech language that reads it. */
-export function spokenIn(german: string, language: TargetLanguage): { text: string; speechLang: string; english?: string } {
-  const text = translationOf(german, language.id);
-  const english = language.id === "en" ? undefined : translationOf(german, "en");
-  return text === undefined ? { text: german, speechLang: GERMAN.speechLang, english } : { text, speechLang: language.speechLang, english };
+/** What to speak for `text` (written in `first`) in `language`: the text and the speech language that reads it. A text without
+ * a translation is said in its first language, and its English recording stands in where there is none of the language's. */
+export function spokenIn(text: string, language: TargetLanguage, first: FirstLanguage = "de"): { text: string; speechLang: string; english?: string } {
+  const own = first === "en" ? ENGLISH : GERMAN;
+  const translated = translationOf(text, language.id, first);
+  const english = language.id === "en" ? undefined : first === "en" ? text : translationOf(text, "en");
+  return translated === undefined ? { text, speechLang: own.speechLang, english } : { text: translated, speechLang: language.speechLang, english };
 }

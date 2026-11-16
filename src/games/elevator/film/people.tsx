@@ -27,7 +27,8 @@ const ARMS = {
 } as const;
 
 /** A grown-up; `face` -1 turns it left. With `wear` "fire" it is a firefighter, with "baker" a baker in a white
- * jacket and a baker's hat, with "blanket" a warm blanket lies round its shoulders. */
+ * jacket and a baker's hat, with "rescue" a paramedic in an orange jacket with silver stripes, with "blanket" a warm
+ * blanket lies round its shoulders. */
 export function Grownup({
   look,
   pose,
@@ -37,14 +38,15 @@ export function Grownup({
 }: {
   look: Look;
   pose: GrownPose;
-  wear?: ("fire" | "baker" | "blanket")[];
+  wear?: ("fire" | "baker" | "blanket" | "rescue")[];
   face?: 1 | -1;
   holding?: ReactNode;
 }) {
   const fire = wear.includes("fire");
   const baker = wear.includes("baker");
-  const shirt = fire ? FIRE_BLUE : baker ? "#f8f9fa" : look.shirt;
-  const pants = fire ? FIRE_BLUE : look.pants;
+  const rescue = wear.includes("rescue");
+  const shirt = fire ? FIRE_BLUE : baker ? "#f8f9fa" : rescue ? "#ff922b" : look.shirt;
+  const pants = fire ? FIRE_BLUE : rescue ? "#2b3a55" : look.pants;
   const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
   const left = ARMS[pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
   const arm = (a: (typeof ARMS)[keyof typeof ARMS], className: string, origin: string, mirror: boolean) => (
@@ -71,6 +73,7 @@ export function Grownup({
         ))}
         <rect x="-32" y="-202" width="64" height="110" rx="22" fill={shirt} />
         {fire && <path d="M-32 -116 H32 M-32 -132 H32" stroke={FIRE_STRIPE} strokeWidth="6" />}
+        {rescue && <path d="M-32 -116 H32 M-32 -132 H32" stroke="#f1f3f5" strokeWidth="6" />}
         {baker && (
           <g>
             <rect x="-32" y="-202" width="64" height="110" rx="22" fill="none" stroke="#ced4da" strokeWidth="3" />

@@ -52,6 +52,7 @@ const END_MS = 9000;
 const STRIP_RUN_MS = 600;
 /** The language a film speaks until it is translated. */
 const GERMAN = targetLanguageFor("de");
+const ENGLISH = targetLanguageFor("en");
 
 /** What the screen shows: the scene, how far its beats are, and what waits for the child. */
 interface View {
@@ -223,14 +224,15 @@ export function FilmPlay({
   );
 
   /** A film not yet translated into the app language is said all in German, never in two languages. */
-  const voice = translationOf(film.title, language.id) === undefined ? GERMAN : language;
+  const first = film.first ?? "de";
+  const voice = translationOf(film.title, language.id, first) === undefined ? (first === "en" ? ENGLISH : GERMAN) : language;
 
   /** Something was said since the last quiet moment. */
   const spoke = useRef(false);
   /** Says a German line of the film in the app language, from its recording. */
   const say = (german: string) => {
     spoke.current = true;
-    sayIn(german, voice);
+    sayIn(german, voice, first);
   };
 
   const sound = (play: () => void) => {
@@ -326,8 +328,8 @@ export function FilmPlay({
     // Only the film's lines up to its first choice load (then those of the way picked); the first scene's first line
     // holds its beats until it is there, so it comes with the picture.
     const opening = film.scenes(picks)[0]?.beats.find((beat) => beat.say || beat.ask);
-    const ready = linesReady([opening?.ask, opening?.say], voice);
-    loadLines(filmLines(film, picks), voice);
+    const ready = linesReady([opening?.ask, opening?.say], voice, first);
+    loadLines(filmLines(film, picks), voice, first);
     const g = generation.current;
     for (let i = 0; ; i++) {
       const scene = film.scenes(picks)[i];
@@ -361,7 +363,7 @@ export function FilmPlay({
         await quiet();
         picks = [...picks, await waitChoice(scene.choice)];
         put({ picks });
-        loadLines(filmLines(film, picks), voice);
+        loadLines(filmLines(film, picks), voice, first);
         await wait(PICKED_MS);
       }
     }

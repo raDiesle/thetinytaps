@@ -86,7 +86,10 @@ export interface Scene {
 /** A film: scenes that tell one story, cut from place to place. */
 export interface Film {
   id: string;
-  /** German; shown through `titleIn` in the app language. */
+  /** The first language of its title and lines: German when absent (the older films), "en" for what is new. Shown and
+   * said through `titleIn` / `spokenIn` in the app language; where it has no translation, in this language. */
+  first?: "en";
+  /** In its first language; shown through `titleIn` in the app language. */
   title: string;
   /** The scenes, given what the child has picked so far: up to the next scene whose choice is not picked yet, or
    * all of them to the end. */

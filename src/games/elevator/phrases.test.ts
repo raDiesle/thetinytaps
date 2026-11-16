@@ -1,8 +1,9 @@
 import { expect, test } from "bun:test";
+import { targetLanguageFor } from "@/content/targetLanguages";
 import { STORIES, texts } from "./content";
 import { FILMS } from "./film/films";
 import type { Film } from "./film/types";
-import { PHRASEBOOKS } from "./phrases";
+import { PHRASEBOOKS, spokenIn, titleIn, translationOf } from "./phrases";
 import { TRAIL_LEVELS } from "./trail/levels";
 import type { Station, Way } from "./trail/types";
 
@@ -99,5 +100,20 @@ test("sentences in another script are in its letters, with no Latin letters", ()
     for (const [german, text] of Object.entries(PHRASEBOOKS[language as keyof typeof PHRASEBOOKS] ?? {})) {
       expect({ german, own: script.test(text), latin: /[A-Za-z]/.test(text) }, language).toEqual({ german, own: true, latin: false });
     }
+  }
+});
+
+test("an English-first film is said in English until it is translated, never in German", () => {
+  const line = "Here we are!";
+  expect(translationOf(line, "en", "en")).toBe(line);
+  expect(translationOf(line, "de", "en")).toBeUndefined();
+  expect(titleIn(line, "de", "en")).toBe(line);
+  for (const id of ["de", "en", "ru"] as const) {
+    const said = spokenIn(line, targetLanguageFor(id), "en");
+    expect(said.text).toBe(line);
+    expect(said.speechLang.startsWith("en")).toBe(true);
+  }
+  for (const film of FILMS.filter((f) => f.first === "en")) {
+    expect(PHRASEBOOKS.de?.[film.title]).toBeUndefined();
   }
 });

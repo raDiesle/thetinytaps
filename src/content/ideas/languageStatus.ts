@@ -251,6 +251,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Neu (10. November 2026), Titel und Sätze übersetzt auf Wunsch am 11. November 2026. Von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme im zweiten Konto („Tapsi Coach (Klon)“, die Credits des ersten waren aufgebraucht): Englisch am 11., Chinesisch, Hindi, Spanisch und Arabisch am 12. November 2026; Deutsch und Russisch noch nicht aufgenommen: bis dahin liest die Stimme des Browsers. Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto). Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto).",
       },
+      {
+        label: "🚑 The ambulance",
+        recorded: true,
+        languages: { en: "text" },
+        note: "New (16 November 2026), English first: written in English only, not translated (also not into German) and not recorded; until then every player sees and hears English. Its lines wait on /management/ under „Filme (zuerst Englisch)“.",
+      },
     ],
   },
   {

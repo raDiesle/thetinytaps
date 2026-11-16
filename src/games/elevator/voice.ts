@@ -4,7 +4,7 @@ import { waitingFor } from "@/lib/soundWait";
 import { recordedVoice, type VoiceLine } from "@/lib/voice";
 import { texts, type Story } from "./content";
 import type { Film } from "./film/types";
-import { spokenIn } from "./phrases";
+import { type FirstLanguage, spokenIn } from "./phrases";
 import type { Station, TrailLevel } from "./trail/types";
 
 // What the stories, levels and films say, from their ElevenLabs recordings (`bun run voice make`,
@@ -16,22 +16,22 @@ import type { Station, TrailLevel } from "./trail/types";
 const voice = recordedVoice(voiceFiles, { browser: true });
 
 /** Says a German sentence of the game in `language`, or in German where its phrasebook has no translation. */
-export function sayIn(german: string, language: TargetLanguage) {
-  const { text, speechLang, english } = spokenIn(german, language);
+export function sayIn(german: string, language: TargetLanguage, first: FirstLanguage = "de") {
+  const { text, speechLang, english } = spokenIn(german, language, first);
   voice.say(text, language.id, { speechLang, english });
 }
 
 /** The recordings `sayIn` plays for these German sentences in `language`. */
-const linesIn = (germans: (string | undefined)[], language: TargetLanguage): VoiceLine[] =>
+const linesIn = (germans: (string | undefined)[], language: TargetLanguage, first: FirstLanguage = "de"): VoiceLine[] =>
   germans.flatMap((german) => {
     if (!german) return [];
-    const { text, english } = spokenIn(german, language);
+    const { text, english } = spokenIn(german, language, first);
     return [{ text, english }];
   });
 
 /** Starts fetching the recordings of these German sentences in `language` (not decoded), so each comes on time. */
-export function loadLines(germans: (string | undefined)[], language: TargetLanguage) {
-  voice.load(linesIn(germans, language), language.id);
+export function loadLines(germans: (string | undefined)[], language: TargetLanguage, first: FirstLanguage = "de") {
+  voice.load(linesIn(germans, language, first), language.id);
 }
 
 /**
@@ -39,8 +39,8 @@ export function loadLines(germans: (string | undefined)[], language: TargetLangu
  * after SOUND_WAIT_MS): call it when the first of them is due. Only then, if they are still loading, the paw track of
  * `SoundLoading` shows – the moments the script waits anyway (a pose, the iris) load without it.
  */
-export function linesReady(germans: (string | undefined)[], language: TargetLanguage): () => Promise<void> {
-  const lines = linesIn(germans, language);
+export function linesReady(germans: (string | undefined)[], language: TargetLanguage, first: FirstLanguage = "de"): () => Promise<void> {
+  const lines = linesIn(germans, language, first);
   const loaded = voice.ready(lines, language.id);
   return () => (voice.isReady(lines, language.id) ? loaded : waitingFor(loaded));
 }

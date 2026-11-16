@@ -175,6 +175,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG. Das Kind (Junge / Mädchen) bleibt, bis D-19 entschieden ist.",
     tasks: [
       {
+        label: "Krankenwagen-Film: Bärenkind, Fuchs-Mama oder -Papa, Sanitäterin und Fahrer",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Neu (16. November 2026): das gestürzte Kind ist ein Bärenkind, sein Elternteil ein Fuchs, die Sanitäterin ein Fuchs, der Fahrer ein Bär – alle in Rollen, mit Kleidung. Das Kind des Spiels bleibt ein Mensch und kommt in diesem Film nicht vor.",
+      },
+      {
         label: "Feuerwehr, Nachbarin, Bewohner und Fahrer im Feuerwehr-Film werden Füchse oder Bären",
         work: "drawing",
         effort: "M",

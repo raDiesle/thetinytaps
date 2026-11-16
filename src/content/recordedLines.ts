@@ -6,7 +6,7 @@
 
 import { APP_LANGUAGES, type Localized } from "@/lib/language";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { voiceLines } from "@/content/voiceLines";
+import { ENGLISH_FILMS, voiceLines } from "@/content/voiceLines";
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
 import { GOOD_NIGHT } from "@/components/GameShell";
 import { translationOf } from "@/games/elevator/phrases";
@@ -39,12 +39,6 @@ const once = (lines: (RecordedLine | false | "" | undefined)[]) => {
   return lines.filter((l): l is RecordedLine => !!l && !!l.text.trim() && !seen.has(l.text) && !!seen.add(l.text));
 };
 
-/** The German lines of a game on the /management/ list (voiceLines.ts). */
-const germanOf = (href: string) =>
-  voiceLines()
-    .find((g) => g.href === href)
-    ?.groups.flatMap((g) => g.lines) ?? [];
-
 function teeth(language: TargetLanguageId): RecordedLine[] {
   const daytimes = (["morning", "evening"] as const).map((d) => (language === "de" ? DAYTIME[d] : DAYTIME_TRANSLATIONS[language]?.[d]));
   const daytime = (key: "hello" | "grow" | "after", kind: RecordedKind) => daytimes.map((d) => d?.[key] && { text: d[key], kind });
@@ -65,12 +59,20 @@ function teeth(language: TargetLanguageId): RecordedLine[] {
 }
 
 function elevator(language: TargetLanguageId): RecordedLine[] {
-  return once(
-    germanOf("/kleine-abenteuer/").map((german) => {
-      const text = translationOf(german, language);
-      return text !== undefined && { text, kind: "instruction" };
+  const groups = voiceLines().find((g) => g.href === "/kleine-abenteuer/")?.groups ?? [];
+  const german = groups.filter((g) => g.label !== ENGLISH_FILMS).flatMap((g) => g.lines);
+  // The films written English first: English as written, another language where its phrasebook has the line, German never.
+  const english = groups.filter((g) => g.label === ENGLISH_FILMS).flatMap((g) => g.lines);
+  return once([
+    ...german.map((line) => {
+      const text = translationOf(line, language);
+      return text !== undefined && { text, kind: "instruction" as const };
     }),
-  );
+    ...english.map((line) => {
+      const text = language === "de" ? undefined : translationOf(line, language, "en");
+      return text !== undefined && { text, kind: "instruction" as const };
+    }),
+  ]);
 }
 
 /** The list of `voiceLines.ts` in each language, built once: it reads every game's data. */
