@@ -778,16 +778,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     }
 
-    // Hooray: confetti when Tapsi has turned round, and again with every other landing.
-    if (step === S.hooray) {
-      if (atClip(0)) {
-        confetti.burst(tmpA.copy(g).add(v3(0, 1.4, 0)), 60, 4.5, true);
-        cue("chime");
-      }
-      for (let n = 0; n * CHEER_PERIOD < clipLength(step); n += 2) {
-        if (atClip((n + LANDING) * CHEER_PERIOD)) confetti.burst(tmpA.copy(g).add(v3(0, 1.8, 0)), 14, 3);
-      }
-    }
+    // Hooray: no confetti – the finished rainbow and Tapsi's cheering are the celebration, so the child settles after moving.
+    if (step === S.hooray && atClip(0)) cue("chime");
 
     const dt = Math.max(0, Math.min(0.1, time - lastTime));
     lastTime = time;

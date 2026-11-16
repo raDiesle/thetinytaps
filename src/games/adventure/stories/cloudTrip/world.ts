@@ -98,7 +98,7 @@ export function makeWorld(scene: THREE.Scene) {
   tip.visible = false;
   scene.add(tip);
 
-  const confetti = makeConfetti(220);
+  const confetti = makeConfetti(60);
   const sparkle = makeConfetti(120, ["#ffd23f", "#fff3a0", "#ffffff"], 0.8);
   scene.add(confetti.mesh, sparkle.mesh);
   return { wolle, parrot, planes, balloons, stars, puffs, rainCloud, sun, rain, rainbow, tip, confetti, sparkle };
