@@ -431,11 +431,10 @@ export function makeWorld(scene: THREE.Scene) {
     return { ...crab, holder, ground: groundHeight(x, z) };
   });
 
-  const confetti = makeConfetti(400);
   const spray = makeConfetti(240, ["#ffffff", "#d8f6ff", "#9fe4ff"], 0.9);
   const gold = makeConfetti(160, ["#ffd23f", "#ffcc33", "#fff1a8"], 1.4);
   const sand = makeConfetti(160, ["#f2d49b", "#e3c48e", "#fff1d0"], 0.8);
-  scene.add(confetti.mesh, spray.mesh, gold.mesh, sand.mesh);
+  scene.add(spray.mesh, gold.mesh, sand.mesh);
   // Two more crabs carry the open chest from the raft up the beach.
   const porters = [0, 1].map(() => {
     const crab = makeCrab();
@@ -497,7 +496,6 @@ export function makeWorld(scene: THREE.Scene) {
     key,
     ropeMat,
     crabs,
-    confetti,
     spray,
     gold,
     sand,

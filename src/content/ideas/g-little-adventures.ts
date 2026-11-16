@@ -279,6 +279,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Am Ende eines Films kein Tusch und kein Jubel aus der Dose: alle winken, die Stimme sagt den Schlusssatz in Ruhe, und ein leises Glockenspiel klingt aus, während die Herzen und Sterne langsam aufsteigen. Für alle Filme, oder nur abends (die Uhrzeit sagt es).",
       why: "Ein ruhiges Ende lässt den Film ausklingen, statt das Kind am Schluss noch einmal aufzudrehen.",
       effort: "S",
+      partial: "Done for all films: a soft glockenspiel instead of the Tusch. Not done: the evening-only variant and the hearts and stars rising slowly.",
     },
     {
       id: "G-32",

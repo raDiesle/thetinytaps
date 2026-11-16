@@ -204,7 +204,9 @@ export function ManagementPage() {
             href={`#${id}`}
             onClick={(e) => {
               e.preventDefault();
-              document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              const target = document.getElementById(id);
+              if (target instanceof HTMLDetailsElement) target.open = true;
+              target?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
           >
             {label}
@@ -230,12 +232,14 @@ export function ManagementPage() {
 
       <Mascots onShow={showIdea} />
 
-      <section id="stimmen" className="ideas-panel">
-        <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
+      <details id="stimmen" className="ideas-panel">
+        <summary>
+          <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
+        </summary>
         <Suspense fallback={<p className="ideas-hint">Die Sätze aller Spiele werden gelesen …</p>}>
           <VoiceList />
         </Suspense>
-      </section>
+      </details>
 
       <section id="recherchen" className="ideas-research">
         <h2>🔍 Recherchen</h2>
@@ -583,8 +587,10 @@ function LanguageCell({ language, state }: { language: TargetLanguage; state: La
  */
 function Languages() {
   return (
-    <section id="sprachen" className="ideas-panel">
-      <h2>🌍 Sprachen: Deutsch, die fünf größten Weltsprachen, Russisch, Italienisch</h2>
+    <details id="sprachen" className="ideas-panel">
+      <summary>
+        <h2>🌍 Sprachen: Deutsch, die fünf größten Weltsprachen, Russisch, Italienisch</h2>
+      </summary>
       <p className="ideas-hint">
         Übersetzt und aufgenommen wird nur auf Wunsch, weil es Tokens und Credits kostet: Neues kommt erst auf Deutsch und steht hier als fehlend. Sag dann z.
         B. „übersetze die Wolkenreise ins Englische“ oder „nimm Russisch für die Schatzinsel auf“. ✅ fertig, 📝 übersetzt, aber die Aufnahme (🎙️) fehlt noch, 🟡
@@ -644,7 +650,7 @@ function Languages() {
           </tfoot>
         </table>
       </div>
-    </section>
+    </details>
   );
 }
 
@@ -658,8 +664,10 @@ const MASCOT_STATE: Record<NonNullable<MascotTask["state"]>, string> = { done: "
 function Mascots({ onShow }: { onShow: (id: string) => void }) {
   const tasks = MASCOT_STATUS.flatMap((row) => row.tasks);
   return (
-    <section id="maskottchen" className="ideas-panel">
-      <h2>🦊🐻 Fuchs & Bär: wo die Maskottchen der App noch vorkommen könnten</h2>
+    <details id="maskottchen" className="ideas-panel">
+      <summary>
+        <h2>🦊🐻 Fuchs & Bär: wo die Maskottchen der App noch vorkommen könnten</h2>
+      </summary>
       <p className="ideas-hint">
         Fuchs und Bär kommen in den Spielen immer wieder vor, aber nur, wo sie zum Spiel gehören: als Figur, die das Spiel zeigt und die darin etwas tut, oder
         in einer Rolle, die das Bild schon hat (Bäcker, Fahrerin). Nie als Deko, die daneben steht, zuschaut oder jubelt – Kinder wollen sie antippen und
@@ -720,7 +728,7 @@ function Mascots({ onShow }: { onShow: (id: string) => void }) {
           </tfoot>
         </table>
       </div>
-    </section>
+    </details>
   );
 }
 

@@ -124,6 +124,14 @@ export function playTusch() {
   [0, 2, 3, 5].forEach((step) => note({ from: PENTATONIC[step], duration: 1.1, type: "triangle", volume: 0.1 }));
 }
 
+/** A soft glockenspiel that rings out slowly, falling – the quiet end of a film (no drum, no cymbal). */
+export function playGlockenspielEnd() {
+  [5, 4, 2, 1, 0].forEach((step, i) => {
+    note({ from: PENTATONIC[step] * 2, duration: 1.4, type: "sine", volume: 0.09, delay: i * 0.5 });
+    note({ from: PENTATONIC[step] * 5.4, duration: 0.3, type: "sine", volume: 0.02, delay: i * 0.5 });
+  });
+}
+
 /** "Bumm, bamm, bimm" – toy drums from big and low (0) to small and high. */
 export function playDrumNote(i: number) {
   const pitch = 130 * 1.4 ** i;
