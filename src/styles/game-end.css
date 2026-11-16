@@ -252,6 +252,12 @@
   animation: game-end-in 0.5s ease-out;
 }
 
+/* On its board a tap on the trophy opens the trophy room at it (GameEnd). */
+.game-end.landed .game-end-trophy {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .game-end.inline .game-end-trophy {
   height: clamp(80px, 22vh, 170px);
 }

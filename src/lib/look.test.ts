@@ -90,19 +90,15 @@ test("the highlighter covers all the words of a chosen choice", () => {
 // November 2026): on tablets and computers its note is much bigger than the fullscreen one beside it and carries its
 // name in words, and it lights up softly a few times as play starts, then stands still. On a phone the words covered
 // too much of the picture: there it is only the gear, on a slip like the fullscreen one.
-test("⚙️ while playing is a big note with its name that lights up only as play starts", () => {
+test("⚙️ while playing is a big symbol-only note that lights up only as play starts", () => {
   const slip = rule(".play-area .play-options-corner .play-options-button");
   const width = (decls: string) => Number(decls.match(/width:\s*(\d+)px/)?.[1]);
-  expect(width(slip)).toBeGreaterThan(2 * width(rule(".play-area .play-fullscreen, .play-options-button)")));
+  expect(width(slip)).toBeGreaterThan(1.5 * width(rule(".play-area .play-fullscreen, .play-options-button)")));
   const playing = readFileSync("src/styles/playing.css", "utf8");
   const playingRule = (selector: string) => playing.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
   expect(Number(playingRule(".play-options-gear").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(2.4);
-  expect(Number(playingRule(".play-options-label b").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(1.3);
-  // The name is there on big screens, not only while held or under a mouse – and left out on a phone.
-  expect(playingRule(".play-options-label")).not.toMatch(/opacity:\s*0|display:\s*none/);
-  const phone = playing.slice(playing.indexOf("@media (max-width: 599.98px), (max-height: 599.98px)"));
-  expect(phone).toMatch(/\.play-options-label \{\s*display: none;/);
-  expect(readFileSync("src/components/PlayOptions.tsx", "utf8")).toContain('className="play-options-label"');
+  // Only the symbol: its name and „halten“ are read out, never written on the slip (user feedback, November 2026).
+  expect(readFileSync("src/components/PlayOptions.tsx", "utf8")).not.toContain("play-options-label");
   const glow = playing.match(/\.play-options-corner \{[^}]*animation:\s*([^;]+);/)?.[1] ?? "";
   expect(glow).toContain("play-options-glow");
   // A number of times, never `infinite`: after it, nothing idles.

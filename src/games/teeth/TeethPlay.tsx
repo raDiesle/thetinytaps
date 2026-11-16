@@ -11,7 +11,6 @@ import { hush, recordedVoice } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
-import { Medal } from "./medal";
 import { INK, Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
@@ -609,14 +608,6 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       <span className="teeth-sky" aria-hidden>
         {daytime === "morning" ? "☀️" : "🌙"}
       </span>
-      {/* No words on the picture: the story, the sink, the song and the voice say what to do. At the end the gold medal
-          swings down, a picture of „well done“ a child sees without reading. */}
-      {done && (
-        <div className="teeth-heading" key={round}>
-          <Medal label={t({ de: "Geschafft!", en: "Done it!", zh: "成功啦！", hi: "हो गया!", es: "¡Lo logramos!", ar: "نجحنا!", ru: "Ура, получилось!" })} />
-        </div>
-      )}
-
       {/* Before the picture, so it is there when the picture measures it. */}
       <div className="teeth-room" ref={room} />
       <div className="teeth-stage" ref={stage}>

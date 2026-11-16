@@ -59,52 +59,6 @@
   }
 }
 
-/* At the end the gold medal swings down at the top, alone: no words on the picture. */
-.teeth-heading {
-  display: flex;
-  justify-content: center;
-  font-size: clamp(2.4rem, 12vmin, 6.5rem);
-}
-
-.teeth-medal {
-  width: 1.1em;
-  height: 1.43em;
-  overflow: visible;
-  transform-origin: 50% 0;
-  animation: teeth-medal-swing 2.14s ease-out 0.27s backwards;
-}
-
-/* Drops in on its ribbon and swings out in two beats either way. */
-@keyframes teeth-medal-swing {
-  0% {
-    transform: translateY(-120%) rotate(-25deg);
-  }
-  25% {
-    transform: translateY(0) rotate(18deg);
-  }
-  50% {
-    transform: rotate(-10deg);
-  }
-  75% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0);
-  }
-}
-
-.teeth-medal-shine {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: teeth-medal-twinkle 1.07s ease-in-out 2.4s 3;
-}
-
-@keyframes teeth-medal-twinkle {
-  50% {
-    transform: scale(1.5) rotate(36deg);
-  }
-}
-
 /* The mirror (or the sink) fills the whole screen behind the heading and the controls; what matters
    fits into .teeth-room, the free part between them (see fitBox in mouth.tsx). */
 .teeth-stage {
@@ -1525,8 +1479,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .teeth-sky,
-  .teeth-medal,
-  .teeth-medal-shine,
   .prep-sun,
   .teeth-day,
   .teeth-slot.fresh {

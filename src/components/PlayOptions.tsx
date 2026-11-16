@@ -9,13 +9,13 @@ const HOLD_MS = 500;
 const INTRO_MS = 9000;
 
 /**
- * A game's options while it plays, for grown-ups: ⚙️ in the top corner with its name in words beside it, always held
+ * A game's options while it plays, for grown-ups: ⚙️ in the top corner as a symbol only (its name just read out), always held
  * (the ring fills), opens `children` in a panel over the game; „Weiter spielen“ or a tap beside it closes it. While it
  * is open, keys don't reach the game (holding Esc still leaves it). Changes apply at once, the game keeps playing behind.
  * `intro` (a game with many ways to play) is a note under it as play starts, telling grown-ups what they can choose
  * there; it fades by itself and goes when the options are opened.
  */
-export function PlayOptions({ children, intro, iconOnly = false }: { children: ReactNode; intro?: ReactNode; iconOnly?: boolean }) {
+export function PlayOptions({ children, intro }: { children: ReactNode; intro?: ReactNode }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [introShown, setIntroShown] = useState(intro !== undefined);
@@ -47,13 +47,6 @@ export function PlayOptions({ children, intro, iconOnly = false }: { children: R
           <span className="play-options-gear" aria-hidden>
             ⚙️
           </span>
-          {/* `iconOnly`: just the gear, its name only read out (a game whose corner has room for nothing more). */}
-          {!iconOnly && (
-            <span className="play-options-label" aria-hidden>
-              <b>{label}</b>
-              <small>{hold}</small>
-            </span>
-          )}
         </button>
         {introShown && (
           <div
