@@ -760,29 +760,36 @@ function BookFaces({ book, spine }: { book: ShelfBook; spine?: boolean }) {
       <span className="box-left">{spine && <SpineLabel title={t(book.title)} picture={book.spine} />}</span>
       <span className="box-right" />
       <span className="box-top" />
-      <span className="shelf-book-cover">
-        <span className="shelf-book-title">{t(book.title)}</span>
-        <span className="shelf-book-picture">
-          {book.cover ? (
-            <img className="shelf-book-art" src={book.cover} alt="" decoding="async" draggable={false} />
-          ) : (
-            <>
-              {/* Without a picture of its own, a book shows a piece of its category's world. */}
-              <WorldCardScene world={book.world} />
-              {book.games ? (
-                <span className="shelf-book-collage" data-count={Math.min(book.games.length, 4)}>
-                  {book.games.slice(0, 4).map((e, i) => (
-                    <span key={i}>{e}</span>
-                  ))}
-                </span>
-              ) : (
-                <span className="shelf-book-emoji">{book.emoji}</span>
-              )}
-            </>
-          )}
+      {spine && book.spine ? (
+        // A game's own book opens with the very picture of its spine and nothing else: no title, no line, no second picture.
+        <span className="shelf-book-cover" data-spine-art>
+          <img className="shelf-book-art" src={book.spine} alt="" decoding="async" draggable={false} />
         </span>
-        <span className="shelf-book-blurb">{t(book.blurb)}</span>
-      </span>
+      ) : (
+        <span className="shelf-book-cover">
+          <span className="shelf-book-title">{t(book.title)}</span>
+          <span className="shelf-book-picture">
+            {book.cover ? (
+              <img className="shelf-book-art" src={book.cover} alt="" decoding="async" draggable={false} />
+            ) : (
+              <>
+                {/* Without a picture of its own, a book shows a piece of its category's world. */}
+                <WorldCardScene world={book.world} />
+                {book.games ? (
+                  <span className="shelf-book-collage" data-count={Math.min(book.games.length, 4)}>
+                    {book.games.slice(0, 4).map((e, i) => (
+                      <span key={i}>{e}</span>
+                    ))}
+                  </span>
+                ) : (
+                  <span className="shelf-book-emoji">{book.emoji}</span>
+                )}
+              </>
+            )}
+          </span>
+          <span className="shelf-book-blurb">{t(book.blurb)}</span>
+        </span>
+      )}
     </>
   );
 }
