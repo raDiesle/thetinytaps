@@ -151,25 +151,6 @@
   line-height: 1;
 }
 
-.play-options-label {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  line-height: 1.1;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.play-options-label b {
-  font-size: 1.45rem;
-}
-
-.play-options-label small {
-  font-size: 0.95rem;
-  font-weight: 600;
-  opacity: 0.75;
-}
-
 /*
  * The intro note under ⚙️ as play starts (a game with many ways to play): it tells grown-ups what they can choose
  * there, stays a few seconds, then fades and is gone (`INTRO_MS`); taps go through it to the game.
@@ -211,10 +192,6 @@
 
   .play-options-gear {
     font-size: 1.3rem;
-  }
-
-  .play-options-label {
-    display: none;
   }
 
   .play-options-intro {

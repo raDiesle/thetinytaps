@@ -1472,16 +1472,16 @@
 }
 
 /*
- * ⚙️ while playing is the bigger slip, its gear twice the size and its name written on it beside the gear, its clip
- * grown with it: on the small one the grey gear was hardly seen, and without words grown-ups didn't know it was the
- * options (user feedback, November 2026).
+ * ⚙️ while playing is the bigger slip, its gear twice the size, its clip grown with it: on the small one the grey gear
+ * was hardly seen. The symbol alone, no „Einstellungen“ nor „halten“ on it (user feedback, November 2026).
  */
 :root .play-area .play-options-corner .play-options-button {
-  width: auto;
-  min-width: 190px;
-  height: auto;
-  min-height: 72px;
-  padding: 14px 40px 10px 14px;
+  width: 72px;
+  min-width: 0;
+  height: 72px;
+  min-height: 0;
+  /* The gear a little left of the middle, clear of the clip at the right. */
+  padding: 12px 14px 0 0;
 }
 
 /* On a phone the gear alone, on a slip like the fullscreen one (playing.css). */
@@ -1496,7 +1496,7 @@
   }
 }
 
-/* Its clip holds it at the right, in room of its own beside the words. */
+/* Its clip holds it at the right. */
 :root .play-area .play-options-corner .play-options-button::before {
   top: -16px;
   right: 9px;
