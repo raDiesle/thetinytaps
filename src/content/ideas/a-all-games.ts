@@ -107,6 +107,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "2-Jährige legen oft die ganze Hand oder den Handballen auf den Bildschirm. Jeder Finger soll trotzdem etwas auslösen, ein aufliegender Ballen blockiert nichts, und Tippen ganz am Rand löst keine Systemgesten aus.",
       why: "Sonst „geht es nicht“ – und das Kind gibt auf.",
       effort: "S",
+      done: true,
     },
     {
       id: "A-14",
@@ -203,7 +204,7 @@ export const allGamesIdeas: IdeaArea = {
       why: "Ein Kind, das nicht liest, weiß nicht, was auf den beiden Knöpfen steht. Hört es die Frage, kann es selbst wählen, statt auf einen Großen zu warten. Der Satz davor sagt ihm, was es geschafft hat, ruhiger als jedes Feuerwerk.",
       effort: "S",
       partial:
-        "Eingebaut (7. November 2026): GameEnd fragt 1,5 s nach dem Ende „Nochmal oder weiter?“ bzw. „Nochmal?“, außer wenn die Spielzeit um ist; beide Sätze in allen sieben Sprachen geschrieben. Noch nicht aufgenommen (`bun run voice make --only alle-spiele`), bis dahin still.",
+        "Eingebaut (7. November 2026): GameEnd fragt 1,5 s nach dem Ende „Nochmal oder weiter?“ bzw. „Nochmal?“, außer wenn die Spielzeit um ist; beide Sätze in allen sieben Sprachen geschrieben. Noch nicht aufgenommen (`bun run voice make --only alle-spiele`), bis dahin still. Stand 16. November 2026 (Umsetzung ohne die Alltagshelfer – Timer, Abstillen, Schnullerfee, Kita-Start, Zähne putzen, Aufs Töpfchen, Belohnungstafel und Zeitplan bleiben bewusst draußen, Töpfchen-Satz und Timer-Satz siehe H-72): Der Satz vor der Frage ist in allen übrigen Spielen schon da – Kleine Abenteuer (Geschichten, Wege und Filme enden mit ihrem Schlusssatz), Bewegungsabenteuer, Kettenreaktion, Gefühle. Nur „Was ist passiert?“ hat keinen, weil das Spiel ganz ohne Stimme ist (die Worte unter dem Bild lesen die Großen vor); dort bleibt es dabei.",
     },
     {
       id: "A-25",

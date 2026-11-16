@@ -26,3 +26,13 @@ describe("tap targets", () => {
     expect(tapState({})).toBe("");
   });
 });
+
+describe("contactReach", () => {
+  test("a finger or mouse adds nothing, a palm adds half its size, capped", async () => {
+    const { contactReach, MAX_CONTACT_REACH_PX } = await import("./tapTargets");
+    expect(contactReach({ width: 12, height: 12 })).toBe(0);
+    expect(contactReach({})).toBe(0);
+    expect(contactReach({ width: 80, height: 50 })).toBe(40);
+    expect(contactReach({ width: 400, height: 400 })).toBe(MAX_CONTACT_REACH_PX);
+  });
+});

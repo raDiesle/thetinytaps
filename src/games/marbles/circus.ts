@@ -506,7 +506,7 @@ export function buildCircus() {
     return { pt: { x: clownLand.x, y: NET.y + sagAt(t) - CLOWN.seat }, turn: 0 };
   };
 
-  /* The finale: the curtain opens, the spotlights come on, confetti rains, „Tusch“. */
+  /* The finale: the curtain opens, the spotlights come on, „Tusch“ – no confetti (A-30). */
   const tShow = tNet + 0.7;
   const tDone = tShow + 2.4;
   at(tShow, { sound: playWhoosh });
