@@ -107,6 +107,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "2-Jährige legen oft die ganze Hand oder den Handballen auf den Bildschirm. Jeder Finger soll trotzdem etwas auslösen, ein aufliegender Ballen blockiert nichts, und Tippen ganz am Rand löst keine Systemgesten aus.",
       why: "Sonst „geht es nicht“ – und das Kind gibt auf.",
       effort: "S",
+      done: true,
     },
     {
       id: "A-14",

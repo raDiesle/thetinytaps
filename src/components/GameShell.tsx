@@ -362,12 +362,18 @@ export function GameShell({
     window.addEventListener("beforeunload", block);
     // Safari on iPad zooms on pinch even with touch-action: none.
     window.addEventListener("gesturestart", block);
+    // A whole hand or a touch at the very edge must not scroll, pull down or start a browser gesture (A-13).
+    const noPan = (e: TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+    };
+    window.addEventListener("touchmove", noPan, { passive: false });
     return () => {
       window.removeEventListener("keydown", onKeyDown, { capture: true });
       window.removeEventListener("keyup", onKeyUp, { capture: true });
       window.removeEventListener("contextmenu", block);
       window.removeEventListener("beforeunload", block);
       window.removeEventListener("gesturestart", block);
+      window.removeEventListener("touchmove", noPan);
     };
   }, [playing]);
 

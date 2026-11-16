@@ -23,6 +23,17 @@ export const TAP_SLOP_PX = 30;
  */
 export const mayDrag = (e: { pointerType: string }) => e.pointerType === "mouse";
 
+/**
+ * Extra reach for a big contact: a whole hand or the heel of a palm lands wide (the event's `width`/`height`, in CSS
+ * pixels), and its centre may be far from the thing it covers. Half the larger side is added to the slop, capped so a
+ * flat hand doesn't reach across the screen. A finger reports a few pixels, a mouse none, so they change nothing.
+ */
+export const MAX_CONTACT_REACH_PX = 60;
+export function contactReach(e: { width?: number; height?: number }): number {
+  const size = Math.max(e.width ?? 0, e.height ?? 0);
+  return size > 24 ? Math.min(size / 2, MAX_CONTACT_REACH_PX) : 0;
+}
+
 /** What a target is right now: the right answer, already tapped, or neither (""). */
 export type TapState = "" | "goal" | "done";
 
@@ -82,7 +93,7 @@ function distanceTo(el: Element, x: number, y: number): number {
  * The target a tap at (x, y) means, given the element right under it (`document.elementFromPoint`
  * or the event's target); null when the tap is for no target, or for a button that isn't one.
  */
-export function tapTargetAt(x: number, y: number, hit: Element | null): Element | null {
+export function tapTargetAt(x: number, y: number, hit: Element | null, reach = 0): Element | null {
   if (!hit) return null;
   const under = hit.closest("[data-tap]");
   const keep = hit.closest(KEEP);
@@ -94,7 +105,7 @@ export function tapTargetAt(x: number, y: number, hit: Element | null): Element 
   for (const el of root.querySelectorAll("[data-tap]")) {
     if (el === under || el.closest(ROOT) !== root) continue;
     const distance = distanceTo(el, x, y);
-    if (distance <= TAP_SLOP_PX && reachable(el)) candidates.push({ target: el, state: el.getAttribute("data-tap") ?? "", distance });
+    if (distance <= TAP_SLOP_PX + reach && reachable(el)) candidates.push({ target: el, state: el.getAttribute("data-tap") ?? "", distance });
   }
   return pickTap(candidates)?.target ?? null;
 }
@@ -109,7 +120,7 @@ const forwarded = new WeakSet<Event>();
 export function forwardNearTaps(area: Element): () => void {
   const onDown = (e: PointerEvent) => {
     if (forwarded.has(e) || !(e.target instanceof Element)) return;
-    const target = tapTargetAt(e.clientX, e.clientY, e.target);
+    const target = tapTargetAt(e.clientX, e.clientY, e.target, contactReach(e));
     if (!target || target.contains(e.target)) return;
     e.stopPropagation();
     e.preventDefault();
