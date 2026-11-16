@@ -167,6 +167,27 @@ const UP_SHOWN_BELOW = 40;
  * rail, the tennis ball hops along the rows, the apple bumps a little because
  * it isn't round, and the soap bubble floats over the rail, bobbing.
  */
+/**
+ * `memo` for the still parts of the wall: the run draws again in every frame, so a part whose props have not changed
+ * (objects and arrays compared by their contents, handlers ignored – they only use refs) is skipped by React instead of
+ * being compared and patched element by element 60 times a second (A-29: that cost an old phone its frames).
+ */
+function still<P extends object>(Part: (props: P) => ReactNode) {
+  const sameValue = (a: unknown, b: unknown): boolean => {
+    if (Object.is(a, b)) return true;
+    if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+    const ka = Object.keys(a);
+    return ka.length === Object.keys(b).length && ka.every((k) => Object.is((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
+  };
+  return memo(Part, (before, after) => (Object.keys(after) as (keyof P)[]).every((k) => typeof after[k] === "function" || sameValue(before[k], after[k])));
+}
+
+/** Seconds since a hit, held at `SETTLED_S`: by then every wobble and flash is over, so a part nobody hit stops changing and `still` can skip it. */
+const SETTLED_S = 8;
+
+/** Half the side, in world units, of the small layer a rolling thing is drawn in: its tap circle (56) and a bit more, since the layer shows what lies outside it too. */
+const MARBLE_PAD = 60;
+
 function lift(m: Marble, t: number): number {
   const sit = ROLLER[m.kind].r - BALL_R;
   switch (m.kind) {
@@ -867,26 +888,34 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     tapAge: (t - basketTapped.current) / 1000,
     fullTube: fullTube.current,
   };
-  const spot = (i: number, layer: "back" | "front") => <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />;
+  const spot = (i: number, layer: "back" | "front") => (
+    <Spot
+      key={i}
+      slot={SLOTS[i]}
+      piece={build.current[i]}
+      age={age(spots.current[i].swapped)}
+      hitAge={age(spots.current[i].hit)}
+      angle={spots.current[i].angle}
+      layer={layer}
+    />
+  );
   const cam = camera.current;
-  const age = (hit: number) => (t - hit) / 1000;
+  const age = (hit: number) => Math.min(SETTLED_S, (t - hit) / 1000);
+  const barAges = bars.current.map(age);
   const basketAge = age(basketTapped.current);
   const tapBar = (i: number, e: PointerEvent) => {
     tapped(e);
     playBar(i, performance.now());
   };
 
+  const layerBox = `0 ${-TOP_ROOM} ${VIEW_W} ${TRACK_H + TOP_ROOM}`;
+  const unit = (Number(cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h }).width) || VIEW_W) / VIEW_W;
+  const layerStyle = cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   const at = cameraPoint(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
       <TrackLook.Provider value={look}>
-        <svg
-          ref={svg}
-          className="marble-camera"
-          viewBox={`0 ${-TOP_ROOM} ${VIEW_W} ${TRACK_H + TOP_ROOM}`}
-          style={cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h })}
-          aria-label={label}
-        >
+        <svg ref={svg} className="marble-camera" viewBox={layerBox} style={layerStyle} aria-label={label}>
           <look.Backdrop />
 
           {/* The boards the spots sit on */}
@@ -895,8 +924,8 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
           ))}
 
           {/* Rows 1a and 1b with the xylophone */}
-          <Xylophone row={ROW1A} hits={bars.current} t={t} onTap={tapBar} />
-          <Xylophone row={ROW1B} hits={bars.current} t={t} onTap={tapBar} />
+          <Xylophone row={ROW1A} ages={barAges} onTap={tapBar} />
+          <Xylophone row={ROW1B} ages={barAges} onTap={tapBar} />
 
           {/* The ledge, the walls the marble turns at, and the rows */}
           <TrackRail a={{ x: LEDGE.x0, y: LEDGE.y }} b={{ x: LEDGE.x1, y: LEDGE.y }} />
@@ -908,7 +937,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
           {[...ZIGS, ROW4, LEFT2, ROW5, ROW5B, ROW6, ROW7, ROW8].map((row, i) => (
             <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
           ))}
-          <Xylophone row={LEFT1} hits={bars.current} t={t} onTap={tapBar} />
+          <Xylophone row={LEFT1} ages={barAges} onTap={tapBar} />
           <g
             data-tap
             onPointerDown={(e) => {
@@ -932,14 +961,13 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             </g>
           ))}
           <Chimes
-            hits={chimes.current}
-            t={t}
+            ages={chimes.current.map(age)}
             onTap={(i, e) => {
               tapped(e);
               playChimeAt(i, performance.now());
             }}
           />
-          <Xylophone row={ROW9} hits={bars.current} t={t} onTap={tapBar} />
+          <Xylophone row={ROW9} ages={barAges} onTap={tapBar} />
 
           {SLOTS.map((_, i) => spot(i, "back"))}
 
@@ -1018,37 +1046,53 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
           </g>
           {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
           {!touchOnly && <ShelfKeys held={held.current} onTake={take} />}
+        </svg>
+        {/* Each thing rolling on the run is a small layer of its own, moved by a transform: moving inside the big svg made a phone paint all of it again in every frame (A-29) */}
+        <div className="marble-camera run-layer" style={layerStyle}>
           {marbles.current.map((m) => {
             const k = (t - m.nudged) / NUDGE_MS;
             // Waiting behind the barrier, it can't keep still.
             const fidget = m.waiting ? { x: 1.8 * Math.sin(t / 55 + m.id * 1.7), y: 3 * Math.abs(Math.sin(t / 120 + m.id)) } : { x: 0, y: 0 };
             return (
-              <g
+              <svg
                 key={m.id}
+                className="run-marble"
                 data-tap
+                viewBox={`${-MARBLE_PAD} ${-MARBLE_PAD} ${2 * MARBLE_PAD} ${2 * MARBLE_PAD}`}
+                style={{
+                  width: 2 * MARBLE_PAD * unit,
+                  height: 2 * MARBLE_PAD * unit,
+                  transform: `translate3d(${(m.x + fidget.x - MARBLE_PAD) * unit}px, ${(m.y - fidget.y + TOP_ROOM - MARBLE_PAD) * unit}px, 0)`,
+                }}
+                aria-hidden
                 onPointerDown={(e) => {
                   tapped(e);
                   nudge(m, performance.now());
                 }}
               >
-                <circle cx={m.x} cy={m.y} r="56" fill="transparent" />
+                <circle r="56" fill="transparent" />
                 <RollerBody
                   kind={m.kind}
                   color={m.color}
                   look={m.look}
-                  x={m.x + fidget.x}
-                  y={m.y - fidget.y}
+                  x={0}
+                  y={0}
                   spin={m.spin + fidget.x / 20 + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
                   grow={Math.min(1, m.dist / runLength)}
                   scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1}
                 />
-              </g>
+              </svg>
             );
           })}
-          {pops.current.map((p) => (
-            <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
-          ))}
-
+          {pops.current.length > 0 && (
+            <svg className="marble-camera" viewBox={layerBox} style={layerStyle} aria-hidden>
+              {pops.current.map((p) => (
+                <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
+              ))}
+            </svg>
+          )}
+        </div>
+        <svg className="marble-camera run-layer" viewBox={layerBox} style={layerStyle} aria-hidden>
           {/* In front of the marbles */}
           <Hopper />
           {SLOTS.map((_, i) => spot(i, "front"))}
@@ -1140,11 +1184,11 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
 }
 
 /** The slightly darker board a spot sits on, with a dashed edge: here something can be swapped. */
-function SpotBoard({ slot }: { slot: Slot }) {
+const SpotBoard = still(function SpotBoard({ slot }: { slot: Slot }) {
   const { board } = useLook();
   const b = slotBoard(slot);
   return <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill={board.fill} stroke={board.edge} strokeWidth="4" strokeDasharray="14 10" />;
-}
+});
 
 /** A thing on the run (or bigger by `scale`, on the shelf), its middle at `x`, `y`, turned by `spin` as it rolls; the run's world draws it. */
 function RollerBody({
@@ -1385,7 +1429,7 @@ const inset = (pt: Pt, row: Row, by: number): Pt => {
 };
 
 /** A row's rails with the beam under its xylophone bars, which light up and dip when hit by a marble or a finger. */
-function Xylophone({ row, hits, t, onTap }: { row: Row; hits: number[]; t: number; onTap: (bar: number, e: PointerEvent) => void }) {
+const Xylophone = still(function Xylophone({ row, ages, onTap }: { row: Row; ages: number[]; onTap: (bar: number, e: PointerEvent) => void }) {
   const bars = BARS.map((bar, i) => ({ ...bar, i })).filter((bar) => bar.row === row);
   const first = bars[0];
   const last = bars[bars.length - 1];
@@ -1407,7 +1451,7 @@ function Xylophone({ row, hits, t, onTap }: { row: Row; hits: number[]; t: numbe
         strokeLinecap="round"
       />
       {bars.map((bar) => {
-        const age = (t - hits[bar.i]) / 1000;
+        const age = ages[bar.i];
         const cx = bar.x + bar.w / 2;
         const dip = age >= 0 && age < 1 ? 5 * Math.exp(-age * 10) : 0;
         return (
@@ -1424,7 +1468,7 @@ function Xylophone({ row, hits, t, onTap }: { row: Row; hits: number[]; t: numbe
       <TrackRail a={at(last.x + last.w + 4)} b={hi} />
     </g>
   );
-}
+});
 
 /**
  * The switch at the end of row 3 (K-01): a flap on a hinge, lifted to the right
@@ -1492,9 +1536,21 @@ function Gate({ lift, open, rang, glow }: { lift: number; open: boolean; rang: n
  * The part in one spot, behind the marbles (`back`) or in front of them
  * (`front`). A part that has just been put in pops up from small.
  */
-function Spot({ slot, piece, state, t, layer }: { slot: Slot; piece: Piece; state: SpotState; t: number; layer: "back" | "front" }) {
-  const age = (t - state.swapped) / 1000;
-  const hitAge = (t - state.hit) / 1000;
+const Spot = still(function Spot({
+  slot,
+  piece,
+  age,
+  hitAge,
+  angle,
+  layer,
+}: {
+  slot: Slot;
+  piece: Piece;
+  age: number;
+  hitAge: number;
+  angle: number;
+  layer: "back" | "front";
+}) {
   // A funnel wobbles a little when a marble swirls in or a finger taps it.
   const k = (age >= 0 && age < 1.5 ? 1 - 0.45 * Math.exp(-age * 7) * Math.cos(age * 22) : 1) * (piece === "funnel" ? 1 + wobble(hitAge, 0.07, 24, 6) : 1);
   const m = slotMiddle(slot);
@@ -1531,15 +1587,15 @@ function Spot({ slot, piece, state, t, layer }: { slot: Slot; piece: Piece; stat
       break;
     }
     case "wheel":
-      body = layer === "back" ? <PaddleWheel slot={slot} angle={state.angle} /> : null;
+      body = layer === "back" ? <PaddleWheel slot={slot} angle={angle} /> : null;
       break;
   }
   if (!body) return null;
   return <g transform={`translate(${m.x} ${m.y}) scale(${k}) translate(${-m.x} ${-m.y})`}>{body}</g>;
-}
+});
 
 /** The wall at a turn, with a round bumper where the marble hits it; the bumper flashes `age` seconds after a hit. */
-function Wall({ turn, index, age }: { turn: Turn; index: number; age: number }) {
+const Wall = still(function Wall({ turn, index, age }: { turn: Turn; index: number; age: number }) {
   const { post } = useLook();
   const side = turnSide(turn);
   const top = turn.from.y - 70;
@@ -1562,10 +1618,10 @@ function Wall({ turn, index, age }: { turn: Turn; index: number; age: number }) 
       <ellipse cx={turn.x - side * (5 - squash)} cy={y} rx={9 - squash} ry="24" fill="#fff" opacity={0.8 * flash} />
     </g>
   );
-}
+});
 
 /** The looping: a round track the marble rides inside, glowing for a moment after each marble. */
-function Loop({ age }: { age: number }) {
+const Loop = still(function Loop({ age }: { age: number }) {
   const r = LOOP.r + BALL_R + 7;
   const glow = age >= 0 && age < 2 ? Math.exp(-age * 2) : 0;
   return (
@@ -1579,10 +1635,10 @@ function Loop({ age }: { age: number }) {
       <rect x={LOOP.cx - 9} y={LOOP.cy + r + 8} width="18" height="70" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** Drum `i`, big to small: its skin sags and the drum jumps a little when a marble hits it. */
-function Drum({ i, age }: { i: number; age: number }) {
+const Drum = still(function Drum({ i, age }: { i: number; age: number }) {
   const { x, top, r, h } = DRUMS[i];
   const ry = r * 0.3;
   const hit = age >= 0 && age < 1;
@@ -1613,10 +1669,10 @@ function Drum({ i, age }: { i: number; age: number }) {
       <rect x={x - r} y={top + h - 8} width={r * 2} height="8" fill="#ffd23f" stroke={INK} strokeWidth="2" />
     </g>
   );
-}
+});
 
 /** The chimes hanging from their beam; one swings away and rings when a marble or a finger knocks it. */
-function Chimes({ hits, t, onTap }: { hits: number[]; t: number; onTap: (chime: number, e: PointerEvent) => void }) {
+const Chimes = still(function Chimes({ ages, onTap }: { ages: number[]; onTap: (chime: number, e: PointerEvent) => void }) {
   const { x0, x1, y } = CHIME_BEAM;
   return (
     <g>
@@ -1624,7 +1680,7 @@ function Chimes({ hits, t, onTap }: { hits: number[]; t: number; onTap: (chime: 
       {CHIMES.map((chime, i) => {
         const bottom = rowY(ROW7, chime.x) - BALL_R + 4;
         const tubeTop = bottom - chime.length;
-        const age = (t - hits[i]) / 1000;
+        const age = ages[i];
         return (
           <g key={i} transform={`rotate(${wobble(age, 16, 8, 1.6)} ${chime.x} ${y + 6})`} data-tap onPointerDown={(e) => onTap(i, e)}>
             <rect x={chime.x - 28} y={tubeTop} width="56" height={chime.length} fill="transparent" />
@@ -1645,9 +1701,9 @@ function Chimes({ hits, t, onTap }: { hits: number[]; t: number; onTap: (chime: 
       })}
     </g>
   );
-}
+});
 
-function Hopper() {
+const Hopper = still(function Hopper() {
   const { hopper } = useLook();
   return (
     <g>
@@ -1661,7 +1717,7 @@ function Hopper() {
       <path d={`M${HOPPER.x - 36} 8 L${HOPPER.x + 36} 8`} stroke="#fff8" strokeWidth="6" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 function PaddleWheel({ slot, angle }: { slot: Slot; angle: number }) {
   const WHEEL = wheelIn(slot);
@@ -1753,7 +1809,7 @@ function Funnel({ slot }: { slot: Slot }) {
   );
 }
 
-function Tunnel() {
+const Tunnel = still(function Tunnel() {
   const { tunnel } = useLook();
   const { x0, x1 } = TUNNEL;
   const y = (x: number) => ROW3.from.y + ((x - ROW3.from.x) * (ROW3.to.y - ROW3.from.y)) / (ROW3.to.x - ROW3.from.x);
@@ -1776,7 +1832,7 @@ function Tunnel() {
       })}
     </g>
   );
-}
+});
 
 function Basket() {
   const { x0, x1, rimY, bottomY } = BASKET;
@@ -1863,10 +1919,10 @@ function useLook(): TrackTheme {
 }
 
 /** A rail in the run's world. */
-function TrackRail(props: { a: Pt; b: Pt }) {
+const TrackRail = still(function TrackRail(props: { a: Pt; b: Pt }) {
   const { Rail: WorldRail } = useLook();
   return <WorldRail {...props} />;
-}
+});
 
 /** „Klingende Kugelbahn“: the wooden run. */
 export const TrackLevel = (props: LevelProps) => <Run {...props} look={WOODEN} />;

@@ -146,3 +146,21 @@
   stroke-width: 5;
   stroke-linejoin: round;
 }
+
+/* The layers over the run's first svg (the rolling things, the parts in front of them) take only the taps on what they hold: the rest goes through to what lies below. */
+.run-layer {
+  pointer-events: none;
+}
+
+.run-layer [data-tap] {
+  pointer-events: auto;
+}
+
+/* A rolling thing's own little layer: placed by its transform from the layer's top left corner. */
+.run-marble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  will-change: transform;
+}

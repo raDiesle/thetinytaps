@@ -166,6 +166,12 @@ takes a `look`); other things keep their look and an animal looks out for them.
   both that thing and what it taps, or it runs off and leaves the child looking at a waiting picture it can't reach.
 - A pointing hand or glow added for a new tap target sits beside it, not over another part (the bars, a spot): check it
   next to its neighbours in the preview: a finger above the barrier once covered row 1's xylophone.
+- **The run is drawn in layers** (A-29, perf November 2026: 47–58 screens/s rastered while the camera followed, limit 30): the
+  still wall is one big svg whose parts are `still(…)` (a `memo` that compares props by content and ignores handlers; ages
+  are held at `SETTLED_S`, so a part nobody hit stops changing), each rolling thing is a small svg layer of its own moved by a
+  `translate3d` (`.run-marble`, `MARBLE_PAD`), and what lies in front of them is a second big svg. Never draw a moving thing
+  inside the big svg (the whole svg is painted again), and a new part with a wobble or flash takes its age as a prop,
+  never `t`. `bun run perf kugelbahn` checks it (now about 20 screens/s).
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,

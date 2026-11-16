@@ -112,3 +112,4 @@ the app language (🌐, `useLanguagePack()`), never in another one and never wit
   word each (they must be typeable: Hindi leaves out sleep, wave and clap, which need two words).
 - "Wo ist das B?" only asks for letters with a key of their own on most keyboards (`findableLetters`: no umlauts, no Ё,
   no Ñ; in Hindi and Arabic the letters printed on the keyboard rows, none that needs Shift).
+- Each key pops a big card: `.card` has `will-change: transform, opacity` so the pop-in scales a finished layer (A-27, perf: 29.9 → 26 screens/s rastered, limit 30); a new big card that pops in does the same.

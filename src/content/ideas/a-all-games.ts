@@ -230,6 +230,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 9. November 2026: beim Tippen auf der Tastatur 60 Bilder pro Sekunde und nur 10–13 % beschäftigt, aber das Handy malt 32–33 ganze Bildschirme pro Sekunde neu (Grenze 30, eine Woche davor 47). Jede Taste lässt einen großen Buchstaben mit Bild aufspringen (pop-in, das Bild wächst), und eine wachsende große Ebene wird in jedem Bild neu gemalt. Lösung: den Buchstaben in seiner Endgröße als eigene Ebene zeichnen und nur mit transform/opacity einblenden, die Bilder kleiner halten, als sie wirken.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
     },
     {
       id: "A-28",
@@ -247,6 +248,7 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 9. November 2026: Wenn die Kamera den Kugeln folgt, 60 Bilder pro Sekunde, 37–50 % beschäftigt, aber 30–42 ganze Bildschirme pro Sekunde neu gemalt (Grenze 30, eine Woche davor 37). Die Zeit geht in React: Run in TrackLevel.tsx zeichnet die Bahn in jedem Bild neu (commitMutationEffectsOnFiber, updateProperties), damit sich die Kugeln bewegen. Lösung: die Bahn einmal zeichnen (memo) und nur die Kugeln als kleine eigene Ebenen mit transform verschieben, ohne dass React jedes Bild neu rendert.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
+      done: true,
     },
     {
       id: "A-30",
