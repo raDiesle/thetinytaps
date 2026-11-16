@@ -26,7 +26,7 @@ import "@/styles/museum.css";
 
 /** The vanishing point's height on the screen, and how big the back wall is against the screen round that point. */
 const EYE = 0.42;
-const BACK = 0.8;
+const BACK = 0.92;
 
 /** How long a walk through a door takes, out of one room and into the next (`museum-walk-*` in museum.css). */
 const WALK_MS = 420;
@@ -35,8 +35,8 @@ const WALK_MS = 420;
 const MIN_TROPHY = 0.13;
 
 /** A trophy with its board and its plate is this many trophy heights tall; and this many wide per trophy width. */
-const CELL_HIGH = 1.34;
-const CELL_WIDE = 0.8;
+const CELL_HIGH = 1.28;
+const CELL_WIDE = 0.74;
 
 /** How the rooms are drawn on a screen `w` × `h`: their walls, and the area of the back wall the tiers and doors stand in. */
 export function museumLayout(w: number, h: number) {
@@ -44,7 +44,7 @@ export function museumLayout(w: number, h: number) {
   const vy = h * EYE;
   const back = { x0: vx - vx * BACK, x1: vx + vx * BACK, y0: vy - vy * BACK, y1: vy + (h - vy) * BACK };
   // Under the room's sign, between the back wall's sides, down to its foot.
-  const area = { x: back.x0 + w * 0.02, y: back.y0 + h * 0.2, w: back.x1 - back.x0 - w * 0.04, h: back.y1 - back.y0 - h * 0.2 };
+  const area = { x: back.x0 + w * 0.01, y: back.y0 + h * 0.14, w: back.x1 - back.x0 - w * 0.02, h: back.y1 - back.y0 - h * 0.14 };
   return { w, h, vx, vy, back, area };
 }
 
@@ -292,7 +292,7 @@ const toward = (l: Layout, x: number, y: number, k: number) => [l.vx + (x - l.vx
 const points = (list: readonly (readonly [number, number])[]) => list.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
 
 /** A doorway in a side wall, between depths `near` and `far` (1 at the screen, `BACK` at the back wall). */
-function doorway(l: Layout, side: "left" | "right", near = 0.96, far = 0.82) {
+function doorway(l: Layout, side: "left" | "right", near = 0.995, far = BACK + 0.02) {
   const x = side === "left" ? 0 : l.w;
   const high = 0.66;
   const at = (k: number, up: number) => toward(l, x, l.h - up * l.h, k);
@@ -397,7 +397,7 @@ const RoomShell = memo(function RoomShell({ layout: l, left }: { layout: Layout;
 /** One doorway in a side wall: its frame, the light (or the shelf's room) beyond, and paw tracks walking into it. */
 function Doorway({ layout: l, side, kind }: { layout: Layout; side: "left" | "right"; kind: "shelf" | "room" }) {
   const door = doorway(l, side);
-  const frame = doorway(l, side, 0.975, 0.8);
+  const frame = doorway(l, side, 1, BACK);
   return (
     <g>
       <polygon points={points(frame)} fill="#5c3216" />
@@ -450,7 +450,7 @@ function PawTrack({ layout: l, side }: { layout: Layout; side: "left" | "right" 
 
 /** The left doorway's tap: one room back, the shelf from the hall. Laid over the drawn doorway, with a soft arrow on its floor. */
 function Door({ layout: l, label, name, onWalk }: { layout: Layout; label: string; name: string; onWalk: () => void }) {
-  const door = doorway(l, "left", 0.985, 0.78);
+  const door = doorway(l, "left", 1, BACK - 0.02);
   const xs = door.map(([x]) => x);
   const ys = door.map(([, y]) => y);
   const box = { left: Math.min(...xs), top: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
