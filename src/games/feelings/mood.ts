@@ -31,7 +31,7 @@ export interface Mood {
    * (user decision, November 2026), kept so the eight drawn faces can be used again for something else.
    */
   face: MoodFace;
-  /** The moment its picture shows, in German for grown-ups looking at the card's idea (bilder/README.md). */
+  /** The moment its picture shows, in German for grown-ups looking at the card's idea (bilder/prompts/wie-gehts-dir.md). */
   moment: string;
 }
 

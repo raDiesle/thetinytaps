@@ -299,14 +299,14 @@ A long strip (a print border, `--aspect 21:9` cropped to 4:1) comes back as a na
 above and below, even when the prompt says „edge to edge“: the cover crop then keeps white rows, or cuts the sides
 (the sun of a sky strip). Trim the white rows from the raw `.image-raw/` picture first (sharp `extract`), then crop
 to the size; move the crop (`position`) so the strip's main thing stays whole. Folders with their own guide (like
-`src/games/feelings/bilder/README.md`) have their own style block, characters and file
+`src/games/feelings/bilder/README.md`, its prompts by topic in `prompts/` beside it) have their own style block, characters and file
 names – use those.
 
 ## Workflow
 
 0. Pictures the user didn't ask for (a feature of yours needs new ones) are not generated on your own:
    leave a placeholder in the game (the Gefühle game shows the file name, `Placeholder` in its `shared.tsx`)
-   and list file name and prompt where the game keeps them (e.g. „Geplant“ in its `bilder/README.md`),
+   and list file name and prompt where the game keeps them (e.g. Gefühle's `bilder/prompts/geplant.md`),
    so the user looks at the ideas first and then makes them with you.
    Prompts kept in `src/content/picturePrompts.ts` stay there once made, each with the `url` of its picture, so it
    counts as made and not as missing (`picturePrompts.test.ts` checks it).

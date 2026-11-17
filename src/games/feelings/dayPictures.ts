@@ -2,7 +2,7 @@ import type { QueuedPicture } from "@/content/pictureQueue";
 
 // The pictures of the days' pages of the story (`days.ts`, user idea, November 2026), as the picture queue takes them
 // until they are made (`/bild-erzeugen`, never made on your own); a made one leaves the list, its prompt kept in
-// `bilder/README.md` („Tagesgeschichten“). All 39 were made on 4 November 2026: a new page joins with `dayPage`. Each page shows a moment a little *before* the scene
+// `bilder/prompts/tagesgeschichten.md`. All 39 were made on 4 November 2026: a new page joins with `dayPage`. Each page shows a moment a little *before* the scene
 // it leads to, in that scene's place: so it is drawn from that scene's first picture (`firstImage`) as its only `--ref`,
 // keeping the place and the look of everyone, and only what the characters do changes – nothing has happened yet, all
 // are calm. The night that ends every day is the little bear's room at night. Plain data, with no picture imports, so

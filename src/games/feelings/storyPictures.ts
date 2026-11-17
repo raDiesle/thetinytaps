@@ -9,7 +9,7 @@ import type { SituationId } from "./kita";
 // place; every later picture redrawn from that first picture as its only `--ref`, the place kept and only what the
 // characters do changed. In every picture the little bear acts himself, so no hands come in from the edges. Plain data,
 // with no picture imports, so the management page that lists the queue doesn't load the game's pictures. The short
-// form of every prompt stands in `bilder/README.md` under „Geplant“ until the picture is made.
+// form of every prompt stands in `bilder/prompts/geplant.md` until the picture is made.
 
 const DIR = "src/games/feelings/bilder";
 
@@ -43,7 +43,7 @@ export type Shot = string | { shows: string; cast: Figure[] };
 export interface StoryDrawing {
   /** The story's id (`Situation.id`), which names its pictures (`puzzle-passiert`, `puzzle-1` …). */
   id: SituationId;
-  /** The place and what is in it, in German, for grown-ups reading `bilder/README.md`. */
+  /** The place and what is in it, in German, for grown-ups reading the story's prompts in `bilder/prompts/`. */
   place: string;
   /** Who is in the first picture (and so in every later one, unless a `Shot` says otherwise). */
   cast: Figure[];

@@ -244,7 +244,7 @@
 
 /* ---------- A picture planned but not made yet ---------- */
 
-/* Its file name, to look up the prompt in bilder/README.md; the caption says what it will show. */
+/* Its file name, to look up the prompt in bilder/prompts/geplant.md; the caption says what it will show. */
 .fg-placeholder {
   position: absolute;
   inset: 0;
