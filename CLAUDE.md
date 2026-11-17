@@ -810,7 +810,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is
   always the book's **left** page: its outer edge on the left with the board and the table round it, the spine on the
   right with the facing page in its shadow beyond it (`--page-left`, `--page-right`; `look.test.ts`). Most of it is CSS
-  in `src/styles/book.css` and `bookshelf.css`, whose rules begin with `:root` to win over the shared base styles; games
+  in `src/styles/book.css` and `bookshelf.css` (its books in `bookshelf-books.css`, the way into a book in `book-travel.css`), whose rules begin with `:root` to win over the shared base styles; games
   don't style for it.
   It should look real, not flat (user feedback, October 2026): the shelf is drawn in 3D (boards seen from the eye's
   height, walls going back, books as boxes with spines and page edges, other books standing with their spines out to
