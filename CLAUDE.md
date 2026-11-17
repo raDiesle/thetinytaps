@@ -688,6 +688,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
   defaults (so new fields need no migration); `speech`/`sounds` are filled in from the
   shared options (always off and on). Bump the key's `.vN` only when old values would break.
+  What a game saves besides its settings (a week's stars, a day's mood) is read and written with `readStored` /
+  `writeStored` of `src/lib/storage.ts`, never `localStorage` by hand, and dates that several games share (the day's
+  key, its week, morning or evening) come from `src/lib/days.ts`, never from another game's folder (`days.test.ts`).
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
   `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.
