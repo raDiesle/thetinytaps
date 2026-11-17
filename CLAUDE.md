@@ -93,6 +93,8 @@ In a fresh worktree run `bun install` first.
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
   that kind mounts one (so far Was gehört zusammen?, Gefühle, Was ist passiert? and the chapter books, `ChapterBook`).
+- Look for files with `git ls-files '*.ts*'` and `git grep -l`, never `find` or `ls -R` over `src`: about 25,000
+  recordings under the games' `stimme/` folders flood the output (code review, November 2026).
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
@@ -259,7 +261,11 @@ In a fresh worktree run `bun install` first.
   (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy, and ≤ 30
   screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles). Until
   November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
-  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A new game,
+  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A stretch that
+  starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,
+  and whether it catches them depends on when its counter starts: before blaming a motion, compare where the stutters
+  fall with when it starts (in „Buch aus dem Regal nehmen“ all of them fell in the 0.2 s before the book lifts, and
+  splitting that work over two frames only added one, since neither half got under 50 ms; November 2026). A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
   `--profile` names the functions that cost, `--shots` shows what was measured). A stretch after one that taps everything starts wherever those taps left the game: start it
   from a reload (`{ eval: "location.reload()" }`, a wait, then the fullscreen question's `.screen-hint-button`), as
