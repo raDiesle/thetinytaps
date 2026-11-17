@@ -10,6 +10,9 @@ bun run verify     # lint + format check + typecheck + unit tests, all three at 
 bun run format     # format everything and apply safe lint fixes (Biome)
 bun test           # unit tests only (about 17 s one file after the other, `bun test --parallel` about 7 s; one file: `bun test <path>`, < 1 s); bun test --watch while working
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
+bun run lint       # Biome alone; bun run typecheck: tsc alone (both are part of verify)
+bun run previews   # the menus' pictures of the games, see „Menus show pictures from the games“
+bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rules for every game
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
@@ -36,7 +39,7 @@ stylesheet still holds one. Keep it that way when adding such code.
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
 Use `dev` – it moves to the next free port when another session has 3000, so
-never add configs with fixed ports. Bun's dev server can stay stuck on „Could not resolve“ after a merge brought new
+never add configs with fixed ports (only `preview-pages` keeps its 3200). Bun's dev server can stay stuck on „Could not resolve“ after a merge brought new
 files with their importers; `tools/dev.ts` then restarts it on the same port (the page reloads), so a „Could not
 resolve“ that stays is a real typo or missing file – never work around it in the code. `preview-pages` serves the built site with
 the service worker. Sound and speech are muted when the browser
@@ -178,7 +181,12 @@ In a fresh worktree run `bun install` first.
   A visit downloads only its own language: such a file is imported only by `src/content/texts/texts-<lang>.ts` (one chunk
   per language, loaded before the first screen; the service worker keeps only the languages played), and the game's
   table fills from there with `byLanguage(…)` – never import it from game code, or every visitor downloads it
-  (`texts.test.ts` checks this). Inline texts stay in the code with all their languages: moving them into the language
+  (`texts.test.ts` checks this). A game whose translations are big (Was gehört zusammen?, Gefühle, Kleine Abenteuer)
+  keeps them in a part of its own, `texts-<lang>-<part>.ts` (`PART_MODULES` in `src/content/texts/index.ts`), loaded
+  with its page by `withTexts(part, …)` in `App.tsx`, never in the language's chunk the first screen waits for (that
+  chunk was 88 KB gz in English and 112 KB in Russian and Hindi, now 56 and 73): a new big game's translations go into
+  such a part, another page that shows them loads the part too, and tests and tools load everything with
+  `loadEveryText`. Inline texts stay in the code with all their languages: moving them into the language
   chunks at build time was tried (October 2026) and saved too little for what it cost (the app waiting for its
   language, a reload on every switch, a build step), so don't do it again.
   A text without a translation shows in its first language – German for the older texts, English for what is new
@@ -415,8 +423,9 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   Abenteuer and the good-night sentence do; the management list then leaves its recorded lines out. Music hushes
   while a recording plays (`talking()`). The dev server keeps the file list of a `?glob` from its start: after
   recording (or adding any files to a globbed folder) restart it before checking, or the new files seem missing.
-  The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
-  (things standing in the bookshelf, see the picture book below).
+  The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, „Junge / Mädchen“,
+  play time (⏳), the language (🌐) and „Offline spielen“ (things standing in or hanging from the bookshelf, see the
+  picture book below).
 - **A figure that stands for the child follows „Junge / Mädchen“** (stickers of a fox girl and a bear boy on a wall inside the shelf, each with a little ♀ / ♂ beside
   it so it is plain which is which, one tap on either chooses it – user decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
@@ -667,13 +676,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
   start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
   (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that
-  plays at once goes back with ✕, Esc and „Menü“ to the page before it, the book's table of contents (or the shelf),
+  plays at once goes back with ✕ and Esc (and the end's „Menü“ in the two games that show one) to the page before it, the book's table of contents (or the shelf),
   never to a start screen the child didn't see on the way in – neither one with only „Los geht’s!“ nor one with cards
   whose choice is made while playing (user feedback, October and November 2026; `GameShell` does it by itself). A game whose menu is
   the page before it (a picture of Lebendige Bilder, its mode chosen in the row on `/bilder/`) has no start screen at all:
-  `leaveTo` sends ✕, Esc and „Menü“ back to that page. A game a routine opens for one of its steps (the Tagesplan's
+  `leaveTo` sends ✕ and Esc back to that page. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or
-  „Menü“ go back to the routine.
+  its end's „Menü“ go back to the routine.
   **Aim for no settings and no description**, so start screens stay clear: a game should explain itself by playing
   (a glow, the pointing hand, a reaction to every tap), and what a switch would choose is decided once, the way that
   plays best, instead of being left to grown-ups. `GameShell` has no `info` („ℹ️ Über das Spiel“, removed from every
@@ -897,7 +906,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   November 2026).
 - A game still being built is marked `unfinished: true` in `CATEGORIES` (user decision, November 2026): it stands
   neither on the shelf nor in its book, its page carries `noindex` and stays out of the sitemap (its texts wait in
-  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ and „Menü“ lead back.
+  `SEO_TEXTS`), and it is reached only from „🚧 In Arbeit“ on `/management/`, where its ✕ leads back.
   Where the user wants it seen already, it is `unfinished: "labelled"` instead (user request, November 2026, L-23):
   it stands in its book's table of contents with the page marker „in Bearbeitung“ (`BookContents`, the label of the
   start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
