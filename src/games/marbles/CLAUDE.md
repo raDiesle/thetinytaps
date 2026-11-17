@@ -128,7 +128,7 @@ are the shared `TapHint`, still until the child has waited a few seconds.
 
 ## Klingende Kugelbahn
 
-Level `track` (`TrackLevel.tsx`, `track.ts`). Ideas N-34, X-08, K-19 (more in the K area of the ideas page).
+Level `track` (`TrackLevel.tsx`, `trackParts.tsx`, `track.ts`). Ideas N-34, X-08, K-19 (more in the K area of the ideas page).
 
 A wooden marble run down a wall 1600 × 2250 (`TRACK_W`/`TRACK_H`, two and a half screens). One tap or key opens the hopper,
 and six marbles come out one after the other. Each rolls over a xylophone, through six spots (bell, paddle wheel, funnel,
@@ -182,8 +182,10 @@ takes a `look`); other things keep their look and an animal looks out for them.
   the next, nothing leaves the wall, spot boards don't overlap, the lifted flap is clear of the right way, and the barrier
   has room for a long row: run it after moving anything.
 - `TrackLevel.tsx`: the marbles (rolling downhill with gravity and friction, fixed speed on wheel, funnel, seesaw and loop),
-  the drawing, and the camera. The camera follows the marbles down: on a tall screen it shows more of the wall (up to all of
-  it), before the tap the hopper, after the last marble the basket.
+  the layers they are drawn in, and the camera (`Run`). `trackParts.tsx`: the drawn parts of the wall (spots, shelf,
+  xylophones, switch, barrier, looping, drums, chimes, tunnel, `still`) and the wooden world `WOODEN`. The camera follows
+  the marbles down: on a tall screen it shows more of the wall (up to all of it), before the tap the hopper, after the last
+  marble the basket.
 - The camera may go `TOP_ROOM` above the wall's top, so the shelf and the hopper sit clear of the top edge and the ✕.
   Never put what the child taps right at the wall's top edge: on a phone on its side the picture is cut there.
 - The camera never follows what waits for the child's tap (marbles at the barrier): it stays where the child can see
@@ -191,7 +193,7 @@ takes a `look`); other things keep their look and an animal looks out for them.
 - A pointing hand or glow added for a new tap target sits beside it, not over another part (the bars, a spot): check it
   next to its neighbours in the preview: a finger above the barrier once covered row 1's xylophone.
 - **The run is drawn in layers** (A-29, perf November 2026: 47–58 screens/s rastered while the camera followed, limit 30): the
-  still wall is one big svg whose parts are `still(…)` (a `memo` that compares props by content and ignores handlers; ages
+  still wall is one big svg whose parts are `still(…)` (`trackParts.tsx`, a `memo` that compares props by content and ignores handlers; ages
   are held at `SETTLED_S`, so a part nobody hit stops changing), each rolling thing is a small svg layer of its own moved by a
   `translate3d` (`.run-marble`, `MARBLE_PAD`), and what lies in front of them is a second big svg. Never draw a moving thing
   inside the big svg (the whole svg is painted again), and a new part with a wobble or flash takes its age as a prop,
@@ -220,7 +222,7 @@ camera (`Run` in `TrackLevel.tsx`), only drawn in another world, with other thin
 A world is a `TrackTheme` (`trackTheme.ts`): its backdrop, rail, colours of boards, posts, shelf, hopper and tunnel, one
 thing per `Roller` behaviour (`Thing`; the five behaviours stay as they are, only the drawing changes), its sounds, the line
 when full, the animals in the tunnel, and its `End` (drawn behind and in front of what landed, told how many have arrived,
-`fullAge` and `tapAge`). `TrackLook` hands it to every drawing in the run; the wooden run is `WOODEN` in `TrackLevel.tsx`.
+`fullAge` and `tapAge`). `TrackLook` hands it to every drawing in the run; the wooden run is `WOODEN` in `trackParts.tsx`.
 - A new world is a new file with a `TrackTheme`, a `MarbleLevel`, a `LEVELS` entry, `LEVEL_TEXTS` and
   `RUNS` in `catalog.ts` (no background music). Give it five things that look different from every other world's, and
   an end that does something of its own when full – never the wooden basket and flag again.

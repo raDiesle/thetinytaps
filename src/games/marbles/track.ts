@@ -5,7 +5,7 @@
 // tapping it (X-08), and a switch sends the marble one of two ways (K-01), so
 // the route comes in sections: the fixed stretches between them, one section
 // for every part in every spot, and one for each way at the switch. The
-// drawing in TrackLevel.tsx is laid out along the same numbers.
+// drawing in trackParts.tsx is laid out along the same numbers.
 
 import { arc, BALL_R, indexAt, line, quad, type Pt } from "./path";
 

@@ -1,7 +1,7 @@
 // What makes one marble run look like a world of its own (K-18): the same way
 // down the wall, the same parts and the same joining in, but its own wall, rails,
 // things on the shelf and its own end. The wooden run is one of them
-// (`TrackLevel.tsx`); the others each have a file (`snowTrack.tsx`, …).
+// (`WOODEN` in `trackParts.tsx`); the others each have a file (`snowTrack.tsx`, …).
 
 import { type ComponentType, createContext } from "react";
 import type { Localized } from "@/lib/language";

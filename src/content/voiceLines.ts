@@ -133,7 +133,7 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
     {
       text: "Der Korb ist voll!",
       translations: { en: "The basket is full!", zh: "篮子满啦！", hi: "टोकरी भर गई!", es: "¡La cesta está llena!", ar: "السلة ممتلئة!", ru: "Корзина полна!" },
-      file: "src/games/marbles/TrackLevel.tsx",
+      file: "src/games/marbles/trackParts.tsx",
     },
     {
       text: "Bumm! Alles umgefallen!",

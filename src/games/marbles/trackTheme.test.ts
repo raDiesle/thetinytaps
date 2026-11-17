@@ -8,7 +8,7 @@ import { SNOW_TRACK } from "./snowTrack";
 import { SPACE_TRACK } from "./spaceTrack";
 import { BASKET_FULL, ROW9, SHELF, TRACK_H, TRACK_W } from "./track";
 import { BALL_R } from "./path";
-import { WOODEN } from "./TrackLevel";
+import { WOODEN } from "./trackParts";
 
 const WORLDS = [WOODEN, COLOR_TRACK, SNOW_TRACK, SPACE_TRACK, SLIDE_TRACK, SITE_TRACK];
 
