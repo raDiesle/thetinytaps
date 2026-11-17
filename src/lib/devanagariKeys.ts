@@ -87,6 +87,3 @@ export function sameDevanagariKey(a: string, b: string) {
   const code = CODE_OF.get(a);
   return code !== undefined && code === CODE_OF.get(b);
 }
-
-/** Whether `letter` is a Devanagari letter. */
-export const isDevanagari = (letter: string) => /\p{Script=Devanagari}/u.test(letter);

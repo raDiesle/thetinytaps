@@ -24,6 +24,3 @@ export function cyrillicLetterOf(e: Pick<KeyboardEvent, "key" | "code">): string
   if (e.key.length === 1 && /\p{Script=Cyrillic}/u.test(e.key)) return e.key.toLocaleUpperCase("ru-RU");
   return LETTER_BY_CODE.get(e.code);
 }
-
-/** Whether `letter` is a Cyrillic letter. */
-export const isCyrillic = (letter: string) => /\p{Script=Cyrillic}/u.test(letter);

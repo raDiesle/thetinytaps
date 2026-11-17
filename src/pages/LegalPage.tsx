@@ -45,7 +45,7 @@ function Out({ href, children }: { href: string; children: ReactNode }) {
 function LegalPage({ title, children }: { title: string; children: ReactNode }) {
   useTitle(title);
   return (
-    <main className="home legal">
+    <main className="home legal" lang="de" dir="ltr">
       <MenuTop to="/" back="Alle Spiele" />
       <h1>{title}</h1>
       {children}

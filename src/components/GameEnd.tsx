@@ -7,6 +7,7 @@ import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { noPointerClick } from "@/lib/press";
+import { AGAIN, BACK_TO_SHELF } from "@/lib/sharedTexts";
 import { screenTap } from "@/lib/tapGuard";
 import { awardTrophy, gameOfPath, trophyKey, useTrophies } from "@/lib/trophies";
 import { museumHref, TROPHY_ROOM } from "@/lib/museum";
@@ -250,19 +251,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
           <button
             type="button"
             className={`game-end-button menu${toShelf ? " to-shelf" : ""}`}
-            aria-label={
-              toShelf
-                ? t({
-                    de: "Zurück zum Bücherregal",
-                    ru: "Назад к книжной полке",
-                    en: "Back to the bookshelf",
-                    zh: "返回书架",
-                    hi: "किताबों की अलमारी पर वापस",
-                    es: "Volver a la estantería",
-                    ar: "العودة إلى رف الكتب",
-                  })
-                : undefined
-            }
+            aria-label={toShelf ? t(BACK_TO_SHELF) : undefined}
             onPointerDown={(e) => e.stopPropagation()}
             // A click, not pointer down, like the corner: leaving on the way down would let the lifted finger tap the shelf.
             onClick={leave}
@@ -273,7 +262,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
         ) : (
           onAgain && (
             <button type="button" className="game-end-button again" {...press("nochmal", onAgain)}>
-              {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}
+              {t(AGAIN)}
             </button>
           )
         )}

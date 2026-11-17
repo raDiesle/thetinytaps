@@ -140,6 +140,18 @@ let chain: Promise<void> = Promise.resolve();
 let generation = 0;
 /** Lines asked for and not yet over (still waiting for the page, loading or playing), in every game. */
 let pending = 0;
+/** Settles `hushed`. */
+let endWait: () => void = () => undefined;
+/** Settles at the next hush (`untilHush`). */
+let hushed = new Promise<void>((resolve) => {
+  endWait = resolve;
+});
+
+/**
+ * Settles at the next `hush()`: a line waiting for its recording stops waiting then, so the paw slip (`SoundLoading`)
+ * goes with the game that was left instead of staying up to SOUND_WAIT_MS over the menu.
+ */
+export const untilHush = (): Promise<undefined> => hushed.then(() => undefined);
 
 function play(buffer: AudioBuffer) {
   const ac = audioContext();
@@ -199,6 +211,7 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
       const url = urlOf(text, language, english);
       if (!queue) hush();
       const at = generation;
+      const stopped = untilHush();
       if (!url) {
         if (browser)
           chain = chain.then(
@@ -215,7 +228,7 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
         counted(async () => {
           await pageStill();
           // Due and not there yet: the paw track shows until it is (SoundLoading), so the child sees it is coming.
-          const sound = fetched.has(url) || at !== generation ? await buffer : await waitingFor(atMost(buffer));
+          const sound = fetched.has(url) || at !== generation ? await buffer : await waitingFor(Promise.race([atMost(buffer), stopped]));
           if (sound && at === generation) await play(sound);
         }),
       );
@@ -239,6 +252,10 @@ function counted(run: () => Promise<void>) {
 /** Stops what is being said and everything waiting to be said, in every game. */
 export function hush() {
   generation++;
+  endWait();
+  hushed = new Promise((resolve) => {
+    endWait = resolve;
+  });
   chain = Promise.resolve();
   playing?.stop();
   playing = null;

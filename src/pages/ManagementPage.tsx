@@ -182,7 +182,7 @@ export function ManagementPage() {
   const markProps = { marks, onMark: setMark };
 
   return (
-    <main className="home ideas">
+    <main className="home ideas" lang="de" dir="ltr">
       <MenuTop to="/" back="Alle Spiele" />
       <h1>
         <span aria-hidden>🧭</span> Management

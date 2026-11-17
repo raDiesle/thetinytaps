@@ -43,6 +43,16 @@ const WIND_DOWN_MS = 60_000;
 /** Longest step counted at once, so a sleeping tablet doesn't eat the time. */
 const MAX_STEP_MS = 2000;
 
+/**
+ * How often the time counted while playing is written to localStorage: every second was a write a second for nothing.
+ * It is also written when the page is hidden or closed, when a game starts or ends and when it is left, so at most
+ * this much is lost when a tab is killed outright.
+ */
+export const SAVE_EVERY_MS = 10_000;
+
+/** Whether the time counted since `lastSaved` is due to be written at `now`. */
+export const dueToSave = (lastSaved: number, now: number) => now - lastSaved >= SAVE_EVERY_MS;
+
 /** What was played today. */
 export interface Played {
   day: string;
@@ -126,11 +136,39 @@ function changed() {
   for (const listener of listeners) listener();
 }
 
+/** Counted time not yet written to localStorage (`flushPlayed`). */
+let unsaved = false;
+
 function savePlayed(next: Played) {
   played = next;
+  unsaved = false;
   write(PLAYED_KEY, next);
   changed();
 }
+
+/** Writes the time counted since the last write, if any. */
+function flushPlayed() {
+  if (!unsaved || !played) return;
+  unsaved = false;
+  write(PLAYED_KEY, played);
+}
+
+// A page hidden (another app, the screen off) or closed may never come back: what was counted is written then.
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", flushPlayed);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushPlayed();
+  });
+}
+
+/**
+ * What the play time's components show of a state: whole minutes (PlaytimeOptions, PlaytimeNote), whether anything
+ * was played, the lock, good night and the dusk. A second counted that changes none of these tells nobody.
+ */
+const shownOf = (state: PlaytimeState) => `${Math.floor(state.played.ms / 60_000)} ${state.played.ms > 0} ${state.over} ${state.goodNight} ${state.dusk}`;
+
+/** Whether the components would show `after` differently from `before`. */
+export const shownChanged = (before: PlaytimeState, after: PlaytimeState) => shownOf(before) !== shownOf(after);
 
 /** Where the play time stands right now. */
 export interface PlaytimeState {
@@ -212,6 +250,7 @@ export function countGame() {
 export function gameEnded() {
   if (lastGameEnded) return;
   lastGameEnded = true;
+  flushPlayed();
   changed();
 }
 
@@ -222,7 +261,8 @@ export interface GamePlaytime {
 }
 
 /**
- * Marks a game as on screen while `active` and counts the time meanwhile, every second.
+ * Marks a game as on screen while `active` and counts the time meanwhile, every second – kept in memory, written every
+ * SAVE_EVERY_MS (`dueToSave`), and told to the components only when what they show changes (`shownChanged`).
  * Only a change of good night or dusk re-renders the game, not every second counted.
  */
 export function usePlaytime(active: boolean): GamePlaytime {
@@ -232,17 +272,27 @@ export function usePlaytime(active: boolean): GamePlaytime {
     lastGameEnded = false;
     changed();
     let last = performance.now();
+    let lastSaved = last;
     const timer = setInterval(() => {
       const now = performance.now();
       const p = currentPlayed();
+      const before = currentState();
       // Counted until good night, also through the last game of a game limit.
-      if (document.visibilityState === "visible" && !currentState().goodNight) {
-        savePlayed({ ...p, ms: p.ms + Math.min(now - last, MAX_STEP_MS) });
+      if (document.visibilityState === "visible" && !before.goodNight) {
+        played = { ...p, ms: p.ms + Math.min(now - last, MAX_STEP_MS) };
+        unsaved = true;
+        if (dueToSave(lastSaved, now)) {
+          flushPlayed();
+          lastSaved = now;
+        }
+        state = null;
+        if (shownChanged(before, currentState())) changed();
       }
       last = now;
     }, 1000);
     return () => {
       clearInterval(timer);
+      flushPlayed();
       inGame = false;
       lastGameEnded = false;
       changed();

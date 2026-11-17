@@ -2,7 +2,8 @@ import { Glob } from "bun";
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { basename, dirname } from "node:path";
-import { forgetOld, recordingUrl } from "./voice";
+import { isWaiting, waitingFor } from "./soundWait";
+import { forgetOld, hush, recordingUrl, untilHush } from "./voice";
 import { recordingName } from "./voiceName";
 
 // What a line with a missing recording does (user decision, November 2026): the English recording plays instead,
@@ -73,4 +74,16 @@ test("only a voice of a few dozen lines a language loads all of them", () => {
     }
     expect(Math.max(0, ...perLanguage.values()), `${file} loads all of ${game}'s voice`).toBeLessThanOrEqual(LIMIT);
   }
+});
+
+test("a line still waiting for its recording stops waiting when the game is left (hush)", async () => {
+  // The paw slip (SoundLoading) showed for up to SOUND_WAIT_MS over the menu after a game was left mid-download.
+  const never = new Promise<undefined>(() => undefined);
+  const waited = waitingFor(Promise.race([never, untilHush()]));
+  expect(isWaiting()).toBe(true);
+  hush();
+  await waited;
+  expect(isWaiting()).toBe(false);
+  // say() waits so: a recording not there yet races the next hush.
+  expect(readFileSync(new URL("./voice.ts", import.meta.url), "utf8")).toContain("waitingFor(Promise.race([atMost(buffer), stopped]))");
 });

@@ -1,9 +1,10 @@
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useT } from "@/lib/language";
+import { noPointerClick } from "@/lib/press";
 import "./voiceSwitch.css";
 
 /**
- * One tap on a grown-ups' note in the corner acts at once, as the finger lands (or Enter / Space): the loudspeaker and
+ * One tap on a grown-ups' note in the corner acts at once, as the finger lands (or Enter / Space, or a screen reader): the loudspeaker and
  * the book of the text to read out are tapped, never held (user feedback, November 2026: held, they were too slow).
  */
 export const tapProps = (onTap: () => void) => ({
@@ -17,6 +18,8 @@ export const tapProps = (onTap: () => void) => ({
     e.stopPropagation();
     onTap();
   },
+  // A screen reader's activation sends only a click (Enter and Space are taken above, so they never come twice).
+  onClick: noPointerClick(onTap),
 });
 
 /**

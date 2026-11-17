@@ -9,6 +9,7 @@ import { goBack } from "@/lib/goBack";
 import { type Texts, useAppLanguage, useT } from "@/lib/language";
 import { TROPHY_PARAM, TROPHY_ROOM, useMuseumTrophies } from "@/lib/museum";
 import { useStepAddress } from "@/lib/stepAddress";
+import { BACK_TO_SHELF } from "@/lib/sharedTexts";
 import { gameOf, type TrophyWon, trophyKey } from "@/lib/trophies";
 import "@/styles/museum.css";
 
@@ -198,15 +199,7 @@ export function TrophyMuseum() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const shelfLabel = t({
-    de: "Zurück zum Bücherregal",
-    ru: "Назад к книжной полке",
-    en: "Back to the bookshelf",
-    zh: "返回书架",
-    hi: "किताबों की अलमारी पर वापस",
-    es: "Volver a la estantería",
-    ar: "العودة إلى رف الكتب",
-  });
+  const shelfLabel = t(BACK_TO_SHELF);
   // Where the left door leads: the shelf from the hall, else the room one step up (the hall, or the wing's hall).
   const parent = here.length > 1 ? nodeAt(tree, here.slice(0, -1)) : undefined;
   const backName = here.length === 0 ? t({ en: "Bookshelf" }) : parent ? t(parent.title) : t({ en: "Hall" });

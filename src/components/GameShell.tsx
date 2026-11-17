@@ -12,6 +12,7 @@ import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { BACK_TO_SHELF } from "@/lib/sharedTexts";
 import { useCommonSettings } from "@/lib/common";
 import { goBack } from "@/lib/goBack";
 import { levelHome, levelHref } from "@/lib/levelAddress";
@@ -469,23 +470,7 @@ export function GameShell({
         ) : ended && !playtime.goodNight ? (
           // At the end of a level the corner is the way back, as in a menu: one tap, held or not (the „Menü“ button it
           // replaces was a tap too), and onto the shelf it is the book's ribbon, since the book closes and goes back.
-          <TapExit
-            onExit={stop}
-            sign={toShelf ? "shelf" : "close"}
-            label={
-              toShelf
-                ? t({
-                    de: "Zurück zum Bücherregal",
-                    ru: "Назад к книжной полке",
-                    en: "Back to the bookshelf",
-                    zh: "返回书架",
-                    hi: "किताबों की अलमारी पर वापस",
-                    es: "Volver a la estantería",
-                    ar: "العودة إلى رف الكتب",
-                  })
-                : backToMenu
-            }
-          />
+          <TapExit onExit={stop} sign={toShelf ? "shelf" : "close"} label={toShelf ? t(BACK_TO_SHELF) : backToMenu} />
         ) : (
           <ExitButton onExit={stop} label={backToMenu} />
         )}

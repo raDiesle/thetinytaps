@@ -219,10 +219,16 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   useLayoutEffect(() => {
     const box = room.current;
     if (!box) return;
+    // The inputs the plan was made from: the same again (the room's own resize after the plan changed its height, the
+    // window's resize event after the observer's) plans nothing anew, so the 3D shelf is drawn once, not three times.
+    let planned = "";
     const measure = () => {
       const [width, height] = [box.clientWidth, box.clientHeight];
       // The screen's shape decides, not the room's: the room's height follows the plan (`data-plan` in bookshelf.css).
       const upright = window.innerWidth / window.innerHeight < 0.95;
+      const inputs = `${width}×${height}${upright ? " upright" : ""}`;
+      if (inputs === planned) return;
+      planned = inputs;
       const sign = Math.min(64, Math.max(20, height * SIGN_SIZE));
       const options = {
         upright,

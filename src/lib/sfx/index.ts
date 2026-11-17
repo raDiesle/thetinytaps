@@ -7,7 +7,6 @@ export {
   speaker,
   decodeSound,
   type Loop,
-  type LoopOptions,
   loadRecordings,
   loadSound,
   playLoop,
