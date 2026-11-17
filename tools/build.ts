@@ -103,7 +103,11 @@ async function walkOut(): Promise<Built> {
     if (name) chunks.set(name, [...(chunks.get(name) ?? []), file]);
   }
   const texts = new Map<string, Promise<string>>();
-  const read = (file: string) => texts.get(file) ?? (texts.set(file, readFile(join(OUT, file), "utf8")), texts.get(file) as Promise<string>);
+  const read = (file: string) => {
+    const text = texts.get(file) ?? readFile(join(OUT, file), "utf8");
+    texts.set(file, text);
+    return text;
+  };
   const closures = new Map<string, Promise<string[]>>();
   return {
     files,
