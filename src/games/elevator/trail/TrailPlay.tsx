@@ -1,4 +1,4 @@
-import { type ComponentType, type PointerEvent, type ReactNode, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type PointerEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { INK } from "@/components/drawing";
 import { useDevice } from "@/lib/device";
@@ -6,36 +6,27 @@ import { playCountNote, playMelody, playPop, playRandomNote, playSlide } from "@
 import { loadRealSounds, playGiggle } from "@/lib/realSounds";
 import { TRAIL_SOUNDS } from "./levels";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
-import { pick } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
-import { ActionButton } from "../house";
-import { KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose, useHero } from "../kid";
-import { spokenIn, translationOf } from "../phrases";
+import { KID_H, Kid, ThoughtBubble, useHero } from "../kid";
+import { translationOf } from "../phrases";
 import { linesReady, loadLines, sayIn, trailLines } from "../voice";
 import { FRIENDS, type FriendPose } from "./friends";
 import { allStations, facing, groundY, placed, route } from "./ground";
-import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
+import { SLOT_COUNT, type Screen, VIEW_H, VIEW_W, layoutHud } from "./hud";
+import { Fitted, GOALS, ITEMS, type ItemId, type Picture } from "./items";
+import { BagAndButton, ForkSigns, Layer, WantRing, ringOf } from "./layers";
 import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
+import { type KidState, type Next, PACK_SHUT, type View, afloatAt, carryAt, goalAt, handOf, heldOf, itemOf, nextFrom, startView } from "./view";
 import { WORRIES } from "./worries";
 import "./trail.css";
 import { useStepAddress } from "@/lib/stepAddress";
 
-const VIEW_W = 1600;
-const VIEW_H = 900;
 /** Where the child's feet are on the 1600 × 900 picture the backdrops are drawn for: the world scrolls so that they
  * stay there, and `layoutHud` then puts that point where the screen has room for it (`Hud.feet`). */
 const KID_AT: Point = [760, 740];
 /** How high the child's feet are on the screen in a world that goes up (`turns`), which keeps the whole width. */
 const UP_FEET = 620;
-/** A screen taller than the picture zooms the world in until it shows this much height, so it doesn't fill with
- * sky; at most `MAX_ZOOM` times, so a world going sideways still shows enough of the way ahead. */
-const WORLD_H = 900;
-const MAX_ZOOM = 1.5;
-/** At least this much of the world is shown ahead of the child (and a third of it behind). */
-const AHEAD = 840;
-/** Ground kept free between the child's feet and the top of the frames below them. */
-const FEET_GAP = 24;
 /** How much slower the far hills move than the world. */
 const FAR = 0.3;
 /** Walking time per world point. */
@@ -56,8 +47,6 @@ const HAND_OUT: Point = [72, -128];
 const HAND_UP: Point = [44, -196];
 const PACK_TOP: Point = [-54, -180];
 const PACK_IN: Point = [-51, -96];
-/** The backpack on the child's back while nothing goes in or out (the ghost wears it too). */
-const PACK_SHUT = { open: false, bump: 0 };
 /** Without a tap for so long, the hand pops up again (and while choosing, the right thing glows). */
 const NUDGE_MS = 7000;
 /** A tap while something is still going on makes the next tap's walk go by itself: first the footprints and the
@@ -67,323 +56,13 @@ const QUEUED_MS = 600;
 const END_MS = 6000;
 /** The language a level speaks until it is translated. */
 const GERMAN = targetLanguageFor("de");
-/** The backpack on the screen holds three things at most, standing side by side in it. */
-const SLOT_COUNT = 3;
-/** From one thing's middle to the next, and from the frame's left edge to the first. */
-const SLOT_STEP = 150;
-const SLOT_IN = 100;
-/** The upper edge of the front pockets: the things stand behind them, their bottoms hidden. */
-const RIM = 808;
-/** A pocket of the backpack on the screen: from its middle to its side, and its top and height. */
-const FACH = 62;
-const FACH_TOP = 772;
-const POCKET_Y = 806;
-const POCKET_H = 66;
-const ACTION_R = 62;
-/** The bag's frame and the button's frame, as high as each other: drawn here, then moved down by `Hud.lift` to the
- * screen's bottom edge. */
-const HUD_TOP = 704;
-const HUD_H = 188;
-/** The backpack's body is a little lower than the button's frame: its handle sticks out above it. */
-const BAG_TOP = 724;
-/** On a computer a small key cap under the action button, and one on each thing's front pocket, shows which key
- * does it. */
-const KEY_Y = 864;
-const POCKET_KEY_Y = 842;
-/** Room kept free between the screen's edge and the frames. */
-const EDGE = 18;
-/** The footprints to where the child goes next are this far apart. */
-const PRINT_GAP = 62;
-/** The round picture sign of each way at a fork. */
-const WAY_R = 66;
 /** A friend walks this far behind the child, clear of its backpack. */
 const FRIEND_GAP = 170;
 /** A friend running to help or back, per world point: faster than the child walks. */
 const RUN_MS = 1.4;
 
-/** The screen's free edges (without a notch) in the picture's units: they lie outside 0–1600 and 0–900 where the
- * screen is wider or taller than the picture. */
-export interface Screen {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-}
-
-/** Where the bag and the action button are on the screen, and where the world is, in the picture's units. */
-export interface Hud {
-  /** The bag's frame: left, top, width, height – before `lift`. */
-  bagBox: [number, number, number, number];
-  /** Where each thing stands in the backpack: its middle, on the front pockets' upper edge – before `lift`. */
-  slots: Point[];
-  action: Point;
-  actionBox: [number, number, number, number];
-  /** Bag and button are drawn as above, then their frames' bottom-left corner moves here, at the screen's bottom
-   * edge, and they grow by `zoom` from there. */
-  corner: Point;
-  /** Where the child's feet are on the screen in a world going sideways: above the frames, never behind them. */
-  feet: Point;
-  /** How much bigger the world – and bag and button with it – is drawn than the picture's units, on a screen taller
-   * than the picture (a tablet: so its big buttons are big to the thumb too). */
-  zoom: number;
-}
-
-/**
- * Bag and button sit side by side along the screen's bottom edge, not the picture's – the bag at the very left and
- * the button right next to it, where one thumb reaches both – and the child walks above them: its feet stand just
- * over the frames, so nothing of the way is covered and the sky gets only what is left. A screen taller than the
- * picture (a tablet) zooms the world in instead of showing more sky – bag and button grow with it – and the child
- * stands further left there so the way ahead stays in sight.
- */
-export function layoutHud({ left, right, top, bottom }: Screen, keys: boolean): Hud {
-  const x0 = left + EDGE;
-  const y = keys ? 784 : HUD_TOP + HUD_H / 2;
-  const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + SLOT_IN + i * SLOT_STEP, RIM]);
-  const bagW = 2 * SLOT_IN + (SLOT_COUNT - 1) * SLOT_STEP;
-  const boxW = 2 * ACTION_R + 44;
-  const boxX = x0 + bagW + 26;
-  const zoom = Math.min(MAX_ZOOM, Math.max(1, (bottom - top) / WORLD_H));
-  const kidX = Math.max(left + (AHEAD / 3) * zoom, Math.min((left + right) / 2, right - AHEAD * zoom));
-  const base = bottom - EDGE;
-  return {
-    bagBox: [x0, HUD_TOP, bagW, HUD_H],
-    slots,
-    action: [boxX + boxW / 2, y],
-    actionBox: [boxX, HUD_TOP, boxW, HUD_H],
-    corner: [x0, base],
-    feet: [kidX, base - HUD_H * zoom - FEET_GAP],
-    zoom,
-  };
-}
-
-const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
-
 /** How much bigger a thing is where it lies in the world than while it is carried. */
 const natural = (picture: Picture) => 1 / Math.min(CARRY / picture.w, CARRY / picture.h);
-
-/** A thing standing in the open backpack on (0, 0), its bottom behind the front; a long thing (the plank) sticks out slanted. */
-function InPack({ picture }: { picture: Picture }) {
-  if (picture.w > picture.h * 2.5) return <g transform={`rotate(-58) scale(${150 / picture.w})`}>{picture.draw()}</g>;
-  const s = Math.min(118 / picture.w, 104 / picture.h);
-  return <g transform={`translate(0 ${Math.min(24, picture.h * s * 0.25)}) scale(${s})`}>{picture.draw()}</g>;
-}
-
-/** How big the ring round a thing lying in the world is: about as big as the thing. */
-const ringOf = (picture: Picture) => Math.min(110, Math.max(56, Math.max(picture.w, picture.h) / 2 + 14));
-
-/** A dashed yellow ring round the thing the next tap picks up, in the world and in the backpack on the screen. */
-function WantRing({ at: [x, y], r }: { at: Point; r: number }) {
-  return (
-    <g className="tl-want">
-      <circle cx={x} cy={y} r={r} stroke={INK} strokeWidth="13" />
-      <circle cx={x} cy={y} r={r} stroke="#ffd43b" strokeWidth="7" />
-    </g>
-  );
-}
-
-/** A small key of the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
-function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: number; on: boolean; down: boolean; children: ReactNode }) {
-  return (
-    <g className={`tl-key${on ? " on" : ""}${down ? " down" : ""}`}>
-      <rect x={x - w / 2} y={y - 14} width={w} height={34} rx="8" className="tl-key-base" />
-      <g className="tl-key-top">
-        <rect x={x - w / 2} y={y - 18} width={w} height={32} rx="8" className="tl-key-face" stroke={INK} strokeWidth="3" />
-        <g transform={`translate(${x} ${y - 2})`}>{children}</g>
-      </g>
-    </g>
-  );
-}
-
-/** What the next tap does: the child walks along the footprints to its pale ghost and does what the ghost does
- * there; the button shows the thing it gets there, or feet or stairs. */
-interface Next {
-  prints: Point[];
-  ghost: Point;
-  /** The way the ghost looks: in a world that turns, it may look left. */
-  face: 1 | -1;
-  pose: Pose;
-  icon: ItemId | "walk" | "climb" | "paddle";
-  /** Where the thing lies that the tap picks up: a yellow ring goes round it, and its pale picture waits in the
-   * backpack where it will go. */
-  at?: Point;
-}
-
-/** The thing the next tap picks up, if it picks one up. */
-const itemOf = (icon: Next["icon"]): ItemId | null => (icon === "walk" || icon === "climb" || icon === "paddle" ? null : icon);
-
-/** The picture on the action button for what the next tap does. */
-function NextIcon({ icon }: { icon: Next["icon"] }) {
-  if (icon === "paddle")
-    return (
-      <g transform="rotate(30)">
-        <path d="M0 -40 V14" stroke={INK} strokeWidth="12" strokeLinecap="round" />
-        <path d="M0 -40 V14" stroke="#c08552" strokeWidth="6" strokeLinecap="round" />
-        <ellipse cy="24" rx="14" ry="22" fill="#fcc419" stroke={INK} strokeWidth="4" />
-      </g>
-    );
-  if (icon === "climb")
-    return <path d="M-30 26 H-12 V8 H6 V-10 H24 V-28" fill="none" stroke={INK} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />;
-  if (icon === "walk")
-    return (
-      <g fill="#fff" stroke={INK} strokeWidth="4">
-        {[
-          [-13, 8, -12],
-          [13, -8, 12],
-        ].map(([x, y, turn]) => (
-          <g key={x} transform={`translate(${x} ${y}) rotate(${turn})`}>
-            <ellipse cy="-6" rx="10" ry="15" fill="#4263eb" />
-            <ellipse cy="16" rx="8" ry="7" fill="#4263eb" />
-          </g>
-        ))}
-      </g>
-    );
-  return <Fitted picture={ITEMS[icon]} width={70} />;
-}
-
-interface KidState {
-  x: number;
-  y: number;
-  /** Length of the current walk (and scroll) in ms; 0 while standing. */
-  walk: number;
-  pose: Pose;
-  face: 1 | -1;
-  /** Bumped to make it hop when tapped. */
-  hop: number;
-}
-
-/** The creature walking along with the child (G-10), drawn by its `FRIENDS` entry. */
-interface FriendState {
-  /** Its picture in the bag, and the key of `FRIENDS`. */
-  id: ItemId;
-  x: number;
-  y: number;
-  /** Length of the current run in ms; 0 while it stays. */
-  ms: number;
-  face: 1 | -1;
-  pose: FriendPose;
-  /** Bumped to make it hop (joining, setting off, tapped). */
-  hop: number;
-}
-
-interface View {
-  picking: boolean;
-  kid: KidState;
-  /** The things in the bag, one per slot. */
-  bag: (ItemId | null)[];
-  /** The slot a thing is just dropping into, or rising out of, on the screen. */
-  entering: number | null;
-  leaving: number | null;
-  /** Bumped to bounce the backpack on the screen when a thing goes in or out. */
-  bagBump: number;
-  /** The thing the child carries in the world, between where it lies, the hands and the backpack. */
-  carry: ItemId | null;
-  /** What the child wears (bare feet, flip-flops). */
-  wear: Outfit[];
-  /** The backpack on the child's back: its lid is open while a thing goes in or out; `bump` bounces it. */
-  pack: { open: boolean; bump: number };
-  done: string[];
-  here: string | null;
-  nope: { id: string; n: number } | null;
-  /** The bag is open: the child picks a thing. */
-  choosing: boolean;
-  /** The thing that helps glows. */
-  hint: ItemId | null;
-  /** Bumped to bounce the slots. */
-  shake: number;
-  /** The action button waits for a tap; `nudge` makes it jump anew, `next` shows what the tap will do. */
-  action: { nudge: number; next: Next } | null;
-  /** The child tapped while something was still going on: the button stays lit, and the next walk goes by itself. */
-  queued: boolean;
-  /** A thought bubble: the child's (`at` null) with the goal when it goes away, or at an obstacle why a thing helps –
-   * the child's worry, or the creature's wish above its head at `at`. `nudge` counts the reminders. */
-  bubble: { picture: Picture; at: Point | null; nudge: number } | null;
-  /** At a fork: the child picks a way by its sign; each shows where it goes first. `nudge` makes the signs hop. */
-  fork: { id: string; ways: Next[]; nudge: number } | null;
-  /** The friend walking along, once a creature has joined. */
-  friend: FriendState | null;
-  /** The goal is going away, with the level's thief round it (the hare). */
-  away: boolean;
-  /** The child sits on this while it slides down (the sled). */
-  riding: ComponentType | null;
-  party: boolean;
-}
-
-const startView = (level: TrailLevel): View => {
-  const [x, y] = placed(level.turns, [level.start, groundY(level.ground, level.start)]);
-  return {
-    picking: false,
-    kid: { x, y, walk: 0, pose: "stand", face: facing(level.turns, level.start), hop: 0 },
-    bag: [null, null, null],
-    entering: null,
-    leaving: null,
-    bagBump: 0,
-    carry: null,
-    wear: level.wear ?? [],
-    pack: PACK_SHUT,
-    done: [],
-    here: null,
-    nope: null,
-    choosing: false,
-    hint: null,
-    shake: 0,
-    action: null,
-    queued: false,
-    bubble: null,
-    fork: null,
-    friend: null,
-    away: false,
-    riding: null,
-    party: false,
-  };
-};
-
-/**
- * One layer of the picture: its own svg over the whole screen, moved as a whole by CSS. Moving a group inside one
- * svg makes the browser paint the whole picture again in every frame while the world scrolls, which stutters on
- * phones; a layer of its own is only shifted. `pan` is where the camera is (times the layer's depth) and `walker`
- * where someone walking stands in the world, drawn on (0, 0) of the svg – both in the picture's units, moving in
- * their `ms`; `scale` turns the picture's units into pixels. `stage` places and zooms the world in the svg (it
- * changes only with the screen), so `scale` then includes the zoom.
- */
-function Layer({
-  scale,
-  stage,
-  pan: [px, py],
-  ms,
-  walker,
-  svgRef,
-  children,
-}: {
-  scale: number;
-  stage?: string;
-  pan: Point;
-  ms: number;
-  walker?: { x: number; y: number; ms: number };
-  svgRef?: Ref<SVGSVGElement>;
-  children: ReactNode;
-}) {
-  const svg = (
-    <svg ref={svgRef} className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
-      {stage ? <g transform={stage}>{children}</g> : children}
-    </svg>
-  );
-  return (
-    <div className="tl-layer" style={{ transform: `translate(${-px * scale}px, ${-py * scale}px)`, transitionDuration: `${ms}ms` }}>
-      {walker ? (
-        <div className="tl-layer" style={{ transform: `translate(${walker.x * scale}px, ${walker.y * scale}px)`, transitionDuration: `${walker.ms}ms` }}>
-          {svg}
-        </div>
-      ) : (
-        svg
-      )}
-    </div>
-  );
-}
-
-/** The hand of the child reaching out (pose "reach"), where the string is held. */
-const handOf = (kid: KidState): Point => [kid.x + 62 * kid.face, kid.y - 112];
-/** Where the goal is while the child holds it: high up on its string, or in the reaching hand. */
-const heldOf = (kid: KidState, goal: Goal): Point => (goal.carry === "string" ? [kid.x + 140 * kid.face, kid.y - 250] : [kid.x + 66 * kid.face, kid.y - 78]);
 
 /** "Weg-Abenteuer": the goal goes away, the child follows it through a scrolling world and uses what it finds. */
 export function TrailPlay({
@@ -400,7 +79,7 @@ export function TrailPlay({
   const theGoal = GOALS[level.goal];
   const { raft } = level;
   /** On the raft here: from the start until the child gets off at `raft.until`. */
-  const afloat = (x: number) => !!raft && x <= raft.until;
+  const afloat = (x: number) => afloatAt(level, x);
   const onString = theGoal.carry === "string";
   const [view, setView] = useState<View>(() => startView(level));
   // How far the child got, in the address (stepAddress.ts): the station it walks to, from 1, or the end.
@@ -535,9 +214,7 @@ export function TrailPlay({
     const frame = (now: number) => {
       if (g !== generation.current) return;
       const t = Math.min(1, (now - begin) / ms);
-      const e = ease(t);
-      const side = Math.sin(t * Math.PI * 3) * sway * (1 - t);
-      drawGoal([x0 + (to[0] - x0) * e, y0 + (to[1] - y0) * e + side], hand);
+      drawGoal(goalAt([x0, y0], to, t, sway), hand);
       if (t < 1) requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
@@ -615,8 +292,8 @@ export function TrailPlay({
     const frame = (now: number) => {
       if (g !== generation.current || move !== mover.current) return;
       const t = Math.min(1, (now - begin) / ms);
-      const e = linear ? t : ease(t);
-      drawCarry([x0 + (to[0] - x0) * e, y0 + (to[1] - y0) * e - arc * 4 * t * (1 - t)], s0 + (s - s0) * e);
+      const step = carryAt([x0, y0], s0, to, s, t, arc, linear);
+      drawCarry(step.at, step.s);
       if (t < 1) requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
@@ -705,30 +382,8 @@ export function TrailPlay({
     if (viewRef.current.queued) put({ queued: false });
   };
 
-  /** Footprints along `on` (the ground) from the child to `x`, then one on each of `steps`, where they are drawn. */
-  const printsTo = (x: number, steps: Point[] = [], on = ground.current): Point[] => {
-    const prints: Point[] = [];
-    for (let px = along.current + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(on, px)]);
-    return [...prints, ...steps].map(place);
-  };
-
-  /** Walking on to `x` and doing `pose` there, shown before the tap. */
-  const nextAt = (x: number, pose: Pose, icon: Next["icon"], on = ground.current): Next => ({
-    prints: printsTo(x, [], on),
-    ghost: place([x, groundY(on, x)]),
-    face: facing(level.turns, x),
-    pose,
-    icon: icon === "walk" && afloat(x) ? "paddle" : icon,
-  });
-
-  /** What the tap at `station` does: for stairs, walking there and up all the steps. */
-  const nextOf = (station: Station, on = ground.current): Next => {
-    if (station.kind === "pickup") return { ...nextAt(station.x, "take", station.item, on), at: station.at };
-    if (station.kind === "moment") return nextAt(station.x, station.pose, "walk", on);
-    if (station.kind === "obstacle") return nextAt(station.x, "stand", "walk", on);
-    const top = station.steps[station.steps.length - 1];
-    return { prints: printsTo(station.x, station.steps, on), ghost: place(top), face: facing(level.turns, top[0]), pose: "stand", icon: "climb" };
-  };
+  /** What the tap at `station` does, from where the child is now (`nextOf` in `view.ts`). */
+  const nextOf = (station: Station, on = ground.current): Next => nextFrom(level, along.current, station, on);
 
   /** The action button lights up until the child taps (it, anywhere, or any key), and footprints and the child's
    * ghost show where the tap takes it; after a while the button jumps and the footprints and the ghost come again.
@@ -1168,13 +823,9 @@ export function TrailPlay({
   const shown = next ? [next] : (view.fork?.ways ?? []);
   /** Bumped by the reminders: the footprints, the ghost and the ring come again. */
   const again = view.action?.nudge ?? 0;
-  /** The free place in the backpack where the next thing goes, when the next tap picks one up. */
-  const nextItem = next?.at ? itemOf(next.icon) : null;
-  const packing = nextItem ? { item: nextItem, slot: view.bag.indexOf(null) } : null;
   const forks = level.stations.filter((s): s is Fork => s.kind === "fork");
-  const { bagBox, slots, action, actionBox, corner, feet, zoom } = layoutHud(screen, !touchOnly);
-  const [bx, , bw] = bagBox;
-  const handle = `M${bx + bw / 2 - 58} ${BAG_TOP + 14} Q${bx + bw / 2 - 58} ${BAG_TOP - 38} ${bx + bw / 2} ${BAG_TOP - 38} Q${bx + bw / 2 + 58} ${BAG_TOP - 38} ${bx + bw / 2 + 58} ${BAG_TOP + 14}`;
+  const hud = layoutHud(screen, !touchOnly);
+  const { feet, zoom } = hud;
   const [cx, cy] = camOf(k);
   /** Puts the picture's `KID_AT` where the HUD wants the child's feet, zoomed; a world going up keeps the picture. */
   const stage = level.turns ? undefined : `translate(${feet[0]} ${feet[1]}) scale(${zoom}) translate(${-KID_AT[0]} ${-KID_AT[1]})`;
@@ -1251,36 +902,7 @@ export function TrailPlay({
           </g>
         ))}
         {/* The picture signs of the ways at a fork: always there; while the child picks a way they hop and glow */}
-        {forks.flatMap((f) =>
-          f.ways.map(({ id, Sign, sign: [x, y], say: wayName }, w) => {
-            const on = view.fork?.id === f.id;
-            return (
-              <g
-                key={`${id}-${on ? view.fork?.nudge : "off"}`}
-                className={`tl-way${on ? " on" : ""}`}
-                data-tap
-                onPointerDown={pressWay(w)}
-                role="button"
-                aria-label={spokenIn(wayName, language).text}
-              >
-                <g className="tl-way-board" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${w * 120}ms` }}>
-                  <circle cx={x} cy={y} r={WAY_R + 12} className="tl-way-glow" fill="none" strokeWidth="14" />
-                  <circle cx={x} cy={y} r={WAY_R} className="tl-way-face" stroke={INK} strokeWidth="6" />
-                  <g transform={`translate(${x} ${y})`}>
-                    <Sign />
-                  </g>
-                </g>
-                {on && !touchOnly && (
-                  <KeyCap x={x} y={y + WAY_R + 40} w={40} on down={held === `${w + 1}`}>
-                    <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
-                      {w + 1}
-                    </text>
-                  </KeyCap>
-                )}
-              </g>
-            );
-          }),
-        )}
+        <ForkSigns forks={forks} fork={view.fork} touchOnly={touchOnly} held={held} language={language} pressWay={pressWay} />
         {/* The raft stays behind where the child got off */}
         {raft && !afloat(k.x) && (
           <g transform={`translate(${raft.until} ${groundY(level.ground, raft.until)})`}>
@@ -1330,156 +952,7 @@ export function TrailPlay({
         )}
       </Layer>
       <Layer scale={scale} pan={[0, 0]} ms={0} svgRef={svgEl}>
-        <g transform={`translate(${corner[0]} ${corner[1]}) scale(${zoom}) translate(${-bx} ${-(HUD_TOP + HUD_H)})`}>
-          <ActionButton
-            waiting={!!view.action || view.queued}
-            nudge={view.action?.nudge ?? 0}
-            x={action[0]}
-            y={action[1]}
-            r={ACTION_R}
-            box={actionBox}
-            picture={next && <NextIcon icon={next.icon} />}
-          />
-          {!touchOnly && (
-            <KeyCap x={action[0]} y={KEY_Y} w={110} on={!!view.action} down={held === " "}>
-              <path d="M-24 -5 V5 H24 V-5" fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-            </KeyCap>
-          )}
-          {/* The child's backpack again, big and open at the bottom left: its body is the frame, the handle on top
-            sticks out, and the things stand side by side in its three pockets */}
-          <g className={`tl-bag${view.choosing ? " open" : ""}`}>
-            <path d={handle} stroke={INK} strokeWidth="20" strokeLinecap="round" fill="none" />
-            <path d={handle} stroke={PACK.dark} strokeWidth="10" strokeLinecap="round" fill="none" />
-            <rect x={bx + 8} y={BAG_TOP + 8} width={bw} height={HUD_TOP + HUD_H - BAG_TOP} rx="56" className="tl-bag-shadow" />
-            <rect x={bx} y={BAG_TOP} width={bw} height={HUD_TOP + HUD_H - BAG_TOP} rx="56" fill={PACK.body} stroke={INK} strokeWidth="6" />
-            <g key={view.bagBump} className={view.bagBump ? "tl-bag-bump" : undefined} style={{ transformOrigin: `${bx + bw / 2}px 888px` }}>
-              {/* The lid along the top, folded open */}
-              <path
-                d={`M${bx + 56} ${BAG_TOP + 3} H${bx + bw - 56} Q${bx + bw - 6} ${BAG_TOP + 3} ${bx + bw - 3} ${BAG_TOP + 38} H${bx + 3} Q${bx + 6} ${BAG_TOP + 3} ${bx + 56} ${BAG_TOP + 3} Z`}
-                fill={PACK.dark}
-              />
-              <path d={`M${bx + 3} ${BAG_TOP + 38} H${bx + bw - 3}`} stroke={INK} strokeWidth="4" />
-              <path d={`M${bx + 60} ${BAG_TOP + 20} H${bx + bw - 60}`} stroke="#fff" strokeWidth="4" strokeDasharray="10 8" opacity="0.4" />
-              {/* Three pockets, open at the top: each holds one thing and is a button to take it out */}
-              {slots.map(([x], i) => (
-                <g key={x}>
-                  {view.choosing && view.bag[i] && (
-                    <rect
-                      x={x - FACH - 10}
-                      y={FACH_TOP - 12}
-                      width={2 * FACH + 20}
-                      height={POCKET_Y + POCKET_H + 20 - FACH_TOP}
-                      rx="28"
-                      className="tl-fach-ring"
-                      fill="none"
-                      strokeWidth="9"
-                      style={{ animationDelay: `${i * 80}ms` }}
-                    />
-                  )}
-                  <rect x={x - FACH} y={FACH_TOP} width={2 * FACH} height={POCKET_Y - FACH_TOP + 16} rx="20" fill={PACK.inside} stroke={INK} strokeWidth="4" />
-                  {!view.bag[i] && packing?.slot !== i && (
-                    <rect
-                      x={x - FACH + 14}
-                      y={FACH_TOP + 10}
-                      width={2 * FACH - 28}
-                      height={POCKET_Y - FACH_TOP - 14}
-                      rx="12"
-                      fill="none"
-                      stroke={PACK.lining}
-                      strokeWidth="4"
-                      strokeDasharray="10 8"
-                      opacity="0.45"
-                    />
-                  )}
-                </g>
-              ))}
-              {slots.map(([x, y], i) => {
-                const item = view.bag[i];
-                if (!item) return null;
-                const moving = view.entering === i ? " in" : view.leaving === i ? " out" : "";
-                return (
-                  <g
-                    key={`${i}-${view.shake}`}
-                    className={`tl-slot${item === view.hint ? " hint" : ""}`}
-                    style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${i * 80}ms` }}
-                  >
-                    <g transform={`translate(${x} ${y})`}>
-                      <g key={item} className={`tl-thing${moving}`}>
-                        <ellipse className="tl-glow" cx="0" cy="-48" rx="70" ry="64" />
-                        <InPack picture={ITEMS[item]} />
-                      </g>
-                    </g>
-                  </g>
-                );
-              })}
-              {/* The thing the next tap picks up, pale and ringed like in the world, already over where it will go */}
-              {packing && slots[packing.slot] && (
-                <g key={again} transform={`translate(${slots[packing.slot][0]} ${slots[packing.slot][1] - 30})`}>
-                  <WantRing at={[0, -50]} r={62} />
-                  <g className="tl-pack-ghost">
-                    <InPack picture={ITEMS[packing.item]} />
-                  </g>
-                </g>
-              )}
-              {/* The front of each pocket, raised like a button and pressed in when its thing comes out: its number key
-              on a computer, a buckle on a tablet */}
-              {slots.map(([x], i) => (
-                <g key={x}>
-                  <rect x={x - FACH} y={POCKET_Y + 8} width={2 * FACH} height={POCKET_H} rx="18" fill={PACK.dark} stroke={INK} strokeWidth="4" />
-                  <g className={`tl-pocket${view.leaving === i ? " press" : ""}`}>
-                    <rect x={x - FACH} y={POCKET_Y} width={2 * FACH} height={POCKET_H} rx="18" fill={PACK.pocket} stroke={INK} strokeWidth="5" />
-                    <rect
-                      x={x - FACH + 9}
-                      y={POCKET_Y + 9}
-                      width={2 * FACH - 18}
-                      height={POCKET_H - 18}
-                      rx="11"
-                      fill="none"
-                      stroke="#fff"
-                      strokeWidth="3"
-                      strokeDasharray="8 6"
-                      opacity="0.6"
-                    />
-                    {touchOnly ? (
-                      <>
-                        <path
-                          d={`M${x - FACH} ${POCKET_Y + 22} Q${x} ${POCKET_Y + 36} ${x + FACH} ${POCKET_Y + 22}`}
-                          stroke={INK}
-                          strokeWidth="3"
-                          fill="none"
-                          opacity="0.5"
-                        />
-                        <rect x={x - 13} y={POCKET_Y + 22} width="26" height="22" rx="5" fill={PACK.buckle} stroke={INK} strokeWidth="3" />
-                      </>
-                    ) : (
-                      <KeyCap x={x} y={POCKET_KEY_Y} w={40} on={view.choosing && !!view.bag[i]} down={held === `${i + 1}`}>
-                        <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
-                          {i + 1}
-                        </text>
-                      </KeyCap>
-                    )}
-                  </g>
-                </g>
-              ))}
-            </g>
-            {/* What a tap hits: a thing with its pocket below it */}
-            {slots.map(([x], i) => (
-              <rect
-                key={x}
-                x={x - SLOT_STEP / 2}
-                y={bagBox[1] - 60}
-                width={SLOT_STEP}
-                height={bagBox[3] + 60}
-                fill="transparent"
-                data-tap={tapState({ goal: need !== null && view.bag[i] === need })}
-                onPointerDown={pressSlot(i)}
-                role="button"
-                aria-label={view.bag[i] ?? pick({ de: "leer", ru: "пусто", en: "empty", zh: "空的", hi: "ख़ाली", es: "vacío", ar: "فارغ" }, language.id)}
-                className="tl-slot-tap"
-              />
-            ))}
-          </g>
-        </g>
+        <BagAndButton view={view} hud={hud} need={need} held={held} touchOnly={touchOnly} language={language} pressSlot={pressSlot} />
       </Layer>
 
       {view.picking && <StoryEnd id={level.id} onPick={onPick} />}

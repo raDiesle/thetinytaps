@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { layoutHud, type Screen } from "./TrailPlay";
+import { layoutHud, type Screen } from "./hud";
 
 describe("the bag and the action button", () => {
   // The screen's free edges in the picture's units (1600 × 900, under a bar of 56 px): a 16:9 computer, a 4:3
