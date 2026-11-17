@@ -1,6 +1,6 @@
 import { useLocation } from "react-router";
 import { useAppLanguage } from "@/lib/language";
-import { seoWords } from "@/lib/seoText";
+import { type PageWords, seoWords } from "@/lib/seoText";
 
 /**
  * Below the first screen of a menu, for grown-ups who scroll down: what the page is, in the words search
@@ -24,13 +24,23 @@ function useSeoWords() {
   return seoWords(pathname, id);
 }
 
-/** What the page is, in the words search engines get, on a panel of its own: SeoText's, or the one behind the shelf's „mehr …“. */
-export function SeoWords() {
+/**
+ * What the page is, in the words search engines get, on a panel of its own: SeoText's, or the one behind the shelf's
+ * „mehr …“. Their title is a heading below the page's own (a menu's title, the shelf's name); `main` makes it the
+ * page's one `<h1>`, for a page that has no other while it shows them: a game playing, which replaced the built
+ * page's `<h1>` with its picture and left Google a page without a main heading.
+ */
+export function SeoWords({ main = false }: { main?: boolean }) {
   const words = useSeoWords();
-  if (!words) return null;
+  return words ? <WordsPanel words={words} main={main} /> : null;
+}
+
+/** The panel of `words`, their title the page's `<h1>` where `main` says so, else an `<h2>` (SeoWords). */
+export function WordsPanel({ words, main }: { words: PageWords; main: boolean }) {
+  const Heading = main ? "h1" : "h2";
   return (
     <section className="seo-text">
-      <h2>{words.title}</h2>
+      <Heading>{words.title}</Heading>
       <p>{words.text}</p>
       <p>{words.promise}</p>
     </section>

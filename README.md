@@ -66,7 +66,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/feelings/` | Book „Gefühle“: „Wie geht's dir?“ (the child tells how it feels by a weather) and „Alltagssituationen“ (everyday scenes by feeling, one picture choice each). Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
 | `src/games/marbles/` | Game „Kettenreaktion“: the Klingende Kugelbahn (a long marble run with parts to swap), „Alles fällt um“, eight Rube Goldberg machines, and Nagelbrett, Hatschi-Kette and Wasserbahn to join in. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
-| `src/games/elevator/` | Game „Kleine Abenteuer“ (was „Spaß im Aufzug“): picture stories in a house with a lift, and trail adventures through a scrolling world with a bag of things. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
+| `src/games/elevator/` | Game „Kleine Abenteuer“ (was „Spaß im Aufzug“): picture stories in a house with a lift, and trail adventures through a scrolling world with a bag of things, and films told from place to place. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md), the trail adventures' in [`trail/CLAUDE.md`](src/games/elevator/trail/CLAUDE.md) and the films' in [`film/CLAUDE.md`](src/games/elevator/film/CLAUDE.md) |
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
 | `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Kleine Abenteuer" use them (`playRecorded` / `recorded` in `src/lib/sfx/core.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
@@ -130,6 +130,7 @@ one is full bleed with the art inside the middle circle), then:
 
 ```bash
 cd public/icons
+rsvg-convert -w 48 icon.svg -o favicon-48.png   # the tab's and Google's icon, which takes no SVG
 rsvg-convert -w 192 icon.svg -o icon-192.png
 rsvg-convert -w 512 icon.svg -o icon-512.png
 rsvg-convert -w 512 icon-maskable.svg -o maskable-512.png

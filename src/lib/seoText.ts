@@ -7,6 +7,8 @@ const TRANSLATIONS = byLanguage((texts) => texts.seo);
 
 /** What a page says to search engines and grown-ups in one language. */
 export interface PageWords extends PageText {
+  /** The address of the page the words are for, without the language's prefix: the game's own for one of its levels. */
+  path: string;
   /** What every page says about the whole site. */
   promise: string;
   /** The language the words are in. */
@@ -20,5 +22,5 @@ export function seoWords(path: string, language: TargetLanguageId): PageWords | 
   if (language === "de") return { ...german, promise: SITE_PROMISE, language };
   const translation = TRANSLATIONS[language];
   const page = translation?.pages[german.path];
-  return page && translation ? { ...page, promise: translation.promise, language } : undefined;
+  return page && translation ? { ...page, path: german.path, promise: translation.promise, language } : undefined;
 }

@@ -7,6 +7,7 @@
 // has the same pages under its prefix (/en/zaehne/), its texts in seo.<id>.ts by German address.
 // No `@/` imports here: tools/build.ts reads this file too.
 import { isUnfinished } from "./games";
+import { pageOfLevel } from "./levelPages";
 // The texts are what parents search for (see the research on /management/).
 // No <meta name="keywords">: Google has ignored it since 2009 and Bing reads it as a hint of spam; the
 // words parents search for belong in title, description and text instead.
@@ -95,7 +96,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Wimmelbilder und Geschichten für Kleinkinder",
     description:
       "Lebendige Wimmelbilder, Bewegungsspiele, Kettenreaktionen und kleine Abenteuer, die auf jedes Antippen antworten. Für Kleinkinder, ohne Werbung.",
-    text: "Bilder und Geschichten, die auf jedes Antippen antworten: über zwanzig Lebendige Bilder, Bewegungsabenteuer zum Mitmachen mit dem Fuchs Tapsi, zwanzig Kettenreaktionen und Kugelbahnen, und Kleine Abenteuer mit dem Aufzug, auf Wegen und in kleinen Filmen – mit der Feuerwehr, beim Bäcker, mit einem Brief für Oma oder im eigenen Garten.",
+    text: "Bilder und Geschichten, die auf jedes Antippen antworten: über zwanzig Lebendige Bilder, Bewegungsabenteuer zum Mitmachen mit dem Fuchs Tapsi, einundzwanzig Kettenreaktionen und Kugelbahnen, und Kleine Abenteuer mit dem Aufzug, auf Wegen und in kleinen Filmen – mit der Feuerwehr, beim Bäcker, mit einem Brief für Oma oder im eigenen Garten. Vier Spiele stehen in diesem Buch, mal ruhig, mal lebhaft. In den Wimmelbildern, von der Baustelle bis zum Weltall, tippt das Kind an, was es entdeckt, malt aus, sucht oder leuchtet mit der Taschenlampe durchs Dunkle. Bei der Kettenreaktion genügt ein Tippen, und Kugeln rollen über Holz, Schnee und Wasser, oder eine Maschine in der Küche, im Garten oder im Zirkus stößt ein Ding nach dem anderen an. Die kleinen Abenteuer dauern nur ein paar Minuten, und unterwegs entscheidet das Kind mit. Und wenn die Beine zappeln, geht es mit Tapsi auf die Schatzinsel oder auf die Wolkenreise – hüpfen, ducken und strecken vor dem Bildschirm. Wer eine Bahn oder eine Geschichte zu Ende spielt, bekommt dafür einen kleinen Pokal.",
   },
   {
     path: "/spiele/gefuehle/",
@@ -122,14 +123,14 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/bilder/",
     title: "Lebendige Wimmelbilder zum Antippen für Kinder",
     description: "Über 20 Wimmelbilder für Kleinkinder: Baustelle, Bauernhof, Zoo, Feuerwache und mehr. Alles bewegt sich und macht Geräusche – ohne Werbung.",
-    text: "Wimmelbilder, die lebendig werden: Bagger baggern, Kühe muhen, das Feuerwehrauto fährt los. Mit Suchen, Ausmalen, Straßen malen und Entdecken, für Kleinkinder.",
+    text: "Wimmelbilder, die lebendig werden: Bagger baggern, Kühe muhen, das Feuerwehrauto fährt los. Über zwanzig Bilder für Kleinkinder liegen in diesem Buch – Baustelle, Bauernhof, Zoo und Feuerwache, Vertrautes wie Küche, Badezimmer, Supermarkt, Kita und Kinderarzt, Fernes wie Weltall, Unterwasser und Dinotal, dazu Winter, Herbst, Ostern und ein Gute-Nacht-Bild für den Abend. Über den Bildern wählen wir, wie gespielt wird. Beim „Freien Entdecken“ antwortet alles, was das Kind antippt, mit Bewegung und Geräusch, hinter mancher Tür schaut eine Überraschung hervor, und ist alles entdeckt, feiert das ganze Bild. Beim „Ausmalen“ bekommt das graue Bild Tupfer für Tupfer seine Farben zurück, bei „Suchen“ zeigt eine Blase, was gefunden werden will, und bei „Fragen“ geht es darum, was rot ist, was fliegen kann oder Räder hat. Mit der „Taschenlampe“ leuchtet das Kind durch das dunkle Bild, und bei „Straßen“ malt es mit dem Finger einen Weg, auf dem Auto, Traktor oder Dampflok losfahren. Ab und zu fährt ein Fahrzeug sogar hinüber ins nächste Bild.",
   },
   {
     path: "/abenteuer/",
     title: "Bewegungsspiele für Kleinkinder drinnen",
     description:
       "Bewegungsabenteuer zum Mitmachen: Der Fuchs Tapsi zeigt Hüpfen, Strecken und Schleichen, das Kind macht vor dem Bildschirm mit. Ohne Werbung.",
-    text: "Bewegungsgeschichten für drinnen, auf der Schatzinsel oder auf einer Reise mit der kleinen Wolke: Tapsi springt, duckt sich und streckt sich, das Kind macht mit, und die Welt antwortet. Ohne Lesen, Tapsi sagt alles.",
+    text: "Bewegungsgeschichten für drinnen, auf der Schatzinsel oder auf einer Reise mit der kleinen Wolke: Tapsi springt, duckt sich und streckt sich, das Kind macht mit, und die Welt antwortet. Ohne Lesen, Tapsi sagt alles. Auf der Schatzinsel, etwa sechs Minuten lang, winkt der Fuchs seinem Papagei, wirft die Angel aus, paddelt auf einer Schildkröte zum Strand, stampft, hüpft, trommelt, dreht an einer Kurbel und zieht am Seil, bis der Schlüssel die Schatztruhe öffnet und die Goldmünzen durch die Luft fliegen. Auf der Wolkenreise, etwa drei Minuten, flattert er mit den Armen, damit die Wolke steigt, duckt sich unter kleinen Flugzeugen, tippt Luftballons an, lehnt sich in die Kurven, schiebt die Regenwolke weg und malt mit großen Armbögen einen Regenbogen. Jede Bewegung macht Tapsi erst vor, eine dunkle Tanzfigur zeigt sie mit, und dann ist das Kind dran – eine Kamera braucht es dafür nicht. Ein Tippen aufs Bild macht Pause, und klein in der Ecke sehen wir Große, wie lange die Geschichte noch dauert.",
   },
   {
     path: "/gefuehle/",
@@ -187,39 +188,39 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/socken/",
     title: "Socken-Paare finden – Spiel für Kleinkinder",
     description: "Die Waschmaschine ist fertig: Socken-Paare finden und an die Wäscheleine hängen. Erstes Paare-Suchen für Kleinkinder, ohne Werbung.",
-    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr, mit Mustern und unter Wäschekörben wie bei Memory – sobald das Kind sicher wird. Danach kommen Fäustlinge, Gummistiefel und Bärenhausschuhe, je ein linker und ein rechter.",
+    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr, mit Mustern und unter Wäschekörben wie bei Memory – sobald das Kind sicher wird. Danach kommen Fäustlinge, Gummistiefel und Bärenhausschuhe, je ein linker und ein rechter. Das Spiel fängt von selbst an: Die volle Maschine wäscht, die Tür geht auf, die Leine senkt sich, und die Socken liegen auf dem Boden. Tippt das Kind eine an, hebt sie sich und spielt ihren Ton, und findet es die zweite dazu, hängen beide mit Klammern an der Leine. Eine andere Socke ist nie falsch, dann hebt sich einfach die neue. Hängen alle Paare, hüpfen sie einmal vor Freude, die Leine wird aus dem Bild gezogen, und schon purzelt die nächste Wäsche heraus, so lange das Kind mag. Schwerer wird es nur in dem, was es zu sehen und zu merken gibt, nie durch eine Uhr: Aus zwei Paaren werden bis zu sechs, und später verrät nur noch das Muster, welche Socken zusammengehören.",
   },
   {
     path: "/buchstaben/",
     title: "Frei tippen – Buchstaben lernen mit der Tastatur",
     description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Zahlen kommen mit Dingen zum Zählen. Ein Tastatur-Spiel ohne Werbung.",
-    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Jeder Buchstabe kommt mit Bild und Wort, jede Zahl mit Dingen zum Zählen. Auf Wunsch große und kleine Buchstaben, Nachspuren mit dem Finger und Bilder zu einem Thema.",
+    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Jeder Buchstabe kommt mit Bild und Wort, jede Zahl mit Dingen zum Zählen. Auf Wunsch große und kleine Buchstaben, Nachspuren mit dem Finger und Bilder zu einem Thema. Das Spiel beginnt sofort und kennt kein Falsch: Drückt das Kind das B, erscheint der Buchstabe groß auf einer Karte, daneben ein Bär mit seinem Wort, und die Stimme sagt „B wie Bär!“. Drückt es die Drei, liegen neben der Ziffer drei Dinge, zum Beispiel drei Äpfel. Am Tablet stehen die Tasten als große Felder auf dem Bildschirm. Alles Weitere wartet hinter dem Zahnrad oben rechts, das wir Großen gedrückt halten, während das Spiel weiterläuft: ob die Dinge einer Zahl gleich dastehen oder vorgezählt werden, ob der Buchstabe aus Punkten zum Nachspuren erscheint und Sterne dem Finger folgen, und ob die Bilder bunt gemischt kommen oder aus einem Thema wie Tiere, Fahrzeuge, Essen oder Familie.",
   },
   {
     path: "/zaehlen/",
     title: "Zählen lernen – Zahlen-Spiel für Kleinkinder",
     description:
       "Jede Taste bringt eine Zahl mit so vielen Dingen zum Zählen: alles auf einmal, vorgezählt, Schritt für Schritt oder selbst gezählt. Ohne Werbung.",
-    text: "Ein Zahlen-Spiel auf der Tastatur oder dem Bildschirm: Jede Ziffer zeigt sich mit so vielen Dingen, jede andere Taste bringt eine Zahl von 1 bis 9. Die Dinge kommen alle auf einmal, werden vorgezählt, kommen Schritt für Schritt, oder das Kind tippt jedes an und zählt selbst.",
+    text: "Ein Zahlen-Spiel auf der Tastatur oder dem Bildschirm: Jede Ziffer zeigt sich mit so vielen Dingen, jede andere Taste bringt eine Zahl von 1 bis 9. Die Dinge kommen alle auf einmal, werden vorgezählt, kommen Schritt für Schritt, oder das Kind tippt jedes an und zählt selbst. Drückt es die Vier, liegen zum Beispiel vier Äpfel neben der großen Ziffer, und die Stimme sagt, wie viele es sind. Wie die Dinge kommen, wählen wir Großen hinter dem Zahnrad oben rechts, das wir gedrückt halten: Bei „Alles sofort“ sind sie gleich da, bei „Vorzählen“ erscheint eins nach dem anderen und wird laut mitgezählt, bei „Schritt für Schritt“ bringt jeder Tastendruck das nächste, und bei „Selbst zählen“ tippt das Kind jedes Ding an, bis am Ende die Ziffer dasteht. Wer mag, lässt die Ziffer erst kommen, wenn dieselbe Zahl gleich noch einmal gedrückt wird, damit zuerst die Menge zählt, oder lässt sie aus Punkten erscheinen, zum Nachspuren mit dem Finger. Am Tablet liegen die Zifferntasten groß auf dem Bildschirm.",
   },
   {
     path: "/mitmachen/",
     title: "Zahlen zum Mitmachen – hüpfen, klatschen, stampfen",
     description: "Bei jeder Zahl hüpft, klatscht oder stampft ein Fuchs- oder Bärenkind genau so oft und zählt laut mit – das Kind macht mit. Ohne Werbung.",
-    text: "Ein Zahlen-Spiel zum Mitbewegen: Jede Ziffer auf der Tastatur oder dem Bildschirm, jede andere Taste bringt eine Zahl von 1 bis 9. Ein Fuchs- oder Bärenkind lädt ein – „Hüpf mit!“ – und hüpft, klatscht oder stampft so oft, wie die Zahl sagt, neben ihm sein Großer. Jedes Mal wird laut mitgezählt und kurz gewartet, damit das Kind mitmachen kann. So wird die Zahl zur Menge im eigenen Körper.",
+    text: "Ein Zahlen-Spiel zum Mitbewegen: Jede Ziffer auf der Tastatur oder dem Bildschirm, jede andere Taste bringt eine Zahl von 1 bis 9. Ein Fuchs- oder Bärenkind lädt ein – „Hüpf mit!“ – und hüpft, klatscht oder stampft so oft, wie die Zahl sagt, und unter der Ziffer füllt sich für jedes Mal ein Zeichen. Jedes Mal wird laut mitgezählt und kurz gewartet, damit das Kind mitmachen kann. So wird die Zahl zur Menge im eigenen Körper.",
   },
   {
     path: "/woerter/",
     title: "Wörter tippen – erste Wörter für Kleinkinder",
     description:
       "Erste Wörter Buchstabe für Buchstabe tippen: Bär, Ball, Farben und Tu-Wörter. Oder „Wo ist das B?“ – die Taste zum Buchstaben finden. Ohne Werbung.",
-    text: "Ein Bild und sein Wort: Das Kind tippt es Buchstabe für Buchstabe auf der Tastatur oder dem Bildschirm. Bildwörter, Farben, Tu-Wörter oder alles gemischt, in drei Längen. Oder nur der erste Buchstabe: „Wo ist das B?“ – die Taste dazu finden.",
+    text: "Ein Bild und sein Wort: Das Kind tippt es Buchstabe für Buchstabe auf der Tastatur oder dem Bildschirm. Bildwörter, Farben, Tu-Wörter oder alles gemischt, in drei Längen. Oder nur der erste Buchstabe: „Wo ist das B?“ – die Taste dazu finden. Der Buchstabe, der dran ist, wartet unter dem Bild, und auf den Bildschirm-Tasten leuchtet seine Taste. Jede richtige Taste setzt ihn ins Wort und nennt seinen Namen; eine andere Taste ist kein Fehler, und nach ein paar Versuchen sagt die Stimme den gesuchten Buchstaben noch einmal. Ist das Wort fertig, wird es gesagt und gelobt: Bei einem Farbwort nimmt der Bildschirm seine Farbe an, und ein Tu-Wort wie „Hüpf“ macht das Bild vor und lädt zum Mitmachen ein. Hinter dem Zahnrad, das wir Großen gedrückt halten, wählen wir die Art der Wörter, ihre Länge von höchstens drei, vier oder sieben Buchstaben und ob große, kleine oder beide Buchstaben zu sehen sind.",
   },
   {
     path: "/gross-klein/",
     title: "Wo ist das kleine b? – große und kleine Buchstaben",
     description: "Ein großer Buchstabe sucht sein Kind: Von drei kleinen Buchstaben gehört einer dazu und läuft zu ihm hinüber.",
-    text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber und stellt sich neben ihn; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p.",
+    text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber und stellt sich neben ihn; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p. Das Spiel beginnt sofort, und einzustellen gibt es nichts: Tippt das Kind den passenden Buchstaben an oder drückt seine Taste, hüpft er in kleinen Sprüngen hinüber, und die Stimme nennt seinen Namen. Findet das Kind dreimal hintereinander gleich den richtigen, werden die drei einander ähnlicher, und nach einem Griff daneben sind sie wieder deutlich verschieden – so bleibt es weder zu leicht noch zu schwer. Die Buchstaben sind schlicht gezeichnet, ohne Augen und Gesichter, damit der Blick auf ihrer Form bleibt. Nebenbei merkt das Kind, dass das große A und das kleine a zusammengehören.",
   },
   {
     path: "/zaehne/",
@@ -459,11 +460,39 @@ export const NO_INDEX_PATHS = [
   ...SEO_TEXTS.filter((page) => isUnfinished(page.path)).map((page) => page.path),
 ];
 
-/** The entry for an address (with or without the trailing slash), if it has one. */
+/**
+ * The entry for an address (with or without the trailing slash), if it has one. A level's address
+ * (`/abenteuer/schatzinsel/`) has its game's: the level is the game's page with another card picked, so title, text
+ * and canonical link are the game's (`pageOfLevel`).
+ */
 export function seoFor(pathname: string): PageSeo | undefined {
-  const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
+  const path = pageOfLevel(pathname);
   return SEO_PAGES.find((page) => page.path === path);
 }
 
-/** The full title as the browser tab and Google show it. */
-export const fullTitle = (page: PageText) => `${page.title} | ${SITE_NAME}`;
+/** Whether an address must stay out of search results (NO_INDEX_PATHS), a level's with its game. */
+export const isNoIndex = (pathname: string) => NO_INDEX_PATHS.includes(pageOfLevel(pathname));
+
+/** How wide a search result shows a title before it cuts it, counted in Latin letters (`titleWidth`). */
+export const TITLE_WIDTH = 60;
+
+/**
+ * How wide a title is in a search result, in Latin letters: Google cuts by width, not by count. A Chinese sign (and its
+ * full-width punctuation) is as wide as two, and a mark that sits above or below its letter (Hindi's vowel signs,
+ * Arabic's) takes no room of its own.
+ */
+export function titleWidth(title: string) {
+  let width = 0;
+  for (const sign of title) width += /\p{Mn}/u.test(sign) ? 0 : /[\p{Script=Han}\u3000-\u303F\uFF00-\uFFEF]/u.test(sign) ? 2 : 1;
+  return width;
+}
+
+/**
+ * The full title as the browser tab and Google show it: the page's with the site's name after it – but the page's alone
+ * where both together would be cut off in a search result (TITLE_WIDTH), since the words parents search for count more
+ * than the name. The home page (`path` "/") always keeps the name: there it is what is searched for.
+ */
+export function fullTitle(page: PageText, path: string) {
+  const named = `${page.title} | ${SITE_NAME}`;
+  return path === "/" || titleWidth(named) <= TITLE_WIDTH ? named : page.title;
+}

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router";
-import { NO_INDEX_PATHS, seoFor } from "@/content/seo";
+import { isNoIndex, seoFor } from "@/content/seo";
 import { addressLanguage, addressOf } from "@/lib/pageAddress";
 import { seoWords } from "@/lib/seoText";
 
@@ -23,8 +23,8 @@ function headTag<T extends HTMLElement>(selector: string, make: () => T) {
 export function SeoHead() {
   const { pathname } = useLocation();
   useEffect(() => {
+    // A level's address has its game's entry, so its canonical link is the game's page, as on its built page.
     const seo = seoFor(pathname);
-    const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
     // Only there once the language's texts are loaded; until then the built page's description stays.
     const words = seoWords(pathname, addressLanguage());
     if (words) {
@@ -38,7 +38,7 @@ export function SeoHead() {
       link.href = addressOf(seo.path);
       if (!canonical) document.head.append(link);
     } else canonical?.remove();
-    const noIndex = NO_INDEX_PATHS.some((p) => path.endsWith(p));
+    const noIndex = isNoIndex(pathname);
     const robots = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
     if (noIndex) headTag<HTMLMetaElement>('meta[name="robots"]', () => Object.assign(document.createElement("meta"), { name: "robots" })).content = "noindex";
     else robots?.remove();

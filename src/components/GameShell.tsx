@@ -458,9 +458,10 @@ export function GameShell({
         {/* The edge of the book's page round the picture (`book.css`). */}
         <div className="book-frame" aria-hidden />
         {/* What the page is, unseen: Google reads the page after the app ran, and a game that plays at once replaced the
-            built page's text with a picture and left Google a page without words (pages „gecrawlt – zurzeit nicht indexiert“, November 2026). */}
+            built page's text with a picture and left Google a page without words (pages „gecrawlt – zurzeit nicht indexiert“, November 2026).
+            Their title is the page's main heading here (`main`): while playing no menu's title stands above them. */}
         <div hidden>
-          <SeoWords />
+          <SeoWords main />
         </div>
         {inner && !ended && !playtime.goodNight ? (
           // Back to the game's screen before (`useInnerBack`): one tap, held or not, since nothing is left.
@@ -670,9 +671,12 @@ function PanelButton({ open, onClick, icon, label }: { open: boolean; onClick: (
 
 /**
  * The last minute of play time: the screen slowly darkens, sounds get quieter
- * and every animation slows down.
+ * and every animation slows down. Once it is over (more time given, the game left), sounds and animations are as before.
  */
 function Dusk({ level }: { level: number }) {
+  /** How fast each slowed animation ran before, to give that back when the dusk ends. */
+  const slowed = useRef(new Map<Animation, number>());
+
   useEffect(() => {
     setSfxVolume(1 - 0.7 * level);
     const rate = 1 - 0.6 * level;
@@ -680,11 +684,21 @@ function Dusk({ level }: { level: number }) {
       const target = (animation.effect as KeyframeEffect | null)?.target;
       // The exit ring must keep matching its timer.
       if (target?.closest(".hold-exit")) continue;
+      if (!slowed.current.has(animation)) slowed.current.set(animation, animation.playbackRate);
       animation.playbackRate = rate;
     }
   }, [level]);
 
-  useEffect(() => () => setSfxVolume(1), []);
+  // Without this an animation still running stayed slow for good: after a grown-up gave more time, the game went on
+  // at the last minute's pace.
+  useEffect(() => {
+    const before = slowed.current;
+    return () => {
+      setSfxVolume(1);
+      for (const [animation, rate] of before) animation.playbackRate = rate;
+      before.clear();
+    };
+  }, []);
 
   return <div className="playtime-dusk" style={{ opacity: 0.65 * level }} aria-hidden />;
 }

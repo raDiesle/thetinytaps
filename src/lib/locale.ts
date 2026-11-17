@@ -26,10 +26,14 @@ function browserLanguages(): readonly string[] {
 
 /**
  * Search engines that run the page, and Google's own page tests, by their user agent. Named one by one:
- * a pattern like /bot/ would also catch phones (Cubot) and send their players German.
+ * a pattern like /bot/ would also catch phones (Cubot) and send their players German. Each by the name its crawler
+ * alone carries: Sogou's as „Sogou web spider“ (its browser says „SogouMobileBrowser“), Naver's as „Yeti/“.
+ * Besides Baidu, China's other search engines are here, since the pages come in Chinese (Sogou, 360, Bytespider),
+ * Naver and Cốc Cốc, and the crawlers of Google, Bing and Yandex that render a page besides their main one
+ * (GoogleOther, AdsBot, BingPreview, Yandex's mobile and rendering bots).
  */
 export const CRAWLER =
-  /googlebot|google-inspectiontool|storebot-google|chrome-lighthouse|bingbot|yandexbot|duckduckbot|baiduspider|applebot|petalbot|seznambot|slurp/i;
+  /googlebot|google-inspectiontool|storebot-google|googleother|adsbot-google|chrome-lighthouse|bingbot|bingpreview|yandexbot|yandexmobilebot|yandexrenderresourcesbot|duckduckbot|baiduspider|sogou \w+ spider|360spider|bytespider|yeti\/|coccocbot|applebot|petalbot|seznambot|slurp/i;
 
 /** Where the app language a grown-up picked is saved (language.ts); a built page's head reads it too (tools/pageStart.ts). */
 export const LANGUAGE_KEY = "tinytaps.applanguage.v1";

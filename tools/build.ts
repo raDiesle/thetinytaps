@@ -23,9 +23,11 @@ import { SEO_HI } from "../src/content/seo.hi";
 import { SEO_RU } from "../src/content/seo.ru";
 import { SEO_ZH } from "../src/content/seo.zh";
 import { shelfEntryOf } from "../src/content/games";
+import { levelPaths } from "../src/content/levelPages";
 import { appPlugin, PRODUCTION } from "./appPlugin";
 import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
 import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, textsPreload } from "./pageStart";
+import { structuredDataTags } from "./structuredData";
 import { CRAWLER, LANGUAGE_KEY } from "../src/lib/locale";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
@@ -106,6 +108,8 @@ async function bundle() {
 const APP_LINKS = [
   `<link rel="manifest" href="${href("/manifest.webmanifest")}" />`,
   `<link rel="icon" href="${href("/icons/icon.svg")}" type="image/svg+xml" />`,
+  // A PNG beside it: Google's results and older browsers take no SVG icon, and Google wants at least 48 × 48.
+  `<link rel="icon" type="image/png" sizes="48x48" href="${href("/icons/favicon-48.png")}" />`,
   `<link rel="apple-touch-icon" href="${href("/icons/apple-touch-icon.png")}" />`,
 ];
 
@@ -199,25 +203,13 @@ function headTags({ language, page, text }: BuiltPage) {
     meta("og:image:alt", language === "de" ? PREVIEW_IMAGE.alt : TRANSLATIONS[language].imageAlt),
     '<meta name="twitter:card" content="summary_large_image" />',
   ];
-  if (page.path === "/") {
-    // The site's name in Google's results comes from WebSite; without it Google guesses from the domain.
-    const site = { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url, inLanguage: language };
-    tags.push(`<script type="application/ld+json">${JSON.stringify(site)}</script>`);
-    const app = {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      name: SITE_NAME,
-      url,
-      description: text.description,
-      applicationCategory: "GameApplication",
-      operatingSystem: "Web",
-      inLanguage: language,
-      isAccessibleForFree: true,
-      offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-      audience: { "@type": "PeopleAudience", suggestedMinAge: 2, suggestedMaxAge: 4 },
-    };
-    tags.push(`<script type="application/ld+json">${JSON.stringify(app)}</script>`);
-  }
+  // What the site is on its home pages, and on every other page the way to it from the home page (structuredData.ts).
+  const titleOf = (path: string) => {
+    const other = SEO_PAGES.find((p) => p.path === path);
+    if (!other) throw new Error(`build: ${page.path} names ${path} on its way from the home page, which is no page`);
+    return textIn(other, language).title;
+  };
+  tags.push(...structuredDataTags({ path: page.path, language, text, titleOf, urlOf: (path) => urlOf(path, language) }));
   return tags.join("\n    ");
 }
 
@@ -232,20 +224,26 @@ function headTags({ language, page, text }: BuiltPage) {
 // read that tag, so robots.txt must not block them – a blocked page that is linked (the Impressum is, from the
 // home page) can still turn up in results, as a bare address. The sitemap has no <lastmod>: the build date on
 // every page would be wrong, and Google ignores lastmod on a site where it is often wrong.
-// 404.html stays the plain start page, so deep links like /bilder/baustelle/ still boot the app.
+// A level of a game with cards has an address of its own (/abenteuer/schatzinsel/, src/content/levelPages.ts), which
+// is shared and bookmarked: it gets the game's page as it is, canonical link and hreflang naming the game's address,
+// so it opens with status 200 and Google counts it as the game's page. It stays out of the sitemap, which lists only
+// the addresses to be found.
+// 404.html stays the plain start page, so any other deep link still boots the app.
 async function writePages(template: string) {
   const { preloadsOf, textsOf } = await pagePreloads(template);
   await writeFile(join(OUT, "404.html"), textsOf(template, "de"));
   const built = SEO_LANGUAGES.flatMap((language) => SEO_PAGES.map((page): BuiltPage => ({ language, page, text: textIn(page, language) })));
   for (const one of built) {
     let html = replaceOnce(textsOf(template, one.language), '<html lang="de">', `<html lang="${one.language}">`);
-    html = replaceOnce(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(one.text))}</title>`);
+    html = replaceOnce(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(one.text, one.page.path))}</title>`);
     html = replaceOnce(html, /<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${escapeHtml(one.text.description)}" />`);
     html = replaceOnce(html, "</head>", `  ${[headTags(one), ...(await preloadsOf(one))].join("\n    ")}\n  </head>`);
     html = replaceOnce(html, '<div id="root"></div>', `<div id="root">${staticBody(one)}</div>`);
-    const dir = join(OUT, languagePrefix(one.language), one.page.path);
-    await mkdir(dir, { recursive: true });
-    await writeFile(join(dir, "index.html"), html);
+    for (const path of [one.page.path, ...levelPaths(one.page.path)]) {
+      const dir = join(OUT, languagePrefix(one.language), path);
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, "index.html"), html);
+    }
   }
   for (const language of SEO_LANGUAGES) {
     for (const path of NO_INDEX_PATHS) {

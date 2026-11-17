@@ -14,8 +14,10 @@ import {
   SITE_NAME,
   SITE_PROMISE,
   type SeoTranslation,
+  TITLE_WIDTH,
   fullTitle,
   splitLanguage,
+  titleWidth,
 } from "./seo";
 import { SEO_AR } from "./seo.ar";
 import { SEO_EN } from "./seo.en";
@@ -27,6 +29,7 @@ import { APP_LANGUAGES, pick } from "../lib/language";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
+import { structuredData } from "../../tools/structuredData";
 
 describe("home menu", () => {
   const app = readFileSync("src/App.tsx", "utf8");
@@ -163,15 +166,25 @@ describe("ideas", () => {
 const TRANSLATIONS: Record<string, SeoTranslation> = { en: SEO_EN, zh: SEO_ZH, hi: SEO_HI, es: SEO_ES, ar: SEO_AR, ru: SEO_RU };
 
 /**
- * How long a title (with the site's name) and a description may be, in characters as JavaScript counts them: Google
- * cuts by width, so Chinese, twice as wide a character, gets half, and Hindi, whose vowel signs count as characters
- * of their own, more.
+ * How long a description may be, in characters as JavaScript counts them: Google cuts by width, so Chinese, twice as
+ * wide a character, gets half, and Hindi, whose vowel signs count as characters of their own, more.
  */
-const SEO_LIMITS: Record<string, { title: number; min: number; max: number }> = {
-  default: { title: 70, min: 80, max: 160 },
-  zh: { title: 70, min: 40, max: 90 },
-  hi: { title: 85, min: 80, max: 200 },
+const SEO_LIMITS: Record<string, { min: number; max: number }> = {
+  default: { min: 80, max: 160 },
+  zh: { min: 40, max: 90 },
+  hi: { min: 80, max: 200 },
 };
+
+/**
+ * A title as the tab and Google show it fits in a search result (TITLE_WIDTH, by `titleWidth` in every script): it
+ * leaves the site's name out where both would be cut off. Only the home page always keeps the name and may run a
+ * little over, since there the name is what is searched for.
+ */
+function expectTitleFits(page: { title: string }, path: string) {
+  const title = fullTitle({ ...page, description: "", text: "" }, path);
+  expect(titleWidth(title), title).toBeLessThanOrEqual(path === "/" ? 70 : TITLE_WIDTH);
+  if (path === "/") expect(title).toEndWith(` | ${SITE_NAME}`);
+}
 
 describe("search engine texts (seo.ts)", () => {
   const paths = SEO_TEXTS.map((page) => page.path);
@@ -187,7 +200,7 @@ describe("search engine texts (seo.ts)", () => {
   });
 
   test.each(SEO_TEXTS.map((page) => [page.path, page] as const))("%s: title and description fit in a search result", (_, page) => {
-    expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(70);
+    expectTitleFits(page, page.path);
     expect(page.description.length, page.description).toBeGreaterThanOrEqual(80);
     expect(page.description.length, page.description).toBeLessThanOrEqual(160);
     expect(page.text.length).toBeGreaterThan(60);
@@ -222,12 +235,12 @@ describe("search engine texts (seo.ts)", () => {
   });
 
   describe.each(Object.entries(TRANSLATIONS))("%s", (language, seo) => {
-    const { title, min, max } = SEO_LIMITS[language] ?? SEO_LIMITS.default;
+    const { min, max } = SEO_LIMITS[language] ?? SEO_LIMITS.default;
 
     test("has every page and nothing else, fitting in a search result like German", () => {
       expect(Object.keys(seo.pages).sort()).toEqual([...paths].sort());
       for (const [path, page] of Object.entries(seo.pages)) {
-        expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(title);
+        expectTitleFits(page, path);
         expect(page.description.length, `${path}: ${page.description}`).toBeGreaterThanOrEqual(min);
         expect(page.description.length, `${path}: ${page.description}`).toBeLessThanOrEqual(max);
         expect(page.text.length, path).toBeGreaterThan(min / 2);
@@ -245,6 +258,27 @@ describe("search engine texts (seo.ts)", () => {
         expect(text.replaceAll(SITE_NAME, "").match(/[A-Za-z]+/g), text).toBeNull();
       }
     });
+  });
+
+  // Many titles ran past what a search result shows once „ | Fun for Both“ stood after them (Spanish 31 of 54), and
+  // Google cut the end off: the name gives way, the words parents search for stay whole.
+  test("a title keeps the site's name only where both fit in a search result; the home page always keeps it", () => {
+    const text = { description: "", text: "" };
+    expect(fullTitle({ title: "Zähne putzen mit Lied", ...text }, "/zaehne/")).toBe(`Zähne putzen mit Lied | ${SITE_NAME}`);
+    const long = "Wimmelbild Winter-Baustelle für Kleinkinder zum Antippen";
+    expect(titleWidth(`${long} | ${SITE_NAME}`)).toBeGreaterThan(TITLE_WIDTH);
+    expect(fullTitle({ title: long, ...text }, "/bilder/winterbaustelle/")).toBe(long);
+    expect(fullTitle({ title: long, ...text }, "/")).toBe(`${long} | ${SITE_NAME}`);
+    // By width, not by count: a Chinese sign is as wide as two letters, a Hindi vowel sign above its letter as none.
+    expect(titleWidth("刷牙歌")).toBe(6);
+    expect(titleWidth("abc")).toBe(3);
+    expect(titleWidth("कि")).toBe(2);
+    expect(titleWidth("कु")).toBe(1);
+    expect(fullTitle({ title: "小".repeat(23), ...text }, "/zaehne/")).toBe("小".repeat(23));
+    expect(fullTitle({ title: "小".repeat(22), ...text }, "/zaehne/")).toBe(`${"小".repeat(22)} | ${SITE_NAME}`);
+    // The built page and the running app take the same title, from the one function.
+    expect(readFileSync("tools/build.ts", "utf8")).toContain("fullTitle(one.text, one.page.path)");
+    expect(readFileSync("src/lib/title.ts", "utf8")).toContain("fullTitle(seo, seo.path)");
   });
 
   test("an address finds its language and page", () => {
@@ -317,6 +351,22 @@ describe("no age to start at", () => {
     ]),
   ])("%s names no age", (_, text) => {
     expect(text.match(AGE)?.[0]).toBeUndefined();
+  });
+
+  // The home pages' JSON-LD once said `audience: { suggestedMinAge: 2, suggestedMaxAge: 4 }`: what only search
+  // engines read names no age either.
+  test("the structured data the build writes into a page's head names no age", () => {
+    for (const language of SEO_LANGUAGES) {
+      for (const page of SEO_PAGES) {
+        const text = language === "de" ? page : TRANSLATIONS[language].pages[page.path];
+        const data = JSON.stringify(
+          structuredData({ path: page.path, language, text, titleOf: (path) => path, urlOf: (path) => `https://example.org${path}` }),
+        );
+        expect(data.match(/audience|"\w*Age\w*"|"age\w*"/)?.[0], `${language} ${page.path}`).toBeUndefined();
+        expect(data.match(AGE)?.[0], `${language} ${page.path}`).toBeUndefined();
+      }
+    }
+    expect(readFileSync("tools/build.ts", "utf8")).not.toMatch(/audience|suggested\w*Age/);
   });
 });
 

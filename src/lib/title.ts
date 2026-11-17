@@ -25,6 +25,6 @@ export function useTitle(page?: string) {
   });
   useEffect(() => {
     const seo = seoWords(pathname, id);
-    document.title = seo ? fullTitle(seo) : page ? `${page} – ${SITE_NAME}` : `${SITE_NAME} – ${fallback}`;
+    document.title = seo ? fullTitle(seo, seo.path) : page ? `${page} – ${SITE_NAME}` : `${SITE_NAME} – ${fallback}`;
   }, [page, pathname, id, fallback]);
 }

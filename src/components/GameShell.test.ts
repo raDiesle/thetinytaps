@@ -54,6 +54,13 @@ test("no start screen moves the mode played last to the front", async () => {
 test("a playing game keeps its page's words for search engines, and no turn-sideways note hides them", async () => {
   const shell = await Bun.file("src/components/GameShell.tsx").text();
   const playing = shell.slice(shell.indexOf("if (playing) {"), shell.indexOf("if (menu) return null;"));
-  expect(playing).toMatch(/<div hidden>\s*<SeoWords \/>\s*<\/div>/);
+  // Their title is the page's one <h1> there (`main`): the app replaced the built page's, and while playing no menu's
+  // title stands in the page – the start screen has its MenuHead's and shows the words under an <h2>.
+  expect(playing).toMatch(/<div hidden>\s*<SeoWords main \/>\s*<\/div>/);
+  expect(playing).not.toMatch(/<MenuHead|<h1/);
+  const startScreen = shell.slice(shell.indexOf("if (menu) return null;"));
+  expect(startScreen).toContain("<MenuHead");
+  expect(startScreen).toContain("<SeoText />");
+  expect(startScreen).not.toContain("<SeoWords");
   expect(await Bun.file("src/components/ScreenHint.tsx").text()).toContain("isCrawler()");
 });
