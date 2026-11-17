@@ -179,7 +179,7 @@ function boardsOf(spans: number[], rows: number): number[][] {
  * picture books two side by side on each board below – never one picture book on each board, which left the shelf a tall
  * column of single books (user feedback, November 2026).
  */
-export function uprightBoards(spans: number[]): number[][] {
+function uprightBoards(spans: number[]): number[][] {
   const wide = spans.flatMap((s, i) => (s > 1 ? [[i]] : []));
   const rest = spans.flatMap((s, i) => (s > 1 ? [] : [i]));
   const pairs = Array.from({ length: Math.ceil(rest.length / 2) }, (_, r) => rest.slice(2 * r, 2 * r + 2));

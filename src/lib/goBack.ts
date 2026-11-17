@@ -56,7 +56,7 @@ export function useHistoryTrail() {
 }
 
 /** Whether the page before this one in the history is `to`, so going back there is a step back. */
-export const cameFrom = (to: string) => {
+const cameFrom = (to: string) => {
   const idx = place();
   return idx !== undefined && idx > 0 && trail[idx - 1] === to;
 };

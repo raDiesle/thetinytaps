@@ -124,7 +124,7 @@ function contentHeight(page: HTMLElement) {
 }
 
 /** Whether the screen is a phone's (its shorter side below `PHONE_SCREEN`). */
-export const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
+const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
 
 /**
  * Room the page keeps free under its cards for a picture standing there: `--menu-floor`, a registered length
@@ -136,7 +136,7 @@ const floorOf = (page: HTMLElement) => parseFloat(getComputedStyle(page).getProp
  * How tall `part` of the menu `page` may grow so that the page's first screen holds everything above and below it
  * (not what waits `data-below-fold`), with the room under the last row the cards keep.
  */
-export function roomFor(part: HTMLElement, page: HTMLElement) {
+function roomFor(part: HTMLElement, page: HTMLElement) {
   return window.innerHeight - (contentHeight(page) - part.offsetHeight) - Math.max(isPhone() ? BOTTOM_PHONE : BOTTOM, floorOf(page));
 }
 

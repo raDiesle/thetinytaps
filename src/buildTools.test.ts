@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PRODUCTION } from "../tools/appPlugin";
+import { isTest } from "./testSources";
 import { fontsAsFiles } from "../tools/pageStart";
 
 // Bun bundles the app with one plugin (tools/appPlugin.ts); code written for another bundler would build
@@ -9,7 +10,7 @@ import { fontsAsFiles } from "../tools/pageStart";
 
 const SRC = import.meta.dir;
 const code = (readdirSync(SRC, { recursive: true, encoding: "utf8" }) as string[])
-  .filter((file) => /\.(ts|tsx)$/.test(file) && !file.endsWith(".test.ts"))
+  .filter((file) => /\.(ts|tsx)$/.test(file) && !isTest(file))
   .map((file) => ({ file, text: readFileSync(join(SRC, file), "utf8") }));
 
 test("no code of another bundler: files come from `?glob` imports, build facts from src/lib/buildInfo.ts", () => {

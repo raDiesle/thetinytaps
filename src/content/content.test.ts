@@ -30,6 +30,7 @@ import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 import { structuredData } from "../../tools/structuredData";
+import { isTest } from "../testSources";
 
 describe("home menu", () => {
   const app = readFileSync("src/App.tsx", "utf8");
@@ -436,7 +437,7 @@ describe("the app's name", () => {
 
   test("the old name is gone from what players and search engines see", () => {
     const seen = ["index.html", "public/manifest.webmanifest", ...readdirSync("src", { recursive: true, encoding: "utf8" }).map((f) => `src/${f}`)].filter(
-      (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.includes("/research/") && !file.endsWith(".test.ts"),
+      (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.includes("/research/") && !isTest(file),
     );
     for (const file of seen) expect(readFileSync(file, "utf8").includes("Tiny Taps"), file).toBe(false);
   });

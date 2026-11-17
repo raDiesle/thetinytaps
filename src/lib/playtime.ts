@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { track } from "@/lib/analytics";
 
-export const PLAYTIME_SETTINGS_KEY = "tt-playtime";
+const PLAYTIME_SETTINGS_KEY = "tt-playtime";
 
 /** What the limit counts: nothing, minutes or games. */
 export type PlaytimeLimit = "none" | "time" | "games";

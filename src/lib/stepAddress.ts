@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router";
 
 /** The part of the address that names the step. */
-export const STEP_PARAM = "seite";
+const STEP_PARAM = "seite";
 
 /** The step shown last on a page, and how many steps that page showed so far. */
 interface ShownStep {

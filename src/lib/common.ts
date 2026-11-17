@@ -44,7 +44,7 @@ export type Figure = "boy" | "girl";
  */
 const FIXED = { speech: false, sounds: true } as const;
 
-export const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true, figure: "boy", leave: "tap" };
+const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true, figure: "boy", leave: "tap" };
 
 /**
  * The options filled into a game's fields of the same name. Not music: a game with

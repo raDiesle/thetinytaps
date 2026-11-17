@@ -37,7 +37,7 @@ export function canFullscreen(): boolean {
 }
 
 /** Whether the page is in fullscreen right now. */
-export function isFullscreen(): boolean {
+function isFullscreen(): boolean {
   const doc = document as WebkitDocument;
   return Boolean(doc.fullscreenElement || doc.webkitFullscreenElement);
 }

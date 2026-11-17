@@ -12,7 +12,7 @@ const GROWN_UP_PAGES = ["/management", "/ideen", "/impressum", "/datenschutz"];
 const ANSWERS = "a, button, input, select, textarea, label, summary, [role='button'], [role='dialog'], [data-tap], [data-tap-root], .play-area, .shelf-box";
 
 /** Whether a tap on this element sets something off, so the ripple would only be in its way. */
-export function answersTap(target: Element): boolean {
+function answersTap(target: Element): boolean {
   if (target.closest(ANSWERS)) return true;
   // Anything styled as tappable (a hold to open, a card drawn as a div) answers too.
   for (let el: Element | null = target; el && el !== document.body; el = el.parentElement) {

@@ -93,7 +93,7 @@ function distanceTo(el: Element, x: number, y: number): number {
  * The target a tap at (x, y) means, given the element right under it (`document.elementFromPoint`
  * or the event's target); null when the tap is for no target, or for a button that isn't one.
  */
-export function tapTargetAt(x: number, y: number, hit: Element | null, reach = 0): Element | null {
+function tapTargetAt(x: number, y: number, hit: Element | null, reach = 0): Element | null {
   if (!hit) return null;
   const under = hit.closest("[data-tap]");
   const keep = hit.closest(KEEP);

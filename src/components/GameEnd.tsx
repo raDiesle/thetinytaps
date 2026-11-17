@@ -39,7 +39,7 @@ const ASK_AFTER_MS = 1500;
  * moment, then shrinks onto its little board beside the buttons – into the collection. `game-end-trophy-award` in
  * game-end.css runs exactly this long.
  */
-export const AWARD_MS = 3400;
+const AWARD_MS = 3400;
 /** The trophy's height in the middle of the screen, as a share of the screen's height (and at most of its width). */
 const AWARD_HEIGHT = 0.58;
 

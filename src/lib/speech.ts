@@ -19,7 +19,7 @@ const rank = (voice: SpeechSynthesisVoice) => {
  * Voices for `lang` (e.g. "de-DE"), nicest first. Empty if the browser has
  * none, or hasn't loaded them yet.
  */
-export function voicesFor(lang: string): SpeechSynthesisVoice[] {
+function voicesFor(lang: string): SpeechSynthesisVoice[] {
   if (!supported()) return [];
   const prefix = lang.slice(0, 2);
   return window.speechSynthesis
@@ -32,7 +32,7 @@ export function voicesFor(lang: string): SpeechSynthesisVoice[] {
  * The nicest voice for `lang`, else null. Without network
  * only voices on the device itself (the online "Google" ones stay silent offline).
  */
-export function pickVoice(lang: string): SpeechSynthesisVoice | null {
+function pickVoice(lang: string): SpeechSynthesisVoice | null {
   const voices = voicesFor(lang).filter((v) => navigator.onLine || v.localService);
   return voices[0] ?? null;
 }

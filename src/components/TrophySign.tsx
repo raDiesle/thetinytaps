@@ -13,7 +13,7 @@ import { preloadPage } from "@/lib/preloadPages";
  */
 
 /** How long the walk from the shelf into the trophy room takes; `museum-door-*` in bookshelf.css run exactly this long. */
-export const DOORWAY_MS = 1900;
+const DOORWAY_MS = 1900;
 
 /** The sign on the shelf's right side, `top` px from the shelf's top. */
 export function TrophySign({ top }: { top: number }) {

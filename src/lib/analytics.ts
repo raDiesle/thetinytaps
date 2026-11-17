@@ -53,7 +53,7 @@ export function track(name: EventName, data?: Record<string, string | number>) {
 }
 
 /** Shorter stretches on a page are passing through (a menu tapped past, a game left at once) and not sent. */
-export const MIN_PAGE_MS = 3_000;
+const MIN_PAGE_MS = 3_000;
 
 /** A time in steps grown-ups can compare at a glance, the same in every report. */
 export function durationStep(ms: number): string {

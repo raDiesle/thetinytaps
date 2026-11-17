@@ -6,7 +6,7 @@ export function touchOnly() {
 }
 
 /** False on a computer with only mouse or trackpad: no finger can reach the screen. */
-export function hasTouch() {
+function hasTouch() {
   return matchMedia("(any-pointer: coarse)").matches;
 }
 

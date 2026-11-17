@@ -32,7 +32,7 @@ export function readerFileOf(family: Family, n: number): string {
 }
 
 /** The picture of who reads on this side in this visit; one not made yet (still in the picture queue) falls back to the parents. */
-export function readerOf(family: Family, n = visitNumber()): string | undefined {
+function readerOf(family: Family, n = visitNumber()): string | undefined {
   return pictures[readerFileOf(family, n)] ?? FAMILY_PICTURES[family];
 }
 
