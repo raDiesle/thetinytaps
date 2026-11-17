@@ -268,7 +268,10 @@ In a fresh worktree run `bun install` first.
   starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,
   and whether it catches them depends on when its counter starts: before blaming a motion, compare where the stutters
   fall with when it starts (in „Buch aus dem Regal nehmen“ all of them fell in the 0.2 s before the book lifts, and
-  splitting that work over two frames only added one, since neither half got under 50 ms; November 2026). A new game,
+  splitting that work over two frames only added one, since neither half got under 50 ms; November 2026). So a stretch
+  meant to measure a motion that starts a moment after its tap waits for it with `startWhen` (`tools/perfScenarios.ts`):
+  the stretch begins with the first moving frame, and the wait from the finger landing is a number of its own with its
+  own limit („tap to lift“, about 0.3 s on the old phone) – never one stretch judging both by chance. A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
   `--profile` names the functions that cost, `--shots` shows what was measured). A stretch after one that taps everything starts wherever those taps left the game: start it
   from a reload (`{ eval: "location.reload()" }`, a wait, then the fullscreen question's `.screen-hint-button`), as

@@ -55,6 +55,23 @@ export interface Part {
   type?: { keys: string[]; every: number };
   /** Limits of this stretch alone, over the scenario's; only for a decision written down next to it. */
   budget?: Partial<Budget>;
+  /**
+   * For a motion that begins a moment after its tap (the next page is drawn first, the screen standing still): the
+   * stretch starts only once the motion runs, so it measures the motion and nothing else, and the wait before it is a
+   * number of its own with its own limit. Without it the frame counter started somewhere inside that wait, and the
+   * stretch passed or failed by how many of the wait's slow frames it happened to catch (code review R-P15).
+   */
+  startWhen?: StartWhen;
+}
+
+/** When a stretch starts, see `Part.startWhen`. */
+export interface StartWhen {
+  /** An expression asked in the page at every frame after the finger landed: the stretch starts once it is true. */
+  holds: string;
+  /** What the time from the finger landing (the first tap of `before`) to that frame is called in the output. */
+  lead: string;
+  /** That time's limit in ms on this device: longer, and the tap feels unanswered. */
+  within: number;
 }
 
 /** One game (or one mode of it) to play. */
@@ -96,7 +113,14 @@ export const SCENARIOS: Scenario[] = [
     parts: [
       { label: "Startseite", ms: 3000 },
       // The home page is a bookshelf: a book is taken out and opened at its table of contents, whose line turns a page.
-      { label: "Buch aus dem Regal nehmen", before: [{ tap: '.shelf-book[data-book="lebendige-welten"]' }], ms: 2500 },
+      // The book lifts only once its first page is drawn (the screen still meanwhile): that wait is „tap to lift“, and
+      // the stretch is the flight itself, to its end and the page landing as the screen (2.55 s, `bookTravel.ts`).
+      {
+        label: "Buch aus dem Regal nehmen",
+        before: [{ tap: '.shelf-book[data-book="lebendige-welten"]' }],
+        startWhen: { holds: 'document.querySelector(".bt-book")?.getAnimations({ subtree: true }).length > 0', lead: "tap to lift", within: 600 },
+        ms: 3000,
+      },
       { label: "Seite blättern in ein Spiel", before: [{ waitFor: ".toc-line" }, { tap: ".toc-line" }], ms: 2500 },
     ],
   },
