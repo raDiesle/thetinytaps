@@ -80,10 +80,12 @@ function worker(
   const quick = source.replace(/NETWORK_WAIT_MS = \d+/, "NETWORK_WAIT_MS = 50");
   expect(quick).not.toBe(source);
   /** Only the address of a request matters here; the worker's relative ones resolve against its scope. */
+  const requests: { url: string; cache?: string }[] = [];
   class FakeRequest {
     url: string;
-    constructor(url: string) {
+    constructor(url: string, init?: { cache?: string }) {
       this.url = address(url);
+      requests.push({ url: this.url.replace(SCOPE, ""), cache: init?.cache });
     }
   }
   const fetch = (request: { url: string }) => network({ url: address(request) });
@@ -100,6 +102,8 @@ function worker(
   };
   return {
     store,
+    /** Every Request the worker made, with its cache mode. */
+    requests,
     install: () => dispatch("install", {}),
     message: (data: unknown) => dispatch("message", { data }),
     /** What the worker answers for the file at `path`. */
@@ -163,6 +167,17 @@ test("a first visit downloads what the home page needs, not every game", async (
   const { asked, network } = online();
   await worker(network, { files: FILES, shell: SHELL }).install();
   expect(asked.sort()).toEqual([...SHELL].sort());
+});
+
+test("at install only files without a hash bypass the browser's cache: the start the page just loaded isn't downloaded twice", async () => {
+  const { network } = online();
+  const sw = worker(network, { files: FILES, shell: SHELL });
+  await sw.install();
+  expect(sw.requests).toEqual([
+    { url: "index.html", cache: "reload" },
+    { url: "static/app.a1.js", cache: undefined },
+    { url: "static/cover.b2.webp", cache: undefined },
+  ]);
 });
 
 test("a file played once is kept and plays offline", async () => {

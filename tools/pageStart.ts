@@ -32,6 +32,23 @@ export function pageModuleFor(path: string, modules: Map<string, string>) {
 }
 
 /**
+ * The chunk of each picture of Lebendige Bilder by its id (`bauernhof` → `Bauernhof`), read from the
+ * `{ id: "bauernhof", …, load: () => import("./bauernhof/Bauernhof")… }` entries of src/games/scenes/catalog.ts. Every
+ * picture is a chunk of its own that `ScenePage` loads only once it runs, so a picture's built page preloads it too.
+ */
+export function sceneModules(catalogSource: string) {
+  const scenes = new Map<string, string>();
+  for (const [, id, module] of catalogSource.matchAll(/\{\s*id:\s*"([\w-]+)"[^{}]*?import\("\.\/[\w/]*?(\w+)"\)/g)) scenes.set(id, module);
+  return scenes;
+}
+
+/** The picture's own chunk a page of seo.ts needs besides its page module (`/bilder/bauernhof/` → `Bauernhof`), if any. */
+export function sceneModuleFor(path: string, scenes: Map<string, string>) {
+  const id = /^\/bilder\/([^/]+)\/$/.exec(path)?.[1];
+  return id === undefined ? undefined : scenes.get(id);
+}
+
+/**
  * A chunk with every chunk it imports statically, one level after another (`from"/static/x.js"`, `import"/static/x.js"`;
  * never the `import("…")` of a page loaded later). `read` gives a chunk's code by its file (`static/x.js`), `prefix` is
  * how the code names a file (`/static/`, with the base path).

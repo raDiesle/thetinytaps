@@ -26,6 +26,8 @@ const OFFLINE = __OFFLINE__;
 const ON_DEMAND = /\/((musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3|static\/texts-[a-z]{2}\.[^/]*\.js)$/;
 /** Files named by their content (static/<name>.<hash>.<ext>): the same address is the same file in every build. */
 const HASHED = /\/static\/[^/]+$/;
+/** Whether a file of the site (an address relative to the worker) is named by its content. */
+const isHashed = (file) => HASHED.test(new URL(file, self.registration.scope).pathname);
 
 const PREFIX = "tinytaps-";
 const CACHE = PREFIX + VERSION;
@@ -143,8 +145,11 @@ self.addEventListener("install", (event) => {
       // Then what the start needs and is not there yet: index.html and the files not named by their content always.
       const start = [...SHELL_FILES, ...[...languages].map((id) => TEXTS[id]).filter(Boolean)];
       const missing = [];
-      for (const file of start) if (!HASHED.test(new URL(file, self.registration.scope).pathname) || !(await cache.match(file))) missing.push(file);
-      await cache.addAll(missing.map((file) => new Request(file, { cache: "reload" })));
+      for (const file of start) if (!isHashed(file) || !(await cache.match(file))) missing.push(file);
+      // A file named by its content never changes, so the copy the page just loaded (the browser's HTTP cache) is the
+      // right one: fetching it again with "reload" downloaded the whole start twice. Only index.html and the other
+      // files without a hash must come fresh from the network.
+      await cache.addAll(missing.map((file) => new Request(file, isHashed(file) ? {} : { cache: "reload" })));
       if (wantsAll) await keepAll(cache, wantsAll);
       await self.skipWaiting();
     })(),

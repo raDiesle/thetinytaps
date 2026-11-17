@@ -8,7 +8,8 @@ import type { BunPlugin } from "bun";
 // - `import files from "./musik/*.mp3?glob"`: all files matching a pattern, relative to the importing
 //   file, as { "musik-hintergrund.mp3": url } – keyed by their path below the pattern's folder. A file
 //   becomes its bundled URL (a JSON file its content), so a new sound or picture needs no code.
-// - src/lib/buildInfo.ts gets the facts of this build (dev server or not, base path, time).
+// - src/lib/buildInfo.ts gets the facts of this build (dev server or not, base path) – never a value that changes with each
+//   build, which would rename every chunk importing it.
 // - In the build, a stylesheet a module imports (`import "./socks.css"` in a game) travels inside that
 //   module's chunk and is added as a <style> when the chunk runs, so a game's CSS arrives only when the
 //   game is opened. Bun itself would put every imported stylesheet into the start page's CSS – which the
@@ -20,7 +21,6 @@ export interface BuildInfo {
   DEV: boolean;
   PROD: boolean;
   BASE_URL: string;
-  BUILD_TIME: string;
 }
 
 /**
@@ -93,4 +93,4 @@ document.head.append(style);
 }
 
 /** The dev server's plugin (bunfig.toml, [serve.static]): developer helpers on, no service worker, served from the root, CSS left to Bun. */
-export default appPlugin({ DEV: true, PROD: false, BASE_URL: "/", BUILD_TIME: new Date().toISOString() });
+export default appPlugin({ DEV: true, PROD: false, BASE_URL: "/" });

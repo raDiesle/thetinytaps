@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { track } from "@/lib/analytics";
-import { BASE_URL, BUILD_TIME, PROD } from "@/lib/buildInfo";
+import { BASE_URL, PROD } from "@/lib/buildInfo";
 import { loadCommon } from "@/lib/common";
 import type { OfflineChoice } from "@/lib/offlineParts";
 import { loadStored } from "@/lib/storage";
@@ -245,8 +245,15 @@ export function useUpdateBetweenGames() {
   }, [updateReady]);
 }
 
-/** When the running version was built, e.g. "25.10.2026, 14:30" (in the device's time zone). */
-export const buildDate = () => new Date(BUILD_TIME).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+/**
+ * When the running version was built, e.g. "25.10.2026, 14:30" (in the device's time zone), read from the page's
+ * `<meta name="build-time">` that tools/build.ts writes – never compiled into the code, where it renamed most chunks on
+ * every build. The dev server's page has none: there it says so.
+ */
+export function buildDate() {
+  const time = document.querySelector<HTMLMetaElement>('meta[name="build-time"]')?.content;
+  return time ? new Date(time).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }) : "Dev-Server";
+}
 
 /** Opens the browser's install dialog (only when `installPrompt` is set). */
 export async function install() {

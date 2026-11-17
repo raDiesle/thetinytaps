@@ -26,7 +26,7 @@ import { shelfEntryOf } from "../src/content/games";
 import { levelPaths } from "../src/content/levelPages";
 import { appPlugin, PRODUCTION } from "./appPlugin";
 import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
-import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, textsPreload } from "./pageStart";
+import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "./pageStart";
 import { structuredDataTags } from "./structuredData";
 import { CRAWLER, LANGUAGE_KEY } from "../src/lib/locale";
 
@@ -93,7 +93,7 @@ async function bundle() {
     publicPath: `${base}/`,
     naming: { entry: "[dir]/[name].[ext]", chunk: "static/[name].[hash].[ext]", asset: "static/[name].[hash].[ext]" },
     // The font (@fontsource in src/globals.css) ends up inside the stylesheet, so it needs no request of its own.
-    plugins: [appPlugin({ DEV: false, PROD: true, BASE_URL: base || "/", BUILD_TIME: new Date().toISOString() }, await minifiedStyles())],
+    plugins: [appPlugin({ DEV: false, PROD: true, BASE_URL: base || "/" }, await minifiedStyles())],
     throw: false,
   });
   if (!result.success) {
@@ -275,15 +275,16 @@ async function writePages(template: string) {
 }
 
 /**
- * The chunks a page needs beyond the start's, as `<link rel="modulepreload">` tags (`preloadsOf`): its own page's code
- * (App.tsx loads it lazily, so without them it was fetched only after the start's code had run, one round trip after
- * another). And `textsOf`, which puts the script into a page's head that fetches the texts of the language the visitor
+ * The chunks a page needs beyond the start's, as `<link rel="modulepreload">` tags (`preloadsOf`): its own page's code,
+ * and on a picture of Lebendige Bilder that picture's chunk (App.tsx and ScenePage load them lazily, so without these
+ * tags they were fetched only after the start's code had run, one round trip after another). And `textsOf`, which puts the script into a page's head that fetches the texts of the language the visitor
  * will play in (textsPreload) – the browser's, not the address's: a German page played in English needs the English
  * texts, an English page played in German none. They come down together with the start's code, while the page's title
  * waits on paper (`.boot`).
  */
 async function pagePreloads(template: string) {
   const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
+  const scenes = sceneModules(await readFile(join(ROOT, "src/games/scenes/catalog.ts"), "utf8"));
   const files = await filesIn(OUT);
   const linked = new Set([...template.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]));
   const read = (file: string) => readFile(join(OUT, file), "utf8");
@@ -300,7 +301,11 @@ async function pagePreloads(template: string) {
     preloadsOf: async ({ page }: BuiltPage) => {
       const module = pageModuleFor(page.path, modules);
       if (module === undefined) throw new Error(`build: no page of App.tsx opens ${page.path}`);
-      return (module ? await unlinked(chunkOf(module)) : []).map((url) => `<link rel="modulepreload" crossorigin href="${url}">`);
+      // A picture of Lebendige Bilder needs its own chunk too, which ScenePage would ask for only once it runs.
+      const scene = sceneModuleFor(page.path, scenes);
+      if (module === "ScenePage" && !scene) throw new Error(`build: no picture of src/games/scenes/catalog.ts is at ${page.path}`);
+      const urls = new Set([...(module ? await unlinked(chunkOf(module)) : []), ...(scene ? await unlinked(chunkOf(scene)) : [])]);
+      return [...urls].map((url) => `<link rel="modulepreload" crossorigin href="${url}">`);
     },
     textsOf: (html: string, address: SeoLanguage) =>
       replaceOnce(html, stylesheet, `${textsPreload(texts, address, { key: LANGUAGE_KEY, crawler: CRAWLER })}${stylesheet}`),
@@ -333,7 +338,11 @@ async function writeServiceWorker() {
   const shell = await shellFiles();
   const template = await readFile(join(ROOT, "src/sw.js"), "utf8");
   const hash = createHash("sha256").update(template);
-  for (const file of files) hash.update(file).update(await readFile(join(OUT, file)));
+  // The build's time in index.html is left out, so a build that changed nothing installs no new worker.
+  for (const file of files) {
+    const bytes = await readFile(join(OUT, file));
+    hash.update(file).update(file.endsWith(".html") ? bytes.toString("utf8").replace(/<meta name="build-time" content="[^"]*" \/>/, "") : bytes);
+  }
   const worker = template
     .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
     .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
@@ -421,10 +430,16 @@ async function writeOfflineManifest() {
   return `./${name}`;
 }
 
+/** The most the service worker's install may download (`shellFiles`), in files and in MB. */
+const MAX_SHELL = { files: 70, megabytes: 1.6 };
+
 /**
  * What the service worker keeps at install, so the app starts offline on its home page even right after an update:
  * index.html, the scripts and styles it links (Bun lists every chunk the start needs as a modulepreload) and the
- * pictures those name (the shelf's covers, the logo) – not the sounds they name, which only a game plays.
+ * pictures those name (the shelf's covers, the logo) – not the sounds they name, which only a game plays, and not the
+ * menus' and trophies' previews (`vorschau/` folders, which the start's code names through trophyPictures.ts): 82 of
+ * them made 1 MB that every first visit downloaded for a trophy room or a book it may never open (R-P3). A preview is
+ * kept once a page shows it, like every other file. Fails above `MAX_SHELL`, so the start can't silently grow again.
  */
 async function shellFiles() {
   const html = await readFile(join(OUT, "index.html"), "utf8");
@@ -432,20 +447,45 @@ async function shellFiles() {
     .map((match) => match[1])
     .filter((ref) => ref.startsWith(`${base}/`) && !ref.endsWith("/"))
     .map((ref) => ref.slice(base.length + 1));
+  // The previews, known by their content: their built names say nothing of the folder they came from.
+  const digest = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
+  const previews = new Set<string>();
+  for (const file of await filesIn(join(ROOT, "src"))) if (/(^|\/)vorschau\/[^/]+\.webp$/.test(file)) previews.add(digest(await readFile(join(ROOT, "src", file))));
   const pictures = new Set<string>();
   for (const file of linked.filter((file) => /\.(js|css)$/.test(file))) {
-    for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(/static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)/g)) pictures.add(match[0]);
+    for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(/static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)/g))
+      if (!previews.has(digest(await readFile(join(OUT, match[0]))))) pictures.add(match[0]);
   }
-  return ["index.html", ...linked, ...pictures];
+  const shell = ["index.html", ...linked, ...pictures];
+  const megabytes = shell.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0) / 1e6;
+  console.log(`service worker's start: ${shell.length} files, ${megabytes.toFixed(2)} MB`);
+  if (shell.length > MAX_SHELL.files || megabytes > MAX_SHELL.megabytes) {
+    console.error(`build: the service worker's start is ${shell.length} files and ${megabytes.toFixed(2)} MB, over ${MAX_SHELL.files} files or ${MAX_SHELL.megabytes} MB: every first visit downloads it`);
+    process.exit(1);
+  }
+  return shell;
 }
+
+/** The most out/ may weigh, in MB: GitHub Pages publishes at most 1 GB, and the deploy should fail long before. */
+const MAX_SITE_MB = 800;
 
 const started = performance.now();
 await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
 await cp(join(ROOT, "public"), OUT, { recursive: true });
-const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${[...APP_LINKS, ...ANALYTICS].join("")}</head>`);
+// The time of this build stands in every page (`buildDate` in src/lib/pwa.ts reads it), never in the code: a value
+// that changes with each build renamed most chunks every time, so returning visitors downloaded every game again.
+const BUILD_TIME_TAG = `<meta name="build-time" content="${new Date().toISOString()}" />`;
+const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${[BUILD_TIME_TAG, ...APP_LINKS, ...ANALYTICS].join("")}</head>`);
 await writeFile(join(OUT, "index.html"), template);
 await writePages(template);
 await writeServiceWorker();
 const files = await filesIn(OUT);
-console.log(`out/: ${files.length} files (${result.outputs.length} bundled) in ${Math.round(performance.now() - started)} ms`);
+const bytes = files.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0);
+const megabytes = Math.round(bytes / 1e6);
+console.log(`out/: ${files.length} files, ${megabytes} MB (${result.outputs.length} bundled) in ${Math.round(performance.now() - started)} ms`);
+// GitHub Pages publishes a site of at most 1 GB; stop well before it, while there is still time to make room (R-D8).
+if (megabytes > MAX_SITE_MB) {
+  console.error(`build: out/ is ${megabytes} MB, over the limit of ${MAX_SITE_MB} MB (GitHub Pages takes at most 1 GB) – make the recordings or pictures smaller first`);
+  process.exit(1);
+}

@@ -7,5 +7,6 @@ export const DEV: boolean = false;
 export const PROD: boolean = false;
 /** Where the site lives: "/", the root of its domain, or a folder when built with PUBLIC_BASE_PATH. */
 export const BASE_URL: string = "/";
-/** When this version was built (ISO time), shown small on the home page. */
-export const BUILD_TIME: string = new Date().toISOString();
+// No time of the build here, nor anything else that changes from one build to the next: this module is part of the
+// chunk every page imports, so such a value renamed most chunks on every build and returning visitors downloaded
+// every game again (R-P2, November 2026). The build writes its time into the pages instead (`buildDate` in pwa.ts).

@@ -16,6 +16,17 @@ test("no code of another bundler: files come from `?glob` imports, build facts f
   expect(found).toEqual([]);
 });
 
+test("no value that changes with every build is compiled into the code: it renamed most chunks on each deploy", () => {
+  // The build's time is written into the pages (tools/build.ts) and read from there (`buildDate` in src/lib/pwa.ts).
+  const info = readFileSync(join(SRC, "lib", "buildInfo.ts"), "utf8");
+  expect(info).not.toMatch(/new Date\(|Date\.now|Math\.random|crypto/);
+  const plugin = readFileSync(join(SRC, "..", "tools", "appPlugin.ts"), "utf8");
+  expect(plugin).not.toMatch(/BUILD_TIME|toISOString|Date\.now/);
+  expect(code.filter(({ text }) => /\bBUILD_TIME\b/.test(text)).map(({ file }) => file)).toEqual([]);
+  expect(readFileSync(join(SRC, "..", "tools", "build.ts"), "utf8")).toContain('<meta name="build-time" content=');
+  expect(code.find(({ file }) => file === join("lib", "pwa.ts"))?.text).toContain('meta[name="build-time"]');
+});
+
 test("a `?glob` pattern has one extension and no braces, which Bun can't load", () => {
   const wrong: string[] = [];
   for (const { file, text } of code)

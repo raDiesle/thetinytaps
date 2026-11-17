@@ -2,7 +2,8 @@ import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
-import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, textsPreload } from "../tools/pageStart";
+import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "../tools/pageStart";
+import { SCENE_ENTRIES } from "./games/scenes/catalog";
 import { PageLoading } from "./components/PageLoading";
 import { SEO_LANGUAGES, SEO_PAGES } from "./content/seo";
 import { APP_LANGUAGES } from "./lib/language";
@@ -23,6 +24,24 @@ test("every page for search engines knows the page code it opens with, so its bu
   }).map(({ path }) => path);
   expect(missing).toEqual([]);
   expect(modules.get("/zaehne/")).toBe("TeethPage");
+});
+
+test("every picture of Lebendige Bilder knows its own chunk, so its built page fetches the picture with the start", () => {
+  const scenes = sceneModules(readFileSync(join(import.meta.dir, "games", "scenes", "catalog.ts"), "utf8"));
+  expect([...scenes.keys()].sort()).toEqual(SCENE_ENTRIES.map((entry) => entry.id).sort());
+  expect(scenes.get("bauernhof")).toBe("Bauernhof");
+  expect(scenes.get("winterbaustelle")).toBe("WinterBaustelle");
+  const scenePages = SEO_PAGES.filter(({ path }) => pageModuleFor(path, modules) === "ScenePage");
+  expect(scenePages.length).toBeGreaterThan(10);
+  for (const { path } of scenePages) {
+    const module = sceneModuleFor(path, scenes);
+    expect({ path, found: !!module && existsSync(join(import.meta.dir, "games", "scenes", path.split("/")[2], `${module}.tsx`)) }).toEqual({
+      path,
+      found: true,
+    });
+  }
+  expect(sceneModuleFor("/bilder/", scenes)).toBeUndefined();
+  expect(sceneModuleFor("/zaehne/", scenes)).toBeUndefined();
 });
 
 test("a page whose code is still loading shows the paw track on paper, the same as a built page before the app starts", () => {
