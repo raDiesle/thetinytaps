@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import voiceFiles from "./stimme/**/*.mp3?glob";
+import voiceFiles from "./stimme/**/*.mp3?glob-by-language";
 import { useAppLanguage } from "@/lib/language";
 import { ASIDE_LINE_GAP_MS } from "@/lib/spacing";
 import { recordedVoice } from "@/lib/voice";

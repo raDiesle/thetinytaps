@@ -1,4 +1,4 @@
-import voiceFiles from "./stimme/**/*.mp3?glob";
+import voiceFiles from "./stimme/**/*.mp3?glob-by-language";
 import { recordedVoice } from "@/lib/voice";
 
 // What Schatten finden says, from its ElevenLabs recordings (`bun run voice make --only schatten`,

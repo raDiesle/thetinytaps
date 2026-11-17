@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflinePart, sizeOf, wanted } from "./offlineParts";
+import { fileNamesLanguage, isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflinePart, sizeOf, wanted } from "./offlineParts";
 
 // The offline copy keeps only what grown-ups chose (user request, November 2026): the books not left out, in the app
 // language, with its voices and the background song if chosen – never every language's voices (over 200 MB).
@@ -65,4 +65,11 @@ describe("what a choice keeps", () => {
     expect(keep({ languages: ["ru"], skip: [], music: false, voices: true })).toContain("./static/en.mp3");
     expect(sizeOf({ parts }, { languages: ["de", "en"], skip: [], music: false, voices: true })).toBe(521);
   });
+});
+
+test("a voice's file names split by language are known by their chunk's name (`?glob-by-language`)", () => {
+  expect(fileNamesLanguage("static/files-ru.3k9x2abc.js")).toBe("ru");
+  expect(fileNamesLanguage("./static/files-de.zz01.js")).toBe("de");
+  expect(fileNamesLanguage("static/ElevatorPage.f5qcwf6m.js")).toBeUndefined();
+  expect(fileNamesLanguage("static/files-ru.3k9x2abc.mp3")).toBeUndefined();
 });

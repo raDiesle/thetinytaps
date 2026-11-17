@@ -25,8 +25,14 @@ import { recordingName } from "./voiceName";
 /** A line to load: its text, or its text and the same line in English (`say`'s `english`). */
 export type VoiceLine = string | { text: string; english?: string };
 
-/** The voice of one game: the recordings in its stimme/ folder and the folders below (a `?glob` import of their MP3s). */
+/** The voice of one game: the recordings in its stimme/ folder and the folders below (`VoiceFiles`). */
 export interface RecordedVoice {
+  /**
+   * Loads which recordings there are in `language` (a voice split by language, `VoiceFiles`); resolves once they are
+   * known (or after SOUND_WAIT_MS). `ready`, `load` and `say` do it by themselves; a game that asks `has` before them
+   * calls it as it starts.
+   */
+  prepare: (language: string) => Promise<void>;
   /** Starts fetching the recordings of `lines` in `language`, so each plays right when it is due (this round's and the next's). */
   load: (lines: VoiceLine[], language: string) => void;
   /**
@@ -48,7 +54,7 @@ export interface RecordedVoice {
    * line off, so quick answers don't chop line after line.
    */
   say: (text: string, language: string, options?: { queue?: boolean; speechLang?: string; gap?: number; english?: string }) => void;
-  /** True when `text` has a recording in `language`. */
+  /** True when `text` has a recording in `language`; false while a voice split by language still loads its file names (`prepare`). */
   has: (text: string, language: string) => boolean;
 }
 
@@ -169,13 +175,56 @@ function play(buffer: AudioBuffer) {
   });
 }
 
+/** One language's part of a voice's files (file path → URL), as a `?glob-by-language` import loads it. */
+export type LanguagePart = () => Promise<{ default: Readonly<Record<string, string>> }>;
+
 /**
- * A game's voice from its recording files (file path → URL). With `browser`, a line without a recording (English ones included) is said by
+ * A voice's recording files: a `?glob` import (file path → URL, every language in the game's chunk), or a
+ * `?glob-by-language` import (language → its part, each a chunk of its own, tools/appPlugin.ts) for a game with hundreds
+ * of lines a language, so a visit downloads only the file names of its language and of English, which stands in.
+ */
+export type VoiceFiles = Readonly<Record<string, string>> | Readonly<Record<string, LanguagePart>>;
+
+/** The parts whose file names a voice in `language` needs: its own and, for the languages besides German and English, the English stand-ins (`recordingUrl`). */
+export const partsFor = (language: string) => (language === "de" || language === "en" ? [language] : [language, "en"]);
+
+/**
+ * A game's voice from its recording files (`VoiceFiles`). With `browser`, a line without a recording (English ones included) is said by
  * the browser's voice, in `speechLang` (the voice of the language the text is in) or else `language`'s – only for
  * games whose story is told by the voice (`voiceLines.test.ts` keeps the list).
+ * Split by language, a language's file names load with the first thing asked of it in that language (`prepare`, and
+ * `ready`, `load`, `say`, which the games already wait for): until they are there `has` is false and `isReady` too, and
+ * a line said meanwhile waits for them on the chain.
  */
-export function recordedVoice(files: Record<string, string>, { browser = false }: { browser?: boolean } = {}): RecordedVoice {
-  const urls = new Map(Object.entries(files).map(([file, url]) => [file.slice(file.lastIndexOf("/") + 1, -4), url]));
+export function recordedVoice(files: VoiceFiles, { browser = false }: { browser?: boolean } = {}): RecordedVoice {
+  const urls = new Map<string, string>();
+  const add = (map: Readonly<Record<string, string>>) => {
+    for (const [file, url] of Object.entries(map)) urls.set(file.slice(file.lastIndexOf("/") + 1, -4), url);
+  };
+  const parts = Object.values(files).some((value) => typeof value === "function") ? (files as Readonly<Record<string, LanguagePart>>) : null;
+  if (!parts) add(files as Readonly<Record<string, string>>);
+  /** The parts loading or loaded, by language; one that failed (offline) is tried again next time. */
+  const loading = new Map<string, Promise<void>>();
+  const loaded = new Set<string>();
+  const part = (language: string) => {
+    const known = loading.get(language);
+    if (known) return known;
+    const load = parts?.[language];
+    if (!load) return Promise.resolve();
+    const next = load()
+      .then((module) => {
+        add(module.default);
+        loaded.add(language);
+      })
+      .catch(() => {
+        loading.delete(language);
+      });
+    loading.set(language, next);
+    return next;
+  };
+  const known = (language: string) => !parts || partsFor(language).every((each) => !parts[each] || loaded.has(each));
+  const prepare = (language: string) => (known(language) ? Promise.resolve() : Promise.all(partsFor(language).map(part)).then(() => undefined));
+
   const urlOf = (text: string, language: string, english?: string) => recordingUrl(urls, text, language, english);
   const urlsOf = (lines: VoiceLine[], language: string) =>
     lines.flatMap((line) => {
@@ -185,21 +234,25 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
   /** When this voice's last line that only accompanies the play was said (`say`'s `gap`). */
   let lastAside = Number.NEGATIVE_INFINITY;
   return {
+    prepare: (language) => atMost(prepare(language)).then(() => undefined),
     load: (lines, language) => {
-      if (!audioContext()) return;
+      if (!audioContext()) return void prepare(language);
       // Only the files: decoding a line takes a moment when it is said, and a decoded line ten times the memory.
-      for (const url of urlsOf(lines, language)) void fileOf(url);
+      void prepare(language).then(() => {
+        for (const url of urlsOf(lines, language)) void fileOf(url);
+      });
     },
     ready: async (lines, language) => {
-      if (!audioContext()) return;
-      await atMost(Promise.all(urlsOf(lines, language).map(soundOf)));
+      await atMost(prepare(language).then(() => (audioContext() ? Promise.all(urlsOf(lines, language).map(soundOf)) : undefined)));
     },
-    isReady: (lines, language) => !audioContext() || urlsOf(lines, language).every((url) => decoded.has(url) || fetched.has(url)),
+    isReady: (lines, language) => !audioContext() || (known(language) && urlsOf(lines, language).every((url) => decoded.has(url) || fetched.has(url))),
     loadAll: (language) => {
       if (!audioContext()) return;
       // The language's own recordings and, for the others, the English ones that stand in for missing lines.
       const own = language === "de" ? /^[0-9a-f]{8}$/ : new RegExp(`^(${language}|en)-[0-9a-f]{8}$`);
-      for (const [name, url] of urls) if (own.test(name)) void fileOf(url);
+      void prepare(language).then(() => {
+        for (const [name, url] of urls) if (own.test(name)) void fileOf(url);
+      });
     },
     say: (text, language, { queue = false, speechLang, gap, english } = {}) => {
       if (gap !== undefined) {
@@ -208,32 +261,47 @@ export function recordedVoice(files: Record<string, string>, { browser = false }
         if ((!queue && (pending > 0 || talking())) || now - lastAside < gap) return;
         lastAside = now;
       }
-      const url = urlOf(text, language, english);
+      const ready = known(language);
+      const names = ready ? undefined : prepare(language);
       if (!queue) hush();
       const at = generation;
       const stopped = untilHush();
-      if (!url) {
-        if (browser)
-          chain = chain.then(
-            counted(async () => {
-              await pageStill();
-              if (at === generation) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
-            }),
-          );
-        return;
-      }
-      if (!audioContext()) return;
-      const buffer = soundOf(url);
-      chain = chain.then(
-        counted(async () => {
+      /** What saying the line does once its recording's URL is known: play it, or let the browser's voice say it, or nothing. */
+      const sayFrom = (url: string | undefined) => {
+        if (!url)
+          return browser
+            ? async () => {
+                await pageStill();
+                if (at === generation) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
+              }
+            : undefined;
+        if (!audioContext()) return undefined;
+        const buffer = soundOf(url);
+        return async () => {
           await pageStill();
           // Due and not there yet: the paw track shows until it is (SoundLoading), so the child sees it is coming.
           const sound = fetched.has(url) || at !== generation ? await buffer : await waitingFor(Promise.race([atMost(buffer), stopped]));
           if (sound && at === generation) await play(sound);
+        };
+      };
+      if (!names) {
+        const run = sayFrom(urlOf(text, language, english));
+        if (run) chain = chain.then(counted(run));
+        return;
+      }
+      // The language's file names are still coming (the first line in it): the line waits for them on the chain.
+      chain = chain.then(
+        counted(async () => {
+          // The line itself still waits for the page to lie still (`sayFrom`); the names usually come long before.
+          await waitingFor(Promise.race([atMost(names), stopped]));
+          if (at === generation) await sayFrom(urlOf(text, language, english))?.();
         }),
       );
     },
-    has: (text, language) => urlOf(text, language) !== undefined,
+    has: (text, language) => {
+      if (!known(language)) void prepare(language);
+      return urlOf(text, language) !== undefined;
+    },
   };
 }
 

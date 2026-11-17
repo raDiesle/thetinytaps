@@ -52,7 +52,7 @@ test("no two lines of a game share a recording", () => {
 test("every recorded game's folder is played, with its languages below it", () => {
   for (const game of RECORDED_GAMES) {
     const player = PLAYERS[game.folder];
-    const plays = !!player && dirname(player) === dirname(game.folder) && readFileSync(player, "utf8").includes('"./stimme/**/*.mp3?glob"');
+    const plays = !!player && dirname(player) === dirname(game.folder) && /"\.\/stimme\/\*\*\/\*\.mp3\?glob(-by-language)?"/.test(readFileSync(player, "utf8"));
     expect({ folder: game.folder, plays }).toEqual({ folder: game.folder, plays: true });
   }
 });

@@ -1,4 +1,4 @@
-import voiceFiles from "./stimme/**/*.mp3?glob";
+import voiceFiles from "./stimme/**/*.mp3?glob-by-language";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { waitingFor } from "@/lib/soundWait";
 import { recordedVoice, type VoiceLine } from "@/lib/voice";

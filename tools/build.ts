@@ -25,7 +25,7 @@ import { SEO_ZH } from "../src/content/seo.zh";
 import { shelfEntryOf } from "../src/content/games";
 import { levelPaths } from "../src/content/levelPages";
 import { appPlugin, PRODUCTION } from "./appPlugin";
-import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
+import { fileNamesLanguage, isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
 import { BOOT_WAIT, chunkClosure, countedHosts, fontsAsFiles, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "./pageStart";
 import { structuredDataTags } from "./structuredData";
 import { CRAWLER, LANGUAGE_KEY } from "../src/lib/locale";
@@ -414,7 +414,8 @@ async function writeServiceWorker(built: Built) {
  * A file belongs to the books whose pages' code names it: each lazy page of App.tsx with every chunk it imports (and
  * loads later itself, but no other page), less what the start already needs, which every book shares. The other
  * languages' voices and songs are told apart by their names; an English recording stands in for the languages whose
- * recordings in the same game's code fall short (`needsEnglish`).
+ * recordings in the same game's code fall short (`needsEnglish`). A voice's file names split by language
+ * (`files-<language>.<hash>.js`, `fileNamesLanguage`) go with their language, the English ones with every language but German.
  */
 async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
   const escaped = `${base}/static/`.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
@@ -455,8 +456,10 @@ async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
     const part: OfflinePart = { path: `./${file}`, bytes: (await Bun.file(join(OUT, file)).size) as number };
     const inBooks = books.get(file);
     if (inBooks) part.books = [...inBooks].sort();
-    const language = languageOf(file);
+    const language = languageOf(file) ?? fileNamesLanguage(file);
     if (language) part.language = language;
+    // English file names come with every language but German: the voice looks its stand-ins up there (src/lib/voice.ts).
+    if (fileNamesLanguage(file) === "en") english.set(file, new Set(SEO_LANGUAGES.filter((l) => l !== "de" && l !== "en")));
     if (isBackgroundSong(file)) part.music = true;
     if (isVoice(file)) part.voice = true;
     const standsIn = english.get(file);

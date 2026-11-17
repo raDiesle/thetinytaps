@@ -5,7 +5,7 @@ import { hush, recordedVoice } from "@/lib/voice";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
-import voiceFiles from "./stimme/**/*.mp3?glob";
+import voiceFiles from "./stimme/**/*.mp3?glob-by-language";
 
 /** Said with the laugh when a good idea is chosen, one at random. */
 export const PRAISE: Localized<string[]> = {
@@ -68,6 +68,8 @@ export function useVoice(settings: FeelingsSettings) {
     },
     [language.id],
   );
+  // Which lines have recordings is loaded per language (`prepare`); `voiced` needs it also while the voice is off.
+  useEffect(() => void voice.prepare(language.id), [language.id]);
   const voiced = useCallback((text: string) => voice.has(text, language.id), [language.id]);
   /** Starts loading the recordings of a story's lines, so each is said right when its picture comes; nothing while the voice is off. */
   const preload = useCallback(

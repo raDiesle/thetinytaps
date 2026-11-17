@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { basename, dirname } from "node:path";
 import { isWaiting, waitingFor } from "./soundWait";
-import { forgetOld, hush, recordingUrl, untilHush } from "./voice";
+import { forgetOld, hush, recordedVoice, recordingUrl, untilHush } from "./voice";
 import { recordingName } from "./voiceName";
 
 // What a line with a missing recording does (user decision, November 2026): the English recording plays instead,
@@ -86,4 +86,58 @@ test("a line still waiting for its recording stops waiting when the game is left
   expect(isWaiting()).toBe(false);
   // say() waits so: a recording not there yet races the next hush.
   expect(readFileSync(new URL("./voice.ts", import.meta.url), "utf8")).toContain("waitingFor(Promise.race([atMost(buffer), stopped]))");
+});
+
+// A game with hundreds of lines a language gets its file names split by language (`?glob-by-language`, R-P1): a visit
+// loads only its language's names and the English ones that stand in for missing lines, when first asked.
+describe("a voice split by language", () => {
+  const asked: string[] = [];
+  const part = (language: string, texts: string[]) => async () => {
+    asked.push(language);
+    return { default: Object.fromEntries(texts.map((text) => [`${language}/${recordingName(text, language)}.mp3`, `${language}:${text}`])) };
+  };
+  const parts = {
+    de: part("de", ["Gute Nacht!"]),
+    en: part("en", ["Good night!"]),
+    ru: part("ru", ["Спокойной ночи!"]),
+    es: part("es", []),
+  };
+
+  test("knows no line before its language is loaded, then its own and the English ones", async () => {
+    asked.length = 0;
+    const voice = recordedVoice(parts);
+    expect(asked).toEqual([]);
+    await voice.prepare("ru");
+    expect(asked.sort()).toEqual(["en", "ru"]);
+    expect(voice.has("Спокойной ночи!", "ru")).toBe(true);
+    expect(voice.has("Good night!", "en")).toBe(true);
+    expect(voice.has("Gute Nacht!", "de")).toBe(false);
+  });
+
+  test("German loads only German, and each part only once", async () => {
+    asked.length = 0;
+    const voice = recordedVoice(parts);
+    await Promise.all([voice.ready(["Gute Nacht!"], "de"), voice.prepare("de")]);
+    await voice.prepare("de");
+    expect(asked).toEqual(["de"]);
+    expect(voice.has("Gute Nacht!", "de")).toBe(true);
+  });
+
+  test("a language switched to loads its own part then", async () => {
+    asked.length = 0;
+    const voice = recordedVoice(parts);
+    await voice.prepare("en");
+    await voice.prepare("es");
+    expect(asked).toEqual(["en", "es"]);
+  });
+
+  test("the plugin gives one part per language folder, German outside them", async () => {
+    const { default: byLanguage } = await import("../games/letters/stimme/**/*.mp3?glob-by-language");
+    expect(Object.keys(byLanguage)).toEqual(expect.arrayContaining(["de", "en", "ru"]));
+    const [de, ru] = await Promise.all([byLanguage.de(), byLanguage.ru()]);
+    const names = (map: Readonly<Record<string, string>>) => Object.keys(map);
+    expect(names(de.default).length).toBeGreaterThan(100);
+    expect(names(de.default).every((file) => !file.includes("/"))).toBe(true);
+    expect(names(ru.default).every((file) => file.startsWith("ru/ru-"))).toBe(true);
+  });
 });
