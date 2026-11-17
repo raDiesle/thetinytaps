@@ -56,6 +56,13 @@ export function languageOf(path: string): string | undefined {
  */
 export const fileNamesLanguage = (path: string) => /(?:^|\/)files-([a-z]{2})\.[a-z0-9]+\.js$/.exec(path)?.[1];
 
+/**
+ * The language of a game's part of the texts, a chunk `texts-<language>-<part>.<hash>.js` (src/content/texts, loaded
+ * with the game's page): kept offline with that language and the game's book. The language's own texts chunk
+ * (`texts-<language>.<hash>.js`) is none of these; the worker keeps it by its TEXTS.
+ */
+export const textsPartLanguage = (path: string) => /(?:^|\/)texts-([a-z]{2})-[a-z]+\.[a-z0-9]+\.js$/.exec(path)?.[1];
+
 /** A recorded line of a game's voice (a song sung in a language is the game's, not a voice). */
 export const isVoice = (path: string) => languageOf(path) !== undefined && !/(^|\/)musik-[^/]*$/.test(path);
 

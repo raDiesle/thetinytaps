@@ -44,7 +44,9 @@ describe("home menu", () => {
 
   test("every game with cards has an address for each level (`/:level?`), which GameShell keeps in step", () => {
     // Which page shows which game: the pages import the games' start screens, App.tsx loads the pages.
-    const pageFiles = new Map([...app.matchAll(/const (\w+) = page\(\(\) => import\("@\/pages\/(\w+)"\)/g)].map((m) => [m[1], m[2]]));
+    const pageFiles = new Map(
+      [...app.matchAll(/const (\w+) = page\(\s*(?:withTexts\("\w+",\s*)?\(\) => import\("@\/pages\/(\w+)"\)/g)].map((m) => [m[1], m[2]]),
+    );
     const routeOf = new Map([...app.matchAll(/<Route path="([^"]+)" element=\{<(\w+) \/>\}/g)].map((m) => [m[2], m[1]]));
     const withCards: string[] = [];
     for (const dir of readdirSync("src/games")) {

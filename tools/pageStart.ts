@@ -12,13 +12,26 @@ export const BOOT_WAIT = '<div class="boot-wait" aria-hidden="true"><span></span
 
 /**
  * The lazy-loaded page modules of App.tsx by the addresses they open at (`/zaehne/` → `TeethPage`), read from its
- * `page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/")` lines.
+ * `page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/")` lines (a loader may be wrapped in `withTexts`, a call
+ * broken over several lines by the formatter).
  */
 export function pageModules(appSource: string) {
   const modules = new Map<string, string>();
-  for (const [, module, paths] of appSource.matchAll(/page\(\(\) => import\("@\/pages\/(\w+)"\), "\w+"((?:, "[^"]+")*)\)/g))
+  for (const [, module, paths] of appSource.matchAll(
+    /page\(\s*(?:withTexts\("\w+",\s*)?\(\) => import\("@\/pages\/(\w+)"\)\)?,\s*"\w+"((?:,\s*"[^"]+")*),?\s*\)/g,
+  ))
     for (const [, path] of paths.matchAll(/"([^"]+)"/g)) modules.set(path, module);
   return modules;
+}
+
+/**
+ * The part of the texts each page module loads with its code (`TogetherPage` → `together`), read from App.tsx's
+ * `page(withTexts("together", () => import("@/pages/TogetherPage")), …)` lines: its chunks are `texts-<language>-<part>`.
+ */
+export function pageTextsParts(appSource: string) {
+  const parts = new Map<string, string>();
+  for (const [, part, module] of appSource.matchAll(/withTexts\("(\w+)",\s*\(\) => import\("@\/pages\/(\w+)"\)\)/g)) parts.set(module, part);
+  return parts;
 }
 
 /**

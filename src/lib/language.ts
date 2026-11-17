@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
-import { hasTexts, loadTexts } from "@/content/texts";
+import { hasTexts, hasTextsPart, loadTexts, loadTextsPart, type TextsPart } from "@/content/texts";
 import { LANGUAGE_KEY, playLanguage } from "@/lib/locale";
 import { addressLanguage } from "@/lib/pageAddress";
 import { keepTextsOffline } from "@/lib/pwa";
@@ -79,9 +79,25 @@ export async function loadAppLanguage() {
   }
 }
 
+/** The parts of the texts (`TextsPart`) the pages of this visit asked for: a switch of language loads them too. */
+const askedParts = new Set<TextsPart>();
+
+/**
+ * A page's loader (App.tsx) that brings its game's part of the texts in the app language together with its code, so
+ * the page, held on the loading paper until both are there, never shows its first language first and then flips. The
+ * part is remembered for a later switch of language (`setAppLanguage`); German, without parts, loads nothing more.
+ */
+export function withTexts<T>(part: TextsPart, load: () => Promise<T>): () => Promise<T> {
+  return () => {
+    askedParts.add(part);
+    return Promise.all([load(), loadTextsPart(part, current)]).then(([module]) => module);
+  };
+}
+
 /**
  * Switches the whole app to `id` and remembers it; every component using the language renders again. A language
- * not loaded yet switches once its texts are there; offline without them, the app stays in the language it has.
+ * not loaded yet switches once its texts are there, with the parts the pages of this visit asked for (`withTexts`),
+ * so the game on screen changes language whole; offline without them, the app stays in the language it has.
  */
 export function setAppLanguage(id: TargetLanguageId) {
   const switchTo = () => {
@@ -95,9 +111,10 @@ export function setAppLanguage(id: TargetLanguageId) {
     keepTextsOffline(id);
     for (const listener of listeners) listener();
   };
-  if (hasTexts(id)) switchTo();
+  const parts = [...askedParts];
+  if (hasTexts(id) && parts.every((part) => hasTextsPart(part, id))) switchTo();
   // German plays without its texts (only the English-first stories' translations are missing, and show in English).
-  else loadTexts(id).then(switchTo, id === "de" ? switchTo : () => {});
+  else Promise.all([loadTexts(id), ...parts.map((part) => loadTextsPart(part, id))]).then(switchTo, id === "de" ? switchTo : () => {});
 }
 
 /** The app language outside React, e.g. in a sound helper; components use useAppLanguage. */

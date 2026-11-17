@@ -25,8 +25,28 @@ import { SEO_ZH } from "../src/content/seo.zh";
 import { shelfEntryOf } from "../src/content/games";
 import { levelPaths } from "../src/content/levelPages";
 import { appPlugin, PRODUCTION } from "./appPlugin";
-import { fileNamesLanguage, isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
-import { BOOT_WAIT, chunkClosure, countedHosts, fontsAsFiles, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "./pageStart";
+import {
+  fileNamesLanguage,
+  isBackgroundSong,
+  isVoice,
+  languageOf,
+  needsEnglish,
+  type OfflineManifest,
+  type OfflinePart,
+  textsPartLanguage,
+} from "../src/lib/offlineParts";
+import {
+  BOOT_WAIT,
+  chunkClosure,
+  countedHosts,
+  fontsAsFiles,
+  pageModuleFor,
+  pageModules,
+  pageTextsParts,
+  sceneModuleFor,
+  sceneModules,
+  textsPreload,
+} from "./pageStart";
 import { structuredDataTags } from "./structuredData";
 import { CRAWLER, LANGUAGE_KEY } from "../src/lib/locale";
 
@@ -292,7 +312,7 @@ async function writePages(template: string, out: Built) {
   await put("404.html", textsOf(template, "de"));
   const built = SEO_LANGUAGES.flatMap((language) => SEO_PAGES.map((page): BuiltPage => ({ language, page, text: textIn(page, language) })));
   for (const one of built) {
-    let html = replaceOnce(textsOf(template, one.language), '<html lang="de">', `<html lang="${one.language}">`);
+    let html = replaceOnce(textsOf(template, one.language, one.page.path), '<html lang="de">', `<html lang="${one.language}">`);
     html = replaceOnce(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(one.text, one.page.path))}</title>`);
     html = replaceOnce(html, /<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${escapeHtml(one.text.description)}" />`);
     html = replaceOnce(html, "</head>", `  ${[headTags(one), ...(await preloadsOf(one))].join("\n    ")}\n  </head>`);
@@ -332,10 +352,13 @@ async function writePages(template: string, out: Built) {
  * tags they were fetched only after the start's code had run, one round trip after another). And `textsOf`, which puts the script into a page's head that fetches the texts of the language the visitor
  * will play in (textsPreload) – the browser's, not the address's: a German page played in English needs the English
  * texts, an English page played in German none. They come down together with the start's code, while the page's title
- * waits on paper (`.boot`).
+ * waits on paper (`.boot`). On the page of a game whose texts are a part of their own (`withTexts` in App.tsx), the
+ * same script fetches that part in the same language beside them (R-P4).
  */
 async function pagePreloads(template: string, built: Built) {
-  const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
+  const app = await readFile(join(ROOT, "src/App.tsx"), "utf8");
+  const modules = pageModules(app);
+  const textsParts = pageTextsParts(app);
   const scenes = sceneModules(await readFile(join(ROOT, "src/games/scenes/catalog.ts"), "utf8"));
   const linked = new Set([...template.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]));
   const chunkOf = (name: string) => {
@@ -344,8 +367,19 @@ async function pagePreloads(template: string, built: Built) {
     return found;
   };
   const unlinked = async (first: string) => (await built.closure(first)).map((file) => href(`/${file}`)).filter((url) => !linked.has(url));
-  const texts: Record<string, string[]> = {};
-  for (const language of SEO_LANGUAGES) texts[language] = await unlinked(chunkOf(`texts-${language}`));
+  const own: Record<string, string[]> = {};
+  for (const language of SEO_LANGUAGES) own[language] = await unlinked(chunkOf(`texts-${language}`));
+  /** Each language's texts with the chunks of `part` in it (German has none). */
+  const withPart = async (part: string) => {
+    const all: Record<string, string[]> = {};
+    for (const language of SEO_LANGUAGES) {
+      const chunk = built.chunkOf(`texts-${language}-${part}`);
+      all[language] = [...new Set([...own[language], ...(chunk ? await unlinked(chunk) : [])])];
+    }
+    return all;
+  };
+  const byPart = new Map<string, Record<string, string[]>>();
+  for (const part of new Set(textsParts.values())) byPart.set(part, await withPart(part));
   const stylesheet = '<link rel="stylesheet"';
   return {
     preloadsOf: async ({ page }: BuiltPage) => {
@@ -357,8 +391,12 @@ async function pagePreloads(template: string, built: Built) {
       const urls = new Set([...(module ? await unlinked(chunkOf(module)) : []), ...(scene ? await unlinked(chunkOf(scene)) : [])]);
       return [...urls].map((url) => `<link rel="modulepreload" crossorigin href="${url}">`);
     },
-    textsOf: (html: string, address: SeoLanguage) =>
-      replaceOnce(html, stylesheet, `${textsPreload(texts, address, { key: LANGUAGE_KEY, crawler: CRAWLER })}${stylesheet}`),
+    textsOf: (html: string, address: SeoLanguage, path?: string) => {
+      const module = path === undefined ? undefined : pageModuleFor(path, modules);
+      const part = module ? textsParts.get(module) : undefined;
+      const texts = (part && byPart.get(part)) || own;
+      return replaceOnce(html, stylesheet, `${textsPreload(texts, address, { key: LANGUAGE_KEY, crawler: CRAWLER })}${stylesheet}`);
+    },
   };
 }
 
@@ -435,11 +473,14 @@ async function writeServiceWorker(built: Built) {
  * loads later itself, but no other page), less what the start already needs, which every book shares. The other
  * languages' voices and songs are told apart by their names; an English recording stands in for the languages whose
  * recordings in the same game's code fall short (`needsEnglish`). A voice's file names split by language
- * (`files-<language>.<hash>.js`, `fileNamesLanguage`) go with their language, the English ones with every language but German.
+ * (`files-<language>.<hash>.js`, `fileNamesLanguage`) go with their language, the English ones with every language but German;
+ * a game's part of the texts (`texts-<language>-<part>.<hash>.js`, `textsPartLanguage`) with its language and its page's book.
  */
 async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
   const escaped = `${base}/static/`.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
-  const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
+  const app = await readFile(join(ROOT, "src/App.tsx"), "utf8");
+  const modules = pageModules(app);
+  const textsParts = pageTextsParts(app);
   const pageChunks = new Set([...new Set(modules.values())].map(chunkOf).filter((chunk): chunk is string => !!chunk));
   /** The files a chunk's code names (pictures, sounds), besides itself. */
   const named = async (chunk: string) => [
@@ -454,6 +495,11 @@ async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
   const shared = new Set<string>();
   for (const chunk of start) for (const file of await named(chunk)) shared.add(file);
 
+  /** The chunks of `part` in `language` (none where the language has no such part). */
+  const textsChunks = async (language: string, part: string) => {
+    const first = chunkOf(`texts-${language}-${part}`);
+    return first ? await closure(first) : [];
+  };
   const books = new Map<string, Set<string>>();
   const english = new Map<string, Set<string>>();
   for (const [path, module] of modules) {
@@ -461,8 +507,12 @@ async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
     const chunk = chunkOf(module);
     if (!book || !chunk) continue;
     const used: string[] = [];
-    // A chunk with the chunks it imports, statically or later, but never another page.
-    for (const each of await closure(chunk, { stop: pageChunks })) if (!start.has(each)) used.push(...(await named(each)));
+    // A chunk with the chunks it imports, statically or later, but never another page. The parts of the texts are
+    // reached through the start's code here (src/content/texts loads them all), so they are left to the lines below.
+    for (const each of await closure(chunk, { stop: pageChunks })) if (!start.has(each) && !textsPartLanguage(each)) used.push(...(await named(each)));
+    // Its part of the texts in every language (`withTexts`): the start's code loads it, but only for this page.
+    const part = textsParts.get(module);
+    if (part) for (const language of SEO_LANGUAGES) for (const each of await textsChunks(language, part)) if (!start.has(each)) used.push(each);
     const lacking = needsEnglish(used)(SEO_LANGUAGES);
     for (const file of used) {
       if (shared.has(file)) continue;
@@ -479,7 +529,7 @@ async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
     const part: OfflinePart = { path: `./${file}`, bytes: (await Bun.file(join(OUT, file)).size) as number };
     const inBooks = books.get(file);
     if (inBooks) part.books = [...inBooks].sort();
-    const language = languageOf(file) ?? fileNamesLanguage(file);
+    const language = languageOf(file) ?? fileNamesLanguage(file) ?? textsPartLanguage(file);
     if (language) part.language = language;
     // English file names come with every language but German: the voice looks its stand-ins up there (src/lib/voice.ts).
     if (fileNamesLanguage(file) === "en") english.set(file, new Set(SEO_LANGUAGES.filter((l) => l !== "de" && l !== "en")));

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { fileNamesLanguage, isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflinePart, sizeOf, wanted } from "./offlineParts";
+import { fileNamesLanguage, isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflinePart, sizeOf, textsPartLanguage, wanted } from "./offlineParts";
 
 // The offline copy keeps only what grown-ups chose (user request, November 2026): the books not left out, in the app
 // language, with its voices and the background song if chosen – never every language's voices (over 200 MB).
@@ -72,4 +72,19 @@ test("a voice's file names split by language are known by their chunk's name (`?
   expect(fileNamesLanguage("./static/files-de.zz01.js")).toBe("de");
   expect(fileNamesLanguage("static/ElevatorPage.f5qcwf6m.js")).toBeUndefined();
   expect(fileNamesLanguage("static/files-ru.3k9x2abc.mp3")).toBeUndefined();
+});
+
+test("a game's part of the texts is known by its chunk's name, and kept only with its language and its book", () => {
+  expect(textsPartLanguage("static/texts-ru-together.3k9x2abc.js")).toBe("ru");
+  expect(textsPartLanguage("./static/texts-hi-feelings.zz01.js")).toBe("hi");
+  // The language's own texts are kept by the worker's TEXTS, never as a part of a book.
+  expect(textsPartLanguage("static/texts-ru.3k9x2abc.js")).toBeUndefined();
+  expect(textsPartLanguage("static/TogetherPage.f5qcwf6m.js")).toBeUndefined();
+  const part: OfflinePart = { path: "./static/texts-ru-together.ab12.js", bytes: 10, books: ["lernspiele"], language: "ru" };
+  const choice = { languages: ["ru"], skip: [], music: false, voices: true };
+  expect(wanted(part, choice)).toBe(true);
+  expect(wanted(part, { ...choice, languages: ["en"] })).toBe(false);
+  expect(wanted(part, { ...choice, skip: ["lernspiele"] })).toBe(false);
+  // Without the voices the texts still come: they are what the game shows.
+  expect(wanted(part, { ...choice, voices: false })).toBe(true);
 });

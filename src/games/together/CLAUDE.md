@@ -209,13 +209,13 @@ The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arab
 texts (name, blurb, ⚙️, the topic line) are inline `t({ de, … })`; the sentences are `TOGETHER_TEXTS` (`pick(…, language.id)`),
 German built from the pairs' articles (`GERMAN_SAYS`: „gehört“, „gehören“ for a `plural` partner, „braucht“), every
 other language written out per pair in `content.<lang>.ts` (a `TogetherTranslation`: name, partner, question – the
-pair's wish in that language –, right, belongs) and listed in `src/content/texts/texts-<lang>.ts`, never imported from game code. A pair without its sentences
+pair's wish in that language –, right, belongs) and listed in `src/content/texts/texts-<lang>-together.ts` (a chunk loaded with the game's page, `withTexts`), never imported from game code. A pair without its sentences
 in a language is said wholly in German, and its name under the choice shows in German. Things "go with" each other,
 helpers "need" their tools; where a verb would follow someone's gender, the sentence is built so it follows the tool or
 no one (Hindi „… के लिए … चाहिए“, Russian „нужен / нужна / нужны“), and the helpers keep the German ones' gender
 (Spanish la doctora, Arabic تحتاج). Every pair is translated in all six languages, wish included (November 2026; the nine handmade ones in
 `content.<lang>.ts`, all others, painted ones not made yet too, in `content.scenes.<lang>.ts`; both are merged in
-`src/content/texts/texts-<lang>.ts`, and `content.test.ts` checks that every pair has its sentences in each language,
+`src/content/texts/texts-<lang>-together.ts`, and `content.test.ts` checks that every pair has its sentences in each language,
 which differ from the German, the names of things excepted in languages with Latin letters: Pizza, Computer; that the
 game says exactly them; and that no wish holds its partner's name in that language). A translated wish keeps the rules
 of the German one: it never names its partner, nor in the helper's name where that holds it in that language (English

@@ -23,17 +23,11 @@ import { ES as weltall } from "@/games/scenes/weltall/es";
 import { ES as winter } from "@/games/scenes/winter/es";
 import { ES as winterbaustelle } from "@/games/scenes/winterbaustelle/es";
 import { ES as zoo } from "@/games/scenes/zoo/es";
-import { ES as elevator } from "@/games/elevator/es";
 import { SPANISH as animals } from "@/games/animals/content.es";
-import { SPANISH as togetherHandmade } from "@/games/together/content.es";
-import { SPANISH_SCENES as togetherScenes } from "@/games/together/content.scenes.es";
 import { SPANISH as shadows } from "@/games/shadows/content.es";
 import { SPANISH_TEXTS as socks } from "@/games/socks/content.es";
 import { STEP_TEXTS_ES as teethSteps } from "@/games/teeth/steps.es";
 import { DAYTIME_ES as teethDaytime } from "@/games/teeth/daytime.es";
-import { COMFORTS_ES as comforts, FEELINGS_ES as feelings } from "@/games/feelings/bear.es";
-import { SITUATIONS_ES as situations } from "@/games/feelings/kita.es";
-import { DAYS_ES as days } from "@/games/feelings/days.es";
 import { MILK_CHAIN_ES as milkChain } from "@/games/milkchain/es";
 import { PACIFIER_STORY_ES as pacifierStory } from "@/games/pacifierstory/es";
 import { HAIR_STORY_ES as hairStory } from "@/games/hairstory/es";
@@ -73,17 +67,11 @@ export const TEXTS: LanguageTexts = {
     winterbaustelle,
     zoo,
   },
-  elevator,
   animals,
-  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,
   teethDaytime,
-  comforts,
-  feelings,
-  situations,
-  days,
   milkChain,
   pacifierStory,
   hairStory,

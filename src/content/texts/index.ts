@@ -27,6 +27,10 @@ import type { StepId, StepTexts } from "@/games/teeth/steps";
 // in English. The service worker keeps only the languages a page has loaded (tools/build.ts leaves texts-*.js out
 // of the files it keeps for every visitor).
 //
+// The biggest games' texts (Was gehört zusammen?, Gefühle, Kleine Abenteuer: about half of a language's texts) are
+// parts of their own (`TextsPart`, texts-<id>-<part>.ts), loaded only with their game's page (`withTexts` in
+// src/lib/language.ts, App.tsx), so the first screen of a visit in another language doesn't wait for them (R-P4).
+//
 // The games keep their tables by language (`PHRASEBOOKS`, `SHADOW_TRANSLATIONS`, …); `byLanguage` makes such
 // a table and fills it as languages load, so a game reads it as before.
 
@@ -39,7 +43,7 @@ export interface LanguageTexts {
   pack?: LanguagePack;
   /** Lebendige Bilder: each picture's translation by scene id (`scenes/<scene>/<id>.ts`). */
   scenes?: Record<string, SceneTranslation>;
-  /** Kleine Abenteuer: the phrasebook by German sentence (`elevator/<id>.ts`). */
+  /** Kleine Abenteuer: the phrasebook by German sentence (`elevator/<id>.ts`), in its part (`texts-<id>-elevator.ts`). */
   elevator?: Record<string, string>;
   /** Tiere füttern (`animals/content.<id>.ts`). */
   animals?: AnimalTranslation;
@@ -47,13 +51,13 @@ export interface LanguageTexts {
   shadows?: ShadowTranslation;
   /** Socken-Paare (`socks/content.<id>.ts`); German fills the gaps. */
   socks?: Partial<SockTexts>;
-  /** Was gehört zusammen?: each pair's sentences (`together/content.<id>.ts`); German fills the gaps. */
+  /** Was gehört zusammen?: each pair's sentences (`together/content.<id>.ts`), in its part; German fills the gaps. */
   together?: TogetherTranslation;
   /** Zähne putzen: the steps by step id (`teeth/steps.<id>.ts`). */
   teethSteps?: Partial<Record<StepId, Partial<StepTexts>>>;
   /** Zähne putzen: morning and evening (`teeth/daytime.<id>.ts`). */
   teethDaytime?: Record<Daytime, Partial<DaytimeTexts>>;
-  /** Gefühle, Zu Hause: the kind things and the bear's feelings (`feelings/bear.<id>.ts`). */
+  /** Gefühle, Zu Hause: the kind things and the bear's feelings (`feelings/bear.<id>.ts`); all of Gefühle is in its part. */
   comforts?: Partial<Record<ComfortId, ComfortText>>;
   feelings?: Partial<Record<FeelingId, FeelingText>>;
   /** Gefühle, Im Kindergarten (`feelings/kita.<id>.ts`). */
@@ -91,36 +95,93 @@ const MODULES: Record<TextsLanguageId, () => Promise<{ TEXTS: LanguageTexts }>> 
 /** Every language with texts of its own, e.g. for the tests, which load them all. */
 export const TEXTS_LANGUAGES = Object.keys(MODULES) as TextsLanguageId[];
 
-const loaded = new Map<TextsLanguageId, LanguageTexts>();
-const loading = new Map<TextsLanguageId, Promise<void>>();
+/**
+ * The parts loaded only with their game's page, each language's a chunk of its own (texts-<id>-<part>.<hash>.js, which
+ * src/lib/offlineParts.ts knows by its name); a language without one (German) loads nothing for it.
+ */
+const PART_MODULES = {
+  together: {
+    en: () => import("./texts-en-together"),
+    zh: () => import("./texts-zh-together"),
+    hi: () => import("./texts-hi-together"),
+    es: () => import("./texts-es-together"),
+    ar: () => import("./texts-ar-together"),
+    ru: () => import("./texts-ru-together"),
+  },
+  feelings: {
+    en: () => import("./texts-en-feelings"),
+    zh: () => import("./texts-zh-feelings"),
+    hi: () => import("./texts-hi-feelings"),
+    es: () => import("./texts-es-feelings"),
+    ar: () => import("./texts-ar-feelings"),
+    ru: () => import("./texts-ru-feelings"),
+  },
+  elevator: {
+    en: () => import("./texts-en-elevator"),
+    zh: () => import("./texts-zh-elevator"),
+    hi: () => import("./texts-hi-elevator"),
+    es: () => import("./texts-es-elevator"),
+    ar: () => import("./texts-ar-elevator"),
+    ru: () => import("./texts-ru-elevator"),
+  },
+} satisfies Record<string, Partial<Record<TextsLanguageId, () => Promise<{ TEXTS: LanguageTexts }>>>>;
+
+/** A game's texts loaded with its page rather than before the first screen (`withTexts` in src/lib/language.ts). */
+export type TextsPart = keyof typeof PART_MODULES;
+
+/** Every part, e.g. for the tests and tools, which load them all (`loadEveryText`). */
+export const TEXTS_PARTS = Object.keys(PART_MODULES) as TextsPart[];
+
+/** The texts loaded so far, the language's own (by id) and its parts' (by `<id>-<part>`), in the order they came. */
+const loaded = new Map<string, { id: TextsLanguageId; texts: LanguageTexts }>();
+const loading = new Map<string, Promise<void>>();
 const fillers = new Set<(id: TextsLanguageId, texts: LanguageTexts) => void>();
 
-/** Whether the texts of `id` are there. */
-export const hasTexts = (id: TargetLanguageId | LanguageId) => loaded.has(id);
-
-/** Downloads the texts of `id` once and fills every table made with `byLanguage`; fails when offline and not kept. */
-export function loadTexts(id: TargetLanguageId | LanguageId): Promise<void> {
-  if (loaded.has(id)) return Promise.resolve();
+/** Downloads one module of texts once under `key` and fills every table made with `byLanguage`. */
+function loadModule(key: string, id: TextsLanguageId, load: () => Promise<{ TEXTS: LanguageTexts }>): Promise<void> {
+  if (loaded.has(key)) return Promise.resolve();
   const running =
-    loading.get(id) ??
-    MODULES[id]().then(
+    loading.get(key) ??
+    load().then(
       ({ TEXTS }) => {
-        loaded.set(id, TEXTS);
+        loaded.set(key, { id, texts: TEXTS });
         for (const fill of fillers) fill(id, TEXTS);
       },
       (error: unknown) => {
         // A later try (back online) starts afresh.
-        loading.delete(id);
+        loading.delete(key);
         throw error;
       },
     );
-  loading.set(id, running);
+  loading.set(key, running);
   return running;
 }
 
-/** Calls `fill` for every language loaded so far and for each one loaded later. */
+/** Whether the texts of `id` are there (its own; its parts by `hasTextsPart`). */
+export const hasTexts = (id: TargetLanguageId | LanguageId) => loaded.has(id);
+
+/** Downloads the texts of `id` once and fills every table made with `byLanguage`; fails when offline and not kept. */
+export const loadTexts = (id: TargetLanguageId | LanguageId): Promise<void> => loadModule(id, id, MODULES[id]);
+
+/** The module of `part` in `id`, if that language has one. */
+const partModule = (part: TextsPart, id: TextsLanguageId): (() => Promise<{ TEXTS: LanguageTexts }>) | undefined =>
+  (PART_MODULES[part] as Partial<Record<TextsLanguageId, () => Promise<{ TEXTS: LanguageTexts }>>>)[id];
+
+/** Whether `part` is there in `id`; always where the language has no such part. */
+export const hasTextsPart = (part: TextsPart, id: TargetLanguageId | LanguageId) => !partModule(part, id) || loaded.has(`${id}-${part}`);
+
+/** Downloads `part` in `id` once, like `loadTexts`; nothing where the language has no such part. */
+export function loadTextsPart(part: TextsPart, id: TargetLanguageId | LanguageId): Promise<void> {
+  const load = partModule(part, id);
+  return load ? loadModule(`${id}-${part}`, id, load) : Promise.resolve();
+}
+
+/** The texts of `id` with every part, for the tests and tools that read every game in every language. */
+export const loadEveryText = (id: TargetLanguageId | LanguageId) => Promise.all([loadTexts(id), ...TEXTS_PARTS.map((part) => loadTextsPart(part, id))]);
+
+/** Calls `fill` for every language (and part) loaded so far and for each one loaded later. */
 export function onTexts(fill: (id: TextsLanguageId, texts: LanguageTexts) => void) {
-  for (const [id, texts] of loaded) fill(id, texts);
+  for (const { id, texts } of loaded.values()) fill(id, texts);
   fillers.add(fill);
 }
 

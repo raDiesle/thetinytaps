@@ -178,8 +178,8 @@ async function record(config, text, seed, language) {
 const load = (path) => import(pathToFileURL(resolve(path)).href);
 // The games' data imports like the app's (`…?glob`) and reads translations loaded by language, as in the tests.
 plugin((await load("tools/appPlugin.ts")).appPlugin());
-const { loadTexts, TEXTS_LANGUAGES } = await load("src/content/texts/index.ts");
-await Promise.all(TEXTS_LANGUAGES.map(loadTexts));
+const { loadEveryText, TEXTS_LANGUAGES } = await load("src/content/texts/index.ts");
+await Promise.all(TEXTS_LANGUAGES.map(loadEveryText));
 const { recordingName, voiceId } = await load("src/lib/voiceName.ts");
 const { spokenLines } = await load(join(ADVENTURE, "voiceId.ts"));
 const { RECORDED_GAMES, RECORDED_LANGUAGES } = await load("src/content/recordedLines.ts");

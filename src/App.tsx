@@ -4,6 +4,7 @@ import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { PageLoading } from "@/components/PageLoading";
 import { CategoryPage } from "@/pages/CategoryPage";
 import { useHistoryTrail } from "@/lib/goBack";
+import { withTexts } from "@/lib/language";
 import { lazyPage } from "@/lib/lazyPage";
 import { registerPage } from "@/lib/preloadPages";
 import { Home } from "@/pages/Home";
@@ -21,8 +22,16 @@ function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, n
 
 const AdventurePage = page(() => import("@/pages/AdventurePage"), "AdventurePage", "/abenteuer/");
 const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage", "/tiere/");
-const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage", "/kleine-abenteuer/");
-const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage", "/gefuehle/");
+const ElevatorPage = page(
+  withTexts("elevator", () => import("@/pages/ElevatorPage")),
+  "ElevatorPage",
+  "/kleine-abenteuer/",
+);
+const FeelingsPage = page(
+  withTexts("feelings", () => import("@/pages/FeelingsPage")),
+  "FeelingsPage",
+  "/gefuehle/",
+);
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/buchstaben/");
 const CountingPage = page(() => import("@/pages/LettersPage"), "CountingPage", "/zaehlen/");
 const MovePage = page(() => import("@/pages/LettersPage"), "MovePage", "/mitmachen/");
@@ -47,7 +56,11 @@ const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bild
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
 const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
-const TogetherPage = page(() => import("@/pages/TogetherPage"), "TogetherPage", "/zusammen/");
+const TogetherPage = page(
+  withTexts("together", () => import("@/pages/TogetherPage")),
+  "TogetherPage",
+  "/zusammen/",
+);
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
 const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/");
 const TrophyRoomPage = page(() => import("@/pages/TrophyRoomPage"), "TrophyRoomPage", "/pokale/");

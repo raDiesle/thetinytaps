@@ -23,17 +23,11 @@ import { RU as weltall } from "@/games/scenes/weltall/ru";
 import { RU as winter } from "@/games/scenes/winter/ru";
 import { RU as winterbaustelle } from "@/games/scenes/winterbaustelle/ru";
 import { RU as zoo } from "@/games/scenes/zoo/ru";
-import { RU as elevator } from "@/games/elevator/ru";
 import { RUSSIAN as animals } from "@/games/animals/content.ru";
-import { RUSSIAN as togetherHandmade } from "@/games/together/content.ru";
-import { RUSSIAN_SCENES as togetherScenes } from "@/games/together/content.scenes.ru";
 import { RUSSIAN as shadows } from "@/games/shadows/content.ru";
 import { RUSSIAN_TEXTS as socks } from "@/games/socks/content.ru";
 import { STEP_TEXTS_RU as teethSteps } from "@/games/teeth/steps.ru";
 import { DAYTIME_RU as teethDaytime } from "@/games/teeth/daytime.ru";
-import { COMFORTS_RU as comforts, FEELINGS_RU as feelings } from "@/games/feelings/bear.ru";
-import { SITUATIONS_RU as situations } from "@/games/feelings/kita.ru";
-import { DAYS_RU as days } from "@/games/feelings/days.ru";
 import { MILK_CHAIN_RU as milkChain } from "@/games/milkchain/ru";
 import { PACIFIER_STORY_RU as pacifierStory } from "@/games/pacifierstory/ru";
 import { HAIR_STORY_RU as hairStory } from "@/games/hairstory/ru";
@@ -73,17 +67,11 @@ export const TEXTS: LanguageTexts = {
     winterbaustelle,
     zoo,
   },
-  elevator,
   animals,
-  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,
   teethDaytime,
-  comforts,
-  feelings,
-  situations,
-  days,
   milkChain,
   pacifierStory,
   hairStory,

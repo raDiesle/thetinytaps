@@ -23,17 +23,11 @@ import { AR as weltall } from "@/games/scenes/weltall/ar";
 import { AR as winter } from "@/games/scenes/winter/ar";
 import { AR as winterbaustelle } from "@/games/scenes/winterbaustelle/ar";
 import { AR as zoo } from "@/games/scenes/zoo/ar";
-import { AR as elevator } from "@/games/elevator/ar";
 import { ARABIC as animals } from "@/games/animals/content.ar";
-import { ARABIC as togetherHandmade } from "@/games/together/content.ar";
-import { ARABIC_SCENES as togetherScenes } from "@/games/together/content.scenes.ar";
 import { ARABIC as shadows } from "@/games/shadows/content.ar";
 import { ARABIC_TEXTS as socks } from "@/games/socks/content.ar";
 import { STEP_TEXTS_AR as teethSteps } from "@/games/teeth/steps.ar";
 import { DAYTIME_AR as teethDaytime } from "@/games/teeth/daytime.ar";
-import { COMFORTS_AR as comforts, FEELINGS_AR as feelings } from "@/games/feelings/bear.ar";
-import { SITUATIONS_AR as situations } from "@/games/feelings/kita.ar";
-import { DAYS_AR as days } from "@/games/feelings/days.ar";
 import { MILK_CHAIN_AR as milkChain } from "@/games/milkchain/ar";
 import { PACIFIER_STORY_AR as pacifierStory } from "@/games/pacifierstory/ar";
 import { HAIR_STORY_AR as hairStory } from "@/games/hairstory/ar";
@@ -73,17 +67,11 @@ export const TEXTS: LanguageTexts = {
     winterbaustelle,
     zoo,
   },
-  elevator,
   animals,
-  together: { ...togetherHandmade, ...togetherScenes },
   shadows,
   socks,
   teethSteps,
   teethDaytime,
-  comforts,
-  feelings,
-  situations,
-  days,
   milkChain,
   pacifierStory,
   hairStory,

@@ -2,10 +2,21 @@ import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
-import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "../tools/pageStart";
+import {
+  BOOT_WAIT,
+  chunkClosure,
+  countedHosts,
+  pageModuleFor,
+  pageModules,
+  pageTextsParts,
+  sceneModuleFor,
+  sceneModules,
+  textsPreload,
+} from "../tools/pageStart";
 import { SCENE_ENTRIES } from "./games/scenes/catalog";
 import { PageLoading } from "./components/PageLoading";
 import { SEO_LANGUAGES, SEO_PAGES } from "./content/seo";
+import { TEXTS_PARTS } from "./content/texts";
 import { APP_LANGUAGES } from "./lib/language";
 import { CRAWLER, LANGUAGE_KEY, playLanguage } from "./lib/locale";
 
@@ -24,6 +35,15 @@ test("every page for search engines knows the page code it opens with, so its bu
   }).map(({ path }) => path);
   expect(missing).toEqual([]);
   expect(modules.get("/zaehne/")).toBe("TeethPage");
+});
+
+test("every part of the texts is loaded with a page, and that page's built page fetches it in the visitor's language", () => {
+  const parts = pageTextsParts(app);
+  expect(parts.get("TogetherPage")).toBe("together");
+  expect(modules.get("/zusammen/")).toBe("TogetherPage");
+  expect([...new Set(parts.values())].sort()).toEqual([...TEXTS_PARTS].sort());
+  const build = readFileSync(join(import.meta.dir, "..", "tools", "build.ts"), "utf8");
+  expect(build).toContain("textsOf(template, one.language, one.page.path)");
 });
 
 test("every picture of Lebendige Bilder knows its own chunk, so its built page fetches the picture with the start", () => {
