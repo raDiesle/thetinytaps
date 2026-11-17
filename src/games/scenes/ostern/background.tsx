@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
-import { Cloud, INK } from "../shared";
+import { Cloud } from "../shared";
+import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 import type { Box } from "../types";
 import { BUSH, POT, TABLE, TREE, WILLOW } from "./layout";

@@ -1,4 +1,5 @@
-import { GLASS, INK, Inside, Rider, STEEL, nth } from "../shared";
+import { GLASS, Inside, Rider, STEEL, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Cap, SNOW, SNOW_SHADE, TurningWheel, guard, vars } from "./parts";
 
 // The winter service: the snow plough and the gritter. Both face left and stand with their

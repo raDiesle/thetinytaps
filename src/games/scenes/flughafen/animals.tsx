@@ -1,4 +1,5 @@
-import { Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { RAIL_RED } from "./parts";
 
 // Animals. Each drawing has its foot point at (0, 0).

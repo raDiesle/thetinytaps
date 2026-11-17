@@ -1,7 +1,8 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { DIGGER, FLOWERS, HAMMER, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, SITE } from "./layout";
 import type { ReactNode } from "react";
-import { Cloud, INK } from "../shared";
+import { Cloud } from "../shared";
+import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 
 // The sky ends at the fence (HORIZON). Behind it lies the city in a light haze;

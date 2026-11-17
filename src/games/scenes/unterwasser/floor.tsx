@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { CHEEK, Eye, Face, INK, nth, side } from "../shared";
+import { Eye, Face, nth, side } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Bubbles, Heart, Lid, Sand, Sparkle } from "./parts";
 
 // Small things on the sandy sea floor at the front. Each drawing has its foot point at (0, 0);

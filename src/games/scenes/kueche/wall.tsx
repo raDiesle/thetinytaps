@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Cloud, Eye, INK, Inside, STEEL, nth } from "../shared";
+import { Cloud, Eye, Inside, STEEL, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { CUPBOARD, CUPBOARD_DARK } from "./background";
 import { Lines, Notes, Steam } from "./parts";
 

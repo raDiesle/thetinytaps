@@ -1,4 +1,5 @@
-import { Face, INK, Inside, SKIN, nth } from "../shared";
+import { Face, Inside, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 // People and animals. Each drawing has its foot point at (0, 0), except those that sit
 // on something else: the cat (house), the sparrow (postbox) and the bird (tree).

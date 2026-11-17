@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon } from "../layout";
-import { Cloud, INK } from "../shared";
+import { Cloud } from "../shared";
+import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 import { HOUSES, PARK_X, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, ZEBRA } from "./layout";
 

@@ -1,4 +1,5 @@
-import { CHEEK, INK, SKIN, nth } from "../shared";
+import { nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Eyes, Sparkles, SleepyFace, Yawn, Zzz, star } from "./parts";
 
 // The bed and the bedside table. Bed, blanket, child and teddy share the bed's placement

@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 
 // The things of the stories. Each drawing has its foot point at (0, 0) and is centred on x = 0.
 // The same drawing stands in the room and shows in the thought bubble, so the child can match them.

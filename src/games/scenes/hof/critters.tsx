@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lid, Lines } from "./parts";
 
 // Small animals. Each drawing has its foot point at (0, 0), except those that sit on

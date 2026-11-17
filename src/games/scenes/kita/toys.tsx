@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { CHEEK, Eye, Face, INK, nth, side } from "../shared";
+import { Eye, Face, nth, side } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Drops, Hearts, Lid, Lines, Notes, Puffs, Sparkles } from "./parts";
 
 // Toys and things on the floor. Each drawing has its foot point at (0, 0) and is placed with ground().

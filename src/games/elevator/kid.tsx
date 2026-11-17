@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { MASCOT_COLORS, MascotHead, type MascotKind } from "@/components/Mascot";
-import { CHEEK, INK, SKIN } from "@/games/scenes/shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { type Figure, useFigure } from "@/lib/common";
 import {
   Bed,

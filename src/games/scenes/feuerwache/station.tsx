@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Hideout } from "../hideout";
-import { GLASS, INK, Inside, Rider, SKIN, nth } from "../shared";
+import { GLASS, Inside, Rider, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { BlueLight, DARK_RED, FIRE_RED, HelmetHead, Jacket, NAVY, STRIPE, Toot } from "./parts";
 
 // The fire station: tower, building, its bays, the alarm bell and the flag. The building

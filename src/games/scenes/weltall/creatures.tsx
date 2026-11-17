@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, heartPath, nth } from "../shared";
+import { Eye, heartPath, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Dust, Lid, Sparkles, starPath } from "./parts";
 
 // Who lives on the moon: the green alien, the alien baby, the space flower, the moon rabbit and

@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lid, Lines } from "./parts";
 
 // The birds. Each sits on something else and is drawn in its coordinates: the owl in the

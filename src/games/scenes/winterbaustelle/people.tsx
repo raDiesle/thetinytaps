@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Lids } from "../baustelle/figures";
-import { CHEEK, Eye, Face, INK, Inside, SKIN, nth } from "../shared";
+import { Eye, Face, Inside, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Cap, Flake, SNOW, SNOW_SHADE, glint } from "./parts";
 
 // The snowman and the people of the winter site. Each drawing stands with its foot point on (0, 0).

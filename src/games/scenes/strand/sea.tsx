@@ -1,4 +1,5 @@
-import { Eye, INK, Inside, Pane, Rider, SKIN, nth } from "../shared";
+import { Eye, Inside, Pane, Rider, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Drops, FOAM, Head, Lid, Puffs, Ripples, SEA } from "./parts";
 
 // Far out on the sea: the lighthouse on its rock, the sailing boat, the big ferry, the

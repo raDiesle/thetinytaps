@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 
 // Small creatures. The anthill and the snail stand on the ground with their foot point at
 // (0, 0); the stag beetle sits on the log pile, the ladybird on the fern and the butterfly

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { playEngine, playHonk } from "@/lib/realSounds";
 import { playAlarm, playChime, playClick, playPlop, playPop, playRecorded, playRing, playRustle, playSiren } from "@/lib/sfx";
 import { Kid, KidHead, type Look, type Pose, useHero } from "../kid";

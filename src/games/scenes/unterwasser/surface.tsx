@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { Eye, INK, Inside, Pane, Rider, SKIN, nth } from "../shared";
+import { Eye, Inside, Pane, Rider, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { ANCHOR, BOAT } from "./layout";
 import { Bubbles, Lid, Lines, Sand } from "./parts";
 

@@ -1,6 +1,7 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
 import { Hideout } from "../hideout";
-import { CHEEK, Eye, Face, INK, MascotFace, SKIN, STEEL, heartPath, nth, side, sparklePath } from "../shared";
+import { Eye, Face, MascotFace, STEEL, heartPath, nth, side, sparklePath } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Hearts, Lid, Lines, Plaster, Sparkles } from "./parts";
 
 // The exam corner: the scale, the sink, the couch with the child, the doctor, the trolley with

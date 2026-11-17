@@ -1,5 +1,6 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
-import { Face, INK, MascotFace, SKIN, nth } from "../shared";
+import { Face, MascotFace, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Lid } from "./parts";
 
 // The forester, the child collecting leaves and the signpost on the path. Foot point at (0, 0).

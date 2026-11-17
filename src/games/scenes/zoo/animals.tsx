@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Drops, Lid } from "./parts";
 
 // Monkeys, birds and the smaller animals of the middle enclosures and the path. Each drawing

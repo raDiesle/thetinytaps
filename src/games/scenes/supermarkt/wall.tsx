@@ -1,5 +1,6 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
-import { Eye, Face, INK, Inside, MascotFace, SKIN, STEEL, nth } from "../shared";
+import { Eye, Face, Inside, MascotFace, STEEL, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Lid, Lines, Mist, Notes, Sparkles } from "./parts";
 
 // Things on and at the back wall, drawn in picture coordinates: the loudspeaker, the sliding

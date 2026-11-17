@@ -1,4 +1,5 @@
-import { Face, SKIN, heartPath, nth, sparklePath } from "../shared";
+import { Face, heartPath, nth, sparklePath } from "../shared";
+import { SKIN } from "@/components/drawing";
 
 // Little parts many drawings of this scene share. Their animations are in spielplatz.css
 // ("Parts many items share"); lids, notes, puffs, hearts and sparkles are hidden until the item plays.

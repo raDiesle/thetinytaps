@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, INK, Pane, Rider, STEEL, Wheel, nth, side, sparklePath } from "../shared";
+import { Face, Pane, Rider, STEEL, Wheel, nth, side, sparklePath } from "../shared";
+import { INK } from "@/components/drawing";
 import { LEAF_COLOURS, Leaf } from "../weather";
 
 // Things standing around in the autumn picture. Foot point at (0, 0).

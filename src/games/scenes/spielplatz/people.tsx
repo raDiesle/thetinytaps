@@ -1,5 +1,6 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
-import { INK, MascotFace, SKIN, Wheel, nth } from "../shared";
+import { MascotFace, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Arm, Head, Leg, Lid, Puffs } from "./parts";
 
 // Grown-ups and children on the playground: grandpa on the bench, the ice cream man, mum

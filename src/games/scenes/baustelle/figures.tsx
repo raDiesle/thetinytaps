@@ -1,4 +1,5 @@
-import { CHEEK, Face, INK, SKIN, STEEL, nth } from "../shared";
+import { Face, STEEL, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 
 /** Eyelids in the colour of the face, closed only for a blink while the item plays. */
 export function Lids({ eyes, r, fill }: { eyes: [number, number][]; r: number; fill: string }) {

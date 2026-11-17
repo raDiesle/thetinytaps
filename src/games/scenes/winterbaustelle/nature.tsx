@@ -1,5 +1,6 @@
 import { Lids } from "../baustelle/figures";
-import { CHEEK, Cloud, Eye, Face, INK, nth } from "../shared";
+import { Cloud, Eye, Face, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Cap, Flake, SNOW, SNOW_SHADE, glint, vars } from "./parts";
 
 // Trees, clouds and animals of the winter site. Drawings stand with their foot point on (0, 0),

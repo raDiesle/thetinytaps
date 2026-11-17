@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, Wheel, nth } from "../shared";
+import { Wheel, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Puffs, Sparkles } from "./parts";
 
 // Things on the playground: the bin, the ball, the toys in the sandpit and the water pump.

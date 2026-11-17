@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Bubbles } from "./parts";
 
 // The washstand and the wall above it. Washstand, tap, toothbrush and toothpaste share the

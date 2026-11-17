@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, GLASS, INK, Inside, Pane, Rider, SKIN, STEEL, Wheel, nth } from "../shared";
+import { Face, GLASS, Inside, Pane, Rider, STEEL, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { NAVY, RAIL_RED, Toot } from "./parts";
 
 // The railway: the signal, the train (driving left) and the things on the platform.

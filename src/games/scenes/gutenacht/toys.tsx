@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, Inside, Wheel, nth } from "../shared";
+import { Inside, Wheel, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Eyes, SleepyFace, Sparkles, Zzz, star } from "./parts";
 
 // Toys on the floor. The rug is drawn in picture coordinates; every other toy has its foot

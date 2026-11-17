@@ -1,5 +1,6 @@
 import type { ReactNode, SVGProps } from "react";
-import { Eye, Face, GLASS, INK, Inside, SKIN, nth } from "../shared";
+import { Eye, Face, GLASS, Inside, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Helmet, Lid, SUIT, Sparkles, ellipsePath, starPath } from "./parts";
 
 // Everything up in space. Each drawing has its middle at (0, 0) and is placed with `space`.

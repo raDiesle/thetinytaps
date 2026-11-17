@@ -1,4 +1,5 @@
-import { GLASS, INK, Inside, nth } from "../shared";
+import { GLASS, Inside, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Head } from "./parts";
 
 // Things in the sky above the playground: the kite, the balloon and the little plane.

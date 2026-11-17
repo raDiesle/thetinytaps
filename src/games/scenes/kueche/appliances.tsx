@@ -1,4 +1,5 @@
-import { INK, STEEL, nth } from "../shared";
+import { STEEL, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lines, Steam } from "./parts";
 
 // Things standing on the worktop. Each drawing has its foot point at (0, 0) and is placed with

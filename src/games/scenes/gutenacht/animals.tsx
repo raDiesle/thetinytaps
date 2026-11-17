@@ -1,4 +1,5 @@
-import { CHEEK, nth } from "../shared";
+import { nth } from "../shared";
+import { CHEEK } from "@/components/drawing";
 import { Eyes, SleepyFace, Yawn, Zzz } from "./parts";
 
 // The animals on the floor: the cuddly bunny, the cat in its basket, the cuddly sheep and

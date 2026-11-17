@@ -1,4 +1,5 @@
-import { Eye, INK, Wheel, nth } from "../shared";
+import { Eye, Wheel, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Hearts, Lid, Lines } from "./parts";
 
 // Things on the floor. Each drawing has its foot point at (0, 0) and is placed with ground().

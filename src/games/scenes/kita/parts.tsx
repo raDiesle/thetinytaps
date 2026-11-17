@@ -1,4 +1,5 @@
-import { CHEEK, INK, SKIN, nth, sparklePath } from "../shared";
+import { nth, sparklePath } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 
 // Little parts many drawings of this scene share. Their animations are in kita.css
 // ("Parts many items share"); they are hidden until the item plays.

@@ -1,4 +1,5 @@
-import { Face, MascotFace, SKIN, Wheel, nth, type Mascot } from "../shared";
+import { Face, MascotFace, Wheel, nth, type Mascot } from "../shared";
+import { SKIN } from "@/components/drawing";
 
 // Small parts used by several drawings of the fire station.
 

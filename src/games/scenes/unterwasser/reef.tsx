@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Eye, Face, INK, Inside, SKIN, nth, side } from "../shared";
+import { Eye, Face, Inside, nth, side } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Bubbles, Heart, Lid, Sand } from "./parts";
 
 // Things that sit on the sea floor at the back and in the middle: the old ship, the reef and

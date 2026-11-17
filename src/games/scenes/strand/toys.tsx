@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { CHEEK, Eye, Face, INK, nth } from "../shared";
+import { Eye, Face, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Drops, Puffs, SAND, SAND_DARK, Sparkles, SEA } from "./parts";
 
 // Things in the sand at the front: the sand castle, the bucket, the spade, the sand pile with

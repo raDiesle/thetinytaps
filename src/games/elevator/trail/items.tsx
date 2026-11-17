@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { DogFace } from "./friends";
 
 // The things the child finds on the way and carries in its bag, and the things a level is about

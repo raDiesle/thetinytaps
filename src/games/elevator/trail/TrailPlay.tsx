@@ -1,6 +1,6 @@
 import { type ComponentType, type PointerEvent, type ReactNode, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
 import { loadRealSounds, playGiggle } from "@/lib/realSounds";

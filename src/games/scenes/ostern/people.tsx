@@ -1,4 +1,5 @@
-import { CHEEK, Eye, SKIN, nth, sparklePath } from "../shared";
+import { Eye, nth, sparklePath } from "../shared";
+import { CHEEK, SKIN } from "@/components/drawing";
 import { Arm, Head, Leg, Lid } from "../spielplatz/parts";
 import { Blades, Egg } from "./parts";
 

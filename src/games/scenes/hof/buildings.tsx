@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, GLASS, INK, Inside, Pane, SKIN, nth } from "../shared";
+import { Face, GLASS, Inside, Pane, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 // Buildings of the farm. Each drawing has its foot point (the middle of its front, on
 // the ground) at (0, 0).

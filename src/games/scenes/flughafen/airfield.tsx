@@ -1,4 +1,5 @@
-import { Face, GLASS, INK, Inside, SKIN, STEEL, nth } from "../shared";
+import { Face, GLASS, Inside, STEEL, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { NAVY, RAIL_RED, TurningWheel } from "./parts";
 
 // The airfield at the back: the airliner on the runway, the tower, the hangar, the windsock and

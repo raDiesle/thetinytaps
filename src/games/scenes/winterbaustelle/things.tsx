@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, Inside, nth } from "../shared";
+import { Inside, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { ICE, SNOW, SNOW_SHADE, glint, vars } from "./parts";
 
 // Things of the winter site. Each drawing stands with its foot point on (0, 0), except the icicles

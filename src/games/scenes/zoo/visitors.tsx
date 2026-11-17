@@ -1,6 +1,7 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
 import { Hideout } from "../hideout";
-import { Face, INK, MascotFace, Pane, Rider, SKIN, Wheel, nth } from "../shared";
+import { Face, MascotFace, Pane, Rider, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Drops, Lid } from "./parts";
 
 // People and things on the zoo path, and the balloon that flew away. Each drawing has its

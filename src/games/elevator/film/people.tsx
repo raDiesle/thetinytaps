@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, handColor, KidHead, type Look } from "../kid";
 import { ChefHat } from "../things";
 

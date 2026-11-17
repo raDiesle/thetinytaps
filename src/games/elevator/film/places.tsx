@@ -1,4 +1,4 @@
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { GROUND } from "./types";
 
 // The places of the fire brigade film, drawn standing on their ground at (0, 0) unless said otherwise. The sky and

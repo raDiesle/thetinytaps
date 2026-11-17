@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 
 // Plants in the park and on the pavement, and the butterfly. Foot point at (0, 0).
 

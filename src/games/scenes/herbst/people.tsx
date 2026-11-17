@@ -1,4 +1,5 @@
-import { Face, INK, SKIN, nth } from "../shared";
+import { Face, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Leaf } from "../weather";
 
 // The people of the autumn picture, foot point at (0, 0). Grandma sits on the bench

@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, Inside, SKIN, nth } from "../shared";
+import { Face, Inside, nth } from "../shared";
+import { SKIN } from "@/components/drawing";
 import { Arm, Head, Hearts, Leg, Lid, Puffs, SAND } from "./parts";
 
 // The big things on the beach: the beach chair with grandpa, the beach tent with the baby,

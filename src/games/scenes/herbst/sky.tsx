@@ -1,4 +1,5 @@
-import { CHEEK, Eye, Face, INK, nth } from "../shared";
+import { Eye, Face, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { LEAF_COLOURS, Leaf } from "../weather";
 import { BOY, BOY_HAND } from "./layout";
 

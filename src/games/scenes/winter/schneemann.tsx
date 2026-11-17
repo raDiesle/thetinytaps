@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import type { Placement, SceneItem } from "../types";
 import "./schneemann.css";
 

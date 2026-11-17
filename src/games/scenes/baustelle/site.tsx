@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, INK, Inside, Pane, SAND, SKIN, STEEL, Wheel, nth } from "../shared";
+import { Face, Inside, Pane, SAND, STEEL, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 /** A worker's head with a hard hat, peeking out of doors and windows. */
 function Peeker({ cx, cy, size = 1 }: { cx: number; cy: number; size?: number }) {

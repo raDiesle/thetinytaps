@@ -1,4 +1,5 @@
-import { CHEEK, Eye, nth, side } from "../shared";
+import { Eye, nth, side } from "../shared";
+import { CHEEK } from "@/components/drawing";
 import type { Placement, SceneItem } from "../types";
 import { LEAF_COLOURS, Leaf } from "../weather";
 import "./kuerbis.css";

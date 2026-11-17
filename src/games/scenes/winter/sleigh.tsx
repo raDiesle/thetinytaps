@@ -1,5 +1,6 @@
 import { Lids } from "../baustelle/figures";
-import { Eye, Face, INK, SKIN, nth } from "../shared";
+import { Eye, Face, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { SNOW, SNOW_SHADE } from "../winterbaustelle/parts";
 
 // The horse sleigh on the path, facing left: a brown horse with bells on its collar pulls a red

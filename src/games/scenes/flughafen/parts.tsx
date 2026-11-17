@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
-import { Face, SKIN, Wheel, nth } from "../shared";
+import { Face, Wheel, nth } from "../shared";
+import { SKIN } from "@/components/drawing";
 
 // Small parts used by several drawings of the airport and the station.
 

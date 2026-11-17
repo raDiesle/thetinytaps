@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { CHEEK, nth } from "../shared";
+import { nth } from "../shared";
+import { CHEEK } from "@/components/drawing";
 
 // Little parts many drawings of this scene share. Their animations are in dinotal.css
 // ("Parts many items share"); lids, lines and notes are hidden until the item plays.

@@ -1,4 +1,5 @@
-import { INK, heartPath, nth, sparklePath } from "../shared";
+import { heartPath, nth, sparklePath } from "../shared";
+import { INK } from "@/components/drawing";
 
 // Little parts many drawings of this scene share. Their animations are in kinderarzt.css
 // ("Parts many items share"); all are hidden until the item plays.

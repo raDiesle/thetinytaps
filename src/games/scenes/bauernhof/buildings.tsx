@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, Pane, SKIN, nth } from "../shared";
+import { Pane, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 // Barn, farmhouse, windmill and the water pump. Foot point at (0, 0).
 

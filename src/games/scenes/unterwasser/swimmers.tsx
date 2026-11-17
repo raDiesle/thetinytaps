@@ -1,4 +1,5 @@
-import { CHEEK, Eye, Face, GLASS, INK, Inside, Rider, SKIN, nth } from "../shared";
+import { Eye, Face, GLASS, Inside, Rider, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Bubbles, Heart, Lid, Lines, Sparkle } from "./parts";
 
 // Everything that swims in the open water. Each drawing has its origin in its middle and is

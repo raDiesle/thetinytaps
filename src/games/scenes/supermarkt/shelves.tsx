@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, STEEL, nth } from "../shared";
+import { STEEL, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lines, Mist, Sparkles } from "./parts";
 
 // Shelves, in picture coordinates: the cooling shelf, the milk shelf and the bottle machine at

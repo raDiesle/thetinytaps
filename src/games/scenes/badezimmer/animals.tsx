@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Lid, Lines } from "./parts";
 
 // The animals of the bathroom. Cat and dog have their foot point at (0, 0); the spider hangs

@@ -1,4 +1,5 @@
-import { INK, STEEL, nth } from "../shared";
+import { STEEL, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lines, Steam } from "./parts";
 
 // The table and what is on it. The table has its front foot point at (0, 0) and stands at TABLE;

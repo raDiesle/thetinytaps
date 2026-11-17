@@ -1,4 +1,5 @@
-import { INK, Pane, STEEL, nth, sparklePath } from "../shared";
+import { Pane, STEEL, nth, sparklePath } from "../shared";
+import { INK } from "@/components/drawing";
 import { Dust, Helmet, SUIT } from "./parts";
 
 // Everything with wheels or a motor on the moon: digger, rover, robot and robot dog. Each

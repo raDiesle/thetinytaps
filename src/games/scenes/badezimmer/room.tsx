@@ -1,4 +1,5 @@
-import { Cloud, Face, INK, Inside, SKIN, nth } from "../shared";
+import { Cloud, Face, Inside, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Bubbles, Lines } from "./parts";
 
 // Things on and against the back wall. The wall things (window, fan, clock, shelf, toilet

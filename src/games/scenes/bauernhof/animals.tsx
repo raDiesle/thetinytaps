@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, Inside, nth } from "../shared";
+import { Eye, Inside, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 
 // The farm animals. Each drawing has its foot point at (0, 0), except those that sit on
 // something else: the owl (barn), the stork and the cat (farmhouse), the duck (water line)

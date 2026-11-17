@@ -1,4 +1,5 @@
-import { CHEEK, INK, Inside, SKIN, nth } from "../shared";
+import { Inside, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Eyes, Heart, Notes, Sparkles, SleepyFace, Zzz, star } from "./parts";
 
 // Things on the back wall and at the door, all drawn in picture coordinates: the fairy

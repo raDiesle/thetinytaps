@@ -1,4 +1,5 @@
-import { INK, STEEL, nth } from "../shared";
+import { STEEL, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lines, Sparkles } from "./parts";
 
 // Fruit and vegetables on the wooden stand (STAND coordinates: the stand's foot is at (0, 0), the

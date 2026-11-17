@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Lid, Lines } from "./parts";
 
 // Bath toys on the floor. Each drawing has its foot point at (0, 0).

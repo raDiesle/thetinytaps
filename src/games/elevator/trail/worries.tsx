@@ -1,4 +1,4 @@
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { KidHead, useHero } from "../kid";
 import { Football, type Picture } from "./items";
 

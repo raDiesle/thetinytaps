@@ -1,4 +1,5 @@
-import { Face, GLASS, INK, Inside, Pane, Rider, SKIN, Wheel, nth } from "../shared";
+import { Face, GLASS, Inside, Pane, Rider, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 // Vehicles. Each drawing has its foot point (the middle between the wheels, on the
 // ground) at (0, 0). In the far lane they drive left, in the near lane right.

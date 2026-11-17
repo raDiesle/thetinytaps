@@ -1,4 +1,5 @@
-import { Face, INK, nth } from "../shared";
+import { Face, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { DARK_RED, FIRE_RED, NAVY, STRIPE } from "./parts";
 
 // The tree, the garden and the things lying around. Foot points at (0, 0).

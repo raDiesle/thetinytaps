@@ -1,4 +1,5 @@
-import { Face, GLASS, INK, Inside, Rider, SKIN, nth } from "../shared";
+import { Face, GLASS, Inside, Rider, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Lid, Lines } from "./parts";
 
 // The farmer's things: tractor, wheelbarrow and scarecrow. Foot point at (0, 0).

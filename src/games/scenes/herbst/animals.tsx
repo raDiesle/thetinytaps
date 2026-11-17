@@ -1,4 +1,5 @@
-import { CHEEK, Eye, Face, INK, Inside, nth } from "../shared";
+import { Eye, Face, Inside, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Leaf } from "../weather";
 
 // The animals of the autumn picture. Foot point at (0, 0), except the cat, which

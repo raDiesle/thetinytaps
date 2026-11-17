@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { playBark } from "@/lib/realSounds";
 import type { ItemId } from "./items";
 

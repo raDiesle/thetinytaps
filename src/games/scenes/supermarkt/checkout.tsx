@@ -1,5 +1,6 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
-import { Face, INK, Inside, MascotFace, SKIN, STEEL, Wheel, nth } from "../shared";
+import { Face, Inside, MascotFace, STEEL, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Lid, Lines, Notes, Sparkles } from "./parts";
 
 // The shopping cart with the child (CART coordinates, foot at (0, 0)) and the checkout

@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, Inside, SKIN } from "../shared";
+import { Inside } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Arm, Head, Hearts, Leg, Lid, Puffs } from "./parts";
 
 // The playground equipment: climbing tower and slide, swing, seesaw, roundabout and spring

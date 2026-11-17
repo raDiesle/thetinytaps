@@ -1,7 +1,8 @@
 import { createContext, useContext, useId, type ComponentType, type CSSProperties } from "react";
 import type { Localized } from "@/lib/language";
 import { MASCOT_COLORS, MASCOT_INK, MascotHead, type MascotKind } from "@/components/Mascot";
-import { CHEEK, Eye, Face, INK, sparklePath } from "./shared";
+import { Eye, Face, sparklePath } from "./shared";
+import { CHEEK, INK } from "@/components/drawing";
 import type { SceneItem, SceneSound } from "./types";
 import "./hideout.css";
 

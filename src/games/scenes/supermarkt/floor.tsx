@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, INK, SKIN, STEEL, Wheel, nth } from "../shared";
+import { Face, STEEL, Wheel, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Lid, Lines, Mist, Notes, Sparkles } from "./parts";
 
 // Things standing on the floor. Each drawing has its foot point at (0, 0).

@@ -1,7 +1,8 @@
 import { Bagger, Gabelstapler, Kipplaster, Kran } from "../baustelle/machines";
 import { Hase, Maus } from "../baustelle/figures";
 import { Bauwagen, Container, Haus, Huetchen, Klo, Laterne, Schild, Schubkarre } from "../baustelle/site";
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Cap, SNOW, SNOW_SHADE } from "./parts";
 
 // The Baustelle's drawings with snow on them. Each overlay is drawn on top of the original in

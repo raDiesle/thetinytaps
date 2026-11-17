@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { INK, Inside, SKIN, nth } from "../shared";
+import { Inside, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { SHELF_BOARD_1, SHELF_BOARD_2, SHELF_TOP } from "./layout";
 import { Eyes, Notes, Sparkles, Zzz, star } from "./parts";
 

@@ -1,5 +1,6 @@
 import { MASCOT_COLORS } from "@/components/Mascot";
-import { CHEEK, Face, INK, SKIN, nth } from "../shared";
+import { Face, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { DARK_RED, FIRE_RED, HelmetHead, Jacket, NAVY, STRIPE, Toot } from "./parts";
 
 // People. Each drawing has its foot point (between the feet, on the ground) at (0, 0).

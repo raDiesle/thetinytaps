@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, GLASS, INK, Inside, Pane, Rider, SKIN, STEEL, nth } from "../shared";
+import { Face, GLASS, Inside, Pane, Rider, STEEL, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Beacon, NAVY, RAIL_RED, SIGNAL_ORANGE, Suitcase, Toot, TurningWheel, guard } from "./parts";
 
 // Vehicles on the apron and the forecourt. Each drawing has its foot point (between the

@@ -1,6 +1,7 @@
 import { Lids } from "../baustelle/figures";
 import { Hideout } from "../hideout";
-import { Face, GLASS, INK, Inside, SKIN, heartPath, nth } from "../shared";
+import { Face, GLASS, Inside, heartPath, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Cap, SNOW, SNOW_SHADE, glint } from "../winterbaustelle/parts";
 
 // The red wooden house, the church, the deer feeder, the bench with hot cocoa, a lost mitten

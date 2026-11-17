@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Lids } from "../baustelle/figures";
-import { Face, INK, SKIN, nth } from "../shared";
+import { Face, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { SNOW, SNOW_SHADE } from "../winterbaustelle/parts";
 
 // Children and grown-ups playing in the snow. Each drawing stands with its foot point on (0, 0).

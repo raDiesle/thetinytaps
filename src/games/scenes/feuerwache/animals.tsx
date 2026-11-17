@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { DARK_RED, FIRE_RED, STRIPE } from "./parts";
 
 // Animals. Most share the placement of what they sit on (tree, flag, roof, boot);

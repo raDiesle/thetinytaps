@@ -1,5 +1,5 @@
 import { createContext, useContext, useId, type CSSProperties, type ReactNode } from "react";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { KidHead, useHero } from "./kid";
 import { ROOM_H, ROOM_L, ROOM_R } from "./layout";
 import {

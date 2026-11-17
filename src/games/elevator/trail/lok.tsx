@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Cloud, INK } from "@/games/scenes/shared";
+import { Cloud } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { Apple, Carrot, Corn, Lantern } from "./items";
 import type { Point, SceneryProps } from "./types";
 

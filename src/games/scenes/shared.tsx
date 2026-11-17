@@ -1,15 +1,13 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { CHEEK, SKIN } from "@/components/drawing";
 import { MascotHead } from "@/components/Mascot";
 
 // Drawing helpers shared by all scenes. Everything is drawn in absolute scene coordinates (1600 × 1000),
 // so the transform-origin of an animated part is simply its pivot point in the picture.
 
-export const INK = "#3d405b";
 export const STEEL = "#8d99ae";
 export const GLASS = "#bde0fe";
 export const SAND = "#e9b872";
-export const SKIN = "#f1c27d";
-export const CHEEK = "#ff8fa3";
 
 /** Sets the --i custom property used to stagger animations. */
 export const nth = (i: number) => ({ "--i": i }) as CSSProperties;

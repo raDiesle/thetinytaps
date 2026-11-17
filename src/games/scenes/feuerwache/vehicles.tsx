@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { GLASS, INK, Inside, Rider, Wheel, nth } from "../shared";
+import { GLASS, Inside, Rider, Wheel, nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { BlueLight, DARK_RED, FIRE_RED, HelmetHead, NAVY, STRIPE, Toot, TurningWheel, guard } from "./parts";
 
 // Vehicles. Each drawing has its foot point (the middle between the wheels, on the

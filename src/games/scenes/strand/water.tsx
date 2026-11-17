@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, Inside, SKIN, nth } from "../shared";
+import { Eye, Inside, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Arm, Drops, FOAM, Head, Lid, Puffs, Ripples, SEA } from "./parts";
 
 // At the water's edge: the waves, the child in the swim ring, the inflatable duck and dad on

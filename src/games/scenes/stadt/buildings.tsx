@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Hideout } from "../hideout";
-import { Face, GLASS, INK, Pane, SKIN, nth } from "../shared";
+import { Face, GLASS, Pane, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 // Houses and street furniture. Each drawing has its foot point at (0, 0).
 

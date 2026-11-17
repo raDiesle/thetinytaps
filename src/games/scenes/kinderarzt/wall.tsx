@@ -1,4 +1,5 @@
-import { Cloud, Eye, Face, INK, Inside, SKIN, STEEL, heartPath, nth, side, sparklePath } from "../shared";
+import { Cloud, Eye, Face, Inside, STEEL, heartPath, nth, side, sparklePath } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Bubbles, Lid, Lines, Notes, Plaster, Sparkles } from "./parts";
 
 // Things on the back wall and hanging from the ceiling, all drawn in picture coordinates.

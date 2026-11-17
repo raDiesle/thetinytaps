@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Eyes, SleepyFace, Sparkles, Yawn, Zzz, star } from "./parts";
 
 // What is seen through the window, in picture coordinates: the moon with its nightcap,

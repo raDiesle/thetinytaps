@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { CHEEK, Eye, Face, INK, SKIN, STEEL, Wheel, heartPath, nth, sparklePath } from "../shared";
+import { Eye, Face, STEEL, Wheel, heartPath, nth, sparklePath } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Bubbles, Hearts, Lid, Lines, Notes, Sparkles } from "./parts";
 
 // The waiting room: the water dispenser, Papa, the aquarium, the reception desk with the

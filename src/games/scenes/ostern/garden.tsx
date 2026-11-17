@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { CHEEK, Eye, INK, Inside, Pane, SKIN, heartPath, nth, sparklePath } from "../shared";
+import { Eye, Inside, Pane, heartPath, nth, sparklePath } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Lid, Puffs } from "../spielplatz/parts";
 import { Blossom, Egg } from "./parts";
 

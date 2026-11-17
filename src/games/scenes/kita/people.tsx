@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
-import { Face, INK, MascotFace, SKIN, nth, side } from "../shared";
+import { Face, MascotFace, nth, side } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Drops, Hearts, Lids, Lines, Mouth, SleepFace, Sparkles, Zzz } from "./parts";
 
 // The children and the teacher. Each drawing has its foot point at (0, 0) and is placed with

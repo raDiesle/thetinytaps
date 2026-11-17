@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 import { Lid, Lines } from "./parts";
 
 // Things at the brook: the bridge, the fish, the frog on its stone and the dragonfly.

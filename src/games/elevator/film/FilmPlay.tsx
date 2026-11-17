@@ -2,7 +2,7 @@ import { type CSSProperties, type PointerEvent, memo, useCallback, useEffect, us
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { HintHand, TapHint } from "@/components/TapHint";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
-import { INK } from "@/games/scenes/shared";
+import { INK } from "@/components/drawing";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { touchOnly } from "@/lib/device";
 import { useT } from "@/lib/language";

@@ -1,4 +1,5 @@
-import { INK, SKIN, nth } from "../shared";
+import { nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 import { Arm, Head, Hearts, Leg, Sparkles } from "./parts";
 
 // Mum and her chips on the towel (drawn in the towel's coordinates, see TOWEL in layout.ts)

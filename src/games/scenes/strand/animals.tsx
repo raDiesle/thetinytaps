@@ -1,4 +1,5 @@
-import { CHEEK, Eye, Face, INK, side } from "../shared";
+import { Eye, Face, side } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Lid, Puffs, Sparkles } from "./parts";
 
 // Animals on the sand: the cheeky gull, the crab, the starfish and the shell. Foot point at (0, 0).

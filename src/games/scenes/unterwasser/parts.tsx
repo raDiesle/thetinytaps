@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 
 // Small parts many Unterwasser drawings share. They only show while their item plays; the
 // timing is in unterwasser.css ("Parts many items share"). `delay` sets --d, when they start.

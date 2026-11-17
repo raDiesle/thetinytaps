@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, Inside, nth } from "../shared";
+import { Eye, Inside, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Drops, Lid } from "./parts";
 
 // The big animals of the savanna and the middle enclosures. Each drawing has its foot

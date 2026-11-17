@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, Inside, nth } from "../shared";
+import { Eye, Inside, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Drops, Lid } from "./parts";
 
 // Animals at the water at the front: the penguin pool, the seal's rock and the hippo river.

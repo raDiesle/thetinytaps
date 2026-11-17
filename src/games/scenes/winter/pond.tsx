@@ -1,5 +1,6 @@
 import { Lids } from "../baustelle/figures";
-import { CHEEK, Eye, Face, SKIN, nth } from "../shared";
+import { Eye, Face, nth } from "../shared";
+import { CHEEK, SKIN } from "@/components/drawing";
 import { glint } from "../winterbaustelle/parts";
 
 // On and at the frozen pond: the skater, a duck sliding on the ice and a pair of ice skates.

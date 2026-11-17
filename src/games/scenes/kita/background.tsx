@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { HORIZON, depthScale, onFloor, towardsHorizon } from "../layout";
-import { INK } from "../shared";
+import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 
 // The back wall: sunny yellow paint with little dots, a mint band below with the wooden rail

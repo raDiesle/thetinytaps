@@ -1,4 +1,5 @@
-import { INK, nth } from "../shared";
+import { nth } from "../shared";
+import { INK } from "@/components/drawing";
 
 // Little parts many drawings of this scene share. Their animations are in kueche.css
 // ("Parts many items share"); all but the eyelids' frames are hidden until the item plays.

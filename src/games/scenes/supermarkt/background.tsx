@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { HORIZON, depthScale, transformOf, onFloor } from "../layout";
-import { INK, STEEL } from "../shared";
+import { STEEL } from "../shared";
+import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 import { GONDOLA, STAND } from "./layout";
 

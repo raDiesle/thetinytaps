@@ -1,4 +1,5 @@
-import { Face, Inside, SKIN, nth, sparklePath } from "../shared";
+import { Face, Inside, nth, sparklePath } from "../shared";
+import { SKIN } from "@/components/drawing";
 
 // Small parts many drawings of the Weltall scene share.
 

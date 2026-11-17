@@ -1,4 +1,5 @@
-import { Eye, Face, SKIN, nth } from "../shared";
+import { Eye, Face, nth } from "../shared";
+import { SKIN } from "@/components/drawing";
 import { Bubbles, Lid, Lines, Splash } from "./parts";
 
 // The bathtub and what is in it. All but the shower share the tub's placement (BATH), so they

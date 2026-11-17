@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 
 // Little parts many drawings of this scene share. Their animations are in gutenacht.css
 // ("Falling asleep"): open eyes (gn-open) close for good once the item is asleep, sleeping

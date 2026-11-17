@@ -1,4 +1,5 @@
-import { CHEEK, Face, INK, SKIN, nth } from "../shared";
+import { Face, nth } from "../shared";
+import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Hearts, Lid, Notes } from "./parts";
 
 // The family. Each drawing has its foot point at (0, 0) and is placed with ground().

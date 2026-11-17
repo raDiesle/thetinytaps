@@ -1,4 +1,5 @@
-import { Face, INK, Inside, Rider, SKIN, nth } from "../shared";
+import { Face, Inside, Rider, nth } from "../shared";
+import { INK, SKIN } from "@/components/drawing";
 
 // Up in the air above the beach: the little plane with its banner and the kite. Drawn around (0, 0).
 

@@ -1,4 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
+import { Eye, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Lid, Notes } from "./parts";
 
 // Animals on the playground. The bird and the squirrel are drawn in the tree's coordinates,

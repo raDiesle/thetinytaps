@@ -1,4 +1,5 @@
-import { CHEEK, Eye, Face, INK, Inside, heartPath, nth } from "../shared";
+import { Eye, Face, Inside, heartPath, nth } from "../shared";
+import { CHEEK, INK } from "@/components/drawing";
 import { Lid, Puffs } from "../spielplatz/parts";
 import { Blades, eggPath } from "./parts";
 
