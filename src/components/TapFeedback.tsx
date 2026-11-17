@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { pick } from "@/lib/random";
 
 /** A five-pointed star in a 100 × 100 box, drawn in several games. */
@@ -39,7 +39,8 @@ const JOY_COLORS: Record<JoyThing, string[]> = {
   note: ["#7c8cff", "#5bb8e8", "#b07cff"],
 };
 
-interface Effect {
+/** One ring, light or rising thing drawn by `FeedbackLayer`. */
+export interface Effect {
   id: number;
   kind: "ripple" | "glow" | JoyThing;
   x: number;
@@ -63,31 +64,71 @@ interface CelebrateOptions {
 }
 
 /**
+ * The effects on screen, kept outside React state: the game that taps holds this one handle for its whole life and
+ * never renders again when a ring comes or goes – only `FeedbackLayer`, which subscribes, does (code review R-C15:
+ * every tap rendered a whole play component twice, on old phones, only to draw a ring).
+ */
+export interface FeedbackEffects {
+  /** The effects now on screen (a new array whenever they change). */
+  current: () => readonly Effect[];
+  /** Calls `listener` whenever the effects change; returns the unsubscribe. */
+  subscribe: (listener: () => void) => () => void;
+  /** Adds effects and removes them again after `lifetime` ms; more than `MAX_EFFECTS` drop the oldest. */
+  add: (added: Omit<Effect, "id">[], lifetime: number) => void;
+  /** Clears the pending removals, so nothing changes after the game is gone. */
+  dispose: () => void;
+}
+
+const NONE: readonly Effect[] = [];
+
+/** A store of effects: what `useTapFeedback` keeps for its lifetime, exported for its test. */
+export function createFeedbackEffects(): FeedbackEffects {
+  let effects = NONE;
+  let nextId = 0;
+  const listeners = new Set<() => void>();
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  const set = (next: readonly Effect[]) => {
+    effects = next;
+    for (const listener of listeners) listener();
+  };
+  return {
+    current: () => effects,
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    add(added, lifetime) {
+      const withIds = added.map((e) => ({ ...e, id: nextId++ }));
+      const ids = new Set(withIds.map((e) => e.id));
+      set([...effects, ...withIds].slice(-MAX_EFFECTS));
+      const timer = setTimeout(() => {
+        timers.delete(timer);
+        // Dropped already when more came: then nothing changes and no one is told.
+        if (effects.some((e) => ids.has(e.id))) set(effects.filter((e) => !ids.has(e.id)));
+      }, lifetime);
+      timers.add(timer);
+    },
+    dispose() {
+      for (const timer of timers) clearTimeout(timer);
+      timers.clear();
+    },
+  };
+}
+
+/**
  * Feedback that fits what a tap did, drawn in one layer (`FeedbackLayer`) over the game:
  * - `ripple`: a tap or key that sets nothing off – soft rings, as if a finger touched water.
  * - `glow`: a tap that did set something off – a warm light where the finger was; the thing itself does the rest.
  * - `celebrate`: something done – a few hearts, stars and notes rise slowly while everyone in the picture cheers.
+ * `effects` is the same handle on every render: passing it to `FeedbackLayer` is all a game does with it.
  */
 export function useTapFeedback() {
-  const [effects, setEffects] = useState<Effect[]>([]);
-  const nextId = useRef(0);
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const [effects] = useState(createFeedbackEffects);
 
-  useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
-  }, []);
+  // Pending removals end with the game, so the layer is never told of a change after it is gone.
+  useEffect(() => () => effects.dispose(), [effects]);
 
-  const add = useCallback((added: Omit<Effect, "id">[], lifetime: number) => {
-    const withIds = added.map((e) => ({ ...e, id: nextId.current++ }));
-    const ids = new Set(withIds.map((e) => e.id));
-    setEffects((prev) => [...prev, ...withIds].slice(-MAX_EFFECTS));
-    const timer = setTimeout(() => {
-      timers.current.delete(timer);
-      setEffects((prev) => prev.filter((e) => !ids.has(e.id)));
-    }, lifetime);
-    timers.current.add(timer);
-  }, []);
+  const add = effects.add;
 
   /** Rings at (x, y) in pixels, or where a raindrop might fall, for a key. */
   const ripple = useCallback(
@@ -136,10 +177,12 @@ export function useTapFeedback() {
 }
 
 /** The layer the feedback is drawn in: put it last inside the game's play element, or `fixed` over the whole window. */
-export function FeedbackLayer({ effects, fixed = false }: { effects: Effect[]; fixed?: boolean }) {
+export function FeedbackLayer({ effects, fixed = false }: { effects: FeedbackEffects; fixed?: boolean }) {
+  // Only this layer renders when an effect comes or goes, never the game around it.
+  const shown = useSyncExternalStore(effects.subscribe, effects.current, effects.current);
   return (
     <div className={`fx-layer${fixed ? " fixed" : ""}`} aria-hidden>
-      {effects.map((e) => {
+      {shown.map((e) => {
         const style = { left: e.x, top: e.y, "--delay": `${e.delay}ms` } as CSSProperties;
         if (e.kind === "ripple")
           return (
