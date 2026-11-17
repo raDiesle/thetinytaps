@@ -8,6 +8,7 @@ import { useAppLanguage, useT, type Localized } from "@/lib/language";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import pictureFiles from "./bilder/*.webp?glob";
+import "./letters.css";
 import "./move.css";
 import { useSoftTap } from "./softTap";
 

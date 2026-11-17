@@ -1,4 +1,5 @@
-/* Loaded for the whole app: src/globals.css imports it in order, so the cascade stays the same. */
+/* Frei tippen, Zählen, Mitmachen, Wörter tippen and „Wo ist das B?“: imported by the components that draw these classes, so it
+   loads with the letters games only. The on-screen keys, the keyboard map and Picture bring their own CSS (src/components). */
 
 /* ---------- Letters & numbers ---------- */
 
@@ -20,55 +21,6 @@
   align-items: center;
   justify-content: center;
   container-type: size;
-}
-
-/* ---------- On-screen keys (tablets) ---------- */
-
-.touch-keyboard {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(6px, 1.2vh, 12px);
-  width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: clamp(8px, 1.6vh, 16px) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
-}
-
-/* Ten keys per row; a shorter last row is centred. */
-.touch-row {
-  --gap: clamp(5px, 1vw, 12px);
-  display: flex;
-  justify-content: center;
-  gap: var(--gap);
-}
-
-.touch-key {
-  flex: 0 0 calc((100% - 9 * var(--gap)) / 10);
-  height: clamp(44px, 9vh, 84px);
-  padding: 0;
-  border: 3px solid var(--ink);
-  border-radius: 18px;
-  background: var(--key);
-  color: #fff;
-  font-family: inherit;
-  font-size: clamp(1.4rem, 4.5vh, 2.6rem);
-  font-weight: 700;
-  -webkit-text-stroke: 0.08em var(--ink);
-  paint-order: stroke fill;
-  box-shadow: 0 5px 0 var(--ink);
-  touch-action: none;
-  cursor: pointer;
-}
-
-.touch-key:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 var(--ink);
-}
-
-.touch-key.wanted {
-  outline: 4px dashed var(--ink);
-  outline-offset: 3px;
-  animation: waiting 1.8s ease-in-out infinite;
 }
 
 .letters-welcome {
@@ -231,18 +183,6 @@
   }
 }
 
-.picture {
-  font-family: var(--font-emoji);
-  font-size: min(30cqh, 40cqw);
-  line-height: 1.1;
-  animation: wiggle 2.4s ease-in-out 0.5s infinite;
-}
-
-.picture-image {
-  width: min(36cqh, 48cqw);
-  height: auto;
-}
-
 .word {
   font-size: min(9cqh, 12cqw);
   font-weight: 700;
@@ -386,29 +326,5 @@
     .letters-play .card:not(.find-card) .count-badge {
       font-size: min(9cqh, 3cqw);
     }
-  }
-}
-
-/* Above the mode cards: the letters for every mode, then what „Wörter tippen“ plays, flowing in as few lines as fit. */
-.letters-level {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 22px;
-}
-
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  .letters-level {
-    gap: 4px 14px;
-  }
-
-  .letters-level .choice {
-    gap: 6px;
-  }
-
-  .letters-level .choice button {
-    min-height: 36px;
-    padding: 2px 10px;
-    box-shadow: 0 3px 0 var(--ink);
   }
 }

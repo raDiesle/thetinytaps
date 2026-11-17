@@ -4,6 +4,7 @@ import { useT } from "@/lib/language";
 import { noPointerClick } from "@/lib/press";
 import { BRIGHT_COLORS } from "./TapFeedback";
 import { Choice, SettingsGroup } from "./SettingControls";
+import "./touchKeyboard.css";
 
 /** Show big keys on the screen: only on touch devices without mouse or trackpad ("auto"), always, or never. */
 export type TouchKeysMode = "auto" | "on" | "off";

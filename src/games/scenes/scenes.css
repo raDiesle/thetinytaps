@@ -1,9 +1,10 @@
-/* Loaded for the whole app: src/globals.css imports it in order, so the cascade stays the same. */
+/* The scene engine's classes; ScenePlay.tsx imports it, so it loads with a picture, never with the start. */
 
 /* ---------- Lebendige Bilder ---------- */
 
-/* Above and below the picture the sky and ground continue, whatever the screen shape. */
-.scene {
+/* Above and below the picture the sky and ground continue, whatever the screen shape. Named `scene-root`, not `.scene`:
+   Was gehört zusammen? puts a class „scene“ on its pictures, and this sheet now loads with the game, possibly after its. */
+.scene-root {
   position: absolute;
   inset: 0;
   background: linear-gradient(var(--sky) 50%, var(--ground) 50%);

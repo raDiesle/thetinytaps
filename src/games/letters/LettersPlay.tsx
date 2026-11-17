@@ -11,6 +11,7 @@ import { LetterCard, NumberCard } from "./Cards";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
+import "./letters.css";
 
 /**
  * Presses closer together than this only make ripples, so mashing doesn't strobe nor chop line after line. The same key

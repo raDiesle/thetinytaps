@@ -6,6 +6,7 @@ import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/
 import { tapState } from "@/lib/tapTargets";
 import type { LettersSettings } from "./settings";
 import { TraceGlyphs } from "./TraceGlyphs";
+import "./letters.css";
 
 /** Item counts per row, arranged so small numbers are easy to count at a glance. */
 const ROWS: Record<number, number[]> = {

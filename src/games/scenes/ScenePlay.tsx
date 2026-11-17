@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
+// First of the game's own stylesheets, as it was when it was global: the engine's rules come before its parts' and pictures'.
+import "./scenes.css";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -735,7 +737,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const greyFilter = `url(#${greyId})`;
   // The grey copy of the background, with holes where it was painted.
   const greyCopy = { filter: greyFilter, mask: `url(#${svgId}-paint)` };
-  const sceneClass = ["scene", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
+  const sceneClass = ["scene scene-root", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
 
   return (
     <div

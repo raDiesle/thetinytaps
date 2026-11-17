@@ -1,5 +1,6 @@
 import type { WordEntry } from "@/content/types";
 import { asset } from "@/lib/asset";
+import "./picture.css";
 
 /** The word's illustration if it has one, otherwise its emoji. */
 export function Picture({ word }: { word: WordEntry }) {

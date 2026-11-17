@@ -225,7 +225,14 @@ In a fresh worktree run `bun install` first.
   classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
   game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
   (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
-  keyframes from another game's CSS (`css.test.ts` checks it).
+  keyframes from another game's CSS (`css.test.ts` checks it). Game sheets arrive in any order (the shelf preloads
+  them), so a class a game styles alone is prefixed even when it looks private: Was gehört zusammen?'s boxes carry
+  the class `scene`, and the scene engine's root rule is `.scene-root` for that reason (code review, November 2026).
+  A shared component's CSS lives beside it in `src/components/` and is imported by the component
+  (`touchKeyboard.css`, `tapHint.css`), never kept in `globals.css` for it: the start's stylesheet holds only what
+  the menus and every game need. Layers that order things across the whole page have names, `--z-…` on `:root` in
+  `src/styles/base.css`; a z-index above 10 is never a bare number in `src/styles/`, only local stacking inside one
+  component stays a literal, and a new page-wide layer gets its name and its place in the comment there (`css.test.ts`).
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
   Phones must keep up: what moves across a big picture as a whole (a scrolling world, a camera) is an HTML layer of its
@@ -1027,6 +1034,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    Sound is muted there, so "I hear no music" can't be checked by ear: wrap
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
+   While the Browser pane is hidden its pages run as background pages with throttled timers: a built page
+   (`preview-pages`) then waited for ever where a game holds a round for its voice, and looked broken (November 2026).
+   What a built page really shows, `bun run perf --no-build --shots <scenario>` tells with a screenshot from headless
+   Chrome – and not while the Mac is busy (a virus scan had its Chrome time out).
    Look only at the localhost servers of `.claude/launch.json`, never at this Mac's network address or another host to
    see how the real site behaves (the user declines it, November 2026): what depends on the host (`canTestUnfinished`)
    gets a unit test instead.

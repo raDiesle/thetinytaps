@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import "./keyboardMap.css";
 
 /** How far each row starts to the right of the one above, in key widths, like on a real keyboard. */
 const ROW_OFFSETS = [0, 0.5, 0.75, 1.25];

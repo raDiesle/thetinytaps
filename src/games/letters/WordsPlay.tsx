@@ -13,6 +13,8 @@ import { useVoiceReady } from "@/lib/voiceReady";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 import { useSoftTap } from "./softTap";
+import "./letters.css";
+import "./words.css";
 
 /** Keys closer together than this only make ripples, so mashing doesn't race through the word. */
 const MIN_TYPE_MS = 300;

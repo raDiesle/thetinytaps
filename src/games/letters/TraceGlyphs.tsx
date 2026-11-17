@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BRIGHT_COLORS, STAR_PATH } from "@/components/TapFeedback";
 import { playCountNote } from "@/lib/sfx";
+import "./letters.css";
 
 /** Room between two glyphs, like .glyphs (0.25em). */
 const GAP_EM = 0.25;

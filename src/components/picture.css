@@ -1,0 +1,13 @@
+/* Picture: a word's emoji or drawing, sized by the card's room (the stage, cqh / cqw). Loads with the component. */
+
+.picture {
+  font-family: var(--font-emoji);
+  font-size: min(30cqh, 40cqw);
+  line-height: 1.1;
+  animation: wiggle 2.4s ease-in-out 0.5s infinite;
+}
+
+.picture-image {
+  width: min(36cqh, 48cqw);
+  height: auto;
+}

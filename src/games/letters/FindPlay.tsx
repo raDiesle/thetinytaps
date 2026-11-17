@@ -14,6 +14,8 @@ import { LetterWord } from "./Cards";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
+import "./letters.css";
+import "./find.css";
 
 /** Keys closer together than this only make ripples, so mashing the whole keyboard doesn't count as finding. */
 const MIN_PRESS_MS = 300;
