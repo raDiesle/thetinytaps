@@ -1,6 +1,6 @@
 # Fun for Both
 
-Simple keyboard and touch games for toddlers, German first.
+Simple keyboard and touch games for toddlers. Everything new is written English first (since 11 November 2026); older content is German first.
 
 ## Development
 
@@ -32,7 +32,7 @@ Use **Bun** (not npm or yarn) for everything: installing, scripts, tests, bundli
 Working with Claude Code: [`CLAUDE.md`](CLAUDE.md) has the rules and the map of
 the code; each game folder has its own `CLAUDE.md` with what the game does and
 where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
-`/bild-erzeugen`.
+`/neues-abenteuer`, `/bild-erzeugen`, `/musik-erzeugen`, `/zahnputzlied`.
 
 ## Structure
 
@@ -105,8 +105,10 @@ browser bars.
 
 ## Offline and as an app
 
-After the first visit every file of the site is kept in the browser (service
-worker, `src/sw.js`), so the games start without network – in the plane or
+The service worker (`src/sw.js`) keeps what a visit uses: at install only the
+start, then every file a page fetched, so a game played once plays offline. More
+is kept only for an installed app or when grown-ups ask under „Offline spielen“
+on the home page. So the games start without network – in the plane or
 without WLAN – and straight away. The home page shows „Funktioniert auch ohne
 Internet“ once that is done, and an „Als App installieren“ button in Chrome /
 Edge / Android (on iPhone and iPad: Safari → Teilen → „Zum Home-Bildschirm“).
@@ -142,8 +144,9 @@ To add a picture that has no emoji, put an SVG in `public/images/` and set
 
 ## Leaving the game
 
-Hold **Esc** or the ✕ button (top right) for 1 second; the start screen of
-every game explains this before it starts. In Chrome/Edge the
+One tap on the ✕ (the page's corner, top left) or hold **Esc**. Holding ✕ for a
+moment is an option grown-ups can switch on under ⏳ on the home page; nothing
+explains this on screen. In Chrome/Edge the
 keyboard is locked while a game runs, so shortcuts like Cmd+W are captured
 (in the menus a single Esc leaves fullscreen);
 Cmd+Q / Cmd+Tab can't be blocked by any website.

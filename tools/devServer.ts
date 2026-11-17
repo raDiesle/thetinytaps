@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import index from "../index.html";
+import { safePath } from "./safePath";
 import { askedPort, serveOnFreePort } from "./serve";
 
 // The dev server: the app from the sources with hot reload. Bun bundles index.html on the fly with the
@@ -15,7 +16,9 @@ const publicRoutes = Object.fromEntries(
   readdirSync(PUBLIC, { withFileTypes: true }).map((entry) => [
     entry.isDirectory() ? `/${entry.name}/*` : `/${entry.name}`,
     async (request: Request) => {
-      const file = Bun.file(join(PUBLIC, decodeURIComponent(new URL(request.url).pathname)));
+      const found = safePath(PUBLIC, new URL(request.url).pathname);
+      if ("status" in found) return new Response("Not found", { status: found.status });
+      const file = Bun.file(found.path);
       return (await file.exists()) ? new Response(file) : new Response("Not found", { status: 404 });
     },
   ]),

@@ -37,3 +37,12 @@ test("docs, skills, scripts and tests say bun, not yarn, npx or Rstest (branches
   const found = files.filter((f) => f !== "src/packageSafety.test.ts" && old.test(readFileSync(join(ROOT, f), "utf8")));
   expect(found).toEqual([]);
 });
+
+test("every dependency is pinned to one exact version", () => {
+  const all = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+  };
+  const loose = Object.entries({ ...all.dependencies, ...all.devDependencies }).filter(([, version]) => !/^\d+\.\d+\.\d+$/.test(version));
+  expect(loose).toEqual([]);
+});

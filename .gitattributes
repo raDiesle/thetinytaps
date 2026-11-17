@@ -1,0 +1,7 @@
+# Media files are already compressed: git should neither delta-compress nor diff them.
+*.mp3 binary -delta
+*.webp binary -delta
+*.png binary -delta
+*.woff2 binary -delta
+*.jpg binary -delta
+*.wav binary -delta

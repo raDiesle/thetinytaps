@@ -1,4 +1,5 @@
-import { join, normalize } from "node:path";
+import { join } from "node:path";
+import { safePath } from "./safePath";
 import { askedPort, serveOnFreePort } from "./serve";
 
 // `bun run preview`: serves out/ like GitHub Pages does – under PUBLIC_BASE_PATH, a folder answers with
@@ -11,8 +12,9 @@ const base = (process.env.PUBLIC_BASE_PATH || "/").replace(/\/$/, "");
 /** The file of out/ an address stands for, if there is one. */
 async function fileFor(pathname: string) {
   if (!pathname.startsWith(`${base}/`)) return null;
-  let path = normalize(join(OUT, decodeURIComponent(pathname.slice(base.length))));
-  if (!path.startsWith(OUT)) return null;
+  const found = safePath(OUT, pathname.slice(base.length));
+  if (!("path" in found)) return null;
+  let path = found.path;
   if (pathname.endsWith("/")) path = join(path, "index.html");
   const file = Bun.file(path);
   return (await file.exists()) ? file : null;

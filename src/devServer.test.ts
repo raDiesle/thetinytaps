@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { join } from "node:path";
+import { safePath } from "../tools/safePath";
 import { isThere, stillImported, type UnresolvedImport, unresolvedImportReader } from "../tools/staleImports";
 
 // `bun run dev` (tools/dev.ts) restarts the dev server when Bun is stuck on files that are there by now. It reads
@@ -42,4 +43,13 @@ test("an import fixed in its importer is no longer waited for", () => {
   expect(stillImported({ specifier: "react-router", importer: APP })).toBe(true);
   expect(stillImported({ specifier: "@/lib/noSuchFile", importer: APP })).toBe(false);
   expect(stillImported({ specifier: "react", importer: "/no/such/file.ts" })).toBe(false);
+});
+
+test("the local servers never resolve an address outside their folder", () => {
+  const root = join(import.meta.dir, "../out");
+  for (const address of ["/../package.json", "/%2e%2e/package.json", "/..%2fpackage.json", "/../out-x/a"])
+    expect(safePath(root, address), address).toEqual({ status: 404 });
+  expect(safePath(root, "/%")).toEqual({ status: 400 });
+  expect(safePath(root, "/en/index.html")).toEqual({ path: join(root, "en/index.html") });
+  expect(safePath(root, "/")).toEqual({ path: root });
 });

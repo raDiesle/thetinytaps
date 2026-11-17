@@ -186,8 +186,14 @@ test("every peeking animal looks like exactly one group of „Wer schaut da raus
 test("peepholes lie on drawn cells and never overlap", () => {
   // A shape drawn only in its left half.
   const cover = Array.from({ length: GRID * GRID }, (_, i) => (i % GRID < 2 ? 1 : 0));
+  // Seeded, so a failure repeats.
+  let seed = 11;
+  const random = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
   for (let n = 0; n < 20; n++) {
-    const holes = pickPeepholes(cover, 180, 180, 3, 60);
+    const holes = pickPeepholes(cover, 180, 180, 3, 60, random);
     expect(holes.length).toBeGreaterThan(0);
     for (const h of holes) expect(h.x).toBeLessThan(0.4);
     for (const a of holes) for (const b of holes) if (a !== b) expect(Math.hypot((a.x - b.x) * 180, (a.y - b.y) * 180)).toBeGreaterThanOrEqual(60);

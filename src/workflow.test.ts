@@ -38,3 +38,15 @@ test("tests that play a whole story are heavy tests, skipped on CI", () => {
     expect(text, file).toContain("heavyTest(");
   }
 });
+
+test("every deploy job has a timeout and a deploy running is never cancelled", () => {
+  const text = readFileSync(join(WORKFLOWS, "deploy.yml"), "utf8");
+  const jobs = text
+    .slice(text.indexOf("\njobs:"))
+    .split("\n")
+    .filter((line) => /^ {2}[\w-]+:\s*$/.test(line));
+  expect(jobs.length).toBeGreaterThan(0);
+  expect(text.match(/^ {4}timeout-minutes: \d+/gm)?.length).toBe(jobs.length);
+  expect(text).toMatch(/cancel-in-progress: false/);
+  expect(text).not.toMatch(/cancel-in-progress: true/);
+});
