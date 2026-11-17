@@ -49,22 +49,56 @@ export function sceneModuleFor(path: string, scenes: Map<string, string>) {
 }
 
 /**
- * A chunk with every chunk it imports statically, one level after another (`from"/static/x.js"`, `import"/static/x.js"`;
- * never the `import("…")` of a page loaded later). `read` gives a chunk's code by its file (`static/x.js`), `prefix` is
- * how the code names a file (`/static/`, with the base path).
+ * A chunk with every chunk it imports statically, one level after another (`from"/static/x.js"`, `import"/static/x.js"`).
+ * `read` gives a chunk's code by its file (`static/x.js`), `prefix` is how the code names a file (`/static/`, with the
+ * base path). With `later`, also the chunks it loads later itself (`import("/static/x.js")`), but none of `stop` (the
+ * other pages, which a book's copy leaves to their own books) unless it is `first` itself.
  */
-export async function chunkClosure(first: string, read: (file: string) => Promise<string>, prefix: string) {
+export async function chunkClosure(
+  first: string,
+  read: (file: string) => Promise<string>,
+  prefix: string,
+  { later = false, stop }: { later?: boolean; stop?: ReadonlySet<string> } = {},
+) {
+  const named = new RegExp(`(?:from|import)\\s*${later ? "\\(?" : ""}"${prefix.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}([\\w.-]+\\.js)"`, "g");
   const seen = new Set<string>();
   const queue = [first];
   while (queue.length) {
     const file = queue.shift()!;
     if (seen.has(file)) continue;
     seen.add(file);
-    const code = await read(file);
-    for (const [, name] of code.matchAll(new RegExp(`(?:from|import)\\s*"${prefix.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}([\\w.-]+\\.js)"`, "g")))
-      queue.push(`static/${name}`);
+    for (const [, name] of (await read(file)).matchAll(named)) {
+      const chunk = `static/${name}`;
+      if (!stop?.has(chunk) || chunk === first) queue.push(chunk);
+    }
   }
   return [...seen];
+}
+
+/** A font moved out of a stylesheet (`fontsAsFiles`): its path in out/ (`static/<name>.<hash>.woff2`) and its bytes. */
+export interface FontFile {
+  path: string;
+  bytes: Uint8Array;
+}
+
+/**
+ * Bun's CSS bundler always embeds a font a stylesheet names as base64 (`url(data:font/woff2;base64,…)`), whatever
+ * loader is set: Fredoka's two parts made 36 of the start stylesheet's 65 KB gz, and that stylesheet holds up every
+ * page's first picture, while `font-display: swap` lets the text show in the device's font until the file has come
+ * (R-P5). So the build takes each one out again into a file named by its content, and the stylesheet names that file.
+ * `names` gives a font's name by the sha256 of its bytes (`fredoka-latin-wght-normal`, the source file's), `prefix`
+ * how the stylesheet names a file (`/static/`, with the base path).
+ */
+export function fontsAsFiles(css: string, names: ReadonlyMap<string, string>, prefix: string) {
+  const files: FontFile[] = [];
+  const out = css.replace(/url\(\s*(["']?)data:font\/woff2;base64,([A-Za-z0-9+/=]+)\1\s*\)/g, (_, _quote: string, base64: string) => {
+    const bytes = Uint8Array.from(Buffer.from(base64, "base64"));
+    const digest = new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
+    const path = `static/${names.get(digest) ?? "font"}.${digest.slice(0, 8)}.woff2`;
+    if (!files.some((file) => file.path === path)) files.push({ path, bytes });
+    return `url(${prefix}${path.slice("static/".length)})`;
+  });
+  return { css: out, files };
 }
 
 /**

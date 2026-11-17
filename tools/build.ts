@@ -26,7 +26,7 @@ import { shelfEntryOf } from "../src/content/games";
 import { levelPaths } from "../src/content/levelPages";
 import { appPlugin, PRODUCTION } from "./appPlugin";
 import { isBackgroundSong, isVoice, languageOf, needsEnglish, type OfflineManifest, type OfflinePart } from "../src/lib/offlineParts";
-import { BOOT_WAIT, chunkClosure, countedHosts, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "./pageStart";
+import { BOOT_WAIT, chunkClosure, countedHosts, fontsAsFiles, pageModuleFor, pageModules, sceneModuleFor, sceneModules, textsPreload } from "./pageStart";
 import { structuredDataTags } from "./structuredData";
 import { CRAWLER, LANGUAGE_KEY } from "../src/lib/locale";
 
@@ -52,10 +52,20 @@ const escapeHtml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "
 /** The address of a page or file inside the site, with the base path. */
 const href = (path: string) => `${base}${path}`;
 
-/** Replaces exactly one match, so a changed index.html fails the build instead of silently losing a tag. */
-function replaceOnce(html: string, search: RegExp | string, replacement: string) {
-  if (!(typeof search === "string" ? html.includes(search) : search.test(html))) throw new Error(`build: ${search} not found in index.html`);
+/** Replaces exactly one match, so a changed index.html (or src/sw.js, `where`) fails the build instead of silently losing a tag. */
+function replaceOnce(html: string, search: RegExp | string, replacement: string, where = "index.html") {
+  if (!(typeof search === "string" ? html.includes(search) : search.test(html))) throw new Error(`build: ${search} not found in ${where}`);
   return html.replace(search, () => replacement);
+}
+
+/** Every file written into out/ after its one walk (`walkOut`), as paths relative to it with "/". */
+const written = new Set<string>();
+
+/** Writes a file into out/ (its folders too) and notes it for the closing count. */
+async function put(file: string, data: string | Uint8Array) {
+  await mkdir(join(OUT, file, ".."), { recursive: true });
+  await writeFile(join(OUT, file), data);
+  written.add(file);
 }
 
 /** All files below a folder, as paths relative to it with "/". */
@@ -65,6 +75,45 @@ async function filesIn(dir: string) {
     .filter((entry) => entry.isFile())
     .map((entry) => join(entry.parentPath, entry.name).slice(dir.length + 1).split("\\").join("/"))
     .sort();
+}
+
+/** out/ as bundled, walked once (`walkOut`): its files, each chunk by its name, and their code read once. */
+interface Built {
+  /** Every file, relative to out/ with "/", sorted. */
+  files: string[];
+  /** A chunk's file by its name (`TeethPage` → `static/TeethPage.<hash>.js`), or undefined; never two. */
+  chunkOf(name: string): string | undefined;
+  /** A file's text, read once. */
+  read(file: string): Promise<string>;
+  /** `chunkClosure` of a chunk over `read`, worked out once for each chunk and kind (every caller passes the same `stop`). */
+  closure(first: string, later?: { stop: ReadonlySet<string> }): Promise<string[]>;
+}
+
+/** Walks out/ once, after bundling and before the pages are written (R-D9: it was walked four times, 27k files each). */
+async function walkOut(): Promise<Built> {
+  const files = await filesIn(OUT);
+  const chunks = new Map<string, string[]>();
+  for (const file of files) {
+    const name = /^static\/(.+)\.[a-z0-9]+\.js$/.exec(file)?.[1];
+    if (name) chunks.set(name, [...(chunks.get(name) ?? []), file]);
+  }
+  const texts = new Map<string, Promise<string>>();
+  const read = (file: string) => texts.get(file) ?? (texts.set(file, readFile(join(OUT, file), "utf8")), texts.get(file) as Promise<string>);
+  const closures = new Map<string, Promise<string[]>>();
+  return {
+    files,
+    chunkOf: (name) => {
+      const found = chunks.get(name) ?? [];
+      if (found.length > 1) throw new Error(`build: ${found.length} chunks for ${name}`);
+      return found[0];
+    },
+    read,
+    closure: (first, later) => {
+      const key = `${later ? "later" : "now"} ${first}`;
+      if (!closures.has(key)) closures.set(key, chunkClosure(first, read, `${base}/static/`, later ? { later: true, stop: later.stop } : {}));
+      return closures.get(key) as Promise<string[]>;
+    },
+  };
 }
 
 /**
@@ -92,7 +141,7 @@ async function bundle() {
     sourcemap: "none",
     publicPath: `${base}/`,
     naming: { entry: "[dir]/[name].[ext]", chunk: "static/[name].[hash].[ext]", asset: "static/[name].[hash].[ext]" },
-    // The font (@fontsource in src/globals.css) ends up inside the stylesheet, so it needs no request of its own.
+    // Bun embeds the font (src/styles/font.css) into the stylesheet; fontsOutOfStyles takes it out again afterwards.
     plugins: [appPlugin({ DEV: false, PROD: true, BASE_URL: base || "/" }, await minifiedStyles())],
     throw: false,
   });
@@ -229,9 +278,9 @@ function headTags({ language, page, text }: BuiltPage) {
 // so it opens with status 200 and Google counts it as the game's page. It stays out of the sitemap, which lists only
 // the addresses to be found.
 // 404.html stays the plain start page, so any other deep link still boots the app.
-async function writePages(template: string) {
-  const { preloadsOf, textsOf } = await pagePreloads(template);
-  await writeFile(join(OUT, "404.html"), textsOf(template, "de"));
+async function writePages(template: string, out: Built) {
+  const { preloadsOf, textsOf } = await pagePreloads(template, out);
+  await put("404.html", textsOf(template, "de"));
   const built = SEO_LANGUAGES.flatMap((language) => SEO_PAGES.map((page): BuiltPage => ({ language, page, text: textIn(page, language) })));
   for (const one of built) {
     let html = replaceOnce(textsOf(template, one.language), '<html lang="de">', `<html lang="${one.language}">`);
@@ -240,17 +289,13 @@ async function writePages(template: string) {
     html = replaceOnce(html, "</head>", `  ${[headTags(one), ...(await preloadsOf(one))].join("\n    ")}\n  </head>`);
     html = replaceOnce(html, '<div id="root"></div>', `<div id="root">${staticBody(one)}</div>`);
     for (const path of [one.page.path, ...levelPaths(one.page.path)]) {
-      const dir = join(OUT, languagePrefix(one.language), path);
-      await mkdir(dir, { recursive: true });
-      await writeFile(join(dir, "index.html"), html);
+      await put(`${languagePrefix(one.language)}${path}index.html`.slice(1), html);
     }
   }
   for (const language of SEO_LANGUAGES) {
     for (const path of NO_INDEX_PATHS) {
-      const dir = join(OUT, languagePrefix(language), path);
-      await mkdir(dir, { recursive: true });
       const html = replaceOnce(textsOf(template, language), '<html lang="de">', `<html lang="${language}">`);
-      await writeFile(join(dir, "index.html"), replaceOnce(html, "</head>", '<meta name="robots" content="noindex" /></head>'));
+      await put(`${languagePrefix(language)}${path}index.html`.slice(1), replaceOnce(html, "</head>", '<meta name="robots" content="noindex" /></head>'));
     }
   }
   // A moved page sends on to its new address in the same language: GitHub Pages can't answer 301, and Google takes a
@@ -258,20 +303,18 @@ async function writePages(template: string) {
   for (const language of SEO_LANGUAGES) {
     for (const [from, to] of Object.entries(MOVED_PATHS)) {
       const target = urlOf(to, language);
-      const dir = join(OUT, languagePrefix(language), from);
-      await mkdir(dir, { recursive: true });
-      await writeFile(
-        join(dir, "index.html"),
+      await put(
+        `${languagePrefix(language)}${from}index.html`.slice(1),
         `<!doctype html>\n<html lang="${language}">\n<head>\n<meta charset="utf-8" />\n<title>${SITE_NAME}</title>\n<link rel="canonical" href="${target}" />\n<meta http-equiv="refresh" content="0; url=${target}" />\n</head>\n<body><a href="${target}">${target}</a></body>\n</html>\n`,
       );
     }
   }
   const urls = built.map(({ language, page }) => `  <url><loc>${urlOf(page.path, language)}</loc></url>`);
-  await writeFile(
-    join(OUT, "sitemap.xml"),
+  await put(
+    "sitemap.xml",
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
   );
-  await writeFile(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
+  await put("robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
 }
 
 /**
@@ -282,18 +325,16 @@ async function writePages(template: string) {
  * texts, an English page played in German none. They come down together with the start's code, while the page's title
  * waits on paper (`.boot`).
  */
-async function pagePreloads(template: string) {
+async function pagePreloads(template: string, built: Built) {
   const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
   const scenes = sceneModules(await readFile(join(ROOT, "src/games/scenes/catalog.ts"), "utf8"));
-  const files = await filesIn(OUT);
   const linked = new Set([...template.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]));
-  const read = (file: string) => readFile(join(OUT, file), "utf8");
   const chunkOf = (name: string) => {
-    const found = files.filter((file) => new RegExp(`^static/${name}\\.[a-z0-9]+\\.js$`).test(file));
-    if (found.length !== 1) throw new Error(`build: ${found.length} chunks for ${name}`);
-    return found[0];
+    const found = built.chunkOf(name);
+    if (!found) throw new Error(`build: no chunk for ${name}`);
+    return found;
   };
-  const unlinked = async (first: string) => (await chunkClosure(first, read, `${base}/static/`)).map((file) => href(`/${file}`)).filter((url) => !linked.has(url));
+  const unlinked = async (first: string) => (await built.closure(first)).map((file) => href(`/${file}`)).filter((url) => !linked.has(url));
   const texts: Record<string, string[]> = {};
   for (const language of SEO_LANGUAGES) texts[language] = await unlinked(chunkOf(`texts-${language}`));
   const stylesheet = '<link rel="stylesheet"';
@@ -312,17 +353,19 @@ async function pagePreloads(template: string) {
   };
 }
 
-// Offline support (PWA): writes out/sw.js from src/sw.js with the list of all built files, so the
-// service worker can keep them in the browser. The version is a hash over the worker and all files,
+// Offline support (PWA): writes out/sw.js from src/sw.js, so the service worker can keep the built files in the
+// browser. It names only the few files not named by their content (UNHASHED); the content hashes of the others go into
+// static/built.<hash>.txt, which the worker fetches only at install (R-P9: listed in sw.js they made it 246 KB). The
+// version is a hash over the worker and all files,
 // so every change installs a new one. 404.html is left out: the worker answers deep links with
 // index.html itself, and so is the picture for link previews (PREVIEW_IMAGE), which only other sites fetch. So are songs (files named musik-*.mp3): music can be switched off for all games,
 // and then they must not be downloaded; the worker keeps a song once a page has fetched it. The same
 // for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/lib/voiceName.ts)
 // and the texts of each language (texts-ru.<hash>.js, src/content/texts): only the chosen one is needed, and
 // the worker keeps the one a page asks for (TEXTS, by language).
-async function writeServiceWorker() {
-  const offline = await writeOfflineManifest();
-  const all = await filesIn(OUT);
+async function writeServiceWorker(built: Built) {
+  const offline = await writeOfflineManifest(built);
+  const all = built.files;
   const texts = Object.fromEntries(all.flatMap((file) => /^static\/texts-([a-z]{2})\.[^/]*\.js$/.exec(file)?.slice(1, 2).map((id) => [id, `./${file}`]) ?? []));
   // Offline every address opens index.html (src/sw.js), so the other pages, written for search engines, stay out.
   const files = all.filter(
@@ -332,9 +375,21 @@ async function writeServiceWorker() {
       `/${file}` !== PREVIEW_IMAGE.path &&
       !/\.(map|LICENSE\.txt)$/.test(file) &&
       !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file) &&
-      !Object.values(texts).includes(`./${file}`) &&
-      `./${file}` !== offline,
+      !Object.values(texts).includes(`./${file}`),
   );
+  const unhashed = files.filter((file) => !file.startsWith("static/"));
+  const hashes = files
+    .filter((file) => file.startsWith("static/"))
+    .map((file) => {
+      const hash = /^static\/[^/]+\.([a-z0-9]+)\.[a-z0-9]+$/.exec(file)?.[1];
+      if (!hash) throw new Error(`build: static/ holds ${file}, which is not named by its content: the service worker would keep it for good`);
+      return hash;
+    });
+  // Only a handful: everything else must be named by its content, or the worker's start grows again.
+  if (unhashed.length > 30) throw new Error(`build: ${unhashed.length} files outside static/, each named in sw.js: ${unhashed.slice(0, 5).join(", ")} …`);
+  const list = [...new Set(hashes)].sort().join("\n");
+  const builtList = `./static/built.${createHash("sha256").update(list).digest("hex").slice(0, 8)}.txt`;
+  await put(builtList.slice(2), list);
   const shell = await shellFiles();
   const template = await readFile(join(ROOT, "src/sw.js"), "utf8");
   const hash = createHash("sha256").update(template);
@@ -343,13 +398,15 @@ async function writeServiceWorker() {
     const bytes = await readFile(join(OUT, file));
     hash.update(file).update(file.endsWith(".html") ? bytes.toString("utf8").replace(/<meta name="build-time" content="[^"]*" \/>/, "") : bytes);
   }
-  const worker = template
-    .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
-    .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
-    .replace("__SHELL__", JSON.stringify(shell.map((file) => `./${file}`)))
-    .replace("__TEXTS__", JSON.stringify(texts))
-    .replace("__OFFLINE__", JSON.stringify(offline));
-  await writeFile(join(OUT, "sw.js"), worker);
+  const fills: [string, string][] = [
+    ['"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12))],
+    ["__UNHASHED__", JSON.stringify(unhashed.map((file) => `./${file}`))],
+    ["__BUILT__", JSON.stringify(builtList)],
+    ["__SHELL__", JSON.stringify(shell.map((file) => `./${file}`))],
+    ["__TEXTS__", JSON.stringify(texts)],
+    ["__OFFLINE__", JSON.stringify(offline)],
+  ];
+  await put("sw.js", fills.reduce((code, [placeholder, value]) => replaceOnce(code, placeholder, value, "src/sw.js"), template));
 }
 
 /**
@@ -359,35 +416,17 @@ async function writeServiceWorker() {
  * languages' voices and songs are told apart by their names; an English recording stands in for the languages whose
  * recordings in the same game's code fall short (`needsEnglish`).
  */
-async function writeOfflineManifest() {
-  const files = await filesIn(OUT);
-  const read = (file: string) => readFile(join(OUT, file), "utf8");
-  const prefix = `${base}/static/`;
-  const escaped = prefix.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
+  const escaped = `${base}/static/`.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
   const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
-  const chunkOf = (name: string) => files.find((file) => new RegExp(`^static/${name}\\.[a-z0-9]+\\.js$`).test(file));
   const pageChunks = new Set([...new Set(modules.values())].map(chunkOf).filter((chunk): chunk is string => !!chunk));
-  /** A chunk with the chunks it imports, statically or later, but never another page. */
-  const closure = async (first: string) => {
-    const seen = new Set<string>();
-    const queue = [first];
-    while (queue.length) {
-      const file = queue.shift() as string;
-      if (seen.has(file)) continue;
-      seen.add(file);
-      for (const [, name] of (await read(file)).matchAll(new RegExp(`(?:from|import)\\s*\\(?"${escaped}([\\w.-]+\\.js)"`, "g"))) {
-        const chunk = `static/${name}`;
-        if (!pageChunks.has(chunk) || chunk === first) queue.push(chunk);
-      }
-    }
-    return seen;
-  };
   /** The files a chunk's code names (pictures, sounds), besides itself. */
   const named = async (chunk: string) => [chunk, ...[...(await read(chunk)).matchAll(new RegExp(`${escaped}([\\w.-]+\\.(?:mp3|webp|png|jpe?g|svg|woff2?))`, "g"))].map((m) => `static/${m[1]}`)];
 
-  const html = await read("index.html");
+  // index.html as writePages left it (the home page's), read anew: `read` keeps what it read once.
+  const html = await readFile(join(OUT, "index.html"), "utf8");
   const start = new Set<string>();
-  for (const [, name] of html.matchAll(new RegExp(`${escaped}([\\w.-]+\\.js)`, "g"))) for (const chunk of await chunkClosure(`static/${name}`, read, prefix)) start.add(chunk);
+  for (const [, name] of html.matchAll(new RegExp(`${escaped}([\\w.-]+\\.js)`, "g"))) for (const chunk of await closure(`static/${name}`)) start.add(chunk);
   const shared = new Set<string>();
   for (const chunk of start) for (const file of await named(chunk)) shared.add(file);
 
@@ -398,7 +437,8 @@ async function writeOfflineManifest() {
     const chunk = chunkOf(module);
     if (!book || !chunk) continue;
     const used: string[] = [];
-    for (const each of await closure(chunk)) if (!start.has(each)) used.push(...(await named(each)));
+    // A chunk with the chunks it imports, statically or later, but never another page.
+    for (const each of await closure(chunk, { stop: pageChunks })) if (!start.has(each)) used.push(...(await named(each)));
     const lacking = needsEnglish(used)(SEO_LANGUAGES);
     for (const file of used) {
       if (shared.has(file)) continue;
@@ -426,7 +466,7 @@ async function writeOfflineManifest() {
   const manifest: OfflineManifest = { parts };
   const json = JSON.stringify(manifest);
   const name = `static/offline.${createHash("sha256").update(json).digest("hex").slice(0, 8)}.json`;
-  await writeFile(join(OUT, name), json);
+  await put(name, json);
   return `./${name}`;
 }
 
@@ -456,7 +496,8 @@ async function shellFiles() {
     for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(/static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)/g))
       if (!previews.has(digest(await readFile(join(OUT, match[0]))))) pictures.add(match[0]);
   }
-  const shell = ["index.html", ...linked, ...pictures];
+  // The preloaded font is linked and named by the stylesheet too: kept once.
+  const shell = [...new Set(["index.html", ...linked, ...pictures])];
   const megabytes = shell.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0) / 1e6;
   console.log(`service worker's start: ${shell.length} files, ${megabytes.toFixed(2)} MB`);
   if (shell.length > MAX_SHELL.files || megabytes > MAX_SHELL.megabytes) {
@@ -466,6 +507,34 @@ async function shellFiles() {
   return shell;
 }
 
+/** The font every page preloads: the Latin part, which every language's menus use (the others only for a few letters). */
+const PRELOADED_FONT = "fredoka-latin-wght-normal";
+
+/**
+ * Takes the fonts Bun embedded into the built stylesheets out again into files of their own (`fontsAsFiles`), named
+ * after the files src/styles/font.css names; returns the preload tag of `PRELOADED_FONT`. The latin-ext part stays a
+ * file the browser fetches only for a letter it covers (`unicode-range`): Chinese pinyin's tone marks (bō, ǎ) need it.
+ */
+async function fontsOutOfStyles() {
+  const source = await readFile(join(ROOT, "src/styles/font.css"), "utf8");
+  const names = new Map<string, string>();
+  for (const [, path] of source.matchAll(/url\("([^"]+\.woff2)"\)/g)) {
+    const bytes = await readFile(join(ROOT, "src/styles", path));
+    names.set(createHash("sha256").update(bytes).digest("hex"), path.slice(path.lastIndexOf("/") + 1, -".woff2".length));
+  }
+  const written: string[] = [];
+  for (const file of (await readdir(join(OUT, "static"))).filter((name) => name.endsWith(".css"))) {
+    const { css, files } = fontsAsFiles(await readFile(join(OUT, "static", file), "utf8"), names, `${base}/static/`);
+    if (css.includes("data:font")) throw new Error(`build: static/${file} still embeds a font that is no woff2`);
+    for (const font of files) await writeFile(join(OUT, font.path), font.bytes);
+    written.push(...files.map((font) => font.path));
+    await writeFile(join(OUT, "static", file), css);
+  }
+  const preloaded = written.find((path) => path.startsWith(`static/${PRELOADED_FONT}.`));
+  if (!preloaded) throw new Error(`build: no ${PRELOADED_FONT} font came out of the stylesheets`);
+  return `<link rel="preload" as="font" type="font/woff2" crossorigin href="${href(`/${preloaded}`)}" />`;
+}
+
 /** The most out/ may weigh, in MB: GitHub Pages publishes at most 1 GB, and the deploy should fail long before. */
 const MAX_SITE_MB = 800;
 
@@ -473,14 +542,18 @@ const started = performance.now();
 await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
 await cp(join(ROOT, "public"), OUT, { recursive: true });
+const fontPreload = await fontsOutOfStyles();
 // The time of this build stands in every page (`buildDate` in src/lib/pwa.ts reads it), never in the code: a value
 // that changes with each build renamed most chunks every time, so returning visitors downloaded every game again.
 const BUILD_TIME_TAG = `<meta name="build-time" content="${new Date().toISOString()}" />`;
-const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${[BUILD_TIME_TAG, ...APP_LINKS, ...ANALYTICS].join("")}</head>`);
+// The font's preload stands before the stylesheet, so its download starts as early as the stylesheet's.
+const bundled = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), '<link rel="stylesheet"', `${fontPreload}<link rel="stylesheet"`);
+const template = replaceOnce(bundled, "</head>", `${[BUILD_TIME_TAG, ...APP_LINKS, ...ANALYTICS].join("")}</head>`);
 await writeFile(join(OUT, "index.html"), template);
-await writePages(template);
-await writeServiceWorker();
-const files = await filesIn(OUT);
+const built = await walkOut();
+await writePages(template, built);
+await writeServiceWorker(built);
+const files = [...new Set([...built.files, ...written])];
 const bytes = files.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0);
 const megabytes = Math.round(bytes / 1e6);
 console.log(`out/: ${files.length} files, ${megabytes} MB (${result.outputs.length} bundled) in ${Math.round(performance.now() - started)} ms`);

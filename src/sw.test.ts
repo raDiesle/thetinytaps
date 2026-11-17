@@ -55,7 +55,13 @@ function fakeCaches(store: Store, network: Network) {
   };
 }
 
-/** Loads the worker of a build with these files into the fake browser, `network` as its fetch. */
+/** Where the worker of `worker()` finds the content hashes of its build's files (BUILT). */
+const BUILT = "static/built.l1.txt";
+
+/**
+ * Loads the worker of a build with these files into the fake browser, `network` as its fetch. Its list of the build's
+ * files (BUILT) the fake browser serves itself, from `files`, counting in `builtFetched` how often it was asked for.
+ */
 function worker(
   network: Network,
   { store = new Map() as Store, version = "new", files = [] as string[], shell = [] as string[], offline = null as string | null } = {},
@@ -72,7 +78,8 @@ function worker(
   };
   const source = readFileSync(join(import.meta.dir, "sw.js"), "utf8")
     .replace('"__VERSION__"', JSON.stringify(version))
-    .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
+    .replace("__UNHASHED__", JSON.stringify(files.filter((file) => !file.startsWith("static/")).map((file) => `./${file}`)))
+    .replace("__BUILT__", JSON.stringify(`./${BUILT}`))
     .replace("__SHELL__", JSON.stringify(shell.map((file) => `./${file}`)))
     .replace("__TEXTS__", "{}")
     .replace("__OFFLINE__", JSON.stringify(offline && `./${offline}`));
@@ -88,7 +95,13 @@ function worker(
       requests.push({ url: this.url.replace(SCOPE, ""), cache: init?.cache });
     }
   }
-  const fetch = (request: { url: string }) => network({ url: address(request) });
+  let builtFetched = 0;
+  const hashes = files.filter((file) => file.startsWith("static/")).map((file) => file.split(".").at(-2));
+  const fetch = async (request: string | { url: string }) => {
+    if (address(request) !== SCOPE + BUILT) return network({ url: address(request) });
+    builtFetched++;
+    return new Response(hashes.join("\n"));
+  };
   new Function("self", "caches", "fetch", "Request", quick)(self, fakeCaches(store, network), fetch, FakeRequest);
 
   /** Sends the worker an event and waits for its answer and, unless `settle` is false, all the work it started. */
@@ -102,6 +115,8 @@ function worker(
   };
   return {
     store,
+    /** How often the worker fetched its build's list of files (BUILT). */
+    builtFetched: () => builtFetched,
     /** Every Request the worker made, with its cache mode. */
     requests,
     install: () => dispatch("install", {}),
@@ -204,24 +219,70 @@ test("a new build keeps what the old one had without downloading it again", asyn
   expect([...(next.store.get("tinytaps-2")?.keys() ?? [])]).toContain(`${SCOPE}static/zahn.d4.webp`);
 });
 
-test("an installed app keeps every file, and so does its next build", async () => {
-  const first = online();
-  const old = worker(first.network, { version: "1", files: FILES, shell: SHELL });
+/** A network serving `manifest` as the offline copy's list (`partsOf`), recording every other address asked for. */
+function serving(manifest: string, parts: object[]) {
+  const net = online();
+  const network: Network = async (request) => (request.url === SCOPE + manifest ? new Response(JSON.stringify({ parts })) : net.network(request));
+  return { asked: net.asked, network };
+}
+
+/** The offline copy's list of a build of `files`, as an app from before the choice keeps it: a song it leaves to music. */
+const partsOf = (files: string[]) => [...files, "static/musik-hintergrund.s1.mp3"].map((file) => ({ path: `./${file}`, bytes: 1 }));
+
+test("an installed app from before the choice keeps every file but the songs, and so does its next build", async () => {
+  const first = serving("static/offline.o1.json", partsOf(FILES));
+  const old = worker(first.network, { version: "1", files: FILES, shell: SHELL, offline: "static/offline.o1.json" });
   await old.install();
   await old.message({ keepAll: true });
   expect(first.asked.sort()).toEqual([...FILES].sort());
-  const next = online();
   const files = [...FILES, "static/neu.f6.webp"];
-  await worker(next.network, { store: old.store, version: "2", files, shell: SHELL }).install();
+  const next = serving("static/offline.o2.json", partsOf(files));
+  await worker(next.network, { store: old.store, version: "2", files, shell: SHELL, offline: "static/offline.o2.json" }).install();
   // index.html is fetched anew with every build; of the rest only the new file.
   expect(next.asked.sort()).toEqual(["index.html", "static/neu.f6.webp"]);
+});
+
+test("without the offline copy's list (offline) nothing is marked as kept, and the next start tries again", async () => {
+  const { network } = online();
+  let up = false;
+  const sw = worker((request) => (up ? network(request) : offline(request)), { files: FILES, shell: SHELL, offline: "static/offline.o1.json" });
+  await sw.message({ keepAll: true });
+  expect(cached(sw)).not.toContain("__all__");
+  up = true;
+  const parts = serving("static/offline.o1.json", partsOf(FILES));
+  const again = worker(parts.network, { store: sw.store, files: FILES, shell: SHELL, offline: "static/offline.o1.json" });
+  await again.message({ keepAll: true });
+  expect(cached(again)).toContain("__all__");
+  expect(cached(again)).toContain("static/zahn.d4.webp");
+});
+
+test("a new build takes over only the files it still has, and a first visit fetches no list of the build's files", async () => {
+  const before = online();
+  const old = worker(before.network, { version: "1", files: FILES, shell: SHELL });
+  await old.install();
+  expect(old.builtFetched()).toBe(0);
+  await old.file("static/zahn.d4.webp");
+  await old.file("static/zaehne.c3.js");
+  // The new build changed the teeth's code (a new hash) and the start's.
+  const files = ["index.html", "static/app.e5.js", "static/cover.b2.webp", "static/zaehne.g7.js", "static/zahn.d4.webp"];
+  const next = worker(online().network, { store: old.store, version: "2", files, shell: ["index.html", "static/app.e5.js", "static/cover.b2.webp"] });
+  await next.install();
+  expect(next.builtFetched()).toBe(1);
+  expect(cached(next, "2")).toContain("static/zahn.d4.webp");
+  expect(cached(next, "2")).not.toContain("static/zaehne.c3.js");
+  expect(cached(next, "2")).not.toContain("static/app.a1.js");
 });
 
 test("an installed app's download that breaks off goes on from where it stopped", async () => {
   const many = ["index.html", ...Array.from({ length: 60 }, (_, i) => `static/bild${i}.h${i}.webp`)];
   const { asked, network } = online();
   let budget = 40;
-  const sw = worker((request) => (budget-- > 0 ? network(request) : offline(request)), { files: many, shell: ["index.html"] });
+  const manifest = serving("static/offline.o1.json", partsOf(many));
+  const sw = worker((request) => (budget-- > 0 ? (request.url.endsWith(".json") ? manifest.network(request) : network(request)) : offline(request)), {
+    files: many,
+    shell: ["index.html"],
+    offline: "static/offline.o1.json",
+  });
   await sw.install();
   await sw.message({ keepAll: true });
   budget = Infinity;
@@ -248,11 +309,7 @@ const PARTS = [
 ];
 
 /** A network serving the offline copy's list too. */
-function withManifest() {
-  const net = online();
-  const network: Network = async (request) => (request.url === SCOPE + MANIFEST ? new Response(JSON.stringify({ parts: PARTS })) : net.network(request));
-  return { asked: net.asked, network };
-}
+const withManifest = () => serving(MANIFEST, PARTS);
 
 const cached = (sw: { store: Store }, version = "new") => [...(sw.store.get(`tinytaps-${version}`)?.keys() ?? [])].map((url) => url.replace(SCOPE, ""));
 

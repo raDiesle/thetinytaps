@@ -1,8 +1,10 @@
 /*
  * The app's font, Fredoka, as a variable font: only the Latin parts, which every language of the app with Latin
  * letters needs (Chinese, Hindi, Arabic and Russian use the device's own fonts). The package's own stylesheet
- * (`@fontsource-variable/fredoka`) adds a Hebrew part no language uses; the build embeds every part into the
- * stylesheet each page waits for before its first picture, so that part cost every visitor 12 KB (A-23).
+ * (`@fontsource-variable/fredoka`) adds a Hebrew part no language uses (A-23). Bun embeds each part into the
+ * stylesheet every page waits for before its first picture; the build takes them out again into files of their own
+ * (`fontsOutOfStyles` in tools/build.ts) and preloads the Latin one (R-P5). The latin-ext part stays: the browser
+ * fetches it only for a letter in its range, and Chinese pinyin's tone marks (bō, ǎ, src/content/zh.ts) are there.
  */
 @font-face {
   font-family: "Fredoka Variable";
