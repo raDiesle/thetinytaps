@@ -4,31 +4,21 @@
 // of the picture going on and the line coming late, or never (user request, November 2026). No React here, so
 // voice.ts can use it.
 
-let waits = 0;
-const listeners = new Set<() => void>();
-const notify = () => {
-  for (const listener of listeners) listener();
-};
+import { createStore } from "@/lib/store";
 
-/** Calls `listener` whenever waiting starts or ends; returns how to stop. */
-export function subscribeWaiting(listener: () => void) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
+/** How many sounds are waited for now. */
+const waits = createStore(0);
+
+/** Calls `listener` whenever waiting starts or ends (and whenever one more or one less is waited for); returns how to stop. */
+export const subscribeWaiting = waits.subscribe;
 
 /** True while some sound the game needs now is still loading. */
-export const isWaiting = () => waits > 0;
+export const isWaiting = () => waits.get() > 0;
 
 /** `promise`, counted as waited for (the loader shows) until it settles. */
 export function waitingFor<T>(promise: Promise<T>): Promise<T> {
-  waits++;
-  notify();
-  const done = () => {
-    waits--;
-    notify();
-  };
+  waits.set(waits.get() + 1);
+  const done = () => waits.set(waits.get() - 1);
   promise.then(done, done);
   return promise;
 }

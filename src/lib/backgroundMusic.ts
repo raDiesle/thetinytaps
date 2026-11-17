@@ -1,9 +1,10 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { downloadMusic } from "@/lib/musicFile";
 import { DUCK, songGain } from "@/lib/loudness";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { afterLoad, savesData } from "@/lib/pwa";
 import { decodeSound, type Loop, playLoop, unlockAudio } from "@/lib/sfx";
+import { createStore, useStore } from "@/lib/store";
 import { talking } from "@/lib/voice";
 
 // The song every game plays in the background (downloaded in musicFile.ts), unless
@@ -54,17 +55,9 @@ const songAt = (from: number, seconds: number) => SONG.start + ((from - SONG.sta
 const hidden = () => typeof document !== "undefined" && document.hidden;
 
 // How many mounted parts of the game want the song off (see useNoBackgroundMusic).
-let hushes = 0;
+const hushes = createStore(0);
 // Whether anyone has tapped or pressed a key in this visit: the browser lets the song play only after that.
-let tapped = false;
-const listeners = new Set<() => void>();
-const notify = () => {
-  for (const listener of listeners) listener();
-};
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
+const tapped = createStore(false);
 
 /**
  * Keeps the background song off while the calling component is mounted (and
@@ -74,12 +67,8 @@ const subscribe = (listener: () => void) => {
 export function useNoBackgroundMusic(when = true) {
   useEffect(() => {
     if (!when) return;
-    hushes++;
-    notify();
-    return () => {
-      hushes--;
-      notify();
-    };
+    hushes.set(hushes.get() + 1);
+    return () => hushes.set(hushes.get() - 1);
   }, [when]);
 }
 
@@ -87,9 +76,7 @@ if (typeof window !== "undefined") {
   const onFirst = () => {
     // The tap also lets the audio play, wherever it lands (a menu, a game).
     unlockAudio();
-    if (tapped) return;
-    tapped = true;
-    notify();
+    tapped.set(true);
   };
   // The song goes with the click, not as the finger lands: a tap on a book on the shelf takes it out only with its
   // click, and the song must wait until that book lies open (pageMotion.ts), never start before it flies.
@@ -106,8 +93,8 @@ if (typeof window !== "undefined") {
  * voice speaks.
  */
 export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
-  const hushed = useSyncExternalStore(subscribe, () => hushes > 0);
-  const going = useSyncExternalStore(subscribe, () => tapped);
+  const hushed = useStore(hushes, (count) => count > 0);
+  const going = useStore(tapped);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [visible, setVisible] = useState(() => !hidden());
   /** Counts the times the song is asked for again after its download failed (see below). */

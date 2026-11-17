@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { DEFAULT_PLAYTIME_SETTINGS, dueToSave, limitReached, type PlaytimeState, parseSettings, SAVE_EVERY_MS, shownChanged } from "./playtime";
+import { DEFAULT_PLAYTIME_SETTINGS, dueToSave, limitReached, type PlaytimeState, parsePlayed, parseSettings, SAVE_EVERY_MS, shownChanged } from "./playtime";
 
 const day = new Date().toDateString();
 
@@ -13,6 +13,25 @@ describe("play time", () => {
 
   test("new settings are read as saved", () => {
     expect(parseSettings(JSON.stringify({ by: "games", minutes: 15, games: 4 }))).toEqual({ by: "games", minutes: 15, games: 4 });
+  });
+
+  test("a saved field of the wrong type falls back to its default, the others stay", () => {
+    expect(parseSettings(JSON.stringify({ by: "games", minutes: "20", games: 4 }))).toEqual({ by: "games", minutes: 15, games: 4 });
+    expect(parseSettings(JSON.stringify({ by: "time", minutes: 30, games: null }))).toEqual({ by: "time", minutes: 30, games: 3 });
+    expect(parseSettings(JSON.stringify({ by: "time", minutes: -5, games: 2 }))).toEqual({ by: "time", minutes: 15, games: 2 });
+    // An unknown limit is no limit of its own: only a minutes value saved with it still means a time limit.
+    expect(parseSettings(JSON.stringify({ by: "forever", games: 2 }))).toEqual(DEFAULT_PLAYTIME_SETTINGS);
+    expect(parseSettings(JSON.stringify({ by: 7, minutes: 20 }))).toEqual({ ...DEFAULT_PLAYTIME_SETTINGS, by: "time", minutes: 20 });
+    expect(parseSettings(JSON.stringify({ minutes: "20" }))).toEqual(DEFAULT_PLAYTIME_SETTINGS);
+    for (const raw of ["5", "null", "[1,2]", '"time"']) expect(parseSettings(raw)).toEqual(DEFAULT_PLAYTIME_SETTINGS);
+  });
+
+  test("what was played today is read as saved, a field of the wrong type as nothing played", () => {
+    expect(parsePlayed(JSON.stringify({ day, ms: 90_000, games: 2 }))).toEqual({ day, ms: 90_000, games: 2 });
+    expect(parsePlayed(JSON.stringify({ day, ms: "90000", games: 2 }))).toEqual({ day, ms: 0, games: 2 });
+    expect(parsePlayed(JSON.stringify({ day, ms: 90_000, games: -1 }))).toEqual({ day, ms: 90_000, games: 0 });
+    expect(parsePlayed(JSON.stringify({ day: "Mon Jan 01 2001", ms: 90_000, games: 2 }))).toEqual({ day, ms: 0, games: 0 });
+    for (const raw of [null, "{broken", "3", "[]"]) expect(parsePlayed(raw)).toEqual({ day, ms: 0, games: 0 });
   });
 
   test("the limit counts what it is set to, and nothing without one", () => {

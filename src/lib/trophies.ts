@@ -1,5 +1,5 @@
-import { useSyncExternalStore } from "react";
 import { CATEGORIES, type Game } from "@/content/games";
+import { createStore, useStore } from "@/lib/store";
 
 /*
  * The trophies a child collects (user decision, November 2026): every level or story played to its end (`GameEnd`)
@@ -36,13 +36,9 @@ function read(): TrophyWon[] {
   }
 }
 
-let won: TrophyWon[] | undefined;
-const listeners = new Set<() => void>();
-
-const current = () => {
-  won ??= read();
-  return won;
-};
+/** The trophies won, read from storage the first time they are asked for. */
+const won = createStore(read);
+const current = won.get;
 
 /** One trophy per game and level: the key both are stored and drawn by. */
 export const trophyKey = (game: string, level: string) => `${game}#${level}`;
@@ -71,24 +67,19 @@ export function awardTrophy(game: string, level: string, now = Date.now(), { ear
   }
   claimed = early ? key : undefined;
   const before = current().find((t) => t.game === game && t.level === level);
-  won = before ? current().map((t) => (t === before ? { ...t, wins: t.wins + 1 } : t)) : [...current(), { game, level, at: now, wins: 1 }];
+  const next = before ? current().map((t) => (t === before ? { ...t, wins: t.wins + 1 } : t)) : [...current(), { game, level, at: now, wins: 1 }];
   try {
-    localStorage.setItem(KEY, JSON.stringify({ won }));
+    localStorage.setItem(KEY, JSON.stringify({ won: next }));
   } catch {
     // Storage full or disabled: the trophy still stands on the shelf for this visit.
   }
-  for (const listener of listeners) listener();
+  won.set(next);
   return !before;
 }
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
-
 /** The trophies won, in the order they were won. */
 export function useTrophies(): TrophyWon[] {
-  return useSyncExternalStore(subscribe, current);
+  return useStore(won);
 }
 
 /** Every game on the shelf or in a book, with the addresses of its parts. */
@@ -107,7 +98,6 @@ export const gameOrder = (href: string) => GAMES.findIndex((game) => game.href =
 
 /** Forgets every trophy: only for tests. */
 export function resetTrophiesForTest(list: TrophyWon[] = []) {
-  won = list;
   claimed = undefined;
-  for (const listener of listeners) listener();
+  won.set(list);
 }

@@ -64,28 +64,43 @@ export interface Played {
 
 const today = () => new Date().toDateString();
 
+/** The kinds of limit, to check what storage holds. */
+const LIMITS: readonly PlaytimeLimit[] = ["none", "time", "games"];
+
+/** `value` when it is a number above zero (minutes, games), else `fallback`. */
+const positive = (value: unknown, fallback: number) => (typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback);
+
+/** `value` when it is a count of zero or more (milliseconds, games played), else 0. */
+const count = (value: unknown) => (typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0);
+
+/** What `raw` holds as JSON when it is an object, else nothing: storage may hold anything another version or a hand wrote. */
+function savedObject(raw: string | null): Record<string, unknown> {
+  try {
+    const saved: unknown = raw ? JSON.parse(raw) : null;
+    if (saved && typeof saved === "object" && !Array.isArray(saved)) return saved as Record<string, unknown>;
+  } catch {
+    // Broken storage: as if nothing was saved.
+  }
+  return {};
+}
+
 /**
- * The saved settings. Before there was a choice of limit, only `minutes` was
- * saved, 0 meaning none: such a value still means a time limit (or none).
+ * The saved settings, each field checked: one of the wrong type falls back to its default. Before there was a choice
+ * of limit, only `minutes` was saved, 0 meaning none: such a value still means a time limit (or none).
  */
 export function parseSettings(raw: string | null): PlaytimeSettings {
-  try {
-    const saved = raw ? (JSON.parse(raw) as Partial<PlaytimeSettings>) : {};
-    if (saved.by) return { ...DEFAULT_PLAYTIME_SETTINGS, ...saved };
-    if (saved.minutes) return { ...DEFAULT_PLAYTIME_SETTINGS, by: "time", minutes: saved.minutes };
-  } catch {
-    // Broken storage: no limit.
-  }
+  const saved = savedObject(raw);
+  const minutes = positive(saved.minutes, DEFAULT_PLAYTIME_SETTINGS.minutes);
+  if (LIMITS.includes(saved.by as PlaytimeLimit))
+    return { by: saved.by as PlaytimeLimit, minutes, games: positive(saved.games, DEFAULT_PLAYTIME_SETTINGS.games) };
+  if (positive(saved.minutes, 0)) return { ...DEFAULT_PLAYTIME_SETTINGS, by: "time", minutes };
   return DEFAULT_PLAYTIME_SETTINGS;
 }
 
-function parsePlayed(raw: string | null): Played {
-  try {
-    const saved = raw ? (JSON.parse(raw) as Partial<Played>) : {};
-    if (saved.day === today()) return { day: today(), ms: saved.ms ?? 0, games: saved.games ?? 0 };
-  } catch {
-    // Broken storage: nothing played yet.
-  }
+/** What was played today as saved, each field checked; saved on another day, or broken, nothing was played yet. */
+export function parsePlayed(raw: string | null): Played {
+  const saved = savedObject(raw);
+  if (saved.day === today()) return { day: today(), ms: count(saved.ms), games: count(saved.games) };
   return { day: today(), ms: 0, games: 0 };
 }
 

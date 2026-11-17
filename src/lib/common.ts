@@ -2,9 +2,10 @@
 // ⏳). Sounds and the browser's voice have no switch (root CLAUDE.md): sounds always play, and the browser's voice
 // speaks only as the fallback of `recordedVoice` in the games told by their voice.
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback } from "react";
 import { track } from "@/lib/analytics";
 import { loadStored, useStoredSettings } from "@/lib/storage";
+import { createStore, useStore } from "@/lib/store";
 
 export interface CommonSettings {
   /**
@@ -38,15 +39,9 @@ export const COMMON_SETTINGS_KEY = "tinytaps.common.v1";
 
 // One copy for the whole app, so a switch on the home page reaches the background song
 // playing at the same time (src/components/BackgroundMusic.tsx) at once.
-let common: CommonSettings | null = null;
-const listeners = new Set<() => void>();
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
 /** The shared options as saved, merged into the defaults. */
 export const loadCommon = (): CommonSettings => loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS);
-const current = () => (common ??= showFigure(loadCommon()));
+const common = createStore(() => showFigure(loadCommon()));
 
 /** Puts the figure on the html element, where the menus' second family of colours hangs on it (`base.css`). */
 function showFigure(settings: CommonSettings): CommonSettings {
@@ -58,22 +53,22 @@ function showFigure(settings: CommonSettings): CommonSettings {
 }
 
 /** Sets the colours of the saved figure before the first screen (`index.tsx`), so a menu never flashes the other ones. */
-export const applySavedFigure = () => void current();
+export const applySavedFigure = () => void common.get();
 
 /** The shared options and their setter; every component using them sees a change at once. */
 export function useCommonSettings() {
-  const value = useSyncExternalStore(subscribe, current);
+  const value = useStore(common);
   const update = useCallback((patch: Partial<Pick<CommonSettings, "music" | "figure" | "leave">>) => {
-    common = showFigure({ ...current(), ...patch });
+    const next = showFigure({ ...common.get(), ...patch });
     // Which options grown-ups choose for all games (analytics.ts).
     for (const [name, value] of Object.entries(patch))
       track("einstellung", { name, wert: typeof value === "boolean" ? (value ? "an" : "aus") : String(value) });
     try {
-      localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(common));
+      localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(next));
     } catch {
       // Storage full or disabled: the setting still applies for this visit.
     }
-    for (const listener of listeners) listener();
+    common.set(next);
   }, []);
   return [value, update] as const;
 }

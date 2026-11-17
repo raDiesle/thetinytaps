@@ -1,9 +1,9 @@
-import { useSyncExternalStore } from "react";
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
 import { hasTexts, hasTextsPart, loadTexts, loadTextsPart, type TextsPart } from "@/content/texts";
 import { LANGUAGE_KEY, playLanguage } from "@/lib/locale";
 import { addressLanguage } from "@/lib/pageAddress";
 import { keepTextsOffline } from "@/lib/pwa";
+import { createStore, useStore } from "@/lib/store";
 
 // The language of the whole app, chosen once on the home page: the grown-ups'
 // screens (home page, start screens, settings) and what the child hears and sees
@@ -43,7 +43,6 @@ export interface Translate {
 }
 
 const KEY = LANGUAGE_KEY;
-const listeners = new Set<() => void>();
 
 /** The saved app language; until a grown-up picks one, the browser's language if the app speaks it (playLanguage). */
 function load(): TargetLanguageId {
@@ -56,13 +55,16 @@ function load(): TargetLanguageId {
   return playLanguage(APP_LANGUAGES, undefined, undefined, addressLanguage());
 }
 
-let current = load();
+/** The app language; every component using it renders again when it changes. */
+const current = createStore(load());
 
+/** Makes `id` the app language of this visit and puts it on the page. */
 function apply(id: TargetLanguageId) {
   // `lang` also lets Arabic text run right to left while pictures and layout stay as they are (base.css).
   if (typeof document !== "undefined") document.documentElement.lang = id;
+  current.set(id);
 }
-apply(current);
+apply(current.get());
 
 /**
  * Loads the texts of the app language (src/content/texts) before the first screen shows (index.tsx), so
@@ -71,11 +73,10 @@ apply(current);
  */
 export async function loadAppLanguage() {
   try {
-    await loadTexts(current);
-    keepTextsOffline(current);
+    await loadTexts(current.get());
+    keepTextsOffline(current.get());
   } catch {
-    current = "de";
-    apply(current);
+    apply("de");
   }
 }
 
@@ -90,7 +91,7 @@ const askedParts = new Set<TextsPart>();
 export function withTexts<T>(part: TextsPart, load: () => Promise<T>): () => Promise<T> {
   return () => {
     askedParts.add(part);
-    return Promise.all([load(), loadTextsPart(part, current)]).then(([module]) => module);
+    return Promise.all([load(), loadTextsPart(part, current.get())]).then(([module]) => module);
   };
 }
 
@@ -101,15 +102,13 @@ export function withTexts<T>(part: TextsPart, load: () => Promise<T>): () => Pro
  */
 export function setAppLanguage(id: TargetLanguageId) {
   const switchTo = () => {
-    current = id;
-    apply(id);
     try {
       localStorage.setItem(KEY, id);
     } catch {
       // Storage full or disabled: the language still applies for this visit.
     }
     keepTextsOffline(id);
-    for (const listener of listeners) listener();
+    apply(id);
   };
   const parts = [...askedParts];
   if (hasTexts(id) && parts.every((part) => hasTextsPart(part, id))) switchTo();
@@ -118,16 +117,11 @@ export function setAppLanguage(id: TargetLanguageId) {
 }
 
 /** The app language outside React, e.g. in a sound helper; components use useAppLanguage. */
-export const appLanguage = () => current;
-
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
+export const appLanguage = current.get;
 
 /** The app language (id, speech language, label); shared by all components, so switching it updates every screen at once. */
 export function useAppLanguage(): TargetLanguage {
-  return targetLanguageFor(useSyncExternalStore(subscribe, appLanguage));
+  return targetLanguageFor(useStore(current));
 }
 
 /** A line to speak and the voice for it. */

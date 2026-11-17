@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { createStore } from "@/lib/store";
 
 /*
  * While a book is taken out of the shelf and opens (bookTravel.ts) or a page turns (look.ts), the game or menu it leads
@@ -14,8 +15,7 @@ import { useSyncExternalStore } from "react";
 const LONGEST_MS = 5000;
 
 /** Motions running now; nothing starts while there is one. */
-let running = 0;
-const listeners = new Set<() => void>();
+const running = createStore(0);
 
 /** An animation this short (delay and run together) that starts invisible is a picture coming in, not a story. */
 export const ENTRANCE_MS = 1000;
@@ -49,18 +49,20 @@ function showEntrances() {
 
 /** While the page moves, every frame shows what has just come onto it whole (a round may come mid-motion). */
 function showEntrancesWhileMoving() {
-  if (running === 0 || typeof requestAnimationFrame !== "function") return;
+  if (running.get() === 0 || typeof requestAnimationFrame !== "function") return;
   showEntrances();
   requestAnimationFrame(showEntrancesWhileMoving);
 }
 
-function changed() {
+/** Counts one motion more or less, marks the page for book.css (before anyone is told) and tells everyone waiting. */
+function count(change: 1 | -1) {
+  const next = running.get() + change;
   const html = typeof document === "undefined" ? null : document.documentElement;
   if (html) {
-    if (running > 0) html.dataset.pageMoving = "";
+    if (next > 0) html.dataset.pageMoving = "";
     else delete html.dataset.pageMoving;
   }
-  for (const listener of [...listeners]) listener();
+  running.set(next);
 }
 
 /**
@@ -68,23 +70,21 @@ function changed() {
  * more calls do nothing). Call it before the change of screen it moves round, so the new screen already waits.
  */
 export function pageMoves(): () => void {
-  running++;
-  changed();
-  if (running === 1) showEntrancesWhileMoving();
+  count(1);
+  if (running.get() === 1) showEntrancesWhileMoving();
   let ended = false;
   const end = () => {
     if (ended) return;
     ended = true;
     clearTimeout(cap);
-    running--;
-    changed();
+    count(-1);
   };
   const cap = setTimeout(end, LONGEST_MS);
   return end;
 }
 
 /** True while a book opens or closes or a page turns. */
-export const pageMoving = () => running > 0;
+export const pageMoving = () => running.get() > 0;
 
 /**
  * Runs `run` once nothing moves: at once when nothing does, else when the motion has ended. Returns a function that
@@ -95,27 +95,21 @@ export function afterPageMotion(run: () => void): () => void {
     run();
     return () => {};
   }
-  const listener = () => {
+  const stop = running.subscribe(() => {
     if (pageMoving()) return;
-    listeners.delete(listener);
+    stop();
     run();
-  };
-  listeners.add(listener);
-  return () => listeners.delete(listener);
+  });
+  return stop;
 }
 
 /** Resolves once nothing moves (at once when nothing does). */
 export const pageStill = () => new Promise<void>((resolve) => afterPageMotion(resolve));
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
-
 /** For components: false while a book or page moves, true once it lies still. */
 export function usePageStill() {
   return useSyncExternalStore(
-    subscribe,
+    running.subscribe,
     () => !pageMoving(),
     () => true,
   );

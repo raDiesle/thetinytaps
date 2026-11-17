@@ -1,10 +1,11 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import { track } from "@/lib/analytics";
 import { BASE_URL, PROD } from "@/lib/buildInfo";
 import { loadCommon } from "@/lib/common";
 import type { OfflineChoice } from "@/lib/offlineParts";
 import { isStandalone } from "@/lib/standalone";
 import { loadStored } from "@/lib/storage";
+import { createStore, useStore } from "@/lib/store";
 
 // Offline and "install as app" (PWA). The service worker itself is src/sw.js.
 
@@ -39,7 +40,7 @@ function loadOfflineSettings(): OfflineSettings {
   return typeof localStorage === "undefined" ? OFFLINE_DEFAULTS : loadStored(OFFLINE_KEY, OFFLINE_DEFAULTS);
 }
 
-const state = {
+const pwa = createStore({
   /** All files are in the browser (only an installed app keeps them all); the games start without network. */
   offlineReady: false,
   installPrompt: null as InstallPromptEvent | null,
@@ -52,20 +53,13 @@ const state = {
   offlineManifest: null as string | null,
   /** What grown-ups chose to keep for playing without internet. */
   offline: loadOfflineSettings(),
-};
-let snapshot = { ...state };
-const listeners = new Set<() => void>();
+});
 
-function update(changes: Partial<typeof state>) {
-  Object.assign(state, changes);
-  snapshot = { ...state };
-  for (const listener of listeners) listener();
-}
+/** Where installing, updating and the offline copy stand now. */
+const state = pwa.get;
 
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
+/** Changes some of it; every component using it renders again. */
+const update = (changes: Partial<ReturnType<typeof state>>) => pwa.set({ ...state(), ...changes });
 
 /** Opened from the home screen (or as an installed desktop app), not in a browser tab. */
 export { isStandalone };
@@ -164,7 +158,7 @@ export function setUpPwa() {
 let appLanguage = "de";
 
 /** Whether an offline copy is kept: as chosen, else for an installed app only. */
-export const keepsOffline = (settings = state.offline) => settings.on ?? isStandalone();
+export const keepsOffline = (settings = state().offline) => settings.on ?? isStandalone();
 
 /**
  * What the worker keeps for `settings`: the books not left out in the app language (🌐 decides it, the offline copy
@@ -181,7 +175,7 @@ export function offlineChoiceOf(settings: OfflineSettings, language = appLanguag
  */
 function keepAllOffline({ again = false } = {}) {
   if (!PROD || !("serviceWorker" in navigator) || !keepsOffline()) return;
-  const choice = offlineChoiceOf(state.offline);
+  const choice = offlineChoiceOf(state().offline);
   // The same choice once per worker: the worker goes on with a download that broke off by itself.
   if (!again && JSON.stringify(choice) === lastSent) return;
   lastSent = JSON.stringify(choice);
@@ -194,9 +188,9 @@ let lastSent = "";
 /** Changes what is kept for playing without internet, remembers it and tells the worker. */
 export function setOfflineSettings(changes: Partial<OfflineSettings>) {
   const before = keepsOffline();
-  update({ offline: { ...state.offline, ...changes } });
+  update({ offline: { ...state().offline, ...changes } });
   try {
-    localStorage.setItem(OFFLINE_KEY, JSON.stringify(state.offline));
+    localStorage.setItem(OFFLINE_KEY, JSON.stringify(state().offline));
   } catch {
     // Storage full or disabled: it still applies for this visit.
   }
@@ -222,7 +216,7 @@ export function keepTextsOffline(language: string) {
 
 /** Reloading in fullscreen would end it, and only a tap brings it back; such a page waits for the next start. */
 const reloadNow = () => {
-  if (state.updateReady && !document.fullscreenElement) location.reload();
+  if (state().updateReady && !document.fullscreenElement) location.reload();
 };
 
 /**
@@ -257,13 +251,14 @@ export function buildDate() {
 
 /** Opens the browser's install dialog (only when `installPrompt` is set). */
 export async function install() {
-  const prompt = state.installPrompt;
+  const prompt = state().installPrompt;
   if (!prompt) return;
   await prompt.prompt();
   const { outcome } = await prompt.userChoice;
   update({ installPrompt: null, installed: outcome === "accepted" });
 }
 
+/** Installing, updating and the offline copy as they stand, for components. */
 export function usePwa() {
-  return useSyncExternalStore(subscribe, () => snapshot);
+  return useStore(pwa);
 }
