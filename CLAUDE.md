@@ -29,7 +29,10 @@ build come from `src/lib/buildInfo.ts` (never `import.meta.env`; never a value t
 into the JS, which renamed 139 of 196 chunks at each deploy – the build's time stands only in each page's
 `<meta name="build-time">`, `buildTools.test.ts`), and in the build a stylesheet a module imports travels in
 that module's chunk (Bun alone would load every game's CSS with the start page; the dev server still does, for hot
-reload, so a game borrowing another's CSS shows only in `preview-pages` – `css.test.ts` checks the keyframes). Keep it that way when adding such code.
+reload, so a game borrowing another's CSS shows only in `preview-pages` – `css.test.ts` checks the keyframes). Bun embeds
+every font a stylesheet names as base64, which made the start's stylesheet 64 KB instead of 28: the build moves them out
+into files named by their content and preloads the latin one (`fontsOutOfStyles` in `tools/build.ts`), and fails when a
+stylesheet still holds one. Keep it that way when adding such code.
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
 Use `dev` – it moves to the next free port when another session has 3000, so
@@ -736,13 +739,19 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   download every file for every visitor again: it was 42 MB on each first visit and after each build, while few play
   offline (November 2026; `sw.test.ts`). The start kept at install holds no `vorschau/` previews and takes files named
   by their content from the browser's cache rather than fetching them twice; the build fails when the start passes 70
-  files or 1.6 MB, and when `out/` passes 800 MB (GitHub Pages allows 1 GB). What is fetched ahead (other pages' code, the song) waits when the visitor
+  files or 1.6 MB, and when `out/` passes 800 MB (GitHub Pages allows 1 GB). `sw.js` never lists every file (it was
+  246 KB, fetched after each deploy and parsed at every start of the worker): what lies under `static/` is named by its
+  content, and a list of all files (`static/built.<hash>.txt`, the offline manifest) is fetched only when it is needed.
+  What is fetched ahead (other pages' code, the song) waits when the visitor
   saves data (`savesData()` in `src/lib/pwa.ts`).
 - A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same. A game made of many big parts (pictures, levels drawn in code) loads each
-  part's code only when it is played, through an `import()` per part, and keeps what its menu needs before that (id,
+  part's code only when it is played, through an `import()` per part – wrapped in `lazyPart` (`src/lib/lazyPart.ts`),
+  read as `part.loaded() ?? use(part.load())`, with the start screen passing `GameShell prepare`, so a level fetched
+  ahead is drawn before the page turns to it: `use()` alone showed the loading paper first and drew the level in the
+  turn's middle, a 450 ms frame on an old phone (`bun run perf`, November 2026; `lazyPart.test.ts`) – and keeps what its menu needs before that (id,
   emoji, title) in a small catalog: Lebendige Bilder's 23 pictures in one chunk were 1.6 MB that its menu and every
   picture downloaded and ran first (perf analysis, November 2026; `src/games/scenes/catalog.ts`).
   Nothing ever loads in the dark (user feedback, November 2026: Zähne putzen opened straight from its address stood dark
