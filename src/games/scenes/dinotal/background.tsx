@@ -1,5 +1,5 @@
 import { HORIZON, depthScale } from "../layout";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { Poke } from "../spots";
 import { LAKE, TRAIL, trailHalf, trailX } from "./layout";
 

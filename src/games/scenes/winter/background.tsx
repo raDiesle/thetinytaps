@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { HORIZON, depthScale } from "../layout";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { Poke } from "../spots";
 import { Snow } from "../weather";
 import { Cap, SNOW, SNOW_SHADE } from "../winterbaustelle/parts";

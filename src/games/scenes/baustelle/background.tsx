@@ -1,7 +1,7 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { DIGGER, FLOWERS, HAMMER, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, SITE } from "./layout";
 import type { ReactNode } from "react";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 

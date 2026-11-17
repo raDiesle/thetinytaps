@@ -1,5 +1,5 @@
 import type { CSSProperties, PointerEvent, ReactNode } from "react";
-import { Cloud } from "@/games/scenes/shared";
+import { Cloud } from "@/components/drawing";
 import { useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import {

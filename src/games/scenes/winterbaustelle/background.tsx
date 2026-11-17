@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Poke } from "../spots";
 import { DIGGER, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, SITE } from "./layout";

@@ -1,5 +1,5 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { Poke } from "../spots";
 import type { Box } from "../types";
 import { FallenLeaves, LEAF_COLOURS, Leaf } from "../weather";

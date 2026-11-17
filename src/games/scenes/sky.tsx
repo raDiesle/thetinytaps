@@ -1,4 +1,5 @@
-import { Cloud, Face, nth } from "./shared";
+import { Cloud } from "@/components/drawing";
+import { Face, nth } from "./shared";
 import "./sky.css";
 
 // Sun and rain cloud, the same in every scene. Each scene places them with `float`.

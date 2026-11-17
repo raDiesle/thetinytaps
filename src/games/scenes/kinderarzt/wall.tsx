@@ -1,4 +1,5 @@
-import { Cloud, Eye, Face, Inside, STEEL, heartPath, nth, side, sparklePath } from "../shared";
+import { Cloud } from "@/components/drawing";
+import { Eye, Face, Inside, STEEL, heartPath, nth, side, sparklePath } from "../shared";
 import { INK, SKIN } from "@/components/drawing";
 import { Bubbles, Lid, Lines, Notes, Plaster, Sparkles } from "./parts";
 

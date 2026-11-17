@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Cloud, Eye, Face, Inside, STEEL, nth } from "../shared";
+import { Cloud } from "@/components/drawing";
+import { Eye, Face, Inside, STEEL, nth } from "../shared";
 import { INK, SKIN } from "@/components/drawing";
 import { SLEEP_WINDOW, WINDOW, WINDOW_GLASS } from "./layout";
 import { Hearts, Lines, Notes, Puffs, Sparkles } from "./parts";

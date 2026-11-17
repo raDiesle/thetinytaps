@@ -1,5 +1,5 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { Poke } from "../spots";
 import { FENCE, FENCE_END, FIELD_X, MUD, POND, ROAD_BOTTOM, ROAD_TOP, SUNFLOWER } from "./layout";
 

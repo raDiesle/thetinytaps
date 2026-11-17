@@ -1,5 +1,5 @@
 import { HORIZON, depthScale } from "../layout";
-import { Cloud } from "../shared";
+import { Cloud } from "@/components/drawing";
 import { Poke } from "../spots";
 import { BRIDGE_Y, BROOK_TOP, DAMM_Y, brookHalf, brookX, pathHalf, pathY } from "./layout";
 

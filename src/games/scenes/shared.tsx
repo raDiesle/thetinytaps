@@ -205,25 +205,6 @@ export function Face({ cx, cy, size = 1 }: { cx: number; cy: number; size?: numb
   );
 }
 
-/** A cloud whose left puff is centred on (x, y). */
-/** A white cloud; tapped or caught by a gust of wind it drifts a little way (`data-poke`, see spots.tsx). */
-export function Cloud({ x, y, scale = 1, className }: { x: number; y: number; scale?: number; className?: string }) {
-  return (
-    <g className={className} data-poke="drift">
-      <g transform={`translate(${x} ${y}) scale(${scale})`}>
-        <g className="cloud-puffs" fill="#fff">
-          <circle cx="0" cy="0" r="38" />
-          <circle cx="44" cy="-18" r="48" />
-          <circle cx="96" cy="0" r="36" />
-          <rect x="0" y="0" width="96" height="36" />
-        </g>
-        <ellipse cx="48" cy="29" rx="62" ry="7" fill="#dbe9fb" />
-        <ellipse cx="30" cy="-30" rx="18" ry="9" fill="#fff" opacity="0.8" />
-      </g>
-    </g>
-  );
-}
-
 /** A four-pointed sparkle centred on (x, y). */
 export function sparklePath(x: number, y: number, r: number) {
   return `M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r} Z`;

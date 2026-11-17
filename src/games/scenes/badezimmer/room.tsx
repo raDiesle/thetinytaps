@@ -1,4 +1,5 @@
-import { Cloud, Face, Inside, nth } from "../shared";
+import { Cloud } from "@/components/drawing";
+import { Face, Inside, nth } from "../shared";
 import { INK, SKIN } from "@/components/drawing";
 import { Bubbles, Lines } from "./parts";
 

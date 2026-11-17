@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
-import { Cloud, nth } from "../shared";
+import { Cloud } from "@/components/drawing";
+import { nth } from "../shared";
 import { Poke } from "../spots";
 import { MERMAID_ROCK, OCTO_ROCK, SNAIL_STONE, SURFACE } from "./layout";
 

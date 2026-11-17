@@ -1,5 +1,6 @@
 import { Lids } from "../baustelle/figures";
-import { Cloud, Eye, Face, nth } from "../shared";
+import { Cloud } from "@/components/drawing";
+import { Eye, Face, nth } from "../shared";
 import { CHEEK, INK } from "@/components/drawing";
 import { Cap, Flake, SNOW, SNOW_SHADE, glint, vars } from "./parts";
 
