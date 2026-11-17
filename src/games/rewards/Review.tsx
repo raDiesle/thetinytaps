@@ -100,7 +100,7 @@ export function usePeriodLabel() {
  * the big one, ‹ › or the arrow keys go on, a small one shows it big. Only weeks with stars, never an empty one, and
  * nothing to change here: forgotten stars are added on the board with ‹.
  */
-export function Review({ board, log, linked, sounds, onClose }: { board: Board; log: StarLog; linked: LinkedDays; sounds: boolean; onClose: () => void }) {
+export function Review({ board, log, linked, onClose }: { board: Board; log: StarLog; linked: LinkedDays; onClose: () => void }) {
   const t = useT();
   const label = usePeriodLabel();
   const today = new Date();
@@ -119,7 +119,7 @@ export function Review({ board, log, linked, sounds, onClose }: { board: Board; 
   const go = (index: number) => {
     if (periods.length < 2) return;
     unlockAudio();
-    if (sounds) playWhoosh();
+    playWhoosh();
     setPick((index + periods.length) % periods.length);
   };
 

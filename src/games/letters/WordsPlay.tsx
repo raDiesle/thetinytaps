@@ -112,7 +112,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const ready = useVoiceReady(lettersVoice, round ? linesOf(round.word) : [], language, { next: round ? linesOf(round.after) : [] });
   useEffect(() => lettersVoice.load(pack.praise, language), [pack, language]);
 
-  const softTap = useSoftTap(ripple, settings.sounds);
+  const softTap = useSoftTap(ripple);
 
   // Go through all words in random order before any word comes again; each is drawn one round ahead, so its lines load
   // while the word before it is typed.
@@ -154,17 +154,17 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     setNudges(0);
     sayLetter(char);
     if (next < letters.length) {
-      if (settings.sounds) playCountNote(typed);
+      playCountNote(typed);
       return;
     }
     doneAt.current = performance.now();
-    if (settings.sounds) playChime();
+    playChime();
     const word = current.word;
     say(`${word.word}!`, true);
     if (isAction(word)) say(pack.joinIn(word), true);
     else praise(pick(pack.praise));
     if (isColor(word)) setBackground(word.color);
-  }, [current, done, letters, typed, pack, say, praise, sayLetter, settings.sounds]);
+  }, [current, done, letters, typed, pack, say, praise, sayLetter]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {

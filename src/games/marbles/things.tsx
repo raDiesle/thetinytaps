@@ -12,7 +12,7 @@ const LINE = { stroke: INK, strokeWidth: 3, strokeLinejoin: "round" as const };
 
 export interface Thing {
   kind: string;
-  /** Its name in each language the game speaks, for saying it when speech is on. */
+  /** Its name in each language the game speaks. */
   name: Localized;
   w: number;
   h: number;

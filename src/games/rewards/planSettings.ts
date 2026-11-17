@@ -7,8 +7,6 @@ export interface PlannerSettings {
   /** Id of the plan shown. */
   current: string;
   print: PlanPrintOptions;
-  speech: boolean;
-  sounds: boolean;
 }
 
 /**
@@ -43,8 +41,6 @@ export const DEFAULT_PLANNER_SETTINGS: PlannerSettings = {
   plans: [],
   current: "",
   print: { orientation: "auto", color: true, cards: true },
-  speech: false,
-  sounds: true,
 };
 
 /** The defaults on this device: none, or the old first plan while its ticks are kept and nothing was saved over it. */

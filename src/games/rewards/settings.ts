@@ -25,8 +25,6 @@ export interface RewardsSettings {
   /** Id of the board shown. */
   current: string;
   print: PrintOptions;
-  speech: boolean;
-  sounds: boolean;
 }
 
 /**
@@ -40,8 +38,6 @@ export const DEFAULT_REWARDS_SETTINGS: RewardsSettings = {
   boards: [],
   current: "",
   print: { orientation: "auto", color: true, colorIn: false, stickers: false, cards: false, nextMonth: false },
-  speech: false,
-  sounds: true,
 };
 
 /** The defaults on this device: none, or the old first board while its stars are kept and nothing was saved over it. */

@@ -275,9 +275,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   useEffect(() => voice.loadAll(language.id), [language.id]);
 
   useEffect(() => {
-    if (settings.sounds)
-      loadRecordings([...(settings.origin ? ORIGIN_RECORDINGS : []), ...(settings.prep ? PREP_RECORDINGS : []), ...TIDY_RECORDINGS, "cheer", "laugh"]);
-  }, [settings.sounds, settings.origin, settings.prep]);
+    loadRecordings([...(settings.origin ? ORIGIN_RECORDINGS : []), ...(settings.prep ? PREP_RECORDINGS : []), ...TIDY_RECORDINGS, "cheer", "laugh"]);
+  }, [settings.origin, settings.prep]);
 
   // The sounds of the story, the sink and tidying up, each when the clock passes its moment; none of those a jump skips over.
   const lastElapsed = useRef(elapsed);
@@ -289,7 +288,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       : ending === "tidy"
         ? { start: introMs + totalMs + CHEER_MS, cues: PREP_CUES.tidy }
         : null;
-    if (!settings.sounds || !sounds || elapsed <= from || elapsed - from > CUE_GAP_MS) return;
+    if (!sounds || elapsed <= from || elapsed - from > CUE_GAP_MS) return;
     for (const cue of sounds.cues) if (sounds.start + cue.at > from && sounds.start + cue.at <= elapsed) cue.play();
   }, [elapsed]);
 
@@ -309,19 +308,17 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   // What to say and play when a new part begins.
   useEffect(() => {
     if (before) {
-      if (settings.sounds && part > 0) playChime();
+      if (part > 0) playChime();
       if (part === 0) say(daytimeText(daytime, "hello", language));
       say(preludeCue(before), part === 0);
     } else if (phase < STEPS.length) {
       // The drum roll before the brushing ends with a „Tusch“.
-      if (settings.sounds) (phase === 0 ? playTusch : playChime)();
+      (phase === 0 ? playTusch : playChime)();
       if (!sung) say(stepText(STEPS[phase], "cue", language));
     } else {
       // Done: a fanfare of notes and children cheering; the medal and the grin say the rest, nothing rises.
-      if (settings.sounds) {
-        [0, 1, 2, 3, 4, 5].forEach((i) => later(() => playCountNote(i), i * 120));
-        later(() => playRecorded("cheer", playTusch), 700);
-      }
+      [0, 1, 2, 3, 4, 5].forEach((i) => later(() => playCountNote(i), i * 120));
+      later(() => playRecorded("cheer", playTusch), 700);
       // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
       if (!sung) say(spokenIn(DONE_SAY, language));
       // A star on the week chart, whether or not it is shown, so it is complete when turned on.
@@ -344,14 +341,14 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   // A drum roll under the countdown, louder each second.
   useEffect(() => {
-    if (count !== null && !paused && settings.sounds) playDrumRoll(COUNTDOWN - count);
+    if (count !== null && !paused) playDrumRoll(COUNTDOWN - count);
     // Only when the number changes.
   }, [count, round]);
 
   useEffect(() => {
-    if (goneCount > lastGone.current && settings.sounds) playPoof();
+    if (goneCount > lastGone.current) playPoof();
     lastGone.current = goneCount;
-  }, [goneCount, settings.sounds]);
+  }, [goneCount]);
 
   useEffect(
     () => () => {
@@ -362,15 +359,12 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   // Tapping isn't needed, but a tapped monster giggles and wiggles.
   // The same function from tick to tick, so the monsters in the mirror aren't drawn again with every tick (`PlacedMonster`).
-  const tickle = useCallback(
-    (id: number) => {
-      if (settings.sounds) playSqueak();
-      setTickled(id);
-      if (tickleTimer.current) clearTimeout(tickleTimer.current);
-      tickleTimer.current = setTimeout(() => setTickled(null), TICKLE_MS);
-    },
-    [settings.sounds],
-  );
+  const tickle = useCallback((id: number) => {
+    playSqueak();
+    setTickled(id);
+    if (tickleTimer.current) clearTimeout(tickleTimer.current);
+    tickleTimer.current = setTimeout(() => setTickled(null), TICKLE_MS);
+  }, []);
 
   const again = useCallback(() => {
     const t = performance.now();

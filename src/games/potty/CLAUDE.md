@@ -90,8 +90,8 @@ came ends on `play` and never shows the chart.
 
 Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes, texts in every language), `images.ts` (finds
 `bilder/fox-<picture>.webp` and its `-b` frame), `StoryPicture.tsx` (the picture with its frames, also in the bubble),
-`PottyPlay.tsx` (steps, sounds, speech, the ✓, the star), `WeekStars.tsx`, `potty.css`, `settings.ts`
-(`tinytaps.potty.v3`: only speech and sounds, from the home page). `potty.test.ts` fails when a picture of the story is missing, a
+`PottyPlay.tsx` (steps, sounds, voice, the ✓, the star), `WeekStars.tsx`, `potty.css` (no settings: the story has
+nothing to choose). `potty.test.ts` fails when a picture of the story is missing, a
 thought's picture lacks its second frame, or `bilder/` holds a picture of anybody else.
 
 German, English, Chinese, Hindi, Spanish, Arabic and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart

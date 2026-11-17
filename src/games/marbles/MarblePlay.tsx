@@ -29,6 +29,9 @@ function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
 /** Party time after a level, before "Nochmal" and "Weiter" come. */
 const PARTY_MS = 3200;
 
+/** Plays a level's sound effect (`LevelProps.sound`). */
+const play = (sound: () => void) => sound();
+
 /**
  * "Kettenreaktion": one tap, and one thing sets off the next – the marble
  * run, the Rube Goldberg machines and the long row of things that fall over,
@@ -53,12 +56,6 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const { later } = useTimers();
 
-  const sound = useCallback(
-    (play: () => void) => {
-      if (settings.sounds) play();
-    },
-    [settings.sounds],
-  );
   // Every line is said from its ElevenLabs recording in the app language; a line not translated yet in German. Lines wait
   // for each other, but a level's first line cuts off what is still said from before.
   const say = useCallback((text: Localized, queue = true) => marblesVoice.say(pick(text, language.id), language.id, { queue }), [language.id]);
@@ -70,12 +67,12 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     // „Weiter“ should not wait for the next level's code: fetched during the party, never while a level runs.
     if (!savesData()) prefetchLevel(next);
     // The good-night machine ends as calmly as it ran.
-    sound(level.id === "night" ? playLullaby : playMelody);
+    (level.id === "night" ? playLullaby : playMelody)();
     later(() => {
       setParty(false);
       setEnded(true);
     }, PARTY_MS);
-  }, [sound, level.id, later, next]);
+  }, [level.id, later, next]);
 
   // One ball in the goal is enough for the level's trophy (user decision, November 2026); the end shows it beside its buttons.
   const game = gameOfPath(useLocation().pathname)?.href;
@@ -105,7 +102,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     <div className={`marble-play${party ? " party" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
       {/* The paper with the paw track while the level's code still loads – never a dark screen. */}
       <Suspense fallback={<PageLoading />}>
-        <PlayedLevel key={round} entry={level} sound={sound} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
+        <PlayedLevel key={round} entry={level} sound={play} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
       </Suspense>
       {ended && <GameEnd level={level.id} onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <FeedbackLayer effects={effects} />

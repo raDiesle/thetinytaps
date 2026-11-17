@@ -5,10 +5,6 @@ export interface TeethSettings {
   origin: boolean;
   /** First fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
-  /** "Vorlesen" from the home page: says the prelude; the song sings the steps itself. */
-  speech: boolean;
-  /** A poof for every monster, a chime when it is time to move on. */
-  sounds: boolean;
 }
 
 // No choices for the song or the daytime: the song always plays, sung in the app
@@ -17,8 +13,6 @@ export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   week: true,
   origin: true,
   prep: true,
-  speech: false,
-  sounds: true,
 };
 
 // v2: music became on by default; v3: speech became off by default. Saved older

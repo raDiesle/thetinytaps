@@ -149,7 +149,7 @@ export function AdventurePlay({
           music.hush(quiet);
         },
         onCue(cue) {
-          if (settingsRef.current.sounds) CUES[cue]();
+          CUES[cue]();
         },
         onEnd() {
           setEnded(true);

@@ -154,24 +154,6 @@ export function spokenIn<T>(texts: Texts<T>, language: TargetLanguage): Spoken<T
   return { text: texts[first] as T, lang: targetLanguageFor(first).speechLang, english };
 }
 
-/** The script of each language not written in Latin letters: a sentence without it was not translated. */
-const SCRIPTS: Partial<Record<TargetLanguageId, RegExp>> = {
-  ru: /\p{Script=Cyrillic}/u,
-  zh: /\p{Script=Han}/u,
-  hi: /\p{Script=Devanagari}/u,
-  ar: /\p{Script=Arabic}/u,
-};
-
-/**
- * The voice for `text`, a sentence built for `language`: the German voice where a screen in another script fell
- * back to a German sentence (none of its own letters in it), for games that build whole sentences from translated
- * words. Languages in Latin letters can't tell this way and always get their own voice.
- */
-export function voiceFor(text: string, language: TargetLanguage) {
-  const script = SCRIPTS[language.id];
-  return script && !script.test(text) ? targetLanguageFor("de").speechLang : language.speechLang;
-}
-
 /** `t` for the app language: t({ en: "Music", ru: "Музыка" }) → the text in the chosen language. */
 export function useT(): Translate {
   const { id } = useAppLanguage();

@@ -8,7 +8,6 @@ import { GROW_MS, GROW_TEXTS, GrowthPicture } from "./growth";
 import type { GrowRound } from "./levels";
 import { voiceQuiet } from "@/lib/voice";
 import { useRoundTime, useSay } from "./roundTime";
-import type { AnimalsSettings } from "./settings";
 
 /** The picked one's flight up into the small one, before it starts to become it. */
 const FLIGHT_MS = 500;
@@ -24,7 +23,6 @@ const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height /
 
 /** What a round of "Was wird aus mir?" gets from `AnimalsRounds`, which plays it in turn with the other kinds. */
 export interface GrowPlayProps {
-  settings: Pick<AnimalsSettings, "speech" | "sounds">;
   round: GrowRound;
   /** What the round is about, for grown-ups: shown under the picture. */
   topic?: ReactNode;
@@ -42,7 +40,7 @@ export interface GrowPlayProps {
  * becomes it: the caterpillar spins itself in and a butterfly flies out, the egg cracks, the seed grows into a
  * sunflower, the tadpole grows legs and hops onto a lily pad as a frog. A wrong pick shows the small one it comes from.
  */
-export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: GrowPlayProps) {
+export function GrowPlay({ round, topic, intro, onSolved, onNext }: GrowPlayProps) {
   const language = useAppLanguage();
   const texts = pick(GROW_TEXTS, language.id);
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -75,9 +73,9 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   const choose = (index: number) => {
@@ -89,7 +87,7 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
     if (!ok) {
       // Never a "wrong" for the child; only the difficulty takes note. The small one it comes from pops up.
       misses.current++;
-      if (settings.sounds) later(250, playPop);
+      later(250, playPop);
       say(texts.comesFrom(round.grown[index]));
       say(texts.whatBecomes(round.growth));
       // The next pick only once its lines are said, so they never pile up.
@@ -109,10 +107,8 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
       setFlight({ x: end.x - start.x, y: end.y - start.y });
     }
     later(FLIGHT_MS, () => setGrowing(true));
-    if (settings.sounds) {
-      later(200, playChime);
-      for (const [ms, sound] of round.growth.sounds) later(FLIGHT_MS + ms, sound);
-    }
+    later(200, playChime);
+    for (const [ms, sound] of round.growth.sounds) later(FLIGHT_MS + ms, sound);
     say(texts.becomes(round.growth));
     onSolved(misses.current);
     // The next round only once the answer is said in full.
@@ -124,7 +120,7 @@ export function GrowPlay({ settings, round, topic, intro, onSolved, onNext }: Gr
     e.stopPropagation();
     if (busy.current) return;
     if (voiceQuiet()) say(texts.whatBecomes(round.growth));
-    if (settings.sounds) playPop();
+    playPop();
     setNudge((n) => n + 1);
   };
 

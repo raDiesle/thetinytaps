@@ -5,7 +5,7 @@ import type { MarbleLevel } from "./settings";
 
 /** What every level gets from the game around it. */
 export interface LevelProps {
-  /** Plays a sound effect, unless sounds are off. */
+  /** Plays a sound effect. */
   sound: (play: () => void) => void;
   /** Says a line in the app language, after what is being said; with `queue` false it cuts that off instead (a count that must keep up with the picture). */
   say: (text: Localized, queue?: boolean) => void;

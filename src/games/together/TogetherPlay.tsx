@@ -8,7 +8,6 @@ import { distanceToRect, mayDrag, TAP_SLOP_PX, tapState } from "@/lib/tapTargets
 import type { TogetherRound } from "./levels";
 import { PairPicture, PartnerIcon } from "./PairPicture";
 import { TOGETHER_TEXTS, type TogetherTexts, WORK_MS } from "./pairs";
-import type { TogetherSettings } from "./settings";
 import { togetherVoice } from "./voice";
 
 /** The picked partner's flight up into the picture, before the two set to work. */
@@ -35,7 +34,6 @@ export function roundLines(round: TogetherRound, texts: TogetherTexts): string[]
 
 /** What a round gets from `TogetherRounds`, which plays the two kinds in turn. */
 export interface TogetherPlayProps {
-  settings: Pick<TogetherSettings, "speech" | "sounds">;
   round: TogetherRound;
   /** The right one was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
@@ -56,7 +54,7 @@ const near = (r: DOMRect, x: number, y: number) => distanceToRect(x, y, r) <= TA
  * onto the brush, the key turns and the door opens, the hose puts out the fire, the scissors snip. A wrong pick shows
  * the one it belongs to over its plate; it is never shown as wrong.
  */
-export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }: TogetherPlayProps) {
+export function TogetherPlay({ round, onSolved, onNext, topic, back }: TogetherPlayProps) {
   const language = useAppLanguage();
   const texts = pick(TOGETHER_TEXTS, language.id);
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -108,9 +106,9 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }:
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   const choose = (index: number) => {
@@ -128,7 +126,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }:
     if (!ok) {
       // Never a "wrong" for the child; only the difficulty takes note. The one it belongs to pops up.
       misses.current++;
-      if (settings.sounds) later(250, playPop);
+      later(250, playPop);
       say(texts.belongs(round.choices[index]));
       say(texts.question(round.pair), true);
       later(WRONG_MS, () => {
@@ -148,10 +146,8 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }:
       setFlight({ x: end.x - start.x, y: end.y - start.y });
     }
     later(FLIGHT_MS, () => setWorking(true));
-    if (settings.sounds) {
-      later(200, playChime);
-      for (const [ms, sound] of round.pair.sounds) later(FLIGHT_MS + ms, sound);
-    }
+    later(200, playChime);
+    for (const [ms, sound] of round.pair.sounds) later(FLIGHT_MS + ms, sound);
     say(texts.right(round.pair));
     onSolved(misses.current);
     later(FLIGHT_MS + WORK_MS, onNext);
@@ -162,7 +158,7 @@ export function TogetherPlay({ settings, round, onSolved, onNext, topic, back }:
     e.stopPropagation();
     if (busy.current) return;
     say(texts.question(round.pair));
-    if (settings.sounds) playPop();
+    playPop();
     setNudge((n) => n + 1);
   };
 

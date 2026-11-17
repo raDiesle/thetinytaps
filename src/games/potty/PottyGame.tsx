@@ -1,8 +1,6 @@
 import { GameShell } from "@/components/GameShell";
-import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
 import { PottyPlay } from "./PottyPlay";
-import { DEFAULT_POTTY_SETTINGS, POTTY_SETTINGS_KEY } from "./settings";
 import "./potty.css";
 
 /** The game's name, on its start screen and in the browser tab. */
@@ -18,7 +16,6 @@ export const POTTY_TITLE: Localized = {
 
 export function PottyGame() {
   const t = useT();
-  const [settings] = useGameSettings(POTTY_SETTINGS_KEY, DEFAULT_POTTY_SETTINGS);
 
   return (
     <GameShell
@@ -27,7 +24,7 @@ export function PottyGame() {
       // ✕ and „Menü“ go back to the shelf (GameShell), there is no start screen.
       startMode="story"
     >
-      <PottyPlay settings={settings} />
+      <PottyPlay />
     </GameShell>
   );
 }

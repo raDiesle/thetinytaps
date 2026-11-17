@@ -2,11 +2,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { dayKey } from "@/lib/days";
-import { useAppLanguage, useT, voiceFor } from "@/lib/language";
+import { useT } from "@/lib/language";
 import { playChime, playCountNote, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
 import { type RoutineVisit, waitForStep } from "@/lib/routine";
 import { loadRealSounds, playCrow } from "@/lib/realSounds";
-import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { useTimers } from "@/lib/timers";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
@@ -21,7 +20,6 @@ import {
   gameOf,
   moonsLeft,
   nightsOf,
-  nightsUntil,
   pairsOf,
   type Plan,
   planProgress,
@@ -33,7 +31,7 @@ import {
 } from "./plan";
 import { RitualDialog } from "./RitualCard";
 import { type Ritual, ritualOf } from "./rituals";
-import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, SLEEPS_UNTIL, type StepState, TODAY, useStepLabel } from "./PlanSheet";
+import { PLAN_SCREEN, PlanSheet, type StepState, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
 const UNDO_MS = 8000;
@@ -85,8 +83,6 @@ export function PlanScreen({
   setLog,
   linked,
   day,
-  sounds,
-  speech,
   onExamplesOff,
 }: {
   plan: Plan;
@@ -95,12 +91,9 @@ export function PlanScreen({
   linked: LinkedDays;
   /** The day shown: today, or another one a grown-up looks at (only today's cards can be ticked). */
   day: Date;
-  sounds: boolean;
-  speech: boolean;
   onExamplesOff: () => void;
 }) {
   const t = useT();
-  const language = useAppLanguage();
   const stepLabel = useStepLabel();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -133,10 +126,6 @@ export function PlanScreen({
   const boxed = plan.view === "day" && !!plan.nowField;
   /** An Erst–Dann's pairs done today: „Von vorn“ makes them ready for the next time. */
   const pairsDone = plan.view === "first-then" ? pairsOf(todaySteps).filter((pair) => pair.every((step) => stepDone(ticks, linked, today, step))) : [];
-
-  const sound = (play: () => void) => sounds && play();
-  // A line without its translation is German and gets the German voice.
-  const say = (text: string) => speech && speak(text, voiceFor(text, language));
 
   useEffect(() => {
     const el = box.current;
@@ -212,19 +201,11 @@ export function PlanScreen({
       if (plan.view === "countdown") return countDown();
       const now = box.current?.querySelector("[data-state='now']") ?? box.current?.querySelector("[data-state='done']");
       if (now) poke(now, now.getAttribute("data-state") === "now" ? "wiggle" : "twinkle");
-      sound(playTwinkle);
+      playTwinkle();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   });
-
-  /** Says what is left: „Noch 3-mal schlafen, dann Geburtstag“, or on the day itself that it has come. */
-  const sayLeft = (moons: number, label: string) =>
-    say(
-      moons > 0
-        ? t(SLEEPS_UNTIL)(moons, label)
-        : `${t({ de: "Heute ist es so weit:", en: "Today is the day:", zh: "今天就是这一天：", hi: "आज वह दिन आ गया:", es: "¡Hoy es el día!", ar: "اليوم هو اليوم:", ru: "Сегодня этот день:" })} ${label}`,
-    );
 
   /** The big day has come: its picture's party. */
   const bigDayParty = () => {
@@ -232,9 +213,8 @@ export function PlanScreen({
     if (!step) return;
     setWon(false);
     setParty(step.emoji);
-    sound(playTusch);
+    playTusch();
     celebrate();
-    sayLeft(0, stepLabel(step));
   };
 
   /**
@@ -253,7 +233,7 @@ export function PlanScreen({
     if (moons === 0) {
       if (waiting) {
         poke(waiting, "wiggle");
-        sound(playPop);
+        playPop();
         return;
       }
       if (card) poke(card, "wiggle");
@@ -265,14 +245,13 @@ export function PlanScreen({
     root.querySelectorAll("[data-night='later']").forEach((moon, i) =>
       later(i * each, () => {
         poke(moon, "twinkle");
-        sound(() => playCountNote(i));
+        playCountNote(i);
       }),
     );
     later(moons * each, () => {
       if (card) poke(card, "wiggle");
-      sound(playChime);
+      playChime();
     });
-    say(t(SLEEPS_UNTIL)(moons, stepLabel(step)));
   };
 
   /**
@@ -286,7 +265,7 @@ export function PlanScreen({
     if (state === "later") return countDown();
     if (state === "done") {
       poke(el, "twinkle");
-      sound(playTwinkle);
+      playTwinkle();
       return;
     }
     const nights = nightsOf(plan, today, ticks);
@@ -296,7 +275,7 @@ export function PlanScreen({
     setLog(next);
     setFresh(key);
     setUndo(key);
-    sound(playCrow);
+    playCrow();
     const rect = el.getBoundingClientRect();
     glow(rect.left + rect.width / 2, rect.top + rect.height / 2);
     // The last morning: its sun rises, then the big day's picture comes big with its party.
@@ -305,12 +284,10 @@ export function PlanScreen({
         setFresh(null);
         bigDayParty();
       }, 1100);
-    else sayLeft(moonsLeft(plan, today), stepLabel(step));
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
     unlockAudio();
-    unlockSpeech();
     if (plan.view === "countdown") {
       const night = (e.target as Element).closest<HTMLElement>("[data-night]");
       // Only today's mornings turn into suns; on a day looked back at a tap counts the moons.
@@ -320,7 +297,7 @@ export function PlanScreen({
       return;
     }
     const header = (e.target as Element).closest<HTMLElement>("[data-day]");
-    if (header) return sayDay(header);
+    if (header) return pokeDay(header);
     const el = (e.target as Element).closest<HTMLElement>("[data-step]");
     const doneBox = el ? null : (e.target as Element).closest<HTMLElement>("[data-box]");
     if (!el && !doneBox) return;
@@ -330,10 +307,10 @@ export function PlanScreen({
       if (from) move.current = { key: "", from, into: false };
       keepMarker();
       onExamplesOff();
-      sound(playPop);
+      playPop();
       return;
     }
-    if (doneBox) return sayBox(doneBox);
+    if (doneBox) return pokeBox(doneBox);
     if (!el) return;
     const key = el.dataset.step as string;
     const state = el.dataset.state as StepState;
@@ -342,24 +319,20 @@ export function PlanScreen({
     const index = steps.findIndex((step) => step.id === taskId);
     const step = steps[index];
     if (!step) return;
-    const label = stepLabel(step);
     if (state === "done") {
       poke(el, "twinkle");
-      sound(playTwinkle);
-      say(label);
+      playTwinkle();
       return;
     }
     if (state === "later") {
       poke(el, "wiggle");
-      sound(playPop);
-      const nights = nightsUntil(today, stepDay);
-      say(nights > 0 ? `${t(SLEEPS_LEFT)(nights)}: ${label}` : label);
+      playPop();
       return;
     }
     // The teeth card opens Zähne putzen; leaving comes back here, and a finished brushing ticks this card.
     const game = gameOf(step);
     if (game) {
-      sound(playPop);
+      playPop();
       waitForStep(pathname, routineStep(plan.id, key));
       navigate(game, { state: { returnTo: pathname } satisfies RoutineVisit });
       return;
@@ -367,7 +340,7 @@ export function PlanScreen({
     // A ritual opens its words for the grown-up; „Gemacht“ under them ticks it as this tap would.
     const words = ritualOf(step);
     if (words) {
-      sound(playPop);
+      playPop();
       setRitual({ ritual: words, key });
       return;
     }
@@ -384,7 +357,6 @@ export function PlanScreen({
     const index = steps.findIndex((s) => s.id === taskId);
     const step = steps[index];
     if (!step) return;
-    const label = stepLabel(step);
     const before = planProgress(plan, ticks, linked, stepDay);
     const next = addStar(log, plan.id, key, today, starsOf(step));
     const after = planProgress(plan, next[plan.id], linked, stepDay);
@@ -393,7 +365,7 @@ export function PlanScreen({
     setLog(next);
     setFresh(key);
     setUndo(key);
-    sound(playChime);
+    playChime();
     const rect = el.getBoundingClientRect();
     glow(rect.left + rect.width / 2, rect.top + rect.height / 2);
     // The reward reached: its party, whatever else is left.
@@ -402,92 +374,36 @@ export function PlanScreen({
       timers.later(() => {
         setWon(true);
         setParty(reward.emoji);
-        sound(playTusch);
+        playTusch();
         celebrate();
-        say(
-          `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(reward)}`,
-        );
       }, 450);
       return;
     }
-    // Counting stars, the card isn't done until it has them all: it says itself again.
-    if (counts && !stepDone(next[plan.id], linked, stepDay, step)) {
-      say(label);
-      return;
-    }
-    // An Erst–Dann pair stands on its own: done with its Dann card, and its Erst card says what comes then.
+    // Counting stars, the card isn't done until it has them all.
+    if (counts && !stepDone(next[plan.id], linked, stepDay, step)) return;
+    // An Erst–Dann pair stands on its own: done with its Dann card.
     const pair = plan.view === "first-then" ? pairsOf(steps)[Math.floor(index / 2)] : steps;
     const left = currentStep(pair, next[plan.id], linked, stepDay);
     if (left === -1) {
       timers.later(() => {
         setWon(false);
         setParty(step.emoji);
-        sound(playTusch);
+        playTusch();
         celebrate();
-        say(
-          t({
-            de: "Alles geschafft! Hurra!",
-            en: "All done! Hooray!",
-            zh: "全部完成啦！好耶！",
-            hi: "सब हो गया! हुर्रे!",
-            es: "¡Todo listo! ¡Hurra!",
-            ar: "انتهينا من كل شيء! يا للفرح!",
-            ru: "Всё готово! Ура!",
-          }),
-        );
       }, 450);
-    } else if (counts) {
-      say(t({ de: "Super!", en: "Super!", zh: "太棒了！", hi: "शाबाश!", es: "¡Genial!", ar: "رائع!", ru: "Супер!" }));
-    } else {
-      say(
-        `${t({ de: "Super! Jetzt:", en: "Super! Now:", zh: "太棒了！现在：", hi: "शाबाश! अब:", es: "¡Genial! Ahora:", ar: "رائع! والآن:", ru: "Супер! Теперь:" })} ${stepLabel(pair[left])}`,
-      );
     }
   };
 
-  /** The Fertig-Kiste tapped: it wiggles and names what is in it. */
-  const sayBox = (el: HTMLElement) => {
+  /** The Fertig-Kiste tapped: it wiggles. */
+  const pokeBox = (el: HTMLElement) => {
     poke(el, "wiggle");
-    sound(playPop);
-    const done = stepsOn(plan, day).filter((step) => stepDone(ticks, linked, day, step));
-    say(
-      done.length
-        ? `${t({ de: "Schon fertig:", en: "Already done:", zh: "已经完成：", hi: "हो चुका है:", es: "Ya está hecho:", ar: "انتهينا من:", ru: "Уже готово:" })} ${done.map(stepLabel).join(", ")}`
-        : t({
-            de: "Hier kommt rein, was fertig ist.",
-            en: "What’s done goes in here.",
-            zh: "做完的放到这里。",
-            hi: "जो हो गया, वह यहाँ आता है।",
-            es: "Aquí va lo que ya está hecho.",
-            ar: "هنا نضع ما انتهينا منه.",
-            ru: "Сюда кладём то, что готово.",
-          }),
-    );
+    playPop();
   };
 
-  /** A day of the week tapped: it says when it is and what comes then. */
-  const sayDay = (header: HTMLElement) => {
+  /** A day of the week tapped: it wiggles. */
+  const pokeDay = (header: HTMLElement) => {
     poke(header, "wiggle");
-    sound(playPop);
-    const d = new Date(`${header.dataset.day}T12:00`);
-    const nights = nightsUntil(today, d);
-    const when =
-      nights === 0
-        ? t(TODAY)
-        : nights === 1
-          ? t({
-              de: "Morgen, noch einmal schlafen",
-              en: "Tomorrow, one more sleep",
-              zh: "明天，再睡一觉",
-              hi: "कल, बस एक बार और सोना है",
-              es: "Mañana, falta una noche",
-              ar: "غدًا، بعد ليلة واحدة",
-              ru: "Завтра, ещё разок поспать",
-            })
-          : nights > 1
-            ? t(SLEEPS_LEFT)(nights)
-            : new Intl.DateTimeFormat(language.speechLang, { weekday: "long" }).format(d);
-    say(`${when}: ${stepsOn(plan, d).map(stepLabel).join(", ")}`);
+    playPop();
   };
 
   const takeBack = () => {

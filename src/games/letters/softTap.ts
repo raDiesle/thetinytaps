@@ -8,13 +8,13 @@ import { EXTRA_SOUND_GAP_MS, spaced } from "@/lib/spacing";
  * heard a note at every press (user feedback, November 2026). `quiet` leaves the note out: the same key pressed again
  * during its pause (`repeatPause`) only ripples.
  */
-export function useSoftTap(ripple: (x?: number, y?: number) => void, sounds: boolean) {
+export function useSoftTap(ripple: (x?: number, y?: number) => void) {
   const notes = useMemo(() => spaced(EXTRA_SOUND_GAP_MS), []);
   return useCallback(
     (x?: number, y?: number, quiet = false) => {
       ripple(x, y);
-      if (sounds && !quiet && notes.pass()) playRandomNote();
+      if (!quiet && notes.pass()) playRandomNote();
     },
-    [ripple, sounds, notes],
+    [ripple, notes],
   );
 }

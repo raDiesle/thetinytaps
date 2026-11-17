@@ -57,17 +57,6 @@ export const SLEEPS_LEFT: Localized<(nights: number) => string> = {
   ru: (n) => (n === 1 ? "Ещё разок поспать" : `Ещё ${n} ${new Intl.PluralRules("ru").select(n) === "few" ? "раза" : "раз"} поспать`),
 };
 
-/** „Noch 3-mal schlafen, dann Geburtstag“: a Countdown's moons and its big day, said to the child (H-41). */
-export const SLEEPS_UNTIL: Localized<(nights: number, what: string) => string> = {
-  de: (n, what) => `${SLEEPS_LEFT.de(n)}, dann ${what}`,
-  en: (n, what) => `${(SLEEPS_LEFT.en ?? SLEEPS_LEFT.de)(n)}, then ${what}`,
-  zh: (n, what) => `${(SLEEPS_LEFT.zh ?? SLEEPS_LEFT.de)(n)}，然后就是${what}`,
-  hi: (n, what) => `${(SLEEPS_LEFT.hi ?? SLEEPS_LEFT.de)(n)}, फिर ${what}`,
-  es: (n, what) => `${(SLEEPS_LEFT.es ?? SLEEPS_LEFT.de)(n)} y luego llega: ${what}`,
-  ar: (n, what) => `${(SLEEPS_LEFT.ar ?? SLEEPS_LEFT.de)(n)}، ثم ${what}`,
-  ru: (n, what) => `${(SLEEPS_LEFT.ru ?? SLEEPS_LEFT.de)(n)}, а потом – ${what}`,
-};
-
 /** At most this many moons count the nights until a day of the week; further days are next week's anyway. */
 const MAX_MOONS = 6;
 

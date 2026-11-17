@@ -33,13 +33,9 @@ export interface LettersSettings {
   trace: boolean;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
-  /** Speak letters/words and count numbers aloud. */
-  speech: boolean;
   announce: Announce;
   /** Prefer words and countables from this theme; letters without one fall back to all words. */
   theme: "all" | ThemeId;
-  /** Chimes and notes. */
-  sounds: boolean;
   /** How a number comes in, see NumberReveal. */
   numbers: NumberReveal;
   /** "count" only: ignore new letters/numbers until counting has finished. */
@@ -62,10 +58,8 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   letterFamily: true,
   trace: false,
   showWord: true,
-  speech: false,
   announce: "letterAndWord",
   theme: "all",
-  sounds: true,
   numbers: "all",
   finishCounting: true,
   digitOnRepeat: false,

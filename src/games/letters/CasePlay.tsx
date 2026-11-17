@@ -10,7 +10,6 @@ import { screenChanged } from "@/lib/tapGuard";
 import { tapState } from "@/lib/tapTargets";
 import { useTimers } from "@/lib/timers";
 import { useVoiceReady } from "@/lib/voiceReady";
-import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
 import { lettersVoice } from "./voice";
 import "./case.css";
@@ -91,7 +90,7 @@ type Round = { id: number; letter: LetterEntry; choices: LetterEntry[]; next: Le
  * belongs to it; tapped (or its key pressed), it walks over to the big one and they stand together. A wrong one shakes its
  * head. First the three look plainly different, then – once the child finds them at the first tap – alike (b, d, p).
  */
-export function CasePlay({ pack, language, settings }: { pack: LanguagePack; language: string; settings: LettersSettings }) {
+export function CasePlay({ pack, language }: { pack: LanguagePack; language: string }) {
   const letters = useMemo(() => caseLetters(pack), [pack]);
   const [round, setRound] = useState<Round | null>(null);
   const [coming, setComing] = useState<Round | null>(null);
@@ -99,7 +98,7 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
   const [wrong, setWrong] = useState<string[]>([]);
   const [found, setFound] = useState(false);
   const { effects, ripple, glow } = useTapFeedback();
-  const softTap = useSoftTap(ripple, settings.sounds);
+  const softTap = useSoftTap(ripple);
   const { later } = useTimers();
 
   const nextId = useRef(0);
@@ -195,7 +194,7 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
         glow(x, y);
         setFound(true);
         // The chime comes when the small letter arrives; left before that, it must not sound in the menu.
-        if (settings.sounds) later(playChime, WALK_MS);
+        later(playChime, WALK_MS);
         say(`${choice.spoken}!`);
         aside(pack.praise[Math.floor(Math.random() * pack.praise.length)]);
         // Found at the first tap: after a few in a row the small letters look alike.
@@ -214,7 +213,7 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
       streak.current = 0;
       alike.current = false;
     },
-    [round, found, wrong, softTap, glow, say, aside, later, settings.sounds, pack],
+    [round, found, wrong, softTap, glow, say, aside, later, pack],
   );
 
   // A key of one of the three small letters chooses it; any other key only ripples.

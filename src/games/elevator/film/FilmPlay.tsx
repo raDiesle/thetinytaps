@@ -12,7 +12,6 @@ import { hush, talking } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
 import { translationOf } from "../phrases";
 import { filmLines, linesReady, loadLines, sayIn } from "../voice";
-import type { ElevatorSettings } from "../settings";
 import { Fitted, type Picture } from "../trail/items";
 import type { Cue } from "../trail/types";
 import { type Choice, type Film, type Option, PACE, type Spot } from "./types";
@@ -115,13 +114,11 @@ const CARD = { w: 400, h: 330, edge: 16, holes: 40, clear: 72 };
 /** A film („Filme“, G-14): scenes cut one after the other, a few taps in each, and choices that pick how it goes on. */
 export function FilmPlay({
   language,
-  settings,
   film,
   onPick,
 }: {
   /** The app language: what the child hears is spoken in it. */
   language: TargetLanguage;
-  settings: ElevatorSettings;
   film: Film;
   onPick: (id: string) => void;
 }) {
@@ -235,12 +232,8 @@ export function FilmPlay({
     sayIn(german, voice, first);
   };
 
-  const sound = (play: () => void) => {
-    if (settings.sounds) play();
-  };
-
   /** Plays a beat's sounds, their times stretched by `PACE` like the beat, from `after` ms on. */
-  const cue = (sounds: Cue[], after = 0) => sounds.forEach(([ms, play]) => later(after + ms * PACE, () => sound(play)));
+  const cue = (sounds: Cue[], after = 0) => sounds.forEach(([ms, play]) => later(after + ms * PACE, play));
 
   /** After a line: resolves once nothing is being said any more (or after `LINE_MAX_MS`), then after a quiet `REST_MS`. */
   const quiet = async () => {
@@ -317,7 +310,7 @@ export function FilmPlay({
         stop();
         const option = choice.options.find((o) => o.id === id);
         if (option) say(option.say);
-        sound(playPop);
+        playPop();
         put({ picked: id, hand: false, shown: choice.options.length });
         resolve(id);
       };
@@ -370,7 +363,7 @@ export function FilmPlay({
     await quiet();
     put({ party: true });
     say(film.end);
-    sound(playGlockenspielEnd);
+    playGlockenspielEnd();
     await wait(END_MS);
     put({ picking: true });
   };
@@ -386,7 +379,7 @@ export function FilmPlay({
     const now = performance.now();
     if (now - lastNote.current < FREE_NOTE_MS) return;
     lastNote.current = now;
-    sound(playRandomNote);
+    playRandomNote();
   };
 
   /** A tap on the picture (or a key): it sets off the waiting beat, makes the options hop, or is kept for later. */
@@ -395,7 +388,7 @@ export function FilmPlay({
     if (v.picking || pausedRef.current) return;
     if (tapper.current) {
       glow(x, y);
-      sound(playPop);
+      playPop();
       return tapper.current();
     }
     if (chooser.current) put((w) => ({ nudge: w.nudge + 1 }));

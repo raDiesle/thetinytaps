@@ -40,10 +40,6 @@ export interface TimerSettings {
    * (`shown`, then `showTime` held the old default for everyone who had played before), so the new one reaches them too.
    */
   timeNote: TimeShown;
-  /** Always off: the timer says nothing (see the root CLAUDE.md on voice). */
-  speech: boolean;
-  /** The whistle, chimes and the tune at the end. */
-  sounds: boolean;
 }
 
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
@@ -53,8 +49,6 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   useOwn: false,
   toy: "bobbycar",
   timeNote: "digits",
-  speech: false,
-  sounds: true,
 };
 
 export const TIMER_SETTINGS_KEY = "tinytaps.timer.v1";

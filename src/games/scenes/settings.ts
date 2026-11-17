@@ -20,10 +20,6 @@ export const hasHints = (mode: SceneMode) => mode === "questions";
 export interface ScenesSettings {
   /** Picked in the row above the pictures on `/bilder/`; a tap on a picture plays it in this mode. */
   mode: SceneMode;
-  /** Speak names, sentences and questions. */
-  speech: boolean;
-  /** Engine noises, beeps and chimes. */
-  sounds: boolean;
   /**
    * Every item has its own key, shown in the picture, wherever there is a keyboard (tapping still works).
    * Switched off and on with ⌨️ in the picture, and kept so for the next pictures.
@@ -33,8 +29,6 @@ export interface ScenesSettings {
 
 export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   mode: "explore",
-  speech: false,
-  sounds: true,
   keys: true,
 };
 

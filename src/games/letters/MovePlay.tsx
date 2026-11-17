@@ -198,10 +198,8 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
           setTimeout(
             () => {
               act(move);
-              if (settings.sounds) {
-                SOUNDS[move]();
-                playCountNote(k - 1);
-              }
+              SOUNDS[move]();
+              playCountNote(k - 1);
               say(`${pack.numberWords[k]}!`, true);
               setRound((r) => (r?.id === id ? { ...r, done: k } : r));
             },
@@ -210,13 +208,13 @@ export function MovePlay({ pack, settings }: { pack: LanguagePack; settings: Let
         );
       }
       const end = READY_MS + (n - 1) * BEAT_MS + DONE_MS;
-      timers.current.push(setTimeout(() => settings.sounds && playChime(), end));
+      timers.current.push(setTimeout(() => playChime(), end));
       busyUntil.current = performance.now() + end;
     },
-    [stop, say, pack, invite, act, settings.sounds],
+    [stop, say, pack, invite, act],
   );
 
-  const softTap = useSoftTap(ripple, settings.sounds);
+  const softTap = useSoftTap(ripple);
 
   /** A digit plays its number; any other key a number by chance, never the one on screen. */
   const pressKey = useCallback(

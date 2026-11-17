@@ -28,10 +28,6 @@ export interface MarbleSettings {
    * say "all", "both" or "machines"; they begin with the first.)
    */
   levels: MarbleLevel;
-  /** Say a short line when a level starts and when it is done. */
-  speech: boolean;
-  /** Bell, xylophone, the knocks of falling things and the sounds along the marble run. */
-  sounds: boolean;
   /**
    * "join": the marble run's barrier and the machines' stops wait for the child's tap, and the switch stays where the child put it;
    * "watch": the barrier stays open, the switch flips by itself after each marble and the machines run straight through, so nothing waits for a tap.
@@ -41,8 +37,6 @@ export interface MarbleSettings {
 
 export const DEFAULT_MARBLE_SETTINGS: MarbleSettings = {
   levels: "track",
-  speech: false,
-  sounds: true,
   play: "join",
 };
 

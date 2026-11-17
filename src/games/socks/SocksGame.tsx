@@ -1,8 +1,6 @@
 import { GameShell } from "@/components/GameShell";
-import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
 import { SocksPlay } from "./SocksPlay";
-import { DEFAULT_SOCKS_SETTINGS, SOCKS_SETTINGS_KEY } from "./settings";
 import "./socks.css";
 
 /** The game's name, on its start screen and in the browser tab. */
@@ -18,7 +16,6 @@ export const SOCKS_TITLE: Localized = {
 
 export function SocksGame() {
   const t = useT();
-  const [settings] = useGameSettings(SOCKS_SETTINGS_KEY, DEFAULT_SOCKS_SETTINGS);
 
   return (
     <GameShell
@@ -27,7 +24,7 @@ export function SocksGame() {
       // go back to the table of contents (GameShell), there is no start screen.
       startMode="play"
     >
-      <SocksPlay settings={settings} />
+      <SocksPlay />
     </GameShell>
   );
 }

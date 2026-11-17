@@ -54,8 +54,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
   (`src/components/SettingControls.tsx`) – only options, no description; never an own switch for
   Vorlesen, Töne, Musik or Sprache, the home page sets those for all games.
 - Sounds: build on `note()` and friends in `src/lib/sfx/core.ts` (the new sound goes into the topic file it fits), or `playRecorded(name, fallback)`
-  for a recording in `src/lib/sounds/`. Speech: `speak()` from `src/lib/speech.ts`, only if
-  `settings.speech`.
+  for a recording in `src/lib/sounds/`. Voice: lines are
+  said from their recordings with `recordedVoice` (`src/lib/voice.ts`), never `speak()`; there are no speech or sounds settings.
 - End of a level: `<GameEnd onAgain next />` from `src/components/GameEnd.tsx`.
 - Leaving is handled by `GameShell` (hold Esc / ✕). Never add another exit.
 

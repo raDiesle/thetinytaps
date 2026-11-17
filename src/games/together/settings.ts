@@ -11,16 +11,10 @@ export interface TogetherSettings {
    * grown-ups pick everything or one thing, so the options stay plain).
    */
   kinds: "all" | RoundKind;
-  /** Speak the question and what belongs to what (off for good until its lines are recorded). */
-  speech: boolean;
-  /** The pairs' and helpers' sounds and chimes. */
-  sounds: boolean;
 }
 
 export const DEFAULT_TOGETHER_SETTINGS: TogetherSettings = {
   kinds: "all",
-  speech: false,
-  sounds: true,
 };
 
 export const TOGETHER_SETTINGS_KEY = "tinytaps.together.v1";

@@ -141,21 +141,20 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   /** Speak and play the sound for reaching `stage`. */
   const announce = useCallback(
     (s: Shown, stage: number, queue = false) => {
-      const sound = (play: () => void) => settings.sounds && play();
       if (stage === lastStage(s)) {
-        sound(playChime);
+        playChime();
         say(sentenceFor(s), queue);
       } else if (stage === 0) {
         say(pack.zero.sentence, queue);
       } else {
-        sound(() => playCountNote(stage - 1));
+        playCountNote(stage - 1);
         say(`${pack.numberWords[stage]}!`, queue);
       }
     },
-    [pack, say, sentenceFor, settings.sounds],
+    [pack, say, sentenceFor],
   );
 
-  const softTap = useSoftTap(ripple, settings.sounds);
+  const softTap = useSoftTap(ripple);
 
   /** The word the letter comes with next time: its words take turns, so repeated presses stay interesting. */
   const nextWordOf = useCallback(
@@ -363,7 +362,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       if (key !== " " && key !== "Enter" && !(key in ARROWS) && (key !== "Backspace" || history.current.length === 0)) return false;
       // The same key again moves the card but sounds only after its pause; Backspace waits for it, since it speaks.
       const again = !repeats.pass(key);
-      const sound = (play: () => void) => settings.sounds && !again && play();
+      const sound = (play: () => void) => !again && play();
       if (key === " ") {
         sound(playBoing);
         animateCard([{ transform: "none" }, { transform: "translateY(-18%) scale(1.06)" }, { transform: "none" }], 600);
@@ -396,7 +395,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       }
       return false;
     },
-    [present, ripple, softTap, animateCard, settings.sounds, repeats],
+    [present, ripple, softTap, animateCard, repeats],
   );
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -537,7 +536,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
               stage={stage}
               hint={stepByStep || byTap(shown) || holdDigit}
               tapped={byTap(shown) ? tapped : undefined}
-              trace={settings.trace ? { sounds: settings.sounds } : undefined}
+              trace={settings.trace}
               onItemPointer={onItemPointer}
               onPointerDown={onCardPointer}
             />

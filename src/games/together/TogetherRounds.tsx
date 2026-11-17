@@ -170,7 +170,6 @@ export function TogetherRounds({ settings }: { settings: TogetherSettings }) {
     <>
       <TogetherPlay
         key={`${shown.turn}-${shown.round.pair.id}`}
-        settings={settings}
         round={shown.round}
         onSolved={onSolved}
         onNext={onNext}

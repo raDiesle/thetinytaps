@@ -9,7 +9,6 @@ import { choiceRows } from "@/lib/rounds";
 import type { PeekLevel } from "./levels";
 import { emojiGlyph, pickPeepholes, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
-import type { ShadowsSettings } from "./settings";
 import { animalsVoice } from "@/games/animals/voice";
 
 /** Time to watch the animal that came out before the next one hides. */
@@ -112,7 +111,6 @@ const HIDE_DIRECTION: Record<Side, { x: number; y: number }> = {
 
 /** What a round of "Wer schaut da raus?" gets from „Erkennen“ (`ShadowsPlay`), which plays it in turn with the shadows. */
 export interface PeekPlayProps {
-  settings: Pick<ShadowsSettings, "speech" | "sounds">;
   /** The animal that hides. */
   item: ShadowItem;
   /** The whole animals to choose from, `item` among them. */
@@ -131,7 +129,7 @@ export interface PeekPlayProps {
  * only bits of it show through gaps in the leaves); tap the whole animal below. The other kind of round of
  * „Erkennen“, next to the shadows, with which it shares the stage, pictures and glyphs.
  */
-export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNext }: PeekPlayProps) {
+export function PeekPlay({ item, choices, level, topic, onSolved, onNext }: PeekPlayProps) {
   const language = useAppLanguage();
   const texts = pick(SHADOW_TEXTS, language.id);
   const [round] = useState(() => hideAnimal(item, choices, level));
@@ -171,9 +169,9 @@ export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNe
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   const choose = (index: number) => {
@@ -186,7 +184,7 @@ export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNe
       // Never a "wrong" for the child; only the difficulty takes note.
       misses.current++;
       const owner = round.choices[index];
-      if (settings.sounds) later(250, () => (owner.sound ?? playPop)());
+      later(250, () => (owner.sound ?? playPop)());
       say(texts.thatIs(owner));
       say(texts.peek, true);
       later(WRONG_MS, () => {
@@ -201,10 +199,8 @@ export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNe
       setPhase("out");
       later(450, () => setPhase("front"));
     } else setPhase("front");
-    if (settings.sounds) {
-      later(200, playChime);
-      later(600, () => round.item.sound?.());
-    }
+    later(200, playChime);
+    later(600, () => round.item.sound?.());
     say(texts.there(round.item));
     onSolved(misses.current);
     later(CELEBRATE_MS, onNext);
@@ -215,7 +211,7 @@ export function PeekPlay({ settings, item, choices, level, topic, onSolved, onNe
     e.stopPropagation();
     if (busy.current) return;
     setRustle((n) => n + 1);
-    if (settings.sounds) (round.item.sound ?? playPop)();
+    (round.item.sound ?? playPop)();
     say(texts.peek);
   };
 

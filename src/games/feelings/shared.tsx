@@ -45,15 +45,15 @@ export function oops(heard: OopsSound | undefined, sound: (name: SoundName) => v
 const voice = recordedVoice(voiceFiles);
 
 /**
- * Speech and sounds: each line from its recording in the app language, a line not translated yet (still German) from
+ * Voice and sounds: each line from its recording in the app language, a line not translated yet (still German) from
  * its German one. `voiced` tells whether a line has a recording, so a story waits for it to be said – also while the
  * voice is switched off (`FeelingsSettings.voice`), so a grown-up telling the story has the same time for it.
  */
 export function useVoice(settings: FeelingsSettings) {
   const language = useAppLanguage();
   useEffect(() => {
-    if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
-  }, [settings.sounds]);
+    loadRecordings(RECORDED_SOUNDS);
+  }, []);
 
   // Read when a line is due, not when it was planned: switched off mid-story, the lines already waiting stay silent too.
   const speaking = useRef(settings.voice);
@@ -83,12 +83,9 @@ export function useVoice(settings: FeelingsSettings) {
     [language.id],
   );
 
-  const sound = useCallback(
-    (name: SoundName | undefined) => {
-      if (name && settings.sounds) SOUNDS[name]();
-    },
-    [settings.sounds],
-  );
+  const sound = useCallback((name: SoundName | undefined) => {
+    if (name) SOUNDS[name]();
+  }, []);
 
   return { say, sound, voiced, preload };
 }

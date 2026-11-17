@@ -91,7 +91,7 @@ Not a game but a tool for grown-ups that a child taps too: a reward chart the pa
 the same on screen and on paper (A4 from the browser, also offline). It stands on the home page's shelf as three books, „Zeitplan“, „Wie lange warten?“ and „Belohnungstafel“, tied together with a red ribbon right of Aufs Töpfchen among the „Alltagshelfer“, but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
-folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, speech, tap
+folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, tap
 targets) – keep it that way.
 
 ## Files
@@ -198,7 +198,7 @@ black-and-white print) where a sheet has more than one.
 
 The child taps an open field and its star pops in with a sound – one tap is enough (user decision, November 2026: the
 grown-up's hold and the big star to send off are gone). A filled field twinkles, a field of a later day wiggles. On a collecting board any open field of a way fills that way's
-next one, and its goal brings that way's own reward to the party. A full day gets a few hearts, stars and notes rising from it, the goal a party (and speech, if Vorlesen is on). „Stern zurück“ shows for
+next one, and its goal brings that way's own reward to the party. A full day gets a few hearts, stars and notes rising from it, the goal a party. „Stern zurück“ shows for
 `UNDO_MS` after a star, for a wrong tap.
 
 ## Printing
@@ -410,12 +410,11 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
 The child taps the card to do. In Jetzt – Dann with the marker the card stays in its place with a tick and the paper
 arrow slides on to the next card, as at home the paper arrow moves along the sheet; with the „Jetzt“ field the card
 flies with a sound into the Fertig-Kiste at the bottom edge (H-42), as on a Velcro board at home, and the row gets
-shorter until only the last card (the bed) is left. The voice (if on) names what comes next, and the last one starts a
+shorter until only the last card (the bed) is left. The last one starts a
 small party. The flight (`PlanScreen`, Web Animations from the card's or the marker's old place, `flyFrom`) only
 follows a tap, and is left out with reduced motion. On a
 Countdown (H-05) the field of each night slept glows in the morning, a 👇 over the first: the child's tap puts the star
-into its ring, with the rooster's crow (`playCrow` from `realSounds`), and the voice (if on) says „Noch 3-mal schlafen,
-dann Geburtstag“. A tap on any glowing night fills the oldest one waiting (a morning was missed). The tick is the
+into its ring, with the rooster's crow (`playCrow` from `realSounds`). A tap on any glowing night fills the oldest one waiting (a morning was missed). The tick is the
 morning's key with the task id `nacht`, so another picture keeps the stars. A tap on a night still to come or on the
 big card counts the nights, each lighting up with a rising note, then the card wiggles; while a night glows on the big
 day itself, that night wiggles instead. The last morning's star lands first, then the picture comes big with the party.
@@ -518,6 +517,9 @@ German; both are marked in
 - What is built from parts has a form per language, never German pieces glued together: weekday names from
   `DAY_NAMES` (catalog.ts), headings with the child's name from `AUTO_TITLES` (board.ts; Russian puts the name first,
   „Лена: мой день“, as a typed name can't be declined), „Noch 3-mal schlafen“ with `Intl.PluralRules` (`SLEEPS_LEFT`).
+- What the board and the plan are meant to say to the child (praise, „Schon fertig:“, „Noch 3-mal schlafen, dann …“)
+  lives as data in `lines.ts` (`REWARD_LINES`, `SLEEPS_UNTIL`), listed on /management/ (🎙️ Stimmen) to record: nothing
+  says it until it is recorded, then the game says it with `recordedVoice`.
 - A template's title is stored in the language the board or plan was made in, and shown in the app language as long
   as it is still a template's own title in any language (`isTemplateTitle`); a title a grown-up typed stays as typed.
 - Chinese, Hindi and Arabic have no Latin letters (no „A4“ there, „cm“ as 厘米 / सेमी / سم); German shop names and

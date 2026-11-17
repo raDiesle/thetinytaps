@@ -157,7 +157,7 @@ export function chain(t0: number, runs: Run[]) {
 export interface MachineEvent {
   at: number;
   sound?: () => void;
-  /** Said in the app language when speech is on. */
+  /** Said in the app language by the recorded voice. */
   say?: Localized;
   done?: boolean;
 }

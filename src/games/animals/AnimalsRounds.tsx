@@ -156,10 +156,10 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   });
   if (!ready) return null;
   const key = dealt.current.key;
-  if (round.kind === "sound") return <SoundPlay key={key} settings={settings} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />;
+  if (round.kind === "sound") return <SoundPlay key={key} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />;
   return round.kind === "grow" ? (
-    <GrowPlay key={key} settings={settings} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
+    <GrowPlay key={key} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
   ) : (
-    <AnimalsPlay key={key} settings={settings} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
+    <AnimalsPlay key={key} round={round} topic={topic} intro={intro} onSolved={onSolved} onNext={onNext} />
   );
 }

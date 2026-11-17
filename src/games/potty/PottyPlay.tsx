@@ -47,7 +47,6 @@ import {
   type Went,
 } from "./content";
 import { framesFor, preloadImages } from "./images";
-import type { PottySettings } from "./settings";
 import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
 import { pottyVoice } from "./voice";
@@ -98,7 +97,7 @@ interface Begin {
  * steps by themselves (`Step.auto`); while sitting a tap brings the next thought. What it has to do is what the child said,
  * picked by a grown-up while Tapsi calls (unknown until then); what came – or that nothing came – is chosen at the ✓.
  */
-export function PottyPlay({ settings }: { settings: PottySettings }) {
+export function PottyPlay() {
   const language = useAppLanguage();
   const t = useT();
   const texts = t(POTTY_TEXTS);
@@ -205,7 +204,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     if (withFinish) say(texts.finish, true);
   };
   const sound = (ms: number, play: () => void) => {
-    if (settings.sounds) later(ms, play);
+    later(ms, play);
   };
   const footsteps = (ms: number) => {
     for (let t = 0; t < ms; t += 320) sound(t, () => playKnock(t % 640 ? 380 : 440));
@@ -335,12 +334,12 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     if (index >= here.length - 1 || (sittingNow ? busyRef.current : performance.now() - startedAt.current < TAP_GUARD_MS)) {
       ripple(x, y);
       // While sitting the waiting song plays alone.
-      if (settings.sounds && !sittingNow) playRandomNote();
+      if (!sittingNow) playRandomNote();
       return;
     }
     if (sittingNow) nextScene(true);
     else {
-      if (settings.sounds) playPop();
+      playPop();
       jump(index + 1);
     }
   };
@@ -361,7 +360,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   /** A button while calling: what the child said is kept, and the story goes on with it at once – the only way on there. */
   const pick = (choice: Went, e: PointerEvent) => {
-    if (settings.sounds) playPop();
+    playPop();
     glow(e.clientX, e.clientY);
     setSaid(choice);
     stopTimers();
@@ -407,7 +406,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   /** „Weiter“: the next step at once, also while this one's sounds still play. */
   const next = (e: PointerEvent) => {
     e.stopPropagation();
-    if (settings.sounds) playPop();
+    playPop();
     jump(atRef.current.step + 1);
   };
 

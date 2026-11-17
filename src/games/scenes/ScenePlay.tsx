@@ -7,7 +7,6 @@ import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } fr
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { pick } from "@/lib/random";
-import { speak } from "@/lib/speech";
 import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
@@ -110,7 +109,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const appLanguage = useAppLanguage();
   const language = targetLanguageFor(sceneLanguage(scene.id, appLanguage.id));
   const words = pickLanguage(SCENE_PHRASES, language.id);
-  const speechLang = language.speechLang;
   const [plays, setPlays] = useState<Plays>({});
   const [quest, setQuest] = useState<Quest | null>(null);
   /** Answers already found for the current question. */
@@ -169,7 +167,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const lastKeyItem = useRef<SceneItem | null>(null);
   /** Taps per vehicle that can drive off: every second one sends it on its way. */
   const driveTaps = useRef(new Map<string, number>());
-  const sentenceIndex = useRef(new Map<string, number>());
   /** Hidden surprises: the one each hideout showed last, and the last one shown anywhere. */
   const lastSurprise = useRef(new Map<string, number>());
   const lastSurpriseAnywhere = useRef(-1);
@@ -194,7 +191,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   /** "Straße malen" (N-43): drawn roads, and what a vehicle drives past wakes up (LaneLayer.tsx). */
   const lanes = settings.mode === "road";
   const laneRef = useRef<LaneControl>(null);
-  const soundsOn = settings.sounds;
   const quests = useMemo(() => questsFor(settings.mode, scene, language.id), [settings.mode, scene, language.id]);
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
   const roads = useMemo(() => roadsFrom(scene.id), [scene]);
@@ -221,26 +217,12 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     loadRecordings(new Set(items.map((item) => item.sound)));
   }, [items]);
 
-  const say = useCallback(
-    (text: string, queue = false) => {
-      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
-    },
-    [settings.speech, speechLang],
-  );
-
-  // Repeated taps cycle through the item's sentences, so there is always something new to hear.
-  const describe = useCallback((item: SceneItem) => {
-    const index = sentenceIndex.current.get(item.id) ?? 0;
-    sentenceIndex.current.set(item.id, index + 1);
-    return item.sentences[index % item.sentences.length];
-  }, []);
-
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (soundsOn) playRandomNote();
+      playRandomNote();
     },
-    [ripple, soundsOn],
+    [ripple],
   );
 
   /** Hidden surprises: never the same twice in a row, neither in one hideout nor one after the other. */
@@ -262,7 +244,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       const surprise = item.hideout ? nextSurprise(item) : undefined;
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true, surprise } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (soundsOn && !quiet) {
+      if (!quiet) {
         playSound(item.sound);
         // The surprise says hello once it is out of its hideout; not while looking for something, it would
         // mislead, and not at bedtime, where a bark would wake everyone up.
@@ -270,7 +252,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       }
       return true;
     },
-    [later, soundsOn, nextSurprise, questMode, bedtime],
+    [later, nextSurprise, questMode, bedtime],
   );
 
   /** The asked colours each item shows somewhere, read from the drawing once (colour questions, `coloursIn`). */
@@ -286,33 +268,26 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     return colours.has(colour);
   };
 
-  /** Asks the question (again). */
-  const ask = useCallback(
-    (quest: Quest, queue = false) => {
-      lastQuestion.current = performance.now();
-      say(quest.question, queue);
-    },
-    [say],
-  );
+  /** Asks the question (again): its bubble shows it, and a key asks again only after a while. */
+  const ask = useCallback(() => {
+    lastQuestion.current = performance.now();
+  }, []);
 
-  const newQuestion = useCallback(
-    (queue: boolean) => {
-      const next = nextQuest(quests, questRef.current);
-      questRef.current = next;
-      answeredRef.current = new Set();
-      celebrating.current = false;
-      misses.current = 0;
-      setQuest(next);
-      setAnswered(answeredRef.current);
-      setHint(false);
-      if (next) ask(next, queue);
-    },
-    [quests, ask],
-  );
+  const newQuestion = useCallback(() => {
+    const next = nextQuest(quests, questRef.current);
+    questRef.current = next;
+    answeredRef.current = new Set();
+    celebrating.current = false;
+    misses.current = 0;
+    setQuest(next);
+    setAnswered(answeredRef.current);
+    setHint(false);
+    if (next) ask();
+  }, [quests, ask]);
 
   // Settings can't change while playing, so this only runs once.
   useEffect(() => {
-    if (questMode) newQuestion(false);
+    if (questMode) newQuestion();
   }, []);
 
   // The hint ring marks an answer that hasn't been found yet; after each found one the wait starts again.
@@ -337,8 +312,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   /** Everything was discovered: all items dance at once; then the end's buttons come with the picture's trophy. */
   const party = () => {
     setPartying(true);
-    if (soundsOn) playMelody();
-    say(colouring ? words.allColoured : words.allFound);
+    playMelody();
     items.forEach((item, i) => later(() => animate(item, true), i * 40));
     later(() => setPartying(false), PARTY_MS);
   };
@@ -346,8 +320,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   /** Bedtime picture: everything is asleep, so the room goes dark – softly, without dancing or rising hearts. */
   const goodNight = () => {
     setNight(true);
-    if (soundsOn) playLullaby();
-    say(words.goodNight);
+    playLullaby();
   };
 
   const startOver = () => {
@@ -417,7 +390,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     if (!matrix) return;
     const { x, y } = new DOMPoint(spot.x, spot.y).matrixTransform(matrix);
     glow(x, y);
-    if (soundsOn) playRandomNote();
+    playRandomNote();
   };
 
   /** Chain reaction: the items after this one react one by one, each telling its part of the story. */
@@ -427,7 +400,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       later(
         () => {
           const next = itemsById.get(step.item);
-          if (next && animate(next)) say(step.sentence, true);
+          if (next) animate(next);
         },
         (i + 1) * CHAIN_STEP_MS,
       );
@@ -446,15 +419,14 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     [scene, later],
   );
 
-  // Arrived by following a vehicle: it drives in and says hello.
+  // Arrived by following a vehicle: it drives in with its sound.
   useEffect(() => {
     if (!arrival) return;
-    const { road, home } = arrival;
+    const { road } = arrival;
     const item = guest?.item ?? itemsById.get(road.item);
     if (!item) return;
     driveIn(item, road);
-    if (soundsOn) playSound(item.sound);
-    say(home ? words.backHome(item, words.places[scene.id]) : words.comesFrom(item, words.places[road.from]));
+    playSound(item.sound);
     // So a reload doesn't bring it once more.
     const { trip: _, ...state } = location.state as { trip?: Trip };
     navigate(location.pathname, { replace: true, state });
@@ -473,8 +445,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const ms = driveMs(dx);
     busyUntil.current.set(item.id, Infinity);
     setDrives((prev) => ({ ...prev, [item.id]: { phase: "out", dx, ms } }));
-    if (soundsOn) playSound(item.sound);
-    say(words.drivesTo(item, words.places[to]), true);
+    playSound(item.sound);
     later(() => {
       setDrives((prev) => ({ ...prev, [item.id]: { phase: "gone", dx, ms } }));
       const exit: Exit = { item, to, trip: { road: roadId(road), home: goingHome } };
@@ -535,9 +506,9 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     for (const item of lit) if (!before.has(item.id) && item.id !== started) wake(item);
   };
 
-  /** Torch and road mode: an item the light or a vehicle reaches moves, sounds, speaks and is counted. */
+  /** Torch and road mode: an item the light or a vehicle reaches moves, sounds and is counted. */
   const wake = (item: SceneItem) => {
-    if (animate(item)) say(describe(item));
+    animate(item);
     discover(item, ...screenPoint(item));
   };
 
@@ -571,10 +542,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
 
     if (!quest) {
       const started = animate(item);
-      if (started) {
-        say(describe(item));
-        if (item.hideout) say(words.peekaboo(pickLanguage(SURPRISES[lastSurprise.current.get(item.id)!].found, language.id)), true);
-      } else softTap(x, y);
+      if (!started) softTap(x, y);
       paint(x, y);
       discover(item, x, y);
       if (started) {
@@ -596,18 +564,16 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       // The item's own animation and the chime are the answer: no shapes fly up (root CLAUDE.md).
       animate(item);
       glow(x, y);
-      if (soundsOn) playChime();
+      playChime();
       setHint(false);
       setFound((n) => n + 1);
       misses.current = 0;
-      say(`${pick(words.praise)} ${isPart && quest.partPraise ? quest.partPraise : quest.praise(item)}`);
       if (answeredRef.current.size >= quest.needed) {
         celebrating.current = true;
-        later(() => newQuestion(true), NEXT_QUESTION_MS);
+        later(() => newQuestion(), NEXT_QUESTION_MS);
       } else {
         // More answers to find: ask again.
         lastQuestion.current = performance.now();
-        say(quest.question, true);
       }
       return;
     }
@@ -616,7 +582,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     misses.current++;
     if (hintsOn && misses.current >= HINT_AFTER_MISSES) setHint(true);
     lastQuestion.current = performance.now();
-    say(words.thatIs(item, quest.question));
   };
 
   // The key handler is set up once; this way it always calls the current activate.
@@ -654,7 +619,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const thing = e.target instanceof Element ? e.target.closest("[data-poke]") : null;
     if (thing) {
       const sound = poke(thing);
-      if (soundsOn) playSound(sound);
+      playSound(sound);
       return;
     }
     const matrix = svgRef.current?.getScreenCTM();
@@ -675,7 +640,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     later(() => setEffects((prev) => prev.filter((other) => other.id !== id)), SPOTS[kind].ms);
     const background = svgRef.current?.querySelector(`#${svgId}-bg`);
     if ((kind === "wind" || kind === "flurry") && svgRef.current && background) gust(svgRef.current, background);
-    if (soundsOn) playSound(SPOTS[kind].sound);
+    playSound(SPOTS[kind].sound);
   };
 
   useEffect(() => {
@@ -699,7 +664,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         const step = scene.width * TORCH_STEP;
         const [x, y] = lightAt.current;
         moveLightRef.current(x + arrow[0] * step, y + arrow[1] * step);
-        if (settings.sounds) playRandomNote();
+        playRandomNote();
         return;
       }
 
@@ -718,7 +683,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           interacted();
           const from = focusRef.current;
           moveFocus(from ? nextInDirection(items, from, arrow) : middleItem(items, scene.width, scene.height));
-          if (settings.sounds) playRandomNote();
+          playRandomNote();
           return;
         }
         const key = pressedKey(e, language.id);
@@ -747,7 +712,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
 
       const quest = questRef.current;
       if (quest) {
-        if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask(quest);
+        if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask();
         else softTap();
         return;
       }
@@ -763,7 +728,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [scene, items, here, keys, screenPoint, colouring, torch, lanes, keyboard, keysOn, settings.sounds, ask, softTap, moveFocus, language.id]);
+  }, [scene, items, here, keys, screenPoint, colouring, torch, lanes, keyboard, keysOn, ask, softTap, moveFocus, language.id]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -884,7 +849,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
       </SceneLayer>
       {/* Torch mode: the night over everything but the light; it goes when all were found (a bedtime picture stays dark). */}
-      {lanes && <LaneLayer ref={laneRef} width={scene.width} height={scene.height} items={items} sounds={soundsOn} onPass={wake} />}
+      {lanes && <LaneLayer ref={laneRef} width={scene.width} height={scene.height} items={items} onPass={wake} />}
       {torch && <TorchNight nightRef={nightRef} off={allDiscovered && !bedtime} />}
 
       {quest && (
@@ -895,7 +860,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           aria-label={quest.question}
           onPointerDown={(e) => {
             e.stopPropagation();
-            ask(quest);
+            ask();
           }}
         >
           {quest.item && <Thumbnail item={quest.item} />}

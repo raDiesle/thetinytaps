@@ -251,23 +251,12 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
             setLog={setLog}
             linked={linked}
             day={boardDay}
-            sounds={boards.sounds}
-            speech={boards.speech}
             onExamplesOff={() => changeBoard({ examples: false })}
             onCertificate={() => setPanel("certificate")}
           />
         )
       : plan && (
-          <PlanScreen
-            plan={plan}
-            log={log}
-            setLog={setLog}
-            linked={linked}
-            day={planDay}
-            sounds={plans.sounds}
-            speech={plans.speech}
-            onExamplesOff={() => changePlan({ ...plan, examples: false })}
-          />
+          <PlanScreen plan={plan} log={log} setLog={setLog} linked={linked} day={planDay} onExamplesOff={() => changePlan({ ...plan, examples: false })} />
         );
   const review = type === "board" && !!board && board.kind !== "collect";
   const certificate = type === "board" && !!board && board.tasks.length > 0;
@@ -295,7 +284,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   ) : panel === "certificate" && certificate && board ? (
     <Certificate key={board.id} board={board} color={boards.print.color} onChange={changeBoard} onEdit={openEditor} onClose={() => setPanel(null)} />
   ) : panel === "review" && review && board ? (
-    <Review board={board} log={log} linked={linked} sounds={boards.sounds} onClose={() => setPanel(null)} />
+    <Review board={board} log={log} linked={linked} onClose={() => setPanel(null)} />
   ) : (
     <div className="rw-main">
       {screen}

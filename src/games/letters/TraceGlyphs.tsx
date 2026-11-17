@@ -37,7 +37,7 @@ interface Layout {
  * The letter as a big dotted outline to trace with a finger or the mouse.
  * Wherever it goes over the letter, stars appear and stay. No scoring.
  */
-export function TraceGlyphs({ glyphs, sounds }: { glyphs: string[]; sounds: boolean }) {
+export function TraceGlyphs({ glyphs }: { glyphs: string[] }) {
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const layout = useRef<Layout | null>(null);
@@ -127,39 +127,36 @@ export function TraceGlyphs({ glyphs, sounds }: { glyphs: string[]; sounds: bool
   }, [text]);
 
   /** Put a star where the pointer is if it is on the letter. Returns whether it is on the letter. */
-  const trace = useCallback(
-    (e: PointerEvent, force: boolean) => {
-      const l = layout.current;
-      const rect = canvas.current?.getBoundingClientRect();
-      if (!l || !rect) return false;
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const px = Math.floor(x);
-      const py = Math.floor(y);
-      const inside = px >= 0 && py >= 0 && px < l.mask.width && py < l.mask.height;
-      if (!inside || l.mask.data[(py * l.mask.width + px) * 4 + 3] === 0) {
-        lastStar.current = null;
-        return false;
-      }
-      const prev = lastStar.current;
-      if (!force && prev && Math.hypot(x - prev.x, y - prev.y) < STAR_SPACING_EM * l.size) return true;
-      lastStar.current = { x, y };
+  const trace = useCallback((e: PointerEvent, force: boolean) => {
+    const l = layout.current;
+    const rect = canvas.current?.getBoundingClientRect();
+    if (!l || !rect) return false;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const px = Math.floor(x);
+    const py = Math.floor(y);
+    const inside = px >= 0 && py >= 0 && px < l.mask.width && py < l.mask.height;
+    if (!inside || l.mask.data[(py * l.mask.width + px) * 4 + 3] === 0) {
+      lastStar.current = null;
+      return false;
+    }
+    const prev = lastStar.current;
+    if (!force && prev && Math.hypot(x - prev.x, y - prev.y) < STAR_SPACING_EM * l.size) return true;
+    lastStar.current = { x, y };
 
-      const id = nextId.current++;
-      if (sounds && id % NOTE_EVERY === 0) playCountNote(id / NOTE_EVERY);
-      const star: Star = {
-        id,
-        x: x / l.size,
-        y: y / l.size,
-        size: 0.12 + Math.random() * 0.08,
-        color: BRIGHT_COLORS[id % BRIGHT_COLORS.length],
-        rotate: Math.random() * 70 - 35,
-      };
-      setStars((prev) => [...prev.slice(-(MAX_STARS - 1)), star]);
-      return true;
-    },
-    [sounds],
-  );
+    const id = nextId.current++;
+    if (id % NOTE_EVERY === 0) playCountNote(id / NOTE_EVERY);
+    const star: Star = {
+      id,
+      x: x / l.size,
+      y: y / l.size,
+      size: 0.12 + Math.random() * 0.08,
+      color: BRIGHT_COLORS[id % BRIGHT_COLORS.length],
+      rotate: Math.random() * 70 - 35,
+    };
+    setStars((prev) => [...prev.slice(-(MAX_STARS - 1)), star]);
+    return true;
+  }, []);
 
   // Tracing on the letter must not count as a tap on the card (next part, repeat).
   const onPointerDown = (e: PointerEvent) => {

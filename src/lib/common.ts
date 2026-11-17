@@ -1,17 +1,12 @@
-// Options most games share, the same for all of them: read aloud, sounds, music, the child's figure and how a game is
-// left. Music (🎵), the figure (👦 / 👧) and leaving (⏳) are set on the home page; read aloud and sounds are decided once
-// (FIXED). Each game keeps its own fields for read aloud and sounds and gets them filled
-// in from here (see withCommon).
+// Options every game shares: music, the child's figure and how a game is left, all set on the home page (🎵, 👦 / 👧,
+// ⏳). Sounds and the browser's voice have no switch (root CLAUDE.md): sounds always play, and the browser's voice
+// speaks only as the fallback of `recordedVoice` in the games told by their voice.
 
 import { useCallback, useSyncExternalStore } from "react";
 import { track } from "@/lib/analytics";
 import { loadStored, useStoredSettings } from "@/lib/storage";
 
 export interface CommonSettings {
-  /** Speak names, sentences and questions with the browser's voice – always off (FIXED). */
-  speech: boolean;
-  /** Chimes, notes and noises – always on (FIXED). */
-  sounds: boolean;
   /**
    * The background song in every game (`backgroundMusic.ts`); off also silences a game's
    * own music and keeps the song files from being downloaded at all. Not the song of
@@ -37,20 +32,7 @@ export type Leave = "tap" | "hold";
 /** The child's own figure: a boy (as everything was drawn first) or a girl. */
 export type Figure = "boy" | "girl";
 
-/**
- * No switch for these any more: the browser's voice sounds too poor to read to a child (spoken
- * lines come as ElevenLabs recordings instead, which play without a switch), and a game without
- * its sounds gives a tap no answer. Also over a value a grown-up once saved, when they were switches.
- */
-const FIXED = { speech: false, sounds: true } as const;
-
-const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true, figure: "boy", leave: "tap" };
-
-/**
- * The options filled into a game's fields of the same name. Not music: a game with
- * its own music keeps its own switch for it, which only counts while music is on here.
- */
-const FILLED_IN = ["speech", "sounds"] as const;
+const DEFAULT_COMMON_SETTINGS: CommonSettings = { music: true, figure: "boy", leave: "tap" };
 
 export const COMMON_SETTINGS_KEY = "tinytaps.common.v1";
 
@@ -62,8 +44,8 @@ const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
-/** The shared options as saved, with read aloud and sounds always as FIXED says. */
-export const loadCommon = (): CommonSettings => ({ ...loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS), ...FIXED });
+/** The shared options as saved, merged into the defaults. */
+export const loadCommon = (): CommonSettings => loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS);
 const current = () => (common ??= showFigure(loadCommon()));
 
 /** Puts the figure on the html element, where the menus' second family of colours hangs on it (`base.css`). */
@@ -99,18 +81,7 @@ export function useCommonSettings() {
 /** The child's figure, boy or girl: every drawing that stands for the child asks this (`heroLook`, the mirror's face). */
 export const useFigure = (): Figure => useCommonSettings()[0].figure;
 
-/** A game's own settings with the shared options put in, for the fields the game has. */
-export function withCommon<T extends object>(settings: T, common: CommonSettings): T {
-  const merged = { ...settings } as Record<string, unknown>;
-  for (const key of FILLED_IN) {
-    if (key in settings) merged[key] = common[key];
-  }
-  return merged as T;
-}
-
-/** The game's settings with the shared options in, and the setter for its own ones. */
+/** A game's own settings, saved under `key` and merged into `defaults` (so new fields need no migration), and their setter. */
 export function useGameSettings<T extends object>(key: string, defaults: T) {
-  const [stored, update] = useStoredSettings(key, defaults);
-  const [common] = useCommonSettings();
-  return [withCommon(stored, common), update, stored] as const;
+  return useStoredSettings(key, defaults);
 }

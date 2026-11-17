@@ -49,6 +49,7 @@ import { buildTidy } from "@/games/marbles/tidy";
 import { buildWater } from "@/games/marbles/water";
 import { POTTY_TEXTS, STEPS as POTTY_STEPS, TAPSI, WAIT_SCENES } from "@/games/potty/content";
 import { ACTIVITIES, REWARDS, TASKS } from "@/games/rewards/catalog";
+import { REWARD_LINES } from "@/games/rewards/lines";
 import { SCENES } from "@/games/scenes";
 import { SURPRISES } from "@/games/scenes/hideout";
 import { SCENE_PHRASES } from "@/games/scenes/phrases";
@@ -212,18 +213,6 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
       file: "src/games/marbles/spaceTrack.tsx",
     },
     { text: "Die Röhre ist voll!", file: "src/games/marbles/colors.ts" },
-  ],
-  "/belohnungstafel/": [
-    { text: "Geschafft! Hurra!", file: "src/games/rewards/BoardScreen.tsx" },
-    { text: "Geschafft! Jetzt gibt es:", file: "src/games/rewards/BoardScreen.tsx" },
-    { text: "Super! Der Tag ist voll!", file: "src/games/rewards/BoardScreen.tsx" },
-    { text: "Super!", file: "src/games/rewards/BoardScreen.tsx" },
-    { text: "Alles geschafft! Hurra!", file: "src/games/rewards/PlanScreen.tsx" },
-    { text: "Super! Jetzt:", file: "src/games/rewards/PlanScreen.tsx" },
-    { text: "Schon fertig:", file: "src/games/rewards/PlanScreen.tsx" },
-    { text: "Hier kommt rein, was fertig ist.", file: "src/games/rewards/PlanScreen.tsx" },
-    { text: "Noch einmal schlafen", file: "src/games/rewards/PlanSheet.tsx" },
-    { text: "Heute ist es so weit:", file: "src/games/rewards/PlanScreen.tsx" },
   ],
 };
 
@@ -540,7 +529,7 @@ function rewards(): VoiceGroup[] {
     },
     {
       label: "Sätze auf der Tafel und im Tagesplan",
-      lines: once([...inline("/belohnungstafel/"), "Noch 2-mal schlafen:", "Noch 3-mal schlafen:"]),
+      lines: once([...Object.values(REWARD_LINES).map((line) => line.de), "Noch einmal schlafen", "Noch 2-mal schlafen:", "Noch 3-mal schlafen:"]),
       built: "Ein Satzanfang, danach der Name einer Aufgabe oder Belohnung",
     },
     {

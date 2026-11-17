@@ -11,7 +11,6 @@ import type { FeedRound, GiftRound, HomeRound } from "./levels";
 import { voiceQuiet } from "@/lib/voice";
 import { questionLines } from "./lines";
 import { useRoundTime, useSay } from "./roundTime";
-import type { AnimalsSettings } from "./settings";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
@@ -46,7 +45,6 @@ const moveStyle = (o: Offset | null): CSSProperties | undefined =>
 
 /** What a feeding, gift or home round gets from `AnimalsRounds`, which plays the kinds in turn. */
 export interface AnimalsPlayProps {
-  settings: Pick<AnimalsSettings, "speech" | "sounds">;
   round: FeedRound | GiftRound | HomeRound;
   /** What the round is about, for grown-ups: shown under the picture. */
   topic?: ReactNode;
@@ -62,7 +60,7 @@ export interface AnimalsPlayProps {
  * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), what the animal gives us to it (Z-01), or
  * the animal to its home (N-09). A tap picks; a mouse may drag too, a finger never (`mayDrag`).
  */
-export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }: AnimalsPlayProps) {
+export function AnimalsPlay({ round, topic, intro, onSolved, onNext }: AnimalsPlayProps) {
   const language = useAppLanguage();
   const texts = pick(ANIMAL_TEXTS, language.id);
   const giftTexts = pick(GIFT_TEXTS, language.id);
@@ -98,16 +96,16 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
     whenQuiet(0, () => {
       if (intro) say(intro);
       ask();
-      if (settings.sounds) later(400, () => round.animal.sound?.());
+      later(400, () => round.animal.sound?.());
     });
   }, []);
 
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   /** The child picked option `index`; `from` is how far the dragged thing already is from its place. */
@@ -123,19 +121,19 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
       // Never a "wrong" for the child; only the difficulty takes note.
       misses.current++;
       if (round.kind === "feed") {
-        if (settings.sounds) playYuck();
+        playYuck();
         say(texts.yuck(round.animal));
         say(texts.whatEats(round.animal));
       } else if (round.kind === "gift") {
         // The animal it comes from pops up behind the plate and says so.
         const gift = round.gifts[index];
         const giver = giverOf(gift);
-        if (settings.sounds) later(300, () => giver.sound?.());
+        later(300, () => giver.sound?.());
         say(giftTexts.comesFrom(gift, giver));
         ask();
       } else {
         const resident = ANIMALS.find((a) => a.home === round.homes[index].id)!;
-        if (settings.sounds) later(300, () => resident.sound?.());
+        later(300, () => resident.sound?.());
         say(texts.livesHere(resident));
         ask();
       }
@@ -156,7 +154,7 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
         const mouth = { x: animalBox.left + animalBox.width / 2, y: animalBox.top + animalBox.height * 0.6 };
         setLanded({ who: index, to: { x: mouth.x - start.x + from.x, y: mouth.y - start.y + from.y, scale: 0.3 } });
       }
-      if (settings.sounds) later(450, () => playRecorded("munch", playMunch));
+      later(450, () => playRecorded("munch", playMunch));
       say(texts.yummy(round.animal, round.foods[index]));
     } else if (round.kind === "gift") {
       // The gift flies to the animal's side and is gone; there the animal makes it anew (`.ap-made`).
@@ -166,10 +164,8 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
         const side = { x: animalBox.right, y: animalBox.bottom - animalBox.height * 0.25 };
         setLanded({ who: index, to: { x: side.x - start.x + from.x, y: side.y - start.y + from.y, scale: 0.5 } });
       }
-      if (settings.sounds) {
-        later(500, () => round.animal.sound?.());
-        later(1300, playPop);
-      }
+      later(500, () => round.animal.sound?.());
+      later(1300, playPop);
       say(giftTexts.gives(round.animal, round.gifts[index]));
     } else {
       // The animal walks into its home and stays in the doorway, small enough to fit.
@@ -187,13 +183,11 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
           to: { x: spot.x - start.x + from.x, y: spot.y - start.y + from.y, scale: (home.fit * drawing.width) / emoji.offsetHeight },
         });
       }
-      if (settings.sounds) {
-        later(650, playPop);
-        later(900, () => round.animal.sound?.());
-      }
+      later(650, playPop);
+      later(900, () => round.animal.sound?.());
       say(texts.movedIn(round.animal, home));
     }
-    if (settings.sounds) later(200, playChime);
+    later(200, playChime);
     onSolved(misses.current);
     // The next animal only once the answer is said in full.
     whenQuiet(round.kind === "gift" ? GIFT_CELEBRATE_MS : CELEBRATE_MS, onNext);
@@ -202,7 +196,7 @@ export function AnimalsPlay({ settings, round, topic, intro, onSolved, onNext }:
   /** Tapping the animal asks again (unless a line is still being said); it makes its noise and hops. */
   const askAgain = () => {
     if (voiceQuiet()) ask();
-    if (settings.sounds) round.animal.sound?.();
+    round.animal.sound?.();
     setNudge((prev) => ({ who: "animal", n: (prev?.n ?? 0) + 1 }));
   };
 

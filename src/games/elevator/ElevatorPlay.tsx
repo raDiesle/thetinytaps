@@ -10,7 +10,6 @@ import { BROTHER, Bubble, KID_H, Kid, type Holding, type Outfit, type PicId, typ
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
 import { linesReady, loadLines, sayIn, storyLines } from "./voice";
 import { WeatherContext } from "./rooms";
-import type { ElevatorSettings } from "./settings";
 import { useStepAddress } from "@/lib/stepAddress";
 
 /** Time the lift takes per floor. */
@@ -111,13 +110,11 @@ const actorAt = (floor: number, x: number, face: 1 | -1, pose: Pose): Actor => (
 /** "Aufzug": picture stories – the bubble shows what the child needs, and the lift takes it to the floor where it is. */
 export function ElevatorPlay({
   language,
-  settings,
   story: storyId,
   onPick,
 }: {
   /** The app language: what the child hears is spoken in it. */
   language: TargetLanguage;
-  settings: ElevatorSettings;
   /** The story to play. */
   story: string;
   /** „Nochmal“ or „Weiter“ at the end: the game starts that story or level. */
@@ -174,17 +171,13 @@ export function ElevatorPlay({
   useEffect(() => cancel, []);
 
   useEffect(() => {
-    if (settings.sounds) loadRecordings(RECORDINGS);
-  }, [settings.sounds]);
+    loadRecordings(RECORDINGS);
+  }, []);
 
   /** Says a German sentence of the story in the app language, from its recording. */
   const say = (german: string) => sayIn(german, language);
 
-  const sound = (play: () => void) => {
-    if (settings.sounds) play();
-  };
-
-  const cue = (sounds: [number, () => void][]) => sounds.forEach(([ms, play]) => later(ms, () => sound(play)));
+  const cue = (sounds: [number, () => void][]) => sounds.forEach(([ms, play]) => later(ms, play));
 
   /** Shows a wish; the same wish again doesn't pop the bubble up anew but runs a light along its outline. */
   const showBubble = (who: Who, pic: PicId) =>
@@ -206,7 +199,7 @@ export function ElevatorPlay({
   /** Doors shut, the lift goes to `target` with everyone in it, "Pling", doors open. */
   const ride = async (target: number) => {
     put({ doors: false, lit: target });
-    sound(playSlide);
+    playSlide();
     await wait(DOOR_MS);
     const from = viewRef.current.cabin;
     const ms = Math.abs(target - from) * FLOOR_MS;
@@ -218,11 +211,11 @@ export function ElevatorPlay({
         buddy: v.actors.buddy?.inCabin ? { ...v.actors.buddy, floor: target } : v.actors.buddy,
       },
     }));
-    sound(() => playLift(ms / 1000, target > from));
+    playLift(ms / 1000, target > from);
     await wait(ms);
     put({ lit: null, doors: true });
-    sound(playDing);
-    later(150, () => sound(playSlide));
+    playDing();
+    later(150, playSlide);
     await wait(DOOR_MS);
   };
 
@@ -247,7 +240,7 @@ export function ElevatorPlay({
       stopNudging();
       if (pressed === floor && (here || pressed === viewRef.current.cabin)) break;
       if (!here && pressed !== viewRef.current.cabin) {
-        sound(() => playKnock(1500));
+        playKnock(1500);
         await ride(pressed);
         if (pressed === floor) break;
       }
@@ -285,7 +278,7 @@ export function ElevatorPlay({
         ...(lastTap && task.wear && { wear: [...a.wear, task.wear] }),
       });
       if (task.together) actor(other, { pose: task.pose });
-      sound(task.sound);
+      task.sound();
       await wait(task.beat ?? BEAT_MS);
       actor(who, { pose: task.rest ?? "stand" });
       if (task.together) actor(other, { pose: task.rest ?? "stand" });
@@ -354,11 +347,11 @@ export function ElevatorPlay({
     const last = story.steps[story.steps.length - 1];
     if (story.ending === "sleep") {
       put((v) => ({ used: [...v.used, last.prop], night: true }));
-      sound(playLullaby);
+      playLullaby();
       say(texts.sleep);
     } else {
       put({ party: true, cleared: true });
-      sound(playMelody);
+      playMelody();
       say(texts.party);
       later(1200, () => {
         put((v) => ({ playing: null, used: [...v.used, last.prop] }));
@@ -399,7 +392,7 @@ export function ElevatorPlay({
     if (resolve) {
       waiter.current = null;
       resolve(floor);
-    } else sound(() => playKnock(1500));
+    } else playKnock(1500);
   };
 
   const tapKid = (who: Who) => (e: PointerEvent) => {
@@ -409,15 +402,15 @@ export function ElevatorPlay({
     const a = viewRef.current.actors[who];
     if (!a || a.walk) return;
     actor(who, { hop: a.hop + 1 });
-    sound(playGiggle);
+    playGiggle();
   };
 
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   // The story picked on the start screen begins at once; „Nochmal“ and „Weiter“ come after it.

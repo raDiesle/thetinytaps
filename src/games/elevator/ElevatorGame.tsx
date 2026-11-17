@@ -73,10 +73,10 @@ function Stories({ settings }: { settings: ElevatorSettings }) {
   const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));
   const level = TRAIL_LEVELS.find((l) => l.id === run.story);
   const film = FILMS.find((f) => f.id === run.story);
-  if (film) return <FilmPlay key={run.n} language={language} settings={settings} film={film} onPick={pick} />;
+  if (film) return <FilmPlay key={run.n} language={language} film={film} onPick={pick} />;
   return level ? (
-    <TrailPlay key={run.n} language={language} settings={settings} level={level} onPick={pick} />
+    <TrailPlay key={run.n} language={language} level={level} onPick={pick} />
   ) : (
-    <ElevatorPlay key={run.n} language={language} settings={settings} story={run.story} onPick={pick} />
+    <ElevatorPlay key={run.n} language={language} story={run.story} onPick={pick} />
   );
 }

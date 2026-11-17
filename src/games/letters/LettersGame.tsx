@@ -3,13 +3,12 @@ import { GameShell } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting, useTouchKeys } from "@/components/TouchKeyboard";
-import { hasCase, languageFor, sampleLetter, useLanguagePack } from "@/content/languages";
+import { hasCase, languageFor, useLanguagePack } from "@/content/languages";
 import { useGameSettings } from "@/lib/common";
 import { useAppLanguage, useT } from "@/lib/language";
 import {
   DEFAULT_LETTERS_SETTINGS,
   LETTERS_SETTINGS_KEY,
-  type Announce,
   type LetterCase,
   type LettersSettings,
   type NumberReveal,
@@ -35,12 +34,8 @@ export function LettersGame({ way }: { way: LettersWay }) {
   // Hindi and Arabic letters have one form only: no choice of big and small letters, the games show that one.
   const cased = hasCase(pack);
   const play: LettersSettings = cased ? settings : { ...settings, letterCase: "upper" };
-  // Examples in the settings, in the app language: „Be, wie Bär“.
-  const b = sampleLetter(pack);
-  const word = b.words[0].word;
   const a = pack.letters[0];
   const t = useT();
-  const quote = (text: string) => t({ de: `„${text}“`, ru: `«${text}»`, en: `“${text}”`, zh: `“${text}”`, hi: `“${text}”`, es: `«${text}»`, ar: `«${text}»` });
   const all = t({ de: "🌈 Alle", ru: "🌈 Все", en: "🌈 All", zh: "🌈 全部", hi: "🌈 सब", es: "🌈 Todas", ar: "🌈 الكل" });
   // Frei tippen and Zählen: the keys on every touch screen, Wörter tippen only on tablets.
   const anyTouch = way !== "words";
@@ -75,7 +70,7 @@ export function LettersGame({ way }: { way: LettersWay }) {
     const caseLanguage = cased ? appLanguage : english === languageFor("de").pack ? "de" : "en";
     return (
       <GameShell title={title} startMode={way}>
-        <CasePlay pack={casePack} language={caseLanguage} settings={play} />
+        <CasePlay pack={casePack} language={caseLanguage} />
       </GameShell>
     );
   }
@@ -281,18 +276,6 @@ export function LettersGame({ way }: { way: LettersWay }) {
                 })}
                 checked={settings.letterFamily}
                 onChange={(letterFamily) => update({ letterFamily })}
-              />
-            )}
-            {!numbersOnly && settings.speech && (
-              <Choice<Announce>
-                label={t({ de: "Ansage", ru: "Что звучит", en: "What is said", zh: "播报内容", hi: "क्या बोला जाए", es: "Qué se dice", ar: "ما يقال" })}
-                value={settings.announce}
-                onChange={(announce) => update({ announce })}
-                options={[
-                  { value: "letterAndWord", label: quote(pack.letterSentence(b, b.words[0]).replace(/[!！]$/, "")) },
-                  { value: "word", label: quote(word) },
-                  { value: "letter", label: quote(b.spoken) },
-                ]}
               />
             )}
           </SettingsGroup>

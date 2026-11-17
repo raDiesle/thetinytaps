@@ -70,7 +70,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const say = useLettersSay();
   const praise = useLettersPraise();
 
-  const softTap = useSoftTap(ripple, settings.sounds);
+  const softTap = useSoftTap(ripple);
 
   // Cycle through the letter's words, so a letter that comes again has a new picture.
   const pickWord = useCallback(
@@ -154,7 +154,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
 
       if (keyMatches(key, current.letter.upper, pack)) {
         setFound(true);
-        if (settings.sounds) playChime();
+        playChime();
         say(pack.letterSentence(current.letter, current.word));
         praise(pick(pack.praise));
         return;
@@ -163,7 +163,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, say, praise, softTap, settings.sounds],
+    [current, found, wrong, pack, say, praise, softTap],
   );
 
   useEffect(() => {

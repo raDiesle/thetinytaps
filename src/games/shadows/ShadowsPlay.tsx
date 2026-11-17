@@ -11,7 +11,7 @@ import { ITEMS, PEEK_ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } f
 import { choiceRows, nextLevel, useDeck } from "@/lib/rounds";
 import { dealPeek, dealShadows, PEEK_LEVELS, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type PeekLevel, type ShadowLevel, type ShadowPose } from "./levels";
 import { PeekPlay } from "./PeekPlay";
-import type { ShadowsSettings, ShadowTheme } from "./settings";
+import type { ShadowTheme } from "./settings";
 import { shadowsVoice } from "./voice";
 import { useStepAddress } from "@/lib/stepAddress";
 
@@ -109,7 +109,7 @@ interface PeekRound {
  * after it an animal peeks out of a bush or the pond and the child taps the whole animal (`PeekPlay`) – the two kinds
  * take turns, each climbing its own steps by how the child plays: more to choose from and closer ones, fewer when it gets hard.
  */
-export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
+export function ShadowsPlay() {
   const language = useAppLanguage();
   const t = useT();
   const texts = pick(SHADOW_TEXTS, language.id);
@@ -263,15 +263,15 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     if (!round || peek || !shadowReady || asked.current === round.id) return;
     asked.current = round.id;
     say(texts.search(round.item));
-    if (settings.sounds) later(400, () => round.item.sound?.());
+    later(400, () => round.item.sound?.());
   }, [round, peek, shadowReady]);
 
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   /** The child picked shadow `index`; `from` is how far the dragged picture already is from its place. */
@@ -288,7 +288,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       missesRef.current++;
       // The shadow lights up and shows who it really belongs to.
       const owner = round.shadows[index];
-      if (settings.sounds) later(250, () => (owner.sound ?? playPop)());
+      later(250, () => (owner.sound ?? playPop)());
       say(texts.thatIs(owner));
       say(texts.search(round.item), true);
       later(WRONG_MS, () => {
@@ -317,10 +317,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
         pose: round.poses[index],
       });
     }
-    if (settings.sounds) {
-      later(200, playChime);
-      later(700, () => round.item.sound?.());
-    }
+    later(200, playChime);
+    later(700, () => round.item.sound?.());
     say(texts.found(round.item));
     later(CELEBRATE_MS, () => advanceRef.current());
   };
@@ -333,7 +331,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     if (!round || busy.current) return;
     setOpened(index);
     setFlapsNew(false);
-    if (settings.sounds) playRustle();
+    playRustle();
   };
 
   /** A tap, key or drop on shadow `index`: lifts its flap while it is covered, else picks it. */
@@ -349,7 +347,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const askAgain = () => {
     if (!round) return;
     say(texts.search(round.item));
-    if (settings.sounds) round.item.sound?.();
+    round.item.sound?.();
     setNudge((n) => n + 1);
   };
 
@@ -423,7 +421,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   /** Only pictures of `next` from now on ("all" mixes them): a new picture comes at once, at the same step. */
   const pickTheme = (next: ShadowTheme) => {
     if (next === themeRef.current) {
-      if (settings.sounds) playPop();
+      playPop();
       return;
     }
     themeRef.current = next;
@@ -484,9 +482,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   if (peek)
     return (
       <>
-        {peekReady && (
-          <PeekPlay key={peek.id} settings={settings} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />
-        )}
+        {peekReady && <PeekPlay key={peek.id} item={peek.item} choices={peek.choices} level={peek.level} onSolved={peekSolved} onNext={nextRound} />}
         {corner}
       </>
     );

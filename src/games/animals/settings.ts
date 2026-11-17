@@ -10,16 +10,10 @@ export interface AnimalsSettings {
    * grown-ups pick everything or one thing, so the options stay plain).
    */
   kinds: "all" | RoundKind;
-  /** Speak the question, the thanks and the "Bäh!". */
-  speech: boolean;
-  /** Munching, animal noises and chimes. */
-  sounds: boolean;
 }
 
 export const DEFAULT_ANIMALS_SETTINGS: AnimalsSettings = {
   kinds: "all",
-  speech: false,
-  sounds: true,
 };
 
 export const ANIMALS_SETTINGS_KEY = "tinytaps.animals.v3";

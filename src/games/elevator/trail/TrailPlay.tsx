@@ -13,7 +13,6 @@ import { ActionButton } from "../house";
 import { KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose, useHero } from "../kid";
 import { spokenIn, translationOf } from "../phrases";
 import { linesReady, loadLines, sayIn, trailLines } from "../voice";
-import type { ElevatorSettings } from "../settings";
 import { FRIENDS, type FriendPose } from "./friends";
 import { allStations, facing, groundY, placed, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
@@ -389,13 +388,11 @@ const heldOf = (kid: KidState, goal: Goal): Point => (goal.carry === "string" ? 
 /** "Weg-Abenteuer": the goal goes away, the child follows it through a scrolling world and uses what it finds. */
 export function TrailPlay({
   language,
-  settings,
   level,
   onPick,
 }: {
   /** The app language: what the child hears is spoken in it. */
   language: TargetLanguage;
-  settings: ElevatorSettings;
   level: TrailLevel;
   onPick: (id: string) => void;
 }) {
@@ -510,11 +507,7 @@ export function TrailPlay({
   /** Says a German sentence of the story in the app language, from its recording. */
   const say = (german: string) => sayIn(german, voice);
 
-  const sound = (play: () => void) => {
-    if (settings.sounds) play();
-  };
-
-  const cue = (sounds: Cue[]) => sounds.forEach(([ms, play]) => later(ms, () => sound(play)));
+  const cue = (sounds: Cue[]) => sounds.forEach(([ms, play]) => later(ms, play));
 
   /** Draws the goal at `at`, with its string to `hand` if it is held; a ball turns as far as it has rolled. */
   const drawGoal = (at: Point, hand: Point | null) => {
@@ -657,7 +650,7 @@ export function TrailPlay({
       entering: slot,
       bagBump: v.bagBump + 1,
     }));
-    sound(playPop);
+    playPop();
     kid({ pose: "stand" });
     await wait(500);
     put({ entering: null });
@@ -667,7 +660,7 @@ export function TrailPlay({
    * holds the thing up high. */
   const takeOut = async (item: ItemId, slot: number) => {
     put((v) => ({ leaving: slot, bagBump: v.bagBump + 1 }));
-    sound(playPop);
+    playPop();
     await wait(320);
     put((v) => ({ leaving: null, carry: item, bag: v.bag.map((thing, i) => (i === slot ? null : thing)), pack: { ...v.pack, open: true } }));
     kid({ pose: "pack" });
@@ -761,7 +754,7 @@ export function TrailPlay({
     say(station.ask);
     // The child takes the thing, holds it up high and puts it into the backpack.
     kid({ pose: "take" });
-    sound(station.sound);
+    station.sound();
     put((v) => ({ done: [...v.done, station.id], carry: station.item }));
     drawCarry(station.at, natural(ITEMS[station.item]), false);
     await moveCarry(byKid(HAND_OUT), 450, 1);
@@ -776,12 +769,12 @@ export function TrailPlay({
   const sendFriend = async (slot: number, to: Point, pose: FriendPose) => {
     const f = viewRef.current.friend!;
     put((v) => ({ leaving: slot, bagBump: v.bagBump + 1 }));
-    sound(playPop);
+    playPop();
     await wait(320);
     put((v) => ({ leaving: null, bag: v.bag.map((thing, i) => (i === slot ? null : thing)) }));
     kid({ pose: "reach" });
     hopFriend();
-    sound(FRIENDS[f.id]!.sound);
+    FRIENDS[f.id]!.sound();
     await wait(400);
     await runFriend(to, pose);
   };
@@ -792,7 +785,7 @@ export function TrailPlay({
     if (slot === null) return;
     const id = viewRef.current.friend!.id;
     put((v) => ({ bag: v.bag.map((thing, i) => (i === slot ? id : thing)), entering: slot, bagBump: v.bagBump + 1 }));
-    sound(playPop);
+    playPop();
     await wait(500);
     put({ entering: null });
   };
@@ -801,13 +794,13 @@ export function TrailPlay({
    * backpack, and it runs round behind the child. */
   const befriend = async ({ friend: id, from, say: line }: NonNullable<Obstacle["befriends"]>) => {
     put({ friend: { id, x: from[0], y: from[1], ms: 0, face: -1, pose: "sit", hop: 1 } });
-    sound(FRIENDS[id]!.sound);
+    FRIENDS[id]!.sound();
     say(line);
     kid({ pose: "cheer" });
     await wait(600);
     const slot = viewRef.current.bag.indexOf(null);
     put((v) => ({ bag: v.bag.map((thing, i) => (i === slot ? id : thing)), entering: slot, bagBump: v.bagBump + 1 }));
-    sound(playPop);
+    playPop();
     await wait(500);
     put({ entering: null });
     kid({ pose: "stand" });
@@ -846,7 +839,7 @@ export function TrailPlay({
           break;
         }
         put((v) => ({ nope: { id: station.id, n: (v.nope?.n ?? 0) + 1 } }));
-        sound(station.nope);
+        station.nope();
         kid({ pose: "shake" });
         hopFriend();
         await wait(1000);
@@ -862,7 +855,7 @@ export function TrailPlay({
       if (item === station.need) break;
       // Not this one: something funny happens, the thing comes back into the backpack and the right one glows.
       put((v) => ({ nope: { id: station.id, n: (v.nope?.n ?? 0) + 1 } }));
-      sound(station.nope);
+      station.nope();
       kid({ pose: "shake" });
       await wait(1000);
       kid({ pose: "take" });
@@ -925,13 +918,13 @@ export function TrailPlay({
       const [x, y] = place(step);
       along.current = step[0];
       kid({ x, y, walk: STEP_MS, pose: "walk" });
-      sound(() => playCountNote(i));
+      playCountNote(i);
       await wait(STEP_MS);
       kid({ walk: 0, pose: "stand" });
     }
     if (station.slide) {
       // Down the slide by itself: "Huiii!" – on the sled, if there is one. A friend, who waited at the bottom, runs along below.
-      sound(playSlide);
+      playSlide();
       if (station.sled) put({ here: station.id, riding: station.sled });
       kid({ pose: station.sled ? "sit" : "cheer" });
       const { slide } = station;
@@ -949,7 +942,7 @@ export function TrailPlay({
       if (station.sled) put((v) => ({ here: null, riding: null, done: [...v.done, station.id] }));
       kid({ walk: 0, pose: "cheer" });
       friendStays();
-      sound(playGiggle);
+      playGiggle();
       await wait(700);
       kid({ pose: "stand" });
     }
@@ -999,7 +992,7 @@ export function TrailPlay({
     stop();
     put((v) => ({ fork: null, here: null, done: [...v.done, at.id, way.id] }));
     if (way.ground) ground.current = way.ground;
-    sound(playPop);
+    playPop();
     say(way.say);
     for (const [i, s] of way.stations.entries()) await station(s, i === 0);
   };
@@ -1007,9 +1000,9 @@ export function TrailPlay({
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   const play = async () => {
@@ -1036,7 +1029,7 @@ export function TrailPlay({
     for (const s of level.stations) await (s.kind === "fork" ? fork(s) : station(s));
     // The goal is back in the child's hands: up it goes.
     put({ party: true });
-    sound(playMelody);
+    playMelody();
     say(level.finale.say);
     const finaleMs = level.finale.ms + (level.finale.via ?? []).reduce((sum, [, ms]) => sum + ms, 0);
     await flyGoal(level.finale, onString ? handOf(viewRef.current.kid) : null);
@@ -1117,7 +1110,7 @@ export function TrailPlay({
     if (pick || picker.current) showHint();
     if (v.friend.ms) return;
     hopFriend();
-    sound(FRIENDS[v.friend.id]!.sound);
+    FRIENDS[v.friend.id]!.sound();
   };
 
   const tapKid = (e: PointerEvent) => {
@@ -1131,7 +1124,7 @@ export function TrailPlay({
       return;
     }
     kid({ hop: k.hop + 1 });
-    sound(playGiggle);
+    playGiggle();
   };
 
   // Any key goes on when the action button lights up (the space bar is the one shown on it); 1–3 take a thing out

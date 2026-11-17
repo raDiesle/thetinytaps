@@ -52,14 +52,18 @@ describe("lines still to record", () => {
   });
 
   // The browser's voice speaks only for a line not recorded yet, and only in a game whose story is told by the voice
-  // (root CLAUDE.md): src/lib/voice.ts does that for the games below. Every other call of it stays where the shared
-  // read aloud option, which is always off, guards it – the good-night screen once spoke without it.
-  test("every call of the browser's voice sits behind the read aloud option", () => {
+  // (root CLAUDE.md): src/lib/voice.ts does that for the games below, and nothing else may make it speak – the
+  // good-night screen once spoke with it. So only voice.ts takes `speak` from the speech module, and only the
+  // speech module itself hands a sentence to the browser (`speechSynthesis.speak`, `SpeechSynthesisUtterance`).
+  test("only the voice's fallback calls the browser's voice", () => {
+    const voice = join("src", "lib", "voice.ts");
+    const speech = join("src", "lib", "speech.ts");
     for (const file of sources("src")) {
-      if (file === join("src", "lib", "voice.ts")) continue;
+      if (file === speech) continue;
       const code = readFileSync(file, "utf8");
-      if (!/import \{[^}]*\bspeak\b[^}]*\} from "(@\/lib|\.)\/speech"/.test(code)) continue;
-      expect({ file, guarded: /settings\.speech|\bspeech &&/.test(code) }).toEqual({ file, guarded: true });
+      const importsSpeak = /import \{[^}]*\bspeak\b[^}]*\} from "[^"]*\/speech"/.test(code);
+      const speaksItself = /speechSynthesis\.speak\b|SpeechSynthesisUtterance/.test(code);
+      expect({ file, speaks: (importsSpeak && file !== voice) || speaksItself }).toEqual({ file, speaks: false });
     }
   });
 

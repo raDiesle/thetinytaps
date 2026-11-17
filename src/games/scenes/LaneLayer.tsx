@@ -64,14 +64,12 @@ export function LaneLayer({
   width,
   height,
   items,
-  sounds,
   onPass,
   ref,
 }: {
   width: number;
   height: number;
   items: readonly SceneItem[];
-  sounds: boolean;
   onPass: (item: SceneItem) => void;
   ref?: Ref<LaneControl>;
 }) {
@@ -82,11 +80,11 @@ export function LaneLayer({
   const pen = useRef<{ pointerId: number; lane: Lane; shown: boolean } | null>(null);
   const [, render] = useReducer((n: number) => n + 1, 0);
   const frame = useRef(0);
-  const props = useRef({ items, sounds, onPass });
-  props.current = { items, sounds, onPass };
+  const props = useRef({ items, onPass });
+  props.current = { items, onPass };
   const maskId = `lane-${useId().replace(/[^\w-]/g, "")}`;
 
-  const sound = (name: Parameters<typeof playSound>[0]) => props.current.sounds && playSound(name);
+  const sound = (name: Parameters<typeof playSound>[0]) => playSound(name);
 
   const honk = (vehicle: Vehicle) => {
     vehicle.honks++;

@@ -2,7 +2,7 @@
 export type AdventureStoryId = "schatzinsel" | "wolkenreise" | "feuerwehr";
 
 /**
- * Only the story played last is kept: read aloud, sounds, music and Tapsi's language
+ * Only the story played last is kept: music and Tapsi's language
  * come from the home page, the glow and the child figure are always on.
  */
 export interface AdventureSettings {

@@ -61,7 +61,6 @@ describe("lines that only accompany the play", () => {
 
   /** Games that still say praise with a plain `say`, and why that can't pile up there. */
   const PLAIN_PRAISE: Record<string, string> = {
-    "scenes/ScenePlay.tsx": "the browser's voice, which is always off (FIXED in common.ts)",
     "feelings/shared.tsx": "once per story round, between the story's own lines",
   };
 

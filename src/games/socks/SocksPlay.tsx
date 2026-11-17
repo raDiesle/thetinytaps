@@ -9,7 +9,6 @@ import { ASIDE_LINE_GAP_MS, EXTRA_SOUND_GAP_MS, spaced } from "@/lib/spacing";
 import { tapState } from "@/lib/tapTargets";
 import { dealPairs, lookKey, nextLevel, type Side, SOCK_LEVELS, SOCK_TEXTS, type SockLook } from "./content";
 import { Basket, Peg, SockDrawing, WashingMachine } from "./drawings";
-import type { SocksSettings } from "./settings";
 import { socksVoice } from "./voice";
 import { useStepAddress } from "@/lib/stepAddress";
 
@@ -115,7 +114,7 @@ const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height /
  * "Socken-Paare" (N-45): the washing machine spins by itself, socks tumble out, two same ones hop onto the line
  * together. When all hang, the line is pulled away and the next wash tumbles out, harder or easier by how it went.
  */
-export function SocksPlay({ settings }: { settings: SocksSettings }) {
+export function SocksPlay() {
   const language = useAppLanguage();
   const texts = useT()(SOCK_TEXTS);
   // While developing, `?level=N` starts on step N (an index into SOCK_LEVELS), to look at the harder washes.
@@ -193,16 +192,16 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   const softTap = (x?: number, y?: number) => {
     ripple(x, y);
-    if (settings.sounds) playRandomNote();
+    playRandomNote();
   };
 
   /** The socks of `next` tumble out of the machine onto the floor. */
   const tumble = (next: Round) => {
     setPhase("sorting");
-    if (settings.sounds) next.socks.forEach((_, i) => later(200 + i * TUMBLE_STEP_MS, playPlop));
+    next.socks.forEach((_, i) => later(200 + i * TUMBLE_STEP_MS, playPlop));
     const lying = (next.socks.length - 1) * TUMBLE_STEP_MS + TUMBLE_MS;
     const baskets = next.socks.some((s) => s.covered);
-    if (baskets && settings.sounds) later(lying + BASKET_WAIT_MS + BASKET_DROP_MS * 0.8, () => playKnock(700));
+    if (baskets) later(lying + BASKET_WAIT_MS + BASKET_DROP_MS * 0.8, () => playKnock(700));
     // The clock for the difficulty starts once the last sock lies (and the baskets stand); a toddler can't pick one still
     // in the air.
     sortStartRef.current = performance.now() + lying + (baskets ? BASKET_WAIT_MS + BASKET_DROP_MS : 0);
@@ -216,7 +215,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     loadRecordings(["washer"]);
     later(INTRO_MS, () => {
       setPhase("washing");
-      if (settings.sounds) playRecorded("washer", playWash);
+      playRecorded("washer", playWash);
     });
     later(INTRO_MS + WASH_MS, () => {
       say(texts.start);
@@ -251,7 +250,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       if (isPlaytimeOver()) return;
       countGame();
       setPhase("pull");
-      if (settings.sounds) playWhoosh();
+      playWhoosh();
       later(PULL_MS, () => startRound(level));
     });
   };
@@ -281,21 +280,17 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     const last = matchedRef.current.size === round.socks.length;
     // The rising note and one knock always answer a pair; the rest only when the last extras lie far enough back.
     const flourish = !last && extras.pass();
-    if (settings.sounds) {
-      // Each pair in a row a note higher up the scale, so a quick run climbs like a tune.
-      later(120, () => playCountNote(Math.min(streak - 1, 7)));
-      if (flourish) later(150, playBoing);
-    }
+    // Each pair in a row a note higher up the scale, so a quick run climbs like a tune.
+    later(120, () => playCountNote(Math.min(streak - 1, 7)));
+    if (flourish) later(150, playBoing);
     if (!last) aside(oneOf(texts.pair));
 
     later(FLY_MS, () => {
       setLanded((l) => [...l, ...pieces]);
-      if (settings.sounds) {
-        playKnock(1500);
-        if (flourish) later(120, () => playKnock(1300));
-        // From the third pair in a row on a twinkle comes with it – a sound only, nothing floats up after an answer.
-        if (flourish && streak >= 3) playTwinkle();
-      }
+      playKnock(1500);
+      if (flourish) later(120, () => playKnock(1300));
+      // From the third pair in a row on a twinkle comes with it – a sound only, nothing floats up after an answer.
+      if (flourish && streak >= 3) playTwinkle();
     });
 
     if (last) later(FLY_MS + LAST_LANDED_MS, finish);
@@ -307,7 +302,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     if (phase !== "sorting" || matchedRef.current.has(index)) return;
     const before = selectedRef.current;
     // Both pieces of a look sound the same, so the note never tells a left from a right one.
-    if (settings.sounds) playCountNote(sock.look);
+    playCountNote(sock.look);
     if (before === index) {
       setNudge((n) => n + 1);
       return;
@@ -367,10 +362,8 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
         const to = left[current === null ? 0 : (at + (back ? -1 : 1) + left.length) % left.length];
         move(to);
         // Under a basket its note would give it away: a knock on the basket instead.
-        if (settings.sounds) {
-          if (round.socks[to].covered && selectedRef.current !== to) playKnock(700);
-          else playCountNote(round.socks[to].look);
-        }
+        if (round.socks[to].covered && selectedRef.current !== to) playKnock(700);
+        else playCountNote(round.socks[to].look);
       }
     };
     window.addEventListener("keydown", onKeyDown);

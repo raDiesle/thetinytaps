@@ -22,10 +22,6 @@ export interface FeelingsSettings {
    * the child themselves switch it off (`VoiceSwitch`); the sounds go on. „Wie geht's dir?“ always speaks.
    */
   voice: boolean;
-  /** Read aloud by the browser's voice: always off (`FIXED` in src/lib/common.ts), kept for the shared options. */
-  speech: boolean;
-  /** Little sounds for hugs, stomping, lullabies. */
-  sounds: boolean;
 }
 
 export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
@@ -36,8 +32,6 @@ export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
   scene: 0,
   steps: {},
   voice: true,
-  speech: false,
-  sounds: true,
 };
 
 export const FEELINGS_SETTINGS_KEY = "tinytaps.feelings.v1";

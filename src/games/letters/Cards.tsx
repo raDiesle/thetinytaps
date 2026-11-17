@@ -52,7 +52,7 @@ export function LetterCard({
   return (
     <div className="card" onPointerDown={onPointerDown}>
       {settings.trace ? (
-        <TraceGlyphs glyphs={glyphs} sounds={settings.sounds} />
+        <TraceGlyphs glyphs={glyphs} />
       ) : settings.letterCase === "both" && settings.letterFamily ? (
         <LetterFamily letter={letter} />
       ) : (
@@ -167,8 +167,8 @@ export function NumberCard({
    * been tapped, in order. Each tapped item keeps its number.
    */
   tapped?: number[];
-  /** Show the digit as dots to trace, with stars; `sounds` plays notes while tracing. */
-  trace?: { sounds: boolean };
+  /** Show the digit as dots to trace, with stars and notes while tracing. */
+  trace?: boolean;
   onItemPointer?: (index: number, e: PointerEvent) => void;
   onPointerDown?: PointerEventHandler;
 }) {
@@ -214,7 +214,7 @@ export function NumberCard({
       )}
       <Reveal visible={stage > n} hint={hint}>
         {trace ? (
-          <TraceGlyphs glyphs={[String(n)]} sounds={trace.sounds} />
+          <TraceGlyphs glyphs={[String(n)]} />
         ) : (
           <div className="glyphs">
             <span>{n}</span>

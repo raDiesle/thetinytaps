@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
-import { useAppLanguage, useT, voiceFor } from "@/lib/language";
-import { speak, unlockSpeech } from "@/lib/speech";
+import { useT } from "@/lib/language";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { useTimers } from "@/lib/timers";
 import {
@@ -23,7 +22,7 @@ import {
   takeBackWayStar,
   wayCount,
 } from "./board";
-import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
+import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel } from "./BoardSheet";
 import { ItemPic, Pic, picture } from "./pictures";
 
 /** How long „Stern zurück“ stays after a star, for a grown-up who tapped the wrong field. */
@@ -54,8 +53,6 @@ export function BoardScreen({
   setLog,
   linked,
   day,
-  sounds,
-  speech,
   onExamplesOff,
   onCertificate,
 }: {
@@ -65,16 +62,12 @@ export function BoardScreen({
   linked: LinkedDays;
   /** A day of the week, month or day shown: today, or an earlier one a grown-up went back to. */
   day: Date;
-  sounds: boolean;
-  speech: boolean;
   /** The example stars go: with the first real star, or when a grown-up hides them. */
   onExamplesOff: () => void;
   /** Opens „🏅 Urkunde“, which the board offers once its goal is reached (T-15). */
   onCertificate: () => void;
 }) {
   const t = useT();
-  const language = useAppLanguage();
-  const taskLabel = useTaskLabel();
   const rewardLabel = useRewardLabel();
   const box = useRef<HTMLDivElement>(null);
   const [aspect, setAspect] = useState(1.6);
@@ -87,10 +80,6 @@ export function BoardScreen({
   const { later } = useTimers();
   const today = new Date();
   const stars = log[board.id];
-
-  const sound = (play: () => void) => sounds && play();
-  // A line without its translation is German and gets the German voice.
-  const say = (text: string) => speech && speak(text, voiceFor(text, language));
 
   // The path of a collecting board follows the shape of the room it has.
   useEffect(() => {
@@ -121,7 +110,7 @@ export function BoardScreen({
         const open = box.current?.querySelector("[data-state='open']");
         if (open) poke(open, "wiggle");
       }
-      sound(playTwinkle);
+      playTwinkle();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -147,20 +136,17 @@ export function BoardScreen({
     const el = (e.target as Element).closest<HTMLElement>("[data-field]");
     if (!el) return;
     unlockAudio();
-    unlockSpeech();
     const field = el.dataset.field as string;
     const state = el.dataset.state as FieldState;
     const task = fieldTask(field);
     if (state === "filled") {
-      if (task) say(taskLabel(task));
       poke(el, "twinkle");
-      sound(playTwinkle);
+      playTwinkle();
       return;
     }
     if (state === "future") {
-      if (task) say(taskLabel(task));
       poke(el, "wiggle");
-      sound(playPop);
+      playPop();
       return;
     }
     // An open field: its star comes at once; on a collecting board the next free field gets it, whichever was tapped.
@@ -180,7 +166,7 @@ export function BoardScreen({
     if (board.examples) onExamplesOff();
     setFresh(pending.field);
     setUndo({ key: pending.key, way: pending.way });
-    sound(playChime);
+    playChime();
     const target = document.querySelector(`[data-field="${CSS.escape(pending.field)}"]`)?.getBoundingClientRect();
     const x = target ? target.left + target.width / 2 : undefined;
     const y = target ? target.top + target.height / 2 : undefined;
@@ -195,39 +181,14 @@ export function BoardScreen({
       // The big party: the reward, or just the joy of it.
       later(() => {
         setParty({ reward });
-        sound(playTusch);
+        playTusch();
         celebrate();
-        say(
-          reward
-            ? `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(reward)}`
-            : t({
-                de: "Geschafft! Hurra!",
-                en: "You did it! Hooray!",
-                zh: "完成啦！好耶！",
-                hi: "हो गया! हुर्रे!",
-                es: "¡Lo lograste! ¡Hurra!",
-                ar: "نجحنا! يا للفرح!",
-                ru: "Получилось! Ура!",
-              }),
-        );
       }, 500);
     } else if ((board.kind === "week" || board.kind === "month") && !wasFull && dayFull(board, next[board.id], linked, pending.day)) {
       // A day with all its stars: a small party right there.
       later(() => celebrate({ at: { x: x ?? window.innerWidth / 2, y: y ?? window.innerHeight / 2 } }), 120);
-      later(() => sound(playChime), 300);
-      say(
-        t({
-          de: "Super! Der Tag ist voll!",
-          en: "Super! The day is full!",
-          zh: "太棒了！今天满啦！",
-          hi: "शाबाश! आज का दिन पूरा हो गया!",
-          es: "¡Genial! ¡El día está completo!",
-          ar: "رائع! اكتمل اليوم!",
-          ru: "Супер! Весь день в звёздах!",
-        }),
-      );
+      later(playChime, 300);
     } else {
-      say(t({ de: "Super!", en: "Super!", zh: "太棒了！", hi: "शाबाश!", es: "¡Genial!", ar: "رائع!", ru: "Супер!" }));
     }
   };
 

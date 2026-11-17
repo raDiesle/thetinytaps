@@ -11,7 +11,6 @@ import { voiceQuiet } from "@/lib/voice";
 import { ANIMAL_TEXTS, type Animal } from "./content";
 import type { SoundRound } from "./levels";
 import { useRoundTime, useSay } from "./roundTime";
-import type { AnimalsSettings } from "./settings";
 import { SOUND_TEXTS } from "./sounds";
 
 /** Time to look at the animal found after its line, before the next round. */
@@ -32,7 +31,6 @@ const CALL_WAIT_MS = 3000;
 
 /** What a round of „Wer macht das Geräusch?“ gets from `AnimalsRounds`, which plays it in turn with the other kinds. */
 export interface SoundPlayProps {
-  settings: Pick<AnimalsSettings, "speech" | "sounds">;
   round: SoundRound;
   /** What the round is about, for grown-ups: shown under the stage. */
   topic?: ReactNode;
@@ -54,7 +52,7 @@ const call = (animal: Animal) => (animal.sound ?? playPop)();
  * curtain sways it and lets the animal call at once. A wrong one calls with its own voice, so the two can be compared;
  * the right one opens the curtain, and the animal stands there and calls again.
  */
-export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: SoundPlayProps) {
+export function SoundPlay({ round, topic, intro, onSolved, onNext }: SoundPlayProps) {
   const language = useAppLanguage();
   const texts = pick(SOUND_TEXTS, language.id);
   const names = pick(ANIMAL_TEXTS, language.id);
@@ -97,13 +95,13 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
       if (found.current) return;
       const now = performance.now();
       if (!voiceQuiet() || pageMoving()) soundUntil.current = Math.max(soundUntil.current, now);
-      else if (!busy.current && settings.sounds && now - soundUntil.current >= LOOP_PAUSE_MS) callNow(round.animal);
+      else if (!busy.current && now - soundUntil.current >= LOOP_PAUSE_MS) callNow(round.animal);
       later(LOOP_TICK_MS, loop);
     };
     whenQuiet(0, () => {
       void atMost(recordingReady(round.animal.call ?? ""), CALL_WAIT_MS).then(() => {
         if (!alive) return;
-        const first = settings.sounds ? callNow(round.animal) : 0;
+        const first = callNow(round.animal);
         later(first, () => {
           if (intro) say(intro);
           say(texts.listen);
@@ -119,9 +117,9 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
   const softTap = useCallback(
     (x?: number, y?: number) => {
       ripple(x, y);
-      if (settings.sounds) playRandomNote();
+      playRandomNote();
     },
-    [ripple, settings.sounds],
+    [ripple],
   );
 
   /** A tap on the curtain: it sways, and the animal behind it calls – unless it calls already or a line is being said. */
@@ -129,7 +127,7 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
     if (busy.current) return;
     setSway((n) => n + 1);
     glow(x, y);
-    if (settings.sounds && voiceQuiet() && performance.now() >= soundUntil.current && again.pass("curtain")) callNow(round.animal);
+    if (voiceQuiet() && performance.now() >= soundUntil.current && again.pass("curtain")) callNow(round.animal);
   };
 
   const choose = (index: number) => {
@@ -145,7 +143,7 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
       // Its call once the call or line still sounding is over, then „Das ist …“ after it: nothing sounds together
       // (user feedback, November 2026). The next pick (and the loop's next call) only once that line is said.
       whenQuiet(Math.max(150, soundUntil.current - performance.now()), () => {
-        later(settings.sounds ? callNow(picked) : 0, () => {
+        later(callNow(picked), () => {
           say(texts.thatIs(picked));
           whenQuiet(0, () => {
             busy.current = false;
@@ -160,10 +158,10 @@ export function SoundPlay({ settings, round, topic, intro, onSolved, onNext }: S
     // „Da ist ja …“ after its call; the loop ends, and the next round comes only once that line is said in full.
     found.current = true;
     onSolved(misses.current);
-    if (settings.sounds) later(150, playChime);
+    later(150, playChime);
     whenQuiet(Math.max(700, soundUntil.current - performance.now()), () => {
-      if (settings.sounds) call(round.animal);
-      later(settings.sounds ? callMs(round.animal) : 0, () => {
+      call(round.animal);
+      later(callMs(round.animal), () => {
         say(texts.there(round.animal));
         whenQuiet(0, () => whenQuiet(LOOK_MS, onNext));
       });
