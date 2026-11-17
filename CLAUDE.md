@@ -963,6 +963,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    the home menu against the routes and kid tiles, ideas, language packs, the movement
    library, the Gefühle pictures, unique `@keyframes` names.
    When you add data with rules like these, add a check.
+   The deploy on `main` runs `bun run verify` on GitHub's runner, about twice as slow as this Mac, and `bun test`
+   fails a test after 5 s: a test taking over a second here (one playing a whole story frame by frame) gets a
+   timeout of its own (`WHOLE_STORY_MS` in `collisions.test.ts`), or it fails only there (November 2026: the deploy
+   stopped on two collision tests that passed here in 3.5 s).
 2. Look at it in the browser preview: the change itself, the console, and the rules above.
    Sound is muted there, so "I hear no music" can't be checked by ear: wrap
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
