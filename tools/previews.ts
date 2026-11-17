@@ -88,7 +88,13 @@ const BOOK_DIR = "src/components/vorschau";
 const isBook = (file: string) => file.startsWith(BOOK_DIR);
 
 /** What CUTS and WAITS know a picture by: its game's folder and its id, „marbles/topple“ (a book's line: „components/…“). */
-const keyOf = (file: string) => file.split("/").filter((part) => part !== "vorschau").slice(-2).join("/").replace(/\.webp$/, "");
+const keyOf = (file: string) =>
+  file
+    .split("/")
+    .filter((part) => part !== "vorschau")
+    .slice(-2)
+    .join("/")
+    .replace(/\.webp$/, "");
 
 /**
  * Where the cut lies, by `keyOf`: its middle as a share of the window's width and height, and its height as a share of
@@ -359,7 +365,11 @@ async function picture(cdp: Cdp, file: string, area?: Area | null) {
       `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs><linearGradient id="f"><stop offset="0" stop-opacity="0"/><stop offset="${fade / width}" stop-opacity="1"/><stop offset="${1 - fade / width}" stop-opacity="1"/><stop offset="1" stop-opacity="0"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#f)"/></svg>`,
     );
     const alpha = await sharp(mask).resize(width, height, { fit: "fill" }).png().toBuffer();
-    const faded = await sharp(png).ensureAlpha().composite([{ input: alpha, blend: "dest-in" }]).png().toBuffer();
+    const faded = await sharp(png)
+      .ensureAlpha()
+      .composite([{ input: alpha, blend: "dest-in" }])
+      .png()
+      .toBuffer();
     // Two steps: sharp resizes before it composites (or extends), whatever order they are asked in.
     const whole = await sharp(backdrop)
       .composite([{ input: faded, left: Math.round((wide - width) / 2), top: 0 }])

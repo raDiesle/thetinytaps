@@ -73,7 +73,12 @@ async function filesIn(dir: string) {
   const entries = await readdir(dir, { recursive: true, withFileTypes: true });
   return entries
     .filter((entry) => entry.isFile())
-    .map((entry) => join(entry.parentPath, entry.name).slice(dir.length + 1).split("\\").join("/"))
+    .map((entry) =>
+      join(entry.parentPath, entry.name)
+        .slice(dir.length + 1)
+        .split("\\")
+        .join("/"),
+    )
     .sort();
 }
 
@@ -366,7 +371,15 @@ async function pagePreloads(template: string, built: Built) {
 async function writeServiceWorker(built: Built) {
   const offline = await writeOfflineManifest(built);
   const all = built.files;
-  const texts = Object.fromEntries(all.flatMap((file) => /^static\/texts-([a-z]{2})\.[^/]*\.js$/.exec(file)?.slice(1, 2).map((id) => [id, `./${file}`]) ?? []));
+  const texts = Object.fromEntries(
+    all.flatMap(
+      (file) =>
+        /^static\/texts-([a-z]{2})\.[^/]*\.js$/
+          .exec(file)
+          ?.slice(1, 2)
+          .map((id) => [id, `./${file}`]) ?? [],
+    ),
+  );
   // Offline every address opens index.html (src/sw.js), so the other pages, written for search engines, stay out.
   const files = all.filter(
     (file) =>
@@ -406,7 +419,10 @@ async function writeServiceWorker(built: Built) {
     ["__TEXTS__", JSON.stringify(texts)],
     ["__OFFLINE__", JSON.stringify(offline)],
   ];
-  await put("sw.js", fills.reduce((code, [placeholder, value]) => replaceOnce(code, placeholder, value, "src/sw.js"), template));
+  await put(
+    "sw.js",
+    fills.reduce((code, [placeholder, value]) => replaceOnce(code, placeholder, value, "src/sw.js"), template),
+  );
 }
 
 /**
@@ -422,7 +438,10 @@ async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
   const modules = pageModules(await readFile(join(ROOT, "src/App.tsx"), "utf8"));
   const pageChunks = new Set([...new Set(modules.values())].map(chunkOf).filter((chunk): chunk is string => !!chunk));
   /** The files a chunk's code names (pictures, sounds), besides itself. */
-  const named = async (chunk: string) => [chunk, ...[...(await read(chunk)).matchAll(new RegExp(`${escaped}([\\w.-]+\\.(?:mp3|webp|png|jpe?g|svg|woff2?))`, "g"))].map((m) => `static/${m[1]}`)];
+  const named = async (chunk: string) => [
+    chunk,
+    ...[...(await read(chunk)).matchAll(new RegExp(`${escaped}([\\w.-]+\\.(?:mp3|webp|png|jpe?g|svg|woff2?))`, "g"))].map((m) => `static/${m[1]}`),
+  ];
 
   // index.html as writePages left it (the home page's), read anew: `read` keeps what it read once.
   const html = await readFile(join(OUT, "index.html"), "utf8");
@@ -493,7 +512,8 @@ async function shellFiles() {
   // The previews, known by their content: their built names say nothing of the folder they came from.
   const digest = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
   const previews = new Set<string>();
-  for (const file of await filesIn(join(ROOT, "src"))) if (/(^|\/)vorschau\/[^/]+\.webp$/.test(file)) previews.add(digest(await readFile(join(ROOT, "src", file))));
+  for (const file of await filesIn(join(ROOT, "src")))
+    if (/(^|\/)vorschau\/[^/]+\.webp$/.test(file)) previews.add(digest(await readFile(join(ROOT, "src", file))));
   const pictures = new Set<string>();
   for (const file of linked.filter((file) => /\.(js|css)$/.test(file))) {
     for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(/static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)/g))
@@ -504,7 +524,9 @@ async function shellFiles() {
   const megabytes = shell.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0) / 1e6;
   console.log(`service worker's start: ${shell.length} files, ${megabytes.toFixed(2)} MB`);
   if (shell.length > MAX_SHELL.files || megabytes > MAX_SHELL.megabytes) {
-    console.error(`build: the service worker's start is ${shell.length} files and ${megabytes.toFixed(2)} MB, over ${MAX_SHELL.files} files or ${MAX_SHELL.megabytes} MB: every first visit downloads it`);
+    console.error(
+      `build: the service worker's start is ${shell.length} files and ${megabytes.toFixed(2)} MB, over ${MAX_SHELL.files} files or ${MAX_SHELL.megabytes} MB: every first visit downloads it`,
+    );
     process.exit(1);
   }
   return shell;
@@ -562,6 +584,8 @@ const megabytes = Math.round(bytes / 1e6);
 console.log(`out/: ${files.length} files, ${megabytes} MB (${result.outputs.length} bundled) in ${Math.round(performance.now() - started)} ms`);
 // GitHub Pages publishes a site of at most 1 GB; stop well before it, while there is still time to make room (R-D8).
 if (megabytes > MAX_SITE_MB) {
-  console.error(`build: out/ is ${megabytes} MB, over the limit of ${MAX_SITE_MB} MB (GitHub Pages takes at most 1 GB) – make the recordings or pictures smaller first`);
+  console.error(
+    `build: out/ is ${megabytes} MB, over the limit of ${MAX_SITE_MB} MB (GitHub Pages takes at most 1 GB) – make the recordings or pictures smaller first`,
+  );
   process.exit(1);
 }

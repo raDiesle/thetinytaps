@@ -108,10 +108,16 @@ export function appPlugin(info?: BuildInfo, styles?: ReadonlyMap<string, string>
         const rest = path.slice(0, path.lastIndexOf("/files-"));
         const root = rest.slice(0, rest.lastIndexOf("/"));
         const glob = decodeURIComponent(rest.slice(rest.lastIndexOf("/") + 1));
-        return { contents: mapModule(root, filesOf(root, glob).filter((file) => fileLanguage(file) === language)), loader: "js" };
+        return {
+          contents: mapModule(
+            root,
+            filesOf(root, glob).filter((file) => fileLanguage(file) === language),
+          ),
+          loader: "js",
+        };
       });
       if (info)
-          build.onLoad({ filter: /\/src\/lib\/buildInfo\.ts$/ }, () => ({
+        build.onLoad({ filter: /\/src\/lib\/buildInfo\.ts$/ }, () => ({
           contents: Object.entries(info)
             .map(([key, value]) => `export const ${key} = ${JSON.stringify(value)};`)
             .join("\n"),

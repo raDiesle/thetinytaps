@@ -58,7 +58,10 @@ export function isThere({ specifier, importer }: UnresolvedImport) {
   else if (path.startsWith(".")) base = join(dirname(importer), path);
   else if (isAbsolute(path)) base = path;
   else {
-    const name = path.split("/").slice(0, path.startsWith("@") ? 2 : 1).join("/");
+    const name = path
+      .split("/")
+      .slice(0, path.startsWith("@") ? 2 : 1)
+      .join("/");
     return isFile(join(ROOT, "node_modules", name, "package.json"));
   }
   return ENDINGS.some((ending) => isFile(base + ending));

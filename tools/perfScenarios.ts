@@ -42,12 +42,7 @@ export interface Budget {
 export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScreensPerS: 30 };
 
 /** Something done before a stretch is measured. */
-export type Step =
-  | { wait: number }
-  | { waitFor: string }
-  | { tap: string; optional?: boolean }
-  | { key: string }
-  | { eval: string };
+export type Step = { wait: number } | { waitFor: string } | { tap: string; optional?: boolean } | { key: string } | { eval: string };
 
 /** A stretch to measure. */
 export interface Part {
@@ -189,14 +184,23 @@ export const SCENARIOS: Scenario[] = [
   {
     name: "timer-abwechseln-wechsel",
     path: "/timer/?sekunden=5",
-    parts: [{ label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Abwechseln"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [
+      {
+        label: "Auslosen und Wechsel",
+        before: [{ tap: `.mode-card[title^="Abwechseln"]` }, { wait: 500 }],
+        ms: 10000,
+        tap: { selector: ".tm-play", every: 1500 },
+      },
+    ],
   },
   // „Tennis“ with short turns: the sides drawing who begins, the racket swinging, the ball flying over the net and the
   // shade changing sides as it crosses.
   {
     name: "timer-tennis-wechsel",
     path: "/timer/?sekunden=5",
-    parts: [{ label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Tennis"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [
+      { label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Tennis"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } },
+    ],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.
   {
@@ -237,8 +241,15 @@ export const SCENARIOS: Scenario[] = [
           { wait: 4000 },
           { tap: ".screen-hint-button", optional: true },
           { wait: 500 },
-          { waitFor: ".mode-picker li:nth-child(1) button" }, { tap: ".mode-picker li:nth-child(1) button" }, { wait: 1500 },
-          { waitFor: '.fg-card[aria-label="Wütend"]' }, { wait: 1500 }, { tap: '.fg-card[aria-label="Wütend"]' }, { waitFor: ".mood-strengths" }, { wait: 1500 }],
+          { waitFor: ".mode-picker li:nth-child(1) button" },
+          { tap: ".mode-picker li:nth-child(1) button" },
+          { wait: 1500 },
+          { waitFor: '.fg-card[aria-label="Wütend"]' },
+          { wait: 1500 },
+          { tap: '.fg-card[aria-label="Wütend"]' },
+          { waitFor: ".mood-strengths" },
+          { wait: 1500 },
+        ],
         ms: 8000,
         // The arrows pick a weaker or stronger picture, the other two going pale.
         type: { keys: ["ArrowRight", "ArrowRight", "ArrowLeft", "ArrowLeft", "ArrowLeft", "ArrowRight", "ArrowRight", "ArrowRight"], every: 700 },
@@ -270,7 +281,14 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
-  { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },
+  {
+    name: "socken",
+    path: "/socken/",
+    parts: [
+      { label: "Waschen", before: [{ wait: 500 }], ms: 8000 },
+      { label: "Socken paaren", ms: 8000, tap: TAPS },
+    ],
+  },
   { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
   {
     // The marble run's camera following three things down the wall (the barrier open, „Von selbst“): the picture that
@@ -293,7 +311,11 @@ export const SCENARIOS: Scenario[] = [
     parts: [
       {
         label: "Große Maschine läuft",
-        before: [{ eval: `[...document.querySelectorAll(".mode-card")].find((c) => c.textContent.includes("Große Maschine")).click()` }, { wait: 1500 }, ...key(" ")],
+        before: [
+          { eval: `[...document.querySelectorAll(".mode-card")].find((c) => c.textContent.includes("Große Maschine")).click()` },
+          { wait: 1500 },
+          ...key(" "),
+        ],
         ms: 12000,
       },
     ],

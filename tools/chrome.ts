@@ -72,7 +72,11 @@ export class Cdp {
   /** Listens to an event until the returned function is called. */
   on(method: string, listener: (params: Record<string, unknown>) => void) {
     this.listeners.set(method, [...(this.listeners.get(method) ?? []), listener]);
-    return () => this.listeners.set(method, (this.listeners.get(method) ?? []).filter((l) => l !== listener));
+    return () =>
+      this.listeners.set(
+        method,
+        (this.listeners.get(method) ?? []).filter((l) => l !== listener),
+      );
   }
 
   once(method: string) {
@@ -153,11 +157,23 @@ export async function launchChrome(screen: Screen) {
  * Builds the site and serves out/ (unless `build` is false: the out/ that is there), or uses the server at `url`.
  * `readable` keeps the build's function names, for profiles.
  */
-export async function siteUrl({ url, build = true, readable = false }: { url?: string; build?: boolean; readable?: boolean }): Promise<{ url: string; stop: () => void }> {
+export async function siteUrl({
+  url,
+  build = true,
+  readable = false,
+}: {
+  url?: string;
+  build?: boolean;
+  readable?: boolean;
+}): Promise<{ url: string; stop: () => void }> {
   if (url) return { url: url.replace(/\/$/, ""), stop: () => {} };
   if (build) {
     console.log("Building …");
-    const built = Bun.spawnSync(["bun", "run", "build"], { stdout: "ignore", stderr: "inherit", env: { ...process.env, PUBLIC_BASE_PATH: "/", READABLE: readable ? "1" : "" } });
+    const built = Bun.spawnSync(["bun", "run", "build"], {
+      stdout: "ignore",
+      stderr: "inherit",
+      env: { ...process.env, PUBLIC_BASE_PATH: "/", READABLE: readable ? "1" : "" },
+    });
     if (built.exitCode !== 0) throw new Error("The build failed.");
   }
   const server = Bun.spawn(["bun", join(import.meta.dir, "preview.ts"), "--port", "3400"], { stdout: "pipe", stderr: "inherit" });

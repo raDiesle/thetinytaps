@@ -120,7 +120,12 @@ const KEY_CODES: Record<string, number> = { ArrowRight: 39, ArrowLeft: 37, Arrow
 
 async function pressKey(cdp: Cdp, key: string) {
   const code = KEY_CODES[key] ?? key.toUpperCase().charCodeAt(0);
-  const base = { key, code: key === " " ? "Space" : key.length === 1 ? `Key${key.toUpperCase()}` : key, windowsVirtualKeyCode: code, nativeVirtualKeyCode: code };
+  const base = {
+    key,
+    code: key === " " ? "Space" : key.length === 1 ? `Key${key.toUpperCase()}` : key,
+    windowsVirtualKeyCode: code,
+    nativeVirtualKeyCode: code,
+  };
   await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", ...base, text: key.length === 1 ? key : undefined });
   await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", ...base });
 }
@@ -217,7 +222,15 @@ async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   const events: TraceEvent[] = [];
   const off = cdp.on("Tracing.dataCollected", (params) => events.push(...(params.value as TraceEvent[])));
   await cdp.send("Tracing.start", {
-    traceConfig: { includedCategories: ["devtools.timeline", "disabled-by-default-devtools.timeline", "disabled-by-default-devtools.timeline.frame", "disabled-by-default-cc.debug", ...(flag("trace") ? ["disabled-by-default-devtools.timeline.invalidationTracking"] : [])] },
+    traceConfig: {
+      includedCategories: [
+        "devtools.timeline",
+        "disabled-by-default-devtools.timeline",
+        "disabled-by-default-devtools.timeline.frame",
+        "disabled-by-default-cc.debug",
+        ...(flag("trace") ? ["disabled-by-default-devtools.timeline.invalidationTracking"] : []),
+      ],
+    },
     transferMode: "ReportEvents",
   });
   await during();
@@ -253,22 +266,26 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
   let wall = 0;
   let after = before;
   let frames: Frames | null = null;
-  const { paintMs, rasterMs, rasteredPixels } = await traced(cdp, async () => {
-    const play = async () => {
-      const stopTapping = tap ? startTapping(cdp, tap.selector, tap.every) : null;
-      const stopTyping = type ? startTyping(cdp, type.keys, type.every) : null;
-      await sleep(ms);
-      await stopTapping?.();
-      await stopTyping?.();
-    };
-    if (flag("profile")) hot = await profiled(cdp, play);
-    else await play();
-    // Frames and time are read as the stretch ends: collecting the trace takes seconds, and its idle frames would
-    // water down every number (four stutters in a book taken out once passed as fine).
-    wall = (performance.now() - start) / 1000;
-    after = await metrics(cdp);
-    frames = await evaluate(cdp, "window.__perfStop ? window.__perfStop() : null");
-  }, traceFile);
+  const { paintMs, rasterMs, rasteredPixels } = await traced(
+    cdp,
+    async () => {
+      const play = async () => {
+        const stopTapping = tap ? startTapping(cdp, tap.selector, tap.every) : null;
+        const stopTyping = type ? startTyping(cdp, type.keys, type.every) : null;
+        await sleep(ms);
+        await stopTapping?.();
+        await stopTyping?.();
+      };
+      if (flag("profile")) hot = await profiled(cdp, play);
+      else await play();
+      // Frames and time are read as the stretch ends: collecting the trace takes seconds, and its idle frames would
+      // water down every number (four stutters in a book taken out once passed as fine).
+      wall = (performance.now() - start) / 1000;
+      after = await metrics(cdp);
+      frames = await evaluate(cdp, "window.__perfStop ? window.__perfStop() : null");
+    },
+    traceFile,
+  );
   // (Set inside the callback, which TypeScript can't see.)
   const counted = frames as Frames | null;
   if (!counted) throw new Error(`${label}: the page was left while measuring (a tap opened another page?)`);

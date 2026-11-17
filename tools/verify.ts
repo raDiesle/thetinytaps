@@ -84,7 +84,12 @@ async function run(step: Step): Promise<StepResult> {
     };
     const [exitCode] = await Promise.all([child.exited, read(child.stdout), read(child.stderr)]);
     // A step killed by a signal has no exit code of its own: it failed.
-    return { step, exitCode: child.signalCode ? null : exitCode, output: child.signalCode ? `${output}\nkilled by ${child.signalCode}` : output, ms: performance.now() - started };
+    return {
+      step,
+      exitCode: child.signalCode ? null : exitCode,
+      output: child.signalCode ? `${output}\nkilled by ${child.signalCode}` : output,
+      ms: performance.now() - started,
+    };
   } catch (error) {
     return { step, exitCode: null, output: `could not be started: ${error}`, ms: performance.now() - started };
   }
