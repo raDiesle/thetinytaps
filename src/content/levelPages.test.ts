@@ -36,7 +36,7 @@ const REAL_LEVELS: Record<string, () => string[]> = {
   "/wie-gehts-dir/": () => [...source("games/feelings/MoodGame.tsx").matchAll(/^const (?:FEELING|NEED) = "([^"]+)";/gm)].map((match) => match[1]),
   "/kettenreaktion/": () => idsIn("games/marbles/MarbleGame.tsx", "const MODES", "];"),
   "/kleine-abenteuer/": () => idsIn("games/elevator/ElevatorGame.tsx", "modes={[", "]}"),
-  "/abenteuer/": () => idsIn("games/adventure/AdventureGame.tsx", "const STORIES", "];"),
+  "/abenteuer/": () => idsIn("games/adventure/catalog.ts", "const STORIES", "];"),
 };
 
 test("every game whose route takes a level has its levels listed for the build, and no other", () => {

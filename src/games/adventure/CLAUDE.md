@@ -11,7 +11,7 @@ from `onPose` (the bar by `scaleX`, the number only when its second changes), ne
 and the pill has no backdrop blur, which would be drawn again with every frame of the 3D picture. It, the route and the
 dancer's box add `var(--frame)`: the book's paper margin lies over the picture's edges and hid half the route.
 
-The start screen picks the story (`settings.story`, the modes are the sequences' titles). At the end of a story the shared `GameEnd` offers „Nochmal“ and „Weiter“ (the next playable story in `STORIES` order, after the last the first; none while only one can be played). A story still being built is `unfinished` in `STORIES` (user decision, November 2026: the Wolkenreise until 13 November 2026, then published; Fire Rescue now): its card says „in Bearbeitung“ and starts only on localhost (`canTestUnfinished`, `src/lib/localTest.ts`), on the real site it stands greyed out and „Weiter“ skips it – unless the user holds its card for three seconds, which starts it and lets it play for the rest of the visit (`unlockUnfinished`, user request, November 2026: a way only the user knows, so nothing on the screen hints at it – no ring, glow, sound or text); remove the mark to publish it. The second story is
+The start screen picks the story (`settings.story`, the modes are the sequences' titles). At the end of a story the shared `GameEnd` offers „Nochmal“ and „Weiter“ (the next playable story in `STORIES` order (`catalog.ts`), after the last the first; none while only one can be played). A story still being built is `unfinished` in `STORIES` (user decision, November 2026: the Wolkenreise until 13 November 2026, then published; Fire Rescue now): its card says „in Bearbeitung“ and starts only on localhost (`canTestUnfinished`, `src/lib/localTest.ts`), on the real site it stands greyed out and „Weiter“ skips it – unless the user holds its card for three seconds, which starts it and lets it play for the rest of the visit (`unlockUnfinished`, user request, November 2026: a way only the user knows, so nothing on the screen hints at it – no ring, glow, sound or text); remove the mark to publish it. The second story is
 `stories/cloudTrip/`, „Die Wolkenreise“ (about 3 minutes, same files as the treasure island): it opens at a
 dark rain cloud that hides the sun, then flies back over the land to Tapsi standing on the little cloud Wolle
 on a meadow by a village (the camera far enough back that Wolle's underside shows). Tapsi waves Kiki over,
@@ -191,3 +191,8 @@ October 2026: 2,186 objects, 79 % busy, budget 60 %). So:
   scenarios and sequences only use movements that exist.
 - `__adventure.seek(seconds)` in the console jumps to a moment; arrow keys skip, Space or a tap on the picture pauses.
 - three.js is only imported below this folder, so the rest of the app stays small.
+- The start screen loads neither three.js nor a story (R-P11, November 2026: its chunk was 1.17 MB, now 3 KB): a
+  story's card data (id, emoji, title, first language, translations) lives in `catalog.ts`, each story and
+  `AdventurePlay` come by `import()` behind a `Suspense` showing `PageLoading`, and the player is fetched in an idle
+  moment once the page lies still – a new story gets its entry there, never a static import in `AdventureGame.tsx`
+  (`catalog.test.ts`).

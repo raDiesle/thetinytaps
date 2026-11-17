@@ -1,26 +1,20 @@
-import { useMemo } from "react";
+import { lazy, Suspense, use, useEffect, useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
-import { targetLanguageFor } from "@/content/targetLanguages";
-import { useCommonSettings } from "@/lib/common";
+import { PageLoading } from "@/components/PageLoading";
+import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
+import { type CommonSettings, useCommonSettings } from "@/lib/common";
 import { canPlayUnfinished } from "@/lib/localTest";
 import { useAppLanguage, useT } from "@/lib/language";
+import { afterPageMotion } from "@/lib/pageMotion";
+import { afterLoad, savesData } from "@/lib/pwa";
 import { useStoredSettings } from "@/lib/storage";
-import { AdventurePlay } from "./AdventurePlay";
+import { entryTitle, entryToldIn, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
 import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
-import { CLOUD_TRIP } from "./stories/cloudTrip";
-import { FIRE_RESCUE } from "./stories/fireRescue";
-import { firstLanguage, type Story, storyIn, storyTitle, toldIn } from "./stories/story";
-import { TREASURE_ISLAND } from "./stories/treasureIsland";
+import { storyIn } from "./stories/story";
 import previews from "./vorschau/*.webp?glob";
 
-/** The stories on the start screen, each a card; one `unfinished` says „in Bearbeitung“ and starts only on localhost. */
-const STORIES: { id: AdventureStoryId; emoji: string; story: Story; unfinished?: true }[] = [
-  { id: "schatzinsel", emoji: "🏝️", story: TREASURE_ISLAND },
-  // Still being built (user decision, November 2026): tested on localhost only.
-  { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP },
-  // Tapsi rides Robo, a hover robot, so it never has to walk (user idea, November 2026); being built, English first.
-  { id: "feuerwehr", emoji: "🚒", story: FIRE_RESCUE, unfinished: true },
-];
+// The player with three.js and each story are chunks of their own (catalog.ts): this start screen loads neither.
+const AdventurePlay = lazy(() => loadPlay().then((m) => ({ default: m.AdventurePlay })));
 
 /** The start screen: no options of its own, music and Tapsi's language come from the home page. */
 export function AdventureGame() {
@@ -35,14 +29,35 @@ export function AdventureGame() {
     0,
     playable.findIndex((s) => s.id === settings.story),
   );
-  const chosen = playable[at].story;
+  const chosen = playable[at];
   // „Weiter“ at the end: the next story that can be played, after the last the first – none where there is only one.
   const next = playable.length > 1 ? playable[(at + 1) % playable.length] : undefined;
   // The app language, like every game. A story not told in it yet is said in English, or else in the language it was
   // written in – never German words with a Russian voice.
-  const language = targetLanguageFor(toldIn(chosen, app.id) ? app.id : toldIn(chosen, "en") ? "en" : firstLanguage(chosen));
-  // Built once per story and language: the game starts anew when the story changes.
-  const story = useMemo(() => storyIn(chosen, language.id), [chosen, language.id]);
+  const language = targetLanguageFor(entryToldIn(chosen, app.id) ? app.id : entryToldIn(chosen, "en") ? "en" : chosen.language);
+
+  // The first tap should not wait for the player's code: fetched once the page lies still and the browser is idle,
+  // then the story picked last – never while a book flies or a page turns, nor when the visitor saves data.
+  const chosenId = chosen.id;
+  useEffect(() => {
+    if (savesData()) return;
+    let live = true;
+    const cancel = afterPageMotion(() =>
+      afterLoad(() => {
+        if (!live) return;
+        const entry = STORIES.find((s) => s.id === chosenId);
+        void loadPlay()
+          .then(() => (entry && live ? loadStory(entry) : undefined))
+          .catch(() => {
+            // Offline: the tap will show the loading paper and try again.
+          });
+      }),
+    );
+    return () => {
+      live = false;
+      cancel();
+    };
+  }, [chosenId]);
 
   return (
     <GameShell
@@ -56,19 +71,39 @@ export function AdventureGame() {
         ar: "مغامرات الحركة",
         ru: "Приключения в движении",
       })}
-      modes={STORIES.map((s) => ({ id: s.id, emoji: s.emoji, title: storyTitle(s.story, app.id), unfinished: s.unfinished }))}
+      modes={STORIES.map((s) => ({ id: s.id, emoji: s.emoji, title: entryTitle(s, app.id), unfinished: s.unfinished }))}
       mode={settings.story}
       onMode={(id) => update({ story: id as AdventureStoryId })}
     >
-      {/* Its own music, which plays while music is on for all games. */}
-      <AdventurePlay
-        key={story.sequence.title}
-        story={story}
-        storyId={playable[at].id}
-        language={language}
-        settings={common}
-        next={next && { name: storyTitle(next.story, app.id), onNext: () => update({ story: next.id }) }}
-      />
+      {/* The paper with the paw track while the player's or the story's code still loads – never a dark screen. */}
+      <Suspense fallback={<PageLoading />}>
+        <StoryPlay
+          key={chosen.id}
+          entry={chosen}
+          language={language}
+          settings={common}
+          next={next && { name: entryTitle(next, app.id), onNext: () => update({ story: next.id }) }}
+        />
+      </Suspense>
     </GameShell>
   );
+}
+
+/** One story played: waits (suspends) for its code, then hands it to the player in its language. */
+function StoryPlay({
+  entry,
+  language,
+  settings,
+  next,
+}: {
+  entry: StoryEntry;
+  language: TargetLanguage;
+  settings: CommonSettings;
+  next?: { name: string; onNext: () => void };
+}) {
+  const loaded = use(loadStory(entry));
+  // Built once per story and language: the game starts anew when the story changes.
+  const story = useMemo(() => storyIn(loaded, language.id), [loaded, language.id]);
+  // Its own music, which plays while music is on for all games.
+  return <AdventurePlay story={story} storyId={entry.id} language={language} settings={settings} next={next} />;
 }

@@ -135,3 +135,9 @@ test("no attribute selector inside :has() and no * after it", () => {
   }
   expect(wrong).toEqual([]);
 });
+
+// Over the 3D canvas of Bewegungsabenteuer a backdrop blur is drawn again in every frame on a phone.
+test("no stylesheet of Bewegungsabenteuer uses backdrop-filter", () => {
+  const found = cssFiles.filter((file) => file.startsWith(join("src", "games", "adventure")) && /backdrop-filter/.test(readFileSync(file, "utf8")));
+  expect(found).toEqual([]);
+});
