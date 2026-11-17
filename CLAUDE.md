@@ -36,6 +36,12 @@ reload, so a game borrowing another's CSS shows only in `preview-pages` – `css
 every font a stylesheet names as base64, which made the start's stylesheet 64 KB instead of 28: the build moves them out
 into files named by their content and preloads the latin one (`fontsOutOfStyles` in `tools/build.ts`), and fails when a
 stylesheet still holds one. Keep it that way when adding such code.
+`bun run build` writes over the last build in `out/` (code review, November 2026: a build was 25–40 s, nearly all of it
+deleting and writing 28,000 files; a repeated one is now about 3 s): it bundles in memory, writes only files whose content
+changed (a static asset named by its own bytes is trusted by name and size, everything else compared byte by byte, each
+written under a temp name and renamed), deletes what this build did not make, and hashes the worker's version from all
+names plus the content of every file not named by its own bytes. `bun run build --clean` starts from an empty `out/`, as
+CI always does. Never let a build step list `out/` to learn what the build made (`buildTools.test.ts`).
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
 Use `dev` – it moves to the next free port when another session has 3000, so
@@ -191,7 +197,7 @@ In a fresh worktree run `bun install` first.
   language, a reload on every switch, a build step), so don't do it again.
   A text without a translation shows in its first language – German for the older texts, English for what is new
   (`pick`, `firstLanguage`, `language.test.ts`) –; a browser voice speaks it with that language's voice – never German
-  or English words with another language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`),
+  or English words with another language's voice: speak a text with the speech language of the language it is in (`spokenIn`),
   never a fixed `de-DE`. **A recording missing in the app language is replaced by the English one, else nothing plays,
   never the German one** (user decision, November 2026: a child hearing Russian or Spanish can't follow German;
   `recordingUrl` in `src/lib/voice.ts`, `voice.test.ts`): a line with several languages passes its English text as
@@ -403,7 +409,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   in `pageMotion.ts`) –, and a game's own story, clock or timers
   start in `afterPageMotion` / `usePageStill` – a new game that starts by itself does the same (`pageMotion.test.ts`).
 - Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice speaks
-  nothing of its own (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
+  nothing of its own – it sounds too poor for a child, and no game has a `speech` or `sounds` setting to branch on (both
+  were dead switches and were taken out, code review, November 2026). What a game says comes as a high-quality
   ElevenLabs recording (like Tapsi's lines in Bewegungsabenteuer), which always plays, like a sound; a line without
   one stays silent – except in a game whose story is told by the voice and can't be followed without it (Kleine
   Abenteuer, Bewegungsabenteuer): there the browser's voice (Google's) says a line until its recording is made
@@ -415,8 +422,10 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   three) – only there, never as a pattern for other games (`VoiceSwitch.test.ts`). Recordings are made only when the user asks (see Language).
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
-  browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard, and on
-  a game with the fallback that is not on its list).
+  browser's voice (`voiceLines.test.ts` fails when anything but `src/lib/voice.ts` takes `speak` from the speech module,
+  and on a game with the fallback that is not on its list). Lines that wait for their recording and are said by nothing
+  yet stay in the game as plain data (the Belohnungstafel's `lines.ts`), so the list keeps them – never delete a
+  translated line because nothing says it at the moment.
   A game gets its recordings by listing its lines in every language in `src/content/recordedLines.ts` (`bun run voice
   make --only <name>` records what is missing into its `stimme/`, `--dry` first) and playing them with
   `recordedVoice(files)` from `src/lib/voice.ts` (a `./stimme/**/*.mp3?glob` import), as Zähne putzen, Kleine
@@ -695,8 +704,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (Musik, Sprache), nor a switch for sounds or voice, nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
-  defaults (so new fields need no migration); `speech`/`sounds` are filled in from the
-  shared options (always off and on). Bump the key's `.vN` only when old values would break.
+  defaults (so new fields need no migration); a game with nothing to set has no `settings.ts`. Bump the key's `.vN` only when old values would break.
   What a game saves besides its settings (a week's stars, a day's mood) is read and written with `readStored` /
   `writeStored` of `src/lib/storage.ts`, never `localStorage` by hand, and dates that several games share (the day's
   key, its week, morning or evening) come from `src/lib/days.ts`, never from another game's folder (`days.test.ts`).
