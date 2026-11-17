@@ -25,7 +25,7 @@ export const SEO_EN: SeoTranslation = {
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
       description: "Living look-and-find pictures, movement games, chain reactions and little adventures that answer every tap. For toddlers, without ads.",
-      text: "Pictures and stories that answer every tap: more than twenty Living Pictures, Move-Along Adventures with Tapsi the fox, twenty Chain Reactions and marble runs, and Little Adventures in the elevator, along paths and in little films – with the fire brigade, at the bakery, with a letter for Grandma or in our own garden.",
+      text: "Pictures and stories that answer every tap: more than twenty Living Pictures, Move-Along Adventures with Tapsi the fox, twenty-one Chain Reactions and marble runs, and Little Adventures in the elevator, along paths and in little films – with the fire brigade, at the bakery, with a letter for Grandma or in our own garden. Four games stand in this book, some calm, some lively. In the look-and-find pictures, from the construction site to outer space, the child taps whatever it discovers, colors in, searches or shines a flashlight through the dark. In Chain Reaction one tap is enough, and marbles roll over wood, snow and water, or a machine in the kitchen, the garden or the circus sets off one thing after another. The Little Adventures last only a few minutes, and on the way the child helps decide. And when little legs get fidgety, Tapsi heads for Treasure Island or the cloud journey – hopping, ducking and stretching in front of the screen. Whoever finishes a track or a story gets a little trophy for it.",
     },
     "/spiele/gefuehle/": {
       title: "Feelings Games for Toddlers",
@@ -49,13 +49,13 @@ export const SEO_EN: SeoTranslation = {
       title: "Interactive Look-and-Find Pictures for Toddlers",
       description:
         "Over 20 look-and-find pictures for toddlers: construction site, farm, zoo, fire station and more. Everything moves and makes sounds – no ads.",
-      text: "Look-and-find pictures that come alive: diggers dig, cows moo, the fire engine drives off. With finding, coloring, drawing roads and exploring, for toddlers.",
+      text: "Look-and-find pictures that come alive: diggers dig, cows moo, the fire engine drives off. More than twenty pictures for toddlers lie in this book – construction site, farm, zoo and fire station, familiar places like the kitchen, bathroom, supermarket, daycare and the pediatrician, faraway ones like outer space, under the sea and a dinosaur valley, plus winter, autumn, Easter and a good-night picture for the evening. Above the pictures we choose how to play. In “Free exploring” everything the child taps answers with a movement and a sound, a surprise peeks out from behind some doors, and once everything is found, the whole picture celebrates. In “Coloring” the gray picture gets its colors back dab by dab, in “Find it” a bubble shows what wants to be found, and in “Questions” it is about what is red, what can fly or what has wheels. With the “Flashlight” the child shines through the dark picture, and in “Roads” it draws a way with a finger for a car, a tractor or a steam train to drive along. Now and then a vehicle even drives over into the next picture.",
     },
     "/abenteuer/": {
       title: "Indoor Movement Games for Toddlers",
       description:
         "Movement adventures to join in: Tapsi the fox shows jumping, stretching and sneaking, and the child moves along in front of the screen. No ads.",
-      text: "Movement stories for indoors, on a treasure island or on a trip with a little cloud: Tapsi jumps, ducks and stretches, the child joins in, and the world answers. No reading needed, Tapsi says it all.",
+      text: "Movement stories for indoors, on a treasure island or on a trip with a little cloud: Tapsi jumps, ducks and stretches, the child joins in, and the world answers. No reading needed, Tapsi says it all. On Treasure Island, about six minutes long, the fox waves to his parrot, casts his fishing line, paddles to the beach on a turtle, stamps, hops, drums, turns a crank and pulls a rope until the key opens the treasure chest and gold coins fly through the air. On the cloud journey, about three minutes, he flaps his arms so the cloud rises, ducks under little planes, taps balloons, leans into the curves, pushes the rain cloud away and paints a rainbow with big sweeps of his arms. Tapsi shows each movement first, a dark dancing figure shows it along with him, and then it is the child's turn – no camera needed. A tap on the picture pauses it, and small in the corner we grown-ups see how long the story still lasts.",
     },
     "/gefuehle/": {
       title: "Feelings for Toddlers – Everyday Situations",
@@ -103,36 +103,36 @@ export const SEO_EN: SeoTranslation = {
     "/socken/": {
       title: "Sock Pairs – Matching Game for Toddlers",
       description: "The washing machine is done: find pairs of socks and hang them on the line. A first pairs game for toddlers, without ads.",
-      text: "The socks tumble out of the washing machine. Matching socks sound the same; a pair hops onto the line. First a few pairs in bright colors, then more, with patterns and under laundry baskets like memory – as the child gets sure. Then come mittens, rain boots and bear slippers, each a left and a right one.",
+      text: "The socks tumble out of the washing machine. Matching socks sound the same; a pair hops onto the line. First a few pairs in bright colors, then more, with patterns and under laundry baskets like memory – as the child gets sure. Then come mittens, rain boots and bear slippers, each a left and a right one. The game starts by itself: the full machine washes, the door opens, the line comes down, and the socks lie on the floor. When the child taps one, it lifts and plays its sound, and when the child finds its partner, both hang on the line with pegs. Another sock is never wrong; the new one simply lifts instead. When all pairs hang, they hop once for joy, the line is pulled out of the picture, and the next wash already tumbles out, for as long as the child likes. It only gets harder in what there is to see and remember, never by a clock: two pairs grow to as many as six, and later only the pattern tells which socks belong together.",
     },
     "/buchstaben/": {
       title: "Free Typing – Learning Letters on the Keyboard",
       description:
         "Every key shows its letter with a picture and a voice: B for bear. Numbers come with things to count. A keyboard game for toddlers, without ads.",
-      text: "Free typing on the keyboard or the screen: every letter comes with a picture and a word, every number with things to count. If you like, capital and small letters, tracing with a finger and pictures on one theme.",
+      text: "Free typing on the keyboard or the screen: every letter comes with a picture and a word, every number with things to count. If you like, capital and small letters, tracing with a finger and pictures on one theme. The game starts at once and knows no wrong: when the child presses B, the letter appears big on a card, a bear with its word beside it, and the voice says “B for bear!”. Press three, and three things lie next to the digit, three apples for example. On a tablet the keys stand as big fields on the screen. Everything else waits behind the gear at the top right, which we grown-ups press and hold while the game goes on: whether a number's things are there at once or counted out, whether the letter appears in dots to trace while stars follow the finger, and whether the pictures come all mixed or from one theme like animals, vehicles, food or family.",
     },
     "/zaehlen/": {
       title: "Learning to Count – Number Game for Toddlers",
       description:
         "Every key brings a number with as many things to count: all at once, counted aloud, step by step or counted by tapping. For toddlers, without ads.",
-      text: "A number game on the keyboard or the screen: every digit shows itself with as many things, any other key brings a number from 1 to 9. The things come all at once, are counted aloud, come step by step, or the child taps each one and counts.",
+      text: "A number game on the keyboard or the screen: every digit shows itself with as many things, any other key brings a number from 1 to 9. The things come all at once, are counted aloud, come step by step, or the child taps each one and counts. Press four, and four apples, say, lie next to the big digit, and the voice says how many there are. How the things come is chosen by us grown-ups behind the gear at the top right, which we press and hold: with “All at once” they are there right away, with “Counted aloud” one appears after another and is counted out loud, with “Step by step” every key press brings the next, and with “Count by tapping” the child taps each thing until the digit stands there at the end. If you like, the digit comes only when the same number is pressed again right away, so the amount counts first, or it appears in dots to trace with a finger. On a tablet the number keys lie big on the screen.",
     },
     "/mitmachen/": {
       title: "Numbers to Join In – Hop, Clap, Stamp",
       description:
         "With every number a fox or bear child hops, claps or stamps just as often and counts aloud – and the child joins in. For toddlers, without ads.",
-      text: "A number game to move along with: every digit on the keyboard or the screen, any other key brings a number from 1 to 9. A fox or bear child invites – “Hop along!” – and hops, claps or stamps as often as the number says, its grown-up beside it. Each one is counted aloud, with a short wait so the child can join in. So the number becomes an amount in the child's own body.",
+      text: "A number game to move along with: every digit on the keyboard or the screen, any other key brings a number from 1 to 9. A fox or bear child invites – “Hop along!” – and hops, claps or stamps as often as the number says. Each one is counted aloud, with a short wait so the child can join in. So the number becomes an amount in the child's own body.",
     },
     "/woerter/": {
       title: "Typing Words – First Words for Toddlers",
       description:
         "Type first words letter by letter: bear, ball, colors and action words. Or “Where is the B?” – find the key for a letter. For toddlers, without ads.",
-      text: "A picture and its word: the child types it letter by letter on the keyboard or the screen. Picture words, colors, action words or all mixed, in three lengths. Or just the first letter: “Where is the B?” – find its key.",
+      text: "A picture and its word: the child types it letter by letter on the keyboard or the screen. Picture words, colors, action words or all mixed, in three lengths. Or just the first letter: “Where is the B?” – find its key. The letter whose turn it is waits under the picture, and on the screen keys its key lights up. Every right key puts it into the word and says its name; another key is no mistake, and after a few tries the voice says the letter it is looking for once more. When the word is finished, it is said and praised: a color word turns the screen its color, and an action word like “hop” is acted out by the picture, which invites the child to join in. Behind the gear, which we grown-ups press and hold, we choose the kind of words, their length of at most three, four or seven letters, and whether capital, small or both kinds of letters are shown.",
     },
     "/gross-klein/": {
       title: "Where Is Little b? – Capital and Small Letters",
       description: "A big letter looks for its little one: three small letters to choose from, and the right one walks over to it.",
-      text: "A letter game about capital and small letters: a big letter looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and stands beside it; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p.",
+      text: "A letter game about capital and small letters: a big letter looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and stands beside it; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p. The game starts at once, and there is nothing to set: when the child taps the matching letter or presses its key, it hops over in little jumps, and the voice says its name. When the child finds the right one at the first try three times in a row, the three become more alike, and after a miss they are plainly different again – so it stays neither too easy nor too hard. The letters are drawn plainly, without eyes or faces, so the eye stays on their shape. Along the way the child notices that the big A and the small a belong together.",
     },
     "/zaehne/": {
       title: "Tooth Brushing for Kids – Song and Timer",
