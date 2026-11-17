@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DevTag, letterCode } from "@/components/DevTag";
 import { StepBack } from "@/components/StepBack";
 import { nextLevel, useDeck } from "@/lib/rounds";
+import { decodePictures } from "@/lib/pictureFolder";
 import { DEV } from "@/lib/buildInfo";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
@@ -43,13 +44,7 @@ function useImagesReady(round: TogetherRound): boolean {
   useEffect(() => {
     let cancelled = false;
     const urls = key ? key.split("|") : [];
-    Promise.all(
-      urls.map((src) => {
-        const img = new Image();
-        img.src = src;
-        return img.decode().catch(() => undefined);
-      }),
-    ).then(() => {
+    decodePictures(urls).then(() => {
       if (!cancelled) setLoaded(key);
     });
     return () => {

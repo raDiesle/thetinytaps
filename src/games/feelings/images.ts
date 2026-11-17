@@ -2,28 +2,19 @@
 // A picture can have more frames for a little movement: "push-1" is the first,
 // "push-1-b" the second; they fade into each other in a loop.
 
+import { pictureFolder } from "@/lib/pictureFolder";
 import pictureFiles from "./bilder/*.webp?glob";
 
-const IMAGES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
-
-const FRAME_SUFFIXES = ["", "-b", "-c"];
+const folder = pictureFolder(pictureFiles, ["", "-b", "-c"]);
 
 /** The picture called `name` ("push-1", "baer-sad"), if there is one. */
-export function imageFor(name: string): string | undefined {
-  return IMAGES.get(name);
-}
+export const imageFor = folder.image;
 
 /** All frames of the picture `name`, first one first; empty if there is none. */
-export function framesFor(name: string): string[] {
-  return FRAME_SUFFIXES.map((suffix) => IMAGES.get(name + suffix)).filter((src) => src !== undefined);
-}
+export const framesFor = folder.frames;
 
 /** Starts loading these pictures with all their frames, so they don't pop in empty. */
-export function preloadImages(names: string[]) {
-  for (const name of names) {
-    for (const src of framesFor(name)) new Image().src = src;
-  }
-}
+export const preloadImages = folder.preload;
 
 /** Names of the pictures for one kindergarten story. */
 export const storyImages = {
