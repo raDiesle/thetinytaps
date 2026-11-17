@@ -4,6 +4,7 @@
 
 import type { ReactNode } from "react";
 import type { Localized } from "@/lib/language";
+import { pick, shuffle } from "@/lib/random";
 import { playClonk, playDing, playKnock, playRustle, playThump } from "@/lib/sfx";
 
 const INK = "#2a1e5c";
@@ -19,8 +20,6 @@ export interface Thing {
   sound: () => void;
   draw: () => ReactNode;
 }
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 function crayon(): Thing {
   const color = pick(["#ff5d73", "#3a86ff", "#3ec300", "#ffb703", "#8e7dff"]);
@@ -343,12 +342,6 @@ function broom(): Thing {
 
 const SMALL = [crayon, block, toiletRoll, can, saltShaker];
 const MIDDLE = [juice, bottle, cereal, umbrella, vase, thermos];
-
-const shuffle = <T,>(list: T[]) =>
-  list
-    .map((item) => ({ item, key: Math.random() }))
-    .sort((a, b) => a.key - b.key)
-    .map(({ item }) => item);
 
 /**
  * A new row of things, in `groups` runs from small to tall, so each one can

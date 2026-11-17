@@ -12,6 +12,8 @@ import { type ColorSort, type EndProps, INK, type ThingProps, TrackLook, type Tr
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
+import { shuffle } from "@/lib/random";
+import { useTimers } from "@/lib/timers";
 import {
   playBlub,
   playBoing,
@@ -294,6 +296,8 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const label = useLevelName(look.level);
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
+  // What comes a moment after a landing (its note, the end) is dropped when the run is left before it.
+  const { later } = useTimers();
   const routes = useMemo(buildRoutes, []);
   useEffect(() => loadRealSounds([...Object.values(look.release), look.landSound, look.fullSound]), [look]);
   /** How long the whole run is with the parts it starts with, for how much of it lies behind a thing. */
@@ -346,9 +350,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const box = useRef<HTMLDivElement>(null);
   /** The three things on the shelf, when each was put there, and which a key or a tap on the wall lets out next. */
   // A run that sorts by colour (K-10) always has one marble of each colour there.
-  const [firstShelf] = useState<Roller[]>(() =>
-    look.sort ? look.sort.colors.map(() => "marble") : [...ROLLERS].sort(() => Math.random() - 0.5).slice(0, SHELF.things.length),
-  );
+  const [firstShelf] = useState<Roller[]>(() => (look.sort ? look.sort.colors.map(() => "marble") : shuffle(ROLLERS).slice(0, SHELF.things.length)));
   const shelf = useRef(firstShelf);
   const filled = useRef(SHELF.things.map(() => -Infinity));
   const turn = useRef(0);
@@ -490,7 +492,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       fullAt.current = t + LAND_MS;
       sound(look.fullSound);
       say(look.full);
-      setTimeout(onDone, DONE_AFTER_FULL_MS);
+      later(onDone, DONE_AFTER_FULL_MS);
     }
   };
 
@@ -506,7 +508,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     const to = sort.landAt(tube, n);
     landed.current.push({ id: m.id, kind: m.kind, color: m.color, look: m.look, from: { x: m.x, y: m.y }, to, at: t });
     sound(playWhoosh);
-    setTimeout(() => {
+    later(() => {
       sound(() => {
         look.landSound(m.kind);
         playCountNote(n);
@@ -518,11 +520,11 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       done.current = true;
       fullTube.current = tube;
       fullAt.current = t + sort.hopMs;
-      setTimeout(() => {
+      later(() => {
         sound(look.fullSound);
         say(look.full);
       }, sort.hopMs);
-      setTimeout(onDone, sort.hopMs + DONE_AFTER_FULL_MS);
+      later(onDone, sort.hopMs + DONE_AFTER_FULL_MS);
     }
   };
 

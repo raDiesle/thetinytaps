@@ -1,0 +1,308 @@
+import { type PointerEvent, type ReactNode, useEffect, useState } from "react";
+import { StepBack as SharedStepBack } from "@/components/StepBack";
+import { screenTap } from "@/lib/tapGuard";
+import { distanceToRect, TAP_SLOP_PX } from "@/lib/tapTargets";
+import { framesFor } from "./images";
+
+// What a story's screen is built from – the big picture, its words, the choice cards, the ways on and back. Kept apart
+// from shared.tsx, which holds the game's voice: „Was ist passiert?“ builds its rounds from these parts with pictures
+// and a voice of its own, and importing them must not bring the list of Gefühle's recordings along (cause.test.ts).
+
+/** How long each frame of a moving picture stays before the next one fades in: slow, so nothing blinks. */
+const FRAME_MS = 1500;
+
+/**
+ * How the big picture looks. "story": what happens, as a framed photo. "quiet": the same while
+ * the child chooses, paler, so the cards stand out and it doesn't look like one of them.
+ * "good" and "bad": the answer to a choice, a still green or red frame with a tick or a cross.
+ */
+export type PictureLook = "story" | "quiet" | "good" | "bad";
+
+/** Which of `count` frames shows now: they take turns, like a tiny GIF; with `count` 1 the first stays. */
+function useFrame(count: number): number {
+  const [frame, setFrame] = useState(0);
+  const loops = count > 1;
+
+  useEffect(() => {
+    if (!loops || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
+    return () => clearInterval(timer);
+  }, [loops]);
+
+  return loops ? frame % count : 0;
+}
+
+/**
+ * The frames of a picture on top of each other; while `moving` they fade into each other in turn, otherwise the first
+ * stays. Only one thing moves at a time (user feedback, November 2026): the big picture while the scene is shown, the
+ * two cards while the child chooses.
+ */
+export function Frames({ name, moving, className, sources }: { name: string; moving: boolean; className?: string; sources?: string[] }) {
+  const frames = sources ?? framesFor(name);
+  const shown = useFrame(moving ? frames.length : 1);
+  if (frames.length === 0) return <Placeholder name={name} />;
+  return frames.map((src, i) => (
+    <img key={src} className={`${className ?? ""}${i === shown ? " on" : ""}`} src={src} alt="" decoding="async" draggable={false} />
+  ));
+}
+
+/**
+ * The big picture in the middle: what happens right now. Unless `still`, its frames fade into each other in a loop,
+ * like a tiny GIF, so the animals seem to move a little. Its text stands under it, outside it (`StoryWords`).
+ * Where it waits for a tap to go on, `GoOn` lies beside it: ▶ in the screen's corner, the whole screen tapped.
+ * Give it a new `key` with every new picture, so it starts at the first frame.
+ */
+export function StoryPicture({
+  name,
+  sources,
+  art,
+  look = "story",
+  still = false,
+  onTap,
+}: {
+  name: string;
+  /** The picture's frames, where another game shows its own pictures here (Was ist passiert?); otherwise found by `name`. */
+  sources?: string[];
+  /** A drawing shown instead of the picture `name` (the big face of „Wie geht's dir?“). */
+  art?: ReactNode;
+  look?: PictureLook;
+  /** Shows only the first frame: while the child chooses, the cards move instead. */
+  still?: boolean;
+  /** While the child chooses, the small scene above the cards: a tap brings it back big (`RoundPlay`). */
+  onTap?: () => void;
+}) {
+  return (
+    <div
+      className={`fg-frame fg-look-${look}${onTap ? " fg-frame-tap" : ""}`}
+      data-tap={onTap ? "" : undefined}
+      onPointerDown={
+        onTap &&
+        ((e: PointerEvent) => {
+          e.stopPropagation();
+          if (screenTap()) onTap();
+        })
+      }
+    >
+      <div className="fg-picture">{art ?? <Frames name={name} sources={sources} moving={!still} />}</div>
+      {/* On the corner, not over the picture, so what happened stays to be seen. */}
+      {look === "good" && <Mark good className="fg-picture-mark" />}
+      {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
+    </div>
+  );
+}
+
+/**
+ * Everything the voice says with the big picture, whole, under it (user feedback, November 2026: the text to read out
+ * stands under the pictures, never on them or on a sheet of its own). Set like Abstillen's sentence under its picture
+ * (`.mk-words`): the book's serif, its first letter big and red, at the size of every caption (`--caption-size`),
+ * between two curled flourishes.
+ */
+export function StoryWords({ text }: { text: string }) {
+  return (
+    <div className="fg-words">
+      <p className="fg-words-text">{text}</p>
+    </div>
+  );
+}
+
+/**
+ * "choose": the child can tap it; one tap chooses it (user feedback, November 2026: no second tap to confirm).
+ * "playing": chosen, the bear does it now. "wrong": the not-so-good idea, crossed out. "rest": waits.
+ */
+export type CardState = "choose" | "playing" | "wrong" | "rest";
+
+/** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
+export function ChoiceCard({
+  image,
+  sources,
+  caption,
+  state,
+  onChoose,
+  letter,
+  marker,
+}: {
+  /** Name of the picture, see images.ts. */
+  image: string;
+  /** The picture's frames, where another game shows its own pictures here (Was ist passiert?); otherwise found by `image`. */
+  sources?: string[];
+  /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
+  caption: string;
+  state: CardState;
+  onChoose?: () => void;
+  /**
+   * The letter on the card's corner („A“, „B“): the two choices are told apart by it and by the colour of its ring and
+   * circle (user wish, November 2026), never by which is right.
+   */
+  letter?: string;
+  /**
+   * A note for grown-ups on a page marker over the card's top edge („Heute früh“), kept out of the caption so the
+   * caption stays the card's few words and never covers the picture.
+   */
+  marker?: string;
+}) {
+  const active = state === "choose";
+  return (
+    <div className="fg-choice" data-letter={letter}>
+      <button
+        type="button"
+        className={`fg-card fg-card-${state}`}
+        // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
+        data-tap
+        disabled={!active}
+        aria-label={marker ? `${marker}: ${caption}` : caption}
+        onPointerDown={(e: PointerEvent) => {
+          e.stopPropagation();
+          // A tap right after the cards came (a double tap that brought them) picks nothing (`screenTap`).
+          if (active && screenTap()) onChoose?.();
+        }}
+      >
+        {/* While the child can choose, the card's frames take turns; the big picture stands still meanwhile. */}
+        <Frames name={image} sources={sources} moving={active} className="fg-card-image" />
+        {state === "playing" && <Mark good className="fg-card-mark" />}
+        {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
+      </button>
+      {letter && (
+        <span className="fg-card-letter" aria-hidden>
+          {letter}
+        </span>
+      )}
+      {marker && (
+        <span className="fg-card-marker" aria-hidden>
+          {marker}
+        </span>
+      )}
+      <span className="fg-caption" aria-hidden>
+        {caption}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Stands where a picture is planned but not made yet: its file name, so the grown-up can look up its prompt in
+ * bilder/prompts/geplant.md and make it (`/bild-erzeugen`). The caption under it says what it will show.
+ */
+function Placeholder({ name }: { name: string }) {
+  return (
+    <span className="fg-placeholder">
+      <span className="fg-placeholder-icon" aria-hidden>
+        🖼️
+      </span>
+      <span className="fg-placeholder-name">{name}</span>
+    </span>
+  );
+}
+
+/** A round green tick or red cross: good idea, or not so good. Drawn, so it reads the same everywhere. */
+export function Mark({ good, className = "" }: { good: boolean; className?: string }) {
+  return (
+    <svg className={`fg-mark ${good ? "good" : "bad"} ${className}`} viewBox="0 0 100 100" aria-hidden>
+      <circle cx="50" cy="50" r="44" />
+      <path d={good ? "M28 52 L44 68 L73 34" : "M32 32 L68 68 M68 32 L32 68"} />
+    </svg>
+  );
+}
+
+/** What else a grown-up or child may tap on the screen: a tap this close to one of them is not a tap to go on. */
+const OTHER_TAPS = ":is(button, a, [data-tap], [data-tap-keep]):not(.fg-next)";
+
+/**
+ * The way on wherever „Gefühle“ waits for a tap (a scene told, a chosen idea's last picture, a page of a day's story,
+ * the face to copy): ▶ always at the same place, the screen's bottom right corner, and the whole screen tapped to go
+ * on – except right next to anything else that can be tapped (the dots, the grown-ups' notes, ✕), whose taps stay
+ * theirs (user feedback, November 2026: ▶ moved from scene to page and lay under the grown-ups' notes). Put it as a
+ * direct child of the screen's `.story-play` or `.fg-day`; what lies above it lets its taps through.
+ */
+export function GoOn({ onNext, label }: { onNext: () => void; label: string }) {
+  return (
+    <>
+      <div
+        className="fg-go-on"
+        aria-hidden
+        onPointerDown={(e: PointerEvent<HTMLDivElement>) => {
+          const near = [...document.querySelectorAll(OTHER_TAPS)].some((el) => {
+            const box = el.getBoundingClientRect();
+            return box.width > 0 && distanceToRect(e.clientX, e.clientY, box) <= TAP_SLOP_PX;
+          });
+          // A second tap right after the first goes on only once (`screenTap`).
+          if (!near && screenTap()) onNext();
+        }}
+      />
+      <button
+        type="button"
+        className="fg-next"
+        data-tap="goal"
+        aria-label={label}
+        onPointerDown={(e: PointerEvent) => {
+          e.stopPropagation();
+          if (screenTap()) onNext();
+        }}
+      >
+        <svg className="fg-next-sign" viewBox="0 0 100 100" aria-hidden>
+          <circle cx="50" cy="50" r="44" />
+          <path d="M40 30 L72 50 L40 70 Z" />
+        </svg>
+      </button>
+    </>
+  );
+}
+
+/**
+ * The way back (`RoundPlay`, `DayPage`, `onBack`): bottom left, as ▶ is bottom right – from the choices to the scene
+ * told, from a scene to the page or scene before. Only a tap on it goes back, never on; the screen's other taps stay as
+ * they are (user feedback, November 2026: short scenes need a way back). The shared `StepBack`, placed as `.fg-back`.
+ */
+export function StepBack({ onBack, label }: { onBack: () => void; label: string }) {
+  return <SharedStepBack className="fg-back" onBack={onBack} label={label} />;
+}
+
+/**
+ * One dot per scene at the top: green with a tick when done, yellow for the one that comes now. With `onPick` the
+ * dots up to `upTo` are tapped to play that scene again – one done before, or the one now from its start (user wish,
+ * November 2026: grown-ups want to go back or repeat); the ones still to come are not.
+ */
+export function StepDots({
+  total,
+  done,
+  current,
+  upTo = done,
+  onPick,
+}: {
+  total: number;
+  done: number;
+  current: boolean;
+  /** The last dot that can be tapped, counted from 0. */
+  upTo?: number;
+  onPick?: (index: number) => void;
+}) {
+  return (
+    <span className="fg-dots">
+      {Array.from({ length: total }, (_, i) => {
+        const className = `fg-dot${i < done ? " done" : ""}${i === done && current ? " now" : ""}`;
+        const mark = i < done ? "✓" : "";
+        if (!onPick || i > upTo)
+          return (
+            <span key={i} className={className} aria-hidden>
+              {mark}
+            </span>
+          );
+        return (
+          <button
+            key={i}
+            type="button"
+            className={`${className} fg-dot-pick`}
+            // The nearest dot wins, done or not: a dot played is no answer already given.
+            data-tap=""
+            aria-label={String(i + 1)}
+            onPointerDown={(e: PointerEvent) => {
+              e.stopPropagation();
+              if (screenTap()) onPick(i);
+            }}
+          >
+            {mark}
+          </button>
+        );
+      })}
+    </span>
+  );
+}

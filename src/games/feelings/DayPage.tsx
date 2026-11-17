@@ -3,7 +3,8 @@ import { useT } from "@/lib/language";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
 import { preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
-import { Frames, GoOn, StepBack, StepDots, useLinesReady, useVoice } from "./shared";
+import { useLinesReady, useVoice } from "./shared";
+import { Frames, GoOn, StepBack, StepDots } from "./storyParts";
 
 /**
  * A page of a day's story between two scenes (`days.ts`): only told, never chosen in (user idea, November 2026). So it

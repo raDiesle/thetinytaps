@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type ComponentType, type PointerEvent } from "react";
+import { useCallback, useEffect, useState, type ComponentType, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useLevelOnScreen } from "@/components/GameShell";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage } from "@/lib/language";
+import { useTimers } from "@/lib/timers";
 import { BathLevel } from "./BathLevel";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
@@ -92,7 +93,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const { effects, ripple } = useTapFeedback();
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const { later } = useTimers();
 
   const sound = useCallback(
     (play: () => void) => {
@@ -110,19 +111,15 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     say(LEVEL_TEXTS[level.id].intro, false);
   }, [level, round, say]);
 
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
-
   const onDone = useCallback(() => {
     setParty(true);
     // The good-night machine ends as calmly as it ran.
     sound(level.id === "night" ? playLullaby : playMelody);
-    timers.current.push(
-      setTimeout(() => {
-        setParty(false);
-        setEnded(true);
-      }, PARTY_MS),
-    );
-  }, [sound, level.id]);
+    later(() => {
+      setParty(false);
+      setEnded(true);
+    }, PARTY_MS);
+  }, [sound, level.id, later]);
 
   // One ball in the goal is enough for the level's trophy (user decision, November 2026); the end shows it beside its buttons.
   const game = gameOfPath(useLocation().pathname)?.href;

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, listedGames } from "@/content/games";
-import { shelfBookOf } from "./bookTravel";
+import { putBookBack, shelfBookOf } from "./bookTravel";
 
 // The way back puts the book into its own gap (a shelf book's `data-book` is its category's id): every page in a book
 // finds it – the category's page and each of its games. A game standing apart has a book of its own; one still being
@@ -38,4 +38,48 @@ test("each of a game's volumes is found by its own address", () => {
 
 test("a page outside any book has none", () => {
   expect(shelfBookOf("/management/")).toBeUndefined();
+});
+
+// `putBookBack` once had no try/finally: a throw while the page was copied left the book „travelling“ for good, so no
+// book opened again until a reload. A page that can't be copied still goes back, and the next way back travels again.
+test("a way back that fails still goes back and leaves the next book free to travel", async () => {
+  const names = ["document", "matchMedia"] as const;
+  const real = names.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
+  let layers = 0;
+  const part = () => ({
+    className: "",
+    style: { setProperty: () => {}, pointerEvents: "" },
+    classList: { add: () => {}, remove: () => {} },
+    append: () => {},
+    remove: () => {},
+    animate: () => ({ finished: Promise.resolve() }),
+  });
+  const page = {
+    documentElement: { dataset: {} },
+    body: { append: () => layers++ },
+    createElement: part,
+    // Copying the page fails: the first thing the way back does after its layer is there.
+    getElementById: () => {
+      throw new Error("no page to copy");
+    },
+  };
+  Object.assign(globalThis, { document: page, matchMedia: () => ({ matches: false }) });
+  try {
+    const from = categoryHref(CATEGORIES.find((c) => !c.apart) ?? CATEGORIES[0]);
+    let went = 0;
+    for (const round of [1, 2]) {
+      expect(() => putBookBack(from, () => went++)).not.toThrow();
+      expect(went).toBe(round);
+      // A layer of its own each time: the second way back travels, it was not turned away as „still travelling“.
+      expect(layers).toBe(round);
+      // The failed move ends in a later step (its layer fades); only then the next may start.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  } finally {
+    names.forEach((name, i) => {
+      const was = real[i];
+      if (was) Object.defineProperty(globalThis, name, was);
+      else delete (globalThis as Record<string, unknown>)[name];
+    });
+  }
 });

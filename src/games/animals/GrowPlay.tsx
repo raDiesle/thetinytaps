@@ -3,7 +3,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
-import { choiceRows } from "@/games/shadows/levels";
+import { choiceRows } from "@/lib/rounds";
 import { GROW_MS, GROW_TEXTS, GrowthPicture } from "./growth";
 import type { GrowRound } from "./levels";
 import { voiceQuiet } from "@/lib/voice";

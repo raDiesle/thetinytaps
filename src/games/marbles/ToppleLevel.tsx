@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
+import { useTimers } from "@/lib/timers";
 import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { cameraOn } from "./machineKit";
@@ -121,6 +122,8 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const now = useRef(performance.now());
   const camera = useRef(0);
   const box = useRef<HTMLDivElement>(null);
+  // The knocks, the twinkle after the drum and the end are dropped when the level is left before them.
+  const { later } = useTimers();
 
   const drumBox: Pt[] = [
     { x: drumLeft, y: 0 },
@@ -131,9 +134,9 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   // Tock, tock, tock: each one on the first screen lands after dropping in; then the row is ready.
   useEffect(() => {
-    const timers = things.slice(0, onFirstScreen).map((t, i) => setTimeout(() => sound(() => playKnock(1100 - t.h)), i * DROP_STAGGER_MS + DROP_MS * 0.7));
+    const timers = things.slice(0, onFirstScreen).map((t, i) => later(() => sound(() => playKnock(1100 - t.h)), i * DROP_STAGGER_MS + DROP_MS * 0.7));
     timers.push(
-      setTimeout(
+      later(
         () => {
           phase.current = "ready";
         },
@@ -141,11 +144,11 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
       ),
     );
     return () => timers.forEach(clearTimeout);
-  }, [things, onFirstScreen, sound]);
+  }, [things, onFirstScreen, sound, later]);
 
   const finish = () => {
     phase.current = "done";
-    setTimeout(onDone, DONE_AFTER_DRUM_MS);
+    later(onDone, DONE_AFTER_DRUM_MS);
   };
 
   useFrames((dt, t) => {
@@ -185,7 +188,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
           } else {
             drumAt.current = t;
             sound(playDrum);
-            setTimeout(() => sound(playTwinkle), 350);
+            later(() => sound(playTwinkle), 350);
             say({
               de: "Bumm! Alles umgefallen!",
               en: "Boom! Everything fell over!",

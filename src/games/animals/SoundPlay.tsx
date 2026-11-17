@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { choiceRows } from "@/games/shadows/levels";
+import { choiceRows } from "@/lib/rounds";
 import { pick, useAppLanguage } from "@/lib/language";
 import { pageMoving } from "@/lib/pageMotion";
 import { playChime, playPop, playRandomNote, recordingReady, recordingSeconds } from "@/lib/sfx";

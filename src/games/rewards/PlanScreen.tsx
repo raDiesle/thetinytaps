@@ -8,6 +8,7 @@ import { type RoutineVisit, waitForStep } from "@/lib/routine";
 import { loadRealSounds, playCrow } from "@/lib/realSounds";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
+import { useTimers } from "@/lib/timers";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
 import { useRewardLabel } from "./BoardSheet";
 import { ItemPic, Pic, picture } from "./pictures";
@@ -119,6 +120,8 @@ export function PlanScreen({
   const move = useRef<Move | null>(null);
   /** A Countdown's moons still to count: a new tap starts the count again. */
   const moonTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  /** A party that comes a moment after its tap: dropped when the plan is left before it, so it never sounds elsewhere. */
+  const timers = useTimers();
   /** Where the marker lay before a tick or „Zurück“: it slides from there to the card to do now. */
   const markerFrom = useRef<DOMRect | null>(null);
   const today = new Date();
@@ -298,7 +301,7 @@ export function PlanScreen({
     glow(rect.left + rect.width / 2, rect.top + rect.height / 2);
     // The last morning: its sun rises, then the big day's picture comes big with its party.
     if (bigDayCome(plan, today, next[plan.id]))
-      setTimeout(() => {
+      timers.later(() => {
         setFresh(null);
         bigDayParty();
       }, 1100);
@@ -396,7 +399,7 @@ export function PlanScreen({
     // The reward reached: its party, whatever else is left.
     if (counts && plan.reward && before.count < before.goal && after.count >= after.goal) {
       const reward = plan.reward;
-      setTimeout(() => {
+      timers.later(() => {
         setWon(true);
         setParty(reward.emoji);
         sound(playTusch);
@@ -416,7 +419,7 @@ export function PlanScreen({
     const pair = plan.view === "first-then" ? pairsOf(steps)[Math.floor(index / 2)] : steps;
     const left = currentStep(pair, next[plan.id], linked, stepDay);
     if (left === -1) {
-      setTimeout(() => {
+      timers.later(() => {
         setWon(false);
         setParty(step.emoji);
         sound(playTusch);

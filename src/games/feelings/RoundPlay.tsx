@@ -3,26 +3,13 @@ import { DevTag, letterCode } from "@/components/DevTag";
 import { useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
+import { useTimers } from "@/lib/timers";
 import { preloadImages } from "./images";
 import { STORIES } from "./stories";
 import { beatText, openingLines, type ReadPart, roundText, roundImages, roundLines, type Round } from "./rounds";
 import type { FeelingsSettings } from "./settings";
-import {
-  CHEER_MS,
-  ChoiceCard,
-  GoOn,
-  OOPS_MS,
-  StepBack,
-  StepDots,
-  StoryPicture,
-  StoryWords,
-  cheer,
-  oops,
-  useLinesReady,
-  useTimers,
-  useVoice,
-  type PictureLook,
-} from "./shared";
+import { CHEER_MS, OOPS_MS, cheer, oops, useLinesReady, useVoice } from "./shared";
+import { ChoiceCard, GoOn, StepBack, StepDots, StoryPicture, StoryWords, type PictureLook } from "./storyParts";
 import { beatMs, type Beat } from "./story";
 
 /**

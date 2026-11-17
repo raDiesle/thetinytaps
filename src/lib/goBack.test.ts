@@ -1,22 +1,28 @@
 import { afterEach, expect, test } from "bun:test";
 import type { NavigateFunction } from "react-router";
-import { goBack, notePage } from "./goBack";
+import { goBack, notePage, STEP_BACK_WAIT_MS } from "./goBack";
 
-// A browser history as the router keeps it: entries with their `idx`, a step back arriving a moment later (popstate).
-function fakeBrowser() {
+// A browser history as the router keeps it: entries with their `idx`, a step back arriving a moment later (popstate) –
+// or never, with `lost`: the browser stays where it is and reports nothing.
+function fakeBrowser({ lost = false } = {}) {
   const entries: string[] = [];
   let idx = -1;
-  const listeners: (() => void)[] = [];
+  const listeners = new Set<() => void>();
   const history = {
     get state() {
       return { idx };
     },
     go(delta: number) {
+      if (lost) return;
       idx += delta;
-      for (const listener of listeners.splice(0)) listener();
+      for (const listener of [...listeners]) listener();
     },
   };
-  globalThis.window = { history, addEventListener: (_: string, listener: () => void) => listeners.push(listener) } as unknown as Window & typeof globalThis;
+  globalThis.window = {
+    history,
+    addEventListener: (_: string, listener: () => void) => listeners.add(listener),
+    removeEventListener: (_: string, listener: () => void) => listeners.delete(listener),
+  } as unknown as Window & typeof globalThis;
   /** Opens a page, as a link does. */
   const open = (path: string) => {
     entries.splice(++idx, entries.length, path);
@@ -58,4 +64,23 @@ test("a way back to a page not just before replaces the page left", () => {
   goBack(browser.navigate, "/spiele/lebendige-welten/");
   expect(browser.shown()).toBe("/spiele/lebendige-welten/");
   expect(browser.depth()).toBe(0);
+});
+
+// Only the browser's popstate ended the wait for a step back: where none came (an installed app's first entry, a page
+// restored from the browser's cache), ✕ and every corner did nothing more until a reload.
+test("a step back that never lands holds the ways back only for a moment", async () => {
+  const browser = fakeBrowser({ lost: true });
+  browser.open("/");
+  browser.open("/bilder/");
+  browser.open("/bilder/baustelle/");
+  goBack(browser.navigate, "/bilder/");
+  // The page shown is the one gone back to, whether or not the history then steps back.
+  expect(browser.shown()).toBe("/bilder/");
+  // A second tap right away still does nothing: the step back may yet land.
+  goBack(browser.navigate, "/kettenreaktion/");
+  expect(browser.shown()).toBe("/bilder/");
+  await Bun.sleep(STEP_BACK_WAIT_MS + 50);
+  // To a page not just before, so this test leaves no step back on its way.
+  goBack(browser.navigate, "/kettenreaktion/");
+  expect(browser.shown()).toBe("/kettenreaktion/");
 });

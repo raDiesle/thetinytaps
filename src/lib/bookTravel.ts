@@ -340,36 +340,50 @@ export function putBookBack(from: string, go: () => void) {
   const lies = pageMoves();
   // The screen as it is, still on top while the shelf comes in under it.
   const root = layer();
-  const print = copyScreen();
-  print.classList.add("bt-print-full");
-  root.append(print);
-  go();
-  const started = performance.now();
-  const findBook = async (): Promise<HTMLElement | null> => {
-    const book = document.querySelector<HTMLElement>(`.shelf [data-book="${id}"]`);
-    if (book || performance.now() - started > 1500) return book;
-    await frames(1);
-    return findBook();
-  };
-  void findBook().then((book) => {
-    if (!book) {
+  // Everything up to the first wait runs at once, as before: the page is copied and `go` called before this returns.
+  void (async () => {
+    let gone = false;
+    let book: HTMLElement | null = null;
+    try {
+      const print = copyScreen();
+      print.classList.add("bt-print-full");
+      root.append(print);
+      gone = true;
+      go();
+      const started = performance.now();
+      const findBook = async (): Promise<HTMLElement | null> => {
+        const found = document.querySelector<HTMLElement>(`.shelf [data-book="${id}"]`);
+        if (found || performance.now() - started > 1500) return found;
+        await frames(1);
+        return findBook();
+      };
+      book = await findBook();
+      if (!book) return;
+      const built = buildBook(book);
+      const m = moves(built);
+      book.dataset.away = "";
+      print.classList.remove("bt-print-full");
+      print.style.transform = m.print;
+      built.left.append(print);
+      root.append(built.book);
+      setTimeout(() => playPageTurn(OPEN / 1000), ZOOM);
+      await travel(built, m, "reverse")();
+    } catch {
+      // A move cut short (the page hidden meanwhile, a copy that failed): the way back itself is never dropped.
+      if (!gone) go();
+    } finally {
+      // Whatever happened, the next book can travel: left set, no book opened again until a reload (as in takeOutBook).
       travelling = false;
-      void leave(root, 250).finally(lies);
-      return;
+      if (book) {
+        delete book.dataset.away;
+        root.remove();
+        lies();
+      } else {
+        // No book to close (the shelf never came, or the move failed before it): the copy of the page just fades.
+        void leave(root, 250)
+          .catch(() => root.remove())
+          .finally(lies);
+      }
     }
-    const built = buildBook(book);
-    const m = moves(built);
-    book.dataset.away = "";
-    print.classList.remove("bt-print-full");
-    print.style.transform = m.print;
-    built.left.append(print);
-    root.append(built.book);
-    setTimeout(() => playPageTurn(OPEN / 1000), ZOOM);
-    travel(built, m, "reverse")().finally(() => {
-      delete book.dataset.away;
-      travelling = false;
-      root.remove();
-      lies();
-    });
-  });
+  })();
 }

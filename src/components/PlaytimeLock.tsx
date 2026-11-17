@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
+import { useHold } from "@/lib/hold";
 import { useT } from "@/lib/language";
 import { usePlaytimeState } from "@/lib/playtime";
 import { routineReturn } from "@/lib/routine";
@@ -93,34 +94,13 @@ function Lock() {
 /** The grown-ups' way in: ⏳ held for three seconds while its ring fills; letting go earlier does nothing. */
 function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
   const t = useT();
-  const [holding, setHolding] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-
-  const press = () => {
-    if (timer.current) return;
-    setHolding(true);
-    timer.current = setTimeout(onUnlock, UNLOCK_HOLD_MS);
-  };
-  const release = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-    setHolding(false);
-  };
-  const isPressKey = (key: string) => key === "Enter" || key === " ";
+  const { holding, props } = useHold(onUnlock, UNLOCK_HOLD_MS);
 
   return (
     <div className="playtime-lock-unlock">
       <button
         type="button"
         className={`playtime-lock-hold${holding ? " holding" : ""}`}
-        style={{ "--hold-ms": `${UNLOCK_HOLD_MS}ms` } as CSSProperties}
         aria-label={t({
           de: "Für Erwachsene: Spielzeit (3 Sekunden gedrückt halten)",
           ru: "Для взрослых: время игры (удерживать 3 секунды)",
@@ -130,21 +110,7 @@ function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
           es: "Para adultos: tiempo de juego (mantener pulsado 3 segundos)",
           ar: "للكبار: وقت اللعب (ضغط مطوّل 3 ثوانٍ)",
         })}
-        onPointerDown={(e) => {
-          // A finger that slides a little still counts as holding.
-          e.currentTarget.setPointerCapture(e.pointerId);
-          press();
-        }}
-        onPointerUp={release}
-        onPointerCancel={release}
-        onContextMenu={(e) => e.preventDefault()}
-        onKeyDown={(e) => {
-          if (!isPressKey(e.key)) return;
-          e.preventDefault();
-          if (!e.repeat) press();
-        }}
-        onKeyUp={(e) => isPressKey(e.key) && release()}
-        onBlur={release}
+        {...props}
       >
         ⏳
       </button>

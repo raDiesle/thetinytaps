@@ -1,4 +1,4 @@
-import { shuffle } from "@/games/shadows/deck";
+import { shuffle } from "@/lib/random";
 import type { Pair } from "./pairs";
 
 /** The two kinds of rounds: things of the day that belong together (Z-03), helpers and what they need (Z-13). */
@@ -9,7 +9,7 @@ export const KIND_ORDER: RoundKind[] = ["pair", "helper"];
 
 /**
  * How many to choose from on each step, which the game climbs (or goes back down) by how the child plays (`nextLevel`
- * from Schatten finden); every visit begins on the first. Harder means more to choose from, never quicker.
+ * in `@/lib/rounds`); every visit begins on the first. Harder means more to choose from, never quicker.
  */
 export const TOGETHER_LEVELS: number[] = [2, 3, 3, 4, 4];
 

@@ -6,6 +6,7 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
+import { pick } from "@/lib/random";
 import { speak } from "@/lib/speech";
 import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
@@ -48,8 +49,6 @@ const DRIVE_MIN_MS = 1400;
 const DRIVE_MAX_MS = 3000;
 /** …and how long the sign at the edge waits to be followed before the vehicle comes back. */
 const GONE_MS = 15000;
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /**
  * Per item: how often it was started (remounts restart the animation), whether it is running

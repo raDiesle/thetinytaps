@@ -4,6 +4,7 @@ import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/s
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
+import { useTimers } from "@/lib/timers";
 import {
   addStar,
   addWayStar,
@@ -82,6 +83,8 @@ export function BoardScreen({
   // The party's reward: a way's on a collecting board, else the board's; null for a party together.
   const [party, setParty] = useState<{ reward: BoardReward | null } | null>(null);
   const { effects, glow, celebrate } = useTapFeedback();
+  // A party comes a moment after its star: dropped when the board is left before it, so it never sounds elsewhere.
+  const { later } = useTimers();
   const today = new Date();
   const stars = log[board.id];
 
@@ -190,7 +193,7 @@ export function BoardScreen({
     const reward = way ? way.reward : board.reward;
     if (goalReached) {
       // The big party: the reward, or just the joy of it.
-      setTimeout(() => {
+      later(() => {
         setParty({ reward });
         sound(playTusch);
         celebrate();
@@ -210,8 +213,8 @@ export function BoardScreen({
       }, 500);
     } else if ((board.kind === "week" || board.kind === "month") && !wasFull && dayFull(board, next[board.id], linked, pending.day)) {
       // A day with all its stars: a small party right there.
-      setTimeout(() => celebrate({ at: { x: x ?? window.innerWidth / 2, y: y ?? window.innerHeight / 2 } }), 120);
-      setTimeout(() => sound(playChime), 300);
+      later(() => celebrate({ at: { x: x ?? window.innerWidth / 2, y: y ?? window.innerHeight / 2 } }), 120);
+      later(() => sound(playChime), 300);
       say(
         t({
           de: "Super! Der Tag ist voll!",

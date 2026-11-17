@@ -4,7 +4,9 @@ import { moodImages, preloadImages } from "./images";
 import { usePickKeys } from "./moodGroups";
 import { BREATH_MS, CALM_DONE, CALM_LINE, NEEDS, NEEDS_QUESTION, type Need } from "./needs";
 import type { FeelingsSettings } from "./settings";
-import { ChoiceCard, useTimers, useVoice } from "./shared";
+import { useTimers } from "@/lib/timers";
+import { useVoice } from "./shared";
+import { ChoiceCard } from "./storyParts";
 
 /** A need's picture: the little bear doing it alone. */
 const pictureOf = (need: Need) => moodImages.need(need.id);

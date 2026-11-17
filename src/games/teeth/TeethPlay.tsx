@@ -7,6 +7,7 @@ import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/l
 import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { pageMoving, usePageStill } from "@/lib/pageMotion";
 import { finishRoutineStep } from "@/lib/routine";
+import { useTimers } from "@/lib/timers";
 import { hush, recordedVoice } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
@@ -310,6 +311,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The end's fanfare and cheer come over most of a second: left meanwhile, they must not sound in the menu.
+  const { later } = useTimers();
   const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
   const room = useRef<HTMLDivElement>(null);
@@ -433,8 +436,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     } else {
       // Done: a fanfare of notes and children cheering; the medal and the grin say the rest, nothing rises.
       if (settings.sounds) {
-        [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
-        setTimeout(() => playRecorded("cheer", playTusch), 700);
+        [0, 1, 2, 3, 4, 5].forEach((i) => later(() => playCountNote(i), i * 120));
+        later(() => playRecorded("cheer", playTusch), 700);
       }
       // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
       if (!sung) say(spokenIn(DONE_SAY, language));

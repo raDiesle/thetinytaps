@@ -22,6 +22,13 @@ let trail = readTrail();
 /** A step back is on its way (the browser moves through its history a moment later). */
 let stepping = false;
 
+/**
+ * How long a step back is waited for before the ways back work again without it. The browser reports it (popstate)
+ * within a few frames, some ten ms even on a slow phone; half a second is well past that and past a child's hand
+ * landing twice, which the wait is there for, and short enough that a grown-up's next tap on ✕ is not lost.
+ */
+export const STEP_BACK_WAIT_MS = 500;
+
 /** The router's place of the current entry in the browser's history; none outside the router. */
 const place = (): number | undefined => {
   const idx = (window.history.state as { idx?: unknown } | null)?.idx;
@@ -66,6 +73,15 @@ export function goBack(navigate: NavigateFunction, to: string) {
   navigate(to, { replace: true });
   if (!step) return;
   stepping = true;
-  window.addEventListener("popstate", () => (stepping = false), { once: true });
+  const landed = () => {
+    stepping = false;
+    clearTimeout(lost);
+    window.removeEventListener("popstate", landed);
+  };
+  window.addEventListener("popstate", landed);
+  // A step back that never lands (no entry before this one after all, a page restored from the browser's cache) must
+  // not hold every later way back: ✕ and the corner then did nothing until a reload. The page shown is `to` already
+  // (replaced above), so nothing is navigated again – by then the child may have gone on from there.
+  const lost = setTimeout(landed, STEP_BACK_WAIT_MS);
   window.history.go(-1);
 }

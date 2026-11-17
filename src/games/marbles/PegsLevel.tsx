@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playPlink, playPop } from "@/lib/sfx";
 import { loadRealSounds, playBark, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
+import { useTimers } from "@/lib/timers";
 import { cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { BAR_COLORS, Ball } from "./parts";
@@ -103,9 +104,9 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   /** Sparkles where a marble found its bin full. */
   const pops = useRef<{ x: number; y: number; at: number }[]>([]);
   const landed = useRef(0);
-  const doneTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // The end is dropped when the level is left before it.
+  const { later } = useTimers();
 
-  useEffect(() => () => clearTimeout(doneTimer.current), []);
   useEffect(() => loadRealSounds([playBark, playCroak, playMeow, playMoo, playOink, playQuack]), []);
 
   const plink = (peg: number) => {
@@ -129,7 +130,7 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
     landed.current++;
     // The first marble in a bin wins the level's trophy.
     if (landed.current === 1) onGoal?.();
-    if (landed.current === DONE_AFTER) doneTimer.current = setTimeout(onDone, DONE_DELAY_MS);
+    if (landed.current === DONE_AFTER) later(onDone, DONE_DELAY_MS);
   };
 
   /** Once below the dividers' tops, a marble picks its bin and the place in it it will lie. */

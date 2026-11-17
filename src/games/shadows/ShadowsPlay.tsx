@@ -8,20 +8,8 @@ import { mayDrag, tapState } from "@/lib/tapTargets";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { animalsVoice } from "@/games/animals/voice";
 import { ITEMS, PEEK_ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
-import { useDeck } from "./deck";
-import {
-  choiceRows,
-  dealPeek,
-  dealShadows,
-  nextLevel,
-  PEEK_LEVELS,
-  poseShadows,
-  QUICK_STEPS,
-  SHADOW_LEVELS,
-  type PeekLevel,
-  type ShadowLevel,
-  type ShadowPose,
-} from "./levels";
+import { choiceRows, nextLevel, useDeck } from "@/lib/rounds";
+import { dealPeek, dealShadows, PEEK_LEVELS, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type PeekLevel, type ShadowLevel, type ShadowPose } from "./levels";
 import { PeekPlay } from "./PeekPlay";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
 import { shadowsVoice } from "./voice";

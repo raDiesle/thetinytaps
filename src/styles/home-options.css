@@ -78,6 +78,8 @@
   background: #fff;
   box-shadow: var(--lift);
   text-align: left;
+  /* It takes the focus as it opens (MenuButton), for keyboards and screen readers: no ring round the whole menu. */
+  outline: none;
 }
 
 /* Name and ✕ only where the menu covers the whole screen (phones, below). */

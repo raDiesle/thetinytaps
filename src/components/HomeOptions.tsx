@@ -17,7 +17,9 @@ import { downloadMusic } from "@/lib/musicFile";
  * screen, with its name and ✕ on top. Tapping outside, ✕ or Escape closes it;
  * the tap that closes it lands on a see-through backdrop, so it never also
  * starts the game underneath. While there is more below, a bar at the bottom
- * says so, so a grown-up knows to scroll.
+ * says so, so a grown-up knows to scroll. Open, it is a dialog with the thing's name that takes the focus, and closed
+ * the focus goes back to the thing: without that a keyboard or a screen reader stayed on the shelf behind it and never
+ * reached play time, the language or the offline copy.
  */
 export function MenuButton({
   icon,
@@ -42,6 +44,15 @@ export function MenuButton({
   const [open, setOpen] = useState(false);
   const [more, setMore] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLButtonElement>(null);
+
+  // The focus goes into the menu as it opens and back to its thing as it closes (not when the whole page goes, the
+  // thing with it). Without scrolling: the shelf never scrolls, and the menu opens at its top.
+  useEffect(() => {
+    if (!open) return;
+    panel.current?.focus({ preventScroll: true });
+    return () => opener.current?.focus({ preventScroll: true });
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -77,7 +88,7 @@ export function MenuButton({
     <>
       {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
       <div className="home-menu-backdrop" onClick={() => setOpen(false)} />
-      <div ref={panel} className="home-menu-panel">
+      <div ref={panel} className="home-menu-panel" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1}>
         <div className="home-menu-head">
           <span className="home-menu-name">
             <span aria-hidden>{icon}</span> {label}
@@ -112,11 +123,12 @@ export function MenuButton({
 
   return (
     <div className="home-menu">
-      <button type="button" className={className} aria-expanded={open} title={label} aria-label={label} onClick={() => setOpen(!open)}>
+      <button ref={opener} type="button" className={className} aria-expanded={open} title={label} aria-label={label} onClick={() => setOpen(!open)}>
         {art}
       </button>
       {/* The bookshelf's 3D room opens the menu outside it, over the whole screen (a transform would hold it in). */}
       {sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body)}
+      {/* Kept unseen while closed, as plain text: no dialog and nothing to focus until it is opened. */}
       {keep && !open && <div hidden>{children}</div>}
     </div>
   );

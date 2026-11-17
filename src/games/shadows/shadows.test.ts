@@ -13,8 +13,9 @@ import {
   SHADOW_TRANSLATIONS,
 } from "./content";
 import { GRID, pickPeepholes } from "./glyph";
+import { nextLevel } from "@/lib/rounds";
 import { RUSSIAN_NAMES } from "./content.ru";
-import { dealPeek, dealShadows, nextLevel, PEEK_LEVELS, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel } from "./levels";
+import { dealPeek, dealShadows, PEEK_LEVELS, poseShadows, QUICK_STEPS, SHADOW_LEVELS, type ShadowLevel } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -165,17 +166,6 @@ test("turned shadows are plainly turned, mirrored steps show at least one mirror
       expect(poses.some((p) => p.flip)).toBe(!!level.mirror);
     }
   }
-});
-
-test("sure goes up, unsure goes down, never past the ends", () => {
-  expect(nextLevel(0, [0])).toBe(0);
-  expect(nextLevel(0, [0, 0])).toBe(1);
-  expect(nextLevel(SHADOW_LEVELS.length - 1, [0, 0])).toBe(SHADOW_LEVELS.length - 1);
-  expect(nextLevel(2, [1, 0])).toBe(2);
-  expect(nextLevel(2, [2])).toBe(1);
-  expect(nextLevel(2, [1])).toBe(2);
-  expect(nextLevel(2, [1, 1])).toBe(1);
-  expect(nextLevel(0, [3])).toBe(0);
 });
 
 test("the first steps are left after one sure picture, so a child who knows them soon reaches the harder ones", () => {

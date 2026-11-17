@@ -1,5 +1,6 @@
 import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
+import { pick as oneOf, shuffle } from "@/lib/random";
 
 /** A sock colour: the knitted body and the lighter cuff, heel and toe. */
 export interface SockColor {
@@ -99,16 +100,6 @@ export const SOCK_LEVELS: SockLevel[] = [
   { pairs: 6, kind: "twins", covered: 4 },
 ];
 
-/** A new list with the same items in random order. */
-export function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
 /** The pairs of one wash at `level`; no two look the same, except in `twins`, where every look comes twice. */
 export function dealPairs({ pairs, kind }: Pick<SockLevel, "pairs" | "kind">): SockLook[] {
   const colors = shuffle(SOCK_COLORS);
@@ -154,9 +145,6 @@ export function nextLevel(level: number, { pairs, misses, ms }: WashResult): num
   else if (missesPerPair >= 1.5 || secondsPerPair >= 20) step = -1;
   return Math.max(0, Math.min(SOCK_LEVELS.length - 1, level + step));
 }
-
-/** One of `list`, at random. */
-export const oneOf = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /** What is said (only with "Vorlesen" on) and shown, in one language. */
 export interface SockTexts {

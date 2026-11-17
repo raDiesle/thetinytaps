@@ -7,6 +7,7 @@ import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
 import { useAppLanguage } from "@/lib/language";
+import { pick, shuffle } from "@/lib/random";
 import { playChime } from "@/lib/sfx";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { LetterWord } from "./Cards";
@@ -38,17 +39,6 @@ function findableLetters(pack: LanguagePack, theme: "all" | ThemeId): LetterEntr
   const matching = plain.filter((l) => l.words.some((w) => w.theme === theme));
   return matching.length > 0 ? matching : plain;
 }
-
-function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /** A letter to look for, with its picture. */
 type Sought = { letter: LetterEntry; word: WordEntry };

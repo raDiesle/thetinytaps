@@ -14,13 +14,18 @@ let bytes: Promise<ArrayBuffer | null> | null = null;
 /**
  * Starts downloading the song, once per visit; null when there is none. Only the
  * file: decoding needs the audio context, which the browser allows after the first tap.
+ * A download that failed is forgotten, so the next call tries again: kept, one flaky request at the start left the
+ * whole visit without music (as `fileOf` in voice.ts does for a line).
  */
 export function downloadMusic() {
-  bytes ??= SONG_URL
-    ? fetch(SONG_URL)
-        .then((response) => (response.ok ? response.arrayBuffer() : null))
-        .catch(() => null)
-    : Promise.resolve(null);
+  if (!SONG_URL) return Promise.resolve(null);
+  bytes ??= fetch(SONG_URL)
+    .then((response) => (response.ok ? response.arrayBuffer() : null))
+    .catch(() => null)
+    .then((data) => {
+      if (!data) bytes = null;
+      return data;
+    });
   return bytes;
 }
 

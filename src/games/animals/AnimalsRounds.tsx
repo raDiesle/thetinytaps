@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SHADOW_RECORDINGS } from "@/games/shadows/content";
-import { useDeck } from "@/games/shadows/deck";
-import { nextLevel } from "@/games/shadows/levels";
+import { nextLevel, useDeck } from "@/lib/rounds";
 import { DEV } from "@/lib/buildInfo";
 import { useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";

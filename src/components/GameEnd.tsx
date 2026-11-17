@@ -1,4 +1,4 @@
-import { type CSSProperties, type PointerEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, type PointerEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useCountsPlaytime, useEndShown, useLeaveGame, useLeavesToShelf } from "@/components/GameShell";
 import { ShelfLabelArt } from "@/components/PageCornerArt";
@@ -6,6 +6,8 @@ import { track } from "@/lib/analytics";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
+import { noPointerClick } from "@/lib/press";
+import { screenTap } from "@/lib/tapGuard";
 import { awardTrophy, gameOfPath, trophyKey, useTrophies } from "@/lib/trophies";
 import { museumHref, TROPHY_ROOM } from "@/lib/museum";
 import { recordedVoice } from "@/lib/voice";
@@ -184,12 +186,27 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
 
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
   // „Nochmal“ and „Weiter“ each start one more game, for a game limit.
-  const press = (event: "nochmal" | "weiter", action: () => void) => (e: PointerEvent) => {
-    e.stopPropagation();
-    track(event, { spiel: pathname });
-    if (counts) countGame();
-    // The next round comes on a new page.
-    turnPageWith("forward", action);
+  const press = (event: "nochmal" | "weiter", action: () => void) => {
+    const go = () => {
+      track(event, { spiel: pathname });
+      if (counts) countGame();
+      // The next round comes on a new page.
+      turnPageWith("forward", action);
+    };
+    return {
+      onPointerDown: (e: PointerEvent) => {
+        e.stopPropagation();
+        go();
+      },
+      // Enter, Space or a screen reader, which send no pointer: one step for one press, also while the key repeats.
+      onClick: noPointerClick(() => {
+        if (screenTap()) go();
+      }),
+    };
+  };
+  // On its board the trophy opens the trophy room at it.
+  const openTrophy = () => {
+    if (game) void navigate(museumHref(trophyKey(game, level)));
   };
 
   return (
@@ -210,9 +227,17 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
             className={`game-end-trophy${award && !landed ? " awarding" : ""}`}
             style={award}
             data-tap=""
-            role={landed ? "link" : undefined}
-            aria-label={landed ? t(TROPHY_ROOM) : undefined}
-            onPointerDown={() => (landed ? navigate(museumHref(trophyKey(game, level))) : setLanded(true))}
+            onPointerDown={() => (landed ? openTrophy() : setLanded(true))}
+            // On its board it is a link, reached and opened without a pointer too: by Tab and Enter, or a screen reader's click.
+            {...(landed && {
+              role: "link",
+              "aria-label": t(TROPHY_ROOM),
+              tabIndex: 0,
+              onKeyDown: (e: KeyboardEvent) => {
+                if (e.key === "Enter" && !e.repeat) openTrophy();
+              },
+              onClick: noPointerClick(openTrophy),
+            })}
           >
             <Trophy game={game} level={level} wins={wins} className="game-end-trophy-art" />
             {!landed && <span className="game-end-done">{t({ de: "Geschafft!" })}</span>}
@@ -247,7 +272,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
           </button>
         ) : (
           onAgain && (
-            <button type="button" className="game-end-button again" onPointerDown={press("nochmal", onAgain)}>
+            <button type="button" className="game-end-button again" {...press("nochmal", onAgain)}>
               {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}
             </button>
           )
@@ -260,7 +285,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
           aria-label={[t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" }), next.name]
             .filter(Boolean)
             .join(": ")}
-          onPointerDown={press("weiter", next.onNext)}
+          {...press("weiter", next.onNext)}
         >
           {t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}
           {showNext && next.name && <span className="game-end-next-name">{next.name}</span>}

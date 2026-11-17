@@ -59,16 +59,36 @@ export function unlockAudio() {
 const RECORDING_URLS = new Map(Object.entries(soundFiles).map(([file, url]) => [file.replace(/\.mp3$/, ""), url]));
 const recordings = new Map<string, Promise<AudioBuffer | null>>();
 const loaded = new Map<string, AudioBuffer>();
+/** When a recording last failed to load (`performance.now()`), so it is not asked for again right away. */
+const failedAt = new Map<string, number>();
 
-/** Starts loading these recordings, so they are ready by the first tap; names without a file are skipped. */
+/**
+ * How long a recording that failed to load is left alone: every tap on its sound asks for it again (playRecorded), and
+ * a child hammering a key offline must not send a request with each press.
+ */
+export const RECORDING_RETRY_MS = 5000;
+
+/**
+ * Starts loading these recordings, so they are ready by the first tap; names without a file are skipped. One that
+ * failed is forgotten and loaded again by a later call (after RECORDING_RETRY_MS): kept as failed, one flaky request
+ * left only the synthesized sound for the whole visit.
+ */
 export function loadRecordings(names: Iterable<string>) {
   const ac = audio();
   if (!ac) return;
   for (const name of names) {
     const url = RECORDING_URLS.get(name);
     if (!url || recordings.has(name)) continue;
+    const failed = failedAt.get(name);
+    if (failed !== undefined && performance.now() - failed < RECORDING_RETRY_MS) continue;
     const buffer = loadSound(url).then((decoded) => {
-      if (decoded) loaded.set(name, decoded);
+      if (decoded) {
+        loaded.set(name, decoded);
+        failedAt.delete(name);
+      } else {
+        recordings.delete(name);
+        failedAt.set(name, performance.now());
+      }
       return decoded;
     });
     recordings.set(name, buffer);
@@ -89,6 +109,8 @@ export async function loadSound(url: string): Promise<AudioBuffer | null> {
   if (!audio()) return null;
   try {
     const response = await fetch(url);
+    // An error page (a 404 after a deploy, the service worker's answer offline) is no sound to decode.
+    if (!response.ok) return null;
     return await decodeSound(await response.arrayBuffer());
   } catch {
     return null;

@@ -53,16 +53,23 @@ export function Home() {
   return <Bookshelf secretProps={secretProps} legal={<LegalLinks />} />;
 }
 
-/** Holding the foxes on the title's o opens the hidden management page: the handlers for them. */
-function useSecretHold(): HTMLAttributes<HTMLElement> {
+/**
+ * Holding the foxes on the title's o opens the hidden management page: the handlers for them. Not `useHold`, which
+ * fills a ring (a new render of the whole shelf), keeps the tap from the page and holds on when the finger slides off.
+ */
+export function useSecretHold(): HTMLAttributes<HTMLElement> {
   const navigate = useNavigate();
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const beginHold = () => {
-    holdTimer.current = setTimeout(() => navigate("/management/"), IDEAS_HOLD_MS);
-  };
   const cancelHold = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+  };
+  const beginHold = () => {
+    // A second finger landing starts the hold anew: its timer must not leave the first one running, which no lift
+    // would stop any more – the page would open under a child's hand after both fingers were gone.
+    cancelHold();
+    holdTimer.current = setTimeout(() => navigate("/management/"), IDEAS_HOLD_MS);
   };
 
   useEffect(() => cancelHold, []);

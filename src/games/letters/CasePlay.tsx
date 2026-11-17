@@ -3,10 +3,12 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { keyMatches, keyOf, toLower } from "@/content/languages";
 import type { LanguagePack, LetterEntry } from "@/content/types";
 import type { Localized } from "@/lib/language";
+import { shuffle } from "@/lib/random";
 import { playChime } from "@/lib/sfx";
 import { ASIDE_LINE_GAP_MS, repeatPause } from "@/lib/spacing";
 import { screenChanged } from "@/lib/tapGuard";
 import { tapState } from "@/lib/tapTargets";
+import { useTimers } from "@/lib/timers";
 import { useVoiceReady } from "@/lib/voiceReady";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
@@ -56,15 +58,6 @@ export const caseLetters = (pack: LanguagePack) =>
 /** The group of look-alikes a small letter belongs to (its plain form: ä counts as a). */
 const groupOf = (lower: string) => ALIKE.findIndex((group) => group.includes(lower) || group.includes(lower.normalize("NFD")[0]));
 
-function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
 /**
  * The three small letters for `letter`: its own and two others, never one whose big letter is the same. Easy: none of
  * the others looks like it nor like each other; `alike`: one of them looks like it, where its script has one.
@@ -107,6 +100,7 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
   const [found, setFound] = useState(false);
   const { effects, ripple, glow } = useTapFeedback();
   const softTap = useSoftTap(ripple, settings.sounds);
+  const { later } = useTimers();
 
   const nextId = useRef(0);
   const deck = useRef<LetterEntry[]>([]);
@@ -200,7 +194,8 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
         from.current = element?.getBoundingClientRect() ?? null;
         glow(x, y);
         setFound(true);
-        if (settings.sounds) setTimeout(playChime, WALK_MS);
+        // The chime comes when the small letter arrives; left before that, it must not sound in the menu.
+        if (settings.sounds) later(playChime, WALK_MS);
         say(`${choice.spoken}!`);
         aside(pack.praise[Math.floor(Math.random() * pack.praise.length)]);
         // Found at the first tap: after a few in a row the small letters look alike.
@@ -219,7 +214,7 @@ export function CasePlay({ pack, language, settings }: { pack: LanguagePack; lan
       streak.current = 0;
       alike.current = false;
     },
-    [round, found, wrong, softTap, glow, say, aside, settings.sounds, pack],
+    [round, found, wrong, softTap, glow, say, aside, later, settings.sounds, pack],
   );
 
   // A key of one of the three small letters chooses it; any other key only ripples.

@@ -1,6 +1,7 @@
 import type { CSSProperties, PointerEvent } from "react";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
+import { noPointerClick } from "@/lib/press";
 import { BRIGHT_COLORS } from "./TapFeedback";
 import { Choice, SettingsGroup } from "./SettingControls";
 
@@ -62,6 +63,8 @@ export function TouchKeyboard({
                 className={`touch-key${key === highlight ? " wanted" : ""}`}
                 style={{ "--key": color } as CSSProperties}
                 onPointerDown={(e) => press(key, e)}
+                // A screen reader's activation sends no pointer.
+                onClick={noPointerClick(() => onKey(key))}
               >
                 {label(key)}
               </button>

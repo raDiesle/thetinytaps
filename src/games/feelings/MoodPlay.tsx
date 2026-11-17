@@ -23,7 +23,8 @@ import {
 import { MoodGroups, usePickKeys } from "./moodGroups";
 import { NEEDS_TITLE } from "./needs";
 import type { FeelingsSettings } from "./settings";
-import { ChoiceCard, useVoice } from "./shared";
+import { useVoice } from "./shared";
+import { ChoiceCard } from "./storyParts";
 import { useStepAddress } from "@/lib/stepAddress";
 
 /** A feeling's card: the little bear alone with it, in a moment that brings it (user feedback, November 2026). */

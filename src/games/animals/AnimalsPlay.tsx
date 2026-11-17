@@ -3,7 +3,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";
 import { mayDrag, tapState } from "@/lib/tapTargets";
-import { choiceRows } from "@/games/shadows/levels";
+import { choiceRows } from "@/lib/rounds";
 import { ANIMAL_TEXTS, ANIMALS, GIFT_TEXTS, giverOf } from "./content";
 import { GiftDrawing } from "./gifts";
 import { HomeDrawing } from "./homes";

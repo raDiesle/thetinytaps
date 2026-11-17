@@ -1,5 +1,6 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick as pickLanguage } from "@/lib/language";
+import { pick } from "@/lib/random";
 import { type ColourTrait, isColourTrait } from "./colourParts";
 import { SCENE_PHRASES } from "./phrases";
 import type { SceneMode } from "./settings";
@@ -32,8 +33,6 @@ const TRAITS = Object.keys(SCENE_PHRASES.de.traits) as SceneTrait[];
 
 /** A question with many answers is done after this many, so it doesn't drag on. */
 const MAX_NEEDED = 3;
-
-const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /**
  * Everything that can be asked in this mode and scene, in `languageId` (the scene's

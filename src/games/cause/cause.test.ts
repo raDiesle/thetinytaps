@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import { PICTURE_QUEUE } from "@/content/pictureQueue";
 import { CAUSE_SCENES_AR } from "./scenes.ar";
@@ -77,4 +77,16 @@ describe("Was ist passiert?", () => {
       }
     }
   });
+});
+
+// The game borrows Gefühle's layout parts. Taken from `feelings/shared.tsx` they once brought the list of all of
+// Gefühle's recordings along (273 KB for a game with a voice of its own): the parts live in `storyParts.tsx`, which
+// must stay free of the voice.
+test("borrowing Gefühle's layout brings none of its voice files", () => {
+  const read = (path: string) => readFileSync(path, "utf8");
+  const imports = (code: string) => [...code.matchAll(/from "([^"]+)"/g)].map((m) => m[1]);
+  expect(imports(read("src/games/cause/CausePlay.tsx")).filter((from) => from.includes("feelings/"))).toEqual(["../feelings/storyParts"]);
+  for (const from of imports(read("src/games/feelings/storyParts.tsx"))) {
+    expect(from, "no voice in the layout parts").not.toMatch(/stimme|\/shared$|voice/);
+  }
 });

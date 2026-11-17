@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DevTag, letterCode } from "@/components/DevTag";
 import { StepBack } from "@/components/StepBack";
-import { useDeck } from "@/games/shadows/deck";
-import { nextLevel } from "@/games/shadows/levels";
+import { nextLevel, useDeck } from "@/lib/rounds";
 import { DEV } from "@/lib/buildInfo";
 import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";

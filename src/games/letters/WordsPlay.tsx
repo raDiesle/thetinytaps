@@ -7,6 +7,7 @@ import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling"
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { useAppLanguage } from "@/lib/language";
+import { pick, shuffle } from "@/lib/random";
 import { playChime, playCountNote } from "@/lib/sfx";
 import { useVoiceReady } from "@/lib/voiceReady";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
@@ -40,17 +41,6 @@ function wordsFor(pack: LanguagePack, kind: WordKind, maxLetters: number, theme:
 
 const isColor = (word: WordEntry): word is ColorWord => "color" in word;
 const isAction = (word: WordEntry): word is ActionWord => "action" in word;
-
-function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /** Where the things of a colour hop in: around the edges, so the word stays readable. */
 function paradeSpots(count: number) {

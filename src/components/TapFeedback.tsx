@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { pick } from "@/lib/random";
 
 /** A five-pointed star in a 100 × 100 box, drawn in several games. */
 export const STAR_PATH = "M50 5 L61 38 L96 38 L68 59 L79 93 L50 72 L21 93 L32 59 L4 38 L39 38 Z";
@@ -60,8 +61,6 @@ interface CelebrateOptions {
   /** What rises: all three by default, only stars for a calm good night. */
   things?: JoyThing[];
 }
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /**
  * Feedback that fits what a tap did, drawn in one layer (`FeedbackLayer`) over the game:

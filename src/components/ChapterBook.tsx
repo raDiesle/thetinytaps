@@ -6,6 +6,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { VoiceSwitch } from "@/components/VoiceSwitch";
 import type { TextsLanguageId } from "@/content/texts";
 import { type Texts, useAppLanguage, useT } from "@/lib/language";
+import { noPointerClick } from "@/lib/press";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
 import { stepIndexInAddress, useStepAddress } from "@/lib/stepAddress";
 import { useStoredSettings } from "@/lib/storage";
@@ -244,6 +245,8 @@ export function ChapterBook({
                     e.stopPropagation();
                     open(c);
                   }}
+                  // Enter, Space or a screen reader, which send no pointer.
+                  onClick={noPointerClick(() => open(c))}
                 >
                   <span className="cb-toc-picture" aria-hidden>
                     {picture && <img src={picture} alt="" draggable={false} decoding="async" />}
@@ -307,6 +310,7 @@ export function ChapterBook({
             e.stopPropagation();
             back();
           }}
+          onClick={noPointerClick(back)}
         >
           ◀
         </button>
@@ -321,6 +325,7 @@ export function ChapterBook({
             e.stopPropagation();
             forward();
           }}
+          onClick={noPointerClick(() => forward())}
         >
           ▶
         </button>

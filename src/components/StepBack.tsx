@@ -1,4 +1,5 @@
 import type { PointerEvent } from "react";
+import { noPointerClick } from "@/lib/press";
 import { screenTap } from "@/lib/tapGuard";
 import "./stepBack.css";
 
@@ -19,6 +20,10 @@ export function StepBack({ onBack, label, className }: { onBack: () => void; lab
         e.stopPropagation();
         if (screenTap()) onBack();
       }}
+      // Enter, Space or a screen reader, which send no pointer.
+      onClick={noPointerClick(() => {
+        if (screenTap()) onBack();
+      })}
     >
       <svg className="step-back-sign" viewBox="0 0 100 100" aria-hidden>
         <circle cx="50" cy="50" r="44" />

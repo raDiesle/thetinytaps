@@ -1,4 +1,4 @@
-import { shuffle } from "@/games/shadows/deck";
+import { shuffle } from "@/lib/random";
 import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./content";
 import { GIFTS, type Gift } from "./gifts";
 import { GROWTHS, growLookAlike, type Growth } from "./growth";
@@ -22,7 +22,7 @@ export interface AnimalLevel {
 }
 
 /**
- * The steps the game climbs (or goes back down) by how the child plays (`nextLevel` from Schatten finden: two rounds
+ * The steps the game climbs (or goes back down) by how the child plays (`nextLevel` in `@/lib/rounds`: two rounds
  * without a wrong pick go up, a wrong pick in two rounds or two in one go down); every visit begins on the first.
  * Harder means more to choose from, never quicker.
  */

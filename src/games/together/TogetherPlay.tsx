@@ -1,5 +1,5 @@
 import { type PointerEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { choiceRows } from "@/games/shadows/levels";
+import { choiceRows } from "@/lib/rounds";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage } from "@/lib/language";

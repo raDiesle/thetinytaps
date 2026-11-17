@@ -7,7 +7,7 @@ import { byLanguage } from "@/content/texts";
 import { useAppLanguage, useT } from "@/lib/language";
 import { playPlop, playTwinkle } from "@/lib/sfx";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
-import { ChoiceCard, GoOn, StepBack, StepDots, StoryPicture, StoryWords } from "../feelings/shared";
+import { ChoiceCard, GoOn, StepBack, StepDots, StoryPicture, StoryWords } from "../feelings/storyParts";
 import { framesOf, preloadImages } from "./images";
 import { CAUSE_PASSES, CAUSE_QUESTION, type CauseScene, causeOnLeft, sceneCode, sceneImages } from "./scenes";
 

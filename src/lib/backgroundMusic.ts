@@ -31,9 +31,16 @@ const DUCK_CHECK_MS = 150;
 
 let song: Promise<AudioBuffer | null> | null = null;
 
-/** The decoded song, once per visit; null when there is none. */
+/**
+ * The decoded song, once per visit; null when there is none. Where its download failed it is forgotten, so the next
+ * look tries again (musicFile.ts); a file that came and can't be decoded stays so, its bytes are used up.
+ */
 const loadSong = () => {
-  song ??= downloadMusic().then((data) => (data ? decodeSound(data) : null));
+  song ??= downloadMusic().then((data) => {
+    if (data) return decodeSound(data);
+    song = null;
+    return null;
+  });
   return song;
 };
 
@@ -43,9 +50,6 @@ let stoppedAt = SONG.start;
 
 /** Where in the song it is `seconds` after starting from `from`, going round the parts. */
 const songAt = (from: number, seconds: number) => SONG.start + ((from - SONG.start + seconds) % (SONG.loopEnd - SONG.start));
-
-/** A recorded line is playing (src/lib/voice.ts), or the browser's voice speaks. */
-const speaking = () => talking() || (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking);
 
 const hidden = () => typeof document !== "undefined" && document.hidden;
 
@@ -106,6 +110,8 @@ export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
   const going = useSyncExternalStore(subscribe, () => tapped);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [visible, setVisible] = useState(() => !hidden());
+  /** Counts the times the song is asked for again after its download failed (see below). */
+  const [tries, setTries] = useState(0);
   const on = enabled && !hushed;
 
   // Downloaded and decoded only once the page has loaded and nothing moves, as downloadMusicIfOn does: fetching it right
@@ -129,13 +135,28 @@ export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
       alive = false;
       cancel();
     };
-  }, [on, going]);
+  }, [on, going, tries]);
 
   useEffect(() => {
     const onChange = () => setVisible(!hidden());
     document.addEventListener("visibilitychange", onChange);
     return () => document.removeEventListener("visibilitychange", onChange);
   }, []);
+
+  // A song whose download failed is asked for once more when the page comes back to the front or the browser is online
+  // again – one new try each time, never a loop of them: a flaky request at the first tap left the visit without music.
+  useEffect(() => {
+    if (buffer) return;
+    const again = () => {
+      if (!hidden()) setTries((count) => count + 1);
+    };
+    window.addEventListener("online", again);
+    document.addEventListener("visibilitychange", again);
+    return () => {
+      window.removeEventListener("online", again);
+      document.removeEventListener("visibilitychange", again);
+    };
+  }, [buffer]);
 
   useEffect(() => {
     if (!on || !going || !visible || !buffer) return;
@@ -144,14 +165,15 @@ export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
       const from = stoppedAt;
       const loop = playLoop(buffer, {
         offset: from,
-        volume: speaking() ? DUCKED : VOLUME,
+        volume: talking() ? DUCKED : VOLUME,
         loopStart: SONG.start,
         loopEnd: SONG.loopEnd,
         fadeIn: 1.5,
       });
-      let ducked = speaking();
+      // `talking` is true for a recorded line and for the browser's voice alike (voice.ts).
+      let ducked = talking();
       const timer = setInterval(() => {
-        if (speaking() === ducked) return;
+        if (talking() === ducked) return;
         ducked = !ducked;
         loop?.fade(ducked ? DUCKED : VOLUME, ducked ? 0.25 : 0.8);
       }, DUCK_CHECK_MS);

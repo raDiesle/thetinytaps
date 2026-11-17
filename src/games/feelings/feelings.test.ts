@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { expect, test } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -33,13 +33,33 @@ const TRANSLATED_KITA = translatedIn("Wie geht's dir? und Kindergarten");
 const TRANSLATED_SELF = translatedIn("Mehr Gefühle", true);
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
-// allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
-const README = readFileSync("src/games/feelings/bilder/README.md", "utf8");
-const PLANNED = README.slice(README.indexOf("## Geplant"));
+// allowed only while bilder/prompts/geplant.md lists it with its prompt, for the grown-up to look at first.
+// The prompts are kept by topic: bilder/README.md has the rules for every picture and the list of the topic files in
+// bilder/prompts/ (one file was 468 KB, which a session had to read whole to find one section).
+const PICTURE_DOCS = "src/games/feelings/bilder";
+const README = readFileSync(`${PICTURE_DOCS}/README.md`, "utf8");
+const PROMPT_FILES = readdirSync(`${PICTURE_DOCS}/prompts`)
+  .filter((f) => f.endsWith(".md"))
+  .sort();
+/** Everything written about the pictures, whichever file a row stands in or is moved to. */
+const ALL_PROMPTS = [README, ...PROMPT_FILES.map((f) => readFileSync(`${PICTURE_DOCS}/prompts/${f}`, "utf8"))].join("\n");
+const PLANNED = readFileSync(`${PICTURE_DOCS}/prompts/geplant.md`, "utf8");
 const PLANNED_NAMES = [...PLANNED.matchAll(/^\| `([\w-]+)`/gm)].map((m) => m[1]);
 
+// The prompts stay split by topic, so a session reads only the file it needs.
+test("the picture prompts are split by topic and listed in bilder/README.md", () => {
+  expect(PROMPT_FILES.length).toBeGreaterThanOrEqual(10);
+  for (const file of PROMPT_FILES) {
+    expect(README, `${file}: no line in the list „Wo die Prompts stehen“ of bilder/README.md`).toContain(`(prompts/${file})`);
+    expect(statSync(`${PICTURE_DOCS}/prompts/${file}`).size, `${file}: over 60 KB, split it at its headings`).toBeLessThan(60_000);
+  }
+  for (const [, file] of README.matchAll(/\]\(prompts\/([\w-]+\.md)\)/g)) expect(PROMPT_FILES, `${file} is listed in bilder/README.md`).toContain(file);
+  // The index itself holds only what goes for every picture.
+  expect(README.length, "bilder/README.md: a story's prompts go into its topic's file in prompts/").toBeLessThan(30_000);
+});
+
 function expectPicture(name: string) {
-  if (!imageFor(name)) expect(PLANNED_NAMES, `${name}: no picture in bilder/, and not planned in README.md`).toContain(name);
+  if (!imageFor(name)) expect(PLANNED_NAMES, `${name}: no picture in bilder/, and not planned in bilder/prompts/geplant.md`).toContain(name);
 }
 
 // The kindergarten stories and the stories of more feelings (selbst.ts) play alike and find their pictures by id.
@@ -69,7 +89,7 @@ test("every not-so-good answer starts with „Hmm,“", () => {
 });
 
 test("a planned picture that is made leaves „Geplant“", () => {
-  for (const name of PLANNED_NAMES) expect(imageFor(name), `${name} is made: move its row out of „Geplant“`).toBeUndefined();
+  for (const name of PLANNED_NAMES) expect(imageFor(name), `${name} is made: move its row out of prompts/geplant.md into its topic's file`).toBeUndefined();
 });
 
 test("every story has its own id", () => {
@@ -110,8 +130,8 @@ test("every feeling has its card, in a group of four", () => {
 test("the feelings are always the little bear, in his clothes", () => {
   const art = readFileSync("src/games/feelings/moodArt.tsx", "utf8");
   expect(art).not.toMatch(/kind=\{|kind="fox"/);
-  // Their prompts, waiting in the queue or kept in bilder/README.md once made.
-  const rows = [...README.matchAll(/^\| `((?:gefuehl|brauche)-[\w-]+)` +\| (.*)\|$/gm)].map((m) => ({ id: m[1], prompt: m[2] }));
+  // Their prompts, waiting in the queue or kept in bilder/prompts/ once made.
+  const rows = [...ALL_PROMPTS.matchAll(/^\| `((?:gefuehl|brauche)-[\w-]+)` +\| (.*)\|$/gm)].map((m) => ({ id: m[1], prompt: m[2] }));
   const prompts = [...rows, ...MOOD_PICTURE_QUEUE.map((p) => ({ id: p.id, prompt: `${p.prompt} --ref ${p.ref?.join(" ")}` }))];
   expect(prompts.length).toBeGreaterThanOrEqual(15);
   for (const { id, prompt } of prompts) {
@@ -172,7 +192,7 @@ test("a picked need stays a card among the others", () => {
 // Nothing floats up, hops, shakes or pulses after a choice: the picture's change is the answer (user feedback,
 // November 2026). The big picture's slow two-frame fade is the only thing that keeps going.
 test("the game answers calmly", () => {
-  const files = ["shared.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "NeedsPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
+  const files = ["shared.tsx", "storyParts.tsx", "RoundPlay.tsx", "MoodPlay.tsx", "NeedsPlay.tsx", "PassPlay.tsx", "DayPlay.tsx", "DayPage.tsx"].map((f) =>
     readFileSync(`src/games/feelings/${f}`, "utf8"),
   );
   for (const code of files) expect(code).not.toMatch(/float\(|Floater/);
@@ -188,7 +208,7 @@ test("a scene goes on with a tap, and one thing moves at a time", () => {
   expect(round).toContain('const next = phase === "intro" ? goOn : phase === "done" ? onDone : undefined;');
   expect(round).toContain("still={choosing}");
   expect(round, "the intro's beats only end in the question").toContain("playBeats(round.start.beats, () => say(round.question, true))");
-  expect(readFileSync("src/games/feelings/shared.tsx", "utf8")).toContain(
+  expect(readFileSync("src/games/feelings/storyParts.tsx", "utf8")).toContain(
     '<Frames name={image} sources={sources} moving={active} className="fg-card-image" />',
   );
   expect(readFileSync("src/games/feelings/feelings.css", "utf8")).not.toMatch(/text-overflow:\s*ellipsis|white-space:\s*nowrap/);
@@ -210,7 +230,7 @@ test("choosing: small scene, A and B in two colours, and only the chosen picture
   expect(round, "no grey cards to wake any more").not.toMatch(/front|Front|cheering|onWake/);
   expect(round, "the text under the pictures is the whole part said").toContain("roundText(round).find((p) => p.id === part)?.text");
   expect(round, "under the pictures").toContain("<StoryWords text={caption} />");
-  const shared = readFileSync("src/games/feelings/shared.tsx", "utf8");
+  const shared = readFileSync("src/games/feelings/storyParts.tsx", "utf8");
   expect(shared, "a card picks, once").toMatch(/if \(active && screenTap\(\)\) onChoose\?\.\(\);/);
   expect(shared, "a card knows its letter").toContain("data-letter={letter}");
   const css = readFileSync("src/games/feelings/feelings.css", "utf8");
@@ -284,7 +304,7 @@ test("after the good choice ▶ brings the next scene, and „Weiter“ names a 
 // at the top play a scene again (user wish, November 2026).
 test("▶ keeps one place, the notes stay off the pages, and the dots go back", () => {
   const read = (f: string) => readFileSync(`src/games/feelings/${f}`, "utf8");
-  const shared = read("shared.tsx");
+  const shared = read("storyParts.tsx");
   const picture = shared.slice(shared.indexOf("export function StoryPicture"), shared.indexOf("export type CardState"));
   expect(picture, "the big picture is no button of its own").not.toContain("onNext");
   for (const f of ["RoundPlay.tsx", "DayPage.tsx"]) expect(read(f), f).toContain("<GoOn ");

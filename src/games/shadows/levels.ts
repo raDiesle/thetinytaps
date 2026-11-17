@@ -1,16 +1,5 @@
-import type { CSSProperties } from "react";
+import { shuffle } from "@/lib/random";
 import { lookAlike, lookOf, PEEK_LOOKALIKES, SHADOW_LOOKALIKES, type ShadowItem } from "./content";
-import { shuffle } from "./deck";
-
-/**
- * How `n` choices lie in their rows, for the CSS sizing them as big as the room allows: all side by side (`--n`), and on
- * a phone held upright two to a row while that leaves at most two rows, else three (`--tall-cols`, `--tall-rows`).
- * Shared by Schatten finden and every round of „Was gehört zum Tier?“.
- */
-export function choiceRows(n: number): CSSProperties {
-  const tallCols = n > 4 ? 3 : Math.min(n, 2);
-  return { "--n": n, "--tall-cols": tallCols, "--tall-rows": Math.ceil(n / tallCols) } as CSSProperties;
-}
 
 /** One step of difficulty: how many shadows to choose from, and what makes them harder to tell apart or to find. */
 export interface ShadowLevel {
@@ -73,23 +62,6 @@ export function poseShadows(n: number, level: ShadowLevel, random = Math.random)
   });
   if (level.mirror && n > 0 && !poses.some((p) => p.flip)) poses[Math.floor(random() * n)].flip = true;
   return poses;
-}
-
-/**
- * The step after a picture, from the wrong shadows tapped in each picture on the current step (newest last): two
- * pictures without one go one up; two in one picture, or one in each of two pictures in a row, go one down. Time
- * plays no part: a slow but sure child climbs too, and nothing asks it to be quick. `top` is the last step; "Was gehört
- * zum Tier?" climbs its own steps by the same rule. Below step `quick` one picture without a wrong shadow is enough.
- */
-export function nextLevel(level: number, misses: number[], top = SHADOW_LEVELS.length - 1, quick = 0): number {
-  const last = misses.at(-1);
-  if (last === undefined) return level;
-  if (level < quick && last === 0) return Math.min(top, level + 1);
-  const recent = misses.slice(-2);
-  let step = 0;
-  if (last >= 2 || (recent.length === 2 && recent.every((m) => m > 0))) step = -1;
-  else if (recent.length === 2 && recent.every((m) => m === 0)) step = 1;
-  return Math.max(0, Math.min(top, level + step));
 }
 
 /**

@@ -54,3 +54,20 @@ test("the trophy is handed over big in the middle, then lands on its board befor
   expect(award).not.toMatch(/\b(width|height|top|left|filter):/);
   expect(css).toMatch(/\.game-end:not\(\.landed\) > :not\(\.game-end-prize\) \{\s*visibility: hidden;/);
 });
+
+// „Nochmal“, „Weiter“ and the trophy acted only as a pointer landed, so Enter, Space and a screen reader's activation
+// did nothing: each also takes the click no pointer made (`noPointerClick`), „Nochmal“ and „Weiter“ one step per press.
+test("the end's buttons and its trophy answer without a pointer too", async () => {
+  const end = await Bun.file("src/components/GameEnd.tsx").text();
+  expect(end).toMatch(/onClick: noPointerClick\(\(\) => \{\s*if \(screenTap\(\)\) go\(\);/);
+  expect(end).toContain('{...press("nochmal", onAgain)}');
+  expect(end).toContain('{...press("weiter", next.onNext)}');
+  const trophy = end.match(/className=\{`game-end-trophy[\s\S]*?\n {10}>/)?.[0] ?? "";
+  // Only once it stands on its board: before that it is no link and takes no focus.
+  expect(trophy).toContain("{...(landed && {");
+  expect(trophy).toContain("tabIndex: 0,");
+  expect(trophy).toContain('e.key === "Enter"');
+  expect(trophy).toContain("onClick: noPointerClick(openTrophy),");
+  // Still a span, so no rule for buttons restyles it.
+  expect(end).toMatch(/<span\s+ref=\{trophyRef\}/);
+});
