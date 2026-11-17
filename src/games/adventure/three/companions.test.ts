@@ -1,5 +1,6 @@
-import { expect, test } from "bun:test";
+import { expect } from "bun:test";
 import * as THREE from "three";
+import { heavyTest } from "@/heavyTest";
 import { FIRE_RESCUE } from "../stories/fireRescue";
 import type { Story } from "../stories/story";
 import { Guide } from "./guide";
@@ -18,9 +19,6 @@ const EVERY = 0.1;
 const AT_MOST = 1.5;
 /** Seconds into the first step the companion flies in from afar, and is not looked for yet. */
 const FLYING_IN = 3;
-/** Playing a whole story frame by frame takes seconds, twice as long on GitHub's runner as on a Mac: past `bun test`'s
- * 5 s default there, the deploy on main fails (as `collisions.test.ts` did, November 2026). */
-const WHOLE_STORY_MS = 30_000;
 /** The screen's shape the pictures are checked at (a tablet on its side, 1024 × 640). */
 const ASPECT = 1.6;
 /** The dancer's box in the bottom right corner, in the picture's -1…1 space (measured at 1024 × 640), with a margin. */
@@ -104,10 +102,6 @@ function companionTrouble(story: Story, name: string) {
   return [...trouble].slice(0, 12);
 }
 
-test(
-  "in Fire Rescue Kiki flies round things and is always seen",
-  () => {
-    expect(companionTrouble(FIRE_RESCUE, "Kiki")).toEqual([]);
-  },
-  WHOLE_STORY_MS,
-);
+heavyTest("in Fire Rescue Kiki flies round things and is always seen", () => {
+  expect(companionTrouble(FIRE_RESCUE, "Kiki")).toEqual([]);
+});

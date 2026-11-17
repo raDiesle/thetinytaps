@@ -1,5 +1,6 @@
-import { expect, test } from "bun:test";
+import { expect } from "bun:test";
 import * as THREE from "three";
+import { heavyTest } from "@/heavyTest";
 import { CLOUD_TRIP } from "../stories/cloudTrip";
 import { FIRE_RESCUE } from "../stories/fireRescue";
 import type { Story } from "../stories/story";
@@ -20,9 +21,6 @@ const FUR = 0.03;
 const ARM_FROM = 0.3;
 /** Seconds between the frames checked. */
 const EVERY = 0.1;
-/** Playing a whole story frame by frame takes seconds (the Schatzinsel 3.5 s on a Mac, twice that on GitHub's runner),
- * past `bun test`'s 5 s default there: the deploy on main failed on it (November 2026). */
-const WHOLE_STORY_MS = 30_000;
 
 /** Where things reach into the guide's body: the deepest moment of each in each step, as "what in step n at time: depth". */
 function overlaps(story: Story) {
@@ -94,26 +92,14 @@ function overlaps(story: Story) {
   return [...worst].map(([what, w]) => `${what} at ${w.time.toFixed(1)} s: ${w.depth.toFixed(3)} deep`);
 }
 
-test(
-  "in Die Schatzinsel nothing reaches into Tapsi's body",
-  () => {
-    expect(overlaps(TREASURE_ISLAND)).toEqual([]);
-  },
-  WHOLE_STORY_MS,
-);
+heavyTest("in Die Schatzinsel nothing reaches into Tapsi's body", () => {
+  expect(overlaps(TREASURE_ISLAND)).toEqual([]);
+});
 
-test(
-  "in Die Wolkenreise nothing reaches into Tapsi's body",
-  () => {
-    expect(overlaps(CLOUD_TRIP)).toEqual([]);
-  },
-  WHOLE_STORY_MS,
-);
+heavyTest("in Die Wolkenreise nothing reaches into Tapsi's body", () => {
+  expect(overlaps(CLOUD_TRIP)).toEqual([]);
+});
 
-test(
-  "in Fire Rescue nothing reaches into Tapsi's body",
-  () => {
-    expect(overlaps(FIRE_RESCUE)).toEqual([]);
-  },
-  WHOLE_STORY_MS,
-);
+heavyTest("in Fire Rescue nothing reaches into Tapsi's body", () => {
+  expect(overlaps(FIRE_RESCUE)).toEqual([]);
+});

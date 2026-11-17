@@ -25,3 +25,16 @@ test("every action in the workflows is a version that runs on Node.js 24", () =>
     }
   }
 });
+
+// A test playing a whole story frame by frame takes seconds and ran past `bun test`'s 5 s limit on GitHub's slower
+// runner, stopping the deploy (November 2026): such a test is a `heavyTest` (`src/heavyTest.ts`), run before every
+// commit and skipped on CI.
+test("tests that play a whole story are heavy tests, skipped on CI", () => {
+  const tests = new Bun.Glob("**/*.test.{ts,tsx}");
+  for (const file of tests.scanSync(join(import.meta.dir))) {
+    const text = readFileSync(join(import.meta.dir, file), "utf8");
+    if (!/\bstoryFrame\b/.test(text)) continue;
+    expect(/^\s*test\(/m.test(text), `${file} plays a story frame by frame with a plain test()`).toBe(false);
+    expect(text, file).toContain("heavyTest(");
+  }
+});

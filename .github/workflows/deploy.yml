@@ -25,6 +25,7 @@ jobs:
           bun-version-file: package.json
       # Exactly what bun.lock says, with the safety settings of bunfig.toml (no install scripts, 3 days old).
       - run: bun install --frozen-lockfile
+      # GitHub sets CI=true: tests that take seconds (`heavyTest`, src/heavyTest.ts) are skipped here, they ran before the commit.
       - run: bun run verify
       # The site is served from the root of https://www.funforboth.com (repo settings → Pages → Custom domain).
       - run: bun run build
