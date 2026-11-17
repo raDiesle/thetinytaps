@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "n
 import { join } from "node:path";
 import { PRODUCTION } from "../tools/appPlugin";
 import { isTest } from "./testSources";
-import { fontsAsFiles } from "../tools/pageStart";
+import { fontsAsFiles, namedByOwnBytes } from "../tools/pageStart";
 
 // Bun bundles the app with one plugin (tools/appPlugin.ts); code written for another bundler would build
 // with holes (no sounds, no pictures) or not at all. These checks keep the code to what the plugin offers.
@@ -62,6 +62,22 @@ test("fonts leave the start stylesheet as files of their own: embedded, they hel
   // And no stylesheet of src/ embeds one itself.
   const styles = (readdirSync(SRC, { recursive: true, encoding: "utf8" }) as string[]).filter((file) => file.endsWith(".css"));
   expect(styles.filter((file) => readFileSync(join(SRC, file), "utf8").includes("data:font"))).toEqual([]);
+});
+
+test("a build over the last one trusts a file's name only where it is a hash of the file's own bytes (R-P10)", () => {
+  // Those the build skips when out/ has them at their size, and leaves out of the worker's version by content: every
+  // other file is compared and hashed byte by byte, so a change anywhere still installs a new worker.
+  for (const file of ["static/zh-5712b660.ckm2ykyk.mp3", "static/cover-lernen.a1b2c3d4.webp", "static/fredoka-latin-wght-normal.0a1b2c3d.woff2"])
+    expect(namedByOwnBytes(file)).toBe(true);
+  for (const file of ["static/LegalPage.n79rsna7.js", "static/index.y79qypx9.css", "static/offline.370f5b11.json", "static/built.52a2742a.txt"])
+    expect(namedByOwnBytes(file)).toBe(false);
+  for (const file of ["index.html", "sw.js", "icons/icon.svg", "icons/favicon-48.png", "preview.jpg", "static/sub/x.ab12.mp3"])
+    expect(namedByOwnBytes(file)).toBe(false);
+  const build = readFileSync(join(SRC, "..", "tools", "build.ts"), "utf8");
+  // The worker's version and writeSite ask it; out/ is never listed to learn what this build made (walkOut takes the build's own files).
+  expect(build.match(/namedByOwnBytes\(file\)/g)?.length).toBe(2);
+  expect(build).not.toMatch(/filesIn\(OUT\)/);
+  expect(build).toContain("removeOthers(");
 });
 
 test("the build for players has React without its development code (several times faster on phones)", async () => {

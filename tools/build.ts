@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm, rmdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
   fullTitle,
@@ -40,6 +40,7 @@ import {
   chunkClosure,
   countedHosts,
   fontsAsFiles,
+  namedByOwnBytes,
   pageModuleFor,
   pageModules,
   pageTextsParts,
@@ -78,7 +79,7 @@ function replaceOnce(html: string, search: RegExp | string, replacement: string,
   return html.replace(search, () => replacement);
 }
 
-/** Every file written into out/ after its one walk (`walkOut`), as paths relative to it with "/". */
+/** Every file written into out/ after the bundled site (`writeSite`), as paths relative to it with "/". */
 const written = new Set<string>();
 
 /** Writes a file into out/ (its folders too) and notes it for the closing count. */
@@ -102,7 +103,69 @@ async function filesIn(dir: string) {
     .sort();
 }
 
-/** out/ as bundled, walked once (`walkOut`): its files, each chunk by its name, and their code read once. */
+/** The bundled site before its pages: each file's path relative to out/ with "/", and its content. */
+type Site = Map<string, Blob | string>;
+
+/**
+ * Writes the bundled site into out/, leaving the files already there with the same content (R-P10: rewriting all
+ * 28,000 files, mostly recordings, took most of a build's 25 s). A file named by its own bytes is compared by its size
+ * only, every other file byte by byte (the code is small, and a chunk's name may not tell every change of its imports).
+ * A file is written under another name and then renamed, so a build cut off halfway never leaves a half-written file
+ * that a later build would take for done.
+ */
+async function writeSite(site: Site) {
+  let wrote = 0;
+  const one = async ([file, content]: [string, Blob | string]) => {
+    const path = join(OUT, file);
+    const there = Bun.file(path);
+    const size = typeof content === "string" ? Buffer.byteLength(content) : content.size;
+    if ((await there.exists()) && there.size === size) {
+      if (namedByOwnBytes(file)) return;
+      const bytes = typeof content === "string" ? Buffer.from(content) : new Uint8Array(await content.arrayBuffer());
+      if (Buffer.from(await there.bytes()).equals(bytes)) return;
+    }
+    await mkdir(join(path, ".."), { recursive: true });
+    const part = `${path}.part-${process.pid}`;
+    await Bun.write(part, content);
+    await rename(part, path);
+    wrote++;
+  };
+  // A few at a time: one after the other the disk waits, all at once the files run out.
+  const all = [...site];
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: 32 }, async () => {
+      while (next < all.length) await one(all[next++]);
+    }),
+  );
+  return wrote;
+}
+
+/** Deletes from out/ every file this build did not make (and folders left empty), so out/ holds exactly this build. */
+async function removeOthers(keep: ReadonlySet<string>) {
+  const entries = await readdir(OUT, { recursive: true, withFileTypes: true });
+  const path = (entry: (typeof entries)[number]) => join(entry.parentPath, entry.name);
+  const stale = entries.filter(
+    (entry) =>
+      !entry.isDirectory() &&
+      !keep.has(
+        path(entry)
+          .slice(OUT.length + 1)
+          .split("\\")
+          .join("/"),
+      ),
+  );
+  await Promise.all(stale.map((entry) => rm(path(entry))));
+  // The deepest folders first, so a folder emptied by its subfolders goes too; one with files stays (rmdir fails).
+  const folders = entries
+    .filter((entry) => entry.isDirectory())
+    .map(path)
+    .sort((a, b) => b.length - a.length);
+  for (const folder of folders) await rmdir(folder).catch(() => {});
+  return stale.length;
+}
+
+/** The bundled site, read once (`walkOut`): its files, each chunk by its name, and their code. */
 interface Built {
   /** Every file, relative to out/ with "/", sorted. */
   files: string[];
@@ -114,9 +177,12 @@ interface Built {
   closure(first: string, later?: { stop: ReadonlySet<string> }): Promise<string[]>;
 }
 
-/** Walks out/ once, after bundling and before the pages are written (R-D9: it was walked four times, 27k files each). */
-async function walkOut(): Promise<Built> {
-  const files = await filesIn(OUT);
+/**
+ * The bundled site's files, taken once after bundling and before the pages are written (R-D9: out/ was walked four
+ * times, 27k files each). From the build itself, never from out/, which may still hold an earlier build's files.
+ */
+function walkOut(site: Site): Built {
+  const files = [...site.keys()].sort();
   const chunks = new Map<string, string[]>();
   for (const file of files) {
     const name = /^static\/(.+)\.[a-z0-9]+\.js$/.exec(file)?.[1];
@@ -159,11 +225,13 @@ async function minifiedStyles() {
   return new Map(await Promise.all(result.outputs.map(async (output) => [join(ROOT, "src", output.path), await output.text()] as const)));
 }
 
-/** Bundles the app: index.html with its script, every lazy page a chunk of its own, files named by their content. */
+/**
+ * Bundles the app in memory (`writeSite` puts it into out/): index.html with its script, every lazy page a chunk of
+ * its own, files named by their content.
+ */
 async function bundle() {
   const result = await Bun.build({
     entrypoints: [join(ROOT, "index.html")],
-    outdir: OUT,
     splitting: true,
     minify,
     ...PRODUCTION,
@@ -403,8 +471,8 @@ async function pagePreloads(template: string, built: Built) {
 // Offline support (PWA): writes out/sw.js from src/sw.js, so the service worker can keep the built files in the
 // browser. It names only the few files not named by their content (UNHASHED); the content hashes of the others go into
 // static/built.<hash>.txt, which the worker fetches only at install (R-P9: listed in sw.js they made it 246 KB). The
-// version is a hash over the worker and all files,
-// so every change installs a new one. 404.html is left out: the worker answers deep links with
+// version is a hash over the worker and all files – the names of all, and the content of each whose name doesn't carry
+// a hash of its own bytes (`namedByOwnBytes`) – so every change installs a new one. 404.html is left out: the worker answers deep links with
 // index.html itself, and so is the picture for link previews (PREVIEW_IMAGE), which only other sites fetch. So are songs (files named musik-*.mp3): music can be switched off for all games,
 // and then they must not be downloaded; the worker keeps a song once a page has fetched it. The same
 // for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/lib/voiceName.ts)
@@ -448,10 +516,13 @@ async function writeServiceWorker(built: Built) {
   const shell = await shellFiles();
   const template = await readFile(join(ROOT, "src/sw.js"), "utf8");
   const hash = createHash("sha256").update(template);
-  // The build's time in index.html is left out, so a build that changed nothing installs no new worker.
+  // Every file's name, and the content of each whose name doesn't stand for it (R-P10: reading the recordings and
+  // pictures too took 2.8 s). The build's time in index.html is left out, so a build that changed nothing installs no new worker.
   for (const file of files) {
+    hash.update(file);
+    if (namedByOwnBytes(file)) continue;
     const bytes = await readFile(join(OUT, file));
-    hash.update(file).update(file.endsWith(".html") ? bytes.toString("utf8").replace(/<meta name="build-time" content="[^"]*" \/>/, "") : bytes);
+    hash.update(file.endsWith(".html") ? bytes.toString("utf8").replace(/<meta name="build-time" content="[^"]*" \/>/, "") : bytes);
   }
   const fills: [string, string][] = [
     ['"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12))],
@@ -594,7 +665,7 @@ const PRELOADED_FONT = "fredoka-latin-wght-normal";
  * after the files src/styles/font.css names; returns the preload tag of `PRELOADED_FONT`. The latin-ext part stays a
  * file the browser fetches only for a letter it covers (`unicode-range`): Chinese pinyin's tone marks (bō, ǎ) need it.
  */
-async function fontsOutOfStyles() {
+async function fontsOutOfStyles(site: Site) {
   const source = await readFile(join(ROOT, "src/styles/font.css"), "utf8");
   const names = new Map<string, string>();
   for (const [, path] of source.matchAll(/url\("([^"]+\.woff2)"\)/g)) {
@@ -602,12 +673,12 @@ async function fontsOutOfStyles() {
     names.set(createHash("sha256").update(bytes).digest("hex"), path.slice(path.lastIndexOf("/") + 1, -".woff2".length));
   }
   const written: string[] = [];
-  for (const file of (await readdir(join(OUT, "static"))).filter((name) => name.endsWith(".css"))) {
-    const { css, files } = fontsAsFiles(await readFile(join(OUT, "static", file), "utf8"), names, `${base}/static/`);
-    if (css.includes("data:font")) throw new Error(`build: static/${file} still embeds a font that is no woff2`);
-    for (const font of files) await writeFile(join(OUT, font.path), font.bytes);
+  for (const [file, content] of [...site].filter(([name]) => /^static\/[^/]+\.css$/.test(name))) {
+    const { css, files } = fontsAsFiles(typeof content === "string" ? content : await content.text(), names, `${base}/static/`);
+    if (css.includes("data:font")) throw new Error(`build: ${file} still embeds a font that is no woff2`);
+    for (const font of files) site.set(font.path, new Blob([Buffer.from(font.bytes)]));
     written.push(...files.map((font) => font.path));
-    await writeFile(join(OUT, "static", file), css);
+    site.set(file, css);
   }
   const preloaded = written.find((path) => path.startsWith(`static/${PRELOADED_FONT}.`));
   if (!preloaded) throw new Error(`build: no ${PRELOADED_FONT} font came out of the stylesheets`);
@@ -618,24 +689,32 @@ async function fontsOutOfStyles() {
 const MAX_SITE_MB = 800;
 
 const started = performance.now();
-await rm(OUT, { recursive: true, force: true });
+// A build writes over the last one in out/, changing only what changed (`writeSite`, `removeOthers`); `--clean`
+// empties it first. GitHub's runner has no out/, so the deploy always builds from nothing.
+if (process.argv.includes("--clean")) await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
-await cp(join(ROOT, "public"), OUT, { recursive: true });
-const fontPreload = await fontsOutOfStyles();
+const site: Site = new Map(result.outputs.map((output) => [output.path.replace(/^\.\//, ""), output]));
+// public/ goes in as it is, over a bundled file of the same name.
+for (const file of await filesIn(join(ROOT, "public"))) site.set(file, Bun.file(join(ROOT, "public", file)));
+const fontPreload = await fontsOutOfStyles(site);
 // The time of this build stands in every page (`buildDate` in src/lib/pwa.ts reads it), never in the code: a value
 // that changes with each build renamed most chunks every time, so returning visitors downloaded every game again.
 const BUILD_TIME_TAG = `<meta name="build-time" content="${new Date().toISOString()}" />`;
 // The font's preload stands before the stylesheet, so its download starts as early as the stylesheet's.
-const bundled = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), '<link rel="stylesheet"', `${fontPreload}<link rel="stylesheet"`);
+const bundled = replaceOnce(await (site.get("index.html") as Blob).text(), '<link rel="stylesheet"', `${fontPreload}<link rel="stylesheet"`);
 const template = replaceOnce(bundled, "</head>", `${[BUILD_TIME_TAG, ...APP_LINKS, ...ANALYTICS].join("")}</head>`);
-await writeFile(join(OUT, "index.html"), template);
-const built = await walkOut();
+site.set("index.html", template);
+const changed = await writeSite(site);
+const built = walkOut(site);
 await writePages(template, built);
 await writeServiceWorker(built);
 const files = [...new Set([...built.files, ...written])];
+const removed = await removeOthers(new Set(files));
 const bytes = files.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0);
 const megabytes = Math.round(bytes / 1e6);
-console.log(`out/: ${files.length} files, ${megabytes} MB (${result.outputs.length} bundled) in ${Math.round(performance.now() - started)} ms`);
+console.log(
+  `out/: ${files.length} files, ${megabytes} MB (${result.outputs.length} bundled, ${changed} of them written anew, ${removed} old files removed) in ${Math.round(performance.now() - started)} ms`,
+);
 // GitHub Pages publishes a site of at most 1 GB; stop well before it, while there is still time to make room (R-D8).
 if (megabytes > MAX_SITE_MB) {
   console.error(

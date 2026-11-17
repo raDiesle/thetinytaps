@@ -88,6 +88,14 @@ export async function chunkClosure(
   return [...seen];
 }
 
+/**
+ * Whether a file of out/ carries a hash of its own bytes in its name (Bun's assets – recordings, pictures – and the
+ * fonts `fontsAsFiles` takes out): the build then knows it by its name alone, skipping it when out/ already has it at
+ * its size and leaving its bytes out of the worker's version (R-P10). Never the code: a chunk's text names other
+ * chunks, and every file outside static/ (public/, the pages) has no hash at all.
+ */
+export const namedByOwnBytes = (file: string) => /^static\/[^/]+\.[a-z0-9]+\.(mp3|webp|png|jpe?g|svg|woff2?)$/.test(file);
+
 /** A font moved out of a stylesheet (`fontsAsFiles`): its path in out/ (`static/<name>.<hash>.woff2`) and its bytes. */
 export interface FontFile {
   path: string;
