@@ -1,0 +1,80 @@
+/*
+ * Split from bookshelf.css: imported right after bookshelf-books.css in globals.css, so the cascade stays as it was.
+ */
+
+/* ----- The book taken out (bookTravel.ts): a layer of its own over the app ----- */
+
+.book-travel {
+  position: fixed;
+  inset: 0;
+  /* Under the play-time lock and the „Bitte quer halten“ note, over everything else. */
+  z-index: 800;
+  overflow: hidden;
+  perspective: var(--bt-eye);
+  perspective-origin: 50% 50%;
+}
+
+.bt-backdrop {
+  position: absolute;
+  pointer-events: none;
+}
+
+.bt-book {
+  position: absolute;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.bt-lid {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+.bt-page {
+  position: absolute;
+  inset: 0;
+  background: var(--paper-grain, none), var(--paper, #fbf4e3);
+}
+
+/* The page under the cover: the right page once the book is open, the stack of pages at its edges, the back board. */
+.bt-right {
+  transform: translateZ(-1px);
+  background: linear-gradient(90deg, #00000059, #0000 12%), var(--paper-grain, none), var(--paper, #fbf4e3);
+  box-shadow:
+    1px 1px 0 var(--paper-edge, #dccdab),
+    3px 2px 0 var(--paper, #fbf4e3),
+    4px 3px 0 var(--paper-edge, #dccdab),
+    6px 4px 0 #efe4ca,
+    7px 6px 0 2px color-mix(in srgb, var(--w1) 70%, #3d3045);
+}
+
+/* The inside of the cover once it lies open on the left: the page the book's first menu is printed on. */
+.bt-left {
+  overflow: hidden;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  background: linear-gradient(270deg, #00000059, #00000014 4%, #0000 8%), var(--paper-mottle, none), linear-gradient(var(--sky-top), var(--paper, #fbf4e3) 72%);
+}
+
+/* A still copy of the screen, printed on the page; or at first, on the way back, the screen itself. */
+.bt-print {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.bt-print-full {
+  background: var(--lamp, none), var(--table, #94603d);
+}
+
+/* On the page the copy's own book edges and board aren't printed: the page has its own. */
+.bt-left .bt-print .sky {
+  box-shadow: none;
+}

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { METALS, trophyLook } from "@/components/Trophy";
-import { museumLayout, museumTree, type MuseumNode, tierPlan } from "@/components/TrophyMuseum";
+import { museumLayout, museumTree, type MuseumNode, tierPlan } from "@/components/museumLayout";
 import { everyTrophy, trophyPicture } from "@/components/trophyPictures";
 import { CATEGORIES } from "@/content/games";
 import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest, trophyWins } from "./trophies";

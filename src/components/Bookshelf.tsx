@@ -43,7 +43,7 @@ interface ShelfBook {
 /** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
 const DAILY_COLOURS = ["#2f78a8", "#3f8a4a", "#b0457a", "#c77d4f", "#2f5d62"];
 
-/** The gold cloth of the Belohnungstafel, with its gilded bands (`[data-gold]` in bookshelf.css). */
+/** The gold cloth of the Belohnungstafel, with its gilded bands (`[data-gold]` in bookshelf-books.css). */
 const GOLD = "#c8952c";
 
 /**

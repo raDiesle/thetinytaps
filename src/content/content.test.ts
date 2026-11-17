@@ -426,7 +426,7 @@ describe("the app's name", () => {
   // the books only filling the shelf look plainly unlike the ones to take (dull, no paper label), yet answer a tap by
   // rocking, so a child sees the tap was felt.
   test("names on the spines stay in one line, and the books only filling the shelf answer a tap", () => {
-    const css = readFileSync("src/styles/bookshelf.css", "utf8");
+    const css = ["src/styles/bookshelf.css", "src/styles/bookshelf-books.css"].map((file) => readFileSync(file, "utf8")).join("\n");
     const title = css.match(/\n\.shelf-daily-title \{([^}]*)\}/)?.[1] ?? "";
     expect(title).toContain("white-space: nowrap;");
     expect(title).not.toContain("hyphens");

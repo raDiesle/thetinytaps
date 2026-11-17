@@ -186,7 +186,7 @@ describe("the bookshelf", () => {
   // Spread over a wide board, the books stood with big empty room between them and looked lost on a big monitor (user
   // feedback, November 2026): they stand together in the middle, BOOK_GAP apart, and books spine out fill the ends.
   test("the books of a board stand together in the middle, not spread over it", () => {
-    const css = readFileSync(new URL("../styles/bookshelf.css", import.meta.url), "utf8");
+    const css = ["bookshelf.css", "bookshelf-books.css"].map((file) => readFileSync(new URL(`../styles/${file}`, import.meta.url), "utf8")).join("\n");
     const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
     expect(rule(".shelf-row")).toContain("justify-content: center");
     expect(rule(".shelf-row")).toContain("gap: calc(var(--bh) * var(--gap))");
@@ -199,7 +199,7 @@ describe("the bookshelf", () => {
 
   // Leaning, the books tied together with a ribbon looked unnatural (user feedback, November 2026).
   test("books tied together stand upright", () => {
-    const css = readFileSync(new URL("../styles/bookshelf.css", import.meta.url), "utf8");
+    const css = readFileSync(new URL("../styles/bookshelf-books.css", import.meta.url), "utf8");
     const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
     expect(rule(".shelf-daily-books > .shelf-bundle")).toContain("--lean: 0deg");
     expect(rule(".shelf-bundle")).not.toContain("rotate");
