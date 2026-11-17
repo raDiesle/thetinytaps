@@ -64,7 +64,7 @@ const BUILT = "static/built.l1.txt";
  */
 function worker(
   network: Network,
-  { store = new Map() as Store, version = "new", files = [] as string[], shell = [] as string[], offline = null as string | null } = {},
+  { store = new Map() as Store, version = "new", files = [] as string[], shell = [] as string[], offline = null as string | null, windows = 1 } = {},
 ) {
   const handlers: Record<string, Handler> = {};
   const self = {
@@ -74,7 +74,7 @@ function worker(
       handlers[type] = handler;
     },
     skipWaiting: async () => {},
-    clients: { claim: async () => {} },
+    clients: { claim: async () => {}, matchAll: async () => Array.from({ length: windows }, () => ({})) },
   };
   const source = readFileSync(join(import.meta.dir, "sw.js"), "utf8")
     .replace('"__VERSION__"', JSON.stringify(version))
@@ -120,6 +120,7 @@ function worker(
     /** Every Request the worker made, with its cache mode. */
     requests,
     install: () => dispatch("install", {}),
+    activate: () => dispatch("activate", {}),
     message: (data: unknown) => dispatch("message", { data }),
     /** What the worker answers for the file at `path`. */
     file: async (path: string) => {
@@ -350,4 +351,46 @@ test("the same choice again downloads nothing, and the next build keeps the choi
   await sw.install();
   expect(cached(sw, "2")).toContain("static/1a2b3c4d.v1.mp3");
   expect(cached(sw, "2")).not.toContain("static/en-1a2b3c4d.v2.mp3");
+});
+
+// Every file the new build takes over was kept twice, in its cache and the earlier build's, kept for a page still open:
+// a German offline copy of 120 MB took 240 (R-P8). Now it is moved, and the earlier cache keeps only what the new build
+// dropped, for that page.
+test("a new build moves what it takes over, and a page of the old build still open finds every file", async () => {
+  const old = worker(online().network, { version: "1", files: FILES, shell: SHELL });
+  await old.install();
+  await old.file("static/zahn.d4.webp");
+  await old.file("static/zaehne.c3.js");
+  const files = ["index.html", "static/app.e5.js", "static/cover.b2.webp", "static/zaehne.g7.js", "static/zahn.d4.webp"];
+  let up = true;
+  const next = worker((request) => (up ? online().network(request) : offline(request)), {
+    store: old.store,
+    version: "2",
+    files,
+    shell: ["index.html", "static/app.e5.js", "static/cover.b2.webp"],
+  });
+  await next.install();
+  await next.activate();
+  // Each file once: what the new build has only in its cache, what it dropped only in the old one.
+  expect(cached(next, "2")).toContain("static/zahn.d4.webp");
+  expect(cached(next, "1")).not.toContain("static/zahn.d4.webp");
+  expect(cached(next, "1")).not.toContain("static/cover.b2.webp");
+  expect(cached(next, "1")).toContain("static/zaehne.c3.js");
+  expect(cached(next, "1")).toContain("static/app.a1.js");
+  // The old page's files come from either cache, even offline, after the server dropped the old ones.
+  up = false;
+  expect(await next.file("static/zaehne.c3.js")).toBe("net static/zaehne.c3.js");
+  expect(await next.file("static/zahn.d4.webp")).toBe("net static/zahn.d4.webp");
+  expect(await next.file("static/app.a1.js")).toBe("net static/app.a1.js");
+});
+
+test("the build before last goes at activate, and the last one too when no window is open", async () => {
+  const store: Store = new Map([
+    ["tinytaps-1", new Map([[`${SCOPE}static/alt.a0.js`, new Response("1")]])],
+    ["tinytaps-2", new Map([[`${SCOPE}static/alt.b0.js`, new Response("2")]])],
+  ]);
+  await worker(online().network, { store, version: "3", files: FILES, shell: SHELL }).activate();
+  expect([...store.keys()]).toEqual(["tinytaps-2"]);
+  await worker(online().network, { store, version: "3", files: FILES, shell: SHELL, windows: 0 }).activate();
+  expect([...store.keys()]).toEqual([]);
 });

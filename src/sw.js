@@ -166,14 +166,21 @@ self.addEventListener("install", (event) => {
       const inBuild = older.some(({ request }) => HASHED.test(new URL(request.url).pathname)) ? await builtNow() : () => false;
       const languages = new Set();
       let wantsAll = null;
+      // Such a file is moved, not copied: kept in both, an offline copy of 120 MB took 240 until the build after next
+      // (R-P8). A page of the earlier build still open finds it in the new cache all the same, since a file named by its
+      // content is looked for in every cache (openFile), and the earlier cache keeps only what this build dropped.
       for (const { cache: from, request } of older) {
         if (request.url === ALL && wantsAll === null) wantsAll = await keptChoice(await from.match(request));
         const language = /\/static\/texts-([a-z]{2})\./.exec(request.url)?.[1];
         if (language) languages.add(language);
-        if (!HASHED.test(new URL(request.url).pathname) || (await cache.match(request))) continue;
-        if (!ON_DEMAND.test(request.url) && !(ours(request.url) && inBuild(request.url))) continue;
-        const response = await from.match(request);
-        if (response) await cache.put(request, response);
+        if (!HASHED.test(new URL(request.url).pathname)) continue;
+        if (!(await cache.match(request))) {
+          if (!ON_DEMAND.test(request.url) && !(ours(request.url) && inBuild(request.url))) continue;
+          const response = await from.match(request);
+          if (!response) continue;
+          await cache.put(request, response);
+        }
+        await from.delete(request);
       }
       // Then what the start needs and is not there yet: index.html and the files not named by their content always.
       const start = [...SHELL_FILES, ...[...languages].map((id) => TEXTS[id]).filter(Boolean)];
@@ -193,9 +200,11 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       // A page that is still open runs the previous build and may load more of
-      // its pictures later, so that build's cache is kept; older ones go.
+      // its pictures later, so that build's cache is kept (only what this build dropped, see install); older ones go.
+      // With no window open (the browser updating the worker in the background) no page can ask for them: all go.
       const old = (await caches.keys()).filter((key) => key.startsWith(PREFIX) && key !== CACHE);
-      await Promise.all(old.slice(0, -1).map((key) => caches.delete(key)));
+      const open = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      await Promise.all((open.length ? old.slice(0, -1) : old).map((key) => caches.delete(key)));
       await self.clients.claim();
     })(),
   );
