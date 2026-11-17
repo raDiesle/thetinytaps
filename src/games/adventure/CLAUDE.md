@@ -179,9 +179,14 @@ October 2026: 2,186 objects, 79 % busy, budget 60 %). So:
 - Never drop to 30 fps on slow devices (user decision, October 2026): the motions must stay smooth. A part that holds a
   steady 60 fps (p95 17 ms) may stay over the busy budget, but only as a per-part `budget` in `tools/perfScenarios.ts`
   with the decision written next to it – never by loosening the scenario's limits.
-- Where it stands (October 2026): the opening about 47 % busy, the glowing drums 85–90 % (accepted, its own limit
-  95 %; both hold 60 fps); about a quarter of that is the headless browser's GL work on the CPU (SwiftShader), which a
-  phone's graphics chip does.
+- What is drawn anew in every frame over the 3D picture (the child figure's svg in `.adventure-outline`) is an HTML
+  layer of its own (`will-change: transform`, `layers.test.ts`), and a new overlay (a bar, a counter, a button) is
+  measured with `bun run perf abenteuer` and `feuerwehr` before it is committed: the time bar added in November 2026
+  changed how Chrome grouped the overlays, the figure's repaint landed in a shared layer, and the drums rastered 47
+  screens a second instead of 18 (Schlauch 37) until the figure got its own layer.
+- Where it stands (November 2026): the opening about 45–50 % busy, the glowing drums 84–95 % (accepted, its own limit
+  95 %; both hold 60 fps) at about 24 screens rastered a second; about a quarter of the busy time is the headless
+  browser's GL work on the CPU (SwiftShader), which a phone's graphics chip does.
 
 ## Working on levels
 
