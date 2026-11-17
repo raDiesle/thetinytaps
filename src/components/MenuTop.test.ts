@@ -49,7 +49,9 @@ test("the page turning back is the one whose corner is touched, lifted at its le
 // with a ✕ on it, tapped or held like the ✕ (held where grown-ups chose so, so a child's tap can't end the game), in
 // the top left like a menu's, and a game's ⚙️ moves to the top right for it.
 test("a game is left by the page's corner, top left", () => {
-  const shell = read("src/components/GameShell.tsx");
+  // GameShell's corner while playing lives in gameExit.tsx.
+  expect(read("src/components/GameShell.tsx")).toContain("<GameExit ");
+  const shell = read("src/components/gameExit.tsx");
   const exit = shell.slice(shell.indexOf("function ExitButton"));
   expect(exit).toContain("useHold(");
   expect(exit).toContain('<PageCornerArt sign="close" />');
@@ -206,7 +208,7 @@ test("the families stand at the bottom of a menu's page, not in its head", () =>
 test("headings carry no emoji", () => {
   const leading = /<h[1-6][^>]*>\s*(<span aria-hidden>|\{?[^\s<{}]*\p{Extended_Pictographic})/u;
   const offenders = sourceFiles()
-    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|PictureQueue|VoiceList/.test(file))
+    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|pages\/management\/|PictureQueue|VoiceList/.test(file))
     .filter((file) => leading.test(read(join("src", file))));
   expect(offenders).toEqual([]);
   expect(read("src/components/MenuTop.tsx")).toMatch(/title: string; tools/);

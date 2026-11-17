@@ -31,8 +31,11 @@ test("the end of a level has no way back of its own: the corner is it, but in ZÃ
   const shell = await Bun.file("src/components/GameShell.tsx").text();
   expect(shell).toMatch(/<EndShown value=\{setEnded\}>/);
   expect(shell).toMatch(/<LeavesToShelf value=\{toShelf\}>/);
-  expect(shell).toMatch(/ended && [^?]*\?\s*\(?[\s\S]{0,400}<TapExit[\s\S]{0,60}sign=\{toShelf \? "shelf" : "close"\}/);
-  expect(shell).toMatch(/<PageCornerArt sign=\{sign\} \/>/);
+  // The corner while playing lives in gameExit.tsx, which GameShell hands `ended` and `toShelf`.
+  expect(shell).toMatch(/<GameExit\b[^>]*\bended=\{ended\}[^>]*\btoShelf=\{toShelf\}/);
+  const exit = await Bun.file("src/components/gameExit.tsx").text();
+  expect(exit).toMatch(/ended && [^?]*\?\s*\(?[\s\S]{0,400}<TapExit[\s\S]{0,60}sign=\{toShelf \? "shelf" : "close"\}/);
+  expect(exit).toMatch(/<PageCornerArt sign=\{sign\} \/>/);
   const withMenu: string[] = [];
   for (const file of new Bun.Glob("src/**/*.tsx").scanSync()) {
     if (/<GameEnd\b[^>]*\bmenu\b/.test(await Bun.file(file).text())) withMenu.push(file);

@@ -1,10 +1,11 @@
-import { useLocation, useNavigate, useParams } from "react-router";
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { FullscreenButton } from "@/components/FullscreenButton";
+import { useLocation, useNavigate } from "react-router";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { GoodNight } from "@/components/GoodNight";
 import { CardPicture, pictureCard, UNFINISHED_LABEL } from "@/components/GameCard";
+import { EndShown, GameExit, InnerBack, LeaveGame, LeavesToShelf, useInnerBackState, usePlayGuards } from "@/components/gameExit";
+import { LevelOnScreen, useLevelAddress, useLevelSync } from "@/components/gameLevelAddress";
 import { MenuHead } from "@/components/MenuTop";
-import { PageCornerArt } from "@/components/PageCornerArt";
+import { CountsPlaytime, Dusk, PlaytimeNote } from "@/components/playtimeUi";
 import { SeoText, SeoWords } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf, isHidden, pagesBetween } from "@/content/games";
@@ -14,14 +15,12 @@ import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { useT } from "@/lib/language";
 import { codeSoon } from "@/lib/lazyPart";
-import { BACK_TO_SHELF } from "@/lib/sharedTexts";
-import { useCommonSettings } from "@/lib/common";
 import { goBack } from "@/lib/goBack";
-import { levelHome, levelHref } from "@/lib/levelAddress";
-import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
+import { levelHref } from "@/lib/levelAddress";
+import { countGame, isPlaytimeOver, usePlaytime } from "@/lib/playtime";
 import { track } from "@/lib/analytics";
 import { routineReturn } from "@/lib/routine";
-import { setSfxVolume, unlockAudio } from "@/lib/sfx";
+import { unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
 import { UNLOCK_HOLD_MS, canPlayUnfinished, unlockUnfinished } from "@/lib/localTest";
@@ -29,76 +28,10 @@ import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice } from "@/lib/voice";
 
-/** How long ✕ has to be held to leave the game, where grown-ups chose holding (`leave`); the ring fills meanwhile. */
-const EXIT_DELAY_MS = 500;
-
-/** Esc has to be held, since children press it while typing. */
-const ESC_HOLD_MS = 1000;
-
-/** Leaves the game for the menu before it, like ✕. */
-const LeaveGame = createContext<() => void>(() => {});
-
-/** The way back to the menu before the game, for a game that has a way out of its own (the Timer). */
-export const useLeaveGame = () => useContext(LeaveGame);
-
-/** Whether leaving the game closes its book and puts it back on the shelf (not back to a menu or a routine). */
-const LeavesToShelf = createContext(false);
-
-/** For `GameEnd`'s „Menü“ button: it shows the shelf only where that is where it leads. */
-export const useLeavesToShelf = () => useContext(LeavesToShelf);
-
-/**
- * Tells GameShell whether the end of a level (`GameEnd`) is on screen: then the corner in the top left is the way back,
- * with one tap – the ribbon onto the shelf where the game goes back there. The end shows no „Menü“ button of its own,
- * except in Zähne putzen and Aufs Töpfchen (`GameEnd`'s `menu`).
- */
-const EndShown = createContext<(shown: boolean) => void>(() => {});
-
-/** For `GameEnd`: says it is on screen (true) or gone again (false). */
-export const useEndShown = () => useContext(EndShown);
-
-/** Tells GameShell which level is on screen, for its address (`useLevelOnScreen`). */
-const LevelOnScreen = createContext<(id: string | undefined) => void>(() => {});
-
-/**
- * For a game that goes on from level to level by itself, without changing the card picked (`mode`): Kettenreaktion's
- * „Weiter“ plays the next machine, Kleine Abenteuer's the next story. The address then names the level on screen
- * (levelAddress.ts), not the card picked first.
- */
-export function useLevelOnScreen(id: string) {
-  const set = useContext(LevelOnScreen);
-  useEffect(() => set(id), [id, set]);
-}
-
-/**
- * A screen inside the game to go back from (a feeling picked in „Wie geht's dir?“, back to all feelings): while a game
- * sets one, the corner in the top left is the way back to the game's screen before, with one tap, and turns the page
- * back – „Back is always the screen seen before“ (root CLAUDE.md, user feedback, November 2026).
- */
-const InnerBack = createContext<(back: (() => void) | undefined) => void>(() => {});
-
-/**
- * For a game with screens of its own inside (a card picked, then its page): `back` leads to the screen before, and
- * while it is given the corner's ✕ becomes the way back to it (an arrow, one tap; holding Esc goes there too). Leave it
- * undefined on the game's first screen, where the corner leaves the game as always.
- */
-export function useInnerBack(back: (() => void) | undefined) {
-  const set = useContext(InnerBack);
-  const latest = useRef(back);
-  latest.current = back;
-  const on = !!back;
-  useEffect(() => {
-    if (!on) return;
-    set(() => latest.current?.());
-    return () => set(undefined);
-  }, [on, set]);
-}
-
-/** Whether what plays counts as play time: not a tool for the day (`GameShellProps.tool`) nor a routine's step. */
-const CountsPlaytime = createContext(true);
-
-/** Whether the game on screen counts as play time, for the „Nochmal“ and „Weiter“ at the end of a level. */
-export const useCountsPlaytime = () => useContext(CountsPlaytime);
+// Leaving, the level's address and play time live in modules of their own; games keep importing their hooks from here.
+export { useEndShown, useInnerBack, useLeaveGame, useLeavesToShelf } from "@/components/gameExit";
+export { useLevelOnScreen } from "@/components/gameLevelAddress";
+export { useCountsPlaytime } from "@/components/playtimeUi";
 
 /** One way to play a game, picked on its start screen with a big card. */
 export interface GameMode {
@@ -240,33 +173,13 @@ export function GameShell({
         ? t(category.title)
         : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const menu = menuAfterPlay({ startMode, leaveTo }, back);
-  // Each card's level has an address of its own below the game's (`abenteuer/:level?`, levelAddress.ts) – not in a game
-  // that plays at once or as a routine's step, which have no cards to come back to.
-  const addressed = useParams().level;
-  const levels = !!modes?.length && !startMode && !returnTo;
-  const home = levelHome(location.pathname, levels ? addressed : undefined);
-  /** Whether a level can be played here: one of the cards, and one still being built only where it may be tested. */
-  const playable = (id: string) => !!modes?.some((m) => m.id === id && (!m.unfinished || canPlayUnfinished()));
-  /** The level the address was last set to or played from, so a change of address the game made itself isn't handled again. */
-  const shownLevel = useRef<string | undefined>(undefined);
-  // The level a game says is on screen (`useLevelOnScreen`), where it went on by itself; else the card picked.
-  const [onScreen, setOnScreen] = useState<string | undefined>(undefined);
+  const address = useLevelAddress({ modes, startMode, returnTo, pathname: location.pathname });
+  const { addressed, levels, home, shownLevel, setOnScreen } = address;
   const [playing, setPlaying] = useState(false);
   // The end of a level is on screen (GameEnd): the corner is then the way back, not a „Menü“ button.
   const [ended, setEnded] = useState(false);
   // A screen inside the game to go back from (`useInnerBack`): the corner then goes there instead of leaving.
-  const innerBack = useRef<(() => void) | undefined>(undefined);
-  const [inner, setInner] = useState(false);
-  const setInnerBack = useRef((back: (() => void) | undefined) => {
-    innerBack.current = back;
-    setInner(!!back);
-  }).current;
-  const goInner = () => {
-    const back = innerBack.current;
-    if (back) turnPageWith("back", back);
-  };
-  const goInnerRef = useRef(goInner);
-  goInnerRef.current = goInner;
+  const { innerBack, inner, setInnerBack, goInner, goInnerRef } = useInnerBackState();
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
   const playtime = usePlaytime(playing && !free);
@@ -358,46 +271,10 @@ export function GameShell({
     void start(true, id);
   }, UNLOCK_HOLD_MS);
 
-  useEffect(() => {
-    if (!playing) return;
-    let escDownAt: number | null = null;
-
-    // Capture phase so this runs before the game's own handlers.
-    const onKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      if (e.key !== "Escape") return;
-      if (!e.repeat) escDownAt = performance.now();
-      else if (escDownAt !== null && performance.now() - escDownAt >= ESC_HOLD_MS) {
-        escDownAt = null;
-        if (innerBack.current) goInnerRef.current();
-        else stopRef.current();
-      }
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Escape") escDownAt = null;
-    };
-    const block = (e: Event) => e.preventDefault();
-
-    window.addEventListener("keydown", onKeyDown, { capture: true });
-    window.addEventListener("keyup", onKeyUp, { capture: true });
-    window.addEventListener("contextmenu", block);
-    window.addEventListener("beforeunload", block);
-    // Safari on iPad zooms on pinch even with touch-action: none.
-    window.addEventListener("gesturestart", block);
-    // A whole hand or a touch at the very edge must not scroll, pull down or start a browser gesture (A-13).
-    const noPan = (e: TouchEvent) => {
-      if (e.cancelable) e.preventDefault();
-    };
-    window.addEventListener("touchmove", noPan, { passive: false });
-    return () => {
-      window.removeEventListener("keydown", onKeyDown, { capture: true });
-      window.removeEventListener("keyup", onKeyUp, { capture: true });
-      window.removeEventListener("contextmenu", block);
-      window.removeEventListener("beforeunload", block);
-      window.removeEventListener("gesturestart", block);
-      window.removeEventListener("touchmove", noPan);
-    };
-  }, [playing]);
+  usePlayGuards(playing, () => {
+    if (innerBack.current) goInnerRef.current();
+    else stopRef.current();
+  });
 
   // A game that starts at once (or a routine's step) does so only when the page opens, once (React runs effects twice
   // while developing).
@@ -411,51 +288,9 @@ export function GameShell({
     else void start();
   }, []);
 
-  // The address names another level than the one shown: a link, a reload or the browser's forward button opened it, so
-  // it plays at once (an unknown one, or any while play time is over, leads to the cards). No level while playing: the
-  // phone's back button went back to the cards, which show again.
-  useEffect(() => {
-    if (!levels || addressed === shownLevel.current) return;
-    shownLevel.current = addressed;
-    if (addressed && !playable(addressed)) {
-      shownLevel.current = undefined;
-      navigate(home, { replace: true });
-    } else if (addressed && playing) onMode?.(addressed);
-    else if (addressed) {
-      if (!free && isPlaytimeOver()) {
-        shownLevel.current = undefined;
-        navigate(home, { replace: true });
-        return;
-      }
-      onMode?.(addressed);
-      void start();
-    } else if (playing) {
-      stopSpeaking();
-      hushVoice();
-      exitKidMode();
-      turnPageWith("back", () => setPlaying(false));
-    }
-  }, [addressed]);
-
-  // „Weiter“, or the game itself, went on to another level: the address follows, in place of the one before.
-  const current = onScreen ?? mode;
-  useEffect(() => {
-    if (!playing) setOnScreen(undefined);
-    if (!levels || !playing || !current || current === addressed || !playable(current)) return;
-    shownLevel.current = current;
-    navigate(levelHref(home, current), { replace: true });
-  }, [current, playing]);
+  useLevelSync({ ...address, navigate, playing, setPlaying, mode, onMode, free, start });
 
   if (playing) {
-    const backToMenu = t({
-      de: "Zurück zum Menü",
-      ru: "Назад в меню",
-      en: "Back to menu",
-      zh: "返回菜单",
-      hi: "मेन्यू पर वापस",
-      es: "Volver al menú",
-      ar: "العودة إلى القائمة",
-    });
     // Leaving closes the book and puts it back on the shelf (see `stop`).
     const toShelf = !returnTo && menu === "/";
     return (
@@ -485,16 +320,7 @@ export function GameShell({
         <div hidden>
           <SeoWords main />
         </div>
-        {inner && !ended && !playtime.goodNight ? (
-          // Back to the game's screen before (`useInnerBack`): one tap, held or not, since nothing is left.
-          <TapExit onExit={goInner} sign="back" label={t({ de: "Zurück", ru: "Назад", en: "Back", zh: "返回", hi: "वापस", es: "Atrás", ar: "رجوع" })} />
-        ) : ended && !playtime.goodNight ? (
-          // At the end of a level the corner is the way back, as in a menu: one tap, held or not (the „Menü“ button it
-          // replaces was a tap too), and onto the shelf it is the book's ribbon, since the book closes and goes back.
-          <TapExit onExit={stop} sign={toShelf ? "shelf" : "close"} label={toShelf ? t(BACK_TO_SHELF) : backToMenu} />
-        ) : (
-          <ExitButton onExit={stop} label={backToMenu} />
-        )}
+        <GameExit inner={inner} ended={ended} goodNight={playtime.goodNight} toShelf={toShelf} onInner={goInner} onLeave={stop} />
       </div>
     );
   }
@@ -632,38 +458,6 @@ export function GameShell({
   );
 }
 
-/** On the start screen, for the grown-up: how much of today's play time is used. */
-function PlaytimeNote() {
-  const t = useT();
-  const { settings, played } = usePlaytimeState();
-  if (settings.by === "none") return null;
-  const playedMinutes = Math.min(Math.floor(played.ms / 60_000), settings.minutes);
-  return (
-    <p className="shared-settings-note">
-      <span aria-hidden>⏳</span>{" "}
-      {settings.by === "time"
-        ? t({
-            de: `Spielzeit heute: ${playedMinutes} von ${settings.minutes} Min.`,
-            ru: `Время игры сегодня: ${playedMinutes} из ${settings.minutes} мин.`,
-            en: `Play time today: ${playedMinutes} of ${settings.minutes} min`,
-            zh: `今天的游戏时间：${playedMinutes} / ${settings.minutes} 分钟`,
-            hi: `आज खेलने का समय: ${settings.minutes} में से ${playedMinutes} मिनट`,
-            es: `Tiempo de juego hoy: ${playedMinutes} de ${settings.minutes} min`,
-            ar: `وقت اللعب اليوم: ${playedMinutes} من ${settings.minutes} دقيقة`,
-          })
-        : t({
-            de: `Spiele heute: ${Math.min(played.games, settings.games)} von ${settings.games}`,
-            ru: `Игры сегодня: ${Math.min(played.games, settings.games)} из ${settings.games}`,
-            en: `Games today: ${Math.min(played.games, settings.games)} of ${settings.games}`,
-            zh: `今天的游戏：${Math.min(played.games, settings.games)} / ${settings.games} 局`,
-            hi: `आज के खेल: ${settings.games} में से ${Math.min(played.games, settings.games)}`,
-            es: `Juegos hoy: ${Math.min(played.games, settings.games)} de ${settings.games}`,
-            ar: `ألعاب اليوم: ${Math.min(played.games, settings.games)} من ${settings.games}`,
-          })}
-    </p>
-  );
-}
-
 /**
  * The small round sign next to the way back (⚙️): opens its panel below the top row, or folds it away
  * again. Its name is only a tooltip and read out, so it takes no more room than the sign.
@@ -674,114 +468,4 @@ function PanelButton({ open, onClick, icon, label }: { open: boolean; onClick: (
       {icon}
     </button>
   );
-}
-
-/**
- * The last minute of play time: the screen slowly darkens, sounds get quieter
- * and every animation slows down. Once it is over (more time given, the game left), sounds and animations are as before.
- */
-function Dusk({ level }: { level: number }) {
-  /** How fast each slowed animation ran before, to give that back when the dusk ends. */
-  const slowed = useRef(new Map<Animation, number>());
-
-  useEffect(() => {
-    setSfxVolume(1 - 0.7 * level);
-    const rate = 1 - 0.6 * level;
-    for (const animation of document.getAnimations()) {
-      const target = (animation.effect as KeyframeEffect | null)?.target;
-      // The exit ring must keep matching its timer.
-      if (target?.closest(".hold-exit")) continue;
-      if (!slowed.current.has(animation)) slowed.current.set(animation, animation.playbackRate);
-      animation.playbackRate = rate;
-    }
-  }, [level]);
-
-  // Without this an animation still running stayed slow for good: after a grown-up gave more time, the game went on
-  // at the last minute's pace.
-  useEffect(() => {
-    const before = slowed.current;
-    return () => {
-      setSfxVolume(1);
-      for (const [animation, rate] of before) animation.playbackRate = rate;
-      before.clear();
-    };
-  }, []);
-
-  return <div className="playtime-dusk" style={{ opacity: 0.65 * level }} aria-hidden />;
-}
-
-/**
- * The ✕ in the corner (the page's turned-up corner): one tap leaves the game, or – where grown-ups chose
- * holding (`leave`, under ⏳ on the home page) – it has to be held for half a second while the ring fills (the corner
- * lifts), and letting go earlier keeps playing. No note beside it says what it does: grown-ups know ✕ and the corner
- * (user feedback, November 2026); its name is only read out.
- */
-function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
-  const [{ leave }] = useCommonSettings();
-  return leave === "hold" ? <HoldExit onExit={onExit} label={label} /> : <TapExit onExit={onExit} label={label} />;
-}
-
-/**
- * The ✕ left with one tap; `shelf` draws the book's ribbon instead, the way back onto the shelf, and `back` the page's
- * corner with an arrow, back to the game's screen before (`useInnerBack`).
- */
-function TapExit({ onExit, label, sign = "close" }: { onExit: () => void; label: string; sign?: "close" | "back" | "shelf" }) {
-  const shelf = sign === "shelf";
-  return (
-    <ExitCorner>
-      <button
-        type="button"
-        className={shelf ? "hold-exit exit-ribbon" : "hold-exit"}
-        aria-label={label}
-        // Keeps the game from reacting to the tap on the button.
-        onPointerDown={(e) => e.stopPropagation()}
-        onContextMenu={(e) => e.preventDefault()}
-        // A click, not pointer down: leaving on the way down would let the lifted finger tap the menu.
-        onClick={onExit}
-      >
-        {sign === "close" ? <ExitSign /> : <PageCornerArt sign={sign} />}
-      </button>
-    </ExitCorner>
-  );
-}
-
-/** The ✕ that has to be held. */
-function HoldExit({ onExit, label }: { onExit: () => void; label: string }) {
-  const t = useT();
-  const { holding, props } = useHold(onExit, EXIT_DELAY_MS);
-  return (
-    <ExitCorner>
-      <button
-        type="button"
-        className={`hold-exit${holding ? " holding" : ""}`}
-        aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })})`}
-        {...props}
-      >
-        <ExitSign />
-      </button>
-    </ExitCorner>
-  );
-}
-
-/**
- * The corner the ✕ sits in, alone in the top left; the fullscreen button goes to the far top right, with ⚙️ (if the
- * game has one) right beside it on its left (user feedback, November 2026: beside the ✕ it hung on its own up there).
- */
-function ExitCorner({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <div className="exit-corner" data-tap-keep>
-        {children}
-      </div>
-      <div className="play-fullscreen-corner" data-tap-keep>
-        {/* Only to get back into fullscreen: a child's finger must not end it. */}
-        <FullscreenButton className="play-fullscreen" playing />
-      </div>
-    </>
-  );
-}
-
-/** The ✕: the page's turned-up corner with a ✕ on it (`book.css`), lifting further while held. */
-function ExitSign() {
-  return <PageCornerArt sign="close" />;
 }
