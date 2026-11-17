@@ -1,5 +1,6 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
+import { read, sourceFiles } from "@/testSources";
 import { APP_LANGUAGES } from "@/lib/language";
 import { LANGUAGE_STATUS, type LanguageStatusRow } from "./ideas";
 
@@ -57,7 +58,7 @@ const OWN_FILES = new Set(Object.values(FOLDERS).flatMap((paths) => paths.filter
 /** Every .ts/.tsx file below `path` (or `path` itself), tests and other games' own files left out. */
 function sources(path: string): string[] {
   if (/\.tsx?$/.test(path)) return [path];
-  return readdirSync(path, { recursive: true, encoding: "utf8" })
+  return sourceFiles(path)
     .filter((f) => /\.tsx?$/.test(f) && !f.includes(".test."))
     .map((f) => `${path}/${f}`)
     .filter((f) => !GERMAN_ONLY.test(f) && !OWN_FILES.has(f));
@@ -177,7 +178,7 @@ describe("inline texts against the language status", () => {
       const missing = checks.flatMap(([checked, files]) => {
         const languages = APP_LANGUAGES.filter((language) => textsDone(checked, language));
         return files.flatMap((file) =>
-          inlineTexts(readFileSync(file, "utf8")).flatMap(({ line, text, keys }) => {
+          inlineTexts(read(file)).flatMap(({ line, text, keys }) => {
             const lacking = languages.filter((language) => !keys.includes(language));
             return lacking.length ? [`${file}:${line} ${text} – ${lacking.join(", ")}`] : [];
           }),

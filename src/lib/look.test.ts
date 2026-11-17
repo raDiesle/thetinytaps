@@ -1,9 +1,9 @@
-import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
+import { isTest, read, sourceFiles } from "@/testSources";
 import { forgetOldLook, TURN_SECONDS } from "./look";
 
-const css = readFileSync("src/styles/book.css", "utf8");
+const css = read("src/styles/book.css");
 
 /** The number of seconds a `name: <n>s` (or a `const NAME = <n>`) in `text` gives. */
 const seconds = (text: string, pattern: RegExp) => Number(text.match(pattern)?.[1]);
@@ -21,10 +21,10 @@ test("there is only the book look, whatever an old visit stored", () => {
     globalThis.localStorage = real;
   }
   expect(values.size).toBe(0);
-  const look = readFileSync("src/lib/look.ts", "utf8");
+  const look = read("src/lib/look.ts");
   expect(look).not.toMatch(/getItem|setItem|location\.search|"buch"/);
-  const sources = readdirSync("src", { recursive: true, encoding: "utf8" }).filter((f) => /\.(tsx?|css)$/.test(f) && !f.endsWith(".test.ts"));
-  const telling = sources.filter((f) => /data-look|dataset\.look|isBookLook|buch=aus/.test(readFileSync(join("src", f), "utf8")));
+  const sources = sourceFiles().filter((f) => /\.(tsx?|css)$/.test(f) && !isTest(f));
+  const telling = sources.filter((f) => /data-look|dataset\.look|isBookLook|buch=aus/.test(read(join("src", f))));
   expect(telling).toEqual([]);
 });
 
@@ -70,9 +70,9 @@ test("the highlighter covers all the words of a chosen choice", () => {
   expect(words).toContain("animation: book-highlight-words");
   expect(words).toContain("box-decoration-break: clone");
   expect(css).not.toMatch(/\.choice button\.selected::after/);
-  const sources = readdirSync("src", { recursive: true, encoding: "utf8" })
+  const sources = sourceFiles()
     .filter((file) => /\.tsx$/.test(file) && !file.includes(".test."))
-    .map((file) => [file, readFileSync(join("src", file), "utf8")] as const)
+    .map((file) => [file, read(join("src", file))] as const)
     .filter(([, code]) => /className="choice\b/.test(code));
   expect(sources.length).toBeGreaterThan(2);
   for (const [file, code] of sources) {
@@ -94,11 +94,11 @@ test("⚙️ while playing is a big symbol-only note that lights up only as play
   const slip = rule(".play-area .play-options-corner .play-options-button");
   const width = (decls: string) => Number(decls.match(/width:\s*(\d+)px/)?.[1]);
   expect(width(slip)).toBeGreaterThan(1.5 * width(rule(".play-area .play-fullscreen, .play-options-button)")));
-  const playing = readFileSync("src/styles/playing.css", "utf8");
+  const playing = read("src/styles/playing.css");
   const playingRule = (selector: string) => playing.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
   expect(Number(playingRule(".play-options-gear").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(2.4);
   // Only the symbol: its name and „halten“ are read out, never written on the slip (user feedback, November 2026).
-  expect(readFileSync("src/components/PlayOptions.tsx", "utf8")).not.toContain("play-options-label");
+  expect(read("src/components/PlayOptions.tsx")).not.toContain("play-options-label");
   const glow = playing.match(/\.play-options-corner \{[^}]*animation:\s*([^;]+);/)?.[1] ?? "";
   expect(glow).toContain("play-options-glow");
   // A number of times, never `infinite`: after it, nothing idles.

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { isTest, read, sourceFiles } from "@/testSources";
 import { bookIdOf, CATEGORIES, hasPage, listedGames } from "@/content/games";
 import sharp from "sharp";
 import { PREVIEW_SIZE } from "@/components/GameCard";
@@ -11,19 +12,17 @@ import { SCENE_ENTRIES } from "@/games/scenes/catalog";
 // light, so a phone shows a menu without drawing a single game.
 
 const ROOT = join(import.meta.dir, "..");
-const TOOL = readFileSync(join(ROOT, "tools/previews.ts"), "utf8");
+const TOOL = read(join(ROOT, "tools/previews.ts"));
 
 /** Every source file below `dir`. */
 const sources = (dir: string): string[] =>
-  readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
-    entry.isDirectory() ? sources(join(dir, entry.name)) : /\.tsx?$/.test(entry.name) && !entry.name.endsWith(".test.ts") ? [join(dir, entry.name)] : [],
-  );
+  sourceFiles(dir)
+    .filter((file) => /\.tsx?$/.test(file) && !isTest(file))
+    .map((file) => join(dir, file));
 
 /** The `vorschau/` folders the app imports, relative to the repo (not the wildcard folders of the page of all pictures). */
 const folders = sources(join(ROOT, "src")).flatMap((file) =>
-  [...readFileSync(file, "utf8").matchAll(/from "([^"*]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) =>
-    join(file.slice(ROOT.length + 1, file.lastIndexOf("/")), path),
-  ),
+  [...read(file).matchAll(/from "([^"*]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) => join(file.slice(ROOT.length + 1, file.lastIndexOf("/")), path)),
 );
 
 describe("menu pictures", () => {
@@ -40,7 +39,7 @@ describe("menu pictures", () => {
   test("a folder of files is imported by a path relative to its importer", () => {
     // tools/appPlugin.ts resolves a `?glob` next to the importing file only: "@/…" found no files and gave an empty
     // list without an error, so Lebendige Bilder's menu kept its emojis.
-    for (const file of sources(join(ROOT, "src"))) expect(readFileSync(file, "utf8"), file).not.toMatch(/from "@\/[^"]*\?glob"/);
+    for (const file of sources(join(ROOT, "src"))) expect(read(file), file).not.toMatch(/from "@\/[^"]*\?glob"/);
   });
 
   test("bun run previews knows every folder the menus show", () => {

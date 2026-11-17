@@ -1,32 +1,15 @@
-import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
+import { cssRules, read, sourceFiles } from "@/testSources";
 
 // On a computer the back link is fixed in the top left corner, outside the page's layout. A menu title drawn
 // on its own (not by MenuHead, which starts the title's column where the corner ends) slid under it at 1024 px.
 test("only MenuHead draws a menu's title", () => {
-  const drawers = readdirSync("src", { recursive: true, encoding: "utf8" })
+  const drawers = sourceFiles()
     .filter((file) => file.endsWith(".tsx"))
-    .filter((file) => readFileSync(join("src", file), "utf8").includes('className="menu-title"'));
+    .filter((file) => read(join("src", file)).includes('className="menu-title"'));
   expect(drawers).toEqual([join("components", "MenuTop.tsx")]);
 });
-
-/** Every CSS rule in src (selector and body), roughly split – enough for flat rules and rules inside one @media. */
-function cssRules() {
-  return readdirSync("src", { recursive: true, encoding: "utf8" })
-    .filter((file) => file.endsWith(".css"))
-    .flatMap((file) =>
-      [
-        ...readFileSync(join("src", file), "utf8")
-          .replace(/\/\*[\s\S]*?\*\//g, "")
-          .matchAll(/([^{}]+)\{([^{}]*)\}/g),
-      ].map(([, selector, body]) => ({
-        file,
-        selector: selector.trim(),
-        body,
-      })),
-    );
-}
 
 // Grown-ups on a big monitor didn't find the round arrow fixed in the screen's corner: it stays next to the menu's title.
 test("the way back from a menu is never fixed in a corner", () => {
@@ -38,7 +21,7 @@ test("the way back from a menu is never fixed in a corner", () => {
 // feedback, October 2026: a corner in the top right turned the other page, and grown-ups didn't look there). Every menu
 // head draws it, it lies fixed at the page's corner, and no round arrow beside the title stands in for it.
 test("a menu turns back at the page's corner, top left", () => {
-  const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
+  const menuTop = read("src/components/MenuTop.tsx");
   const head = menuTop.slice(menuTop.indexOf("export function MenuHead"), menuTop.indexOf("function PageCorner"));
   expect(head).toContain("<PageCorner ");
   expect(head).not.toContain("back-link");
@@ -66,7 +49,7 @@ test("the page turning back is the one whose corner is touched, lifted at its le
 // with a ✕ on it, tapped or held like the ✕ (held where grown-ups chose so, so a child's tap can't end the game), in
 // the top left like a menu's, and a game's ⚙️ moves to the top right for it.
 test("a game is left by the page's corner, top left", () => {
-  const shell = readFileSync("src/components/GameShell.tsx", "utf8");
+  const shell = read("src/components/GameShell.tsx");
   const exit = shell.slice(shell.indexOf("function ExitButton"));
   expect(exit).toContain("useHold(");
   expect(exit).toContain('<PageCornerArt sign="close" />');
@@ -116,11 +99,11 @@ test("the menus' sun is in the top left corner", () => {
 // page“, and the cover's corner lying over the page floated where no cover can be (user feedback, October 2026), so the
 // way back to the home page is the book's ribbon hanging over the page's top edge, with a shelf on it.
 test("the way back onto the shelf is the book's ribbon, not a corner", () => {
-  const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
+  const menuTop = read("src/components/MenuTop.tsx");
   const corner = menuTop.slice(menuTop.indexOf("function PageCorner"));
   expect(corner).toMatch(/sign=\{to === "\/" \? "shelf" : "back"\}/);
   expect(corner).toMatch(/className=\{to === "\/" \? "page-corner page-ribbon" : "page-corner"\}/);
-  const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
+  const art = read("src/components/PageCornerArt.tsx");
   expect(art).toMatch(/if \(sign === "shelf"\) return <RibbonArt \/>/);
   expect(art).not.toContain("CoverCorner");
 });
@@ -129,7 +112,7 @@ test("the way back onto the shelf is the book's ribbon, not a corner", () => {
 // the title: the menu's head reaches down past it from the top of the menu's padding (`--menu-pad`, which must be the
 // padding the menus really have), the table of contents counts that room as taken, and it stays left of the head.
 test("the ribbon reaches no further than the room the menus keep free for it", () => {
-  const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
+  const art = read("src/components/PageCornerArt.tsx");
   const [, w, h] = (art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? []).map(Number);
   const rules = cssRules();
   const body = (selector: string) => rules.filter((r) => r.selector === selector).map((r) => r.body);
@@ -137,7 +120,7 @@ test("the ribbon reaches no further than the room the menus keep free for it", (
   const lift = Number(ribbon?.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
   expect(ribbon).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
   expect(ribbon).toContain("position: absolute");
-  expect(readFileSync("src/components/MenuTop.tsx", "utf8")).toContain('createPortal(corner, document.getElementById("root")');
+  expect(read("src/components/MenuTop.tsx")).toContain('createPortal(corner, document.getElementById("root")');
   const sizes = body(":root:has(.page-ribbon)");
   expect(sizes.join("")).toContain(`--ribbon-reach: calc(var(--page-top) + var(--ribbon) * ${(h ?? 0) - lift} / ${w})`);
   // Left of the head, which keeps the corner's room free (`.menu-head`'s margin): its widest part, the arrow's disc.
@@ -161,7 +144,7 @@ test("the ribbon reaches no further than the room the menus keep free for it", (
 // feedback, October 2026: in the corner it was far too small, with much empty room between it and the lines). It keeps
 // clear of the lines from the first width it does so: even its smallest size fits, with room for its sway and a scrollbar.
 test("on a wide screen the ribbon lies beside the table of contents, never over its lines", () => {
-  const css = readFileSync("src/styles/book.css", "utf8");
+  const css = read("src/styles/book.css");
   const wide = css.match(/@media \(min-width: (\d+)px\) and \(min-height: 600px\) \{\s*:root:has\(\.page-ribbon\):has\(\.toc\) \{([^}]*)\}/);
   const [, from, body] = wide ?? [];
   expect(css).toMatch(/\.toc \{[^}]*width: min\(100%, 900px\);/);
@@ -180,7 +163,7 @@ test("on a wide screen the ribbon lies beside the table of contents, never over 
 // The arrow on the ribbon's disc is a plain arrow pointing back, as the round arrow of MenuTop: a straight shaft and a
 // head of two equal strokes meeting at its tip (a bent shaft with uneven strokes was not seen as an arrow).
 test("the ribbon's arrow is a straight arrow with an even head", () => {
-  const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
+  const art = read("src/components/PageCornerArt.tsx");
   const d = art.match(/className="page-ribbon-arrow" d="([^"]+)"/)?.[1] ?? "";
   const [x0, y0, x1, ax, ay, tx, ty, bx, by] = (d.match(/-?[\d.]+/g) ?? []).map(Number);
   expect(d).toMatch(/^M[\d.]+ [\d.]+H[\d.]+M[\d.]+ [\d.]+L[\d.]+ [\d.]+L[\d.]+ [\d.]+$/);
@@ -195,26 +178,26 @@ test("the ribbon's arrow is a straight arrow with an even head", () => {
 // User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, no game passes one, and no
 // game's own menu has an ℹ️ panel either (the Belohnungstafel's „Über die Tafel“ went too).
 test("no start screen has an „Über das Spiel“", () => {
-  const panels = readdirSync("src/games", { recursive: true, encoding: "utf8" })
+  const panels = sourceFiles("src/games")
     .filter((file) => file.endsWith(".tsx"))
-    .filter((file) => readFileSync(join("src/games", file), "utf8").includes('emoji="ℹ️"'));
+    .filter((file) => read(join("src/games", file)).includes('emoji="ℹ️"'));
   expect(panels).toEqual([]);
-  expect(readFileSync("src/components/GameShell.tsx", "utf8")).not.toMatch(/\binfo\?:/);
-  const games = readdirSync("src/games", { recursive: true, encoding: "utf8" })
+  expect(read("src/components/GameShell.tsx")).not.toMatch(/\binfo\?:/);
+  const games = sourceFiles("src/games")
     .filter((file) => file.endsWith(".tsx"))
-    .filter((file) => /<GameShell[\s\S]*?\binfo=\{/.test(readFileSync(join("src/games", file), "utf8")));
+    .filter((file) => /<GameShell[\s\S]*?\binfo=\{/.test(read(join("src/games", file))));
   expect(games).toEqual([]);
 });
 
 // User feedback, October 2026: the animal families stand at the bottom of a menu's page, never in its top row beside
 // the title, where they were too small and in the way; the page keeps room for them under its cards.
 test("the families stand at the bottom of a menu's page, not in its head", () => {
-  expect(readFileSync("src/components/MenuTop.tsx", "utf8")).not.toContain("BookFamil");
-  expect(readFileSync("src/components/Sky.tsx", "utf8")).toContain("<BookFamilies />");
+  expect(read("src/components/MenuTop.tsx")).not.toContain("BookFamil");
+  expect(read("src/components/Sky.tsx")).toContain("<BookFamilies />");
   const family = cssRules().filter((r) => r.selector === ":root .book-family");
   expect(family.length).toBeGreaterThan(0);
   for (const rule of family) expect(rule.body).toMatch(/bottom:/);
-  expect(readFileSync("src/lib/fitGrid.ts", "utf8")).toContain("--menu-floor");
+  expect(read("src/lib/fitGrid.ts")).toContain("--menu-floor");
 });
 
 // User feedback, October 2026: headings carry no emoji („Lebendige Welten“, never „🌳 Lebendige Welten“). MenuHead takes
@@ -222,9 +205,9 @@ test("the families stand at the bottom of a menu's page, not in its head", () =>
 // page, which only the makers see, keeps its signs).
 test("headings carry no emoji", () => {
   const leading = /<h[1-6][^>]*>\s*(<span aria-hidden>|\{?[^\s<{}]*\p{Extended_Pictographic})/u;
-  const offenders = readdirSync("src", { recursive: true, encoding: "utf8" })
+  const offenders = sourceFiles()
     .filter((file) => file.endsWith(".tsx") && !/ManagementPage|PictureQueue|VoiceList/.test(file))
-    .filter((file) => leading.test(readFileSync(join("src", file), "utf8")));
+    .filter((file) => leading.test(read(join("src", file))));
   expect(offenders).toEqual([]);
-  expect(readFileSync("src/components/MenuTop.tsx", "utf8")).toMatch(/title: string; tools/);
+  expect(read("src/components/MenuTop.tsx")).toMatch(/title: string; tools/);
 });

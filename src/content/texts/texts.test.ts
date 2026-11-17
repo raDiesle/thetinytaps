@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { dirname, join, relative } from "node:path";
+import { isTest, read, sourceFiles } from "@/testSources";
 import { TEXTS_LANGUAGES } from ".";
 
 // A visit downloads only the texts of its language: every file in another language (`ru.ts`, `content.ru.ts`,
@@ -9,13 +10,13 @@ import { TEXTS_LANGUAGES } from ".";
 const SRC = join(import.meta.dir, "../..");
 const LANGUAGE_FILE = new RegExp(`(^|[/.])(${TEXTS_LANGUAGES.join("|")})\\.ts$`);
 
-const sources = [...new Bun.Glob("**/*.{ts,tsx}").scanSync({ cwd: SRC })].filter((file) => !/\.test\.tsx?$/.test(file) && file !== "testPreload.ts");
+const sources = sourceFiles().filter((file) => /\.tsx?$/.test(file) && !isTest(file) && file !== "testPreload.ts");
 // German's words pack (content/de.ts) is the code's own first language, played without the German module.
 const languageFiles = sources.filter((file) => LANGUAGE_FILE.test(file) && !file.startsWith("content/texts/") && file !== "content/de.ts");
 
 /** The source files `file` imports (aliases and relative paths; packages left out). */
-async function importsOf(file: string) {
-  const code = await Bun.file(join(SRC, file)).text();
+function importsOf(file: string) {
+  const code = read(join(SRC, file));
   return [...code.matchAll(/(?:from|import)\s*\(?\s*"([^"]+)"/g)]
     .map(([, path]) => (path.startsWith("@/") ? path.slice(2) : path.startsWith(".") ? relative(SRC, join(SRC, dirname(file), path)) : undefined))
     .filter((path) => path !== undefined)
@@ -31,11 +32,11 @@ describe("language files", () => {
     expect(own.filter((file) => !listed.includes(file))).toEqual([]);
   });
 
-  test("imported only by their language's texts module", async () => {
+  test("imported only by their language's texts module", () => {
     const strays: string[] = [];
     for (const file of sources) {
       const language = /^content\/texts\/texts-(\w+)\.ts$/.exec(file)?.[1];
-      for (const imported of await importsOf(file)) {
+      for (const imported of importsOf(file)) {
         const of = LANGUAGE_FILE.exec(imported)?.[2];
         if (of && languageFiles.includes(imported) && of !== language) strays.push(`${file} → ${imported}`);
       }

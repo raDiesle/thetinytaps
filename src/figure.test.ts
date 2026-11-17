@@ -1,13 +1,13 @@
-import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
+import { isTest, read, sourceFiles } from "@/testSources";
 import { heroLook } from "@/games/elevator/kid";
 
 // A figure that stands for the child follows „Junge / Mädchen“ on the home page (`useFigure` in src/lib/common.ts).
 // Animals (Tapsi, the Gefühle animals) and the people in the pictures stay as they are.
 
-const sources = readdirSync("src", { recursive: true, encoding: "utf8" })
-  .filter((file) => /\.tsx?$/.test(file) && !file.endsWith(".test.ts") && !file.startsWith(join("content", "ideas")))
+const sources = sourceFiles()
+  .filter((file) => /\.tsx?$/.test(file) && !isTest(file) && !file.startsWith(join("content", "ideas")))
   .map((file) => join("src", file));
 
 /** Every drawing of the child itself: each asks the figure. A new one goes on this list. */
@@ -19,14 +19,14 @@ const CHILD_DRAWINGS = [
 
 describe("the child's figure", () => {
   test("every drawing of the child asks whether it is a boy or a girl", () => {
-    const fixed = CHILD_DRAWINGS.filter((file) => !/\buse(Figure|Hero)\(\)/.test(readFileSync(file, "utf8")));
+    const fixed = CHILD_DRAWINGS.filter((file) => !/\buse(Figure|Hero)\(\)/.test(read(file)));
     expect(fixed).toEqual([]);
   });
 
   // `heroLook` is the only place the child's looks are written down: a game drawing the child with a look of its own
   // would forget the setting.
   test("the child of Kleine Abenteuer is drawn with useHero, never with a fixed look", () => {
-    const fixed = sources.filter((file) => /\blook=\{\{/.test(readFileSync(file, "utf8")));
+    const fixed = sources.filter((file) => /\blook=\{\{/.test(read(file)));
     expect(fixed).toEqual([]);
   });
 
@@ -42,7 +42,7 @@ describe("the child's figure", () => {
     const gendered =
       /\b(brave[rs]?|gute[rs]?|große[rs]?|kleine[rs]?|liebe[rs]?|starke[rs]?|tolle[rs]?) (Junge|Mädchen)\b|\b(good|brave|big|clever) (boy|girl)\b|(молодец, мальчик|умница, девочка)/i;
     const found = sources.flatMap((file) =>
-      readFileSync(file, "utf8")
+      read(file)
         .split("\n")
         .filter((line) => gendered.test(line))
         .map((line) => `${file}: ${line.trim()}`),
