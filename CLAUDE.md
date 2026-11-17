@@ -25,7 +25,9 @@ or `bun x`, which fetch past the lockfile. Tests import from `bun:test`.
 What a bundler adds to the code comes from one Bun plugin (`tools/appPlugin.ts`), used alike by build, dev server
 (`bunfig.toml`, `[serve.static]`) and tests (`src/testPreload.ts`): a folder of files is `import files from
 "./bilder/*.webp?glob"` (relative to the importing file – an `@/` path finds no files and no error says so –, one extension per pattern – Bun can't load `{a,b}` – `**` for subfolders), facts about the
-build come from `src/lib/buildInfo.ts` (never `import.meta.env`), and in the build a stylesheet a module imports travels in
+build come from `src/lib/buildInfo.ts` (never `import.meta.env`; never a value that changes with every build compiled
+into the JS, which renamed 139 of 196 chunks at each deploy – the build's time stands only in each page's
+`<meta name="build-time">`, `buildTools.test.ts`), and in the build a stylesheet a module imports travels in
 that module's chunk (Bun alone would load every game's CSS with the start page; the dev server still does, for hot
 reload, so a game borrowing another's CSS shows only in `preview-pages` – `css.test.ts` checks the keyframes). Keep it that way when adding such code.
 
@@ -162,7 +164,7 @@ In a fresh worktree run `bun install` first.
 - **The whole app speaks German, English, Chinese, Hindi, Spanish, Arabic and Russian** (🌐 on the home page,
   `APP_LANGUAGES` in `src/lib/language.ts`): grown-ups' screens and what the child hears and sees, translated once on
   request (Russian, then the other five, October 2026). Write every user-facing text so it can be translated: short
-  texts inline as `t({ en: "…" })` (`useT()`; typed `EnglishFirst`, the older German-first ones `Localized`, and a
+  texts inline as `t({ en: "…" })` (a text several components share stands once in `src/lib/sharedTexts.ts`; `useT()`; typed `EnglishFirst`, the older German-first ones `Localized`, and a
   field taking either is `Texts`, all in `src/lib/language.ts`), adding the other languages only when translations
   are asked for; larger content gets a `<lang>.ts` / `*.<lang>.ts` file next to its first language's data (English
   for what is new), keyed by id, and a table by language. German has a chunk of its own
@@ -617,7 +619,9 @@ A game may give it before its end where reaching the goal once is enough (Ketten
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
-  or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). A tool for the day
+  or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do). What it counts
+  each second stays in memory, is saved every ten seconds and when the page hides, and reaches its listeners only when
+  what they show changes – never a write and a redraw of every listener each second (`playtime.test.ts`). A tool for the day
   rather than a game (the Timer, like the Belohnungstafel) counts no play time and still opens when it is over:
   `GameShell tool` and its address in `PlaytimeLock`.
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): „Nochmal“ and „Weiter“
@@ -730,7 +734,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   so a new kind of file named by language must be known there, and the worker deletes what is no longer chosen. A new
   build takes over the files named by their content from the old cache instead of downloading them again. Never
   download every file for every visitor again: it was 42 MB on each first visit and after each build, while few play
-  offline (November 2026; `sw.test.ts`). What is fetched ahead (other pages' code, the song) waits when the visitor
+  offline (November 2026; `sw.test.ts`). The start kept at install holds no `vorschau/` previews and takes files named
+  by their content from the browser's cache rather than fetching them twice; the build fails when the start passes 70
+  files or 1.6 MB, and when `out/` passes 800 MB (GitHub Pages allows 1 GB). What is fetched ahead (other pages' code, the song) waits when the visitor
   saves data (`savesData()` in `src/lib/pwa.ts`).
 - A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
@@ -746,7 +752,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   loads (`PageLoading`), never nothing. A built page fetches its own page's code, and on an English page the English
   texts, together with the start's (`modulepreload`, `pagePreloads` in `tools/build.ts`), not one after the other: a
   new lazy page is a `page(…)` line in `App.tsx` with its addresses, and `pageStart.test.tsx` checks every page for
-  search engines finds its code. Fetching ahead stays as it is: after the page has loaded, in idle moments, never the
+  search engines finds its code. A part loaded by its own `import()` that a built page opens with (a picture's scene)
+  gets its modulepreload too (`sceneModules` in `tools/pageStart.ts`). A page's code is only ever loaded through
+  `lazyPage` (`src/lib/lazyPage.ts`), which tries a failed download once more, under `PageErrorBoundary`, which shows
+  a paper page with the way back and „Again“ instead of an empty screen (code review, November 2026). Fetching ahead stays as it is: after the page has loaded, in idle moments, never the
   songs or every game for every visitor.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`,
   `src/lib/look.ts`). **It is the only look** (user decision, November 2026): the old toy-block look (cards on a sky,
