@@ -436,11 +436,11 @@
 }
 
 .room-menu .home-menu-backdrop {
-  z-index: 40;
+  z-index: var(--z-menu-sheet);
 }
 
 .room-menu .home-menu-panel {
-  z-index: 41;
+  z-index: var(--z-menu-sheet-panel);
 }
 
 @media (min-width: 600px) and (min-height: 600px) {
@@ -1234,7 +1234,7 @@
 .museum-doorway {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: var(--z-museum-doorway);
   overflow: hidden;
   perspective: 1100px;
   cursor: pointer;

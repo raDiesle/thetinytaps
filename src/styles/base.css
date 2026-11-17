@@ -17,6 +17,24 @@
   /* The words for grown-ups under a picture (a story's sentence, Gefühle's caption): small, since only grown-ups
      read them, and the same size in every game – set in the rounded face, weight 600, in ink. */
   --caption-size: clamp(0.85rem, 2.1vh, 1.1rem);
+  /* Layers that order things across the whole page (a renaming of the old literals, never a re-ordering). From the
+     bottom: the page's corner, the play options and the sound-wait slip lie over their game; the grown-ups' option
+     sheet, the picture viewer and the museum's doorway over a page; the book taken out over all of those; the play-time
+     lock over the book; the feedback ripples (`MenuRipples`), the "Bitte quer halten" note and the dev tag on top. The
+     feedback layer and the screen hint tie at 1000 on purpose, as they always did. Local stacking inside one component
+     (-1 … 10) stays a plain number. */
+  --z-page-corner: 20;
+  --z-play-options: 20;
+  --z-menu-sheet: 40;
+  --z-menu-sheet-panel: 41;
+  --z-pics-viewer: 50;
+  --z-sound-wait: 60;
+  --z-museum-doorway: 60;
+  --z-book-travel: 800;
+  --z-playtime-lock: 900;
+  --z-feedback: 1000;
+  --z-screen-hint: 1000;
+  --z-dev-tag: 9999;
 }
 
 /* The girl's family of colours (👧 on the home page, `data-figure` from src/lib/common.ts): a warm lilac sky
@@ -155,7 +173,7 @@ html:has(.play-area) body {
   position: fixed;
   left: 50%;
   top: 50%;
-  z-index: 60;
+  z-index: var(--z-sound-wait);
   padding: 18px 26px;
   border-radius: 6px;
   background: var(--paper-grain, none), var(--paper, #fbf4e3);

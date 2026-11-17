@@ -227,7 +227,7 @@
 .play-options-panel {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: var(--z-play-options);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -272,7 +272,7 @@
 /* Over the menus (`MenuRipples`): above every page, its book and its option menus. */
 .fx-layer.fixed {
   position: fixed;
-  z-index: 1000;
+  z-index: var(--z-feedback);
 }
 
 /* A tap that sets nothing off: two soft rings spread as on water, light enough for dark and pale pictures alike. */

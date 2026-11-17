@@ -8,7 +8,7 @@
   position: fixed;
   inset: 0;
   /* Under the play-time lock and the „Bitte quer halten“ note, over everything else. */
-  z-index: 800;
+  z-index: var(--z-book-travel);
   overflow: hidden;
   perspective: var(--bt-eye);
   perspective-origin: 50% 50%;

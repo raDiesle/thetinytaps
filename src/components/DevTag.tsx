@@ -14,7 +14,7 @@ export function DevTag({ code, id }: { code: string; id?: string }) {
         position: "fixed",
         right: 6,
         bottom: 6,
-        zIndex: 9999,
+        zIndex: "var(--z-dev-tag)",
         padding: "2px 6px",
         borderRadius: 4,
         background: "rgba(0,0,0,.55)",

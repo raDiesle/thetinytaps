@@ -883,7 +883,7 @@
   position: fixed;
   top: var(--page-top);
   left: var(--page-left);
-  z-index: 20;
+  z-index: var(--z-page-corner);
   width: var(--corner);
   height: var(--corner);
   -webkit-tap-highlight-color: transparent;
@@ -1592,7 +1592,7 @@
 :root .menu-head .panel-icon {
   position: fixed;
   top: calc(var(--page-top) + 6px);
-  z-index: 20;
+  z-index: var(--z-page-corner);
 }
 
 :root .menu-head > .fullscreen-corner {

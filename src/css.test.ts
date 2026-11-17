@@ -103,7 +103,7 @@ test("a game's controls in the top left corner keep clear of the way out", () =>
 // ✕ says nothing beside it, not even while pressed: „Zurück zum Menü“ there was more than grown-ups needed (user feedback,
 // November 2026). Its name is only read out.
 test("no note shows beside ✕", () => {
-  const files = ["src/components/GameShell.tsx", "src/styles/playing.css", "src/styles/book.css"];
+  const files = ["src/components/GameShell.tsx", "src/components/gameExit.tsx", "src/styles/playing.css", "src/styles/book.css"];
   expect(files.filter((file) => readFileSync(file, "utf8").includes("exit-hint"))).toEqual([]);
 });
 
@@ -140,4 +140,18 @@ test("no attribute selector inside :has() and no * after it", () => {
 test("no stylesheet of Bewegungsabenteuer uses backdrop-filter", () => {
   const found = cssFiles.filter((file) => file.startsWith(join("src", "games", "adventure")) && /backdrop-filter/.test(readFileSync(file, "utf8")));
   expect(found).toEqual([]);
+});
+
+// One scale for the layers that order the whole page: named in base.css, never a bare number above 10 (a renaming of 800/900/1000 once left two tied).
+test("app-wide z-index layers take a --z-… name defined in base.css", () => {
+  const base = readFileSync(join("src", "styles", "base.css"), "utf8");
+  const wrong: string[] = [];
+  for (const file of cssFiles.filter((f) => f.startsWith(join("src", "styles")))) {
+    for (const m of readFileSync(file, "utf8").matchAll(/z-index:\s*([^;}]+)/g)) {
+      const value = m[1].trim();
+      const name = value.match(/^var\((--z-[\w-]+)\)$/)?.[1];
+      if (name ? !new RegExp(`${name}:\\s*\\d+;`).test(base) : Number(value) > 10) wrong.push(`${file}: z-index: ${value}`);
+    }
+  }
+  expect(wrong).toEqual([]);
 });
