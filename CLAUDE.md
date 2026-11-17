@@ -6,9 +6,9 @@ built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backe
 ## Commands (always Bun, never npm, yarn or npx)
 
 ```bash
-bun run verify     # lint + format check + typecheck + unit tests – run before every commit (never piped into tail or grep before `&& git commit` or `&& git merge`: the pipe hides a failure and the commit or the merge into main goes in anyway – one left main half-merged)
+bun run verify     # lint + format check + typecheck + unit tests, all three at once (about 7 s, `tools/verify.ts`; its last line says `verify: OK` or `verify: FAILED (…)` with what failed) – run before every commit (never piped into tail or grep before `&& git commit` or `&& git merge`: the pipe hides a failure and the commit or the merge into main goes in anyway – one left main half-merged)
 bun run format     # format everything and apply safe lint fixes (Biome)
-bun test           # unit tests only (bun test, < 1 s); bun test --watch while working
+bun test           # unit tests only (about 17 s one file after the other, `bun test --parallel` about 7 s; one file: `bun test <path>`, < 1 s); bun test --watch while working
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
@@ -78,7 +78,7 @@ In a fresh worktree run `bun install` first.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
-  that kind mounts one (so far Was gehört zusammen? and Gefühle).
+  that kind mounts one (so far Was gehört zusammen?, Gefühle, Was ist passiert? and the chapter books, `ChapterBook`).
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
@@ -376,7 +376,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   never from fixed `vh` caps – with clear room between them; each has its name small and quiet below it for grown-ups
   (one line, the same words as its `aria-label`), and what a round is about („Was brauche ich?“) stands as plain small
   text under the picture: no emoji, no bubble, no frame (user feedback from the Zuordnen games, November 2026: small
-  buttons with room to spare, a loud topic bubble; `choiceRows` in `src/games/shadows/levels.ts`).
+  buttons with room to spare, a loud topic bubble; `choiceRows` in `src/lib/rounds.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
   waiting starts to move after its first stage). In a game that plays
@@ -513,7 +513,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
-  plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
+  plays at once, options while playing behind ⚙️ held in the top right corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
   never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
   not the same game easier or with other words – are games of their own in the book's table of contents, never one
   game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
@@ -580,7 +580,12 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   (`.home > .menu-head` margin in `menus.css`) and between buttons in a row.
   Check menus at 844×390 and 390×844 as well as tablet and computer.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
-  devices and on-screen keys on computers.
+  devices and on-screen keys on computers. A button that acts as the finger lands (`onPointerDown`) also takes
+  `onClick={noPointerClick(…)}` (`src/lib/press.ts`): Enter, Space and a screen reader send no pointer, so „Nochmal“
+  and „Weiter“ did nothing on a keyboard (code review, November 2026).
+- What comes a moment later (a sound, a line, a level's end) is set through `later` of `useTimers`
+  (`src/lib/timers.ts`), never a bare `setTimeout`: a bare one still fired after ✕, and a level's end tune and trophy
+  came in the menu (code review, November 2026; `timers.test.ts`).
 - A game is left with one tap on its ✕, or by holding Esc (`GameShell`): holding ✕ for a moment was the only way once
   and got in the grown-ups' way (user decision, November 2026), so it is a choice now, „Spiel verlassen“ under ⏳ on
   the home page (`leave` in `src/lib/common.ts`, `LeaveOptions`), for parents whose child taps ✕ by chance. Esc is
@@ -646,7 +651,7 @@ src/games/<game>/        one folder per game, see its CLAUDE.md
   content.ts             texts (English first since November 2026, German in the older games) and pictures
   <game>.css             styles and animations, classes prefixed by the game
 src/components/          shared UI: GameShell, GameEnd (Nochmal/Weiter), SettingControls, …
-src/content/             home menu (games.ts), language packs (de/en/tr/pl), ideas
+src/content/             home menu (games.ts), language packs (one file per language), ideas
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
@@ -908,7 +913,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
   and head in step (`useTitle`, `SeoHead`). Under `/en/`, `/ru/` … the router runs below the prefix (`routerBase()`,
   `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
-  browser's language. Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
+  browser's language. A level's address (`/abenteuer/schatzinsel/`) gets the game's built page too, with the game's canonical link and out of the sitemap, and `seoFor` gives it the game's entry – GitHub Pages answered a shared level link with 404 before: a new game with levels, or a new level, is listed in `LEVEL_IDS` (`src/content/levelPages.ts`, ids only, since the build must not load a game; `levelPages.test.ts` checks it against the games). A title leaves „ | Fun for Both“ out where both would be cut off in a search result (`fullTitle`, 60 letters wide; the home page keeps it), and every page but the home pages carries its way from the home page as a BreadcrumbList (`tools/structuredData.ts`). Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
   renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
   text in every language in the same commit, and its book's and the home page's where they name it, also for something new in every game (the trophies) or a new picture in a game (the Timer's Tennis), which both stayed missing from the texts for days (November 2026) – they had fallen
   behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
@@ -960,7 +965,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 
 1. `bun run verify`. The tests (`*.test.ts` next to the code) check data that is easy to
    get wrong by hand: scene items (ids, tap sizes, chains, keys, plural grammar), roads,
-   the home menu against the routes and kid tiles, ideas, language packs, the movement
+   the home menu against the routes, ideas, language packs, the movement
    library, the Gefühle pictures, unique `@keyframes` names.
    When you add data with rules like these, add a check.
    The deploy on `main` runs `bun run verify` on GitHub's runner, about twice as slow as this Mac, and `bun test`

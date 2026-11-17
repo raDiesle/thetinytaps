@@ -281,8 +281,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   `Localized` in all app languages (November 2026) and said in the app language through `timerSay` (its English
   recording standing in where the language has none); `timerSaid(language)` lists them for the recordings. Only
   recordings play (`timerVoice`, ./stimme/, `bun run voice make --only timer`), never the browser's voice: a line without its recording stays
-  silent (every app language but Russian recorded, November 2026). A new picture gets its two lines in `PICTURE_LINES` (the type asks for them), German only
-  until translations are asked for, and they come on the 🎙️ list by themselves; `timer.test.ts` fails on a line missing
+  silent (every app language but Russian recorded, November 2026). A new picture gets its two lines in `PICTURE_LINES` (the type asks for them), English only
+  until translations are asked for, German included (root `CLAUDE.md`, Language – the lines are `Localized`, German
+  first, so far: the first English-only pair makes them `Texts` of `src/lib/language.ts` and teaches `timerSay` and
+  `timer.test.ts`, which compares with the German lines, a line's first language; a changed line of the older ones is
+  changed in its German), and they come on the 🎙️ list by themselves; `timer.test.ts` fails on a line missing
   in a language until it is translated (mark the gap in `languageStatus.ts` and loosen that check only then).
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,

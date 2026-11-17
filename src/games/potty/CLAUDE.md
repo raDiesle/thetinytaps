@@ -95,7 +95,9 @@ Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes,
 thought's picture lacks its second frame, or `bilder/` holds a picture of anybody else.
 
 German, English, Chinese, Hindi, Spanish, Arabic and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart
-inline `t({ … })`): another language goes next to them when asked for, and a new or changed German line loses its
+inline `t({ … })`): another language goes next to them when asked for; a new line comes in English only
+(root `CLAUDE.md`, Language: inline `t({ en: "…" })`, and the first English-first line of `POTTY_TEXTS`, German first so
+far, teaches it a line's first language, with a test), and a changed German line is changed in its German and loses its
 translations until then. Everything Tapsi's story says is played from its ElevenLabs recording (`voice.ts`, files in `stimme/`),
 recorded in every app language (November 2026); a thought not translated yet stays silent in another language. Two sentences in a row (what the child said, then the
 next step; a thought, then what the ✓ is for) go one after the other (`queue`), never as one joined sentence, which

@@ -12,8 +12,11 @@ Bilder und schreibe den Text darunter (mit Zurück-Button), UI angeordnet wie be
   froh, stolz, igitt): what the picture shows (`shows`), the two questions under the cards (`cause`, `other`), why
   (`told`), and what Gemini draws (`draw`).
 - `scenes.<lang>.ts` – the words under the pictures in the other app languages, keyed by id (translated 11 November
-  2026), loaded with their language's texts (`texts.cause`, `byLanguage` in `CausePlay.tsx`); a new or changed scene
-  comes German only, and the row „Die 30 Szenen“ in `languageStatus.ts` then says what is missing (`cause.test.ts`
+  2026), loaded with their language's texts (`texts.cause`, `byLanguage` in `CausePlay.tsx`); a new scene
+  comes in English only (root `CLAUDE.md`, Language; other languages, German included, only when the user asks) –
+  `scenes.ts` holds German words, so the first English-first scene teaches the scenes a scene's first language, with a
+  test, never by writing it German first after all –, a changed scene of the 30 is changed in its German, and the row
+  „Die 30 Szenen“ in `languageStatus.ts` then says what is missing (`cause.test.ts`
   wants every scene where that row says „done“); a changed meaning drops that scene's lines there rather than keep wrong ones.
 - `causePictures.ts` – the scenes' pictures as the picture queue takes them; `FEELING_WAITING` and `CAUSE_WAITING` list the scenes whose feeling or earlier moments are still to make (all made 10 November 2026).
 - `images.ts` – the pictures in `bilder/`: `<id>` (the feeling), `<id>-grund` (what happened), `<id>-anders` (what didn't).
@@ -22,7 +25,7 @@ Bilder und schreibe den Text darunter (mit Zurück-Button), UI angeordnet wie be
 - `names.ts` – the name and line in every app language.
 
 How a scene plays, laid out exactly like „Alltagssituationen“ (`RoundPlay`), with Gefühle's own components
-(`StoryPicture`, `ChoiceCard`, `StoryWords`, `GoOn`, `StepBack`, `StepDots` in `../feelings/shared.tsx`, given this
+(`StoryPicture`, `ChoiceCard`, `StoryWords`, `GoOn`, `StepBack`, `StepDots` in `../feelings/storyParts.tsx`, given this
 game's pictures by `sources`) – a change of that layout reaches both games:
 1. The feeling's picture big, under it „Der kleine Bär weint. Was ist passiert?“; ▶ bottom right, or a tap anywhere.
 2. The two pictures A and B side by side, the feeling small above them, each with its question for grown-ups under it

@@ -17,6 +17,8 @@ Read first, every time:
   **„What the parent wants next“**. They are the parent's feedback; a level that
   breaks one of them is not done. New feedback on a level goes there as a general
   rule, in the same commit as the fix.
+- `src/games/elevator/trail/CLAUDE.md`: how a trail level plays and is built, and the
+  „Levels so far“.
 - The ideas in `src/content/ideas/g-little-adventures.ts` (area „G“). Pick the one
   the user named, or the next open one that fits a side-scrolling world.
 
@@ -183,7 +185,7 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    `GOALS[level.goal]` – nothing to add, but check the new card shows the goal.
 7. **Mark the idea done**: `done: true` (or `partial: "…"`) in
    `g-little-adventures.ts`, and add the level to „Levels so far“ in
-   `src/games/elevator/CLAUDE.md` with its stations in one line.
+   `src/games/elevator/trail/CLAUDE.md` with its stations in one line.
 
 ## Hard rules (from the parent – never break)
 

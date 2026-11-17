@@ -48,9 +48,11 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   drinks, Mama lays her paw on her breast through her clothes.
 - Tapsi is an animal, not the child's figure, so it does not follow „Junge / Mädchen“. A new story about weaning (night
   only) keeps the order of `MILK_ORDER`.
-- Every language has every chapter and page (`milkchain.test.ts`): a new page or chapter comes in German only and its
-  languages' rows in `languageStatus.ts` say what is missing until the user asks for translations; a German line whose
-  meaning changes loses its translations (they fall back to German). The rules for the child's languages hold here
+- Every language has every chapter and page (`milkchain.test.ts`): a new page or chapter comes in English only
+  (root `CLAUDE.md`, Language) – the stories are German first and `ChapterBook`'s `first` is the whole book's, so the
+  first English-first page teaches the book a page's first language, with a test, never by writing it German first
+  after all – and its languages' rows in `languageStatus.ts` say what is missing until the user asks for translations,
+  German included; a German line whose meaning changes is changed in its German and loses its translations (they fall back to German). The rules for the child's languages hold here
   too: Tapsi in each script (Тапси, 塔普西, टैप्सी, تابسي), the breast named (Brust, breast, 乳房, छाती, pecho, صدر, грудь),
   Arabic with „let's“ instead of an imperative, Spanish without adjectives about Tapsi that change with gender.
 - **Tapsi's voice reads each page's sentence** as it comes (user decision, 13 November 2026, replacing „a grown-up

@@ -60,8 +60,8 @@ top of `backdrops/index.ts`). A new scene picks a backdrop that tells its place;
 While developing, a `DevTag` at the bottom right names the pair on screen (`C07`: its topic's letter and its place in the topic, plus the id), and `?pair=<id>` shows that pair first and `?level=N` starts on difficulty step N.
 
 **Difficulty** (`TOGETHER_LEVELS`, `dealRound` in `levels.ts`): 2, 3, 3, 4, 4 things to choose from, with the step rule
-of Schatten finden (`nextLevel`), always found by the game itself. Every visit begins on the first step. Every six rounds count as a game for the
-play-time limit (`gameEnded`, `countGame`). A thing comes again only after all of its kind (`useDeck`).
+of Schatten finden (`nextLevel` in `src/lib/rounds.ts`), always found by the game itself. Every visit begins on the first step. Every six rounds count as a game for the
+play-time limit (`gameEnded`, `countGame`). A thing comes again only after all of its kind (`useDeck`, also there).
 
 ## Rules
 
@@ -184,7 +184,7 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   Christmas's sleigh, so `weihnachtsmann` and `reiterin`). Never name another pair's partner in a wish either
   („Schlitten“ in Father Christmas's would point at the Rodlerin's).
 - A new pair comes with its wish in the same commit (`content.test.ts` wants one on every pair, also painted pairs not
-  made yet), German only and unrecorded until the user asks.
+  made yet), English only (see Languages below) and unrecorded until the user asks.
 
 ### Picture and caption come together (user feedback, November 2026)
 
@@ -220,8 +220,13 @@ which differ from the German, the names of things excepted in languages with Lat
 game says exactly them; and that no wish holds its partner's name in that language). A translated wish keeps the rules
 of the German one: it never names its partner, nor in the helper's name where that holds it in that language (English
 „guitarist“, Chinese 水管工 – say „the fox“, „the bear“ then), nor another pair's partner where the German doesn't.
-The topics' names are translated inline in `topics.ts`. A new pair or topic comes in German only until the user asks
-for its translations: it goes on `GERMAN_ONLY` in `content.test.ts` (and `languageStatus.ts` says so) until its
+The topics' names are translated inline in `topics.ts`. A new pair or topic comes in English only until the user asks
+for its translations, German included (root `CLAUDE.md`, Language): the pairs and the topics' names so far
+are German first (their words, `GERMAN_SAYS`, a topic's `name: Localized`), so the first English-first pair or topic
+teaches them a part's first language (a name: `Texts` of `src/lib/language.ts`), with a test – never by writing it
+German first after all –, and `languageStatus.ts` says what is missing. A
+changed line of an older pair is changed in its German. A pair added German first and not translated yet stands on
+`GERMAN_ONLY` in `content.test.ts` (empty now), and `languageStatus.ts` says so, until its
 sentences are added to each `content.scenes.<lang>.ts`. Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in every app
 language but German and Russian for the painted pairs and the wishes (November 2026, the month's credits ran out): a
 sentence without its recording stays silent. With hundreds of sentences per language the game never loads them all

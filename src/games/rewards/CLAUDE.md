@@ -510,8 +510,11 @@ beside it close it without a tick. The plan prints every ritual it has as a card
 
 Board, plan, wizard, prints and the catalog speak the app language (German, English, Chinese, Hindi, Spanish, Arabic,
 Russian; `useAppLanguage()`), translated in October 2026: every text inline as `t({ de, en, zh, hi, es, ar, ru })` or a
-`Localized` in `catalog.ts`. New or changed lines come German-only until translations are asked for, marked in
-`src/content/ideas/languageStatus.ts` (`inlineTexts.test.ts` fails on a German-only line while the row says done).
+`Localized` in `catalog.ts`. New lines come in English only (`t({ en: "…" })`; a `Localized`
+field of `catalog.ts` taking one becomes a `Texts` of `src/lib/language.ts`; root `CLAUDE.md`, Language) until
+translations are asked for, German included, and a changed line of the older German-first ones is changed in its
+German; both are marked in
+`src/content/ideas/languageStatus.ts` (`inlineTexts.test.ts` fails on a line missing a language while the row says done).
 - What is built from parts has a form per language, never German pieces glued together: weekday names from
   `DAY_NAMES` (catalog.ts), headings with the child's name from `AUTO_TITLES` (board.ts; Russian puts the name first,
   „Лена: мой день“, as a typed name can't be declined), „Noch 3-mal schlafen“ with `Intl.PluralRules` (`SLEEPS_LEFT`).

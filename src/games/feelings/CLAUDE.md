@@ -15,12 +15,12 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
      two groups (`MoodGroups`, `moodGroups.tsx`): the pleasant ones on a warm yellow panel, the unpleasant ones on a cool
      blue-grey one, each named small for grown-ups („Angenehme / Unangenehme Gefühle“), side by side on wide screens and
      one above the other upright. Each card is the little bear alone with the feeling, in a moment that brings it
-     (`Mood.moment`, `gefuehl-…`, made 6 November 2026, prompts in `bilder/README.md`). Digits pick that card, any
+     (`Mood.moment`, `gefuehl-…`, made 6 November 2026, prompts in `bilder/prompts/wie-gehts-dir.md`). Digits pick that card, any
      other key one at random.
   2. A tap shows at once three pictures of that feeling side by side, weak to strong: „Wie doll ist es?“ (C-36). The
      card's own picture is the middle („Schon ziemlich“); `gefuehl-<id>-wenig` („Ein bisschen“) and `-doll` („Ganz
      doll“) are the same moment drawn from it (`moodImages.strength`, prompts and how to
-     draw them in `bilder/README.md`, „Wie doll ist es?“). A tap on one (digits, arrows, any other key steps on and back) plays a note, higher the
+     draw them in `bilder/prompts/wie-gehts-dir.md`, „Wie doll ist es?“). A tap on one (digits, arrows, any other key steps on and back) plays a note, higher the
      stronger, and the voice says „Ein bisschen.“, „Schon ziemlich.“ or „Ganz doll!“; the other two go pale (by filter)
      and stay tappable to change it. In the bottom right corner a paper slip with the hug's round picture leads on to
      „Was brauche ich?“ (`NeedsLink`, user wish, November 2026): a page turns forward and the same game shows its
@@ -55,7 +55,7 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
   child may need or want now (`NEEDS`: in den Arm nehmen, allein sein, toben, stampfen und pusten, trinken, essen,
   ausruhen, ein Lied, and the „Grundbedürfnisse“ of 9 November 2026 – aufs Töpfchen, warm anziehen, ein Pflaster, frische
   Luft, translated 10 November 2026 (not yet recorded), their pictures `brauche-toilette` … `brauche-luft` drawn on 9 November with the bear's first
-  picture as the only reference, prompts in `bilder/README.md`) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
+  picture as the only reference, prompts in `bilder/prompts/was-brauche-ich.md`) – none is wrong; a tap marks the one picked where it stands (the others go pale, as in „Wie doll
   ist es?“, and stay tappable to change it) and its line says it does good, so the grown-up sees what the child needs.
   **A need never shows big** (user feedback, November 2026: the picture was not to be tapped open): no big picture,
   no screen of its own, so the corner always leaves the game (`feelings.test.ts`). Every card is a picture of the little bear doing it (`brauche-…`, made 6 and 9 November 2026), never
@@ -110,7 +110,7 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
   until the user asks for the recordings (`bun run voice make --only gefuehle`).
 - A page's picture is the next scene's place a moment _earlier_, nothing has happened yet: drawn from that scene's first
   picture (`firstImage`) as its only `--ref`, made with `dayPage` of `dayPictures.ts`, and queued there
-  (`DAY_PICTURE_QUEUE`, `bilder/README.md` „Tagesgeschichten“; `feelings.test.ts` checks both).
+  (`DAY_PICTURE_QUEUE`, `bilder/prompts/tagesgeschichten.md`; `feelings.test.ts` checks both).
 - A new scene gets its place in a day (or a new day) in the same commit, with its page. The built site shows a day only
   once all its pages' pictures and scenes are made (`playableDays`); with none, it shows no row and only the groups. When
   the days go live in the built site, the search texts (`seo.ts`, `seo.en.ts`, which say „nach Gefühlen geordnet“) are
@@ -133,7 +133,7 @@ have no such switch; besides the chapter books read aloud (`ChapterBook`), no ot
 
 **The whole text stands under the pictures (user wish, November 2026):** everything the voice says in a round – the
 scene and its question, the not-so-good idea's answer, what the good one tells, the happy end – stands whole under the
-pictures, the part said now (`roundText` in `rounds.ts`, `StoryWords` in `shared.tsx`), so grown-ups who switched the
+pictures, the part said now (`roundText` in `rounds.ts`, `StoryWords` in `storyParts.tsx`), so grown-ups who switched the
 voice off read it out from there. It is set like Abstillen's sentence (`.fg-words` copies `.mk-words`): the book's
 serif, small at `--caption-size`, its first letter big and red, curled flourishes beside it on wide screens. There is
 no button to show the text: a paper note with a book that opened it on a sheet (`ReadAlong`) was removed with it. A new
@@ -158,7 +158,7 @@ Keys: the left arrow picks the not-so-good idea, every other key the good one.
 **▶ has one place, and the whole screen goes on (user feedback, November 2026):** wherever the game waits for a tap
 to go on – a scene told, a chosen idea's last picture, a page of a day's story – ▶
 stands at the same spot, the screen's bottom right corner, and a tap anywhere on the screen goes on (`GoOn` in
-`shared.tsx`), except within reach of anything else that can be tapped (the dots, ◀, the loudspeaker, ✕), whose taps
+`storyParts.tsx`), except within reach of anything else that can be tapped (the dots, ◀, the loudspeaker, ✕), whose taps
 stay theirs. Nothing else ever stands in that corner: the loudspeaker stands left of it (`feelings.test.ts`). ▶ on
 the picture's corner and ▶ under a page's text moved from screen to screen and lay under the notes.
 
@@ -189,7 +189,7 @@ the same.
 
 **Calm (user feedback, November 2026):** nothing floats up (no hearts, stars, 💢, 💥, 💧, 💤, 🎉), nothing hops,
 shakes, pulses, glows, stamps or grows – not after a choice, not while waiting. Only one thing moves at a time, its
-two frames fading slowly into each other (`FRAME_MS`, 1.5 s, `Frames` in `shared.tsx`): the big picture while the scene
+two frames fading slowly into each other (`FRAME_MS`, 1.5 s, `Frames` in `storyParts.tsx`): the big picture while the scene
 is shown and while a chosen idea plays, the two cards while the child chooses – then the big picture stands on its
 first frame (user feedback, November 2026). The picture of the
 choice – the relieved, happy bear – is the answer. `GameEnd`'s pop and „Weiter“'s breathing are switched off here too.
@@ -261,7 +261,7 @@ playing on in wet trousers).
 A good idea does something that helps – comforts, calms, mends, shares – never only looks at what happened in another
 way: „Zwei Hälften zeigen“ („Jetzt hab ich zwei Kekse!“) made no sense to grown-ups and was taken out; the broken cookie
 is shared with the fox instead (user feedback, November 2026). Pictures are named by a step's place (`cookie-2`,
-`cookie-nein-2`), so a step taken out renames the pictures of the steps after it, in `bilder/` and `bilder/README.md`.
+`cookie-nein-2`), so a step taken out renames the pictures of the steps after it, in `bilder/` and its story's file in `bilder/prompts/`.
 Saying how one feels is a good idea only where saying it changes something (it brings comfort, stops someone, asks for
 help). Where the feeling asks for something to do – bored on a rainy day – the good idea is the doing itself, best
 something creative played together with what the picture shows (cooking a rain soup with the pots, a blanket cave, a
@@ -307,7 +307,7 @@ the first picture shows (the teddy from the toy box, the lamp, the cake on the t
 something that could break, burst or startle (user feedback, November 2026: the balloon story's „Kleinen Ballon
 quietschen lassen“ used a small balloon the first picture hardly showed, and a balloon can burst – right after a bang;
 it became „Mit dem Fuchs Kuchen essen“). Only a not-so-good idea may bring a small new thing (the pin, the monster
-puppet). `bilder/README.md` lists what each first picture shows.
+puppet). `bilder/prompts/zuhause.md` lists what each first picture shows (the other stories' files say it with each story).
 
 **What a story is about is named so it can't be mixed up with anything in the picture (user feedback, November 2026):**
 in „Traurig, Kuschelhase weg“ the text said only „das Kuscheltier ist weg“ while the fox sat there holding his own plush
@@ -351,16 +351,16 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle (
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades slowly in and out
-for a little movement (`Frames` in `shared.tsx`): in the big picture while the scene is shown, on the cards while the
+for a little movement (`Frames` in `storyParts.tsx`): in the big picture while the scene is shown, on the cards while the
 child chooses. A picture the game asks for that is not made yet shows a placeholder with its
-file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
-with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first, and into the
+file name (`Placeholder` in `storyParts.tsx`): new pictures are never generated on your own – list each one
+with its prompt in `bilder/prompts/geplant.md`, so the user can look at the idea first, and into the
 picture queue (`src/content/pictureQueue.ts`), where it waits to be made together with other sessions' pictures in one
 batch when the user asks (`/bild-erzeugen`) – never `--make` it yourself, not even when its sheet is full (user
 feedback, November 2026). A new story (`selbst.ts`) whose pictures are still planned would show players placeholders:
 the built site leaves it off the start screen until all its pictures are made (`stories.ts`, `PROD`, `situationImages`) –
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
-and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `shared.tsx`)
+and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `storyParts.tsx`)
 with a green tick or red cross, so children can choose without reading; „Nochmal“ and „Weiter“ at a pass's
 end are the shared `GameEnd` (`inline`), words only like in every game. Timing of a story's beats and its sounds in
 `story.ts`.
@@ -377,7 +377,9 @@ by the picture. Every picture has one (`caption`, `endCaption`, `instead.caption
 Bärs Pfote“ is wrong), no full stop.
 
 New or changed pictures: `/bild-erzeugen` (`bun run image`); file names and prompts
-are listed in `bilder/README.md`. Grown-ups are only in a picture once a step fetched
+are listed by topic in `bilder/prompts/` – `bilder/README.md` has only the rules for every picture (style block,
+characters) and the list of which file holds which story, so read that list and then only the file you need (the
+prompts were one file of 468 KB once; `feelings.test.ts` keeps them split). Grown-ups are only in a picture once a step fetched
 them; a second frame only moves a little and is drawn from the first (`--ref`),
 never as a grid pair – `bun run frames` lists pairs that jump. Within a story only what
 the characters do changes: every picture is drawn from the story's first one
@@ -408,8 +410,11 @@ with load quietly (`nextLines`, given by `DayPlay` and `PassPlay`). With the voi
 „Was brauche ich?“ are on that list in every language they are translated into (C-73, `MOOD_SAID`, `NEEDS_SAID`): a
 child picking a feeling hears it in its own language; a new line said there goes into those lists with all its languages.
 A feeling's card, tapped, says its name („Traurig“) before „Wie doll ist es?“. Rules:
-- New stories, feelings and kind things come in German only; their translations are written only when the user
-  asks (a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German). A not-so-good idea at home
+- New stories, feelings and kind things come in English only (root `CLAUDE.md`, Language); their translations,
+  German included, are written only when the user asks, and a changed line of an older German-first story is changed
+  in its German. The stories so far are written in German with the other languages laid over them, so the first
+  English-first one teaches the game a story's first language, with a test – never by writing it German first after
+  all. Of the German-first ones, a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German. A not-so-good idea at home
   without its translation is `null` and told in German; `useVoice` plays a line that is still German from its German
   recording. But a story that has a translation must match the German step for step and beat for
   beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated story, change every

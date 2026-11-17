@@ -9,6 +9,9 @@ marble runs' basket or tubes, the Nagelbrett's bins) the first one landing calls
 once; a new level with such a goal calls it too. Kettenreaktion's trophies hold a ball lying in their cup (`BALL_GAMES` in
 `Trophy.tsx`). Shared by the marble run and the
 machines: the points-along-a-way helpers in `path.ts`, the marble and rail drawings in `parts.tsx`, `useFrames`/`useAnyKey` in `level.ts`.
+Nothing a level sets off for later outlives it: a sound, a line or `onDone` after a delay goes through `later` of
+`useTimers` (`src/lib/timers.ts`), never a bare `setTimeout` – the end's tune once played in the menu when ✕ was tapped
+right after the last ball (`timers.test.ts`).
 
 "Alles fällt um" (`ToppleLevel.tsx`): everyday things (`things.tsx`) stand in seven runs, each small to tall, and topple onto each other like dominoes; each round picks other things, and the last one is always the broom, which falls onto the drum, bang, and sparkles burst out of it.
 
@@ -45,8 +48,11 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
   with `bun run voice make --only kettenreaktion`, only when the user asks.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
   name the helper differently (`tr`, or call `useT()(…)` directly).
-- New lines come in German only (`{ de: "…" }`); translations are added only when the user asks. When you change a German
-  line that has translations, update or drop them with it, so they never say different things.
+- New lines come in English only (root `CLAUDE.md`, Language): inline texts as `t({ en: "…" })`; `say` and the levels'
+  texts take a `Localized` (`{ de: "…" }`, German first) so far, so the first English-first line there teaches them a
+  line's first language (`EnglishFirst`/`Texts` in `src/lib/language.ts`), with a test. Translations, German included,
+  are added only when the user asks. A changed line of the older German-first ones is changed in its German; when it
+  has translations, update or drop them with it, so they never say different things.
   `content.test.ts` checks every name, first line and machine line: German there, Russian, Chinese, Hindi and Arabic (if
   any) in their own script with no Latin letters, and a line with Russian has all five other languages too.
 - The game is „Chain Reaction“ / „连锁反应“ / „चेन रिएक्शन“ / „Reacción en cadena“ / „تفاعل متسلسل“. Arabic lines speak
