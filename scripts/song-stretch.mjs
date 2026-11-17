@@ -15,6 +15,13 @@
 import { execFileSync } from "node:child_process";
 
 const args = process.argv.slice(2);
+/**
+ * The number after `--<name>`, else `fallback`.
+ * @template F
+ * @param {string} name
+ * @param {F} fallback
+ * @returns {number | F}
+ */
 const option = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i === -1 ? fallback : Number(args[i + 1]);
@@ -37,6 +44,7 @@ const raw = execFileSync("ffmpeg", ["-loglevel", "error", "-i", file, "-ac", "1"
 });
 const samples = new Int16Array(raw.buffer, raw.byteOffset, raw.length / 2);
 const n = RATE * HOP;
+/** @type {number[]} */
 const env = [];
 for (let i = 0; i + n <= samples.length; i += n) {
   let sum = 0;
@@ -45,7 +53,7 @@ for (let i = 0; i + n <= samples.length; i += n) {
 }
 const onsets = env.map((v, i) => (i === 0 ? 0 : Math.max(0, v - env[i - 1])));
 /** The strongest onset within 10 ms of `t`. */
-const onsetAt = (t) => Math.max(...[-2, -1, 0, 1, 2].map((d) => onsets[Math.round(t / HOP) + d] ?? 0));
+const onsetAt = (/** @type {number} */ t) => Math.max(...[-2, -1, 0, 1, 2].map((d) => onsets[Math.round(t / HOP) + d] ?? 0));
 const duration = env.length * HOP;
 
 // The first beat, near --start.
@@ -80,8 +88,9 @@ const lead = option("lead", null);
 const segments = [[lead === null ? 0 : Math.max(0, starts[0] - lead), starts[0], 1]];
 const pad = lead === null ? 0 : Math.max(0, lead - starts[0]);
 for (let i = 0; i < starts.length - 1; i++) segments.push([starts[i], starts[i + 1], (starts[i + 1] - starts[i]) / target]);
-segments.push([starts.at(-1), duration, segments.at(-1)[2]]);
-const s = (x) => `${x.toFixed(2)} s`;
+// There is at least one start and one segment here (a song shorter than its lead-in would have none).
+segments.push([/** @type {number} */ (starts.at(-1)), duration, /** @type {number[]} */ (segments.at(-1))[2]]);
+const s = (/** @type {number} */ x) => `${x.toFixed(2)} s`;
 segments.forEach(([a, b, r], i) => console.log(`${i === 0 ? "lead-in" : `part ${i}`.padEnd(7)}  ${s(a)}–${s(b)}  ×${r.toFixed(4)}`));
 
 const graph = segments

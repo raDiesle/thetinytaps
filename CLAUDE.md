@@ -6,7 +6,7 @@ built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backe
 ## Commands (always Bun, never npm, yarn or npx)
 
 ```bash
-bun run verify     # lint + format check + typecheck + unit tests, all three at once (about 7 s, `tools/verify.ts`; its last line says `verify: OK` or `verify: FAILED (…)` with what failed) – run before every commit (never piped into tail or grep before `&& git commit` or `&& git merge`: the pipe hides a failure and the commit or the merge into main goes in anyway – one left main half-merged)
+bun run verify     # lint + format check + typecheck (the app, and the scripts in `scripts/` by their JSDoc types, `tsconfig.scripts.json`) + unit tests, all at once (about 7 s, `tools/verify.ts`; its last line says `verify: OK` or `verify: FAILED (…)` with what failed) – run before every commit (never piped into tail or grep before `&& git commit` or `&& git merge`: the pipe hides a failure and the commit or the merge into main goes in anyway – one left main half-merged)
 bun run format     # format everything and apply safe lint fixes (Biome)
 bun test           # unit tests only (about 17 s one file after the other, `bun test --parallel` about 7 s; one file: `bun test <path>`, < 1 s); bun test --watch while working
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
@@ -93,6 +93,9 @@ In a fresh worktree run `bun install` first.
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
   that kind mounts one (so far Was gehört zusammen?, Gefühle, Was ist passiert? and the chapter books, `ChapterBook`).
+- A new or changed script in `scripts/` stays `.mjs` with JSDoc types and passes verify's typecheck of the scripts,
+  never `@ts-nocheck` or a loosened option: two of them spend money when they run (voice, image), so a typo must fail
+  before it costs credits (`src/verify.test.ts`; code review, November 2026).
 - Look for files with `git ls-files '*.ts*'` and `git grep -l`, never `find` or `ls -R` over `src`: about 25,000
   recordings under the games' `stimme/` folders flood the output (code review, November 2026).
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.

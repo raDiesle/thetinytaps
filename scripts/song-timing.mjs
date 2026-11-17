@@ -11,6 +11,13 @@ import { tmpdir } from "node:os";
 import { basename, extname, join } from "node:path";
 
 const args = process.argv.slice(2);
+/**
+ * The number after `--<name>`, else `fallback`.
+ * @template F
+ * @param {string} name
+ * @param {F} fallback
+ * @returns {number | F}
+ */
 const option = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i === -1 ? fallback : Number(args[i + 1]);
@@ -23,15 +30,27 @@ if (!file) {
 const askedBpm = option("bpm", null);
 const bars = option("bars", 8);
 
-/** The song as mono samples, only the bass (kick and bass line carry the beat). */
+/**
+ * The song as mono samples, only the bass (kick and bass line carry the beat).
+ * @param {number} rate
+ */
 function bass(rate) {
-  const raw = execFileSync("ffmpeg", ["-loglevel", "error", "-i", file, "-ac", "1", "-af", "lowpass=f=150", "-ar", String(rate), "-f", "s16le", "-"], {
-    maxBuffer: 1 << 30,
-  });
+  const raw = execFileSync(
+    "ffmpeg",
+    ["-loglevel", "error", "-i", /** @type {string} checked above */ (file), "-ac", "1", "-af", "lowpass=f=150", "-ar", String(rate), "-f", "s16le", "-"],
+    {
+      maxBuffer: 1 << 30,
+    },
+  );
   return new Int16Array(raw.buffer, raw.byteOffset, raw.length / 2);
 }
 
-/** Loudness (RMS) in windows of `hop` seconds. */
+/**
+ * Loudness (RMS) in windows of `hop` seconds.
+ * @param {Int16Array} samples
+ * @param {number} rate
+ * @param {number} hop
+ */
 function envelope(samples, rate, hop) {
   const n = Math.round(rate * hop);
   const out = [];
@@ -51,7 +70,7 @@ const duration = samples.length / RATE;
 const HOP = 0.01;
 const env = envelope(samples, RATE, HOP);
 const onsets = env.map((v, i) => (i === 0 ? 0 : Math.max(0, v - env[i - 1])));
-function comb(period) {
+function comb(/** @type {number} */ period) {
   let best = { score: 0, phase: 0 };
   for (let ph = 0; ph < period; ph += HOP) {
     let score = 0;
@@ -73,6 +92,7 @@ const part = bars * 4 * beat;
 const slow = envelope(samples, RATE, 0.1);
 const loud = Math.max(...slow);
 const quiet = [];
+/** @type {number | null} */
 let since = null;
 slow.forEach((v, i) => {
   if (v < loud * 0.05) since ??= i;
@@ -95,7 +115,7 @@ execFileSync("ffmpeg", [
   png,
 ]);
 
-const s = (t) => `${t.toFixed(2)} s`;
+const s = (/** @type {number} */ t) => `${t.toFixed(2)} s`;
 console.log(`duration      ${s(duration)}`);
 console.log(`tempo         ${tempo.bpm} BPM (beat ${s(beat)}, ${bars}-bar part ${s(part)})`);
 console.log(`first beat    ${s(tempo.phase)}  (the beat grid's phase; a part may start a few beats later)`);
