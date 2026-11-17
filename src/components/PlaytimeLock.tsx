@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
+import { GoodNightSky } from "@/components/GoodNight";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { useHold } from "@/lib/hold";
 import { useT } from "@/lib/language";
@@ -62,23 +63,7 @@ function Lock() {
       })}
       tabIndex={-1}
     >
-      <div className="good-night">
-        {STARS.map(([x, y], i) => (
-          <span key={i} className="good-night-star" style={{ left: `${x}%`, top: `${y}%` }} aria-hidden>
-            ✦
-          </span>
-        ))}
-        <span className="good-night-moon" aria-hidden>
-          🌙
-        </span>
-        <span className="good-night-sleeper" aria-hidden>
-          🧸<span className="good-night-zzz">💤</span>
-        </span>
-        <p className="good-night-text">
-          {t({ de: "Gute Nacht!", ru: "Спокойной ночи!", en: "Good night!", zh: "晚安！", hi: "शुभ रात्रि!", es: "¡Buenas noches!", ar: "ليلة سعيدة!" })}
-        </p>
-        {!open && <HoldToUnlock onUnlock={() => setOpen(true)} />}
-      </div>
+      <GoodNightSky still>{!open && <HoldToUnlock onUnlock={() => setOpen(true)} />}</GoodNightSky>
       {open && (
         <div className="playtime-lock-panel">
           <PlaytimeOptions />
@@ -128,17 +113,3 @@ function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
     </div>
   );
 }
-
-/** Star positions in percent of the screen; still, unlike the game's twinkling good night. */
-const STARS: [number, number][] = [
-  [8, 12],
-  [22, 30],
-  [35, 8],
-  [52, 22],
-  [68, 10],
-  [84, 26],
-  [92, 8],
-  [14, 52],
-  [78, 48],
-  [44, 40],
-];

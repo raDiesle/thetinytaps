@@ -82,7 +82,7 @@ said both, where both endings take turns as frames.
 
 The stars (`stars`, the last step, once the mode „Hat geklappt!“): over the party picture (still moving) this week's
 chart pops in at the top (`WeekStars.tsx`, a column per day, today marked; `stars.ts`, `tinytaps.potty.stars.v1`,
-counts per day, kept two weeks; `dayKey`/`weekOf` come from Zähne putzen's `daytime.ts`). When a grown-up tapped a ✓
+counts per day, kept two weeks; `dayKey`/`weekOf` come from `src/lib/days.ts`). When a grown-up tapped a ✓
 in this round (`checked`), a new star pops onto today with a twinkle and „Hat geklappt! Hurra, ein Stern für dich!“;
 one round, one star (`starred`), also when the row jumps to the end again. Reached without a ✓ (jumping in the row,
 or a ✓ forgotten by jumping back before „fertig“), the chart shows only the stars there are. The story when nothing

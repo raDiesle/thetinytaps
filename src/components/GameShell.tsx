@@ -1,6 +1,7 @@
 import { useLocation, useNavigate, useParams } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
+import { GoodNight } from "@/components/GoodNight";
 import { CardPicture, pictureCard, UNFINISHED_LABEL } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
@@ -11,7 +12,7 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
-import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 import { codeSoon } from "@/lib/lazyPart";
 import { BACK_TO_SHELF } from "@/lib/sharedTexts";
 import { useCommonSettings } from "@/lib/common";
@@ -20,14 +21,13 @@ import { levelHome, levelHref } from "@/lib/levelAddress";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { track } from "@/lib/analytics";
 import { routineReturn } from "@/lib/routine";
-import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
+import { setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
 import { UNLOCK_HOLD_MS, canPlayUnfinished, unlockUnfinished } from "@/lib/localTest";
 import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
-import { hush as hushVoice, recordedVoice } from "@/lib/voice";
-import goodNightFiles from "./stimme/**/*.mp3?glob";
+import { hush as hushVoice } from "@/lib/voice";
 
 /** How long ✕ has to be held to leave the game, where grown-ups chose holding (`leave`); the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
@@ -709,90 +709,6 @@ function Dusk({ level }: { level: number }) {
 
   return <div className="playtime-dusk" style={{ opacity: 0.65 * level }} aria-hidden />;
 }
-
-/** The good-night sentence's recordings. */
-const goodNightVoice = recordedVoice(goodNightFiles);
-
-/** Said when play time is over, from its recording (src/components/stimme/). */
-export const GOOD_NIGHT: Localized = {
-  de: "Gute Nacht! Die Spielzeit ist vorbei.",
-  ru: "Спокойной ночи! Время игры закончилось.",
-  en: "Good night! Play time is over.",
-  zh: "晚安！游戏时间结束了。",
-  hi: "शुभ रात्रि! खेलने का समय ख़त्म हो गया।",
-  es: "¡Buenas noches! Se acabó el tiempo de juego.",
-  ar: "ليلة سعيدة! انتهى وقت اللعب.",
-};
-
-/** Play time is over: a quiet night sky that ignores taps and keys until a grown-up exits. */
-function GoodNight() {
-  const t = useT();
-  const language = useAppLanguage();
-  const [{ leave }] = useCommonSettings();
-  useEffect(() => {
-    playLullaby();
-    const timer = setTimeout(() => goodNightVoice.say(GOOD_NIGHT[language.id] ?? GOOD_NIGHT.de, language.id, { english: GOOD_NIGHT.en }), 1200);
-    return () => {
-      clearTimeout(timer);
-      hushVoice();
-    };
-  }, [language.id]);
-
-  return (
-    <div className="good-night" role="status">
-      {STARS.map(([x, y, delay], i) => (
-        <span key={i} className="good-night-star" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${delay}s` }} aria-hidden>
-          ✦
-        </span>
-      ))}
-      <span className="good-night-moon" aria-hidden>
-        🌙
-      </span>
-      <span className="good-night-sleeper" aria-hidden>
-        🧸<span className="good-night-zzz">💤</span>
-      </span>
-      <p className="good-night-text">
-        {t({ de: "Gute Nacht!", ru: "Спокойной ночи!", en: "Good night!", zh: "晚安！", hi: "शुभ रात्रि!", es: "¡Buenas noches!", ar: "ليلة سعيدة!" })}
-      </p>
-      {/* No side named: the ✕ is the page's corner, top left. */}
-      <p className="good-night-hint">
-        {leave === "hold"
-          ? t({
-              de: "Die Spielzeit ist vorbei. Zum Beenden ✕ gedrückt halten.",
-              ru: "Время игры закончилось. Чтобы выйти, удерживайте ✕.",
-              en: "Play time is over. To leave, hold ✕.",
-              zh: "游戏时间结束了。按住 ✕ 即可退出。",
-              hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ✕ दबाए रखें।",
-              es: "Se acabó el tiempo de juego. Para salir, mantenga pulsada la ✕.",
-              ar: "انتهى وقت اللعب. للخروج اضغطوا مطولًا على ✕.",
-            })
-          : t({
-              de: "Die Spielzeit ist vorbei. Zum Beenden auf ✕ tippen.",
-              ru: "Время игры закончилось. Чтобы выйти, нажмите ✕.",
-              en: "Play time is over. To leave, tap ✕.",
-              zh: "游戏时间结束了。轻点 ✕ 即可退出。",
-              hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ✕ पर टैप करें।",
-              es: "Se acabó el tiempo de juego. Para salir, toque la ✕.",
-              ar: "انتهى وقت اللعب. للخروج انقروا على ✕.",
-            })}
-      </p>
-    </div>
-  );
-}
-
-/** Star positions in percent of the screen, with a twinkle delay in seconds. */
-const STARS: [number, number, number][] = [
-  [8, 12, 0],
-  [22, 30, 1.2],
-  [35, 8, 2.1],
-  [52, 22, 0.6],
-  [68, 10, 1.7],
-  [84, 26, 0.3],
-  [92, 8, 2.4],
-  [14, 52, 1.9],
-  [78, 48, 0.9],
-  [44, 40, 2.8],
-];
 
 /**
  * The ✕ in the corner (the page's turned-up corner): one tap leaves the game, or – where grown-ups chose

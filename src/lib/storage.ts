@@ -1,14 +1,29 @@
 import { useCallback, useState } from "react";
 
-/** The saved value merged into `defaults`, so adding a new setting later keeps the old ones. */
-export function loadStored<T extends object>(key: string, defaults: T): T {
+/** The JSON saved under `key`, or `empty` when there is none or storage is broken or unavailable. */
+export function readStored<T>(key: string, empty: T): T {
   try {
     const raw = localStorage.getItem(key);
-    if (raw) return { ...defaults, ...(JSON.parse(raw) as Partial<T>) };
+    if (raw) return JSON.parse(raw) as T;
   } catch {
-    // Ignore broken or unavailable storage and keep the defaults.
+    // Ignore broken or unavailable storage and start empty.
   }
-  return defaults;
+  return empty;
+}
+
+/** Saves `value` as JSON under `key`; when storage is full or off it only lasts this visit. */
+export function writeStored(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Nothing to do: what was saved still shows until the page closes.
+  }
+}
+
+/** The saved value merged into `defaults`, so adding a new setting later keeps the old ones. */
+export function loadStored<T extends object>(key: string, defaults: T): T {
+  const saved = readStored<Partial<T> | null>(key, null);
+  return saved ? { ...defaults, ...saved } : defaults;
 }
 
 /**
@@ -23,11 +38,7 @@ export function useStoredSettings<T extends object>(key: string, defaults: T) {
     (patch: Partial<T>) => {
       setValue((prev) => {
         const next = { ...prev, ...patch };
-        try {
-          localStorage.setItem(key, JSON.stringify(next));
-        } catch {
-          // Storage full or disabled: the setting still applies for this visit.
-        }
+        writeStored(key, next);
         return next;
       });
     },

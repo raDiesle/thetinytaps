@@ -1,4 +1,4 @@
-import { dayKey, weekOf } from "@/games/teeth/daytime";
+import { dayKey, weekOf } from "@/lib/days";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { type BoardReward, cellKey, type LinkedDays, newId, type StarLog, weekday } from "./board";

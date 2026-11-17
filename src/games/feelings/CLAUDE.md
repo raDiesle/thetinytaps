@@ -41,7 +41,7 @@ what helps were steps of „Wie geht's dir?“ and became games of their own; �
      touches another, a group's name or the screen's edge (they did at 844×390 and ran past 1024×768 before).
      The corner in the top left is a round arrow back to all feelings while one is shown (`useInnerBack`, see the root
      `CLAUDE.md`), the ✕ again on the cards. **Morning and evening** (C-33): the feeling picked is kept per time of day
-     (`MoodDay` under `tinytaps.mood.day.v2`, `daytimeOf` from Zähne putzen: before 14:00 is morning); in the evening the
+     (`MoodDay` under `tinytaps.mood.day.v2`, `daytimeOf` from `src/lib/days.ts`: before 14:00 is morning, as for brushing); in the evening the
      card picked this morning carries „Heute früh“ on a page marker of coloured film over its top edge (`ChoiceCard
      marker`); its caption stays the feeling alone („Traurig“). A note for grown-ups never joins a card's caption: „Heute
      früh: Traurig“ took three lines over the bear's face (user feedback, November 2026; `feelings.test.ts`). Only today's morning counts (`morningMood`). The Tagesplan's

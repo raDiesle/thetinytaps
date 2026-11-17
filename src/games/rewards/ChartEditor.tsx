@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { dayKey } from "@/games/teeth/daytime";
+import { dayKey } from "@/lib/days";
 import { useFigure } from "@/lib/common";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import {

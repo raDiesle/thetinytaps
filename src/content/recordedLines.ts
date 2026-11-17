@@ -8,11 +8,11 @@ import { APP_LANGUAGES, type Localized } from "@/lib/language";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ENGLISH_FILMS, voiceLines } from "@/content/voiceLines";
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
-import { GOOD_NIGHT } from "@/components/GameShell";
+import { GOOD_NIGHT } from "@/components/GoodNight";
 import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
 import { type Step, STEP_TRANSLATIONS, STEPS } from "@/games/teeth/steps";
-import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { DONE_SAY, PRELUDE_TEXTS, TIDY_SAY } from "@/games/teeth/lines";
 
 /** How a line is said: the recording script puts an audio tag for it in front. */
 export type RecordedKind = "instruction" | "praise" | "calm";
@@ -50,7 +50,7 @@ function teeth(language: TargetLanguageId): RecordedLine[] {
   return once([
     ...daytime("hello", "instruction"),
     ...daytime("grow", "instruction"),
-    ...Object.values(PRELUDE).map((p) => said(p.cue, "instruction")),
+    ...Object.values(PRELUDE_TEXTS).map((p) => said(p.cue, "instruction")),
     said(DONE_SAY, "praise"),
     said(TIDY_SAY, "instruction"),
     ...daytime("after", "calm"),

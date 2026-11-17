@@ -3,6 +3,7 @@ import { track } from "@/lib/analytics";
 import { BASE_URL, PROD } from "@/lib/buildInfo";
 import { loadCommon } from "@/lib/common";
 import type { OfflineChoice } from "@/lib/offlineParts";
+import { isStandalone } from "@/lib/standalone";
 import { loadStored } from "@/lib/storage";
 
 // Offline and "install as app" (PWA). The service worker itself is src/sw.js.
@@ -67,8 +68,7 @@ const subscribe = (listener: () => void) => {
 };
 
 /** Opened from the home screen (or as an installed desktop app), not in a browser tab. */
-export const isStandalone = () =>
-  matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+export { isStandalone };
 
 /** iPhone / iPad Safari, where installing only works through the share menu. */
 export const isIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));

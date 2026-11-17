@@ -4,7 +4,7 @@ import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
 import type { Cue } from "./cues";
-import type { Daytime } from "./daytime";
+import type { Daytime } from "@/lib/days";
 import { PICTURE } from "./jaw";
 import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 

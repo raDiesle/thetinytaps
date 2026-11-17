@@ -1,4 +1,4 @@
-import { dayKey, weekOf } from "@/games/teeth/daytime";
+import { dayKey, weekOf } from "@/lib/days";
 import { type Localized, useT } from "@/lib/language";
 import type { StarLog } from "./stars";
 

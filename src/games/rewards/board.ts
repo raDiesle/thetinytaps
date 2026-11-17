@@ -1,5 +1,5 @@
 import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
-import { dayKey, weekOf } from "@/games/teeth/daytime";
+import { dayKey, weekOf } from "@/lib/days";
 import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, pick } from "@/lib/language";

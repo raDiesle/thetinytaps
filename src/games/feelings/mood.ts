@@ -5,8 +5,9 @@
 // of its own in the book.
 
 import type { MascotBrows, MascotEyes, MascotMouth } from "@/components/Mascot";
-import { type Daytime, dayKey, daytimeOf } from "@/games/teeth/daytime";
+import { type Daytime, dayKey, daytimeOf } from "@/lib/days";
 import type { Localized } from "@/lib/language";
+import { readStored, writeStored } from "@/lib/storage";
 
 export type MoodId = "froh" | "stolz" | "aufgeregt" | "ruhig" | "muede" | "traurig" | "wuetend" | "angst";
 
@@ -177,23 +178,10 @@ export const morningMood = (day: MoodDay | undefined, now: Date): MoodId | undef
   daytimeOf(now) === "evening" && day?.day === dayKey(now) ? day.morning : undefined;
 
 /** Today's feelings as saved, if any. */
-export function loadMoodDay(): MoodDay | undefined {
-  try {
-    const raw = localStorage.getItem(MOOD_DAY_KEY);
-    return raw ? (JSON.parse(raw) as MoodDay) : undefined;
-  } catch {
-    return undefined;
-  }
-}
+export const loadMoodDay = (): MoodDay | undefined => readStored<MoodDay | undefined>(MOOD_DAY_KEY, undefined);
 
-/** Keeps today's feelings for the evening. */
-export function saveMoodDay(day: MoodDay) {
-  try {
-    localStorage.setItem(MOOD_DAY_KEY, JSON.stringify(day));
-  } catch {
-    // No storage: the evening then shows only its own feeling.
-  }
-}
+/** Keeps today's feelings for the evening; without storage the evening shows only its own feeling. */
+export const saveMoodDay = (day: MoodDay) => writeStored(MOOD_DAY_KEY, day);
 
 /** On the card of the feeling picked this morning, in the evening, for grown-ups (in its caption): feelings come and go (C-33). */
 export const THIS_MORNING: Localized = {

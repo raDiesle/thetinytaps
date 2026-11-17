@@ -3,7 +3,7 @@ import { STAR_PATH } from "@/components/TapFeedback";
 import { useT } from "@/lib/language";
 import { playPuff, playRecorded, playSplash, playTwinkle } from "@/lib/sfx";
 import type { Cue } from "./cues";
-import type { Daytime } from "./daytime";
+import type { Daytime } from "@/lib/days";
 import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a

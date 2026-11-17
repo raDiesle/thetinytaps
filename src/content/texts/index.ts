@@ -14,7 +14,8 @@ import type { SceneTranslation } from "@/games/scenes/types";
 import type { ShadowTranslation } from "@/games/shadows/content";
 import type { SockTexts } from "@/games/socks/content";
 import type { TogetherTranslation } from "@/games/together/pairs";
-import type { Daytime, DaytimeTexts } from "@/games/teeth/daytime";
+import type { DaytimeTexts } from "@/games/teeth/daytime";
+import type { Daytime } from "@/lib/days";
 import type { StepId, StepTexts } from "@/games/teeth/steps";
 
 // The texts of each language that live in files of their own (the letters and words pack, scene translations,

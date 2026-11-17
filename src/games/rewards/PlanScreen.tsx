@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
-import { dayKey } from "@/games/teeth/daytime";
+import { dayKey } from "@/lib/days";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { playChime, playCountNote, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
 import { type RoutineVisit, waitForStep } from "@/lib/routine";

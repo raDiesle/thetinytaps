@@ -23,7 +23,7 @@ import {
   type View,
 } from "./jaw";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
-import type { Daytime } from "./daytime";
+import type { Daytime } from "@/lib/days";
 import type { Motion } from "./steps";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see

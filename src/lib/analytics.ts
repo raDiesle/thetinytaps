@@ -11,6 +11,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router";
+import { isStandalone } from "./standalone";
 import { stepOf } from "./stepAddress";
 
 /** Umami's tracker, there once its script has loaded. */
@@ -65,11 +66,6 @@ export function durationStep(ms: number): string {
   return "über 20 Min";
 }
 
-/** Opened from the home screen rather than in a browser tab (as `isStandalone` in pwa.ts, which can't be imported here). */
-const installed = () =>
-  typeof matchMedia === "function" &&
-  (matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
-
 /**
  * Measures how long each page is on screen and sends it as one event „seite“ when the page changes – or when the app
  * goes into the background (a phone laid aside, a tab closed), since nothing may come after that. Time in the
@@ -93,7 +89,7 @@ export function PageTime() {
         dauer: durationStep(ms),
         sekunden: Math.round(ms / 1000),
         sprache: document.documentElement.lang || "de",
-        app: installed() ? "installiert" : "browser",
+        app: isStandalone() ? "installiert" : "browser",
       });
     };
     const onVisibility = () => {

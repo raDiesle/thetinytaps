@@ -11,7 +11,7 @@ import { RECORDED_GAMES, RECORDED_LANGUAGES } from "./recordedLines";
 const PLAYERS: Record<string, string> = {
   "src/games/teeth/stimme": "src/games/teeth/TeethPlay.tsx",
   "src/games/elevator/stimme": "src/games/elevator/voice.ts",
-  "src/components/stimme": "src/components/GameShell.tsx",
+  "src/components/stimme": "src/components/GoodNight.tsx",
   "src/games/animals/stimme": "src/games/animals/voice.ts",
   "src/games/feelings/stimme": "src/games/feelings/shared.tsx",
   "src/games/shadows/stimme": "src/games/shadows/voice.ts",

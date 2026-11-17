@@ -1,5 +1,6 @@
 import { type Localized, useT } from "@/lib/language";
-import { dayKey, weekOf, type Daytime, type WeekLog } from "./daytime";
+import { type Daytime, dayKey, weekOf } from "@/lib/days";
+import type { WeekLog } from "./daytime";
 
 /** Monday to Sunday, short. */
 const DAY_NAMES: Localized<string[]> = {

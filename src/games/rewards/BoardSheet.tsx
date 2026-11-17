@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { dayKey } from "@/games/teeth/daytime";
+import { dayKey } from "@/lib/days";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type TapState, tapState } from "@/lib/tapTargets";
 import {

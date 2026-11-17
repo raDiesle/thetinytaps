@@ -1,4 +1,5 @@
-import type { Daytime, DaytimeTexts } from "./daytime";
+import type { Daytime } from "@/lib/days";
+import type { DaytimeTexts } from "./daytime";
 
 /** The morning and evening texts in Spanish; a text missing here is said in German (see daytimeText). */
 export const DAYTIME_ES: Record<Daytime, Partial<DaytimeTexts>> = {
