@@ -699,7 +699,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   comes with its picture, not late; nothing waits longer than `SOUND_WAIT_MS`, then the game goes on silent. Fetched
   files stay as bytes and are decoded when said; decoded voice is kept only for `KEEP_SECONDS` (a decoded buffer is
   about ten times its MP3, which old phones can't hold). `loadAll` is only for a voice of a few dozen lines
-  (`voice.test.ts` checks), and a voice switched off (`VoiceSwitch`) loads nothing.
+  (`voice.test.ts` checks), and a voice switched off (`VoiceSwitch`) loads nothing. The list of a game's recordings
+  loads by language too: a voice imports its folder as `./stimme/**/*.mp3?glob-by-language` (one small chunk per
+  language, the app's and English fetched when the voice is first asked; a plain `?glob` put all seven languages'
+  names into the game's chunk, 352 of 372 KB in Buchstaben & Zahlen), so `voice.has` and `isReady` say no until that
+  list is there – a game that decides by `has` what to show waits for `voice.prepare(language)` first (Gefühle does).
 - Music: one background song plays behind the menus and every game from the first tap or key of the visit
   (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
