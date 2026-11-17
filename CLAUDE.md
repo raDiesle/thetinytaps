@@ -736,6 +736,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
   when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
+- A value shared by the whole app that components follow (the language, the shared options, the trophies) is a
+  `createStore` from `src/lib/store.ts`, read in components with `useStore` – never another hand-written set of
+  listeners with its own `useSyncExternalStore`; only a store that must leave some changes untold (play time's count
+  each second) keeps its own.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright – under it one short sentence on what the site offers and why
   sideways (user request, November 2026: a grown-up coming from a search sees this first) – (its „Trotzdem hochkant“, a small plain slip above the turning phone, never beside the big
@@ -759,7 +763,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   every language and never a language chosen there – switching 🌐 swaps the kept voices. The build lists each file with its book and language
   (`writeOfflineManifest` in `tools/build.ts`, filling `__OFFLINE__` in `sw.js`; the rules in `src/lib/offlineParts.ts`),
   so a new kind of file named by language must be known there, and the worker deletes what is no longer chosen. A new
-  build takes over the files named by their content from the old cache instead of downloading them again. Never
+  build takes over the files named by their content from the old cache instead of downloading them again – moved, never
+  copied, so an offline copy is never kept twice (120 MB took 240 until the build after next, code review, November
+  2026); the earlier cache keeps only what the new build dropped, for a page of it still open, and goes at the next
+  build, or at once when no window is open (`sw.test.ts`). Never
   download every file for every visitor again: it was 42 MB on each first visit and after each build, while few play
   offline (November 2026; `sw.test.ts`). The start kept at install holds no `vorschau/` previews and takes files named
   by their content from the browser's cache rather than fetching them twice; the build fails when the start passes 70
