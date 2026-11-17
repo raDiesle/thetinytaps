@@ -6,7 +6,7 @@ import type { CatalogTask } from "./catalog";
 // any other step; tapped when it is the one to do, it opens its words for the grown-up to say or ask (`RitualCard`) –
 // or its game, „Wie geht's dir?“ (C-33) –
 // and the plan prints them as cards to keep at the mirror or the bed. Where the words come from: research „rituale“ in
-// src/content/research.ts.
+// src/content/research/.
 
 /** Who speaks a group of lines: the grown-up asks, the grown-up says, or the child says it after them. */
 export interface RitualPart {

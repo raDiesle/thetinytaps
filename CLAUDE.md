@@ -112,7 +112,7 @@ In a fresh worktree run `bun install` first.
   `PICTURE_SOURCES`, a new naming convention for pictures that belong together its rule there (`pictureGallery.test.ts`). Scrolling down it always shows
   every open idea: a tap above (the overview's numbers, the contents) jumps to its place and marks it, never filters, and
   the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
-  market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
+  market or keyword analyses, measurements) is written into `src/content/research/` (one file per study, joined in its `index.ts`) with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
   way or ask the user for before concluding, never guess or give an impression: guessed desk calendars at 4–7 € each

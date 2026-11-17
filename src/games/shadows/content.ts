@@ -323,7 +323,7 @@ export const lookOf = (item: ShadowItem) => PEEK_LOOKS.findIndex((ids) => ids.in
  * Pictures whose black shadows can't be told apart on Apple's or Google's emojis (X-14): a pig, a sheep and a turtle
  * are the same round blob on Android, a cat and a dog the same on an iPhone. They are never dealt together, so exactly
  * one shadow fits. Measured by comparing every pair's outline in both fonts and looking at the closest ones (November
- * 2026, `research.ts`); a new picture is looked at next to its closest outlines and added here when it is one of them
+ * 2026, `src/content/research/`); a new picture is looked at next to its closest outlines and added here when it is one of them
  * (the zebra stands like the cow on an iPhone, the hippo like the pig, the peacock is a round crown on a stem like the
  * tree on Android, the monkey sits with its tail up like the squirrel).
  */

@@ -73,7 +73,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `scripts/gemini-image.mjs` | `bun run image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
 | `src/content/ideas/` | Idea collection, one file per area (`n-new-games.ts` …) with fixed IDs (e.g. `N-03`), shown on the hidden page `/management/` – hold the „p“ in the home page title for 2 seconds |
 | `src/content/seo.ts` | Title, description and text for search engines per game, category and scene; the build writes a page of its own for each, plus `sitemap.xml` and `robots.txt` |
-| `src/content/research.ts` | Research for grown-ups (e.g. what parents search on Google), with date, method, findings and the ideas it led to, also shown on `/management/` |
+| `src/content/research/` | Research for grown-ups (e.g. what parents search on Google), with date, method, findings and the ideas it led to, also shown on `/management/` |
 
 To add a scene to "Lebendige Bilder", create a folder like `src/games/scenes/baustelle/`
 with the drawing (SVG in React, one component per tappable item), its texts and a

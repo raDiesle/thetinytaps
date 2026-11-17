@@ -2,7 +2,7 @@
 
 Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan, and `/wie-lange-warten/`, opened on a
 Countdown: `also` in `games.ts`, so each keeps its own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
-„belohnungstafel“ in `src/content/research.ts`. One card, „📅 Belohnungstafel & Zeitplan“
+„belohnungstafel“ in `src/content/research/`. One card, „📅 Belohnungstafel & Zeitplan“
 (both things it makes, a calendar as its sign – user decision, October 2026; the search entries keep „Tagesplan“, as
 parents search for it): the **Belohnungstafel**
 (boards of stars, first part below) and the **Tagesplan** (plans of picture cards, second part) share one page, one
@@ -352,7 +352,7 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 # Tagesplan
 
 Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-41, H-42 done), T-20 · research
-„tagesplan“ in `src/content/research.ts`.
+„tagesplan“ in `src/content/research/`.
 
 A picture schedule („Strukturtafel“), called „Zeitplan“ beside the Belohnungstafel (`CHART_TYPES`), in four views (`PLAN_VIEWS`) –
 three ways of showing the same cards, and the Countdown: **Jetzt – Dann** (view id `"day"`: the day's cards in reading

@@ -32,7 +32,7 @@ Its card plays at once (`startMode`): there is nothing to choose before playing,
   colour is what gives animals away least through the gaps: the brown and tan ones (monkey, deer, kangaroo, camel, goat,
   horse), the grey ones and the green ones are paired there. A new animal goes into exactly one `PEEK_LOOKS` group and,
   when it lives in water, into `IN_THE_POND`; only whole bodies, never a face or a round blob (🐤 and 🐸 are faces). Of two animals that are the same shape (tiger and leopard, camel and dromedary, dolphin and shark) take one.
-- Shapes that fail most often in black (measured November 2026 on about 190 emojis, `research.ts`), so look at a new
+- Shapes that fail most often in black (measured November 2026 on about 190 emojis, `src/content/research/`), so look at a new
   picture against these first: Apple's vehicles seen at an angle from the front are all one box (bus, lorry, fire
   engine, tram, police car – an ambulance would be a sixth, so it was left out); food in a box or a cup is a box
   (chips, popcorn, cup, juice); a round head on a short stem is one shape (fried egg, lollipop, balloon, light bulb,
