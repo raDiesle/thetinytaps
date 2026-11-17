@@ -215,7 +215,7 @@ Fehler in späteren Leveln nicht wieder passiert.
   Füße, Beine und Körper bleiben über dem Panzer (im Sitzen: Beine gerade nach vorn, auf den Fersen),
   Stangen, Seile und Taschen gehen nicht durch den Körper. Im Zweifel weglassen (ein Taschenriemen lief
   als brauner Ring durch den Fuchs). Von der Seite anschauen und nachmessen. **Ein Test prüft es**
-  (`three/collisions.test.ts`): Er spielt jede Geschichte Bild für Bild ohne Bildschirm ab und meldet
+  (`three/collisions.*.test.ts`): Er spielt jede Geschichte Bild für Bild ohne Bildschirm ab und meldet
   jeden Moment, in dem eine Pfote oder etwas, das Tapsi hält, aufhebt oder ablegt, in Rumpf oder Kopf
   steckt oder ein Arm im Körper, in Hals oder Kopf (beim Aufheben der Angel steckten Pfote und Angel im Bauch, Rückmeldung November 2026). Er
   meldet für jeden Schritt den tiefsten Treffer einzeln, sonst verdeckt einer alle anderen. Jedes

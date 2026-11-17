@@ -91,7 +91,7 @@ export const ROD_DIR = {
 /**
  * Where the left elbow points (body space) while that arm holds the rod: down while the rod is in front of the chest
  * or cast out, forwards as the paw goes behind the right shoulder, so the arm crosses in front, under the chin, and
- * never through chest or head (`collisions.test.ts` measures the arms too).
+ * never through chest or head (`collisions.*.test.ts` measures the arms too).
  */
 export const rodElbowL = (back: number, out: THREE.Vector3) => out.set(0.25, -1 + back, 0.1 + 0.9 * back);
 /** How many short pieces the fishing line is drawn of, so it can sag in a curve. */

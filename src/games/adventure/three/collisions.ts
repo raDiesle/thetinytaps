@@ -1,10 +1,5 @@
-import { expect } from "bun:test";
 import * as THREE from "three";
-import { heavyTest } from "@/heavyTest";
-import { CLOUD_TRIP } from "../stories/cloudTrip";
-import { FIRE_RESCUE } from "../stories/fireRescue";
 import type { Story } from "../stories/story";
-import { TREASURE_ISLAND } from "../stories/treasureIsland";
 import { FOREARM, Guide, SHOULDER } from "./guide";
 import { quietStage, shown, withoutScreen } from "./headless";
 import { storyFrame, storyPose, storyTimes, worldPose } from "./player";
@@ -14,6 +9,10 @@ import { storyFrame, storyPose, storyTimes, worldPose } from "./player";
 // nothing Tapsi holds (`StoryWorld.held`) nor its own paws and arms may reach into its torso or head (user feedback,
 // November 2026: winding up the rod, the left arm went through the head, which a check of the paws alone missed).
 // Water, air and clouds are no solids; the line of the fishing rod is too thin to count.
+//
+// Each story has a test file of its own (`collisions.<story>.test.ts`) calling this, so `bun test --parallel`, which
+// hands out whole files, plays the stories side by side: in one file the three of them took 7 s, the longest of the
+// whole suite. A new story gets its file there.
 
 /** How deep something may sink into the fur before it counts, in fox units: a paw resting on the tummy only touches it. */
 const FUR = 0.03;
@@ -22,8 +21,11 @@ const ARM_FROM = 0.3;
 /** Seconds between the frames checked. */
 const EVERY = 0.1;
 
-/** Where things reach into the guide's body: the deepest moment of each in each step, as "what in step n at time: depth". */
-function overlaps(story: Story) {
+/**
+ * Where things reach into the guide's body while a story plays: the deepest moment of each in each step, as
+ * "what in step n at time: depth". Empty when nothing does. Plays the whole story, so its tests are `heavyTest`s.
+ */
+export function storyOverlaps(story: Story) {
   const stage = quietStage();
   const guide = new Guide();
   stage.scene.add(guide.root);
@@ -91,15 +93,3 @@ function overlaps(story: Story) {
   }
   return [...worst].map(([what, w]) => `${what} at ${w.time.toFixed(1)} s: ${w.depth.toFixed(3)} deep`);
 }
-
-heavyTest("in Die Schatzinsel nothing reaches into Tapsi's body", () => {
-  expect(overlaps(TREASURE_ISLAND)).toEqual([]);
-});
-
-heavyTest("in Die Wolkenreise nothing reaches into Tapsi's body", () => {
-  expect(overlaps(CLOUD_TRIP)).toEqual([]);
-});
-
-heavyTest("in Fire Rescue nothing reaches into Tapsi's body", () => {
-  expect(overlaps(FIRE_RESCUE)).toEqual([]);
-});

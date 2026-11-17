@@ -10,13 +10,17 @@ permissions:
   pages: write
   id-token: write
 
+# One deploy at a time, as in GitHub's own Pages starter workflow: a newer push replaces a run still waiting in the
+# queue, but a run already going is left to finish, so a deploy is never killed half-way.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # A whole run takes about a minute and a half: one that hangs stops here, not after GitHub's 6 hours.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
@@ -39,6 +43,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    # Handing the artifact to Pages takes seconds; a deploy stuck waiting for Pages gives up here.
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

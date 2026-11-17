@@ -65,7 +65,7 @@ hang and the gate's height. The card's and the trophy's picture show Tapsi spray
 ## Nothing goes into Tapsi
 
 No solid thing reaches into another (user feedback, November 2026: picking up the rod, paw and rod were inside Tapsi's
-body); only water, air, clouds and the thin fishing line may be passed through. `three/collisions.test.ts` plays every
+body); only water, air, clouds and the thin fishing line may be passed through. `three/collisions.*.test.ts` plays every
 story frame by frame without a screen – the same clock and poses as the player (`storyTimes`, `storyFrame`,
 `storyPose`, `worldPose` exported from `three/player.ts`) – and fails on any moment where a paw or something Tapsi
 holds reaches more than `FUR` into its torso or head, or an arm (upper arm below the shoulder, forearm) into its torso,
@@ -126,7 +126,8 @@ The game has no settings of its own: its own music and the language follow the s
 
 - The start screen, buttons, tooltips and notes follow the app language of the home page (`src/lib/language.ts`), as
   Tapsi does. A text that has a translation is written as `t({ de: "…", en: "…", zh: "…", hi: "…", es: "…", ar: "…", ru: "…" })` (`useT()`); new texts
-  come in German only, like Tapsi's lines, until the user asks for a language.
+  come in English only (`t({ en: "…" })`), like Tapsi's new lines, until the user asks for a language, German included
+  (root `CLAUDE.md`, Language); a changed line of an older German-first text is changed in its German.
 - A story's title and its step names on the route come from its translations (`title`, `name` per step in
   `lines.<language>.ts`), shown in the app language (`storyTitle`, `stepName` in `AdventurePlay.tsx`), German where a
   translation has none; the movement library itself stays German (notes for building stories, shown only as a fallback name).

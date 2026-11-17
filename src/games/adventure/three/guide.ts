@@ -974,7 +974,7 @@ export class Guide {
   /**
    * Tells how deep a point (world space) lies inside the torso or the skull, in fox units, 0 or less outside – for the
    * body as it stands now. So a test can tell that nothing the fox holds, and none of its own paws, reaches into its
-   * body, nor any of its arms (`collisions.test.ts`).
+   * body, nor any of its arms (`collisions.*.test.ts`).
    */
   insideNow() {
     this.spine.updateWorldMatrix(true, false);

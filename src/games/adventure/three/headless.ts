@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { Stage } from "./stage";
 
-// Playing a story without a screen, for the tests that follow a story frame by frame (`collisions.test.ts`, the
+// Playing a story without a screen, for the tests that follow a story frame by frame (`collisions.*.test.ts`, the
 // companions' checks): a stage that draws nothing and a canvas that paints nothing.
 
 /** A stage that draws nothing: what the worlds use of it, without a renderer. */

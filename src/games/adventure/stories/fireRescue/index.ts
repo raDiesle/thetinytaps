@@ -561,7 +561,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const clip = f.act + f.demo;
     const pulling = f.opening === null && f.step === S.bell;
     // Let go at the end of the last pull, while the paws are up at the handle: dropping with them, the handle
-    // went through Tapsi's head and chest (`collisions.test.ts`).
+    // went through Tapsi's head and chest (`collisions.*.test.ts`).
     const held = pulling ? smooth((clip - 0.25) / 0.5) * (1 - smooth((clip - clipLength(S.bell) + 0.3) / 0.3)) : 0;
     const at = handle.position.copy(HANDLE_REST);
     if (held > 0) {
@@ -569,7 +569,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       guide.gripPoint("R", tmpB);
       at.lerp(tmpA.add(tmpB).multiplyScalar(0.5), held);
       // The paws close round the bar on either side of the rope, the elbows out to the sides: reaching up, bent
-      // forwards or back, they lay against the cheeks (`collisions.test.ts` measures the arms too).
+      // forwards or back, they lay against the cheeks (`collisions.*.test.ts` measures the arms too).
       left.set(1, 0, 0).applyAxisAngle(UP, place.yaw);
       guide.hold("L", tmpC.copy(at).addScaledVector(left, 0.09), left, held, ELBOW_OUT_L);
       guide.hold("R", tmpC.copy(at).addScaledVector(left, -0.09), left, held, ELBOW_OUT_R);
@@ -714,7 +714,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const clip = f.opening === null && f.step === S.catch ? f.act + f.demo : f.opening === null && f.step > S.catch ? 99 : -99;
     guide.gripPoint("L", tmpA);
     guide.gripPoint("R", tmpB);
-    // Lying on the forearms in front of the chest, never pressed into it (`collisions.test.ts`): where the arms
+    // Lying on the forearms in front of the chest, never pressed into it (`collisions.*.test.ts`): where the arms
     // close in, it stays KITTEN_OUT before Tapsi's middle.
     const paws = tmpA
       .add(tmpB)
