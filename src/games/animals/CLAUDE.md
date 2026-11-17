@@ -20,7 +20,7 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest 
    November 2026 the cage (hamster), the leaf pile (hedgehog), the meadow (butterfly, ladybird, grasshopper), the garden
    (snail, caterpillar), the river (crocodile, hippo, otter), the mountain (goat, llama, eagle), the forest (deer, wolf,
    elk, boar, raccoon) and the coral reef (pufferfish, octopus).
-4. Was wird aus mir? (Z-12, `GrowPlay.tsx`, drawn in `growth.tsx`): something small stands above – a caterpillar, an
+4. Was wird aus mir? (Z-12, `GrowPlay.tsx`, drawn in `growthParts.tsx`, listed in `growthList.tsx`, types in `growthTypes.ts`, `growth.tsx` the entry): something small stands above – a caterpillar, an
    egg, a seed, a tadpole, an acorn, a bulb, a pumpkin seed, a coconut, a rose bud, the eggs of a turtle, a crocodile,
    a dinosaur, a penguin, a snake and a fish, a bee's larva, the seeds of a carrot, maize, a dandelion and a strawberry –
    and the child taps what it becomes below (butterfly, chick, sunflower, frog, tree, tulip, pumpkin, palm, rose,
@@ -66,7 +66,7 @@ each round its `RoundTopic` (`topic`) to show under its picture. Every five roun
 comes, on the step this round leads to), shows a round only once the lines it starts with are loaded (`useVoiceReady`:
 the kind's question and the round's own, `questionLines` in `lines.ts`; the paw track shows meanwhile), and then loads
 the rest of its lines (`answerLines`, `wrongLines`) and the next round's question and answer. A new line a round says
-goes into `lines.ts` too, or it is fetched only when said and comes late on a phone. Homes are drawn in `homes.tsx`, gifts in `gifts.tsx`, the small ones and their growing in `growth.tsx`; animals, foods, gifts' givers and sentences are in `content.ts`.
+goes into `lines.ts` too, or it is fetched only when said and comes late on a phone. Homes are drawn in `homes.tsx`, gifts in `gifts.tsx`, the small ones and their growing in `growth.tsx` (drawings `growthParts.tsx`, list `growthList.tsx`); animals, foods, gifts' givers and sentences are in `content.ts`.
 
 **Difficulty** (`ANIMAL_LEVELS`, `dealFeed`, `dealGift`, `dealHome`, `dealGrow`, `dealSound` in `levels.ts`; the step rule is `nextLevel` in `src/lib/rounds.ts`, shared with
 Schatten finden): one step for all five kinds, always found by the game itself (no „Schwierigkeit“ to fix any more). Two rounds in a row without a wrong pick → one up; two wrong picks in
