@@ -34,7 +34,7 @@ const REAL_LEVELS: Record<string, () => string[]> = {
   // Days or feelings, by the row above the cards (FeelingsGame).
   "/gefuehle/": () => [...DAYS.map((day) => day.id), ...GROUPS.map((group) => group.id)],
   "/wie-gehts-dir/": () => [...source("games/feelings/MoodGame.tsx").matchAll(/^const (?:FEELING|NEED) = "([^"]+)";/gm)].map((match) => match[1]),
-  "/kettenreaktion/": () => idsIn("games/marbles/MarbleGame.tsx", "const MODES", "];"),
+  "/kettenreaktion/": () => idsIn("games/marbles/catalog.ts", "export const LEVELS", "];"),
   "/kleine-abenteuer/": () => idsIn("games/elevator/ElevatorGame.tsx", "modes={[", "]}"),
   "/abenteuer/": () => idsIn("games/adventure/catalog.ts", "const STORIES", "];"),
 };

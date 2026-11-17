@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
 import { playPlop } from "@/lib/sfx";
 import { loadRealSounds, playCroak, playFlush, playQuack, playSplash } from "@/lib/realSounds";
-import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { deg, svgLine } from "./machineKit";
 import type { Pt } from "./path";
@@ -139,6 +139,10 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
     const cam = camera.current ?? target;
     const k = 1 - Math.exp(-dt * CAMERA_FOLLOW);
     camera.current = { x: cam.x + (target.x - cam.x) * k, y: cam.y + (target.y - cam.y) * k };
+    // Still while the duck waits at a gate and once the pool's fountain and sparkles are over after the end.
+    const s = current();
+    const running = clock.current >= 0 && (step.current < stretches.length - 1 || clock.current < s.duration + SETTLE_S);
+    return running || ripples.current.length > 0 || life.current - hopAt.current < HOP.s || gliding(cam.x, target.x) || gliding(cam.y, target.y);
   });
 
   /** The duck waits at a gate: open it now, with its creak right away. */

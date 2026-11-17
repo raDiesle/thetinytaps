@@ -1,63 +1,21 @@
-import { useCallback, useEffect, useState, type ComponentType, type PointerEvent } from "react";
+import { Suspense, use, useCallback, useEffect, useState, type PointerEvent } from "react";
+import { useLocation } from "react-router";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useLevelOnScreen } from "@/components/GameShell";
+import { PageLoading } from "@/components/PageLoading";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage } from "@/lib/language";
+import { savesData } from "@/lib/pwa";
 import { useTimers } from "@/lib/timers";
-import { BathLevel } from "./BathLevel";
-import { BuildingLevel } from "./BuildingLevel";
-import { CircusLevel } from "./CircusLevel";
-import { LEVEL_TEXTS } from "./content";
-import { FarmLevel } from "./FarmLevel";
-import { GardenLevel } from "./GardenLevel";
-import { KitchenLevel } from "./KitchenLevel";
-import { useAnyKey, type LevelProps } from "./level";
-import { LightLevel } from "./LightLevel";
-import { MachineLevel } from "./MachineLevel";
-import { NightLevel } from "./NightLevel";
-import { PegsLevel } from "./PegsLevel";
-import type { MarbleLevel, MarbleSettings } from "./settings";
-import { SneezeLevel } from "./SneezeLevel";
-import { SpaceLevel } from "./SpaceLevel";
-import { TidyLevel } from "./TidyLevel";
-import { ToppleLevel } from "./ToppleLevel";
-import { ColorTrackLevel, SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
-import { marblesVoice } from "./voice";
-import { WaterLevel } from "./WaterLevel";
-import "./marbles.css";
-import "./track.css";
-import { useLocation } from "react-router";
 import { awardTrophy, gameOfPath } from "@/lib/trophies";
-
-/** The levels in turn (names and first lines in `content.ts`). */
-const LEVELS: { id: MarbleLevel; Level: ComponentType<LevelProps> }[] = [
-  { id: "track", Level: TrackLevel },
-  { id: "colortrack", Level: ColorTrackLevel },
-  { id: "snowtrack", Level: SnowTrackLevel },
-  { id: "spacetrack", Level: SpaceTrackLevel },
-  { id: "slidetrack", Level: SlideTrackLevel },
-  { id: "sitetrack", Level: SiteTrackLevel },
-  { id: "machine", Level: MachineLevel },
-  { id: "sneeze", Level: SneezeLevel },
-  { id: "kitchen", Level: KitchenLevel },
-  { id: "garden", Level: GardenLevel },
-  { id: "pegs", Level: PegsLevel },
-  { id: "topple", Level: ToppleLevel },
-  { id: "building", Level: BuildingLevel },
-  { id: "water", Level: WaterLevel },
-  { id: "circus", Level: CircusLevel },
-  { id: "space", Level: SpaceLevel },
-  { id: "light", Level: LightLevel },
-  { id: "bath", Level: BathLevel },
-  { id: "farm", Level: FarmLevel },
-  { id: "night", Level: NightLevel },
-  { id: "tidy", Level: TidyLevel },
-];
-
-/** The marble runs, the wooden one and its other worlds (K-18). */
-const RUNS: MarbleLevel[] = ["track", "colortrack", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
+import { type LevelEntry, LEVELS, loadedLevel, loadLevel, prefetchLevel, RUNS } from "./catalog";
+import { LEVEL_TEXTS } from "./content";
+import { useAnyKey, type LevelProps } from "./level";
+import type { MarbleLevel, MarbleSettings } from "./settings";
+import { marblesVoice } from "./voice";
+import "./marbles.css";
 
 /** The levels in turn, beginning with the chosen one (`/kettenreaktion/garden/` opens that one), so „Weiter“ always has a next. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
@@ -107,19 +65,17 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   // Its few dozen lines are fetched as it starts, so none comes late (src/lib/voice.ts: `loadAll` only for so few).
   useEffect(() => marblesVoice.loadAll(language.id), [language.id]);
 
-  useEffect(() => {
-    say(LEVEL_TEXTS[level.id].intro, false);
-  }, [level, round, say]);
-
   const onDone = useCallback(() => {
     setParty(true);
+    // „Weiter“ should not wait for the next level's code: fetched during the party, never while a level runs.
+    if (!savesData()) prefetchLevel(next);
     // The good-night machine ends as calmly as it ran.
     sound(level.id === "night" ? playLullaby : playMelody);
     later(() => {
       setParty(false);
       setEnded(true);
     }, PARTY_MS);
-  }, [sound, level.id, later]);
+  }, [sound, level.id, later, next]);
 
   // One ball in the goal is enough for the level's trophy (user decision, November 2026); the end shows it beside its buttons.
   const game = gameOfPath(useLocation().pathname)?.href;
@@ -147,9 +103,23 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
-      <level.Level key={round} sound={sound} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
+      {/* The paper with the paw track while the level's code still loads – never a dark screen. */}
+      <Suspense fallback={<PageLoading />}>
+        <PlayedLevel key={round} entry={level} sound={sound} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
+      </Suspense>
       {ended && <GameEnd level={level.id} onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <FeedbackLayer effects={effects} />
     </div>
   );
+}
+
+/** One level played: waits (suspends) for its code, then says its first line and plays it. */
+function PlayedLevel({ entry, ...props }: LevelProps & { entry: LevelEntry }) {
+  const Level = loadedLevel(entry) ?? use(loadLevel(entry));
+  const { say } = props;
+  // Its first line comes with its picture, not while its code still loads; a level's first line cuts off what is still said from before.
+  useEffect(() => {
+    say(LEVEL_TEXTS[entry.id].intro, false);
+  }, [entry, say]);
+  return <Level {...props} />;
 }

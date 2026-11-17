@@ -1,4 +1,5 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { type LazyPart, lazyPart } from "@/lib/lazyPart";
 import type { AdventureStoryId } from "./settings";
 import type { Story, StoryTranslation } from "./stories/story";
 import { TRANSLATIONS as CLOUD_TRIP_TRANSLATIONS } from "./stories/cloudTrip/translations";
@@ -62,29 +63,26 @@ export const entryTitle = (entry: StoryEntry, language: TargetLanguageId) => ent
 /** True if the story can be said in `language`: its own lines' language, or one it has a translation into. */
 export const entryToldIn = (entry: StoryEntry, language: TargetLanguageId) => language === entry.language || Boolean(entry.translations?.[language]);
 
-const loading = new Map<AdventureStoryId, Promise<Story>>();
-
-/** The story's code, loaded once (the same promise every time, as `use()` needs). */
-export function loadStory(entry: StoryEntry): Promise<Story> {
-  let promise = loading.get(entry.id);
-  if (!promise) {
-    promise = entry.load();
-    // A failed download (offline) is tried again next time instead of staying failed.
-    promise.catch(() => loading.delete(entry.id));
-    loading.set(entry.id, promise);
+const parts = new Map<AdventureStoryId, LazyPart<Story>>();
+const partOf = (entry: StoryEntry) => {
+  let part = parts.get(entry.id);
+  if (!part) {
+    part = lazyPart(entry.load);
+    parts.set(entry.id, part);
   }
-  return promise;
-}
+  return part;
+};
 
-let player: Promise<typeof import("./AdventurePlay")> | undefined;
+/** The story's code, loaded once (the same promise every time, as `use()` needs); a failed download is tried again next time. */
+export const loadStory = (entry: StoryEntry): Promise<Story> => partOf(entry).load();
+
+/** The story once it is loaded, so its first picture is drawn at once – before the page turns to it. */
+export const loadedStory = (entry: StoryEntry): Story | undefined => partOf(entry).loaded();
+
+const player = lazyPart(() => import("./AdventurePlay"));
 
 /** The player's code with three.js, loaded once: fetched ahead on the start screen, awaited when a story starts. */
-export function loadPlay() {
-  if (!player) {
-    player = import("./AdventurePlay");
-    player.catch(() => {
-      player = undefined;
-    });
-  }
-  return player;
-}
+export const loadPlay = player.load;
+
+/** The player's code once it is loaded (see `loadedStory`). */
+export const loadedPlay = player.loaded;

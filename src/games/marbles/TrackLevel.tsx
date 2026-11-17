@@ -1,6 +1,6 @@
 import { memo, useContext, useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/TapFeedback";
-import { cameraLayer, cameraPoint, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint } from "./level";
+import { cameraLayer, cameraPoint, gliding, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
 import { SITE_TRACK } from "./siteTrack";
@@ -97,6 +97,7 @@ import {
   type Turn,
   type Way,
 } from "./track";
+import "./track.css";
 
 const GRAVITY = 1600;
 const FRICTION = 0.3;
@@ -372,6 +373,8 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const flap = useRef(FLAP_UP);
   const flapHit = useRef(-Infinity);
   const flipAt = useRef(Infinity);
+  /** When a tap or key last reached the run (ms): what it set off draws until `SETTLED_S` later. */
+  const stirred = useRef(-Infinity);
   const lastSection = routes.sections.length - 1;
 
   const routeOf = (m: Marble): Route => {
@@ -706,7 +709,24 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     const target = pushed ? SEESAW.tipped : SEESAW.rest;
     tilt.current += (target - tilt.current) * Math.min(1, dt * (pushed ? 10 : 4));
     if (glitters.current.some((g) => t - g.at >= GLITTER_MS)) glitters.current = glitters.current.filter((g) => t - g.at < GLITTER_MS);
-    follow(dt);
+    const panning = follow(dt);
+    // Still while nothing is on the run (waiting things fidget), every part has swung back and the last tap's, key's or
+    // landing's wobble is over (`SETTLED_S`); once full, the end draws on, since some ends keep moving (the pool's fountains).
+    const g = gate.current;
+    const lastStir = Math.max(stirred.current, ...landed.current.map((l) => l.at + landMs));
+    return (
+      done.current ||
+      panning ||
+      marbles.current.length > 0 ||
+      pops.current.length > 0 ||
+      glitters.current.length > 0 ||
+      g.step < 4 ||
+      gliding(g.lift * 1000, (g.open ? 1 : 0) * 1000) ||
+      gliding(flap.current * 1000, (way.current === "left" ? FLAP_DOWN : FLAP_UP) * 1000) ||
+      gliding(tilt.current * 1000, target * 1000) ||
+      spots.current.some((spot) => Math.abs(spot.spin) > 0.001) ||
+      t - lastStir < SETTLED_S * 1000
+    );
   });
 
   /**
@@ -781,8 +801,11 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       middle = Math.max((Math.min(...ys) + lowest) / 2, lowest + LEAD_ROOM - cam.h / 2);
     }
     const top = Math.min(TRACK_H - cam.h, Math.max(-TOP_ROOM, middle - cam.h / 2));
+    const from = { ...cam };
     cam.y += (top - cam.y) * Math.min(1, dt * CAMERA_PULL);
     cam.y = Math.min(TRACK_H - cam.h, Math.max(-TOP_ROOM, cam.y));
+    // Whether the camera is still on its way (or the screen's shape changed it).
+    return gliding(from.y, top) || from.h !== cam.h;
   };
 
   /** The ⬆ button (or the up arrow key): back up to the shelf, to let out the next thing. */
@@ -844,6 +867,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
    * thing in turn; the space bar rebuilds the run, the up arrow looks up to the shelf.
    */
   useAnyKey((e) => {
+    stirred.current = performance.now();
     held.current = e.key;
     const place = SHELF.things.findIndex((_, i) => e.key === `${i + 1}`);
     if (e.key === " ") {
@@ -864,6 +888,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
 
   useEffect(() => {
     const onKeyUp = () => {
+      stirred.current = performance.now();
       held.current = null;
     };
     window.addEventListener("keyup", onKeyUp);
@@ -915,7 +940,15 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const layerStyle = cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   const at = cameraPoint(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   return (
-    <div className="run-level" ref={box} onPointerDown={tapWall}>
+    <div
+      className="run-level"
+      ref={box}
+      onPointerDown={tapWall}
+      // Every tap – also on a part, which stops its event there – draws the run again until its wobble is over.
+      onPointerDownCapture={() => {
+        stirred.current = performance.now();
+      }}
+    >
       <TrackLook.Provider value={look}>
         <svg ref={svg} className="marble-camera" viewBox={layerBox} style={layerStyle} aria-label={label}>
           <look.Backdrop />

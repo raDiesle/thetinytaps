@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playHa, playHatschi, playLeaves, playSniff, playSqueak, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { loadRealSounds, playBaa, playBark, playGiggle, playMeow, playMoo, playOink, playQuack, playTrumpet, playTweet } from "@/lib/realSounds";
-import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
 import type { Pt } from "./path";
@@ -141,6 +141,8 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   const leavesT = useRef(Infinity);
   /** One-off sounds of the ending that have played, and whether the level is done. */
   const fired = useRef(new Set<string>());
+  /** When the level was done, in seconds since the tap. */
+  const doneAt = useRef(Infinity);
   const camera = useRef({ x: 0, z: 1 });
   const box = useRef<HTMLDivElement>(null);
   const ids = useId();
@@ -202,7 +204,11 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
           sound(playTrumpet);
         });
         if (t >= laughT + 0.7) once("laugh2", () => sound(playGiggle));
-        if (t >= laughT + DONE_AFTER_LAUGH_S) once("done", onDone);
+        if (t >= laughT + DONE_AFTER_LAUGH_S)
+          once("done", () => {
+            doneAt.current = t;
+            onDone();
+          });
       }
     }
     // The camera looks between the animal whose turn it is and the next one; from the elephant on, at the end of the row.
@@ -213,8 +219,14 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
     const next = cur < last ? row.seats[cur + 1].x : row.tree.x;
     const x = atEnd ? row.worldW - viewW : Math.min(row.worldW - viewW, Math.max(0, (row.seats[cur].x + next) / 2 - viewW * 0.42));
     const follow = 1 - Math.exp(-dt * CAMERA_FOLLOW);
+    const panning = gliding(camera.current.x, x) || gliding(camera.current.z * 1000, z * 1000);
     camera.current.x += (x - camera.current.x) * follow;
     camera.current.z += (z - camera.current.z) * follow;
+    // Still before the tap, and once the leaves lie, the laughing is over and the last tap's hop or giggle has faded.
+    const t = clock.current;
+    const lastTap = Math.max(...beasts.current.map((b) => b.tapT));
+    const settled = fired.current.has("done") && t - Math.max(doneAt.current, lastTap) > SETTLE_S;
+    return (t >= 0 && !settled) || panning;
   });
 
   /** A tap that isn't on an animal, or a key: the chain goes on by one step at once. */

@@ -70,6 +70,24 @@ are the shared `TapHint`, still until the child has waited a few seconds.
 
 „Wasserbahn“ (`water.ts`, `WaterLevel.tsx`, `water.css`; ideas X-09 and R-03): a yellow rubber duck rides a water run down a sunny hillside 6200 × 2000, four stone basins in steps from the upper left to a paddling pool at the lower right; the camera follows the duck both ways. The child sets off the run and one gate on the way: the duck waits, all still, at the first lock gate and at one more, `TAP_GATE` before the slide (the `TapHint` marks the handwheel, its hand to the right), until any tap or key – the other gates open by themselves once it has settled, and with „Von selbst“ only the first waits; as a gate opens it lifts with a creak, the water rushes, the duck rides down to the next basin and the gate shuts again, so everything is still within a couple of seconds. Each stretch has its own thing: a flume and waterfall turning a water wheel whose pegs ring a bell; a brook where a fish leaps over the duck and a frog jumps in from its lily pad; a twisty slide round a tower with a spin through the air; and a pipe the duck pops out of into the pool, where the fountain sprays, three ducklings quack in turn and the level ends (about 30 s if the child taps right away). While the duck moves, a tap on the water makes a ripple and any other tap or key makes it quack and hop (in the pipe, the bump swells). Each stretch is a pure function of the seconds since its gate opened (`Stretch`, `poseAt`, `gateAt`, `flowAt`); in development `__water.seek(stretch, seconds)` jumps there (−1 is waiting at that gate). `water.test.ts` checks that the stretches join up at the wait spots, the duck stays in the world, basins sit on their terraces, and the run lasts about half a minute and ends once.
 
+## Loading and drawing only what is needed
+
+- **Every level is a chunk of its own** (R-P12, November 2026: all 21 levels in the start screen's chunk were 454 KB):
+  the cards' data (id, emoji) lives in `catalog.ts` with one `import()` per level (the six marble runs share
+  `TrackLevel`'s), names in `content.ts`; `MarblePlay` waits for a level's code behind a `Suspense` showing
+  `PageLoading` (`PlayedLevel`, which also says the level's first line once its picture is there). The start screen
+  fetches the level picked last once the page lies still and the browser is idle, and a level's end fetches the next
+  one during its party – never while a level runs, nor when `savesData()`. A new level gets its entry in `LEVELS`,
+  never a static import in `MarbleGame.tsx` or `MarblePlay.tsx`, and imports its own CSS (`track.css` in
+  `TrackLevel.tsx`) (`catalog.test.ts`).
+- **A level draws only while something moves** (R-G7, November 2026: every level rendered 60 times a second also while
+  it waited for the first tap, at a stop and behind the end): `useFrames`' step runs every frame and returns whether
+  the picture changes – its clock running, a camera still `gliding`, a wobble, flash or sparkle younger than `SETTLE_S`
+  (the marble run's parts: `SETTLED_S`, and any tap or key stirs it) – and the frame where things come to rest is drawn
+  last (`frameTicker`, `frames.test.ts`). A new thing that changes with time or with a tap counts itself in its level's
+  step, or it freezes. Machines and the runs draw on after their end, since some ends keep moving (the good-night
+  machine's „z z z“, the pool's fountains).
+
 ## Working on machines
 
 - Everything in a machine level is a pure function of the seconds since the tap, so any moment can be
@@ -203,8 +221,8 @@ A world is a `TrackTheme` (`trackTheme.ts`): its backdrop, rail, colours of boar
 thing per `Roller` behaviour (`Thing`; the five behaviours stay as they are, only the drawing changes), its sounds, the line
 when full, the animals in the tunnel, and its `End` (drawn behind and in front of what landed, told how many have arrived,
 `fullAge` and `tapAge`). `TrackLook` hands it to every drawing in the run; the wooden run is `WOODEN` in `TrackLevel.tsx`.
-- A new world is a new file with a `TrackTheme`, a `MarbleLevel`, a card in `MODES`, a `LEVELS` entry, `LEVEL_TEXTS` and
-  `RUNS` in `MarblePlay.tsx` (no background music). Give it five things that look different from every other world's, and
+- A new world is a new file with a `TrackTheme`, a `MarbleLevel`, a `LEVELS` entry, `LEVEL_TEXTS` and
+  `RUNS` in `catalog.ts` (no background music). Give it five things that look different from every other world's, and
   an end that does something of its own when full – never the wooden basket and flag again.
 - Their names, first lines and the line when full (`full` in each world's `TrackTheme`) speak every language, like
   everything shared with the wooden run. The tunnel's colour-changing magic is the wooden run's only

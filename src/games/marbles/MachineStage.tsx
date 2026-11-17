@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, gliding, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
 import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
 import { PROD } from "@/lib/buildInfo";
@@ -98,7 +98,11 @@ export function MachineStage({
       }
     }
     const target = machine.cameraTarget(clock.current);
+    const from = camera.current;
     camera.current += (target - camera.current) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
+    // Still before the tap and at a stop, once the camera is there; after the end it runs on, since some machines'
+    // pictures keep moving then (the good-night machine's „z z z“).
+    return (clock.current >= 0 && !waiting.current) || gliding(from, target);
   });
 
   // For trying out the machine in the browser console: __machine.seek(20)

@@ -76,29 +76,59 @@ export function worldHint(at: ReturnType<typeof cameraPoint>, spot: { x: number;
 /** How tall the hint's hand is, in world units (the picture is 1600 × 900). */
 export const HINT_HAND = 150;
 
+/** Seconds after a hit until its wobble, flash or sparkles are over (`wobble`, `Sparkles`): a level still from then on can stop drawing. */
+export const SETTLE_S = 4;
+
 /** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
-export const wobble = (age: number, amp: number, freq: number, damp: number) => (age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq));
+export const wobble = (age: number, amp: number, freq: number, damp: number) =>
+  age < 0 || age > SETTLE_S ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq);
+
+/** True while a camera (or anything gliding after a target) is still visibly on its way, in world units. */
+export const gliding = (from: number, to: number) => Math.abs(to - from) > 0.1;
 
 /**
- * Calls `step(dt, now)` on every animation frame and renders again after it.
- * `dt` is capped, so a tab coming back from the background doesn't jump.
+ * One frame of `useFrames`: steps the level and says whether to draw it again. The first step returning `false`
+ * (nothing moves after it) is still drawn, so the picture shows where things came to rest, and then nothing until a
+ * step moves again. `dt` is capped, so a tab coming back from the background doesn't jump.
  */
-export function useFrames(step: (dt: number, now: number) => void) {
+export function frameTicker(step: (dt: number, now: number) => boolean, draw: () => void, start: number) {
+  let last = start;
+  let moved = true;
+  return (now: number) => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const moving = step(dt, now);
+    if (moving || moved) draw();
+    moved = moving;
+  };
+}
+
+/**
+ * Calls `step(dt, now)` on every animation frame and renders again after it – but only while `step` says something
+ * moves (code review R-G7, November 2026: every level rendered 60 times a second also while it waited for the first
+ * tap, at a stop and behind the end). A step that returns `false` must count everything that changes the picture as
+ * moving: the clock, a camera gliding (`gliding`), an age-driven wobble or flash not yet over (`SETTLE_S`). The step
+ * itself runs every frame either way, so what it times never misses a beat; a tap only changes refs, and the next step
+ * sees it moving. A resize draws once, since the camera's layer is measured from the box.
+ */
+export function useFrames(step: (dt: number, now: number) => boolean) {
   const [, setFrame] = useState(0);
   const stepRef = useRef(step);
   stepRef.current = step;
   useEffect(() => {
     let frame = 0;
-    let last = performance.now();
-    const tick = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      stepRef.current(dt, now);
-      setFrame((f) => f + 1);
-      frame = requestAnimationFrame(tick);
+    const draw = () => setFrame((f) => f + 1);
+    const tick = frameTicker((dt, now) => stepRef.current(dt, now), draw, performance.now());
+    const loop = (now: number) => {
+      tick(now);
+      frame = requestAnimationFrame(loop);
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(loop);
+    window.addEventListener("resize", draw);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", draw);
+    };
   }, []);
 }
 

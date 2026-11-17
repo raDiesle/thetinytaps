@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
 import { useTimers } from "@/lib/timers";
-import { cameraLayer, cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
+import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { cameraOn } from "./machineKit";
 import { Sparkles } from "./scenery";
@@ -159,8 +159,11 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
       if (o.started) front = i;
     });
     const focus = drumAt.current > 0 ? roomX(drumLeft + DRUM.w / 2) : front < 0 ? 0 : roomX(lefts[front] + things[front].w);
-    camera.current += (cameraOn(worldW, focus) - camera.current) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
-    if (phase.current !== "falling") return;
+    const target = cameraOn(worldW, focus);
+    const panning = gliding(camera.current, target);
+    camera.current += (target - camera.current) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
+    // While the things drop in, draw on, so the hint comes as the row is ready; at the end, until the drum and its sparkles are still.
+    if (phase.current !== "falling") return phase.current === "dropping" || panning || t - drumAt.current < SETTLE_S * 1000;
     const tips = tipping.current;
     tips.forEach((o, i) => {
       if (!o.started) return;
@@ -207,6 +210,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
       o.angle = angle;
     });
     if (phase.current === "falling" && t - fallStart.current > MAX_FALL_MS_EACH * things.length) finish();
+    return true;
   });
 
   const push = () => {

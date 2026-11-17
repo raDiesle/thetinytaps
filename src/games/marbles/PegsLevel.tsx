@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "r
 import { playPlink, playPop } from "@/lib/sfx";
 import { loadRealSounds, playBark, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
 import { useTimers } from "@/lib/timers";
-import { cameraPoint, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
+import { cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { BAR_COLORS, Ball } from "./parts";
 import { BALL_R } from "./path";
@@ -160,13 +160,18 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
     }
     falling.current = still;
     // Lying marbles roll the last bit to their place in the pile.
+    let rolling = false;
     for (const m of lying.current) {
       const target = binCenter(m.bin) + PILE_SLOTS[m.slot].x;
       const step = (target - m.x) * (1 - Math.exp(-dt * 9));
+      if (gliding(m.x, target)) rolling = true;
       m.x += step;
       m.spin += step / BALL_R;
     }
     pops.current = pops.current.filter((p) => t - p.at < 3000);
+    // Still once every marble lies and every nail's glow and animal's hop is over.
+    const lastHit = Math.max(lastPlink.current, ...pegHit.current, ...joy.current);
+    return falling.current.length > 0 || rolling || pops.current.length > 0 || t - lastHit < SETTLE_S * 1000;
   });
 
   /** One marble from the top, above `x`; with too many in the air, the top nails above `x` ring instead. */

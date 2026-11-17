@@ -1,4 +1,4 @@
-import { lazy, Suspense, use, useEffect, useMemo } from "react";
+import { Suspense, use, useEffect, useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
 import { PageLoading } from "@/components/PageLoading";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
@@ -8,13 +8,18 @@ import { useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
 import { afterLoad, savesData } from "@/lib/pwa";
 import { useStoredSettings } from "@/lib/storage";
-import { entryTitle, entryToldIn, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
+import { entryTitle, entryToldIn, loadedPlay, loadedStory, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
 import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { storyIn } from "./stories/story";
 import previews from "./vorschau/*.webp?glob";
 
 // The player with three.js and each story are chunks of their own (catalog.ts): this start screen loads neither.
-const AdventurePlay = lazy(() => loadPlay().then((m) => ({ default: m.AdventurePlay })));
+
+/** The player's and a story's code, which a tap on the story's card waits for a moment before the page turns. */
+const codeFor = (id?: string) => {
+  const entry = STORIES.find((s) => s.id === id);
+  return Promise.all([loadPlay(), entry && loadStory(entry)]);
+};
 
 /** The start screen: no options of its own, music and Tapsi's language come from the home page. */
 export function AdventureGame() {
@@ -74,6 +79,7 @@ export function AdventureGame() {
       modes={STORIES.map((s) => ({ id: s.id, emoji: s.emoji, title: entryTitle(s, app.id), unfinished: s.unfinished }))}
       mode={settings.story}
       onMode={(id) => update({ story: id as AdventureStoryId })}
+      prepare={(id) => codeFor(id ?? chosen.id)}
     >
       {/* The paper with the paw track while the player's or the story's code still loads – never a dark screen. */}
       <Suspense fallback={<PageLoading />}>
@@ -101,7 +107,9 @@ function StoryPlay({
   settings: CommonSettings;
   next?: { name: string; onNext: () => void };
 }) {
-  const loaded = use(loadStory(entry));
+  // Read at once where they were fetched ahead, so the story's first picture is drawn before the page turns to it.
+  const loaded = loadedStory(entry) ?? use(loadStory(entry));
+  const { AdventurePlay } = loadedPlay() ?? use(loadPlay());
   // Built once per story and language: the game starts anew when the story changes.
   const story = useMemo(() => storyIn(loaded, language.id), [loaded, language.id]);
   // Its own music, which plays while music is on for all games.

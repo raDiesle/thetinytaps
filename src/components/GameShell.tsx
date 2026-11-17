@@ -12,6 +12,7 @@ import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { codeSoon } from "@/lib/lazyPart";
 import { BACK_TO_SHELF } from "@/lib/sharedTexts";
 import { useCommonSettings } from "@/lib/common";
 import { goBack } from "@/lib/goBack";
@@ -139,6 +140,12 @@ interface GameShellProps {
   /** Ways to play, as big cards: tapping one picks it and starts the game. Without them there is one start button. */
   modes?: GameMode[];
   /**
+   * The code the level `id` (none: the one picked) needs, in a game that loads each level by its own `import()`
+   * (`lazyPart`): fetched as the finger lands on its card and waited for a moment (`codeSoon`) before the page turns,
+   * so the level is drawn before the motion, not in its middle. Still missing then, the page turns to the loading paper.
+   */
+  prepare?: (id?: string) => Promise<unknown>;
+  /**
    * The game's `vorschau/` folder (`import previews from "./vorschau/*.webp?glob"`): `<mode id>.webp` is a framed cut of
    * the game as that card plays it, shown on the card in place of its emoji (user request, November 2026). `bun run
    * previews` makes them; a still picture costs a phone nothing, where the game's own svg in every card would.
@@ -199,6 +206,7 @@ export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo"
 export function GameShell({
   title,
   modes,
+  prepare,
   previews,
   labelOnPicture,
   mode,
@@ -279,11 +287,14 @@ export function GameShell({
   const playArea = useRef<HTMLDivElement>(null);
   useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
+  const starting = useRef(false);
   /**
    * Starts playing; `turn` turns the page into the game (not when the page opens playing). A card's level `id` gets its
    * own address, a new step in the history, so the phone's back button comes back to the cards.
    */
   const start = async (turn = false, id?: string) => {
+    // A second tap while the first still waits for its level's code starts nothing again.
+    if (starting.current) return;
     // The menus are locked then (PlaytimeLock); this also stops a key that slips past it. A routine's step is no game.
     if (!free) {
       if (isPlaytimeOver()) return;
@@ -298,6 +309,16 @@ export function GameShell({
       shownLevel.current = id;
       navigate(levelHref(home, id));
     };
+    if (turn && prepare) {
+      // Fullscreen needs the tap as its gesture, so it is asked for before the wait.
+      const kid = enterKidMode();
+      starting.current = true;
+      await codeSoon(prepare(id));
+      starting.current = false;
+      turnPageWith("forward", play);
+      await kid;
+      return;
+    }
     if (turn) turnPageWith("forward", play);
     else play();
     await enterKidMode();
@@ -511,6 +532,7 @@ export function GameShell({
         <button
           type="button"
           className={`game-card mode-card${m.art ? " mode-art-card" : labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
+          onPointerDown={() => void prepare?.(m.id).catch(() => undefined)}
           onClick={() => pick(m.id)}
           data-mode={m.id}
           aria-label={m.art ? [m.title, m.note].filter(Boolean).join(": ") : undefined}
