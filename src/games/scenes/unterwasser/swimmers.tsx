@@ -304,7 +304,7 @@ export function UBoot() {
             {i === 0 ? (
               <Inside d={porthole(cx)}>
                 <g className="uw-uboot-captain">
-                  <Rider cx={cx} cy={-6} shirt="#3a86ff" cap="#e63946" />
+                  <Rider animal="bear" cx={cx} cy={-6} shirt="#3a86ff" cap="#e63946" />
                 </g>
               </Inside>
             ) : (

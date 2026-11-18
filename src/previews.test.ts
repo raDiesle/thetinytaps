@@ -6,6 +6,7 @@ import { bookIdOf, CATEGORIES, hasPage, listedGames } from "@/content/games";
 import sharp from "sharp";
 import { PREVIEW_SIZE } from "@/components/GameCard";
 import { SCENE_ENTRIES } from "@/games/scenes/catalog";
+import { COMMON_SETTINGS_KEY } from "@/lib/common";
 
 // The menus show a framed 3 : 2 cut of each game instead of its emoji (user request and feedback, November 2026), made by
 // `bun run previews` (tools/previews.ts) as small still pictures: these checks keep every menu's pictures there and
@@ -20,9 +21,11 @@ const sources = (dir: string): string[] =>
     .filter((file) => /\.tsx?$/.test(file) && !isTest(file))
     .map((file) => join(dir, file));
 
-/** The `vorschau/` folders the app imports, relative to the repo (not the wildcard folders of the page of all pictures). */
+/** The `vorschau/` folders the app imports (and the girl's `vorschau-maedchen/`), relative to the repo (not the wildcard folders of the page of all pictures). */
 const folders = sources(join(ROOT, "src")).flatMap((file) =>
-  [...read(file).matchAll(/from "([^"*]*vorschau)\/\*\.webp\?glob"/g)].map(([, path]) => join(file.slice(ROOT.length + 1, file.lastIndexOf("/")), path)),
+  [...read(file).matchAll(/from "([^"*]*vorschau(?:-maedchen)?)\/\*\.webp\?glob"/g)].map(([, path]) =>
+    join(file.slice(ROOT.length + 1, file.lastIndexOf("/")), path),
+  ),
 );
 
 describe("menu pictures", () => {
@@ -45,6 +48,18 @@ describe("menu pictures", () => {
   test("bun run previews knows every folder the menus show", () => {
     expect(folders.length).toBeGreaterThan(5);
     for (const folder of new Set(folders)) expect(TOOL.includes(`"${folder}"`), folder).toBe(true);
+  });
+
+  test("a girl's picture stands for a boy's of the same name, in a game that draws the child", () => {
+    // `useFigurePictures` lays the girl's over the boy's by name: one without its boy's would show for the girl alone,
+    // and a folder of girl's pictures where nothing draws the child would be a Gemini picture made twice.
+    const girls = [...new Set(folders)].filter((folder) => folder.endsWith("vorschau-maedchen"));
+    expect(girls.length).toBeGreaterThan(0);
+    for (const folder of girls) {
+      const boy = folder.replace(/-maedchen$/, "");
+      for (const name of readdirSync(join(ROOT, folder))) expect(existsSync(join(ROOT, boy, name)), `${folder}/${name}`).toBe(true);
+    }
+    expect(TOOL).toContain(`localStorage.setItem("${COMMON_SETTINGS_KEY}"`);
   });
 
   test("every picture is 3 : 2 at the size the menus show, so it fills a card without stretching", async () => {

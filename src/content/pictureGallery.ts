@@ -3,12 +3,15 @@
 // belongs together is read from their names – the conventions the games and `/bild-erzeugen` already follow:
 // `x-b.webp` is the second frame fading over `x.webp`, `x-linie.webp` the Belohnungstafel's line drawing of `x`,
 // `x-grund` / `x-anders` what happened and what didn't in „Was ist passiert?“, `x-1` / `x-2` before and after in the
-// games that paint two numbered frames, and `teile/x.webp` the painted partner of pair `x` in „Was gehört zusammen?“.
+// games that paint two numbered frames, `teile/x.webp` the painted partner of pair `x` in „Was gehört zusammen?“, and
+// `vorschau-maedchen/x.webp` the menu's picture `vorschau/x.webp` with the child as a girl (`useFigurePictures`).
 
 import componentPictures from "../components/bilder/*.webp?glob";
 import componentPreviews from "../components/vorschau/*.webp?glob";
+import componentGirlPreviews from "../components/vorschau-maedchen/*.webp?glob";
 import gamePictures from "../games/*/bilder/**/*.webp?glob";
 import gamePreviews from "../games/*/vorschau/*.webp?glob";
+import gameGirlPreviews from "../games/*/vorschau-maedchen/*.webp?glob";
 
 /** One picture file. */
 export interface GalleryPicture {
@@ -100,6 +103,9 @@ export const KIND_TITLES: Record<PictureKind, string> = {
   teile: "Teile, die auf ein Bild gelegt werden",
 };
 
+/** What a menu's picture with the child as a girl (`vorschau-maedchen/`) is called on the page, after its boy's name. */
+const GIRL_SUFFIX = "-maedchen";
+
 /** Endings that make a picture part of another one's set, with the part's name, when that other picture exists. */
 const VARIANTS: { suffix: string; role: string; frame?: boolean }[] = [
   { suffix: "-b", role: "2. Frame", frame: true },
@@ -107,6 +113,7 @@ const VARIANTS: { suffix: string; role: string; frame?: boolean }[] = [
   { suffix: "-linie", role: "Linie zum Ausmalen" },
   { suffix: "-grund", role: "Was passiert ist" },
   { suffix: "-anders", role: "Was nicht passiert ist" },
+  { suffix: GIRL_SUFFIX, role: "Mädchen" },
 ];
 
 /** Every picture file of the app, found by its folder. */
@@ -117,14 +124,18 @@ export function allPictures(): GalleryPicture[] {
       const path = `${folder}/${below}`;
       const parts = path.split("/");
       const source = parts[1] === "components" ? "components" : parts[2];
-      const kind: PictureKind = parts.includes("teile") ? "teile" : parts.includes("vorschau") ? "vorschau" : "bilder";
-      found.push({ path, url, source, kind, stem: (parts.at(-1) as string).replace(/\.webp$/, "") });
+      const girl = parts.includes("vorschau-maedchen");
+      const kind: PictureKind = parts.includes("teile") ? "teile" : girl || parts.includes("vorschau") ? "vorschau" : "bilder";
+      const stem = (parts.at(-1) as string).replace(/\.webp$/, "");
+      found.push({ path, url, source, kind, stem: girl ? `${stem}${GIRL_SUFFIX}` : stem });
     }
   };
   add(componentPictures, "src/components/bilder");
   add(componentPreviews, "src/components/vorschau");
+  add(componentGirlPreviews, "src/components/vorschau-maedchen");
   add(gamePictures, "src/games");
   add(gamePreviews, "src/games");
+  add(gameGirlPreviews, "src/games");
   return found.sort((a, b) => a.path.localeCompare(b.path));
 }
 

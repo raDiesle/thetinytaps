@@ -1,4 +1,4 @@
-import { Face, Inside, nth, sparklePath } from "../shared";
+import { Face, Inside, type Mascot, MascotFace, nth, sparklePath } from "../shared";
 import { SKIN } from "@/components/drawing";
 
 // Small parts many drawings of the Weltall scene share.
@@ -59,8 +59,26 @@ export function Lid({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fi
   );
 }
 
-/** An astronaut's helmet around (cx, cy): a white shell with a light visor, the face shows through it. */
-export function Helmet({ cx, cy, r, hair = "#6b4423" }: { cx: number; cy: number; r: number; hair?: string }) {
+/**
+ * An astronaut's helmet around (cx, cy): a white shell with a light visor, the face shows through it – a person's, or
+ * with `animal` a fox's or a bear's (the app's mascots in a role, D-18), small enough that its ears stay inside the visor.
+ */
+export function Helmet({
+  cx,
+  cy,
+  r,
+  hair = "#6b4423",
+  animal,
+  lashes = false,
+}: {
+  cx: number;
+  cy: number;
+  r: number;
+  hair?: string;
+  animal?: Mascot;
+  /** For an astronaut who is a woman, with `animal`. */
+  lashes?: boolean;
+}) {
   const visor = ellipsePath(cx, cy + r * 0.08, r * 0.74, r * 0.6);
   return (
     <>
@@ -68,12 +86,18 @@ export function Helmet({ cx, cy, r, hair = "#6b4423" }: { cx: number; cy: number
       <path d={`M${cx - r * 0.87} ${cy + r * 0.5} A${r} ${r} 0 0 0 ${cx + r * 0.87} ${cy + r * 0.5} Z`} fill={SUIT_SHADE} />
       <path d={visor} fill={VISOR} />
       <Inside d={visor}>
-        <circle cx={cx} cy={cy + r * 0.2} r={r * 0.5} fill={SKIN} />
-        <path
-          d={`M${cx - r * 0.52} ${cy + r * 0.1} Q${cx} ${cy - r * 0.5} ${cx + r * 0.52} ${cy + r * 0.1} Q${cx} ${cy - r * 0.12} ${cx - r * 0.52} ${cy + r * 0.1} Z`}
-          fill={hair}
-        />
-        <Face cx={cx} cy={cy + r * 0.16} size={r / 42} />
+        {animal ? (
+          <MascotFace kind={animal} cx={cx} cy={cy + r * 0.24} r={r * 0.45} lashes={lashes} />
+        ) : (
+          <>
+            <circle cx={cx} cy={cy + r * 0.2} r={r * 0.5} fill={SKIN} />
+            <path
+              d={`M${cx - r * 0.52} ${cy + r * 0.1} Q${cx} ${cy - r * 0.5} ${cx + r * 0.52} ${cy + r * 0.1} Q${cx} ${cy - r * 0.12} ${cx - r * 0.52} ${cy + r * 0.1} Z`}
+              fill={hair}
+            />
+            <Face cx={cx} cy={cy + r * 0.16} size={r / 42} />
+          </>
+        )}
       </Inside>
       <path d={visor} fill="none" stroke="#adb5bd" strokeWidth={r * 0.08} />
       <path

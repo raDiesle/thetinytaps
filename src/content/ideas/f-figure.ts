@@ -53,5 +53,14 @@ export const figureIdeas: IdeaArea = {
       why: "Damit kein neues Spiel die Einstellung vergisst.",
       effort: "S",
     },
+    {
+      id: "F-06",
+      done: true,
+      emoji: "🖼️",
+      title: "Menübilder fürs Mädchen",
+      text: "Die Vorschaubilder in den Menüs sind Ausschnitte aus den Spielen und zeigten das Kind immer als Jungen. Kleine Abenteuer bekommt deshalb jede Karte, seine Zeile im Inhaltsverzeichnis und die Bilder in seinen Pokalen ein zweites Mal mit dem Mädchen (bun run previews, Ordner vorschau-maedchen/), und die Menüs zeigen sie, wenn „Mädchen“ gewählt ist. Nur was aus den SVG-Zeichnungen der Spiele stammt – mit Gemini gemalte Bilder (Buchdeckel, Buchrücken, Geschichten, Mitmachen) bleiben einmal, weil jedes zweite Bild Geld kostet.",
+      why: "Das Mädchen findet sich schon auf der Karte, bevor es spielt.",
+      effort: "S",
+    },
   ],
 };
