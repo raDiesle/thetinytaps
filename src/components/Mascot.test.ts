@@ -14,6 +14,7 @@ const MASCOT_DRAWINGS = [
   "src/games/together/Helper.tsx",
   "src/games/marbles/scenery.tsx",
   "src/games/marbles/CircusLevel.tsx",
+  "src/games/marbles/SpaceLevel.tsx",
   "src/games/scenes/hideout.tsx",
   "src/games/elevator/kid.tsx",
   "src/games/scenes/supermarkt/wall.tsx",

@@ -151,7 +151,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/kettenreaktion/",
-    note: "SVG. Aus dem Tunnel schauen 🦊 und 🐻 auf der Kugelbahn und der Baustellenbahn, 🦊 und 🐻‍❄️ auf der Schneebahn; Bagger, Walze und Kran fahren ein Fuchs und zwei Bären, und die Zirkuspuppe ist ein Fuchs im Clownskostüm.",
+    note: "SVG. Aus dem Tunnel schauen 🦊 und 🐻 auf der Kugelbahn und der Baustellenbahn, 🦊 und 🐻‍❄️ auf der Schneebahn; Bagger, Walze und Kran fahren ein Fuchs und zwei Bären, die Zirkuspuppe ist ein Fuchs im Clownskostüm, auf dem Einrad im Zirkus fährt ein Bär im Artistenanzug und aus dem Raketenfenster winkt ein Bär im Raumanzug. Die Spielsachen der Kinderzimmer (der Teddy am Steuer des Spielzeugautos, der Gute-Nacht-Teddy) bleiben Spielsachen.",
     tasks: [
       {
         label: "🦊 statt 👷 auf der Baustellenbahn, 🦊 bei den Gucker-Tieren jeder Bahn",
@@ -168,6 +168,20 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "CabDriver in scenery.tsx, auch für weitere Fahrzeuge.",
       },
       { label: "Die Clownpuppe im Zirkus wird eine Fuchs- oder Bärenpuppe", work: "drawing", effort: "S", state: "done" },
+      {
+        label: "Der Teddy auf dem Einrad im Zirkus wird ein Bär im Artistenanzug",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "18. November 2026: der geteilte Bärenkopf statt eines Teddykopfs aus Kreisen, im lila Anzug mit Goldgürtel; er fängt die Murmel und fährt über das Seil – er tut im Bild, was der Teddy tat.",
+      },
+      {
+        label: "Der Teddy-Astronaut im Raketenfenster wird ein Bär im Raumanzug",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "18. November 2026: der geteilte Bärenkopf im weißen Raumanzug; er winkt beim Countdown mit dem Handschuh und fliegt mit der Rakete zum Mond.",
+      },
     ],
   },
   {
