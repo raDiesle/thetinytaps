@@ -119,7 +119,12 @@ In a fresh worktree run `bun install` first.
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
   its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
   area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
-  built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
+  built, set `done: true` there: `/management/` then no longer lists it (user feedback, November 2026: the page shows
+  only what is still to decide), while the data keeps it so its number stays taken and the research and mascot tables
+  still link it. Never leave an idea half done: `partial` is only a note on a done (or rejected) idea of what was built,
+  and what is really left becomes a new idea with the area's next number, while a rest that is only translations or
+  recordings is no rest at all (`languageStatus.ts` and the voice list track those; `content.test.ts`). An idea the user
+  turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
@@ -462,6 +467,13 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   it. A new drawing of the child goes on `CHILD_DRAWINGS` in `src/figure.test.ts`, which also checks that nothing calls
   the child a „braver Junge“ or the like. With „Mädchen“ the menus get the girl's colours (`:root[data-figure="girl"]` in
   `base.css`: a lilac sky going pink): a new shared colour of the menus gets its girl's value there too.
+  The menus' pictures of a game that draws the child (its cards, its line in the table of contents, its trophies'
+  medallions) show the chosen child too: `bun run previews` pictures such a game a second time with „Mädchen“ into
+  `vorschau-maedchen/` beside `vorschau/` (`Menu.girl`, `GIRL_LINES` in `tools/previews.ts`), and the menus lay them
+  over the boy's with `useFigurePictures` (`src/lib/figurePictures.ts`); a new menu or game drawing the child adds its
+  folder there. Only what is cut from the games' own svg follows the figure: a picture painted by Gemini (covers, spines,
+  the stories' pictures, Mitmachen's fox and bear child) is never made a second time for it, which would cost a picture
+  each (user decision, November 2026).
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer (what a game puts at the picture's edge adds `var(--frame, 0px)`: the book's paper margin lies
   over the picture's edges and hid half of Bewegungsabenteuer's route): let it fill the screen behind headings and controls and zoom what matters into

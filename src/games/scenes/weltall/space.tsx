@@ -328,7 +328,7 @@ export function Astronaut() {
           <path d="M16 -10 L32 -28" stroke={SUIT} strokeWidth="11" strokeLinecap="round" />
           <circle cx="34" cy="-31" r="6.5" fill="#ced4da" />
         </g>
-        <Helmet cx={0} cy={-34} r={24} hair="#e09f3e" />
+        <Helmet cx={0} cy={-34} r={24} animal="fox" />
         <Sparkles className="wa-astro-glint" spots={[[-9, -44]]} r={6} />
       </g>
     </>
