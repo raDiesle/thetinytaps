@@ -27,8 +27,8 @@ const ARMS = {
 } as const;
 
 /** A grown-up; `face` -1 turns it left. With `wear` "fire" it is a firefighter, with "baker" a baker in a white
- * jacket and a baker's hat, with "rescue" a paramedic in an orange jacket with silver stripes, with "blanket" a warm
- * blanket lies round its shoulders. */
+ * jacket and a baker's hat, with "rescue" a paramedic in an orange jacket with silver stripes, with "farmer" a farmer in
+ * dungarees and a straw hat, with "blanket" a warm blanket lies round its shoulders. */
 export function Grownup({
   look,
   pose,
@@ -38,13 +38,14 @@ export function Grownup({
 }: {
   look: Look;
   pose: GrownPose;
-  wear?: ("fire" | "baker" | "blanket" | "rescue")[];
+  wear?: ("fire" | "baker" | "blanket" | "rescue" | "farmer")[];
   face?: 1 | -1;
   holding?: ReactNode;
 }) {
   const fire = wear.includes("fire");
   const baker = wear.includes("baker");
   const rescue = wear.includes("rescue");
+  const farmer = wear.includes("farmer");
   const shirt = fire ? FIRE_BLUE : baker ? "#f8f9fa" : rescue ? "#ff922b" : look.shirt;
   const pants = fire ? FIRE_BLUE : rescue ? "#2b3a55" : look.pants;
   const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
@@ -87,6 +88,15 @@ export function Grownup({
             </g>
           </g>
         )}
+        {farmer && (
+          <g>
+            <path d="M-26 -176 H26 V-100 H-26 Z" fill={pants} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+            <path d="M-20 -176 L-24 -200 M20 -176 L24 -200" stroke={pants} strokeWidth="7" strokeLinecap="round" />
+            <circle cx="-17" cy="-168" r="4" fill="#ffd43b" stroke={INK} strokeWidth="1.5" />
+            <circle cx="17" cy="-168" r="4" fill="#ffd43b" stroke={INK} strokeWidth="1.5" />
+            <rect x="-12" y="-152" width="24" height="18" rx="3" fill="none" stroke={INK} strokeOpacity="0.4" strokeWidth="2" />
+          </g>
+        )}
         {arm(left, "el-arm-l", "-24px -188px", true)}
         {holding && <g transform="translate(0 -122)">{holding}</g>}
         {wear.includes("blanket") && (
@@ -101,6 +111,7 @@ export function Grownup({
           <g transform="translate(0 -120) scale(0.8)">
             <KidHead look={look} />
             {fire && <FireHelmet />}
+            {farmer && <StrawHat />}
             {baker && (
               <g transform="translate(0 -160) scale(0.95)">
                 <ChefHat />
@@ -109,6 +120,18 @@ export function Grownup({
           </g>
         </g>
       </g>
+    </g>
+  );
+}
+
+/** A farmer's straw hat with a red band, on a head drawn like `KidHead`. */
+function StrawHat() {
+  return (
+    <g>
+      <ellipse cx="0" cy="-150" rx="70" ry="14" fill="#f2c94c" stroke={INK} strokeWidth="3" />
+      <path d="M-36 -152 Q-38 -196 0 -198 Q38 -196 36 -152 Z" fill="#ffe08a" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-36 -162 Q0 -170 36 -162 L36 -152 Q0 -160 -36 -152 Z" fill="#e03131" />
+      <path d="M-50 -148 Q0 -140 50 -148 M-22 -186 Q0 -190 22 -186" stroke="#d4a72c" strokeWidth="2.5" fill="none" />
     </g>
   );
 }

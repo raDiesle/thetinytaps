@@ -66,6 +66,7 @@ export const LEVEL_IDS: Record<string, readonly string[]> = {
     "baecker",
     "garten",
     "krankenwagen",
+    "korn",
   ],
   "/abenteuer/": ["schatzinsel", "wolkenreise", "feuerwehr"],
 };

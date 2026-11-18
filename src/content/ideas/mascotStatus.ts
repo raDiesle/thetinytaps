@@ -175,6 +175,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG. Das Kind (Junge / Mädchen) bleibt, bis D-19 entschieden ist.",
     tasks: [
       {
+        label: "Korn-Film: Bauer, Bäuerin, Müllerin und Bäcker",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Neu (18. November 2026): der Bauer ist ein Fuchs mit Latzhose und Strohhut, die Bäuerin eine Füchsin, die Müllerin eine Bärin, der Bäcker der Bär aus „Beim Bäcker“ – alle in Rollen, mit Kleidung. Das Kind des Spiels bleibt ein Mensch.",
+      },
+      {
         label: "Krankenwagen-Film: Bärenkind, Fuchs-Mama oder -Papa, Sanitäterin und Fahrer",
         work: "drawing",
         effort: "S",

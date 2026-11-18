@@ -184,7 +184,8 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Filme, in denen etwas entsteht, Schritt für Schritt: vom Korn zum Brot (Traktor sät, Regen, das Korn wächst, Mähdrescher, Mühle, Bäckerei, Brötchen zum Frühstück), vom Brief zur Oma (malen, Umschlag, Briefkasten, Postauto, Briefträger klingelt, Oma freut sich), vom Haus (Bagger, Kran, Wände, Dach, Einzug mit Party), der Müll (Tonne raus, Müllauto, Recyclinghof). Wahl am Anfang zum Beispiel: Brötchen, Brezel oder Kuchen.",
       why: "Kinder sehen, woher Dinge kommen und dass viele zusammenhelfen.",
       effort: "L",
-      partial: "„Ein Brief für Oma“ (G-24) und „Beim Bäcker“ (G-25) sind gebaut; Korn zum Brot, Haus und Müll fehlen noch.",
+      partial:
+        "„Ein Brief für Oma“ (G-24), „Beim Bäcker“ (G-25) und „From grain to bread“ (Korn zum Brot, zuerst auf Englisch) sind gebaut; Haus und Müll fehlen noch.",
     },
     {
       id: "G-21",

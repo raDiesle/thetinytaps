@@ -935,6 +935,114 @@
   }
 }
 
+/* „From grain to bread“: seeds fall from the drill's tines and show in the furrows as it passes, the trailer tips round
+   its back, the grain heaps up in it and pours out in a stream, the grain grows and is cut, the windmill's sails turn
+   twice round, and the miller goes in at the door. */
+.fm-kn-drop {
+  animation: fm-kn-drop calc(0.5s * var(--fm-pace)) ease-in infinite;
+}
+
+@keyframes fm-kn-drop {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+.fm-kn-sow {
+  animation: fm-kn-show calc(0.4s * var(--fm-pace)) ease-out backwards;
+}
+
+@keyframes fm-kn-show {
+  from {
+    opacity: 0;
+  }
+}
+
+.fm-kn-tip {
+  transition: transform calc(1.6s * var(--fm-pace)) ease-in-out;
+}
+
+.fm-kn-heap {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform calc(2.6s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-kn-pour {
+  animation: fm-kn-pour calc(0.6s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-kn-pour {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.fm-kn-grow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition:
+    transform calc(2.4s * var(--fm-pace)) ease-out calc(0.6s * var(--fm-pace)),
+    opacity calc(1.4s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-kn-cut {
+  animation: fm-kn-cut calc(0.5s * var(--fm-pace)) ease-in forwards;
+}
+
+@keyframes fm-kn-cut {
+  to {
+    opacity: 0;
+  }
+}
+
+.fm-kn-sails.turn {
+  animation: fm-kn-sails calc(9s * var(--fm-pace)) ease-in-out;
+}
+
+@keyframes fm-kn-sails {
+  to {
+    transform: rotate(720deg);
+  }
+}
+
+/* A puff of flour at the mill's door as the miller comes out with the sack. */
+.fm-kn-dust {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fm-kn-dust calc(1.6s * var(--fm-pace)) ease-out calc(1.6s * var(--fm-pace));
+}
+
+@keyframes fm-kn-dust {
+  from {
+    transform: scale(0.3);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.fm-kn-inside {
+  animation: fm-kn-inside calc(0.4s * var(--fm-pace)) ease-in calc(1.8s * var(--fm-pace)) forwards;
+}
+
+@keyframes fm-kn-inside {
+  to {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-wheel.spin,
   .fm-flame,
@@ -944,6 +1052,8 @@
   .fm-br-ring,
   .fm-gt-rain,
   .fm-gt-wings,
+  .fm-kn-drop,
+  .fm-kn-pour,
   .fm-strip.run .fm-frame,
   .fm-card-move::before {
     animation: none;
