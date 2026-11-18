@@ -49,7 +49,7 @@ export function Mondbagger() {
         <rect x="-116" y="-160" width="90" height="12" rx="6" fill="#f4a100" />
         <Pane x={-102} y={-144} w={60} h={46}>
           <g className="wa-bagger-driver">
-            <Helmet cx={-72} cy={-118} r={16} hair="#2b2d42" />
+            <Helmet cx={-72} cy={-118} r={16} animal="fox" />
           </g>
         </Pane>
         <rect x="-80" y="-174" width="16" height="14" rx="5" fill="#b5651d" />
@@ -114,7 +114,7 @@ export function Buggy() {
           <g className="wa-buggy-arm" style={{ transformOrigin: "-20px -100px" }}>
             <path d="M-20 -100 L24 -102" stroke={SUIT} strokeWidth="10" strokeLinecap="round" />
           </g>
-          <Helmet cx={-31} cy={-130} r={22} />
+          <Helmet cx={-31} cy={-130} r={22} animal="bear" />
         </g>
         <path d="M46 -76 L30 -104" stroke="#495057" strokeWidth="5" strokeLinecap="round" />
         <ellipse cx="28" cy="-106" rx="10" ry="4" fill="#343a40" />

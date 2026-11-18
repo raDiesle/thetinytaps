@@ -117,7 +117,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/bilder/",
-    note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es als Tiere im Wald und im Winter, als Fahrer und Erwachsene in Rollen und als Überraschung im Versteck.",
+    note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es als Tiere im Wald und im Winter, als Fahrer und Erwachsene in Rollen (auch Bauarbeiter, Astronauten, Rettungsschwimmerin) und als Überraschung im Versteck.",
     tasks: [
       {
         label: "Fahrer, Mitfahrer und Pilotinnen werden Füchse oder Bären",
@@ -139,6 +139,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "L",
         state: "done",
         note: "Mit `MascotFace` (scenes/shared.tsx), dem geteilten Kopf an Stelle eines Menschenkopfs: im Supermarkt ist die Bäckerin eine Bärin mit Kochmütze und die Kassiererin eine Füchsin mit Schleife am Ohr, in der Kita liest eine Füchsin mit runder Brille vor, beim Kinderarzt ist die Ärztin eine Bärin mit Brille (wie in der Belohnungstafel), im Wald die Försterin eine Bärin (der wilde Fuchs bleibt ein Fuchs), in der Feuerwache der Feuerwehrmann mit der Pfeife ein Fuchs unter dem Helm (die Feuerwehrfrau bleibt ein Mensch), im Zoo die Tierpflegerin eine Füchsin, auf dem Bauernhof der Bauer ein Bär (ein Fuchs bei den Hühnern wäre der falsche), am Flughafen die Pilotin eine Bärin mit Mütze zwischen den Ohren und der Schaffner am Bahnsteig ein Fuchs mit roter Mütze, auf dem Spielplatz der Eismann ein Fuchs mit Papierhut (6. November 2026). Menschen bleiben mit Absicht: der Einweiser, der Verkäufer auf der Leiter, die Feuerwehrfrau, Mama, Papa, Oma und Opa neben Menschenkindern; die Kinder bleiben Kinder.",
+      },
+      {
+        label: "Weitere Rollen werden Füchse oder Bären: Bauarbeiter und Baggerfahrer, Astronauten, Rettungsschwimmerin, Tee-Arbeiter, U-Boot-Kapitän",
+        work: "drawing",
+        effort: "M",
+        state: "done",
+        note: "Nur wo das Bild die Rolle schon hat, ein Mensch wird Fuchs oder Bär (18. November 2026): auf der Baustelle der Bauarbeiter mit Helm ein Bär, die Fahrer von Bagger und Kipplaster Bären, von Betonmischer und Walze Füchse (`Driver animal`, auch in der Winter-Baustelle; der Gabelstapler und der Mann am Presslufthammer bleiben Menschen); im Weltall die Astronautin auf dem Mond eine Bärin, der schwebende Astronaut, der Fahrer des Mondbaggers ein Fuchs und der Buggyfahrer ein Bär (`Helmet animal`; die zwei in der Station bleiben Menschen); am Strand die Rettungsschwimmerin auf dem Turm eine Füchsin mit roter Mütze; in der Winter-Baustelle der Tee-Arbeiter am Feuer ein Bär mit Pudelmütze (Bär, weil dort der wilde Winterfuchs läuft); unter Wasser der Kapitän im U-Boot-Fenster ein Bär. Der Bauer mit der Schubkarre auf dem Hof, die Köchin der Pommesbude und die Leute am Flughafen bleiben Menschen.",
       },
       {
         label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa in jeder Szene (Hand in Hand, auf den Schultern, auf der Bank daneben)",
