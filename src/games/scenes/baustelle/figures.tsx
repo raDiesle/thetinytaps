@@ -1,4 +1,5 @@
-import { Face, STEEL, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
+import { Face, MascotFace, STEEL, nth } from "../shared";
 import { CHEEK, INK, SKIN } from "@/components/drawing";
 
 /** Eyelids in the colour of the face, closed only for a blink while the item plays. */
@@ -12,6 +13,10 @@ export function Lids({ eyes, r, fill }: { eyes: [number, number][]; r: number; f
   );
 }
 
+/** The builder's paws: he is a bear, one of the app's mascots in a role (D-18). */
+const BUILDER_PAW = MASCOT_COLORS.bear.fur;
+
+/** The builder, a bear in a hi-vis jacket and a hard hat between his round ears; he hops, waves and lifts his helmet to say hello. */
 export function Bauarbeiter() {
   return (
     <g className="arbeiter-body" style={{ transformOrigin: "1290px 650px" }}>
@@ -21,7 +26,7 @@ export function Bauarbeiter() {
       <rect x="1290" y="638" width="28" height="12" rx="5" fill={INK} />
       <g className="arbeiter-arm-left" style={{ transformOrigin: "1266px 526px" }}>
         <path d="M1266 526 L1252 578" stroke="#ff8c42" strokeWidth="14" strokeLinecap="round" />
-        <circle cx="1251" cy="583" r="7" fill={SKIN} />
+        <circle cx="1251" cy="583" r="7" fill={BUILDER_PAW} />
       </g>
       <rect x="1262" y="514" width="56" height="84" rx="16" fill="#ff8c42" />
       <path d="M1262 550 H1318 M1262 572 H1318" stroke="#ffd60a" strokeWidth="6" />
@@ -29,28 +34,16 @@ export function Bauarbeiter() {
       <rect x="1262" y="584" width="56" height="9" fill="#8d5a2b" />
       <rect x="1296" y="582" width="12" height="16" rx="2" fill="#a0522d" />
       <rect x="1302" y="574" width="4" height="12" fill={STEEL} />
-      <circle cx="1290" cy="490" r="24" fill={SKIN} />
-      <circle cx="1266" cy="492" r="5" fill={SKIN} />
-      <circle cx="1314" cy="492" r="5" fill={SKIN} />
-      <path d="M1268 484 q2 -8 10 -6 M1312 484 q-2 -8 -10 -6" stroke="#8d5a2b" strokeWidth="5" strokeLinecap="round" fill="none" />
-      <Face cx={1290} cy={488} size={1.05} />
-      <Lids
-        eyes={[
-          [1282.65, 488],
-          [1297.35, 488],
-        ]}
-        r={4.4}
-        fill={SKIN}
-      />
-      {/* He lifts his helmet to say hello. */}
-      <g className="arbeiter-helmet" style={{ transformOrigin: "1290px 482px" }}>
-        <path d="M1264 482 Q1264 456 1290 456 Q1316 456 1316 482 Z" fill="#ffd60a" />
-        <rect x="1258" y="478" width="64" height="8" rx="4" fill="#ffb703" />
-        <path d="M1276 470 Q1280 460 1290 458" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.6" fill="none" />
+      <MascotFace kind="bear" cx={1290} cy={490} r={24} />
+      {/* He lifts his helmet to say hello; it sits between his round ears. */}
+      <g className="arbeiter-helmet" style={{ transformOrigin: "1290px 467px" }}>
+        <path d="M1272 467 Q1272 446 1290 446 Q1308 446 1308 467 Z" fill="#ffd60a" />
+        <rect x="1266" y="463" width="48" height="7" rx="3.5" fill="#ffb703" />
+        <path d="M1279 459 Q1282 451 1290 449" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" opacity="0.6" fill="none" />
       </g>
       <g className="arbeiter-arm" style={{ transformOrigin: "1314px 526px" }}>
         <path d="M1314 526 L1328 578" stroke="#ff8c42" strokeWidth="14" strokeLinecap="round" />
-        <circle cx="1329" cy="583" r="7" fill={SKIN} />
+        <circle cx="1329" cy="583" r="7" fill={BUILDER_PAW} />
       </g>
     </g>
   );

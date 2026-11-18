@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "n
 import { join } from "node:path";
 import { PRODUCTION } from "../tools/appPlugin";
 import { isTest } from "./testSources";
-import { fontsAsFiles, namedByOwnBytes } from "../tools/pageStart";
+import { fontsAsFiles, namedByOwnBytes, PICTURE_IN_CODE } from "../tools/pageStart";
 
 // Bun bundles the app with one plugin (tools/appPlugin.ts); code written for another bundler would build
 // with holes (no sounds, no pictures) or not at all. These checks keep the code to what the plugin offers.
@@ -93,3 +93,8 @@ test("the build for players has React without its development code (several time
     rmSync(dir, { recursive: true, force: true });
   }
 }, 20000);
+
+test("a picture named in a built script is found whole, never in a chunk whose hash begins like an extension", () => {
+  const code = 'import"/static/index.jpg4hze3.js";const a="/static/fox.ab12cd.webp",b="/static/sun.png";';
+  expect([...code.matchAll(PICTURE_IN_CODE)].map((m) => m[0])).toEqual(["static/fox.ab12cd.webp", "static/sun.png"]);
+});

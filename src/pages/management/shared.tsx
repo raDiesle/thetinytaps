@@ -44,8 +44,15 @@ export function CopyCommand({ command }: { command: string }) {
   );
 }
 
-/** An idea number that shows the idea in the list below. */
+/** An idea number that shows the idea in the list below – or, for a built idea, which the list no longer holds, only its number with a tick. */
 export function IdeaLink({ id, onShow }: { id: string; onShow: (id: string) => void }) {
+  const idea = IDEA_BY_ID.get(id);
+  if (idea?.done)
+    return (
+      <span className="idea-id idea-id-done" title={`${idea.title} – umgesetzt`}>
+        {id} ✓
+      </span>
+    );
   return (
     <button type="button" className="idea-id" title={IDEA_BY_ID.get(id)?.title} onClick={() => onShow(id)}>
       {id}
