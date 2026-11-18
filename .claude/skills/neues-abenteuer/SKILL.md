@@ -183,7 +183,7 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    other trail levels. If the start-screen note mentions the levels or keys, keep it true.
 6. **The cards pick it up**: `cards.tsx` builds the end cards from `TRAIL_LEVELS` and
    `GOALS[level.goal]` – nothing to add, but check the new card shows the goal.
-7. **Mark the idea done**: `done: true` (or `partial: "…"`) in
+7. **Mark the idea done**: `done: true` (what is left becomes a new idea, see CLAUDE.md) in
    `g-little-adventures.ts`, and add the level to „Levels so far“ in
    `src/games/elevator/trail/CLAUDE.md` with its stations in one line.
 

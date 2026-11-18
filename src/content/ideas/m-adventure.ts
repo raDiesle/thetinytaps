@@ -17,6 +17,7 @@ export const adventureIdeas: IdeaArea = {
       effort: "L",
       partial:
         "Das Wolkenland ist gebaut: „Die Wolkenreise“, auf dem Startbild neben der Schatzinsel wählbar. Die Feuerwehr auch (13. November 2026, noch in Bearbeitung): „Fire Rescue“, Tapsi steht auf dem Schwebe-Roboter Robo und muss nie laufen. Winterwald, Dinotal und die Karte fehlen.",
+      done: true,
     },
     {
       id: "M-02",
@@ -92,6 +93,15 @@ export const adventureIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Beide Schlüsse ohne Konfetti; die Truhe leuchtet von innen. Gischt und Sand fliegen weiter in der Geschichte selbst (Paddeln, Skorpione), nicht am Ende.",
+      done: true,
+    },
+    {
+      id: "M-11",
+      emoji: "🗺️",
+      title: "Bewegungsabenteuer: Winterwald, Dinotal und eine Karte",
+      text: "Nach Wolkenreise, Schatzinsel und Feuerwehr (M-01) zwei weitere Welten als 3D-Geschichte: der Winterwald und das Dinotal. Auf dem Startbild eine Karte, auf der das Kind das Ziel antippt, statt Karten nebeneinander.",
+      why: "Neue Welten zum Mitbewegen; die Karte zeigt, wohin die Reise geht.",
+      effort: "L",
     },
   ],
 };

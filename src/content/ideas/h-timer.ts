@@ -292,6 +292,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Eingebaut (7. November 2026, src/games/timer/voice.ts): jedes Bild sagt seinen Satz am Anfang, sobald die Seite stillliegt, „Gleich ist es so weit!“ zur Glocke und seinen Satz am Ende; Abwechseln und Tennis sagen „Wer fängt an?“, „Das Fuchskind fängt an!“ / „Das Bärenkind fängt an!“ und bei jedem Wechsel „Tauschen! Jetzt ist das … dran.“. 26 Sätze, nur Deutsch, noch nicht aufgenommen (bun run voice make --only timer), bis dahin still.",
+      done: true,
     },
     {
       id: "H-75",

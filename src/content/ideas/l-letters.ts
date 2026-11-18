@@ -206,6 +206,7 @@ export const lettersIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Als eigenes Spiel im Buch „Buchstaben & Zahlen“ (/gross-klein/, November 2026),, für alle spielbar; ohne Augen und ohne Kette zwischen den Buchstaben. Die Frage „Wo ist das kleine …?“ ist noch nicht aufgenommen, Name und Zeile nur auf Deutsch.",
+      done: true,
     },
   ],
 };

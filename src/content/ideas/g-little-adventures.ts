@@ -71,6 +71,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Gebaut als Weg-Abenteuer „Picknick im Wald“ (Nuss fürs Eichhörnchen, Brombeeren für die Rotkehlchen, Baumstamm über den Fluss, Regenschirm am Wasserfall, Honig für den Bären, Picknick mit allen). Ohne das sachte Tippen: am Igel bleibt das Kind von selbst still stehen; die Brombeeren sind ein Zweig, ohne Korb.",
+      done: true,
     },
     {
       id: "G-08",
@@ -99,6 +100,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Der Hund in „Der Ball rollt weg“ kommt nach dem Knochen mit, steht als Bild im Rucksack und buddelt am Ende den Ball aus dem Sand. Das Eichhörnchen als Freund fehlt noch.",
+      done: true,
     },
     {
       id: "G-11",
@@ -176,6 +178,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       why: "Ein bekanntes Muster in vielen Kleidern; Kinder lernen die Helfer und ihre Fahrzeuge kennen.",
       effort: "L",
       partial: "„The ambulance“ (Krankenwagen) ist gebaut, zuerst auf Englisch; Polizei, Abschleppwagen, Bergrettung, Rettungsboot und Tierarzt fehlen noch.",
+      done: true,
     },
     {
       id: "G-20",
@@ -185,6 +188,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       why: "Kinder sehen, woher Dinge kommen und dass viele zusammenhelfen.",
       effort: "L",
       partial: "„Ein Brief für Oma“ (G-24) und „Beim Bäcker“ (G-25) sind gebaut; Korn zum Brot, Haus und Müll fehlen noch.",
+      done: true,
     },
     {
       id: "G-21",
@@ -203,6 +207,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       why: "Vertraute Figuren machen neue Filme sofort heimisch; Kinder freuen sich, sie wiederzusehen.",
       effort: "M",
       partial: "Im Feuerwehr-Film ist es in jeder Szene dieselbe Mannschaft (zwei Feuerwehrleute); der Wachhund, eigene Stimmen und Eigenheiten fehlen noch.",
+      done: true,
     },
     {
       id: "G-23",
@@ -280,6 +285,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       why: "Ein ruhiges Ende lässt den Film ausklingen, statt das Kind am Schluss noch einmal aufzudrehen.",
       effort: "S",
       partial: "Done for all films: a soft glockenspiel instead of the Tusch. Not done: the evening-only variant and the hearts and stars rising slowly.",
+      done: true,
     },
     {
       id: "G-32",
@@ -296,6 +302,38 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Am Ziel gehen die Fenster an und die Tür öffnet sich; beim Aufzug gehen die Türen auf, und die Leute auf dem Stockwerk winken einmal; ein Film endet mit „Ende“ wie auf der letzten Buchseite – statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
       why: "Das Kind sieht, dass es angekommen ist, und das Ende erzählt die Geschichte weiter.",
       effort: "S",
+    },
+    {
+      id: "G-34",
+      emoji: "🐿️",
+      title: "Das Eichhörnchen kommt mit",
+      text: "Wie der Hund in „Der Ball rollt weg“ (G-10) läuft in einem anderen Abenteuer ein Eichhörnchen mit, dem das Kind geholfen hat, steht als Bild im Rucksack und holt später etwas vom Baum.",
+      why: "Ein Freund, der hilft, weil man ihm geholfen hat – das versteht schon ein Zweijähriger.",
+      effort: "M",
+    },
+    {
+      id: "G-35",
+      emoji: "🚓",
+      title: "Mehr Helferfilme: Polizei, Abschleppwagen, Bergwacht, Rettungsboot, Tierarzt",
+      text: "Nach dem Krankenwagen (G-19) weitere Filme nach demselben Muster, immer harmlos: die Polizei findet einen weggelaufenen Hund, der Abschleppwagen holt ein Auto mit Panne, die Bergwacht bringt einem Wanderer eine Decke, das Rettungsboot holt ein Schlauchboot zurück, der Tierarzt verbindet eine Pfote.",
+      why: "Kinder lernen die Helfer und ihre Fahrzeuge kennen, in einem Muster, das sie schon kennen.",
+      effort: "L",
+    },
+    {
+      id: "G-36",
+      emoji: "🌾",
+      title: "Filme vom Werden: vom Korn zum Brot und vom Haus",
+      text: "Nach dem Brief für Oma und dem Bäcker (G-20) zwei weitere Filme, in denen etwas entsteht: vom Korn zum Brot (Traktor sät, Regen, das Korn wächst, Mähdrescher, Mühle, Bäckerei) und vom Haus (Bagger, Kran, Wände, Dach, Einzug). Die Müllabfuhr ist G-27.",
+      why: "Kinder sehen, woher Dinge kommen und dass viele zusammenhelfen.",
+      effort: "L",
+    },
+    {
+      id: "G-37",
+      emoji: "🐕",
+      title: "Die Feuerwehr-Mannschaft: Wachhund, eigene Stimmen, kleine Eigenheiten",
+      text: "Zu den zwei Feuerwehrleuten, die in jeder Szene dieselben sind (G-22), kommt der Wachhund mit Helm; jeder bekommt eine eigene Stimme und eine kleine Eigenheit (der Hund bellt beim Martinshorn mit, einer vergisst den Helm und rennt zurück), und sie tauchen in anderen Filmen kurz auf.",
+      why: "Vertraute Figuren machen neue Filme sofort heimisch.",
+      effort: "M",
     },
   ],
 };

@@ -17,6 +17,7 @@ export const bookIdeas: IdeaArea = {
       id: "D-01",
       partial:
         "Das Cover gab es bis Oktober 2026; seit die Startseite ein Bücherregal ist, hängt das Bild der Tierfamilien gerahmt an der Wand neben dem Regal (wo Platz ist).",
+      done: true,
       emoji: "🦊",
       title: "Cover mit Tierfamilien",
       text: "Das Cover ist ein Buch mit Stoffeinband, goldenem Titel, Lederecken und Lesebändchen; aufgeklebt ist ein Bild, auf dem Tapsis Fuchsfamilie und Mama Bär mit ihrem Kleinen zusammen ein Buch anschauen.",
@@ -27,6 +28,7 @@ export const bookIdeas: IdeaArea = {
       id: "D-02",
       partial:
         "Fuchs- und Bärenfamilie stehen unten auf jeder Menüseite, die Füchse links, die Bären rechts – auf breiten Bildschirmen (ab 1400 px) neben den Karten, auf Handys und Tablets unter den Karten, wo die Seite ihnen Platz lässt (statt Scheune und Bäumen). Von Besuch zu Besuch lesen dort abwechselnd die Eltern, Oma und Opa (D-21). Fuchs- oder Bärenpaare passend zu jeder Welt fehlen noch.",
+      done: true,
       emoji: "🦊",
       title: "Tiereltern am Seitenrand",
       text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchs- und die Bärenfamilie, und später in jeder Welt ein Großer mit seinem Kind, wie sie zu ihr passen (Papa Bär und das Bärenkind mit Bauhelm auf der Baustelle, Oma Fuchs und das Fuchskind in Gummistiefeln auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
@@ -102,6 +104,7 @@ export const bookIdeas: IdeaArea = {
       id: "D-11",
       partial:
         "Der Titel steht jetzt in einer Buchschrift, auf dem o von „Both“ liest Papa Fuchs seinem Kind auf dem Schoß vor (D-16); Sonne mit Gesicht und Pillen-Knöpfe sind noch offen.",
+      done: true,
       emoji: "🌈",
       title: "Titel wie gedruckt",
       text: "Prüfung, was noch nicht zum Buch passt: Der bunte Titel auf der Inhaltsseite, die Sonne mit Gesicht und die runden Pillen-Knöpfe oben rechts sehen noch nach App aus. Ein Titel in einer Buchschrift mit einer Vignette, die Sonne als Zeichnung ohne Gesicht, die Knöpfe als kleine Lesezeichen am Seitenrand.",
@@ -203,6 +206,22 @@ export const bookIdeas: IdeaArea = {
       text: "Heute sehen alle Bücher innen gleich aus: dasselbe Papier, dieselben Karten, nur die Farben und die Welt im Hintergrund wechseln. Jedes Buch im Regal bekommt einen eigenen Stil, wie echte Bilderbücher von verschiedenen Zeichnern: „Lebendige Welten“ in Wasserfarben, „Zuordnen“ wie aus Papier ausgeschnitten und aufgeklebt, „Buchstaben & Zahlen“ wie ein Stempel- oder Holzklötzchenbuch, „Für jeden Tag“ mit Buntstift gezeichnet. Darüber hinaus kann jede Seite eines Buchs (das Inhaltsverzeichnis, die Startseite jedes Spiels) einzeln gestaltet sein: ein eigenes Bild, eine eigene Anordnung der Karten, eine kleine Szene am Rand, die zum Spiel passt. Alles in book.css und Worlds.tsx je Buch (data-world), ohne dass die Spiele selbst etwas tun müssen.",
       why: "Ein Regal voller gleich aussehender Bücher wirkt wie eine App; verschiedene Stile machen jedes Buch zu einem eigenen Ding, das Kinder wiedererkennen und auf das sie sich freuen.",
       effort: "L",
+    },
+    {
+      id: "D-23",
+      emoji: "👷",
+      title: "Tiereltern passend zu jeder Welt",
+      text: "Die Fuchs- und Bärenfamilie unten auf den Menüseiten (D-02) bekommt in jeder Welt eine passende Kleidung: Papa Bär und das Bärenkind mit Bauhelm auf der Baustelle, Oma Fuchs und das Fuchskind in Gummistiefeln auf dem Bauernhof.",
+      why: "Jedes Buch fühlt sich eigener an, und die Familie gehört zu seiner Welt.",
+      effort: "M",
+    },
+    {
+      id: "D-24",
+      emoji: "☀️",
+      title: "Die Sonne der Menüs als Zeichnung ohne Gesicht",
+      text: "Die Sonne oben links in den Menüs hat noch ein Gesicht, das nach App aussieht (D-11): als Zeichnung wie im Bilderbuch, ohne Gesicht, mit den Strahlen, die sich beim Antippen einmal drehen.",
+      why: "Passt zum Bilderbuch, wo der Rest schon aus Papier ist.",
+      effort: "S",
     },
   ],
 };

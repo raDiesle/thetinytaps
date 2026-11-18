@@ -119,7 +119,12 @@ In a fresh worktree run `bun install` first.
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
   its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
   area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
-  built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
+  built, set `done: true` there: `/management/` then no longer lists it (user feedback, November 2026: the page shows
+  only what is still to decide), while the data keeps it so its number stays taken and the research and mascot tables
+  still link it. Never leave an idea half done: `partial` is only a note on a done (or rejected) idea of what was built,
+  and what is really left becomes a new idea with the area's next number, while a rest that is only translations or
+  recordings is no rest at all (`languageStatus.ts` and the voice list track those; `content.test.ts`). An idea the user
+  turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
