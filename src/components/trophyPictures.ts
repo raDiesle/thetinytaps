@@ -1,12 +1,16 @@
 import { bookIdOf, CATEGORIES } from "@/content/games";
+import type { Figure } from "@/lib/common";
+import { forFigure } from "@/lib/figurePictures";
 import type { TrophyWon } from "@/lib/trophies";
 import adventure from "../games/adventure/vorschau/*.webp?glob";
 import elevator from "../games/elevator/vorschau/*.webp?glob";
+import elevatorGirl from "../games/elevator/vorschau-maedchen/*.webp?glob";
 import feelings from "../games/feelings/vorschau/*.webp?glob";
 import marbles from "../games/marbles/vorschau/*.webp?glob";
 import scenes from "../games/scenes/vorschau/*.webp?glob";
 import shelfPictures from "./bilder/*.webp?glob";
 import books from "./vorschau/*.webp?glob";
+import booksGirl from "./vorschau-maedchen/*.webp?glob";
 
 /*
  * The picture in a trophy's medallion (Trophy.tsx): the level's own cut from its game's menu card where there is one,
@@ -24,10 +28,16 @@ const LEVELS: Record<string, Record<string, string>> = {
   "/wie-gehts-dir/": feelings,
 };
 
-/** The picture for the trophy of `level` in the game at `game`, if any. */
-export function trophyPicture(game: string, level: string): string | undefined {
+/** The girl's versions of those cuts, where the game draws the child (`vorschau-maedchen/`, `forFigure`). */
+const GIRL_LEVELS: Record<string, Record<string, string>> = {
+  "/kleine-abenteuer/": elevatorGirl,
+};
+
+/** The picture for the trophy of `level` in the game at `game`, if any, showing the child as `figure`. */
+export function trophyPicture(game: string, level: string, figure: Figure = "boy"): string | undefined {
   const id = bookIdOf(game);
-  return (level ? LEVELS[game]?.[`${level}.webp`] : undefined) ?? books[`${id}.webp`] ?? shelfPictures[`spine-${id}.webp`];
+  const levels = forFigure(figure, LEVELS[game] ?? {}, GIRL_LEVELS[game] ?? {});
+  return (level ? levels[`${level}.webp`] : undefined) ?? forFigure(figure, books, booksGirl)[`${id}.webp`] ?? shelfPictures[`spine-${id}.webp`];
 }
 
 /**

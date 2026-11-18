@@ -149,3 +149,10 @@ export function textsPreload(chunks: Record<string, string[]>, address: string, 
   const code = `(function(c,a,k,r){var l,w,i,x,n=navigator;try{l=localStorage.getItem(k)}catch(e){}if(l!=="de"&&!c[l]){l="de";w=r.test(n.userAgent)?[a]:[].concat(n.languages&&n.languages.length?n.languages:n.language?[n.language]:[],"en");for(i=0;i<w.length;i++){x=String(w[i]).toLowerCase().split("-")[0];if(x==="de"||c[x]){l=x;break}}}(c[l]||[]).forEach(function(f){var t=document.createElement("link");t.rel="modulepreload";t.crossOrigin="anonymous";t.href=f;document.head.appendChild(t)})})(${JSON.stringify(chunks)},${JSON.stringify(address)},${JSON.stringify(key)},${crawler.toString()})`;
   return `<script>${code}</script>`;
 }
+
+/**
+ * A picture or font named in a built script or stylesheet. It must end there: a chunk's hash may begin with an
+ * extension's letters, and „static/index.jpg4hze3.js“ was once taken for the picture „static/index.jpg“ and stopped the
+ * build (November 2026; `buildTools.test.ts`).
+ */
+export const PICTURE_IN_CODE = /static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)(?![\w.-])/g;
