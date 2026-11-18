@@ -462,6 +462,13 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   it. A new drawing of the child goes on `CHILD_DRAWINGS` in `src/figure.test.ts`, which also checks that nothing calls
   the child a „braver Junge“ or the like. With „Mädchen“ the menus get the girl's colours (`:root[data-figure="girl"]` in
   `base.css`: a lilac sky going pink): a new shared colour of the menus gets its girl's value there too.
+  The menus' pictures of a game that draws the child (its cards, its line in the table of contents, its trophies'
+  medallions) show the chosen child too: `bun run previews` pictures such a game a second time with „Mädchen“ into
+  `vorschau-maedchen/` beside `vorschau/` (`Menu.girl`, `GIRL_LINES` in `tools/previews.ts`), and the menus lay them
+  over the boy's with `useFigurePictures` (`src/lib/figurePictures.ts`); a new menu or game drawing the child adds its
+  folder there. Only what is cut from the games' own svg follows the figure: a picture painted by Gemini (covers, spines,
+  the stories' pictures, Mitmachen's fox and bear child) is never made a second time for it, which would cost a picture
+  each (user decision, November 2026).
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer (what a game puts at the picture's edge adds `var(--frame, 0px)`: the book's paper margin lies
   over the picture's edges and hid half of Bewegungsabenteuer's route): let it fill the screen behind headings and controls and zoom what matters into

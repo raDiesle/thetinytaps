@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GameShell, useLevelOnScreen } from "@/components/GameShell";
 import { useGameSettings } from "@/lib/common";
+import { useFigurePictures } from "@/lib/figurePictures";
 import { useAppLanguage, useT } from "@/lib/language";
 import { ElevatorPlay } from "./ElevatorPlay";
 import { FilmPlay } from "./film/FilmPlay";
@@ -11,6 +12,7 @@ import { TRAIL_LEVELS } from "./trail/levels";
 import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
 import previews from "./vorschau/*.webp?glob";
+import girlPreviews from "./vorschau-maedchen/*.webp?glob";
 
 /** The names of the card groups: which levels ride the lift in the house, which walk through the world, which are films. */
 const LIFT = { de: "🛗 Aufzug", ru: "🛗 Лифт", en: "🛗 Elevator", zh: "🛗 电梯", hi: "🛗 लिफ़्ट", es: "🛗 Ascensor", ar: "🛗 المصعد" };
@@ -24,10 +26,12 @@ export function ElevatorGame() {
   const { id: language } = useAppLanguage();
   // The story titles are German in the data and come in the app language from its phrasebook (`phrases.ts`).
   const title = (german: string) => titleIn(german, language);
+  // The cards show the child as a boy or a girl, as chosen on the home page.
+  const pictures = useFigurePictures(previews, girlPreviews);
 
   return (
     <GameShell
-      previews={previews}
+      previews={pictures}
       title={t({
         de: "Kleine Abenteuer",
         ru: "Маленькие приключения",
