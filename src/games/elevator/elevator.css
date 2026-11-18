@@ -233,6 +233,12 @@
   animation: el-wave 0.4s ease-in-out infinite alternate-reverse;
 }
 
+/* Goodbye at a film's end (G-31): one hand beside the head sways slowly a few times and then rests, raised – calm,
+   never the cheer's bounce. The film's pace stretches it like everything else in a film. */
+.pose-wave .el-arm-r {
+  animation: el-goodbye calc(0.9s * var(--fm-pace, 1)) ease-in-out 6 alternate;
+}
+
 .pose-jump .el-kid-body {
   animation: el-jump 1s ease-in-out infinite;
 }
@@ -861,6 +867,15 @@
   }
   to {
     transform: rotate(14deg);
+  }
+}
+
+@keyframes el-goodbye {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
   }
 }
 

@@ -1,14 +1,15 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useContext } from "react";
 import { INK } from "@/components/drawing";
-import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, handColor, KidHead, type Look } from "../kid";
+import { FIRE_BLUE, FIRE_STRIPE, FilmOver, FireHelmet, handColor, KidHead, type Look, waving } from "../kid";
 import { ChefHat } from "../things";
 
 // The grown-ups of the films, drawn from the front with their feet at (0, 0), facing right. They use the class
 // names of the children (`el-kid`, `pose-…`, `el-arm-r` …), so the poses of elevator.css move them the same way.
 
 /** What a grown-up does: the arms of `cheer` wave, `walk` swings legs and arms, `phone` holds the phone to the ear,
- * `hold` carries something in front of the chest (`holding`). */
-export type GrownPose = "stand" | "walk" | "cheer" | "phone" | "hold";
+ * `hold` carries something in front of the chest (`holding`), `wave` says goodbye with one hand at a film's end (given
+ * by `FilmOver`, never asked for by a scene). */
+export type GrownPose = "stand" | "walk" | "cheer" | "phone" | "hold" | "wave";
 
 /** The firefighters and the people they help: the app's mascots, a fox and a bear in the crew (D-18). */
 export const CREW: Look[] = [
@@ -22,6 +23,7 @@ export const DRIVER: Look = { shirt: "#7950f2", pants: "#2b8a3e", hair: "#c2410c
 const ARMS = {
   down: { d: "M24 -188 Q40 -150 36 -112", hand: [36, -110] },
   up: { d: "M24 -188 Q46 -214 44 -256", hand: [44, -260] },
+  wave: { d: "M24 -188 Q60 -196 64 -244", hand: [66, -248] },
   front: { d: "M24 -188 Q44 -150 16 -136", hand: [14, -136] },
   ear: { d: "M24 -188 Q58 -196 36 -228", hand: [34, -230] },
 } as const;
@@ -31,7 +33,7 @@ const ARMS = {
  * blanket lies round its shoulders. */
 export function Grownup({
   look,
-  pose,
+  pose: asked,
   wear = [],
   face = 1,
   holding,
@@ -42,12 +44,13 @@ export function Grownup({
   face?: 1 | -1;
   holding?: ReactNode;
 }) {
+  const pose = waving(asked, useContext(FilmOver), !!holding);
   const fire = wear.includes("fire");
   const baker = wear.includes("baker");
   const rescue = wear.includes("rescue");
   const shirt = fire ? FIRE_BLUE : baker ? "#f8f9fa" : rescue ? "#ff922b" : look.shirt;
   const pants = fire ? FIRE_BLUE : rescue ? "#2b3a55" : look.pants;
-  const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
+  const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "wave" ? "wave" : pose === "hold" ? "front" : "down"];
   const left = ARMS[pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
   const arm = (a: (typeof ARMS)[keyof typeof ARMS], className: string, origin: string, mirror: boolean) => (
     <g className={`el-arm ${className}`} style={{ transformOrigin: origin }}>
