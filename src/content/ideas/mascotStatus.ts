@@ -196,6 +196,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG. Das Kind (Junge / Mädchen) bleibt, bis D-19 entschieden ist.",
     tasks: [
       {
+        label: "Müll-Film: Fahrer des Müllautos",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Neu (19. November 2026): der Fahrer des Müllautos ist ein Bär. Das Kind und sein Elternteil bleiben Menschen.",
+      },
+      {
         label: "Haus-Film: Baggerfahrer, Betonmischer-Fahrer, Maurerin und Kranführerin",
         work: "drawing",
         effort: "S",

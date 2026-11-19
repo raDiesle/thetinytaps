@@ -251,6 +251,8 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Das Kind bringt mit Papa die Tonne raus, das Müllauto kommt langsam die Straße entlang, der Greifarm hebt die Tonne (ein Tippen), der Müll fällt hinein, die Presse brummt leise. Dann zum Recyclinghof: Glas, Papier und Plastik kommen jeweils in ihren Container. Keine Hupe im Dauerton, nur ein kurzes Piepen beim Rückwärtsfahren.",
       why: "Müllautos faszinieren kleine Kinder; zeigt nebenbei, wohin der Müll geht.",
       effort: "L",
+      partial: "Gebaut als „The rubbish truck“ (muell.tsx), auf Englisch: das Kind wählt die Tonne (Rest, Papier, Plastik).",
+      done: true,
     },
     {
       id: "G-28",

@@ -1112,6 +1112,51 @@
   animation: fm-kn-inside calc(0.4s * var(--fm-pace)) ease-in calc(3.2s * var(--fm-pace)) forwards;
 }
 
+/* „The rubbish truck“ (`muell.tsx`) */
+.fm-mu-lid {
+  transition: transform calc(0.6s * var(--fm-pace)) ease-out;
+}
+
+/* The arm swings the bin up over the hopper and back down, slowly. */
+.fm-mu-arm {
+  transition: transform calc(2.2s * var(--fm-pace)) ease-in-out;
+}
+
+/* What lies in the bin drops into the hopper once the bin is up. */
+.fm-mu-fall {
+  animation: fm-mu-fall calc(1s * var(--fm-pace)) ease-in calc(2s * var(--fm-pace)) both;
+}
+
+@keyframes fm-mu-fall {
+  from {
+    transform: translateY(-110px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+/* The press squeezes the rubbish: the box draws together a little, twice. */
+.fm-mu-squeeze.on {
+  animation: fm-mu-squeeze calc(1.2s * var(--fm-pace)) ease-in-out 2;
+}
+
+@keyframes fm-mu-squeeze {
+  50% {
+    transform: scaleX(0.96);
+  }
+}
+
+/* A thing at the recycling yard vanishes into its container's opening. */
+.fm-mu-into {
+  animation: fm-kn-inside calc(0.3s * var(--fm-pace)) ease-in calc(1.7s * var(--fm-pace)) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-wheel.spin,
   .fm-flame,
