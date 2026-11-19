@@ -81,7 +81,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Little Adventures – Picture Stories for Toddlers",
       description:
         "Short picture adventures for toddlers: ride the elevator, walk along paths and watch little films like the bakery. Every tap moves the story on.",
-      text: "Adventures of a few minutes: ride the elevator and discover something on every floor, walk along a path – after the ball, the kite or the little train – and celebrate at the end, or live a little film: drive out with the fire brigade, ride the ambulance to a little bear with a sore knee and put on a plaster, take a letter to Grandma, sow grain with the tractor and follow it through the mill to the bakery, bake rolls, a pretzel or a cake at the bakery, or sow a sunflower, carrots or strawberries in the garden, water them and watch them grow. On the way the child decides too.",
+      text: "Adventures of a few minutes: ride the elevator and discover something on every floor, walk along a path – after the ball, the kite or the little train – and celebrate at the end, or live a little film: drive out with the fire brigade, ride the ambulance to a little bear with a sore knee and put on a plaster, take a letter to Grandma, sow grain with the tractor and follow it through the mill to the bakery, build a house with the digger and the crane and move in, bake rolls, a pretzel or a cake at the bakery, or sow a sunflower, carrots or strawberries in the garden, water them and watch them grow. On the way the child decides too.",
     },
     "/tiere/": {
       title: "Feed the Animals – Animal Game for Toddlers",

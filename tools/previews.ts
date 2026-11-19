@@ -168,6 +168,13 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
   // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening (the fifth
   // step, after the pump).
   "adventure/feuerwehr": (cdp) => stepInto(cdp, 5),
+  // A film's opening is often an empty place where its machines are still to come: „We build a house“ shows the digger
+  // digging the hole (a key taps the spot shown, once the first line is said), not the empty building site.
+  "elevator/haus": async (cdp) => {
+    await sleep(7500);
+    await press(cdp, "x");
+    await sleep(4000);
+  },
   // Many pairs on the line (user feedback, November 2026): three washes hung whole, so the game takes the child to
   // four pairs with patterns, and of those all but one.
   "components/socken": (cdp) => hangSocks(cdp, 3),

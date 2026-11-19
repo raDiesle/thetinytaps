@@ -196,6 +196,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG. Das Kind (Junge / Mädchen) bleibt, bis D-19 entschieden ist.",
     tasks: [
       {
+        label: "Haus-Film: Baggerfahrer, Betonmischer-Fahrer, Maurerin und Kranführerin",
+        work: "drawing",
+        effort: "S",
+        state: "done",
+        note: "Neu (18. November 2026): der Baggerfahrer ist ein Fuchs, der Fahrer des Betonmischers ein Bär, die Maurerin eine Bärin, die Kranführerin eine Füchsin – alle in Rollen, mit Warnweste und Bauhelm. Das Kind und sein Elternteil bleiben Menschen.",
+      },
+      {
         label: "Korn-Film: Bauer, Bäuerin, Müllerin und Bäcker",
         work: "drawing",
         effort: "S",

@@ -11,7 +11,8 @@ A story told like television, from place to place with a cut in between, instead
   a human child with a fox mother doesn't fit; grown-ups in a role or next door may be foxes and bears; `places.tsx` – houses, trees, the road, the ditch; `truck.tsx` – the fire engine (ladder, blue light, wheels). The child is `Kid` from `../kid.tsx` with the `fire` outfit (helmet, jacket, boots).
 - `krankenwagen.tsx` – „The ambulance“ and its `Ambulance` drawing (white box, red cross, blue lights, wheels); `Grownup`'s `wear` also takes `"rescue"` (orange jacket, silver stripes).
 - `korn.tsx` – „From grain to bread“ with its `Tractor`, `SeedDrill`, `Trailer`, `Combine`, `Windmill` and the growing grain (`grainPaths`, paths built once at module level); `Grownup`'s `wear` also takes `"farmer"` (dungarees and a straw hat). It borrows from the other films what is the same place: `Bakery`, the baker and the oven and breakfast scenes from `baecker.tsx` (told again with its own English lines by `retold`), `RainCloud` from `garten.tsx`.
-- `film.css` – classes and keyframes `fm-` (`fm-br-` for „Ein Brief für Oma“, `fm-bk-` for „Beim Bäcker“, `fm-gt-` for „Unser Garten wächst“, `fm-kn-` for „From grain to bread“); a duration that goes with the story is written `calc(… * var(--fm-pace))`.
+- `haus.tsx` – „We build a house“ with its `Digger`, `Mixer`, `TowerCrane`, `Van` and the growing `NewHouse` (hole, slab, rows of bricks, bare roof, tiles, door and windows); `Grownup`'s `wear` also takes `"builder"` (a yellow safety vest and a `HardHat`), and `Wheel` comes from `korn.tsx`.
+- `film.css` – classes and keyframes `fm-` (`fm-br-` for „Ein Brief für Oma“, `fm-bk-` for „Beim Bäcker“, `fm-gt-` for „Unser Garten wächst“, `fm-kn-` for „From grain to bread“, `fm-hs-` for „We build a house“); a duration that goes with the story is written `calc(… * var(--fm-pace))`.
 - `films.test.tsx` checks every way through every film: it ends, a pick only adds scenes after those seen, no scene twice, two or three different options, every tap spot and option lies wholly in its scene's `focus`, every tap beat asks, every line is a German sentence, the pace is calm (at most three sounds in a beat, at least 0.9 s apart as played, a beat that speaks at least 2.7 s), and the last picture waves goodbye, never cheers.
 
 Films so far:
@@ -75,6 +76,15 @@ Rules for films (from building the first one; follow them in the next):
   miller (a she-bear) goes in and comes out with a sack in a puff of flour, and it goes on the trailer → at the bakery
   the child rings, the baker takes the flour and the child picks in the shop window what to bake from it → the oven and
   the breakfast of „Beim Bäcker“. A calm film of many helpers: slow machines, soft sounds.
+- „We build a house“ (G-36, `haus.tsx`, English first, classes `fm-hs-`): on the building site the fox digs the hole
+  with the digger, the bear's mixer pours the slab, and the child picks the house's colour (red, yellow, blue: the
+  bricks of every later scene) → the builder (a she-bear) lays three rows of bricks, one tap on her pallet each →
+  the vixen's tower crane lifts the roof, swings it over the house and lowers it, a tap puts on the tiles → the van
+  backs up, the child opens it, carries the teddy in and switches on the light → a party in front of the new house with
+  everyone who built it: the cake is cut and the child rings the new doorbell.
+- A figure that walks in a scene is mounted a step before it walks: `Go` only places a thing on its first path, so a
+  figure that first appears with its walking path stands at the end at once (the family of „We build a house“ never
+  walked to the door). Mount it with its start, then change the path.
 - To play a film through in the preview, send keys instead of clicking: a digit picks that card (only once the cards
   are out – sent earlier, nothing happens) and any other key taps the spot shown; a click on the picture while the
   cards come out picks the next card in turn, not the one under it.

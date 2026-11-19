@@ -162,7 +162,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Kleine Abenteuer – Bildergeschichten für Kleinkinder",
     description:
       "Kurze Bilder-Abenteuer für Kleinkinder: Aufzug fahren, Wege entlanglaufen und kleine Filme wie beim Bäcker. Jedes Tippen bringt die Geschichte weiter.",
-    text: "Abenteuer von wenigen Minuten: mit dem Aufzug fahren und auf jedem Stockwerk etwas entdecken, einen Weg entlanglaufen – dem Ball, dem Drachen oder der kleinen Lok hinterher – und am Ende feiern, oder einen kleinen Film erleben: mit der Feuerwehr ausrücken, mit dem Krankenwagen zu einem gestürzten Bärenkind fahren und ein Pflaster aufkleben, einen Brief zu Oma bringen, mit dem Traktor Korn säen und es über die Mühle bis zum Bäcker begleiten, beim Bäcker Brötchen, eine Brezel oder einen Kuchen backen oder im Garten eine Sonnenblume, Karotten oder Erdbeeren säen, gießen und wachsen sehen. Unterwegs entscheidet das Kind mit.",
+    text: "Abenteuer von wenigen Minuten: mit dem Aufzug fahren und auf jedem Stockwerk etwas entdecken, einen Weg entlanglaufen – dem Ball, dem Drachen oder der kleinen Lok hinterher – und am Ende feiern, oder einen kleinen Film erleben: mit der Feuerwehr ausrücken, mit dem Krankenwagen zu einem gestürzten Bärenkind fahren und ein Pflaster aufkleben, einen Brief zu Oma bringen, mit dem Traktor Korn säen und es über die Mühle bis zum Bäcker begleiten, mit Bagger und Kran ein Haus bauen und einziehen, beim Bäcker Brötchen, eine Brezel oder einen Kuchen backen oder im Garten eine Sonnenblume, Karotten oder Erdbeeren säen, gießen und wachsen sehen. Unterwegs entscheidet das Kind mit.",
   },
   {
     path: "/tiere/",

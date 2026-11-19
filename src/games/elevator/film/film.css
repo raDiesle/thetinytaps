@@ -1043,6 +1043,75 @@
   }
 }
 
+/* „We build a house“: the hole, the heap and each row of wall grow from their foot, the floor and the tiles fade in,
+   the digger's arm scoops, the mixer's drum turns, the van's shutter rolls up, and the family goes in at the door. */
+.fm-hs-grow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition:
+    transform calc(1.4s * var(--fm-pace)) ease-out calc(0.4s * var(--fm-pace)),
+    opacity calc(0.6s * var(--fm-pace)) ease-out calc(0.4s * var(--fm-pace)),
+    fill calc(2s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-hs-fade,
+.fm-hs-tiles,
+.fm-hs-light {
+  transition: opacity calc(1.6s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-hs-light {
+  transition-duration: calc(0.3s * var(--fm-pace));
+  transition-delay: 0s;
+}
+
+.fm-hs-fade-in {
+  animation: fm-kn-show calc(0.8s * var(--fm-pace)) ease-out calc(1.2s * var(--fm-pace)) backwards;
+}
+
+.fm-hs-arm.dig {
+  animation: fm-hs-dig calc(1.8s * var(--fm-pace)) ease-in-out 3;
+}
+
+@keyframes fm-hs-dig {
+  35% {
+    transform: rotate(-16deg);
+  }
+  70% {
+    transform: rotate(8deg);
+  }
+}
+
+.fm-hs-drum.turn {
+  animation: fm-hs-drum calc(0.9s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-hs-drum {
+  to {
+    stroke-dashoffset: -90;
+  }
+}
+
+.fm-hs-pour {
+  animation: fm-hs-pour calc(0.6s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-hs-pour {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+
+.fm-hs-shutter {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transition: transform calc(1.2s * var(--fm-pace)) ease-in-out;
+}
+
+.fm-hs-inside {
+  animation: fm-kn-inside calc(0.4s * var(--fm-pace)) ease-in calc(3.2s * var(--fm-pace)) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-wheel.spin,
   .fm-flame,
@@ -1054,6 +1123,9 @@
   .fm-gt-wings,
   .fm-kn-drop,
   .fm-kn-pour,
+  .fm-hs-arm.dig,
+  .fm-hs-drum.turn,
+  .fm-hs-pour,
   .fm-strip.run .fm-frame,
   .fm-card-move::before {
     animation: none;

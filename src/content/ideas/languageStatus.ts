@@ -263,6 +263,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { en: "text" },
         note: "New (18 November 2026, G-20), English first: written in English only, not translated (also not into German) and not recorded; until then every player sees and hears English. Its lines wait on /management/ under „Filme (zuerst Englisch)“.",
       },
+      {
+        label: "🏡 We build a house",
+        recorded: true,
+        languages: { en: "text" },
+        note: "New (18 November 2026, G-36), English first: written in English only, not translated (also not into German) and not recorded; until then every player sees and hears English. Its lines wait on /management/ under „Filme (zuerst Englisch)“.",
+      },
     ],
   },
   {

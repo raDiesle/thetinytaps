@@ -60,6 +60,7 @@ export function ElevatorGame() {
         { id: "garten", emoji: "🌻", title: title("Unser Garten wächst"), kind: t(FILM) },
         { id: "krankenwagen", emoji: "🚑", title: titleIn("The ambulance", language, "en"), kind: t(FILM) },
         { id: "korn", emoji: "🌾", title: titleIn("From grain to bread", language, "en"), kind: t(FILM) },
+        { id: "haus", emoji: "🏡", title: titleIn("We build a house", language, "en"), kind: t(FILM) },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}

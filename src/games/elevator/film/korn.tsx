@@ -183,7 +183,7 @@ const RIM = "#fab005";
 const HITCH: Point = [-200, -60];
 
 /** A wheel with its tread and a yellow rim, centred on (0, 0); it turns while `spin`. */
-function Wheel({ r, spin }: { r: number; spin: boolean }) {
+export function Wheel({ r, spin }: { r: number; spin: boolean }) {
   return (
     <g className={spin ? "fm-wheel spin" : "fm-wheel"}>
       <circle r={r} fill="#343a40" stroke={INK} strokeWidth="4" />

@@ -327,6 +327,8 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Nach dem Brief für Oma und dem Bäcker (G-20) zwei weitere Filme, in denen etwas entsteht: vom Korn zum Brot (Traktor sät, Regen, das Korn wächst, Mähdrescher, Mühle, Bäckerei) und vom Haus (Bagger, Kran, Wände, Dach, Einzug). Die Müllabfuhr ist G-27.",
       why: "Kinder sehen, woher Dinge kommen und dass viele zusammenhelfen.",
       effort: "L",
+      partial: "Beide gebaut: „From grain to bread“ (korn.tsx) und „We build a house“ (haus.tsx), auf Englisch.",
+      done: true,
     },
     {
       id: "G-37",
