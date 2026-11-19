@@ -249,5 +249,6 @@ change a marble's colour).
 - Nothing can be wrong: every colour has its tube, and any tube full ends the run.
 - The tubes stand `TUBES.bottom` well above the wall's lower edge: at its very edge the bottom marbles were cut off by
   the frame on a tablet, and the stand in front must not cover the lowest marble either.
-- Its texts are German only, and the counting lines aren't recorded yet (`languageStatus.ts`, „🎨 Farbenbahn“); until
-  then only the notes count. `trackTheme.test.ts` checks the tubes, the counting and the hop.
+- Its texts stand in all seven languages (translated 19 November 2026; the counting lines per language in `COUNTS`, each
+  with its own agreement of number and colour), recorded only in German so far (`languageStatus.ts`, „🎨 Farbenbahn“);
+  where a recording is missing only the notes count. `trackTheme.test.ts` checks the tubes, the counting and the hop.

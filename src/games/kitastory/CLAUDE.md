@@ -20,8 +20,11 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
   and „Schnullerfee“; dev tags `E0`, `E<chapter>-<page>`). A change to how the book reads goes there, so all get it. Tapsi's voice reads each page's sentence (`voice`, from
   `stimme/`, listed in `recordedLines.ts` as `kita`, recorded only when the user asks), and the loudspeaker above ▶
   switches it off (`VoiceSwitch`, user decision, 13 November 2026); a page without its recording stays silent.
-- `names.ts`: the book's name on the shelf („Kita-Start“), the story's title and its blurb – German only until the user
-  asks for translations; then `<lang>.ts` files like the Schnullerfee's, imported only by `src/content/texts/texts-<lang>.ts`.
+- `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
+  (translated on request, 19 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with
+  `byLanguage` (`kitaStory`), passed to `ChapterBook` as `translations`. A changed German sentence drops its translations
+  until they are made again (root CLAUDE.md).
+- `names.ts`: the book's name on the shelf („Kita-Start“), the story's title and its blurb in every language.
 
 ## Rules
 

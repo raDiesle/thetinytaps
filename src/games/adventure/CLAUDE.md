@@ -132,8 +132,8 @@ The game has no settings of its own: its own music and the language follow the s
   `lines.<language>.ts`), shown in the app language (`storyTitle`, `stepName` in `AdventurePlay.tsx`), German where a
   translation has none; the movement library itself stays German (notes for building stories, shown only as a fallback name).
 - Names: Wolle is Woolly / 棉棉 / रुई / Pelusa / قطنة / „Пушинка“; Tapsi is Tapsi / 塔普西 / टैप्सी / تابسي / „Тапси“;
-  Kiki is Kiki / 琪琪 / कीकी / كيكي / „Кики“; Ole is Ole / 奥乐 / ओले / أولي / „Оле“. Both stories have a title and every step name in
-  all six languages (`voice.test.ts` checks it, and that Russian, Chinese, Hindi and Arabic ones have no Latin letters).
+  Kiki is Kiki / 琪琪 / कीकी / كيكي / „Кики“; Ole is Ole / 奥乐 / ओले / أولي / „Оле“; Robo is Robo / 罗博 / रोबो / روبو / „Робо“. Every story has a title and every
+  step name in each language it is translated into (Fire Rescue, English first, has German among them) (`voice.test.ts` checks it, and that Russian, Chinese, Hindi and Arabic ones have no Latin letters).
 
 ## Keeping the scene cheap
 

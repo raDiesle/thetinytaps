@@ -1,5 +1,6 @@
 import { ChapterBook } from "@/components/ChapterBook";
 import { GameShell } from "@/components/GameShell";
+import { byLanguage } from "@/content/texts";
 import { useT } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import pictureFiles from "./bilder/*.webp?glob";
@@ -14,6 +15,9 @@ const VOICE = recordedVoice(voiceFiles);
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
 const pictureOf = (id: string) => PICTURES.get(`kita-${id}`);
 
+/** The story in the other languages, filled as the app's language loads (`kitastory/<lang>.ts`). */
+const TRANSLATIONS = byLanguage((texts) => texts.kitaStory);
+
 /** „Tapsi geht in die Kita“, read in chapters like the books „Abstillen“ and „Schnullerfee“ (`ChapterBook`). */
 export function KitaStoryGame() {
   const t = useT();
@@ -23,7 +27,7 @@ export function KitaStoryGame() {
       // One story with nothing to choose before it: it starts at once, and ✕ goes back to the page before it.
       startMode="story"
     >
-      <ChapterBook chapters={KITA_STORY} voice={VOICE} title={KITA_STORY_TITLE} pictureOf={pictureOf} code="E" />
+      <ChapterBook chapters={KITA_STORY} voice={VOICE} title={KITA_STORY_TITLE} pictureOf={pictureOf} translations={TRANSLATIONS} code="E" />
     </GameShell>
   );
 }

@@ -205,7 +205,7 @@ export const lettersIdeas: IdeaArea = {
       why: "Groß und klein zusammenbringen – die Brücke zum Lesen echter Texte, in denen fast alles klein ist.",
       effort: "S",
       partial:
-        "Als eigenes Spiel im Buch „Buchstaben & Zahlen“ (/gross-klein/, November 2026),, für alle spielbar; ohne Augen und ohne Kette zwischen den Buchstaben. Die Frage „Wo ist das kleine …?“ ist noch nicht aufgenommen, Name und Zeile nur auf Deutsch.",
+        "Als eigenes Spiel im Buch „Buchstaben & Zahlen“ (/gross-klein/, November 2026),, für alle spielbar; ohne Augen und ohne Kette zwischen den Buchstaben. Name, Zeile und die Frage „Wo ist das kleine …?“ übersetzt am 19. November 2026; die Frage ist nur auf Deutsch aufgenommen.",
       done: true,
     },
   ],

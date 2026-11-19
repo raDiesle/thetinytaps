@@ -7,7 +7,7 @@ import { HOME_LOOKALIKES, HOMES, type HomeId } from "./homes";
 import { GROW_LOOKALIKES, GROW_MS, GROW_TEXTS, growLookAlike, GROWTHS } from "./growth";
 import { DEFAULT_ANIMALS_SETTINGS } from "./settings";
 import { ANIMAL_LEVELS, dealFeed, dealGift, dealGrow, dealHome, dealSound, KIND_ORDER, nextKind, type RoundKind } from "./levels";
-import { SOUND_ANIMALS, SOUND_LOOKALIKES, soundLookAlike } from "./sounds";
+import { SOUND_ANIMALS, SOUND_LOOKALIKES, SOUND_TEXTS, soundLookAlike } from "./sounds";
 import { readdirSync, readFileSync } from "node:fs";
 
 const CYRILLIC = /^[а-яё -]+$/;
@@ -421,6 +421,18 @@ test("every calling animal has a recording of its own, and no two share one", ()
   expect(new Set(calls).size).toBe(calls.length);
   // An animal calls with its own recording wherever it calls.
   for (const a of SOUND_ANIMALS) expect(a.sound, a.id).toBeDefined();
+});
+
+test("„Wer macht das Geräusch?“ says its sentences in every translated language, with no Latin letters in another script", () => {
+  for (const language of COMPLETE) {
+    const texts = SOUND_TEXTS[language]!;
+    const shown: [string, string][] = [[texts.listen, SOUND_TEXTS.de.listen]];
+    for (const animal of SOUND_ANIMALS) shown.push([texts.there(animal), SOUND_TEXTS.de.there(animal)], [texts.thatIs(animal), SOUND_TEXTS.de.thatIs(animal)]);
+    for (const [sentence, de] of shown) {
+      expect(sentence, language).not.toBe(de);
+      if (OWN_SCRIPT.includes(language)) expect(sentence, language).not.toMatch(/[A-Za-zäöüß]/);
+    }
+  }
 });
 
 test("the sound look-alikes name animals that call, each in one group only", () => {

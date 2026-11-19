@@ -8,8 +8,8 @@ import type { StoryChapter } from "@/components/ChapterBook";
 // bunny that comes along, the yellow star on Tapsi's hook, the waving window, and Mama's promise told by the day's
 // order – „nach dem Mittagsschlaf“ – never by the clock.
 //
-// German only (translations come when the user asks). Played at `/kita/`, the book „Kita-Start“ among the Alltagshelfer
-// (`ChapterBook`); its pictures come from Gemini (`kitaStoryPictures.ts`).
+// Written German first, translated on request on 19 November 2026 (`<lang>.ts` in this folder). Played at `/kita/`,
+// the book „Kita-Start“ among the Alltagshelfer (`ChapterBook`); its pictures come from Gemini (`kitaStoryPictures.ts`).
 
 /** A step of settling into a Kita gently, as the guides give it; each has a chapter of its own. */
 export type SettlingStep = "vorbereiten" | "dabeibleiben" | "erste-trennung" | "bezugsperson" | "ritual" | "tagesablauf" | "abholen";

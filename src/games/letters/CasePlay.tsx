@@ -24,11 +24,16 @@ const ALIKE_AFTER = 3;
 const HINT_AFTER_WRONG = 2;
 
 /**
- * „Wo ist das kleine b?“, asked for each big letter. German only for now: the other languages ask nothing until their
- * line is written and recorded (root CLAUDE.md) – the letter's name is still said when it is found.
+ * „Wo ist das kleine b?“, asked for each big letter, in the language of the pack played (translated 19 November 2026).
+ * Hindi and Arabic have none: their letters have one form, so they play the English pack. Chinese names a pinyin letter
+ * as its children read it (b → 玻). A line not recorded yet stays silent – the letter's name is still said when found.
  */
 export const SMALL_PROMPT: Partial<Localized<(spoken: string) => string>> = {
   de: (spoken) => `Wo ist das kleine ${spoken}?`,
+  en: (spoken) => `Where is the little ${spoken}?`,
+  zh: (spoken) => `小写的${spoken}在哪里？`,
+  es: (spoken) => `¿Dónde está la ${spoken} pequeña?`,
+  ru: (spoken) => (spoken.endsWith("знак") ? `Где маленький ${spoken}?` : `Где маленькая буква ${spoken}?`),
 };
 
 /**

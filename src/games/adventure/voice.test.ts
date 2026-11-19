@@ -91,12 +91,13 @@ test("Russian, Chinese, Hindi and Arabic titles and step names, where a story ha
   }
 });
 
-// A story with Russian titles and step names has them in the other translated languages too (October 2026).
-test("a story with a Russian title and step names has them in en, zh, hi, es and ar too", () => {
+// A story with Russian titles and step names has them in the other translated languages too (October 2026), German
+// among them where the story is written English first; its own language has them in the story itself.
+test("a story with a Russian title and step names has them in de, en, zh, hi, es and ar too", () => {
   for (const { dir, story } of STORIES) {
     const ru = story.translations?.ru;
     if (!ru?.title) continue;
-    for (const language of ["en", "zh", "hi", "es", "ar"] as const) {
+    for (const language of (["de", "en", "zh", "hi", "es", "ar"] as const).filter((l) => l !== firstLanguage(story))) {
       const own = story.translations?.[language];
       expect(own?.title?.trim(), `${dir} ${language}`).toBeTruthy();
       ru.steps.forEach((step, i) => {

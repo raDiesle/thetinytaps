@@ -1,3 +1,4 @@
+import { TRANSLATION as fireRescue } from "@/games/adventure/stories/fireRescue/lines.de";
 import { HAIR_STORY_DE as hairStory } from "@/games/hairstory/de";
 import type { LanguageTexts } from ".";
 
@@ -8,4 +9,5 @@ import type { LanguageTexts } from ".";
 /** The German texts. */
 export const TEXTS: LanguageTexts = {
   hairStory,
+  stories: { fireRescue },
 };

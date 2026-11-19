@@ -2,6 +2,7 @@ import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./
 import type { Gift, GiftId } from "./gifts";
 import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // Spanish texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in content.ts and
 // homes.tsx. Each animal and food carries its article ("el conejito", "las zanahorias"); "a" + "el" becomes "al"
@@ -87,6 +88,14 @@ export const SPANISH_ANIMALS: Record<string, SpanishAnimal> = {
   dachs: { name: "tejón", the: "el tejón" },
   qualle: { name: "medusa", the: "la medusa" },
   schwan: { name: "cisne", the: "el cisne" },
+  hahn: { name: "gallo", the: "el gallo" },
+  taube: { name: "paloma", the: "la paloma" },
+  truthahn: { name: "pavo", the: "el pavo" },
+  pfau: { name: "pavo real", the: "el pavo real" },
+  muecke: { name: "mosquito", the: "el mosquito" },
+  schlange: { name: "serpiente", the: "la serpiente" },
+  kueken: { name: "pollito", the: "el pollito" },
+  fliege: { name: "mosca", the: "la mosca" },
 };
 
 /** A food in Spanish. */
@@ -283,10 +292,21 @@ export function spanishGrowth(german: GrowTexts): GrowTexts {
   };
 }
 
+/** „Wer macht das Geräusch?“ in Spanish; an animal without its Spanish words gets the whole German sentence. */
+export function spanishSound(german: SoundTexts): SoundTexts {
+  const animal = (a: Animal) => SPANISH_ANIMALS[a.id];
+  return {
+    listen: "¡Escucha! ¿Quién está detrás de la cortina?",
+    there: (a) => (animal(a) ? `¡Ahí está ${animal(a).the}!` : german.there(a)),
+    thatIs: (a) => (animal(a) ? `Es ${animal(a).the}.` : german.thatIs(a)),
+  };
+}
+
 /** Spanish, for the table of languages in content.ts. */
 export const SPANISH: AnimalTranslation = {
   words: { animals: SPANISH_ANIMALS, foods: SPANISH_FOODS, homes: SPANISH_HOMES },
   texts: spanishTexts,
   gifts: spanishGifts,
   growth: spanishGrowth,
+  sound: spanishSound,
 };

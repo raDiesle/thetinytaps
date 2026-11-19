@@ -2,8 +2,8 @@ import type { Situation } from "./kita";
 
 // The everyday scenes of „Alltagssituationen“ from the ideas C-37 to C-72 (November 2026): the bear frustrated, scared,
 // excited, worn out or disgusted at home, in the kindergarten and out and about, three steps each like the stories of
-// selbst.ts. German only, kept apart from SELF_SITUATIONS so they wait for their translations without failing that list's
-// check; their pictures wait in the picture queue (alltagDrawings.ts), so on the live site a story shows only once all its
+// selbst.ts. Written German first and kept apart from SELF_SITUATIONS; their words in the other languages are in
+// kita.<lang>.ts (November 2026). Their pictures wait in the picture queue (alltagDrawings.ts), so on the live site a story shows only once all its
 // pictures are made (stories.ts).
 
 /** The everyday scenes, in the order of their ideas. */

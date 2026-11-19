@@ -50,6 +50,7 @@ import {
   sprayTime,
   TRAVEL,
 } from "./script";
+import { TRANSLATIONS } from "./translations";
 import { makeWorld } from "./world";
 
 // „Fire Rescue“: smoke comes out of a house in town and kittens sit up on its roof. Tapsi never walks: it stands on
@@ -807,5 +808,6 @@ export const FIRE_RESCUE: Story = {
   demo: DEMO,
   praise: PRAISE,
   lines: LINES,
+  translations: TRANSLATIONS,
   build,
 };

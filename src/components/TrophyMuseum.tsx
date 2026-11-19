@@ -128,7 +128,12 @@ export function TrophyMuseum() {
   const shelfLabel = t(BACK_TO_SHELF);
   // Where the left door leads: the shelf from the hall, else the room one step up (the hall, or the wing's hall).
   const parent = here.length > 1 ? nodeAt(tree, here.slice(0, -1)) : undefined;
-  const backName = here.length === 0 ? t({ en: "Bookshelf" }) : parent ? t(parent.title) : t({ en: "Hall" });
+  const backName =
+    here.length === 0
+      ? t({ en: "Bookshelf", de: "Bücherregal", zh: "书架", hi: "किताबों की अलमारी", es: "Estantería", ar: "رف الكتب", ru: "Книжная полка" })
+      : parent
+        ? t(parent.title)
+        : t({ en: "Hall", de: "Halle", zh: "大厅", hi: "हॉल", es: "Vestíbulo", ar: "القاعة", ru: "Зал" });
   const backLabel = here.length === 0 ? shelfLabel : backName;
   const doors = node ? node.kids : tree;
   const style = { "--ox": walk?.origin.split(" ")[0], "--oy": walk?.origin.split(" ")[1] } as CSSProperties;
@@ -169,8 +174,24 @@ export function TrophyMuseum() {
       <button
         type="button"
         className="museum-map-button"
-        aria-label={t({ en: "Plan of the trophy rooms" })}
-        title={t({ en: "Plan of the trophy rooms" })}
+        aria-label={t({
+          en: "Plan of the trophy rooms",
+          de: "Plan der Pokalzimmer",
+          zh: "奖杯室平面图",
+          hi: "ट्रॉफ़ी कमरों का नक्शा",
+          es: "Plano de las salas de trofeos",
+          ar: "خريطة غرف الكؤوس",
+          ru: "План комнат с кубками",
+        })}
+        title={t({
+          en: "Plan of the trophy rooms",
+          de: "Plan der Pokalzimmer",
+          zh: "奖杯室平面图",
+          hi: "ट्रॉफ़ी कमरों का नक्शा",
+          es: "Plano de las salas de trofeos",
+          ar: "خريطة غرف الكؤوس",
+          ru: "План комнат с кубками",
+        })}
         onClick={() => setPlanOpen(true)}
       >
         <PlanIcon />
@@ -542,7 +563,11 @@ function Plan({
         aria-current={key === now ? "location" : undefined}
         onClick={() => onGo(path)}
       >
-        {key === now && <span className="museum-plan-here">{t({ en: "You are here" })}</span>}
+        {key === now && (
+          <span className="museum-plan-here">
+            {t({ en: "You are here", de: "Du bist hier", zh: "你在这里", hi: "तुम यहाँ हो", es: "Estás aquí", ar: "نحن هنا", ru: "Ты здесь" })}
+          </span>
+        )}
         <span>
           <span aria-hidden>{emoji}</span> {label}
         </span>
@@ -555,17 +580,35 @@ function Plan({
     );
   };
   return (
-    <div className="museum-plan" role="dialog" aria-label={t({ en: "Plan of the trophy rooms" })}>
-      <button type="button" className="museum-big-close" aria-label={t({ en: "Close" })} onClick={onClose} />
+    <div
+      className="museum-plan"
+      role="dialog"
+      aria-label={t({
+        en: "Plan of the trophy rooms",
+        de: "Plan der Pokalzimmer",
+        zh: "奖杯室平面图",
+        hi: "ट्रॉफ़ी कमरों का नक्शा",
+        es: "Plano de las salas de trofeos",
+        ar: "خريطة غرف الكؤوس",
+        ru: "План комнат с кубками",
+      })}
+    >
+      <button
+        type="button"
+        className="museum-big-close"
+        aria-label={t({ en: "Close", de: "Schließen", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق", ru: "Закрыть" })}
+        onClick={onClose}
+      />
       <div className="museum-plan-card">
         <div className="museum-plan-map">
           <button type="button" className="museum-plan-room shelf" onClick={onShelf}>
             <span>
-              <span aria-hidden>📚</span> {t({ en: "Bookshelf" })}
+              <span aria-hidden>📚</span>{" "}
+              {t({ en: "Bookshelf", de: "Bücherregal", zh: "书架", hi: "किताबों की अलमारी", es: "Estantería", ar: "رف الكتب", ru: "Книжная полка" })}
             </span>
           </button>
           <span className="museum-plan-link" aria-hidden />
-          {room([], t({ en: "Hall" }), "🏛️")}
+          {room([], t({ en: "Hall", de: "Halle", zh: "大厅", hi: "हॉल", es: "Vestíbulo", ar: "القاعة", ru: "Зал" }), "🏛️")}
           <span className="museum-plan-link" aria-hidden />
           <ul className="museum-plan-rooms">
             {tree.map((node) => (
@@ -614,7 +657,20 @@ function BigTrophy({ trophy, from, name, onClose }: { trophy: TrophyWon; from?: 
   return (
     <div className="museum-big" role="dialog" aria-label={name ?? (game ? t(game.title) : "")}>
       {/* The whole screen puts it back: one tap anywhere. */}
-      <button type="button" className="museum-big-close" aria-label={t({ en: "Put it back" })} onClick={onClose} />
+      <button
+        type="button"
+        className="museum-big-close"
+        aria-label={t({
+          en: "Put it back",
+          de: "Zurückstellen",
+          zh: "放回去",
+          hi: "वापस रखो",
+          es: "Ponerlo en su sitio",
+          ar: "إعادته إلى مكانه",
+          ru: "Поставить на место",
+        })}
+        onClick={onClose}
+      />
       <div ref={art} className={`museum-big-trophy${from ? (start ? " grow" : " waiting") : ""}`} style={start}>
         {/* A magnifying glass over the trophy tapped: its lens opens out and the trophy grows to fill the room. */}
         <div className="museum-lens">
@@ -628,7 +684,16 @@ function BigTrophy({ trophy, from, name, onClose }: { trophy: TrophyWon; from?: 
         {/* Since when, for the grown-ups; the test view's trophies were never won and have no day. */}
         {trophy.at > 1e12 && (
           <span className="museum-plate-since">
-            {t({ en: "First won" })}: {since}
+            {t({
+              en: "First won",
+              de: "Zum ersten Mal gewonnen",
+              zh: "首次赢得",
+              hi: "पहली बार जीती गई",
+              es: "Ganado por primera vez",
+              ar: "أول فوز",
+              ru: "Впервые выигран",
+            })}
+            : {since}
           </span>
         )}
       </div>

@@ -1,3 +1,4 @@
+import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
 import { type Animal, ANIMALS } from "./content";
 
@@ -54,14 +55,15 @@ export interface SoundTexts {
   thatIs: (a: Animal) => string;
 }
 
-/**
- * German only, until the user asks for translations (`languageStatus.ts`); another language finds no recording of
- * them and stays silent. `there` and `thatIs` read as „Wer schaut da raus?“'s, so its recordings are said here too.
- */
-export const SOUND_TEXTS: Localized<SoundTexts> = {
-  de: {
-    listen: "Hör mal! Wer ist hinter dem Vorhang?",
-    there: (a) => `Da ist ja ${a.the}!`,
-    thatIs: (a) => `Das ist ${a.the}.`,
-  },
+const GERMAN_SOUND_TEXTS: SoundTexts = {
+  listen: "Hör mal! Wer ist hinter dem Vorhang?",
+  there: (a) => `Da ist ja ${a.the}!`,
+  thatIs: (a) => `Das ist ${a.the}.`,
 };
+
+/**
+ * The texts by app language: `pick(SOUND_TEXTS, language.id)`, each language's from its `content.<lang>.ts` (translated
+ * on request, 19 November 2026). `there` and `thatIs` read as „Wer schaut da raus?“'s did, so its recordings are said
+ * here too.
+ */
+export const SOUND_TEXTS: Localized<SoundTexts> = byLanguage((texts) => texts.animals?.sound(GERMAN_SOUND_TEXTS), GERMAN_SOUND_TEXTS);

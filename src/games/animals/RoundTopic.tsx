@@ -26,8 +26,15 @@ export const KIND_QUESTIONS: Record<RoundKind, Localized> = {
     es: "¿En qué me convierto?",
     ar: "إلى ماذا أتحول؟",
   },
-  // German only until translations are asked for (languageStatus.ts).
-  sound: { de: "Wer macht das Geräusch?" },
+  sound: {
+    de: "Wer macht das Geräusch?",
+    ru: "Чей это звук?",
+    en: "Who makes that sound?",
+    zh: "这是谁的声音？",
+    hi: "यह आवाज़ किसकी है?",
+    es: "¿Quién hace ese ruido?",
+    ar: "من يصدر هذا الصوت؟",
+  },
 };
 
 /**

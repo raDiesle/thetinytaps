@@ -21,8 +21,8 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   little hops and stands beside it, a wrong one shakes its head. Three rounds in a row found at the first tap bring
   look-alikes (b next to d, `ALIKE`), a wrong tap among them plainly different ones again (`choicesFor`). Only letters
   with a big and a small form and no marks over them (`caseLetters`: no umlauts, no Й); Hindi and Arabic, which have
-  one form, play it in English. It asks „Wo ist das kleine …?“ (`SMALL_PROMPT`, German, not yet recorded, so silent
-  until then) and says the letter's name when found, from the recordings of the other games. No ⚙️.
+  one form, play it in English. It asks „Wo ist das kleine …?“ (`SMALL_PROMPT`, in German, English, Chinese, Spanish and Russian, recorded only in
+  German so far, silent where not) and says the letter's name when found, from the recordings of the other games. No ⚙️.
 
 `LettersGame way={…}` is all five (`LettersPage.tsx` has a page for each); names and table-of-contents lines in
 `names.ts`. Each plays at once (`startMode`) with no start screen: ✕ goes back to the book's table of contents,
