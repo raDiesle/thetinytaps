@@ -161,6 +161,28 @@ function mouthFocus(lips: Point2[], zoom: number, open: number): Box {
   return { x: (left + right - width) / 2, y: (top + bottom - height) / 2, width, height };
 }
 
+/**
+ * The whole head with its ears: what the end shows, so the clean grin comes with the happy eyes and glowing cheeks
+ * (zoomed onto the lips alone, the end showed a mouth and a nose).
+ */
+export function faceFocus(project: Projector): Box {
+  const middle = project.point(HEAD_MIDDLE);
+  const r = HEAD_RADIUS * project.zoom;
+  const [across, up, down] = [1.16 * r, 1.04 * r, 1.04 * r];
+  return { x: middle.x - across, y: middle.y - up, width: 2 * across, height: up + down };
+}
+
+/** Between two boxes: the middle moves evenly and the size changes by the same factor in every frame, so a zoom feels even. */
+export function blendBox(a: Box, b: Box, k: number): Box {
+  if (k <= 0) return a;
+  if (k >= 1) return b;
+  const width = a.width * (b.width / a.width) ** k;
+  const height = a.height * (b.height / a.height) ** k;
+  const cx = a.x + a.width / 2 + (b.x + b.width / 2 - a.x - a.width / 2) * k;
+  const cy = a.y + a.height / 2 + (b.y + b.height / 2 - a.y - a.height / 2) * k;
+  return { x: cx - width / 2, y: cy - height / 2, width, height };
+}
+
 export interface MonsterSpot {
   id: number;
   tooth: ToothId;
@@ -190,8 +212,10 @@ interface MouthProps {
   monsters: MonsterSpot[];
   /** The brush goes from stop to stop; `at` is how far, 1.5 is half way from the second to the third. */
   brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
-  /** All clean: sparkles and smiling eyes. */
+  /** All clean: the teeth shine and the eyes smile. */
   happy: boolean;
+  /** Right after the brushing: a last sugar monster peeks in, dazzled by the shining teeth, and puts on sunglasses. */
+  dazzled: boolean;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
   /**
@@ -265,7 +289,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, action, gliding, glide, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gliding, glide, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -311,7 +335,10 @@ export function Mouth({ view, zone, monsters, brush, happy, action, gliding, gli
 
   const svg = useRef<SVGSVGElement>(null);
   const room = useRoom(svg, free);
-  const { box, unit } = fitBox(room, mouthFocus(lipPoints, project.zoom, view.open));
+  // At the end the camera zooms out from the lips to the whole laughing head, along with the head's glide to the grin.
+  const lipFocus = mouthFocus(lipPoints, project.zoom, view.open);
+  const focus = happy ? blendBox(lipFocus, faceFocus(project), gliding ? glide.k : 1) : lipFocus;
+  const { box, unit } = fitBox(room, focus);
   const frame = screenFrame(box, unit);
   // The mirror's glass and frame stay where they are on the screen however the picture zooms, so they are drawn in
   // screen px: an svg whose viewBox changed with every frame of a turning head was painted anew each time.
@@ -324,6 +351,18 @@ export function Mouth({ view, zone, monsters, brush, happy, action, gliding, gli
     y: (at.y - box.y - box.height / 2) / unit,
     scale: scale / unit,
   });
+
+  // The outer faces of the teeth that show, for the shine round them at the end.
+  const shineTeeth = useMemo(
+    () =>
+      happy
+        ? model.teeth.flatMap((t) => {
+            const face = surfaceFace(t.faces, "outer");
+            return all[t.id.jaw].facing(face.normal) > MIN_FACING ? [{ key: t.key, d: facePath(face, all[t.id.jaw]) }] : [];
+          })
+        : [],
+    [happy, model, all],
+  );
 
   // The face and the teeth change only while the head turns or the mouth opens: built once for each view,
   // not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
@@ -494,6 +533,33 @@ export function Mouth({ view, zone, monsters, brush, happy, action, gliding, gli
         </svg>
       )}
 
+      {/* All clean: a soft white light round the teeth that breathes, clipped to the mouth with the teeth themselves
+          left out, so their outlines stay sharp. Its own layer, which only changes its opacity. */}
+      {happy && !gliding && (
+        <svg className="mouth mouth-moving teeth-shine" viewBox={viewBox} aria-hidden>
+          <defs>
+            <clipPath id="mirror-shine">
+              <rect {...frame} />
+            </clipPath>
+            <clipPath id="mouth-shine">
+              <path d={`${lipsPath} ${shineTeeth.map((t) => t.d).join(" ")}`} clipRule="evenodd" />
+            </clipPath>
+            <filter id="teeth-shine-soft" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation={6} />
+            </filter>
+          </defs>
+          <g clipPath="url(#mirror-shine)">
+            <g clipPath="url(#mouth-shine)">
+              <g filter="url(#teeth-shine-soft)" fill="none" stroke="#fffbe6" strokeWidth={22} strokeLinejoin="round">
+                {shineTeeth.map((t) => (
+                  <path key={t.key} d={t.d} />
+                ))}
+              </g>
+            </g>
+          </g>
+        </svg>
+      )}
+
       {!gliding && (
         <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
           <defs>
@@ -509,20 +575,8 @@ export function Mouth({ view, zone, monsters, brush, happy, action, gliding, gli
         {/* The ones being brushed now on top. */}
         {monsters.filter((m) => !m.waiting).map(placed)}
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
-        {/* All clean: the front teeth sparkle, each star a small layer of its own that twinkles as a whole. */}
-        {happy &&
-          model.teeth.map((t, i) => {
-            const face = surfaceFace(t.faces, "outer");
-            if (all[t.id.jaw].facing(face.normal) < 0.4 || t.id.n > 2) return null;
-            const at = onScreen(all[t.id.jaw].point(face.center), 0.2);
-            return (
-              <Sprite key={t.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={SPARKLE_REACH} className="tooth-sparkle">
-                <svg viewBox={spriteBox(SPARKLE_REACH)} style={{ "--delay": `${i * 90}ms` } as CSSProperties}>
-                  <path d={STAR_PATH} transform="translate(-50 -50)" fill="#ffd23f" stroke={INK} strokeWidth={8} />
-                </svg>
-              </Sprite>
-            );
-          })}
+        {/* A last sugar monster peeks in, dazzled by the clean teeth, and puts on sunglasses: no sugar left for it. */}
+        {dazzled && <DazzledMonster screen={screen} />}
       </div>
 
       <svg className="mouth mouth-moving" viewBox={`0 0 ${screen.width} ${screen.height}`} aria-hidden>
@@ -646,9 +700,6 @@ function Sprite({ spot, reach, className, children }: { spot: SpriteSpot; reach:
     </div>
   );
 }
-
-/** How far a sparkle's star reaches from its middle, in its own units (STAR_PATH is about 100 wide round 50, 50). */
-const SPARKLE_REACH = 60;
 
 /** The viewBox of an svg filling a Sprite: `reach` units each way round (0, 0). */
 const spriteBox = (reach: number) => `${-reach} ${-reach} ${2 * reach} ${2 * reach}`;
@@ -824,6 +875,67 @@ const MONSTER_TOPS = [
   "M-11 -10 L-8 -21 L-3 -14 Z M-3 -14 L0 -24 L3 -14 Z M3 -14 L8 -21 L11 -10 Z",
 ];
 
+/** A sugar monster's round body with its wavy foot, about 30 wide round (0, 0). */
+const MONSTER_BODY = "M-15 8 C-17 -6 -10 -15 0 -15 C10 -15 17 -6 15 8 C12 14 7 11 5 15 C2 11 -2 11 -5 15 C-7 11 -12 14 -15 8 Z";
+
+/** Where the mirror's frame covers its bottom edge, in px from the screen's edge (FRAME_PX: inset and half the ink). */
+const MIRROR_EDGE_PX = 12;
+
+/** How far the dazzled monster reaches round its middle, horns and paws included, in its own units. */
+const DAZZLED_REACH = 26;
+
+/**
+ * The end's surprise: a last sugar monster rises at the bottom edge of the mirror, squeezes its eyes shut at the
+ * shining teeth, then sunglasses drop onto its nose and it grins – there is no sugar left for it. A small layer of
+ * its own (body and glasses each an HTML layer moved by CSS, `teeth-dazzle-…`), placed on the screen, so the end's
+ * zoom doesn't move it.
+ */
+function DazzledMonster({ screen }: { screen: { width: number; height: number } }) {
+  const size = round(Math.min(screen.height * 0.36, screen.width * 0.26));
+  const box = spriteBox(DAZZLED_REACH);
+  return (
+    <div
+      className="mouth-sprite dazzled-monster"
+      style={{
+        width: size,
+        height: size,
+        transform: `translate(${round(screen.width * 0.3 - size / 2)}px, ${round(screen.height / 2 - size - MIRROR_EDGE_PX)}px)`,
+      }}
+    >
+      <div className="dazzle-body">
+        <svg viewBox={box} aria-hidden>
+          <path d={MONSTER_TOPS[0]} fill="#8bd346" stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+          {/* Paws up at the bright light. */}
+          <g fill="#8bd346" stroke={INK} strokeWidth={2}>
+            <ellipse cx={-17} cy={0} rx={4.5} ry={3.5} transform="rotate(-30 -17 0)" />
+            <ellipse cx={17} cy={0} rx={4.5} ry={3.5} transform="rotate(30 17 0)" />
+          </g>
+          <path d={MONSTER_BODY} fill="#8bd346" stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+          {/* Eyes squeezed shut: > < */}
+          <path d="M-9 -7 L-4 -4 L-9 -1 M9 -7 L4 -4 L9 -1" fill="none" stroke={INK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M-6 4 Q0 10 6 4" fill="#7a1f3d" stroke={INK} strokeWidth={2} strokeLinejoin="round" />
+          <path d="M-3.5 5.6 L-2.2 9 L-0.8 6.6 Z" fill="#fff" />
+        </svg>
+        <div className="dazzle-glasses">
+          <svg viewBox={box} aria-hidden>
+            <path d="M-13 -5 L13 -5" stroke={INK} strokeWidth={2} />
+            <path d="M-13 -5 L-17 -8 M13 -5 L17 -8" stroke={INK} strokeWidth={1.8} strokeLinecap="round" />
+            <path
+              d="M-12.5 -6.5 H-1.5 Q-1.5 1.5 -7 1.5 Q-12.5 1.5 -12.5 -6.5 Z M1.5 -6.5 H12.5 Q12.5 1.5 7 1.5 Q1.5 1.5 1.5 -6.5 Z"
+              fill="#2b2140"
+              stroke={INK}
+              strokeWidth={1.6}
+              strokeLinejoin="round"
+            />
+            {/* The light on the lenses. */}
+            <path d="M-10 -4.5 L-7.5 -4.5 M3.5 -4.5 L6 -4.5" stroke="#fff" strokeWidth={1.3} strokeLinecap="round" opacity={0.85} />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** A sugar monster drawn round its middle, about 30 wide; the story at the start (origin.tsx) shows the same ones. */
 export function Monster({
   color,
@@ -868,13 +980,7 @@ export function Monster({
             <circle cx={9} cy={-24} r={3.2} />
           </g>
         )}
-        <path
-          d="M-15 8 C-17 -6 -10 -15 0 -15 C10 -15 17 -6 15 8 C12 14 7 11 5 15 C2 11 -2 11 -5 15 C-7 11 -12 14 -15 8 Z"
-          fill={color}
-          stroke={INK}
-          strokeWidth={2.5}
-          strokeLinejoin="round"
-        />
+        <path d={MONSTER_BODY} fill={color} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
         <g className="monster-eyes">
           <circle cx={-5.5} cy={-4} r={4.2} fill="#fff" stroke={INK} strokeWidth={1.8} />
           <circle cx={5.5} cy={-4} r={4.2} fill="#fff" stroke={INK} strokeWidth={1.8} />

@@ -168,8 +168,7 @@
   }
 }
 
-.mouth,
-.prep {
+.mouth {
   display: block;
   width: 100%;
   height: 100%;
@@ -353,11 +352,67 @@
   animation: none;
 }
 
-/* A sparkle is a small layer of its own (Sprite): its svg pops in and twinkles as a whole, never something inside it. */
-.tooth-sparkle > svg {
+/* All clean: the light round the teeth comes up over two beats, then breathes slowly, two bars a breath. Only its
+   layer's opacity changes, which a phone does without painting. */
+.teeth-shine {
   animation:
-    pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay) backwards,
-    twinkle 1.6s ease-in-out calc(var(--delay) + 0.4s) infinite;
+    teeth-shine-in 1.07s ease-out backwards,
+    teeth-shine-breathe 4.29s ease-in-out 1.07s infinite;
+}
+
+@keyframes teeth-shine-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes teeth-shine-breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* The end's surprise (mouth.tsx, DazzledMonster), eight beats as long as the cheer: three beats while the head glides
+   to its grin, the monster rises at the mirror's bottom edge in two, squints, the sunglasses drop onto its nose in one,
+   and at the end it sinks back. Body and glasses are layers of their own moved by transform. */
+/* It rises from behind the mirror's bottom edge: its box ends there and hides what is below. */
+.dazzled-monster {
+  overflow: hidden;
+}
+
+.dazzle-body {
+  animation: teeth-dazzle-peek 4.29s ease-in-out both;
+}
+
+@keyframes teeth-dazzle-peek {
+  0%,
+  37% {
+    transform: translateY(100%);
+  }
+  50%,
+  88% {
+    transform: translateY(26%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.dazzle-glasses {
+  animation: teeth-dazzle-glasses 4.29s ease-in both;
+}
+
+@keyframes teeth-dazzle-glasses {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(-45%);
+  }
+  75%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. They lie
@@ -598,7 +653,7 @@
 
   .monster-body,
   .zone-glow,
-  .tooth-sparkle > svg,
+  .teeth-shine,
   .monster-glow {
     animation: none;
   }
@@ -684,9 +739,9 @@
   pointer-events: none;
 }
 
-/* The story's moving pieces (Piece in origin.tsx): picture units on the screen, each piece a small layer of its own
-   that its keyframes move as a whole, over the still pictures (the sky, the child). */
-.origin-space {
+/* The moving pieces of the story and the sink (Piece in piece.tsx): picture units on the screen, each piece a small
+   layer of its own that its keyframes move as a whole, over the still pictures (the sky, the child, the wall). */
+.teeth-space {
   position: absolute;
   left: 0;
   top: 0;
@@ -694,12 +749,12 @@
   pointer-events: none;
 }
 
-.origin-piece {
+.teeth-piece {
   position: absolute;
   will-change: transform;
 }
 
-.origin-piece > svg {
+.teeth-piece > svg {
   position: absolute;
   inset: 0;
   display: block;
@@ -708,7 +763,7 @@
   overflow: visible;
 }
 
-.origin-piece .monster-body {
+.teeth-piece .monster-body {
   pointer-events: auto;
 }
 
@@ -996,6 +1051,38 @@
 
 /* ---------- Before brushing: get the brush, toothpaste on ---------- */
 
+/* The sink (prep.tsx): a still picture with the moving pieces (Piece) over it and the frame on top. */
+.prep {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.prep-picture,
+.prep-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.prep-frame {
+  pointer-events: none;
+}
+
+/* The still pieces (the window's front, the cup's glass, the brush and the fist inside their moving pieces) need no
+   layer of their own: they are painted once into the layer they lie in or over. */
+.teeth-piece.prep-still {
+  will-change: auto;
+}
+
+/* The rising sun shows only through the window's glass. */
+.prep-window-clip {
+  overflow: hidden;
+  border-radius: 10px;
+}
+
 .prep-brush {
   transform: translate(356px, 95px) rotate(90deg) scale(0.9);
 }
@@ -1134,7 +1221,7 @@
 }
 
 /* The tube gets squeezed while the toothpaste comes out. */
-.prep.at-paste .prep-tube > g {
+.prep.at-paste .prep-tube-squeeze {
   animation: squeeze 5.5s ease-in-out forwards;
 }
 
@@ -1153,7 +1240,6 @@
 
 /* The dab swells out of the tube onto the bristles while it is squeezed. */
 .prep-paste {
-  transform-box: fill-box;
   transform-origin: 50% 100%;
   animation: paste-out 5.5s ease-out forwards;
 }
@@ -1170,8 +1256,6 @@
 }
 
 .prep-twinkle {
-  transform-box: fill-box;
-  transform-origin: center;
   transform: scale(0);
   animation: twinkle-once 1.1s ease-in-out 2 forwards;
 }
@@ -1251,7 +1335,6 @@
 
 /* The water washes the foam off while the brush is scrubbed under it. */
 .prep-foam {
-  transform-box: fill-box;
   transform-origin: 50% 100%;
   animation: foam-off 8.57s ease-in forwards;
 }
@@ -1271,7 +1354,6 @@
 
 /* The tap runs from the first beat until the brush is lifted out. */
 .prep-water {
-  transform-box: fill-box;
   transform-origin: 50% 0;
   transform: scaleY(0);
   animation: water-run 8.57s ease-in-out forwards;
@@ -1309,7 +1391,7 @@
   animation-iteration-count: 3;
 }
 
-/* Important for the same reason as the story's: `.prep.at-paste .prep-tube > g` outranks it. */
+/* Important for the same reason as the story's: `.prep.at-paste .prep-tube-squeeze` outranks it. */
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
 .teeth-play.paused .lip-arrow {
@@ -1340,7 +1422,7 @@
    window and the sky of the story tell the time of day. */
 @keyframes teeth-sun-up {
   from {
-    transform: translateY(60%);
+    transform: translateY(110%);
     opacity: 0;
   }
 }
@@ -1509,6 +1591,9 @@
 }
 
 .mouth-sprite > *,
+.dazzle-body > svg,
+.dazzle-glasses,
+.dazzle-glasses > svg,
 .sprite-body > svg,
 .lip-arrow-sprite > div > svg {
   position: absolute;

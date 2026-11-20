@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useRef, type CSSProperties, type RefObject } from "react";
 import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
@@ -7,6 +7,7 @@ import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
 import { PICTURE } from "./jaw";
 import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box } from "./mouth";
+import { Piece, pictureSpace } from "./piece";
 
 // Before anything else, a short story of where the sugar monsters come from:
 // a sweet appears in the corner, floats a moment so the child sees what it is,
@@ -47,9 +48,10 @@ const topAt = (x: number) => {
   const s = (x - MOUTH.left) / (MOUTH.right - MOUTH.left);
   return MOUTH.top + 24 * s * (1 - s);
 };
-const TOOTH_W = 30;
+/** Wide enough that neighbouring teeth nearly touch: with gaps between them the story's child looked to have lost teeth. */
+const TOOTH_W = 33;
 /** Six teeth along the top, four along the round bottom. */
-const UPPER = [0, 1, 2, 3, 4, 5].map((i) => MOUTH.left + 6 + i * 34.5 + TOOTH_W / 2);
+const UPPER = [0, 1, 2, 3, 4, 5].map((i) => MOUTH.left + 21 + i * 34.5);
 const LOWER = [0, 1, 2, 3].map((i) => MID + (i - 1.5) * 35);
 const upperX = (i: number) => UPPER[i];
 const lowerX = (i: number) => LOWER[i];
@@ -279,39 +281,6 @@ const MOUTH_AREA: Box = { x: 100, y: 232, width: 240, height: 140 };
 /** Round the picture's corner, where each sweet is drawn before its keyframes move it into place. */
 const SWEET_AREA: Box = { x: -42, y: -36, width: 84, height: 98 };
 
-/**
- * A moving part of the story's picture in an HTML layer of its own (`.origin-piece`), so the phone moves a finished
- * picture instead of painting the whole one again: `area` is where it lies in picture units, inside `.origin-space`
- * (picture units on the screen) or inside the piece `within`, and its svg draws in picture units too, so the drawing,
- * the transform origins and the keyframes stay those of the one picture. `over` goes on top, inside it (pieces moving
- * with it).
- */
-function Piece({
-  area,
-  within,
-  className,
-  style,
-  over,
-  children,
-}: {
-  area: Box;
-  within?: Box;
-  className: string;
-  style?: CSSProperties;
-  over?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={`origin-piece ${className}`}
-      style={{ left: area.x - (within?.x ?? 0), top: area.y - (within?.y ?? 0), width: area.width, height: area.height, ...style }}
-    >
-      <svg viewBox={`${area.x} ${area.y} ${area.width} ${area.height}`}>{children}</svg>
-      {over}
-    </div>
-  );
-}
-
 /** The story filling the screen; `free` is the part between heading and controls, where the head has to fit. */
 export function Origin({
   part,
@@ -344,7 +313,7 @@ export function Origin({
     "--zoom-y": `${((box.y - close.box.y) / close.unit).toFixed(1)}px`,
   } as CSSProperties;
   /** Picture units on the screen, for the moving pieces: a point of the picture lands where the svgs show it. */
-  const space: CSSProperties = { transform: `scale(${(1 / unit).toFixed(5)}) translate(${(-box.x).toFixed(1)}px, ${(-box.y).toFixed(1)}px)` };
+  const space = pictureSpace(box, unit);
   const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
   const label =
     part === "sweets"
@@ -381,7 +350,7 @@ export function Origin({
           </defs>
           <rect className="origin-sky" {...box} clipPath="url(#origin-frame-back)" />
         </svg>
-        <div className="origin-space" style={space}>
+        <div className="teeth-space" style={space}>
           {/* In the morning the night ends with the sun coming up beside the head. */}
           {daytime === "morning" && part === "grow" && (
             <Piece area={{ x: 42, y: 42, width: 60, height: 60 }} className="origin-sunrise">
@@ -449,7 +418,7 @@ export function Origin({
           </g>
         </svg>
 
-        <div className="origin-space" style={space}>
+        <div className="teeth-space" style={space}>
           {BROWS.map((brow) => (
             <Piece key={brow.side} area={brow.area} className={`origin-brow ${brow.side}`} style={sweets ? DELIGHT : undefined}>
               <path d={brow.d} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
