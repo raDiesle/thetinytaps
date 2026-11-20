@@ -213,6 +213,20 @@ describe("Aufs Töpfchen", () => {
     expect(listed.sort()).toEqual(sung.sort());
   });
 
+  it("lets the waiting song play alone while sitting: no line and no sound with the thoughts, none as sitting begins", () => {
+    // The user wants to listen to the song: a voice or sound over it (even with the song hushed) is in the way.
+    const play = readFileSync("src/games/potty/PottyPlay.tsx", "utf8");
+    const nextScene = play.match(/const nextScene = \(\) => \{([\s\S]*?)\n {2}\};/)?.[1];
+    expect(nextScene).toBeDefined();
+    expect(nextScene).not.toMatch(/\bsay\(|\bplay[A-Z]\w*\(|\bsound\(/);
+    // No thought's line nor what the ✓ is for is said anywhere: both were said over the song.
+    expect(play).not.toMatch(/texts\.(scenes|finish)\b/);
+    // Sitting down hushes what is still said and says nothing of its own.
+    expect(play).toMatch(/if \(id === "sit"\) hush\(\);\n\s*else /);
+    const sitCase = play.match(/case "sit":([\s\S]*?)(case|default)/)?.[1] ?? "";
+    expect(sitCase).not.toMatch(/sound\(|say\(/);
+  });
+
   it("keeps the thought bubble's stand-ins for pipi and kaka out of the waiting song", () => {
     // Every block of lyrics in the Suno sheet; the song is about the waiting, the bubble shows the rest.
     const sheet = readFileSync("src/games/potty/musik/suno-lied.md", "utf8");

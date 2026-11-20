@@ -68,12 +68,14 @@ until something comes out (a toy train out of a tunnel, a tortoise; for children
 The hen, the whale, the mole, the hourglass and the funnel come first, in this order, as far as they fit what was said
 (`FIRST_SCENES`, the user's favourites), the others after them in a random order, shuffled anew each round (`scenesFor`).
 The wheelbarrow, the water slide, the dandelion, the tube slide, the paper boat, the kite and the rain with its puddle
-were taken out with their pictures (user feedback, November 2026; their ideas are `rejected`). The thoughts added on 30 October 2026 speak German in every
-language until they are translated (`sayScene`). A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
+were taken out with their pictures (user feedback, November 2026; their ideas are `rejected`). A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
 else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
 (`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown
-since the user wanted only the helping ones. Only tapped scenes speak (and the first, which explains the ✓). Nothing else
-sounds while the waiting song plays: no sound with a thought, none on a tap that only ripples, no plop on sitting down.
+since the user wanted only the helping ones. Nothing speaks or
+sounds while the waiting song plays (user feedback, November 2026: the song couldn't be listened to): sitting down hushes
+a line still said from the step before and says none of its own, no thought is said (tapped or not) and nothing explains
+the ✓, no sound comes with a thought, none on a tap that only ripples, no plop on sitting down. The thoughts' lines and
+`finish` stay in `POTTY_TEXTS` as recorded data, said by nothing.
 Only one of the two green ✓ (a framed group „Was ist im Töpfchen?“, ✓💧 and ✓💩, a yellow ring on the one the child
 said; Enter on a keyboard is that one, else ✓💧) or „nichts“ under them ends the waiting. So a child can sit on the real
 potty and play along, and a grown-up taps the ✓ of what really came – that picks `fertig-pipi` or `fertig-kaka`. There is
@@ -99,8 +101,8 @@ inline `t({ … })`): another language goes next to them when asked for; a new l
 (root `CLAUDE.md`, Language: inline `t({ en: "…" })`, and the first English-first line of `POTTY_TEXTS`, German first so
 far, teaches it a line's first language, with a test), and a changed German line is changed in its German and loses its
 translations until then. Everything Tapsi's story says is played from its ElevenLabs recording (`voice.ts`, files in `stimme/`),
-recorded in every app language (November 2026); a thought not translated yet stays silent in another language. Two sentences in a row (what the child said, then the
-next step; a thought, then what the ✓ is for) go one after the other (`queue`), never as one joined sentence, which
+recorded in every app language (November 2026). Two sentences in a row (what the child said, then the
+next step; „nichts“, then washing hands) go one after the other (`queue`), never as one joined sentence, which
 would have no recording. A new or changed line is listed by `src/content/recordedLines.ts` (`toepfchen`) and recorded
 with `bun run voice make --only toepfchen`, only when the user asks. Tapsi (`TAPSI.name` is `Localized`) is „Tapsi“ in English and Spanish, „塔普西“, „टैप्सी“,
 „تابسي“, „Тапси“. „Pipi“ and „Kaka“ are pee/poop, pipí/popó, 尿尿/便便, सू-सू/पॉटी, بيبي/كاكا, „пи-пи“/„ка-ка“ (as in the
@@ -109,7 +111,7 @@ plural, „вы“; to the child: tú, तुम, „ты“. Hindi verbs agree 
 never the subject of a gendered verb („टैप्सी को सू-सू जाना है“); Arabic says "we" (هيّا نغسل), "I" or „بحاجة إلى“.
 `potty.test.ts` checks that every language has every line, Chinese, Hindi and Arabic with no Latin letters.
 
-The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and gets quiet while the voice speaks. In all seven languages (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
+The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and plays alone (nothing speaks while Tapsi sits; it would still get quiet for a voice). In all seven languages (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 
 ## Rules
 
@@ -161,8 +163,10 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 - The thoughts are only for what was said – flowing water and letting go for pipi, pressing for kaka, both kinds for
   both or when nobody said. A new one goes into `WAIT_SCENES` (with an emoji) and `POTTY_TEXTS.scenes`; its picture,
   when made, gets two frames. A thought taken out takes its pictures with it (`potty.test.ts`).
-- While the waiting song plays, it plays alone: thoughts and taps make no sound (sounds over the song disturbed the
-  user); only the voice speaks, and the song hushes for it.
+- While the waiting song plays (step 6, sitting), it plays alone: no voice and no sound at all – not the step's own
+  line, no thought, nothing about the ✓, no sound on a thought or a tap (sounds over the song disturbed the user, and
+  then the voice did too, November 2026: the song couldn't be listened to). Sitting down hushes what the step before
+  still says. Never bring a line or sound back into the waiting (`potty.test.ts`).
 - A thought stays long enough for a toddler to look at it (`WAIT_SCENE_MS`, 8 s; 2.6 s was far too short for the user).
 - In a thought the child watches what flows or comes out, dry and happy – never wet, never a puddle under it (the
   elephant once soaked Tapsi). What comes out is seen only coming out, wholly hidden before: the tortoise's head right

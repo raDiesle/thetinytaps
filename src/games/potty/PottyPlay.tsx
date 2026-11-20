@@ -54,6 +54,7 @@ import { WaitClock } from "./WaitClock";
 import { WeekStars } from "./WeekStars";
 import { useWaitingMusic } from "./waitMusic";
 import { useStepAddress } from "@/lib/stepAddress";
+import { hush } from "@/lib/voice";
 
 const flush = recorded("flush", playFlush);
 const splash = recorded("splash", playSplash);
@@ -123,8 +124,6 @@ export function PottyPlay() {
   const atRef = useRef<At>(START);
   /** What waits to happen later in this step (`later`), each as the function that cancels it. */
   const timers = useRef(new Set<() => void>());
-  /** The ✓ was explained once in this round. */
-  const toldFinish = useRef(false);
   /** When the step began, for `TAP_GUARD_MS`. */
   const startedAt = useRef(0);
   /** A grown-up tapped a ✓ in this round: something really came, so the end brings a star. */
@@ -198,11 +197,6 @@ export function PottyPlay() {
   const say = (text: string, queue = false) => pottyVoice.say(text, language.id, { queue });
   // Its few dozen lines are fetched as it starts, so none comes late (src/lib/voice.ts: `loadAll` only for so few).
   useEffect(() => pottyVoice.loadAll(language.id), [language.id]);
-  /** A thought's line, in German where it is not translated yet, and after it what the ✓ is for. */
-  const sayScene = (id: string, withFinish: boolean) => {
-    say(texts.scenes[id] ?? POTTY_TEXTS.de.scenes[id]);
-    if (withFinish) say(texts.finish, true);
-  };
   const sound = (ms: number, play: () => void) => {
     later(ms, play);
   };
@@ -231,7 +225,9 @@ export function PottyPlay() {
     const line = texts.steps[id](t(TAPSI.name), came ?? saidNow);
     // The end shows this week's stars, with a new one only when a ✓ said what really came in this round.
     const star = id === "stars" && checked.current && !starred.current;
-    if (star) say(texts.star, queue);
+    // Sitting is the waiting song's alone: no line of its own, and what the step before still said stops.
+    if (id === "sit") hush();
+    else if (star) say(texts.star, queue);
     else if (nothing && id === "wash") {
       say(texts.nothing, queue);
       say(line, true);
@@ -261,7 +257,7 @@ export function PottyPlay() {
       case "down":
         sound(moves ? 700 : 0, playWhoosh);
         break;
-      // Sitting starts the waiting song, which plays alone: no plop over its first bars.
+      // Sitting starts the waiting song, which plays alone: no plop over its first bars, no line.
       case "done":
         if (came !== "kaka") sound(0, playTrickle);
         if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
@@ -308,18 +304,11 @@ export function PottyPlay() {
 
   /**
    * While sitting Tapsi thinks of the next thing, endlessly – the animal sits as long as it takes. It comes by itself
-   * every few seconds, or at once on a tap; only a tapped one is said, so the voice doesn't talk all the time.
+   * every few seconds, or at once on a tap, silently: the waiting song plays alone, with no sound and no voice over it
+   * (both disturbed the user, who wants to listen to the song).
    */
-  const nextScene = (tapped: boolean) => {
-    const index = (atRef.current.scene + 1) % scenes.length;
-    const scene = scenes[index];
-    // No sound: the waiting song plays alone (sounds over it disturbed the user).
-    goTo({ ...atRef.current, scene: index }, SCENE_MS);
-    // Once per round the voice says what the ✓ is for; after that only tapped scenes speak.
-    if (!toldFinish.current) {
-      toldFinish.current = true;
-      sayScene(scene.id, true);
-    } else if (tapped) sayScene(scene.id, false);
+  const nextScene = () => {
+    goTo({ ...atRef.current, scene: (atRef.current.scene + 1) % scenes.length }, SCENE_MS);
   };
 
   /**
@@ -337,7 +326,7 @@ export function PottyPlay() {
       if (!sittingNow) playRandomNote();
       return;
     }
-    if (sittingNow) nextScene(true);
+    if (sittingNow) nextScene();
     else {
       playPop();
       jump(index + 1);
@@ -347,7 +336,7 @@ export function PottyPlay() {
   // The story goes on by itself where nothing real has to happen (Step.auto), and the thoughts follow each other. Through a ref, so the timer started for a step runs with what was picked meanwhile.
   const goOn = useRef(() => {});
   goOn.current = () => {
-    if (storyFor(atRef.current.nothing)[atRef.current.step].id === "sit") nextScene(false);
+    if (storyFor(atRef.current.nothing)[atRef.current.step].id === "sit") nextScene();
     else begin(atRef.current.step + 1);
   };
   useEffect(() => {
