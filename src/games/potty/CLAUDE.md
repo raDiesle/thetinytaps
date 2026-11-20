@@ -6,9 +6,10 @@ A picture story like „Gefühle“: every step is a Gemini picture (`bilder/`, 
 its second frame (`-b`) fading in and out so the foxes move a little; a new picture fades in over the one before
 (which stays below it meanwhile) and settles from a little closer. A step can play a tiny animation once before its
 picture (`Step.moves`: trousers going down, sitting down; `StoryPicture`'s `moves`); with `Step.again` it plays again
-after that pause, over and over until the story goes on (trousers down, so the child sees what to do while doing it). Drawn on top (emoji and CSS):
-what Tapsi feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubble, while sitting the clock on
-the wall and the thought bubble, and at the bottom the row of step icons (each one jumps there) with the
+after that pause, over and over until the story goes on (trousers down, so the child sees what to do while doing it). Drawn on top (SVG and CSS):
+the picture shaking when the tummy rumbles, the call bubble (`CallBubble.tsx`: a speech bubble beside Tapsi's head
+with only the potty in it, `fox-toepfchen`, cut out of `fox-bad`), while sitting the clock on the wall and the thought
+bubble, and at the bottom the row of step icons (each one jumps there) with the
 grown-ups' buttons on the right next to it.
 
 The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both needs, since a child often can't tell beforehand.
@@ -194,6 +195,11 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   tablet and a computer after changing it.
 - A picture of a movement (`moves`) is drawn from the step's own picture as its only reference, changing only the
   child's trousers and pose, so it blends into it without anything jumping (`prompts.py moves`).
+- What Tapsi feels or wants is shown by its picture, and where it says something, by one picture in a speech bubble
+  placed beside its head in the picture (`.pt-scene`) – never by emoji floating over the picture or a row of symbols
+  (💦 🌀 over the need, 📣 💧 💩 in the call bubble were taken out, user feedback, November 2026). What the grown-up
+  picks stays on the buttons below. A thing in a bubble is cut out of one of the story's own pictures, so it looks the
+  same as in the bathroom (`bilder/README.md`).
 - Mama and Papa stand together and, once called, stay in every picture to the end, cheering or being silly.
   Nobody else comes in; every picture of a place is drawn from that place's first picture (`essen` for the
   kitchen, `bad` for the bathroom) as its only reference, so the room never changes (see `bilder/README.md`).

@@ -23,6 +23,7 @@ import {
   type Went,
   type Which,
 } from "./content";
+import { CALL_PICTURE } from "./CallBubble";
 import { addStar } from "./stars";
 import { loopPosition, waitLanguageFor, waitLanguageOf } from "./waitMusic";
 
@@ -220,6 +221,8 @@ describe("Aufs Töpfchen", () => {
       ...thoughts.flatMap((name) => [name, `${name}-b`]),
     ]);
     expect([...names].map((name) => `${TAPSI.pictures}-${name}.webp`).filter((f) => !files.includes(f))).toEqual([]);
+    // The potty in Tapsi's speech bubble while it calls, cut out of the bathroom picture.
+    expect(files).toContain(`${CALL_PICTURE}.webp`);
     // Only Tapsi goes to the potty: pictures of other animals would only be downloaded for nothing.
     expect(files.filter((f) => !f.startsWith(`${TAPSI.pictures}-`))).toEqual([]);
     // A thought taken out of the bubble takes its pictures with it (the user removed seven, November 2026).

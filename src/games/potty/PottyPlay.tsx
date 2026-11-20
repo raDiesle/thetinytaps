@@ -53,6 +53,7 @@ import {
   WAIT_SCENE_MS,
   type Went,
 } from "./content";
+import { CALL_PICTURE, CallBubble } from "./CallBubble";
 import { framesFor, preloadImages } from "./images";
 import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
@@ -205,6 +206,7 @@ export function PottyPlay() {
     const here = storyFor(at.nothing);
     const nexts = here[at.step]?.id === "sit" ? [STEPS[SIT + 1], ...storyFor(true).slice(SIT + 1)] : [here[at.step + 1]];
     const names = nexts.flatMap((s) => (s ? picturesFor(s, s.id === "done" ? "unsure" : (went ?? said)) : [])).map((p) => `${TAPSI.pictures}-${p}`);
+    if (nexts.some((s) => s?.id === "call")) names.push(CALL_PICTURE);
     if (here[at.step]?.id === "down") names.push(...scenes.map((s) => `${TAPSI.pictures}-${scenePicture(s)}`));
     preloadImages(names);
   }, [at.step, at.nothing, said, went, scenes]);
@@ -467,8 +469,6 @@ export function PottyPlay() {
   // The picture before stays under the new one while it fades in, so pictures blend into each other.
   const [shown, setShown] = useState({ now: pictures, before: null as string[] | null });
   if (shown.now.join() !== pictures.join()) setShown({ now: pictures, before: shown.now });
-  /** The needs Tapsi feels and calls for: both while nobody knows. */
-  const feels = said === "pipi" || said === "kaka" ? [said] : NEEDS;
   /** The ✓ with a yellow ring: what the child said, when that was one of the two. */
   const expected = said === "pipi" || said === "kaka" ? said : null;
 
@@ -488,12 +488,6 @@ export function PottyPlay() {
         className={beat > 1 ? "pt-picture pt-picture-new" : "pt-picture"}
       />
 
-      {/* Drawn on top of the picture: what the animal feels and says, without words. */}
-      {step.id === "need" && (
-        <div key={beat} className="pt-feel" aria-hidden>
-          {feels.map((n) => (n === "pipi" ? "💦" : "🌀")).join("")}
-        </div>
-      )}
       {/* While sitting: everybody waits (a clock on the wall ticks), Tapsi thinks of things that help in a bubble. */}
       {sitting && <WaitClock />}
       {sitting && <WaitMouse paused={paused} />}
@@ -514,14 +508,8 @@ export function PottyPlay() {
       )}
       {/* The end: this week's stars over the party picture. */}
       {step.id === "stars" && <WeekStars log={log} fresh={fresh} />}
-      {step.id === "call" && (
-        <div className="pt-call" aria-hidden>
-          <span>📣</span>
-          {feels.map((n) => (
-            <span key={n}>{NEED_EMOJI[n]}</span>
-          ))}
-        </div>
-      )}
+      {/* „Mama! Papa!“: a speech bubble with the potty, without words. */}
+      {step.id === "call" && <CallBubble />}
 
       {/* The pause screen while sitting, under the buttons; a tap on it goes on (act). */}
       {sitting && paused && (
