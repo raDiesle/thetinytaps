@@ -33,6 +33,7 @@ import type { Localized } from "@/lib/language";
 import { GIFTS, type Gift, type GiftId } from "./gifts";
 import type { GrowTexts } from "./growth";
 import { HOMES, type Home, type HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
 // who lives where (N-09) and what it gives us (Z-01); what the small ones become (Z-12) is in growth.tsx. The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
@@ -874,7 +875,7 @@ export const ANIMALS: Animal[] = [
  * its words in each translated language, and that these have none yet – once translated, take them off this list.
  */
 export const GERMAN_ONLY: { animals: string[]; foods: string[]; homes: string[]; gifts: string[]; growths: string[] } = {
-  animals: ["hahn", "taube", "truthahn", "pfau", "muecke", "schlange", "kueken", "fliege"],
+  animals: [],
   foods: [],
   homes: [],
   gifts: [],
@@ -972,6 +973,8 @@ export interface AnimalTranslation {
   gifts: (german: GiftTexts) => GiftTexts;
   /** What "Was wird aus mir?" says; a small one without its words gets the whole German sentence. */
   growth: (german: GrowTexts) => GrowTexts;
+  /** What „Wer macht das Geräusch?“ says; an animal without its words gets the whole German sentence. */
+  sound: (german: SoundTexts) => SoundTexts;
 }
 
 /** Every language besides German, by its id. */

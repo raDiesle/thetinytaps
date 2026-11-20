@@ -18,3 +18,31 @@ export const BACK_TO_SHELF: Localized = {
 
 /** „Nochmal“: the same again (a level at its end, a page that failed to load). */
 export const AGAIN: Localized = { de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" };
+
+/** „Pause“: a game's pause button and the screen while it waits (Zähne putzen, Aufs Töpfchen). */
+export const PAUSE: Localized = { de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" };
+
+/** The pause button while paused: going on. */
+export const GO_ON: Localized = { de: "Weiter", en: "Next", zh: "继续", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" };
+
+/** Under „Pause“ on a touch screen: how to go on. */
+export const TAP_TO_GO_ON: Localized = {
+  de: "Tippen: weiter",
+  en: "Tap: go on",
+  zh: "点一下：继续",
+  hi: "टैप: आगे",
+  es: "Toca: seguir",
+  ar: "لمسة: متابعة",
+  ru: "Нажми — и дальше",
+};
+
+/** Under „Pause“ with a keyboard: how to go on. */
+export const SPACE_OR_TAP_TO_GO_ON: Localized = {
+  de: "Leertaste oder Tippen: weiter",
+  en: "Space or tap: go on",
+  zh: "空格键或点一下：继续",
+  hi: "स्पेस या टैप: आगे",
+  es: "Espacio o toque: seguir",
+  ar: "المسافة أو لمسة: متابعة",
+  ru: "Пробел или нажатие — и дальше",
+};

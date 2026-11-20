@@ -3,10 +3,11 @@ import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@
 
 // The stories and levels are written in German (`content.ts`, `trail/levels.ts`); each other language
 // has a phrasebook with the same sentences, by the German text (`en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`,
-// `ru.ts`), loaded with the app language (src/content/texts). Speech always uses the voice of the language the sentence is in, so a sentence missing from a
+// `ru.ts`), loaded with the app language (src/content/texts). The films written English first are keyed by their
+// English text in those books, and German has a book of them too (`de.ts`). Speech always uses the voice of the language the sentence is in, so a sentence missing from a
 // phrasebook is said in German by the German voice, never German words by another language's voice.
 
-/** The phrasebook of each language besides German. */
+/** The phrasebook of each language; German's holds only the films written English first, by their English text (`de.ts`). */
 export const PHRASEBOOKS: Partial<Record<TargetLanguageId, Record<string, string>>> = byLanguage((texts) => texts.elevator);
 
 const GERMAN = targetLanguageFor("de");

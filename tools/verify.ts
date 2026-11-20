@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-// `bun run verify`: lint and format check, typecheck and unit tests, the check before every commit. The three run at
+// `bun run verify`: lint and format check, typecheck (the app, and the scripts in scripts/) and unit tests, the check before every commit. They run at
 // the same time (one after the other they took 18 s, 90 % of it the tests; side by side, with the test files spread
 // over the cores by `bun test --parallel`, about 6 s), and each one's output is printed whole and in a fixed order once
 // it is done, so nothing is mixed up.
@@ -41,6 +41,13 @@ const ROOT = join(import.meta.dir, "..");
 export const STEPS: Step[] = [
   { name: "lint", args: [join(ROOT, "node_modules/.bin/biome"), "check"], shown: "biome check" },
   { name: "typecheck", args: [join(ROOT, "node_modules/.bin/tsc"), "--noEmit"], shown: "tsc --noEmit" },
+  // The plain-JS scripts in scripts/, two of which spend money (ElevenLabs, Gemini): checked by their JSDoc types with a
+  // config of their own, since `allowJs` in the main one would also check src/sw.js. Under a second, alongside the rest.
+  {
+    name: "typecheck scripts",
+    args: [join(ROOT, "node_modules/.bin/tsc"), "--noEmit", "-p", "tsconfig.scripts.json"],
+    shown: "tsc --noEmit -p tsconfig.scripts.json",
+  },
   { name: "tests", args: ["test", "--parallel"], shown: "bun test --parallel" },
 ];
 
@@ -112,7 +119,7 @@ async function verify() {
   const others = STEPS.filter((step) => step.name !== "tests");
   // On GitHub's runner (`CI`) the tests wait for lint and typecheck and run one file after the other, as they always
   // did there: its two cores are slow enough that a test sharing them could run past `bun test`'s 5 s limit, which
-  // stopped a deploy before (see src/heavyTest.ts). Everywhere else all three start at once.
+  // stopped a deploy before (see src/heavyTest.ts). Everywhere else all of them start at once.
   const results = process.env.CI ? [...(await runTogether(others)), ...(await runTogether([CI_TESTS]))] : await runTogether(STEPS);
   console.log(summaryLine(results, performance.now() - started));
   return verifyExitCode(results);

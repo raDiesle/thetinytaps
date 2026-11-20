@@ -17,6 +17,13 @@ import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 
 const args = process.argv.slice(2);
+/**
+ * The word after `--<name>`, else `fallback`.
+ * @template F
+ * @param {string} name
+ * @param {F} fallback
+ * @returns {string | F}
+ */
 const option = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i === -1 ? fallback : args[i + 1];
@@ -73,12 +80,17 @@ const dir = mkdtempSync(join(tmpdir(), "song-verses-"));
 const wav = join(dir, "song.wav");
 execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", out, "-ac", "1", "-ar", "16000", wav]);
 
-const letters = (text) => text.toLocaleLowerCase(lang).replace(/[^\p{L}]/gu, "");
+const letters = (/** @type {string} */ text) => text.toLocaleLowerCase(lang).replace(/[^\p{L}]/gu, "");
 
 /** The words Whisper hears in the song, with their times. */
 function hear() {
-  execFileSync("whisper-cli", ["-m", model, "-l", lang, "-f", wav, "-ml", "1", "-dtw", "base", "-oj", "-of", join(dir, "song")], { stdio: "ignore" });
+  execFileSync(
+    "whisper-cli",
+    ["-m", model, "-l", /** @type {string} checked above */ (lang), "-f", wav, "-ml", "1", "-dtw", "base", "-oj", "-of", join(dir, "song")],
+    { stdio: "ignore" },
+  );
   // Whisper's pieces become words: a piece starting with a space starts a new word.
+  /** @type {{ t: number; w: string }[]} */
   const words = [];
   for (const { text, offsets } of JSON.parse(readFileSync(join(dir, "song.json"), "utf8")).transcription) {
     const w = letters(text);
@@ -89,7 +101,7 @@ function hear() {
   return words;
 }
 
-const distance = (a, b) => {
+const distance = (/** @type {string} */ a, /** @type {string} */ b) => {
   const row = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) {
     let diag = row[0];
@@ -107,6 +119,9 @@ const distance = (a, b) => {
  * Where `line` begins among `words` (an index), from the time `after` on: the first place
  * where the heard letters match the line's first three words (Whisper mishears sung words,
  * so a quarter may differ). Null when it isn't there.
+ * @param {{ t: number; w: string }[]} words
+ * @param {string} line
+ * @param {number} after
  */
 function find(words, line, after) {
   const target = line.split(/\s+/).slice(0, 3).map(letters).join("");
@@ -122,7 +137,9 @@ function find(words, line, after) {
 // break too early (at the end of the break), so it is taken no earlier than shortly before
 // the second word. Checked against a spectrogram: the voice came in where this says.
 const words = hear();
+/** @type {number[]} */
 const verses = [];
+/** @type {boolean[]} */
 const smeared = [];
 for (const line of firstLines) {
   const after = (verses.at(-1) ?? -1) + 1;
@@ -153,7 +170,7 @@ verses.forEach((t, i) => {
     `part ${i + 1}  ${t.toFixed(2).padStart(6)} s  ${length === null ? "finale" : `${length.toFixed(1)} s`}${warn ? "  <- odd length" : ""}${smeared[i] ? "  <- unsure start" : ""}  ${firstLines[i]}`,
   );
 });
-console.log(`written       ${out} and ${out.replace(/\.mp3$/, ".json")}; brushing lasts ${(verses.at(-1) - verses[0]).toFixed(1)} s`);
+console.log(`written       ${out} and ${out.replace(/\.mp3$/, ".json")}; brushing lasts ${(/** @type {number} */ (verses.at(-1)) - verses[0]).toFixed(1)} s`);
 if (odd)
   console.log(
     "Odd length: listen there, a new take may be better. Unsure start: Whisper smeared the line's first words, draw a spectrogram there (see /zahnputzlied) and correct the .json.",

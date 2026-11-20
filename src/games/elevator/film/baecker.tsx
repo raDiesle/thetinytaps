@@ -23,7 +23,7 @@ const FAR = 2400;
 
 const PARENT: Look = { shirt: "#20c997", pants: "#495057", hair: "#8d5a3b" };
 /** The baker is a bear in a white jacket and a baker's hat (a grown-up in a role, so one of the app's mascots). */
-const BAKER: Look = { shirt: "#f8f9fa", pants: "#868e96", hair: "#8d5a3b", animal: "bear" };
+export const BAKER: Look = { shirt: "#f8f9fa", pants: "#868e96", hair: "#8d5a3b", animal: "bear" };
 
 /** The child, in its own clothes; in the bakehouse with a baker's hat like the baker's. */
 function Child({ pose, face = 1, chef = false }: { pose: Pose; face?: 1 | -1; chef?: boolean }) {
@@ -207,7 +207,7 @@ const goodsIcon = (bake: Bake): Picture =>
       <Goods bake={bake} baked />
     </g>
   ));
-const BAKE_ICON: Record<Bake, Picture> = { broetchen: goodsIcon("broetchen"), brezel: goodsIcon("brezel"), kuchen: goodsIcon("kuchen") };
+export const BAKE_ICON: Record<Bake, Picture> = { broetchen: goodsIcon("broetchen"), brezel: goodsIcon("brezel"), kuchen: goodsIcon("kuchen") };
 
 /** A choice's card: a close-up of the baked goods on their tray on the floury table, as they will come out of the
  * oven, warm. */
@@ -232,7 +232,7 @@ const bakeCard = (bake: Bake): Picture =>
       </g>
     </g>
   ));
-const BAKE_CARD: Record<Bake, Picture> = { broetchen: bakeCard("broetchen"), brezel: bakeCard("brezel"), kuchen: bakeCard("kuchen") };
+export const BAKE_CARD: Record<Bake, Picture> = { broetchen: bakeCard("broetchen"), brezel: bakeCard("brezel"), kuchen: bakeCard("kuchen") };
 
 const BAKE_SAY: Record<Bake, string> = {
   broetchen: "Brötchen!",
@@ -240,13 +240,13 @@ const BAKE_SAY: Record<Bake, string> = {
   kuchen: "Einen Kuchen!",
 };
 /** Each option's sound as its card comes out. */
-const BAKE_SOUND: Record<Bake, Cue[]> = {
+export const BAKE_SOUND: Record<Bake, Cue[]> = {
   broetchen: [[0, playPlop]],
   brezel: [[0, playRustle]],
   kuchen: [[0, playChime]],
 };
 
-const SHOP_ICON = pic(300, 260, () => (
+export const SHOP_ICON = pic(300, 260, () => (
   <g>
     <path d="M-130 -60 L0 -130 L130 -60 Z" fill="#e8590c" stroke={INK} strokeWidth="8" strokeLinejoin="round" />
     <rect x="-120" y="-60" width="240" height="190" fill="#ffd8a8" stroke={INK} strokeWidth="8" />
@@ -285,18 +285,18 @@ const TABLE_ICON = pic(320, 200, () => (
 // ---------- In front of the bakery: what do we bake? ----------
 
 const SHOP = { left: 420, right: 1300, top: GROUND - 500 };
-const DOOR_X = 560;
+export const DOOR_X = 560;
 const DOOR = { w: 130, h: 220 };
 /** The shop window, with the goods on show in it. */
 const WINDOW = { left: 740, right: 1240, top: 470, bottom: 700 };
 /** Where each of the goods stands in the window: what the child taps to pick it. */
-const IN_WINDOW: Record<Bake, Point> = { broetchen: [845, 660], brezel: [990, 650], kuchen: [1135, 662] };
+export const IN_WINDOW: Record<Bake, Point> = { broetchen: [845, 660], brezel: [990, 650], kuchen: [1135, 662] };
 const KID_SHOP = 450;
 const PARENT_SHOP = 290;
 
 /** The bakery's front: a house with a roof, a shop window under a striped awning, the door with its bell, and the
  * golden pretzel hanging as its sign. */
-function Bakery({ open }: { open: boolean }) {
+export function Bakery({ open }: { open: boolean }) {
   const { left, right, top } = SHOP;
   const w = right - left;
   const mid = (left + right) / 2;
@@ -989,7 +989,7 @@ function OvenDraw({ step, busy, picks }: SceneProps) {
   );
 }
 
-const oven: Scene = {
+export const oven: Scene = {
   id: "ofen",
   icon: OVEN_ICON,
   focus: [150, 200, 1300, 620],
@@ -1150,7 +1150,7 @@ function HomeDraw({ step, busy, picks }: SceneProps) {
   );
 }
 
-const home: Scene = {
+export const home: Scene = {
   id: "fruehstueck",
   icon: TABLE_ICON,
   focus: [150, 300, 1250, 520],

@@ -84,4 +84,70 @@ export const DAYS_EN: Partial<Record<string, DayText>> = {
     ],
     end: "At home, Little Bear tells how high he climbed. Then he falls asleep. Good night! The day is over.",
   },
+  "tag-9": {
+    pages: [
+      "Good morning! It's getting light outside. Little Bear wakes up. Today is a kindergarten day.",
+      "After that, Little Bear pads into the kitchen. Big Bear is setting the table.",
+      "Then Big Bear takes Little Bear to kindergarten. Little Fox is already painting at the table there.",
+      "After painting, Little Fox builds a tall tower in the playroom.",
+      "After lunch, everyone lies down for a nap. Little Fox and Hedgehog fall asleep quickly.",
+      "After the nap, everyone plays in the playroom. Soon the grown-ups come to pick them up.",
+    ],
+    end: "At home, Little Bear tells all about kindergarten. Then he falls asleep. Good night! The day is over.",
+  },
+  "tag-10": {
+    pages: [
+      "Good morning! Little Bear and Big Bear are having breakfast together.",
+      "After breakfast, off they go. Bunny and the raccoon are already sitting at the drawing table.",
+      "Later, everyone plays outside in the sandbox.",
+      "In the afternoon, Big Bear picks him up. It was a long day.",
+      "After dinner, it's time to brush teeth. Off to the bathroom!",
+    ],
+    end: "With clean teeth, Little Bear snuggles into bed. Good night! The day is over.",
+  },
+  "tag-11": {
+    pages: [
+      "Good morning! Little Bear's hair is very long. So today they are going to the hairdresser's.",
+      "After that, they go shopping. Little Bear is carrying his cuddly rabbit.",
+      "In the afternoon, Little Bear rides his scooter outside. Then Little Fox comes along.",
+      "After that, Little Bear is very hungry. Big Bear opens the fridge.",
+      "In the evening, Little Bear plays with his train set in his pajamas.",
+    ],
+    end: "After the story, Little Bear falls asleep. Good night! The day is over.",
+  },
+  "tag-12": {
+    pages: [
+      "Good morning! Today Little Fox comes over to play in the garden.",
+      "After that, Little Bear and Little Fox water the flowers.",
+      "In the evening, the doorbell rings. It's Little Fox's dad.",
+      "After that, Little Bear packs his suitcase. Tomorrow they are going to the sea!",
+    ],
+    end: "At last Little Bear is asleep. Tomorrow they are going to the sea. Good night! The day is over.",
+  },
+  "tag-13": {
+    pages: [
+      "Good morning! Today everyone is driving to Grandma Bear's. She lives by the sea.",
+      "At Grandma Bear's, the sun is shining. Little Bear and Big Bear have a picnic on the meadow.",
+      "In the evening, Big Bear drives home with the baby. Tonight Little Bear sleeps at Grandma's for the first time.",
+    ],
+    end: "Grandma Bear tucks him in snugly. Tomorrow they are building sandcastles by the sea. Good night! The day is over.",
+  },
+  "tag-14": {
+    pages: [
+      "Good morning! Little Bear has a cold. Today he stays at home.",
+      "By late morning, he is already feeling better. He draws a picture for Big Bear.",
+      "After lunch, Little Bear gets out his puzzle with the farm animals.",
+      "After that, Little Bear plays with his red car. The baby crawls over to him.",
+      "In the evening, Little Bear is painting at the table. The baby wants to paint too.",
+    ],
+    end: "The cold is almost gone. Little Bear is fast asleep. Good night! The day is over.",
+  },
+  "tag-15": {
+    pages: [
+      "Good morning! It rained all night. Little Bear and Little Fox go for a walk outside.",
+      "On the way home, Little Bear walks through the park. Along comes the fox lady with a little dog.",
+      "In the evening, Little Fox comes to visit. They are both muddy from the rain. Into the bathtub!",
+    ],
+    end: "After that, Little Fox is picked up. Freshly bathed, Little Bear falls asleep. Good night! The day is over.",
+  },
 };

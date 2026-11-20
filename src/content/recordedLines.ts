@@ -61,7 +61,7 @@ function teeth(language: TargetLanguageId): RecordedLine[] {
 function elevator(language: TargetLanguageId): RecordedLine[] {
   const groups = voiceLines().find((g) => g.href === "/kleine-abenteuer/")?.groups ?? [];
   const german = groups.filter((g) => g.label !== ENGLISH_FILMS).flatMap((g) => g.lines);
-  // The films written English first: English as written, another language where its phrasebook has the line, German never.
+  // The films written English first: English as written, another language (German too) where its phrasebook has the line.
   const english = groups.filter((g) => g.label === ENGLISH_FILMS).flatMap((g) => g.lines);
   return once([
     ...german.map((line) => {
@@ -69,7 +69,7 @@ function elevator(language: TargetLanguageId): RecordedLine[] {
       return text !== undefined && { text, kind: "instruction" as const };
     }),
     ...english.map((line) => {
-      const text = language === "de" ? undefined : translationOf(line, language, "en");
+      const text = translationOf(line, language, "en");
       return text !== undefined && { text, kind: "instruction" as const };
     }),
   ]);

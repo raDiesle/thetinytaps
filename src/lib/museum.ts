@@ -10,7 +10,15 @@ import { type TrophyWon, useTrophies } from "@/lib/trophies";
  */
 
 /** The trophy room's name: on the shelf's sign, over an empty room, and read out at the trophy that leads there. */
-export const TROPHY_ROOM: EnglishFirst = { en: "Trophy room" };
+export const TROPHY_ROOM: EnglishFirst = {
+  en: "Trophy room",
+  de: "Pokalzimmer",
+  zh: "奖杯室",
+  hi: "ट्रॉफ़ी का कमरा",
+  es: "Sala de trofeos",
+  ar: "غرفة الكؤوس",
+  ru: "Комната кубков",
+};
 
 /** The trophy room's address. */
 export const MUSEUM_PATH = "/pokale/";

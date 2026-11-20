@@ -41,9 +41,13 @@ const scenes = args.includes("--scenes");
 const paths = args.filter((a) => !a.startsWith("--"));
 const folder = paths[0] && statSync(paths[0]).isDirectory() ? paths[0] : "src/games/feelings/bilder";
 
-const grid = async (file) => sharp(file).resize(W, H, { fit: "fill" }).blur(0.6).greyscale().raw().toBuffer();
+const grid = async (/** @type {string} */ file) => sharp(file).resize(W, H, { fit: "fill" }).blur(0.6).greyscale().raw().toBuffer();
 
-/** How much of the whole picture and of its border differs between two pictures. */
+/**
+ * How much of the whole picture and of its border differs between two pictures.
+ * @param {string} first
+ * @param {string} second
+ */
 async function compare(first, second) {
   const [a, b] = await Promise.all([grid(first), grid(second)]);
   let changed = 0;
@@ -107,7 +111,7 @@ for (const [first, second] of scenes ? scenePairs() : framePairs()) {
 }
 
 rows.sort((x, y) => y.edge + y.changed - (x.edge + x.changed));
-const pct = (n) => `${(n * 100).toFixed(0).padStart(3)} %`;
+const pct = (/** @type {number} */ n) => `${(n * 100).toFixed(0).padStart(3)} %`;
 console.log("changed    edge");
 for (const r of rows) {
   const label = scenes ? `${basename(r.second)}  (against ${basename(r.first)})` : r.second;

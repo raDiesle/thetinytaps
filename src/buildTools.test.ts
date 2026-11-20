@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PRODUCTION } from "../tools/appPlugin";
+import { DEV_FILES, mapModule, PRODUCTION } from "../tools/appPlugin";
 import { isTest } from "./testSources";
-import { fontsAsFiles, namedByOwnBytes } from "../tools/pageStart";
+import { fontsAsFiles, namedByOwnBytes, PICTURE_IN_CODE } from "../tools/pageStart";
 
 // Bun bundles the app with one plugin (tools/appPlugin.ts); code written for another bundler would build
 // with holes (no sounds, no pictures) or not at all. These checks keep the code to what the plugin offers.
@@ -27,6 +27,19 @@ test("no value that changes with every build is compiled into the code: it renam
   expect(code.filter(({ text }) => /\bBUILD_TIME\b/.test(text)).map(({ file }) => file)).toEqual([]);
   expect(readFileSync(join(SRC, "..", "tools", "build.ts"), "utf8")).toContain('<meta name="build-time" content=');
   expect(code.find(({ file }) => file === join("lib", "pwa.ts"))?.text).toContain('meta[name="build-time"]');
+});
+
+test("the dev server reads `?glob` files from the disk: imported, the ~25,000 recordings held up its start for 11 s", () => {
+  const sounds = join(SRC, "lib", "sounds");
+  const dev = mapModule(sounds, ["yay.mp3", "list.json"], true);
+  expect(dev).toContain(`"yay.mp3": "${DEV_FILES}lib/sounds/yay.mp3"`);
+  expect(dev).not.toContain('yay.mp3";');
+  // A JSON file is its content, so it stays imported; so does a file outside src/, which the dev server doesn't serve.
+  expect(dev).toContain(`from ${JSON.stringify(join(sounds, "list.json"))}`);
+  expect(mapModule(join(SRC, ".."), ["a.mp3"], true)).toContain("import f0 from");
+  // The build and the tests import every file as before.
+  expect(mapModule(sounds, ["yay.mp3"], false)).toContain(`import f0 from ${JSON.stringify(join(sounds, "yay.mp3"))}`);
+  expect(readFileSync(join(SRC, "..", "tools", "devServer.ts"), "utf8")).toContain("[`${DEV_FILES}*`]: fileOf(SRC, DEV_FILES)");
 });
 
 test("a `?glob` pattern has one extension and no braces, which Bun can't load", () => {
@@ -93,3 +106,8 @@ test("the build for players has React without its development code (several time
     rmSync(dir, { recursive: true, force: true });
   }
 }, 20000);
+
+test("a picture named in a built script is found whole, never in a chunk whose hash begins like an extension", () => {
+  const code = 'import"/static/index.jpg4hze3.js";const a="/static/fox.ab12cd.webp",b="/static/sun.png";';
+  expect([...code.matchAll(PICTURE_IN_CODE)].map((m) => m[0])).toEqual(["static/fox.ab12cd.webp", "static/sun.png"]);
+});

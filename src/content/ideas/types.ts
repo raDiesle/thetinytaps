@@ -13,18 +13,21 @@ export interface Idea {
   effort: Effort;
   /** Already on the README roadmap or in the "bald" list. */
   planned?: boolean;
-  /** Already in the app. */
+  /** Already in the app: no longer shown on /management/, kept only so its number stays taken and links to it work. */
   done?: boolean;
-  /** Partly in the app: what is there already, so the rest is clear. */
+  /**
+   * On a done or rejected idea only: what of it was built, and what was left out on purpose. Never on an open idea –
+   * an idea is done once it is built, and what is still left becomes a new idea of its own (`content.test.ts`).
+   */
   partial?: string;
   /** Decided against it: stays in the list (and keeps its number) so it isn't suggested again. */
   rejected?: boolean;
 }
 
-export type IdeaStatus = "done" | "partial" | "open" | "rejected";
+export type IdeaStatus = "done" | "open" | "rejected";
 
 /** A rejected idea counts as rejected even if a part of it is in the app, so nobody builds the rest. */
-export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.rejected ? "rejected" : idea.partial ? "partial" : "open");
+export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.rejected ? "rejected" : "open");
 
 export interface IdeaArea {
   /** Tells areas apart that share a prefix (the Gefühle book's two games, both C); defaults to the prefix. */

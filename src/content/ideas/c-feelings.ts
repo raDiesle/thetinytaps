@@ -481,6 +481,7 @@ export const feelingsIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Die Gruppe „Frust & Warten“ gibt es (groups.ts), vorerst nur mit den neuen Szenen C-37, C-40, C-48 und C-50 und nur Deutsch; die neuen Szenen stehen in ihren Gruppen. Offen: Jacke und Pfannkuchen hinüber, die neue Reihenfolge und die Farben der Gruppen.",
+      done: true,
     },
     {
       id: "C-55",
@@ -677,6 +678,14 @@ export const feelingsIdeas: IdeaArea = {
       partial:
         "Als Geschichte „Wütend, noch nicht ins Bett“ in Gefühle (alltag.ts, Tag 11), nur Deutsch und noch nicht aufgenommen; die acht Bilder warten in der Bilder-Queue. Statt nur sagen: Fäuste drücken; statt verstecken und Buch wegschieben: Schienen kaputt treten und Buch zerreißen.",
     },
+    {
+      id: "C-74",
+      emoji: "🎨",
+      title: "Gruppen: Jacke und Pfannkuchen zu „Frust & Warten“, neue Reihenfolge und Farben",
+      text: "Die Gruppe „Frust & Warten“ gibt es (C-54). Offen: die Szenen mit der Jacke und dem Pfannkuchen dorthin, die Gruppen in der Reihenfolge der Recherche „gefuehle-gruppen“ (Freude, Traurig, Wütend, Frust, Angst, Müde & zu viel, Igitt & Hoppla, dann die zwei Gruppen mit anderen) und jede Gruppe in der Farbe ihres Gefühls wie im Farbenmonster.",
+      why: "Gleich lange Gruppen in einer Reihenfolge, die mit den Grundgefühlen beginnt, wie Papilio und RULER es tun.",
+      effort: "S",
+    },
   ],
 };
 
@@ -700,6 +709,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Gebaut (4. November 2026) als acht Gesichter (mit C-30): fröhlich, stolz, aufgeregt, ruhig, müde, traurig, wütend, ängstlich, jedes führt zu seiner Gruppe in „Alltagssituationen“. Die Wetter aus der Idee waren zuerst das Zeichen bei „Wie doll ist es?“ (C-36); seit dem 6. November 2026 zeigt das der Regler mit dem kleinen Bären. Die acht Gefühle stehen jetzt in zwei Gruppen, die angenehmen getrennt von den unangenehmen.",
+      done: true,
     },
     {
       id: "C-30",
@@ -710,6 +720,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Gebaut (4. November 2026): acht Karten, je vier mit Fuchs- und Bärenkind, Mama und Papa abwechselnd; nach der Wahl nimmt der Erwachsene das Kind in den Arm. Seit dem 6. November 2026 (Rückmeldung): immer derselbe kleine Bär, angezogen und allein, groß im Bild in einer typischen Lage (Geburtstagskuchen, Turm, offene Tür, Bett, etwas kaputt, Lutscher zu hoch im Regal, Gewitter draußen); die acht Bilder sind gemacht (6. November 2026). Die 16 alten Bilder bleiben für später aufgehoben.",
+      done: true,
     },
     {
       id: "C-31",
@@ -720,6 +731,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Gebaut (4. November 2026): nach dem Gefühl drei Karten, die zu ihm passen (seit C-29 und C-30 zu jedem der acht, `Mood.helps`; zuerst so: (Sonne: toben, Lied, kuscheln; Wolke: kuscheln, trinken, allein sein; Regen: kuscheln, Lied, allein sein; Gewitter: toben, allein sein, trinken)). Seit dem 6. November 2026 (Rückmeldung) ein Spiel für sich im Buch „Gefühle“, „Was brauche ich?“: acht Karten (in den Arm nehmen, allein sein, toben, tief pusten, etwas trinken, etwas essen, ausruhen, ein Lied singen), ohne Gefühl davor; das Pusten zeichnet den kleinen Bären, die sieben Bilder sind gemacht (6. November 2026). Seit dem 6. November 2026 (Wunsch) führt in „Wie geht's dir?“ nach dem Gefühl ein Zettel unten rechts zu „Was brauche ich?“, und dessen ✕ wieder zurück. Seit dem 6. November 2026 (Rückmeldung) wird eine gewählte Karte nicht mehr groß gezeigt: sie bleibt an ihrem Platz und ist nur markiert, die anderen werden blass.",
+      done: true,
     },
     {
       id: "C-32",
@@ -777,6 +789,7 @@ export const feelingsCheckInIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Eingebaut (7. November 2026): Ein getipptes Gefühl sagt seinen Namen vor „Wie doll ist es?“, und alle Sätze von „Wie geht's dir?“ und „Was brauche ich?“ stehen in allen sieben Sprachen auf der Aufnahmeliste. Noch nicht aufgenommen (`bun run voice make --only gefuehle`), bis dahin still.",
+      done: true,
     },
   ],
 };

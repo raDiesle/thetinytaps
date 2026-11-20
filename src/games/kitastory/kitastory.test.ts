@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { KITA_STORY_AR } from "./ar";
+import { KITA_STORY_EN } from "./en";
+import { KITA_STORY_ES } from "./es";
+import { KITA_STORY_HI } from "./hi";
 import { KITA_PAGES, KITA_STORY, SETTLING_STEPS } from "./kitaStory";
+import { KITA_STORY_RU } from "./ru";
+import { KITA_STORY_ZH } from "./zh";
 import { KITA_PICTURE_QUEUE, kitaPicture } from "./kitaStoryPictures";
 
 describe("Tapsi geht in die Kita", () => {
@@ -100,4 +106,35 @@ describe("Tapsi geht in die Kita", () => {
       else expect(kitaPicture(page).prompt, page.id).not.toContain("not in this picture at all");
     }
   });
+});
+
+describe("Tapsi geht in die Kita in every language", () => {
+  const chapterIds = KITA_STORY.map((c) => c.id).sort();
+  const pageIds = KITA_PAGES.map((p) => p.id).sort();
+  const LANGUAGES = { en: KITA_STORY_EN, zh: KITA_STORY_ZH, hi: KITA_STORY_HI, es: KITA_STORY_ES, ar: KITA_STORY_AR, ru: KITA_STORY_RU };
+  /** Tapsi's name, the Kita and Mama's promise by the day's order (the nap, never the clock), as each language writes them. */
+  const SAYS = {
+    en: ["Tapsi", "daycare", "after nap time"],
+    zh: ["塔普西", "托儿所", "午睡以后"],
+    hi: ["टैप्सी", "डेकेयर", "दोपहर की नींद के बाद"],
+    es: ["Tapsi", "guardería", "después de la siesta"],
+    ar: ["تابسي", "الحضانة", "بعد القيلولة"],
+    ru: ["Тапси", "садик", "после тихого часа"],
+  };
+
+  for (const [language, translation] of Object.entries(LANGUAGES)) {
+    test(`${language}: every chapter and page, nothing else`, () => {
+      expect(Object.keys(translation.chapters).sort()).toEqual(chapterIds);
+      expect(Object.keys(translation.pages).sort()).toEqual(pageIds);
+      for (const text of [...Object.values(translation.chapters), ...Object.values(translation.pages)]) expect(text.trim()).not.toBe("");
+    });
+
+    test(`${language}: Tapsi in its own script, the Kita named, and Mama's promise by the nap`, () => {
+      const all = Object.values(translation.pages).join(" ");
+      for (const word of SAYS[language as keyof typeof SAYS]) expect(all).toContain(word);
+      expect(translation.pages.wann).toContain(SAYS[language as keyof typeof SAYS][2]);
+      // Russian, Chinese, Hindi and Arabic are written without Latin letters.
+      if (language !== "en" && language !== "es") expect(all + Object.values(translation.chapters).join(" ")).not.toMatch(/[A-Za-z]/);
+    });
+  }
 });

@@ -1,14 +1,15 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useContext } from "react";
 import { INK } from "@/components/drawing";
-import { FIRE_BLUE, FIRE_STRIPE, FireHelmet, handColor, KidHead, type Look } from "../kid";
+import { FIRE_BLUE, FIRE_STRIPE, FilmOver, FireHelmet, handColor, KidHead, type Look, waving } from "../kid";
 import { ChefHat } from "../things";
 
 // The grown-ups of the films, drawn from the front with their feet at (0, 0), facing right. They use the class
 // names of the children (`el-kid`, `pose-…`, `el-arm-r` …), so the poses of elevator.css move them the same way.
 
 /** What a grown-up does: the arms of `cheer` wave, `walk` swings legs and arms, `phone` holds the phone to the ear,
- * `hold` carries something in front of the chest (`holding`). */
-export type GrownPose = "stand" | "walk" | "cheer" | "phone" | "hold";
+ * `hold` carries something in front of the chest (`holding`), `wave` says goodbye with one hand at a film's end (given
+ * by `FilmOver`, never asked for by a scene). */
+export type GrownPose = "stand" | "walk" | "cheer" | "phone" | "hold" | "wave";
 
 /** The firefighters and the people they help: the app's mascots, a fox and a bear in the crew (D-18). */
 export const CREW: Look[] = [
@@ -22,32 +23,36 @@ export const DRIVER: Look = { shirt: "#7950f2", pants: "#2b8a3e", hair: "#c2410c
 const ARMS = {
   down: { d: "M24 -188 Q40 -150 36 -112", hand: [36, -110] },
   up: { d: "M24 -188 Q46 -214 44 -256", hand: [44, -260] },
+  wave: { d: "M24 -188 Q60 -196 64 -244", hand: [66, -248] },
   front: { d: "M24 -188 Q44 -150 16 -136", hand: [14, -136] },
   ear: { d: "M24 -188 Q58 -196 36 -228", hand: [34, -230] },
 } as const;
 
 /** A grown-up; `face` -1 turns it left. With `wear` "fire" it is a firefighter, with "baker" a baker in a white
- * jacket and a baker's hat, with "rescue" a paramedic in an orange jacket with silver stripes, with "blanket" a warm
- * blanket lies round its shoulders. */
+ * jacket and a baker's hat, with "rescue" a paramedic in an orange jacket with silver stripes, with "farmer" a farmer in
+ * dungarees and a straw hat, with "builder" a builder in a yellow safety vest and a hard hat, with "blanket" a warm blanket lies round its shoulders. */
 export function Grownup({
   look,
-  pose,
+  pose: asked,
   wear = [],
   face = 1,
   holding,
 }: {
   look: Look;
   pose: GrownPose;
-  wear?: ("fire" | "baker" | "blanket" | "rescue")[];
+  wear?: ("fire" | "baker" | "blanket" | "rescue" | "farmer" | "builder")[];
   face?: 1 | -1;
   holding?: ReactNode;
 }) {
+  const pose = waving(asked, useContext(FilmOver), !!holding);
   const fire = wear.includes("fire");
   const baker = wear.includes("baker");
   const rescue = wear.includes("rescue");
+  const farmer = wear.includes("farmer");
+  const builder = wear.includes("builder");
   const shirt = fire ? FIRE_BLUE : baker ? "#f8f9fa" : rescue ? "#ff922b" : look.shirt;
   const pants = fire ? FIRE_BLUE : rescue ? "#2b3a55" : look.pants;
-  const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
+  const right = ARMS[pose === "phone" ? "ear" : pose === "cheer" ? "up" : pose === "wave" ? "wave" : pose === "hold" ? "front" : "down"];
   const left = ARMS[pose === "cheer" ? "up" : pose === "hold" ? "front" : "down"];
   const arm = (a: (typeof ARMS)[keyof typeof ARMS], className: string, origin: string, mirror: boolean) => (
     <g className={`el-arm ${className}`} style={{ transformOrigin: origin }}>
@@ -87,6 +92,22 @@ export function Grownup({
             </g>
           </g>
         )}
+        {farmer && (
+          <g>
+            <path d="M-26 -176 H26 V-100 H-26 Z" fill={pants} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+            <path d="M-20 -176 L-24 -200 M20 -176 L24 -200" stroke={pants} strokeWidth="7" strokeLinecap="round" />
+            <circle cx="-17" cy="-168" r="4" fill="#ffd43b" stroke={INK} strokeWidth="1.5" />
+            <circle cx="17" cy="-168" r="4" fill="#ffd43b" stroke={INK} strokeWidth="1.5" />
+            <rect x="-12" y="-152" width="24" height="18" rx="3" fill="none" stroke={INK} strokeOpacity="0.4" strokeWidth="2" />
+          </g>
+        )}
+        {builder && (
+          <g>
+            <rect x="-32" y="-200" width="64" height="104" rx="20" fill="#ffd43b" stroke={INK} strokeWidth="2.5" />
+            <path d="M0 -200 V-98" stroke={shirt} strokeWidth="12" />
+            <path d="M-32 -128 H-6 M6 -128 H32 M-32 -112 H-6 M6 -112 H32" stroke="#f1f3f5" strokeWidth="5" />
+          </g>
+        )}
         {arm(left, "el-arm-l", "-24px -188px", true)}
         {holding && <g transform="translate(0 -122)">{holding}</g>}
         {wear.includes("blanket") && (
@@ -101,6 +122,8 @@ export function Grownup({
           <g transform="translate(0 -120) scale(0.8)">
             <KidHead look={look} />
             {fire && <FireHelmet />}
+            {farmer && <StrawHat />}
+            {builder && <HardHat />}
             {baker && (
               <g transform="translate(0 -160) scale(0.95)">
                 <ChefHat />
@@ -109,6 +132,30 @@ export function Grownup({
           </g>
         </g>
       </g>
+    </g>
+  );
+}
+
+/** A farmer's straw hat with a red band, on a head drawn like `KidHead`. */
+function StrawHat() {
+  return (
+    <g>
+      <ellipse cx="0" cy="-150" rx="70" ry="14" fill="#f2c94c" stroke={INK} strokeWidth="3" />
+      <path d="M-36 -152 Q-38 -196 0 -198 Q38 -196 36 -152 Z" fill="#ffe08a" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-36 -162 Q0 -170 36 -162 L36 -152 Q0 -160 -36 -152 Z" fill="#e03131" />
+      <path d="M-50 -148 Q0 -140 50 -148 M-22 -186 Q0 -190 22 -186" stroke="#d4a72c" strokeWidth="2.5" fill="none" />
+    </g>
+  );
+}
+
+/** A builder's yellow hard hat with its ridge and brim, on a head drawn like `KidHead`. */
+export function HardHat() {
+  return (
+    <g>
+      <path d="M-40 -156 Q-40 -208 0 -208 Q40 -208 40 -156 Z" fill="#fcc419" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M0 -208 V-158 M-22 -200 Q-26 -180 -24 -158 M22 -200 Q26 -180 24 -158" stroke="#e8a317" strokeWidth="5" fill="none" />
+      <rect x="-54" y="-162" width="108" height="14" rx="7" fill="#fab005" stroke={INK} strokeWidth="3" />
+      <path d="M-26 -194 Q-16 -202 -4 -202" stroke="#fff3bf" strokeWidth="5" strokeLinecap="round" fill="none" />
     </g>
   );
 }

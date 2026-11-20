@@ -2,8 +2,11 @@ import { BAECKER } from "./baecker";
 import { BRIEF } from "./brief";
 import { FEUERWEHR } from "./feuerwehr";
 import { GARTEN } from "./garten";
+import { HAUS } from "./haus";
+import { MUELL } from "./muell";
+import { KORN } from "./korn";
 import { KRANKENWAGEN } from "./krankenwagen";
 import type { Film } from "./types";
 
 /** The films of „Kleine Abenteuer“, in play order after the trail levels. */
-export const FILMS: Film[] = [FEUERWEHR, BRIEF, BAECKER, GARTEN, KRANKENWAGEN];
+export const FILMS: Film[] = [FEUERWEHR, BRIEF, BAECKER, GARTEN, KRANKENWAGEN, KORN, HAUS, MUELL];

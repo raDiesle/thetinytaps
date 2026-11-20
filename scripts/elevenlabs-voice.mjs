@@ -60,7 +60,10 @@ const DESIGN_TEXT =
  */
 const RECORDING_ORDER = ["en", "zh", "hi", "es", "ar", "de", "ru"];
 
-/** How each kind of line is said: an audio tag in front of it (costs its characters too). */
+/**
+ * How each kind of line is said: an audio tag in front of it (costs its characters too).
+ * @type {Record<string, string>}
+ */
 const TAGS = {
   opening: "[curious]",
   situation: "[excited]",
@@ -73,6 +76,10 @@ const TAGS = {
   calm: "[softly]",
 };
 
+/**
+ * @param {string} message
+ * @returns {never}
+ */
 function fail(message) {
   console.error(message);
   process.exit(1);
@@ -82,7 +89,9 @@ function fail(message) {
 
 const [command, ...argv] = process.argv.slice(2);
 const flags = new Set();
+/** @type {Record<string, string | undefined>} */
 const values = {};
+/** @type {string[]} */
 const rest = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
@@ -112,8 +121,30 @@ const RETRIES = 5;
  */
 const ANSWER_LIMIT_MS = 10 * 60_000;
 
+/**
+ * What `call` may be given: a JSON body makes it a POST, `soft` returns null instead of stopping on an error.
+ * @typedef {{ body?: object; query?: Record<string, string>; soft?: boolean }} CallOptions
+ */
+/**
+ * @overload
+ * @param {string} path
+ * @param {CallOptions & { soft?: false }} [options]
+ * @returns {Promise<Response>}
+ */
+/**
+ * @overload
+ * @param {string} path
+ * @param {CallOptions & { soft: true }} options
+ * @returns {Promise<Response | null>}
+ */
+/**
+ * @param {string} path
+ * @param {CallOptions} [options]
+ * @returns {Promise<Response | null>}
+ */
 async function call(path, { body, query, soft = false } = {}) {
   const url = `${API}${path}${query ? `?${new URLSearchParams(query)}` : ""}`;
+  /** @type {Response} */
   let response;
   for (let attempt = 0; ; attempt++) {
     response = await fetch(url, {
@@ -121,7 +152,14 @@ async function call(path, { body, query, soft = false } = {}) {
       headers: { "xi-api-key": apiKey(), ...(body ? { "content-type": "application/json" } : {}) },
       body: body ? JSON.stringify(body) : undefined,
       signal: AbortSignal.timeout(ANSWER_LIMIT_MS),
-    }).catch((error) => ({ ok: false, status: 0, text: async () => `no answer (${error}) – the line may have been charged; run again to go on` }));
+    }).catch(
+      (error) =>
+        /** @type {Response} only what is read of a failed answer */ ({
+          ok: false,
+          status: 0,
+          text: async () => `no answer (${error}) – the line may have been charged; run again to go on`,
+        }),
+    );
     if (response.ok || attempt >= RETRIES || !(response.status === 429 || response.status >= 500)) break;
     await new Promise((done) => setTimeout(done, 2000 * 2 ** attempt));
   }
@@ -156,9 +194,15 @@ function readConfig() {
 }
 
 /** The spoken text: the line with the tag of its kind in front. */
-const spoken = (line) => (flags.has("no-tags") ? line.text : `${TAGS[line.kind]} ${line.text}`);
+const spoken = (/** @type {{ text: string; kind: string }} */ line) => (flags.has("no-tags") ? line.text : `${TAGS[line.kind]} ${line.text}`);
 
-/** Records `text` in `language` ("de", "en", …); the language is given so a short line is not read as German. */
+/**
+ * Records `text` in `language` ("de", "en", …); the language is given so a short line is not read as German.
+ * @param {{ voice: string; model: string }} config
+ * @param {string} text
+ * @param {number} seed
+ * @param {string} language
+ */
 async function record(config, text, seed, language) {
   const response = await call(`/text-to-speech/${config.voice}`, {
     query: { output_format: FORMAT },
@@ -175,6 +219,7 @@ async function record(config, text, seed, language) {
 
 // ---------- The lines ----------
 
+/** @type {(path: string) => Promise<any>} */
 const load = (path) => import(pathToFileURL(resolve(path)).href);
 // The games' data imports like the app's (`…?glob`) and reads translations loaded by language, as in the tests.
 plugin((await load("tools/appPlugin.ts")).appPlugin());
@@ -192,6 +237,7 @@ const ONLY = values.only ? new Set(values.only.split(",")) : null;
 
 /** Every story and recorded game in every language: its lines and the folder of their recordings. */
 async function stories() {
+  /** @type {{ name: string; language: string; folder: string; lines: { text: string; kind: string }[] }[]} */
   const found = [];
   for (const entry of readdirSync(STORIES, { withFileTypes: true })) {
     const dir = join(STORIES, entry.name);
@@ -237,7 +283,7 @@ async function design() {
   });
   const { previews } = await response.json();
   mkdirSync(RAW_DIR, { recursive: true });
-  const drafts = previews.map((preview, i) => {
+  const drafts = previews.map((/** @type {{ audio_base_64: string; generated_voice_id: string }} */ preview, /** @type {number} */ i) => {
     const file = join(RAW_DIR, `entwurf-${i + 1}.mp3`);
     writeFileSync(file, Buffer.from(preview.audio_base_64, "base64"));
     console.log(`${i + 1}: ${file}`);
@@ -255,7 +301,12 @@ async function save() {
   if (!chosen) fail(`Which draft? 1-${drafts.length}`);
   const name = rest[1] ?? "Tapsi Coach";
   const response = await call("/text-to-voice", {
-    body: { voice_name: name, voice_description: description, generated_voice_id: chosen, played_not_selected_voice_ids: drafts.filter((d) => d !== chosen) },
+    body: {
+      voice_name: name,
+      voice_description: description,
+      generated_voice_id: chosen,
+      played_not_selected_voice_ids: drafts.filter((/** @type {string} */ d) => d !== chosen),
+    },
   });
   const { voice_id } = await response.json();
   writeFileSync(CONFIG, `${JSON.stringify({ voice: voice_id, name, model: DEFAULT_MODEL, description }, null, 2)}\n`);
@@ -297,6 +348,7 @@ async function make() {
   // still puts it to sleep: let a run finish first.
   if (process.platform === "darwin") spawn("caffeinate", ["-i", "-w", String(process.pid)], { stdio: "ignore" }).unref();
   const config = flags.has("dry") ? null : readConfig();
+  /** @type {{ text: string; kind: string; file: string; story: Awaited<ReturnType<typeof stories>>[number] }[]} */
   const todo = [];
   for (const story of await stories()) {
     const wanted = new Set(story.lines.map((line) => `${recordingName(line.text, story.language)}.mp3`));
@@ -313,11 +365,11 @@ async function make() {
   }
   // English first, then the other languages by their speakers in the world, German before Russian (user decisions,
   // November 2026): a run stopped halfway (credits, network) leaves the languages most players hear done.
-  const rank = (language) => (RECORDING_ORDER.includes(language) ? RECORDING_ORDER.indexOf(language) : RECORDING_ORDER.length);
+  const rank = (/** @type {string} */ language) => (RECORDING_ORDER.includes(language) ? RECORDING_ORDER.indexOf(language) : RECORDING_ORDER.length);
   todo.sort((a, b) => rank(a.story.language) - rank(b.story.language));
   const characters = todo.reduce((sum, line) => sum + spoken(line).length, 0);
   const byStory = Object.entries(Object.groupBy(todo, (line) => line.story.name)).map(
-    ([name, lines]) => `${name} ${lines.reduce((sum, line) => sum + spoken(line).length, 0)}`,
+    ([name, lines]) => `${name} ${/** @type {typeof todo} groupBy makes no empty groups */ (lines).reduce((sum, line) => sum + spoken(line).length, 0)}`,
   );
   console.log(
     `${todo.length} lines to record, ${characters} characters, ≈ ${Math.ceil(characters * CREDITS_PER_CHARACTER)} credits${byStory.length > 1 ? ` (characters: ${byStory.join(", ")})` : ""}`,
@@ -351,6 +403,7 @@ async function make() {
   if (before && after) console.log(`Used ${after.used - before.used} credits, ${after.left} left this month.`);
 }
 
+/** @type {Record<string, () => Promise<void>>} */
 const COMMANDS = {
   credits: async () => {
     const left = await credits();

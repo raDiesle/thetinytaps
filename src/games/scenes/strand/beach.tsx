@@ -1,5 +1,6 @@
 import { Hideout } from "../hideout";
-import { Face, Inside, nth } from "../shared";
+import { Face, Inside, MascotFace, nth } from "../shared";
+import { MASCOT_COLORS } from "@/components/Mascot";
 import { SKIN } from "@/components/drawing";
 import { Arm, Head, Hearts, Leg, Lid, Puffs, SAND } from "./parts";
 
@@ -143,7 +144,7 @@ export function Sonnenschirm() {
   );
 }
 
-/** The lifeguard tower: the lifeguard blows her whistle and waves, the flag flies and the ring swings. */
+/** The lifeguard tower: the lifeguard, a fox, blows her whistle and waves, the flag flies and the ring swings. */
 export function Rettungsturm() {
   return (
     <>
@@ -161,7 +162,10 @@ export function Rettungsturm() {
       <Inside d="M-40 -262 h80 v44 h-80 Z">
         <g className="sd-turm-guard">
           <rect x="-24" y="-226" width="48" height="30" rx="12" fill="#e63946" />
-          <Head cx={0} cy={-242} r={18} hair="#ffd43b" style="bun" cap="#e63946" />
+          <MascotFace kind="fox" cx={0} cy={-242} r={18} lashes>
+            <path d="M30 32 C30 9 70 9 70 32 Z" fill="#e63946" />
+            <path d="M24 34 Q50 25 76 34 Q50 40 24 34 Z" fill="#c92a2a" />
+          </MascotFace>
           <path className="sd-turm-whistle" d="M4 -232 h16 v6 h-16 Z" fill="#ffd43b" />
         </g>
       </Inside>
@@ -170,7 +174,7 @@ export function Rettungsturm() {
       <path d="M-86 -262 H86" stroke="#c92a2a" strokeWidth="6" strokeLinecap="round" />
       <g className="sd-turm-arm" style={{ transformOrigin: "40px -226px" }}>
         <path d="M40 -226 L60 -262" stroke="#e63946" strokeWidth="10" strokeLinecap="round" />
-        <circle cx="62" cy="-266" r="7" fill={SKIN} />
+        <circle cx="62" cy="-266" r="7" fill={MASCOT_COLORS.fox.fur} />
       </g>
       {/* Flag on its pole */}
       <path d="M-60 -296 V-380" stroke="#868e96" strokeWidth="5" strokeLinecap="round" />

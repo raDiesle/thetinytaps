@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import type { BunPlugin } from "bun";
 
 // The one Bun plugin of the app, used by the build (tools/build.ts), the dev server (tools/devServer.ts) and
@@ -7,7 +7,8 @@ import type { BunPlugin } from "bun";
 //
 // - `import files from "./musik/*.mp3?glob"`: all files matching a pattern, relative to the importing
 //   file, as { "musik-hintergrund.mp3": url } – keyed by their path below the pattern's folder. A file
-//   becomes its bundled URL (a JSON file its content), so a new sound or picture needs no code.
+//   becomes its bundled URL (a JSON file its content), so a new sound or picture needs no code; on the dev
+//   server its address under DEV_FILES, read from the disk (see mapModule).
 // - `import byLanguage from "./stimme/**/*.mp3?glob-by-language"`: the same files split by language, as
 //   { de: () => import(…), en: () => import(…), … }, each `import()` giving that language's part of the map above
 //   (same keys) as its `default`. A file's language is its folder when that is named by two small letters
@@ -52,11 +53,23 @@ const SRC = join(import.meta.dir, "../src");
 /** The files below `root` matching `glob`, sorted; none where the folder isn't there yet (a game's stimme/ before its first recording). */
 const filesOf = (root: string, glob: string) => (existsSync(root) ? [...new Bun.Glob(glob).scanSync({ cwd: root })].sort() : []);
 
-/** A map module of `files` (relative to `root`): each file's bundled URL by its relative path. */
-function mapModule(root: string, files: string[]) {
-  const imports = files.map((file, i) => `import f${i} from ${JSON.stringify(join(root, file))};`);
-  const entries = files.map((file, i) => `  ${JSON.stringify(file)}: f${i},`);
-  return `${imports.join("\n")}\nexport default {\n${entries.join("\n")}\n};\n`;
+/** Where the dev server serves a file of src/ straight from the disk (tools/devServer.ts). */
+export const DEV_FILES = "/_src/";
+
+/**
+ * A map module of `files` (relative to `root`): each file's bundled URL by its relative path. On the dev server
+ * (`direct`) a file other than JSON is its address under DEV_FILES instead, served from the disk: imported, Bun read
+ * and hashed each of the ~25,000 recordings before the first page, which took 11 of the start's 11 seconds
+ * (November 2026; `src/buildTools.test.ts`).
+ */
+export function mapModule(root: string, files: string[], direct: boolean) {
+  // A file outside src/ stays imported: the dev server serves nothing else from the disk.
+  const imported = (file: string) => !direct || file.endsWith(".json") || relative(SRC, join(root, file)).startsWith("..");
+  const imports = files.map((file, i) => (imported(file) ? `import f${i} from ${JSON.stringify(join(root, file))};` : ""));
+  const entries = files.map(
+    (file, i) => `  ${JSON.stringify(file)}: ${imported(file) ? `f${i}` : JSON.stringify(DEV_FILES + relative(SRC, join(root, file)))},`,
+  );
+  return `${imports.filter(Boolean).join("\n")}\nexport default {\n${entries.join("\n")}\n};\n`;
 }
 
 /**
@@ -80,6 +93,7 @@ export function appPlugin(info?: BuildInfo, styles?: ReadonlyMap<string, string>
   return {
     name: "tinytaps",
     setup(build) {
+      const direct = info?.DEV === true;
       build.onResolve({ filter: /\?glob$/ }, ({ path, importer }) => ({
         path: `${dirname(importer)}|${path.slice(0, -"?glob".length)}`,
         namespace: "glob",
@@ -88,7 +102,7 @@ export function appPlugin(info?: BuildInfo, styles?: ReadonlyMap<string, string>
         const [importerDir, pattern] = path.split("|");
         const { folder, glob } = splitPattern(pattern);
         const root = join(importerDir, folder);
-        return { contents: mapModule(root, filesOf(root, glob)), loader: "js" };
+        return { contents: mapModule(root, filesOf(root, glob), direct), loader: "js" };
       });
       build.onResolve({ filter: /\?glob-by-language$/ }, ({ path, importer }) => ({
         path: `${dirname(importer)}|${path.slice(0, -"?glob-by-language".length)}`,
@@ -112,6 +126,7 @@ export function appPlugin(info?: BuildInfo, styles?: ReadonlyMap<string, string>
           contents: mapModule(
             root,
             filesOf(root, glob).filter((file) => fileLanguage(file) === language),
+            direct,
           ),
           loader: "js",
         };

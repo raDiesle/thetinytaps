@@ -3,6 +3,7 @@ import { type LazyPart, lazyPart } from "@/lib/lazyPart";
 import type { AdventureStoryId } from "./settings";
 import type { Story, StoryTranslation } from "./stories/story";
 import { TRANSLATIONS as CLOUD_TRIP_TRANSLATIONS } from "./stories/cloudTrip/translations";
+import { TRANSLATIONS as FIRE_RESCUE_TRANSLATIONS } from "./stories/fireRescue/translations";
 import { TRANSLATIONS as TREASURE_ISLAND_TRANSLATIONS } from "./stories/treasureIsland/translations";
 
 // Every story is a chunk of its own, loaded only when it is played, and three.js comes only with the player
@@ -52,6 +53,7 @@ export const STORIES: StoryEntry[] = [
     emoji: "🚒",
     title: "Fire Rescue",
     language: "en",
+    translations: FIRE_RESCUE_TRANSLATIONS,
     unfinished: true,
     load: () => import("./stories/fireRescue").then((m) => m.FIRE_RESCUE),
   },

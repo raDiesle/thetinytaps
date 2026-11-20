@@ -2,6 +2,7 @@ import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./
 import type { Gift, GiftId } from "./gifts";
 import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // Arabic (Modern Standard, without vowel marks) texts for "Was gehört zum Tier?", by the ids of the animals, foods
 // and homes in content.ts and homes.tsx. Verbs and adjectives follow the animal word's gender (الأرنب جائع، القطة
@@ -89,6 +90,14 @@ export const ARABIC_ANIMALS: Record<string, ArabicAnimal> = {
   dachs: { name: "غرير" },
   qualle: { name: "قنديل بحر", the: "قنديل البحر" },
   schwan: { name: "بجعة", female: true },
+  hahn: { name: "ديك" },
+  taube: { name: "حمامة", female: true },
+  truthahn: { name: "ديك رومي", the: "الديك الرومي" },
+  pfau: { name: "طاووس" },
+  muecke: { name: "بعوضة", female: true },
+  schlange: { name: "ثعبان" },
+  kueken: { name: "كتكوت" },
+  fliege: { name: "ذبابة", female: true },
 };
 
 /** A food in Arabic. */
@@ -276,10 +285,22 @@ export function arabicGrowth(german: GrowTexts): GrowTexts {
   };
 }
 
+/** „Wer macht das Geräusch?“ in Arabic, „ها هو/ها هي“ and „هذا/هذه“ by the animal word's gender; an animal without its Arabic words gets the whole German sentence. */
+export function arabicSound(german: SoundTexts): SoundTexts {
+  const animal = (a: Animal) => ARABIC_ANIMALS[a.id];
+  const the = (a: Animal) => animal(a).the ?? `ال${animal(a).name}`;
+  return {
+    listen: "هيّا نسمع! من وراء الستارة؟",
+    there: (a) => (animal(a) ? `${animal(a).female ? "ها هي" : "ها هو"} ${the(a)}!` : german.there(a)),
+    thatIs: (a) => (animal(a) ? `${animal(a).female ? "هذه" : "هذا"} ${the(a)}.` : german.thatIs(a)),
+  };
+}
+
 /** Arabic, for the table of languages in content.ts. */
 export const ARABIC: AnimalTranslation = {
   words: { animals: ARABIC_ANIMALS, foods: ARABIC_FOODS, homes: ARABIC_HOMES },
   texts: arabicTexts,
   gifts: arabicGifts,
   growth: arabicGrowth,
+  sound: arabicSound,
 };

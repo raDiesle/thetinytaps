@@ -241,7 +241,11 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
             })}
           >
             <Trophy game={game} level={level} wins={wins} className="game-end-trophy-art" />
-            {!landed && <span className="game-end-done">{t({ de: "Geschafft!" })}</span>}
+            {!landed && (
+              <span className="game-end-done">
+                {t({ de: "Geschafft!", ru: "Готово!", en: "All done!", zh: "完成啦！", hi: "हो गया!", es: "¡Listo!", ar: "انتهينا!" })}
+              </span>
+            )}
           </span>
           <span className="game-end-board" />
         </span>

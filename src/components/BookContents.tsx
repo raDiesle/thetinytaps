@@ -4,9 +4,11 @@ import { CardPicture, UNFINISHED_LABEL } from "@/components/GameCard";
 import { bookIdOf, type Game, gamePage } from "@/content/games";
 import { useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
+import { useFigurePictures } from "@/lib/figurePictures";
 import { canTestUnfinished } from "@/lib/localTest";
 import { preloadPage } from "@/lib/preloadPages";
 import previews from "./vorschau/*.webp?glob";
+import girlPreviews from "./vorschau-maedchen/*.webp?glob";
 
 /**
  * A book's first page, laid out as a picture book's table of contents (user feedback, October 2026):
@@ -33,8 +35,9 @@ function ContentsLine({ game, page }: { game: Game; page: number }) {
   const turnPage = useTurnPage(game.href, "forward");
   const title = t(game.title);
   const labelled = game.unfinished === "labelled";
+  const pictures = useFigurePictures(previews, girlPreviews);
   const label = labelled && <span className="toc-badge">{t(UNFINISHED_LABEL)}</span>;
-  const picture = <CardPicture className="toc-picture" emoji={game.emoji} picture={previews[`${bookIdOf(game.href)}.webp`]} />;
+  const picture = <CardPicture className="toc-picture" emoji={game.emoji} picture={pictures[`${bookIdOf(game.href)}.webp`]} />;
   const name = (
     <span className="toc-name">
       <span className="toc-title">{title}</span>

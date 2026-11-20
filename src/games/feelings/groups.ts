@@ -41,10 +41,18 @@ export const GROUPS: StoryGroup[] = [
   },
   {
     // Anger without anyone to be angry at (C-54: the Zones of Regulation name frustration on its own). Only new scenes
-    // so far, German only: the built site shows the group once their pictures are made.
+    // so far: the built site shows the group once their pictures are made.
     id: "frust",
     emoji: "😤",
-    title: { de: "Frust & Warten" },
+    title: {
+      de: "Frust & Warten",
+      en: "Frustration & waiting",
+      zh: "烦躁和等待",
+      hi: "झुंझलाहट और इंतज़ार",
+      es: "Frustración y espera",
+      ar: "إحباط وانتظار",
+      ru: "Досада и ожидание",
+    },
     stories: ["alltag-puzzle", "alltag-myself", "alltag-pointing", "alltag-phone"],
   },
   {

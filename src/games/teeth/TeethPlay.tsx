@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
+import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
@@ -13,7 +15,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { daytimeOf } from "@/lib/days";
 import { addBrushing, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
-import { INK, Mouth, type MonsterSpot, type MouthAction } from "./mouth";
+import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
@@ -104,9 +106,9 @@ const formatTime = (ms: number) => {
 
 const ease = (k: number) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
 
-/** Glides from one view to the next, so the child sees the head turn and the mouth open; `gliding` while it does. */
-function useGlidingView(target: View, ms: number): { view: View; gliding: boolean } {
-  const [view, setView] = useState(target);
+/** Glides from one view to the next, so the child sees the head turn and the mouth open; `gliding` while it does, `k` how far (eased). */
+function useGlidingView(target: View, ms: number): { view: View; gliding: boolean; k: number } {
+  const [glide, setGlide] = useState({ view: target, k: 1, to: target });
   const current = useRef(target);
   useEffect(() => {
     const from = current.current;
@@ -115,7 +117,7 @@ function useGlidingView(target: View, ms: number): { view: View; gliding: boolea
     const step = (t: number) => {
       const k = ms <= 0 ? 1 : Math.min(1, (t - start) / ms);
       current.current = k >= 1 ? target : lerpView(from, target, ease(k));
-      setView(current.current);
+      setGlide({ view: current.current, k: ease(k), to: target });
       if (k < 1) frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
@@ -126,7 +128,9 @@ function useGlidingView(target: View, ms: number): { view: View; gliding: boolea
       clearTimeout(arrive);
     };
   }, [target, ms]);
-  return { view, gliding: view !== target };
+  const gliding = glide.view !== target;
+  // Right after the target changed, the last frame still belongs to the glide before: this one has not begun yet.
+  return { view: glide.view, gliding, k: !gliding ? 1 : glide.to === target ? glide.k : 0 };
 }
 
 /** Elapsed time that can be paused and jumped around in. */
@@ -459,7 +463,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const scene: SceneKind =
     before === "sweets" || before === "grow" ? "story" : before === "brush" || before === "paste" || ending === "tidy" ? "sink" : "mirror";
   const target = step?.view ?? GRIN_VIEW;
-  const { view, gliding } = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
+  const { view, gliding, k: glided } = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
   // The brush glides along the step's teeth and reaches each monster just as it goes.
   const inStep = monsters.filter((m) => m.step === phase);
@@ -485,12 +489,17 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   return (
     <div className={`teeth-play ${daytime}${done ? " done" : ""}${paused ? " paused" : ""}`}>
-      <span className="teeth-sky" aria-hidden>
-        {daytime === "morning" ? "☀️" : "🌙"}
-      </span>
       {/* Before the picture, so it is there when the picture measures it. */}
       <div className="teeth-room" ref={room} />
-      <div className="teeth-stage" ref={stage}>
+      {/* A tap on the picture pauses, like the pause button (user request, November 2026); a tapped monster only giggles,
+          and the pause screen over it goes on again. Not at the end, which has nothing left to pause. */}
+      <div
+        className="teeth-stage"
+        ref={stage}
+        onPointerDown={() => {
+          if (!done && !paused) togglePause();
+        }}
+      >
         <Scenes id={`${round}-${scene}`} kind={scene} paused={paused}>
           {scene === "story" ? (
             <Origin key={round} part={before === "sweets" ? "sweets" : "grow"} daytime={daytime} tickled={tickled} onTickle={tickle} free={room} />
@@ -507,6 +516,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
               daytime={daytime}
               action={action}
               gliding={gliding}
+              glide={{ to: target, k: glided }}
               free={room}
               onTickle={tickle}
             />
@@ -531,17 +541,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             </div>
           )}
           <div className="teeth-controls">
-            <button
-              type="button"
-              className="teeth-button"
-              onClick={togglePause}
-              aria-label={
-                paused
-                  ? t({ de: "Weiter", en: "Next", zh: "继续", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" })
-                  : t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })
-              }
-            >
-              <ControlIcon kind={paused ? "play" : "pause"} />
+            <button type="button" className="teeth-button" onClick={togglePause} aria-label={paused ? t(GO_ON) : t(PAUSE)}>
+              <ControlIcon kind={paused ? "play" : "pause"} className="teeth-button-icon" />
             </button>
             <button
               type="button"
@@ -549,7 +550,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
               onClick={again}
               aria-label={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}
             >
-              <ControlIcon kind="again" />
+              <ControlIcon kind="again" className="teeth-button-icon" />
             </button>
             <div
               className="teeth-progress"
@@ -651,45 +652,12 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {paused && (
         <button type="button" className="teeth-paused" onClick={togglePause}>
           <span className="teeth-paused-icon" aria-hidden>
-            <ControlIcon kind="pause" />
+            <ControlIcon kind="pause" className="teeth-button-icon" />
           </span>
-          {t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })}
-          <small>
-            {touchOnly
-              ? t({ de: "Tippen: weiter", en: "Tap: go on", zh: "点一下：继续", hi: "टैप: आगे", es: "Toca: seguir", ar: "لمسة: متابعة", ru: "Нажми — и дальше" })
-              : t({
-                  de: "Leertaste oder Tippen: weiter",
-                  en: "Space or tap: go on",
-                  zh: "空格键或点一下：继续",
-                  hi: "स्पेस या टैप: आगे",
-                  es: "Espacio o toque: seguir",
-                  ar: "المسافة أو لمسة: متابعة",
-                  ru: "Пробел или нажатие — и дальше",
-                })}
-          </small>
+          {t(PAUSE)}
+          <small>{t(touchOnly ? TAP_TO_GO_ON : SPACE_OR_TAP_TO_GO_ON)}</small>
         </button>
       )}
     </div>
-  );
-}
-
-/** The drawn signs on the controls, in the game's ink: two round bars to pause, a round triangle to go on, a round arrow to start again. */
-function ControlIcon({ kind }: { kind: "pause" | "play" | "again" }) {
-  return (
-    <svg className="teeth-button-icon" viewBox="0 0 40 40" aria-hidden>
-      {kind === "pause" ? (
-        <g fill={INK}>
-          <rect x={10} y={9} width={7.5} height={22} rx={3} />
-          <rect x={22.5} y={9} width={7.5} height={22} rx={3} />
-        </g>
-      ) : kind === "play" ? (
-        <path d="M14 9.5 C14 7.8 15.8 6.9 17.2 7.8 L31 17.4 C32.3 18.3 32.3 21.7 31 22.6 L17.2 32.2 C15.8 33.1 14 32.2 14 30.5 Z" fill={INK} />
-      ) : (
-        <g fill="none" stroke={INK} strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M29.5 24.5 A10.5 10.5 0 1 1 27.4 12.3" />
-          <path d="M28.6 5.8 L28 13 L20.8 12.4" />
-        </g>
-      )}
-    </svg>
   );
 }

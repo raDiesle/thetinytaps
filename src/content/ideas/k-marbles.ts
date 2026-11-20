@@ -17,6 +17,7 @@ export const marblesIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Eine Weiche am Ende von Reihe 3: Klappe mit dickem Hebel, Antippen (oder ← →) klappt sie um. Rechts geht es wie bisher im Zickzack an den Prallkissen hinunter, links über ein eigenes Xylophon. Mit „🔄 Von selbst“ klappt sie nach jeder Kugel von allein um. Eine zweite und dritte Weiche fehlen noch.",
+      done: true,
     },
     {
       id: "K-02",
@@ -62,6 +63,7 @@ export const marblesIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Jede Kugel kommt anders aus dem Tunnel: andere Farbe, Streifen, Punkte, goldene Sternkugel, oder ein Tier guckt heraus. Zwei kleine Kugeln aus einer fehlen noch.",
+      done: true,
     },
     {
       id: "K-07",
@@ -114,6 +116,7 @@ export const marblesIdeas: IdeaArea = {
       effort: "L",
       partial:
         "Sechs Plätze auf der Kugelbahn wechseln beim Antippen reihum Glocke, Trampolin, Trichter und Wasserrad (X-08); Looping und Trommeln gibt es als feste Stationen (K-19). Looping und Trommel als Teile zum Tauschen und das Ziehen aus einer Leiste fehlen.",
+      done: true,
     },
     {
       id: "K-13",
@@ -182,6 +185,31 @@ export const marblesIdeas: IdeaArea = {
       why: "Ein Ende wie im Theater: ruhig, und es gehört zur Bahn.",
       effort: "S",
       partial: "Im Zirkus sind Konfettiregen, Konfettikanone und Funken weg; der Vorhang öffnet sich weiter zum Stern (kein Zugehen).",
+      done: true,
+    },
+    {
+      id: "K-21",
+      emoji: "🔀",
+      title: "Kugelbahn: eine zweite und dritte Weiche",
+      text: "Zur Weiche am Ende von Reihe 3 (K-01) kommen zwei weitere mit dickem Hebel, weiter oben auf der Bahn, so dass eine Kugel mehrere Wege nehmen kann: über das Xylophon, über Trommel und Glocke oder an den Prallkissen hinunter.",
+      why: "Mehr Wege machen das Umlegen spannender: das Kind sieht, dass seine Wahl den Weg bestimmt.",
+      effort: "M",
+    },
+    {
+      id: "K-22",
+      emoji: "🫧",
+      title: "Zaubertunnel: aus einer Kugel werden zwei kleine",
+      text: "Der Zaubertunnel (K-06) kann eine Kugel auch als zwei kleine Kugeln herauslassen, die nebeneinander weiterrollen und unten wieder eine werden.",
+      why: "Eine Überraschung mehr im Tunnel, die Kinder zum Staunen bringt.",
+      effort: "S",
+    },
+    {
+      id: "K-23",
+      emoji: "🧩",
+      title: "Bahn selbst bauen: Looping und Trommel tauschen, Teile aus einer Leiste ziehen",
+      text: "Die sechs Plätze der Kugelbahn (K-12) wechseln reihum auch Looping und Trommel, nicht nur Glocke, Trampolin, Trichter und Wasserrad. Für Ältere: die Teile aus einer Leiste am Rand in die Lücken ziehen (mit der Maus; ein Finger tippt).",
+      why: "Mehr Teile machen mehr Mischungen; das Ziehen ist der nächste Schritt für Größere.",
+      effort: "M",
     },
   ],
 };

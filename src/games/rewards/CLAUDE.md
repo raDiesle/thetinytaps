@@ -1,7 +1,7 @@
 # Belohnungstafel & Zeitplan: both on one page
 
 Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan, and `/wie-lange-warten/`, opened on a
-Countdown: `also` in `games.ts`, so each keeps its own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
+Countdown: `also` in `games.ts`, so each keeps its own search entry) · ideas H-01, H-02, H-76 and area T (`src/content/ideas/t-reward-chart.ts`) · research
 „belohnungstafel“ in `src/content/research/`. One card, „📅 Belohnungstafel & Zeitplan“
 (both things it makes, a calendar as its sign – user decision, October 2026; the search entries keep „Tagesplan“, as
 parents search for it): the **Belohnungstafel**

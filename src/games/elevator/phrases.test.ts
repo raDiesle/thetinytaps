@@ -10,7 +10,8 @@ import type { Station, Way } from "./trail/types";
 // Translations come only on request, so a German sentence may lack its translation (it is said in German then);
 // but nothing in a phrasebook is left over from a sentence that changed, and what is there is in its language.
 // The languages translated so far have every shared text, and every sentence of each story and level they have
-// the title of: a new level comes in German only, and plays all in German until it is translated whole.
+// the title of: a new level comes in German only, and plays all in German until it is translated whole. A film written
+// English first is keyed by its English text, and German has a phrasebook of those films alone.
 
 /** Every line of a film along every way through it: the title first, then each scene's beats and choice, and the end. */
 function filmTexts(film: Film): string[] {
@@ -103,8 +104,8 @@ test("sentences in another script are in its letters, with no Latin letters", ()
   }
 });
 
-test("an English-first film is said in English until it is translated, never in German", () => {
-  const line = "Here we are!";
+test("an English-first line is said in English until it is translated, never in German", () => {
+  const line = "A line nobody has translated yet.";
   expect(translationOf(line, "en", "en")).toBe(line);
   expect(translationOf(line, "de", "en")).toBeUndefined();
   expect(titleIn(line, "de", "en")).toBe(line);
@@ -113,7 +114,20 @@ test("an English-first film is said in English until it is translated, never in 
     expect(said.text).toBe(line);
     expect(said.speechLang.startsWith("en")).toBe(true);
   }
-  for (const film of FILMS.filter((f) => f.first === "en")) {
-    expect(PHRASEBOOKS.de?.[film.title]).toBeUndefined();
+});
+
+test("German has only English-first films, each whole where it has the title", () => {
+  const book = PHRASEBOOKS.de ?? {};
+  const english = FILMS.filter((f) => f.first === "en");
+  const theirs = new Set(english.flatMap(filmTexts));
+  expect(Object.keys(book).filter((line) => !theirs.has(line))).toEqual([]);
+  for (const film of english) {
+    if (!book[film.title]) continue;
+    expect(
+      filmTexts(film).filter((line) => !book[line]),
+      `de: ${film.title}`,
+    ).toEqual([]);
+    const said = spokenIn(film.title, targetLanguageFor("de"), "en");
+    expect(said.speechLang.startsWith("de")).toBe(true);
   }
 });

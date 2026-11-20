@@ -2,6 +2,7 @@ import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./
 import type { Gift, GiftId } from "./gifts";
 import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // Russian texts for "Was gehört zum Tier?", by the ids of the animals, foods and
 // homes in content.ts and homes.tsx. The sentences are built so that no word has
@@ -79,6 +80,14 @@ export const RUSSIAN_ANIMALS: Record<string, string> = {
   dachs: "барсук",
   qualle: "медуза",
   schwan: "лебедь",
+  hahn: "петушок",
+  taube: "голубь",
+  truthahn: "индюк",
+  pfau: "павлин",
+  muecke: "комар",
+  schlange: "змея",
+  kueken: "цыплёнок",
+  fliege: "муха",
 };
 
 /** A food in Russian. */
@@ -266,10 +275,21 @@ export function russianGrowth(german: GrowTexts): GrowTexts {
   };
 }
 
+/** „Wer macht das Geräusch?“ in Russian; an animal without its Russian word gets the whole German sentence. */
+export function russianSound(german: SoundTexts): SoundTexts {
+  const animal = (a: Animal) => RUSSIAN_ANIMALS[a.id];
+  return {
+    listen: "Послушай! Кто там за занавеской?",
+    there: (a) => (animal(a) ? `Вот ${animal(a)}!` : german.there(a)),
+    thatIs: (a) => (animal(a) ? `Это ${animal(a)}.` : german.thatIs(a)),
+  };
+}
+
 /** Russian, for the table of languages in content.ts. */
 export const RUSSIAN: AnimalTranslation = {
   words: { animals: RUSSIAN_ANIMALS, foods: RUSSIAN_FOODS, homes: RUSSIAN_HOMES },
   texts: russianTexts,
   gifts: russianGifts,
   growth: russianGrowth,
+  sound: russianSound,
 };

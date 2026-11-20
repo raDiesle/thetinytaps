@@ -85,4 +85,70 @@ export const DAYS_ES: Partial<Record<string, DayText>> = {
     ],
     end: "En casa, Osito cuenta qué tan alto subió. Luego se duerme. ¡Buenas noches! El día se terminó.",
   },
+  "tag-9": {
+    pages: [
+      "¡Buenos días! Afuera ya está aclarando. Osito se despierta. Hoy hay guardería.",
+      "Después Osito camina despacito a la cocina. El oso grande pone la mesa.",
+      "Luego el oso grande lleva a Osito a la guardería. Allí Zorrito ya está pintando en la mesa.",
+      "Después de pintar, Zorrito construye una torre alta en el salón de juegos.",
+      "Después de comer, todos se acuestan a dormir la siesta. Zorrito y Erizo se duermen rápido.",
+      "Después de la siesta, todos juegan en el salón de juegos. Pronto llegan los grandes a recogerlos.",
+    ],
+    end: "En casa, Osito cuenta cómo le fue en la guardería. Luego se duerme. ¡Buenas noches! El día se terminó.",
+  },
+  "tag-10": {
+    pages: [
+      "¡Buenos días! Osito y el oso grande desayunan juntos.",
+      "Después del desayuno, ¡en marcha! En la mesa de dibujo ya están sentados Conejito y el mapache.",
+      "Más tarde, todos juegan afuera en el arenero.",
+      "En la tarde, el oso grande lo recoge. Fue un día largo.",
+      "Después de cenar, es hora de lavarse los dientes. ¡Al baño!",
+    ],
+    end: "Con los dientes limpios, Osito se acurruca en la cama. ¡Buenas noches! El día se terminó.",
+  },
+  "tag-11": {
+    pages: [
+      "¡Buenos días! Osito tiene el pelo muy largo. Por eso hoy van a la peluquería.",
+      "Después van de compras. Osito lleva su conejo de peluche.",
+      "En la tarde, Osito anda en su monopatín afuera. Entonces llega Zorrito.",
+      "Después Osito tiene mucha hambre. El oso grande abre el refrigerador.",
+      "En la noche, Osito juega en pijama con su tren.",
+    ],
+    end: "Después del cuento, Osito se duerme. ¡Buenas noches! El día se terminó.",
+  },
+  "tag-12": {
+    pages: [
+      "¡Buenos días! Hoy Zorrito viene a jugar al jardín.",
+      "Después Osito y Zorrito riegan las flores.",
+      "En la tarde suena el timbre. Es el papá de Zorrito.",
+      "Después Osito hace su maleta. ¡Mañana van al mar!",
+    ],
+    end: "Por fin Osito se duerme. Mañana van al mar. ¡Buenas noches! El día se terminó.",
+  },
+  "tag-13": {
+    pages: [
+      "¡Buenos días! Hoy todos van a casa de la abuela Osa. Ella vive junto al mar.",
+      "En casa de la abuela Osa brilla el sol. Osito y el oso grande hacen un pícnic en el pasto.",
+      "En la tarde, el oso grande regresa a casa con el bebé. Hoy Osito duerme por primera vez en casa de la abuela.",
+    ],
+    end: "La abuela Osa lo arropa bien. Mañana van a hacer castillos de arena en la playa. ¡Buenas noches! El día se terminó.",
+  },
+  "tag-14": {
+    pages: [
+      "¡Buenos días! Osito tiene un resfriado. Hoy se queda en casa.",
+      "En la mañana ya se siente mejor. Hace un dibujo para el oso grande.",
+      "Después de comer, Osito saca su rompecabezas de animales de la granja.",
+      "Después Osito juega con su carrito rojo. El bebé gatea hacia él.",
+      "En la tarde, Osito pinta en la mesa. El bebé también quiere pintar.",
+    ],
+    end: "El resfriado ya casi se quitó. Osito duerme profundamente. ¡Buenas noches! El día se terminó.",
+  },
+  "tag-15": {
+    pages: [
+      "¡Buenos días! Llovió toda la noche. Osito y Zorrito salen a pasear.",
+      "De regreso a casa, Osito pasa por el parque. Entonces llega la señora Zorro con un perrito.",
+      "En la tarde, Zorrito viene de visita. Los dos están muy sucios por la lluvia. ¡A la tina!",
+    ],
+    end: "Después vienen por Zorrito. Recién bañado, Osito se duerme. ¡Buenas noches! El día se terminó.",
+  },
 };

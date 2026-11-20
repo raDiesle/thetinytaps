@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { CI_TESTS, failed, STEPS, type StepResult, summaryLine, verifyExitCode } from "../tools/verify";
 
 /** A step's result with the given exit code. */
@@ -22,10 +22,28 @@ test("verify's last line names what failed", () => {
 });
 
 test("verify runs lint, typecheck and the tests, and package.json starts it", () => {
-  expect(STEPS.map((step) => step.name)).toEqual(["lint", "typecheck", "tests"]);
-  expect(STEPS[2].args).toEqual(["test", "--parallel"]);
+  expect(STEPS.map((step) => step.name)).toEqual(["lint", "typecheck", "typecheck scripts", "tests"]);
+  expect(STEPS[3].args).toEqual(["test", "--parallel"]);
   // GitHub's slow runner keeps the plain run, whose tests it is known to finish in time.
   expect(CI_TESTS.args).toEqual(["test"]);
   const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
   expect(scripts.verify).toBe("bun tools/verify.ts");
+});
+
+// The scripts in scripts/ are plain JavaScript, and two of them spend money when they run (`bun run voice make`,
+// `bun run image`): a typo there costs credits before anyone sees it, so their JSDoc types are checked like the app.
+test("the typecheck covers every script in scripts/", () => {
+  const config = JSON.parse(readFileSync("tsconfig.scripts.json", "utf8"));
+  expect(config.include).toContain("scripts");
+  expect(config.compilerOptions).toMatchObject({ allowJs: true, checkJs: true });
+  // Strict like the app: no option of the main config is loosened for the scripts.
+  for (const loose of ["strict", "noImplicitAny", "strictNullChecks", "noUnusedLocals", "noUnusedParameters"])
+    expect(config.compilerOptions[loose]).toBeUndefined();
+  expect(STEPS.find((step) => step.name === "typecheck scripts")?.args.slice(1)).toEqual(["--noEmit", "-p", "tsconfig.scripts.json"]);
+  const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
+  expect(scripts.typecheck).toContain("tsc --noEmit -p tsconfig.scripts.json");
+  for (const file of readdirSync("scripts")) {
+    expect(file).toMatch(/\.mjs$/);
+    expect(readFileSync(`scripts/${file}`, "utf8")).not.toContain("@ts-nocheck");
+  }
 });

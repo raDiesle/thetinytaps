@@ -43,7 +43,7 @@ export interface LanguageTexts {
   pack?: LanguagePack;
   /** Lebendige Bilder: each picture's translation by scene id (`scenes/<scene>/<id>.ts`). */
   scenes?: Record<string, SceneTranslation>;
-  /** Kleine Abenteuer: the phrasebook by German sentence (`elevator/<id>.ts`), in its part (`texts-<id>-elevator.ts`). */
+  /** Kleine Abenteuer: the phrasebook by German sentence, and by English one for the films written English first (`elevator/<id>.ts`, German only for those), in its part (`texts-<id>-elevator.ts`). */
   elevator?: Record<string, string>;
   /** Tiere füttern (`animals/content.<id>.ts`). */
   animals?: AnimalTranslation;
@@ -68,6 +68,8 @@ export interface LanguageTexts {
   milkChain?: MilkChainTranslation;
   /** Tapsi und die Schnullerfee: chapter titles and pages (`pacifierstory/<id>.ts`). */
   pacifierStory?: MilkChainTranslation;
+  /** Tapsi geht in die Kita: chapter titles and pages (`kitastory/<id>.ts`). */
+  kitaStory?: MilkChainTranslation;
   /** Tapsi and the Foam Crown, written English first: chapter titles and pages (`hairstory/<id>.ts`, German too). */
   hairStory?: MilkChainTranslation;
   /** Was ist passiert?: each scene's words for grown-ups by scene id (`cause/scenes.<id>.ts`). */
@@ -75,7 +77,7 @@ export interface LanguageTexts {
   /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
   seo?: SeoTranslation;
   /** Bewegungsabenteuer: Tapsi's lines by story folder (`adventure/stories/<story>/lines.<id>.ts`). */
-  stories?: Partial<Record<"cloudTrip" | "treasureIsland", StoryTranslation>>;
+  stories?: Partial<Record<"cloudTrip" | "fireRescue" | "treasureIsland", StoryTranslation>>;
 }
 
 /** Each language's module; a dynamic import each, so each becomes a chunk of its own (texts-<id>.<hash>.js). */
@@ -97,7 +99,7 @@ export const TEXTS_LANGUAGES = Object.keys(MODULES) as TextsLanguageId[];
 
 /**
  * The parts loaded only with their game's page, each language's a chunk of its own (texts-<id>-<part>.<hash>.js, which
- * src/lib/offlineParts.ts knows by its name); a language without one (German) loads nothing for it.
+ * src/lib/offlineParts.ts knows by its name); a language without one (German, but for Kleine Abenteuer's English-first films) loads nothing for it.
  */
 const PART_MODULES = {
   together: {
@@ -117,6 +119,7 @@ const PART_MODULES = {
     ru: () => import("./texts-ru-feelings"),
   },
   elevator: {
+    de: () => import("./texts-de-elevator"),
     en: () => import("./texts-en-elevator"),
     zh: () => import("./texts-zh-elevator"),
     hi: () => import("./texts-hi-elevator"),

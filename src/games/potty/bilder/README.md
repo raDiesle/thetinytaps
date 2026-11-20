@@ -34,6 +34,10 @@ Die Stufen nacheinander, jede braucht die Bilder der vorigen als Referenz (`.ima
    `bilder/`, die Rohbilder der ersten Runde sind weg). Der Prompt muss sagen, was noch NICHT so ist, sonst zeichnet
    das Modell die Endpose. Ein Bild „halb hingesetzt“ gelang in drei Versuchen nicht (es saß immer schon) und fehlt.
 
+`fox-toepfchen` ist kein Gemini-Bild, sondern das Töpfchen, aus `fox-bad` ausgeschnitten (Rechteck um das Töpfchen,
+der Boden von den Rändern her bis an seinen dunklen Umriss durchsichtig gefüllt, dreifach mit Lanczos vergrößert): es
+steht in Tapsis Sprechblase beim Rufen (`CallBubble.tsx`) und sieht so genau aus wie im Bad.
+
 Nur Tapsi geht aufs Töpfchen – jedes weitere Tier bräuchte alle rund 50 Bilder noch einmal. Ein anderes Tier nur,
 wenn es ausdrücklich gewünscht ist.
 

@@ -1472,16 +1472,22 @@
 }
 
 /*
- * ⚙️ while playing is the bigger slip, its gear twice the size, its clip grown with it: on the small one the grey gear
- * was hardly seen. The symbol alone, no „Einstellungen“ nor „halten“ on it (user feedback, November 2026).
+ * ⚙️ while playing is the bigger slip, its clip grown with it: on the small one the grey gear was hardly seen. The
+ * symbol alone, no „Einstellungen“ nor „halten“ on it (user feedback, November 2026). The gear stands in the middle of
+ * the slip with even room on both sides, below the clip, which starts higher up over the slip's edge and ends above
+ * the gear – a gear filling the slip from its left edge into the clip looked cramped (user feedback, November 2026).
  */
 :root .play-area .play-options-corner .play-options-button {
+  justify-content: center;
   width: 72px;
   min-width: 0;
   height: 72px;
   min-height: 0;
-  /* The gear a little left of the middle, clear of the clip at the right. */
-  padding: 12px 14px 0 0;
+  padding: 16px 0 0;
+}
+
+:root .play-area .play-options-corner .play-options-gear {
+  font-size: 1.85rem;
 }
 
 /* On a phone the gear alone, on a slip like the fullscreen one (playing.css). */
@@ -1491,25 +1497,28 @@
     min-width: 0;
     height: 46px;
     min-height: 0;
-    /* The gear a little left of the middle, clear of the clip at the right. */
-    padding: 8px 9px 0 0;
+    padding: 12px 0 0;
+  }
+
+  :root .play-area .play-options-corner .play-options-gear {
+    font-size: 1.15rem;
   }
 }
 
-/* Its clip holds it at the right. */
+/* Its clip holds it at the right, reaching well above the slip. */
 :root .play-area .play-options-corner .play-options-button::before {
-  top: -16px;
-  right: 9px;
+  top: -20px;
+  right: 8px;
   width: 16px;
   height: 48px;
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .play-area .play-options-corner .play-options-button::before {
-    top: -13px;
+    top: -14px;
     right: 5px;
-    width: 13px;
-    height: 39px;
+    width: 11px;
+    height: 34px;
   }
 }
 

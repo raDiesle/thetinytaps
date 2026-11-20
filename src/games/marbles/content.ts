@@ -39,8 +39,16 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
     },
   },
   colortrack: {
-    name: { de: "Farbenbahn" },
-    intro: { de: "Welche Farbe? Tipp eine Kugel an!" },
+    name: { de: "Farbenbahn", en: "Color Run", zh: "颜色轨道", hi: "रंगों का रास्ता", es: "La pista de colores", ar: "مسار الألوان", ru: "Цветная трасса" },
+    intro: {
+      de: "Welche Farbe? Tipp eine Kugel an!",
+      en: "Which color? Tap a marble!",
+      zh: "什么颜色？点一颗弹珠！",
+      hi: "कौन-सा रंग? एक कंचा छुओ!",
+      es: "¿Qué color? ¡Toca una canica!",
+      ar: "أيّ لون؟ هيّا نلمس كرة!",
+      ru: "Какой цвет? Нажми на шарик!",
+    },
   },
   snowtrack: {
     name: { de: "Schneebahn", en: "Snow Run", zh: "雪球轨道", hi: "बर्फ़ का रास्ता", es: "La pista de nieve", ar: "مسار الثلج", ru: "Снежная горка" },

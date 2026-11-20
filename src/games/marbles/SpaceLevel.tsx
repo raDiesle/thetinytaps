@@ -1,4 +1,5 @@
 import { memo, useId, useMemo, type ReactNode } from "react";
+import { MASCOT_COLORS, MascotHead } from "@/components/Mascot";
 import { useT } from "@/lib/language";
 import { VIEW_H, wobble, type LevelProps } from "./level";
 import { beside, deg, hop, lerp, svgLine } from "./machineKit";
@@ -1106,7 +1107,7 @@ function Hose({ drop }: { drop: number }) {
   );
 }
 
-/** The rocket with a teddy astronaut at the window; it lifts off on its flame. */
+/** The rocket with a bear astronaut at the window (the app's bear in a white space suit, D-18); it lifts off on its flame. */
 function Rocket({ space, t }: { space: Space; t: number }) {
   const clip = useId();
   const { w, h, nose } = ROCKET;
@@ -1114,7 +1115,8 @@ function Rocket({ space, t }: { space: Space; t: number }) {
   const rise = space.rocketRise(t);
   const top = -30 - h;
   const waving = t >= space.tCount[0];
-  const paw = waving ? { x: 15 + 4 * Math.sin(t * 12), y: -WINDOW_UP - 2 - 5 * Math.abs(Math.sin(t * 6)) } : { x: 12, y: -WINDOW_UP + 18 };
+  // The gloved paw waves beside the cheek, clear of the ear.
+  const paw = waving ? { x: 20 + 3 * Math.sin(t * 12), y: -WINDOW_UP + 6 - 5 * Math.abs(Math.sin(t * 6)) } : { x: 12, y: -WINDOW_UP + 18 };
   const plugY = HOSE.plug.y - ROCKET.bottom;
   const fin = (s: number) => (
     <path
@@ -1149,7 +1151,7 @@ function Rocket({ space, t }: { space: Space; t: number }) {
       <rect x={-half} y={-110} width={w} height="26" fill="#3a86ff" stroke={INK} strokeWidth="3" />
       <rect x={-half + 14} y={top + 30} width="10" height={h - 80} rx="5" fill="#fff" />
       <rect x={half - 4} y={plugY - 10} width="12" height="20" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
-      {/* Window with the teddy astronaut */}
+      {/* Window with the bear astronaut */}
       <defs>
         <clipPath id={clip}>
           <circle cy={-WINDOW_UP} r="27" />
@@ -1157,14 +1159,14 @@ function Rocket({ space, t }: { space: Space; t: number }) {
       </defs>
       <circle cy={-WINDOW_UP} r="27" fill="#bde9ff" />
       <g clipPath={`url(#${clip})`}>
-        <circle cy={-WINDOW_UP + 8} r="22" fill="#fff" stroke={INK} strokeWidth="2.5" />
-        <circle cx="-12" cy={-WINDOW_UP - 6} r="6" fill="#c98a4b" stroke={INK} strokeWidth="2" />
-        <circle cx="12" cy={-WINDOW_UP - 6} r="6" fill="#c98a4b" stroke={INK} strokeWidth="2" />
-        <circle cy={-WINDOW_UP + 6} r="14" fill="#c98a4b" stroke={INK} strokeWidth="2" />
-        <circle cx="-5" cy={-WINDOW_UP + 3} r="2.2" fill={INK} />
-        <circle cx="5" cy={-WINDOW_UP + 3} r="2.2" fill={INK} />
-        <path d={`M-5 ${-WINDOW_UP + 11} Q0 ${-WINDOW_UP + 15} 5 ${-WINDOW_UP + 11}`} fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-        <circle cx={paw.x} cy={paw.y} r="6" fill="#c98a4b" stroke={INK} strokeWidth="2" />
+        {/* The white space suit with its blue collar ring, then the app's bear head (components/Mascot.tsx) and a gloved paw */}
+        <circle cy={-WINDOW_UP + 30} r="24" fill="#fff" stroke={INK} strokeWidth="2.5" />
+        <path d={`M-15 ${-WINDOW_UP + 14} Q0 ${-WINDOW_UP + 22} 15 ${-WINDOW_UP + 14}`} fill="none" stroke="#3a86ff" strokeWidth="5" strokeLinecap="round" />
+        <g transform={`translate(-19 ${-WINDOW_UP - 20}) scale(0.38)`}>
+          <BearFace />
+        </g>
+        <circle cx={paw.x} cy={paw.y} r="6" fill="#fff" stroke={INK} strokeWidth="2" />
+        <circle cx={paw.x} cy={paw.y} r="2.5" fill={MASCOT_COLORS.bear.fur} />
       </g>
       <circle cy={-WINDOW_UP} r="30" fill="none" stroke={DARK_STEEL} strokeWidth="8" />
       <circle cy={-WINDOW_UP} r="34" fill="none" stroke={INK} strokeWidth="3" />
@@ -1180,6 +1182,11 @@ function Rocket({ space, t }: { space: Space; t: number }) {
     </g>
   );
 }
+
+/** The bear astronaut's head, drawn once: the rocket moves it but never changes it. */
+const BearFace = memo(function BearFace() {
+  return <MascotHead kind="bear" mouth="grin" />;
+});
 
 /** The flame under the rocket, flickering; `size` is 0 when the engine is off. */
 function Flame({ size, t }: { size: number; t: number }) {

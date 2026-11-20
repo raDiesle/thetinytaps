@@ -212,7 +212,11 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
       },
       file: "src/games/marbles/spaceTrack.tsx",
     },
-    { text: "Die Röhre ist voll!", file: "src/games/marbles/colors.ts" },
+    {
+      text: "Die Röhre ist voll!",
+      translations: { en: "The tube is full!", zh: "管子满啦！", hi: "नली भर गई!", es: "¡El tubo está lleno!", ar: "امتلأ الأنبوب!", ru: "Трубка полная!" },
+      file: "src/games/marbles/colors.ts",
+    },
   ],
 };
 
@@ -350,6 +354,7 @@ function animals(language: TargetLanguageId): VoiceGroup[] {
 /** The chapter books' translations, filled as the languages' texts load. */
 const MILK_CHAIN_TEXTS = byLanguage((texts) => texts.milkChain);
 const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
+const KITA_TEXTS = byLanguage((texts) => texts.kitaStory);
 const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
 
 /**
@@ -602,7 +607,7 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/timer/", groups: timer(language) },
     { href: "/abstillen/", groups: chapterBook(MILK_CHAIN, language, MILK_CHAIN_TEXTS) },
     { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
-    { href: "/kita/", groups: chapterBook(KITA_STORY, language) },
+    { href: "/kita/", groups: chapterBook(KITA_STORY, language, KITA_TEXTS) },
     { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, HAIR_TEXTS, "en") },
     {
       href: "",

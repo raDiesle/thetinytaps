@@ -10,7 +10,7 @@
     "test:watch": "bun test --watch",
     "lint": "biome check",
     "format": "biome check --write",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "preview": "bun tools/preview.ts",
     "image": "bun scripts/gemini-image.mjs",
     "song": "bun scripts/song-timing.mjs",

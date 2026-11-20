@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 import { MASCOT_COLORS, MascotHead, type MascotKind } from "@/components/Mascot";
 import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { type Figure, useFigure } from "@/lib/common";
@@ -97,7 +97,19 @@ export type Pose =
   | "paddle"
   // Kneading dough at a table: the child draws no arms, the scene draws them over the dough (`KneadArms` in
   // film/baecker.tsx), since the hands lie on something drawn in front of the child.
-  | "knead";
+  | "knead"
+  // Saying goodbye at the end of a film: one hand raised beside the head, waving slowly a few times, then still.
+  | "wave";
+
+/** True while a film is over and its closing sentence is said (G-31): a child or grown-up standing or cheering then
+ * waves goodbye instead (`waving`), so the film ends quietly, never with cheering. Given by the film engine only. */
+export const FilmOver = createContext(false);
+
+/** The pose a figure shows: at a film's end (`FilmOver`) standing or cheering becomes a calm wave; what it is busy
+ * with (walking, eating, holding something) goes on. */
+export function waving<P extends string>(pose: P, over: boolean, busy = false): P | "wave" {
+  return over && !busy && (pose === "stand" || pose === "cheer") ? "wave" : pose;
+}
 
 /** What the child wears; "barefoot" and "flipflops" are for the beach (feet instead of shoes), "fire" is the fire
  * brigade's jacket, trousers and helmet. */
@@ -138,13 +150,14 @@ const IN_FRONT: Partial<Record<Holding, { draw: () => ReactNode; scale: number }
   teddy: { draw: () => <Teddy />, scale: 0.6 },
 };
 
-type Arm = "down" | "up" | "out" | "front" | "belly" | "mouth" | "fork" | "side" | "back";
+type Arm = "down" | "up" | "wave" | "out" | "front" | "belly" | "mouth" | "fork" | "side" | "back";
 
 /** The right arm in each position, and where its hand is; the left one is mirrored. */
 const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
   down: { d: "M22 -100 Q34 -80 32 -58", hand: [32, -56] },
   up: { d: "M22 -100 Q40 -116 40 -146", hand: [40, -150] },
   out: { d: "M22 -100 Q40 -96 60 -110", hand: [62, -112] },
+  wave: { d: "M22 -100 Q48 -104 52 -138", hand: [54, -142] },
   front: { d: "M22 -100 Q34 -80 18 -70", hand: [17, -70] },
   belly: { d: "M22 -100 Q36 -82 12 -74", hand: [10, -74] },
   mouth: { d: "M22 -100 Q44 -98 14 -118", hand: [12, -120] },
@@ -154,6 +167,7 @@ const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
 };
 
 function rightArm(pose: Pose, front: boolean): Arm {
+  if (pose === "wave") return "wave";
   if (pose === "reach" || pose === "stir" || pose === "serve" || pose === "take") return "out";
   if (pose === "cheer" || pose === "yawn" || pose === "build" || pose === "lift" || pose === "pack") return "up";
   if (pose === "eat") return "fork";
@@ -289,7 +303,7 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
 /** A child. `face` -1 mirrors it, so it turns to where it walks or reaches; `backpack` puts one on its back. */
 export function Kid({
   look,
-  pose,
+  pose: asked,
   holding,
   wear,
   face,
@@ -302,6 +316,7 @@ export function Kid({
   face: 1 | -1;
   backpack?: { open: boolean; bump: number };
 }) {
+  const pose = waving(asked, useContext(FilmOver), !!holding);
   const pyjama = wear.includes("pyjama");
   const coat = wear.includes("coat");
   const boots = wear.includes("boots");

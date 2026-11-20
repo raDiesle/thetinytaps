@@ -45,25 +45,67 @@ const RAW_DIR = ".image-raw";
 const DEFAULT_MODEL = "gemini-3.1-flash-lite-image";
 const API = "https://generativelanguage.googleapis.com/v1beta";
 const POLL_MS = 30_000;
+/** @type {Record<string, string>} */
 const MIME = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp" };
 /** The gaps between the pictures of a grid: a colour no picture here uses, so the cuts are easy to find. */
 const GAP = "ff00ff";
 const ASPECTS = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"];
 
+/**
+ * @param {string} message
+ * @returns {never}
+ */
 function fail(message) {
   console.error(message);
   process.exit(1);
 }
 
-const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
+const git = (/** @type {string[]} */ ...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
 const ROOT = git("rev-parse", "--show-toplevel");
 /** Shared by all worktrees of the repository, so a batch outlives the worktree that sent it. */
 const BATCH_DIR = join(git("rev-parse", "--path-format=absolute", "--git-common-dir"), "image-batches");
 
 // ---------- Arguments ----------
 
+/**
+ * The command line's options; `out` and `prompt` are its first two words.
+ * @typedef {{ refs: string[]; panels: string[]; key: string; quality: number; grid?: string; jobs?: string; from?: string; aspect?: string;
+ *   size?: string; transparent?: boolean; frames?: boolean; model?: string; imageSize?: string; thinking?: string; now?: boolean;
+ *   wait?: boolean; make?: boolean; force?: string; out?: string; prompt?: string }} Options
+ */
+
+/**
+ * What a job is made from: the command line's options, an entry of a --jobs file or a sheet of the queue.
+ * @typedef {{ out?: string | string[]; prompt?: string; ref?: string | string[]; refs?: string[]; panels?: string[]; aspect?: string;
+ *   grid?: string; size?: string; quality?: number; transparent?: boolean; key?: string; frames?: boolean; model?: string;
+ *   imageSize?: string; thinking?: string; from?: string }} JobInput
+ */
+
+/**
+ * One request, checked: one picture, or one grid cut into several.
+ * @typedef {{ outs: string[]; prompt: string; refs: string[]; panels: string[]; aspect?: string; grid?: string; size?: string;
+ *   quality: number; transparent: boolean; key: string; frames: boolean; model?: string; imageSize?: string; thinking?: string }} Job
+ */
+
+/**
+ * A batch sent to Gemini, as noted in the shared .git folder; `usage` is added once its answers are in.
+ * @typedef {{ name: string; model: string; sent: string; checkout: string; branch: string; jobs: Job[]; usage?: Usage[] }} BatchRecord
+ */
+
+/**
+ * Gemini's token counts of one answer.
+ * @typedef {{ promptTokenCount?: number; candidatesTokenCount?: number; thoughtsTokenCount?: number;
+ *   candidatesTokensDetails?: { modality: string; tokenCount: number }[] }} Usage
+ */
+
+/**
+ * @param {string[]} argv
+ * @returns {Options}
+ */
 function parseArgs(argv) {
+  /** @type {Options} */
   const opts = { refs: [], panels: [], key: "ff00ff", quality: 80 };
+  /** @type {string[]} */
   const rest = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -117,13 +159,20 @@ const JOB_FIELDS = new Set([
   "thinking",
 ]);
 
-/** A job read from a --jobs file, checked for fields this script doesn't know. */
+/**
+ * A job read from a --jobs file, checked for fields this script doesn't know.
+ * @param {JobInput} o
+ */
 function checkedJob(o) {
   const unknown = Object.keys(o).filter((k) => !JOB_FIELDS.has(k));
   if (unknown.length) fail(`unknown job field(s): ${unknown.join(", ")} – allowed: ${[...JOB_FIELDS].join(", ")}`);
   return o;
 }
 
+/**
+ * @param {JobInput} o
+ * @returns {Job}
+ */
 function toJob(o) {
   const outs = Array.isArray(o.out)
     ? o.out
@@ -161,6 +210,10 @@ function toJob(o) {
   return job;
 }
 
+/**
+ * @param {string | undefined} grid
+ * @returns {[number, number]}
+ */
 function parseGrid(grid) {
   const m = /^(\d)x(\d)$/.exec(grid ?? "1x1");
   if (!m) fail("--grid must be columns x rows, like 2x2 or 1x2");
@@ -169,13 +222,19 @@ function parseGrid(grid) {
 
 // ---------- Asking Gemini ----------
 
+/** @type {Record<string, string[]>} */
 const POSITIONS = {
   "2x1": ["left", "right"],
   "1x2": ["top", "bottom"],
   "2x2": ["top left", "top right", "bottom left", "bottom right"],
 };
 
-/** The whole picture's aspect for a grid of panels with this aspect, if Gemini can make it. */
+/**
+ * The whole picture's aspect for a grid of panels with this aspect, if Gemini can make it.
+ * @param {string | undefined} aspect
+ * @param {number} cols
+ * @param {number} rows
+ */
 function gridAspect(aspect, cols, rows) {
   const [w, h] = (aspect ?? "1:1").split(":").map(Number);
   const [gw, gh] = [w * cols, h * rows];
@@ -188,8 +247,9 @@ function gridAspect(aspect, cols, rows) {
 }
 
 /** On a cut-out the backdrop already is the gap. */
-const gapColour = (job) => (job.transparent ? job.key : GAP);
+const gapColour = (/** @type {Job} */ job) => (job.transparent ? job.key : GAP);
 
+/** @param {Job} job */
 function buildRequest(job) {
   let text = job.prompt;
   let aspect = job.aspect;
@@ -208,18 +268,25 @@ function buildRequest(job) {
   if (job.transparent) {
     text += `\n\nPlace the subject on a plain, perfectly flat, solid #${job.key} background that fills the whole picture edge to edge – no gradient, no texture, no floor, no cast shadow, no other objects. Keep a small margin around the subject.`;
   }
+  /** @type {({ text: string } | { inlineData: { mimeType: string; data: string } })[]} */
   const parts = [{ text }];
   for (const file of job.refs) {
     const mimeType = MIME[extname(file).toLowerCase()];
     if (!mimeType) fail(`--ref ${file}: only PNG, JPG and WebP`);
     parts.push({ inlineData: { mimeType, data: readFileSync(resolve(ROOT, file)).toString("base64") } });
   }
+  /** @type {{ responseModalities: string[]; imageConfig?: object; thinkingConfig?: object }} */
   const generationConfig = { responseModalities: ["IMAGE"] };
   if (aspect || job.imageSize) generationConfig.imageConfig = { ...(aspect && { aspectRatio: aspect }), ...(job.imageSize && { imageSize: job.imageSize }) };
   if (job.thinking) generationConfig.thinkingConfig = { thinkingLevel: job.thinking };
   return { contents: [{ parts }], generationConfig };
 }
 
+/**
+ * @param {string} path
+ * @param {RequestInit} [init]
+ * @returns {Promise<any>} Gemini's answer as it sent it
+ */
 async function call(path, init = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) fail("GEMINI_API_KEY is not set (create a key in Google AI Studio and export it in ~/.zshrc)");
@@ -232,23 +299,31 @@ async function call(path, init = {}) {
   return json;
 }
 
-/** The picture in a generateContent answer, or why there is none. */
+/**
+ * The picture in a generateContent answer, or why there is none.
+ * @param {any} answer
+ * @returns {{ picture: Buffer; error?: undefined } | { picture?: undefined; error: string }}
+ */
 function pictureIn(answer) {
   const candidate = answer?.candidates?.[0];
-  const image = candidate?.content?.parts?.find((p) => p.inlineData)?.inlineData;
+  const image = candidate?.content?.parts?.find((/** @type {any} */ p) => p.inlineData)?.inlineData;
   if (image) return { picture: Buffer.from(image.data, "base64") };
   const said = candidate?.content?.parts
-    ?.map((p) => p.text)
+    ?.map((/** @type {any} */ p) => p.text)
     .filter(Boolean)
     .join(" ");
   const reason = candidate?.finishReason ?? answer?.promptFeedback?.blockReason ?? "no picture";
   return { error: `Gemini returned no picture (${reason})${said ? `: ${said}` : ""}` };
 }
 
-const modelOf = (opts) => opts.model ?? process.env.GEMINI_IMAGE_MODEL ?? DEFAULT_MODEL;
+const modelOf = (/** @type {{ model?: string }} */ opts) => opts.model ?? process.env.GEMINI_IMAGE_MODEL ?? DEFAULT_MODEL;
 
 // ---------- Batches ----------
 
+/**
+ * @param {Job[]} jobs
+ * @param {string} model
+ */
 async function submit(jobs, model) {
   const body = {
     batch: {
@@ -257,6 +332,7 @@ async function submit(jobs, model) {
     },
   };
   const batch = await call(`models/${model}:batchGenerateContent`, { method: "POST", body: JSON.stringify(body) });
+  /** @type {BatchRecord} */
   const record = {
     name: batch.name,
     model,
@@ -272,8 +348,9 @@ async function submit(jobs, model) {
   return record;
 }
 
-const recordPath = (record) => join(BATCH_DIR, `${record.name.replace(/\W+/g, "-")}.json`);
+const recordPath = (/** @type {{ name: string }} */ record) => join(BATCH_DIR, `${record.name.replace(/\W+/g, "-")}.json`);
 
+/** @returns {BatchRecord[]} */
 function openRecords() {
   if (!existsSync(BATCH_DIR)) return [];
   return readdirSync(BATCH_DIR)
@@ -281,6 +358,10 @@ function openRecords() {
     .map((f) => JSON.parse(readFileSync(join(BATCH_DIR, f), "utf8")));
 }
 
+/**
+ * @param {BatchRecord} record
+ * @param {string} how
+ */
 function closeRecord(record, how) {
   const done = join(BATCH_DIR, how);
   mkdirSync(done, { recursive: true });
@@ -291,14 +372,18 @@ function closeRecord(record, how) {
  * US dollars per million tokens in a batch (half the price of asking at once): input (text and pictures), text and
  * thinking output, picture output. From ai.google.dev/gemini-api/docs/pricing, November 2026.
  */
+/** @type {Record<string, { input: number; text: number; image: number }>} */
 const BATCH_PRICES = {
   "gemini-3.1-flash-lite-image": { input: 0.125, text: 0.75, image: 15 },
   "gemini-nano-banana-2.1": { input: 0.75, text: 3.75, image: 15 },
 };
 
-/** Prints what a batch really cost, from the token counts Gemini sent back, so a price is measured, not assumed. */
+/**
+ * Prints what a batch really cost, from the token counts Gemini sent back, so a price is measured, not assumed.
+ * @param {BatchRecord & { usage: Usage[] }} record
+ */
 function reportCost(record) {
-  const sum = (key) => record.usage.reduce((n, u) => n + (u[key] ?? 0), 0);
+  const sum = (/** @type {"promptTokenCount" | "candidatesTokenCount" | "thoughtsTokenCount"} */ key) => record.usage.reduce((n, u) => n + (u[key] ?? 0), 0);
   const imageOut = record.usage.reduce(
     (n, u) => n + (u.candidatesTokensDetails ?? []).filter((d) => d.modality === "IMAGE").reduce((m, d) => m + d.tokenCount, 0),
     0,
@@ -312,9 +397,12 @@ function reportCost(record) {
   console.log(`${record.name}: ${tokens} – $${dollars.toFixed(4)} for ${requests} request${requests === 1 ? "" : "s"}`);
 }
 
-const stateOf = (batch) => String(batch.metadata?.state ?? batch.state ?? "unknown");
+const stateOf = (/** @type {any} */ batch) => String(batch.metadata?.state ?? batch.state ?? "unknown");
 
-/** Looks at one batch; saves its pictures once it is done. Returns true when nothing is left to wait for. */
+/**
+ * Looks at one batch; saves its pictures once it is done. Returns true when nothing is left to wait for.
+ * @param {BatchRecord} record
+ */
 async function check(record) {
   const batch = await call(record.name);
   const state = stateOf(batch);
@@ -329,9 +417,9 @@ async function check(record) {
   const root = existsSync(record.checkout) ? record.checkout : ROOT;
   if (root !== record.checkout) console.warn(`${record.checkout} is gone – saving into ${root} instead`);
   let failed = 0;
-  record.usage = answers.map((answer) => answer.response?.usageMetadata).filter(Boolean);
+  record.usage = answers.map((/** @type {any} */ answer) => answer.response?.usageMetadata).filter(Boolean);
   writeFileSync(recordPath(record), JSON.stringify(record, null, 2));
-  reportCost(record);
+  reportCost(/** @type {BatchRecord & { usage: Usage[] }} set just above */ (record));
   for (const [i, answer] of answers.entries()) {
     const job = record.jobs[Number(answer.metadata?.key ?? i)];
     const { picture, error } = answer.error ? { error: answer.error.message } : pictureIn(answer.response);
@@ -340,16 +428,18 @@ async function check(record) {
       console.error(`${job.outs.join(", ")}: ${error}`);
       continue;
     }
-    await finish(job, picture, root);
+    await finish(job, /** @type {Buffer} no error, so a picture */ (picture), root);
   }
   closeRecord(record, failed ? "failed" : "done");
   return true;
 }
 
+/** @param {BatchRecord[]} records */
 async function waitFor(records) {
   let open = records;
   let rounds = 0;
   while (open.length) {
+    /** @type {BatchRecord[]} */
     const still = [];
     for (const record of open) if (!(await check(record))) still.push(record);
     open = still;
@@ -372,13 +462,19 @@ async function status() {
 
 // ---------- The queue ----------
 
-const dollars = (sheets) => `$${costOf(sheets).toFixed(3)}`;
-const engineName = ({ engine }) => `${ENGINES[engine].model}${ENGINES[engine].imageSize ? ` ${ENGINES[engine].imageSize}` : ""}`;
+const dollars = (/** @type {Parameters<typeof costOf>[0]} */ sheets) => `$${costOf(sheets).toFixed(3)}`;
+/** @typedef {import("../src/content/pictureQueuePlan.ts").Engine} Engine */
+/** @type {(sheet: { engine: keyof typeof ENGINES }) => string} */
+const engineName = ({ engine }) =>
+  `${ENGINES[engine].model}${/** @type {Engine} */ (ENGINES[engine]).imageSize ? ` ${/** @type {Engine} */ (ENGINES[engine]).imageSize}` : ""}`;
 
-/** Prints what of the queue is cheap now, what waits for partners and what waits for its reference. */
+/**
+ * Prints what of the queue is cheap now, what waits for partners and what waits for its reference.
+ * @param {ReturnType<typeof planQueue>} plan
+ */
 function printPlan(plan) {
   if (!PICTURE_QUEUE.length) return console.log("the queue is empty (src/content/pictureQueue.ts)");
-  const ids = (pictures) => pictures.map((p) => p.id).join(", ");
+  const ids = (/** @type {{ id: string }[]} */ pictures) => pictures.map((p) => p.id).join(", ");
   console.log(`cheap now – ${plan.now.length} request${plan.now.length === 1 ? "" : "s"}, ${dollars(plan.now)}:`);
   if (!plan.now.length) console.log("  nothing");
   for (const sheet of plan.now) {
@@ -395,18 +491,22 @@ function printPlan(plan) {
   }
 }
 
-/** Sends the jobs as one batch per model (or at once with --now) and saves the pictures. */
+/**
+ * Sends the jobs as one batch per model (or at once with --now) and saves the pictures.
+ * @param {Job[]} jobs
+ */
 async function make(jobs) {
-  const modelOfJob = (job) => job.model ?? modelOf(opts);
+  const modelOfJob = (/** @type {Job} */ job) => job.model ?? modelOf(opts);
   if (opts.now) {
     for (const job of jobs) {
       const answer = await call(`models/${modelOfJob(job)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
       const { picture, error } = pictureIn(answer);
       if (error) fail(error);
-      await finish(job, picture, ROOT);
+      await finish(job, /** @type {Buffer} no error, so a picture */ (picture), ROOT);
     }
   } else {
     // A batch holds requests to one model, so the queue's sheets for Lite and for Nano Banana 2.1 go as two.
+    /** @type {BatchRecord[]} */
     const records = [];
     for (const model of new Set(jobs.map(modelOfJob)))
       records.push(
@@ -422,6 +522,11 @@ async function make(jobs) {
 
 // ---------- Saving ----------
 
+/**
+ * @param {Job} job
+ * @param {Buffer} picture
+ * @param {string} root
+ */
 async function finish(job, picture, root) {
   mkdirSync(join(root, RAW_DIR), { recursive: true });
   const raw = join(root, RAW_DIR, `${basename(job.outs[0], extname(job.outs[0]))}${job.grid ? `-grid${job.grid}` : ""}.png`);
@@ -434,6 +539,9 @@ async function finish(job, picture, root) {
 /**
  * The pictures in what Gemini sent, cut out when asked: the whole, the panels of a grid, or a sheet of frames cut into
  * equal cells and cropped all by one box round what any of them shows, so they still line up.
+ * @param {Job} job
+ * @param {Buffer} picture
+ * @returns {Promise<Buffer[]>}
  */
 async function cutPieces(job, picture) {
   if (!job.grid) return [job.transparent ? await cutOut(picture, job.key) : picture];
@@ -443,13 +551,16 @@ async function cutPieces(job, picture) {
   }
   const frames = await Promise.all((await splitCells(picture, ...parseGrid(job.grid))).map((cell) => cutOut(cell, job.key, false)));
   const boxes = await Promise.all(frames.map(async (f) => (await sharp(f).trim({ threshold: 0 }).toBuffer({ resolveWithObject: true })).info));
+  // trim() always reports its offsets.
+  const trimmed = /** @type {Required<import("sharp").OutputInfo>[]} */ (boxes);
   const { width, height } = await sharp(frames[0]).metadata();
-  const left = Math.min(...boxes.map((b) => -b.trimOffsetLeft));
-  const top = Math.min(...boxes.map((b) => -b.trimOffsetTop));
-  const right = Math.max(...boxes.map((b) => -b.trimOffsetLeft + b.width));
-  const bottom = Math.max(...boxes.map((b) => -b.trimOffsetTop + b.height));
+  const left = Math.min(...trimmed.map((b) => -b.trimOffsetLeft));
+  const top = Math.min(...trimmed.map((b) => -b.trimOffsetTop));
+  const right = Math.max(...trimmed.map((b) => -b.trimOffsetLeft + b.width));
+  const bottom = Math.max(...trimmed.map((b) => -b.trimOffsetTop + b.height));
   const pad = Math.round(Math.max(right - left, bottom - top) * 0.02);
-  const box = { left: Math.max(0, left - pad), top: Math.max(0, top - pad) };
+  // Its width and height are added below, from its left and top.
+  const box = /** @type {import("sharp").Region} */ ({ left: Math.max(0, left - pad), top: Math.max(0, top - pad) });
   Object.assign(box, { width: Math.min(width, right + pad) - box.left, height: Math.min(height, bottom + pad) - box.top });
   return Promise.all(frames.map((f) => sharp(f).extract(box).png().toBuffer()));
 }
@@ -457,6 +568,11 @@ async function cutPieces(job, picture) {
 // The frames of one animation drawn on one sheet (a child standing, hopping, clapping) are cut into equal cells and
 // keep them whole (`--frames`): Gemini places the body at the same spot in each cell, so stacked they line up. Cropped
 // to its outline each, a frame with raised arms came out a different size and shifted (Mitmachen, November 2026).
+/**
+ * @param {Buffer} input
+ * @param {number} cols
+ * @param {number} rows
+ */
 async function splitCells(input, cols, rows) {
   const { width, height } = await sharp(input).metadata();
   const [w, h] = [Math.floor(width / cols), Math.floor(height / rows)];
@@ -477,19 +593,28 @@ async function splitCells(input, cols, rows) {
 // Cuts a grid picture into its panels. The model never draws the gaps exactly
 // where asked, so each cut goes along the line with most gap colour near where
 // it should be, and gap colour left at a panel's edges is trimmed away.
+/**
+ * @param {Buffer} input
+ * @param {number} cols
+ * @param {number} rows
+ * @param {string} gapHex
+ * @param {boolean} [cutOutLater]
+ */
 async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
   const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   const gap = [0, 2, 4].map((i) => parseInt(gapHex.slice(i, i + 2), 16));
   // The gap sometimes comes back far darker than asked (a plum 150, 45, 105 round two pairs' frames, November 2026, left
   // as bands): where the sheet has a plain border of a magenta-ish colour, that colour is gap too.
+  /** @type {number[]} */
   const border = [];
   for (let x = 0; x < w; x += 4) border.push((2 * w + x) * 3, ((h - 3) * w + x) * 3);
-  const median = (c) => border.map((p) => data[p + c]).sort((a, b) => a - b)[border.length >> 1];
+  const median = (/** @type {number} */ c) => border.map((p) => data[p + c]).sort((a, b) => a - b)[border.length >> 1];
   const seen = [median(0), median(1), median(2)];
   const plain = border.filter((p) => Math.hypot(data[p] - seen[0], data[p + 1] - seen[1], data[p + 2] - seen[2]) < 40).length / border.length;
-  const tinted = (c) => [0, 1, 2].every((i) => (gap[i] > 128 ? c[i] - Math.min(...c) > 40 : c[i] <= Math.min(...c) + 10));
+  const tinted = (/** @type {number[]} */ c) => [0, 1, 2].every((i) => (gap[i] > 128 ? c[i] - Math.min(...c) > 40 : c[i] <= Math.min(...c) + 10));
   const second = plain > 0.8 && tinted(seen) ? seen : null;
+  /** @type {(x: number, y: number) => boolean} */
   const isGap = (x, y) => {
     const p = (y * w + x) * 3;
     // Wide enough for the darker magenta the book's softened colours bring (198, 24, 147 left a band of gap on two
@@ -501,6 +626,7 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
   // blue well above green), even where it is blended with the picture's paper.
   const highs = [0, 1, 2].filter((i) => gap[i] > 128);
   const lows = [0, 1, 2].filter((i) => gap[i] <= 128);
+  /** @type {(x: number, y: number) => boolean} */
   const isTint = (x, y) => {
     const p = (y * w + x) * 3;
     const top = Math.max(...lows.map((i) => data[p + i]));
@@ -508,17 +634,20 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
     if (second && Math.hypot(data[p] - second[0], data[p + 1] - second[1], data[p + 2] - second[2]) < 90 && data[p] - data[p + 1] > 30) return true;
     return highs.length > 0 && lows.length > 0 && highs.every((i) => data[p + i] > 110 && data[p + i] - top > 45);
   };
+  /** @type {(x: number, y0?: number, y1?: number) => number} */
   const columnGap = (x, y0 = 0, y1 = h) => {
     let n = 0;
-    for (let y = y0; y < y1; y++) n += isGap(x, y);
+    for (let y = y0; y < y1; y++) n += +isGap(x, y);
     return n / (y1 - y0);
   };
+  /** @type {(y: number, x0?: number, x1?: number) => number} */
   const rowGap = (y, x0 = 0, x1 = w) => {
     let n = 0;
-    for (let x = x0; x < x1; x++) n += isGap(x, y);
+    for (let x = x0; x < x1; x++) n += +isGap(x, y);
     return n / (x1 - x0);
   };
   // The cuts between panels: [end of one, start of the next].
+  /** @type {(count: number, length: number, gapness: (line: number) => number) => number[][]} */
   const cuts = (count, length, gapness) => {
     const result = [[0, 0]];
     for (let i = 1; i < count; i++) {
@@ -577,17 +706,18 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
       // magenta out of themselves, so a few pixels of it at the very edge are always seam.
       // The seam is gap colour blended into the picture (a soft pink), so it is told by its tint, not its distance.
       const [seamX, seamY] = [Math.round((x1 - x0) * 0.025), Math.round((y1 - y0) * 0.025)];
-      const tintRow = (y) => {
+      const tintRow = (/** @type {number} */ y) => {
         let n = 0;
-        for (let x = x0; x < x1; x++) n += isTint(x, y);
+        for (let x = x0; x < x1; x++) n += +isTint(x, y);
         return n / (x1 - x0);
       };
-      const tintColumn = (x) => {
+      const tintColumn = (/** @type {number} */ x) => {
         let n = 0;
-        for (let y = y0; y < y1; y++) n += isTint(x, y);
+        for (let y = y0; y < y1; y++) n += +isTint(x, y);
         return n / (y1 - y0);
       };
       // Two lines clean in a row end the seam: a single clean line can lie inside a soft one.
+      /** @type {(from: number, step: number, limit: number, tint: (line: number) => number) => number} */
       const trim = (from, step, limit, tint) => {
         let at = from;
         for (let n = 0; n < limit && (tint(at) > 0.03 || tint(at + step) > 0.03); n++) at += step;
@@ -623,14 +753,20 @@ async function splitGrid(input, cols, rows, gapHex, cutOutLater = false) {
 // Removes the flat background: flood fill from the edges over pixels close to
 // the key colour, a soft edge in between, and the key colour taken out of the
 // edge pixels so no coloured fringe is left.
+/**
+ * @param {Buffer} input
+ * @param {string} keyHex
+ * @param {boolean} [crop]
+ */
 async function cutOut(input, keyHex, crop = true) {
   const { data, info } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   let key = [0, 2, 4].map((i) => parseInt(keyHex.slice(i, i + 2), 16));
   const HARD = 70;
   const SOFT = 150;
-  const dist = (p) => Math.hypot(data[p * 4] - key[0], data[p * 4 + 1] - key[1], data[p * 4 + 2] - key[2]);
+  const dist = (/** @type {number} */ p) => Math.hypot(data[p * 4] - key[0], data[p * 4 + 1] - key[1], data[p * 4 + 2] - key[2]);
 
+  /** @type {number[]} */
   const edge = [];
   for (let x = 0; x < w; x++) edge.push(x, (h - 1) * w + x);
   for (let y = 1; y < h - 1; y++) edge.push(y * w, y * w + w - 1);
@@ -639,7 +775,7 @@ async function cutOut(input, keyHex, crop = true) {
   // ff36f8), so key on what the border really is.
   const near = edge.filter((p) => dist(p) < SOFT);
   if (near.length) {
-    const median = (c) => near.map((p) => data[p * 4 + c]).sort((a, b) => a - b)[near.length >> 1];
+    const median = (/** @type {number} */ c) => near.map((p) => data[p * 4 + c]).sort((a, b) => a - b)[near.length >> 1];
     key = [median(0), median(1), median(2)];
   }
   const onKey = edge.filter((p) => dist(p) < HARD).length / edge.length;
@@ -653,7 +789,7 @@ async function cutOut(input, keyHex, crop = true) {
   for (let p = 0; p < w * h; p++) if (dist(p) < HARD / 2) stack.push(p);
   const seen = new Uint8Array(w * h);
   while (stack.length) {
-    const p = stack.pop();
+    const p = /** @type {number} the stack is not empty */ (stack.pop());
     if (seen[p]) continue;
     seen[p] = 1;
     const d = dist(p);
@@ -701,6 +837,10 @@ async function cutOut(input, keyHex, crop = true) {
     .toBuffer();
 }
 
+/**
+ * @param {Buffer} input
+ * @param {{ out: string; size?: string; quality: number; transparent: boolean }} job
+ */
 async function save(input, { out, size, quality, transparent }) {
   let img = sharp(input);
   if (size) {
@@ -759,5 +899,7 @@ if (opts.out === "status") {
   }
 } else {
   const shared = { refs: opts.refs, aspect: opts.aspect, size: opts.size, quality: opts.quality, transparent: opts.transparent, key: opts.key };
-  await make(opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...checkedJob(o) })) : [toJob(opts)]);
+  await make(
+    opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((/** @type {JobInput} */ o) => toJob({ ...shared, ...checkedJob(o) })) : [toJob(opts)],
+  );
 }

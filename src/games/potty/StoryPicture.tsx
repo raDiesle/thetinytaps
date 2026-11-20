@@ -10,7 +10,7 @@ const MOVE_MS = 650;
 /**
  * A picture of the story; in „Muss mal!“ it fills the screen. Its two frames fade into each
  * other, like a tiny GIF, once the story has started (`moving`); before the first
- * tap it stands still. Several names show one picture's frames after the other's. The pictures of
+ * tap it stands still (and while paused, where it keeps the frame it shows). Several names show one picture's frames after the other's. The pictures of
  * `moves` come once before them (trousers going down), then the picture stays – or, with `again`, they play
  * once more after that pause, over and over. Give it a new `key` for every picture.
  */
@@ -19,12 +19,15 @@ export function StoryPicture({
   moves = [],
   again,
   moving,
+  frameMs = FRAME_MS,
   className = "pt-picture",
 }: {
   name: string | string[];
   moves?: string[];
   again?: number;
   moving: boolean;
+  /** How long each frame stays: a thought's two frames tell before and after, so they stay longer than a picture's. */
+  frameMs?: number;
   className?: string;
 }) {
   const once = moves.flatMap(framesFor);
@@ -38,9 +41,9 @@ export function StoryPicture({
 
   useEffect(() => {
     if (still || (!intro && loop.length < 2)) return;
-    const timer = setTimeout(() => setFrame((f) => f + 1), intro ? MOVE_MS : FRAME_MS);
+    const timer = setTimeout(() => setFrame((f) => f + 1), intro ? MOVE_MS : frameMs);
     return () => clearTimeout(timer);
-  }, [still, intro, loop.length, frame]);
+  }, [still, intro, loop.length, frame, frameMs]);
 
   // After the pause the animation starts again from its first picture.
   useEffect(() => {

@@ -94,11 +94,31 @@ export const WORDS_BLURB: Localized = {
   ar: "كلمات أولى والبحث عن الحروف",
 };
 
-/** Wo ist das kleine b?: a big letter looks for its small one among three (L-23). German only until translations are asked for. */
-export const CASE_TITLE: Localized = { de: "Wo ist das kleine b?" };
+/**
+ * Wo ist das kleine b?: a big letter looks for its small one among three (L-23), named as the pages for search engines
+ * name it (seo.<lang>.ts). Hindi and Arabic have one form of each letter and play it in English, so their name, like the
+ * Chinese and Russian one, asks for the small letter without showing one.
+ */
+export const CASE_TITLE: Localized = {
+  de: "Wo ist das kleine b?",
+  ru: "Где маленькая буква?",
+  en: "Where is little b?",
+  zh: "小写字母在哪里？",
+  hi: "छोटा अक्षर कहाँ है?",
+  es: "¿Dónde está la b pequeña?",
+  ar: "أين الحرف الصغير؟",
+};
 
 /** Its line in the book's table of contents. */
-export const CASE_BLURB: Localized = { de: "Großer Buchstabe sucht sein kleines Kind" };
+export const CASE_BLURB: Localized = {
+  de: "Großer Buchstabe sucht sein kleines Kind",
+  ru: "Большая буква ищет свою маленькую",
+  en: "A big letter looks for its little one",
+  zh: "大写字母找它的小写字母",
+  hi: "बड़ा अक्षर अपना छोटा अक्षर ढूँढता है",
+  es: "Una letra grande busca a su pequeña",
+  ar: "الحرف الكبير يبحث عن حرفه الصغير",
+};
 
 /** Each game's name, by the way it plays. */
 export const WAY_TITLES: Record<LettersWay, Localized> = { free: FREE_TITLE, count: COUNT_TITLE, move: MOVE_TITLE, words: WORDS_TITLE, case: CASE_TITLE };

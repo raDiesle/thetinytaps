@@ -30,6 +30,7 @@ import { STEP_TEXTS_EN as teethSteps } from "@/games/teeth/steps.en";
 import { DAYTIME_EN as teethDaytime } from "@/games/teeth/daytime.en";
 import { MILK_CHAIN_EN as milkChain } from "@/games/milkchain/en";
 import { PACIFIER_STORY_EN as pacifierStory } from "@/games/pacifierstory/en";
+import { KITA_STORY_EN as kitaStory } from "@/games/kitastory/en";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.en";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.en";
 import { CAUSE_SCENES_EN as cause } from "@/games/cause/scenes.en";
@@ -73,6 +74,7 @@ export const TEXTS: LanguageTexts = {
   teethDaytime,
   milkChain,
   pacifierStory,
+  kitaStory,
   cause,
   stories: { cloudTrip, treasureIsland },
   seo,
