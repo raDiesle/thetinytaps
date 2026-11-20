@@ -20,6 +20,7 @@ import { marblesIdeas } from "./k-marbles";
 import { chainReactionIdeas } from "./r-chain-reactions";
 import { parentPhoneIdeas } from "./e-parent-phone";
 import { everydayHelpersIdeas } from "./h-everyday-helpers";
+import { pottyIdeas } from "./h-potty";
 import { timerIdeas } from "./h-timer";
 import { allGamesIdeas } from "./a-all-games";
 import { figureIdeas } from "./f-figure";
@@ -59,7 +60,7 @@ export const IDEA_GROUPS: IdeaGroup[] = [
   {
     emoji: "👪",
     title: "Für Eltern & Technik",
-    areas: [everydayHelpersIdeas, timerIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
+    areas: [everydayHelpersIdeas, timerIdeas, pottyIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
   },
 ];
 
