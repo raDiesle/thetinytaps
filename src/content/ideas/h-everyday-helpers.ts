@@ -28,6 +28,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Die Belohnungstafel und der Tagesplan drucken A4 direkt aus dem Browser (farbig, grau, zum Ausmalen, mit Ausschneidebogen). Die Bildkarten des Tagesplans und die Sterne der Tafel gibt es als Fotoabzug: 10 × 15, 13 × 18 oder 20 × 30 cm (überall zu bestellen, auch als 4 × 6″), als JPG zum Speichern oder Teilen, mit Schnittlinien und einer Anleitung bis zu den Klettpunkten. Offen: Ausmalbilder der Lebendigen Bilder, Brief der Schnullerfee.",
+      done: true,
     },
     {
       id: "H-03",
@@ -60,6 +61,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       partial:
         "„Aufs Töpfchen“ (/toepfchen/): Gemini-Bildgeschichte mit Tapsi dem Fuchs – essen, trinken, Blase drückt oder Bauch brummelt, Mama und Papa rufen, jeder Schritt ein Tippen. Eine einzige Geschichte ohne Untermenü, die sofort startet: während Tapsi isst, tippt der Erwachsene auf runde Knöpfe, was das Kind gesagt hat (Pipi, Kaka oder beides); beim Sitzen machen Mama und Papa bei jedem Tippen etwas anderes (Wasser plätschert bei Pipi, Drücken bei Kaka, Quatsch), bis ein grüner Haken „fertig“ sagt – einer für Pipi, einer für Kaka, je nachdem, was wirklich kam, oder „nichts“. Essen und Trinken wechseln sich schon vor dem ersten Tippen ab, und jeder Schritt unten in der Leiste springt direkt dorthin. Am Ende zeigt eine Wochentafel die Sterne, mit einem neuen, wenn der Erwachsene beim Sitzen einen Haken getippt hat (früher ein eigener Modus „Hat geklappt!“). Das Warte-Lied ist noch synthetisch (kein Suno-Lied), und die Sterne landen noch nicht auf einer gemeinsamen Sternentafel (H-01).",
+      done: true,
     },
     {
       id: "H-07",
@@ -105,6 +107,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Gebaut als eigenes Buch der Alltagshelfer neben „Abstillen“ (/schnullerfee/, 10. November 2026): „Tapsi und die Schnullerfee“, eine Vorlesegeschichte in Kapiteln mit Gemini-Bildern wie „Abstillen“, entlang der Schritte eines sanften Abschieds (Recherche „schnullerfee-kapitel“): erzählen, nur noch im Bett, den Tag mit drei Sternen am Fenster aussuchen, einsammeln und Tschüss sagen, die erste Nacht, die Fee tauscht die Schachtel gegen einen Kuschelhasen, vermissen dürfen. Eine erste, gespielte Fassung (SVG, ein Zimmer, Kästchen oder Luftballon und das Geschenk hinter ⚙️) wurde dafür auf Wunsch gelöscht (10. November 2026). Offen: der Name des Kindes und der Feenbrief zum Ausdrucken (H-02).",
+      done: true,
     },
     {
       id: "H-12",
@@ -425,6 +428,14 @@ export const everydayHelpersIdeas: IdeaArea = {
       title: "Zeitplan: die Karte dreht sich, am Ende geht der Mond auf",
       text: "Eine erledigte Karte dreht sich um und zeigt eine Pfote. Ist der ganze Tag erledigt, geht oben auf der Seite langsam der Mond auf (morgens die Sonne) – statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
       why: "Das Kind sieht, wie der Tag voll wird, und das Ende passt zur Tageszeit.",
+      effort: "S",
+    },
+    {
+      id: "H-76",
+      emoji: "💌",
+      title: "Schnullerfee: der Feenbrief zum Ausdrucken, mit dem Namen des Kindes",
+      text: "Zur Geschichte „Tapsi und die Schnullerfee“ (H-11) ein Brief der Fee an das Kind, den Eltern mit dem Namen des Kindes als A4 direkt aus dem Browser drucken (wie die Belohnungstafel, H-02) und am Morgen neben das Geschenk legen.",
+      why: "Ein Brief auf Papier macht den Abschied vom Schnuller greifbar und feierlich.",
       effort: "S",
     },
   ],

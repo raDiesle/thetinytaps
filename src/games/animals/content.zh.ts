@@ -2,6 +2,7 @@ import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./
 import type { Gift, GiftId } from "./gifts";
 import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // Chinese (Simplified, Mandarin) texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in
 // content.ts and homes.tsx. Chinese has no articles, gender or plural, so the sentences take the words as they are;
@@ -79,6 +80,14 @@ export const CHINESE_ANIMALS: Record<string, string> = {
   dachs: "獾",
   qualle: "水母",
   schwan: "天鹅",
+  hahn: "公鸡",
+  taube: "鸽子",
+  truthahn: "火鸡",
+  pfau: "孔雀",
+  muecke: "蚊子",
+  schlange: "蛇",
+  kueken: "小鸡",
+  fliege: "苍蝇",
 };
 
 /** Foods by their id (one without an entry is said in German), for the plate and „……爱吃……“. */
@@ -232,10 +241,21 @@ export function chineseGrowth(german: GrowTexts): GrowTexts {
   };
 }
 
+/** „Wer macht das Geräusch?“ in Chinese; an animal without its Chinese word gets the whole German sentence. */
+export function chineseSound(german: SoundTexts): SoundTexts {
+  const animal = (a: Animal) => CHINESE_ANIMALS[a.id];
+  return {
+    listen: "听！幕布后面是谁？",
+    there: (a) => (animal(a) ? `原来是${animal(a)}！` : german.there(a)),
+    thatIs: (a) => (animal(a) ? `这是${animal(a)}。` : german.thatIs(a)),
+  };
+}
+
 /** Chinese, for the table of languages in content.ts. */
 export const CHINESE: AnimalTranslation = {
   words: { animals: CHINESE_ANIMALS, foods: CHINESE_FOODS, homes: CHINESE_HOMES },
   texts: chineseTexts,
   gifts: chineseGifts,
   growth: chineseGrowth,
+  sound: chineseSound,
 };

@@ -121,7 +121,7 @@ export function Astronautin() {
           <path d="M28 -146 Q50 -162 54 -190" stroke={SUIT} strokeWidth="18" fill="none" strokeLinecap="round" />
           <circle cx="55" cy="-196" r="10" fill="#ced4da" />
         </g>
-        <Helmet cx={0} cy={-186} r={38} hair="#a0522d" />
+        <Helmet cx={0} cy={-186} r={38} animal="bear" lashes />
         <Sparkles className="wa-astra-glint" spots={[[-16, -204]]} r={8} />
       </g>
     </>

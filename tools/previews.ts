@@ -1,4 +1,4 @@
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
@@ -17,6 +17,10 @@ import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome
 //
 // Look at every new picture before committing it: a card whose game starts with a dark screen, a loading slip or a
 // story's first words gets a cut of its own in CUTS, or a later moment in WAIT.
+//
+// A game that draws the child (Kleine Abenteuer) is pictured twice: as the boy into `vorschau/`, then with „Mädchen“
+// chosen into `vorschau-maedchen/` beside it (`Menu.girl`, `GIRL_LINES`), which the menus show for a girl
+// (`useFigurePictures`). A girl's picture that looks like the boy's (the child not in sight) is not kept.
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(`--${name}`);
@@ -46,6 +50,8 @@ interface Menu {
    * returns the part of the window to look in (CSS pixels), whose busiest part becomes the picture.
    */
   prepare?: string;
+  /** Where the cards' pictures with the child as a girl go, for a game that draws the child (`useFigurePictures`). */
+  girl?: string;
 }
 
 /**
@@ -74,7 +80,7 @@ const WHOLE_WORLD = `(() => {
 const MENUS: Menu[] = [
   { path: "/bilder/", dir: "src/games/scenes/vorschau" },
   { path: "/kettenreaktion/", dir: "src/games/marbles/vorschau", prepare: WHOLE_WORLD },
-  { path: "/kleine-abenteuer/", dir: "src/games/elevator/vorschau" },
+  { path: "/kleine-abenteuer/", dir: "src/games/elevator/vorschau", girl: "src/games/elevator/vorschau-maedchen" },
   { path: "/abenteuer/", dir: "src/games/adventure/vorschau" },
   { path: "/gefuehle/", dir: "src/games/feelings/vorschau", levels: 2 },
   { path: "/wie-gehts-dir/", dir: "src/games/feelings/vorschau" },
@@ -83,6 +89,9 @@ const MENUS: Menu[] = [
 /** The books whose table of contents gets pictures (`BookContents`), in `src/components/vorschau/<book id>.webp`. */
 const BOOKS = ["lebendige-welten", "gefuehle", "zuordnen", "buchstaben-zahlen"];
 const BOOK_DIR = "src/components/vorschau";
+/** The tables of contents' lines whose game draws the child, pictured again as a girl into `GIRL_BOOK_DIR`. */
+const GIRL_LINES = ["/kleine-abenteuer/"];
+const GIRL_BOOK_DIR = "src/components/vorschau-maedchen";
 
 /** Where the tables of contents' pictures go: smaller in the line than on a card, so they are cut closer (`ZOOMED`). */
 const isBook = (file: string) => file.startsWith(BOOK_DIR);
@@ -91,7 +100,7 @@ const isBook = (file: string) => file.startsWith(BOOK_DIR);
 const keyOf = (file: string) =>
   file
     .split("/")
-    .filter((part) => part !== "vorschau")
+    .filter((part) => !/^vorschau(-maedchen)?$/.test(part))
     .slice(-2)
     .join("/")
     .replace(/\.webp$/, "");
@@ -159,6 +168,13 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
   // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening (the fifth
   // step, after the pump).
   "adventure/feuerwehr": (cdp) => stepInto(cdp, 5),
+  // A film's opening is often an empty place where its machines are still to come: „We build a house“ shows the digger
+  // digging the hole (a key taps the spot shown, once the first line is said), not the empty building site.
+  "elevator/haus": async (cdp) => {
+    await sleep(7500);
+    await press(cdp, "x");
+    await sleep(4000);
+  },
   // Many pairs on the line (user feedback, November 2026): three washes hung whole, so the game takes the child to
   // four pairs with patterns, and of those all but one.
   "components/socken": (cdp) => hangSocks(cdp, 3),
@@ -406,7 +422,9 @@ async function pickLevel(cdp: Cdp, n: number) {
   await sleep(400);
 }
 
-async function pictureMenu(cdp: Cdp, base: string, menu: Menu) {
+/** Pictures each card of `menu` into `dir` (the boy's `menu.dir`, or the girl's `menu.girl`); returns the files written. */
+async function pictureMenu(cdp: Cdp, base: string, menu: Menu, dir = menu.dir): Promise<string[]> {
+  const written: string[] = [];
   for (let level = menu.levels ? 1 : 0; level <= (menu.levels ?? 0); level++) {
     await open(cdp, `${base}${menu.path}`);
     await sleep(1500);
@@ -416,27 +434,78 @@ async function pictureMenu(cdp: Cdp, base: string, menu: Menu) {
       await sleep(1200);
       await pickLevel(cdp, level);
       await evaluate(cdp, `document.querySelector('[data-mode="${id}"]')?.click()`);
-      const file = join(menu.dir, `${id}.webp`);
+      const file = join(dir, `${id}.webp`);
       await sleep(WAITS[keyOf(file)] ?? WAIT);
       await picture(cdp, file, menu.prepare && !CUTS[keyOf(file)] ? await evaluate<Area | null>(cdp, menu.prepare) : null);
+      written.push(file);
     }
   }
+  return written;
 }
 
-/** A table of contents: each game as it plays, or, where its page is a menu of cards, as its first card plays. */
-async function pictureBook(cdp: Cdp, base: string, book: string) {
+/**
+ * A table of contents: each game as it plays, or, where its page is a menu of cards, as its first card plays – into
+ * `dir`, and only the lines `only` names where given (the girl's); returns the files written.
+ */
+async function pictureBook(cdp: Cdp, base: string, book: string, dir = BOOK_DIR, only?: string[]): Promise<string[]> {
+  const written: string[] = [];
   await open(cdp, `${base}/spiele/${book}/`);
   await sleep(1500);
   const hrefs = await evaluate<string[]>(cdp, `[...document.querySelectorAll(".toc-line")].map((e) => e.getAttribute("href"))`);
-  for (const href of hrefs) {
+  for (const href of hrefs.filter((h) => !only || only.includes(h))) {
     await open(cdp, `${base}${href}`);
     await sleep(2000);
     const first = (await cardIds(cdp))[0];
     if (first) await evaluate(cdp, `document.querySelector('[data-mode="${first}"]')?.click()`);
-    const file = join(BOOK_DIR, `${href.replaceAll("/", "")}.webp`);
+    const file = join(dir, `${href.replaceAll("/", "")}.webp`);
     await sleep(WAITS[keyOf(file)] ?? WAIT);
     const prepare = MENUS.find((menu) => menu.path === href)?.prepare;
     await picture(cdp, file, prepare && !CUTS[keyOf(file)] ? await evaluate<Area | null>(cdp, prepare) : null);
+    written.push(file);
+  }
+  return written;
+}
+
+/**
+ * The cuts, by `keyOf`, where the child is out of sight but the scene moves (smoke), so `keepIfOther` would keep a
+ * girl's picture that shows no girl: the fire film's card shows the burning house before the engine comes.
+ */
+const NO_CHILD = new Set(["elevator/feuerwehr"]);
+
+/**
+ * Drops the girl's picture `file` where it looks like the boy's in `boyDir` – the child was not in sight there – so the
+ * menu shows the boy's and nothing is kept twice.
+ */
+async function keepIfOther(file: string, boyDir: string) {
+  const boy = join(boyDir, file.slice(file.lastIndexOf("/") + 1));
+  if (!existsSync(boy)) return;
+  if (NO_CHILD.has(keyOf(file))) {
+    unlinkSync(file);
+    console.log(`  ${file} shows no child: not kept`);
+    return;
+  }
+  const [a, b] = await Promise.all([file, boy].map((f) => sharp(f).greyscale().resize(120, 80).raw().toBuffer()));
+  let changed = 0;
+  for (let i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > 24) changed++;
+  // The pigtails and the pink shirt change far more than 1 % of the picture; noise of the encoding none.
+  if (changed < a.length * 0.01) {
+    unlinkSync(file);
+    console.log(`  ${file} looks like the boy's: not kept`);
+  }
+}
+
+/** The pictures of the menus' cards and lines whose game draws the child, again with „Mädchen“ chosen. */
+async function pictureGirls(cdp: Cdp, base: string, wanted: (text: string) => boolean) {
+  await open(cdp, `${base}/`);
+  // The shared options' store (`COMMON_SETTINGS_KEY` in src/lib/common.ts), merged into its defaults.
+  await evaluate(cdp, `localStorage.setItem("tinytaps.common.v1", JSON.stringify({ figure: "girl" })); true`);
+  for (const book of BOOKS.filter((b) => wanted(`${b} ${BOOK_DIR} ${GIRL_BOOK_DIR} ${GIRL_LINES.join(" ")}`))) {
+    console.log(`/spiele/${book}/ (Mädchen)`);
+    for (const file of await pictureBook(cdp, base, book, GIRL_BOOK_DIR, GIRL_LINES)) await keepIfOther(file, BOOK_DIR);
+  }
+  for (const menu of MENUS.filter((m) => m.girl && wanted(`${m.path} ${m.dir} ${m.girl}`))) {
+    console.log(`${menu.path} (Mädchen)`);
+    for (const file of await pictureMenu(cdp, base, menu, menu.girl)) await keepIfOther(file, menu.dir);
   }
 }
 
@@ -461,6 +530,7 @@ try {
     console.log(menu.path);
     await pictureMenu(cdp, site.url, menu);
   }
+  await pictureGirls(cdp, site.url, wanted);
 } finally {
   stop();
   site.stop();

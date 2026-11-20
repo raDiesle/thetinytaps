@@ -2,6 +2,7 @@ import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./
 import type { Gift, GiftId } from "./gifts";
 import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // English texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in content.ts and
 // homes.tsx. Animals take "the" ("The bunny is hungry!"), foods the plural where one eats many ("likes carrots").
@@ -78,6 +79,14 @@ export const ENGLISH_ANIMALS: Record<string, string> = {
   dachs: "badger",
   qualle: "jellyfish",
   schwan: "swan",
+  hahn: "rooster",
+  taube: "pigeon",
+  truthahn: "turkey",
+  pfau: "peacock",
+  muecke: "mosquito",
+  schlange: "snake",
+  kueken: "chick",
+  fliege: "fly",
 };
 
 /** A food in English. */
@@ -253,10 +262,21 @@ export function englishGrowth(german: GrowTexts): GrowTexts {
   };
 }
 
+/** „Wer macht das Geräusch?“ in English; an animal without its English word gets the whole German sentence. */
+export function englishSound(german: SoundTexts): SoundTexts {
+  const animal = (a: Animal) => ENGLISH_ANIMALS[a.id];
+  return {
+    listen: "Listen! Who is behind the curtain?",
+    there: (a) => (animal(a) ? `There's the ${animal(a)}!` : german.there(a)),
+    thatIs: (a) => (animal(a) ? `That's the ${animal(a)}.` : german.thatIs(a)),
+  };
+}
+
 /** English, for the table of languages in content.ts. */
 export const ENGLISH: AnimalTranslation = {
   words: { animals: ENGLISH_ANIMALS, foods: ENGLISH_FOODS, homes: ENGLISH_HOMES },
   texts: englishTexts,
   gifts: englishGifts,
   growth: englishGrowth,
+  sound: englishSound,
 };

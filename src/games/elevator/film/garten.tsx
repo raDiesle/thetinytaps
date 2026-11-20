@@ -906,7 +906,7 @@ const CLOUD_RAIN: Point = [PLANT[0], 330];
 const CLOUD_GONE: Point = [2000, 200];
 
 /** The grey-white rain cloud, centred on (0, 0); while it rains (`raining`) drops fall from it down to the bed. */
-function RainCloud({ raining }: { raining: boolean }) {
+export function RainCloud({ raining }: { raining: boolean }) {
   return (
     <g>
       {raining && (

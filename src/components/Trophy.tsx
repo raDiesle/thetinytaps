@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { STAR_PATH } from "@/components/TapFeedback";
 import { trophyPicture } from "@/components/trophyPictures";
+import { useFigure } from "@/lib/common";
 import { gameOrder, trophyKey } from "@/lib/trophies";
 
 /*
@@ -102,7 +103,7 @@ export function Trophy({ game, level, className, label, wins = 0 }: { game: stri
   const uid = useId().replaceAll(":", "");
   const look = trophyLook(game, level);
   const metal = METALS[look.metal];
-  const picture = trophyPicture(game, level);
+  const picture = trophyPicture(game, level, useFigure());
   const fill = `url(#${uid}m)`;
   const cup = look.form === "star" ? undefined : CUPS[look.form];
   // The medallion as big as the cup allows, so its picture is recognised (user feedback, November 2026).

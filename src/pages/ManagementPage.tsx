@@ -3,18 +3,7 @@ import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
 import { ALL_TROPHIES, MUSEUM_PATH } from "@/lib/museum";
-import {
-  EFFORT_LABELS,
-  IDEA_AREAS,
-  TODDLER_RULES,
-  TOP_PICKS,
-  ideaStatus,
-  type Effort,
-  type Idea,
-  type IdeaArea,
-  areaKey,
-  type IdeaStatus,
-} from "@/content/ideas";
+import { EFFORT_LABELS, IDEA_AREAS, TODDLER_RULES, TOP_PICKS, type Effort, type Idea, type IdeaArea, areaKey } from "@/content/ideas";
 import { RESEARCH } from "@/content/research";
 import { buildDate } from "@/lib/pwa";
 import { useStoredSettings } from "@/lib/storage";
@@ -43,11 +32,13 @@ import {
 } from "./management/shared";
 import { Unfinished } from "./management/Unfinished";
 
-type StatusFilter = "all" | "todo" | "done" | "rejected";
+/**
+ * Built ideas are never listed (user feedback, November 2026: the page shows only what is still to decide); they stay in
+ * the data so their numbers stay taken and the research and mascot links to them still name them.
+ */
+type StatusFilter = "todo" | "rejected";
 type MarkFilter = "any" | Mark | "undecided";
 type GroupBy = "area" | "effort";
-
-const STATUS_ORDER: Record<IdeaStatus, number> = { open: 0, partial: 1, done: 2, rejected: 3 };
 
 /** What is saved per browser: the marks and how the list is ordered – never a filter (see `FILTERS`). */
 const DEFAULTS = {
@@ -112,11 +103,12 @@ export function ManagementPage() {
     updateStored({ marks: next, starred: [] });
   };
 
-  /** Shows an idea even when the filters hide it, then scrolls to it. */
+  /** Shows an idea even when the filters hide it, then scrolls to it (a built one is not in the list to show). */
   const showIdea = (id: string) => {
+    if (IDEA_BY_ID.get(id)?.done) return;
     if (!document.getElementById(id)) {
       setQuery("");
-      update({ status: "all", efforts: [], mark: "any", area: "" });
+      update({ ...FILTERS, status: IDEA_BY_ID.get(id)?.rejected ? "rejected" : "todo" });
     }
     setTimeout(() => {
       const el = document.getElementById(id);
@@ -143,17 +135,15 @@ export function ManagementPage() {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const visible = (idea: Idea) => {
     const mark = marks[idea.id];
-    if ((saved.status === "rejected") !== !!idea.rejected) return false;
-    if (saved.status === "todo" && !isOpen(idea)) return false;
-    if (saved.status === "done" && !idea.done) return false;
+    if (idea.done || (saved.status === "rejected") !== !!idea.rejected) return false;
     if (saved.efforts.length > 0 && !saved.efforts.includes(idea.effort)) return false;
     if (saved.area && areaKey(AREA_OF.get(idea.id) as IdeaArea) !== saved.area) return false;
     if (saved.mark === "undecided" ? mark : saved.mark !== "any" && mark !== saved.mark) return false;
     const haystack = `${idea.id} ${idea.title} ${idea.text} ${idea.why ?? ""} ${idea.partial ?? ""}`.toLowerCase();
     return words.every((w) => haystack.includes(w));
   };
-  /** Open before partly done before done; "eher nicht" sinks to the bottom; otherwise number order. */
-  const order = (a: Idea, b: Idea) => STATUS_ORDER[ideaStatus(a)] - STATUS_ORDER[ideaStatus(b)] || Number(marks[a.id] === "no") - Number(marks[b.id] === "no");
+  /** "Eher nicht" sinks to the bottom; otherwise number order. */
+  const order = (a: Idea, b: Idea) => Number(marks[a.id] === "no") - Number(marks[b.id] === "no");
 
   const shown = ALL_IDEAS.filter(visible);
   const sections: { key: string; title: string; intro?: string; ideas: Idea[] }[] =
@@ -184,8 +174,8 @@ export function ManagementPage() {
         <Link to={`${MUSEUM_PATH}?${ALL_TROPHIES}`}>🏆 Alle Pokale im Pokalzimmer ansehen (zum Testen)</Link>
       </p>
       <p className="home-subtitle">
-        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
-        abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
+        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt (nicht mehr
+        aufgelistet), {rejected} abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={active} />
       <nav className="ideas-contents" aria-label="Inhalt">
@@ -290,8 +280,6 @@ export function ManagementPage() {
           label="Zeigen"
           options={[
             { value: "todo", label: `Offen (${active - done})` },
-            { value: "done", label: `✅ Umgesetzt (${done})` },
-            { value: "all", label: "Alle" },
             { value: "rejected", label: `🚫 Abgelehnt (${rejected})` },
           ]}
           selected={[saved.status]}

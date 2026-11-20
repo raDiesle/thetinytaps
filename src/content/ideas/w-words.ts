@@ -22,7 +22,6 @@ export const wordsIdeas: IdeaArea = {
       text: "Auf dem Tablet statt Tastatur 3–6 riesige Buchstabenknöpfe: der richtige plus ein paar andere. Anzahl einstellbar.",
       why: "Tablet-tauglich und für Anfänger viel leichter als 26 Tasten.",
       effort: "M",
-      partial: "Auf dem Tablet gibt es Bildschirmtasten mit hervorgehobenem Buchstaben, aber noch das ganze ABC statt weniger großer Knöpfe.",
     },
     {
       id: "W-03",

@@ -31,7 +31,7 @@ const PLAYERS: Record<string, string> = {
  * Recorded games whose texts are not translated yet (translations come only when the user asks), by name: the address
  * of their row in languageStatus.ts, which must say so by leaving the other languages out.
  */
-const GERMAN_ONLY: Record<string, string> = { kita: "/kita/" };
+const GERMAN_ONLY: Record<string, string> = {};
 
 /**
  * Recorded games written English first (root CLAUDE.md, November 2026) and not translated yet, German included: they say

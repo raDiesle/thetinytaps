@@ -965,4 +965,989 @@ export const SITUATIONS_ES: Partial<Record<SituationId, SituationText>> = {
     outro: [{ narration: "¡Súper! Taparse los oídos, soplar hondo y luego comer pastel juntos." }],
     endCaption: "Osito y Zorrito comen pastel juntos",
   },
+  // The everyday scenes (alltag.ts). El mapache is the raccoon, as in days.es.ts.
+  puzzle: {
+    title: "Frustración, la pieza no entra",
+    caption: "La vaca no entra, Osito está enojado",
+    intro: [{ narration: "Osito arma un rompecabezas de animales de la granja." }, { narration: "¡La vaca no entra en su hueco! Osito está enojado." }],
+    steps: [
+      {
+        caption: "Apretar los puños",
+        question: "La vaca no entra. Osito está enojado. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito aprieta los puños muy fuerte. Y los suelta." }, { line: "Uf. Ya estoy mejor." }],
+        instead: { caption: "Tirar el rompecabezas de la mesa", answer: "Mmm, ahora todas las piezas están en el piso. Mejor aprieta los puños muy fuerte." },
+      },
+      {
+        caption: "Voltear la pieza",
+        question: "La vaca no entra en su hueco. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito voltea la vaca y prueba al revés." }, { line: "¡Clic! ¡Entró!" }],
+        instead: { caption: "Meter la pieza a golpes", answer: "Mmm, ahora el rompecabezas está roto. Mejor voltea la vaca y prueba al revés." },
+      },
+      {
+        caption: "Decir «¡Ayúdame, por favor!»",
+        question: "Osito no lo logra sin ayuda. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Osito le dice al oso grande:", line: "¡Ayúdame, por favor!" },
+          { narration: "El oso grande señala la esquina. Y la vaca entra." },
+        ],
+        instead: { caption: "Gritarle al oso grande", answer: "Mmm, ahora el oso grande se asustó. Mejor di: ¡Ayúdame, por favor!" },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Apretar los puños, voltear la pieza, pedir ayuda. El rompecabezas está listo, y la vaca hace: ¡Muu!" }],
+    endCaption: "Rompecabezas listo, Osito sonríe feliz",
+  },
+  race: {
+    title: "Perder una carrera",
+    caption: "Zorrito llega primero al árbol, Osito está enojado",
+    intro: [{ narration: "Osito y Zorrito echan una carrera. ¡Hasta el manzano!" }, { narration: "Zorrito llega primero. Osito perdió. Está enojado." }],
+    steps: [
+      {
+        caption: "Zapatear fuerte",
+        question: "Zorrito ganó. Osito está enojado. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito zapatea muy fuerte en el suelo. ¡Pum, pum!" }, { line: "Uf. Ya se me pasó el enojo." }],
+        instead: { caption: "Empujar a Zorrito", answer: "Mmm, empujar duele. Mejor zapatea muy fuerte en el suelo." },
+      },
+      {
+        caption: "Gritar «¡Otra vez!»",
+        question: "Osito también quiere ganar alguna vez. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito grita:", line: "¡Otra vez! ¡Otra carrera!" }, { line: "¡Sí! ¡En sus marcas, listos, fuera!" }],
+        instead: { caption: "Gritar «¡No vale!» y salir corriendo", answer: "Mmm, ahora Zorrito está solito y triste. Mejor grita: ¡Otra vez!" },
+      },
+      {
+        caption: "Chocar los cinco",
+        question: "Zorrito está contento. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le extiende la pata a Zorrito.", line: "¡Qué bien corres!" }, { narration: "¡Plas! Chocan los cinco." }],
+        instead: { caption: "Jalarle la oreja a Zorrito", answer: "Mmm, eso le duele a Zorrito. Mejor choca los cinco con él." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Zapatear, correr otra vez, chocar los cinco. Y ahora corren los dos de la mano." }],
+    endCaption: "Osito y Zorrito corren de la mano",
+  },
+  farewell: {
+    title: "Tristeza, el amigo se va a casa",
+    caption: "Zorrito se va a casa, Osito llora",
+    intro: [{ narration: "Zorrito vino a jugar. Ahora su papá viene por él." }, { narration: "Zorrito se pone su gorro. Osito llora." }],
+    steps: [
+      {
+        caption: "Abrazar fuerte",
+        question: "Zorrito se va a su casa. Osito está triste. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito abraza muy fuerte a Zorrito.", line: "¡Adiós, Zorrito!" }, { line: "¡Adiós, Osito!" }],
+        instead: { caption: "Quitarle el gorro a Zorrito", answer: "Mmm, ahora Zorrito llora. Quiere su gorro. Mejor abrázalo para despedirte." },
+      },
+      {
+        caption: "Apretar el carrito",
+        question: "Osito tiene el carrito con el que jugaron. Está triste. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito aprieta el carrito muy fuerte contra su panza.", line: "Mañana seguimos jugando con él." }],
+        instead: { caption: "Aventar el carrito", answer: "Mmm, ahora el carrito está roto. Mejor apriétalo muy fuerte contra tu panza." },
+      },
+      {
+        caption: "Decir adiós desde la ventana",
+        question: "Zorrito se va con su papá. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito corre a la ventana y dice adiós con la mano hasta que Zorrito da vuelta en la esquina." },
+          { narration: "Zorrito también dice adiós con la mano." },
+        ],
+        instead: { caption: "Patear la puerta", answer: "Mmm, eso duele en el pie. Mejor corre a la ventana y di adiós con la mano." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Abrazar, apretar el carrito, decir adiós. Y el oso grande dice:", line: "¡Hasta mañana!" }],
+    endCaption: "Zorrito dice adiós desde afuera, Osito también",
+  },
+  myself: {
+    title: "Enojo, quiero hacerlo yo",
+    caption: "El jugo ya está servido, Osito está enojado",
+    intro: [{ narration: "Osito y el oso grande desayunan." }, { narration: "El oso grande ya sirvió el jugo. ¡Pero Osito quería hacerlo él! Está enojado." }],
+    steps: [
+      {
+        caption: "Decir «¡Quiero hacerlo yo!»",
+        question: "El oso grande sirvió el jugo. Osito quería hacerlo él. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito dice fuerte:", line: "¡Quiero hacerlo yo!" }, { line: "Qué bueno que lo dices. Entonces ahora sirves tú." }],
+        instead: { caption: "Tirar el vaso de jugo", answer: "Mmm, ahora todo el jugo está en la mesa. Mejor di: ¡Quiero hacerlo yo!" },
+      },
+      {
+        caption: "Soplar hondo",
+        question: "Osito está muy enojado. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito se voltea de la mesa y sopla muy hondo hacia arriba. Fuuuh." }, { line: "Ya estoy mejor." }],
+        instead: { caption: "Pegarle al oso grande", answer: "Mmm, pegar duele. Mejor sopla muy hondo." },
+      },
+      {
+        caption: "Servir él mismo",
+        question: "El vaso del oso grande está vacío. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le sirve él mismo al oso grande. El oso grande solo detiene un poquito la jarra." }, { line: "¡Yo puedo!" }],
+        instead: { caption: "Tirar la jarra", answer: "Mmm, ahora la jarra está rota. Mejor sirve tú." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decir lo que quieres, soplar hondo, servir por tu cuenta. Ahora toman los dos." }],
+    endCaption: "Osito y el oso grande toman jugo, Osito sonríe feliz",
+  },
+  homesick: {
+    title: "Extrañar la casa, la primera noche con la abuela",
+    caption: "Primera noche con la abuela, Osito extraña su casa",
+    intro: [
+      { narration: "Hoy Osito duerme por primera vez en casa de la abuela Osa." },
+      { narration: "El oso grande ya se fue a casa. Osito extraña su casa." },
+    ],
+    steps: [
+      {
+        caption: "Apretar el conejo de peluche",
+        question: "Osito extraña su casa. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito aprieta muy fuerte su conejo de peluche. Vino con él desde casa." }, { line: "Qué bueno que estás aquí." }],
+        instead: { caption: "Tirar la lamparita", answer: "Mmm, ahora la lamparita está rota. Mejor aprieta muy fuerte tu conejo de peluche." },
+      },
+      {
+        caption: "Decir «Extraño mi casa»",
+        question: "La abuela está sentada junto a la cama. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito le dice a la abuela:", line: "Extraño mi casa." },
+          { narration: "La abuela asiente y le acaricia la cabeza.", line: "Mañana temprano el oso grande viene por ti." },
+        ],
+        instead: { caption: "Empujar a la abuela", answer: "Mmm, empujar le duele a la abuela. Mejor dile lo que extrañas." },
+      },
+      {
+        caption: "Respirar despacio",
+        question: "Osito no se puede dormir. ¿Qué puede hacer él?",
+        beats: [{ narration: "Cierra los ojos y pone la pata en la panza." }, { narration: "Aire adentro. Y afuera. Muy despacio." }],
+        instead: { caption: "Arrancar el cuadro de la pared", answer: "Mmm, ahora el cuadro está roto. Mejor respira muy despacio, con la pata en la panza." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Apretar el conejo de peluche, decir lo que extrañas, respirar despacio. Ahora Osito duerme." }],
+    endCaption: "Osito duerme sonriendo en casa de la abuela",
+  },
+  barber: {
+    title: "Miedo en la peluquería",
+    caption: "Osito en la silla de la peluquería tiene miedo",
+    intro: [
+      { narration: "Osito está en la peluquería. Está sentado en la silla alta." },
+      { narration: "La peluquera llega con el peine y las tijeras. Osito tiene miedo." },
+    ],
+    steps: [
+      {
+        caption: "Agarrarse fuerte de la silla",
+        question: "Osito tiene miedo de las tijeras. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito se agarra muy fuerte de los brazos de la silla. Y no se mueve." }, { line: "Me agarro bien fuerte." }],
+        instead: { caption: "Patear a la peluquera", answer: "Mmm, las patadas le duelen a la peluquera. Mejor agárrate de los brazos de la silla." },
+      },
+      {
+        caption: "Mirar en el espejo",
+        question: "Detrás de la oreja hace chic, chic. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se mira en el espejo. Ahí cae un mechón de pelo." }, { line: "¡Oh! ¡Ahí va volando mi pelo!" }],
+        instead: { caption: "Tirar el atomizador", answer: "Mmm, ahora el atomizador está roto. Mejor mírate en el espejo." },
+      },
+      {
+        caption: "Decir «¡Una pausa, por favor!»",
+        question: "Esto es mucho para Osito. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Osito dice:", line: "¡Una pausa, por favor!" },
+          { narration: "La peluquera espera. Y el oso grande lo saluda con la mano.", line: "¡Claro! Avisa cuando sigamos." },
+        ],
+        instead: { caption: "Gritarle a la peluquera", answer: "Mmm, ahora la peluquera se asustó. Mejor di: ¡Una pausa, por favor!" },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Agarrarse, mirar en el espejo, pedir una pausa. ¡Y ahora Osito tiene un corte nuevo!" }],
+    endCaption: "Osito se ríe en el espejo con su corte nuevo",
+  },
+  accident: {
+    title: "Ups, sin querer",
+    caption: "Osito tumbó la torre de Zorrito y se asusta",
+    intro: [{ narration: "Osito corre por la guardería." }, { narration: "¡Pum! Sin querer choca con la torre de Zorrito. La torre se cae. Osito se asusta." }],
+    steps: [
+      {
+        caption: "Decir «¡Perdón!»",
+        question: "La torre de Zorrito se cayó. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le dice a Zorrito:", line: "¡Perdón! No fue a propósito." }, { line: "Está bien." }],
+        instead: { caption: "Patear los otros bloques", answer: "Mmm, ahora todo se cayó, y Zorrito está triste. Mejor di: ¡Perdón!" },
+      },
+      {
+        caption: "Soplar hondo",
+        question: "Osito está muy asustado. ¿Qué puede hacer él?",
+        beats: [{ narration: "Se arrodilla junto a Zorrito y sopla muy hondo hacia arriba. Fuuuh." }, { narration: "Ahora su corazón late más tranquilo." }],
+        instead: { caption: "Reírse y seguir corriendo", answer: "Mmm, ahora Zorrito llora. Mejor arrodíllate junto a él y sopla muy hondo." },
+      },
+      {
+        caption: "Construir juntos otra vez",
+        question: "Los bloques están en el piso. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Le da un bloque a Zorrito.", line: "¿Construimos juntos?" }, { line: "¡Sí!" }],
+        instead: { caption: "Aventar bloques", answer: "Mmm, el bloque le pega a Zorrito. Eso duele. Mejor construye con él." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Pedir perdón, soplar hondo, construir juntos. ¡La torre nueva es todavía más alta!" }],
+    endCaption: "Torre nueva y alta, Osito y Zorrito se ríen",
+  },
+  laughed: {
+    title: "Dolido, se burlan de su dibujo",
+    caption: "El mapache se ríe del dibujo, Osito se siente herido",
+    intro: [
+      { narration: "Osito pinta en la guardería. Círculos de colores. ¡Es el oso grande!" },
+      { narration: "El mapache lo señala y se ríe. Osito se siente herido." },
+    ],
+    steps: [
+      {
+        caption: "Decir «¡Eso no me gusta!»",
+        question: "El mapache se ríe del dibujo de Osito. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito dice fuerte:", line: "¡No te rías! ¡Eso no me gusta!" },
+          { narration: "El mapache deja de reírse.", line: "Está bien. Perdón." },
+        ],
+        instead: {
+          caption: "Romper el dibujo del mapache",
+          answer: "Mmm, ahora el dibujo del mapache está roto, y llora. Mejor di fuerte: ¡Eso no me gusta!",
+        },
+      },
+      {
+        caption: "Apretar los puños y soplar",
+        question: "Osito se siente muy herido. ¿Qué puede hacer él?",
+        beats: [{ narration: "Aprieta los puños muy fuerte. Luego sopla hondo hacia arriba. Fuuuh." }, { line: "Ya estoy mejor." }],
+        instead: { caption: "Aventar los crayones", answer: "Mmm, los crayones le pegan al mapache. Eso duele. Mejor aprieta los puños y sopla." },
+      },
+      {
+        caption: "Seguir pintando con Conejito",
+        question: "Conejito pinta muy tranquilo. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se sienta junto a Conejito y sigue pintando." }, { line: "¡Qué bonito! ¡Es el oso grande!" }],
+        instead: { caption: "Arrugar su propio dibujo", answer: "Mmm, ahora tu dibujo bonito está arruinado. Mejor siéntate con Conejito y sigue pintando." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decir lo que no te gusta, soplar, seguir pintando. Ahora el dibujo está colgado en la pared." }],
+    endCaption: "El dibujo de Osito cuelga en la pared, el mapache lo mira",
+  },
+  excited: {
+    title: "Demasiada emoción para dormir",
+    caption: "La maleta lista, Osito no tiene nada de sueño en la cama",
+    intro: [
+      { narration: "¡Mañana Osito va al mar! Su maleta ya está lista." },
+      { narration: "Está acostado en la cama. Tiene tanta emoción que no se puede dormir." },
+    ],
+    steps: [
+      {
+        caption: "Poner la pata en la panza",
+        question: "Osito tiene mucha emoción. ¿Qué puede hacer él?",
+        beats: [{ narration: "Pone la pata en la panza y respira muy despacio. Aire adentro y afuera." }],
+        instead: { caption: "Vaciar la maleta", answer: "Mmm, ¡pum! Ahora todo está en el piso. Mejor pon la pata en la panza y respira despacio." },
+      },
+      {
+        caption: "Susurrarle al conejo de peluche",
+        question: "Osito piensa todo el tiempo en el mar. ¿Qué puede hacer él?",
+        beats: [{ narration: "Le susurra al oído a su conejo de peluche:", line: "Mañana hacemos un castillo de arena." }],
+        instead: {
+          caption: "Tocar el balde como tambor",
+          answer: "Mmm, ¡qué ruido! Ahora se despertó el bebé en el otro cuarto. Mejor susúrrale a tu conejo de peluche lo que vas a construir mañana.",
+        },
+      },
+      {
+        caption: "Cerrar los ojos y pensar en las olas",
+        question: "Ya es tarde. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Cierra los ojos y piensa en las olas." }, { narration: "Shh, shh. Se va calmando." }],
+        instead: { caption: "Prender la luz y jugar", answer: "Mmm, con la luz prendida se va el sueño. Mejor cierra los ojos y piensa en las olas." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Respirar despacio, susurrarle al conejo de peluche, pensar en las olas. ¡Buenas noches!" }],
+    endCaption: "Osito duerme con la pala en los brazos",
+  },
+  envy: {
+    title: "Envidia por la bici",
+    caption: "Zorrito enseña su bici de equilibrio nueva, Osito tiene envidia",
+    intro: [
+      { narration: "Zorrito tiene una bici de equilibrio nueva. ¡Roja, con timbre!" },
+      { narration: "Osito solo tiene su monopatín viejo. Tiene envidia." },
+    ],
+    steps: [
+      {
+        caption: "Apretar los puños",
+        question: "Osito también quiere una bici así. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito aprieta los puños muy fuerte y dice:", line: "¡Yo también quiero una!" }, { narration: "Uf. Ahora se siente mejor." }],
+        instead: { caption: "Tumbar la bici", answer: "Mmm, ahora el timbre está roto. Mejor aprieta los puños muy fuerte." },
+      },
+      {
+        caption: "Preguntar «¿Me prestas?»",
+        question: "Osito también quiere andar en la bici. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito pregunta:", line: "¿Me prestas?" }, { line: "¡Sí! Después de mi vuelta." }],
+        instead: { caption: "Bajar a Zorrito de la bici", answer: "Mmm, ahora Zorrito se cayó. Mejor pregunta: ¿Me prestas?" },
+      },
+      {
+        caption: "Intercambiar",
+        question: "Osito tiene un monopatín. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito pregunta:", line: "¿Cambiamos?" }, { narration: "Zorrito prueba el monopatín, Osito la bici." }],
+        instead: { caption: "Patear el monopatín", answer: "Mmm, ahora tu monopatín está roto. Mejor cambia con Zorrito." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Apretar los puños, preguntar, intercambiar. Ahora andan los dos juntos." }],
+    endCaption: "Osito y Zorrito andan lado a lado, Osito toca el timbre",
+  },
+  supermarket: {
+    title: "Miedo, perdido en el súper",
+    caption: "Osito está entre los estantes sin nadie, tiene miedo",
+    intro: [{ narration: "Osito está en el súper." }, { narration: "¿Dónde está el oso grande? Osito ya no lo ve. Tiene miedo." }],
+    steps: [
+      {
+        caption: "Pararse como un árbol",
+        question: "Osito está solo. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito se para como un árbol. Los pies firmes en el piso." }, { narration: "Respira hondo, adentro y afuera." }],
+        instead: { caption: "Treparse al estante", answer: "Mmm, el estante se tambalea, y todo se cae. Mejor párate como un árbol." },
+      },
+      {
+        caption: "Gritar «¡Papá!»",
+        question: "Osito no ve al oso grande. ¿Qué puede hacer él?",
+        beats: [{ narration: "Grita muy fuerte:", line: "¡Papá! ¡Aquí estoy!" }, { line: "¡Te oigo! ¡Ya voy!" }],
+        instead: { caption: "Tumbar la torre de latas", answer: "Mmm, ahora todas las latas están en el piso. Mejor grita muy fuerte: ¡Papá!" },
+      },
+      {
+        caption: "Apretar el conejo de peluche y esperar",
+        question: "El oso grande lo busca. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Aprieta muy fuerte su conejo de peluche y espera justo donde está." }],
+        instead: { caption: "Tirar las manzanas", answer: "Mmm, ahora las manzanas ruedan por todos lados. Mejor aprieta tu conejo de peluche y espera aquí." },
+      },
+    ],
+    outro: [{ narration: "¡Ahí viene el oso grande por el pasillo!", line: "¡Aquí estás!" }, { narration: "¡Súper! Pararse, gritar fuerte, esperar." }],
+    endCaption: "El oso grande llegó, los dos se abrazan",
+  },
+  pointing: {
+    title: "Enojo, nadie me entiende",
+    caption: "El oso grande levanta una manzana, Osito quiere el yogur",
+    intro: [
+      { narration: "Osito quiere el yogur. Grita:", line: "¡Ahí! ¡Ahí!" },
+      { narration: "El oso grande levanta una manzana. ¡No! Osito está muy enojado." },
+    ],
+    steps: [
+      {
+        caption: "Señalar bien",
+        question: "El oso grande levanta una manzana. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito señala con la pata justo el yogur." }, { line: "¡Ah, el yogur!" }],
+        instead: { caption: "Quitarle la manzana de un manotazo", answer: "Mmm, eso le duele al oso grande. Mejor señala justo el yogur." },
+      },
+      {
+        caption: "Zapatear y soplar",
+        question: "Osito está muy enojado. ¿Qué puede hacer él?",
+        beats: [{ narration: "Zapatea muy fuerte. ¡Pum, pum!" }, { narration: "Luego sopla muy hondo. Fuuuh." }],
+        instead: { caption: "Patear el refrigerador", answer: "Mmm, ahora todo se cayó adentro del refrigerador. Mejor zapatea muy fuerte y sopla." },
+      },
+      {
+        caption: "Llevarlo al refrigerador",
+        question: "El oso grande no lo entiende. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Toma al oso grande de la pata y lo lleva al refrigerador." }, { line: "¡Ah, el yogur! Ahora entiendo." }],
+        instead: { caption: "Gritar muy fuerte", answer: "Mmm, ¡qué ruido! Eso le duele en los oídos al oso grande. Mejor tómalo de la pata." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Señalar, zapatear y soplar, llevarlo. Ahora comen yogur los dos." }],
+    endCaption: "Osito y el oso grande comen yogur",
+  },
+  bee: {
+    title: "Miedo a la abeja",
+    caption: "Una abeja zumba alrededor del jugo, Osito tiene miedo",
+    intro: [
+      { narration: "Osito y el oso grande hacen un pícnic en el pasto." },
+      { narration: "¡Bzz, bzz! Una abeja vuela alrededor del jugo. Osito tiene miedo." },
+    ],
+    steps: [
+      {
+        caption: "Sentarse sin moverse",
+        question: "La abeja zumba alrededor del jugo. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se sienta sin moverse. Como una piedra." }, { line: "Muy bien. La abeja solo quiere el jugo." }],
+        instead: { caption: "Manotear a la abeja", answer: "Mmm, ahora la abeja picó. Mejor siéntate sin moverte." },
+      },
+      {
+        caption: "Alejarse despacio",
+        question: "La abeja se queda en el vaso. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Se levanta despacio y se aleja unos pasos." }, { narration: "Aquí no hay abeja. ¡Uf!" }],
+        instead: { caption: "Tirar el jugo", answer: "Mmm, ¡plaf! Ahora el mantel está todo mojado. Mejor aléjate despacio unos pasos." },
+      },
+      {
+        caption: "Mirar y soltar el aire",
+        question: "La abeja se va volando. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Mira cómo la abeja vuela a las flores." }, { narration: "Luego suelta el aire muy hondo. Fuuuh." }],
+        instead: { caption: "Aventarle la pelota a la abeja", answer: "Mmm, ahora se cayeron el jugo y el té. Mejor mira cómo se va volando la abeja." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Sentarse sin moverse, alejarse, soltar el aire. Ahora la abeja zumba en las flores." }],
+    endCaption: "Los dos sentados en el mantel, la abeja está en las flores",
+  },
+  phone: {
+    title: "Esperar, el oso grande habla por teléfono",
+    caption: "El oso grande habla por teléfono, Osito quiere enseñarle su dibujo",
+    intro: [
+      { narration: "El oso grande habla por teléfono en la cocina." },
+      { narration: "Osito le quiere enseñar su dibujo nuevo. ¡Ahorita mismo! Esperar es muy difícil." },
+    ],
+    steps: [
+      {
+        caption: "Tocarle el brazo despacito",
+        question: "El oso grande habla por teléfono. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le toca el brazo despacito al oso grande." }, { narration: "El oso grande levanta la pata y susurra:", line: "Ahorita." }],
+        instead: { caption: "Arrebatarle el teléfono", answer: "Mmm, ahora el teléfono se cayó y se rompió. Mejor tócale el brazo despacito." },
+      },
+      {
+        caption: "Contar con el conejo de peluche",
+        question: "La llamada tarda. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Se sienta en la silla con su conejo de peluche en los brazos y cuenta con los dedos." },
+          { line: "¡Uno, dos, tres, cuatro, cinco!" },
+        ],
+        instead: { caption: "Gritar en medio de la llamada", answer: "Mmm, ¡qué ruido! Eso le duele en los oídos al oso grande. Mejor cuenta con los dedos." },
+      },
+      {
+        caption: "Poner el dibujo en la mesa",
+        question: "Osito tiene su dibujo. ¿Qué puede hacer él?",
+        beats: [{ narration: "Pone su dibujo bien en la mesa y le pinta un sol." }, { narration: "Así está listo cuando venga el oso grande." }],
+        instead: { caption: "Arrugar el dibujo", answer: "Mmm, ahora tu dibujo bonito está arrugado. Mejor ponlo bien en la mesa." },
+      },
+    ],
+    outro: [
+      { narration: "El oso grande cuelga y mira el dibujo un buen rato.", line: "¡Ay, qué bonito!" },
+      { narration: "¡Súper! Tocar despacito, contar, poner el dibujo en la mesa." },
+    ],
+    endCaption: "El oso grande mira el dibujo un buen rato",
+  },
+  hit: {
+    title: "Pegó, ¿y ahora?",
+    caption: "Zorrito se agarra el brazo, Osito se asusta",
+    intro: [{ narration: "Osito y Zorrito se pelean por la pala. Y Osito le pega a Zorrito." }, { narration: "Zorrito llora. Osito se asusta." }],
+    steps: [
+      {
+        caption: "Bajar las patas, soplar hondo",
+        question: "Osito pegó. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito baja las patas y sopla muy hondo. Fuuuh." }, { narration: "Ahora está más tranquilo." }],
+        instead: { caption: "Pegar otra vez", answer: "Mmm, eso le duele todavía más a Zorrito. Mejor baja las patas y sopla." },
+      },
+      {
+        caption: "Decir «¡Perdón!»",
+        question: "Zorrito llora. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito dice:", line: "¡Perdón! No fue a propósito." },
+          { narration: "Zorrito sorbe la nariz.", line: "Está bien." },
+        ],
+        instead: { caption: "Seguir escarbando con la pala", answer: "Mmm, ahora Zorrito llora todavía más. Mejor dile: ¡Perdón!" },
+      },
+      {
+        caption: "Ir con la maestra",
+        question: "A Zorrito le duele el brazo. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Va con Zorrito a ver a la maestra." },
+          { narration: "Ella le pone una bolsa de hielo en el brazo.", line: "Listo, ahorita se siente mejor." },
+        ],
+        instead: { caption: "Burlarse de Zorrito", answer: "Mmm, burlarse pone a Zorrito más triste. Mejor ve con él a ver a la maestra." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Soplar, pedir perdón, buscar ayuda. Ahora escarban los dos juntos." }],
+    endCaption: "Osito y Zorrito escarban juntos",
+  },
+  pickup: {
+    title: "Alegría, vienen por él",
+    caption: "El oso grande saluda en la puerta, Osito sonríe feliz",
+    intro: [{ narration: "Es la tarde en la guardería. ¡Ahí está el oso grande en la puerta!" }, { narration: "¡Osito está feliz, feliz!" }],
+    steps: [
+      {
+        caption: "Brincar y saludar",
+        question: "¡Llegó el oso grande! ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito brinca de alegría y saluda con la mano.", line: "¡Papá!" }, { line: "¡Hola, Osito!" }],
+        instead: { caption: "Tumbar a Zorrito corriendo", answer: "Mmm, ahora Zorrito se cayó. Mejor brinca y saluda con la mano." },
+      },
+      {
+        caption: "Decirle «¡Adiós!» a Zorrito",
+        question: "Zorrito construye una torre. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Primero Osito va con Zorrito.", line: "¡Adiós, hasta mañana!" }, { line: "¡Adiós, Osito!" }],
+        instead: { caption: "Tumbar la torre corriendo", answer: "Mmm, ahora la torre de Zorrito está rota. Mejor primero dile: ¡Adiós!" },
+      },
+      {
+        caption: "Abrazar muy fuerte",
+        question: "¡Osito está tan feliz! ¿Qué puede hacer él?",
+        beats: [{ narration: "Corre a los brazos del oso grande y lo abraza muy fuerte." }, { line: "¡Te extrañé!" }],
+        instead: { caption: "Arrebatar la bolsa", answer: "Mmm, ¡ras! Ahora la correa se rompió. Mejor corre a sus brazos y abrázalo." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Brincar y saludar, decir adiós, abrazar muy fuerte. Ahora, ¡a casa!" }],
+    endCaption: "Osito y el oso grande van de la mano, Zorrito dice adiós",
+  },
+  bath: {
+    title: "Risitas en la tina",
+    caption: "Osito y Zorrito se ríen en la tina",
+    intro: [{ narration: "Zorrito vino de visita. Él y Osito se bañan juntos." }, { narration: "Se ríen y se ríen. ¡Osito está de lo más payaso!" }],
+    steps: [
+      {
+        caption: "Hacerse una barba de espuma",
+        question: "Osito está de lo más payaso. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito se hace una barba de espuma.", line: "¡Jo, jo, jo!" }, { narration: "Zorrito se ríe también." }],
+        instead: { caption: "Salpicar a Zorrito", answer: "Mmm, ahora Zorrito tiene agua en los ojos y llora. Mejor hazte una barba de espuma." },
+      },
+      {
+        caption: "Soplar espuma hacia arriba",
+        question: "Osito está muy alborotado de alegría. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Toma espuma en la pata y sopla muy despacio. Fuuuh." },
+          { narration: "Los copos vuelan hacia arriba. Osito se calma y se ríe bajito." },
+        ],
+        instead: {
+          caption: "Vaciar el champú",
+          answer: "Mmm, ahora se acabó el champú, y la espuma le arde a Zorrito en los ojos. Mejor sopla espuma muy despacio hacia arriba.",
+        },
+      },
+      {
+        caption: "Envolverse en la toalla",
+        question: "Ya terminó el baño. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito sale despacio de la tina.", line: "¡Toalla, por favor!" }, { narration: "Se acurruca en la toalla suavecita." }],
+        instead: { caption: "Saltar fuera de la tina", answer: "Mmm, en el piso mojado uno se resbala. Mejor sal despacio y envuélvete en la toalla." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Barba de espuma, soplar espuma, acurrucarse en la toalla. Ahora los dos se ríen bajito." }],
+    endCaption: "Osito y Zorrito se ríen bajito en la toalla",
+  },
+  butterfly: {
+    title: "Asombro, una mariposa",
+    caption: "Una mariposa en la flor, Osito se asombra",
+    intro: [{ narration: "Osito y Zorrito están en el jardín." }, { narration: "¡Mira! En la flor hay una mariposa. Osito se asombra." }],
+    steps: [
+      {
+        caption: "Pararse sin moverse",
+        question: "La mariposa está muy cerca. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se para sin moverse. Respira muy bajito." }, { narration: "La mariposa se queda y abre y cierra las alas." }],
+        instead: {
+          caption: "Agarrar la mariposa",
+          answer: "Mmm, las mariposas son muy delicadas. Ahora se fue volando, y Zorrito está triste. Mejor párate sin moverte.",
+        },
+      },
+      {
+        caption: "Susurrar «¡Mira!»",
+        question: "Zorrito también quiere ver la mariposa. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito le hace lugar y señala la flor.", line: "¡Shh, mira!" }, { line: "¡Ay, qué bonita!" }],
+        instead: { caption: "Empujar a Zorrito", answer: "Mmm, empujar duele. Mejor hazle lugar y susurra: ¡Mira!" },
+      },
+      {
+        caption: "Aletear como una mariposa",
+        question: "La mariposa se va volando. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito aletea con los brazos como una mariposa.", line: "¡Aleteo, aleteo!" }, { narration: "Zorrito aletea también." }],
+        instead: { caption: "Correr por las flores", answer: "Mmm, ahora las flores están dobladas, y Zorrito está triste. Mejor aletea como una mariposa." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Pararse sin moverse, señalar bajito, aletear. Y la mariposa se posa en la regadera." }],
+    endCaption: "La mariposa en la regadera, los dos se ríen bajito",
+  },
+  morning: {
+    title: "De malas en la mañana, levantarse cuesta",
+    caption: "En la mañana en la cama, Osito está de malas",
+    intro: [{ narration: "Es de mañana. Osito se despierta." }, { narration: "Tiene mucho sueño. ¡Levantarse cuesta! Está de malas." }],
+    steps: [
+      {
+        caption: "Estirarse y bostezar",
+        question: "Osito tiene sueño y está de malas. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito se estira muy largo, como un gato." }, { narration: "Luego bosteza muy grande. ¡Aaaah! Ya tiene menos sueño." }],
+        instead: { caption: "Tirar el despertador", answer: "Mmm, ahora el despertador está roto. Mejor estírate muy largo como un gato." },
+      },
+      {
+        caption: "Ponerse las pantuflas",
+        question: "Las pantuflas están junto a la cama. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se pone las pantuflas. Primero una, luego la otra." }, { line: "¡Buenos días, bebé!" }],
+        instead: { caption: "Aventarle una pantufla al bebé", answer: "Mmm, la pantufla le pega al bebé. Mejor ponte tus pantuflas." },
+      },
+      {
+        caption: "Abrir la cortina",
+        question: "La cortina está cerrada, el cuarto está oscuro. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito abre la cortina." }, { narration: "Entra el sol. Parpadea y sonríe.", line: "¡Hola, sol!" }],
+        instead: { caption: "Arrancar la cortina", answer: "Mmm, ahora la cortina está en el piso. Mejor ábrela y deja entrar el sol." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Estirarse, ponerse las pantuflas, dejar entrar el sol. ¡Buenos días!" }],
+    endCaption: "Osito en pantuflas va a desayunar con el bebé",
+  },
+  worn: {
+    title: "Agotado después de la guardería",
+    caption: "Osito está acostado en el pasillo con la chaqueta puesta, muy agotado",
+    intro: [{ narration: "Osito llega a casa de la guardería." }, { narration: "Se acuesta en el piso con la chaqueta puesta. Está agotado y llorón." }],
+    steps: [
+      {
+        caption: "Seguir en el piso y respirar hondo",
+        question: "Osito está agotado y llorón. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito sigue acostado. Respira hondo y suelta el aire muy despacio. Fuuuh." }, { narration: "Ya está un poquito más tranquilo." }],
+        instead: { caption: "Aventar la lonchera a la pared", answer: "Mmm, ahora la lonchera está rota. Mejor sigue en el piso y respira hondo." },
+      },
+      {
+        caption: "Decir «Ya no puedo más»",
+        question: "Todo es demasiado para Osito. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito le dice al oso grande:", line: "Ya no puedo más." }, { line: "Te creo. Ven, te ayudo con la chaqueta." }],
+        instead: { caption: "Tumbar la torre del bebé", answer: "Mmm, ahora la torre del bebé está rota, y llora. Mejor di: Ya no puedo más." },
+      },
+      {
+        caption: "Gatear al rincón de cojines",
+        question: "Osito necesita calma. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito gatea él solo al rincón de cojines." }, { narration: "Se acurruca en el cojín y aprieta su conejo de peluche." }],
+        instead: { caption: "Pegarle al oso grande", answer: "Mmm, pegar duele. El oso grande solo quiere ayudar. Mejor gatea al rincón de cojines." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Respirar hondo, decir cómo te sientes, descansar. Ahora Osito se siente mejor." }],
+    endCaption: "Osito está acostado con su conejo de peluche en el rincón de cojines",
+  },
+  sick: {
+    title: "Enfermo y sin fuerzas",
+    caption: "Osito está enfermo, afuera juega Zorrito",
+    intro: [
+      { narration: "Osito está enfermo. Está acostado en el sillón, le escurre la nariz." },
+      { narration: "Afuera Zorrito juega con la pelota. Osito no tiene fuerzas y está triste." },
+    ],
+    steps: [
+      {
+        caption: "Acurrucarse en la cobija",
+        question: "Osito está enfermo y sin fuerzas. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito se acurruca en la cobija y cierra los ojos." }, { narration: "Respira muy tranquilo. Descansar hace bien." }],
+        instead: { caption: "Tirar la taza de té", answer: "Mmm, ahora la taza está rota y el té se derramó. Mejor acurrúcate en la cobija." },
+      },
+      {
+        caption: "Saludar a Zorrito",
+        question: "Osito también quiere salir, pero tiene que quedarse adentro. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito saluda a Zorrito con la mano por la ventana." }, { narration: "Zorrito lo saluda también y se ríe." }],
+        instead: { caption: "Golpear la ventana", answer: "Mmm, eso duele en la pata, y la ventana se puede romper. Mejor saluda a Zorrito con la mano." },
+      },
+      {
+        caption: "Ver un libro de dibujos",
+        question: "En el sillón Osito se aburre. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito abre el libro de dibujos." }, { narration: "Mira los dibujos. ¡Un barco, una ballena!" }],
+        instead: { caption: "Romper el libro", answer: "Mmm, ahora el libro bonito está roto. Mejor mira los dibujos." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Descansar, saludar, ver los dibujos. Pronto Osito se va a aliviar." }],
+    endCaption: "Osito saluda con el libro, Zorrito saluda desde afuera",
+  },
+  car: {
+    title: "De malas en el carro",
+    caption: "Viaje largo a casa de la abuela Osa, Osito está de malas",
+    intro: [
+      { narration: "El oso grande va con Osito y el bebé a casa de la abuela Osa." },
+      { narration: "¡El viaje es tan largo! El bebé duerme. Osito está de malas." },
+    ],
+    steps: [
+      {
+        caption: "Apretar el conejo de peluche",
+        question: "El viaje es tan largo. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito abraza muy fuerte a su conejo de peluche." }, { narration: "Apretar fuerte. Y soltar. Ya está mejor." }],
+        instead: {
+          caption: "Patear el asiento",
+          answer: "Mmm, eso le duele en la espalda al oso grande, y él tiene que manejar. Mejor aprieta muy fuerte tu conejo de peluche.",
+        },
+      },
+      {
+        caption: "Contar carros",
+        question: "Osito ya lleva mucho rato en su sillita. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito mira por la ventana y cuenta carros." }, { line: "¡Un carro rojo! ¡Uno azul! ¡Uno amarillo!" }],
+        instead: {
+          caption: "Aventar la botella hacia adelante",
+          answer: "Mmm, la botella vuela hacia el oso grande. Mientras maneja, eso es peligroso. Mejor cuenta carros.",
+        },
+      },
+      {
+        caption: "Cerrar los ojos",
+        question: "Osito tiene sueño y está de malas. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito recarga la cabeza y cierra los ojos." }, { narration: "Ya casi se duerme, como el bebé." }],
+        instead: { caption: "Despertar al bebé", answer: "Mmm, ahora el bebé se despertó y llora. Mejor cierra los ojos." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Apretar el conejo de peluche, contar carros, cerrar los ojos. Ya casi llegan con la abuela Osa." }],
+    endCaption: "Osito y el bebé duermen, el oso grande maneja a casa de la abuela",
+  },
+  sticky: {
+    title: "Puaj, patas pegajosas",
+    caption: "Patas llenas de pintura, a Osito le da asco",
+    intro: [{ narration: "Osito y Zorrito pintan con pintura de dedos." }, { narration: "Ahora las patas de Osito están todas pegajosas. ¡Puaj! Le da asco." }],
+    steps: [
+      {
+        caption: "Levantar las patas y soplar",
+        question: "La pintura se pega en las patas. ¡Puaj! ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito levanta las patas.", line: "¡Puaj, se pega!" }, { narration: "Luego suelta el aire muy despacio. Fuuuh. Ya está mejor." }],
+        instead: {
+          caption: "Limpiarse las patas en Zorrito",
+          answer: "Mmm, ahora la camiseta de Zorrito está llena de pintura, y llora. Mejor levanta las patas y sopla.",
+        },
+      },
+      {
+        caption: "Lavarse las patas",
+        question: "Osito quiere las patas limpias. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito va al lavabo y se lava las patas." }, { line: "¡Todo limpio!" }],
+        instead: { caption: "Tirar el vaso de pintura", answer: "Mmm, ahora hay pintura en toda la mesa. Mejor lávate las patas." },
+      },
+      {
+        caption: "Pintar con el pincel",
+        question: "A Osito no le gusta pintar con los dedos. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito toma el pincel y sigue pintando.", line: "¡Así también se puede!" }, { narration: "¡Un árbol y un sol!" }],
+        instead: {
+          caption: "Arrugar el dibujo de Zorrito",
+          answer: "Mmm, ahora el dibujo de Zorrito está arruinado, y llora. Mejor sigue pintando con el pincel.",
+        },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Levantar las patas y soplar, lavarse, pintar con el pincel. Ahora los dos enseñan sus dibujos." }],
+    endCaption: "Osito y Zorrito levantan sus dibujos",
+  },
+  nappy: {
+    title: "Puf, el pañal huele feo",
+    caption: "El pañal del bebé huele feo, Osito arruga la nariz",
+    intro: [{ narration: "Osito juega con su carrito. El bebé está sentado a su lado." }, { narration: "¡Puf! El pañal del bebé huele feo. ¡Puaj!" }],
+    steps: [
+      {
+        caption: "Taparse la nariz y reírse",
+        question: "El pañal del bebé huele feo. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se tapa la nariz.", line: "¡Puuuf!" }, { narration: "Se ríe. El bebé se ríe también." }],
+        instead: { caption: "Empujar al bebé", answer: "Mmm, ahora el bebé se cayó y llora. Mejor tápate la nariz." },
+      },
+      {
+        caption: "Abrir la ventana",
+        question: "El cuarto huele a pañal. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito abre la ventana." }, { narration: "Entra aire fresco. ¡Aaah!" }],
+        instead: { caption: "Aventarle el carrito al bebé", answer: "Mmm, el carrito le pega al bebé. Eso duele. Mejor abre la ventana." },
+      },
+      {
+        caption: "Pasar un pañal limpio",
+        question: "El oso grande quiere cambiarle el pañal al bebé. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito toma el pañal limpio y se lo da al oso grande.", line: "¡Toma!" }, { line: "¡Gracias! Me ayudas mucho." }],
+        instead: {
+          caption: "Salir corriendo y azotar la puerta",
+          answer: "Mmm, la puerta suena muy fuerte, y el bebé se asusta. Mejor dale al oso grande el pañal limpio.",
+        },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Taparse la nariz, abrir la ventana, ayudar. Ahora el bebé huele rico y se ríe." }],
+    endCaption: "El bebé con pañal limpio se ríe con Osito",
+  },
+  socks: {
+    title: "Puaj, calcetines mojados",
+    caption: "Agua en la bota, a Osito le da asco",
+    intro: [{ narration: "Llovió. Osito y Zorrito salen a pasear." }, { narration: "¡Plaf! Osito pisa un charco hondo. ¡Agua en la bota! ¡Puaj!" }],
+    steps: [
+      {
+        caption: "Sacudir el pie",
+        question: "Hay agua en la bota. ¡Puaj! ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito sacude el pie muy fuerte.", line: "¡Puaj, todo mojado!" }, { narration: "Y le da risa." }],
+        instead: { caption: "Empujar a Zorrito al charco", answer: "Mmm, ahora Zorrito está sentado en el charco y llora. Mejor sacude tu pie muy fuerte." },
+      },
+      {
+        caption: "Vaciar la bota",
+        question: "La bota está llena de agua. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Se sienta en la banca y se quita la bota." }, { narration: "Luego la voltea. ¡Plaf!", line: "¡Fuera el agua!" }],
+        instead: { caption: "Aventarle la bota a Zorrito", answer: "Mmm, la bota le pega a Zorrito. Eso duele. Mejor siéntate en la banca y vacíala." },
+      },
+      {
+        caption: "Exprimir el calcetín",
+        question: "El calcetín está empapado. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Se quita el calcetín mojado y lo exprime. ¡Plic, plic!" },
+          { narration: "Luego se pone otra vez la bota.", line: "¡Mucho mejor!" },
+        ],
+        instead: { caption: "Salpicar a Zorrito", answer: "Mmm, ahora Zorrito también está mojado y llora. Mejor exprime tu calcetín." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Sacudir el pie, vaciar la bota, exprimir el calcetín. ¡Y a seguir!" }],
+    endCaption: "Osito y Zorrito siguen paseando y se ríen",
+  },
+  lick: {
+    title: "Puaj, el perro lame",
+    caption: "Un perro lame a Osito, a Osito le da asco",
+    intro: [
+      { narration: "Osito está en el parque. Ahí viene la señora Zorro con un perrito." },
+      { narration: "¡Slurp! El perro le lame toda la cara. ¡Puaj!" },
+    ],
+    steps: [
+      {
+        caption: "Decir «¡No me lamas!»",
+        question: "El perro le lame la cara a Osito. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito voltea la cara y dice fuerte:", line: "¡No me lamas!" },
+          { line: "¡Ay, perdón! ¡Sentado, perrito!" },
+          { narration: "El perro se sienta muy obediente." },
+        ],
+        instead: { caption: "Pegarle al perro", answer: "Mmm, pegar le duele al perro. Mejor voltea la cara y di: ¡No me lamas!" },
+      },
+      {
+        caption: "Limpiarse la cara",
+        question: "La cara está toda mojada. ¡Puaj! ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito se limpia la cara con la pata.", line: "¡Puaj!" }, { narration: "Y luego le da risa." }],
+        instead: { caption: "Jalarle las orejas", answer: "Mmm, eso le duele al perro. Mejor límpiate la cara." },
+      },
+      {
+        caption: "Acariciarle la espalda",
+        question: "El perrito es muy bueno. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "La señora Zorro señala la espalda del perro.", line: "Aquí le gusta." },
+          { narration: "Osito lo acaricia con mucho cuidado.", line: "¡Qué suavecito!" },
+          { narration: "El perro mueve la cola." },
+        ],
+        instead: { caption: "Aventarle un palo al perro", answer: "Mmm, el palo le pega al perro. Mejor acarícialo con mucho cuidado en la espalda." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decir no, limpiarse la cara, acariciar con cuidado. ¡Adiós, perrito!" }],
+    endCaption: "El perro mueve la cola, Osito le dice adiós",
+  },
+  paintbrush: {
+    title: "Enojo, el bebé agarra el pincel",
+    caption: "El bebé tiene el pincel, Osito está enojado",
+    intro: [
+      { narration: "Osito pinta en la mesa. El bebé oso está sentado a su lado." },
+      { narration: "¡Zas! El bebé le agarra el pincel a Osito y embarra todo. ¡Osito está enojado!" },
+    ],
+    steps: [
+      {
+        caption: "Decir «¡Es mío!»",
+        question: "El bebé tiene el pincel de Osito. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito dice fuerte:", line: "¡Es mío! Dámelo, por favor." }, { narration: "El bebé lo mira. Luego le da el pincel." }],
+        instead: { caption: "Arrebatarle el pincel", answer: "Mmm, ahora el bebé llora. Mejor di fuerte: ¡Es mío!" },
+      },
+      {
+        caption: "Golpear el cojín",
+        question: "¡Osito está tan enojado! ¿Qué puede hacer él?",
+        beats: [{ narration: "Va al sillón y golpea el cojín. ¡Pum, pum, pum!" }, { narration: "Ya se le pasó el enojo.", line: "Uf. Ya estoy mejor." }],
+        instead: {
+          caption: "Aventar el vaso de pintura",
+          answer: "Mmm, ahora hay pintura por todos lados, y el bebé se asusta. Mejor golpea el cojín del sillón.",
+        },
+      },
+      {
+        caption: "Darle un crayón",
+        question: "El bebé también quiere pintar. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito le da un crayón al bebé.", line: "¡Toma, este es para ti!" },
+          { narration: "El bebé suelta el pincel. Ahora pintan los dos." },
+        ],
+        instead: { caption: "Romper la hoja del bebé", answer: "Mmm, ahora la hoja está rota y el bebé llora. Mejor dale un crayón." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decir lo que es tuyo, golpear el cojín, pintar juntos." }],
+    endCaption: "Osito y el bebé pintan juntos",
+  },
+  bluecup: {
+    title: "Enojo, el vaso azul",
+    caption: "La leche en el vaso rojo, Osito está enojado",
+    intro: [{ narration: "¡Desayuno! El oso grande sirve leche en el vaso rojo." }, { narration: "¡Pero Osito quiere el azul! Está enojado." }],
+    steps: [
+      {
+        caption: "Decir «¡Quiero el azul!»",
+        question: "Osito quiere el vaso azul. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Osito dice fuerte:", line: "¡Quiero el vaso azul!" },
+          { line: "Ah, el azul. ¡Qué bueno que lo dices!" },
+          { narration: "El oso grande pone el vaso azul en la mesa." },
+        ],
+        instead: { caption: "Tirar el vaso rojo", answer: "Mmm, ahora la leche se derramó. Mejor di fuerte: ¡Quiero el azul!" },
+      },
+      {
+        caption: "Zapatear muy fuerte",
+        question: "Osito está muy enojado. ¿Qué puede hacer él?",
+        beats: [{ narration: "Osito zapatea muy fuerte con los dos pies. ¡Pum, pum!" }, { line: "Uf. Ya estoy mejor." }],
+        instead: { caption: "Golpear con la cuchara", answer: "Mmm, eso hace mucho ruido, y la avena salpica por todos lados. Mejor zapatea muy fuerte." },
+      },
+      {
+        caption: "Pasar la leche él mismo",
+        question: "La leche está en el vaso rojo. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito trae el vaso azul. El oso grande lo detiene." },
+          { narration: "Y Osito pasa la leche él mismo. ¡Glu, glu!", line: "¡Lo logré!" },
+        ],
+        instead: { caption: "Tirar la avena", answer: "Mmm, ahora el plato está roto y la avena está en el piso. Mejor pasa tú la leche al vaso azul." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Decir lo que quieres, zapatear muy fuerte, pasar la leche por tu cuenta. ¡Buen provecho!" }],
+    endCaption: "Osito toma feliz de su vaso azul",
+  },
+  nap: {
+    title: "Sin sueño a la hora de la siesta",
+    caption: "Todos duermen, Osito no tiene nada de sueño",
+    intro: [
+      { narration: "Hora de la siesta en la guardería. Zorrito y Erizo ya duermen." },
+      { narration: "Solo Osito no tiene nada de sueño. Se mueve y se mueve. No se puede dormir." },
+    ],
+    steps: [
+      {
+        caption: "Apretar el conejo de peluche",
+        question: "Todos duermen, solo Osito no. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Osito aprieta muy fuerte su conejo de peluche.", line: "Buenas noches, conejo." },
+          { narration: "Muy suavecito y calientito. Se va calmando." },
+        ],
+        instead: { caption: "Picar a Zorrito", answer: "Mmm, ahora Zorrito se despertó y llora. Mejor aprieta muy fuerte tu conejo de peluche." },
+      },
+      {
+        caption: "Soplar despacio",
+        question: "Osito se mueve y se mueve. ¿Qué puede hacer él?",
+        beats: [{ narration: "Sopla muy despacio, como a una vela. Fuuuh." }, { narration: "Y otra vez. Los brazos se sienten muy pesados." }],
+        instead: { caption: "Cantar fuerte", answer: "Mmm, ahora todos se despertaron, y Erizo llora. Mejor sopla muy despacio." },
+      },
+      {
+        caption: "Pensar en algo bonito",
+        question: "Osito no se puede dormir. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Se queda acostado sin moverse y piensa en algo bonito." },
+          { narration: "En el columpio. Para acá y para allá, para acá y para allá." },
+        ],
+        instead: { caption: "Correr por el salón", answer: "Mmm, se tropieza con Erizo. Eso duele. Mejor no te muevas y piensa en algo bonito." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Apretar el conejo de peluche, soplar despacio, pensar en algo bonito. Y ya se durmió." }],
+    endCaption: "Osito duerme con su conejo de peluche",
+  },
+  teeth: {
+    title: "Enojo al lavarse los dientes",
+    caption: "Boca cerrada, Osito no quiere lavarse los dientes",
+    intro: [
+      { narration: "Es de noche. Osito ya tiene puesta la pijama." },
+      { narration: "El oso grande le da el cepillo de dientes. ¡Pero Osito no quiere! Cierra la boca muy fuerte." },
+    ],
+    steps: [
+      {
+        caption: "Zapatear muy fuerte",
+        question: "Osito no quiere lavarse los dientes. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Osito zapatea muy fuerte con los dos pies.", line: "¡No quiero!" },
+          { line: "Lo sé. Zapatea fuerte, está bien." },
+          { narration: "Uf. Ya se le pasó el enojo." },
+        ],
+        instead: { caption: "Tirar el cepillo de un manotazo", answer: "Mmm, ahora el cepillo está en el piso. Mejor zapatea muy fuerte y di: ¡No quiero!" },
+      },
+      {
+        caption: "Voltear el reloj de arena",
+        question: "Lavarse los dientes tarda mucho. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito voltea él mismo el reloj de arena.", line: "¡Vamos!" },
+          { narration: "La arena cae. Ahora a lavar hasta que esté toda abajo." },
+        ],
+        instead: { caption: "Salir corriendo", answer: "Mmm, en el piso liso se resbala. Mejor voltea tú el reloj de arena." },
+      },
+      {
+        caption: "Lavarse él mismo",
+        question: "El oso grande le da el cepillo de dientes. ¿Qué puede hacer Osito?",
+        beats: [
+          { narration: "Osito toma el cepillo y se lava los dientes él mismo. ¡Ras, ras!" },
+          { narration: "Luego le enseña los dientes al espejo.", line: "¡Mira, bien limpios!" },
+        ],
+        instead: { caption: "Tirar el vaso", answer: "Mmm, ahora el vaso está roto. Mejor lávate tú los dientes y enséñaselos al espejo." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Zapatear, voltear el reloj de arena, lavarse sin ayuda. ¡Relucientes!" }],
+    endCaption: "Osito enseña sus dientes limpios en el espejo",
+  },
+  bedtime: {
+    title: "Enojo, todavía no a la cama",
+    caption: "Hora de dormir, Osito quiere seguir jugando",
+    intro: [
+      { narration: "Es de noche. Osito juega en pijama con su tren." },
+      { narration: "El oso grande tiene un libro de cuentos.", line: "¡Ven, hora de dormir!" },
+      { narration: "Osito dice que no con la cabeza. Está enojado." },
+    ],
+    steps: [
+      {
+        caption: "Apretar los puños",
+        question: "Osito quiere seguir jugando. ¿Qué puede hacer él?",
+        beats: [
+          { narration: "Osito aprieta los puños muy fuerte y dice:", line: "¡Quiero seguir jugando!" },
+          { line: "Lo sé. Una vuelta más, y luego a dormir." },
+          { narration: "Abre los puños. Uf." },
+        ],
+        instead: { caption: "Aventar el tren", answer: "Mmm, ahora la locomotora está rota. Mejor aprieta los puños y di: ¡Quiero seguir jugando!" },
+      },
+      {
+        caption: "Meter el tren al túnel",
+        question: "Es hora de dormir para el tren. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito mete él mismo el tren al túnel.", line: "¡Buenas noches, tren!" }, { narration: "Chu-chu. Ahora el tren duerme." }],
+        instead: { caption: "Romper las vías a patadas", answer: "Mmm, ahora las vías están rotas. Mejor mete el tren al túnel: ¡Buenas noches, tren!" },
+      },
+      {
+        caption: "Escoger un libro",
+        question: "Ahorita le van a leer un cuento. ¿Qué puede hacer Osito?",
+        beats: [{ narration: "Osito escoge él mismo un libro del librero.", line: "¡Este! El de la luna." }, { line: "Ay, qué bonito. Ven, te lo leo." }],
+        instead: { caption: "Romper el libro", answer: "Mmm, ahora el libro está roto. Mejor escoge tú un libro." },
+      },
+    ],
+    outro: [{ narration: "¡Súper! Apretar los puños, darle las buenas noches al tren, escoger un libro. Ahora, a leer." }],
+    endCaption: "El oso grande lee un cuento, Osito se acurruca con él",
+  },
 };

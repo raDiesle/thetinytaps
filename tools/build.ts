@@ -44,6 +44,7 @@ import {
   pageModuleFor,
   pageModules,
   pageTextsParts,
+  PICTURE_IN_CODE,
   sceneModuleFor,
   sceneModules,
   textsPreload,
@@ -556,7 +557,7 @@ async function writeOfflineManifest({ files, read, chunkOf, closure }: Built) {
   /** The files a chunk's code names (pictures, sounds), besides itself. */
   const named = async (chunk: string) => [
     chunk,
-    ...[...(await read(chunk)).matchAll(new RegExp(`${escaped}([\\w.-]+\\.(?:mp3|webp|png|jpe?g|svg|woff2?))`, "g"))].map((m) => `static/${m[1]}`),
+    ...[...(await read(chunk)).matchAll(new RegExp(`${escaped}([\\w.-]+\\.(?:mp3|webp|png|jpe?g|svg|woff2?))(?![\\w.-])`, "g"))].map((m) => `static/${m[1]}`),
   ];
 
   // index.html as writePages left it (the home page's), read anew: `read` keeps what it read once.
@@ -638,10 +639,10 @@ async function shellFiles() {
   const digest = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
   const previews = new Set<string>();
   for (const file of await filesIn(join(ROOT, "src")))
-    if (/(^|\/)vorschau\/[^/]+\.webp$/.test(file)) previews.add(digest(await readFile(join(ROOT, "src", file))));
+    if (/(^|\/)vorschau(-maedchen)?\/[^/]+\.webp$/.test(file)) previews.add(digest(await readFile(join(ROOT, "src", file))));
   const pictures = new Set<string>();
   for (const file of linked.filter((file) => /\.(js|css)$/.test(file))) {
-    for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(/static\/[\w.-]+\.(?:webp|png|jpe?g|svg|woff2?)/g))
+    for (const match of (await readFile(join(OUT, file), "utf8")).matchAll(PICTURE_IN_CODE))
       if (!previews.has(digest(await readFile(join(OUT, match[0]))))) pictures.add(match[0]);
   }
   // The preloaded font is linked and named by the stylesheet too: kept once.

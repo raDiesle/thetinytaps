@@ -1,5 +1,5 @@
 import { memo, useId, useMemo } from "react";
-import { MascotHead } from "@/components/Mascot";
+import { MASCOT_COLORS, MascotHead } from "@/components/Mascot";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BASKET,
@@ -59,8 +59,8 @@ const GOLD = "#ffc93c";
  * the elephant's trunk as a slide that flings the marble up to a monkey on a
  * trapeze, who catches it with its feet, swings higher and higher and drops it
  * into the mane of a dozing lion; the lion wakes with a start, roars, leaps
- * onto the next pedestal and shakes the marble out into a teddy's basket, and
- * the teddy rides a unicycle along the high wire through a ring of paper flames,
+ * onto the next pedestal and shakes the marble out into the bear acrobat's basket, and
+ * the bear rides a unicycle along the high wire through a ring of paper flames,
  * pulling the ribbon of the cannon that shoots the clown doll into the net. Then the curtain opens. The camera travels along
  * with whatever moves.
  */
@@ -788,7 +788,7 @@ function Hoop({ t, tPass, part }: { t: number; tPass: number; part: "back" | "fr
   );
 }
 
-/** The unicycle with the teddy holding out the back of its basket, its wheel's middle `at`, leaning `lean` degrees. */
+/** The unicycle with the bear acrobat holding out the back of its basket, its wheel's middle `at`, leaning `lean` degrees. */
 function Unicycle({ at, turned, lean }: { at: Pt; turned: number; lean: number }) {
   const r = UNICYCLE.r;
   const spin = deg(turned / r);
@@ -819,33 +819,37 @@ function Unicycle({ at, turned, lean }: { at: Pt; turned: number; lean: number }
         <line x1="0" y1="-2" x2="0" y2="-78" stroke="#ff5d73" strokeWidth="3" strokeLinecap="round" />
         <circle r="5" fill={INK} />
         <rect x="-18" y="-88" width="36" height="10" rx="5" fill={INK} />
-        {/* The teddy */}
-        <ellipse cx="0" cy="-110" rx="24" ry="28" fill="#c98a4b" stroke={INK} strokeWidth="3" />
-        <ellipse cx="2" cy="-104" rx="13" ry="16" fill="#e8b98a" />
+        {/* The bear acrobat (D-18) in a striped circus suit with a golden belt */}
+        <ellipse cx="0" cy="-110" rx="24" ry="28" fill="#8e7dff" stroke={INK} strokeWidth="3" />
+        <path d="M-10 -136 Q-14 -110 -10 -84 M10 -136 Q14 -110 10 -84" fill="none" stroke="#fff" strokeWidth="5" opacity="0.8" />
+        <path d="M-23 -100 Q0 -94 23 -100 L22 -92 Q0 -86 -22 -92 Z" fill={GOLD} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
         {/* The back of the basket, then both arms reaching out to hold it */}
         <BasketBack />
-        {["#3a2a1a", "#c98a4b"].map((color, i) => (
+        {[INK, BEAR.fur].map((color, i) => (
           <g key={color} stroke={i ? color : INK} strokeWidth={i ? 8 : 13} strokeLinecap="round" fill="none">
             <path d={`M-16 -124 Q${BASKET.x - 50} -112 ${BASKET.x - 28} ${BASKET.y + 8}`} />
             <path d={`M16 -124 Q${BASKET.x - 34} -128 ${BASKET.x - 24} ${BASKET.y + 2}`} />
           </g>
         ))}
         <path d="M-12 -138 L0 -132 L12 -138 L12 -126 L0 -132 L-12 -126 Z" fill="#ff3b5c" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-        <circle cx="-14" cy="-168" r="8" fill="#c98a4b" stroke={INK} strokeWidth="2.5" />
-        <circle cx="14" cy="-168" r="8" fill="#c98a4b" stroke={INK} strokeWidth="2.5" />
-        <circle cx="0" cy="-153" r="20" fill="#c98a4b" stroke={INK} strokeWidth="3" />
-        <ellipse cx="4" cy="-146" rx="9" ry="7" fill="#e8b98a" />
-        <circle cx="5" cy="-149" r="3" fill={INK} />
-        <circle cx="-5" cy="-158" r="2.5" fill={INK} />
-        <circle cx="9" cy="-158" r="2.5" fill={INK} />
+        <g transform="translate(-27 -183) scale(0.54)">
+          <AcrobatFace />
+        </g>
       </g>
     </g>
   );
 }
 
+const BEAR = MASCOT_COLORS.bear;
+
+/** The bear acrobat's head, the app's bear (components/Mascot.tsx), drawn once: the unicycle moves it but never changes it. */
+const AcrobatFace = memo(function AcrobatFace() {
+  return <MascotHead kind="bear" mouth="open" />;
+});
+
 const WICKER = "#d9a05b";
 
-/** The inside back of the teddy's basket; the marble sits in front of it. */
+/** The inside back of the bear's basket; the marble sits in front of it. */
 function BasketBack() {
   const { x, y } = BASKET;
   return (
@@ -859,7 +863,7 @@ function BasketBack() {
   );
 }
 
-/** The front of the teddy's basket, drawn over the marble; same place and lean as the unicycle. */
+/** The front of the bear's basket, drawn over the marble; same place and lean as the unicycle. */
 function Basket({ at, lean }: { at: Pt; lean: number }) {
   const { x, y } = BASKET;
   const rim = y - 6;

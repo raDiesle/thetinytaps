@@ -30,8 +30,10 @@ import { STEP_TEXTS_AR as teethSteps } from "@/games/teeth/steps.ar";
 import { DAYTIME_AR as teethDaytime } from "@/games/teeth/daytime.ar";
 import { MILK_CHAIN_AR as milkChain } from "@/games/milkchain/ar";
 import { PACIFIER_STORY_AR as pacifierStory } from "@/games/pacifierstory/ar";
+import { KITA_STORY_AR as kitaStory } from "@/games/kitastory/ar";
 import { HAIR_STORY_AR as hairStory } from "@/games/hairstory/ar";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.ar";
+import { TRANSLATION as fireRescue } from "@/games/adventure/stories/fireRescue/lines.ar";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.ar";
 import { CAUSE_SCENES_AR as cause } from "@/games/cause/scenes.ar";
 import type { LanguageTexts } from ".";
@@ -74,8 +76,9 @@ export const TEXTS: LanguageTexts = {
   teethDaytime,
   milkChain,
   pacifierStory,
+  kitaStory,
   hairStory,
   cause,
   seo,
-  stories: { cloudTrip, treasureIsland },
+  stories: { cloudTrip, fireRescue, treasureIsland },
 };

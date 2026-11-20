@@ -10,6 +10,7 @@ import { playPop, playRandomNote, playGlockenspielEnd } from "@/lib/sfx";
 import { tapState } from "@/lib/tapTargets";
 import { hush, talking } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
+import { FilmOver } from "../kid";
 import { translationOf } from "../phrases";
 import { filmLines, linesReady, loadLines, sayIn } from "../voice";
 import { Fitted, type Picture } from "../trail/items";
@@ -457,7 +458,9 @@ export function FilmPlay({
   return (
     <div ref={playEl} className="fm-play" style={{ "--fm-pace": PACE } as CSSProperties} onPointerDown={(e) => tap(e.clientX, e.clientY)}>
       <svg className="fm-svg" viewBox={viewBox} preserveAspectRatio="xMidYMid meet" aria-hidden>
-        <Draw step={view.step} busy={view.busy} picks={view.picks} />
+        <FilmOver.Provider value={view.party}>
+          <Draw step={view.step} busy={view.busy} picks={view.picks} />
+        </FilmOver.Provider>
         {spot && <circle className="fm-spot" cx={spot.at[0]} cy={spot.at[1]} r={spot.r} data-tap={tapState({ goal: true })} />}
         {choice?.options.map((o, i) => (
           <g

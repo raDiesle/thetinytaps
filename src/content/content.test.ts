@@ -163,6 +163,13 @@ describe("ideas", () => {
   test("a rejected idea is not marked as done", () => {
     expect(ideas.filter(({ idea }) => idea.rejected && idea.done).map(({ idea }) => idea.id)).toEqual([]);
   });
+
+  // An idea is done once it is built; what is still left becomes a new idea of its own, so nothing stays „teilweise“
+  // on /management/ for ever (user feedback, November 2026). Missing translations and recordings are no such rest:
+  // languageStatus.ts and the voice list track them.
+  test("no open idea is partly done", () => {
+    expect(ideas.filter(({ idea }) => idea.partial && !idea.done && !idea.rejected).map(({ idea }) => idea.id)).toEqual([]);
+  });
 });
 
 /** Every language's search texts besides German, as the build has them. */

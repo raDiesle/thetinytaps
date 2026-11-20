@@ -935,6 +935,228 @@
   }
 }
 
+/* „From grain to bread“: seeds fall from the drill's tines and show in the furrows as it passes, the trailer tips round
+   its back, the grain heaps up in it and pours out in a stream, the grain grows and is cut, the windmill's sails turn
+   twice round, and the miller goes in at the door. */
+.fm-kn-drop {
+  animation: fm-kn-drop calc(0.5s * var(--fm-pace)) ease-in infinite;
+}
+
+@keyframes fm-kn-drop {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+.fm-kn-sow {
+  animation: fm-kn-show calc(0.4s * var(--fm-pace)) ease-out backwards;
+}
+
+@keyframes fm-kn-show {
+  from {
+    opacity: 0;
+  }
+}
+
+.fm-kn-tip {
+  transition: transform calc(1.6s * var(--fm-pace)) ease-in-out;
+}
+
+.fm-kn-heap {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform calc(2.6s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-kn-pour {
+  animation: fm-kn-pour calc(0.6s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-kn-pour {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.fm-kn-grow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition:
+    transform calc(2.4s * var(--fm-pace)) ease-out calc(0.6s * var(--fm-pace)),
+    opacity calc(1.4s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-kn-cut {
+  animation: fm-kn-cut calc(0.5s * var(--fm-pace)) ease-in forwards;
+}
+
+@keyframes fm-kn-cut {
+  to {
+    opacity: 0;
+  }
+}
+
+.fm-kn-sails.turn {
+  animation: fm-kn-sails calc(9s * var(--fm-pace)) ease-in-out;
+}
+
+@keyframes fm-kn-sails {
+  to {
+    transform: rotate(720deg);
+  }
+}
+
+/* A puff of flour at the mill's door as the miller comes out with the sack. */
+.fm-kn-dust {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fm-kn-dust calc(1.6s * var(--fm-pace)) ease-out calc(1.6s * var(--fm-pace));
+}
+
+@keyframes fm-kn-dust {
+  from {
+    transform: scale(0.3);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.fm-kn-inside {
+  animation: fm-kn-inside calc(0.4s * var(--fm-pace)) ease-in calc(1.8s * var(--fm-pace)) forwards;
+}
+
+@keyframes fm-kn-inside {
+  to {
+    opacity: 0;
+  }
+}
+
+/* „We build a house“: the hole, the heap and each row of wall grow from their foot, the floor and the tiles fade in,
+   the digger's arm scoops, the mixer's drum turns, the van's shutter rolls up, and the family goes in at the door. */
+.fm-hs-grow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition:
+    transform calc(1.4s * var(--fm-pace)) ease-out calc(0.4s * var(--fm-pace)),
+    opacity calc(0.6s * var(--fm-pace)) ease-out calc(0.4s * var(--fm-pace)),
+    fill calc(2s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-hs-fade,
+.fm-hs-tiles,
+.fm-hs-light {
+  transition: opacity calc(1.6s * var(--fm-pace)) ease-in-out calc(0.6s * var(--fm-pace));
+}
+
+.fm-hs-light {
+  transition-duration: calc(0.3s * var(--fm-pace));
+  transition-delay: 0s;
+}
+
+.fm-hs-fade-in {
+  animation: fm-kn-show calc(0.8s * var(--fm-pace)) ease-out calc(1.2s * var(--fm-pace)) backwards;
+}
+
+.fm-hs-arm.dig {
+  animation: fm-hs-dig calc(1.8s * var(--fm-pace)) ease-in-out 3;
+}
+
+@keyframes fm-hs-dig {
+  35% {
+    transform: rotate(-16deg);
+  }
+  70% {
+    transform: rotate(8deg);
+  }
+}
+
+.fm-hs-drum.turn {
+  animation: fm-hs-drum calc(0.9s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-hs-drum {
+  to {
+    stroke-dashoffset: -90;
+  }
+}
+
+.fm-hs-pour {
+  animation: fm-hs-pour calc(0.6s * var(--fm-pace)) linear infinite;
+}
+
+@keyframes fm-hs-pour {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+
+.fm-hs-shutter {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transition: transform calc(1.2s * var(--fm-pace)) ease-in-out;
+}
+
+.fm-hs-inside {
+  animation: fm-kn-inside calc(0.4s * var(--fm-pace)) ease-in calc(3.2s * var(--fm-pace)) forwards;
+}
+
+/* „The rubbish truck“ (`muell.tsx`) */
+.fm-mu-lid {
+  transition: transform calc(0.6s * var(--fm-pace)) ease-out;
+}
+
+/* The arm swings the bin up over the hopper and back down, slowly. */
+.fm-mu-arm {
+  transition: transform calc(2.2s * var(--fm-pace)) ease-in-out;
+}
+
+/* What lies in the bin drops into the hopper once the bin is up. */
+.fm-mu-fall {
+  animation: fm-mu-fall calc(1s * var(--fm-pace)) ease-in calc(2s * var(--fm-pace)) both;
+}
+
+@keyframes fm-mu-fall {
+  from {
+    transform: translateY(-110px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+/* The press squeezes the rubbish: the box draws together a little, twice. */
+.fm-mu-squeeze.on {
+  animation: fm-mu-squeeze calc(1.2s * var(--fm-pace)) ease-in-out 2;
+}
+
+@keyframes fm-mu-squeeze {
+  50% {
+    transform: scaleX(0.96);
+  }
+}
+
+/* A thing at the recycling yard vanishes into its container's opening. */
+.fm-mu-into {
+  animation: fm-kn-inside calc(0.3s * var(--fm-pace)) ease-in calc(1.7s * var(--fm-pace)) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fm-wheel.spin,
   .fm-flame,
@@ -944,6 +1166,11 @@
   .fm-br-ring,
   .fm-gt-rain,
   .fm-gt-wings,
+  .fm-kn-drop,
+  .fm-kn-pour,
+  .fm-hs-arm.dig,
+  .fm-hs-drum.turn,
+  .fm-hs-pour,
   .fm-strip.run .fm-frame,
   .fm-card-move::before {
     animation: none;

@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import { FilmOver } from "../kid";
 import { FILMS } from "./films";
 import type { Point } from "../trail/types";
 import { type Box, type Film, PACE, type Scene } from "./types";
@@ -89,6 +91,22 @@ for (const film of FILMS) {
           for (let i = 1; i < at.length; i++) expect(at[i] - at[i - 1], `${scene.id}: sounds too close`).toBeGreaterThanOrEqual(900);
           if (beat.say) expect(beat.ms * PACE, `${scene.id}: ${beat.say}`).toBeGreaterThanOrEqual(2700);
         }
+      }
+    });
+
+    test("it ends quietly: in its last picture everybody waves goodbye, nobody cheers (G-31)", () => {
+      for (const picks of paths) {
+        const scenes = film.scenes(picks);
+        const { Draw, beats } = scenes[scenes.length - 1];
+        const html = renderToStaticMarkup(
+          <FilmOver.Provider value>
+            <svg>
+              <Draw step={beats.length} busy={false} picks={picks} />
+            </svg>
+          </FilmOver.Provider>,
+        );
+        expect(html).toContain("pose-wave");
+        expect(html).not.toContain("pose-cheer");
       }
     });
   });

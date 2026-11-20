@@ -91,6 +91,8 @@ interface Measurement {
   stutterAt: number[];
   /** With --profile: the functions that took the most time themselves. */
   hot: string[];
+  /** Where the stretch waited for its motion (`Part.startWhen`): the ms from the finger landing to the first frame of it. */
+  lead?: { name: string; ms: number };
   over: string[];
 }
 
@@ -128,6 +130,24 @@ async function pressKey(cdp: Cdp, key: string) {
   };
   await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", ...base, text: key.length === 1 ? key : undefined });
   await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", ...base });
+}
+
+/** How long a stretch waits for its motion to start before it gives up, in ms. */
+const LEAD_LIMIT_MS = 10_000;
+
+/**
+ * Watches for a motion to start, installed before the tap that sets it off: `window.__perfLead` resolves with the ms
+ * from the finger landing (the event's own time, so a busy page answering late counts) to the frame in which `holds`
+ * is true. (The script ends in `0`: evaluating to the promise would wait for it.)
+ */
+const leadWatcher = (holds: string) =>
+  `window.__perfLead = new Promise((done) => { let down = null; addEventListener("pointerdown", (e) => { down = e.timeStamp; }, { capture: true, once: true }); const look = () => (down !== null && (${holds}) ? done(performance.now() - down) : requestAnimationFrame(look)); requestAnimationFrame(look); }); 0`;
+
+/** Waits until the motion `leadWatcher` looks for runs, and says how long it took from the tap, in ms. */
+async function leadTime(cdp: Cdp, part: Part): Promise<number> {
+  const ms = await evaluate<number | null>(cdp, `Promise.race([window.__perfLead, new Promise((late) => setTimeout(late, ${LEAD_LIMIT_MS}, null))])`);
+  if (ms === null) throw new Error(`${part.label}: its motion never started (startWhen: ${part.startWhen?.holds})`);
+  return Math.round(ms);
 }
 
 async function runStep(cdp: Cdp, step: Step) {
@@ -256,8 +276,8 @@ async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
 /** What the page's frame counter saw: every frame's time since the one before, and the long frames with their scripts. */
 type Frames = { deltas: number[]; long: { ms: number; scripts: { source: string; ms: number }[] }[] };
 
-/** Measures `ms` of whatever runs now. */
-async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget, traceFile?: string): Promise<Measurement> {
+/** Measures `ms` of whatever runs now; `leadMs` is how long the stretch waited for its motion (`Part.startWhen`). */
+async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget, leadMs?: number, traceFile?: string): Promise<Measurement> {
   const { label, ms, tap, type } = part;
   await evaluate(cdp, FRAME_COUNTER);
   const before = await metrics(cdp);
@@ -327,6 +347,10 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
   if (m.stutters / wall > limits.stuttersPerS) m.over.push(`${m.stutters} stutters`);
   if (m.busy > limits.busy) m.over.push(`busy ${Math.round(m.busy * 100)} % > ${Math.round(limits.busy * 100)} %`);
   if (m.rasterScreensPerS > limits.rasterScreensPerS) m.over.push(`raster ${m.rasterScreensPerS} > ${limits.rasterScreensPerS} screens/s`);
+  if (part.startWhen && leadMs !== undefined) {
+    m.lead = { name: part.startWhen.lead, ms: leadMs };
+    if (leadMs > part.startWhen.within) m.over.push(`${part.startWhen.lead} ${leadMs} > ${part.startWhen.within} ms`);
+  }
   return m;
 }
 
@@ -363,6 +387,7 @@ function printRow(m: Measurement) {
   console.log(
     `  ${mark} ${m.label.padEnd(34)} ${String(m.fps).padStart(5)} fps  ${String(m.stutters).padStart(3)} stutters  longest ${String(m.longest).padStart(4)} ms  p95 ${String(m.p95).padStart(3)} ms  busy ${pct(m.busy)} % (script ${pct(m.script)}, style ${pct(m.style)}, layout ${pct(m.layout)}, other ${pct(m.other)})  paint ${String(m.paintMsPerS).padStart(3)}  raster ${String(m.rasterMsPerS).padStart(4)} ms/s ${String(m.rasterScreensPerS).padStart(5)} screens/s${m.over.length ? `  ← ${m.over.join(", ")}` : ""}`,
   );
+  if (m.lead) console.log(`      ${m.lead.name}: ${m.lead.ms} ms, the stretch starts after it`);
   if (m.over.length && m.culprits.length) console.log(`      slowest scripts in long frames: ${m.culprits.join(" · ")}`);
   if (m.over.length && m.stutterAt.length) console.log(`      stutters at: ${m.stutterAt.map((t) => `${t}s`).join(" ")}`);
   if (m.hot.length) console.log(`      most time in: ${m.hot.join(" · ")}`);
@@ -382,9 +407,11 @@ async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir:
   await sleep(500);
   const results: Measurement[] = [];
   for (const part of scenario.parts) {
+    if (part.startWhen) await evaluate(cdp, leadWatcher(part.startWhen.holds));
     for (const step of part.before ?? []) await runStep(cdp, step);
+    const leadMs = part.startWhen ? await leadTime(cdp, part) : undefined;
     const file = (ext: string) => join(shotsDir ?? "", `${scenario.name}-${part.label}.${ext}`.replace(/[^\w.-]+/g, "_"));
-    const m = await measure(cdp, scenario, part, BUDGET, shotsDir && flag("trace") ? file("json") : undefined);
+    const m = await measure(cdp, scenario, part, BUDGET, leadMs, shotsDir && flag("trace") ? file("json") : undefined);
     results.push(m);
     printRow(m);
     if (shotsDir) {

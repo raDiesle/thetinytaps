@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
+const git = (/** @type {string[]} */ ...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
 const BATCH_DIR = join(git("rev-parse", "--path-format=absolute", "--git-common-dir"), "image-batches");
 const MAIN = "main";
 
@@ -18,13 +18,16 @@ const batches = existsSync(BATCH_DIR)
       .map((f) => JSON.parse(readFileSync(join(BATCH_DIR, f), "utf8")))
   : [];
 
-const worktrees = git("worktree", "list", "--porcelain")
-  .split("\n\n")
-  .map((block) => ({
-    path: /^worktree (.+)$/m.exec(block)?.[1],
-    branch: /^branch refs\/heads\/(.+)$/m.exec(block)?.[1],
-  }))
-  .filter((w) => w.path);
+// Only worktrees with a path are kept, so `path` is a string below.
+const worktrees = /** @type {{ path: string; branch: string | undefined }[]} */ (
+  git("worktree", "list", "--porcelain")
+    .split("\n\n")
+    .map((block) => ({
+      path: /^worktree (.+)$/m.exec(block)?.[1],
+      branch: /^branch refs\/heads\/(.+)$/m.exec(block)?.[1],
+    }))
+    .filter((w) => w.path)
+);
 
 let unsafe = 0;
 for (const { path, branch } of worktrees) {

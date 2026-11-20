@@ -249,7 +249,9 @@ puzzle, a lost race, a friend going home, „Ich will selber!“, the first nigh
 laughed at, too excited to sleep, envy, lost in the supermarket, not understood, a bee, waiting while the phone goes on,
 having hit, picked up, silly in the bath, a butterfly, a grumpy morning, worn out, ill, a long drive, sticky paint, a
 smelly nappy, wet socks, a licking dog, the baby's paintbrush, the blue cup, the nap, brushing teeth and bedtime. They
-are German only, apart from `SELF_SITUATIONS`, so they wait for their translations without failing its check, and are
+were written German first and are kept apart from `SELF_SITUATIONS` (whose check wants every language); their texts in
+the six other languages are in `kita.<lang>.ts` after the others (19 November 2026, text only, not yet recorded; the
+raccoon is named as in `days.<lang>.ts`: the raccoon, 小浣熊, रैकून, el mapache, الراكون, Енотик). They are
 told in Tag 9 to Tag 15; their pictures are described per story in `alltagDrawings.ts` (`StoryDrawing`), whose prompts
 `storyPictures.ts` wraps in the frames of „So bleibt die Szene gleich“ for the picture queue. A new story of this kind
 goes there the same way. Where an idea's family plot needs a bear baby to take something (the paintbrush), the baby may

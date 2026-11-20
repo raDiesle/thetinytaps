@@ -49,6 +49,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Die Pakete für Englisch, Türkisch und Polnisch sind da und spielen, sobald die ganze App die Sprache spricht (🌐). Zweisprachig („Bär – bear“) gab es, ist im Oktober 2026 entfernt: eine Sprache für alles, nie gemischt.",
+      done: true,
     },
     {
       id: "A-06",
@@ -149,6 +150,7 @@ export const allGamesIdeas: IdeaArea = {
       why: "Mehrsprachige Familien und Kinder überall auf der Welt; die Spiele kommen fast ohne Text aus, nur die Stimme muss sich ändern.",
       effort: "L",
       partial: "Alles auf Deutsch; „Buchstaben & Zahlen“ und „Wörter tippen“ auch auf Englisch.",
+      done: true,
     },
     {
       id: "A-19",
@@ -168,6 +170,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Gebaut und der einzige Look (der alte Spielzeug-Look und sein Schalter sind seit November 2026 ganz entfernt): Die Startseite ist ein Zimmer mit Bücherregal – ein Tipp nimmt ein Buch heraus und schlägt es auf, zurück stellt es sich wieder ins Regal; die Bücher stehen zu zweit oben und unten mit Platz drumherum, in schmalen Fächern daneben stehen Lautsprecher, Sanduhr und ein Globus (Sprache) statt Knöpfen, Fuchs- und Bärenaufkleber kleben an der Rückwand, der Name ist ein Schild auf dem Regal. Die Seite einer Welt ist das Inhaltsverzeichnis ihres Buchs, man sieht immer die linke Seite, im Buch blättert man um (auch beim Starten und Verlassen der Spiele); Papierknöpfe, Papierrand im Spiel. Die Zeichnungen der Spiele selbst sind noch die alten – weitere Schritte im Bereich D „Das Bilderbuch“.",
+      done: true,
     },
     {
       id: "A-21",
@@ -205,6 +208,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "S",
       partial:
         "Eingebaut (7. November 2026): GameEnd fragt 1,5 s nach dem Ende „Nochmal oder weiter?“ bzw. „Nochmal?“, außer wenn die Spielzeit um ist; beide Sätze in allen sieben Sprachen geschrieben. Noch nicht aufgenommen (`bun run voice make --only alle-spiele`), bis dahin still. Stand 16. November 2026 (Umsetzung ohne die Alltagshelfer – Timer, Abstillen, Schnullerfee, Kita-Start, Zähne putzen, Aufs Töpfchen, Belohnungstafel und Zeitplan bleiben bewusst draußen, Töpfchen-Satz und Timer-Satz siehe H-72): Der Satz vor der Frage ist in allen übrigen Spielen schon da – Kleine Abenteuer (Geschichten, Wege und Filme enden mit ihrem Schlusssatz), Bewegungsabenteuer, Kettenreaktion, Gefühle. Nur „Was ist passiert?“ hat keinen, weil das Spiel ganz ohne Stimme ist (die Worte unter dem Bild lesen die Großen vor); dort bleibt es dabei.",
+      done: true,
     },
     {
       id: "A-25",
@@ -260,6 +264,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Die aufsteigenden Herzen, Sterne und Noten (`celebrate`) sind an allen Enden weg, der Pokal des Levels steht dort (A-31, 11. November 2026); das Konfetti in Bewegungsabenteuer und im Zirkus und die eigenen Enden der Spiele sind noch offen.",
+      done: true,
     },
     {
       id: "A-31",
@@ -287,6 +292,15 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
       partial:
         "Umgesetzt am 12. November 2026: Die Warteschlange gibt große Bilder und ganze Bilder zu viert auf 2K-Bögen von Nano Banana 2.1, kleine zu viert auf 1K-Bögen von Lite, je nachdem, was je Bild weniger kostet, und das Skript schickt je Modell einen Batch. Offen: den ersten 2K-Bogen ohne Vorlage genau anschauen, und Geschichtenbilder auf 2.1-Bögen noch einmal versuchen, sobald Guthaben da ist.",
+      done: true,
+    },
+    {
+      id: "A-34",
+      emoji: "🧪",
+      title: "Bilder: Bögen von Nano Banana 2.1 prüfen und für Geschichten noch einmal versuchen",
+      text: "Seit A-33 gehen große Bilder zu viert auf 2K-Bögen von Nano Banana 2.1. Offen: den ersten 2K-Bogen ohne Vorlage genau anschauen, und Geschichtenbilder nach einer Vorlage noch einmal auf 2.1-Bögen versuchen (zuerst verloren sie Dinge, die bleiben müssen), sobald Guthaben da ist.",
+      why: "Hält es, kosten auch die Geschichtenbilder etwa die Hälfte.",
+      effort: "S",
     },
   ],
 };

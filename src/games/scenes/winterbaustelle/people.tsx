@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Lids } from "../baustelle/figures";
-import { Eye, Face, Inside, nth } from "../shared";
+import { Eye, Face, Inside, MascotFace, nth } from "../shared";
 import { CHEEK, INK, SKIN } from "@/components/drawing";
 import { Cap, Flake, SNOW, SNOW_SHADE, glint } from "./parts";
 
@@ -217,7 +217,7 @@ export function Schneeballkinder() {
   );
 }
 
-/** A worker in a woolly hat warming one hand at the fire and drinking hot tea. */
+/** A bear worker in a woolly hat warming one hand at the fire and drinking hot tea. */
 export function Teearbeiter() {
   return (
     <g className="wb-tee-body" style={{ transformOrigin: "0px 0px" }}>
@@ -232,24 +232,15 @@ export function Teearbeiter() {
       <rect x="-30" y="-142" width="60" height="88" rx="18" fill="#ff8c42" />
       <path d="M-30 -96 H30 M-30 -76 H30" stroke="#ffd60a" strokeWidth="6" />
       <path d="M0 -140 V-56" stroke="#e76f51" strokeWidth="3" opacity="0.6" />
-      <circle cx="0" cy="-162" r="24" fill={SKIN} />
-      <circle cx="-24" cy="-160" r="5" fill={SKIN} />
-      <circle cx="24" cy="-160" r="5" fill={SKIN} />
-      <Face cx={0} cy={-162} size={1.05} />
-      <Lids
-        eyes={[
-          [-7.35, -162],
-          [7.35, -162],
-        ]}
-        r={4.4}
-        fill={SKIN}
-      />
-      <circle cx="0" cy="-156" r="3.5" fill="#ff8fa3" />
-      <g className="wb-tee-hat" style={{ transformOrigin: "0px -176px" }}>
-        <path d="M-25 -168 Q-26 -198 0 -198 Q26 -198 25 -168 Z" fill="#e63946" />
-        <path d="M-12 -192 V-176 M0 -196 V-176 M12 -192 V-176" stroke="#c1121f" strokeWidth="2.5" />
-        <rect x="-27" y="-174" width="54" height="10" rx="5" fill="#ff5d73" />
-        <circle className="wb-tee-bobble" cx="0" cy="-202" r="9" fill="#fff" />
+      <MascotFace kind="bear" cx={0} cy={-162} r={24} />
+      {/* The woolly hat sits a little high, over the bear's ears, so its brows show. */}
+      <g transform="translate(0 -4)">
+        <g className="wb-tee-hat" style={{ transformOrigin: "0px -176px" }}>
+          <path d="M-25 -168 Q-26 -198 0 -198 Q26 -198 25 -168 Z" fill="#e63946" />
+          <path d="M-12 -192 V-176 M0 -196 V-176 M12 -192 V-176" stroke="#c1121f" strokeWidth="2.5" />
+          <rect x="-27" y="-174" width="54" height="10" rx="5" fill="#ff5d73" />
+          <circle className="wb-tee-bobble" cx="0" cy="-202" r="9" fill="#fff" />
+        </g>
       </g>
       <rect x="-22" y="-142" width="44" height="9" rx="4" fill="#2a9d8f" />
       <path d="M8 -136 L14 -110 L24 -112 L18 -138 Z" fill="#2a9d8f" />

@@ -1,8 +1,23 @@
-import { GLASS, Inside, Pane, SAND, STEEL, Wheel, nth } from "../shared";
+import { GLASS, Inside, type Mascot, MascotFace, Pane, SAND, STEEL, Wheel, nth } from "../shared";
 import { INK, SKIN } from "@/components/drawing";
 
-/** A driver's head with a hard hat, for cabs. */
-function Driver({ cx, cy, hat = "#ffd60a" }: { cx: number; cy: number; hat?: string }) {
+/**
+ * A driver's head with a hard hat, for cabs; with `animal` a fox or a bear, one of the app's mascots in a role (D-18),
+ * the hat small between its ears. The drivers of the machines Winterbaustelle shares are bears: its wild fox stays the
+ * only fox there.
+ */
+function Driver({ cx, cy, hat = "#ffd60a", animal }: { cx: number; cy: number; hat?: string; animal?: Mascot }) {
+  if (animal) {
+    return (
+      <g className="bs-driver">
+        <rect x={cx - 13} y={cy + 10} width="26" height="14" rx="5" fill="#ff8c42" />
+        <MascotFace kind={animal} cx={cx} cy={cy} r={12}>
+          <path fill={hat} d="M30 32 C30 9 70 9 70 32 Z" />
+          <path fill={hat} d="M24 34 Q50 25 76 34 Q50 40 24 34 Z" />
+        </MascotFace>
+      </g>
+    );
+  }
   return (
     <g className="bs-driver">
       <rect x={cx - 13} y={cy + 10} width="26" height="14" rx="5" fill="#ff8c42" />
@@ -61,7 +76,7 @@ export function Bagger() {
         <rect x="128" y="505" width="120" height="95" rx="14" fill="#ffb703" />
         <rect x="124" y="500" width="128" height="14" rx="7" fill="#f4a100" />
         <Pane x={146} y={522} w={84} h={52}>
-          <Driver cx={178} cy={552} />
+          <Driver cx={178} cy={552} animal="bear" />
         </Pane>
         <circle cx="248" cy="530" r="6" fill="#fff4d6" />
         <circle className="bs-blink" cx="188" cy="494" r="8" fill="#ff8c42" />
@@ -156,7 +171,7 @@ export function Betonmischer() {
       <path d="M876 716 H916" stroke="#90e0ef" strokeWidth="5" strokeLinecap="round" />
       <path d="M884 722 H918 Q932 722 938 752 H884 Z" fill={GLASS} />
       <Inside d="M884 722 H918 Q932 722 938 752 H884 Z">
-        <Driver cx={906} cy={740} hat="#fff" />
+        <Driver cx={906} cy={740} hat="#fff" animal="fox" />
       </Inside>
       <path d="M900 724 h8 L896 752 h-8 Z" fill="#fff" opacity="0.5" />
       <rect x="940" y="776" width="18" height="11" rx="4" fill="#fff4d6" />
@@ -210,7 +225,7 @@ export function Kipplaster() {
       <Beacon cx={1040} cy={698} />
       <path d="M1066 722 H1024 Q1008 722 1002 752 H1066 Z" fill={GLASS} />
       <Inside d="M1066 722 H1024 Q1008 722 1002 752 H1066 Z">
-        <Driver cx={1040} cy={740} />
+        <Driver cx={1040} cy={740} animal="bear" />
       </Inside>
       <path d="M1046 724 h8 L1042 752 h-8 Z" fill="#fff" opacity="0.5" />
       <rect x="984" y="776" width="18" height="11" rx="4" fill="#fff4d6" />
@@ -336,7 +351,7 @@ export function Walze() {
       <rect x="280" y="636" width="108" height="12" rx="5" fill="#e85d04" />
       <Beacon cx={334} cy={628} />
       <Pane x={296} y={654} w={76} h={44}>
-        <Driver cx={334} cy={676} />
+        <Driver cx={334} cy={676} animal="fox" />
       </Pane>
       <g className="walze-drum" style={{ transformOrigin: "170px 760px" }}>
         <circle cx="170" cy="760" r="40" fill="#6c757d" />

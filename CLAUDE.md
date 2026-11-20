@@ -6,7 +6,7 @@ built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backe
 ## Commands (always Bun, never npm, yarn or npx)
 
 ```bash
-bun run verify     # lint + format check + typecheck + unit tests, all three at once (about 7 s, `tools/verify.ts`; its last line says `verify: OK` or `verify: FAILED (…)` with what failed) – run before every commit (never piped into tail or grep before `&& git commit` or `&& git merge`: the pipe hides a failure and the commit or the merge into main goes in anyway – one left main half-merged)
+bun run verify     # lint + format check + typecheck (the app, and the scripts in `scripts/` by their JSDoc types, `tsconfig.scripts.json`) + unit tests, all at once (about 7 s, `tools/verify.ts`; its last line says `verify: OK` or `verify: FAILED (…)` with what failed) – run before every commit (never piped into tail or grep before `&& git commit` or `&& git merge`: the pipe hides a failure and the commit or the merge into main goes in anyway – one left main half-merged)
 bun run format     # format everything and apply safe lint fixes (Biome)
 bun test           # unit tests only (about 17 s one file after the other, `bun test --parallel` about 7 s; one file: `bun test <path>`, < 1 s); bun test --watch while working
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
@@ -95,6 +95,9 @@ In a fresh worktree run `bun install` first.
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
   that kind mounts one (so far Was gehört zusammen?, Gefühle, Was ist passiert? and the chapter books, `ChapterBook`).
+- A new or changed script in `scripts/` stays `.mjs` with JSDoc types and passes verify's typecheck of the scripts,
+  never `@ts-nocheck` or a loosened option: two of them spend money when they run (voice, image), so a typo must fail
+  before it costs credits (`src/verify.test.ts`; code review, November 2026).
 - Look for files with `git ls-files '*.ts*'` and `git grep -l`, never `find` or `ls -R` over `src`: about 25,000
   recordings under the games' `stimme/` folders flood the output (code review, November 2026).
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
@@ -118,7 +121,12 @@ In a fresh worktree run `bun install` first.
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). A game with ideas of its own gets an area of
   its own (a `key` sharing the old prefix, like „Wie geht's dir?“ and „Timer“), never a run of them inside a long mixed
   area, where the user could no longer find the Timer's ideas (user feedback, November 2026). When an idea is
-  built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
+  built, set `done: true` there: `/management/` then no longer lists it (user feedback, November 2026: the page shows
+  only what is still to decide), while the data keeps it so its number stays taken and the research and mascot tables
+  still link it. Never leave an idea half done: `partial` is only a note on a done (or rejected) idea of what was built,
+  and what is really left becomes a new idea with the area's next number, while a rest that is only translations or
+  recordings is no rest at all (`languageStatus.ts` and the voice list track those; `content.test.ts`). An idea the user
+  turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
@@ -267,7 +275,10 @@ In a fresh worktree run `bun install` first.
   starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,
   and whether it catches them depends on when its counter starts: before blaming a motion, compare where the stutters
   fall with when it starts (in „Buch aus dem Regal nehmen“ all of them fell in the 0.2 s before the book lifts, and
-  splitting that work over two frames only added one, since neither half got under 50 ms; November 2026). A new game,
+  splitting that work over two frames only added one, since neither half got under 50 ms; November 2026). So a stretch
+  meant to measure a motion that starts a moment after its tap waits for it with `startWhen` (`tools/perfScenarios.ts`):
+  the stretch begins with the first moving frame, and the wait from the finger landing is a number of its own with its
+  own limit („tap to lift“, about 0.3 s on the old phone) – never one stretch judging both by chance. A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
   `--profile` names the functions that cost, `--shots` shows what was measured). A stretch after one that taps everything starts wherever those taps left the game: start it
   from a reload (`{ eval: "location.reload()" }`, a wait, then the fullscreen question's `.screen-hint-button`), as
@@ -458,6 +469,13 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   it. A new drawing of the child goes on `CHILD_DRAWINGS` in `src/figure.test.ts`, which also checks that nothing calls
   the child a „braver Junge“ or the like. With „Mädchen“ the menus get the girl's colours (`:root[data-figure="girl"]` in
   `base.css`: a lilac sky going pink): a new shared colour of the menus gets its girl's value there too.
+  The menus' pictures of a game that draws the child (its cards, its line in the table of contents, its trophies'
+  medallions) show the chosen child too: `bun run previews` pictures such a game a second time with „Mädchen“ into
+  `vorschau-maedchen/` beside `vorschau/` (`Menu.girl`, `GIRL_LINES` in `tools/previews.ts`), and the menus lay them
+  over the boy's with `useFigurePictures` (`src/lib/figurePictures.ts`); a new menu or game drawing the child adds its
+  folder there. Only what is cut from the games' own svg follows the figure: a picture painted by Gemini (covers, spines,
+  the stories' pictures, Mitmachen's fox and bear child) is never made a second time for it, which would cost a picture
+  each (user decision, November 2026).
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer (what a game puts at the picture's edge adds `var(--frame, 0px)`: the book's paper margin lies
   over the picture's edges and hid half of Bewegungsabenteuer's route): let it fill the screen behind headings and controls and zoom what matters into

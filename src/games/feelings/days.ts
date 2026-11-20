@@ -165,7 +165,7 @@ export const DAYS: Day[] = [
     end: "Zu Hause erzählt der kleine Bär, wie hoch er geklettert ist. Dann schläft er ein. Gute Nacht! Der Tag ist vorbei.",
   },
   {
-    // Tag 9 to Tag 15 tell the everyday scenes of alltag.ts (ideas C-37 to C-72); German only until translated.
+    // Tag 9 to Tag 15 tell the everyday scenes of alltag.ts (ideas C-37 to C-72).
     id: "tag-9",
     emoji: "🌅",
     scenes: [

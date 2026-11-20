@@ -4,7 +4,7 @@
 // elephant's trunk that flings the marble up to a monkey on a trapeze, who
 // swings high and drops it into a dozing lion's mane, the lion that wakes with
 // a start, roars and leaps onto the next pedestal and shakes the marble out
-// into the basket of a teddy on a unicycle on the high wire, a cannon that
+// into the basket of a bear acrobat on a unicycle on the high wire, a cannon that
 // shoots the clown into the net – while the camera travels along. Everything
 // is worked out ahead as a function of the seconds since the tap, so
 // CircusLevel.tsx only asks where each thing is at a moment. Coordinates are
@@ -161,7 +161,7 @@ const nestOf = (puff: number): Pt => ({ x: MANE.x, y: MANE.y - MANE.r * puff + 1
 /** The little platform where the unicycle waits, in front of the elephant. */
 export const PLATFORM = { x0: 3900, x1: 4060, y: 640 };
 export const UNICYCLE = { x0: 4000, r: 34 };
-/** Where the marble's middle is in the teddy's basket, from the middle of the wheel (unicycle upright). */
+/** Where the marble's middle is in the bear's basket, from the middle of the wheel (unicycle upright). */
 export const BASKET: Pt = { x: 75, y: -150 };
 /** The basket's front rim, from the marble's middle: it catches the ribbon. */
 export const BASKET_RIM: Pt = { x: 30, y: -4 };
@@ -187,7 +187,7 @@ export const MUZZLE: Pt = onBarrel(CANNON.len, 0);
 /**
  * The mast at the end of the high wire. The cannon's pull cord – a ribbon,
  * like on a party popper – runs from the barrel up through the eye at its top
- * and hangs down to a tassel, just where the teddy's basket comes past.
+ * and hangs down to a tassel, just where the bear's basket comes past.
  */
 export const MAST = { x: 5250, top: 300 };
 export const EYE: Pt = { x: MAST.x, y: MAST.top + 10 };
@@ -325,7 +325,7 @@ export function buildCircus() {
    * The marble drops into the mane of the lion dozing on its pedestal. The lion
    * wakes with a start, looks up at the monkey, roars (a small, friendly roar),
    * crouches and leaps onto the next pedestal, higher up. There it shakes its
-   * mane, and the marble flies out into the teddy's basket.
+   * mane, and the marble flies out into the bear's basket.
    */
   const released = onTrapeze(FEET, SWING);
   const restPose: LionPose = { x: LION_FROM.x, y: LION_FROM.top, tilt: 0, sx: 1, sy: 1, head: 0, puff: 1, roar: 0, stretch: 0, eyes: "sleep" };
@@ -383,7 +383,7 @@ export function buildCircus() {
     return onLion(pose, nestOf(pose.puff), true);
   };
 
-  /* Out of the mane into the teddy's basket: the teddy catches the marble. */
+  /* Out of the mane into the bear's basket: the bear catches the marble. */
   const caught = { x: UNICYCLE.x0 + BASKET.x, y: PLATFORM.y - UNICYCLE.r + BASKET.y };
   const flungFrom = nestAt(tOut);
   const tCatch = tOut + 0.85;
@@ -391,7 +391,7 @@ export function buildCircus() {
   at(tCatch + 0.2, { sound: playGiggle });
 
   /*
-   * Caught! The teddy rocks forward with the catch and pedals off: down the
+   * Caught! The bear rocks forward with the catch and pedals off: down the
    * high wire through the hoop. At the end its basket hooks the ribbon's
    * tassel and pulls the ribbon tight, which brakes it.
    */
@@ -543,7 +543,7 @@ export function buildCircus() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the seal with the marble on its nose, the monkey at the top of its swing, the teddy on its unicycle, the cannon. Only the cannon waits; the machine runs through the others. */
+  /** Where it could wait for the child's tap (R-03): the seal with the marble on its nose, the monkey at the top of its swing, the bear on its unicycle, the cannon. Only the cannon waits; the machine runs through the others. */
   const stops = [
     { at: tNod, x: NECK.x, y: ON_NOSE.y + 40 },
     { at: tDrop, x: released.x, y: released.y },

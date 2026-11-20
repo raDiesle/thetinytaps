@@ -66,6 +66,10 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
 - Drivers and passengers are `Rider` (`shared.tsx`); most are the app's mascots (`animal="fox"` or `"bear"`, a cap sits
   small between the ears), some stay people. A new vehicle's driver is a fox or a bear more often than not, and a grown-up
   riding with a child sits beside it (`child`, smaller) – never a lone fox or bear child.
+  Figures drawn by a scene's own helper take the shared head the same way: the Baustelle's cab `Driver` and Weltall's
+  space `Helmet` have an `animal` prop (`lashes` for a woman), and a role's head is swapped for `MascotFace` with the
+  role's hat as its `children` (the Strand's lifeguard) or kept over it (the Winterbaustelle's woolly hat). Where a wild
+  fox lives in the picture (Winter, Winterbaustelle, Wald) the role-holder is a bear.
 - `scenes.test.ts` checks every picture's data (unique ids, articles, tap sizes, chains, keys,
   plural grammar in questions, roads). `bun test` after every change to items.
 - The mode labels for the row on `/bilder/` are `SCENE_MODES` in `settings.ts`, so their languages count for this game in

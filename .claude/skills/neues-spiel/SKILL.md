@@ -30,7 +30,7 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 1. Route in `src/App.tsx`, German path with trailing slash in the link (`/aufzug/`).
    Lazy-load it like the other pages.
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
-3. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
+3. The idea in `src/content/ideas/<area>.ts`: `done: true` (what is left becomes a new idea, see CLAUDE.md).
    And its entry in `src/content/seo.ts`: a title with what parents search for (see the research
    on `/management/`), a description of 80–160 characters and a short text; true to what the game does.
    The same three in English in `src/content/seo.en.ts` (what English-speaking parents search for), for the

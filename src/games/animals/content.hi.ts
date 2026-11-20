@@ -2,6 +2,7 @@ import type { Animal, AnimalTexts, AnimalTranslation, Food, GiftTexts } from "./
 import type { Gift, GiftId } from "./gifts";
 import type { Growth, GrowTexts, GrowthId } from "./growth";
 import type { Home, HomeId } from "./homes";
+import type { SoundTexts } from "./sounds";
 
 // Hindi texts for "Was gehört zum Tier?", by the ids of the animals, foods and homes in content.ts and homes.tsx.
 // Hindi verbs follow the animal's gender (रहता/रहती), so the sentences are built with को and का instead, which
@@ -88,6 +89,14 @@ export const HINDI_ANIMALS: Record<string, HindiAnimal> = {
   dachs: { name: "बिज्जू" },
   qualle: { name: "जेलीफ़िश" },
   schwan: { name: "हंस" },
+  hahn: { name: "मुर्गा", of: "मुर्गे" },
+  taube: { name: "कबूतर" },
+  truthahn: { name: "टर्की" },
+  pfau: { name: "मोर" },
+  muecke: { name: "मच्छर" },
+  schlange: { name: "साँप" },
+  kueken: { name: "चूज़ा", of: "चूज़े" },
+  fliege: { name: "मक्खी" },
 };
 
 /** A food in Hindi. */
@@ -271,10 +280,21 @@ export function hindiGrowth(german: GrowTexts): GrowTexts {
   };
 }
 
+/** „Wer macht das Geräusch?“ in Hindi; an animal without its Hindi word gets the whole German sentence. */
+export function hindiSound(german: SoundTexts): SoundTexts {
+  const animal = (a: Animal) => HINDI_ANIMALS[a.id];
+  return {
+    listen: "सुनो! पर्दे के पीछे कौन है?",
+    there: (a) => (animal(a) ? `अरे, यह तो ${animal(a).name} है!` : german.there(a)),
+    thatIs: (a) => (animal(a) ? `यह ${animal(a).name} है।` : german.thatIs(a)),
+  };
+}
+
 /** Hindi, for the table of languages in content.ts. */
 export const HINDI: AnimalTranslation = {
   words: { animals: HINDI_ANIMALS, foods: HINDI_FOODS, homes: HINDI_HOMES },
   texts: hindiTexts,
   gifts: hindiGifts,
   growth: hindiGrowth,
+  sound: hindiSound,
 };

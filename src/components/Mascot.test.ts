@@ -14,6 +14,7 @@ const MASCOT_DRAWINGS = [
   "src/games/together/Helper.tsx",
   "src/games/marbles/scenery.tsx",
   "src/games/marbles/CircusLevel.tsx",
+  "src/games/marbles/SpaceLevel.tsx",
   "src/games/scenes/hideout.tsx",
   "src/games/elevator/kid.tsx",
   "src/games/scenes/supermarkt/wall.tsx",
@@ -27,6 +28,11 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/zoo/visitors.tsx",
   "src/games/scenes/bauernhof/figures.tsx",
   "src/games/scenes/flughafen/people.tsx",
+  "src/games/scenes/baustelle/figures.tsx",
+  "src/games/scenes/baustelle/machines.tsx",
+  "src/games/scenes/weltall/parts.tsx",
+  "src/games/scenes/strand/beach.tsx",
+  "src/games/scenes/winterbaustelle/people.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */
