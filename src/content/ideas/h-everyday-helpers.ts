@@ -186,7 +186,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi kippt einen Eimer Wasser in den Graben seiner Sandburg, das Wasser läuft rundherum. Gesagt: „Tapsi kippt den Eimer aus. Das Wasser läuft in den Graben!“ Ton: rieseln. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Ausleeren ist genau, was beim Pipi passiert; der Sandkasten ist vertraut.",
       effort: "S",
-      done: true,
+      rejected: true,
     },
     {
       id: "H-21",
@@ -204,7 +204,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Am Wasserspielplatz dreht das Wasser ein kleines Mühlrad, Tapsi schaut zu. Gesagt: „Das Wasser dreht das Rad. Plätscher, plätscher!“ Ton: plätschern. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Wasser, das fließt und etwas bewegt: zum Zuschauen, solange es dauert.",
       effort: "S",
-      done: true,
+      rejected: true,
     },
     {
       id: "H-23",
@@ -240,7 +240,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Ein Küken drückt von innen gegen sein Ei, bis die Schale knackt; Tapsi schaut zu. Gesagt: „Das Küken drückt und drückt. Knack, da ist es!“ Ton: knacken und piepsen. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Wie das Huhn: drücken, bis etwas kommt, und am Ende freut sich jemand.",
       effort: "S",
-      done: true,
+      rejected: true,
     },
     {
       id: "H-27",
@@ -249,7 +249,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsis Spielzeugzug fährt in einen Tunnel, Tapsi wartet, dann kommt er vorne heraus. Gesagt: „Der Zug ist im Tunnel. Tuut, da kommt er raus!“ Ton: Pfeife. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Warten, bis etwas herauskommt – ohne Drücken, für Kinder, die beim Kaka Angst haben.",
       effort: "S",
-      done: true,
+      rejected: true,
     },
     {
       id: "H-28",
@@ -366,7 +366,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "An einem Zweig drückt sich ein Schmetterling langsam aus seiner Puppe und breitet die Flügel aus, Tapsi schaut zu. Gesagt: „Der Schmetterling drückt sich raus. Jetzt fliegt er!“ Ton: Glitzern. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Langsam drücken, dann ist es geschafft und leicht.",
       effort: "S",
-      done: true,
+      rejected: true,
     },
     {
       id: "H-41",

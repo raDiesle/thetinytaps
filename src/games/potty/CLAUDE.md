@@ -19,8 +19,9 @@ frames, moving at once), and plays it like every other step once the book lies o
 step timers count from then too, `later`) – its line „Mmh! Tapsi isst Nudeln und trinkt Wasser.“
 and its sounds (the tap on the card was the act; until November 2026 it waited for a tap and the line was never heard).
 Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
-(`act`): „Weiter“ on every step, at once also while the step's sounds still run, and the next thought while sitting
-(Enter there is the ✓ of what the child said). The first steps (eating, the need, calling, going to the bathroom; `Step.nudge`) never go on
+(`act`): „Weiter“ on every step, at once also while the step's sounds still run; while sitting a tap pauses the
+waiting or goes on with it, like Zähne putzen (see the pause below), and a key brings the next thought (Space pauses,
+Enter is the ✓ of what the child said). The first steps (eating, the need, calling, going to the bathroom; `Step.nudge`) never go on
 by themselves, and there „Weiter“ ▶ swells and sends out a ring, since everybody waits for it. Sitting down goes on
 into the waiting by itself and „fertig“ to wiping (`Step.auto`). „Weiter“ is on every step but sitting, where the ✓
 are, and while the buttons for what the child said show.
@@ -38,7 +39,7 @@ wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see belo
 „Nochmal“ – user request, November 2026), small in the bottom corner (`GameEnd`'s `corners`: „Menü“ bottom right with
 the ribbon's shelf label beside the word, the party picture free beside it; the ribbon in the top left leads there too),
 which closes the book and puts it back on the shelf. Only a tap within `TAP_GUARD_MS` of a step's start
-sparkles (a double tap), and while sitting one while a thought still runs.
+sparkles (a double tap), and while sitting one within `SIT_GUARD_MS` of sitting down.
 
 When nothing comes, the „nichts“ next to the ✓ takes the other story (`NOTHING_STEPS`, `storyFor`, `At.nothing`):
 „Heute kommt nichts. Macht nichts!“ and washing hands (the usual `waschen` picture), then `play`: Tapsi plays with
@@ -57,18 +58,32 @@ softly) stays as it is, a clock ticks on the wall above the bathtub (`WaitClock.
 `.pt-scene`, a layer cut exactly like the pictures so it stays on the wall on every screen) and a big thought bubble top
 left (`.pt-think`, filling the room left of Tapsi up to its ear, found from where the picture lies on the screen, its
 picture zoomed past the white edges) shows
-what Tapsi thinks of: the next thought comes by itself every `WAIT_SCENE_MS` (8 s, long enough to look at it), or at
-once on a tap, round and round without end – only thoughts for what the child said: for pipi
-things that flow and splash (watering a flower, a fountain, a balloon let go, a garden hose, a water
-wheel, pouring tea for the teddy, an elephant's trunk, a whale's fountain, a funnel into a bottle,
-a bucket into a sandcastle's moat, a garden pump, an hourglass), for kaka things that are pressed until something comes (ketchup, blowing up a
-balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod, a carrot pulled out, a chick
-hatching, a honey bottle, a chestnut out of its case, a butterfly out of its chrysalis, a mole out of its hill) and some that only wait
-until something comes out (a toy train out of a tunnel, a tortoise; for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure both kinds.
+what Tapsi thinks of: the next thought comes by itself every `WAIT_SCENE_MS` (14 s, its two frames taking turns every
+`THOUGHT_FRAME_MS`, 3.5 s), or at once on a key, round and round without end – only thoughts for what the child said: for pipi
+things that flow and splash (a fountain, a balloon let go, a garden hose, pouring tea for the teddy, an elephant's
+trunk, a whale's fountain, a funnel into a bottle, a garden pump, an hourglass), for kaka things that are pressed until something comes (ketchup, blowing up a
+balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod, a carrot pulled out,
+a honey bottle, a chestnut out of its case, a mole out of its hill) and one that only waits
+until something comes out (a tortoise; for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure both kinds.
+A thought's picture can be cut differently in the bubble (`WaitScene.focus`: the point that goes in the bubble's
+middle and a zoom, its edges faded): the tortoise's head, bottom left in its picture, was cut off (user feedback,
+November 2026).
+
+The pause (user request, November 2026, like Zähne putzen): while sitting a round paper button ⏸/▶ (`.pt-pause`, the
+shared `ControlIcon` of `src/components/`) stands left of the ✓, and a tap anywhere on the picture does the same (only
+not within `SIT_GUARD_MS` of sitting down, the tap that sat Tapsi down). Paused, a white veil says „Pause“ and how to
+go on, the thoughts and their frames stand still, the clock's hands, the mouse and the time till the next thought or
+mouse stop, the voice is hushed and the song stops, going on where it stopped (`loopPosition`, `useWaitingMusic`).
+
+The mouse (`WaitMouse.tsx`, user request, November 2026): after `MOUSE_FIRST_MS` (20 s) of waiting, and then every
+`MOUSE_AGAIN_MS` (45 s), a little grey mouse drawn in SVG runs in from the right across the bathroom floor, stops in
+front of the potty to sniff and runs off left – an HTML layer in `.pt-scene`, moved by a transform, silent.
 The hen, the whale, the mole, the hourglass and the funnel come first, in this order, as far as they fit what was said
 (`FIRST_SCENES`, the user's favourites), the others after them in a random order, shuffled anew each round (`scenesFor`).
 The wheelbarrow, the water slide, the dandelion, the tube slide, the paper boat, the kite and the rain with its puddle
-were taken out with their pictures (user feedback, November 2026; their ideas are `rejected`). The thoughts added on 30 October 2026 speak German in every
+were taken out with their pictures (user feedback, November 2026; their ideas are `rejected`), and so, later that
+month, were the butterfly, the water wheel, the sandcastle's bucket, the train in the tunnel, the chick and the
+watered flower, with their pictures and recordings. The thoughts added on 30 October 2026 speak German in every
 language until they are translated (`sayScene`). A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
 else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
 (`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown
@@ -122,7 +137,7 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   and drinking are one step, never two.
 - The first steps never go on by themselves (`Step.nudge`; going on alone after three seconds was too fast for the user),
   and „Weiter“ calls for attention there, since everybody waits for it. But any tap or key always does the most
-  sensible thing – „Weiter“, or the next thought while sitting – never only a sparkle (a sparkle-only tap on the
+  sensible thing – „Weiter“, or while sitting pause and go on – never only a sparkle (a sparkle-only tap on the
   first steps felt broken to the user). A tap anywhere on the picture that is not on a button is „Weiter“, on every
   step and at once – also while the step's sounds still run and while the buttons for what the child said show
   (the user asked for it after both a sparkle-only tap and a tap that only shook those buttons); only a double tap
@@ -153,7 +168,9 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   two ✓ while sitting (pipi, kaka) – a child saying „Pipi“ may still do kaka.
 - What the child really does (sitting on the potty) has no fixed length: it never ends on a timer or on an ordinary
   tap. Sometimes nothing comes: „nichts“ next to the ✓ leads to a story of its own (washing hands, playing, Mama and
-  Papa asking again later), never a sad ending. The thoughts follow each other by themselves (and on every tap), endlessly; only the ✓ say „fertig“.
+  Papa asking again later), never a sad ending. The thoughts follow each other by themselves (and on every key), endlessly; only the ✓ say „fertig“.
+- The waiting can always be paused, by its ⏸ button and by a tap on the picture, and goes on from where it stood
+  (thought, frame, clock, mouse, song) – a tap there never skips to the next thought (user request, November 2026).
 - While sitting the full picture never changes: pictures drawn one by one never match exactly, and swapping them every
   few seconds made the room jump. What changes goes into the thought bubble, drawn away from the bathroom, and a clear
   animation shows that everybody waits: a clock drawn into the room (on the wall, no frame round it), always moving.
@@ -163,11 +180,15 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   when made, gets two frames. A thought taken out takes its pictures with it (`potty.test.ts`).
 - While the waiting song plays, it plays alone: thoughts and taps make no sound (sounds over the song disturbed the
   user); only the voice speaks, and the song hushes for it.
-- A thought stays long enough for a toddler to look at it (`WAIT_SCENE_MS`, 8 s; 2.6 s was far too short for the user).
+- A thought stays long enough for a toddler to look at it (`WAIT_SCENE_MS`, 14 s, and each frame `THOUGHT_FRAME_MS`,
+  3.5 s; 2.6 s and then 8 s were too short for the user) – `potty.test.ts` keeps both from getting shorter.
+- What matters in a thought's picture is whole and in the middle of the bubble: where the bubble's round cut hides it
+  (the tortoise's head), give the thought a `focus` rather than drawing it again.
+- Something going on in the bathroom while everybody waits (the mouse) runs on the floor, silent, rarely (first after
+  20 s), and stops with the pause; never more than one at a time, never in the bubble or over Tapsi.
 - In a thought the child watches what flows or comes out, dry and happy – never wet, never a puddle under it (the
   elephant once soaked Tapsi). What comes out is seen only coming out, wholly hidden before: the tortoise's head right
-  inside its shell, then stretched far out; the tunnel starting at the picture's left edge, so the train is never seen
-  going in.
+  inside its shell, then stretched far out.
 - The thought bubble is as big as the room beside Tapsi allows (the user asked twice for it bigger) and never covers
   Tapsi (not its ears or tail either), its puffs leading right to Tapsi's head; look at it on a phone on its side, a
   tablet and a computer after changing it.

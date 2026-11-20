@@ -15,13 +15,16 @@ import {
   scenesFor,
   STEPS,
   TAPSI,
+  THOUGHT_FRAME_MS,
+  MOUSE_AGAIN_MS,
+  MOUSE_FIRST_MS,
   WAIT_SCENE_MS,
   WAIT_SCENES,
   type Went,
   type Which,
 } from "./content";
 import { addStar } from "./stars";
-import { waitLanguageFor, waitLanguageOf } from "./waitMusic";
+import { loopPosition, waitLanguageFor, waitLanguageOf } from "./waitMusic";
 
 /** What the child can have said: a button each, or nothing yet. */
 const SAIDS: Said[] = [...SAID.map((s) => s.id), "unsure"];
@@ -109,8 +112,41 @@ describe("Aufs Töpfchen", () => {
     // The trousers go down again and again until the story goes on, after a pause longer than a frame.
     for (const step of ALL_STEPS) if (step.again !== undefined) expect(step.moves?.length).toBeGreaterThan(0);
     expect(WAIT_SCENE_MS).toBeGreaterThan(SCENE_MS);
-    // Long enough for a toddler to look at a thought: 2.6 s was far too short for the user.
-    expect(WAIT_SCENE_MS).toBeGreaterThanOrEqual(7000);
+    // Long enough for a toddler to look at a thought: 2.6 s was far too short for the user, and so was 8 s.
+    expect(WAIT_SCENE_MS).toBeGreaterThan(8000);
+    // A thought's before and after each stay long enough to be seen, at least twice in a thought.
+    expect(THOUGHT_FRAME_MS).toBeGreaterThanOrEqual(3000);
+    expect(WAIT_SCENE_MS).toBeGreaterThanOrEqual(2 * 2 * THOUGHT_FRAME_MS - 500);
+    // The mouse comes only after a while, and never again before the last one ran off (its run takes 10 s, potty.css).
+    expect(MOUSE_FIRST_MS).toBeGreaterThanOrEqual(10000);
+    expect(MOUSE_AGAIN_MS).toBeGreaterThan(10000);
+  });
+
+  it("left out the thoughts the user didn't want, and centres a thought only on a point inside its picture", () => {
+    // User feedback, November 2026: the watering can, water wheel, sandcastle bucket, chick, tunnel and butterfly.
+    for (const id of ["giesskanne", "wasserrad", "eimer", "kueken", "tunnel", "schmetterling"]) {
+      expect(WAIT_SCENES.some((s) => s.id === id)).toBe(false);
+      for (const lang of Object.values(POTTY_TEXTS)) expect(lang.scenes[id]).toBeUndefined();
+    }
+    for (const { focus } of WAIT_SCENES) {
+      if (!focus) continue;
+      for (const v of [focus.x, focus.y]) {
+        expect(v).toBeGreaterThan(0);
+        expect(v).toBeLessThan(1);
+      }
+      // Zoomed in, never out: the bubble is filled by the picture.
+      expect(focus.zoom).toBeGreaterThanOrEqual(1);
+    }
+    // The tortoise's head comes out at the bottom left: the bubble centres there.
+    expect(WAIT_SCENES.find((s) => s.id === "schildkroete")?.focus?.x).toBeLessThan(0.5);
+  });
+
+  it("goes on with the waiting song where it was paused, inside its repeating part", () => {
+    const part = { loopStart: 1, loopEnd: 11 };
+    expect(loopPosition(1, 0, 4000, part)).toBe(5);
+    // Past the end it wraps to the loop's start: 1 + 14 s is 15, 4 s past the end, so 1 + 4.
+    expect(loopPosition(1, 0, 14000, part)).toBe(5);
+    expect(loopPosition(9, 1000, 3000, part)).toBe(1);
   });
 
   it("shows both need pictures in turn and ❓ in the row while nobody knows", () => {

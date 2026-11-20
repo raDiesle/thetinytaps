@@ -403,6 +403,124 @@
   }
 }
 
+/* A mouse runs across the floor now and then while Tapsi sits (WaitMouse.tsx): an HTML layer round its own small
+   svg, moved only by transform, in front of the potty (its feet at 658 of the picture's 768). Its x is in its own
+   widths (100 of the picture's 1376): in from the right, a stop to sniff in front of Mama, off to the left. */
+.pt-mouse {
+  position: absolute;
+  left: 0;
+  top: calc(600 / 768 * 100%);
+  width: calc(100 / 1376 * 100%);
+  animation: pt-mouse-run 10s ease-in-out both;
+  will-change: transform;
+}
+
+@keyframes pt-mouse-run {
+  0% {
+    transform: translateX(1400%);
+  }
+  35%,
+  60% {
+    transform: translateX(720%);
+  }
+  100% {
+    transform: translateX(-130%);
+  }
+}
+
+/* Its little trot, a hop of its own layer. */
+.pt-mouse-trot {
+  animation: pt-mouse-trot 0.22s ease-in-out infinite alternate;
+}
+
+@keyframes pt-mouse-trot {
+  to {
+    transform: translateY(-7%) rotate(-3deg);
+  }
+}
+
+.pt-mouse-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Paused (only while sitting): the clock, the mouse and the pictures' frames stand still, the song stops. */
+.potty-play.paused .pt-clock line,
+.potty-play.paused .pt-mouse,
+.potty-play.paused .pt-mouse-trot {
+  animation-play-state: paused;
+}
+
+/* The pause screen, as in Zähne putzen: the picture paled behind a big pause sign; a tap anywhere goes on. Under the
+   row of steps and the grown-ups' buttons, which still work. */
+.pt-paused {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vmin;
+  background: #ffffffb0;
+  color: #2a1e5c;
+  font-size: clamp(2.4rem, 10vmin, 5rem);
+  font-weight: 700;
+  cursor: pointer;
+  animation: pop-in 0.3s ease-out;
+}
+
+.pt-paused-icon {
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 4px solid #2a1e5c;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.pt-paused small {
+  font-size: 0.35em;
+  font-weight: 500;
+}
+
+/* Pause or go on, beside the ✓ while sitting: a round paper disc with a drawn sign, like Zähne putzen's. */
+.pt-pause {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(46px, 11vmin, 66px);
+  height: clamp(46px, 11vmin, 66px);
+  padding: 0;
+  border: 3px solid #2a1e5c;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  box-shadow:
+    0 4px 0 #2a1e5c,
+    0 6px 12px #0003;
+  cursor: pointer;
+}
+
+.pt-pause:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #2a1e5c,
+    0 2px 6px #0003;
+}
+
+.pt-pause-icon {
+  display: block;
+  width: 62%;
+  height: 62%;
+}
+
+.pt-paused-icon .pt-pause-icon {
+  width: 60%;
+  height: 60%;
+}
+
 /* What Tapsi thinks of, top left on the wall: a big cloud with two small puffs leading towards Tapsi. A new
    thought pops in inside it, so only the bubble changes, never the room. As big as the room left of Tapsi allows
    (the user wanted it bigger, twice): it reaches right up to Tapsi's ear, found where the picture lies on this screen
@@ -482,6 +600,14 @@
   inset: -14%;
 }
 
+/* A thought whose matter lies off the middle (WaitScene.focus) is moved so that point is the bubble's middle. */
+.pt-think-scene.focused .pt-think-picture {
+  transform: scale(var(--zoom)) translate(calc((0.5 - var(--fx)) * 100%), calc((0.5 - var(--fy)) * 100%));
+  /* Moved, its own edge comes into the bubble: it fades into the bubble's white instead of ending in a hard line. */
+  mask: linear-gradient(to right, transparent, #000 5% 95%, transparent), linear-gradient(transparent, #000 5% 95%, transparent);
+  mask-composite: intersect;
+}
+
 .pt-think-picture img {
   position: absolute;
   inset: 0;
@@ -508,6 +634,10 @@
   .pt-said,
   .pt-clock line {
     animation: none;
+  }
+
+  .pt-mouse-track {
+    display: none;
   }
 }
 

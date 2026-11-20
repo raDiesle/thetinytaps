@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
+import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
@@ -13,7 +15,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { daytimeOf } from "@/lib/days";
 import { addBrushing, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
-import { INK, Mouth, type MonsterSpot, type MouthAction } from "./mouth";
+import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
@@ -539,17 +541,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             </div>
           )}
           <div className="teeth-controls">
-            <button
-              type="button"
-              className="teeth-button"
-              onClick={togglePause}
-              aria-label={
-                paused
-                  ? t({ de: "Weiter", en: "Next", zh: "继续", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" })
-                  : t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })
-              }
-            >
-              <ControlIcon kind={paused ? "play" : "pause"} />
+            <button type="button" className="teeth-button" onClick={togglePause} aria-label={paused ? t(GO_ON) : t(PAUSE)}>
+              <ControlIcon kind={paused ? "play" : "pause"} className="teeth-button-icon" />
             </button>
             <button
               type="button"
@@ -557,7 +550,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
               onClick={again}
               aria-label={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}
             >
-              <ControlIcon kind="again" />
+              <ControlIcon kind="again" className="teeth-button-icon" />
             </button>
             <div
               className="teeth-progress"
@@ -659,46 +652,12 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {paused && (
         <button type="button" className="teeth-paused" onClick={togglePause}>
           <span className="teeth-paused-icon" aria-hidden>
-            <ControlIcon kind="pause" />
+            <ControlIcon kind="pause" className="teeth-button-icon" />
           </span>
-          {t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })}
-          <small>
-            {touchOnly
-              ? t({ de: "Tippen: weiter", en: "Tap: go on", zh: "点一下：继续", hi: "टैप: आगे", es: "Toca: seguir", ar: "لمسة: متابعة", ru: "Нажми — и дальше" })
-              : t({
-                  de: "Leertaste oder Tippen: weiter",
-                  en: "Space or tap: go on",
-                  zh: "空格键或点一下：继续",
-                  hi: "स्पेस या टैप: आगे",
-                  es: "Espacio o toque: seguir",
-                  ar: "المسافة أو لمسة: متابعة",
-                  ru: "Пробел или нажатие — и дальше",
-                })}
-          </small>
+          {t(PAUSE)}
+          <small>{t(touchOnly ? TAP_TO_GO_ON : SPACE_OR_TAP_TO_GO_ON)}</small>
         </button>
       )}
     </div>
-  );
-}
-
-/** The drawn signs on the controls, in the game's ink: two round bars to pause, a round triangle to go on, an arrow turning round to start again. */
-function ControlIcon({ kind }: { kind: "pause" | "play" | "again" }) {
-  return (
-    <svg className="teeth-button-icon" viewBox="0 0 40 40" aria-hidden>
-      {kind === "pause" ? (
-        <g fill={INK}>
-          <rect x={10} y={9} width={7.5} height={22} rx={3} />
-          <rect x={22.5} y={9} width={7.5} height={22} rx={3} />
-        </g>
-      ) : kind === "play" ? (
-        <path d="M14 9.5 C14 7.8 15.8 6.9 17.2 7.8 L31 17.4 C32.3 18.3 32.3 21.7 31 22.6 L17.2 32.2 C15.8 33.1 14 32.2 14 30.5 Z" fill={INK} />
-      ) : (
-        // A ring turning clockwise, open at the top right where its arrowhead points on round it.
-        <g stroke={INK} strokeLinecap="round" strokeLinejoin="round" transform="translate(0 1)">
-          <path d="M30.8 18.1 A11 11 0 1 1 23.8 9.7" fill="none" strokeWidth={4.5} />
-          <path d="M25.6 4.5 L30.3 12.1 L21.9 14.8 Z" fill={INK} strokeWidth={2} />
-        </g>
-      )}
-    </svg>
   );
 }

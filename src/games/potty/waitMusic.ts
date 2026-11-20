@@ -1,7 +1,8 @@
 import songFiles from "./musik/*.mp3?glob";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DUCK, songGain } from "@/lib/loudness";
 import { type Loop, loadSound, playLoop, playWaitNote } from "@/lib/sfx";
+import { talking } from "@/lib/voice";
 import { BEAT_MS } from "./content";
 
 // The waiting song while the animal sits on the potty: musik/musik-toepfchen-warten-<lang>.mp3,
@@ -68,17 +69,32 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();
 
-const speaking = () => typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
+// The voice speaks from recordings, which the browser's speechSynthesis never sees: `talking()` knows both.
+const speaking = talking;
+
+/** Where a loop playing since `startedAt` (performance.now()) from `offset` stands now, wrapped into its repeating part. */
+export function loopPosition(offset: number, startedAt: number, now: number, part: { loopStart: number; loopEnd: number }) {
+  const at = offset + (now - startedAt) / 1000;
+  if (at < part.loopEnd) return at;
+  return part.loopStart + ((at - part.loopStart) % (part.loopEnd - part.loopStart));
+}
 
 /**
  * Plays the waiting song in `appLanguage` (see waitLanguageFor) over and over while
  * `playing`, getting quiet while the voice speaks; the synthesized tune repeats
- * instead while there is no song or it still loads. It stops when `playing` ends.
+ * instead while there is no song or it still loads. It stops when `playing` ends, and while `paused` it stops and goes
+ * on where it was (like the brushing song), starting from the top only for a new sitting.
  */
-export function useWaitingMusic(playing: boolean, appLanguage: string) {
+export function useWaitingMusic(playing: boolean, paused: boolean, appLanguage: string) {
   const lang = waitLanguageFor(appLanguage, Object.keys(SONGS));
   const [buffer, setBuffer] = useState<{ lang: string; buffer: AudioBuffer | null } | null>(null);
   const song = buffer?.lang === lang ? buffer.buffer : null;
+  /** Where the song stood when it was paused, in seconds into its file; null to start from its loop's start. */
+  const position = useRef<number | null>(null);
+  // After the song's cleanup kept where it stood: once sitting ends, the next sitting starts from the top.
+  useEffect(() => {
+    if (!playing) position.current = null;
+  }, [playing]);
 
   // Loaded when sitting begins, not before: most visits never get that far.
   useEffect(() => {
@@ -94,7 +110,7 @@ export function useWaitingMusic(playing: boolean, appLanguage: string) {
   }, [playing, lang]);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || paused) return;
     if (!song) {
       let beat = 0;
       playWaitNote(beat++);
@@ -103,7 +119,9 @@ export function useWaitingMusic(playing: boolean, appLanguage: string) {
     }
     let ducked = speaking();
     const part = (lang && LOOPS[lang]) || { loopStart: 0, loopEnd: song.duration };
-    const loop: Loop | null = playLoop(song, { offset: part.loopStart, volume: ducked ? DUCKED : VOLUME, ...part });
+    const offset = position.current ?? part.loopStart;
+    const startedAt = performance.now();
+    const loop: Loop | null = playLoop(song, { offset, volume: ducked ? DUCKED : VOLUME, ...part });
     const timer = setInterval(() => {
       if (speaking() === ducked) return;
       ducked = !ducked;
@@ -112,6 +130,7 @@ export function useWaitingMusic(playing: boolean, appLanguage: string) {
     return () => {
       clearInterval(timer);
       loop?.stop();
+      position.current = loopPosition(offset, startedAt, performance.now(), part);
     };
-  }, [playing, song, lang]);
+  }, [playing, paused, song, lang]);
 }

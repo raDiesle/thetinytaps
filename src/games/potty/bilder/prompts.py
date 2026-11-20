@@ -175,7 +175,6 @@ def thought(a, what):
 
 THOUGHTS = {
  # Pipi: things that flow, splash and let go.
- "giesskanne": "Outside in a sunny garden, Tapsi waters a big yellow sunflower with a small red watering can; a thin stream of water pours from the spout onto the flower. Tapsi smiles.",
  "brunnen": "In a sunny park, a small round stone fountain bubbles: water shoots up in a high arc and splashes into its basin. Tapsi stands at the edge and holds one paw into the falling water, laughing.",
  "ballon": "Outside under a blue sky, Tapsi has just let go of a big red balloon: it whizzes up and away, twisting, with a little puff of air behind it. Tapsi looks up after it, mouth open in delight.",
  "schlauch": "In a sunny garden, Tapsi holds a green garden hose and sprays a long arc of water into a small blue paddling pool where a yellow rubber duck floats. Tapsi grins.",
@@ -183,7 +182,6 @@ THOUGHTS = {
  "ketchup": "At a small table outside, Tapsi squeezes a big red ketchup bottle with both paws, pressing hard with rosy cheeks; a long red stripe of ketchup comes out onto a plate of noodles.",
  "aufblasen": "Outside on a meadow, Tapsi blows up a big red balloon, cheeks puffed up round and red with effort, pressing hard, eyes squeezed.",
  "huhn": "On a farm, a plump brown hen sits in a straw nest and presses with a red face, eyes squeezed shut; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
- "wasserrad": "At a sunny water playground, a stream of water runs down a little wooden channel and turns a small wooden water wheel, splashing; Tapsi kneels beside it and watches, delighted, one paw pointing at the wheel.",
  "elefant": ("At the zoo, a friendly grey elephant sprays a long arc of water from its trunk high into the air, drops sparkling, falling back down far away from Tapsi; "
              "Tapsi stands next to the fence, completely dry, and looks up, laughing; no water on Tapsi, no puddle on the ground."),
  "wal": "At the seaside, a friendly blue whale in the calm sea blows a tall fountain of water up from its head; Tapsi stands on the sandy beach in front and waves at it, delighted.",
@@ -193,18 +191,12 @@ THOUGHTS = {
  "spritzbeutel": "At a small table, Tapsi squeezes a big white piping bag with both paws, pressing hard with rosy cheeks; a thick white swirl of whipped cream comes out onto a round strawberry cake.",
  "erbsen": "In a vegetable garden, Tapsi presses a long green pea pod open with both thumbs, pressing hard with rosy cheeks; round green peas pop out of it and jump into the air above a small wooden bowl.",
  # Waiting until something comes out, without pressing.
- "schmetterling": "In a garden, a butterfly chrysalis hangs from a twig; a colourful butterfly is pressing its way out of it, half out, its wings still folded; Tapsi crouches below and watches, excited, both paws at its cheeks.",
  # The user wanted only the train coming out, never going in: the hill starts at the picture's left edge, its entrance unseen.
- "tunnel": ("On a playroom floor, a big green felt hill with a toy tunnel through it fills the left third of the picture and runs off the picture's left edge, "
-            "so the tunnel's entrance is never seen; only its right opening shows, a round dark opening, empty, with wooden toy rails running out of it to the right. "
-            "No train is visible at all yet. Tapsi, in its light blue T-shirt and blue trousers, kneels on the floor to the right of the opening and peeks into it, curious, waiting."),
  # Pipi, added later (H-17 … H-34).
- "eimer": "On a sunny beach, Tapsi tips a small red bucket of water into the moat round a big sandcastle; the water pours out of the bucket into the moat. Tapsi watches, delighted.",
  "pumpe": "In a garden, Tapsi pushes down the handle of an old green hand water pump with both paws; a stream of water pours from the spout into a small red watering can below.",
  "sanduhr": "On a little table, a big wooden hourglass with yellow sand stands upright, most sand still in the top; a thin stream of sand trickles into the bottom. Tapsi sits at the table, chin on its paws, and watches.",
  # Kaka, added later (H-23 … H-39).
  "moehre": "In a vegetable garden, Tapsi pulls hard at the green leaves of a carrot stuck in the soil with both paws, leaning back, eyes squeezed, rosy cheeks; only the top of the orange carrot shows.",
- "kueken": "In a straw nest on a farm, a big white egg has a crack across it and a small piece of shell lifts off the top; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
  "honig": "At a small table, Tapsi squeezes a squeezy honey bottle with both paws over a slice of bread on a plate, pressing hard with rosy cheeks; a thick golden drop of honey just comes out of the tip.",
  "maulwurf": "On a green meadow, a small brown mound of earth bulges up, earth crumbs rolling down; Tapsi kneels in front of it and stares, curious, both paws on its knees.",
  "schildkroete": ("On a green lawn, a friendly green tortoise has pulled its head and all four legs completely inside its round shell: no head, no face, no eyes and no legs are visible at all, "
@@ -212,7 +204,6 @@ THOUGHTS = {
  "kastanie": "Under a chestnut tree in autumn, Tapsi presses a spiky green chestnut case with both thumbs, pressing hard with rosy cheeks; the case has just begun to split open.",
 }
 THOUGHT_MOVES = {
- "giesskanne": "the watering can is tipped further, more water pours, the sunflower nods a little",
  "brunnen": "the water arc is a little higher, new splashes in the basin and on Tapsi's paw",
  "ballon": "the balloon is further up and smaller, twisting the other way",
  "schlauch": "the water arc reaches further, the rubber duck bobs and splashes",
@@ -220,7 +211,6 @@ THOUGHT_MOVES = {
  "aufblasen": "the balloon is much bigger, the cheeks even rounder",
  "huhn": "plop: the hen has stood up a little, a white egg lies in the straw under it; Tapsi cheers with both arms up",
  "knete": "the dough sausages are much longer and curl onto the table, Tapsi presses further down",
- "wasserrad": "the water wheel has turned on (its paddles stand at other places), new splashes fly up, Tapsi claps both paws",
  "elefant": ("the elephant holds its trunk straight up and blows a tall fountain of water high up into the sky above itself, the drops fall back down onto the elephant, far away from Tapsi; "
              "Tapsi stays completely dry, no water on Tapsi and no puddle anywhere on the ground; Tapsi only watches and claps both paws, laughing"),
  "wal": "the water fountain is much higher and splashes into the sea around the whale, Tapsi jumps with both arms up",
@@ -228,13 +218,9 @@ THOUGHT_MOVES = {
  "tee": "the teapot is tipped further, the cup in front of the teddy is full to the brim with a little splash, Tapsi laughs",
  "spritzbeutel": "Tapsi has lifted its head and smiles proudly with open eyes and an open mouth, the cheeks no longer puffed; the piping bag is squeezed flat and empty; a second tall white cream swirl now sits on the cake next to the first",
  "erbsen": "the pod is wide open and empty, the peas have landed in the bowl, Tapsi laughs with both arms up",
- "schmetterling": "the butterfly is out and spreads its big colourful wings above the empty chrysalis, flying up; Tapsi cheers with both arms up",
- "tunnel": "a red toy engine now comes out of the tunnel's right opening, its front already out on the rails, Tapsi points at it and cheers",
- "eimer": "the bucket is tipped upside down and empty, the water has run all the way round the sandcastle's moat, Tapsi claps both paws",
  "pumpe": "the pump handle is pushed down further, much more water pours, the watering can is half full and splashing",
  "sanduhr": "much more sand now lies in the bottom half and less is in the top, the sand stream still trickles",
  "moehre": "plop: the whole long orange carrot is out of the soil and held up high in Tapsi's paws, Tapsi cheers, a few crumbs of earth fly",
- "kueken": "the shell has broken open in two halves and a fluffy yellow chick sits in the nest, beak open, peeping; Tapsi cheers with both arms up",
  "honig": "a long thick golden stream of honey now curls onto the bread, Tapsi smiles proudly with open eyes",
  "maulwurf": "a small dark-grey mole with pink paws and a pink nose has popped its head out of the top of the mound, Tapsi waves at it with one paw, delighted",
  "schildkroete": "the tortoise stretches its smiling head far out of the shell on a long neck, as far as it can, and its four legs are out too; Tapsi lifts its head and smiles at it, delighted",

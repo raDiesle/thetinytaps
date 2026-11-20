@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { ControlIcon } from "@/components/ControlIcon";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { useDevice } from "@/lib/device";
 import { useAppLanguage, useT } from "@/lib/language";
+import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
+import { noPointerClick } from "@/lib/press";
+import { hush } from "@/lib/voice";
 import { afterPageMotion, usePageStill } from "@/lib/pageMotion";
 // Taps this soon after a step began only ripple, so a double tap doesn't skip a step: the app's one value for it.
 import { TAP_GUARD_MS } from "@/lib/tapGuard";
@@ -39,10 +44,12 @@ import {
   type Said,
   SCENE_MS,
   scenePicture,
+  SIT_GUARD_MS,
   scenesFor,
   STEPS,
   storyFor,
   TAPSI,
+  THOUGHT_FRAME_MS,
   WAIT_SCENE_MS,
   type Went,
 } from "./content";
@@ -51,6 +58,7 @@ import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
 import { pottyVoice } from "./voice";
 import { WaitClock } from "./WaitClock";
+import { WaitMouse } from "./WaitMouse";
 import { WeekStars } from "./WeekStars";
 import { useWaitingMusic } from "./waitMusic";
 import { useStepAddress } from "@/lib/stepAddress";
@@ -117,6 +125,13 @@ export function PottyPlay() {
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
   const { effects, ripple, glow } = useTapFeedback();
+  const { touchOnly } = useDevice();
+  /**
+   * The waiting is paused (only while sitting, where things run by themselves: the song, the clock, the thoughts, the
+   * mouse): a tap on the picture or the pause button pauses and goes on, as in Zähne putzen (user request, November 2026).
+   */
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
 
   // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
@@ -182,7 +197,7 @@ export function PottyPlay() {
   // The waiting song is part of sitting (like the brushing song), so it plays even with Töne or Musik off;
   // the background song waits meanwhile.
   useNoBackgroundMusic(sitting);
-  useWaitingMusic(sitting, language.id);
+  useWaitingMusic(sitting, paused, language.id);
 
   // The next step's pictures load while this one plays, the thought bubble's once the animal sits.
   useEffect(() => {
@@ -227,6 +242,7 @@ export function PottyPlay() {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
     startedAt.current = performance.now();
+    setPause(false);
     setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
     const line = texts.steps[id](t(TAPSI.name), came ?? saidNow);
     // The end shows this week's stars, with a new one only when a ✓ said what really came in this round.
@@ -322,23 +338,34 @@ export function PottyPlay() {
     } else if (tapped) sayScene(scene.id, false);
   };
 
+  /** Pauses the waiting or goes on with it; pausing stops the voice mid-sentence, as in Zähne putzen. */
+  const setPause = (on: boolean) => {
+    if (pausedRef.current === on) return;
+    pausedRef.current = on;
+    setPaused(on);
+    if (on) hush();
+  };
+
   /**
-   * A tap anywhere on the picture (not on a button) or a key: while sitting the next thought, everywhere else just what
-   * „Weiter“ does, also while the step's sounds still run (what the child said stays as picked, unknown when nobody
-   * did). It only ripples at the end, right after a step began (a double tap), and while a thought still runs.
+   * A tap anywhere on the picture (not on a button): while sitting it pauses the waiting or goes on with it (as in Zähne
+   * putzen), everywhere else it does what „Weiter“ does, also while the step's sounds still run (what the child said stays
+   * as picked, unknown when nobody did). It only ripples at the end and right after a step began (a double tap; the tap
+   * that sat down).
    */
   const act = (x?: number, y?: number) => {
     const { step: index, nothing } = atRef.current;
     const here = storyFor(nothing);
     const sittingNow = here[index].id === "sit";
-    if (index >= here.length - 1 || (sittingNow ? busyRef.current : performance.now() - startedAt.current < TAP_GUARD_MS)) {
+    if (index >= here.length - 1 || performance.now() - startedAt.current < (sittingNow ? SIT_GUARD_MS : TAP_GUARD_MS)) {
       ripple(x, y);
       // While sitting the waiting song plays alone.
       if (!sittingNow) playRandomNote();
       return;
     }
-    if (sittingNow) nextScene(true);
-    else {
+    if (sittingNow) {
+      ripple(x, y);
+      setPause(!pausedRef.current);
+    } else {
       playPop();
       jump(index + 1);
     }
@@ -350,13 +377,14 @@ export function PottyPlay() {
     if (storyFor(atRef.current.nothing)[atRef.current.step].id === "sit") nextScene(false);
     else begin(atRef.current.step + 1);
   };
+  // While paused the next thought waits; going on, it comes a whole thought's time later.
   useEffect(() => {
     const here = storyFor(at.nothing)[at.step];
     const ms = here.id === "sit" && at.scene >= 0 ? WAIT_SCENE_MS : here.auto;
-    if (ms === undefined) return;
+    if (ms === undefined || paused) return;
     const timer = setTimeout(() => goOn.current(), ms);
     return () => clearTimeout(timer);
-  }, [at]);
+  }, [at, paused]);
 
   /** A button while calling: what the child said is kept, and the story goes on with it at once – the only way on there. */
   const pick = (choice: Went, e: PointerEvent) => {
@@ -413,11 +441,19 @@ export function PottyPlay() {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
-      // While sitting Enter is the ✓ for what the child said (pipi when it said both or nothing), every other key the
-      // next thought. Everywhere else every key is „Weiter“.
+      // While sitting Enter is the ✓ for what the child said (pipi when it said both or nothing), Space pauses or goes
+      // on (as in Zähne putzen), and every other key goes on when paused, else brings the next thought (said aloud).
+      // Everywhere else every key is „Weiter“.
       const here = storyFor(atRef.current.nothing)[atRef.current.step];
-      if (e.key === "Enter" && here?.id === "sit" && !busyRef.current) finish(expected ?? "pipi");
-      else act();
+      if (here?.id !== "sit") act();
+      else if (performance.now() - startedAt.current < SIT_GUARD_MS) ripple();
+      else if (e.key === "Enter") finish(expected ?? "pipi");
+      else if (e.key === " ") {
+        e.preventDefault();
+        setPause(!pausedRef.current);
+      } else if (pausedRef.current) setPause(false);
+      else if (!busyRef.current) nextScene(true);
+      else ripple();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -437,14 +473,17 @@ export function PottyPlay() {
   const expected = said === "pipi" || said === "kaka" ? said : null;
 
   return (
-    <div className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
+    <div
+      className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}${sitting && paused ? " paused" : ""}`}
+      onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}
+    >
       {shown.before && <StoryPicture key={`before-${shown.before.join()}`} name={shown.before} moving={false} />}
       <StoryPicture
         key={pictures.join()}
         name={pictures}
         moves={moves}
         again={step.again}
-        moving={still}
+        moving={still && !paused}
         // The book opens on the first picture, already there: only the pictures after it fade in.
         className={beat > 1 ? "pt-picture pt-picture-new" : "pt-picture"}
       />
@@ -457,11 +496,16 @@ export function PottyPlay() {
       )}
       {/* While sitting: everybody waits (a clock on the wall ticks), Tapsi thinks of things that help in a bubble. */}
       {sitting && <WaitClock />}
+      {sitting && <WaitMouse paused={paused} />}
       {thought && (
         <div className="pt-think" aria-hidden>
-          <div key={beat} className="pt-think-scene">
+          <div
+            key={beat}
+            className={`pt-think-scene${thought.focus ? " focused" : ""}`}
+            style={thought.focus && ({ "--fx": thought.focus.x, "--fy": thought.focus.y, "--zoom": thought.focus.zoom } as CSSProperties)}
+          >
             {framesFor(thoughtPicture).length > 0 ? (
-              <StoryPicture name={thoughtPicture} moving={still} className="pt-think-picture" />
+              <StoryPicture name={thoughtPicture} moving={still && !paused} frameMs={THOUGHT_FRAME_MS} className="pt-think-picture" />
             ) : (
               <span className="pt-think-emoji">{thought.emoji}</span>
             )}
@@ -476,6 +520,17 @@ export function PottyPlay() {
           {feels.map((n) => (
             <span key={n}>{NEED_EMOJI[n]}</span>
           ))}
+        </div>
+      )}
+
+      {/* The pause screen while sitting, under the buttons; a tap on it goes on (act). */}
+      {sitting && paused && (
+        <div className="pt-paused">
+          <span className="pt-paused-icon" aria-hidden>
+            <ControlIcon kind="pause" className="pt-pause-icon" />
+          </span>
+          {t(PAUSE)}
+          <small>{t(touchOnly ? TAP_TO_GO_ON : SPACE_OR_TAP_TO_GO_ON)}</small>
         </div>
       )}
 
@@ -530,6 +585,22 @@ export function PottyPlay() {
 
           {/* A ✓ for pipi and one for kaka, since what comes may not be what the child said: a grown-up taps what is in
               the potty (for both, either one: the user wanted only the two). */}
+          {/* Pause or go on, as in Zähne putzen: only while sitting, where things run by themselves. */}
+          {sitting && (
+            <button
+              type="button"
+              className="pt-pause"
+              aria-label={paused ? t(GO_ON) : t(PAUSE)}
+              aria-pressed={paused}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                setPause(!pausedRef.current);
+              }}
+              onClick={noPointerClick(() => setPause(!pausedRef.current))}
+            >
+              <ControlIcon kind={paused ? "play" : "pause"} className="pt-pause-icon" />
+            </button>
+          )}
           {sitting && (
             <div className="pt-choice" role="group" aria-label={texts.askWent}>
               <span className="pt-choice-label">{texts.askWent}</span>
