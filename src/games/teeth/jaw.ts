@@ -328,22 +328,52 @@ export const TOOTH_CLEAR = 24;
 /** How far a corner of the mouth may be pulled out, as a share of its half width. */
 const MAX_STRETCH = 1.8;
 
-/**
- * The lips with their corners pulled out sideways, as a cheek is when the brush works behind it, so every point of
- * `keep` (the teeth being brushed) lies at least `margin` inside the opening. Seen from the side the near corner of
- * the mouth would otherwise hide the back teeth and their monsters. Each side stretches on its own about the middle of
- * the mouth, only as far as needed; a point no stretch sideways can free (above or below the lips) is left alone.
- */
-export function openCorners(lips: Point2[], keep: { x: number; y: number }[], margin: number): Point2[] {
+/** How far each corner of the mouth is pulled out sideways, as a factor of its half width: 1 not at all. */
+export interface CornerStretch {
+  left: number;
+  right: number;
+}
+
+export const NO_STRETCH: CornerStretch = { left: 1, right: 1 };
+
+/** A face counts as seen once it faces the viewer at least this much. */
+export const MIN_FACING = 0.03;
+
+/** The teeth being brushed as the mirror shows them: each seen face's line from end to end, in picture coordinates. */
+export function brushedPoints(model: MouthModel, all: ReturnType<typeof projectors>, zone: { surface: Surface; teeth: ToothId[] }): Point2[] {
+  return zone.teeth.flatMap((id) => {
+    const face = model.teeth.find((t) => t.key === toothKey(id))!.faces.find((f) => f.kind === zone.surface)!;
+    return all[id.jaw].facing(face.normal) > MIN_FACING ? midLine(face).map(all[id.jaw].point) : [];
+  });
+}
+
+const middleOf = (lips: Point2[]) => {
   const xs = lips.map((p) => p.x);
-  const middle = (Math.min(...xs) + Math.max(...xs)) / 2;
-  let out = lips;
-  for (const side of [-1, 1]) {
-    const stretch = (k: number) => out.map((p) => (Math.sign(p.x - middle) === side ? { ...p, x: middle + (p.x - middle) * k } : p));
-    const widest = stretch(MAX_STRETCH);
-    const mine = keep.filter((p) => Math.sign(p.x - middle) === side && insideBy(p, widest, margin));
+  return (Math.min(...xs) + Math.max(...xs)) / 2;
+};
+
+/** The lips with each corner pulled out sideways by its factor, about the middle of the mouth. */
+export function stretchLips(lips: Point2[], { left, right }: CornerStretch): Point2[] {
+  const middle = middleOf(lips);
+  return lips.map((p) => (p.x === middle ? p : { ...p, x: middle + (p.x - middle) * (p.x < middle ? left : right) }));
+}
+
+/**
+ * How far the corners are pulled out, as a cheek is when the brush works behind it, so every point of `keep` (the
+ * teeth being brushed) lies at least `margin` inside the opening. Seen from the side the near corner of the mouth
+ * would otherwise hide the back teeth and their monsters. Each side stretches on its own about the middle of the
+ * mouth, only as far as needed; a point no stretch sideways can free (above or below the lips) is left alone.
+ */
+export function cornerStretch(lips: Point2[], keep: { x: number; y: number }[], margin: number): CornerStretch {
+  const middle = middleOf(lips);
+  const stretch = { ...NO_STRETCH };
+  for (const side of ["left", "right"] as const) {
+    const sign = side === "left" ? -1 : 1;
+    const at = (k: number) => stretchLips(lips, { ...stretch, [side]: k });
+    const widest = at(MAX_STRETCH);
+    const mine = keep.filter((p) => Math.sign(p.x - middle) === sign && insideBy(p, widest, margin));
     const fits = (k: number) => {
-      const lipsAt = stretch(k);
+      const lipsAt = at(k);
       return mine.every((p) => insideBy(p, lipsAt, margin));
     };
     if (fits(1)) continue;
@@ -353,10 +383,24 @@ export function openCorners(lips: Point2[], keep: { x: number; y: number }[], ma
       if (fits(k)) high = k;
       else low = k;
     }
-    out = stretch(high);
+    stretch[side] = high;
   }
-  return out;
+  return stretch;
 }
+
+/** The lips with their corners pulled out as far as the teeth being brushed need (`cornerStretch`). */
+export const openCorners = (lips: Point2[], keep: { x: number; y: number }[], margin: number): Point2[] => stretchLips(lips, cornerStretch(lips, keep, margin));
+
+/**
+ * The corners while the head turns or the mouth opens: from where they were to where the next step needs them, as far
+ * as the glide has come (`k`, 0 to 1). Worked out from each in-between picture instead, the half turned, half open
+ * mouth asked for corners far wider than either end, and the lips jumped open and shut within a few frames (user
+ * feedback, November 2026, from the turn onto the left outside; `jaw.test.ts`).
+ */
+export const glideStretch = (from: CornerStretch, to: CornerStretch, k: number): CornerStretch => ({
+  left: from.left + (to.left - from.left) * k,
+  right: from.right + (to.right - from.right) * k,
+});
 
 /** Turns 3D points into picture coordinates for a view. */
 export function projector(view: View) {

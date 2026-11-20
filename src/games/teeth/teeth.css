@@ -157,10 +157,6 @@
   z-index: 1;
 }
 
-.teeth-sky {
-  z-index: 1;
-}
-
 .teeth-heading {
   pointer-events: none;
 }
@@ -364,40 +360,53 @@
     twinkle 1.6s ease-in-out calc(var(--delay) + 0.4s) infinite;
 }
 
-/* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. */
+/* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. They lie
+   together on one strip of paper, like the book's notes, so they read as one thing apart from the picture behind them
+   (user feedback, November 2026: on their own the discs, the pills and the time looked scattered over the picture). */
 .teeth-controls {
   position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 14px;
-  width: min(90vw, 780px);
+  gap: clamp(8px, 1.6vmin, 14px);
+  width: min(92vw, 800px);
+  padding: 5px clamp(8px, 1.6vmin, 14px) 5px 6px;
+  border: 1px solid #3d304559;
+  border-radius: 999px;
+  background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 70%, #fff);
+  box-shadow:
+    0 2px 0 #5a3c1f22,
+    0 8px 18px -6px #2a1e5c59;
 }
 
-/* Pause (or go on) and start again: round white discs with drawn signs in the game's ink, no emoji. */
+/* Pause (or go on) and start again: round paper discs with drawn signs in the game's ink, no emoji. */
 .teeth-button {
   flex: none;
   display: grid;
   place-items: center;
-  width: clamp(44px, 8vmin, 60px);
-  height: clamp(44px, 8vmin, 60px);
+  width: clamp(44px, 8vmin, 58px);
+  height: clamp(44px, 8vmin, 58px);
   padding: 0;
-  border: 3px solid var(--ink);
+  border: 2.5px solid var(--ink);
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff 55%, #e4f6ff);
-  box-shadow: 0 3px 8px #2a1e5c33;
+  background: radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  box-shadow:
+    inset 0 -3px 0 #3d30451f,
+    0 2px 3px #2a1e5c33;
   cursor: pointer;
 }
 
 .teeth-button:active {
   translate: 0 1px;
-  box-shadow: 0 1px 4px #2a1e5c33;
+  box-shadow:
+    inset 0 -1px 0 #3d30451f,
+    0 1px 2px #2a1e5c33;
 }
 
 .teeth-button-icon {
   display: block;
-  width: 62%;
-  height: 62%;
+  width: 64%;
+  height: 64%;
 }
 
 /* The time right of the bar: before the brushing the time until it starts (in the intro's lilac), then the brushing time
@@ -405,13 +414,14 @@
 .teeth-time {
   flex: none;
   min-width: 3.2em;
-  padding: 0.05em 0.5em;
-  border: 3px solid var(--ink);
+  padding: 0.1em 0.55em;
+  border: 2.5px solid var(--ink);
   border-radius: 999px;
   background: #fff;
+  box-shadow: inset 0 -2px 0 #3d30451a;
   text-align: center;
   color: var(--ink);
-  font-size: clamp(1.1rem, 4vmin, 1.8rem);
+  font-size: clamp(1.05rem, 3.6vmin, 1.6rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -430,46 +440,56 @@
 .teeth-progress {
   flex: 1;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: clamp(4px, 0.9vmin, 8px);
   /* Room above and below the thin bar, so a finger hits it easily. */
   padding: 12px 0;
   cursor: pointer;
   touch-action: none;
 }
 
+/* Each part a groove pressed into the paper, filled with its colour as the time goes by. */
 .teeth-segment {
   flex: 1;
-  height: clamp(16px, 3.5vmin, 30px);
-  border: 3px solid var(--ink);
+  height: clamp(14px, 3vmin, 24px);
+  border: 2px solid var(--ink);
   border-radius: 999px;
-  background: #fff;
+  background: #fffaf0;
+  box-shadow: inset 0 2px 3px #3d304529;
   overflow: hidden;
 }
 
 .teeth-segment > span {
   display: block;
   height: 100%;
-  background: var(--mint);
+  /* A soft shine along the top, so the colour looks filled in rather than flat. */
+  background: linear-gradient(#ffffff73 0 30%, #fff0 55%), var(--fill, #6fcf9d);
   /* Grows by scaling, not by its width: a width that changes lays out the bar again in every frame of its glide. */
   transform-origin: left;
   transition: transform 0.2s linear;
 }
 
 /* The time before the brushing: story, sink and the first look in the mirror. */
-.teeth-segment.intro > span {
-  background: #c9b8ff;
+.teeth-segment.intro {
+  --fill: #b9a4f5;
 }
 
-.teeth-segment.top > span {
-  background: var(--sunshine);
+.teeth-segment.top {
+  --fill: #f5c94a;
 }
 
-.teeth-segment.inner > span {
-  background: #ff8fab;
+.teeth-segment.inner {
+  --fill: #ff8fab;
 }
 
+/* The part running now stands a little taller with a golden ring, still – never pulsing. */
 .teeth-segment.now {
-  outline: 4px solid var(--sunshine);
+  height: clamp(20px, 4.2vmin, 32px);
+  border-width: 2.5px;
+  box-shadow:
+    inset 0 2px 3px #3d304529,
+    0 0 0 3px #ffc61a,
+    0 2px 6px 2px #2a1e5c40;
 }
 
 /* Pause: brush, monsters and glow stand still under a big button that goes on. */
@@ -1316,21 +1336,8 @@
   background: linear-gradient(#a49be6, #c9b8ff 55%, #ffd9c7);
 }
 
-/* Away from the grown-ups' ✕ in the other corner. */
-.teeth-sky {
-  position: absolute;
-  top: calc(max(12px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
-  left: max(16px, env(safe-area-inset-left));
-  font-size: clamp(2.4rem, 9vmin, 4.5rem);
-  line-height: 1;
-  pointer-events: none;
-}
-
-/* The sun comes up once when brushing starts; the moon just hangs there. */
-.teeth-play.morning .teeth-sky {
-  animation: teeth-sun-up 2.5s ease-out;
-}
-
+/* No sun or moon in a corner of the picture while brushing (taken out, user feedback, November 2026): the sink's
+   window and the sky of the story tell the time of day. */
 @keyframes teeth-sun-up {
   from {
     transform: translateY(60%);
@@ -1478,7 +1485,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .teeth-sky,
   .prep-sun,
   .teeth-day,
   .teeth-slot.fresh {

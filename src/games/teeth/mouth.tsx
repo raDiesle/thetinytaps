@@ -4,11 +4,15 @@ import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import {
   alongFace,
+  brushedPoints,
   buildMouth,
+  cornerStretch,
+  glideStretch,
   insideBy,
-  midLine,
-  openCorners,
+  MIN_FACING,
+  NO_STRETCH,
   projectors,
+  stretchLips,
   TOOTH_CLEAR,
   toothKey,
   type Face,
@@ -36,7 +40,6 @@ const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", 
 /** The gum's edge round each tooth. */
 const GUM_RIM = "#e2577c";
 const ZONE_FILL = "#fff2a8";
-const MIN_FACING = 0.03;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 const HEAD = 270;
@@ -197,6 +200,8 @@ interface MouthProps {
    * to brush waits until it holds still (the yellow of those teeth shows the way meanwhile).
    */
   gliding: boolean;
+  /** Where the glide is going, and how far it has come (0 to 1, eased like the view): the corners of the mouth follow it. */
+  glide: { to: View; k: number };
   /** The free part of the screen between heading and controls, where the mouth has to fit. */
   free: RefObject<HTMLElement | null>;
   onTickle: (id: number) => void;
@@ -261,7 +266,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gliding, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gliding, glide, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -291,13 +296,18 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gli
   };
 
   // The corners of the mouth open as far as the teeth being brushed need, so seen from the side none hides behind them.
-  const lipPoints = useMemo(() => {
-    const keep = (zone?.teeth ?? []).flatMap((id) => {
-      const face = surfaceFace(teethByKey.get(toothKey(id))!.faces, zone!.surface);
-      return all[id.jaw].facing(face.normal) > MIN_FACING ? midLine(face).map(all[id.jaw].point) : [];
-    });
-    return openCorners(model.lips.map(project.point), keep, TOOTH_CLEAR);
-  }, [model, project, all, teethByKey, zone?.teeth, zone?.surface]);
+  // Worked out for where the view is going; while it glides there they go from where they were (`glideStretch`).
+  const settled = useMemo(() => {
+    if (!zone) return NO_STRETCH;
+    const to = projectors(glide.to);
+    const target = mouthAt(glide.to.open);
+    return cornerStretch(target.lips.map(to.face.point), brushedPoints(target, to, zone), TOOTH_CLEAR);
+  }, [glide.to, zone?.teeth, zone?.surface]);
+  // The stretch shown last while the head held still: where the corners start from when it glides again.
+  const heldStretch = useRef(settled);
+  if (!gliding) heldStretch.current = settled;
+  const stretch = gliding ? glideStretch(heldStretch.current, settled, glide.k) : settled;
+  const lipPoints = useMemo(() => stretchLips(model.lips.map(project.point), stretch), [model, project, stretch.left, stretch.right]);
   const lipsPath = useMemo(() => smoothPath(lipPoints), [lipPoints]);
 
   const svg = useRef<SVGSVGElement>(null);
@@ -860,9 +870,11 @@ export function Monster({
   blinkMs: number;
   onTickle: () => void;
 }) {
+  // A tapped monster giggles instead of the tap pausing the brushing; where one is gone, the tap goes on to the picture.
   const stop = (e: PointerEvent) => {
+    if (gone) return;
     e.stopPropagation();
-    if (!gone) onTickle();
+    onTickle();
   };
   return (
     <g
