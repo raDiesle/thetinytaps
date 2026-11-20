@@ -27,7 +27,9 @@ the fly. Never loosen these; add a package with `bun add --exact <name>` (`-d` f
 or `bun x`, which fetch past the lockfile. Tests import from `bun:test`.
 What a bundler adds to the code comes from one Bun plugin (`tools/appPlugin.ts`), used alike by build, dev server
 (`bunfig.toml`, `[serve.static]`) and tests (`src/testPreload.ts`): a folder of files is `import files from
-"./bilder/*.webp?glob"` (relative to the importing file – an `@/` path finds no files and no error says so –, one extension per pattern – Bun can't load `{a,b}` – `**` for subfolders), facts about the
+"./bilder/*.webp?glob"` (relative to the importing file – an `@/` path finds no files and no error says so –, one extension per pattern – Bun can't load `{a,b}` – `**` for subfolders; on the dev server a file is its address under `/_src/`, read from the disk when asked for: imported,
+Bun read and hashed all ~25,000 recordings before the first page, an 11 s start – never let the dev server bundle them
+again, `buildTools.test.ts`), facts about the
 build come from `src/lib/buildInfo.ts` (never `import.meta.env`; never a value that changes with every build compiled
 into the JS, which renamed 139 of 196 chunks at each deploy – the build's time stands only in each page's
 `<meta name="build-time">`, `buildTools.test.ts`), and in the build a stylesheet a module imports travels in
