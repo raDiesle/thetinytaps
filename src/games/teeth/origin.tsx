@@ -32,8 +32,12 @@ const FOCUS: Box = { x: 40, y: 34, width: 360, height: 340 };
 const MOUTH_FOCUS: Box = { x: 95, y: 222, width: 250, height: 150 };
 const HEAD = { x: W / 2, y: 215, r: 165 };
 /** The open smile: a nearly straight top edge and a round bottom. */
-const MOUTH = { left: 110, right: 330, top: 262, depth: 95 };
+/** The mouth's corners, top and depth. */
+export const MOUTH = { left: 110, right: 330, top: 262, depth: 95 };
 const MID = (MOUTH.left + MOUTH.right) / 2;
+/** The cheeks: their middles across, and where and how big they are; kept clear of the mouth's corners (`layers.test.ts`). */
+export const CHEEKS = [98, 342];
+export const CHEEK = { y: 222, rx: 28, ry: 17 };
 const HALF = (MOUTH.right - MOUTH.left) / 2;
 const MOUTH_PATH = `M${MOUTH.left} ${MOUTH.top} Q${MID} ${MOUTH.top + 12} ${MOUTH.right} ${MOUTH.top} A${HALF} ${MOUTH.depth} 0 0 1 ${MOUTH.left} ${MOUTH.top} Z`;
 /** The bottom edge of the mouth below x. */
@@ -464,9 +468,22 @@ export function Origin({
               ))}
             </Piece>
           )}
-          {[104, 336].map((cx) => (
-            <Piece key={cx} area={{ x: cx - 26, y: 222, width: 52, height: 32 }} className="origin-cheek" style={sweets ? GLOW : undefined}>
-              <ellipse cx={cx} cy={238} rx={24} ry={14} fill="#ff8fab" />
+          {/* The cheeks sit up beside the eyes, clear of the open mouth's corners (they once lay right on them). */}
+          {CHEEKS.map((cx) => (
+            <Piece
+              key={cx}
+              area={{ x: cx - CHEEK.rx, y: CHEEK.y - CHEEK.ry, width: 2 * CHEEK.rx, height: 2 * CHEEK.ry }}
+              className="origin-cheek"
+              style={sweets ? GLOW : undefined}
+            >
+              <defs>
+                <radialGradient id={`origin-cheek-${cx}`}>
+                  <stop offset="0" stopColor="#ff7f99" stopOpacity={0.85} />
+                  <stop offset="0.6" stopColor="#ff8fab" stopOpacity={0.6} />
+                  <stop offset="1" stopColor="#ff8fab" stopOpacity={0} />
+                </radialGradient>
+              </defs>
+              <ellipse cx={cx} cy={CHEEK.y} rx={CHEEK.rx} ry={CHEEK.ry} fill={`url(#origin-cheek-${cx})`} />
             </Piece>
           ))}
 

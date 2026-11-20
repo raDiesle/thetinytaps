@@ -312,6 +312,76 @@ export function insideBy(p: { x: number; y: number }, points: { x: number; y: nu
   return inside && nearest >= margin;
 }
 
+/** How far a point lies from the closed outline `points`, negative inside it. */
+export function distanceOutside(p: { x: number; y: number }, points: { x: number; y: number }[]): number {
+  if (insideBy(p, points, 0)) return -1;
+  let nearest = Number.POSITIVE_INFINITY;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const [a, b] = [points[j], points[i]];
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const k = Math.max(0, Math.min(1, ((p.x - b.x) * dx + (p.y - b.y) * dy) / (dx * dx + dy * dy || 1)));
+    nearest = Math.min(nearest, Math.hypot(p.x - (b.x + k * dx), p.y - (b.y + k * dy)));
+  }
+  return nearest;
+}
+
+/** The child's head round the mouth: its middle in the model and its radius. */
+export const HEAD_MIDDLE: Vec3 = [0, 20, -60];
+export const HEAD_RADIUS = 270;
+
+/** The cheeks' size about their middle, across and up, in model units (times the view's zoom on the picture). */
+export const CHEEK = { rx: 28, ry: 18 };
+/** Room between a cheek's edge and the lips' outline: half the thick lip (34 wide) and a gap of skin. */
+export const CHEEK_GAP = 17 + 16;
+/** Where a cheek sits on a shut mouth's face: beside the nose, below the eyes. */
+const CHEEK_AT: Vec3 = [150, 92, 84];
+/** How far a cheek may be pushed up and out by a wide mouth before it would leave the face. */
+const CHEEK_PUSH = 90;
+
+/** A cheek in the picture: its middle, its size and how far it is turned towards the viewer. */
+export interface CheekSpot {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  facing: number;
+}
+
+/**
+ * Where the cheeks lie, kept clear of the lips: a wide open or stretched mouth pushes them up and out, as a real one
+ * does, instead of the blush lying on the corner of the mouth. A cheek turned away, or one that would be pushed off
+ * the face, is left out.
+ */
+export function cheekSpots(project: Projector, lips: { x: number; y: number }[]): CheekSpot[] {
+  const head = { ...project.point(HEAD_MIDDLE), r: HEAD_RADIUS * project.zoom };
+  const xs = lips.map((p) => p.x);
+  const ys = lips.map((p) => p.y);
+  const middle = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
+  const spots: CheekSpot[] = [];
+  for (const s of [-1, 1]) {
+    const [x, y, z] = CHEEK_AT;
+    const facing = project.facing([(s * x) / 200, 0.1, 0.95]);
+    if (facing <= 0.15) continue;
+    const at = project.point([s * x, y, z]);
+    const rx = CHEEK.rx * project.zoom * Math.max(0.4, Math.min(1, facing));
+    const ry = CHEEK.ry * project.zoom;
+    // Measured as a circle as wide as the cheek, so it keeps its gap in every direction.
+    const reach = Math.max(rx, ry) + CHEEK_GAP;
+    // Away from the mouth's middle, more up than out.
+    const away = { x: at.x - middle.x, y: Math.min(at.y - middle.y, 0) - Math.abs(at.x - middle.x) * 0.6 };
+    const length = Math.hypot(away.x, away.y) || 1;
+    for (let push = 0; push <= CHEEK_PUSH; push += 3) {
+      const spot = { x: at.x + (away.x / length) * push, y: at.y + (away.y / length) * push };
+      if (distanceOutside(spot, lips) < reach) continue;
+      if (Math.hypot(spot.x - head.x, spot.y - head.y) + Math.max(rx, ry) > head.r - 6) break;
+      spots.push({ ...spot, rx, ry, facing });
+      break;
+    }
+  }
+  return spots;
+}
+
 /** A point on a tooth's face, `i` steps along the tooth from one end, half way between its long edges. */
 export function alongFace(face: Face, i: number): Vec3 {
   const a = face.points[i];

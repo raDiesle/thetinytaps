@@ -25,9 +25,11 @@ import {
   type ToothId,
   type Vec3,
   type View,
+  cheekSpots,
+  HEAD_MIDDLE,
+  HEAD_RADIUS,
 } from "./jaw";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
-import type { Daytime } from "@/lib/days";
 import type { Motion } from "./steps";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
@@ -42,7 +44,6 @@ const GUM_RIM = "#e2577c";
 const ZONE_FILL = "#fff2a8";
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
-const HEAD = 270;
 /** The child's hair, also its eyebrows. */
 const HAIR = "#8a5a3c";
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
@@ -191,8 +192,6 @@ interface MouthProps {
   brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
   /** All clean: sparkles and smiling eyes. */
   happy: boolean;
-  /** In the morning breakfast crumbs stick round the mouth until all is clean. */
-  daytime: Daytime;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
   /**
@@ -266,7 +265,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gliding, glide, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, action, gliding, glide, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -391,7 +390,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gli
     const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
     return (
       <>
-        <KidFace project={all.face} head={all.face.point([0, 20, -60])} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
+        <KidFace project={all.face} head={all.face.point(HEAD_MIDDLE)} happy={happy} open={view.open} lips={lipPoints} />
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill="#5c1430" />
           {tongueUp && <path d={smoothPath(model.tongue.map(all.lower.point))} fill="#ff6f91" stroke="#d94f74" strokeWidth={3} />}
@@ -400,7 +399,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, gli
         </g>
       </>
     );
-  }, [view, all, model, gumsByKey, lipsPath, zoneSurface, zoneTeeth, happy, daytime]);
+  }, [view, all, model, gumsByKey, lipPoints, lipsPath, zoneSurface, zoneTeeth, happy]);
 
   const placed = (m: MonsterSpot) => {
     const face = toothFace(m.tooth, m.surface);
@@ -698,30 +697,21 @@ function LipArrows({
   ));
 }
 
-/** Breakfast crumbs on the chin and by the corners of the mouth: across, below the lips, size. */
-const CRUMBS: [number, number, number][] = [
-  [-180, -54, 7],
-  [-64, 36, 8],
-  [-22, 52, 6],
-  [40, 40, 9],
-  [92, 30, 6],
-  [174, -50, 8],
-];
-
 /** Where the girl's two lashes start on the outer top of an eye: sideways and up from its middle. */
 const LASHES = [
   [10, 14],
   [15, 4],
 ];
 
-function KidFace({ project, head, happy, open, crumbs }: { project: Project; head: Point2; happy: boolean; open: number; crumbs: boolean }) {
+function KidFace({ project, head, happy, open, lips }: { project: Project; head: Point2; happy: boolean; open: number; lips: Point2[] }) {
   const p = project.point;
   const feature = (x: number, y: number, z: number) => ({ at: p([x, y, z]), facing: project.facing([x / 200, 0.1, 0.95]) });
-  const ears = [-1, 1].map((s) => ({ s, at: p([s * HEAD * 0.97, 70, -60]) }));
+  const ears = [-1, 1].map((s) => ({ s, at: p([s * HEAD_RADIUS * 0.97, 70, -60]) }));
   const eyes = [-1, 1].map((s) => feature(s * 66, 138, 120));
   // The eyebrows go up with a wide open mouth.
   const brows = [-1, 1].map((s) => feature(s * 70, 174 + 14 * open, 112));
-  const cheeks = [-1, 1].map((s) => feature(s * 150, 84, 84));
+  // The cheeks keep clear of the lips: a wide mouth pushes them up and out instead of the blush touching its corners.
+  const cheeks = cheekSpots(project, lips);
   const nose = feature(0, 96, 148);
   const squash = (facing: number) => Math.max(0.25, Math.min(1, facing));
   // The girl (👧 on the home page) has two pigtails above the ears, which turn with the head like the ears do, and
@@ -730,13 +720,21 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
   const pigtails = girl
     ? [-1, 1].map((s) => ({
         s,
-        tail: p([s * (HEAD + 60), 170, -90]),
-        band: { at: p([s * HEAD * 0.9, 200, -30]), facing: project.facing([s * 0.9, 0.4, 0.3]) },
+        tail: p([s * (HEAD_RADIUS + 60), 170, -90]),
+        band: { at: p([s * HEAD_RADIUS * 0.9, 200, -30]), facing: project.facing([s * 0.9, 0.4, 0.3]) },
       }))
     : [];
 
   return (
     <g>
+      <defs>
+        {/* A soft blush that fades into the skin, no hard edge. */}
+        <radialGradient id="kid-cheek">
+          <stop offset="0" stopColor="#ff7f99" stopOpacity={0.7} />
+          <stop offset="0.6" stopColor="#ff8fa3" stopOpacity={0.45} />
+          <stop offset="1" stopColor="#ff8fa3" stopOpacity={0} />
+        </radialGradient>
+      </defs>
       {pigtails.map(({ s, tail }) => (
         <ellipse
           key={s}
@@ -753,9 +751,9 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
       {ears.map(({ s, at }) => (
         <circle key={s} cx={at.x} cy={at.y} r={40 * project.zoom} fill={SKIN} stroke={INK} strokeWidth={5} />
       ))}
-      <circle cx={head.x} cy={head.y} r={HEAD * project.zoom} fill={SKIN} stroke={INK} strokeWidth={6} />
+      <circle cx={head.x} cy={head.y} r={HEAD_RADIUS * project.zoom} fill={SKIN} stroke={INK} strokeWidth={6} />
       <clipPath id="head-shape">
-        <circle cx={head.x} cy={head.y} r={HEAD * project.zoom} />
+        <circle cx={head.x} cy={head.y} r={HEAD_RADIUS * project.zoom} />
       </clipPath>
       {/* Hair: a fringe that moves with the head. */}
       <ellipse
@@ -771,9 +769,9 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
       {pigtails.map(({ s, band }) =>
         band.facing > 0 ? <circle key={s} cx={band.at.x} cy={band.at.y} r={26 * project.zoom} fill="#ffd43b" stroke={INK} strokeWidth={5} /> : null,
       )}
-      {cheeks.map(({ at, facing }, i) =>
-        facing > 0 ? <ellipse key={i} cx={at.x} cy={at.y} rx={30 * squash(facing)} ry={20} fill="#ff8fa3" opacity={0.55} /> : null,
-      )}
+      {cheeks.map((c, i) => (
+        <ellipse key={i} cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} fill="url(#kid-cheek)" />
+      ))}
       {eyes.map(({ at, facing }, i) =>
         facing <= 0 ? null : happy ? (
           <path
@@ -813,27 +811,6 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
         ) : null,
       )}
       {nose.facing > 0 && <ellipse cx={nose.at.x} cy={nose.at.y} rx={16 * squash(nose.facing)} ry={11} fill="#e8a982" />}
-      {crumbs &&
-        CRUMBS.map(([x, below, size], i) => {
-          // They sit just below the lower lip, which drops as the mouth opens.
-          const { at, facing } = feature(x, -(60 + 62 * open) - below, 110 - Math.abs(x) / 4);
-          if (facing <= 0) return null;
-          const r = size * project.zoom * squash(facing);
-          return (
-            <rect
-              key={i}
-              x={at.x - r}
-              y={at.y - r}
-              width={2 * r}
-              height={1.6 * r}
-              rx={r / 2}
-              fill="#e0a85a"
-              stroke="#a8682a"
-              strokeWidth={2}
-              transform={`rotate(${i * 37} ${at.x} ${at.y})`}
-            />
-          );
-        })}
     </g>
   );
 }
