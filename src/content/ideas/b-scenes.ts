@@ -142,6 +142,9 @@ export const scenesIdeas: IdeaArea = {
       text: "Tippt eine Weile niemand, winkt ein einzelnes Ding sanft und ruft leise „Hallo!“ – eine Einladung, kein Auftrag. Nach dem ersten Tippen ist es wieder still.",
       why: "Hilft, wenn das Kind nicht weiß, wo es anfangen soll – ohne das Bild unruhig zu machen.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt beim Entdecken und Ausmalen (hello.ts): Tippt nach dem Start 6 Sekunden niemand, wiegt sich ein Ding sanft zweimal auf seinem Fuß – erst die Tiere, die der Bildmitte am nächsten sind –, danach alle 12 Sekunden ein anderes, höchstens drei. Dabei macht es leise sein eigenes Geräusch (im Gute-Nacht-Bild nicht). Der erste Tipp oder Tastendruck beendet es. Ohne „Hallo!“: Die Bilder sprechen nicht (keine Stimme in Lebendige Bilder).",
     },
     {
       id: "B-16",

@@ -47,6 +47,15 @@ after `HINT_AFTER_MS` or two misses a ring marks one and the sound comes once mo
   recording yet plays the usual one. The first sound waits for the page to lie still and for its recording (at most
   `RIDDLE_WAIT_MS`).
 
+## „Hier bin ich!“ (idea B-15)
+
+Where the child taps freely (explore and colour mode, never with a question, the torch or roads), nobody tapping a
+picture for `HELLO_AFTER_MS` after it lies still makes one item rock gently on its foot twice (`HELLO_KEYFRAMES`,
+moving the item's own layer about its foot like a bow at the end, never its group inside the svg), then every `HELLO_AGAIN_MS` another, at most `HELLO_TIMES` (`hello.ts`: animals
+first, nearest to the middle first). The first tap or key ends it for the picture. It makes **its own sound softly**
+(`softly(HELLO_VOLUME, …)` from `@/lib/sfx`, user decision, 21 November 2026), never a „Hallo!“ or any voice: the
+pictures have none (see Rules); the bedtime picture waves without it. `hello.test.ts` checks it. Never make it repeat for ever, grow or glow: an invitation, not a task.
+
 ## The end of a picture (idea B-21)
 
 Once everything is found (Entdecken, Ausmalen, Taschenlampe, Straßen; `curtainCall` in `ScenePlay.tsx`, the numbers

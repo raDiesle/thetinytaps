@@ -7,7 +7,7 @@ import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE } from "./jaw";
-import { BROW, Ear, EyeBall, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
+import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
 import { fitBox, FrameStroke, Monster, screenFrame, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
@@ -152,6 +152,43 @@ const GUM_PATHS = {
 /** Tickle ids of the monsters here start above the mirror's (step × 100 + order in TeethPlay). */
 const FIRST_ID = 1000;
 
+/** The closed mouth while chewing: where its lips meet, in the middle (a little below the open mouth's top). */
+const CLOSED = { y: MOUTH.top + 16, half: 58 };
+/** Its piece, and the point it moves round (where the lips meet). */
+const CLOSED_AREA: Box = { x: MID - CLOSED.half - 10, y: CLOSED.y - 22, width: 2 * CLOSED.half + 20, height: 60 };
+
+/**
+ * The closed lips of a chewing mouth, full and a little pursed round the sweet: a thinner upper lip, a fuller lower one,
+ * the line where they meet turning up at the corners as the smile does.
+ */
+function ClosedMouth() {
+  const { y, half } = CLOSED;
+  const [l, r] = [MID - half, MID + half];
+  const upper = `M${l} ${y} Q${MID - half / 2} ${y - 16} ${MID} ${y - 10} Q${MID + half / 2} ${y - 16} ${r} ${y} Q${MID} ${y + 8} ${l} ${y} Z`;
+  const lower = `M${l + 2} ${y + 1} Q${MID} ${y + 9} ${r - 2} ${y + 1} Q${MID + half / 2} ${y + 24} ${MID} ${y + 26} Q${MID - half / 2} ${y + 24} ${l + 2} ${y + 1} Z`;
+  return (
+    <g strokeLinejoin="round">
+      <path d={lower} fill={LIP} stroke={INK} strokeWidth={4} />
+      <path d={upper} fill={LIP} stroke={INK} strokeWidth={4} />
+      <path
+        d={`M${l - 4} ${y - 4} Q${l} ${y + 1} ${l + 6} ${y + 2} Q${MID} ${y + 8} ${r - 6} ${y + 2} Q${r} ${y + 1} ${r + 4} ${y - 4}`}
+        fill="none"
+        stroke={INK}
+        strokeWidth={5}
+        strokeLinecap="round"
+      />
+      <path
+        d={`M${MID - 18} ${y + 18} Q${MID} ${y + 22} ${MID + 18} ${y + 18}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth={3}
+        strokeLinecap="round"
+        opacity={0.55}
+      />
+    </g>
+  );
+}
+
 /** When each sweet reaches the mouth (ms into the sweets part); it shows a while before, then the mouth chews. */
 const ARRIVE_MS = [2300, 5000, 7700];
 /** How long the mouth chews each sweet; the crumbs show when it opens again. */
@@ -169,9 +206,15 @@ const perSweet = (names: string[], ms: number, times: number[]): CSSProperties =
   animationDelay: times.map((at) => `${at}ms`).join(", "),
 });
 
-/** One chew per sweet. */
+/** The open mouth closes over each sweet and opens again once it is chewed. */
 const CHEWING = perSweet(
   ARRIVE_MS.map(() => "teeth-origin-chew"),
+  CHEW_MS,
+  ARRIVE_MS,
+);
+/** Meanwhile the closed lips chew it: the jaw goes down and up twice, a beat each, a little to the side each time. */
+const CHEWING_LIPS = perSweet(
+  ARRIVE_MS.map(() => "teeth-origin-chew-lips"),
   CHEW_MS,
   ARRIVE_MS,
 );
@@ -254,10 +297,13 @@ function Cupcake() {
 
 const SWEETS = [Lollipop, Bonbon, Cupcake];
 
-/** The eyes follow each sweet: up to its corner while it floats, down to the mouth as it glides in. */
+/**
+ * The eyes follow each sweet: up to its corner while it floats, down to the mouth as it glides in, and back to rest
+ * only once they are closed over the chewing (`HAPPY_EYES`), so they never jump while seen.
+ */
 const LOOK = perSweet(
   SWEET_FROM.map((from) => (from.x > W / 2 ? "teeth-origin-look-right" : "teeth-origin-look-left")),
-  SHOW_MS,
+  SHOW_MS + 600,
   APPEAR_MS,
 );
 
@@ -330,12 +376,22 @@ function EyeWhite({ x, y, side }: { x: number; y: number; side: -1 | 1 }) {
   );
 }
 
-/** An eye's iris with its pupil and lights: it follows the sweets, and looks down at the teeth while the monsters grow. */
+/** Where the iris lies in the eye's opening (`eyeOpening`), which clips it, so it never reaches past the eye. */
+const OPENING = eyeOpening(FACE.eyes.rx, FACE.eyes.ry);
+
+/**
+ * An eye's iris with its pupil and lights, in a clip the shape of the eye's white: it follows the sweets, and looks down
+ * at the teeth while the monsters grow. It rests a little low in the eye, looking at the viewer.
+ */
 function Pupil({ x, y, look }: { x: number; y: number; look?: CSSProperties }) {
+  const r = FACE.eyes.iris;
+  const clip = { x: x - OPENING.rx, y: y - OPENING.ry, width: 2 * OPENING.rx, height: 2 * OPENING.ry };
   return (
-    <Piece area={{ x: x - 16, y: y - 14, width: 36, height: 36 }} className="origin-pupil" style={look}>
-      <Iris x={x + 2} y={y + 4} r={FACE.eyes.iris} />
-    </Piece>
+    <div className="teeth-piece origin-eye-clip" style={{ left: clip.x, top: clip.y, width: clip.width, height: clip.height }}>
+      <Piece area={{ x: x - r - 2, y: y + 3 - r - 2, width: 2 * r + 4, height: 2 * r + 4 }} within={clip} className="origin-pupil" style={look}>
+        <Iris x={x} y={y + 3} r={r} />
+      </Piece>
+    </div>
   );
 }
 
@@ -495,6 +551,12 @@ export function Origin({
           {EYES.map((eye) => (
             <Pupil key={eye.s} x={eye.x} y={eye.y} look={sweets ? LOOK : undefined} />
           ))}
+          {/* The lids lie over the irises' tops; they stand still. */}
+          <Piece area={{ x: EYES[0].x - 30, y: EYES[0].y - 34, width: EYES[1].x - EYES[0].x + 60, height: 32 }} className="origin-still">
+            {EYES.map((eye) => (
+              <EyeLid key={eye.s} x={eye.x} y={eye.y} rx={FACE.eyes.rx} ry={FACE.eyes.ry} />
+            ))}
+          </Piece>
           {/* Happy closed eyes while chewing: skin over the eye (in the head's own light) and a smiling arc. */}
           {sweets && (
             <Piece area={{ x: 126, y: 150, width: 188, height: 72 }} className="origin-happy-eyes" style={HAPPY_EYES}>
@@ -528,7 +590,12 @@ export function Origin({
             </Piece>
           ))}
 
-          {/* The mouth closes and chews when a sweet arrives. */}
+          {/* The mouth closes over each sweet and the closed lips chew it (`CHEWING_LIPS`), then it opens again. */}
+          {sweets && (
+            <Piece area={CLOSED_AREA} pivot={{ x: MID, y: CLOSED.y }} className="origin-chewing" style={CHEWING_LIPS}>
+              <ClosedMouth />
+            </Piece>
+          )}
           <Piece
             area={MOUTH_AREA}
             className="origin-mouth"

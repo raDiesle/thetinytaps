@@ -72,7 +72,7 @@ export interface LanguageTexts {
   kitaStory?: MilkChainTranslation;
   /** Tapsi and the Foam Crown, written English first: chapter titles and pages (`hairstory/<id>.ts`, German too). */
   hairStory?: MilkChainTranslation;
-  /** Bye-Bye, Bottle!, written English first: chapter titles and pages (`bottlestory/<id>.ts`, German too), none translated yet. */
+  /** Bye-Bye, Bottle!, written English first: chapter titles and pages (`bottlestory/<id>.ts`, German too). */
   bottleStory?: MilkChainTranslation;
   /** Was ist passiert?: each scene's words for grown-ups by scene id (`cause/scenes.<id>.ts`). */
   cause?: CauseTranslation;

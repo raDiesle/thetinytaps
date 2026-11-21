@@ -42,7 +42,6 @@ const GERMAN_ONLY: Record<string, string> = {};
  * story that is a part of a book's row (the night story of Abstillen), that part.
  */
 const ENGLISH_ONLY: Record<string, { href: string; part?: string }> = {
-  flaeschchen: { href: "/flaeschchen/" },
   "grosses-bett": { href: "/grosses-bett/" },
   "abstillen-nachts": { href: "/abstillen/", part: "🌙 The Milk Sleeps at Night" },
 };
