@@ -14,6 +14,7 @@ bun run lint       # Biome alone; bun run typecheck: tsc alone (both are part of
 bun run previews   # the menus' pictures of the games, see „Menus show pictures from the games“
 bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rules for every game
 bun run image ...  # picture with Gemini, see /bild-erzeugen
+bun run paid       # every approved paid request at once (voice queue, cheap pictures) – on a computer outside Zscaler, see Working here
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
@@ -92,6 +93,16 @@ In a fresh worktree run `bun install` first.
   requests at once, the default 4 stopped a run); check a key's account first
   (`bun run voice credits`: Creator is the first, Starter the second). The clone sounds close, not the same: use it for
   whole parts or languages or whole rounds (a pair, a scene: what is heard together comes from one voice), never a few lines among the original's, and say so in `languageStatus.ts`. It speaks Chinese, Hindi, Spanish and Arabic well though made from English takes (checked with `whisper-cli`, which writes Hindi in Urdu letters).
+- **This Mac reaches neither ElevenLabs nor Gemini** (user decision, 21 November 2026): the company's Zscaler answers
+  every request to api.elevenlabs.io and generativelanguage.googleapis.com with „Website blocked“, for good. So never
+  start a paid run here (`bun run voice make`, `try`, `clone`, `credits`, `bun run image` with a prompt, `queue --make`)
+  and never look for a way round the filter. What the user approves goes into a queue instead, in the same commit as
+  the work that needs it: recordings as a job in `src/content/voiceQueue.ts` (parts, languages, the account and clone
+  its voice lives in – `voiceQueue.test.ts` checks them), pictures into `src/content/pictureQueue.ts` as always. Then
+  merge into local main and tell the user to run `bun run paid` on the other computer (pull, `bun install`, the keys in
+  its shell, `bun run paid --dry` first; `scripts/paid-queue.mjs` refuses to start where the filter answers). The free
+  parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). Both queues are on
+  `/management/`. A job or picture leaves its queue in the commit that brings its files.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of

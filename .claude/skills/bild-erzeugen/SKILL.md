@@ -14,6 +14,9 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 
 - `GEMINI_API_KEY` must be exported in the user's shell (key from Google AI Studio).
   If the script says it is missing, tell the user to set it themselves.
+- The Mac most sessions run on sits behind Zscaler, which blocks Gemini (root CLAUDE.md): there nothing is sent. Steps 3
+  and 4 below then only queue: the cheap part is made by `bun run paid` on the user's other computer, and a sheet the
+  user wants made now is named to them as `bun run image queue --make --force <id,…>` to run there.
 - Image models need billing enabled in AI Studio (the free tier allows 0 pictures;
   a `429 … free_tier … limit: 0` means billing is off). Don't generate dozens of
   variants without asking.

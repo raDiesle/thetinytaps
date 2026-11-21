@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
+import { VoiceQueue } from "@/components/VoiceQueue";
 import { UNFINISHED } from "@/content/games";
 import { EFFORT_LABELS, IDEA_AREAS, TODDLER_RULES, TOP_PICKS, type Effort, type Idea, type IdeaArea, areaKey } from "@/content/ideas";
 import { RESEARCH } from "@/content/research";
@@ -222,6 +223,7 @@ export function ManagementPage() {
         <summary>
           <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
         </summary>
+        <VoiceQueue />
         <Suspense fallback={<p className="ideas-hint">Die Sätze aller Spiele werden gelesen …</p>}>
           <VoiceList />
         </Suspense>

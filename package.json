@@ -18,6 +18,7 @@
     "song:verses": "bun scripts/song-verses.mjs",
     "archive-check": "bun scripts/archive-check.mjs",
     "frames": "bun scripts/frame-check.mjs",
+    "paid": "bun scripts/paid-queue.mjs",
     "perf": "bun tools/perf.ts",
     "previews": "bun tools/previews.ts",
     "video": "bun tools/video.ts",
