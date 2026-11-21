@@ -6,7 +6,7 @@ import { type TrophyWon, useTrophies } from "@/lib/trophies";
 
 /*
  * The trophy room (TrophyMuseum, user request, November 2026): a page of its own next to the bookshelf, reached through
- * a door behind the sign on the shelf's right side (TrophySign) or by a tap on the trophy at a level's end (GameEnd).
+ * a door behind the golden cup's sign at the bottom right of the picture books' compartment (TrophySign) or by a tap on the trophy at a level's end (GameEnd).
  */
 
 /** The trophy room's name: on the shelf's sign, over an empty room, and read out at the trophy that leads there. */

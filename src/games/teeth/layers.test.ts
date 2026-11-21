@@ -70,3 +70,13 @@ test("the end's shine breathes as a layer of its own, and the dazzled monster mo
 test("the mirror's glass and frame are drawn in screen px, so a turning head does not paint them again", () => {
   expect(mouth).toContain("<FrameStroke frame={screenEdge} unit={1} />");
 });
+
+test("a brushed monster dissolves as HTML layers: its sprite's body and the grains, never something inside its svg", () => {
+  // Its body blurs and fades as the sprite's div, the grains are divs of their own.
+  expect(css).toMatch(/\.monster-sprite\.gone \.sprite-body \{[^}]*animation: teeth-monster-dissolve/);
+  expect(css).toMatch(/\.monster-dust > i \{[^}]*animation: teeth-dust/);
+  expect(mouth).toMatch(/<div className="monster-dust"/);
+  // The old puff and spin inside the svg are gone, and nothing animates the svg's body once it is brushed.
+  expect(css).not.toMatch(/\.sugar-monster\.gone \.monster-(body|puff) \{[^}]*animation/);
+  expect(mouth).not.toContain("monster-puff");
+});

@@ -134,8 +134,46 @@ never the subject of a gendered verb („टैप्सी को सू-सू
 
 The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and plays alone (nothing speaks while Tapsi sits; it would still get quiet for a voice). In all seven languages (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 
+For a YouTube video (idea Y-21, November 2026) `/management/video-toepfchen/` (linked at the top of `/management/`,
+`PottyVideo.tsx`, noindex) plays the whole story once on the shared 16 : 9 stage (`VideoRecorder` in `src/components/`,
+as Zähne putzen's video): `PottyPlay video` shows only the picture – no row of steps, no buttons, no pause, no week's
+stars (the story ends with the party), no `GameEnd` – answers no tap or key, keeps nothing (no star, no play time) and
+puts no `?seite=` into the address. What a grown-up taps in the game is chosen on the page before (`PottyVideoRun`):
+what Tapsi needs (said from the first step on, so the need's picture and the call already say it), what is in the
+potty, and how many whole passes of the waiting song Tapsi sits (`WaitPasses`, `passesEndMs`: the waiting ends where
+the song would begin its first verse again, never inside one). Every other step goes on by itself once its movement
+has played once (`moves`, without `again`), its line is said (`voiceQuiet`) and `VIDEO_LOOK_MS` has passed; the party
+stays `VIDEO_TAIL_MS` more, then the recording ends. The page fetches the pictures, the thoughts that fit, the sounds
+(`preloadPottySounds`), the waiting song (`loadWaitSong`) and every line before it lets the recording start.
+A new thing shown beside the picture (a button, a chart) stays out of the video (`potty.test.ts`).
+
+The video for parents (idea Y-29, November 2026): `/management/video-toepfchen-eltern/` (linked at the top of
+`/management/`, `ParentsVideo.tsx`, noindex) shows the real game on a drawn tablet lying on a table, and a grown-up's
+drawn hand in a jumper sleeve (`ParentHand`) comes up from below and taps it through after a fixed script
+(`PARENTS_SCRIPT` in `parentsScript.ts`): the story starting at once, ▶, the 💧 of what the child said, sitting with the
+song and the thoughts, ⏸ and ▶ again, the ✓💧, the steps after it, the week's stars – about a minute and a half, a short
+line for grown-ups on a sheet beside the tablet at each part (English first, `languageStatus.ts`), then 15 s of the name
+and the game's address (`END_SLATE_MS`) for YouTube's end screen, since this video is „not made for kids“. Each beat waits
+for its step (`pt-at-<step>`), and the hand presses the button (`pt-pressed`, its look under a finger) and sends it a
+pointer event, so the game answers as to a finger. `PottyPlay demo` keeps nothing: the week shown is made up
+(`sampleWeek`), the round's star is never saved, no `GameEnd` (no trophy, no game counted), no step in the address, and
+a real click or key of the one recording changes nothing. The background song stays out; voice, sounds and the waiting
+song are fetched before (`loadWaitSong`). Recorded in the same shared frame as the children's video (`VideoRecorder`).
+
 ## Rules
 
+- The parents' video shows only the tablet and a grown-up's hand – never a real child, not from behind nor blurred
+  (Y-29). The game in it is laid out at a real tablet's size (`SCREEN`, 1280 × 800) and scaled to the drawn screen:
+  laid out in the small screen itself, it sized buttons from the window and the ✓ ran off the tablet. Record it in a
+  window of 1080p or more, where the game's sizes come out as on a tablet. A new button the story needs a grown-up to
+  tap gets its beat in `PARENTS_SCRIPT` (`parentsScript.test.ts` checks the buttons it taps exist).
+
+- „Junge / Mädchen“ on the home page changes nothing here: the child of the story is Tapsi, an animal in Gemini
+  pictures (root `CLAUDE.md`: animals stay as they are, and a painted picture is never made a second time for the
+  figure), and the game's own svg (clock, mouse, bubble, week chart) draws no child. A girl Tapsi would mean the whole
+  story of about 50 pictures and their frames drawn again: that is idea H-88, **parked** (user decision, November 2026).
+  Never generate those pictures with others, never put them into the picture queue or a batch, and never offer them –
+  only when the user says in so many words to generate the pictures for „Töpfchen gehen“ for the girl.
 - Only Tapsi goes to the potty (the user's choice, to save pictures and tokens): every animal more would need the
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
 - The game is opened when the child has to go now: the tile starts the story at once, with no start screen or

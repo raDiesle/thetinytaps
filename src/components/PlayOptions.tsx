@@ -5,8 +5,11 @@ import { useHold } from "@/lib/hold";
 /** How long ⚙️ has to be held while playing before the options open: as long as ✕, so a child's tap does nothing. */
 const HOLD_MS = 500;
 
-/** How long the `intro` note stays as play starts, before it fades (`play-options-intro` in playing.css). */
-const INTRO_MS = 9000;
+/**
+ * How long the `intro` note stays as play starts, fade included (`play-options-intro` in playing.css): a short glance
+ * for grown-ups, then the picture is the child's again – 9 s lingered far too long (user feedback, November 2026).
+ */
+export const INTRO_MS = 4000;
 
 /**
  * A game's options while it plays, for grown-ups: ⚙️ in the top corner as a symbol only (its name just read out), always held

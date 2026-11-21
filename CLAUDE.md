@@ -16,6 +16,7 @@ bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rul
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
+bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
@@ -126,7 +127,9 @@ In a fresh worktree run `bun install` first.
   still link it. Never leave an idea half done: `partial` is only a note on a done (or rejected) idea of what was built,
   and what is really left becomes a new idea with the area's next number, while a rest that is only translations or
   recordings is no rest at all (`languageStatus.ts` and the voice list track those; `content.test.ts`). An idea the user
-  turns down gets `rejected: true` (kept, never deleted).
+  turns down gets `rejected: true` (kept, never deleted). An idea the user parks gets `parked: "<why, and the words that
+  start it>"` (🅿️ on `/management/`): it is never built, generated or recorded with other work, never put into a batch or
+  the picture queue and never offered – only done when the user says those words (H-88, user decision, November 2026).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
@@ -343,7 +346,10 @@ In a fresh worktree run `bun install` first.
   a story's end is celebrated by its picture and its sound (everyone in it cheering, the tune) and by its trophy handed
   over (see trophies below) – nothing rises there any more: the hearts, stars and notes of `celebrate`
   were replaced by the trophy (user decision, November 2026), and never a storm of confetti, shapes or fast movement.
-  `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). `tapFeedback.test.ts` keeps it
+  `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). The one place where a key or tap
+  is meant to set off a show is Frei tippen, where keys without a letter, number or job, and taps beside the card, open
+  a surprise (a firework, a present, an egg hatching, user request, November 2026) – one at a time, never a storm, and
+  never copied into another game's answers (`src/games/letters/CLAUDE.md`). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user
@@ -384,8 +390,12 @@ In a fresh worktree run `bun install` first.
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
-  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a small
-  paper sign nailed onto the shelf's right side above the loudspeaker (`TrophySign`, only once a trophy is won) – a tap
+  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a paper
+  sign with a big golden cup, nailed onto the post at the bottom right of the picture books' compartment (the second
+  board on a wide shelf) and reaching left into it over the books spine out (`TrophySign`, only once a trophy is won;
+  user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
+  sized by the books, `--trophy-sign`, and is the one thing on the shelf that moves by itself: two small glints flash on
+  the cup now and then, gently, as a trophy does in a game, each a tiny layer of its own, never a glow or a bounce) – a tap
   turns the eye to the right, a wall comes round with a door, it opens and one walks in – and by a tap on the trophy
   landed beside a level's end buttons, which opens the room at that trophy shown big. Inside it is a little museum in
   simple pseudo-3D using the whole screen (user request, November 2026): one walks into a hall with a door and a sign
@@ -424,7 +434,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   buttons with room to spare, a loud topic bubble; `choiceRows` in `src/lib/rounds.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
-  waiting starts to move after its first stage). In a game that plays
+  waiting starts to move after its first stage, and on the shelf the trophy sign's two glints). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
@@ -925,7 +935,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
-  be chosen there, that fades by itself after a few seconds, goes once the options were opened and lets taps through
+  be chosen there, that fades by itself after about four seconds (`INTRO_MS`; nine lingered far too long, user feedback, November 2026), goes once the options were opened and lets taps through
   (`PlayOptions.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
   grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
@@ -936,7 +946,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   paper's grain over them, `book.css`). While playing, the ✕ is the page's corner, lying flush in the screen's very corner with no gap to either edge, also
   on a phone with a camera cut-out or rounded corners: it never steps in by the safe area (that left a strip of the
   picture beside it), it grows by it instead (`--play-corner`, user feedback, November 2026; `MenuTop.test.ts`). Pictures of the fox and the bear family reading with their
-  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book – a tap on the sun turns its rays once round clockwise (user request, November 2026; `spinSunAt` in `Sky.tsx`, asked by `MenuRipples`, since the sky lies behind the page), with the rays a layer of their own.
+  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles (but the trophy sign's two glints, see trophies): the sky's clouds and rays stand still in the book – a tap on the sun turns its rays once round clockwise (user request, November 2026; `spinSunAt` in `Sky.tsx`, asked by `MenuRipples`, since the sky lies behind the page), with the rays a layer of their own.
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
   with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the

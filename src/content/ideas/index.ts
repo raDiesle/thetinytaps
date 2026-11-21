@@ -16,6 +16,7 @@ import { newGamesIdeas } from "./n-new-games";
 import { adventureIdeas } from "./m-adventure";
 import { littleAdventuresIdeas } from "./g-little-adventures";
 import { otherGamesIdeas } from "./x-other-games";
+import { teethIdeas } from "./x-teeth";
 import { marblesIdeas } from "./k-marbles";
 import { chainReactionIdeas } from "./r-chain-reactions";
 import { parentPhoneIdeas } from "./e-parent-phone";
@@ -30,13 +31,14 @@ import { bookIdeas } from "./d-book";
 import { matchingIdeas, recognisingIdeas } from "./z-matching";
 import { feelingsCheckInIdeas, feelingsIdeas } from "./c-feelings";
 import { feelingsGamesIdeas } from "./j-feelings-games";
+import { youtubeIdeas } from "./y-youtube";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
 export * from "./mascotStatus";
 export * from "./languageStatus";
 
-/** Areas sorted by what kind of work they are: grow a game, make a new one, or for parents. */
+/** Areas sorted by what kind of work they are: grow a game, make a new one, for parents, or making the site known. */
 export const IDEA_GROUPS: IdeaGroup[] = [
   {
     emoji: "🧱",
@@ -60,8 +62,20 @@ export const IDEA_GROUPS: IdeaGroup[] = [
   {
     emoji: "👪",
     title: "Für Eltern & Technik",
-    areas: [everydayHelpersIdeas, timerIdeas, pottyIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
+    areas: [
+      everydayHelpersIdeas,
+      timerIdeas,
+      pottyIdeas,
+      teethIdeas,
+      rewardChartIdeas,
+      figureIdeas,
+      bookIdeas,
+      parentPhoneIdeas,
+      firstVisitIdeas,
+      allGamesIdeas,
+    ],
   },
+  { emoji: "📣", title: "Bekannt machen", areas: [youtubeIdeas] },
 ];
 
 /** Every area in page order. */

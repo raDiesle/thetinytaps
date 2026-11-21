@@ -170,6 +170,14 @@ describe("ideas", () => {
   test("no open idea is partly done", () => {
     expect(ideas.filter(({ idea }) => idea.partial && !idea.done && !idea.rejected).map(({ idea }) => idea.id)).toEqual([]);
   });
+
+  // A parked idea waits for the user's own words, which it names (H-88: the girl's potty pictures); done or rejected
+  // it waits for nothing, and the mark would only mislead.
+  test("only open ideas are parked, each saying what starts it", () => {
+    const parked = ideas.filter(({ idea }) => idea.parked !== undefined);
+    expect(parked.filter(({ idea }) => idea.done || idea.rejected || !idea.parked?.includes("„")).map(({ idea }) => idea.id)).toEqual([]);
+    expect(parked.map(({ idea }) => idea.id)).toContain("H-88");
+  });
 });
 
 /** Every language's search texts besides German, as the build has them. */

@@ -1,0 +1,118 @@
+/* ---------- The frame every game's YouTube video is recorded in (VideoRecorder, /management/video-…/, for grown-ups) ---------- */
+
+/* The page is dark round a 16 : 9 stage as big as the window allows; only the stage is recorded (Region Capture). */
+.video-rec {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #111;
+  color: #2d2340;
+}
+
+/* While it plays the mouse pointer stays out of the picture. */
+.video-rec.running {
+  cursor: none;
+}
+
+.video-rec-stage {
+  position: relative;
+  width: min(100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  /* The game gives its own background (`stageStyle`), so the first frames before the play are not black. */
+  background: #fff4d6;
+}
+
+/* The choices before and the video after lie over the stage, and are gone before the recording starts. */
+.video-rec-card {
+  position: absolute;
+  inset: auto;
+  width: min(92vw, 640px);
+  max-height: 92dvh;
+  overflow: auto;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: #fffdf6;
+  box-shadow: 0 10px 40px #0008;
+  line-height: 1.4;
+}
+
+.video-rec-card h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.video-rec-card .menu-top {
+  float: left;
+  margin: 0 12px 4px 0;
+}
+
+.video-rec-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 10px 0 4px;
+}
+
+.video-rec-facts > div {
+  display: contents;
+}
+
+.video-rec-facts dt {
+  font-weight: 700;
+}
+
+.video-rec-facts dd {
+  margin: 0;
+}
+
+.video-rec-small {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.video-rec-warn {
+  color: #b3261e;
+}
+
+.video-rec-choice,
+.video-rec-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.video-rec-choice-label {
+  min-width: 7em;
+  font-weight: 700;
+}
+
+.video-rec-card button {
+  padding: 8px 16px;
+  border: 2px solid #c9bfa8;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.video-rec-card button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.video-rec-card button.chosen,
+.video-rec-card button.video-rec-go {
+  border-color: #e0a800;
+  background: #ffe27a;
+}
+
+.video-rec-preview {
+  width: 100%;
+  border-radius: 8px;
+  background: #000;
+}

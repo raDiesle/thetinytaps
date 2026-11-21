@@ -3,7 +3,9 @@ import { STAR_PATH } from "@/components/TapFeedback";
 import { useT } from "@/lib/language";
 import { playPuff, playRecorded, playSplash, playTwinkle } from "@/lib/sfx";
 import type { Cue } from "./cues";
+import { useFigure } from "@/lib/common";
 import type { Daytime } from "@/lib/days";
+import { PyjamaPattern, topFill } from "./clothes";
 import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
@@ -105,15 +107,13 @@ const ARM_SPREAD = 0.06;
  * four fingers curled round it, the thumb lying along the top.
  */
 function Fist({ daytime }: { daytime: Daytime }) {
-  const sleeve = daytime === "evening" ? "url(#prep-pyjama)" : "#8e7dff";
+  // The sleeve is the boy's or the girl's T-shirt, or pyjama in the evening (`clothes.tsx`).
+  const figure = useFigure();
+  const sleeve = topFill(figure, daytime, "prep-pyjama");
   return (
     <g stroke={INK} strokeWidth={4} strokeLinejoin="round">
       <defs>
-        <pattern id="prep-pyjama" width={36} height={36} patternUnits="userSpaceOnUse">
-          <rect width={36} height={36} fill="#3a4a9e" />
-          <circle cx={9} cy={9} r={4} fill="#ffe680" />
-          <circle cx={27} cy={27} r={3} fill="#fff" />
-        </pattern>
+        <PyjamaPattern id="prep-pyjama" figure={figure} />
       </defs>
       {/* Long enough to reach past the screen's edge however much of the sink shows, and wider further down: the arm
           comes towards us from the child standing in front of the sink, not up out of the basin. */}
