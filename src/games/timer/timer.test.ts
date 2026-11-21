@@ -115,6 +115,14 @@ describe("Timer", () => {
     expect(TIMER_SECONDS).toContain(DEFAULT_TIMER_SETTINGS.seconds as (typeof TIMER_SECONDS)[number]);
   });
 
+  test("every visit starts at 5 minutes: the length picked is never stored (user request, November 2026)", async () => {
+    expect(DEFAULT_TIMER_SETTINGS.seconds).toBe(300);
+    const game = await Bun.file(new URL("./TimerGame.tsx", import.meta.url)).text();
+    // The row's length and whether the own time is chosen live in `visitLength`, never in the stored settings.
+    expect(game).not.toMatch(/update\(\{[^}]*\b(seconds|useOwn)\b/);
+    expect(game).toMatch(/useState\(visitLength\)/);
+  });
+
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
     expect(TRAIN.x).toBeGreaterThanOrEqual(200);
     expect(TRAIN.stop + TRAIN.w).toBeLessThanOrEqual(1400 + 200);

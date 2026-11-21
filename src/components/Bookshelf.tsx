@@ -5,7 +5,7 @@ import { Logo } from "@/components/Logo";
 import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomOffline, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { TrophySign } from "@/components/TrophySign";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
+import { bookIdOf, CATEGORIES, hasPage, SHELF, shelfVolumes } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
@@ -129,7 +129,7 @@ for (const entry of SHELF) {
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
   };
-  const volumes = entry.game?.volumes?.map(
+  const volumes = (entry.game && shelfVolumes(entry.game))?.map(
     (v, i): ShelfBook => ({
       ...book,
       id: bookIdOf(v.href),
@@ -568,7 +568,11 @@ function Compartment({
       <span className="shelf-cell-ceiling" />
       <span className="shelf-cell-floor" />
       {ends && (
-        <div className="shelf-row" data-leads={leads || undefined} style={cell.lead ? ({ "--lead": `${cell.lead}px` } as CSSProperties) : undefined}>
+        <div
+          className="shelf-row"
+          data-leads={leads || undefined}
+          style={cell.lead || cell.pull ? ({ "--lead": `${cell.lead ?? 0}px`, "--pull": `${cell.pull ?? 0}px` } as CSSProperties) : undefined}
+        >
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
             <Spines count={stackLeft ? ends.left - ends.stack : ends.left} seed={seed} />

@@ -26,7 +26,7 @@ import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./pr
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
-import { teethSymbol } from "./symbols";
+import { type TeethSymbol, teethSymbol } from "./symbols";
 import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
@@ -186,6 +186,47 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
     if (elapsed < end) return p;
   }
   return prelude[prelude.length - 1];
+}
+
+/** The phases of the routine the bar shows apart: eating sweets, getting the brush, brushing, putting the brush away. */
+type BarPhase = "eat" | "fetch" | "ready" | "tidy";
+
+/** The symbol of each phase on the bar; the brushing has its frame with the riding brush and the clean tooth instead. */
+const PHASE_SYMBOL: Record<BarPhase, TeethSymbol | null> = { eat: "bonbon", fetch: "zahnpasta", ready: null, tidy: "becher" };
+
+/**
+ * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush. The
+ * first look in the mirror with its 3, 2, 1 ends the tile before it, or stands alone when neither is shown.
+ */
+function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }[] {
+  const tiles: { phase: BarPhase; parts: Prelude[] }[] = [];
+  const eat = prelude.filter((p) => p === "sweets" || p === "grow");
+  const fetch = prelude.filter((p) => p === "brush" || p === "paste");
+  if (eat.length) tiles.push({ phase: "eat", parts: eat });
+  if (fetch.length) tiles.push({ phase: "fetch", parts: fetch });
+  if (tiles.length) tiles[tiles.length - 1].parts.push("monsters");
+  else tiles.push({ phase: "ready", parts: ["monsters"] });
+  return tiles;
+}
+
+/** A symbol of the bar, or its empty place while its picture is not made yet (never an emoji instead). */
+function BarSymbol({ name }: { name: TeethSymbol | null }) {
+  const src = name && teethSymbol(name);
+  return src ? <img className="teeth-symbol" src={src} alt="" draggable={false} aria-hidden /> : <span className="teeth-symbol" aria-hidden />;
+}
+
+/** One phase outside the brushing on the bar: its symbol beside a groove that fills as the time goes by. */
+function PhaseTile({ phase, now, done, title }: { phase: BarPhase; now: boolean; done: number; title: string }) {
+  return (
+    <span className={`teeth-tile ${phase}`}>
+      <BarSymbol name={PHASE_SYMBOL[phase]} />
+      <span className="teeth-lane">
+        <span className={`teeth-segment ${phase}${now ? " now" : ""}`} title={title}>
+          <span style={{ "--done": done } as CSSProperties} />
+        </span>
+      </span>
+    </span>
+  );
 }
 
 /**
@@ -432,9 +473,10 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   // jump into the middle of a part they would play it from its start while the clock, the song and the bar are further
   // on. Each of their animations belongs to the part shown (`at-<part>`), so all of them are set to where the clock is in it.
   useLayoutEffect(() => {
-    if (!jumps || !before) return;
+    // The sink at the end (tidying up) is such a part too, reached from the bar's last part.
+    const into = before ? elapsed - preludeStart(prelude, before) : ending === "tidy" ? brushed - totalMs - CHEER_MS : null;
+    if (!jumps || into === null) return;
     const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep)");
-    const into = elapsed - preludeStart(prelude, before);
     for (const animation of picture?.getAnimations({ subtree: true }) ?? []) animation.currentTime = into;
   }, [jumps]);
 
@@ -445,30 +487,43 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     [seek, prelude, introMs, stepStarts],
   );
 
-  /** The progress bar's parts on the clock, as [start, length] in ms: the time before the brushing (story, sink, mirror), then each step. */
-  const segments: [number, number][] = [[0, introMs], ...STEPS.map((_, k): [number, number] => [introMs + stepStarts[k], stepLength(k)])];
+  /**
+   * The progress bar shows the routine's four phases, each plainly apart (user feedback, November 2026: a sweet at the
+   * start and a tooth at the end said nothing of what each part is): eating sweets (the story), getting the brush with
+   * its toothpaste (the sink), the brushing itself – its steps in a frame of their own, the brush riding along them to
+   * the clean tooth – and putting the brush away at the end. Each part is [start, length] on the clock, in ms.
+   */
+  const tiles = preludeTiles(prelude);
+  const tileParts: [number, number][] = tiles.map(({ parts }) => [preludeStart(prelude, parts[0]), parts.reduce((sum, p) => sum + PRELUDE[p].ms, 0)]);
+  const stepParts = STEPS.map((_, k): [number, number] => [introMs + stepStarts[k], stepLength(k)]);
+  const tidyPart: [number, number] = [introMs + totalMs, ENDING_MS];
+  /** Every `.teeth-segment` of the bar in its order, as tapping and dragging find them. */
+  const segments: [number, number][] = [...tileParts, ...stepParts, tidyPart];
+  /** How far through a part the clock is, 0 to 1. */
+  const share = ([start, length]: [number, number]) => Math.max(0, Math.min(1, (elapsed - start) / length));
 
   /**
-   * Where the toothbrush rides on the bar: the part it is in and how far through it, as one number (2.5 is halfway
-   * through the third part). The parts are equally wide, so `teeth.css` turns it into a place without measuring.
+   * Where the toothbrush rides in the brushing's frame: the step it is in and how far through it, as one number (2.5 is
+   * halfway through the third step); afterwards it stands at the clean tooth. The steps are equally wide, so
+   * `teeth.css` turns it into a place without measuring.
    */
-  const runnerPart = before ? 0 : done ? segments.length - 1 : phase + 1;
-  const runnerShare = before ? elapsed / introMs : done ? 1 : (brushed - stepStarts[phase]) / stepLength(phase);
+  const runnerPart = done ? STEPS.length - 1 : Math.max(0, phase);
+  const runnerShare = done ? 1 : phase < 0 ? 0 : (brushed - stepStarts[phase]) / stepLength(phase);
   const runnerAt = {
-    "--parts": segments.length,
+    "--parts": STEPS.length,
     "--part": runnerPart,
     "--at": Math.round((runnerPart + Math.max(0, Math.min(1, runnerShare))) * 1000) / 1000,
   } as CSSProperties;
 
   /**
-   * Tapping or dragging on the progress bar jumps to the start of the section under the finger (`sectionStart`), before
-   * or while brushing: a step, or a part of the time before it. Dragging jumps only when it reaches another section, so
-   * a section is never started again and again under a moving finger.
+   * Tapping or dragging on the progress bar jumps to the start of the section under the finger (`sectionStart`), before,
+   * while or after brushing: a part of the prelude, a step, or the end's cheer and tidying. Dragging jumps only when it
+   * reaches another section, so a section is never started again and again under a moving finger.
    */
-  const sectionStarts = [...prelude.map((p) => preludeStart(prelude, p)), ...STEPS.map((_, k) => introMs + stepStarts[k])];
+  const sectionStarts = [...prelude.map((p) => preludeStart(prelude, p)), ...stepParts.map(([start]) => start), tidyPart[0]];
   const lastSection = useRef<number | null>(null);
   const seekFromPointer = (e: PointerEvent<HTMLDivElement>, first: boolean) => {
-    const parts = [...e.currentTarget.querySelectorAll(":scope > .teeth-segment")];
+    const parts = [...e.currentTarget.querySelectorAll(".teeth-segment")];
     // Standing at the picture's side on a wide screen (teeth.css), the bar runs from top to bottom.
     const upright = getComputedStyle(e.currentTarget).flexDirection === "column";
     const along = upright ? e.clientY : e.clientX;
@@ -479,7 +534,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     const rect = parts[i].getBoundingClientRect();
     const k = Math.max(0, Math.min(1, upright ? (e.clientY - rect.top) / rect.height : (e.clientX - rect.left) / rect.width));
     const [start, length] = segments[i];
-    const target = sectionStart(Math.min(start + k * length, introMs + totalMs - 1), sectionStarts);
+    const target = sectionStart(Math.min(start + k * length, introMs + totalMs + ENDING_MS - 1), sectionStarts);
     if (!first && target === lastSection.current) return;
     lastSection.current = target;
     seek(target);
@@ -574,13 +629,11 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
 
       {/* The buttons and the week's new star wait until the brush is put away. A video shows only the picture: no
           controls, no week, no buttons and no trophy, whose end would hand it over. */}
-      {video ? null : done ? (
-        ending === "rest" && (
-          <div className="teeth-end">
-            {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-            <GameEnd inline menu />
-          </div>
-        )
+      {video ? null : ending === "rest" ? (
+        <div className="teeth-end">
+          {settings.week && <Week log={week} today={new Date()} now={daytime} />}
+          <GameEnd inline menu />
+        </div>
       ) : (
         <>
           {/* The week shows before brushing too, which star is to come (not during the story, nor on a phone, where the pictures need the room); while brushing, the mouth gets its room. */}
@@ -601,14 +654,13 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
             >
               <ControlIcon kind="again" className="teeth-button-icon" />
             </button>
-            {teethSymbol("bonbon") && <img className="teeth-symbol" src={teethSymbol("bonbon")} alt="" draggable={false} aria-hidden />}
             <div
               className="teeth-progress"
               role="slider"
               aria-label={t({ de: "Fortschritt", en: "Progress", zh: "进度", hi: "प्रगति", es: "Progreso", ar: "التقدّم", ru: "Сколько уже почищено" })}
               aria-valuemin={0}
-              aria-valuemax={Math.round((introMs + totalMs) / 1000)}
-              aria-valuenow={Math.round(Math.max(0, Math.min(elapsed, introMs + totalMs)) / 1000)}
+              aria-valuemax={Math.round((introMs + totalMs + ENDING_MS) / 1000)}
+              aria-valuenow={Math.round(Math.max(0, Math.min(elapsed, introMs + totalMs + ENDING_MS)) / 1000)}
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
                 seekFromPointer(e, true);
@@ -617,27 +669,40 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
                 if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e, false);
               }}
             >
-              {/* Before the brushing: the story, the sink and the first look in the mirror, a part of its own with its own time. */}
-              <span className={`teeth-segment intro${before ? " now" : ""}`} title={prelude.map((p) => t(PRELUDE[p].title)).join(" · ")}>
-                <span style={{ "--done": Math.max(0, Math.min(1, elapsed / introMs)) } as CSSProperties} />
-              </span>
-              {STEPS.map((s, i) => (
-                <span
-                  key={i}
-                  className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}
-                  title={`${stepText(s, "title", language).text} · ${stepText(s, "hint", language).text}`}
-                >
-                  <span style={{ "--done": Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i))) } as CSSProperties} />
-                </span>
+              {/* Before the brushing: eating sweets, then getting the brush (the first look in the mirror and 3, 2, 1 end the last of them). */}
+              {tiles.map(({ phase: kind, parts }, i) => (
+                <PhaseTile
+                  key={kind}
+                  phase={kind}
+                  now={before !== null && parts.includes(before)}
+                  done={share(tileParts[i])}
+                  title={parts.map((p) => t(PRELUDE[p].title)).join(" · ")}
+                />
               ))}
-              {/* The toothbrush rides along the bar to where the clock is: an HTML layer moved by its transform. */}
-              {teethSymbol("zahnbuerste") && (
-                <span className="teeth-runner" style={runnerAt} aria-hidden>
-                  <img src={teethSymbol("zahnbuerste")} alt="" draggable={false} />
-                </span>
-              )}
+              {/* The brushing itself: its steps in a frame of their own, the brush riding along them to the clean tooth. */}
+              <div className="teeth-brushing">
+                <div className="teeth-lane teeth-track">
+                  {STEPS.map((s, i) => (
+                    <span
+                      key={i}
+                      className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}
+                      title={`${stepText(s, "title", language).text} · ${stepText(s, "hint", language).text}`}
+                    >
+                      <span style={{ "--done": share(stepParts[i]) } as CSSProperties} />
+                    </span>
+                  ))}
+                  {/* An HTML layer moved by its transform to where the clock is; it comes with the brushing, so before it nothing lies over the groove of getting the brush. */}
+                  {!before && teethSymbol("zahnbuerste") && (
+                    <span className="teeth-runner" style={runnerAt} aria-hidden>
+                      <img src={teethSymbol("zahnbuerste")} alt="" draggable={false} />
+                    </span>
+                  )}
+                </div>
+                <BarSymbol name="zahn" />
+              </div>
+              {/* After the brushing: the cheer at the clean teeth, then the brush rinsed and put back in its cup. */}
+              <PhaseTile phase="tidy" now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />
             </div>
-            {teethSymbol("zahn") && <img className="teeth-symbol goal" src={teethSymbol("zahn")} alt="" draggable={false} aria-hidden />}
             {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it
                 starts, then the brushing time left – two clocks in one place. */}
             {before ? (

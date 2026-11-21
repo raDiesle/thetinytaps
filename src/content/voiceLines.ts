@@ -60,6 +60,9 @@ import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { KITA_STORY } from "@/games/kitastory/kitaStory";
 import { HAIR_STORY } from "@/games/hairstory/hairStory";
+import { NIGHT_MILK } from "@/games/nightmilk/nightMilk";
+import { BOTTLE_STORY } from "@/games/bottlestory/bottleStory";
+import { BED_STORY } from "@/games/bedstory/bedStory";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
 import { PACIFIER_STORY } from "@/games/pacifierstory/pacifierStory";
 import { DONE_SAY, TIDY_SAY } from "@/games/teeth/lines";
@@ -73,6 +76,9 @@ import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import kitaFiles from "../games/kitastory/stimme/*.mp3?glob";
 import hairFiles from "../games/hairstory/stimme/en/*.mp3?glob";
+import nightMilkFiles from "../games/nightmilk/stimme/en/*.mp3?glob";
+import bottleFiles from "../games/bottlestory/stimme/en/*.mp3?glob";
+import bedFiles from "../games/bedstory/stimme/en/*.mp3?glob";
 import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
 import pacifierFiles from "../games/pacifierstory/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
@@ -360,6 +366,7 @@ const MILK_CHAIN_TEXTS = byLanguage((texts) => texts.milkChain);
 const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
 const KITA_TEXTS = byLanguage((texts) => texts.kitaStory);
 const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
+const BOTTLE_TEXTS = byLanguage((texts) => texts.bottleStory);
 
 /**
  * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
@@ -569,6 +576,9 @@ const RECORDED = new Set(
     kitaFiles,
     // An English-first book is recorded in English first (`en-<hash>`): its hash is the line's, as German files' are.
     hairFiles,
+    nightMilkFiles,
+    bottleFiles,
+    bedFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4).replace(/^en-/, ""))),
 );
 
@@ -614,6 +624,9 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
     { href: "/kita/", groups: chapterBook(KITA_STORY, language, KITA_TEXTS) },
     { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, HAIR_TEXTS, "en") },
+    { href: "/abstillen/nachts/", groups: chapterBook(NIGHT_MILK, language, {}, "en") },
+    { href: "/flaeschchen/", groups: chapterBook(BOTTLE_STORY, language, BOTTLE_TEXTS, "en") },
+    { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, {}, "en") },
     {
       href: "",
       groups: [

@@ -41,6 +41,9 @@ export interface Budget {
 
 export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScreensPerS: 30 };
 
+/** Lebendige Bilder: the items of the picture, and a finger landing on one (an `eval` step defines `tapItem` with it). */
+const TAP_ITEMS = `((window.tapItem = (el) => { const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerType: "touch", isPrimary: true })); }), [...document.querySelectorAll("[data-item]")])`;
+
 /** Something done before a stretch is measured. */
 export type Step = { wait: number } | { waitFor: string } | { tap: string; optional?: boolean } | { key: string } | { eval: string };
 
@@ -176,7 +179,28 @@ export const SCENARIOS: Scenario[] = [
     path: "/zusammen/",
     parts: [{ label: "Was gehört zusammen?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
-  { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
+  {
+    name: "bilder",
+    path: "/bilder/flughafen/",
+    parts: [
+      { label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS },
+      // The end once all is found (B-21): the evening light fades in and everything bows in turn. From a reload, all
+      // items but one tapped and left to finish their own animations, then the last one, as a child finds it.
+      {
+        label: "Ende: Abendlicht und Verbeugung",
+        before: [
+          { eval: "location.reload()" },
+          { wait: 2500 },
+          { tap: ".screen-hint-button", optional: true },
+          { eval: `${TAP_ITEMS}.slice(1).forEach(tapItem)` },
+          { wait: 4000 },
+          { eval: `tapItem(${TAP_ITEMS}[0])` },
+          { wait: 700 },
+        ],
+        ms: 6000,
+      },
+    ],
+  },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "kita", path: "/kita/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },

@@ -27,11 +27,11 @@ export const TIMER_SECONDS = [10, 30, 60, 120, 180, 300, 600] as const;
 export interface TimerSettings {
   /** The picture played last, marked on its card; „Weiter“ goes on with the next. */
   picture: TimerPicture;
-  /** How long the timer runs in seconds, one of `TIMER_SECONDS`, unless `useOwn`. */
+  /** How long the timer runs in seconds, one of `TIMER_SECONDS`, unless `useOwn`. Chosen per visit, never stored: each visit starts at 5 minutes. */
   seconds: number;
   /** The time a grown-up set last behind „Andere …“ (H-59, H-60): it stays as a slip of its own in the row until another comes. */
   own: OwnTime | null;
-  /** Whether that own time is the one chosen, instead of `seconds`. */
+  /** Whether that own time is the one chosen, instead of `seconds`. Per visit like `seconds`, never stored. */
   useOwn: boolean;
   /** The toy in „Abwechseln“ (H-52). */
   toy: SwapToy;

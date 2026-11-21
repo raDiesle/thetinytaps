@@ -5,6 +5,9 @@ Route `/abstillen/` · idea H-44 · research „abstillen-kapitel“.
 The book „Abstillen“ among the Alltagshelfer (`MILK_CHAIN_BOOK`, a spine book of its own, playing at once): a weaning
 story in chapters (user request, 9 November 2026), read by a grown-up with the child chapter by chapter. It replaced a
 first, shorter SVG story „Tschüss, Mama-Milch“ that stood at this address (deleted on the user's request the same day).
+Since 21 November 2026 the book holds a second story, „The Milk Sleeps at Night“ (`/abstillen/nachts/`, H-104,
+`src/games/nightmilk`), for weaning only at night: a volume of this game (`volumes`), still unfinished until its pictures
+are made, then both stand tied together on the shelf.
 
 Tapsi the fox drank at Mama's breast as a baby and is big now; Mama tells why the milk may go, and over Tapsi's bed hangs
 a chain with one milk drop per milk time. Chapter by chapter one drop goes – the day's, the evening's, the night's and

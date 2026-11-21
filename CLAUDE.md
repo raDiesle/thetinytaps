@@ -131,8 +131,7 @@ In a fresh worktree run `bun install` first.
   should happen by itself (user request, 21 November 2026): a scheduled task starting a fresh cloud session each
   evening with „Run /paid-queue“ – scheduled tasks are off for the organization so far (an admin turns them on under
   Organization settings → Capabilities); create it once they are on. Whether anything is open for Claude Cloud is the
-  first thing on `/management/` (`CloudQueueStatus`, right under the title, `CloudQueueStatus.test.ts`), with the
-  queues' details further down. `scripts/paid-queue.mjs` refuses to start where the filter answers. A cloud session
+  first thing on `/management/` (`CloudQueueStatus`, right under the title, `CloudQueueStatus.test.ts`), each queue there one short line folded open to its whole list (🎙️ Stimmen, 🔊 Geräusche, 🖼️ Offene Bilder; user request, 21 November 2026: never a section of its own further down again). `scripts/paid-queue.mjs` refuses to start where the filter answers. A cloud session
   asked to work on the queue may start the paid run there – the rule against paid runs is for this Mac. The free parts
   still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). A job, picture or sound
   leaves its queue in the commit that brings its files.
@@ -502,7 +501,9 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   buttons with room to spare, a loud topic bubble; `choiceRows` in `src/lib/rounds.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
-  waiting starts to move after its first stage, and on the shelf the trophy sign's two glints). In a game that plays
+  waiting starts to move after its first stage, on the shelf the trophy sign's two glints, and in Lebendige Bilder a
+  few items waving one after the other before the first tap, B-15 – each with its own sound, softly, the one sound
+  allowed before a tap, user decision, November 2026). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
@@ -524,7 +525,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   (`VoiceSwitch` in `src/components/`, user decisions, November 2026) – Gefühle's „Alltagssituationen“ and the chapter
   books read aloud by Tapsi's voice (`ChapterBook`'s `voice`: Abstillen, Schnullerfee, Kita-Start, one switch for all
   three) – only there, never as a pattern for other games (`VoiceSwitch.test.ts`). Recordings are made only when the user asks (see Language).
-  What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
+  What still waits for its recording is listed on `/management/` (🎙️ Stimmen, a folded line in the Claude Cloud status at the top), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails when anything but `src/lib/voice.ts` takes `speak` from the speech module,
   and on a game with the fallback that is not on its list). Lines that wait for their recording and are said by nothing
@@ -639,7 +640,11 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   doesn't (a phone on its side has the room: only „Für Groß & Klein“ there left the board empty, user feedback, November
   2026). Its place is only as wide as its words need (a wider one left a gap beside them), plus the room the first
   helper's top needs where it leans left towards them (`LEAN_CLEAR`, `--lean-clear`: it reached over the sentence);
-  where there is room its first line grows to a heading (`cqw`), so the eye finds it (user request, November 2026);
+  it stands out by its place at the far left, a brighter light and colour (its first line in the book's red), never by
+  room made for it: its letters grow only into the room that is there anyway – from the board up to under the sign,
+  as wide as its place – (`cqw`, `cqh` of `.shelf-carving`, capped by the books' height), while the plan never widens
+  its place for them (user feedback, November 2026, twice: a heading that widened its place took the books' room;
+  `shelfLayout.test.ts` keeps the books nearly as big as without it);
   words added to it widen its place (`CARVINGS`), never spill past the board – measure its first and last line against
   its box at 1280×720 and 1920×1080 (the 3D push makes it look smaller than it is laid out). Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
@@ -971,9 +976,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   and stand centred under it. **Sign and words come first, at the top board's far left**, a gap from the post, and the
   everyday helpers follow at their right (user request, November 2026: a visitor looks at the left first, and this is
   what they should see first; at the far right by the stickers' wall it was found last): the plan keeps room for the sign
-  where it is wider than the words (`ShelfCell.lead`, `ShelfLayout.sign`, `signOver`), so it never covers a book to take
-  – the first helper leans towards it (`LEAN_CLEAR`) – and the books keep clear of the wall with the stickers
-  (`STICKERS_CLEAR`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
+  where it is wider than the words (`ShelfCell.lead`, `ShelfLayout.sign`, `signOver`) – after letting it reach half over
+  the left post (`SIGN_OVER_POST`) and narrowing the words at their right so they stay centred under it (`pull`), since
+  that room would come off the books – so it never covers a book to take – the first helper leans towards it
+  (`LEAN_CLEAR`) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
   board's right end (`data-leads`). A brighter, still light falls on sign and words (`.shelf-light.lead`) so they stand
   out, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
   off the books. Upright, the words stand before the helpers too. On an upright screen it
@@ -1044,7 +1050,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
   takes no tap –, keeps `noindex`, and its ✕ leads back to its book. Its
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
-  entry or route. `content.test.ts` checks it.
+  entry or route. `content.test.ts` checks it. A volume of a game still being built (a second story of a book, H-104's
+  night story in Abstillen) is marked on its line in `volumes` (`Volume.unfinished`, with its blurb for the management
+  page): no book on the shelf (`shelfVolumes`, a single book left stands alone), `noindex`, reached from „🚧 In Arbeit“.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
 - The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
@@ -1120,7 +1128,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`
   – always as cheap as it can be (user decision, November 2026): every picture asked for goes into the queue
-  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“) and `bun run image queue` makes only
+  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“, folded in the Claude Cloud status at the top) and `bun run image queue` makes only
   what is already as cheap as it gets; a picture whose shared sheet isn't full waits for later sessions, unless
   the user, asked in the session with the number of pictures short of their sheet, says to make it now. Never a
   picture generated alone where a sheet can hold it – unless the user says to make it faster (user decision, 12

@@ -72,6 +72,11 @@ export function playLullaby() {
   [5, 4, 2, 3, 1, 0].forEach((step, i) => note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }));
 }
 
+/** A soft, warm chord that rings out slowly, once: the end of a picture in the evening light (Lebendige Bilder). */
+export function playEvening() {
+  [0, 2, 4].forEach((step, i) => note({ from: PENTATONIC[step], duration: 2.2 - i * 0.2, type: "sine", volume: 0.09, delay: i * 0.18 }));
+}
+
 /** Funkel, funkel: quick high notes, like a star glittering. */
 export function playTwinkle() {
   [7, 5, 6, 4, 7].forEach((step, i) => note({ from: PENTATONIC[step] * 2, duration: 0.25, type: "sine", volume: 0.08, delay: i * 0.09 }));
