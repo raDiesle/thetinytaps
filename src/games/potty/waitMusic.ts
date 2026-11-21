@@ -69,6 +69,35 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();
 
+/** Fetches and decodes the waiting song sung for `appLanguage` (once); resolves with it, or null when there is none. */
+export function loadWaitSong(appLanguage: string): Promise<AudioBuffer | null> {
+  const lang = waitLanguageFor(appLanguage, Object.keys(SONGS));
+  if (!lang) return Promise.resolve(null);
+  if (!loading.has(lang)) loading.set(lang, loadSound(SONGS[lang]));
+  return loading.get(lang) ?? Promise.resolve(null);
+}
+
+/** How long one pass of the waiting song's repeating part lasts in `appLanguage`, in seconds; null while unknown (a song without `LOOPS`, or none). */
+export function waitLoopSeconds(appLanguage: string): number | null {
+  const lang = waitLanguageFor(appLanguage, Object.keys(SONGS));
+  const part = lang ? LOOPS[lang] : undefined;
+  return part ? part.loopEnd - part.loopStart : null;
+}
+
+/**
+ * When `passes` whole passes of the repeating `part` end, in ms after the song started at `offset` seconds into its file:
+ * the rest of the pass it is in, then whole passes – so a video's waiting never ends inside a verse.
+ */
+export const passesEndMs = (offset: number, part: { loopStart: number; loopEnd: number }, passes: number) =>
+  (part.loopEnd - offset + (passes - 1) * (part.loopEnd - part.loopStart)) * 1000;
+
+/** For a video (`PottyVideoRun`): the waiting ends after this many whole passes of the song, never inside one. */
+export interface WaitPasses {
+  passes: number;
+  /** Called at the end of the last pass, where the song would begin its first verse again. */
+  onEnd: () => void;
+}
+
 // The voice speaks from recordings, which the browser's speechSynthesis never sees: `talking()` knows both.
 const speaking = talking;
 
@@ -85,12 +114,14 @@ export function loopPosition(offset: number, startedAt: number, now: number, par
  * instead while there is no song or it still loads. It stops when `playing` ends, and while `paused` it stops and goes
  * on where it was (like the brushing song), starting from the top only for a new sitting.
  */
-export function useWaitingMusic(playing: boolean, paused: boolean, appLanguage: string) {
+export function useWaitingMusic(playing: boolean, paused: boolean, appLanguage: string, passes?: WaitPasses) {
   const lang = waitLanguageFor(appLanguage, Object.keys(SONGS));
   const [buffer, setBuffer] = useState<{ lang: string; buffer: AudioBuffer | null } | null>(null);
   const song = buffer?.lang === lang ? buffer.buffer : null;
   /** Where the song stood when it was paused, in seconds into its file; null to start from its loop's start. */
   const position = useRef<number | null>(null);
+  const passesRef = useRef(passes);
+  passesRef.current = passes;
   // After the song's cleanup kept where it stood: once sitting ends, the next sitting starts from the top.
   useEffect(() => {
     if (!playing) position.current = null;
@@ -100,14 +131,13 @@ export function useWaitingMusic(playing: boolean, paused: boolean, appLanguage: 
   useEffect(() => {
     if (!playing || !lang) return;
     let alive = true;
-    if (!loading.has(lang)) loading.set(lang, loadSound(SONGS[lang]));
-    void loading.get(lang)?.then((loaded) => {
+    void loadWaitSong(appLanguage).then((loaded) => {
       if (alive) setBuffer({ lang, buffer: loaded });
     });
     return () => {
       alive = false;
     };
-  }, [playing, lang]);
+  }, [playing, lang, appLanguage]);
 
   useEffect(() => {
     if (!playing || paused) return;
@@ -127,8 +157,12 @@ export function useWaitingMusic(playing: boolean, paused: boolean, appLanguage: 
       ducked = !ducked;
       loop?.fade(ducked ? DUCKED : VOLUME, ducked ? 0.25 : 0.8);
     }, DUCK_CHECK_MS);
+    // A video's waiting ends at the end of its last pass: from here to the end of this pass, then whole passes.
+    const end = passesRef.current;
+    const ending = end ? setTimeout(() => passesRef.current?.onEnd(), passesEndMs(offset, part, end.passes)) : undefined;
     return () => {
       clearInterval(timer);
+      clearTimeout(ending);
       loop?.stop();
       position.current = loopPosition(offset, startedAt, performance.now(), part);
     };
