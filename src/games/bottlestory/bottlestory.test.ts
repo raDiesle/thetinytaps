@@ -1,6 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import { BOTTLE_ORDER, BOTTLE_PAGES, BOTTLE_STEPS, BOTTLE_STORY } from "./bottleStory";
 import { BOTTLE, BOTTLE_PICTURE_QUEUE, bottlePicture } from "./bottleStoryPictures";
+import { BOTTLE_STORY_AR } from "./ar";
+import { BOTTLE_STORY_DE } from "./de";
+import { BOTTLE_STORY_ES } from "./es";
+import { BOTTLE_STORY_HI } from "./hi";
+import { BOTTLE_STORY_RU } from "./ru";
+import { BOTTLE_STORY_ZH } from "./zh";
+import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK, BOTTLE_STORY_TITLE } from "./names";
+
+/** Every translation of the story (user request, 21 November 2026: „übersetze alles in alle Sprachen“). */
+const TRANSLATIONS = { de: BOTTLE_STORY_DE, zh: BOTTLE_STORY_ZH, hi: BOTTLE_STORY_HI, es: BOTTLE_STORY_ES, ar: BOTTLE_STORY_AR, ru: BOTTLE_STORY_RU };
+
+/** Tapsi's name in each language's own script (root CLAUDE.md, Language). */
+const TAPSI = { de: "Tapsi", zh: "塔普西", hi: "टैप्सी", es: "Tapsi", ar: "تابسي", ru: "Тапси" };
 
 /** The chapter of a step, by its place in the story. */
 const chapterOf = (step: string) => BOTTLE_STORY.findIndex((c) => c.step === step);
@@ -113,6 +126,27 @@ describe("Bye-Bye, Bottle!", () => {
       const prompt = bottlePicture(page).prompt;
       if (/bottle/.test(page.picture)) expect(prompt, page.id).toContain(BOTTLE);
       for (const thing of ["green cup", "plush bunny", "box"]) if (page.picture.includes(thing)) expect(prompt, `${page.id}: ${thing}`).toMatch(/only one/);
+    }
+  });
+
+  // Translated on request: every language has every chapter and page, no more, and the name, the book and its line.
+  test("every language has every chapter, page and name", () => {
+    for (const [language, t] of Object.entries(TRANSLATIONS)) {
+      expect(Object.keys(t.chapters).sort(), language).toEqual(BOTTLE_STORY.map((c) => c.id).sort());
+      expect(Object.keys(t.pages).sort(), language).toEqual(BOTTLE_PAGES.map((p) => p.id).sort());
+      for (const text of [...Object.values(t.chapters), ...Object.values(t.pages)]) expect(text.trim().length, language).toBeGreaterThan(0);
+      for (const names of [BOTTLE_STORY_TITLE, BOTTLE_STORY_BOOK, BOTTLE_STORY_BLURB]) expect(names[language as keyof typeof names], language).toBeTruthy();
+    }
+  });
+
+  // Names the voice says are written in the language's own script, never in Latin letters inside a sentence of another
+  // script, and every page naming Tapsi in English names Tapsi in each translation too.
+  test("Tapsi in each script, no Latin letters in Russian, Chinese, Hindi and Arabic", () => {
+    for (const [language, t] of Object.entries(TRANSLATIONS)) {
+      const name = TAPSI[language as keyof typeof TAPSI];
+      for (const page of BOTTLE_PAGES) if (page.text.includes("Tapsi")) expect(t.pages[page.id], `${language} ${page.id}`).toContain(name);
+      if (["ru", "zh", "hi", "ar"].includes(language))
+        for (const text of [...Object.values(t.chapters), ...Object.values(t.pages)]) expect(text, language).not.toMatch(/[A-Za-z]/);
     }
   });
 });

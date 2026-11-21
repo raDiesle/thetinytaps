@@ -2,7 +2,7 @@
 
 Route `/flaeschchen/` · idea H-105 · research „flasche-abgewoehnen“.
 
-The book „Bottle to Cup“ among the Alltagshelfer (`BOTTLE_STORY_BOOK`, a spine book of its own, playing at once): a
+The book „Bottle to Cup“ („Flasche abgewöhnen“) among the Alltagshelfer (`BOTTLE_STORY_BOOK`, a spine book of its own, playing at once): a
 story in chapters like „Abstillen“, but for the bottle, and shorter (idea H-105, user request, 21 November 2026: „setze
 um in hoher Qualität Idee H-105“). It is read by a grown-up with the child over the days the bottles go: one chapter
 per step, the bedtime chapter on the evening the bedtime bottle goes.
@@ -26,15 +26,21 @@ the cup everywhere now, sometimes still thinks of the bottle and gets a cuddle, 
   change to how the book reads goes there, so every chapter book gets it. Tapsi's voice reads each page (`voice`, from
   `stimme/`, listed in `recordedLines.ts` as `flaeschchen`, recorded only when the user asks), and the loudspeaker
   switches it off (`VoiceSwitch`); a page without its recording stays silent.
-- `names.ts`: the book's name on the shelf, the story's title and its blurb (English only so far).
+- `names.ts`: the book's name on the shelf, the story's title and its blurb in every language.
+- `de.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language,
+  imported only by `src/content/texts/texts-<lang>.ts` and read with `byLanguage`.
 
 ## Rules
 
-- **English first, nothing translated yet** (root CLAUDE.md, Language): pages, title, book name and blurb are English;
-  German and the other languages come only when the user asks, then as `<language>.ts` here, loaded by
-  `texts-<language>.ts` into `texts.bottleStory` (like `hairstory/`), and `languageStatus.ts` says what is there. Its
-  search texts are in all seven languages already (they always are); the German one says the story is in English so far
-  – change that sentence once German comes.
+- **Written English first, translated on request** (root CLAUDE.md, Language): pages, title, book name and blurb were
+  written in English and translated the same day (21 November 2026, „übersetze alles in alle Sprachen“) into every app
+  language, German as one of them: `<language>.ts` here, loaded by `texts-<language>.ts` into `texts.bottleStory`, and
+  `names.ts`. A changed page is changed in English first and its translations deleted until made again (they fall back
+  to English, never German); `bottlestory.test.ts` checks every language has every chapter and page, Tapsi in its own
+  script (Тапси, 塔普西, टैप्सी, تابسي) and no Latin letters in Russian, Chinese, Hindi and Arabic. The rules for the
+  child's languages hold: Spanish without adjectives about Tapsi that change with gender („Tapsi es grande“, „tú y
+  yo“ rather than „juntos“), Russian without past-tense forms that show a gender, Arabic with „let's“ (هيّا) instead
+  of an imperative to the child. A new page needs its six translations again, when the user asks.
 - **The chapters follow the guides' steps in their order** (`BOTTLE_STEPS`, checked): tell beforehand, choose an open
   cup and practise, then one bottle after the other – the daytime bottle first, the morning's next, the bedtime bottle
   last (`BOTTLE_ORDER`, checked) –, the night, the goodbye. The last chapter only tells the story. The sources differ on
