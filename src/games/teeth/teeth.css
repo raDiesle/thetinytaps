@@ -456,10 +456,14 @@
 }
 
 .teeth-progress {
+  --gap: clamp(4px, 0.9vmin, 8px);
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.9vmin, 8px);
+  gap: var(--gap);
+  /* The toothbrush riding along measures the bar's width in cqw. */
+  container-type: inline-size;
   /* Room above and below the thin bar, so a finger hits it easily. */
   padding: 12px 0;
   cursor: pointer;
@@ -511,6 +515,41 @@
     0 2px 6px 2px #2a1e5c40;
 }
 
+/* The sweet at the start of the bar and the clean tooth at its end, small pictures from Gemini (`symbols.ts`). */
+.teeth-symbol {
+  flex: none;
+  width: clamp(34px, 7vmin, 50px);
+  height: clamp(34px, 7vmin, 50px);
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px #3d304540);
+}
+
+/* The toothbrush riding along the bar: a layer as small as the brush, moved by its transform to where the clock is
+   (`--at` parts of `--parts` equally wide ones, with the gaps between them), its head on that point. */
+.teeth-runner {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+  transform: translateX(calc((100cqw - var(--gap) * (var(--parts) - 1)) * var(--at) / var(--parts) + var(--gap) * var(--part)));
+  transition: transform 0.2s linear;
+}
+
+.teeth-runner > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(44px, 9vmin, 68px);
+  height: clamp(44px, 9vmin, 68px);
+  object-fit: contain;
+  translate: -82% -62%;
+  filter: drop-shadow(0 2px 2px #3d304559);
+}
+
 /* On a screen wider than tall – a phone on its side, a tablet, a computer – the controls stand as a slim, quiet strip
    along the left edge under the ✕, and the mouth gets the whole height beside them (user request, November 2026: the
    teeth and the brushing as big as the screen allows, the controls out of the way). The bar runs from top to bottom
@@ -547,10 +586,31 @@
     flex-direction: column;
     align-self: stretch;
     align-items: center;
-    gap: clamp(3px, 0.7vmin, 6px);
+    --gap: clamp(3px, 0.7vmin, 6px);
     min-height: 0;
     /* Room beside the thin bar, so a finger hits it easily. */
     padding: 4px 0;
+    /* Upright, the riding toothbrush measures the bar's height in cqh. */
+    container-type: size;
+  }
+
+  .teeth-symbol {
+    width: clamp(30px, 6vmin, 44px);
+    height: clamp(30px, 6vmin, 44px);
+  }
+
+  /* Upright the brush rides down the bar, turned so its head points down onto where the clock is. */
+  .teeth-runner {
+    top: 4px;
+    left: 50%;
+    transform: translateY(calc((100cqh - var(--gap) * (var(--parts) - 1)) * var(--at) / var(--parts) + var(--gap) * var(--part)));
+  }
+
+  .teeth-runner > img {
+    width: clamp(36px, 7vmin, 54px);
+    height: clamp(36px, 7vmin, 54px);
+    translate: -50% -82%;
+    rotate: 90deg;
   }
 
   .teeth-segment {

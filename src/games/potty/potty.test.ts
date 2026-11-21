@@ -1,9 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import {
   expectedWent,
-  iconFor,
   NOTHING_STEPS,
   picturesFor,
   POTTY_TEXTS,
@@ -14,6 +13,7 @@ import {
   FIRST_SCENES,
   scenesFor,
   STEPS,
+  symbolsFor,
   TAPSI,
   THOUGHT_FRAME_MS,
   MOUSE_AGAIN_MS,
@@ -24,11 +24,13 @@ import {
   type Which,
 } from "./content";
 import { CALL_PICTURE } from "./CallBubble";
+import { SYMBOL_EMOJI } from "./StripSymbol";
+import { SYMBOL_PICTURE_QUEUE } from "./symbolPictures";
 import { addStar } from "./stars";
 import { loopPosition, passesEndMs, waitLanguageFor, waitLanguageOf, waitLoopSeconds } from "./waitMusic";
 
 /** What the child can have said: a button each, or nothing yet. */
-const SAIDS: Said[] = [...SAID.map((s) => s.id), "unsure"];
+const SAIDS: Said[] = [...SAID, "unsure"];
 const WENTS: Went[] = ["pipi", "kaka", "both"];
 const WHICHES: Which[] = [...new Set([...SAIDS, ...WENTS])];
 /** The steps of both stories. */
@@ -48,7 +50,7 @@ describe("Aufs Töpfchen", () => {
       // „Was ist im Töpfchen?“ offers pipi and kaka only (the user's choice), and „nichts“ in a word.
       expect(Object.keys(texts.went).sort()).toEqual(["kaka", "pipi"]);
       expect(texts.nothingButton.trim()).not.toBe("");
-      for (const { id } of SAID) expect(texts.said[id].trim()).not.toBe("");
+      for (const id of SAID) expect(texts.said[id].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       // A new thought comes in German first; the game says it in German until it is translated (sayScene).
       for (const scene of WAIT_SCENES) if (texts === POTTY_TEXTS.de || scene.id in texts.scenes) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
@@ -58,7 +60,7 @@ describe("Aufs Töpfchen", () => {
 
   it("asks what the child said with one button each for pipi, kaka and both, and no ❓, since not knowing is both", () => {
     // ❓ was the same as 💧💩 to the user: a button that means what another one means only makes a grown-up think.
-    expect(SAID.map((s) => s.id)).toEqual(["pipi", "kaka", "both"]);
+    expect(SAID).toEqual(["pipi", "kaka", "both"]);
     expect(expectedWent("unsure")).toBe("both");
     const fixed = () => 0.5;
     expect(scenesFor("unsure", fixed)).toEqual(scenesFor("both", fixed));
@@ -154,8 +156,9 @@ describe("Aufs Töpfchen", () => {
     const need = STEPS.find((s) => s.id === "need")!;
     expect(picturesFor(need, "unsure")).toEqual(["blase", "bauch"]);
     expect(picturesFor(need, "kaka")).toEqual(["bauch"]);
-    expect(iconFor(need, "unsure")).toBe("❓");
-    expect(iconFor(need, "pipi")).toBe("💦");
+    // Not knowing is both, so the row shows both symbols, never a ❓.
+    expect(symbolsFor(need, "unsure")).toEqual(["pipi", "kaka"]);
+    expect(symbolsFor(need, "pipi")).toEqual(["pipi"]);
   });
 
   it("starts with eating and drinking taking turns in one step, and shows both endings when both came", () => {
@@ -163,7 +166,7 @@ describe("Aufs Töpfchen", () => {
     expect(picturesFor(STEPS[0], "unsure")).toEqual(["essen", "trinken"]);
     const done = STEPS.find((s) => s.id === "done")!;
     expect(picturesFor(done, "both")).toEqual(["fertig-pipi", "fertig-kaka"]);
-    expect(iconFor(done, "both")).toBe("💧💩");
+    expect(symbolsFor(done, "both")).toEqual(["pipi", "kaka"]);
     for (const texts of Object.values(POTTY_TEXTS)) expect(texts.steps.done(TAPSI.name.de, "both")).not.toBe(texts.steps.done(TAPSI.name.de, "pipi"));
   });
 
@@ -339,5 +342,24 @@ describe("Aufs Töpfchen", () => {
     // The parents' video (`demo`) shows no GameEnd either.
     expect(play).toMatch(/\{last && !video(?: && !demo)? && <GameEnd/);
     expect(play).toContain("if (video) return;");
+  });
+});
+
+describe("Symbols of the strips (Aufs Töpfchen, Zähne putzen)", () => {
+  const queued = new Set(SYMBOL_PICTURE_QUEUE.map((picture) => picture.file));
+  const has = (file: string) => existsSync(file) || queued.has(file);
+
+  it("every symbol of the potty's strip has its picture or waits for it in the queue", () => {
+    for (const name of Object.keys(SYMBOL_EMOJI)) expect(has(`src/games/potty/bilder/symbole/${name}.webp`), name).toBe(true);
+  });
+
+  it("every picture of the teeth's bar has its picture or waits for it in the queue", () => {
+    for (const name of ["bonbon", "zahnbuerste", "zahn"]) expect(has(`src/games/teeth/bilder/symbole/${name}.webp`), name).toBe(true);
+  });
+
+  it("every step of the story shows a symbol there is", () => {
+    for (const step of [...STEPS, ...NOTHING_STEPS]) {
+      for (const name of symbolsFor(step, "both")) expect(name in SYMBOL_EMOJI, `${step.id}: ${name}`).toBe(true);
+    }
   });
 });

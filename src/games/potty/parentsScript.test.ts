@@ -21,7 +21,7 @@ describe("the parents' video of Aufs Töpfchen (Y-29)", () => {
   it("taps only buttons the game has, the 💧 first among what was said", () => {
     for (const selector of Object.values(TARGET_SELECTORS))
       for (const name of selector.match(/\.pt-[a-z-]+/g) ?? []) expect(play).toMatch(new RegExp(`["\`\\s]${name.slice(1)}(?![\\w-])`));
-    expect(SAID[0].id).toBe("pipi");
+    expect(SAID[0]).toBe("pipi");
   });
 
   it("starts with a line and shows each line long enough to read", () => {

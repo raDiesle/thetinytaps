@@ -9,6 +9,7 @@ import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { HAIR_PICTURE_QUEUE } from "@/games/hairstory/hairStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
 import { READER_PICTURE_QUEUE } from "@/components/readerPictures";
+import { SYMBOL_PICTURE_QUEUE } from "@/games/potty/symbolPictures";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
 // here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet, or a
@@ -87,4 +88,5 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...HAIR_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,
   ...READER_PICTURE_QUEUE,
+  ...SYMBOL_PICTURE_QUEUE,
 ];

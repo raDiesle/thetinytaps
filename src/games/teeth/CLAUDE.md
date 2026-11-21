@@ -64,6 +64,11 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - What the child should see stays still long enough to be seen (at least a bar, 2.14 s) before it moves on; nothing whizzes across.
 - Every motion goes with the song (112 BPM): durations are beats (0.536 s), two beats or bars, and nothing loops faster than a beat (a tapped giggle may be quicker). Write new timings that way (`STROKE_S` in `brush.tsx`, the beat comment in `teeth.css`).
 - No words on the picture, ever – no heading („Süßes essen“, „Geschafft!“), no hint for grown-ups („Erbsengroß“, „Ausspucken“), no goodbye line (user feedback, November 2026): the picture, the song and the voice say it, the trophy handed over by `GameEnd` says „well done“ (no medal of its own: it was taken out for the trophy, user feedback, November 2026). The names of the prelude parts and the steps live in the progress bar's tooltips. `controls.test.ts` checks.
+- The bar's pictures (user request, November 2026: the strip should look nicer) are Gemini pictures from
+  `bilder/symbole/` (`symbols.ts`, queued with Aufs Töpfchen's in `src/games/potty/symbolPictures.ts`): a sweet before
+  the bar, the toothbrush riding along it to where the clock is (`.teeth-runner`, a small HTML layer moved by its
+  transform from `--at`, never a redraw) and a shining clean tooth at its end, the goal. Never an emoji in their place:
+  until its picture is made, a place stays empty. Tapping and dragging on the bar reads only its `.teeth-segment`s.
 - The controls are drawn signs (`ControlIcon`), never emoji (⏸️ ▶️ looked poor, user feedback, November 2026), and each says what it does at a glance: „Von vorn“ is a ring with a real arrowhead turning round (a bent hook didn't look like an arrow, user feedback, November 2026); the time before brushing shows where the brushing time does, as the first part of the progress bar with its own clock, never in a corner of its own.
 - Everything follows the clock, also after a jump on the progress bar: the picture plays on from the point tapped,
   never from the start of its part (user feedback, November 2026). The story's and the sink's pictures are CSS
