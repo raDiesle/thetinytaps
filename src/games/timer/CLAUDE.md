@@ -181,7 +181,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **A picture of taking turns plays out something toddlers know and do themselves** (user feedback, 21 November 2026:
   Tennis is poorly done – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
   the middle, the players standing stiff, the ball hopping above the racket instead of lying on it, the time only a row
-  of lights): a new one (better ideas in H-104 to H-113) shows a scene from their own day (a seesaw, a swing, a ball
+  of lights): a new one (better ideas in H-108 to H-117) shows a scene from their own day (a seesaw, a swing, a ball
   rolled to each other), seen so the change crosses the whole picture, with what passes over really held or sat on, and
   the time in the very motion where it can be – and it thinks of the waiting child, who should see its turn coming.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
