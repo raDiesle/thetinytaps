@@ -12,11 +12,11 @@ import { finishRoutineStep } from "@/lib/routine";
 import { useTimers } from "@/lib/timers";
 import { hush, recordedVoice } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
-import { daytimeOf } from "@/lib/days";
+import { type Daytime, daytimeOf } from "@/lib/days";
 import { addBrushing, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
-import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
+import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
 import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
@@ -55,6 +55,24 @@ const GO_MS = 1300;
 /** After the brushing: two bars of cheering at the clean grin, then the brush is rinsed and put away, then the buttons. */
 const CHEER_MS = 4290;
 const ENDING_MS = CHEER_MS + PREP_MS.tidy;
+/** A video recording ends at least this long after the brush is put away, so the last grin stays a moment. */
+const VIDEO_TAIL_MS = 3000;
+/** After the sung finale has rung out, the recording keeps the still grin this much longer, so the video doesn't end on the last note. */
+const VIDEO_AFTER_SONG_MS = 1000;
+
+/** The brushing played for a video (`TeethVideo`): the picture alone, with nothing to tap and nothing kept. */
+export interface VideoRun {
+  /** Morning or evening, chosen for the video instead of read from the clock. */
+  daytime: Daytime;
+  /** The brush is put away and the song has rung out: the recording can end. */
+  onFinished: () => void;
+}
+
+/** Loads the voice and the sounds of a whole brushing ahead, for a video recording, where nothing may come late. */
+export function preloadBrushing(language: string) {
+  voice.loadAll(language);
+  loadRecordings([...ORIGIN_RECORDINGS, ...PREP_RECORDINGS, ...TIDY_RECORDINGS, "cheer", "laugh"]);
+}
 
 /** The parts of the end: cheering at the clean teeth, tidying the brush away, and resting with the week chart and the buttons. */
 type Ending = "cheer" | "tidy" | "rest";
@@ -177,7 +195,7 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
  * and tapping the progress bar jumps there.
  */
-export function TeethPlay({ settings }: { settings: TeethSettings }) {
+export function TeethPlay({ settings, video }: { settings: TeethSettings; video?: VideoRun }) {
   // Everything shown and said follows the app language; a line without a translation is said in German with the German voice (spoken.ts).
   const language = useAppLanguage();
   const t = useT();
@@ -210,7 +228,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
-  const daytime = useMemo(() => daytimeOf(), [round]);
+  const daytime = useMemo(() => video?.daytime ?? daytimeOf(), [round]);
   const preludeCue = (p: Prelude) => {
     const cue = PRELUDE[p].cue;
     return cue ? spokenIn(cue, language) : daytimeText(daytime, "grow", language);
@@ -325,6 +343,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       later(() => playRecorded("cheer", playTusch), 700);
       // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
       if (!sung) say(spokenIn(DONE_SAY, language));
+      // A video's brushing is no child's: nothing goes on the week chart or the routine.
+      if (video) return;
       // A star on the week chart, whether or not it is shown, so it is complete when turned on.
       const next = addBrushing(loadWeek(), new Date(), daytime);
       saveWeek(next);
@@ -340,6 +360,14 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     if (sung) return;
     if (ending === "tidy") say(spokenIn(TIDY_SAY, language), true);
     if (ending === "rest") say(daytimeText(daytime, "after", language), true);
+    // Only when the end moves on.
+  }, [ending]);
+
+  // A video ends once the brush is put away and the sung finale has rung out (it lasts longer than the tidying).
+  useEffect(() => {
+    if (!video || ending !== "rest") return;
+    const songLeft = (songEndMs(sungIn, song.buffer) ?? 0) + VIDEO_AFTER_SONG_MS - (totalMs + ENDING_MS);
+    later(video.onFinished, Math.max(VIDEO_TAIL_MS, songLeft));
     // Only when the end moves on.
   }, [ending]);
 
@@ -488,7 +516,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     }));
 
   return (
-    <div className={`teeth-play ${daytime}${done ? " done" : ""}${paused ? " paused" : ""}`}>
+    <div className={`teeth-play ${daytime}${done ? " done" : ""}${paused ? " paused" : ""}${video ? " video" : ""}`}>
       {/* Before the picture, so it is there when the picture measures it. */}
       <div className="teeth-room" ref={room} />
       {/* A tap on the picture pauses, like the pause button (user request, November 2026); a tapped monster only giggles,
@@ -497,7 +525,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         className="teeth-stage"
         ref={stage}
         onPointerDown={() => {
-          if (!done && !paused) togglePause();
+          // In a video nothing on the picture answers a click: the recording must not stop by chance.
+          if (!video && !done && !paused) togglePause();
         }}
       >
         <Scenes id={`${round}-${scene}`} kind={scene} paused={paused}>
@@ -524,8 +553,9 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         </Scenes>
       </div>
 
-      {/* The buttons and the week's new star wait until the brush is put away. */}
-      {done ? (
+      {/* The buttons and the week's new star wait until the brush is put away. A video shows only the picture: no
+          controls, no week, no buttons and no trophy, whose end would hand it over. */}
+      {video ? null : done ? (
         ending === "rest" && (
           <div className="teeth-end">
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}

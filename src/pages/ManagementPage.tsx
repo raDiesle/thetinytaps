@@ -172,6 +172,8 @@ export function ManagementPage() {
       {/* To look at every trophy in the trophy room without playing: shown only for this visit of the page, nothing is stored. */}
       <p className="ideas-test-links">
         <Link to={`${MUSEUM_PATH}?${ALL_TROPHIES}`}>🏆 Alle Pokale im Pokalzimmer ansehen (zum Testen)</Link>
+        {" · "}
+        <Link to="/management/video-zaehne/">🎬 Zähne putzen fürs Video aufnehmen</Link>
       </p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt (nicht mehr

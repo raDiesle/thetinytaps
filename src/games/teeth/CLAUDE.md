@@ -17,6 +17,16 @@ Languages: everything follows the app language (German, English, Chinese, Hindi,
 The Tagesplan (`/tagesplan/`) opens this game for its 🪥 card (`src/lib/routine.ts`): the brushing starts at once,
 outside play time, and ✕ goes back to the plan, which the finished brushing ticks.
 
+For a YouTube video (user request, November 2026) `/management/video-zaehne/` (linked at the top of `/management/`,
+`TeethVideo.tsx`, noindex) plays the whole routine once on a 16 : 9 stage: `TeethPlay video` shows only the picture – no
+controls, week chart, end buttons or trophy, a click on the picture pauses nothing – and keeps nothing (no star, no
+routine step, no play time: a `/management` address is a tool for `PlaytimeLock`). Morning or evening is chosen there
+(`VideoRun.daytime`), language and child follow the shelf. In Chrome „🎬 Aufnehmen“ records its own tab with its sound
+(`getDisplayMedia` with `preferCurrentTab`, cut to the stage by Region Capture, `MediaRecorder` as MP4, else WebM) and
+saves the file once the sung finale has rung out (`songEndMs`); „▶ Nur abspielen“ plays in fullscreen for a recorder of
+one's own; Esc stops. Voice, sounds and song are fetched while the page is read (`preloadBrushing`), so nothing comes
+late in the video. A new thing shown beside the picture (a control, a chart, a button) stays out of the video.
+
 ## Rules
 
 - The child's face (the mirror in `mouth.tsx`, the story in `origin.tsx`) follows „Junge / Mädchen“ from the home page

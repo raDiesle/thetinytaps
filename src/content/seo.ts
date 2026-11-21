@@ -454,6 +454,7 @@ export const NO_INDEX_PATHS = [
   // The trophy room shows what this one child has won, nothing for a search.
   "/pokale/",
   "/management/bilder/",
+  "/management/video-zaehne/",
   "/ideen/",
   "/impressum/",
   "/datenschutz/",
