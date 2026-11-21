@@ -14,7 +14,7 @@ bun run lint       # Biome alone; bun run typecheck: tsc alone (both are part of
 bun run previews   # the menus' pictures of the games, see „Menus show pictures from the games“
 bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rules for every game
 bun run image ...  # picture with Gemini, see /bild-erzeugen
-bun run paid       # every approved paid request at once (voice queue, cheap pictures) – on a computer outside Zscaler, see Working here
+bun run paid       # every approved paid request at once (voice queue, cheap pictures) – in a Claude cloud session, outside Zscaler, see Working here
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
@@ -99,10 +99,16 @@ In a fresh worktree run `bun install` first.
   and never look for a way round the filter. What the user approves goes into a queue instead, in the same commit as
   the work that needs it: recordings as a job in `src/content/voiceQueue.ts` (parts, languages, the account and clone
   its voice lives in – `voiceQueue.test.ts` checks them), pictures into `src/content/pictureQueue.ts` as always. Then
-  merge into local main and tell the user to run `bun run paid` on the other computer (pull, `bun install`, the keys in
-  its shell, `bun run paid --dry` first; `scripts/paid-queue.mjs` refuses to start where the filter answers). The free
-  parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). Both queues are on
-  `/management/`. A job or picture leaves its queue in the commit that brings its files.
+  merge into local main (pushing stays the user’s move). **The queue runs in a Claude cloud session** (claude.ai/code,
+  user decision, 21 November 2026, first run that day): its container is outside Zscaler and its environment holds
+  `ELEVENLABS_API_KEY`, `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a
+  cloud session on the repo and asks it to run the open queue – there `bun install`, `bun run paid --dry`, `bun run paid`,
+  look at every picture made (`.image-raw/`), take the made jobs and pictures out of their queues in the commit that
+  brings their files, `bun run verify`, merge into main and push its branch. Another computer outside the filter works
+  the same way (pull, `bun install`, the keys in its shell). `scripts/paid-queue.mjs` refuses to start where the filter
+  answers. A cloud session asked to work on the queue may start the paid run there – the rule against paid runs is
+  for this Mac. The free parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`).
+  Both queues are on `/management/`. A job or picture leaves its queue in the commit that brings its files.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
