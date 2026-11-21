@@ -649,7 +649,8 @@ async function shellFiles() {
   const shell = [...new Set(["index.html", ...linked, ...pictures])];
   const megabytes = shell.reduce((sum, file) => sum + Bun.file(join(OUT, file)).size, 0) / 1e6;
   console.log(`service worker's start: ${shell.length} files, ${megabytes.toFixed(2)} MB`);
-  if (shell.length > MAX_SHELL.files || megabytes > MAX_SHELL.megabytes) {
+  // A readable build (`perf --profile`) keeps names and whitespace, so it weighs more than the real start: only measured.
+  if (minify === true && (shell.length > MAX_SHELL.files || megabytes > MAX_SHELL.megabytes)) {
     console.error(
       `build: the service worker's start is ${shell.length} files and ${megabytes.toFixed(2)} MB, over ${MAX_SHELL.files} files or ${MAX_SHELL.megabytes} MB: every first visit downloads it`,
     );

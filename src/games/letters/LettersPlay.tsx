@@ -14,6 +14,7 @@ import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
 import { SurpriseLayer, useSurprises } from "./Surprises";
 import { TWO_DIGIT_MAX, TWO_DIGIT_MIN, TWO_DIGIT_WORDS } from "./twoDigits";
+import { PageColor } from "./PageColor";
 import "./letters.css";
 
 /** A surprise's size: this share of the play area's shorter side, within these limits in px. */
@@ -623,7 +624,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
-    <div ref={root} className={`letters-play${dark ? " ft-dark" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div ref={root} className={`letters-play${dark ? " ft-dark" : ""}`} onPointerDown={onPlayAreaPointer}>
+      <PageColor color={background} />
       <div ref={stageBox} className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {firstDigit !== null && <HalfNumberCard key="half" first={firstDigit} />}

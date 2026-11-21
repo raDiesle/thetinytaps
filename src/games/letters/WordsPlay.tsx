@@ -15,6 +15,7 @@ import { bigKeyChoices, findableLetters, useKeyLevel } from "./fewKeys";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 import { useSoftTap } from "./softTap";
+import { PageColor } from "./PageColor";
 import "./letters.css";
 import "./words.css";
 
@@ -280,7 +281,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const typedColor = (i: number) => (color ? (done ? "#fff" : color.color) : BRIGHT_COLORS[i % BRIGHT_COLORS.length]);
 
   return (
-    <div className={`words-play${color && done ? " colored" : ""}${fewKeys ? " wb-play" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div className={`words-play${color && done ? " colored" : ""}${fewKeys ? " wb-play" : ""}`} onPointerDown={onPlayAreaPointer}>
+      <PageColor color={background} />
       <div className="stage">
         {color && done && (
           <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>

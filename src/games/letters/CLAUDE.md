@@ -174,3 +174,9 @@ the app language (🌐, `useLanguagePack()`), never in another one and never wit
 - "Wo ist das B?" only asks for letters with a key of their own on most keyboards (`findableLetters`: no umlauts, no Ё,
   no Ñ; in Hindi and Arabic the letters printed on the keyboard rows, none that needs Shift).
 - Each key pops a big card: `.card` has `will-change: transform, opacity` so the pop-in scales a finished layer (A-27, perf: 29.9 → 26 screens/s rastered, limit 30); a new big card that pops in does the same.
+- The page's colour, changing with each letter, number or word, lies on layers of its own (`PageColor`, `.lp-color`):
+  the new colour fades in by opacity over the one before, never as a `background` transition on `.letters-play` or
+  `.words-play`. That transition repainted and rastered the whole screen, keys and all, in every frame of its fade, and
+  once keys answered every ¼ s the page was fading nearly all the time: 54 screens/s rastered against a budget of 30,
+  1.8 with the layers (`bun run perf buchstaben`, November 2026; `css.test.ts` checks for background transitions). A
+  new play page of these games with a colour of its own takes `PageColor` too.

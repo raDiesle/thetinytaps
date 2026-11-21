@@ -16,6 +16,7 @@ import { LetterWord } from "./Cards";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
+import { PageColor } from "./PageColor";
 import "./letters.css";
 import "./find.css";
 
@@ -191,7 +192,8 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
     : [];
 
   return (
-    <div className={`letters-play${fewKeys ? " wb-play" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div className={`letters-play${fewKeys ? " wb-play" : ""}`} onPointerDown={onPlayAreaPointer}>
+      <PageColor color={background} />
       <div className="stage">
         {current && (
           <div key={current.id} className={`card find-card${found ? " done" : ""}`} data-tap onPointerDown={onCardPointer}>

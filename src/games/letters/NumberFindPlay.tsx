@@ -16,6 +16,7 @@ import { digitOf, drawNumber, type FindPace, HINT_AFTER_WRONG, NUMBER_FIND_PROMP
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
+import { PageColor } from "./PageColor";
 import "./letters.css";
 import "./find.css";
 
@@ -165,7 +166,8 @@ export function NumberFindPlay({ pack, settings }: { pack: LanguagePack; setting
   const lit = showHint || found ? String(current?.n) : undefined;
 
   return (
-    <div className="letters-play" style={{ background: BACKGROUNDS[(current?.id ?? 0) % BACKGROUNDS.length] }} onPointerDown={onPlayAreaPointer}>
+    <div className="letters-play" onPointerDown={onPlayAreaPointer}>
+      <PageColor color={BACKGROUNDS[(current?.id ?? 0) % BACKGROUNDS.length]} />
       <div className="stage">
         {current && (
           <div key={current.id} className={`card find-card nf-card${found ? " done" : ""}`} data-tap onPointerDown={onCardPointer}>
