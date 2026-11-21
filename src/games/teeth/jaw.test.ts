@@ -161,8 +161,8 @@ describe("insideBy", () => {
   });
 });
 
-// Seen from the side the lips are seen from the side, pulled back onto the teeth, and the front teeth stand out past
-// them with no lip in front (user feedback, November 2026).
+// Seen from the side the lips are seen from the side, and every tooth stays inside the mouth behind them, growing out of
+// its gum: front teeth standing out past the lips with no gum looked plainly wrong (user feedback, November 2026).
 describe("the mouth seen from the side", () => {
   const sideways = STEPS.filter((s) => Math.abs(s.view.yaw) >= 60);
 
@@ -175,12 +175,18 @@ describe("the mouth seen from the side", () => {
     for (const view of [GRIN_VIEW, ...STEPS.filter((s) => s.view.yaw === 0).map((s) => s.view)]) expect(profileOf(view)).toBe(0);
   });
 
-  test.each(sideways.map((s) => [s.id, s] as const))("%s: the lips end behind the front teeth's fronts", (_, step) => {
+  test.each(sideways.map((s) => [s.id, s] as const))("%s: the lips end in front of the front teeth, past their gums", (_, step) => {
     const model = buildMouth(step.view.open);
-    const fronts = model.teeth.filter((t) => t.id.n === 0).flatMap((t) => t.faces.flatMap((f) => f.points.map((p) => p[2])));
     const lips = viewedLips(model.lips, step.view);
     const middle = lips.filter((p) => Math.abs(p[0]) < 1e-6);
     expect(middle).toHaveLength(2);
-    for (const p of middle) expect(p[2]).toBeLessThan(Math.max(...fronts) - 10);
+    for (const jaw of ["upper", "lower"] as const) {
+      const points = model.teeth.filter((t) => t.id.n === 0 && t.id.jaw === jaw).flatMap((t) => t.faces.flatMap((f) => f.points));
+      const lip = middle.find((p) => (jaw === "upper" ? p[1] > 0 : p[1] < 0))!;
+      expect(lip[2]).toBeGreaterThan(Math.max(...points.map((p) => p[2])) + 5);
+      // A band of gum shows between the lip and the crowns.
+      if (jaw === "upper") expect(lip[1]).toBeGreaterThan(Math.max(...points.map((p) => p[1])) + 4);
+      else expect(lip[1]).toBeLessThan(Math.min(...points.map((p) => p[1])) - 4);
+    }
   });
 });

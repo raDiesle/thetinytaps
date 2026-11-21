@@ -1,3 +1,4 @@
+import { sectionStart } from "./seekBar";
 import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
@@ -47,8 +48,6 @@ const TURN_MS = 1600;
 const MOUTH_MS = 2100;
 /** How long the arrows on the lips show after the mouth has to open or close. */
 const ACTION_MS = 3500;
-/** Dragging on the progress bar stops this far before the end. */
-const SEEK_END_MS = 1000;
 /** The last seconds before the brushing are counted down big, with a drum roll. */
 const COUNTDOWN = 3;
 /** How long „Los!“ shows when the brushing begins. */
@@ -461,8 +460,14 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     "--at": Math.round((runnerPart + Math.max(0, Math.min(1, runnerShare))) * 1000) / 1000,
   } as CSSProperties;
 
-  /** Tapping or dragging on the progress bar jumps to that point, before or while brushing. */
-  const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
+  /**
+   * Tapping or dragging on the progress bar jumps to the start of the section under the finger (`sectionStart`), before
+   * or while brushing: a step, or a part of the time before it. Dragging jumps only when it reaches another section, so
+   * a section is never started again and again under a moving finger.
+   */
+  const sectionStarts = [...prelude.map((p) => preludeStart(prelude, p)), ...STEPS.map((_, k) => introMs + stepStarts[k])];
+  const lastSection = useRef<number | null>(null);
+  const seekFromPointer = (e: PointerEvent<HTMLDivElement>, first: boolean) => {
     const parts = [...e.currentTarget.querySelectorAll(":scope > .teeth-segment")];
     // Standing at the picture's side on a wide screen (teeth.css), the bar runs from top to bottom.
     const upright = getComputedStyle(e.currentTarget).flexDirection === "column";
@@ -474,8 +479,10 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     const rect = parts[i].getBoundingClientRect();
     const k = Math.max(0, Math.min(1, upright ? (e.clientY - rect.top) / rect.height : (e.clientX - rect.left) / rect.width));
     const [start, length] = segments[i];
-    // Stop just short of the end, so dragging to the right edge doesn't finish at once.
-    seek(Math.min(start + k * length, introMs + totalMs - SEEK_END_MS));
+    const target = sectionStart(Math.min(start + k * length, introMs + totalMs - 1), sectionStarts);
+    if (!first && target === lastSection.current) return;
+    lastSection.current = target;
+    seek(target);
   };
 
   useEffect(() => {
@@ -604,10 +611,10 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
               aria-valuenow={Math.round(Math.max(0, Math.min(elapsed, introMs + totalMs)) / 1000)}
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
-                seekFromPointer(e);
+                seekFromPointer(e, true);
               }}
               onPointerMove={(e) => {
-                if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e);
+                if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e, false);
               }}
             >
               {/* Before the brushing: the story, the sink and the first look in the mirror, a part of its own with its own time. */}

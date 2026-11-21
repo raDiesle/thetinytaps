@@ -23,3 +23,10 @@ test("every preloaded prelude recording has its file", () => {
   for (const name of [...ORIGIN_RECORDINGS, ...PREP_RECORDINGS, ...TIDY_RECORDINGS])
     expect({ name, file: existsSync(`src/lib/sounds/${name}.mp3`) }).toEqual({ name, file: true });
 });
+
+// The toothpaste going on gets no stars and no twinkle (user feedback, November 2026): the dab on the brush is enough.
+test("the toothpaste gets no twinkle, seen or heard", async () => {
+  const prep = await Bun.file("src/games/teeth/prep.tsx").text();
+  expect(prep).toMatch(/\bpaste: \[\],/);
+  expect(PREP_CUES.paste.some((c) => c.play.toString().includes("Twinkle"))).toBe(false);
+});
