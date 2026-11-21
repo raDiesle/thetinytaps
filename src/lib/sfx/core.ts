@@ -192,6 +192,13 @@ export function playRecorded(name: string, synth: () => void) {
     synth();
     return;
   }
+  playBuffer(buffer);
+}
+
+/** Plays a recording loaded elsewhere (`loadSound`) as a sound effect, slightly higher or lower each time. */
+export function playBuffer(buffer: AudioBuffer) {
+  const ac = audio();
+  if (!ac) return;
   const source = ac.createBufferSource();
   source.buffer = buffer;
   source.playbackRate.value = 0.96 + Math.random() * 0.08;

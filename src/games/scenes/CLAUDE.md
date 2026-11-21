@@ -5,14 +5,14 @@ Routes `/bilder/` (menu) and `/bilder/<id>/`. The menu has the mode as a choice 
 no „Über das Spiel“ and no „Einstellungen“ (`GameShell` with `startMode` and `leaveTo`), and ✕ and Esc go
 back to `/bilder/`.
 
-Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds and is counted – and at the party the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Straße malen" (see below); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
-badges in the picture; ⌨️ in the bottom left corner switches it off and on, kept for the next pictures); vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the party), and the season pictures `winter/`, `herbst/`, `ostern/`; every tap on the background brings something to life in `spots.tsx` (a thing of the background wrapped in `<Poke>` sways, wobbles, hops or glows; anywhere else the scene's `spots` say what comes out there – a gust of wind in the sky that bends the trees and blows the clouds along, a beetle crawling out of the floor tiles, a spider on the wall, a flower and butterfly from the meadow, a fish jumping out of the water; no speech, so nothing to translate); hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; leaves and snow on the ground and in the air for outdoor pictures in `weather.tsx`.
+Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; the „Geräusch-Rätsel“ below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds and is counted – and at the end the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Straße malen" (see below); "Freies Entdecken" with chain reactions and the end once all is found (see „The end of a picture“); tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
+badges in the picture; ⌨️ in the bottom left corner switches it off and on, kept for the next pictures); vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the evening light and the bows), and the season pictures `winter/`, `herbst/`, `ostern/`; every tap on the background brings something to life in `spots.tsx` (a thing of the background wrapped in `<Poke>` sways, wobbles, hops or glows; anywhere else the scene's `spots` say what comes out there – a gust of wind in the sky that bends the trees and blows the clouds along, a beetle crawling out of the floor tiles, a spider on the wall, a flower and butterfly from the meadow, a fish jumping out of the water; no speech, so nothing to translate); hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; leaves and snow on the ground and in the air for outdoor pictures in `weather.tsx`.
 
 ## Straße malen (idea N-43)
 
 Mode `road`, „🛣️ Straßen“ in the row. A line drawn with a finger or the mouse becomes a road, and a car, a tractor or a
 steam engine drives exactly along it, through bends and loops; at its end it honks, hops and waits. What it drives past
-wakes up like in the torch's light (moves, sounds, is counted), so the picture ends with the usual party.
+wakes up like in the torch's light (moves, sounds, is counted), so the picture ends as every picture does (see „The end of a picture“).
 - `lanes.ts`: the numbers and geometry (points, pose along the road, the smooth path, the vehicle's turn and mirror so it
   never drives upside down, the bend a key draws); `lanes.test.ts` checks them. `LaneLayer.tsx`: the roads, the three
   vehicles, the pointer handling and the frame loop; `lanes.css` (classes `lane-`).
@@ -27,6 +27,41 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
 - Everything is still once the vehicles wait: wheels turn only while driving, and the frame loop stops.
 - Its prompt is `roadPrompts` in `phrases.ts`, in every language.
 
+## Geräusch-Rätsel (idea B-02)
+
+Mode `sound`, „🔊 Sounds“ in the row (English first, its texts in `soundRiddle.ts`, a part of its own in
+`languageStatus.ts`). Only a sound plays – a dog barks, a digger rumbles – and the child taps who made it. The bubble at
+the top shows a loudspeaker and nothing to read; a tap on it plays the sound again, after `REPEAT_PAUSE_MS` (meanwhile
+it only ripples), and so does a key where the key badges are off. Every item with that sound is right (`needed: 1`);
+after `HINT_AFTER_MS` or two misses a ring marks one and the sound comes once more.
+- Only sounds a small child knows by ear are asked (`RIDDLE_SOUNDS`: animals, vehicles, a few things like the clock, the
+  toilet and the kettle), never a synthesized pop, boing or chime. An item that only borrows such a sound (the fox and
+  the seal barking like a dog, a washing machine on the digger's engine) goes on `BORROWED_SOUNDS`: it asks nothing, but
+  counts as right where another item asks its sound. A new item with a sound of the list is either what a child
+  pictures hearing it or goes on that list; every picture asks at least two sounds (`soundRiddle.test.ts`).
+- Its sounds come from ElevenLabs (user decision, 21 November 2026), one recording per sound in `geraeusche/` (its
+  README: prompt, cut, mono 44.1 kHz 64 kbit/s), made by a cloud session from `src/content/soundQueue.ts`. They are
+  fetched **only while the mode is on** (user request): `riddleSounds.ts`, imported by `ScenePlay` alone, whose
+  `loadRiddleSounds` is called only in the sound mode's start; the glob holds addresses, never the files. In the mode
+  the items sound with them too (`playRiddleSound`), so the answer sounds like the question; a sound without its
+  recording yet plays the usual one. The first sound waits for the page to lie still and for its recording (at most
+  `RIDDLE_WAIT_MS`).
+
+## The end of a picture (idea B-21)
+
+Once everything is found (Entdecken, Ausmalen, Taschenlampe, Straßen; `curtainCall` in `ScenePlay.tsx`, the numbers
+and the order in `curtainCall.ts`, `curtainCall.test.ts`): the light turns warm like an evening and stays so until
+„Nochmal“ (`.scene-evening`, an HTML layer over the items whose opacity alone fades in, `mix-blend-mode: multiply` so
+the drawing keeps its contrast), and everything found bows once, one after the other from left to right like actors at
+the end of a play – silently, then one soft warm chord (`playEvening`) once the last has bowed, and only then the
+trophy and the end's buttons (`curtainEndAt`). The bedtime picture goes dark instead (`goodNight`).
+- A bow moves the item's own layer, its `SceneLayer` svg, with the Web Animations API about the item's foot
+  (`layerPoint` turns the foot into the layer's pixels under `meet`), never the item's group inside its svg, which
+  would paint that svg again in every frame. `bun run perf bilder` measures it („Ende: Abendlicht und Verbeugung“).
+- All bows begin within a few seconds, however many things a picture has (`bowStep`), so the trophy comes after
+  about six seconds at most; never one sound per bow, never everything dancing at once (the old party, user idea B-21),
+  and nothing rising.
+
 ## Working on scenes
 
 - **Every picture is a chunk of its own** (perf analysis, November 2026: all pictures in one chunk were 1.6 MB of code,
@@ -34,14 +69,14 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
   picture by its entry in `catalog.ts` (`SCENE_ENTRIES`: id, emoji, German title, `load`); the game gets the picture
   itself only from `loadScene` / `loadedScene`. `index.ts`'s `SCENES` imports them all and is only for the tests and the
   management page – never import it in the game (`scenes.test.ts` checks, and that both lists agree). Whatever
-  another picture is needed for loads it ahead: a vehicle driving off loads the picture it drives to, the party the
+  another picture is needed for loads it ahead: a vehicle driving off loads the picture it drives to, the end the
   next picture for „Weiter“, and a visiting vehicle's own picture loads with the one it visits (`ScenesGame`).
 - **A picture is a stack of svgs, one per item** (A-28, November 2026: with all items in one svg an old phone painted
   the whole airport again in every frame while a tapped item moved – busy 84–96 %, now 43–53 %): the background's svg
   (`scene-svg`) holds only the still background and its colouring copy; each item, what background taps bring out,
   the overlay and the marks have a `SceneLayer` of their own, all full-size with the picture's viewBox, so the stack
   looks exactly like one svg. An item's layer is a layer of the graphics card while it plays or drives (`moving`), not
-  at the party, where dozens at once would fill an old phone's memory. Never put something that moves back into the
+  at the end, where dozens at once would fill an old phone's memory. Never put something that moves back into the
   background's svg (`layers.test.ts`), and since an item now lies in an svg of its own, its drawing must not rely on
   the background's ids or structure: a gradient, filter or clip path it uses is defined in its own drawing (the grey
   filter of colouring in is the one shared reference). Cropping an item's svg to its own box measured worse – don't.
@@ -74,7 +109,7 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
   plural grammar in questions, roads). `bun test` after every change to items.
 - The mode labels for the row on `/bilder/` are `SCENE_MODES` in `settings.ts`, so their languages count for this game in
   `languageStatus.ts`; a new mode comes with its label in English only (root `CLAUDE.md`, Language; `label` is a
-  `Localized`, German first, so far – the first English-only one makes it a `Texts` of `src/lib/language.ts`) and a part
+  `Texts`, as „🔊 Sounds“, kept in the mode's own file so its part of the language status covers it) and a part
   marking the gap there, German included. Keep labels
   short: all modes must fit in one row on a phone on its side (844 × 390), or the row wraps and pushes the pictures down
   („Straße malen“ is „🛣️ Straßen“ there for this). Check the row there after adding a mode.
@@ -109,7 +144,7 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
 - Grammar follows the translation, never the German: an item can be plural in a translation and not in German
   (санки, часы) and the other way round. `localize.ts` (`localizeScene`, `localizeItem`) gives ScenePlay,
   the menu and guests from other pictures the scene in the app language, German where the translation is missing or incomplete.
-- Every sentence the engine builds itself (prompts, praise, party, find and trait questions, wrong taps,
+- Every sentence the engine builds itself (prompts, praise, the end, find and trait questions, wrong taps,
   vehicles driving between pictures, labels) is in `phrases.ts`, one block per language; never put a
   German sentence into `ScenePlay.tsx` or `quests.ts`. Adjectives and verbs agree with the item's gender/plural
   (Russian `agree`, `esAgree`, `hiAgree`, `arAgree`); nothing said to the child depends on it being a boy or a girl
@@ -134,9 +169,9 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
   never the narration – and only when the user orders exactly that for Lebendige Bilder.
 - The picture keeps its count of what was found: „⭐ found/all“ (`scene-goal`) and the stars in Suchen (`find-stars`).
   Grown-ups need both (user decision, November 2026), though other games lost their stars; never remove them.
-- No options for grown-ups on a picture: what the start screen once offered (counting with a party, vehicles
+- No options for grown-ups on a picture: what the start screen once offered (counting to an end, vehicles
   driving into other pictures, hints in Fragen, the picture moving by itself, how the picture is set off, what
-  is said) is fixed – the party, the vehicles and the hints are always on, the picture never moves by itself.
+  is said) is fixed – the end, the vehicles and the hints are always on, the picture never moves by itself.
   The only choice is the mode, in the row on `/bilder/`; don't bring back a ⚙️ or ℹ️ for a picture, and put
   something a grown-up must switch while playing (like ⌨️) small into a corner of the picture.
 - Every tap on a picture brings something to life, never only a ripple: on an item its animation, on the

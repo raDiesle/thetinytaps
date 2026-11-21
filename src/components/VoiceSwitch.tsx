@@ -25,7 +25,7 @@ export const tapProps = (onTap: () => void) => ({
 /**
  * A wooden loudspeaker with a speech bubble in the bottom right corner, drawn like the shelf's loudspeaker for the
  * music, for grown-ups who would rather tell the story to the child in their own words. Only in Gefühle's
- * „Alltagssituationen“ and the chapter books read aloud (`ChapterBook`: Abstillen, Schnullerfee, Kita-Start; user
+ * „Alltagssituationen“ and the chapter books read aloud (`ChapterBook`: Abstillen, Schnullerfee, Kita-Start, Haare waschen, Fläschchen; user
  * decisions, November 2026) – no other game gets one. One tap switches the voice that tells the story off or on; the
  * sounds stay. Off, the bubble gives way to a red cross.
  */

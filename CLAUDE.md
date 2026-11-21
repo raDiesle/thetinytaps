@@ -1049,7 +1049,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
   takes no tap –, keeps `noindex`, and its ✕ leads back to its book. Its
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
-  entry or route. `content.test.ts` checks it.
+  entry or route. `content.test.ts` checks it. A volume of a game still being built (a second story of a book, H-104's
+  night story in Abstillen) is marked on its line in `volumes` (`Volume.unfinished`, with its blurb for the management
+  page): no book on the shelf (`shelfVolumes`, a single book left stands alone), `noindex`, reached from „🚧 In Arbeit“.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
 - The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;

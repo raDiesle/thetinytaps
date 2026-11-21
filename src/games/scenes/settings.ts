@@ -1,4 +1,5 @@
-import type { Localized } from "@/lib/language";
+import type { Texts } from "@/lib/language";
+import { SOUND_MODE_LABEL } from "./soundRiddle";
 
 /**
  * In menu order – Explore ("Freies Entdecken", the first and default): tap anything to see and hear it.
@@ -8,14 +9,15 @@ import type { Localized } from "@/lib/language";
  * keys, and what comes into the light wakes up.
  * Road ("Straße malen", idea N-43): a line drawn with the finger becomes a road, a car, tractor or train drives
  * along it and wakes what it passes, and honks at the end.
+ * Sound ("Geräusch-Rätsel", idea B-02): only a sound plays – who made it? (soundRiddle.ts)
  */
-export type SceneMode = "explore" | "colour" | "find" | "questions" | "torch" | "road";
+export type SceneMode = "explore" | "colour" | "find" | "questions" | "sound" | "torch" | "road";
 
 /** Modes in which the child looks for something that was asked. */
-export const isQuestMode = (mode: SceneMode) => mode === "find" || mode === "questions";
+export const isQuestMode = (mode: SceneMode) => mode === "find" || mode === "questions" || mode === "sound";
 
-/** Quest modes that can mark an answer; in find mode that would make it too easy. */
-export const hasHints = (mode: SceneMode) => mode === "questions";
+/** Quest modes that can mark an answer; in find mode, where the bubble shows the very thing, that would make it too easy. */
+export const hasHints = (mode: SceneMode) => mode === "questions" || mode === "sound";
 
 export interface ScenesSettings {
   /** Picked in the row above the pictures on `/bilder/`; a tap on a picture plays it in this mode. */
@@ -50,7 +52,7 @@ export function carryOverScenesSettings() {
 }
 
 /** The modes in the row above the pictures on `/bilder/`, in menu order, with their labels. */
-export const SCENE_MODES: { value: SceneMode; label: Localized }[] = [
+export const SCENE_MODES: { value: SceneMode; label: Texts }[] = [
   {
     value: "explore",
     label: {
@@ -66,7 +68,8 @@ export const SCENE_MODES: { value: SceneMode; label: Localized }[] = [
   { value: "colour", label: { de: "🖍️ Ausmalen", ru: "🖍️ Раскраска", en: "🖍️ Coloring", zh: "🖍️ 涂颜色", hi: "🖍️ रंग भरें", es: "🖍️ Colorear", ar: "🖍️ تلوين" } },
   { value: "find", label: { de: "🔍 Suchen", ru: "🔍 Поиск", en: "🔍 Find it", zh: "🔍 找一找", hi: "🔍 ढूँढें", es: "🔍 Buscar", ar: "🔍 بحث" } },
   { value: "questions", label: { de: "❓ Fragen", ru: "❓ Вопросы", en: "❓ Questions", zh: "❓ 问一问", hi: "❓ सवाल", es: "❓ Preguntas", ar: "❓ أسئلة" } },
+  { value: "sound", label: SOUND_MODE_LABEL },
   { value: "torch", label: { de: "🔦 Taschenlampe", ru: "🔦 Фонарик", en: "🔦 Flashlight", zh: "🔦 手电筒", hi: "🔦 टॉर्च", es: "🔦 Linterna", ar: "🔦 كشّاف" } },
-  // Short, so the six modes still fit in one row on a phone on its side (844 px).
+  // Short, so the seven modes still fit in one row on a phone on its side (844 px).
   { value: "road", label: { de: "🛣️ Straßen", ru: "🛣️ Дороги", en: "🛣️ Roads", zh: "🛣️ 画路", hi: "🛣️ सड़कें", es: "🛣️ Caminos", ar: "🛣️ طرق" } },
 ];

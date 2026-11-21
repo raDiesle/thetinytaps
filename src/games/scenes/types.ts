@@ -194,7 +194,7 @@ export interface Scene {
   chains?: SceneChain[];
   /**
    * Bedtime picture (explore mode): a tapped item says good night and stays asleep (class `asleep`),
-   * and once all are asleep the room goes dark (class `night` on the scene) instead of the party.
+   * and once all are asleep the room goes dark (class `night` on the scene) instead of the evening light and the bows.
    */
   bedtime?: boolean;
   /** Drawn above the items and not tappable, e.g. falling snow. */
