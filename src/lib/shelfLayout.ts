@@ -115,6 +115,13 @@ export interface ShelfCell extends ShelfRect {
    * the sign where it reaches left over the post (`SIGN_OVER_POST`).
    */
   pull?: number;
+  /**
+   * Where the top compartment is tall enough that the sign hangs above the everyday helpers' books, the most those books
+   * stand high, in px, so their tops keep clear under it (`UNDER_SIGN`). Then the board keeps no room beside the words
+   * for the sign (`lead`): it reaches over the books' tops instead, and they get that room – on a tablet the sign took
+   * half the board and left the helpers' spines too thin for their pictures (user feedback, November 2026).
+   */
+  tall?: number;
 }
 
 /** The plan of the shelf. */
@@ -161,6 +168,24 @@ export interface Sign {
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+/**
+ * The room kept between the sign and the tops of the everyday helpers' books under it, in book heights, where the sign
+ * hangs above them (`ShelfCell.tall`): they lean and tip out under a mouse, and never touch it.
+ */
+export const UNDER_SIGN = 0.08;
+
+/**
+ * Where the sign hangs above the everyday helpers, the room the carved words still get beside their own width, in book
+ * heights: without the sign's room beside them the first book, leaning towards them, reached into „Für Groß & Klein“.
+ */
+export const WORDS_BREATH = 0.15;
+
+/**
+ * How much wider the top board's books must get for the sign to hang above them rather than beside the words: under the
+ * sign they stand lower, so a few px more width was not worth it (on a laptop 3 px wider pictures cost 50 px of height).
+ */
+export const ABOVE_GAIN = 1.15;
 
 /** The planks' sizes for a shelf in a room of this size. */
 function frameFor(width: number, height: number): ShelfFrame {
@@ -274,13 +299,19 @@ function leadFor(sign: { width: number }, bh: number, words: number, post: numbe
  * right it keeps `LEAN_CLEAR` and the words' `pull`, so they stand centred under the sign.
  */
 function signOver(top: ShelfCell, bh: number, sign: Sign, carved: number, post: number): ShelfRect {
+  const y = signY(top, sign);
+  const start = top.x + 2 + BOOK_GAP * bh;
   const place = (carved * BOOK_ASPECT - LEAN_CLEAR) * bh + (top.lead ?? 0);
+  // Above the helpers' books it is centred over the words where it can be, else it reaches half over the post and on
+  // over the books' tops; the words keep their whole place.
+  if (top.tall !== undefined) return { x: Math.max(start + place / 2 - sign.width / 2, start - overhang(bh, post)), y, w: sign.width, h: sign.height };
   const pull = clamp(sign.width - place, 0, overhang(bh, post));
   if (pull > 0) top.pull = pull;
-  // On a low screen it hangs a little deeper, so the foxes on it stay on the screen (the shelf starts at its top).
-  const y = Math.max(top.y + top.h * SIGN_DIP - sign.height, sign.rise ?? 0);
-  return { x: top.x + 2 + BOOK_GAP * bh + (place - pull) / 2 - sign.width / 2, y, w: sign.width, h: sign.height };
+  return { x: start + (place - pull) / 2 - sign.width / 2, y, w: sign.width, h: sign.height };
 }
+
+/** How high the sign hangs over the compartment `top`: by `SIGN_DIP` into it, a little deeper on a low screen, so the foxes on it stay on the screen (the shelf starts at its top). */
+const signY = (top: ShelfRect, sign: Sign) => Math.max(top.y + top.h * SIGN_DIP - sign.height, sign.rise ?? 0);
 
 function planWide(width: number, height: number, spans: number[], legs: number, sign: Sign, carved: number): ShelfLayout {
   const count = spans.length;
@@ -297,7 +328,18 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     // the books: a few steps settle it.
     let plan = rowsOf(spans, rows, room, tier, true);
     for (let step = 0; step < 20; step++) plan = rowsOf(spans, rows, room, tier, true, leadFor(sign, plan.bhs[0], words, post));
-    return { rows, tier, ...plan };
+    const beside = { rows, tier, ...plan, tall: undefined as number | undefined };
+    if (!words || !sign.width) return beside;
+    // Or the sign hangs above the helpers' books, which then have the board but for a breath beside the words
+    // (`WORDS_BREATH`) and stand under it at least as high as a picture book: where that makes them clearly bigger.
+    let free = rowsOf(spans, rows, room, tier, true);
+    for (let step = 0; step < 10; step++) free = rowsOf(spans, rows, room, tier, true, WORDS_BREATH * free.bhs[0]);
+    const below = tier - (signY({ x: 0, y: crown, w: 0, h: tier }, sign) + sign.height - crown);
+    const top = Math.min(free.bhs[0], below / (1 + UNDER_SIGN));
+    if (top < plan.bhs[0] * ABOVE_GAIN) return beside;
+    const bhs = [top, ...free.bhs.slice(1)];
+    const middle = Math.max(...free.boards.map((books, r) => rowWidth(spanOf(spans, books), books.length, bhs[r])));
+    return { rows, tier, ...free, bhs, bh: Math.min(...bhs), middle, tall: below - UNDER_SIGN * top };
   };
   const plan = count > 1 ? prefer(option(2), option(1)) : option(1);
   const middle = Math.min(room, plan.middle);
@@ -321,7 +363,18 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     const lead = plan.leadOf(r);
     // The stickers on the top compartment's right wall.
     const things: ShelfThing[] | undefined = r === 0 ? ["figure"] : undefined;
-    cells.push({ x: mid, y, w: middle, h: plan.tier, books, bh: plan.bhs[r], ...(things && { things }), ...(lead > 0 && { lead }) });
+    const tall = r === 0 ? plan.tall : undefined;
+    cells.push({
+      x: mid,
+      y,
+      w: middle,
+      h: plan.tier,
+      books,
+      bh: plan.bhs[r],
+      ...(things && { things }),
+      ...(lead > 0 && { lead }),
+      ...(tall !== undefined && { tall }),
+    });
     if (r > 0) planks.push({ x: mid, y: y - board, w: middle, h: board });
   });
   const top = cells[SIDE_COLUMN.length];

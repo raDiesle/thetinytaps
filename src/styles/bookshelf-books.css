@@ -315,11 +315,12 @@
  */
 /*
  * They stand taller than the picture books (`DAILY_TALL`), as high as their compartment lets them be taken out
- * (`TAKE_OUT` of its height, `--ch`): their row is as wide as the board allows, so only their height can grow, and the
- * room above them stood empty while their pictures and names were too small to recognise (user feedback, November 2026).
+ * (`TAKE_OUT` of its height, `--ch`) and, where the sign hangs above them, no higher than keeps them clear under it
+ * (`--tall`, `ShelfCell.tall`): their row is as wide as the board allows, so only their height can grow, and the room
+ * above them stood empty while their pictures and names were too small to recognise (user feedback, November 2026).
  */
 .shelf-daily-books {
-  --sh: min(var(--ch, var(--bh)) * 0.9, var(--bh) * var(--daily-tall, 1));
+  --sh: min(var(--ch, var(--bh)) * 0.9, var(--bh) * var(--daily-tall, 1), var(--tall, 100vh));
   position: relative;
   display: flex;
   flex: none;
@@ -349,6 +350,15 @@
 
 .shelf-daily-books > :nth-child(even) {
   --lean: -10.5deg;
+}
+
+/*
+ * The first leans towards the carved words, which keep `LEAN_CLEAR` free for a book about a picture book high: standing
+ * taller (`--sh`), its foot moves right by what it leans further, or its top reached into „Für Groß & Klein“ on a tablet
+ * (November 2026).
+ */
+.shelf-daily-books > :first-child {
+  margin-left: max(0px, calc((var(--sh) - var(--bh)) * 0.3));
 }
 
 /* A book right of the tied books, which stand upright, leans on them less and stands off at its foot so as not to lean into them (`LEAN_ROOM`). */

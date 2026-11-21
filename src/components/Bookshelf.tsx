@@ -551,6 +551,8 @@ function Compartment({
   const style = {
     ...rect(cell),
     ...(cell.bh && { "--bh": `${cell.bh}px` }),
+    // Under the sign hanging above them, the everyday helpers' books stand no higher than this.
+    ...(cell.tall !== undefined && { "--tall": `${cell.tall}px` }),
     "--cw": `${cell.w}px`,
     "--ch": `${cell.h}px`,
     "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
