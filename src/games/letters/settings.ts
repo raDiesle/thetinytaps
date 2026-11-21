@@ -42,6 +42,8 @@ export interface LettersSettings {
   finishCounting: boolean;
   /** "all" and "count": a number shows its things first, its digit only when the same number is pressed again. */
   digitOnRepeat: boolean;
+  /** Frei tippen and Zählen: two keys make one number, 2 then 3 is 23, shown as rows of ten things (`twoDigits.ts`). */
+  twoDigits: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
   touchKeys: TouchKeysMode;
   /** „Wörter tippen“: which words. */
@@ -63,6 +65,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   numbers: "all",
   finishCounting: true,
   digitOnRepeat: false,
+  twoDigits: false,
   touchKeys: "auto",
   wordKind: "nouns",
   wordTyping: "spell",

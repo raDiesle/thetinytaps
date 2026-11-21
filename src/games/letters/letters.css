@@ -231,6 +231,34 @@
   font-size: min(22cqh, 24cqw);
 }
 
+/* Two-digit numbers: a row for each ten, sized so up to ten rows fit above the digits; see TensGrid in Cards.tsx. */
+.count-tens {
+  --tens-item: min(calc(52cqh / (var(--rows) * 1.2)), 4.6cqw, 14cqh);
+  /* The rest's row starts under the full ones, so the tens line up as on a counting frame. */
+  align-items: flex-start;
+  gap: calc(var(--tens-item) * 0.12);
+}
+
+.count-tens .count-row {
+  gap: calc(var(--tens-item) * 0.9);
+}
+
+.count-five {
+  display: flex;
+  gap: calc(var(--tens-item) * 0.15);
+}
+
+.count-tens .count-item {
+  font-size: var(--tens-item);
+}
+
+/* Two-digit numbers: the place where the second digit will stand, still empty. */
+.digit-slot {
+  width: 0.62em;
+  border-bottom: 0.08em dashed currentColor;
+  opacity: 0.35;
+}
+
 /* Counting by tapping: things wait pale until tapped, then hop and keep their number. */
 .count-tap {
   position: relative;
@@ -321,6 +349,14 @@
 
     .letters-play .card:not(.find-card) :is(.count-1, .count-2, .count-3) .count-item {
       font-size: min(50cqh, 14cqw);
+    }
+
+    .letters-play .card:not(.find-card) .count-tens {
+      --tens-item: min(calc(80cqh / (var(--rows) * 1.2)), 3.4cqw, 27cqh);
+    }
+
+    .letters-play .card:not(.find-card) .count-tens .count-item {
+      font-size: var(--tens-item);
     }
 
     .letters-play .card:not(.find-card) .count-badge {

@@ -206,6 +206,12 @@ export function LettersGame({ way }: { way: LettersWay }) {
                 },
               ]}
             />
+            {/* Two keys make one number (user request, November 2026): a two-digit number always shows everything at once. */}
+            <Toggle
+              label={t({ en: "Two-digit numbers: two keys make one number (2, then 3 is 23)" })}
+              checked={settings.twoDigits}
+              onChange={(twoDigits) => update({ twoDigits })}
+            />
             {/* Step by step and by tapping, the digit waits for more presses anyway. */}
             {(settings.numbers === "all" || settings.numbers === "count") && (
               <Toggle

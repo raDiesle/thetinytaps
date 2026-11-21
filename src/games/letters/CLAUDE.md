@@ -8,7 +8,15 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
 - Zählen, `/zaehlen/` (`LettersPlay.tsx` with `numbersOnly`): only numbers come – a digit shows itself, any other key
   without a meaning of its own (Space, Enter, arrows, Backspace keep theirs) brings a number from 1 to 9 by chance; on
   touch screens only the digit keys. With `digitOnRepeat` (for „Alles sofort“ and „Vorzählen“, in both games) a number
-  shows its things first and its digit only when the same number is pressed again right after.
+  shows its things first and its digit only when the same number is pressed again right after. With `twoDigits`
+  („Two-digit numbers“ behind ⚙️, in both games; user request, November 2026) two keys make one number
+  (`twoDigits.ts`): the first digit waits big beside an empty dashed place (`HalfNumberCard`, a soft note, no voice,
+  Backspace takes it back), the second makes the number – a leading 0 a one-digit number – and Zählen's keys by chance
+  bring 10–99. A two-digit number always shows everything at once, whatever „Zahlen“ says: its things in rows of ten,
+  each row two groups of five as on a counting frame, the rest's row starting under them (`TensGrid`), sized from the
+  stage so 99 fits on a phone on its side – counting 99 aloud or by tapping would be no game. Its word („twenty-three!“,
+  English first, `TWO_DIGIT_WORDS`) waits for its recording and stays silent until then; the second digit always
+  answers, while the same number again within `REPEAT_PAUSE_MS` stays quiet.
 - Mitmachen, `/mitmachen/` (`MovePlay.tsx`, `move.css`; L-15): a digit, or any other key for a number by chance, has a
   fox or bear child hop, clap or stamp that many times (the three take turns), alone; it
   invites first („Hüpf mit!“ – hop and clap from the pack's doing words, `joinIn`), then counts each one aloud with a
